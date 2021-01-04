@@ -9,25 +9,25 @@
               <form (ngSubmit)="signIn()" [formGroup]="form" novalidate>
                 <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
                   <mat-form-field>
-                    <mat-label>Username or email</mat-label>
+                    <mat-label i18n>Username or email</mat-label>
                     <input matInput required formControlName="username" autocomplete="username">
-                    <mat-error>
+                    <mat-error i18n>
                       Please provide a valid username
                     </mat-error>
                   </mat-form-field>
                   <mat-form-field>
-                    <mat-label>Password</mat-label>
+                    <mat-label i18n>Password</mat-label>
                     <input matInput required type="password" autocomplete="current-password" formControlName="password">
-                    <mat-error>
+                    <mat-error i18n>
                       Please provide a valid password
                     </mat-error>
                   </mat-form-field>
-                  <button mat-raised-button color="accent" [disabled]="form.invalid" type="submit">Sign In</button>
+                  <button mat-raised-button color="accent" [disabled]="form.invalid" type="submit" i18n>Sign In</button>
                 </div>
               </form>
               <div fxLayout="column" fxLayoutAlign="space-evenly center">
                 <br>
-                <b>Or sign in with</b>
+                <b i18n>Or sign in with</b>
                 <br>
               </div>
               <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
@@ -45,7 +45,7 @@
               <app-sign-up></app-sign-up>
               <div fxLayout="column" fxLayoutAlign="space-evenly center">
                 <br>
-                <b>Or register with</b>
+                <b i18n>Or register with</b>
                 <br>
               </div>
               <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
