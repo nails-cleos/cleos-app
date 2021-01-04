@@ -1,0 +1,104 @@
+<div fxLayout="row" fxLayoutAlign="center">
+  <div fxFlex.lt-sm="90%" fxFlex="80%" fxFlex.gt-lg="70%">
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z24"
+           matSort matSortActive="username" matSortDisableClear matSortDirection="desc">
+      <ng-container matColumnDef="position">
+        <th mat-header-cell *matHeaderCellDef> No.</th>
+        <td mat-cell *matCellDef="let user; let i = index;">
+          <div *ngIf="user.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
+          <ng-template #skeleton>
+            <div class="ssc-line"></div>
+          </ng-template>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Name</th>
+        <td mat-cell *matCellDef="let user">
+          <div *ngIf="user.id; else skeleton">{{user.firstName}} {{user.lastName}}</div>
+          <ng-template #skeleton>
+            <div class="ssc-line"></div>
+          </ng-template>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="username">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Username</th>
+        <td mat-cell class="column-large-text" *matCellDef="let user">
+          <div *ngIf="user.id; else skeleton">{{user.username}}</div>
+          <ng-template #skeleton>
+            <div class="ssc-line"></div>
+          </ng-template>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Email</th>
+        <td mat-cell class="column-large-text"  *matCellDef="let user">
+          <div *ngIf="user.id; else skeleton">{{user.email}}</div>
+          <ng-template #skeleton>
+            <div class="ssc-line"></div>
+          </ng-template>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="provider">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Provider</th>
+        <td mat-cell *matCellDef="let user">
+          <div *ngIf="user.id; else skeleton">{{user.provider}}</div>
+          <ng-template #skeleton>
+            <div class="ssc-line"></div>
+          </ng-template>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+        <td mat-cell *matCellDef="let user">
+          <div *ngIf="user.id; else skeleton">
+            <div *ngIf="!user.deleted; else deleteBlock">
+              <mat-icon
+                *ngIf="user.enabled || user.provider !== 'LOCAL'; else elseBlock">
+                check_circle_outline
+              </mat-icon>
+              <ng-template #elseBlock>
+                <mat-icon color="warn">pause_circle_outline</mat-icon>
+              </ng-template>
+            </div>
+            <ng-template #deleteBlock>
+              <mat-icon color="accent">delete_outline</mat-icon>
+            </ng-template>
+          </div>
+          <ng-template #skeleton>
+            <div class="ssc-line"></div>
+          </ng-template>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Actions</th>
+        <td mat-cell *matCellDef="let user">
+          <div *ngIf="user.id; else skeleton">
+            <button *ngIf="!user.deleted" mat-icon-button (click)="edit(user)">
+              <mat-icon color="primary">edit</mat-icon>
+            </button>
+            <button *ngIf="!user.deleted" mat-icon-button (click)="delete(user)">
+              <mat-icon color="warn">delete</mat-icon>
+            </button>
+            <button mat-icon-button (click)="sendInvite(user)"
+                    *ngIf="!user.deleted && !user.enabled && user.provider === 'LOCAL'">
+              <mat-icon color="primary">forward_to_inbox</mat-icon>
+            </button>
+          </div>
+          <ng-template #skeleton>
+            <div class="ssc-line"></div>
+          </ng-template>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+    <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+  </div>
+</div>

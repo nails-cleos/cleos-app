@@ -1,0 +1,69 @@
+<div class="flex-container" fxLayout="column">
+  <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" class="card-container">
+    <div fxFlex.lt-sm="80%" fxFlex="50%" fxFlex.gt-lg="40%">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Update User</mat-card-title>
+          <mat-card-subtitle *ngIf="user; else skeleton">{{user.firstName}} {{user.lastName}}</mat-card-subtitle>
+          <ng-template #skeleton>
+            <div class="ssc-line"></div>
+          </ng-template>
+        </mat-card-header>
+        <form (ngSubmit)="update()" [formGroup]="form" novalidate>
+          <mat-card-content *ngIf="user; else boxSkeleton">
+            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+              <mat-form-field>
+                <mat-label>Id</mat-label>
+                <input matInput disabled value="{{user.id}}">
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Username</mat-label>
+                <input matInput required formControlName="username" autocomplete="username">
+                <mat-error>
+                  Username is <b>required</b>
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Email</mat-label>
+                <input matInput required formControlName="email" autocomplete="username">
+                <mat-error *ngIf="email.hasError('email')">
+                  Provide a valid email
+                </mat-error>
+                <mat-error *ngIf="email.hasError('required')">
+                  Password is <b>required</b>
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>First name</mat-label>
+                <input matInput required formControlName="firstName" autocomplete="username">
+                <mat-error>
+                  First name is <b>required</b>
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Last name</mat-label>
+                <input matInput required formControlName="lastName" autocomplete="username">
+                <mat-error>
+                  Last name is <b>required</b>
+                </mat-error>
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+          <ng-template #boxSkeleton>
+            <div class="ssc-hr"></div>
+            <div class="ssc-square mb" style="height: 200px"></div>
+            <div class="ssc-hr"></div>
+          </ng-template>
+          <mat-card-actions *ngIf="user; else buttonSkeleton">
+            <div fxFlex></div>
+            <button mat-raised-button color="primary" [disabled]="form.invalid || form.pristine" type="submit">Update</button>
+            <button mat-raised-button color="accent" routerLink="/dashboard/users">Back</button>
+          </mat-card-actions>
+          <ng-template #buttonSkeleton>
+            <div class="ssc-head-line"></div>
+          </ng-template>
+        </form>
+      </mat-card>
+    </div>
+  </div>
+</div>
