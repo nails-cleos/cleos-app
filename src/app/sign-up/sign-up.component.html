@@ -1,0 +1,43 @@
+<form (ngSubmit)="register()" [formGroup]="form" novalidate>
+  <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+    <mat-form-field>
+      <mat-label>Username</mat-label>
+      <input matInput required formControlName="username" autocomplete="username">
+      <mat-error>
+        Username is <b>required</b>
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Email</mat-label>
+      <input matInput required formControlName="email" autocomplete="username">
+      <mat-error *ngIf="email.hasError('email')">
+        Provide a valid email
+      </mat-error>
+      <mat-error *ngIf="email.hasError('required')">
+        Password is <b>required</b>
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Password</mat-label>
+      <input matInput required type="password" autocomplete="current-password" formControlName="password">
+      <mat-error>
+        Password is <b>required</b>
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>First name</mat-label>
+      <input matInput required formControlName="firstName" autocomplete="username">
+      <mat-error>
+        First name is <b>required</b>
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Last name</mat-label>
+      <input matInput required formControlName="lastName" autocomplete="username">
+      <mat-error>
+        Last name is <b>required</b>
+      </mat-error>
+    </mat-form-field>
+    <button mat-raised-button color="accent" [disabled]="form.invalid" type="submit">Register</button>
+  </div>
+</form>

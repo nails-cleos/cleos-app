@@ -1,1 +1,61 @@
 /* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
+@import "skeleton-screen-css";
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+@media only screen and (max-width: 700px) {
+  .my-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+}
+
+.card-header-content {
+  position: -webkit-sticky; /* Safari */
+  position: sticky;
+  top: 85px;
+  z-index: 1;
+}
+
+table {
+  width: 100%;
+}
+
+.mat-column-position {
+  flex: 0 0 5%;
+  width: 5%;
+}
+
+.mat-column-actions {
+  flex: 0 0 15%;
+  width: 15%;
+}
+
+.mat-cell-position {
+  text-align: center;
+  justify-content:center;
+}
+
+.column-large-text {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 20% !important;
+  width: 20% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}

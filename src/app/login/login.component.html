@@ -1,0 +1,65 @@
+<div class="flex-container" fxLayout="column">
+  <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" class="card-container">
+    <div fxFlex.lt-sm="80%" fxFlex="50%" fxFlex.gt-lg="40%">
+      <mat-card>
+        <mat-tab-group>
+          <mat-tab label="Sign In">
+            <mat-card-content>
+              <!--          <div *ngIf="error | async" color="error">{{ error | async }}</div>-->
+              <form (ngSubmit)="signIn()" [formGroup]="form" novalidate>
+                <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+                  <mat-form-field>
+                    <mat-label>Username or email</mat-label>
+                    <input matInput required formControlName="username" autocomplete="username">
+                    <mat-error>
+                      Please provide a valid username
+                    </mat-error>
+                  </mat-form-field>
+                  <mat-form-field>
+                    <mat-label>Password</mat-label>
+                    <input matInput required type="password" autocomplete="current-password" formControlName="password">
+                    <mat-error>
+                      Please provide a valid password
+                    </mat-error>
+                  </mat-form-field>
+                  <button mat-raised-button color="accent" [disabled]="form.invalid" type="submit">Sign In</button>
+                </div>
+              </form>
+              <div fxLayout="column" fxLayoutAlign="space-evenly center">
+                <br>
+                <b>Or sign in with</b>
+                <br>
+              </div>
+              <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+                <button mat-button (click)="socialSignIn('google')">
+                  <img width="15px" style="margin-bottom:3px; margin-right:5px" alt="Google login"
+                       src="https://developers.google.com/identity/images/g-logo.png"/>
+                  Google
+                </button>
+                <button mat-button color="success" (click)="socialSignIn('facebook')">Facebook</button>
+              </div>
+            </mat-card-content>
+          </mat-tab>
+          <mat-tab label="Register">
+            <mat-card-content>
+              <app-sign-up></app-sign-up>
+              <div fxLayout="column" fxLayoutAlign="space-evenly center">
+                <br>
+                <b>Or register with</b>
+                <br>
+              </div>
+              <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+                <button mat-button (click)="socialSignIn('google')">
+                  <img width="15px" style="margin-bottom:3px; margin-right:5px" alt="Google login"
+                       src="https://developers.google.com/identity/images/g-logo.png"/>
+                  Google
+                </button>
+                <button mat-button color="success" (click)="socialSignIn('facebook')">Facebook</button>
+              </div>
+            </mat-card-content>
+          </mat-tab>
+        </mat-tab-group>
+      </mat-card>
+    </div>
+  </div>
+</div>
