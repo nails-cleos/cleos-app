@@ -4,13 +4,14 @@ import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../store/app.states';
 import { Observable, merge, of } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Clean, GetAll, DeleteUser, UserSelected } from '../store/user.actions';
+import { Clean, GetAll, DeleteUser, UserSelected, ResendToken } from '../store/user.actions';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../dialog/dialog.component';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { Pagination } from '../interfaces/pagination';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-users',
@@ -29,7 +30,8 @@ export class UsersComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(public dialog: MatDialog, private snackBar: MatSnackBar, private store: Store<AppState>, private cdRef: ChangeDetectorRef) {
+  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
+              private store: Store<AppState>, private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectUserState);
   }
 
@@ -95,8 +97,10 @@ export class UsersComponent implements OnInit, AfterViewInit {
   }
 
   delete(user: IUser): void {
+    const title = this.translate.instant('USER.DELETED.TITLE');
+    const content = this.translate.instant('USER.DELETED.CONTENT', {firstName: user.firstName, lastName: user.lastName});
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: {title: `Delete user`, content: `Are you sure to delete user ${user.firstName} ${user.lastName}`, value: user}
+      data: {title, content, value: user}
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -109,6 +113,18 @@ export class UsersComponent implements OnInit, AfterViewInit {
   }
 
   sendInvite(user: IUser): void {
-    console.log(user);
+    const title = this.translate.instant('USER.ACTIVATION_RESEND.TITLE');
+    const content = this.translate.instant('USER.ACTIVATION_RESEND.CONTENT', {firstName: user.firstName, lastName: user.lastName});
+    const dialogRef = this.dialog.open(DialogComponent, {
+      data: {title, content, value: user}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.store.dispatch(
+          new ResendToken(result.id)
+        );
+      }
+    });
   }
 }

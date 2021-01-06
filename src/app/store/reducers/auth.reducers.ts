@@ -19,6 +19,7 @@ export const initialState: State = {
 
 export function reducer(state = initialState, action: All): State {
   switch (action.type) {
+    case AuthActionTypes.SIGNUP_FAILURE:
     case AuthActionTypes.LOGIN_FAILURE: {
       return {
         ...state,
@@ -27,13 +28,13 @@ export function reducer(state = initialState, action: All): State {
       };
     }
     case AuthActionTypes.LOGIN_SUCCESS: {
-      console.log(action);
       return {
         ...state,
         isAuthenticated: true,
         user: action.payload.user,
         token: action.payload.tokenAccess,
-        errorMessage: null
+        errorMessage: null,
+        message: null
       };
     }
     case AuthActionTypes.SIGNUP_SUCCESS: {
@@ -42,16 +43,18 @@ export function reducer(state = initialState, action: All): State {
         isAuthenticated: false,
         user: action.payload,
         errorMessage: null,
-        message: `User ${action.payload.username} created. Check your email ${action.payload.email}`
+        message: action.payload.message
       };
     }
-    case AuthActionTypes.SIGNUP_FAILURE: {
+    case AuthActionTypes.ACTIVATE_ACCOUNT: {
       return {
         ...state,
-        errorMessage: action.payload.error.message,
-        message: null
+        isAuthenticated: false,
+        errorMessage: null,
+        message: action.payload.message
       };
     }
+    case AuthActionTypes.CLEAN:
     case AuthActionTypes.LOGOUT: {
       return initialState;
     }

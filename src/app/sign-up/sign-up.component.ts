@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { IUser, User } from '../interfaces/user';
 import { AppState, selectAuthState } from '../store/app.states';
 import { Store } from '@ngrx/store';
-import { SignUp } from '../store/auth.actions';
+import { SignUp, Clean } from '../store/auth.actions';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -56,11 +56,22 @@ export class SignUpComponent implements OnInit {
   subscribe(): void {
     this.getState.subscribe(state => {
       if (state.errorMessage || state.message) {
-        this.snackBar.open(state.errorMessage || state.message, 'OK', {
+        const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
           duration: 5000
         });
+
+        if (state.message) {
+          snackBarRef.afterDismissed().subscribe(() => {
+            this.clean();
+            location.reload(true);
+          });
+        }
       }
     });
+  }
+
+  clean(): void {
+    this.store.dispatch(new Clean());
   }
 
   register(): void {

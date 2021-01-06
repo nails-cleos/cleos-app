@@ -21,4 +21,4 @@ export class User implements IUser {
   }
 }
 
-export const PAGE_SIZE = 2;
+export const PAGE_SIZE = 10;

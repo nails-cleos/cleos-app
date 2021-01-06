@@ -10,8 +10,10 @@ import { environment } from '../../environments/environment';
 export class NoopInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const apiReq = req.clone({url: `${environment.baseUrl}/${req.url}`});
+    if (req.url.indexOf('i18n') === -1) {
+      req = req.clone({url: `${environment.baseUrl}/${req.url}`});
+    }
 
-    return next.handle(apiReq);
+    return next.handle(req);
   }
 }

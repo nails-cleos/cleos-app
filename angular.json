@@ -16,12 +16,6 @@
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
-      "i18n": {
-        "sourceLocale": "en-US",
-        "locales": {
-          "es": "src/locale/messages.es.xlf"
-        }
-      },
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
@@ -43,9 +37,6 @@
             "scripts": []
           },
           "configurations": {
-            "es": {
-              "localize": ["es"]
-            },
             "production": {
               "fileReplacements": [
                 {
@@ -83,9 +74,6 @@
           "configurations": {
             "production": {
               "browserTarget": "nails-app:build:production"
-            },
-            "es": {
-              "browserTarget": "nails-app:build:es"
             }
           }
         },

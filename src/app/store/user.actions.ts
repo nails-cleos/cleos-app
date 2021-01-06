@@ -9,6 +9,7 @@ export enum UserActionTypes {
   SAVE_USER = '[User] Save',
   USER_SAVE_SUCCESS = '[User] Save Success',
   USER_DELETE = '[User] Delete',
+  RESEND_USER_TOKEN = '[User] Resend user token',
   CLEAN = '[User] Clean'
 }
 
@@ -68,6 +69,13 @@ export class DeleteUser implements Action {
   }
 }
 
+export class ResendToken implements Action {
+  readonly type = UserActionTypes.RESEND_USER_TOKEN;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class Clean implements Action {
   readonly type = UserActionTypes.CLEAN;
 }
@@ -81,4 +89,5 @@ export type All =
   | SaveUser
   | UserSaveSuccess
   | DeleteUser
+  | ResendToken
   | Clean;

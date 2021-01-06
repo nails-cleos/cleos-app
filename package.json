@@ -4,7 +4,6 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "translate": "ng extract-i18n --output-path src/locale",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
@@ -25,6 +24,8 @@
     "@angular/router": "~11.0.5",
     "@ngrx/effects": "^10.1.2",
     "@ngrx/store": "^10.1.2",
+    "@ngx-translate/core": "^13.0.0",
+    "@ngx-translate/http-loader": "^6.0.0",
     "angularx-social-login": "^3.5.4",
     "ngrx-store-localstorage": "^10.1.1",
     "reselect": "^4.0.0",

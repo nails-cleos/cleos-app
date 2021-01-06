@@ -1,33 +1,34 @@
+<script src="../../polyfills.ts"></script>
 <div class="flex-container" fxLayout="column">
   <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" class="card-container">
     <div fxFlex.lt-sm="80%" fxFlex="50%" fxFlex.gt-lg="40%">
       <mat-card>
         <mat-tab-group>
-          <mat-tab label="Sign In">
+          <mat-tab label="{{ 'AUTH.SIGN_IN.TITLE' | translate }}">
             <mat-card-content>
-              <!--          <div *ngIf="error | async" color="error">{{ error | async }}</div>-->
               <form (ngSubmit)="signIn()" [formGroup]="form" novalidate>
                 <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
                   <mat-form-field>
-                    <mat-label i18n>Username or email</mat-label>
+                    <mat-label>{{ 'AUTH.SIGN_IN.USERNAME.FIELD' | translate }}</mat-label>
                     <input matInput required formControlName="username" autocomplete="username">
-                    <mat-error i18n>
-                      Please provide a valid username
+                    <mat-error>
+                      {{ 'AUTH.SIGN_IN.USERNAME.ERROR' | translate }}
                     </mat-error>
                   </mat-form-field>
                   <mat-form-field>
-                    <mat-label i18n>Password</mat-label>
+                    <mat-label>{{ 'AUTH.SIGN_IN.PASSWORD.FIELD' | translate }}</mat-label>
                     <input matInput required type="password" autocomplete="current-password" formControlName="password">
-                    <mat-error i18n>
-                      Please provide a valid password
+                    <mat-error>
+                      {{ 'AUTH.SIGN_IN.USERNAME.ERROR' | translate }}
                     </mat-error>
                   </mat-form-field>
-                  <button mat-raised-button color="accent" [disabled]="form.invalid" type="submit" i18n>Sign In</button>
+                  <button mat-raised-button color="accent" [disabled]="form.invalid"
+                          type="submit">{{ 'AUTH.SIGN_IN.TITLE' | translate }}</button>
                 </div>
               </form>
               <div fxLayout="column" fxLayoutAlign="space-evenly center">
                 <br>
-                <b i18n>Or sign in with</b>
+                <b>{{ 'AUTH.SIGN_IN.OR' | translate }}</b>
                 <br>
               </div>
               <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
@@ -40,12 +41,12 @@
               </div>
             </mat-card-content>
           </mat-tab>
-          <mat-tab label="Register">
+          <mat-tab label="{{ 'AUTH.SIGN_UP.TITLE' | translate }}">
             <mat-card-content>
               <app-sign-up></app-sign-up>
               <div fxLayout="column" fxLayoutAlign="space-evenly center">
                 <br>
-                <b i18n>Or register with</b>
+                <b>{{ 'AUTH.SIGN_UP.OR' | translate }}</b>
                 <br>
               </div>
               <div fxLayout="column" fxLayoutAlign="space-evenly stretch">

@@ -39,4 +39,9 @@ export class UserService {
     const url = `${this.userUrl}/${id}`;
     return this.http.delete<IUser>(url);
   }
+
+  resend(id: string | null): Observable<any> {
+    const url = `${this.userUrl}/${id}/token`;
+    return this.http.post(url, null);
+  }
 }

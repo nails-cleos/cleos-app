@@ -1,0 +1,124 @@
+{
+  "COMMON": {
+    "BUTTON": {
+      "BACK": "Back",
+      "YES": "Yes",
+      "NO": "No"
+    },
+    "COLUMN": {
+      "ACTIONS": "Actions"
+    },
+    "PAGINATOR": {
+      "ITEMS_PER_PAGE_LABEL": "Items per page:",
+      "NEXT_PAGE_LABEL": "Next page",
+      "PREVIOUS_PAGE_LABEL": "Previous page",
+      "FIRST_PAGE_LABEL": "First page",
+      "LAST_PAGE_LABEL": "Last page",
+      "RANGE_PAGE_LABEL_1": "0 of {{length}}",
+      "RANGE_PAGE_LABEL_2": "{{startIndex}} - {{endIndex}} of {{length}}"
+    }
+  },
+  "DASHBOARD": {
+    "PROFILE": "Profile",
+    "CHANGE_PASSWORD": "Change password",
+    "SIGN_OUT": "Sign out"
+  },
+  "AUTH": {
+    "SIGN_IN": {
+      "TITLE": "Sign In",
+      "USERNAME": {
+        "FIELD": "Username or email",
+        "ERROR": "Please provide a valid username"
+      },
+      "PASSWORD": {
+        "FIELD": "Password",
+        "ERROR": "Please provide a valid password"
+      },
+      "OR": "Or sign in with"
+    },
+    "SIGN_UP": {
+      "TITLE": "Sign up",
+      "USERNAME": {
+        "FIELD": "Username",
+        "REQUIRED": "Username is <b>required</b>"
+      },
+      "EMAIL": {
+        "FIELD": "Email",
+        "REQUIRED": "Email is <b>required</b>",
+        "VALID": "Provide a valid email"
+      },
+      "PASSWORD": {
+        "FIELD": "Password",
+        "REQUIRED": "Password is <b>required</b>"
+      },
+      "FIRST_NAME": {
+        "FIELD": "First name",
+        "REQUIRED": "First name is <b>required</b>"
+      },
+      "LAST_NAME": {
+        "FIELD": "Last name",
+        "REQUIRED": "Last name is <b>required</b>"
+      },
+      "OR": "Or sign up with",
+      "SUCCESS": "User {{username}} created. Check your email {{email}}"
+    },
+    "ACTIVATE_ACCOUNT": {
+      "TITLE": "Activate account",
+      "CONTENT": "Welcome to Nails",
+      "BUTTON": "Activate",
+      "MESSAGE": "Account activated"
+    }
+  },
+  "USER": {
+    "LIST": {
+      "COLUMN": {
+        "NAME": "Name",
+        "USERNAME": "Username",
+        "EMAIL": "Email",
+        "PROVIDER": "Provider",
+        "STATUS": "Status"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Update user",
+      "BUTTON": "Update",
+      "USERNAME": {
+        "FIELD": "Username",
+        "REQUIRED": "Username is <b>required</b>"
+      },
+      "EMAIL": {
+        "FIELD": "Email",
+        "REQUIRED": "Email is <b>required</b>",
+        "VALID": "Provide a valid email"
+      },
+      "PASSWORD": {
+        "FIELD": "Password",
+        "REQUIRED": "Password is <b>required</b>"
+      },
+      "FIRST_NAME": {
+        "FIELD": "First name",
+        "REQUIRED": "First name is <b>required</b>"
+      },
+      "LAST_NAME": {
+        "FIELD": "Last name",
+        "REQUIRED": "Last name is <b>required</b>"
+      }
+    },
+    "DELETED": {
+      "TITLE": "Delete user",
+      "CONTENT": "Are you sure to delete user {{firstName}} {{lastName}}?",
+      "MESSAGE":  "User {{username}} deleted"
+    },
+    "UPDATED": {
+      "MESSAGE": "User {{username}} updated"
+    },
+    "ACTIVATION_RESEND": {
+      "TITLE": "Resend activation code",
+      "CONTENT": "Are you sure to resend activation code to user {{firstName}} {{lastName}}?",
+      "MESSAGE": "Activation code sent"
+    }
+  },
+  "last": {
+    "dummy": "dummy translation"
+  }
+}
