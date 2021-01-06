@@ -6,6 +6,7 @@ import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthActionTypes, LoginFailure, LoginSuccess, SignUpSuccess, SignUpFailure } from '../auth.actions';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable()
 export class LoginEffects {
@@ -19,7 +20,7 @@ export class LoginEffects {
         switchMap((response: any) => {
           return of(new LoginSuccess(response));
         }),
-        catchError((err: HttpErrorResponse) => of(new LoginFailure({error: err})))
+        catchError((err: HttpErrorResponse) => of(new LoginFailure({error: err.error})))
       );
     })
   );
@@ -54,7 +55,22 @@ export class LoginEffects {
     switchMap((payload: any) => {
       return this.authService.signUp(payload).pipe(
         switchMap((response: any) => {
-          return of(new SignUpSuccess(response));
+          const message = this.translate.instant('AUTH.SIGN_UP.SUCCESS', {username: response.username, email: response.email});
+          return of(new SignUpSuccess({message}));
+        }),
+        catchError((err: HttpErrorResponse) => of(new SignUpFailure({error: err.error})))
+      );
+    })
+  );
+
+  @Effect()
+  activateAccount$ = this.actions$.pipe(ofType(AuthActionTypes.ACTIVATE_ACCOUNT)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => {
+      return this.authService.activateAccount(payload).pipe(
+        switchMap(() => {
+          const message = this.translate.instant('AUTH.ACTIVATE_ACCOUNT.MESSAGE');
+          return of(new SignUpSuccess({message}));
         }),
         catchError((err: HttpErrorResponse) => of(new SignUpFailure({error: err.error})))
       );
@@ -63,8 +79,7 @@ export class LoginEffects {
 
   @Effect({dispatch: false})
   signUpSuccess$ = this.actions$.pipe(
-    ofType(AuthActionTypes.SIGNUP_SUCCESS),
-    tap(() => location.reload(true))
+    ofType(AuthActionTypes.SIGNUP_SUCCESS)
   );
 
   @Effect({dispatch: false})
@@ -81,7 +96,7 @@ export class LoginEffects {
     })
   );
 
-  constructor(private actions$: Actions, private authService: AuthService,
+  constructor(private readonly translate: TranslateService, private actions$: Actions, private authService: AuthService,
               private router: Router, private route: ActivatedRoute) {
     this.returnUrl = this.route.snapshot.queryParams.returnUrl || 'dashboard/main';
   }

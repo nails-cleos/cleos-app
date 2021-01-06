@@ -37,13 +37,6 @@ export function reducer(state = initialState, action: All): State {
         message: null
       };
     }
-    case UserActionTypes.SAVE_USER: {
-      return {
-        ...state,
-        errorMessage: null,
-        message: null
-      };
-    }
     case UserActionTypes.USER_SUCCESS: {
       return {
         ...state,
@@ -74,6 +67,8 @@ export function reducer(state = initialState, action: All): State {
         message: null
       };
     }
+    case UserActionTypes.SAVE_USER:
+    case UserActionTypes.RESEND_USER_TOKEN:
     case UserActionTypes.USER_DELETE: {
       return {
         ...state,

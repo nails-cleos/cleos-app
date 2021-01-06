@@ -1,6 +1,6 @@
 <h1 mat-dialog-title>{{data.title}}</h1>
 <div mat-dialog-content>{{data.content}}</div>
 <div mat-dialog-actions>
-  <button mat-button (click)="onNoClick()" cdkFocusInitial i18n>No</button>
-  <button mat-button [mat-dialog-close]="data.value" i18n>Yes</button>
+  <button mat-button (click)="onNoClick()" cdkFocusInitial>{{ 'COMMON.BUTTON.NO' | translate }}</button>
+  <button mat-button [mat-dialog-close]="data.value">{{ 'COMMON.BUTTON.YES' | translate }}</button>
 </div>

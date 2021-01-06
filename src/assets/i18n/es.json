@@ -1,0 +1,118 @@
+{
+  "COMMON": {
+    "BUTTON": {
+      "BACK": "Volver",
+      "YES": "Si",
+      "NO": "No"
+    },
+    "COLUMN": {
+      "ACTIONS": "Acciones"
+    },
+    "PAGINATOR": {
+      "ITEMS_PER_PAGE_LABEL": "Items por página:",
+      "NEXT_PAGE_LABEL": "Página siguiente",
+      "PREVIOUS_PAGE_LABEL": "Página anterior",
+      "FIRST_PAGE_LABEL": "Primera página",
+      "LAST_PAGE_LABEL": "Última página",
+      "RANGE_PAGE_LABEL_1": "0 de {{length}}",
+      "RANGE_PAGE_LABEL_2": "{{startIndex}} - {{endIndex}} de {{length}}"
+    }
+  },
+  "DASHBOARD": {
+    "PROFILE": "Perfil",
+    "CHANGE_PASSWORD": "Cambiar contraseña",
+    "SIGN_OUT": "Cerrar sessión"
+  },
+  "AUTH": {
+    "SIGN_IN": {
+      "TITLE": "Ingresar",
+      "USERNAME": {
+        "FIELD": "Nombre de usuario o email",
+        "ERROR": "Por favor ingrese un nombre de usuario o email"
+      },
+      "PASSWORD": {
+        "FIELD": "Contraseña",
+        "ERROR": "Por favor ingrese una contraseña"
+      },
+      "OR": "O ingresa con"
+    },
+    "SIGN_UP": {
+      "TITLE": "Registrar",
+      "USERNAME": {
+        "FIELD": "Nombre de usuario",
+        "REQUIRED": "Nombre de usuario es <b>requerido</b>"
+      },
+      "EMAIL": {
+        "FIELD": "Email",
+        "REQUIRED": "Email es <b>requerido</b>",
+        "VALID": "Ingrese un email valido"
+      },
+      "PASSWORD": {
+        "FIELD": "Contraseña",
+        "REQUIRED": "Contraseña es <b>requerido</b>"
+      },
+      "FIRST_NAME": {
+        "FIELD": "Nombre",
+        "REQUIRED": "Nombre es <b>requerido</b>"
+      },
+      "LAST_NAME": {
+        "FIELD": "Apellido",
+        "REQUIRED": "Apellido es <b>requerido</b>"
+      },
+      "OR": "O registrate con",
+      "SUCCESS": "Usuario {{username}} creado. Verifica tu email {{email}}"
+    }
+  },
+  "USER": {
+    "LIST": {
+      "COLUMN": {
+        "NAME": "Nombre",
+        "USERNAME": "Nombre de usuario",
+        "EMAIL": "Email",
+        "PROVIDER": "Proveedor",
+        "STATUS": "Estado"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Actualizar usuario",
+      "BUTTON": "Actualizar",
+      "USERNAME": {
+        "FIELD": "Nombre de usuario",
+        "REQUIRED": "Nombre de usuario es <b>requerido</b>"
+      },
+      "EMAIL": {
+        "FIELD": "Email",
+        "REQUIRED": "Email es <b>requerido</b>",
+        "VALID": "Provide a valid email"
+      },
+      "PASSWORD": {
+        "FIELD": "Contraseña",
+        "REQUIRED": "Contraseña es <b>requerido</b>"
+      },
+      "FIRST_NAME": {
+        "FIELD": "Nombre",
+        "REQUIRED": "Nombre es <b>requerido</b>"
+      },
+      "LAST_NAME": {
+        "FIELD": "Apellido",
+        "REQUIRED": "Apellido es <b>requerido</b>"
+      }
+    },
+    "DELETED": {
+      "TITLE": "Eliminar usuario",
+      "CONTENT": "¿Está seguro de eliminar el usuario {{firstName}} {{lastName}}?",
+      "MESSAGE":  "Usuario {{username}} eliminado"
+    },
+    "UPDATED": {
+      "MESSAGE": "Usuario {{username}} actualizado"
+    },
+    "ACTIVATION_RESEND": {
+      "TITLE": "Reenviar código de activación",
+      "CONTENT": "¿Está seguro de reenviar el código de activación al usuario {{firstName}} {{lastName}}?",
+      "MESSAGE": "Código de activación enviado"
+    }
+  },
+  "last": {
+    "dummy": "dummy translation"
+  }
+}

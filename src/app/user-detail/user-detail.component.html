@@ -3,7 +3,7 @@
     <div fxFlex.lt-sm="80%" fxFlex="50%" fxFlex.gt-lg="40%">
       <mat-card>
         <mat-card-header>
-          <mat-card-title i18n>Update User</mat-card-title>
+          <mat-card-title>{{ 'USER.DETAIL.TITLE' | translate }}</mat-card-title>
           <mat-card-subtitle *ngIf="user; else skeleton">{{user.firstName}} {{user.lastName}}</mat-card-subtitle>
           <ng-template #skeleton>
             <div class="ssc-line"></div>
@@ -13,38 +13,34 @@
           <mat-card-content *ngIf="user; else boxSkeleton">
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <mat-form-field>
-                <mat-label i18n>Id</mat-label>
+                <mat-label>Id</mat-label>
                 <input matInput disabled value="{{user.id}}">
               </mat-form-field>
               <mat-form-field>
-                <mat-label i18n>Username</mat-label>
+                <mat-label>{{ 'USER.DETAIL.USERNAME.FIELD' | translate }}</mat-label>
                 <input matInput required formControlName="username" autocomplete="username">
-                <mat-error i18n>
-                  Username is <b>required</b>
+                <mat-error [innerHTML]="'USER.DETAIL.USERNAME.REQUIRED' | translate">
                 </mat-error>
               </mat-form-field>
               <mat-form-field>
-                <mat-label i18n>Email</mat-label>
+                <mat-label>{{ 'USER.DETAIL.EMAIL.FIELD' | translate }}</mat-label>
                 <input matInput required formControlName="email" autocomplete="username">
-                <mat-error i18n *ngIf="email.hasError('email')">
-                  Provide a valid email
+                <mat-error *ngIf="email.hasError('email')">
+                  {{ 'USER.DETAIL.EMAIL.VALID' | translate }}
                 </mat-error>
-                <mat-error i18n *ngIf="email.hasError('required')">
-                  Password is <b>required</b>
+                <mat-error *ngIf="email.hasError('required')" [innerHTML]="'USER.DETAIL.EMAIL.REQUIRED' | translate">
                 </mat-error>
               </mat-form-field>
               <mat-form-field>
-                <mat-label i18n>First name</mat-label>
+                <mat-label>{{ 'USER.DETAIL.FIRST_NAME.FIELD' | translate }}</mat-label>
                 <input matInput required formControlName="firstName" autocomplete="username">
-                <mat-error i18n>
-                  First name is <b>required</b>
+                <mat-error [innerHTML]="'USER.DETAIL.FIRST_NAME.REQUIRED' | translate">
                 </mat-error>
               </mat-form-field>
               <mat-form-field>
-                <mat-label i18n>Last name</mat-label>
+                <mat-label>{{ 'USER.DETAIL.LAST_NAME.FIELD' | translate }}</mat-label>
                 <input matInput required formControlName="lastName" autocomplete="username">
-                <mat-error i18n>
-                  Last name is <b>required</b>
+                <mat-error [innerHTML]="'USER.DETAIL.LAST_NAME.REQUIRED' | translate">
                 </mat-error>
               </mat-form-field>
             </div>
@@ -56,8 +52,10 @@
           </ng-template>
           <mat-card-actions *ngIf="user; else buttonSkeleton">
             <div fxFlex></div>
-            <button mat-raised-button color="primary" [disabled]="form.invalid || form.pristine" type="submit" i18n>Update</button>
-            <button mat-raised-button color="accent" routerLink="/dashboard/users" i18n>Back</button>
+            <button mat-raised-button color="primary" [disabled]="form.invalid || form.pristine"
+                    type="submit">{{ 'USER.DETAIL.BUTTON' | translate }}</button>
+            <button mat-raised-button color="accent"
+                    routerLink="/dashboard/users">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
           <ng-template #buttonSkeleton>
             <div class="ssc-head-line"></div>

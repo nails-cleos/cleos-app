@@ -6,6 +6,7 @@ import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { UserActionTypes, UserFailure, UserSaveSuccess, UserSelected, UserSuccess } from '../user.actions';
 import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable()
 export class UserEffects {
@@ -42,7 +43,8 @@ export class UserEffects {
     switchMap((payload: any) => {
       return this.userService.update(payload).pipe(
         switchMap((response: any) => {
-          return of(new UserSaveSuccess({message: `User ${response.username} updated`}));
+          const message = this.translate.instant('USER.UPDATED.MESSAGE', {username: response.username});
+          return of(new UserSaveSuccess({message}));
         }),
         catchError((err: HttpErrorResponse) => of(new UserFailure({error: err.error})))
       );
@@ -55,7 +57,22 @@ export class UserEffects {
     switchMap((payload: any) => {
       return this.userService.delete(payload).pipe(
         switchMap((response: any) => {
-          return of(new UserSaveSuccess({message: `User ${response.username} deleted`}));
+          const message = this.translate.instant('USER.DELETED.MESSAGE', {username: response.username});
+          return of(new UserSaveSuccess({message}));
+        }),
+        catchError((err: HttpErrorResponse) => of(new UserFailure({error: err.error})))
+      );
+    })
+  );
+
+  @Effect()
+  resend$ = this.actions$.pipe(ofType(UserActionTypes.RESEND_USER_TOKEN)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => {
+      return this.userService.resend(payload).pipe(
+        switchMap(() => {
+          const message = this.translate.instant('USER.ACTIVATION_RESEND.MESSAGE');
+          return of(new UserSaveSuccess({message}));
         }),
         catchError((err: HttpErrorResponse) => of(new UserFailure({error: err.error})))
       );
@@ -83,6 +100,7 @@ export class UserEffects {
     })
   );
 
-  constructor(private actions$: Actions, private userService: UserService, private router: Router) {
+  constructor(private readonly translate: TranslateService, private actions$: Actions, private userService: UserService,
+              private router: Router) {
   }
 }

@@ -1,43 +1,39 @@
 <form (ngSubmit)="register()" [formGroup]="form" novalidate>
   <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
     <mat-form-field>
-      <mat-label i18n>Username</mat-label>
+      <mat-label>{{ 'AUTH.SIGN_UP.USERNAME.FIELD' | translate }}</mat-label>
       <input matInput required formControlName="username" autocomplete="username">
-      <mat-error i18n>
-        Username is <b>required</b>
+      <mat-error [innerHTML]="'AUTH.SIGN_UP.USERNAME.REQUIRED' | translate">
       </mat-error>
     </mat-form-field>
     <mat-form-field>
-      <mat-label i18n>Email</mat-label>
+      <mat-label>{{ 'AUTH.SIGN_UP.EMAIL.FIELD' | translate }}</mat-label>
       <input matInput required formControlName="email" autocomplete="username">
-      <mat-error i18n *ngIf="email.hasError('email')">
-        Provide a valid email
+      <mat-error *ngIf="email.hasError('email')">
+        {{ 'AUTH.SIGN_UP.EMAIL.VALID' | translate }}
       </mat-error>
-      <mat-error i18n *ngIf="email.hasError('required')">
-        Password is <b>required</b>
+      <mat-error *ngIf="email.hasError('required')" [innerHTML]="'AUTH.SIGN_UP.EMAIL.REQUIRED' | translate">
       </mat-error>
     </mat-form-field>
     <mat-form-field>
-      <mat-label i18n>Password</mat-label>
+      <mat-label>{{ 'AUTH.SIGN_UP.PASSWORD.FIELD' | translate }}</mat-label>
       <input matInput required type="password" autocomplete="current-password" formControlName="password">
-      <mat-error i18n>
-        Password is <b>required</b>
+      <mat-error [innerHTML]="'AUTH.SIGN_UP.PASSWORD.REQUIRED' | translate">
       </mat-error>
     </mat-form-field>
     <mat-form-field>
-      <mat-label i18n>First name</mat-label>
+      <mat-label>{{ 'AUTH.SIGN_UP.FIRST_NAME.FIELD' | translate }}</mat-label>
       <input matInput required formControlName="firstName" autocomplete="username">
-      <mat-error i18n>
-        First name is <b>required</b>
+      <mat-error [innerHTML]="'AUTH.SIGN_UP.FIRST_NAME.REQUIRED' | translate">
       </mat-error>
     </mat-form-field>
     <mat-form-field>
-      <mat-label i18n>Last name</mat-label>
+      <mat-label>{{ 'AUTH.SIGN_UP.LAST_NAME.FIELD' | translate }}</mat-label>
       <input matInput required formControlName="lastName" autocomplete="username">
-      <mat-error i18n>
-        Last name is <b>required</b>
+      <mat-error [innerHTML]="'AUTH.SIGN_UP.LAST_NAME.REQUIRED' | translate">
       </mat-error>
     </mat-form-field>
-    <button mat-raised-button color="accent" [disabled]="form.invalid" type="submit" i18n>Register</button>
+    <button mat-raised-button color="accent" [disabled]="form.invalid"
+            type="submit">{{ 'AUTH.SIGN_UP.TITLE' | translate }}</button>
   </div>
 </form>

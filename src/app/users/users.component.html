@@ -3,7 +3,7 @@
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z24"
            matSort matSortActive="username" matSortDisableClear matSortDirection="desc">
       <ng-container matColumnDef="position">
-        <th i18n mat-header-cell *matHeaderCellDef> No.</th>
+        <th mat-header-cell *matHeaderCellDef> No.</th>
         <td mat-cell *matCellDef="let user; let i = index;">
           <div *ngIf="user.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
           <ng-template #skeleton>
@@ -13,7 +13,7 @@
       </ng-container>
 
       <ng-container matColumnDef="name">
-        <th i18n mat-header-cell *matHeaderCellDef mat-sort-header> Name</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'USER.LIST.COLUMN.NAME' | translate }}</th>
         <td mat-cell *matCellDef="let user">
           <div *ngIf="user.id; else skeleton">{{user.firstName}} {{user.lastName}}</div>
           <ng-template #skeleton>
@@ -23,7 +23,7 @@
       </ng-container>
 
       <ng-container matColumnDef="username">
-        <th i18n mat-header-cell *matHeaderCellDef mat-sort-header> Username</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'USER.LIST.COLUMN.USERNAME' | translate }}</th>
         <td mat-cell class="column-large-text" *matCellDef="let user">
           <div *ngIf="user.id; else skeleton">{{user.username}}</div>
           <ng-template #skeleton>
@@ -33,7 +33,7 @@
       </ng-container>
 
       <ng-container matColumnDef="email">
-        <th i18n mat-header-cell *matHeaderCellDef mat-sort-header> Email</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'USER.LIST.COLUMN.EMAIL' | translate }}</th>
         <td mat-cell class="column-large-text"  *matCellDef="let user">
           <div *ngIf="user.id; else skeleton">{{user.email}}</div>
           <ng-template #skeleton>
@@ -43,7 +43,7 @@
       </ng-container>
 
       <ng-container matColumnDef="provider">
-        <th i18n mat-header-cell *matHeaderCellDef mat-sort-header> Provider</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'USER.LIST.COLUMN.PROVIDER' | translate }}</th>
         <td mat-cell *matCellDef="let user">
           <div *ngIf="user.id; else skeleton">{{user.provider}}</div>
           <ng-template #skeleton>
@@ -53,7 +53,7 @@
       </ng-container>
 
       <ng-container matColumnDef="status">
-        <th i18n mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'USER.LIST.COLUMN.STATUS' | translate }}</th>
         <td mat-cell *matCellDef="let user">
           <div *ngIf="user.id; else skeleton">
             <div *ngIf="!user.deleted; else deleteBlock">
@@ -76,7 +76,7 @@
       </ng-container>
 
       <ng-container matColumnDef="actions">
-        <th i18n mat-header-cell *matHeaderCellDef> Actions</th>
+        <th mat-header-cell *matHeaderCellDef>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
         <td mat-cell *matCellDef="let user">
           <div *ngIf="user.id; else skeleton">
             <button *ngIf="!user.deleted" mat-icon-button (click)="edit(user)">

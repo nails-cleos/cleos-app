@@ -12,16 +12,16 @@
     <mat-menu #menuNotLogged="matMenu">
       <button mat-menu-item (click)="profile()">
         <mat-icon>settings</mat-icon>
-        <span i18n>Profile</span>
+        <span>{{'DASHBOARD.PROFILE' | translate }}</span>
       </button>
       <button mat-menu-item (click)="changePassword()">
         <mat-icon>mode_edit</mat-icon>
-        <span i18n>Change password</span>
+        <span>{{'DASHBOARD.CHANGE_PASSWORD' | translate }}</span>
       </button>
       <mat-divider></mat-divider>
       <button mat-menu-item (click)="logout()">
         <mat-icon>exit_to_app</mat-icon>
-        <span i18n>Sign out</span>
+        <span>{{'DASHBOARD.SIGN_OUT' | translate }}</span>
       </button>
     </mat-menu>
   </mat-toolbar>
