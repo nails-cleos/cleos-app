@@ -16,12 +16,17 @@
       "LAST_PAGE_LABEL": "Última página",
       "RANGE_PAGE_LABEL_1": "0 de {{length}}",
       "RANGE_PAGE_LABEL_2": "{{startIndex}} - {{endIndex}} de {{length}}"
+    },
+    "ROLES": {
+      "ROLE_CUSTOMER": "Cliente",
+      "ROLE_PROFESSIONAL": "Profesional"
     }
   },
   "DASHBOARD": {
     "PROFILE": "Perfil",
     "CHANGE_PASSWORD": "Cambiar contraseña",
-    "SIGN_OUT": "Cerrar sessión"
+    "SIGN_OUT": "Cerrar sessión",
+    "SIGN_IN": "Ingresar"
   },
   "AUTH": {
     "SIGN_IN": {
@@ -34,10 +39,68 @@
         "FIELD": "Contraseña",
         "ERROR": "Por favor ingrese una contraseña"
       },
-      "OR": "O ingresa con"
+      "OR": "O ingresa con",
+      "NEW": "¿Nuevo en Nails?"
     },
     "SIGN_UP": {
       "TITLE": "Registrar",
+      "USERNAME": {
+        "FIELD": "Nombre de usuario",
+        "REQUIRED": "Nombre de usuario es <b>requerido</b>"
+      },
+      "EMAIL": {
+        "FIELD": "Email",
+        "REQUIRED": "Email es <b>requerido</b>",
+        "VALID": "Ingrese un email valido"
+      },
+      "PASSWORD": {
+        "FIELD": "Contraseña",
+        "REQUIRED": "Contraseña es <b>requerido</b>"
+      },
+      "CONFIRM_PASSWORD": {
+        "FIELD": "Confirmar contraseña",
+        "REQUIRED": "Confirmar contraseña es <b>requerido</b>",
+        "MUST_MATCH": "Contraseña y confirmar contraseña deben coincidir"
+      },
+      "FIRST_NAME": {
+        "FIELD": "Nombre",
+        "REQUIRED": "Nombre es <b>requerido</b>"
+      },
+      "LAST_NAME": {
+        "FIELD": "Apellido",
+        "REQUIRED": "Apellido es <b>requerido</b>"
+      },
+      "OR": "O registrate con",
+      "SUCCESS": "Usuario {{username}} creado. Verifica tu email {{email}}",
+      "ALREADY": "¿Ya tienes Nails?"
+    },
+    "ACTIVATE_ACCOUNT": {
+      "TITLE": "Activate account",
+      "CONTENT": "Welcome to Nails",
+      "BUTTON": "Activate",
+      "MESSAGE": "Account activated"
+    }
+  },
+  "USER": {
+    "LIST": {
+      "COLUMN": {
+        "NAME": "Nombre",
+        "USERNAME": "Nombre de usuario",
+        "EMAIL": "Email",
+        "PROVIDER": "Proveedor",
+        "STATUS": "Estado",
+        "DETAIL": {
+          "TITLE": "Roles"
+        }
+      }
+    },
+    "ADD": {
+      "TITLE": "Agregar usuario",
+      "BUTTON": "Crear",
+      "ROLE": {
+        "FIELD": "Roles",
+        "REQUIRED": "Rol es <b>requerido</b>"
+      },
       "USERNAME": {
         "FIELD": "Nombre de usuario",
         "REQUIRED": "Nombre de usuario es <b>requerido</b>"
@@ -59,19 +122,8 @@
         "FIELD": "Apellido",
         "REQUIRED": "Apellido es <b>requerido</b>"
       },
-      "OR": "O registrate con",
-      "SUCCESS": "Usuario {{username}} creado. Verifica tu email {{email}}"
-    }
-  },
-  "USER": {
-    "LIST": {
-      "COLUMN": {
-        "NAME": "Nombre",
-        "USERNAME": "Nombre de usuario",
-        "EMAIL": "Email",
-        "PROVIDER": "Proveedor",
-        "STATUS": "Estado"
-      }
+      "CUSTOMER": "Cliente {{username}} creado",
+      "PROFESSIONAL": "Profesional {{username}} creado"
     },
     "DETAIL": {
       "TITLE": "Actualizar usuario",

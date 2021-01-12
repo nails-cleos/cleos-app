@@ -2,9 +2,9 @@ import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '
 import { IUser, PAGE_SIZE } from '../interfaces/user';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../store/app.states';
-import { Observable, merge, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Clean, GetAll, DeleteUser, UserSelected, ResendToken } from '../store/user.actions';
+import * as fromActionsUser from '../store/user.actions';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../dialog/dialog.component';
@@ -12,16 +12,25 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { Pagination } from '../interfaces/pagination';
 import { TranslateService } from '@ngx-translate/core';
+import { animate, state, style, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-users',
   templateUrl: './users.component.html',
-  styleUrls: ['./users.component.scss']
+  styleUrls: ['./users.component.scss'],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed', style({height: '0px', minHeight: '0'})),
+      state('expanded', style({height: '*'})),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ]
 })
 export class UsersComponent implements OnInit, AfterViewInit {
 
   displayedColumns: string[] = ['position', 'name', 'username', 'email', 'provider', 'status', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IUser>>();
+  expandedUser: IUser | undefined;
   getState: Observable<any>;
 
   resultsLength = 0;
@@ -55,27 +64,27 @@ export class UsersComponent implements OnInit, AfterViewInit {
   }
 
   subscribe(): void {
-    this.getState.subscribe((state) => {
-      if (state.errorMessage || state.message) {
-        const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
+    this.getState.subscribe((stateValue) => {
+      if (stateValue.errorMessage || stateValue.message) {
+        const snackBarRef = this.snackBar.open(stateValue.errorMessage || stateValue.message, 'OK', {
           duration: 5000
         });
 
-        if (state.message) {
+        if (stateValue.message) {
           snackBarRef.afterDismissed().subscribe(() => {
             this.clean();
             this.getUsers();
           });
         }
       }
-      this.dataSource = state.data?.content;
-      this.resultsLength = state.data?.totalElements;
+      this.dataSource = stateValue.data?.content;
+      this.resultsLength = stateValue.data?.totalElements;
     });
   }
 
   clean(): void {
     this.store.dispatch(
-      new Clean()
+      new fromActionsUser.Clean()
     );
   }
 
@@ -86,13 +95,13 @@ export class UsersComponent implements OnInit, AfterViewInit {
       page: this.paginator.pageIndex
     };
     this.store.dispatch(
-      new GetAll(payload)
+      new fromActionsUser.GetAll(payload)
     );
   }
 
   edit(user: IUser): void {
     this.store.dispatch(
-      new UserSelected(user)
+      new fromActionsUser.UserSelected(user)
     );
   }
 
@@ -106,7 +115,7 @@ export class UsersComponent implements OnInit, AfterViewInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.store.dispatch(
-          new DeleteUser(result.id)
+          new fromActionsUser.DeleteUser(result.id)
         );
       }
     });
@@ -122,7 +131,7 @@ export class UsersComponent implements OnInit, AfterViewInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.store.dispatch(
-          new ResendToken(result.id)
+          new fromActionsUser.ResendToken(result.id)
         );
       }
     });

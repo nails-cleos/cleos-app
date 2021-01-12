@@ -8,13 +8,14 @@ import { AuthGuardService } from './services/auth-guard.service';
 import { LoginComponent } from './login/login.component';
 import { Role } from './interfaces/token';
 import { TranslationLoaderResolver } from './util/translation.resolver';
-import { ActivateAccountComponent } from './activation-code/activate-account.component';
+import { ActivateAccountComponent } from './activate-account/activate-account.component';
+import { UserComponent } from './user/user.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/dashboard/main', pathMatch: 'full'},
   {
     path: 'dashboard', component: DashboardComponent, resolve: {model: TranslationLoaderResolver}, children: [
-      {path: 'activation-code', component: ActivateAccountComponent},
+      {path: 'activate-account', component: ActivateAccountComponent},
       {path: 'login', component: LoginComponent, data: {error: 'error'}},
       {path: 'main', component: MainComponent},
       {
@@ -23,7 +24,12 @@ const routes: Routes = [
         }
       },
       {
-        path: 'users/:id', component: UserDetailComponent, canActivate: [AuthGuardService], data: {
+        path: 'user/:id', component: UserDetailComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.Admin]
+        }
+      },
+      {
+        path: 'user', component: UserComponent, canActivate: [AuthGuardService], data: {
           roles: [Role.Admin]
         }
       }

@@ -15,6 +15,52 @@
 
 .mat-cell-status {
   text-align: center;
-  justify-content:center;
+  justify-content: center;
+}
+
+tr.user-detail-row {
+  height: 0;
+}
+
+tr.user-row:not(.user-expanded-row):hover {
+  background: whitesmoke;
+}
+
+tr.user-row:not(.user-expanded-row):active {
+  background: #efefef;
+}
+
+.user-row td {
+  border-bottom-width: 0;
+}
+
+.user-detail {
+  overflow: hidden;
+  display: flex;
+}
+
+
+.mainDiv {
+  position: relative;
+}
+
+@media all and (max-device-width: 812px) and (orientation: portrait) {
+  #add-button {
+    top: auto;
+    right: 20px;
+    bottom: 20px;
+    left: auto;
+    position: fixed;
+  }
+}
+
+@media not all and (max-device-width: 812px) and (orientation: portrait) {
+  #add-button {
+    top: 85px;
+    right: 30px;
+    bottom: auto;
+    left: auto;
+    position: fixed;
+  }
 }
 

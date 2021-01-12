@@ -7,6 +7,7 @@ import { UserActionTypes, UserFailure, UserSaveSuccess, UserSelected, UserSucces
 import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { Role } from '../../interfaces/token';
 
 @Injectable()
 export class UserEffects {
@@ -41,13 +42,32 @@ export class UserEffects {
   save$ = this.actions$.pipe(ofType(UserActionTypes.SAVE_USER)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => {
-      return this.userService.update(payload).pipe(
-        switchMap((response: any) => {
-          const message = this.translate.instant('USER.UPDATED.MESSAGE', {username: response.username});
-          return of(new UserSaveSuccess({message}));
-        }),
-        catchError((err: HttpErrorResponse) => of(new UserFailure({error: err.error})))
-      );
+      switch (payload.role) {
+        case Role.Customer:
+          return this.userService.addCustomer(payload.user).pipe(
+            switchMap((response: any) => {
+              const message = this.translate.instant('USER.ADD.CUSTOMER', {username: response.username});
+              return of(new UserSaveSuccess({message}));
+            }),
+            catchError((err: HttpErrorResponse) => of(new UserFailure({error: err.error})))
+          );
+        case Role.Professional:
+          return this.userService.addProfessional(payload.user).pipe(
+            switchMap((response: any) => {
+              const message = this.translate.instant('USER.ADD.PROFESSIONAL', {username: response.username});
+              return of(new UserSaveSuccess({message}));
+            }),
+            catchError((err: HttpErrorResponse) => of(new UserFailure({error: err.error})))
+          );
+        default:
+          return this.userService.update(payload.user).pipe(
+            switchMap((response: any) => {
+              const message = this.translate.instant('USER.UPDATED.MESSAGE', {username: response.username});
+              return of(new UserSaveSuccess({message}));
+            }),
+            catchError((err: HttpErrorResponse) => of(new UserFailure({error: err.error})))
+          );
+      }
     })
   );
 
@@ -88,7 +108,7 @@ export class UserEffects {
   selectedData$ = this.actions$.pipe(
     ofType(UserActionTypes.USER_SELECTED),
     tap((data: any) => {
-      this.router.navigate(['dashboard', 'users', data.payload.id]);
+      this.router.navigate(['dashboard', 'user', data.payload.id]);
     })
   );
 

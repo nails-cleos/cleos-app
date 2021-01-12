@@ -35,6 +35,14 @@ export class UserService {
     return this.http.patch<IUser>(url, user);
   }
 
+  addCustomer(user: IUser): Observable<IUser> {
+    return this.http.post('customers', user);
+  }
+
+  addProfessional(user: IUser): Observable<IUser> {
+    return this.http.post('professionals', user);
+  }
+
   delete(id: string | null): Observable<IUser> {
     const url = `${this.userUrl}/${id}`;
     return this.http.delete<IUser>(url);

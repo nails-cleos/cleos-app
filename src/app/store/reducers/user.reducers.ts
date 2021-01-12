@@ -5,15 +5,19 @@ import { Pagination } from '../../interfaces/pagination';
 export interface State {
   data: IUser | Pagination<IUser> | null;
   errorMessage: string | null;
+  subErrors: any;
   selected: IUser | null;
   message: string | null;
+  isLoading: boolean;
 }
 
 export const initialState: State = {
   data: null,
   errorMessage: null,
+  subErrors: null,
   selected: null,
-  message: null
+  message: null,
+  isLoading: false
 };
 
 export function reducer(state = initialState, action: All): State {
@@ -24,8 +28,10 @@ export function reducer(state = initialState, action: All): State {
         // @ts-ignore
         data: {content: [{}, {}, {}], totalElements: 3},
         errorMessage: null,
+        subErrors: null,
         selected: null,
-        message: null
+        message: null,
+        isLoading: true
       };
     }
     case UserActionTypes.FIND_USER: {
@@ -33,8 +39,10 @@ export function reducer(state = initialState, action: All): State {
         ...state,
         data: {},
         errorMessage: null,
+        subErrors: null,
         selected: null,
-        message: null
+        message: null,
+        isLoading: true
       };
     }
     case UserActionTypes.USER_SUCCESS: {
@@ -42,7 +50,9 @@ export function reducer(state = initialState, action: All): State {
         ...state,
         data: action.payload,
         errorMessage: null,
-        message: null
+        subErrors: null,
+        message: null,
+        isLoading: false
       };
     }
     case UserActionTypes.USER_SELECTED: {
@@ -50,21 +60,27 @@ export function reducer(state = initialState, action: All): State {
         ...state,
         selected: action.payload,
         errorMessage: null,
-        message: null
+        subErrors: null,
+        message: null,
+        isLoading: false
       };
     }
     case UserActionTypes.USER_SAVE_SUCCESS: {
       return {
         ...state,
         message: action.payload.message,
-        errorMessage: null
+        errorMessage: null,
+        subErrors: null,
+        isLoading: false
       };
     }
     case UserActionTypes.USER_FAILURE: {
       return {
         ...state,
         errorMessage: action.payload.error.message,
-        message: null
+        subErrors: action.payload.error.subErrors,
+        message: null,
+        isLoading: false
       };
     }
     case UserActionTypes.SAVE_USER:
@@ -73,7 +89,9 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         errorMessage: null,
-        message: null
+        subErrors: null,
+        message: null,
+        isLoading: true
       };
     }
     case UserActionTypes.CLEAN: {

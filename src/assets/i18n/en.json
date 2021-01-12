@@ -16,12 +16,17 @@
       "LAST_PAGE_LABEL": "Last page",
       "RANGE_PAGE_LABEL_1": "0 of {{length}}",
       "RANGE_PAGE_LABEL_2": "{{startIndex}} - {{endIndex}} of {{length}}"
+    },
+    "ROLES": {
+      "ROLE_CUSTOMER": "Customer",
+      "ROLE_PROFESSIONAL": "Professional"
     }
   },
   "DASHBOARD": {
     "PROFILE": "Profile",
     "CHANGE_PASSWORD": "Change password",
-    "SIGN_OUT": "Sign out"
+    "SIGN_OUT": "Sign out",
+    "SIGN_IN": "Sign In"
   },
   "AUTH": {
     "SIGN_IN": {
@@ -34,10 +39,68 @@
         "FIELD": "Password",
         "ERROR": "Please provide a valid password"
       },
-      "OR": "Or sign in with"
+      "OR": "Or sign in with",
+      "NEW": "New to Nails?"
     },
     "SIGN_UP": {
       "TITLE": "Sign up",
+      "USERNAME": {
+        "FIELD": "Username",
+        "REQUIRED": "Username is <b>required</b>"
+      },
+      "EMAIL": {
+        "FIELD": "Email",
+        "REQUIRED": "Email is <b>required</b>",
+        "VALID": "Provide a valid email"
+      },
+      "PASSWORD": {
+        "FIELD": "Password",
+        "REQUIRED": "Password is <b>required</b>"
+      },
+      "CONFIRM_PASSWORD": {
+        "FIELD": "Confirm password",
+        "REQUIRED": "Confirm password is <b>required</b>",
+        "MUST_MATCH": "Password and confirm password must match"
+      },
+      "FIRST_NAME": {
+        "FIELD": "First name",
+        "REQUIRED": "First name is <b>required</b>"
+      },
+      "LAST_NAME": {
+        "FIELD": "Last name",
+        "REQUIRED": "Last name is <b>required</b>"
+      },
+      "OR": "Or sign up with",
+      "SUCCESS": "User {{username}} created. Check your email {{email}}",
+      "ALREADY": "Already on Nails?"
+    },
+    "ACTIVATE_ACCOUNT": {
+      "TITLE": "Activate account",
+      "CONTENT": "Welcome to Nails",
+      "BUTTON": "Activate",
+      "MESSAGE": "Account activated"
+    }
+  },
+  "USER": {
+    "LIST": {
+      "COLUMN": {
+        "NAME": "Name",
+        "USERNAME": "Username",
+        "EMAIL": "Email",
+        "PROVIDER": "Provider",
+        "STATUS": "Status",
+        "DETAIL": {
+          "TITLE": "Roles"
+        }
+      }
+    },
+    "ADD": {
+      "TITLE": "Add user",
+      "BUTTON": "Create",
+      "ROLE": {
+        "FIELD": "Roles",
+        "REQUIRED": "Role is <b>required</b>"
+      },
       "USERNAME": {
         "FIELD": "Username",
         "REQUIRED": "Username is <b>required</b>"
@@ -59,25 +122,8 @@
         "FIELD": "Last name",
         "REQUIRED": "Last name is <b>required</b>"
       },
-      "OR": "Or sign up with",
-      "SUCCESS": "User {{username}} created. Check your email {{email}}"
-    },
-    "ACTIVATE_ACCOUNT": {
-      "TITLE": "Activate account",
-      "CONTENT": "Welcome to Nails",
-      "BUTTON": "Activate",
-      "MESSAGE": "Account activated"
-    }
-  },
-  "USER": {
-    "LIST": {
-      "COLUMN": {
-        "NAME": "Name",
-        "USERNAME": "Username",
-        "EMAIL": "Email",
-        "PROVIDER": "Provider",
-        "STATUS": "Status"
-      }
+      "CUSTOMER": "Customer {{username}} created",
+      "PROFESSIONAL": "Professional {{username}} created"
     },
     "DETAIL": {
       "TITLE": "Update user",

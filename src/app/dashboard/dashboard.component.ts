@@ -2,10 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Menu, MENUS } from '../interfaces/menu';
 import { IUser } from '../interfaces/user';
-import { AppState, selectAuthState } from '../store/app.states';
+import { AppState, selectAuthState, selectUserState } from '../store/app.states';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { LogOut } from '../store/auth.actions';
+import * as fromActionsLogin from '../store/auth.actions';
 
 @Component({
   selector: 'app-dashboard',
@@ -24,6 +24,10 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.subscribe();
+  }
+
+  subscribe(): void {
     this.getState.subscribe((state) => {
       if (state.isAuthenticated) {
         const user = state.user;
@@ -35,7 +39,7 @@ export class DashboardComponent implements OnInit {
 
   logout(): void {
     this.store.dispatch(
-      new LogOut()
+      new fromActionsLogin.LogOut()
     );
     this.router.navigate(['dashboard', 'main']);
   }

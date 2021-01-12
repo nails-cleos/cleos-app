@@ -2,10 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { IUser, User } from '../interfaces/user';
 import { AppState, selectAuthState } from '../store/app.states';
 import { Store } from '@ngrx/store';
-import { SignUp, Clean } from '../store/auth.actions';
+import * as fromActionsLogin from '../store/auth.actions';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MustMatch } from '../util/validators';
 
 @Component({
   selector: 'app-sign-up',
@@ -14,6 +15,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class SignUpComponent implements OnInit {
 
+  hideConfirm = true;
+  hide = true;
   form!: FormGroup;
   user: IUser = new User();
   getState: Observable<any>;
@@ -33,6 +36,9 @@ export class SignUpComponent implements OnInit {
   password: FormControl = new FormControl('', [
     Validators.required
   ]);
+  confirmPassword: FormControl = new FormControl('', [
+    Validators.required
+  ]);
 
   constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private snackBar: MatSnackBar) {
     this.getState = this.store.select(selectAuthState);
@@ -40,6 +46,7 @@ export class SignUpComponent implements OnInit {
 
   ngOnInit(): void {
     this.createForm();
+    this.clean();
     this.subscribe();
   }
 
@@ -49,7 +56,10 @@ export class SignUpComponent implements OnInit {
       email: this.email,
       firstName: this.firstName,
       lastName: this.lastName,
-      password: this.password
+      password: this.password,
+      confirmPassword: this.confirmPassword
+    }, {
+      validator: MustMatch('password', 'confirmPassword')
     });
   }
 
@@ -71,7 +81,7 @@ export class SignUpComponent implements OnInit {
   }
 
   clean(): void {
-    this.store.dispatch(new Clean());
+    this.store.dispatch(new fromActionsLogin.Clean());
   }
 
   register(): void {
@@ -80,6 +90,6 @@ export class SignUpComponent implements OnInit {
     this.user.firstName = this.firstName.value;
     this.user.lastName = this.lastName.value;
     this.user.password = this.password.value;
-    this.store.dispatch(new SignUp(this.user));
+    this.store.dispatch(new fromActionsLogin.SignUp(this.user));
   }
 }

@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   baseUrl: 'http://localhost:8080/api',
-  googleClientId: '101919845477-fdnq6upj7rcuoepia39nom2vattg27nu.apps.googleusercontent.com',
+  googleClientId: '57757755712-1gcjdgbd0lkj4msirrmra9aglcb0vbmk.apps.googleusercontent.com',
   facebookClientId: '453309609006101'
 };
 

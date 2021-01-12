@@ -17,8 +17,26 @@
     </mat-form-field>
     <mat-form-field>
       <mat-label>{{ 'AUTH.SIGN_UP.PASSWORD.FIELD' | translate }}</mat-label>
-      <input matInput required type="password" autocomplete="current-password" formControlName="password">
+      <input matInput required [type]="hide ? 'password' : 'text'" autocomplete="current-password"
+             formControlName="password">
+      <button type="button" mat-icon-button matSuffix (click)="hide = !hide">
+        <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+      </button>
       <mat-error [innerHTML]="'AUTH.SIGN_UP.PASSWORD.REQUIRED' | translate">
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>{{ 'AUTH.SIGN_UP.CONFIRM_PASSWORD.FIELD' | translate }}</mat-label>
+      <input matInput required [type]="hideConfirm ? 'password' : 'text'" autocomplete="current-password"
+             formControlName="confirmPassword">
+      <button type="button" mat-icon-button matSuffix (click)="hideConfirm = !hideConfirm">
+        <mat-icon>{{hideConfirm ? 'visibility_off' : 'visibility'}}</mat-icon>
+      </button>
+      <mat-error *ngIf="confirmPassword.hasError('required')"
+                 [innerHTML]="'AUTH.SIGN_UP.CONFIRM_PASSWORD.REQUIRED' | translate">
+      </mat-error>
+      <mat-error *ngIf="confirmPassword.hasError('mustMatch')">
+        {{ 'AUTH.SIGN_UP.CONFIRM_PASSWORD.MUST_MATCH' | translate }}
       </mat-error>
     </mat-form-field>
     <mat-form-field>
@@ -33,6 +51,7 @@
       <mat-error [innerHTML]="'AUTH.SIGN_UP.LAST_NAME.REQUIRED' | translate">
       </mat-error>
     </mat-form-field>
+    <br>
     <button mat-raised-button color="accent" [disabled]="form.invalid"
             type="submit">{{ 'AUTH.SIGN_UP.TITLE' | translate }}</button>
   </div>

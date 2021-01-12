@@ -1,10 +1,10 @@
-<script src="../../polyfills.ts"></script>
 <div class="flex-container" fxLayout="column">
   <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" class="card-container">
     <div fxFlex.lt-sm="80%" fxFlex="50%" fxFlex.gt-lg="40%">
       <mat-card>
-        <mat-tab-group>
+        <mat-tab-group #authGroup>
           <mat-tab label="{{ 'AUTH.SIGN_IN.TITLE' | translate }}">
+            <br>
             <mat-card-content>
               <form (ngSubmit)="signIn()" [formGroup]="form" novalidate>
                 <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
@@ -17,11 +17,15 @@
                   </mat-form-field>
                   <mat-form-field>
                     <mat-label>{{ 'AUTH.SIGN_IN.PASSWORD.FIELD' | translate }}</mat-label>
-                    <input matInput required type="password" autocomplete="current-password" formControlName="password">
+                    <input matInput required [type]="hide ? 'password' : 'text'" autocomplete="current-password" formControlName="password">
+                    <button type="button" mat-icon-button matSuffix (click)="hide = !hide">
+                      <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                    </button>
                     <mat-error>
                       {{ 'AUTH.SIGN_IN.USERNAME.ERROR' | translate }}
                     </mat-error>
                   </mat-form-field>
+                  <br>
                   <button mat-raised-button color="accent" [disabled]="form.invalid"
                           type="submit">{{ 'AUTH.SIGN_IN.TITLE' | translate }}</button>
                 </div>
@@ -29,7 +33,6 @@
               <div fxLayout="column" fxLayoutAlign="space-evenly center">
                 <br>
                 <b>{{ 'AUTH.SIGN_IN.OR' | translate }}</b>
-                <br>
               </div>
               <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
                 <button mat-button (click)="socialSignIn('google')">
@@ -37,17 +40,27 @@
                        src="https://developers.google.com/identity/images/g-logo.png"/>
                   Google
                 </button>
-                <button mat-button color="success" (click)="socialSignIn('facebook')">Facebook</button>
+                <button mat-raised-button color="facebook" (click)="socialSignIn('facebook')">
+                  <mat-icon>facebook</mat-icon>
+                  Facebook
+                </button>
+              </div>
+              <div>
+                <br>
+                <p>
+                  {{ 'AUTH.SIGN_IN.NEW' | translate }}
+                  <a [routerLink]="" (click)="authGroup.selectedIndex=1">{{ 'AUTH.SIGN_UP.TITLE' | translate }}!</a>
+                </p>
               </div>
             </mat-card-content>
           </mat-tab>
           <mat-tab label="{{ 'AUTH.SIGN_UP.TITLE' | translate }}">
+            <br>
             <mat-card-content>
               <app-sign-up></app-sign-up>
               <div fxLayout="column" fxLayoutAlign="space-evenly center">
                 <br>
                 <b>{{ 'AUTH.SIGN_UP.OR' | translate }}</b>
-                <br>
               </div>
               <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
                 <button mat-button (click)="socialSignIn('google')">
@@ -55,7 +68,17 @@
                        src="https://developers.google.com/identity/images/g-logo.png"/>
                   Google
                 </button>
-                <button mat-button color="success" (click)="socialSignIn('facebook')">Facebook</button>
+                <button mat-raised-button color="facebook" (click)="socialSignIn('facebook')">
+                  <mat-icon>facebook</mat-icon>
+                  Facebook
+                </button>
+              </div>
+              <div>
+                <br>
+                <p>
+                  {{ 'AUTH.SIGN_UP.ALREADY' | translate }}
+                  <a [routerLink]="" (click)="authGroup.selectedIndex=0">{{ 'AUTH.SIGN_IN.TITLE' | translate }}!</a>
+                </p>
               </div>
             </mat-card-content>
           </mat-tab>
