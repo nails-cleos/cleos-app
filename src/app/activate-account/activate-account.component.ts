@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState, selectUserState } from '../store/app.states';
+import { AppState, selectAuthState } from '../store/app.states';
 import { Observable } from 'rxjs';
-import { GetAll } from '../store/user.actions';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ActivateAccount, Clean } from '../store/auth.actions';
+import * as fromActionsLogin from '../store/auth.actions';
 
 @Component({
   selector: 'app-activation-code',
@@ -21,6 +20,7 @@ export class ActivateAccountComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.clean();
     this.subscribe();
   }
 
@@ -43,14 +43,14 @@ export class ActivateAccountComponent implements OnInit {
 
   clean(): void {
     this.store.dispatch(
-      new Clean()
+      new fromActionsLogin.Clean()
     );
   }
 
   activate(): void {
     const token: string | null = this.route.snapshot.queryParamMap.get('token');
     this.store.dispatch(
-      new ActivateAccount(token)
+      new fromActionsLogin.ActivateAccount(token)
     );
   }
 }

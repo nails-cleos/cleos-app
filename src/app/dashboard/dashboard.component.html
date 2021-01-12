@@ -1,14 +1,20 @@
 <mat-sidenav-container autosize fullscreen>
   <mat-toolbar color="primary" class="position header max-size">
-    <button mat-icon-button (click)="sidenav.toggle()">
+    <button mat-icon-button (click)="sidenav.toggle()" *ngIf="currentUser">
       <mat-icon>menu</mat-icon>
     </button>
     <button mat-button routerLink="/">{{title}}</button>
     <span class="align-right"></span>
-    <button mat-raised-button color="primary" [matMenuTriggerFor]="menuNotLogged" *ngIf="username">
+    <button mat-raised-button color="accent" [matMenuTriggerFor]="menuNotLogged" *ngIf="username; else login">
       <mat-icon>person_pin</mat-icon>
       {{username | titlecase}}
     </button>
+    <ng-template #login>
+      <button mat-raised-button color="accent" routerLink="/dashboard/login">
+        <mat-icon>login</mat-icon>
+        {{'DASHBOARD.SIGN_IN' | translate }}
+      </button>
+    </ng-template>
     <mat-menu #menuNotLogged="matMenu">
       <button mat-menu-item (click)="profile()">
         <mat-icon>settings</mat-icon>
@@ -48,7 +54,7 @@
   </mat-sidenav>
   <div class="my-content">
     <div class="card-header-content">
-      <div class="flex-container" fxLayout="column">
+      <div fxLayout="column">
         <router-outlet></router-outlet>
       </div>
     </div>

@@ -1,23 +1,31 @@
-import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
-import { IUser, User } from '../interfaces/user';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, Output, EventEmitter} from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../store/app.states';
 import * as fromActionsUser from '../store/user.actions';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { IUser, User } from '../interfaces/user';
 
 @Component({
-  selector: 'app-user-detail',
-  templateUrl: './user-detail.component.html',
-  styleUrls: ['./user-detail.component.scss']
+  selector: 'app-user',
+  templateUrl: './user.component.html',
+  styleUrls: ['./user.component.scss']
 })
-export class UserDetailComponent implements OnInit, AfterViewInit {
+export class UserComponent implements OnInit {
 
-  @Input() user: IUser | undefined;
+  hide = false;
   form!: FormGroup;
   getState: Observable<any>;
+  isLoading: boolean | undefined;
+  errors: any = [];
+
+  @Output() newItemEvent = new EventEmitter<string>();
+
+  role: FormControl = new FormControl('', [
+    Validators.required
+  ]);
   username: FormControl = new FormControl('', [
     Validators.required
   ]);
@@ -30,14 +38,13 @@ export class UserDetailComponent implements OnInit, AfterViewInit {
   lastName: FormControl = new FormControl('', [
     Validators.required
   ]);
+  password: FormControl = new FormControl('', [
+    Validators.required
+  ]);
 
   constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
               private formBuilder: FormBuilder) {
     this.getState = this.store.select(selectUserState);
-  }
-
-  private static getValue(formControl: FormControl, value: string | undefined): string | undefined {
-    return formControl.dirty && value !== formControl.value ? formControl.value : null;
   }
 
   ngOnInit(): void {
@@ -46,16 +53,14 @@ export class UserDetailComponent implements OnInit, AfterViewInit {
     this.subscribe();
   }
 
-  ngAfterViewInit(): void {
-    this.getUser();
-  }
-
   createForm(): void {
     this.form = this.formBuilder.group({
+      role: this.role,
       username: this.username,
       email: this.email,
       firstName: this.firstName,
-      lastName: this.lastName
+      lastName: this.lastName,
+      password: this.password
     });
   }
 
@@ -70,8 +75,12 @@ export class UserDetailComponent implements OnInit, AfterViewInit {
       if (state.selected) {
         this.form.patchValue(state.selected);
       }
-      this.user = state.selected;
-      if (state.errorMessage) {
+      if (state.subErrors) {
+        state.subErrors.forEach((value: any) => {
+          this.errors[value.field] = value.message;
+          this.form.controls[value.field].setErrors({incorrect: true});
+        });
+      } else if (state.errorMessage) {
         this.snackBar.open(state.errorMessage, 'OK', {
           duration: 5000
         });
@@ -79,23 +88,17 @@ export class UserDetailComponent implements OnInit, AfterViewInit {
     });
   }
 
-  getUser(): void {
-    if (!this.user) {
-      const id = this.route.snapshot.paramMap.get('id');
-      this.store.dispatch(
-        new fromActionsUser.FindUser(id)
-      );
-    }
-  }
-
-  update(): void {
+  create(): void {
     const user: IUser = new User();
-    user.id = this.user?.id;
-    user.username = UserDetailComponent.getValue(this.username, this.user?.username);
-    user.email = UserDetailComponent.getValue(this.email, this.user?.email);
-    user.firstName = UserDetailComponent.getValue(this.firstName, this.user?.firstName);
-    user.lastName = UserDetailComponent.getValue(this.lastName, this.user?.lastName);
+    user.username = this.username.value;
+    user.email = this.email.value;
+    user.firstName = this.firstName.value;
+    user.lastName = this.lastName.value;
+    user.password = this.password.value;
 
-    this.store.dispatch(new fromActionsUser.SaveUser({user}));
+    this.store.dispatch(
+      new fromActionsUser.SaveUser({user, role: this.role.value})
+    );
   }
+
 }

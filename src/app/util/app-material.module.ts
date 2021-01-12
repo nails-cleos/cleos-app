@@ -14,6 +14,9 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSelectModule } from '@angular/material/select';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 @NgModule({
   imports: [
@@ -31,7 +34,10 @@ import { MatPaginatorModule } from '@angular/material/paginator';
     MatSnackBarModule,
     MatDialogModule,
     MatSortModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatTooltipModule,
+    MatSelectModule,
+    MatProgressBarModule
   ],
   exports: [
     MatTableModule,
@@ -48,7 +54,10 @@ import { MatPaginatorModule } from '@angular/material/paginator';
     MatSnackBarModule,
     MatDialogModule,
     MatSortModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatTooltipModule,
+    MatSelectModule,
+    MatProgressBarModule
   ]
 })
 export class AppMaterialModule {

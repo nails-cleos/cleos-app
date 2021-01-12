@@ -43,7 +43,8 @@ import { MainComponent } from './main/main.component';
 import { LoginComponent } from './login/login.component';
 import { SignUpComponent } from './sign-up/sign-up.component';
 import { DialogComponent } from './dialog/dialog.component';
-import { ActivateAccountComponent } from './activation-code/activate-account.component';
+import { ActivateAccountComponent } from './activate-account/activate-account.component';
+import { UserComponent } from './user/user.component';
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -81,7 +82,8 @@ const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
     LoginComponent,
     SignUpComponent,
     DialogComponent,
-    ActivateAccountComponent
+    ActivateAccountComponent,
+    UserComponent
   ],
   imports: [
     BrowserModule,

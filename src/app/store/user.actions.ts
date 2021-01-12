@@ -91,3 +91,6 @@ export type All =
   | DeleteUser
   | ResendToken
   | Clean;
+
+export class newCustomer {
+}

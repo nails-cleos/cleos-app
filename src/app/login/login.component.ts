@@ -16,6 +16,7 @@ import { Router } from '@angular/router';
 })
 export class LoginComponent implements OnInit {
 
+  hide = true;
   form!: FormGroup;
   user: IUser | undefined;
   getState: Observable<any>;
@@ -26,6 +27,17 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.clean();
+    this.subscribe();
+  }
+
+  clean(): void {
+    this.store.dispatch(
+      new fromActionsLogin.Clean()
+    );
+  }
+
+  subscribe(): void {
     this.getState.subscribe((state) => {
       if (state.isAuthenticated) {
         this.router.navigate(['dashboard', 'main']);

@@ -7,6 +7,7 @@ export interface State {
   token: null;
   errorMessage: string | null;
   message: string | null;
+  subErrors: any;
 }
 
 export const initialState: State = {
@@ -14,17 +15,19 @@ export const initialState: State = {
   user: null,
   token: null,
   errorMessage: null,
-  message: null
+  message: null,
+  subErrors: null
 };
 
 export function reducer(state = initialState, action: All): State {
   switch (action.type) {
-    case AuthActionTypes.SIGNUP_FAILURE:
-    case AuthActionTypes.LOGIN_FAILURE: {
+    case AuthActionTypes.LOGIN_FAILURE:
+    case AuthActionTypes.SIGNUP_FAILURE: {
       return {
         ...state,
         errorMessage: action.payload.error.message,
-        message: null
+        message: null,
+        subErrors: action.payload.error.subErrors
       };
     }
     case AuthActionTypes.LOGIN_SUCCESS: {
@@ -34,7 +37,8 @@ export function reducer(state = initialState, action: All): State {
         user: action.payload.user,
         token: action.payload.tokenAccess,
         errorMessage: null,
-        message: null
+        message: null,
+        subErrors: null
       };
     }
     case AuthActionTypes.SIGNUP_SUCCESS: {
@@ -43,7 +47,8 @@ export function reducer(state = initialState, action: All): State {
         isAuthenticated: false,
         user: action.payload,
         errorMessage: null,
-        message: action.payload.message
+        message: action.payload.message,
+        subErrors: null
       };
     }
     case AuthActionTypes.ACTIVATE_ACCOUNT: {
@@ -51,7 +56,8 @@ export function reducer(state = initialState, action: All): State {
         ...state,
         isAuthenticated: false,
         errorMessage: null,
-        message: action.payload.message
+        message: action.payload.message,
+        subErrors: null
       };
     }
     case AuthActionTypes.CLEAN:
