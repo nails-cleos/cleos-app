@@ -40,11 +40,15 @@ import { UsersComponent } from './users/users.component';
 import { UserDetailComponent } from './user-detail/user-detail.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { MainComponent } from './main/main.component';
-import { LoginComponent } from './login/login.component';
+import { AuthComponent } from './auth/auth.component';
 import { SignUpComponent } from './sign-up/sign-up.component';
 import { DialogComponent } from './dialog/dialog.component';
 import { ActivateAccountComponent } from './activate-account/activate-account.component';
 import { UserComponent } from './user/user.component';
+import { SignInComponent } from './sign-in/sign-in.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { RecoveryPasswordComponent } from './recovery-password/recovery-password.component';
+import { ChangePasswordComponent } from './change-password/change-password.component';
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -79,11 +83,15 @@ const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
     UserDetailComponent,
     DashboardComponent,
     MainComponent,
-    LoginComponent,
+    AuthComponent,
     SignUpComponent,
     DialogComponent,
     ActivateAccountComponent,
-    UserComponent
+    UserComponent,
+    SignInComponent,
+    ForgotPasswordComponent,
+    RecoveryPasswordComponent,
+    ChangePasswordComponent
   ],
   imports: [
     BrowserModule,

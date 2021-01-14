@@ -8,6 +8,7 @@ export interface State {
   errorMessage: string | null;
   message: string | null;
   subErrors: any;
+  queryParams: any;
 }
 
 export const initialState: State = {
@@ -16,7 +17,8 @@ export const initialState: State = {
   token: null,
   errorMessage: null,
   message: null,
-  subErrors: null
+  subErrors: null,
+  queryParams: {}
 };
 
 export function reducer(state = initialState, action: All): State {
@@ -34,11 +36,12 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         isAuthenticated: true,
-        user: action.payload.user,
-        token: action.payload.tokenAccess,
+        user: action.payload.response.user,
+        token: action.payload.response.tokenAccess,
         errorMessage: null,
         message: null,
-        subErrors: null
+        subErrors: null,
+        queryParams: action.payload.queryParams
       };
     }
     case AuthActionTypes.SIGNUP_SUCCESS: {
@@ -51,6 +54,8 @@ export function reducer(state = initialState, action: All): State {
         subErrors: null
       };
     }
+    case AuthActionTypes.FORGOT_PASSWORD:
+    case AuthActionTypes.RECOVERY_PASSWORD:
     case AuthActionTypes.ACTIVATE_ACCOUNT: {
       return {
         ...state,

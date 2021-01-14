@@ -52,4 +52,9 @@ export class UserService {
     const url = `${this.userUrl}/${id}/token`;
     return this.http.post(url, null);
   }
+
+  public changePassword(oldPassword: string, password: string): Observable<any> {
+    const url = `${this.userUrl}/me/change-password`;
+    return this.http.post(url, {oldPassword, password});
+  }
 }

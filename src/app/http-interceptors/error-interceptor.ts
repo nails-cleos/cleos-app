@@ -19,7 +19,6 @@ export class ErrorInterceptor implements HttpInterceptor {
         this.store.dispatch(
           new fromActionsLogin.LogOut()
         );
-        location.reload(true);
       }
 
       const error = err.error.message || err.statusText;

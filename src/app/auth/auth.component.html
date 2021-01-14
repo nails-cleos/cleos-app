@@ -6,34 +6,6 @@
           <mat-tab label="{{ 'AUTH.SIGN_IN.TITLE' | translate }}">
             <br>
             <mat-card-content>
-              <form (ngSubmit)="signIn()" [formGroup]="form" novalidate>
-                <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-                  <mat-form-field>
-                    <mat-label>{{ 'AUTH.SIGN_IN.USERNAME.FIELD' | translate }}</mat-label>
-                    <input matInput required formControlName="username" autocomplete="username">
-                    <mat-error>
-                      {{ 'AUTH.SIGN_IN.USERNAME.ERROR' | translate }}
-                    </mat-error>
-                  </mat-form-field>
-                  <mat-form-field>
-                    <mat-label>{{ 'AUTH.SIGN_IN.PASSWORD.FIELD' | translate }}</mat-label>
-                    <input matInput required [type]="hide ? 'password' : 'text'" autocomplete="current-password" formControlName="password">
-                    <button type="button" mat-icon-button matSuffix (click)="hide = !hide">
-                      <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
-                    </button>
-                    <mat-error>
-                      {{ 'AUTH.SIGN_IN.USERNAME.ERROR' | translate }}
-                    </mat-error>
-                  </mat-form-field>
-                  <br>
-                  <button mat-raised-button color="accent" [disabled]="form.invalid"
-                          type="submit">{{ 'AUTH.SIGN_IN.TITLE' | translate }}</button>
-                </div>
-              </form>
-              <div fxLayout="column" fxLayoutAlign="space-evenly center">
-                <br>
-                <b>{{ 'AUTH.SIGN_IN.OR' | translate }}</b>
-              </div>
               <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
                 <button mat-button (click)="socialSignIn('google')">
                   <img width="15px" style="margin-bottom:3px; margin-right:5px" alt="Google login"
@@ -45,6 +17,13 @@
                   Facebook
                 </button>
               </div>
+              <div fxLayout="column" fxLayoutAlign="space-evenly center">
+                <br>
+                <mat-divider></mat-divider>
+                <br>
+                <b>{{ 'AUTH.SIGN_IN.OR' | translate }}</b>
+              </div>
+              <app-sign-in></app-sign-in>
               <div>
                 <br>
                 <p>
@@ -57,11 +36,6 @@
           <mat-tab label="{{ 'AUTH.SIGN_UP.TITLE' | translate }}">
             <br>
             <mat-card-content>
-              <app-sign-up></app-sign-up>
-              <div fxLayout="column" fxLayoutAlign="space-evenly center">
-                <br>
-                <b>{{ 'AUTH.SIGN_UP.OR' | translate }}</b>
-              </div>
               <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
                 <button mat-button (click)="socialSignIn('google')">
                   <img width="15px" style="margin-bottom:3px; margin-right:5px" alt="Google login"
@@ -73,6 +47,13 @@
                   Facebook
                 </button>
               </div>
+              <div fxLayout="column" fxLayoutAlign="space-evenly center">
+                <br>
+                <mat-divider></mat-divider>
+                <br>
+                <b>{{ 'AUTH.SIGN_UP.OR' | translate }}</b>
+              </div>
+              <app-sign-up></app-sign-up>
               <div>
                 <br>
                 <p>

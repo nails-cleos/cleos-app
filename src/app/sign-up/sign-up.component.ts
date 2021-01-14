@@ -3,7 +3,7 @@ import { IUser, User } from '../interfaces/user';
 import { AppState, selectAuthState } from '../store/app.states';
 import { Store } from '@ngrx/store';
 import * as fromActionsLogin from '../store/auth.actions';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControlOptions, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MustMatch } from '../util/validators';
@@ -60,7 +60,7 @@ export class SignUpComponent implements OnInit {
       confirmPassword: this.confirmPassword
     }, {
       validator: MustMatch('password', 'confirmPassword')
-    });
+    } as AbstractControlOptions);
   }
 
   subscribe(): void {

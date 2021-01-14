@@ -39,8 +39,9 @@
         "FIELD": "Contraseña",
         "ERROR": "Por favor ingrese una contraseña"
       },
-      "OR": "O ingresa con",
-      "NEW": "¿Nuevo en Nails?"
+      "OR": "O ingresa con tu email",
+      "NEW": "¿Nuevo en Nails?",
+      "FORGOT_PASSWORD": "¿Olvido su contraseña?"
     },
     "SIGN_UP": {
       "TITLE": "Registrar",
@@ -70,7 +71,7 @@
         "FIELD": "Apellido",
         "REQUIRED": "Apellido es <b>requerido</b>"
       },
-      "OR": "O registrate con",
+      "OR": "O registrate con tu email",
       "SUCCESS": "Usuario {{username}} creado. Verifica tu email {{email}}",
       "ALREADY": "¿Ya tienes Nails?"
     },
@@ -79,6 +80,27 @@
       "CONTENT": "Welcome to Nails",
       "BUTTON": "Activate",
       "MESSAGE": "Account activated"
+    },
+    "FORGOT_PASSWORD": {
+      "TITLE": "Olvido su contraseña",
+      "MESSAGE": "Revisa tu email para cambiar tu contraseña",
+      "USERNAME": {
+        "FIELD": "Nombre de usuario o emial",
+        "ERROR": "Por favor ingrese un nombre de usuario o email"
+      }
+    },
+    "RECOVERY_PASSWORD": {
+      "TITLE": "Recuperar contraseña",
+      "MESSAGE": "Contraseña actualizada",
+      "PASSWORD": {
+        "FIELD": "Contraseña",
+        "REQUIRED": "Contraseña es <b>requerido</b>"
+      },
+      "CONFIRM_PASSWORD": {
+        "FIELD": "Confirmar contraseña",
+        "REQUIRED": "Confirmar contraseña es <b>requerido</b>",
+        "MUST_MATCH": "Contraseña y confirmar contraseña deben coincidir"
+      }
     }
   },
   "USER": {
