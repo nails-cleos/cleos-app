@@ -3,7 +3,8 @@
     "BUTTON": {
       "BACK": "Back",
       "YES": "Yes",
-      "NO": "No"
+      "NO": "No",
+      "SEND": "Send"
     },
     "COLUMN": {
       "ACTIONS": "Actions"
@@ -33,14 +34,15 @@
       "TITLE": "Sign In",
       "USERNAME": {
         "FIELD": "Username or email",
-        "ERROR": "Please provide a valid username"
+        "ERROR": "Please provide a valid username or email"
       },
       "PASSWORD": {
         "FIELD": "Password",
         "ERROR": "Please provide a valid password"
       },
-      "OR": "Or sign in with",
-      "NEW": "New to Nails?"
+      "OR": "Or sign in with email",
+      "NEW": "New to Nails?",
+      "FORGOT_PASSWORD": "Forgot password?"
     },
     "SIGN_UP": {
       "TITLE": "Sign up",
@@ -70,7 +72,7 @@
         "FIELD": "Last name",
         "REQUIRED": "Last name is <b>required</b>"
       },
-      "OR": "Or sign up with",
+      "OR": "Or sign up with email",
       "SUCCESS": "User {{username}} created. Check your email {{email}}",
       "ALREADY": "Already on Nails?"
     },
@@ -79,6 +81,44 @@
       "CONTENT": "Welcome to Nails",
       "BUTTON": "Activate",
       "MESSAGE": "Account activated"
+    },
+    "FORGOT_PASSWORD": {
+      "TITLE": "Forgot password",
+      "MESSAGE": "Check your email in order to change your password",
+      "USERNAME": {
+        "FIELD": "Username or email",
+        "ERROR": "Please provide a valid username or email"
+      }
+    },
+    "RECOVERY_PASSWORD": {
+      "TITLE": "Recovery password",
+      "MESSAGE": "Password updated",
+      "PASSWORD": {
+        "FIELD": "Password",
+        "REQUIRED": "Password is <b>required</b>"
+      },
+      "CONFIRM_PASSWORD": {
+        "FIELD": "Confirm password",
+        "REQUIRED": "Confirm password is <b>required</b>",
+        "MUST_MATCH": "Password and confirm password must match"
+      }
+    },
+    "CHANGE_PASSWORD": {
+      "TITLE": "Change password",
+      "MESSAGE": "Password updated",
+      "OLD_PASSWORD": {
+        "FIELD": "Old password",
+        "REQUIRED": "Old password is <b>required</b>"
+      },
+      "PASSWORD": {
+        "FIELD": "New password",
+        "REQUIRED": "New password is <b>required</b>"
+      },
+      "CONFIRM_PASSWORD": {
+        "FIELD": "Confirm password",
+        "REQUIRED": "Confirm password is <b>required</b>",
+        "MUST_MATCH": "New password and confirm password must match"
+      }
     }
   },
   "USER": {

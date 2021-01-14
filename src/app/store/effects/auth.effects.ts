@@ -4,13 +4,12 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthActionTypes, LoginFailure, LoginSuccess, SignUpSuccess, SignUpFailure } from '../auth.actions';
 import { TranslateService } from '@ngx-translate/core';
 
 @Injectable()
 export class LoginEffects {
-  returnUrl: string;
 
   @Effect()
   login$ = this.actions$.pipe(ofType(AuthActionTypes.LOGIN)).pipe(
@@ -18,7 +17,7 @@ export class LoginEffects {
     switchMap((payload: any) => {
       return this.authService.login(payload.username, payload.password).pipe(
         switchMap((response: any) => {
-          return of(new LoginSuccess(response));
+          return of(new LoginSuccess({response, queryParams: payload.queryParams}));
         }),
         catchError((err: HttpErrorResponse) => of(new LoginFailure({error: err.error})))
       );
@@ -29,9 +28,10 @@ export class LoginEffects {
   socialLogin$ = this.actions$.pipe(ofType(AuthActionTypes.SOCIAL_LOGIN)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => {
-      return this.authService.socialLogin(payload.idToken || payload.authToken, payload.provider).pipe(
+      const user = payload.socialUser;
+      return this.authService.socialLogin(user.idToken || user.authToken, user.provider).pipe(
         switchMap((response: any) => {
-          return of(new LoginSuccess(response));
+          return of(new LoginSuccess({response, queryParams: payload.queryParams}));
         }),
         catchError((err: HttpErrorResponse) => of(new LoginFailure({error: err.error})))
       );
@@ -41,7 +41,9 @@ export class LoginEffects {
   @Effect({dispatch: false})
   loginSuccess$ = this.actions$.pipe(
     ofType(AuthActionTypes.LOGIN_SUCCESS),
-    tap(() => this.router.navigate([this.returnUrl]))
+    tap((response: any) => {
+      this.router.navigate([response.payload.queryParams.returnUrl || 'dashboard/main']);
+    })
   );
 
   @Effect({dispatch: false})
@@ -77,6 +79,34 @@ export class LoginEffects {
     })
   );
 
+  @Effect()
+  forgotPassword$ = this.actions$.pipe(ofType(AuthActionTypes.FORGOT_PASSWORD)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => {
+      return this.authService.forgotPassword(payload).pipe(
+        switchMap(() => {
+          const message = this.translate.instant('AUTH.FORGOT_PASSWORD.MESSAGE');
+          return of(new SignUpSuccess({message}));
+        }),
+        catchError((err: HttpErrorResponse) => of(new SignUpFailure({error: err.error})))
+      );
+    })
+  );
+
+  @Effect()
+  recoveryPassword$ = this.actions$.pipe(ofType(AuthActionTypes.RECOVERY_PASSWORD)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => {
+      return this.authService.recoveryPassword(payload.token, payload.password).pipe(
+        switchMap(() => {
+          const message = this.translate.instant('AUTH.RECOVERY_PASSWORD.MESSAGE');
+          return of(new SignUpSuccess({message}));
+        }),
+        catchError((err: HttpErrorResponse) => of(new SignUpFailure({error: err.error})))
+      );
+    })
+  );
+
   @Effect({dispatch: false})
   signUpSuccess$ = this.actions$.pipe(
     ofType(AuthActionTypes.SIGNUP_SUCCESS)
@@ -97,7 +127,6 @@ export class LoginEffects {
   );
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private authService: AuthService,
-              private router: Router, private route: ActivatedRoute) {
-    this.returnUrl = this.route.snapshot.queryParams.returnUrl || 'dashboard/main';
+              private router: Router) {
   }
 }

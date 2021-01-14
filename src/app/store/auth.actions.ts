@@ -10,6 +10,8 @@ export enum AuthActionTypes {
   SIGNUP_FAILURE = '[Auth] Signup Failure',
   LOGOUT = '[Auth] Logout',
   ACTIVATE_ACCOUNT = '[Auth] Activate Account',
+  FORGOT_PASSWORD = '[Auth] Forgot password',
+  RECOVERY_PASSWORD = '[Auth] Recovery password',
   CLEAN = '[Auth] Clean'
 }
 
@@ -73,6 +75,20 @@ export class ActivateAccount implements Action {
   }
 }
 
+export class ForgotPassword implements Action {
+  readonly type = AuthActionTypes.FORGOT_PASSWORD;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class RecoveryPassword implements Action {
+  readonly type = AuthActionTypes.RECOVERY_PASSWORD;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class Clean implements Action {
   readonly type = AuthActionTypes.CLEAN;
 }
@@ -87,4 +103,6 @@ export type All =
   | SignUpFailure
   | ActivateAccount
   | LogOut
+  | ForgotPassword
+  | RecoveryPassword
   | Clean;

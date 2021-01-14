@@ -8,6 +8,7 @@ import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Role } from '../../interfaces/token';
+import { AuthActionTypes, SignUpFailure, SignUpSuccess } from '../auth.actions';
 
 @Injectable()
 export class UserEffects {
@@ -92,6 +93,20 @@ export class UserEffects {
       return this.userService.resend(payload).pipe(
         switchMap(() => {
           const message = this.translate.instant('USER.ACTIVATION_RESEND.MESSAGE');
+          return of(new UserSaveSuccess({message}));
+        }),
+        catchError((err: HttpErrorResponse) => of(new UserFailure({error: err.error})))
+      );
+    })
+  );
+
+  @Effect()
+  changePassword$ = this.actions$.pipe(ofType(UserActionTypes.CHANGE_PASSWORD)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => {
+      return this.userService.changePassword(payload.oldPassword, payload.password).pipe(
+        switchMap(() => {
+          const message = this.translate.instant('USER.CHANGE_PASSWORD.MESSAGE');
           return of(new UserSaveSuccess({message}));
         }),
         catchError((err: HttpErrorResponse) => of(new UserFailure({error: err.error})))

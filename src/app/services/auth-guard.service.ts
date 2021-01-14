@@ -3,6 +3,7 @@ import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from
 import { IUser } from '../interfaces/user';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState } from '../store/app.states';
+import * as fromActionsLogin from '../store/auth.actions';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -26,8 +27,12 @@ export class AuthGuardService implements CanActivate {
       return true;
     }
 
-    // not logged in so redirect to login page with the return url
-    this.router.navigate(['dashboard', 'login'], {queryParams: {returnUrl: state.url}});
+    // not logged in so redirect to auth page with the return url
+    this.router.navigate(['dashboard', 'auth'], {queryParams: {returnUrl: state.url}});
+
+    // this.store.dispatch(
+    //   new fromActionsLogin.LogOut()
+    // );
     return false;
   }
 

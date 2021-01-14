@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Menu, MENUS } from '../interfaces/menu';
 import { IUser } from '../interfaces/user';
-import { AppState, selectAuthState, selectUserState } from '../store/app.states';
+import { AppState, selectAuthState } from '../store/app.states';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import * as fromActionsLogin from '../store/auth.actions';
@@ -18,6 +18,7 @@ export class DashboardComponent implements OnInit {
   currentUser!: IUser | null;
   username: string | undefined;
   getState: Observable<any>;
+  canChangePassword = false;
 
   constructor(private router: Router, private store: Store<AppState>) {
     this.getState = this.store.select(selectAuthState);
@@ -32,6 +33,7 @@ export class DashboardComponent implements OnInit {
       if (state.isAuthenticated) {
         const user = state.user;
         this.currentUser = user;
+        this.canChangePassword = user?.provider === 'LOCAL';
         this.username = user?.firstName ? `${user.firstName} ${user?.lastName}` : user?.username;
       }
     });
@@ -42,13 +44,5 @@ export class DashboardComponent implements OnInit {
       new fromActionsLogin.LogOut()
     );
     this.router.navigate(['dashboard', 'main']);
-  }
-
-  profile(): void {
-    this.router.navigate(['/panel/profile']);
-  }
-
-  changePassword(): void {
-    this.router.navigate(['/panel/change-password']);
   }
 }

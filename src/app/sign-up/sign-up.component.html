@@ -52,7 +52,10 @@
       </mat-error>
     </mat-form-field>
     <br>
-    <button mat-raised-button color="accent" [disabled]="form.invalid"
+  </div>
+  <div fxLayout="row">
+    <div fxFlex></div>
+    <button fxFlex mat-raised-button color="accent" [disabled]="form.invalid"
             type="submit">{{ 'AUTH.SIGN_UP.TITLE' | translate }}</button>
   </div>
 </form>

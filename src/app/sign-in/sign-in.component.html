@@ -1,0 +1,31 @@
+<form (ngSubmit)="signIn()" [formGroup]="form" novalidate>
+  <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+    <mat-form-field>
+      <mat-label>{{ 'AUTH.SIGN_IN.USERNAME.FIELD' | translate }}</mat-label>
+      <input matInput required formControlName="username" autocomplete="username">
+      <mat-error>
+        {{ 'AUTH.SIGN_IN.USERNAME.ERROR' | translate }}
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>{{ 'AUTH.SIGN_IN.PASSWORD.FIELD' | translate }}</mat-label>
+      <input matInput required [type]="hide ? 'password' : 'text'" autocomplete="current-password"
+             formControlName="password">
+      <button type="button" mat-icon-button matSuffix (click)="hide = !hide">
+        <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+      </button>
+      <mat-error>
+        {{ 'AUTH.SIGN_IN.PASSWORD.ERROR' | translate }}
+      </mat-error>
+    </mat-form-field>
+    <br>
+  </div>
+  <div fxLayout="row">
+    <div fxLayout="column" fxLayoutAlign="space-evenly start">
+      <a type="button" routerLink="/dashboard/forgot-password">{{ 'AUTH.SIGN_IN.FORGOT_PASSWORD' | translate }}</a>
+    </div>
+    <div fxFlex></div>
+    <button fxFlex mat-raised-button color="accent" [disabled]="form.invalid"
+            type="submit">{{ 'AUTH.SIGN_IN.TITLE' | translate }}</button>
+  </div>
+</form>

@@ -10,17 +10,17 @@
       {{username | titlecase}}
     </button>
     <ng-template #login>
-      <button mat-raised-button color="accent" routerLink="/dashboard/login">
+      <button mat-raised-button color="accent" routerLink="/dashboard/auth">
         <mat-icon>login</mat-icon>
         {{'DASHBOARD.SIGN_IN' | translate }}
       </button>
     </ng-template>
     <mat-menu #menuNotLogged="matMenu">
-      <button mat-menu-item (click)="profile()">
+      <button mat-menu-item routerLink="/dashboard/profile">
         <mat-icon>settings</mat-icon>
         <span>{{'DASHBOARD.PROFILE' | translate }}</span>
       </button>
-      <button mat-menu-item (click)="changePassword()">
+      <button mat-menu-item routerLink="/dashboard/change-password" *ngIf="canChangePassword">
         <mat-icon>mode_edit</mat-icon>
         <span>{{'DASHBOARD.CHANGE_PASSWORD' | translate }}</span>
       </button>

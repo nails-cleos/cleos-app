@@ -83,6 +83,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
+    case UserActionTypes.CHANGE_PASSWORD:
     case UserActionTypes.SAVE_USER:
     case UserActionTypes.RESEND_USER_TOKEN:
     case UserActionTypes.USER_DELETE: {
