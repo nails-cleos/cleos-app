@@ -34,6 +34,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
+    case UserActionTypes.FIND_ME:
     case UserActionTypes.FIND_USER: {
       return {
         ...state,
@@ -58,7 +59,7 @@ export function reducer(state = initialState, action: All): State {
     case UserActionTypes.USER_SELECTED: {
       return {
         ...state,
-        selected: action.payload,
+        selected: action.payload.user,
         errorMessage: null,
         subErrors: null,
         message: null,
@@ -85,6 +86,7 @@ export function reducer(state = initialState, action: All): State {
     }
     case UserActionTypes.CHANGE_PASSWORD:
     case UserActionTypes.SAVE_USER:
+    case UserActionTypes.UPDATE_USER:
     case UserActionTypes.RESEND_USER_TOKEN:
     case UserActionTypes.USER_DELETE: {
       return {

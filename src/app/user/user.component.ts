@@ -21,8 +21,6 @@ export class UserComponent implements OnInit {
   isLoading: boolean | undefined;
   errors: any = [];
 
-  @Output() newItemEvent = new EventEmitter<string>();
-
   role: FormControl = new FormControl('', [
     Validators.required
   ]);
@@ -100,5 +98,4 @@ export class UserComponent implements OnInit {
       new fromActionsUser.SaveUser({user, role: this.role.value})
     );
   }
-
 }

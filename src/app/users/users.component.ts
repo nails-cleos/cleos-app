@@ -101,7 +101,7 @@ export class UsersComponent implements OnInit, AfterViewInit {
 
   edit(user: IUser): void {
     this.store.dispatch(
-      new fromActionsUser.UserSelected(user)
+      new fromActionsUser.UserSelected({user, profile: false})
     );
   }
 

@@ -8,7 +8,6 @@ export enum AuthActionTypes {
   SIGNUP = '[Auth] Signup',
   SIGNUP_SUCCESS = '[Auth] Signup Success',
   SIGNUP_FAILURE = '[Auth] Signup Failure',
-  LOGOUT = '[Auth] Logout',
   ACTIVATE_ACCOUNT = '[Auth] Activate Account',
   FORGOT_PASSWORD = '[Auth] Forgot password',
   RECOVERY_PASSWORD = '[Auth] Recovery password',
@@ -64,10 +63,6 @@ export class SignUpFailure implements Action {
   }
 }
 
-export class LogOut implements Action {
-  readonly type = AuthActionTypes.LOGOUT;
-}
-
 export class ActivateAccount implements Action {
   readonly type = AuthActionTypes.ACTIVATE_ACCOUNT;
 
@@ -102,7 +97,6 @@ export type All =
   | SignUpSuccess
   | SignUpFailure
   | ActivateAccount
-  | LogOut
   | ForgotPassword
   | RecoveryPassword
   | Clean;

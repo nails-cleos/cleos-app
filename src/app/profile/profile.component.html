@@ -1,0 +1,62 @@
+<div class="flex-container" fxLayout="column">
+  <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" class="card-container">
+    <div fxFlex.lt-sm="80%" fxFlex="50%" fxFlex.gt-lg="40%">
+      <mat-progress-bar mode="indeterminate" color="accent" *ngIf="isLoading"></mat-progress-bar>
+      <mat-card>
+        <mat-card-header *ngIf="user">
+          <mat-card-title>{{ 'PROFILE.TITLE' | translate }}</mat-card-title>
+          <mat-card-subtitle>{{user.email}}</mat-card-subtitle>
+          <div mat-card-avatar class="circle" [ngStyle]="{'background-color':  '#673AB7' }">
+            <img *ngIf="!showInitials; else showInitialsBlock" src="{{user?.imageUrl}}" alt="profile">
+            <ng-template #showInitialsBlock>
+              <div class="initials">{{ initials | uppercase }}</div>
+            </ng-template>
+          </div>
+        </mat-card-header>
+        <br>
+        <form (ngSubmit)="update()" [formGroup]="form" novalidate>
+          <mat-card-content>
+            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+              <mat-form-field>
+                <mat-label>{{ 'PROFILE.USERNAME.FIELD' | translate }}</mat-label>
+                <input matInput required formControlName="username" autocomplete="username">
+                <mat-error *ngIf="username.hasError('required')" [innerHTML]="'PROFILE.PROFILE.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['username']">
+                  {{errors['username']}}
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>{{ 'PROFILE.FIRST_NAME.FIELD' | translate }}</mat-label>
+                <input matInput required formControlName="firstName" autocomplete="username">
+                <mat-error *ngIf="firstName.hasError('required')"
+                           [innerHTML]="'PROFILE.FIRST_NAME.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['firstName']">
+                  {{errors['firstName']}}
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>{{ 'PROFILE.LAST_NAME.FIELD' | translate }}</mat-label>
+                <input matInput required formControlName="lastName" autocomplete="username">
+                <mat-error *ngIf="lastName.hasError('required')"
+                           [innerHTML]="'PROFILE.LAST_NAME.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['lastName']">
+                  {{errors['lastName']}}
+                </mat-error>
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+          <mat-card-actions>
+            <div fxFlex></div>
+            <button mat-raised-button color="primary" [disabled]="form.invalid"
+                    type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
+            <button mat-raised-button color="accent" type="button" (click)="back()">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+          </mat-card-actions>
+        </form>
+      </mat-card>
+    </div>
+  </div>
+</div>
+

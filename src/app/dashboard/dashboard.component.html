@@ -34,12 +34,16 @@
   <mat-sidenav #sidenav mode="over">
     <div (click)="sidenav.toggle()">
       <mat-card>
-        <img *ngIf="currentUser && currentUser.imageUrl" mat-card-image src="{{currentUser.imageUrl}}" alt="profile">
-        <div class="card-title" *ngIf="currentUser">
-          <b>{{username | uppercase}}</b>
-          <br>
-          <span>{{currentUser.email}} </span>
-        </div>
+        <mat-card-header *ngIf="currentUser">
+          <div mat-card-avatar class="circle" [ngStyle]="{'background-color':  '#673AB7' }">
+            <img *ngIf="!showInitials; else showInitialsBlock" src="{{currentUser?.imageUrl}}" alt="profile">
+            <ng-template #showInitialsBlock>
+              <div class="initials">{{ initials | uppercase }}</div>
+            </ng-template>
+          </div>
+          <mat-card-title>{{username | uppercase}}</mat-card-title>
+          <mat-card-subtitle>{{currentUser.email}}</mat-card-subtitle>
+        </mat-card-header>
       </mat-card>
       <mat-nav-list>
         <div *ngFor="let menu of menus">

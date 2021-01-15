@@ -30,7 +30,7 @@
               </mat-form-field>
               <mat-form-field>
                 <mat-label>{{ 'USER.ADD.EMAIL.FIELD' | translate }}</mat-label>
-                <input matInput required formControlName="email" autocomplete="username">
+                <input matInput required formControlName="email" autocomplete="email">
                 <mat-error *ngIf="email.hasError('email')">
                   {{ 'USER.ADD.EMAIL.VALID' | translate }}
                 </mat-error>

@@ -95,5 +95,4 @@ export class ChangePasswordComponent implements OnInit {
   back(): void {
     this.location.back();
   }
-
 }

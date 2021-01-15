@@ -49,6 +49,7 @@ import { SignInComponent } from './sign-in/sign-in.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { RecoveryPasswordComponent } from './recovery-password/recovery-password.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
+import { ProfileComponent } from './profile/profile.component';
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -91,7 +92,8 @@ const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
     SignInComponent,
     ForgotPasswordComponent,
     RecoveryPasswordComponent,
-    ChangePasswordComponent
+    ChangePasswordComponent,
+    ProfileComponent
   ],
   imports: [
     BrowserModule,
