@@ -8,7 +8,6 @@ import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Role } from '../../interfaces/token';
-import { AuthActionTypes, SignUpFailure, SignUpSuccess } from '../auth.actions';
 
 @Injectable()
 export class UserEffects {
@@ -32,7 +31,20 @@ export class UserEffects {
     switchMap((payload: any) => {
       return this.userService.getById(payload).pipe(
         switchMap((response: any) => {
-          return of(new UserSelected(response));
+          return of(new UserSelected({user: response}));
+        }),
+        catchError((err: HttpErrorResponse) => of(new UserFailure({error: err.error})))
+      );
+    })
+  );
+
+  @Effect()
+  findMe$ = this.actions$.pipe(ofType(UserActionTypes.FIND_ME)).pipe(
+    map((action: any) => action.payload),
+    switchMap(() => {
+      return this.userService.getMe().pipe(
+        switchMap((response: any) => {
+          return of(new UserSelected({user: response, profile: true}));
         }),
         catchError((err: HttpErrorResponse) => of(new UserFailure({error: err.error})))
       );
@@ -69,6 +81,20 @@ export class UserEffects {
             catchError((err: HttpErrorResponse) => of(new UserFailure({error: err.error})))
           );
       }
+    })
+  );
+
+  @Effect()
+  update$ = this.actions$.pipe(ofType(UserActionTypes.UPDATE_USER)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => {
+      return this.userService.updateMe(payload).pipe(
+        switchMap((response: any) => {
+          const message = this.translate.instant('PROFILE.MESSAGE', {username: response.username});
+          return of(new UserSaveSuccess({message}));
+        }),
+        catchError((err: HttpErrorResponse) => of(new UserFailure({error: err.error})))
+      );
     })
   );
 
@@ -123,7 +149,9 @@ export class UserEffects {
   selectedData$ = this.actions$.pipe(
     ofType(UserActionTypes.USER_SELECTED),
     tap((data: any) => {
-      this.router.navigate(['dashboard', 'user', data.payload.id]);
+      if (!data.payload.profile) {
+        this.router.navigate(['dashboard', 'user', data.payload.user.id]);
+      }
     })
   );
 

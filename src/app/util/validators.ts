@@ -1,4 +1,4 @@
-import { AbstractControl } from '@angular/forms';
+import { AbstractControl, FormControl } from '@angular/forms';
 
 export function MustMatch(controlName: string, matchingControlName: string): (controls: AbstractControl) => any {
   return (controls: AbstractControl) => {
@@ -17,4 +17,8 @@ export function MustMatch(controlName: string, matchingControlName: string): (co
       return matchingControl?.setErrors(null);
     }
   };
+}
+
+export function FieldChange(formControl: FormControl, value: string | undefined): string | undefined {
+  return formControl.dirty && value !== formControl.value ? formControl.value : null;
 }

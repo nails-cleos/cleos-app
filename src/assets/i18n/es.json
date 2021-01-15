@@ -3,7 +3,9 @@
     "BUTTON": {
       "BACK": "Volver",
       "YES": "Si",
-      "NO": "No"
+      "NO": "No",
+      "SEND": "Enviar",
+      "UPDATE": "Actualizar"
     },
     "COLUMN": {
       "ACTIONS": "Acciones"
@@ -175,7 +177,7 @@
     "DELETED": {
       "TITLE": "Eliminar usuario",
       "CONTENT": "¿Está seguro de eliminar el usuario {{firstName}} {{lastName}}?",
-      "MESSAGE":  "Usuario {{username}} eliminado"
+      "MESSAGE": "Usuario {{username}} eliminado"
     },
     "UPDATED": {
       "MESSAGE": "Usuario {{username}} actualizado"
@@ -184,6 +186,40 @@
       "TITLE": "Reenviar código de activación",
       "CONTENT": "¿Está seguro de reenviar el código de activación al usuario {{firstName}} {{lastName}}?",
       "MESSAGE": "Código de activación enviado"
+    },
+    "CHANGE_PASSWORD": {
+      "TITLE": "Cambiar contraseña",
+      "MESSAGE": "La contraseña se actualizo",
+      "USERNAME": {
+        "FIELD": "Nombre de usuario"
+      },
+      "OLD_PASSWORD": {
+        "FIELD": "Contraseña actual",
+        "REQUIRED": "Contraseña actual es <b>requerido</b>"
+      },
+      "PASSWORD": {
+        "FIELD": "Contraseña",
+        "REQUIRED": "Contraseña es <b>requerido</b>"
+      },
+      "CONFIRM_PASSWORD": {
+        "FIELD": "Confirmar contraseña",
+        "REQUIRED": "Confirmar contraseña es <b>requerido</b>",
+        "MUST_MATCH": "Contraseña y confirmar contraseña deben coincidir"
+      }
+    }
+  },
+  "PROFILE": {
+    "TITLE": "Perfil",
+    "USERNAME": {
+      "FIELD": "Nombre de usuario"
+    },
+    "FIRST_NAME": {
+      "FIELD": "Nombre",
+      "REQUIRED": "Nombre es <b>requerido</b>"
+    },
+    "LAST_NAME": {
+      "FIELD": "Apellido",
+      "REQUIRED": "Apellido es <b>requerido</b>"
     }
   },
   "last": {

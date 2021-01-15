@@ -53,7 +53,7 @@
           <mat-card-actions *ngIf="user; else buttonSkeleton">
             <div fxFlex></div>
             <button mat-raised-button color="primary" [disabled]="form.invalid || form.pristine"
-                    type="submit">{{ 'USER.DETAIL.BUTTON' | translate }}</button>
+                    type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
             <button mat-raised-button color="accent"
                     routerLink="/dashboard/users">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>

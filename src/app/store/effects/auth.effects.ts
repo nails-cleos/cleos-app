@@ -119,7 +119,7 @@ export class LoginEffects {
 
   @Effect({dispatch: false})
   public logOut$ = this.actions$.pipe(
-    ofType(AuthActionTypes.LOGOUT),
+    ofType(AuthActionTypes.CLEAN),
     tap(() => {
       localStorage.removeItem('auth');
       location.reload(true);

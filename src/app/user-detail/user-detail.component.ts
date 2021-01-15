@@ -7,6 +7,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../store/app.states';
 import * as fromActionsUser from '../store/user.actions';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FieldChange } from '../util/validators';
 
 @Component({
   selector: 'app-user-detail',
@@ -34,10 +35,6 @@ export class UserDetailComponent implements OnInit, AfterViewInit {
   constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
               private formBuilder: FormBuilder) {
     this.getState = this.store.select(selectUserState);
-  }
-
-  private static getValue(formControl: FormControl, value: string | undefined): string | undefined {
-    return formControl.dirty && value !== formControl.value ? formControl.value : null;
   }
 
   ngOnInit(): void {
@@ -68,9 +65,9 @@ export class UserDetailComponent implements OnInit, AfterViewInit {
   subscribe(): void {
     this.getState.subscribe(state => {
       if (state.selected) {
+        this.user = state.selected;
         this.form.patchValue(state.selected);
       }
-      this.user = state.selected;
       if (state.errorMessage) {
         this.snackBar.open(state.errorMessage, 'OK', {
           duration: 5000
@@ -91,10 +88,10 @@ export class UserDetailComponent implements OnInit, AfterViewInit {
   update(): void {
     const user: IUser = new User();
     user.id = this.user?.id;
-    user.username = UserDetailComponent.getValue(this.username, this.user?.username);
-    user.email = UserDetailComponent.getValue(this.email, this.user?.email);
-    user.firstName = UserDetailComponent.getValue(this.firstName, this.user?.firstName);
-    user.lastName = UserDetailComponent.getValue(this.lastName, this.user?.lastName);
+    user.username = FieldChange(this.username, this.user?.username);
+    user.email = FieldChange(this.email, this.user?.email);
+    user.firstName = FieldChange(this.firstName, this.user?.firstName);
+    user.lastName = FieldChange(this.lastName, this.user?.lastName);
 
     this.store.dispatch(new fromActionsUser.SaveUser({user}));
   }

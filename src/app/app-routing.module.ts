@@ -13,6 +13,7 @@ import { UserComponent } from './user/user.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { RecoveryPasswordComponent } from './recovery-password/recovery-password.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
+import { ProfileComponent } from './profile/profile.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/dashboard/main', pathMatch: 'full'},
@@ -25,6 +26,11 @@ const routes: Routes = [
       {path: 'main', component: MainComponent},
       {
         path: 'change-password', component: ChangePasswordComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.Admin, Role.Professional, Role.Customer]
+        }
+      },
+      {
+        path: 'profile', component: ProfileComponent, canActivate: [AuthGuardService], data: {
           roles: [Role.Admin, Role.Professional, Role.Customer]
         }
       },

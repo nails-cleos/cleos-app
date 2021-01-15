@@ -4,7 +4,8 @@
       "BACK": "Back",
       "YES": "Yes",
       "NO": "No",
-      "SEND": "Send"
+      "SEND": "Send",
+      "UPDATE": "Update"
     },
     "COLUMN": {
       "ACTIONS": "Actions"
@@ -102,23 +103,6 @@
         "REQUIRED": "Confirm password is <b>required</b>",
         "MUST_MATCH": "Password and confirm password must match"
       }
-    },
-    "CHANGE_PASSWORD": {
-      "TITLE": "Change password",
-      "MESSAGE": "Password updated",
-      "OLD_PASSWORD": {
-        "FIELD": "Old password",
-        "REQUIRED": "Old password is <b>required</b>"
-      },
-      "PASSWORD": {
-        "FIELD": "New password",
-        "REQUIRED": "New password is <b>required</b>"
-      },
-      "CONFIRM_PASSWORD": {
-        "FIELD": "Confirm password",
-        "REQUIRED": "Confirm password is <b>required</b>",
-        "MUST_MATCH": "New password and confirm password must match"
-      }
     }
   },
   "USER": {
@@ -193,7 +177,7 @@
     "DELETED": {
       "TITLE": "Delete user",
       "CONTENT": "Are you sure to delete user {{firstName}} {{lastName}}?",
-      "MESSAGE":  "User {{username}} deleted"
+      "MESSAGE": "User {{username}} deleted"
     },
     "UPDATED": {
       "MESSAGE": "User {{username}} updated"
@@ -202,6 +186,40 @@
       "TITLE": "Resend activation code",
       "CONTENT": "Are you sure to resend activation code to user {{firstName}} {{lastName}}?",
       "MESSAGE": "Activation code sent"
+    },
+    "CHANGE_PASSWORD": {
+      "TITLE": "Change password",
+      "MESSAGE": "Password updated",
+      "USERNAME": {
+        "FIELD": "Username"
+      },
+      "OLD_PASSWORD": {
+        "FIELD": "Old password",
+        "REQUIRED": "Old password is <b>required</b>"
+      },
+      "PASSWORD": {
+        "FIELD": "New password",
+        "REQUIRED": "New password is <b>required</b>"
+      },
+      "CONFIRM_PASSWORD": {
+        "FIELD": "Confirm password",
+        "REQUIRED": "Confirm password is <b>required</b>",
+        "MUST_MATCH": "New password and confirm password must match"
+      }
+    }
+  },
+  "PROFILE": {
+    "TITLE": "Profile",
+    "USERNAME": {
+      "FIELD": "Username"
+    },
+    "FIRST_NAME": {
+      "FIELD": "First name",
+      "REQUIRED": "First name is <b>required</b>"
+    },
+    "LAST_NAME": {
+      "FIELD": "Last name",
+      "REQUIRED": "Last name is <b>required</b>"
     }
   },
   "last": {

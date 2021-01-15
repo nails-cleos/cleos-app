@@ -6,7 +6,9 @@ export enum UserActionTypes {
   USER_FAILURE = '[User] Failure',
   USER_SELECTED = '[User] Selected',
   FIND_USER = '[User] Find',
+  FIND_ME = '[User] Me',
   SAVE_USER = '[User] Save',
+  UPDATE_USER = '[User] Update',
   USER_SAVE_SUCCESS = '[User] Save Success',
   USER_DELETE = '[User] Delete',
   RESEND_USER_TOKEN = '[User] Resend user token',
@@ -49,8 +51,19 @@ export class FindUser implements Action {
   }
 }
 
+export class FindMe implements Action {
+  readonly type = UserActionTypes.FIND_ME;
+}
+
 export class SaveUser implements Action {
   readonly type = UserActionTypes.SAVE_USER;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class UpdateUser implements Action {
+  readonly type = UserActionTypes.UPDATE_USER;
 
   constructor(public payload: any) {
   }
@@ -94,7 +107,9 @@ export type All =
   | UserFailure
   | UserSelected
   | FindUser
+  | FindMe
   | SaveUser
+  | UpdateUser
   | UserSaveSuccess
   | DeleteUser
   | ResendToken

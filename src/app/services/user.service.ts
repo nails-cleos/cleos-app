@@ -30,8 +30,18 @@ export class UserService {
     return this.http.get<IUser>(url);
   }
 
+  getMe(): Observable<IUser | undefined> {
+    const url = `${this.userUrl}/me`;
+    return this.http.get<IUser>(url);
+  }
+
   update(user: IUser): Observable<IUser> {
     const url = `${this.userUrl}/${user.id}`;
+    return this.http.patch<IUser>(url, user);
+  }
+
+  updateMe(user: IUser): Observable<IUser> {
+    const url = `${this.userUrl}/me`;
     return this.http.patch<IUser>(url, user);
   }
 
