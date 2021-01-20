@@ -48,7 +48,6 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         isAuthenticated: false,
-        user: action.payload,
         errorMessage: null,
         message: action.payload.message,
         subErrors: null
@@ -65,7 +64,15 @@ export function reducer(state = initialState, action: All): State {
         subErrors: null
       };
     }
-    case AuthActionTypes.CLEAN:
+    case AuthActionTypes.CLEAN: {
+      return {
+        ...state,
+        errorMessage: null,
+        message: null,
+        subErrors: null,
+        queryParams: null
+      };
+    }
     case AuthActionTypes.LOGOUT: {
       return initialState;
     }

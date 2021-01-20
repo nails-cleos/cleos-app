@@ -36,9 +36,6 @@ export class UserComponent implements OnInit {
   lastName: FormControl = new FormControl('', [
     Validators.required
   ]);
-  password: FormControl = new FormControl('', [
-    Validators.required
-  ]);
 
   constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
               private formBuilder: FormBuilder) {
@@ -57,8 +54,7 @@ export class UserComponent implements OnInit {
       username: this.username,
       email: this.email,
       firstName: this.firstName,
-      lastName: this.lastName,
-      password: this.password
+      lastName: this.lastName
     });
   }
 
@@ -92,7 +88,6 @@ export class UserComponent implements OnInit {
     user.email = this.email.value;
     user.firstName = this.firstName.value;
     user.lastName = this.lastName.value;
-    user.password = this.password.value;
 
     this.store.dispatch(
       new fromActionsUser.SaveUser({user, role: this.role.value})

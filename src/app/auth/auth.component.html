@@ -4,7 +4,6 @@
       <mat-card>
         <mat-tab-group #authGroup>
           <mat-tab label="{{ 'AUTH.SIGN_IN.TITLE' | translate }}">
-            <br>
             <mat-card-content>
               <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
                 <button mat-button (click)="socialSignIn('google')">
@@ -17,15 +16,14 @@
                   Facebook
                 </button>
               </div>
-              <div fxLayout="column" fxLayoutAlign="space-evenly center">
-                <br>
+              <div class="divider">
                 <mat-divider></mat-divider>
-                <br>
+              </div>
+              <div fxLayout="column" fxLayoutAlign="space-evenly center" class="divider-padding">
                 <b>{{ 'AUTH.SIGN_IN.OR' | translate }}</b>
               </div>
               <app-sign-in></app-sign-in>
-              <div>
-                <br>
+              <div class="divider">
                 <p>
                   {{ 'AUTH.SIGN_IN.NEW' | translate }}
                   <a [routerLink]="" (click)="authGroup.selectedIndex=1">{{ 'AUTH.SIGN_UP.TITLE' | translate }}!</a>
@@ -34,7 +32,6 @@
             </mat-card-content>
           </mat-tab>
           <mat-tab label="{{ 'AUTH.SIGN_UP.TITLE' | translate }}">
-            <br>
             <mat-card-content>
               <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
                 <button mat-button (click)="socialSignIn('google')">
@@ -47,15 +44,14 @@
                   Facebook
                 </button>
               </div>
-              <div fxLayout="column" fxLayoutAlign="space-evenly center">
-                <br>
+              <div class="divider">
                 <mat-divider></mat-divider>
-                <br>
+              </div>
+              <div fxLayout="column" fxLayoutAlign="space-evenly center" class="divider-padding">
                 <b>{{ 'AUTH.SIGN_UP.OR' | translate }}</b>
               </div>
               <app-sign-up></app-sign-up>
-              <div>
-                <br>
+              <div class="divider">
                 <p>
                   {{ 'AUTH.SIGN_UP.ALREADY' | translate }}
                   <a [routerLink]="" (click)="authGroup.selectedIndex=0">{{ 'AUTH.SIGN_IN.TITLE' | translate }}!</a>
