@@ -6,6 +6,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectAuthState, selectUserState } from '../store/app.states';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as fromActionsUser from '../store/user.actions';
+import * as fromActionsLogin from '../store/auth.actions';
 import { MustMatch } from '../util/validators';
 import { Location } from '@angular/common';
 import { IUser } from '../interfaces/user';
@@ -75,8 +76,9 @@ export class ChangePasswordComponent implements OnInit {
 
         if (state.message) {
           snackBarRef.afterDismissed().subscribe(() => {
-            this.clean();
-            this.router.navigate(['dashboard', 'auth']);
+            this.store.dispatch(
+              new fromActionsLogin.LogOut()
+            );
           });
         }
       }

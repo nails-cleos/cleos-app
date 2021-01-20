@@ -66,6 +66,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
+    case UserActionTypes.CHANGE_PASSWORD_SUCCESS:
     case UserActionTypes.USER_SAVE_SUCCESS: {
       return {
         ...state,

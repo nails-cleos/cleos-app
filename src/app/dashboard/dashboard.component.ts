@@ -54,7 +54,7 @@ export class DashboardComponent implements OnInit {
 
   logout(): void {
     this.store.dispatch(
-      new fromActionsLogin.Clean()
+      new fromActionsLogin.LogOut()
     );
     this.router.navigate(['dashboard', 'main']);
   }

@@ -17,7 +17,7 @@ export class ErrorInterceptor implements HttpInterceptor {
       if ([401, 403].indexOf(err.status) !== -1) {
         // auto logout if 401 response returned from api
         this.store.dispatch(
-          new fromActionsLogin.Clean()
+          new fromActionsLogin.LogOut()
         );
       }
 

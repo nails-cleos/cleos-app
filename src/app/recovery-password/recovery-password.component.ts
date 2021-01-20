@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { AppState, selectAuthState } from '../store/app.states';
+import { ActivatedRoute } from '@angular/router';
+import { AppState } from '../store/app.states';
 import { Store } from '@ngrx/store';
 import * as fromActionsLogin from '../store/auth.actions';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { AbstractControlOptions, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MustMatch } from '../util/validators';
 
@@ -18,7 +16,6 @@ export class RecoveryPasswordComponent implements OnInit {
   hideConfirm = true;
   hide = true;
   form!: FormGroup;
-  getState: Observable<any>;
 
   password: FormControl = new FormControl('', [
     Validators.required
@@ -27,15 +24,12 @@ export class RecoveryPasswordComponent implements OnInit {
     Validators.required
   ]);
 
-  constructor(private snackBar: MatSnackBar, private store: Store<AppState>, private route: ActivatedRoute, private router: Router,
-              private formBuilder: FormBuilder) {
-    this.getState = this.store.select(selectAuthState);
+  constructor(private store: Store<AppState>, private route: ActivatedRoute, private formBuilder: FormBuilder) {
   }
 
   ngOnInit(): void {
     this.clean();
     this.createForm();
-    this.subscribe();
   }
 
   clean(): void {
@@ -51,23 +45,6 @@ export class RecoveryPasswordComponent implements OnInit {
     }, {
       validator: MustMatch('password', 'confirmPassword')
     } as AbstractControlOptions);
-  }
-
-  subscribe(): void {
-    this.getState.subscribe((state) => {
-      if (state.errorMessage || state.message) {
-        const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
-        });
-
-        if (state.message) {
-          snackBarRef.afterDismissed().subscribe(() => {
-            this.clean();
-            this.router.navigate(['dashboard', 'auth']);
-          });
-        }
-      }
-    });
   }
 
   recoveryPassword(): void {

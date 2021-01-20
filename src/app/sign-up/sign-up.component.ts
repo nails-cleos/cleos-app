@@ -20,6 +20,7 @@ export class SignUpComponent implements OnInit {
   form!: FormGroup;
   user: IUser = new User();
   getState: Observable<any>;
+  errors: any = [];
 
   username: FormControl = new FormControl('', [
     Validators.required
@@ -46,7 +47,6 @@ export class SignUpComponent implements OnInit {
 
   ngOnInit(): void {
     this.createForm();
-    this.clean();
     this.subscribe();
   }
 
@@ -64,27 +64,20 @@ export class SignUpComponent implements OnInit {
   }
 
   subscribe(): void {
-    this.getState.subscribe(state => {
-      if (state.errorMessage || state.message) {
-        const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
+    this.getState.subscribe((state) => {
+      if (state.subErrors) {
+        state.subErrors.forEach((value: any) => {
+          this.errors[value.field] = value.message;
+          this.form.controls[value.field].setErrors({incorrect: true});
         });
-
-        if (state.message) {
-          snackBarRef.afterDismissed().subscribe(() => {
-            this.clean();
-            location.reload(true);
-          });
-        }
       }
     });
   }
 
-  clean(): void {
-    this.store.dispatch(new fromActionsLogin.Clean());
-  }
-
   register(): void {
+    if (this.form.invalid) {
+      return;
+    }
     this.user.username = this.username.value;
     this.user.email = this.email.value;
     this.user.firstName = this.firstName.value;

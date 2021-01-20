@@ -42,6 +42,7 @@ export class LoginEffects {
   loginSuccess$ = this.actions$.pipe(
     ofType(AuthActionTypes.LOGIN_SUCCESS),
     tap((response: any) => {
+      console.log(response.payload.user.changePassword)
       this.router.navigate([response.payload.queryParams.returnUrl || 'dashboard/main']);
     })
   );
@@ -109,7 +110,10 @@ export class LoginEffects {
 
   @Effect({dispatch: false})
   signUpSuccess$ = this.actions$.pipe(
-    ofType(AuthActionTypes.SIGNUP_SUCCESS)
+    ofType(AuthActionTypes.SIGNUP_SUCCESS),
+    tap(() => {
+      window.location.href = '/dashboard/auth';
+    })
   );
 
   @Effect({dispatch: false})
@@ -119,10 +123,10 @@ export class LoginEffects {
 
   @Effect({dispatch: false})
   public logOut$ = this.actions$.pipe(
-    ofType(AuthActionTypes.CLEAN),
+    ofType(AuthActionTypes.LOGOUT),
     tap(() => {
       localStorage.removeItem('auth');
-      location.reload(true);
+      window.location.href = '/dashboard/auth';
     })
   );
 

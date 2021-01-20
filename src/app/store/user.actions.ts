@@ -13,6 +13,7 @@ export enum UserActionTypes {
   USER_DELETE = '[User] Delete',
   RESEND_USER_TOKEN = '[User] Resend user token',
   CHANGE_PASSWORD = '[Auth] Change password',
+  CHANGE_PASSWORD_SUCCESS = '[Auth] Change password Success',
   CLEAN = '[User] Clean'
 }
 
@@ -97,6 +98,13 @@ export class ChangePassword implements Action {
   }
 }
 
+export class ChangePasswordSuccess implements Action {
+  readonly type = UserActionTypes.CHANGE_PASSWORD_SUCCESS;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class Clean implements Action {
   readonly type = UserActionTypes.CLEAN;
 }
@@ -114,4 +122,5 @@ export type All =
   | DeleteUser
   | ResendToken
   | ChangePassword
+  | ChangePasswordSuccess
   | Clean;

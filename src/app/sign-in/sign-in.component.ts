@@ -18,42 +18,18 @@ export class SignInComponent implements OnInit {
   hide = true;
   form!: FormGroup;
   user: IUser | undefined;
-  getState: Observable<any>;
 
-  constructor(private formBuilder: FormBuilder, private store: Store<AppState>, private route: ActivatedRoute,
-              private snackBar: MatSnackBar, private router: Router) {
-    this.getState = this.store.select(selectAuthState);
+  constructor(private formBuilder: FormBuilder, private store: Store<AppState>, private route: ActivatedRoute) {
   }
 
   ngOnInit(): void {
     this.createForm();
-    this.clean();
-    this.subscribe();
   }
 
   createForm(): void {
     this.form = this.formBuilder.group({
       username: ['', Validators.required],
       password: ['', Validators.required]
-    });
-  }
-
-  clean(): void {
-    this.store.dispatch(
-      new fromActionsLogin.Clean()
-    );
-  }
-
-  subscribe(): void {
-    this.getState.subscribe((state) => {
-      if (state.isAuthenticated) {
-        this.router.navigate(['dashboard', 'main']);
-      }
-      if (state.errorMessage) {
-        this.snackBar.open(state.errorMessage, 'OK', {
-          duration: 5000
-        });
-      }
     });
   }
 

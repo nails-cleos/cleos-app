@@ -3,8 +3,11 @@
     <mat-form-field>
       <mat-label>{{ 'AUTH.SIGN_UP.USERNAME.FIELD' | translate }}</mat-label>
       <input matInput required formControlName="username" autocomplete="username">
-      <mat-error [innerHTML]="'AUTH.SIGN_UP.USERNAME.REQUIRED' | translate">
+      <mat-error *ngIf="username.hasError('required')" [innerHTML]="'AUTH.SIGN_UP.USERNAME.REQUIRED' | translate">
       </mat-error>
+      <mat-error *ngIf="errors['username']">
+      {{errors['username']}}
+    </mat-error>
     </mat-form-field>
     <mat-form-field>
       <mat-label>{{ 'AUTH.SIGN_UP.EMAIL.FIELD' | translate }}</mat-label>
@@ -14,6 +17,9 @@
       </mat-error>
       <mat-error *ngIf="email.hasError('required')" [innerHTML]="'AUTH.SIGN_UP.EMAIL.REQUIRED' | translate">
       </mat-error>
+      <mat-error *ngIf="errors['email']">
+        {{errors['email']}}
+      </mat-error>
     </mat-form-field>
     <mat-form-field>
       <mat-label>{{ 'AUTH.SIGN_UP.PASSWORD.FIELD' | translate }}</mat-label>
@@ -22,7 +28,10 @@
       <button type="button" mat-icon-button matSuffix (click)="hide = !hide">
         <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
       </button>
-      <mat-error [innerHTML]="'AUTH.SIGN_UP.PASSWORD.REQUIRED' | translate">
+      <mat-error *ngIf="password.hasError('required')" [innerHTML]="'AUTH.SIGN_UP.PASSWORD.REQUIRED' | translate">
+      </mat-error>
+      <mat-error *ngIf="errors['password']">
+        {{errors['password']}}
       </mat-error>
     </mat-form-field>
     <mat-form-field>
@@ -38,20 +47,28 @@
       <mat-error *ngIf="confirmPassword.hasError('mustMatch')">
         {{ 'AUTH.SIGN_UP.CONFIRM_PASSWORD.MUST_MATCH' | translate }}
       </mat-error>
+      <mat-error *ngIf="errors['confirmPassword']">
+        {{errors['confirmPassword']}}
+      </mat-error>
     </mat-form-field>
     <mat-form-field>
       <mat-label>{{ 'AUTH.SIGN_UP.FIRST_NAME.FIELD' | translate }}</mat-label>
       <input matInput required formControlName="firstName" autocomplete="username">
-      <mat-error [innerHTML]="'AUTH.SIGN_UP.FIRST_NAME.REQUIRED' | translate">
+      <mat-error *ngIf="firstName.hasError('required')" [innerHTML]="'AUTH.SIGN_UP.FIRST_NAME.REQUIRED' | translate">
+      </mat-error>
+      <mat-error *ngIf="errors['firstName']">
+        {{errors['firstName']}}
       </mat-error>
     </mat-form-field>
     <mat-form-field>
       <mat-label>{{ 'AUTH.SIGN_UP.LAST_NAME.FIELD' | translate }}</mat-label>
       <input matInput required formControlName="lastName" autocomplete="username">
-      <mat-error [innerHTML]="'AUTH.SIGN_UP.LAST_NAME.REQUIRED' | translate">
+      <mat-error *ngIf="lastName.hasError('required')" [innerHTML]="'AUTH.SIGN_UP.LAST_NAME.REQUIRED' | translate">
+      </mat-error>
+      <mat-error *ngIf="errors['lastName']">
+        {{errors['lastName']}}
       </mat-error>
     </mat-form-field>
-    <br>
   </div>
   <div fxLayout="row">
     <div fxFlex></div>

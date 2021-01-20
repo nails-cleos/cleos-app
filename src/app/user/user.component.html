@@ -6,7 +6,6 @@
         <mat-card-header>
           <mat-card-title>{{ 'USER.ADD.TITLE' | translate }}</mat-card-title>
         </mat-card-header>
-        <br>
         <form (ngSubmit)="create()" [formGroup]="form" novalidate>
           <mat-card-content>
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
@@ -38,20 +37,6 @@
                 </mat-error>
                 <mat-error *ngIf="errors['email']">
                   {{errors['email']}}
-                </mat-error>
-              </mat-form-field>
-              <mat-form-field>
-                <mat-label>{{ 'AUTH.SIGN_UP.PASSWORD.FIELD' | translate }}</mat-label>
-                <input matInput required [type]="hide ? 'password' : 'text'" autocomplete="current-password"
-                       formControlName="password">
-                <button type="button" mat-icon-button matSuffix (click)="hide = !hide">
-                  <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
-                </button>
-                <mat-error *ngIf="password.hasError('required')"
-                           [innerHTML]="'AUTH.SIGN_UP.PASSWORD.REQUIRED' | translate">
-                </mat-error>
-                <mat-error *ngIf="errors['password']">
-                  {{errors['password']}}
                 </mat-error>
               </mat-form-field>
               <mat-form-field>
