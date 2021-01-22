@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter} from '@angular/core';
+import { Component, OnInit} from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
@@ -83,6 +83,9 @@ export class UserComponent implements OnInit {
   }
 
   create(): void {
+    if (this.form.invalid) {
+      return;
+    }
     const user: IUser = new User();
     user.username = this.username.value;
     user.email = this.email.value;

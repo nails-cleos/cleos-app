@@ -112,7 +112,7 @@ export class LoginEffects {
   signUpSuccess$ = this.actions$.pipe(
     ofType(AuthActionTypes.SIGNUP_SUCCESS),
     tap(() => {
-      window.location.href = '/dashboard/auth';
+      window.location.href = '/auth';
     })
   );
 
@@ -126,7 +126,7 @@ export class LoginEffects {
     ofType(AuthActionTypes.LOGOUT),
     tap(() => {
       localStorage.removeItem('auth');
-      window.location.href = '/dashboard/auth';
+      window.location.href = '/auth';
     })
   );
 

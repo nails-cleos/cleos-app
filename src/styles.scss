@@ -11,22 +11,26 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
-@media only screen and (max-width: 700px) {
-  .my-content {
-    margin-left: 0 !important;
-    width: 100% !important;
-  }
-}
+//@media only screen and (max-width: 700px) {
+//  .my-content {
+//    margin-left: 0 !important;
+//    width: 100% !important;
+//  }
+//}
 
-.card-header-content {
-  position: -webkit-sticky; /* Safari */
-  position: sticky;
-  top: 85px;
-  z-index: 1;
-}
+//.card-header-content {
+//  position: -webkit-sticky; /* Safari */
+//  position: sticky;
+//  top: 85px;
+//  z-index: 1;
+//}
 
 table {
   width: 100%;
+}
+
+.small-table {
+  overflow-x: scroll !important;
 }
 
 .mat-column-position {
@@ -94,4 +98,28 @@ a, u {
 
 .divider-padding {
   padding: 10px 0 0 0;
+}
+
+@media all and (max-device-width: 812px) and (orientation: portrait) {
+  #add-button {
+    top: auto;
+    right: 20px;
+    bottom: 20px;
+    left: auto;
+    position: fixed;
+  }
+}
+
+@media not all and (max-device-width: 812px) and (orientation: portrait) {
+  #add-button {
+    top: 83px;
+    right: 30px;
+    bottom: auto;
+    left: auto;
+    position: fixed;
+  }
+}
+
+.ssc-hr {
+  margin: 5px 0 5px 0;
 }

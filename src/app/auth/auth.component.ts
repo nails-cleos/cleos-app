@@ -27,9 +27,8 @@ export class AuthComponent implements OnInit {
 
   subscribe(): void {
     this.getState.subscribe((state) => {
-      console.log(state)
       if (state.isAuthenticated) {
-        this.router.navigate(['dashboard', 'main']);
+        this.router.navigate(['main']);
       }
       if (!state.subErrors && (state.errorMessage || state.message)) {
         const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {

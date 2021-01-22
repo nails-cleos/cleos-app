@@ -1,0 +1,27 @@
+mat-sidenav-container {
+  height: 100%;
+
+  mat-toolbar {
+    .align-right {
+      flex: 1 1 auto;
+    }
+  }
+}
+
+.sidenav {
+  width: auto;
+}
+
+.sidenav .mat-toolbar {
+  background: inherit;
+}
+
+.mat-toolbar.mat-primary {
+  position: sticky;
+  top: 0;
+  z-index: 99;
+}
+
+.grid-container {
+  margin: 20px;
+}

@@ -28,7 +28,7 @@ export class AuthGuardService implements CanActivate {
     }
 
     // not logged in so redirect to auth page with the return url
-    this.router.navigate(['dashboard', 'auth'], {queryParams: {returnUrl: state.url}});
+    this.router.navigate(['auth'], {queryParams: {returnUrl: state.url}});
 
     // this.store.dispatch(
     //   new fromActionsLogin.LogOut()

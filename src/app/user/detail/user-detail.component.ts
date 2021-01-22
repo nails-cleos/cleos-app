@@ -1,13 +1,13 @@
 import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
-import { IUser, User } from '../interfaces/user';
+import { IUser, User } from '../../interfaces/user';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
-import { AppState, selectUserState } from '../store/app.states';
-import * as fromActionsUser from '../store/user.actions';
+import { AppState, selectUserState } from '../../store/app.states';
+import * as fromActionsUser from '../../store/user.actions';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { FieldChange } from '../util/validators';
+import { FieldChange } from '../../util/validators';
 
 @Component({
   selector: 'app-user-detail',

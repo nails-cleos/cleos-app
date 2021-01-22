@@ -5,7 +5,8 @@
       "YES": "Yes",
       "NO": "No",
       "SEND": "Send",
-      "UPDATE": "Update"
+      "UPDATE": "Update",
+      "CANCEL": "Cancel"
     },
     "COLUMN": {
       "ACTIONS": "Actions"
@@ -151,7 +152,6 @@
     },
     "DETAIL": {
       "TITLE": "Update user",
-      "BUTTON": "Update",
       "USERNAME": {
         "FIELD": "Username",
         "REQUIRED": "Username is <b>required</b>"
@@ -220,6 +220,69 @@
     "LAST_NAME": {
       "FIELD": "Last name",
       "REQUIRED": "Last name is <b>required</b>"
+    }
+  },
+  "PRODUCT": {
+    "LIST": {
+      "COLUMN": {
+        "NAME": "Name",
+        "DESCRIPTION": "Description",
+        "PRICE": "Price",
+        "DURATION": "Duration"
+      }
+    },
+    "ADD": {
+      "TITLE": "Add product",
+      "BUTTON": "Create",
+      "NAME": {
+        "FIELD": "Name",
+        "REQUIRED": "Name is <b>required</b>"
+      },
+      "DESCRIPTION": {
+        "FIELD": "Description"
+      },
+      "PRICE": {
+        "FIELD": "Price",
+        "REQUIRED": "Price is <b>required</b>",
+        "GREATER": "Price must be greater than 1"
+      },
+      "DURATION": {
+        "FIELD": "Duration",
+        "REQUIRED": "Duration is <b>required</b>",
+        "GREATER": "{{type}} must be greater than 0",
+        "LESS": "{{type}} must be less than {{max}}"
+      },
+      "CREATED": "Product {{name}} created"
+    },
+    "DETAIL": {
+      "TITLE": "Update product",
+      "NAME": {
+        "FIELD": "Name",
+        "REQUIRED": "Name is <b>required</b>"
+      },
+      "DESCRIPTION": {
+        "FIELD": "Description"
+      },
+      "PRICE": {
+        "FIELD": "Price",
+        "REQUIRED": "Price is <b>required</b>",
+        "GREATER": "Price must be greater than 1"
+      },
+      "DURATION": {
+        "FIELD": "Duration",
+        "REQUIRED": "Duration is <b>required</b>",
+        "GREATER": "{{type}} must be greater than 0",
+        "LESS": "{{type}} must be less than {{max}}"
+      },
+      "CREATED": "Product {{name}} created"
+    },
+    "DELETED": {
+      "TITLE": "Delete product",
+      "CONTENT": "Are you sure to delete product {{name}}?",
+      "MESSAGE": "Product {{name}} deleted"
+    },
+    "UPDATED": {
+      "MESSAGE": "Product {{name}} updated"
     }
   },
   "last": {

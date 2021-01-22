@@ -1,16 +1,16 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { IUser, PAGE_SIZE } from '../interfaces/user';
+import { IUser, PAGE_SIZE } from '../../interfaces/user';
 import { Store } from '@ngrx/store';
-import { AppState, selectUserState } from '../store/app.states';
+import { AppState, selectUserState } from '../../store/app.states';
 import { Observable } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import * as fromActionsUser from '../store/user.actions';
+import * as fromActionsUser from '../../store/user.actions';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
-import { DialogComponent } from '../dialog/dialog.component';
+import { DialogComponent } from '../../dialog/dialog.component';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { Pagination } from '../interfaces/pagination';
+import { Pagination } from '../../interfaces/pagination';
 import { TranslateService } from '@ngx-translate/core';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 
@@ -106,6 +106,7 @@ export class UsersComponent implements OnInit, AfterViewInit {
   }
 
   delete(user: IUser): void {
+    this.noExpanded(user);
     const title = this.translate.instant('USER.DELETED.TITLE');
     const content = this.translate.instant('USER.DELETED.CONTENT', {firstName: user.firstName, lastName: user.lastName});
     const dialogRef = this.dialog.open(DialogComponent, {
@@ -122,6 +123,7 @@ export class UsersComponent implements OnInit, AfterViewInit {
   }
 
   sendInvite(user: IUser): void {
+    this.noExpanded(user);
     const title = this.translate.instant('USER.ACTIVATION_RESEND.TITLE');
     const content = this.translate.instant('USER.ACTIVATION_RESEND.CONTENT', {firstName: user.firstName, lastName: user.lastName});
     const dialogRef = this.dialog.open(DialogComponent, {
@@ -135,5 +137,13 @@ export class UsersComponent implements OnInit, AfterViewInit {
         );
       }
     });
+  }
+
+  private noExpanded(user: IUser): void {
+    if (this.expandedUser) {
+      this.expandedUser = undefined;
+    } else {
+      this.expandedUser = user;
+    }
   }
 }

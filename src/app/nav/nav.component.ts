@@ -1,20 +1,28 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { Menu, MENUS } from '../interfaces/menu';
-import { IUser } from '../interfaces/user';
-import { AppState, selectAuthState } from '../store/app.states';
-import { Store } from '@ngrx/store';
+import { Component, OnInit } from '@angular/core';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable } from 'rxjs';
+import { map, shareReplay } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { AppState, selectAuthState } from '../store/app.states';
+import { IUser } from '../interfaces/user';
 import * as fromActionsLogin from '../store/auth.actions';
 
 @Component({
-  selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  selector: 'app-nav',
+  templateUrl: './nav.component.html',
+  styleUrls: ['./nav.component.scss']
 })
-export class DashboardComponent implements OnInit {
+export class NavComponent implements OnInit {
+
+  isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
+    .pipe(
+      map(result => result.matches),
+      shareReplay()
+    );
+
   title = 'Nails';
-  menus: Menu[] = MENUS;
+  menuItems = ['dashboard', 'users', 'products'];
   currentUser!: IUser | null;
   username: string | undefined;
   getState: Observable<any>;
@@ -23,7 +31,7 @@ export class DashboardComponent implements OnInit {
   showInitials = false;
   initials: string | undefined;
 
-  constructor(private router: Router, private store: Store<AppState>) {
+  constructor(private breakpointObserver: BreakpointObserver, private router: Router, private store: Store<AppState>) {
     this.getState = this.store.select(selectAuthState);
   }
 
@@ -56,6 +64,7 @@ export class DashboardComponent implements OnInit {
     this.store.dispatch(
       new fromActionsLogin.LogOut()
     );
-    this.router.navigate(['dashboard', 'main']);
+    this.router.navigate(['main']);
   }
+
 }

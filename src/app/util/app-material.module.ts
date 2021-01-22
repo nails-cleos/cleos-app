@@ -18,6 +18,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSelectModule } from '@angular/material/select';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatTimepickerModule } from 'mat-timepicker';
+import { LayoutModule } from '@angular/cdk/layout';
 
 @NgModule({
   imports: [
@@ -39,7 +43,10 @@ import { MatDividerModule } from '@angular/material/divider';
     MatTooltipModule,
     MatSelectModule,
     MatProgressBarModule,
-    MatDividerModule
+    MatDividerModule,
+    MatGridListModule,
+    MatRadioModule,
+    LayoutModule
   ],
   exports: [
     MatTableModule,
@@ -60,7 +67,11 @@ import { MatDividerModule } from '@angular/material/divider';
     MatTooltipModule,
     MatSelectModule,
     MatProgressBarModule,
-    MatDividerModule
+    MatDividerModule,
+    MatGridListModule,
+    MatRadioModule,
+    MatTimepickerModule,
+    LayoutModule
   ]
 })
 export class AppMaterialModule {
