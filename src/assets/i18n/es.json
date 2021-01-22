@@ -151,7 +151,6 @@
     },
     "DETAIL": {
       "TITLE": "Actualizar usuario",
-      "BUTTON": "Actualizar",
       "USERNAME": {
         "FIELD": "Nombre de usuario",
         "REQUIRED": "Nombre de usuario es <b>requerido</b>"

@@ -39,28 +39,7 @@ tr.user-row:not(.user-expanded-row):active {
   display: flex;
 }
 
-
 .mainDiv {
   position: relative;
-}
-
-@media all and (max-device-width: 812px) and (orientation: portrait) {
-  #add-button {
-    top: auto;
-    right: 20px;
-    bottom: 20px;
-    left: auto;
-    position: fixed;
-  }
-}
-
-@media not all and (max-device-width: 812px) and (orientation: portrait) {
-  #add-button {
-    top: 85px;
-    right: 30px;
-    bottom: auto;
-    left: auto;
-    position: fixed;
-  }
 }
 

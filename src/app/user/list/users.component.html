@@ -1,0 +1,150 @@
+<div class="mat-elevation-z8 small-table">
+  <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort matSortActive="username"
+         matSortDisableClear matSortDirection="desc">
+    <ng-container matColumnDef="position">
+      <th mat-header-cell *matHeaderCellDef> No.</th>
+      <td mat-cell *matCellDef="let user; let i = dataIndex;">
+        <div *ngIf="user.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'USER.LIST.COLUMN.NAME' | translate }}</th>
+      <td mat-cell *matCellDef="let user">
+        <div *ngIf="user.id; else skeleton">{{user.firstName}} {{user.lastName}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="username">
+      <th mat-header-cell fxShow fxHide.lt-sm *matHeaderCellDef mat-sort-header>{{ 'USER.LIST.COLUMN.USERNAME' | translate }}</th>
+      <td mat-cell fxShow fxHide.lt-sm class="column-large-text" *matCellDef="let user">
+        <div *ngIf="user.id; else skeleton">{{user.username}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="email">
+      <th mat-header-cell fxShow fxHide.lt-sm *matHeaderCellDef mat-sort-header>{{ 'USER.LIST.COLUMN.EMAIL' | translate }}</th>
+      <td mat-cell fxShow fxHide.lt-sm class="column-large-text" *matCellDef="let user">
+        <div *ngIf="user.id; else skeleton">{{user.email}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="provider">
+      <th mat-header-cell fxShow fxHide.lt-sm *matHeaderCellDef mat-sort-header>{{ 'USER.LIST.COLUMN.PROVIDER' | translate }}</th>
+      <td mat-cell fxShow fxHide.lt-sm *matCellDef="let user">
+        <div *ngIf="user.id; else skeleton">{{user.provider}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <th mat-header-cell fxShow fxHide.lt-sm *matHeaderCellDef mat-sort-header>{{ 'USER.LIST.COLUMN.STATUS' | translate }}</th>
+      <td mat-cell fxShow fxHide.lt-sm *matCellDef="let user">
+        <div *ngIf="user.id; else skeleton">
+          <div *ngIf="!user.deleted; else deleteBlock">
+            <mat-icon
+              *ngIf="user.enabled || user.provider !== 'LOCAL'; else elseBlock">
+              check_circle_outline
+            </mat-icon>
+            <ng-template #elseBlock>
+              <mat-icon color="warn">pause_circle_outline</mat-icon>
+            </ng-template>
+          </div>
+          <ng-template #deleteBlock>
+            <mat-icon color="accent">delete_outline</mat-icon>
+          </ng-template>
+        </div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+      <td mat-cell *matCellDef="let user">
+        <div *ngIf="user.id; else skeleton">
+          <button *ngIf="!user.deleted" mat-icon-button (click)="edit(user)">
+            <mat-icon color="primary">edit</mat-icon>
+          </button>
+          <button *ngIf="!user.deleted" mat-icon-button (click)="delete(user)">
+            <mat-icon color="warn">delete</mat-icon>
+          </button>
+          <button mat-icon-button (click)="sendInvite(user)"
+                  *ngIf="!user.deleted && !user.enabled && user.provider === 'LOCAL'">
+            <mat-icon color="primary">forward_to_inbox</mat-icon>
+          </button>
+        </div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="expandedDetail">
+      <td mat-cell *matCellDef="let user" [attr.colspan]="displayedColumns.length">
+        <div class="user-detail"
+             [@detailExpand]="user == expandedUser ? 'expanded' : 'collapsed'">
+          <mat-list>
+            <div fxHide fxShow.lt-sm mat-subheader>{{ 'USER.LIST.COLUMN.USERNAME' | translate }}</div>
+            <mat-list-item fxHide fxShow.lt-sm role="list">
+              <div mat-line>{{user.username}}</div>
+            </mat-list-item>
+            <div fxHide fxShow.lt-sm mat-subheader>{{ 'USER.LIST.COLUMN.EMAIL' | translate }}</div>
+            <mat-list-item fxHide fxShow.lt-sm role="list">
+              <div mat-line>{{user.email}}</div>
+            </mat-list-item>
+            <div fxHide fxShow.lt-sm mat-subheader>{{ 'USER.LIST.COLUMN.PROVIDER' | translate }}</div>
+            <mat-list-item fxHide fxShow.lt-sm role="list">
+              <div mat-line>{{user.provider}}</div>
+            </mat-list-item>
+            <div fxHide fxShow.lt-sm mat-subheader>{{ 'USER.LIST.COLUMN.STATUS' | translate }}</div>
+            <mat-list-item fxHide fxShow.lt-sm role="list">
+              <div mat-line *ngIf="!user.deleted; else deleteBlock">
+                <mat-icon
+                  *ngIf="user.enabled || user.provider !== 'LOCAL'; else elseBlock">
+                  check_circle_outline
+                </mat-icon>
+                <ng-template #elseBlock>
+                  <mat-icon color="warn">pause_circle_outline</mat-icon>
+                </ng-template>
+              </div>
+              <ng-template #deleteBlock>
+                <mat-icon color="accent">delete_outline</mat-icon>
+              </ng-template>
+            </mat-list-item>
+            <div mat-subheader>{{ 'USER.LIST.COLUMN.DETAIL.TITLE' | translate }}</div>
+            <mat-list-item role="list" *ngFor="let it of user.authorities">
+              <mat-icon mat-list-icon>accessibility_new</mat-icon>
+              <div mat-line>{{ 'COMMON.ROLES.' + it.authority | translate}}</div>
+            </mat-list-item>
+          </mat-list>
+        </div>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let user; columns: displayedColumns;"
+        class="user-row" (click)="expandedUser = expandedUser === user ? null : user"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="user-detail-row"></tr>
+  </table>
+  <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+
+  <button routerLink="/user" mat-fab color="accent" id="add-button" matTooltip="{{ 'USER.ADD.TITLE' | translate }}">
+    <mat-icon>person_add</mat-icon>
+  </button>
+</div>

@@ -1,0 +1,86 @@
+<div class="flex-container" fxLayout="column">
+  <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" class="card-container">
+    <div fxFlex.lt-sm="80%" fxFlex="50%" fxFlex.gt-lg="40%">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>{{ 'PRODUCT.DETAIL.TITLE' | translate }}</mat-card-title>
+          <mat-card-subtitle *ngIf="product; else skeleton">{{product.name}}</mat-card-subtitle>
+          <ng-template #skeleton>
+            <div class="ssc-line"></div>
+          </ng-template>
+        </mat-card-header>
+        <form (ngSubmit)="update()" [formGroup]="form" novalidate>
+          <mat-card-content *ngIf="product; else boxSkeleton">
+            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+              <mat-form-field>
+                <mat-label>{{ 'PRODUCT.DETAIL.NAME.FIELD' | translate }}</mat-label>
+                <label>
+                  <input matInput required formControlName="name" autocomplete="name">
+                </label>
+                <mat-error *ngIf="name.hasError('required')" [innerHTML]="'PRODUCT.DETAIL.NAME.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['name']">
+                  {{errors['name']}}
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>{{ 'PRODUCT.DETAIL.DESCRIPTION.FIELD' | translate }}</mat-label>
+                <label>
+                  <textarea matInput formControlName="description" #message maxlength="256"></textarea>
+                </label>
+                <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>{{ 'PRODUCT.DETAIL.PRICE.FIELD' | translate }}</mat-label>
+                <span matPrefix>
+                  <mat-icon matPrefix>attach_money</mat-icon> &nbsp;
+                </span>
+                <label>
+                  <input type="number" matInput step="1" required formControlName="price">
+                </label>
+                <mat-error *ngIf="price.hasError('required')" [innerHTML]="'PRODUCT.DETAIL.PRICE.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="price.hasError('min')">
+                  {{ 'PRODUCT.DETAIL.PRICE.GREATER' | translate }}
+                </mat-error>
+                <mat-error *ngIf="errors['price']">
+                  {{errors['price']}}
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>{{ 'PRODUCT.DETAIL.DURATION.FIELD' | translate }}</mat-label>
+                <label>
+                  <input matTimepicker #t="matTimepicker" mode="24h" formControlName="durationDate" #t="matTimepicker"
+                         cancelLabel="{{ 'COMMON.BUTTON.CANCEL' | translate }}">
+                </label>
+                <span matPrefix>
+                  <mat-icon matPrefix (click)="t.showDialog()">timer</mat-icon> &nbsp;
+                </span>
+                <mat-error *ngIf="durationDate.hasError('required')" [innerHTML]="'PRODUCT.DETAIL.DURATION.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['duration']">
+                  {{errors['duration']}}
+                </mat-error>
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+          <ng-template #boxSkeleton>
+            <div class="ssc-hr"></div>
+            <div class="ssc-square mb" style="height: 200px"></div>
+            <div class="ssc-hr"></div>
+          </ng-template>
+          <mat-card-actions *ngIf="product; else buttonSkeleton">
+            <div fxFlex></div>
+            <button mat-raised-button color="primary" [disabled]="form.invalid || form.pristine"
+                    type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
+            <button mat-raised-button color="accent"
+                    routerLink="/products">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+          </mat-card-actions>
+          <ng-template #buttonSkeleton>
+            <div class="ssc-head-line"></div>
+          </ng-template>
+        </form>
+      </mat-card>
+    </div>
+  </div>
+</div>

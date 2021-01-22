@@ -34,7 +34,7 @@ export class ActivateAccountComponent implements OnInit {
         if (state.message) {
           snackBarRef.afterDismissed().subscribe(() => {
             this.clean();
-            this.router.navigate(['dashboard', 'auth']);
+            this.router.navigate(['auth']);
           });
         }
       }

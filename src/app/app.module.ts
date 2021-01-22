@@ -11,6 +11,7 @@ import { SocialLoginModule } from 'angularx-social-login';
 import { ActionReducer, MetaReducer, StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ChartsModule } from 'ng2-charts';
 
 // Providers
 import { httpInterceptorProviders } from './http-interceptors';
@@ -26,6 +27,7 @@ import { TranslationLoaderResolver } from './util/translation.resolver';
 import { AuthGuardService } from './services/auth-guard.service';
 import { AuthService } from './services/auth.service';
 import { UserService } from './services/user.service';
+import { ProductService } from './services/product.service';
 
 // Reducers
 import { reducers } from './store/app.states';
@@ -33,12 +35,12 @@ import { reducers } from './store/app.states';
 // Effects
 import { LoginEffects } from './store/effects/auth.effects';
 import { UserEffects } from './store/effects/user.effects';
+import { ProductEffects } from './store/effects/product.effects';
 
 // Components
 import { AppComponent } from './app.component';
-import { UsersComponent } from './users/users.component';
-import { UserDetailComponent } from './user-detail/user-detail.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
+import { UsersComponent } from './user/list/users.component';
+import { UserDetailComponent } from './user/detail/user-detail.component';
 import { MainComponent } from './main/main.component';
 import { AuthComponent } from './auth/auth.component';
 import { SignUpComponent } from './sign-up/sign-up.component';
@@ -50,6 +52,12 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 import { RecoveryPasswordComponent } from './recovery-password/recovery-password.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { ProfileComponent } from './profile/profile.component';
+import { NavComponent } from './nav/nav.component';
+import { DashComponent } from './dash/dash.component';
+import { CardComponent } from './card/card.component';
+import { ProductsComponent } from './product/list/products.component';
+import { ProductComponent } from './product/product.component';
+import { ProductDetailComponent } from './product/detail/product-detail.component';
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -82,7 +90,6 @@ const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
     AppComponent,
     UsersComponent,
     UserDetailComponent,
-    DashboardComponent,
     MainComponent,
     AuthComponent,
     SignUpComponent,
@@ -93,12 +100,18 @@ const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
     ForgotPasswordComponent,
     RecoveryPasswordComponent,
     ChangePasswordComponent,
-    ProfileComponent
+    ProfileComponent,
+    NavComponent,
+    DashComponent,
+    CardComponent,
+    ProductsComponent,
+    ProductComponent,
+    ProductDetailComponent
   ],
   imports: [
     BrowserModule,
     StoreModule.forRoot(reducers, {metaReducers}),
-    EffectsModule.forRoot([LoginEffects, UserEffects]),
+    EffectsModule.forRoot([LoginEffects, UserEffects, ProductEffects]),
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {
@@ -107,6 +120,7 @@ const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
         deps: [HttpClient]
       }
     }),
+    ChartsModule,
     AppRoutingModule,
     SocialLoginModule,
     BrowserAnimationsModule,
@@ -125,6 +139,7 @@ const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
     AuthGuardService,
     AuthService,
     UserService,
+    ProductService,
     TranslationLoaderResolver,
     {
       provide: 'SocialAuthServiceConfig',

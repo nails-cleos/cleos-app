@@ -150,7 +150,7 @@ export class UserEffects {
     ofType(fromActionsLogin.UserActionTypes.USER_SELECTED),
     tap((data: any) => {
       if (!data.payload.profile) {
-        this.router.navigate(['dashboard', 'user', data.payload.user.id]);
+        this.router.navigate(['user', data.payload.user.id]);
       }
     })
   );
@@ -159,7 +159,7 @@ export class UserEffects {
   saveSuccess$ = this.actions$.pipe(
     ofType(fromActionsLogin.UserActionTypes.USER_SAVE_SUCCESS),
     tap(() => {
-      this.router.navigate(['dashboard', 'users']);
+      this.router.navigate(['users']);
     })
   );
 
