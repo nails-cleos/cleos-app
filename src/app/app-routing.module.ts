@@ -17,6 +17,9 @@ import { DashComponent } from './dash/dash.component';
 import { ProductsComponent } from './product/list/products.component';
 import { ProductComponent } from './product/product.component';
 import { ProductDetailComponent } from './product/detail/product-detail.component';
+import { RoomsComponent } from './room/list/rooms.component';
+import { RoomComponent } from './room/room.component';
+import { RoomDetailComponent } from './room/detail/room-detail.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/dashboard', pathMatch: 'full', resolve: {model: TranslationLoaderResolver}},
@@ -67,6 +70,21 @@ const routes: Routes = [
   },
   {
     path: 'product/:id', component: ProductDetailComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.Admin]
+    }
+  },
+  {
+    path: 'rooms', component: RoomsComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService], data: {
+      roles: [Role.Admin]
+    }
+  },
+  {
+    path: 'room', component: RoomComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.Admin]
+    }
+  },
+  {
+    path: 'room/:id', component: RoomDetailComponent, canActivate: [AuthGuardService], data: {
       roles: [Role.Admin]
     }
   }

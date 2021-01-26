@@ -1,0 +1,86 @@
+<div class="flex-container" fxLayout="column">
+  <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" class="card-container">
+    <div fxFlex.lt-sm="80%" fxFlex="50%" fxFlex.gt-lg="40%">
+      <form [formGroup]="form" novalidate (ngSubmit)="create()">
+        <mat-card class="shipping-card">
+          <mat-card-header>
+            <mat-card-title>{{ 'ROOM.ADD.TITLE' | translate }}</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+              <mat-form-field>
+                <mat-label>{{ 'ROOM.ADD.NAME.FIELD' | translate }}</mat-label>
+                <label>
+                  <input matInput required [formControl]="name" autocomplete="name">
+                </label>
+                <mat-error *ngIf="name.hasError('required')" [innerHTML]="'ROOM.ADD.NAME.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['name']">
+                  {{errors['name']}}
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field *ngIf="professionals; else skeleton">
+                <mat-label>{{ 'ROOM.ADD.PROFESSIONAL.FIELD' | translate }}</mat-label>
+                <input type="text" matInput [formControl]="professional" [matAutocomplete]="auto" required>
+                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+                  <mat-option *ngFor="let professional of filteredOptions | async" [value]="professional">
+                    {{professional.firstName}} {{professional.lastName}}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="professional.hasError('required')"
+                           [innerHTML]="'ROOM.ADD.PROFESSIONAL.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['professional']">
+                  {{errors['professional']}}
+                </mat-error>
+              </mat-form-field>
+              <ng-template #skeleton>
+                <div class="ssc-line"></div>
+              </ng-template>
+              <mat-label>{{ 'ROOM.ADD.WORKING_TIME.FIELD' | translate }}</mat-label>
+              <mat-form-field>
+                <mat-label>{{ 'ROOM.ADD.START.FIELD' | translate }}</mat-label>
+                <label>
+                  <input matTimepicker #tStart="matTimepicker" mode="24h" formControlName="start" #t="matTimepicker"
+                         cancelLabel="{{ 'COMMON.BUTTON.CANCEL' | translate }}">
+                </label>
+                <span matPrefix>
+                  <mat-icon matPrefix (click)="tStart.showDialog()">timer</mat-icon> &nbsp;
+                </span>
+                <mat-error *ngIf="start.hasError('required')"
+                           [innerHTML]="'ROOM.ADD.START.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['start']">
+                  {{errors['start']}}
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>{{ 'PRODUCT.ADD.END.FIELD' | translate }}</mat-label>
+                <label>
+                  <input matTimepicker #tEnd="matTimepicker" mode="24h" formControlName="end" #t="matTimepicker"
+                         cancelLabel="{{ 'COMMON.BUTTON.CANCEL' | translate }}">
+                </label>
+                <span matPrefix>
+                  <mat-icon matPrefix (click)="tEnd.showDialog()">timer</mat-icon> &nbsp;
+                </span>
+                <mat-error *ngIf="end.hasError('required')"
+                           [innerHTML]="'ROOM.ADD.END.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['end']">
+                  {{errors['end']}}
+                </mat-error>
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+          <mat-card-actions>
+            <div fxFlex></div>
+            <button mat-raised-button color="primary" [disabled]="form.invalid"
+                    type="submit">{{ 'COMMON.BUTTON.ADD' | translate }}</button>
+            <button mat-raised-button color="accent"
+                    routerLink="/products">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+          </mat-card-actions>
+        </mat-card>
+      </form>
+    </div>
+  </div>
+</div>

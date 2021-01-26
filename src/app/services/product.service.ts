@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { IProduct, PAGE_SIZE } from '../interfaces/product';
-import { IUser } from '../interfaces/user';
 
 @Injectable({
   providedIn: 'root'

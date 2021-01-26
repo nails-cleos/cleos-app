@@ -22,6 +22,8 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatTimepickerModule } from 'mat-timepicker';
 import { LayoutModule } from '@angular/cdk/layout';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatStepperModule } from '@angular/material/stepper';
 
 @NgModule({
   imports: [
@@ -46,7 +48,9 @@ import { LayoutModule } from '@angular/cdk/layout';
     MatDividerModule,
     MatGridListModule,
     MatRadioModule,
-    LayoutModule
+    LayoutModule,
+    MatAutocompleteModule,
+    MatStepperModule
   ],
   exports: [
     MatTableModule,
@@ -71,7 +75,9 @@ import { LayoutModule } from '@angular/cdk/layout';
     MatGridListModule,
     MatRadioModule,
     MatTimepickerModule,
-    LayoutModule
+    LayoutModule,
+    MatAutocompleteModule,
+    MatStepperModule
   ]
 })
 export class AppMaterialModule {

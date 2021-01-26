@@ -1,0 +1,89 @@
+<div class="flex-container" fxLayout="column">
+  <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" class="card-container">
+    <div fxFlex.lt-sm="80%" fxFlex="50%" fxFlex.gt-lg="40%">
+      <form [formGroup]="form" novalidate (ngSubmit)="update()">
+        <mat-card class="shipping-card">
+          <mat-card-header>
+            <mat-card-title>{{ 'ROOM.DETAIL.TITLE' | translate }}</mat-card-title>
+            <mat-card-subtitle *ngIf="room; else skeleton">{{room.name}}</mat-card-subtitle>
+            <ng-template #skeleton>
+              <div class="ssc-line"></div>
+            </ng-template>
+          </mat-card-header>
+          <mat-card-content *ngIf="room; else boxSkeleton">
+            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+              <mat-form-field>
+                <mat-label>{{ 'ROOM.DETAIL.NAME.FIELD' | translate }}</mat-label>
+                <label>
+                  <input matInput required [formControl]="name" autocomplete="name">
+                </label>
+                <mat-error *ngIf="name.hasError('required')" [innerHTML]="'ROOM.DETAIL.NAME.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['name']">
+                  {{errors['name']}}
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>{{ 'ROOM.DETAIL.PROFESSIONAL.FIELD' | translate }}</mat-label>
+                <label>
+                  <input type="text" matInput [value]="professionalName" disabled>
+                </label>
+              </mat-form-field>
+              <ng-template #skeleton>
+                <div class="ssc-line"></div>
+              </ng-template>
+              <mat-label>{{ 'ROOM.DETAIL.WORKING_TIME.FIELD' | translate }}</mat-label>
+              <mat-form-field>
+                <mat-label>{{ 'ROOM.DETAIL.START.FIELD' | translate }}</mat-label>
+                <label>
+                  <input matTimepicker #tStart="matTimepicker" mode="24h" formControlName="startDate" #t="matTimepicker"
+                         cancelLabel="{{ 'COMMON.BUTTON.CANCEL' | translate }}">
+                </label>
+                <span matPrefix>
+                  <mat-icon matPrefix (click)="tStart.showDialog()">timer</mat-icon> &nbsp;
+                </span>
+                <mat-error *ngIf="startDate.hasError('required')"
+                           [innerHTML]="'ROOM.DETAIL.START.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['start']">
+                  {{errors['start']}}
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>{{ 'PRODUCT.DETAIL.END.FIELD' | translate }}</mat-label>
+                <label>
+                  <input matTimepicker #tEnd="matTimepicker" mode="24h" formControlName="endDate" #t="matTimepicker"
+                         cancelLabel="{{ 'COMMON.BUTTON.CANCEL' | translate }}">
+                </label>
+                <span matPrefix>
+                  <mat-icon matPrefix (click)="tEnd.showDialog()">timer</mat-icon> &nbsp;
+                </span>
+                <mat-error *ngIf="endDate.hasError('required')"
+                           [innerHTML]="'ROOM.DETAIL.END.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['end']">
+                  {{errors['end']}}
+                </mat-error>
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+          <ng-template #boxSkeleton>
+            <div class="ssc-hr"></div>
+            <div class="ssc-square mb" style="height: 200px"></div>
+            <div class="ssc-hr"></div>
+          </ng-template>
+          <mat-card-actions *ngIf="room; else buttonSkeleton">
+            <div fxFlex></div>
+            <button mat-raised-button color="primary" [disabled]="form.invalid"
+                    type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
+            <button mat-raised-button color="accent"
+                    routerLink="/products">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+          </mat-card-actions>
+          <ng-template #buttonSkeleton>
+            <div class="ssc-head-line"></div>
+          </ng-template>
+        </mat-card>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,27 +1,27 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { Pagination } from '../../interfaces/pagination';
-import { IProduct, PAGE_SIZE } from '../../interfaces/product';
+import { IRoom, PAGE_SIZE } from '../../interfaces/room';
 import { Observable } from 'rxjs';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { AppState, selectProductState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
-import * as fromActionsProduct from '../../store/product.actions';
+import { AppState, selectRoomState } from '../../store/app.states';
+import * as fromActionsRoom from '../../store/room.actions';
 import { DialogComponent } from '../../dialog/dialog.component';
 
 @Component({
-  selector: 'app-products',
-  templateUrl: './products.component.html',
-  styleUrls: ['./products.component.scss']
+  selector: 'app-rooms',
+  templateUrl: './rooms.component.html',
+  styleUrls: ['./rooms.component.scss']
 })
-export class ProductsComponent implements OnInit, AfterViewInit {
+export class RoomsComponent implements OnInit, AfterViewInit {
 
-  displayedColumns: string[] = ['position', 'name', 'description', 'price', 'duration', 'actions'];
-  dataSource: any = new MatTableDataSource<Pagination<IProduct>>();
+  displayedColumns: string[] = ['position', 'name', 'professional', 'working', 'actions'];
+  dataSource: any = new MatTableDataSource<Pagination<IRoom>>();
   getState: Observable<any>;
 
   resultsLength = 0;
@@ -32,19 +32,20 @@ export class ProductsComponent implements OnInit, AfterViewInit {
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
               private store: Store<AppState>, private cdRef: ChangeDetectorRef) {
-    this.getState = this.store.select(selectProductState);
+    this.getState = this.store.select(selectRoomState);
   }
 
   ngAfterViewInit(): void {
     this.sort.sortChange.subscribe(() => {
-      this.getProducts();
+      this.getRooms();
+      // this.paginator.pageIndex = 0;
     });
 
     this.paginator.page.subscribe(() => {
-      this.getProducts();
+      this.getRooms();
     });
 
-    this.getProducts();
+    this.getRooms();
     this.cdRef.detectChanges();
   }
 
@@ -63,7 +64,7 @@ export class ProductsComponent implements OnInit, AfterViewInit {
         if (stateValue.message) {
           snackBarRef.afterDismissed().subscribe(() => {
             this.clean();
-            this.getProducts();
+            this.getRooms();
           });
         }
       }
@@ -74,38 +75,38 @@ export class ProductsComponent implements OnInit, AfterViewInit {
 
   clean(): void {
     this.store.dispatch(
-      new fromActionsProduct.Clean()
+      new fromActionsRoom.Clean()
     );
   }
 
-  getProducts(): void {
+  getRooms(): void {
     const payload = {
       active: this.sort.active,
       direction: this.sort.direction,
       page: this.paginator.pageIndex
     };
     this.store.dispatch(
-      new fromActionsProduct.GetAll(payload)
+      new fromActionsRoom.GetAll(payload)
     );
   }
 
-  edit(product: IProduct): void {
+  edit(room: IRoom): void {
     this.store.dispatch(
-      new fromActionsProduct.ProductSelected(product)
+      new fromActionsRoom.RoomSelected(room)
     );
   }
 
-  delete(product: IProduct): void {
-    const title = this.translate.instant('PRODUCT.DELETED.TITLE');
-    const content = this.translate.instant('PRODUCT.DELETED.CONTENT', {name: product.name});
+  delete(room: IRoom): void {
+    const title = this.translate.instant('ROOM.DELETED.TITLE');
+    const content = this.translate.instant('ROOM.DELETED.CONTENT', {name: room.name});
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: {title, content, value: product}
+      data: {title, content, value: room}
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsProduct.DeleteProduct(result.id)
+          new fromActionsRoom.DeleteRoom(result.id)
         );
       }
     });

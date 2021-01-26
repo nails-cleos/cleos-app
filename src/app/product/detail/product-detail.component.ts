@@ -70,7 +70,8 @@ export class ProductDetailComponent implements OnInit, AfterViewInit {
           description: state.selected.description,
           price: state.selected.price
         } as IProduct;
-        this.product.durationDate = new Date(new Date().setHours(state.selected.duration.hours, state.selected.duration.minutes));
+        const time = state.selected.duration.split(':');
+        this.product.durationDate = new Date(new Date().setHours(time[0], time[1]));
         this.form.patchValue(this.product);
       }
       if (state.subErrors) {
@@ -106,8 +107,9 @@ export class ProductDetailComponent implements OnInit, AfterViewInit {
     product.price = FieldChange(this.price, this.product?.price);
 
     const durationTime = this.durationDate.value;
-    product.duration.hours = durationTime.getHours();
-    product.duration.minutes = durationTime.getMinutes();
+    const durationHours = `0${durationTime.getHours()}`.slice(-2);
+    const durationMinutes = `0${durationTime.getMinutes()}`.slice(-2);
+    product.duration = `${durationHours}:${durationMinutes}`;
 
     this.store.dispatch(new fromActionsProduct.ProductUpdate(product));
   }

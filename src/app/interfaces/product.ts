@@ -4,25 +4,12 @@ export interface IProduct {
   price?: number;
   deleted?: boolean;
   description?: string;
-  duration: IDuration;
+  duration?: string;
   durationDate?: Date;
 }
 
-export interface IDuration {
-  hours?: number;
-  minutes?: number;
-}
-
-export class Duration implements IDuration {
-  constructor() {
-  }
-}
-
 export class Product implements IProduct {
-  duration: IDuration;
-
   constructor() {
-    this.duration = new Duration();
   }
 }
 
