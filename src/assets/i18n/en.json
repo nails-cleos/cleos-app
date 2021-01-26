@@ -5,6 +5,7 @@
       "YES": "Yes",
       "NO": "No",
       "SEND": "Send",
+      "ADD": "Create",
       "UPDATE": "Update",
       "CANCEL": "Cancel"
     },
@@ -121,7 +122,6 @@
     },
     "ADD": {
       "TITLE": "Add user",
-      "BUTTON": "Create",
       "ROLE": {
         "FIELD": "Roles",
         "REQUIRED": "Role is <b>required</b>"
@@ -233,7 +233,6 @@
     },
     "ADD": {
       "TITLE": "Add product",
-      "BUTTON": "Create",
       "NAME": {
         "FIELD": "Name",
         "REQUIRED": "Name is <b>required</b>"
@@ -248,9 +247,7 @@
       },
       "DURATION": {
         "FIELD": "Duration",
-        "REQUIRED": "Duration is <b>required</b>",
-        "GREATER": "{{type}} must be greater than 0",
-        "LESS": "{{type}} must be less than {{max}}"
+        "REQUIRED": "Duration is <b>required</b>"
       },
       "CREATED": "Product {{name}} created"
     },
@@ -270,11 +267,8 @@
       },
       "DURATION": {
         "FIELD": "Duration",
-        "REQUIRED": "Duration is <b>required</b>",
-        "GREATER": "{{type}} must be greater than 0",
-        "LESS": "{{type}} must be less than {{max}}"
-      },
-      "CREATED": "Product {{name}} created"
+        "REQUIRED": "Duration is <b>required</b>"
+      }
     },
     "DELETED": {
       "TITLE": "Delete product",
@@ -283,6 +277,67 @@
     },
     "UPDATED": {
       "MESSAGE": "Product {{name}} updated"
+    }
+  },
+  "ROOM": {
+    "LIST": {
+      "COLUMN": {
+        "NAME": "Name",
+        "PROFESSIONAL": "Professional",
+        "WORKING_TIME": "Working time"
+      }
+    },
+    "ADD": {
+      "TITLE": "Add room",
+      "NAME": {
+        "FIELD": "Name",
+        "REQUIRED": "Name is <b>required</b>"
+      },
+      "PROFESSIONAL": {
+        "FIELD": "Professional",
+        "REQUIRED": "Professional is <b>required</b>"
+      },
+      "WORKING_TIME": {
+        "FIELD": "Working time"
+      },
+      "START": {
+        "FIELD": "Start",
+        "REQUIRED": "Start is <b>required</b>"
+      },
+      "END": {
+        "FIELD": "End",
+        "REQUIRED": "End is <b>required</b>"
+      },
+      "CREATED": "Room {{name}} created"
+    },
+    "DETAIL": {
+      "TITLE": "Update room",
+      "NAME": {
+        "FIELD": "Name",
+        "REQUIRED": "Name is <b>required</b>"
+      },
+      "PROFESSIONAL": {
+        "FIELD": "Professional"
+      },
+      "WORKING_TIME": {
+        "FIELD": "Working time"
+      },
+      "START": {
+        "FIELD": "Start",
+        "REQUIRED": "Start is <b>required</b>"
+      },
+      "END": {
+        "FIELD": "End",
+        "REQUIRED": "End is <b>required</b>"
+      }
+    },
+    "DELETED": {
+      "TITLE": "Delete room",
+      "CONTENT": "Are you sure to delete room {{name}}?",
+      "MESSAGE": "Room {{name}} deleted"
+    },
+    "UPDATED": {
+      "MESSAGE": "Room {{name}} updated"
     }
   },
   "last": {

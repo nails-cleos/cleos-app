@@ -48,7 +48,7 @@
       <td mat-cell fxShow fxHide.lt-sm class="column-large-text" *matCellDef="let product">
         <div *ngIf="product.id; else skeleton">
           <mat-icon matPrefix>timer</mat-icon>&nbsp;
-          {{product.duration.hours | number:'2.0-0'}}:{{product.duration.minutes | number:'2.0-0'}}
+          {{product.duration.slice(0, 5)}}
         </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>

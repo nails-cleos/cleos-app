@@ -36,6 +36,7 @@ import { reducers } from './store/app.states';
 import { LoginEffects } from './store/effects/auth.effects';
 import { UserEffects } from './store/effects/user.effects';
 import { ProductEffects } from './store/effects/product.effects';
+import { RoomEffects } from './store/effects/room.effects';
 
 // Components
 import { AppComponent } from './app.component';
@@ -58,6 +59,9 @@ import { CardComponent } from './card/card.component';
 import { ProductsComponent } from './product/list/products.component';
 import { ProductComponent } from './product/product.component';
 import { ProductDetailComponent } from './product/detail/product-detail.component';
+import { RoomComponent } from './room/room.component';
+import { RoomsComponent } from './room/list/rooms.component';
+import { RoomDetailComponent } from './room/detail/room-detail.component';
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -106,12 +110,15 @@ const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
     CardComponent,
     ProductsComponent,
     ProductComponent,
-    ProductDetailComponent
+    ProductDetailComponent,
+    RoomComponent,
+    RoomsComponent,
+    RoomDetailComponent
   ],
   imports: [
     BrowserModule,
     StoreModule.forRoot(reducers, {metaReducers}),
-    EffectsModule.forRoot([LoginEffects, UserEffects, ProductEffects]),
+    EffectsModule.forRoot([LoginEffects, UserEffects, ProductEffects, RoomEffects]),
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {

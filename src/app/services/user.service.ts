@@ -67,4 +67,9 @@ export class UserService {
     const url = `${this.userUrl}/me/change-password`;
     return this.http.post(url, {oldPassword, password});
   }
+
+  getAllProfessional(): Observable<IUser[]> {
+
+    return this.http.get<IUser[]>('professionals');
+  }
 }

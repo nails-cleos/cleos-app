@@ -5,7 +5,9 @@
       "YES": "Si",
       "NO": "No",
       "SEND": "Enviar",
-      "UPDATE": "Actualizar"
+      "ADD": "Crear",
+      "UPDATE": "Actualizar",
+      "CANCEL": "Cancelar"
     },
     "COLUMN": {
       "ACTIONS": "Acciones"
@@ -120,7 +122,6 @@
     },
     "ADD": {
       "TITLE": "Agregar usuario",
-      "BUTTON": "Crear",
       "ROLE": {
         "FIELD": "Roles",
         "REQUIRED": "Rol es <b>requerido</b>"
@@ -219,6 +220,124 @@
     "LAST_NAME": {
       "FIELD": "Apellido",
       "REQUIRED": "Apellido es <b>requerido</b>"
+    }
+  },
+  "PRODUCT": {
+    "LIST": {
+      "COLUMN": {
+        "NAME": "Nombre",
+        "DESCRIPTION": "Descripción",
+        "PRICE": "Precio",
+        "DURATION": "Duración"
+      }
+    },
+    "ADD": {
+      "TITLE": "Agregar producto",
+      "NAME": {
+        "FIELD": "Nombre",
+        "REQUIRED": "Nombre es <b>requerido</b>"
+      },
+      "DESCRIPTION": {
+        "FIELD": "Descripción"
+      },
+      "PRICE": {
+        "FIELD": "Precio",
+        "REQUIRED": "Precio es <b>requerido</b>",
+        "GREATER": "Precio debe ser mayor a 1"
+      },
+      "DURATION": {
+        "FIELD": "Duración",
+        "REQUIRED": "Duración es <b>requerido</b>"
+      },
+      "CREATED": "Producto {{name}} creado"
+    },
+    "DETAIL": {
+      "TITLE": "Actualizar producto",
+      "NAME": {
+        "FIELD": "Nombre",
+        "REQUIRED": "Nombre es <b>requerido</b>"
+      },
+      "DESCRIPTION": {
+        "FIELD": "Descripción"
+      },
+      "PRICE": {
+        "FIELD": "Precio",
+        "REQUIRED": "Precio es <b>requerido</b>",
+        "GREATER": "Precio debe ser mayor a 1"
+      },
+      "DURATION": {
+        "FIELD": "Duración",
+        "REQUIRED": "Duración es <b>requerido</b>"
+      }
+    },
+    "DELETED": {
+      "TITLE": "Eliminar producto",
+      "CONTENT": "¿Está seguro de eliminar el producto {{name}}?",
+      "MESSAGE": "Producto {{name}} eliminado"
+    },
+    "UPDATED": {
+      "MESSAGE": "Producto {{name}} actualizado"
+    }
+  },
+  "ROOM": {
+    "LIST": {
+      "COLUMN": {
+        "NAME": "Nombre",
+        "PROFESSIONAL": "Profesional",
+        "WORKING_TIME": "Tiempo de trabajo"
+      }
+    },
+    "ADD": {
+      "TITLE": "Agregar sala",
+      "NAME": {
+        "FIELD": "Nombre",
+        "REQUIRED": "Nombre es <b>requerido</b>"
+      },
+      "PROFESSIONAL": {
+        "FIELD": "Profesional",
+        "REQUIRED": "Profesional es <b>requerido</b>"
+      },
+      "WORKING_TIME": {
+        "FIELD": "Tiempo de trabajo"
+      },
+      "START": {
+        "FIELD": "Inicio",
+        "REQUIRED": "Inicio es <b>requerido</b>"
+      },
+      "END": {
+        "FIELD": "Fin",
+        "REQUIRED": "Fin es <b>requerido</b>"
+      },
+      "CREATED": "Sala {{name}} creada"
+    },
+    "DETAIL": {
+      "TITLE": "Actualizar sala",
+      "NAME": {
+        "FIELD": "Nombre",
+        "REQUIRED": "Nombre es <b>requerido</b>"
+      },
+      "PROFESSIONAL": {
+        "FIELD": "Profesional"
+      },
+      "WORKING_TIME": {
+        "FIELD": "Tiempo de trabajo"
+      },
+      "START": {
+        "FIELD": "Inicio",
+        "REQUIRED": "Inicio es <b>requerido</b>"
+      },
+      "END": {
+        "FIELD": "Fin",
+        "REQUIRED": "Fin es <b>requerido</b>"
+      }
+    },
+    "DELETED": {
+      "TITLE": "Eliminar sala",
+      "CONTENT": "¿Está seguro de eliminar la sala {{name}}?",
+      "MESSAGE": "Sala {{name}} eliminada"
+    },
+    "UPDATED": {
+      "MESSAGE": "Sala {{name}} actualizada"
     }
   },
   "last": {

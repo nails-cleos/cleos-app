@@ -74,13 +74,16 @@ export class ProductComponent implements OnInit {
     if (this.form.invalid) {
       return;
     }
-    const durationTime = this.duration.value;
+
     const product: IProduct = new Product();
     product.name = this.name.value;
     product.description = this.form.value.description;
     product.price = this.price.value;
-    product.duration.hours = durationTime.getHours();
-    product.duration.minutes = durationTime.getMinutes();
+
+    const durationTime = this.duration.value;
+    const durationHours = `0${durationTime.getHours()}`.slice(-2);
+    const durationMinutes = `0${durationTime.getMinutes()}`.slice(-2);
+    product.duration = `${durationHours}:${durationMinutes}`;
 
     this.store.dispatch(
       new fromActionsProduct.ProductSave(product)
