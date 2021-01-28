@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
-import { IRoom, Room } from '../../interfaces/room';
+import { AvailabilityDate, IAvailability, IAvailabilityDate, IRoom, Room } from '../../interfaces/room';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
@@ -8,6 +8,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../store/app.states';
 import * as fromActionsRoom from '../../store/room.actions';
 import { FieldChange } from '../../util/validators';
+import { IconName, IIcon } from '../room.component';
 
 @Component({
   selector: 'app-room-detail',
@@ -22,13 +23,19 @@ export class RoomDetailComponent implements OnInit, AfterViewInit {
   errors: any = [];
   professionalName: string | undefined;
 
+  step = 0;
+  icons: IIcon = {
+    week: IconName.event_busy,
+    saturday: IconName.event_busy,
+    sunday: IconName.event_busy
+  };
+  weekDate?: IAvailabilityDate;
+  satDate?: IAvailabilityDate;
+  sunDate?: IAvailabilityDate;
+
+  availabilities: IAvailability[] = [];
+
   name: FormControl = new FormControl('', [
-    Validators.required
-  ]);
-  startDate: FormControl = new FormControl('', [
-    Validators.required
-  ]);
-  endDate: FormControl = new FormControl('', [
     Validators.required
   ]);
 
@@ -37,25 +44,30 @@ export class RoomDetailComponent implements OnInit, AfterViewInit {
     this.getState = this.store.select(selectRoomState);
   }
 
+  private static createAv(date: string | undefined): Date | undefined {
+    if (date) {
+      const startTime = date.split(':');
+      return new Date(new Date().setHours(Number(startTime[0]), Number(startTime[1])));
+    }
+    return undefined;
+  }
+
   ngOnInit(): void {
     this.createForm();
-    this.clean();
     this.subscribe();
   }
 
   ngAfterViewInit(): void {
-    this.getUser();
+    this.getRoom();
   }
 
   createForm(): void {
     this.form = this.formBuilder.group({
-      name: this.name,
-      startDate: this.startDate,
-      endDate: this.endDate
+      name: this.name
     });
   }
 
-  clean(): void {
+  private clean(): void {
     this.store.dispatch(
       new fromActionsRoom.Clean()
     );
@@ -69,10 +81,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit {
           name: state.selected.name
         } as IRoom;
         this.professionalName = `${state.selected.professional.firstName} ${state.selected.professional.lastName}`;
-        const startTime = state.selected.availability.start.split(':');
-        this.room.startDate = new Date(new Date().setHours(startTime[0], startTime[1]));
-        const endTime = state.selected.availability.end.split(':');
-        this.room.endDate = new Date(new Date().setHours(endTime[0], endTime[1]));
+        this.getAvailabilities(state.selected.availabilities);
         this.form.patchValue(this.room);
       }
       if (state.subErrors) {
@@ -88,7 +97,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit {
     });
   }
 
-  getUser(): void {
+  getRoom(): void {
     if (!this.room) {
       const id = this.route.snapshot.paramMap.get('id');
       this.store.dispatch(
@@ -97,25 +106,111 @@ export class RoomDetailComponent implements OnInit, AfterViewInit {
     }
   }
 
+  setStep(index: number): void {
+    this.step = index;
+  }
+
   update(): void {
-    if (this.form.invalid) {
+    if (this.validate()) {
       return;
     }
     const room: IRoom = new Room();
     room.id = this.room?.id;
     room.name = FieldChange(this.name, this.room?.name);
-
-    const startTime = this.startDate.value;
-    const startHours = `0${startTime.getHours()}`.slice(-2);
-    const startMinutes = `0${startTime.getMinutes()}`.slice(-2);
-    room.availability.start = `${startHours}:${startMinutes}`;
-
-    const endTime = this.endDate.value;
-    const endHours = `0${endTime.getHours()}`.slice(-2);
-    const endMinutes = `0${endTime.getMinutes()}`.slice(-2);
-    room.availability.end = `${endHours}:${endMinutes}`;
+    room.availabilities = this.availabilities;
 
     this.store.dispatch(new fromActionsRoom.RoomUpdate(room));
+  }
+
+  addAvailability(availability: IAvailability, step: number): void {
+    this.setIcon(availability.day, IconName.event_available);
+    const index = this.availabilities.findIndex((e) => e.day === availability.day);
+
+    if (index !== -1) {
+      console.log(this.availabilities);
+      this.availabilities.splice(index, 1);
+    }
+    this.availabilities = [...this.availabilities, availability];
+
+    this.step = step;
+  }
+
+  ignore(day: string, step: number): void {
+    this.setIcon(day, IconName.event_busy);
+    const index = this.availabilities.findIndex((e) => e.day === day);
+    if (index > -1) {
+      this.availabilities.splice(index, 1);
+    }
+    this.step = step;
+  }
+
+  private getAvailabilities(availabilities: IAvailability[]): void {
+    availabilities.forEach((av: IAvailability) => {
+      this.addAvailability(av, 0);
+
+      const availability: IAvailabilityDate = new AvailabilityDate();
+      availability.startDate = RoomDetailComponent.createAv(av.start);
+      availability.endDate = RoomDetailComponent.createAv(av.end);
+      availability.startLunchDate = RoomDetailComponent.createAv(av.startLunch);
+      availability.endLunchDate = RoomDetailComponent.createAv(av.endLunch);
+
+      switch (av.day) {
+        case 'WEEK':
+          this.weekDate = availability;
+          break;
+        case 'SATURDAY':
+          this.satDate = availability;
+          break;
+        case 'SUNDAY':
+          this.sunDate = availability;
+      }
+    });
+  }
+
+  private setIcon(day: string, icon: IconName): void {
+    switch (day) {
+      case 'WEEK':
+        this.icons.week = icon;
+        break;
+      case 'SATURDAY':
+        this.icons.saturday = icon;
+        break;
+      case 'SUNDAY':
+        this.icons.sunday = icon;
+        break;
+    }
+  }
+
+  private validate(): boolean {
+    if (this.form.invalid) {
+      return true;
+    }
+    let step = -1;
+    this.errors = [];
+    switch (IconName.calendar_today) {
+      case this.icons.week:
+        step = 0;
+        break;
+      case this.icons.saturday:
+        step = 1;
+        break;
+      case this.icons.sunday:
+        step = 2;
+        break;
+    }
+    if (step > -1) {
+      this.errors[`day${step}`] = true;
+      this.setStep(step);
+      return true;
+    }
+
+    if (this.availabilities.length === 0) {
+      this.errors.availability = true;
+      this.setStep(0);
+      return true;
+    }
+
+    return false;
   }
 }
 

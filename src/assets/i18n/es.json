@@ -2,10 +2,13 @@
   "COMMON": {
     "BUTTON": {
       "BACK": "Volver",
+      "NEXT": "Siguiente",
       "YES": "Si",
       "NO": "No",
       "SEND": "Enviar",
-      "ADD": "Crear",
+      "CREATE": "Crear",
+      "ADD": "Agregar",
+      "IGNORE": "Ignorar",
       "UPDATE": "Actualizar",
       "CANCEL": "Cancelar"
     },
@@ -284,7 +287,12 @@
       "COLUMN": {
         "NAME": "Nombre",
         "PROFESSIONAL": "Profesional",
-        "WORKING_TIME": "Tiempo de trabajo"
+        "AVAILABILITY": {
+          "FIELD": "Disponibilidad",
+          "WEEK": "Semanal",
+          "SATURDAY": "Sábado",
+          "SUNDAY": "Domingo"
+        }
       }
     },
     "ADD": {
@@ -295,10 +303,31 @@
       },
       "PROFESSIONAL": {
         "FIELD": "Profesional",
-        "REQUIRED": "Profesional es <b>requerido</b>"
+        "REQUIRED": "Profesional es <b>requerido</b>",
+        "INVALID": "Profesional no valido"
       },
-      "WORKING_TIME": {
-        "FIELD": "Tiempo de trabajo"
+      "AVAILABILITY": {
+        "FIELD": "Disponibilidad",
+        "REQUIRED": "Al menos una disponibilidad es <b>requerida</b>"
+      },
+      "WEEK_TIME": {
+        "FIELD": "Disponibilidad semanal",
+        "DESCRIPTION": "Disponibilidad de trabajo semanal",
+        "REQUIRED": "Agregue o ignore la disponibilidad semanal"
+      },
+      "SATURDAY_TIME": {
+        "FIELD": "Disponibilidad los sábados",
+        "DESCRIPTION": "Disponibilidad de trabajo los sábados",
+        "REQUIRED": "Agregue o ignore la disponibilidad del sábado"
+      },
+      "SUNDAY_TIME": {
+        "FIELD": "Disponibilidad los domingos",
+        "DESCRIPTION": "Disponibilidad de trabajo los domingos",
+        "REQUIRED": "Agregue o ignore la disponibilidad del domingo"
+      },
+      "LUNCH": {
+        "FIELD": "Hora de almuerzo",
+        "CHECK": "Agregar hora de almuerzo"
       },
       "START": {
         "FIELD": "Inicio",
@@ -319,8 +348,28 @@
       "PROFESSIONAL": {
         "FIELD": "Profesional"
       },
-      "WORKING_TIME": {
-        "FIELD": "Tiempo de trabajo"
+      "AVAILABILITY": {
+        "FIELD": "Disponibilidad",
+        "REQUIRED": "Al menos una disponibilidad es <b>requerida</b>"
+      },
+      "WEEK_TIME": {
+        "FIELD": "Disponibilidad semanal",
+        "DESCRIPTION": "Disponibilidad de trabajo semanal",
+        "REQUIRED": "Agregue o ignore la disponibilidad semanal"
+      },
+      "SATURDAY_TIME": {
+        "FIELD": "Disponibilidad los sábados",
+        "DESCRIPTION": "Disponibilidad de trabajo los sábados",
+        "REQUIRED": "Agregue o ignore la disponibilidad del sábado"
+      },
+      "SUNDAY_TIME": {
+        "FIELD": "Disponibilidad los domingos",
+        "DESCRIPTION": "Disponibilidad de trabajo los domingos",
+        "REQUIRED": "Agregue o ignore la disponibilidad del domingo"
+      },
+      "LUNCH": {
+        "FIELD": "Hora de almuerzo",
+        "CHECK": "Agregar hora de almuerzo"
       },
       "START": {
         "FIELD": "Inicio",

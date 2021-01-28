@@ -7,7 +7,6 @@ import * as fromActionsRoom from '../room.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { RoomService } from '../../services/room.service';
 import { Router } from '@angular/router';
-import * as fromActionsUser from '../user.actions';
 import { UserService } from '../../services/user.service';
 
 @Injectable()
@@ -30,7 +29,7 @@ export class RoomEffects {
   getAllProfessional$ = this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.GET_ALL_PROFESSIONAL)).pipe(
     map((action: any) => action.payload),
     switchMap(() => {
-      return this.userService.getAllProfessional().pipe(
+      return this.userService.getAllProfessionals().pipe(
         switchMap((response: any) => {
           return of(new fromActionsRoom.RoomSuccess(response));
         }),

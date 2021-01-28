@@ -24,6 +24,10 @@ import { MatTimepickerModule } from 'mat-timepicker';
 import { LayoutModule } from '@angular/cdk/layout';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatStepperModule } from '@angular/material/stepper';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @NgModule({
   imports: [
@@ -50,7 +54,11 @@ import { MatStepperModule } from '@angular/material/stepper';
     MatRadioModule,
     LayoutModule,
     MatAutocompleteModule,
-    MatStepperModule
+    MatStepperModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatExpansionModule,
+    MatCheckboxModule
   ],
   exports: [
     MatTableModule,
@@ -77,7 +85,11 @@ import { MatStepperModule } from '@angular/material/stepper';
     MatTimepickerModule,
     LayoutModule,
     MatAutocompleteModule,
-    MatStepperModule
+    MatStepperModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatExpansionModule,
+    MatCheckboxModule
   ]
 })
 export class AppMaterialModule {

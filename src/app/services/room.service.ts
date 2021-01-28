@@ -22,7 +22,11 @@ export class RoomService {
       params = params.append('direction', direction);
     }
 
-    return this.http.get<IRoom[]>(this.url, {params});
+    return this.http.get<IRoom[]>(`${this.url}/pages`, {params});
+  }
+
+  getAllRooms(): Observable<IRoom[]> {
+    return this.http.get<IRoom[]>(this.url);
   }
 
   getById(id: string | null): Observable<IRoom | undefined> {

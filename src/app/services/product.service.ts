@@ -22,7 +22,11 @@ export class ProductService {
       params = params.append('direction', direction);
     }
 
-    return this.http.get<IProduct[]>(this.url, {params});
+    return this.http.get<IProduct[]>(`${this.url}/pages`, {params});
+  }
+
+  getAllProducts(): Observable<IProduct[]> {
+    return this.http.get<IProduct[]>(this.url);
   }
 
   getById(id: string | null): Observable<IProduct | undefined> {

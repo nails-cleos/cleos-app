@@ -5,27 +5,40 @@ export interface IRoom {
   name?: string;
   professionalId?: string;
   professional?: IUser;
-  description?: string;
-  startDate?: Date;
-  endDate?: Date;
-  availability: IAvailability;
+  availabilities: IAvailability[];
 }
 
 export interface IAvailability {
+  day: string;
   start?: string;
   end?: string;
+  startLunch?: string;
+  endLunch?: string;
+}
+
+export interface IAvailabilityDate {
+  startDate?: Date;
+  endDate?: Date;
+  startLunchDate?: Date;
+  endLunchDate?: Date;
 }
 
 export class Availability implements IAvailability {
+  day = '';
+  constructor() {
+  }
+}
+
+export class AvailabilityDate implements IAvailabilityDate {
   constructor() {
   }
 }
 
 export class Room implements IRoom {
-  availability: IAvailability;
+  availabilities: IAvailability[];
 
   constructor() {
-    this.availability = new Availability();
+    this.availabilities = [];
   }
 }
 

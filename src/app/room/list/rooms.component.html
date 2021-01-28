@@ -31,10 +31,18 @@
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="working">
-      <th mat-header-cell fxShow fxHide.lt-sm *matHeaderCellDef mat-sort-header>{{ 'ROOM.LIST.COLUMN.WORKING_TIME' | translate }}</th>
+    <ng-container matColumnDef="availability">
+      <th mat-header-cell fxShow fxHide.lt-sm *matHeaderCellDef mat-sort-header>{{ 'ROOM.LIST.COLUMN.AVAILABILITY.FIELD' | translate }}</th>
       <td mat-cell fxShow fxHide.lt-sm *matCellDef="let room">
-        <div *ngIf="room.id; else skeleton">{{room.availability.start.slice(0, 5)}} - {{room.availability.end.slice(0, 5)}}</div>
+        <div *ngIf="room.id; else skeleton">
+          <mat-list>
+            <mat-list-item *ngFor="let availability of room.availabilities">
+              <mat-icon mat-list-icon>folder</mat-icon>
+              <div mat-line>{{ 'ROOM.LIST.COLUMN.AVAILABILITY.' + availability.day | translate}}:
+                {{availability.start.slice(0, 5)}} - {{availability.end.slice(0, 5)}}</div>
+            </mat-list-item>
+          </mat-list>
+        </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>

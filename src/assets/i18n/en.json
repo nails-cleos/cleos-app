@@ -2,10 +2,13 @@
   "COMMON": {
     "BUTTON": {
       "BACK": "Back",
+      "NEXT": "Next",
       "YES": "Yes",
       "NO": "No",
       "SEND": "Send",
-      "ADD": "Create",
+      "CREATE": "Create",
+      "ADD": "Add",
+      "IGNORE": "Ignore",
       "UPDATE": "Update",
       "CANCEL": "Cancel"
     },
@@ -284,7 +287,12 @@
       "COLUMN": {
         "NAME": "Name",
         "PROFESSIONAL": "Professional",
-        "WORKING_TIME": "Working time"
+        "AVAILABILITY": {
+          "FIELD": "Availability",
+          "WEEK": "Week",
+          "SATURDAY": "Saturday",
+          "SUNDAY": "Sunday"
+        }
       }
     },
     "ADD": {
@@ -295,10 +303,31 @@
       },
       "PROFESSIONAL": {
         "FIELD": "Professional",
-        "REQUIRED": "Professional is <b>required</b>"
+        "REQUIRED": "Professional is <b>required</b>",
+        "INVALID": "Professional is invalid"
       },
-      "WORKING_TIME": {
-        "FIELD": "Working time"
+      "AVAILABILITY": {
+        "FIELD": "Availability",
+        "REQUIRED": "At least one availability is <b>required</b>"
+      },
+      "WEEK_TIME": {
+        "FIELD": "Week availability",
+        "DESCRIPTION": "Week working time availability",
+        "REQUIRED": "Add or ignore week working time"
+      },
+      "SATURDAY_TIME": {
+        "FIELD": "Saturday availability",
+        "DESCRIPTION": "Saturday working time availability",
+        "REQUIRED": "Add or ignore saturday working time"
+      },
+      "SUNDAY_TIME": {
+        "FIELD": "Sunday availability",
+        "DESCRIPTION": "Sunday working time availability",
+        "REQUIRED": "Add or ignore sunday working time"
+      },
+      "LUNCH": {
+        "FIELD": "Lunch time",
+        "CHECK": "Add lunch time"
       },
       "START": {
         "FIELD": "Start",
@@ -319,8 +348,28 @@
       "PROFESSIONAL": {
         "FIELD": "Professional"
       },
-      "WORKING_TIME": {
-        "FIELD": "Working time"
+      "AVAILABILITY": {
+        "FIELD": "Availability",
+        "REQUIRED": "At least one availability is <b>required</b>"
+      },
+      "WEEK_TIME": {
+        "FIELD": "Week availability",
+        "DESCRIPTION": "Week working time availability",
+        "REQUIRED": "Add or ignore week working time"
+      },
+      "SATURDAY_TIME": {
+        "FIELD": "Saturday availability",
+        "DESCRIPTION": "Saturday working time availability",
+        "REQUIRED": "Add or ignore saturday working time"
+      },
+      "SUNDAY_TIME": {
+        "FIELD": "Sunday availability",
+        "DESCRIPTION": "Sunday working time availability",
+        "REQUIRED": "Add or ignore sunday working time"
+      },
+      "LUNCH": {
+        "FIELD": "Lunch time",
+        "CHECK": "Add lunch time"
       },
       "START": {
         "FIELD": "Start",
@@ -338,6 +387,47 @@
     },
     "UPDATED": {
       "MESSAGE": "Room {{name}} updated"
+    }
+  },
+  "RESERVATION": {
+    "ADD": {
+      "CUSTOMER": {
+        "FIELD": "Customer",
+        "REQUIRED": "Customer is <b>required</b>",
+        "INVALID": "Customer is invalid"
+      },
+      "ROOM": {
+        "FIELD": "Room",
+        "REQUIRED": "Room is <b>required</b>",
+        "INVALID": "Room is invalid"
+      },
+      "PRODUCT": {
+        "FIELD": "Product",
+        "REQUIRED": "Product is <b>required</b>",
+        "INVALID": "Product is invalid"
+      },
+      "DATE": {
+        "FIELD": "Pick a date",
+        "REQUIRED": "Date is <b>required</b>"
+      },
+      "SCHEDULE": {
+        "FIELD": "Book reservation"
+      },
+      "PREVIEW": {
+        "FIELD": "Preview"
+      },
+      "EVENT": {
+        "DETAIL": "<div><b>Customer name:</b> {{customerName}}</div><div><b>Product:</b> {{productName}}</div><div><b>Duration:</b> {{duration}}</div>",
+        "TITLE": "Add new reservation",
+        "CONTENT": "Are you sure to add reservation at {{date}}?",
+        "CHANGE": "Are you sure to change reservation to {{date}}?",
+        "MESSAGE": {
+          "UNAVAILABLE": "Unavailable",
+          "LUNCH": "Lunch time",
+          "NOT_WORKING": "Not working"
+        }
+      },
+      "CREATED": "Reservation {{name}} created"
     }
   },
   "last": {

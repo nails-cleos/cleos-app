@@ -38,7 +38,6 @@ export class ProductDetailComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.createForm();
-    this.clean();
     this.subscribe();
   }
 
@@ -53,12 +52,6 @@ export class ProductDetailComponent implements OnInit, AfterViewInit {
       price: this.price,
       durationDate: this.durationDate
     });
-  }
-
-  clean(): void {
-    this.store.dispatch(
-      new fromActionsProduct.Clean()
-    );
   }
 
   subscribe(): void {
