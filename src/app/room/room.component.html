@@ -30,6 +30,9 @@
                 <mat-error *ngIf="professional.hasError('required')"
                            [innerHTML]="'ROOM.ADD.PROFESSIONAL.REQUIRED' | translate">
                 </mat-error>
+                <mat-error *ngIf="professional.hasError('requireMatch')"
+                           [innerHTML]="'ROOM.ADD.PROFESSIONAL.INVALID' | translate">
+                </mat-error>
                 <mat-error *ngIf="errors['professional']">
                   {{errors['professional']}}
                 </mat-error>
@@ -37,45 +40,65 @@
               <ng-template #skeleton>
                 <div class="ssc-line"></div>
               </ng-template>
-              <mat-label>{{ 'ROOM.ADD.WORKING_TIME.FIELD' | translate }}</mat-label>
-              <mat-form-field>
-                <mat-label>{{ 'ROOM.ADD.START.FIELD' | translate }}</mat-label>
-                <label>
-                  <input matTimepicker #tStart="matTimepicker" mode="24h" formControlName="start" #t="matTimepicker"
-                         cancelLabel="{{ 'COMMON.BUTTON.CANCEL' | translate }}">
-                </label>
-                <span matPrefix>
-                  <mat-icon matPrefix (click)="tStart.showDialog()">timer</mat-icon> &nbsp;
-                </span>
-                <mat-error *ngIf="start.hasError('required')"
-                           [innerHTML]="'ROOM.ADD.START.REQUIRED' | translate">
-                </mat-error>
-                <mat-error *ngIf="errors['start']">
-                  {{errors['start']}}
-                </mat-error>
-              </mat-form-field>
-              <mat-form-field>
-                <mat-label>{{ 'PRODUCT.ADD.END.FIELD' | translate }}</mat-label>
-                <label>
-                  <input matTimepicker #tEnd="matTimepicker" mode="24h" formControlName="end" #t="matTimepicker"
-                         cancelLabel="{{ 'COMMON.BUTTON.CANCEL' | translate }}">
-                </label>
-                <span matPrefix>
-                  <mat-icon matPrefix (click)="tEnd.showDialog()">timer</mat-icon> &nbsp;
-                </span>
-                <mat-error *ngIf="end.hasError('required')"
-                           [innerHTML]="'ROOM.ADD.END.REQUIRED' | translate">
-                </mat-error>
-                <mat-error *ngIf="errors['end']">
-                  {{errors['end']}}
-                </mat-error>
-              </mat-form-field>
+              <mat-label class="divider">{{ 'ROOM.ADD.AVAILABILITY.FIELD' | translate }}</mat-label>
+              <mat-accordion class="headers-align" multi>
+                <mat-expansion-panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      {{ 'ROOM.ADD.WEEK_TIME.FIELD' | translate }}
+                    </mat-panel-title>
+                    <mat-panel-description fxShow fxHide.lt-sm>
+                      {{ 'ROOM.ADD.WEEK_TIME.DESCRIPTION' | translate }}
+                      <mat-icon>{{icons.week}}</mat-icon>
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <app-availability [day]="'WEEK'" (availability)="addAvailability($event, 1)"
+                                    (ignore)="ignore('WEEK', 1)"></app-availability>
+                  <mat-error *ngIf="errors['day0']">
+                    {{ 'ROOM.ADD.WEEK_TIME.REQUIRED' | translate }}
+                  </mat-error>
+                </mat-expansion-panel>
+                <mat-expansion-panel [expanded]="step === 1" (opened)="setStep(1)" hideToggle>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      {{ 'ROOM.ADD.SATURDAY_TIME.FIELD' | translate }}
+                    </mat-panel-title>
+                    <mat-panel-description fxShow fxHide.lt-sm>
+                      {{ 'ROOM.ADD.SATURDAY_TIME.DESCRIPTION' | translate }}
+                      <mat-icon>{{icons.saturday}}</mat-icon>
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <app-availability [day]="'SATURDAY'" (availability)="addAvailability($event, 2)"
+                                    (ignore)="ignore('SATURDAY', 2)"></app-availability>
+                  <mat-error *ngIf="errors['day1']">
+                    {{ 'ROOM.ADD.SATURDAY_TIME.REQUIRED' | translate }}
+                  </mat-error>
+                </mat-expansion-panel>
+                <mat-expansion-panel [expanded]="step === 2" (opened)="setStep(2)" hideToggle>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      {{ 'ROOM.ADD.SUNDAY_TIME.FIELD' | translate }}
+                    </mat-panel-title>
+                    <mat-panel-description fxShow fxHide.lt-sm>
+                      {{ 'ROOM.ADD.SUNDAY_TIME.DESCRIPTION' | translate }}
+                      <mat-icon>{{icons.sunday}}</mat-icon>
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <app-availability [day]="'SUNDAY'" (availability)="addAvailability($event, 3)"
+                                    (ignore)="ignore('SUNDAY', 3)"></app-availability>
+                  <mat-error *ngIf="errors['day2']">
+                    {{ 'ROOM.ADD.SUNDAY_TIME.REQUIRED' | translate }}
+                  </mat-error>
+                </mat-expansion-panel>
+              </mat-accordion>
+              <mat-error class="divider" *ngIf="errors['availability']"
+                         [innerHTML]="'ROOM.ADD.AVAILABILITY.REQUIRED' | translate"></mat-error>
             </div>
           </mat-card-content>
           <mat-card-actions>
             <div fxFlex></div>
-            <button mat-raised-button color="primary" [disabled]="form.invalid"
-                    type="submit">{{ 'COMMON.BUTTON.ADD' | translate }}</button>
+            <button mat-raised-button color="primary"
+                    type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
             <button mat-raised-button color="accent"
                     routerLink="/products">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>

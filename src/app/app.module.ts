@@ -12,6 +12,8 @@ import { ActionReducer, MetaReducer, StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ChartsModule } from 'ng2-charts';
+import { CalendarModule, DateAdapter } from 'angular-calendar';
+import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 
 // Providers
 import { httpInterceptorProviders } from './http-interceptors';
@@ -28,6 +30,8 @@ import { AuthGuardService } from './services/auth-guard.service';
 import { AuthService } from './services/auth.service';
 import { UserService } from './services/user.service';
 import { ProductService } from './services/product.service';
+import { RoomService } from './services/room.service';
+import { ReservationService } from './services/reservation.service';
 
 // Reducers
 import { reducers } from './store/app.states';
@@ -37,6 +41,7 @@ import { LoginEffects } from './store/effects/auth.effects';
 import { UserEffects } from './store/effects/user.effects';
 import { ProductEffects } from './store/effects/product.effects';
 import { RoomEffects } from './store/effects/room.effects';
+import { ReservationEffects } from './store/effects/reservation.effects';
 
 // Components
 import { AppComponent } from './app.component';
@@ -62,6 +67,10 @@ import { ProductDetailComponent } from './product/detail/product-detail.componen
 import { RoomComponent } from './room/room.component';
 import { RoomsComponent } from './room/list/rooms.component';
 import { RoomDetailComponent } from './room/detail/room-detail.component';
+import { ReservationComponent } from './reservation/reservation.component';
+import { ReservationsComponent } from './reservation/list/reservations.component';
+import { ReservationDetailComponent } from './reservation/detail/reservation-detail.component';
+import { AvailabilityComponent } from './availability/availability.component';
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -113,12 +122,16 @@ const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
     ProductDetailComponent,
     RoomComponent,
     RoomsComponent,
-    RoomDetailComponent
+    RoomDetailComponent,
+    ReservationComponent,
+    ReservationsComponent,
+    ReservationDetailComponent,
+    AvailabilityComponent
   ],
   imports: [
     BrowserModule,
     StoreModule.forRoot(reducers, {metaReducers}),
-    EffectsModule.forRoot([LoginEffects, UserEffects, ProductEffects, RoomEffects]),
+    EffectsModule.forRoot([LoginEffects, UserEffects, ProductEffects, RoomEffects, ReservationEffects]),
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {
@@ -126,6 +139,9 @@ const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
         useFactory: HttpLoaderFactory,
         deps: [HttpClient]
       }
+    }),
+    CalendarModule.forRoot({
+      provide: DateAdapter, useFactory: adapterFactory
     }),
     ChartsModule,
     AppRoutingModule,
@@ -147,6 +163,8 @@ const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
     AuthService,
     UserService,
     ProductService,
+    RoomService,
+    ReservationService,
     TranslationLoaderResolver,
     {
       provide: 'SocialAuthServiceConfig',

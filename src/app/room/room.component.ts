@@ -5,9 +5,23 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../store/app.states';
 import * as fromActionsRoom from '../store/room.actions';
-import { IRoom, Room } from '../interfaces/room';
+import { IAvailability, IRoom, Room } from '../interfaces/room';
 import { IUser } from '../interfaces/user';
 import { map, startWith } from 'rxjs/operators';
+import { TranslateService } from '@ngx-translate/core';
+import { RequireMatch } from '../util/validators';
+
+export enum IconName {
+  calendar_today = 'calendar_today',
+  event_available = 'event_available',
+  event_busy = 'event_busy'
+}
+
+export interface IIcon {
+  week: IconName;
+  saturday: IconName;
+  sunday: IconName;
+}
 
 @Component({
   selector: 'app-room',
@@ -17,7 +31,15 @@ import { map, startWith } from 'rxjs/operators';
 export class RoomComponent implements OnInit {
   getState: Observable<any>;
   form!: FormGroup;
+  room: IRoom = new Room();
   errors: any = [];
+
+  step = 0;
+  icons: IIcon = {
+    week: IconName.calendar_today,
+    saturday: IconName.calendar_today,
+    sunday: IconName.calendar_today
+  };
 
   professionals: IUser[] | undefined;
   filteredOptions: Observable<IUser[] | undefined> | undefined;
@@ -27,23 +49,12 @@ export class RoomComponent implements OnInit {
   ]);
 
   professional: FormControl = new FormControl('', [
-    Validators.required
+    Validators.required, RequireMatch
   ]);
-  start: FormControl;
-  end: FormControl;
 
-  constructor(private snackBar: MatSnackBar, private store: Store<AppState>, private formBuilder: FormBuilder) {
+  constructor(private readonly translate: TranslateService, private snackBar: MatSnackBar, private store: Store<AppState>,
+              private formBuilder: FormBuilder) {
     this.getState = this.store.select(selectRoomState);
-    const start = new Date(new Date().setHours(9, 0));
-    const end = new Date(new Date().setHours(18, 0));
-
-    this.start = new FormControl(start, [
-      Validators.required
-    ]);
-
-    this.end = new FormControl(end, [
-      Validators.required
-    ]);
   }
 
   ngOnInit(): void {
@@ -56,18 +67,15 @@ export class RoomComponent implements OnInit {
   createForm(): void {
     this.form = this.formBuilder.group({
       name: this.name,
-      professional: this.professional,
-      start: this.start,
-      end: this.end
+      professional: this.professional
     });
-    this.filteredOptions = this.professional.valueChanges
-      .pipe(
-        startWith(''),
-        map(value => typeof value === 'string' ? value : value.name),
-        map(name => {
-          return name ? this._filter(name) : this.professionals ? this.professionals.slice() : this.professionals;
-        })
-      );
+    this.filteredOptions = this.professional.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value.name),
+      map(name => {
+        return name ? this._filter(name) : this.professionals ? this.professionals.slice() : this.professionals;
+      })
+    );
   }
 
   clean(): void {
@@ -100,30 +108,94 @@ export class RoomComponent implements OnInit {
     );
   }
 
+  setStep(index: number): void {
+    this.step = index;
+  }
+
   create(): void {
-    if (this.form.invalid) {
+    if (this.validate()) {
       return;
     }
-    const room: IRoom = new Room();
-    room.name = this.name.value;
-    room.professionalId = this.professional.value.id;
 
-    const startTime = this.start.value;
-    const startHours = `0${startTime.getHours()}`.slice(-2);
-    const startMinutes = `0${startTime.getMinutes()}`.slice(-2);
-    room.availability.start = `${startHours}:${startMinutes}`;
-    const endTime = this.end.value;
-    const endHours = `0${endTime.getHours()}`.slice(-2);
-    const endMinutes = `0${endTime.getMinutes()}`.slice(-2);
-    room.availability.end = `${endHours}:${endMinutes}`;
+    this.room.name = this.name.value;
+    this.room.professionalId = this.professional.value.id;
 
     this.store.dispatch(
-      new fromActionsRoom.RoomSave(room)
+      new fromActionsRoom.RoomSave(this.room)
     );
   }
 
   displayFn(user: IUser): string {
-    return user && user.firstName ? user.firstName : '';
+    return user ? `${user.firstName} ${user.lastName}` : '';
+  }
+
+  addAvailability(availability: IAvailability, step: number): void {
+    this.setIcon(availability.day, IconName.event_available);
+
+    const index = this.room.availabilities.findIndex((e) => e.day === availability.day);
+
+    if (index === -1) {
+      this.room.availabilities = [...this.room.availabilities, availability];
+    } else {
+      this.room.availabilities[index] = availability;
+    }
+
+    this.step = step;
+  }
+
+  ignore(day: string, step: number): void {
+    this.setIcon(day, IconName.event_busy);
+    const index = this.room.availabilities.findIndex((e) => e.day === day);
+    if (index > -1) {
+      this.room.availabilities.splice(index, 1);
+    }
+    this.step = step;
+  }
+
+  private setIcon(day: string, icon: IconName): void {
+    switch (day) {
+      case 'WEEK':
+        this.icons.week = icon;
+        break;
+      case 'SATURDAY':
+        this.icons.saturday = icon;
+        break;
+      case 'SUNDAY':
+        this.icons.sunday = icon;
+        break;
+    }
+  }
+
+  private validate(): boolean {
+    if (this.form.invalid) {
+      return true;
+    }
+    let step = -1;
+    this.errors = [];
+    switch (IconName.calendar_today) {
+      case this.icons.week:
+        step = 0;
+        break;
+      case this.icons.saturday:
+        step = 1;
+        break;
+      case this.icons.sunday:
+        step = 2;
+        break;
+    }
+    if (step > -1) {
+      this.errors[`day${step}`] = true;
+      this.setStep(step);
+      return true;
+    }
+
+    if (this.room.availabilities.length === 0) {
+      this.errors.availability = true;
+      this.setStep(0);
+      return true;
+    }
+
+    return false;
   }
 
   private _filter(name: string): IUser[] | undefined {

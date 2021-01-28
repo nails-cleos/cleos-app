@@ -20,7 +20,7 @@ import { DialogComponent } from '../../dialog/dialog.component';
 })
 export class RoomsComponent implements OnInit, AfterViewInit {
 
-  displayedColumns: string[] = ['position', 'name', 'professional', 'working', 'actions'];
+  displayedColumns: string[] = ['position', 'name', 'professional', 'availability', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IRoom>>();
   getState: Observable<any>;
 

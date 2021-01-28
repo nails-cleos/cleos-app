@@ -22,7 +22,7 @@ export class NavComponent implements OnInit {
     );
 
   title = 'Nails';
-  menuItems = ['dashboard', 'users', 'products', 'rooms'];
+  menuItems = ['dashboard', 'users', 'products', 'rooms', 'reservations'];
   currentUser!: IUser | null;
   username: string | undefined;
   getState: Observable<any>;

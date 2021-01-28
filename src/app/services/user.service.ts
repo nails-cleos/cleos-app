@@ -8,7 +8,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 })
 export class UserService {
 
-  private userUrl = 'users';
+  private url = 'users';
 
   constructor(private http: HttpClient) {
   }
@@ -22,26 +22,26 @@ export class UserService {
       params = params.append('direction', direction);
     }
 
-    return this.http.get<IUser[]>(this.userUrl, {params});
+    return this.http.get<IUser[]>(`${this.url}/pages`, {params});
   }
 
   getById(id: string | null): Observable<IUser | undefined> {
-    const url = `${this.userUrl}/${id}`;
+    const url = `${this.url}/${id}`;
     return this.http.get<IUser>(url);
   }
 
   getMe(): Observable<IUser | undefined> {
-    const url = `${this.userUrl}/me`;
+    const url = `${this.url}/me`;
     return this.http.get<IUser>(url);
   }
 
   update(user: IUser): Observable<IUser> {
-    const url = `${this.userUrl}/${user.id}`;
+    const url = `${this.url}/${user.id}`;
     return this.http.patch<IUser>(url, user);
   }
 
   updateMe(user: IUser): Observable<IUser> {
-    const url = `${this.userUrl}/me`;
+    const url = `${this.url}/me`;
     return this.http.patch<IUser>(url, user);
   }
 
@@ -54,22 +54,25 @@ export class UserService {
   }
 
   delete(id: string | null): Observable<IUser> {
-    const url = `${this.userUrl}/${id}`;
+    const url = `${this.url}/${id}`;
     return this.http.delete<IUser>(url);
   }
 
   resend(id: string | null): Observable<any> {
-    const url = `${this.userUrl}/${id}/token`;
+    const url = `${this.url}/${id}/token`;
     return this.http.post(url, null);
   }
 
   public changePassword(oldPassword: string, password: string): Observable<any> {
-    const url = `${this.userUrl}/me/change-password`;
+    const url = `${this.url}/me/change-password`;
     return this.http.post(url, {oldPassword, password});
   }
 
-  getAllProfessional(): Observable<IUser[]> {
-
+  getAllProfessionals(): Observable<IUser[]> {
     return this.http.get<IUser[]>('professionals');
+  }
+
+  getAllCustomers(): Observable<IUser[]> {
+    return this.http.get<IUser[]>('customers');
   }
 }

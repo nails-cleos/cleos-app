@@ -20,6 +20,9 @@ import { ProductDetailComponent } from './product/detail/product-detail.componen
 import { RoomsComponent } from './room/list/rooms.component';
 import { RoomComponent } from './room/room.component';
 import { RoomDetailComponent } from './room/detail/room-detail.component';
+import { ReservationsComponent } from './reservation/list/reservations.component';
+import { ReservationComponent } from './reservation/reservation.component';
+import { ReservationDetailComponent } from './reservation/detail/reservation-detail.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/dashboard', pathMatch: 'full', resolve: {model: TranslationLoaderResolver}},
@@ -85,6 +88,22 @@ const routes: Routes = [
   },
   {
     path: 'room/:id', component: RoomDetailComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.Admin]
+    }
+  },
+  {
+    path: 'reservations', component: ReservationsComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService],
+    data: {
+      roles: [Role.Admin]
+    }
+  },
+  {
+    path: 'reservation', component: ReservationComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.Admin]
+    }
+  },
+  {
+    path: 'reservation/:id', component: ReservationDetailComponent, canActivate: [AuthGuardService], data: {
       roles: [Role.Admin]
     }
   }
