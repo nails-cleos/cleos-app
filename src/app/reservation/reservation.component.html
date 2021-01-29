@@ -1,160 +1,277 @@
-<mat-horizontal-stepper #stepper linear>
-  <mat-step [stepControl]="customerForm" state="user">
-    <form [formGroup]="customerForm">
-      <ng-template matStepLabel>{{ 'RESERVATION.ADD.CUSTOMER.FIELD' | translate }}</ng-template>
-      <mat-form-field *ngIf="customers; else skeleton">
-        <mat-label>{{ 'RESERVATION.ADD.CUSTOMER.FIELD' | translate }}</mat-label>
-        <label>
-          <input [formControl]="customer" [matAutocomplete]="autoCustomer" matInput required type="text">
-        </label>
-        <mat-autocomplete #autoCustomer="matAutocomplete" [displayWith]="displayFnUser">
-          <mat-option *ngFor="let customer of filteredCustomer | async" [value]="customer">
-            {{customer.firstName}} {{customer.lastName}}
-          </mat-option>
-        </mat-autocomplete>
-        <mat-error *ngIf="customer.hasError('required')"
-                   [innerHTML]="'RESERVATION.ADD.CUSTOMER.REQUIRED' | translate">
-        </mat-error>
-        <mat-error *ngIf="customer.hasError('requireMatch')"
-                   [innerHTML]="'RESERVATION.ADD.CUSTOMER.INVALID' | translate">
-        </mat-error>
-        <mat-error *ngIf="errors['customer']">
-          {{errors['customer']}}
-        </mat-error>
-      </mat-form-field>
-      <ng-template #skeleton>
-        <div class="ssc-line"></div>
-      </ng-template>
-      <div>
-        <button (click)="getRooms(stepper)" color="primary" mat-button type="button">
-          {{ 'COMMON.BUTTON.NEXT' | translate }}
-        </button>
-      </div>
-    </form>
-  </mat-step>
-  <mat-step [stepControl]="roomForm" state="room">
-    <form [formGroup]="roomForm">
-      <ng-template matStepLabel>{{ 'RESERVATION.ADD.ROOM.FIELD' | translate }}</ng-template>
-      <mat-form-field *ngIf="rooms; else skeleton">
-        <mat-label>{{ 'RESERVATION.ADD.ROOM.FIELD' | translate }}</mat-label>
-        <label>
-          <input [formControl]="room" [matAutocomplete]="autoRoom" matInput required type="text">
-        </label>
-        <mat-autocomplete #autoRoom="matAutocomplete" [displayWith]="displayFnRoom">
-          <mat-option *ngFor="let room of filteredRoom | async" [value]="room">
-            {{room.name}}
-          </mat-option>
-        </mat-autocomplete>
-        <mat-error *ngIf="room.hasError('required')"
-                   [innerHTML]="'RESERVATION.ADD.ROOM.REQUIRED' | translate">
-        </mat-error>
-        <mat-error *ngIf="room.hasError('requireMatch')"
-                   [innerHTML]="'RESERVATION.ADD.ROOM.INVALID' | translate">
-        </mat-error>
-        <mat-error *ngIf="errors['room']">
-          {{errors['room']}}
-        </mat-error>
-      </mat-form-field>
-      <ng-template #skeleton>
-        <div class="ssc-line"></div>
-      </ng-template>
-      <div>
-        <button (click)="getProducts(stepper)" color="primary" mat-button type="button">
-          {{ 'COMMON.BUTTON.NEXT' | translate }}
-        </button>
-        <button mat-button matStepperPrevious>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
-      </div>
-    </form>
-  </mat-step>
-  <mat-step [stepControl]="productForm" state="product">
-    <form [formGroup]="productForm">
-      <ng-template matStepLabel>{{ 'RESERVATION.ADD.PRODUCT.FIELD' | translate }}</ng-template>
-      <div fxLayout="column" fxLayoutAlign="space-evenly start">
-        <mat-form-field *ngIf="products; else skeleton">
-          <mat-label>{{ 'RESERVATION.ADD.PRODUCT.FIELD' | translate }}</mat-label>
-          <label>
-            <input [formControl]="product" [matAutocomplete]="autoProduct" matInput required type="text">
-          </label>
-          <mat-autocomplete #autoProduct="matAutocomplete" [displayWith]="displayFnProduct">
-            <mat-option *ngFor="let product of filteredProduct | async" [value]="product">
-              {{product.name}}
-            </mat-option>
-          </mat-autocomplete>
-          <mat-error *ngIf="product.hasError('required')"
-                     [innerHTML]="'RESERVATION.ADD.PRODUCT.REQUIRED' | translate">
-          </mat-error>
-          <mat-error *ngIf="product.hasError('requireMatch')"
-                     [innerHTML]="'RESERVATION.ADD.PRODUCT.INVALID' | translate">
-          </mat-error>
-          <mat-error *ngIf="errors['product']">
-            {{errors['product']}}
-          </mat-error>
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>{{ 'RESERVATION.ADD.DATE.FIELD' | translate }}</mat-label>
-          <label>
-            <input [formControl]="date" [matDatepickerFilter]="myFilter" [matDatepicker]="picker" matInput required>
-          </label>
-          <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
-          <mat-datepicker #picker touchUi></mat-datepicker>
-          <mat-error *ngIf="product.hasError('required')"
-                     [innerHTML]="'RESERVATION.ADD.DATE.REQUIRED' | translate">
-          </mat-error>
-        </mat-form-field>
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
-      </div>
-      <div>
-        <button (click)="searchAvailability(stepper)" color="primary" mat-button
-                type="button">{{ 'COMMON.BUTTON.NEXT' | translate }}</button>
-        <button mat-button matStepperPrevious>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
-      </div>
-    </form>
-  </mat-step>
-  <mat-step state="date">
-    <ng-template matStepLabel>{{ 'RESERVATION.ADD.SCHEDULE.FIELD' | translate }}</ng-template>
-    <div *ngIf="!isLoading; else box">
-      <mwl-calendar-week-view
-        (hourSegmentClicked)="segmentClick($event.date)"
-        [dayEndHour]="dayEndHour"
-        [dayEndMinute]="dayEndMinute"
-        [dayStartHour]="dayStartHour"
-        [dayStartMinute]="dayStartMinute"
-        [daysInWeek]="7"
-        [events]="events"
-        [viewDate]="viewDate"></mwl-calendar-week-view>
-    </div>
-    <ng-template #box>
-      <div class="ssc-square mb" style="height: 200px"></div>
+<ng-template #stepOne>
+  <form [formGroup]="customerForm">
+    <mat-form-field *ngIf="customers; else skeleton">
+      <mat-label>{{ 'RESERVATION.ADD.CUSTOMER.FIELD' | translate }}</mat-label>
+      <label>
+        <input [formControl]="customer" [matAutocomplete]="autoCustomer" matInput required type="text">
+      </label>
+      <mat-autocomplete #autoCustomer="matAutocomplete" [displayWith]="displayFnUser">
+        <mat-option *ngFor="let customer of filteredCustomer | async" [value]="customer">
+          {{customer.firstName}} {{customer.lastName}}
+        </mat-option>
+      </mat-autocomplete>
+      <mat-error *ngIf="customer.hasError('required')"
+                 [innerHTML]="'RESERVATION.ADD.CUSTOMER.REQUIRED' | translate">
+      </mat-error>
+      <mat-error *ngIf="customer.hasError('requireMatch')"
+                 [innerHTML]="'RESERVATION.ADD.CUSTOMER.INVALID' | translate">
+      </mat-error>
+      <mat-error *ngIf="errors['customer']">
+        {{errors['customer']}}
+      </mat-error>
+    </mat-form-field>
+    <ng-template #skeleton>
+      <div class="ssc-line"></div>
     </ng-template>
-    <div>
-      <button color="primary" mat-button matStepperNext type="button">{{ 'COMMON.BUTTON.NEXT' | translate }}</button>
-      <button mat-button matStepperPrevious>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
-    </div>
-  </mat-step>
-  <mat-step state="preview">
-    <ng-template matStepLabel>{{ 'RESERVATION.ADD.PREVIEW.FIELD' | translate }}</ng-template>
-    <p>You're welcome.</p>
-    <div>
-      <button mat-button matStepperPrevious>Back</button>
-    </div>
-  </mat-step>
+  </form>
+</ng-template>
 
-  <!-- Icon overrides. -->
-  <ng-template matStepperIcon="user">
-    <mat-icon>person_search</mat-icon>
+<ng-template #stepTwo>
+  <form [formGroup]="roomForm">
+    <mat-form-field *ngIf="rooms; else skeleton">
+      <mat-label>{{ 'RESERVATION.ADD.ROOM.FIELD' | translate }}</mat-label>
+      <label>
+        <input [formControl]="room" [matAutocomplete]="autoRoom" matInput required type="text">
+      </label>
+      <mat-autocomplete #autoRoom="matAutocomplete" [displayWith]="displayFnRoom">
+        <mat-option *ngFor="let room of filteredRoom | async" [value]="room">
+          {{room.name}}
+        </mat-option>
+      </mat-autocomplete>
+      <mat-error *ngIf="room.hasError('required')"
+                 [innerHTML]="'RESERVATION.ADD.ROOM.REQUIRED' | translate">
+      </mat-error>
+      <mat-error *ngIf="room.hasError('requireMatch')"
+                 [innerHTML]="'RESERVATION.ADD.ROOM.INVALID' | translate">
+      </mat-error>
+      <mat-error *ngIf="errors['room']">
+        {{errors['room']}}
+      </mat-error>
+    </mat-form-field>
+    <ng-template #skeleton>
+      <div class="ssc-line"></div>
+    </ng-template>
+  </form>
+</ng-template>
+
+<ng-template #stepThree>
+  <form [formGroup]="productForm">
+    <div fxLayout="column" fxLayoutAlign="space-evenly start">
+      <mat-form-field *ngIf="products; else skeleton">
+        <mat-label>{{ 'RESERVATION.ADD.PRODUCT.FIELD' | translate }}</mat-label>
+        <label>
+          <input [formControl]="product" [matAutocomplete]="autoProduct" matInput required type="text">
+        </label>
+        <mat-autocomplete #autoProduct="matAutocomplete" [displayWith]="displayFnProduct">
+          <mat-option *ngFor="let product of filteredProduct | async" [value]="product">
+            {{product.name}}
+          </mat-option>
+        </mat-autocomplete>
+        <mat-error *ngIf="product.hasError('required')"
+                   [innerHTML]="'RESERVATION.ADD.PRODUCT.REQUIRED' | translate">
+        </mat-error>
+        <mat-error *ngIf="product.hasError('requireMatch')"
+                   [innerHTML]="'RESERVATION.ADD.PRODUCT.INVALID' | translate">
+        </mat-error>
+        <mat-error *ngIf="errors['product']">
+          {{errors['product']}}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>{{ 'RESERVATION.ADD.DATE.FIELD' | translate }}</mat-label>
+        <label>
+          <input [formControl]="date" [matDatepickerFilter]="myFilter" [matDatepicker]="picker" matInput required>
+        </label>
+        <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
+        <mat-datepicker #picker touchUi></mat-datepicker>
+        <mat-error *ngIf="product.hasError('required')"
+                   [innerHTML]="'RESERVATION.ADD.DATE.REQUIRED' | translate">
+        </mat-error>
+      </mat-form-field>
+      <ng-template #skeleton>
+        <div class="ssc-line"></div>
+      </ng-template>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #stepFour>
+  <div *ngIf="!isLoading; else box">
+    <mwl-calendar-week-view
+      (hourSegmentClicked)="segmentClick($event.date)"
+      [dayEndHour]="dayEndHour"
+      [dayEndMinute]="dayEndMinute"
+      [dayStartHour]="dayStartHour"
+      [dayStartMinute]="dayStartMinute"
+      [daysInWeek]="daysInWeek"
+      [events]="events"
+      [hourSegments]="hourSegments"
+      [viewDate]="viewDate"></mwl-calendar-week-view>
+    <mat-error *ngIf="this.errors['schedule']" [innerHTML]="'RESERVATION.ADD.SCHEDULE.REQUIRED' | translate"
+               class="divider"></mat-error>
+    <mat-error *ngIf="this.errors['overlapping']" class="divider" [innerHTML]="errors['overlapping']">
+    </mat-error>
+  </div>
+  <ng-template #box>
+    <div class="ssc-square mb" style="height: 200px"></div>
   </ng-template>
-  <ng-template matStepperIcon="room">
-    <mat-icon>room</mat-icon>
-  </ng-template>
-  <ng-template matStepperIcon="product">
-    <mat-icon>home_repair_service</mat-icon>
-  </ng-template>
-  <ng-template matStepperIcon="date">
-    <mat-icon>book_online</mat-icon>
-  </ng-template>
-  <ng-template matStepperIcon="preview">
-    <mat-icon>preview</mat-icon>
-  </ng-template>
-</mat-horizontal-stepper>
+</ng-template>
+
+<ng-template #stepFive>
+  <mat-card *ngIf="isPreview">
+    <mat-card-header>
+      <mat-card-title>{{ 'RESERVATION.ADD.PREVIEW.TITLE' | translate }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-list>
+        <div mat-subheader>{{ 'RESERVATION.ADD.PREVIEW.CUSTOMER' | translate}}</div>
+        <mat-list-item>
+          <mat-icon mat-list-icon>wash</mat-icon>
+          <div mat-line>{{customer.value.firstName}} {{customer.value.lastName}}</div>
+        </mat-list-item>
+        <mat-divider></mat-divider>
+        <div mat-subheader>{{ 'RESERVATION.ADD.PREVIEW.ROOM.TITLE' | translate}}</div>
+        <mat-list-item>
+          <mat-icon mat-list-icon>room</mat-icon>
+          <div mat-line>{{ 'RESERVATION.ADD.PREVIEW.ROOM.NAME' | translate}}</div>
+          <div mat-line>{{room.value.name}}</div>
+        </mat-list-item>
+        <mat-list-item>
+          <mat-icon mat-list-icon>person_pin</mat-icon>
+          <div mat-line>{{ 'RESERVATION.ADD.PREVIEW.ROOM.PROFESSIONAL' | translate}}</div>
+          <div mat-line>{{room.value.professional.firstName}} {{room.value.professional.lastName}}</div>
+        </mat-list-item>
+        <mat-divider></mat-divider>
+        <div mat-subheader>{{ 'RESERVATION.ADD.PREVIEW.PRODUCT.TITLE' | translate}}</div>
+        <mat-list-item>
+          <mat-icon mat-list-icon>home_repair_service</mat-icon>
+          <div mat-line>{{ 'RESERVATION.ADD.PREVIEW.PRODUCT.NAME' | translate}}</div>
+          <div mat-line>{{product.value.name}}</div>
+        </mat-list-item>
+        <mat-list-item>
+          <mat-icon mat-list-icon>timer</mat-icon>
+          <div mat-line>{{ 'RESERVATION.ADD.PREVIEW.PRODUCT.DURATION' | translate}}</div>
+          <div mat-line>{{product.value.duration.slice(0, 5)}}</div>
+        </mat-list-item>
+        <mat-list-item>
+          <mat-icon mat-list-icon>attach_money</mat-icon>
+          <div mat-line>{{ 'RESERVATION.ADD.PREVIEW.PRODUCT.PRICE' | translate}}</div>
+          <div mat-line>{{product.value.price | number:'1.2-2'}}</div>
+        </mat-list-item>
+        <mat-divider></mat-divider>
+        <div mat-subheader>{{ 'RESERVATION.ADD.PREVIEW.APPOINTMENT' | translate}}</div>
+        <mat-list-item>
+          <mat-icon mat-list-icon>event</mat-icon>
+          <div mat-line>{{eventSelected?.start?.toLocaleString(locale)}} - {{eventSelected?.end?.toLocaleString(locale)}}</div>
+        </mat-list-item>
+      </mat-list>
+    </mat-card-content>
+  </mat-card>
+</ng-template>
+
+<ng-template [ngIfElse]="bigScreen" [ngIf]="smallScreen">
+  <mat-vertical-stepper #stepper>
+    <mat-step [stepControl]="customerForm" state="person_search">
+      <ng-template matStepLabel>{{ 'RESERVATION.ADD.CUSTOMER.FIELD' | translate }}</ng-template>
+      <ng-container *ngTemplateOutlet="stepOne"></ng-container>
+      <div>
+        <button (click)="getRooms(stepper)" color="primary" mat-button type="button" [disabled]="customerForm.invalid">
+          {{ 'COMMON.BUTTON.NEXT' | translate }}
+        </button>
+      </div>
+    </mat-step>
+    <mat-step [stepControl]="roomForm" state="room">
+      <ng-template matStepLabel>{{ 'RESERVATION.ADD.ROOM.FIELD' | translate }}</ng-template>
+      <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
+      <div>
+        <button (click)="getProducts(stepper)" color="primary" mat-button type="button" [disabled]="roomForm.invalid">
+          {{ 'COMMON.BUTTON.NEXT' | translate }}
+        </button>
+        <button (click)="goBack(stepper)" mat-button>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+      </div>
+    </mat-step>
+    <mat-step [stepControl]="productForm" state="home_repair_service">
+      <ng-template matStepLabel>{{ 'RESERVATION.ADD.PRODUCT.FIELD' | translate }}</ng-template>
+      <ng-container *ngTemplateOutlet="stepThree"></ng-container>
+      <div>
+        <button (click)="searchAvailability(stepper)" color="primary" mat-button type="button" [disabled]="productForm.invalid">
+          {{ 'COMMON.BUTTON.NEXT' | translate }}
+        </button>
+        <button (click)="goBack(stepper)" mat-button>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+      </div>
+    </mat-step>
+    <mat-step state="book_online">
+      <ng-template matStepLabel>{{ 'RESERVATION.ADD.SCHEDULE.FIELD' | translate }}</ng-template>
+      <ng-container *ngTemplateOutlet="stepFour"></ng-container>
+      <div>
+        <button (click)="preview(stepper)" color="primary" mat-button type="button">
+          {{ 'COMMON.BUTTON.NEXT' | translate }}
+        </button>
+        <button (click)="goBack(stepper)" mat-button>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+      </div>
+    </mat-step>
+    <mat-step state="preview">
+      <ng-template matStepLabel>{{ 'RESERVATION.ADD.PREVIEW.TITLE' | translate }}</ng-template>
+      <ng-container *ngTemplateOutlet="stepFive"></ng-container>
+      <div>
+        <button (click)="create()" color="primary" mat-button type="button">
+          {{ 'COMMON.BUTTON.BOOK' | translate }}
+        </button>
+        <button (click)="goBack(stepper)" mat-button>Back</button>
+      </div>
+    </mat-step>
+  </mat-vertical-stepper>
+</ng-template>
+
+<ng-template #bigScreen>
+  <mat-horizontal-stepper #stepper>
+    <mat-step [stepControl]="customerForm" state="person_search">
+      <ng-template matStepLabel>{{ 'RESERVATION.ADD.CUSTOMER.FIELD' | translate }}</ng-template>
+      <ng-container *ngTemplateOutlet="stepOne"></ng-container>
+      <div>
+        <button (click)="getRooms(stepper)" color="primary" mat-button type="button" [disabled]="customerForm.invalid">
+          {{ 'COMMON.BUTTON.NEXT' | translate }}
+        </button>
+      </div>
+    </mat-step>
+    <mat-step [stepControl]="roomForm" state="room">
+      <ng-template matStepLabel>{{ 'RESERVATION.ADD.ROOM.FIELD' | translate }}</ng-template>
+      <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
+      <div>
+        <button (click)="getProducts(stepper)" color="primary" mat-button type="button" [disabled]="roomForm.invalid">
+          {{ 'COMMON.BUTTON.NEXT' | translate }}
+        </button>
+        <button (click)="goBack(stepper)" mat-button>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+      </div>
+    </mat-step>
+    <mat-step [stepControl]="productForm" state="home_repair_service">
+      <ng-template matStepLabel>{{ 'RESERVATION.ADD.PRODUCT.FIELD' | translate }}</ng-template>
+      <ng-container *ngTemplateOutlet="stepThree"></ng-container>
+      <div>
+        <button (click)="searchAvailability(stepper)" color="primary" mat-button type="button" [disabled]="productForm.invalid">
+          {{ 'COMMON.BUTTON.NEXT' | translate }}
+        </button>
+        <button (click)="goBack(stepper)" mat-button>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+      </div>
+    </mat-step>
+    <mat-step state="book_online">
+      <ng-template matStepLabel>{{ 'RESERVATION.ADD.SCHEDULE.FIELD' | translate }}</ng-template>
+      <ng-container *ngTemplateOutlet="stepFour"></ng-container>
+      <div>
+        <button (click)="preview(stepper)" color="primary" mat-button
+                type="button">{{ 'COMMON.BUTTON.NEXT' | translate }}</button>
+        <button (click)="goBack(stepper)" mat-button>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+      </div>
+    </mat-step>
+    <mat-step state="preview">
+      <ng-template matStepLabel>{{ 'RESERVATION.ADD.PREVIEW.TITLE' | translate }}</ng-template>
+      <ng-container *ngTemplateOutlet="stepFive"></ng-container>
+      <div>
+        <button (click)="create()" color="primary" mat-button type="button">
+          {{ 'COMMON.BUTTON.BOOK' | translate }}
+        </button>
+        <button (click)="goBack(stepper)" mat-button>Back</button>
+      </div>
+    </mat-step>
+  </mat-horizontal-stepper>
+</ng-template>

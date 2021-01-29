@@ -10,7 +10,8 @@
       "ADD": "Agregar",
       "IGNORE": "Ignorar",
       "UPDATE": "Actualizar",
-      "CANCEL": "Cancelar"
+      "CANCEL": "Cancelar",
+      "BOOK": "Reservar"
     },
     "COLUMN": {
       "ACTIONS": "Acciones"
@@ -387,6 +388,66 @@
     },
     "UPDATED": {
       "MESSAGE": "Sala {{name}} actualizada"
+    }
+  },
+  "RESERVATION": {
+    "ADD": {
+      "CUSTOMER": {
+        "FIELD": "Cliente",
+        "REQUIRED": "Cliente es <b>requerido</b>",
+        "INVALID": "Cliente no valido"
+      },
+      "ROOM": {
+        "FIELD": "Sala",
+        "REQUIRED": "Sala es <b>requerido</b>",
+        "INVALID": "Sala no valido"
+      },
+      "PRODUCT": {
+        "FIELD": "Servicio",
+        "REQUIRED": "Servicio es <b>requerido</b>",
+        "INVALID": "Servicio no valido"
+      },
+      "DATE": {
+        "FIELD": "Elegí una fecha",
+        "REQUIRED": "Fecha es <b>requerida</b>"
+      },
+      "SCHEDULE": {
+        "FIELD": "Reservar una cita",
+        "REQUIRED": "Reservar una cita es <b>requerido</b>"
+      },
+      "PREVIEW": {
+        "TITLE": "Vista previa",
+        "CUSTOMER": "Cliente",
+        "ROOM": {
+          "TITLE": "Sala",
+          "NAME": "Nombre",
+          "PROFESSIONAL": "Profesional"
+        },
+        "PRODUCT": {
+          "TITLE": "Servicio",
+          "NAME": "Nombre",
+          "DURATION": "Duración",
+          "PRICE": "Precio"
+        },
+        "APPOINTMENT": "Cita"
+      },
+      "EVENT": {
+        "OVERLAPPING": {
+          "TITLE": "Reserva superpuesta",
+          "CONTENT": "La nueva reserva se superpone con <div>{{data}}</div> ¿Está seguro de agregar la reserva?",
+          "ERROR": "La nueva reserva se superpone con <div>{{data}}</div>"
+        },
+        "DETAIL": "<div><b>Nombre del cliente:</b> {{customerName}}</div><div><b>Servicio:</b> {{productName}}</div><div><b>Duración:</b> {{duration}}</div>",
+        "TITLE": "Agregar nueva reserva",
+        "CONTENT": "Estás segura de añadir la reserva el {{date}}?",
+        "CHANGE": "Estás segura de cambiar la reserva al {{date}}?",
+        "MESSAGE": {
+          "UNAVAILABLE": "<b>No disponible</b>",
+          "LUNCH": "<b>Hora de almuerzo</b>",
+          "OUT_OF_WORK": "<b>Fuera del trabajo</b>"
+        }
+      },
+      "CREATED": "Reservation {{name}} created"
     }
   },
   "last": {

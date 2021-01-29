@@ -10,7 +10,15 @@ export interface IReservation {
   product?: IProduct;
   roomId?: string;
   room?: IRoom;
-  start?: Date;
+  start?: string;
+}
+
+export interface IReservationAll {
+  id: string;
+  customer: IUser;
+  product: IProduct;
+  room: IRoom;
+  start: string;
 }
 
 export class Reservation implements IReservation {
