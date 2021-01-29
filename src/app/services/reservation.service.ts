@@ -35,8 +35,9 @@ export class ReservationService {
     return this.http.get<IReservation>(url);
   }
 
-  add(product: IReservation): Observable<IReservation> {
-    return this.http.post<IReservation>(`${this.url}/customers`, product);
+  add(reservation: IReservation): Observable<IReservation> {
+    console.log(reservation)
+    return this.http.post<IReservation>(`${this.url}/customers`, reservation);
   }
 
   delete(id: string | null): Observable<IReservation> {
@@ -44,8 +45,8 @@ export class ReservationService {
     return this.http.delete<IReservation>(url);
   }
 
-  update(product: IReservation): Observable<IReservation> {
-    const url = `${this.url}/${product.id}`;
-    return this.http.patch<IReservation>(url, product);
+  update(reservation: IReservation): Observable<IReservation> {
+    const url = `${this.url}/${reservation.id}`;
+    return this.http.patch<IReservation>(url, reservation);
   }
 }

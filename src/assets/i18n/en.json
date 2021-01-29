@@ -10,7 +10,8 @@
       "ADD": "Add",
       "IGNORE": "Ignore",
       "UPDATE": "Update",
-      "CANCEL": "Cancel"
+      "CANCEL": "Cancel",
+      "BOOK": "Reserve"
     },
     "COLUMN": {
       "ACTIONS": "Actions"
@@ -411,20 +412,39 @@
         "REQUIRED": "Date is <b>required</b>"
       },
       "SCHEDULE": {
-        "FIELD": "Book reservation"
+        "FIELD": "Book an appointment",
+        "REQUIRED": "Book an appointment is <b>required</b>"
       },
       "PREVIEW": {
-        "FIELD": "Preview"
+        "TITLE": "Preview",
+        "CUSTOMER": "Customer",
+        "ROOM": {
+          "TITLE": "Room",
+          "NAME": "Name",
+          "PROFESSIONAL": "Professional"
+        },
+        "PRODUCT": {
+          "TITLE": "Product",
+          "NAME": "Name",
+          "DURATION": "Duration",
+          "PRICE": "Price"
+        },
+        "APPOINTMENT": "Appointment"
       },
       "EVENT": {
+        "OVERLAPPING": {
+          "TITLE": "Reservation overlapping",
+          "CONTENT": "The new reservation is overlapping with <div>{{data}}</div> Are you sure to add reservation?",
+          "ERROR": "The new reservation is overlapping with <div>{{data}}</div>"
+        },
         "DETAIL": "<div><b>Customer name:</b> {{customerName}}</div><div><b>Product:</b> {{productName}}</div><div><b>Duration:</b> {{duration}}</div>",
         "TITLE": "Add new reservation",
-        "CONTENT": "Are you sure to add reservation at {{date}}?",
+        "CONTENT": "Are you sure to add reservation on {{date}}?",
         "CHANGE": "Are you sure to change reservation to {{date}}?",
         "MESSAGE": {
-          "UNAVAILABLE": "Unavailable",
-          "LUNCH": "Lunch time",
-          "NOT_WORKING": "Not working"
+          "UNAVAILABLE": "<b>Unavailable</b>",
+          "LUNCH": "<b>Lunch time</b>",
+          "OUT_OF_WORK": "<b>Out of work</b>"
         }
       },
       "CREATED": "Reservation {{name}} created"
