@@ -20,7 +20,7 @@ export class AnnualReservationsChartComponent implements OnChanges {
   ];
   public lineChartLabels: Label[] = [];
   public lineChartOptions: ChartOptions = {
-    responsive: true,
+    responsive: true
   };
   public lineChartColors: Color[] = [
     {
@@ -67,16 +67,18 @@ export class AnnualReservationsChartComponent implements OnChanges {
         }, new Map<string, number>());
 
         let data: number[] = [];
+        let label: string[] = [];
 
         for (let i = 12; i >= 0; i--) {
           const date = new Date(new Date().setMonth(now.getMonth() - i, 1));
           const key = this.formatDate(date);
-          this.lineChartLabels = [...this.lineChartLabels, key];
+          label = [...label, key];
 
           const count = group.get(key) || 0;
           data = [...data, count];
         }
         this.lineChartData[0].data = data;
+        this.lineChartLabels = label;
       }
     }
   }
