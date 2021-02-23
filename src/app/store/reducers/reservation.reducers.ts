@@ -52,8 +52,7 @@ export function reducer(state = initialState, action: All): State {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case ReservationActionTypes.SEARCH_RESERVATION:
