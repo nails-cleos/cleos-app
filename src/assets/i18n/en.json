@@ -34,7 +34,23 @@
     "PROFILE": "Profile",
     "CHANGE_PASSWORD": "Change password",
     "SIGN_OUT": "Sign out",
-    "SIGN_IN": "Sign In"
+    "SIGN_IN": "Sign In",
+    "CARD": {
+      "DURATION": "since last month",
+      "TOTAL_PRODUCT_SALES": "Total Product Sales",
+      "AVERAGE_PRODUCT_VALUE": "Average Product Value",
+      "TOTAL_PRODUCTS": "Total Products",
+      "NEW_CUSTOMERS_RESERVATION": "New Customers Reservation"
+    },
+    "CHART": {
+      "MONTHLY_RESERVATION": "Monthly Reservations",
+      "PRODUCT_RESERVATION": "Product Reservation",
+      "YEARLY_PRODUCT_PRICE": "Yearly products price",
+      "CUSTOMER_RESERVATION": "Customer Reservation"
+    },
+    "TABLE": {
+      "RESERVATION": "Reservations"
+    }
   },
   "AUTH": {
     "SIGN_IN": {
@@ -447,7 +463,55 @@
           "OUT_OF_WORK": "<b>Out of work</b>"
         }
       },
-      "CREATED": "Reservation {{name}} created"
+      "CREATED": "Reservation {{date}} created"
+    },
+    "DETAIL": {
+      "TITLE": "Customer reservation",
+      "ROOM": {
+        "TITLE": "Room",
+        "NAME": "Name",
+        "PROFESSIONAL": "Professional"
+      },
+      "PRODUCT": {
+        "TITLE": "Product",
+        "NAME": "Name",
+        "DURATION": "Duration",
+        "PRICE": "Price"
+      },
+      "APPOINTMENT": "Appointment",
+      "HISTORY": {
+        "TITLE": "History",
+        "COLUMN": {
+          "PROFESSIONAL": "Professional",
+          "START": "Start",
+          "PRODUCT": "Product",
+          "STATE": "State"
+        }
+      }
+    },
+    "PAGE": {
+      "COLUMN": {
+        "CUSTOMER": "Customer",
+        "PROFESSIONAL": "Professional",
+        "START": "Start",
+        "STATE": "State",
+        "PRODUCT": "Product"
+      }
+    },
+    "DELETED": {
+      "TITLE": "Delete reservation",
+      "CONTENT": "Are you sure to delete reservation {{date}}?",
+      "MESSAGE": "Reservation {{date}} deleted"
+    },
+    "UPDATED": {
+      "MESSAGE": "Room {{name}} updated"
+    },
+    "STATE": {
+      "CREATED": "Created",
+      "APPROVED": "Approved",
+      "STARTED": "Started",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled"
     }
   },
   "last": {

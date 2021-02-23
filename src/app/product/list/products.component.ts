@@ -12,6 +12,7 @@ import { AppState, selectProductState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
 import * as fromActionsProduct from '../../store/product.actions';
 import { DialogComponent } from '../../dialog/dialog.component';
+import { ConvertDuration } from '../../util/dates';
 
 @Component({
   selector: 'app-products',
@@ -67,7 +68,14 @@ export class ProductsComponent implements OnInit, AfterViewInit {
           });
         }
       }
-      this.dataSource = stateValue.data?.content;
+      this.dataSource = stateValue.data?.content?.map((product: IProduct) => {
+        if (product.duration) {
+          const duration = ConvertDuration(product.duration);
+
+          return Object.assign({}, product, {hour: duration.hour, minute: duration.minute});
+        }
+        return product;
+      });
       this.resultsLength = stateValue.data?.totalElements;
     });
   }

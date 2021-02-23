@@ -32,7 +32,7 @@ const routes: Routes = [
   {path: 'recovery-password', component: RecoveryPasswordComponent},
   {path: 'main', component: MainComponent},
   {
-    path: 'dashboard', component: DashComponent, canActivate: [AuthGuardService], data: {
+    path: 'dashboard', component: DashComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService], data: {
       roles: [Role.Admin, Role.Professional, Role.Customer]
     }
   },
@@ -94,17 +94,17 @@ const routes: Routes = [
   {
     path: 'reservations', component: ReservationsComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService],
     data: {
-      roles: [Role.Admin]
+      roles: [Role.Admin, Role.Professional]
     }
   },
   {
     path: 'reservation', component: ReservationComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.Admin]
+      roles: [Role.Admin, Role.Professional]
     }
   },
   {
     path: 'reservation/:id', component: ReservationDetailComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.Admin]
+      roles: [Role.Admin, Role.Professional]
     }
   }
 ];

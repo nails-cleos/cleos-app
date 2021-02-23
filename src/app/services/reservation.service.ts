@@ -13,7 +13,7 @@ export class ReservationService {
   constructor(private http: HttpClient) {
   }
 
-  getAll(sort: string, direction: string, page: number): Observable<IReservation[]> {
+  getAllPage(sort: string, direction: string, page: number): Observable<IReservation[]> {
     let params = new HttpParams().set('page', String(page)).set('size', String(PAGE_SIZE));
     if (sort) {
       params = params.append('sort', sort);
@@ -23,6 +23,15 @@ export class ReservationService {
     }
 
     return this.http.get<IReservation[]>(`${this.url}/pages`, {params});
+  }
+
+  getAll(): Observable<IReservation[]> {
+    return this.http.get<IReservation[]>(this.url);
+  }
+
+  getAllGroupingByRoom(): Observable<IReservation[]> {
+    const params = new HttpParams().set('date', new Date().toISOString().slice(0, 10));
+    return this.http.get<any>(`${this.url}/rooms`, {params});
   }
 
   search(roomId: string, date: Date): Observable<IReservation[]> {
@@ -36,8 +45,7 @@ export class ReservationService {
   }
 
   add(reservation: IReservation): Observable<IReservation> {
-    console.log(reservation)
-    return this.http.post<IReservation>(`${this.url}/customers`, reservation);
+    return this.http.post<IReservation>(this.url, reservation);
   }
 
   delete(id: string | null): Observable<IReservation> {

@@ -8,6 +8,13 @@ export interface IRoom {
   availabilities: IAvailability[];
 }
 
+export interface IRoomAll {
+  id: string;
+  name: string;
+  professional: IUser;
+  availabilities: IAvailability[];
+}
+
 export interface IAvailability {
   day: string;
   start?: string;

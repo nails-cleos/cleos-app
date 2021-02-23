@@ -8,6 +8,7 @@ import { AppState, selectProductState } from '../../store/app.states';
 import * as fromActionsProduct from '../../store/product.actions';
 import { FieldChange } from '../../util/validators';
 import { IProduct, Product } from '../../interfaces/product';
+import { ConvertDuration } from '../../util/dates';
 
 @Component({
   selector: 'app-product-detail',
@@ -42,7 +43,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.getUser();
+    this.getProduct();
   }
 
   createForm(): void {
@@ -63,8 +64,9 @@ export class ProductDetailComponent implements OnInit, AfterViewInit {
           description: state.selected.description,
           price: state.selected.price
         } as IProduct;
-        const time = state.selected.duration.split(':');
-        this.product.durationDate = new Date(new Date().setHours(time[0], time[1]));
+
+        const duration = ConvertDuration(state.selected.duration);
+        this.product.durationDate = new Date(new Date().setHours(duration.hour, duration.minute));
         this.form.patchValue(this.product);
       }
       if (state.subErrors) {
@@ -80,7 +82,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit {
     });
   }
 
-  getUser(): void {
+  getProduct(): void {
     if (!this.product) {
       const id = this.route.snapshot.paramMap.get('id');
       this.store.dispatch(
@@ -96,7 +98,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit {
     const product: IProduct = new Product();
     product.id = this.product?.id;
     product.name = FieldChange(this.name, this.product?.name);
-    product.description = FieldChange(this.form.value.description, this.product?.description);
+    product.description = FieldChange(this.form.value?.description, this.product?.description);
     product.price = FieldChange(this.price, this.product?.price);
 
     const durationTime = this.durationDate.value;

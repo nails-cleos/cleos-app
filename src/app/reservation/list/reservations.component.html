@@ -1,1 +1,25 @@
-<p>reservations works!</p>
+<div *ngIf="!isLoading && data && calendar.size; else box">
+  <mat-accordion>
+    <mat-expansion-panel *ngFor="let room of data | keyvalue">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <p style="font-weight: bold">{{calendar.get(room.key)!.room.name}}</p>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <mwl-calendar-week-view
+        (hourSegmentClicked)="segmentClick($event.date, calendar.get(room.key)!.room)"
+        (eventClicked)="view($event.event)"
+        [dayEndHour]="calendar.get(room.key)!.day!.dayEndHour"
+        [dayEndMinute]="calendar.get(room.key)!.day!.dayEndMinute"
+        [dayStartHour]="calendar.get(room.key)!.day!.dayStartHour"
+        [dayStartMinute]="calendar.get(room.key)!.day!.dayStartMinute"
+        [daysInWeek]="calendar.get(room.key)!.day!.daysInWeek"
+        [events]="calendar.get(room.key)!.events"
+        [hourSegments]="calendar.get(room.key)!.day!.hourSegments"
+        [viewDate]="viewDate"></mwl-calendar-week-view>
+    </mat-expansion-panel>
+  </mat-accordion>
+</div>
+<ng-template #box>
+  <div class="ssc-square mb" style="height: 200px"></div>
+</ng-template>

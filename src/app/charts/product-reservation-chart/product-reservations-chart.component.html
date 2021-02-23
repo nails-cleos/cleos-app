@@ -1,0 +1,11 @@
+<div class="chartContainer" *ngIf="!isLoading; else box">
+  <canvas baseChart
+    [datasets]="radarChartData"
+    [options]="radarChartOptions"
+    [labels]="radarChartLabels"
+    [chartType]="radarChartType">
+  </canvas>
+</div>
+<ng-template #box>
+  <div class="ssc-square mb" style="height: 200px"></div>
+</ng-template>

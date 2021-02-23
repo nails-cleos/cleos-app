@@ -1,0 +1,71 @@
+<div class="mat-elevation-z8 small-table">
+  <table mat-table [dataSource]="dataSource" class="full-width-table" matSort matSortActive="customer"
+         matSortDisableClear matSortDirection="desc">
+    <ng-container matColumnDef="position">
+      <th mat-header-cell *matHeaderCellDef> No.</th>
+      <td mat-cell *matCellDef="let reservation; let i = index;">
+        <div *ngIf="reservation.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="customer">
+      <th mat-header-cell *matHeaderCellDef>{{ 'RESERVATION.PAGE.COLUMN.CUSTOMER' | translate }}</th>
+      <td mat-cell *matCellDef="let reservation">
+        <div *ngIf="reservation.id; else skeleton">{{reservation.customer.firstName}} {{reservation.customer.lastName}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="start">
+      <th mat-header-cell fxShow fxHide.lt-sm *matHeaderCellDef mat-sort-header>{{ 'RESERVATION.PAGE.COLUMN.START' | translate }}</th>
+      <td mat-cell fxShow fxHide.lt-sm *matCellDef="let reservation">
+        <div *ngIf="reservation.id; else skeleton">{{reservation.start | date:'short':undefined:language}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="state">
+      <th mat-header-cell fxShow fxHide.lt-sm *matHeaderCellDef mat-sort-header>{{ 'RESERVATION.PAGE.COLUMN.STATE' | translate }}</th>
+      <td mat-cell fxShow fxHide.lt-sm *matCellDef="let reservation">
+        <div *ngIf="reservation.id; else skeleton">
+          <mat-icon matPrefix>{{getIcon(reservation.state)}}</mat-icon>&nbsp;
+          {{ 'RESERVATION.STATE.' + reservation.state | translate}}
+        </div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="professional">
+      <th mat-header-cell fxShow fxHide.lt-sm *matHeaderCellDef>{{ 'RESERVATION.PAGE.COLUMN.PROFESSIONAL' | translate }}</th>
+      <td mat-cell fxShow fxHide.lt-sm *matCellDef="let reservation">
+        <div *ngIf="reservation.id; else skeleton">{{reservation.room.professional.firstName}} {{reservation.room.professional.lastName}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="product">
+      <th mat-header-cell fxShow fxHide.lt-sm *matHeaderCellDef>{{ 'RESERVATION.PAGE.COLUMN.PRODUCT' | translate }}</th>
+      <td mat-cell fxShow fxHide.lt-sm *matCellDef="let reservation">
+        <div *ngIf="reservation.id; else skeleton">{{reservation.product.name}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+  <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+</div>

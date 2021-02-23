@@ -20,7 +20,7 @@ export function MustMatch(controlName: string, matchingControlName: string): (co
 }
 
 export function FieldChange(formControl: FormControl, value: any | undefined): any | undefined {
-  return formControl.dirty && value !== formControl.value ? formControl.value : null;
+  return formControl && formControl.dirty && value !== formControl.value ? formControl.value : null;
 }
 
 export function RequireMatch(control: AbstractControl): any {

@@ -17,10 +17,36 @@ export class ReservationEffects {
   @Effect()
   getAll$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.GET_ALL)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.reservationService.getAll(payload.active, payload.direction, payload.page).pipe(
+    switchMap(() => {
+      return this.reservationService.getAll().pipe(
         switchMap((response: any) => {
           return of(new fromActionsReservation.ReservationSuccess(response));
+        }),
+        catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
+      );
+    })
+  );
+
+  @Effect()
+  getAllPage$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.GET_ALL_PAGE)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => {
+      return this.reservationService.getAllPage(payload.active, payload.direction, payload.page).pipe(
+        switchMap((response: any) => {
+          return of(new fromActionsReservation.ReservationPageSuccess(response));
+        }),
+        catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
+      );
+    })
+  );
+
+  @Effect()
+  getAllGroupingByRoom$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.GET_ALL_GROUPING_BY_ROOM)).pipe(
+    map((action: any) => action.payload),
+    switchMap(() => {
+      return this.reservationService.getAllGroupingByRoom().pipe(
+        switchMap((response: any) => {
+          return of(new fromActionsReservation.ReservationSuccess(new Map(Object.entries(response))));
         }),
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
       );
@@ -85,6 +111,7 @@ export class ReservationEffects {
     switchMap((payload: any) => {
       return this.reservationService.getById(payload).pipe(
         switchMap((reservation: any) => {
+          console.log(reservation);
           return of(new fromActionsReservation.ReservationSelected(reservation));
         }),
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
@@ -98,7 +125,7 @@ export class ReservationEffects {
     switchMap((payload: any) => {
       return this.reservationService.add(payload).pipe(
         switchMap((response: any) => {
-          const message = this.translate.instant('RESERVATION.ADD.CREATED', {name: response.name});
+          const message = this.translate.instant('RESERVATION.ADD.CREATED', {date: response.start});
           return of(new fromActionsReservation.ReservationSaveSuccess({message}));
         }),
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
@@ -112,7 +139,7 @@ export class ReservationEffects {
     switchMap((payload: any) => {
       return this.reservationService.update(payload).pipe(
         switchMap((response: any) => {
-          const message = this.translate.instant('RESERVATION.UPDATED.MESSAGE', {name: response.name});
+          const message = this.translate.instant('RESERVATION.UPDATED.MESSAGE', {date: response.start});
           return of(new fromActionsReservation.ReservationSaveSuccess({message}));
         }),
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
@@ -126,7 +153,7 @@ export class ReservationEffects {
     switchMap((payload: any) => {
       return this.reservationService.delete(payload).pipe(
         switchMap((response: any) => {
-          const message = this.translate.instant('RESERVATION.DELETED.MESSAGE', {name: response.name});
+          const message = this.translate.instant('RESERVATION.DELETED.MESSAGE', {date: response.start});
           return of(new fromActionsReservation.ReservationSaveSuccess({message}));
         }),
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
@@ -145,6 +172,11 @@ export class ReservationEffects {
   @Effect({dispatch: false})
   dataSuccess$ = this.actions$.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.RESERVATION_SUCCESS)
+  );
+
+  @Effect({dispatch: false})
+  dataPageSuccess$ = this.actions$.pipe(
+    ofType(fromActionsReservation.ReservationActionTypes.RESERVATION_PAGE_SUCCESS)
   );
 
   @Effect({dispatch: false})

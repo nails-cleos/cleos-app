@@ -127,7 +127,6 @@ export class RoomDetailComponent implements OnInit, AfterViewInit {
     const index = this.availabilities.findIndex((e) => e.day === availability.day);
 
     if (index !== -1) {
-      console.log(this.availabilities);
       this.availabilities.splice(index, 1);
     }
     this.availabilities = [...this.availabilities, availability];

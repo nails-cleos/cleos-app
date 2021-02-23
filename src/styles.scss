@@ -45,7 +45,7 @@ table {
 
 .mat-cell-position {
   text-align: center;
-  justify-content:center;
+  justify-content: center;
 }
 
 .column-large-text {
@@ -69,23 +69,23 @@ a, u {
 }
 
 .circle {
-  border-radius   : 50%;
-  width           : 60px;
-  height          : 60px;
-  display         : flex;
-  justify-content : center;
-  align-items     : center;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-  img{
+  img {
     border-radius: 50%;
-    width        : 60px;
-    height       : 60px;
+    width: 60px;
+    height: 60px;
   }
 
   .initials {
-    color         : #FFFFFF;
-    font-size     : 20px;
-    line-height   : 19px;
+    color: #FFFFFF;
+    font-size: 20px;
+    line-height: 19px;
     letter-spacing: 0.2625px;
   }
 }
@@ -122,4 +122,19 @@ a, u {
 
 .ssc-hr {
   margin: 5px 0 5px 0;
+}
+
+/*Charts*/
+
+.chartContainer canvas {
+  max-height: 250px;
+  width: auto;
+}
+
+.chartContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }

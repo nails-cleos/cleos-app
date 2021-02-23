@@ -1,17 +1,38 @@
 <h1 class="mat-h1">Dashboard</h1>
 <mat-grid-list cols="{{ ( cardLayout | async )?.columns }}" rowHeight="200px">
   <!--Mini Cards-->
-  <mat-grid-tile *ngFor="let i of [1, 2, 3, 4]" [colspan]="( cardLayout | async )?.miniCard?.cols"
+  <mat-grid-tile *ngFor="let mc of miniCardData" [colspan]="( cardLayout | async )?.miniCard?.cols"
                  [rowspan]="( cardLayout | async )?.miniCard?.rows">
-    <app-card title="Card {{i}}"><div>Mini Card Content Here</div></app-card>
+    <app-mini-card [color]="mc.color" [icon]="mc.icon" [isCurrency]="mc. isCurrency" [isIncrease]="mc.isIncrease"
+                   [percentValue]="mc.percentValue"
+                   [title]="mc.title" [value]="mc.value"
+                   duration="DASHBOARD.CARD.DURATION"></app-mini-card>
   </mat-grid-tile>
   <!--Charts-->
-  <mat-grid-tile *ngFor="let i of [5, 6, 7, 8]" [colspan]="( cardLayout | async )?.chart?.cols"
-                 [rowspan]="( cardLayout | async )?.chart?.rows">
-    <app-card title="Card {{i}}"><div>Chart Content Here</div></app-card>
+  <mat-grid-tile [colspan]="( cardLayout | async )?.chart?.cols" [rowspan]="( cardLayout | async )?.chart?.rows">
+    <app-card title="{{ 'DASHBOARD.CHART.MONTHLY_RESERVATION' | translate }}">
+      <app-monthly-reservation-chart [state]="state"></app-monthly-reservation-chart>
+    </app-card>
+  </mat-grid-tile>
+  <mat-grid-tile [colspan]="( cardLayout | async )?.chart?.cols" [rowspan]="( cardLayout | async )?.chart?.rows">
+    <app-card title="{{ 'DASHBOARD.CHART.PRODUCT_RESERVATION' | translate }}">
+      <app-product-reservations-chart [state]="state"></app-product-reservations-chart>
+    </app-card>
+  </mat-grid-tile>
+  <mat-grid-tile [colspan]="( cardLayout | async )?.chart?.cols" [rowspan]="( cardLayout | async )?.chart?.rows">
+    <app-card title="{{ 'DASHBOARD.CHART.YEARLY_PRODUCT_PRICE' | translate }}">
+      <app-annual-reservations-chart [state]="state"></app-annual-reservations-chart>
+    </app-card>
+  </mat-grid-tile>
+  <mat-grid-tile [colspan]="( cardLayout | async )?.chart?.cols" [rowspan]="( cardLayout | async )?.chart?.rows">
+    <app-card title="{{ 'DASHBOARD.CHART.CUSTOMER_RESERVATION' | translate }}">
+      <app-customer-reservations-chart [state]="state"></app-customer-reservations-chart>
+    </app-card>
   </mat-grid-tile>
   <!--Table-->
   <mat-grid-tile [colspan]="( cardLayout | async )?.table?.cols" [rowspan]="( cardLayout | async )?.table?.rows">
-    <app-card title="Card 9"><div>Table Content Here</div></app-card>
+    <app-card title="{{ 'DASHBOARD.TABLE.RESERVATION' | translate }}">
+      <app-reservation-table [state]="page"></app-reservation-table>
+    </app-card>
   </mat-grid-tile>
 </mat-grid-list>
