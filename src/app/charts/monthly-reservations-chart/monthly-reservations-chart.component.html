@@ -1,0 +1,13 @@
+<div class="chartContainer" *ngIf="!isLoading; else box">
+  <canvas baseChart
+    [data]="pieChartData"
+    [labels]="pieChartLabels"
+    [chartType]="pieChartType"
+    [options]="pieChartOptions"
+    [plugins]="pieChartPlugins"
+    [legend]="pieChartLegend">
+  </canvas>
+</div>
+<ng-template #box>
+  <div class="ssc-square mb" style="height: 200px"></div>
+</ng-template>

@@ -14,6 +14,7 @@ import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-transla
 import { ChartsModule } from 'ng2-charts';
 import { CalendarModule, DateAdapter } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
+import { registerLocaleData } from '@angular/common';
 
 // Providers
 import { httpInterceptorProviders } from './http-interceptors';
@@ -24,6 +25,8 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { PaginatorI18n } from './util/paginator';
 import { TranslationLoaderResolver } from './util/translation.resolver';
+import localeEn from '@angular/common/locales/en';
+import localeEs from '@angular/common/locales/es';
 
 // Services
 import { AuthGuardService } from './services/auth-guard.service';
@@ -71,6 +74,12 @@ import { ReservationComponent } from './reservation/reservation.component';
 import { ReservationsComponent } from './reservation/list/reservations.component';
 import { ReservationDetailComponent } from './reservation/detail/reservation-detail.component';
 import { AvailabilityComponent } from './availability/availability.component';
+import { ProductReservationsChartComponent } from './charts/product-reservation-chart/product-reservations-chart.component';
+import { MonthlyReservationsChartComponent } from './charts/monthly-reservations-chart/monthly-reservations-chart.component';
+import { AnnualReservationsChartComponent } from './charts/annual-reservations-chart/annual-reservations-chart.component';
+import { MiniCardComponent } from './mini-card/mini-card.component';
+import { CustomerReservationsChartComponent } from './charts/customer-reservations-chart/customer-reservations-chart.component';
+import { ReservationTableComponent } from './reservation/table/reservation-table.component';
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -97,6 +106,9 @@ export function localStorageSyncReducer(reducer: ActionReducer<any>): ActionRedu
 }
 
 const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
+
+registerLocaleData(localeEn, 'en');
+registerLocaleData(localeEs, 'es');
 
 @NgModule({
   declarations: [
@@ -126,7 +138,13 @@ const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
     ReservationComponent,
     ReservationsComponent,
     ReservationDetailComponent,
-    AvailabilityComponent
+    AvailabilityComponent,
+    ProductReservationsChartComponent,
+    MonthlyReservationsChartComponent,
+    AnnualReservationsChartComponent,
+    MiniCardComponent,
+    CustomerReservationsChartComponent,
+    ReservationTableComponent
   ],
   imports: [
     BrowserModule,

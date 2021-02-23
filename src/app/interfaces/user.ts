@@ -12,6 +12,17 @@ export interface IUser {
   imageUrl?: string;
 }
 
+export interface IUserAll {
+  id: string;
+  firstName: string;
+  lastName: string;
+  provider: string;
+  username: string;
+  email: string;
+  authorities: IAuthority[];
+  imageUrl?: string;
+}
+
 export interface IAuthority {
   authority: string;
 }

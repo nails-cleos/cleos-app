@@ -1,1 +1,107 @@
-<p>reservation-detail works!</p>
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>{{ 'RESERVATION.DETAIL.TITLE' | translate }}</mat-card-title>
+    <mat-card-subtitle
+      *ngIf="reservation; else skeleton">{{reservation.customer.firstName}} {{reservation.customer.lastName}}</mat-card-subtitle>
+    <ng-template #skeleton>
+      <div class="ssc-line"></div>
+    </ng-template>
+  </mat-card-header>
+  <mat-card-content *ngIf="reservation; else boxSkeleton">
+    <mat-list>
+      <div mat-subheader>{{ 'RESERVATION.DETAIL.ROOM.TITLE' | translate}}</div>
+      <mat-list-item>
+        <mat-icon mat-list-icon>room</mat-icon>
+        <div mat-line>{{ 'RESERVATION.DETAIL.ROOM.NAME' | translate}}</div>
+        <div mat-line>{{reservation.room.name}}</div>
+      </mat-list-item>
+      <mat-list-item>
+        <mat-icon mat-list-icon>person_pin</mat-icon>
+        <div mat-line>{{ 'RESERVATION.DETAIL.ROOM.PROFESSIONAL' | translate}}</div>
+        <div mat-line>{{reservation.room.professional.firstName}} {{reservation.room.professional.lastName}}</div>
+      </mat-list-item>
+      <mat-divider></mat-divider>
+      <div mat-subheader>{{ 'RESERVATION.DETAIL.PRODUCT.TITLE' | translate}}</div>
+      <mat-list-item>
+        <mat-icon mat-list-icon>home_repair_service</mat-icon>
+        <div mat-line>{{ 'RESERVATION.DETAIL.PRODUCT.NAME' | translate}}</div>
+        <div mat-line>{{reservation.product.name}}</div>
+      </mat-list-item>
+      <mat-list-item>
+        <mat-icon mat-list-icon>timer</mat-icon>
+        <div mat-line>{{ 'RESERVATION.DETAIL.PRODUCT.DURATION' | translate}}</div>
+        <div mat-line>{{duration.hour | number:'2.0-0'}}:{{duration.minute | number:'2.0-0'}}</div>
+      </mat-list-item>
+      <mat-list-item>
+        <mat-icon mat-list-icon>attach_money</mat-icon>
+        <div mat-line>{{ 'RESERVATION.DETAIL.PRODUCT.PRICE' | translate}}</div>
+        <div mat-line>{{reservation.product.price | number:'1.2-2'}}</div>
+      </mat-list-item>
+      <mat-divider></mat-divider>
+      <div mat-subheader>{{ 'RESERVATION.DETAIL.APPOINTMENT' | translate}}</div>
+      <mat-list-item>
+        <mat-icon mat-list-icon>event</mat-icon>
+        <div mat-line>{{start | date:'short':undefined:language}}
+          - {{end | date:'short':undefined:language}}</div>
+      </mat-list-item>
+      <mat-list-item>
+        <mat-icon mat-list-icon>{{state}}</mat-icon>
+        <div mat-line>{{ 'RESERVATION.STATE.' + reservation.state | translate}}</div>
+      </mat-list-item>
+      <mat-divider></mat-divider>
+    </mat-list>
+    <mat-list *ngIf="reservation.history">
+      <div mat-subheader>{{ 'RESERVATION.DETAIL.HISTORY.TITLE' | translate}}</div>
+      <table [dataSource]="dataSource" mat-table>
+
+        <ng-container matColumnDef="position">
+          <th *matHeaderCellDef mat-header-cell> No.</th>
+          <td *matCellDef="let history; let i = index;" mat-cell> {{((paginator?.pageIndex || 0) * pageSize) + i + 1}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="professional">
+          <th *matHeaderCellDef fxHide.lt-sm fxShow
+              mat-header-cell> {{ 'RESERVATION.DETAIL.HISTORY.COLUMN.PROFESSIONAL' | translate }} </th>
+          <td *matCellDef="let history" fxHide.lt-sm fxShow
+              mat-cell> {{history.room.professional.firstName}} {{history.room.professional.lastName}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="start">
+          <th *matHeaderCellDef mat-header-cell> {{ 'RESERVATION.DETAIL.HISTORY.COLUMN.START' | translate }} </th>
+          <td *matCellDef="let history" mat-cell> {{history.start | date:'short':undefined:language}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="product">
+          <th *matHeaderCellDef mat-header-cell> {{ 'RESERVATION.DETAIL.HISTORY.COLUMN.PRODUCT' | translate }} </th>
+          <td *matCellDef="let history" mat-cell> {{history.product.name}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="state">
+          <th *matHeaderCellDef fxHide.lt-sm fxShow
+              mat-header-cell> {{ 'RESERVATION.DETAIL.HISTORY.COLUMN.STATE' | translate }} </th>
+          <td *matCellDef="let history" fxHide.lt-sm fxShow mat-cell> <mat-icon matPrefix>{{getIcon(history.state)}}</mat-icon>&nbsp;
+            {{ 'RESERVATION.STATE.' + history.state | translate}}</td>
+        </ng-container>
+
+        <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+        <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
+      </table>
+
+      <mat-paginator [pageSize]="pageSize" showFirstLastButtons></mat-paginator>
+      <mat-divider></mat-divider>
+    </mat-list>
+  </mat-card-content>
+  <ng-template #boxSkeleton>
+    <div class="ssc-hr"></div>
+    <div class="ssc-square mb" style="height: 200px"></div>
+    <div class="ssc-hr"></div>
+  </ng-template>
+  <mat-card-actions *ngIf="reservation; else buttonSkeleton">
+    <div fxFlex></div>
+    <button color="accent" mat-raised-button
+            routerLink="/reservations">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+  </mat-card-actions>
+  <ng-template #buttonSkeleton>
+    <div class="ssc-head-line"></div>
+  </ng-template>
+</mat-card>

@@ -1,0 +1,27 @@
+<mat-card class="dashboard-card">
+  <div *ngIf="value; else box">
+    <mat-card-header class="card-header">
+      <mat-card-title>
+        <h1 *ngIf="isCurrency; else noCurrency" class="value-text">{{value | currency:'$':'symbol':'0.0' }}</h1>
+        <ng-template #noCurrency>
+          <h1 *ngIf="!isCurrency" class="value-text">{{value}}</h1>
+        </ng-template>
+      </mat-card-title>
+      <div class="card-icon" mat-card-avatar>
+        <mat-icon [color]="color" class="avatar-icon">{{icon}}</mat-icon>
+      </div>
+    </mat-card-header>
+    <h3 class="title-text">{{title | translate}}</h3>
+    <p class="difference-text">
+        <span [ngClass]="{ 'green-text': isIncrease, 'red-text': !isIncrease }">
+          {{ isIncrease ? '+' : '-' }}{{ percentValue | percent:'2.1-2' }}
+          <mat-icon *ngIf="isIncrease" matSuffix>arrow_upward</mat-icon>
+          <mat-icon *ngIf="!isIncrease" matSuffix>arrow_downward</mat-icon>
+        </span>
+      <span class="duration">{{duration | translate}}</span>
+    </p>
+  </div>
+  <ng-template #box>
+    <div class="ssc-square mb" style="height: 200px"></div>
+  </ng-template>
+</mat-card>

@@ -1,9 +1,9 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
 import { IUser } from '../interfaces/user';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../store/app.states';
@@ -18,6 +18,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../dialog/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { ConvertDuration, Duration, GetMinAndMax, GetStartEndDay, IDuration } from '../util/dates';
+import { FillNotAvailable, NewEvent } from '../util/event';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-reservation',
@@ -27,8 +30,9 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
     provide: STEPPER_GLOBAL_OPTIONS, useValue: {displayDefaultIndicatorType: false}
   }]
 })
-export class ReservationComponent implements OnInit {
+export class ReservationComponent implements OnInit, OnDestroy {
   getState: Observable<any>;
+  subscription: Subscription | undefined;
   errors: any = [];
 
   isLoading = false;
@@ -74,9 +78,15 @@ export class ReservationComponent implements OnInit {
   eventSelected: CalendarEvent | undefined;
   smallScreen: boolean | undefined;
   isPreview = false;
+  duration: IDuration = new Duration();
+
+  extras: any;
+
+  @ViewChild('stepper') stepper!: MatStepper;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
-              private store: Store<AppState>, private formBuilder: FormBuilder, private breakpointObserver: BreakpointObserver) {
+              private store: Store<AppState>, private formBuilder: FormBuilder, private breakpointObserver: BreakpointObserver,
+              private router: Router) {
     this.getState = this.store.select(selectReservationState);
     const userLang = navigator.language;
     const index = userLang.indexOf('-');
@@ -92,22 +102,11 @@ export class ReservationComponent implements OnInit {
         this.hourSegments = 1;
       }
     });
-  }
-
-  private static getMinAndMax(availability: IAvailability, date: Date): any {
-    let min;
-    let max;
-    if (availability) {
-      if (availability.start) {
-        const start = availability.start.split(':');
-        min = new Date(date.setHours(Number(start[0]), Number(start[1])));
-      }
-      if (availability.end) {
-        const end = availability.end.split(':');
-        max = new Date(date.setHours(Number(end[0]), Number(end[1])));
-      }
+    this.extras = this.router.getCurrentNavigation()?.extras.state;
+    if (this.extras) {
+      this.room.setValue(this.extras.room);
+      this.date.setValue(this.extras.date);
     }
-    return {min, max};
   }
 
   ngOnInit(): void {
@@ -115,6 +114,10 @@ export class ReservationComponent implements OnInit {
     this.clean();
     this.subscribe();
     this.getCustomers();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 
   createForm(): void {
@@ -153,20 +156,35 @@ export class ReservationComponent implements OnInit {
   }
 
   subscribe(): void {
-    this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe(state => {
       this.isLoading = state.isLoading;
       this.customers = state.customers;
       this.products = state.products;
       this.rooms = state.rooms;
-      if (this.rooms) {
+      if (this.rooms?.length === 1) {
         this.room.setValue(this.rooms[0]);
       }
       if (state.data && !state.isLoading) {
         this.reservations = state.data;
         this.addReservations();
+        if (this.extras && !this.eventSelected) {
+          this.segmentClick(this.extras.date);
+        }
       }
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
+          switch (value.field) {
+            case 'room':
+              this.stepper.selectedIndex = 1;
+              break;
+            case 'professional':
+              this.stepper.selectedIndex = 3;
+              break;
+            default:
+              this.stepper.selectedIndex = 0;
+              break;
+          }
+          this.eventSelected = undefined;
           this.errors[value.field] = value.message;
           this.customerForm.controls[value.field]?.setErrors({incorrect: true});
           this.productForm.controls[value.field]?.setErrors({incorrect: true});
@@ -183,26 +201,17 @@ export class ReservationComponent implements OnInit {
     this.reservations?.forEach(it => {
       if (it.product.duration) {
         const start = new Date(it.start);
-        const duration: string = it.product.duration;
-        const durationTime = duration.split(':');
+        const duration = ConvertDuration(it.product.duration);
         const end = new Date(new Date(start).setHours(
-          start.getHours() + Number(durationTime[0]), start.getMinutes() + Number(durationTime[1]))
+          start.getHours() + duration.hour, start.getMinutes() + duration.minute)
         );
         const detail = this.translate.instant('RESERVATION.ADD.EVENT.DETAIL', {
           customerName: `${it.customer.firstName} ${it.customer.lastName}`,
           productName: it.product.name,
-          duration: it.product.duration
+          duration: `${duration.hour}:${duration.minute}`
         });
 
-        const event = {
-          id: it.id,
-          start, end,
-          color: {
-            primary: '#000',
-            secondary: '#ede7f6'
-          },
-          title: detail
-        } as unknown as CalendarEvent;
+        const event = NewEvent(detail, '#ede7f6', start, end, '#000', it.id);
         this.events = [...this.events, event];
       }
     });
@@ -275,6 +284,7 @@ export class ReservationComponent implements OnInit {
     if (this.productForm.invalid) {
       return;
     }
+    this.duration = ConvertDuration(this.product.value.duration);
     this.events = [];
 
     const date = new Date(this.date.value);
@@ -283,7 +293,11 @@ export class ReservationComponent implements OnInit {
     const {week, saturday, sunday} = this.getAvailability();
 
     this.setStartEndDay(week, saturday, sunday);
-    this.fillNotAvailable(date, sunday, saturday, week);
+    const unavailable = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.UNAVAILABLE');
+    const lunch = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.LUNCH');
+    const notWorking = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.OUT_OF_WORK');
+    this.events = this.events.concat(FillNotAvailable(unavailable, lunch, notWorking,
+      this.daysInWeek, 1, date, sunday, saturday, week));
     this.viewDate = date;
     this.store.dispatch(
       new fromActionsReservation.SearchReservation({date: this.date.value, roomId: this.room.value.id})
@@ -294,14 +308,23 @@ export class ReservationComponent implements OnInit {
   segmentClick(date: Date): void {
     this.errors.overlapping = false;
     const nowTime = date.toLocaleTimeString('en-GB').split(':');
-    const duration: string = this.product.value.duration;
-    const durationTime = duration.split(':');
+    const duration = ConvertDuration(this.product.value.duration);
 
     const start = new Date(date.setHours(Number(nowTime[0]), Number(nowTime[1])));
     const end = new Date(new Date(start).setHours(
-      start.getHours() + Number(durationTime[0]), start.getMinutes() + Number(durationTime[1]))
+      start.getHours() + duration.hour, start.getMinutes() + duration.minute)
     );
 
+    const detail = this.translate.instant('RESERVATION.ADD.EVENT.DETAIL', {
+      customerName: `${this.customer.value.firstName} ${this.customer.value.lastName}`,
+      productName: this.product.value.name,
+      duration: `${duration.hour}:${duration.minute}`
+    });
+
+    const event = NewEvent(detail, '#ede7f6', start, end, '#000');
+
+    let title;
+    let content;
     const eventsOverlapping = this.isAnOverlapEvent(start, end);
     if (eventsOverlapping.length && eventsOverlapping[0] !== this.eventSelected) {
       const overlapping = eventsOverlapping.find(e => e.id);
@@ -309,30 +332,27 @@ export class ReservationComponent implements OnInit {
         this.errors.overlapping = this.translate.instant('RESERVATION.ADD.EVENT.OVERLAPPING.ERROR', {data: overlapping.title});
         return;
       }
-      let content = '';
+      let message = '';
       eventsOverlapping.forEach(e => {
-        content += `<div>${e.title}</div>`;
+        message += `<div>${e.title}</div>`;
       });
-      const dialogRef = this.dialog.open(DialogComponent, {
-        data: {
-          title: this.translate.instant('RESERVATION.ADD.EVENT.OVERLAPPING.TITLE'),
-          content: this.translate.instant('RESERVATION.ADD.EVENT.OVERLAPPING.CONTENT', {data: content}),
-          value: {start, end}
-        }
-      });
-
-      dialogRef.afterClosed().subscribe(result => {
-        if (result) {
-          this.createSelectEvent(result.start, result.end);
-        }
-      });
+      title = this.translate.instant('RESERVATION.ADD.EVENT.OVERLAPPING.TITLE');
+      content = this.translate.instant('RESERVATION.ADD.EVENT.OVERLAPPING.CONTENT', {data: message});
     } else {
-      this.createSelectEvent(start, end);
+      if (!this.eventSelected) {
+        title = this.translate.instant('RESERVATION.ADD.EVENT.TITLE');
+        content = this.translate.instant('RESERVATION.ADD.EVENT.CONTENT', {date: start.toLocaleString('en-GB')});
+      } else {
+        title = this.translate.instant('RESERVATION.ADD.EVENT.TITLE');
+        content = this.translate.instant('RESERVATION.ADD.EVENT.CHANGE', {date: start.toLocaleString('en-GB')});
+      }
     }
+    this.createSelectEvent(title, content, event);
   }
 
   preview(stepper: MatStepper): void {
     this.errors.schedule = false;
+    this.errors.overlapping = false;
     if (!this.eventSelected) {
       this.errors.schedule = true;
       return;
@@ -360,32 +380,7 @@ export class ReservationComponent implements OnInit {
     stepper.previous();
   }
 
-  private createSelectEvent(start: Date, end: Date): void {
-    const detail = this.translate.instant('RESERVATION.ADD.EVENT.DETAIL', {
-      customerName: `${this.customer.value.firstName} ${this.customer.value.lastName}`,
-      productName: this.product.value.name,
-      duration: this.product.value.duration
-    });
-
-    const event = {
-      start, end,
-      color: {
-        primary: '#000',
-        secondary: '#ede7f6'
-      },
-      title: detail
-    } as unknown as CalendarEvent;
-
-    let title;
-    let content;
-    if (!this.eventSelected) {
-      title = this.translate.instant('RESERVATION.ADD.EVENT.TITLE');
-      content = this.translate.instant('RESERVATION.ADD.EVENT.CONTENT', {date: start.toLocaleString('en-GB')});
-    } else {
-      title = this.translate.instant('RESERVATION.ADD.EVENT.TITLE');
-      content = this.translate.instant('RESERVATION.ADD.EVENT.CHANGE', {date: start.toLocaleString('en-GB')});
-    }
-
+  private createSelectEvent(title: string, content: string, event: CalendarEvent): void {
     const dialogRef = this.dialog.open(DialogComponent, {
       data: {title, content, value: event}
     });
@@ -409,189 +404,13 @@ export class ReservationComponent implements OnInit {
     return {week, saturday, sunday};
   }
 
-  private fillNotAvailable(selectDate: Date, sunday: IAvailability, saturday: IAvailability, week: IAvailability): void {
-    const date = new Date(selectDate.getFullYear(), selectDate.getMonth(), selectDate.getDate());
-    const now = new Date();
-    for (let i = 0; i < this.daysInWeek; i++) {
-      const day = date.getDay();
-      if (date < new Date(now.getFullYear(), now.getMonth(), now.getDate())) {
-        const event = {
-          start: new Date(new Date(date).setHours(0, 0)),
-          end: new Date(new Date(date).setHours(23, 59)),
-          color: {
-            secondary: '#ffebee'
-          },
-          title: this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.UNAVAILABLE')
-        } as unknown as CalendarEvent;
-        this.events = [...this.events, event];
-      } else if (day === 0) {
-        this.createEvent(sunday, date);
-      } else if (day === 6) {
-        this.createEvent(saturday, date);
-      } else {
-        this.createEvent(week, date);
-      }
-      date.setDate(date.getDate() + 1);
-    }
-  }
-
   private setStartEndDay(week: IAvailability, saturday: IAvailability, sunday: IAvailability): void {
-    const date: Date = new Date();
-    const weekMinMax = ReservationComponent.getMinAndMax(week, date);
-    const saturdayMinMax = ReservationComponent.getMinAndMax(saturday, date);
-    const sundayMinMax = ReservationComponent.getMinAndMax(sunday, date);
-
-    let min: Date = weekMinMax.min;
-    let max: Date = weekMinMax.max;
-
-    if (!min || saturdayMinMax.min < min) {
-      min = saturdayMinMax.min;
-    }
-    if (sundayMinMax.min < min) {
-      min = sundayMinMax.min;
-    }
-
-    if (!max || saturdayMinMax.max > max) {
-      max = saturdayMinMax.max;
-    }
-    if (sundayMinMax.max > max) {
-      max = sundayMinMax.max;
-    }
+    const {min, max} = GetStartEndDay(week, saturday, sunday);
 
     this.dayStartHour = min.getHours();
     this.dayStartMinute = min.getMinutes();
     this.dayEndHour = max.getHours();
     this.dayEndMinute = max.getMinutes();
-  }
-
-  private createEvent(it: IAvailability, date: Date): void {
-    const notWorking = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.OUT_OF_WORK');
-    if (!it) {
-      const event = {
-        start: new Date(new Date(date).setHours(0, 0)),
-        end: new Date(new Date(date).setHours(23, 59)),
-        color: {
-          secondary: '#ffebee'
-        },
-        title: notWorking
-      } as unknown as CalendarEvent;
-      this.events = [...this.events, event];
-    } else {
-      const now = new Date();
-      const nowTime = now.toLocaleTimeString('en-GB').split(':');
-      const hour = Number(nowTime[0]) + 1;
-      const minute = Number(nowTime[1]);
-      if (it.start) {
-        const start = it.start.split(':');
-        const endHour = Number(start[0]);
-        const endMinute = Number(start[1]);
-        let startHour: number | null = 0;
-        let startMinute: number | null = 0;
-        if (date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate()) {
-          if (hour < endHour || (hour === endHour && minute < endMinute)) {
-            startHour = hour;
-            startMinute = minute;
-          } else {
-            startHour = null;
-            startMinute = null;
-          }
-        }
-        if ((startHour || startHour === 0) && (startMinute || startMinute === 0)) {
-          const eventBefore = {
-            start: new Date(date.setHours(startHour, startMinute)),
-            end: new Date(date.setHours(endHour, endMinute)),
-            color: {
-              secondary: '#ffebee'
-            },
-            title: notWorking
-          } as unknown as CalendarEvent;
-          this.events = [...this.events, eventBefore];
-        }
-      }
-      if (it.end) {
-        const end = it.end.split(':');
-        const endHour = Number(end[0]);
-        const endMinute = Number(end[1]);
-        let startHour = endHour;
-        let startMinute = endMinute;
-        if (date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate()
-          && (hour > endHour || (hour === endHour && minute > endMinute))) {
-          startHour = hour;
-          startMinute = minute;
-        }
-        const eventAfter = {
-          start: new Date(date.setHours(startHour, startMinute)),
-          end: new Date(date.setHours(23, 59)),
-          color: {
-            secondary: '#ffebee'
-          },
-          title: notWorking
-        } as unknown as CalendarEvent;
-        this.events = [...this.events, eventAfter];
-      }
-      this.createLunchEvent(it, date);
-    }
-  }
-
-  private createLunchEvent(it: IAvailability, date: Date): void {
-    const now = new Date();
-    const nowTime = now.toLocaleTimeString('en-GB').split(':');
-    let hour = Number(nowTime[0]);
-    let minute = Number(nowTime[1]);
-    const unavailable = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.UNAVAILABLE');
-    if (it.startLunch && it.endLunch) {
-      const lunchStart = it.startLunch.split(':');
-      const lunchEnd = it.endLunch.split(':');
-      const lunchEndHour = Number(lunchEnd[0]);
-      const lunchEndMinute = Number(lunchEnd[1]);
-      const lunchStartHour = Number(lunchStart[0]);
-      const lunchStartMinute = Number(lunchStart[1]);
-
-      if (date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate()) {
-        if (hour > 23) {
-          hour = 23;
-          minute = 59;
-        } else {
-          hour = hour + 1;
-          this.lunchEvent(hour, lunchStartHour, minute, lunchStartMinute, lunchEndHour, lunchEndMinute, date);
-        }
-        const event = {
-          start: new Date(new Date().setHours(0, 0)),
-          end: new Date(new Date().setHours(hour, minute)),
-          color: {
-            secondary: '#ffebee'
-          },
-          title: unavailable
-        } as unknown as CalendarEvent;
-        this.events = [...this.events, event];
-      } else {
-        const lunchEvent = {
-          start: new Date(date.setHours(lunchStartHour, lunchStartMinute)),
-          end: new Date(date.setHours(lunchEndHour, lunchEndMinute)),
-          color: {
-            secondary: '#ffebee'
-          },
-          title: this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.LUNCH')
-        } as unknown as CalendarEvent;
-        this.events = [...this.events, lunchEvent];
-      }
-    } else if (date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate()) {
-      if (hour > 23) {
-        hour = 23;
-        minute = 59;
-      } else {
-        hour = hour + 1;
-      }
-      const event = {
-        start: new Date(new Date().setHours(0, 0)),
-        end: new Date(new Date().setHours(hour, minute)),
-        color: {
-          secondary: '#ffebee'
-        },
-        title: unavailable
-      } as unknown as CalendarEvent;
-      this.events = [...this.events, event];
-    }
   }
 
   // private isAnOverlapEvent(eventStartDay: Date, eventEndDay: Date): CalendarEvent | undefined {
@@ -617,31 +436,6 @@ export class ReservationComponent implements OnInit {
       || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
       || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end)
     );
-  }
-
-  private lunchEvent(hour: number, lunchStartHour: number, minute: number, lunchStartMinute: number, lunchEndHour: number,
-                     lunchEndMinute: number, date: Date): void {
-    let lunchHour;
-    let lunchMinute;
-    if (hour < lunchStartHour || (hour === lunchStartHour && minute < lunchStartMinute)) {
-      lunchHour = lunchStartHour;
-      lunchMinute = lunchStartMinute;
-    } else if ((hour > lunchStartHour || (hour === lunchStartHour && minute > lunchStartMinute))
-      && (hour < lunchEndHour || (hour === lunchEndHour && minute < lunchEndMinute))) {
-      lunchHour = hour;
-      lunchMinute = minute;
-    }
-    if ((lunchHour || lunchHour === 0) && (lunchMinute || lunchMinute === 0)) {
-      const lunchEvent = {
-        start: new Date(date.setHours(lunchHour, lunchMinute)),
-        end: new Date(date.setHours(lunchEndHour, lunchEndMinute)),
-        color: {
-          secondary: '#ffebee'
-        },
-        title: this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.LUNCH')
-      } as unknown as CalendarEvent;
-      this.events = [...this.events, lunchEvent];
-    }
   }
 
   private filterCustomer(name: string): IUser[] | undefined {

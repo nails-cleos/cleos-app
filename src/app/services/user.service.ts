@@ -9,6 +9,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 export class UserService {
 
   private url = 'users';
+  private professionalUrl = 'professionals';
+  private customerUrl = 'customers';
 
   constructor(private http: HttpClient) {
   }
@@ -46,11 +48,11 @@ export class UserService {
   }
 
   addCustomer(user: IUser): Observable<IUser> {
-    return this.http.post('customers', user);
+    return this.http.post(this.customerUrl, user);
   }
 
   addProfessional(user: IUser): Observable<IUser> {
-    return this.http.post('professionals', user);
+    return this.http.post(this.professionalUrl, user);
   }
 
   delete(id: string | null): Observable<IUser> {
@@ -69,10 +71,10 @@ export class UserService {
   }
 
   getAllProfessionals(): Observable<IUser[]> {
-    return this.http.get<IUser[]>('professionals');
+    return this.http.get<IUser[]>(this.professionalUrl);
   }
 
   getAllCustomers(): Observable<IUser[]> {
-    return this.http.get<IUser[]>('customers');
+    return this.http.get<IUser[]>(this.customerUrl);
   }
 }

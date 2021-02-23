@@ -1,9 +1,9 @@
 <div class="mat-elevation-z8 small-table">
-  <table mat-table [dataSource]="dataSource" matSort matSortActive="name"
-         matSortDisableClear matSortDirection="desc">
+  <table [dataSource]="dataSource" mat-table matSort matSortActive="name"
+         matSortDirection="desc" matSortDisableClear>
     <ng-container matColumnDef="position">
-      <th mat-header-cell *matHeaderCellDef> No.</th>
-      <td mat-cell *matCellDef="let product; let i = index;">
+      <th *matHeaderCellDef mat-header-cell> No.</th>
+      <td *matCellDef="let product; let i = index;" mat-cell>
         <div *ngIf="product.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -12,8 +12,8 @@
     </ng-container>
 
     <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'PRODUCT.LIST.COLUMN.NAME' | translate }}</th>
-      <td mat-cell *matCellDef="let product">
+      <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'PRODUCT.LIST.COLUMN.NAME' | translate }}</th>
+      <td *matCellDef="let product" mat-cell>
         <div *ngIf="product.id; else skeleton">{{product.name}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -22,8 +22,9 @@
     </ng-container>
 
     <ng-container matColumnDef="description">
-      <th mat-header-cell fxShow fxHide.lt-sm *matHeaderCellDef mat-sort-header>{{ 'PRODUCT.LIST.COLUMN.DESCRIPTION' | translate }}</th>
-      <td mat-cell fxShow fxHide.lt-sm *matCellDef="let product">
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+          mat-sort-header>{{ 'PRODUCT.LIST.COLUMN.DESCRIPTION' | translate }}</th>
+      <td *matCellDef="let product" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="product.id; else skeleton">{{product.description}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -32,8 +33,8 @@
     </ng-container>
 
     <ng-container matColumnDef="price">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'PRODUCT.LIST.COLUMN.PRICE' | translate }}</th>
-      <td mat-cell *matCellDef="let product">
+      <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'PRODUCT.LIST.COLUMN.PRICE' | translate }}</th>
+      <td *matCellDef="let product" mat-cell>
         <div *ngIf="product.id; else skeleton">
           <mat-icon matPrefix>attach_money</mat-icon>&nbsp;{{product.price | number:'1.2-2'}}
         </div>
@@ -44,11 +45,12 @@
     </ng-container>
 
     <ng-container matColumnDef="duration">
-      <th mat-header-cell fxShow fxHide.lt-sm *matHeaderCellDef mat-sort-header>{{ 'PRODUCT.LIST.COLUMN.DURATION' | translate }}</th>
-      <td mat-cell fxShow fxHide.lt-sm class="column-large-text" *matCellDef="let product">
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+          mat-sort-header>{{ 'PRODUCT.LIST.COLUMN.DURATION' | translate }}</th>
+      <td *matCellDef="let product" class="column-large-text" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="product.id; else skeleton">
           <mat-icon matPrefix>timer</mat-icon>&nbsp;
-          {{product.duration.slice(0, 5)}}
+          {{product.hour | number:'2.0-0'}}:{{product.minute | number:'2.0-0'}}
         </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -57,13 +59,13 @@
     </ng-container>
 
     <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-      <td mat-cell *matCellDef="let product">
+      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+      <td *matCellDef="let product" mat-cell>
         <div *ngIf="product.id; else skeleton">
-          <button *ngIf="!product.deleted" mat-icon-button (click)="edit(product)">
+          <button (click)="edit(product)" *ngIf="!product.deleted" mat-icon-button>
             <mat-icon color="primary">edit</mat-icon>
           </button>
-          <button *ngIf="!product.deleted" mat-icon-button (click)="delete(product)">
+          <button (click)="delete(product)" *ngIf="!product.deleted" mat-icon-button>
             <mat-icon color="warn">delete</mat-icon>
           </button>
         </div>
@@ -73,12 +75,13 @@
       </td>
     </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+    <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
   </table>
   <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
 
-  <button routerLink="/product" mat-fab color="accent" id="add-button" matTooltip="{{ 'PRODUCT.ADD.TITLE' | translate }}">
+  <button color="accent" id="add-button" mat-fab matTooltip="{{ 'PRODUCT.ADD.TITLE' | translate }}"
+          routerLink="/product">
     <mat-icon>add</mat-icon>
   </button>
 </div>

@@ -42,7 +42,6 @@ export class LoginEffects {
   loginSuccess$ = this.actions$.pipe(
     ofType(AuthActionTypes.LOGIN_SUCCESS),
     tap((response: any) => {
-      console.log(response.payload.user.changePassword)
       this.router.navigate([response.payload.queryParams.returnUrl || 'dashboard/main']);
     })
   );

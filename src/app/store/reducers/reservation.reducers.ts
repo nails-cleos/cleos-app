@@ -1,12 +1,13 @@
-import { Pagination } from '../../interfaces/pagination';
 import { All, ReservationActionTypes } from '../reservation.actions';
 import { IReservation } from '../../interfaces/reservation';
 import { IUser } from '../../interfaces/user';
 import { IProduct } from '../../interfaces/product';
 import { IRoom } from '../../interfaces/room';
+import { Pagination } from '../../interfaces/pagination';
 
 export interface State {
-  data: IReservation | Pagination<IReservation> | null;
+  data: IReservation | Map<string, IReservation[]> | IReservation[] | null;
+  page: Pagination<IReservation> | null;
   customers: IUser[] | null;
   rooms: IRoom[] | null;
   products: IProduct[] | null;
@@ -19,6 +20,7 @@ export interface State {
 
 export const initialState: State = {
   data: null,
+  page: null,
   customers: null,
   rooms: null,
   products: null,
@@ -31,12 +33,35 @@ export const initialState: State = {
 
 export function reducer(state = initialState, action: All): State {
   switch (action.type) {
-    case ReservationActionTypes.SEARCH_RESERVATION:
     case ReservationActionTypes.GET_ALL: {
       return {
         ...state,
+        data: null,
+        errorMessage: null,
+        subErrors: null,
+        selected: null,
+        message: null,
+        isLoading: true
+      };
+    }
+    case ReservationActionTypes.GET_ALL_PAGE: {
+      return {
+        ...state,
         // @ts-ignore
-        data: {content: [{}, {}, {}], totalElements: 3},
+        page: {content: [{}, {}, {}], totalElements: 3},
+        errorMessage: null,
+        subErrors: null,
+        selected: null,
+        message: null,
+        isLoading: true
+      };
+    }
+    case ReservationActionTypes.SEARCH_RESERVATION:
+    case ReservationActionTypes.GET_ALL_GROUPING_BY_ROOM: {
+      return {
+        ...state,
+        // @ts-ignore
+        data: new Map('', {}),
         errorMessage: null,
         subErrors: null,
         selected: null,
@@ -80,13 +105,23 @@ export function reducer(state = initialState, action: All): State {
     case ReservationActionTypes.RESERVATION_FIND: {
       return {
         ...state,
-        // @ts-ignore
-        data: {},
+        data: {} as IReservation,
+        page: null,
         errorMessage: null,
         subErrors: null,
         selected: null,
         message: null,
         isLoading: true
+      };
+    }
+    case ReservationActionTypes.RESERVATION_PAGE_SUCCESS: {
+      return {
+        ...state,
+        page: action.payload,
+        errorMessage: null,
+        subErrors: null,
+        message: null,
+        isLoading: false
       };
     }
     case ReservationActionTypes.RESERVATION_SUCCESS: {

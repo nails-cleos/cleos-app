@@ -1,3 +1,6 @@
+import { IUser } from './user';
+import { IRoom } from './room';
+
 export interface IProduct {
   id?: string;
   name?: string;
@@ -6,6 +9,14 @@ export interface IProduct {
   description?: string;
   duration?: string;
   durationDate?: Date;
+}
+
+export interface IProductAll {
+  id: string;
+  name: string;
+  price: number;
+  duration: string;
+  description?: string;
 }
 
 export class Product implements IProduct {
