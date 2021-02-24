@@ -56,7 +56,6 @@ export class AnnualReservationsChartComponent implements OnChanges {
       if (completedList) {
         const group = completedList.reduce((map, item) => {
           const formattedDate = this.formatDate(new Date(item.start));
-
           const key = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
 
           const price = map.get(key) || 0;
@@ -71,7 +70,8 @@ export class AnnualReservationsChartComponent implements OnChanges {
 
         for (let i = 12; i >= 0; i--) {
           const date = new Date(new Date().setMonth(now.getMonth() - i, 1));
-          const key = this.formatDate(date);
+          const formattedDate = this.formatDate(date);
+          const key = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
           label = [...label, key];
 
           const count = group.get(key) || 0;
