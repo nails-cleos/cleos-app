@@ -4,11 +4,11 @@ import { Color, Label } from 'ng2-charts';
 import { IReservationAll } from '../../interfaces/reservation';
 
 @Component({
-  selector: 'app-annual-reservations-chart',
-  templateUrl: './annual-reservations-chart.component.html',
-  styleUrls: ['./annual-reservations-chart.component.scss']
+  selector: 'app-last-month-reservations-chart',
+  templateUrl: './last-month-reservations-chart.component.html',
+  styleUrls: ['./last-month-reservations-chart.component.scss']
 })
-export class AnnualReservationsChartComponent implements OnChanges {
+export class LastMonthReservationsChartComponent implements OnChanges {
   @Input() state: any;
   @Input() label: any;
 
@@ -26,7 +26,7 @@ export class AnnualReservationsChartComponent implements OnChanges {
   public lineChartColors: Color[] = [
     {
       borderColor: 'rgb(103, 58, 183)',
-      backgroundColor: 'rgba(103, 58, 183,0.3)'
+      backgroundColor: 'rgba(103, 58, 183, 0.3)'
     }
   ];
   public lineChartLegend = true;
@@ -55,28 +55,18 @@ export class AnnualReservationsChartComponent implements OnChanges {
       this.data = this.state.data;
       const completedList = this.data?.filter(r => r.state === 'COMPLETED' && new Date(r.start) > filterDate);
       if (completedList) {
-        const group = completedList.reduce((map, item) => {
-          const formattedDate = this.formatDate(new Date(item.start));
-          const key = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
-
-          const price = map.get(key) || 0;
-
-          map.set(key, price + item.product.price);
-
-          return map;
-        }, new Map<string, number>());
-
         let data: number[] = [];
         let label: string[] = [];
 
         for (let i = 12; i >= 0; i--) {
           const date = new Date(new Date().setMonth(now.getMonth() - i, 1));
           const formattedDate = this.formatDate(date);
+          const total: number = completedList.filter(r => this.formatDate(new Date(r.start)) === formattedDate).length;
+
           const key = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
           label = [...label, key];
 
-          const count = group.get(key) || 0;
-          data = [...data, count];
+          data = [...data, total];
         }
         this.lineChartData[0] = {data, label: this.label};
         this.lineChartLabels = label;

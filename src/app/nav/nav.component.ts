@@ -5,7 +5,7 @@ import { map, shareReplay } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState } from '../store/app.states';
-import { IUser } from '../interfaces/user';
+import { IMenu, IUser } from '../interfaces/user';
 import * as fromActionsLogin from '../store/auth.actions';
 
 @Component({
@@ -22,7 +22,7 @@ export class NavComponent implements OnInit {
     );
 
   title = 'Nails';
-  menuItems = ['dashboard', 'users', 'products', 'rooms', 'reservations'];
+  menuItems: IMenu[] = [];
   currentUser!: IUser | null;
   username: string | undefined;
   getState: Observable<any>;
@@ -41,9 +41,11 @@ export class NavComponent implements OnInit {
 
   subscribe(): void {
     this.getState.subscribe((state) => {
+      console.log(state)
       if (state.isAuthenticated) {
         const user = state.user;
         this.currentUser = user;
+        this.menuItems = state.menus;
         this.canChangePassword = user?.provider === 'LOCAL';
         if (user.firstName) {
           this.username = `${user.firstName} ${user?.lastName}`;

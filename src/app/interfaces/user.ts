@@ -27,6 +27,12 @@ export interface IAuthority {
   authority: string;
 }
 
+export interface IMenu {
+  name: string;
+  path: string;
+  icon: string;
+}
+
 export class User implements IUser {
   constructor() {
   }

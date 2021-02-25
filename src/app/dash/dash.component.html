@@ -10,8 +10,8 @@
   </mat-grid-tile>
   <!--Charts-->
   <mat-grid-tile [colspan]="( cardLayout | async )?.chart?.cols" [rowspan]="( cardLayout | async )?.chart?.rows">
-    <app-card title="{{ 'DASHBOARD.CHART.MONTHLY_RESERVATION' | translate }}">
-      <app-monthly-reservation-chart [state]="state"></app-monthly-reservation-chart>
+    <app-card title="{{ 'DASHBOARD.CHART.QUANTITY_PRODUCT' | translate }}">
+      <app-quantity-product-reservations-chart [state]="state" [label]="quantityLabel"></app-quantity-product-reservations-chart>
     </app-card>
   </mat-grid-tile>
   <mat-grid-tile [colspan]="( cardLayout | async )?.chart?.cols" [rowspan]="( cardLayout | async )?.chart?.rows">
@@ -20,19 +20,29 @@
     </app-card>
   </mat-grid-tile>
   <mat-grid-tile [colspan]="( cardLayout | async )?.chart?.cols" [rowspan]="( cardLayout | async )?.chart?.rows">
+    <app-card title="{{ 'DASHBOARD.CHART.MONTHLY_RESERVATION' | translate }}">
+      <app-monthly-reservation-chart [state]="state"></app-monthly-reservation-chart>
+    </app-card>
+  </mat-grid-tile>
+  <mat-grid-tile [colspan]="( cardLayout | async )?.chart?.cols" [rowspan]="( cardLayout | async )?.chart?.rows">
     <app-card title="{{ 'DASHBOARD.CHART.YEARLY_PRODUCT_PRICE' | translate }}">
-      <app-annual-reservations-chart [state]="state"></app-annual-reservations-chart>
+      <app-annual-reservations-chart [state]="state" [label]="annualLabel"></app-annual-reservations-chart>
     </app-card>
   </mat-grid-tile>
   <mat-grid-tile [colspan]="( cardLayout | async )?.chart?.cols" [rowspan]="( cardLayout | async )?.chart?.rows">
     <app-card title="{{ 'DASHBOARD.CHART.CUSTOMER_RESERVATION' | translate }}">
-      <app-customer-reservations-chart [state]="state"></app-customer-reservations-chart>
+      <app-customer-reservations-chart [state]="state" [label]="customerLabel"></app-customer-reservations-chart>
+    </app-card>
+  </mat-grid-tile>
+  <mat-grid-tile [colspan]="( cardLayout | async )?.chart?.cols" [rowspan]="( cardLayout | async )?.chart?.rows">
+    <app-card title="{{ 'DASHBOARD.CHART.LAST_MONTH_RESERVATION' | translate }}">
+      <app-last-month-reservations-chart [state]="state" [label]="lastMonthLabel"></app-last-month-reservations-chart>
     </app-card>
   </mat-grid-tile>
   <!--Table-->
   <mat-grid-tile [colspan]="( cardLayout | async )?.table?.cols" [rowspan]="( cardLayout | async )?.table?.rows">
     <app-card title="{{ 'DASHBOARD.TABLE.RESERVATION' | translate }}">
-      <app-reservation-table [state]="page"></app-reservation-table>
+      <app-reservation-table></app-reservation-table>
     </app-card>
   </mat-grid-tile>
 </mat-grid-list>

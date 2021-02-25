@@ -1,12 +1,11 @@
 <mat-sidenav-container>
-  <mat-sidenav #drawer class="sidenav" fixedInViewport
-               [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+  <mat-sidenav #drawer [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
                [mode]="(isHandset$ | async) ? 'over' : 'side'"
-               [opened]="(isHandset$ | async) === false">
+               [opened]="(isHandset$ | async) === false" class="sidenav" fixedInViewport>
     <mat-card *ngIf="currentUser">
       <mat-card-header>
-        <div mat-card-avatar class="circle" [ngStyle]="{'background-color':  '#673AB7' }">
-          <img *ngIf="!showInitials; else showInitialsBlock" src="{{currentUser?.imageUrl}}" alt="profile">
+        <div [ngStyle]="{'background-color':  '#673AB7' }" class="circle" mat-card-avatar>
+          <img *ngIf="!showInitials; else showInitialsBlock" alt="profile" src="{{currentUser?.imageUrl}}">
           <ng-template #showInitialsBlock>
             <div class="initials">{{ initials | uppercase }}</div>
           </ng-template>
@@ -17,28 +16,30 @@
     </mat-card>
     <mat-toolbar>Menu</mat-toolbar>
     <mat-nav-list>
-      <a *ngFor="let item of menuItems" mat-list-item [routerLink]="'/'+item"> {{item | titlecase}} </a>
+      <div *ngFor="let menu of menuItems">
+        <a [routerLink]="'/'+menu.path" mat-list-item>
+          <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>
+          <div mat-line>{{menu.name}}</div>
+        </a>
+        <mat-divider></mat-divider>
+      </div>
       <mat-divider></mat-divider>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
     <mat-toolbar color="primary">
-      <button
-        type="button"
-        aria-label="Toggle sidenav"
-        mat-icon-button
-        (click)="drawer.toggle()"
-        *ngIf="isHandset$ | async">
+      <button (click)="drawer.toggle()" *ngIf="isHandset$ | async"
+              aria-label="Toggle sidenav" mat-icon-button type="button">
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
       <span>{{title}}</span>
       <span class="align-right"></span>
-      <button mat-raised-button color="accent" [matMenuTriggerFor]="menuNotLogged" *ngIf="username; else login">
+      <button *ngIf="username; else login" [matMenuTriggerFor]="menuNotLogged" color="accent" mat-raised-button>
         <mat-icon>person_pin</mat-icon>
         {{username | titlecase}}
       </button>
       <ng-template #login>
-        <button mat-raised-button color="accent" routerLink="/auth">
+        <button color="accent" mat-raised-button routerLink="/auth">
           <mat-icon>login</mat-icon>
           {{'DASHBOARD.SIGN_IN' | translate }}
         </button>
@@ -48,12 +49,12 @@
           <mat-icon>settings</mat-icon>
           <span>{{'DASHBOARD.PROFILE' | translate }}</span>
         </button>
-        <button mat-menu-item routerLink="/change-password" *ngIf="canChangePassword">
+        <button *ngIf="canChangePassword" mat-menu-item routerLink="/change-password">
           <mat-icon>mode_edit</mat-icon>
           <span>{{'DASHBOARD.CHANGE_PASSWORD' | translate }}</span>
         </button>
         <mat-divider></mat-divider>
-        <button mat-menu-item (click)="logout()">
+        <button (click)="logout()" mat-menu-item>
           <mat-icon>exit_to_app</mat-icon>
           <span>{{'DASHBOARD.SIGN_OUT' | translate }}</span>
         </button>

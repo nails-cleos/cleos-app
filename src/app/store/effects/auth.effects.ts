@@ -42,7 +42,7 @@ export class LoginEffects {
   loginSuccess$ = this.actions$.pipe(
     ofType(AuthActionTypes.LOGIN_SUCCESS),
     tap((response: any) => {
-      this.router.navigate([response.payload.queryParams.returnUrl || 'dashboard/main']);
+      this.router.navigate([response.payload.queryParams.returnUrl || 'dashboard']);
     })
   );
 

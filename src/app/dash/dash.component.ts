@@ -7,6 +7,7 @@ import { AppState, selectReservationState } from '../store/app.states';
 import * as fromActionsReservation from '../store/reservation.actions';
 import { IReservationAll, IReservationSummary } from '../interfaces/reservation';
 import { IUserAll } from '../interfaces/user';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-dash',
@@ -17,6 +18,10 @@ export class DashComponent implements OnInit, OnDestroy {
   getState: Observable<any>;
   subscription: Subscription | undefined;
   state: any;
+  annualLabel: any;
+  customerLabel: any;
+  quantityLabel: any;
+  lastMonthLabel: any;
 
   // @ts-ignore
   miniCardData: IReservationSummary[] = [{}, {}, {}, {}];
@@ -41,8 +46,13 @@ export class DashComponent implements OnInit, OnDestroy {
     })
   );
 
-  constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>) {
+  constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
+              private readonly translate: TranslateService) {
     this.getState = this.store.select(selectReservationState);
+    this.annualLabel = this.translate.instant('DASHBOARD.CHART.LABEL.ANNUAL');
+    this.customerLabel = this.translate.instant('DASHBOARD.CHART.LABEL.CUSTOMER');
+    this.quantityLabel = this.translate.instant('DASHBOARD.CHART.LABEL.QUANTITY');
+    this.lastMonthLabel = this.translate.instant('DASHBOARD.CHART.LABEL.LAST_MONTH');
   }
 
   private static getSumReservationPrice(total: number, reservation: IReservationAll): number {

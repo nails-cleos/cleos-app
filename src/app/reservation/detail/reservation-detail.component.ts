@@ -40,7 +40,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy, AfterViewI
 
   displayedColumns: string[] = ['position', 'professional', 'start', 'product', 'state'];
   dataSource: any;
-  pageSize = 2;
+  pageSize = 5;
 
   public paginator: MatPaginator | undefined;
 

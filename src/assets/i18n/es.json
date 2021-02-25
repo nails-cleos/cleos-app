@@ -43,10 +43,18 @@
       "NEW_CUSTOMERS_RESERVATION": "Reservas de nuevos clientes"
     },
     "CHART": {
-      "MONTHLY_RESERVATION": "Reservas mensuales",
+      "LABEL": {
+        "ANNUAL": "Reservas",
+        "CUSTOMER": "Clientes",
+        "QUANTITY": "Cantidad",
+        "LAST_MONTH": "Último mes"
+      },
+      "QUANTITY_PRODUCT": "Cantidad por servicio",
       "PRODUCT_RESERVATION": "Servicios",
+      "MONTHLY_RESERVATION": "Reservas mensuales",
       "YEARLY_PRODUCT_PRICE": "Ganancias anuales",
-      "CUSTOMER_RESERVATION": "Reservas por cliente"
+      "CUSTOMER_RESERVATION": "Reservas por cliente",
+      "LAST_MONTH_RESERVATION": "Reservas en el último mes"
     },
     "TABLE": {
       "RESERVATION": "Reservations"

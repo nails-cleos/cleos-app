@@ -4,16 +4,15 @@ import { Color, Label } from 'ng2-charts';
 import { IReservationAll } from '../../interfaces/reservation';
 
 @Component({
-  selector: 'app-customer-reservations-chart',
-  templateUrl: './customer-reservations-chart.component.html',
-  styleUrls: ['./customer-reservations-chart.component.scss']
+  selector: 'app-quantity-product-reservations-chart',
+  templateUrl: './quantity-product-reservations-chart.component.html',
+  styleUrls: ['./quantity-product-reservations-chart.component.scss']
 })
-export class CustomerReservationsChartComponent implements OnChanges {
-  @Input() state: any;
-  @Input() label: any;
-
+export class QuantityProductReservationsChartComponent implements OnChanges {
   isLoading = true;
   data: IReservationAll[] | undefined;
+  @Input() state: any;
+  @Input() label: any;
 
   public barChartOptions: ChartOptions = {
     responsive: true,
@@ -25,6 +24,7 @@ export class CustomerReservationsChartComponent implements OnChanges {
       }]
     }
   };
+
   public barChartLabels: Label[] = [];
   public barChartType: ChartType = 'bar';
   public barChartLegend = true;
@@ -53,14 +53,12 @@ export class CustomerReservationsChartComponent implements OnChanges {
         // TODO: show error
         return;
       }
-      const now = new Date();
-      const filterDate = new Date(new Date().setMonth(now.getMonth() - 12, 0));
       this.data = this.state.data;
-      const completedList = this.data?.filter(r => r.state === 'COMPLETED' && new Date(r.start) > filterDate);
+      const completedList = this.data?.filter(r => r.state === 'COMPLETED');
       if (completedList) {
         const group = completedList.reduce((map, item) => {
-          let total = map.get(item.customer.username) || 0;
-          map.set(item.customer.username, ++total);
+          let total = map.get(item.product.name) || 0;
+          map.set(item.product.name, ++total);
 
           return map;
         }, new Map<string, number>());
@@ -70,4 +68,5 @@ export class CustomerReservationsChartComponent implements OnChanges {
       }
     }
   }
+
 }
