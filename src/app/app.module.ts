@@ -80,6 +80,8 @@ import { AnnualReservationsChartComponent } from './charts/annual-reservations-c
 import { MiniCardComponent } from './mini-card/mini-card.component';
 import { CustomerReservationsChartComponent } from './charts/customer-reservations-chart/customer-reservations-chart.component';
 import { ReservationTableComponent } from './reservation/table/reservation-table.component';
+import { QuantityProductReservationsChartComponent } from './charts/quantity-product-reservations-chart/quantity-product-reservations-chart.component';
+import { LastMonthReservationsChartComponent } from './charts/last-month-reservations-chart/last-month-reservations-chart.component';
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -144,7 +146,9 @@ registerLocaleData(localeEs, 'es');
     AnnualReservationsChartComponent,
     MiniCardComponent,
     CustomerReservationsChartComponent,
-    ReservationTableComponent
+    ReservationTableComponent,
+    QuantityProductReservationsChartComponent,
+    LastMonthReservationsChartComponent
   ],
   imports: [
     BrowserModule,

@@ -4,7 +4,7 @@ import { AppState, selectReservationState } from '../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Calendar, Day, ICalendar, IReservation, IReservationAll } from '../../interfaces/reservation';
+import { Calendar, Day, ICalendar, IReservationAll } from '../../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ConvertDuration, GetStartEndDay } from '../../util/dates';

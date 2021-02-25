@@ -1,10 +1,11 @@
-import { IUser } from '../../interfaces/user';
+import { IMenu, IUser } from '../../interfaces/user';
 import { All, AuthActionTypes } from '../auth.actions';
 
 export interface State {
   isAuthenticated: boolean;
   user: IUser | null;
   token: null;
+  menus: IMenu[] | null;
   errorMessage: string | null;
   message: string | null;
   subErrors: any;
@@ -15,6 +16,7 @@ export const initialState: State = {
   isAuthenticated: false,
   user: null,
   token: null,
+  menus: null,
   errorMessage: null,
   message: null,
   subErrors: null,
@@ -38,6 +40,7 @@ export function reducer(state = initialState, action: All): State {
         isAuthenticated: true,
         user: action.payload.response.user,
         token: action.payload.response.tokenAccess,
+        menus: action.payload.response.menus,
         errorMessage: null,
         message: null,
         subErrors: null,

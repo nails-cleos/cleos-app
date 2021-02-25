@@ -1,0 +1,14 @@
+<div *ngIf="!isLoading; else box" class="chartContainer">
+  <canvas [chartType]="barChartType"
+          [colors]="barChartColors"
+          [datasets]="barChartData"
+          [labels]="barChartLabels"
+          [legend]="barChartLegend"
+          [options]="barChartOptions"
+          [plugins]="barChartPlugins"
+          baseChart>
+  </canvas>
+</div>
+<ng-template #box>
+  <div class="ssc-square mb" style="height: 200px"></div>
+</ng-template>
