@@ -1,24 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ContentChild, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { IUser, User } from '../interfaces/user';
 import { AppState, selectAuthState } from '../store/app.states';
 import { Store } from '@ngrx/store';
 import * as fromActionsLogin from '../store/auth.actions';
-import { AbstractControlOptions, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Observable, Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MustMatch } from '../util/validators';
 
 @Component({
   selector: 'app-sign-up',
   templateUrl: './sign-up.component.html',
   styleUrls: ['./sign-up.component.scss']
 })
-export class SignUpComponent implements OnInit {
+export class SignUpComponent implements OnInit, OnDestroy {
 
-  hideConfirm = true;
-  hide = true;
+  @ViewChild('passwordComponent') passwordComponent: any;
+  showError = false;
   form!: FormGroup;
-  user: IUser = new User();
+  subscription: Subscription | undefined;
   getState: Observable<any>;
   errors: any = [];
 
@@ -34,12 +33,6 @@ export class SignUpComponent implements OnInit {
   lastName: FormControl = new FormControl('', [
     Validators.required
   ]);
-  password: FormControl = new FormControl('', [
-    Validators.required
-  ]);
-  confirmPassword: FormControl = new FormControl('', [
-    Validators.required
-  ]);
 
   constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private snackBar: MatSnackBar) {
     this.getState = this.store.select(selectAuthState);
@@ -50,39 +43,46 @@ export class SignUpComponent implements OnInit {
     this.subscribe();
   }
 
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+  }
+
   createForm(): void {
     this.form = this.formBuilder.group({
       username: this.username,
       email: this.email,
       firstName: this.firstName,
-      lastName: this.lastName,
-      password: this.password,
-      confirmPassword: this.confirmPassword
-    }, {
-      validator: MustMatch('password', 'confirmPassword')
-    } as AbstractControlOptions);
+      lastName: this.lastName
+    });
   }
 
   subscribe(): void {
-    this.getState.subscribe((state) => {
+    this.subscription = this.getState.subscribe((state) => {
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({incorrect: true});
+          this.form.controls[value.field]?.setErrors({incorrect: true});
         });
       }
     });
   }
 
   register(): void {
-    if (this.form.invalid) {
+    if (this.form.invalid || this.passwordComponent.passwordFormControl.invalid
+    || this.passwordComponent.passwordConfirmationFormControl.invalid) {
       return;
     }
-    this.user.username = this.username.value;
-    this.user.email = this.email.value;
-    this.user.firstName = this.firstName.value;
-    this.user.lastName = this.lastName.value;
-    this.user.password = this.password.value;
-    this.store.dispatch(new fromActionsLogin.SignUp(this.user));
+    const user: IUser = new User();
+    user.username = this.username.value;
+    user.email = this.email.value;
+    user.firstName = this.firstName.value;
+    user.lastName = this.lastName.value;
+    user.password = this.passwordComponent.passwordFormControl.value;
+    this.store.dispatch(new fromActionsLogin.SignUp(user));
+  }
+
+  onStrengthChanged(): void {
+    this.showError = true;
+    this.passwordComponent.passwordConfirmationFormControl.updateValueAndValidity();
   }
 }

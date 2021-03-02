@@ -12,7 +12,7 @@
         <form (ngSubmit)="update()" [formGroup]="form" novalidate>
           <mat-card-content *ngIf="product; else boxSkeleton">
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-              <mat-form-field>
+              <mat-form-field appearance="fill">
                 <mat-label>{{ 'PRODUCT.DETAIL.NAME.FIELD' | translate }}</mat-label>
                 <label>
                   <input matInput required formControlName="name" autocomplete="name">
@@ -23,14 +23,14 @@
                   {{errors['name']}}
                 </mat-error>
               </mat-form-field>
-              <mat-form-field>
+              <mat-form-field appearance="fill">
                 <mat-label>{{ 'PRODUCT.DETAIL.DESCRIPTION.FIELD' | translate }}</mat-label>
                 <label>
                   <textarea matInput formControlName="description" #message maxlength="256"></textarea>
                 </label>
                 <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
               </mat-form-field>
-              <mat-form-field>
+              <mat-form-field appearance="fill">
                 <mat-label>{{ 'PRODUCT.DETAIL.PRICE.FIELD' | translate }}</mat-label>
                 <span matPrefix>
                   <mat-icon matPrefix>attach_money</mat-icon> &nbsp;
@@ -47,7 +47,7 @@
                   {{errors['price']}}
                 </mat-error>
               </mat-form-field>
-              <mat-form-field>
+              <mat-form-field appearance="fill">
                 <mat-label>{{ 'PRODUCT.DETAIL.DURATION.FIELD' | translate }}</mat-label>
                 <label>
                   <input matTimepicker #t="matTimepicker" mode="24h" formControlName="durationDate" #t="matTimepicker"

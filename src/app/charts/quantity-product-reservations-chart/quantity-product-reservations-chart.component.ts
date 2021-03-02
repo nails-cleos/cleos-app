@@ -35,9 +35,7 @@ export class QuantityProductReservationsChartComponent implements OnChanges {
     }
   ];
 
-  public barChartData: ChartDataSets[] = [
-    {data: []}
-  ];
+  public barChartData: ChartDataSets[] = [];
 
   constructor() {
   }

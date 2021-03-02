@@ -261,7 +261,7 @@ export class ReservationComponent implements OnInit, OnDestroy {
       }
     }
     return result;
-  };
+  }
 
   displayFnUser(user: IUser): string {
     return user ? `${user.firstName} ${user.lastName}` : '';

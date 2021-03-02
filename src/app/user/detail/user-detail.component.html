@@ -12,17 +12,17 @@
         <form (ngSubmit)="update()" [formGroup]="form" novalidate>
           <mat-card-content *ngIf="user; else boxSkeleton">
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-              <mat-form-field>
+              <mat-form-field appearance="fill">
                 <mat-label>Id</mat-label>
                 <input matInput disabled value="{{user.id}}">
               </mat-form-field>
-              <mat-form-field>
+              <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.DETAIL.USERNAME.FIELD' | translate }}</mat-label>
                 <input matInput required formControlName="username" autocomplete="username">
                 <mat-error [innerHTML]="'USER.DETAIL.USERNAME.REQUIRED' | translate">
                 </mat-error>
               </mat-form-field>
-              <mat-form-field>
+              <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.DETAIL.EMAIL.FIELD' | translate }}</mat-label>
                 <input matInput required formControlName="email" autocomplete="username">
                 <mat-error *ngIf="email.hasError('email')">
@@ -31,13 +31,13 @@
                 <mat-error *ngIf="email.hasError('required')" [innerHTML]="'USER.DETAIL.EMAIL.REQUIRED' | translate">
                 </mat-error>
               </mat-form-field>
-              <mat-form-field>
+              <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.DETAIL.FIRST_NAME.FIELD' | translate }}</mat-label>
                 <input matInput required formControlName="firstName" autocomplete="username">
                 <mat-error [innerHTML]="'USER.DETAIL.FIRST_NAME.REQUIRED' | translate">
                 </mat-error>
               </mat-form-field>
-              <mat-form-field>
+              <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.DETAIL.LAST_NAME.FIELD' | translate }}</mat-label>
                 <input matInput required formControlName="lastName" autocomplete="username">
                 <mat-error [innerHTML]="'USER.DETAIL.LAST_NAME.REQUIRED' | translate">

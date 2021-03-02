@@ -21,7 +21,6 @@ export class NavComponent implements OnInit {
       shareReplay()
     );
 
-  title = 'Nails';
   menuItems: IMenu[] = [];
   currentUser!: IUser | null;
   username: string | undefined;
@@ -41,7 +40,6 @@ export class NavComponent implements OnInit {
 
   subscribe(): void {
     this.getState.subscribe((state) => {
-      console.log(state)
       if (state.isAuthenticated) {
         const user = state.user;
         this.currentUser = user;

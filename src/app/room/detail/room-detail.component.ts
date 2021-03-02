@@ -16,7 +16,6 @@ import { IconName, IIcon } from '../room.component';
   styleUrls: ['./room-detail.component.scss']
 })
 export class RoomDetailComponent implements OnInit, AfterViewInit {
-
   @Input() room: IRoom | undefined;
   form!: FormGroup;
   getState: Observable<any>;
@@ -65,12 +64,6 @@ export class RoomDetailComponent implements OnInit, AfterViewInit {
     this.form = this.formBuilder.group({
       name: this.name
     });
-  }
-
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsRoom.Clean()
-    );
   }
 
   subscribe(): void {
@@ -141,6 +134,12 @@ export class RoomDetailComponent implements OnInit, AfterViewInit {
       this.availabilities.splice(index, 1);
     }
     this.step = step;
+  }
+
+  private clean(): void {
+    this.store.dispatch(
+      new fromActionsRoom.Clean()
+    );
   }
 
   private getAvailabilities(availabilities: IAvailability[]): void {

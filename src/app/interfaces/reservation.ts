@@ -26,6 +26,11 @@ export interface IReservationAll {
   history?: IReservationAll[];
 }
 
+export interface IRoomReservation {
+  room: IRoomAll;
+  reservations: IReservationAll[];
+}
+
 export interface IDay {
   dayStartHour: number;
   dayStartMinute: number;

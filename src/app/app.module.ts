@@ -5,7 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppMaterialModule } from './util/app-material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientJsonpModule, HttpClientModule } from '@angular/common/http';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { SocialLoginModule } from 'angularx-social-login';
 import { ActionReducer, MetaReducer, StoreModule } from '@ngrx/store';
@@ -15,6 +15,8 @@ import { ChartsModule } from 'ng2-charts';
 import { CalendarModule, DateAdapter } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { registerLocaleData } from '@angular/common';
+import { MatPasswordStrengthModule } from '@angular-material-extensions/password-strength';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 // Providers
 import { httpInterceptorProviders } from './http-interceptors';
@@ -170,10 +172,16 @@ registerLocaleData(localeEs, 'es');
     SocialLoginModule,
     BrowserAnimationsModule,
     HttpClientModule,
+    HttpClientJsonpModule,
     FormsModule,
     AppMaterialModule,
+    MatPasswordStrengthModule.forRoot(),
     FlexLayoutModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: environment.production,
+      registrationStrategy: 'registerImmediately',
+    })
   ],
   providers: [
     {

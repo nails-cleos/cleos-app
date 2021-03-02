@@ -1,17 +1,21 @@
 <form (ngSubmit)="register()" [formGroup]="form" novalidate>
   <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-    <mat-form-field>
+    <mat-form-field appearance="fill">
       <mat-label>{{ 'AUTH.SIGN_UP.USERNAME.FIELD' | translate }}</mat-label>
-      <input matInput required formControlName="username" autocomplete="username">
+      <label>
+        <input [tabIndex]="1" autocomplete="username" formControlName="username" matInput required>
+      </label>
       <mat-error *ngIf="username.hasError('required')" [innerHTML]="'AUTH.SIGN_UP.USERNAME.REQUIRED' | translate">
       </mat-error>
       <mat-error *ngIf="errors['username']">
-      {{errors['username']}}
-    </mat-error>
+        {{errors['username']}}
+      </mat-error>
     </mat-form-field>
-    <mat-form-field>
+    <mat-form-field appearance="fill">
       <mat-label>{{ 'AUTH.SIGN_UP.EMAIL.FIELD' | translate }}</mat-label>
-      <input matInput required formControlName="email" autocomplete="username">
+      <label>
+        <input [tabIndex]="2" autocomplete="username" formControlName="email" matInput required>
+      </label>
       <mat-error *ngIf="email.hasError('email')">
         {{ 'AUTH.SIGN_UP.EMAIL.VALID' | translate }}
       </mat-error>
@@ -21,48 +25,70 @@
         {{errors['email']}}
       </mat-error>
     </mat-form-field>
-    <mat-form-field>
+    <mat-form-field [color]="passwordComponent.color" appearance="fill">
       <mat-label>{{ 'AUTH.SIGN_UP.PASSWORD.FIELD' | translate }}</mat-label>
-      <input matInput required [type]="hide ? 'password' : 'text'" autocomplete="current-password"
-             formControlName="password">
-      <button type="button" mat-icon-button matSuffix (click)="hide = !hide">
-        <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
-      </button>
-      <mat-error *ngIf="password.hasError('required')" [innerHTML]="'AUTH.SIGN_UP.PASSWORD.REQUIRED' | translate">
-      </mat-error>
-      <mat-error *ngIf="errors['password']">
-        {{errors['password']}}
-      </mat-error>
+      <mat-pass-toggle-visibility #togglePass matSuffix></mat-pass-toggle-visibility>
+      <label>
+        <input #passwordInput (focusout)="onStrengthChanged()" [formControl]="passwordComponent.passwordFormControl"
+               [tabIndex]="3" [type]="togglePass.type"
+               autocomplete="new-password" matInput required>
+      </label>
+      <mat-hint align="end" aria-live="polite">
+        {{passwordInput.value.length}} / {{passwordComponent.max}}
+      </mat-hint>
     </mat-form-field>
-    <mat-form-field>
+    <mat-error *ngIf="showError && passwordComponent.passwordFormControl.hasError('required')"
+               [innerHTML]="'AUTH.SIGN_UP.PASSWORD.REQUIRED' | translate">
+    </mat-error>
+    <mat-error *ngIf="showError && passwordComponent.passwordFormControl.hasError('pattern')">
+      {{ 'AUTH.SIGN_UP.PASSWORD.INVALID' | translate }}
+    </mat-error>
+    <mat-error *ngIf="showError && passwordComponent.passwordFormControl.hasError('maxlength')">
+      {{ 'AUTH.SIGN_UP.PASSWORD.MAX' | translate }}
+    </mat-error>
+    <mat-password-strength #passwordComponent [min]="6" [password]="passwordInput.value">
+    </mat-password-strength>
+    <mat-slide-toggle #toggle class="divider">{{ 'AUTH.SIGN_UP.PASSWORD.DETAIL' | translate }}</mat-slide-toggle>
+    <mat-password-strength-info *ngIf="toggle.checked" [digitsCriteriaMsg]="'AUTH.SIGN_UP.PASSWORD.DIGIT' | translate"
+                                [lowerCaseCriteriaMsg]="'AUTH.SIGN_UP.PASSWORD.LOWER_CASE' | translate"
+                                [minCharsCriteriaMsg]="'AUTH.SIGN_UP.PASSWORD.MIN' | translate"
+                                [passwordComponent]="passwordComponent"
+                                [specialCharsCriteriaMsg]="'AUTH.SIGN_UP.PASSWORD.SPECIAL' | translate"
+                                [upperCaseCriteriaMsg]="'AUTH.SIGN_UP.PASSWORD.UPPER_CASE' | translate">
+    </mat-password-strength-info>
+    <mat-form-field appearance="fill">
       <mat-label>{{ 'AUTH.SIGN_UP.CONFIRM_PASSWORD.FIELD' | translate }}</mat-label>
-      <input matInput required [type]="hideConfirm ? 'password' : 'text'" autocomplete="current-password"
-             formControlName="confirmPassword">
-      <button type="button" mat-icon-button matSuffix (click)="hideConfirm = !hideConfirm">
-        <mat-icon>{{hideConfirm ? 'visibility_off' : 'visibility'}}</mat-icon>
-      </button>
-      <mat-error *ngIf="confirmPassword.hasError('required')"
+      <mat-pass-toggle-visibility #toggleConfirm matSuffix></mat-pass-toggle-visibility>
+      <label>
+        <input [formControl]="passwordComponent.passwordConfirmationFormControl" [tabIndex]="4"
+               [type]="toggleConfirm.type" autocomplete="current-password" matInput required>
+      </label>
+      <mat-error *ngIf="passwordComponent.passwordConfirmationFormControl.hasError('required')"
                  [innerHTML]="'AUTH.SIGN_UP.CONFIRM_PASSWORD.REQUIRED' | translate">
       </mat-error>
-      <mat-error *ngIf="confirmPassword.hasError('mustMatch')">
+      <mat-error *ngIf="passwordComponent.passwordConfirmationFormControl.hasError('notConfirmed')">
         {{ 'AUTH.SIGN_UP.CONFIRM_PASSWORD.MUST_MATCH' | translate }}
       </mat-error>
       <mat-error *ngIf="errors['confirmPassword']">
         {{errors['confirmPassword']}}
       </mat-error>
     </mat-form-field>
-    <mat-form-field>
+    <mat-form-field appearance="fill">
       <mat-label>{{ 'AUTH.SIGN_UP.FIRST_NAME.FIELD' | translate }}</mat-label>
-      <input matInput required formControlName="firstName" autocomplete="username">
+      <label>
+        <input [tabIndex]="5" autocomplete="username" formControlName="firstName" matInput required>
+      </label>
       <mat-error *ngIf="firstName.hasError('required')" [innerHTML]="'AUTH.SIGN_UP.FIRST_NAME.REQUIRED' | translate">
       </mat-error>
       <mat-error *ngIf="errors['firstName']">
         {{errors['firstName']}}
       </mat-error>
     </mat-form-field>
-    <mat-form-field>
+    <mat-form-field appearance="fill">
       <mat-label>{{ 'AUTH.SIGN_UP.LAST_NAME.FIELD' | translate }}</mat-label>
-      <input matInput required formControlName="lastName" autocomplete="username">
+      <label>
+        <input [tabIndex]="6" autocomplete="username" formControlName="lastName" matInput required>
+      </label>
       <mat-error *ngIf="lastName.hasError('required')" [innerHTML]="'AUTH.SIGN_UP.LAST_NAME.REQUIRED' | translate">
       </mat-error>
       <mat-error *ngIf="errors['lastName']">
@@ -72,7 +98,9 @@
   </div>
   <div fxLayout="row">
     <div fxFlex></div>
-    <button fxFlex mat-raised-button color="accent" [disabled]="form.invalid"
+    <button [disabled]="form.invalid || passwordComponent.passwordConfirmationFormControl.invalid ||
+     passwordComponent.passwordFormControl.invalid"
+            [tabIndex]="7" color="accent" fxFlex mat-raised-button
             type="submit">{{ 'AUTH.SIGN_UP.TITLE' | translate }}</button>
   </div>
 </form>

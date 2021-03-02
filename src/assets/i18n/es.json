@@ -1,4 +1,7 @@
 {
+  "APP": {
+    "TITLE": "Nails"
+  },
   "COMMON": {
     "BUTTON": {
       "BACK": "Volver",
@@ -88,7 +91,15 @@
       },
       "PASSWORD": {
         "FIELD": "Contraseña",
-        "REQUIRED": "Contraseña es <b>requerido</b>"
+        "DETAIL": "Mostrar detalles de la contraseña",
+        "REQUIRED": "Contraseña es <b>requerido</b>",
+        "INVALID": "La contraseña no es valida",
+        "DIGIT": "Contener 1 o más dígitos",
+        "LOWER_CASE": "Contener 1 o más caracteres en minúscula",
+        "UPPER_CASE": "Contener 1 o más caracteres en mayúscula",
+        "MIN": "Tener 6 o más caracteres de longitud",
+        "MAX": "No tener más de 30 caracteres de longitud",
+        "SPECIAL": "Contener 1 o más caracteres especiales"
       },
       "CONFIRM_PASSWORD": {
         "FIELD": "Confirmar contraseña",
@@ -126,7 +137,15 @@
       "MESSAGE": "Contraseña actualizada",
       "PASSWORD": {
         "FIELD": "Contraseña",
-        "REQUIRED": "Contraseña es <b>requerido</b>"
+        "DETAIL": "Mostrar detalles de la contraseña",
+        "REQUIRED": "La contraseña es <b>requerido</b>",
+        "INVALID": "La contraseña no es valida",
+        "DIGIT": "Contener 1 o más dígitos",
+        "LOWER_CASE": "Contener 1 o más caracteres en minúscula",
+        "UPPER_CASE": "Contener 1 o más caracteres en mayúscula",
+        "MIN": "Tener 6 o más caracteres de longitud",
+        "MAX": "No tener más de 30 caracteres de longitud",
+        "SPECIAL": "Contener 1 o más caracteres especiales"
       },
       "CONFIRM_PASSWORD": {
         "FIELD": "Confirmar contraseña",
@@ -227,7 +246,15 @@
       },
       "PASSWORD": {
         "FIELD": "Contraseña",
-        "REQUIRED": "Contraseña es <b>requerido</b>"
+        "DETAIL": "Mostrar detalles de la contraseña",
+        "REQUIRED": "La contraseña es <b>requerido</b>",
+        "INVALID": "La contraseña no es valida",
+        "DIGIT": "Contener 1 o más dígitos",
+        "LOWER_CASE": "Contener 1 o más caracteres en minúscula",
+        "UPPER_CASE": "Contener 1 o más caracteres en mayúscula",
+        "MIN": "Tener 6 o más caracteres de longitud",
+        "MAX": "No tener más de 30 caracteres de longitud",
+        "SPECIAL": "Contener 1 o más caracteres especiales"
       },
       "CONFIRM_PASSWORD": {
         "FIELD": "Confirmar contraseña",

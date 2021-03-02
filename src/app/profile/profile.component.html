@@ -16,7 +16,7 @@
         <form (ngSubmit)="update()" [formGroup]="form" novalidate>
           <mat-card-content>
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-              <mat-form-field>
+              <mat-form-field appearance="fill">
                 <mat-label>{{ 'PROFILE.USERNAME.FIELD' | translate }}</mat-label>
                 <input matInput required formControlName="username" autocomplete="username">
                 <mat-error *ngIf="username.hasError('required')" [innerHTML]="'PROFILE.PROFILE.REQUIRED' | translate">
@@ -25,7 +25,7 @@
                   {{errors['username']}}
                 </mat-error>
               </mat-form-field>
-              <mat-form-field>
+              <mat-form-field appearance="fill">
                 <mat-label>{{ 'PROFILE.FIRST_NAME.FIELD' | translate }}</mat-label>
                 <input matInput required formControlName="firstName" autocomplete="username">
                 <mat-error *ngIf="firstName.hasError('required')"
@@ -35,7 +35,7 @@
                   {{errors['firstName']}}
                 </mat-error>
               </mat-form-field>
-              <mat-form-field>
+              <mat-form-field appearance="fill">
                 <mat-label>{{ 'PROFILE.LAST_NAME.FIELD' | translate }}</mat-label>
                 <input matInput required formControlName="lastName" autocomplete="username">
                 <mat-error *ngIf="lastName.hasError('required')"

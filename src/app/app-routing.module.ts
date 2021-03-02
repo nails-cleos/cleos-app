@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { UsersComponent } from './user/list/users.component';
 import { UserDetailComponent } from './user/detail/user-detail.component';
 import { MainComponent } from './main/main.component';
@@ -33,7 +33,7 @@ const routes: Routes = [
   {path: 'main', component: MainComponent},
   {
     path: 'dashboard', component: DashComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService], data: {
-      roles: [Role.Admin, Role.Professional, Role.Customer]
+      roles: [Role.Admin, Role.Professional]
     }
   },
   {
@@ -110,7 +110,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })],
   exports: [RouterModule]
 })
 export class AppRoutingModule {

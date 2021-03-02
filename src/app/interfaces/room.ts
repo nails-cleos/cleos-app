@@ -6,6 +6,7 @@ export interface IRoom {
   professionalId?: string;
   professional?: IUser;
   availabilities: IAvailability[];
+  location?: ILocation;
 }
 
 export interface IRoomAll {
@@ -13,6 +14,7 @@ export interface IRoomAll {
   name: string;
   professional: IUser;
   availabilities: IAvailability[];
+  location: ILocation;
 }
 
 export interface IAvailability {
@@ -28,6 +30,11 @@ export interface IAvailabilityDate {
   endDate?: Date;
   startLunchDate?: Date;
   endLunchDate?: Date;
+}
+
+export interface ILocation {
+  x: number;
+  y: number;
 }
 
 export class Availability implements IAvailability {

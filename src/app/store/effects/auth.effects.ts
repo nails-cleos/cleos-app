@@ -5,8 +5,9 @@ import { of } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
-import { AuthActionTypes, LoginFailure, LoginSuccess, SignUpSuccess, SignUpFailure } from '../auth.actions';
+import { AuthActionTypes, LoginFailure, LoginSuccess, SignUpFailure, SignUpSuccess } from '../auth.actions';
 import { TranslateService } from '@ngx-translate/core';
+import { Role } from '../../interfaces/token';
 
 @Injectable()
 export class LoginEffects {
@@ -42,7 +43,12 @@ export class LoginEffects {
   loginSuccess$ = this.actions$.pipe(
     ofType(AuthActionTypes.LOGIN_SUCCESS),
     tap((response: any) => {
-      this.router.navigate([response.payload.queryParams.returnUrl || 'dashboard']);
+      const roles = [Role.Admin, Role.Professional];
+      const dash = response.payload.response.user.authorities.some((au: any) => roles.includes(au.authority)) ? 'dashboard' : 'main';
+      const redirectUrl = response.payload.response.user.changePassword
+        ? 'change-password'
+        : response.payload.queryParams.returnUrl || dash;
+      this.router.navigate([redirectUrl]);
     })
   );
 

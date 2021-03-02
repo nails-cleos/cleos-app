@@ -1,4 +1,7 @@
 {
+  "APP": {
+    "TITLE": "Nails"
+  },
   "COMMON": {
     "BUTTON": {
       "BACK": "Back",
@@ -88,7 +91,15 @@
       },
       "PASSWORD": {
         "FIELD": "Password",
-        "REQUIRED": "Password is <b>required</b>"
+        "DETAIL": "Show password details",
+        "REQUIRED": "Password is <b>required</b>",
+        "INVALID": "Password is not valid",
+        "DIGIT": "Contains at least one digit character",
+        "LOWER_CASE": "Contains at least one lower character",
+        "UPPER_CASE": "Contains at least one upper character",
+        "MIN": "Contains at least 6 characters",
+        "MAX": "Contains no more than 30 characters",
+        "SPECIAL": "Contains at least one special character"
       },
       "CONFIRM_PASSWORD": {
         "FIELD": "Confirm password",
@@ -126,7 +137,15 @@
       "MESSAGE": "Password updated",
       "PASSWORD": {
         "FIELD": "Password",
-        "REQUIRED": "Password is <b>required</b>"
+        "DETAIL": "Show password details",
+        "REQUIRED": "Password is <b>required</b>",
+        "INVALID": "Password is not valid",
+        "DIGIT": "Contains at least one digit character",
+        "LOWER_CASE": "Contains at least one lower character",
+        "UPPER_CASE": "Contains at least one upper character",
+        "MIN": "Contains at least 6 characters",
+        "MAX": "Contains no more than 30 characters",
+        "SPECIAL": "Contains at least one special character"
       },
       "CONFIRM_PASSWORD": {
         "FIELD": "Confirm password",
@@ -227,7 +246,15 @@
       },
       "PASSWORD": {
         "FIELD": "New password",
-        "REQUIRED": "New password is <b>required</b>"
+        "DETAIL": "Show password details",
+        "REQUIRED": "New password is <b>required</b>",
+        "INVALID": "Password is not valid",
+        "DIGIT": "Contains at least one digit character",
+        "LOWER_CASE": "Contains at least one lower character",
+        "UPPER_CASE": "Contains at least one upper character",
+        "MIN": "Contains at least 6 characters",
+        "MAX": "Contains no more than 30 characters",
+        "SPECIAL": "Contains at least one special character"
       },
       "CONFIRM_PASSWORD": {
         "FIELD": "Confirm password",
