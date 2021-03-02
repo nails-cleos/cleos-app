@@ -1,6 +1,6 @@
 <ng-template #stepOne>
   <form [formGroup]="customerForm">
-    <mat-form-field *ngIf="customers; else skeleton">
+    <mat-form-field appearance="fill" *ngIf="customers; else skeleton">
       <mat-label>{{ 'RESERVATION.ADD.CUSTOMER.FIELD' | translate }}</mat-label>
       <label>
         <input [formControl]="customer" [matAutocomplete]="autoCustomer" matInput required type="text">
@@ -28,7 +28,7 @@
 
 <ng-template #stepTwo>
   <form [formGroup]="roomForm">
-    <mat-form-field *ngIf="rooms; else skeleton">
+    <mat-form-field appearance="fill" *ngIf="rooms; else skeleton">
       <mat-label>{{ 'RESERVATION.ADD.ROOM.FIELD' | translate }}</mat-label>
       <label>
         <input [formControl]="room" [matAutocomplete]="autoRoom" matInput required type="text">
@@ -57,7 +57,7 @@
 <ng-template #stepThree>
   <form [formGroup]="productForm">
     <div fxLayout="column" fxLayoutAlign="space-evenly start">
-      <mat-form-field *ngIf="products; else skeleton">
+      <mat-form-field appearance="fill" *ngIf="products; else skeleton">
         <mat-label>{{ 'RESERVATION.ADD.PRODUCT.FIELD' | translate }}</mat-label>
         <label>
           <input [formControl]="product" [matAutocomplete]="autoProduct" matInput required type="text">
@@ -77,7 +77,7 @@
           {{errors['product']}}
         </mat-error>
       </mat-form-field>
-      <mat-form-field>
+      <mat-form-field appearance="fill">
         <mat-label>{{ 'RESERVATION.ADD.DATE.FIELD' | translate }}</mat-label>
         <label>
           <input (focus)="picker.open()" [formControl]="date" [matDatepickerFilter]="myFilter" [matDatepicker]="picker"

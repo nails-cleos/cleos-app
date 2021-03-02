@@ -14,8 +14,8 @@
         <mat-card-subtitle>{{currentUser.email}}</mat-card-subtitle>
       </mat-card-header>
     </mat-card>
-    <mat-toolbar>Menu</mat-toolbar>
-    <mat-nav-list>
+    <mat-toolbar *ngIf="currentUser">Menu</mat-toolbar>
+    <mat-nav-list *ngIf="currentUser">
       <div *ngFor="let menu of menuItems">
         <a [routerLink]="'/'+menu.path" mat-list-item>
           <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>
@@ -32,7 +32,7 @@
               aria-label="Toggle sidenav" mat-icon-button type="button">
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
-      <span>{{title}}</span>
+      <span>{{'APP.TITLE' | translate}}</span>
       <span class="align-right"></span>
       <button *ngIf="username; else login" [matMenuTriggerFor]="menuNotLogged" color="accent" mat-raised-button>
         <mat-icon>person_pin</mat-icon>

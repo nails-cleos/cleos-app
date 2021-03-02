@@ -41,7 +41,7 @@ export class AuthService {
 
   public recoveryPassword(token: string, password: string): Observable<any> {
     const url = `${this.authUrl}/recovery-password?token=${token}`;
-    return this.http.post(url, {password});
+    return this.http.post(url, {password, username: 'recovery-password'});
   }
 
   private performLogin(url: string, body: any): Observable<Token> {

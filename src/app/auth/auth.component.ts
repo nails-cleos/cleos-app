@@ -37,7 +37,7 @@ export class AuthComponent implements OnInit {
         if (state.message) {
           snackBarRef.afterDismissed().subscribe(() => {
             this.clean();
-            location.reload(true);
+            location.reload();
           });
         }
 

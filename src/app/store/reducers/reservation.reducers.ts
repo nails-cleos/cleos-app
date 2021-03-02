@@ -1,12 +1,12 @@
 import { All, ReservationActionTypes } from '../reservation.actions';
-import { IReservation } from '../../interfaces/reservation';
+import { IReservation, IRoomReservation } from '../../interfaces/reservation';
 import { IUser } from '../../interfaces/user';
 import { IProduct } from '../../interfaces/product';
 import { IRoom } from '../../interfaces/room';
 import { Pagination } from '../../interfaces/pagination';
 
 export interface State {
-  data: IReservation | Map<string, IReservation[]> | IReservation[] | null;
+  data: IReservation | IRoomReservation[] | IReservation[] | null;
   page: Pagination<IReservation> | null;
   customers: IUser[] | null;
   rooms: IRoom[] | null;
@@ -59,8 +59,7 @@ export function reducer(state = initialState, action: All): State {
     case ReservationActionTypes.GET_ALL_GROUPING_BY_ROOM: {
       return {
         ...state,
-        // @ts-ignore
-        data: new Map('', {}),
+        data: null,
         errorMessage: null,
         subErrors: null,
         selected: null,

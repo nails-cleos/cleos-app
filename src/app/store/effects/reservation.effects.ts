@@ -46,7 +46,7 @@ export class ReservationEffects {
     switchMap(() => {
       return this.reservationService.getAllGroupingByRoom().pipe(
         switchMap((response: any) => {
-          return of(new fromActionsReservation.ReservationSuccess(new Map(Object.entries(response))));
+          return of(new fromActionsReservation.ReservationSuccess(response));
         }),
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
       );
@@ -111,7 +111,6 @@ export class ReservationEffects {
     switchMap((payload: any) => {
       return this.reservationService.getById(payload).pipe(
         switchMap((reservation: any) => {
-          console.log(reservation);
           return of(new fromActionsReservation.ReservationSelected(reservation));
         }),
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))

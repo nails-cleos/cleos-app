@@ -130,7 +130,7 @@ export class UserEffects {
   changePassword$ = this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.CHANGE_PASSWORD)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => {
-      return this.userService.changePassword(payload.oldPassword, payload.password).pipe(
+      return this.userService.changePassword(payload.username, payload.oldPassword, payload.password).pipe(
         switchMap(() => {
           const message = this.translate.instant('USER.CHANGE_PASSWORD.MESSAGE');
           return of(new fromActionsUser.ChangePasswordSuccess({message}));

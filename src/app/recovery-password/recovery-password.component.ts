@@ -1,10 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AppState } from '../store/app.states';
 import { Store } from '@ngrx/store';
 import * as fromActionsLogin from '../store/auth.actions';
-import { AbstractControlOptions, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { MustMatch } from '../util/validators';
 
 @Component({
   selector: 'app-recovery-password',
@@ -13,23 +11,14 @@ import { MustMatch } from '../util/validators';
 })
 export class RecoveryPasswordComponent implements OnInit {
 
-  hideConfirm = true;
-  hide = true;
-  form!: FormGroup;
+  @ViewChild('passwordComponent') passwordComponent: any;
+  showError = false;
 
-  password: FormControl = new FormControl('', [
-    Validators.required
-  ]);
-  confirmPassword: FormControl = new FormControl('', [
-    Validators.required
-  ]);
-
-  constructor(private store: Store<AppState>, private route: ActivatedRoute, private formBuilder: FormBuilder) {
+  constructor(private store: Store<AppState>, private route: ActivatedRoute) {
   }
 
   ngOnInit(): void {
     this.clean();
-    this.createForm();
   }
 
   clean(): void {
@@ -38,19 +27,19 @@ export class RecoveryPasswordComponent implements OnInit {
     );
   }
 
-  createForm(): void {
-    this.form = this.formBuilder.group({
-      password: this.password,
-      confirmPassword: this.confirmPassword
-    }, {
-      validator: MustMatch('password', 'confirmPassword')
-    } as AbstractControlOptions);
-  }
-
   recoveryPassword(): void {
+    if (this.passwordComponent.passwordFormControl.invalid
+      || this.passwordComponent.passwordConfirmationFormControl.invalid) {
+      return;
+    }
     const token = this.route.snapshot.queryParamMap.get('token');
     this.store.dispatch(
-      new fromActionsLogin.RecoveryPassword({token, password: this.password.value})
+      new fromActionsLogin.RecoveryPassword({token, password: this.passwordComponent.passwordFormControl.value})
     );
+  }
+
+  onStrengthChanged(): void {
+    this.showError = true;
+    this.passwordComponent.passwordConfirmationFormControl.updateValueAndValidity();
   }
 }

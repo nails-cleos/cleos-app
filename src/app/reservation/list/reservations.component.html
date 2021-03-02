@@ -1,21 +1,21 @@
-<div *ngIf="!isLoading && data && calendar.size; else box">
+<div *ngIf="!isLoading; else box">
   <mat-accordion>
-    <mat-expansion-panel *ngFor="let room of data | keyvalue">
+    <mat-expansion-panel *ngFor="let rr of data">
       <mat-expansion-panel-header>
         <mat-panel-title>
-          <p style="font-weight: bold">{{calendar.get(room.key)!.room.name}}</p>
+          <p style="font-weight: bold">{{rr.room.name}}</p>
         </mat-panel-title>
       </mat-expansion-panel-header>
       <mwl-calendar-week-view
-        (hourSegmentClicked)="segmentClick($event.date, calendar.get(room.key)!.room)"
+        (hourSegmentClicked)="segmentClick($event.date, rr.room)"
         (eventClicked)="view($event.event)"
-        [dayEndHour]="calendar.get(room.key)!.day!.dayEndHour"
-        [dayEndMinute]="calendar.get(room.key)!.day!.dayEndMinute"
-        [dayStartHour]="calendar.get(room.key)!.day!.dayStartHour"
-        [dayStartMinute]="calendar.get(room.key)!.day!.dayStartMinute"
-        [daysInWeek]="calendar.get(room.key)!.day!.daysInWeek"
-        [events]="calendar.get(room.key)!.events"
-        [hourSegments]="calendar.get(room.key)!.day!.hourSegments"
+        [dayEndHour]="calendar.get(rr.room.id)!.day!.dayEndHour"
+        [dayEndMinute]="calendar.get(rr.room.id)!.day!.dayEndMinute"
+        [dayStartHour]="calendar.get(rr.room.id)!.day!.dayStartHour"
+        [dayStartMinute]="calendar.get(rr.room.id)!.day!.dayStartMinute"
+        [daysInWeek]="calendar.get(rr.room.id)!.day!.daysInWeek"
+        [events]="calendar.get(rr.room.id)!.events"
+        [hourSegments]="calendar.get(rr.room.id)!.day!.hourSegments"
         [viewDate]="viewDate"></mwl-calendar-week-view>
     </mat-expansion-panel>
   </mat-accordion>

@@ -4,7 +4,7 @@ import { AppState, selectReservationState } from '../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Calendar, Day, ICalendar, IReservationAll } from '../../interfaces/reservation';
+import { Calendar, Day, ICalendar, IReservationAll, IRoomReservation } from '../../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ConvertDuration, GetStartEndDay } from '../../util/dates';
@@ -24,7 +24,7 @@ export class ReservationsComponent implements OnInit, OnDestroy {
 
   isLoading = false;
 
-  data: Map<string, IReservationAll[]> | undefined;
+  data: IRoomReservation[] | undefined;
   calendar: Map<string, ICalendar> = new Map<string, ICalendar>();
   dayStart: Date = new Date(new Date().setHours(9, 0));
   dayEnd: Date = new Date(new Date().setHours(18, 0));
@@ -58,12 +58,8 @@ export class ReservationsComponent implements OnInit, OnDestroy {
   private subscribe(): void {
     this.subscription = this.getState.subscribe((stateValue) => {
       this.data = stateValue.data;
-      if (this.data) {
-        this.data.forEach((value, key) => {
-          if (Array.isArray(value)) {
-            this.addReservations(key, value);
-          }
-        });
+      if (this.data && Array.isArray(this.data) && this.data[0].room && this.data[0].reservations) {
+        this.data.forEach(value => this.addReservations(value));
         this.calendar.forEach(calendar => {
           const {week, saturday, sunday} = ReservationsComponent.getAvailability(calendar.room);
           const {min, max} = GetStartEndDay(week, saturday, sunday);
@@ -102,7 +98,9 @@ export class ReservationsComponent implements OnInit, OnDestroy {
     this.router.navigate(['reservation', event.id]);
   }
 
-  addReservations(roomId: string, reservations: IReservationAll[]): void {
+  addReservations(rr: IRoomReservation): void {
+    const reservations: IReservationAll[] = rr.reservations;
+    this.calendar.set(rr.room.id, new Calendar(rr.room, []));
     reservations.forEach(it => {
       if (it.product.duration) {
         const start = new Date(it.start);
@@ -131,14 +129,14 @@ export class ReservationsComponent implements OnInit, OnDestroy {
         }
 
         const event = NewEvent(detail, color, start, end, '#000', it.id);
-        const calendar = this.calendar.get(roomId);
+        const calendar = this.calendar.get(rr.room.id);
         let events;
         if (calendar) {
           events = [...calendar.events, event];
         } else {
           events = [event];
         }
-        this.calendar.set(roomId, new Calendar(it.room, events));
+        this.calendar.set(rr.room.id, new Calendar(it.room, events));
       }
     });
   }
