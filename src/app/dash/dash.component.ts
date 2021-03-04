@@ -33,7 +33,7 @@ export class DashComponent implements OnInit, OnDestroy {
           columns: 1,
           miniCard: {cols: 1, rows: 1},
           chart: {cols: 1, rows: 2},
-          table: {cols: 1, rows: 4}
+          table: {cols: 1, rows: 3}
         };
       }
 
@@ -49,10 +49,10 @@ export class DashComponent implements OnInit, OnDestroy {
   constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
               private readonly translate: TranslateService) {
     this.getState = this.store.select(selectReservationState);
-    this.annualLabel = this.translate.instant('DASHBOARD.CHART.LABEL.ANNUAL');
-    this.customerLabel = this.translate.instant('DASHBOARD.CHART.LABEL.CUSTOMER');
-    this.quantityLabel = this.translate.instant('DASHBOARD.CHART.LABEL.QUANTITY');
-    this.lastMonthLabel = this.translate.instant('DASHBOARD.CHART.LABEL.LAST_MONTH');
+    this.annualLabel = this.translate.instant('DASHBOARD.CARD.LABEL.ANNUAL');
+    this.customerLabel = this.translate.instant('DASHBOARD.CARD.LABEL.CUSTOMER');
+    this.quantityLabel = this.translate.instant('DASHBOARD.CARD.LABEL.QUANTITY');
+    this.lastMonthLabel = this.translate.instant('DASHBOARD.CARD.LABEL.LAST_MONTH');
   }
 
   private static getSumReservationPrice(total: number, reservation: IReservationAll): number {
@@ -141,7 +141,7 @@ export class DashComponent implements OnInit, OnDestroy {
           });
 
           const revenue = {
-            title: 'DASHBOARD.CARD.TOTAL_PRODUCT_SALES',
+            title: 'DASHBOARD.MINI_CARD.TOTAL_PRODUCT_SALES',
             value: totalRevenue,
             isIncrease: lastMonthRevenue >= prevMonthRevenue,
             color: 'primary',
@@ -151,7 +151,7 @@ export class DashComponent implements OnInit, OnDestroy {
           } as IReservationSummary;
 
           const products = {
-            title: 'DASHBOARD.CARD.AVERAGE_PRODUCT_VALUE',
+            title: 'DASHBOARD.MINI_CARD.AVERAGE_PRODUCT_VALUE',
             value: Number((totalAvg).toFixed(2)),
             isIncrease: lastMonthAvg >= prevMonthAvg,
             color: 'accent',
@@ -161,7 +161,7 @@ export class DashComponent implements OnInit, OnDestroy {
           } as IReservationSummary;
 
           const totalProducts = {
-            title: 'DASHBOARD.CARD.TOTAL_PRODUCTS',
+            title: 'DASHBOARD.MINI_CARD.TOTAL_PRODUCTS',
             value: completedList.length,
             isIncrease: lastMonthList.length >= prevMonthList.length,
             color: 'warn',
@@ -171,7 +171,7 @@ export class DashComponent implements OnInit, OnDestroy {
           } as IReservationSummary;
 
           const customer = {
-            title: 'DASHBOARD.CARD.NEW_CUSTOMERS_RESERVATION',
+            title: 'DASHBOARD.MINI_CARD.NEW_CUSTOMERS_RESERVATION',
             value: lastMonthCounter,
             isIncrease: lastMonthCounter >= prevCounter,
             color: 'primary',

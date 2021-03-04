@@ -7,6 +7,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectAuthState } from '../store/app.states';
 import { IMenu, IUser } from '../interfaces/user';
 import * as fromActionsLogin from '../store/auth.actions';
+import { WebsocketService } from '../services/websocket.service';
 
 @Component({
   selector: 'app-nav',
@@ -30,7 +31,8 @@ export class NavComponent implements OnInit {
   showInitials = false;
   initials: string | undefined;
 
-  constructor(private breakpointObserver: BreakpointObserver, private router: Router, private store: Store<AppState>) {
+  constructor(private breakpointObserver: BreakpointObserver, private router: Router, private store: Store<AppState>,
+              private webSocketService: WebsocketService) {
     this.getState = this.store.select(selectAuthState);
   }
 
@@ -56,6 +58,12 @@ export class NavComponent implements OnInit {
         if (!this.currentUser?.imageUrl) {
           this.showInitials = true;
         }
+        const stompClient = this.webSocketService.connect();
+        stompClient.connect({}, () => {
+          stompClient.subscribe(`/user/${user.username}/reply`, (data: any) => {
+            console.log(data);
+          });
+        });
       }
     });
   }

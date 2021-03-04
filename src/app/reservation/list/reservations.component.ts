@@ -11,7 +11,8 @@ import { ConvertDuration, GetStartEndDay } from '../../util/dates';
 import { IAvailability, IRoom } from '../../interfaces/room';
 import { FillNotAvailable, NewEvent } from '../../util/event';
 import { Router } from '@angular/router';
-import { CalendarEvent } from 'angular-calendar';
+import { CalendarEvent, CalendarView } from 'angular-calendar';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-reservations',
@@ -32,10 +33,24 @@ export class ReservationsComponent implements OnInit, OnDestroy {
   lessDays = 3;
   hourSegments = 2;
   viewDate: Date = new Date();
+  calendarView: CalendarView = CalendarView.Week;
+  week = 0;
+  smallScreen: boolean | undefined;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
-              private store: Store<AppState>, private router: Router) {
+              private store: Store<AppState>, private router: Router, private breakpointObserver: BreakpointObserver) {
     this.getState = this.store.select(selectReservationState);
+    breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small
+    ]).subscribe(result => {
+      this.smallScreen = result.matches;
+      if (this.smallScreen) {
+        this.daysInWeek = 3;
+        this.lessDays = 1;
+        this.hourSegments = 1;
+      }
+    });
   }
 
   private static getAvailability(room: IRoom): any {
@@ -53,45 +68,6 @@ export class ReservationsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
-  }
-
-  private subscribe(): void {
-    this.subscription = this.getState.subscribe((stateValue) => {
-      this.data = stateValue.data;
-      if (this.data && Array.isArray(this.data) && this.data[0].room && this.data[0].reservations) {
-        this.data.forEach(value => this.addReservations(value));
-        this.calendar.forEach(calendar => {
-          const {week, saturday, sunday} = ReservationsComponent.getAvailability(calendar.room);
-          const {min, max} = GetStartEndDay(week, saturday, sunday);
-          calendar.day = new Day(min.getHours() - 1, min.getMinutes(), max.getHours() + 1, max.getMinutes());
-          const unavailable = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.UNAVAILABLE');
-          const lunch = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.LUNCH');
-          const notWorking = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.OUT_OF_WORK');
-          calendar.events = calendar.events.concat(FillNotAvailable(unavailable, lunch, notWorking,
-            this.daysInWeek, 0, this.viewDate, sunday, saturday, week));
-
-        });
-      }
-      if (stateValue.errorMessage || stateValue.message) {
-        this.snackBar.open(stateValue.errorMessage || stateValue.message, 'OK', {
-          duration: 5000
-        });
-      }
-      this.isLoading = stateValue.isLoading;
-    });
-  }
-
-  private clean(): void {
-    this.calendar = new Map<string, ICalendar>();
-    this.store.dispatch(
-      new fromActionsReservation.Clean()
-    );
-  }
-
-  private getReservations(): void {
-    this.store.dispatch(
-      new fromActionsReservation.GetAllGroupingByRoom()
-    );
   }
 
   view(event: CalendarEvent): void {
@@ -146,5 +122,56 @@ export class ReservationsComponent implements OnInit, OnDestroy {
       const data = {date, room};
       this.router.navigateByUrl('/reservation', {state: data});
     }
+  }
+
+  previousWeek(): void {
+    this.week--;
+  }
+
+  today(): void {
+    this.week = 0;
+  }
+
+  nextWeek(): void {
+    this.week++;
+  }
+
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe((stateValue) => {
+      this.data = stateValue.data;
+      if (this.data && Array.isArray(this.data) && this.data[0].room && this.data[0].reservations) {
+        this.data.forEach(value => this.addReservations(value));
+        this.calendar.forEach(calendar => {
+          const {week, saturday, sunday} = ReservationsComponent.getAvailability(calendar.room);
+          const {min, max} = GetStartEndDay(week, saturday, sunday);
+          calendar.day = new Day(min.getHours() - 1, min.getMinutes(), max.getHours() + 1, max.getMinutes());
+          const unavailable = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.UNAVAILABLE');
+          const lunch = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.LUNCH');
+          const notWorking = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.OUT_OF_WORK');
+          calendar.events = calendar.events.concat(FillNotAvailable(unavailable, lunch, notWorking,
+            56, 0, this.viewDate, sunday, saturday, week));
+
+        });
+      }
+      if (stateValue.errorMessage || stateValue.message) {
+        this.snackBar.open(stateValue.errorMessage || stateValue.message, 'OK', {
+          duration: 5000
+        });
+      }
+      this.isLoading = stateValue.isLoading;
+    });
+  }
+
+  private clean(): void {
+    this.calendar = new Map<string, ICalendar>();
+    this.store.dispatch(
+      new fromActionsReservation.Clean()
+    );
+  }
+
+  private getReservations(): void {
+    this.store.dispatch(
+      new fromActionsReservation.GetAllGroupingByRoom()
+    );
   }
 }

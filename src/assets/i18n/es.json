@@ -38,7 +38,7 @@
     "CHANGE_PASSWORD": "Cambiar contraseña",
     "SIGN_OUT": "Cerrar sessión",
     "SIGN_IN": "Ingresar",
-    "CARD": {
+    "MINI_CARD": {
       "DURATION": "desde el mes pasado",
       "TOTAL_PRODUCT_SALES": "Ganancia total",
       "AVERAGE_PRODUCT_VALUE": "Ganancia promedio",
@@ -57,10 +57,8 @@
       "MONTHLY_RESERVATION": "Reservas mensuales",
       "YEARLY_PRODUCT_PRICE": "Ganancias anuales",
       "CUSTOMER_RESERVATION": "Reservas por cliente",
-      "LAST_MONTH_RESERVATION": "Reservas en el último mes"
-    },
-    "TABLE": {
-      "RESERVATION": "Reservations"
+      "LAST_MONTH_RESERVATION": "Reservas en el último mes",
+      "RESERVATION": "Reservas"
     }
   },
   "AUTH": {

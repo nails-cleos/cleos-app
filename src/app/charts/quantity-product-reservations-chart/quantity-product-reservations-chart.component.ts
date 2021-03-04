@@ -2,6 +2,7 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
 import { Color, Label } from 'ng2-charts';
 import { IReservationAll } from '../../interfaces/reservation';
+import { QuantityProduct } from '../../util/chart';
 
 @Component({
   selector: 'app-quantity-product-reservations-chart',
@@ -51,18 +52,10 @@ export class QuantityProductReservationsChartComponent implements OnChanges {
         // TODO: show error
         return;
       }
-      this.data = this.state.data;
-      const completedList = this.data?.filter(r => r.state === 'COMPLETED');
-      if (completedList) {
-        const group = completedList.reduce((map, item) => {
-          let total = map.get(item.product.name) || 0;
-          map.set(item.product.name, ++total);
-
-          return map;
-        }, new Map<string, number>());
-
-        this.barChartLabels = Array.from(group.keys());
-        this.barChartData[0] = {data: Array.from(group.values()), label: this.label};
+      const chartResult = QuantityProduct(this.state.data, this.label);
+      if (chartResult) {
+        this.barChartData = chartResult.chartDataSet;
+        this.barChartLabels = chartResult.chartLabels;
       }
     }
   }
