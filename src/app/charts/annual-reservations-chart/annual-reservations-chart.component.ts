@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
 import { Color, Label } from 'ng2-charts';
-import { IReservationAll } from '../../interfaces/reservation';
+import { AnnualReservation } from '../../util/chart';
 
 @Component({
   selector: 'app-annual-reservations-chart',
@@ -13,7 +13,6 @@ export class AnnualReservationsChartComponent implements OnChanges {
   @Input() label: any;
 
   isLoading = true;
-  data: IReservationAll[] | undefined;
   locale: string;
 
   public lineChartData: ChartDataSets[] = [
@@ -50,43 +49,11 @@ export class AnnualReservationsChartComponent implements OnChanges {
         // TODO: show error
         return;
       }
-      const now = new Date();
-      const filterDate = new Date(new Date().setMonth(now.getMonth() - 12, 0));
-      this.data = this.state.data;
-      const completedList = this.data?.filter(r => r.state === 'COMPLETED' && new Date(r.start) > filterDate);
-      if (completedList) {
-        const group = completedList.reduce((map, item) => {
-          const formattedDate = this.formatDate(new Date(item.start));
-          const key = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
-
-          const price = map.get(key) || 0;
-
-          map.set(key, price + item.product.price);
-
-          return map;
-        }, new Map<string, number>());
-
-        let data: number[] = [];
-        let label: string[] = [];
-
-        for (let i = 12; i >= 0; i--) {
-          const date = new Date(new Date().setMonth(now.getMonth() - i, 1));
-          const formattedDate = this.formatDate(date);
-          const key = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
-          label = [...label, key];
-
-          const count = group.get(key) || 0;
-          data = [...data, count];
-        }
-        this.lineChartData[0] = {data, label: this.label};
-        this.lineChartLabels = label;
+      const chartResult = AnnualReservation(this.state.data, this.locale, this.label);
+      if (chartResult) {
+        this.lineChartData = chartResult.chartDataSet;
+        this.lineChartLabels = chartResult.chartLabels;
       }
     }
-  }
-
-  private formatDate(date: Date): string {
-    return date.toLocaleDateString(this.locale, {
-      month: 'short', year: 'numeric'
-    }).replace(/ /g, '-');
   }
 }

@@ -2,6 +2,7 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
 import { Color, Label } from 'ng2-charts';
 import { IReservationAll } from '../../interfaces/reservation';
+import { CustomerReservation } from '../../util/chart';
 
 @Component({
   selector: 'app-customer-reservations-chart',
@@ -53,20 +54,10 @@ export class CustomerReservationsChartComponent implements OnChanges {
         // TODO: show error
         return;
       }
-      const now = new Date();
-      const filterDate = new Date(new Date().setMonth(now.getMonth() - 12, 0));
-      this.data = this.state.data;
-      const completedList = this.data?.filter(r => r.state === 'COMPLETED' && new Date(r.start) > filterDate);
-      if (completedList) {
-        const group = completedList.reduce((map, item) => {
-          let total = map.get(item.customer.username) || 0;
-          map.set(item.customer.username, ++total);
-
-          return map;
-        }, new Map<string, number>());
-
-        this.barChartLabels = Array.from(group.keys());
-        this.barChartData[0] = {data: Array.from(group.values()), label: this.label};
+      const chartResult = CustomerReservation(this.state.data, this.label);
+      if (chartResult) {
+        this.barChartData = chartResult.chartDataSet;
+        this.barChartLabels = chartResult.chartLabels;
       }
     }
   }

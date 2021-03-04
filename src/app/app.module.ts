@@ -37,6 +37,7 @@ import { UserService } from './services/user.service';
 import { ProductService } from './services/product.service';
 import { RoomService } from './services/room.service';
 import { ReservationService } from './services/reservation.service';
+import { WebsocketService } from './services/websocket.service';
 
 // Reducers
 import { reducers } from './store/app.states';
@@ -65,7 +66,7 @@ import { ChangePasswordComponent } from './change-password/change-password.compo
 import { ProfileComponent } from './profile/profile.component';
 import { NavComponent } from './nav/nav.component';
 import { DashComponent } from './dash/dash.component';
-import { CardComponent } from './card/card.component';
+import { CardChartComponent, CardComponent } from './card/card.component';
 import { ProductsComponent } from './product/list/products.component';
 import { ProductComponent } from './product/product.component';
 import { ProductDetailComponent } from './product/detail/product-detail.component';
@@ -150,7 +151,8 @@ registerLocaleData(localeEs, 'es');
     CustomerReservationsChartComponent,
     ReservationTableComponent,
     QuantityProductReservationsChartComponent,
-    LastMonthReservationsChartComponent
+    LastMonthReservationsChartComponent,
+    CardChartComponent
   ],
   imports: [
     BrowserModule,
@@ -195,6 +197,7 @@ registerLocaleData(localeEs, 'es');
     ProductService,
     RoomService,
     ReservationService,
+    WebsocketService,
     TranslationLoaderResolver,
     {
       provide: 'SocialAuthServiceConfig',

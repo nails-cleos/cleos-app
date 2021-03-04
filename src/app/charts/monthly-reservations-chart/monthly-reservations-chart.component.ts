@@ -2,6 +2,7 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ChartOptions, ChartType } from 'chart.js';
 import { Label, SingleDataSet } from 'ng2-charts';
 import { IReservationAll } from '../../interfaces/reservation';
+import { MonthlyReservation } from '../../util/chart';
 
 @Component({
   selector: 'app-monthly-reservation-chart',
@@ -41,27 +42,10 @@ export class MonthlyReservationsChartComponent implements OnChanges {
         // TODO: show error
         return;
       }
-      const now = new Date();
-      const filterDate = new Date(now.setMonth(new Date().getMonth() - 12, 0));
-      this.data = this.state.data;
-      const completedList = this.data?.filter(r => r.state === 'COMPLETED' && new Date(r.start) > filterDate);
-      if (completedList) {
-        const group = completedList.reduce((map, item) => {
-          const formattedDate = new Date(item.start).toLocaleDateString(this.locale, {
-            month: 'short', year: 'numeric'
-          }).replace(/ /g, '-');
-
-
-          const key = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
-
-          let total = map.get(key) || 0;
-          map.set(key, ++total);
-
-          return map;
-        }, new Map<string, number>());
-
-        this.pieChartLabels = Array.from(group.keys());
-        this.pieChartData = Array.from(group.values());
+      const chartResult = MonthlyReservation(this.state.data, this.locale);
+      if (chartResult) {
+        this.pieChartData = chartResult.chartData;
+        this.pieChartLabels = chartResult.chartLabels;
       }
     }
   }

@@ -1,0 +1,24 @@
+<button [mat-dialog-close]="true" class="close-button" mat-icon-button>
+  <mat-icon class="close-icon">close</mat-icon>
+</button>
+<h1 mat-dialog-title>{{'DASHBOARD.CARD.' + data.title | translate}}</h1>
+<div mat-dialog-content>
+  <div *ngIf="data.chartDataSet">
+    <canvas [chartType]="data.chartType" [colors]="data.colors"
+            [datasets]="data.chartDataSet"
+            [labels]="data.chartLabels"
+            [legend]="true"
+            [options]="data.options"
+            baseChart style="display: block">
+    </canvas>
+  </div>
+  <div *ngIf="data.chartData">
+    <canvas [chartType]="data.chartType" [colors]="data.colors"
+            [data]="data.chartData"
+            [labels]="data.chartLabels"
+            [legend]="true"
+            [options]="data.options"
+            baseChart style="display: block">
+    </canvas>
+  </div>
+</div>

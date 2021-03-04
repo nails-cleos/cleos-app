@@ -38,14 +38,14 @@
     "CHANGE_PASSWORD": "Change password",
     "SIGN_OUT": "Sign out",
     "SIGN_IN": "Sign In",
-    "CARD": {
+    "MINI_CARD": {
       "DURATION": "since last month",
       "TOTAL_PRODUCT_SALES": "Total Product Sales",
       "AVERAGE_PRODUCT_VALUE": "Average Product Value",
       "TOTAL_PRODUCTS": "Total Products",
       "NEW_CUSTOMERS_RESERVATION": "New Customers Reservation"
     },
-    "CHART": {
+    "CARD": {
       "LABEL": {
         "ANNUAL": "Reservations",
         "CUSTOMER": "Customers",
@@ -57,9 +57,7 @@
       "MONTHLY_RESERVATION": "Monthly Reservations",
       "YEARLY_PRODUCT_PRICE": "Yearly products price",
       "CUSTOMER_RESERVATION": "Customer Reservation",
-      "LAST_MONTH_RESERVATION": "Last Month Reservations"
-    },
-    "TABLE": {
+      "LAST_MONTH_RESERVATION": "Last Month Reservations",
       "RESERVATION": "Reservations"
     }
   },
