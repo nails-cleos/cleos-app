@@ -13,8 +13,8 @@ export class ReservationService {
   constructor(private http: HttpClient) {
   }
 
-  getAllPage(sort: string, direction: string, page: number): Observable<IReservation[]> {
-    let params = new HttpParams().set('page', String(page)).set('size', String(PAGE_SIZE));
+  getAllPage(sort: string, direction: string, page: number, size: number = PAGE_SIZE): Observable<IReservation[]> {
+    let params = new HttpParams().set('page', String(page)).set('size', String(size));
     if (sort) {
       params = params.append('sort', sort);
     }
@@ -56,5 +56,9 @@ export class ReservationService {
   update(reservation: IReservation): Observable<IReservation> {
     const url = `${this.url}/${reservation.id}`;
     return this.http.patch<IReservation>(url, reservation);
+  }
+
+  changeState(reservationId: string, event: string): Observable<IReservation> {
+    return this.http.post<IReservation>(`${this.url}/${reservationId}/${event}`, null);
   }
 }

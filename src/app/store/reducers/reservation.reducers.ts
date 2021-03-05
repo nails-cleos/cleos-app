@@ -100,6 +100,10 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
+    case ReservationActionTypes.APPROVE:
+    case ReservationActionTypes.START:
+    case ReservationActionTypes.COMPLETE:
+    case ReservationActionTypes.CANCEL:
     case ReservationActionTypes.RESERVATION_FIND: {
       return {
         ...state,
@@ -162,6 +166,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
+    case ReservationActionTypes.STATE_SUCCESS:
     case ReservationActionTypes.RESERVATION_SAVE_SUCCESS: {
       return {
         ...state,

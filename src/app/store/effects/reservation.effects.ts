@@ -31,7 +31,7 @@ export class ReservationEffects {
   getAllPage$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.GET_ALL_PAGE)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => {
-      return this.reservationService.getAllPage(payload.active, payload.direction, payload.page).pipe(
+      return this.reservationService.getAllPage(payload.active, payload.direction, payload.page, payload.size).pipe(
         switchMap((response: any) => {
           return of(new fromActionsReservation.ReservationPageSuccess(response));
         }),
@@ -160,6 +160,62 @@ export class ReservationEffects {
     })
   );
 
+  @Effect()
+  approve$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.APPROVE)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => {
+      return this.reservationService.changeState(payload, 'approve').pipe(
+        switchMap(() => {
+          const message = this.translate.instant('RESERVATION.DETAIL.STATE.APPROVED');
+          return of(new fromActionsReservation.StateSuccess({id: payload, message}));
+        }),
+        catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
+      );
+    })
+  );
+
+  @Effect()
+  start$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.START)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => {
+      return this.reservationService.changeState(payload, 'start').pipe(
+        switchMap(() => {
+          const message = this.translate.instant('RESERVATION.DETAIL.STATE.START');
+          return of(new fromActionsReservation.StateSuccess({id: payload, message}));
+        }),
+        catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
+      );
+    })
+  );
+
+  @Effect()
+  complete$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.COMPLETE)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => {
+      return this.reservationService.changeState(payload, 'complete').pipe(
+        switchMap(() => {
+          const message = this.translate.instant('RESERVATION.DETAIL.STATE.COMPLETE');
+          return of(new fromActionsReservation.StateSuccess({id: payload, message}));
+        }),
+        catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
+      );
+    })
+  );
+
+  @Effect()
+  cancel$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.CANCEL)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => {
+      return this.reservationService.changeState(payload, 'cancel').pipe(
+        switchMap(() => {
+          const message = this.translate.instant('RESERVATION.DETAIL.STATE.CANCEL');
+          return of(new fromActionsReservation.StateSuccess({id: payload, message}));
+        }),
+        catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
+      );
+    })
+  );
+
   @Effect({dispatch: false})
   selectedData$ = this.actions$.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.RESERVATION_SELECTED),
@@ -199,6 +255,11 @@ export class ReservationEffects {
     tap(() => {
       this.router.navigate(['reservations']);
     })
+  );
+
+  @Effect({dispatch: false})
+  stateSuccess$ = this.actions$.pipe(
+    ofType(fromActionsReservation.ReservationActionTypes.STATE_SUCCESS)
   );
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private reservationService: ReservationService,

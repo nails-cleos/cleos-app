@@ -1,9 +1,9 @@
 <div class="mat-elevation-z8 small-table">
-  <table mat-table [dataSource]="dataSource" matSort matSortActive="name"
-         matSortDisableClear matSortDirection="desc">
+  <table [dataSource]="dataSource" mat-table matSort matSortActive="name"
+         matSortDirection="desc" matSortDisableClear>
     <ng-container matColumnDef="position">
-      <th mat-header-cell *matHeaderCellDef> No.</th>
-      <td mat-cell *matCellDef="let room; let i = index;">
+      <th *matHeaderCellDef mat-header-cell> No.</th>
+      <td *matCellDef="let room; let i = index;" mat-cell>
         <div *ngIf="room.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -12,8 +12,8 @@
     </ng-container>
 
     <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'ROOM.LIST.COLUMN.NAME' | translate }}</th>
-      <td mat-cell *matCellDef="let room">
+      <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'ROOM.LIST.COLUMN.NAME' | translate }}</th>
+      <td *matCellDef="let room" mat-cell>
         <div *ngIf="room.id; else skeleton">{{room.name}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -22,8 +22,9 @@
     </ng-container>
 
     <ng-container matColumnDef="professional">
-      <th mat-header-cell fxShow fxHide.lt-sm *matHeaderCellDef mat-sort-header>{{ 'ROOM.LIST.COLUMN.PROFESSIONAL' | translate }}</th>
-      <td mat-cell fxShow fxHide.lt-sm *matCellDef="let room">
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+          mat-sort-header>{{ 'ROOM.LIST.COLUMN.PROFESSIONAL' | translate }}</th>
+      <td *matCellDef="let room" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="room.id; else skeleton">{{room.professional.firstName}} {{room.professional.lastName}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -32,8 +33,9 @@
     </ng-container>
 
     <ng-container matColumnDef="availability">
-      <th mat-header-cell fxShow fxHide.lt-sm *matHeaderCellDef mat-sort-header>{{ 'ROOM.LIST.COLUMN.AVAILABILITY.FIELD' | translate }}</th>
-      <td mat-cell fxShow fxHide.lt-sm *matCellDef="let room">
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+          mat-sort-header>{{ 'ROOM.LIST.COLUMN.AVAILABILITY.FIELD' | translate }}</th>
+      <td *matCellDef="let room" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="room.id; else skeleton">
           <mat-list>
             <mat-list-item *ngFor="let availability of room.availabilities">
@@ -50,13 +52,15 @@
     </ng-container>
 
     <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-      <td mat-cell *matCellDef="let room">
+      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+      <td *matCellDef="let room" mat-cell>
         <div *ngIf="room.id; else skeleton">
-          <button *ngIf="!room.deleted" mat-icon-button (click)="edit(room)">
+          <button (click)="edit(room)" *ngIf="!room.deleted" mat-icon-button
+                  matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
             <mat-icon color="primary">edit</mat-icon>
           </button>
-          <button *ngIf="!room.deleted" mat-icon-button (click)="delete(room)">
+          <button (click)="delete(room)" *ngIf="!room.deleted" mat-icon-button
+                  matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
             <mat-icon color="warn">delete</mat-icon>
           </button>
         </div>
@@ -66,12 +70,12 @@
       </td>
     </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+    <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
   </table>
   <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
 
-  <button routerLink="/room" mat-fab color="accent" id="add-button" matTooltip="{{ 'ROOM.ADD.TITLE' | translate }}">
+  <button color="accent" id="add-button" mat-fab matTooltip="{{ 'ROOM.ADD.TITLE' | translate }}" routerLink="/room">
     <mat-icon>add</mat-icon>
   </button>
 </div>

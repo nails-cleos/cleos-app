@@ -17,10 +17,17 @@
     <mat-toolbar *ngIf="currentUser">Menu</mat-toolbar>
     <mat-nav-list *ngIf="currentUser">
       <div *ngFor="let menu of menuItems">
-        <a [routerLink]="'/'+menu.path" mat-list-item>
+        <a (click)="drawer.toggle()" *ngIf="isHandset$ | async; else showMenu" [routerLink]="'/'+menu.path"
+           mat-list-item>
           <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>
           <div mat-line>{{menu.name}}</div>
         </a>
+        <ng-template #showMenu>
+          <a [routerLink]="'/'+menu.path" mat-list-item>
+            <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>
+            <div mat-line>{{menu.name}}</div>
+          </a>
+        </ng-template>
         <mat-divider></mat-divider>
       </div>
       <mat-divider></mat-divider>
