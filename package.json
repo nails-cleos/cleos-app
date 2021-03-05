@@ -6,12 +6,13 @@
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
-    "lint": "ng lint",
+    "lint": "ng lint --fix",
     "e2e": "ng e2e",
     "start-pwa": "ng build --prod  --source-map && http-server-spa dist/nails-app index.html 8443"
   },
   "private": true,
   "dependencies": {
+    "@angular-material-extensions/fab-menu": "^3.0.0",
     "@angular-material-extensions/password-strength": "^8.1.1",
     "@angular/animations": "^11.0.5",
     "@angular/cdk": "^11.0.3",

@@ -164,9 +164,9 @@ export class DashComponent implements OnInit, OnDestroy {
             title: 'DASHBOARD.MINI_CARD.TOTAL_PRODUCTS',
             value: completedList.length,
             isIncrease: lastMonthList.length >= prevMonthList.length,
-            color: 'warn',
+            color: 'primary',
             percentValue: Math.abs((lastMonthList.length - prevMonthList.length) / Math.abs(prevMonthList.length)),
-            icon: 'shopping_cart',
+            icon: 'home_repair_service',
             isCurrency: false
           } as IReservationSummary;
 
@@ -174,7 +174,7 @@ export class DashComponent implements OnInit, OnDestroy {
             title: 'DASHBOARD.MINI_CARD.NEW_CUSTOMERS_RESERVATION',
             value: lastMonthCounter,
             isIncrease: lastMonthCounter >= prevCounter,
-            color: 'primary',
+            color: 'accent',
             percentValue: Math.abs((lastMonthCounter - prevCounter) / prevCounter),
             icon: 'portrait',
             isCurrency: false

@@ -20,6 +20,11 @@ export enum ReservationActionTypes {
   RESERVATION_SELECTED = '[Reservation] Selected',
   RESERVATION_FIND = '[Reservation] Find',
   RESERVATION_DELETE = '[Reservation] Delete',
+  APPROVE = '[Reservation] Approve',
+  START = '[Reservation] Start',
+  COMPLETE = '[Reservation] Complete',
+  CANCEL = '[Reservation] Cancel',
+  STATE_SUCCESS = '[Reservation] State success',
   CLEAN = '[Reservation] Clean'
 }
 
@@ -141,6 +146,41 @@ export class DeleteReservation implements Action {
   }
 }
 
+export class Approve implements Action {
+  readonly type = ReservationActionTypes.APPROVE;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class Start implements Action {
+  readonly type = ReservationActionTypes.START;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class Complete implements Action {
+  readonly type = ReservationActionTypes.COMPLETE;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class Cancel implements Action {
+  readonly type = ReservationActionTypes.CANCEL;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class StateSuccess implements Action {
+  readonly type = ReservationActionTypes.STATE_SUCCESS;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class Clean implements Action {
   readonly type = ReservationActionTypes.CLEAN;
 }
@@ -165,4 +205,9 @@ export type All =
   | ReservationFind
   | ReservationSelected
   | DeleteReservation
+  | Approve
+  | Start
+  | Complete
+  | Cancel
+  | StateSuccess
   | Clean;

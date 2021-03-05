@@ -6,6 +6,8 @@
     "BUTTON": {
       "BACK": "Volver",
       "NEXT": "Siguiente",
+      "PREVIOUS": "Anterior",
+      "TODAY": "Hoy",
       "YES": "Si",
       "NO": "No",
       "SEND": "Enviar",
@@ -14,7 +16,11 @@
       "IGNORE": "Ignorar",
       "UPDATE": "Actualizar",
       "CANCEL": "Cancelar",
-      "BOOK": "Reservar"
+      "BOOK": "Reservar",
+      "VIEW": "Ver",
+      "EDIT": "Editar",
+      "DELETE": "Eliminar",
+      "INVITE": "Enviar invitación"
     },
     "COLUMN": {
       "ACTIONS": "Acciones"
@@ -58,7 +64,8 @@
       "YEARLY_PRODUCT_PRICE": "Ganancias anuales",
       "CUSTOMER_RESERVATION": "Reservas por cliente",
       "LAST_MONTH_RESERVATION": "Reservas en el último mes",
-      "RESERVATION": "Reservas"
+      "RESERVATION": "Reservas",
+      "EXPAND": "Expandir"
     }
   },
   "AUTH": {
@@ -163,6 +170,11 @@
         "DETAIL": {
           "TITLE": "Roles"
         }
+      },
+      "STATUS": {
+        "ENABLED":"Habilitado",
+        "DISABLED": "Deshabilitado",
+        "DELETED": "Eliminado"
       }
     },
     "ADD": {
@@ -516,10 +528,26 @@
         "TITLE": "Historial",
         "COLUMN": {
           "PROFESSIONAL": "Profesional",
-          "START": "Inicon",
+          "START": "Inicio",
           "PRODUCT": "Servicio",
           "STATE": "Estado"
         }
+      },
+      "STATE": {
+        "APPROVE": "La reserva fue aprobada",
+        "START": "La reserva se inicio",
+        "COMPLETE": "La reserva se completo",
+        "CANCEL": "La reserva se cancelo"
+      },
+      "CHANGE_STATE":{
+        "TITLE": "Cambio de estado",
+        "ACTION": {
+          "APPROVE": "aprobar la reserva",
+          "START": "iniciar la cita",
+          "COMPLETE": "completar la cita",
+          "CANCEL": "cancelar la reserva"
+        },
+        "CONTENT": "¿Está seguro de {{action}}?"
       }
     },
     "PAGE": {
@@ -540,11 +568,11 @@
       "MESSAGE": "Sala {{name}} updated"
     },
     "STATE": {
-      "CREATED": "Creado",
-      "APPROVED": "Aprobado",
-      "STARTED": "Empezado",
-      "COMPLETED": "Completado",
-      "CANCELLED": "Cancelado"
+      "CREATED": "Creada",
+      "APPROVED": "Aprobada",
+      "STARTED": "Empezada",
+      "COMPLETED": "Completada",
+      "CANCELLED": "Cancelada"
     }
   },
   "last": {

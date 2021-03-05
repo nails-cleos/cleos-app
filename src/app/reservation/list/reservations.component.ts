@@ -34,8 +34,10 @@ export class ReservationsComponent implements OnInit, OnDestroy {
   hourSegments = 2;
   viewDate: Date = new Date();
   calendarView: CalendarView = CalendarView.Week;
-  week = 0;
+  selectView = 'WEEK';
+  days = 0;
   smallScreen: boolean | undefined;
+  locale: string;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
               private store: Store<AppState>, private router: Router, private breakpointObserver: BreakpointObserver) {
@@ -46,11 +48,15 @@ export class ReservationsComponent implements OnInit, OnDestroy {
     ]).subscribe(result => {
       this.smallScreen = result.matches;
       if (this.smallScreen) {
-        this.daysInWeek = 3;
+        this.selectView = 'DAY';
+        this.calendarView = CalendarView.Day;
         this.lessDays = 1;
         this.hourSegments = 1;
       }
     });
+    const userLang = navigator.language;
+    const index = userLang.indexOf('-');
+    this.locale = index === -1 ? userLang : userLang.substr(0, index);
   }
 
   private static getAvailability(room: IRoom): any {
@@ -125,15 +131,15 @@ export class ReservationsComponent implements OnInit, OnDestroy {
   }
 
   previousWeek(): void {
-    this.week--;
+    this.days = this.smallScreen ? this.days - 1 : this.days - 7;
   }
 
   today(): void {
-    this.week = 0;
+    this.days = 0;
   }
 
   nextWeek(): void {
-    this.week++;
+    this.days = this.smallScreen ? this.days + 1 : this.days + 7;
   }
 
   private subscribe(): void {

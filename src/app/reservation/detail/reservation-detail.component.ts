@@ -4,13 +4,17 @@ import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
-import { IReservation, IReservationAll } from '../../interfaces/reservation';
+import { IReservationAll } from '../../interfaces/reservation';
 import { ActivatedRoute } from '@angular/router';
 import { ConvertDuration, Duration, IDuration } from '../../util/dates';
 import { MatTableDataSource } from '@angular/material/table';
-import { Pagination } from '../../interfaces/pagination';
-import { IProduct } from '../../interfaces/product';
 import { MatPaginator } from '@angular/material/paginator';
+import { IUserAll } from '../../interfaces/user';
+import { IProduct } from '../../interfaces/product';
+import { DialogComponent } from '../../dialog/dialog.component';
+import * as fromActionsProduct from '../../store/product.actions';
+import { TranslateService } from '@ngx-translate/core';
+import { MatDialog } from '@angular/material/dialog';
 
 export enum ReservationIconName {
   CREATED = 'assignment',
@@ -37,6 +41,9 @@ export class ReservationDetailComponent implements OnInit, OnDestroy, AfterViewI
   locale: string;
   language: string;
   isLoading = false;
+  changeState: any;
+  professionalId: string | undefined;
+  machine: any;
 
   displayedColumns: string[] = ['position', 'professional', 'start', 'product', 'state'];
   dataSource: any;
@@ -44,13 +51,25 @@ export class ReservationDetailComponent implements OnInit, OnDestroy, AfterViewI
 
   public paginator: MatPaginator | undefined;
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private snackBar: MatSnackBar,
-              private cdRef: ChangeDetectorRef) {
+  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private route: ActivatedRoute,
+              private store: Store<AppState>, private snackBar: MatSnackBar, private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectReservationState);
     const userLang = navigator.language;
     const index = userLang.indexOf('-');
     this.language = userLang;
     this.locale = index === -1 ? userLang : userLang.substr(0, index);
+    const token = localStorage.getItem('auth');
+    if (token) {
+      const user: IUserAll = JSON.parse(token).user;
+      this.professionalId = user.id;
+    }
+  }
+
+  @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
+    this.paginator = mp;
+    if (this.dataSource) {
+      this.dataSource.paginator = this.paginator;
+    }
   }
 
   ngOnInit(): void {
@@ -70,11 +89,19 @@ export class ReservationDetailComponent implements OnInit, OnDestroy, AfterViewI
     return ReservationIconName[name];
   }
 
-  @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
-    this.paginator = mp;
-    if (this.dataSource) {
-      this.dataSource.paginator = this.paginator;
-    }
+  onChangeState(id: string): void {
+    const title = this.translate.instant('RESERVATION.DETAIL.CHANGE_STATE.TITLE');
+    const action = this.translate.instant(`RESERVATION.DETAIL.CHANGE_STATE.ACTION.${id.toUpperCase()}`);
+    const content = this.translate.instant('RESERVATION.DETAIL.CHANGE_STATE.CONTENT', {action});
+    const dialogRef = this.dialog.open(DialogComponent, {
+      data: {title, content, value: id}
+    });
+
+    dialogRef.afterClosed().subscribe(event => {
+      if (event) {
+        this.machine.transition(this.reservation?.state, event);
+      }
+    });
   }
 
   private subscribe(): void {
@@ -88,13 +115,18 @@ export class ReservationDetailComponent implements OnInit, OnDestroy, AfterViewI
         // @ts-ignore
         this.state = ReservationIconName[state.selected.state];
         this.reservation = state.selected;
+        if (this.professionalId && this.professionalId === this.reservation?.room.professional.id) {
+          this.setupMachine(this.reservation.id, this.store, this.translate);
+          this.changeState = this.machine.next(this.reservation.state);
+        }
         this.dataSource = new MatTableDataSource<IReservationAll>(state.selected.history);
         this.cdRef.detectChanges();
       }
-      if (state.errorMessage) {
-        this.snackBar.open(state.errorMessage, 'OK', {
+      if (state.errorMessage || state.message) {
+        const snack = this.snackBar.open(state.errorMessage || state.message, 'OK', {
           duration: 5000
         });
+        snack.afterDismissed().subscribe(() => window.location.reload());
       }
     });
   }
@@ -106,5 +138,129 @@ export class ReservationDetailComponent implements OnInit, OnDestroy, AfterViewI
         new fromActionsReservation.ReservationFind(id)
       );
     }
+  }
+
+  private createMachine(stateMachineDefinition: any, initialState: any): any {
+    const machine = {
+      value: initialState,
+      transition(currentState: any, event: any): any {
+        const currentStateDefinition = stateMachineDefinition[currentState];
+        const destinationTransition = currentStateDefinition.transitions[event];
+        if (!destinationTransition) {
+          return;
+        }
+        const destinationState = destinationTransition.target;
+        destinationTransition.action();
+        machine.value = destinationState;
+        return machine.value;
+      },
+      next(currentState: any): any {
+        const currentStateDefinition = stateMachineDefinition[currentState];
+        return currentStateDefinition.next;
+      }
+    };
+    return machine;
+  }
+
+  private setupMachine(reservationId: string, store: Store<AppState>, translate: TranslateService): void {
+    this.machine = this.createMachine({
+      initialState: ReservationIconName.CREATED,
+      CREATED: {
+        transitions: {
+          approve: {
+            target: 'APPROVED',
+            action(): void {
+              store.dispatch(
+                new fromActionsReservation.Approve(reservationId)
+              );
+              console.log('transition action for "approve" in "CREATED" state');
+            }
+          },
+          cancel: {
+            target: 'CANCELLED',
+            action(): void {
+              store.dispatch(
+                new fromActionsReservation.Cancel(reservationId)
+              );
+              console.log('transition action for "cancel" in "CREATED" state');
+            }
+          }
+        },
+        next: [{
+          tooltip: translate.instant('RESERVATION.DETAIL.ACTION.APPROVE'),
+          tooltipPosition: 'below',
+          icon: ReservationIconName.APPROVED,
+          id: 'approve',
+          color: 'accent'
+        }, {
+          tooltip: translate.instant('RESERVATION.DETAIL.ACTION.CANCEL'),
+          tooltipPosition: 'below',
+          icon: ReservationIconName.CANCELLED,
+          id: 'cancel',
+          color: 'warn'
+        }]
+      },
+      APPROVED: {
+        transitions: {
+          start: {
+            target: 'STARTED',
+            action(): void {
+              store.dispatch(
+                new fromActionsReservation.Start(reservationId)
+              );
+              console.log('transition action for "start" in "APPROVED" state');
+            }
+          },
+          cancel: {
+            target: 'CANCELLED',
+            action(): void {
+              store.dispatch(
+                new fromActionsReservation.Cancel(reservationId)
+              );
+              console.log('transition action for "cancel" in "CREATED" state');
+            }
+          }
+        },
+        next: [{
+          tooltip: translate.instant('RESERVATION.DETAIL.ACTION.START'),
+          tooltipPosition: 'below',
+          icon: ReservationIconName.STARTED,
+          id: 'start',
+          color: 'accent'
+        }, {
+          tooltip: translate.instant('RESERVATION.DETAIL.ACTION.CANCEL'),
+          tooltipPosition: 'below',
+          icon: ReservationIconName.CANCELLED,
+          id: 'cancel',
+          color: 'warn'
+        }]
+      },
+      STARTED: {
+        transitions: {
+          complete: {
+            target: 'COMPLETED',
+            action(): void {
+              store.dispatch(
+                new fromActionsReservation.Complete(reservationId)
+              );
+              console.log('transition action for "start" in "APPROVED" state');
+            }
+          }
+        },
+        next: [{
+          tooltip: translate.instant('RESERVATION.DETAIL.ACTION.COMPLETE'),
+          tooltipPosition: 'below',
+          icon: ReservationIconName.COMPLETED,
+          id: 'complete',
+          color: 'accent'
+        }]
+      },
+      COMPLETED: {
+        next: []
+      },
+      CANCELLED: {
+        next: []
+      }
+    }, this.reservation?.state);
   }
 }

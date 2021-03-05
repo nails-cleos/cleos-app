@@ -6,6 +6,8 @@
     "BUTTON": {
       "BACK": "Back",
       "NEXT": "Next",
+      "PREVIOUS": "Previous",
+      "TODAY": "Today",
       "YES": "Yes",
       "NO": "No",
       "SEND": "Send",
@@ -14,7 +16,11 @@
       "IGNORE": "Ignore",
       "UPDATE": "Update",
       "CANCEL": "Cancel",
-      "BOOK": "Reserve"
+      "BOOK": "Reserve",
+      "VIEW": "View",
+      "EDIT": "Edit",
+      "DELETE": "Delete",
+      "INVITE": "Send invite"
     },
     "COLUMN": {
       "ACTIONS": "Actions"
@@ -58,7 +64,8 @@
       "YEARLY_PRODUCT_PRICE": "Yearly products price",
       "CUSTOMER_RESERVATION": "Customer Reservation",
       "LAST_MONTH_RESERVATION": "Last Month Reservations",
-      "RESERVATION": "Reservations"
+      "RESERVATION": "Reservations",
+      "EXPAND": "Expand"
     }
   },
   "AUTH": {
@@ -163,6 +170,11 @@
         "DETAIL": {
           "TITLE": "Roles"
         }
+      },
+      "STATUS": {
+        "ENABLED":"Enabled",
+        "DISABLED": "Disabled",
+        "DELETED": "Deleted"
       }
     },
     "ADD": {
@@ -520,6 +532,28 @@
           "PRODUCT": "Product",
           "STATE": "State"
         }
+      },
+      "STATE": {
+        "APPROVE": "Reservation approved",
+        "START": "Reservation started",
+        "COMPLETE": "Reservation completed",
+        "CANCEL": "Reservation cancelled"
+      },
+      "ACTION": {
+        "APPROVE": "Approve",
+        "START": "Start",
+        "COMPLETE": "Complete",
+        "CANCEL": "Cancel"
+      },
+      "CHANGE_STATE":{
+        "TITLE": "Change state",
+        "ACTION": {
+          "APPROVE": "approve the reservation",
+          "START": "start the appointment",
+          "COMPLETE": "complete the appointment",
+          "CANCEL": "cancel the reservation"
+        },
+        "CONTENT": "Are you sure to {{action}}?"
       }
     },
     "PAGE": {

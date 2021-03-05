@@ -30,6 +30,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { OverlayModule } from '@angular/cdk/overlay';
+import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
 
 @NgModule({
   imports: [
@@ -62,7 +63,8 @@ import { OverlayModule } from '@angular/cdk/overlay';
     MatExpansionModule,
     MatCheckboxModule,
     MatSlideToggleModule,
-    OverlayModule
+    OverlayModule,
+    MatFabMenuModule
   ],
   exports: [
     MatTableModule,
@@ -95,7 +97,8 @@ import { OverlayModule } from '@angular/cdk/overlay';
     MatExpansionModule,
     MatCheckboxModule,
     MatSlideToggleModule,
-    OverlayModule
+    OverlayModule,
+    MatFabMenuModule
   ]
 })
 export class AppMaterialModule {
