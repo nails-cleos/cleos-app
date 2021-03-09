@@ -10,6 +10,7 @@ import {
 } from '../util/chart';
 import { Color, Label, SingleDataSet } from 'ng2-charts';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
+import { TranslateService } from '@ngx-translate/core';
 
 enum ChartTypeEnum {
   QUANTITY_PRODUCT,
@@ -44,8 +45,8 @@ export class CardComponent implements OnInit {
   };
   chartColors: Color[] = [];
 
-  constructor(public dialog: MatDialog) {
-    const userLang = navigator.language;
+  constructor(public translate: TranslateService, public dialog: MatDialog) {
+    const userLang = this.translate.currentLang;
     const index = userLang.indexOf('-');
     this.locale = index === -1 ? userLang : userLang.substr(0, index);
   }

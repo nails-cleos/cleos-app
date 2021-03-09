@@ -3,6 +3,7 @@ import { ChartOptions, ChartType } from 'chart.js';
 import { Label, SingleDataSet } from 'ng2-charts';
 import { IReservationAll } from '../../interfaces/reservation';
 import { MonthlyReservation } from '../../util/chart';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-monthly-reservation-chart',
@@ -25,8 +26,8 @@ export class MonthlyReservationsChartComponent implements OnChanges {
   public pieChartLegend = true;
   public pieChartPlugins = [];
 
-  constructor() {
-    const userLang = navigator.language;
+  constructor(public translate: TranslateService) {
+    const userLang = this.translate.currentLang;
     const index = userLang.indexOf('-');
     this.locale = index === -1 ? userLang : userLang.substr(0, index);
   }

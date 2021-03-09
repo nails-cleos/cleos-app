@@ -43,3 +43,14 @@ tr.user-row:not(.user-expanded-row):active {
   position: relative;
 }
 
+.flex-container {
+  display: flex;
+
+  .flex-child {
+    flex: 1;
+  }
+
+  .flex-child:first-child {
+    margin-right: 100%;
+  }
+}

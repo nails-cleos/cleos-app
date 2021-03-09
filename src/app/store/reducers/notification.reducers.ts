@@ -1,12 +1,11 @@
-import { All, UserActionTypes } from '../user.actions';
-import { IUser } from '../../interfaces/user';
+import { All, NotificationActionTypes } from '../notification.actions';
+import { INotification } from '../../interfaces/notification';
 import { Pagination } from '../../interfaces/pagination';
 
 export interface State {
-  data: IUser | Pagination<IUser> | null;
+  data: INotification[] | Pagination<INotification> | null;
   errorMessage: string | null;
   subErrors: any;
-  selected: IUser | null;
   message: string | null;
   isLoading: boolean;
 }
@@ -15,38 +14,34 @@ export const initialState: State = {
   data: null,
   errorMessage: null,
   subErrors: null,
-  selected: null,
   message: null,
   isLoading: false
 };
 
 export function reducer(state = initialState, action: All): State {
   switch (action.type) {
-    case UserActionTypes.GET_ALL: {
+    case NotificationActionTypes.NOTIFICATION_PAGE: {
       return {
         ...state,
         // @ts-ignore
         data: {content: [{}, {}, {}], totalElements: 3},
         errorMessage: null,
         subErrors: null,
-        selected: null,
         message: null,
         isLoading: true
       };
     }
-    case UserActionTypes.FIND_ME:
-    case UserActionTypes.FIND_USER: {
+    case NotificationActionTypes.NOTIFICATION: {
       return {
         ...state,
-        data: {},
+        data: null,
         errorMessage: null,
         subErrors: null,
-        selected: null,
         message: null,
         isLoading: true
       };
     }
-    case UserActionTypes.USER_SUCCESS: {
+    case NotificationActionTypes.NOTIFICATION_SUCCESS: {
       return {
         ...state,
         data: action.payload,
@@ -56,27 +51,15 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case UserActionTypes.USER_SELECTED: {
+    case NotificationActionTypes.NOTIFICATION_READ_SUCCESS: {
       return {
         ...state,
-        selected: action.payload.user,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
-        isLoading: false
-      };
-    }
-    case UserActionTypes.CHANGE_PASSWORD_SUCCESS:
-    case UserActionTypes.USER_SAVE_SUCCESS: {
-      return {
-        ...state,
-        message: action.payload.message,
         errorMessage: null,
         subErrors: null,
         isLoading: false
       };
     }
-    case UserActionTypes.USER_FAILURE: {
+    case NotificationActionTypes.NOTIFICATION_FAILURE: {
       return {
         ...state,
         errorMessage: action.payload.error.message,
@@ -85,21 +68,17 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case UserActionTypes.SET_ROLE:
-    case UserActionTypes.CHANGE_PASSWORD:
-    case UserActionTypes.SAVE_USER:
-    case UserActionTypes.UPDATE_USER:
-    case UserActionTypes.RESEND_USER_TOKEN:
-    case UserActionTypes.USER_DELETE: {
+    case NotificationActionTypes.NOTIFICATION_READ: {
       return {
         ...state,
+        data: null,
         errorMessage: null,
         subErrors: null,
         message: null,
         isLoading: true
       };
     }
-    case UserActionTypes.CLEAN: {
+    case NotificationActionTypes.CLEAN: {
       return initialState;
     }
     default: {

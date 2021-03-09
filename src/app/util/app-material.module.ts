@@ -25,12 +25,13 @@ import { LayoutModule } from '@angular/cdk/layout';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, MatRippleModule } from '@angular/material/core';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
+import { MatBadgeModule } from '@angular/material/badge';
 
 @NgModule({
   imports: [
@@ -64,7 +65,9 @@ import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
     MatCheckboxModule,
     MatSlideToggleModule,
     OverlayModule,
-    MatFabMenuModule
+    MatFabMenuModule,
+    MatBadgeModule,
+    MatRippleModule
   ],
   exports: [
     MatTableModule,
@@ -98,7 +101,9 @@ import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
     MatCheckboxModule,
     MatSlideToggleModule,
     OverlayModule,
-    MatFabMenuModule
+    MatFabMenuModule,
+    MatBadgeModule,
+    MatRippleModule
   ]
 })
 export class AppMaterialModule {

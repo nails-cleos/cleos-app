@@ -21,6 +21,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ConvertDuration, Duration, GetMinAndMax, GetStartEndDay, IDuration } from '../util/dates';
 import { FillNotAvailable, NewEvent } from '../util/event';
 import { ActivatedRoute, Router } from '@angular/router';
+import { DateAdapter } from '@angular/material/core';
 
 @Component({
   selector: 'app-reservation',
@@ -86,11 +87,12 @@ export class ReservationComponent implements OnInit, OnDestroy {
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
               private store: Store<AppState>, private formBuilder: FormBuilder, private breakpointObserver: BreakpointObserver,
-              private router: Router) {
+              private router: Router, private _adapter: DateAdapter<any>) {
     this.getState = this.store.select(selectReservationState);
-    const userLang = navigator.language;
+    const userLang = this.translate.currentLang;
     const index = userLang.indexOf('-');
     this.locale = index === -1 ? userLang : userLang.substr(0, index);
+    this._adapter.setLocale(this.locale);
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small

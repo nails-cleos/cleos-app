@@ -63,12 +63,12 @@
             <mat-icon *ngIf="user.enabled || user.provider !== 'LOCAL'; else elseBlock"
                       matTooltip="{{ 'USER.LIST.STATUS.ENABLED' | translate }}"
                       matTooltipPosition="left">
-              check_circle_outline
+              verified_user
             </mat-icon>
             <ng-template #elseBlock>
               <mat-icon color="warn" matTooltip="{{ 'USER.LIST.STATUS.DISABLED' | translate }}"
                         matTooltipPosition="left">
-                pause_circle_outline
+                gpp_bad
               </mat-icon>
             </ng-template>
           </div>
@@ -89,11 +89,11 @@
       <td *matCellDef="let user" mat-cell>
         <div *ngIf="user.id; else skeleton">
           <button (click)="edit(user)" *ngIf="!user.deleted" mat-icon-button
-                  matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
+                  matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="above">
             <mat-icon color="primary">edit</mat-icon>
           </button>
           <button (click)="delete(user)" *ngIf="!user.deleted"
-                  [matTooltipPosition]="!user.enabled && user.provider === 'LOCAL' ? 'above' : 'right'"
+                  matTooltipPosition="above"
                   mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}">
             <mat-icon color="warn">delete</mat-icon>
@@ -101,7 +101,7 @@
           <button (click)="sendInvite(user)" *ngIf="!user.deleted && !user.enabled && user.provider === 'LOCAL'"
                   mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.INVITE' | translate }}"
-                  matTooltipPosition="right">
+                  matTooltipPosition="above">
             <mat-icon color="accent">forward_to_inbox</mat-icon>
           </button>
         </div>
@@ -133,10 +133,10 @@
               <div *ngIf="!user.deleted; else deleteBlock" mat-line>
                 <mat-icon
                   *ngIf="user.enabled || user.provider !== 'LOCAL'; else elseBlock">
-                  check_circle_outline
+                  verified_user
                 </mat-icon>
                 <ng-template #elseBlock>
-                  <mat-icon color="warn">pause_circle_outline</mat-icon>
+                  <mat-icon color="warn">gpp_bad</mat-icon>
                 </ng-template>
               </div>
               <ng-template #deleteBlock>
@@ -144,10 +144,24 @@
               </ng-template>
             </mat-list-item>
             <div mat-subheader>{{ 'USER.LIST.COLUMN.DETAIL.TITLE' | translate }}</div>
-            <mat-list-item *ngFor="let it of user.authorities" role="list">
-              <mat-icon mat-list-icon>accessibility_new</mat-icon>
-              <div mat-line>{{ 'COMMON.ROLES.' + it.authority | translate}}</div>
-            </mat-list-item>
+            <div class="flex-container">
+              <div class="flex-child">
+                <mat-list-item *ngFor="let it of user.authorities" role="list">
+                  <mat-icon mat-list-icon>{{getIcon(it.authority)}}</mat-icon>
+                  <div mat-line>{{ 'COMMON.ROLES.' + it.authority | translate}}</div>
+                  <button mat-icon-button color="warn" (click)="removeRole(user.id, it.authority)">
+                    <mat-icon mat-list-icon>clear</mat-icon>
+                  </button>
+                </mat-list-item>
+              </div>
+              <div class="flex-child">
+                <div *ngFor="let role of user.missing">
+                  <button mat-icon-button color="primary" (click)="addRole(user.id, role)">
+                    <mat-icon mat-list-icon>{{getIcon(role)}}</mat-icon>
+                    {{'COMMON.BUTTON.ADD' | translate}} {{ 'COMMON.ROLES.' + role | translate | lowercase}}</button>
+                </div>
+              </div>
+            </div>
           </mat-list>
         </div>
       </td>

@@ -23,6 +23,7 @@ import { RoomDetailComponent } from './room/detail/room-detail.component';
 import { ReservationsComponent } from './reservation/list/reservations.component';
 import { ReservationComponent } from './reservation/reservation.component';
 import { ReservationDetailComponent } from './reservation/detail/reservation-detail.component';
+import { NotificationsComponent } from './notification/list/notifications.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/dashboard', pathMatch: 'full', resolve: {model: TranslationLoaderResolver}},
@@ -105,6 +106,12 @@ const routes: Routes = [
   {
     path: 'reservation/:id', component: ReservationDetailComponent, canActivate: [AuthGuardService], data: {
       roles: [Role.Admin, Role.Professional]
+    }
+  },
+  {
+    path: 'notifications', component: NotificationsComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService],
+    data: {
+      roles: [Role.Admin, Role.Professional, Role.Customer]
     }
   }
 ];

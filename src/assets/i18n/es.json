@@ -1,6 +1,6 @@
 {
   "APP": {
-    "TITLE": "Nails"
+    "TITLE": "Uñas"
   },
   "COMMON": {
     "BUTTON": {
@@ -36,7 +36,11 @@
     },
     "ROLES": {
       "ROLE_CUSTOMER": "Cliente",
-      "ROLE_PROFESSIONAL": "Profesional"
+      "ROLE_PROFESSIONAL": "Profesional",
+      "ROLE_ADMIN": "Admin"
+    },
+    "NOTIFICATION": {
+      "NO": "No hay notificaciones"
     }
   },
   "DASHBOARD": {
@@ -51,7 +55,7 @@
       "TOTAL_PRODUCTS": "Total de servicios",
       "NEW_CUSTOMERS_RESERVATION": "Reservas de nuevos clientes"
     },
-    "CHART": {
+    "CARD": {
       "LABEL": {
         "ANNUAL": "Reservas",
         "CUSTOMER": "Clientes",
@@ -172,8 +176,8 @@
         }
       },
       "STATUS": {
-        "ENABLED":"Habilitado",
-        "DISABLED": "Deshabilitado",
+        "ENABLED": "Verificado",
+        "DISABLED": "No verificado",
         "DELETED": "Eliminado"
       }
     },
@@ -539,7 +543,7 @@
         "COMPLETE": "La reserva se completo",
         "CANCEL": "La reserva se cancelo"
       },
-      "CHANGE_STATE":{
+      "CHANGE_STATE": {
         "TITLE": "Cambio de estado",
         "ACTION": {
           "APPROVE": "aprobar la reserva",

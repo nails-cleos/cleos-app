@@ -3,6 +3,7 @@ import * as user from './reducers/user.reducers';
 import * as product from './reducers/product.reducers';
 import * as room from './reducers/room.reducers';
 import * as reservation from './reducers/reservation.reducers';
+import * as notification from './reducers/notification.reducers';
 import { createFeatureSelector } from '@ngrx/store';
 
 export interface AppState {
@@ -11,6 +12,7 @@ export interface AppState {
   productState: product.State;
   roomState: room.State;
   reservationState: reservation.State;
+  notificationState: notification.State;
 }
 
 export const reducers = {
@@ -18,7 +20,8 @@ export const reducers = {
   user: user.reducer,
   product: product.reducer,
   room: room.reducer,
-  reservation: reservation.reducer
+  reservation: reservation.reducer,
+  notification: notification.reducer
 };
 
 export const selectAuthState = createFeatureSelector<AppState>('auth');
@@ -26,3 +29,4 @@ export const selectUserState = createFeatureSelector<AppState>('user');
 export const selectProductState = createFeatureSelector<AppState>('product');
 export const selectRoomState = createFeatureSelector<AppState>('room');
 export const selectReservationState = createFeatureSelector<AppState>('reservation');
+export const selectNotificationState = createFeatureSelector<AppState>('notification');

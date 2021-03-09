@@ -7,6 +7,7 @@ export enum UserActionTypes {
   USER_SELECTED = '[User] Selected',
   FIND_USER = '[User] Find',
   FIND_ME = '[User] Me',
+  SET_ROLE = '[User] Add role',
   SAVE_USER = '[User] Save',
   UPDATE_USER = '[User] Update',
   USER_SAVE_SUCCESS = '[User] Save Success',
@@ -58,6 +59,13 @@ export class FindMe implements Action {
 
 export class SaveUser implements Action {
   readonly type = UserActionTypes.SAVE_USER;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class SetRole implements Action {
+  readonly type = UserActionTypes.SET_ROLE;
 
   constructor(public payload: any) {
   }
@@ -117,6 +125,7 @@ export type All =
   | FindUser
   | FindMe
   | SaveUser
+  | SetRole
   | UpdateUser
   | UserSaveSuccess
   | DeleteUser

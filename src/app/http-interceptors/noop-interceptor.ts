@@ -12,6 +12,10 @@ export class NoopInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     if (req.url.indexOf('i18n') === -1) {
       req = req.clone({url: `${environment.baseUrl}/${req.url}`});
+    } else {
+      const index = req.url.indexOf('-');
+      const url = index === -1 ? req.url : `${req.url.substr(0, index)}.json`;
+      req = req.clone({url});
     }
 
     return next.handle(req);

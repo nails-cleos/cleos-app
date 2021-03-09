@@ -1,6 +1,6 @@
 {
   "APP": {
-    "TITLE": "Nails"
+    "TITLE": "Nail"
   },
   "COMMON": {
     "BUTTON": {
@@ -36,7 +36,11 @@
     },
     "ROLES": {
       "ROLE_CUSTOMER": "Customer",
-      "ROLE_PROFESSIONAL": "Professional"
+      "ROLE_PROFESSIONAL": "Professional",
+      "ROLE_ADMIN": "Admin"
+    },
+    "NOTIFICATION": {
+      "NO": "No notifications"
     }
   },
   "DASHBOARD": {
@@ -172,8 +176,8 @@
         }
       },
       "STATUS": {
-        "ENABLED":"Enabled",
-        "DISABLED": "Disabled",
+        "ENABLED": "Verified",
+        "DISABLED": "Not verified",
         "DELETED": "Deleted"
       }
     },
@@ -545,7 +549,7 @@
         "COMPLETE": "Complete",
         "CANCEL": "Cancel"
       },
-      "CHANGE_STATE":{
+      "CHANGE_STATE": {
         "TITLE": "Change state",
         "ACTION": {
           "APPROVE": "approve the reservation",
