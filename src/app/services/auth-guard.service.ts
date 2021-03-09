@@ -3,7 +3,6 @@ import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from
 import { IUser } from '../interfaces/user';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState } from '../store/app.states';
-import * as fromActionsLogin from '../store/auth.actions';
 import { Observable } from 'rxjs';
 
 @Injectable({

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { IUser, PAGE_SIZE } from '../interfaces/user';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { Role } from '../interfaces/token';
 
 @Injectable({
   providedIn: 'root'
@@ -76,5 +77,23 @@ export class UserService {
 
   getAllCustomers(): Observable<IUser[]> {
     return this.http.get<IUser[]>(this.customerUrl);
+  }
+
+  setRole(userId: string, role: Role): Observable<IUser> {
+    let roleName;
+    switch (role) {
+      case Role.Admin:
+        roleName = 'admin';
+        break;
+      case Role.Professional:
+        roleName = 'professional';
+        break;
+      case Role.Customer:
+      default:
+        roleName = 'customer';
+        break;
+    }
+    const url = `${this.url}/${userId}/roles/${roleName}`;
+    return this.http.post<IUser>(url, null);
   }
 }

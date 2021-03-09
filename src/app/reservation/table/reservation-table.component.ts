@@ -37,7 +37,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private router: Router,
               private store: Store<AppState>, private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
     this.getState = this.store.select(selectReservationState);
-    this.language = navigator.language;
+    this.language = this.translate.currentLang;
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -64,6 +64,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
 
     this.getReservations();
     this.cdRef.detectChanges();
+    console.log('TRANSLATE', this.translate.currentLang);
   }
 
   ngOnDestroy(): void {

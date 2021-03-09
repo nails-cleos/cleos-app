@@ -10,18 +10,18 @@
   </mat-grid-tile>
   <!--Charts-->
   <mat-grid-tile [colspan]="( cardLayout | async )?.chart?.cols" [rowspan]="( cardLayout | async )?.chart?.rows">
-    <app-card  [data]="state?.data" [label]="quantityLabel" title="QUANTITY_PRODUCT">
+    <app-card [data]="state?.data" [label]="quantityLabel" title="QUANTITY_PRODUCT">
       <app-quantity-product-reservations-chart [label]="quantityLabel"
                                                [state]="state"></app-quantity-product-reservations-chart>
     </app-card>
   </mat-grid-tile>
   <mat-grid-tile [colspan]="( cardLayout | async )?.chart?.cols" [rowspan]="( cardLayout | async )?.chart?.rows">
-    <app-card  [data]="state?.data" title="PRODUCT_RESERVATION">
+    <app-card [data]="state?.data" title="PRODUCT_RESERVATION">
       <app-product-reservations-chart [state]="state"></app-product-reservations-chart>
     </app-card>
   </mat-grid-tile>
   <mat-grid-tile [colspan]="( cardLayout | async )?.chart?.cols" [rowspan]="( cardLayout | async )?.chart?.rows">
-    <app-card  [data]="state?.data" title="MONTHLY_RESERVATION">
+    <app-card [data]="state?.data" title="MONTHLY_RESERVATION">
       <app-monthly-reservation-chart [state]="state"></app-monthly-reservation-chart>
     </app-card>
   </mat-grid-tile>
@@ -31,12 +31,12 @@
     </app-card>
   </mat-grid-tile>
   <mat-grid-tile [colspan]="( cardLayout | async )?.chart?.cols" [rowspan]="( cardLayout | async )?.chart?.rows">
-    <app-card  [data]="state?.data" [label]="customerLabel" title="CUSTOMER_RESERVATION">
+    <app-card [data]="state?.data" [label]="customerLabel" title="CUSTOMER_RESERVATION">
       <app-customer-reservations-chart [label]="customerLabel" [state]="state"></app-customer-reservations-chart>
     </app-card>
   </mat-grid-tile>
   <mat-grid-tile [colspan]="( cardLayout | async )?.chart?.cols" [rowspan]="( cardLayout | async )?.chart?.rows">
-    <app-card  [data]="state?.data" [label]="lastMonthLabel" title="LAST_MONTH_RESERVATION">
+    <app-card [data]="state?.data" [label]="lastMonthLabel" title="LAST_MONTH_RESERVATION">
       <app-last-month-reservations-chart [label]="lastMonthLabel" [state]="state"></app-last-month-reservations-chart>
     </app-card>
   </mat-grid-tile>

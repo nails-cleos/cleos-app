@@ -63,6 +63,7 @@
               [daysInWeek]="daysInWeek"
               [events]="calendar.get(rr.room.id)!.events"
               [hourSegments]="hourSegments"
+              [locale]="locale"
               [viewDate]="viewDate"></mwl-calendar-week-view>
           </div>
           <div *ngSwitchCase="'DAY'">
@@ -76,6 +77,7 @@
               [dayStartMinute]="calendar.get(rr.room.id)!.day!.dayStartMinute"
               [events]="calendar.get(rr.room.id)!.events"
               [hourSegments]="hourSegments"
+              [locale]="locale"
               [viewDate]="viewDate"></mwl-calendar-day-view>
           </div>
         </div>

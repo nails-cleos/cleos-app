@@ -166,7 +166,7 @@ export class ReservationEffects {
     switchMap((payload: any) => {
       return this.reservationService.changeState(payload, 'approve').pipe(
         switchMap(() => {
-          const message = this.translate.instant('RESERVATION.DETAIL.STATE.APPROVED');
+          const message = this.translate.instant('RESERVATION.DETAIL.STATE.APPROVE');
           return of(new fromActionsReservation.StateSuccess({id: payload, message}));
         }),
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))

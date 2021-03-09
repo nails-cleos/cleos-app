@@ -3,6 +3,7 @@ import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
 import { Color, Label } from 'ng2-charts';
 import { IReservationAll } from '../../interfaces/reservation';
 import { LastMonthReservation } from '../../util/chart';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-last-month-reservations-chart',
@@ -34,8 +35,8 @@ export class LastMonthReservationsChartComponent implements OnChanges {
   public lineChartType: ChartType = 'line';
   public lineChartPlugins = [];
 
-  constructor() {
-    const userLang = navigator.language;
+  constructor(public translate: TranslateService) {
+    const userLang = this.translate.currentLang;
     const index = userLang.indexOf('-');
     this.locale = index === -1 ? userLang : userLang.substr(0, index);
   }

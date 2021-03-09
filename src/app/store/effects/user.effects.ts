@@ -85,6 +85,21 @@ export class UserEffects {
   );
 
   @Effect()
+  setRole$ = this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.SET_ROLE)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => {
+      return this.userService.setRole(payload.id, payload.role).pipe(
+        switchMap((response: any) => {
+          const role = this.translate.instant(`COMMON.ROLE.${payload.role}`);
+          const message = this.translate.instant(`USER.ROLE.${payload.action}`, {role});
+          return of(new fromActionsUser.UserSaveSuccess({message}));
+        }),
+        catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
+      );
+    })
+  );
+
+  @Effect()
   update$ = this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.UPDATE_USER)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => {

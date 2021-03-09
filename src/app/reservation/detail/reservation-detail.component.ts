@@ -10,9 +10,7 @@ import { ConvertDuration, Duration, IDuration } from '../../util/dates';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { IUserAll } from '../../interfaces/user';
-import { IProduct } from '../../interfaces/product';
 import { DialogComponent } from '../../dialog/dialog.component';
-import * as fromActionsProduct from '../../store/product.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -54,10 +52,13 @@ export class ReservationDetailComponent implements OnInit, OnDestroy, AfterViewI
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private route: ActivatedRoute,
               private store: Store<AppState>, private snackBar: MatSnackBar, private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectReservationState);
-    const userLang = navigator.language;
-    const index = userLang.indexOf('-');
+    const userLang = this.translate.currentLang;
     this.language = userLang;
+    const index = userLang.indexOf('-');
     this.locale = index === -1 ? userLang : userLang.substr(0, index);
+
+    console.log(this.translate.currentLang)
+    console.log(this.locale)
     const token = localStorage.getItem('auth');
     if (token) {
       const user: IUserAll = JSON.parse(token).user;
@@ -89,9 +90,9 @@ export class ReservationDetailComponent implements OnInit, OnDestroy, AfterViewI
     return ReservationIconName[name];
   }
 
-  onChangeState(id: string): void {
+  onChangeState(id: string | number): void {
     const title = this.translate.instant('RESERVATION.DETAIL.CHANGE_STATE.TITLE');
-    const action = this.translate.instant(`RESERVATION.DETAIL.CHANGE_STATE.ACTION.${id.toUpperCase()}`);
+    const action = this.translate.instant(`RESERVATION.DETAIL.CHANGE_STATE.ACTION.${String(id).toUpperCase()}`);
     const content = this.translate.instant('RESERVATION.DETAIL.CHANGE_STATE.CONTENT', {action});
     const dialogRef = this.dialog.open(DialogComponent, {
       data: {title, content, value: id}
@@ -173,7 +174,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy, AfterViewI
               store.dispatch(
                 new fromActionsReservation.Approve(reservationId)
               );
-              console.log('transition action for "approve" in "CREATED" state');
             }
           },
           cancel: {
@@ -182,7 +182,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy, AfterViewI
               store.dispatch(
                 new fromActionsReservation.Cancel(reservationId)
               );
-              console.log('transition action for "cancel" in "CREATED" state');
             }
           }
         },
@@ -208,7 +207,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy, AfterViewI
               store.dispatch(
                 new fromActionsReservation.Start(reservationId)
               );
-              console.log('transition action for "start" in "APPROVED" state');
             }
           },
           cancel: {
@@ -217,7 +215,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy, AfterViewI
               store.dispatch(
                 new fromActionsReservation.Cancel(reservationId)
               );
-              console.log('transition action for "cancel" in "CREATED" state');
             }
           }
         },
@@ -243,7 +240,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy, AfterViewI
               store.dispatch(
                 new fromActionsReservation.Complete(reservationId)
               );
-              console.log('transition action for "start" in "APPROVED" state');
             }
           }
         },

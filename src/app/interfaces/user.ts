@@ -5,6 +5,7 @@ export interface IUser {
   enabled?: boolean;
   deleted?: boolean;
   provider?: string;
+  lang?: string;
   username?: string;
   email?: string;
   password?: string;

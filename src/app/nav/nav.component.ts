@@ -1,20 +1,23 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState } from '../store/app.states';
+import { AppState, selectAuthState, selectNotificationState } from '../store/app.states';
 import { IMenu, IUser } from '../interfaces/user';
 import * as fromActionsLogin from '../store/auth.actions';
+import * as fromActionsNotification from '../store/notification.actions';
 import { WebsocketService } from '../services/websocket.service';
+import { INotification } from '../interfaces/notification';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-nav',
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.scss']
 })
-export class NavComponent implements OnInit {
+export class NavComponent implements OnInit, OnDestroy {
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(
@@ -23,27 +26,58 @@ export class NavComponent implements OnInit {
     );
 
   menuItems: IMenu[] = [];
+  notifications: INotification[] = [];
   currentUser!: IUser | null;
   username: string | undefined;
   getState: Observable<any>;
+  getNotificationState: Observable<any>;
   canChangePassword = false;
+  authSubscription: Subscription | undefined;
+  notificationSubscription: Subscription | undefined;
+  language: string;
+  isAuthorized = false;
 
   showInitials = false;
   initials: string | undefined;
 
-  constructor(private breakpointObserver: BreakpointObserver, private router: Router, private store: Store<AppState>,
-              private webSocketService: WebsocketService) {
+  constructor(public translate: TranslateService, private breakpointObserver: BreakpointObserver, private router: Router,
+              private store: Store<AppState>, private webSocketService: WebsocketService) {
+    this.language = this.translate.currentLang;
     this.getState = this.store.select(selectAuthState);
+    this.getNotificationState = this.store.select(selectNotificationState);
   }
 
   ngOnInit(): void {
     this.subscribe();
+    this.getNotifications();
   }
 
-  subscribe(): void {
-    this.getState.subscribe((state) => {
+  logout(): void {
+    this.store.dispatch(
+      new fromActionsLogin.LogOut()
+    );
+    this.router.navigate(['main']);
+  }
+
+  notification(notification: INotification): void {
+    this.store.dispatch(
+      new fromActionsNotification.NotificationRead(notification)
+    );
+    this.notifications = this.notifications.filter(n => n.id !== notification.id);
+  }
+
+  ngOnDestroy(): void {
+    this.authSubscription?.unsubscribe();
+    this.notificationSubscription?.unsubscribe();
+  }
+
+  private subscribe(): void {
+    this.authSubscription = this.getState.subscribe((state) => {
+      this.isAuthorized = state.isAuthenticated;
       if (state.isAuthenticated) {
         const user = state.user;
+        this.translate.use(user.lang || navigator.language);
+        this.language = user.lang || navigator.language;
         this.currentUser = user;
         this.menuItems = state.menus;
         this.canChangePassword = user?.provider === 'LOCAL';
@@ -61,18 +95,22 @@ export class NavComponent implements OnInit {
         const stompClient = this.webSocketService.connect();
         stompClient.connect({}, () => {
           stompClient.subscribe(`/user/${user.username}/reply`, (data: any) => {
-            console.log(data);
+            this.notifications = [JSON.parse(data.body) as INotification].concat(this.notifications);
           });
         });
       }
     });
+
+    this.notificationSubscription = this.getNotificationState.subscribe((state) => {
+      if (state.data) {
+        this.notifications = state.data;
+      }
+    });
   }
 
-  logout(): void {
+  private getNotifications(): void {
     this.store.dispatch(
-      new fromActionsLogin.LogOut()
+      new fromActionsNotification.GetAllUnread()
     );
-    this.router.navigate(['main']);
   }
-
 }

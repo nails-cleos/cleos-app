@@ -54,7 +54,7 @@ export class ReservationsComponent implements OnInit, OnDestroy {
         this.hourSegments = 1;
       }
     });
-    const userLang = navigator.language;
+    const userLang = this.translate.currentLang;
     const index = userLang.indexOf('-');
     this.locale = index === -1 ? userLang : userLang.substr(0, index);
   }

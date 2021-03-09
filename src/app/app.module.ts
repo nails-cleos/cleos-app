@@ -48,6 +48,7 @@ import { UserEffects } from './store/effects/user.effects';
 import { ProductEffects } from './store/effects/product.effects';
 import { RoomEffects } from './store/effects/room.effects';
 import { ReservationEffects } from './store/effects/reservation.effects';
+import { NotificationEffects } from './store/effects/notification.effects';
 
 // Components
 import { AppComponent } from './app.component';
@@ -85,6 +86,7 @@ import { CustomerReservationsChartComponent } from './charts/customer-reservatio
 import { ReservationTableComponent } from './reservation/table/reservation-table.component';
 import { QuantityProductReservationsChartComponent } from './charts/quantity-product-reservations-chart/quantity-product-reservations-chart.component';
 import { LastMonthReservationsChartComponent } from './charts/last-month-reservations-chart/last-month-reservations-chart.component';
+import { NotificationsComponent } from './notification/list/notifications.component';
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -152,12 +154,13 @@ registerLocaleData(localeEs, 'es');
     ReservationTableComponent,
     QuantityProductReservationsChartComponent,
     LastMonthReservationsChartComponent,
-    CardChartComponent
+    CardChartComponent,
+    NotificationsComponent
   ],
   imports: [
     BrowserModule,
     StoreModule.forRoot(reducers, {metaReducers}),
-    EffectsModule.forRoot([LoginEffects, UserEffects, ProductEffects, RoomEffects, ReservationEffects]),
+    EffectsModule.forRoot([LoginEffects, UserEffects, ProductEffects, RoomEffects, ReservationEffects, NotificationEffects]),
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {
@@ -208,11 +211,4 @@ registerLocaleData(localeEs, 'es');
   exports: [AppMaterialModule]
 })
 export class AppModule {
-  constructor(translate: TranslateService) {
-    let userLang = navigator.language;
-    const index = userLang.indexOf('-');
-    userLang = index === -1 ? userLang : userLang.substr(0, index);
-    translate.setDefaultLang('en');
-    translate.use(userLang);
-  }
 }
