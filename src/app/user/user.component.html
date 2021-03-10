@@ -1,7 +1,7 @@
 <div class="flex-container" fxLayout="column">
-  <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" class="card-container">
-    <div fxFlex.lt-sm="80%" fxFlex="50%" fxFlex.gt-lg="40%">
-      <mat-progress-bar mode="indeterminate" color="accent" *ngIf="isLoading"></mat-progress-bar>
+  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
+    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+      <mat-progress-bar *ngIf="isLoading" color="accent" mode="indeterminate"></mat-progress-bar>
       <mat-card>
         <mat-card-header>
           <mat-card-title>{{ 'USER.ADD.TITLE' | translate }}</mat-card-title>
@@ -11,7 +11,7 @@
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.ADD.ROLE.FIELD' | translate }}</mat-label>
-                <mat-select [formControl]="role">
+                <mat-select [formControl]="role" required>
                   <mat-option value="ROLE_CUSTOMER">{{ 'COMMON.ROLES.ROLE_CUSTOMER' | translate }}</mat-option>
                   <mat-option value="ROLE_PROFESSIONAL">{{ 'COMMON.ROLES.ROLE_PROFESSIONAL' | translate }}</mat-option>
                 </mat-select>
@@ -20,7 +20,9 @@
               </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.ADD.USERNAME.FIELD' | translate }}</mat-label>
-                <input matInput required formControlName="username" autocomplete="username">
+                <label>
+                  <input autocomplete="username" formControlName="username" matInput required>
+                </label>
                 <mat-error *ngIf="username.hasError('required')" [innerHTML]="'USER.ADD.USERNAME.REQUIRED' | translate">
                 </mat-error>
                 <mat-error *ngIf="errors['username']">
@@ -29,7 +31,9 @@
               </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.ADD.EMAIL.FIELD' | translate }}</mat-label>
-                <input matInput required formControlName="email" autocomplete="email">
+                <label>
+                  <input autocomplete="email" formControlName="email" matInput required>
+                </label>
                 <mat-error *ngIf="email.hasError('email')">
                   {{ 'USER.ADD.EMAIL.VALID' | translate }}
                 </mat-error>
@@ -41,7 +45,9 @@
               </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.ADD.FIRST_NAME.FIELD' | translate }}</mat-label>
-                <input matInput required formControlName="firstName" autocomplete="username">
+                <label>
+                  <input autocomplete="username" formControlName="firstName" matInput required>
+                </label>
                 <mat-error *ngIf="firstName.hasError('required')"
                            [innerHTML]="'USER.ADD.FIRST_NAME.REQUIRED' | translate">
                 </mat-error>
@@ -51,7 +57,9 @@
               </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.ADD.LAST_NAME.FIELD' | translate }}</mat-label>
-                <input matInput required formControlName="lastName" autocomplete="username">
+                <label>
+                  <input autocomplete="username" formControlName="lastName" matInput required>
+                </label>
                 <mat-error *ngIf="lastName.hasError('required')"
                            [innerHTML]="'USER.ADD.LAST_NAME.REQUIRED' | translate">
                 </mat-error>
@@ -59,13 +67,27 @@
                   {{errors['lastName']}}
                 </mat-error>
               </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>{{ 'USER.ADD.LANG.FIELD' | translate }}</mat-label>
+                <span *ngIf="select.value" [class]="'flag-icon  flag-icon-squared flag-icon-' + select.value.icon" matPrefix
+                      style="margin-right: 8px;"></span>
+                <mat-select #select [formControl]="lang" required>
+
+                  <mat-option *ngFor="let lang of flags" [value]="lang">
+                    <span [class]="'flag-icon  flag-icon-squared flag-icon-' + lang.icon"></span>
+                    {{ 'COMMON.LANG.' + lang.text | translate }}
+                  </mat-option>
+                </mat-select>
+                <mat-error [innerHTML]="'USER.ADD.LANG.REQUIRED' | translate">
+                </mat-error>
+              </mat-form-field>
             </div>
           </mat-card-content>
           <mat-card-actions>
             <div fxFlex></div>
-            <button mat-raised-button color="primary" [disabled]="form.invalid"
+            <button [disabled]="form.invalid" color="primary" mat-raised-button
                     type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
-            <button mat-raised-button color="accent"
+            <button color="accent" mat-raised-button
                     routerLink="/users">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
         </form>

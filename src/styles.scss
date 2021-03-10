@@ -1,6 +1,9 @@
 @import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
 @import "~skeleton-screen-css";
 
+$flag-icon-css-path: '~flag-icon-css/flags' !default;
+@import "~flag-icon-css/sass/flag-icon";
+
 html, body {
   height: 100%;
 }

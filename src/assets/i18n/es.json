@@ -41,6 +41,10 @@
     },
     "NOTIFICATION": {
       "NO": "No hay notificaciones"
+    },
+    "LANG": {
+      "ES": "Español",
+      "EN": "Inglés"
     }
   },
   "DASHBOARD": {
@@ -73,6 +77,7 @@
     }
   },
   "AUTH": {
+    "FORBIDDEN": "El usuario no tiene los permisos necesarios",
     "SIGN_IN": {
       "TITLE": "Ingresar",
       "USERNAME": {
@@ -84,7 +89,7 @@
         "ERROR": "Por favor ingrese una contraseña"
       },
       "OR": "O ingresa con tu email",
-      "NEW": "¿Nuevo en Nails?",
+      "NEW": "¿Nuevo en nail?",
       "FORGOT_PASSWORD": "¿Olvido su contraseña?"
     },
     "SIGN_UP": {
@@ -125,11 +130,11 @@
       },
       "OR": "O registrate con tu email",
       "SUCCESS": "Usuario {{username}} creado. Verifica tu email {{email}}",
-      "ALREADY": "¿Ya tienes Nails?"
+      "ALREADY": "¿Ya tienes nail?"
     },
     "ACTIVATE_ACCOUNT": {
       "TITLE": "Activate account",
-      "CONTENT": "Welcome to Nails",
+      "CONTENT": "Welcome to nail",
       "BUTTON": "Activate",
       "MESSAGE": "Account activated"
     },
@@ -208,6 +213,10 @@
         "FIELD": "Apellido",
         "REQUIRED": "Apellido es <b>requerido</b>"
       },
+      "LANG": {
+        "FIELD": "Idioma",
+        "REQUIRED": "Idioma es <b>requerido</b>"
+      },
       "CUSTOMER": "Cliente {{username}} creado",
       "PROFESSIONAL": "Profesional {{username}} creado"
     },
@@ -233,6 +242,10 @@
       "LAST_NAME": {
         "FIELD": "Apellido",
         "REQUIRED": "Apellido es <b>requerido</b>"
+      },
+      "LANG": {
+        "FIELD": "Idioma",
+        "REQUIRED": "Idioma es <b>requerido</b>"
       }
     },
     "DELETED": {
@@ -275,6 +288,10 @@
         "REQUIRED": "Confirmar contraseña es <b>requerido</b>",
         "MUST_MATCH": "Contraseña y confirmar contraseña deben coincidir"
       }
+    },
+    "ROLE": {
+      "REMOVE": "Rol {{role}} eliminado de {{username}}",
+      "ADD": "Role {{role}} agregado a {{username}}"
     }
   },
   "PROFILE": {
@@ -289,6 +306,10 @@
     "LAST_NAME": {
       "FIELD": "Apellido",
       "REQUIRED": "Apellido es <b>requerido</b>"
+    },
+    "LANG": {
+      "FIELD": "Idioma",
+      "REQUIRED": "Idioma es <b>requerido</b>"
     }
   },
   "PRODUCT": {

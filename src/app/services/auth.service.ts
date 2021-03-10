@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Token } from '../interfaces/token';
 import { IUser } from '../interfaces/user';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +31,7 @@ export class AuthService {
 
   public activateAccount(token: string): Observable<any> {
     const url = `${this.authUrl}/confirm-account?token=${token}`;
+    console.log(url)
     return this.http.post(url, null);
   }
 

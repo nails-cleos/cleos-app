@@ -1,6 +1,3 @@
-import { IUser } from './user';
-import { IRoom } from './room';
-
 export interface IProduct {
   id?: string;
   name?: string;
