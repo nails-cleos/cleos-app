@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../store/app.states';
@@ -6,8 +6,9 @@ import { IUser, User } from '../interfaces/user';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import * as fromActionsUser from '../store/user.actions';
-import { FieldChange } from '../util/validators';
+import { FieldChange, ValueChange } from '../util/validators';
 import { Location } from '@angular/common';
+import { Flags, IFlag } from '../util/flags';
 
 @Component({
   selector: 'app-profile',
@@ -34,8 +35,14 @@ export class ProfileComponent implements OnInit {
   lastName: FormControl = new FormControl('', [
     Validators.required
   ]);
+  langValue: FormControl = new FormControl('', [
+    Validators.required
+  ]);
 
-  constructor(private snackBar: MatSnackBar, private store: Store<AppState>, private formBuilder: FormBuilder, private location: Location) {
+  flags: IFlag[] = Flags();
+
+  constructor(private snackBar: MatSnackBar, private store: Store<AppState>, private formBuilder: FormBuilder, private location: Location,
+              private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectUserState);
   }
 
@@ -56,7 +63,8 @@ export class ProfileComponent implements OnInit {
     this.form = this.formBuilder.group({
       username: this.username,
       firstName: this.firstName,
-      lastName: this.lastName
+      lastName: this.lastName,
+      langValue: this.langValue
     });
   }
 
@@ -82,6 +90,9 @@ export class ProfileComponent implements OnInit {
           this.showInitials = true;
         }
         this.form.patchValue(state.selected);
+        const langValue = this.flags.filter((lang: any) => lang.value === state.selected.lang)[0];
+        this.langValue.setValue(langValue);
+        this.cdRef.detectChanges();
       }
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
@@ -101,6 +112,7 @@ export class ProfileComponent implements OnInit {
       return;
     }
     const user: IUser = new User();
+    user.lang = ValueChange(this.langValue.value.value, this.user?.lang);
     user.username = FieldChange(this.username, this.user?.username);
     user.firstName = FieldChange(this.firstName, this.user?.firstName);
     user.lastName = FieldChange(this.lastName, this.user?.lastName);

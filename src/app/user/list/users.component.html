@@ -149,14 +149,14 @@
                 <mat-list-item *ngFor="let it of user.authorities" role="list">
                   <mat-icon mat-list-icon>{{getIcon(it.authority)}}</mat-icon>
                   <div mat-line>{{ 'COMMON.ROLES.' + it.authority | translate}}</div>
-                  <button mat-icon-button color="warn" (click)="removeRole(user.id, it.authority)">
+                  <button mat-icon-button color="warn" (click)="removeRole(user, it.authority)">
                     <mat-icon mat-list-icon>clear</mat-icon>
                   </button>
                 </mat-list-item>
               </div>
               <div class="flex-child">
                 <div *ngFor="let role of user.missing">
-                  <button mat-icon-button color="primary" (click)="addRole(user.id, role)">
+                  <button mat-icon-button color="primary" (click)="addRole(user, role)">
                     <mat-icon mat-list-icon>{{getIcon(role)}}</mat-icon>
                     {{'COMMON.BUTTON.ADD' | translate}} {{ 'COMMON.ROLES.' + role | translate | lowercase}}</button>
                 </div>

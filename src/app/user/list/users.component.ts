@@ -139,15 +139,15 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     return RoleIconName[name];
   }
 
-  addRole(id: string, role: Role): void {
+  addRole(user: IUserAll, role: Role): void {
     this.store.dispatch(
-      new fromActionsUser.SetRole({id, role, action: 'ADD'})
+      new fromActionsUser.SetRole({user, role, action: 'ADD'})
     );
   }
 
-  removeRole(id: string, role: string): void {
+  removeRole(user: IUserAll, role: string): void {
     this.store.dispatch(
-      new fromActionsUser.SetRole({id, role, action: 'REMOVE'})
+      new fromActionsUser.SetRole({user, role, action: 'REMOVE'})
     );
   }
 

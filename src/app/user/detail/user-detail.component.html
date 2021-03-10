@@ -1,6 +1,6 @@
 <div class="flex-container" fxLayout="column">
-  <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" class="card-container">
-    <div fxFlex.lt-sm="80%" fxFlex="50%" fxFlex.gt-lg="40%">
+  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
+    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <mat-card>
         <mat-card-header>
           <mat-card-title>{{ 'USER.DETAIL.TITLE' | translate }}</mat-card-title>
@@ -14,17 +14,23 @@
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <mat-form-field appearance="fill">
                 <mat-label>Id</mat-label>
-                <input matInput disabled value="{{user.id}}">
+                <label>
+                  <input disabled matInput value="{{user.id}}">
+                </label>
               </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.DETAIL.USERNAME.FIELD' | translate }}</mat-label>
-                <input matInput required formControlName="username" autocomplete="username">
+                <label>
+                  <input autocomplete="username" formControlName="username" matInput required>
+                </label>
                 <mat-error [innerHTML]="'USER.DETAIL.USERNAME.REQUIRED' | translate">
                 </mat-error>
               </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.DETAIL.EMAIL.FIELD' | translate }}</mat-label>
-                <input matInput required formControlName="email" autocomplete="username">
+                <label>
+                  <input autocomplete="username" formControlName="email" matInput required>
+                </label>
                 <mat-error *ngIf="email.hasError('email')">
                   {{ 'USER.DETAIL.EMAIL.VALID' | translate }}
                 </mat-error>
@@ -33,14 +39,32 @@
               </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.DETAIL.FIRST_NAME.FIELD' | translate }}</mat-label>
-                <input matInput required formControlName="firstName" autocomplete="username">
+                <label>
+                  <input autocomplete="username" formControlName="firstName" matInput required>
+                </label>
                 <mat-error [innerHTML]="'USER.DETAIL.FIRST_NAME.REQUIRED' | translate">
                 </mat-error>
               </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.DETAIL.LAST_NAME.FIELD' | translate }}</mat-label>
-                <input matInput required formControlName="lastName" autocomplete="username">
+                <label>
+                  <input autocomplete="username" formControlName="lastName" matInput required>
+                </label>
                 <mat-error [innerHTML]="'USER.DETAIL.LAST_NAME.REQUIRED' | translate">
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>{{ 'USER.DETAIL.LANG.FIELD' | translate }}</mat-label>
+                <span *ngIf="select.value" [class]="'flag-icon  flag-icon-squared flag-icon-' + select.value.icon" matPrefix
+                      style="margin-right: 8px;"></span>
+                <mat-select #select [formControl]="langValue" required>
+
+                  <mat-option *ngFor="let lang of flags" [value]="lang">
+                    <span [class]="'flag-icon  flag-icon-squared flag-icon-' + lang.icon"></span>
+                    {{ 'COMMON.LANG.' + lang.text | translate }}
+                  </mat-option>
+                </mat-select>
+                <mat-error [innerHTML]="'USER.DETAIL.LANG.REQUIRED' | translate">
                 </mat-error>
               </mat-form-field>
             </div>
@@ -52,9 +76,9 @@
           </ng-template>
           <mat-card-actions *ngIf="user; else buttonSkeleton">
             <div fxFlex></div>
-            <button mat-raised-button color="primary" [disabled]="form.invalid || form.pristine"
+            <button [disabled]="form.invalid || form.pristine" color="primary" mat-raised-button
                     type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
-            <button mat-raised-button color="accent"
+            <button color="accent" mat-raised-button
                     routerLink="/users">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
           <ng-template #buttonSkeleton>

@@ -41,6 +41,10 @@
     },
     "NOTIFICATION": {
       "NO": "No notifications"
+    },
+    "LANG": {
+      "ES": "Spanish",
+      "EN": "English"
     }
   },
   "DASHBOARD": {
@@ -73,6 +77,7 @@
     }
   },
   "AUTH": {
+    "FORBIDDEN": "User not have the necessary permissions",
     "SIGN_IN": {
       "TITLE": "Sign In",
       "USERNAME": {
@@ -84,7 +89,7 @@
         "ERROR": "Please provide a valid password"
       },
       "OR": "Or sign in with email",
-      "NEW": "New to Nails?",
+      "NEW": "New to nail?",
       "FORGOT_PASSWORD": "Forgot password?"
     },
     "SIGN_UP": {
@@ -125,11 +130,11 @@
       },
       "OR": "Or sign up with email",
       "SUCCESS": "User {{username}} created. Check your email {{email}}",
-      "ALREADY": "Already on Nails?"
+      "ALREADY": "Already on nail?"
     },
     "ACTIVATE_ACCOUNT": {
       "TITLE": "Activate account",
-      "CONTENT": "Welcome to Nails",
+      "CONTENT": "Welcome to nail",
       "BUTTON": "Activate",
       "MESSAGE": "Account activated"
     },
@@ -208,6 +213,10 @@
         "FIELD": "Last name",
         "REQUIRED": "Last name is <b>required</b>"
       },
+      "LANG": {
+        "FIELD": "Language",
+        "REQUIRED": "Language is <b>required</b>"
+      },
       "CUSTOMER": "Customer {{username}} created",
       "PROFESSIONAL": "Professional {{username}} created"
     },
@@ -233,6 +242,10 @@
       "LAST_NAME": {
         "FIELD": "Last name",
         "REQUIRED": "Last name is <b>required</b>"
+      },
+      "LANG": {
+        "FIELD": "Language",
+        "REQUIRED": "Language is <b>required</b>"
       }
     },
     "DELETED": {
@@ -275,6 +288,10 @@
         "REQUIRED": "Confirm password is <b>required</b>",
         "MUST_MATCH": "New password and confirm password must match"
       }
+    },
+    "ROLE": {
+      "REMOVE": "Role {{role}} removed to {{username}}",
+      "ADD": "Role {{role}} added to {{username}}"
     }
   },
   "PROFILE": {
@@ -289,6 +306,10 @@
     "LAST_NAME": {
       "FIELD": "Last name",
       "REQUIRED": "Last name is <b>required</b>"
+    },
+    "LANG": {
+      "FIELD": "Language",
+      "REQUIRED": "Language is <b>required</b>"
     }
   },
   "PRODUCT": {

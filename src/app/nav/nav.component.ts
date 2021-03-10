@@ -39,6 +39,7 @@ export class NavComponent implements OnInit, OnDestroy {
 
   showInitials = false;
   initials: string | undefined;
+  hasNotifications = false;
 
   constructor(public translate: TranslateService, private breakpointObserver: BreakpointObserver, private router: Router,
               private store: Store<AppState>, private webSocketService: WebsocketService) {
@@ -49,7 +50,6 @@ export class NavComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscribe();
-    this.getNotifications();
   }
 
   logout(): void {
@@ -75,6 +75,7 @@ export class NavComponent implements OnInit, OnDestroy {
     this.authSubscription = this.getState.subscribe((state) => {
       this.isAuthorized = state.isAuthenticated;
       if (state.isAuthenticated) {
+        this.getNotifications();
         const user = state.user;
         this.translate.use(user.lang || navigator.language);
         this.language = user.lang || navigator.language;
@@ -98,6 +99,9 @@ export class NavComponent implements OnInit, OnDestroy {
             this.notifications = [JSON.parse(data.body) as INotification].concat(this.notifications);
           });
         });
+      } else {
+        this.translate.use(navigator.language);
+        this.language = navigator.language;
       }
     });
 
@@ -109,8 +113,11 @@ export class NavComponent implements OnInit, OnDestroy {
   }
 
   private getNotifications(): void {
-    this.store.dispatch(
-      new fromActionsNotification.GetAllUnread()
-    );
+    if (!this.hasNotifications) {
+      this.store.dispatch(
+        new fromActionsNotification.GetAllUnread()
+      );
+      this.hasNotifications = true;
+    }
   }
 }

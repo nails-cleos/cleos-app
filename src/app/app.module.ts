@@ -185,7 +185,7 @@ registerLocaleData(localeEs, 'es');
     ReactiveFormsModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,
-      registrationStrategy: 'registerImmediately',
+      registrationStrategy: 'registerImmediately'
     })
   ],
   providers: [

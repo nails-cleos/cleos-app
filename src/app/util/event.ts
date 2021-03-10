@@ -1,6 +1,5 @@
 import { IAvailability } from '../interfaces/room';
 import { CalendarEvent } from 'angular-calendar';
-import * as fromActionsReservation from '../store/reservation.actions';
 
 export function FillNotAvailable(unavailable: string, lunch: string, notWorking: string, daysInWeek: number, plusHour: number,
                                  selectDate: Date, sunday: IAvailability, saturday: IAvailability, week: IAvailability): CalendarEvent[] {
