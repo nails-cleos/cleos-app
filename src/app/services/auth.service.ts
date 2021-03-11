@@ -31,7 +31,6 @@ export class AuthService {
 
   public activateAccount(token: string): Observable<any> {
     const url = `${this.authUrl}/confirm-account?token=${token}`;
-    console.log(url)
     return this.http.post(url, null);
   }
 

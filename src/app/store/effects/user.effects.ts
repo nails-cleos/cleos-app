@@ -60,7 +60,7 @@ export class UserEffects {
           return this.userService.addCustomer(payload.user).pipe(
             switchMap((response: any) => {
               const message = this.translate.instant('USER.ADD.CUSTOMER', {username: response.username});
-              return of(new fromActionsUser.UserSaveSuccess({message}));
+              return of(new fromActionsUser.UserSaveSuccess({message, redirect: true}));
             }),
             catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
           );
@@ -68,7 +68,7 @@ export class UserEffects {
           return this.userService.addProfessional(payload.user).pipe(
             switchMap((response: any) => {
               const message = this.translate.instant('USER.ADD.PROFESSIONAL', {username: response.username});
-              return of(new fromActionsUser.UserSaveSuccess({message}));
+              return of(new fromActionsUser.UserSaveSuccess({message, redirect: true}));
             }),
             catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
           );
@@ -76,7 +76,7 @@ export class UserEffects {
           return this.userService.update(payload.user).pipe(
             switchMap((response: any) => {
               const message = this.translate.instant('USER.UPDATED.MESSAGE', {username: response.username});
-              return of(new fromActionsUser.UserSaveSuccess({message}));
+              return of(new fromActionsUser.UserSaveSuccess({message, redirect: true}));
             }),
             catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
           );
@@ -92,7 +92,7 @@ export class UserEffects {
         switchMap(() => {
           const role = this.translate.instant(`COMMON.ROLES.${payload.role}`);
           const message = this.translate.instant(`USER.ROLE.${payload.action}`, {role, username: payload.user.username});
-          return of(new fromActionsUser.UserSaveSuccess({message}));
+          return of(new fromActionsUser.UserSaveSuccess({message, redirect: true}));
         }),
         catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
       );
@@ -120,7 +120,7 @@ export class UserEffects {
       return this.userService.delete(payload).pipe(
         switchMap((response: any) => {
           const message = this.translate.instant('USER.DELETED.MESSAGE', {username: response.username});
-          return of(new fromActionsUser.UserSaveSuccess({message}));
+          return of(new fromActionsUser.UserSaveSuccess({message, redirect: true}));
         }),
         catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
       );
@@ -173,8 +173,10 @@ export class UserEffects {
   @Effect({dispatch: false})
   saveSuccess$ = this.actions$.pipe(
     ofType(fromActionsUser.UserActionTypes.USER_SAVE_SUCCESS),
-    tap(() => {
-      this.router.navigate(['users']);
+    tap((data: any) => {
+      if (data.payload.redirect) {
+        this.router.navigate(['users']);
+      }
     })
   );
 

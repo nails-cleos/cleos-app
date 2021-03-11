@@ -77,23 +77,6 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  clean(): void {
-    this.store.dispatch(
-      new fromActionsUser.Clean()
-    );
-  }
-
-  getUsers(): void {
-    const payload = {
-      active: this.sort.active,
-      direction: this.sort.direction,
-      page: this.paginator.pageIndex
-    };
-    this.store.dispatch(
-      new fromActionsUser.GetAll(payload)
-    );
-  }
-
   edit(user: IUser): void {
     this.store.dispatch(
       new fromActionsUser.UserSelected({user, profile: false})
@@ -148,6 +131,23 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   removeRole(user: IUserAll, role: string): void {
     this.store.dispatch(
       new fromActionsUser.SetRole({user, role, action: 'REMOVE'})
+    );
+  }
+
+  private clean(): void {
+    this.store.dispatch(
+      new fromActionsUser.Clean()
+    );
+  }
+
+  private getUsers(): void {
+    const payload = {
+      active: this.sort.active,
+      direction: this.sort.direction,
+      page: this.paginator.pageIndex
+    };
+    this.store.dispatch(
+      new fromActionsUser.GetAll(payload)
     );
   }
 

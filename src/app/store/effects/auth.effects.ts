@@ -78,7 +78,6 @@ export class LoginEffects {
       return this.authService.activateAccount(payload).pipe(
         switchMap(() => {
           const message = this.translate.instant('AUTH.ACTIVATE_ACCOUNT.MESSAGE');
-          console.log(message)
           return of(new SignUpSuccess({message}));
         }),
         catchError((err: HttpErrorResponse) => of(new SignUpFailure({error: err.error})))

@@ -2,20 +2,20 @@ import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/cor
 import { AvailabilityDate, IAvailability, IAvailabilityDate, IRoom, Room } from '../../interfaces/room';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
+import { IconName, IIcon } from '../room.component';
 import { ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../store/app.states';
-import * as fromActionsRoom from '../../store/room.actions';
 import { FieldChange } from '../../util/validators';
-import { IconName, IIcon } from '../room.component';
+import * as fromActionsRoom from '../../store/room.actions';
 
 @Component({
-  selector: 'app-room-detail',
-  templateUrl: './room-detail.component.html',
-  styleUrls: ['./room-detail.component.scss']
+  selector: 'app-room-me',
+  templateUrl: './room-me.component.html',
+  styleUrls: ['./room-me.component.scss']
 })
-export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
+export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() room: IRoom | undefined;
   form!: FormGroup;
   getState: Observable<any>;
@@ -81,6 +81,15 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     this.store.dispatch(new fromActionsRoom.RoomUpdate(room));
   }
 
+  ignore(day: string, step: number): void {
+    this.setIcon(day, IconName.event_busy);
+    const index = this.availabilities.findIndex((e) => e.day === day);
+    if (index > -1) {
+      this.availabilities.splice(index, 1);
+    }
+    this.step = step;
+  }
+
   addAvailability(availability: IAvailability, step: number): void {
     this.setIcon(availability.day, IconName.event_available);
     const index = this.availabilities.findIndex((e) => e.day === availability.day);
@@ -93,15 +102,6 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     this.step = step;
   }
 
-  ignore(day: string, step: number): void {
-    this.setIcon(day, IconName.event_busy);
-    const index = this.availabilities.findIndex((e) => e.day === day);
-    if (index > -1) {
-      this.availabilities.splice(index, 1);
-    }
-    this.step = step;
-  }
-
   private createForm(): void {
     this.form = this.formBuilder.group({
       name: this.name
@@ -110,9 +110,8 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private getRoom(): void {
     if (!this.room) {
-      const id = this.route.snapshot.paramMap.get('id');
       this.store.dispatch(
-        new fromActionsRoom.RoomFind(id)
+        new fromActionsRoom.GetMyRoom()
       );
     }
   }
@@ -146,10 +145,10 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       this.addAvailability(av, 0);
 
       const availability: IAvailabilityDate = new AvailabilityDate();
-      availability.startDate = RoomDetailComponent.createAv(av.start);
-      availability.endDate = RoomDetailComponent.createAv(av.end);
-      availability.startLunchDate = RoomDetailComponent.createAv(av.startLunch);
-      availability.endLunchDate = RoomDetailComponent.createAv(av.endLunch);
+      availability.startDate = RoomMeComponent.createAv(av.start);
+      availability.endDate = RoomMeComponent.createAv(av.end);
+      availability.startLunchDate = RoomMeComponent.createAv(av.startLunch);
+      availability.endLunchDate = RoomMeComponent.createAv(av.endLunch);
 
       switch (av.day) {
         case 'WEEK':

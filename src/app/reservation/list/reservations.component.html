@@ -1,4 +1,4 @@
-<div *ngIf="!isLoading; else box">
+<div *ngIf="!isLoading && data; else box">
   <div class="divider">
     <div [ngSwitch]="selectView">
       <div *ngSwitchCase="'WEEK'">

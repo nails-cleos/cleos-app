@@ -1,0 +1,106 @@
+<div class="flex-container" fxLayout="column">
+  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
+    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+      <form (ngSubmit)="update()" [formGroup]="form" novalidate>
+        <mat-card class="shipping-card">
+          <mat-card-header>
+            <mat-card-title>{{ 'ROOM.ME.TITLE' | translate }}</mat-card-title>
+            <mat-card-subtitle *ngIf="room; else skeleton">{{room.name}}</mat-card-subtitle>
+            <ng-template #skeleton>
+              <div class="ssc-line"></div>
+            </ng-template>
+          </mat-card-header>
+          <mat-card-content *ngIf="room; else boxSkeleton">
+            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+              <mat-form-field appearance="fill">
+                <mat-label>{{ 'ROOM.ME.NAME.FIELD' | translate }}</mat-label>
+                <label>
+                  <input [formControl]="name" autocomplete="name" matInput required>
+                </label>
+                <mat-error *ngIf="name.hasError('required')" [innerHTML]="'ROOM.ME.NAME.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['name']">
+                  {{errors['name']}}
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>{{ 'ROOM.ME.PROFESSIONAL.FIELD' | translate }}</mat-label>
+                <label>
+                  <input [value]="professionalName" disabled matInput type="text">
+                </label>
+              </mat-form-field>
+              <mat-label class="divider">{{ 'ROOM.ME.AVAILABILITY.FIELD' | translate }}</mat-label>
+              <mat-accordion class="headers-align" multi>
+                <mat-expansion-panel (opened)="setStep(0)" [expanded]="step === 0" hideToggle>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      {{ 'ROOM.ME.WEEK_TIME.FIELD' | translate }}
+                    </mat-panel-title>
+                    <mat-panel-description fxHide.lt-sm fxShow>
+                      {{ 'ROOM.ME.WEEK_TIME.DESCRIPTION' | translate }}
+                      <mat-icon>{{icons.week}}</mat-icon>
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <app-availability (availability)="addAvailability($event, 1)" (ignore)="ignore('WEEK', 1)"
+                                    [dates]="weekDate" [day]="'WEEK'"></app-availability>
+                  <mat-error *ngIf="errors['day0']">
+                    {{ 'ROOM.ME.WEEK_TIME.REQUIRED' | translate }}
+                  </mat-error>
+                </mat-expansion-panel>
+                <mat-expansion-panel (opened)="setStep(1)" [expanded]="step === 1" hideToggle>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      {{ 'ROOM.ME.SATURDAY_TIME.FIELD' | translate }}
+                    </mat-panel-title>
+                    <mat-panel-description fxHide.lt-sm fxShow>
+                      {{ 'ROOM.ME.SATURDAY_TIME.DESCRIPTION' | translate }}
+                      <mat-icon>{{icons.saturday}}</mat-icon>
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <app-availability (availability)="addAvailability($event, 2)" (ignore)="ignore('SATURDAY', 2)"
+                                    [dates]="satDate" [day]="'SATURDAY'"></app-availability>
+                  <mat-error *ngIf="errors['day1']">
+                    {{ 'ROOM.ME.SATURDAY_TIME.REQUIRED' | translate }}
+                  </mat-error>
+                </mat-expansion-panel>
+                <mat-expansion-panel (opened)="setStep(2)" [expanded]="step === 2" hideToggle>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      {{ 'ROOM.ME.SUNDAY_TIME.FIELD' | translate }}
+                    </mat-panel-title>
+                    <mat-panel-description fxHide.lt-sm fxShow>
+                      {{ 'ROOM.ME.SUNDAY_TIME.DESCRIPTION' | translate }}
+                      <mat-icon>{{icons.sunday}}</mat-icon>
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <app-availability (availability)="addAvailability($event, 3)" (ignore)="ignore('SUNDAY', 3)"
+                                    [dates]="sunDate" [day]="'SUNDAY'"></app-availability>
+                  <mat-error *ngIf="errors['day2']">
+                    {{ 'ROOM.ME.SUNDAY_TIME.REQUIRED' | translate }}
+                  </mat-error>
+                </mat-expansion-panel>
+              </mat-accordion>
+              <mat-error *ngIf="errors['availability']" [innerHTML]="'ROOM.ME.AVAILABILITY.REQUIRED' | translate"
+                         class="divider"></mat-error>
+            </div>
+          </mat-card-content>
+          <ng-template #boxSkeleton>
+            <div class="ssc-hr"></div>
+            <div class="ssc-square mb"></div>
+            <div class="ssc-hr"></div>
+          </ng-template>
+          <mat-card-actions *ngIf="room; else buttonSkeleton">
+            <div fxFlex></div>
+            <button [disabled]="form.invalid" color="primary" mat-raised-button
+                    type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
+            <button color="accent" mat-raised-button routerLink="/rooms"
+                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+          </mat-card-actions>
+          <ng-template #buttonSkeleton>
+            <div class="ssc-head-line"></div>
+          </ng-template>
+        </mat-card>
+      </form>
+    </div>
+  </div>
+</div>

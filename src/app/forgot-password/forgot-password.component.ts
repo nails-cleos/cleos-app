@@ -21,21 +21,21 @@ export class ForgotPasswordComponent implements OnInit {
     this.createForm();
   }
 
-  clean(): void {
+  forgotPassword(): void {
+    this.store.dispatch(
+      new fromActionsLogin.ForgotPassword(this.form.get('username')?.value.trim())
+    );
+  }
+
+  private clean(): void {
     this.store.dispatch(
       new fromActionsLogin.Clean()
     );
   }
 
-  createForm(): void {
+  private createForm(): void {
     this.form = this.formBuilder.group({
       username: ['', Validators.required]
     });
-  }
-
-  forgotPassword(): void {
-    this.store.dispatch(
-      new fromActionsLogin.ForgotPassword(this.form.get('username')?.value.trim())
-    );
   }
 }

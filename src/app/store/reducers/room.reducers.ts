@@ -48,6 +48,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
+    case RoomActionTypes.GET_MY_ROOM:
     case RoomActionTypes.ROOM_FIND: {
       return {
         ...state,
@@ -83,7 +84,7 @@ export function reducer(state = initialState, action: All): State {
     case RoomActionTypes.ROOM_SELECTED: {
       return {
         ...state,
-        selected: action.payload,
+        selected: action.payload.room,
         errorMessage: null,
         subErrors: null,
         message: null,

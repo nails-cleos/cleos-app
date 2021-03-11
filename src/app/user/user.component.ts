@@ -1,23 +1,24 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../store/app.states';
 import * as fromActionsUser from '../store/user.actions';
 import { IUser, User } from '../interfaces/user';
-import { Flags, IFlag } from '../util/flags';
+import { Maps, IFlag } from '../util/maps';
 
 @Component({
   selector: 'app-user',
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.scss']
 })
-export class UserComponent implements OnInit {
+export class UserComponent implements OnInit, OnDestroy {
 
   hide = false;
   form!: FormGroup;
+  subscription: Subscription | undefined;
   getState: Observable<any>;
   isLoading: boolean | undefined;
   errors: any = [];
@@ -41,11 +42,15 @@ export class UserComponent implements OnInit {
     Validators.required
   ]);
 
-  flags: IFlag[] = Flags();
+  flags: IFlag[] = Maps();
 
   constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
               private formBuilder: FormBuilder, private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectUserState);
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 
   ngOnInit(): void {
@@ -53,38 +58,6 @@ export class UserComponent implements OnInit {
     this.clean();
     this.subscribe();
     this.cdRef.detectChanges();
-  }
-
-  createForm(): void {
-    this.form = this.formBuilder.group({
-      role: this.role,
-      username: this.username,
-      email: this.email,
-      firstName: this.firstName,
-      lastName: this.lastName,
-      lang: this.lang
-    });
-  }
-
-  clean(): void {
-    this.store.dispatch(
-      new fromActionsUser.Clean()
-    );
-  }
-
-  subscribe(): void {
-    this.getState.subscribe(state => {
-      if (state.subErrors) {
-        state.subErrors.forEach((value: any) => {
-          this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({incorrect: true});
-        });
-      } else if (state.errorMessage) {
-        this.snackBar.open(state.errorMessage, 'OK', {
-          duration: 5000
-        });
-      }
-    });
   }
 
   create(): void {
@@ -102,5 +75,37 @@ export class UserComponent implements OnInit {
     this.store.dispatch(
       new fromActionsUser.SaveUser({user, role: this.role.value})
     );
+  }
+
+  private createForm(): void {
+    this.form = this.formBuilder.group({
+      role: this.role,
+      username: this.username,
+      email: this.email,
+      firstName: this.firstName,
+      lastName: this.lastName,
+      lang: this.lang
+    });
+  }
+
+  private clean(): void {
+    this.store.dispatch(
+      new fromActionsUser.Clean()
+    );
+  }
+
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe(state => {
+      if (state.subErrors) {
+        state.subErrors.forEach((value: any) => {
+          this.errors[value.field] = value.message;
+          this.form.controls[value.field].setErrors({incorrect: true});
+        });
+      } else if (state.errorMessage) {
+        this.snackBar.open(state.errorMessage, 'OK', {
+          duration: 5000
+        });
+      }
+    });
   }
 }

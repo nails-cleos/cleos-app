@@ -21,7 +21,6 @@ enum ChartTypeEnum {
   LAST_MONTH_RESERVATION
 }
 
-
 @Component({
   selector: 'app-card',
   templateUrl: './card.component.html',
@@ -152,7 +151,6 @@ export class CardComponent implements OnInit {
 })
 export class CardChartComponent {
   constructor(
-    public dialogRef: MatDialogRef<CardChartComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any) {
   }
 }

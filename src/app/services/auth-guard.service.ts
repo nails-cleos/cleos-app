@@ -23,7 +23,7 @@ export class AuthGuardService implements CanActivate {
     });
   }
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+  public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
     if (this.currentUser) {
       if (this.hasRole(route, this.currentUser)) {
         return true;

@@ -77,7 +77,7 @@ export class DashComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      if (state.data) {
+      if (state.data && Array.isArray(state.data) && !state.data[0].reservations) {
         this.state = state;
         const now = new Date(new Date().setHours(0, 0));
         const filterDate = new Date(now.setMonth(now.getMonth() - 1));

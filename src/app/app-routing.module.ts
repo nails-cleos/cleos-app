@@ -24,6 +24,7 @@ import { ReservationsComponent } from './reservation/list/reservations.component
 import { ReservationComponent } from './reservation/reservation.component';
 import { ReservationDetailComponent } from './reservation/detail/reservation-detail.component';
 import { NotificationsComponent } from './notification/list/notifications.component';
+import { RoomMeComponent } from './room/me/room-me.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/dashboard', pathMatch: 'full', resolve: {model: TranslationLoaderResolver}},
@@ -90,6 +91,11 @@ const routes: Routes = [
   {
     path: 'room/:id', component: RoomDetailComponent, canActivate: [AuthGuardService], data: {
       roles: [Role.Admin]
+    }
+  },
+  {
+    path: 'me-room', component: RoomMeComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.Professional]
     }
   },
   {

@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 
 import * as Stomp from 'stompjs';
 import * as SockJS from 'sockjs-client';
@@ -9,9 +9,10 @@ import { environment } from '../../environments/environment';
 })
 export class WebsocketService {
 
-  constructor() { }
+  constructor() {
+  }
 
-  connect(): any {
+  public connect(): any {
     const socket = new SockJS(environment.wsEndpoint);
 
     return Stomp.over(socket);

@@ -1,8 +1,8 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { Pagination } from '../../interfaces/pagination';
 import { IProduct, PAGE_SIZE } from '../../interfaces/product';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { TranslateService } from '@ngx-translate/core';
@@ -19,10 +19,11 @@ import { ConvertDuration } from '../../util/dates';
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.scss']
 })
-export class ProductsComponent implements OnInit, AfterViewInit {
+export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   displayedColumns: string[] = ['position', 'name', 'description', 'price', 'duration', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IProduct>>();
+  subscription: Subscription | undefined;
   getState: Observable<any>;
 
   resultsLength = 0;
@@ -54,8 +55,34 @@ export class ProductsComponent implements OnInit, AfterViewInit {
     this.clean();
   }
 
-  subscribe(): void {
-    this.getState.subscribe((stateValue) => {
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+  }
+
+  edit(product: IProduct): void {
+    this.store.dispatch(
+      new fromActionsProduct.ProductSelected(product)
+    );
+  }
+
+  delete(product: IProduct): void {
+    const title = this.translate.instant('PRODUCT.DELETED.TITLE');
+    const content = this.translate.instant('PRODUCT.DELETED.CONTENT', {name: product.name});
+    const dialogRef = this.dialog.open(DialogComponent, {
+      data: {title, content, value: product}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.store.dispatch(
+          new fromActionsProduct.DeleteProduct(result.id)
+        );
+      }
+    });
+  }
+
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe((stateValue) => {
       if (stateValue.errorMessage || stateValue.message) {
         const snackBarRef = this.snackBar.open(stateValue.errorMessage || stateValue.message, 'OK', {
           duration: 5000
@@ -80,13 +107,13 @@ export class ProductsComponent implements OnInit, AfterViewInit {
     });
   }
 
-  clean(): void {
+  private clean(): void {
     this.store.dispatch(
       new fromActionsProduct.Clean()
     );
   }
 
-  getProducts(): void {
+  private getProducts(): void {
     const payload = {
       active: this.sort.active,
       direction: this.sort.direction,
@@ -95,27 +122,5 @@ export class ProductsComponent implements OnInit, AfterViewInit {
     this.store.dispatch(
       new fromActionsProduct.GetAll(payload)
     );
-  }
-
-  edit(product: IProduct): void {
-    this.store.dispatch(
-      new fromActionsProduct.ProductSelected(product)
-    );
-  }
-
-  delete(product: IProduct): void {
-    const title = this.translate.instant('PRODUCT.DELETED.TITLE');
-    const content = this.translate.instant('PRODUCT.DELETED.CONTENT', {name: product.name});
-    const dialogRef = this.dialog.open(DialogComponent, {
-      data: {title, content, value: product}
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.store.dispatch(
-          new fromActionsProduct.DeleteProduct(result.id)
-        );
-      }
-    });
   }
 }

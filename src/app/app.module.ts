@@ -87,6 +87,7 @@ import { ReservationTableComponent } from './reservation/table/reservation-table
 import { QuantityProductReservationsChartComponent } from './charts/quantity-product-reservations-chart/quantity-product-reservations-chart.component';
 import { LastMonthReservationsChartComponent } from './charts/last-month-reservations-chart/last-month-reservations-chart.component';
 import { NotificationsComponent } from './notification/list/notifications.component';
+import { RoomMeComponent } from './room/me/room-me.component';
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -155,7 +156,8 @@ registerLocaleData(localeEs, 'es');
     QuantityProductReservationsChartComponent,
     LastMonthReservationsChartComponent,
     CardChartComponent,
-    NotificationsComponent
+    NotificationsComponent,
+    RoomMeComponent
   ],
   imports: [
     BrowserModule,

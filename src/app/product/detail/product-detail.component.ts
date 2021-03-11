@@ -1,6 +1,6 @@
-import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
@@ -15,10 +15,11 @@ import { ConvertDuration } from '../../util/dates';
   templateUrl: './product-detail.component.html',
   styleUrls: ['./product-detail.component.scss']
 })
-export class ProductDetailComponent implements OnInit, AfterViewInit {
+export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Input() product: IProduct | undefined;
   form!: FormGroup;
+  subscription: Subscription | undefined;
   getState: Observable<any>;
   errors: any = [];
 
@@ -42,11 +43,33 @@ export class ProductDetailComponent implements OnInit, AfterViewInit {
     this.subscribe();
   }
 
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+  }
+
   ngAfterViewInit(): void {
     this.getProduct();
   }
 
-  createForm(): void {
+  update(): void {
+    if (this.form.invalid) {
+      return;
+    }
+    const product: IProduct = new Product();
+    product.id = this.product?.id;
+    product.name = FieldChange(this.name, this.product?.name);
+    product.description = FieldChange(this.form.value?.description, this.product?.description);
+    product.price = FieldChange(this.price, this.product?.price);
+
+    const durationTime = this.durationDate.value;
+    const durationHours = `0${durationTime.getHours()}`.slice(-2);
+    const durationMinutes = `0${durationTime.getMinutes()}`.slice(-2);
+    product.duration = `${durationHours}:${durationMinutes}`;
+
+    this.store.dispatch(new fromActionsProduct.ProductUpdate(product));
+  }
+
+  private createForm(): void {
     this.form = this.formBuilder.group({
       name: this.name,
       description: new FormControl(),
@@ -55,8 +78,8 @@ export class ProductDetailComponent implements OnInit, AfterViewInit {
     });
   }
 
-  subscribe(): void {
-    this.getState.subscribe(state => {
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
         this.product = {
           id: state.selected.id,
@@ -82,30 +105,12 @@ export class ProductDetailComponent implements OnInit, AfterViewInit {
     });
   }
 
-  getProduct(): void {
+  private getProduct(): void {
     if (!this.product) {
       const id = this.route.snapshot.paramMap.get('id');
       this.store.dispatch(
         new fromActionsProduct.ProductFind(id)
       );
     }
-  }
-
-  update(): void {
-    if (this.form.invalid) {
-      return;
-    }
-    const product: IProduct = new Product();
-    product.id = this.product?.id;
-    product.name = FieldChange(this.name, this.product?.name);
-    product.description = FieldChange(this.form.value?.description, this.product?.description);
-    product.price = FieldChange(this.price, this.product?.price);
-
-    const durationTime = this.durationDate.value;
-    const durationHours = `0${durationTime.getHours()}`.slice(-2);
-    const durationMinutes = `0${durationTime.getMinutes()}`.slice(-2);
-    product.duration = `${durationHours}:${durationMinutes}`;
-
-    this.store.dispatch(new fromActionsProduct.ProductUpdate(product));
   }
 }

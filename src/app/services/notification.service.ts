@@ -13,11 +13,11 @@ export class NotificationService {
   constructor(private http: HttpClient) {
   }
 
-  findNotifications(): Observable<INotification | undefined> {
+  public findNotifications(): Observable<INotification | undefined> {
     return this.http.get<INotification>(this.url);
   }
 
-  getAll(sort: string, direction: string, page: number): Observable<INotification[]> {
+  public getAll(sort: string, direction: string, page: number): Observable<INotification[]> {
     let params = new HttpParams().set('page', String(page)).set('size', String(PAGE_SIZE));
     if (sort) {
       params = params.append('sort', sort);
@@ -29,7 +29,7 @@ export class NotificationService {
     return this.http.get<INotification[]>(`${this.url}/pages`, {params});
   }
 
-  readNotification(notificationId: string): Observable<INotification | undefined> {
+  public readNotification(notificationId: string): Observable<INotification | undefined> {
     const url = `${this.url}/${notificationId}`;
     return this.http.post<INotification>(url, null);
   }

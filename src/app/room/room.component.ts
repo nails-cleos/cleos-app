@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Observable, Subscription } from 'rxjs';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
@@ -28,8 +28,9 @@ export interface IIcon {
   templateUrl: './room.component.html',
   styleUrls: ['./room.component.scss']
 })
-export class RoomComponent implements OnInit {
+export class RoomComponent implements OnInit, OnDestroy {
   getState: Observable<any>;
+  subscription: Subscription | undefined;
   form!: FormGroup;
   room: IRoom = new Room();
   errors: any = [];
@@ -64,48 +65,8 @@ export class RoomComponent implements OnInit {
     this.getProfessionals();
   }
 
-  createForm(): void {
-    this.form = this.formBuilder.group({
-      name: this.name,
-      professional: this.professional
-    });
-    this.filteredOptions = this.professional.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => {
-        return name ? this._filter(name) : this.professionals ? this.professionals.slice() : this.professionals;
-      })
-    );
-  }
-
-  clean(): void {
-    this.store.dispatch(
-      new fromActionsRoom.Clean()
-    );
-  }
-
-  subscribe(): void {
-    this.getState.subscribe(state => {
-      if (state.professionals) {
-        this.professionals = state.professionals;
-      }
-      if (state.subErrors) {
-        state.subErrors.forEach((value: any) => {
-          this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({incorrect: true});
-        });
-      } else if (state.errorMessage) {
-        this.snackBar.open(state.errorMessage, 'OK', {
-          duration: 5000
-        });
-      }
-    });
-  }
-
-  getProfessionals(): void {
-    this.store.dispatch(
-      new fromActionsRoom.GetAllProfessional()
-    );
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 
   setStep(index: number): void {
@@ -150,6 +111,50 @@ export class RoomComponent implements OnInit {
       this.room.availabilities.splice(index, 1);
     }
     this.step = step;
+  }
+
+  private createForm(): void {
+    this.form = this.formBuilder.group({
+      name: this.name,
+      professional: this.professional
+    });
+    this.filteredOptions = this.professional.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value.name),
+      map(name => {
+        return name ? this._filter(name) : this.professionals ? this.professionals.slice() : this.professionals;
+      })
+    );
+  }
+
+  private clean(): void {
+    this.store.dispatch(
+      new fromActionsRoom.Clean()
+    );
+  }
+
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe(state => {
+      if (state.professionals) {
+        this.professionals = state.professionals;
+      }
+      if (state.subErrors) {
+        state.subErrors.forEach((value: any) => {
+          this.errors[value.field] = value.message;
+          this.form.controls[value.field].setErrors({incorrect: true});
+        });
+      } else if (state.errorMessage) {
+        this.snackBar.open(state.errorMessage, 'OK', {
+          duration: 5000
+        });
+      }
+    });
+  }
+
+  private getProfessionals(): void {
+    this.store.dispatch(
+      new fromActionsRoom.GetAllProfessional()
+    );
   }
 
   private setIcon(day: string, icon: IconName): void {
