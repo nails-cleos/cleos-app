@@ -1,25 +1,26 @@
-import { AfterViewInit, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { IUser, User } from '../../interfaces/user';
 import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
 import * as fromActionsUser from '../../store/user.actions';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { FieldChange, ValueChange } from '../../util/validators';
-import { Flags, IFlag } from '../../util/flags';
+import { Maps, IFlag } from '../../util/maps';
 
 @Component({
   selector: 'app-user-detail',
   templateUrl: './user-detail.component.html',
   styleUrls: ['./user-detail.component.scss']
 })
-export class UserDetailComponent implements OnInit, AfterViewInit {
+export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Input() user: IUser | undefined;
   form!: FormGroup;
   getState: Observable<any>;
+  subscription: Subscription | undefined;
   username: FormControl = new FormControl('', [
     Validators.required
   ]);
@@ -36,7 +37,7 @@ export class UserDetailComponent implements OnInit, AfterViewInit {
     Validators.required
   ]);
 
-  flags: IFlag[] = Flags();
+  flags: IFlag[] = Maps();
 
   constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
               private formBuilder: FormBuilder, private cdRef: ChangeDetectorRef) {
@@ -53,46 +54,8 @@ export class UserDetailComponent implements OnInit, AfterViewInit {
     this.getUser();
   }
 
-  createForm(): void {
-    this.form = this.formBuilder.group({
-      username: this.username,
-      email: this.email,
-      firstName: this.firstName,
-      lastName: this.lastName,
-      langValue: this.langValue
-    });
-  }
-
-  clean(): void {
-    this.store.dispatch(
-      new fromActionsUser.Clean()
-    );
-  }
-
-  subscribe(): void {
-    this.getState.subscribe(state => {
-      if (state.selected) {
-        this.user = state.selected;
-        this.form.patchValue(state.selected);
-        const langValue = this.flags.filter((lang: any) => lang.value === state.selected.lang)[0];
-        this.langValue.setValue(langValue);
-        this.cdRef.detectChanges();
-      }
-      if (state.errorMessage) {
-        this.snackBar.open(state.errorMessage, 'OK', {
-          duration: 5000
-        });
-      }
-    });
-  }
-
-  getUser(): void {
-    if (!this.user) {
-      const id = this.route.snapshot.paramMap.get('id');
-      this.store.dispatch(
-        new fromActionsUser.FindUser(id)
-      );
-    }
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 
   update(): void {
@@ -109,5 +72,47 @@ export class UserDetailComponent implements OnInit, AfterViewInit {
     user.lang = ValueChange(this.langValue.value.value, this.user?.lang);
 
     this.store.dispatch(new fromActionsUser.SaveUser({user}));
+  }
+
+  private createForm(): void {
+    this.form = this.formBuilder.group({
+      username: this.username,
+      email: this.email,
+      firstName: this.firstName,
+      lastName: this.lastName,
+      langValue: this.langValue
+    });
+  }
+
+  private clean(): void {
+    this.store.dispatch(
+      new fromActionsUser.Clean()
+    );
+  }
+
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe(state => {
+      if (state.selected) {
+        this.user = state.selected;
+        this.form.patchValue(state.selected);
+        const langValue = this.flags.filter((lang: any) => lang.value === state.selected.lang)[0];
+        this.langValue.setValue(langValue);
+        this.cdRef.detectChanges();
+      }
+      if (state.errorMessage) {
+        this.snackBar.open(state.errorMessage, 'OK', {
+          duration: 5000
+        });
+      }
+    });
+  }
+
+  private getUser(): void {
+    if (!this.user) {
+      const id = this.route.snapshot.paramMap.get('id');
+      this.store.dispatch(
+        new fromActionsUser.FindUser(id)
+      );
+    }
   }
 }

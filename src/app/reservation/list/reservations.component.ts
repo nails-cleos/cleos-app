@@ -13,6 +13,7 @@ import { FillNotAvailable, NewEvent } from '../../util/event';
 import { Router } from '@angular/router';
 import { CalendarEvent, CalendarView } from 'angular-calendar';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { FindStateColor, IState, StateColor } from '../../util/maps';
 
 @Component({
   selector: 'app-reservations',
@@ -38,6 +39,8 @@ export class ReservationsComponent implements OnInit, OnDestroy {
   days = 0;
   smallScreen: boolean | undefined;
   locale: string;
+
+  colors: IState[] = StateColor();
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
               private store: Store<AppState>, private router: Router, private breakpointObserver: BreakpointObserver) {
@@ -80,49 +83,6 @@ export class ReservationsComponent implements OnInit, OnDestroy {
     this.router.navigate(['reservation', event.id]);
   }
 
-  addReservations(rr: IRoomReservation): void {
-    const reservations: IReservationAll[] = rr.reservations;
-    this.calendar.set(rr.room.id, new Calendar(rr.room, []));
-    reservations.forEach(it => {
-      if (it.product.duration) {
-        const start = new Date(it.start);
-        const duration = ConvertDuration(it.product.duration);
-        const end = new Date(new Date(start).setHours(
-          start.getHours() + duration.hour, start.getMinutes() + duration.minute)
-        );
-        const detail = this.translate.instant('RESERVATION.ADD.EVENT.DETAIL', {
-          customerName: `${it.customer.firstName} ${it.customer.lastName}`,
-          productName: it.product.name,
-          duration: `${duration.hour}:${duration.minute}`
-        });
-
-        let color;
-        switch (it.state) {
-          case 'CREATED':
-            color = '#ffecb3';
-            break;
-          case 'COMPLETED':
-            color = '#ede7f6';
-            break;
-          case 'APPROVED':
-          default:
-            color = '#dcedc8';
-            break;
-        }
-
-        const event = NewEvent(detail, color, start, end, '#000', it.id);
-        const calendar = this.calendar.get(rr.room.id);
-        let events;
-        if (calendar) {
-          events = [...calendar.events, event];
-        } else {
-          events = [event];
-        }
-        this.calendar.set(rr.room.id, new Calendar(it.room, events));
-      }
-    });
-  }
-
   segmentClick(date: Date, room?: IRoom): void {
     if (date && room) {
       const data = {date, room};
@@ -142,11 +102,41 @@ export class ReservationsComponent implements OnInit, OnDestroy {
     this.days = this.smallScreen ? this.days + 1 : this.days + 7;
   }
 
+  private addReservations(rr: IRoomReservation): void {
+    const reservations: IReservationAll[] = rr.reservations;
+    this.calendar.set(rr.room.id, new Calendar(rr.room, []));
+    reservations.forEach(it => {
+      if (it.product.duration) {
+        const start = new Date(it.start);
+        const duration = ConvertDuration(it.product.duration);
+        const end = new Date(new Date(start).setHours(
+          start.getHours() + duration.hour, start.getMinutes() + duration.minute)
+        );
+        const detail = this.translate.instant('RESERVATION.ADD.EVENT.DETAIL', {
+          customerName: `${it.customer.firstName} ${it.customer.lastName}`,
+          productName: it.product.name,
+          duration: `${duration.hour}:${duration.minute}`
+        });
+
+        const color = FindStateColor(it.state);
+        const event = NewEvent(detail, color, start, end, '#000', it.id);
+        const calendar = this.calendar.get(rr.room.id);
+        let events;
+        if (calendar) {
+          events = [...calendar.events, event];
+        } else {
+          events = [event];
+        }
+        this.calendar.set(rr.room.id, new Calendar(it.room, events));
+      }
+    });
+  }
+
   private subscribe(): void {
     this.subscription = this.getState.subscribe((stateValue) => {
-      this.data = stateValue.data;
-      if (this.data && Array.isArray(this.data) && this.data[0].room && this.data[0].reservations) {
-        this.data.forEach(value => this.addReservations(value));
+      if (stateValue.data && Array.isArray(stateValue.data) && stateValue.data[0].room && stateValue.data[0].reservations) {
+        this.data = stateValue.data;
+        stateValue.data.forEach((value: IRoomReservation) => this.addReservations(value));
         this.calendar.forEach(calendar => {
           const {week, saturday, sunday} = ReservationsComponent.getAvailability(calendar.room);
           const {min, max} = GetStartEndDay(week, saturday, sunday);

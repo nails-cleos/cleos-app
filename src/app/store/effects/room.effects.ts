@@ -26,6 +26,19 @@ export class RoomEffects {
   );
 
   @Effect()
+  getMyRoom$ = this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.GET_MY_ROOM)).pipe(
+    map((action: any) => action.payload),
+    switchMap(() => {
+      return this.roomService.getMyRoom().pipe(
+        switchMap((room: any) => {
+          return of(new fromActionsRoom.RoomSelected({room}));
+        }),
+        catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
+      );
+    })
+  );
+
+  @Effect()
   getAllProfessional$ = this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.GET_ALL_PROFESSIONAL)).pipe(
     map((action: any) => action.payload),
     switchMap(() => {
@@ -44,7 +57,7 @@ export class RoomEffects {
     switchMap((payload: any) => {
       return this.roomService.getById(payload).pipe(
         switchMap((room: any) => {
-          return of(new fromActionsRoom.RoomSelected(room));
+          return of(new fromActionsRoom.RoomSelected({room, redirect: true}));
         }),
         catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
       );
@@ -97,7 +110,9 @@ export class RoomEffects {
   selectedData$ = this.actions$.pipe(
     ofType(fromActionsRoom.RoomActionTypes.ROOM_SELECTED),
     tap((data: any) => {
-      this.router.navigate(['room', data.payload.id]);
+      if (data.payload.redirect) {
+        this.router.navigate(['room', data.payload.room.id]);
+      }
     })
   );
 

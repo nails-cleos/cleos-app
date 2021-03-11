@@ -64,7 +64,6 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
 
     this.getReservations();
     this.cdRef.detectChanges();
-    console.log('TRANSLATE', this.translate.currentLang);
   }
 
   ngOnDestroy(): void {

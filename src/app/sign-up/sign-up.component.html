@@ -95,6 +95,20 @@
         {{errors['lastName']}}
       </mat-error>
     </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>{{ 'USER.ADD.LANG.FIELD' | translate }}</mat-label>
+      <span *ngIf="select.value" [class]="'flag-icon  flag-icon-squared flag-icon-' + select.value.icon" matPrefix
+            style="margin-right: 8px;"></span>
+      <mat-select #select [formControl]="lang" required>
+
+        <mat-option *ngFor="let lang of flags" [value]="lang">
+          <span [class]="'flag-icon  flag-icon-squared flag-icon-' + lang.icon"></span>
+          {{ 'COMMON.LANG.' + lang.text | translate }}
+        </mat-option>
+      </mat-select>
+      <mat-error [innerHTML]="'USER.ADD.LANG.REQUIRED' | translate">
+      </mat-error>
+    </mat-form-field>
   </div>
   <div fxLayout="row">
     <div fxFlex></div>

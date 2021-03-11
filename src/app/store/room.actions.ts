@@ -2,6 +2,7 @@ import { Action } from '@ngrx/store';
 
 export enum RoomActionTypes {
   GET_ALL = '[Room] Get all',
+  GET_MY_ROOM = '[Room] Get my room',
   GET_ALL_PROFESSIONAL = '[Room] Get all professional',
   ROOM_SUCCESS = '[Room] Success',
   ROOM_SAVE = '[Room] Save',
@@ -19,6 +20,10 @@ export class GetAll implements Action {
 
   constructor(public payload: any) {
   }
+}
+
+export class GetMyRoom implements Action {
+  readonly type = RoomActionTypes.GET_MY_ROOM;
 }
 
 export class GetAllProfessional implements Action {
@@ -87,6 +92,7 @@ export class Clean implements Action {
 
 export type All =
   | GetAll
+  | GetMyRoom
   | GetAllProfessional
   | RoomSave
   | RoomUpdate

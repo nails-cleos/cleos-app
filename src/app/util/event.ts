@@ -1,15 +1,22 @@
 import { IAvailability } from '../interfaces/room';
 import { CalendarEvent } from 'angular-calendar';
+import { FindStateColor } from './maps';
 
 export function FillNotAvailable(unavailable: string, lunch: string, notWorking: string, daysInWeek: number, plusHour: number,
-                                 selectDate: Date, sunday: IAvailability, saturday: IAvailability, week: IAvailability): CalendarEvent[] {
+                                 selectDate: Date, sunday: IAvailability, saturday: IAvailability, week: IAvailability,
+                                 addToday: boolean = false): CalendarEvent[] {
   let events: CalendarEvent[] = [];
   const date = new Date(selectDate.getFullYear(), selectDate.getMonth(), selectDate.getDate());
   const now = new Date();
   for (let i = 0; i < daysInWeek; i++) {
     const day = date.getDay();
+    if (addToday && date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate()) {
+      const event = NewEvent(notWorking, FindStateColor('DEFAULT'), new Date(new Date(now).setHours(0, 0)),
+        new Date(new Date(now).setHours(now.getHours() + plusHour, now.getMinutes())));
+      events = [...events, event];
+    }
     if (date < new Date(now.getFullYear(), now.getMonth(), now.getDate())) {
-      const event = NewEvent(notWorking, '#ffebee', new Date(new Date(date).setHours(0, 0)),
+      const event = NewEvent(notWorking, FindStateColor('DEFAULT'), new Date(new Date(date).setHours(0, 0)),
         new Date(new Date(date).setHours(23, 59)));
       events = [...events, event];
     } else if (day === 0) {
@@ -29,7 +36,7 @@ function createEvent(it: IAvailability, date: Date, notWorking: string, unavaila
                      plusHour: number): CalendarEvent[] {
   let events: CalendarEvent[] = [];
   if (!it) {
-    const event = NewEvent(notWorking, '#ffebee', new Date(new Date(date).setHours(0, 0)),
+    const event = NewEvent(notWorking, FindStateColor('DEFAULT'), new Date(new Date(date).setHours(0, 0)),
       new Date(new Date(date).setHours(23, 59)));
     events = [...events, event];
   } else {
@@ -53,7 +60,7 @@ function createEvent(it: IAvailability, date: Date, notWorking: string, unavaila
         }
       }
       if ((startHour || startHour === 0) && (startMinute || startMinute === 0)) {
-        const eventBefore = NewEvent(notWorking, '#ffebee', new Date(date.setHours(startHour, startMinute)),
+        const eventBefore = NewEvent(notWorking, FindStateColor('DEFAULT'), new Date(date.setHours(startHour, startMinute)),
           new Date(date.setHours(endHour, endMinute)));
         events = [...events, eventBefore];
       }
@@ -69,7 +76,7 @@ function createEvent(it: IAvailability, date: Date, notWorking: string, unavaila
         startHour = hour;
         startMinute = minute;
       }
-      const eventAfter = NewEvent(notWorking, '#ffebee', new Date(date.setHours(startHour, startMinute)),
+      const eventAfter = NewEvent(notWorking, FindStateColor('DEFAULT'), new Date(date.setHours(startHour, startMinute)),
         new Date(date.setHours(23, 59)));
       events = [...events, eventAfter];
     }
@@ -106,11 +113,11 @@ function createLunchEvent(it: IAvailability, date: Date, unavailable: string, lu
       }
       const start = new Date(new Date().setHours(0, 0));
       const end = new Date(new Date().setHours(hour, minute));
-      return NewEvent(unavailable, '#ffebee', start, end);
+      return NewEvent(unavailable, FindStateColor('DEFAULT'), start, end);
     } else {
       const start = new Date(date.setHours(lunchStartHour, lunchStartMinute));
       const end = new Date(date.setHours(lunchEndHour, lunchEndMinute));
-      return NewEvent(lunch, '#ffebee', start, end);
+      return NewEvent(lunch, FindStateColor('DEFAULT'), start, end);
     }
   } else if (date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate()) {
     if (hour > 23) {
@@ -121,7 +128,7 @@ function createLunchEvent(it: IAvailability, date: Date, unavailable: string, lu
     }
     const start = new Date(date.setHours(0, 0));
     const end = new Date(date.setHours(hour, minute));
-    return NewEvent(lunch, '#ffebee', start, end);
+    return NewEvent(lunch, FindStateColor('DEFAULT'), start, end);
   }
 
   return undefined;
@@ -142,7 +149,7 @@ function lunchEvent(hour: number, lunchStartHour: number, minute: number, lunchS
   if ((lunchHour || lunchHour === 0) && (lunchMinute || lunchMinute === 0)) {
     const start = new Date(date.setHours(lunchHour, lunchMinute));
     const end = new Date(date.setHours(lunchEndHour, lunchEndMinute));
-    return NewEvent(lunch, '#ffebee', start, end);
+    return NewEvent(lunch, FindStateColor('DEFAULT'), start, end);
   }
 
   return undefined;

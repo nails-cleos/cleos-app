@@ -57,8 +57,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy, AfterViewI
     const index = userLang.indexOf('-');
     this.locale = index === -1 ? userLang : userLang.substr(0, index);
 
-    console.log(this.translate.currentLang)
-    console.log(this.locale)
     const token = localStorage.getItem('auth');
     if (token) {
       const user: IUserAll = JSON.parse(token).user;

@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import * as fromActionsProduct from '../store/product.actions';
 import { AppState, selectProductState } from '../store/app.states';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { IProduct, Product } from '../interfaces/product';
 
 @Component({
@@ -12,8 +12,9 @@ import { IProduct, Product } from '../interfaces/product';
   templateUrl: './product.component.html',
   styleUrls: ['./product.component.scss']
 })
-export class ProductComponent implements OnInit {
+export class ProductComponent implements OnInit, OnDestroy {
   getState: Observable<any>;
+  subscription: Subscription | undefined;
   form!: FormGroup;
   errors: any = [];
 
@@ -40,34 +41,8 @@ export class ProductComponent implements OnInit {
     this.subscribe();
   }
 
-  createForm(): void {
-    this.form = this.formBuilder.group({
-      name: this.name,
-      description: new FormControl(),
-      price: this.price,
-      duration: this.duration
-    });
-  }
-
-  clean(): void {
-    this.store.dispatch(
-      new fromActionsProduct.Clean()
-    );
-  }
-
-  subscribe(): void {
-    this.getState.subscribe(state => {
-      if (state.subErrors) {
-        state.subErrors.forEach((value: any) => {
-          this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({incorrect: true});
-        });
-      } else if (state.errorMessage) {
-        this.snackBar.open(state.errorMessage, 'OK', {
-          duration: 5000
-        });
-      }
-    });
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 
   create(): void {
@@ -88,5 +63,35 @@ export class ProductComponent implements OnInit {
     this.store.dispatch(
       new fromActionsProduct.ProductSave(product)
     );
+  }
+
+  private createForm(): void {
+    this.form = this.formBuilder.group({
+      name: this.name,
+      description: new FormControl(),
+      price: this.price,
+      duration: this.duration
+    });
+  }
+
+  private clean(): void {
+    this.store.dispatch(
+      new fromActionsProduct.Clean()
+    );
+  }
+
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe(state => {
+      if (state.subErrors) {
+        state.subErrors.forEach((value: any) => {
+          this.errors[value.field] = value.message;
+          this.form.controls[value.field].setErrors({incorrect: true});
+        });
+      } else if (state.errorMessage) {
+        this.snackBar.open(state.errorMessage, 'OK', {
+          duration: 5000
+        });
+      }
+    });
   }
 }
