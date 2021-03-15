@@ -75,7 +75,7 @@ import { RoomComponent } from './room/room.component';
 import { RoomsComponent } from './room/list/rooms.component';
 import { RoomDetailComponent } from './room/detail/room-detail.component';
 import { ReservationComponent } from './reservation/reservation.component';
-import { ReservationsComponent } from './reservation/list/reservations.component';
+import { AssignmentsComponent } from './assignment/assignments.component';
 import { ReservationDetailComponent } from './reservation/detail/reservation-detail.component';
 import { AvailabilityComponent } from './availability/availability.component';
 import { ProductReservationsChartComponent } from './charts/product-reservation-chart/product-reservations-chart.component';
@@ -88,6 +88,8 @@ import { QuantityProductReservationsChartComponent } from './charts/quantity-pro
 import { LastMonthReservationsChartComponent } from './charts/last-month-reservations-chart/last-month-reservations-chart.component';
 import { NotificationsComponent } from './notification/list/notifications.component';
 import { RoomMeComponent } from './room/me/room-me.component';
+import { CalendarComponent } from './reservation/calendar/calendar.component';
+import { ErrorComponent } from './error/error.component';
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -144,7 +146,7 @@ registerLocaleData(localeEs, 'es');
     RoomsComponent,
     RoomDetailComponent,
     ReservationComponent,
-    ReservationsComponent,
+    AssignmentsComponent,
     ReservationDetailComponent,
     AvailabilityComponent,
     ProductReservationsChartComponent,
@@ -157,7 +159,9 @@ registerLocaleData(localeEs, 'es');
     LastMonthReservationsChartComponent,
     CardChartComponent,
     NotificationsComponent,
-    RoomMeComponent
+    RoomMeComponent,
+    ErrorComponent,
+    CalendarComponent
   ],
   imports: [
     BrowserModule,

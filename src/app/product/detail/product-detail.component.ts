@@ -22,6 +22,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   subscription: Subscription | undefined;
   getState: Observable<any>;
   errors: any = [];
+  error: string | undefined;
 
   name: FormControl = new FormControl('', [
     Validators.required
@@ -101,6 +102,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
         this.snackBar.open(state.errorMessage, 'OK', {
           duration: 5000
         });
+        this.error = state.error;
       }
     });
   }

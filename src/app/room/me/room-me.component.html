@@ -1,7 +1,7 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
-      <form (ngSubmit)="update()" [formGroup]="form" novalidate>
+    <div *ngIf="!error; else errorBox" fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+      <form (ngSubmit)="update()" novalidate>
         <mat-card class="shipping-card">
           <mat-card-header>
             <mat-card-title>{{ 'ROOM.ME.TITLE' | translate }}</mat-card-title>
@@ -15,13 +15,8 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'ROOM.ME.NAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input [formControl]="name" autocomplete="name" matInput required>
+                  <input [value]="room.name" autocomplete="name" disabled matInput>
                 </label>
-                <mat-error *ngIf="name.hasError('required')" [innerHTML]="'ROOM.ME.NAME.REQUIRED' | translate">
-                </mat-error>
-                <mat-error *ngIf="errors['name']">
-                  {{errors['name']}}
-                </mat-error>
               </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'ROOM.ME.PROFESSIONAL.FIELD' | translate }}</mat-label>
@@ -91,7 +86,7 @@
           </ng-template>
           <mat-card-actions *ngIf="room; else buttonSkeleton">
             <div fxFlex></div>
-            <button [disabled]="form.invalid" color="primary" mat-raised-button
+            <button color="primary" mat-raised-button
                     type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
             <button color="accent" mat-raised-button routerLink="/rooms"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
@@ -102,5 +97,8 @@
         </mat-card>
       </form>
     </div>
+    <ng-template #errorBox>
+      <app-error [error]="error"></app-error>
+    </ng-template>
   </div>
 </div>

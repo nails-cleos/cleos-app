@@ -39,7 +39,8 @@ export class NavComponent implements OnInit, OnDestroy {
 
   showInitials = false;
   initials: string | undefined;
-  hasNotifications = false;
+  countNotifications = 0;
+  plusNotification: string | undefined;
 
   constructor(public translate: TranslateService, private breakpointObserver: BreakpointObserver, private router: Router,
               private store: Store<AppState>, private webSocketService: WebsocketService) {
@@ -60,10 +61,18 @@ export class NavComponent implements OnInit, OnDestroy {
   }
 
   notification(notification: INotification): void {
-    this.store.dispatch(
-      new fromActionsNotification.NotificationRead(notification)
-    );
-    this.notifications = this.notifications.filter(n => n.id !== notification.id);
+    if (notification.read) {
+      this.router.navigate([notification.navigation]);
+    } else {
+      this.countNotifications--;
+      if (this.countNotifications < 10) {
+        this.plusNotification = undefined;
+      }
+      notification.read = true;
+      this.store.dispatch(
+        new fromActionsNotification.NotificationRead(notification)
+      );
+    }
   }
 
   ngOnDestroy(): void {
@@ -97,6 +106,13 @@ export class NavComponent implements OnInit, OnDestroy {
         stompClient.connect({}, () => {
           stompClient.subscribe(`/user/${user.username}/reply`, (data: any) => {
             this.notifications = [JSON.parse(data.body) as INotification].concat(this.notifications);
+            if (this.notifications.length > 9) {
+              this.notifications.splice(-1, 1);
+            }
+            this.countNotifications++;
+            if (this.countNotifications > 9) {
+              this.plusNotification = '+9';
+            }
           });
         });
       } else {
@@ -106,18 +122,26 @@ export class NavComponent implements OnInit, OnDestroy {
     });
 
     this.notificationSubscription = this.getNotificationState.subscribe((state) => {
-      if (state.data) {
-        this.notifications = state.data;
+      if (state.data && state.data.page.content[0].id) {
+        this.notifications = state.data.page.content;
+        this.countNotifications = state.data.unread;
+        if (this.countNotifications > 9) {
+          this.plusNotification = '+9';
+        }
       }
     });
   }
 
   private getNotifications(): void {
-    if (!this.hasNotifications) {
+    if (!this.countNotifications) {
+      const payload = {
+        active: 'date',
+        direction: 'desc',
+        page: 0
+      };
       this.store.dispatch(
-        new fromActionsNotification.GetAllUnread()
+        new fromActionsNotification.GetAllPaged(payload)
       );
-      this.hasNotifications = true;
     }
   }
 }

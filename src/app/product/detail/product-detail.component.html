@@ -1,6 +1,6 @@
 <div class="flex-container" fxLayout="column">
-  <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" class="card-container">
-    <div fxFlex.lt-sm="80%" fxFlex="50%" fxFlex.gt-lg="40%">
+  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
+    <div *ngIf="!error; else errorBox" fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <mat-card>
         <mat-card-header>
           <mat-card-title>{{ 'PRODUCT.DETAIL.TITLE' | translate }}</mat-card-title>
@@ -15,7 +15,7 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PRODUCT.DETAIL.NAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input matInput required formControlName="name" autocomplete="name">
+                  <input autocomplete="name" formControlName="name" matInput required>
                 </label>
                 <mat-error *ngIf="name.hasError('required')" [innerHTML]="'PRODUCT.DETAIL.NAME.REQUIRED' | translate">
                 </mat-error>
@@ -26,7 +26,7 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PRODUCT.DETAIL.DESCRIPTION.FIELD' | translate }}</mat-label>
                 <label>
-                  <textarea matInput formControlName="description" #message maxlength="256"></textarea>
+                  <textarea #message formControlName="description" matInput maxlength="256"></textarea>
                 </label>
                 <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
               </mat-form-field>
@@ -36,7 +36,7 @@
                   <mat-icon matPrefix>attach_money</mat-icon> &nbsp;
                 </span>
                 <label>
-                  <input type="number" matInput step="1" required formControlName="price">
+                  <input formControlName="price" matInput required step="1" type="number">
                 </label>
                 <mat-error *ngIf="price.hasError('required')" [innerHTML]="'PRODUCT.DETAIL.PRICE.REQUIRED' | translate">
                 </mat-error>
@@ -50,13 +50,14 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PRODUCT.DETAIL.DURATION.FIELD' | translate }}</mat-label>
                 <label>
-                  <input matTimepicker #t="matTimepicker" mode="24h" formControlName="durationDate" #t="matTimepicker"
-                         cancelLabel="{{ 'COMMON.BUTTON.CANCEL' | translate }}">
+                  <input #t="matTimepicker" #t="matTimepicker" cancelLabel="{{ 'COMMON.BUTTON.CANCEL' | translate }}" formControlName="durationDate" matTimepicker
+                         mode="24h">
                 </label>
                 <span matPrefix>
-                  <mat-icon matPrefix (click)="t.showDialog()">timer</mat-icon> &nbsp;
+                  <mat-icon (click)="t.showDialog()" matPrefix>timer</mat-icon> &nbsp;
                 </span>
-                <mat-error *ngIf="durationDate.hasError('required')" [innerHTML]="'PRODUCT.DETAIL.DURATION.REQUIRED' | translate">
+                <mat-error *ngIf="durationDate.hasError('required')"
+                           [innerHTML]="'PRODUCT.DETAIL.DURATION.REQUIRED' | translate">
                 </mat-error>
                 <mat-error *ngIf="errors['duration']">
                   {{errors['duration']}}
@@ -71,9 +72,9 @@
           </ng-template>
           <mat-card-actions *ngIf="product; else buttonSkeleton">
             <div fxFlex></div>
-            <button mat-raised-button color="primary" [disabled]="form.invalid || form.pristine"
+            <button [disabled]="form.invalid || form.pristine" color="primary" mat-raised-button
                     type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
-            <button mat-raised-button color="accent"
+            <button color="accent" mat-raised-button
                     routerLink="/products">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
           <ng-template #buttonSkeleton>
@@ -82,5 +83,8 @@
         </form>
       </mat-card>
     </div>
+    <ng-template #errorBox>
+      <app-error [error]="error"></app-error>
+    </ng-template>
   </div>
 </div>

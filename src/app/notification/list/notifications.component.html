@@ -1,1 +1,39 @@
-<p>notifications works!</p>
+<div class="flex-container" fxLayout="column">
+  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
+    <div *ngIf="!error; else errorBox" fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>{{ 'NOTIFICATION.TITLE' | translate }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+            <mat-list>
+              <mat-list-item (click)="notification(not)" *ngFor="let not of notifications; last as last"
+                             class="notification"
+                             matRipple>
+                <div [matTooltip]="not.message" [ngClass]="{ 'gray-text': not.read}" mat-line>
+                  <span *ngIf="!not.read" class="dot"></span>{{not.message}}
+                </div>
+                <div [ngClass]="{ 'gray-text': not.read}" mat-line>{{not.date | date:'short':undefined:language}}</div>
+                <mat-divider *ngIf="!last || showMore" class="divider"></mat-divider>
+              </mat-list-item>
+              <mat-list-item *ngFor="let n of loadingNotifications">
+                <div class="ssc-line" mat-line></div>
+                <div class="ssc-line" mat-line style="margin-top: 2%"></div>
+                <mat-divider class="divider"></mat-divider>
+              </mat-list-item>
+              <mat-list-item *ngIf="showMore">
+                <button (click)="getNotifications()" color="primary" mat-button>
+                  {{'NOTIFICATION.LOAD_MORE' | translate}}
+                </button>
+              </mat-list-item>
+            </mat-list>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+    <ng-template #errorBox>
+      <app-error [error]="error"></app-error>
+    </ng-template>
+  </div>
+</div>

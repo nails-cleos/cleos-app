@@ -47,18 +47,6 @@
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="professional">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow
-          mat-header-cell>{{ 'RESERVATION.PAGE.COLUMN.PROFESSIONAL' | translate }}</th>
-      <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
-        <div
-          *ngIf="reservation.id; else skeleton">{{reservation.room.professional.firstName}} {{reservation.room.professional.lastName}}</div>
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
-      </td>
-    </ng-container>
-
     <ng-container matColumnDef="product">
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'RESERVATION.PAGE.COLUMN.PRODUCT' | translate }}</th>
       <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
@@ -76,10 +64,6 @@
           <button (click)="view(reservation)" *ngIf="!reservation.deleted" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
             <mat-icon color="primary">visibility</mat-icon>
-          </button>
-          <button (click)="delete(reservation)" *ngIf="!reservation.deleted" fxHide.lt-sm fxShow mat-icon-button
-                  matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
-            <mat-icon color="warn">delete</mat-icon>
           </button>
         </div>
         <ng-template #skeleton>

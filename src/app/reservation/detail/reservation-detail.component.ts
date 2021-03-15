@@ -27,7 +27,7 @@ export enum ReservationIconName {
   templateUrl: './reservation-detail.component.html',
   styleUrls: ['./reservation-detail.component.scss']
 })
-export class ReservationDetailComponent implements OnInit, OnDestroy, AfterViewInit {
+export class ReservationDetailComponent implements OnInit, OnDestroy {
   getState: Observable<any>;
   subscription: Subscription | undefined;
   reservation: IReservationAll | undefined;
@@ -39,6 +39,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy, AfterViewI
   locale: string;
   language: string;
   isLoading = false;
+  error: string | undefined;
   changeState: any;
   professionalId: string | undefined;
   machine: any;
@@ -71,75 +72,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy, AfterViewI
     }
   }
 
-  ngOnInit(): void {
-    this.subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  ngAfterViewInit(): void {
-    this.getReservation();
-  }
-
-  getIcon(name: any): any {
-    // @ts-ignore
-    return ReservationIconName[name];
-  }
-
-  onChangeState(id: string | number): void {
-    const title = this.translate.instant('RESERVATION.DETAIL.CHANGE_STATE.TITLE');
-    const action = this.translate.instant(`RESERVATION.DETAIL.CHANGE_STATE.ACTION.${String(id).toUpperCase()}`);
-    const content = this.translate.instant('RESERVATION.DETAIL.CHANGE_STATE.CONTENT', {action});
-    const dialogRef = this.dialog.open(DialogComponent, {
-      data: {title, content, value: id}
-    });
-
-    dialogRef.afterClosed().subscribe(event => {
-      if (event) {
-        this.machine.transition(this.reservation?.state, event);
-      }
-    });
-  }
-
-  private subscribe(): void {
-    this.subscription = this.getState.subscribe(state => {
-      this.isLoading = state.isLoading;
-      if (state.selected) {
-        this.duration = ConvertDuration(state.selected.product.duration);
-        this.start = new Date(state.selected.start);
-        this.end = new Date(new Date(state.selected.start).setHours(this.start.getHours() + this.duration.hour,
-          this.start.getMinutes() + this.duration.minute));
-        // @ts-ignore
-        this.state = ReservationIconName[state.selected.state];
-        this.reservation = state.selected;
-        if (this.professionalId && this.professionalId === this.reservation?.room.professional.id) {
-          this.setupMachine(this.reservation.id, this.store, this.translate);
-          this.changeState = this.machine.next(this.reservation.state);
-        }
-        this.dataSource = new MatTableDataSource<IReservationAll>(state.selected.history);
-        this.cdRef.detectChanges();
-      }
-      if (state.errorMessage || state.message) {
-        const snack = this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
-        });
-        snack.afterDismissed().subscribe(() => window.location.reload());
-      }
-    });
-  }
-
-  private getReservation(): void {
-    if (!this.reservation) {
-      const id = this.route.snapshot.paramMap.get('id');
-      this.store.dispatch(
-        new fromActionsReservation.ReservationFind(id)
-      );
-    }
-  }
-
-  private createMachine(stateMachineDefinition: any, initialState: any): any {
+  private static createMachine(stateMachineDefinition: any, initialState: any): any {
     const machine = {
       value: initialState,
       transition(currentState: any, event: any): any {
@@ -161,8 +94,80 @@ export class ReservationDetailComponent implements OnInit, OnDestroy, AfterViewI
     return machine;
   }
 
-  private setupMachine(reservationId: string, store: Store<AppState>, translate: TranslateService): void {
-    this.machine = this.createMachine({
+  ngOnInit(): void {
+    this.subscribe();
+    this.route.params.subscribe(routeParams => {
+      this.getReservation(routeParams.id);
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+  }
+
+  getIcon(name: any): any {
+    // @ts-ignore
+    return ReservationIconName[name];
+  }
+
+  onChangeState(id: string | number): void {
+    const title = this.translate.instant('RESERVATION.DETAIL.CHANGE_STATE.TITLE');
+    const action = this.translate.instant(`RESERVATION.DETAIL.CHANGE_STATE.ACTION.${String(id).toUpperCase()}`);
+    const content = this.translate.instant('RESERVATION.DETAIL.CHANGE_STATE.CONTENT', {action});
+    const dialogRef = this.dialog.open(DialogComponent, {
+      data: {title, content, value: id}
+    });
+
+    dialogRef.afterClosed().subscribe(event => {
+      if (event) {
+        const state = this.reservation?.state;
+        this.reservation = undefined;
+        this.machine.transition(state, event);
+      }
+    });
+  }
+
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe(state => {
+      this.isLoading = state.isLoading;
+      if (state.selected) {
+        this.duration = ConvertDuration(state.selected.product.duration);
+        this.start = new Date(state.selected.start);
+        this.end = new Date(new Date(state.selected.start).setHours(this.start.getHours() + this.duration.hour,
+          this.start.getMinutes() + this.duration.minute));
+        // @ts-ignore
+        this.state = ReservationIconName[state.selected.state];
+        this.reservation = state.selected;
+        if (this.professionalId && this.professionalId === this.reservation?.room.professional.id) {
+          this.setupMachine(this.reservation.id, this.store, this.translate, this.reservation?.state);
+          this.changeState = this.machine.next(this.reservation.state);
+        }
+        this.dataSource = new MatTableDataSource<IReservationAll>(state.selected.history);
+        this.cdRef.detectChanges();
+      }
+      if (state.errorMessage || state.message) {
+        if (state.message) {
+          const id: string | null = this.route.snapshot.paramMap.get('id');
+          this.getReservation(id);
+        } else {
+          this.error = state.error;
+        }
+        this.snackBar.open(state.errorMessage || state.message, 'OK', {
+          duration: 5000
+        });
+      }
+    });
+  }
+
+  private getReservation(id: string | null): void {
+    this.reservation = undefined;
+    this.store.dispatch(
+      new fromActionsReservation.ReservationFind(id)
+    );
+  }
+
+  private setupMachine(reservationId: string, store: Store<AppState>, translate: TranslateService, initialState: string): void {
+    this.machine = ReservationDetailComponent.createMachine({
       initialState: ReservationIconName.CREATED,
       CREATED: {
         transitions: {
@@ -255,6 +260,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy, AfterViewI
       CANCELLED: {
         next: []
       }
-    }, this.reservation?.state);
+    }, initialState);
   }
 }

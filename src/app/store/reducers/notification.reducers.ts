@@ -1,10 +1,10 @@
 import { All, NotificationActionTypes } from '../notification.actions';
-import { INotification } from '../../interfaces/notification';
-import { Pagination } from '../../interfaces/pagination';
+import { INotificationDTO } from '../../interfaces/notification';
 
 export interface State {
-  data: INotification[] | Pagination<INotification> | null;
+  data: INotificationDTO | null;
   errorMessage: string | null;
+  error: any;
   subErrors: any;
   message: string | null;
   isLoading: boolean;
@@ -13,6 +13,7 @@ export interface State {
 export const initialState: State = {
   data: null,
   errorMessage: null,
+  error: null,
   subErrors: null,
   message: null,
   isLoading: false
@@ -24,17 +25,7 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         // @ts-ignore
-        data: {content: [{}, {}, {}], totalElements: 3},
-        errorMessage: null,
-        subErrors: null,
-        message: null,
-        isLoading: true
-      };
-    }
-    case NotificationActionTypes.NOTIFICATION: {
-      return {
-        ...state,
-        data: null,
+        data: {page: {content: [{}, {}, {}]}},
         errorMessage: null,
         subErrors: null,
         message: null,
@@ -63,6 +54,7 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         errorMessage: action.payload.error.message,
+        error: action.payload.error,
         subErrors: action.payload.error.subErrors,
         message: null,
         isLoading: false

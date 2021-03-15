@@ -16,6 +16,7 @@ export class MonthlyReservationsChartComponent implements OnChanges {
   isLoading = true;
   data: IReservationAll[] | undefined;
   locale: string;
+  error: string | undefined;
 
   public pieChartOptions: ChartOptions = {
     responsive: true
@@ -40,7 +41,7 @@ export class MonthlyReservationsChartComponent implements OnChanges {
     if (this.state) {
       this.isLoading = this.state.isLoading;
       if (this.state.errorMessage) {
-        // TODO: show error
+        this.error = this.state.error;
         return;
       }
       const chartResult = MonthlyReservation(this.state.data, this.locale);

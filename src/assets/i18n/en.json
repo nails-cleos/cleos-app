@@ -1,7 +1,4 @@
 {
-  "APP": {
-    "TITLE": "Nail"
-  },
   "COMMON": {
     "BUTTON": {
       "BACK": "Back",
@@ -310,6 +307,9 @@
     "LANG": {
       "FIELD": "Language",
       "REQUIRED": "Language is <b>required</b>"
+    },
+    "UPDATED": {
+      "MESSAGE": "User {{username}} updated"
     }
   },
   "PRODUCT": {
@@ -428,6 +428,47 @@
     },
     "DETAIL": {
       "TITLE": "Update room",
+      "NAME": {
+        "FIELD": "Name",
+        "REQUIRED": "Name is <b>required</b>"
+      },
+      "PROFESSIONAL": {
+        "FIELD": "Professional"
+      },
+      "AVAILABILITY": {
+        "FIELD": "Availability",
+        "REQUIRED": "At least one availability is <b>required</b>"
+      },
+      "WEEK_TIME": {
+        "FIELD": "Week availability",
+        "DESCRIPTION": "Week working time availability",
+        "REQUIRED": "Add or ignore week working time"
+      },
+      "SATURDAY_TIME": {
+        "FIELD": "Saturday availability",
+        "DESCRIPTION": "Saturday working time availability",
+        "REQUIRED": "Add or ignore saturday working time"
+      },
+      "SUNDAY_TIME": {
+        "FIELD": "Sunday availability",
+        "DESCRIPTION": "Sunday working time availability",
+        "REQUIRED": "Add or ignore sunday working time"
+      },
+      "LUNCH": {
+        "FIELD": "Lunch time",
+        "CHECK": "Add lunch time"
+      },
+      "START": {
+        "FIELD": "Start",
+        "REQUIRED": "Start is <b>required</b>"
+      },
+      "END": {
+        "FIELD": "End",
+        "REQUIRED": "End is <b>required</b>"
+      }
+    },
+    "ME": {
+      "TITLE": "My room",
       "NAME": {
         "FIELD": "Name",
         "REQUIRED": "Name is <b>required</b>"
@@ -606,7 +647,11 @@
       "CANCELLED": "Cancelled"
     }
   },
-  "last": {
-    "dummy": "dummy translation"
+  "NOTIFICATION": {
+    "TITLE": "Notifications",
+    "LOAD_MORE": "Load more"
+  },
+  "APP": {
+    "TITLE": "Nail"
   }
 }

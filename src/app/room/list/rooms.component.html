@@ -1,4 +1,4 @@
-<div class="mat-elevation-z8 small-table">
+<div *ngIf="!error; else errorBox" class="mat-elevation-z8 small-table">
   <table [dataSource]="dataSource" mat-table matSort matSortActive="name"
          matSortDirection="desc" matSortDisableClear>
     <ng-container matColumnDef="position">
@@ -39,7 +39,7 @@
         <div *ngIf="room.id; else skeleton">
           <mat-list>
             <mat-list-item *ngFor="let availability of room.availabilities">
-              <mat-icon mat-list-icon>folder</mat-icon>
+              <mat-icon mat-list-icon>date_range</mat-icon>
               <div mat-line>{{ 'ROOM.LIST.COLUMN.AVAILABILITY.' + availability.day | translate}}:
                 {{availability.start.slice(0, 5)}} - {{availability.end.slice(0, 5)}}</div>
             </mat-list-item>
@@ -79,3 +79,6 @@
     <mat-icon>add</mat-icon>
   </button>
 </div>
+<ng-template #errorBox>
+  <app-error [error]="error"></app-error>
+</ng-template>

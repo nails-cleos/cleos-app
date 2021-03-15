@@ -17,11 +17,11 @@ import * as fromActionsRoom from '../../store/room.actions';
 })
 export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() room: IRoom | undefined;
-  form!: FormGroup;
   getState: Observable<any>;
   subscription: Subscription | undefined;
   errors: any = [];
   professionalName: string | undefined;
+  error: string | undefined;
 
   step = 0;
   icons: IIcon = {
@@ -35,12 +35,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   availabilities: IAvailability[] = [];
 
-  name: FormControl = new FormControl('', [
-    Validators.required
-  ]);
-
-  constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
-              private formBuilder: FormBuilder) {
+  constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>) {
     this.getState = this.store.select(selectRoomState);
   }
 
@@ -57,7 +52,6 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.createForm();
     this.subscribe();
   }
 
@@ -75,7 +69,6 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     const room: IRoom = new Room();
     room.id = this.room?.id;
-    room.name = FieldChange(this.name, this.room?.name);
     room.availabilities = this.availabilities;
 
     this.store.dispatch(new fromActionsRoom.RoomUpdate(room));
@@ -102,10 +95,33 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.step = step;
   }
 
-  private createForm(): void {
-    this.form = this.formBuilder.group({
-      name: this.name
-    });
+  validate(): boolean {
+    let step = -1;
+    this.errors = [];
+    switch (IconName.calendar_today) {
+      case this.icons.week:
+        step = 0;
+        break;
+      case this.icons.saturday:
+        step = 1;
+        break;
+      case this.icons.sunday:
+        step = 2;
+        break;
+    }
+    if (step > -1) {
+      this.errors[`day${step}`] = true;
+      this.setStep(step);
+      return true;
+    }
+
+    if (this.availabilities.length === 0) {
+      this.errors.availability = true;
+      this.setStep(0);
+      return true;
+    }
+
+    return false;
   }
 
   private getRoom(): void {
@@ -125,17 +141,16 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
         } as IRoom;
         this.professionalName = `${state.selected.professional.firstName} ${state.selected.professional.lastName}`;
         this.getAvailabilities(state.selected.availabilities);
-        this.form.patchValue(this.room);
       }
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({incorrect: true});
         });
       } else if (state.errorMessage) {
         this.snackBar.open(state.errorMessage, 'OK', {
           duration: 5000
         });
+        this.error = state.error;
       }
     });
   }
@@ -175,37 +190,5 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.icons.sunday = icon;
         break;
     }
-  }
-
-  private validate(): boolean {
-    if (this.form.invalid) {
-      return true;
-    }
-    let step = -1;
-    this.errors = [];
-    switch (IconName.calendar_today) {
-      case this.icons.week:
-        step = 0;
-        break;
-      case this.icons.saturday:
-        step = 1;
-        break;
-      case this.icons.sunday:
-        step = 2;
-        break;
-    }
-    if (step > -1) {
-      this.errors[`day${step}`] = true;
-      this.setStep(step);
-      return true;
-    }
-
-    if (this.availabilities.length === 0) {
-      this.errors.availability = true;
-      this.setStep(0);
-      return true;
-    }
-
-    return false;
   }
 }

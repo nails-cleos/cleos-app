@@ -22,7 +22,7 @@ import { ConvertDuration, Duration, GetStartEndDay, IDuration } from '../util/da
 import { FillNotAvailable, NewEvent } from '../util/event';
 import { Router } from '@angular/router';
 import { DateAdapter } from '@angular/material/core';
-import { FindStateColor } from '../util/maps';
+import { FindStateColor } from '../util/flags';
 
 @Component({
   selector: 'app-reservation',
@@ -38,6 +38,7 @@ export class ReservationComponent implements OnInit, OnDestroy {
   errors: any = [];
 
   isLoading = false;
+  error: string | undefined;
 
   customerForm!: FormGroup;
   customers: IUser[] | undefined;
@@ -141,7 +142,7 @@ export class ReservationComponent implements OnInit, OnDestroy {
       }
     }
     return result;
-  };
+  }
 
   displayFnUser(user: IUser): string {
     return user ? `${user.firstName} ${user.lastName}` : '';
@@ -201,7 +202,7 @@ export class ReservationComponent implements OnInit, OnDestroy {
       duration: `${duration.hour}:${duration.minute}`
     });
 
-    const event = NewEvent(detail, '#ede7f6', start, end, '#000');
+    const event = NewEvent(detail, FindStateColor('CREATED'), start, end, '#000');
 
     let title;
     let content;
@@ -258,6 +259,26 @@ export class ReservationComponent implements OnInit, OnDestroy {
   goBack(stepper: MatStepper): void {
     this.isPreview = false;
     stepper.previous();
+  }
+
+  getProducts(stepper: MatStepper): void {
+    if (this.roomForm.invalid) {
+      return;
+    }
+    this.store.dispatch(
+      new fromActionsReservation.GetAllProducts()
+    );
+    stepper.next();
+  }
+
+  getRooms(stepper: MatStepper): void {
+    if (this.customerForm.invalid) {
+      return;
+    }
+    this.store.dispatch(
+      new fromActionsReservation.GetAllRooms()
+    );
+    stepper.next();
   }
 
   private createForm(): void {
@@ -325,26 +346,6 @@ export class ReservationComponent implements OnInit, OnDestroy {
     );
   }
 
-  private getProducts(stepper: MatStepper): void {
-    if (this.roomForm.invalid) {
-      return;
-    }
-    this.store.dispatch(
-      new fromActionsReservation.GetAllProducts()
-    );
-    stepper.next();
-  }
-
-  private getRooms(stepper: MatStepper): void {
-    if (this.customerForm.invalid) {
-      return;
-    }
-    this.store.dispatch(
-      new fromActionsReservation.GetAllRooms()
-    );
-    stepper.next();
-  }
-
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       this.isLoading = state.isLoading;
@@ -380,6 +381,7 @@ export class ReservationComponent implements OnInit, OnDestroy {
           this.productForm.controls[value.field]?.setErrors({incorrect: true});
         });
       } else if (state.errorMessage) {
+        this.error = state.error;
         this.snackBar.open(state.errorMessage, 'OK', {
           duration: 5000
         });

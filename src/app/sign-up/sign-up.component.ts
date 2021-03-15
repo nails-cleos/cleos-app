@@ -5,7 +5,7 @@ import { Store } from '@ngrx/store';
 import * as fromActionsLogin from '../store/auth.actions';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
-import { IFlag, Maps } from '../util/maps';
+import { IFlag, Flags } from '../util/flags';
 
 @Component({
   selector: 'app-sign-up',
@@ -37,7 +37,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
     Validators.required
   ]);
 
-  flags: IFlag[] = Maps();
+  flags: IFlag[] = Flags();
 
   constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectAuthState);

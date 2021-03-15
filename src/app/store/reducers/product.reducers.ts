@@ -5,6 +5,7 @@ import { IProduct } from '../../interfaces/product';
 export interface State {
   data: IProduct | Pagination<IProduct> | null;
   errorMessage: string | null;
+  error: any;
   subErrors: any;
   selected: IProduct | null;
   message: string | null;
@@ -14,6 +15,7 @@ export interface State {
 export const initialState: State = {
   data: null,
   errorMessage: null,
+  error: null,
   subErrors: null,
   selected: null,
   message: null,
@@ -79,6 +81,7 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         errorMessage: action.payload.error.message,
+        error: action.payload.error,
         subErrors: action.payload.error.subErrors,
         message: null,
         isLoading: false

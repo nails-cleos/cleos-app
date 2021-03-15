@@ -3,6 +3,7 @@ import { Action } from '@ngrx/store';
 export enum ReservationActionTypes {
   GET_ALL = '[Reservation] Get all',
   GET_ALL_PAGE = '[Reservation] Get all page',
+  GET_ALL_ASSIGNMENT_PAGE = '[Reservation] Get all page assignment',
   GET_ALL_GROUPING_BY_ROOM = '[Reservation] Get all grouping by room',
   SEARCH_RESERVATION = '[Reservation] Search reservation',
   GET_CUSTOMERS = '[Reservation] Get customers',
@@ -34,6 +35,13 @@ export class GetAll implements Action {
 
 export class GetAllPage implements Action {
   readonly type = ReservationActionTypes.GET_ALL_PAGE;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class GetAllAssignmentPage implements Action {
+  readonly type = ReservationActionTypes.GET_ALL_ASSIGNMENT_PAGE;
 
   constructor(public payload: any) {
   }
@@ -188,6 +196,7 @@ export class Clean implements Action {
 export type All =
   | GetAll
   | GetAllPage
+  | GetAllAssignmentPage
   | GetAllGroupingByRoom
   | SearchReservation
   | GetAllCustomers

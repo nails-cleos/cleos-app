@@ -41,6 +41,19 @@ export class ReservationEffects {
   );
 
   @Effect()
+  getAllAssignmentPage$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.GET_ALL_ASSIGNMENT_PAGE)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => {
+      return this.reservationService.getAllAssignmentPage(payload.active, payload.direction, payload.page).pipe(
+        switchMap((response: any) => {
+          return of(new fromActionsReservation.ReservationPageSuccess(response));
+        }),
+        catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
+      );
+    })
+  );
+
+  @Effect()
   getAllGroupingByRoom$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.GET_ALL_GROUPING_BY_ROOM)).pipe(
     map((action: any) => action.payload),
     switchMap(() => {
@@ -113,7 +126,10 @@ export class ReservationEffects {
         switchMap((reservation: any) => {
           return of(new fromActionsReservation.ReservationSelected(reservation));
         }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
+        catchError((err: HttpErrorResponse) => {
+          console.log(err);
+          return of(new fromActionsReservation.ReservationFailure({error: err.error}));
+        })
       );
     })
   );

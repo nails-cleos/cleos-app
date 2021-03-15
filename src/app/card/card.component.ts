@@ -29,6 +29,7 @@ enum ChartTypeEnum {
 export class CardComponent implements OnInit {
 
   @Input() title: string | undefined;
+  @Input() type: string | undefined;
   @Input() label: any;
   @Input() data: any;
   @Input() expand = true;
@@ -55,7 +56,7 @@ export class CardComponent implements OnInit {
 
   onClick(): void {
     // @ts-ignore
-    switch (ChartTypeEnum[this.title]) {
+    switch (ChartTypeEnum[this.type]) {
       case ChartTypeEnum.QUANTITY_PRODUCT.valueOf():
         const quantityProduct = QuantityProduct(this.data, this.label);
         this.setBarChart(quantityProduct);
@@ -100,7 +101,7 @@ export class CardComponent implements OnInit {
           chartType: this.chartType,
           options: this.chartOptions,
           colors: this.chartColors,
-          title: this.title
+          title: this.type
         }
       });
     }

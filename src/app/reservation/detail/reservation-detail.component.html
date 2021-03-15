@@ -1,4 +1,4 @@
-<mat-card>
+<mat-card *ngIf="!error; else errorBox">
   <mat-card-header>
     <mat-card-title>{{ 'RESERVATION.DETAIL.TITLE' | translate }}</mat-card-title>
     <mat-card-subtitle
@@ -114,3 +114,6 @@
     <div class="ssc-head-line"></div>
   </ng-template>
 </mat-card>
+<ng-template #errorBox>
+  <app-error [error]="error"></app-error>
+</ng-template>

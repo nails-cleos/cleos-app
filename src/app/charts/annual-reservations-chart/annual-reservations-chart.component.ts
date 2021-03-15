@@ -13,6 +13,7 @@ export class AnnualReservationsChartComponent implements OnChanges {
   @Input() label: any;
 
   isLoading = true;
+  error: string | undefined;
   locale: string;
 
   public lineChartData: ChartDataSets[] = [
@@ -46,7 +47,7 @@ export class AnnualReservationsChartComponent implements OnChanges {
     if (this.state) {
       this.isLoading = this.state.isLoading;
       if (this.state.errorMessage) {
-        // TODO: show error
+        this.error = this.state.error;
         return;
       }
       const chartResult = AnnualReservation(this.state.data, this.locale, this.label);
