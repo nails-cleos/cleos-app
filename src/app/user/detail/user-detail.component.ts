@@ -8,7 +8,7 @@ import { AppState, selectUserState } from '../../store/app.states';
 import * as fromActionsUser from '../../store/user.actions';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { FieldChange, ValueChange } from '../../util/validators';
-import { Maps, IFlag } from '../../util/maps';
+import { FindFlag, Flags, IFlag } from '../../util/flags';
 
 @Component({
   selector: 'app-user-detail',
@@ -37,7 +37,8 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     Validators.required
   ]);
 
-  flags: IFlag[] = Maps();
+  flags: IFlag[] = Flags();
+  error: string | undefined;
 
   constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
               private formBuilder: FormBuilder, private cdRef: ChangeDetectorRef) {
@@ -95,14 +96,14 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       if (state.selected) {
         this.user = state.selected;
         this.form.patchValue(state.selected);
-        const langValue = this.flags.filter((lang: any) => lang.value === state.selected.lang)[0];
-        this.langValue.setValue(langValue);
+        this.langValue.setValue(FindFlag(this.flags, state.selected.lang));
         this.cdRef.detectChanges();
       }
       if (state.errorMessage) {
         this.snackBar.open(state.errorMessage, 'OK', {
           duration: 5000
         });
+        this.error = state.error;
       }
     });
   }

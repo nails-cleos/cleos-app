@@ -21,6 +21,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   getState: Observable<any>;
   subscription: Subscription | undefined;
   errors: any = [];
+  error: string | undefined;
   professionalName: string | undefined;
 
   step = 0;
@@ -137,6 +138,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
         this.snackBar.open(state.errorMessage, 'OK', {
           duration: 5000
         });
+        this.error = state.error;
       }
     });
   }

@@ -1,17 +1,12 @@
 import { Action } from '@ngrx/store';
 
 export enum NotificationActionTypes {
-  NOTIFICATION = '[Notification] Get all unread',
   NOTIFICATION_PAGE = '[Notification] Get all paged',
   NOTIFICATION_SUCCESS = '[Notification] Notifications success',
   NOTIFICATION_FAILURE = '[Notification] Failure',
   NOTIFICATION_READ = '[Notification] Notification read',
   NOTIFICATION_READ_SUCCESS = '[Notification] Notification read success',
   CLEAN = '[Notification] Clean'
-}
-
-export class GetAllUnread implements Action {
-  readonly type = NotificationActionTypes.NOTIFICATION;
 }
 
 export class GetAllPaged implements Action {
@@ -54,7 +49,6 @@ export class Clean implements Action {
 }
 
 export type All =
-  | GetAllUnread
   | GetAllPaged
   | NotificationSuccess
   | NotificationFailure

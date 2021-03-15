@@ -7,7 +7,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../store/app.states';
 import * as fromActionsUser from '../store/user.actions';
 import { IUser, User } from '../interfaces/user';
-import { Maps, IFlag } from '../util/maps';
+import { Flags, IFlag } from '../util/flags';
 
 @Component({
   selector: 'app-user',
@@ -42,7 +42,7 @@ export class UserComponent implements OnInit, OnDestroy {
     Validators.required
   ]);
 
-  flags: IFlag[] = Maps();
+  flags: IFlag[] = Flags();
 
   constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
               private formBuilder: FormBuilder, private cdRef: ChangeDetectorRef) {

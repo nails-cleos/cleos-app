@@ -28,6 +28,7 @@ export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   resultsLength = 0;
   pageSize = PAGE_SIZE;
+  error: string | undefined;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -93,6 +94,9 @@ export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
             this.clean();
             this.getProducts();
           });
+        } else {
+          this.error = stateValue.error;
+          return;
         }
       }
       this.dataSource = stateValue.data?.content?.map((product: IProduct) => {

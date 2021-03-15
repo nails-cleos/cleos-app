@@ -1,7 +1,7 @@
 <mat-card class="dashboard-card">
   <mat-card-header>
     <mat-card-title>
-      {{'DASHBOARD.CARD.' + title | translate}}
+      {{title}}
       <div *ngIf="expand">
         <button mat-icon-button class="more-button" [matMenuTriggerFor]="menu" aria-label="Toggle menu">
           <mat-icon>more_vert</mat-icon>

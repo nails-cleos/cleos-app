@@ -26,6 +26,7 @@ export class RoomsComponent implements OnInit, AfterViewInit {
 
   resultsLength = 0;
   pageSize = PAGE_SIZE;
+  error: string | undefined;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -66,6 +67,8 @@ export class RoomsComponent implements OnInit, AfterViewInit {
             this.clean();
             this.getRooms();
           });
+        } else {
+          this.error = stateValue.error;
         }
       }
       this.dataSource = stateValue.data?.content;

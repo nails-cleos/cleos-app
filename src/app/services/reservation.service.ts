@@ -25,6 +25,18 @@ export class ReservationService {
     return this.http.get<IReservation[]>(`${this.url}/pages`, {params});
   }
 
+  public getAllAssignmentPage(sort: string, direction: string, page: number): Observable<IReservation[]> {
+    let params = new HttpParams().set('page', String(page)).set('size', String(PAGE_SIZE));
+    if (sort) {
+      params = params.append('sort', sort);
+    }
+    if (direction) {
+      params = params.append('direction', direction);
+    }
+
+    return this.http.get<IReservation[]>(`${this.url}/assignments`, {params});
+  }
+
   public getAll(): Observable<IReservation[]> {
     return this.http.get<IReservation[]>(this.url);
   }

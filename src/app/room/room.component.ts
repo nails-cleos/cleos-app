@@ -34,6 +34,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   form!: FormGroup;
   room: IRoom = new Room();
   errors: any = [];
+  error: string | undefined;
 
   step = 0;
   icons: IIcon = {
@@ -144,6 +145,7 @@ export class RoomComponent implements OnInit, OnDestroy {
           this.form.controls[value.field].setErrors({incorrect: true});
         });
       } else if (state.errorMessage) {
+        this.error = state.error;
         this.snackBar.open(state.errorMessage, 'OK', {
           duration: 5000
         });

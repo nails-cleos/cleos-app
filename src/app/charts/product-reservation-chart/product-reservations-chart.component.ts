@@ -12,6 +12,8 @@ import { ProductReservation } from '../../util/chart';
 export class ProductReservationsChartComponent implements OnChanges {
   isLoading = true;
   data: IReservationAll[] | undefined;
+  error: string | undefined;
+
   @Input() state: any;
 
   public radarChartOptions: ChartOptions = {
@@ -33,7 +35,7 @@ export class ProductReservationsChartComponent implements OnChanges {
     if (this.state) {
       this.isLoading = this.state.isLoading;
       if (this.state.errorMessage) {
-        // TODO: show error
+        this.error = this.state.error;
         return;
       }
       const chartResult = ProductReservation(this.state.data);

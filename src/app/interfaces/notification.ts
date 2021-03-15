@@ -1,3 +1,5 @@
+import { Pagination } from './pagination';
+
 export interface INotification {
   id: string;
   message: string;
@@ -6,4 +8,9 @@ export interface INotification {
   read: boolean;
 }
 
-export const PAGE_SIZE = 100;
+export interface INotificationDTO {
+  unread: number;
+  page: Pagination<INotification>;
+}
+
+export const PAGE_SIZE = 10;

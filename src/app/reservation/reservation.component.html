@@ -175,7 +175,7 @@
 </ng-template>
 
 <ng-template [ngIfElse]="bigScreen" [ngIf]="smallScreen">
-  <mat-vertical-stepper #stepper [linear]="true">
+  <mat-vertical-stepper #stepper *ngIf="!error; else errorBox" [linear]="true">
     <mat-step [stepControl]="customerForm" state="person_search">
       <ng-template matStepLabel>{{ 'RESERVATION.ADD.CUSTOMER.FIELD' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepOne"></ng-container>
@@ -231,7 +231,7 @@
 </ng-template>
 
 <ng-template #bigScreen>
-  <mat-horizontal-stepper #stepper [linear]="true">
+  <mat-horizontal-stepper #stepper *ngIf="!error; else errorBox" [linear]="true">
     <mat-step [stepControl]="customerForm" state="person_search">
       <ng-template matStepLabel>{{ 'RESERVATION.ADD.CUSTOMER.FIELD' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepOne"></ng-container>
@@ -283,4 +283,8 @@
       </div>
     </mat-step>
   </mat-horizontal-stepper>
+</ng-template>
+
+<ng-template #errorBox>
+  <app-error [error]="error"></app-error>
 </ng-template>

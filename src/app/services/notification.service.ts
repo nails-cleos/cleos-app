@@ -13,10 +13,6 @@ export class NotificationService {
   constructor(private http: HttpClient) {
   }
 
-  public findNotifications(): Observable<INotification | undefined> {
-    return this.http.get<INotification>(this.url);
-  }
-
   public getAll(sort: string, direction: string, page: number): Observable<INotification[]> {
     let params = new HttpParams().set('page', String(page)).set('size', String(PAGE_SIZE));
     if (sort) {
@@ -25,7 +21,6 @@ export class NotificationService {
     if (direction) {
       params = params.append('direction', direction);
     }
-
     return this.http.get<INotification[]>(`${this.url}/pages`, {params});
   }
 

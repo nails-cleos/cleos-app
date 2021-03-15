@@ -1,7 +1,4 @@
 {
-  "APP": {
-    "TITLE": "Uñas"
-  },
   "COMMON": {
     "BUTTON": {
       "BACK": "Volver",
@@ -310,6 +307,9 @@
     "LANG": {
       "FIELD": "Idioma",
       "REQUIRED": "Idioma es <b>requerido</b>"
+    },
+    "UPDATED": {
+      "MESSAGE": "Usuario {{username}} actualizado"
     }
   },
   "PRODUCT": {
@@ -428,6 +428,47 @@
     },
     "DETAIL": {
       "TITLE": "Actualizar sala",
+      "NAME": {
+        "FIELD": "Nombre",
+        "REQUIRED": "Nombre es <b>requerido</b>"
+      },
+      "PROFESSIONAL": {
+        "FIELD": "Profesional"
+      },
+      "AVAILABILITY": {
+        "FIELD": "Disponibilidad",
+        "REQUIRED": "Al menos una disponibilidad es <b>requerida</b>"
+      },
+      "WEEK_TIME": {
+        "FIELD": "Disponibilidad semanal",
+        "DESCRIPTION": "Disponibilidad de trabajo semanal",
+        "REQUIRED": "Agregue o ignore la disponibilidad semanal"
+      },
+      "SATURDAY_TIME": {
+        "FIELD": "Disponibilidad los sábados",
+        "DESCRIPTION": "Disponibilidad de trabajo los sábados",
+        "REQUIRED": "Agregue o ignore la disponibilidad del sábado"
+      },
+      "SUNDAY_TIME": {
+        "FIELD": "Disponibilidad los domingos",
+        "DESCRIPTION": "Disponibilidad de trabajo los domingos",
+        "REQUIRED": "Agregue o ignore la disponibilidad del domingo"
+      },
+      "LUNCH": {
+        "FIELD": "Hora de almuerzo",
+        "CHECK": "Agregar hora de almuerzo"
+      },
+      "START": {
+        "FIELD": "Inicio",
+        "REQUIRED": "Inicio es <b>requerido</b>"
+      },
+      "END": {
+        "FIELD": "Fin",
+        "REQUIRED": "Fin es <b>requerido</b>"
+      }
+    },
+    "ME": {
+      "TITLE": "Mi sala",
       "NAME": {
         "FIELD": "Nombre",
         "REQUIRED": "Nombre es <b>requerido</b>"
@@ -600,7 +641,11 @@
       "CANCELLED": "Cancelada"
     }
   },
-  "last": {
-    "dummy": "dummy translation"
+  "NOTIFICATION": {
+    "TITLE": "Notificaciones",
+    "LOAD_MORE": "Ver mas"
+  },
+  "APP": {
+    "TITLE": "Uñas"
   }
 }

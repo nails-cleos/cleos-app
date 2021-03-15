@@ -1,6 +1,6 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+    <div *ngIf="!error; else errorBox" fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <mat-card>
         <mat-card-header>
           <mat-card-title>{{ 'USER.DETAIL.TITLE' | translate }}</mat-card-title>
@@ -55,7 +55,8 @@
               </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.DETAIL.LANG.FIELD' | translate }}</mat-label>
-                <span *ngIf="select.value" [class]="'flag-icon  flag-icon-squared flag-icon-' + select.value.icon" matPrefix
+                <span *ngIf="select.value" [class]="'flag-icon  flag-icon-squared flag-icon-' + select.value.icon"
+                      matPrefix
                       style="margin-right: 8px;"></span>
                 <mat-select #select [formControl]="langValue" required>
 
@@ -87,5 +88,8 @@
         </form>
       </mat-card>
     </div>
+    <ng-template #errorBox>
+      <app-error [error]="error"></app-error>
+    </ng-template>
   </div>
 </div>

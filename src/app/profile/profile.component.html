@@ -1,25 +1,30 @@
 <div class="flex-container" fxLayout="column">
-  <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" class="card-container">
-    <div fxFlex.lt-sm="80%" fxFlex="50%" fxFlex.gt-lg="40%">
-      <mat-progress-bar mode="indeterminate" color="accent" *ngIf="isLoading"></mat-progress-bar>
+  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
+    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <mat-card>
-        <mat-card-header *ngIf="user">
+        <mat-card-header>
           <mat-card-title>{{ 'PROFILE.TITLE' | translate }}</mat-card-title>
-          <mat-card-subtitle>{{user.email}}</mat-card-subtitle>
-          <div mat-card-avatar class="circle" [ngStyle]="{'background-color':  '#673AB7' }">
-            <img *ngIf="!showInitials; else showInitialsBlock" src="{{user?.imageUrl}}" alt="profile">
+          <mat-card-subtitle *ngIf="user; else skeleton">{{user.email}}</mat-card-subtitle>
+          <ng-template #skeleton>
+            <div class="ssc-line"></div>
+          </ng-template>
+          <div *ngIf="user; else circle" [ngStyle]="{'background-color':  '#673AB7' }" class="circle" mat-card-avatar>
+            <img *ngIf="!showInitials; else showInitialsBlock" alt="profile" src="{{user?.imageUrl}}">
             <ng-template #showInitialsBlock>
               <div class="initials">{{ initials | uppercase }}</div>
             </ng-template>
           </div>
+          <ng-template #circle>
+            <div class="ssc-circle"></div>
+          </ng-template>
         </mat-card-header>
         <form (ngSubmit)="update()" [formGroup]="form" novalidate>
-          <mat-card-content>
+          <mat-card-content *ngIf="user; else boxSkeleton">
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PROFILE.USERNAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input matInput required formControlName="username" autocomplete="username">
+                  <input autocomplete="username" formControlName="username" matInput required>
                 </label>
                 <mat-error *ngIf="username.hasError('required')" [innerHTML]="'PROFILE.PROFILE.REQUIRED' | translate">
                 </mat-error>
@@ -30,7 +35,7 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PROFILE.FIRST_NAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input matInput required formControlName="firstName" autocomplete="username">
+                  <input autocomplete="username" formControlName="firstName" matInput required>
                 </label>
                 <mat-error *ngIf="firstName.hasError('required')"
                            [innerHTML]="'PROFILE.FIRST_NAME.REQUIRED' | translate">
@@ -42,7 +47,7 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PROFILE.LAST_NAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input matInput required formControlName="lastName" autocomplete="username">
+                  <input autocomplete="username" formControlName="lastName" matInput required>
                 </label>
                 <mat-error *ngIf="lastName.hasError('required')"
                            [innerHTML]="'PROFILE.LAST_NAME.REQUIRED' | translate">
@@ -53,10 +58,10 @@
               </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PROFILE.LANG.FIELD' | translate }}</mat-label>
-                <span *ngIf="select.value" [class]="'flag-icon  flag-icon-squared flag-icon-' + select.value.icon" matPrefix
+                <span *ngIf="select.value" [class]="'flag-icon  flag-icon-squared flag-icon-' + select.value.icon"
+                      matPrefix
                       style="margin-right: 8px;"></span>
                 <mat-select #select [formControl]="langValue" required>
-
                   <mat-option *ngFor="let lang of flags" [value]="lang">
                     <span [class]="'flag-icon  flag-icon-squared flag-icon-' + lang.icon"></span>
                     {{ 'COMMON.LANG.' + lang.text | translate }}
@@ -67,12 +72,21 @@
               </mat-form-field>
             </div>
           </mat-card-content>
-          <mat-card-actions>
+          <ng-template #boxSkeleton>
+            <div class="ssc-hr"></div>
+            <div class="ssc-square mb"></div>
+            <div class="ssc-hr"></div>
+          </ng-template>
+          <mat-card-actions *ngIf="user; else buttonSkeleton">
             <div fxFlex></div>
-            <button mat-raised-button color="primary" [disabled]="form.invalid"
+            <button [disabled]="form.invalid || !canChange" color="primary" mat-raised-button
                     type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
-            <button mat-raised-button color="accent" type="button" (click)="back()">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <button (click)="back()" color="accent" mat-raised-button
+                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
+          <ng-template #buttonSkeleton>
+            <div class="ssc-head-line"></div>
+          </ng-template>
         </form>
       </mat-card>
     </div>

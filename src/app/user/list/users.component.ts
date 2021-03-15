@@ -42,6 +42,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   getState: Observable<any>;
 
   allRole: Role[] = [Role.Customer, Role.Professional, Role.Admin];
+  error: string | undefined;
 
   resultsLength = 0;
   pageSize = PAGE_SIZE;
@@ -163,6 +164,9 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
             this.clean();
             this.getUsers();
           });
+        } else {
+          this.error = stateValue.error;
+          return;
         }
       }
       this.dataSource = stateValue.data?.content?.map((user: IUserAll) => {

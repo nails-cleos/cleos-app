@@ -20,11 +20,12 @@ import { ProductDetailComponent } from './product/detail/product-detail.componen
 import { RoomsComponent } from './room/list/rooms.component';
 import { RoomComponent } from './room/room.component';
 import { RoomDetailComponent } from './room/detail/room-detail.component';
-import { ReservationsComponent } from './reservation/list/reservations.component';
+import { AssignmentsComponent } from './assignment/assignments.component';
 import { ReservationComponent } from './reservation/reservation.component';
 import { ReservationDetailComponent } from './reservation/detail/reservation-detail.component';
 import { NotificationsComponent } from './notification/list/notifications.component';
 import { RoomMeComponent } from './room/me/room-me.component';
+import { CalendarComponent } from './reservation/calendar/calendar.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/dashboard', pathMatch: 'full', resolve: {model: TranslationLoaderResolver}},
@@ -99,12 +100,6 @@ const routes: Routes = [
     }
   },
   {
-    path: 'reservations', component: ReservationsComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService],
-    data: {
-      roles: [Role.Admin, Role.Professional]
-    }
-  },
-  {
     path: 'reservation', component: ReservationComponent, canActivate: [AuthGuardService], data: {
       roles: [Role.Admin, Role.Professional]
     }
@@ -112,6 +107,18 @@ const routes: Routes = [
   {
     path: 'reservation/:id', component: ReservationDetailComponent, canActivate: [AuthGuardService], data: {
       roles: [Role.Admin, Role.Professional]
+    }, runGuardsAndResolvers: 'always'
+  },
+  {
+    path: 'calendar', component: CalendarComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService],
+    data: {
+      roles: [Role.Admin, Role.Professional]
+    }
+  },
+  {
+    path: 'assignments', component: AssignmentsComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService],
+    data: {
+      roles: [Role.Professional]
     }
   },
   {
@@ -123,7 +130,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })],
+  imports: [RouterModule.forRoot(routes, {preloadingStrategy: PreloadAllModules, onSameUrlNavigation: 'reload'})],
   exports: [RouterModule]
 })
 export class AppRoutingModule {

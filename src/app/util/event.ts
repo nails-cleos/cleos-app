@@ -1,6 +1,6 @@
 import { IAvailability } from '../interfaces/room';
 import { CalendarEvent } from 'angular-calendar';
-import { FindStateColor } from './maps';
+import { FindStateColor } from './flags';
 
 export function FillNotAvailable(unavailable: string, lunch: string, notWorking: string, daysInWeek: number, plusHour: number,
                                  selectDate: Date, sunday: IAvailability, saturday: IAvailability, week: IAvailability,

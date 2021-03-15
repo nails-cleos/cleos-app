@@ -9,16 +9,37 @@ export interface IState {
   color: string;
 }
 
-export function Maps(): IFlag[] {
+export function Flags(): IFlag[] {
   return [{
     icon: 'ar',
     value: 'es-AR',
     text: 'ES'
   }, {
+    icon: 'es',
+    value: 'es',
+    text: 'ES'
+  }, {
+    icon: 'gb',
+    value: 'en-GB',
+    text: 'EN'
+  }, {
     icon: 'us',
     value: 'en',
     text: 'EN'
   }];
+}
+
+export function FindFlag(flags: IFlag[], lang: string): IFlag {
+  let value = flags.find(flag => flag.value === lang);
+  if (!value) {
+    const index = lang.indexOf('-');
+    const locale = index === -1 ? lang : lang.substr(0, index);
+    value = flags.find(flag => flag.value === locale);
+    if (!value) {
+      value = flags.find(flag => flag.value.startsWith(navigator.language) || navigator.language.startsWith(flag.value));
+    }
+  }
+  return value ? value : FindFlag(flags, 'en');
 }
 
 export function StateColor(): IState[] {

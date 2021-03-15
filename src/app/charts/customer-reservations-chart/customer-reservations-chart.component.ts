@@ -15,6 +15,7 @@ export class CustomerReservationsChartComponent implements OnChanges {
 
   isLoading = true;
   data: IReservationAll[] | undefined;
+  error: string | undefined;
 
   public barChartOptions: ChartOptions = {
     responsive: true,
@@ -51,7 +52,7 @@ export class CustomerReservationsChartComponent implements OnChanges {
     if (this.state) {
       this.isLoading = this.state.isLoading;
       if (this.state.errorMessage) {
-        // TODO: show error
+        this.error = this.state.error;
         return;
       }
       const chartResult = CustomerReservation(this.state.data, this.label);

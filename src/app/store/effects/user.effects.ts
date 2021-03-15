@@ -105,7 +105,7 @@ export class UserEffects {
     switchMap((payload: any) => {
       return this.userService.updateMe(payload).pipe(
         switchMap((response: any) => {
-          const message = this.translate.instant('PROFILE.MESSAGE', {username: response.username});
+          const message = this.translate.instant('PROFILE.UPDATED.MESSAGE', {username: response.username});
           return of(new fromActionsUser.UserSaveSuccess({message}));
         }),
         catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))

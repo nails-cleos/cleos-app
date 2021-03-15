@@ -1,27 +1,26 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatTableDataSource } from '@angular/material/table';
+import { Pagination } from '../interfaces/pagination';
+import { IReservation, IReservationAll, MOBILE_PAGE_SIZE, PAGE_SIZE } from '../interfaces/reservation';
+import { Observable, Subscription } from 'rxjs';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { Store } from '@ngrx/store';
-import { AppState, selectReservationState } from '../../store/app.states';
-import { Observable, Subscription } from 'rxjs';
-import * as fromActionsReservation from '../../store/reservation.actions';
-import { IReservation, IReservationAll, MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/reservation';
-import { MatTableDataSource } from '@angular/material/table';
-import { Pagination } from '../../interfaces/pagination';
-import { ReservationIconName } from '../detail/reservation-detail.component';
-import { DialogComponent } from '../../dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { Store } from '@ngrx/store';
+import { AppState, selectReservationState } from '../store/app.states';
+import { ReservationIconName } from '../reservation/detail/reservation-detail.component';
+import { DialogComponent } from '../dialog/dialog.component';
+import * as fromActionsReservation from '../store/reservation.actions';
 
 @Component({
-  selector: 'app-reservation-table',
-  templateUrl: './reservation-table.component.html',
-  styleUrls: ['./reservation-table.component.scss']
+  selector: 'app-reservations',
+  templateUrl: './assignments.component.html',
+  styleUrls: ['./assignments.component.scss']
 })
-export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestroy {
-  displayedColumns: string[] = ['position', 'customer', 'start', 'state', 'professional', 'product', 'actions'];
+export class AssignmentsComponent implements AfterViewInit, OnInit, OnDestroy {
+  displayedColumns: string[] = ['position', 'customer', 'start', 'state', 'product', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IReservationAll>>();
   getState: Observable<any>;
   subscription: Subscription | undefined;
@@ -36,17 +35,9 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
   error: string | undefined;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private router: Router,
-              private store: Store<AppState>, private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+              private store: Store<AppState>, private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectReservationState);
     this.language = this.translate.currentLang;
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small
-    ]).subscribe(result => {
-      if (result.matches) {
-        this.pageSize = MOBILE_PAGE_SIZE;
-      }
-    });
   }
 
   ngOnInit(): void {
@@ -80,22 +71,6 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
     this.router.navigate(['reservation', reservation.id]);
   }
 
-  delete(reservation: IReservation): void {
-    const title = this.translate.instant('RESERVATION.DELETED.TITLE');
-    const content = this.translate.instant('RESERVATION.DELETED.CONTENT', {start: reservation.start});
-    const dialogRef = this.dialog.open(DialogComponent, {
-      data: {title, content, value: reservation}
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.store.dispatch(
-          new fromActionsReservation.DeleteReservation(result.id)
-        );
-      }
-    });
-  }
-
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       this.error = state.error;
@@ -110,11 +85,11 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
     const payload = {
       active: this.sort.active,
       direction: this.sort.direction,
-      page: this.paginator.pageIndex,
-      size: this.pageSize
+      page: this.paginator.pageIndex
     };
     this.store.dispatch(
-      new fromActionsReservation.GetAllPage(payload)
+      new fromActionsReservation.GetAllAssignmentPage(payload)
     );
   }
 }
+

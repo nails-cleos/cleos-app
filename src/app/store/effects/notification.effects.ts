@@ -25,19 +25,6 @@ export class NotificationEffects {
   );
 
   @Effect()
-  findMyNotifications$ = this.actions$.pipe(ofType(fromActionsNotification.NotificationActionTypes.NOTIFICATION)).pipe(
-    map((action: any) => action.payload),
-    switchMap(() => {
-      return this.notificationService.findNotifications().pipe(
-        switchMap((response: any) => {
-          return of(new fromActionsNotification.NotificationSuccess(response));
-        }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsNotification.NotificationFailure({error: err.error})))
-      );
-    })
-  );
-
-  @Effect()
   readNotification$ = this.actions$.pipe(ofType(fromActionsNotification.NotificationActionTypes.NOTIFICATION_READ)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => {
@@ -60,7 +47,6 @@ export class NotificationEffects {
     ofType(fromActionsNotification.NotificationActionTypes.NOTIFICATION_READ_SUCCESS),
     tap((data: any) => {
         this.router.navigate([data.payload.navigation]);
-        location.reload();
     })
   );
 

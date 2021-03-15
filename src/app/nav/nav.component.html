@@ -4,7 +4,7 @@
                [opened]="(isHandset$ | async) === false" class="sidenav" fixedInViewport>
     <mat-card *ngIf="currentUser">
       <mat-card-header>
-        <div [ngStyle]="{'background-color':  '#673AB7' }" class="circle" mat-card-avatar>
+        <div class="circle" mat-card-avatar>
           <img *ngIf="!showInitials; else showInitialsBlock" alt="profile" src="{{currentUser?.imageUrl}}">
           <ng-template #showInitialsBlock>
             <div class="initials">{{ initials | uppercase }}</div>
@@ -16,21 +16,21 @@
     </mat-card>
     <mat-toolbar *ngIf="currentUser">Menu</mat-toolbar>
     <mat-nav-list *ngIf="currentUser">
-      <div *ngFor="let menu of menuItems">
+      <mat-divider></mat-divider>
+      <div *ngFor="let menu of menuItems; last as last">
         <a (click)="drawer.toggle()" *ngIf="isHandset$ | async; else showMenu" [routerLink]="'/'+menu.path"
            mat-list-item>
           <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>
           <div mat-line>{{menu.name}}</div>
         </a>
         <ng-template #showMenu>
-          <a [routerLink]="'/'+menu.path" mat-list-item>
+          <a [routerLinkActive]="['active']" [routerLink]="'/'+menu.path" mat-list-item>
             <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>
             <div mat-line>{{menu.name}}</div>
           </a>
         </ng-template>
-        <mat-divider></mat-divider>
+        <mat-divider *ngIf="!last"></mat-divider>
       </div>
-      <mat-divider></mat-divider>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
@@ -44,17 +44,26 @@
       <div *ngIf="username; else login">
         <button *ngIf="notifications.length; else notificationIcon" [matMenuTriggerFor]="menuNotification"
                 mat-icon-button style="margin-right: 10px">
-          <mat-icon [matBadgeHidden]="!notifications.length" [matBadge]="notifications.length" matBadgeColor="warn">
+          <mat-icon [matBadgeHidden]="!countNotifications"
+                    [matBadge]="plusNotification ? plusNotification : countNotifications"
+                    matBadgeColor="warn">
             notifications
           </mat-icon>
         </button>
         <mat-menu #menuNotification="matMenu" xPosition="before">
           <mat-list>
-            <mat-list-item (click)="notification(n)" *ngFor="let n of notifications" class="notification" matRipple>
-              <div mat-line>{{n.message}}</div>
-              <div mat-line>{{n.date | date:'short':undefined:language}}</div>
+            <mat-list-item (click)="notification(not)" *ngFor="let not of notifications" class="notification" matRipple>
+              <div [matTooltip]="not.message" [ngClass]="{ 'gray-text': not.read}" mat-line>
+                <span *ngIf="!not.read" class="dot"></span>{{not.message}}
+              </div>
+              <div [ngClass]="{ 'gray-text': not.read}" mat-line>{{not.date | date:'short':undefined:language}}</div>
+              <mat-divider class="divider"></mat-divider>
             </mat-list-item>
-            <mat-divider></mat-divider>
+            <mat-list-item>
+              <button color="primary" mat-button routerLink="/notifications">
+                {{'NOTIFICATION.LOAD_MORE' | translate}}
+              </button>
+            </mat-list-item>
           </mat-list>
         </mat-menu>
         <ng-template #notificationIcon>

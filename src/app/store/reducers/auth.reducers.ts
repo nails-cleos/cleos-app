@@ -7,6 +7,7 @@ export interface State {
   token: null;
   menus: IMenu[] | null;
   errorMessage: string | null;
+  error: any;
   message: string | null;
   subErrors: any;
   queryParams: any;
@@ -18,6 +19,7 @@ export const initialState: State = {
   token: null,
   menus: null,
   errorMessage: null,
+  error: null,
   message: null,
   subErrors: null,
   queryParams: {}
@@ -30,6 +32,7 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         errorMessage: action.payload.error.message,
+        error: action.payload.error,
         message: null,
         subErrors: action.payload.error.subErrors
       };

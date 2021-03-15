@@ -46,12 +46,13 @@ export interface ICalendar {
 
 export interface IReservationSummary {
   title: string;
-  value: number;
-  isIncrease: boolean;
-  color: ThemePalette;
-  percentValue: number;
-  icon: string;
-  isCurrency: boolean;
+  value?: number;
+  isIncrease?: boolean;
+  color?: ThemePalette;
+  percentValue?: number;
+  icon?: string;
+  isCurrency?: boolean;
+  error?: string;
 }
 
 export class Reservation implements IReservation {

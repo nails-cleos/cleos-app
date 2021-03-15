@@ -1,10 +1,15 @@
-<div class="chartContainer" *ngIf="!isLoading; else box">
-  <canvas baseChart
-    [datasets]="radarChartData"
-    [options]="radarChartOptions"
-    [labels]="radarChartLabels"
-    [chartType]="radarChartType">
-  </canvas>
+<div *ngIf="!isLoading; else box" class="chartContainer">
+  <div *ngIf="!error; else errorBox">
+    <canvas [chartType]="radarChartType"
+            [datasets]="radarChartData"
+            [labels]="radarChartLabels"
+            [options]="radarChartOptions"
+            baseChart>
+    </canvas>
+  </div>
+  <ng-template #errorBox>
+    <app-error [error]="error" [isCard]="true"></app-error>
+  </ng-template>
 </div>
 <ng-template #box>
   <div class="ssc-square mb"></div>

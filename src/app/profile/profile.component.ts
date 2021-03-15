@@ -8,7 +8,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import * as fromActionsUser from '../store/user.actions';
 import { FieldChange, ValueChange } from '../util/validators';
 import { Location } from '@angular/common';
-import { Maps, IFlag } from '../util/maps';
+import { FindFlag, Flags, IFlag } from '../util/flags';
 import { Router } from '@angular/router';
 
 @Component({
@@ -41,7 +41,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     Validators.required
   ]);
 
-  flags: IFlag[] = Maps();
+  flags: IFlag[] = Flags();
 
   constructor(private snackBar: MatSnackBar, private store: Store<AppState>, private formBuilder: FormBuilder, private location: Location,
               private cdRef: ChangeDetectorRef, private router: Router) {
@@ -70,6 +70,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     user.firstName = FieldChange(this.firstName, this.user?.firstName);
     user.lastName = FieldChange(this.lastName, this.user?.lastName);
 
+    this.user = undefined;
     this.store.dispatch(
       new fromActionsUser.UpdateUser(user)
     );
@@ -103,7 +104,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private subscribe(): void {
     this.subscription = this.getState.subscribe((state) => {
       this.isLoading = state.isLoading;
-      if (state.selected) {
+      if (state.selected && !this.isLoading) {
         const user = state.selected;
         this.user = user;
         this.canChange = user?.provider === 'LOCAL';
@@ -116,8 +117,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
           this.showInitials = true;
         }
         this.form.patchValue(state.selected);
-        const langValue = this.flags.filter((lang: any) => lang.value === state.selected.lang)[0];
+        const langValue = FindFlag(this.flags, state.selected.lang);
         this.langValue.setValue(langValue);
+        this.cdRef.detectChanges();
       }
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
@@ -125,15 +127,12 @@ export class ProfileComponent implements OnInit, OnDestroy {
           this.form.controls[value.field].setErrors({incorrect: true});
         });
       } else if (state.errorMessage || state.message) {
-        const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
+        if (state.message) {
+          this.findMe();
+        }
+        this.snackBar.open(state.errorMessage || state.message, 'OK', {
           duration: 5000
         });
-        if (state.message) {
-          snackBarRef.afterDismissed().subscribe(() => {
-            this.clean();
-            this.router.navigate(['main']);
-          });
-        }
       }
     });
   }

@@ -13,18 +13,20 @@ import { FillNotAvailable, NewEvent } from '../../util/event';
 import { Router } from '@angular/router';
 import { CalendarEvent, CalendarView } from 'angular-calendar';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { FindStateColor, IState, StateColor } from '../../util/maps';
+import { FindStateColor, IState, StateColor } from '../../util/flags';
+import { IUserAll } from '../../interfaces/user';
 
 @Component({
-  selector: 'app-reservations',
-  templateUrl: './reservations.component.html',
-  styleUrls: ['./reservations.component.scss']
+  selector: 'app-calendar',
+  templateUrl: './calendar.component.html',
+  styleUrls: ['./calendar.component.scss']
 })
-export class ReservationsComponent implements OnInit, OnDestroy {
+export class CalendarComponent implements OnInit, OnDestroy {
   getState: Observable<any>;
   subscription: Subscription | undefined;
 
   isLoading = false;
+  error: string | undefined;
 
   data: IRoomReservation[] | undefined;
   calendar: Map<string, ICalendar> = new Map<string, ICalendar>();
@@ -39,6 +41,7 @@ export class ReservationsComponent implements OnInit, OnDestroy {
   days = 0;
   smallScreen: boolean | undefined;
   locale: string;
+  professionalId: string | undefined;
 
   colors: IState[] = StateColor();
 
@@ -60,6 +63,11 @@ export class ReservationsComponent implements OnInit, OnDestroy {
     const userLang = this.translate.currentLang;
     const index = userLang.indexOf('-');
     this.locale = index === -1 ? userLang : userLang.substr(0, index);
+    const token = localStorage.getItem('auth');
+    if (token) {
+      const user: IUserAll = JSON.parse(token).user;
+      this.professionalId = user.id;
+    }
   }
 
   private static getAvailability(room: IRoom): any {
@@ -138,7 +146,7 @@ export class ReservationsComponent implements OnInit, OnDestroy {
         this.data = stateValue.data;
         stateValue.data.forEach((value: IRoomReservation) => this.addReservations(value));
         this.calendar.forEach(calendar => {
-          const {week, saturday, sunday} = ReservationsComponent.getAvailability(calendar.room);
+          const {week, saturday, sunday} = CalendarComponent.getAvailability(calendar.room);
           const {min, max} = GetStartEndDay(week, saturday, sunday);
           calendar.day = new Day(min.getHours() - 1, min.getMinutes(), max.getHours() + 1, max.getMinutes());
           const unavailable = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.UNAVAILABLE');
@@ -153,6 +161,9 @@ export class ReservationsComponent implements OnInit, OnDestroy {
         this.snackBar.open(stateValue.errorMessage || stateValue.message, 'OK', {
           duration: 5000
         });
+        if (stateValue.errorMessage) {
+          this.error = stateValue.error;
+        }
       }
       this.isLoading = stateValue.isLoading;
     });

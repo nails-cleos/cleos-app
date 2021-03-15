@@ -1,4 +1,4 @@
-<div class="mat-elevation-z8 small-table">
+<div *ngIf="!error; else errorBox" class="mat-elevation-z8 small-table">
   <table [dataSource]="dataSource" mat-table matSort matSortActive="username" matSortDirection="desc"
          matSortDisableClear multiTemplateDataRows>
     <ng-container matColumnDef="position">
@@ -93,9 +93,9 @@
             <mat-icon color="primary">edit</mat-icon>
           </button>
           <button (click)="delete(user)" *ngIf="!user.deleted"
-                  matTooltipPosition="above"
                   mat-icon-button
-                  matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}">
+                  matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}"
+                  matTooltipPosition="above">
             <mat-icon color="warn">delete</mat-icon>
           </button>
           <button (click)="sendInvite(user)" *ngIf="!user.deleted && !user.enabled && user.provider === 'LOCAL'"
@@ -149,14 +149,14 @@
                 <mat-list-item *ngFor="let it of user.authorities" role="list">
                   <mat-icon mat-list-icon>{{getIcon(it.authority)}}</mat-icon>
                   <div mat-line>{{ 'COMMON.ROLES.' + it.authority | translate}}</div>
-                  <button mat-icon-button color="warn" (click)="removeRole(user, it.authority)">
+                  <button (click)="removeRole(user, it.authority)" color="warn" mat-icon-button>
                     <mat-icon mat-list-icon>clear</mat-icon>
                   </button>
                 </mat-list-item>
               </div>
               <div class="flex-child">
                 <div *ngFor="let role of user.missing">
-                  <button mat-icon-button color="primary" (click)="addRole(user, role)">
+                  <button (click)="addRole(user, role)" color="primary" mat-icon-button>
                     <mat-icon mat-list-icon>{{getIcon(role)}}</mat-icon>
                     {{'COMMON.BUTTON.ADD' | translate}} {{ 'COMMON.ROLES.' + role | translate | lowercase}}</button>
                 </div>
@@ -178,3 +178,6 @@
     <mat-icon>person_add</mat-icon>
   </button>
 </div>
+<ng-template #errorBox>
+  <app-error [error]="error"></app-error>
+</ng-template>
