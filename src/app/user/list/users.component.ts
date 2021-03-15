@@ -1,8 +1,8 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { IUser, PAGE_SIZE } from '../../interfaces/user';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { IUser, IUserAll, PAGE_SIZE } from '../../interfaces/user';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import * as fromActionsUser from '../../store/user.actions';
 import { MatTableDataSource } from '@angular/material/table';
@@ -13,6 +13,13 @@ import { MatSort } from '@angular/material/sort';
 import { Pagination } from '../../interfaces/pagination';
 import { TranslateService } from '@ngx-translate/core';
 import { animate, state, style, transition, trigger } from '@angular/animations';
+import { Role } from '../../interfaces/token';
+
+enum RoleIconName {
+  ROLE_CUSTOMER = 'perm_identity',
+  ROLE_PROFESSIONAL = 'manage_accounts',
+  ROLE_ADMIN = 'supervisor_account'
+}
 
 @Component({
   selector: 'app-users',
@@ -22,16 +29,20 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
     trigger('detailExpand', [
       state('collapsed', style({height: '0px', minHeight: '0'})),
       state('expanded', style({height: '*'})),
-      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
-    ]),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)'))
+    ])
   ]
 })
-export class UsersComponent implements OnInit, AfterViewInit {
+export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
 
   displayedColumns: string[] = ['position', 'name', 'username', 'email', 'provider', 'status', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IUser>>();
+  subscription: Subscription | undefined;
   expandedUser: IUser | undefined;
   getState: Observable<any>;
+
+  allRole: Role[] = [Role.Customer, Role.Professional, Role.Admin];
+  error: string | undefined;
 
   resultsLength = 0;
   pageSize = PAGE_SIZE;
@@ -42,6 +53,11 @@ export class UsersComponent implements OnInit, AfterViewInit {
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
               private store: Store<AppState>, private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectUserState);
+  }
+
+  ngOnInit(): void {
+    this.subscribe();
+    this.clean();
   }
 
   ngAfterViewInit(): void {
@@ -58,45 +74,8 @@ export class UsersComponent implements OnInit, AfterViewInit {
     this.cdRef.detectChanges();
   }
 
-  ngOnInit(): void {
-    this.subscribe();
-    this.clean();
-  }
-
-  subscribe(): void {
-    this.getState.subscribe((stateValue) => {
-      if (stateValue.errorMessage || stateValue.message) {
-        const snackBarRef = this.snackBar.open(stateValue.errorMessage || stateValue.message, 'OK', {
-          duration: 5000
-        });
-
-        if (stateValue.message) {
-          snackBarRef.afterDismissed().subscribe(() => {
-            this.clean();
-            this.getUsers();
-          });
-        }
-      }
-      this.dataSource = stateValue.data?.content;
-      this.resultsLength = stateValue.data?.totalElements;
-    });
-  }
-
-  clean(): void {
-    this.store.dispatch(
-      new fromActionsUser.Clean()
-    );
-  }
-
-  getUsers(): void {
-    const payload = {
-      active: this.sort.active,
-      direction: this.sort.direction,
-      page: this.paginator.pageIndex
-    };
-    this.store.dispatch(
-      new fromActionsUser.GetAll(payload)
-    );
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 
   edit(user: IUser): void {
@@ -136,6 +115,68 @@ export class UsersComponent implements OnInit, AfterViewInit {
           new fromActionsUser.ResendToken(result.id)
         );
       }
+    });
+  }
+
+  getIcon(name: any): any {
+    // @ts-ignore
+    return RoleIconName[name];
+  }
+
+  addRole(user: IUserAll, role: Role): void {
+    this.store.dispatch(
+      new fromActionsUser.SetRole({user, role, action: 'ADD'})
+    );
+  }
+
+  removeRole(user: IUserAll, role: string): void {
+    this.store.dispatch(
+      new fromActionsUser.SetRole({user, role, action: 'REMOVE'})
+    );
+  }
+
+  private clean(): void {
+    this.store.dispatch(
+      new fromActionsUser.Clean()
+    );
+  }
+
+  private getUsers(): void {
+    const payload = {
+      active: this.sort.active,
+      direction: this.sort.direction,
+      page: this.paginator.pageIndex
+    };
+    this.store.dispatch(
+      new fromActionsUser.GetAll(payload)
+    );
+  }
+
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe((stateValue) => {
+      if (stateValue.errorMessage || stateValue.message) {
+        const snackBarRef = this.snackBar.open(stateValue.errorMessage || stateValue.message, 'OK', {
+          duration: 5000
+        });
+
+        if (stateValue.message) {
+          snackBarRef.afterDismissed().subscribe(() => {
+            this.clean();
+            this.getUsers();
+          });
+        } else {
+          this.error = stateValue.error;
+          return;
+        }
+      }
+      this.dataSource = stateValue.data?.content?.map((user: IUserAll) => {
+        if (user.authorities) {
+          const missing = this.allRole.filter(au => !user.authorities.some(u => u.authority === au));
+          return Object.assign({}, user, {missing});
+        }
+        return user;
+      });
+      this.resultsLength = stateValue.data?.totalElements;
     });
   }
 

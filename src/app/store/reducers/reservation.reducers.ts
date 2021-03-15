@@ -12,6 +12,7 @@ export interface State {
   rooms: IRoom[] | null;
   products: IProduct[] | null;
   errorMessage: string | null;
+  error: any;
   subErrors: any;
   selected: IReservation | null;
   message: string | null;
@@ -25,6 +26,7 @@ export const initialState: State = {
   rooms: null,
   products: null,
   errorMessage: null,
+  error: null,
   subErrors: null,
   selected: null,
   message: null,
@@ -44,6 +46,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
+    case ReservationActionTypes.GET_ALL_ASSIGNMENT_PAGE:
     case ReservationActionTypes.GET_ALL_PAGE: {
       return {
         ...state,
@@ -100,6 +103,10 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
+    case ReservationActionTypes.APPROVE:
+    case ReservationActionTypes.START:
+    case ReservationActionTypes.COMPLETE:
+    case ReservationActionTypes.CANCEL:
     case ReservationActionTypes.RESERVATION_FIND: {
       return {
         ...state,
@@ -162,6 +169,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
+    case ReservationActionTypes.STATE_SUCCESS:
     case ReservationActionTypes.RESERVATION_SAVE_SUCCESS: {
       return {
         ...state,
@@ -185,6 +193,7 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         errorMessage: action.payload.error.message,
+        error: action.payload.error,
         subErrors: action.payload.error.subErrors,
         message: null,
         isLoading: false

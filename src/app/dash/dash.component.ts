@@ -8,6 +8,7 @@ import * as fromActionsReservation from '../store/reservation.actions';
 import { IReservationAll, IReservationSummary } from '../interfaces/reservation';
 import { IUserAll } from '../interfaces/user';
 import { TranslateService } from '@ngx-translate/core';
+import { ThemePalette } from '@angular/material/core';
 
 @Component({
   selector: 'app-dash',
@@ -59,6 +60,21 @@ export class DashComponent implements OnInit, OnDestroy {
     return total + reservation.product.price;
   }
 
+  private static createMiniCard(title: string, value: number, isIncrease: boolean, color: ThemePalette, percentValue: number,
+                                icon: string, isCurrency: boolean): IReservationSummary {
+    return {
+      title: `DASHBOARD.MINI_CARD.${title}`,
+      value, isIncrease, color, percentValue, icon, isCurrency
+    };
+  }
+
+  private static createErrorMiniCard(title: string, error: string): IReservationSummary {
+    return {
+      title: `DASHBOARD.MINI_CARD.${title}`,
+      error
+    };
+  }
+
   ngOnInit(): void {
     this.clean();
     this.subscribe();
@@ -77,7 +93,18 @@ export class DashComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      if (state.data) {
+      if (state.errorMessage) {
+        this.state = state;
+        const revenue = DashComponent.createErrorMiniCard('TOTAL_PRODUCT_SALES', this.state.errorMessage);
+
+        const products = DashComponent.createErrorMiniCard('AVERAGE_PRODUCT_VALUE', this.state.errorMessage);
+
+        const totalProducts = DashComponent.createErrorMiniCard('TOTAL_PRODUCTS', this.state.errorMessage);
+
+        const customer = DashComponent.createErrorMiniCard('NEW_CUSTOMERS_RESERVATION', this.state.errorMessage);
+        this.miniCardData = [revenue, products, totalProducts, customer];
+      }
+      if (state.data && Array.isArray(state.data) && !state.data[0].reservations) {
         this.state = state;
         const now = new Date(new Date().setHours(0, 0));
         const filterDate = new Date(now.setMonth(now.getMonth() - 1));
@@ -140,45 +167,21 @@ export class DashComponent implements OnInit, OnDestroy {
             }
           });
 
-          const revenue = {
-            title: 'DASHBOARD.MINI_CARD.TOTAL_PRODUCT_SALES',
-            value: totalRevenue,
-            isIncrease: lastMonthRevenue >= prevMonthRevenue,
-            color: 'primary',
-            percentValue: Math.abs((lastMonthRevenue - prevMonthRevenue) / Math.abs(prevMonthRevenue)),
-            icon: 'payments',
-            isCurrency: true
-          } as IReservationSummary;
+          const revenue = DashComponent.createMiniCard('TOTAL_PRODUCT_SALES', totalRevenue,
+            lastMonthRevenue >= prevMonthRevenue, 'primary',
+            Math.abs((lastMonthRevenue - prevMonthRevenue) / Math.abs(prevMonthRevenue)), 'payments', true);
 
-          const products = {
-            title: 'DASHBOARD.MINI_CARD.AVERAGE_PRODUCT_VALUE',
-            value: Number((totalAvg).toFixed(2)),
-            isIncrease: lastMonthAvg >= prevMonthAvg,
-            color: 'accent',
-            percentValue: Math.abs((lastMonthAvg - prevMonthAvg) / Math.abs(prevMonthAvg)),
-            icon: 'local_atm',
-            isCurrency: true
-          } as IReservationSummary;
+          const products = DashComponent.createMiniCard('AVERAGE_PRODUCT_VALUE', Number((totalAvg).toFixed(2)),
+            lastMonthAvg >= prevMonthAvg, 'accent',
+            Math.abs((lastMonthAvg - prevMonthAvg) / Math.abs(prevMonthAvg)), 'local_atm', true);
 
-          const totalProducts = {
-            title: 'DASHBOARD.MINI_CARD.TOTAL_PRODUCTS',
-            value: completedList.length,
-            isIncrease: lastMonthList.length >= prevMonthList.length,
-            color: 'warn',
-            percentValue: Math.abs((lastMonthList.length - prevMonthList.length) / Math.abs(prevMonthList.length)),
-            icon: 'shopping_cart',
-            isCurrency: false
-          } as IReservationSummary;
+          const totalProducts = DashComponent.createMiniCard('TOTAL_PRODUCTS', completedList.length,
+            lastMonthList.length >= prevMonthList.length, 'primary',
+            Math.abs((lastMonthList.length - prevMonthList.length) / Math.abs(prevMonthList.length)), 'home_repair_service', false);
 
-          const customer = {
-            title: 'DASHBOARD.MINI_CARD.NEW_CUSTOMERS_RESERVATION',
-            value: lastMonthCounter,
-            isIncrease: lastMonthCounter >= prevCounter,
-            color: 'primary',
-            percentValue: Math.abs((lastMonthCounter - prevCounter) / prevCounter),
-            icon: 'portrait',
-            isCurrency: false
-          } as IReservationSummary;
+          const customer = DashComponent.createMiniCard('NEW_CUSTOMERS_RESERVATION', lastMonthCounter,
+            lastMonthCounter >= prevCounter, 'accent',
+            Math.abs((lastMonthCounter - prevCounter) / prevCounter), 'portrait', false);
 
           this.miniCardData = [revenue, products, totalProducts, customer];
         }

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
@@ -18,9 +18,11 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../dialog/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { ConvertDuration, Duration, GetMinAndMax, GetStartEndDay, IDuration } from '../util/dates';
+import { ConvertDuration, Duration, GetStartEndDay, IDuration } from '../util/dates';
 import { FillNotAvailable, NewEvent } from '../util/event';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
+import { DateAdapter } from '@angular/material/core';
+import { FindStateColor } from '../util/flags';
 
 @Component({
   selector: 'app-reservation',
@@ -36,6 +38,7 @@ export class ReservationComponent implements OnInit, OnDestroy {
   errors: any = [];
 
   isLoading = false;
+  error: string | undefined;
 
   customerForm!: FormGroup;
   customers: IUser[] | undefined;
@@ -86,11 +89,12 @@ export class ReservationComponent implements OnInit, OnDestroy {
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
               private store: Store<AppState>, private formBuilder: FormBuilder, private breakpointObserver: BreakpointObserver,
-              private router: Router) {
+              private router: Router, private adapter: DateAdapter<any>) {
     this.getState = this.store.select(selectReservationState);
-    const userLang = navigator.language;
+    const userLang = this.translate.currentLang;
     const index = userLang.indexOf('-');
     this.locale = index === -1 ? userLang : userLang.substr(0, index);
+    this.adapter.setLocale(this.locale);
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -118,129 +122,6 @@ export class ReservationComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
-  }
-
-  createForm(): void {
-    this.customerForm = this.formBuilder.group({
-      customer: this.customer
-    });
-    this.productForm = this.formBuilder.group({
-      product: this.product,
-      date: this.date
-    });
-    this.roomForm = this.formBuilder.group({
-      room: this.room
-    });
-
-    this.filteredCustomer = this.customer.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterCustomer(name) : this.customers ? this.customers.slice() : this.customers)
-    );
-    this.filteredProduct = this.product.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterProduct(name) : this.products ? this.products.slice() : this.products)
-    );
-    this.filteredRoom = this.room.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterRoom(name) : this.rooms ? this.rooms.slice() : this.rooms)
-    );
-  }
-
-  clean(): void {
-    this.store.dispatch(
-      new fromActionsReservation.Clean()
-    );
-  }
-
-  subscribe(): void {
-    this.subscription = this.getState.subscribe(state => {
-      this.isLoading = state.isLoading;
-      this.customers = state.customers;
-      this.products = state.products;
-      this.rooms = state.rooms;
-      if (this.rooms?.length === 1) {
-        this.room.setValue(this.rooms[0]);
-      }
-      if (state.data && !state.isLoading) {
-        this.reservations = state.data;
-        this.addReservations();
-        if (this.extras && !this.eventSelected) {
-          this.segmentClick(this.extras.date);
-        }
-      }
-      if (state.subErrors) {
-        state.subErrors.forEach((value: any) => {
-          switch (value.field) {
-            case 'room':
-              this.stepper.selectedIndex = 1;
-              break;
-            case 'professional':
-              this.stepper.selectedIndex = 3;
-              break;
-            default:
-              this.stepper.selectedIndex = 0;
-              break;
-          }
-          this.eventSelected = undefined;
-          this.errors[value.field] = value.message;
-          this.customerForm.controls[value.field]?.setErrors({incorrect: true});
-          this.productForm.controls[value.field]?.setErrors({incorrect: true});
-        });
-      } else if (state.errorMessage) {
-        this.snackBar.open(state.errorMessage, 'OK', {
-          duration: 5000
-        });
-      }
-    });
-  }
-
-  addReservations(): void {
-    this.reservations?.forEach(it => {
-      if (it.product.duration) {
-        const start = new Date(it.start);
-        const duration = ConvertDuration(it.product.duration);
-        const end = new Date(new Date(start).setHours(
-          start.getHours() + duration.hour, start.getMinutes() + duration.minute)
-        );
-        const detail = this.translate.instant('RESERVATION.ADD.EVENT.DETAIL', {
-          customerName: `${it.customer.firstName} ${it.customer.lastName}`,
-          productName: it.product.name,
-          duration: `${duration.hour}:${duration.minute}`
-        });
-
-        const event = NewEvent(detail, '#ede7f6', start, end, '#000', it.id);
-        this.events = [...this.events, event];
-      }
-    });
-  }
-
-  getCustomers(): void {
-    this.store.dispatch(
-      new fromActionsReservation.GetAllCustomers()
-    );
-  }
-
-  getProducts(stepper: MatStepper): void {
-    if (this.roomForm.invalid) {
-      return;
-    }
-    this.store.dispatch(
-      new fromActionsReservation.GetAllProducts()
-    );
-    stepper.next();
-  }
-
-  getRooms(stepper: MatStepper): void {
-    if (this.customerForm.invalid) {
-      return;
-    }
-    this.store.dispatch(
-      new fromActionsReservation.GetAllRooms()
-    );
-    stepper.next();
   }
 
   myFilter = (d: Date | null): boolean => {
@@ -297,7 +178,7 @@ export class ReservationComponent implements OnInit, OnDestroy {
     const lunch = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.LUNCH');
     const notWorking = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.OUT_OF_WORK');
     this.events = this.events.concat(FillNotAvailable(unavailable, lunch, notWorking,
-      this.daysInWeek, 1, date, sunday, saturday, week));
+      this.daysInWeek, 1, date, sunday, saturday, week, true));
     this.viewDate = date;
     this.store.dispatch(
       new fromActionsReservation.SearchReservation({date: this.date.value, roomId: this.room.value.id})
@@ -321,7 +202,7 @@ export class ReservationComponent implements OnInit, OnDestroy {
       duration: `${duration.hour}:${duration.minute}`
     });
 
-    const event = NewEvent(detail, '#ede7f6', start, end, '#000');
+    const event = NewEvent(detail, FindStateColor('CREATED'), start, end, '#000');
 
     let title;
     let content;
@@ -378,6 +259,134 @@ export class ReservationComponent implements OnInit, OnDestroy {
   goBack(stepper: MatStepper): void {
     this.isPreview = false;
     stepper.previous();
+  }
+
+  getProducts(stepper: MatStepper): void {
+    if (this.roomForm.invalid) {
+      return;
+    }
+    this.store.dispatch(
+      new fromActionsReservation.GetAllProducts()
+    );
+    stepper.next();
+  }
+
+  getRooms(stepper: MatStepper): void {
+    if (this.customerForm.invalid) {
+      return;
+    }
+    this.store.dispatch(
+      new fromActionsReservation.GetAllRooms()
+    );
+    stepper.next();
+  }
+
+  private createForm(): void {
+    this.customerForm = this.formBuilder.group({
+      customer: this.customer
+    });
+    this.productForm = this.formBuilder.group({
+      product: this.product,
+      date: this.date
+    });
+    this.roomForm = this.formBuilder.group({
+      room: this.room
+    });
+
+    this.filteredCustomer = this.customer.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value.name),
+      map(name => name ? this.filterCustomer(name) : this.customers ? this.customers.slice() : this.customers)
+    );
+    this.filteredProduct = this.product.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value.name),
+      map(name => name ? this.filterProduct(name) : this.products ? this.products.slice() : this.products)
+    );
+    this.filteredRoom = this.room.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value.name),
+      map(name => name ? this.filterRoom(name) : this.rooms ? this.rooms.slice() : this.rooms)
+    );
+  }
+
+  private clean(): void {
+    this.store.dispatch(
+      new fromActionsReservation.Clean()
+    );
+  }
+
+  private addReservations(): void {
+    this.reservations?.forEach(it => {
+      if (it.product.duration) {
+        const start = new Date(it.start);
+        if (start < new Date()) {
+          return;
+        }
+        const duration = ConvertDuration(it.product.duration);
+        const end = new Date(new Date(start).setHours(
+          start.getHours() + duration.hour, start.getMinutes() + duration.minute)
+        );
+        const detail = this.translate.instant('RESERVATION.ADD.EVENT.DETAIL', {
+          customerName: `${it.customer.firstName} ${it.customer.lastName}`,
+          productName: it.product.name,
+          duration: `${duration.hour}:${duration.minute}`
+        });
+
+        const color = FindStateColor(it.state);
+        const event = NewEvent(detail, color, start, end, '#000', it.id);
+        this.events = [...this.events, event];
+      }
+    });
+  }
+
+  private getCustomers(): void {
+    this.store.dispatch(
+      new fromActionsReservation.GetAllCustomers()
+    );
+  }
+
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe(state => {
+      this.isLoading = state.isLoading;
+      this.customers = state.customers;
+      this.products = state.products;
+      this.rooms = state.rooms;
+      if (this.rooms?.length === 1) {
+        this.room.setValue(this.rooms[0]);
+      }
+      if (state.data && !state.isLoading) {
+        this.reservations = state.data;
+        this.addReservations();
+        if (this.extras && !this.eventSelected) {
+          this.segmentClick(this.extras.date);
+        }
+      }
+      if (state.subErrors) {
+        state.subErrors.forEach((value: any) => {
+          switch (value.field) {
+            case 'room':
+              this.stepper.selectedIndex = 1;
+              break;
+            case 'professional':
+              this.stepper.selectedIndex = 3;
+              break;
+            default:
+              this.stepper.selectedIndex = 0;
+              break;
+          }
+          this.eventSelected = undefined;
+          this.errors[value.field] = value.message;
+          this.customerForm.controls[value.field]?.setErrors({incorrect: true});
+          this.productForm.controls[value.field]?.setErrors({incorrect: true});
+        });
+      } else if (state.errorMessage) {
+        this.error = state.error;
+        this.snackBar.open(state.errorMessage, 'OK', {
+          duration: 5000
+        });
+      }
+    });
   }
 
   private createSelectEvent(title: string, content: string, event: CalendarEvent): void {

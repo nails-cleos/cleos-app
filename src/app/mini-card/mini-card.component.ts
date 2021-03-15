@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-mini-card',
@@ -13,13 +14,16 @@ export class MiniCardComponent implements OnInit {
   @Input() color: ThemePalette | undefined;
   @Input() isIncrease: boolean | undefined;
   @Input() isCurrency: boolean | undefined;
-  @Input() duration!: string;
+  @Input() duration: string | undefined;
   @Input() percentValue: number | undefined;
+  @Input() error: string | undefined;
 
-  constructor() {
+  locale: string;
+
+  constructor(private translate: TranslateService) {
+    this.locale = this.translate.currentLang;
   }
 
   ngOnInit(): void {
   }
-
 }

@@ -1,8 +1,8 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { Pagination } from '../../interfaces/pagination';
 import { IProduct, PAGE_SIZE } from '../../interfaces/product';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { TranslateService } from '@ngx-translate/core';
@@ -19,14 +19,16 @@ import { ConvertDuration } from '../../util/dates';
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.scss']
 })
-export class ProductsComponent implements OnInit, AfterViewInit {
+export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   displayedColumns: string[] = ['position', 'name', 'description', 'price', 'duration', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IProduct>>();
+  subscription: Subscription | undefined;
   getState: Observable<any>;
 
   resultsLength = 0;
   pageSize = PAGE_SIZE;
+  error: string | undefined;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -54,47 +56,8 @@ export class ProductsComponent implements OnInit, AfterViewInit {
     this.clean();
   }
 
-  subscribe(): void {
-    this.getState.subscribe((stateValue) => {
-      if (stateValue.errorMessage || stateValue.message) {
-        const snackBarRef = this.snackBar.open(stateValue.errorMessage || stateValue.message, 'OK', {
-          duration: 5000
-        });
-
-        if (stateValue.message) {
-          snackBarRef.afterDismissed().subscribe(() => {
-            this.clean();
-            this.getProducts();
-          });
-        }
-      }
-      this.dataSource = stateValue.data?.content?.map((product: IProduct) => {
-        if (product.duration) {
-          const duration = ConvertDuration(product.duration);
-
-          return Object.assign({}, product, {hour: duration.hour, minute: duration.minute});
-        }
-        return product;
-      });
-      this.resultsLength = stateValue.data?.totalElements;
-    });
-  }
-
-  clean(): void {
-    this.store.dispatch(
-      new fromActionsProduct.Clean()
-    );
-  }
-
-  getProducts(): void {
-    const payload = {
-      active: this.sort.active,
-      direction: this.sort.direction,
-      page: this.paginator.pageIndex
-    };
-    this.store.dispatch(
-      new fromActionsProduct.GetAll(payload)
-    );
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 
   edit(product: IProduct): void {
@@ -117,5 +80,51 @@ export class ProductsComponent implements OnInit, AfterViewInit {
         );
       }
     });
+  }
+
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe((stateValue) => {
+      if (stateValue.errorMessage || stateValue.message) {
+        const snackBarRef = this.snackBar.open(stateValue.errorMessage || stateValue.message, 'OK', {
+          duration: 5000
+        });
+
+        if (stateValue.message) {
+          snackBarRef.afterDismissed().subscribe(() => {
+            this.clean();
+            this.getProducts();
+          });
+        } else {
+          this.error = stateValue.error;
+          return;
+        }
+      }
+      this.dataSource = stateValue.data?.content?.map((product: IProduct) => {
+        if (product.duration) {
+          const duration = ConvertDuration(product.duration);
+
+          return Object.assign({}, product, {hour: duration.hour, minute: duration.minute});
+        }
+        return product;
+      });
+      this.resultsLength = stateValue.data?.totalElements;
+    });
+  }
+
+  private clean(): void {
+    this.store.dispatch(
+      new fromActionsProduct.Clean()
+    );
+  }
+
+  private getProducts(): void {
+    const payload = {
+      active: this.sort.active,
+      direction: this.sort.direction,
+      page: this.paginator.pageIndex
+    };
+    this.store.dispatch(
+      new fromActionsProduct.GetAll(payload)
+    );
   }
 }

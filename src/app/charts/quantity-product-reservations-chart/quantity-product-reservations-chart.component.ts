@@ -12,6 +12,8 @@ import { QuantityProduct } from '../../util/chart';
 export class QuantityProductReservationsChartComponent implements OnChanges {
   isLoading = true;
   data: IReservationAll[] | undefined;
+  error: string | undefined;
+
   @Input() state: any;
   @Input() label: any;
 
@@ -49,7 +51,7 @@ export class QuantityProductReservationsChartComponent implements OnChanges {
     if (this.state) {
       this.isLoading = this.state.isLoading;
       if (this.state.errorMessage) {
-        // TODO: show error
+        this.error = this.state.error;
         return;
       }
       const chartResult = QuantityProduct(this.state.data, this.label);
@@ -59,5 +61,4 @@ export class QuantityProductReservationsChartComponent implements OnChanges {
       }
     }
   }
-
 }

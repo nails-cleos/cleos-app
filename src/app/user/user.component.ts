@@ -1,22 +1,24 @@
-import { Component, OnInit} from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../store/app.states';
 import * as fromActionsUser from '../store/user.actions';
 import { IUser, User } from '../interfaces/user';
+import { Flags, IFlag } from '../util/flags';
 
 @Component({
   selector: 'app-user',
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.scss']
 })
-export class UserComponent implements OnInit {
+export class UserComponent implements OnInit, OnDestroy {
 
   hide = false;
   form!: FormGroup;
+  subscription: Subscription | undefined;
   getState: Observable<any>;
   isLoading: boolean | undefined;
   errors: any = [];
@@ -36,39 +38,64 @@ export class UserComponent implements OnInit {
   lastName: FormControl = new FormControl('', [
     Validators.required
   ]);
+  lang: FormControl = new FormControl('', [
+    Validators.required
+  ]);
+
+  flags: IFlag[] = Flags();
 
   constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
-              private formBuilder: FormBuilder) {
+              private formBuilder: FormBuilder, private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectUserState);
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 
   ngOnInit(): void {
     this.createForm();
     this.clean();
     this.subscribe();
+    this.cdRef.detectChanges();
   }
 
-  createForm(): void {
+  create(): void {
+    if (this.form.invalid) {
+      return;
+    }
+    const user: IUser = new User();
+    user.username = this.username.value;
+    user.email = this.email.value;
+    user.firstName = this.firstName.value;
+    user.lang = this.lang.value.value;
+    user.lastName = this.lastName.value;
+    user.password = 'Ch4ng#';
+
+    this.store.dispatch(
+      new fromActionsUser.SaveUser({user, role: this.role.value})
+    );
+  }
+
+  private createForm(): void {
     this.form = this.formBuilder.group({
       role: this.role,
       username: this.username,
       email: this.email,
       firstName: this.firstName,
-      lastName: this.lastName
+      lastName: this.lastName,
+      lang: this.lang
     });
   }
 
-  clean(): void {
+  private clean(): void {
     this.store.dispatch(
       new fromActionsUser.Clean()
     );
   }
 
-  subscribe(): void {
-    this.getState.subscribe(state => {
-      if (state.selected) {
-        this.form.patchValue(state.selected);
-      }
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe(state => {
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
@@ -80,20 +107,5 @@ export class UserComponent implements OnInit {
         });
       }
     });
-  }
-
-  create(): void {
-    if (this.form.invalid) {
-      return;
-    }
-    const user: IUser = new User();
-    user.username = this.username.value;
-    user.email = this.email.value;
-    user.firstName = this.firstName.value;
-    user.lastName = this.lastName.value;
-
-    this.store.dispatch(
-      new fromActionsUser.SaveUser({user, role: this.role.value})
-    );
   }
 }

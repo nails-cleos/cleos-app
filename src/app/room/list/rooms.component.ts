@@ -26,6 +26,7 @@ export class RoomsComponent implements OnInit, AfterViewInit {
 
   resultsLength = 0;
   pageSize = PAGE_SIZE;
+  error: string | undefined;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -66,6 +67,8 @@ export class RoomsComponent implements OnInit, AfterViewInit {
             this.clean();
             this.getRooms();
           });
+        } else {
+          this.error = stateValue.error;
         }
       }
       this.dataSource = stateValue.data?.content;
@@ -73,26 +76,9 @@ export class RoomsComponent implements OnInit, AfterViewInit {
     });
   }
 
-  clean(): void {
-    this.store.dispatch(
-      new fromActionsRoom.Clean()
-    );
-  }
-
-  getRooms(): void {
-    const payload = {
-      active: this.sort.active,
-      direction: this.sort.direction,
-      page: this.paginator.pageIndex
-    };
-    this.store.dispatch(
-      new fromActionsRoom.GetAll(payload)
-    );
-  }
-
   edit(room: IRoom): void {
     this.store.dispatch(
-      new fromActionsRoom.RoomSelected(room)
+      new fromActionsRoom.RoomSelected({room, redirect: true})
     );
   }
 
@@ -110,5 +96,22 @@ export class RoomsComponent implements OnInit, AfterViewInit {
         );
       }
     });
+  }
+
+  private clean(): void {
+    this.store.dispatch(
+      new fromActionsRoom.Clean()
+    );
+  }
+
+  private getRooms(): void {
+    const payload = {
+      active: this.sort.active,
+      direction: this.sort.direction,
+      page: this.paginator.pageIndex
+    };
+    this.store.dispatch(
+      new fromActionsRoom.GetAll(payload)
+    );
   }
 }

@@ -3,8 +3,9 @@ import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from
 import { IUser } from '../interfaces/user';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState } from '../store/app.states';
-import * as fromActionsLogin from '../store/auth.actions';
 import { Observable } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({
   providedIn: 'root'
@@ -15,18 +16,27 @@ export class AuthGuardService implements CanActivate {
   currentUser!: IUser;
   token!: string;
 
-  constructor(private router: Router, private store: Store<AppState>) {
+  constructor(private snackBar: MatSnackBar, private router: Router, private store: Store<AppState>, private translate: TranslateService) {
     this.getState = this.store.select(selectAuthState);
     this.getState.subscribe((state) => {
       this.currentUser = state.user;
     });
   }
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+  public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
     if (this.currentUser) {
       if (this.hasRole(route, this.currentUser)) {
         return true;
       } else {
+        let message;
+        if (this.translate.currentLang.startsWith('es')) {
+          message = 'El usuario no tiene los permisos necesarios';
+        } else {
+          message = 'User not have the necessary permissions';
+        }
+        this.snackBar.open(message, 'OK', {
+          duration: 5000
+        });
         this.router.navigate(['main']);
         return false;
       }

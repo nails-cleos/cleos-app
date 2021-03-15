@@ -1,4 +1,4 @@
-<mat-card>
+<mat-card *ngIf="!error; else errorBox">
   <mat-card-header>
     <mat-card-title>{{ 'RESERVATION.DETAIL.TITLE' | translate }}</mat-card-title>
     <mat-card-subtitle
@@ -6,6 +6,12 @@
     <ng-template #skeleton>
       <div class="ssc-line"></div>
     </ng-template>
+    <div fxFlex></div>
+    <div *ngIf="changeState && changeState.length">
+      <mat-fab-menu (onFabMenuItemSelected)="onChangeState($event)" [fabButtons]="changeState" color="primary"
+                    direction="left" icon="all_out">
+      </mat-fab-menu>
+    </div>
   </mat-card-header>
   <mat-card-content *ngIf="reservation; else boxSkeleton">
     <mat-list>
@@ -51,12 +57,14 @@
       <mat-divider></mat-divider>
     </mat-list>
     <mat-list *ngIf="reservation.history">
-      <div mat-subheader>{{ 'RESERVATION.DETAIL.HISTORY.TITLE' | translate}}</div>
+      <div class="divider">
+        <h1>{{ 'RESERVATION.DETAIL.HISTORY.TITLE' | translate}}</h1>
+      </div>
       <table [dataSource]="dataSource" mat-table>
-
         <ng-container matColumnDef="position">
           <th *matHeaderCellDef mat-header-cell> No.</th>
-          <td *matCellDef="let history; let i = index;" mat-cell> {{((paginator?.pageIndex || 0) * pageSize) + i + 1}} </td>
+          <td *matCellDef="let history; let i = index;"
+              mat-cell> {{((paginator?.pageIndex || 0) * pageSize) + i + 1}} </td>
         </ng-container>
 
         <ng-container matColumnDef="professional">
@@ -79,7 +87,8 @@
         <ng-container matColumnDef="state">
           <th *matHeaderCellDef fxHide.lt-sm fxShow
               mat-header-cell> {{ 'RESERVATION.DETAIL.HISTORY.COLUMN.STATE' | translate }} </th>
-          <td *matCellDef="let history" fxHide.lt-sm fxShow mat-cell> <mat-icon matPrefix>{{getIcon(history.state)}}</mat-icon>&nbsp;
+          <td *matCellDef="let history" fxHide.lt-sm fxShow mat-cell>
+            <mat-icon matPrefix>{{getIcon(history.state)}}</mat-icon>&nbsp;
             {{ 'RESERVATION.STATE.' + history.state | translate}}</td>
         </ng-container>
 
@@ -105,3 +114,6 @@
     <div class="ssc-head-line"></div>
   </ng-template>
 </mat-card>
+<ng-template #errorBox>
+  <app-error [error]="error"></app-error>
+</ng-template>

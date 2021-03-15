@@ -1,22 +1,25 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../store/app.states';
 import { IUser, User } from '../interfaces/user';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import * as fromActionsUser from '../store/user.actions';
-import { FieldChange } from '../util/validators';
+import { FieldChange, ValueChange } from '../util/validators';
 import { Location } from '@angular/common';
+import { FindFlag, Flags, IFlag } from '../util/flags';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent implements OnInit, OnDestroy {
 
   getState: Observable<any>;
+  subscription: Subscription | undefined;
   form!: FormGroup;
   errors: any = [];
   user: IUser | undefined;
@@ -34,8 +37,14 @@ export class ProfileComponent implements OnInit {
   lastName: FormControl = new FormControl('', [
     Validators.required
   ]);
+  langValue: FormControl = new FormControl('', [
+    Validators.required
+  ]);
 
-  constructor(private snackBar: MatSnackBar, private store: Store<AppState>, private formBuilder: FormBuilder, private location: Location) {
+  flags: IFlag[] = Flags();
+
+  constructor(private snackBar: MatSnackBar, private store: Store<AppState>, private formBuilder: FormBuilder, private location: Location,
+              private cdRef: ChangeDetectorRef, private router: Router) {
     this.getState = this.store.select(selectUserState);
   }
 
@@ -44,32 +53,58 @@ export class ProfileComponent implements OnInit {
     this.clean();
     this.findMe();
     this.subscribe();
+    this.cdRef.detectChanges();
   }
 
-  findMe(): void {
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+  }
+
+  update(): void {
+    if (this.form.invalid) {
+      return;
+    }
+    const user: IUser = new User();
+    user.lang = ValueChange(this.langValue.value.value, this.user?.lang);
+    user.username = FieldChange(this.username, this.user?.username);
+    user.firstName = FieldChange(this.firstName, this.user?.firstName);
+    user.lastName = FieldChange(this.lastName, this.user?.lastName);
+
+    this.user = undefined;
+    this.store.dispatch(
+      new fromActionsUser.UpdateUser(user)
+    );
+  }
+
+  back(): void {
+    this.location.back();
+  }
+
+  private findMe(): void {
     this.store.dispatch(
       new fromActionsUser.FindMe()
     );
   }
 
-  createForm(): void {
+  private createForm(): void {
     this.form = this.formBuilder.group({
       username: this.username,
       firstName: this.firstName,
-      lastName: this.lastName
+      lastName: this.lastName,
+      langValue: this.langValue
     });
   }
 
-  clean(): void {
+  private clean(): void {
     this.store.dispatch(
       new fromActionsUser.Clean()
     );
   }
 
-  subscribe(): void {
-    this.getState.subscribe((state) => {
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe((state) => {
       this.isLoading = state.isLoading;
-      if (state.selected) {
+      if (state.selected && !this.isLoading) {
         const user = state.selected;
         this.user = user;
         this.canChange = user?.provider === 'LOCAL';
@@ -82,35 +117,23 @@ export class ProfileComponent implements OnInit {
           this.showInitials = true;
         }
         this.form.patchValue(state.selected);
+        const langValue = FindFlag(this.flags, state.selected.lang);
+        this.langValue.setValue(langValue);
+        this.cdRef.detectChanges();
       }
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({incorrect: true});
         });
-      } else if (state.errorMessage) {
-        this.snackBar.open(state.errorMessage, 'OK', {
+      } else if (state.errorMessage || state.message) {
+        if (state.message) {
+          this.findMe();
+        }
+        this.snackBar.open(state.errorMessage || state.message, 'OK', {
           duration: 5000
         });
       }
     });
-  }
-
-  update(): void {
-    if (this.form.invalid) {
-      return;
-    }
-    const user: IUser = new User();
-    user.username = FieldChange(this.username, this.user?.username);
-    user.firstName = FieldChange(this.firstName, this.user?.firstName);
-    user.lastName = FieldChange(this.lastName, this.user?.lastName);
-
-    this.store.dispatch(
-      new fromActionsUser.UpdateUser(user)
-    );
-  }
-
-  back(): void {
-    this.location.back();
   }
 }

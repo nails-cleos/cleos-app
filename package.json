@@ -1,17 +1,18 @@
 {
-  "name": "nails-app",
+  "name": "nail-app",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
-    "lint": "ng lint",
+    "lint": "ng lint --fix",
     "e2e": "ng e2e",
-    "start-pwa": "ng build --prod  --source-map && http-server-spa dist/nails-app index.html 8443"
+    "start-pwa": "ng build --prod  --source-map && http-server-spa dist/nail-app index.html 8443"
   },
   "private": true,
   "dependencies": {
+    "@angular-material-extensions/fab-menu": "^3.0.0",
     "@angular-material-extensions/password-strength": "^8.1.1",
     "@angular/animations": "^11.0.5",
     "@angular/cdk": "^11.0.3",
@@ -35,6 +36,7 @@
     "angularx-social-login": "^3.5.4",
     "chart.js": "^2.9.4",
     "date-fns": "^2.16.1",
+    "flag-icon-css": "^3.5.0",
     "mat-timepicker": "^5.1.0",
     "net": "^1.0.2",
     "ng2-charts": "^2.4.2",

@@ -13,7 +13,7 @@ export class RoomService {
   constructor(private http: HttpClient) {
   }
 
-  getAll(sort: string, direction: string, page: number): Observable<IRoom[]> {
+  public getAll(sort: string, direction: string, page: number): Observable<IRoom[]> {
     let params = new HttpParams().set('page', String(page)).set('size', String(PAGE_SIZE));
     if (sort) {
       params = params.append('sort', sort);
@@ -25,25 +25,29 @@ export class RoomService {
     return this.http.get<IRoom[]>(`${this.url}/pages`, {params});
   }
 
-  getAllRooms(): Observable<IRoom[]> {
+  public getAllRooms(): Observable<IRoom[]> {
     return this.http.get<IRoom[]>(this.url);
   }
 
-  getById(id: string | null): Observable<IRoom | undefined> {
+  public getMyRoom(): Observable<IRoom> {
+    return this.http.get<IRoom>(`${this.url}/me`);
+  }
+
+  public getById(id: string | null): Observable<IRoom | undefined> {
     const url = `${this.url}/${id}`;
     return this.http.get<IRoom>(url);
   }
 
-  add(product: IRoom): Observable<IRoom> {
+  public add(product: IRoom): Observable<IRoom> {
     return this.http.post<IRoom>(this.url, product);
   }
 
-  delete(id: string | null): Observable<IRoom> {
+  public delete(id: string | null): Observable<IRoom> {
     const url = `${this.url}/${id}`;
     return this.http.delete<IRoom>(url);
   }
 
-  update(product: IRoom): Observable<IRoom> {
+  public update(product: IRoom): Observable<IRoom> {
     const url = `${this.url}/${product.id}`;
     return this.http.patch<IRoom>(url, product);
   }

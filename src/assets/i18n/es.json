@@ -1,11 +1,10 @@
 {
-  "APP": {
-    "TITLE": "Nails"
-  },
   "COMMON": {
     "BUTTON": {
       "BACK": "Volver",
       "NEXT": "Siguiente",
+      "PREVIOUS": "Anterior",
+      "TODAY": "Hoy",
       "YES": "Si",
       "NO": "No",
       "SEND": "Enviar",
@@ -14,7 +13,11 @@
       "IGNORE": "Ignorar",
       "UPDATE": "Actualizar",
       "CANCEL": "Cancelar",
-      "BOOK": "Reservar"
+      "BOOK": "Reservar",
+      "VIEW": "Ver",
+      "EDIT": "Editar",
+      "DELETE": "Eliminar",
+      "INVITE": "Enviar invitación"
     },
     "COLUMN": {
       "ACTIONS": "Acciones"
@@ -30,7 +33,15 @@
     },
     "ROLES": {
       "ROLE_CUSTOMER": "Cliente",
-      "ROLE_PROFESSIONAL": "Profesional"
+      "ROLE_PROFESSIONAL": "Profesional",
+      "ROLE_ADMIN": "Admin"
+    },
+    "NOTIFICATION": {
+      "NO": "No hay notificaciones"
+    },
+    "LANG": {
+      "ES": "Español",
+      "EN": "Inglés"
     }
   },
   "DASHBOARD": {
@@ -45,7 +56,7 @@
       "TOTAL_PRODUCTS": "Total de servicios",
       "NEW_CUSTOMERS_RESERVATION": "Reservas de nuevos clientes"
     },
-    "CHART": {
+    "CARD": {
       "LABEL": {
         "ANNUAL": "Reservas",
         "CUSTOMER": "Clientes",
@@ -58,10 +69,12 @@
       "YEARLY_PRODUCT_PRICE": "Ganancias anuales",
       "CUSTOMER_RESERVATION": "Reservas por cliente",
       "LAST_MONTH_RESERVATION": "Reservas en el último mes",
-      "RESERVATION": "Reservas"
+      "RESERVATION": "Reservas",
+      "EXPAND": "Expandir"
     }
   },
   "AUTH": {
+    "FORBIDDEN": "El usuario no tiene los permisos necesarios",
     "SIGN_IN": {
       "TITLE": "Ingresar",
       "USERNAME": {
@@ -73,7 +86,7 @@
         "ERROR": "Por favor ingrese una contraseña"
       },
       "OR": "O ingresa con tu email",
-      "NEW": "¿Nuevo en Nails?",
+      "NEW": "¿Nuevo en nail?",
       "FORGOT_PASSWORD": "¿Olvido su contraseña?"
     },
     "SIGN_UP": {
@@ -114,11 +127,11 @@
       },
       "OR": "O registrate con tu email",
       "SUCCESS": "Usuario {{username}} creado. Verifica tu email {{email}}",
-      "ALREADY": "¿Ya tienes Nails?"
+      "ALREADY": "¿Ya tienes nail?"
     },
     "ACTIVATE_ACCOUNT": {
       "TITLE": "Activate account",
-      "CONTENT": "Welcome to Nails",
+      "CONTENT": "Welcome to nail",
       "BUTTON": "Activate",
       "MESSAGE": "Account activated"
     },
@@ -163,6 +176,11 @@
         "DETAIL": {
           "TITLE": "Roles"
         }
+      },
+      "STATUS": {
+        "ENABLED": "Verificado",
+        "DISABLED": "No verificado",
+        "DELETED": "Eliminado"
       }
     },
     "ADD": {
@@ -192,6 +210,10 @@
         "FIELD": "Apellido",
         "REQUIRED": "Apellido es <b>requerido</b>"
       },
+      "LANG": {
+        "FIELD": "Idioma",
+        "REQUIRED": "Idioma es <b>requerido</b>"
+      },
       "CUSTOMER": "Cliente {{username}} creado",
       "PROFESSIONAL": "Profesional {{username}} creado"
     },
@@ -217,6 +239,10 @@
       "LAST_NAME": {
         "FIELD": "Apellido",
         "REQUIRED": "Apellido es <b>requerido</b>"
+      },
+      "LANG": {
+        "FIELD": "Idioma",
+        "REQUIRED": "Idioma es <b>requerido</b>"
       }
     },
     "DELETED": {
@@ -259,6 +285,10 @@
         "REQUIRED": "Confirmar contraseña es <b>requerido</b>",
         "MUST_MATCH": "Contraseña y confirmar contraseña deben coincidir"
       }
+    },
+    "ROLE": {
+      "REMOVE": "Rol {{role}} eliminado de {{username}}",
+      "ADD": "Role {{role}} agregado a {{username}}"
     }
   },
   "PROFILE": {
@@ -273,6 +303,13 @@
     "LAST_NAME": {
       "FIELD": "Apellido",
       "REQUIRED": "Apellido es <b>requerido</b>"
+    },
+    "LANG": {
+      "FIELD": "Idioma",
+      "REQUIRED": "Idioma es <b>requerido</b>"
+    },
+    "UPDATED": {
+      "MESSAGE": "Usuario {{username}} actualizado"
     }
   },
   "PRODUCT": {
@@ -430,6 +467,47 @@
         "REQUIRED": "Fin es <b>requerido</b>"
       }
     },
+    "ME": {
+      "TITLE": "Mi sala",
+      "NAME": {
+        "FIELD": "Nombre",
+        "REQUIRED": "Nombre es <b>requerido</b>"
+      },
+      "PROFESSIONAL": {
+        "FIELD": "Profesional"
+      },
+      "AVAILABILITY": {
+        "FIELD": "Disponibilidad",
+        "REQUIRED": "Al menos una disponibilidad es <b>requerida</b>"
+      },
+      "WEEK_TIME": {
+        "FIELD": "Disponibilidad semanal",
+        "DESCRIPTION": "Disponibilidad de trabajo semanal",
+        "REQUIRED": "Agregue o ignore la disponibilidad semanal"
+      },
+      "SATURDAY_TIME": {
+        "FIELD": "Disponibilidad los sábados",
+        "DESCRIPTION": "Disponibilidad de trabajo los sábados",
+        "REQUIRED": "Agregue o ignore la disponibilidad del sábado"
+      },
+      "SUNDAY_TIME": {
+        "FIELD": "Disponibilidad los domingos",
+        "DESCRIPTION": "Disponibilidad de trabajo los domingos",
+        "REQUIRED": "Agregue o ignore la disponibilidad del domingo"
+      },
+      "LUNCH": {
+        "FIELD": "Hora de almuerzo",
+        "CHECK": "Agregar hora de almuerzo"
+      },
+      "START": {
+        "FIELD": "Inicio",
+        "REQUIRED": "Inicio es <b>requerido</b>"
+      },
+      "END": {
+        "FIELD": "Fin",
+        "REQUIRED": "Fin es <b>requerido</b>"
+      }
+    },
     "DELETED": {
       "TITLE": "Eliminar sala",
       "CONTENT": "¿Está seguro de eliminar la sala {{name}}?",
@@ -516,10 +594,26 @@
         "TITLE": "Historial",
         "COLUMN": {
           "PROFESSIONAL": "Profesional",
-          "START": "Inicon",
+          "START": "Inicio",
           "PRODUCT": "Servicio",
           "STATE": "Estado"
         }
+      },
+      "STATE": {
+        "APPROVE": "La reserva fue aprobada",
+        "START": "La reserva se inicio",
+        "COMPLETE": "La reserva se completo",
+        "CANCEL": "La reserva se cancelo"
+      },
+      "CHANGE_STATE": {
+        "TITLE": "Cambio de estado",
+        "ACTION": {
+          "APPROVE": "aprobar la reserva",
+          "START": "iniciar la cita",
+          "COMPLETE": "completar la cita",
+          "CANCEL": "cancelar la reserva"
+        },
+        "CONTENT": "¿Está seguro de {{action}}?"
       }
     },
     "PAGE": {
@@ -540,14 +634,18 @@
       "MESSAGE": "Sala {{name}} updated"
     },
     "STATE": {
-      "CREATED": "Creado",
-      "APPROVED": "Aprobado",
-      "STARTED": "Empezado",
-      "COMPLETED": "Completado",
-      "CANCELLED": "Cancelado"
+      "CREATED": "Creada",
+      "APPROVED": "Aprobada",
+      "STARTED": "Empezada",
+      "COMPLETED": "Completada",
+      "CANCELLED": "Cancelada"
     }
   },
-  "last": {
-    "dummy": "dummy translation"
+  "NOTIFICATION": {
+    "TITLE": "Notificaciones",
+    "LOAD_MORE": "Ver mas"
+  },
+  "APP": {
+    "TITLE": "Uñas"
   }
 }

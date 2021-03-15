@@ -13,17 +13,20 @@ import { FillNotAvailable, NewEvent } from '../../util/event';
 import { Router } from '@angular/router';
 import { CalendarEvent, CalendarView } from 'angular-calendar';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { FindStateColor, IState, StateColor } from '../../util/flags';
+import { IUserAll } from '../../interfaces/user';
 
 @Component({
-  selector: 'app-reservations',
-  templateUrl: './reservations.component.html',
-  styleUrls: ['./reservations.component.scss']
+  selector: 'app-calendar',
+  templateUrl: './calendar.component.html',
+  styleUrls: ['./calendar.component.scss']
 })
-export class ReservationsComponent implements OnInit, OnDestroy {
+export class CalendarComponent implements OnInit, OnDestroy {
   getState: Observable<any>;
   subscription: Subscription | undefined;
 
   isLoading = false;
+  error: string | undefined;
 
   data: IRoomReservation[] | undefined;
   calendar: Map<string, ICalendar> = new Map<string, ICalendar>();
@@ -35,7 +38,13 @@ export class ReservationsComponent implements OnInit, OnDestroy {
   viewDate: Date = new Date();
   calendarView: CalendarView = CalendarView.Week;
   week = 0;
+  selectView = 'WEEK';
+  days = 0;
   smallScreen: boolean | undefined;
+  locale: string;
+  professionalId: string | undefined;
+
+  colors: IState[] = StateColor();
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
               private store: Store<AppState>, private router: Router, private breakpointObserver: BreakpointObserver) {
@@ -47,10 +56,20 @@ export class ReservationsComponent implements OnInit, OnDestroy {
       this.smallScreen = result.matches;
       if (this.smallScreen) {
         this.daysInWeek = 3;
+        this.selectView = 'DAY';
+        this.calendarView = CalendarView.Day;
         this.lessDays = 1;
         this.hourSegments = 1;
       }
     });
+    const userLang = this.translate.currentLang;
+    const index = userLang.indexOf('-');
+    this.locale = index === -1 ? userLang : userLang.substr(0, index);
+    const token = localStorage.getItem('auth');
+    if (token) {
+      const user: IUserAll = JSON.parse(token).user;
+      this.professionalId = user.id;
+    }
   }
 
   private static getAvailability(room: IRoom): any {
@@ -74,7 +93,14 @@ export class ReservationsComponent implements OnInit, OnDestroy {
     this.router.navigate(['reservation', event.id]);
   }
 
-  addReservations(rr: IRoomReservation): void {
+  segmentClick(date: Date, room?: IRoom): void {
+    if (date && room) {
+      const data = {date, room};
+      this.router.navigateByUrl('/reservation', {state: data});
+    }
+  }
+
+  private addReservations(rr: IRoomReservation): void {
     const reservations: IReservationAll[] = rr.reservations;
     this.calendar.set(rr.room.id, new Calendar(rr.room, []));
     reservations.forEach(it => {
@@ -90,20 +116,7 @@ export class ReservationsComponent implements OnInit, OnDestroy {
           duration: `${duration.hour}:${duration.minute}`
         });
 
-        let color;
-        switch (it.state) {
-          case 'CREATED':
-            color = '#ffecb3';
-            break;
-          case 'COMPLETED':
-            color = '#ede7f6';
-            break;
-          case 'APPROVED':
-          default:
-            color = '#dcedc8';
-            break;
-        }
-
+        const color = FindStateColor(it.state);
         const event = NewEvent(detail, color, start, end, '#000', it.id);
         const calendar = this.calendar.get(rr.room.id);
         let events;
@@ -117,32 +130,13 @@ export class ReservationsComponent implements OnInit, OnDestroy {
     });
   }
 
-  segmentClick(date: Date, room?: IRoom): void {
-    if (date && room) {
-      const data = {date, room};
-      this.router.navigateByUrl('/reservation', {state: data});
-    }
-  }
-
-  previousWeek(): void {
-    this.week--;
-  }
-
-  today(): void {
-    this.week = 0;
-  }
-
-  nextWeek(): void {
-    this.week++;
-  }
-
   private subscribe(): void {
     this.subscription = this.getState.subscribe((stateValue) => {
-      this.data = stateValue.data;
-      if (this.data && Array.isArray(this.data) && this.data[0].room && this.data[0].reservations) {
-        this.data.forEach(value => this.addReservations(value));
+      if (stateValue.data && Array.isArray(stateValue.data) && stateValue.data[0].room && stateValue.data[0].reservations) {
+        this.data = stateValue.data;
+        stateValue.data.forEach((value: IRoomReservation) => this.addReservations(value));
         this.calendar.forEach(calendar => {
-          const {week, saturday, sunday} = ReservationsComponent.getAvailability(calendar.room);
+          const {week, saturday, sunday} = CalendarComponent.getAvailability(calendar.room);
           const {min, max} = GetStartEndDay(week, saturday, sunday);
           calendar.day = new Day(min.getHours() - 1, min.getMinutes(), max.getHours() + 1, max.getMinutes());
           const unavailable = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.UNAVAILABLE');
@@ -157,9 +151,24 @@ export class ReservationsComponent implements OnInit, OnDestroy {
         this.snackBar.open(stateValue.errorMessage || stateValue.message, 'OK', {
           duration: 5000
         });
+        if (stateValue.errorMessage) {
+          this.error = stateValue.error;
+        }
       }
       this.isLoading = stateValue.isLoading;
     });
+  }
+
+  previousWeek(): void {
+    this.week--;
+  }
+
+  today(): void {
+    this.week = 0;
+  }
+
+  nextWeek(): void {
+    this.week++;
   }
 
   private clean(): void {

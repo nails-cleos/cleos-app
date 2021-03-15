@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AbstractControlOptions, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
@@ -24,6 +24,7 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
   subscription: Subscription | undefined;
   getState: Observable<any>;
   currentUser: IUser | undefined;
+  userSubscription: Subscription | undefined;
   getUserState: Observable<any>;
 
   oldPassword: FormControl = new FormControl('', [
@@ -44,18 +45,7 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
-  }
-
-  clean(): void {
-    this.store.dispatch(
-      new fromActionsUser.Clean()
-    );
-  }
-
-  createForm(): void {
-    this.form = this.formBuilder.group({
-      oldPassword: this.oldPassword
-    });
+    this.userSubscription?.unsubscribe();
   }
 
   changePassword(): void {
@@ -81,11 +71,23 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
     this.passwordComponent.passwordConfirmationFormControl.updateValueAndValidity();
   }
 
+  private clean(): void {
+    this.store.dispatch(
+      new fromActionsUser.Clean()
+    );
+  }
+
+  private createForm(): void {
+    this.form = this.formBuilder.group({
+      oldPassword: this.oldPassword
+    });
+  }
+
   private subscribe(): void {
     this.subscription = this.getState.subscribe((state) => {
       this.currentUser = state.user;
     });
-    this.getUserState.subscribe((state) => {
+    this.userSubscription = this.getUserState.subscribe((state) => {
       if (state.errorMessage || state.message) {
         const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
           duration: 5000

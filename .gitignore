@@ -4,7 +4,7 @@
 /dist
 /tmp
 /out-tsc
-nails-app
+nail-app
 # Only exists if Bazel was run
 /bazel-out
 

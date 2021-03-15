@@ -48,6 +48,7 @@ import { UserEffects } from './store/effects/user.effects';
 import { ProductEffects } from './store/effects/product.effects';
 import { RoomEffects } from './store/effects/room.effects';
 import { ReservationEffects } from './store/effects/reservation.effects';
+import { NotificationEffects } from './store/effects/notification.effects';
 
 // Components
 import { AppComponent } from './app.component';
@@ -74,7 +75,7 @@ import { RoomComponent } from './room/room.component';
 import { RoomsComponent } from './room/list/rooms.component';
 import { RoomDetailComponent } from './room/detail/room-detail.component';
 import { ReservationComponent } from './reservation/reservation.component';
-import { ReservationsComponent } from './reservation/list/reservations.component';
+import { AssignmentsComponent } from './assignment/assignments.component';
 import { ReservationDetailComponent } from './reservation/detail/reservation-detail.component';
 import { AvailabilityComponent } from './availability/availability.component';
 import { ProductReservationsChartComponent } from './charts/product-reservation-chart/product-reservations-chart.component';
@@ -85,6 +86,10 @@ import { CustomerReservationsChartComponent } from './charts/customer-reservatio
 import { ReservationTableComponent } from './reservation/table/reservation-table.component';
 import { QuantityProductReservationsChartComponent } from './charts/quantity-product-reservations-chart/quantity-product-reservations-chart.component';
 import { LastMonthReservationsChartComponent } from './charts/last-month-reservations-chart/last-month-reservations-chart.component';
+import { NotificationsComponent } from './notification/list/notifications.component';
+import { RoomMeComponent } from './room/me/room-me.component';
+import { CalendarComponent } from './reservation/calendar/calendar.component';
+import { ErrorComponent } from './error/error.component';
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -141,7 +146,7 @@ registerLocaleData(localeEs, 'es');
     RoomsComponent,
     RoomDetailComponent,
     ReservationComponent,
-    ReservationsComponent,
+    AssignmentsComponent,
     ReservationDetailComponent,
     AvailabilityComponent,
     ProductReservationsChartComponent,
@@ -152,12 +157,16 @@ registerLocaleData(localeEs, 'es');
     ReservationTableComponent,
     QuantityProductReservationsChartComponent,
     LastMonthReservationsChartComponent,
-    CardChartComponent
+    CardChartComponent,
+    NotificationsComponent,
+    RoomMeComponent,
+    ErrorComponent,
+    CalendarComponent
   ],
   imports: [
     BrowserModule,
     StoreModule.forRoot(reducers, {metaReducers}),
-    EffectsModule.forRoot([LoginEffects, UserEffects, ProductEffects, RoomEffects, ReservationEffects]),
+    EffectsModule.forRoot([LoginEffects, UserEffects, ProductEffects, RoomEffects, ReservationEffects, NotificationEffects]),
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {
@@ -182,7 +191,7 @@ registerLocaleData(localeEs, 'es');
     ReactiveFormsModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,
-      registrationStrategy: 'registerImmediately',
+      registrationStrategy: 'registerImmediately'
     })
   ],
   providers: [
@@ -208,11 +217,4 @@ registerLocaleData(localeEs, 'es');
   exports: [AppMaterialModule]
 })
 export class AppModule {
-  constructor(translate: TranslateService) {
-    let userLang = navigator.language;
-    const index = userLang.indexOf('-');
-    userLang = index === -1 ? userLang : userLang.substr(0, index);
-    translate.setDefaultLang('en');
-    translate.use(userLang);
-  }
 }

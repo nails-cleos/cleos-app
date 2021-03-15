@@ -36,9 +36,6 @@ export interface IDay {
   dayStartMinute: number;
   dayEndHour: number;
   dayEndMinute: number;
-  daysInWeek: number;
-  lessDays: number;
-  hourSegments: number;
 }
 
 export interface ICalendar {
@@ -49,12 +46,13 @@ export interface ICalendar {
 
 export interface IReservationSummary {
   title: string;
-  value: number;
-  isIncrease: boolean;
-  color: ThemePalette;
-  percentValue: number;
-  icon: string;
-  isCurrency: boolean;
+  value?: number;
+  isIncrease?: boolean;
+  color?: ThemePalette;
+  percentValue?: number;
+  icon?: string;
+  isCurrency?: boolean;
+  error?: string;
 }
 
 export class Reservation implements IReservation {
@@ -67,9 +65,6 @@ export class Day implements IDay {
   dayStartMinute: number;
   dayEndHour: number;
   dayEndMinute: number;
-  daysInWeek = 7;
-  lessDays = 3;
-  hourSegments = 2;
 
   constructor(dayStartHour: number = 9, dayStartMinute: number = 0, dayEndHour: number = 18, dayEndMinute: number = 0) {
     this.dayStartHour = dayStartHour;
@@ -91,3 +86,4 @@ export class Calendar implements ICalendar {
 }
 
 export const PAGE_SIZE = 10;
+export const MOBILE_PAGE_SIZE = 5;

@@ -7,6 +7,7 @@ export interface State {
   data: IRoom | Pagination<IRoom> | null;
   professionals: IUser[] | null;
   errorMessage: string | null;
+  error: any;
   subErrors: any;
   selected: IRoom | null;
   message: string | null;
@@ -17,6 +18,7 @@ export const initialState: State = {
   data: null,
   professionals: null,
   errorMessage: null,
+  error: null,
   subErrors: null,
   selected: null,
   message: null,
@@ -48,6 +50,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
+    case RoomActionTypes.GET_MY_ROOM:
     case RoomActionTypes.ROOM_FIND: {
       return {
         ...state,
@@ -83,7 +86,7 @@ export function reducer(state = initialState, action: All): State {
     case RoomActionTypes.ROOM_SELECTED: {
       return {
         ...state,
-        selected: action.payload,
+        selected: action.payload.room,
         errorMessage: null,
         subErrors: null,
         message: null,
@@ -94,6 +97,7 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         errorMessage: action.payload.error.message,
+        error: action.payload.error,
         subErrors: action.payload.error.subErrors,
         message: null,
         isLoading: false

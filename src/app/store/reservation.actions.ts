@@ -3,6 +3,7 @@ import { Action } from '@ngrx/store';
 export enum ReservationActionTypes {
   GET_ALL = '[Reservation] Get all',
   GET_ALL_PAGE = '[Reservation] Get all page',
+  GET_ALL_ASSIGNMENT_PAGE = '[Reservation] Get all page assignment',
   GET_ALL_GROUPING_BY_ROOM = '[Reservation] Get all grouping by room',
   SEARCH_RESERVATION = '[Reservation] Search reservation',
   GET_CUSTOMERS = '[Reservation] Get customers',
@@ -20,6 +21,11 @@ export enum ReservationActionTypes {
   RESERVATION_SELECTED = '[Reservation] Selected',
   RESERVATION_FIND = '[Reservation] Find',
   RESERVATION_DELETE = '[Reservation] Delete',
+  APPROVE = '[Reservation] Approve',
+  START = '[Reservation] Start',
+  COMPLETE = '[Reservation] Complete',
+  CANCEL = '[Reservation] Cancel',
+  STATE_SUCCESS = '[Reservation] State success',
   CLEAN = '[Reservation] Clean'
 }
 
@@ -29,6 +35,13 @@ export class GetAll implements Action {
 
 export class GetAllPage implements Action {
   readonly type = ReservationActionTypes.GET_ALL_PAGE;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class GetAllAssignmentPage implements Action {
+  readonly type = ReservationActionTypes.GET_ALL_ASSIGNMENT_PAGE;
 
   constructor(public payload: any) {
   }
@@ -141,6 +154,41 @@ export class DeleteReservation implements Action {
   }
 }
 
+export class Approve implements Action {
+  readonly type = ReservationActionTypes.APPROVE;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class Start implements Action {
+  readonly type = ReservationActionTypes.START;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class Complete implements Action {
+  readonly type = ReservationActionTypes.COMPLETE;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class Cancel implements Action {
+  readonly type = ReservationActionTypes.CANCEL;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class StateSuccess implements Action {
+  readonly type = ReservationActionTypes.STATE_SUCCESS;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class Clean implements Action {
   readonly type = ReservationActionTypes.CLEAN;
 }
@@ -148,6 +196,7 @@ export class Clean implements Action {
 export type All =
   | GetAll
   | GetAllPage
+  | GetAllAssignmentPage
   | GetAllGroupingByRoom
   | SearchReservation
   | GetAllCustomers
@@ -165,4 +214,9 @@ export type All =
   | ReservationFind
   | ReservationSelected
   | DeleteReservation
+  | Approve
+  | Start
+  | Complete
+  | Cancel
+  | StateSuccess
   | Clean;

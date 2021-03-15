@@ -1,6 +1,6 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+    <div *ngIf="!error; else errorBox" fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <form (ngSubmit)="update()" [formGroup]="form" novalidate>
         <mat-card class="shipping-card">
           <mat-card-header>
@@ -102,5 +102,8 @@
         </mat-card>
       </form>
     </div>
+    <ng-template #errorBox>
+      <app-error [error]="error"></app-error>
+    </ng-template>
   </div>
 </div>

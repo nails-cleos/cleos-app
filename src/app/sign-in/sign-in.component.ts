@@ -1,12 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as fromActionsLogin from '../store/auth.actions';
 import { IUser } from '../interfaces/user';
-import { Observable } from 'rxjs';
-import { AppState, selectAuthState } from '../store/app.states';
+import { AppState } from '../store/app.states';
 import { Store } from '@ngrx/store';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-sign-in',
@@ -26,7 +24,7 @@ export class SignInComponent implements OnInit {
     this.createForm();
   }
 
-  createForm(): void {
+  private createForm(): void {
     this.form = this.formBuilder.group({
       username: ['', Validators.required],
       password: ['', Validators.required]

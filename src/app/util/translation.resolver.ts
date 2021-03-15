@@ -10,7 +10,7 @@ export class TranslationLoaderResolver {
   }
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
-    return this.translate.get('last.dummy');
+    return this.translate.get('APP.TITTLE');
   }
 
 }

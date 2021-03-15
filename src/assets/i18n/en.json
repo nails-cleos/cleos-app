@@ -1,11 +1,10 @@
 {
-  "APP": {
-    "TITLE": "Nails"
-  },
   "COMMON": {
     "BUTTON": {
       "BACK": "Back",
       "NEXT": "Next",
+      "PREVIOUS": "Previous",
+      "TODAY": "Today",
       "YES": "Yes",
       "NO": "No",
       "SEND": "Send",
@@ -14,7 +13,11 @@
       "IGNORE": "Ignore",
       "UPDATE": "Update",
       "CANCEL": "Cancel",
-      "BOOK": "Reserve"
+      "BOOK": "Reserve",
+      "VIEW": "View",
+      "EDIT": "Edit",
+      "DELETE": "Delete",
+      "INVITE": "Send invite"
     },
     "COLUMN": {
       "ACTIONS": "Actions"
@@ -30,7 +33,15 @@
     },
     "ROLES": {
       "ROLE_CUSTOMER": "Customer",
-      "ROLE_PROFESSIONAL": "Professional"
+      "ROLE_PROFESSIONAL": "Professional",
+      "ROLE_ADMIN": "Admin"
+    },
+    "NOTIFICATION": {
+      "NO": "No notifications"
+    },
+    "LANG": {
+      "ES": "Spanish",
+      "EN": "English"
     }
   },
   "DASHBOARD": {
@@ -58,10 +69,12 @@
       "YEARLY_PRODUCT_PRICE": "Yearly products price",
       "CUSTOMER_RESERVATION": "Customer Reservation",
       "LAST_MONTH_RESERVATION": "Last Month Reservations",
-      "RESERVATION": "Reservations"
+      "RESERVATION": "Reservations",
+      "EXPAND": "Expand"
     }
   },
   "AUTH": {
+    "FORBIDDEN": "User not have the necessary permissions",
     "SIGN_IN": {
       "TITLE": "Sign In",
       "USERNAME": {
@@ -73,7 +86,7 @@
         "ERROR": "Please provide a valid password"
       },
       "OR": "Or sign in with email",
-      "NEW": "New to Nails?",
+      "NEW": "New to nail?",
       "FORGOT_PASSWORD": "Forgot password?"
     },
     "SIGN_UP": {
@@ -114,11 +127,11 @@
       },
       "OR": "Or sign up with email",
       "SUCCESS": "User {{username}} created. Check your email {{email}}",
-      "ALREADY": "Already on Nails?"
+      "ALREADY": "Already on nail?"
     },
     "ACTIVATE_ACCOUNT": {
       "TITLE": "Activate account",
-      "CONTENT": "Welcome to Nails",
+      "CONTENT": "Welcome to nail",
       "BUTTON": "Activate",
       "MESSAGE": "Account activated"
     },
@@ -163,6 +176,11 @@
         "DETAIL": {
           "TITLE": "Roles"
         }
+      },
+      "STATUS": {
+        "ENABLED": "Verified",
+        "DISABLED": "Not verified",
+        "DELETED": "Deleted"
       }
     },
     "ADD": {
@@ -192,6 +210,10 @@
         "FIELD": "Last name",
         "REQUIRED": "Last name is <b>required</b>"
       },
+      "LANG": {
+        "FIELD": "Language",
+        "REQUIRED": "Language is <b>required</b>"
+      },
       "CUSTOMER": "Customer {{username}} created",
       "PROFESSIONAL": "Professional {{username}} created"
     },
@@ -217,6 +239,10 @@
       "LAST_NAME": {
         "FIELD": "Last name",
         "REQUIRED": "Last name is <b>required</b>"
+      },
+      "LANG": {
+        "FIELD": "Language",
+        "REQUIRED": "Language is <b>required</b>"
       }
     },
     "DELETED": {
@@ -259,6 +285,10 @@
         "REQUIRED": "Confirm password is <b>required</b>",
         "MUST_MATCH": "New password and confirm password must match"
       }
+    },
+    "ROLE": {
+      "REMOVE": "Role {{role}} removed to {{username}}",
+      "ADD": "Role {{role}} added to {{username}}"
     }
   },
   "PROFILE": {
@@ -273,6 +303,13 @@
     "LAST_NAME": {
       "FIELD": "Last name",
       "REQUIRED": "Last name is <b>required</b>"
+    },
+    "LANG": {
+      "FIELD": "Language",
+      "REQUIRED": "Language is <b>required</b>"
+    },
+    "UPDATED": {
+      "MESSAGE": "User {{username}} updated"
     }
   },
   "PRODUCT": {
@@ -430,6 +467,47 @@
         "REQUIRED": "End is <b>required</b>"
       }
     },
+    "ME": {
+      "TITLE": "My room",
+      "NAME": {
+        "FIELD": "Name",
+        "REQUIRED": "Name is <b>required</b>"
+      },
+      "PROFESSIONAL": {
+        "FIELD": "Professional"
+      },
+      "AVAILABILITY": {
+        "FIELD": "Availability",
+        "REQUIRED": "At least one availability is <b>required</b>"
+      },
+      "WEEK_TIME": {
+        "FIELD": "Week availability",
+        "DESCRIPTION": "Week working time availability",
+        "REQUIRED": "Add or ignore week working time"
+      },
+      "SATURDAY_TIME": {
+        "FIELD": "Saturday availability",
+        "DESCRIPTION": "Saturday working time availability",
+        "REQUIRED": "Add or ignore saturday working time"
+      },
+      "SUNDAY_TIME": {
+        "FIELD": "Sunday availability",
+        "DESCRIPTION": "Sunday working time availability",
+        "REQUIRED": "Add or ignore sunday working time"
+      },
+      "LUNCH": {
+        "FIELD": "Lunch time",
+        "CHECK": "Add lunch time"
+      },
+      "START": {
+        "FIELD": "Start",
+        "REQUIRED": "Start is <b>required</b>"
+      },
+      "END": {
+        "FIELD": "End",
+        "REQUIRED": "End is <b>required</b>"
+      }
+    },
     "DELETED": {
       "TITLE": "Delete room",
       "CONTENT": "Are you sure to delete room {{name}}?",
@@ -520,6 +598,28 @@
           "PRODUCT": "Product",
           "STATE": "State"
         }
+      },
+      "STATE": {
+        "APPROVE": "Reservation approved",
+        "START": "Reservation started",
+        "COMPLETE": "Reservation completed",
+        "CANCEL": "Reservation cancelled"
+      },
+      "ACTION": {
+        "APPROVE": "Approve",
+        "START": "Start",
+        "COMPLETE": "Complete",
+        "CANCEL": "Cancel"
+      },
+      "CHANGE_STATE": {
+        "TITLE": "Change state",
+        "ACTION": {
+          "APPROVE": "approve the reservation",
+          "START": "start the appointment",
+          "COMPLETE": "complete the appointment",
+          "CANCEL": "cancel the reservation"
+        },
+        "CONTENT": "Are you sure to {{action}}?"
       }
     },
     "PAGE": {
@@ -547,7 +647,11 @@
       "CANCELLED": "Cancelled"
     }
   },
-  "last": {
-    "dummy": "dummy translation"
+  "NOTIFICATION": {
+    "TITLE": "Notifications",
+    "LOAD_MORE": "Load more"
+  },
+  "APP": {
+    "TITLE": "Nail"
   }
 }

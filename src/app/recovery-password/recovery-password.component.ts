@@ -21,12 +21,6 @@ export class RecoveryPasswordComponent implements OnInit {
     this.clean();
   }
 
-  clean(): void {
-    this.store.dispatch(
-      new fromActionsLogin.Clean()
-    );
-  }
-
   recoveryPassword(): void {
     if (this.passwordComponent.passwordFormControl.invalid
       || this.passwordComponent.passwordConfirmationFormControl.invalid) {
@@ -41,5 +35,11 @@ export class RecoveryPasswordComponent implements OnInit {
   onStrengthChanged(): void {
     this.showError = true;
     this.passwordComponent.passwordConfirmationFormControl.updateValueAndValidity();
+  }
+
+  private clean(): void {
+    this.store.dispatch(
+      new fromActionsLogin.Clean()
+    );
   }
 }
