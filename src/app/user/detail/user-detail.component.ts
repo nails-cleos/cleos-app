@@ -38,7 +38,7 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   ]);
 
   flags: IFlag[] = Flags();
-  error: string | undefined;
+  error: any;
 
   constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
               private formBuilder: FormBuilder, private cdRef: ChangeDetectorRef) {

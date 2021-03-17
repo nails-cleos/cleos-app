@@ -269,7 +269,7 @@ export class ReservationEffects {
   saveSuccess$ = this.actions$.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.RESERVATION_SAVE_SUCCESS),
     tap(() => {
-      this.router.navigate(['reservations']);
+      this.router.navigate(['calendar']);
     })
   );
 

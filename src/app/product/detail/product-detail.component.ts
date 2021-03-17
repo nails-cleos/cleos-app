@@ -22,7 +22,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   subscription: Subscription | undefined;
   getState: Observable<any>;
   errors: any = [];
-  error: string | undefined;
+  error: any;
 
   name: FormControl = new FormControl('', [
     Validators.required

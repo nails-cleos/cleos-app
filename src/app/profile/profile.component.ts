@@ -22,6 +22,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   subscription: Subscription | undefined;
   form!: FormGroup;
   errors: any = [];
+  error: any;
   user: IUser | undefined;
   canChange = false;
   showInitials = false;
@@ -129,6 +130,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
       } else if (state.errorMessage || state.message) {
         if (state.message) {
           this.findMe();
+        } else {
+          this.error = state.error;
         }
         this.snackBar.open(state.errorMessage || state.message, 'OK', {
           duration: 5000

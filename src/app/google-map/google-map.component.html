@@ -1,0 +1,20 @@
+<div *ngIf="addressFormGroup" [formGroup]="addressFormGroup" class="divider">
+  <mat-google-maps-autocomplete [addressLabelText]="'COMMON.ADDRESS.FIELD' | translate"
+                                [appearance]="appearance.FILL"
+                                [invalidErrorText]="'COMMON.ADDRESS.INVALID' | translate"
+                                formControlName="address"
+                                placeholderText=""
+                                type="address">
+  </mat-google-maps-autocomplete>
+</div>
+<agm-map *ngIf="!isLoading; else box" [latitude]="latitudeMarker || latitude" [longitude]="longitudeMarker || longitude"
+         [zoom]="zoom"
+         class="divider">
+  <agm-marker (dragEnd)="markerDragEnd($event)" *ngIf="latitudeMarker && longitudeMarker" [latitude]="latitudeMarker"
+              [longitude]="longitudeMarker" [markerDraggable]="isDraggable">
+    <agm-info-window>{{info}}</agm-info-window>
+  </agm-marker>
+</agm-map>
+<ng-template #box>
+  <div class="ssc-square mb"></div>
+</ng-template>

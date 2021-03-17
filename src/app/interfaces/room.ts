@@ -1,6 +1,7 @@
 import { IUser } from './user';
 
 export interface IRoom {
+  address?: string;
   id?: string;
   name?: string;
   professionalId?: string;

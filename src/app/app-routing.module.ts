@@ -26,6 +26,7 @@ import { ReservationDetailComponent } from './reservation/detail/reservation-det
 import { NotificationsComponent } from './notification/list/notifications.component';
 import { RoomMeComponent } from './room/me/room-me.component';
 import { CalendarComponent } from './reservation/calendar/calendar.component';
+import { GoogleMapComponent } from './google-map/google-map.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/dashboard', pathMatch: 'full', resolve: {model: TranslationLoaderResolver}},
@@ -126,6 +127,9 @@ const routes: Routes = [
     data: {
       roles: [Role.Admin, Role.Professional, Role.Customer]
     }
+  },
+  {
+    path: 'maps', component: GoogleMapComponent
   }
 ];
 

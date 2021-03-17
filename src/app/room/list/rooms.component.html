@@ -32,6 +32,16 @@
       </td>
     </ng-container>
 
+    <ng-container matColumnDef="address">
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'ROOM.LIST.COLUMN.NAME' | translate }}</th>
+      <td *matCellDef="let room" mat-cell>
+        <div *ngIf="room.id; else skeleton">{{room.address}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
     <ng-container matColumnDef="availability">
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
           mat-sort-header>{{ 'ROOM.LIST.COLUMN.AVAILABILITY.FIELD' | translate }}</th>

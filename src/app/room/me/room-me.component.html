@@ -1,7 +1,7 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div *ngIf="!error; else errorBox" fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
-      <form (ngSubmit)="update()" novalidate>
+      <form (ngSubmit)="update()" [formGroup]="form" novalidate>
         <mat-card class="shipping-card">
           <mat-card-header>
             <mat-card-title>{{ 'ROOM.ME.TITLE' | translate }}</mat-card-title>
@@ -77,6 +77,8 @@
               </mat-accordion>
               <mat-error *ngIf="errors['availability']" [innerHTML]="'ROOM.ME.AVAILABILITY.REQUIRED' | translate"
                          class="divider"></mat-error>
+              <app-google-map [addressFormGroup]="form" [latitudeMarker]="room.location?.x"
+                              [longitudeMarker]="room.location?.y"></app-google-map>
             </div>
           </mat-card-content>
           <ng-template #boxSkeleton>
@@ -86,7 +88,7 @@
           </ng-template>
           <mat-card-actions *ngIf="room; else buttonSkeleton">
             <div fxFlex></div>
-            <button color="primary" mat-raised-button
+            <button [disabled]="form.invalid" color="primary" mat-raised-button
                     type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
             <button color="accent" mat-raised-button routerLink="/rooms"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>

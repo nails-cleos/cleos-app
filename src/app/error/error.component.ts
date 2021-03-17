@@ -9,11 +9,18 @@ export class ErrorComponent implements OnInit {
 
   @Input() error: any;
   @Input() isCard: boolean | undefined;
+  imageSrc: string | undefined;
 
   constructor() {
   }
 
   ngOnInit(): void {
+    console.log(this.error);
+    if (this.error.status === 'NOT_FOUND') {
+        this.imageSrc = './assets/not_found.png';
+    } else {
+      this.imageSrc = './assets/error.png';
+    }
   }
 
 }

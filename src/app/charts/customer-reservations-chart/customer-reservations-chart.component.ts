@@ -15,7 +15,7 @@ export class CustomerReservationsChartComponent implements OnChanges {
 
   isLoading = true;
   data: IReservationAll[] | undefined;
-  error: string | undefined;
+  error: any;
 
   public barChartOptions: ChartOptions = {
     responsive: true,

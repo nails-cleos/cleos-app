@@ -103,11 +103,13 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
+    case RoomActionTypes.ROOM_UPDATE_ME:
     case RoomActionTypes.ROOM_UPDATE:
     case RoomActionTypes.ROOM_SAVE:
     case RoomActionTypes.ROOM_DELETE: {
       return {
         ...state,
+        selected: null,
         errorMessage: null,
         subErrors: null,
         message: null,

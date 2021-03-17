@@ -131,26 +131,35 @@
         <div mat-subheader>{{ 'RESERVATION.ADD.PREVIEW.CUSTOMER' | translate}}</div>
         <mat-list-item>
           <mat-icon mat-list-icon>wash</mat-icon>
-          <div mat-line>{{customer.value.firstName}} {{customer.value.lastName}}</div>
+          <div mat-line matTooltip="{{customer.value.firstName}} {{customer.value.lastName}}"
+               matTooltipPosition="left">{{customer.value.firstName}} {{customer.value.lastName}}</div>
         </mat-list-item>
         <mat-divider></mat-divider>
         <div mat-subheader>{{ 'RESERVATION.ADD.PREVIEW.ROOM.TITLE' | translate}}</div>
         <mat-list-item>
-          <mat-icon mat-list-icon>room</mat-icon>
+          <mat-icon mat-list-icon>store</mat-icon>
           <div mat-line>{{ 'RESERVATION.ADD.PREVIEW.ROOM.NAME' | translate}}</div>
-          <div mat-line>{{room.value.name}}</div>
+          <div [matTooltip]="room.value.name" mat-line matTooltipPosition="left">{{room.value.name}}</div>
         </mat-list-item>
         <mat-list-item>
           <mat-icon mat-list-icon>person_pin</mat-icon>
           <div mat-line>{{ 'RESERVATION.ADD.PREVIEW.ROOM.PROFESSIONAL' | translate}}</div>
-          <div mat-line>{{room.value.professional.firstName}} {{room.value.professional.lastName}}</div>
+          <div mat-line matTooltip="{{room.value.professional.firstName}} {{room.value.professional.lastName}}"
+               matTooltipPosition="left">
+            {{room.value.professional.firstName}} {{room.value.professional.lastName}}
+          </div>
+        </mat-list-item>
+        <mat-list-item *ngIf="address">
+          <mat-icon mat-list-icon>room</mat-icon>
+          <div mat-line>{{ 'RESERVATION.ADD.PREVIEW.ROOM.ADDRESS' | translate}}</div>
+          <div [matTooltip]="address" mat-line matTooltipPosition="left">{{address}}</div>
         </mat-list-item>
         <mat-divider></mat-divider>
         <div mat-subheader>{{ 'RESERVATION.ADD.PREVIEW.PRODUCT.TITLE' | translate}}</div>
         <mat-list-item>
           <mat-icon mat-list-icon>home_repair_service</mat-icon>
           <div mat-line>{{ 'RESERVATION.ADD.PREVIEW.PRODUCT.NAME' | translate}}</div>
-          <div mat-line>{{product.value.name}}</div>
+          <div [matTooltip]="product.value.name" mat-line>{{product.value.name}}</div>
         </mat-list-item>
         <mat-list-item>
           <mat-icon mat-list-icon>timer</mat-icon>
@@ -188,7 +197,16 @@
     </mat-step>
     <mat-step [stepControl]="roomForm" state="room">
       <ng-template matStepLabel>{{ 'RESERVATION.ADD.ROOM.FIELD' | translate }}</ng-template>
-      <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
+      <div class="flex-container" fxLayout="column">
+        <div fxLayout="column" fxLayoutAlign="space-between start">
+          <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
+          <div class="vertical-divider"></div>
+          <div *ngIf="room.value && room.value.location" style="width: 400px">
+            <app-google-map (addressEmitter)="getAddress($event)" [latitudeMarker]="room.value.location.x"
+                            [longitudeMarker]="room.value.location.y"></app-google-map>
+          </div>
+        </div>
+      </div>
       <div>
         <button (click)="goBack(stepper)" mat-button>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
         <button (click)="getProducts(stepper)" [disabled]="roomForm.invalid" color="primary" mat-button type="button">
@@ -244,7 +262,16 @@
     </mat-step>
     <mat-step [stepControl]="roomForm" state="room">
       <ng-template matStepLabel>{{ 'RESERVATION.ADD.ROOM.FIELD' | translate }}</ng-template>
-      <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
+      <div class="flex-container" fxLayout="row">
+        <div fxLayout="row" fxLayoutAlign="space-between start">
+          <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
+          <div class="vertical-divider"></div>
+          <div *ngIf="room.value && room.value.location" style="width: 400px">
+            <app-google-map (addressEmitter)="getAddress($event)" [latitudeMarker]="room.value.location.x"
+                            [longitudeMarker]="room.value.location.y"></app-google-map>
+          </div>
+        </div>
+      </div>
       <div>
         <button (click)="goBack(stepper)" mat-button>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
         <button (click)="getProducts(stepper)" [disabled]="roomForm.invalid" color="primary" mat-button type="button">

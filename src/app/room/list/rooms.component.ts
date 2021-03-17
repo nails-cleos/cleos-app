@@ -12,6 +12,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../store/app.states';
 import * as fromActionsRoom from '../../store/room.actions';
 import { DialogComponent } from '../../dialog/dialog.component';
+import { GeocodeService } from '../../services/geocode.service';
 
 @Component({
   selector: 'app-rooms',
@@ -20,19 +21,19 @@ import { DialogComponent } from '../../dialog/dialog.component';
 })
 export class RoomsComponent implements OnInit, AfterViewInit {
 
-  displayedColumns: string[] = ['position', 'name', 'professional', 'availability', 'actions'];
+  displayedColumns: string[] = ['position', 'name', 'professional', 'address', 'availability', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IRoom>>();
   getState: Observable<any>;
 
   resultsLength = 0;
   pageSize = PAGE_SIZE;
-  error: string | undefined;
+  error: any;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
-              private store: Store<AppState>, private cdRef: ChangeDetectorRef) {
+              private store: Store<AppState>, private cdRef: ChangeDetectorRef, private geocodeService: GeocodeService) {
     this.getState = this.store.select(selectRoomState);
   }
 
@@ -71,7 +72,19 @@ export class RoomsComponent implements OnInit, AfterViewInit {
           this.error = stateValue.error;
         }
       }
-      this.dataSource = stateValue.data?.content;
+      this.dataSource = stateValue.data?.content?.map((room: IRoom) => {
+        if (room.location) {
+          this.geocodeService.geocodeAddress(room.location.x, room.location.y).subscribe(location => {
+            this.dataSource.find((e: any) => {
+              if (e.id === room.id) {
+                e.address = location.formatted_address;
+              }
+            });
+          });
+          return Object.assign({}, room, {address: undefined});
+        }
+        return room;
+      });
       this.resultsLength = stateValue.data?.totalElements;
     });
   }

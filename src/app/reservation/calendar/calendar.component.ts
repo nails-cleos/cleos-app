@@ -26,7 +26,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   subscription: Subscription | undefined;
 
   isLoading = false;
-  error: string | undefined;
+  error: any;
 
   data: IRoomReservation[] | undefined;
   calendar: Map<string, ICalendar> = new Map<string, ICalendar>();

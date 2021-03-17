@@ -12,7 +12,7 @@ import { QuantityProduct } from '../../util/chart';
 export class QuantityProductReservationsChartComponent implements OnChanges {
   isLoading = true;
   data: IReservationAll[] | undefined;
-  error: string | undefined;
+  error: any;
 
   @Input() state: any;
   @Input() label: any;
