@@ -12,7 +12,7 @@ import { ProductReservation } from '../../util/chart';
 export class ProductReservationsChartComponent implements OnChanges {
   isLoading = true;
   data: IReservationAll[] | undefined;
-  error: string | undefined;
+  error: any;
 
   @Input() state: any;
 

@@ -21,7 +21,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   getState: Observable<any>;
   subscription: Subscription | undefined;
   errors: any = [];
-  error: string | undefined;
+  error: any;
   professionalName: string | undefined;
 
   step = 0;
@@ -37,6 +37,10 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   availabilities: IAvailability[] = [];
 
   name: FormControl = new FormControl('', [
+    Validators.required
+  ]);
+
+  address: FormControl = new FormControl('', [
     Validators.required
   ]);
 
@@ -78,6 +82,11 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     room.id = this.room?.id;
     room.name = FieldChange(this.name, this.room?.name);
     room.availabilities = this.availabilities;
+    const location = this.address.value.geometry.location;
+    room.location = {
+      x: location.lat(),
+      y: location.lng()
+    };
 
     this.store.dispatch(new fromActionsRoom.RoomUpdate(room));
   }
@@ -105,7 +114,8 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private createForm(): void {
     this.form = this.formBuilder.group({
-      name: this.name
+      name: this.name,
+      address: this.address
     });
   }
 
@@ -123,7 +133,8 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       if (state.selected) {
         this.room = {
           id: state.selected.id,
-          name: state.selected.name
+          name: state.selected.name,
+          location: state.selected.location
         } as IRoom;
         this.professionalName = `${state.selected.professional.firstName} ${state.selected.professional.lastName}`;
         this.getAvailabilities(state.selected.availabilities);

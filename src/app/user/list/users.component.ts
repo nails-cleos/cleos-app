@@ -42,7 +42,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   getState: Observable<any>;
 
   allRole: Role[] = [Role.Customer, Role.Professional, Role.Admin];
-  error: string | undefined;
+  error: any;
 
   resultsLength = 0;
   pageSize = PAGE_SIZE;

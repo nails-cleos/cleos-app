@@ -1,13 +1,13 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div *ngIf="isCard; else cardBox">
-      <img alt="error" src="favicon.ico">
+      <img alt="error" class="error" src="{{imageSrc}}">
     </div>
     <ng-template #cardBox>
       <mat-card>
         <mat-card-header>
         </mat-card-header>
-        <img alt="error" mat-card-image src="favicon.ico">
+        <img alt="error" class="error" mat-card-image src="{{imageSrc}}">
       </mat-card>
     </ng-template>
   </div>

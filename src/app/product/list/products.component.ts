@@ -28,7 +28,7 @@ export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   resultsLength = 0;
   pageSize = PAGE_SIZE;
-  error: string | undefined;
+  error: any;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;

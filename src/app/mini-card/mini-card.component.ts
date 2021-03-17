@@ -16,7 +16,7 @@ export class MiniCardComponent implements OnInit {
   @Input() isCurrency: boolean | undefined;
   @Input() duration: string | undefined;
   @Input() percentValue: number | undefined;
-  @Input() error: string | undefined;
+  @Input() error: any;
 
   locale: string;
 

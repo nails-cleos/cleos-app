@@ -17,7 +17,7 @@ export class LastMonthReservationsChartComponent implements OnChanges {
   isLoading = true;
   data: IReservationAll[] | undefined;
   locale: string;
-  error: string | undefined;
+  error: any;
 
   public lineChartData: ChartDataSets[] = [
     {data: []}

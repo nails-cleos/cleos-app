@@ -16,7 +16,7 @@ export class MonthlyReservationsChartComponent implements OnChanges {
   isLoading = true;
   data: IReservationAll[] | undefined;
   locale: string;
-  error: string | undefined;
+  error: any;
 
   public pieChartOptions: ChartOptions = {
     responsive: true

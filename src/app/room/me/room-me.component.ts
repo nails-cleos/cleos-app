@@ -7,7 +7,6 @@ import { ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../store/app.states';
-import { FieldChange } from '../../util/validators';
 import * as fromActionsRoom from '../../store/room.actions';
 
 @Component({
@@ -21,7 +20,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   subscription: Subscription | undefined;
   errors: any = [];
   professionalName: string | undefined;
-  error: string | undefined;
+  error: any;
 
   step = 0;
   icons: IIcon = {
@@ -35,7 +34,13 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   availabilities: IAvailability[] = [];
 
-  constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>) {
+  form!: FormGroup;
+  address: FormControl = new FormControl('', [
+    Validators.required
+  ]);
+
+  constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
+              private formBuilder: FormBuilder) {
     this.getState = this.store.select(selectRoomState);
   }
 
@@ -52,6 +57,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.createForm();
     this.subscribe();
   }
 
@@ -70,8 +76,15 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
     const room: IRoom = new Room();
     room.id = this.room?.id;
     room.availabilities = this.availabilities;
+    const location = this.address.value.geometry.location;
+    room.location = {
+      x: location.lat(),
+      y: location.lng()
+    };
 
-    this.store.dispatch(new fromActionsRoom.RoomUpdate(room));
+    this.store.dispatch(new fromActionsRoom.RoomUpdateMe(room));
+    this.room = undefined;
+    this.availabilities = [];
   }
 
   ignore(day: string, step: number): void {
@@ -124,6 +137,12 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
     return false;
   }
 
+  private createForm(): void {
+    this.form = this.formBuilder.group({
+      address: this.address
+    });
+  }
+
   private getRoom(): void {
     if (!this.room) {
       this.store.dispatch(
@@ -137,7 +156,8 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
       if (state.selected) {
         this.room = {
           id: state.selected.id,
-          name: state.selected.name
+          name: state.selected.name,
+          location: state.selected.location
         } as IRoom;
         this.professionalName = `${state.selected.professional.firstName} ${state.selected.professional.lastName}`;
         this.getAvailabilities(state.selected.availabilities);
@@ -146,11 +166,17 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
         });
-      } else if (state.errorMessage) {
-        this.snackBar.open(state.errorMessage, 'OK', {
+      } else if (state.errorMessage || state.message) {
+        const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
           duration: 5000
         });
-        this.error = state.error;
+        if (state.message) {
+          snackBarRef.afterDismissed().subscribe(() => {
+            this.getRoom();
+          });
+        } else {
+          this.error = state.error;
+        }
       }
     });
   }

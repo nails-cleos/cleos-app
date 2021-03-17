@@ -23,6 +23,7 @@ import { FillNotAvailable, NewEvent } from '../util/event';
 import { Router } from '@angular/router';
 import { DateAdapter } from '@angular/material/core';
 import { FindStateColor } from '../util/flags';
+import { GeocoderResult } from '@agm/core';
 
 @Component({
   selector: 'app-reservation',
@@ -38,7 +39,7 @@ export class ReservationComponent implements OnInit, OnDestroy {
   errors: any = [];
 
   isLoading = false;
-  error: string | undefined;
+  error: any;
 
   customerForm!: FormGroup;
   customers: IUser[] | undefined;
@@ -60,6 +61,7 @@ export class ReservationComponent implements OnInit, OnDestroy {
   room: FormControl = new FormControl('', [
     Validators.required, RequireMatch
   ]);
+  address: string | undefined;
 
   date: FormControl = new FormControl('', [
     Validators.required
@@ -154,7 +156,6 @@ export class ReservationComponent implements OnInit, OnDestroy {
 
   displayFnRoom(room: IRoom): string {
     if (room) {
-      // TODO show info
       return `${room.name}`;
     } else {
       return '';
@@ -464,5 +465,9 @@ export class ReservationComponent implements OnInit, OnDestroy {
     const filterValue = name.toLowerCase();
 
     return this.rooms?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
+  }
+
+  getAddress($event: GeocoderResult): void {
+    this.address = $event.formatted_address;
   }
 }

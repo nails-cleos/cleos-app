@@ -5,7 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppMaterialModule } from './util/app-material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClient, HttpClientJsonpModule, HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { SocialLoginModule } from 'angularx-social-login';
 import { ActionReducer, MetaReducer, StoreModule } from '@ngrx/store';
@@ -17,6 +17,8 @@ import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { registerLocaleData } from '@angular/common';
 import { MatPasswordStrengthModule } from '@angular-material-extensions/password-strength';
 import { ServiceWorkerModule } from '@angular/service-worker';
+import { AgmCoreModule } from '@agm/core';
+import { MatGoogleMapsAutocompleteModule } from '@angular-material-extensions/google-maps-autocomplete';
 
 // Providers
 import { httpInterceptorProviders } from './http-interceptors';
@@ -38,6 +40,7 @@ import { ProductService } from './services/product.service';
 import { RoomService } from './services/room.service';
 import { ReservationService } from './services/reservation.service';
 import { WebsocketService } from './services/websocket.service';
+import { GeocodeService } from './services/geocode.service';
 
 // Reducers
 import { reducers } from './store/app.states';
@@ -90,6 +93,7 @@ import { NotificationsComponent } from './notification/list/notifications.compon
 import { RoomMeComponent } from './room/me/room-me.component';
 import { CalendarComponent } from './reservation/calendar/calendar.component';
 import { ErrorComponent } from './error/error.component';
+import { GoogleMapComponent } from './google-map/google-map.component';
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -161,7 +165,8 @@ registerLocaleData(localeEs, 'es');
     NotificationsComponent,
     RoomMeComponent,
     ErrorComponent,
-    CalendarComponent
+    CalendarComponent,
+    GoogleMapComponent
   ],
   imports: [
     BrowserModule,
@@ -183,12 +188,16 @@ registerLocaleData(localeEs, 'es');
     SocialLoginModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    HttpClientJsonpModule,
     FormsModule,
     AppMaterialModule,
     MatPasswordStrengthModule.forRoot(),
     FlexLayoutModule,
     ReactiveFormsModule,
+    AgmCoreModule.forRoot({
+      apiKey: environment.googleMapKey,
+      libraries: ['places']
+    }),
+    MatGoogleMapsAutocompleteModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,
       registrationStrategy: 'registerImmediately'
@@ -208,6 +217,7 @@ registerLocaleData(localeEs, 'es');
     ReservationService,
     WebsocketService,
     TranslationLoaderResolver,
+    GeocodeService,
     {
       provide: 'SocialAuthServiceConfig',
       useValue: getAuthServiceConfigs()

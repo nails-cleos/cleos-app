@@ -82,6 +82,7 @@
               </mat-accordion>
               <mat-error *ngIf="errors['availability']" [innerHTML]="'ROOM.DETAIL.AVAILABILITY.REQUIRED' | translate"
                          class="divider"></mat-error>
+              <app-google-map [addressFormGroup]="form" [latitudeMarker]="room.location?.x" [longitudeMarker]="room.location?.y"></app-google-map>
             </div>
           </mat-card-content>
           <ng-template #boxSkeleton>

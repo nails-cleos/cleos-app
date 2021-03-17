@@ -39,7 +39,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   locale: string;
   language: string;
   isLoading = false;
-  error: string | undefined;
+  error: any;
   changeState: any;
   professionalId: string | undefined;
   machine: any;

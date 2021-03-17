@@ -13,7 +13,7 @@ export class AnnualReservationsChartComponent implements OnChanges {
   @Input() label: any;
 
   isLoading = true;
-  error: string | undefined;
+  error: any;
   locale: string;
 
   public lineChartData: ChartDataSets[] = [

@@ -33,7 +33,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
   @ViewChild(MatSort) sort!: MatSort;
 
   language: string;
-  error: string | undefined;
+  error: any;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private router: Router,
               private store: Store<AppState>, private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {

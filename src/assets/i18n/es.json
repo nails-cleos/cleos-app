@@ -42,6 +42,10 @@
     "LANG": {
       "ES": "Español",
       "EN": "Inglés"
+    },
+    "ADDRESS": {
+      "FIELD": "Dirección",
+      "INVALID": "La dirección es invalida"
     }
   },
   "DASHBOARD": {
@@ -548,7 +552,8 @@
         "ROOM": {
           "TITLE": "Sala",
           "NAME": "Nombre",
-          "PROFESSIONAL": "Profesional"
+          "PROFESSIONAL": "Profesional",
+          "ADDRESS": "Dirección"
         },
         "PRODUCT": {
           "TITLE": "Servicio",

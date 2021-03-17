@@ -17,7 +17,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   notifications: INotification[] = [];
   getState: Observable<any>;
   subscription: Subscription | undefined;
-  error: string | undefined;
+  error: any;
   page: number;
   language: string;
   showMore = false;

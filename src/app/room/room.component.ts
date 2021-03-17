@@ -10,6 +10,8 @@ import { IUser } from '../interfaces/user';
 import { map, startWith } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { RequireMatch } from '../util/validators';
+import { Appearance, GermanAddress, Location } from '@angular-material-extensions/google-maps-autocomplete';
+import PlaceResult = google.maps.places.PlaceResult;
 
 export enum IconName {
   calendar_today = 'calendar_today',
@@ -34,7 +36,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   form!: FormGroup;
   room: IRoom = new Room();
   errors: any = [];
-  error: string | undefined;
+  error: any;
 
   step = 0;
   icons: IIcon = {
@@ -52,6 +54,10 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   professional: FormControl = new FormControl('', [
     Validators.required, RequireMatch
+  ]);
+
+  address: FormControl = new FormControl('', [
+    Validators.required
   ]);
 
   constructor(private readonly translate: TranslateService, private snackBar: MatSnackBar, private store: Store<AppState>,
@@ -81,6 +87,11 @@ export class RoomComponent implements OnInit, OnDestroy {
 
     this.room.name = this.name.value;
     this.room.professionalId = this.professional.value.id;
+    const location = this.address.value.geometry.location;
+    this.room.location = {
+      x: location.lat(),
+      y: location.lng()
+    };
 
     this.store.dispatch(
       new fromActionsRoom.RoomSave(this.room)
@@ -117,7 +128,8 @@ export class RoomComponent implements OnInit, OnDestroy {
   private createForm(): void {
     this.form = this.formBuilder.group({
       name: this.name,
-      professional: this.professional
+      professional: this.professional,
+      address: this.address
     });
     this.filteredOptions = this.professional.valueChanges.pipe(
       startWith(''),
