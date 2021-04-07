@@ -1,0 +1,8 @@
+<div *ngIf="open" class="viewer-container">
+  <div class="viewer-content">
+    <button [matTooltip]="'COMMON.BUTTON.CLOSE' | translate" (click)="close.emit()" class="close-button" mat-icon-button>
+      <mat-icon>close</mat-icon>
+    </button>
+    <img [src]="imageURL" alt="full image" class="main-img"/>
+  </div>
+</div>

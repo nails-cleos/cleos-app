@@ -2,8 +2,8 @@
   <mat-sidenav #drawer [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
                [mode]="(isHandset$ | async) ? 'over' : 'side'"
                [opened]="(isHandset$ | async) === false" class="sidenav" fixedInViewport>
-    <mat-card *ngIf="currentUser">
-      <mat-card-header>
+    <mat-card *ngIf="currentUser" style="padding: 16px 0 0 0">
+      <mat-card-header style="padding-left: 16px">
         <div class="circle" mat-card-avatar>
           <img *ngIf="!showInitials; else showInitialsBlock" alt="profile" src="{{currentUser?.imageUrl}}">
           <ng-template #showInitialsBlock>
@@ -13,25 +13,26 @@
         <mat-card-title>{{username | uppercase}}</mat-card-title>
         <mat-card-subtitle>{{currentUser.email}}</mat-card-subtitle>
       </mat-card-header>
+      <mat-card-content>
+        <mat-nav-list *ngIf="currentUser">
+          <mat-divider></mat-divider>
+          <div *ngFor="let menu of menuItems; last as last">
+            <a (click)="drawer.toggle()" *ngIf="isHandset$ | async; else showMenu" [routerLink]="'/'+menu.path"
+               mat-list-item>
+              <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>
+              <div mat-line>{{menu.name}}</div>
+            </a>
+            <ng-template #showMenu>
+              <a [routerLinkActive]="['active']" [routerLink]="'/'+menu.path" mat-list-item>
+                <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>
+                <div mat-line>{{menu.name}}</div>
+              </a>
+            </ng-template>
+            <mat-divider *ngIf="!last"></mat-divider>
+          </div>
+        </mat-nav-list>
+      </mat-card-content>
     </mat-card>
-    <mat-toolbar *ngIf="currentUser">Menu</mat-toolbar>
-    <mat-nav-list *ngIf="currentUser">
-      <mat-divider></mat-divider>
-      <div *ngFor="let menu of menuItems; last as last">
-        <a (click)="drawer.toggle()" *ngIf="isHandset$ | async; else showMenu" [routerLink]="'/'+menu.path"
-           mat-list-item>
-          <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>
-          <div mat-line>{{menu.name}}</div>
-        </a>
-        <ng-template #showMenu>
-          <a [routerLinkActive]="['active']" [routerLink]="'/'+menu.path" mat-list-item>
-            <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>
-            <div mat-line>{{menu.name}}</div>
-          </a>
-        </ng-template>
-        <mat-divider *ngIf="!last"></mat-divider>
-      </div>
-    </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
     <mat-toolbar color="primary">
@@ -39,11 +40,20 @@
               aria-label="Toggle sidenav" mat-icon-button type="button">
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
+      <img alt="logo" mat-card-avatar src="./favicon.ico">
       <span>{{'APP.TITLE' | translate}}</span>
       <span class="align-right"></span>
       <div *ngIf="username; else login">
+        <button *ngIf="workDay.length; else workDayIcon" [matMenuTriggerFor]="menuWorkDay"
+                class="badge-padding" mat-icon-button>
+          <mat-icon [matBadgeHidden]="!workDay.length"
+                    [matBadge]="workDay.length"
+                    matBadgeColor="warn">
+            work
+          </mat-icon>
+        </button>
         <button *ngIf="notifications.length; else notificationIcon" [matMenuTriggerFor]="menuNotification"
-                mat-icon-button style="margin-right: 10px">
+                class="badge-padding" mat-icon-button>
           <mat-icon [matBadgeHidden]="!countNotifications"
                     [matBadge]="plusNotification ? plusNotification : countNotifications"
                     matBadgeColor="warn">
@@ -52,7 +62,7 @@
         </button>
         <mat-menu #menuNotification="matMenu" xPosition="before">
           <mat-list>
-            <mat-list-item (click)="notification(not)" *ngFor="let not of notifications" class="notification" matRipple>
+            <mat-list-item (click)="notification(not)" *ngFor="let not of notifications" class="pointer" matRipple>
               <div [matTooltip]="not.message" [ngClass]="{ 'gray-text': not.read}" mat-line>
                 <span *ngIf="!not.read" class="dot"></span>{{not.message}}
               </div>
@@ -67,42 +77,58 @@
           </mat-list>
         </mat-menu>
         <ng-template #notificationIcon>
-          <button [matMenuTriggerFor]="menuNoNotification" mat-icon-button style="margin-right: 10px">
+          <button [matMenuTriggerFor]="menuNoNotification" class="badge-padding" mat-icon-button>
             <mat-icon>notifications</mat-icon>
           </button>
           <mat-menu #menuNoNotification="matMenu" xPosition="before">
             <mat-list>
-              <mat-list-item class="notification" matRipple>
+              <mat-list-item class="pointer" matRipple>
                 <div mat-line>{{'COMMON.NOTIFICATION.NO' | translate}}</div>
               </mat-list-item>
             </mat-list>
           </mat-menu>
         </ng-template>
+        <mat-menu #menuWorkDay="matMenu" xPosition="before">
+          <mat-list>
+            <mat-list-item (click)="notification(not)" *ngFor="let not of workDay" class="pointer" matRipple>
+              <div [matTooltip]="not.message" mat-line>{{not.message}}</div>
+              <mat-divider class="divider"></mat-divider>
+            </mat-list-item>
+          </mat-list>
+        </mat-menu>
+        <ng-template #workDayIcon>
+          <button class="badge-padding" mat-icon-button>
+            <mat-icon>work_off</mat-icon>
+          </button>
+        </ng-template>
 
         <button [matMenuTriggerFor]="menuLogged" color="accent" mat-raised-button>
           <mat-icon>person_pin</mat-icon>
-          <span fxHide.lt-sm fxShow>{{username | titlecase}}</span>
+          <span *ngIf="!(isHandset$ | async)">{{username | titlecase}}</span>
         </button>
         <mat-menu #menuLogged="matMenu">
-          <button mat-menu-item routerLink="/profile">
-            <mat-icon>settings</mat-icon>
-            <span>{{'DASHBOARD.PROFILE' | translate }}</span>
-          </button>
-          <button *ngIf="canChangePassword" mat-menu-item routerLink="/change-password">
-            <mat-icon>mode_edit</mat-icon>
-            <span>{{'DASHBOARD.CHANGE_PASSWORD' | translate }}</span>
-          </button>
-          <mat-divider></mat-divider>
-          <button (click)="logout()" mat-menu-item>
-            <mat-icon>exit_to_app</mat-icon>
-            <span>{{'DASHBOARD.SIGN_OUT' | translate }}</span>
-          </button>
+          <mat-nav-list>
+            <a mat-list-item routerLink="/profile">
+              <mat-icon mat-list-icon>settings</mat-icon>
+              <div mat-line>{{'DASHBOARD.PROFILE' | translate }}</div>
+            </a>
+            <mat-divider></mat-divider>
+            <a *ngIf="canChangePassword" mat-list-item routerLink="/change-password">
+              <mat-icon mat-list-icon>mode_edit</mat-icon>
+              <div mat-line>{{'DASHBOARD.CHANGE_PASSWORD' | translate }}</div>
+            </a>
+            <mat-divider></mat-divider>
+            <a (click)="logout()" mat-list-item>
+              <mat-icon mat-list-icon>exit_to_app</mat-icon>
+              <div mat-line>{{'DASHBOARD.SIGN_OUT' | translate }}</div>
+            </a>
+          </mat-nav-list>
         </mat-menu>
       </div>
       <ng-template #login>
         <button color="accent" mat-raised-button routerLink="/auth">
           <mat-icon>login</mat-icon>
-          {{'DASHBOARD.SIGN_IN' | translate }}
+          <span *ngIf="!(isHandset$ | async)">{{'DASHBOARD.SIGN_IN' | translate }}</span>
         </button>
       </ng-template>
     </mat-toolbar>

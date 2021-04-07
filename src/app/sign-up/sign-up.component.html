@@ -97,8 +97,8 @@
     </mat-form-field>
     <mat-form-field appearance="fill">
       <mat-label>{{ 'USER.ADD.LANG.FIELD' | translate }}</mat-label>
-      <span *ngIf="select.value" [class]="'flag-icon  flag-icon-squared flag-icon-' + select.value.icon" matPrefix
-            style="margin-right: 8px;"></span>
+      <span *ngIf="select.value" [class]="'flag-icon  flag-icon-squared flag-icon-' + select.value.icon" class="margin-right-eight"
+            matPrefix></span>
       <mat-select #select [formControl]="lang" required>
 
         <mat-option *ngFor="let lang of flags" [value]="lang">

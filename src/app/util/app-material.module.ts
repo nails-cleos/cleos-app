@@ -32,6 +32,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
 import { MatBadgeModule } from '@angular/material/badge';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @NgModule({
   imports: [
@@ -67,7 +68,8 @@ import { MatBadgeModule } from '@angular/material/badge';
     OverlayModule,
     MatFabMenuModule,
     MatBadgeModule,
-    MatRippleModule
+    MatRippleModule,
+    DragDropModule
   ],
   exports: [
     MatTableModule,
@@ -103,7 +105,8 @@ import { MatBadgeModule } from '@angular/material/badge';
     OverlayModule,
     MatFabMenuModule,
     MatBadgeModule,
-    MatRippleModule
+    MatRippleModule,
+    DragDropModule
   ]
 })
 export class AppMaterialModule {

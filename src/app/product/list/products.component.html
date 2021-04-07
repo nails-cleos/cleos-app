@@ -1,8 +1,8 @@
-<div *ngIf="!error; else errorBox" class="mat-elevation-z8 small-table">
+<div *ngIf="!error; else errorBox" class="mat-elevation-z8">
   <table [dataSource]="dataSource" mat-table matSort matSortActive="name"
          matSortDirection="desc" matSortDisableClear>
     <ng-container matColumnDef="position">
-      <th *matHeaderCellDef mat-header-cell> No.</th>
+      <th *matHeaderCellDef mat-header-cell>#</th>
       <td *matCellDef="let product; let i = index;" mat-cell>
         <div *ngIf="product.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
         <ng-template #skeleton>

@@ -27,6 +27,10 @@ import { NotificationsComponent } from './notification/list/notifications.compon
 import { RoomMeComponent } from './room/me/room-me.component';
 import { CalendarComponent } from './reservation/calendar/calendar.component';
 import { GoogleMapComponent } from './google-map/google-map.component';
+import { CataloguesComponent } from './catalogue/list/catalogues.component';
+import { CatalogueComponent } from './catalogue/catalogue.component';
+import { CatalogueDetailComponent } from './catalogue/detail/catalogue-detail.component';
+import { CatalogComponent } from './catalog/catalog.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/dashboard', pathMatch: 'full', resolve: {model: TranslationLoaderResolver}},
@@ -34,6 +38,7 @@ const routes: Routes = [
   {path: 'activate-account', component: ActivateAccountComponent},
   {path: 'forgot-password', component: ForgotPasswordComponent},
   {path: 'recovery-password', component: RecoveryPasswordComponent},
+  {path: 'catalogs', component: CatalogComponent},
   {path: 'main', component: MainComponent},
   {
     path: 'dashboard', component: DashComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService], data: {
@@ -77,6 +82,25 @@ const routes: Routes = [
   },
   {
     path: 'product/:id', component: ProductDetailComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.Admin]
+    }
+  },
+  {
+    path: 'catalogues',
+    component: CataloguesComponent,
+    resolve: {model: TranslationLoaderResolver},
+    canActivate: [AuthGuardService],
+    data: {
+      roles: [Role.Admin]
+    }
+  },
+  {
+    path: 'catalogue', component: CatalogueComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.Admin]
+    }
+  },
+  {
+    path: 'catalogue/:id', component: CatalogueDetailComponent, canActivate: [AuthGuardService], data: {
       roles: [Role.Admin]
     }
   },

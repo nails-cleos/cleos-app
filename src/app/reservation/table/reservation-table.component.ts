@@ -82,7 +82,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
 
   delete(reservation: IReservation): void {
     const title = this.translate.instant('RESERVATION.DELETED.TITLE');
-    const content = this.translate.instant('RESERVATION.DELETED.CONTENT', {start: reservation.start});
+    const content = this.translate.instant('RESERVATION.DELETED.CONTENT', {date: reservation.start});
     const dialogRef = this.dialog.open(DialogComponent, {
       data: {title, content, value: reservation}
     });

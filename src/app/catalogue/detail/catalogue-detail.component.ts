@@ -1,0 +1,156 @@
+import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ICatalogue, Catalogue, ICatalogueAll } from '../../interfaces/catalogue';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Observable, Subscription } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Store } from '@ngrx/store';
+import { AppState, selectCatalogueState } from '../../store/app.states';
+import { FieldChange } from '../../util/validators';
+import * as fromActionsCatalogue from '../../store/catalogue.actions';
+import { FormatBytes } from '../../util/file';
+import { DialogComponent } from '../../dialog/dialog.component';
+import * as fromActionsProduct from '../../store/product.actions';
+import { TranslateService } from '@ngx-translate/core';
+import { MatDialog } from '@angular/material/dialog';
+
+@Component({
+  selector: 'app-catalogue-detail',
+  templateUrl: './catalogue-detail.component.html',
+  styleUrls: ['./catalogue-detail.component.scss']
+})
+export class CatalogueDetailComponent implements OnInit, AfterViewInit, OnDestroy {
+
+  @Input() catalogue: ICatalogue | undefined;
+  form!: FormGroup;
+  subscription: Subscription | undefined;
+  getState: Observable<any>;
+  errors: any = [];
+  error: any;
+  file: any;
+  img: any;
+  showImg = true;
+
+  name: FormControl = new FormControl('', [
+    Validators.required
+  ]);
+
+  constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
+              private formBuilder: FormBuilder, private translate: TranslateService, public dialog: MatDialog) {
+    this.getState = this.store.select(selectCatalogueState);
+  }
+
+  ngOnInit(): void {
+    this.createForm();
+    this.subscribe();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+  }
+
+  ngAfterViewInit(): void {
+    this.getCatalogue();
+  }
+
+  update(): void {
+    if (this.form.invalid) {
+      return;
+    }
+    const catalogue: ICatalogue = new Catalogue();
+    catalogue.id = this.catalogue?.id;
+    catalogue.name = FieldChange(this.name, this.catalogue?.name);
+    catalogue.description = FieldChange(this.form.value?.description, this.catalogue?.description);
+
+    this.store.dispatch(new fromActionsCatalogue.CatalogueUpdate({catalogue, file: this.file}));
+  }
+
+  onFileDropped(files: any): void {
+    files[0].progress = 0;
+    this.file = files[0];
+    this.uploadFilesSimulator();
+  }
+
+  fileBrowseHandler($event: any): void {
+    $event.target.files[0].progress = 0;
+    this.file = $event.target.files[0];
+    this.uploadFilesSimulator();
+  }
+
+  deleteImg(): void {
+    const content = this.translate.instant('CATALOGUE.DETAIL.DELETE.MESSAGE', {name: this.catalogue?.name});
+    const undo = this.translate.instant('CATALOGUE.DETAIL.DELETE.UNDO');
+    const snackBarRef = this.snackBar.open(content, undo, {
+      duration: 5000
+    });
+    snackBarRef.onAction().subscribe(() => {
+      this.showImg = true;
+    });
+
+    this.showImg = false;
+  }
+
+  deleteFile(): void {
+    this.file = undefined;
+  }
+
+  formatBytes(bytes: any, decimals: number): string {
+    return FormatBytes(bytes, decimals);
+  }
+
+  private createForm(): void {
+    this.form = this.formBuilder.group({
+      name: this.name,
+      description: new FormControl()
+    });
+  }
+
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe(state => {
+      if (state.selected) {
+        this.catalogue = {
+          id: state.selected.id,
+          name: state.selected.name,
+          description: state.selected.description
+        } as ICatalogue;
+        this.img = state.selected.blob;
+        this.showImg = !!this.img;
+        this.form.patchValue(this.catalogue);
+      }
+      if (state.subErrors) {
+        state.subErrors.forEach((value: any) => {
+          this.errors[value.field] = value.message;
+          this.form.controls[value.field].setErrors({incorrect: true});
+        });
+      } else if (state.errorMessage) {
+        this.snackBar.open(state.errorMessage, 'OK', {
+          duration: 5000
+        });
+        this.error = state.error;
+      }
+    });
+  }
+
+  private getCatalogue(): void {
+    if (!this.catalogue) {
+      const id = this.route.snapshot.paramMap.get('id');
+      this.store.dispatch(
+        new fromActionsCatalogue.CatalogueFind(id)
+      );
+    }
+  }
+
+  private uploadFilesSimulator(): void {
+    setTimeout(() => {
+      const progressInterval = setInterval(() => {
+        if (this.file) {
+          if (this.file.progress === 100) {
+            clearInterval(progressInterval);
+          } else {
+            this.file.progress += 5;
+          }
+        }
+      }, 200);
+    }, 500);
+  }
+}

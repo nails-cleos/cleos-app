@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { IUser } from '../interfaces/user';
+import { IAuthority, IUser } from '../interfaces/user';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState } from '../store/app.states';
 import { Observable } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
+import { Role } from '../interfaces/token';
 
 @Injectable({
   providedIn: 'root'
@@ -23,9 +24,26 @@ export class AuthGuardService implements CanActivate {
     });
   }
 
+  private static isCustomer(authorities: IAuthority[] | undefined): boolean {
+    return !!authorities && authorities.length === 1 && authorities[0].authority === Role.Customer;
+  }
+
+  private static hasRole(route: ActivatedRouteSnapshot, user: IUser): boolean {
+    if (route.data.roles && user.authorities) {
+      return user.authorities.some(au => route.data.roles.includes(au.authority));
+    }
+
+    return false;
+  }
+
   public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
     if (this.currentUser) {
-      if (this.hasRole(route, this.currentUser)) {
+      if (AuthGuardService.isCustomer(this.currentUser.authorities)) {
+        this.router.navigate(['auth'], {queryParams: {returnUrl: state.url}});
+
+        return false;
+      }
+      if (AuthGuardService.hasRole(route, this.currentUser)) {
         return true;
       } else {
         let message;
@@ -43,14 +61,6 @@ export class AuthGuardService implements CanActivate {
     }
     // not logged in so redirect to auth page with the return url
     this.router.navigate(['auth'], {queryParams: {returnUrl: state.url}});
-
-    return false;
-  }
-
-  private hasRole(route: ActivatedRouteSnapshot, user: IUser): boolean {
-    if (route.data.roles && user.authorities) {
-      return user.authorities.some(au => route.data.roles.includes(au.authority));
-    }
 
     return false;
   }

@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../store/app.states';
@@ -44,9 +44,15 @@ export class UserComponent implements OnInit, OnDestroy {
 
   flags: IFlag[] = Flags();
 
+  extras: any;
+
   constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
-              private formBuilder: FormBuilder, private cdRef: ChangeDetectorRef) {
+              private formBuilder: FormBuilder, private router: Router, private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectUserState);
+    this.extras = this.router.getCurrentNavigation()?.extras.state;
+    if (this.extras) {
+      this.role.setValue(this.extras.role);
+    }
   }
 
   ngOnDestroy(): void {

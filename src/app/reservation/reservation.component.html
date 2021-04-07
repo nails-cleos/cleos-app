@@ -187,7 +187,13 @@
   <mat-vertical-stepper #stepper *ngIf="!error; else errorBox" [linear]="true">
     <mat-step [stepControl]="customerForm" state="person_search">
       <ng-template matStepLabel>{{ 'RESERVATION.ADD.CUSTOMER.FIELD' | translate }}</ng-template>
-      <ng-container *ngTemplateOutlet="stepOne"></ng-container>
+      <div class="flex-container" fxLayout="column">
+        <div fxLayout="column" fxLayoutAlign="space-between start">
+          <ng-container *ngTemplateOutlet="stepOne"></ng-container>
+          <div class="vertical-divider"></div>
+          asfd
+        </div>
+      </div>
       <div>
         <button mat-button routerLink="/reservations">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
         <button (click)="getRooms(stepper)" [disabled]="customerForm.invalid" color="primary" mat-button type="button">
@@ -252,7 +258,16 @@
   <mat-horizontal-stepper #stepper *ngIf="!error; else errorBox" [linear]="true">
     <mat-step [stepControl]="customerForm" state="person_search">
       <ng-template matStepLabel>{{ 'RESERVATION.ADD.CUSTOMER.FIELD' | translate }}</ng-template>
-      <ng-container *ngTemplateOutlet="stepOne"></ng-container>
+      <div class="flex-container" fxLayout="row">
+        <div fxLayout="row" fxLayoutAlign="space-between center">
+          <ng-container *ngTemplateOutlet="stepOne"></ng-container>
+          <div class="vertical-divider"></div>
+          <button color="accent" mat-raised-button (click)="addCustomer()">
+            <mat-icon>person_add</mat-icon>{{ 'RESERVATION.ADD.CUSTOMER.ADD_BUTTON' | translate }}
+          </button>
+        </div>
+      </div>
+
       <div>
         <button mat-button routerLink="/reservations">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
         <button (click)="getRooms(stepper)" [disabled]="customerForm.invalid" color="primary" mat-button type="button">

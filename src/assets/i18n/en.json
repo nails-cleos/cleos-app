@@ -17,7 +17,8 @@
       "VIEW": "View",
       "EDIT": "Edit",
       "DELETE": "Delete",
-      "INVITE": "Send invite"
+      "INVITE": "Send invite",
+      "CLOSE": "Close"
     },
     "COLUMN": {
       "ACTIONS": "Actions"
@@ -373,6 +374,55 @@
       "MESSAGE": "Product {{name}} updated"
     }
   },
+  "CATALOGUE": {
+    "ADD": {
+      "TITLE": "Add catalogue",
+      "NAME": {
+        "FIELD": "Name",
+        "REQUIRED": "Name is <b>required</b>"
+      },
+      "DESCRIPTION": {
+        "FIELD": "Description"
+      },
+      "FILE": {
+        "DRAG_DROP": "Drag and drop file here",
+        "OR": "or",
+        "CHOOSE": "Choose a file"
+      },
+      "CREATED": "Catalogue {{name}} created"
+    },
+    "DETAIL": {
+      "TITLE": "Update catalogue",
+      "NAME": {
+        "FIELD": "Name",
+        "REQUIRED": "Name is <b>required</b>"
+      },
+      "DESCRIPTION": {
+        "FIELD": "Description"
+      },
+      "FILE": {
+        "DRAG_DROP": "Drag and drop file here",
+        "OR": "or",
+        "CHOOSE": "Choose a file"
+      },
+      "DELETE": {
+        "BUTTON": "Delete image {{name}}",
+        "MESSAGE": "Image {{name}} deleted",
+        "UNDO": "Undo"
+      }
+    },
+    "DELETED": {
+      "TITLE": "Delete catalogue",
+      "CONTENT": "Are you sure to delete catalogue {{name}}?",
+      "MESSAGE": "Catalogue {{name}} deleted"
+    },
+    "UPDATED": {
+      "ALL": {
+        "MESSAGE": "Sorted catalogs"
+      },
+      "MESSAGE": "Catalogue {{name}} updated"
+    }
+  },
   "ROOM": {
     "LIST": {
       "COLUMN": {
@@ -526,7 +576,8 @@
       "CUSTOMER": {
         "FIELD": "Customer",
         "REQUIRED": "Customer is <b>required</b>",
-        "INVALID": "Customer is invalid"
+        "INVALID": "Customer is invalid",
+        "ADD_BUTTON": "Add customer"
       },
       "ROOM": {
         "FIELD": "Room",
@@ -642,7 +693,7 @@
       "MESSAGE": "Reservation {{date}} deleted"
     },
     "UPDATED": {
-      "MESSAGE": "Room {{name}} updated"
+      "MESSAGE": "Reservation {{date}} updated"
     },
     "STATE": {
       "CREATED": "Created",
@@ -657,6 +708,6 @@
     "LOAD_MORE": "Load more"
   },
   "APP": {
-    "TITLE": "Nail"
+    "TITLE": "Cleos"
   }
 }

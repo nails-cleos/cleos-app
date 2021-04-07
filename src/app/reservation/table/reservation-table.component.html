@@ -1,8 +1,8 @@
-<div *ngIf="!error; else errorBox" class="mat-elevation-z8 small-table">
+<div *ngIf="!error; else errorBox" class="mat-elevation-z8">
   <table [dataSource]="dataSource" class="full-width-table" mat-table matSort matSortActive="start"
          matSortDirection="desc" matSortDisableClear>
     <ng-container matColumnDef="position">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell> No.</th>
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>#</th>
       <td *matCellDef="let reservation; let i = index;" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="reservation.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
         <ng-template #skeleton>

@@ -24,6 +24,7 @@ import { Router } from '@angular/router';
 import { DateAdapter } from '@angular/material/core';
 import { FindStateColor } from '../util/flags';
 import { GeocoderResult } from '@agm/core';
+import { Role } from '../interfaces/token';
 
 @Component({
   selector: 'app-reservation',
@@ -144,7 +145,7 @@ export class ReservationComponent implements OnInit, OnDestroy {
       }
     }
     return result;
-  }
+  };
 
   displayFnUser(user: IUser): string {
     return user ? `${user.firstName} ${user.lastName}` : '';
@@ -282,6 +283,14 @@ export class ReservationComponent implements OnInit, OnDestroy {
     stepper.next();
   }
 
+  addCustomer(): void {
+    this.router.navigateByUrl('/user', {state: {role: Role.Customer}});
+  }
+
+  getAddress($event: GeocoderResult): void {
+    this.address = $event.formatted_address;
+  }
+
   private createForm(): void {
     this.customerForm = this.formBuilder.group({
       customer: this.customer
@@ -414,15 +423,6 @@ export class ReservationComponent implements OnInit, OnDestroy {
     return {week, saturday, sunday};
   }
 
-  private setStartEndDay(week: IAvailability, saturday: IAvailability, sunday: IAvailability): void {
-    const {min, max} = GetStartEndDay(week, saturday, sunday);
-
-    this.dayStartHour = min.getHours();
-    this.dayStartMinute = min.getMinutes();
-    this.dayEndHour = max.getHours();
-    this.dayEndMinute = max.getMinutes();
-  }
-
   // private isAnOverlapEvent(eventStartDay: Date, eventEndDay: Date): CalendarEvent | undefined {
   //   return this.events.find((eventA: CalendarEvent) => {
   //     if (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end) {
@@ -440,6 +440,15 @@ export class ReservationComponent implements OnInit, OnDestroy {
   //     return null;
   //   });
   // }
+
+  private setStartEndDay(week: IAvailability, saturday: IAvailability, sunday: IAvailability): void {
+    const {min, max} = GetStartEndDay(week, saturday, sunday);
+
+    this.dayStartHour = min.getHours();
+    this.dayStartMinute = min.getMinutes();
+    this.dayEndHour = max.getHours();
+    this.dayEndMinute = max.getMinutes();
+  }
 
   private isAnOverlapEvent(eventStartDay: Date, eventEndDay: Date): CalendarEvent[] {
     return this.events.filter((eventA: CalendarEvent) => (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
@@ -465,9 +474,5 @@ export class ReservationComponent implements OnInit, OnDestroy {
     const filterValue = name.toLowerCase();
 
     return this.rooms?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-  getAddress($event: GeocoderResult): void {
-    this.address = $event.formatted_address;
   }
 }

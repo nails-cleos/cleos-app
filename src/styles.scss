@@ -1,4 +1,5 @@
-@import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
+@import '~@angular/material/theming';
+@import "theme";
 @import "~skeleton-screen-css";
 
 $flag-icon-css-path: '~flag-icon-css/flags' !default;
@@ -22,10 +23,6 @@ body {
 
 table {
   width: 100%;
-}
-
-.small-table {
-  overflow-x: scroll !important;
 }
 
 .mat-column-position {
@@ -132,13 +129,13 @@ a, u {
 
 .chartContainer {
   height: 100%;
-  display: flex;
+  display: block;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
 
-.notification {
+.pointer {
   cursor: pointer;
 }
 
@@ -152,4 +149,19 @@ a, u {
 
 .gray-text {
   color: gray;
+}
+
+.mat-raised-button {
+  .mat-icon {
+    display: inherit !important;
+    margin-right: 5px
+  }
+}
+
+.margin-right-eight {
+  margin-right: 8px;
+}
+
+.bold {
+  font-weight: bold;
 }

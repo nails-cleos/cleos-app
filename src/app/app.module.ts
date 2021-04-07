@@ -41,6 +41,7 @@ import { RoomService } from './services/room.service';
 import { ReservationService } from './services/reservation.service';
 import { WebsocketService } from './services/websocket.service';
 import { GeocodeService } from './services/geocode.service';
+import { CatalogueService } from './services/catalogue.service';
 
 // Reducers
 import { reducers } from './store/app.states';
@@ -52,6 +53,10 @@ import { ProductEffects } from './store/effects/product.effects';
 import { RoomEffects } from './store/effects/room.effects';
 import { ReservationEffects } from './store/effects/reservation.effects';
 import { NotificationEffects } from './store/effects/notification.effects';
+import { CatalogueEffects } from './store/effects/catalogue.effects';
+
+// Directives
+import { DragDropDirective } from './directives/drag-drop.directive';
 
 // Components
 import { AppComponent } from './app.component';
@@ -94,6 +99,12 @@ import { RoomMeComponent } from './room/me/room-me.component';
 import { CalendarComponent } from './reservation/calendar/calendar.component';
 import { ErrorComponent } from './error/error.component';
 import { GoogleMapComponent } from './google-map/google-map.component';
+import { CatalogueComponent } from './catalogue/catalogue.component';
+import { CataloguesComponent } from './catalogue/list/catalogues.component';
+import { CatalogueDetailComponent } from './catalogue/detail/catalogue-detail.component';
+import { SpecialCharacterDirective } from './directives/special-character.directive';
+import { CatalogComponent } from './catalog/catalog.component';
+import { ImageViewerComponent } from './image-viewer/image-viewer.component';
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -166,12 +177,20 @@ registerLocaleData(localeEs, 'es');
     RoomMeComponent,
     ErrorComponent,
     CalendarComponent,
-    GoogleMapComponent
+    GoogleMapComponent,
+    CatalogueComponent,
+    CataloguesComponent,
+    CatalogueDetailComponent,
+    DragDropDirective,
+    SpecialCharacterDirective,
+    CatalogComponent,
+    ImageViewerComponent
   ],
   imports: [
     BrowserModule,
     StoreModule.forRoot(reducers, {metaReducers}),
-    EffectsModule.forRoot([LoginEffects, UserEffects, ProductEffects, RoomEffects, ReservationEffects, NotificationEffects]),
+    EffectsModule.forRoot([LoginEffects, UserEffects, ProductEffects, CatalogueEffects, RoomEffects, ReservationEffects,
+      NotificationEffects]),
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {
@@ -215,6 +234,7 @@ registerLocaleData(localeEs, 'es');
     ProductService,
     RoomService,
     ReservationService,
+    CatalogueService,
     WebsocketService,
     TranslationLoaderResolver,
     GeocodeService,

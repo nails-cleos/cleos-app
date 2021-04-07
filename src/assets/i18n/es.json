@@ -17,7 +17,8 @@
       "VIEW": "Ver",
       "EDIT": "Editar",
       "DELETE": "Eliminar",
-      "INVITE": "Enviar invitación"
+      "INVITE": "Enviar invitación",
+      "CLOSE": "Cerrar"
     },
     "COLUMN": {
       "ACTIONS": "Acciones"
@@ -373,6 +374,55 @@
       "MESSAGE": "Producto {{name}} actualizado"
     }
   },
+  "CATALOGUE": {
+    "ADD": {
+      "TITLE": "Agregar catálogo",
+      "NAME": {
+        "FIELD": "Nombre",
+        "REQUIRED": "Nombre es <b>requerido</b>"
+      },
+      "DESCRIPTION": {
+        "FIELD": "Descripción"
+      },
+      "FILE": {
+        "DRAG_DROP": "Arrastrar y soltar el archivo aquí",
+        "OR": "o",
+        "CHOOSE": "Elegí un archivo"
+      },
+      "CREATED": "Catálogo {{name}} creado"
+    },
+    "DETAIL": {
+      "TITLE": "Actualizar catálogo",
+      "NAME": {
+        "FIELD": "Nombre",
+        "REQUIRED": "Nombre es <b>requerido</b>"
+      },
+      "DESCRIPTION": {
+        "FIELD": "Descripción"
+      },
+      "FILE": {
+        "DRAG_DROP": "Arrastrar y soltar el archivo aquí",
+        "OR": "o",
+        "CHOOSE": "Elegí un archivo"
+      },
+      "DELETE": {
+        "BUTTON": "Eliminar imagen {{name}}",
+        "MESSAGE": "Imagen {{name}} eliminada",
+        "UNDO": "Deshacer"
+      }
+    },
+    "DELETED": {
+      "TITLE": "Eliminar catálogo",
+      "CONTENT": "¿Está seguro de eliminar el catálogo {{name}}?",
+      "MESSAGE": "Catálogo {{name}} eliminado"
+    },
+    "UPDATED": {
+      "ALL": {
+        "MESSAGE": "Catálogos ordenados"
+      },
+      "MESSAGE": "Catálogo {{name}} actualizado"
+    }
+  },
   "ROOM": {
     "LIST": {
       "COLUMN": {
@@ -526,7 +576,8 @@
       "CUSTOMER": {
         "FIELD": "Cliente",
         "REQUIRED": "Cliente es <b>requerido</b>",
-        "INVALID": "Cliente no valido"
+        "INVALID": "Cliente no valido",
+        "ADD_BUTTON": "Agregar cliente"
       },
       "ROOM": {
         "FIELD": "Sala",
@@ -610,6 +661,12 @@
         "COMPLETE": "La reserva se completo",
         "CANCEL": "La reserva se cancelo"
       },
+      "ACTION": {
+        "APPROVE": "Aprobar",
+        "START": "Iniciar",
+        "COMPLETE": "Completar",
+        "CANCEL": "Cancelar"
+      },
       "CHANGE_STATE": {
         "TITLE": "Cambio de estado",
         "ACTION": {
@@ -631,12 +688,12 @@
       }
     },
     "DELETED": {
-      "TITLE": "Delete reservation",
-      "CONTENT": "Are you sure to delete reservation {{date}}?",
-      "MESSAGE": "Reservation {{date}} deleted"
+      "TITLE": "Eliminar reserva",
+      "CONTENT": "¿Está seguro de eliminar la reserva {{date}}?",
+      "MESSAGE": "Reserva {{date}} eliminada"
     },
     "UPDATED": {
-      "MESSAGE": "Sala {{name}} updated"
+      "MESSAGE": "Reserva {{date}} actualizada"
     },
     "STATE": {
       "CREATED": "Creada",
@@ -651,6 +708,6 @@
     "LOAD_MORE": "Ver mas"
   },
   "APP": {
-    "TITLE": "Uñas"
+    "TITLE": "Cleos"
   }
 }

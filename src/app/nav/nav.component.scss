@@ -1,6 +1,18 @@
 mat-sidenav-container {
   height: 100%;
 
+  mat-sidenav-content {
+    mat-toolbar {
+      img {
+        margin-right: 1%;
+      }
+
+      .badge-padding {
+        padding-right: 15%;
+      }
+    }
+  }
+
   mat-toolbar {
     .align-right {
       flex: 1 1 auto;

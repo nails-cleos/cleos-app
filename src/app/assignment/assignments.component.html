@@ -1,9 +1,9 @@
-<div *ngIf="!error; else errorBox" class="mat-elevation-z8 small-table">
+<div *ngIf="!error; else errorBox" class="mat-elevation-z8">
   <table [dataSource]="dataSource" class="full-width-table" mat-table matSort matSortActive="start"
          matSortDirection="desc" matSortDisableClear>
     <ng-container matColumnDef="position">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell> No.</th>
-      <td *matCellDef="let reservation; let i = index;" fxHide.lt-sm fxShow mat-cell>
+      <th *matHeaderCellDef mat-header-cell>#</th>
+      <td *matCellDef="let reservation; let i = index;" mat-cell>
         <div *ngIf="reservation.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -65,6 +65,10 @@
                   matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
             <mat-icon color="primary">visibility</mat-icon>
           </button>
+          <button (click)="cancel(reservation.id)" *ngIf="reservation.deadLine" fxHide.lt-sm fxShow mat-icon-button
+                  matTooltip="{{ 'COMMON.BUTTON.CANCEL' | translate }}" matTooltipPosition="right">
+            <mat-icon color="warn">close</mat-icon>
+          </button>
         </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -73,7 +77,7 @@
     </ng-container>
 
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-    <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
+    <tr *matRowDef="let row; columns: displayedColumns;" [ngClass]="{'deadLine': row.deadLine}" mat-row></tr>
   </table>
   <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
 </div>
