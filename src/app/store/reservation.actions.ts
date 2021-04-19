@@ -15,13 +15,13 @@ export enum ReservationActionTypes {
   RESERVATION_PRODUCTS_SUCCESS = '[Reservation] Products success',
   RESERVATION_ROOMS_SUCCESS = '[Reservation] Rooms success',
   RESERVATION_SAVE = '[Reservation] Save',
-  RESERVATION_UPDATE = '[Reservation] Update',
   RESERVATION_SAVE_SUCCESS = '[Reservation] Save Success',
   RESERVATION_FAILURE = '[Reservation] Failure',
   RESERVATION_SELECTED = '[Reservation] Selected',
   RESERVATION_FIND = '[Reservation] Find',
   RESERVATION_DELETE = '[Reservation] Delete',
   APPROVE = '[Reservation] Approve',
+  EDIT = '[Reservation] Edit',
   START = '[Reservation] Start',
   COMPLETE = '[Reservation] Complete',
   CANCEL = '[Reservation] Cancel',
@@ -112,13 +112,6 @@ export class ReservationSave implements Action {
   }
 }
 
-export class ReservationUpdate implements Action {
-  readonly type = ReservationActionTypes.RESERVATION_UPDATE;
-
-  constructor(public payload: any) {
-  }
-}
-
 export class ReservationSaveSuccess implements Action {
   readonly type = ReservationActionTypes.RESERVATION_SAVE_SUCCESS;
 
@@ -156,6 +149,13 @@ export class DeleteReservation implements Action {
 
 export class Approve implements Action {
   readonly type = ReservationActionTypes.APPROVE;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class Edit implements Action {
+  readonly type = ReservationActionTypes.EDIT;
 
   constructor(public payload: any) {
   }
@@ -203,7 +203,6 @@ export type All =
   | GetAllProducts
   | GetAllRooms
   | ReservationSave
-  | ReservationUpdate
   | ReservationSuccess
   | ReservationPageSuccess
   | ReservationCustomersSuccess
@@ -216,6 +215,7 @@ export type All =
   | DeleteReservation
   | Approve
   | Start
+  | Edit
   | Complete
   | Cancel
   | StateSuccess

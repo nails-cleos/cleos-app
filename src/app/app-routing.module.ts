@@ -26,7 +26,6 @@ import { ReservationDetailComponent } from './reservation/detail/reservation-det
 import { NotificationsComponent } from './notification/list/notifications.component';
 import { RoomMeComponent } from './room/me/room-me.component';
 import { CalendarComponent } from './reservation/calendar/calendar.component';
-import { GoogleMapComponent } from './google-map/google-map.component';
 import { CataloguesComponent } from './catalogue/list/catalogues.component';
 import { CatalogueComponent } from './catalogue/catalogue.component';
 import { CatalogueDetailComponent } from './catalogue/detail/catalogue-detail.component';
@@ -126,7 +125,7 @@ const routes: Routes = [
   },
   {
     path: 'reservation', component: ReservationComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.Admin, Role.Professional]
+      roles: [Role.Admin, Role.Professional] //TODO Customer not allowed
     }
   },
   {
@@ -151,9 +150,6 @@ const routes: Routes = [
     data: {
       roles: [Role.Admin, Role.Professional, Role.Customer]
     }
-  },
-  {
-    path: 'maps', component: GoogleMapComponent
   }
 ];
 

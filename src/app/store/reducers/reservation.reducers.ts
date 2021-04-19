@@ -104,6 +104,7 @@ export function reducer(state = initialState, action: All): State {
       };
     }
     case ReservationActionTypes.APPROVE:
+    case ReservationActionTypes.EDIT:
     case ReservationActionTypes.START:
     case ReservationActionTypes.COMPLETE:
     case ReservationActionTypes.CANCEL:
@@ -199,7 +200,6 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case ReservationActionTypes.RESERVATION_UPDATE:
     case ReservationActionTypes.RESERVATION_SAVE:
     case ReservationActionTypes.RESERVATION_DELETE: {
       return {

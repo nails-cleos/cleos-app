@@ -1,11 +1,11 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
 import { IReservationAll } from '../../interfaces/reservation';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ConvertDuration, Duration, IDuration } from '../../util/dates';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -13,13 +13,15 @@ import { IUserAll } from '../../interfaces/user';
 import { DialogComponent } from '../../dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
+import { Role } from '../../interfaces/token';
 
 export enum ReservationIconName {
   CREATED = 'assignment',
   APPROVED = 'done',
   STARTED = 'play_arrow',
   COMPLETED = 'done_all',
-  CANCELLED = 'clear'
+  CANCELLED = 'clear',
+  EDIT = 'edit'
 }
 
 @Component({
@@ -47,11 +49,12 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = ['position', 'professional', 'start', 'product', 'state'];
   dataSource: any;
   pageSize = 5;
+  user: IUserAll | undefined;
 
   public paginator: MatPaginator | undefined;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private route: ActivatedRoute,
-              private store: Store<AppState>, private snackBar: MatSnackBar, private cdRef: ChangeDetectorRef) {
+              private store: Store<AppState>, private snackBar: MatSnackBar, private cdRef: ChangeDetectorRef, private router: Router) {
     this.getState = this.store.select(selectReservationState);
     const userLang = this.translate.currentLang;
     this.language = userLang;
@@ -61,7 +64,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     const token = localStorage.getItem('auth');
     if (token) {
       const user: IUserAll = JSON.parse(token).user;
-      this.professionalId = user.id;
+      this.professionalId = user.authorities.some(u => u.authority === Role.Professional) ? user.id : undefined;
+      this.user = user;
     }
   }
 
@@ -121,7 +125,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(event => {
       if (event) {
         const state = this.reservation?.state;
-        this.reservation = undefined;
         this.machine.transition(state, event);
       }
     });
@@ -139,7 +142,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         this.state = ReservationIconName[state.selected.state];
         this.reservation = state.selected;
         if (this.professionalId && this.professionalId === this.reservation?.room.professional.id) {
-          this.setupMachine(this.reservation.id, this.store, this.translate, this.reservation?.state);
+          this.setupMachine(this);
           this.changeState = this.machine.next(this.reservation.state);
         }
         this.dataSource = new MatTableDataSource<IReservationAll>(state.selected.history);
@@ -166,7 +169,11 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     );
   }
 
-  private setupMachine(reservationId: string, store: Store<AppState>, translate: TranslateService, initialState: string): void {
+  private setupMachine(self: this): void {
+    const reservationId = self.reservation?.id;
+    const initialState = self.reservation?.state;
+    const store = self.store;
+    const translate = self.translate;
     this.machine = ReservationDetailComponent.createMachine({
       initialState: ReservationIconName.CREATED,
       CREATED: {
@@ -174,6 +181,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
           approve: {
             target: 'APPROVED',
             action(): void {
+              self.reservation = undefined;
               store.dispatch(
                 new fromActionsReservation.Approve(reservationId)
               );
@@ -182,9 +190,17 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
           cancel: {
             target: 'CANCELLED',
             action(): void {
+              self.reservation = undefined;
               store.dispatch(
                 new fromActionsReservation.Cancel(reservationId)
               );
+            }
+          },
+          edit: {
+            target: 'EDITED',
+            action(): void {
+              const data = {editReservation: {reservation: self.reservation, user: self.user}};
+              self.router.navigateByUrl('/reservation', {state: data});
             }
           }
         },
@@ -193,6 +209,12 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
           tooltipPosition: 'below',
           icon: ReservationIconName.APPROVED,
           id: 'approve',
+          color: 'accent'
+        }, {
+          tooltip: translate.instant('RESERVATION.DETAIL.ACTION.EDIT'),
+          tooltipPosition: 'below',
+          icon: ReservationIconName.EDIT,
+          id: 'edit',
           color: 'accent'
         }, {
           tooltip: translate.instant('RESERVATION.DETAIL.ACTION.CANCEL'),
@@ -207,6 +229,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
           start: {
             target: 'STARTED',
             action(): void {
+              self.reservation = undefined;
               store.dispatch(
                 new fromActionsReservation.Start(reservationId)
               );
@@ -215,9 +238,17 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
           cancel: {
             target: 'CANCELLED',
             action(): void {
+              self.reservation = undefined;
               store.dispatch(
                 new fromActionsReservation.Cancel(reservationId)
               );
+            }
+          },
+          edit: {
+            target: 'EDITED',
+            action(): void {
+              const data = {editReservation: {reservation: self.reservation, user: self.user}};
+              self.router.navigateByUrl('/reservation', {state: data});
             }
           }
         },
@@ -226,6 +257,12 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
           tooltipPosition: 'below',
           icon: ReservationIconName.STARTED,
           id: 'start',
+          color: 'accent'
+        }, {
+          tooltip: translate.instant('RESERVATION.DETAIL.ACTION.EDIT'),
+          tooltipPosition: 'below',
+          icon: ReservationIconName.EDIT,
+          id: 'edit',
           color: 'accent'
         }, {
           tooltip: translate.instant('RESERVATION.DETAIL.ACTION.CANCEL'),
@@ -240,6 +277,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
           complete: {
             target: 'COMPLETED',
             action(): void {
+              self.reservation = undefined;
               store.dispatch(
                 new fromActionsReservation.Complete(reservationId)
               );

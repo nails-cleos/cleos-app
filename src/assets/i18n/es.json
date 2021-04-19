@@ -593,6 +593,10 @@
         "FIELD": "Elegí una fecha",
         "REQUIRED": "Fecha es <b>requerida</b>"
       },
+      "START": {
+        "FIELD": "Elegí una hora",
+        "REQUIRED": "Hora es <b>requerido</b>"
+      },
       "SCHEDULE": {
         "FIELD": "Reservar una cita",
         "REQUIRED": "Reservar una cita es <b>requerido</b>"
@@ -622,8 +626,11 @@
         },
         "DETAIL": "<div><b>Nombre del cliente:</b> {{customerName}}</div><div><b>Servicio:</b> {{productName}}</div><div><b>Duración:</b> {{duration}}</div>",
         "TITLE": "Agregar nueva reserva",
-        "CONTENT": "Estás segura de añadir la reserva el {{date}}?",
-        "CHANGE": "Estás segura de cambiar la reserva al {{date}}?",
+        "CONTENT": "¿Estás segura de añadir la reserva el {{date}}?",
+        "CHANGE": {
+          "TITLE": "Actualizar reserva",
+          "CONTENT": "¿Estás segura de cambiar la reserva al {{date}}?"
+        },
         "MESSAGE": {
           "UNAVAILABLE": "<b>No disponible</b>",
           "LUNCH": "<b>Hora de almuerzo</b>",
@@ -657,13 +664,14 @@
       },
       "STATE": {
         "APPROVE": "La reserva fue aprobada",
-        "START": "La reserva se inicio",
-        "COMPLETE": "La reserva se completo",
-        "CANCEL": "La reserva se cancelo"
+        "START": "La reserva se inició",
+        "COMPLETE": "La reserva se completó",
+        "CANCEL": "La reserva se canceló"
       },
       "ACTION": {
         "APPROVE": "Aprobar",
         "START": "Iniciar",
+        "EDIT": "Editar",
         "COMPLETE": "Completar",
         "CANCEL": "Cancelar"
       },
@@ -671,6 +679,7 @@
         "TITLE": "Cambio de estado",
         "ACTION": {
           "APPROVE": "aprobar la reserva",
+          "EDIT": "editar la cita",
           "START": "iniciar la cita",
           "COMPLETE": "completar la cita",
           "CANCEL": "cancelar la reserva"

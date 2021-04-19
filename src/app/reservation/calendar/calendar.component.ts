@@ -37,7 +37,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
   hourSegments = 2;
   viewDate: Date = new Date();
   calendarView: CalendarView = CalendarView.Week;
-  week = 0;
   selectView = 'WEEK';
   days = 0;
   smallScreen: boolean | undefined;
@@ -160,15 +159,23 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   previousWeek(): void {
-    this.week--;
+    this.days -= 7;
   }
 
   today(): void {
-    this.week = 0;
+    this.days = 0;
   }
 
   nextWeek(): void {
-    this.week++;
+    this.days += 7;
+  }
+
+  previousDay(): void {
+    this.days--;
+  }
+
+  nextDay(): void {
+    this.days++;
   }
 
   private clean(): void {

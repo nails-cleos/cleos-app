@@ -20,6 +20,35 @@
         <mat-icon mat-list-icon>room</mat-icon>
         <div mat-line>{{ 'RESERVATION.DETAIL.ROOM.NAME' | translate}}</div>
         <div mat-line>{{reservation.room.name}}</div>
+<!--        <div class="flex-container" fxLayout="row" *ngIf="edit && adminId">-->
+<!--          <div fxLayout="row" fxLayoutAlign="space-between start">-->
+<!--            <mat-form-field *ngIf="rooms; else skeleton" appearance="fill">-->
+<!--              <mat-label>{{ 'RESERVATION.ADD.ROOM.FIELD' | translate }}</mat-label>-->
+<!--              <label>-->
+<!--                <input [formControl]="room" [matAutocomplete]="autoRoom" matInput required type="text">-->
+<!--              </label>-->
+<!--              <mat-autocomplete #autoRoom="matAutocomplete" [displayWith]="displayFnRoom">-->
+<!--                <mat-option *ngFor="let room of filteredRoom | async" [value]="room">-->
+<!--                  {{room.name}}-->
+<!--                </mat-option>-->
+<!--              </mat-autocomplete>-->
+<!--              <mat-error *ngIf="room.hasError('required')"-->
+<!--                         [innerHTML]="'RESERVATION.ADD.ROOM.REQUIRED' | translate">-->
+<!--              </mat-error>-->
+<!--              <mat-error *ngIf="room.hasError('requireMatch')"-->
+<!--                         [innerHTML]="'RESERVATION.ADD.ROOM.INVALID' | translate">-->
+<!--              </mat-error>-->
+<!--              <mat-error *ngIf="errors['room']">-->
+<!--                {{errors['room']}}-->
+<!--              </mat-error>-->
+<!--            </mat-form-field>-->
+<!--            <div class="vertical-divider"></div>-->
+<!--            <div *ngIf="room.value && room.value.location" style="width: 400px">-->
+<!--              <app-google-map (addressEmitter)="getAddress($event)" [latitudeMarker]="room.value.location.x"-->
+<!--                              [longitudeMarker]="room.value.location.y"></app-google-map>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
       </mat-list-item>
       <mat-list-item>
         <mat-icon mat-list-icon>person_pin</mat-icon>
