@@ -77,10 +77,17 @@
       </td>
     </ng-container>
 
+    <ng-container matColumnDef="noContent">
+      <td class="no-content" mat-footer-cell *matFooterCellDef [attr.colspan]="displayedColumns.length">
+        {{ 'PRODUCT.LIST.ERROR.NO_CONTENT' | translate }}</td>
+    </ng-container>
+
+    <tr mat-footer-row *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0"></tr>
+
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
     <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
   </table>
-  <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+  <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
 
   <button color="accent" id="add-button" mat-fab matTooltip="{{ 'PRODUCT.ADD.TITLE' | translate }}"
           routerLink="/product">

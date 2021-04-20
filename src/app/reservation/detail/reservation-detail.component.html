@@ -17,43 +17,20 @@
     <mat-list>
       <div mat-subheader>{{ 'RESERVATION.DETAIL.ROOM.TITLE' | translate}}</div>
       <mat-list-item>
-        <mat-icon mat-list-icon>room</mat-icon>
+        <mat-icon mat-list-icon>store</mat-icon>
         <div mat-line>{{ 'RESERVATION.DETAIL.ROOM.NAME' | translate}}</div>
         <div mat-line>{{reservation.room.name}}</div>
-<!--        <div class="flex-container" fxLayout="row" *ngIf="edit && adminId">-->
-<!--          <div fxLayout="row" fxLayoutAlign="space-between start">-->
-<!--            <mat-form-field *ngIf="rooms; else skeleton" appearance="fill">-->
-<!--              <mat-label>{{ 'RESERVATION.ADD.ROOM.FIELD' | translate }}</mat-label>-->
-<!--              <label>-->
-<!--                <input [formControl]="room" [matAutocomplete]="autoRoom" matInput required type="text">-->
-<!--              </label>-->
-<!--              <mat-autocomplete #autoRoom="matAutocomplete" [displayWith]="displayFnRoom">-->
-<!--                <mat-option *ngFor="let room of filteredRoom | async" [value]="room">-->
-<!--                  {{room.name}}-->
-<!--                </mat-option>-->
-<!--              </mat-autocomplete>-->
-<!--              <mat-error *ngIf="room.hasError('required')"-->
-<!--                         [innerHTML]="'RESERVATION.ADD.ROOM.REQUIRED' | translate">-->
-<!--              </mat-error>-->
-<!--              <mat-error *ngIf="room.hasError('requireMatch')"-->
-<!--                         [innerHTML]="'RESERVATION.ADD.ROOM.INVALID' | translate">-->
-<!--              </mat-error>-->
-<!--              <mat-error *ngIf="errors['room']">-->
-<!--                {{errors['room']}}-->
-<!--              </mat-error>-->
-<!--            </mat-form-field>-->
-<!--            <div class="vertical-divider"></div>-->
-<!--            <div *ngIf="room.value && room.value.location" style="width: 400px">-->
-<!--              <app-google-map (addressEmitter)="getAddress($event)" [latitudeMarker]="room.value.location.x"-->
-<!--                              [longitudeMarker]="room.value.location.y"></app-google-map>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
       </mat-list-item>
       <mat-list-item>
         <mat-icon mat-list-icon>person_pin</mat-icon>
         <div mat-line>{{ 'RESERVATION.DETAIL.ROOM.PROFESSIONAL' | translate}}</div>
         <div mat-line>{{reservation.room.professional.firstName}} {{reservation.room.professional.lastName}}</div>
+      </mat-list-item>
+      <mat-list-item>
+        <mat-icon mat-list-icon>room</mat-icon>
+        <div mat-line>{{ 'RESERVATION.DETAIL.ROOM.ADDRESS' | translate}}</div>
+        <div mat-line>{{reservation.room.address.name}}</div>
+        <div mat-line>{{reservation.room.address?.description}}</div>
       </mat-list-item>
       <mat-divider></mat-divider>
       <div mat-subheader>{{ 'RESERVATION.DETAIL.PRODUCT.TITLE' | translate}}</div>
@@ -121,11 +98,18 @@
             {{ 'RESERVATION.STATE.' + history.state | translate}}</td>
         </ng-container>
 
+        <ng-container matColumnDef="noContent">
+          <td class="no-content" mat-footer-cell *matFooterCellDef [attr.colspan]="displayedColumns.length">
+            {{ 'RESERVATION.DETAIL.HISTORY.ERROR.NO_CONTENT' | translate }}</td>
+        </ng-container>
+
+        <tr mat-footer-row *matFooterRowDef="['noContent']" [hidden]="reservation.history.length > 0"></tr>
+
         <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
         <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
       </table>
 
-      <mat-paginator [pageSize]="pageSize" showFirstLastButtons></mat-paginator>
+      <mat-paginator *ngIf="reservation.history.length" [pageSize]="pageSize" showFirstLastButtons></mat-paginator>
       <mat-divider></mat-divider>
     </mat-list>
   </mat-card-content>

@@ -57,6 +57,10 @@ export class LastMonthReservationsChartComponent implements OnChanges {
       if (chartResult) {
         this.lineChartData = chartResult.chartDataSet;
         this.lineChartLabels = chartResult.chartLabels;
+      } else {
+        this.error = {
+          status: 'NO_CONTENT'
+        };
       }
     }
   }

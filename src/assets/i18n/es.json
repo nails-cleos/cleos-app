@@ -46,7 +46,11 @@
     },
     "ADDRESS": {
       "FIELD": "Dirección",
-      "INVALID": "La dirección es invalida"
+      "INVALID": "La dirección es invalida",
+      "DESCRIPTION": "Descripción"
+    },
+    "ERROR": {
+      "NO_CONTENT": "Sin datos"
     }
   },
   "DASHBOARD": {
@@ -181,6 +185,9 @@
         "DETAIL": {
           "TITLE": "Roles"
         }
+      },
+      "ERROR": {
+        "NO_CONTENT": "No hay usuarios"
       },
       "STATUS": {
         "ENABLED": "Verificado",
@@ -324,6 +331,9 @@
         "DESCRIPTION": "Descripción",
         "PRICE": "Precio",
         "DURATION": "Duración"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No hay productos"
       }
     },
     "ADD": {
@@ -434,6 +444,9 @@
           "SATURDAY": "Sábado",
           "SUNDAY": "Domingo"
         }
+      },
+      "ERROR": {
+        "NO_CONTENT": "No hay salas"
       }
     },
     "ADD": {
@@ -581,8 +594,12 @@
       },
       "ROOM": {
         "FIELD": "Sala",
-        "REQUIRED": "Sala es <b>requerido</b>",
-        "INVALID": "Sala no valido"
+        "REQUIRED": "Sala es <b>requerida</b>",
+        "INVALID": "Sala no valida",
+        "ADDRESS": {
+          "NAME": "Dirección",
+          "DESCRIPTION": "Descripción"
+        }
       },
       "PRODUCT": {
         "FIELD": "Servicio",
@@ -644,7 +661,8 @@
       "ROOM": {
         "TITLE": "Sala",
         "NAME": "Nombre",
-        "PROFESSIONAL": "Profesional"
+        "PROFESSIONAL": "Profesional",
+        "ADDRESS": "Dirección"
       },
       "PRODUCT": {
         "TITLE": "Servicio",
@@ -660,6 +678,9 @@
           "START": "Inicio",
           "PRODUCT": "Servicio",
           "STATE": "Estado"
+        },
+        "ERROR": {
+          "NO_CONTENT": "No hay historial"
         }
       },
       "STATE": {
@@ -694,6 +715,9 @@
         "START": "Inicio",
         "STATE": "Estado",
         "PRODUCT": "Servicio"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No hay reservas"
       }
     },
     "DELETED": {

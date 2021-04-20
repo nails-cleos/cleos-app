@@ -3,7 +3,6 @@ import { Appearance } from '@angular-material-extensions/google-maps-autocomplet
 import { ControlContainer, FormGroup, NgForm } from '@angular/forms';
 import { GeocodeService } from '../services/geocode.service';
 import { GeocoderResult } from '@agm/core';
-import { IAvailability } from '../interfaces/room';
 
 @Component({
   selector: 'app-google-map',

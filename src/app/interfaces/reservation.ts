@@ -52,7 +52,7 @@ export interface IReservationSummary {
   percentValue?: number;
   icon?: string;
   isCurrency?: boolean;
-  error?: string;
+  error?: any;
 }
 
 export class Reservation implements IReservation {

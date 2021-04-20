@@ -48,6 +48,10 @@ export class MonthlyReservationsChartComponent implements OnChanges {
       if (chartResult) {
         this.pieChartData = chartResult.chartData;
         this.pieChartLabels = chartResult.chartLabels;
+      } else {
+        this.error = {
+          status: 'NO_CONTENT'
+        };
       }
     }
   }

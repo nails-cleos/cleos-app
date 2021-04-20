@@ -43,6 +43,10 @@ export class ProductReservationsChartComponent implements OnChanges {
         this.radarChartData = chartResult.chartDataSet;
         this.radarChartLabels = chartResult.chartLabels;
       }
+    } else {
+      this.error = {
+        status: 'NO_CONTENT'
+      };
     }
   }
 }

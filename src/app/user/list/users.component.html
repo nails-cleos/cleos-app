@@ -73,7 +73,7 @@
             </ng-template>
           </div>
           <ng-template #deleteBlock>
-            <mat-icon color="accent" matTooltip="{{ 'USER.LIST.STATUS.DELETED' | translate }}"
+            <mat-icon color="primary" matTooltip="{{ 'USER.LIST.STATUS.DELETED' | translate }}"
                       matTooltipPosition="left">delete_outline
             </mat-icon>
           </ng-template>
@@ -167,12 +167,19 @@
       </td>
     </ng-container>
 
+    <ng-container matColumnDef="noContent">
+      <td class="no-content" mat-footer-cell *matFooterCellDef [attr.colspan]="displayedColumns.length">
+        {{ 'COMMON.ERROR.NO_CONTENT' | translate }}</td>
+    </ng-container>
+
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
     <tr (click)="expandedUser = expandedUser === user ? null : user" *matRowDef="let user; columns: displayedColumns;"
         class="user-row" mat-row></tr>
     <tr *matRowDef="let row; columns: ['expandedDetail']" class="user-detail-row" mat-row></tr>
+
+    <tr mat-footer-row *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0"></tr>
   </table>
-  <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+  <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
 
   <button color="accent" id="add-button" mat-fab matTooltip="{{ 'USER.ADD.TITLE' | translate }}" routerLink="/user">
     <mat-icon>person_add</mat-icon>

@@ -66,7 +66,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
       // this.paginator.pageIndex = 0;
     });
 
-    this.paginator.page.subscribe(() => {
+    this.paginator?.page.subscribe(() => {
       this.getUsers();
     });
 
@@ -145,7 +145,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     const payload = {
       active: this.sort.active,
       direction: this.sort.direction,
-      page: this.paginator.pageIndex
+      page: this.paginator ? this.paginator.pageIndex : 0
     };
     this.store.dispatch(
       new fromActionsUser.GetAll(payload)
@@ -164,9 +164,6 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
             this.clean();
             this.getUsers();
           });
-        } else {
-          this.error = stateValue.error;
-          return;
         }
       }
       this.dataSource = stateValue.data?.content?.map((user: IUserAll) => {

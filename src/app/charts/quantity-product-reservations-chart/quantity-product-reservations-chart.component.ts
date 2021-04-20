@@ -58,6 +58,10 @@ export class QuantityProductReservationsChartComponent implements OnChanges {
       if (chartResult) {
         this.barChartData = chartResult.chartDataSet;
         this.barChartLabels = chartResult.chartLabels;
+      } else {
+        this.error = {
+          status: 'NO_CONTENT'
+        };
       }
     }
   }

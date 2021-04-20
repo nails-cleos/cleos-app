@@ -52,7 +52,7 @@ export class AssignmentsComponent implements AfterViewInit, OnInit, OnDestroy {
       // this.paginator.pageIndex = 0;
     });
 
-    this.paginator.page.subscribe(() => {
+    this.paginator?.page.subscribe(() => {
       this.getReservations();
     });
 
@@ -83,7 +83,6 @@ export class AssignmentsComponent implements AfterViewInit, OnInit, OnDestroy {
     this.subscription = this.getState.subscribe(state => {
       this.error = state.error;
       if (this.paginator && state.page) {
-        console.log(state);
         const now = new Date();
         this.dataSource = state.page?.content?.map((reservation: IReservationAll) => {
           if (reservation.start) {
@@ -122,7 +121,7 @@ export class AssignmentsComponent implements AfterViewInit, OnInit, OnDestroy {
     const payload = {
       active: this.sort.active,
       direction: this.sort.direction,
-      page: this.paginator.pageIndex
+      page: this.paginator ? this.paginator.pageIndex : 0
     };
     this.store.dispatch(
       new fromActionsReservation.GetAllAssignmentPage(payload)

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Geocoder, GeocoderResult, GeocoderStatus, MapsAPILoader } from '@agm/core';
+import { GeocoderResult, GeocoderStatus, MapsAPILoader } from '@agm/core';
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { tap, map, switchMap } from 'rxjs/operators';
@@ -24,7 +24,7 @@ export class GeocodeService {
             if (status === google.maps.GeocoderStatus.OK) {
               observer.next(results[0]);
             } else {
-              console.log('Error - ', results, ' & Status - ', status);
+              console.error('Error - ', results, ' & Status - ', status);
               observer.next(undefined);
             }
             observer.complete();

@@ -57,6 +57,10 @@ export class CatalogComponent implements OnInit, OnDestroy {
           duration: 5000
         });
         this.error = state.error;
+        return;
+      }
+      if (state.error) {
+        this.error = state.error;
       }
     });
   }

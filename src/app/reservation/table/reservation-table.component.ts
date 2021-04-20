@@ -59,7 +59,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
       // this.paginator.pageIndex = 0;
     });
 
-    this.paginator.page.subscribe(() => {
+    this.paginator?.page.subscribe(() => {
       this.getReservations();
     });
 
@@ -110,7 +110,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
     const payload = {
       active: this.sort.active,
       direction: this.sort.direction,
-      page: this.paginator.pageIndex,
+      page: this.paginator ? this.paginator.pageIndex : 0,
       size: this.pageSize
     };
     this.store.dispatch(

@@ -5,7 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../store/app.states';
 import * as fromActionsRoom from '../store/room.actions';
-import { IAvailability, IRoom, Room } from '../interfaces/room';
+import { IAddress, IAvailability, ILocation, IRoom, Room } from '../interfaces/room';
 import { IUser } from '../interfaces/user';
 import { map, startWith } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
@@ -60,6 +60,8 @@ export class RoomComponent implements OnInit, OnDestroy {
     Validators.required
   ]);
 
+  addressDescription: FormControl = new FormControl();
+
   constructor(private readonly translate: TranslateService, private snackBar: MatSnackBar, private store: Store<AppState>,
               private formBuilder: FormBuilder) {
     this.getState = this.store.select(selectRoomState);
@@ -88,10 +90,14 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.room.name = this.name.value;
     this.room.professionalId = this.professional.value.id;
     const location = this.address.value.geometry.location;
-    this.room.location = {
-      x: location.lat(),
-      y: location.lng()
-    };
+    this.room.address = {
+      name: this.address.value.formatted_address,
+      description: this.addressDescription.value,
+      location : {
+        x: location.lat(),
+        y: location.lng()
+      } as ILocation
+    } as IAddress;
 
     this.store.dispatch(
       new fromActionsRoom.RoomSave(this.room)
@@ -129,7 +135,8 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.form = this.formBuilder.group({
       name: this.name,
       professional: this.professional,
-      address: this.address
+      address: this.address,
+      addressDescription: this.addressDescription
     });
     this.filteredOptions = this.professional.valueChanges.pipe(
       startWith(''),

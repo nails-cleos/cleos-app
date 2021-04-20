@@ -99,6 +99,26 @@ export class CalendarComponent implements OnInit, OnDestroy {
     }
   }
 
+  previousWeek(): void {
+    this.days -= 7;
+  }
+
+  today(): void {
+    this.days = 0;
+  }
+
+  nextWeek(): void {
+    this.days += 7;
+  }
+
+  previousDay(): void {
+    this.days--;
+  }
+
+  nextDay(): void {
+    this.days++;
+  }
+
   private addReservations(rr: IRoomReservation): void {
     const reservations: IReservationAll[] = rr.reservations;
     this.calendar.set(rr.room.id, new Calendar(rr.room, []));
@@ -131,7 +151,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe((stateValue) => {
-      if (stateValue.data && Array.isArray(stateValue.data) && stateValue.data[0].room && stateValue.data[0].reservations) {
+      if (stateValue.data && Array.isArray(stateValue.data) && stateValue.data[0] &&
+        stateValue.data[0].room && stateValue.data[0].reservations) {
         this.data = stateValue.data;
         stateValue.data.forEach((value: IRoomReservation) => this.addReservations(value));
         this.calendar.forEach(calendar => {
@@ -154,28 +175,11 @@ export class CalendarComponent implements OnInit, OnDestroy {
           this.error = stateValue.error;
         }
       }
+      if (stateValue.error) {
+        this.error = stateValue.error;
+      }
       this.isLoading = stateValue.isLoading;
     });
-  }
-
-  previousWeek(): void {
-    this.days -= 7;
-  }
-
-  today(): void {
-    this.days = 0;
-  }
-
-  nextWeek(): void {
-    this.days += 7;
-  }
-
-  previousDay(): void {
-    this.days--;
-  }
-
-  nextDay(): void {
-    this.days++;
   }
 
   private clean(): void {

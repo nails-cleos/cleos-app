@@ -125,6 +125,7 @@ export function reducer(state = initialState, action: All): State {
         ...state,
         page: action.payload,
         errorMessage: null,
+        error: null,
         subErrors: null,
         message: null,
         isLoading: false

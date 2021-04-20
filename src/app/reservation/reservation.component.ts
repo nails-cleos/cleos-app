@@ -147,10 +147,12 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     if (this.isEditing) {
+      this.myStepper.next();
       if (!this.isAdmin) {
         this.myStepper.next();
+      } else {
+        this.getRoomList();
       }
-      this.myStepper.next();
     }
     if (this.showTime) {
       this.productForm = this.formBuilder.group({
@@ -561,6 +563,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private setData(): void {
+    this.isEditing = true;
+
     const reservation: IReservationAll = this.extras.editReservation.reservation;
     this.editReservation = reservation;
     const user: IUserAll = this.extras.editReservation.user;
@@ -574,7 +578,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (!isAdmin) {
       this.getProductList();
-      this.isEditing = true;
     }
   }
 }

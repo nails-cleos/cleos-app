@@ -92,6 +92,9 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
           return;
         }
       }
+      if (state.error) {
+        this.error = state.error;
+      }
     });
   }
 

@@ -8,7 +8,7 @@ export const environment = {
   wsEndpoint: 'http://localhost:8080/api/ws',
   googleClientId: '57757755712-1gcjdgbd0lkj4msirrmra9aglcb0vbmk.apps.googleusercontent.com',
   facebookClientId: '453309609006101',
-  googleMapKey: 'AIzaSyCUsJwrD0fVAWgjGAJUxBtdjljtJWR-_cA'
+  googleMapKey: 'AIzaSyBVYE6eWD4Ekmb4xdWz_N4QKk5p4Q8oIcc'
 };
 
 /*
@@ -18,4 +18,4 @@ export const environment = {
  * This import should be commented out in production mode because it will have a negative impact
  * on performance if an error is thrown.
  */
-import 'zone.js/dist/zone-error';  // Included with Angular CLI.
+// import 'zone.js/dist/zone-error';  // Included with Angular CLI.

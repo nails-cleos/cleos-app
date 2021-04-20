@@ -40,10 +40,9 @@ export class RoomsComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.sort.sortChange.subscribe(() => {
       this.getRooms();
-      // this.paginator.pageIndex = 0;
     });
 
-    this.paginator.page.subscribe(() => {
+    this.paginator?.page.subscribe(() => {
       this.getRooms();
     });
 
@@ -72,19 +71,7 @@ export class RoomsComponent implements OnInit, AfterViewInit {
           this.error = stateValue.error;
         }
       }
-      this.dataSource = stateValue.data?.content?.map((room: IRoom) => {
-        if (room.location) {
-          this.geocodeService.geocodeAddress(room.location.x, room.location.y).subscribe(location => {
-            this.dataSource.find((e: any) => {
-              if (e.id === room.id) {
-                e.address = location.formatted_address;
-              }
-            });
-          });
-          return Object.assign({}, room, {address: undefined});
-        }
-        return room;
-      });
+      this.dataSource = stateValue.data?.content;
       this.resultsLength = stateValue.data?.totalElements;
     });
   }
@@ -121,7 +108,7 @@ export class RoomsComponent implements OnInit, AfterViewInit {
     const payload = {
       active: this.sort.active,
       direction: this.sort.direction,
-      page: this.paginator.pageIndex
+      page: this.paginator ? this.paginator.pageIndex : 0
     };
     this.store.dispatch(
       new fromActionsRoom.GetAll(payload)

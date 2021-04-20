@@ -43,7 +43,7 @@ export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
       this.getProducts();
     });
 
-    this.paginator.page.subscribe(() => {
+    this.paginator?.page.subscribe(() => {
       this.getProducts();
     });
 
@@ -121,7 +121,7 @@ export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
     const payload = {
       active: this.sort.active,
       direction: this.sort.direction,
-      page: this.paginator.pageIndex
+      page: this.paginator ? this.paginator.pageIndex : 0
     };
     this.store.dispatch(
       new fromActionsProduct.GetAll(payload)

@@ -16,9 +16,8 @@ export class CatalogueEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => {
       return this.catalogueService.getAll().pipe(
-        switchMap((response: any) => {
-          return of(new fromActionsCatalogue.CatalogueSuccess(response));
-        }),
+        switchMap((response: any) => response ? of(new fromActionsCatalogue.CatalogueSuccess(response))
+        : of(new fromActionsCatalogue.CatalogueFailure({error: {status: 'NO_CONTENT'}}))),
         catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({error: err.error})))
       );
     })

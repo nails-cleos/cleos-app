@@ -46,7 +46,11 @@
     },
     "ADDRESS": {
       "FIELD": "Address",
-      "INVALID": "Address is invalid"
+      "INVALID": "Address is invalid",
+      "DESCRIPTION": "Description"
+    },
+    "ERROR": {
+      "NO_CONTENT": "No content"
     }
   },
   "DASHBOARD": {
@@ -181,6 +185,9 @@
         "DETAIL": {
           "TITLE": "Roles"
         }
+      },
+      "ERROR": {
+        "NO_CONTENT": "No users"
       },
       "STATUS": {
         "ENABLED": "Verified",
@@ -324,6 +331,9 @@
         "DESCRIPTION": "Description",
         "PRICE": "Price",
         "DURATION": "Duration"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No products"
       }
     },
     "ADD": {
@@ -434,6 +444,9 @@
           "SATURDAY": "Saturday",
           "SUNDAY": "Sunday"
         }
+      },
+      "ERROR": {
+        "NO_CONTENT": "No rooms"
       }
     },
     "ADD": {
@@ -582,7 +595,11 @@
       "ROOM": {
         "FIELD": "Room",
         "REQUIRED": "Room is <b>required</b>",
-        "INVALID": "Room is invalid"
+        "INVALID": "Room is invalid",
+        "ADDRESS": {
+          "NAME": "Address",
+          "DESCRIPTION": "Description"
+        }
       },
       "PRODUCT": {
         "FIELD": "Product",
@@ -644,7 +661,8 @@
       "ROOM": {
         "TITLE": "Room",
         "NAME": "Name",
-        "PROFESSIONAL": "Professional"
+        "PROFESSIONAL": "Professional",
+        "ADDRESS": "Address"
       },
       "PRODUCT": {
         "TITLE": "Product",
@@ -660,6 +678,9 @@
           "START": "Start",
           "PRODUCT": "Product",
           "STATE": "State"
+        },
+        "ERROR": {
+          "NO_CONTENT": "No histories"
         }
       },
       "STATE": {
@@ -694,6 +715,9 @@
         "START": "Start",
         "STATE": "State",
         "PRODUCT": "Product"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No reservations"
       }
     },
     "DELETED": {

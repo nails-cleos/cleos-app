@@ -8,6 +8,7 @@ import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Role } from '../../interfaces/token';
+import * as fromActionsReservation from '../reservation.actions';
 
 @Injectable()
 export class UserEffects {
@@ -18,7 +19,7 @@ export class UserEffects {
     switchMap((payload: any) => {
       return this.userService.getAll(payload.active, payload.direction, payload.page).pipe(
         switchMap((response: any) => {
-          return of(new fromActionsUser.UserSuccess(response));
+          return of(new fromActionsUser.UserSuccess(response ? response : {content: [], totalElements: 0}));
         }),
         catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
       );

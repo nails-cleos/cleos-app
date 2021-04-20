@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { AvailabilityDate, IAvailability, IAvailabilityDate, IRoom, Room } from '../../interfaces/room';
+import { AvailabilityDate, IAddress, IAvailability, IAvailabilityDate, ILocation, IRoom, Room } from '../../interfaces/room';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
@@ -43,6 +43,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   address: FormControl = new FormControl('', [
     Validators.required
   ]);
+  addressDescription: FormControl = new FormControl();
 
   constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
               private formBuilder: FormBuilder) {
@@ -83,10 +84,14 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     room.name = FieldChange(this.name, this.room?.name);
     room.availabilities = this.availabilities;
     const location = this.address.value.geometry.location;
-    room.location = {
-      x: location.lat(),
-      y: location.lng()
-    };
+    room.address = {
+      name: this.address.value.formatted_address,
+      description: this.addressDescription.value,
+      location : {
+        x: location.lat(),
+        y: location.lng()
+      } as ILocation
+    } as IAddress;
 
     this.store.dispatch(new fromActionsRoom.RoomUpdate(room));
   }
@@ -115,7 +120,8 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   private createForm(): void {
     this.form = this.formBuilder.group({
       name: this.name,
-      address: this.address
+      address: this.address,
+      addressDescription: this.addressDescription
     });
   }
 
@@ -134,9 +140,11 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
         this.room = {
           id: state.selected.id,
           name: state.selected.name,
-          location: state.selected.location
+          address: state.selected.address
         } as IRoom;
         this.professionalName = `${state.selected.professional.firstName} ${state.selected.professional.lastName}`;
+        this.addressDescription.setValue(this.room.address?.description);
+        this.address.setValue(this.room.address?.name);
         this.getAvailabilities(state.selected.availabilities);
         this.form.patchValue(this.room);
       }

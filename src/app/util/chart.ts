@@ -22,7 +22,7 @@ export function QuantityProduct(result: IReservationAll[] | undefined, label: st
 export function AnnualReservation(result: IReservationAll[] | undefined, locale: string, label: string): IChartUtil | null {
   const now = new Date();
   const completedList = completeWithDateFilter(result, now, 12);
-  if (completedList) {
+  if (completedList && completedList.length) {
     const group = completedList.reduce((map, item) => {
       const formattedDate = formatMonthYear(new Date(item.start), locale);
       const key = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
@@ -57,7 +57,7 @@ export function AnnualReservation(result: IReservationAll[] | undefined, locale:
 export function LastMonthReservation(result: IReservationAll[] | undefined, locale: string, label: string): IChartUtil | null {
   const now = new Date();
   const completedList = completeWithDateFilter(result, now, 1);
-  if (completedList) {
+  if (completedList && completedList.length) {
     let data: number[] = [];
     let labels: string[] = [];
 
@@ -82,7 +82,7 @@ export function LastMonthReservation(result: IReservationAll[] | undefined, loca
 
 export function ProductReservation(result: IReservationAll[] | undefined): IChartUtil | null {
   const completedList = result?.filter(r => r.state === 'COMPLETED');
-  if (completedList) {
+  if (completedList && completedList.length) {
     const distRoom: Array<any> = [...new Set(completedList.map(x => x.room.name))];
 
     const group = completedList.reduce((map, item) => {
@@ -123,7 +123,7 @@ export function ProductReservation(result: IReservationAll[] | undefined): IChar
 export function MonthlyReservation(result: IReservationAll[] | undefined, locale: string): IChartUtil | null {
   const now = new Date();
   const completedList = completeWithDateFilter(result, now, 12);
-  if (completedList) {
+  if (completedList && completedList.length) {
     const group = completedList.reduce((map, item) => {
       const formattedDate = new Date(item.start).toLocaleDateString(locale, {
         month: 'short', year: 'numeric'
@@ -146,7 +146,7 @@ export function MonthlyReservation(result: IReservationAll[] | undefined, locale
 }
 
 function barChart(completedList: IReservationAll[] | undefined, label: string, key: string, value: string): IChartUtil | null {
-  if (completedList) {
+  if (completedList && completedList.length) {
     const group = completedList.reduce((map, item) => {
       // @ts-ignore
       let total = map.get(item[key][value]) || 0;

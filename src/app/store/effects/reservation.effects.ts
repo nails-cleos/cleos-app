@@ -19,9 +19,8 @@ export class ReservationEffects {
     map((action: any) => action.payload),
     switchMap(() => {
       return this.reservationService.getAll().pipe(
-        switchMap((response: any) => {
-          return of(new fromActionsReservation.ReservationSuccess(response));
-        }),
+        switchMap((response: any) => response ? of(new fromActionsReservation.ReservationSuccess(response)) :
+          of(new fromActionsReservation.ReservationFailure({error: {status: 'NO_CONTENT', message: 'NO_CONTENT'}}))),
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
       );
     })
@@ -32,9 +31,7 @@ export class ReservationEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => {
       return this.reservationService.getAllPage(payload.active, payload.direction, payload.page, payload.size).pipe(
-        switchMap((response: any) => {
-          return of(new fromActionsReservation.ReservationPageSuccess(response));
-        }),
+        switchMap((response: any) => of(new fromActionsReservation.ReservationPageSuccess(response ? response : {content: []}))),
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
       );
     })
@@ -45,9 +42,7 @@ export class ReservationEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => {
       return this.reservationService.getAllAssignmentPage(payload.active, payload.direction, payload.page).pipe(
-        switchMap((response: any) => {
-          return of(new fromActionsReservation.ReservationPageSuccess(response));
-        }),
+        switchMap((response: any) => of(new fromActionsReservation.ReservationPageSuccess(response))),
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
       );
     })
@@ -58,9 +53,8 @@ export class ReservationEffects {
     map((action: any) => action.payload),
     switchMap(() => {
       return this.reservationService.getAllGroupingByRoom().pipe(
-        switchMap((response: any) => {
-          return of(new fromActionsReservation.ReservationSuccess(response));
-        }),
+        switchMap((response: any) => response ? of(new fromActionsReservation.ReservationSuccess(response)) :
+          of(new fromActionsReservation.ReservationFailure({error: {status: 'NO_CONTENT'}}))),
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
       );
     })
@@ -71,9 +65,7 @@ export class ReservationEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => {
       return this.reservationService.search(payload.roomId, payload.date).pipe(
-        switchMap((response: any) => {
-          return of(new fromActionsReservation.ReservationSuccess(response));
-        }),
+        switchMap((response: any) => of(new fromActionsReservation.ReservationSuccess(response ? response : []))),
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
       );
     })
@@ -97,9 +89,7 @@ export class ReservationEffects {
     map((action: any) => action.payload),
     switchMap(() => {
       return this.productService.getAllProducts().pipe(
-        switchMap((response: any) => {
-          return of(new fromActionsReservation.ReservationProductsSuccess(response));
-        }),
+        switchMap((response: any) => of(new fromActionsReservation.ReservationProductsSuccess(response ? response : []))),
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
       );
     })
@@ -110,9 +100,7 @@ export class ReservationEffects {
     map((action: any) => action.payload),
     switchMap(() => {
       return this.roomService.getAllRooms().pipe(
-        switchMap((response: any) => {
-          return of(new fromActionsReservation.ReservationRoomsSuccess(response));
-        }),
+        switchMap((response: any) => of(new fromActionsReservation.ReservationRoomsSuccess(response))),
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
       );
     })
@@ -126,10 +114,7 @@ export class ReservationEffects {
         switchMap((reservation: any) => {
           return of(new fromActionsReservation.ReservationSelected(reservation));
         }),
-        catchError((err: HttpErrorResponse) => {
-          console.log(err);
-          return of(new fromActionsReservation.ReservationFailure({error: err.error}));
-        })
+        catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
       );
     })
   );
