@@ -29,7 +29,12 @@
       <mat-list-item>
         <mat-icon mat-list-icon>room</mat-icon>
         <div mat-line>{{ 'RESERVATION.DETAIL.ROOM.ADDRESS' | translate}}</div>
-        <div mat-line>{{reservation.room.address.name}}</div>
+        <div mat-line>
+          <a target="_blank"
+             [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + reservation.room.address.name">
+            {{reservation.room.address.name}}
+          </a>
+        </div>
         <div mat-line>{{reservation.room.address?.description}}</div>
       </mat-list-item>
       <mat-divider></mat-divider>
