@@ -14,9 +14,9 @@ import { Appearance, GermanAddress, Location } from '@angular-material-extension
 import PlaceResult = google.maps.places.PlaceResult;
 
 export enum IconName {
-  calendarToday = 'calendarToday',
-  eventAvailable = 'eventAvailable',
-  eventBusy = 'eventBusy'
+  calendarToday = 'calendar_today',
+  eventAvailable = 'event_available',
+  eventBusy = 'event_busy'
 }
 
 export interface IIcon {

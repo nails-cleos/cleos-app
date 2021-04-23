@@ -95,7 +95,7 @@
         "ERROR": "Por favor ingrese una contraseña"
       },
       "OR": "O ingresa con tu email",
-      "NEW": "¿Nuevo en nail?",
+      "NEW": "¿Nuevo en Cleos?",
       "FORGOT_PASSWORD": "¿Olvido su contraseña?"
     },
     "SIGN_UP": {
@@ -136,13 +136,13 @@
       },
       "OR": "O registrate con tu email",
       "SUCCESS": "Usuario {{username}} creado. Verifica tu email {{email}}",
-      "ALREADY": "¿Ya tienes nail?"
+      "ALREADY": "¿Ya tienes Cleos?"
     },
     "ACTIVATE_ACCOUNT": {
-      "TITLE": "Activate account",
-      "CONTENT": "Welcome to nail",
-      "BUTTON": "Activate",
-      "MESSAGE": "Account activated"
+      "TITLE": "Activar cuenta",
+      "CONTENT": "Bienvenido a Cleos",
+      "BUTTON": "Activar",
+      "MESSAGE": "Cuenta activada"
     },
     "FORGOT_PASSWORD": {
       "TITLE": "Olvido su contraseña",

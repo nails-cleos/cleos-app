@@ -57,7 +57,7 @@
 
 <ng-template #stepThree>
   <form [formGroup]="productForm">
-    <div class="no-content" *ngIf="!products?.length; else data">
+    <div class="no-content bold" *ngIf="!products?.length; else data">
       {{'PRODUCT.LIST.ERROR.NO_CONTENT' | translate}}
     </div>
     <ng-template #data>

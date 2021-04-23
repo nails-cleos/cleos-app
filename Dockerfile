@@ -16,4 +16,4 @@ RUN npm run build
 
 # Stage 2
 FROM nginx:1.17.1-alpine
-COPY --from=build-step /app/dist/nail-app /usr/share/nginx/html
+COPY --from=build-step /app/dist/cleos-app /usr/share/nginx/html

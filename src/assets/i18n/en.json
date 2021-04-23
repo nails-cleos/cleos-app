@@ -95,7 +95,7 @@
         "ERROR": "Please provide a valid password"
       },
       "OR": "Or sign in with email",
-      "NEW": "New to nail?",
+      "NEW": "New to Cleos?",
       "FORGOT_PASSWORD": "Forgot password?"
     },
     "SIGN_UP": {
@@ -136,11 +136,11 @@
       },
       "OR": "Or sign up with email",
       "SUCCESS": "User {{username}} created. Check your email {{email}}",
-      "ALREADY": "Already on nail?"
+      "ALREADY": "Already on Cleos?"
     },
     "ACTIVATE_ACCOUNT": {
       "TITLE": "Activate account",
-      "CONTENT": "Welcome to nail",
+      "CONTENT": "Welcome to Cleos",
       "BUTTON": "Activate",
       "MESSAGE": "Account activated"
     },

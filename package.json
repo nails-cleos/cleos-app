@@ -1,15 +1,15 @@
 {
-  "name": "nail-app",
-  "version": "0.0.0",
+  "name": "cleos-app",
+  "version": "0.0.1",
   "scripts": {
     "ng": "ng",
-    "start": "http-server-spa dist/nail-app index.html 8443",
-    "build": "ng build --source-map ",
+    "start": "ng serve",
+    "build": "ng build --prod --source-map",
     "test": "ng test",
     "lint": "ng lint --fix",
     "eslint": "eslint src --fix",
     "e2e": "ng e2e",
-    "start-dev": "ng serve"
+    "start-pwa": "http-server-spa dist/cleos-app index.html 8443"
   },
   "private": true,
   "dependencies": {
@@ -83,6 +83,7 @@
     "karma-jasmine-html-reporter": "^1.5.0",
     "ng2-charts-schematics": "^0.1.7",
     "protractor": "~7.0.0",
+    "source-map-explorer": "^2.5.2",
     "ts-node": "~8.3.0",
     "tslint": "~6.1.0",
     "typescript": "~4.0.2"

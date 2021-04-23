@@ -40,22 +40,6 @@ table {
   justify-content: center;
 }
 
-.column-large-text {
-  word-wrap: break-word !important;
-  white-space: unset !important;
-  flex: 0 0 20% !important;
-  width: 20% !important;
-  overflow-wrap: break-word;
-  word-wrap: break-word;
-
-  word-break: break-word;
-
-  -ms-hyphens: auto;
-  -moz-hyphens: auto;
-  -webkit-hyphens: auto;
-  hyphens: auto;
-}
-
 a, u {
   text-decoration: none;
 }
@@ -86,14 +70,6 @@ a, u {
 .mat-card-content,
 .mat-form-field {
   margin: 10px 0 0 0;
-}
-
-.vertical-divider {
-  margin-left: 10px;
-}
-
-.divider-padding {
-  padding: 10px 0 0 0;
 }
 
 @media all and (max-device-width: 812px) and (orientation: portrait) {
@@ -167,6 +143,5 @@ a, u {
 }
 
 .no-content {
-  font-weight: bold;
   text-align: center;
 }

@@ -1,6 +1,6 @@
 {
-  "name": "nail-app",
-  "short_name": "nail-app",
+  "name": "cleos-app",
+  "short_name": "cleos-app",
   "theme_color": "#1976d2",
   "background_color": "#fafafa",
   "display": "standalone",

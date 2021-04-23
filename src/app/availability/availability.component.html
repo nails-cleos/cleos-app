@@ -1,5 +1,5 @@
 <form [formGroup]="availabilityForm" novalidate>
-  <mat-form-field appearance="fill">
+  <mat-form-field class="margin-right-eight" appearance="fill">
     <mat-label>{{ 'ROOM.ADD.START.FIELD' | translate }}</mat-label>
     <label>
       <input #tStart="matTimepicker" #tStart="matTimepicker" [formControl]="start" [maxDate]="end.value"
@@ -10,7 +10,7 @@
                [innerHTML]="'ROOM.ADD.START.REQUIRED' | translate">
     </mat-error>
   </mat-form-field>
-  <mat-form-field appearance="fill">
+  <mat-form-field class="margin-right-eight" appearance="fill">
     <mat-label>{{ 'ROOM.ADD.END.FIELD' | translate }}</mat-label>
     <label>
       <input #tEnd="matTimepicker" #tEnd="matTimepicker" [formControl]="end" [minDate]="start.value"
@@ -20,13 +20,13 @@
     <mat-error *ngIf="end.hasError('required')" [innerHTML]="'ROOM.ADD.END.REQUIRED' | translate">
     </mat-error>
   </mat-form-field>
-  <mat-checkbox (change)="checked = !checked"
+  <mat-checkbox (change)="checked = !checked" color="primary"
                 [checked]="checked">{{ 'ROOM.ADD.LUNCH.CHECK' | translate }}</mat-checkbox>
   <div *ngIf="checked">
     <div class="divider">
       <mat-label>{{ 'ROOM.ADD.LUNCH.FIELD' | translate }}</mat-label>
     </div>
-    <mat-form-field appearance="fill">
+    <mat-form-field class="margin-right-eight" appearance="fill">
       <mat-label>{{ 'ROOM.ADD.START.FIELD' | translate }}</mat-label>
       <label>
         <input #tLunchStart="matTimepicker" #tLunchStart="matTimepicker" [formControl]="startLunch"
@@ -35,7 +35,7 @@
       </label>
       <span matPrefix><mat-icon (click)="tLunchStart.showDialog()" matPrefix>timer</mat-icon> &nbsp;</span>
     </mat-form-field>
-    <mat-form-field appearance="fill">
+    <mat-form-field class="margin-right-eight" appearance="fill">
       <mat-label>{{ 'ROOM.ADD.END.FIELD' | translate }}</mat-label>
       <label>
         <input #tLunchEnd="matTimepicker" #tLunchEnd="matTimepicker" [formControl]="endLunch"
