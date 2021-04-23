@@ -3,13 +3,13 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "start": "http-server-spa dist/nail-app index.html 8443",
+    "build": "ng build --source-map ",
     "test": "ng test",
     "lint": "ng lint --fix",
     "eslint": "eslint src --fix",
     "e2e": "ng e2e",
-    "start-pwa": "ng build --prod  --source-map && http-server-spa dist/nail-app index.html 8443"
+    "start-dev": "ng serve"
   },
   "private": true,
   "dependencies": {
