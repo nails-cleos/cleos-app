@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { Pagination } from '../interfaces/pagination';
-import { IReservation, IReservationAll, MOBILE_PAGE_SIZE, PAGE_SIZE } from '../interfaces/reservation';
+import { IReservation, IReservationAll, PAGE_SIZE } from '../interfaces/reservation';
 import { Observable, Subscription } from 'rxjs';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -11,7 +11,6 @@ import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../store/app.states';
 import { ReservationIconName } from '../reservation/detail/reservation-detail.component';
-import { DialogComponent } from '../dialog/dialog.component';
 import * as fromActionsReservation from '../store/reservation.actions';
 import * as fromActionsProduct from '../store/product.actions';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -22,6 +21,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   styleUrls: ['./assignments.component.scss']
 })
 export class AssignmentsComponent implements AfterViewInit, OnInit, OnDestroy {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+
   displayedColumns: string[] = ['position', 'customer', 'start', 'state', 'product', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IReservationAll>>();
   getState: Observable<any>;
@@ -29,9 +31,6 @@ export class AssignmentsComponent implements AfterViewInit, OnInit, OnDestroy {
 
   resultsLength = 0;
   pageSize = PAGE_SIZE;
-
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
 
   language: string;
   error: any;
@@ -49,7 +48,6 @@ export class AssignmentsComponent implements AfterViewInit, OnInit, OnDestroy {
   ngAfterViewInit(): void {
     this.sort.sortChange.subscribe(() => {
       this.getReservations();
-      // this.paginator.pageIndex = 0;
     });
 
     this.paginator?.page.subscribe(() => {

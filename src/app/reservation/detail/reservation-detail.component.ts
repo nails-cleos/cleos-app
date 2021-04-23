@@ -6,7 +6,7 @@ import { Observable, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
 import { IReservationAll } from '../../interfaces/reservation';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ConvertDuration, Duration, IDuration } from '../../util/dates';
+import { convertDuration, Duration, IDuration } from '../../util/dates';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { IUserAll } from '../../interfaces/user';
@@ -16,12 +16,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { Role } from '../../interfaces/token';
 
 export enum ReservationIconName {
-  CREATED = 'assignment',
-  APPROVED = 'done',
-  STARTED = 'play_arrow',
-  COMPLETED = 'done_all',
-  CANCELLED = 'clear',
-  EDIT = 'edit'
+  created = 'assignment',
+  approved = 'done',
+  started = 'play_arrow',
+  completed = 'done_all',
+  cancelled = 'clear',
+  edit = 'edit'
 }
 
 @Component({
@@ -64,7 +64,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     const token = localStorage.getItem('auth');
     if (token) {
       const user: IUserAll = JSON.parse(token).user;
-      this.professionalId = user.authorities.some(u => u.authority === Role.Professional) ? user.id : undefined;
+      this.professionalId = user.authorities.some(u => u.authority === Role.professional) ? user.id : undefined;
       this.user = user;
     }
   }
@@ -79,7 +79,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   private static createMachine(stateMachineDefinition: any, initialState: any): any {
     const machine = {
       value: initialState,
-      transition(currentState: any, event: any): any {
+      transition: (currentState: any, event: any): any => {
         const currentStateDefinition = stateMachineDefinition[currentState];
         const destinationTransition = currentStateDefinition.transitions[event];
         if (!destinationTransition) {
@@ -90,7 +90,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         machine.value = destinationState;
         return machine.value;
       },
-      next(currentState: any): any {
+      next: (currentState: any): any => {
         const currentStateDefinition = stateMachineDefinition[currentState];
         return currentStateDefinition.next;
       }
@@ -124,7 +124,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(event => {
       if (event) {
-        const state = this.reservation?.state;
+        const state = this.reservation?.state.toLowerCase();
         this.machine.transition(state, event);
       }
     });
@@ -134,16 +134,16 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     this.subscription = this.getState.subscribe(state => {
       this.isLoading = state.isLoading;
       if (state.selected) {
-        this.duration = ConvertDuration(state.selected.product.duration);
+        this.duration = convertDuration(state.selected.product.duration);
         this.start = new Date(state.selected.start);
         this.end = new Date(new Date(state.selected.start).setHours(this.start.getHours() + this.duration.hour,
           this.start.getMinutes() + this.duration.minute));
         // @ts-ignore
-        this.state = ReservationIconName[state.selected.state];
+        this.state = ReservationIconName[state.selected.state.toLowerCase()];
         this.reservation = state.selected;
         if (this.professionalId && this.professionalId === this.reservation?.room.professional.id) {
           this.setupMachine(this);
-          this.changeState = this.machine.next(this.reservation.state);
+          this.changeState = this.machine.next(this.reservation.state.toLowerCase());
         }
         this.dataSource = new MatTableDataSource<IReservationAll>(state.selected.history);
         this.cdRef.detectChanges();
@@ -175,12 +175,12 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     const store = self.store;
     const translate = self.translate;
     this.machine = ReservationDetailComponent.createMachine({
-      initialState: ReservationIconName.CREATED,
-      CREATED: {
+      initialState: ReservationIconName.created,
+      created: {
         transitions: {
           approve: {
-            target: 'APPROVED',
-            action(): void {
+            target: 'approved',
+            action: (): void => {
               self.reservation = undefined;
               store.dispatch(
                 new fromActionsReservation.Approve(reservationId)
@@ -188,8 +188,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
             }
           },
           cancel: {
-            target: 'CANCELLED',
-            action(): void {
+            target: 'cancelled',
+            action: (): void => {
               self.reservation = undefined;
               store.dispatch(
                 new fromActionsReservation.Cancel(reservationId)
@@ -197,8 +197,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
             }
           },
           edit: {
-            target: 'EDITED',
-            action(): void {
+            target: 'edited',
+            action: (): void => {
               const data = {editReservation: {reservation: self.reservation, user: self.user}};
               self.router.navigateByUrl('/reservation', {state: data});
             }
@@ -207,28 +207,28 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         next: [{
           tooltip: translate.instant('RESERVATION.DETAIL.ACTION.APPROVE'),
           tooltipPosition: 'below',
-          icon: ReservationIconName.APPROVED,
+          icon: ReservationIconName.approved,
           id: 'approve',
           color: 'accent'
         }, {
           tooltip: translate.instant('RESERVATION.DETAIL.ACTION.EDIT'),
           tooltipPosition: 'below',
-          icon: ReservationIconName.EDIT,
+          icon: ReservationIconName.edit,
           id: 'edit',
           color: 'accent'
         }, {
           tooltip: translate.instant('RESERVATION.DETAIL.ACTION.CANCEL'),
           tooltipPosition: 'below',
-          icon: ReservationIconName.CANCELLED,
+          icon: ReservationIconName.cancelled,
           id: 'cancel',
           color: 'warn'
         }]
       },
-      APPROVED: {
+      approved: {
         transitions: {
           start: {
-            target: 'STARTED',
-            action(): void {
+            target: 'started',
+            action: (): void => {
               self.reservation = undefined;
               store.dispatch(
                 new fromActionsReservation.Start(reservationId)
@@ -236,8 +236,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
             }
           },
           cancel: {
-            target: 'CANCELLED',
-            action(): void {
+            target: 'cancelled',
+            action: (): void => {
               self.reservation = undefined;
               store.dispatch(
                 new fromActionsReservation.Cancel(reservationId)
@@ -245,8 +245,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
             }
           },
           edit: {
-            target: 'EDITED',
-            action(): void {
+            target: 'edited',
+            action: (): void => {
               const data = {editReservation: {reservation: self.reservation, user: self.user}};
               self.router.navigateByUrl('/reservation', {state: data});
             }
@@ -255,28 +255,28 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         next: [{
           tooltip: translate.instant('RESERVATION.DETAIL.ACTION.START'),
           tooltipPosition: 'below',
-          icon: ReservationIconName.STARTED,
+          icon: ReservationIconName.started,
           id: 'start',
           color: 'accent'
         }, {
           tooltip: translate.instant('RESERVATION.DETAIL.ACTION.EDIT'),
           tooltipPosition: 'below',
-          icon: ReservationIconName.EDIT,
+          icon: ReservationIconName.edit,
           id: 'edit',
           color: 'accent'
         }, {
           tooltip: translate.instant('RESERVATION.DETAIL.ACTION.CANCEL'),
           tooltipPosition: 'below',
-          icon: ReservationIconName.CANCELLED,
+          icon: ReservationIconName.cancelled,
           id: 'cancel',
           color: 'warn'
         }]
       },
-      STARTED: {
+      started: {
         transitions: {
           complete: {
-            target: 'COMPLETED',
-            action(): void {
+            target: 'completed',
+            action: (): void => {
               self.reservation = undefined;
               store.dispatch(
                 new fromActionsReservation.Complete(reservationId)
@@ -287,15 +287,15 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         next: [{
           tooltip: translate.instant('RESERVATION.DETAIL.ACTION.COMPLETE'),
           tooltipPosition: 'below',
-          icon: ReservationIconName.COMPLETED,
+          icon: ReservationIconName.completed,
           id: 'complete',
           color: 'accent'
         }]
       },
-      COMPLETED: {
+      completed: {
         next: []
       },
-      CANCELLED: {
+      cancelled: {
         next: []
       }
     }, initialState);

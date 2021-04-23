@@ -1,17 +1,14 @@
 import { AbstractControl, FormControl } from '@angular/forms';
 
-export function FieldChange(formControl: FormControl, value: any | undefined): any | undefined {
-  return formControl && formControl.dirty && value !== formControl.value ? formControl.value : null;
-}
+export const fieldChange = (formControl: FormControl, value: any | undefined): any | undefined =>
+  formControl && formControl.dirty && value !== formControl.value ? formControl.value : null;
 
-export function ValueChange(newValue: any, oldValue: any | undefined): any | undefined {
-  return oldValue !== newValue ? newValue : null;
-}
+export const valueChange = (newValue: any, oldValue: any | undefined): any | undefined => oldValue !== newValue ? newValue : null;
 
-export function RequireMatch(control: AbstractControl): any {
+export const requireMatch = (control: AbstractControl): any => {
   const selection: any = control.value;
   if (selection && typeof selection === 'string') {
     return {requireMatch: true};
   }
   return null;
-}
+};

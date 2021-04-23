@@ -20,6 +20,8 @@ import { GeocodeService } from '../../services/geocode.service';
   styleUrls: ['./rooms.component.scss']
 })
 export class RoomsComponent implements OnInit, AfterViewInit {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   displayedColumns: string[] = ['position', 'name', 'professional', 'address', 'availability', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IRoom>>();
@@ -28,9 +30,6 @@ export class RoomsComponent implements OnInit, AfterViewInit {
   resultsLength = 0;
   pageSize = PAGE_SIZE;
   error: any;
-
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
               private store: Store<AppState>, private cdRef: ChangeDetectorRef, private geocodeService: GeocodeService) {

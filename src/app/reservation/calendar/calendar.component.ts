@@ -7,13 +7,13 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Calendar, Day, ICalendar, IReservationAll, IRoomReservation } from '../../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ConvertDuration, GetStartEndDay } from '../../util/dates';
+import { convertDuration, getStartEndDay } from '../../util/dates';
 import { IAvailability, IRoom } from '../../interfaces/room';
-import { FillNotAvailable, NewEvent } from '../../util/event';
+import { fillNotAvailable, newEvent } from '../../util/event';
 import { Router } from '@angular/router';
 import { CalendarEvent, CalendarView } from 'angular-calendar';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { FindStateColor, IState, StateColor } from '../../util/flags';
+import { findStateColor, IState, stateColor } from '../../util/flags';
 import { IUserAll } from '../../interfaces/user';
 
 @Component({
@@ -43,7 +43,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   locale: string;
   professionalId: string | undefined;
 
-  colors: IState[] = StateColor();
+  colors: IState[] = stateColor();
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
               private store: Store<AppState>, private router: Router, private breakpointObserver: BreakpointObserver) {
@@ -125,7 +125,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     reservations.forEach(it => {
       if (it.product.duration) {
         const start = new Date(it.start);
-        const duration = ConvertDuration(it.product.duration);
+        const duration = convertDuration(it.product.duration);
         const end = new Date(new Date(start).setHours(
           start.getHours() + duration.hour, start.getMinutes() + duration.minute)
         );
@@ -135,8 +135,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
           duration: `${duration.hour}:${duration.minute}`
         });
 
-        const color = FindStateColor(it.state);
-        const event = NewEvent(detail, color, start, end, '#000', it.id);
+        const color = findStateColor(it.state);
+        const event = newEvent(detail, color, start, end, '#000', it.id);
         const calendar = this.calendar.get(rr.room.id);
         let events;
         if (calendar) {
@@ -157,12 +157,12 @@ export class CalendarComponent implements OnInit, OnDestroy {
         stateValue.data.forEach((value: IRoomReservation) => this.addReservations(value));
         this.calendar.forEach(calendar => {
           const {week, saturday, sunday} = CalendarComponent.getAvailability(calendar.room);
-          const {min, max} = GetStartEndDay(week, saturday, sunday);
+          const {min, max} = getStartEndDay(week, saturday, sunday);
           calendar.day = new Day(min.getHours() - 1, min.getMinutes(), max.getHours() + 1, max.getMinutes());
           const unavailable = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.UNAVAILABLE');
           const lunch = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.LUNCH');
           const notWorking = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.OUT_OF_WORK');
-          calendar.events = calendar.events.concat(FillNotAvailable(unavailable, lunch, notWorking,
+          calendar.events = calendar.events.concat(fillNotAvailable(unavailable, lunch, notWorking,
             56, 0, this.viewDate, sunday, saturday, week));
 
         });

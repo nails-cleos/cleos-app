@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
 import { Color, Label } from 'ng2-charts';
-import { AnnualReservation } from '../../util/chart';
+import { annualReservationChart } from '../../util/chart';
 
 @Component({
   selector: 'app-annual-reservations-chart',
@@ -50,7 +50,7 @@ export class AnnualReservationsChartComponent implements OnChanges {
         this.error = this.state.error;
         return;
       }
-      const chartResult = AnnualReservation(this.state.data, this.locale, this.label);
+      const chartResult = annualReservationChart(this.state.data, this.locale, this.label);
       if (chartResult) {
         this.lineChartData = chartResult.chartDataSet;
         this.lineChartLabels = chartResult.chartLabels;

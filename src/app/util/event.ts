@@ -1,22 +1,22 @@
 import { IAvailability } from '../interfaces/room';
 import { CalendarEvent } from 'angular-calendar';
-import { FindStateColor } from './flags';
+import { findStateColor } from './flags';
 
-export function FillNotAvailable(unavailable: string, lunch: string, notWorking: string, daysInWeek: number, plusHour: number,
+export const fillNotAvailable = (unavailable: string, lunch: string, notWorking: string, daysInWeek: number, plusHour: number,
                                  selectDate: Date, sunday: IAvailability, saturday: IAvailability, week: IAvailability,
-                                 addToday: boolean = false): CalendarEvent[] {
+                                 addToday: boolean = false): CalendarEvent[] => {
   let events: CalendarEvent[] = [];
   const date = new Date(selectDate.getFullYear(), selectDate.getMonth(), selectDate.getDate());
   const now = new Date();
   for (let i = 0; i < daysInWeek; i++) {
     const day = date.getDay();
     if (addToday && date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate()) {
-      const event = NewEvent(notWorking, FindStateColor('DEFAULT'), new Date(new Date(now).setHours(0, 0)),
+      const event = newEvent(notWorking, findStateColor('DEFAULT'), new Date(new Date(now).setHours(0, 0)),
         new Date(new Date(now).setHours(now.getHours() + plusHour, now.getMinutes())));
       events = [...events, event];
     }
     if (date < new Date(now.getFullYear(), now.getMonth(), now.getDate())) {
-      const event = NewEvent(notWorking, FindStateColor('DEFAULT'), new Date(new Date(date).setHours(0, 0)),
+      const event = newEvent(notWorking, findStateColor('DEFAULT'), new Date(new Date(date).setHours(0, 0)),
         new Date(new Date(date).setHours(23, 59)));
       events = [...events, event];
     } else if (day === 0) {
@@ -30,13 +30,24 @@ export function FillNotAvailable(unavailable: string, lunch: string, notWorking:
   }
 
   return events;
-}
+};
 
-function createEvent(it: IAvailability, date: Date, notWorking: string, unavailable: string, lunch: string,
-                     plusHour: number): CalendarEvent[] {
+export const newEvent = (title: string, color: string, start: Date, end?: Date, primary?: string, id?: string): CalendarEvent => ({
+  id,
+  start,
+  end,
+  title,
+  color: {
+    primary,
+    secondary: color
+  }
+} as unknown as CalendarEvent);
+
+const createEvent = (it: IAvailability, date: Date, notWorking: string, unavailable: string, lunch: string,
+                     plusHour: number): CalendarEvent[] => {
   let events: CalendarEvent[] = [];
   if (!it) {
-    const event = NewEvent(notWorking, FindStateColor('DEFAULT'), new Date(new Date(date).setHours(0, 0)),
+    const event = newEvent(notWorking, findStateColor('DEFAULT'), new Date(new Date(date).setHours(0, 0)),
       new Date(new Date(date).setHours(23, 59)));
     events = [...events, event];
   } else {
@@ -60,7 +71,7 @@ function createEvent(it: IAvailability, date: Date, notWorking: string, unavaila
         }
       }
       if ((startHour || startHour === 0) && (startMinute || startMinute === 0)) {
-        const eventBefore = NewEvent(notWorking, FindStateColor('DEFAULT'), new Date(date.setHours(startHour, startMinute)),
+        const eventBefore = newEvent(notWorking, findStateColor('DEFAULT'), new Date(date.setHours(startHour, startMinute)),
           new Date(date.setHours(endHour, endMinute)));
         events = [...events, eventBefore];
       }
@@ -76,7 +87,7 @@ function createEvent(it: IAvailability, date: Date, notWorking: string, unavaila
         startHour = hour;
         startMinute = minute;
       }
-      const eventAfter = NewEvent(notWorking, FindStateColor('DEFAULT'), new Date(date.setHours(startHour, startMinute)),
+      const eventAfter = newEvent(notWorking, findStateColor('DEFAULT'), new Date(date.setHours(startHour, startMinute)),
         new Date(date.setHours(23, 59)));
       events = [...events, eventAfter];
     }
@@ -87,9 +98,10 @@ function createEvent(it: IAvailability, date: Date, notWorking: string, unavaila
   }
 
   return events;
-}
+};
 
-function createLunchEvent(it: IAvailability, date: Date, unavailable: string, lunch: string, plusHour: number): CalendarEvent | undefined {
+const createLunchEvent = (it: IAvailability, date: Date, unavailable: string,
+                          lunch: string, plusHour: number): CalendarEvent | undefined => {
   const now = new Date();
   const nowTime = now.toLocaleTimeString('en-GB').split(':');
   let hour = Number(nowTime[0]);
@@ -113,11 +125,11 @@ function createLunchEvent(it: IAvailability, date: Date, unavailable: string, lu
       }
       const start = new Date(new Date().setHours(0, 0));
       const end = new Date(new Date().setHours(hour, minute));
-      return NewEvent(unavailable, FindStateColor('DEFAULT'), start, end);
+      return newEvent(unavailable, findStateColor('DEFAULT'), start, end);
     } else {
       const start = new Date(date.setHours(lunchStartHour, lunchStartMinute));
       const end = new Date(date.setHours(lunchEndHour, lunchEndMinute));
-      return NewEvent(lunch, FindStateColor('DEFAULT'), start, end);
+      return newEvent(lunch, findStateColor('DEFAULT'), start, end);
     }
   } else if (date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate()) {
     if (hour > 23) {
@@ -128,14 +140,14 @@ function createLunchEvent(it: IAvailability, date: Date, unavailable: string, lu
     }
     const start = new Date(date.setHours(0, 0));
     const end = new Date(date.setHours(hour, minute));
-    return NewEvent(lunch, FindStateColor('DEFAULT'), start, end);
+    return newEvent(lunch, findStateColor('DEFAULT'), start, end);
   }
 
   return undefined;
-}
+};
 
-function lunchEvent(hour: number, lunchStartHour: number, minute: number, lunchStartMinute: number, lunchEndHour: number,
-                    lunchEndMinute: number, date: Date, lunch: string): CalendarEvent | undefined {
+const lunchEvent = (hour: number, lunchStartHour: number, minute: number, lunchStartMinute: number, lunchEndHour: number,
+                    lunchEndMinute: number, date: Date, lunch: string): CalendarEvent | undefined => {
   let lunchHour;
   let lunchMinute;
   if (hour < lunchStartHour || (hour === lunchStartHour && minute < lunchStartMinute)) {
@@ -149,21 +161,8 @@ function lunchEvent(hour: number, lunchStartHour: number, minute: number, lunchS
   if ((lunchHour || lunchHour === 0) && (lunchMinute || lunchMinute === 0)) {
     const start = new Date(date.setHours(lunchHour, lunchMinute));
     const end = new Date(date.setHours(lunchEndHour, lunchEndMinute));
-    return NewEvent(lunch, FindStateColor('DEFAULT'), start, end);
+    return newEvent(lunch, findStateColor('DEFAULT'), start, end);
   }
 
   return undefined;
-}
-
-export function NewEvent(title: string, color: string, start: Date, end?: Date, primary?: string, id?: string): CalendarEvent {
-  return {
-    id,
-    start,
-    end,
-    title,
-    color: {
-      primary,
-      secondary: color
-    }
-  } as unknown as CalendarEvent;
-}
+};

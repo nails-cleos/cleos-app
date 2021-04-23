@@ -8,18 +8,18 @@ interface IChartUtil {
   chartData: SingleDataSet;
 }
 
-export function CustomerReservation(result: IReservationAll[] | undefined, label: string): IChartUtil | null {
+export const customerReservationChart = (result: IReservationAll[] | undefined, label: string): IChartUtil | null => {
   const now = new Date();
   const completedList = completeWithDateFilter(result, now, 12);
   return barChart(completedList, label, 'customer', 'username');
-}
+};
 
-export function QuantityProduct(result: IReservationAll[] | undefined, label: string): IChartUtil | null {
+export const quantityProductChart = (result: IReservationAll[] | undefined, label: string): IChartUtil | null => {
   const completedList = result?.filter(r => r.state === 'COMPLETED');
   return barChart(completedList, label, 'product', 'name');
-}
+};
 
-export function AnnualReservation(result: IReservationAll[] | undefined, locale: string, label: string): IChartUtil | null {
+export const annualReservationChart = (result: IReservationAll[] | undefined, locale: string, label: string): IChartUtil | null => {
   const now = new Date();
   const completedList = completeWithDateFilter(result, now, 12);
   if (completedList && completedList.length) {
@@ -52,9 +52,9 @@ export function AnnualReservation(result: IReservationAll[] | undefined, locale:
     } as IChartUtil;
   }
   return null;
-}
+};
 
-export function LastMonthReservation(result: IReservationAll[] | undefined, locale: string, label: string): IChartUtil | null {
+export const lastMonthReservationChart = (result: IReservationAll[] | undefined, locale: string, label: string): IChartUtil | null => {
   const now = new Date();
   const completedList = completeWithDateFilter(result, now, 1);
   if (completedList && completedList.length) {
@@ -78,9 +78,9 @@ export function LastMonthReservation(result: IReservationAll[] | undefined, loca
     } as IChartUtil;
   }
   return null;
-}
+};
 
-export function ProductReservation(result: IReservationAll[] | undefined): IChartUtil | null {
+export const productReservationChart = (result: IReservationAll[] | undefined): IChartUtil | null => {
   const completedList = result?.filter(r => r.state === 'COMPLETED');
   if (completedList && completedList.length) {
     const distRoom: Array<any> = [...new Set(completedList.map(x => x.room.name))];
@@ -118,9 +118,9 @@ export function ProductReservation(result: IReservationAll[] | undefined): IChar
     } as IChartUtil;
   }
   return null;
-}
+};
 
-export function MonthlyReservation(result: IReservationAll[] | undefined, locale: string): IChartUtil | null {
+export const monthlyReservationChart = (result: IReservationAll[] | undefined, locale: string): IChartUtil | null => {
   const now = new Date();
   const completedList = completeWithDateFilter(result, now, 12);
   if (completedList && completedList.length) {
@@ -143,9 +143,9 @@ export function MonthlyReservation(result: IReservationAll[] | undefined, locale
     } as IChartUtil;
   }
   return null;
-}
+};
 
-function barChart(completedList: IReservationAll[] | undefined, label: string, key: string, value: string): IChartUtil | null {
+const barChart = (completedList: IReservationAll[] | undefined, label: string, key: string, value: string): IChartUtil | null => {
   if (completedList && completedList.length) {
     const group = completedList.reduce((map, item) => {
       // @ts-ignore
@@ -162,21 +162,17 @@ function barChart(completedList: IReservationAll[] | undefined, label: string, k
     } as IChartUtil;
   }
   return null;
-}
+};
 
-function formatMonthYear(date: Date, locale: string): string {
-  return date.toLocaleDateString(locale, {
-    month: 'short', year: 'numeric'
-  }).replace(/ /g, '-');
-}
+const formatMonthYear = (date: Date, locale: string): string => date.toLocaleDateString(locale, {
+  month: 'short', year: 'numeric'
+}).replace(/ /g, '-');
 
-function formatDate(date: Date, locale: string): string {
-  return date.toLocaleDateString(locale, {
-    day: 'numeric', month: 'short', year: 'numeric'
-  }).replace(/ /g, '-');
-}
+const formatDate = (date: Date, locale: string): string => date.toLocaleDateString(locale, {
+  day: 'numeric', month: 'short', year: 'numeric'
+}).replace(/ /g, '-');
 
-function completeWithDateFilter(result: IReservationAll[] | undefined, now: Date, minusMonth: number): IReservationAll[] | undefined {
+const completeWithDateFilter = (result: IReservationAll[] | undefined, now: Date, minusMonth: number): IReservationAll[] | undefined => {
   const filterDate = new Date(new Date().setMonth(now.getMonth() - minusMonth, 0));
   return result?.filter(r => r.state === 'COMPLETED' && new Date(r.start) > filterDate);
-}
+};

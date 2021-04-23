@@ -15,20 +15,20 @@ export class Duration implements IDuration {
   }
 }
 
-export function ConvertDuration(duration: string): IDuration {
+export const convertDuration = (duration: string): IDuration => {
   const hIndex = duration.indexOf('H');
   const mIndex = duration.indexOf('M');
   const hour = hIndex > -1 ? Number(duration.slice(2, hIndex)) : 0;
   const minute = mIndex > -1 ? Number(duration.slice(hIndex > -1 ? hIndex + 1 : 2, mIndex)) : 0;
 
   return new Duration(hour, minute);
-}
+};
 
-export function GetStartEndDay(week: IAvailability, saturday: IAvailability, sunday: IAvailability): any {
+export const getStartEndDay = (week: IAvailability, saturday: IAvailability, sunday: IAvailability): any => {
   const date: Date = new Date();
-  const weekMinMax = GetMinAndMax(week, date);
-  const saturdayMinMax = GetMinAndMax(saturday, date);
-  const sundayMinMax = GetMinAndMax(sunday, date);
+  const weekMinMax = cetMinAndMax(week, date);
+  const saturdayMinMax = cetMinAndMax(saturday, date);
+  const sundayMinMax = cetMinAndMax(sunday, date);
 
   let min: Date = weekMinMax.min;
   let max: Date = weekMinMax.max;
@@ -48,9 +48,9 @@ export function GetStartEndDay(week: IAvailability, saturday: IAvailability, sun
   }
 
   return {min, max};
-}
+};
 
-export function GetMinAndMax(availability: IAvailability, date: Date): any {
+export const cetMinAndMax = (availability: IAvailability, date: Date): any => {
   let min;
   let max;
   if (availability) {
@@ -64,4 +64,4 @@ export function GetMinAndMax(availability: IAvailability, date: Date): any {
     }
   }
   return {min, max};
-}
+};

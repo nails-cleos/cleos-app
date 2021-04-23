@@ -21,6 +21,9 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
   styleUrls: ['./reservation-table.component.scss']
 })
 export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestroy {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+
   displayedColumns: string[] = ['position', 'customer', 'start', 'state', 'professional', 'product', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IReservationAll>>();
   getState: Observable<any>;
@@ -28,9 +31,6 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
 
   resultsLength = 0;
   pageSize = PAGE_SIZE;
-
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
 
   language: string;
   error: any;

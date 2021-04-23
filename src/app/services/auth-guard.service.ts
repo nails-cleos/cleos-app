@@ -25,7 +25,7 @@ export class AuthGuardService implements CanActivate {
   }
 
   private static isCustomer(authorities: IAuthority[] | undefined): boolean {
-    return !!authorities && authorities.length === 1 && authorities[0].authority === Role.Customer;
+    return !!authorities && authorities.length === 1 && authorities[0].authority === Role.customer;
   }
 
   private static hasRole(route: ActivatedRouteSnapshot, user: IUser): boolean {

@@ -8,12 +8,12 @@ import { Availability, IAvailability, IAvailabilityDate } from '../interfaces/ro
   styleUrls: ['./availability.component.scss']
 })
 export class AvailabilityComponent implements OnChanges {
-
-  availabilityForm!: FormGroup;
   @Input() dates?: IAvailabilityDate;
   @Input() day!: string;
   @Output() availability = new EventEmitter<IAvailability>();
   @Output() ignore = new EventEmitter();
+
+  availabilityForm!: FormGroup;
   start: FormControl;
   end: FormControl;
   startLunch: FormControl;

@@ -9,7 +9,6 @@ export class ImageViewerComponent {
 
   @Input() open!: boolean;
   @Input() imageURL!: string;
-
   @Output() close = new EventEmitter();
 
   constructor() {

@@ -8,7 +8,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../store/app.states';
 import * as fromActionsReservation from '../store/reservation.actions';
-import { RequireMatch } from '../util/validators';
+import { requireMatch } from '../util/validators';
 import { IProduct } from '../interfaces/product';
 import { MatStepper } from '@angular/material/stepper';
 import { IAvailability, IRoom } from '../interfaces/room';
@@ -18,11 +18,11 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../dialog/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { ConvertDuration, Duration, GetStartEndDay, IDuration } from '../util/dates';
-import { FillNotAvailable, NewEvent } from '../util/event';
+import { convertDuration, Duration, getStartEndDay, IDuration } from '../util/dates';
+import { fillNotAvailable, newEvent } from '../util/event';
 import { Router } from '@angular/router';
 import { DateAdapter } from '@angular/material/core';
-import { FindStateColor } from '../util/flags';
+import { findStateColor } from '../util/flags';
 import { GeocoderResult } from '@agm/core';
 import { Role } from '../interfaces/token';
 
@@ -35,6 +35,9 @@ import { Role } from '../interfaces/token';
   }]
 })
 export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
+  @Input() events: CalendarEvent[] = [];
+  @ViewChild('stepper') myStepper!: MatStepper;
+
   getState: Observable<any>;
   subscription: Subscription | undefined;
   errors: any = [];
@@ -46,21 +49,21 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   customers: IUser[] | undefined;
   filteredCustomer: Observable<IUser[] | undefined> | undefined;
   customer: FormControl = new FormControl('', [
-    Validators.required, RequireMatch
+    Validators.required, requireMatch
   ]);
 
   productForm!: FormGroup;
   products: IProduct[] | undefined;
   filteredProduct: Observable<IProduct[] | undefined> | undefined;
   product: FormControl = new FormControl('', [
-    Validators.required, RequireMatch
+    Validators.required, requireMatch
   ]);
 
   roomForm!: FormGroup;
   rooms: IRoom[] | undefined;
   filteredRoom: Observable<IRoom[] | undefined> | undefined;
   room: FormControl = new FormControl('', [
-    Validators.required, RequireMatch
+    Validators.required, requireMatch
   ]);
   address: string | undefined;
 
@@ -74,7 +77,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   reservations: IReservationAll[] | undefined;
   viewDate: Date = new Date();
-  @Input() events: CalendarEvent[] = [];
 
   dayStartHour = 9;
   dayStartMinute = 0;
@@ -99,8 +101,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   maxDate: Date | undefined;
 
   isAdmin = false;
-
-  @ViewChild('stepper') myStepper!: MatStepper;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
               private store: Store<AppState>, private formBuilder: FormBuilder, private breakpointObserver: BreakpointObserver,
@@ -134,7 +134,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const token = localStorage.getItem('auth');
     if (token) {
       const user: IUserAll = JSON.parse(token).user;
-      this.isAdmin = user.authorities.some(u => u.authority === Role.Admin);
+      this.isAdmin = user.authorities.some(u => u.authority === Role.admin);
     }
   }
 
@@ -209,7 +209,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
     return result;
-  }
+  };
 
   displayFnUser(user: IUser): string {
     return user ? `${user.firstName} ${user.lastName}` : '';
@@ -231,7 +231,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.productForm.invalid) {
       return;
     }
-    this.duration = ConvertDuration(this.product.value.duration);
+    this.duration = convertDuration(this.product.value.duration);
     this.events = [];
 
     const date = new Date(this.date.value);
@@ -243,7 +243,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const unavailable = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.UNAVAILABLE');
     const lunch = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.LUNCH');
     const notWorking = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.OUT_OF_WORK');
-    this.events = this.events.concat(FillNotAvailable(unavailable, lunch, notWorking,
+    this.events = this.events.concat(fillNotAvailable(unavailable, lunch, notWorking,
       this.daysInWeek, 1, date, sunday, saturday, week, true));
     this.viewDate = date;
     this.store.dispatch(
@@ -255,7 +255,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   segmentClick(date: Date, state: string, id?: string): void {
     this.errors.overlapping = false;
     const nowTime = date.toLocaleTimeString('en-GB').split(':');
-    const duration = ConvertDuration(this.product.value.duration);
+    const duration = convertDuration(this.product.value.duration);
 
     const start = new Date(date.setHours(Number(nowTime[0]), Number(nowTime[1])));
     const end = new Date(new Date(start).setHours(
@@ -268,7 +268,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       duration: `${duration.hour}:${duration.minute}`
     });
 
-    const event = NewEvent(detail, FindStateColor(state), start, end, '#000', id);
+    const event = newEvent(detail, findStateColor(state), start, end, '#000', id);
 
     let title;
     let content;
@@ -351,7 +351,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   addCustomer(): void {
-    this.router.navigateByUrl('/user', {state: {role: Role.Customer}});
+    this.router.navigateByUrl('/user', {state: {role: Role.customer}});
   }
 
   getAddress($event: GeocoderResult): void {
@@ -412,7 +412,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         if (start < new Date()) {
           return;
         }
-        const duration = ConvertDuration(it.product.duration);
+        const duration = convertDuration(it.product.duration);
         const end = new Date(new Date(start).setHours(
           start.getHours() + duration.hour, start.getMinutes() + duration.minute)
         );
@@ -422,8 +422,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           duration: `${duration.hour}:${duration.minute}`
         });
 
-        const color = FindStateColor(it.state);
-        const event = NewEvent(detail, color, start, end, '#000', it.id);
+        const color = findStateColor(it.state);
+        const event = newEvent(detail, color, start, end, '#000', it.id);
         if (this.editReservation && this.editReservation.id === it.id) {
           this.eventSelected = event;
         }
@@ -528,7 +528,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   // }
 
   private setStartEndDay(week: IAvailability, saturday: IAvailability, sunday: IAvailability): void {
-    const {min, max} = GetStartEndDay(week, saturday, sunday);
+    const {min, max} = getStartEndDay(week, saturday, sunday);
 
     this.dayStartHour = min.getHours();
     this.dayStartMinute = min.getMinutes();
@@ -574,7 +574,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.start.setValue(date);
     this.customer.setValue(reservation.customer);
     this.product.setValue(reservation.product);
-    const isAdmin = user.authorities.some(u => u.authority === Role.Admin);
+    const isAdmin = user.authorities.some(u => u.authority === Role.admin);
 
     if (!isAdmin) {
       this.getProductList();

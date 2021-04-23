@@ -1,101 +1,101 @@
 import { Action } from '@ngrx/store';
 
 export enum RoomActionTypes {
-  GET_ALL = '[Room] Get all',
-  GET_MY_ROOM = '[Room] Get my room',
-  GET_ALL_PROFESSIONAL = '[Room] Get all professional',
-  ROOM_SUCCESS = '[Room] Success',
-  ROOM_SAVE = '[Room] Save',
-  ROOM_UPDATE = '[Room] Update',
-  ROOM_UPDATE_ME = '[Room] Update me',
-  ROOM_SAVE_SUCCESS = '[Room] Save Success',
-  ROOM_FAILURE = '[Room] Failure',
-  ROOM_SELECTED = '[Room] Selected',
-  ROOM_FIND = '[Room] Find',
-  ROOM_DELETE = '[Room] Delete',
-  CLEAN = '[Room] Clean'
+  getAll = '[Room] Get all',
+  getMyRoom = '[Room] Get my room',
+  getAllProfessional = '[Room] Get all professional',
+  roomSuccess = '[Room] Success',
+  roomSave = '[Room] Save',
+  roomUpdate = '[Room] Update',
+  roomUpdateMe = '[Room] Update me',
+  roomSaveSuccess = '[Room] Save Success',
+  roomFailure = '[Room] Failure',
+  roomSelected = '[Room] Selected',
+  roomFind = '[Room] Find',
+  roomDelete = '[Room] Delete',
+  clean = '[Room] Clean'
 }
 
 export class GetAll implements Action {
-  readonly type = RoomActionTypes.GET_ALL;
+  readonly type = RoomActionTypes.getAll;
 
   constructor(public payload: any) {
   }
 }
 
 export class GetMyRoom implements Action {
-  readonly type = RoomActionTypes.GET_MY_ROOM;
+  readonly type = RoomActionTypes.getMyRoom;
 }
 
 export class GetAllProfessional implements Action {
-  readonly type = RoomActionTypes.GET_ALL_PROFESSIONAL;
+  readonly type = RoomActionTypes.getAllProfessional;
 }
 
 export class RoomSuccess implements Action {
-  readonly type = RoomActionTypes.ROOM_SUCCESS;
+  readonly type = RoomActionTypes.roomSuccess;
 
   constructor(public payload: any) {
   }
 }
 
 export class RoomSave implements Action {
-  readonly type = RoomActionTypes.ROOM_SAVE;
+  readonly type = RoomActionTypes.roomSave;
 
   constructor(public payload: any) {
   }
 }
 
 export class RoomUpdate implements Action {
-  readonly type = RoomActionTypes.ROOM_UPDATE;
+  readonly type = RoomActionTypes.roomUpdate;
 
   constructor(public payload: any) {
   }
 }
 
 export class RoomUpdateMe implements Action {
-  readonly type = RoomActionTypes.ROOM_UPDATE_ME;
+  readonly type = RoomActionTypes.roomUpdateMe;
 
   constructor(public payload: any) {
   }
 }
 
 export class RoomSaveSuccess implements Action {
-  readonly type = RoomActionTypes.ROOM_SAVE_SUCCESS;
+  readonly type = RoomActionTypes.roomSaveSuccess;
 
   constructor(public payload: any) {
   }
 }
 
 export class RoomFailure implements Action {
-  readonly type = RoomActionTypes.ROOM_FAILURE;
+  readonly type = RoomActionTypes.roomFailure;
 
   constructor(public payload: any) {
   }
 }
 
 export class RoomSelected implements Action {
-  readonly type = RoomActionTypes.ROOM_SELECTED;
+  readonly type = RoomActionTypes.roomSelected;
 
   constructor(public payload: any) {
   }
 }
 
 export class RoomFind implements Action {
-  readonly type = RoomActionTypes.ROOM_FIND;
+  readonly type = RoomActionTypes.roomFind;
 
   constructor(public payload: any) {
   }
 }
 
 export class DeleteRoom implements Action {
-  readonly type = RoomActionTypes.ROOM_DELETE;
+  readonly type = RoomActionTypes.roomDelete;
 
   constructor(public payload: any) {
   }
 }
 
 export class Clean implements Action {
-  readonly type = RoomActionTypes.CLEAN;
+  readonly type = RoomActionTypes.clean;
 }
 
 export type All =

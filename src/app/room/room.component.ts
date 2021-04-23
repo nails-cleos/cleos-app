@@ -9,14 +9,14 @@ import { IAddress, IAvailability, ILocation, IRoom, Room } from '../interfaces/r
 import { IUser } from '../interfaces/user';
 import { map, startWith } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
-import { RequireMatch } from '../util/validators';
+import { requireMatch } from '../util/validators';
 import { Appearance, GermanAddress, Location } from '@angular-material-extensions/google-maps-autocomplete';
 import PlaceResult = google.maps.places.PlaceResult;
 
 export enum IconName {
-  calendar_today = 'calendar_today',
-  event_available = 'event_available',
-  event_busy = 'event_busy'
+  calendarToday = 'calendarToday',
+  eventAvailable = 'eventAvailable',
+  eventBusy = 'eventBusy'
 }
 
 export interface IIcon {
@@ -40,9 +40,9 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   step = 0;
   icons: IIcon = {
-    week: IconName.calendar_today,
-    saturday: IconName.calendar_today,
-    sunday: IconName.calendar_today
+    week: IconName.calendarToday,
+    saturday: IconName.calendarToday,
+    sunday: IconName.calendarToday
   };
 
   professionals: IUser[] | undefined;
@@ -53,7 +53,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   ]);
 
   professional: FormControl = new FormControl('', [
-    Validators.required, RequireMatch
+    Validators.required, requireMatch
   ]);
 
   address: FormControl = new FormControl('', [
@@ -109,7 +109,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   addAvailability(availability: IAvailability, step: number): void {
-    this.setIcon(availability.day, IconName.event_available);
+    this.setIcon(availability.day, IconName.eventAvailable);
 
     const index = this.room.availabilities.findIndex((e) => e.day === availability.day);
 
@@ -123,7 +123,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   ignore(day: string, step: number): void {
-    this.setIcon(day, IconName.event_busy);
+    this.setIcon(day, IconName.eventBusy);
     const index = this.room.availabilities.findIndex((e) => e.day === day);
     if (index > -1) {
       this.room.availabilities.splice(index, 1);
@@ -141,9 +141,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.filteredOptions = this.professional.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
-      map(name => {
-        return name ? this._filter(name) : this.professionals ? this.professionals.slice() : this.professionals;
-      })
+      map(name => name ? this._filter(name) : this.professionals ? this.professionals.slice() : this.professionals)
     );
   }
 
@@ -198,7 +196,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     }
     let step = -1;
     this.errors = [];
-    switch (IconName.calendar_today) {
+    switch (IconName.calendarToday) {
       case this.icons.week:
         step = 0;
         break;

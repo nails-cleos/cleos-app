@@ -25,10 +25,10 @@ export const initialState: State = {
   queryParams: {}
 };
 
-export function reducer(state = initialState, action: All): State {
+export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case AuthActionTypes.LOGIN_FAILURE:
-    case AuthActionTypes.SIGNUP_FAILURE: {
+    case AuthActionTypes.loginFailure:
+    case AuthActionTypes.signupFailure: {
       return {
         ...state,
         errorMessage: action.payload.error.message,
@@ -37,7 +37,7 @@ export function reducer(state = initialState, action: All): State {
         subErrors: action.payload.error.subErrors
       };
     }
-    case AuthActionTypes.LOGIN_SUCCESS: {
+    case AuthActionTypes.loginSuccess: {
       return {
         ...state,
         isAuthenticated: true,
@@ -50,7 +50,7 @@ export function reducer(state = initialState, action: All): State {
         queryParams: action.payload.queryParams
       };
     }
-    case AuthActionTypes.SIGNUP_SUCCESS: {
+    case AuthActionTypes.signupSuccess: {
       return {
         ...state,
         isAuthenticated: false,
@@ -59,9 +59,9 @@ export function reducer(state = initialState, action: All): State {
         subErrors: null
       };
     }
-    case AuthActionTypes.FORGOT_PASSWORD:
-    case AuthActionTypes.RECOVERY_PASSWORD:
-    case AuthActionTypes.ACTIVATE_ACCOUNT: {
+    case AuthActionTypes.forgotPassword:
+    case AuthActionTypes.recoveryPassword:
+    case AuthActionTypes.activateAccount: {
       return {
         ...state,
         isAuthenticated: false,
@@ -70,7 +70,7 @@ export function reducer(state = initialState, action: All): State {
         subErrors: null
       };
     }
-    case AuthActionTypes.CLEAN: {
+    case AuthActionTypes.clean: {
       return {
         ...state,
         errorMessage: null,
@@ -79,11 +79,11 @@ export function reducer(state = initialState, action: All): State {
         queryParams: null
       };
     }
-    case AuthActionTypes.LOGOUT: {
+    case AuthActionTypes.logout: {
       return initialState;
     }
     default: {
       return state;
     }
   }
-}
+};

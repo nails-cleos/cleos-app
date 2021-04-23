@@ -108,7 +108,7 @@ export class DashComponent implements OnInit, OnDestroy {
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       if (state.errorMessage) {
-        this.miniCardError(state, this.state.errorMessage);
+        this.miniCardError(state, state.errorMessage);
       }
       if (state.data && Array.isArray(state.data) && !state.data[0].reservations) {
         this.state = state;
@@ -125,9 +125,9 @@ export class DashComponent implements OnInit, OnDestroy {
           const lastMonthRevenue = lastMonthList.reduce(DashComponent.getSumReservationPrice, 0);
           const prevMonthRevenue = prevMonthList.reduce(DashComponent.getSumReservationPrice, 0);
 
-          const totalAvg = totalRevenue / completedList.length;
-          const lastMonthAvg = lastMonthRevenue / lastMonthList.length;
-          const prevMonthAvg = prevMonthRevenue / prevMonthList.length;
+          const totalAvg = completedList.length ? totalRevenue / completedList.length : 0;
+          const lastMonthAvg = lastMonthList.length ? lastMonthRevenue / lastMonthList.length : 0;
+          const prevMonthAvg = prevMonthList.length ? prevMonthRevenue / prevMonthList.length : 0;
 
           const totalCustomers = completedList.filter((r: IReservationAll) => new Date(r.start) <= filterDate)
             .reduce((unique: any[], o: IReservationAll) => {

@@ -41,47 +41,47 @@ const routes: Routes = [
   {path: 'main', component: MainComponent},
   {
     path: 'dashboard', component: DashComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService], data: {
-      roles: [Role.Admin, Role.Professional]
+      roles: [Role.admin, Role.professional]
     }
   },
   {
     path: 'change-password', component: ChangePasswordComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.Admin, Role.Professional, Role.Customer]
+      roles: [Role.admin, Role.professional, Role.customer]
     }
   },
   {
     path: 'profile', component: ProfileComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.Admin, Role.Professional, Role.Customer]
+      roles: [Role.admin, Role.professional, Role.customer]
     }
   },
   {
     path: 'users', component: UsersComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService], data: {
-      roles: [Role.Admin]
+      roles: [Role.admin]
     }
   },
   {
     path: 'user/:id', component: UserDetailComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.Admin]
+      roles: [Role.admin]
     }
   },
   {
     path: 'user', component: UserComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.Admin]
+      roles: [Role.admin]
     }
   },
   {
     path: 'products', component: ProductsComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService], data: {
-      roles: [Role.Admin]
+      roles: [Role.admin]
     }
   },
   {
     path: 'product', component: ProductComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.Admin]
+      roles: [Role.admin]
     }
   },
   {
     path: 'product/:id', component: ProductDetailComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.Admin]
+      roles: [Role.admin]
     }
   },
   {
@@ -90,65 +90,65 @@ const routes: Routes = [
     resolve: {model: TranslationLoaderResolver},
     canActivate: [AuthGuardService],
     data: {
-      roles: [Role.Admin]
+      roles: [Role.admin]
     }
   },
   {
     path: 'catalogue', component: CatalogueComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.Admin]
+      roles: [Role.admin]
     }
   },
   {
     path: 'catalogue/:id', component: CatalogueDetailComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.Admin]
+      roles: [Role.admin]
     }
   },
   {
     path: 'rooms', component: RoomsComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService], data: {
-      roles: [Role.Admin]
+      roles: [Role.admin]
     }
   },
   {
     path: 'room', component: RoomComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.Admin]
+      roles: [Role.admin]
     }
   },
   {
     path: 'room/:id', component: RoomDetailComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.Admin]
+      roles: [Role.admin]
     }
   },
   {
     path: 'me-room', component: RoomMeComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.Professional]
+      roles: [Role.professional]
     }
   },
   {
     path: 'reservation', component: ReservationComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.Admin, Role.Professional] //TODO Customer not allowed
+      roles: [Role.admin, Role.professional] //TODO Customer not allowed
     }
   },
   {
     path: 'reservation/:id', component: ReservationDetailComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.Admin, Role.Professional]
+      roles: [Role.admin, Role.professional]
     }, runGuardsAndResolvers: 'always'
   },
   {
     path: 'calendar', component: CalendarComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService],
     data: {
-      roles: [Role.Admin, Role.Professional]
+      roles: [Role.admin, Role.professional]
     }
   },
   {
     path: 'assignments', component: AssignmentsComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService],
     data: {
-      roles: [Role.Professional]
+      roles: [Role.professional]
     }
   },
   {
     path: 'notifications', component: NotificationsComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService],
     data: {
-      roles: [Role.Admin, Role.Professional, Role.Customer]
+      roles: [Role.admin, Role.professional, Role.customer]
     }
   }
 ];

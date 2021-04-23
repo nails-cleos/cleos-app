@@ -12,7 +12,7 @@ import { AppState, selectProductState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
 import * as fromActionsProduct from '../../store/product.actions';
 import { DialogComponent } from '../../dialog/dialog.component';
-import { ConvertDuration } from '../../util/dates';
+import { convertDuration } from '../../util/dates';
 
 @Component({
   selector: 'app-products',
@@ -20,6 +20,8 @@ import { ConvertDuration } from '../../util/dates';
   styleUrls: ['./products.component.scss']
 })
 export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   displayedColumns: string[] = ['position', 'name', 'description', 'price', 'duration', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IProduct>>();
@@ -29,9 +31,6 @@ export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
   resultsLength = 0;
   pageSize = PAGE_SIZE;
   error: any;
-
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
               private store: Store<AppState>, private cdRef: ChangeDetectorRef) {
@@ -101,7 +100,7 @@ export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       this.dataSource = stateValue.data?.content?.map((product: IProduct) => {
         if (product.duration) {
-          const duration = ConvertDuration(product.duration);
+          const duration = convertDuration(product.duration);
 
           return Object.assign({}, product, {hour: duration.hour, minute: duration.minute});
         }

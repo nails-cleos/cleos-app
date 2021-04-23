@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectCatalogueState } from '../store/app.states';
 import * as fromActionsCatalogue from '../store/catalogue.actions';
 import { Catalogue, ICatalogue } from '../interfaces/catalogue';
-import { FormatBytes } from '../util/file';
+import { formatBytes } from '../util/file';
 
 @Component({
   selector: 'app-catalogue',
@@ -69,7 +69,7 @@ export class CatalogueComponent implements OnInit, OnDestroy {
   }
 
   formatBytes(bytes: any, decimals: number): string {
-    return FormatBytes(bytes, decimals);
+    return formatBytes(bytes, decimals);
   }
 
   private createForm(): void {

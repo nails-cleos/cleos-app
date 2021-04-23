@@ -2,7 +2,7 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ChartOptions, ChartType } from 'chart.js';
 import { Label, SingleDataSet } from 'ng2-charts';
 import { IReservationAll } from '../../interfaces/reservation';
-import { MonthlyReservation } from '../../util/chart';
+import { monthlyReservationChart } from '../../util/chart';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
@@ -44,7 +44,7 @@ export class MonthlyReservationsChartComponent implements OnChanges {
         this.error = this.state.error;
         return;
       }
-      const chartResult = MonthlyReservation(this.state.data, this.locale);
+      const chartResult = monthlyReservationChart(this.state.data, this.locale);
       if (chartResult) {
         this.pieChartData = chartResult.chartData;
         this.pieChartLabels = chartResult.chartLabels;

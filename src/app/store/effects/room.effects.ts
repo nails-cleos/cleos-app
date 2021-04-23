@@ -13,116 +13,88 @@ import { UserService } from '../../services/user.service';
 export class RoomEffects {
 
   @Effect()
-  getAll$ = this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.GET_ALL)).pipe(
+  getAll$ = this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.getAll)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.roomService.getAll(payload.active, payload.direction, payload.page).pipe(
-        switchMap((response: any) => {
-          return of(new fromActionsRoom.RoomSuccess(response));
-        }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
-      );
-    })
+    switchMap((payload: any) => this.roomService.getAll(payload.active, payload.direction, payload.page).pipe(
+      switchMap((response: any) => of(new fromActionsRoom.RoomSuccess(response))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
+    ))
   );
 
   @Effect()
-  getMyRoom$ = this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.GET_MY_ROOM)).pipe(
+  getMyRoom$ = this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.getMyRoom)).pipe(
     map((action: any) => action.payload),
-    switchMap(() => {
-      return this.roomService.getMyRoom().pipe(
-        switchMap((room: any) => {
-          return of(new fromActionsRoom.RoomSelected({room}));
-        }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
-      );
-    })
+    switchMap(() => this.roomService.getMyRoom().pipe(
+      switchMap((room: any) => of(new fromActionsRoom.RoomSelected({room}))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
+    ))
   );
 
   @Effect()
-  getAllProfessional$ = this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.GET_ALL_PROFESSIONAL)).pipe(
+  getAllProfessional$ = this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.getAllProfessional)).pipe(
     map((action: any) => action.payload),
-    switchMap(() => {
-      return this.userService.getAllProfessionals().pipe(
-        switchMap((response: any) => {
-          return of(new fromActionsRoom.RoomSuccess(response));
-        }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
-      );
-    })
+    switchMap(() => this.userService.getAllProfessionals().pipe(
+      switchMap((response: any) => of(new fromActionsRoom.RoomSuccess(response))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
+    ))
   );
 
   @Effect()
-  findOne$ = this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.ROOM_FIND)).pipe(
+  findOne$ = this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.roomFind)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.roomService.getById(payload).pipe(
-        switchMap((room: any) => {
-          return of(new fromActionsRoom.RoomSelected({room, redirect: true}));
-        }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
-      );
-    })
+    switchMap((payload: any) => this.roomService.getById(payload).pipe(
+      switchMap((room: any) => of(new fromActionsRoom.RoomSelected({room, redirect: true}))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
+    ))
   );
 
   @Effect()
-  save$ = this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.ROOM_SAVE)).pipe(
+  save$ = this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.roomSave)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.roomService.add(payload).pipe(
-        switchMap((response: any) => {
-          const message = this.translate.instant('ROOM.ADD.CREATED', {name: response.name});
-          return of(new fromActionsRoom.RoomSaveSuccess({message, redirect: true}));
-        }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
-      );
-    })
+    switchMap((payload: any) => this.roomService.add(payload).pipe(
+      switchMap((response: any) => {
+        const message = this.translate.instant('ROOM.ADD.CREATED', {name: response.name});
+        return of(new fromActionsRoom.RoomSaveSuccess({message, redirect: true}));
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
+    ))
   );
 
   @Effect()
-  update$ = this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.ROOM_UPDATE)).pipe(
+  update$ = this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.roomUpdate)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.roomService.update(payload).pipe(
-        switchMap((response: any) => {
-          const message = this.translate.instant('ROOM.UPDATED.MESSAGE', {name: response.name});
-          return of(new fromActionsRoom.RoomSaveSuccess({message, redirect: true}));
-        }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
-      );
-    })
+    switchMap((payload: any) => this.roomService.update(payload).pipe(
+      switchMap((response: any) => {
+        const message = this.translate.instant('ROOM.UPDATED.MESSAGE', {name: response.name});
+        return of(new fromActionsRoom.RoomSaveSuccess({message, redirect: true}));
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
+    ))
   );
 
   @Effect()
-  updateMe$ = this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.ROOM_UPDATE_ME)).pipe(
+  updateMe$ = this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.roomUpdateMe)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.roomService.update(payload).pipe(
-        switchMap((response: any) => {
-          const message = this.translate.instant('ROOM.UPDATED.MESSAGE', {name: response.name});
-          return of(new fromActionsRoom.RoomSaveSuccess({message}));
-        }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
-      );
-    })
+    switchMap((payload: any) => this.roomService.update(payload).pipe(
+      switchMap((response: any) => {
+        const message = this.translate.instant('ROOM.UPDATED.MESSAGE', {name: response.name});
+        return of(new fromActionsRoom.RoomSaveSuccess({message}));
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
+    ))
   );
 
   @Effect()
-  delete$ = this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.ROOM_DELETE)).pipe(
+  delete$ = this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.roomDelete)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.roomService.delete(payload).pipe(
-        switchMap((response: any) => {
-          const message = this.translate.instant('ROOM.DELETED.MESSAGE', {name: response.name});
-          return of(new fromActionsRoom.RoomSaveSuccess({message, redirect: true}));
-        }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
-      );
-    })
+    switchMap((payload: any) => this.roomService.delete(payload).pipe(
+      switchMap((response: any) => {
+        const message = this.translate.instant('ROOM.DELETED.MESSAGE', {name: response.name});
+        return of(new fromActionsRoom.RoomSaveSuccess({message, redirect: true}));
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
+    ))
   );
 
   @Effect({dispatch: false})
   selectedData$ = this.actions$.pipe(
-    ofType(fromActionsRoom.RoomActionTypes.ROOM_SELECTED),
+    ofType(fromActionsRoom.RoomActionTypes.roomSelected),
     tap((data: any) => {
       if (data.payload.redirect) {
         this.router.navigate(['room', data.payload.room.id]);
@@ -132,12 +104,12 @@ export class RoomEffects {
 
   @Effect({dispatch: false})
   dataSuccess$ = this.actions$.pipe(
-    ofType(fromActionsRoom.RoomActionTypes.ROOM_SUCCESS)
+    ofType(fromActionsRoom.RoomActionTypes.roomSuccess)
   );
 
   @Effect({dispatch: false})
   saveSuccess$ = this.actions$.pipe(
-    ofType(fromActionsRoom.RoomActionTypes.ROOM_SAVE_SUCCESS),
+    ofType(fromActionsRoom.RoomActionTypes.roomSaveSuccess),
     tap((data: any) => {
       if (data.payload.redirect) {
         this.router.navigate(['rooms']);

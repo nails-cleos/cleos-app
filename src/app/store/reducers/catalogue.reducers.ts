@@ -22,9 +22,9 @@ export const initialState: State = {
   isLoading: false
 };
 
-export function reducer(state = initialState, action: All): State {
+export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case CatalogueActionTypes.GET_ALL: {
+    case CatalogueActionTypes.getAll: {
       return {
         ...state,
         // @ts-ignore
@@ -36,7 +36,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
-    case CatalogueActionTypes.CATALOGUE_FIND: {
+    case CatalogueActionTypes.catalogueFind: {
       return {
         ...state,
         // @ts-ignore
@@ -48,7 +48,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
-    case CatalogueActionTypes.CATALOGUE_SUCCESS: {
+    case CatalogueActionTypes.catalogueSuccess: {
       return {
         ...state,
         data: action.payload,
@@ -58,7 +58,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case CatalogueActionTypes.CATALOGUE_SAVE_SUCCESS: {
+    case CatalogueActionTypes.catalogueSaveSuccess: {
       return {
         ...state,
         message: action.payload.message,
@@ -67,7 +67,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case CatalogueActionTypes.CATALOGUE_SELECTED: {
+    case CatalogueActionTypes.catalogueSelected: {
       return {
         ...state,
         selected: action.payload,
@@ -77,7 +77,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case CatalogueActionTypes.CATALOGUE_FAILURE: {
+    case CatalogueActionTypes.catalogueFailure: {
       return {
         ...state,
         errorMessage: action.payload.error.message,
@@ -87,7 +87,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case CatalogueActionTypes.CATALOGUE_UPDATE_ALL: {
+    case CatalogueActionTypes.catalogueUpdateAll: {
       return {
         ...state,
         // @ts-ignore
@@ -98,9 +98,9 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
-    case CatalogueActionTypes.CATALOGUE_UPDATE:
-    case CatalogueActionTypes.CATALOGUE_SAVE:
-    case CatalogueActionTypes.CATALOGUE_DELETE: {
+    case CatalogueActionTypes.catalogueUpdate:
+    case CatalogueActionTypes.catalogueSave:
+    case CatalogueActionTypes.catalogueDelete: {
       return {
         ...state,
         errorMessage: null,
@@ -109,11 +109,11 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
-    case CatalogueActionTypes.CLEAN: {
+    case CatalogueActionTypes.clean: {
       return initialState;
     }
     default: {
       return state;
     }
   }
-}
+};

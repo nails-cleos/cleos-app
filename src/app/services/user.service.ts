@@ -82,13 +82,13 @@ export class UserService {
   public setRole(userId: string, role: Role): Observable<IUser> {
     let roleName;
     switch (role) {
-      case Role.Admin:
+      case Role.admin:
         roleName = 'admin';
         break;
-      case Role.Professional:
+      case Role.professional:
         roleName = 'professional';
         break;
-      case Role.Customer:
+      case Role.customer:
       default:
         roleName = 'customer';
         break;

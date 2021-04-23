@@ -24,9 +24,9 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   step = 0;
   icons: IIcon = {
-    week: IconName.event_busy,
-    saturday: IconName.event_busy,
-    sunday: IconName.event_busy
+    week: IconName.eventBusy,
+    saturday: IconName.eventBusy,
+    sunday: IconName.eventBusy
   };
   weekDate?: IAvailabilityDate;
   satDate?: IAvailabilityDate;
@@ -93,7 +93,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ignore(day: string, step: number): void {
-    this.setIcon(day, IconName.event_busy);
+    this.setIcon(day, IconName.eventBusy);
     const index = this.availabilities.findIndex((e) => e.day === day);
     if (index > -1) {
       this.availabilities.splice(index, 1);
@@ -102,7 +102,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   addAvailability(availability: IAvailability, step: number): void {
-    this.setIcon(availability.day, IconName.event_available);
+    this.setIcon(availability.day, IconName.eventAvailable);
     const index = this.availabilities.findIndex((e) => e.day === availability.day);
 
     if (index !== -1) {
@@ -116,7 +116,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   validate(): boolean {
     let step = -1;
     this.errors = [];
-    switch (IconName.calendar_today) {
+    switch (IconName.calendarToday) {
       case this.icons.week:
         step = 0;
         break;

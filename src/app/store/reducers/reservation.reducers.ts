@@ -33,9 +33,9 @@ export const initialState: State = {
   isLoading: false
 };
 
-export function reducer(state = initialState, action: All): State {
+export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case ReservationActionTypes.GET_ALL: {
+    case ReservationActionTypes.getAll: {
       return {
         ...state,
         data: null,
@@ -46,8 +46,8 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
-    case ReservationActionTypes.GET_ALL_ASSIGNMENT_PAGE:
-    case ReservationActionTypes.GET_ALL_PAGE: {
+    case ReservationActionTypes.getAllAssignmentPage:
+    case ReservationActionTypes.getAllPage: {
       return {
         ...state,
         // @ts-ignore
@@ -58,8 +58,8 @@ export function reducer(state = initialState, action: All): State {
         message: null
       };
     }
-    case ReservationActionTypes.SEARCH_RESERVATION:
-    case ReservationActionTypes.GET_ALL_GROUPING_BY_ROOM: {
+    case ReservationActionTypes.searchReservation:
+    case ReservationActionTypes.getAllGroupingByRoom: {
       return {
         ...state,
         data: null,
@@ -70,7 +70,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
-    case ReservationActionTypes.GET_CUSTOMERS: {
+    case ReservationActionTypes.getCustomers: {
       return {
         ...state,
         customers: null,
@@ -81,7 +81,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
-    case ReservationActionTypes.GET_ROOMS: {
+    case ReservationActionTypes.getRooms: {
       return {
         ...state,
         rooms: null,
@@ -92,7 +92,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
-    case ReservationActionTypes.GET_PRODUCTS: {
+    case ReservationActionTypes.getProducts: {
       return {
         ...state,
         products: null,
@@ -103,12 +103,12 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
-    case ReservationActionTypes.APPROVE:
-    case ReservationActionTypes.EDIT:
-    case ReservationActionTypes.START:
-    case ReservationActionTypes.COMPLETE:
-    case ReservationActionTypes.CANCEL:
-    case ReservationActionTypes.RESERVATION_FIND: {
+    case ReservationActionTypes.approve:
+    case ReservationActionTypes.edit:
+    case ReservationActionTypes.start:
+    case ReservationActionTypes.complete:
+    case ReservationActionTypes.cancel:
+    case ReservationActionTypes.reservationFind: {
       return {
         ...state,
         data: {} as IReservation,
@@ -120,7 +120,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
-    case ReservationActionTypes.RESERVATION_PAGE_SUCCESS: {
+    case ReservationActionTypes.reservationPageSuccess: {
       return {
         ...state,
         page: action.payload,
@@ -131,7 +131,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case ReservationActionTypes.RESERVATION_SUCCESS: {
+    case ReservationActionTypes.reservationSuccess: {
       return {
         ...state,
         data: action.payload,
@@ -141,7 +141,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case ReservationActionTypes.RESERVATION_CUSTOMERS_SUCCESS: {
+    case ReservationActionTypes.reservationCustomersSuccess: {
       return {
         ...state,
         customers: action.payload,
@@ -151,7 +151,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case ReservationActionTypes.RESERVATION_ROOMS_SUCCESS: {
+    case ReservationActionTypes.reservationRoomsSuccess: {
       return {
         ...state,
         rooms: action.payload,
@@ -161,7 +161,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case ReservationActionTypes.RESERVATION_PRODUCTS_SUCCESS: {
+    case ReservationActionTypes.reservationProductsSuccess: {
       return {
         ...state,
         products: action.payload,
@@ -171,8 +171,8 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case ReservationActionTypes.STATE_SUCCESS:
-    case ReservationActionTypes.RESERVATION_SAVE_SUCCESS: {
+    case ReservationActionTypes.stateSuccess:
+    case ReservationActionTypes.reservationSaveSuccess: {
       return {
         ...state,
         message: action.payload.message,
@@ -181,7 +181,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case ReservationActionTypes.RESERVATION_SELECTED: {
+    case ReservationActionTypes.reservationSelected: {
       return {
         ...state,
         selected: action.payload,
@@ -191,7 +191,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case ReservationActionTypes.RESERVATION_FAILURE: {
+    case ReservationActionTypes.reservationFailure: {
       return {
         ...state,
         errorMessage: action.payload.error.message,
@@ -201,8 +201,8 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case ReservationActionTypes.RESERVATION_SAVE:
-    case ReservationActionTypes.RESERVATION_DELETE: {
+    case ReservationActionTypes.reservationSave:
+    case ReservationActionTypes.reservationDelete: {
       return {
         ...state,
         errorMessage: null,
@@ -211,11 +211,11 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
-    case ReservationActionTypes.CLEAN: {
+    case ReservationActionTypes.clean: {
       return initialState;
     }
     default: {
       return state;
     }
   }
-}
+};

@@ -6,9 +6,9 @@ import { ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectCatalogueState } from '../../store/app.states';
-import { FieldChange } from '../../util/validators';
+import { fieldChange } from '../../util/validators';
 import * as fromActionsCatalogue from '../../store/catalogue.actions';
-import { FormatBytes } from '../../util/file';
+import { formatBytes } from '../../util/file';
 import { DialogComponent } from '../../dialog/dialog.component';
 import * as fromActionsProduct from '../../store/product.actions';
 import { TranslateService } from '@ngx-translate/core';
@@ -59,8 +59,8 @@ export class CatalogueDetailComponent implements OnInit, AfterViewInit, OnDestro
     }
     const catalogue: ICatalogue = new Catalogue();
     catalogue.id = this.catalogue?.id;
-    catalogue.name = FieldChange(this.name, this.catalogue?.name);
-    catalogue.description = FieldChange(this.form.value?.description, this.catalogue?.description);
+    catalogue.name = fieldChange(this.name, this.catalogue?.name);
+    catalogue.description = fieldChange(this.form.value?.description, this.catalogue?.description);
 
     this.store.dispatch(new fromActionsCatalogue.CatalogueUpdate({catalogue, file: this.file}));
   }
@@ -95,7 +95,7 @@ export class CatalogueDetailComponent implements OnInit, AfterViewInit, OnDestro
   }
 
   formatBytes(bytes: any, decimals: number): string {
-    return FormatBytes(bytes, decimals);
+    return formatBytes(bytes, decimals);
   }
 
   private createForm(): void {

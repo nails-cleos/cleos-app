@@ -19,9 +19,9 @@ export const initialState: State = {
   isLoading: false
 };
 
-export function reducer(state = initialState, action: All): State {
+export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case NotificationActionTypes.NOTIFICATION_PAGE: {
+    case NotificationActionTypes.notificationPage: {
       return {
         ...state,
         // @ts-ignore
@@ -32,7 +32,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
-    case NotificationActionTypes.NOTIFICATION_SUCCESS: {
+    case NotificationActionTypes.notificationSuccess: {
       return {
         ...state,
         data: action.payload,
@@ -42,7 +42,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case NotificationActionTypes.NOTIFICATION_READ_SUCCESS: {
+    case NotificationActionTypes.notificationReadSuccess: {
       return {
         ...state,
         errorMessage: null,
@@ -50,7 +50,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case NotificationActionTypes.NOTIFICATION_FAILURE: {
+    case NotificationActionTypes.notificationFailure: {
       return {
         ...state,
         errorMessage: action.payload.error.message,
@@ -60,7 +60,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case NotificationActionTypes.NOTIFICATION_READ: {
+    case NotificationActionTypes.notificationRead: {
       return {
         ...state,
         data: null,
@@ -70,11 +70,11 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
-    case NotificationActionTypes.CLEAN: {
+    case NotificationActionTypes.clean: {
       return initialState;
     }
     default: {
       return state;
     }
   }
-}
+};

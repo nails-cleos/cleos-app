@@ -14,11 +14,12 @@ import { Pagination } from '../../interfaces/pagination';
 import { TranslateService } from '@ngx-translate/core';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { Role } from '../../interfaces/token';
+import { snakeToCamel } from '../../util/helper';
 
 enum RoleIconName {
-  ROLE_CUSTOMER = 'perm_identity',
-  ROLE_PROFESSIONAL = 'manage_accounts',
-  ROLE_ADMIN = 'supervisor_account'
+  roleCustomer = 'perm_identity',
+  roleProfessional = 'manage_accounts',
+  roleAdmin = 'supervisor_account'
 }
 
 @Component({
@@ -34,6 +35,8 @@ enum RoleIconName {
   ]
 })
 export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   displayedColumns: string[] = ['position', 'name', 'username', 'email', 'provider', 'status', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IUser>>();
@@ -41,14 +44,11 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   expandedUser: IUser | undefined;
   getState: Observable<any>;
 
-  allRole: Role[] = [Role.Customer, Role.Professional, Role.Admin];
+  allRole: Role[] = [Role.customer, Role.professional, Role.admin];
   error: any;
 
   resultsLength = 0;
   pageSize = PAGE_SIZE;
-
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
               private store: Store<AppState>, private cdRef: ChangeDetectorRef) {
@@ -119,8 +119,9 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getIcon(name: any): any {
+    const iconName = snakeToCamel(name);
     // @ts-ignore
-    return RoleIconName[name];
+    return RoleIconName[iconName];
   }
 
   addRole(user: IUserAll, role: Role): void {

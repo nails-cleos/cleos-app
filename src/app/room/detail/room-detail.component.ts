@@ -7,7 +7,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../store/app.states';
 import * as fromActionsRoom from '../../store/room.actions';
-import { FieldChange } from '../../util/validators';
+import { fieldChange } from '../../util/validators';
 import { IconName, IIcon } from '../room.component';
 
 @Component({
@@ -26,9 +26,9 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   step = 0;
   icons: IIcon = {
-    week: IconName.event_busy,
-    saturday: IconName.event_busy,
-    sunday: IconName.event_busy
+    week: IconName.eventBusy,
+    saturday: IconName.eventBusy,
+    sunday: IconName.eventBusy
   };
   weekDate?: IAvailabilityDate;
   satDate?: IAvailabilityDate;
@@ -81,7 +81,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     const room: IRoom = new Room();
     room.id = this.room?.id;
-    room.name = FieldChange(this.name, this.room?.name);
+    room.name = fieldChange(this.name, this.room?.name);
     room.availabilities = this.availabilities;
     const location = this.address.value.geometry.location;
     room.address = {
@@ -97,7 +97,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   addAvailability(availability: IAvailability, step: number): void {
-    this.setIcon(availability.day, IconName.event_available);
+    this.setIcon(availability.day, IconName.eventAvailable);
     const index = this.availabilities.findIndex((e) => e.day === availability.day);
 
     if (index !== -1) {
@@ -109,7 +109,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ignore(day: string, step: number): void {
-    this.setIcon(day, IconName.event_busy);
+    this.setIcon(day, IconName.eventBusy);
     const index = this.availabilities.findIndex((e) => e.day === day);
     if (index > -1) {
       this.availabilities.splice(index, 1);
@@ -205,7 +205,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     let step = -1;
     this.errors = [];
-    switch (IconName.calendar_today) {
+    switch (IconName.calendarToday) {
       case this.icons.week:
         step = 0;
         break;

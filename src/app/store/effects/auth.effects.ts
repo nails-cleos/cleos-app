@@ -13,27 +13,21 @@ import { Role } from '../../interfaces/token';
 export class LoginEffects {
 
   @Effect()
-  login$ = this.actions$.pipe(ofType(AuthActionTypes.LOGIN)).pipe(
+  login$ = this.actions$.pipe(ofType(AuthActionTypes.login)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.authService.login(payload.username, payload.password).pipe(
-        switchMap((response: any) => {
-          return of(new LoginSuccess({response, queryParams: payload.queryParams}));
-        }),
-        catchError((err: HttpErrorResponse) => of(new LoginFailure({error: err.error})))
-      );
-    })
+    switchMap((payload: any) => this.authService.login(payload.username, payload.password).pipe(
+      switchMap((response: any) => of(new LoginSuccess({response, queryParams: payload.queryParams}))),
+      catchError((err: HttpErrorResponse) => of(new LoginFailure({error: err.error})))
+    ))
   );
 
   @Effect()
-  socialLogin$ = this.actions$.pipe(ofType(AuthActionTypes.SOCIAL_LOGIN)).pipe(
+  socialLogin$ = this.actions$.pipe(ofType(AuthActionTypes.socialLogin)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => {
       const user = payload.socialUser;
       return this.authService.socialLogin(user.idToken || user.authToken, user.provider).pipe(
-        switchMap((response: any) => {
-          return of(new LoginSuccess({response, queryParams: payload.queryParams}));
-        }),
+        switchMap((response: any) => of(new LoginSuccess({response, queryParams: payload.queryParams}))),
         catchError((err: HttpErrorResponse) => of(new LoginFailure({error: err.error})))
       );
     })
@@ -41,9 +35,9 @@ export class LoginEffects {
 
   @Effect({dispatch: false})
   loginSuccess$ = this.actions$.pipe(
-    ofType(AuthActionTypes.LOGIN_SUCCESS),
+    ofType(AuthActionTypes.loginSuccess),
     tap((response: any) => {
-      const roles = [Role.Admin, Role.Professional];
+      const roles = [Role.admin, Role.professional];
       const dash = response.payload.response.user.authorities.some((au: any) => roles.includes(au.authority)) ? 'dashboard' : 'main';
       const redirectUrl = response.payload.response.user.changePassword
         ? 'change-password'
@@ -54,81 +48,68 @@ export class LoginEffects {
 
   @Effect({dispatch: false})
   logInFailure$ = this.actions$.pipe(
-    ofType(AuthActionTypes.LOGIN_FAILURE)
+    ofType(AuthActionTypes.loginFailure)
   );
 
   @Effect()
-  signUp$ = this.actions$.pipe(ofType(AuthActionTypes.SIGNUP)).pipe(
+  signUp$ = this.actions$.pipe(ofType(AuthActionTypes.signup)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.authService.signUp(payload).pipe(
-        switchMap((response: any) => {
-          const message = this.translate.instant('AUTH.SIGN_UP.SUCCESS', {username: response.username, email: response.email});
-          return of(new SignUpSuccess({message}));
-        }),
-        catchError((err: HttpErrorResponse) => of(new SignUpFailure({error: err.error})))
-      );
-    })
+    switchMap((payload: any) => this.authService.signUp(payload).pipe(
+      switchMap((response: any) => {
+        const message = this.translate.instant('AUTH.SIGN_UP.SUCCESS', {username: response.username, email: response.email});
+        return of(new SignUpSuccess({message}));
+      }), catchError((err: HttpErrorResponse) => of(new SignUpFailure({error: err.error})))
+    ))
   );
 
   @Effect()
-  activateAccount$ = this.actions$.pipe(ofType(AuthActionTypes.ACTIVATE_ACCOUNT)).pipe(
+  activateAccount$ = this.actions$.pipe(ofType(AuthActionTypes.activateAccount)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.authService.activateAccount(payload).pipe(
-        switchMap(() => {
-          const message = this.translate.instant('AUTH.ACTIVATE_ACCOUNT.MESSAGE');
-          return of(new SignUpSuccess({message}));
-        }),
-        catchError((err: HttpErrorResponse) => of(new SignUpFailure({error: err.error})))
-      );
-    })
+    switchMap((payload: any) => this.authService.activateAccount(payload).pipe(
+      switchMap(() => {
+        const message = this.translate.instant('AUTH.ACTIVATE_ACCOUNT.MESSAGE');
+        return of(new SignUpSuccess({message}));
+      }), catchError((err: HttpErrorResponse) => of(new SignUpFailure({error: err.error})))
+    ))
   );
 
   @Effect()
-  forgotPassword$ = this.actions$.pipe(ofType(AuthActionTypes.FORGOT_PASSWORD)).pipe(
+  forgotPassword$ = this.actions$.pipe(ofType(AuthActionTypes.forgotPassword)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.authService.forgotPassword(payload).pipe(
+    switchMap((payload: any) => this.authService.forgotPassword(payload).pipe(
         switchMap(() => {
           const message = this.translate.instant('AUTH.FORGOT_PASSWORD.MESSAGE');
           return of(new SignUpSuccess({message}));
         }),
         catchError((err: HttpErrorResponse) => of(new SignUpFailure({error: err.error})))
-      );
-    })
+      ))
   );
 
   @Effect()
-  recoveryPassword$ = this.actions$.pipe(ofType(AuthActionTypes.RECOVERY_PASSWORD)).pipe(
+  recoveryPassword$ = this.actions$.pipe(ofType(AuthActionTypes.recoveryPassword)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.authService.recoveryPassword(payload.token, payload.password).pipe(
-        switchMap(() => {
-          const message = this.translate.instant('AUTH.RECOVERY_PASSWORD.MESSAGE');
-          return of(new SignUpSuccess({message}));
-        }),
-        catchError((err: HttpErrorResponse) => of(new SignUpFailure({error: err.error})))
-      );
-    })
+    switchMap((payload: any) => this.authService.recoveryPassword(payload.token, payload.password).pipe(
+      switchMap(() => {
+        const message = this.translate.instant('AUTH.RECOVERY_PASSWORD.MESSAGE');
+        return of(new SignUpSuccess({message}));
+      }), catchError((err: HttpErrorResponse) => of(new SignUpFailure({error: err.error})))
+    ))
   );
 
   @Effect({dispatch: false})
   signUpSuccess$ = this.actions$.pipe(
-    ofType(AuthActionTypes.SIGNUP_SUCCESS),
-    tap(() => {
-      window.location.href = '/auth';
-    })
+    ofType(AuthActionTypes.signupSuccess),
+    tap(() => window.location.href = '/auth')
   );
 
   @Effect({dispatch: false})
   signUpFailure$ = this.actions$.pipe(
-    ofType(AuthActionTypes.SIGNUP_FAILURE)
+    ofType(AuthActionTypes.signupFailure)
   );
 
   @Effect({dispatch: false})
   public logOut$ = this.actions$.pipe(
-    ofType(AuthActionTypes.LOGOUT),
+    ofType(AuthActionTypes.logout),
     tap(() => {
       localStorage.removeItem('auth');
       window.location.href = '/auth';

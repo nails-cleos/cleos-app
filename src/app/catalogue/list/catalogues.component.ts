@@ -16,6 +16,8 @@ import { map, shareReplay } from 'rxjs/operators';
   styleUrls: ['./catalogues.component.scss']
 })
 export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChildren(CdkDropList) dropsQuery!: QueryList<CdkDropList>;
+
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(
       map(result => result.matches),
@@ -25,8 +27,6 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
   subscription: Subscription | undefined;
   getState: Observable<any>;
   error: any;
-
-  @ViewChildren(CdkDropList) dropsQuery!: QueryList<CdkDropList>;
   drops: CdkDropList[] = [];
 
   catalogues: ICatalogueAll[] = [];

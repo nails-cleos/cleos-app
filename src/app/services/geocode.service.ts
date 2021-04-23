@@ -17,8 +17,7 @@ export class GeocodeService {
   geocodeAddress(lat: number, lng: number): Observable<any> {
     return this.waitForMapsToLoad().pipe(
       // filter(loaded => loaded),
-      switchMap(() => {
-        return new Observable(observer => {
+      switchMap(() => new Observable(observer => {
           const latLng = new google.maps.LatLng(lat, lng);
           this.geocoder.geocode({location: latLng}, (results: GeocoderResult[], status: GeocoderStatus) => {
             if (status === google.maps.GeocoderStatus.OK) {
@@ -29,8 +28,7 @@ export class GeocodeService {
             }
             observer.complete();
           });
-        });
-      })
+        }))
     );
   }
 

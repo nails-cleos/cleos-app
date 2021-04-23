@@ -2,7 +2,7 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
 import { Color, Label } from 'ng2-charts';
 import { IReservationAll } from '../../interfaces/reservation';
-import { LastMonthReservation } from '../../util/chart';
+import { lastMonthReservationChart } from '../../util/chart';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
@@ -53,7 +53,7 @@ export class LastMonthReservationsChartComponent implements OnChanges {
         this.error = this.state.error;
         return;
       }
-      const chartResult = LastMonthReservation(this.state.data, this.locale, this.label);
+      const chartResult = lastMonthReservationChart(this.state.data, this.locale, this.label);
       if (chartResult) {
         this.lineChartData = chartResult.chartDataSet;
         this.lineChartLabels = chartResult.chartLabels;

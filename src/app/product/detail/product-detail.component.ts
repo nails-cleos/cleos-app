@@ -6,9 +6,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectProductState } from '../../store/app.states';
 import * as fromActionsProduct from '../../store/product.actions';
-import { FieldChange } from '../../util/validators';
+import { fieldChange } from '../../util/validators';
 import { IProduct, Product } from '../../interfaces/product';
-import { ConvertDuration } from '../../util/dates';
+import { convertDuration } from '../../util/dates';
 
 @Component({
   selector: 'app-product-detail',
@@ -58,9 +58,9 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     }
     const product: IProduct = new Product();
     product.id = this.product?.id;
-    product.name = FieldChange(this.name, this.product?.name);
-    product.description = FieldChange(this.form.value?.description, this.product?.description);
-    product.price = FieldChange(this.price, this.product?.price);
+    product.name = fieldChange(this.name, this.product?.name);
+    product.description = fieldChange(this.form.value?.description, this.product?.description);
+    product.price = fieldChange(this.price, this.product?.price);
 
     const durationTime = this.durationDate.value;
     const durationHours = `0${durationTime.getHours()}`.slice(-2);
@@ -89,7 +89,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
           price: state.selected.price
         } as IProduct;
 
-        const duration = ConvertDuration(state.selected.duration);
+        const duration = convertDuration(state.selected.duration);
         this.product.durationDate = new Date(new Date().setHours(duration.hour, duration.minute));
         this.form.patchValue(this.product);
       }

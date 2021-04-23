@@ -12,92 +12,71 @@ import { Router } from '@angular/router';
 export class ProductEffects {
 
   @Effect()
-  getAll$ = this.actions$.pipe(ofType(fromActionsProduct.ProductActionTypes.GET_ALL)).pipe(
+  getAll$ = this.actions$.pipe(ofType(fromActionsProduct.ProductActionTypes.getAll)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.productService.getAll(payload.active, payload.direction, payload.page).pipe(
-        switchMap((response: any) => {
-          return of(new fromActionsProduct.ProductSuccess(response));
-        }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsProduct.ProductFailure({error: err.error})))
-      );
-    })
+    switchMap((payload: any) => this.productService.getAll(payload.active, payload.direction, payload.page).pipe(
+      switchMap((response: any) => of(new fromActionsProduct.ProductSuccess(response))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsProduct.ProductFailure({error: err.error})))
+    ))
   );
 
   @Effect()
-  findOne$ = this.actions$.pipe(ofType(fromActionsProduct.ProductActionTypes.PRODUCT_FIND)).pipe(
+  findOne$ = this.actions$.pipe(ofType(fromActionsProduct.ProductActionTypes.productFind)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.productService.getById(payload).pipe(
-        switchMap((product: any) => {
-          return of(new fromActionsProduct.ProductSelected(product));
-        }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsProduct.ProductFailure({error: err.error})))
-      );
-    })
+    switchMap((payload: any) => this.productService.getById(payload).pipe(
+      switchMap((product: any) => of(new fromActionsProduct.ProductSelected(product))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsProduct.ProductFailure({error: err.error})))
+    ))
   );
 
   @Effect()
-  save$ = this.actions$.pipe(ofType(fromActionsProduct.ProductActionTypes.PRODUCT_SAVE)).pipe(
+  save$ = this.actions$.pipe(ofType(fromActionsProduct.ProductActionTypes.productSave)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.productService.add(payload).pipe(
-        switchMap((response: any) => {
-          const message = this.translate.instant('PRODUCT.ADD.CREATED', {name: response.name});
-          return of(new fromActionsProduct.ProductSaveSuccess({message}));
-        }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsProduct.ProductFailure({error: err.error})))
-      );
-    })
+    switchMap((payload: any) => this.productService.add(payload).pipe(
+      switchMap((response: any) => {
+        const message = this.translate.instant('PRODUCT.ADD.CREATED', {name: response.name});
+        return of(new fromActionsProduct.ProductSaveSuccess({message}));
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsProduct.ProductFailure({error: err.error})))
+    ))
   );
 
   @Effect()
-  update = this.actions$.pipe(ofType(fromActionsProduct.ProductActionTypes.PRODUCT_UPDATE)).pipe(
+  update = this.actions$.pipe(ofType(fromActionsProduct.ProductActionTypes.productUpdate)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.productService.update(payload).pipe(
-        switchMap((response: any) => {
-          const message = this.translate.instant('PRODUCT.UPDATED.MESSAGE', {name: response.name});
-          return of(new fromActionsProduct.ProductSaveSuccess({message}));
-        }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsProduct.ProductFailure({error: err.error})))
-      );
-    })
+    switchMap((payload: any) => this.productService.update(payload).pipe(
+      switchMap((response: any) => {
+        const message = this.translate.instant('PRODUCT.UPDATED.MESSAGE', {name: response.name});
+        return of(new fromActionsProduct.ProductSaveSuccess({message}));
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsProduct.ProductFailure({error: err.error})))
+    ))
   );
 
   @Effect()
-  delete$ = this.actions$.pipe(ofType(fromActionsProduct.ProductActionTypes.PRODUCT_DELETE)).pipe(
+  delete$ = this.actions$.pipe(ofType(fromActionsProduct.ProductActionTypes.productDelete)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.productService.delete(payload).pipe(
-        switchMap((response: any) => {
-          const message = this.translate.instant('PRODUCT.DELETED.MESSAGE', {name: response.name});
-          return of(new fromActionsProduct.ProductSaveSuccess({message}));
-        }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsProduct.ProductFailure({error: err.error})))
-      );
-    })
+    switchMap((payload: any) => this.productService.delete(payload).pipe(
+      switchMap((response: any) => {
+        const message = this.translate.instant('PRODUCT.DELETED.MESSAGE', {name: response.name});
+        return of(new fromActionsProduct.ProductSaveSuccess({message}));
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsProduct.ProductFailure({error: err.error})))
+    ))
   );
 
   @Effect({dispatch: false})
   selectedData$ = this.actions$.pipe(
-    ofType(fromActionsProduct.ProductActionTypes.PRODUCT_SELECTED),
-    tap((data: any) => {
-      this.router.navigate(['product', data.payload.id]);
-    })
+    ofType(fromActionsProduct.ProductActionTypes.productSelected),
+    tap((data: any) => this.router.navigate(['product', data.payload.id]))
   );
 
   @Effect({dispatch: false})
   dataSuccess$ = this.actions$.pipe(
-    ofType(fromActionsProduct.ProductActionTypes.PRODUCT_SUCCESS)
+    ofType(fromActionsProduct.ProductActionTypes.productSuccess)
   );
 
   @Effect({dispatch: false})
   saveSuccess$ = this.actions$.pipe(
-    ofType(fromActionsProduct.ProductActionTypes.PRODUCT_SAVE_SUCCESS),
-    tap(() => {
-      this.router.navigate(['products']);
-    })
+    ofType(fromActionsProduct.ProductActionTypes.productSaveSuccess),
+    tap(() => this.router.navigate(['products']))
   );
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private productService: ProductService,

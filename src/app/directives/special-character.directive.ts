@@ -4,9 +4,9 @@ import { Directive, HostListener, ElementRef, Input } from '@angular/core';
   selector: '[appSpecialIsAlphaNumeric]'
 })
 export class SpecialCharacterDirective {
+  @Input() isAlphaNumeric: boolean | undefined;
 
   regexStr = '^[a-zA-Z0-9_]*$';
-  @Input() isAlphaNumeric: boolean | undefined;
 
   constructor(private el: ElementRef) {
   }
