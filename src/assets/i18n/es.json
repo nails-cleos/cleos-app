@@ -37,6 +37,11 @@
       "ROLE_PROFESSIONAL": "Profesional",
       "ROLE_ADMIN": "Admin"
     },
+    "REPEAT": {
+      "NONE": "Nunca",
+      "EVERY_DAY": "Todos los dias",
+      "ONCE_A_WEEK": "Una vez a la semana"
+    },
     "NOTIFICATION": {
       "NO": "No hay notificaciones"
     },
@@ -739,6 +744,76 @@
   "NOTIFICATION": {
     "TITLE": "Notificaciones",
     "LOAD_MORE": "Ver mas"
+  },
+  "UNAVAILABLE": {
+    "LIST": {
+      "COLUMN": {
+        "PROFESSIONAL": "Profesional",
+        "DESCRIPTION": "Descripción",
+        "START": "Inicio",
+        "DURATION": "Duración",
+        "REPEAT": "Repetir"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No hay eventos"
+      }
+    },
+    "ADD": {
+      "TITLE": "Agregar no disponible",
+      "DESCRIPTION": {
+        "FIELD": "Descripción"
+      },
+      "PROFESSIONAL": {
+        "FIELD": "Profesional",
+        "REQUIRED": "Profesional es <b>requerido</b>",
+        "INVALID": "Profesional no valido"
+      },
+      "DATE": {
+        "FIELD": "Elegí una fecha",
+        "REQUIRED": "Fecha es <b>requerida</b>"
+      },
+      "TIME": {
+        "FIELD": "Elegí una hora",
+        "REQUIRED": "Hora es <b>requerida</b>"
+      },
+      "DURATION": {
+        "FIELD": "Duración",
+        "REQUIRED": "Duración es <b>requerido</b>"
+      },
+      "REPEAT": {
+        "FIELD": "Repetir"
+      },
+      "CREATED": "No disponible {{date}} creado"
+    },
+    "DETAIL": {
+      "TITLE": "Actualizar producto",
+      "DESCRIPTION": {
+        "FIELD": "Descripción"
+      },
+      "DATE": {
+        "FIELD": "Elegí una fecha",
+        "REQUIRED": "Fecha es <b>requerida</b>"
+      },
+      "TIME": {
+        "FIELD": "Elegí una hora",
+        "REQUIRED": "Hora es <b>requerida</b>"
+      },
+      "DURATION": {
+        "FIELD": "Duración",
+        "REQUIRED": "Duración es <b>requerido</b>"
+      },
+      "REPEAT": {
+        "FIELD": "Repetir"
+      }
+    },
+    "DELETED": {
+      "TITLE": "Eliminar no disponible",
+      "CONTENT": "¿Está seguro de eliminar no disponible {{date}}?",
+      "MESSAGE": "No disponible {{date}} eliminado"
+    },
+    "UPDATED": {
+      "MESSAGE": "No disponible {{date}} actualizado"
+    }
   },
   "APP": {
     "TITLE": "Cleos"

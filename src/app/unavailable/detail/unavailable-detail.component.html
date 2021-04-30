@@ -1,0 +1,103 @@
+<div class="flex-container" fxLayout="column">
+  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
+    <div *ngIf="!error; else errorBox" fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>{{ 'UNAVAILABLE.DETAIL.TITLE' | translate }}</mat-card-title>
+        </mat-card-header>
+        <form (ngSubmit)="update()" [formGroup]="form" novalidate>
+          <mat-card-content *ngIf="unavailable; else boxSkeleton">
+            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+              <mat-form-field appearance="fill">
+                <mat-label>{{ 'ROOM.DETAIL.PROFESSIONAL.FIELD' | translate }}</mat-label>
+                <label>
+                  <input [value]="professionalName" disabled matInput type="text">
+                </label>
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>{{ 'UNAVAILABLE.DETAIL.DESCRIPTION.FIELD' | translate }}</mat-label>
+                <label>
+                  <textarea matInput formControlName="description" #message maxlength="256"></textarea>
+                </label>
+                <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
+              </mat-form-field>
+
+              <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
+                <button mat-icon-button (click)="picker.open()">
+                  <mat-icon>today</mat-icon>
+                </button>
+                <mat-form-field color="primary" appearance="fill" style="margin-right: 12px;">
+                  <mat-label>{{ 'UNAVAILABLE.DETAIL.DATE.FIELD' | translate }}</mat-label>
+                  <label>
+                    <input [formControl]="startDate" (focus)="picker.open()" matInput [matDatepicker]="picker"
+                           (dateChange)="setDate($event, time)" [matDatepickerFilter]="myFilter"
+                           required>
+                  </label>
+                  <mat-datepicker touchUi #picker></mat-datepicker>
+                  <mat-error *ngIf="startDate.hasError('required')"
+                             [innerHTML]="'UNAVAILABLE.DETAIL.DATE.REQUIRED' | translate">
+                  </mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="fill" style="margin-right: 12px;">
+                  <mat-label>{{ 'UNAVAILABLE.DETAIL.TIME.FIELD' | translate }}</mat-label>
+                  <label>
+                    <input (focusin)="focusin()" (timeChange)="setTime($event)" matTimepicker #time="matTimepicker" mode="24h"
+                           [minDate]="minDate" [maxDate]="maxDate"
+                           [formControl]="startTime" cancelLabel="{{ 'COMMON.BUTTON.CANCEL' | translate }}">
+                  </label>
+                  <mat-error *ngIf="startTime.hasError('required')"
+                             [innerHTML]="'UNAVAILABLE.DETAIL.TIME.REQUIRED' | translate">
+                  </mat-error>
+                </mat-form-field>
+              </div>
+
+              <mat-form-field appearance="fill">
+                <mat-label>{{ 'UNAVAILABLE.DETAIL.DURATION.FIELD' | translate }}</mat-label>
+                <label>
+                  <input matTimepicker #t="matTimepicker" mode="24h" [formControl]="durationDate" #t="matTimepicker"
+                         [maxDate]="durationMax"
+                         cancelLabel="{{ 'COMMON.BUTTON.CANCEL' | translate }}" [strict]="true">
+                </label>
+                <span matPrefix>
+                  <mat-icon matPrefix (click)="t.showDialog()">timer</mat-icon> &nbsp;
+                </span>
+                <mat-error *ngIf="durationDate.hasError('required')"
+                           [innerHTML]="'UNAVAILABLE.DETAIL.DURATION.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['duration']">
+                  {{errors['duration']}}
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>{{ 'UNAVAILABLE.DETAIL.REPEAT.FIELD' | translate }}</mat-label>
+                <mat-select [(value)]="repeat">
+                  <mat-option value="NONE">{{ 'COMMON.REPEAT.NONE' | translate }}</mat-option>
+                  <mat-option value="EVERY_DAY">{{ 'COMMON.REPEAT.EVERY_DAY' | translate }}</mat-option>
+                  <mat-option value="ONCE_A_WEEK">{{ 'COMMON.REPEAT.ONCE_A_WEEK' | translate }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+          <ng-template #boxSkeleton>
+            <div class="ssc-hr"></div>
+            <div class="ssc-square mb"></div>
+            <div class="ssc-hr"></div>
+          </ng-template>
+          <mat-card-actions *ngIf="unavailable; else buttonSkeleton">
+            <div fxFlex></div>
+            <button [disabled]="form.invalid || form.pristine" color="primary" mat-raised-button
+                    type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
+            <button color="accent" mat-raised-button
+                    routerLink="/unavailable-list">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+          </mat-card-actions>
+          <ng-template #buttonSkeleton>
+            <div class="ssc-head-line"></div>
+          </ng-template>
+        </form>
+      </mat-card>
+    </div>
+    <ng-template #errorBox>
+      <app-error [error]="error"></app-error>
+    </ng-template>
+  </div>
+</div>

@@ -30,6 +30,9 @@ import { CataloguesComponent } from './catalogue/list/catalogues.component';
 import { CatalogueComponent } from './catalogue/catalogue.component';
 import { CatalogueDetailComponent } from './catalogue/detail/catalogue-detail.component';
 import { CatalogComponent } from './catalog/catalog.component';
+import { UnavailableListComponent } from './unavailable/list/unavailable-list.component';
+import { UnavailableComponent } from './unavailable/unavailable.component';
+import { UnavailableDetailComponent } from './unavailable/detail/unavailable-detail.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/dashboard', pathMatch: 'full', resolve: {model: TranslationLoaderResolver}},
@@ -125,7 +128,7 @@ const routes: Routes = [
   },
   {
     path: 'reservation', component: ReservationComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.professional] //TODO Customer not allowed
+      roles: [Role.admin, Role.professional] // TODO Customer not allowed
     }
   },
   {
@@ -149,6 +152,25 @@ const routes: Routes = [
     path: 'notifications', component: NotificationsComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService],
     data: {
       roles: [Role.admin, Role.professional, Role.customer]
+    }
+  },
+  {
+    path: 'unavailable-list',
+    component: UnavailableListComponent,
+    resolve: {model: TranslationLoaderResolver},
+    canActivate: [AuthGuardService],
+    data: {
+      roles: [Role.admin, Role.professional]
+    }
+  },
+  {
+    path: 'unavailable', component: UnavailableComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.admin, Role.professional]
+    }
+  },
+  {
+    path: 'unavailable/:id', component: UnavailableDetailComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.admin, Role.professional]
     }
   }
 ];

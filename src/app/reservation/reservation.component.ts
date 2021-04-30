@@ -18,13 +18,14 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../dialog/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { convertDuration, Duration, getStartEndDay, IDuration } from '../util/dates';
-import { fillNotAvailable, newEvent } from '../util/event';
+import { convertDuration, Duration, getAvailability, getStartEndDay, IDuration } from '../util/dates';
+import { fillNotAvailable, newEvent, isOverlapEvent } from '../util/event';
 import { Router } from '@angular/router';
 import { DateAdapter } from '@angular/material/core';
 import { findStateColor } from '../util/flags';
 import { GeocoderResult } from '@agm/core';
 import { Role } from '../interfaces/token';
+import { IUnavailableAll } from '../interfaces/unavailable';
 
 @Component({
   selector: 'app-reservation',
@@ -76,6 +77,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   ]);
 
   reservations: IReservationAll[] | undefined;
+  unavailableList: IUnavailableAll[] | undefined;
   viewDate: Date = new Date();
 
   dayStartHour = 9;
@@ -161,17 +163,15 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       });
       const day = this.start.value.getDay();
       let av: IAvailability;
+      const {week, saturday, sunday} = getAvailability(this.room.value);
       switch (day) {
         case 0:
-          const {sunday} = this.getAvailability();
           av = sunday;
           break;
         case 6:
-          const {saturday} = this.getAvailability();
           av = saturday;
           break;
         default:
-          const {week} = this.getAvailability();
           av = week;
           break;
       }
@@ -197,7 +197,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     let result = date > now;
     if (this.room.value) {
       const day = date.getDay();
-      const {week, saturday, sunday} = this.getAvailability();
+      const {week, saturday, sunday} = getAvailability(this.room.value);
       if (!week) {
         result = result && (day === 0 || day === 6);
       }
@@ -209,7 +209,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
     return result;
-  };
+  }
 
   displayFnUser(user: IUser): string {
     return user ? `${user.firstName} ${user.lastName}` : '';
@@ -237,7 +237,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const date = new Date(this.date.value);
     date.setDate(date.getDate() - this.lessDays);
 
-    const {week, saturday, sunday} = this.getAvailability();
+    const {week, saturday, sunday} = getAvailability(this.room.value);
 
     this.setStartEndDay(week, saturday, sunday);
     const unavailable = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.UNAVAILABLE');
@@ -272,7 +272,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
     let title;
     let content;
-    const eventsOverlapping = this.isAnOverlapEvent(start, end);
+    const eventsOverlapping = isOverlapEvent(this.events, start, end);
     if (eventsOverlapping.length && eventsOverlapping[0] !== this.eventSelected) {
       const overlapping = eventsOverlapping.find(e => e.id);
       if (overlapping) {
@@ -432,6 +432,47 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  private addUnavailableList(): void {
+    const weeks = 56;
+    this.unavailableList?.forEach(it => {
+      if (it.duration) {
+        const start = new Date(it.start);
+        switch (it.repeat) {
+          case 'NONE':
+            this.createUnavailableEvent(it.id, start, it.duration, it.description);
+            break;
+          case 'ONCE_A_WEEK':
+            for (let i = 0; i < weeks; i++) {
+              const newDate = new Date(new Date(it.start).setDate(start.getDate() + i * 7));
+              this.createUnavailableEvent(it.id, newDate, it.duration, it.description);
+            }
+            break;
+          case 'EVERY_DAY':
+            for (let i = 0; i < weeks * 7; i++) {
+              const newDate = new Date(new Date(it.start).setDate(start.getDate() + i));
+              this.createUnavailableEvent(it.id, newDate, it.duration, it.description);
+            }
+            break;
+        }
+      }
+    });
+  }
+
+  private createUnavailableEvent(id: string, start: Date, durationTime: string, description?: string): void {
+    const duration = convertDuration(durationTime);
+    const end = new Date(new Date(start).setHours(
+      start.getHours() + duration.hour, start.getMinutes() + duration.minute)
+    );
+    const detail = this.translate.instant('RESERVATION.ADD.EVENT.UNAVAILABLE', {
+      description: description ? description : '',
+      duration: `${duration.hour}:${duration.minute}`
+    });
+
+    const color = findStateColor('DEFAULT');
+    const event = newEvent(detail, color, start, end, '#000', `unavailable/${id}`);
+    this.events = [...this.events, event];
+  }
+
   private getCustomers(): void {
     this.store.dispatch(
       new fromActionsReservation.GetAllCustomers()
@@ -447,9 +488,11 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.rooms?.length === 1) {
         this.room.setValue(this.rooms[0]);
       }
-      if (state.data && Array.isArray(state.data) && !state.isLoading) {
-        this.reservations = state.data;
+      if (state.data && Array.isArray(state.data.reservations) && !state.isLoading) {
+        this.reservations = state.data.reservations;
+        this.unavailableList = state.data.unavailableList;
         this.addReservations();
+        this.addUnavailableList();
         if (this.extras?.date && !this.eventSelected) {
           this.segmentClick(this.date.value, 'CREATED');
         } else if (this.editReservation) {
@@ -502,13 +545,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  private getAvailability(): any {
-    const week: IAvailability = this.room.value.availabilities.filter((el: IAvailability) => el.day === 'WEEK')[0];
-    const saturday: IAvailability = this.room.value.availabilities.filter((el: IAvailability) => el.day === 'SATURDAY')[0];
-    const sunday: IAvailability = this.room.value.availabilities.filter((el: IAvailability) => el.day === 'SUNDAY')[0];
-    return {week, saturday, sunday};
-  }
-
   // private isAnOverlapEvent(eventStartDay: Date, eventEndDay: Date): CalendarEvent | undefined {
   //   return this.events.find((eventA: CalendarEvent) => {
   //     if (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end) {
@@ -534,13 +570,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dayStartMinute = min.getMinutes();
     this.dayEndHour = max.getHours();
     this.dayEndMinute = max.getMinutes();
-  }
-
-  private isAnOverlapEvent(eventStartDay: Date, eventEndDay: Date): CalendarEvent[] {
-    return this.events.filter((eventA: CalendarEvent) => (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
-      || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
-      || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end)
-    );
   }
 
   private filterCustomer(name: string): IUser[] | undefined {

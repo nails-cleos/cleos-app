@@ -3,6 +3,7 @@ import { IProduct, IProductAll } from './product';
 import { IRoom, IRoomAll } from './room';
 import { CalendarEvent } from 'angular-calendar';
 import { ThemePalette } from '@angular/material/core';
+import { IUnavailableAll } from './unavailable';
 
 export interface IReservation {
   id?: string;
@@ -29,6 +30,7 @@ export interface IReservationAll {
 export interface IRoomReservation {
   room: IRoomAll;
   reservations: IReservationAll[];
+  unavailableList: IUnavailableAll[];
 }
 
 export interface IDay {

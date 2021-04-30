@@ -37,6 +37,11 @@
       "ROLE_PROFESSIONAL": "Professional",
       "ROLE_ADMIN": "Admin"
     },
+    "REPEAT": {
+      "NONE": "None",
+      "EVERY_DAY": "Every day",
+      "ONCE_A_WEEK": "Once a week"
+    },
     "NOTIFICATION": {
       "NO": "No notifications"
     },
@@ -652,7 +657,8 @@
           "UNAVAILABLE": "<b>Unavailable</b>",
           "LUNCH": "<b>Lunch time</b>",
           "OUT_OF_WORK": "<b>Out of work</b>"
-        }
+        },
+        "UNAVAILABLE": "<div><b>Unavailable</b></div><div>{{description}}</div><div><b>Duration:</b> {{duration}}</div>"
       },
       "CREATED": "Reservation {{date}} created"
     },
@@ -739,6 +745,76 @@
   "NOTIFICATION": {
     "TITLE": "Notifications",
     "LOAD_MORE": "Load more"
+  },
+  "UNAVAILABLE": {
+    "LIST": {
+      "COLUMN": {
+        "PROFESSIONAL": "Professional",
+        "DESCRIPTION": "Description",
+        "START": "Start",
+        "DURATION": "Duration",
+        "REPEAT": "Repeat"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No events"
+      }
+    },
+    "ADD": {
+      "TITLE": "Add unavailable",
+      "DESCRIPTION": {
+        "FIELD": "Description"
+      },
+      "PROFESSIONAL": {
+        "FIELD": "Professional",
+        "REQUIRED": "Professional is <b>required</b>",
+        "INVALID": "Professional is invalid"
+      },
+      "DATE": {
+        "FIELD": "Pick a date",
+        "REQUIRED": "Date is <b>required</b>"
+      },
+      "TIME": {
+        "FIELD": "Pick a time",
+        "REQUIRED": "Time is <b>required</b>"
+      },
+      "DURATION": {
+        "FIELD": "Duration",
+        "REQUIRED": "Duration is <b>required</b>"
+      },
+      "REPEAT": {
+        "FIELD": "Repeat"
+      },
+      "CREATED": "Unavailable {{date}} created"
+    },
+    "DETAIL": {
+      "TITLE": "Update unavailable",
+      "DESCRIPTION": {
+        "FIELD": "Description"
+      },
+      "DATE": {
+        "FIELD": "Pick a date",
+        "REQUIRED": "Date is <b>required</b>"
+      },
+      "TIME": {
+        "FIELD": "Pick a time",
+        "REQUIRED": "Time is <b>required</b>"
+      },
+      "DURATION": {
+        "FIELD": "Duration",
+        "REQUIRED": "Duration is <b>required</b>"
+      },
+      "REPEAT": {
+        "FIELD": "Repeat"
+      }
+    },
+    "DELETED": {
+      "TITLE": "Delete unavailable",
+      "CONTENT": "Are you sure to delete unavailable {{date}}?",
+      "MESSAGE": "Unavailable {{date}} deleted"
+    },
+    "UPDATED": {
+      "MESSAGE": "Unavailable {{date}} updated"
+    }
   },
   "APP": {
     "TITLE": "Cleos"

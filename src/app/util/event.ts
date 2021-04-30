@@ -43,6 +43,13 @@ export const newEvent = (title: string, color: string, start: Date, end?: Date, 
   }
 } as unknown as CalendarEvent);
 
+export const isOverlapEvent = (events: any[], eventStartDay: Date, eventEndDay: Date): CalendarEvent[] => {
+  return events.filter((eventA: CalendarEvent) => (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
+    || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
+    || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end)
+  );
+};
+
 const createEvent = (it: IAvailability, date: Date, notWorking: string, unavailable: string, lunch: string,
                      plusHour: number): CalendarEvent[] => {
   let events: CalendarEvent[] = [];

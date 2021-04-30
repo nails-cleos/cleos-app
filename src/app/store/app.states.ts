@@ -5,6 +5,7 @@ import * as catalogue from './reducers/catalogue.reducers';
 import * as room from './reducers/room.reducers';
 import * as reservation from './reducers/reservation.reducers';
 import * as notification from './reducers/notification.reducers';
+import * as unavailable from './reducers/unavailable.reducers';
 import { createFeatureSelector } from '@ngrx/store';
 
 export interface AppState {
@@ -15,6 +16,7 @@ export interface AppState {
   roomState: room.State;
   reservationState: reservation.State;
   notificationState: notification.State;
+  unavailableState: unavailable.State;
 }
 
 export const reducers = {
@@ -24,7 +26,8 @@ export const reducers = {
   catalogue: catalogue.reducer,
   room: room.reducer,
   reservation: reservation.reducer,
-  notification: notification.reducer
+  notification: notification.reducer,
+  unavailable: unavailable.reducer
 };
 
 export const selectAuthState = createFeatureSelector<AppState>('auth');
@@ -34,3 +37,4 @@ export const selectCatalogueState = createFeatureSelector<AppState>('catalogue')
 export const selectRoomState = createFeatureSelector<AppState>('room');
 export const selectReservationState = createFeatureSelector<AppState>('reservation');
 export const selectNotificationState = createFeatureSelector<AppState>('notification');
+export const selectUnavailableState = createFeatureSelector<AppState>('unavailable');

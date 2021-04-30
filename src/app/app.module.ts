@@ -42,6 +42,7 @@ import { ReservationService } from './services/reservation.service';
 import { WebsocketService } from './services/websocket.service';
 import { GeocodeService } from './services/geocode.service';
 import { CatalogueService } from './services/catalogue.service';
+import { UnavailableService } from './services/unavailable.service';
 
 // Reducers
 import { reducers } from './store/app.states';
@@ -54,6 +55,7 @@ import { RoomEffects } from './store/effects/room.effects';
 import { ReservationEffects } from './store/effects/reservation.effects';
 import { NotificationEffects } from './store/effects/notification.effects';
 import { CatalogueEffects } from './store/effects/catalogue.effects';
+import { UnavailableEffects } from './store/effects/unavailable.effects';
 
 // Directives
 import { DragDropDirective } from './directives/drag-drop.directive';
@@ -107,6 +109,9 @@ import { CatalogueDetailComponent } from './catalogue/detail/catalogue-detail.co
 import { SpecialCharacterDirective } from './directives/special-character.directive';
 import { CatalogComponent } from './catalog/catalog.component';
 import { ImageViewerComponent } from './image-viewer/image-viewer.component';
+import { UnavailableComponent } from './unavailable/unavailable.component';
+import { UnavailableDetailComponent } from './unavailable/detail/unavailable-detail.component';
+import { UnavailableListComponent } from './unavailable/list/unavailable-list.component';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
@@ -181,13 +186,16 @@ registerLocaleData(localeEs, 'es');
     DragDropDirective,
     SpecialCharacterDirective,
     CatalogComponent,
-    ImageViewerComponent
+    ImageViewerComponent,
+    UnavailableComponent,
+    UnavailableDetailComponent,
+    UnavailableListComponent
   ],
   imports: [
     BrowserModule,
     StoreModule.forRoot(reducers, {metaReducers}),
     EffectsModule.forRoot([LoginEffects, UserEffects, ProductEffects, CatalogueEffects, RoomEffects, ReservationEffects,
-      NotificationEffects]),
+      NotificationEffects, UnavailableEffects]),
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {
@@ -232,6 +240,7 @@ registerLocaleData(localeEs, 'es');
     RoomService,
     ReservationService,
     CatalogueService,
+    UnavailableService,
     WebsocketService,
     TranslationLoaderResolver,
     GeocodeService,
