@@ -6,9 +6,9 @@ import { IUser, User } from '../interfaces/user';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import * as fromActionsUser from '../store/user.actions';
-import { FieldChange, ValueChange } from '../util/validators';
+import { fieldChange, valueChange } from '../util/validators';
 import { Location } from '@angular/common';
-import { FindFlag, Flags, IFlag } from '../util/flags';
+import { findFlag, flags, IFlag } from '../util/flags';
 import { Router } from '@angular/router';
 
 @Component({
@@ -42,7 +42,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     Validators.required
   ]);
 
-  flags: IFlag[] = Flags();
+  flagList: IFlag[] = flags();
 
   constructor(private snackBar: MatSnackBar, private store: Store<AppState>, private formBuilder: FormBuilder, private location: Location,
               private cdRef: ChangeDetectorRef, private router: Router) {
@@ -66,10 +66,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
       return;
     }
     const user: IUser = new User();
-    user.lang = ValueChange(this.langValue.value.value, this.user?.lang);
-    user.username = FieldChange(this.username, this.user?.username);
-    user.firstName = FieldChange(this.firstName, this.user?.firstName);
-    user.lastName = FieldChange(this.lastName, this.user?.lastName);
+    user.lang = valueChange(this.langValue.value.value, this.user?.lang);
+    user.username = fieldChange(this.username, this.user?.username);
+    user.firstName = fieldChange(this.firstName, this.user?.firstName);
+    user.lastName = fieldChange(this.lastName, this.user?.lastName);
 
     this.user = undefined;
     this.store.dispatch(
@@ -118,7 +118,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
           this.showInitials = true;
         }
         this.form.patchValue(state.selected);
-        const langValue = FindFlag(this.flags, state.selected.lang);
+        const langValue = findFlag(this.flagList, state.selected.lang);
         this.langValue.setValue(langValue);
         this.cdRef.detectChanges();
       }

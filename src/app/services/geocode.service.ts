@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Geocoder, GeocoderResult, GeocoderStatus, MapsAPILoader } from '@agm/core';
+import { GeocoderResult, GeocoderStatus, MapsAPILoader } from '@agm/core';
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { tap, map, switchMap } from 'rxjs/operators';
@@ -17,20 +17,18 @@ export class GeocodeService {
   geocodeAddress(lat: number, lng: number): Observable<any> {
     return this.waitForMapsToLoad().pipe(
       // filter(loaded => loaded),
-      switchMap(() => {
-        return new Observable(observer => {
+      switchMap(() => new Observable(observer => {
           const latLng = new google.maps.LatLng(lat, lng);
           this.geocoder.geocode({location: latLng}, (results: GeocoderResult[], status: GeocoderStatus) => {
             if (status === google.maps.GeocoderStatus.OK) {
               observer.next(results[0]);
             } else {
-              console.log('Error - ', results, ' & Status - ', status);
+              console.error('Error - ', results, ' & Status - ', status);
               observer.next(undefined);
             }
             observer.complete();
           });
-        });
-      })
+        }))
     );
   }
 

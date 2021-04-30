@@ -27,6 +27,7 @@ export class NavComponent implements OnInit, OnDestroy {
 
   menuItems: IMenu[] = [];
   notifications: INotification[] = [];
+  workDay: INotification[] = [];
   currentUser!: IUser | null;
   username: string | undefined;
   getState: Observable<any>;
@@ -123,6 +124,7 @@ export class NavComponent implements OnInit, OnDestroy {
 
     this.notificationSubscription = this.getNotificationState.subscribe((state) => {
       if (state.data && state.data.page.content[0].id) {
+        this.workDay = state.data.workDay;
         this.notifications = state.data.page.content;
         this.countNotifications = state.data.unread;
         if (this.countNotifications > 9) {

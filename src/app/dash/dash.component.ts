@@ -68,10 +68,12 @@ export class DashComponent implements OnInit, OnDestroy {
     };
   }
 
-  private static createErrorMiniCard(title: string, error: string): IReservationSummary {
+  private static createErrorMiniCard(title: string, message: string): IReservationSummary {
     return {
       title: `DASHBOARD.MINI_CARD.${title}`,
-      error
+      error: {
+        status: message
+      }
     };
   }
 
@@ -91,18 +93,22 @@ export class DashComponent implements OnInit, OnDestroy {
     );
   }
 
+  private miniCardError(state: any, error: string): void {
+    this.state = state;
+    const revenue = DashComponent.createErrorMiniCard('TOTAL_PRODUCT_SALES', error);
+
+    const products = DashComponent.createErrorMiniCard('AVERAGE_PRODUCT_VALUE', error);
+
+    const totalProducts = DashComponent.createErrorMiniCard('TOTAL_PRODUCTS', error);
+
+    const customer = DashComponent.createErrorMiniCard('NEW_CUSTOMERS_RESERVATION', error);
+    this.miniCardData = [revenue, products, totalProducts, customer];
+  }
+
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       if (state.errorMessage) {
-        this.state = state;
-        const revenue = DashComponent.createErrorMiniCard('TOTAL_PRODUCT_SALES', this.state.errorMessage);
-
-        const products = DashComponent.createErrorMiniCard('AVERAGE_PRODUCT_VALUE', this.state.errorMessage);
-
-        const totalProducts = DashComponent.createErrorMiniCard('TOTAL_PRODUCTS', this.state.errorMessage);
-
-        const customer = DashComponent.createErrorMiniCard('NEW_CUSTOMERS_RESERVATION', this.state.errorMessage);
-        this.miniCardData = [revenue, products, totalProducts, customer];
+        this.miniCardError(state, state.errorMessage);
       }
       if (state.data && Array.isArray(state.data) && !state.data[0].reservations) {
         this.state = state;
@@ -110,7 +116,7 @@ export class DashComponent implements OnInit, OnDestroy {
         const filterDate = new Date(now.setMonth(now.getMonth() - 1));
         const prevFilterDate = new Date(now.setMonth(now.getMonth() - 1));
         const completedList = this.state.data?.filter((r: IReservationAll) => r.state === 'COMPLETED');
-        if (completedList) {
+        if (completedList && completedList.length) {
           const lastMonthList = completedList.filter((r: IReservationAll) => new Date(r.start) > filterDate);
           const prevMonthList = completedList.filter(
             (r: IReservationAll) => new Date(r.start) > prevFilterDate && new Date(r.start) < filterDate
@@ -119,9 +125,9 @@ export class DashComponent implements OnInit, OnDestroy {
           const lastMonthRevenue = lastMonthList.reduce(DashComponent.getSumReservationPrice, 0);
           const prevMonthRevenue = prevMonthList.reduce(DashComponent.getSumReservationPrice, 0);
 
-          const totalAvg = totalRevenue / completedList.length;
-          const lastMonthAvg = lastMonthRevenue / lastMonthList.length;
-          const prevMonthAvg = prevMonthRevenue / prevMonthList.length;
+          const totalAvg = completedList.length ? totalRevenue / completedList.length : 0;
+          const lastMonthAvg = lastMonthList.length ? lastMonthRevenue / lastMonthList.length : 0;
+          const prevMonthAvg = prevMonthList.length ? prevMonthRevenue / prevMonthList.length : 0;
 
           const totalCustomers = completedList.filter((r: IReservationAll) => new Date(r.start) <= filterDate)
             .reduce((unique: any[], o: IReservationAll) => {
@@ -184,6 +190,8 @@ export class DashComponent implements OnInit, OnDestroy {
             Math.abs((lastMonthCounter - prevCounter) / prevCounter), 'portrait', false);
 
           this.miniCardData = [revenue, products, totalProducts, customer];
+        } else {
+          this.miniCardError(state, 'NO_CONTENT');
         }
       }
     });

@@ -1,83 +1,83 @@
 import { Action } from '@ngrx/store';
 
 export enum ProductActionTypes {
-  GET_ALL = '[Product] Get all',
-  PRODUCT_SUCCESS = '[Product] Success',
-  PRODUCT_SAVE = '[Product] Save',
-  PRODUCT_UPDATE = '[Product] Update',
-  PRODUCT_SAVE_SUCCESS = '[Product] Save Success',
-  PRODUCT_FAILURE = '[Product] Failure',
-  PRODUCT_SELECTED = '[Product] Selected',
-  PRODUCT_FIND = '[Product] Find',
-  PRODUCT_DELETE = '[Product] Delete',
-  CLEAN = '[Product] Clean'
+  getAll = '[Product] Get all',
+  productSuccess = '[Product] Success',
+  productSave = '[Product] Save',
+  productUpdate = '[Product] Update',
+  productSaveSuccess = '[Product] Save Success',
+  productFailure = '[Product] Failure',
+  productSelected = '[Product] Selected',
+  productFind = '[Product] Find',
+  productDelete = '[Product] Delete',
+  clean = '[Product] Clean'
 }
 
 export class GetAll implements Action {
-  readonly type = ProductActionTypes.GET_ALL;
+  readonly type = ProductActionTypes.getAll;
 
   constructor(public payload: any) {
   }
 }
 
 export class ProductSuccess implements Action {
-  readonly type = ProductActionTypes.PRODUCT_SUCCESS;
+  readonly type = ProductActionTypes.productSuccess;
 
   constructor(public payload: any) {
   }
 }
 
 export class ProductSave implements Action {
-  readonly type = ProductActionTypes.PRODUCT_SAVE;
+  readonly type = ProductActionTypes.productSave;
 
   constructor(public payload: any) {
   }
 }
 
 export class ProductUpdate implements Action {
-  readonly type = ProductActionTypes.PRODUCT_UPDATE;
+  readonly type = ProductActionTypes.productUpdate;
 
   constructor(public payload: any) {
   }
 }
 
 export class ProductSaveSuccess implements Action {
-  readonly type = ProductActionTypes.PRODUCT_SAVE_SUCCESS;
+  readonly type = ProductActionTypes.productSaveSuccess;
 
   constructor(public payload: any) {
   }
 }
 
 export class ProductFailure implements Action {
-  readonly type = ProductActionTypes.PRODUCT_FAILURE;
+  readonly type = ProductActionTypes.productFailure;
 
   constructor(public payload: any) {
   }
 }
 
 export class ProductSelected implements Action {
-  readonly type = ProductActionTypes.PRODUCT_SELECTED;
+  readonly type = ProductActionTypes.productSelected;
 
   constructor(public payload: any) {
   }
 }
 
 export class ProductFind implements Action {
-  readonly type = ProductActionTypes.PRODUCT_FIND;
+  readonly type = ProductActionTypes.productFind;
 
   constructor(public payload: any) {
   }
 }
 
 export class DeleteProduct implements Action {
-  readonly type = ProductActionTypes.PRODUCT_DELETE;
+  readonly type = ProductActionTypes.productDelete;
 
   constructor(public payload: any) {
   }
 }
 
 export class Clean implements Action {
-  readonly type = ProductActionTypes.CLEAN;
+  readonly type = ProductActionTypes.clean;
 }
 
 export type All =

@@ -1,8 +1,8 @@
-<div *ngIf="!error; else errorBox" class="mat-elevation-z8 small-table">
+<div *ngIf="!error; else errorBox" class="mat-elevation-z8">
   <table [dataSource]="dataSource" mat-table matSort matSortActive="name"
          matSortDirection="desc" matSortDisableClear>
     <ng-container matColumnDef="position">
-      <th *matHeaderCellDef mat-header-cell> No.</th>
+      <th *matHeaderCellDef mat-header-cell>#</th>
       <td *matCellDef="let room; let i = index;" mat-cell>
         <div *ngIf="room.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
         <ng-template #skeleton>
@@ -35,7 +35,7 @@
     <ng-container matColumnDef="address">
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'ROOM.LIST.COLUMN.NAME' | translate }}</th>
       <td *matCellDef="let room" mat-cell>
-        <div *ngIf="room.id; else skeleton">{{room.address}}</div>
+        <div *ngIf="room.id; else skeleton">{{room.address?.name}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
@@ -80,10 +80,17 @@
       </td>
     </ng-container>
 
+    <ng-container matColumnDef="noContent">
+      <td class="no-content bold" mat-footer-cell *matFooterCellDef [attr.colspan]="displayedColumns.length">
+        {{ 'ROOM.LIST.ERROR.NO_CONTENT' | translate }}</td>
+    </ng-container>
+
+    <tr mat-footer-row *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0"></tr>
+
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
     <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
   </table>
-  <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+  <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
 
   <button color="accent" id="add-button" mat-fab matTooltip="{{ 'ROOM.ADD.TITLE' | translate }}" routerLink="/room">
     <mat-icon>add</mat-icon>

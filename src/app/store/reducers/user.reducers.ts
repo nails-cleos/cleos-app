@@ -22,9 +22,9 @@ export const initialState: State = {
   isLoading: false
 };
 
-export function reducer(state = initialState, action: All): State {
+export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case UserActionTypes.GET_ALL: {
+    case UserActionTypes.getAll: {
       return {
         ...state,
         // @ts-ignore
@@ -36,8 +36,8 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
-    case UserActionTypes.FIND_ME:
-    case UserActionTypes.FIND_USER: {
+    case UserActionTypes.findMe:
+    case UserActionTypes.findUser: {
       return {
         ...state,
         data: {},
@@ -48,7 +48,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
-    case UserActionTypes.USER_SUCCESS: {
+    case UserActionTypes.userSuccess: {
       return {
         ...state,
         data: action.payload,
@@ -58,7 +58,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case UserActionTypes.USER_SELECTED: {
+    case UserActionTypes.userSelected: {
       return {
         ...state,
         selected: action.payload.user,
@@ -68,8 +68,8 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case UserActionTypes.CHANGE_PASSWORD_SUCCESS:
-    case UserActionTypes.USER_SAVE_SUCCESS: {
+    case UserActionTypes.changePasswordSuccess:
+    case UserActionTypes.userSaveSuccess: {
       return {
         ...state,
         message: action.payload.message,
@@ -78,7 +78,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case UserActionTypes.USER_FAILURE: {
+    case UserActionTypes.userFailure: {
       return {
         ...state,
         errorMessage: action.payload.error.message,
@@ -88,12 +88,12 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case UserActionTypes.SET_ROLE:
-    case UserActionTypes.CHANGE_PASSWORD:
-    case UserActionTypes.SAVE_USER:
-    case UserActionTypes.UPDATE_USER:
-    case UserActionTypes.RESEND_USER_TOKEN:
-    case UserActionTypes.USER_DELETE: {
+    case UserActionTypes.setRole:
+    case UserActionTypes.changePassword:
+    case UserActionTypes.saveUser:
+    case UserActionTypes.updateUser:
+    case UserActionTypes.resendUserToken:
+    case UserActionTypes.userDelete: {
       return {
         ...state,
         errorMessage: null,
@@ -102,11 +102,11 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
-    case UserActionTypes.CLEAN: {
+    case UserActionTypes.clean: {
       return initialState;
     }
     default: {
       return state;
     }
   }
-}
+};

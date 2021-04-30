@@ -1,4 +1,5 @@
-@import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
+@import '~@angular/material/theming';
+@import "theme";
 @import "~skeleton-screen-css";
 
 $flag-icon-css-path: '~flag-icon-css/flags' !default;
@@ -20,27 +21,12 @@ body {
   font-display: swap;
 }
 
+.style-card {
+  margin: 20px auto;
+}
+
 table {
   width: 100%;
-}
-
-.small-table {
-  overflow-x: scroll !important;
-}
-
-.mat-column-position {
-  flex: 0 0 5%;
-  width: 5%;
-}
-
-.mat-column-actions {
-  flex: 0 0 15%;
-  width: 15%;
-}
-
-.mat-cell-position {
-  text-align: center;
-  justify-content: center;
 }
 
 .column-large-text {
@@ -57,6 +43,21 @@ table {
   -moz-hyphens: auto;
   -webkit-hyphens: auto;
   hyphens: auto;
+}
+
+.mat-column-position {
+  flex: 0 0 5%;
+  width: 5%;
+}
+
+.mat-column-actions {
+  flex: 0 0 15%;
+  width: 15%;
+}
+
+.mat-cell-position {
+  text-align: center;
+  justify-content: center;
 }
 
 a, u {
@@ -89,14 +90,6 @@ a, u {
 .mat-card-content,
 .mat-form-field {
   margin: 10px 0 0 0;
-}
-
-.vertical-divider {
-  margin-left: 10px;
-}
-
-.divider-padding {
-  padding: 10px 0 0 0;
 }
 
 @media all and (max-device-width: 812px) and (orientation: portrait) {
@@ -132,13 +125,13 @@ a, u {
 
 .chartContainer {
   height: 100%;
-  display: flex;
+  display: block;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
 
-.notification {
+.pointer {
   cursor: pointer;
 }
 
@@ -152,4 +145,23 @@ a, u {
 
 .gray-text {
   color: gray;
+}
+
+.mat-raised-button {
+  .mat-icon {
+    display: inherit !important;
+    margin-right: 5px
+  }
+}
+
+.margin-right-eight {
+  margin-right: 8px;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.no-content {
+  text-align: center;
 }

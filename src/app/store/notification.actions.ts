@@ -1,51 +1,51 @@
 import { Action } from '@ngrx/store';
 
 export enum NotificationActionTypes {
-  NOTIFICATION_PAGE = '[Notification] Get all paged',
-  NOTIFICATION_SUCCESS = '[Notification] Notifications success',
-  NOTIFICATION_FAILURE = '[Notification] Failure',
-  NOTIFICATION_READ = '[Notification] Notification read',
-  NOTIFICATION_READ_SUCCESS = '[Notification] Notification read success',
-  CLEAN = '[Notification] Clean'
+  notificationPage = '[Notification] Get all paged',
+  notificationSuccess = '[Notification] Notifications success',
+  notificationFailure = '[Notification] Failure',
+  notificationRead = '[Notification] Notification read',
+  notificationReadSuccess = '[Notification] Notification read success',
+  clean = '[Notification] Clean'
 }
 
 export class GetAllPaged implements Action {
-  readonly type = NotificationActionTypes.NOTIFICATION_PAGE;
+  readonly type = NotificationActionTypes.notificationPage;
 
   constructor(public payload: any) {
   }
 }
 
 export class NotificationSuccess implements Action {
-  readonly type = NotificationActionTypes.NOTIFICATION_SUCCESS;
+  readonly type = NotificationActionTypes.notificationSuccess;
 
   constructor(public payload: any) {
   }
 }
 
 export class NotificationFailure implements Action {
-  readonly type = NotificationActionTypes.NOTIFICATION_FAILURE;
+  readonly type = NotificationActionTypes.notificationFailure;
 
   constructor(public payload: any) {
   }
 }
 
 export class NotificationRead implements Action {
-  readonly type = NotificationActionTypes.NOTIFICATION_READ;
+  readonly type = NotificationActionTypes.notificationRead;
 
   constructor(public payload: any) {
   }
 }
 
 export class NotificationReadSuccess implements Action {
-  readonly type = NotificationActionTypes.NOTIFICATION_READ_SUCCESS;
+  readonly type = NotificationActionTypes.notificationReadSuccess;
 
   constructor(public payload: any) {
   }
 }
 
 export class Clean implements Action {
-  readonly type = NotificationActionTypes.CLEAN;
+  readonly type = NotificationActionTypes.clean;
 }
 
 export type All =

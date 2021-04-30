@@ -1,24 +1,25 @@
 import { Component, Inject, Input, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import {
-  AnnualReservation,
-  CustomerReservation,
-  LastMonthReservation,
-  MonthlyReservation,
-  ProductReservation,
-  QuantityProduct
+  annualReservationChart,
+  customerReservationChart,
+  lastMonthReservationChart,
+  monthlyReservationChart,
+  productReservationChart,
+  quantityProductChart
 } from '../util/chart';
 import { Color, Label, SingleDataSet } from 'ng2-charts';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
 import { TranslateService } from '@ngx-translate/core';
+import { snakeToCamel } from '../util/helper';
 
 enum ChartTypeEnum {
-  QUANTITY_PRODUCT,
-  PRODUCT_RESERVATION,
-  MONTHLY_RESERVATION,
-  YEARLY_PRODUCT_PRICE,
-  CUSTOMER_RESERVATION,
-  LAST_MONTH_RESERVATION
+  quantityProduct,
+  productReservation,
+  monthlyReservation,
+  yearlyProductPrice,
+  customerReservation,
+  lastMonthReservation
 }
 
 @Component({
@@ -56,38 +57,34 @@ export class CardComponent implements OnInit {
 
   onClick(): void {
     // @ts-ignore
-    switch (ChartTypeEnum[this.type]) {
-      case ChartTypeEnum.QUANTITY_PRODUCT.valueOf():
-        const quantityProduct = QuantityProduct(this.data, this.label);
-        this.setBarChart(quantityProduct);
+    switch (ChartTypeEnum[snakeToCamel(this.type)]) {
+      case ChartTypeEnum.quantityProduct.valueOf():
+        this.setBarChart(quantityProductChart(this.data, this.label));
         break;
-      case ChartTypeEnum.PRODUCT_RESERVATION.valueOf():
-        const productReservation = ProductReservation(this.data);
-        if (productReservation) {
-          this.chartDataSet = productReservation.chartDataSet;
-          this.chartLabels = productReservation.chartLabels;
+      case ChartTypeEnum.productReservation.valueOf():
+        const product = productReservationChart(this.data);
+        if (product) {
+          this.chartDataSet = product.chartDataSet;
+          this.chartLabels = product.chartLabels;
           this.chartType = 'radar';
         }
         break;
-      case ChartTypeEnum.MONTHLY_RESERVATION.valueOf():
-        const monthlyReservation = MonthlyReservation(this.data, this.locale);
-        if (monthlyReservation) {
-          this.chartData = monthlyReservation.chartData;
-          this.chartLabels = monthlyReservation.chartLabels;
+      case ChartTypeEnum.monthlyReservation.valueOf():
+        const monthly = monthlyReservationChart(this.data, this.locale);
+        if (monthly) {
+          this.chartData = monthly.chartData;
+          this.chartLabels = monthly.chartLabels;
           this.chartType = 'pie';
         }
         break;
-      case ChartTypeEnum.YEARLY_PRODUCT_PRICE.valueOf():
-        const annualChart = AnnualReservation(this.data, this.locale, this.label);
-        this.setLineChart(annualChart);
+      case ChartTypeEnum.yearlyProductPrice.valueOf():
+        this.setLineChart(annualReservationChart(this.data, this.locale, this.label));
         break;
-      case ChartTypeEnum.CUSTOMER_RESERVATION.valueOf():
-        const customerChart = CustomerReservation(this.data, this.label);
-        this.setBarChart(customerChart);
+      case ChartTypeEnum.customerReservation.valueOf():
+        this.setBarChart(customerReservationChart(this.data, this.label));
         break;
-      case ChartTypeEnum.LAST_MONTH_RESERVATION.valueOf():
-        const lastMonth = LastMonthReservation(this.data, this.locale, this.label);
-        this.setLineChart(lastMonth);
+      case ChartTypeEnum.lastMonthReservation.valueOf():
+        this.setLineChart(lastMonthReservationChart(this.data, this.locale, this.label));
         break;
     }
     if (this.chartType) {

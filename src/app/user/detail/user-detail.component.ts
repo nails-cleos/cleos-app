@@ -7,8 +7,8 @@ import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
 import * as fromActionsUser from '../../store/user.actions';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { FieldChange, ValueChange } from '../../util/validators';
-import { FindFlag, Flags, IFlag } from '../../util/flags';
+import { fieldChange, valueChange } from '../../util/validators';
+import { findFlag, flags, IFlag } from '../../util/flags';
 
 @Component({
   selector: 'app-user-detail',
@@ -37,7 +37,7 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     Validators.required
   ]);
 
-  flags: IFlag[] = Flags();
+  flagList: IFlag[] = flags();
   error: any;
 
   constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
@@ -66,11 +66,11 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const user: IUser = new User();
     user.id = this.user?.id;
-    user.username = FieldChange(this.username, this.user?.username);
-    user.email = FieldChange(this.email, this.user?.email);
-    user.firstName = FieldChange(this.firstName, this.user?.firstName);
-    user.lastName = FieldChange(this.lastName, this.user?.lastName);
-    user.lang = ValueChange(this.langValue.value.value, this.user?.lang);
+    user.username = fieldChange(this.username, this.user?.username);
+    user.email = fieldChange(this.email, this.user?.email);
+    user.firstName = fieldChange(this.firstName, this.user?.firstName);
+    user.lastName = fieldChange(this.lastName, this.user?.lastName);
+    user.lang = valueChange(this.langValue.value.value, this.user?.lang);
 
     this.store.dispatch(new fromActionsUser.SaveUser({user}));
   }
@@ -96,7 +96,7 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       if (state.selected) {
         this.user = state.selected;
         this.form.patchValue(state.selected);
-        this.langValue.setValue(FindFlag(this.flags, state.selected.lang));
+        this.langValue.setValue(findFlag(this.flagList, state.selected.lang));
         this.cdRef.detectChanges();
       }
       if (state.errorMessage) {

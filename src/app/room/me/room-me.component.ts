@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { AvailabilityDate, IAvailability, IAvailabilityDate, IRoom, Room } from '../../interfaces/room';
+import { AvailabilityDate, IAddress, IAvailability, IAvailabilityDate, ILocation, IRoom, Room } from '../../interfaces/room';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { IconName, IIcon } from '../room.component';
@@ -24,9 +24,9 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   step = 0;
   icons: IIcon = {
-    week: IconName.event_busy,
-    saturday: IconName.event_busy,
-    sunday: IconName.event_busy
+    week: IconName.eventBusy,
+    saturday: IconName.eventBusy,
+    sunday: IconName.eventBusy
   };
   weekDate?: IAvailabilityDate;
   satDate?: IAvailabilityDate;
@@ -38,6 +38,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   address: FormControl = new FormControl('', [
     Validators.required
   ]);
+  addressDescription: FormControl = new FormControl();
 
   constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
               private formBuilder: FormBuilder) {
@@ -77,10 +78,14 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
     room.id = this.room?.id;
     room.availabilities = this.availabilities;
     const location = this.address.value.geometry.location;
-    room.location = {
-      x: location.lat(),
-      y: location.lng()
-    };
+    room.address = {
+      name: this.address.value.formatted_address,
+      description: this.addressDescription.value,
+      location : {
+        x: location.lat(),
+        y: location.lng()
+      } as ILocation
+    } as IAddress;
 
     this.store.dispatch(new fromActionsRoom.RoomUpdateMe(room));
     this.room = undefined;
@@ -88,7 +93,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ignore(day: string, step: number): void {
-    this.setIcon(day, IconName.event_busy);
+    this.setIcon(day, IconName.eventBusy);
     const index = this.availabilities.findIndex((e) => e.day === day);
     if (index > -1) {
       this.availabilities.splice(index, 1);
@@ -97,7 +102,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   addAvailability(availability: IAvailability, step: number): void {
-    this.setIcon(availability.day, IconName.event_available);
+    this.setIcon(availability.day, IconName.eventAvailable);
     const index = this.availabilities.findIndex((e) => e.day === availability.day);
 
     if (index !== -1) {
@@ -111,7 +116,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   validate(): boolean {
     let step = -1;
     this.errors = [];
-    switch (IconName.calendar_today) {
+    switch (IconName.calendarToday) {
       case this.icons.week:
         step = 0;
         break;
@@ -139,7 +144,8 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private createForm(): void {
     this.form = this.formBuilder.group({
-      address: this.address
+      address: this.address,
+      addressDescription: this.addressDescription
     });
   }
 
@@ -157,8 +163,9 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.room = {
           id: state.selected.id,
           name: state.selected.name,
-          location: state.selected.location
+          address: state.selected.address
         } as IRoom;
+        this.addressDescription.setValue(this.room.address?.description);
         this.professionalName = `${state.selected.professional.firstName} ${state.selected.professional.lastName}`;
         this.getAvailabilities(state.selected.availabilities);
       }

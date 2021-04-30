@@ -24,13 +24,6 @@ export class SignInComponent implements OnInit {
     this.createForm();
   }
 
-  private createForm(): void {
-    this.form = this.formBuilder.group({
-      username: ['', Validators.required],
-      password: ['', Validators.required]
-    });
-  }
-
   signIn(): void {
     if (this.form.invalid) {
       return;
@@ -41,5 +34,12 @@ export class SignInComponent implements OnInit {
     this.store.dispatch(
       new fromActionsLogin.Login({username, password, queryParams: this.route.snapshot.queryParams})
     );
+  }
+
+  private createForm(): void {
+    this.form = this.formBuilder.group({
+      username: ['', Validators.required],
+      password: ['', Validators.required]
+    });
   }
 }

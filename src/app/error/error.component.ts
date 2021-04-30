@@ -15,11 +15,12 @@ export class ErrorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.error);
-    if (this.error.status === 'NOT_FOUND') {
+    if (this.error.status !== 'NO_CONTENT') {
+      if (this.error.status === 'NOT_FOUND') {
         this.imageSrc = './assets/not_found.png';
-    } else {
-      this.imageSrc = './assets/error.png';
+      } else {
+        this.imageSrc = './assets/error.png';
+      }
     }
   }
 

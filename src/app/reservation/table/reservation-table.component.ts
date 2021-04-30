@@ -21,6 +21,9 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
   styleUrls: ['./reservation-table.component.scss']
 })
 export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestroy {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+
   displayedColumns: string[] = ['position', 'customer', 'start', 'state', 'professional', 'product', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IReservationAll>>();
   getState: Observable<any>;
@@ -28,9 +31,6 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
 
   resultsLength = 0;
   pageSize = PAGE_SIZE;
-
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
 
   language: string;
   error: any;
@@ -59,7 +59,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
       // this.paginator.pageIndex = 0;
     });
 
-    this.paginator.page.subscribe(() => {
+    this.paginator?.page.subscribe(() => {
       this.getReservations();
     });
 
@@ -82,7 +82,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
 
   delete(reservation: IReservation): void {
     const title = this.translate.instant('RESERVATION.DELETED.TITLE');
-    const content = this.translate.instant('RESERVATION.DELETED.CONTENT', {start: reservation.start});
+    const content = this.translate.instant('RESERVATION.DELETED.CONTENT', {date: reservation.start});
     const dialogRef = this.dialog.open(DialogComponent, {
       data: {title, content, value: reservation}
     });
@@ -110,7 +110,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
     const payload = {
       active: this.sort.active,
       direction: this.sort.direction,
-      page: this.paginator.pageIndex,
+      page: this.paginator ? this.paginator.pageIndex : 0,
       size: this.pageSize
     };
     this.store.dispatch(

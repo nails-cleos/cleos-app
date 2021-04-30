@@ -12,42 +12,33 @@ import { TranslateService } from '@ngx-translate/core';
 export class NotificationEffects {
 
   @Effect()
-  getAll$ = this.actions$.pipe(ofType(fromActionsNotification.NotificationActionTypes.NOTIFICATION_PAGE)).pipe(
+  getAll$ = this.actions$.pipe(ofType(fromActionsNotification.NotificationActionTypes.notificationPage)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.notificationService.getAll(payload.active, payload.direction, payload.page).pipe(
-        switchMap((response: any) => {
-          return of(new fromActionsNotification.NotificationSuccess(response));
-        }),
+    switchMap((payload: any) => this.notificationService.getAll(payload.active, payload.direction, payload.page).pipe(
+        switchMap((response: any) => response ? of(new fromActionsNotification.NotificationSuccess(response)) :
+          of(new fromActionsNotification.NotificationFailure({error: {status: 'NO_CONTENT', message: 'NO_CONTENT'}}))),
         catchError((err: HttpErrorResponse) => of(new fromActionsNotification.NotificationFailure({error: err.error})))
-      );
-    })
+      ))
   );
 
   @Effect()
-  readNotification$ = this.actions$.pipe(ofType(fromActionsNotification.NotificationActionTypes.NOTIFICATION_READ)).pipe(
+  readNotification$ = this.actions$.pipe(ofType(fromActionsNotification.NotificationActionTypes.notificationRead)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.notificationService.readNotification(payload.id).pipe(
-        switchMap(() => {
-          return of(new fromActionsNotification.NotificationReadSuccess(payload));
-        }),
+    switchMap((payload: any) => this.notificationService.readNotification(payload.id).pipe(
+        switchMap(() => of(new fromActionsNotification.NotificationReadSuccess(payload))),
         catchError((err: HttpErrorResponse) => of(new fromActionsNotification.NotificationFailure({error: err.error})))
-      );
-    })
+      ))
   );
 
   @Effect({dispatch: false})
   notificationSuccess$ = this.actions$.pipe(
-    ofType(fromActionsNotification.NotificationActionTypes.NOTIFICATION_SUCCESS)
+    ofType(fromActionsNotification.NotificationActionTypes.notificationSuccess)
   );
 
   @Effect({dispatch: false})
   notificationReadSuccess$ = this.actions$.pipe(
-    ofType(fromActionsNotification.NotificationActionTypes.NOTIFICATION_READ_SUCCESS),
-    tap((data: any) => {
-        this.router.navigate([data.payload.navigation]);
-    })
+    ofType(fromActionsNotification.NotificationActionTypes.notificationReadSuccess),
+    tap((data: any) => this.router.navigate([data.payload.navigation]))
   );
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private notificationService: NotificationService,

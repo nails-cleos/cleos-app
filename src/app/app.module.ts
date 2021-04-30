@@ -41,6 +41,8 @@ import { RoomService } from './services/room.service';
 import { ReservationService } from './services/reservation.service';
 import { WebsocketService } from './services/websocket.service';
 import { GeocodeService } from './services/geocode.service';
+import { CatalogueService } from './services/catalogue.service';
+import { UnavailableService } from './services/unavailable.service';
 
 // Reducers
 import { reducers } from './store/app.states';
@@ -52,6 +54,11 @@ import { ProductEffects } from './store/effects/product.effects';
 import { RoomEffects } from './store/effects/room.effects';
 import { ReservationEffects } from './store/effects/reservation.effects';
 import { NotificationEffects } from './store/effects/notification.effects';
+import { CatalogueEffects } from './store/effects/catalogue.effects';
+import { UnavailableEffects } from './store/effects/unavailable.effects';
+
+// Directives
+import { DragDropDirective } from './directives/drag-drop.directive';
 
 // Components
 import { AppComponent } from './app.component';
@@ -87,37 +94,43 @@ import { AnnualReservationsChartComponent } from './charts/annual-reservations-c
 import { MiniCardComponent } from './mini-card/mini-card.component';
 import { CustomerReservationsChartComponent } from './charts/customer-reservations-chart/customer-reservations-chart.component';
 import { ReservationTableComponent } from './reservation/table/reservation-table.component';
-import { QuantityProductReservationsChartComponent } from './charts/quantity-product-reservations-chart/quantity-product-reservations-chart.component';
+import {
+  QuantityProductReservationsChartComponent
+} from './charts/quantity-product-reservations-chart/quantity-product-reservations-chart.component';
 import { LastMonthReservationsChartComponent } from './charts/last-month-reservations-chart/last-month-reservations-chart.component';
 import { NotificationsComponent } from './notification/list/notifications.component';
 import { RoomMeComponent } from './room/me/room-me.component';
 import { CalendarComponent } from './reservation/calendar/calendar.component';
 import { ErrorComponent } from './error/error.component';
 import { GoogleMapComponent } from './google-map/google-map.component';
+import { CatalogueComponent } from './catalogue/catalogue.component';
+import { CataloguesComponent } from './catalogue/list/catalogues.component';
+import { CatalogueDetailComponent } from './catalogue/detail/catalogue-detail.component';
+import { SpecialCharacterDirective } from './directives/special-character.directive';
+import { CatalogComponent } from './catalog/catalog.component';
+import { ImageViewerComponent } from './image-viewer/image-viewer.component';
+import { UnavailableComponent } from './unavailable/unavailable.component';
+import { UnavailableDetailComponent } from './unavailable/detail/unavailable-detail.component';
+import { UnavailableListComponent } from './unavailable/list/unavailable-list.component';
 
-export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
-  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
-}
+export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
-export function getAuthServiceConfigs(): SocialAuthServiceConfig {
-  return {
-    autoLogin: false,
-    providers: [
-      {
-        id: GoogleLoginProvider.PROVIDER_ID,
-        provider: new GoogleLoginProvider(environment.googleClientId)
-      },
-      {
-        id: FacebookLoginProvider.PROVIDER_ID,
-        provider: new FacebookLoginProvider(environment.facebookClientId)
-      }
-    ]
-  } as SocialAuthServiceConfig;
-}
+export const getAuthServiceConfigs = (): SocialAuthServiceConfig => ({
+  autoLogin: false,
+  providers: [
+    {
+      id: GoogleLoginProvider.PROVIDER_ID,
+      provider: new GoogleLoginProvider(environment.googleClientId)
+    },
+    {
+      id: FacebookLoginProvider.PROVIDER_ID,
+      provider: new FacebookLoginProvider(environment.facebookClientId)
+    }
+  ]
+} as SocialAuthServiceConfig);
 
-export function localStorageSyncReducer(reducer: ActionReducer<any>): ActionReducer<any> {
-  return localStorageSync({keys: ['auth'], rehydrate: true})(reducer);
-}
+export const localStorageSyncReducer =
+  (reducer: ActionReducer<any>): ActionReducer<any> => localStorageSync({keys: ['auth'], rehydrate: true})(reducer);
 
 const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
 
@@ -166,17 +179,28 @@ registerLocaleData(localeEs, 'es');
     RoomMeComponent,
     ErrorComponent,
     CalendarComponent,
-    GoogleMapComponent
+    GoogleMapComponent,
+    CatalogueComponent,
+    CataloguesComponent,
+    CatalogueDetailComponent,
+    DragDropDirective,
+    SpecialCharacterDirective,
+    CatalogComponent,
+    ImageViewerComponent,
+    UnavailableComponent,
+    UnavailableDetailComponent,
+    UnavailableListComponent
   ],
   imports: [
     BrowserModule,
     StoreModule.forRoot(reducers, {metaReducers}),
-    EffectsModule.forRoot([LoginEffects, UserEffects, ProductEffects, RoomEffects, ReservationEffects, NotificationEffects]),
+    EffectsModule.forRoot([LoginEffects, UserEffects, ProductEffects, CatalogueEffects, RoomEffects, ReservationEffects,
+      NotificationEffects, UnavailableEffects]),
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {
         provide: TranslateLoader,
-        useFactory: HttpLoaderFactory,
+        useFactory: httpLoaderFactory,
         deps: [HttpClient]
       }
     }),
@@ -200,7 +224,7 @@ registerLocaleData(localeEs, 'es');
     MatGoogleMapsAutocompleteModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,
-      registrationStrategy: 'registerImmediately'
+      registrationStrategy: 'registerWhenStable:30000'
     })
   ],
   providers: [
@@ -215,6 +239,8 @@ registerLocaleData(localeEs, 'es');
     ProductService,
     RoomService,
     ReservationService,
+    CatalogueService,
+    UnavailableService,
     WebsocketService,
     TranslationLoaderResolver,
     GeocodeService,

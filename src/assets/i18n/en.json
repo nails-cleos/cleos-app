@@ -17,7 +17,8 @@
       "VIEW": "View",
       "EDIT": "Edit",
       "DELETE": "Delete",
-      "INVITE": "Send invite"
+      "INVITE": "Send invite",
+      "CLOSE": "Close"
     },
     "COLUMN": {
       "ACTIONS": "Actions"
@@ -36,6 +37,11 @@
       "ROLE_PROFESSIONAL": "Professional",
       "ROLE_ADMIN": "Admin"
     },
+    "REPEAT": {
+      "NONE": "None",
+      "EVERY_DAY": "Every day",
+      "ONCE_A_WEEK": "Once a week"
+    },
     "NOTIFICATION": {
       "NO": "No notifications"
     },
@@ -45,7 +51,11 @@
     },
     "ADDRESS": {
       "FIELD": "Address",
-      "INVALID": "Address is invalid"
+      "INVALID": "Address is invalid",
+      "DESCRIPTION": "Description"
+    },
+    "ERROR": {
+      "NO_CONTENT": "No content"
     }
   },
   "DASHBOARD": {
@@ -90,7 +100,7 @@
         "ERROR": "Please provide a valid password"
       },
       "OR": "Or sign in with email",
-      "NEW": "New to nail?",
+      "NEW": "New to Cleos?",
       "FORGOT_PASSWORD": "Forgot password?"
     },
     "SIGN_UP": {
@@ -131,11 +141,11 @@
       },
       "OR": "Or sign up with email",
       "SUCCESS": "User {{username}} created. Check your email {{email}}",
-      "ALREADY": "Already on nail?"
+      "ALREADY": "Already on Cleos?"
     },
     "ACTIVATE_ACCOUNT": {
       "TITLE": "Activate account",
-      "CONTENT": "Welcome to nail",
+      "CONTENT": "Welcome to Cleos",
       "BUTTON": "Activate",
       "MESSAGE": "Account activated"
     },
@@ -180,6 +190,9 @@
         "DETAIL": {
           "TITLE": "Roles"
         }
+      },
+      "ERROR": {
+        "NO_CONTENT": "No users"
       },
       "STATUS": {
         "ENABLED": "Verified",
@@ -323,6 +336,9 @@
         "DESCRIPTION": "Description",
         "PRICE": "Price",
         "DURATION": "Duration"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No products"
       }
     },
     "ADD": {
@@ -373,6 +389,55 @@
       "MESSAGE": "Product {{name}} updated"
     }
   },
+  "CATALOGUE": {
+    "ADD": {
+      "TITLE": "Add catalogue",
+      "NAME": {
+        "FIELD": "Name",
+        "REQUIRED": "Name is <b>required</b>"
+      },
+      "DESCRIPTION": {
+        "FIELD": "Description"
+      },
+      "FILE": {
+        "DRAG_DROP": "Drag and drop file here",
+        "OR": "or",
+        "CHOOSE": "Choose a file"
+      },
+      "CREATED": "Catalogue {{name}} created"
+    },
+    "DETAIL": {
+      "TITLE": "Update catalogue",
+      "NAME": {
+        "FIELD": "Name",
+        "REQUIRED": "Name is <b>required</b>"
+      },
+      "DESCRIPTION": {
+        "FIELD": "Description"
+      },
+      "FILE": {
+        "DRAG_DROP": "Drag and drop file here",
+        "OR": "or",
+        "CHOOSE": "Choose a file"
+      },
+      "DELETE": {
+        "BUTTON": "Delete image {{name}}",
+        "MESSAGE": "Image {{name}} deleted",
+        "UNDO": "Undo"
+      }
+    },
+    "DELETED": {
+      "TITLE": "Delete catalogue",
+      "CONTENT": "Are you sure to delete catalogue {{name}}?",
+      "MESSAGE": "Catalogue {{name}} deleted"
+    },
+    "UPDATED": {
+      "ALL": {
+        "MESSAGE": "Sorted catalogs"
+      },
+      "MESSAGE": "Catalogue {{name}} updated"
+    }
+  },
   "ROOM": {
     "LIST": {
       "COLUMN": {
@@ -384,6 +449,9 @@
           "SATURDAY": "Saturday",
           "SUNDAY": "Sunday"
         }
+      },
+      "ERROR": {
+        "NO_CONTENT": "No rooms"
       }
     },
     "ADD": {
@@ -526,12 +594,17 @@
       "CUSTOMER": {
         "FIELD": "Customer",
         "REQUIRED": "Customer is <b>required</b>",
-        "INVALID": "Customer is invalid"
+        "INVALID": "Customer is invalid",
+        "ADD_BUTTON": "Add customer"
       },
       "ROOM": {
         "FIELD": "Room",
         "REQUIRED": "Room is <b>required</b>",
-        "INVALID": "Room is invalid"
+        "INVALID": "Room is invalid",
+        "ADDRESS": {
+          "NAME": "Address",
+          "DESCRIPTION": "Description"
+        }
       },
       "PRODUCT": {
         "FIELD": "Product",
@@ -541,6 +614,10 @@
       "DATE": {
         "FIELD": "Pick a date",
         "REQUIRED": "Date is <b>required</b>"
+      },
+      "START": {
+        "FIELD": "Pick a time",
+        "REQUIRED": "Time is <b>required</b>"
       },
       "SCHEDULE": {
         "FIELD": "Book an appointment",
@@ -572,12 +649,16 @@
         "DETAIL": "<div><b>Customer name:</b> {{customerName}}</div><div><b>Product:</b> {{productName}}</div><div><b>Duration:</b> {{duration}}</div>",
         "TITLE": "Add new reservation",
         "CONTENT": "Are you sure to add reservation on {{date}}?",
-        "CHANGE": "Are you sure to change reservation to {{date}}?",
+        "CHANGE": {
+          "TITLE": "Update reservation",
+          "CONTENT": "Are you sure to change reservation to {{date}}?"
+        },
         "MESSAGE": {
           "UNAVAILABLE": "<b>Unavailable</b>",
           "LUNCH": "<b>Lunch time</b>",
           "OUT_OF_WORK": "<b>Out of work</b>"
-        }
+        },
+        "UNAVAILABLE": "<div><b>Unavailable</b></div><div>{{description}}</div><div><b>Duration:</b> {{duration}}</div>"
       },
       "CREATED": "Reservation {{date}} created"
     },
@@ -586,7 +667,8 @@
       "ROOM": {
         "TITLE": "Room",
         "NAME": "Name",
-        "PROFESSIONAL": "Professional"
+        "PROFESSIONAL": "Professional",
+        "ADDRESS": "Address"
       },
       "PRODUCT": {
         "TITLE": "Product",
@@ -602,6 +684,9 @@
           "START": "Start",
           "PRODUCT": "Product",
           "STATE": "State"
+        },
+        "ERROR": {
+          "NO_CONTENT": "No histories"
         }
       },
       "STATE": {
@@ -612,6 +697,7 @@
       },
       "ACTION": {
         "APPROVE": "Approve",
+        "EDIT": "Edit",
         "START": "Start",
         "COMPLETE": "Complete",
         "CANCEL": "Cancel"
@@ -620,6 +706,7 @@
         "TITLE": "Change state",
         "ACTION": {
           "APPROVE": "approve the reservation",
+          "EDIT": "edit the appointment",
           "START": "start the appointment",
           "COMPLETE": "complete the appointment",
           "CANCEL": "cancel the reservation"
@@ -634,6 +721,9 @@
         "START": "Start",
         "STATE": "State",
         "PRODUCT": "Product"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No reservations"
       }
     },
     "DELETED": {
@@ -642,7 +732,7 @@
       "MESSAGE": "Reservation {{date}} deleted"
     },
     "UPDATED": {
-      "MESSAGE": "Room {{name}} updated"
+      "MESSAGE": "Reservation {{date}} updated"
     },
     "STATE": {
       "CREATED": "Created",
@@ -656,7 +746,77 @@
     "TITLE": "Notifications",
     "LOAD_MORE": "Load more"
   },
+  "UNAVAILABLE": {
+    "LIST": {
+      "COLUMN": {
+        "PROFESSIONAL": "Professional",
+        "DESCRIPTION": "Description",
+        "START": "Start",
+        "DURATION": "Duration",
+        "REPEAT": "Repeat"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No events"
+      }
+    },
+    "ADD": {
+      "TITLE": "Add unavailable",
+      "DESCRIPTION": {
+        "FIELD": "Description"
+      },
+      "PROFESSIONAL": {
+        "FIELD": "Professional",
+        "REQUIRED": "Professional is <b>required</b>",
+        "INVALID": "Professional is invalid"
+      },
+      "DATE": {
+        "FIELD": "Pick a date",
+        "REQUIRED": "Date is <b>required</b>"
+      },
+      "TIME": {
+        "FIELD": "Pick a time",
+        "REQUIRED": "Time is <b>required</b>"
+      },
+      "DURATION": {
+        "FIELD": "Duration",
+        "REQUIRED": "Duration is <b>required</b>"
+      },
+      "REPEAT": {
+        "FIELD": "Repeat"
+      },
+      "CREATED": "Unavailable {{date}} created"
+    },
+    "DETAIL": {
+      "TITLE": "Update unavailable",
+      "DESCRIPTION": {
+        "FIELD": "Description"
+      },
+      "DATE": {
+        "FIELD": "Pick a date",
+        "REQUIRED": "Date is <b>required</b>"
+      },
+      "TIME": {
+        "FIELD": "Pick a time",
+        "REQUIRED": "Time is <b>required</b>"
+      },
+      "DURATION": {
+        "FIELD": "Duration",
+        "REQUIRED": "Duration is <b>required</b>"
+      },
+      "REPEAT": {
+        "FIELD": "Repeat"
+      }
+    },
+    "DELETED": {
+      "TITLE": "Delete unavailable",
+      "CONTENT": "Are you sure to delete unavailable {{date}}?",
+      "MESSAGE": "Unavailable {{date}} deleted"
+    },
+    "UPDATED": {
+      "MESSAGE": "Unavailable {{date}} updated"
+    }
+  },
   "APP": {
-    "TITLE": "Nail"
+    "TITLE": "Cleos"
   }
 }

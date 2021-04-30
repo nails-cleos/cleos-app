@@ -38,8 +38,8 @@ export class RoomService {
     return this.http.get<IRoom>(url);
   }
 
-  public add(product: IRoom): Observable<IRoom> {
-    return this.http.post<IRoom>(this.url, product);
+  public add(room: IRoom): Observable<IRoom> {
+    return this.http.post<IRoom>(this.url, room);
   }
 
   public delete(id: string | null): Observable<IRoom> {
@@ -47,8 +47,8 @@ export class RoomService {
     return this.http.delete<IRoom>(url);
   }
 
-  public update(product: IRoom): Observable<IRoom> {
-    const url = `${this.url}/${product.id}`;
-    return this.http.patch<IRoom>(url, product);
+  public update(room: IRoom): Observable<IRoom> {
+    const url = `${this.url}/${room.id}`;
+    return this.http.patch<IRoom>(url, room);
   }
 }

@@ -1,96 +1,96 @@
 import { Action } from '@ngrx/store';
 
 export enum AuthActionTypes {
-  LOGIN = '[Auth] Login',
-  SOCIAL_LOGIN = '[Auth] Social Login',
-  LOGIN_SUCCESS = '[Auth] Login Success',
-  LOGIN_FAILURE = '[Auth] Login Failure',
-  SIGNUP = '[Auth] Signup',
-  SIGNUP_SUCCESS = '[Auth] Signup Success',
-  SIGNUP_FAILURE = '[Auth] Signup Failure',
-  LOGOUT = '[Auth] Logout',
-  ACTIVATE_ACCOUNT = '[Auth] Activate Account',
-  FORGOT_PASSWORD = '[Auth] Forgot password',
-  RECOVERY_PASSWORD = '[Auth] Recovery password',
-  CLEAN = '[Auth] Clean'
+  login = '[Auth] Login',
+  socialLogin = '[Auth] Social Login',
+  loginSuccess = '[Auth] Login Success',
+  loginFailure = '[Auth] Login Failure',
+  signup = '[Auth] Signup',
+  signupSuccess = '[Auth] Signup Success',
+  signupFailure = '[Auth] Signup Failure',
+  logout = '[Auth] Logout',
+  activateAccount = '[Auth] Activate Account',
+  forgotPassword = '[Auth] Forgot password',
+  recoveryPassword = '[Auth] Recovery password',
+  clean = '[Auth] Clean'
 }
 
 export class Login implements Action {
-  readonly type = AuthActionTypes.LOGIN;
+  readonly type = AuthActionTypes.login;
 
   constructor(public payload: any) {
   }
 }
 
 export class SocialLogin implements Action {
-  readonly type = AuthActionTypes.SOCIAL_LOGIN;
+  readonly type = AuthActionTypes.socialLogin;
 
   constructor(public payload: any) {
   }
 }
 
 export class LoginSuccess implements Action {
-  readonly type = AuthActionTypes.LOGIN_SUCCESS;
+  readonly type = AuthActionTypes.loginSuccess;
 
   constructor(public payload: any) {
   }
 }
 
 export class LoginFailure implements Action {
-  readonly type = AuthActionTypes.LOGIN_FAILURE;
+  readonly type = AuthActionTypes.loginFailure;
 
   constructor(public payload: any) {
   }
 }
 
 export class SignUp implements Action {
-  readonly type = AuthActionTypes.SIGNUP;
+  readonly type = AuthActionTypes.signup;
 
   constructor(public payload: any) {
   }
 }
 
 export class SignUpSuccess implements Action {
-  readonly type = AuthActionTypes.SIGNUP_SUCCESS;
+  readonly type = AuthActionTypes.signupSuccess;
 
   constructor(public payload: any) {
   }
 }
 
 export class SignUpFailure implements Action {
-  readonly type = AuthActionTypes.SIGNUP_FAILURE;
+  readonly type = AuthActionTypes.signupFailure;
 
   constructor(public payload: any) {
   }
 }
 
 export class LogOut implements Action {
-  readonly type = AuthActionTypes.LOGOUT;
+  readonly type = AuthActionTypes.logout;
 }
 
 export class ActivateAccount implements Action {
-  readonly type = AuthActionTypes.ACTIVATE_ACCOUNT;
+  readonly type = AuthActionTypes.activateAccount;
 
   constructor(public payload: any) {
   }
 }
 
 export class ForgotPassword implements Action {
-  readonly type = AuthActionTypes.FORGOT_PASSWORD;
+  readonly type = AuthActionTypes.forgotPassword;
 
   constructor(public payload: any) {
   }
 }
 
 export class RecoveryPassword implements Action {
-  readonly type = AuthActionTypes.RECOVERY_PASSWORD;
+  readonly type = AuthActionTypes.recoveryPassword;
 
   constructor(public payload: any) {
   }
 }
 
 export class Clean implements Action {
-  readonly type = AuthActionTypes.CLEAN;
+  readonly type = AuthActionTypes.clean;
 }
 
 export type All =

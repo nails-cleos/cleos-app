@@ -17,7 +17,8 @@
       "VIEW": "Ver",
       "EDIT": "Editar",
       "DELETE": "Eliminar",
-      "INVITE": "Enviar invitación"
+      "INVITE": "Enviar invitación",
+      "CLOSE": "Cerrar"
     },
     "COLUMN": {
       "ACTIONS": "Acciones"
@@ -36,6 +37,11 @@
       "ROLE_PROFESSIONAL": "Profesional",
       "ROLE_ADMIN": "Admin"
     },
+    "REPEAT": {
+      "NONE": "Nunca",
+      "EVERY_DAY": "Todos los dias",
+      "ONCE_A_WEEK": "Una vez a la semana"
+    },
     "NOTIFICATION": {
       "NO": "No hay notificaciones"
     },
@@ -45,7 +51,11 @@
     },
     "ADDRESS": {
       "FIELD": "Dirección",
-      "INVALID": "La dirección es invalida"
+      "INVALID": "La dirección es invalida",
+      "DESCRIPTION": "Descripción"
+    },
+    "ERROR": {
+      "NO_CONTENT": "Sin datos"
     }
   },
   "DASHBOARD": {
@@ -90,7 +100,7 @@
         "ERROR": "Por favor ingrese una contraseña"
       },
       "OR": "O ingresa con tu email",
-      "NEW": "¿Nuevo en nail?",
+      "NEW": "¿Nuevo en Cleos?",
       "FORGOT_PASSWORD": "¿Olvido su contraseña?"
     },
     "SIGN_UP": {
@@ -131,13 +141,13 @@
       },
       "OR": "O registrate con tu email",
       "SUCCESS": "Usuario {{username}} creado. Verifica tu email {{email}}",
-      "ALREADY": "¿Ya tienes nail?"
+      "ALREADY": "¿Ya tienes Cleos?"
     },
     "ACTIVATE_ACCOUNT": {
-      "TITLE": "Activate account",
-      "CONTENT": "Welcome to nail",
-      "BUTTON": "Activate",
-      "MESSAGE": "Account activated"
+      "TITLE": "Activar cuenta",
+      "CONTENT": "Bienvenido a Cleos",
+      "BUTTON": "Activar",
+      "MESSAGE": "Cuenta activada"
     },
     "FORGOT_PASSWORD": {
       "TITLE": "Olvido su contraseña",
@@ -180,6 +190,9 @@
         "DETAIL": {
           "TITLE": "Roles"
         }
+      },
+      "ERROR": {
+        "NO_CONTENT": "No hay usuarios"
       },
       "STATUS": {
         "ENABLED": "Verificado",
@@ -323,6 +336,9 @@
         "DESCRIPTION": "Descripción",
         "PRICE": "Precio",
         "DURATION": "Duración"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No hay productos"
       }
     },
     "ADD": {
@@ -373,6 +389,55 @@
       "MESSAGE": "Producto {{name}} actualizado"
     }
   },
+  "CATALOGUE": {
+    "ADD": {
+      "TITLE": "Agregar catálogo",
+      "NAME": {
+        "FIELD": "Nombre",
+        "REQUIRED": "Nombre es <b>requerido</b>"
+      },
+      "DESCRIPTION": {
+        "FIELD": "Descripción"
+      },
+      "FILE": {
+        "DRAG_DROP": "Arrastrar y soltar el archivo aquí",
+        "OR": "o",
+        "CHOOSE": "Elegí un archivo"
+      },
+      "CREATED": "Catálogo {{name}} creado"
+    },
+    "DETAIL": {
+      "TITLE": "Actualizar catálogo",
+      "NAME": {
+        "FIELD": "Nombre",
+        "REQUIRED": "Nombre es <b>requerido</b>"
+      },
+      "DESCRIPTION": {
+        "FIELD": "Descripción"
+      },
+      "FILE": {
+        "DRAG_DROP": "Arrastrar y soltar el archivo aquí",
+        "OR": "o",
+        "CHOOSE": "Elegí un archivo"
+      },
+      "DELETE": {
+        "BUTTON": "Eliminar imagen {{name}}",
+        "MESSAGE": "Imagen {{name}} eliminada",
+        "UNDO": "Deshacer"
+      }
+    },
+    "DELETED": {
+      "TITLE": "Eliminar catálogo",
+      "CONTENT": "¿Está seguro de eliminar el catálogo {{name}}?",
+      "MESSAGE": "Catálogo {{name}} eliminado"
+    },
+    "UPDATED": {
+      "ALL": {
+        "MESSAGE": "Catálogos ordenados"
+      },
+      "MESSAGE": "Catálogo {{name}} actualizado"
+    }
+  },
   "ROOM": {
     "LIST": {
       "COLUMN": {
@@ -384,6 +449,9 @@
           "SATURDAY": "Sábado",
           "SUNDAY": "Domingo"
         }
+      },
+      "ERROR": {
+        "NO_CONTENT": "No hay salas"
       }
     },
     "ADD": {
@@ -526,12 +594,17 @@
       "CUSTOMER": {
         "FIELD": "Cliente",
         "REQUIRED": "Cliente es <b>requerido</b>",
-        "INVALID": "Cliente no valido"
+        "INVALID": "Cliente no valido",
+        "ADD_BUTTON": "Agregar cliente"
       },
       "ROOM": {
         "FIELD": "Sala",
-        "REQUIRED": "Sala es <b>requerido</b>",
-        "INVALID": "Sala no valido"
+        "REQUIRED": "Sala es <b>requerida</b>",
+        "INVALID": "Sala no valida",
+        "ADDRESS": {
+          "NAME": "Dirección",
+          "DESCRIPTION": "Descripción"
+        }
       },
       "PRODUCT": {
         "FIELD": "Servicio",
@@ -541,6 +614,10 @@
       "DATE": {
         "FIELD": "Elegí una fecha",
         "REQUIRED": "Fecha es <b>requerida</b>"
+      },
+      "START": {
+        "FIELD": "Elegí una hora",
+        "REQUIRED": "Hora es <b>requerido</b>"
       },
       "SCHEDULE": {
         "FIELD": "Reservar una cita",
@@ -571,8 +648,11 @@
         },
         "DETAIL": "<div><b>Nombre del cliente:</b> {{customerName}}</div><div><b>Servicio:</b> {{productName}}</div><div><b>Duración:</b> {{duration}}</div>",
         "TITLE": "Agregar nueva reserva",
-        "CONTENT": "Estás segura de añadir la reserva el {{date}}?",
-        "CHANGE": "Estás segura de cambiar la reserva al {{date}}?",
+        "CONTENT": "¿Estás segura de añadir la reserva el {{date}}?",
+        "CHANGE": {
+          "TITLE": "Actualizar reserva",
+          "CONTENT": "¿Estás segura de cambiar la reserva al {{date}}?"
+        },
         "MESSAGE": {
           "UNAVAILABLE": "<b>No disponible</b>",
           "LUNCH": "<b>Hora de almuerzo</b>",
@@ -586,7 +666,8 @@
       "ROOM": {
         "TITLE": "Sala",
         "NAME": "Nombre",
-        "PROFESSIONAL": "Profesional"
+        "PROFESSIONAL": "Profesional",
+        "ADDRESS": "Dirección"
       },
       "PRODUCT": {
         "TITLE": "Servicio",
@@ -602,18 +683,29 @@
           "START": "Inicio",
           "PRODUCT": "Servicio",
           "STATE": "Estado"
+        },
+        "ERROR": {
+          "NO_CONTENT": "No hay historial"
         }
       },
       "STATE": {
         "APPROVE": "La reserva fue aprobada",
-        "START": "La reserva se inicio",
-        "COMPLETE": "La reserva se completo",
-        "CANCEL": "La reserva se cancelo"
+        "START": "La reserva se inició",
+        "COMPLETE": "La reserva se completó",
+        "CANCEL": "La reserva se canceló"
+      },
+      "ACTION": {
+        "APPROVE": "Aprobar",
+        "START": "Iniciar",
+        "EDIT": "Editar",
+        "COMPLETE": "Completar",
+        "CANCEL": "Cancelar"
       },
       "CHANGE_STATE": {
         "TITLE": "Cambio de estado",
         "ACTION": {
           "APPROVE": "aprobar la reserva",
+          "EDIT": "editar la cita",
           "START": "iniciar la cita",
           "COMPLETE": "completar la cita",
           "CANCEL": "cancelar la reserva"
@@ -628,15 +720,18 @@
         "START": "Inicio",
         "STATE": "Estado",
         "PRODUCT": "Servicio"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No hay reservas"
       }
     },
     "DELETED": {
-      "TITLE": "Delete reservation",
-      "CONTENT": "Are you sure to delete reservation {{date}}?",
-      "MESSAGE": "Reservation {{date}} deleted"
+      "TITLE": "Eliminar reserva",
+      "CONTENT": "¿Está seguro de eliminar la reserva {{date}}?",
+      "MESSAGE": "Reserva {{date}} eliminada"
     },
     "UPDATED": {
-      "MESSAGE": "Sala {{name}} updated"
+      "MESSAGE": "Reserva {{date}} actualizada"
     },
     "STATE": {
       "CREATED": "Creada",
@@ -650,7 +745,77 @@
     "TITLE": "Notificaciones",
     "LOAD_MORE": "Ver mas"
   },
+  "UNAVAILABLE": {
+    "LIST": {
+      "COLUMN": {
+        "PROFESSIONAL": "Profesional",
+        "DESCRIPTION": "Descripción",
+        "START": "Inicio",
+        "DURATION": "Duración",
+        "REPEAT": "Repetir"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No hay eventos"
+      }
+    },
+    "ADD": {
+      "TITLE": "Agregar no disponible",
+      "DESCRIPTION": {
+        "FIELD": "Descripción"
+      },
+      "PROFESSIONAL": {
+        "FIELD": "Profesional",
+        "REQUIRED": "Profesional es <b>requerido</b>",
+        "INVALID": "Profesional no valido"
+      },
+      "DATE": {
+        "FIELD": "Elegí una fecha",
+        "REQUIRED": "Fecha es <b>requerida</b>"
+      },
+      "TIME": {
+        "FIELD": "Elegí una hora",
+        "REQUIRED": "Hora es <b>requerida</b>"
+      },
+      "DURATION": {
+        "FIELD": "Duración",
+        "REQUIRED": "Duración es <b>requerido</b>"
+      },
+      "REPEAT": {
+        "FIELD": "Repetir"
+      },
+      "CREATED": "No disponible {{date}} creado"
+    },
+    "DETAIL": {
+      "TITLE": "Actualizar producto",
+      "DESCRIPTION": {
+        "FIELD": "Descripción"
+      },
+      "DATE": {
+        "FIELD": "Elegí una fecha",
+        "REQUIRED": "Fecha es <b>requerida</b>"
+      },
+      "TIME": {
+        "FIELD": "Elegí una hora",
+        "REQUIRED": "Hora es <b>requerida</b>"
+      },
+      "DURATION": {
+        "FIELD": "Duración",
+        "REQUIRED": "Duración es <b>requerido</b>"
+      },
+      "REPEAT": {
+        "FIELD": "Repetir"
+      }
+    },
+    "DELETED": {
+      "TITLE": "Eliminar no disponible",
+      "CONTENT": "¿Está seguro de eliminar no disponible {{date}}?",
+      "MESSAGE": "No disponible {{date}} eliminado"
+    },
+    "UPDATED": {
+      "MESSAGE": "No disponible {{date}} actualizado"
+    }
+  },
   "APP": {
-    "TITLE": "Uñas"
+    "TITLE": "Cleos"
   }
 }

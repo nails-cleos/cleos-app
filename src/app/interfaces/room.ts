@@ -1,13 +1,12 @@
 import { IUser } from './user';
 
 export interface IRoom {
-  address?: string;
   id?: string;
   name?: string;
   professionalId?: string;
   professional?: IUser;
   availabilities: IAvailability[];
-  location?: ILocation;
+  address?: IAddress;
 }
 
 export interface IRoomAll {
@@ -15,7 +14,7 @@ export interface IRoomAll {
   name: string;
   professional: IUser;
   availabilities: IAvailability[];
-  location: ILocation;
+  address: IAddress;
 }
 
 export interface IAvailability {
@@ -31,6 +30,12 @@ export interface IAvailabilityDate {
   endDate?: Date;
   startLunchDate?: Date;
   endLunchDate?: Date;
+}
+
+export interface IAddress {
+  name: string;
+  description?: string;
+  location: ILocation;
 }
 
 export interface ILocation {

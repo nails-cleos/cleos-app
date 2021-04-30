@@ -1,196 +1,196 @@
 import { Action } from '@ngrx/store';
 
 export enum ReservationActionTypes {
-  GET_ALL = '[Reservation] Get all',
-  GET_ALL_PAGE = '[Reservation] Get all page',
-  GET_ALL_ASSIGNMENT_PAGE = '[Reservation] Get all page assignment',
-  GET_ALL_GROUPING_BY_ROOM = '[Reservation] Get all grouping by room',
-  SEARCH_RESERVATION = '[Reservation] Search reservation',
-  GET_CUSTOMERS = '[Reservation] Get customers',
-  GET_PRODUCTS = '[Reservation] Get products',
-  GET_ROOMS = '[Reservation] Get rooms',
-  RESERVATION_SUCCESS = '[Reservation] Success',
-  RESERVATION_PAGE_SUCCESS = '[Reservation] Page Success',
-  RESERVATION_CUSTOMERS_SUCCESS = '[Reservation] Customers success',
-  RESERVATION_PRODUCTS_SUCCESS = '[Reservation] Products success',
-  RESERVATION_ROOMS_SUCCESS = '[Reservation] Rooms success',
-  RESERVATION_SAVE = '[Reservation] Save',
-  RESERVATION_UPDATE = '[Reservation] Update',
-  RESERVATION_SAVE_SUCCESS = '[Reservation] Save Success',
-  RESERVATION_FAILURE = '[Reservation] Failure',
-  RESERVATION_SELECTED = '[Reservation] Selected',
-  RESERVATION_FIND = '[Reservation] Find',
-  RESERVATION_DELETE = '[Reservation] Delete',
-  APPROVE = '[Reservation] Approve',
-  START = '[Reservation] Start',
-  COMPLETE = '[Reservation] Complete',
-  CANCEL = '[Reservation] Cancel',
-  STATE_SUCCESS = '[Reservation] State success',
-  CLEAN = '[Reservation] Clean'
+  getAll = '[Reservation] Get all',
+  getAllPage = '[Reservation] Get all page',
+  getAllAssignmentPage = '[Reservation] Get all page assignment',
+  getAllGroupingByRoom = '[Reservation] Get all grouping by room',
+  searchReservation = '[Reservation] Search reservation',
+  getCustomers = '[Reservation] Get customers',
+  getProducts = '[Reservation] Get products',
+  getRooms = '[Reservation] Get rooms',
+  reservationSuccess = '[Reservation] Success',
+  reservationPageSuccess = '[Reservation] Page Success',
+  reservationCustomersSuccess = '[Reservation] Customers success',
+  reservationProductsSuccess = '[Reservation] Products success',
+  reservationRoomsSuccess = '[Reservation] Rooms success',
+  reservationSave = '[Reservation] Save',
+  reservationSaveSuccess = '[Reservation] Save Success',
+  reservationFailure = '[Reservation] Failure',
+  reservationSelected = '[Reservation] Selected',
+  reservationFind = '[Reservation] Find',
+  reservationDelete = '[Reservation] Delete',
+  approve = '[Reservation] Approve',
+  edit = '[Reservation] Edit',
+  start = '[Reservation] Start',
+  complete = '[Reservation] Complete',
+  cancel = '[Reservation] Cancel',
+  stateSuccess = '[Reservation] State success',
+  clean = '[Reservation] Clean'
 }
 
 export class GetAll implements Action {
-  readonly type = ReservationActionTypes.GET_ALL;
+  readonly type = ReservationActionTypes.getAll;
 }
 
 export class GetAllPage implements Action {
-  readonly type = ReservationActionTypes.GET_ALL_PAGE;
+  readonly type = ReservationActionTypes.getAllPage;
 
   constructor(public payload: any) {
   }
 }
 
 export class GetAllAssignmentPage implements Action {
-  readonly type = ReservationActionTypes.GET_ALL_ASSIGNMENT_PAGE;
+  readonly type = ReservationActionTypes.getAllAssignmentPage;
 
   constructor(public payload: any) {
   }
 }
 
 export class GetAllGroupingByRoom implements Action {
-  readonly type = ReservationActionTypes.GET_ALL_GROUPING_BY_ROOM;
+  readonly type = ReservationActionTypes.getAllGroupingByRoom;
 }
 
 export class SearchReservation implements Action {
-  readonly type = ReservationActionTypes.SEARCH_RESERVATION;
+  readonly type = ReservationActionTypes.searchReservation;
 
   constructor(public payload: any) {
   }
 }
 
 export class GetAllCustomers implements Action {
-  readonly type = ReservationActionTypes.GET_CUSTOMERS;
+  readonly type = ReservationActionTypes.getCustomers;
 }
 
 export class GetAllProducts implements Action {
-  readonly type = ReservationActionTypes.GET_PRODUCTS;
+  readonly type = ReservationActionTypes.getProducts;
 }
 
 export class GetAllRooms implements Action {
-  readonly type = ReservationActionTypes.GET_ROOMS;
+  readonly type = ReservationActionTypes.getRooms;
 }
 
 export class ReservationSuccess implements Action {
-  readonly type = ReservationActionTypes.RESERVATION_SUCCESS;
+  readonly type = ReservationActionTypes.reservationSuccess;
 
   constructor(public payload: any) {
   }
 }
 
 export class ReservationPageSuccess implements Action {
-  readonly type = ReservationActionTypes.RESERVATION_PAGE_SUCCESS;
+  readonly type = ReservationActionTypes.reservationPageSuccess;
 
   constructor(public payload: any) {
   }
 }
 
 export class ReservationCustomersSuccess implements Action {
-  readonly type = ReservationActionTypes.RESERVATION_CUSTOMERS_SUCCESS;
+  readonly type = ReservationActionTypes.reservationCustomersSuccess;
 
   constructor(public payload: any) {
   }
 }
 
 export class ReservationProductsSuccess implements Action {
-  readonly type = ReservationActionTypes.RESERVATION_PRODUCTS_SUCCESS;
+  readonly type = ReservationActionTypes.reservationProductsSuccess;
 
   constructor(public payload: any) {
   }
 }
 
 export class ReservationRoomsSuccess implements Action {
-  readonly type = ReservationActionTypes.RESERVATION_ROOMS_SUCCESS;
+  readonly type = ReservationActionTypes.reservationRoomsSuccess;
 
   constructor(public payload: any) {
   }
 }
 
 export class ReservationSave implements Action {
-  readonly type = ReservationActionTypes.RESERVATION_SAVE;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class ReservationUpdate implements Action {
-  readonly type = ReservationActionTypes.RESERVATION_UPDATE;
+  readonly type = ReservationActionTypes.reservationSave;
 
   constructor(public payload: any) {
   }
 }
 
 export class ReservationSaveSuccess implements Action {
-  readonly type = ReservationActionTypes.RESERVATION_SAVE_SUCCESS;
+  readonly type = ReservationActionTypes.reservationSaveSuccess;
 
   constructor(public payload: any) {
   }
 }
 
 export class ReservationFailure implements Action {
-  readonly type = ReservationActionTypes.RESERVATION_FAILURE;
+  readonly type = ReservationActionTypes.reservationFailure;
 
   constructor(public payload: any) {
   }
 }
 
 export class ReservationSelected implements Action {
-  readonly type = ReservationActionTypes.RESERVATION_SELECTED;
+  readonly type = ReservationActionTypes.reservationSelected;
 
   constructor(public payload: any) {
   }
 }
 
 export class ReservationFind implements Action {
-  readonly type = ReservationActionTypes.RESERVATION_FIND;
+  readonly type = ReservationActionTypes.reservationFind;
 
   constructor(public payload: any) {
   }
 }
 
 export class DeleteReservation implements Action {
-  readonly type = ReservationActionTypes.RESERVATION_DELETE;
+  readonly type = ReservationActionTypes.reservationDelete;
 
   constructor(public payload: any) {
   }
 }
 
 export class Approve implements Action {
-  readonly type = ReservationActionTypes.APPROVE;
+  readonly type = ReservationActionTypes.approve;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class Edit implements Action {
+  readonly type = ReservationActionTypes.edit;
 
   constructor(public payload: any) {
   }
 }
 
 export class Start implements Action {
-  readonly type = ReservationActionTypes.START;
+  readonly type = ReservationActionTypes.start;
 
   constructor(public payload: any) {
   }
 }
 
 export class Complete implements Action {
-  readonly type = ReservationActionTypes.COMPLETE;
+  readonly type = ReservationActionTypes.complete;
 
   constructor(public payload: any) {
   }
 }
 
 export class Cancel implements Action {
-  readonly type = ReservationActionTypes.CANCEL;
+  readonly type = ReservationActionTypes.cancel;
 
   constructor(public payload: any) {
   }
 }
 
 export class StateSuccess implements Action {
-  readonly type = ReservationActionTypes.STATE_SUCCESS;
+  readonly type = ReservationActionTypes.stateSuccess;
 
   constructor(public payload: any) {
   }
 }
 
 export class Clean implements Action {
-  readonly type = ReservationActionTypes.CLEAN;
+  readonly type = ReservationActionTypes.clean;
 }
 
 export type All =
@@ -203,7 +203,6 @@ export type All =
   | GetAllProducts
   | GetAllRooms
   | ReservationSave
-  | ReservationUpdate
   | ReservationSuccess
   | ReservationPageSuccess
   | ReservationCustomersSuccess
@@ -216,6 +215,7 @@ export type All =
   | DeleteReservation
   | Approve
   | Start
+  | Edit
   | Complete
   | Cancel
   | StateSuccess

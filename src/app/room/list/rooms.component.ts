@@ -20,6 +20,8 @@ import { GeocodeService } from '../../services/geocode.service';
   styleUrls: ['./rooms.component.scss']
 })
 export class RoomsComponent implements OnInit, AfterViewInit {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   displayedColumns: string[] = ['position', 'name', 'professional', 'address', 'availability', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IRoom>>();
@@ -29,9 +31,6 @@ export class RoomsComponent implements OnInit, AfterViewInit {
   pageSize = PAGE_SIZE;
   error: any;
 
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
-
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
               private store: Store<AppState>, private cdRef: ChangeDetectorRef, private geocodeService: GeocodeService) {
     this.getState = this.store.select(selectRoomState);
@@ -40,10 +39,9 @@ export class RoomsComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.sort.sortChange.subscribe(() => {
       this.getRooms();
-      // this.paginator.pageIndex = 0;
     });
 
-    this.paginator.page.subscribe(() => {
+    this.paginator?.page.subscribe(() => {
       this.getRooms();
     });
 
@@ -72,19 +70,7 @@ export class RoomsComponent implements OnInit, AfterViewInit {
           this.error = stateValue.error;
         }
       }
-      this.dataSource = stateValue.data?.content?.map((room: IRoom) => {
-        if (room.location) {
-          this.geocodeService.geocodeAddress(room.location.x, room.location.y).subscribe(location => {
-            this.dataSource.find((e: any) => {
-              if (e.id === room.id) {
-                e.address = location.formatted_address;
-              }
-            });
-          });
-          return Object.assign({}, room, {address: undefined});
-        }
-        return room;
-      });
+      this.dataSource = stateValue.data?.content;
       this.resultsLength = stateValue.data?.totalElements;
     });
   }
@@ -121,7 +107,7 @@ export class RoomsComponent implements OnInit, AfterViewInit {
     const payload = {
       active: this.sort.active,
       direction: this.sort.direction,
-      page: this.paginator.pageIndex
+      page: this.paginator ? this.paginator.pageIndex : 0
     };
     this.store.dispatch(
       new fromActionsRoom.GetAll(payload)

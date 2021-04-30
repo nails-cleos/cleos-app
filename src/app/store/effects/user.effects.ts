@@ -13,156 +13,126 @@ import { Role } from '../../interfaces/token';
 export class UserEffects {
 
   @Effect()
-  getAll$ = this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.GET_ALL)).pipe(
+  getAll$ = this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.getAll)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.userService.getAll(payload.active, payload.direction, payload.page).pipe(
-        switchMap((response: any) => {
-          return of(new fromActionsUser.UserSuccess(response));
-        }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
-      );
-    })
+    switchMap((payload: any) => this.userService.getAll(payload.active, payload.direction, payload.page).pipe(
+      switchMap((response: any) => of(new fromActionsUser.UserSuccess(response ? response : {content: [], totalElements: 0}))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
+    ))
   );
 
   @Effect()
-  findOne$ = this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.FIND_USER)).pipe(
+  findOne$ = this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.findUser)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.userService.getById(payload).pipe(
-        switchMap((response: any) => {
-          return of(new fromActionsUser.UserSelected({user: response}));
-        }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
-      );
-    })
+    switchMap((payload: any) => this.userService.getById(payload).pipe(
+      switchMap((response: any) => of(new fromActionsUser.UserSelected({user: response}))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
+    ))
   );
 
   @Effect()
-  findMe$ = this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.FIND_ME)).pipe(
+  findMe$ = this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.findMe)).pipe(
     map((action: any) => action.payload),
-    switchMap(() => {
-      return this.userService.getMe().pipe(
-        switchMap((response: any) => {
-          return of(new fromActionsUser.UserSelected({user: response, profile: true}));
-        }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
-      );
-    })
+    switchMap(() => this.userService.getMe().pipe(
+      switchMap((response: any) => of(new fromActionsUser.UserSelected({user: response, profile: true}))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
+    ))
   );
 
   @Effect()
-  save$ = this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.SAVE_USER)).pipe(
+  save$ = this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.saveUser)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => {
       switch (payload.role) {
-        case Role.Customer:
+        case Role.customer:
           return this.userService.addCustomer(payload.user).pipe(
             switchMap((response: any) => {
               const message = this.translate.instant('USER.ADD.CUSTOMER', {username: response.username});
               return of(new fromActionsUser.UserSaveSuccess({message, redirect: true}));
-            }),
-            catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
+            }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
           );
-        case Role.Professional:
+        case Role.professional:
           return this.userService.addProfessional(payload.user).pipe(
             switchMap((response: any) => {
               const message = this.translate.instant('USER.ADD.PROFESSIONAL', {username: response.username});
               return of(new fromActionsUser.UserSaveSuccess({message, redirect: true}));
-            }),
-            catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
+            }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
           );
         default:
           return this.userService.update(payload.user).pipe(
             switchMap((response: any) => {
               const message = this.translate.instant('USER.UPDATED.MESSAGE', {username: response.username});
               return of(new fromActionsUser.UserSaveSuccess({message, redirect: true}));
-            }),
-            catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
+            }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
           );
       }
     })
   );
 
   @Effect()
-  setRole$ = this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.SET_ROLE)).pipe(
+  setRole$ = this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.setRole)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.userService.setRole(payload.user.id, payload.role).pipe(
-        switchMap(() => {
-          const role = this.translate.instant(`COMMON.ROLES.${payload.role}`);
-          const message = this.translate.instant(`USER.ROLE.${payload.action}`, {role, username: payload.user.username});
-          return of(new fromActionsUser.UserSaveSuccess({message, redirect: true}));
-        }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
-      );
-    })
+    switchMap((payload: any) => this.userService.setRole(payload.user.id, payload.role).pipe(
+      switchMap(() => {
+        const role = this.translate.instant(`COMMON.ROLES.${payload.role}`);
+        const message = this.translate.instant(`USER.ROLE.${payload.action}`, {role, username: payload.user.username});
+        return of(new fromActionsUser.UserSaveSuccess({message, redirect: true}));
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
+    ))
   );
 
   @Effect()
-  update$ = this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.UPDATE_USER)).pipe(
+  update$ = this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.updateUser)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.userService.updateMe(payload).pipe(
-        switchMap((response: any) => {
-          const message = this.translate.instant('PROFILE.UPDATED.MESSAGE', {username: response.username});
-          return of(new fromActionsUser.UserSaveSuccess({message}));
-        }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
-      );
-    })
+    switchMap((payload: any) => this.userService.updateMe(payload).pipe(
+      switchMap((response: any) => {
+        const message = this.translate.instant('PROFILE.UPDATED.MESSAGE', {username: response.username});
+        return of(new fromActionsUser.UserSaveSuccess({message}));
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
+    ))
   );
 
   @Effect()
-  delete$ = this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.USER_DELETE)).pipe(
+  delete$ = this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.userDelete)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.userService.delete(payload).pipe(
-        switchMap((response: any) => {
-          const message = this.translate.instant('USER.DELETED.MESSAGE', {username: response.username});
-          return of(new fromActionsUser.UserSaveSuccess({message, redirect: true}));
-        }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
-      );
-    })
+    switchMap((payload: any) => this.userService.delete(payload).pipe(
+      switchMap((response: any) => {
+        const message = this.translate.instant('USER.DELETED.MESSAGE', {username: response.username});
+        return of(new fromActionsUser.UserSaveSuccess({message, redirect: true}));
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
+    ))
   );
 
   @Effect()
-  resend$ = this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.RESEND_USER_TOKEN)).pipe(
+  resend$ = this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.resendUserToken)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.userService.resend(payload).pipe(
-        switchMap(() => {
-          const message = this.translate.instant('USER.ACTIVATION_RESEND.MESSAGE');
-          return of(new fromActionsUser.UserSaveSuccess({message}));
-        }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
-      );
-    })
+    switchMap((payload: any) => this.userService.resend(payload).pipe(
+      switchMap(() => {
+        const message = this.translate.instant('USER.ACTIVATION_RESEND.MESSAGE');
+        return of(new fromActionsUser.UserSaveSuccess({message}));
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
+    ))
   );
 
   @Effect()
-  changePassword$ = this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.CHANGE_PASSWORD)).pipe(
+  changePassword$ = this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.changePassword)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      return this.userService.changePassword(payload.username, payload.oldPassword, payload.password).pipe(
-        switchMap(() => {
-          const message = this.translate.instant('USER.CHANGE_PASSWORD.MESSAGE');
-          return of(new fromActionsUser.ChangePasswordSuccess({message}));
-        }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
-      );
-    })
+    switchMap((payload: any) => this.userService.changePassword(payload.username, payload.oldPassword, payload.password).pipe(
+      switchMap(() => {
+        const message = this.translate.instant('USER.CHANGE_PASSWORD.MESSAGE');
+        return of(new fromActionsUser.ChangePasswordSuccess({message}));
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
+    ))
   );
 
   @Effect({dispatch: false})
   dataSuccess$ = this.actions$.pipe(
-    ofType(fromActionsUser.UserActionTypes.USER_SUCCESS)
+    ofType(fromActionsUser.UserActionTypes.userSuccess)
   );
 
   @Effect({dispatch: false})
   selectedData$ = this.actions$.pipe(
-    ofType(fromActionsUser.UserActionTypes.USER_SELECTED),
+    ofType(fromActionsUser.UserActionTypes.userSelected),
     tap((data: any) => {
       if (!data.payload.profile) {
         this.router.navigate(['user', data.payload.user.id]);
@@ -172,7 +142,7 @@ export class UserEffects {
 
   @Effect({dispatch: false})
   saveSuccess$ = this.actions$.pipe(
-    ofType(fromActionsUser.UserActionTypes.USER_SAVE_SUCCESS),
+    ofType(fromActionsUser.UserActionTypes.userSaveSuccess),
     tap((data: any) => {
       if (data.payload.redirect) {
         this.router.navigate(['users']);
@@ -182,7 +152,7 @@ export class UserEffects {
 
   @Effect({dispatch: false})
   changePasswordSuccess$ = this.actions$.pipe(
-    ofType(fromActionsUser.UserActionTypes.CHANGE_PASSWORD_SUCCESS)
+    ofType(fromActionsUser.UserActionTypes.changePasswordSuccess)
   );
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private userService: UserService,

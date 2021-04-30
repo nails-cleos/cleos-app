@@ -25,9 +25,9 @@ export const initialState: State = {
   isLoading: false
 };
 
-export function reducer(state = initialState, action: All): State {
+export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case RoomActionTypes.GET_ALL: {
+    case RoomActionTypes.getAll: {
       return {
         ...state,
         // @ts-ignore
@@ -39,7 +39,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
-    case RoomActionTypes.GET_ALL_PROFESSIONAL: {
+    case RoomActionTypes.getAllProfessional: {
       return {
         ...state,
         professionals: null,
@@ -50,8 +50,8 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
-    case RoomActionTypes.GET_MY_ROOM:
-    case RoomActionTypes.ROOM_FIND: {
+    case RoomActionTypes.getMyRoom:
+    case RoomActionTypes.roomFind: {
       return {
         ...state,
         // @ts-ignore
@@ -63,7 +63,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
-    case RoomActionTypes.ROOM_SUCCESS: {
+    case RoomActionTypes.roomSuccess: {
       return {
         ...state,
         data: action.payload,
@@ -74,7 +74,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case RoomActionTypes.ROOM_SAVE_SUCCESS: {
+    case RoomActionTypes.roomSaveSuccess: {
       return {
         ...state,
         message: action.payload.message,
@@ -83,7 +83,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case RoomActionTypes.ROOM_SELECTED: {
+    case RoomActionTypes.roomSelected: {
       return {
         ...state,
         selected: action.payload.room,
@@ -93,7 +93,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case RoomActionTypes.ROOM_FAILURE: {
+    case RoomActionTypes.roomFailure: {
       return {
         ...state,
         errorMessage: action.payload.error.message,
@@ -103,10 +103,10 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case RoomActionTypes.ROOM_UPDATE_ME:
-    case RoomActionTypes.ROOM_UPDATE:
-    case RoomActionTypes.ROOM_SAVE:
-    case RoomActionTypes.ROOM_DELETE: {
+    case RoomActionTypes.roomUpdateMe:
+    case RoomActionTypes.roomUpdate:
+    case RoomActionTypes.roomSave:
+    case RoomActionTypes.roomDelete: {
       return {
         ...state,
         selected: null,
@@ -116,11 +116,11 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
-    case RoomActionTypes.CLEAN: {
+    case RoomActionTypes.clean: {
       return initialState;
     }
     default: {
       return state;
     }
   }
-}
+};

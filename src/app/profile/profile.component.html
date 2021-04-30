@@ -59,10 +59,10 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PROFILE.LANG.FIELD' | translate }}</mat-label>
                 <span *ngIf="select.value" [class]="'flag-icon  flag-icon-squared flag-icon-' + select.value.icon"
-                      matPrefix
-                      style="margin-right: 8px;"></span>
+                      class="margin-right-eight"
+                      matPrefix></span>
                 <mat-select #select [formControl]="langValue" required>
-                  <mat-option *ngFor="let lang of flags" [value]="lang">
+                  <mat-option *ngFor="let lang of flagList" [value]="lang">
                     <span [class]="'flag-icon  flag-icon-squared flag-icon-' + lang.icon"></span>
                     {{ 'COMMON.LANG.' + lang.text | translate }}
                   </mat-option>

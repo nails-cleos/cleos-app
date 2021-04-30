@@ -3,6 +3,7 @@ import { IUser, PAGE_SIZE } from '../interfaces/user';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Role } from '../interfaces/token';
+import { IRoom } from '../interfaces/room';
 
 @Injectable({
   providedIn: 'root'
@@ -82,18 +83,22 @@ export class UserService {
   public setRole(userId: string, role: Role): Observable<IUser> {
     let roleName;
     switch (role) {
-      case Role.Admin:
+      case Role.admin:
         roleName = 'admin';
         break;
-      case Role.Professional:
+      case Role.professional:
         roleName = 'professional';
         break;
-      case Role.Customer:
+      case Role.customer:
       default:
         roleName = 'customer';
         break;
     }
     const url = `${this.url}/${userId}/roles/${roleName}`;
     return this.http.post<IUser>(url, null);
+  }
+
+  public getRoomByProfessionalId(id: string): Observable<IRoom> {
+    return this.http.get<IRoom>(`${this.professionalUrl}/${id}/rooms`);
   }
 }

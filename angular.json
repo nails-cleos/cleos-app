@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "nail-app": {
+    "cleos-app": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -23,7 +23,7 @@
             "allowedCommonJsDependencies": [
               "chart.js"
             ],
-            "outputPath": "dist/nail-app",
+            "outputPath": "dist/cleos-app",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -76,18 +76,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "nail-app:build"
+            "browserTarget": "cleos-app:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "nail-app:build:production"
+              "browserTarget": "cleos-app:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "nail-app:build"
+            "browserTarget": "cleos-app:build"
           }
         },
         "test": {
@@ -111,15 +111,11 @@
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tsConfig": [
-              "tsconfig.app.json",
-              "tsconfig.spec.json",
-              "e2e/tsconfig.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
             ]
           }
         },
@@ -127,16 +123,16 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "nail-app:serve"
+            "devServerTarget": "cleos-app:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "nail-app:serve:production"
+              "devServerTarget": "cleos-app:serve:production"
             }
           }
         }
       }
     }
   },
-  "defaultProject": "nail-app"
+  "defaultProject": "cleos-app"
 }

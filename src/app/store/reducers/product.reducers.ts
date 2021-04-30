@@ -22,9 +22,9 @@ export const initialState: State = {
   isLoading: false
 };
 
-export function reducer(state = initialState, action: All): State {
+export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case ProductActionTypes.GET_ALL: {
+    case ProductActionTypes.getAll: {
       return {
         ...state,
         // @ts-ignore
@@ -36,7 +36,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
-    case ProductActionTypes.PRODUCT_FIND: {
+    case ProductActionTypes.productFind: {
       return {
         ...state,
         // @ts-ignore
@@ -48,7 +48,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
-    case ProductActionTypes.PRODUCT_SUCCESS: {
+    case ProductActionTypes.productSuccess: {
       return {
         ...state,
         data: action.payload,
@@ -58,7 +58,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case ProductActionTypes.PRODUCT_SAVE_SUCCESS: {
+    case ProductActionTypes.productSaveSuccess: {
       return {
         ...state,
         message: action.payload.message,
@@ -67,7 +67,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case ProductActionTypes.PRODUCT_SELECTED: {
+    case ProductActionTypes.productSelected: {
       return {
         ...state,
         selected: action.payload,
@@ -77,7 +77,7 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case ProductActionTypes.PRODUCT_FAILURE: {
+    case ProductActionTypes.productFailure: {
       return {
         ...state,
         errorMessage: action.payload.error.message,
@@ -87,9 +87,9 @@ export function reducer(state = initialState, action: All): State {
         isLoading: false
       };
     }
-    case ProductActionTypes.PRODUCT_UPDATE:
-    case ProductActionTypes.PRODUCT_SAVE:
-    case ProductActionTypes.PRODUCT_DELETE: {
+    case ProductActionTypes.productUpdate:
+    case ProductActionTypes.productSave:
+    case ProductActionTypes.productDelete: {
       return {
         ...state,
         errorMessage: null,
@@ -98,11 +98,11 @@ export function reducer(state = initialState, action: All): State {
         isLoading: true
       };
     }
-    case ProductActionTypes.CLEAN: {
+    case ProductActionTypes.clean: {
       return initialState;
     }
     default: {
       return state;
     }
   }
-}
+};

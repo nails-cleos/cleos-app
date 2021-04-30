@@ -2,7 +2,7 @@
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div *ngIf="!error; else errorBox" fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <form (ngSubmit)="create()" [formGroup]="form" novalidate>
-        <mat-card class="shipping-card">
+        <mat-card class="style-card">
           <mat-card-header>
             <mat-card-title>{{ 'ROOM.ADD.TITLE' | translate }}</mat-card-title>
           </mat-card-header>

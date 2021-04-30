@@ -1,14 +1,15 @@
 {
-  "name": "nail-app",
-  "version": "0.0.0",
+  "name": "cleos-app",
+  "version": "0.0.1",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --prod --source-map",
     "test": "ng test",
     "lint": "ng lint --fix",
+    "eslint": "eslint src --fix",
     "e2e": "ng e2e",
-    "start-pwa": "ng build --prod  --source-map && http-server-spa dist/nail-app index.html 8443"
+    "start-pwa": "http-server-spa dist/cleos-app index.html 8443"
   },
   "private": true,
   "dependencies": {
@@ -55,13 +56,24 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.1100.5",
+    "@angular-eslint/builder": "1.2.0",
+    "@angular-eslint/eslint-plugin": "1.2.0",
+    "@angular-eslint/eslint-plugin-template": "1.2.0",
+    "@angular-eslint/schematics": "1.2.0",
+    "@angular-eslint/template-parser": "1.2.0",
     "@angular/cli": "~11.0.5",
     "@angular/compiler-cli": "~11.0.5",
     "@angular/localize": "^11.0.5",
     "@types/googlemaps": "^3.43.3",
     "@types/jasmine": "~3.6.0",
     "@types/node": "^12.11.1",
+    "@typescript-eslint/eslint-plugin": "4.3.0",
+    "@typescript-eslint/parser": "4.3.0",
     "codelyzer": "^6.0.0",
+    "eslint": "^7.6.0",
+    "eslint-plugin-import": "2.22.1",
+    "eslint-plugin-jsdoc": "30.7.6",
+    "eslint-plugin-prefer-arrow": "1.2.2",
     "jasmine-core": "~3.6.0",
     "jasmine-spec-reporter": "~5.0.0",
     "karma": "~5.1.0",
@@ -71,6 +83,7 @@
     "karma-jasmine-html-reporter": "^1.5.0",
     "ng2-charts-schematics": "^0.1.7",
     "protractor": "~7.0.0",
+    "source-map-explorer": "^2.5.2",
     "ts-node": "~8.3.0",
     "tslint": "~6.1.0",
     "typescript": "~4.0.2"

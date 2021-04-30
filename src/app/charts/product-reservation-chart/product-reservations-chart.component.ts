@@ -2,7 +2,7 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
 import { Label } from 'ng2-charts';
 import { IReservationAll } from '../../interfaces/reservation';
-import { ProductReservation } from '../../util/chart';
+import { productReservationChart } from '../../util/chart';
 
 @Component({
   selector: 'app-product-reservations-chart',
@@ -10,11 +10,11 @@ import { ProductReservation } from '../../util/chart';
   styleUrls: ['./product-reservations-chart.component.scss']
 })
 export class ProductReservationsChartComponent implements OnChanges {
+  @Input() state: any;
+
   isLoading = true;
   data: IReservationAll[] | undefined;
   error: any;
-
-  @Input() state: any;
 
   public radarChartOptions: ChartOptions = {
     responsive: true
@@ -38,10 +38,14 @@ export class ProductReservationsChartComponent implements OnChanges {
         this.error = this.state.error;
         return;
       }
-      const chartResult = ProductReservation(this.state.data);
+      const chartResult = productReservationChart(this.state.data);
       if (chartResult) {
         this.radarChartData = chartResult.chartDataSet;
         this.radarChartLabels = chartResult.chartLabels;
+      } else {
+        this.error = {
+          status: 'NO_CONTENT'
+        };
       }
     }
   }

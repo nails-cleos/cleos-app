@@ -17,7 +17,7 @@
     <mat-list>
       <div mat-subheader>{{ 'RESERVATION.DETAIL.ROOM.TITLE' | translate}}</div>
       <mat-list-item>
-        <mat-icon mat-list-icon>room</mat-icon>
+        <mat-icon mat-list-icon>store</mat-icon>
         <div mat-line>{{ 'RESERVATION.DETAIL.ROOM.NAME' | translate}}</div>
         <div mat-line>{{reservation.room.name}}</div>
       </mat-list-item>
@@ -25,6 +25,17 @@
         <mat-icon mat-list-icon>person_pin</mat-icon>
         <div mat-line>{{ 'RESERVATION.DETAIL.ROOM.PROFESSIONAL' | translate}}</div>
         <div mat-line>{{reservation.room.professional.firstName}} {{reservation.room.professional.lastName}}</div>
+      </mat-list-item>
+      <mat-list-item>
+        <mat-icon mat-list-icon>room</mat-icon>
+        <div mat-line>{{ 'RESERVATION.DETAIL.ROOM.ADDRESS' | translate}}</div>
+        <div mat-line>
+          <a target="_blank"
+             [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + reservation.room.address.name">
+            {{reservation.room.address.name}}
+          </a>
+        </div>
+        <div mat-line>{{reservation.room.address?.description}}</div>
       </mat-list-item>
       <mat-divider></mat-divider>
       <div mat-subheader>{{ 'RESERVATION.DETAIL.PRODUCT.TITLE' | translate}}</div>
@@ -62,7 +73,7 @@
       </div>
       <table [dataSource]="dataSource" mat-table>
         <ng-container matColumnDef="position">
-          <th *matHeaderCellDef mat-header-cell> No.</th>
+          <th *matHeaderCellDef mat-header-cell>#</th>
           <td *matCellDef="let history; let i = index;"
               mat-cell> {{((paginator?.pageIndex || 0) * pageSize) + i + 1}} </td>
         </ng-container>
@@ -92,11 +103,18 @@
             {{ 'RESERVATION.STATE.' + history.state | translate}}</td>
         </ng-container>
 
+        <ng-container matColumnDef="noContent">
+          <td class="no-content bold" mat-footer-cell *matFooterCellDef [attr.colspan]="displayedColumns.length">
+            {{ 'RESERVATION.DETAIL.HISTORY.ERROR.NO_CONTENT' | translate }}</td>
+        </ng-container>
+
+        <tr mat-footer-row *matFooterRowDef="['noContent']" [hidden]="reservation.history.length > 0"></tr>
+
         <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
         <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
       </table>
 
-      <mat-paginator [pageSize]="pageSize" showFirstLastButtons></mat-paginator>
+      <mat-paginator *ngIf="reservation.history.length" [pageSize]="pageSize" showFirstLastButtons></mat-paginator>
       <mat-divider></mat-divider>
     </mat-list>
   </mat-card-content>

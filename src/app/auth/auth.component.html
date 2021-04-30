@@ -1,17 +1,17 @@
 <div class="flex-container" fxLayout="column">
-  <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" class="card-container">
-    <div fxFlex.lt-sm="80%" fxFlex="50%" fxFlex.gt-lg="40%">
+  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
+    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <mat-card>
         <mat-tab-group #authGroup>
           <mat-tab label="{{ 'AUTH.SIGN_IN.TITLE' | translate }}">
             <mat-card-content>
               <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-                <button mat-button (click)="socialSignIn('google')">
-                  <img width="15px" style="margin-bottom:3px; margin-right:5px" alt="Google login"
-                       src="https://developers.google.com/identity/images/g-logo.png"/>
+                <button (click)="socialSignIn('google')" mat-button>
+                  <img alt="Google login" class="social" src="https://developers.google.com/identity/images/g-logo.png"
+                       width="15px"/>
                   Google
                 </button>
-                <button mat-raised-button color="facebook" (click)="socialSignIn('facebook')">
+                <button (click)="socialSignIn('facebook')" color="facebook" mat-raised-button>
                   <mat-icon>facebook</mat-icon>
                   Facebook
                 </button>
@@ -19,14 +19,14 @@
               <div class="divider">
                 <mat-divider></mat-divider>
               </div>
-              <div fxLayout="column" fxLayoutAlign="space-evenly center" class="divider-padding">
+              <div class="divider-padding" fxLayout="column" fxLayoutAlign="space-evenly center">
                 <b>{{ 'AUTH.SIGN_IN.OR' | translate }}</b>
               </div>
               <app-sign-in></app-sign-in>
               <div class="divider">
                 <p>
                   {{ 'AUTH.SIGN_IN.NEW' | translate }}
-                  <a [routerLink]="" (click)="authGroup.selectedIndex=1">{{ 'AUTH.SIGN_UP.TITLE' | translate }}!</a>
+                  <a (click)="authGroup.selectedIndex=1" [routerLink]="">{{ 'AUTH.SIGN_UP.TITLE' | translate }}!</a>
                 </p>
               </div>
             </mat-card-content>
@@ -34,12 +34,12 @@
           <mat-tab label="{{ 'AUTH.SIGN_UP.TITLE' | translate }}">
             <mat-card-content>
               <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-                <button mat-button (click)="socialSignIn('google')">
-                  <img width="15px" style="margin-bottom:3px; margin-right:5px" alt="Google login"
-                       src="https://developers.google.com/identity/images/g-logo.png"/>
+                <button (click)="socialSignIn('google')" mat-button>
+                  <img alt="Google login" class="social" src="https://developers.google.com/identity/images/g-logo.png"
+                       width="15px"/>
                   Google
                 </button>
-                <button mat-raised-button color="facebook" (click)="socialSignIn('facebook')">
+                <button (click)="socialSignIn('facebook')" color="facebook" mat-raised-button>
                   <mat-icon>facebook</mat-icon>
                   Facebook
                 </button>
@@ -47,14 +47,14 @@
               <div class="divider">
                 <mat-divider></mat-divider>
               </div>
-              <div fxLayout="column" fxLayoutAlign="space-evenly center" class="divider-padding">
+              <div class="divider-padding" fxLayout="column" fxLayoutAlign="space-evenly center">
                 <b>{{ 'AUTH.SIGN_UP.OR' | translate }}</b>
               </div>
               <app-sign-up></app-sign-up>
               <div class="divider">
                 <p>
                   {{ 'AUTH.SIGN_UP.ALREADY' | translate }}
-                  <a [routerLink]="" (click)="authGroup.selectedIndex=0">{{ 'AUTH.SIGN_IN.TITLE' | translate }}!</a>
+                  <a (click)="authGroup.selectedIndex=0" [routerLink]="">{{ 'AUTH.SIGN_IN.TITLE' | translate }}!</a>
                 </p>
               </div>
             </mat-card-content>
