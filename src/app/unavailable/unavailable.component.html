@@ -48,7 +48,7 @@
                   <mat-label>{{ 'UNAVAILABLE.ADD.DATE.FIELD' | translate }}</mat-label>
                   <label>
                     <input [formControl]="startDate" (focus)="picker.open()" matInput [matDatepicker]="picker"
-                           (dateChange)="setDate($event, time)" [matDatepickerFilter]="myFilter"
+                           (dateChange)="setDate($event)" [matDatepickerFilter]="myFilter"
                            required>
                   </label>
                   <mat-datepicker touchUi #picker></mat-datepicker>
@@ -62,26 +62,26 @@
                 <mat-form-field appearance="fill" style="margin-right: 12px;">
                   <mat-label>{{ 'UNAVAILABLE.ADD.TIME.FIELD' | translate }}</mat-label>
                   <label>
-                    <input (timeChange)="setTime($event)" matTimepicker #time="matTimepicker" mode="24h"
-                           [minDate]="minDate" [maxDate]="maxDate" (focusin)="focusin()"
-                           [formControl]="startTime" cancelLabel="{{ 'COMMON.BUTTON.CANCEL' | translate }}">
+                    <input matInput name="start_time" [format]="24" [formControl]="startTime" [ngxTimepicker]="time"
+                           [min]="minTime" [max]="maxTime" readonly (focusin)="focusin()"/>
                   </label>
+                  <span matPrefix><mat-icon (click)="time.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
+                  <ngx-material-timepicker [minutesGap]="15" #time (timeChanged)="setTime($event)"
+                                           [theme]="theme"></ngx-material-timepicker>
                   <mat-error *ngIf="startTime.hasError('required')"
                              [innerHTML]="'UNAVAILABLE.ADD.TIME.REQUIRED' | translate">
                   </mat-error>
                 </mat-form-field>
               </div>
 
-              <mat-form-field appearance="fill" *ngIf="room">
+              <mat-form-field appearance="fill" *ngIf="showDuration">
                 <mat-label>{{ 'UNAVAILABLE.ADD.DURATION.FIELD' | translate }}</mat-label>
                 <label>
-                  <input matTimepicker #t="matTimepicker" mode="24h" [formControl]="duration" #t="matTimepicker"
-                         [maxDate]="durationMax"
-                         cancelLabel="{{ 'COMMON.BUTTON.CANCEL' | translate }}" [strict]="true">
+                  <input matInput name="duration" [format]="24" [formControl]="duration" [ngxTimepicker]="t"
+                         [max]="durationMax" readonly/>
                 </label>
-                <span matPrefix>
-                  <mat-icon matPrefix (click)="t.showDialog()">timer</mat-icon> &nbsp;
-                </span>
+                <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
+                <ngx-material-timepicker [minutesGap]="15" #t [theme]="theme"></ngx-material-timepicker>
                 <mat-error *ngIf="duration.hasError('required')"
                            [innerHTML]="'UNAVAILABLE.ADD.DURATION.REQUIRED' | translate">
                 </mat-error>

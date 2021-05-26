@@ -43,12 +43,29 @@ export const newEvent = (title: string, color: string, start: Date, end?: Date, 
   }
 } as unknown as CalendarEvent);
 
-export const isOverlapEvent = (events: any[], eventStartDay: Date, eventEndDay: Date): CalendarEvent[] => {
-  return events.filter((eventA: CalendarEvent) => (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
+export const getOverlapEvent = (events: any[], eventStartDay: Date, eventEndDay: Date): CalendarEvent[] =>
+  events.filter((eventA: CalendarEvent) => (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
     || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
     || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end)
   );
-};
+
+// private isAnOverlapEvent(eventStartDay: Date, eventEndDay: Date): CalendarEvent | undefined {
+//   return this.events.find((eventA: CalendarEvent) => {
+//     if (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end) {
+//       console.log('start-time in between any of the events');
+//       return eventA;
+//     }
+//     if (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end) {
+//       console.log('end-time in between any of the events');
+//       return eventA;
+//     }
+//     if (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end) {
+//       console.log('any of the events in between/on the start-time and end-time');
+//       return eventA;
+//     }
+//     return null;
+//   });
+// }
 
 const createEvent = (it: IAvailability, date: Date, notWorking: string, unavailable: string, lunch: string,
                      plusHour: number): CalendarEvent[] => {
@@ -168,7 +185,7 @@ const lunchEvent = (hour: number, lunchStartHour: number, minute: number, lunchS
   if ((lunchHour || lunchHour === 0) && (lunchMinute || lunchMinute === 0)) {
     const start = new Date(date.setHours(lunchHour, lunchMinute));
     const end = new Date(date.setHours(lunchEndHour, lunchEndMinute));
-    return newEvent(lunch, findStateColor('DEFAULT'), start, end);
+    return newEvent(lunch, findStateColor('DEFAULT'), start, end, undefined, 'LUNCH');
   }
 
   return undefined;

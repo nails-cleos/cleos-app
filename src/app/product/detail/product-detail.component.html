@@ -50,13 +50,14 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PRODUCT.DETAIL.DURATION.FIELD' | translate }}</mat-label>
                 <label>
-                  <input #t="matTimepicker" #t="matTimepicker" cancelLabel="{{ 'COMMON.BUTTON.CANCEL' | translate }}" formControlName="durationDate" matTimepicker
-                         mode="24h">
+                  <input matInput name="duration" [format]="24" [formControl]="duration"
+                         [ngxTimepicker]="t" readonly/>
                 </label>
-                <span matPrefix>
-                  <mat-icon (click)="t.showDialog()" matPrefix>timer</mat-icon> &nbsp;
-                </span>
-                <mat-error *ngIf="durationDate.hasError('required')"
+                <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
+                <ngx-material-timepicker [minutesGap]="15" #t
+                                         [theme]="theme"></ngx-material-timepicker>
+
+                <mat-error *ngIf="duration.hasError('required')"
                            [innerHTML]="'PRODUCT.DETAIL.DURATION.REQUIRED' | translate">
                 </mat-error>
                 <mat-error *ngIf="errors['duration']">

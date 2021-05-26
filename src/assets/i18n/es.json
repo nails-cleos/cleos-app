@@ -61,7 +61,7 @@
   "DASHBOARD": {
     "PROFILE": "Perfil",
     "CHANGE_PASSWORD": "Cambiar contraseña",
-    "SIGN_OUT": "Cerrar sessión",
+    "SIGN_OUT": "Cerrar sesión",
     "SIGN_IN": "Ingresar",
     "MINI_CARD": {
       "DURATION": "desde el mes pasado",
@@ -153,7 +153,7 @@
       "TITLE": "Olvido su contraseña",
       "MESSAGE": "Revisa tu email para cambiar tu contraseña",
       "USERNAME": {
-        "FIELD": "Nombre de usuario o emial",
+        "FIELD": "Nombre de usuario o email",
         "ERROR": "Por favor ingrese un nombre de usuario o email"
       }
     },
@@ -657,7 +657,8 @@
           "UNAVAILABLE": "<b>No disponible</b>",
           "LUNCH": "<b>Hora de almuerzo</b>",
           "OUT_OF_WORK": "<b>Fuera del trabajo</b>"
-        }
+        },
+        "UNAVAILABLE": "<div><b>No disponible</b></div><div>{{description}}</div><div><b>Duración:</b> {{duration}}</div>"
       },
       "CREATED": "Reservation {{date}} created"
     },

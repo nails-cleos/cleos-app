@@ -20,7 +20,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatRadioModule } from '@angular/material/radio';
-import { MatTimepickerModule } from 'mat-timepicker';
+import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
 import { LayoutModule } from '@angular/cdk/layout';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatStepperModule } from '@angular/material/stepper';
@@ -57,6 +57,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     MatDividerModule,
     MatGridListModule,
     MatRadioModule,
+    NgxMaterialTimepickerModule,
     LayoutModule,
     MatAutocompleteModule,
     MatStepperModule,
@@ -93,7 +94,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     MatDividerModule,
     MatGridListModule,
     MatRadioModule,
-    MatTimepickerModule,
+    NgxMaterialTimepickerModule,
     LayoutModule,
     MatAutocompleteModule,
     MatStepperModule,

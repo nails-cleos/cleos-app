@@ -9,8 +9,7 @@ export interface IUnavailable {
   start?: string;
   duration?: string;
   startDate?: Date;
-  startTime?: Date;
-  durationDate?: Date;
+  startTime?: string;
 }
 
 export interface IUnavailableAll {

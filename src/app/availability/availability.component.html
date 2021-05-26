@@ -2,10 +2,11 @@
   <mat-form-field class="margin-right-eight" appearance="fill">
     <mat-label>{{ 'ROOM.ADD.START.FIELD' | translate }}</mat-label>
     <label>
-      <input #tStart="matTimepicker" #tStart="matTimepicker" [formControl]="start" [maxDate]="end.value"
-             cancelLabel="{{ 'COMMON.BUTTON.CANCEL' | translate }}" matTimepicker mode="24h">
+      <input matInput name="start_time" [format]="24" [formControl]="start" [ngxTimepicker]="tStart" [max]="end.value"
+             required readonly/>
     </label>
-    <span matPrefix><mat-icon (click)="tStart.showDialog()" matPrefix>timer</mat-icon> &nbsp;</span>
+    <span matPrefix><mat-icon (click)="tStart.open()" matPrefix>timer</mat-icon> &nbsp;</span>
+    <ngx-material-timepicker [minutesGap]="15" #tStart [theme]="theme"></ngx-material-timepicker>
     <mat-error *ngIf="start.hasError('required')"
                [innerHTML]="'ROOM.ADD.START.REQUIRED' | translate">
     </mat-error>
@@ -13,10 +14,11 @@
   <mat-form-field class="margin-right-eight" appearance="fill">
     <mat-label>{{ 'ROOM.ADD.END.FIELD' | translate }}</mat-label>
     <label>
-      <input #tEnd="matTimepicker" #tEnd="matTimepicker" [formControl]="end" [minDate]="start.value"
-             cancelLabel="{{ 'COMMON.BUTTON.CANCEL' | translate }}" matTimepicker mode="24h">
+      <input matInput name="end_time" [format]="24" [formControl]="end" [ngxTimepicker]="tEnd" [min]="start.value"
+             readonly/>
     </label>
-    <span matPrefix><mat-icon (click)="tEnd.showDialog()" matPrefix>timer</mat-icon> &nbsp;</span>
+    <span matPrefix><mat-icon (click)="tEnd.open()" matPrefix>timer</mat-icon> &nbsp;</span>
+    <ngx-material-timepicker [minutesGap]="15" #tEnd [theme]="theme"></ngx-material-timepicker>
     <mat-error *ngIf="end.hasError('required')" [innerHTML]="'ROOM.ADD.END.REQUIRED' | translate">
     </mat-error>
   </mat-form-field>
@@ -29,20 +31,20 @@
     <mat-form-field class="margin-right-eight" appearance="fill">
       <mat-label>{{ 'ROOM.ADD.START.FIELD' | translate }}</mat-label>
       <label>
-        <input #tLunchStart="matTimepicker" #tLunchStart="matTimepicker" [formControl]="startLunch"
-               [maxDate]="endLunch.value" [minDate]="start.value" cancelLabel="{{ 'COMMON.BUTTON.CANCEL' | translate }}"
-               matTimepicker mode="24h">
+        <input matInput name="lunch_start_time" [format]="24" [formControl]="startLunch" [ngxTimepicker]="tLunchStart"
+               [min]="start.value" [max]="endLunch.value" readonly/>
       </label>
-      <span matPrefix><mat-icon (click)="tLunchStart.showDialog()" matPrefix>timer</mat-icon> &nbsp;</span>
+      <span matPrefix><mat-icon (click)="tLunchStart.open()" matPrefix>timer</mat-icon> &nbsp;</span>
+      <ngx-material-timepicker [minutesGap]="15" #tLunchStart [theme]="theme"></ngx-material-timepicker>
     </mat-form-field>
     <mat-form-field class="margin-right-eight" appearance="fill">
       <mat-label>{{ 'ROOM.ADD.END.FIELD' | translate }}</mat-label>
       <label>
-        <input #tLunchEnd="matTimepicker" #tLunchEnd="matTimepicker" [formControl]="endLunch"
-               [minDate]="startLunch.value" [maxDate]="end.value"
-               cancelLabel="{{ 'COMMON.BUTTON.CANCEL' | translate }}" matTimepicker mode="24h">
+        <input matInput name="lunch_end_time" [format]="24" [formControl]="endLunch" [ngxTimepicker]="tLunchEnd"
+               [min]="startLunch.value" [max]="end.value" readonly/>
       </label>
-      <span matPrefix><mat-icon (click)="tLunchEnd.showDialog()" matPrefix>timer</mat-icon> &nbsp;</span>
+      <span matPrefix><mat-icon (click)="tLunchEnd.open()" matPrefix>timer</mat-icon> &nbsp;</span>
+      <ngx-material-timepicker [minutesGap]="15" #tLunchEnd [theme]="theme"></ngx-material-timepicker>
     </mat-form-field>
   </div>
   <div fxLayout="row" fxLayoutAlign="space-evenly end">

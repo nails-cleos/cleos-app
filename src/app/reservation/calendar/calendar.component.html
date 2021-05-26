@@ -1,5 +1,5 @@
 <div *ngIf="!error; else errorBox">
-  <div *ngIf="!isLoading; else box">
+  <div *ngIf="!isLoading; else box" class="scroll-container" #scrollContainer>
     <div class="divider">
       <div [ngSwitch]="selectView">
         <div *ngSwitchCase="'WEEK'">
@@ -46,7 +46,8 @@
     </div>
     <div class="divider">
       <mat-accordion>
-        <mat-expansion-panel *ngFor="let rr of data; let i = index" [expanded]="professionalId === rr.room.professional.id || i === 0">
+        <mat-expansion-panel *ngFor="let rr of data; let i = index"
+                             [expanded]="professionalId === rr.room.professional.id || i === 0">
           <mat-expansion-panel-header>
             <mat-panel-title>
               <p class="bold">{{rr.room.name}}</p>
