@@ -18,14 +18,15 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../dialog/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { convertDuration, Duration, getAvailability, getStartEndDay, IDuration } from '../util/dates';
-import { fillNotAvailable, newEvent, isOverlapEvent } from '../util/event';
+import { convertDuration, Duration, getAvailability, getStartEndDay, getTime, IDuration } from '../util/dates';
+import { fillNotAvailable, getOverlapEvent, newEvent } from '../util/event';
 import { Router } from '@angular/router';
 import { DateAdapter } from '@angular/material/core';
 import { findStateColor } from '../util/flags';
 import { GeocoderResult } from '@agm/core';
 import { Role } from '../interfaces/token';
 import { IUnavailableAll } from '../interfaces/unavailable';
+import { timeTheme } from '../util/theme';
 
 @Component({
   selector: 'app-reservation',
@@ -86,7 +87,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   dayEndMinute = 0;
   daysInWeek = 7;
   lessDays = 3;
-  hourSegments = 2;
+  hourSegments = 4;
   locale: string;
 
   eventSelected: CalendarEvent | undefined;
@@ -99,8 +100,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   isEditing = false;
   editReservation: IReservationAll | undefined;
   showTime = false;
-  minDate: Date | undefined;
-  maxDate: Date | undefined;
+  startDate: Date | undefined;
+  minDate: any;
+  maxDate: any;
+  theme = timeTheme();
 
   isAdmin = false;
 
@@ -120,7 +123,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.smallScreen) {
         this.daysInWeek = 3;
         this.lessDays = 1;
-        this.hourSegments = 1;
       }
     });
     this.extras = this.router.getCurrentNavigation()?.extras.state;
@@ -161,7 +163,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         ...this.productForm.controls,
         start: this.start
       });
-      const day = this.start.value.getDay();
+      const day = this.startDate?.getDay();
       let av: IAvailability;
       const {week, saturday, sunday} = getAvailability(this.room.value);
       switch (day) {
@@ -176,12 +178,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           break;
       }
       if (av.start) {
-        const start = av.start.split(':');
-        this.minDate = new Date(new Date(this.start.value).setHours(Number(start[0]), Number(start[1])));
+        this.minDate = av.start.slice(0, 5);
       }
       if (av.end) {
-        const end = av.end.split(':');
-        this.maxDate = new Date(new Date(this.start.value).setHours(Number(end[0]), Number(end[1])));
+        this.maxDate = av.end.slice(0, 5);
       }
     }
     this.cdRef.detectChanges();
@@ -209,7 +209,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
     return result;
-  }
+  };
 
   displayFnUser(user: IUser): string {
     return user ? `${user.firstName} ${user.lastName}` : '';
@@ -272,7 +272,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
     let title;
     let content;
-    const eventsOverlapping = isOverlapEvent(this.events, start, end);
+    const eventsOverlapping = getOverlapEvent(this.events, start, end);
     if (eventsOverlapping.length && eventsOverlapping[0] !== this.eventSelected) {
       const overlapping = eventsOverlapping.find(e => e.id);
       if (overlapping) {
@@ -286,7 +286,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       title = this.translate.instant('RESERVATION.ADD.EVENT.OVERLAPPING.TITLE');
       content = this.translate.instant('RESERVATION.ADD.EVENT.OVERLAPPING.CONTENT', {data: message});
     } else {
-      if (!this.eventSelected) {
+      if (!this.eventSelected && !id) {
         title = this.translate.instant('RESERVATION.ADD.EVENT.TITLE');
         content = this.translate.instant('RESERVATION.ADD.EVENT.CONTENT', {date: start.toLocaleString('en-GB')});
       } else {
@@ -356,6 +356,12 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getAddress($event: GeocoderResult): void {
     this.address = $event.formatted_address;
+  }
+
+  timeChange($event: string): void {
+    const time = $event.split(':');
+    this.date.value.setHours(time[0]);
+    this.date.value.setMinutes(time[1]);
   }
 
   private getRoomList(): void {
@@ -437,20 +443,21 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.unavailableList?.forEach(it => {
       if (it.duration) {
         const start = new Date(it.start);
+        const duration = convertDuration(it.duration);
         switch (it.repeat) {
           case 'NONE':
-            this.createUnavailableEvent(it.id, start, it.duration, it.description);
+            this.validateUnavailableEvent(start, duration, it);
             break;
           case 'ONCE_A_WEEK':
             for (let i = 0; i < weeks; i++) {
               const newDate = new Date(new Date(it.start).setDate(start.getDate() + i * 7));
-              this.createUnavailableEvent(it.id, newDate, it.duration, it.description);
+              this.validateUnavailableEvent(newDate, duration, it);
             }
             break;
           case 'EVERY_DAY':
             for (let i = 0; i < weeks * 7; i++) {
               const newDate = new Date(new Date(it.start).setDate(start.getDate() + i));
-              this.createUnavailableEvent(it.id, newDate, it.duration, it.description);
+              this.validateUnavailableEvent(newDate, duration, it);
             }
             break;
         }
@@ -458,14 +465,33 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  private createUnavailableEvent(id: string, start: Date, durationTime: string, description?: string): void {
-    const duration = convertDuration(durationTime);
+  private validateUnavailableEvent(start: Date, duration: IDuration, it: IUnavailableAll): void {
     const end = new Date(new Date(start).setHours(
       start.getHours() + duration.hour, start.getMinutes() + duration.minute)
     );
+    const overlapEvent = getOverlapEvent(this.events, start, end);
+    if (overlapEvent.length > 0) {
+      overlapEvent.forEach(value => {
+        this.events = this.events.filter(ev => ev !== value);
+        if (value.end) {
+          if (start < value.start && end < value.end) {
+            value.start = end;
+            this.events = [...this.events, value];
+          } else if (start > value.start && end > value.end) {
+            value.end = start;
+            this.events = [...this.events, value];
+          }
+        }
+      });
+    }
+    this.createUnavailableEvent(it.id, start, end, duration, it.description);
+  }
+
+  private createUnavailableEvent(id: string, start: Date, end: Date, duration: IDuration, description?: string): void {
+    const minutes = duration.minute < 10 ? `0${duration.minute}` : `${duration.minute}`;
     const detail = this.translate.instant('RESERVATION.ADD.EVENT.UNAVAILABLE', {
       description: description ? description : '',
-      duration: `${duration.hour}:${duration.minute}`
+      duration: `${duration.hour}:${minutes}`
     });
 
     const color = findStateColor('DEFAULT');
@@ -496,9 +522,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.extras?.date && !this.eventSelected) {
           this.segmentClick(this.date.value, 'CREATED');
         } else if (this.editReservation) {
-          const time: Date = this.start.value;
-          const date: Date = new Date(new Date(this.date.value).setHours(time.getHours(), time.getMinutes()));
-          this.segmentClick(date, this.editReservation.state, this.editReservation.id);
+          if (this.startDate) {
+            const date: Date = new Date(new Date(this.date.value).setHours(this.startDate.getHours(), this.startDate.getMinutes()));
+            this.segmentClick(date, this.editReservation.state, this.editReservation.id);
+          }
         }
       }
       if (state.subErrors) {
@@ -517,7 +544,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           this.eventSelected = undefined;
           this.errors[value.field] = value.message;
           this.customerForm.controls[value.field]?.setErrors({incorrect: true});
-          this.productForm.controls[value.field]?.setErrors({incorrect: true});
+          this.roomForm.controls[value.field]?.setErrors({incorrect: true});
         });
       } else if (state.errorMessage) {
         this.error = state.error;
@@ -545,31 +572,14 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  // private isAnOverlapEvent(eventStartDay: Date, eventEndDay: Date): CalendarEvent | undefined {
-  //   return this.events.find((eventA: CalendarEvent) => {
-  //     if (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end) {
-  //       console.log('start-time in between any of the events');
-  //       return eventA;
-  //     }
-  //     if (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end) {
-  //       console.log('end-time in between any of the events');
-  //       return eventA;
-  //     }
-  //     if (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end) {
-  //       console.log('any of the events in between/on the start-time and end-time');
-  //       return eventA;
-  //     }
-  //     return null;
-  //   });
-  // }
-
   private setStartEndDay(week: IAvailability, saturday: IAvailability, sunday: IAvailability): void {
     const {min, max} = getStartEndDay(week, saturday, sunday);
 
     this.dayStartHour = min.getHours();
     this.dayStartMinute = min.getMinutes();
-    this.dayEndHour = max.getHours();
-    this.dayEndMinute = max.getMinutes();
+    const maxTime = new Date(max.getTime() + 30 * 60000);
+    this.dayEndHour = maxTime.getHours();
+    this.dayEndMinute = maxTime.getMinutes();
   }
 
   private filterCustomer(name: string): IUser[] | undefined {
@@ -600,7 +610,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const date = new Date(reservation.start);
     this.room.setValue(reservation.room);
     this.date.setValue(date);
-    this.start.setValue(date);
+    this.start.setValue(getTime(date));
+    this.startDate = date;
     this.customer.setValue(reservation.customer);
     this.product.setValue(reservation.product);
     const isAdmin = user.authorities.some(u => u.authority === Role.admin);

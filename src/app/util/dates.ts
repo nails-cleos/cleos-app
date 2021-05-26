@@ -47,6 +47,12 @@ export const getStartEndDay = (week: IAvailability, saturday: IAvailability, sun
     max = sundayMinMax.max;
   }
 
+  if ([15, 45].indexOf(min.getMinutes()) > 0 || [15, 45].indexOf(max.getMinutes()) > 0) {
+    min.setHours(min.getHours() + 1, 0);
+  } else {
+    min.setHours(min.getHours(), 0);
+  }
+
   return {min, max};
 };
 
@@ -67,25 +73,18 @@ export const cetMinAndMax = (availability: IAvailability, date: Date): any => {
 };
 
 export const diffTime = (time: Date, maxHour = 24, diffMin = 0): any => {
-  const hour = time.getHours();
-  const minute = time.getMinutes();
+  const date = new Date();
+  date.setHours(time.getHours(), time.getMinutes());
 
-  let diffMinute = 60 - minute;
-  let diffHour = maxHour - 1 - hour;
-  if (diffMinute === 60) {
-    diffMinute = 0;
-    diffHour = maxHour - hour;
-  }
+  const maxDate = new Date();
+  maxDate.setHours(maxHour, diffMin);
 
-  if (diffMin) {
-    const diff = diffMinute + diffMin;
-    if (diff >= 60) {
-      diffHour++;
-      diffMinute = diff - 60;
-    } else {
-      diffMinute = diff;
-    }
-  }
+  const diff = Math.abs(Math.round((maxDate.getTime() - date.getTime()) / (1000 * 60)));
+
+  const hours = (diff / 60);
+  const diffHour = Math.floor(hours);
+  const minutes = (hours - diffHour) * 60;
+  const diffMinute = Math.round(minutes);
 
   return {diffHour, diffMinute};
 };
@@ -97,7 +96,7 @@ export const getAvailability = (room: IRoom): any => {
   return {week, saturday, sunday};
 };
 
-export const getMinMaxDate = (day: number, date: string, room: IRoom): any => {
+export const getMinMaxDate = (day: number, date: any, room: IRoom): any => {
   let minDate;
   let maxDate;
   let av: IAvailability;
@@ -124,4 +123,11 @@ export const getMinMaxDate = (day: number, date: string, room: IRoom): any => {
   }
 
   return {minDate, maxDate};
+};
+
+export const getTime = (time: Date): string => {
+  const hours = `0${time.getHours()}`.slice(-2);
+  const minutes = `0${time.getMinutes()}`.slice(-2);
+
+  return `${hours}:${minutes}`;
 };

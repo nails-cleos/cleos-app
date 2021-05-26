@@ -80,6 +80,7 @@ export class Calendar implements ICalendar {
 
   events: CalendarEvent[];
   room: IRoom;
+  day: any;
 
   constructor(room: IRoom, events: CalendarEvent[]) {
     this.events = events;

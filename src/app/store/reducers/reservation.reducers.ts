@@ -40,6 +40,7 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         data: null,
         errorMessage: null,
+        error: null,
         subErrors: null,
         selected: null,
         message: null,
@@ -53,6 +54,7 @@ export const reducer = (state = initialState, action: All): State => {
         // @ts-ignore
         page: {content: [{}, {}, {}], totalElements: 3},
         errorMessage: null,
+        error: null,
         subErrors: null,
         selected: null,
         message: null
@@ -64,6 +66,7 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         data: null,
         errorMessage: null,
+        error: null,
         subErrors: null,
         selected: null,
         message: null,
@@ -75,6 +78,7 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         customers: null,
         errorMessage: null,
+        error: null,
         subErrors: null,
         selected: null,
         message: null,
@@ -86,6 +90,7 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         rooms: null,
         errorMessage: null,
+        error: null,
         subErrors: null,
         selected: null,
         message: null,
@@ -97,6 +102,7 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         products: null,
         errorMessage: null,
+        error: null,
         subErrors: null,
         selected: null,
         message: null,
@@ -114,6 +120,7 @@ export const reducer = (state = initialState, action: All): State => {
         data: {} as IReservation,
         page: null,
         errorMessage: null,
+        error: null,
         subErrors: null,
         selected: null,
         message: null,
@@ -136,6 +143,7 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         data: action.payload,
         errorMessage: null,
+        error: null,
         subErrors: null,
         message: null,
         isLoading: false
@@ -146,6 +154,7 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         customers: action.payload,
         errorMessage: null,
+        error: null,
         subErrors: null,
         message: null,
         isLoading: false
@@ -156,6 +165,7 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         rooms: action.payload,
         errorMessage: null,
+        error: null,
         subErrors: null,
         message: null,
         isLoading: false
@@ -166,6 +176,7 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         products: action.payload,
         errorMessage: null,
+        error: null,
         subErrors: null,
         message: null,
         isLoading: false
@@ -177,6 +188,7 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         message: action.payload.message,
         errorMessage: null,
+        error: null,
         subErrors: null,
         isLoading: false
       };
@@ -186,6 +198,7 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         selected: action.payload,
         errorMessage: null,
+        error: null,
         subErrors: null,
         message: null,
         isLoading: false
@@ -206,6 +219,7 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         errorMessage: null,
+        error: null,
         subErrors: null,
         message: null,
         isLoading: true

@@ -8,7 +8,8 @@ import { AppState, selectProductState } from '../../store/app.states';
 import * as fromActionsProduct from '../../store/product.actions';
 import { fieldChange } from '../../util/validators';
 import { IProduct, Product } from '../../interfaces/product';
-import { convertDuration } from '../../util/dates';
+import { timeTheme } from '../../util/theme';
+import { convertDuration, getTime } from '../../util/dates';
 
 @Component({
   selector: 'app-product-detail',
@@ -23,6 +24,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   getState: Observable<any>;
   errors: any = [];
   error: any;
+  theme = timeTheme();
 
   name: FormControl = new FormControl('', [
     Validators.required
@@ -30,7 +32,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   price: FormControl = new FormControl('', [
     Validators.required, Validators.min(1)
   ]);
-  durationDate: FormControl = new FormControl('', [
+  duration: FormControl = new FormControl('', [
     Validators.required
   ]);
 
@@ -61,11 +63,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     product.name = fieldChange(this.name, this.product?.name);
     product.description = fieldChange(this.form.value?.description, this.product?.description);
     product.price = fieldChange(this.price, this.product?.price);
-
-    const durationTime = this.durationDate.value;
-    const durationHours = `0${durationTime.getHours()}`.slice(-2);
-    const durationMinutes = `0${durationTime.getMinutes()}`.slice(-2);
-    product.duration = `${durationHours}:${durationMinutes}`;
+    product.duration = fieldChange(this.duration, this.product?.duration);
 
     this.store.dispatch(new fromActionsProduct.ProductUpdate(product));
   }
@@ -75,7 +73,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
       name: this.name,
       description: new FormControl(),
       price: this.price,
-      durationDate: this.durationDate
+      duration: this.duration
     });
   }
 
@@ -90,7 +88,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
         } as IProduct;
 
         const duration = convertDuration(state.selected.duration);
-        this.product.durationDate = new Date(new Date().setHours(duration.hour, duration.minute));
+        this.product.duration = getTime(new Date(new Date().setHours(duration.hour, duration.minute)));
         this.form.patchValue(this.product);
       }
       if (state.subErrors) {

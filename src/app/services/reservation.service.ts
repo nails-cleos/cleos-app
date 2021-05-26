@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IReservation, PAGE_SIZE } from '../interfaces/reservation';
+import { IReservation, IRoomReservation, PAGE_SIZE } from '../interfaces/reservation';
 
 @Injectable({
   providedIn: 'root'
@@ -46,9 +46,9 @@ export class ReservationService {
     return this.http.get<any>(`${this.url}/rooms`, {params});
   }
 
-  public search(roomId: string, date: Date): Observable<IReservation[]> {
+  public search(roomId: string, date: Date): Observable<IRoomReservation> {
     const params = new HttpParams().set('date', date.toISOString().slice(0, 10));
-    return this.http.get<IReservation[]>(`${this.url}/rooms/${roomId}`, {params});
+    return this.http.get<IRoomReservation>(`${this.url}/rooms/${roomId}`, {params});
   }
 
   public getById(id: string | null): Observable<IReservation | undefined> {

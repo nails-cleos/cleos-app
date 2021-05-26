@@ -85,7 +85,8 @@
         <mat-form-field appearance="fill">
           <mat-label>{{ 'RESERVATION.ADD.DATE.FIELD' | translate }}</mat-label>
           <label>
-            <input (focus)="picker.open()" [formControl]="date" [matDatepickerFilter]="myFilter" [matDatepicker]="picker"
+            <input (focus)="picker.open()" [formControl]="date" [matDatepickerFilter]="myFilter"
+                   [matDatepicker]="picker"
                    matInput required>
           </label>
           <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
@@ -97,11 +98,12 @@
         <mat-form-field appearance="fill" *ngIf="showTime">
           <mat-label>{{ 'RESERVATION.ADD.START.FIELD' | translate }}</mat-label>
           <label>
-            <input #tStart="matTimepicker" #tStart="matTimepicker" [formControl]="start" [maxDate]="maxDate!!"
-                   [minDate]="minDate!!"
-                   cancelLabel="{{ 'COMMON.BUTTON.CANCEL' | translate }}" matTimepicker mode="24h">
+            <input matInput name="start" [format]="24" [formControl]="start" [ngxTimepicker]="tStart"
+                   [min]="minDate" [max]="maxDate" readonly/>
           </label>
-          <span matPrefix><mat-icon (click)="tStart.showDialog()" matPrefix>timer</mat-icon> &nbsp;</span>
+          <span matPrefix><mat-icon (click)="tStart.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
+          <ngx-material-timepicker [minutesGap]="15" #tStart (timeChanged)="timeChange($event)"
+                                   [theme]="theme"></ngx-material-timepicker>
           <mat-error *ngIf="start.hasError('required')"
                      [innerHTML]="'RESERVATION.ADD.START.REQUIRED' | translate">
           </mat-error>

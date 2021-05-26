@@ -6,6 +6,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
 import { IProduct, Product } from '../interfaces/product';
+import { timeTheme } from '../util/theme';
+import { getTime } from '../util/dates';
 
 @Component({
   selector: 'app-product',
@@ -17,6 +19,7 @@ export class ProductComponent implements OnInit, OnDestroy {
   subscription: Subscription | undefined;
   form!: FormGroup;
   errors: any = [];
+  theme = timeTheme();
 
   name: FormControl = new FormControl('', [
     Validators.required
@@ -28,7 +31,7 @@ export class ProductComponent implements OnInit, OnDestroy {
 
   constructor(private snackBar: MatSnackBar, private store: Store<AppState>, private formBuilder: FormBuilder) {
     this.getState = this.store.select(selectProductState);
-    const d = new Date(new Date().setHours(0, 0));
+    const d = getTime(new Date(new Date().setHours(0, 0)));
 
     this.duration = new FormControl(d, [
       Validators.required
@@ -54,11 +57,7 @@ export class ProductComponent implements OnInit, OnDestroy {
     product.name = this.name.value;
     product.description = this.form.value.description;
     product.price = this.price.value;
-
-    const durationTime = this.duration.value;
-    const durationHours = `0${durationTime.getHours()}`.slice(-2);
-    const durationMinutes = `0${durationTime.getMinutes()}`.slice(-2);
-    product.duration = `${durationHours}:${durationMinutes}`;
+    product.duration = this.duration.value;
 
     this.store.dispatch(
       new fromActionsProduct.ProductSave(product)
