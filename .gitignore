@@ -5,7 +5,7 @@
 /tmp
 /out-tsc
 nail-app
-cleos-app
+cleos
 # Only exists if Bazel was run
 /bazel-out
 

@@ -42,10 +42,10 @@ export const findFlag = (flagList: IFlag[], lang: string): IFlag => {
 
 export const stateColor = (): IState[] => [{
   name: 'CREATED',
-  color: '#ffecb3'
+  color: '#e3d3c5'
 }, {
   name: 'COMPLETED',
-  color: '#d1c4e9' // TODO change color
+  color: '#d1c4e9'
 }, {
   name: 'STARTED',
   color: '#b3e5fc'

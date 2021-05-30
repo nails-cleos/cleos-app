@@ -1,17 +1,16 @@
 import { NgxMaterialTimepickerTheme } from 'ngx-material-timepicker';
 
-// TODO color.
 export const timeTheme = (): NgxMaterialTimepickerTheme => ({
     container: {
       bodyBackgroundColor: '#fff',
-      buttonColor: '#e4c27c'
+      buttonColor: '#a06c3f'
     },
     dial: {
-      dialBackgroundColor: '#e4c27c'
+      dialBackgroundColor: '#a06c3f'
     },
     clockFace: {
       clockFaceBackgroundColor: '#e3e3e3',
-      clockHandColor: '#e4c27c',
+      clockHandColor: '#a06c3f',
       clockFaceTimeInactiveColor: '#000',
       clockFaceInnerTimeInactiveColor: '#000'
     }

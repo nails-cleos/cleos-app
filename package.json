@@ -1,5 +1,5 @@
 {
-  "name": "cleos-app",
+  "name": "cleos",
   "version": "0.0.1",
   "engines": {
     "node": "14.17.0",
@@ -14,7 +14,7 @@
     "lint": "ng lint --fix",
     "eslint": "eslint src --fix",
     "e2e": "ng e2e",
-    "start:pwa": "http-server-spa dist/cleos-app index.html 8443",
+    "start:pwa": "http-server-spa dist/cleos index.html 8443",
     "heroku-postbuild": "ng build --prod"
   },
   "private": true,
