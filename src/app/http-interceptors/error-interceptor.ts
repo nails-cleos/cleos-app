@@ -1,12 +1,16 @@
 import { Injectable } from '@angular/core';
-import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse } from '@angular/common/http';
+import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { AppState, selectAuthState } from '../store/app.states';
+import * as fromActionsLogin from '../store/auth.actions';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
 
-  constructor() {
+  constructor(private store: Store<AppState>) {
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -14,6 +18,11 @@ export class ErrorInterceptor implements HttpInterceptor {
       if ([0].indexOf(err.status) !== -1) {
         const message = err?.error?.message || err.statusText;
         return throwError({error: {message}});
+      }
+      if ([401].indexOf(err.status) >= 0) {
+        this.store.dispatch(
+          new fromActionsLogin.LogOut()
+        );
       }
       return throwError(err);
     }));

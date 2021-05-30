@@ -6,6 +6,7 @@ export interface IProduct {
   description?: string;
   duration?: string;
   durationDate?: Date;
+  durability?: string;
 }
 
 export interface IProductAll {
@@ -14,6 +15,7 @@ export interface IProductAll {
   price: number;
   duration: string;
   description?: string;
+  durability?: string;
 }
 
 export class Product implements IProduct {

@@ -359,6 +359,9 @@
         "FIELD": "Duration",
         "REQUIRED": "Duration is <b>required</b>"
       },
+      "DURABILITY": {
+        "FIELD": "Durability"
+      },
       "CREATED": "Product {{name}} created"
     },
     "DETAIL": {
@@ -378,6 +381,9 @@
       "DURATION": {
         "FIELD": "Duration",
         "REQUIRED": "Duration is <b>required</b>"
+      },
+      "DURABILITY": {
+        "FIELD": "Durability"
       }
     },
     "DELETED": {

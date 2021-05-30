@@ -3,6 +3,7 @@ import { All, AuthActionTypes } from '../auth.actions';
 
 export interface State {
   isAuthenticated: boolean;
+  isLoading: boolean;
   user: IUser | null;
   token: null;
   menus: IMenu[] | null;
@@ -15,6 +16,7 @@ export interface State {
 
 export const initialState: State = {
   isAuthenticated: false,
+  isLoading: false,
   user: null,
   token: null,
   menus: null,
@@ -27,10 +29,19 @@ export const initialState: State = {
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
+    case AuthActionTypes.login:
+    case AuthActionTypes.signup:
+    case AuthActionTypes.socialLogin: {
+      return {
+        ...state,
+        isLoading: true
+      };
+    }
     case AuthActionTypes.loginFailure:
     case AuthActionTypes.signupFailure: {
       return {
         ...state,
+        isLoading: false,
         errorMessage: action.payload.error.message,
         error: action.payload.error,
         message: null,
@@ -40,6 +51,7 @@ export const reducer = (state = initialState, action: All): State => {
     case AuthActionTypes.loginSuccess: {
       return {
         ...state,
+        isLoading: false,
         isAuthenticated: true,
         user: action.payload.response.user,
         token: action.payload.response.tokenAccess,
@@ -53,6 +65,7 @@ export const reducer = (state = initialState, action: All): State => {
     case AuthActionTypes.signupSuccess: {
       return {
         ...state,
+        isLoading: false,
         isAuthenticated: false,
         errorMessage: null,
         message: action.payload.message,
@@ -73,6 +86,7 @@ export const reducer = (state = initialState, action: All): State => {
     case AuthActionTypes.clean: {
       return {
         ...state,
+        isLoading: false,
         errorMessage: null,
         message: null,
         subErrors: null,

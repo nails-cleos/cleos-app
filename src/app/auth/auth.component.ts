@@ -16,6 +16,7 @@ export class AuthComponent implements OnInit, OnDestroy {
 
   getState: Observable<any>;
   subscription: Subscription | undefined;
+  isLoading: any;
 
   constructor(private socialService: SocialAuthService, private store: Store<AppState>, private route: ActivatedRoute,
               private snackBar: MatSnackBar, private router: Router) {
@@ -47,6 +48,7 @@ export class AuthComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe((state) => {
+      this.isLoading = state.isLoading;
       if (state.isAuthenticated) {
         this.router.navigate(['main']);
       }

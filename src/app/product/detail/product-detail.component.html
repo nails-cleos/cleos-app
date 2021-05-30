@@ -64,6 +64,15 @@
                   {{errors['duration']}}
                 </mat-error>
               </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>{{ 'PRODUCT.DETAIL.DURABILITY.FIELD' | translate }}</mat-label>
+                <label>
+                  <input matInput formControlName="durability">
+                </label>
+                <mat-error *ngIf="errors['durability']">
+                  {{errors['durability']}}
+                </mat-error>
+              </mat-form-field>
             </div>
           </mat-card-content>
           <ng-template #boxSkeleton>

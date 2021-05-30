@@ -58,6 +58,7 @@ export class ProductComponent implements OnInit, OnDestroy {
     product.description = this.form.value.description;
     product.price = this.price.value;
     product.duration = this.duration.value;
+    product.durability = this.form.value.durability;
 
     this.store.dispatch(
       new fromActionsProduct.ProductSave(product)
@@ -68,6 +69,7 @@ export class ProductComponent implements OnInit, OnDestroy {
     this.form = this.formBuilder.group({
       name: this.name,
       description: new FormControl(),
+      durability: new FormControl(),
       price: this.price,
       duration: this.duration
     });

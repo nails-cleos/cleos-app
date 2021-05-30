@@ -6,7 +6,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectProductState } from '../../store/app.states';
 import * as fromActionsProduct from '../../store/product.actions';
-import { fieldChange } from '../../util/validators';
+import { fieldChange, valueChange } from '../../util/validators';
 import { IProduct, Product } from '../../interfaces/product';
 import { timeTheme } from '../../util/theme';
 import { convertDuration, getTime } from '../../util/dates';
@@ -61,9 +61,10 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     const product: IProduct = new Product();
     product.id = this.product?.id;
     product.name = fieldChange(this.name, this.product?.name);
-    product.description = fieldChange(this.form.value?.description, this.product?.description);
+    product.description = valueChange(this.form.value?.description, this.product?.description);
     product.price = fieldChange(this.price, this.product?.price);
     product.duration = fieldChange(this.duration, this.product?.duration);
+    product.durability = valueChange(this.form.value?.durability, this.product?.durability);
 
     this.store.dispatch(new fromActionsProduct.ProductUpdate(product));
   }
@@ -72,6 +73,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     this.form = this.formBuilder.group({
       name: this.name,
       description: new FormControl(),
+      durability: new FormControl(),
       price: this.price,
       duration: this.duration
     });
@@ -84,7 +86,8 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
           id: state.selected.id,
           name: state.selected.name,
           description: state.selected.description,
-          price: state.selected.price
+          price: state.selected.price,
+          durability: state.selected.durability
         } as IProduct;
 
         const duration = convertDuration(state.selected.duration);
