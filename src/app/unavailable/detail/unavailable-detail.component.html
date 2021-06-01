@@ -87,8 +87,7 @@
             <div fxFlex></div>
             <button [disabled]="form.invalid || form.pristine" color="primary" mat-raised-button
                     type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
-            <button color="accent" mat-raised-button
-                    routerLink="/unavailable-list">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <button color="accent" mat-raised-button appBackButton>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
           <ng-template #buttonSkeleton>
             <div class="ssc-head-line"></div>

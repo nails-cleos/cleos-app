@@ -1,30 +1,29 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { Store } from '@ngrx/store';
-import { AppState, selectReservationState } from '../../store/app.states';
-import { Observable, Subscription } from 'rxjs';
-import * as fromActionsReservation from '../../store/reservation.actions';
-import { IReservation, IReservationAll, MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/reservation';
 import { MatTableDataSource } from '@angular/material/table';
 import { Pagination } from '../../interfaces/pagination';
-import { ReservationIconName } from '../detail/reservation-detail.component';
-import { DialogComponent } from '../../dialog/dialog.component';
+import { IReservation, IReservationAll, MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/reservation';
+import { Observable, Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { AppState, selectReservationState } from '../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { ReservationIconName } from '../detail/reservation-detail.component';
+import * as fromActionsReservation from '../../store/reservation.actions';
 
 @Component({
-  selector: 'app-reservation-table',
-  templateUrl: './reservation-table.component.html',
-  styleUrls: ['./reservation-table.component.scss']
+  selector: 'app-reservations',
+  templateUrl: './reservations.component.html',
+  styleUrls: ['./reservations.component.scss']
 })
-export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestroy {
+export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['position', 'customer', 'professional', 'start', 'product', 'state', 'actions'];
+  displayedColumns: string[] = ['position', 'professional', 'start', 'product', 'state', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IReservationAll>>();
   getState: Observable<any>;
   subscription: Subscription | undefined;
@@ -77,23 +76,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
   }
 
   view(reservation: IReservation): void {
-    this.router.navigate(['reservation', reservation.id]);
-  }
-
-  delete(reservation: IReservation): void {
-    const title = this.translate.instant('RESERVATION.DELETED.TITLE');
-    const content = this.translate.instant('RESERVATION.DELETED.CONTENT', {date: reservation.start});
-    const dialogRef = this.dialog.open(DialogComponent, {
-      data: {title, content, value: reservation}
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.store.dispatch(
-          new fromActionsReservation.DeleteReservation(result.id)
-        );
-      }
-    });
+    this.router.navigate(['me', 'reservation', reservation.id]);
   }
 
   private subscribe(): void {
@@ -114,7 +97,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
       size: this.pageSize
     };
     this.store.dispatch(
-      new fromActionsReservation.GetAllPage(payload)
+      new fromActionsReservation.GetAllMePage(payload)
     );
   }
 }

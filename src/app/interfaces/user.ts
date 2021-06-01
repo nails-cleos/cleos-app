@@ -11,6 +11,7 @@ export interface IUser {
   password?: string;
   authorities?: IAuthority[];
   imageUrl?: string;
+  code?: string | null;
 }
 
 export interface IUserAll {

@@ -1,6 +1,6 @@
 <div *ngIf="!error; else errorBox" class="mat-elevation-z8">
   <table [dataSource]="dataSource" mat-table matSort matSortActive="name"
-         matSortDirection="desc" matSortDisableClear>
+         matSortDirection="asc" matSortDisableClear>
     <ng-container matColumnDef="position">
       <th *matHeaderCellDef mat-header-cell>#</th>
       <td *matCellDef="let product; let i = index;" mat-cell>
@@ -21,23 +21,23 @@
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="description">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
-          mat-sort-header>{{ 'PRODUCT.LIST.COLUMN.DESCRIPTION' | translate }}</th>
-      <td *matCellDef="let product" fxHide.lt-sm fxShow mat-cell>
-        <div *ngIf="product.id; else skeleton">{{product.description}}</div>
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
-      </td>
-    </ng-container>
-
     <ng-container matColumnDef="price">
       <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'PRODUCT.LIST.COLUMN.PRICE' | translate }}</th>
       <td *matCellDef="let product" mat-cell>
         <div *ngIf="product.id; else skeleton">
           <mat-icon matPrefix>attach_money</mat-icon>&nbsp;{{product.price | number:'1.2-2'}}
         </div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="durability">
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+          mat-sort-header>{{ 'PRODUCT.LIST.COLUMN.DURABILITY' | translate }}</th>
+      <td *matCellDef="let product" fxHide.lt-sm fxShow mat-cell>
+        <div *ngIf="product.id; else skeleton">{{product.durability}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>

@@ -62,10 +62,6 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
     );
   }
 
-  back(): void {
-    this.location.back();
-  }
-
   onStrengthChanged(): void {
     this.showError = true;
     this.passwordComponent.passwordConfirmationFormControl.updateValueAndValidity();

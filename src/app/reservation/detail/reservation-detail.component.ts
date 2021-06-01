@@ -44,6 +44,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   error: any;
   changeState: any;
   professionalId: string | undefined;
+  customerId: string | undefined;
   machine: any;
 
   displayedColumns: string[] = ['position', 'professional', 'start', 'product', 'state'];
@@ -65,6 +66,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     if (token) {
       const user: IUserAll = JSON.parse(token).user;
       this.professionalId = user.authorities.some(u => u.authority === Role.professional) ? user.id : undefined;
+      this.customerId = user.authorities.some(u => u.authority === Role.customer) ? user.id : undefined;
       this.user = user;
     }
   }
@@ -142,7 +144,10 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         this.state = ReservationIconName[state.selected.state.toLowerCase()];
         this.reservation = state.selected;
         if (this.professionalId && this.professionalId === this.reservation?.room.professional.id) {
-          this.setupMachine(this);
+          this.professionalMachine(this);
+          this.changeState = this.machine.next(this.reservation.state.toLowerCase());
+        } else if (this.customerId && this.customerId === this.reservation?.customer.id) {
+          this.customerMachine(this);
           this.changeState = this.machine.next(this.reservation.state.toLowerCase());
         }
         this.dataSource = new MatTableDataSource<IReservationAll>(state.selected.history);
@@ -169,7 +174,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     );
   }
 
-  private setupMachine(self: this): void {
+  private professionalMachine(self: this): any {
     const reservationId = self.reservation?.id;
     const initialState = self.reservation?.state;
     const store = self.store;
@@ -291,6 +296,93 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
           id: 'complete',
           color: 'accent'
         }]
+      },
+      completed: {
+        next: []
+      },
+      cancelled: {
+        next: []
+      }
+    }, initialState);
+  }
+
+  private customerMachine(self: this): any {
+    const reservationId = self.reservation?.id;
+    const initialState = self.reservation?.state;
+    const store = self.store;
+    const translate = self.translate;
+    this.machine = ReservationDetailComponent.createMachine({
+      initialState: ReservationIconName.created,
+      created: {
+        transitions: {
+          cancel: {
+            target: 'cancelled',
+            action: (): void => {
+              self.reservation = undefined;
+              store.dispatch(
+                new fromActionsReservation.CustomerCancel(reservationId)
+              );
+            }
+          },
+          // TODO Edit
+          // edit: {
+          //   target: 'edited',
+          //   action: (): void => {
+          //     const data = {editReservation: {reservation: self.reservation, user: self.user}};
+          //     self.router.navigateByUrl('/me/reservation', {state: data});
+          //   }
+          // }
+        },
+        next: [{
+        //   tooltip: translate.instant('RESERVATION.DETAIL.ACTION.EDIT'),
+        //   tooltipPosition: 'below',
+        //   icon: ReservationIconName.edit,
+        //   id: 'edit',
+        //   color: 'accent'
+        // }, {
+          tooltip: translate.instant('RESERVATION.DETAIL.ACTION.CANCEL'),
+          tooltipPosition: 'below',
+          icon: ReservationIconName.cancelled,
+          id: 'cancel',
+          color: 'warn'
+        }]
+      },
+      approved: {
+        transitions: {
+          // TODO Edit
+          // edit: {
+          //   target: 'edited',
+          //   action: (): void => {
+          //     const data = {editReservation: {reservation: self.reservation, user: self.user}};
+          //     self.router.navigateByUrl('/me/reservation', {state: data});
+          //   }
+          // },
+          cancel: {
+            target: 'cancelled',
+            action: (): void => {
+              self.reservation = undefined;
+              store.dispatch(
+                new fromActionsReservation.CustomerCancel(reservationId)
+              );
+            }
+          }
+        },
+        next: [{
+        //   tooltip: translate.instant('RESERVATION.DETAIL.ACTION.EDIT'),
+        //   tooltipPosition: 'below',
+        //   icon: ReservationIconName.edit,
+        //   id: 'edit',
+        //   color: 'accent'
+        // }, {
+          tooltip: translate.instant('RESERVATION.DETAIL.ACTION.CANCEL'),
+          tooltipPosition: 'below',
+          icon: ReservationIconName.cancelled,
+          id: 'cancel',
+          color: 'warn'
+        }]
+      },
+      started: {
+        next: []
       },
       completed: {
         next: []

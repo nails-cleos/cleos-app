@@ -3,6 +3,7 @@ import { Action } from '@ngrx/store';
 export enum ReservationActionTypes {
   getAll = '[Reservation] Get all',
   getAllPage = '[Reservation] Get all page',
+  getAllMePage = '[Reservation] Get all me page',
   getAllAssignmentPage = '[Reservation] Get all page assignment',
   getAllGroupingByRoom = '[Reservation] Get all grouping by room',
   searchReservation = '[Reservation] Search reservation',
@@ -25,6 +26,7 @@ export enum ReservationActionTypes {
   start = '[Reservation] Start',
   complete = '[Reservation] Complete',
   cancel = '[Reservation] Cancel',
+  customerCancel = '[Reservation] Customer cancel',
   stateSuccess = '[Reservation] State success',
   clean = '[Reservation] Clean'
 }
@@ -35,6 +37,13 @@ export class GetAll implements Action {
 
 export class GetAllPage implements Action {
   readonly type = ReservationActionTypes.getAllPage;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class GetAllMePage implements Action {
+  readonly type = ReservationActionTypes.getAllMePage;
 
   constructor(public payload: any) {
   }
@@ -182,6 +191,13 @@ export class Cancel implements Action {
   }
 }
 
+export class CustomerCancel implements Action {
+  readonly type = ReservationActionTypes.customerCancel;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class StateSuccess implements Action {
   readonly type = ReservationActionTypes.stateSuccess;
 
@@ -196,6 +212,7 @@ export class Clean implements Action {
 export type All =
   | GetAll
   | GetAllPage
+  | GetAllMePage
   | GetAllAssignmentPage
   | GetAllGroupingByRoom
   | SearchReservation
@@ -218,5 +235,6 @@ export type All =
   | Edit
   | Complete
   | Cancel
+  | CustomerCancel
   | StateSuccess
   | Clean;

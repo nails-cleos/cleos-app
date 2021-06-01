@@ -88,8 +88,7 @@
             <div fxFlex></div>
             <button [disabled]="form.invalid" color="primary" mat-raised-button
                     type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
-            <button color="accent" mat-raised-button
-                    routerLink="/users">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <button color="accent" mat-raised-button appBackButton>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
         </form>
       </mat-card>

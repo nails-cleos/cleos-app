@@ -125,8 +125,7 @@
   </ng-template>
   <mat-card-actions *ngIf="reservation; else buttonSkeleton">
     <div fxFlex></div>
-    <button color="accent" mat-raised-button
-            routerLink="/reservations">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+    <button color="accent" mat-raised-button appBackButton>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
   </mat-card-actions>
   <ng-template #buttonSkeleton>
     <div class="ssc-head-line"></div>

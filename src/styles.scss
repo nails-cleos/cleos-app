@@ -29,6 +29,10 @@ table {
   width: 100%;
 }
 
+th.mat-header-cell {
+  text-align: center !important;
+}
+
 .column-large-text {
   word-wrap: break-word !important;
   white-space: unset !important;
@@ -48,11 +52,13 @@ table {
 .mat-column-position {
   flex: 0 0 5%;
   width: 5%;
+  text-align: center;
 }
 
 .mat-column-actions {
   flex: 0 0 15%;
   width: 15%;
+  text-align: center;
 }
 
 .mat-cell-position {

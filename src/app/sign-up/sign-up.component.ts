@@ -5,7 +5,8 @@ import { Store } from '@ngrx/store';
 import * as fromActionsLogin from '../store/auth.actions';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
-import { IFlag, flags } from '../util/flags';
+import { flags, IFlag } from '../util/flags';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-sign-up',
@@ -20,6 +21,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
   subscription: Subscription | undefined;
   getState: Observable<any>;
   errors: any = [];
+  code: string | undefined | null;
 
   username: FormControl = new FormControl('', [
     Validators.required
@@ -39,11 +41,13 @@ export class SignUpComponent implements OnInit, OnDestroy {
 
   flagList: IFlag[] = flags();
 
-  constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private cdRef: ChangeDetectorRef) {
+  constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private route: ActivatedRoute,
+              private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectAuthState);
   }
 
   ngOnInit(): void {
+    this.code = this.route.snapshot.queryParamMap.get('code');
     this.createForm();
     this.subscribe();
     this.cdRef.detectChanges();
@@ -65,6 +69,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
     user.lastName = this.lastName.value;
     user.password = this.passwordComponent.passwordFormControl.value;
     user.lang = this.lang.value.value;
+    user.code = this.code;
     this.store.dispatch(new fromActionsLogin.SignUp(user));
   }
 

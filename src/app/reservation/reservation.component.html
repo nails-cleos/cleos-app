@@ -217,7 +217,7 @@
         </div>
       </div>
       <div>
-        <button mat-button routerLink="/calendar">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+        <button mat-button appBackButton>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
         <button (click)="getRooms()" [disabled]="customerForm.invalid" color="primary" mat-button type="button">
           {{ 'COMMON.BUTTON.NEXT' | translate }}
         </button>
@@ -282,7 +282,7 @@
         <ng-template matStepLabel>{{ 'RESERVATION.ADD.PREVIEW.TITLE' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepFive"></ng-container>
         <div>
-          <button (click)="goBack()" mat-button>Back</button>
+          <button (click)="goBack()" mat-button>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           <button (click)="create()" color="primary" mat-button type="button">
             {{ 'COMMON.BUTTON.BOOK' | translate }}
           </button>
@@ -311,7 +311,7 @@
       </div>
 
       <div>
-        <button mat-button routerLink="/calendar">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+        <button mat-button appBackButton>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
         <button (click)="getRooms()" [disabled]="customerForm.invalid" color="primary" mat-button type="button">
           {{ 'COMMON.BUTTON.NEXT' | translate }}
         </button>
@@ -377,7 +377,7 @@
         <ng-template matStepLabel>{{ 'RESERVATION.ADD.PREVIEW.TITLE' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepFive"></ng-container>
         <div>
-          <button (click)="goBack()" mat-button>Back</button>
+          <button (click)="goBack()" mat-button>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           <button (click)="create()" color="primary" mat-button type="button">
             {{ 'COMMON.BUTTON.BOOK' | translate }}
           </button>

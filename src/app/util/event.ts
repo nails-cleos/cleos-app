@@ -2,7 +2,7 @@ import { IAvailability } from '../interfaces/room';
 import { CalendarEvent } from 'angular-calendar';
 import { findStateColor } from './flags';
 
-export const fillNotAvailable = (unavailable: string, lunch: string, notWorking: string, daysInWeek: number, plusHour: number,
+export const fillNotAvailable = (unavailable: string, lunch: string, notWorking: string, daysInWeek: number,
                                  selectDate: Date, sunday: IAvailability, saturday: IAvailability, week: IAvailability,
                                  addToday: boolean = false): CalendarEvent[] => {
   let events: CalendarEvent[] = [];
@@ -12,19 +12,15 @@ export const fillNotAvailable = (unavailable: string, lunch: string, notWorking:
     const day = date.getDay();
     if (addToday && date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate()) {
       const event = newEvent(notWorking, findStateColor('DEFAULT'), new Date(new Date(now).setHours(0, 0)),
-        new Date(new Date(now).setHours(now.getHours() + plusHour, now.getMinutes())));
+        new Date(new Date(now).setHours(now.getHours(), now.getMinutes())));
       events = [...events, event];
     }
-    if (date < new Date(now.getFullYear(), now.getMonth(), now.getDate())) {
-      const event = newEvent(notWorking, findStateColor('DEFAULT'), new Date(new Date(date).setHours(0, 0)),
-        new Date(new Date(date).setHours(23, 59)));
-      events = [...events, event];
-    } else if (day === 0) {
-      events = events.concat(createEvent(sunday, date, notWorking, unavailable, lunch, plusHour));
+    if (day === 0) {
+      events = events.concat(createEvent(sunday, date, notWorking, unavailable, lunch));
     } else if (day === 6) {
-      events = events.concat(createEvent(saturday, date, notWorking, unavailable, lunch, plusHour));
+      events = events.concat(createEvent(saturday, date, notWorking, unavailable, lunch));
     } else {
-      events = events.concat(createEvent(week, date, notWorking, unavailable, lunch, plusHour));
+      events = events.concat(createEvent(week, date, notWorking, unavailable, lunch));
     }
     date.setDate(date.getDate() + 1);
   }
@@ -67,8 +63,8 @@ export const getOverlapEvent = (events: any[], eventStartDay: Date, eventEndDay:
 //   });
 // }
 
-const createEvent = (it: IAvailability, date: Date, notWorking: string, unavailable: string, lunch: string,
-                     plusHour: number): CalendarEvent[] => {
+const createEvent = (it: IAvailability, date: Date, notWorking: string, unavailable: string,
+                     lunch: string): CalendarEvent[] => {
   let events: CalendarEvent[] = [];
   if (!it) {
     const event = newEvent(notWorking, findStateColor('DEFAULT'), new Date(new Date(date).setHours(0, 0)),
@@ -77,7 +73,7 @@ const createEvent = (it: IAvailability, date: Date, notWorking: string, unavaila
   } else {
     const now = new Date();
     const nowTime = now.toLocaleTimeString('en-GB').split(':');
-    const hour = Number(nowTime[0]) + plusHour;
+    const hour = Number(nowTime[0]);
     const minute = Number(nowTime[1]);
     if (it.start) {
       const start = it.start.split(':');
@@ -115,7 +111,7 @@ const createEvent = (it: IAvailability, date: Date, notWorking: string, unavaila
         new Date(date.setHours(23, 59)));
       events = [...events, eventAfter];
     }
-    const ev = createLunchEvent(it, date, unavailable, lunch, plusHour);
+    const ev = createLunchEvent(it, date, unavailable, lunch);
     if (ev) {
       events = [...events, ev];
     }
@@ -125,7 +121,7 @@ const createEvent = (it: IAvailability, date: Date, notWorking: string, unavaila
 };
 
 const createLunchEvent = (it: IAvailability, date: Date, unavailable: string,
-                          lunch: string, plusHour: number): CalendarEvent | undefined => {
+                          lunch: string): CalendarEvent | undefined => {
   const now = new Date();
   const nowTime = now.toLocaleTimeString('en-GB').split(':');
   let hour = Number(nowTime[0]);
@@ -144,7 +140,6 @@ const createLunchEvent = (it: IAvailability, date: Date, unavailable: string,
         hour = 23;
         minute = 59;
       } else {
-        hour = hour + plusHour;
         return lunchEvent(hour, lunchStartHour, minute, lunchStartMinute, lunchEndHour, lunchEndMinute, date, lunch);
       }
       const start = new Date(new Date().setHours(0, 0));
@@ -159,8 +154,6 @@ const createLunchEvent = (it: IAvailability, date: Date, unavailable: string,
     if (hour > 23) {
       hour = 23;
       minute = 59;
-    } else {
-      hour = hour + plusHour;
     }
     const start = new Date(date.setHours(0, 0));
     const end = new Date(date.setHours(hour, minute));

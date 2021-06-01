@@ -33,6 +33,7 @@ import { CatalogComponent } from './catalog/catalog.component';
 import { UnavailableListComponent } from './unavailable/list/unavailable-list.component';
 import { UnavailableComponent } from './unavailable/unavailable.component';
 import { UnavailableDetailComponent } from './unavailable/detail/unavailable-detail.component';
+import { ReservationsComponent } from './reservation/list/reservations.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/dashboard', pathMatch: 'full', resolve: {model: TranslationLoaderResolver}},
@@ -43,7 +44,11 @@ const routes: Routes = [
   {path: 'catalogs', component: CatalogComponent},
   {path: 'main', component: MainComponent},
   {
-    path: 'dashboard', component: DashComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService], data: {
+    path: 'dashboard',
+    component: DashComponent,
+    resolve: {model: TranslationLoaderResolver},
+    canActivate: [AuthGuardService],
+    data: {
       roles: [Role.admin, Role.professional]
     }
   },
@@ -58,7 +63,11 @@ const routes: Routes = [
     }
   },
   {
-    path: 'users', component: UsersComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService], data: {
+    path: 'users',
+    component: UsersComponent,
+    resolve: {model: TranslationLoaderResolver},
+    canActivate: [AuthGuardService],
+    data: {
       roles: [Role.admin]
     }
   },
@@ -73,7 +82,11 @@ const routes: Routes = [
     }
   },
   {
-    path: 'products', component: ProductsComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService], data: {
+    path: 'products',
+    component: ProductsComponent,
+    resolve: {model: TranslationLoaderResolver},
+    canActivate: [AuthGuardService],
+    data: {
       roles: [Role.admin]
     }
   },
@@ -107,7 +120,11 @@ const routes: Routes = [
     }
   },
   {
-    path: 'rooms', component: RoomsComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService], data: {
+    path: 'rooms',
+    component: RoomsComponent,
+    resolve: {model: TranslationLoaderResolver},
+    canActivate: [AuthGuardService],
+    data: {
       roles: [Role.admin]
     }
   },
@@ -137,19 +154,28 @@ const routes: Routes = [
     }, runGuardsAndResolvers: 'always'
   },
   {
-    path: 'calendar', component: CalendarComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService],
+    path: 'calendar',
+    component: CalendarComponent,
+    resolve: {model: TranslationLoaderResolver},
+    canActivate: [AuthGuardService],
     data: {
       roles: [Role.admin, Role.professional]
     }
   },
   {
-    path: 'assignments', component: AssignmentsComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService],
+    path: 'assignments',
+    component: AssignmentsComponent,
+    resolve: {model: TranslationLoaderResolver},
+    canActivate: [AuthGuardService],
     data: {
       roles: [Role.professional]
     }
   },
   {
-    path: 'notifications', component: NotificationsComponent, resolve: {model: TranslationLoaderResolver}, canActivate: [AuthGuardService],
+    path: 'notifications',
+    component: NotificationsComponent,
+    resolve: {model: TranslationLoaderResolver},
+    canActivate: [AuthGuardService],
     data: {
       roles: [Role.admin, Role.professional, Role.customer]
     }
@@ -172,6 +198,12 @@ const routes: Routes = [
     path: 'unavailable/:id', component: UnavailableDetailComponent, canActivate: [AuthGuardService], data: {
       roles: [Role.admin, Role.professional]
     }
+  },
+  {
+    path: 'me', canActivate: [AuthGuardService], data: {roles: [Role.customer]}, children: [
+      {path: 'reservations', component: ReservationsComponent, resolve: {model: TranslationLoaderResolver}},
+      {path: 'reservation/:id', component: ReservationDetailComponent}
+    ]
   }
 ];
 

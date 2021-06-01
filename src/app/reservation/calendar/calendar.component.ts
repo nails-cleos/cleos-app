@@ -228,7 +228,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
           const lunch = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.LUNCH');
           const notWorking = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.OUT_OF_WORK');
           calendar.events = calendar.events.concat(fillNotAvailable(unavailable, lunch, notWorking,
-            56, 0, this.viewDate, sunday, saturday, week));
+            56, this.viewDate, sunday, saturday, week));
         });
         stateValue.data.forEach((value: IRoomReservation) => this.addUnavailableList(value));
       }

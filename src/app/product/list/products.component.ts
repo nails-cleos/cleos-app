@@ -23,7 +23,7 @@ export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['position', 'name', 'description', 'price', 'duration', 'actions'];
+  displayedColumns: string[] = ['position', 'name', 'price', 'durability', 'duration', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IProduct>>();
   subscription: Subscription | undefined;
   getState: Observable<any>;

@@ -43,6 +43,7 @@ import { WebsocketService } from './services/websocket.service';
 import { GeocodeService } from './services/geocode.service';
 import { CatalogueService } from './services/catalogue.service';
 import { UnavailableService } from './services/unavailable.service';
+import { NavigationService } from './services/navigation.service';
 
 // Reducers
 import { reducers } from './store/app.states';
@@ -59,6 +60,8 @@ import { UnavailableEffects } from './store/effects/unavailable.effects';
 
 // Directives
 import { DragDropDirective } from './directives/drag-drop.directive';
+import { SpecialCharacterDirective } from './directives/special-character.directive';
+import { BackButtonDirective } from './back-button.directive';
 
 // Components
 import { AppComponent } from './app.component';
@@ -106,12 +109,12 @@ import { GoogleMapComponent } from './google-map/google-map.component';
 import { CatalogueComponent } from './catalogue/catalogue.component';
 import { CataloguesComponent } from './catalogue/list/catalogues.component';
 import { CatalogueDetailComponent } from './catalogue/detail/catalogue-detail.component';
-import { SpecialCharacterDirective } from './directives/special-character.directive';
 import { CatalogComponent } from './catalog/catalog.component';
 import { ImageViewerComponent } from './image-viewer/image-viewer.component';
 import { UnavailableComponent } from './unavailable/unavailable.component';
 import { UnavailableDetailComponent } from './unavailable/detail/unavailable-detail.component';
 import { UnavailableListComponent } from './unavailable/list/unavailable-list.component';
+import { ReservationsComponent } from './reservation/list/reservations.component';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
@@ -183,13 +186,15 @@ registerLocaleData(localeEs, 'es');
     CatalogueComponent,
     CataloguesComponent,
     CatalogueDetailComponent,
-    DragDropDirective,
-    SpecialCharacterDirective,
     CatalogComponent,
     ImageViewerComponent,
     UnavailableComponent,
     UnavailableDetailComponent,
-    UnavailableListComponent
+    UnavailableListComponent,
+    ReservationsComponent,
+    DragDropDirective,
+    SpecialCharacterDirective,
+    BackButtonDirective
   ],
   imports: [
     BrowserModule,
@@ -242,6 +247,7 @@ registerLocaleData(localeEs, 'es');
     CatalogueService,
     UnavailableService,
     WebsocketService,
+    NavigationService,
     TranslationLoaderResolver,
     GeocodeService,
     {

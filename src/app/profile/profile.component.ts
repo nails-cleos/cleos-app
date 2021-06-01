@@ -77,10 +77,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
     );
   }
 
-  back(): void {
-    this.location.back();
-  }
-
   private findMe(): void {
     this.store.dispatch(
       new fromActionsUser.FindMe()

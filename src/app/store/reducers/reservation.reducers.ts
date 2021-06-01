@@ -48,7 +48,8 @@ export const reducer = (state = initialState, action: All): State => {
       };
     }
     case ReservationActionTypes.getAllAssignmentPage:
-    case ReservationActionTypes.getAllPage: {
+    case ReservationActionTypes.getAllPage:
+    case ReservationActionTypes.getAllMePage: {
       return {
         ...state,
         // @ts-ignore
@@ -114,6 +115,7 @@ export const reducer = (state = initialState, action: All): State => {
     case ReservationActionTypes.start:
     case ReservationActionTypes.complete:
     case ReservationActionTypes.cancel:
+    case ReservationActionTypes.customerCancel:
     case ReservationActionTypes.reservationFind: {
       return {
         ...state,

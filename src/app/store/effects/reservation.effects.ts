@@ -27,10 +27,21 @@ export class ReservationEffects {
   @Effect()
   getAllPage$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getAllPage)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.reservationService.getAllPage(payload.active, payload.direction, payload.page, payload.size).pipe(
-      switchMap((response: any) => of(new fromActionsReservation.ReservationPageSuccess(response ? response : {content: []}))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
-    ))
+    switchMap((payload: any) =>
+      this.reservationService.getAllPage('pages', payload.active, payload.direction, payload.page, payload.size).pipe(
+        switchMap((response: any) => of(new fromActionsReservation.ReservationPageSuccess(response ? response : {content: []}))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
+      ))
+  );
+
+  @Effect()
+  getAllMePage$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getAllMePage)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) =>
+      this.reservationService.getAllPage('me/pages', payload.active, payload.direction, payload.page, payload.size).pipe(
+        switchMap((response: any) => of(new fromActionsReservation.ReservationPageSuccess(response ? response : {content: []}))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
+      ))
   );
 
   @Effect()
@@ -174,10 +185,23 @@ export class ReservationEffects {
     ))
   );
 
+  @Effect()
+  customerCancel$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.customerCancel)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.reservationService.changeState(payload, 'cancel/customer').pipe(
+      switchMap(() => {
+        const message = this.translate.instant('RESERVATION.DETAIL.STATE.CANCEL');
+        return of(new fromActionsReservation.StateSuccess({id: payload, message}));
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
+    ))
+  );
+
   @Effect({dispatch: false})
   selectedData$ = this.actions$.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.reservationSelected),
-    tap((data: any) => this.router.navigate(['reservation', data.payload.id]))
+    tap((data: any) => {
+      this.router.navigate([this.router.url]);
+    })
   );
 
   @Effect({dispatch: false})

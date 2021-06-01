@@ -26,7 +26,7 @@ export class LoginEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => {
       const user = payload.socialUser;
-      return this.authService.socialLogin(user.idToken || user.authToken, user.provider).pipe(
+      return this.authService.socialLogin(user.idToken || user.authToken, user.provider, payload.code).pipe(
         switchMap((response: any) => of(new LoginSuccess({response, queryParams: payload.queryParams}))),
         catchError((err: HttpErrorResponse) => of(new LoginFailure({error: err.error})))
       );

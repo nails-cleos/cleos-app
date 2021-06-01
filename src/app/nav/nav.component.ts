@@ -65,11 +65,18 @@ export class NavComponent implements OnInit, OnDestroy {
     if (notification.read) {
       this.router.navigate([notification.navigation]);
     } else {
-      this.countNotifications--;
+      if (this.countNotifications > 0) {
+        this.countNotifications--;
+      }
       if (this.countNotifications < 10) {
         this.plusNotification = undefined;
       }
-      notification.read = true;
+      this.notifications.forEach(value => {
+        if (value.id === notification.id) {
+          return Object.assign({}, value, {read: true});
+        }
+        return value;
+      });
       this.store.dispatch(
         new fromActionsNotification.NotificationRead(notification)
       );

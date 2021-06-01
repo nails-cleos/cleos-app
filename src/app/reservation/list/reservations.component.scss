@@ -1,0 +1,13 @@
+@import '../../../theme';
+$warn: map-get($theme, warn);
+
+.mat-column-professional,
+.mat-column-state,
+.mat-column-product,
+.mat-column-start {
+  text-align: center;
+}
+
+.row-is-canceled {
+  // background-color: mat-color($warn);
+}

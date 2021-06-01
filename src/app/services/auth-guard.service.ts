@@ -38,23 +38,18 @@ export class AuthGuardService implements CanActivate {
 
   public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
     if (this.currentUser) {
-      if (AuthGuardService.isCustomer(this.currentUser.authorities)) {
-        this.router.navigate(['auth'], {queryParams: {returnUrl: state.url}});
-
-        return false;
-      }
       if (AuthGuardService.hasRole(route, this.currentUser)) {
         return true;
       } else {
-        let message;
-        if (this.translate.currentLang.startsWith('es')) {
-          message = 'El usuario no tiene los permisos necesarios';
-        } else {
-          message = 'User not have the necessary permissions';
-        }
-        this.snackBar.open(message, 'OK', {
-          duration: 5000
-        });
+        // let message;
+        // if (this.translate.currentLang.startsWith('es')) {
+        //   message = 'El usuario no tiene los permisos necesarios';
+        // } else {
+        //   message = 'User not have the necessary permissions';
+        // }
+        // this.snackBar.open(message, 'OK', {
+        //   duration: 5000
+        // });
         this.router.navigate(['main']);
         return false;
       }

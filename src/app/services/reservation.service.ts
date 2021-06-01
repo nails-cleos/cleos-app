@@ -13,7 +13,7 @@ export class ReservationService {
   constructor(private http: HttpClient) {
   }
 
-  public getAllPage(sort: string, direction: string, page: number, size: number = PAGE_SIZE): Observable<IReservation[]> {
+  public getAllPage(path: string, sort: string, direction: string, page: number, size: number = PAGE_SIZE): Observable<IReservation[]> {
     let params = new HttpParams().set('page', String(page)).set('size', String(size));
     if (sort) {
       params = params.append('sort', sort);
@@ -22,7 +22,7 @@ export class ReservationService {
       params = params.append('direction', direction);
     }
 
-    return this.http.get<IReservation[]>(`${this.url}/pages`, {params});
+    return this.http.get<IReservation[]>(`${this.url}/${path}`, {params});
   }
 
   public getAllAssignmentPage(sort: string, direction: string, page: number): Observable<IReservation[]> {

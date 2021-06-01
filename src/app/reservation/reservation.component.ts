@@ -234,8 +234,12 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.duration = convertDuration(this.product.value.duration);
     this.events = [];
 
-    const date = new Date(this.date.value);
+    let date = new Date(this.date.value);
+    const now = new Date(new Date().setHours(0, 0));
     date.setDate(date.getDate() - this.lessDays);
+    if (date < new Date(now.getFullYear(), now.getMonth(), now.getDate())) {
+      date = now;
+    }
 
     const {week, saturday, sunday} = getAvailability(this.room.value);
 
@@ -244,7 +248,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const lunch = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.LUNCH');
     const notWorking = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.OUT_OF_WORK');
     this.events = this.events.concat(fillNotAvailable(unavailable, lunch, notWorking,
-      this.daysInWeek, 1, date, sunday, saturday, week, true));
+      this.daysInWeek, date, sunday, saturday, week, true));
     this.viewDate = date;
     this.store.dispatch(
       new fromActionsReservation.SearchReservation({date: this.date.value, roomId: this.room.value.id})
@@ -514,7 +518,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.rooms?.length === 1) {
         this.room.setValue(this.rooms[0]);
       }
-      if (state.data && Array.isArray(state.data.reservations) && !state.isLoading) {
+      if (state.data && (Array.isArray(state.data.reservations) || Array.isArray(state.data.unavailableList)) && !state.isLoading) {
         this.reservations = state.data.reservations;
         this.unavailableList = state.data.unavailableList;
         this.addReservations();

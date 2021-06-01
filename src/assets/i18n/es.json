@@ -333,7 +333,7 @@
     "LIST": {
       "COLUMN": {
         "NAME": "Nombre",
-        "DESCRIPTION": "Descripción",
+        "DURABILITY": "Durabilidad",
         "PRICE": "Precio",
         "DURATION": "Duración"
       },

@@ -1,5 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { SocialAuthService, FacebookLoginProvider, GoogleLoginProvider } from 'angularx-social-login';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthService } from 'angularx-social-login';
 import { Store } from '@ngrx/store';
 import * as fromActionsLogin from '../store/auth.actions';
 import { AppState, selectAuthState } from '../store/app.states';
@@ -12,11 +12,14 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.scss']
 })
-export class AuthComponent implements OnInit, OnDestroy {
+export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
+
+  @ViewChild('authGroup') authGroup: any;
 
   getState: Observable<any>;
   subscription: Subscription | undefined;
   isLoading: any;
+  code: string | undefined | null;
 
   constructor(private socialService: SocialAuthService, private store: Store<AppState>, private route: ActivatedRoute,
               private snackBar: MatSnackBar, private router: Router) {
@@ -25,6 +28,13 @@ export class AuthComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscribe();
+    this.code = this.route.snapshot.queryParamMap.get('code');
+  }
+
+  ngAfterViewInit(): void {
+    if (this.code) {
+      this.authGroup.selectedIndex = 1;
+    }
   }
 
   socialSignIn(provider: string): void {
@@ -37,7 +47,7 @@ export class AuthComponent implements OnInit, OnDestroy {
 
     this.socialService.signIn(id).then(socialUser => {
       this.store.dispatch(
-        new fromActionsLogin.SocialLogin({socialUser, queryParams: this.route.snapshot.queryParams})
+        new fromActionsLogin.SocialLogin({socialUser, code: this.code, queryParams: this.route.snapshot.queryParams})
       );
     });
   }
@@ -62,7 +72,6 @@ export class AuthComponent implements OnInit, OnDestroy {
             location.reload();
           });
         }
-
       }
     });
   }

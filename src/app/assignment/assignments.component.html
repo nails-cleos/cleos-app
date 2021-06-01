@@ -1,5 +1,5 @@
-<div *ngIf="!error; else errorBox" class="mat-elevation-z8">
-  <table [dataSource]="dataSource" class="full-width-table" mat-table matSort matSortActive="start"
+<div *ngIf="!error; else errorBox">
+  <table [dataSource]="dataSource" mat-table matSort matSortActive="start"
          matSortDirection="desc" matSortDisableClear>
     <ng-container matColumnDef="position">
       <th *matHeaderCellDef mat-header-cell>#</th>
