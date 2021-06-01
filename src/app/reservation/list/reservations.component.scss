@@ -1,6 +1,3 @@
-@import '../../../theme';
-$warn: map-get($theme, warn);
-
 .mat-column-professional,
 .mat-column-state,
 .mat-column-product,
@@ -9,5 +6,5 @@ $warn: map-get($theme, warn);
 }
 
 .row-is-canceled {
-  // background-color: mat-color($warn);
+  background-color: #ffb3b3;
 }
