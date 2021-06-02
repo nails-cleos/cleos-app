@@ -2,9 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
-import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState } from '../store/app.states';
+import { AppState } from '../store/app.states';
 import * as fromActionsLogin from '../store/auth.actions';
 
 @Injectable()
