@@ -1,6 +1,6 @@
-import { QueryList, Component, ViewChildren, AfterViewInit, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
 
-import { CdkDropList, CdkDragEnter, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragEnter, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Observable, Subscription } from 'rxjs';
 import { AppState, selectCatalogueState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
@@ -9,6 +9,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ICatalogueAll } from '../../interfaces/catalogue';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
+import { DialogComponent } from '../../dialog/dialog.component';
+import { TranslateService } from '@ngx-translate/core';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-catalogue-list',
@@ -31,8 +34,9 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   catalogues: ICatalogueAll[] = [];
 
-  constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>, private snackBar: MatSnackBar,
-              private cdRef: ChangeDetectorRef) {
+  constructor(private readonly translate: TranslateService, public dialog: MatDialog,
+              private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
+              private snackBar: MatSnackBar, private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectCatalogueState);
   }
 
@@ -69,6 +73,22 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.store.dispatch(
       new fromActionsCatalogue.CatalogueSelected(catalogue)
     );
+  }
+
+  delete(catalogue: ICatalogueAll): void {
+    const title = this.translate.instant('CATALOGUE.DELETED.TITLE');
+    const content = this.translate.instant('CATALOGUE.DELETED.CONTENT', {name: catalogue.name});
+    const dialogRef = this.dialog.open(DialogComponent, {
+      data: {title, content, value: catalogue}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.store.dispatch(
+          new fromActionsCatalogue.DeleteCatalogue(result.id)
+        );
+      }
+    });
   }
 
   private subscribe(): void {

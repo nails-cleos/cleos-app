@@ -31,8 +31,21 @@
     height: 100%;
     width: 100%;
 
+    .wrapper {
+      margin-left:auto;
+      margin-right:auto;
+      height:auto;
+      width:auto;
+    }
+
     .edit {
       float: left;
+      cursor: pointer;
+    }
+
+    .delete {
+      float: left;
+      clear: left;
       cursor: pointer;
     }
   }
