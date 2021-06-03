@@ -82,8 +82,8 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
       name: this.address.value.formatted_address,
       description: this.addressDescription.value,
       location : {
-        x: location.lat(),
-        y: location.lng()
+        x: location.lng(),
+        y: location.lat()
       } as ILocation
     } as IAddress;
 

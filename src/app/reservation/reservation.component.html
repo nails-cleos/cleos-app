@@ -171,9 +171,13 @@
         </mat-list-item>
         <mat-list-item>
           <mat-icon mat-list-icon>room</mat-icon>
-          <div mat-line>{{ 'RESERVATION.ADD.PREVIEW.ROOM.ADDRESS' | translate}}</div>
-          <div [matTooltip]="room.value.address.name" mat-line
-               matTooltipPosition="left">{{room.value.address.name}}</div>
+          <div mat-line>{{ 'RESERVATION.DETAIL.ROOM.ADDRESS' | translate}}</div>
+          <div mat-line [matTooltip]="room.value.address.name" matTooltipPosition="left">
+            <a target="_blank"
+               [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + room.value.address.name">
+              {{room.value.address.name}}
+            </a>
+          </div>
           <div [matTooltip]="room.value.address.description" mat-line
                matTooltipPosition="left">{{room.value.address.description}}</div>
         </mat-list-item>
@@ -242,8 +246,8 @@
           </mat-form-field>
           <div class="vertical-divider"></div>
           <div *ngIf="room.value && room.value.address && room.value.address.location" style="width: 400px">
-            <app-google-map (addressEmitter)="getAddress($event)" [latitudeMarker]="room.value.address.location.x"
-                            [longitudeMarker]="room.value.address.location.y"></app-google-map>
+            <app-google-map (addressEmitter)="getAddress($event)" [latitudeMarker]="room.value.address.location.y"
+                            [longitudeMarker]="room.value.address.location.x"></app-google-map>
           </div>
         </div>
       </div>
@@ -338,8 +342,8 @@
           </div>
           <div class="vertical-divider"></div>
           <div *ngIf="room.value && room.value.address && room.value.address.location" style="width: 400px">
-            <app-google-map (addressEmitter)="getAddress($event)" [latitudeMarker]="room.value.address.location.x"
-                            [longitudeMarker]="room.value.address.location.y"></app-google-map>
+            <app-google-map (addressEmitter)="getAddress($event)" [latitudeMarker]="room.value.address.location.y"
+                            [longitudeMarker]="room.value.address.location.x"></app-google-map>
           </div>
         </div>
       </div>

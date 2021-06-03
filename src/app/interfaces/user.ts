@@ -23,6 +23,7 @@ export interface IUserAll {
   email: string;
   authorities: IAuthority[];
   imageUrl?: string;
+  lang?: string;
 }
 
 export interface IAuthority {
