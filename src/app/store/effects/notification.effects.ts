@@ -30,6 +30,15 @@ export class NotificationEffects {
       ))
   );
 
+  @Effect()
+  notificationSubscribe$ = this.actions$.pipe(ofType(fromActionsNotification.NotificationActionTypes.notificationSubscribe)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.notificationService.subscribe(payload).pipe(
+      switchMap(() => of(new fromActionsNotification.NotificationSuccess(payload))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsNotification.NotificationFailure({error: err.error})))
+    ))
+  );
+
   @Effect({dispatch: false})
   notificationSuccess$ = this.actions$.pipe(
     ofType(fromActionsNotification.NotificationActionTypes.notificationSuccess)

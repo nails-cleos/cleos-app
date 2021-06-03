@@ -666,7 +666,7 @@
         },
         "UNAVAILABLE": "<div><b>No disponible</b></div><div>{{description}}</div><div><b>Duración:</b> {{duration}}</div>"
       },
-      "CREATED": "Reservation {{date}} created"
+      "CREATED": "Reserva {{date}} creada"
     },
     "DETAIL": {
       "TITLE": "Reserva del cliente",

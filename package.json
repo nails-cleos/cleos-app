@@ -28,6 +28,7 @@
     "@angular/common": "~11.0.5",
     "@angular/compiler": "~11.0.5",
     "@angular/core": "~11.0.5",
+    "@angular/fire": "^6.1.5",
     "@angular/flex-layout": "^11.0.0-beta.33",
     "@angular/forms": "~11.0.5",
     "@angular/material": "^11.0.3",
@@ -39,13 +40,12 @@
     "@ngrx/store": "^10.1.2",
     "@ngx-translate/core": "^13.0.0",
     "@ngx-translate/http-loader": "^6.0.0",
-    "@types/sockjs-client": "^1.5.0",
-    "@types/stompjs": "^2.3.4",
     "angular-calendar": "^0.28.22",
     "angularx-social-login": "^3.5.4",
     "chart.js": "^2.9.4",
     "date-fns": "^2.16.1",
     "express": "^4.17.1",
+    "firebase": "^8.6.3",
     "flag-icon-css": "^3.5.0",
     "net": "^1.0.2",
     "ng2-charts": "^2.4.2",
@@ -60,8 +60,8 @@
     "sockjs-client": "^1.5.0",
     "stompjs": "^2.3.3",
     "tslib": "^2.0.0",
-    "zone.js": "~0.10.2",
-    "typescript": "~4.0.2"
+    "typescript": "~4.0.2",
+    "zone.js": "~0.10.2"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.1100.5",

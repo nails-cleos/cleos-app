@@ -11,7 +11,7 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'CATALOGUE.ADD.NAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input appSpecialIsAlphaNumeric [formControl]="name" autocomplete="name" matInput required>
+                  <input [formControl]="name" autocomplete="name" matInput required>
                 </label>
                 <mat-error *ngIf="name.hasError('required')" [innerHTML]="'CATALOGUE.ADD.NAME.REQUIRED' | translate">
                 </mat-error>

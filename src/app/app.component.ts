@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 
-
 declare let google: any;
 
 @Component({

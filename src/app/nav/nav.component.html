@@ -44,7 +44,7 @@
       <span>{{'APP.TITLE' | translate}}</span>
       <span class="align-right"></span>
       <div *ngIf="username; else login">
-        <button *ngIf="workDay.length; else workDayIcon" [matMenuTriggerFor]="menuWorkDay"
+        <button *ngIf="isProfessional && workDay.length; else workDayIcon" [matMenuTriggerFor]="menuWorkDay"
                 class="badge-padding" mat-icon-button>
           <mat-icon [matBadgeHidden]="!workDay.length"
                     [matBadge]="workDay.length"
@@ -97,7 +97,7 @@
           </mat-list>
         </mat-menu>
         <ng-template #workDayIcon>
-          <button class="badge-padding" mat-icon-button>
+          <button *ngIf="isProfessional" class="badge-padding" mat-icon-button>
             <mat-icon>work_off</mat-icon>
           </button>
         </ng-template>

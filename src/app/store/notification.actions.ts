@@ -6,6 +6,7 @@ export enum NotificationActionTypes {
   notificationFailure = '[Notification] Failure',
   notificationRead = '[Notification] Notification read',
   notificationReadSuccess = '[Notification] Notification read success',
+  notificationSubscribe = '[Notification] Notification subscribe',
   clean = '[Notification] Clean'
 }
 
@@ -37,6 +38,13 @@ export class NotificationRead implements Action {
   }
 }
 
+export class NotificationSubscribe implements Action {
+  readonly type = NotificationActionTypes.notificationSubscribe;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class NotificationReadSuccess implements Action {
   readonly type = NotificationActionTypes.notificationReadSuccess;
 
@@ -54,4 +62,5 @@ export type All =
   | NotificationFailure
   | NotificationRead
   | NotificationReadSuccess
+  | NotificationSubscribe
   | Clean;

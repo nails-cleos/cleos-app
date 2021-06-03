@@ -28,4 +28,9 @@ export class NotificationService {
     const url = `${this.url}/${notificationId}`;
     return this.http.post<INotification>(url, null);
   }
+
+  public subscribe(token: string): Observable<any> {
+    const url = `${this.url}/subscribe`;
+    return this.http.post(url, {token});
+  }
 }

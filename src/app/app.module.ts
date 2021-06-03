@@ -7,22 +7,36 @@ import { AppMaterialModule } from './util/app-material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { SocialLoginModule } from 'angularx-social-login';
+import {
+  FacebookLoginProvider,
+  GoogleLoginProvider,
+  SocialAuthServiceConfig,
+  SocialLoginModule
+} from 'angularx-social-login';
 import { ActionReducer, MetaReducer, StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ChartsModule } from 'ng2-charts';
-import { CalendarModule, DateAdapter } from 'angular-calendar';
+import {
+  CalendarDateFormatter,
+  CalendarModule,
+  CalendarNativeDateFormatter,
+  DateAdapter,
+  DateFormatterParams
+} from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
-import { registerLocaleData } from '@angular/common';
+import { AsyncPipe, registerLocaleData } from '@angular/common';
 import { MatPasswordStrengthModule } from '@angular-material-extensions/password-strength';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { AgmCoreModule } from '@agm/core';
 import { MatGoogleMapsAutocompleteModule } from '@angular-material-extensions/google-maps-autocomplete';
+import { AngularFireDatabaseModule } from '@angular/fire/database';
+import { AngularFireModule } from '@angular/fire';
+import { AngularFireAuthModule } from '@angular/fire/auth';
+import { AngularFireMessagingModule } from '@angular/fire/messaging';
 
 // Providers
 import { httpInterceptorProviders } from './http-interceptors';
-import { GoogleLoginProvider, FacebookLoginProvider, SocialAuthServiceConfig } from 'angularx-social-login';
 import { environment } from '../environments/environment';
 import { localStorageSync } from 'ngrx-store-localstorage';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -39,11 +53,11 @@ import { UserService } from './services/user.service';
 import { ProductService } from './services/product.service';
 import { RoomService } from './services/room.service';
 import { ReservationService } from './services/reservation.service';
-import { WebsocketService } from './services/websocket.service';
 import { GeocodeService } from './services/geocode.service';
 import { CatalogueService } from './services/catalogue.service';
 import { UnavailableService } from './services/unavailable.service';
 import { NavigationService } from './services/navigation.service';
+import { MessagingService } from './services/messaging.service';
 
 // Reducers
 import { reducers } from './store/app.states';
@@ -60,8 +74,7 @@ import { UnavailableEffects } from './store/effects/unavailable.effects';
 
 // Directives
 import { DragDropDirective } from './directives/drag-drop.directive';
-import { SpecialCharacterDirective } from './directives/special-character.directive';
-import { BackButtonDirective } from './back-button.directive';
+import { BackButtonDirective } from './directives/back-button.directive';
 
 // Components
 import { AppComponent } from './app.component';
@@ -140,6 +153,17 @@ const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
 registerLocaleData(localeEn, 'en');
 registerLocaleData(localeEs, 'es');
 
+class CustomDateFormatter extends CalendarNativeDateFormatter {
+
+  public dayViewHour({date, locale}: DateFormatterParams): string {
+    return new Intl.DateTimeFormat(locale, {
+      hour: 'numeric',
+      minute: 'numeric'
+    }).format(date);
+  }
+
+}
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -193,7 +217,6 @@ registerLocaleData(localeEs, 'es');
     UnavailableListComponent,
     ReservationsComponent,
     DragDropDirective,
-    SpecialCharacterDirective,
     BackButtonDirective
   ],
   imports: [
@@ -211,6 +234,15 @@ registerLocaleData(localeEs, 'es');
     }),
     CalendarModule.forRoot({
       provide: DateAdapter, useFactory: adapterFactory
+    }),
+    CalendarModule.forRoot({
+      provide: DateAdapter,
+      useFactory: adapterFactory
+    }, {
+      dateFormatter: {
+        provide: CalendarDateFormatter,
+        useClass: CustomDateFormatter
+      }
     }),
     ChartsModule,
     AppRoutingModule,
@@ -230,7 +262,12 @@ registerLocaleData(localeEs, 'es');
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,
       registrationStrategy: 'registerWhenStable:30000'
-    })
+    }),
+
+    AngularFireDatabaseModule,
+    AngularFireAuthModule,
+    AngularFireMessagingModule,
+    AngularFireModule.initializeApp(environment.firebase)
   ],
   providers: [
     {
@@ -246,14 +283,15 @@ registerLocaleData(localeEs, 'es');
     ReservationService,
     CatalogueService,
     UnavailableService,
-    WebsocketService,
     NavigationService,
     TranslationLoaderResolver,
     GeocodeService,
     {
       provide: 'SocialAuthServiceConfig',
       useValue: getAuthServiceConfigs()
-    }
+    },
+    MessagingService,
+    AsyncPipe
   ],
   bootstrap: [AppComponent],
   exports: [AppMaterialModule]
