@@ -9,7 +9,6 @@ import * as fromActionsUser from '../store/user.actions';
 import { fieldChange, valueChange } from '../util/validators';
 import { Location } from '@angular/common';
 import { findFlag, flags, IFlag } from '../util/flags';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
@@ -45,7 +44,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   flagList: IFlag[] = flags();
 
   constructor(private snackBar: MatSnackBar, private store: Store<AppState>, private formBuilder: FormBuilder, private location: Location,
-              private cdRef: ChangeDetectorRef, private router: Router) {
+              private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectUserState);
   }
 

@@ -246,8 +246,8 @@
           </mat-form-field>
           <div class="vertical-divider"></div>
           <div *ngIf="room.value && room.value.address && room.value.address.location" style="width: 400px">
-            <app-google-map (addressEmitter)="getAddress($event)" [latitudeMarker]="room.value.address.location.x"
-                            [longitudeMarker]="room.value.address.location.y"></app-google-map>
+            <app-google-map (addressEmitter)="getAddress($event)" [latitudeMarker]="room.value.address.location.y"
+                            [longitudeMarker]="room.value.address.location.x"></app-google-map>
           </div>
         </div>
       </div>
@@ -342,8 +342,8 @@
           </div>
           <div class="vertical-divider"></div>
           <div *ngIf="room.value && room.value.address && room.value.address.location" style="width: 400px">
-            <app-google-map (addressEmitter)="getAddress($event)" [latitudeMarker]="room.value.address.location.x"
-                            [longitudeMarker]="room.value.address.location.y"></app-google-map>
+            <app-google-map (addressEmitter)="getAddress($event)" [latitudeMarker]="room.value.address.location.y"
+                            [longitudeMarker]="room.value.address.location.x"></app-google-map>
           </div>
         </div>
       </div>

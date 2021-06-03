@@ -10,8 +10,6 @@ import { IUser } from '../interfaces/user';
 import { map, startWith } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { requireMatch } from '../util/validators';
-import { Appearance, GermanAddress, Location } from '@angular-material-extensions/google-maps-autocomplete';
-import PlaceResult = google.maps.places.PlaceResult;
 
 export enum IconName {
   calendarToday = 'calendar_today',
@@ -94,8 +92,8 @@ export class RoomComponent implements OnInit, OnDestroy {
       name: this.address.value.formatted_address,
       description: this.addressDescription.value,
       location : {
-        x: location.lat(),
-        y: location.lng()
+        x: location.lng(),
+        y: location.lat()
       } as ILocation
     } as IAddress;
 
