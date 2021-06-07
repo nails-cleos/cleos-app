@@ -27,13 +27,14 @@ import {
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { AsyncPipe, registerLocaleData } from '@angular/common';
 import { MatPasswordStrengthModule } from '@angular-material-extensions/password-strength';
-import { ServiceWorkerModule } from '@angular/service-worker';
+import { ServiceWorkerModule, SwPush } from '@angular/service-worker';
 import { AgmCoreModule } from '@agm/core';
 import { MatGoogleMapsAutocompleteModule } from '@angular-material-extensions/google-maps-autocomplete';
 import { AngularFireDatabaseModule } from '@angular/fire/database';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFireMessagingModule } from '@angular/fire/messaging';
+import firebase from 'firebase';
 
 // Providers
 import { httpInterceptorProviders } from './http-interceptors';
@@ -110,9 +111,7 @@ import { AnnualReservationsChartComponent } from './charts/annual-reservations-c
 import { MiniCardComponent } from './mini-card/mini-card.component';
 import { CustomerReservationsChartComponent } from './charts/customer-reservations-chart/customer-reservations-chart.component';
 import { ReservationTableComponent } from './reservation/table/reservation-table.component';
-import {
-  QuantityProductReservationsChartComponent
-} from './charts/quantity-product-reservations-chart/quantity-product-reservations-chart.component';
+import { QuantityProductReservationsChartComponent } from './charts/quantity-product-reservations-chart/quantity-product-reservations-chart.component';
 import { LastMonthReservationsChartComponent } from './charts/last-month-reservations-chart/last-month-reservations-chart.component';
 import { NotificationsComponent } from './notification/list/notifications.component';
 import { RoomMeComponent } from './room/me/room-me.component';
@@ -297,4 +296,11 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
   exports: [AppMaterialModule]
 })
 export class AppModule {
+  constructor(swPush: SwPush) {
+    if (swPush.isEnabled) {
+      navigator.serviceWorker
+        .ready
+        .then((registration) => firebase.messaging().useServiceWorker(registration));
+    }
+  }
 }

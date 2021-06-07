@@ -9,13 +9,14 @@
     "ng": "ng",
     "start": "node server.js",
     "start:dev": "ng serve",
-    "build": "ng build --prod --source-map",
+    "start:pwa": "node server.js",
+    "build": "ng build --prod",
+    "build:pwa": "ng build --configuration=pwa --source-map",
     "test": "ng test",
     "lint": "ng lint --fix",
     "eslint": "eslint src --fix",
     "e2e": "ng e2e",
-    "start:pwa": "http-server-spa dist/cleos index.html 8443",
-    "heroku-postbuild": "ng build --prod"
+    "heroku-postbuild": "node post-build.js"
   },
   "private": true,
   "dependencies": {

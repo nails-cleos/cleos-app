@@ -3,8 +3,8 @@ import { AngularFireDatabase } from '@angular/fire/database';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFireMessaging } from '@angular/fire/messaging';
 import { take } from 'rxjs/operators';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { AppState, selectNotificationState } from '../store/app.states';
+import { BehaviorSubject } from 'rxjs';
+import { AppState } from '../store/app.states';
 import { Store } from '@ngrx/store';
 import * as fromActionsNotification from '../store/notification.actions';
 
