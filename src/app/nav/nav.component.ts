@@ -12,6 +12,7 @@ import { INotification } from '../interfaces/notification';
 import { TranslateService } from '@ngx-translate/core';
 import { Role } from '../interfaces/token';
 import { MessagingService } from '../services/messaging.service';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-nav',
@@ -19,6 +20,7 @@ import { MessagingService } from '../services/messaging.service';
   styleUrls: ['./nav.component.scss']
 })
 export class NavComponent implements OnInit, OnDestroy {
+  title = environment.title;
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(

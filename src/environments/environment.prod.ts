@@ -1,5 +1,6 @@
 export const environment = {
   production: true,
+  title: 'Cleos',
   baseUrl: 'https://cleos-api.herokuapp.com/api',
   googleClientId: '1075596698405-ujflh3nuhglps8br89a1gtk7obi333h9.apps.googleusercontent.com',
   facebookClientId: '523962545388946',
