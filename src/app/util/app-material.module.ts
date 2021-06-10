@@ -33,6 +33,7 @@ import { OverlayModule } from '@angular/cdk/overlay';
 import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
 import { MatBadgeModule } from '@angular/material/badge';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
   imports: [
@@ -70,7 +71,8 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     MatFabMenuModule,
     MatBadgeModule,
     MatRippleModule,
-    DragDropModule
+    DragDropModule,
+    MatProgressSpinnerModule
   ],
   exports: [
     MatTableModule,
@@ -107,7 +109,8 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     MatFabMenuModule,
     MatBadgeModule,
     MatRippleModule,
-    DragDropModule
+    DragDropModule,
+    MatProgressSpinnerModule
   ]
 })
 export class AppMaterialModule {

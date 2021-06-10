@@ -1,7 +1,7 @@
 import { IAvailability } from '../interfaces/room';
 import { CalendarEvent } from 'angular-calendar';
 import { findStateColor } from './flags';
-import { createDate, createFullDate, createNewDate, getNow, isToday } from './dates';
+import { createDate, createFullDate, createNewDate, getNow, greaterThanToday, isToday } from './dates';
 
 export const fillNotAvailable = (unavailable: string, lunch: string, notWorking: string, daysInWeek: number,
                                  selectDate: Date, sunday: IAvailability, saturday: IAvailability, week: IAvailability,
@@ -14,7 +14,9 @@ export const fillNotAvailable = (unavailable: string, lunch: string, notWorking:
     if (addToday && isToday(date)) {
       const event = newEvent(notWorking, findStateColor('DEFAULT'), createDate(),
         createDate(now.getHours(), now.getMinutes()));
-      events = [...events, event];
+      if (event) {
+        events = [...events, event];
+      }
     }
     if (day === 0) {
       events = events.concat(createEvent(sunday, date, notWorking, unavailable, lunch));
@@ -29,16 +31,22 @@ export const fillNotAvailable = (unavailable: string, lunch: string, notWorking:
   return events;
 };
 
-export const newEvent = (title: string, color: string, start: Date, end?: Date, primary?: string, id?: string): CalendarEvent => ({
-  id,
-  start,
-  end,
-  title,
-  color: {
-    primary,
-    secondary: color
+export const newEvent = (title: string, color: string, start: Date, end?: Date, primary?: string,
+                         id?: string): CalendarEvent | undefined => {
+  if (greaterThanToday(start)) {
+    return {
+      id,
+      start,
+      end,
+      title,
+      color: {
+        primary,
+        secondary: color
+      }
+    } as unknown as CalendarEvent;
   }
-} as unknown as CalendarEvent);
+  return undefined;
+};
 
 export const getOverlapEvent = (events: any[], eventStartDay: Date, eventEndDay: Date): CalendarEvent[] =>
   events.filter((eventA: CalendarEvent) => (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
@@ -69,8 +77,10 @@ const createEvent = (it: IAvailability, date: Date, notWorking: string, unavaila
   let events: CalendarEvent[] = [];
   if (!it) {
     const event = newEvent(notWorking, findStateColor('DEFAULT'), createNewDate(date),
-      createNewDate(date, 23, 59));
-    events = [...events, event];
+      createNewDate(date, 23, 59), undefined, 'NOT_WORKING_ALL_DAY');
+    if (event) {
+      events = [...events, event];
+    }
   } else {
     const now = getNow();
     const nowTime = now.toLocaleTimeString('en-GB').split(':');
@@ -94,7 +104,9 @@ const createEvent = (it: IAvailability, date: Date, notWorking: string, unavaila
       if ((startHour || startHour === 0) && (startMinute || startMinute === 0)) {
         const eventBefore = newEvent(notWorking, findStateColor('DEFAULT'), createNewDate(date, startHour, startMinute),
           createNewDate(date, endHour, endMinute));
-        events = [...events, eventBefore];
+        if (eventBefore) {
+          events = [...events, eventBefore];
+        }
       }
     }
     if (it.end) {
@@ -109,7 +121,9 @@ const createEvent = (it: IAvailability, date: Date, notWorking: string, unavaila
       }
       const eventAfter = newEvent(notWorking, findStateColor('DEFAULT'), createNewDate(date, startHour, startMinute),
         createNewDate(date, 23, 59));
-      events = [...events, eventAfter];
+      if (eventAfter) {
+        events = [...events, eventAfter];
+      }
     }
     const ev = createLunchEvent(it, date, unavailable, lunch);
     if (ev) {

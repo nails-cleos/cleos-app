@@ -10,13 +10,14 @@ import { MatDialog } from '@angular/material/dialog';
 import {
   convertDuration,
   createDate,
-  newDate,
   createNewDate,
+  formatTime,
   getAvailability,
   getNow,
   getStartEndDay,
   IDuration,
-  plusDay, formatTime
+  newDate,
+  plusDay
 } from '../../util/dates';
 import { IRoom, IRoomAll } from '../../interfaces/room';
 import { fillNotAvailable, getOverlapEvent, newEvent } from '../../util/event';
@@ -26,7 +27,6 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { findStateColor, IState, stateColor } from '../../util/flags';
 import { IUserAll } from '../../interfaces/user';
 import { IUnavailableAll } from '../../interfaces/unavailable';
-import { Role } from '../../interfaces/token';
 
 @Component({
   selector: 'app-calendar',
@@ -141,14 +141,16 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
         const color = findStateColor(it.state);
         const event = newEvent(detail, color, start, end, '#000', `reservation/${it.id}`);
-        const calendar = this.calendar.get(rr.room.id);
-        let events;
-        if (calendar) {
-          events = [...calendar.events, event];
-        } else {
-          events = [event];
+        if (event) {
+          const calendar = this.calendar.get(rr.room.id);
+          let events;
+          if (calendar) {
+            events = [...calendar.events, event];
+          } else {
+            events = [event];
+          }
+          this.calendar.set(rr.room.id, new Calendar(rr.room, events));
         }
-        this.calendar.set(rr.room.id, new Calendar(rr.room, events));
       }
     });
   }
@@ -189,19 +191,23 @@ export class CalendarComponent implements OnInit, OnDestroy {
       const overlapEvent = getOverlapEvent(events, start, end);
       if (overlapEvent.length > 0) {
         overlapEvent.forEach(value => {
-          events = events.filter(ev => ev !== value);
-          if (value.end) {
-            if (start < value.start && end < value.end) {
-              value.start = end;
-              events = [...events, value];
-            } else if (start > value.start && end > value.end) {
-              value.end = start;
-              events = [...events, value];
+          if (value.id !== 'NOT_WORKING_ALL_DAY') {
+            events = events.filter(ev => ev !== value);
+            if (value.end) {
+              if (start < value.start && end < value.end) {
+                value.start = end;
+                events = [...events, value];
+              } else if (start > value.start && end > value.end) {
+                value.end = start;
+                events = [...events, value];
+              }
             }
+            this.createUnavailableEvent(room, events, calendar.day, it.id, start, end, duration, it.description);
           }
         });
+      } else {
+        this.createUnavailableEvent(room, events, calendar.day, it.id, start, end, duration, it.description);
       }
-      this.createUnavailableEvent(room, events, calendar.day, it.id, start, end, duration, it.description);
     }
   }
 
@@ -214,10 +220,12 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
     const color = findStateColor('DEFAULT');
     const event = newEvent(detail, color, start, end, '#000', `unavailable/${id}`);
-    events = [...events, event];
-    const calendar = new Calendar(room, events);
-    calendar.day = day;
-    this.calendar.set(room.id, calendar);
+    if (event) {
+      events = [...events, event];
+      const calendar = new Calendar(room, events);
+      calendar.day = day;
+      this.calendar.set(room.id, calendar);
+    }
   }
 
   private subscribe(): void {

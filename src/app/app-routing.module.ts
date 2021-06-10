@@ -156,6 +156,11 @@ const routes: Routes = [
     }
   },
   {
+    path: 'reservation/:id/edit', component: ReservationComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.admin, Role.professional] // TODO Customer not allowed
+    }
+  },
+  {
     path: 'reservation/:id', component: ReservationDetailComponent, canActivate: [AuthGuardService], data: {
       roles: [Role.admin, Role.professional, Role.customer]
     }, runGuardsAndResolvers: 'always'

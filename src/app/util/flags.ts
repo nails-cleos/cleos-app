@@ -42,19 +42,19 @@ export const findFlag = (flagList: IFlag[], lang: string): IFlag => {
 
 export const stateColor = (): IState[] => [{
   name: 'CREATED',
-  color: '#e3d3c5'
+  color: '#fdf8f3' // accent-lighter
 }, {
   name: 'COMPLETED',
-  color: '#d1c4e9'
+  color: '#dcedc8'
 }, {
   name: 'STARTED',
   color: '#b3e5fc'
 }, {
   name: 'APPROVED',
-  color: '#dcedc8'
+  color: '#e3d3c5' // primary-lighter
 }, {
   name: 'DEFAULT',
-  color: '#ffcdd2'
+  color: '#ffb3b3' // warn-lighter
 }];
 
 export const findStateColor = (state: string): string => {

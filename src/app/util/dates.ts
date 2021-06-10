@@ -199,3 +199,4 @@ export const plusMonthDate = (date: Date, plus: number, day: number): Date => {
   return d;
 };
 
+export const greaterThanToday = (date: Date): boolean => date >= createDate();

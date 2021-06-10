@@ -730,6 +730,11 @@
         "STATE": "State",
         "PRODUCT": "Product"
       },
+      "CANCEL": {
+        "TITLE": "Cancel reservation",
+        "CONTENT": "Are you sure to cancel reservation {{date}}?",
+        "MESSAGE": "Reservation {{date}} cancelled"
+      },
       "ERROR": {
         "NO_CONTENT": "No reservations"
       }

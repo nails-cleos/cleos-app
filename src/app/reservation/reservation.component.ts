@@ -34,7 +34,7 @@ import {
   plusDay
 } from '../util/dates';
 import { fillNotAvailable, getOverlapEvent, newEvent } from '../util/event';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DateAdapter } from '@angular/material/core';
 import { findStateColor } from '../util/flags';
 import { GeocoderResult } from '@agm/core';
@@ -112,7 +112,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   extras: any;
 
   isEditing = false;
-  editReservation: IReservationAll | undefined;
+  reservationId: string | undefined;
   showTime = false;
   startDate: Date | undefined;
   minDate: any;
@@ -123,7 +123,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
               private store: Store<AppState>, private formBuilder: FormBuilder, private breakpointObserver: BreakpointObserver,
-              private router: Router, private adapter: DateAdapter<any>, private cdRef: ChangeDetectorRef) {
+              private router: Router, private route: ActivatedRoute, private adapter: DateAdapter<any>,
+              private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectReservationState);
     const userLang = this.translate.currentLang;
     const index = userLang.indexOf('-');
@@ -141,15 +142,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.extras = this.router.getCurrentNavigation()?.extras.state;
     if (this.extras) {
-      if (this.extras.editReservation) {
-        this.showTime = true;
-        this.setData();
-      } else {
-        this.customer.setValue(this.extras.customer);
-        this.room.setValue(this.extras.room);
-        this.product.setValue(this.extras.product);
-        this.date.setValue(this.extras.date);
-      }
+      this.customer.setValue(this.extras.customer);
+      this.room.setValue(this.extras.room);
+      this.product.setValue(this.extras.product);
+      this.date.setValue(this.extras.date);
     }
     this.store.select(selectAuthState).subscribe((state: any) => {
       const user: IUserAll = state.user;
@@ -161,16 +157,23 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.createForm();
     this.clean();
     this.subscribe();
-    this.getCustomers();
+    this.route.params.subscribe(routeParams => {
+      this.reservationId = routeParams.id;
+      if (this.reservationId) {
+        this.isEditing = true;
+        this.getReservation(this.reservationId);
+      } else {
+        this.getCustomers();
+      }
+    });
   }
 
   ngAfterViewInit(): void {
     if (this.isEditing) {
-      this.myStepper.next();
-      if (!this.isAdmin) {
-        this.myStepper.next();
-      } else {
+      if (this.isAdmin) {
         this.getRoomList();
+      } else {
+        this.getProductList();
       }
     }
     if (this.showTime) {
@@ -287,31 +290,33 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const event = newEvent(detail, findStateColor(state), start, end, '#000', id);
 
-    let title;
-    let content;
-    const eventsOverlapping = getOverlapEvent(this.events, start, end);
-    if (eventsOverlapping.length && eventsOverlapping[0] !== this.eventSelected) {
-      const overlapping = eventsOverlapping.find(e => e.id);
-      if (overlapping) {
-        this.errors.overlapping = this.translate.instant('RESERVATION.ADD.EVENT.OVERLAPPING.ERROR', {data: overlapping.title});
-        return;
-      }
-      let message = '';
-      eventsOverlapping.forEach(e => {
-        message += `<div>${e.title}</div>`;
-      });
-      title = this.translate.instant('RESERVATION.ADD.EVENT.OVERLAPPING.TITLE');
-      content = this.translate.instant('RESERVATION.ADD.EVENT.OVERLAPPING.CONTENT', {data: message});
-    } else {
-      if (!this.eventSelected && !id) {
-        title = this.translate.instant('RESERVATION.ADD.EVENT.TITLE');
-        content = this.translate.instant('RESERVATION.ADD.EVENT.CONTENT', {date: start.toLocaleString('en-GB')});
+    if (event) {
+      let title;
+      let content;
+      const eventsOverlapping = getOverlapEvent(this.events, start, end);
+      if (eventsOverlapping.length && eventsOverlapping[0] !== this.eventSelected) {
+        const overlapping = eventsOverlapping.find(e => e.id);
+        if (overlapping) {
+          this.errors.overlapping = this.translate.instant('RESERVATION.ADD.EVENT.OVERLAPPING.ERROR', {data: overlapping.title});
+          return;
+        }
+        let message = '';
+        eventsOverlapping.forEach(e => {
+          message += `<div>${e.title}</div>`;
+        });
+        title = this.translate.instant('RESERVATION.ADD.EVENT.OVERLAPPING.TITLE');
+        content = this.translate.instant('RESERVATION.ADD.EVENT.OVERLAPPING.CONTENT', {data: message});
       } else {
-        title = this.translate.instant('RESERVATION.ADD.EVENT.CHANGE.TITLE');
-        content = this.translate.instant('RESERVATION.ADD.EVENT.CHANGE.CONTENT', {date: start.toLocaleString('en-GB')});
+        if (!this.eventSelected && !id) {
+          title = this.translate.instant('RESERVATION.ADD.EVENT.TITLE');
+          content = this.translate.instant('RESERVATION.ADD.EVENT.CONTENT', {date: start.toLocaleString('en-GB')});
+        } else {
+          title = this.translate.instant('RESERVATION.ADD.EVENT.CHANGE.TITLE');
+          content = this.translate.instant('RESERVATION.ADD.EVENT.CHANGE.CONTENT', {date: start.toLocaleString('en-GB')});
+        }
       }
+      this.createSelectEvent(title, content, event);
     }
-    this.createSelectEvent(title, content, event);
   }
 
   preview(): void {
@@ -333,8 +338,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.eventSelected) {
       reservation.start = this.eventSelected.start.toLocaleString('en-GB');
 
-      if (this.editReservation) {
-        reservation.id = this.editReservation.id;
+      if (this.isEditing) {
+        reservation.id = this.reservationId;
         this.store.dispatch(
           new fromActionsReservation.Edit({reservation, isCustomer: false})
         );
@@ -384,6 +389,12 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     if (event.code === 'Backspace') {
       form.setValue('');
     }
+  }
+
+  private getReservation(id: string | null): void {
+    this.store.dispatch(
+      new fromActionsReservation.ReservationFind(id)
+    );
   }
 
   private getRoomList(): void {
@@ -450,10 +461,12 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
         const color = findStateColor(it.state);
         const event = newEvent(detail, color, start, end, '#000', it.id);
-        if (this.editReservation && this.editReservation.id === it.id) {
-          this.eventSelected = event;
+        if (event) {
+          if (this.isEditing && this.reservationId === it.id) {
+            this.eventSelected = event;
+          }
+          this.events = [...this.events, event];
         }
-        this.events = [...this.events, event];
       }
     });
   }
@@ -490,19 +503,23 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const overlapEvent = getOverlapEvent(this.events, start, end);
     if (overlapEvent.length > 0) {
       overlapEvent.forEach(value => {
-        this.events = this.events.filter(ev => ev !== value);
-        if (value.end) {
-          if (start < value.start && end < value.end) {
-            value.start = end;
-            this.events = [...this.events, value];
-          } else if (start > value.start && end > value.end) {
-            value.end = start;
-            this.events = [...this.events, value];
+        if (value.id !== 'NOT_WORKING_ALL_DAY') {
+          this.events = this.events.filter(ev => ev !== value);
+          if (value.end) {
+            if (start < value.start && end < value.end) {
+              value.start = end;
+              this.events = [...this.events, value];
+            } else if (start > value.start && end > value.end) {
+              value.end = start;
+              this.events = [...this.events, value];
+            }
           }
+          this.createUnavailableEvent(it.id, start, end, duration, it.description);
         }
       });
+    } else {
+      this.createUnavailableEvent(it.id, start, end, duration, it.description);
     }
-    this.createUnavailableEvent(it.id, start, end, duration, it.description);
   }
 
   private createUnavailableEvent(id: string, start: Date, end: Date, duration: IDuration, description?: string): void {
@@ -513,7 +530,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const color = findStateColor('DEFAULT');
     const event = newEvent(detail, color, start, end, '#000', `unavailable/${id}`);
-    this.events = [...this.events, event];
+    if (event) {
+      this.events = [...this.events, event];
+    }
   }
 
   private getCustomers(): void {
@@ -531,6 +550,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.rooms?.length === 1) {
         this.room.setValue(this.rooms[0]);
       }
+      if (state.selected) {
+        this.setData(state.selected);
+      }
       if (state.data && (Array.isArray(state.data.reservations) || Array.isArray(state.data.unavailableList)) && !state.isLoading) {
         this.reservations = state.data.reservations;
         this.unavailableList = state.data.unavailableList;
@@ -538,11 +560,11 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         this.addUnavailableList();
         if (this.extras?.date && !this.eventSelected) {
           this.segmentClick(this.date.value, 'CREATED');
-        } else if (this.editReservation) {
-          if (this.startDate) {
-            const date: Date = createNewDate(this.date.value, this.startDate.getHours(), this.startDate.getMinutes());
-            this.segmentClick(date, this.editReservation.state, this.editReservation.id);
-          }
+          // } else if (this.editReservation) {
+          //   if (this.startDate) {
+          //     const date: Date = createNewDate(this.date.value, this.startDate.getHours(), this.startDate.getMinutes());
+          //     this.segmentClick(date, this.editReservation.state, this.editReservation.id);
+          //   }
         }
       }
       if (state.subErrors) {
@@ -618,12 +640,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.rooms?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 
-  private setData(): void {
-    this.isEditing = true;
-
-    const reservation: IReservationAll = this.extras.editReservation.reservation;
-    this.editReservation = reservation;
-    const user: IUserAll = this.extras.editReservation.user;
+  private setData(reservation: IReservationAll): void {
+    this.showTime = true;
     const date = newDate(reservation.start);
     this.room.setValue(reservation.room);
     this.date.setValue(date);
@@ -631,10 +649,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.startDate = date;
     this.customer.setValue(reservation.customer);
     this.product.setValue(reservation.product);
-    const isAdmin = user.authorities.some(u => u.authority === Role.admin);
 
-    if (!isAdmin) {
-      this.getProductList();
+    this.myStepper.next();
+    if (!this.isAdmin) {
+      this.myStepper.next();
     }
   }
 }

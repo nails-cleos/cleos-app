@@ -65,7 +65,7 @@
                   matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
             <mat-icon color="primary">visibility</mat-icon>
           </button>
-          <button (click)="cancel(reservation.id)" *ngIf="reservation.deadLine" fxHide.lt-sm fxShow mat-icon-button
+          <button (click)="cancel(reservation)" *ngIf="reservation.deadLine" fxHide.lt-sm fxShow mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.CANCEL' | translate }}" matTooltipPosition="right">
             <mat-icon color="warn">close</mat-icon>
           </button>

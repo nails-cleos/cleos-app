@@ -341,6 +341,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       if (state.selected) {
         this.setData(state.selected);
       }
+      // TODO check state for edited
       if (state.customerReservation && state.customerReservation.upcoming) {
         this.canCreate = false;
         const message = this.translate.instant('RESERVATION.CUSTOMER.ADD.UPCOMING.ERROR',

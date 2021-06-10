@@ -216,8 +216,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     });
 
     const editTransaction = ReservationDetailComponent.createTransaction('started', (): void => {
-      const data = {editReservation: {reservation: self.reservation, user: self.user}};
-      self.router.navigateByUrl('/reservation', {state: data});
+      self.router.navigate(['reservation', reservationId, 'edit']);
     });
 
     const completeTransaction = ReservationDetailComponent.createTransaction('cancelled', (): void => {
