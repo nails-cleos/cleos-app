@@ -37,11 +37,9 @@ export class LoginEffects {
   loginSuccess$ = this.actions$.pipe(
     ofType(AuthActionTypes.loginSuccess),
     tap((response: any) => {
-      const roles = [Role.admin, Role.professional];
-      const dash = response.payload.response.user.authorities.some((au: any) => roles.includes(au.authority)) ? 'dashboard' : 'main';
       const redirectUrl = response.payload.response.user.changePassword
         ? 'change-password'
-        : response.payload.queryParams.returnUrl || dash;
+        : response.payload.queryParams.returnUrl || 'redirect';
       this.router.navigate([redirectUrl]);
     })
   );

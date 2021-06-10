@@ -127,6 +127,8 @@ import { UnavailableComponent } from './unavailable/unavailable.component';
 import { UnavailableDetailComponent } from './unavailable/detail/unavailable-detail.component';
 import { UnavailableListComponent } from './unavailable/list/unavailable-list.component';
 import { ReservationsComponent } from './reservation/list/reservations.component';
+import { MeReservationComponent } from './reservation/me/me-reservation.component';
+import { RedirectComponent } from './redirect/redirect.component';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
@@ -216,7 +218,9 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
     UnavailableListComponent,
     ReservationsComponent,
     DragDropDirective,
-    BackButtonDirective
+    BackButtonDirective,
+    MeReservationComponent,
+    RedirectComponent
   ],
   imports: [
     BrowserModule,
@@ -255,7 +259,7 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
     ReactiveFormsModule,
     AgmCoreModule.forRoot({
       apiKey: environment.googleMapKey,
-      libraries: ['places']
+      libraries: ['places', 'geometry']
     }),
     MatGoogleMapsAutocompleteModule,
     ServiceWorkerModule.register('ngsw-worker.js', {

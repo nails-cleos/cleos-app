@@ -8,3 +8,36 @@
 .row-is-canceled {
   background-color: #ffb3b3;
 }
+
+.mat-card {
+  background-color: #fdf8f3;
+}
+
+.mat-card-header {
+  justify-content: center;
+}
+
+.mat-card-content {
+  .container {
+    margin: auto;
+    text-align: center;
+
+    table {
+      margin: auto;
+
+      td {
+        width: 50%;
+      }
+
+      .left {
+        text-align: left;
+      }
+
+      .right {
+        padding: 0 5% 0;
+        font-weight: bold;
+        text-align: right;
+      }
+    }
+  }
+}

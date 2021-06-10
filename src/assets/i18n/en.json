@@ -706,7 +706,8 @@
         "EDIT": "Edit",
         "START": "Start",
         "COMPLETE": "Complete",
-        "CANCEL": "Cancel"
+        "CANCEL": "Cancel",
+        "BOOK": "Book again"
       },
       "CHANGE_STATE": {
         "TITLE": "Change state",
@@ -715,7 +716,8 @@
           "EDIT": "edit the appointment",
           "START": "start the appointment",
           "COMPLETE": "complete the appointment",
-          "CANCEL": "cancel the reservation"
+          "CANCEL": "cancel the reservation",
+          "BOOK": "book again"
         },
         "CONTENT": "Are you sure to {{action}}?"
       }
@@ -746,6 +748,78 @@
       "STARTED": "Started",
       "COMPLETED": "Completed",
       "CANCELLED": "Cancelled"
+    },
+    "CUSTOMER": {
+      "UPCOMING": {
+        "TITLE": "Upcoming Reservation",
+        "START": "Start",
+        "END": "End",
+        "ROOM": "Room",
+        "ADDRESS": "Address",
+        "PRODUCT": "Product",
+        "PRICE": "Price",
+        "CREATED": "Reservation must be approved by: "
+      },
+      "NO_UPCOMING": {
+        "TITLE": "No upcoming reservations"
+      },
+      "ADD": {
+        "ROOM": {
+          "FIELD": "Room",
+          "REQUIRED": "Room is <b>required</b>",
+          "INVALID": "Room is invalid",
+          "DETAIL": "Detail",
+          "ADDRESS": {
+            "NAME": "<span class='bold'>Address:</span> {{name}}",
+            "DESCRIPTION": "<span class='bold'>Description:</span> {{description}}",
+            "DISTANCE": {
+              "KM": "<span class='bold'>Distance:</span> {{distance}} Kilometers",
+              "M": "<span class='bold'>Distance:</span> {{distance}} Meters"
+            }
+          },
+          "PROFESSIONAL": {
+            "NAME": "<span class='bold'>Professional:</span> {{name}}"
+          }
+        },
+        "PRODUCT": {
+          "FIELD": "Product",
+          "REQUIRED": "Product is <b>required</b>",
+          "INVALID": "Product is invalid",
+          "DETAIL": "Detail",
+          "DESCRIPTION": "<span class='bold'>Description:</span> {{description}}",
+          "PRICE": "<span class='bold'>Price:</span> $ {{price}}",
+          "DURATION": "<span class='bold'>Duration:</span> {{duration}}",
+          "DURABILITY": "<span class='bold'>Durability:</span> {{durability}}"
+        },
+        "DATE": {
+          "FIELD": "Pick a date",
+          "REQUIRED": "Date is <b>required</b>"
+        },
+        "SCHEDULE": {
+          "FIELD": "Book an appointment",
+          "REQUIRED": "Book an appointment is <b>required</b>"
+        },
+        "PREVIEW": {
+          "TITLE": "Preview",
+          "ROOM": {
+            "TITLE": "Room",
+            "NAME": "Name",
+            "PROFESSIONAL": "Professional",
+            "ADDRESS": "Address"
+          },
+          "PRODUCT": {
+            "TITLE": "Product",
+            "NAME": "Name",
+            "DURATION": "Duration",
+            "PRICE": "Price"
+          },
+          "APPOINTMENT": "Appointment"
+        },
+        "UPCOMING": {
+          "ERROR": "Customer already has a reservation on {{date}}"
+        },
+        "NO_CONTENT": "No availability on <span class='bold'>{{date}}</span>"
+      }
     }
   },
   "NOTIFICATION": {

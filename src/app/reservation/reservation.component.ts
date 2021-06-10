@@ -6,7 +6,7 @@ import { IUser, IUserAll } from '../interfaces/user';
 import { Observable, Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
-import { AppState, selectReservationState } from '../store/app.states';
+import { AppState, selectAuthState, selectReservationState } from '../store/app.states';
 import * as fromActionsReservation from '../store/reservation.actions';
 import { requireMatch } from '../util/validators';
 import { IProduct } from '../interfaces/product';
@@ -18,7 +18,21 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../dialog/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { convertDuration, Duration, getAvailability, getStartEndDay, getTime, IDuration } from '../util/dates';
+import {
+  convertDuration,
+  createDate,
+  createFullDate,
+  createNewDate,
+  Duration,
+  formatTime,
+  getAvailability,
+  getNow,
+  getStartEndDay,
+  getTime,
+  IDuration,
+  newDate,
+  plusDay
+} from '../util/dates';
 import { fillNotAvailable, getOverlapEvent, newEvent } from '../util/event';
 import { Router } from '@angular/router';
 import { DateAdapter } from '@angular/material/core';
@@ -79,7 +93,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   reservations: IReservationAll[] | undefined;
   unavailableList: IUnavailableAll[] | undefined;
-  viewDate: Date = new Date();
+  viewDate: Date = getNow();
 
   dayStartHour = 9;
   dayStartMinute = 0;
@@ -131,15 +145,16 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         this.showTime = true;
         this.setData();
       } else {
+        this.customer.setValue(this.extras.customer);
         this.room.setValue(this.extras.room);
+        this.product.setValue(this.extras.product);
         this.date.setValue(this.extras.date);
       }
     }
-    const token = localStorage.getItem('auth');
-    if (token) {
-      const user: IUserAll = JSON.parse(token).user;
+    this.store.select(selectAuthState).subscribe((state: any) => {
+      const user: IUserAll = state.user;
       this.isAdmin = user.authorities.some(u => u.authority === Role.admin);
-    }
+    });
   }
 
   ngOnInit(): void {
@@ -192,7 +207,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   myFilter = (d: Date | null): boolean => {
-    const now = new Date();
+    const now = getNow();
     const date = (d || now);
     let result = date > now;
     if (this.room.value) {
@@ -234,10 +249,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.duration = convertDuration(this.product.value.duration);
     this.events = [];
 
-    let date = new Date(this.date.value);
-    const now = new Date(new Date().setHours(0, 0));
-    date.setDate(date.getDate() - this.lessDays);
-    if (date < new Date(now.getFullYear(), now.getMonth(), now.getDate())) {
+    let date = newDate(this.date.value);
+    const now = createDate();
+    date = plusDay(date, -this.lessDays);
+    if (date < createFullDate(now)) {
       date = now;
     }
 
@@ -261,15 +276,13 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const nowTime = date.toLocaleTimeString('en-GB').split(':');
     const duration = convertDuration(this.product.value.duration);
 
-    const start = new Date(date.setHours(Number(nowTime[0]), Number(nowTime[1])));
-    const end = new Date(new Date(start).setHours(
-      start.getHours() + duration.hour, start.getMinutes() + duration.minute)
-    );
+    const start = createNewDate(date, Number(nowTime[0]), Number(nowTime[1]));
+    const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
 
     const detail = this.translate.instant('RESERVATION.ADD.EVENT.DETAIL', {
       customerName: `${this.customer.value.firstName} ${this.customer.value.lastName}`,
       productName: this.product.value.name,
-      duration: `${duration.hour}:${duration.minute}`
+      duration: formatTime(duration.hour, duration.minute)
     });
 
     const event = newEvent(detail, findStateColor(state), start, end, '#000', id);
@@ -323,11 +336,11 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.editReservation) {
         reservation.id = this.editReservation.id;
         this.store.dispatch(
-          new fromActionsReservation.Edit(reservation)
+          new fromActionsReservation.Edit({reservation, isCustomer: false})
         );
       } else {
         this.store.dispatch(
-          new fromActionsReservation.ReservationSave(reservation)
+          new fromActionsReservation.ReservationSave({reservation, isCustomer: false})
         );
       }
     }
@@ -364,8 +377,13 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   timeChange($event: string): void {
     const time = $event.split(':');
-    this.date.value.setHours(time[0]);
-    this.date.value.setMinutes(time[1]);
+    this.date.value.setHours(time[0], time[1]);
+  }
+
+  keyDownHandler(event: any, form: FormControl): void {
+    if (event.code === 'Backspace') {
+      form.setValue('');
+    }
   }
 
   private getRoomList(): void {
@@ -418,18 +436,16 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   private addReservations(): void {
     this.reservations?.forEach(it => {
       if (it.product.duration) {
-        const start = new Date(it.start);
-        if (start < new Date()) {
+        const start = newDate(it.start);
+        if (start < getNow()) {
           return;
         }
         const duration = convertDuration(it.product.duration);
-        const end = new Date(new Date(start).setHours(
-          start.getHours() + duration.hour, start.getMinutes() + duration.minute)
-        );
+        const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
         const detail = this.translate.instant('RESERVATION.ADD.EVENT.DETAIL', {
           customerName: `${it.customer.firstName} ${it.customer.lastName}`,
           productName: it.product.name,
-          duration: `${duration.hour}:${duration.minute}`
+          duration: formatTime(duration.hour, duration.minute)
         });
 
         const color = findStateColor(it.state);
@@ -446,7 +462,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const weeks = 56;
     this.unavailableList?.forEach(it => {
       if (it.duration) {
-        const start = new Date(it.start);
+        const start = newDate(it.start);
         const duration = convertDuration(it.duration);
         switch (it.repeat) {
           case 'NONE':
@@ -454,14 +470,14 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
             break;
           case 'ONCE_A_WEEK':
             for (let i = 0; i < weeks; i++) {
-              const newDate = new Date(new Date(it.start).setDate(start.getDate() + i * 7));
-              this.validateUnavailableEvent(newDate, duration, it);
+              const onceWeekDate = plusDay(start, +i * 7);
+              this.validateUnavailableEvent(onceWeekDate, duration, it);
             }
             break;
           case 'EVERY_DAY':
             for (let i = 0; i < weeks * 7; i++) {
-              const newDate = new Date(new Date(it.start).setDate(start.getDate() + i));
-              this.validateUnavailableEvent(newDate, duration, it);
+              const everyDayDate = plusDay(start, +i);
+              this.validateUnavailableEvent(everyDayDate, duration, it);
             }
             break;
         }
@@ -470,9 +486,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private validateUnavailableEvent(start: Date, duration: IDuration, it: IUnavailableAll): void {
-    const end = new Date(new Date(start).setHours(
-      start.getHours() + duration.hour, start.getMinutes() + duration.minute)
-    );
+    const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
     const overlapEvent = getOverlapEvent(this.events, start, end);
     if (overlapEvent.length > 0) {
       overlapEvent.forEach(value => {
@@ -492,10 +506,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private createUnavailableEvent(id: string, start: Date, end: Date, duration: IDuration, description?: string): void {
-    const minutes = duration.minute < 10 ? `0${duration.minute}` : `${duration.minute}`;
     const detail = this.translate.instant('RESERVATION.ADD.EVENT.UNAVAILABLE', {
       description: description ? description : '',
-      duration: `${duration.hour}:${minutes}`
+      duration: formatTime(duration.hour, duration.minute)
     });
 
     const color = findStateColor('DEFAULT');
@@ -527,7 +540,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           this.segmentClick(this.date.value, 'CREATED');
         } else if (this.editReservation) {
           if (this.startDate) {
-            const date: Date = new Date(new Date(this.date.value).setHours(this.startDate.getHours(), this.startDate.getMinutes()));
+            const date: Date = createNewDate(this.date.value, this.startDate.getHours(), this.startDate.getMinutes());
             this.segmentClick(date, this.editReservation.state, this.editReservation.id);
           }
         }
@@ -581,7 +594,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.dayStartHour = min.getHours();
     this.dayStartMinute = min.getMinutes();
-    const maxTime = new Date(max.getTime() + 30 * 60000);
+    const maxTime = newDate(max.getTime() + 30 * 60000);
     this.dayEndHour = maxTime.getHours();
     this.dayEndMinute = maxTime.getMinutes();
   }
@@ -611,7 +624,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const reservation: IReservationAll = this.extras.editReservation.reservation;
     this.editReservation = reservation;
     const user: IUserAll = this.extras.editReservation.user;
-    const date = new Date(reservation.start);
+    const date = newDate(reservation.start);
     this.room.setValue(reservation.room);
     this.date.setValue(date);
     this.start.setValue(getTime(date));

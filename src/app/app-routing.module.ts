@@ -34,15 +34,22 @@ import { UnavailableListComponent } from './unavailable/list/unavailable-list.co
 import { UnavailableComponent } from './unavailable/unavailable.component';
 import { UnavailableDetailComponent } from './unavailable/detail/unavailable-detail.component';
 import { ReservationsComponent } from './reservation/list/reservations.component';
+import { MeReservationComponent } from './reservation/me/me-reservation.component';
+import { RedirectComponent } from './redirect/redirect.component';
 
 const routes: Routes = [
-  {path: '', redirectTo: '/dashboard', pathMatch: 'full', resolve: {model: TranslationLoaderResolver}},
+  {path: '', redirectTo: '/redirect', pathMatch: 'full', resolve: {model: TranslationLoaderResolver}},
   {path: 'auth', component: AuthComponent, data: {error: 'error'}},
   {path: 'activate-account', component: ActivateAccountComponent},
   {path: 'forgot-password', component: ForgotPasswordComponent},
   {path: 'recovery-password', component: RecoveryPasswordComponent},
   {path: 'catalogs', component: CatalogComponent},
   {path: 'main', component: MainComponent},
+  {
+    path: 'redirect', component: RedirectComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.admin, Role.professional, Role.customer]
+    }
+  },
   {
     path: 'dashboard',
     component: DashComponent,
@@ -150,7 +157,7 @@ const routes: Routes = [
   },
   {
     path: 'reservation/:id', component: ReservationDetailComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.professional]
+      roles: [Role.admin, Role.professional, Role.customer]
     }, runGuardsAndResolvers: 'always'
   },
   {
@@ -202,7 +209,8 @@ const routes: Routes = [
   {
     path: 'me', canActivate: [AuthGuardService], data: {roles: [Role.customer]}, children: [
       {path: 'reservations', component: ReservationsComponent, resolve: {model: TranslationLoaderResolver}},
-      {path: 'reservation/:id', component: ReservationDetailComponent}
+      {path: 'reservation', component: MeReservationComponent},
+      {path: 'reservation/:id', component: MeReservationComponent}
     ]
   }
 ];

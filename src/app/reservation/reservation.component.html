@@ -3,7 +3,8 @@
     <mat-form-field *ngIf="customers; else skeleton" appearance="fill">
       <mat-label>{{ 'RESERVATION.ADD.CUSTOMER.FIELD' | translate }}</mat-label>
       <label>
-        <input [formControl]="customer" [matAutocomplete]="autoCustomer" autocomplete="off" matInput required
+        <input [formControl]="customer" (keydown)="keyDownHandler($event, customer)" [matAutocomplete]="autoCustomer"
+               autocomplete="off" matInput required
                type="text">
       </label>
       <mat-autocomplete #autoCustomer="matAutocomplete" [displayWith]="displayFnUser">
@@ -32,7 +33,8 @@
     <mat-form-field *ngIf="rooms; else skeleton" appearance="fill">
       <mat-label>{{ 'RESERVATION.ADD.ROOM.FIELD' | translate }}</mat-label>
       <label>
-        <input [formControl]="room" [matAutocomplete]="autoRoom" matInput required type="text">
+        <input [formControl]="room" (keydown)="keyDownHandler($event, room)" [matAutocomplete]="autoRoom" matInput
+               required type="text">
       </label>
       <mat-autocomplete #autoRoom="matAutocomplete" [displayWith]="displayFnRoom">
         <mat-option *ngFor="let room of filteredRoom | async" [value]="room">
@@ -65,7 +67,8 @@
         <mat-form-field *ngIf="products; else skeleton" appearance="fill">
           <mat-label>{{ 'RESERVATION.ADD.PRODUCT.FIELD' | translate }}</mat-label>
           <label>
-            <input [formControl]="product" [matAutocomplete]="autoProduct" matInput required type="text">
+            <input [formControl]="product" (keydown)="keyDownHandler($event, product)" [matAutocomplete]="autoProduct"
+                   matInput required type="text">
           </label>
           <mat-autocomplete #autoProduct="matAutocomplete" [displayWith]="displayFnProduct">
             <mat-option *ngFor="let product of filteredProduct | async" [value]="product">

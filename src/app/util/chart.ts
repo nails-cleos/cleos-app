@@ -1,6 +1,7 @@
 import { IReservationAll } from '../interfaces/reservation';
 import { Label, SingleDataSet } from 'ng2-charts';
 import { ChartDataSets } from 'chart.js';
+import { newDate, getNow, plusDay, plusMonthDate, formatDate } from './dates';
 
 interface IChartUtil {
   chartLabels: Label[];
@@ -9,7 +10,7 @@ interface IChartUtil {
 }
 
 export const customerReservationChart = (result: IReservationAll[] | undefined, label: string): IChartUtil | null => {
-  const now = new Date();
+  const now = getNow();
   const completedList = completeWithDateFilter(result, now, 12);
   return barChart(completedList, label, 'customer', 'username');
 };
@@ -20,11 +21,11 @@ export const quantityProductChart = (result: IReservationAll[] | undefined, labe
 };
 
 export const annualReservationChart = (result: IReservationAll[] | undefined, locale: string, label: string): IChartUtil | null => {
-  const now = new Date();
+  const now = getNow();
   const completedList = completeWithDateFilter(result, now, 12);
   if (completedList && completedList.length) {
     const group = completedList.reduce((map, item) => {
-      const formattedDate = formatMonthYear(new Date(item.start), locale);
+      const formattedDate = formatMonthYear(newDate(item.start), locale);
       const key = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
 
       const price = map.get(key) || 0;
@@ -38,7 +39,7 @@ export const annualReservationChart = (result: IReservationAll[] | undefined, lo
     let labels: string[] = [];
 
     for (let i = 12; i >= 0; i--) {
-      const date = new Date(new Date().setMonth(now.getMonth() - i, 1));
+      const date = plusMonthDate(getNow(), -i, 1);
       const formattedDate = formatMonthYear(date, locale);
       const key = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
       labels = [...labels, key];
@@ -55,16 +56,16 @@ export const annualReservationChart = (result: IReservationAll[] | undefined, lo
 };
 
 export const lastMonthReservationChart = (result: IReservationAll[] | undefined, locale: string, label: string): IChartUtil | null => {
-  const now = new Date();
+  const now = getNow();
   const completedList = completeWithDateFilter(result, now, 1);
   if (completedList && completedList.length) {
     let data: number[] = [];
     let labels: string[] = [];
 
     for (let i = 30; i >= 0; i--) {
-      const date = new Date(new Date().setDate(now.getDate() - i));
+      const date = plusDay(getNow(), -i);
       const formattedDate = formatDate(date, locale);
-      const total: number = completedList.filter(r => formatDate(new Date(r.start), locale) === formattedDate).length;
+      const total: number = completedList.filter(r => formatDate(newDate(r.start), locale) === formattedDate).length;
 
       const key = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
       labels = [...labels, key];
@@ -121,11 +122,11 @@ export const productReservationChart = (result: IReservationAll[] | undefined): 
 };
 
 export const monthlyReservationChart = (result: IReservationAll[] | undefined, locale: string): IChartUtil | null => {
-  const now = new Date();
+  const now = getNow();
   const completedList = completeWithDateFilter(result, now, 12);
   if (completedList && completedList.length) {
     const group = completedList.reduce((map, item) => {
-      const formattedDate = new Date(item.start).toLocaleDateString(locale, {
+      const formattedDate = newDate(item.start).toLocaleDateString(locale, {
         month: 'short', year: 'numeric'
       }).replace(/ /g, '-');
 
@@ -168,11 +169,7 @@ const formatMonthYear = (date: Date, locale: string): string => date.toLocaleDat
   month: 'short', year: 'numeric'
 }).replace(/ /g, '-');
 
-const formatDate = (date: Date, locale: string): string => date.toLocaleDateString(locale, {
-  day: 'numeric', month: 'short', year: 'numeric'
-}).replace(/ /g, '-');
-
 const completeWithDateFilter = (result: IReservationAll[] | undefined, now: Date, minusMonth: number): IReservationAll[] | undefined => {
-  const filterDate = new Date(new Date().setMonth(now.getMonth() - minusMonth, 0));
-  return result?.filter(r => r.state === 'COMPLETED' && new Date(r.start) > filterDate);
+  const filterDate = plusMonthDate(getNow(), - minusMonth, 0);
+  return result?.filter(r => r.state === 'COMPLETED' && newDate(r.start) > filterDate);
 };

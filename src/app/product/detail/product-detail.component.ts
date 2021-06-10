@@ -9,7 +9,7 @@ import * as fromActionsProduct from '../../store/product.actions';
 import { fieldChange, valueChange } from '../../util/validators';
 import { IProduct, Product } from '../../interfaces/product';
 import { timeTheme } from '../../util/theme';
-import { convertDuration, getTime } from '../../util/dates';
+import { convertDuration, createDate, getTime } from '../../util/dates';
 
 @Component({
   selector: 'app-product-detail',
@@ -91,7 +91,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
         } as IProduct;
 
         const duration = convertDuration(state.selected.duration);
-        this.product.duration = getTime(new Date(new Date().setHours(duration.hour, duration.minute)));
+        this.product.duration = getTime(createDate(duration.hour, duration.minute));
         this.form.patchValue(this.product);
       }
       if (state.subErrors) {

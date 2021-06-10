@@ -9,7 +9,16 @@ import * as fromActionsUnavailable from '../store/unavailable.actions';
 import { IUser } from '../interfaces/user';
 import { requireMatch } from '../util/validators';
 import { map, startWith } from 'rxjs/operators';
-import { diffTime, getAvailability, getMinMaxDate, getTime } from '../util/dates';
+import {
+  createDate,
+  createNewDate,
+  diffTime, formatTime,
+  getAvailability,
+  getMinMaxDate,
+  getNow,
+  getTime,
+  newDate
+} from '../util/dates';
 import { IRoomAll } from '../interfaces/room';
 import { timeTheme } from '../util/theme';
 
@@ -73,7 +82,7 @@ export class UnavailableComponent implements OnInit, OnDestroy {
     const unavailable: IUnavailable = new Unavailable();
     unavailable.professionalId = this.professional.value.id;
     unavailable.description = this.form.value.description;
-    unavailable.start = new Date(this.startTime.value).toLocaleString('en-GB');
+    unavailable.start = newDate(this.startTime.value).toLocaleString('en-GB');
     unavailable.repeat = this.repeat;
     unavailable.duration = this.duration.value;
 
@@ -87,8 +96,7 @@ export class UnavailableComponent implements OnInit, OnDestroy {
   }
 
   myFilter = (d: Date | null): boolean => {
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
+    const now = createDate();
     const date = (d || now);
     let result = date >= now;
     if (this.room) {
@@ -108,7 +116,7 @@ export class UnavailableComponent implements OnInit, OnDestroy {
   };
 
   setDate($event: any): void {
-    const date = new Date($event.value);
+    const date = newDate($event.value);
 
     let max;
     if (this.room) {
@@ -127,13 +135,12 @@ export class UnavailableComponent implements OnInit, OnDestroy {
     this.startTime.setValue('');
     this.duration.setValue('');
     this.showDuration = false;
-    this.durationMax = `${diffHour}:${diffMinute}`;
+    this.durationMax = formatTime(diffHour, diffMinute);
   }
 
   setTime($event: any): void {
-    const date = this.startDate.value ? new Date(this.startDate.value) : new Date();
     const time = $event.split(':');
-    date.setHours(time[0], time[1]);
+    const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time[0], time[1]);
 
     let maxHour;
     let diffMin;
@@ -147,7 +154,7 @@ export class UnavailableComponent implements OnInit, OnDestroy {
 
     this.duration.setValue('');
     this.showDuration = true;
-    this.durationMax = `${diffHour}:${diffMinute}`;
+    this.durationMax = formatTime(diffHour, diffMinute);
   }
 
   getRoom(user: IUser): void {
@@ -158,9 +165,8 @@ export class UnavailableComponent implements OnInit, OnDestroy {
 
   focusin(): void {
     if (this.room && this.startTime.value) {
-      const date = this.startDate.value ? new Date(this.startDate.value) : new Date();
       const time = this.startTime.value.split(':');
-      date.setHours(time[0], time[1]);
+      const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time[0], time[1]);
       const day = date.getDay();
       const {minDate, maxDate} = getMinMaxDate(day, date, this.room);
       this.minTime = getTime(minDate);

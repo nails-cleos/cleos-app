@@ -15,7 +15,7 @@ body {
 }
 
 @font-face {
-  font-family: 'Pacifico';
+  font-family: Belleza, "Helvetica Neue", sans-serif;
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -27,6 +27,18 @@ body {
 
 table {
   width: 100%;
+}
+
+.full {
+  width: 100%;
+}
+
+.middle {
+  width: 50%;
+}
+
+.vertical-divider {
+  margin-left: 10px;
 }
 
 th.mat-header-cell {

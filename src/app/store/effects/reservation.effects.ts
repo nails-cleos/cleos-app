@@ -28,18 +28,18 @@ export class ReservationEffects {
   getAllPage$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getAllPage)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) =>
-      this.reservationService.getAllPage('pages', payload.active, payload.direction, payload.page, payload.size).pipe(
+      this.reservationService.getAllPage(payload.active, payload.direction, payload.page, payload.size).pipe(
         switchMap((response: any) => of(new fromActionsReservation.ReservationPageSuccess(response ? response : {content: []}))),
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
       ))
   );
 
   @Effect()
-  getAllMePage$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getAllMePage)).pipe(
+  getCustomerReservations$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getCustomerReservations)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) =>
-      this.reservationService.getAllPage('me/pages', payload.active, payload.direction, payload.page, payload.size).pipe(
-        switchMap((response: any) => of(new fromActionsReservation.ReservationPageSuccess(response ? response : {content: []}))),
+      this.reservationService.getCustomerReservations(payload.active, payload.direction, payload.page, payload.size).pipe(
+        switchMap((response: any) => of(new fromActionsReservation.ReservationCustomerSuccess(response))),
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
       ))
   );
@@ -73,10 +73,19 @@ export class ReservationEffects {
   );
 
   @Effect()
+  customerSearch = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.customerSearchReservation)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.reservationService.customerSearch(payload.roomId, payload.productId, payload.date).pipe(
+      switchMap((response: any) => of(new fromActionsReservation.ReservationSuccess(response ? response : []))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
+    ))
+  );
+
+  @Effect()
   getAllCustomers$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getCustomers)).pipe(
     map((action: any) => action.payload),
     switchMap(() => this.userService.getAllCustomers().pipe(
-      switchMap((response: any) => of(new fromActionsReservation.ReservationCustomersSuccess(response))),
+      switchMap((response: any) => of(new fromActionsReservation.CustomersSuccess(response))),
       catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
     ))
   );
@@ -100,6 +109,15 @@ export class ReservationEffects {
   );
 
   @Effect()
+  getUpcomingReservation$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getUpcomingReservation)).pipe(
+    map((action: any) => action.payload),
+    switchMap(() => this.reservationService.getUpcomingReservation().pipe(
+      switchMap((response: any) => of(new fromActionsReservation.ReservationCustomerSuccess(response))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
+    ))
+  );
+
+  @Effect()
   findOne$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.reservationFind)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.reservationService.getById(payload).pipe(
@@ -111,10 +129,10 @@ export class ReservationEffects {
   @Effect()
   save$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.reservationSave)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.reservationService.add(payload).pipe(
+    switchMap((payload: any) => this.reservationService.add(payload.reservation).pipe(
       switchMap((response: any) => {
         const message = this.translate.instant('RESERVATION.ADD.CREATED', {date: response.start});
-        return of(new fromActionsReservation.ReservationSaveSuccess({message}));
+        return of(new fromActionsReservation.ReservationSaveSuccess({message, isCustomer: payload.isCustomer}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
     ))
   );
@@ -125,7 +143,7 @@ export class ReservationEffects {
     switchMap((payload: any) => this.reservationService.delete(payload).pipe(
       switchMap((response: any) => {
         const message = this.translate.instant('RESERVATION.DELETED.MESSAGE', {date: response.start});
-        return of(new fromActionsReservation.ReservationSaveSuccess({message}));
+        return of(new fromActionsReservation.ReservationSaveSuccess({message, isCustomer: false}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
     ))
   );
@@ -144,10 +162,10 @@ export class ReservationEffects {
   @Effect()
   edit$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.edit)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.reservationService.update(payload).pipe(
+    switchMap((payload: any) => this.reservationService.update(payload.reservation).pipe(
       switchMap((response: any) => {
         const message = this.translate.instant('RESERVATION.UPDATED.MESSAGE', {date: response.start});
-        return of(new fromActionsReservation.ReservationSaveSuccess({message}));
+        return of(new fromActionsReservation.ReservationSaveSuccess({message, isCustomer: payload.isCustomer}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
     ))
   );
@@ -199,9 +217,7 @@ export class ReservationEffects {
   @Effect({dispatch: false})
   selectedData$ = this.actions$.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.reservationSelected),
-    tap((data: any) => {
-      this.router.navigate([this.router.url]);
-    })
+    tap(() => this.router.navigate([this.router.url]))
   );
 
   @Effect({dispatch: false})
@@ -216,7 +232,7 @@ export class ReservationEffects {
 
   @Effect({dispatch: false})
   customersSuccess$ = this.actions$.pipe(
-    ofType(fromActionsReservation.ReservationActionTypes.reservationCustomersSuccess)
+    ofType(fromActionsReservation.ReservationActionTypes.customersSuccess)
   );
 
   @Effect({dispatch: false})
@@ -232,12 +248,17 @@ export class ReservationEffects {
   @Effect({dispatch: false})
   saveSuccess$ = this.actions$.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.reservationSaveSuccess),
-    tap(() => this.router.navigate(['calendar']))
+    tap((data: any) => this.router.navigate(data.payload.isCustomer ? ['me', 'reservations'] : ['calendar']))
   );
 
   @Effect({dispatch: false})
   stateSuccess$ = this.actions$.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.stateSuccess)
+  );
+
+  @Effect({dispatch: false})
+  reservationCustomersSuccess$ = this.actions$.pipe(
+    ofType(fromActionsReservation.ReservationActionTypes.reservationsCustomerSuccess)
   );
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private reservationService: ReservationService,

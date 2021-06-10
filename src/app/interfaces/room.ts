@@ -62,4 +62,14 @@ export class Room implements IRoom {
   }
 }
 
+export class Address implements IAddress {
+  name: string;
+  location: ILocation;
+
+  constructor(name: string, location: ILocation) {
+    this.name = name;
+    this.location = location;
+  }
+}
+
 export const PAGE_SIZE = 10;

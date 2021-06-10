@@ -2,6 +2,8 @@ const { exec } = require('child_process');
 
 let command;
 
+console.info('run in environment: ', process.env.ENVIRONMENT);
+
 if (process.env.ENVIRONMENT === 'production') {
   command = exec('ng build --prod');
 } else if (process.env.ENVIRONMENT === 'staging') {

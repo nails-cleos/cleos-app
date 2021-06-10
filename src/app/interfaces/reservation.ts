@@ -4,6 +4,7 @@ import { IRoom, IRoomAll } from './room';
 import { CalendarEvent } from 'angular-calendar';
 import { ThemePalette } from '@angular/material/core';
 import { IUnavailableAll } from './unavailable';
+import { Pagination } from './pagination';
 
 export interface IReservation {
   id?: string;
@@ -31,6 +32,15 @@ export interface IRoomReservation {
   room: IRoomAll;
   reservations: IReservationAll[];
   unavailableList: IUnavailableAll[];
+}
+
+export interface ICustomerReservation {
+  reservations: Pagination<IReservationAll[]>;
+  upcoming: IReservationAll;
+}
+
+export interface IAvailableDTO {
+  start: string;
 }
 
 export interface IDay {

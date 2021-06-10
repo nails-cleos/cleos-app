@@ -1,6 +1,6 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
-import { Pagination } from '../interfaces/pagination';
+import { DEFAULT_LENGTH, Pagination } from '../interfaces/pagination';
 import { IReservation, IReservationAll, PAGE_SIZE } from '../interfaces/reservation';
 import { Observable, Subscription } from 'rxjs';
 import { MatPaginator } from '@angular/material/paginator';
@@ -14,6 +14,7 @@ import { ReservationIconName } from '../reservation/detail/reservation-detail.co
 import * as fromActionsReservation from '../store/reservation.actions';
 import * as fromActionsProduct from '../store/product.actions';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { newDate, getNow } from '../util/dates';
 
 @Component({
   selector: 'app-reservations',
@@ -29,7 +30,7 @@ export class AssignmentsComponent implements AfterViewInit, OnInit, OnDestroy {
   getState: Observable<any>;
   subscription: Subscription | undefined;
 
-  resultsLength = 0;
+  resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
 
   language: string;
@@ -80,11 +81,11 @@ export class AssignmentsComponent implements AfterViewInit, OnInit, OnDestroy {
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       this.error = state.error;
-      if (this.paginator && state.page) {
-        const now = new Date();
+      if (state.page) {
+        const now = getNow();
         this.dataSource = state.page?.content?.map((reservation: IReservationAll) => {
           if (reservation.start) {
-            const deadLine = new Date(reservation.start) < now;
+            const deadLine = newDate(reservation.start) < now;
             return Object.assign({}, reservation, {deadLine});
           }
           return reservation;

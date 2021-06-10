@@ -2,7 +2,7 @@ import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChi
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { Pagination } from '../../interfaces/pagination';
+import { DEFAULT_LENGTH, Pagination } from '../../interfaces/pagination';
 import { Observable, Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -28,7 +28,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
   subscription: Subscription | undefined;
   getState: Observable<any>;
 
-  resultsLength = 0;
+  resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
   error: any;
 

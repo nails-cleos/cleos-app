@@ -1,12 +1,12 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
-import { AppState, selectReservationState } from '../../store/app.states';
+import { AppState, selectAuthState, selectReservationState } from '../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
 import { IReservationAll } from '../../interfaces/reservation';
 import { ActivatedRoute, Router } from '@angular/router';
-import { convertDuration, Duration, IDuration } from '../../util/dates';
+import { convertDuration, createNewDate, Duration, getNow, IDuration, newDate } from '../../util/dates';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { IUserAll } from '../../interfaces/user';
@@ -21,7 +21,8 @@ export enum ReservationIconName {
   started = 'play_arrow',
   completed = 'done_all',
   cancelled = 'clear',
-  edit = 'edit'
+  edit = 'edit_calendar',
+  book = 'book_online'
 }
 
 @Component({
@@ -34,8 +35,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   subscription: Subscription | undefined;
   reservation: IReservationAll | undefined;
   duration: IDuration = new Duration();
-  start: Date = new Date();
-  end: Date = new Date();
+  start: Date = getNow();
+  end: Date = getNow();
   state: string | undefined;
 
   locale: string;
@@ -62,13 +63,12 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     const index = userLang.indexOf('-');
     this.locale = index === -1 ? userLang : userLang.substr(0, index);
 
-    const token = localStorage.getItem('auth');
-    if (token) {
-      const user: IUserAll = JSON.parse(token).user;
+    this.store.select(selectAuthState).subscribe((state: any) => {
+      const user: IUserAll = state.user;
       this.professionalId = user.authorities.some(u => u.authority === Role.professional) ? user.id : undefined;
       this.customerId = user.authorities.some(u => u.authority === Role.customer) ? user.id : undefined;
       this.user = user;
-    }
+    });
   }
 
   @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
@@ -98,6 +98,14 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       }
     };
     return machine;
+  }
+
+  private static createAction(tooltip: string, icon: string, id: string, color: string): any {
+    return {tooltip, tooltipPosition: 'below', icon, id, color};
+  }
+
+  private static createTransaction(target: string, action: any): any {
+    return {target, action};
   }
 
   ngOnInit(): void {
@@ -137,9 +145,9 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       this.isLoading = state.isLoading;
       if (state.selected) {
         this.duration = convertDuration(state.selected.product.duration);
-        this.start = new Date(state.selected.start);
-        this.end = new Date(new Date(state.selected.start).setHours(this.start.getHours() + this.duration.hour,
-          this.start.getMinutes() + this.duration.minute));
+        this.start = newDate(state.selected.start);
+        this.end = createNewDate(this.start, this.start.getHours() + this.duration.hour,
+          this.start.getMinutes() + this.duration.minute);
         // @ts-ignore
         this.state = ReservationIconName[state.selected.state.toLowerCase()];
         this.reservation = state.selected;
@@ -179,126 +187,90 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     const initialState = self.reservation?.state;
     const store = self.store;
     const translate = self.translate;
+
+    const approve = ReservationDetailComponent.createAction(translate.instant('RESERVATION.DETAIL.ACTION.APPROVE'),
+      ReservationIconName.approved, 'approve', 'primary');
+    const start = ReservationDetailComponent.createAction(translate.instant('RESERVATION.DETAIL.ACTION.START'),
+      ReservationIconName.started, 'start', 'primary');
+    const complete = ReservationDetailComponent.createAction(translate.instant('RESERVATION.DETAIL.ACTION.COMPLETE'),
+      ReservationIconName.completed, 'complete', 'primary');
+    const edit = ReservationDetailComponent.createAction(translate.instant('RESERVATION.DETAIL.ACTION.EDIT'),
+      ReservationIconName.edit, 'edit', 'accent');
+    const cancel = ReservationDetailComponent.createAction(translate.instant('RESERVATION.DETAIL.ACTION.CANCEL'),
+      ReservationIconName.cancelled, 'cancel', 'warn');
+    const book = ReservationDetailComponent.createAction(translate.instant('RESERVATION.DETAIL.ACTION.BOOK'),
+      ReservationIconName.book, 'book', 'primary');
+
+    const approveTransaction = ReservationDetailComponent.createTransaction('approved', (): void => {
+      self.reservation = undefined;
+      store.dispatch(
+        new fromActionsReservation.Approve(reservationId)
+      );
+    });
+
+    const startTransaction = ReservationDetailComponent.createTransaction('approved', (): void => {
+      self.reservation = undefined;
+      store.dispatch(
+        new fromActionsReservation.Start(reservationId)
+      );
+    });
+
+    const editTransaction = ReservationDetailComponent.createTransaction('started', (): void => {
+      const data = {editReservation: {reservation: self.reservation, user: self.user}};
+      self.router.navigateByUrl('/reservation', {state: data});
+    });
+
+    const completeTransaction = ReservationDetailComponent.createTransaction('cancelled', (): void => {
+      self.reservation = undefined;
+      self.store.dispatch(
+        new fromActionsReservation.Complete(reservationId)
+      );
+    });
+
+    const cancelTransaction = ReservationDetailComponent.createTransaction('completed', (): void => {
+      self.reservation = undefined;
+      self.store.dispatch(
+        new fromActionsReservation.Cancel(reservationId)
+      );
+    });
+
+    const bookTransaction = ReservationDetailComponent.createTransaction('booked', (): void => {
+      const customer = self.reservation?.customer;
+      const room = self.reservation?.room;
+      const product = self.reservation?.product;
+      const data = {customer, room, product};
+      this.router.navigateByUrl('/reservation', {state: data});
+    });
+
     this.machine = ReservationDetailComponent.createMachine({
       initialState: ReservationIconName.created,
       created: {
         transitions: {
-          approve: {
-            target: 'approved',
-            action: (): void => {
-              self.reservation = undefined;
-              store.dispatch(
-                new fromActionsReservation.Approve(reservationId)
-              );
-            }
-          },
-          cancel: {
-            target: 'cancelled',
-            action: (): void => {
-              self.reservation = undefined;
-              store.dispatch(
-                new fromActionsReservation.Cancel(reservationId)
-              );
-            }
-          },
-          edit: {
-            target: 'edited',
-            action: (): void => {
-              const data = {editReservation: {reservation: self.reservation, user: self.user}};
-              self.router.navigateByUrl('/reservation', {state: data});
-            }
-          }
+          approve: approveTransaction,
+          cancel: cancelTransaction,
+          edit: editTransaction
         },
-        next: [{
-          tooltip: translate.instant('RESERVATION.DETAIL.ACTION.APPROVE'),
-          tooltipPosition: 'below',
-          icon: ReservationIconName.approved,
-          id: 'approve',
-          color: 'accent'
-        }, {
-          tooltip: translate.instant('RESERVATION.DETAIL.ACTION.EDIT'),
-          tooltipPosition: 'below',
-          icon: ReservationIconName.edit,
-          id: 'edit',
-          color: 'accent'
-        }, {
-          tooltip: translate.instant('RESERVATION.DETAIL.ACTION.CANCEL'),
-          tooltipPosition: 'below',
-          icon: ReservationIconName.cancelled,
-          id: 'cancel',
-          color: 'warn'
-        }]
+        next: [approve, edit, cancel]
       },
       approved: {
         transitions: {
-          start: {
-            target: 'started',
-            action: (): void => {
-              self.reservation = undefined;
-              store.dispatch(
-                new fromActionsReservation.Start(reservationId)
-              );
-            }
-          },
-          cancel: {
-            target: 'cancelled',
-            action: (): void => {
-              self.reservation = undefined;
-              store.dispatch(
-                new fromActionsReservation.Cancel(reservationId)
-              );
-            }
-          },
-          edit: {
-            target: 'edited',
-            action: (): void => {
-              const data = {editReservation: {reservation: self.reservation, user: self.user}};
-              self.router.navigateByUrl('/reservation', {state: data});
-            }
-          }
+          start: startTransaction,
+          cancel: cancelTransaction,
+          edit: editTransaction
         },
-        next: [{
-          tooltip: translate.instant('RESERVATION.DETAIL.ACTION.START'),
-          tooltipPosition: 'below',
-          icon: ReservationIconName.started,
-          id: 'start',
-          color: 'accent'
-        }, {
-          tooltip: translate.instant('RESERVATION.DETAIL.ACTION.EDIT'),
-          tooltipPosition: 'below',
-          icon: ReservationIconName.edit,
-          id: 'edit',
-          color: 'accent'
-        }, {
-          tooltip: translate.instant('RESERVATION.DETAIL.ACTION.CANCEL'),
-          tooltipPosition: 'below',
-          icon: ReservationIconName.cancelled,
-          id: 'cancel',
-          color: 'warn'
-        }]
+        next: [start, edit, cancel]
       },
       started: {
         transitions: {
-          complete: {
-            target: 'completed',
-            action: (): void => {
-              self.reservation = undefined;
-              store.dispatch(
-                new fromActionsReservation.Complete(reservationId)
-              );
-            }
-          }
+          complete: completeTransaction
         },
-        next: [{
-          tooltip: translate.instant('RESERVATION.DETAIL.ACTION.COMPLETE'),
-          tooltipPosition: 'below',
-          icon: ReservationIconName.completed,
-          id: 'complete',
-          color: 'accent'
-        }]
+        next: [complete]
       },
       completed: {
-        next: []
+        transitions: {
+          book: bookTransaction
+        },
+        next: [book]
       },
       cancelled: {
         next: []
@@ -309,83 +281,57 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   private customerMachine(self: this): any {
     const reservationId = self.reservation?.id;
     const initialState = self.reservation?.state;
-    const store = self.store;
     const translate = self.translate;
+
+    const edit = ReservationDetailComponent.createAction(translate.instant('RESERVATION.DETAIL.ACTION.EDIT'),
+      ReservationIconName.edit, 'edit', 'accent');
+    const cancel = ReservationDetailComponent.createAction(translate.instant('RESERVATION.DETAIL.ACTION.CANCEL'),
+      ReservationIconName.cancelled, 'cancel', 'warn');
+    const book = ReservationDetailComponent.createAction(translate.instant('RESERVATION.DETAIL.ACTION.BOOK'),
+      ReservationIconName.book, 'book', 'primary');
+
+    const editTransaction = ReservationDetailComponent.createTransaction('edited', (): void => {
+      self.router.navigate(['me', 'reservation', reservationId]);
+    });
+
+    const cancelTransaction = ReservationDetailComponent.createTransaction('cancelled', (): void => {
+      self.reservation = undefined;
+      self.store.dispatch(
+        new fromActionsReservation.CustomerCancel(reservationId)
+      );
+    });
+
+    const bookTransaction = ReservationDetailComponent.createTransaction('booked', (): void => {
+      const room = self.reservation?.room;
+      const product = self.reservation?.product;
+      const data = {room, product};
+      this.router.navigateByUrl('/me/reservation', {state: data});
+    });
+
     this.machine = ReservationDetailComponent.createMachine({
       initialState: ReservationIconName.created,
       created: {
         transitions: {
-          cancel: {
-            target: 'cancelled',
-            action: (): void => {
-              self.reservation = undefined;
-              store.dispatch(
-                new fromActionsReservation.CustomerCancel(reservationId)
-              );
-            }
-          },
-          // TODO Edit
-          // edit: {
-          //   target: 'edited',
-          //   action: (): void => {
-          //     const data = {editReservation: {reservation: self.reservation, user: self.user}};
-          //     self.router.navigateByUrl('/me/reservation', {state: data});
-          //   }
-          // }
+          cancel: cancelTransaction,
+          edit: editTransaction
         },
-        next: [{
-        //   tooltip: translate.instant('RESERVATION.DETAIL.ACTION.EDIT'),
-        //   tooltipPosition: 'below',
-        //   icon: ReservationIconName.edit,
-        //   id: 'edit',
-        //   color: 'accent'
-        // }, {
-          tooltip: translate.instant('RESERVATION.DETAIL.ACTION.CANCEL'),
-          tooltipPosition: 'below',
-          icon: ReservationIconName.cancelled,
-          id: 'cancel',
-          color: 'warn'
-        }]
+        next: [edit, cancel]
       },
       approved: {
         transitions: {
-          // TODO Edit
-          // edit: {
-          //   target: 'edited',
-          //   action: (): void => {
-          //     const data = {editReservation: {reservation: self.reservation, user: self.user}};
-          //     self.router.navigateByUrl('/me/reservation', {state: data});
-          //   }
-          // },
-          cancel: {
-            target: 'cancelled',
-            action: (): void => {
-              self.reservation = undefined;
-              store.dispatch(
-                new fromActionsReservation.CustomerCancel(reservationId)
-              );
-            }
-          }
+          edit: editTransaction,
+          cancel: cancelTransaction
         },
-        next: [{
-        //   tooltip: translate.instant('RESERVATION.DETAIL.ACTION.EDIT'),
-        //   tooltipPosition: 'below',
-        //   icon: ReservationIconName.edit,
-        //   id: 'edit',
-        //   color: 'accent'
-        // }, {
-          tooltip: translate.instant('RESERVATION.DETAIL.ACTION.CANCEL'),
-          tooltipPosition: 'below',
-          icon: ReservationIconName.cancelled,
-          id: 'cancel',
-          color: 'warn'
-        }]
+        next: [edit, cancel]
       },
       started: {
         next: []
       },
       completed: {
-        next: []
+        transitions: {
+          book: bookTransaction
+        },
+        next: [book]
       },
       cancelled: {
         next: []

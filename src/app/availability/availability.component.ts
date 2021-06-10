@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Availability, IAvailability, IAvailabilityDate } from '../interfaces/room';
 import { timeTheme } from '../util/theme';
-import { getTime } from '../util/dates';
+import { createDate, getTime } from '../util/dates';
 
 @Component({
   selector: 'app-availability',
@@ -44,10 +44,10 @@ export class AvailabilityComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    const start = this.dates?.startDate || new Date(new Date().setHours(9, 0));
-    const end = this.dates?.endDate || new Date(new Date().setHours(18, 0));
-    const startLunch = this.dates?.startLunchDate || new Date(new Date().setHours(13, 0));
-    const endLunch = this.dates?.endLunchDate || new Date(new Date().setHours(14, 0));
+    const start = this.dates?.startDate || createDate(9, 0);
+    const end = this.dates?.endDate || createDate(18, 0);
+    const startLunch = this.dates?.startLunchDate || createDate(13, 0);
+    const endLunch = this.dates?.endLunchDate || createDate(14, 0);
 
     this.start.setValue(getTime(start));
     this.end.setValue(getTime(end));

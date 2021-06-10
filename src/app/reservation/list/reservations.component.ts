@@ -2,8 +2,14 @@ import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChi
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { Pagination } from '../../interfaces/pagination';
-import { IReservation, IReservationAll, MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/reservation';
+import { DEFAULT_LENGTH, Pagination } from '../../interfaces/pagination';
+import {
+  ICustomerReservation,
+  IReservation,
+  IReservationAll,
+  MOBILE_PAGE_SIZE,
+  PAGE_SIZE
+} from '../../interfaces/reservation';
 import { Observable, Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -13,6 +19,7 @@ import { AppState, selectReservationState } from '../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ReservationIconName } from '../detail/reservation-detail.component';
 import * as fromActionsReservation from '../../store/reservation.actions';
+import { convertDuration, createNewDate, newDate } from '../../util/dates';
 
 @Component({
   selector: 'app-reservations',
@@ -27,15 +34,20 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   dataSource: any = new MatTableDataSource<Pagination<IReservationAll>>();
   getState: Observable<any>;
   subscription: Subscription | undefined;
+  data: ICustomerReservation | undefined;
+  upcoming: any;
+  noContent = false;
+  end: Date | undefined;
 
-  resultsLength = 0;
+  resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
 
   language: string;
   error: any;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private router: Router,
-              private store: Store<AppState>, private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+              private store: Store<AppState>, private breakpointObserver: BreakpointObserver,
+              private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectReservationState);
     this.language = this.translate.currentLang;
     breakpointObserver.observe([
@@ -49,6 +61,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.clean();
     this.subscribe();
   }
 
@@ -76,15 +89,33 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   view(reservation: IReservation): void {
+    this.router.navigate(['reservation', reservation.id]);
+  }
+
+  edit(reservation: IReservationAll): void {
     this.router.navigate(['me', 'reservation', reservation.id]);
+  }
+
+  private clean(): void {
+    this.store.dispatch(
+      new fromActionsReservation.Clean()
+    );
   }
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       this.error = state.error;
-      if (state.page) {
-        this.dataSource = state.page?.content;
-        this.resultsLength = state.page?.totalElements;
+      this.data = state.customerReservation;
+      if (this.data) {
+        this.noContent = !state.isLoading && !this.data.upcoming;
+        this.dataSource = this.data.reservations?.content;
+        this.resultsLength = this.data.reservations?.totalElements;
+        this.upcoming = this.data.upcoming ? this.data.upcoming : this.upcoming;
+        if (this.upcoming) {
+          const duration = convertDuration(this.upcoming.product.duration);
+          this.end = newDate(this.upcoming.start);
+          this.end = createNewDate(this.end, this.end.getHours() + duration.hour, this.end.getMinutes() + duration.minute);
+        }
       }
     });
   }
@@ -97,7 +128,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
       size: this.pageSize
     };
     this.store.dispatch(
-      new fromActionsReservation.GetAllMePage(payload)
+      new fromActionsReservation.GetCustomerReservations(payload)
     );
   }
 }

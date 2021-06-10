@@ -1,18 +1,19 @@
 import { IAvailability } from '../interfaces/room';
 import { CalendarEvent } from 'angular-calendar';
 import { findStateColor } from './flags';
+import { createDate, createFullDate, createNewDate, getNow, isToday } from './dates';
 
 export const fillNotAvailable = (unavailable: string, lunch: string, notWorking: string, daysInWeek: number,
                                  selectDate: Date, sunday: IAvailability, saturday: IAvailability, week: IAvailability,
                                  addToday: boolean = false): CalendarEvent[] => {
   let events: CalendarEvent[] = [];
-  const date = new Date(selectDate.getFullYear(), selectDate.getMonth(), selectDate.getDate());
-  const now = new Date();
+  const date = createFullDate(selectDate);
+  const now = getNow();
   for (let i = 0; i < daysInWeek; i++) {
     const day = date.getDay();
-    if (addToday && date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate()) {
-      const event = newEvent(notWorking, findStateColor('DEFAULT'), new Date(new Date(now).setHours(0, 0)),
-        new Date(new Date(now).setHours(now.getHours(), now.getMinutes())));
+    if (addToday && isToday(date)) {
+      const event = newEvent(notWorking, findStateColor('DEFAULT'), createDate(),
+        createDate(now.getHours(), now.getMinutes()));
       events = [...events, event];
     }
     if (day === 0) {
@@ -67,11 +68,11 @@ const createEvent = (it: IAvailability, date: Date, notWorking: string, unavaila
                      lunch: string): CalendarEvent[] => {
   let events: CalendarEvent[] = [];
   if (!it) {
-    const event = newEvent(notWorking, findStateColor('DEFAULT'), new Date(new Date(date).setHours(0, 0)),
-      new Date(new Date(date).setHours(23, 59)));
+    const event = newEvent(notWorking, findStateColor('DEFAULT'), createNewDate(date),
+      createNewDate(date, 23, 59));
     events = [...events, event];
   } else {
-    const now = new Date();
+    const now = getNow();
     const nowTime = now.toLocaleTimeString('en-GB').split(':');
     const hour = Number(nowTime[0]);
     const minute = Number(nowTime[1]);
@@ -81,7 +82,7 @@ const createEvent = (it: IAvailability, date: Date, notWorking: string, unavaila
       const endMinute = Number(start[1]);
       let startHour: number | null = 0;
       let startMinute: number | null = 0;
-      if (date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate()) {
+      if (isToday(date)) {
         if (hour < endHour || (hour === endHour && minute < endMinute)) {
           startHour = hour;
           startMinute = minute;
@@ -91,8 +92,8 @@ const createEvent = (it: IAvailability, date: Date, notWorking: string, unavaila
         }
       }
       if ((startHour || startHour === 0) && (startMinute || startMinute === 0)) {
-        const eventBefore = newEvent(notWorking, findStateColor('DEFAULT'), new Date(date.setHours(startHour, startMinute)),
-          new Date(date.setHours(endHour, endMinute)));
+        const eventBefore = newEvent(notWorking, findStateColor('DEFAULT'), createNewDate(date, startHour, startMinute),
+          createNewDate(date, endHour, endMinute));
         events = [...events, eventBefore];
       }
     }
@@ -102,13 +103,12 @@ const createEvent = (it: IAvailability, date: Date, notWorking: string, unavaila
       const endMinute = Number(end[1]);
       let startHour = endHour;
       let startMinute = endMinute;
-      if (date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate()
-        && (hour > endHour || (hour === endHour && minute > endMinute))) {
+      if (isToday(date) && (hour > endHour || (hour === endHour && minute > endMinute))) {
         startHour = hour;
         startMinute = minute;
       }
-      const eventAfter = newEvent(notWorking, findStateColor('DEFAULT'), new Date(date.setHours(startHour, startMinute)),
-        new Date(date.setHours(23, 59)));
+      const eventAfter = newEvent(notWorking, findStateColor('DEFAULT'), createNewDate(date, startHour, startMinute),
+        createNewDate(date, 23, 59));
       events = [...events, eventAfter];
     }
     const ev = createLunchEvent(it, date, unavailable, lunch);
@@ -122,7 +122,7 @@ const createEvent = (it: IAvailability, date: Date, notWorking: string, unavaila
 
 const createLunchEvent = (it: IAvailability, date: Date, unavailable: string,
                           lunch: string): CalendarEvent | undefined => {
-  const now = new Date();
+  const now = getNow();
   const nowTime = now.toLocaleTimeString('en-GB').split(':');
   let hour = Number(nowTime[0]);
   let minute = Number(nowTime[1]);
@@ -135,28 +135,28 @@ const createLunchEvent = (it: IAvailability, date: Date, unavailable: string,
     const lunchStartHour = Number(lunchStart[0]);
     const lunchStartMinute = Number(lunchStart[1]);
 
-    if (date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate()) {
+    if (isToday(date)) {
       if (hour > 23) {
         hour = 23;
         minute = 59;
       } else {
         return lunchEvent(hour, lunchStartHour, minute, lunchStartMinute, lunchEndHour, lunchEndMinute, date, lunch);
       }
-      const start = new Date(new Date().setHours(0, 0));
-      const end = new Date(new Date().setHours(hour, minute));
+      const start = createDate();
+      const end = createDate(hour, minute);
       return newEvent(unavailable, findStateColor('DEFAULT'), start, end);
     } else {
-      const start = new Date(date.setHours(lunchStartHour, lunchStartMinute));
-      const end = new Date(date.setHours(lunchEndHour, lunchEndMinute));
+      const start = createNewDate(date, lunchStartHour, lunchStartMinute);
+      const end = createNewDate(date, lunchEndHour, lunchEndMinute);
       return newEvent(lunch, findStateColor('DEFAULT'), start, end);
     }
-  } else if (date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate()) {
+  } else if (isToday(date)) {
     if (hour > 23) {
       hour = 23;
       minute = 59;
     }
-    const start = new Date(date.setHours(0, 0));
-    const end = new Date(date.setHours(hour, minute));
+    const start = createNewDate(date);
+    const end = createNewDate(date, hour, minute);
     return newEvent(lunch, findStateColor('DEFAULT'), start, end);
   }
 
@@ -176,8 +176,8 @@ const lunchEvent = (hour: number, lunchStartHour: number, minute: number, lunchS
     lunchMinute = minute;
   }
   if ((lunchHour || lunchHour === 0) && (lunchMinute || lunchMinute === 0)) {
-    const start = new Date(date.setHours(lunchHour, lunchMinute));
-    const end = new Date(date.setHours(lunchEndHour, lunchEndMinute));
+    const start = createNewDate(date, lunchHour, lunchMinute);
+    const end = createNewDate(date, lunchEndHour, lunchEndMinute);
     return newEvent(lunch, findStateColor('DEFAULT'), start, end, undefined, 'LUNCH');
   }
 
