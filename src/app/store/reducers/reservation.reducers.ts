@@ -1,13 +1,14 @@
 import { All, ReservationActionTypes } from '../reservation.actions';
-import { IReservation, IRoomReservation } from '../../interfaces/reservation';
+import { IAvailableDTO, ICustomerReservation, IReservation, IRoomReservation } from '../../interfaces/reservation';
 import { IUser } from '../../interfaces/user';
 import { IProduct } from '../../interfaces/product';
 import { IRoom } from '../../interfaces/room';
 import { Pagination } from '../../interfaces/pagination';
 
 export interface State {
-  data: IReservation | IRoomReservation[] | IReservation[] | null;
+  data: IReservation | IRoomReservation[] | IReservation[] | ICustomerReservation | IAvailableDTO | null;
   page: Pagination<IReservation> | null;
+  customerReservation: ICustomerReservation | null;
   customers: IUser[] | null;
   rooms: IRoom[] | null;
   products: IProduct[] | null;
@@ -22,6 +23,7 @@ export interface State {
 export const initialState: State = {
   data: null,
   page: null,
+  customerReservation: null,
   customers: null,
   rooms: null,
   products: null,
@@ -35,6 +37,19 @@ export const initialState: State = {
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
+    case ReservationActionTypes.getCustomerReservations: {
+      return {
+        ...state,
+        // @ts-ignore
+        customerReservation: {reservations: {content: [{}, {}, {}], totalElements: 3}},
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        selected: null,
+        message: null,
+        isLoading: true
+      };
+    }
     case ReservationActionTypes.getAll: {
       return {
         ...state,
@@ -48,8 +63,7 @@ export const reducer = (state = initialState, action: All): State => {
       };
     }
     case ReservationActionTypes.getAllAssignmentPage:
-    case ReservationActionTypes.getAllPage:
-    case ReservationActionTypes.getAllMePage: {
+    case ReservationActionTypes.getAllPage: {
       return {
         ...state,
         // @ts-ignore
@@ -58,9 +72,12 @@ export const reducer = (state = initialState, action: All): State => {
         error: null,
         subErrors: null,
         selected: null,
-        message: null
+        message: null,
+        isLoading: true
       };
     }
+    case ReservationActionTypes.getUpcomingReservation:
+    case ReservationActionTypes.customerSearchReservation:
     case ReservationActionTypes.searchReservation:
     case ReservationActionTypes.getAllGroupingByRoom: {
       return {
@@ -140,6 +157,17 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false
       };
     }
+    case ReservationActionTypes.reservationsCustomerSuccess: {
+      return {
+        ...state,
+        customerReservation: action.payload,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: null,
+        isLoading: false
+      };
+    }
     case ReservationActionTypes.reservationSuccess: {
       return {
         ...state,
@@ -151,7 +179,7 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false
       };
     }
-    case ReservationActionTypes.reservationCustomersSuccess: {
+    case ReservationActionTypes.customersSuccess: {
       return {
         ...state,
         customers: action.payload,

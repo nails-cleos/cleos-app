@@ -2,8 +2,8 @@
   <mat-sidenav #drawer [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
                [mode]="(isHandset$ | async) ? 'over' : 'side'"
                [opened]="(isHandset$ | async) === false" class="sidenav" fixedInViewport>
-    <mat-card *ngIf="currentUser" style="padding: 16px 0 0 0">
-      <mat-card-header style="padding-left: 16px">
+    <mat-card style="padding: 16px 0 0 0">
+      <mat-card-header style="padding-left: 16px" *ngIf="currentUser; else headerNoLogged">
         <div class="circle" mat-card-avatar>
           <img *ngIf="!showInitials; else showInitialsBlock" alt="profile" src="{{currentUser?.imageUrl}}">
           <ng-template #showInitialsBlock>
@@ -13,8 +13,8 @@
         <mat-card-title>{{username | uppercase}}</mat-card-title>
         <mat-card-subtitle>{{currentUser.email}}</mat-card-subtitle>
       </mat-card-header>
-      <mat-card-content>
-        <mat-nav-list *ngIf="currentUser">
+      <mat-card-content *ngIf="currentUser; else contentNoLogged">
+        <mat-nav-list>
           <mat-divider></mat-divider>
           <div *ngFor="let menu of menuItems; last as last">
             <a (click)="drawer.toggle()" *ngIf="isHandset$ | async; else showMenu" [routerLink]="'/'+menu.path"
@@ -32,6 +32,34 @@
           </div>
         </mat-nav-list>
       </mat-card-content>
+      <ng-template #headerNoLogged>
+        <mat-card-header style="padding-left: 16px">
+          <div class="circle" mat-card-avatar>
+            <img alt="profile" src="../../assets/icons/icon-512x512.png">
+          </div>
+          <mat-card-title>Espacio Cleos</mat-card-title>
+          <mat-card-subtitle>@espacio.cleos</mat-card-subtitle>
+        </mat-card-header>
+      </ng-template>
+      <ng-template #contentNoLogged>
+        <mat-card-content>
+          <mat-nav-list>
+            <mat-divider></mat-divider>
+            <a (click)="drawer.toggle()" *ngIf="isHandset$ | async; else showMenu" [routerLink]="'/auth'"
+               mat-list-item>
+              <mat-icon mat-list-icon>login</mat-icon>
+              <div mat-line>{{'DASHBOARD.SIGN_IN' | translate }}</div>
+            </a>
+            <ng-template #showMenu>
+              <a [routerLinkActive]="['active']" [routerLink]="'/auth'" mat-list-item>
+                <mat-icon mat-list-icon>login</mat-icon>
+                <div mat-line>{{'DASHBOARD.SIGN_IN' | translate }}</div>
+              </a>
+            </ng-template>
+            <mat-divider></mat-divider>
+          </mat-nav-list>
+        </mat-card-content>
+      </ng-template>
     </mat-card>
   </mat-sidenav>
   <mat-sidenav-content>

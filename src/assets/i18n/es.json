@@ -338,11 +338,11 @@
         "DURATION": "Duración"
       },
       "ERROR": {
-        "NO_CONTENT": "No hay productos"
+        "NO_CONTENT": "No hay servicios"
       }
     },
     "ADD": {
-      "TITLE": "Agregar producto",
+      "TITLE": "Agregar servicio",
       "NAME": {
         "FIELD": "Nombre",
         "REQUIRED": "Nombre es <b>requerido</b>"
@@ -362,10 +362,10 @@
       "DURABILITY": {
         "FIELD": "Durabilidad"
       },
-      "CREATED": "Producto {{name}} creado"
+      "CREATED": "Servicio {{name}} creado"
     },
     "DETAIL": {
-      "TITLE": "Actualizar producto",
+      "TITLE": "Actualizar servicio",
       "NAME": {
         "FIELD": "Nombre",
         "REQUIRED": "Nombre es <b>requerido</b>"
@@ -387,12 +387,12 @@
       }
     },
     "DELETED": {
-      "TITLE": "Eliminar producto",
-      "CONTENT": "¿Está seguro de eliminar el producto {{name}}?",
-      "MESSAGE": "Producto {{name}} eliminado"
+      "TITLE": "Eliminar servicio",
+      "CONTENT": "¿Está seguro de eliminar el servicio {{name}}?",
+      "MESSAGE": "Servicio {{name}} eliminado"
     },
     "UPDATED": {
-      "MESSAGE": "Producto {{name}} actualizado"
+      "MESSAGE": "Servicio {{name}} actualizado"
     }
   },
   "CATALOGUE": {
@@ -706,7 +706,8 @@
         "START": "Iniciar",
         "EDIT": "Editar",
         "COMPLETE": "Completar",
-        "CANCEL": "Cancelar"
+        "CANCEL": "Cancelar",
+        "BOOK": "Reservar nuevamente"
       },
       "CHANGE_STATE": {
         "TITLE": "Cambio de estado",
@@ -715,7 +716,8 @@
           "EDIT": "editar la cita",
           "START": "iniciar la cita",
           "COMPLETE": "completar la cita",
-          "CANCEL": "cancelar la reserva"
+          "CANCEL": "cancelar la reserva",
+          "BOOK": "reservar nuevamente"
         },
         "CONTENT": "¿Está seguro de {{action}}?"
       }
@@ -746,6 +748,78 @@
       "STARTED": "Empezada",
       "COMPLETED": "Completada",
       "CANCELLED": "Cancelada"
+    },
+    "CUSTOMER": {
+      "UPCOMING": {
+        "TITLE": "Próxima Reserva",
+        "START": "Inicio",
+        "END": "Fin",
+        "ROOM": "Sala",
+        "ADDRESS": "Dirección",
+        "PRODUCT": "Servicio",
+        "PRICE": "Precio",
+        "CREATED": "La reserva debe ser aprobada por: "
+      },
+      "NO_UPCOMING": {
+        "TITLE": "No hay próxima reserva"
+      },
+      "ADD": {
+        "ROOM": {
+          "FIELD": "Sala",
+          "REQUIRED": "Sala es <b>requerida</b>",
+          "INVALID": "Sala no valida",
+          "DETAIL": "Detalle",
+          "ADDRESS": {
+            "NAME": "<span class='bold'>Dirección:</span> {{name}}",
+            "DESCRIPTION": "<span class='bold'>Descripción:</span> {{description}}",
+            "DISTANCE": {
+              "KM": "<span class='bold'>Distancia:</span> {{distance}} Kilómetros",
+              "M": "<span class='bold'>Distancia:</span> {{distance}} Metros"
+            }
+          },
+          "PROFESSIONAL": {
+            "NAME": "<span class='bold'>Profesional:</span> {{name}}"
+          }
+        },
+        "PRODUCT": {
+          "FIELD": "Servicio",
+          "REQUIRED": "Servicio es <b>requerido</b>",
+          "INVALID": "Servicio no valido",
+          "DETAIL": "Detalle",
+          "DESCRIPTION": "<span class='bold'>Descripción:</span> {{description}}",
+          "PRICE": "<span class='bold'>Precio:</span> $ {{price}}",
+          "DURATION": "<span class='bold'>Duración:</span> {{duration}}",
+          "DURABILITY": "<span class='bold'>Durabilidad:</span> {{durability}}"
+        },
+        "DATE": {
+          "FIELD": "Elegí una fecha",
+          "REQUIRED": "Fecha es <b>requerida</b>"
+        },
+        "SCHEDULE": {
+          "FIELD": "Reservar una cita",
+          "REQUIRED": "Reservar una cita es <b>requerido</b>"
+        },
+        "PREVIEW": {
+          "TITLE": "Vista previa",
+          "ROOM": {
+            "TITLE": "Sala",
+            "NAME": "Nombre",
+            "PROFESSIONAL": "Profesional",
+            "ADDRESS": "Dirección"
+          },
+          "PRODUCT": {
+            "TITLE": "Servicio",
+            "NAME": "Nombre",
+            "DURATION": "Duración",
+            "PRICE": "Precio"
+          },
+          "APPOINTMENT": "Cita"
+        },
+        "UPCOMING": {
+          "ERROR": "El cliente ya tiene una reserva el {{date}}"
+        },
+        "NO_CONTENT": "No hay disponibilidad el <span class='bold'>{{date}}</span>"
+      }
     }
   },
   "NOTIFICATION": {
@@ -793,7 +867,7 @@
       "CREATED": "No disponible {{date}} creado"
     },
     "DETAIL": {
-      "TITLE": "Actualizar producto",
+      "TITLE": "Actualizar servicio",
       "DESCRIPTION": {
         "FIELD": "Descripción"
       },

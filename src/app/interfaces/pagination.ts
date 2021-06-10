@@ -4,3 +4,5 @@ export interface Pagination<T> {
   totalPages: number;
   number: number; // Page number
 }
+
+export const DEFAULT_LENGTH = 3;

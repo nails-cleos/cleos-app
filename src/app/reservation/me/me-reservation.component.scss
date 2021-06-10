@@ -1,0 +1,26 @@
+.mat-tab-labels {
+  justify-content: center;
+}
+
+section {
+  display: table;
+}
+
+.button-row {
+  display: table-cell;
+  width: 390px;
+}
+
+.button-row .mat-button-base {
+  margin: 8px 8px 8px 0;
+}
+
+.mat-raised-button.large {
+  width: 60px;
+  height: 60px;
+  line-height: 60px;
+}
+
+::ng-deep .mat-form-field .mat-form-field-subscript-wrapper {
+  overflow: visible;
+}

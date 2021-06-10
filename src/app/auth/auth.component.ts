@@ -60,7 +60,7 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscription = this.getState.subscribe((state) => {
       this.isLoading = state.isLoading;
       if (state.isAuthenticated) {
-        this.router.navigate(['main']);
+        this.router.navigate(['redirect']);
       }
       if (!state.subErrors && (state.errorMessage || state.message)) {
         const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {

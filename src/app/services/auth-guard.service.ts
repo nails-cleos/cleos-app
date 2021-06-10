@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { IAuthority, IUser } from '../interfaces/user';
+import { IUser } from '../interfaces/user';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState } from '../store/app.states';
 import { Observable } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
-import { Role } from '../interfaces/token';
 
 @Injectable({
   providedIn: 'root'
@@ -24,10 +23,6 @@ export class AuthGuardService implements CanActivate {
     });
   }
 
-  private static isCustomer(authorities: IAuthority[] | undefined): boolean {
-    return !!authorities && authorities.length === 1 && authorities[0].authority === Role.customer;
-  }
-
   private static hasRole(route: ActivatedRouteSnapshot, user: IUser): boolean {
     if (route.data.roles && user.authorities) {
       return user.authorities.some(au => route.data.roles.includes(au.authority));
@@ -41,16 +36,16 @@ export class AuthGuardService implements CanActivate {
       if (AuthGuardService.hasRole(route, this.currentUser)) {
         return true;
       } else {
-        // let message;
-        // if (this.translate.currentLang.startsWith('es')) {
-        //   message = 'El usuario no tiene los permisos necesarios';
-        // } else {
-        //   message = 'User not have the necessary permissions';
-        // }
-        // this.snackBar.open(message, 'OK', {
-        //   duration: 5000
-        // });
-        this.router.navigate(['main']);
+        let message;
+        if (this.translate.currentLang.startsWith('es')) {
+          message = 'El usuario no tiene los permisos necesarios';
+        } else {
+          message = 'User not have the necessary permissions';
+        }
+        this.snackBar.open(message, 'OK', {
+          duration: 5000
+        });
+        this.router.navigate(['redirect']);
         return false;
       }
     }

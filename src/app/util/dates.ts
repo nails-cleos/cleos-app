@@ -131,3 +131,72 @@ export const getTime = (time: Date): string => {
 
   return `${hours}:${minutes}`;
 };
+
+export const formatDateTime = (date: Date, locale: string): string => date.toLocaleDateString(locale, {
+  day: 'numeric', month: 'long', weekday: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+}).replace(/ /g, ' ');
+
+export const formatDateName = (date: Date, locale: string, measure: string): string => date.toLocaleDateString(locale, {
+  day: 'numeric', month: measure, weekday: measure, year: 'numeric'
+}).replace(/ /g, ' ');
+
+export const formatDate = (date: Date, locale: string): string => date.toLocaleDateString(locale, {
+  day: 'numeric', month: 'short', year: 'numeric'
+}).replace(/ /g, '-');
+
+export const formatTime = (hour: number, minute: number): string => getTime(createDate(hour, minute));
+
+export const getNow = (): Date => new Date();
+
+export const isToday = (date: Date): boolean => {
+  const now = getNow();
+  return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth()
+    && date.getDate() === now.getDate();
+};
+
+export const areEqualDate = (date1: Date, date2: Date): boolean => {
+  return date1.getFullYear() === date2.getFullYear() && date1.getMonth() === date2.getMonth()
+    && date1.getDate() === date2.getDate();
+};
+
+export const createDate = (hour: number = 0, minute: number = 0, second: number = 0,
+                           mili: number = 0): Date => createNewDate(new Date(), hour, minute, second, mili);
+
+export const createNewDate = (date: Date, hour: number = 0, minute: number = 0, second: number = 0, mili: number = 0): Date => {
+  const d = new Date(date);
+  d.setHours(hour, minute, second, mili);
+
+  return d;
+};
+
+export const createFullDate = (selectDate: Date): Date => {
+  const date = new Date();
+  date.setFullYear(selectDate.getFullYear(), selectDate.getMonth(), selectDate.getDate());
+
+  return date;
+};
+
+export const newDate = (value: number | string | Date): Date => new Date(value);
+
+export const plusDay = (date: Date, plus: number): Date => {
+  const d = new Date(date);
+  d.setDate(d.getDate() + plus);
+
+  return d;
+};
+
+export const plusMonth = (date: Date, plus: number): Date => {
+  const d = new Date(date);
+  d.setMonth(d.getMonth() + plus);
+
+  return d;
+};
+
+export const plusMonthDate = (date: Date, plus: number, day: number): Date => {
+  const d = new Date(date);
+  d.setMonth(d.getMonth() + plus, day);
+
+  return d;
+};
+
+export const greaterThanToday = (date: Date): boolean => date >= createDate();

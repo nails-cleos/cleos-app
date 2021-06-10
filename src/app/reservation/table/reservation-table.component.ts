@@ -7,7 +7,7 @@ import { Observable, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
 import { IReservation, IReservationAll, MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/reservation';
 import { MatTableDataSource } from '@angular/material/table';
-import { Pagination } from '../../interfaces/pagination';
+import { DEFAULT_LENGTH, Pagination } from '../../interfaces/pagination';
 import { ReservationIconName } from '../detail/reservation-detail.component';
 import { DialogComponent } from '../../dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
@@ -29,7 +29,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
   getState: Observable<any>;
   subscription: Subscription | undefined;
 
-  resultsLength = 0;
+  resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
 
   language: string;

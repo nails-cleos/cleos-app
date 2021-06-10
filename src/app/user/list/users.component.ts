@@ -10,7 +10,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../../dialog/dialog.component';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { Pagination } from '../../interfaces/pagination';
+import { DEFAULT_LENGTH, Pagination } from '../../interfaces/pagination';
 import { TranslateService } from '@ngx-translate/core';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { Role } from '../../interfaces/token';
@@ -47,7 +47,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   allRole: Role[] = [Role.customer, Role.professional, Role.admin];
   error: any;
 
-  resultsLength = 0;
+  resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,

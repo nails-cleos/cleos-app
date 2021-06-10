@@ -12,10 +12,12 @@ import { GeocoderResult } from '@agm/core';
 })
 export class GoogleMapComponent implements OnInit {
 
+  @Input() showDistance: boolean | undefined;
   @Input() addressFormGroup: FormGroup | undefined;
   @Input() public latitudeMarker: number | undefined;
   @Input() public longitudeMarker: number | undefined;
   @Output() addressEmitter = new EventEmitter<GeocoderResult>();
+  @Output() distanceEmitter = new EventEmitter<number>();
 
   public appearance = Appearance;
   public zoom: number;
@@ -45,19 +47,28 @@ export class GoogleMapComponent implements OnInit {
 
   markerDragEnd($event: any): void {
     this.isLoading = true;
-    this.geocodeService.geocodeAddress($event.coords.lat, $event.coords.lng)
-      .subscribe(value => this.addressFormGroup?.get('address')?.setValue(value));
+    this.geocodeService.geocodeAddress($event.coords.lat, $event.coords.lng, this.showDistance)
+      .subscribe(value => {
+        if (value.address) {
+          this.addressFormGroup?.get('address')?.setValue(value.address);
+        }
+      });
   }
 
   private setCurrentPosition(): void {
     this.isLoading = true;
     if (this.latitudeMarker && this.longitudeMarker) {
-      this.geocodeService.geocodeAddress(this.latitudeMarker, this.longitudeMarker)
+      this.geocodeService.geocodeAddress(this.latitudeMarker, this.longitudeMarker, this.showDistance)
         .subscribe(value => {
-          if (this.addressFormGroup) {
-            this.addressFormGroup.get('address')?.setValue(value);
-          } else {
-            this.setAddress(value);
+          if (value.distance) {
+            this.distanceEmitter.emit(value.distance);
+          }
+          if (value.address) {
+            if (this.addressFormGroup) {
+              this.addressFormGroup.get('address')?.setValue(value.address);
+            } else {
+              this.setAddress(value.address);
+            }
           }
         });
     } else {

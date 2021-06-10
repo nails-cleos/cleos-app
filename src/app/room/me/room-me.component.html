@@ -88,7 +88,7 @@
           </ng-template>
           <mat-card-actions *ngIf="room; else buttonSkeleton">
             <div fxFlex></div>
-            <button [disabled]="form.invalid" color="primary" mat-raised-button
+            <button color="primary" mat-raised-button
                     type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
             <button color="accent" mat-raised-button appBackButton
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>

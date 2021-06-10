@@ -1,6 +1,6 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
-import { Pagination } from '../../interfaces/pagination';
+import { DEFAULT_LENGTH, Pagination } from '../../interfaces/pagination';
 import { IRoom, PAGE_SIZE } from '../../interfaces/room';
 import { Observable } from 'rxjs';
 import { MatPaginator } from '@angular/material/paginator';
@@ -27,7 +27,7 @@ export class RoomsComponent implements OnInit, AfterViewInit {
   dataSource: any = new MatTableDataSource<Pagination<IRoom>>();
   getState: Observable<any>;
 
-  resultsLength = 0;
+  resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
   error: any;
 

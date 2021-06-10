@@ -3,20 +3,23 @@ import { Action } from '@ngrx/store';
 export enum ReservationActionTypes {
   getAll = '[Reservation] Get all',
   getAllPage = '[Reservation] Get all page',
-  getAllMePage = '[Reservation] Get all me page',
+  getCustomerReservations = '[Reservation] Get customer reservations',
   getAllAssignmentPage = '[Reservation] Get all page assignment',
   getAllGroupingByRoom = '[Reservation] Get all grouping by room',
   searchReservation = '[Reservation] Search reservation',
+  customerSearchReservation = '[Reservation] Customer search reservation',
   getCustomers = '[Reservation] Get customers',
   getProducts = '[Reservation] Get products',
   getRooms = '[Reservation] Get rooms',
+  getUpcomingReservation = '[Reservation] Get upcoming reservation',
   reservationSuccess = '[Reservation] Success',
   reservationPageSuccess = '[Reservation] Page Success',
-  reservationCustomersSuccess = '[Reservation] Customers success',
+  customersSuccess = '[Reservation] Customers success',
   reservationProductsSuccess = '[Reservation] Products success',
   reservationRoomsSuccess = '[Reservation] Rooms success',
   reservationSave = '[Reservation] Save',
   reservationSaveSuccess = '[Reservation] Save Success',
+  reservationsCustomerSuccess = '[Reservation] reservations customer Success',
   reservationFailure = '[Reservation] Failure',
   reservationSelected = '[Reservation] Selected',
   reservationFind = '[Reservation] Find',
@@ -42,8 +45,8 @@ export class GetAllPage implements Action {
   }
 }
 
-export class GetAllMePage implements Action {
-  readonly type = ReservationActionTypes.getAllMePage;
+export class GetCustomerReservations implements Action {
+  readonly type = ReservationActionTypes.getCustomerReservations;
 
   constructor(public payload: any) {
   }
@@ -67,6 +70,13 @@ export class SearchReservation implements Action {
   }
 }
 
+export class CustomerSearchReservation implements Action {
+  readonly type = ReservationActionTypes.customerSearchReservation;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class GetAllCustomers implements Action {
   readonly type = ReservationActionTypes.getCustomers;
 }
@@ -77,6 +87,10 @@ export class GetAllProducts implements Action {
 
 export class GetAllRooms implements Action {
   readonly type = ReservationActionTypes.getRooms;
+}
+
+export class GetUpcomingReservation implements Action {
+  readonly type = ReservationActionTypes.getUpcomingReservation;
 }
 
 export class ReservationSuccess implements Action {
@@ -93,8 +107,8 @@ export class ReservationPageSuccess implements Action {
   }
 }
 
-export class ReservationCustomersSuccess implements Action {
-  readonly type = ReservationActionTypes.reservationCustomersSuccess;
+export class CustomersSuccess implements Action {
+  readonly type = ReservationActionTypes.customersSuccess;
 
   constructor(public payload: any) {
   }
@@ -123,6 +137,13 @@ export class ReservationSave implements Action {
 
 export class ReservationSaveSuccess implements Action {
   readonly type = ReservationActionTypes.reservationSaveSuccess;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class ReservationCustomerSuccess implements Action {
+  readonly type = ReservationActionTypes.reservationsCustomerSuccess;
 
   constructor(public payload: any) {
   }
@@ -212,20 +233,23 @@ export class Clean implements Action {
 export type All =
   | GetAll
   | GetAllPage
-  | GetAllMePage
+  | GetCustomerReservations
   | GetAllAssignmentPage
   | GetAllGroupingByRoom
   | SearchReservation
+  | CustomerSearchReservation
   | GetAllCustomers
   | GetAllProducts
   | GetAllRooms
+  | GetUpcomingReservation
   | ReservationSave
   | ReservationSuccess
   | ReservationPageSuccess
-  | ReservationCustomersSuccess
+  | CustomersSuccess
   | ReservationProductsSuccess
   | ReservationRoomsSuccess
   | ReservationSaveSuccess
+  | ReservationCustomerSuccess
   | ReservationFailure
   | ReservationFind
   | ReservationSelected

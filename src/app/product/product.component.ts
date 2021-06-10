@@ -7,7 +7,7 @@ import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
 import { IProduct, Product } from '../interfaces/product';
 import { timeTheme } from '../util/theme';
-import { getTime } from '../util/dates';
+import { createDate, getTime } from '../util/dates';
 
 @Component({
   selector: 'app-product',
@@ -31,7 +31,7 @@ export class ProductComponent implements OnInit, OnDestroy {
 
   constructor(private snackBar: MatSnackBar, private store: Store<AppState>, private formBuilder: FormBuilder) {
     this.getState = this.store.select(selectProductState);
-    const d = getTime(new Date(new Date().setHours(0, 0)));
+    const d = getTime(createDate());
 
     this.duration = new FormControl(d, [
       Validators.required

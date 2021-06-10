@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { map } from 'rxjs/operators';
-import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../store/app.states';
@@ -9,6 +9,7 @@ import { IReservationAll, IReservationSummary } from '../interfaces/reservation'
 import { IUserAll } from '../interfaces/user';
 import { TranslateService } from '@ngx-translate/core';
 import { ThemePalette } from '@angular/material/core';
+import { createDate, newDate, plusMonth } from '../util/dates';
 
 @Component({
   selector: 'app-dash',
@@ -112,14 +113,13 @@ export class DashComponent implements OnInit, OnDestroy {
       }
       if (state.data && Array.isArray(state.data) && !state.data[0].reservations) {
         this.state = state;
-        const now = new Date(new Date().setHours(0, 0));
-        const filterDate = new Date(now.setMonth(now.getMonth() - 1));
-        const prevFilterDate = new Date(now.setMonth(now.getMonth() - 1));
+        const filterDate = plusMonth(createDate(), -1);
+        const prevFilterDate = plusMonth(createDate(), -2);
         const completedList = this.state.data?.filter((r: IReservationAll) => r.state === 'COMPLETED');
         if (completedList && completedList.length) {
-          const lastMonthList = completedList.filter((r: IReservationAll) => new Date(r.start) > filterDate);
+          const lastMonthList = completedList.filter((r: IReservationAll) => newDate(r.start) > filterDate);
           const prevMonthList = completedList.filter(
-            (r: IReservationAll) => new Date(r.start) > prevFilterDate && new Date(r.start) < filterDate
+            (r: IReservationAll) => newDate(r.start) > prevFilterDate && newDate(r.start) < filterDate
           );
           const totalRevenue = completedList.reduce(DashComponent.getSumReservationPrice, 0);
           const lastMonthRevenue = lastMonthList.reduce(DashComponent.getSumReservationPrice, 0);
@@ -129,7 +129,7 @@ export class DashComponent implements OnInit, OnDestroy {
           const lastMonthAvg = lastMonthList.length ? lastMonthRevenue / lastMonthList.length : 0;
           const prevMonthAvg = prevMonthList.length ? prevMonthRevenue / prevMonthList.length : 0;
 
-          const totalCustomers = completedList.filter((r: IReservationAll) => new Date(r.start) <= filterDate)
+          const totalCustomers = completedList.filter((r: IReservationAll) => newDate(r.start) <= filterDate)
             .reduce((unique: any[], o: IReservationAll) => {
               if (!unique.some(obj => obj.id === o.customer.id)) {
                 unique.push(o.customer);
@@ -137,7 +137,7 @@ export class DashComponent implements OnInit, OnDestroy {
               return unique;
             }, []);
 
-          const totalCustomersPrev = completedList.filter((r: IReservationAll) => new Date(r.start) <= prevFilterDate)
+          const totalCustomersPrev = completedList.filter((r: IReservationAll) => newDate(r.start) <= prevFilterDate)
             .reduce((unique: any[], o: IReservationAll) => {
               if (!unique.some(obj => obj.id === o.customer.id)) {
                 unique.push(o.customer);
