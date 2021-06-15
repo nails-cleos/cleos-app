@@ -49,8 +49,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case UnavailableActionTypes.getRoom: {
@@ -60,8 +59,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case UnavailableActionTypes.unavailableFind: {

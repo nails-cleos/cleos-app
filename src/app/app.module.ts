@@ -59,6 +59,7 @@ import { CatalogueService } from './services/catalogue.service';
 import { UnavailableService } from './services/unavailable.service';
 import { NavigationService } from './services/navigation.service';
 import { MessagingService } from './services/messaging.service';
+import { DiscountService } from './services/discount.service';
 
 // Reducers
 import { reducers } from './store/app.states';
@@ -72,6 +73,7 @@ import { ReservationEffects } from './store/effects/reservation.effects';
 import { NotificationEffects } from './store/effects/notification.effects';
 import { CatalogueEffects } from './store/effects/catalogue.effects';
 import { UnavailableEffects } from './store/effects/unavailable.effects';
+import { DiscountEffects } from './store/effects/discount.effects';
 
 // Directives
 import { DragDropDirective } from './directives/drag-drop.directive';
@@ -102,7 +104,7 @@ import { RoomComponent } from './room/room.component';
 import { RoomsComponent } from './room/list/rooms.component';
 import { RoomDetailComponent } from './room/detail/room-detail.component';
 import { ReservationComponent } from './reservation/reservation.component';
-import { AssignmentsComponent } from './assignment/assignments.component';
+import { SearchComponent } from './reservation/search/search.component';
 import { ReservationDetailComponent } from './reservation/detail/reservation-detail.component';
 import { AvailabilityComponent } from './availability/availability.component';
 import { ProductReservationsChartComponent } from './charts/product-reservation-chart/product-reservations-chart.component';
@@ -111,7 +113,9 @@ import { AnnualReservationsChartComponent } from './charts/annual-reservations-c
 import { MiniCardComponent } from './mini-card/mini-card.component';
 import { CustomerReservationsChartComponent } from './charts/customer-reservations-chart/customer-reservations-chart.component';
 import { ReservationTableComponent } from './reservation/table/reservation-table.component';
-import { QuantityProductReservationsChartComponent } from './charts/quantity-product-reservations-chart/quantity-product-reservations-chart.component';
+import {
+  QuantityProductReservationsChartComponent
+} from './charts/quantity-product-reservations-chart/quantity-product-reservations-chart.component';
 import { LastMonthReservationsChartComponent } from './charts/last-month-reservations-chart/last-month-reservations-chart.component';
 import { NotificationsComponent } from './notification/list/notifications.component';
 import { RoomMeComponent } from './room/me/room-me.component';
@@ -129,6 +133,15 @@ import { UnavailableListComponent } from './unavailable/list/unavailable-list.co
 import { ReservationsComponent } from './reservation/list/reservations.component';
 import { MeReservationComponent } from './reservation/me/me-reservation.component';
 import { RedirectComponent } from './redirect/redirect.component';
+import {
+  BottomSheetReferralComponent,
+  BottomSheetShareComponent,
+  ReferralsComponent
+} from './referrals/referrals.component';
+import { DiscountComponent } from './discount/discount.component';
+import { DiscountDetailComponent } from './discount/detail/discount-detail.component';
+import { DiscountDialogComponent, DiscountsComponent } from './discount/list/discounts.component';
+import { MeDiscountComponent } from './discount/me/me-discount.component';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
@@ -191,7 +204,7 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
     RoomsComponent,
     RoomDetailComponent,
     ReservationComponent,
-    AssignmentsComponent,
+    SearchComponent,
     ReservationDetailComponent,
     AvailabilityComponent,
     ProductReservationsChartComponent,
@@ -220,13 +233,21 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
     DragDropDirective,
     BackButtonDirective,
     MeReservationComponent,
-    RedirectComponent
+    RedirectComponent,
+    ReferralsComponent,
+    BottomSheetShareComponent,
+    BottomSheetReferralComponent,
+    DiscountComponent,
+    DiscountDetailComponent,
+    DiscountsComponent,
+    DiscountDialogComponent,
+    MeDiscountComponent
   ],
   imports: [
     BrowserModule,
     StoreModule.forRoot(reducers, {metaReducers}),
     EffectsModule.forRoot([LoginEffects, UserEffects, ProductEffects, CatalogueEffects, RoomEffects, ReservationEffects,
-      NotificationEffects, UnavailableEffects]),
+      NotificationEffects, UnavailableEffects, DiscountEffects]),
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {
@@ -286,6 +307,7 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
     ReservationService,
     CatalogueService,
     UnavailableService,
+    DiscountService,
     NavigationService,
     TranslationLoaderResolver,
     GeocodeService,

@@ -12,6 +12,7 @@ export interface IUser {
   authorities?: IAuthority[];
   imageUrl?: string;
   code?: string | null;
+  referralMax?: number;
 }
 
 export interface IUserAll {
@@ -24,6 +25,7 @@ export interface IUserAll {
   authorities: IAuthority[];
   imageUrl?: string;
   lang?: string;
+  referralMax?: number;
 }
 
 export interface IAuthority {

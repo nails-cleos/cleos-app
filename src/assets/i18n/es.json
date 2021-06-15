@@ -18,7 +18,14 @@
       "EDIT": "Editar",
       "DELETE": "Eliminar",
       "INVITE": "Enviar invitación",
-      "CLOSE": "Cerrar"
+      "CLOSE": "Cerrar",
+      "COPY": "Copiar",
+      "SHARE": "Compartir",
+      "DISCOUNT": {
+        "SHOW": "Mostrar descuentos",
+        "HIDE": "Ocultar descuentos",
+        "SEND": "Enviar descuento"
+      }
     },
     "COLUMN": {
       "ACTIONS": "Acciones"
@@ -53,6 +60,10 @@
       "FIELD": "Dirección",
       "INVALID": "La dirección es invalida",
       "DESCRIPTION": "Descripción"
+    },
+    "DISCOUNT": {
+      "MONEY": "Dinero",
+      "PERCENTAGE": "Porcentaje"
     },
     "ERROR": {
       "NO_CONTENT": "Sin datos"
@@ -230,6 +241,9 @@
       "LANG": {
         "FIELD": "Idioma",
         "REQUIRED": "Idioma es <b>requerido</b>"
+      },
+      "CODE": {
+        "FIELD": "Código de referrido"
       },
       "CUSTOMER": "Cliente {{username}} creado",
       "PROFESSIONAL": "Profesional {{username}} creado"
@@ -730,6 +744,11 @@
         "STATE": "Estado",
         "PRODUCT": "Servicio"
       },
+      "CANCEL": {
+        "TITLE": "Cancelar reserva",
+        "CONTENT": "¿Está seguro de cancelar la reserva {{date}}?",
+        "MESSAGE": "Reserva {{date}} cancelada"
+      },
       "ERROR": {
         "NO_CONTENT": "No hay reservas"
       }
@@ -787,9 +806,13 @@
           "INVALID": "Servicio no valido",
           "DETAIL": "Detalle",
           "DESCRIPTION": "<span class='bold'>Descripción:</span> {{description}}",
-          "PRICE": "<span class='bold'>Precio:</span> $ {{price}}",
+          "PRICE": "<span class='bold'>Precio:</span>",
           "DURATION": "<span class='bold'>Duración:</span> {{duration}}",
-          "DURABILITY": "<span class='bold'>Durabilidad:</span> {{durability}}"
+          "DURABILITY": "<span class='bold'>Durabilidad:</span> {{durability}}",
+          "DISCOUNT": {
+            "FIELD": "Descuento",
+            "ADD": "Con descuento"
+          }
         },
         "DATE": {
           "FIELD": "Elegí una fecha",
@@ -819,6 +842,16 @@
           "ERROR": "El cliente ya tiene una reserva el {{date}}"
         },
         "NO_CONTENT": "No hay disponibilidad el <span class='bold'>{{date}}</span>"
+      }
+    },
+    "SEARCH": {
+      "CUSTOMER": {
+        "FIELD": "Buscar por cliente",
+        "PLACEHOLDER": "Cliente"
+      },
+      "STATES": {
+        "FIELD": "Buscar por estados",
+        "PLACEHOLDER": "Estado"
       }
     }
   },
@@ -894,6 +927,83 @@
     },
     "UPDATED": {
       "MESSAGE": "No disponible {{date}} actualizado"
+    }
+  },
+  "REFERRAL": {
+    "TITLE": "Referidos",
+    "MESSAGE": "Referí Cleos a tus amigos y obtené increíbles descuentos",
+    "DETAIL": "Obtendrás descuentos una vez que tu amigo cree una cuenta con tu código y asista a una cita",
+    "COPY": "Code copied",
+    "LINK": "Crea tu cuenta en Cleos. ¡Te la recomiendo! \uD83D\uDE0D\n\nSi usas mi código {{code}} o entrás acá {{url}}, ahorrá en un tu primer reserva. ¡Aprovechá!",
+    "INVITE": {
+      "TITLE": "Invitaciones",
+      "SEND": "Recibieron tu invitación",
+      "USED": "Asistieron a una cita"
+    }
+  },
+  "DISCOUNT": {
+    "LIST": {
+      "COLUMN": {
+        "NAME": "Nombre",
+        "DESCRIPTION": "Descripción",
+        "TYPE": "Tipo",
+        "AMOUNT": "Monto",
+        "USED": "Utilizado"
+      },
+      "DIALOG": {
+        "CUSTOMER": "Clientes"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No hay descuentos"
+      }
+    },
+    "ADD": {
+      "TITLE": "Agregar descuento",
+      "NAME": {
+        "FIELD": "Nombre",
+        "REQUIRED": "Nombre es <b>requerido</b>"
+      },
+      "DESCRIPTION": {
+        "FIELD": "Descripción"
+      },
+      "AMOUNT": {
+        "FIELD": "Monto",
+        "REQUIRED": "Monto es <b>requerido</b>",
+        "GREATER": "Monto debe ser mayor a 1"
+      },
+      "TYPE": {
+        "FIELD": "Tipo",
+        "REQUIRED": "Tipo es <b>requerido</b>"
+      },
+      "SEND": "Descuento {{name}} enviado",
+      "CREATED": "Descuento {{name}} creado"
+    },
+    "DETAIL": {
+      "TITLE": "Actualizar descuento",
+      "NAME": {
+        "FIELD": "Nombre",
+        "REQUIRED": "Nombre es <b>requerido</b>"
+      },
+      "DESCRIPTION": {
+        "FIELD": "Descripción"
+      },
+      "PRICE": {
+        "FIELD": "Monto",
+        "REQUIRED": "Monto es <b>requerido</b>",
+        "GREATER": "Monto debe ser mayor a 1"
+      },
+      "TYPE": {
+        "FIELD": "Tipo",
+        "REQUIRED": "Tipo es <b>requerido</b>"
+      }
+    },
+    "DELETED": {
+      "TITLE": "Eliminar descuento",
+      "CONTENT": "¿Está seguro de eliminar el descuento {{name}}?",
+      "MESSAGE": "Descuento {{name}} eliminado"
+    },
+    "UPDATED": {
+      "MESSAGE": "Descuento {{name}} actualizado"
     }
   },
   "APP": {

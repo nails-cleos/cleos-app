@@ -18,7 +18,14 @@
       "EDIT": "Edit",
       "DELETE": "Delete",
       "INVITE": "Send invite",
-      "CLOSE": "Close"
+      "CLOSE": "Close",
+      "COPY": "Copy",
+      "SHARE": "Share",
+      "DISCOUNT": {
+        "SHOW": "Show discounts",
+        "HIDE": "Hide discounts",
+        "SEND": "Send discount"
+      }
     },
     "COLUMN": {
       "ACTIONS": "Actions"
@@ -53,6 +60,10 @@
       "FIELD": "Address",
       "INVALID": "Address is invalid",
       "DESCRIPTION": "Description"
+    },
+    "DISCOUNT": {
+      "MONEY": "Money",
+      "PERCENTAGE": "Percentage"
     },
     "ERROR": {
       "NO_CONTENT": "No content"
@@ -230,6 +241,9 @@
       "LANG": {
         "FIELD": "Language",
         "REQUIRED": "Language is <b>required</b>"
+      },
+      "CODE": {
+        "FIELD": "Referral code"
       },
       "CUSTOMER": "Customer {{username}} created",
       "PROFESSIONAL": "Professional {{username}} created"
@@ -792,9 +806,13 @@
           "INVALID": "Product is invalid",
           "DETAIL": "Detail",
           "DESCRIPTION": "<span class='bold'>Description:</span> {{description}}",
-          "PRICE": "<span class='bold'>Price:</span> $ {{price}}",
+          "PRICE": "<span class='bold'>Price:</span>",
           "DURATION": "<span class='bold'>Duration:</span> {{duration}}",
-          "DURABILITY": "<span class='bold'>Durability:</span> {{durability}}"
+          "DURABILITY": "<span class='bold'>Durability:</span> {{durability}}",
+          "DISCOUNT": {
+            "FIELD": "Discount",
+            "ADD": "With discount"
+          }
         },
         "DATE": {
           "FIELD": "Pick a date",
@@ -824,6 +842,16 @@
           "ERROR": "Customer already has a reservation on {{date}}"
         },
         "NO_CONTENT": "No availability on <span class='bold'>{{date}}</span>"
+      }
+    },
+    "SEARCH": {
+      "CUSTOMER": {
+        "FIELD": "Find by customer",
+        "PLACEHOLDER": "Customer"
+      },
+      "STATES": {
+        "FIELD": "Find by states",
+        "PLACEHOLDER": "State"
       }
     }
   },
@@ -899,6 +927,83 @@
     },
     "UPDATED": {
       "MESSAGE": "Unavailable {{date}} updated"
+    }
+  },
+  "REFERRAL": {
+    "TITLE": "Referrals",
+    "MESSAGE": "Referral Cleos to your friends and get incredible discounts",
+    "DETAIL": "You will get discounts once your friend creates an account with your code and attends an appointment",
+    "COPY": "Code copied",
+    "LINK": "Create your Cleos account. I recommend it! \uD83D\uDE0D\n\nIf you use my code {{code}} or enter here {{url}}, save on your first reservation. Take advantage of!",
+    "INVITE": {
+      "TITLE": "Invites",
+      "SEND": "Received your invitation",
+      "USED": "Attended to an appointment"
+    }
+  },
+  "DISCOUNT": {
+    "LIST": {
+      "COLUMN": {
+        "NAME": "Name",
+        "DESCRIPTION": "Description",
+        "TYPE": "Type",
+        "AMOUNT": "Amount",
+        "USED": "Used"
+      },
+      "DIALOG": {
+        "CUSTOMER": "Customers"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No discounts"
+      }
+    },
+    "ADD": {
+      "TITLE": "Add discount",
+      "NAME": {
+        "FIELD": "Name",
+        "REQUIRED": "Name is <b>required</b>"
+      },
+      "DESCRIPTION": {
+        "FIELD": "Description"
+      },
+      "AMOUNT": {
+        "FIELD": "Amount",
+        "REQUIRED": "Amount is <b>required</b>",
+        "GREATER": "Amount must be greater than 1"
+      },
+      "TYPE": {
+        "FIELD": "Type",
+        "REQUIRED": "Type is <b>required</b>"
+      },
+      "SEND": "Discount {{name}} send it",
+      "CREATED": "Discount {{name}} created"
+    },
+    "DETAIL": {
+      "TITLE": "Update discount",
+      "NAME": {
+        "FIELD": "Name",
+        "REQUIRED": "Name is <b>required</b>"
+      },
+      "DESCRIPTION": {
+        "FIELD": "Description"
+      },
+      "AMOUNT": {
+        "FIELD": "Amount",
+        "REQUIRED": "Amount is <b>required</b>",
+        "GREATER": "Amount must be greater than 1"
+      },
+      "TYPE": {
+        "FIELD": "Type",
+        "REQUIRED": "Type is <b>required</b>"
+      }
+    },
+    "DELETED": {
+      "TITLE": "Delete discount",
+      "CONTENT": "Are you sure to delete discount {{name}}?",
+      "MESSAGE": "Discount {{name}} deleted"
+    },
+    "UPDATED": {
+      "MESSAGE": "Discount {{name}} updated"
     }
   },
   "APP": {

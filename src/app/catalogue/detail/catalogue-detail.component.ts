@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { ICatalogue, Catalogue, ICatalogueAll } from '../../interfaces/catalogue';
+import { Catalogue, ICatalogue } from '../../interfaces/catalogue';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
@@ -9,8 +9,6 @@ import { AppState, selectCatalogueState } from '../../store/app.states';
 import { fieldChange } from '../../util/validators';
 import * as fromActionsCatalogue from '../../store/catalogue.actions';
 import { formatBytes } from '../../util/file';
-import { DialogComponent } from '../../dialog/dialog.component';
-import * as fromActionsProduct from '../../store/product.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 

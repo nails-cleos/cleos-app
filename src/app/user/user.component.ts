@@ -20,7 +20,7 @@ export class UserComponent implements OnInit, OnDestroy {
   form!: FormGroup;
   subscription: Subscription | undefined;
   getState: Observable<any>;
-  isLoading: boolean | undefined;
+  isLoading = false;
   errors: any = [];
 
   role: FormControl = new FormControl('', [
@@ -102,6 +102,7 @@ export class UserComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
+      this.isLoading = state.isLoading;
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;

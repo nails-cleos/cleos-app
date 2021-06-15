@@ -14,6 +14,8 @@ import { DialogComponent } from '../../dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Role } from '../../interfaces/token';
+import { getPriceDiscount } from '../../util/helper';
+import { transitionAnimation } from '../../interfaces/discount';
 
 export enum ReservationIconName {
   created = 'assignment',
@@ -27,6 +29,7 @@ export enum ReservationIconName {
 
 @Component({
   selector: 'app-reservation-detail',
+  animations: [transitionAnimation],
   templateUrl: './reservation-detail.component.html',
   styleUrls: ['./reservation-detail.component.scss']
 })
@@ -52,6 +55,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   dataSource: any;
   pageSize = 5;
   user: IUserAll | undefined;
+
+  priceDiscount: number | undefined;
 
   public paginator: MatPaginator | undefined;
 
@@ -157,6 +162,9 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         } else if (this.customerId && this.customerId === this.reservation?.customer.id) {
           this.customerMachine(this);
           this.changeState = this.machine.next(this.reservation.state.toLowerCase());
+        }
+        if (this.reservation && this.reservation.product) {
+          this.priceDiscount = getPriceDiscount(this.reservation.product.discount, this.reservation.product.price);
         }
         this.dataSource = new MatTableDataSource<IReservationAll>(state.selected.history);
         this.cdRef.detectChanges();

@@ -4,7 +4,7 @@ export enum ReservationActionTypes {
   getAll = '[Reservation] Get all',
   getAllPage = '[Reservation] Get all page',
   getCustomerReservations = '[Reservation] Get customer reservations',
-  getAllAssignmentPage = '[Reservation] Get all page assignment',
+  getAllFilterPage = '[Reservation] Get all filter page',
   getAllGroupingByRoom = '[Reservation] Get all grouping by room',
   searchReservation = '[Reservation] Search reservation',
   customerSearchReservation = '[Reservation] Customer search reservation',
@@ -14,6 +14,7 @@ export enum ReservationActionTypes {
   getUpcomingReservation = '[Reservation] Get upcoming reservation',
   reservationSuccess = '[Reservation] Success',
   reservationPageSuccess = '[Reservation] Page Success',
+  reservationFilterPageSuccess = '[Reservation] Filter Page Success',
   customersSuccess = '[Reservation] Customers success',
   reservationProductsSuccess = '[Reservation] Products success',
   reservationRoomsSuccess = '[Reservation] Rooms success',
@@ -52,8 +53,8 @@ export class GetCustomerReservations implements Action {
   }
 }
 
-export class GetAllAssignmentPage implements Action {
-  readonly type = ReservationActionTypes.getAllAssignmentPage;
+export class GetAllFilterPage implements Action {
+  readonly type = ReservationActionTypes.getAllFilterPage;
 
   constructor(public payload: any) {
   }
@@ -83,6 +84,9 @@ export class GetAllCustomers implements Action {
 
 export class GetAllProducts implements Action {
   readonly type = ReservationActionTypes.getProducts;
+
+  constructor(public payload?: any) {
+  }
 }
 
 export class GetAllRooms implements Action {
@@ -102,6 +106,13 @@ export class ReservationSuccess implements Action {
 
 export class ReservationPageSuccess implements Action {
   readonly type = ReservationActionTypes.reservationPageSuccess;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class ReservationFilterPageSuccess implements Action {
+  readonly type = ReservationActionTypes.reservationFilterPageSuccess;
 
   constructor(public payload: any) {
   }
@@ -234,7 +245,7 @@ export type All =
   | GetAll
   | GetAllPage
   | GetCustomerReservations
-  | GetAllAssignmentPage
+  | GetAllFilterPage
   | GetAllGroupingByRoom
   | SearchReservation
   | CustomerSearchReservation
@@ -245,6 +256,7 @@ export type All =
   | ReservationSave
   | ReservationSuccess
   | ReservationPageSuccess
+  | ReservationFilterPageSuccess
   | CustomersSuccess
   | ReservationProductsSuccess
   | ReservationRoomsSuccess

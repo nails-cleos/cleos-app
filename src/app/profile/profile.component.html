@@ -8,7 +8,7 @@
           <ng-template #skeleton>
             <div class="ssc-line"></div>
           </ng-template>
-          <div *ngIf="user; else circle" [ngStyle]="{'background-color':  '#673AB7' }" class="circle" mat-card-avatar>
+          <div *ngIf="user; else circle" [ngStyle]="{'background-color':  '#a06c3f' }" class="circle" mat-card-avatar>
             <img *ngIf="!showInitials; else showInitialsBlock" alt="profile" src="{{user?.imageUrl}}">
             <ng-template #showInitialsBlock>
               <div class="initials">{{ initials | uppercase }}</div>

@@ -3,7 +3,7 @@
     <mat-form-field *ngIf="rooms; else skeleton" appearance="fill">
       <mat-label>{{ 'RESERVATION.CUSTOMER.ADD.ROOM.FIELD' | translate }}</mat-label>
       <label>
-        <input [formControl]="room" (keydown)="keyDownHandler($event, room)" [matAutocomplete]="autoRoom" matInput
+        <input (keydown)="keyDownHandler($event, room)" [formControl]="room" [matAutocomplete]="autoRoom" matInput
                required type="text">
       </label>
       <mat-autocomplete #autoRoom="matAutocomplete" [displayWith]="displayFnRoom">
@@ -29,7 +29,7 @@
 
 <ng-template #stepTwo>
   <form [formGroup]="productForm">
-    <div class="no-content bold" *ngIf="!products?.length; else data">
+    <div *ngIf="!products?.length; else data" class="no-content bold">
       {{'PRODUCT.LIST.ERROR.NO_CONTENT' | translate}}
     </div>
     <ng-template #data>
@@ -47,47 +47,72 @@
                      [innerHTML]="'RESERVATION.CUSTOMER.ADD.DATE.REQUIRED' | translate">
           </mat-error>
         </mat-form-field>
-        <mat-form-field *ngIf="products; else skeleton" appearance="fill">
-          <mat-label>{{ 'RESERVATION.CUSTOMER.ADD.PRODUCT.FIELD' | translate }}</mat-label>
-          <label>
-            <input [formControl]="product" (keydown)="keyDownHandler($event, product)" [matAutocomplete]="autoProduct"
-                   matInput required type="text">
-          </label>
-          <mat-autocomplete #autoProduct="matAutocomplete" [displayWith]="displayFnProduct">
-            <mat-option *ngFor="let product of filteredProduct | async" [value]="product">
-              {{product.name}}
-            </mat-option>
-          </mat-autocomplete>
-          <mat-icon matSuffix>home_repair_service</mat-icon>
+        <div>
+          <mat-form-field *ngIf="products; else skeleton" appearance="fill">
+            <mat-label>{{ 'RESERVATION.CUSTOMER.ADD.PRODUCT.FIELD' | translate }}</mat-label>
+            <label>
+              <input (keydown)="keyDownHandler($event, product)" [formControl]="product" [matAutocomplete]="autoProduct"
+                     matInput required type="text">
+            </label>
+            <mat-autocomplete #autoProduct="matAutocomplete" [displayWith]="displayFnProduct">
+              <mat-option *ngFor="let product of filteredProduct | async" [value]="product">
+                {{product.name}}
+              </mat-option>
+            </mat-autocomplete>
+            <mat-icon matSuffix>home_repair_service</mat-icon>
 
-          <mat-error *ngIf="product.hasError('required')"
-                     [innerHTML]="'RESERVATION.CUSTOMER.ADD.PRODUCT.REQUIRED' | translate">
-          </mat-error>
-          <mat-error *ngIf="product.hasError('requireMatch')"
-                     [innerHTML]="'RESERVATION.CUSTOMER.ADD.PRODUCT.INVALID' | translate">
-          </mat-error>
-          <mat-error *ngIf="errors['product']">
-            {{errors['product']}}
-          </mat-error>
+            <mat-error *ngIf="product.hasError('required')"
+                       [innerHTML]="'RESERVATION.CUSTOMER.ADD.PRODUCT.REQUIRED' | translate">
+            </mat-error>
+            <mat-error *ngIf="product.hasError('requireMatch')"
+                       [innerHTML]="'RESERVATION.CUSTOMER.ADD.PRODUCT.INVALID' | translate">
+            </mat-error>
+            <mat-error *ngIf="errors['product']">
+              {{errors['product']}}
+            </mat-error>
+          </mat-form-field>
+          <button (click)="showDiscount = !showDiscount" *ngIf="product.value && !isEditing && discounts?.length"
+                  class="raised-button" mat-raised-button type="button">
+            {{ 'COMMON.BUTTON.DISCOUNT.' + (showDiscount ? 'HIDE' : 'SHOW') | translate }}
+            <mat-icon>redeem</mat-icon>
+          </button>
+        </div>
+        <mat-form-field *ngIf="showDiscount && !isEditing" appearance="fill">
+          <mat-label>{{ 'RESERVATION.CUSTOMER.ADD.PRODUCT.DISCOUNT.FIELD' | translate }}n</mat-label>
+          <mat-select *ngFor="let cd of discounts" [formControl]="discount">
+            <mat-option>--</mat-option>
+            <mat-option [value]="cd.id">{{cd.title}}</mat-option>
+          </mat-select>
         </mat-form-field>
         <mat-list-item *ngIf="product.value">
           <mat-icon mat-list-icon>home_repair_service</mat-icon>
-          <div mat-subheader class="bold">{{ 'RESERVATION.CUSTOMER.ADD.PRODUCT.DETAIL' | translate}}</div>
+          <div class="bold" mat-subheader>{{ 'RESERVATION.CUSTOMER.ADD.PRODUCT.DETAIL' | translate}}</div>
           <mat-divider></mat-divider>
         </mat-list-item>
         <mat-list-item *ngIf="product.value">
-          <div *ngIf="product.value.description" mat-line
-               [innerHTML]="'RESERVATION.CUSTOMER.ADD.PRODUCT.DESCRIPTION' |
-                  translate: {description: product.value.description}">
+          <div *ngIf="product.value.description" [innerHTML]="'RESERVATION.CUSTOMER.ADD.PRODUCT.DESCRIPTION' |
+                  translate: {description: product.value.description}"
+               mat-line>
           </div>
-          <div mat-line [innerHTML]="'RESERVATION.CUSTOMER.ADD.PRODUCT.PRICE' |
-                  translate: {price: product.value.price | number:'1.2-2'}">
+          <div *ngIf="!isEditing; else editing" mat-line>
+            <span [innerHTML]="'RESERVATION.CUSTOMER.ADD.PRODUCT.PRICE' | translate"></span>
+            <span [class.strikethrough]="discount.value"
+                  class="raised-button">$ {{product.value.price | number:'1.2-2'}}</span>
+            <span *ngIf="priceDiscount" [@discountAnimation]
+                  class="raised-button bold">$ {{priceDiscount | number:'1.2-2'}}</span>
           </div>
-          <div mat-line [innerHTML]="'RESERVATION.CUSTOMER.ADD.PRODUCT.DURATION' |
-                  translate: {duration: durationTime}">
+          <ng-template #editing>
+            <span [innerHTML]="'RESERVATION.CUSTOMER.ADD.PRODUCT.PRICE' | translate"></span>
+            <span
+              class="raised-button">$ {{(priceDiscount ? priceDiscount : product.value.price) | number:'1.2-2'}}</span>
+            <span *ngIf="priceDiscount"
+                  class="raised-button bold">{{'RESERVATION.CUSTOMER.ADD.PRODUCT.DISCOUNT.ADD' | translate}}</span>
+          </ng-template>
+          <div [innerHTML]="'RESERVATION.CUSTOMER.ADD.PRODUCT.DURATION' |
+                  translate: {duration: durationTime}" mat-line>
           </div>
-          <div mat-line *ngIf="product.value.durability" [innerHTML]="'RESERVATION.CUSTOMER.ADD.PRODUCT.DURABILITY' |
-                  translate: {durability: product.value.durability}">
+          <div *ngIf="product.value.durability" [innerHTML]="'RESERVATION.CUSTOMER.ADD.PRODUCT.DURABILITY' |
+                  translate: {durability: product.value.durability}" mat-line>
           </div>
         </mat-list-item>
         <ng-template #skeleton>
@@ -100,14 +125,15 @@
 
 <ng-template #stepThree>
   <div *ngIf="!isLoading; else box">
-    <mat-tab-group *ngIf="availableList.size; else empty" mat-align-tabs="center" [selectedIndex]="selectedIndex"
-                   backgroundColor="accent" color="primary">
+    <mat-tab-group *ngIf="availableList.size; else empty" [selectedIndex]="selectedIndex" backgroundColor="accent"
+                   color="primary" mat-align-tabs="center">
       <mat-tab *ngFor="let available of availableList | keyvalue: sortDate" [label]="available.key">
         <section>
           <div class="button-row">
-            <button mat-raised-button class="large" (click)="selectDate(datetime)"
+            <button (click)="selectDate(datetime)" *ngFor="let datetime of sortTime(available.value)"
                     [color]="eventSelected === datetime.date && time === datetime.time ? 'accent' : 'primary'"
-                    *ngFor="let datetime of sortTime(available.value)">
+                    class="large"
+                    mat-raised-button>
               {{datetime.time}}
             </button>
           </div>
@@ -139,34 +165,32 @@
         <mat-list-item>
           <mat-icon mat-list-icon>store</mat-icon>
           <div mat-line>{{ 'RESERVATION.CUSTOMER.ADD.PREVIEW.ROOM.NAME' | translate}}</div>
-          <div [matTooltip]="room.value.name" mat-line matTooltipPosition="left">{{room.value.name}}</div>
+          <div mat-line>{{room.value.name}}</div>
         </mat-list-item>
         <mat-list-item>
           <mat-icon mat-list-icon>person_pin</mat-icon>
           <div mat-line>{{ 'RESERVATION.CUSTOMER.ADD.PREVIEW.ROOM.PROFESSIONAL' | translate}}</div>
-          <div mat-line matTooltip="{{room.value.professional.firstName}} {{room.value.professional.lastName}}"
-               matTooltipPosition="left">
+          <div mat-line>
             {{room.value.professional.firstName}} {{room.value.professional.lastName}}
           </div>
         </mat-list-item>
         <mat-list-item>
           <mat-icon mat-list-icon>room</mat-icon>
           <div mat-line>{{ 'RESERVATION.CUSTOMER.DETAIL.ROOM.ADDRESS' | translate}}</div>
-          <div mat-line [matTooltip]="room.value.address.name" matTooltipPosition="left">
-            <a target="_blank"
-               [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + room.value.address.name">
+          <div mat-line>
+            <a [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + room.value.address.name"
+               target="_blank">
               {{room.value.address.name}}
             </a>
           </div>
-          <div [matTooltip]="room.value.address.description" mat-line
-               matTooltipPosition="left">{{room.value.address.description}}</div>
+          <div mat-line>{{room.value.address.description}}</div>
         </mat-list-item>
         <mat-divider></mat-divider>
         <div mat-subheader>{{ 'RESERVATION.CUSTOMER.ADD.PREVIEW.PRODUCT.TITLE' | translate}}</div>
         <mat-list-item>
           <mat-icon mat-list-icon>home_repair_service</mat-icon>
           <div mat-line>{{ 'RESERVATION.CUSTOMER.ADD.PREVIEW.PRODUCT.NAME' | translate}}</div>
-          <div [matTooltip]="product.value.name" mat-line>{{product.value.name}}</div>
+          <div mat-line>{{product.value.name}}</div>
         </mat-list-item>
         <mat-list-item>
           <mat-icon mat-list-icon>timer</mat-icon>
@@ -176,7 +200,19 @@
         <mat-list-item>
           <mat-icon mat-list-icon>attach_money</mat-icon>
           <div mat-line>{{ 'RESERVATION.CUSTOMER.ADD.PREVIEW.PRODUCT.PRICE' | translate}}</div>
-          <div mat-line>{{product.value.price | number:'1.2-2'}}</div>
+          <div *ngIf="!isEditing; else editing" mat-line>
+            <span [class.strikethrough]="discount.value">{{product.value.price | number:'1.2-2'}}</span>
+            <span *ngIf="priceDiscount" [@discountAnimation]
+                  class="raised-button bold">{{priceDiscount | number:'1.2-2'}}</span>
+          </div>
+          <ng-template #editing>
+            <div mat-line>
+              <span>{{(priceDiscount ? priceDiscount : product.value.price) | number:'1.2-2'}}</span>
+              <span *ngIf="priceDiscount" class="raised-button bold">
+                {{'RESERVATION.CUSTOMER.ADD.PRODUCT.DISCOUNT.ADD' | translate}}
+              </span>
+            </div>
+          </ng-template>
         </mat-list-item>
         <mat-divider></mat-divider>
         <div mat-subheader>{{ 'RESERVATION.CUSTOMER.ADD.PREVIEW.APPOINTMENT' | translate}}</div>
@@ -195,40 +231,40 @@
 <ng-template [ngIfElse]="bigScreen" [ngIf]="smallScreen">
   <div *ngIf="canCreate; else cannotCreate">
     <mat-vertical-stepper #stepper *ngIf="!error; else errorBox" [linear]="true">
-      <mat-step [stepControl]="roomForm" state="room" [editable]="!isEditing">
+      <mat-step [editable]="!isEditing" [stepControl]="roomForm" state="room">
+        <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.ADD.ROOM.FIELD' | translate }}</ng-template>
         <div *ngIf="!isEditing; else editing">
-          <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.ADD.ROOM.FIELD' | translate }}</ng-template>
           <div class="flex-container full" fxLayout="column">
-            <div fxLayout="column" fxLayoutAlign="space-between start" class="full">
+            <div class="full" fxLayout="column" fxLayoutAlign="space-between start">
               <ng-container *ngTemplateOutlet="stepOne"></ng-container>
               <mat-list-item *ngIf="room.value && room.value.address">
                 <mat-icon mat-list-icon>room</mat-icon>
-                <div mat-subheader class="bold">{{ 'RESERVATION.CUSTOMER.ADD.ROOM.DETAIL' | translate}}</div>
+                <div class="bold" mat-subheader>{{ 'RESERVATION.CUSTOMER.ADD.ROOM.DETAIL' | translate}}</div>
                 <mat-divider></mat-divider>
               </mat-list-item>
               <mat-list-item *ngIf="room.value && room.value.address && room.value.professional">
-                <div mat-line [innerHTML]="'RESERVATION.CUSTOMER.ADD.ROOM.PROFESSIONAL.NAME' |
-                  translate: {name: profesionalName}">
+                <div [innerHTML]="'RESERVATION.CUSTOMER.ADD.ROOM.PROFESSIONAL.NAME' |
+                  translate: {name: profesionalName}" mat-line>
                 </div>
-                <div mat-line [innerHTML]="'RESERVATION.CUSTOMER.ADD.ROOM.ADDRESS.NAME' |
-                  translate: {name: room.value.address.name}">
+                <div [innerHTML]="'RESERVATION.CUSTOMER.ADD.ROOM.ADDRESS.NAME' |
+                  translate: {name: room.value.address.name}" mat-line>
                 </div>
-                <div *ngIf="room.value.address.description" mat-line
-                     [innerHTML]="'RESERVATION.CUSTOMER.ADD.ROOM.ADDRESS.DESCRIPTION' |
-                  translate: {description: room.value.address.description}">
+                <div *ngIf="room.value.address.description" [innerHTML]="'RESERVATION.CUSTOMER.ADD.ROOM.ADDRESS.DESCRIPTION' |
+                  translate: {description: room.value.address.description}"
+                     mat-line>
                 </div>
-                <div mat-line *ngIf="distance" [innerHTML]="distance"></div>
+                <div *ngIf="distance" [innerHTML]="distance" mat-line></div>
               </mat-list-item>
             </div>
             <div class="vertical-divider"></div>
             <div *ngIf="room.value && room.value.address && room.value.address.location" class="full">
-              <app-google-map [showDistance]="true" [latitudeMarker]="room.value.address.location.y"
+              <app-google-map (distanceEmitter)="setDistance($event)" [latitudeMarker]="room.value.address.location.y"
                               [longitudeMarker]="room.value.address.location.x"
-                              (distanceEmitter)="setDistance($event)"></app-google-map>
+                              [showDistance]="true"></app-google-map>
             </div>
           </div>
           <div>
-            <button appBackButton [disabled]="isEditing" mat-icon-button>
+            <button [disabled]="isEditing" appBackButton mat-icon-button>
               <mat-icon>keyboard_return</mat-icon>
             </button>
             <button (click)="getProducts()" [disabled]="roomForm.invalid" color="primary" mat-icon-button type="button">
@@ -246,11 +282,11 @@
         <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.ADD.PRODUCT.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
         <div>
-          <button appBackButton *ngIf="isEditing; else noEdit" type="button" mat-icon-button>
+          <button *ngIf="isEditing; else noEdit" appBackButton mat-icon-button type="button">
             <mat-icon>keyboard_return</mat-icon>
           </button>
           <ng-template #noEdit>
-            <button (click)="goBack()" [disabled]="isEditing" type="button" mat-icon-button>
+            <button (click)="goBack()" [disabled]="isEditing" mat-icon-button type="button">
               <mat-icon>arrow_upward</mat-icon>
             </button>
           </ng-template>
@@ -273,8 +309,8 @@
         </div>
       </mat-step>
       <mat-step state="preview">
+        <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.ADD.PREVIEW.TITLE' | translate }}</ng-template>
         <div *ngIf="!isLoading; else box">
-          <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.ADD.PREVIEW.TITLE' | translate }}</ng-template>
           <ng-container *ngTemplateOutlet="stepFour"></ng-container>
           <div>
             <button (click)="goBack()" mat-button>
@@ -299,46 +335,47 @@
 <ng-template #bigScreen>
   <div *ngIf="canCreate; else cannotCreate">
     <mat-horizontal-stepper #stepper *ngIf="!error; else errorBox" [linear]="true">
-      <mat-step [stepControl]="roomForm" state="room" [editable]="!isEditing">
+      <mat-step [editable]="!isEditing" [stepControl]="roomForm" state="room">
         <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.ADD.ROOM.FIELD' | translate }}</ng-template>
         <div *ngIf="!isEditing; else editing">
           <div class="flex-container" fxLayout="row">
-            <div fxLayout="row" fxLayoutAlign="space-between start" class="full">
-              <div fxLayout="column" class="middle">
+            <div class="full" fxLayout="row" fxLayoutAlign="space-between start">
+              <div class="middle" fxLayout="column">
                 <ng-container *ngTemplateOutlet="stepOne"></ng-container>
                 <mat-list-item *ngIf="room.value && room.value.address">
                   <mat-icon mat-list-icon>room</mat-icon>
-                  <div mat-subheader class="bold">{{ 'RESERVATION.CUSTOMER.ADD.ROOM.DETAIL' | translate}}</div>
+                  <div class="bold" mat-subheader>{{ 'RESERVATION.CUSTOMER.ADD.ROOM.DETAIL' | translate}}</div>
                   <mat-divider></mat-divider>
                 </mat-list-item>
                 <mat-list-item *ngIf="room.value && room.value.address && room.value.professional">
-                  <div mat-line [innerHTML]="'RESERVATION.CUSTOMER.ADD.ROOM.PROFESSIONAL.NAME' |
-                  translate: {name: profesionalName}">
+                  <div [innerHTML]="'RESERVATION.CUSTOMER.ADD.ROOM.PROFESSIONAL.NAME' |
+                  translate: {name: profesionalName}" mat-line>
                   </div>
-                  <div mat-line [innerHTML]="'RESERVATION.CUSTOMER.ADD.ROOM.ADDRESS.NAME' |
-                  translate: {name: room.value.address.name}">
+                  <div [innerHTML]="'RESERVATION.CUSTOMER.ADD.ROOM.ADDRESS.NAME' |
+                  translate: {name: room.value.address.name}" mat-line>
                   </div>
-                  <div *ngIf="room.value.address.description" mat-line
-                       [innerHTML]="'RESERVATION.CUSTOMER.ADD.ROOM.ADDRESS.DESCRIPTION' |
-                  translate: {description: room.value.address.description}">
+                  <div *ngIf="room.value.address.description" [innerHTML]="'RESERVATION.CUSTOMER.ADD.ROOM.ADDRESS.DESCRIPTION' |
+                  translate: {description: room.value.address.description}"
+                       mat-line>
                   </div>
-                  <div mat-line *ngIf="distance" [innerHTML]="distance"></div>
+                  <div *ngIf="distance" [innerHTML]="distance" mat-line></div>
                 </mat-list-item>
               </div>
               <div class="vertical-divider"></div>
               <div *ngIf="room.value && room.value.address && room.value.address.location" class="middle">
-                <app-google-map [showDistance]="true" (distanceEmitter)="setDistance($event)"
-                                [latitudeMarker]="room.value.address.location.y"
-                                [longitudeMarker]="room.value.address.location.x"></app-google-map>
+                <app-google-map (distanceEmitter)="setDistance($event)" [latitudeMarker]="room.value.address.location.y"
+                                [longitudeMarker]="room.value.address.location.x"
+                                [showDistance]="true"></app-google-map>
               </div>
             </div>
           </div>
           <div class="divider">
-            <button appBackButton [disabled]="isEditing" mat-raised-button>
+            <button [disabled]="isEditing" appBackButton mat-raised-button>
               <mat-icon>keyboard_return</mat-icon>
               {{ 'COMMON.BUTTON.BACK' | translate }}</button>
-            <button (click)="getProducts()" [disabled]="roomForm.invalid" color="primary" mat-raised-button type="button"
-                    class="raised-button">
+            <button (click)="getProducts()" [disabled]="roomForm.invalid" class="raised-button" color="primary"
+                    mat-raised-button
+                    type="button">
               {{ 'COMMON.BUTTON.NEXT' | translate }}
               <mat-icon>arrow_forward</mat-icon>
             </button>
@@ -354,16 +391,16 @@
         <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.ADD.PRODUCT.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
         <div class="divider">
-          <button appBackButton *ngIf="isEditing; else noEdit" type="button" mat-raised-button>
+          <button *ngIf="isEditing; else noEdit" appBackButton mat-raised-button type="button">
             <mat-icon>keyboard_return</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}</button>
           <ng-template #noEdit>
-            <button (click)="goBack()" [disabled]="isEditing" type="button" mat-raised-button>
+            <button (click)="goBack()" [disabled]="isEditing" mat-raised-button type="button">
               <mat-icon>arrow_back</mat-icon>
               {{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </ng-template>
-          <button (click)="searchAvailability()" [disabled]="productForm.invalid" color="primary" mat-raised-button
-                  type="button" class="raised-button">
+          <button (click)="searchAvailability()" [disabled]="productForm.invalid" class="raised-button" color="primary"
+                  mat-raised-button type="button">
             {{ 'COMMON.BUTTON.NEXT' | translate }}
             <mat-icon>arrow_forward</mat-icon>
           </button>
@@ -376,22 +413,22 @@
           <button (click)="goBack()" mat-raised-button type="button">
             <mat-icon>arrow_back</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}</button>
-          <button (click)="preview()" [disabled]="!eventSelected" color="primary" mat-raised-button
-                  type="button" class="raised-button">
+          <button (click)="preview()" [disabled]="!eventSelected" class="raised-button" color="primary"
+                  mat-raised-button type="button">
             {{ 'COMMON.BUTTON.NEXT' | translate }}
             <mat-icon>arrow_forward</mat-icon>
           </button>
         </div>
       </mat-step>
       <mat-step state="preview">
+        <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.ADD.PREVIEW.TITLE' | translate }}</ng-template>
         <div *ngIf="!isLoading; else box">
-          <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.ADD.PREVIEW.TITLE' | translate }}</ng-template>
           <ng-container *ngTemplateOutlet="stepFour"></ng-container>
           <div class="divider">
             <button (click)="goBack()" mat-raised-button>
               <mat-icon>arrow_back</mat-icon>
               {{ 'COMMON.BUTTON.BACK' | translate }}</button>
-            <button (click)="create()" color="primary" mat-raised-button type="button" class="raised-button">
+            <button (click)="create()" class="raised-button" color="primary" mat-raised-button type="button">
               {{ 'COMMON.BUTTON.BOOK' | translate }}
               <mat-icon>event_available</mat-icon>
             </button>

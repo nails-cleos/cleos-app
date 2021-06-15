@@ -20,9 +20,11 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ReservationIconName } from '../detail/reservation-detail.component';
 import * as fromActionsReservation from '../../store/reservation.actions';
 import { convertDuration, createNewDate, newDate } from '../../util/dates';
+import { DiscountType, transitionAnimation } from '../../interfaces/discount';
 
 @Component({
   selector: 'app-reservations',
+  animations: [transitionAnimation],
   templateUrl: './reservations.component.html',
   styleUrls: ['./reservations.component.scss']
 })
@@ -44,6 +46,8 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
 
   language: string;
   error: any;
+
+  priceDiscount: number | undefined;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private router: Router,
               private store: Store<AppState>, private breakpointObserver: BreakpointObserver,
@@ -115,6 +119,21 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
           const duration = convertDuration(this.upcoming.product.duration);
           this.end = newDate(this.upcoming.start);
           this.end = createNewDate(this.end, this.end.getHours() + duration.hour, this.end.getMinutes() + duration.minute);
+          if (this.upcoming.product.discount && this.upcoming.product.discount.amount) {
+            let discount;
+            switch (this.upcoming.product.discount.type) {
+              case DiscountType.money: {
+                discount = this.upcoming.product.discount.amount;
+                break;
+              }
+              case DiscountType.percentage: {
+                discount = (this.upcoming.product.price / this.upcoming.product.discount.amount);
+              }
+            }
+            if (discount) {
+              this.priceDiscount = this.upcoming.product.price - discount;
+            }
+          }
         }
       }
     });

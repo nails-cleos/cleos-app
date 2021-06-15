@@ -1,5 +1,6 @@
 export const environment = {
   production: false,
+  appServer: 'http://localhost:5000',
   title: 'Cleos PWA',
   baseUrl: 'http://localhost:8080/api',
   googleClientId: '57757755712-1gcjdgbd0lkj4msirrmra9aglcb0vbmk.apps.googleusercontent.com',

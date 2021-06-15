@@ -46,8 +46,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case RoomActionTypes.getMyRoom:

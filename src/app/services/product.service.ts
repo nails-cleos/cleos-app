@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IProduct, PAGE_SIZE } from '../interfaces/product';
+import { IProduct, IProductDiscountDTO, PAGE_SIZE } from '../interfaces/product';
 
 @Injectable({
   providedIn: 'root'
@@ -25,8 +25,12 @@ export class ProductService {
     return this.http.get<IProduct[]>(`${this.url}/pages`, {params});
   }
 
-  public getAllProducts(): Observable<IProduct[]> {
-    return this.http.get<IProduct[]>(this.url);
+  public getAllProducts(customerId?: string): Observable<IProductDiscountDTO[]> {
+    let params = new HttpParams();
+    if (customerId) {
+      params = params.append('customerId', customerId);
+    }
+    return this.http.get<IProductDiscountDTO[]>(this.url, {params});
   }
 
   public getById(id: string | null): Observable<IProduct | undefined> {
