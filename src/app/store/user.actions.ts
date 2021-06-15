@@ -2,6 +2,7 @@ import { Action } from '@ngrx/store';
 
 export enum UserActionTypes {
   getAll = '[User] Get all',
+  getAllCustomers = '[User] Get all customers',
   userSuccess = '[User] Success',
   userFailure = '[User] Failure',
   userSelected = '[User] Selected',
@@ -23,6 +24,10 @@ export class GetAll implements Action {
 
   constructor(public payload: any) {
   }
+}
+
+export class GetAllCustomers implements Action {
+  readonly type = UserActionTypes.getAllCustomers;
 }
 
 export class UserSuccess implements Action {
@@ -119,6 +124,7 @@ export class Clean implements Action {
 
 export type All =
   | GetAll
+  | GetAllCustomers
   | UserSuccess
   | UserFailure
   | UserSelected

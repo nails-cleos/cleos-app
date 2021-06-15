@@ -29,8 +29,8 @@
                 <tr *ngIf="end; else skeleton">
                   <td class="right">{{ 'RESERVATION.CUSTOMER.UPCOMING.ADDRESS' | translate }}</td>
                   <td class="left">
-                    <a target="_blank"
-                       [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + upcoming.room.address.name">
+                    <a [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + upcoming.room.address.name"
+                       target="_blank">
                       {{upcoming.room.address.name}}
                     </a>
                   </td>
@@ -41,10 +41,16 @@
                 </tr>
                 <tr *ngIf="end; else skeleton">
                   <td class="right">{{ 'RESERVATION.CUSTOMER.UPCOMING.PRICE' | translate }}</td>
-                  <td class="left">$ {{upcoming.product.price | number:'1.2-2'}}</td>
+                  <td *ngIf="priceDiscount; else noDiscount" class="left">
+                    <span [class.strikethrough]="priceDiscount">$ {{priceDiscount | number:'1.2-2'}}</span>
+                    <span [@discountAnimation] class="raised-button bold">$ {{priceDiscount | number:'1.2-2'}}</span>
+                  </td>
+                  <ng-template #noDiscount>
+                    <td class="left">$ {{upcoming.product.price | number:'1.2-2'}}</td>
+                  </ng-template>
                 </tr>
               </table>
-              <div [style.color]="'#ff0000'" *ngIf="upcoming && upcoming.state === 'CREATED'">
+              <div *ngIf="upcoming && upcoming.state === 'CREATED'" [style.color]="'#ff0000'">
                 {{ 'RESERVATION.CUSTOMER.UPCOMING.CREATED' | translate }} <span class="bold">
                 {{upcoming.room.professional.firstName}} {{upcoming.room.professional.lastName}}
               </span>
@@ -57,11 +63,11 @@
           <mat-divider *ngIf="upcoming"></mat-divider>
           <mat-card-actions *ngIf="upcoming; else buttonSkeleton">
             <div fxFlex></div>
-            <button color="primary" mat-raised-button (click)="edit(upcoming)">
+            <button (click)="edit(upcoming)" color="primary" mat-raised-button>
               <mat-icon>edit_calendar</mat-icon>
               {{ 'COMMON.BUTTON.EDIT' | translate }}
             </button>
-            <button color="primary" mat-raised-button (click)="view(upcoming)">
+            <button (click)="view(upcoming)" color="primary" mat-raised-button>
               <mat-icon>visibility</mat-icon>
               {{ 'COMMON.BUTTON.VIEW' | translate }}
             </button>
@@ -164,11 +170,11 @@
     </ng-container>
 
     <ng-container matColumnDef="noContent">
-      <td class="no-content bold" mat-footer-cell *matFooterCellDef [attr.colspan]="displayedColumns.length">
+      <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
         {{ 'RESERVATION.PAGE.ERROR.NO_CONTENT' | translate }}</td>
     </ng-container>
 
-    <tr mat-footer-row *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0"></tr>
+    <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
 
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
     <tr *matRowDef="let row; columns: displayedColumns;" [class.row-is-canceled]="row.state === 'CANCELLED'"

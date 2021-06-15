@@ -21,7 +21,6 @@ export class AuthService {
 
   public socialLogin(authToken: string, provider: string, code: string | undefined | null): Observable<Token> {
     const url = `${this.authUrl}/social/login`;
-    console.log({token: authToken, provider, code})
     return this.performLogin(url, {token: authToken, provider, code});
   }
 

@@ -21,6 +21,8 @@ export class ProductComponent implements OnInit, OnDestroy {
   errors: any = [];
   theme = timeTheme();
 
+  isLoading = false;
+
   name: FormControl = new FormControl('', [
     Validators.required
   ]);
@@ -83,6 +85,7 @@ export class ProductComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
+      this.isLoading = state.isLoading;
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;

@@ -30,8 +30,8 @@
         <mat-icon mat-list-icon>room</mat-icon>
         <div mat-line>{{ 'RESERVATION.DETAIL.ROOM.ADDRESS' | translate}}</div>
         <div mat-line>
-          <a target="_blank"
-             [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + reservation.room.address.name">
+          <a [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + reservation.room.address.name"
+             target="_blank">
             {{reservation.room.address.name}}
           </a>
         </div>
@@ -52,7 +52,13 @@
       <mat-list-item>
         <mat-icon mat-list-icon>attach_money</mat-icon>
         <div mat-line>{{ 'RESERVATION.DETAIL.PRODUCT.PRICE' | translate}}</div>
-        <div mat-line>{{reservation.product.price | number:'1.2-2'}}</div>
+        <div *ngIf="priceDiscount; else noDiscount" mat-line>
+          <span [class.strikethrough]="priceDiscount">{{reservation.product.price | number:'1.2-2'}}</span>
+          <span [@discountAnimation] class="raised-button bold">{{priceDiscount | number:'1.2-2'}}</span>
+        </div>
+        <ng-template #noDiscount>
+          <div mat-line>{{reservation.product.price | number:'1.2-2'}}</div>
+        </ng-template>
       </mat-list-item>
       <mat-divider></mat-divider>
       <div mat-subheader>{{ 'RESERVATION.DETAIL.APPOINTMENT' | translate}}</div>
@@ -104,11 +110,11 @@
         </ng-container>
 
         <ng-container matColumnDef="noContent">
-          <td class="no-content bold" mat-footer-cell *matFooterCellDef [attr.colspan]="displayedColumns.length">
+          <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
             {{ 'RESERVATION.DETAIL.HISTORY.ERROR.NO_CONTENT' | translate }}</td>
         </ng-container>
 
-        <tr mat-footer-row *matFooterRowDef="['noContent']" [hidden]="reservation.history.length > 0"></tr>
+        <tr *matFooterRowDef="['noContent']" [hidden]="reservation.history.length > 0" mat-footer-row></tr>
 
         <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
         <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
@@ -125,7 +131,7 @@
   </ng-template>
   <mat-card-actions *ngIf="reservation; else buttonSkeleton">
     <div fxFlex></div>
-    <button color="accent" mat-raised-button appBackButton>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+    <button appBackButton color="accent" mat-raised-button>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
   </mat-card-actions>
   <ng-template #buttonSkeleton>
     <div class="ssc-head-line"></div>

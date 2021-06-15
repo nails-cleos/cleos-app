@@ -36,6 +36,18 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: true
       };
     }
+    case UserActionTypes.getAllCustomers: {
+      return {
+        ...state,
+        // @ts-ignore
+        data: [],
+        errorMessage: null,
+        subErrors: null,
+        selected: null,
+        message: null,
+        isLoading: true
+      };
+    }
     case UserActionTypes.findMe:
     case UserActionTypes.findUser: {
       return {

@@ -34,6 +34,11 @@ import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
 import { MatBadgeModule } from '@angular/material/badge';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
+import { ClipboardModule } from '@angular/cdk/clipboard';
+import { MatChipsModule } from '@angular/material/chips';
+import { ShareButtonsModule } from 'ngx-sharebuttons/buttons';
+import { ShareIconsModule } from 'ngx-sharebuttons/icons';
 
 @NgModule({
   imports: [
@@ -72,7 +77,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatBadgeModule,
     MatRippleModule,
     DragDropModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatBottomSheetModule,
+    ClipboardModule,
+    MatChipsModule,
+    ShareButtonsModule,
+    ShareIconsModule
   ],
   exports: [
     MatTableModule,
@@ -110,7 +120,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatBadgeModule,
     MatRippleModule,
     DragDropModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatBottomSheetModule,
+    ClipboardModule,
+    MatChipsModule,
+    ShareButtonsModule,
+    ShareIconsModule
   ]
 })
 export class AppMaterialModule {

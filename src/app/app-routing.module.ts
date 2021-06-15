@@ -20,7 +20,7 @@ import { ProductDetailComponent } from './product/detail/product-detail.componen
 import { RoomsComponent } from './room/list/rooms.component';
 import { RoomComponent } from './room/room.component';
 import { RoomDetailComponent } from './room/detail/room-detail.component';
-import { AssignmentsComponent } from './assignment/assignments.component';
+import { SearchComponent } from './reservation/search/search.component';
 import { ReservationComponent } from './reservation/reservation.component';
 import { ReservationDetailComponent } from './reservation/detail/reservation-detail.component';
 import { NotificationsComponent } from './notification/list/notifications.component';
@@ -36,6 +36,11 @@ import { UnavailableDetailComponent } from './unavailable/detail/unavailable-det
 import { ReservationsComponent } from './reservation/list/reservations.component';
 import { MeReservationComponent } from './reservation/me/me-reservation.component';
 import { RedirectComponent } from './redirect/redirect.component';
+import { ReferralsComponent } from './referrals/referrals.component';
+import { DiscountsComponent } from './discount/list/discounts.component';
+import { DiscountComponent } from './discount/discount.component';
+import { DiscountDetailComponent } from './discount/detail/discount-detail.component';
+import { MeDiscountComponent } from './discount/me/me-discount.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/redirect', pathMatch: 'full', resolve: {model: TranslationLoaderResolver}},
@@ -146,6 +151,25 @@ const routes: Routes = [
     }
   },
   {
+    path: 'discounts',
+    component: DiscountsComponent,
+    resolve: {model: TranslationLoaderResolver},
+    canActivate: [AuthGuardService],
+    data: {
+      roles: [Role.admin]
+    }
+  },
+  {
+    path: 'discount', component: DiscountComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.admin]
+    }
+  },
+  {
+    path: 'discount/:id', component: DiscountDetailComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.admin]
+    }
+  },
+  {
     path: 'me-room', component: RoomMeComponent, canActivate: [AuthGuardService], data: {
       roles: [Role.professional]
     }
@@ -175,8 +199,8 @@ const routes: Routes = [
     }
   },
   {
-    path: 'assignments',
-    component: AssignmentsComponent,
+    path: 'search',
+    component: SearchComponent,
     resolve: {model: TranslationLoaderResolver},
     canActivate: [AuthGuardService],
     data: {
@@ -215,7 +239,9 @@ const routes: Routes = [
     path: 'me', canActivate: [AuthGuardService], data: {roles: [Role.customer]}, children: [
       {path: 'reservations', component: ReservationsComponent, resolve: {model: TranslationLoaderResolver}},
       {path: 'reservation', component: MeReservationComponent},
-      {path: 'reservation/:id', component: MeReservationComponent}
+      {path: 'reservation/:id', component: MeReservationComponent},
+      {path: 'referrals', component: ReferralsComponent},
+      {path: 'discounts', component: MeDiscountComponent, resolve: {model: TranslationLoaderResolver}}
     ]
   }
 ];

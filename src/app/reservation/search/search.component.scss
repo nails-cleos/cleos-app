@@ -1,0 +1,19 @@
+.deadLine {
+  background-color: #ffb3b3;
+}
+
+#search-box {
+  border: 1px solid lightgray;
+  border-radius: 25px;
+  position: relative;
+  margin-bottom: 10px;
+}
+
+#search-label {
+  background-color: #fafafa;
+  position: absolute;
+  top: -10px;
+  left: 30px;
+  text-align: center;
+  padding: 0 20px;
+}

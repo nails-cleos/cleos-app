@@ -39,7 +39,8 @@ export class ReservationService {
     return this.http.get<ICustomerReservation>(`${this.url}/customer`, {params});
   }
 
-  public getAllAssignmentPage(sort: string, direction: string, page: number): Observable<IReservation[]> {
+  public getAllFilterReservationsPage(sort: string, direction: string, page: number,
+                                      userId?: string, states?: string[]): Observable<IReservation[]> {
     let params = new HttpParams().set('page', String(page)).set('size', String(PAGE_SIZE));
     if (sort) {
       params = params.append('sort', sort);
@@ -47,8 +48,16 @@ export class ReservationService {
     if (direction) {
       params = params.append('direction', direction);
     }
+    if (userId) {
+      params = params.append('userId', userId);
+    }
+    if (states && states.length) {
+      states.forEach(state => {
+        params = params.append('states', state);
+      });
+    }
 
-    return this.http.get<IReservation[]>(`${this.url}/assignments`, {params});
+    return this.http.get<IReservation[]>(`${this.url}/filter`, {params});
   }
 
   public getAll(): Observable<IReservation[]> {

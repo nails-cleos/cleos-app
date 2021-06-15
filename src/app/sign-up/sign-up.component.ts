@@ -39,6 +39,8 @@ export class SignUpComponent implements OnInit, OnDestroy {
     Validators.required
   ]);
 
+  codeForm: FormControl = new FormControl('');
+
   flagList: IFlag[] = flags();
 
   constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private route: ActivatedRoute,
@@ -48,6 +50,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.code = this.route.snapshot.queryParamMap.get('code');
+    this.codeForm.setValue(this.code);
     this.createForm();
     this.subscribe();
     this.cdRef.detectChanges();
@@ -69,7 +72,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
     user.lastName = this.lastName.value;
     user.password = this.passwordComponent.passwordFormControl.value;
     user.lang = this.lang.value.value;
-    user.code = this.code;
+    user.code = this.codeForm.value;
     this.store.dispatch(new fromActionsLogin.SignUp(user));
   }
 

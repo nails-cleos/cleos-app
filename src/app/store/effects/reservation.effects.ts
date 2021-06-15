@@ -45,12 +45,14 @@ export class ReservationEffects {
   );
 
   @Effect()
-  getAllAssignmentPage$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getAllAssignmentPage)).pipe(
+  getAllFilterReservationsPage$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getAllFilterPage)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.reservationService.getAllAssignmentPage(payload.active, payload.direction, payload.page).pipe(
-      switchMap((response: any) => of(new fromActionsReservation.ReservationPageSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
-    ))
+    switchMap((payload: any) =>
+      this.reservationService.getAllFilterReservationsPage(payload.active, payload.direction,
+        payload.page, payload.userId, payload.states).pipe(
+        switchMap((response: any) => of(new fromActionsReservation.ReservationFilterPageSuccess(response ? response : {content: []}))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
+      ))
   );
 
   @Effect()
@@ -93,8 +95,8 @@ export class ReservationEffects {
   @Effect()
   getAllProducts$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getProducts)).pipe(
     map((action: any) => action.payload),
-    switchMap(() => this.productService.getAllProducts().pipe(
-      switchMap((response: any) => of(new fromActionsReservation.ReservationProductsSuccess(response ? response : []))),
+    switchMap((payload: any) => this.productService.getAllProducts(payload?.customerId).pipe(
+      switchMap((response: any) => of(new fromActionsReservation.ReservationProductsSuccess(response))),
       catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
     ))
   );
@@ -228,6 +230,11 @@ export class ReservationEffects {
   @Effect({dispatch: false})
   dataPageSuccess$ = this.actions$.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.reservationPageSuccess)
+  );
+
+  @Effect({dispatch: false})
+  filterPageSuccess$ = this.actions$.pipe(
+    ofType(fromActionsReservation.ReservationActionTypes.reservationFilterPageSuccess)
   );
 
   @Effect({dispatch: false})

@@ -39,6 +39,8 @@ export class UnavailableComponent implements OnInit, OnDestroy {
   showDuration = false;
   theme = timeTheme();
 
+  isLoading = false;
+
   professionals: IUser[] | undefined;
   room: IRoomAll | undefined;
   filteredOptions: Observable<IUser[] | undefined> | undefined;
@@ -79,10 +81,13 @@ export class UnavailableComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const time = this.startTime.value.split(':');
+    const date = createNewDate(this.startDate.value, time[0], time[1]);
+
     const unavailable: IUnavailable = new Unavailable();
     unavailable.professionalId = this.professional.value.id;
     unavailable.description = this.form.value.description;
-    unavailable.start = newDate(this.startTime.value).toLocaleString('en-GB');
+    unavailable.start = date.toLocaleString('en-GB');
     unavailable.repeat = this.repeat;
     unavailable.duration = this.duration.value;
 
@@ -203,6 +208,7 @@ export class UnavailableComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
+      this.isLoading = state.isLoading;
       if (state.professionals) {
         this.professionals = state.professionals;
       }

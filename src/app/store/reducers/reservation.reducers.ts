@@ -1,17 +1,18 @@
 import { All, ReservationActionTypes } from '../reservation.actions';
 import { IAvailableDTO, ICustomerReservation, IReservation, IRoomReservation } from '../../interfaces/reservation';
 import { IUser } from '../../interfaces/user';
-import { IProduct } from '../../interfaces/product';
+import { IProduct, IProductDiscountDTO } from '../../interfaces/product';
 import { IRoom } from '../../interfaces/room';
 import { Pagination } from '../../interfaces/pagination';
 
 export interface State {
   data: IReservation | IRoomReservation[] | IReservation[] | ICustomerReservation | IAvailableDTO | null;
+  filter: Pagination<IReservation> | null;
   page: Pagination<IReservation> | null;
   customerReservation: ICustomerReservation | null;
   customers: IUser[] | null;
   rooms: IRoom[] | null;
-  products: IProduct[] | null;
+  productDiscount: IProductDiscountDTO[] | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -23,10 +24,11 @@ export interface State {
 export const initialState: State = {
   data: null,
   page: null,
+  filter: null,
   customerReservation: null,
   customers: null,
   rooms: null,
-  products: null,
+  productDiscount: null,
   errorMessage: null,
   error: null,
   subErrors: null,
@@ -62,7 +64,19 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: true
       };
     }
-    case ReservationActionTypes.getAllAssignmentPage:
+    case ReservationActionTypes.getAllFilterPage: {
+      return {
+        ...state,
+        // @ts-ignore
+        filter: {content: [{}, {}, {}], totalElements: 3},
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        selected: null,
+        message: null,
+        isLoading: true
+      };
+    }
     case ReservationActionTypes.getAllPage: {
       return {
         ...state,
@@ -118,7 +132,7 @@ export const reducer = (state = initialState, action: All): State => {
     case ReservationActionTypes.getProducts: {
       return {
         ...state,
-        products: null,
+        productDiscount: null,
         errorMessage: null,
         error: null,
         subErrors: null,
@@ -138,6 +152,7 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         data: {} as IReservation,
         page: null,
+        filter: null,
         errorMessage: null,
         error: null,
         subErrors: null,
@@ -150,6 +165,17 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         page: action.payload,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: null,
+        isLoading: false
+      };
+    }
+    case ReservationActionTypes.reservationFilterPageSuccess: {
+      return {
+        ...state,
+        filter: action.payload,
         errorMessage: null,
         error: null,
         subErrors: null,
@@ -204,7 +230,7 @@ export const reducer = (state = initialState, action: All): State => {
     case ReservationActionTypes.reservationProductsSuccess: {
       return {
         ...state,
-        products: action.payload,
+        productDiscount: action.payload,
         errorMessage: null,
         error: null,
         subErrors: null,
