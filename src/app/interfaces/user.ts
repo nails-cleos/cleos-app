@@ -2,6 +2,7 @@ export interface IUser {
   id?: string;
   firstName?: string;
   lastName?: string;
+  phone?: string;
   enabled?: boolean;
   deleted?: boolean;
   provider?: string;
@@ -11,20 +12,22 @@ export interface IUser {
   password?: string;
   authorities?: IAuthority[];
   imageUrl?: string;
+  image?: any;
   code?: string | null;
   referralMax?: number;
 }
 
 export interface IUserAll {
   id: string;
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   provider: string;
   username: string;
   email: string;
   authorities: IAuthority[];
   imageUrl?: string;
-  lang?: string;
+  lang: string;
+  phone?: string;
   referralMax?: number;
 }
 

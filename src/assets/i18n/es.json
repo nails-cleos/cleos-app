@@ -143,12 +143,17 @@
         "MUST_MATCH": "Contraseña y confirmar contraseña deben coincidir"
       },
       "FIRST_NAME": {
-        "FIELD": "Nombre",
-        "REQUIRED": "Nombre es <b>requerido</b>"
+        "FIELD": "Nombre"
       },
       "LAST_NAME": {
-        "FIELD": "Apellido",
-        "REQUIRED": "Apellido es <b>requerido</b>"
+        "FIELD": "Apellido"
+      },
+      "PHONE": {
+        "FIELD": "Teléfono",
+        "INVALID": "Número de teléfono invalido"
+      },
+      "CODE": {
+        "FIELD": "Código de referido"
       },
       "OR": "O registrate con tu email",
       "SUCCESS": "Usuario {{username}} creado. Verifica tu email {{email}}",
@@ -231,19 +236,18 @@
         "REQUIRED": "Contraseña es <b>requerido</b>"
       },
       "FIRST_NAME": {
-        "FIELD": "Nombre",
-        "REQUIRED": "Nombre es <b>requerido</b>"
+        "FIELD": "Nombre"
       },
       "LAST_NAME": {
-        "FIELD": "Apellido",
-        "REQUIRED": "Apellido es <b>requerido</b>"
+        "FIELD": "Apellido"
       },
       "LANG": {
         "FIELD": "Idioma",
         "REQUIRED": "Idioma es <b>requerido</b>"
       },
-      "CODE": {
-        "FIELD": "Código de referrido"
+      "PHONE": {
+        "FIELD": "Teléfono",
+        "INVALID": "Número de teléfono invalido"
       },
       "CUSTOMER": "Cliente {{username}} creado",
       "PROFESSIONAL": "Profesional {{username}} creado"
@@ -264,21 +268,23 @@
         "REQUIRED": "Contraseña es <b>requerido</b>"
       },
       "FIRST_NAME": {
-        "FIELD": "Nombre",
-        "REQUIRED": "Nombre es <b>requerido</b>"
+        "FIELD": "Nombre"
       },
       "LAST_NAME": {
-        "FIELD": "Apellido",
-        "REQUIRED": "Apellido es <b>requerido</b>"
+        "FIELD": "Apellido"
       },
       "LANG": {
         "FIELD": "Idioma",
         "REQUIRED": "Idioma es <b>requerido</b>"
+      },
+      "PHONE": {
+        "FIELD": "Teléfono",
+        "INVALID": "Número de teléfono invalido"
       }
     },
     "DELETED": {
       "TITLE": "Eliminar usuario",
-      "CONTENT": "¿Está seguro de eliminar el usuario {{firstName}} {{lastName}}?",
+      "CONTENT": "¿Está seguro de eliminar el usuario {{username}}?",
       "MESSAGE": "Usuario {{username}} eliminado"
     },
     "UPDATED": {
@@ -286,7 +292,7 @@
     },
     "ACTIVATION_RESEND": {
       "TITLE": "Reenviar código de activación",
-      "CONTENT": "¿Está seguro de reenviar el código de activación al usuario {{firstName}} {{lastName}}?",
+      "CONTENT": "¿Está seguro de reenviar el código de activación al usuario {{username}}?",
       "MESSAGE": "Código de activación enviado"
     },
     "CHANGE_PASSWORD": {
@@ -328,16 +334,18 @@
       "FIELD": "Nombre de usuario"
     },
     "FIRST_NAME": {
-      "FIELD": "Nombre",
-      "REQUIRED": "Nombre es <b>requerido</b>"
+      "FIELD": "Nombre"
     },
     "LAST_NAME": {
-      "FIELD": "Apellido",
-      "REQUIRED": "Apellido es <b>requerido</b>"
+      "FIELD": "Apellido"
     },
     "LANG": {
       "FIELD": "Idioma",
       "REQUIRED": "Idioma es <b>requerido</b>"
+    },
+    "PHONE": {
+      "FIELD": "Teléfono",
+      "INVALID": "Número de teléfono invalido"
     },
     "UPDATED": {
       "MESSAGE": "Usuario {{username}} actualizado"

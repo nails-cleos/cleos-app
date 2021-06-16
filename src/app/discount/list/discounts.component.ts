@@ -26,6 +26,7 @@ import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material
 import * as fromActionsUser from '../../store/user.actions';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { map, startWith } from 'rxjs/operators';
+import { getUserName } from '../../util/helper';
 
 @Component({
   selector: 'app-discounts',
@@ -224,10 +225,14 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
 
   sortCustomers(data: any): IUser[] {
     return data.sort((a: any, b: any) => {
-      const aName = `${a.firstName} ${a.lastName}`.toUpperCase();
-      const bName = `${b.firstName} ${b.lastName}`.toUpperCase();
+      const aName = getUserName(a).toUpperCase();
+      const bName = getUserName(b).toUpperCase();
       return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
     });
+  }
+
+  getName(customer: any): string {
+    return getUserName(customer);
   }
 
   private setSymbol(): void {
@@ -269,7 +274,6 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
   private filter(name: string): IUserAll[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.allCustomers?.filter(option => option.firstName?.toLowerCase().indexOf(filterValue) === 0 ||
-      option.lastName?.toLowerCase().indexOf(filterValue) === 0);
+    return this.allCustomers?.filter(option => getUserName(option)?.toLowerCase().indexOf(filterValue));
   }
 }

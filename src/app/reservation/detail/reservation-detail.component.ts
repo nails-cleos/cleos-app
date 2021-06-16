@@ -14,7 +14,7 @@ import { DialogComponent } from '../../dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Role } from '../../interfaces/token';
-import { getPriceDiscount } from '../../util/helper';
+import { getPriceDiscount, getUserName } from '../../util/helper';
 import { transitionAnimation } from '../../interfaces/discount';
 
 export enum ReservationIconName {
@@ -83,6 +83,14 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     }
   }
 
+  get customerName(): string {
+    return this.reservation ? getUserName(this.reservation.customer) : '';
+  }
+
+  get professionalName(): string {
+    return this.reservation ? getUserName(this.reservation.room.professional) : '';
+  }
+
   private static createMachine(stateMachineDefinition: any, initialState: any): any {
     const machine = {
       value: initialState,
@@ -111,6 +119,10 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
   private static createTransaction(target: string, action: any): any {
     return {target, action};
+  }
+
+  getProfessionalName(history: any): string {
+    return getUserName(history.room.professional);
   }
 
   ngOnInit(): void {

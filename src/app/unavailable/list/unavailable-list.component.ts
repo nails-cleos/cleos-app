@@ -13,6 +13,8 @@ import * as fromActionsUnavailable from '../../store/unavailable.actions';
 import { DialogComponent } from '../../dialog/dialog.component';
 import { convertDuration } from '../../util/dates';
 import { IUnavailable, PAGE_SIZE } from '../../interfaces/unavailable';
+import { IUser } from '../../interfaces/user';
+import { getUserName } from '../../util/helper';
 
 @Component({
   selector: 'app-unavailable-list',
@@ -60,6 +62,10 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+  }
+
+  getProfessionalName(professional: IUser): string {
+    return getUserName(professional);
   }
 
   edit(unavailable: IUnavailable): void {

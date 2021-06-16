@@ -9,6 +9,7 @@ import * as fromActionsUser from '../store/user.actions';
 import { fieldChange, valueChange } from '../util/validators';
 import { Location } from '@angular/common';
 import { findFlag, flags, IFlag } from '../util/flags';
+import { getUserImage, getUserNameInitials } from '../util/helper';
 
 @Component({
   selector: 'app-profile',
@@ -24,22 +25,21 @@ export class ProfileComponent implements OnInit, OnDestroy {
   error: any;
   user: IUser | undefined;
   canChange = false;
-  showInitials = false;
+  image: string | undefined;
   initials: string | undefined;
   isLoading = false;
+  prevImg: string | undefined;
 
   username: FormControl = new FormControl('', [
-    Validators.required
-  ]);
-  firstName: FormControl = new FormControl('', [
-    Validators.required
-  ]);
-  lastName: FormControl = new FormControl('', [
     Validators.required
   ]);
   langValue: FormControl = new FormControl('', [
     Validators.required
   ]);
+
+  firstName: FormControl = new FormControl();
+  lastName: FormControl = new FormControl();
+  phone: FormControl = new FormControl();
 
   flagList: IFlag[] = flags();
 
@@ -69,11 +69,23 @@ export class ProfileComponent implements OnInit, OnDestroy {
     user.username = fieldChange(this.username, this.user?.username);
     user.firstName = fieldChange(this.firstName, this.user?.firstName);
     user.lastName = fieldChange(this.lastName, this.user?.lastName);
+    user.phone = fieldChange(this.phone, this.user?.phone);
 
     this.user = undefined;
     this.store.dispatch(
       new fromActionsUser.UpdateUser(user)
     );
+  }
+
+  onSelectFile(target: any): void {
+    if (target.files && target.files[0]) {
+      const file = target.files[0];
+      this.prevImg = this.user?.image;
+      this.user = undefined;
+      this.store.dispatch(
+        new fromActionsUser.UpdatePhoto(file)
+      );
+    }
   }
 
   private findMe(): void {
@@ -85,9 +97,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private createForm(): void {
     this.form = this.formBuilder.group({
       username: this.username,
+      langValue: this.langValue,
       firstName: this.firstName,
       lastName: this.lastName,
-      langValue: this.langValue
+      phone: this.phone
     });
   }
 
@@ -98,20 +111,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   private subscribe(): void {
-    this.subscription = this.getState.subscribe((state) => {
+    this.subscription = this.getState.subscribe(state => {
       this.isLoading = state.isLoading;
       if (state.selected && !this.isLoading) {
         const user = state.selected;
         this.user = user;
         this.canChange = user?.provider === 'LOCAL';
-        if (user.firstName) {
-          this.initials = `${user.firstName.charAt(0)} ${user?.lastName?.charAt(0)}`;
-        } else {
-          this.initials = user?.username?.charAt(0);
-        }
-        if (!user.imageUrl) {
-          this.showInitials = true;
-        }
+        this.initials = getUserNameInitials(user);
+        this.image = getUserImage(user);
         this.form.patchValue(state.selected);
         const langValue = findFlag(this.flagList, state.selected.lang);
         this.langValue.setValue(langValue);
@@ -128,9 +135,19 @@ export class ProfileComponent implements OnInit, OnDestroy {
         } else {
           this.error = state.error;
         }
-        this.snackBar.open(state.errorMessage || state.message, 'OK', {
+        const snackbarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
           duration: 5000
         });
+        if (state.message) {
+          const userStore: any = JSON.parse(localStorage.getItem('auth') as string);
+          if (userStore && this.user) {
+            if (userStore.user.image !== this.prevImg) {
+              userStore.user.image = this.user.image;
+              localStorage.setItem('auth', JSON.stringify(userStore));
+              snackbarRef.afterDismissed().subscribe(() => window.location.reload());
+            }
+          }
+        }
       }
     });
   }

@@ -6,10 +6,11 @@ import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../store/app.states';
 import * as fromActionsRoom from '../store/room.actions';
 import { IAddress, IAvailability, ILocation, IRoom, Room } from '../interfaces/room';
-import { IUser } from '../interfaces/user';
+import { IUser, IUserAll } from '../interfaces/user';
 import { map, startWith } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { requireMatch } from '../util/validators';
+import { getUserName } from '../util/helper';
 
 export enum IconName {
   calendarToday = 'calendar_today',
@@ -45,7 +46,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     sunday: IconName.calendarToday
   };
 
-  professionals: IUser[] | undefined;
+  professionals: IUserAll[] | undefined;
   filteredOptions: Observable<IUser[] | undefined> | undefined;
 
   name: FormControl = new FormControl('', [
@@ -78,6 +79,10 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
+  getProfessional(professional: IUser): string {
+    return getUserName(professional);
+  }
+
   setStep(index: number): void {
     this.step = index;
   }
@@ -93,7 +98,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.room.address = {
       name: this.address.value.formatted_address,
       description: this.addressDescription.value,
-      location : {
+      location: {
         x: location.lng(),
         y: location.lat()
       } as ILocation
@@ -105,7 +110,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   displayFn(user: IUser): string {
-    return user ? `${user.firstName} ${user.lastName}` : '';
+    return user ? getUserName(user) : '';
   }
 
   addAvailability(availability: IAvailability, step: number): void {
@@ -226,7 +231,6 @@ export class RoomComponent implements OnInit, OnDestroy {
   private _filter(name: string): IUser[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.professionals?.filter(option => option.firstName?.toLowerCase().indexOf(filterValue) === 0 ||
-      option.lastName?.toLowerCase().indexOf(filterValue) === 0);
+    return this.professionals?.filter(option => getUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
   }
 }

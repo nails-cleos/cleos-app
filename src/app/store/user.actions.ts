@@ -11,6 +11,7 @@ export enum UserActionTypes {
   setRole = '[User] Add role',
   saveUser = '[User] Save',
   updateUser = '[User] Update',
+  updatePhoto = '[User] Update photo',
   userSaveSuccess = '[User] Save Success',
   userDelete = '[User] Delete',
   resendUserToken = '[User] Resend user token',
@@ -83,6 +84,13 @@ export class UpdateUser implements Action {
   }
 }
 
+export class UpdatePhoto implements Action {
+  readonly type = UserActionTypes.updatePhoto;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class UserSaveSuccess implements Action {
   readonly type = UserActionTypes.userSaveSuccess;
 
@@ -133,6 +141,7 @@ export type All =
   | SaveUser
   | SetRole
   | UpdateUser
+  | UpdatePhoto
   | UserSaveSuccess
   | DeleteUser
   | ResendToken

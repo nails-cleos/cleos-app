@@ -103,6 +103,17 @@ export class UserEffects {
   );
 
   @Effect()
+  updatePhoto$ = this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.updatePhoto)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.userService.updateMePhoto(payload).pipe(
+      switchMap((response: any) => {
+        const message = this.translate.instant('PROFILE.UPDATED.MESSAGE', {username: response.username});
+        return of(new fromActionsUser.UserSaveSuccess({message}));
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
+    ))
+  );
+
+  @Effect()
   delete$ = this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.userDelete)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.userService.delete(payload).pipe(

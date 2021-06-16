@@ -9,7 +9,7 @@
       </label>
       <mat-autocomplete #autoCustomer="matAutocomplete" [displayWith]="displayFnUser">
         <mat-option *ngFor="let customer of filteredCustomer | async" [value]="customer">
-          {{customer.firstName}} {{customer.lastName}}
+          {{getUsername(customer)}}
         </mat-option>
       </mat-autocomplete>
       <mat-error *ngIf="customer.hasError('required')"
@@ -168,7 +168,7 @@
         <div mat-subheader>{{ 'RESERVATION.ADD.PREVIEW.CUSTOMER' | translate}}</div>
         <mat-list-item>
           <mat-icon mat-list-icon>wash</mat-icon>
-          <div mat-line>{{customer.value.firstName}} {{customer.value.lastName}}</div>
+          <div mat-line>{{getUsername(customer.value)}}</div>
         </mat-list-item>
         <mat-divider></mat-divider>
         <div mat-subheader>{{ 'RESERVATION.ADD.PREVIEW.ROOM.TITLE' | translate}}</div>
@@ -181,7 +181,7 @@
           <mat-icon mat-list-icon>person_pin</mat-icon>
           <div mat-line>{{ 'RESERVATION.ADD.PREVIEW.ROOM.PROFESSIONAL' | translate}}</div>
           <div mat-line>
-            {{room.value.professional.firstName}} {{room.value.professional.lastName}}
+            {{getUsername(room.value.professional)}}
           </div>
         </mat-list-item>
         <mat-list-item>

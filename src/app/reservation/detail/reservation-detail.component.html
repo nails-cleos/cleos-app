@@ -2,7 +2,7 @@
   <mat-card-header>
     <mat-card-title>{{ 'RESERVATION.DETAIL.TITLE' | translate }}</mat-card-title>
     <mat-card-subtitle
-      *ngIf="reservation; else skeleton">{{reservation.customer.firstName}} {{reservation.customer.lastName}}</mat-card-subtitle>
+      *ngIf="reservation; else skeleton">{{customerName}}</mat-card-subtitle>
     <ng-template #skeleton>
       <div class="ssc-line"></div>
     </ng-template>
@@ -24,7 +24,7 @@
       <mat-list-item>
         <mat-icon mat-list-icon>person_pin</mat-icon>
         <div mat-line>{{ 'RESERVATION.DETAIL.ROOM.PROFESSIONAL' | translate}}</div>
-        <div mat-line>{{reservation.room.professional.firstName}} {{reservation.room.professional.lastName}}</div>
+        <div mat-line>{{professionalName}}</div>
       </mat-list-item>
       <mat-list-item>
         <mat-icon mat-list-icon>room</mat-icon>
@@ -88,7 +88,7 @@
           <th *matHeaderCellDef fxHide.lt-sm fxShow
               mat-header-cell> {{ 'RESERVATION.DETAIL.HISTORY.COLUMN.PROFESSIONAL' | translate }} </th>
           <td *matCellDef="let history" fxHide.lt-sm fxShow
-              mat-cell> {{history.room.professional.firstName}} {{history.room.professional.lastName}} </td>
+              mat-cell> {{getProfessionalName(history)}} </td>
         </ng-container>
 
         <ng-container matColumnDef="start">

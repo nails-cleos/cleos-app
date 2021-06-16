@@ -25,7 +25,7 @@
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
           mat-sort-header>{{ 'ROOM.LIST.COLUMN.PROFESSIONAL' | translate }}</th>
       <td *matCellDef="let room" fxHide.lt-sm fxShow mat-cell>
-        <div *ngIf="room.id; else skeleton">{{room.professional.firstName}} {{room.professional.lastName}}</div>
+        <div *ngIf="room.id; else skeleton">{{getProfessionalName(room.professional)}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>

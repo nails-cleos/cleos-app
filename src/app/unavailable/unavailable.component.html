@@ -16,7 +16,7 @@
                 <mat-autocomplete #auto="matAutocomplete" (optionSelected)="getRoom($event.option.value)"
                                   [displayWith]="displayFn">
                   <mat-option *ngFor="let professional of filteredOptions | async" [value]="professional">
-                    {{professional.firstName}} {{professional.lastName}}
+                    {{getProfessionalName(professional)}}
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="professional.hasError('required')"

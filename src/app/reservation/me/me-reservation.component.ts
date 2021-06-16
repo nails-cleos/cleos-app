@@ -29,7 +29,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as fromActionsReservation from '../../store/reservation.actions';
 import { map, startWith } from 'rxjs/operators';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
-import { getPriceDiscount, round } from '../../util/helper';
+import { getPriceDiscount, getUserName, round } from '../../util/helper';
 import { DiscountType, IUserDiscount, transitionAnimation } from '../../interfaces/discount';
 
 @Component({
@@ -145,8 +145,8 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     });
   }
 
-  get profesionalName(): string {
-    return `${this.room.value.professional.firstName} ${this.room.value.professional.lastName}`;
+  get professionalName(): string {
+    return getUserName(this.room.value.professional);
   }
 
   get durationTime(): string {

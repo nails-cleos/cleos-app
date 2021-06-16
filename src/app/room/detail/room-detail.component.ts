@@ -20,6 +20,7 @@ import * as fromActionsRoom from '../../store/room.actions';
 import { fieldChange } from '../../util/validators';
 import { IconName, IIcon } from '../room.component';
 import { createDate } from '../../util/dates';
+import { getUserName } from '../../util/helper';
 
 @Component({
   selector: 'app-room-detail',
@@ -162,7 +163,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
           name: state.selected.name,
           address: state.selected.address
         } as IRoomAll;
-        this.professionalName = `${state.selected.professional.firstName} ${state.selected.professional.lastName}`;
+        this.professionalName = getUserName(state.selected.professional);
         this.addressDescription.setValue(this.room.address?.description);
         this.address.setValue(this.room.address?.name);
         this.getAvailabilities(state.selected.availabilities);

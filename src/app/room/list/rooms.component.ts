@@ -13,6 +13,8 @@ import { AppState, selectRoomState } from '../../store/app.states';
 import * as fromActionsRoom from '../../store/room.actions';
 import { DialogComponent } from '../../dialog/dialog.component';
 import { GeocodeService } from '../../services/geocode.service';
+import { IUser } from '../../interfaces/user';
+import { getUserName } from '../../util/helper';
 
 @Component({
   selector: 'app-rooms',
@@ -52,6 +54,10 @@ export class RoomsComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.subscribe();
     this.clean();
+  }
+
+  getProfessionalName(professional: IUser): string {
+    return getUserName(professional);
   }
 
   subscribe(): void {
