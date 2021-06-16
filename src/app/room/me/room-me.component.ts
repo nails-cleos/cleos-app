@@ -19,6 +19,7 @@ import { AppState, selectRoomState } from '../../store/app.states';
 import * as fromActionsRoom from '../../store/room.actions';
 import { createDate } from '../../util/dates';
 import { fieldChange } from '../../util/validators';
+import { getUserName } from '../../util/helper';
 
 @Component({
   selector: 'app-room-me',
@@ -187,7 +188,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
           address: state.selected.address
         } as IRoomAll;
         this.addressDescription.setValue(this.room.address?.description);
-        this.professionalName = `${state.selected.professional.firstName} ${state.selected.professional.lastName}`;
+        this.professionalName = getUserName(state.selected.professional);
         this.getAvailabilities(state.selected.availabilities);
       }
       if (state.subErrors) {

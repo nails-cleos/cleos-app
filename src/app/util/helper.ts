@@ -1,4 +1,5 @@
 import { DiscountType, IDiscount } from '../interfaces/discount';
+import { IUser, IUserAll } from '../interfaces/user';
 
 export const snakeToCamel = (value: string): string =>
   value.toLowerCase().replace(/([-_]\w)/g, (g: string) => g[1].toUpperCase());
@@ -22,4 +23,52 @@ export const getPriceDiscount = (discount: IDiscount | undefined, price: number)
     }
   }
   return undefined;
+};
+
+export const getUserName = (user: IUserAll | IUser): string => {
+  let names: string[] = [];
+  if (user.firstName) {
+    names = [...names, user.firstName];
+  }
+  if (user.lastName) {
+    names = [...names, user.lastName];
+  }
+
+  if (!names || !names.length) {
+    return user.username ? user.username : '';
+  }
+
+  return names.join(' ');
+};
+
+export const getUserNameInitials = (user: IUserAll): string => {
+  let names: string[] = [];
+  if (user.firstName) {
+    names = [...names, user.firstName];
+  }
+  if (user.lastName) {
+    names = [...names, user.lastName];
+  }
+
+  if (!names || !names.length) {
+    names = [...names, user.username];
+  }
+
+  let name = '';
+  names.forEach(n => name = name + n.charAt(0));
+
+  return name;
+};
+
+export const getUserImage = (user: IUser): string | undefined => {
+  let image;
+  if (user.imageUrl) {
+    if (user.imageUrl.indexOf('http') >= 0) {
+      image = user.imageUrl;
+    } else if (user.image) {
+      image = `data:image/jpg;base64,${user.image}`;
+    }
+  }
+
+  return image;
 };

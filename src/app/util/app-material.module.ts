@@ -39,6 +39,7 @@ import { ClipboardModule } from '@angular/cdk/clipboard';
 import { MatChipsModule } from '@angular/material/chips';
 import { ShareButtonsModule } from 'ngx-sharebuttons/buttons';
 import { ShareIconsModule } from 'ngx-sharebuttons/icons';
+import { NgxMatIntlTelInputModule } from 'ngx-mat-intl-tel-input';
 
 @NgModule({
   imports: [
@@ -82,7 +83,8 @@ import { ShareIconsModule } from 'ngx-sharebuttons/icons';
     ClipboardModule,
     MatChipsModule,
     ShareButtonsModule,
-    ShareIconsModule
+    ShareIconsModule,
+    NgxMatIntlTelInputModule
   ],
   exports: [
     MatTableModule,
@@ -125,7 +127,8 @@ import { ShareIconsModule } from 'ngx-sharebuttons/icons';
     ClipboardModule,
     MatChipsModule,
     ShareButtonsModule,
-    ShareIconsModule
+    ShareIconsModule,
+    NgxMatIntlTelInputModule
   ]
 })
 export class AppMaterialModule {

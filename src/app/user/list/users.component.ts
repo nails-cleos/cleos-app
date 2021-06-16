@@ -14,7 +14,7 @@ import { DEFAULT_LENGTH, Pagination } from '../../interfaces/pagination';
 import { TranslateService } from '@ngx-translate/core';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { Role } from '../../interfaces/token';
-import { snakeToCamel } from '../../util/helper';
+import { getUserName, snakeToCamel } from '../../util/helper';
 
 enum RoleIconName {
   roleCustomer = 'perm_identity',
@@ -78,6 +78,10 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
+  getUsername(user: IUser): string {
+    return getUserName(user);
+  }
+
   edit(user: IUser): void {
     this.store.dispatch(
       new fromActionsUser.UserSelected({user, profile: false})
@@ -87,7 +91,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   delete(user: IUser): void {
     this.noExpanded(user);
     const title = this.translate.instant('USER.DELETED.TITLE');
-    const content = this.translate.instant('USER.DELETED.CONTENT', {firstName: user.firstName, lastName: user.lastName});
+    const content = this.translate.instant('USER.DELETED.CONTENT', {username: getUserName(user)});
     const dialogRef = this.dialog.open(DialogComponent, {
       data: {title, content, value: user}
     });
@@ -104,7 +108,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   sendInvite(user: IUser): void {
     this.noExpanded(user);
     const title = this.translate.instant('USER.ACTIVATION_RESEND.TITLE');
-    const content = this.translate.instant('USER.ACTIVATION_RESEND.CONTENT', {firstName: user.firstName, lastName: user.lastName});
+    const content = this.translate.instant('USER.ACTIVATION_RESEND.CONTENT', {username: getUserName(user)});
     const dialogRef = this.dialog.open(DialogComponent, {
       data: {title, content, value: user}
     });

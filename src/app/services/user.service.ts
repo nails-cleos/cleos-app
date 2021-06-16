@@ -49,6 +49,12 @@ export class UserService {
     return this.http.patch<IUser>(url, user);
   }
 
+  public updateMePhoto(file: File): Observable<IUser> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.patch<IUser>(`${this.url}/me/photo`, formData);
+  }
+
   public addCustomer(user: IUser): Observable<IUser> {
     return this.http.post(this.customerUrl, user);
   }

@@ -21,6 +21,7 @@ import { ReservationIconName } from '../detail/reservation-detail.component';
 import * as fromActionsReservation from '../../store/reservation.actions';
 import { convertDuration, createNewDate, newDate } from '../../util/dates';
 import { DiscountType, transitionAnimation } from '../../interfaces/discount';
+import { getUserName } from '../../util/helper';
 
 @Component({
   selector: 'app-reservations',
@@ -62,6 +63,14 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
         this.pageSize = MOBILE_PAGE_SIZE;
       }
     });
+  }
+
+  get professionalName(): string {
+    return this.getProfessionalName(this.upcoming);
+  }
+
+  getProfessionalName(reservation: any): string {
+    return getUserName(reservation.room.professional);
   }
 
   ngOnInit(): void {

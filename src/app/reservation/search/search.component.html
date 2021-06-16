@@ -36,7 +36,7 @@
         </label>
         <mat-autocomplete #autoCustomer="matAutocomplete" [displayWith]="displayFnUser">
           <mat-option *ngFor="let customer of filteredCustomer | async" [value]="customer">
-            {{customer.firstName}} {{customer.lastName}}
+            {{getCustomerName(customer)}}
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
@@ -63,7 +63,7 @@
       <th *matHeaderCellDef mat-header-cell>{{ 'RESERVATION.PAGE.COLUMN.CUSTOMER' | translate }}</th>
       <td *matCellDef="let reservation" mat-cell>
         <div
-          *ngIf="reservation.id; else skeleton">{{reservation.customer.firstName}} {{reservation.customer.lastName}}</div>
+          *ngIf="reservation.id; else skeleton">{{getCustomerName(reservation.customer)}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>

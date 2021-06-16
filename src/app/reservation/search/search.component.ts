@@ -17,9 +17,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { getNow, newDate } from '../../util/dates';
 import { DialogComponent } from '../../dialog/dialog.component';
 import { map, startWith } from 'rxjs/operators';
-import { IUser } from '../../interfaces/user';
+import { IUser, IUserAll } from '../../interfaces/user';
 import { FormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { getUserName } from '../../util/helper';
 
 @Component({
   selector: 'app-search',
@@ -43,7 +44,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   language: string;
   error: any;
 
-  customers: IUser[] | undefined;
+  customers: IUserAll[] | undefined;
   filteredCustomer: Observable<IUser[] | undefined> | undefined;
   customer: FormControl = new FormControl();
   userId: string | undefined;
@@ -123,8 +124,12 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     });
   }
 
+  getCustomerName(customer: any): string {
+    return getUserName(customer);
+  }
+
   displayFnUser(user: IUser): string {
-    return user ? `${user.firstName} ${user.lastName}` : '';
+    return user ? getUserName(user) : '';
   }
 
   keyDownHandler(event: any): void {
@@ -218,8 +223,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   private filterCustomer(name: string): IUser[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.customers?.filter(option => option.firstName?.toLowerCase().indexOf(filterValue) === 0 ||
-      option.lastName?.toLowerCase().indexOf(filterValue) === 0);
+    return this.customers?.filter(option => getUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
   }
 
   private filterStates(value: string): string[] {

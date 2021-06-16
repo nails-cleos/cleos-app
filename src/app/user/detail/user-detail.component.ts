@@ -9,6 +9,7 @@ import * as fromActionsUser from '../../store/user.actions';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { fieldChange, valueChange } from '../../util/validators';
 import { findFlag, flags, IFlag } from '../../util/flags';
+import { getUserName } from '../../util/helper';
 
 @Component({
   selector: 'app-user-detail',
@@ -27,15 +28,13 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   email: FormControl = new FormControl('', [
     Validators.required, Validators.email
   ]);
-  firstName: FormControl = new FormControl('', [
-    Validators.required
-  ]);
-  lastName: FormControl = new FormControl('', [
-    Validators.required
-  ]);
   langValue: FormControl = new FormControl('', [
     Validators.required
   ]);
+
+  firstName: FormControl = new FormControl();
+  lastName: FormControl = new FormControl();
+  phone: FormControl = new FormControl();
 
   flagList: IFlag[] = flags();
   error: any;
@@ -59,6 +58,10 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
+  get userName(): string {
+    return this.user ? getUserName(this.user) : '';
+  }
+
   update(): void {
     if (this.form.invalid) {
       return;
@@ -71,6 +74,7 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     user.firstName = fieldChange(this.firstName, this.user?.firstName);
     user.lastName = fieldChange(this.lastName, this.user?.lastName);
     user.lang = valueChange(this.langValue.value.value, this.user?.lang);
+    user.phone = fieldChange(this.phone, this.user?.phone);
 
     this.store.dispatch(new fromActionsUser.SaveUser({user}));
   }
@@ -79,9 +83,10 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     this.form = this.formBuilder.group({
       username: this.username,
       email: this.email,
+      langValue: this.langValue,
       firstName: this.firstName,
       lastName: this.lastName,
-      langValue: this.langValue
+      phone: this.phone
     });
   }
 

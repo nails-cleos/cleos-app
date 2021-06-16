@@ -22,6 +22,7 @@ import {
 import { IRoomAll } from '../../interfaces/room';
 import { IUser } from '../../interfaces/user';
 import { timeTheme } from '../../util/theme';
+import { getUserName } from '../../util/helper';
 
 @Component({
   selector: 'app-unavailable-detail',
@@ -198,7 +199,7 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
         } as IUnavailable;
         this.form.patchValue(this.unavailable);
 
-        this.professionalName = `${state.selected.professional.firstName} ${state.selected.professional.lastName}`;
+        this.professionalName = getUserName(state.selected.professional);
       }
       if (this.room && this.unavailable && this.unavailable.startDate) {
         const date = newDate(this.unavailable.startDate);

@@ -7,14 +7,14 @@
     <mat-label>{{ 'DISCOUNT.LIST.DIALOG.CUSTOMER' | translate }}</mat-label>
     <mat-chip-list #chipList aria-label="Customer selection">
       <mat-chip (removed)="remove(customer)" *ngFor="let customer of customers" [removable]="true" [selectable]="true">
-        {{customer.firstName}} {{customer.lastName}}
+        {{getName(customer)}}
         <mat-icon matChipRemove>cancel</mat-icon>
       </mat-chip>
       <input #customerInput [formControl]="customerCtrl" [matAutocomplete]="auto" [matChipInputFor]="chipList">
     </mat-chip-list>
     <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
       <mat-option *ngFor="let customer of sortCustomers(filteredCustomers | async)" [value]="customer">
-        {{customer.firstName}} {{customer.lastName}}
+        {{getName(customer)}}
       </mat-option>
     </mat-autocomplete>
   </mat-form-field>

@@ -6,13 +6,14 @@ import { Store } from '@ngrx/store';
 import { AppState, selectUnavailableState } from '../store/app.states';
 import { IUnavailable, Unavailable } from '../interfaces/unavailable';
 import * as fromActionsUnavailable from '../store/unavailable.actions';
-import { IUser } from '../interfaces/user';
+import { IUser, IUserAll } from '../interfaces/user';
 import { requireMatch } from '../util/validators';
 import { map, startWith } from 'rxjs/operators';
 import {
   createDate,
   createNewDate,
-  diffTime, formatTime,
+  diffTime,
+  formatTime,
   getAvailability,
   getMinMaxDate,
   getNow,
@@ -21,6 +22,7 @@ import {
 } from '../util/dates';
 import { IRoomAll } from '../interfaces/room';
 import { timeTheme } from '../util/theme';
+import { getUserName } from '../util/helper';
 
 @Component({
   selector: 'app-unavailable',
@@ -41,7 +43,7 @@ export class UnavailableComponent implements OnInit, OnDestroy {
 
   isLoading = false;
 
-  professionals: IUser[] | undefined;
+  professionals: IUserAll[] | undefined;
   room: IRoomAll | undefined;
   filteredOptions: Observable<IUser[] | undefined> | undefined;
 
@@ -76,6 +78,10 @@ export class UnavailableComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
+  getProfessionalName(professional: IUser): string {
+    return getUserName(professional);
+  }
+
   create(): void {
     if (this.form.invalid) {
       return;
@@ -97,7 +103,7 @@ export class UnavailableComponent implements OnInit, OnDestroy {
   }
 
   displayFn(user: IUser): string {
-    return user ? `${user.firstName} ${user.lastName}` : '';
+    return user ? getUserName(user) : '';
   }
 
   myFilter = (d: Date | null): boolean => {
@@ -231,7 +237,6 @@ export class UnavailableComponent implements OnInit, OnDestroy {
   private filter(name: string): IUser[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.professionals?.filter(option => option.firstName?.toLowerCase().indexOf(filterValue) === 0 ||
-      option.lastName?.toLowerCase().indexOf(filterValue) === 0);
+    return this.professionals?.filter(option => getUserName(option)?.toLowerCase().indexOf(filterValue));
   }
 }

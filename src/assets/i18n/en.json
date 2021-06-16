@@ -143,12 +143,17 @@
         "MUST_MATCH": "Password and confirm password must match"
       },
       "FIRST_NAME": {
-        "FIELD": "First name",
-        "REQUIRED": "First name is <b>required</b>"
+        "FIELD": "First name"
       },
       "LAST_NAME": {
-        "FIELD": "Last name",
-        "REQUIRED": "Last name is <b>required</b>"
+        "FIELD": "Last name"
+      },
+      "PHONE": {
+        "FIELD": "Phone",
+        "INVALID": "Invalid phone number"
+      },
+      "CODE": {
+        "FIELD": "Referral code"
       },
       "OR": "Or sign up with email",
       "SUCCESS": "User {{username}} created. Check your email {{email}}",
@@ -231,19 +236,18 @@
         "REQUIRED": "Password is <b>required</b>"
       },
       "FIRST_NAME": {
-        "FIELD": "First name",
-        "REQUIRED": "First name is <b>required</b>"
+        "FIELD": "First name"
       },
       "LAST_NAME": {
-        "FIELD": "Last name",
-        "REQUIRED": "Last name is <b>required</b>"
+        "FIELD": "Last name"
+      },
+      "PHONE": {
+        "FIELD": "Phone",
+        "INVALID": "Invalid phone number"
       },
       "LANG": {
         "FIELD": "Language",
         "REQUIRED": "Language is <b>required</b>"
-      },
-      "CODE": {
-        "FIELD": "Referral code"
       },
       "CUSTOMER": "Customer {{username}} created",
       "PROFESSIONAL": "Professional {{username}} created"
@@ -264,21 +268,23 @@
         "REQUIRED": "Password is <b>required</b>"
       },
       "FIRST_NAME": {
-        "FIELD": "First name",
-        "REQUIRED": "First name is <b>required</b>"
+        "FIELD": "First name"
       },
       "LAST_NAME": {
-        "FIELD": "Last name",
-        "REQUIRED": "Last name is <b>required</b>"
+        "FIELD": "Last name"
       },
       "LANG": {
         "FIELD": "Language",
         "REQUIRED": "Language is <b>required</b>"
+      },
+      "PHONE": {
+        "FIELD": "Phone",
+        "INVALID": "Invalid phone number"
       }
     },
     "DELETED": {
       "TITLE": "Delete user",
-      "CONTENT": "Are you sure to delete user {{firstName}} {{lastName}}?",
+      "CONTENT": "Are you sure to delete user {{username}}?",
       "MESSAGE": "User {{username}} deleted"
     },
     "UPDATED": {
@@ -286,7 +292,7 @@
     },
     "ACTIVATION_RESEND": {
       "TITLE": "Resend activation code",
-      "CONTENT": "Are you sure to resend activation code to user {{firstName}} {{lastName}}?",
+      "CONTENT": "Are you sure to resend activation code to user {{username}}?",
       "MESSAGE": "Activation code sent"
     },
     "CHANGE_PASSWORD": {
@@ -328,16 +334,18 @@
       "FIELD": "Username"
     },
     "FIRST_NAME": {
-      "FIELD": "First name",
-      "REQUIRED": "First name is <b>required</b>"
+      "FIELD": "First name"
     },
     "LAST_NAME": {
-      "FIELD": "Last name",
-      "REQUIRED": "Last name is <b>required</b>"
+      "FIELD": "Last name"
     },
     "LANG": {
       "FIELD": "Language",
       "REQUIRED": "Language is <b>required</b>"
+    },
+    "PHONE": {
+      "FIELD": "Phone",
+      "INVALID": "Invalid phone number"
     },
     "UPDATED": {
       "MESSAGE": "User {{username}} updated"

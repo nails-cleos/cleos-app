@@ -14,6 +14,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { getUserName } from '../../util/helper';
 
 @Component({
   selector: 'app-reservation-table',
@@ -69,6 +70,10 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+  }
+
+  getUsername(user: any): string {
+    return getUserName(user);
   }
 
   getIcon(name: any): any {

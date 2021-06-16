@@ -29,17 +29,14 @@ export class SignUpComponent implements OnInit, OnDestroy {
   email: FormControl = new FormControl('', [
     Validators.required, Validators.email
   ]);
-  firstName: FormControl = new FormControl('', [
-    Validators.required
-  ]);
-  lastName: FormControl = new FormControl('', [
-    Validators.required
-  ]);
   lang: FormControl = new FormControl('', [
     Validators.required
   ]);
 
-  codeForm: FormControl = new FormControl('');
+  firstName: FormControl = new FormControl();
+  lastName: FormControl = new FormControl();
+  phone: FormControl = new FormControl();
+  codeForm: FormControl = new FormControl();
 
   flagList: IFlag[] = flags();
 
@@ -68,11 +65,13 @@ export class SignUpComponent implements OnInit, OnDestroy {
     const user: IUser = new User();
     user.username = this.username.value;
     user.email = this.email.value;
-    user.firstName = this.firstName.value;
-    user.lastName = this.lastName.value;
     user.password = this.passwordComponent.passwordFormControl.value;
     user.lang = this.lang.value.value;
+    user.firstName = this.firstName.value;
+    user.lastName = this.lastName.value;
+    user.phone = this.phone.value;
     user.code = this.codeForm.value;
+
     this.store.dispatch(new fromActionsLogin.SignUp(user));
   }
 
@@ -85,9 +84,10 @@ export class SignUpComponent implements OnInit, OnDestroy {
     this.form = this.formBuilder.group({
       username: this.username,
       email: this.email,
+      lang: this.lang,
       firstName: this.firstName,
       lastName: this.lastName,
-      lang: this.lang
+      phone: this.phone
     });
   }
 

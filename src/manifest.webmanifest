@@ -3,7 +3,7 @@
   "short_name": "Cleos",
   "theme_color": "#1976d2",
   "background_color": "#fafafa",
-  "display": "fullscreen",
+  "display": "standalone",
   "gcm_sender_id": "103953800507",
   "scope": "./",
   "start_url": "./",

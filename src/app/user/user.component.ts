@@ -32,15 +32,13 @@ export class UserComponent implements OnInit, OnDestroy {
   email: FormControl = new FormControl('', [
     Validators.required, Validators.email
   ]);
-  firstName: FormControl = new FormControl('', [
-    Validators.required
-  ]);
-  lastName: FormControl = new FormControl('', [
-    Validators.required
-  ]);
   lang: FormControl = new FormControl('', [
     Validators.required
   ]);
+
+  firstName: FormControl = new FormControl();
+  lastName: FormControl = new FormControl();
+  phone: FormControl = new FormControl();
 
   flagList: IFlag[] = flags();
 
@@ -76,6 +74,7 @@ export class UserComponent implements OnInit, OnDestroy {
     user.firstName = this.firstName.value;
     user.lang = this.lang.value.value;
     user.lastName = this.lastName.value;
+    user.phone = this.phone.value;
     user.password = 'Ch4ng#';
 
     this.store.dispatch(
@@ -88,9 +87,10 @@ export class UserComponent implements OnInit, OnDestroy {
       role: this.role,
       username: this.username,
       email: this.email,
+      lang: this.lang,
       firstName: this.firstName,
       lastName: this.lastName,
-      lang: this.lang
+      phone: this.phone
     });
   }
 

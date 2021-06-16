@@ -52,7 +52,7 @@
               </table>
               <div *ngIf="upcoming && upcoming.state === 'CREATED'" [style.color]="'#ff0000'">
                 {{ 'RESERVATION.CUSTOMER.UPCOMING.CREATED' | translate }} <span class="bold">
-                {{upcoming.room.professional.firstName}} {{upcoming.room.professional.lastName}}
+                {{professionalName}}
               </span>
               </div>
             </div>
@@ -112,7 +112,7 @@
           mat-header-cell>{{ 'RESERVATION.PAGE.COLUMN.PROFESSIONAL' | translate }}</th>
       <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
         <div
-          *ngIf="reservation.id; else skeleton">{{reservation.room.professional.firstName}} {{reservation.room.professional.lastName}}</div>
+          *ngIf="reservation.id; else skeleton">{{getProfessionalName(reservation)}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>

@@ -27,6 +27,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { findStateColor, IState, stateColor } from '../../util/flags';
 import { IUserAll } from '../../interfaces/user';
 import { IUnavailableAll } from '../../interfaces/unavailable';
+import { getUserName } from '../../util/helper';
 
 @Component({
   selector: 'app-calendar',
@@ -134,7 +135,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
         const duration = convertDuration(it.product.duration);
         const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
         const detail = this.translate.instant('RESERVATION.ADD.EVENT.DETAIL', {
-          customerName: `${it.customer.firstName} ${it.customer.lastName}`,
+          customerName: getUserName(it.customer),
           productName: it.product.name,
           duration: formatTime(duration.hour, duration.minute)
         });

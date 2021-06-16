@@ -2,29 +2,40 @@
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div *ngIf="!error; else errorBox" fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <mat-card>
-        <mat-card-header>
+        <mat-card-header class="center">
           <mat-card-title>{{ 'PROFILE.TITLE' | translate }}</mat-card-title>
           <mat-card-subtitle *ngIf="user; else skeleton">{{user.email}}</mat-card-subtitle>
           <ng-template #skeleton>
             <div class="ssc-line"></div>
           </ng-template>
-          <div *ngIf="user; else circle" [ngStyle]="{'background-color':  '#a06c3f' }" class="circle" mat-card-avatar>
-            <img *ngIf="!showInitials; else showInitialsBlock" alt="profile" src="{{user?.imageUrl}}">
-            <ng-template #showInitialsBlock>
-              <div class="initials">{{ initials | uppercase }}</div>
-            </ng-template>
-          </div>
-          <ng-template #circle>
-            <div class="ssc-circle"></div>
-          </ng-template>
         </mat-card-header>
+        <div class="center">
+          <div *ngIf="user; else circle" class="hoverable" mat-card-avatar [ngClass]="{'background': !image}">
+            <label for="fileInput" [ngClass]="{'pointer': canChange}">
+              <img *ngIf="image; else showInitialsBlock" alt="profile" class="image"
+                   src="{{image}}">
+              <ng-template #showInitialsBlock>
+                <div class="initials">{{ initials | uppercase }}</div>
+              </ng-template>
+              <div *ngIf="canChange" class="hover-text">Choose file</div>
+              <div *ngIf="canChange" class="background"></div>
+              <input (change)="onSelectFile($event.target)" *ngIf="canChange" accept="image/*" id="fileInput"
+                     type='file'>
+            </label>
+          </div>
+        </div>
+        <ng-template #circle>
+          <div class="divider">
+            <div class="center ssc-circle mb w-60"></div>
+          </div>
+        </ng-template>
         <form (ngSubmit)="update()" [formGroup]="form" novalidate>
           <mat-card-content *ngIf="user; else boxSkeleton">
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PROFILE.USERNAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input autocomplete="username" formControlName="username" matInput required>
+                  <input [formControl]="username" [readonly]="!canChange" autocomplete="username" matInput required>
                 </label>
                 <mat-error *ngIf="username.hasError('required')" [innerHTML]="'PROFILE.PROFILE.REQUIRED' | translate">
                 </mat-error>
@@ -35,32 +46,21 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PROFILE.FIRST_NAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input autocomplete="username" formControlName="firstName" matInput required>
+                  <input [formControl]="firstName" [readonly]="!canChange" autocomplete="firstName" matInput>
                 </label>
-                <mat-error *ngIf="firstName.hasError('required')"
-                           [innerHTML]="'PROFILE.FIRST_NAME.REQUIRED' | translate">
-                </mat-error>
-                <mat-error *ngIf="errors['firstName']">
-                  {{errors['firstName']}}
-                </mat-error>
+                <mat-error *ngIf="errors['firstName']">{{errors['firstName']}}</mat-error>
               </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PROFILE.LAST_NAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input autocomplete="username" formControlName="lastName" matInput required>
+                  <input [formControl]="lastName" [readonly]="!canChange" autocomplete="lastName" matInput>
                 </label>
-                <mat-error *ngIf="lastName.hasError('required')"
-                           [innerHTML]="'PROFILE.LAST_NAME.REQUIRED' | translate">
-                </mat-error>
-                <mat-error *ngIf="errors['lastName']">
-                  {{errors['lastName']}}
-                </mat-error>
+                <mat-error *ngIf="errors['lastName']">{{errors['lastName']}}</mat-error>
               </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PROFILE.LANG.FIELD' | translate }}</mat-label>
                 <span *ngIf="select.value" [class]="'flag-icon  flag-icon-squared flag-icon-' + select.value.icon"
-                      class="margin-right-eight"
-                      matPrefix></span>
+                      class="margin-right-eight" matPrefix></span>
                 <mat-select #select [formControl]="langValue" required>
                   <mat-option *ngFor="let lang of flagList" [value]="lang">
                     <span [class]="'flag-icon  flag-icon-squared flag-icon-' + lang.icon"></span>
@@ -68,6 +68,15 @@
                   </mat-option>
                 </mat-select>
                 <mat-error [innerHTML]="'PROFILE.LANG.REQUIRED' | translate">
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>{{ 'PROFILE.PHONE.FIELD' | translate }}</mat-label>
+                <ngx-mat-intl-tel-input [enablePlaceholder]="true" [enableSearch]="true"
+                                        [formControl]="phone" [preferredCountries]="['ar']"
+                                        name="phone"></ngx-mat-intl-tel-input>
+                <mat-error *ngIf="phone.hasError('validatePhoneNumber')">
+                  {{ 'PROFILE.PHONE.INVALID' | translate }}r
                 </mat-error>
               </mat-form-field>
             </div>
@@ -79,10 +88,10 @@
           </ng-template>
           <mat-card-actions *ngIf="user; else buttonSkeleton">
             <div fxFlex></div>
-            <button [disabled]="form.invalid || !canChange" color="primary" mat-raised-button
+            <button [disabled]="form.invalid" color="primary" mat-raised-button
                     type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
-            <button color="accent" mat-raised-button type="button"
-                    appBackButton>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <button appBackButton color="accent" mat-raised-button
+                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
           <ng-template #buttonSkeleton>
             <div class="ssc-head-line"></div>

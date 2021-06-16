@@ -42,7 +42,7 @@ import { Role } from '../interfaces/token';
 import { IUnavailableAll } from '../interfaces/unavailable';
 import { timeTheme } from '../util/theme';
 import { DiscountType, IUserDiscount, transitionAnimation } from '../interfaces/discount';
-import { getPriceDiscount } from '../util/helper';
+import { getPriceDiscount, getUserName } from '../util/helper';
 
 @Component({
   selector: 'app-reservation',
@@ -65,7 +65,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   error: any;
 
   customerForm!: FormGroup;
-  customers: IUser[] | undefined;
+  customers: IUserAll[] | undefined;
   filteredCustomer: Observable<IUser[] | undefined> | undefined;
   customer: FormControl = new FormControl('', [
     Validators.required, requireMatch
@@ -231,6 +231,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
+  getUsername(user: any): string {
+    return getUserName(user);
+  }
+
   myFilter = (d: Date | null): boolean => {
     const now = createDate();
     const date = (d || now);
@@ -252,7 +256,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   displayFnUser(user: IUser): string {
-    return user ? `${user.firstName} ${user.lastName}` : '';
+    return user ? getUserName(user) : '';
   }
 
   displayFnProduct(product: IProduct): string {
@@ -305,7 +309,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
 
     const detail = this.translate.instant('RESERVATION.ADD.EVENT.DETAIL', {
-      customerName: `${this.customer.value.firstName} ${this.customer.value.lastName}`,
+      customerName: getUserName(this.customer.value),
       productName: this.product.value.name,
       duration: formatTime(duration.hour, duration.minute)
     });
@@ -479,7 +483,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         const duration = convertDuration(it.product.duration);
         const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
         const detail = this.translate.instant('RESERVATION.ADD.EVENT.DETAIL', {
-          customerName: `${it.customer.firstName} ${it.customer.lastName}`,
+          customerName: getUserName(it.customer),
           productName: it.product.name,
           duration: formatTime(duration.hour, duration.minute)
         });
@@ -661,8 +665,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   private filterCustomer(name: string): IUser[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.customers?.filter(option => option.firstName?.toLowerCase().indexOf(filterValue) === 0 ||
-      option.lastName?.toLowerCase().indexOf(filterValue) === 0);
+    return this.customers?.filter(option => getUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
   }
 
   private filterProduct(name: string): IProduct[] | undefined {

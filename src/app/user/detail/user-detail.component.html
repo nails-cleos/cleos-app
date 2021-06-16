@@ -4,7 +4,7 @@
       <mat-card>
         <mat-card-header>
           <mat-card-title>{{ 'USER.DETAIL.TITLE' | translate }}</mat-card-title>
-          <mat-card-subtitle *ngIf="user; else skeleton">{{user.firstName}} {{user.lastName}}</mat-card-subtitle>
+          <mat-card-subtitle *ngIf="user; else skeleton">{{userName}}</mat-card-subtitle>
           <ng-template #skeleton>
             <div class="ssc-line"></div>
           </ng-template>
@@ -21,7 +21,7 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.DETAIL.USERNAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input autocomplete="username" formControlName="username" matInput required>
+                  <input autocomplete="username" [formControl]="username" matInput required>
                 </label>
                 <mat-error [innerHTML]="'USER.DETAIL.USERNAME.REQUIRED' | translate">
                 </mat-error>
@@ -29,28 +29,12 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.DETAIL.EMAIL.FIELD' | translate }}</mat-label>
                 <label>
-                  <input autocomplete="username" formControlName="email" matInput required>
+                  <input autocomplete="username" [formControl]="email" matInput required>
                 </label>
                 <mat-error *ngIf="email.hasError('email')">
                   {{ 'USER.DETAIL.EMAIL.VALID' | translate }}
                 </mat-error>
                 <mat-error *ngIf="email.hasError('required')" [innerHTML]="'USER.DETAIL.EMAIL.REQUIRED' | translate">
-                </mat-error>
-              </mat-form-field>
-              <mat-form-field appearance="fill">
-                <mat-label>{{ 'USER.DETAIL.FIRST_NAME.FIELD' | translate }}</mat-label>
-                <label>
-                  <input autocomplete="username" formControlName="firstName" matInput required>
-                </label>
-                <mat-error [innerHTML]="'USER.DETAIL.FIRST_NAME.REQUIRED' | translate">
-                </mat-error>
-              </mat-form-field>
-              <mat-form-field appearance="fill">
-                <mat-label>{{ 'USER.DETAIL.LAST_NAME.FIELD' | translate }}</mat-label>
-                <label>
-                  <input autocomplete="username" formControlName="lastName" matInput required>
-                </label>
-                <mat-error [innerHTML]="'USER.DETAIL.LAST_NAME.REQUIRED' | translate">
                 </mat-error>
               </mat-form-field>
               <mat-form-field appearance="fill">
@@ -66,6 +50,26 @@
                   </mat-option>
                 </mat-select>
                 <mat-error [innerHTML]="'USER.DETAIL.LANG.REQUIRED' | translate">
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>{{ 'USER.DETAIL.FIRST_NAME.FIELD' | translate }}</mat-label>
+                <label>
+                  <input autocomplete="firstName" [formControl]="firstName" matInput>
+                </label>
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>{{ 'USER.DETAIL.LAST_NAME.FIELD' | translate }}</mat-label>
+                <label>
+                  <input autocomplete="lastName" [formControl]="lastName" matInput>
+                </label>
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>{{ 'USER.DETAIL.PHONE.FIELD' | translate }}</mat-label>
+                <ngx-mat-intl-tel-input [enablePlaceholder]="true" [enableSearch]="true"
+                                        [formControl]="phone" [preferredCountries]="['ar']" name="phone"></ngx-mat-intl-tel-input>
+                <mat-error *ngIf="phone.hasError('validatePhoneNumber')">
+                  {{ 'USER.DETAIL.PHONE.INVALID' | translate }}
                 </mat-error>
               </mat-form-field>
             </div>

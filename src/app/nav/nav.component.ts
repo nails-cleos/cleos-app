@@ -13,6 +13,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Role } from '../interfaces/token';
 import { MessagingService } from '../services/messaging.service';
 import { environment } from '../../environments/environment';
+import { getUserImage, getUserName, getUserNameInitials } from '../util/helper';
 
 @Component({
   selector: 'app-nav',
@@ -43,7 +44,7 @@ export class NavComponent implements OnInit, OnDestroy {
   isProfessional = false;
   message: any;
 
-  showInitials = false;
+  image: string | undefined;
   initials: string | undefined;
   countNotifications = 0;
   plusNotification: string | undefined;
@@ -105,17 +106,9 @@ export class NavComponent implements OnInit, OnDestroy {
         this.isProfessional = user.authorities.some(u => u.authority === Role.professional);
         this.menuItems = state.menus;
         this.canChangePassword = user?.provider === 'LOCAL';
-        if (user.firstName) {
-          this.username = `${user.firstName} ${user?.lastName}`;
-          this.initials = `${user.firstName.charAt(0)} ${user?.lastName?.charAt(0)}`;
-        } else {
-          this.username = user?.username;
-          this.initials = user?.username?.charAt(0);
-        }
-
-        if (!this.currentUser?.imageUrl) {
-          this.showInitials = true;
-        }
+        this.username = getUserName(user);
+        this.initials = getUserNameInitials(user);
+        this.image = getUserImage(user);
         this.messagingService.requestPermission(user.id);
         this.messagingService.receiveMessage();
         this.message = this.messagingService.currentMessage.subscribe((value: any) => {

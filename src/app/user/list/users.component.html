@@ -14,7 +14,7 @@
     <ng-container matColumnDef="name">
       <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'USER.LIST.COLUMN.NAME' | translate }}</th>
       <td *matCellDef="let user" mat-cell>
-        <div *ngIf="user.id; else skeleton">{{user.firstName}} {{user.lastName}}</div>
+        <div *ngIf="user.id; else skeleton">{{getUsername(user)}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
@@ -168,7 +168,7 @@
     </ng-container>
 
     <ng-container matColumnDef="noContent">
-      <td class="no-content bold" mat-footer-cell *matFooterCellDef [attr.colspan]="displayedColumns.length">
+      <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
         {{ 'COMMON.ERROR.NO_CONTENT' | translate }}</td>
     </ng-container>
 
@@ -177,7 +177,7 @@
         class="user-row" mat-row></tr>
     <tr *matRowDef="let row; columns: ['expandedDetail']" class="user-detail-row" mat-row></tr>
 
-    <tr mat-footer-row *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0"></tr>
+    <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
   </table>
   <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
 
