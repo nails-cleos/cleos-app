@@ -14,6 +14,7 @@
     </div>
   </mat-card-header>
   <mat-card-content *ngIf="reservation; else boxSkeleton">
+    <mat-divider></mat-divider>
     <mat-list>
       <div mat-subheader>{{ 'RESERVATION.DETAIL.ROOM.TITLE' | translate}}</div>
       <mat-list-item>
@@ -64,13 +65,32 @@
       <div mat-subheader>{{ 'RESERVATION.DETAIL.APPOINTMENT' | translate}}</div>
       <mat-list-item>
         <mat-icon mat-list-icon>event</mat-icon>
-        <div mat-line>{{start | date:'short':undefined:language}}
-          - {{end | date:'short':undefined:language}}</div>
+        <div mat-line>{{start | date:'short':undefined:language}}</div>
+          <div mat-line>{{end | date:'short':undefined:language}}</div>
       </mat-list-item>
       <mat-list-item>
         <mat-icon mat-list-icon>{{state}}</mat-icon>
         <div mat-line>{{ 'RESERVATION.STATE.' + reservation.state | translate}}</div>
       </mat-list-item>
+      <div *ngIf="reservation.product.extras">
+        <mat-divider></mat-divider>
+        <div mat-subheader>{{ 'RESERVATION.DETAIL.PRODUCT.EXTRAS.TITLE' | translate}}</div>
+        <mat-list-item *ngIf="reservation.product.extras.description">
+          <mat-icon mat-list-icon>description</mat-icon>
+          <div mat-line>{{ 'RESERVATION.DETAIL.PRODUCT.EXTRAS.DESCRIPTION' | translate}}</div>
+          <div mat-line>{{reservation.product.extras.description}}</div>
+        </mat-list-item>
+        <mat-list-item *ngIf="reservation.product.extras.price">
+          <mat-icon mat-list-icon>attach_money</mat-icon>
+          <div mat-line>{{ 'RESERVATION.DETAIL.PRODUCT.EXTRAS.PRICE' | translate}}</div>
+          <div mat-line>{{reservation.product.extras.price}}</div>
+        </mat-list-item>
+        <mat-list-item *ngIf="total">
+          <mat-icon mat-list-icon>paid</mat-icon>
+          <div mat-line><span class="bold">{{ 'RESERVATION.DETAIL.PRODUCT.EXTRAS.TOTAL' | translate}}</span></div>
+          <div mat-line><span class="bold">{{total}}</span></div>
+        </mat-list-item>
+      </div>
       <mat-divider></mat-divider>
     </mat-list>
     <mat-list *ngIf="reservation.history">

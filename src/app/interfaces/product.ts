@@ -1,4 +1,4 @@
-import { IDiscount, IDiscountAll, IUserDiscount } from './discount';
+import { IDiscount, IUserDiscount } from './discount';
 
 export interface IProduct {
   id?: string;
@@ -19,11 +19,17 @@ export interface IProductAll {
   description?: string;
   durability?: string;
   discount?: IDiscount;
+  extras?: IExtras;
 }
 
 export interface IProductDiscountDTO {
   products: IProductAll[];
   discounts: IUserDiscount[];
+}
+
+export interface IExtras {
+  description?: string;
+  price?: number;
 }
 
 export class Product implements IProduct {

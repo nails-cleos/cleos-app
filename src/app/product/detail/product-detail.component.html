@@ -15,7 +15,7 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PRODUCT.DETAIL.NAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input autocomplete="name" formControlName="name" matInput required>
+                  <input autocomplete="name" [formControl]="name" matInput required>
                 </label>
                 <mat-error *ngIf="name.hasError('required')" [innerHTML]="'PRODUCT.DETAIL.NAME.REQUIRED' | translate">
                 </mat-error>
@@ -36,7 +36,7 @@
                   <mat-icon matPrefix>attach_money</mat-icon> &nbsp;
                 </span>
                 <label>
-                  <input formControlName="price" matInput required step="1" type="number">
+                  <input [formControl]="price" matInput required step="1" type="number">
                 </label>
                 <mat-error *ngIf="price.hasError('required')" [innerHTML]="'PRODUCT.DETAIL.PRICE.REQUIRED' | translate">
                 </mat-error>

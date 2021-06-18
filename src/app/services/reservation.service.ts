@@ -101,8 +101,8 @@ export class ReservationService {
     return this.http.patch<IReservation>(url, reservation);
   }
 
-  public changeState(reservationId: string, event: string): Observable<IReservation> {
-    return this.http.post<IReservation>(`${this.url}/${reservationId}/${event}`, null);
+  public changeState(reservationId: string, event: string, extras?: any): Observable<IReservation> {
+    return this.http.post<IReservation>(`${this.url}/${reservationId}/${event}`, extras);
   }
 
   public getUpcomingReservation(): Observable<ICustomerReservation> {

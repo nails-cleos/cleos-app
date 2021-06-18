@@ -68,6 +68,16 @@ export interface IReservationSummary {
   error?: any;
 }
 
+export interface ITracking {
+  reservation: IReservationAll;
+  createdTime?: string;
+  editedTime?: string;
+  approvedTime?: string;
+  startedTime?: string;
+  completedTime?: string;
+  cancelledTime?: string;
+}
+
 export class Reservation implements IReservation {
   constructor() {
   }

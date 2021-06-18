@@ -21,6 +21,7 @@
       "CLOSE": "Cerrar",
       "COPY": "Copiar",
       "SHARE": "Compartir",
+      "COMPLETE": "Completar",
       "DISCOUNT": {
         "SHOW": "Mostrar descuentos",
         "HIDE": "Ocultar descuentos",
@@ -86,7 +87,11 @@
         "ANNUAL": "Reservas",
         "CUSTOMER": "Clientes",
         "QUANTITY": "Cantidad",
-        "LAST_MONTH": "Último mes"
+        "LAST_MONTH": "Último mes",
+        "MIN": "Mínimo",
+        "MAX": "Máximo",
+        "AVG": "Promedio",
+        "ESTIMATE": "Estimado"
       },
       "QUANTITY_PRODUCT": "Cantidad por servicio",
       "PRODUCT_RESERVATION": "Servicios",
@@ -94,6 +99,8 @@
       "YEARLY_PRODUCT_PRICE": "Ganancias anuales",
       "CUSTOMER_RESERVATION": "Reservas por cliente",
       "LAST_MONTH_RESERVATION": "Reservas en el último mes",
+      "TRACKING_AVERAGE": "Tiempo real del servicio",
+      "TRACKING_COMPARE": "Tiempo real/estimado",
       "RESERVATION": "Reservas",
       "EXPAND": "Expandir"
     }
@@ -702,7 +709,30 @@
         "TITLE": "Servicio",
         "NAME": "Nombre",
         "DURATION": "Duración",
-        "PRICE": "Precio"
+        "PRICE": "Precio",
+        "EXTRAS": {
+          "TITLE": "Adicionales",
+          "DESCRIPTION": "Descripción",
+          "PRICE": "Precio",
+          "TOTAL": "Total"
+        },
+        "COMPLETE": {
+          "TITLE": "Servicio",
+          "INVALID": "Servicio no valido",
+          "EXTRAS": {
+            "TITLE": "Adicionales",
+            "DESCRIPTION": {
+              "FIELD": "Descripción"
+            },
+            "PRICE": {
+              "FIELD": "Precio"
+            }
+          },
+          "DESCRIPTION": "<span class='bold'>Descripción:</span> {{description}}",
+          "TOTAL": "<span class='bold'>Total:</span>",
+          "DURATION": "<span class='bold'>Duración:</span> {{duration}}",
+          "DURABILITY": "<span class='bold'>Durabilidad:</span> {{durability}}"
+        }
       },
       "APPOINTMENT": "Cita",
       "HISTORY": {
@@ -729,7 +759,8 @@
         "EDIT": "Editar",
         "COMPLETE": "Completar",
         "CANCEL": "Cancelar",
-        "BOOK": "Reservar nuevamente"
+        "BOOK": "Reservar nuevamente",
+        "SEND": "Enviar Whatsapp"
       },
       "CHANGE_STATE": {
         "TITLE": "Cambio de estado",
@@ -1012,6 +1043,11 @@
     },
     "UPDATED": {
       "MESSAGE": "Descuento {{name}} actualizado"
+    }
+  },
+  "WHATSAPP": {
+    "SEND": {
+      "APPROVE": "Detalle"
     }
   },
   "APP": {
