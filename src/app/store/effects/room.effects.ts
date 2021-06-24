@@ -15,7 +15,8 @@ export class RoomEffects {
   @Effect()
   getAll$ = this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.getAll)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.roomService.getAll(payload.active, payload.direction, payload.page).pipe(
+    switchMap((payload: any) => this.roomService.getAll(payload.active, payload.direction, payload.page,
+      payload.size).pipe(
       switchMap((response: any) => of(new fromActionsRoom.RoomSuccess(response))),
       catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
     ))

@@ -15,7 +15,8 @@ export class UnavailableEffects {
   @Effect()
   getAll$ = this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.getAll)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.unavailableService.getAll(payload.active, payload.direction, payload.page).pipe(
+    switchMap((payload: any) => this.unavailableService.getAll(payload.active, payload.direction, payload.page,
+      payload.size).pipe(
       switchMap((response: any) => of(new fromActionsUnavailable.UnavailableSuccess(response))),
       catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({error: err.error})))
     ))

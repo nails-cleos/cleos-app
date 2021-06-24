@@ -7,6 +7,7 @@ import * as fromActionsCatalogue from '../catalogue.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { CatalogueService } from '../../services/catalogue.service';
 import { Router } from '@angular/router';
+import { ProductService } from '../../services/product.service';
 
 @Injectable()
 export class CatalogueEffects {
@@ -91,7 +92,7 @@ export class CatalogueEffects {
     tap(() => this.router.navigate(['catalogues']))
   );
 
-  constructor(private readonly translate: TranslateService, private actions$: Actions, private catalogueService: CatalogueService,
-              private router: Router) {
+  constructor(private readonly translate: TranslateService, private actions$: Actions,
+              private catalogueService: CatalogueService, private router: Router) {
   }
 }

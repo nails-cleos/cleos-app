@@ -139,17 +139,25 @@ export const getTime = (time: Date): string => {
   return `${hours}:${minutes}`;
 };
 
-export const formatDateTime = (date: Date, locale: string): string => date.toLocaleDateString(locale, {
+export const formatFullDateTime = (date: Date, locale: string): string => date.toLocaleDateString(locale, {
   day: 'numeric', month: 'long', weekday: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
-}).replace(/ /g, ' ');
+});
+
+export const formatDateTime = (date: Date, locale: string): string => {
+  const result = date.toLocaleDateString(locale, {
+    day: 'numeric', month: 'long', weekday: 'long', hour: '2-digit', minute: '2-digit'
+  });
+
+  return result.charAt(0).toUpperCase() + result.slice(1);
+};
 
 export const formatDateName = (date: Date, locale: string, measure: string): string => date.toLocaleDateString(locale, {
   day: 'numeric', month: measure, weekday: measure, year: 'numeric'
-}).replace(/ /g, ' ');
+});
 
 export const formatDate = (date: Date, locale: string): string => date.toLocaleDateString(locale, {
-  day: 'numeric', month: 'short', year: 'numeric'
-}).replace(/ /g, '-');
+  day: 'numeric', month: 'short'
+}).replace(/ /g, '-').replace(/(?:^|\s|-)+\S/g, (c) => c.toUpperCase());
 
 export const formatTime = (hour: number, minute: number): string => getTime(createDate(hour, minute));
 

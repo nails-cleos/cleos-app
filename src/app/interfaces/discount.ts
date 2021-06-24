@@ -43,8 +43,6 @@ export class Discount implements IDiscount {
   }
 }
 
-export const PAGE_SIZE = 10;
-
 export const transitionAnimation = trigger(
   'discountAnimation',
   [

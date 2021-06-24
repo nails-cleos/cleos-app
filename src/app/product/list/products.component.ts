@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
-import { DEFAULT_LENGTH, Pagination } from '../../interfaces/pagination';
-import { IProduct, PAGE_SIZE } from '../../interfaces/product';
+import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
+import { IProduct } from '../../interfaces/product';
 import { Observable, Subscription } from 'rxjs';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -13,6 +13,7 @@ import { Store } from '@ngrx/store';
 import * as fromActionsProduct from '../../store/product.actions';
 import { DialogComponent } from '../../dialog/dialog.component';
 import { convertDuration } from '../../util/dates';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-products',
@@ -33,21 +34,20 @@ export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
   error: any;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
-              private store: Store<AppState>, private cdRef: ChangeDetectorRef) {
+              private store: Store<AppState>, private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+    breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small
+    ]).subscribe(result => {
+      if (result.matches) {
+        this.pageSize = MOBILE_PAGE_SIZE;
+      }
+    });
     this.getState = this.store.select(selectProductState);
   }
 
   ngAfterViewInit(): void {
-    this.sort.sortChange.subscribe(() => {
-      this.getProducts();
-    });
-
-    this.paginator?.page.subscribe(() => {
-      this.getProducts();
-    });
-
     this.getProducts();
-    this.cdRef.detectChanges();
   }
 
   ngOnInit(): void {
@@ -107,6 +107,9 @@ export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
         return product;
       });
       this.resultsLength = stateValue.data?.totalElements;
+      if (this.resultsLength) {
+        this.createPageSubscriptions();
+      }
     });
   }
 
@@ -116,11 +119,22 @@ export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
-  private getProducts(): void {
+  private createPageSubscriptions(): void {
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.getProducts();
+    });
+    this.paginator?.page.subscribe(() => this.getProducts(this.paginator.pageIndex));
+
+    this.cdRef.detectChanges();
+  }
+
+  private getProducts(page: number = 0): void {
     const payload = {
       active: this.sort.active,
       direction: this.sort.direction,
-      page: this.paginator ? this.paginator.pageIndex : 0
+      size: this.pageSize,
+      page
     };
     this.store.dispatch(
       new fromActionsProduct.GetAll(payload)

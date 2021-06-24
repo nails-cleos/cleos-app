@@ -71,5 +71,3 @@ export class Address implements IAddress {
     this.location = location;
   }
 }
-
-export const PAGE_SIZE = 10;

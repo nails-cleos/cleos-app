@@ -2,14 +2,8 @@ import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChi
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { DEFAULT_LENGTH, Pagination } from '../../interfaces/pagination';
-import {
-  ICustomerReservation,
-  IReservation,
-  IReservationAll,
-  MOBILE_PAGE_SIZE,
-  PAGE_SIZE
-} from '../../interfaces/reservation';
+import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
+import { ICustomerReservation, IReservation, IReservationAll } from '../../interfaces/reservation';
 import { Observable, Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -80,13 +74,11 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
       this.getReservations();
-      // this.paginator.pageIndex = 0;
     });
 
-    this.paginator?.page.subscribe(() => {
-      this.getReservations();
-    });
+    this.paginator?.page.subscribe(() => this.getReservations(this.paginator.pageIndex));
 
     this.getReservations();
     this.cdRef.detectChanges();
@@ -148,12 +140,12 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
     });
   }
 
-  private getReservations(): void {
+  private getReservations(page: number = 0): void {
     const payload = {
       active: this.sort.active,
       direction: this.sort.direction,
-      page: this.paginator ? this.paginator.pageIndex : 0,
-      size: this.pageSize
+      size: this.pageSize,
+      page
     };
     this.store.dispatch(
       new fromActionsReservation.GetCustomerReservations(payload)

@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IDiscount, IUserDiscount, PAGE_SIZE } from '../interfaces/discount';
+import { IDiscount, IUserDiscount } from '../interfaces/discount';
+import { PAGE_SIZE } from '../interfaces/pagination';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +14,8 @@ export class DiscountService {
   constructor(private http: HttpClient) {
   }
 
-  public getAll(sort: string, direction: string, page: number, path: string): Observable<IDiscount[]> {
-    let params = new HttpParams().set('page', String(page)).set('size', String(PAGE_SIZE));
+  public getAll(sort: string, direction: string, page: number, path: string, size: number = PAGE_SIZE): Observable<IDiscount[]> {
+    let params = new HttpParams().set('page', String(page)).set('size', String(size));
     if (sort) {
       params = params.append('sort', sort);
     }

@@ -36,5 +36,3 @@ export class Product implements IProduct {
   constructor() {
   }
 }
-
-export const PAGE_SIZE = 10;

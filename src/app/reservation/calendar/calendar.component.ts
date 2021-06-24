@@ -102,7 +102,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   segmentClick(date: Date, room?: IRoom): void {
     if (date && room) {
       const data = {date, room};
-      this.router.navigateByUrl('/reservation', {state: data});
+      this.router.navigate(['reservation'], {state: data});
     }
   }
 

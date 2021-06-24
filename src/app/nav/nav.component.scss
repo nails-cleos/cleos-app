@@ -1,21 +1,17 @@
 mat-sidenav-container {
   height: 100%;
 
-  mat-sidenav-content {
-    mat-toolbar {
-      img {
-        margin-right: 1%;
-      }
-
-      .badge-padding {
-        padding-right: 15%;
-      }
-    }
-  }
-
   mat-toolbar {
     .align-right {
       flex: 1 1 auto;
+    }
+
+    img {
+      margin-right: 1%;
+    }
+
+    .badge-padding {
+      padding-right: 15%;
     }
   }
 }
@@ -71,16 +67,16 @@ mat-sidenav-container {
   background-color: #a06c3f;
   overflow: hidden;
 
-  img {
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-  }
-
   .initials {
     color: #FFFFFF;
     font-size: 20px;
     line-height: 19px;
     letter-spacing: 0.2625px;
   }
+}
+
+img {
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
 }

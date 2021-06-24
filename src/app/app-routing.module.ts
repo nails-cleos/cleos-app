@@ -41,213 +41,188 @@ import { DiscountsComponent } from './discount/list/discounts.component';
 import { DiscountComponent } from './discount/discount.component';
 import { DiscountDetailComponent } from './discount/detail/discount-detail.component';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
+import { NavComponent } from './nav/nav.component';
+import { PrivacyComponent } from './privacy/privacy.component';
+import { TermsAndConditionsComponent } from './terms-and-conditions/terms-and-conditions.component';
 
 const routes: Routes = [
-  {path: '', redirectTo: '/redirect', pathMatch: 'full', resolve: {model: TranslationLoaderResolver}},
-  {path: 'auth', component: AuthComponent, data: {error: 'error'}},
-  {path: 'activate-account', component: ActivateAccountComponent},
-  {path: 'forgot-password', component: ForgotPasswordComponent},
-  {path: 'recovery-password', component: RecoveryPasswordComponent},
-  {path: 'catalogs', component: CatalogComponent},
-  {path: 'main', component: MainComponent},
   {
-    path: 'redirect', component: RedirectComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.professional, Role.customer]
-    }
-  },
-  {
-    path: 'dashboard',
-    component: DashComponent,
-    resolve: {model: TranslationLoaderResolver},
-    canActivate: [AuthGuardService],
-    data: {
-      roles: [Role.admin, Role.professional]
-    }
-  },
-  {
-    path: 'change-password', component: ChangePasswordComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.professional, Role.customer]
-    }
-  },
-  {
-    path: 'profile', component: ProfileComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.professional, Role.customer]
-    }
-  },
-  {
-    path: 'users',
-    component: UsersComponent,
-    resolve: {model: TranslationLoaderResolver},
-    canActivate: [AuthGuardService],
-    data: {
-      roles: [Role.admin]
-    }
-  },
-  {
-    path: 'user/:id', component: UserDetailComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin]
-    }
-  },
-  {
-    path: 'user', component: UserComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin]
-    }
-  },
-  {
-    path: 'products',
-    component: ProductsComponent,
-    resolve: {model: TranslationLoaderResolver},
-    canActivate: [AuthGuardService],
-    data: {
-      roles: [Role.admin]
-    }
-  },
-  {
-    path: 'product', component: ProductComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin]
-    }
-  },
-  {
-    path: 'product/:id', component: ProductDetailComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin]
-    }
-  },
-  {
-    path: 'catalogues',
-    component: CataloguesComponent,
-    resolve: {model: TranslationLoaderResolver},
-    canActivate: [AuthGuardService],
-    data: {
-      roles: [Role.admin]
-    }
-  },
-  {
-    path: 'catalogue', component: CatalogueComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin]
-    }
-  },
-  {
-    path: 'catalogue/:id', component: CatalogueDetailComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin]
-    }
-  },
-  {
-    path: 'rooms',
-    component: RoomsComponent,
-    resolve: {model: TranslationLoaderResolver},
-    canActivate: [AuthGuardService],
-    data: {
-      roles: [Role.admin]
-    }
-  },
-  {
-    path: 'room', component: RoomComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin]
-    }
-  },
-  {
-    path: 'room/:id', component: RoomDetailComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin]
-    }
-  },
-  {
-    path: 'discounts',
-    component: DiscountsComponent,
-    resolve: {model: TranslationLoaderResolver},
-    canActivate: [AuthGuardService],
-    data: {
-      roles: [Role.admin]
-    }
-  },
-  {
-    path: 'discount', component: DiscountComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin]
-    }
-  },
-  {
-    path: 'discount/:id', component: DiscountDetailComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin]
-    }
-  },
-  {
-    path: 'me-room', component: RoomMeComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.professional]
-    }
-  },
-  {
-    path: 'reservation', component: ReservationComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.professional] // TODO Customer not allowed
-    }
-  },
-  {
-    path: 'reservation/:id/edit', component: ReservationComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.professional] // TODO Customer not allowed
-    }
-  },
-  {
-    path: 'reservation/:id', component: ReservationDetailComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.professional, Role.customer]
-    }, runGuardsAndResolvers: 'always'
-  },
-  {
-    path: 'calendar',
-    component: CalendarComponent,
-    resolve: {model: TranslationLoaderResolver},
-    canActivate: [AuthGuardService],
-    data: {
-      roles: [Role.admin, Role.professional]
-    }
-  },
-  {
-    path: 'search',
-    component: SearchComponent,
-    resolve: {model: TranslationLoaderResolver},
-    canActivate: [AuthGuardService],
-    data: {
-      roles: [Role.professional]
-    }
-  },
-  {
-    path: 'notifications',
-    component: NotificationsComponent,
-    resolve: {model: TranslationLoaderResolver},
-    canActivate: [AuthGuardService],
-    data: {
-      roles: [Role.admin, Role.professional, Role.customer]
-    }
-  },
-  {
-    path: 'unavailable-list',
-    component: UnavailableListComponent,
-    resolve: {model: TranslationLoaderResolver},
-    canActivate: [AuthGuardService],
-    data: {
-      roles: [Role.admin, Role.professional]
-    }
-  },
-  {
-    path: 'unavailable', component: UnavailableComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.professional]
-    }
-  },
-  {
-    path: 'unavailable/:id', component: UnavailableDetailComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.professional]
-    }
-  },
-  {
-    path: 'me', canActivate: [AuthGuardService], data: {roles: [Role.customer]}, children: [
-      {path: 'reservations', component: ReservationsComponent, resolve: {model: TranslationLoaderResolver}},
-      {path: 'reservation', component: MeReservationComponent},
-      {path: 'reservation/:id', component: MeReservationComponent},
-      {path: 'referrals', component: ReferralsComponent},
-      {path: 'discounts', component: MeDiscountComponent, resolve: {model: TranslationLoaderResolver}}
+    path: '', component: NavComponent, resolve: {model: TranslationLoaderResolver}, children: [
+      {path: 'auth', component: AuthComponent, data: {error: 'error'}},
+      {path: 'activate-account', component: ActivateAccountComponent},
+      {path: 'forgot-password', component: ForgotPasswordComponent},
+      {path: 'recovery-password', component: RecoveryPasswordComponent},
+      {
+        path: 'redirect', component: RedirectComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin, Role.professional, Role.customer]
+        }
+      },
+      {
+        path: 'dashboard', component: DashComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin, Role.professional]
+        }
+      },
+      {
+        path: 'change-password', component: ChangePasswordComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin, Role.professional, Role.customer]
+        }
+      },
+      {
+        path: 'profile', component: ProfileComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin, Role.professional, Role.customer]
+        }
+      },
+      {
+        path: 'users', component: UsersComponent, canActivate: [AuthGuardService],
+        resolve: {model: TranslationLoaderResolver},
+        data: {
+          roles: [Role.admin]
+        }
+      },
+      {
+        path: 'user/:id', component: UserDetailComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin]
+        }
+      },
+      {
+        path: 'user', component: UserComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin]
+        }
+      },
+      {
+        path: 'products', component: ProductsComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin]
+        }
+      },
+      {
+        path: 'product', component: ProductComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin]
+        }
+      },
+      {
+        path: 'product/:id', component: ProductDetailComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin]
+        }
+      },
+      {
+        path: 'catalogues', component: CataloguesComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin]
+        }
+      },
+      {
+        path: 'catalogue', component: CatalogueComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin]
+        }
+      },
+      {
+        path: 'catalogue/:id', component: CatalogueDetailComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin]
+        }
+      },
+      {
+        path: 'rooms', component: RoomsComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin]
+        }
+      },
+      {
+        path: 'room', component: RoomComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin]
+        }
+      },
+      {
+        path: 'room/:id', component: RoomDetailComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin]
+        }
+      },
+      {
+        path: 'discounts', component: DiscountsComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin]
+        }
+      },
+      {
+        path: 'discount', component: DiscountComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin]
+        }
+      },
+      {
+        path: 'discount/:id', component: DiscountDetailComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin]
+        }
+      },
+      {
+        path: 'me-room', component: RoomMeComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.professional]
+        }
+      },
+      {
+        path: 'reservation', component: ReservationComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin, Role.professional] // TODO Customer not allowed
+        }
+      },
+      {
+        path: 'reservation/:id/edit', component: ReservationComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin, Role.professional] // TODO Customer not allowed
+        }
+      },
+      {
+        path: 'reservation/:id', component: ReservationDetailComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin, Role.professional, Role.customer]
+        }, runGuardsAndResolvers: 'always'
+      },
+      {
+        path: 'calendar', component: CalendarComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin, Role.professional]
+        }
+      },
+      {
+        path: 'search', component: SearchComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.professional]
+        }
+      },
+      {
+        path: 'notifications', component: NotificationsComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin, Role.professional, Role.customer]
+        }
+      },
+      {
+        path: 'unavailable-list', component: UnavailableListComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin, Role.professional]
+        }
+      },
+      {
+        path: 'unavailable', component: UnavailableComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin, Role.professional]
+        }
+      },
+      {
+        path: 'unavailable/:id', component: UnavailableDetailComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin, Role.professional]
+        }
+      },
+      {
+        path: 'me', canActivate: [AuthGuardService], data: {roles: [Role.customer]}, children: [
+          {path: 'reservations', component: ReservationsComponent},
+          {path: 'reservation', component: MeReservationComponent},
+          {path: 'reservation/:id', component: MeReservationComponent},
+          {path: 'referrals', component: ReferralsComponent},
+          {path: 'discounts', component: MeDiscountComponent}
+        ]
+      }
     ]
-  }
+  },
+  {path: 'catalogs', component: CatalogComponent},
+  {path: 'privacy', component: PrivacyComponent},
+  {path: 'term-and-conditions', component: TermsAndConditionsComponent},
+  {path: 'main', component: MainComponent},
+  {path: '**', redirectTo: '/main', pathMatch: 'full', resolve: {model: TranslationLoaderResolver}}
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, {preloadingStrategy: PreloadAllModules, onSameUrlNavigation: 'reload'})],
+  imports: [RouterModule.forRoot(routes, {
+    preloadingStrategy: PreloadAllModules,
+    onSameUrlNavigation: 'reload',
+    anchorScrolling: 'enabled'
+  })],
   exports: [RouterModule]
 })
 export class AppRoutingModule {

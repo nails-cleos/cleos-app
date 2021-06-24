@@ -2,6 +2,7 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
 import { Color, Label } from 'ng2-charts';
 import { annualReservationChart } from '../../util/chart';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-annual-reservations-chart',
@@ -33,8 +34,8 @@ export class AnnualReservationsChartComponent implements OnChanges {
   public lineChartType: ChartType = 'line';
   public lineChartPlugins = [];
 
-  constructor() {
-    const userLang = navigator.language;
+  constructor(private translate: TranslateService) {
+    const userLang = translate.currentLang;
     const index = userLang.indexOf('-');
     this.locale = index === -1 ? userLang : userLang.substr(0, index);
   }

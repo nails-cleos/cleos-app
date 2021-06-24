@@ -16,7 +16,8 @@ export class UserEffects {
   @Effect()
   getAll$ = this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.getAll)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.userService.getAll(payload.active, payload.direction, payload.page).pipe(
+    switchMap((payload: any) => this.userService.getAll(payload.active, payload.direction, payload.page,
+      payload.size).pipe(
       switchMap((response: any) => of(new fromActionsUser.UserSuccess(response ? response : {content: [], totalElements: 0}))),
       catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
     ))

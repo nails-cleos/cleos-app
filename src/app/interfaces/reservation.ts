@@ -109,12 +109,12 @@ export class Calendar implements ICalendar {
   }
 }
 
-export const PAGE_SIZE = 2;
-export const MOBILE_PAGE_SIZE = 5;
-
 export enum States {
   created = 'CREATED',
   approved = 'APPROVED',
   started = 'STARTED',
-  completed = 'COMPLETED'
+  completed = 'COMPLETED',
+  cancelled = 'CANCELLED'
 }
+
+export const MAX_RESERVATION_MONTH = 3;

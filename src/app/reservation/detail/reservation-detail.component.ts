@@ -6,7 +6,16 @@ import { Observable, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
 import { IReservationAll } from '../../interfaces/reservation';
 import { ActivatedRoute, Router } from '@angular/router';
-import { convertDuration, createNewDate, Duration, getNow, getTime, IDuration, newDate } from '../../util/dates';
+import {
+  convertDuration,
+  createNewDate,
+  Duration, formatDateName, formatDateTime,
+  formatFullDateTime,
+  getNow,
+  getTime,
+  IDuration,
+  newDate
+} from '../../util/dates';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { IUserAll } from '../../interfaces/user';
@@ -24,7 +33,7 @@ import { requireMatch, valueChange } from '../../util/validators';
 export enum ReservationIconName {
   created = 'assignment',
   approved = 'done',
-  send = 'sms',
+  send = 'fa fa-whatsapp',
   started = 'play_arrow',
   completed = 'done_all',
   cancelled = 'clear',
@@ -251,8 +260,11 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     });
 
     const sendMessageTransaction = ReservationDetailComponent.createTransaction('send', (): void => {
-      const message = self.translate.instant('WHATSAPP.MESSAGE.APPROVE');
-      window.open(`https://api.whatsapp.com/send?phone=+${self.reservation?.customer?.phone}&text=${message}`, '_blank');
+      if (self.reservation && self.reservation.start) {
+        const date = formatDateTime(newDate(self.reservation.start), self.language);
+        const message = translate.instant('WHATSAPP.SEND.APPROVE', {date});
+        window.open(`https://api.whatsapp.com/send?phone=+${self.reservation?.customer?.phone}&text=${message}`, '_blank');
+      }
     });
 
     const startTransaction = ReservationDetailComponent.createTransaction('approved', (): void => {
@@ -297,7 +309,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       const room = self.reservation?.room;
       const product = self.reservation?.product;
       const data = {customer, room, product};
-      this.router.navigateByUrl('/reservation', {state: data});
+      this.router.navigate(['reservation'], {state: data});
     });
 
     this.machine = ReservationDetailComponent.createMachine({
@@ -364,7 +376,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       const room = self.reservation?.room;
       const product = self.reservation?.product;
       const data = {room, product};
-      this.router.navigateByUrl('/me/reservation', {state: data});
+      this.router.navigate(['me', 'reservation'], {state: data});
     });
 
     this.machine = ReservationDetailComponent.createMachine({

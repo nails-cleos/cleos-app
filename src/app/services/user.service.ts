@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { IUser, PAGE_SIZE } from '../interfaces/user';
+import { IUser } from '../interfaces/user';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Role } from '../interfaces/token';
 import { IRoom } from '../interfaces/room';
+import { PAGE_SIZE } from '../interfaces/pagination';
 
 @Injectable({
   providedIn: 'root'
@@ -17,8 +18,8 @@ export class UserService {
   constructor(private http: HttpClient) {
   }
 
-  public getAll(sort: string, direction: string, page: number): Observable<IUser[]> {
-    let params = new HttpParams().set('page', String(page)).set('size', String(PAGE_SIZE));
+  public getAll(sort: string, direction: string, page: number, size: number = PAGE_SIZE): Observable<IUser[]> {
+    let params = new HttpParams().set('page', String(page)).set('size', String(size));
     if (sort) {
       params = params.append('sort', sort);
     }

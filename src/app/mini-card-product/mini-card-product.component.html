@@ -1,0 +1,15 @@
+<mat-card class="dashboard-card mat-elevation-z8">
+  <mat-card-header>
+    <mat-card-title>
+      {{card.name}}
+    </mat-card-title>
+    <mat-card-subtitle>{{card.price | currency:'$':'symbol':'0.0' }}</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content class="dashboard-card-content">
+    <div>{{card.description}}</div>
+    <div class="divider"></div>
+    <div *ngIf="card.duration" [innerHTML]="'CARD.PRODUCT.DURATION' | translate: {duration: time}"></div>
+    <div *ngIf="card.durability"
+         [innerHTML]="'CARD.PRODUCT.DURABILITY' | translate: {durability: card.durability}"></div>
+  </mat-card-content>
+</mat-card>

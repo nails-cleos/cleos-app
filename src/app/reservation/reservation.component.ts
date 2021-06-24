@@ -308,10 +308,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const start = createNewDate(date, Number(nowTime[0]), Number(nowTime[1]));
     const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
 
-    console.log(date)
-    console.log(start)
-    console.log(end)
-
     const detail = this.translate.instant('RESERVATION.ADD.EVENT.DETAIL', {
       customerName: getUserName(this.customer.value),
       productName: this.product.value.name,
@@ -405,7 +401,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   addCustomer(): void {
-    this.router.navigateByUrl('/user', {state: {role: Role.customer}});
+    this.router.navigate(['user'], {state: {role: Role.customer}});
   }
 
   getAddress($event: GeocoderResult): void {

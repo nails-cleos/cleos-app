@@ -2,7 +2,7 @@ import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChi
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { DEFAULT_LENGTH, Pagination } from '../../interfaces/pagination';
+import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
 import { Observable, Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -12,9 +12,10 @@ import { AppState, selectUnavailableState } from '../../store/app.states';
 import * as fromActionsUnavailable from '../../store/unavailable.actions';
 import { DialogComponent } from '../../dialog/dialog.component';
 import { convertDuration } from '../../util/dates';
-import { IUnavailable, PAGE_SIZE } from '../../interfaces/unavailable';
+import { IUnavailable } from '../../interfaces/unavailable';
 import { IUser } from '../../interfaces/user';
 import { getUserName } from '../../util/helper';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-unavailable-list',
@@ -37,22 +38,21 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
   language: string;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
-              private store: Store<AppState>, private cdRef: ChangeDetectorRef) {
+              private store: Store<AppState>, private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+    breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small
+    ]).subscribe(result => {
+      if (result.matches) {
+        this.pageSize = MOBILE_PAGE_SIZE;
+      }
+    });
     this.getState = this.store.select(selectUnavailableState);
     this.language = this.translate.currentLang;
   }
 
   ngAfterViewInit(): void {
-    this.sort.sortChange.subscribe(() => {
-      this.getUnavailableList();
-    });
-
-    this.paginator?.page.subscribe(() => {
-      this.getUnavailableList();
-    });
-
     this.getUnavailableList();
-    this.cdRef.detectChanges();
   }
 
   ngOnInit(): void {
@@ -116,6 +116,9 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
         return unavailable;
       });
       this.resultsLength = stateValue.data?.totalElements;
+      if (this.resultsLength) {
+        this.createPageSubscriptions();
+      }
     });
   }
 
@@ -125,11 +128,22 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
     );
   }
 
-  private getUnavailableList(): void {
+  private createPageSubscriptions(): void {
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.getUnavailableList();
+    });
+    this.paginator?.page.subscribe(() => this.getUnavailableList(this.paginator.pageIndex));
+
+    this.cdRef.detectChanges();
+  }
+
+  private getUnavailableList(page: number = 0): void {
     const payload = {
       active: this.sort.active,
       direction: this.sort.direction,
-      page: this.paginator ? this.paginator.pageIndex : 0
+      size: this.pageSize,
+      page
     };
     this.store.dispatch(
       new fromActionsUnavailable.GetAll(payload)

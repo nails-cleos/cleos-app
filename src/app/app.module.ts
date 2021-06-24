@@ -35,6 +35,7 @@ import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFireMessagingModule } from '@angular/fire/messaging';
 import firebase from 'firebase';
+import { MatCarouselModule } from '@ngbmodule/material-carousel';
 
 // Providers
 import { httpInterceptorProviders } from './http-interceptors';
@@ -61,6 +62,7 @@ import { NavigationService } from './services/navigation.service';
 import { MessagingService } from './services/messaging.service';
 import { DiscountService } from './services/discount.service';
 import { TrackingService } from './services/tracking.service';
+import { MainService } from './services/main.service';
 
 // Reducers
 import { reducers } from './store/app.states';
@@ -75,6 +77,7 @@ import { NotificationEffects } from './store/effects/notification.effects';
 import { CatalogueEffects } from './store/effects/catalogue.effects';
 import { UnavailableEffects } from './store/effects/unavailable.effects';
 import { DiscountEffects } from './store/effects/discount.effects';
+import { MainEffects } from './store/effects/main.effects';
 
 // Directives
 import { DragDropDirective } from './directives/drag-drop.directive';
@@ -114,9 +117,7 @@ import { AnnualReservationsChartComponent } from './charts/annual-reservations-c
 import { MiniCardComponent } from './mini-card/mini-card.component';
 import { CustomerReservationsChartComponent } from './charts/customer-reservations-chart/customer-reservations-chart.component';
 import { ReservationTableComponent } from './reservation/table/reservation-table.component';
-import {
-  QuantityProductReservationsChartComponent
-} from './charts/quantity-product-reservations-chart/quantity-product-reservations-chart.component';
+import { QuantityProductReservationsChartComponent } from './charts/quantity-product-reservations-chart/quantity-product-reservations-chart.component';
 import { LastMonthReservationsChartComponent } from './charts/last-month-reservations-chart/last-month-reservations-chart.component';
 import { TrackingAverageChartComponent } from './charts/tracking-average-chart/tracking-average-chart.component';
 import { NotificationsComponent } from './notification/list/notifications.component';
@@ -145,6 +146,9 @@ import { DiscountDetailComponent } from './discount/detail/discount-detail.compo
 import { DiscountDialogComponent, DiscountsComponent } from './discount/list/discounts.component';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
 import { TrackingCompareChartComponent } from './charts/tracking-compare-chart/tracking-compare-chart.component';
+import { MiniCardProductComponent } from './mini-card-product/mini-card-product.component';
+import { PrivacyComponent } from './privacy/privacy.component';
+import { TermsAndConditionsComponent } from './terms-and-conditions/terms-and-conditions.component';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
@@ -247,13 +251,16 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
     DiscountDialogComponent,
     MeDiscountComponent,
     CompleteDialogComponent,
-    TrackingCompareChartComponent
+    TrackingCompareChartComponent,
+    MiniCardProductComponent,
+    PrivacyComponent,
+    TermsAndConditionsComponent
   ],
   imports: [
     BrowserModule,
     StoreModule.forRoot(reducers, {metaReducers}),
     EffectsModule.forRoot([LoginEffects, UserEffects, ProductEffects, CatalogueEffects, RoomEffects, ReservationEffects,
-      NotificationEffects, UnavailableEffects, DiscountEffects]),
+      NotificationEffects, UnavailableEffects, DiscountEffects, MainEffects]),
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {
@@ -297,7 +304,8 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
     AngularFireDatabaseModule,
     AngularFireAuthModule,
     AngularFireMessagingModule,
-    AngularFireModule.initializeApp(environment.firebase)
+    AngularFireModule.initializeApp(environment.firebase),
+    MatCarouselModule.forRoot()
   ],
   providers: [
     {
@@ -315,6 +323,7 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
     UnavailableService,
     DiscountService,
     TrackingService,
+    MainService,
     NavigationService,
     TranslationLoaderResolver,
     GeocodeService,

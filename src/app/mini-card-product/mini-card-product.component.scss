@@ -1,0 +1,20 @@
+.dashboard-card {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  right: 15px;
+  bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  background-color: #fdf8f3;
+  cursor: pointer;
+}
+
+.dashboard-card-content {
+  flex-grow: 1;
+  flex-direction: column;
+  align-items: center;
+  max-height: 100%;
+  text-align: justify;
+  text-justify: inter-word;
+}

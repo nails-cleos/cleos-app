@@ -49,8 +49,8 @@ export class ReservationEffects {
   getAllFilterReservationsPage$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getAllFilterPage)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) =>
-      this.reservationService.getAllFilterReservationsPage(payload.active, payload.direction,
-        payload.page, payload.userId, payload.states).pipe(
+      this.reservationService.getAllFilterReservationsPage(payload.active, payload.direction, payload.page,
+        payload.size, payload.userId, payload.states).pipe(
         switchMap((response: any) => of(new fromActionsReservation.ReservationFilterPageSuccess(response ? response : {content: []}))),
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
       ))
