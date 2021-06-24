@@ -45,5 +45,3 @@ export class User implements IUser {
   constructor() {
   }
 }
-
-export const PAGE_SIZE = 10;

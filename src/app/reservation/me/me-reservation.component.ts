@@ -5,14 +5,20 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { requireMatch, valueChange } from '../../util/validators';
 import { IProduct } from '../../interfaces/product';
 import { IRoom } from '../../interfaces/room';
-import { IAvailableDTO, IReservation, IReservationAll, Reservation } from '../../interfaces/reservation';
+import {
+  IAvailableDTO,
+  IReservation,
+  IReservationAll,
+  MAX_RESERVATION_MONTH,
+  Reservation
+} from '../../interfaces/reservation';
 import {
   areEqualDate,
   convertDuration,
   createNewDate,
   Duration,
   formatDateName,
-  formatDateTime,
+  formatFullDateTime,
   getAvailability,
   getNow,
   getTime,
@@ -44,7 +50,7 @@ import { DiscountType, IUserDiscount, transitionAnimation } from '../../interfac
 export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('stepper') myStepper!: MatStepper;
 
-  reservationMonths = 3;
+  reservationMonths = MAX_RESERVATION_MONTH;
   maxDate: Date;
   minDate: Date;
 
@@ -389,7 +395,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       if (state.customerReservation && state.customerReservation.upcoming) {
         this.canCreate = false;
         const message = this.translate.instant('RESERVATION.CUSTOMER.ADD.UPCOMING.ERROR',
-          {date: formatDateTime(newDate(state.customerReservation.upcoming.start), this.translate.currentLang)});
+          {date: formatFullDateTime(newDate(state.customerReservation.upcoming.start), this.translate.currentLang)});
         const snackBarRef = this.snackBar.open(message, 'OK', {
           duration: 5000
         });

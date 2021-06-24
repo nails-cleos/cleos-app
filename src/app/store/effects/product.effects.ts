@@ -14,7 +14,8 @@ export class ProductEffects {
   @Effect()
   getAll$ = this.actions$.pipe(ofType(fromActionsProduct.ProductActionTypes.getAll)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.productService.getAll(payload.active, payload.direction, payload.page).pipe(
+    switchMap((payload: any) => this.productService.getAll(payload.active, payload.direction, payload.page,
+      payload.size).pipe(
       switchMap((response: any) => of(new fromActionsProduct.ProductSuccess(response))),
       catchError((err: HttpErrorResponse) => of(new fromActionsProduct.ProductFailure({error: err.error})))
     ))

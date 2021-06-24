@@ -7,7 +7,6 @@ import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { AuthActionTypes, LoginFailure, LoginSuccess, SignUpFailure, SignUpSuccess } from '../auth.actions';
 import { TranslateService } from '@ngx-translate/core';
-import { Role } from '../../interfaces/token';
 
 @Injectable()
 export class LoginEffects {
@@ -16,7 +15,10 @@ export class LoginEffects {
   login$ = this.actions$.pipe(ofType(AuthActionTypes.login)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.authService.login(payload.username, payload.password).pipe(
-      switchMap((response: any) => of(new LoginSuccess({response, queryParams: payload.queryParams}))),
+      switchMap((response: any) => of(new LoginSuccess({
+        response, queryParams: payload.queryParams,
+        extras: payload.extras
+      }))),
       catchError((err: HttpErrorResponse) => of(new LoginFailure({error: err.error})))
     ))
   );
@@ -26,27 +28,16 @@ export class LoginEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => {
       const user = payload.socialUser;
+      console.log(payload);
       return this.authService.socialLogin(user.idToken || user.authToken, user.provider, payload.code).pipe(
-        switchMap((response: any) => of(new LoginSuccess({response, queryParams: payload.queryParams}))),
+        switchMap((response: any) => of(new LoginSuccess({
+          response,
+          queryParams: payload.queryParams,
+          extras: payload.extras
+        }))),
         catchError((err: HttpErrorResponse) => of(new LoginFailure({error: err.error})))
       );
     })
-  );
-
-  @Effect({dispatch: false})
-  loginSuccess$ = this.actions$.pipe(
-    ofType(AuthActionTypes.loginSuccess),
-    tap((response: any) => {
-      const redirectUrl = response.payload.response.user.changePassword
-        ? 'change-password'
-        : response.payload.queryParams.returnUrl || 'redirect';
-      this.router.navigate([redirectUrl]);
-    })
-  );
-
-  @Effect({dispatch: false})
-  logInFailure$ = this.actions$.pipe(
-    ofType(AuthActionTypes.loginFailure)
   );
 
   @Effect()
@@ -54,7 +45,10 @@ export class LoginEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.authService.signUp(payload).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('AUTH.SIGN_UP.SUCCESS', {username: response.username, email: response.email});
+        const message = this.translate.instant('AUTH.SIGN_UP.SUCCESS', {
+          username: response.username,
+          email: response.email
+        });
         return of(new SignUpSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new SignUpFailure({error: err.error})))
     ))
@@ -75,12 +69,12 @@ export class LoginEffects {
   forgotPassword$ = this.actions$.pipe(ofType(AuthActionTypes.forgotPassword)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.authService.forgotPassword(payload).pipe(
-        switchMap(() => {
-          const message = this.translate.instant('AUTH.FORGOT_PASSWORD.MESSAGE');
-          return of(new SignUpSuccess({message}));
-        }),
-        catchError((err: HttpErrorResponse) => of(new SignUpFailure({error: err.error})))
-      ))
+      switchMap(() => {
+        const message = this.translate.instant('AUTH.FORGOT_PASSWORD.MESSAGE');
+        return of(new SignUpSuccess({message}));
+      }),
+      catchError((err: HttpErrorResponse) => of(new SignUpFailure({error: err.error})))
+    ))
   );
 
   @Effect()
@@ -92,6 +86,22 @@ export class LoginEffects {
         return of(new SignUpSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new SignUpFailure({error: err.error})))
     ))
+  );
+
+  @Effect({dispatch: false})
+  loginSuccess$ = this.actions$.pipe(
+    ofType(AuthActionTypes.loginSuccess),
+    tap((response: any) => {
+      const redirectUrl = response.payload.response.user.changePassword
+        ? 'change-password'
+        : response.payload.queryParams.returnUrl || 'redirect';
+      this.router.navigate([redirectUrl], {state: response.payload.extras});
+    })
+  );
+
+  @Effect({dispatch: false})
+  logInFailure$ = this.actions$.pipe(
+    ofType(AuthActionTypes.loginFailure)
   );
 
   @Effect({dispatch: false})
@@ -110,7 +120,7 @@ export class LoginEffects {
     ofType(AuthActionTypes.logout),
     tap(() => {
       localStorage.removeItem('auth');
-      window.location.href = '/auth';
+      window.location.href = '/main';
     })
   );
 

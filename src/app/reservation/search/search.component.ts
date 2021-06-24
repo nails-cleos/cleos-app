@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
-import { DEFAULT_LENGTH, Pagination } from '../../interfaces/pagination';
-import { IReservation, IReservationAll, PAGE_SIZE, States } from '../../interfaces/reservation';
+import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
+import { IReservation, IReservationAll, States } from '../../interfaces/reservation';
 import { Observable, Subscription } from 'rxjs';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -21,6 +21,7 @@ import { IUser, IUserAll } from '../../interfaces/user';
 import { FormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { getUserName } from '../../util/helper';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-search',
@@ -55,7 +56,16 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   allStates: string[] = Object.keys(States);
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private router: Router,
-              private store: Store<AppState>, private snackBar: MatSnackBar, private cdRef: ChangeDetectorRef) {
+              private store: Store<AppState>, private snackBar: MatSnackBar, private cdRef: ChangeDetectorRef,
+              private breakpointObserver: BreakpointObserver) {
+    breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small
+    ]).subscribe(result => {
+      if (result.matches) {
+        this.pageSize = MOBILE_PAGE_SIZE;
+      }
+    });
     this.getState = this.store.select(selectReservationState);
     this.language = this.translate.currentLang;
     // @ts-ignore
@@ -76,22 +86,13 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     this.customer.valueChanges.subscribe(value => {
       if (value && value.id) {
         this.userId = value.id;
-        this.getReservations(0);
+        this.getReservations();
       }
     });
   }
 
   ngAfterViewInit(): void {
-    this.sort.sortChange.subscribe(() => {
-      this.getReservations(this.paginator ? this.paginator.pageIndex : 0);
-    });
-
-    this.paginator?.page.subscribe(() => {
-      this.getReservations(this.paginator ? this.paginator.pageIndex : 0);
-    });
-
-    this.getReservations(this.paginator ? this.paginator.pageIndex : 0);
-    this.cdRef.detectChanges();
+    this.getReservations();
   }
 
   ngOnDestroy(): void {
@@ -136,7 +137,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     if (event.code === 'Backspace') {
       this.customer.setValue(null);
       this.userId = undefined;
-      this.getReservations(0);
+      this.getReservations();
     }
   }
 
@@ -148,7 +149,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
       this.allStates = Object.keys(States).filter(s => !this.states.includes(s.toUpperCase()));
 
       this.state.setValue(null);
-      this.getReservations(0);
+      this.getReservations();
     }
   }
 
@@ -160,7 +161,17 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     this.allStates = this.allStates.filter(s => States[s] !== state);
     this.stateInput.nativeElement.value = '';
     this.state.setValue(null);
-    this.getReservations(0);
+    this.getReservations();
+  }
+
+  private createPageSubscriptions(): void {
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.getReservations();
+    });
+    this.paginator?.page.subscribe(() => this.getReservations(this.paginator.pageIndex));
+
+    this.cdRef.detectChanges();
   }
 
   private subscribe(): void {
@@ -177,20 +188,16 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
           return reservation;
         });
         this.resultsLength = state.filter?.totalElements;
+        if (this.resultsLength) {
+          this.createPageSubscriptions();
+        }
       }
-      if (state.errorMessage || state.message) {
-        const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
+      if (state.errorMessage) {
+        this.snackBar.open(state.errorMessage || state.message, 'OK', {
           duration: 5000
         });
-        if (state.message) {
-          snackBarRef.afterDismissed().subscribe(() => {
-            this.clean();
-            this.getReservations(0);
-          });
-        } else {
-          this.error = state.error;
-          return;
-        }
+        this.error = state.error;
+        return;
       }
     });
   }
@@ -207,12 +214,13 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     );
   }
 
-  private getReservations(page: number): void {
+  private getReservations(page: number = 0): void {
     const payload = {
       states: this.states,
       userId: this.userId,
       active: this.sort.active,
       direction: this.sort.direction,
+      size: this.pageSize,
       page
     };
     this.store.dispatch(

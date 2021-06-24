@@ -45,15 +45,15 @@
         <mat-card-content>
           <mat-nav-list>
             <mat-divider></mat-divider>
-            <a (click)="drawer.toggle()" *ngIf="isHandset$ | async; else showMenu" [routerLink]="'/auth'"
+            <a (click)="drawer.toggle()" *ngIf="isHandset$ | async; else showMenu" [routerLink]="'/main'"
                mat-list-item>
-              <mat-icon mat-list-icon>login</mat-icon>
-              <div mat-line>{{'DASHBOARD.SIGN_IN' | translate }}</div>
+              <mat-icon mat-list-icon>main</mat-icon>
+              <div mat-line>{{'DASHBOARD.HOME' | translate }}</div>
             </a>
             <ng-template #showMenu>
-              <a [routerLinkActive]="['active']" [routerLink]="'/auth'" mat-list-item>
-                <mat-icon mat-list-icon>login</mat-icon>
-                <div mat-line>{{'DASHBOARD.SIGN_IN' | translate }}</div>
+              <a [routerLinkActive]="['active']" [routerLink]="'/main'" mat-list-item>
+                <mat-icon mat-list-icon>home</mat-icon>
+                <div mat-line>{{'DASHBOARD.HOME' | translate }}</div>
               </a>
             </ng-template>
             <mat-divider></mat-divider>
@@ -132,16 +132,21 @@
 
         <button [matMenuTriggerFor]="menuLogged" color="accent" mat-raised-button>
           <mat-icon>person_pin</mat-icon>
-          <span *ngIf="!(isHandset$ | async)">{{username | titlecase}}</span>
+          <span *ngIf="(isHandset$ | async) === false">{{username | titlecase}}</span>
         </button>
         <mat-menu #menuLogged="matMenu">
           <mat-nav-list>
-            <a mat-list-item routerLink="/profile">
+            <a [routerLinkActive]="['active']" [routerLink]="'/main'" mat-list-item>
+              <mat-icon mat-list-icon>home</mat-icon>
+              <div mat-line>{{'DASHBOARD.HOME' | translate }}</div>
+            </a>
+            <mat-divider></mat-divider>
+            <a mat-list-item [routerLink]="'/profile'">
               <mat-icon mat-list-icon>settings</mat-icon>
               <div mat-line>{{'DASHBOARD.PROFILE' | translate }}</div>
             </a>
             <mat-divider></mat-divider>
-            <a *ngIf="canChangePassword" mat-list-item routerLink="/change-password">
+            <a *ngIf="canChangePassword" mat-list-item [routerLink]="'/change-password'">
               <mat-icon mat-list-icon>mode_edit</mat-icon>
               <div mat-line>{{'DASHBOARD.CHANGE_PASSWORD' | translate }}</div>
             </a>
@@ -154,9 +159,9 @@
         </mat-menu>
       </div>
       <ng-template #login>
-        <button color="accent" mat-raised-button routerLink="/auth">
-          <mat-icon>login</mat-icon>
-          <span *ngIf="!(isHandset$ | async)">{{'DASHBOARD.SIGN_IN' | translate }}</span>
+        <button color="accent" mat-raised-button routerLink="/main">
+          <mat-icon>home</mat-icon>
+          <span *ngIf="(isHandset$ | async) === false">{{'DASHBOARD.HOME' | translate }}</span>
         </button>
       </ng-template>
     </mat-toolbar>

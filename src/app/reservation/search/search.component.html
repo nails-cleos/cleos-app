@@ -1,6 +1,6 @@
 <div *ngIf="!error; else errorBox">
   <div id="search-box">
-    <div id="search-label">Search</div>
+    <div id="search-label">{{'RESERVATION.SEARCH.TITLE' | translate }}</div>
     <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
       <mat-form-field>
         <mat-label>{{ 'RESERVATION.SEARCH.STATES.FIELD' | translate }}</mat-label>

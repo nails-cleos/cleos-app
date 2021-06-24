@@ -14,9 +14,19 @@ export interface ICatalogueAll {
   blob: any;
 }
 
+export interface ISlide {
+  image: any;
+}
+
+export class Slide implements ISlide {
+  image: any;
+
+  constructor(image: any) {
+    this.image = image;
+  }
+}
+
 export class Catalogue implements ICatalogue {
   constructor() {
   }
 }
-
-export const PAGE_SIZE = 10;

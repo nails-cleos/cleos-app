@@ -14,7 +14,8 @@ export class DiscountEffects {
   @Effect()
   getAll$ = this.actions$.pipe(ofType(fromActionsDiscount.DiscountActionTypes.getAll)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.discountService.getAll(payload.active, payload.direction, payload.page, 'pages').pipe(
+    switchMap((payload: any) => this.discountService.getAll(payload.active, payload.direction, payload.page, 'pages',
+      payload.size).pipe(
       switchMap((response: any) => of(new fromActionsDiscount.DiscountSuccess(response))),
       catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({error: err.error})))
     ))
@@ -23,7 +24,8 @@ export class DiscountEffects {
   @Effect()
   getMyDiscounts$ = this.actions$.pipe(ofType(fromActionsDiscount.DiscountActionTypes.getMyDiscounts)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.discountService.getAll(payload.active, payload.direction, payload.page, 'me').pipe(
+    switchMap((payload: any) => this.discountService.getAll(payload.active, payload.direction, payload.page, 'me',
+      payload.size).pipe(
       switchMap((response: any) => of(new fromActionsDiscount.DiscountSuccess(response))),
       catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({error: err.error})))
     ))

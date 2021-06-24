@@ -75,6 +75,7 @@
     "CHANGE_PASSWORD": "Cambiar contraseña",
     "SIGN_OUT": "Cerrar sesión",
     "SIGN_IN": "Ingresar",
+    "HOME": "Principal",
     "MINI_CARD": {
       "DURATION": "desde el mes pasado",
       "TOTAL_PRODUCT_SALES": "Ganancia total",
@@ -884,6 +885,7 @@
       }
     },
     "SEARCH": {
+      "TITLE": "Búsqueda",
       "CUSTOMER": {
         "FIELD": "Buscar por cliente",
         "PLACEHOLDER": "Cliente"
@@ -1047,7 +1049,63 @@
   },
   "WHATSAPP": {
     "SEND": {
-      "APPROVE": "Detalle"
+      "APPROVE": "♡ \uD83C\uDD43\uD83C\uDD44 \uD83C\uDD3F\uD83C\uDD41\uD83C\uDD3E\uD83C\uDD47\uD83C\uDD38\uD83C\uDD3C\uD83C\uDD3E \uD83C\uDD42\uD83C\uDD34\uD83C\uDD41\uD83C\uDD45\uD83C\uDD38\uD83C\uDD32\uD83C\uDD34:%0A♡ {{date}}"
+    }
+  },
+  "MAIN": {
+    "LEGALS": "© 2021 - CLEOS - Todos los derechos reservados.",
+    "SECTION": {
+      "STORY": "Historia",
+      "PRODUCT": "Servicios",
+      "BOOK": "Reservar",
+      "CONTACT": "Contacto",
+      "ACCOUNT": "Mi cuenta",
+      "AUTH": "Ingresar",
+      "PRIVACY": "Privacidad",
+      "TERM_AND_CONDITIONS": "Términos y condiciones"
+    },
+    "STORY_DETAIL": "dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna\n      aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl\n      ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie\n      consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui\n      blandit\n      praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis\n      eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum.",
+    "BOOK": {
+      "DATE": {
+        "FIELD": "Elegí una fecha"
+      },
+      "PRODUCT": {
+        "FIELD": "Servicio",
+        "INVALID": "Servicio no valido"
+      }
+    },
+    "CONTACT": {
+      "TITLE": "Contactanos",
+      "ADDRESS": "San Martín 64 - 08 - Villa Carlos Paz, Córdoba, Argentina",
+      "PHONE": "+54 (351) 758-1773",
+      "MAIL": "espacio.cleos@gmail.com",
+      "SEND": {
+        "TITLE": "¿Tiene alguna pregunta? Nos encantaría saber de ti",
+        "MESSAGE": "Tu mensaje se envió con éxito"
+      },
+      "NAME": {
+        "FIELD": "Tu nombre",
+        "REQUIRED": "Tu nombre es requerido"
+      },
+      "EMAIL": {
+        "FIELD": "Tu email",
+        "REQUIRED": "Tu email es requerido",
+        "INVALID": "Email is invalid"
+      },
+      "SUBJECT": {
+        "FIELD": "Asunto",
+        "REQUIRED": "El asunto es requerido"
+      },
+      "BODY": {
+        "FIELD": "Mensaje",
+        "REQUIRED": "El mensaje es requerido"
+      }
+    }
+  },
+  "CARD": {
+    "PRODUCT": {
+      "DURATION": "<span class='bold'>Duración:</span> {{duration}}",
+      "DURABILITY": "<span class='bold'>Durabilidad:</span> {{durability}}"
     }
   },
   "APP": {

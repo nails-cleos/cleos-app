@@ -2,8 +2,8 @@ import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChi
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { DEFAULT_LENGTH, Pagination } from '../../interfaces/pagination';
-import { DiscountType, IUserDiscount, PAGE_SIZE } from '../../interfaces/discount';
+import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
+import { DiscountType, IUserDiscount } from '../../interfaces/discount';
 import { Observable, Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -12,6 +12,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectDiscountState } from '../../store/app.states';
 import * as fromActionsDiscount from '../../store/discount.actions';
 import { Router } from '@angular/router';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-me-discount',
@@ -32,21 +33,21 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
   error: any;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
-              private store: Store<AppState>, private router: Router, private cdRef: ChangeDetectorRef) {
+              private store: Store<AppState>, private router: Router, private cdRef: ChangeDetectorRef,
+              private breakpointObserver: BreakpointObserver) {
+    breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small
+    ]).subscribe(result => {
+      if (result.matches) {
+        this.pageSize = MOBILE_PAGE_SIZE;
+      }
+    });
     this.getState = this.store.select(selectDiscountState);
   }
 
   ngAfterViewInit(): void {
-    this.sort.sortChange.subscribe(() => {
-      this.getDiscounts();
-    });
-
-    this.paginator?.page.subscribe(() => {
-      this.getDiscounts();
-    });
-
     this.getDiscounts();
-    this.cdRef.detectChanges();
   }
 
   ngOnInit(): void {
@@ -60,7 +61,7 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
 
   useDiscount(discount: IUserDiscount): void {
     const data = {discount};
-    this.router.navigateByUrl('/me/reservation', {state: data});
+    this.router.navigate(['me', 'reservation'], {state: data});
   }
 
   private subscribe(): void {
@@ -96,6 +97,9 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
         return ud;
       });
       this.resultsLength = stateValue.data?.totalElements;
+      if (this.resultsLength) {
+        this.createPageSubscriptions();
+      }
     });
   }
 
@@ -105,11 +109,22 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
-  private getDiscounts(): void {
+  private createPageSubscriptions(): void {
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.getDiscounts();
+    });
+    this.paginator?.page.subscribe(() => this.getDiscounts(this.paginator.pageIndex));
+
+    this.cdRef.detectChanges();
+  }
+
+  private getDiscounts(page: number = 0): void {
     const payload = {
       active: this.sort.active,
       direction: this.sort.direction,
-      page: this.paginator ? this.paginator.pageIndex : 0
+      size: this.pageSize,
+      page
     };
     this.store.dispatch(
       new fromActionsDiscount.GetMyDiscounts(payload)

@@ -1,4 +1,4 @@
-import { Component, Inject, Input, OnInit } from '@angular/core';
+import { Component, Inject, Input } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import {
   annualReservationChart,
@@ -9,7 +9,8 @@ import {
   monthlyReservationChart,
   productReservationChart,
   quantityProductChart,
-  trackingAverageChart, trackingCompareChart
+  trackingAverageChart,
+  trackingCompareChart
 } from '../util/chart';
 import { Color, Label, SingleDataSet } from 'ng2-charts';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
@@ -32,7 +33,7 @@ enum ChartTypeEnum {
   templateUrl: './card.component.html',
   styleUrls: ['./card.component.css']
 })
-export class CardComponent implements OnInit {
+export class CardComponent {
 
   @Input() title: string | undefined;
   @Input() type: string | undefined;
@@ -55,9 +56,6 @@ export class CardComponent implements OnInit {
     const userLang = this.translate.currentLang;
     const index = userLang.indexOf('-');
     this.locale = index === -1 ? userLang : userLang.substr(0, index);
-  }
-
-  ngOnInit(): void {
   }
 
   onClick(): void {

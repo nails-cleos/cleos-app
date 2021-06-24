@@ -64,7 +64,6 @@ export class NavComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsLogin.LogOut()
     );
-    this.router.navigate(['main']);
   }
 
   notification(notification: INotification): void {
@@ -100,8 +99,6 @@ export class NavComponent implements OnInit, OnDestroy {
       if (state.isAuthenticated) {
         this.getNotifications();
         const user: IUserAll = state.user;
-        this.translate.use(user.lang || navigator.language);
-        this.language = user.lang || navigator.language;
         this.currentUser = user;
         this.isProfessional = user.authorities.some(u => u.authority === Role.professional);
         this.menuItems = state.menus;
@@ -131,9 +128,9 @@ export class NavComponent implements OnInit, OnDestroy {
             }
           }
         });
-      } else {
-        this.translate.use(navigator.language);
-        this.language = navigator.language;
+      }
+      if (this.router.url === '/') {
+        this.router.navigate([this.isAuthorized ? 'redirect' : 'main']);
       }
     });
 

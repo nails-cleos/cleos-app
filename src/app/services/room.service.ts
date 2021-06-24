@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IRoom, PAGE_SIZE } from '../interfaces/room';
+import { IRoom } from '../interfaces/room';
+import { PAGE_SIZE } from '../interfaces/pagination';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +14,8 @@ export class RoomService {
   constructor(private http: HttpClient) {
   }
 
-  public getAll(sort: string, direction: string, page: number): Observable<IRoom[]> {
-    let params = new HttpParams().set('page', String(page)).set('size', String(PAGE_SIZE));
+  public getAll(sort: string, direction: string, page: number, size: number = PAGE_SIZE): Observable<IRoom[]> {
+    let params = new HttpParams().set('page', String(page)).set('size', String(size));
     if (sort) {
       params = params.append('sort', sort);
     }

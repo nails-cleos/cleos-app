@@ -25,5 +25,3 @@ export class Unavailable implements IUnavailable {
   constructor() {
   }
 }
-
-export const PAGE_SIZE = 10;

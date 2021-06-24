@@ -14,8 +14,10 @@ html, body {
 }
 
 body {
-  margin: 0;
+  margin: 0 0 60px 0;
+  height: 100vh;
   font-family: Belleza, "Helvetica Neue", sans-serif;
+  background-color: #fafafa;
 }
 
 @font-face {
@@ -215,4 +217,20 @@ pre {
   animation-timing-function: linear;
   animation-iteration-count: 1;
   animation-fill-mode: forwards;
+}
+
+#search-box {
+  border: 1px solid lightgray;
+  border-radius: 25px;
+  position: relative;
+  margin: 10px 0 10px 0;
+}
+
+#search-label {
+  background-color: #fafafa;
+  position: absolute;
+  top: -10px;
+  left: 30px;
+  text-align: center;
+  padding: 0 20px;
 }

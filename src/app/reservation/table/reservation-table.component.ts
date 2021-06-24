@@ -5,9 +5,9 @@ import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
-import { IReservation, IReservationAll, MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/reservation';
+import { IReservation, IReservationAll } from '../../interfaces/reservation';
 import { MatTableDataSource } from '@angular/material/table';
-import { DEFAULT_LENGTH, Pagination } from '../../interfaces/pagination';
+import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
 import { ReservationIconName } from '../detail/reservation-detail.component';
 import { DialogComponent } from '../../dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
@@ -56,13 +56,11 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
 
   ngAfterViewInit(): void {
     this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
       this.getReservations();
-      // this.paginator.pageIndex = 0;
     });
 
-    this.paginator?.page.subscribe(() => {
-      this.getReservations();
-    });
+    this.paginator?.page.subscribe(() => this.getReservations(this.paginator.pageIndex));
 
     this.getReservations();
     this.cdRef.detectChanges();
@@ -111,12 +109,12 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
     });
   }
 
-  private getReservations(): void {
+  private getReservations(page: number = 0): void {
     const payload = {
       active: this.sort.active,
       direction: this.sort.direction,
-      page: this.paginator ? this.paginator.pageIndex : 0,
-      size: this.pageSize
+      size: this.pageSize,
+      page
     };
     this.store.dispatch(
       new fromActionsReservation.GetAllPage(payload)
