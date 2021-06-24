@@ -1,7 +1,7 @@
 import { All, ReservationActionTypes } from '../reservation.actions';
-import { IAvailableDTO, ICustomerReservation, IReservation, IRoomReservation } from '../../interfaces/reservation';
+import { IAvailableDTO, ICustomerReservation, IReservation, IRoomReservation, ITracking } from '../../interfaces/reservation';
 import { IUser } from '../../interfaces/user';
-import { IProduct, IProductDiscountDTO } from '../../interfaces/product';
+import { IProductDiscountDTO } from '../../interfaces/product';
 import { IRoom } from '../../interfaces/room';
 import { Pagination } from '../../interfaces/pagination';
 
@@ -13,6 +13,7 @@ export interface State {
   customers: IUser[] | null;
   rooms: IRoom[] | null;
   productDiscount: IProductDiscountDTO[] | null;
+  tracking: ITracking[] | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -29,6 +30,7 @@ export const initialState: State = {
   customers: null,
   rooms: null,
   productDiscount: null,
+  tracking: null,
   errorMessage: null,
   error: null,
   subErrors: null,
@@ -279,6 +281,29 @@ export const reducer = (state = initialState, action: All): State => {
         subErrors: null,
         message: null,
         isLoading: true
+      };
+    }
+    case ReservationActionTypes.getTracking: {
+      return {
+        ...state,
+        tracking: [],
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        selected: null,
+        message: null,
+        isLoading: true
+      };
+    }
+    case ReservationActionTypes.trackingSuccess: {
+      return {
+        ...state,
+        tracking: action.payload,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: null,
+        isLoading: false
       };
     }
     case ReservationActionTypes.clean: {

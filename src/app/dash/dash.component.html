@@ -46,6 +46,18 @@
       <app-last-month-reservations-chart [label]="lastMonthLabel" [state]="state"></app-last-month-reservations-chart>
     </app-card>
   </mat-grid-tile>
+  <mat-grid-tile [colspan]="( cardLayout | async )?.chart?.cols" [rowspan]="( cardLayout | async )?.chart?.rows">
+    <app-card [data]="state?.tracking" [label]="trackingAverage"
+              [title]="'DASHBOARD.CARD.TRACKING_AVERAGE' | translate" type="TRACKING_AVERAGE">
+      <app-tracking-average-chart [label]="trackingAverage" [state]="stateTracking"></app-tracking-average-chart>
+    </app-card>
+  </mat-grid-tile>
+  <mat-grid-tile [colspan]="( cardLayout | async )?.chart?.cols" [rowspan]="( cardLayout | async )?.chart?.rows">
+    <app-card [data]="state?.tracking" [label]="trackingCompare"
+              [title]="'DASHBOARD.CARD.TRACKING_COMPARE' | translate" type="TRACKING_COMPARE">
+      <app-tracking-compare-chart [label]="trackingCompare" [state]="stateTracking"></app-tracking-compare-chart>
+    </app-card>
+  </mat-grid-tile>
   <!--Table-->
   <mat-grid-tile [colspan]="( cardLayout | async )?.table?.cols" [rowspan]="( cardLayout | async )?.table?.rows">
     <app-card [expand]="false" [title]="'DASHBOARD.CARD.RESERVATION' | translate" type="RESERVATION">

@@ -21,6 +21,7 @@
       "CLOSE": "Close",
       "COPY": "Copy",
       "SHARE": "Share",
+      "COMPLETE": "Complete",
       "DISCOUNT": {
         "SHOW": "Show discounts",
         "HIDE": "Hide discounts",
@@ -86,7 +87,11 @@
         "ANNUAL": "Reservations",
         "CUSTOMER": "Customers",
         "QUANTITY": "Quantity",
-        "LAST_MONTH": "Last month"
+        "LAST_MONTH": "Last month",
+        "MIN": "Minimum",
+        "MAX": "Maximum",
+        "AVG": "Average",
+        "ESTIMATE": "Estimate"
       },
       "QUANTITY_PRODUCT": "Quantity Product",
       "PRODUCT_RESERVATION": "Product Reservation",
@@ -94,6 +99,8 @@
       "YEARLY_PRODUCT_PRICE": "Yearly products price",
       "CUSTOMER_RESERVATION": "Customer Reservation",
       "LAST_MONTH_RESERVATION": "Last Month Reservations",
+      "TRACKING_AVERAGE": "Real product time",
+      "TRACKING_COMPARE": "Time real/estimated",
       "RESERVATION": "Reservations",
       "EXPAND": "Expand"
     }
@@ -702,7 +709,30 @@
         "TITLE": "Product",
         "NAME": "Name",
         "DURATION": "Duration",
-        "PRICE": "Price"
+        "PRICE": "Price",
+        "EXTRAS": {
+          "TITLE": "Extras",
+          "DESCRIPTION": "Description",
+          "PRICE": "Price",
+          "TOTAL": "Total"
+        },
+        "COMPLETE": {
+          "TITLE": "Product",
+          "INVALID": "Product is invalid",
+          "EXTRAS": {
+            "TITLE": "Extras",
+            "DESCRIPTION": {
+              "FIELD": "Description"
+            },
+            "PRICE": {
+              "FIELD": "Price"
+            }
+          },
+          "DESCRIPTION": "<span class='bold'>Description:</span> {{description}}",
+          "TOTAL": "<span class='bold'>Total:</span>",
+          "DURATION": "<span class='bold'>Duration:</span> {{duration}}",
+          "DURABILITY": "<span class='bold'>Durability:</span> {{durability}}"
+        }
       },
       "APPOINTMENT": "Appointment",
       "HISTORY": {
@@ -729,7 +759,8 @@
         "START": "Start",
         "COMPLETE": "Complete",
         "CANCEL": "Cancel",
-        "BOOK": "Book again"
+        "BOOK": "Book again",
+        "SEND": "Send Whatsapp"
       },
       "CHANGE_STATE": {
         "TITLE": "Change state",
@@ -1012,6 +1043,11 @@
     },
     "UPDATED": {
       "MESSAGE": "Discount {{name}} updated"
+    }
+  },
+  "WHATSAPP": {
+    "SEND": {
+      "APPROVE": "Detalle"
     }
   },
   "APP": {

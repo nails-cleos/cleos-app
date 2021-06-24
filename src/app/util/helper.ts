@@ -1,5 +1,6 @@
 import { DiscountType, IDiscount } from '../interfaces/discount';
 import { IUser, IUserAll } from '../interfaces/user';
+import { IProductAll } from '../interfaces/product';
 
 export const snakeToCamel = (value: string): string =>
   value.toLowerCase().replace(/([-_]\w)/g, (g: string) => g[1].toUpperCase());
@@ -23,6 +24,19 @@ export const getPriceDiscount = (discount: IDiscount | undefined, price: number)
     }
   }
   return undefined;
+};
+
+export const totalPrice = (product: IProductAll): number => {
+  let price = product.price;
+  if (product.discount) {
+    const priceDiscount = getPriceDiscount(product.discount, price);
+    price = priceDiscount ? priceDiscount : price;
+  }
+  if (product.extras && product.extras.price) {
+    price += product.extras.price;
+  }
+
+  return price;
 };
 
 export const getUserName = (user: IUserAll | IUser): string => {

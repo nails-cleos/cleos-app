@@ -79,7 +79,7 @@ export const diffTime = (time: Date, maxHour = 24, diffMin = 0): any => {
   const maxDate = new Date();
   maxDate.setHours(maxHour, diffMin);
 
-  const diff = Math.abs(Math.round((maxDate.getTime() - date.getTime()) / (1000 * 60)));
+  const diff = getMinutesBetweenTimes(maxDate, date);
 
   const hours = (diff / 60);
   const diffHour = Math.floor(hours);
@@ -88,6 +88,13 @@ export const diffTime = (time: Date, maxHour = 24, diffMin = 0): any => {
 
   return {diffHour, diffMinute};
 };
+
+export const getMinutesBetweenTimes = (date1: Date, date2: Date): number =>
+  Math.abs(Math.round((date1.getTime() - date2.getTime()) / (1000 * 60)));
+
+export const getSecondsBetweenTimes = (date1: Date, date2: Date): number =>
+  Math.abs(Math.round((date1.getTime() - date2.getTime()) / 1000));
+
 
 export const getAvailability = (room: IRoom): any => {
   const week: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'WEEK')[0];
@@ -154,10 +161,9 @@ export const isToday = (date: Date): boolean => {
     && date.getDate() === now.getDate();
 };
 
-export const areEqualDate = (date1: Date, date2: Date): boolean => {
-  return date1.getFullYear() === date2.getFullYear() && date1.getMonth() === date2.getMonth()
-    && date1.getDate() === date2.getDate();
-};
+export const areEqualDate = (date1: Date, date2: Date): boolean =>
+  date1.getFullYear() === date2.getFullYear() && date1.getMonth() === date2.getMonth()
+  && date1.getDate() === date2.getDate();
 
 export const createDate = (hour: number = 0, minute: number = 0, second: number = 0,
                            mili: number = 0): Date => createNewDate(new Date(), hour, minute, second, mili);

@@ -308,6 +308,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const start = createNewDate(date, Number(nowTime[0]), Number(nowTime[1]));
     const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
 
+    console.log(date)
+    console.log(start)
+    console.log(end)
+
     const detail = this.translate.instant('RESERVATION.ADD.EVENT.DETAIL', {
       customerName: getUserName(this.customer.value),
       productName: this.product.value.name,
@@ -601,11 +605,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         this.addUnavailableList();
         if (this.extras?.date && !this.eventSelected) {
           this.segmentClick(this.date.value, 'CREATED');
-          // } else if (this.editReservation) {
-          //   if (this.startDate) {
-          //     const date: Date = createNewDate(this.date.value, this.startDate.getHours(), this.startDate.getMinutes());
-          //     this.segmentClick(date, this.editReservation.state, this.editReservation.id);
-          //   }
+        } else if (this.reservation && this.date && this.myStepper.selectedIndex === 3) {
+          const date: Date = createNewDate(this.date.value, this.date.value.getHours(), this.date.value.getMinutes());
+          this.segmentClick(date, this.reservation.state, this.reservation.id);
         }
       }
       if (state.subErrors) {

@@ -1,35 +1,33 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
-import { Color, Label } from 'ng2-charts';
-import { IReservationAll } from '../../interfaces/reservation';
-import { barChartDefaultOptions, customerReservationChart } from '../../util/chart';
+import { Label } from 'ng2-charts';
+import { ITracking } from '../../interfaces/reservation';
+import { barChartTimeOptions, trackingAverageChart } from '../../util/chart';
 
 @Component({
-  selector: 'app-customer-reservations-chart',
-  templateUrl: './customer-reservations-chart.component.html',
-  styleUrls: ['./customer-reservations-chart.component.scss']
+  selector: 'app-tracking-average-chart',
+  templateUrl: './tracking-average-chart.component.html',
+  styleUrls: ['./tracking-average-chart.component.scss']
 })
-export class CustomerReservationsChartComponent implements OnChanges {
+export class TrackingAverageChartComponent implements OnChanges {
   @Input() state: any;
   @Input() label: any;
 
   isLoading = true;
-  data: IReservationAll[] | undefined;
+  data: ITracking[] | undefined;
   error: any;
 
-  public barChartOptions: ChartOptions = barChartDefaultOptions();
+  public barChartOptions: ChartOptions = barChartTimeOptions();
+
   public barChartLabels: Label[] = [];
   public barChartType: ChartType = 'bar';
   public barChartLegend = true;
   public barChartPlugins = [];
-  public barChartColors: Color[] = [
-    {
-      backgroundColor: 'rgba(103, 58, 183, 0.7)'
-    }
-  ];
 
   public barChartData: ChartDataSets[] = [
-    {data: []}
+    {data: [3600, 4500], label: 'Min'},
+    {data: [3600, 4500], label: 'Avg'},
+    {data: [3600, 4500], label: 'Max'}
   ];
 
   constructor() {
@@ -46,7 +44,7 @@ export class CustomerReservationsChartComponent implements OnChanges {
         this.error = this.state.error;
         return;
       }
-      const chartResult = customerReservationChart(this.state.data, this.label);
+      const chartResult = trackingAverageChart(this.state.tracking, this.label);
       if (chartResult) {
         this.barChartData = chartResult.chartDataSet;
         this.barChartLabels = chartResult.chartLabels;

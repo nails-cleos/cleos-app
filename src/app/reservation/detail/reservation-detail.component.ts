@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState, selectReservationState } from '../../store/app.states';
@@ -6,20 +6,25 @@ import { Observable, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
 import { IReservationAll } from '../../interfaces/reservation';
 import { ActivatedRoute, Router } from '@angular/router';
-import { convertDuration, createNewDate, Duration, getNow, IDuration, newDate } from '../../util/dates';
+import { convertDuration, createNewDate, Duration, getNow, getTime, IDuration, newDate } from '../../util/dates';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { IUserAll } from '../../interfaces/user';
 import { DialogComponent } from '../../dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Role } from '../../interfaces/token';
 import { getPriceDiscount, getUserName } from '../../util/helper';
 import { transitionAnimation } from '../../interfaces/discount';
+import { FormControl } from '@angular/forms';
+import { map, startWith } from 'rxjs/operators';
+import { IProduct } from '../../interfaces/product';
+import { requireMatch, valueChange } from '../../util/validators';
 
 export enum ReservationIconName {
   created = 'assignment',
   approved = 'done',
+  send = 'sms',
   started = 'play_arrow',
   completed = 'done_all',
   cancelled = 'clear',
@@ -57,6 +62,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   user: IUserAll | undefined;
 
   priceDiscount: number | undefined;
+  total: number | undefined;
 
   public paginator: MatPaginator | undefined;
 
@@ -113,7 +119,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     return machine;
   }
 
-  private static createAction(tooltip: string, icon: string, id: string, color: string): any {
+  private static createAction(tooltip: string, icon: string, id: string, color?: string): any {
     return {tooltip, tooltipPosition: 'below', icon, id, color};
   }
 
@@ -142,6 +148,11 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   }
 
   onChangeState(id: string | number): void {
+    if (id === 'send') {
+      const state = this.reservation?.state.toLowerCase();
+      this.machine.transition(state, id);
+      return;
+    }
     const title = this.translate.instant('RESERVATION.DETAIL.CHANGE_STATE.TITLE');
     const action = this.translate.instant(`RESERVATION.DETAIL.CHANGE_STATE.ACTION.${String(id).toUpperCase()}`);
     const content = this.translate.instant('RESERVATION.DETAIL.CHANGE_STATE.CONTENT', {action});
@@ -177,6 +188,10 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         }
         if (this.reservation && this.reservation.product) {
           this.priceDiscount = getPriceDiscount(this.reservation.product.discount, this.reservation.product.price);
+          if (this.reservation.product.extras && this.reservation.product.extras.price) {
+            this.total = this.reservation.product.extras.price +
+              (this.priceDiscount ? this.priceDiscount : this.reservation.product.price);
+          }
         }
         this.dataSource = new MatTableDataSource<IReservationAll>(state.selected.history);
         this.cdRef.detectChanges();
@@ -220,12 +235,24 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       ReservationIconName.cancelled, 'cancel', 'warn');
     const book = ReservationDetailComponent.createAction(translate.instant('RESERVATION.DETAIL.ACTION.BOOK'),
       ReservationIconName.book, 'book', 'primary');
+    const sendMessage = ReservationDetailComponent.createAction(translate.instant('RESERVATION.DETAIL.ACTION.SEND'),
+      ReservationIconName.send, 'send');
+
+    let approveActions = [start, edit, cancel];
+    if (self.reservation && self.reservation.customer && self.reservation.customer.phone) {
+      approveActions = [...approveActions, sendMessage];
+    }
 
     const approveTransaction = ReservationDetailComponent.createTransaction('approved', (): void => {
       self.reservation = undefined;
       store.dispatch(
         new fromActionsReservation.Approve(reservationId)
       );
+    });
+
+    const sendMessageTransaction = ReservationDetailComponent.createTransaction('send', (): void => {
+      const message = self.translate.instant('WHATSAPP.MESSAGE.APPROVE');
+      window.open(`https://api.whatsapp.com/send?phone=+${self.reservation?.customer?.phone}&text=${message}`, '_blank');
     });
 
     const startTransaction = ReservationDetailComponent.createTransaction('approved', (): void => {
@@ -240,10 +267,22 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     });
 
     const completeTransaction = ReservationDetailComponent.createTransaction('cancelled', (): void => {
-      self.reservation = undefined;
-      self.store.dispatch(
-        new fromActionsReservation.Complete(reservationId)
-      );
+      const dialogRef = self.dialog.open(CompleteDialogComponent, {
+        disableClose: true,
+        data: {
+          reservation: self.reservation
+        }
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          self.reservation = undefined;
+          const extras = result.productId || result.description || result.price ? result : null;
+          self.store.dispatch(
+            new fromActionsReservation.Complete({reservationId, extras})
+          );
+        }
+      });
     });
 
     const cancelTransaction = ReservationDetailComponent.createTransaction('completed', (): void => {
@@ -275,9 +314,10 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         transitions: {
           start: startTransaction,
           cancel: cancelTransaction,
-          edit: editTransaction
+          edit: editTransaction,
+          send: sendMessageTransaction
         },
-        next: [start, edit, cancel]
+        next: approveActions
       },
       started: {
         transitions: {
@@ -356,5 +396,113 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         next: []
       }
     }, initialState);
+  }
+}
+
+@Component({
+  selector: 'app-complete-dialog-component',
+  animations: [transitionAnimation],
+  templateUrl: './complete-dialog.component.html'
+})
+export class CompleteDialogComponent implements OnInit, OnDestroy {
+  getState: Observable<any>;
+  subscription: Subscription | undefined;
+
+  products: IProduct[] | undefined;
+  priceDiscount: number | undefined;
+  filteredProduct: Observable<IProduct[] | undefined> | undefined;
+  product: FormControl = new FormControl('', [requireMatch]);
+
+  description: FormControl = new FormControl();
+  price: FormControl = new FormControl();
+
+  total = 0;
+
+  constructor(public dialogRef: MatDialogRef<CompleteDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
+              private store: Store<AppState>) {
+    this.getState = store.select(selectReservationState);
+    this.product.valueChanges.subscribe(value => {
+      if (value) {
+        this.total = value.price + (this.price.value ? this.price.value : 0);
+        if (data.reservation.product) {
+          this.priceDiscount = getPriceDiscount(data.reservation.product.discount, this.total);
+        }
+      }
+    });
+    this.price.valueChanges.subscribe(value => {
+      if (value) {
+        this.total = this.product.value.price + value;
+        if (data.reservation.product) {
+          this.priceDiscount = getPriceDiscount(data.reservation.product.discount, this.total);
+        }
+      } else {
+        this.total = this.product.value.price;
+      }
+    });
+    this.product.setValue(data.reservation?.product);
+  }
+
+  get customerName(): string {
+    return this.data.reservation ? getUserName(this.data.reservation.customer) : '';
+  }
+
+  get durationTime(): string {
+    const duration = convertDuration(this.product.value.duration);
+    return getTime(createNewDate(getNow(), duration.hour, duration.minute));
+  }
+
+  ngOnInit(): void {
+    this.getProducts();
+    this.subscribe();
+    this.filteredProduct = this.product.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value.name),
+      map(name => name ? this.filterProduct(name) : this.products ? this.products.slice() : this.products)
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+  }
+
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
+
+  doAction(): void {
+    const productId = valueChange(this.product.value.id, this.data.reservation.product.id);
+    const description = this.description.value;
+    const price = this.price.value;
+    this.dialogRef.close({description, price, productId});
+  }
+
+  displayFnProduct(product: IProduct): string {
+    return product ? `${product.name}` : '';
+  }
+
+  keyDownHandler(event: any): void {
+    if (event.code === 'Backspace') {
+      this.product.setValue('');
+    }
+  }
+
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe(state => {
+      if (state.productDiscount) {
+        this.products = state.productDiscount.products;
+      }
+    });
+  }
+
+  private getProducts(): void {
+    this.store.dispatch(
+      new fromActionsReservation.GetAllProducts()
+    );
+  }
+
+  private filterProduct(name: string): IProduct[] | undefined {
+    const filterValue = name.toLowerCase();
+
+    return this.products?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 }

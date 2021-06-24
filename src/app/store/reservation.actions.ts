@@ -32,6 +32,8 @@ export enum ReservationActionTypes {
   cancel = '[Reservation] Cancel',
   customerCancel = '[Reservation] Customer cancel',
   stateSuccess = '[Reservation] State success',
+  getTracking = '[Reservation] Get tracking',
+  trackingSuccess = '[Reservation] Tracking success',
   clean = '[Reservation] Clean'
 }
 
@@ -237,6 +239,17 @@ export class StateSuccess implements Action {
   }
 }
 
+export class GetTracking implements Action {
+  readonly type = ReservationActionTypes.getTracking;
+}
+
+export class TrackingSuccess implements Action {
+  readonly type = ReservationActionTypes.trackingSuccess;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class Clean implements Action {
   readonly type = ReservationActionTypes.clean;
 }
@@ -273,4 +286,6 @@ export type All =
   | Cancel
   | CustomerCancel
   | StateSuccess
+  | GetTracking
+  | TrackingSuccess
   | Clean;

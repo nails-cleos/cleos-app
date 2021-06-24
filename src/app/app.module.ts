@@ -60,6 +60,7 @@ import { UnavailableService } from './services/unavailable.service';
 import { NavigationService } from './services/navigation.service';
 import { MessagingService } from './services/messaging.service';
 import { DiscountService } from './services/discount.service';
+import { TrackingService } from './services/tracking.service';
 
 // Reducers
 import { reducers } from './store/app.states';
@@ -105,7 +106,7 @@ import { RoomsComponent } from './room/list/rooms.component';
 import { RoomDetailComponent } from './room/detail/room-detail.component';
 import { ReservationComponent } from './reservation/reservation.component';
 import { SearchComponent } from './reservation/search/search.component';
-import { ReservationDetailComponent } from './reservation/detail/reservation-detail.component';
+import { CompleteDialogComponent, ReservationDetailComponent } from './reservation/detail/reservation-detail.component';
 import { AvailabilityComponent } from './availability/availability.component';
 import { ProductReservationsChartComponent } from './charts/product-reservation-chart/product-reservations-chart.component';
 import { MonthlyReservationsChartComponent } from './charts/monthly-reservations-chart/monthly-reservations-chart.component';
@@ -117,6 +118,7 @@ import {
   QuantityProductReservationsChartComponent
 } from './charts/quantity-product-reservations-chart/quantity-product-reservations-chart.component';
 import { LastMonthReservationsChartComponent } from './charts/last-month-reservations-chart/last-month-reservations-chart.component';
+import { TrackingAverageChartComponent } from './charts/tracking-average-chart/tracking-average-chart.component';
 import { NotificationsComponent } from './notification/list/notifications.component';
 import { RoomMeComponent } from './room/me/room-me.component';
 import { CalendarComponent } from './reservation/calendar/calendar.component';
@@ -142,6 +144,7 @@ import { DiscountComponent } from './discount/discount.component';
 import { DiscountDetailComponent } from './discount/detail/discount-detail.component';
 import { DiscountDialogComponent, DiscountsComponent } from './discount/list/discounts.component';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
+import { TrackingCompareChartComponent } from './charts/tracking-compare-chart/tracking-compare-chart.component';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
@@ -210,6 +213,7 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
     ProductReservationsChartComponent,
     MonthlyReservationsChartComponent,
     AnnualReservationsChartComponent,
+    TrackingAverageChartComponent,
     MiniCardComponent,
     CustomerReservationsChartComponent,
     ReservationTableComponent,
@@ -241,7 +245,9 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
     DiscountDetailComponent,
     DiscountsComponent,
     DiscountDialogComponent,
-    MeDiscountComponent
+    MeDiscountComponent,
+    CompleteDialogComponent,
+    TrackingCompareChartComponent
   ],
   imports: [
     BrowserModule,
@@ -308,6 +314,7 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
     CatalogueService,
     UnavailableService,
     DiscountService,
+    TrackingService,
     NavigationService,
     TranslationLoaderResolver,
     GeocodeService,

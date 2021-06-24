@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { ProductService } from '../../services/product.service';
 import { RoomService } from '../../services/room.service';
+import { TrackingService } from '../../services/tracking.service';
 
 @Injectable()
 export class ReservationEffects {
@@ -186,12 +187,13 @@ export class ReservationEffects {
   @Effect()
   complete$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.complete)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.reservationService.changeState(payload, 'complete').pipe(
-      switchMap(() => {
-        const message = this.translate.instant('RESERVATION.DETAIL.STATE.COMPLETE');
-        return of(new fromActionsReservation.StateSuccess({id: payload, message}));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
-    ))
+    switchMap((payload: any) =>
+      this.reservationService.changeState(payload.reservationId, 'complete', payload.extras).pipe(
+        switchMap(() => {
+          const message = this.translate.instant('RESERVATION.DETAIL.STATE.COMPLETE');
+          return of(new fromActionsReservation.StateSuccess({id: payload, message}));
+        }), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
+      ))
   );
 
   @Effect()
@@ -213,6 +215,15 @@ export class ReservationEffects {
         const message = this.translate.instant('RESERVATION.DETAIL.STATE.CANCEL');
         return of(new fromActionsReservation.StateSuccess({id: payload, message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
+    ))
+  );
+
+  @Effect()
+  getAllTracking$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getTracking)).pipe(
+    map((action: any) => action.payload),
+    switchMap(() => this.trackingService.getAll().pipe(
+      switchMap((response: any) => of(new fromActionsReservation.TrackingSuccess(response))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
     ))
   );
 
@@ -268,8 +279,14 @@ export class ReservationEffects {
     ofType(fromActionsReservation.ReservationActionTypes.reservationsCustomerSuccess)
   );
 
-  constructor(private readonly translate: TranslateService, private actions$: Actions, private reservationService: ReservationService,
-              private userService: UserService, private productService: ProductService, private roomService: RoomService,
-              private router: Router) {
+  @Effect({dispatch: false})
+  trackingSuccess$ = this.actions$.pipe(
+    ofType(fromActionsReservation.ReservationActionTypes.trackingSuccess)
+  );
+
+  constructor(private readonly translate: TranslateService, private actions$: Actions, private router: Router,
+              private reservationService: ReservationService, private userService: UserService,
+              private productService: ProductService, private roomService: RoomService,
+              private trackingService: TrackingService) {
   }
 }

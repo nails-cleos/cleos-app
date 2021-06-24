@@ -2,7 +2,7 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
 import { Color, Label } from 'ng2-charts';
 import { IReservationAll } from '../../interfaces/reservation';
-import { quantityProductChart } from '../../util/chart';
+import { barChartDefaultOptions, quantityProductChart } from '../../util/chart';
 
 @Component({
   selector: 'app-quantity-product-reservations-chart',
@@ -17,16 +17,7 @@ export class QuantityProductReservationsChartComponent implements OnChanges {
   data: IReservationAll[] | undefined;
   error: any;
 
-public barChartOptions: ChartOptions = {
-    responsive: true,
-    scales: {
-      yAxes: [{
-        ticks: {
-          beginAtZero: true
-        }
-      }]
-    }
-  };
+public barChartOptions: ChartOptions = barChartDefaultOptions();
 
   public barChartLabels: Label[] = [];
   public barChartType: ChartType = 'bar';

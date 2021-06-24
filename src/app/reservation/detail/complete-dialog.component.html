@@ -1,0 +1,71 @@
+<mat-card-title>{{ 'RESERVATION.DETAIL.TITLE' | translate }}</mat-card-title>
+<mat-card-subtitle>{{customerName}}</mat-card-subtitle>
+
+<mat-dialog-content>
+  <div fxLayout="column">
+    <mat-form-field *ngIf="products; else skeleton" appearance="fill">
+      <mat-label>{{ 'RESERVATION.DETAIL.PRODUCT.COMPLETE.TITLE' | translate }}</mat-label>
+      <label>
+        <input (keydown)="keyDownHandler($event)" [formControl]="product" [matAutocomplete]="autoProduct"
+               matInput type="text">
+      </label>
+      <mat-autocomplete #autoProduct="matAutocomplete" [displayWith]="displayFnProduct">
+        <mat-option *ngFor="let product of filteredProduct | async" [value]="product">
+          {{product.name}}
+        </mat-option>
+      </mat-autocomplete>
+      <mat-icon matSuffix>home_repair_service</mat-icon>
+      <mat-error *ngIf="product.hasError('requireMatch')"
+                 [innerHTML]="'RESERVATION.DETAIL.PRODUCT.COMPLETE.INVALID' | translate">
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>{{ 'RESERVATION.DETAIL.PRODUCT.COMPLETE.EXTRAS.DESCRIPTION.FIELD' | translate }}</mat-label>
+      <label>
+        <textarea #message [formControl]="description" matInput maxlength="256"></textarea>
+      </label>
+      <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>{{ 'RESERVATION.DETAIL.PRODUCT.COMPLETE.EXTRAS.PRICE.FIELD' | translate }}</mat-label>
+      <span matPrefix><mat-icon matPrefix>attach_money</mat-icon> &nbsp;</span>
+      <label>
+        <input [formControl]="price" [min]="1" matInput step="1" type="number">
+      </label>
+    </mat-form-field>
+
+    <mat-list-item *ngIf="product.value">
+      <mat-icon mat-list-icon>home_repair_service</mat-icon>
+      <div class="bold" mat-subheader>{{ 'RESERVATION.DETAIL.PRODUCT.COMPLETE.TITLE' | translate}}</div>
+    </mat-list-item>
+    <mat-list-item *ngIf="product.value">
+      <div *ngIf="product.value.description" [innerHTML]="'RESERVATION.DETAIL.PRODUCT.COMPLETE.DESCRIPTION' |
+                  translate: {description: product.value.description}" mat-line>
+      </div>
+      <div mat-line>
+        <span [innerHTML]="'RESERVATION.DETAIL.PRODUCT.COMPLETE.TOTAL' | translate"></span>
+        <span [class.strikethrough]="data.reservation.product.discount"
+              class="vertical-divider">$ {{total | number:'1.2-2'}}</span>
+        <span *ngIf="priceDiscount" [@discountAnimation]
+              class="vertical-divider bold">$ {{priceDiscount | number:'1.2-2'}}</span>
+      </div>
+      <div [innerHTML]="'RESERVATION.DETAIL.PRODUCT.COMPLETE.DURATION' |
+                  translate: {duration: durationTime}" mat-line>
+      </div>
+      <div *ngIf="product.value.durability" [innerHTML]="'RESERVATION.DETAIL.PRODUCT.COMPLETE.DURABILITY' |
+                  translate: {durability: product.value.durability}" mat-line>
+      </div>
+    </mat-list-item>
+    <ng-template #skeleton>
+      <div class="ssc-line"></div>
+    </ng-template>
+  </div>
+</mat-dialog-content>
+<div class="divider"></div>
+<mat-divider></mat-divider>
+<div mat-dialog-actions>
+  <div fxFlex></div>
+  <button (click)="doAction()" cdkFocusInitial color="primary"
+          mat-raised-button>{{ 'COMMON.BUTTON.COMPLETE' | translate }}</button>
+  <button (click)="onNoClick()" mat-raised-button>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+</div>
