@@ -356,7 +356,8 @@
       "INVALID": "Número de teléfono invalido"
     },
     "UPDATED": {
-      "MESSAGE": "Usuario {{username}} actualizado"
+      "MESSAGE": "Usuario {{username}} actualizado",
+      "PHOTO": "Foto de perfil actualizada"
     }
   },
   "PRODUCT": {
@@ -1059,6 +1060,7 @@
       "PRODUCT": "Servicios",
       "BOOK": "Reservar",
       "CONTACT": "Contacto",
+      "CATALOG": "Catálogo",
       "ACCOUNT": "Mi cuenta",
       "AUTH": "Ingresar",
       "PRIVACY": "Privacidad",

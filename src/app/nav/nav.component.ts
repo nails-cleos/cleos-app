@@ -94,8 +94,9 @@ export class NavComponent implements OnInit, OnDestroy {
   }
 
   private subscribe(): void {
-    this.authSubscription = this.getState.subscribe((state) => {
+    this.authSubscription = this.getState.subscribe(state => {
       this.isAuthorized = state.isAuthenticated;
+      console.log(state);
       if (state.isAuthenticated) {
         this.getNotifications();
         const user: IUserAll = state.user;

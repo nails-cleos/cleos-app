@@ -55,24 +55,13 @@ export class RoomEffects {
     switchMap((payload: any) => this.roomService.add(payload).pipe(
       switchMap((response: any) => {
         const message = this.translate.instant('ROOM.ADD.CREATED', {name: response.name});
-        return of(new fromActionsRoom.RoomSaveSuccess({message, redirect: true}));
+        return of(new fromActionsRoom.RoomSaveSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
     ))
   );
 
   @Effect()
   update$ = this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.roomUpdate)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.roomService.update(payload).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('ROOM.UPDATED.MESSAGE', {name: response.name});
-        return of(new fromActionsRoom.RoomSaveSuccess({message, redirect: true}));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
-    ))
-  );
-
-  @Effect()
-  updateMe$ = this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.roomUpdateMe)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.roomService.update(payload).pipe(
       switchMap((response: any) => {
@@ -88,7 +77,7 @@ export class RoomEffects {
     switchMap((payload: any) => this.roomService.delete(payload).pipe(
       switchMap((response: any) => {
         const message = this.translate.instant('ROOM.DELETED.MESSAGE', {name: response.name});
-        return of(new fromActionsRoom.RoomSaveSuccess({message, redirect: true}));
+        return of(new fromActionsRoom.RoomSaveSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
     ))
   );
@@ -110,12 +99,7 @@ export class RoomEffects {
 
   @Effect({dispatch: false})
   saveSuccess$ = this.actions$.pipe(
-    ofType(fromActionsRoom.RoomActionTypes.roomSaveSuccess),
-    tap((data: any) => {
-      if (data.payload.redirect) {
-        this.router.navigate(['rooms']);
-      }
-    })
+    ofType(fromActionsRoom.RoomActionTypes.roomSaveSuccess)
   );
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private roomService: RoomService,

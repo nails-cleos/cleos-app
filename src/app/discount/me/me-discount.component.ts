@@ -51,8 +51,8 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.subscribe();
     this.clean();
+    this.subscribe();
   }
 
   ngOnDestroy(): void {
@@ -65,23 +65,23 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private subscribe(): void {
-    this.subscription = this.getState.subscribe((stateValue) => {
-      if (stateValue.errorMessage || stateValue.message) {
-        const snackBarRef = this.snackBar.open(stateValue.errorMessage || stateValue.message, 'OK', {
+    this.subscription = this.getState.subscribe(state => {
+      if (state.errorMessage || state.message) {
+        const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
           duration: 5000
         });
 
-        if (stateValue.message) {
+        if (state.message) {
           snackBarRef.afterDismissed().subscribe(() => {
             this.clean();
             this.getDiscounts();
           });
         } else {
-          this.error = stateValue.error;
+          this.error = state.error;
           return;
         }
       }
-      this.dataSource = stateValue.data?.content?.map((ud: IUserDiscount) => {
+      this.dataSource = state.data?.content?.map((ud: IUserDiscount) => {
         if (ud && ud.discount) {
           let symbol;
           switch (ud.discount.type) {
@@ -96,7 +96,7 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
         }
         return ud;
       });
-      this.resultsLength = stateValue.data?.totalElements;
+      this.resultsLength = state.data?.totalElements;
       if (this.resultsLength) {
         this.createPageSubscriptions();
       }

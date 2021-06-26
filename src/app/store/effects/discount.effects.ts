@@ -106,8 +106,7 @@ export class DiscountEffects {
 
   @Effect({dispatch: false})
   saveSuccess$ = this.actions$.pipe(
-    ofType(fromActionsDiscount.DiscountActionTypes.discountSaveSuccess),
-    tap(() => this.router.navigate(['discounts']))
+    ofType(fromActionsDiscount.DiscountActionTypes.discountSaveSuccess)
   );
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private discountService: DiscountService,

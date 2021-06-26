@@ -6,6 +6,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectDiscountState } from '../store/app.states';
 import { IDiscount, Discount, DiscountType } from '../interfaces/discount';
 import * as fromActionsDiscount from '../store/discount.actions';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-discount',
@@ -31,7 +32,8 @@ export class DiscountComponent implements OnInit, OnDestroy {
   types = DiscountType;
   isLoading = false;
 
-  constructor(private snackBar: MatSnackBar, private store: Store<AppState>, private formBuilder: FormBuilder) {
+  constructor(private snackBar: MatSnackBar, private store: Store<AppState>, private formBuilder: FormBuilder,
+              private router: Router) {
     this.getState = this.store.select(selectDiscountState);
   }
 
@@ -84,10 +86,13 @@ export class DiscountComponent implements OnInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({incorrect: true});
         });
-      } else if (state.errorMessage) {
-        this.snackBar.open(state.errorMessage, 'OK', {
+      } else if (state.errorMessage || state.message) {
+        this.snackBar.open(state.errorMessage || state.message, 'OK', {
           duration: 5000
         });
+        if (state.message) {
+          this.router.navigate(['discounts'])
+        }
       }
     });
   }

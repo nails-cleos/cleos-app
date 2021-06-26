@@ -44,6 +44,7 @@ import { MeDiscountComponent } from './discount/me/me-discount.component';
 import { NavComponent } from './nav/nav.component';
 import { PrivacyComponent } from './privacy/privacy.component';
 import { TermsAndConditionsComponent } from './terms-and-conditions/terms-and-conditions.component';
+import { MainContentComponent } from './main/main-content/main-content.component';
 
 const routes: Routes = [
   {
@@ -210,10 +211,14 @@ const routes: Routes = [
       }
     ]
   },
-  {path: 'catalogs', component: CatalogComponent},
-  {path: 'privacy', component: PrivacyComponent},
-  {path: 'term-and-conditions', component: TermsAndConditionsComponent},
-  {path: 'main', component: MainComponent},
+  {
+    path: 'main', component: MainComponent, children: [
+      {path: '', component: MainContentComponent},
+      {path: 'catalogs', component: CatalogComponent},
+      {path: 'privacy', component: PrivacyComponent},
+      {path: 'term-and-conditions', component: TermsAndConditionsComponent}
+    ]
+  },
   {path: '**', redirectTo: '/main', pathMatch: 'full', resolve: {model: TranslationLoaderResolver}}
 ];
 

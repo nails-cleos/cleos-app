@@ -31,13 +31,16 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.clean();
     this.subscribe();
-    this.code = this.route.snapshot.queryParamMap.get('code');
   }
 
   ngAfterViewInit(): void {
     if (this.code) {
       this.authGroup.selectedIndex = 1;
     }
+  }
+
+  getCode($event: string): void {
+    this.code = $event;
   }
 
   socialSignIn(provider: string): void {

@@ -24,6 +24,7 @@ export const initialState: State = {
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
+    case CatalogueActionTypes.getAllCatalogs:
     case CatalogueActionTypes.getAll: {
       return {
         ...state,
@@ -62,6 +63,7 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         message: action.payload.message,
+        selected: null,
         errorMessage: null,
         subErrors: null,
         isLoading: false

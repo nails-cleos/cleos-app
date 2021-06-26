@@ -28,7 +28,6 @@ export class LoginEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => {
       const user = payload.socialUser;
-      console.log(payload);
       return this.authService.socialLogin(user.idToken || user.authToken, user.provider, payload.code).pipe(
         switchMap((response: any) => of(new LoginSuccess({
           response,
@@ -106,8 +105,7 @@ export class LoginEffects {
 
   @Effect({dispatch: false})
   signUpSuccess$ = this.actions$.pipe(
-    ofType(AuthActionTypes.signupSuccess),
-    tap(() => window.location.href = '/auth')
+    ofType(AuthActionTypes.signupSuccess)
   );
 
   @Effect({dispatch: false})

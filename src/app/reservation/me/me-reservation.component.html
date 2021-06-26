@@ -78,7 +78,7 @@
           </button>
         </div>
         <mat-form-field *ngIf="showDiscount && !isEditing" appearance="fill">
-          <mat-label>{{ 'RESERVATION.CUSTOMER.ADD.PRODUCT.DISCOUNT.FIELD' | translate }}n</mat-label>
+          <mat-label>{{ 'RESERVATION.CUSTOMER.ADD.PRODUCT.DISCOUNT.FIELD' | translate }}</mat-label>
           <mat-select *ngFor="let cd of discounts" [formControl]="discount">
             <mat-option>--</mat-option>
             <mat-option [value]="cd.id">{{cd.title}}</mat-option>
@@ -428,7 +428,7 @@
               {{ 'COMMON.BUTTON.BACK' | translate }}</button>
             <button (click)="create()" class="raised-button" color="primary" mat-raised-button type="button">
               {{ 'COMMON.BUTTON.BOOK' | translate }}
-              <mat-icon>event_available</mat-icon>
+              <mat-icon>add_task</mat-icon>
             </button>
           </div>
         </div>

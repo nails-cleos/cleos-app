@@ -2,6 +2,8 @@ export interface ICatalogue {
   id?: string;
   name?: string;
   description?: string;
+  home?: boolean;
+  catalog?: boolean;
   file?: any;
   blob?: any;
 }
@@ -11,6 +13,8 @@ export interface ICatalogueAll {
   id: string;
   name: string;
   description?: string;
+  home?: boolean;
+  catalog?: boolean;
   blob: any;
 }
 

@@ -1,10 +1,19 @@
-<div style="display: block;">
-  <canvas baseChart
-    [datasets]="barChartData"
-    [labels]="barChartLabels"
-    [options]="barChartOptions"
-    [plugins]="barChartPlugins"
-    [legend]="barChartLegend"
-    [chartType]="barChartType">
-  </canvas>
+<div *ngIf="!isLoading; else box" class="chartContainer">
+  <div *ngIf="!error; else errorBox">
+    <canvas [chartType]="barChartType"
+            [colors]="barChartColors"
+            [datasets]="barChartData"
+            [labels]="barChartLabels"
+            [legend]="barChartLegend"
+            [options]="barChartOptions"
+            [plugins]="barChartPlugins"
+            baseChart>
+    </canvas>
+  </div>
+  <ng-template #errorBox>
+    <app-error [error]="error" [isCard]="true"></app-error>
+  </ng-template>
 </div>
+<ng-template #box>
+  <div class="ssc-square mb"></div>
+</ng-template>

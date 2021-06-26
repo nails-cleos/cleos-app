@@ -35,7 +35,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscribe();
     this.clean();
-    this.getCatalogues();
+    this.getCatalogs();
   }
 
   ngOnDestroy(): void {
@@ -71,9 +71,9 @@ export class CatalogComponent implements OnInit, OnDestroy {
     );
   }
 
-  private getCatalogues(): void {
+  private getCatalogs(): void {
     this.store.dispatch(
-      new fromActionsCatalogue.GetAll()
+      new fromActionsCatalogue.GetAllCatalogs()
     );
   }
 }

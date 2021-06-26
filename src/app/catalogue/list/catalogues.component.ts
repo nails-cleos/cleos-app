@@ -41,8 +41,8 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.subscribe();
     this.clean();
+    this.subscribe();
     this.getCatalogues();
   }
 

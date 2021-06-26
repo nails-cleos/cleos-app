@@ -65,8 +65,8 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.subscribe();
     this.clean();
+    this.subscribe();
   }
 
   ngOnDestroy(): void {

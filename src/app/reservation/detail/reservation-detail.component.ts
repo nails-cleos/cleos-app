@@ -33,7 +33,7 @@ import { requireMatch, valueChange } from '../../util/validators';
 export enum ReservationIconName {
   created = 'assignment',
   approved = 'done',
-  send = 'fa fa-whatsapp',
+  send = 'sms',
   started = 'play_arrow',
   completed = 'done_all',
   cancelled = 'clear',

@@ -149,6 +149,7 @@ import { TrackingCompareChartComponent } from './charts/tracking-compare-chart/t
 import { MiniCardProductComponent } from './mini-card-product/mini-card-product.component';
 import { PrivacyComponent } from './privacy/privacy.component';
 import { TermsAndConditionsComponent } from './terms-and-conditions/terms-and-conditions.component';
+import { MainContentComponent } from './main/main-content/main-content.component';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
@@ -254,7 +255,8 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
     TrackingCompareChartComponent,
     MiniCardProductComponent,
     PrivacyComponent,
-    TermsAndConditionsComponent
+    TermsAndConditionsComponent,
+    MainContentComponent
   ],
   imports: [
     BrowserModule,

@@ -89,6 +89,7 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         message: action.payload.message,
+        selected: null,
         errorMessage: null,
         subErrors: null,
         isLoading: false

@@ -15,7 +15,7 @@ export class MainEffects {
   @Effect()
   getAllCatalogue$ = this.actions$.pipe(ofType(fromActionsMain.MainActionTypes.getAllCatalogue)).pipe(
     map((action: any) => action.payload),
-    switchMap(() => this.catalogueService.getAll().pipe(
+    switchMap(() => this.catalogueService.getAllHome().pipe(
       switchMap((response: any) => of(new fromActionsMain.CatalogueSuccess(response))),
       catchError((err: HttpErrorResponse) => of(new fromActionsMain.RequestFailure({error: err.error})))
     ))

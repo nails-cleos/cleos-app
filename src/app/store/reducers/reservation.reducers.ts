@@ -1,5 +1,11 @@
 import { All, ReservationActionTypes } from '../reservation.actions';
-import { IAvailableDTO, ICustomerReservation, IReservation, IRoomReservation, ITracking } from '../../interfaces/reservation';
+import {
+  IAvailableDTO,
+  ICustomerReservation,
+  IReservation,
+  IRoomReservation,
+  ITracking
+} from '../../interfaces/reservation';
 import { IUser } from '../../interfaces/user';
 import { IProductDiscountDTO } from '../../interfaces/product';
 import { IRoom } from '../../interfaces/room';
@@ -286,7 +292,7 @@ export const reducer = (state = initialState, action: All): State => {
     case ReservationActionTypes.getTracking: {
       return {
         ...state,
-        tracking: [],
+        tracking: null,
         errorMessage: null,
         error: null,
         subErrors: null,

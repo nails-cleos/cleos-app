@@ -58,20 +58,20 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.ADD.FIRST_NAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input [formControl]="firstName" autocomplete="firstName" matInput>
+                  <input [formControl]="firstName" autocomplete="given-name" matInput>
                 </label>
                 <mat-error *ngIf="errors['firstName']">{{errors['firstName']}}</mat-error>
               </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.ADD.LAST_NAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input [formControl]="lastName" autocomplete="lastName" matInput>
+                  <input [formControl]="lastName" autocomplete="family-name" matInput>
                 </label>
                 <mat-error *ngIf="errors['lastName']">{{errors['lastName']}}</mat-error>
               </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.ADD.PHONE.FIELD' | translate }}</mat-label>
-                <ngx-mat-intl-tel-input [enablePlaceholder]="true" [enableSearch]="true"
+                <ngx-mat-intl-tel-input autocomplete="tel" [enablePlaceholder]="true" [enableSearch]="true"
                                         [formControl]="phone" [preferredCountries]="['ar']"
                                         name="phone"></ngx-mat-intl-tel-input>
                 <mat-error *ngIf="phone.hasError('validatePhoneNumber')">

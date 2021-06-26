@@ -2,7 +2,7 @@ import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/cor
 import { Catalogue, ICatalogue } from '../../interfaces/catalogue';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectCatalogueState } from '../../store/app.states';
@@ -33,8 +33,12 @@ export class CatalogueDetailComponent implements OnInit, AfterViewInit, OnDestro
     Validators.required
   ]);
 
+  home: FormControl = new FormControl();
+  catalog: FormControl = new FormControl();
+
   constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
-              private formBuilder: FormBuilder, private translate: TranslateService, public dialog: MatDialog) {
+              private formBuilder: FormBuilder, private translate: TranslateService, public dialog: MatDialog,
+              private router: Router) {
     this.getState = this.store.select(selectCatalogueState);
   }
 
@@ -59,6 +63,8 @@ export class CatalogueDetailComponent implements OnInit, AfterViewInit, OnDestro
     catalogue.id = this.catalogue?.id;
     catalogue.name = fieldChange(this.name, this.catalogue?.name);
     catalogue.description = fieldChange(this.form.value?.description, this.catalogue?.description);
+    catalogue.home = fieldChange(this.home, this.catalogue?.home);
+    catalogue.catalog = fieldChange(this.catalog, this.catalogue?.catalog);
 
     this.store.dispatch(new fromActionsCatalogue.CatalogueUpdate({catalogue, file: this.file}));
   }
@@ -99,7 +105,9 @@ export class CatalogueDetailComponent implements OnInit, AfterViewInit, OnDestro
   private createForm(): void {
     this.form = this.formBuilder.group({
       name: this.name,
-      description: new FormControl()
+      description: new FormControl(),
+      home: this.home,
+      catalog: this.catalog
     });
   }
 
@@ -109,7 +117,9 @@ export class CatalogueDetailComponent implements OnInit, AfterViewInit, OnDestro
         this.catalogue = {
           id: state.selected.id,
           name: state.selected.name,
-          description: state.selected.description
+          description: state.selected.description,
+          home: state.selected.home,
+          catalog: state.selected.catalog
         } as ICatalogue;
         this.img = state.selected.blob;
         this.showImg = !!this.img;
@@ -120,11 +130,15 @@ export class CatalogueDetailComponent implements OnInit, AfterViewInit, OnDestro
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({incorrect: true});
         });
-      } else if (state.errorMessage) {
-        this.snackBar.open(state.errorMessage, 'OK', {
+      } else if (state.errorMessage || state.message) {
+        this.snackBar.open(state.errorMessage || state.message, 'OK', {
           duration: 5000
         });
-        this.error = state.error;
+        if (state.message) {
+          this.router.navigate(['catalogues']);
+        } else {
+          this.error = state.error;
+        }
       }
     });
   }

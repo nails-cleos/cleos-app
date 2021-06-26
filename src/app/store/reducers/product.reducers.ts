@@ -63,6 +63,7 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         message: action.payload.message,
         errorMessage: null,
+        selected: null,
         subErrors: null,
         isLoading: false
       };

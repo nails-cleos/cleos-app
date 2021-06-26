@@ -356,7 +356,8 @@
       "INVALID": "Invalid phone number"
     },
     "UPDATED": {
-      "MESSAGE": "User {{username}} updated"
+      "MESSAGE": "User {{username}} updated",
+      "PHOTO": "Profile picture updated"
     }
   },
   "PRODUCT": {
@@ -434,6 +435,10 @@
       },
       "DESCRIPTION": {
         "FIELD": "Description"
+      },
+      "SHOW": {
+        "HOME": "Show in home",
+        "CATALOG": "Show in catalog"
       },
       "FILE": {
         "DRAG_DROP": "Drag and drop file here",
@@ -1059,6 +1064,7 @@
       "PRODUCT": "Products",
       "BOOK": "Book",
       "CONTACT": "Contact",
+      "CATALOG": "Catalogs",
       "ACCOUNT": "My account",
       "AUTH": "Login",
       "PRIVACY": "Privacy",

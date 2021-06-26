@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
-import { Label } from 'ng2-charts';
+import { Color, Label } from 'ng2-charts';
 import { ITracking } from '../../interfaces/reservation';
 import { barChartTimeOptions, trackingCompareChart } from '../../util/chart';
 
@@ -23,6 +23,11 @@ export class TrackingCompareChartComponent implements OnChanges {
   public barChartType: ChartType = 'bar';
   public barChartLegend = true;
   public barChartPlugins = [];
+  public barChartColors: Color[] = [
+    {
+      backgroundColor: 'rgba(103, 58, 183, 0.7)'
+    }
+  ];
 
   public barChartData: ChartDataSets[] = [];
 

@@ -56,8 +56,8 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
   }
 
   ngOnInit(): void {
-    this.subscribe();
     this.clean();
+    this.subscribe();
   }
 
   ngOnDestroy(): void {
