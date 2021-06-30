@@ -56,8 +56,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case ReservationActionTypes.getAll: {
@@ -68,8 +67,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case ReservationActionTypes.getAllFilterPage: {
@@ -81,8 +79,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case ReservationActionTypes.getAllPage: {
@@ -94,14 +91,23 @@ export const reducer = (state = initialState, action: All): State => {
         error: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case ReservationActionTypes.getUpcomingReservation:
-    case ReservationActionTypes.customerSearchReservation:
-    case ReservationActionTypes.searchReservation:
     case ReservationActionTypes.getAllGroupingByRoom: {
+      return {
+        ...state,
+        data: null,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        selected: null,
+        message: null
+      };
+    }
+    case ReservationActionTypes.customerSearchReservation:
+    case ReservationActionTypes.searchReservation: {
       return {
         ...state,
         data: null,
@@ -121,8 +127,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case ReservationActionTypes.getRooms: {
@@ -133,8 +138,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case ReservationActionTypes.getProducts: {
@@ -145,8 +149,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case ReservationActionTypes.approve:
@@ -165,8 +168,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case ReservationActionTypes.reservationPageSuccess: {
@@ -176,8 +178,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null,
-        isLoading: false
+        message: null
       };
     }
     case ReservationActionTypes.reservationFilterPageSuccess: {
@@ -187,8 +188,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null,
-        isLoading: false
+        message: null
       };
     }
     case ReservationActionTypes.reservationsCustomerSuccess: {
@@ -198,8 +198,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null,
-        isLoading: false
+        message: null
       };
     }
     case ReservationActionTypes.reservationSuccess: {
@@ -210,7 +209,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: null,
         subErrors: null,
         message: null,
-        isLoading: false
+        isLoading: false // ok
       };
     }
     case ReservationActionTypes.customersSuccess: {
@@ -220,8 +219,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null,
-        isLoading: false
+        message: null
       };
     }
     case ReservationActionTypes.reservationRoomsSuccess: {
@@ -231,8 +229,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null,
-        isLoading: false
+        message: null
       };
     }
     case ReservationActionTypes.reservationProductsSuccess: {
@@ -242,8 +239,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null,
-        isLoading: false
+        message: null
       };
     }
     case ReservationActionTypes.stateSuccess:
@@ -297,8 +293,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case ReservationActionTypes.trackingSuccess: {
@@ -308,8 +303,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null,
-        isLoading: false
+        message: null
       };
     }
     case ReservationActionTypes.clean: {

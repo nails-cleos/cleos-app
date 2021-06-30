@@ -18,7 +18,6 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getState: Observable<any>;
   subscription: Subscription | undefined;
-  isLoading: any;
   code: string | undefined | null;
   extras: any;
 
@@ -69,7 +68,6 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe((state) => {
-      this.isLoading = state.isLoading;
       if (state.isAuthenticated) {
         this.router.navigate(['redirect']);
       }

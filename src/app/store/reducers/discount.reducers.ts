@@ -35,8 +35,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case DiscountActionTypes.getReferrals: {
@@ -47,8 +46,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case DiscountActionTypes.addDiscount: {
@@ -69,8 +67,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case DiscountActionTypes.discountSuccess: {
@@ -79,8 +76,7 @@ export const reducer = (state = initialState, action: All): State => {
         data: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null,
-        isLoading: false
+        message: null
       };
     }
     case DiscountActionTypes.referralSuccess: {
@@ -89,8 +85,7 @@ export const reducer = (state = initialState, action: All): State => {
         referrals: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null,
-        isLoading: false
+        message: null
       };
     }
     case DiscountActionTypes.discountSaveSuccess: {
@@ -109,8 +104,7 @@ export const reducer = (state = initialState, action: All): State => {
         selected: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null,
-        isLoading: false
+        message: null
       };
     }
     case DiscountActionTypes.discountFailure: {

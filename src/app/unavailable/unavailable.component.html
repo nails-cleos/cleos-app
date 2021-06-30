@@ -64,10 +64,10 @@
                   <mat-label>{{ 'UNAVAILABLE.ADD.TIME.FIELD' | translate }}</mat-label>
                   <label>
                     <input (focusin)="focusin()" [formControl]="startTime" [format]="24" [max]="maxTime" [min]="minTime"
-                           [ngxTimepicker]="time" matInput name="start_time" readonly/>
+                           [ngxTimepicker]="time" matInput name="start_time" readonly required/>
                   </label>
                   <span matPrefix><mat-icon (click)="time.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
-                  <ngx-material-timepicker #time (timeChanged)="setTime($event)" [minutesGap]="15"
+                  <ngx-material-timepicker #time (timeSet)="setTime($event)" [minutesGap]="15"
                                            [theme]="theme"></ngx-material-timepicker>
                   <mat-error *ngIf="startTime.hasError('required')"
                              [innerHTML]="'UNAVAILABLE.ADD.TIME.REQUIRED' | translate">
@@ -79,7 +79,7 @@
                 <mat-label>{{ 'UNAVAILABLE.ADD.DURATION.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="duration" [format]="24" [max]="durationMax" [ngxTimepicker]="t" matInput
-                         name="duration" readonly/>
+                         name="duration" readonly required/>
                 </label>
                 <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
                 <ngx-material-timepicker #t [minutesGap]="15" [theme]="theme"></ngx-material-timepicker>
@@ -93,20 +93,19 @@
 
               <mat-form-field *ngIf="room" appearance="fill">
                 <mat-label>{{ 'UNAVAILABLE.ADD.REPEAT.FIELD' | translate }}</mat-label>
-                <mat-select [(value)]="repeat">
-                  <mat-option value="NONE">{{ 'COMMON.REPEAT.NONE' | translate }}</mat-option>
-                  <mat-option value="EVERY_DAY">{{ 'COMMON.REPEAT.EVERY_DAY' | translate }}</mat-option>
-                  <mat-option value="ONCE_A_WEEK">{{ 'COMMON.REPEAT.ONCE_A_WEEK' | translate }}</mat-option>
+                <mat-select [formControl]="repeat" required>
+                  <mat-option *ngFor="let t of repeats | keyvalue" [value]="t.value">
+                    {{ 'COMMON.REPEAT.' + t.value | translate }}
+                  </mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
           </mat-card-content>
           <mat-card-actions>
             <div fxFlex></div>
-            <button [disabled]="form.invalid || isLoading" color="primary" mat-raised-button
+            <button [disabled]="form.invalid" color="primary" mat-raised-button
                     type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
-            <button [disabled]="isLoading" appBackButton color="accent"
-                    mat-raised-button>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <button appBackButton type="button" color="accent" mat-raised-button>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
         </mat-card>
       </form>

@@ -33,8 +33,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case CatalogueActionTypes.catalogueFind: {
@@ -45,8 +44,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case CatalogueActionTypes.catalogueSuccess: {
@@ -55,8 +53,7 @@ export const reducer = (state = initialState, action: All): State => {
         data: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null,
-        isLoading: false
+        message: null
       };
     }
     case CatalogueActionTypes.catalogueSaveSuccess: {
@@ -75,8 +72,7 @@ export const reducer = (state = initialState, action: All): State => {
         selected: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null,
-        isLoading: false
+        message: null
       };
     }
     case CatalogueActionTypes.catalogueFailure: {
@@ -96,8 +92,7 @@ export const reducer = (state = initialState, action: All): State => {
         data: [{}, {}, {}],
         errorMessage: null,
         subErrors: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case CatalogueActionTypes.catalogueUpdate:

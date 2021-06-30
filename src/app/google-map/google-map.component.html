@@ -14,7 +14,7 @@
     <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
   </mat-form-field>
 </div>
-<agm-map *ngIf="!isLoading; else box" [latitude]="latitudeMarker || latitude" [longitude]="longitudeMarker || longitude"
+<agm-map *ngIf="!isMapLoading; else box" [latitude]="latitudeMarker || latitude" [longitude]="longitudeMarker || longitude"
          [zoom]="zoom"
          class="divider">
   <agm-marker (dragEnd)="markerDragEnd($event)" *ngIf="latitudeMarker && longitudeMarker" [latitude]="latitudeMarker"

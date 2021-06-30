@@ -13,7 +13,6 @@ export class CustomerReservationsChartComponent implements OnChanges {
   @Input() state: any;
   @Input() label: any;
 
-  isLoading = true;
   data: IReservationAll[] | undefined;
   error: any;
 
@@ -41,7 +40,6 @@ export class CustomerReservationsChartComponent implements OnChanges {
 
   private createChart(): void {
     if (this.state) {
-      this.isLoading = this.state.isLoading;
       if (this.state.errorMessage) {
         this.error = this.state.error;
         return;

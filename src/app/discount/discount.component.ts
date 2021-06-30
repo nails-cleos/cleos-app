@@ -30,7 +30,6 @@ export class DiscountComponent implements OnInit, OnDestroy {
   ]);
 
   types = DiscountType;
-  isLoading = false;
 
   constructor(private snackBar: MatSnackBar, private store: Store<AppState>, private formBuilder: FormBuilder,
               private router: Router) {
@@ -80,7 +79,6 @@ export class DiscountComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      this.isLoading = state.isLoading;
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;

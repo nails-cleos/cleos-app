@@ -13,7 +13,6 @@ export class QuantityProductReservationsChartComponent implements OnChanges {
   @Input() state: any;
   @Input() label: any;
 
-  isLoading = true;
   data: IReservationAll[] | undefined;
   error: any;
 
@@ -40,7 +39,6 @@ public barChartOptions: ChartOptions = barChartDefaultOptions();
 
   private createChart(): void {
     if (this.state) {
-      this.isLoading = this.state.isLoading;
       if (this.state.errorMessage) {
         this.error = this.state.error;
         return;

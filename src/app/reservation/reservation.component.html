@@ -84,7 +84,7 @@
                    matInput name="start" readonly/>
           </label>
           <span matPrefix><mat-icon (click)="tStart.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
-          <ngx-material-timepicker #tStart (timeChanged)="timeChange($event)" [minutesGap]="15"
+          <ngx-material-timepicker #tStart (timeSet)="timeChange($event)" [minutesGap]="15"
                                    [theme]="theme"></ngx-material-timepicker>
           <mat-error *ngIf="start.hasError('required')"
                      [innerHTML]="'RESERVATION.ADD.START.REQUIRED' | translate">
@@ -134,28 +134,23 @@
 </ng-template>
 
 <ng-template #stepFour>
-  <div *ngIf="!isLoading; else box">
-    <mwl-calendar-week-view
-      (hourSegmentClicked)="segmentClick($event.date, 'CREATED')"
-      [dayEndHour]="dayEndHour"
-      [dayEndMinute]="dayEndMinute"
-      [dayStartHour]="dayStartHour"
-      [dayStartMinute]="dayStartMinute"
-      [daysInWeek]="daysInWeek"
-      [events]="events"
-      [hourSegments]="hourSegments"
-      [locale]="locale"
-      [viewDate]="viewDate"></mwl-calendar-week-view>
-    <mat-error *ngIf="this.errors['schedule']" [innerHTML]="'RESERVATION.ADD.SCHEDULE.REQUIRED' | translate"
-               class="divider"></mat-error>
-    <mat-error *ngIf="this.errors['overlapping']" [innerHTML]="errors['overlapping']" class="divider">
-    </mat-error>
-    <mat-error *ngIf="this.errors['professional']" [innerHTML]="errors['professional']" class="divider">
-    </mat-error>
-  </div>
-  <ng-template #box>
-    <div class="ssc-square mb"></div>
-  </ng-template>
+  <mwl-calendar-week-view
+    (hourSegmentClicked)="segmentClick($event.date, 'CREATED')"
+    [dayEndHour]="dayEndHour"
+    [dayEndMinute]="dayEndMinute"
+    [dayStartHour]="dayStartHour"
+    [dayStartMinute]="dayStartMinute"
+    [daysInWeek]="daysInWeek"
+    [events]="events"
+    [hourSegments]="hourSegments"
+    [locale]="locale"
+    [viewDate]="viewDate"></mwl-calendar-week-view>
+  <mat-error *ngIf="this.errors['schedule']" [innerHTML]="'RESERVATION.ADD.SCHEDULE.REQUIRED' | translate"
+             class="divider"></mat-error>
+  <mat-error *ngIf="this.errors['overlapping']" [innerHTML]="errors['overlapping']" class="divider">
+  </mat-error>
+  <mat-error *ngIf="this.errors['professional']" [innerHTML]="errors['professional']" class="divider">
+  </mat-error>
 </ng-template>
 
 <ng-template #stepFive>
@@ -250,7 +245,7 @@
           </div>
         </div>
         <div>
-          <button appBackButton mat-raised-button>
+          <button appBackButton mat-raised-button type="button">
             <mat-icon>keyboard_return</mat-icon>
           </button>
           <button (click)="getRooms()" [disabled]="customerForm.invalid" class="raised-button" color="primary"
@@ -294,7 +289,7 @@
           <mat-icon>arrow_upward</mat-icon>
         </button>
         <ng-template #editButton>
-          <button appBackButton mat-raised-button>
+          <button appBackButton mat-raised-button type="button">
             <mat-icon>keyboard_return</mat-icon>
           </button>
         </ng-template>
@@ -312,7 +307,7 @@
           <mat-icon>arrow_upward</mat-icon>
         </button>
         <ng-template #editButton>
-          <button appBackButton mat-raised-button>
+          <button appBackButton mat-raised-button type="button">
             <mat-icon>keyboard_return</mat-icon>
           </button>
         </ng-template>
@@ -336,20 +331,15 @@
     </mat-step>
     <mat-step state="preview">
       <ng-template matStepLabel>{{ 'RESERVATION.ADD.PREVIEW.TITLE' | translate }}</ng-template>
-      <div *ngIf="!isLoading; else box">
-        <ng-container *ngTemplateOutlet="stepFive"></ng-container>
-        <div class="divider">
-          <button (click)="goBack()" mat-raised-button>
-            <mat-icon>arrow_upward</mat-icon>
-          </button>
-          <button (click)="create()" class="raised-button" color="primary" mat-raised-button type="button">
-            <mat-icon>add_task</mat-icon>
-          </button>
-        </div>
+      <ng-container *ngTemplateOutlet="stepFive"></ng-container>
+      <div class="divider">
+        <button (click)="goBack()" mat-raised-button>
+          <mat-icon>arrow_upward</mat-icon>
+        </button>
+        <button (click)="create()" class="raised-button" color="primary" mat-raised-button type="button">
+          <mat-icon>add_task</mat-icon>
+        </button>
       </div>
-      <ng-template #box>
-        <div class="ssc-square mb"></div>
-      </ng-template>
     </mat-step>
   </mat-vertical-stepper>
 </ng-template>
@@ -370,7 +360,7 @@
           </div>
         </div>
         <div>
-          <button appBackButton mat-raised-button>
+          <button appBackButton mat-raised-button type="button">
             <mat-icon>keyboard_return</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
@@ -419,14 +409,13 @@
           <mat-icon>arrow_back</mat-icon>
         </button>
         <ng-template #editButton>
-          <button appBackButton mat-raised-button>
+          <button appBackButton mat-raised-button type="button">
             {{ 'COMMON.BUTTON.BACK' | translate }}
             <mat-icon>keyboard_return</mat-icon>
           </button>
         </ng-template>
         <button (click)="getProducts()" [disabled]="roomForm.invalid" class="raised-button" color="primary"
-                mat-raised-button
-                type="button">
+                mat-raised-button type="button">
           <mat-icon>arrow_forward</mat-icon>
           {{ 'COMMON.BUTTON.NEXT' | translate }}
         </button>
@@ -441,7 +430,7 @@
           {{ 'COMMON.BUTTON.BACK' | translate }}
         </button>
         <ng-template #editButton>
-          <button appBackButton mat-raised-button>
+          <button appBackButton mat-raised-button type="button">
             <mat-icon>keyboard_return</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
@@ -468,21 +457,16 @@
     </mat-step>
     <mat-step state="preview">
       <ng-template matStepLabel>{{ 'RESERVATION.ADD.PREVIEW.TITLE' | translate }}</ng-template>
-      <div *ngIf="!isLoading; else box">
-        <ng-container *ngTemplateOutlet="stepFive"></ng-container>
-        <div class="divider">
-          <button (click)="goBack()" mat-raised-button>
-            <mat-icon>arrow_back</mat-icon>
-            {{ 'COMMON.BUTTON.BACK' | translate }}</button>
-          <button (click)="create()" class="raised-button" color="primary" mat-raised-button type="button">
-            <mat-icon>add_task</mat-icon>
-            {{ 'COMMON.BUTTON.BOOK' | translate }}
-          </button>
-        </div>
+      <ng-container *ngTemplateOutlet="stepFive"></ng-container>
+      <div class="divider">
+        <button (click)="goBack()" mat-raised-button>
+          <mat-icon>arrow_back</mat-icon>
+          {{ 'COMMON.BUTTON.BACK' | translate }}</button>
+        <button (click)="create()" class="raised-button" color="primary" mat-raised-button type="button">
+          <mat-icon>add_task</mat-icon>
+          {{ 'COMMON.BUTTON.BOOK' | translate }}
+        </button>
       </div>
-      <ng-template #box>
-        <div class="ssc-square mb"></div>
-      </ng-template>
     </mat-step>
   </mat-horizontal-stepper>
 </ng-template>

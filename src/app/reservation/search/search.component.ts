@@ -76,6 +76,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.clean();
     this.subscribe();
     this.getCustomers();
     this.filteredCustomer = this.customer.valueChanges.pipe(

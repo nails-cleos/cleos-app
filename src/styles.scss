@@ -102,6 +102,13 @@ a, u {
     left: auto;
     position: fixed;
   }
+
+  .spinner-vertical {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 }
 
 @media not all and (max-device-width: 812px) and (orientation: portrait) {
@@ -111,6 +118,13 @@ a, u {
     bottom: auto;
     left: auto;
     position: fixed;
+  }
+
+  .spinner-vertical {
+    position: fixed;
+    top: 50%;
+    left: 60%;
+    transform: translate(-50%, -50%);
   }
 }
 
@@ -239,5 +253,20 @@ pre {
   .section-style {
     margin: 0 10% 0 10%;
     padding-top: 58px;
+  }
+}
+
+.loading {
+  z-index: 9;
+
+  &::before {
+    position: fixed;
+    content: "";
+    width: 100%;
+    height: 100%;
+    left: 0;
+    z-index: 99;
+    background: rgba(235, 235, 235, 0.7);
+    margin-top: -20px;
   }
 }

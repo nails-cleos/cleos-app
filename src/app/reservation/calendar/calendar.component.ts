@@ -38,7 +38,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
   getState: Observable<any>;
   subscription: Subscription | undefined;
 
-  isLoading = false;
   error: any;
 
   data: IRoomReservation[] | undefined;
@@ -258,7 +257,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
       if (stateValue.error) {
         this.error = stateValue.error;
       }
-      this.isLoading = stateValue.isLoading;
     });
   }
 

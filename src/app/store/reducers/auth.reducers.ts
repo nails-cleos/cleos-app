@@ -80,7 +80,8 @@ export const reducer = (state = initialState, action: All): State => {
         isAuthenticated: false,
         errorMessage: null,
         message: action.payload.message,
-        subErrors: null
+        subErrors: null,
+        isLoading: false
       };
     }
     case AuthActionTypes.clean: {

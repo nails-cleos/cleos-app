@@ -76,7 +76,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
 
   delete(unavailable: IUnavailable): void {
     const title = this.translate.instant('UNAVAILABLE.DELETED.TITLE');
-    const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT', {name: unavailable.start});
+    const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT', {date: unavailable.start});
     const dialogRef = this.dialog.open(DialogComponent, {
       data: {title, content, value: unavailable}
     });

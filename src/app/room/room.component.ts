@@ -38,8 +38,6 @@ export class RoomComponent implements OnInit, OnDestroy {
   errors: any = [];
   error: any;
 
-  isLoading = false;
-
   step = 0;
   icons: IIcon = {
     week: IconName.calendarToday,
@@ -159,7 +157,6 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      this.isLoading = state.isLoading;
       if (state.professionals) {
         this.professionals = state.professionals;
       }

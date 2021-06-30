@@ -26,7 +26,7 @@ import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material
 import * as fromActionsUser from '../../store/user.actions';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { map, startWith } from 'rxjs/operators';
-import { getUserName } from '../../util/helper';
+import { getFullUserName, getUserName } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
@@ -239,14 +239,14 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
 
   sortCustomers(data: any): IUser[] {
     return data.sort((a: any, b: any) => {
-      const aName = getUserName(a).toUpperCase();
-      const bName = getUserName(b).toUpperCase();
+      const aName = getFullUserName(a).toUpperCase();
+      const bName = getFullUserName(b).toUpperCase();
       return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
     });
   }
 
   getName(customer: any): string {
-    return getUserName(customer);
+    return getFullUserName(customer);
   }
 
   private setSymbol(): void {

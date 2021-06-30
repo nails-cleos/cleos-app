@@ -222,7 +222,7 @@ export class ReservationEffects {
   getAllTracking$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getTracking)).pipe(
     map((action: any) => action.payload),
     switchMap(() => this.trackingService.getAll().pipe(
-      switchMap((response: any) => response ? of(new fromActionsReservation.ReservationSuccess(response)) :
+      switchMap((response: any) => response ? of(new fromActionsReservation.TrackingSuccess(response)) :
         of(new fromActionsReservation.ReservationFailure({error: {status: 'NO_CONTENT', message: 'NO_CONTENT'}}))),
       catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
     ))

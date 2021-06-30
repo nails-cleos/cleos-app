@@ -55,6 +55,24 @@ export const getUserName = (user: IUserAll | IUser): string => {
   return names.join(' ');
 };
 
+export const getFullUserName = (user: IUserAll | IUser): string => {
+  let names: string[] = [];
+  if (user.firstName) {
+    names = [...names, user.firstName];
+  }
+  if (user.lastName) {
+    names = [...names, user.lastName];
+  }
+
+  if (user.username && (!names || !names.length)) {
+    names = [user.username];
+  }
+
+  names = [...names, `(${user.email})`];
+
+  return names.join(' ');
+};
+
 export const getUserNameInitials = (user: IUserAll): string => {
   let names: string[] = [];
   if (user.firstName) {

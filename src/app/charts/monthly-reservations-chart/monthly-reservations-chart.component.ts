@@ -13,7 +13,6 @@ import { TranslateService } from '@ngx-translate/core';
 export class MonthlyReservationsChartComponent implements OnChanges {
   @Input() state: any;
 
-  isLoading = true;
   data: IReservationAll[] | undefined;
   locale: string;
   error: any;
@@ -39,7 +38,6 @@ export class MonthlyReservationsChartComponent implements OnChanges {
 
   private createChart(): void {
     if (this.state) {
-      this.isLoading = this.state.isLoading;
       if (this.state.errorMessage) {
         this.error = this.state.error;
         return;

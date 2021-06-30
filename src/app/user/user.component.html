@@ -71,8 +71,8 @@
               </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.ADD.PHONE.FIELD' | translate }}</mat-label>
-                <ngx-mat-intl-tel-input autocomplete="tel" [enablePlaceholder]="true" [enableSearch]="true"
-                                        [formControl]="phone" [preferredCountries]="['ar']"
+                <ngx-mat-intl-tel-input [enablePlaceholder]="true" [enableSearch]="true" [formControl]="phone"
+                                        [preferredCountries]="['ar']" autocomplete="tel"
                                         name="phone"></ngx-mat-intl-tel-input>
                 <mat-error *ngIf="phone.hasError('validatePhoneNumber')">
                   {{ 'USER.ADD.PHONE.INVALID' | translate }}
@@ -83,10 +83,9 @@
           </mat-card-content>
           <mat-card-actions>
             <div fxFlex></div>
-            <button [disabled]="form.invalid || isLoading" color="primary" mat-raised-button
+            <button [disabled]="form.invalid" color="primary" mat-raised-button
                     type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
-            <button [disabled]="isLoading" appBackButton color="accent"
-                    mat-raised-button>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <button appBackButton color="accent" mat-raised-button type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
         </form>
       </mat-card>
