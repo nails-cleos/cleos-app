@@ -2,7 +2,7 @@
   <img alt="logo" mat-card-avatar src="../../assets/icons/icon-512x512.png">
   <span>{{title}}</span>
   <span class="mat-spacer"></span>
-  <span *ngIf="!isHandset; else menuButton">
+  <span *ngIf="(isHandset$ | async) === false; else menuButton">
     <button (click)="onNavigation('story')" color="accent" mat-button type="button">
       <span>{{'MAIN.SECTION.STORY' | translate }}</span>
     </button>
@@ -14,6 +14,9 @@
     </button>
     <button (click)="onNavigation('contact')" color="accent" mat-button type="button">
       <span>{{'MAIN.SECTION.CONTACT' | translate }}</span>
+    </button>
+    <button [routerLinkActive]="['active']" [routerLink]="'/main/catalogs'" color="accent" mat-button type="button">
+      <span>{{'MAIN.SECTION.CATALOG' | translate }}</span>
     </button>
     <button *ngIf="isAuthenticated; else login" [routerLinkActive]="['active']" [routerLink]="'/redirect'"
             color="accent"
@@ -52,6 +55,11 @@
           <div mat-line>{{'MAIN.SECTION.CONTACT' | translate }}</div>
         </a>
         <mat-divider></mat-divider>
+        <a [routerLink]="'/main/catalogs'" mat-list-item>
+          <mat-icon mat-list-icon>collections</mat-icon>
+          <div mat-line>{{'MAIN.SECTION.CATALOG' | translate }}</div>
+        </a>
+        <mat-divider></mat-divider>
         <a *ngIf="isAuthenticated; else login" [routerLinkActive]="['active']" [routerLink]="'/redirect'" mat-list-item>
           <mat-icon mat-list-icon>person_pin</mat-icon>
           <div mat-line>{{'MAIN.SECTION.ACCOUNT' | translate }}</div>
@@ -66,188 +74,23 @@
     </mat-menu>
   </ng-template>
 </mat-toolbar>
-<div class="carousel">
-  <mat-carousel *ngIf="slides && slides.length; else loading" [autoplay]="true" [hideArrows]="true"
-                [hideIndicators]="false" [interval]="3000" [loop]="true"
-                [maintainAspectRatio]="false" [slides]="slides.length" [useKeyboard]="true" [useMouseWheel]="false"
-                color="primary" orientation="ltr" timings="250ms ease-in">
-    <mat-carousel-slide #matCarouselSlide *ngFor="let slide of slides; let i = index" [image]="slide.image"
-                        overlayColor="#00000040"
-    ></mat-carousel-slide>
-  </mat-carousel>
-  <ng-template #loading>
-    <div class="spinner-parent-vertical">
-      <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
-    </div>
-  </ng-template>
-</div>
-<div class="content">
-  <section class="section-style" id="story">
-    <h1 class="title">{{ 'MAIN.SECTION.STORY' | translate }}</h1>
-    <div [innerHTML]="'MAIN.STORY_DETAIL' | translate" class="large-text">
-    </div>
-  </section>
-  <section class="section-style" id="product">
-    <h1 class="title">{{ 'MAIN.SECTION.PRODUCT' | translate }}</h1>
-    <mat-grid-list [rowHeight]="'1:1'" cols="{{ ( cardLayout | async )?.columns }}">
-      <mat-grid-tile *ngFor="let product of products" [colspan]="1" [rowspan]="1">
-        <app-mini-card-product (click)="setProduct(product)" [card]="product"></app-mini-card-product>
-      </mat-grid-tile>
-    </mat-grid-list>
-  </section>
-  <section class="section-style" id="book">
-    <h1 class="title">{{ 'MAIN.SECTION.BOOK' | translate }}</h1>
-    <div id="search-box">
-      <div id="search-label">{{'MAIN.SECTION.BOOK' | translate }}</div>
-      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
-        <mat-form-field appearance="fill">
-          <mat-label>{{ 'MAIN.BOOK.DATE.FIELD' | translate }}</mat-label>
-          <label>
-            <input (focus)="picker.open()" [formControl]="date" [matDatepickerFilter]="myFilter"
-                   [matDatepicker]="picker" [max]="maxDate" [min]="minDate"
-                   matInput required>
-          </label>
-          <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
-          <mat-datepicker #picker touchUi></mat-datepicker>
-        </mat-form-field>
-        <mat-form-field *ngIf="products; else skeleton" appearance="fill">
-          <mat-label>{{ 'MAIN.BOOK.PRODUCT.FIELD' | translate }}</mat-label>
-          <label>
-            <input (keydown)="keyDownHandler($event, product)" [formControl]="product"
-                   [matAutocomplete]="autoProduct"
-                   matInput required type="text">
-          </label>
-          <mat-autocomplete #autoProduct="matAutocomplete" [displayWith]="displayFnProduct">
-            <mat-option *ngFor="let product of filteredProduct | async" [value]="product">
-              {{product.name}}
-            </mat-option>
-          </mat-autocomplete>
-          <mat-icon matSuffix>home_repair_service</mat-icon>
-          <mat-error *ngIf="product.hasError('requireMatch')"
-                     [innerHTML]="'MAIN.BOOK.PRODUCT.INVALID' | translate">
-          </mat-error>
-        </mat-form-field>
-        <div [ngClass]="{'last': isHandset}">
-          <button (click)="book()" [disabled]="!product.value && !date.value" color="primary" mat-raised-button
-                  type="button">
-            <mat-icon>book_online</mat-icon>
-            {{'COMMON.BUTTON.BOOK' | translate}}
-          </button>
-        </div>
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
-      </div>
-    </div>
-  </section>
-  <section class="section-style last" id="contact">
-    <h1 class="title">{{ 'MAIN.SECTION.CONTACT' | translate }}</h1>
-    <mat-card>
-      <mat-card-content fxLayout="row" fxLayout.lt-sm="column" fxLayoutAlign="space-evenly stretch">
-        <div class="div-left">
-          <h2 class="bold no-content">{{'MAIN.CONTACT.TITLE' | translate}}</h2>
-          <p>
-            <mat-icon matPrefix>room</mat-icon>&nbsp;
-            <a
-              [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + ('MAIN.CONTACT.ADDRESS' | translate)"
-              target="_blank">
-              {{'MAIN.CONTACT.ADDRESS' | translate}}
-            </a>
-          </p>
-          <p>
-            <mat-icon matPrefix>phone</mat-icon>&nbsp;
-            <a [href]="'tel:' + ('MAIN.CONTACT.PHONE' | translate)">{{'MAIN.CONTACT.PHONE' | translate}}</a>
-          </p>
-          <p>
-            <mat-icon matPrefix>mail</mat-icon>&nbsp;
-            <a [href]="'mailto:' + ('MAIN.CONTACT.MAIL' | translate)">{{'MAIN.CONTACT.MAIL' | translate}}</a>
-          </p>
-          <div fxLayout="row" fxLayoutAlign="center center">
-            <a [href]="'https://api.whatsapp.com/send?phone=' + ('MAIN.CONTACT.PHONE' | translate)" mat-icon-button
-               target="_blank">
-              <i aria-hidden="true" class="fa fa-whatsapp i-size-24"></i>
-            </a>
-            <a [href]="'https://www.instagram.com/espacio.cleos/'" mat-icon-button target="_blank">
-              <i aria-hidden="true" class="fa fa-instagram i-size-24"></i>
-            </a>
-            <a [href]="'https://www.facebook.com/espacio.cleos/'" mat-icon-button target="_blank">
-              <mat-icon>facebook</mat-icon>
-            </a>
-          </div>
-        </div>
-        <mat-divider [vertical]="true"></mat-divider>
-        <div class="div-right">
-          <h2 class="bold no-content">{{'MAIN.CONTACT.SEND.TITLE' | translate}}</h2>
-          <form (ngSubmit)="sendEmail()" [formGroup]="form" novalidate>
-            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-              <mat-form-field appearance="fill">
-                <mat-label>{{ 'MAIN.CONTACT.NAME.FIELD' | translate }}</mat-label>
-                <label>
-                  <input [formControl]="name" autocomplete="name" matInput required>
-                </label>
-                <mat-error *ngIf="name.hasError('required')"
-                           [innerHTML]="'MAIN.CONTACT.NAME.REQUIRED' | translate">
-                </mat-error>
-              </mat-form-field>
-              <mat-form-field appearance="fill">
-                <mat-label>{{ 'MAIN.CONTACT.EMAIL.FIELD' | translate }}</mat-label>
-                <label>
-                  <input [formControl]="email" [tabIndex]="2" autocomplete="email" matInput required>
-                </label>
-                <mat-error *ngIf="email.hasError('email')">
-                  {{ 'MAIN.CONTACT.EMAIL.INVALID' | translate }}
-                </mat-error>
-                <mat-error *ngIf="email.hasError('required')"
-                           [innerHTML]="'MAIN.CONTACT.EMAIL.REQUIRED' | translate">
-                </mat-error>
-              </mat-form-field>
-              <mat-form-field appearance="fill">
-                <mat-label>{{ 'MAIN.CONTACT.SUBJECT.FIELD' | translate }}</mat-label>
-                <label>
-                  <input [formControl]="subject" autocomplete="subject" matInput required>
-                </label>
-                <mat-error *ngIf="subject.hasError('required')"
-                           [innerHTML]="'MAIN.CONTACT.SUBJECT.REQUIRED' | translate">
-                </mat-error>
-              </mat-form-field>
-              <mat-form-field appearance="fill">
-                <mat-label>{{ 'MAIN.CONTACT.BODY.FIELD' | translate }}</mat-label>
-                <label>
-                  <textarea #message [formControl]="body" matInput maxlength="256"></textarea>
-                </label>
-                <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
-                <mat-error *ngIf="body.hasError('required')"
-                           [innerHTML]="'MAIN.CONTACT.BODY.REQUIRED' | translate">
-                </mat-error>
-              </mat-form-field>
-              <div fxFlex></div>
-              <button [disabled]="form.invalid" color="primary" mat-raised-button type="submit">
-                <mat-icon>send</mat-icon>
-                {{'COMMON.BUTTON.SEND' | translate}}
-              </button>
-            </div>
-          </form>
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </section>
-  <mat-toolbar color="accent">
-    <mat-toolbar-row>
+<router-outlet></router-outlet>
+<mat-toolbar color="accent">
+  <mat-toolbar-row>
         <span style="margin: auto;">
-          <button [routerLinkActive]="['active']" [routerLink]="'/privacy'" mat-button>
+          <button [routerLinkActive]="['active']" [routerLink]="'/main/privacy'" mat-button>
             <span>{{'MAIN.SECTION.PRIVACY' | translate }}</span>
           </button>
-          <button [routerLinkActive]="['active']" [routerLink]="'/term-and-conditions'" mat-button>
+          <button [routerLinkActive]="['active']" [routerLink]="'/main/term-and-conditions'" mat-button>
             <span>{{'MAIN.SECTION.TERM_AND_CONDITIONS' | translate }}</span>
           </button>
           <button (click)="onNavigation('contact')" mat-button>
             <span>{{'MAIN.SECTION.CONTACT' | translate }}</span>
           </button>
         </span>
-    </mat-toolbar-row>
-    <mat-toolbar-row>
-      <span style="margin: auto; font-size: small">{{'MAIN.LEGALS' | translate}}</span>
-    </mat-toolbar-row>
-  </mat-toolbar>
-</div>
+  </mat-toolbar-row>
+  <mat-toolbar-row>
+    <span style="margin: auto; font-size: small">{{'MAIN.LEGALS' | translate}}</span>
+  </mat-toolbar-row>
+</mat-toolbar>
 

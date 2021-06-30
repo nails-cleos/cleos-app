@@ -24,6 +24,7 @@ export const initialState: State = {
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
+    case CatalogueActionTypes.getAllCatalogs:
     case CatalogueActionTypes.getAll: {
       return {
         ...state,
@@ -32,8 +33,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case CatalogueActionTypes.catalogueFind: {
@@ -44,8 +44,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case CatalogueActionTypes.catalogueSuccess: {
@@ -54,14 +53,14 @@ export const reducer = (state = initialState, action: All): State => {
         data: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null,
-        isLoading: false
+        message: null
       };
     }
     case CatalogueActionTypes.catalogueSaveSuccess: {
       return {
         ...state,
         message: action.payload.message,
+        selected: null,
         errorMessage: null,
         subErrors: null,
         isLoading: false
@@ -73,8 +72,7 @@ export const reducer = (state = initialState, action: All): State => {
         selected: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null,
-        isLoading: false
+        message: null
       };
     }
     case CatalogueActionTypes.catalogueFailure: {
@@ -94,8 +92,7 @@ export const reducer = (state = initialState, action: All): State => {
         data: [{}, {}, {}],
         errorMessage: null,
         subErrors: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case CatalogueActionTypes.catalogueUpdate:

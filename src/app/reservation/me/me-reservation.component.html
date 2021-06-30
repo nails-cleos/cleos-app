@@ -78,7 +78,7 @@
           </button>
         </div>
         <mat-form-field *ngIf="showDiscount && !isEditing" appearance="fill">
-          <mat-label>{{ 'RESERVATION.CUSTOMER.ADD.PRODUCT.DISCOUNT.FIELD' | translate }}n</mat-label>
+          <mat-label>{{ 'RESERVATION.CUSTOMER.ADD.PRODUCT.DISCOUNT.FIELD' | translate }}</mat-label>
           <mat-select *ngFor="let cd of discounts" [formControl]="discount">
             <mat-option>--</mat-option>
             <mat-option [value]="cd.id">{{cd.title}}</mat-option>
@@ -124,33 +124,28 @@
 </ng-template>
 
 <ng-template #stepThree>
-  <div *ngIf="!isLoading; else box">
-    <mat-tab-group *ngIf="availableList.size; else empty" [selectedIndex]="selectedIndex" backgroundColor="accent"
-                   color="primary" mat-align-tabs="center">
-      <mat-tab *ngFor="let available of availableList | keyvalue: sortDate" [label]="available.key">
-        <section>
-          <div class="button-row">
-            <button (click)="selectDate(datetime)" *ngFor="let datetime of sortTime(available.value)"
-                    [color]="eventSelected === datetime.date && time === datetime.time ? 'accent' : 'primary'"
-                    class="large"
-                    mat-raised-button>
-              {{datetime.time}}
-            </button>
-          </div>
-        </section>
-      </mat-tab>
-    </mat-tab-group>
-    <ng-template #empty>
-      <div class="no-content divider">
-        <p [innerHTML]="'RESERVATION.CUSTOMER.ADD.NO_CONTENT' | translate:{date: getDateNoContent()}"></p>
-      </div>
-    </ng-template>
-    <mat-error *ngIf="this.errors['schedule']" [innerHTML]="'RESERVATION.CUSTOMER.ADD.SCHEDULE.REQUIRED' | translate"
-               class="divider"></mat-error>
-  </div>
-  <ng-template #box>
-    <div class="ssc-square mb"></div>
+  <mat-tab-group *ngIf="availableList.size; else empty" [selectedIndex]="selectedIndex" backgroundColor="accent"
+                 color="primary" mat-align-tabs="center">
+    <mat-tab *ngFor="let available of availableList | keyvalue: sortDate" [label]="available.key">
+      <section>
+        <div class="button-row">
+          <button (click)="selectDate(datetime)" *ngFor="let datetime of sortTime(available.value)"
+                  [color]="eventSelected === datetime.date && time === datetime.time ? 'accent' : 'primary'"
+                  class="large"
+                  mat-raised-button>
+            {{datetime.time}}
+          </button>
+        </div>
+      </section>
+    </mat-tab>
+  </mat-tab-group>
+  <ng-template #empty>
+    <div class="no-content divider">
+      <p [innerHTML]="'RESERVATION.CUSTOMER.ADD.NO_CONTENT' | translate:{date: getDateNoContent()}"></p>
+    </div>
   </ng-template>
+  <mat-error *ngIf="this.errors['schedule']" [innerHTML]="'RESERVATION.CUSTOMER.ADD.SCHEDULE.REQUIRED' | translate"
+             class="divider"></mat-error>
 </ng-template>
 
 <ng-template #stepFour>
@@ -262,7 +257,7 @@
             </div>
           </div>
           <div>
-            <button [disabled]="isEditing" appBackButton mat-icon-button>
+            <button [disabled]="isEditing" appBackButton mat-icon-button type="button">
               <mat-icon>keyboard_return</mat-icon>
             </button>
             <button (click)="getProducts()" [disabled]="roomForm.invalid" color="primary" mat-icon-button type="button">
@@ -308,20 +303,15 @@
       </mat-step>
       <mat-step state="preview">
         <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.ADD.PREVIEW.TITLE' | translate }}</ng-template>
-        <div *ngIf="!isLoading; else box">
-          <ng-container *ngTemplateOutlet="stepFour"></ng-container>
-          <div>
-            <button (click)="goBack()" mat-button>
-              <mat-icon>arrow_upward</mat-icon>
-            </button>
-            <button (click)="create()" color="primary" mat-button type="button">
-              <mat-icon>add_task</mat-icon>
-            </button>
-          </div>
+        <ng-container *ngTemplateOutlet="stepFour"></ng-container>
+        <div>
+          <button (click)="goBack()" mat-button>
+            <mat-icon>arrow_upward</mat-icon>
+          </button>
+          <button (click)="create()" color="primary" mat-button type="button">
+            <mat-icon>add_task</mat-icon>
+          </button>
         </div>
-        <ng-template #box>
-          <div class="ssc-square mb"></div>
-        </ng-template>
       </mat-step>
     </mat-vertical-stepper>
   </div>
@@ -368,7 +358,7 @@
             </div>
           </div>
           <div class="divider">
-            <button [disabled]="isEditing" appBackButton mat-raised-button>
+            <button [disabled]="isEditing" appBackButton mat-raised-button type="button">
               <mat-icon>keyboard_return</mat-icon>
               {{ 'COMMON.BUTTON.BACK' | translate }}</button>
             <button (click)="getProducts()" [disabled]="roomForm.invalid" class="raised-button" color="primary"
@@ -420,21 +410,16 @@
       </mat-step>
       <mat-step state="preview">
         <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.ADD.PREVIEW.TITLE' | translate }}</ng-template>
-        <div *ngIf="!isLoading; else box">
-          <ng-container *ngTemplateOutlet="stepFour"></ng-container>
-          <div class="divider">
-            <button (click)="goBack()" mat-raised-button>
-              <mat-icon>arrow_back</mat-icon>
-              {{ 'COMMON.BUTTON.BACK' | translate }}</button>
-            <button (click)="create()" class="raised-button" color="primary" mat-raised-button type="button">
-              {{ 'COMMON.BUTTON.BOOK' | translate }}
-              <mat-icon>event_available</mat-icon>
-            </button>
-          </div>
+        <ng-container *ngTemplateOutlet="stepFour"></ng-container>
+        <div class="divider">
+          <button (click)="goBack()" mat-raised-button>
+            <mat-icon>arrow_back</mat-icon>
+            {{ 'COMMON.BUTTON.BACK' | translate }}</button>
+          <button (click)="create()" class="raised-button" color="primary" mat-raised-button type="button">
+            {{ 'COMMON.BUTTON.BOOK' | translate }}
+            <mat-icon>add_task</mat-icon>
+          </button>
         </div>
-        <ng-template #box>
-          <div class="ssc-square mb"></div>
-        </ng-template>
       </mat-step>
     </mat-horizontal-stepper>
   </div>

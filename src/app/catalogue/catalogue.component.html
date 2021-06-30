@@ -26,6 +26,12 @@
                 </label>
                 <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
               </mat-form-field>
+              <div>
+                <mat-checkbox [formControl]="home"
+                              color="primary">{{ 'CATALOGUE.ADD.SHOW.HOME' | translate }}</mat-checkbox>
+                <mat-checkbox [formControl]="catalog"
+                              color="primary">{{ 'CATALOGUE.ADD.SHOW.CATALOG' | translate }}</mat-checkbox>
+              </div>
               <div (fileDropped)="onFileDropped($event)" *ngIf="!file" appDragDrop class="container" fxHide.lt-sm
                    fxShow>
                 <input #fileDropRef (change)="fileBrowseHandler($event)" [multiple]="false" id="fileDropRef"
@@ -78,7 +84,7 @@
             <div fxFlex></div>
             <button [disabled]="form.invalid || file?.progress !== 100" color="primary" mat-raised-button
                     type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
-            <button color="accent" mat-raised-button appBackButton>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <button appBackButton type="button" color="accent" mat-raised-button>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
         </mat-card>
       </form>

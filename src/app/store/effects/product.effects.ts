@@ -76,8 +76,7 @@ export class ProductEffects {
 
   @Effect({dispatch: false})
   saveSuccess$ = this.actions$.pipe(
-    ofType(fromActionsProduct.ProductActionTypes.productSaveSuccess),
-    tap(() => this.router.navigate(['products']))
+    ofType(fromActionsProduct.ProductActionTypes.productSaveSuccess)
   );
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private productService: ProductService,

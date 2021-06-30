@@ -9,8 +9,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   convertDuration,
   createNewDate,
-  Duration, formatDateName, formatDateTime,
-  formatFullDateTime,
+  Duration,
+  formatDateTime,
   getNow,
   getTime,
   IDuration,
@@ -23,7 +23,7 @@ import { DialogComponent } from '../../dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Role } from '../../interfaces/token';
-import { getPriceDiscount, getUserName } from '../../util/helper';
+import { getFullUserName, getPriceDiscount, getUserName } from '../../util/helper';
 import { transitionAnimation } from '../../interfaces/discount';
 import { FormControl } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
@@ -33,7 +33,7 @@ import { requireMatch, valueChange } from '../../util/validators';
 export enum ReservationIconName {
   created = 'assignment',
   approved = 'done',
-  send = 'fa fa-whatsapp',
+  send = 'sms',
   started = 'play_arrow',
   completed = 'done_all',
   cancelled = 'clear',
@@ -99,7 +99,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   }
 
   get customerName(): string {
-    return this.reservation ? getUserName(this.reservation.customer) : '';
+    return this.reservation ? getFullUserName(this.reservation.customer) : '';
   }
 
   get professionalName(): string {

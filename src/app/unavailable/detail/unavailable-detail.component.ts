@@ -1,8 +1,8 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { IUnavailable, Unavailable } from '../../interfaces/unavailable';
+import { IUnavailable, Unavailable, UnavailableRepeatType } from '../../interfaces/unavailable';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectUnavailableState } from '../../store/app.states';
@@ -39,7 +39,6 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
   error: any;
   durationTime: any;
   durationMax: any;
-  repeat = 'NONE';
   minTime: any;
   maxTime: any;
   theme = timeTheme();
@@ -59,8 +58,14 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
     Validators.required
   ]);
 
+  repeat: FormControl = new FormControl('', [
+    Validators.required
+  ]);
+
+  repeats = UnavailableRepeatType;
+
   constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
-              private formBuilder: FormBuilder) {
+              private formBuilder: FormBuilder, private router: Router) {
     this.getState = this.store.select(selectUnavailableState);
   }
 
@@ -149,10 +154,13 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
     }
     const unavailable: IUnavailable = new Unavailable();
     unavailable.id = this.unavailable?.id;
-    unavailable.start = this.startTime.value.toLocaleString('en-GB');
-    unavailable.description = valueChange(this.form.value?.description, this.unavailable?.description);
+    const time = this.startTime.value.split(':');
+    const date = createNewDate(this.startDate.value, time[0], time[1]);
 
-    unavailable.repeat = fieldChange(this.duration, this.unavailable?.duration);
+    unavailable.start = date.toLocaleString('en-GB');
+    unavailable.description = valueChange(this.form.value?.description, this.unavailable?.description);
+    unavailable.duration = fieldChange(this.duration, this.unavailable?.duration);
+    unavailable.repeat = fieldChange(this.repeat, this.unavailable?.repeat);
 
     this.store.dispatch(new fromActionsUnavailable.UnavailableUpdate(unavailable));
   }
@@ -173,7 +181,8 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
       description: new FormControl(),
       startDate: this.startDate,
       startTime: this.startTime,
-      duration: this.duration
+      duration: this.duration,
+      repeat: this.repeat
     });
   }
 
@@ -188,14 +197,13 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
           this.getRoom(state.selected.professional);
         }
         this.durationTime = convertDuration(state.selected.duration);
-        this.repeat = state.selected.repeat;
         this.unavailable = {
           id: state.selected.id,
           description: state.selected.description,
           startDate: date,
           startTime: getTime(date),
           duration: formatTime(this.durationTime.hour, this.durationTime.minute),
-          repeat: this.repeat
+          repeat: state.selected.repeat
         } as IUnavailable;
         this.form.patchValue(this.unavailable);
 
@@ -217,11 +225,15 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({incorrect: true});
         });
-      } else if (state.errorMessage) {
-        this.snackBar.open(state.errorMessage, 'OK', {
+      } else if (state.errorMessage || state.message) {
+        this.snackBar.open(state.errorMessage || state.message, 'OK', {
           duration: 5000
         });
-        this.error = state.error;
+        if (state.message) {
+          this.router.navigate(['unavailable-list']);
+        } else {
+          this.error = state.error;
+        }
       }
     });
   }

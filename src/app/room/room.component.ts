@@ -11,6 +11,7 @@ import { map, startWith } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { requireMatch } from '../util/validators';
 import { getUserName } from '../util/helper';
+import { Router } from '@angular/router';
 
 export enum IconName {
   calendarToday = 'calendar_today',
@@ -37,8 +38,6 @@ export class RoomComponent implements OnInit, OnDestroy {
   errors: any = [];
   error: any;
 
-  isLoading = false;
-
   step = 0;
   icons: IIcon = {
     week: IconName.calendarToday,
@@ -64,7 +63,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   addressDescription: FormControl = new FormControl();
 
   constructor(private readonly translate: TranslateService, private snackBar: MatSnackBar, private store: Store<AppState>,
-              private formBuilder: FormBuilder) {
+              private formBuilder: FormBuilder, private router: Router) {
     this.getState = this.store.select(selectRoomState);
   }
 
@@ -158,7 +157,6 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      this.isLoading = state.isLoading;
       if (state.professionals) {
         this.professionals = state.professionals;
       }
@@ -167,11 +165,14 @@ export class RoomComponent implements OnInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({incorrect: true});
         });
-      } else if (state.errorMessage) {
+      } else if (state.errorMessage || state.message) {
         this.error = state.error;
-        this.snackBar.open(state.errorMessage, 'OK', {
+        this.snackBar.open(state.errorMessage || state.message, 'OK', {
           duration: 5000
         });
+        if (state.message) {
+          this.router.navigate(['rooms']);
+        }
       }
     });
   }

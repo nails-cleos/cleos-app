@@ -14,7 +14,7 @@
     <mat-form-field appearance="fill">
       <mat-label>{{ 'AUTH.SIGN_UP.EMAIL.FIELD' | translate }}</mat-label>
       <label>
-        <input [formControl]="email" [tabIndex]="2" autocomplete="username" matInput required>
+        <input [formControl]="email" [tabIndex]="2" autocomplete="email" matInput required>
       </label>
       <mat-error *ngIf="email.hasError('email')">
         {{ 'AUTH.SIGN_UP.EMAIL.VALID' | translate }}
@@ -61,7 +61,7 @@
       <mat-pass-toggle-visibility #toggleConfirm matSuffix></mat-pass-toggle-visibility>
       <label>
         <input [formControl]="passwordComponent.passwordConfirmationFormControl" [tabIndex]="4"
-               [type]="toggleConfirm.type" autocomplete="current-password" matInput required>
+               [type]="toggleConfirm.type" autocomplete="new-password" matInput required>
       </label>
       <mat-error *ngIf="passwordComponent.passwordConfirmationFormControl.hasError('required')"
                  [innerHTML]="'AUTH.SIGN_UP.CONFIRM_PASSWORD.REQUIRED' | translate">
@@ -89,7 +89,7 @@
     <mat-form-field appearance="fill">
       <mat-label>{{ 'AUTH.SIGN_UP.FIRST_NAME.FIELD' | translate }}</mat-label>
       <label>
-        <input [formControl]="firstName" [tabIndex]="6" autocomplete="firstName" matInput>
+        <input [formControl]="firstName" [tabIndex]="6" autocomplete="given-name" matInput>
       </label>
       <mat-error *ngIf="errors['firstName']">
         {{errors['firstName']}}
@@ -98,14 +98,14 @@
     <mat-form-field appearance="fill">
       <mat-label>{{ 'AUTH.SIGN_UP.LAST_NAME.FIELD' | translate }}</mat-label>
       <label>
-        <input [formControl]="lastName" [tabIndex]="7" autocomplete="lastName" matInput>
+        <input [formControl]="lastName" [tabIndex]="7" autocomplete="family-name" matInput>
       </label>
       <mat-error *ngIf="errors['lastName']">{{errors['lastName']}}</mat-error>
     </mat-form-field>
     <mat-form-field appearance="fill">
       <mat-label>{{ 'AUTH.SIGN_UP.PHONE.FIELD' | translate }}</mat-label>
-      <ngx-mat-intl-tel-input [enablePlaceholder]="true" [enableSearch]="true"
-                              [formControl]="phone" [preferredCountries]="['ar']" name="phone"></ngx-mat-intl-tel-input>
+      <ngx-mat-intl-tel-input [enablePlaceholder]="true" [enableSearch]="true" [formControl]="phone"
+                              [preferredCountries]="['ar']" autocomplete="tel" name="phone"></ngx-mat-intl-tel-input>
       <mat-error *ngIf="phone.hasError('validatePhoneNumber')">
         {{ 'AUTH.SIGN_UP.PHONE.INVALID' | translate }}
       </mat-error>

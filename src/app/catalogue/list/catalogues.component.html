@@ -5,6 +5,8 @@
         <cdk-drop-list [cdkDropListConnectedTo]="drops" [cdkDropListData]="i">
           <mat-card (cdkDragEntered)="entered($event)" [cdkDragData]="i" cdkDrag
                     class="catalogue-card mat-elevation-z6">
+            <mat-icon color="primary" *ngIf="catalogue.home && !catalogue.catalog">home</mat-icon>
+            <mat-icon color="primary" *ngIf="!catalogue.home && catalogue.catalog">collections</mat-icon>
             <img *ngIf="catalogue.id; else box" [alt]="catalogue.name" [matTooltip]="catalogue.name"
                  [src]="'data:image/jpg;base64,'+catalogue.blob"
                  mat-card-sm-image
@@ -33,7 +35,7 @@
 
 <button color="accent" id="add-button" mat-fab matTooltip="{{ 'CATALOGUE.ADD.TITLE' | translate }}"
         routerLink="/catalogue">
-  <mat-icon>add</mat-icon>
+  <mat-icon>add_a_photo</mat-icon>
 </button>
 <ng-template #errorBox>
   <app-error [error]="error"></app-error>

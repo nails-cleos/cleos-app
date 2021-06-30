@@ -141,12 +141,12 @@
               <div mat-line>{{'DASHBOARD.HOME' | translate }}</div>
             </a>
             <mat-divider></mat-divider>
-            <a mat-list-item [routerLink]="'/profile'">
+            <a [routerLink]="'/profile'" mat-list-item>
               <mat-icon mat-list-icon>settings</mat-icon>
               <div mat-line>{{'DASHBOARD.PROFILE' | translate }}</div>
             </a>
             <mat-divider></mat-divider>
-            <a *ngIf="canChangePassword" mat-list-item [routerLink]="'/change-password'">
+            <a *ngIf="canChangePassword" [routerLink]="'/change-password'" mat-list-item>
               <mat-icon mat-list-icon>mode_edit</mat-icon>
               <div mat-line>{{'DASHBOARD.CHANGE_PASSWORD' | translate }}</div>
             </a>
@@ -165,7 +165,10 @@
         </button>
       </ng-template>
     </mat-toolbar>
-    <div class="grid-container">
+    <div [ngClass]="{'loading': isLoading}" class="grid-container">
+      <div *ngIf="isLoading" class="spinner-vertical" style="z-index: 999">
+        <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+      </div>
       <router-outlet></router-outlet>
     </div>
   </mat-sidenav-content>

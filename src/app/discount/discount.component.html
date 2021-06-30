@@ -11,7 +11,7 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'DISCOUNT.ADD.NAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input [disabled]="isLoading" [formControl]="name" autocomplete="name" matInput required>
+                  <input [formControl]="name" autocomplete="name" matInput required>
                 </label>
                 <mat-error *ngIf="name.hasError('required')" [innerHTML]="'DISCOUNT.ADD.NAME.REQUIRED' | translate">
                 </mat-error>
@@ -29,7 +29,7 @@
               </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'DISCOUNT.ADD.TYPE.FIELD' | translate }}</mat-label>
-                <mat-select [disabled]="isLoading" [formControl]="type" required>
+                <mat-select [formControl]="type" required>
                   <mat-option *ngFor="let t of types | keyvalue" [value]="t.value">
                     {{ 'COMMON.DISCOUNT.' + t.value | translate }}
                   </mat-option>
@@ -43,7 +43,7 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'DISCOUNT.ADD.AMOUNT.FIELD' | translate }}</mat-label>
                 <label>
-                  <input [disabled]="isLoading" [formControl]="amount" matInput required step="1" type="number">
+                  <input [formControl]="amount" matInput required step="1" type="number">
                 </label>
                 <mat-error *ngIf="amount.hasError('required')" [innerHTML]="'DISCOUNT.ADD.AMOUNT.REQUIRED' | translate">
                 </mat-error>
@@ -58,10 +58,9 @@
           </mat-card-content>
           <mat-card-actions>
             <div fxFlex></div>
-            <button [disabled]="form.invalid || isLoading" color="primary" mat-raised-button
+            <button [disabled]="form.invalid" color="primary" mat-raised-button
                     type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
-            <button [disabled]="isLoading" appBackButton color="accent"
-                    mat-raised-button>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <button appBackButton type="button" color="accent" mat-raised-button>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
         </mat-card>
       </form>

@@ -4,7 +4,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectUnavailableState } from '../store/app.states';
-import { IUnavailable, Unavailable } from '../interfaces/unavailable';
+import { IUnavailable, Unavailable, UnavailableRepeatType } from '../interfaces/unavailable';
 import * as fromActionsUnavailable from '../store/unavailable.actions';
 import { IUser, IUserAll } from '../interfaces/user';
 import { requireMatch } from '../util/validators';
@@ -23,6 +23,7 @@ import {
 import { IRoomAll } from '../interfaces/room';
 import { timeTheme } from '../util/theme';
 import { getUserName } from '../util/helper';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-unavailable',
@@ -35,13 +36,10 @@ export class UnavailableComponent implements OnInit, OnDestroy {
   form!: FormGroup;
   errors: any = [];
   durationMax: any;
-  repeat = 'NONE';
   minTime: any;
   maxTime: any;
   showDuration = false;
   theme = timeTheme();
-
-  isLoading = false;
 
   professionals: IUserAll[] | undefined;
   room: IRoomAll | undefined;
@@ -63,7 +61,14 @@ export class UnavailableComponent implements OnInit, OnDestroy {
     Validators.required
   ]);
 
-  constructor(private snackBar: MatSnackBar, private store: Store<AppState>, private formBuilder: FormBuilder) {
+  repeat: FormControl = new FormControl('', [
+    Validators.required
+  ]);
+
+  repeats = UnavailableRepeatType;
+
+  constructor(private snackBar: MatSnackBar, private store: Store<AppState>, private formBuilder: FormBuilder,
+              private router: Router) {
     this.getState = this.store.select(selectUnavailableState);
   }
 
@@ -94,7 +99,7 @@ export class UnavailableComponent implements OnInit, OnDestroy {
     unavailable.professionalId = this.professional.value.id;
     unavailable.description = this.form.value.description;
     unavailable.start = date.toLocaleString('en-GB');
-    unavailable.repeat = this.repeat;
+    unavailable.repeat = this.repeat.value;
     unavailable.duration = this.duration.value;
 
     this.store.dispatch(
@@ -191,7 +196,8 @@ export class UnavailableComponent implements OnInit, OnDestroy {
       description: new FormControl(),
       startDate: this.startDate,
       startTime: this.startTime,
-      duration: this.duration
+      duration: this.duration,
+      repeat: this.repeat
     });
     this.filteredOptions = this.professional.valueChanges.pipe(
       startWith(''),
@@ -214,7 +220,6 @@ export class UnavailableComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      this.isLoading = state.isLoading;
       if (state.professionals) {
         this.professionals = state.professionals;
       }
@@ -226,10 +231,13 @@ export class UnavailableComponent implements OnInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({incorrect: true});
         });
-      } else if (state.errorMessage) {
-        this.snackBar.open(state.errorMessage, 'OK', {
+      } else if (state.errorMessage || state.message) {
+        this.snackBar.open(state.errorMessage || state.message, 'OK', {
           duration: 5000
         });
+        if (state.message) {
+          this.router.navigate(['unavailable-list']);
+        }
       }
     });
   }

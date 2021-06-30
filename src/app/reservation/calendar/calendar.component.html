@@ -1,5 +1,5 @@
 <div *ngIf="!error; else errorBox">
-  <div *ngIf="!isLoading; else box" class="scroll-container" #scrollContainer>
+  <div #scrollContainer *ngIf="data && data.length && calendar && calendar.size; else box" class="scroll-container">
     <div class="divider">
       <div [ngSwitch]="selectView">
         <div *ngSwitchCase="'WEEK'">
@@ -20,7 +20,7 @@
           </button>
           <div fxFlex></div>
           <button color="accent" mat-raised-button routerLink="/reservation">
-            <mat-icon>add_task</mat-icon>
+            <mat-icon>book_online</mat-icon>
             {{ 'COMMON.BUTTON.BOOK' | translate }}
           </button>
         </div>
@@ -38,7 +38,7 @@
           </button>
           <div fxFlex></div>
           <button color="accent" mat-mini-fab routerLink="/reservation">
-            <mat-icon>add_task</mat-icon>
+            <mat-icon>book_online</mat-icon>
           </button>
         </div>
       </div>

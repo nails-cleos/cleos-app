@@ -53,7 +53,7 @@
         <div *ngIf="userDiscount.id; else skeleton">
           <button (click)="useDiscount(userDiscount)" *ngIf="!userDiscount.used" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.BOOK' | translate }}" matTooltipPosition="left">
-            <mat-icon color="primary">add_task</mat-icon>
+            <mat-icon color="primary">book_online</mat-icon>
           </button>
         </div>
         <ng-template #skeleton>

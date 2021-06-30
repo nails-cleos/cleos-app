@@ -1,10 +1,21 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subscription } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState, selectNotificationState } from '../store/app.states';
+import {
+  AppState,
+  selectAuthState,
+  selectCatalogueState,
+  selectDiscountState,
+  selectNotificationState,
+  selectProductState,
+  selectReservationState,
+  selectRoomState,
+  selectUnavailableState,
+  selectUserState
+} from '../store/app.states';
 import { IMenu, IUser, IUserAll } from '../interfaces/user';
 import * as fromActionsLogin from '../store/auth.actions';
 import * as fromActionsNotification from '../store/notification.actions';
@@ -49,15 +60,24 @@ export class NavComponent implements OnInit, OnDestroy {
   countNotifications = 0;
   plusNotification: string | undefined;
 
-  constructor(public translate: TranslateService, private breakpointObserver: BreakpointObserver, private router: Router,
-              private store: Store<AppState>, private messagingService: MessagingService) {
+  isLoading = false;
+
+  constructor(public translate: TranslateService, private breakpointObserver: BreakpointObserver,
+              private router: Router, private store: Store<AppState>, private messagingService: MessagingService) {
     this.language = this.translate.currentLang;
     this.getState = this.store.select(selectAuthState);
     this.getNotificationState = this.store.select(selectNotificationState);
+    this.selectStore([selectRoomState, selectProductState, selectCatalogueState, selectDiscountState,
+      selectUnavailableState, selectUserState, selectReservationState]);
   }
 
   ngOnInit(): void {
     this.subscribe();
+  }
+
+  ngOnDestroy(): void {
+    this.authSubscription?.unsubscribe();
+    this.notificationSubscription?.unsubscribe();
   }
 
   logout(): void {
@@ -88,14 +108,15 @@ export class NavComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
-    this.authSubscription?.unsubscribe();
-    this.notificationSubscription?.unsubscribe();
+  private selectStore(states: any[]): void {
+    states.forEach(selectedState => this.store.select(selectedState)
+      .subscribe((state: any) => this.isLoading = state.isLoading));
   }
 
   private subscribe(): void {
-    this.authSubscription = this.getState.subscribe((state) => {
+    this.authSubscription = this.getState.subscribe(state => {
       this.isAuthorized = state.isAuthenticated;
+      this.isLoading = state.isLoading;
       if (state.isAuthenticated) {
         this.getNotifications();
         const user: IUserAll = state.user;

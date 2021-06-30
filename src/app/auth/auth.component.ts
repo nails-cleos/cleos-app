@@ -18,7 +18,6 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getState: Observable<any>;
   subscription: Subscription | undefined;
-  isLoading: any;
   code: string | undefined | null;
   extras: any;
 
@@ -31,13 +30,16 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.clean();
     this.subscribe();
-    this.code = this.route.snapshot.queryParamMap.get('code');
   }
 
   ngAfterViewInit(): void {
     if (this.code) {
       this.authGroup.selectedIndex = 1;
     }
+  }
+
+  getCode($event: string): void {
+    this.code = $event;
   }
 
   socialSignIn(provider: string): void {
@@ -66,7 +68,6 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe((state) => {
-      this.isLoading = state.isLoading;
       if (state.isAuthenticated) {
         this.router.navigate(['redirect']);
       }

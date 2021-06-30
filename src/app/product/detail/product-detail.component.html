@@ -15,7 +15,7 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PRODUCT.DETAIL.NAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input autocomplete="name" [formControl]="name" matInput required>
+                  <input [formControl]="name" autocomplete="name" matInput required>
                 </label>
                 <mat-error *ngIf="name.hasError('required')" [innerHTML]="'PRODUCT.DETAIL.NAME.REQUIRED' | translate">
                 </mat-error>
@@ -26,7 +26,8 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PRODUCT.DETAIL.DESCRIPTION.FIELD' | translate }}</mat-label>
                 <label>
-                  <textarea #message formControlName="description" matInput maxlength="256"></textarea>
+                  <textarea #message formControlName="description" matInput
+                            maxlength="256"></textarea>
                 </label>
                 <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
               </mat-form-field>
@@ -50,11 +51,11 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PRODUCT.DETAIL.DURATION.FIELD' | translate }}</mat-label>
                 <label>
-                  <input matInput name="duration" [format]="24" [formControl]="duration"
-                         [ngxTimepicker]="t" readonly/>
+                  <input [formControl]="duration" [format]="24" [ngxTimepicker]="t" matInput
+                         name="duration" readonly/>
                 </label>
                 <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
-                <ngx-material-timepicker [minutesGap]="15" #t
+                <ngx-material-timepicker #t [minutesGap]="15"
                                          [theme]="theme"></ngx-material-timepicker>
 
                 <mat-error *ngIf="duration.hasError('required')"
@@ -67,7 +68,7 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PRODUCT.DETAIL.DURABILITY.FIELD' | translate }}</mat-label>
                 <label>
-                  <input matInput formControlName="durability">
+                  <input formControlName="durability" matInput>
                 </label>
                 <mat-error *ngIf="errors['durability']">
                   {{errors['durability']}}
@@ -84,7 +85,7 @@
             <div fxFlex></div>
             <button [disabled]="form.invalid || form.pristine" color="primary" mat-raised-button
                     type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
-            <button color="accent" mat-raised-button appBackButton>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <button appBackButton type="button" color="accent" mat-raised-button>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
           <ng-template #buttonSkeleton>
             <div class="ssc-head-line"></div>

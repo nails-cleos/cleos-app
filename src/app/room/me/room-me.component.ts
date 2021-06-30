@@ -6,8 +6,7 @@ import {
   IAvailabilityDate,
   ILocation,
   IRoom,
-  IRoomAll,
-  Room
+  IRoomAll
 } from '../../interfaces/room';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
@@ -18,7 +17,6 @@ import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../store/app.states';
 import * as fromActionsRoom from '../../store/room.actions';
 import { createDate } from '../../util/dates';
-import { fieldChange } from '../../util/validators';
 import { getUserName } from '../../util/helper';
 
 @Component({
@@ -87,9 +85,8 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
     if (this.room) {
-      const room: IRoomAll = {
+      const room: IRoom = {
         id: this.room.id,
-        name: this.room.name,
         availabilities: this.availabilities,
         address: {
           name: this.room.address.name,
@@ -99,7 +96,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
         professional: this.room.professional
       };
 
-      if (this.address.value && this.address.value.geometry) {
+      if (this.address.value && this.address.value.geometry && room.address) {
         const location = this.address.value.geometry.location;
         room.address.name = this.address.value.formatted_address;
         room.address.location = {
@@ -108,8 +105,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
         } as ILocation;
       }
 
-      this.store.dispatch(new fromActionsRoom.RoomUpdateMe(room));
-      this.room = undefined;
+      this.store.dispatch(new fromActionsRoom.RoomUpdate(room));
       this.availabilities = [];
     }
   }

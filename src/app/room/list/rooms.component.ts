@@ -51,8 +51,8 @@ export class RoomsComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.subscribe();
     this.clean();
+    this.subscribe();
   }
 
   getProfessionalName(professional: IUser): string {

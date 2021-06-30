@@ -100,8 +100,7 @@ export class UnavailableEffects {
 
   @Effect({dispatch: false})
   saveSuccess$ = this.actions$.pipe(
-    ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableSaveSuccess),
-    tap(() => this.router.navigate(['unavailable-list']))
+    ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableSaveSuccess)
   );
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private unavailableService: UnavailableService,

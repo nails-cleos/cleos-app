@@ -4,7 +4,9 @@
   left: 15px;
   right: 15px;
   bottom: 15px;
-  display: flex;
+  max-width: 200px;
+  min-width: 100px;
+  display: inline-block;
   flex-direction: column;
   background-color: #fdf8f3;
   cursor: pointer;
@@ -17,4 +19,11 @@
   max-height: 100%;
   text-align: justify;
   text-justify: inter-word;
+}
+
+.mat-card {
+  display: inline-block;
+  max-width: 200px;
+  min-width: 100px;
+  margin: 0 10px;
 }

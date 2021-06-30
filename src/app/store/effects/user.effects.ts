@@ -8,7 +8,7 @@ import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Role } from '../../interfaces/token';
-import * as fromActionsReservation from '../reservation.actions';
+import { LoginSuccess } from '../auth.actions';
 
 @Injectable()
 export class UserEffects {
@@ -18,7 +18,10 @@ export class UserEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.userService.getAll(payload.active, payload.direction, payload.page,
       payload.size).pipe(
-      switchMap((response: any) => of(new fromActionsUser.UserSuccess(response ? response : {content: [], totalElements: 0}))),
+      switchMap((response: any) => of(new fromActionsUser.UserSuccess(response ? response : {
+        content: [],
+        totalElements: 0
+      }))),
       catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
     ))
   );
@@ -59,21 +62,21 @@ export class UserEffects {
           return this.userService.addCustomer(payload.user).pipe(
             switchMap((response: any) => {
               const message = this.translate.instant('USER.ADD.CUSTOMER', {username: response.username});
-              return of(new fromActionsUser.UserSaveSuccess({message, redirect: true}));
+              return of(new fromActionsUser.UserSaveSuccess({message}));
             }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
           );
         case Role.professional:
           return this.userService.addProfessional(payload.user).pipe(
             switchMap((response: any) => {
               const message = this.translate.instant('USER.ADD.PROFESSIONAL', {username: response.username});
-              return of(new fromActionsUser.UserSaveSuccess({message, redirect: true}));
+              return of(new fromActionsUser.UserSaveSuccess({message}));
             }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
           );
         default:
           return this.userService.update(payload.user).pipe(
             switchMap((response: any) => {
               const message = this.translate.instant('USER.UPDATED.MESSAGE', {username: response.username});
-              return of(new fromActionsUser.UserSaveSuccess({message, redirect: true}));
+              return of(new fromActionsUser.UserSaveSuccess({message}));
             }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
           );
       }
@@ -87,7 +90,7 @@ export class UserEffects {
       switchMap(() => {
         const role = this.translate.instant(`COMMON.ROLES.${payload.role}`);
         const message = this.translate.instant(`USER.ROLE.${payload.action}`, {role, username: payload.user.username});
-        return of(new fromActionsUser.UserSaveSuccess({message, redirect: true}));
+        return of(new fromActionsUser.UserSaveSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
     ))
   );
@@ -97,8 +100,12 @@ export class UserEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.userService.updateMe(payload).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('PROFILE.UPDATED.MESSAGE', {username: response.username});
-        return of(new fromActionsUser.UserSaveSuccess({message}));
+        const message = this.translate.instant('PROFILE.UPDATED.MESSAGE', {username: response.user.username});
+        return of(new LoginSuccess({
+          response, queryParams: {
+            returnUrl: 'profile'
+          }
+        }), new fromActionsUser.UserSaveSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
     ))
   );
@@ -108,8 +115,12 @@ export class UserEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.userService.updateMePhoto(payload).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('PROFILE.UPDATED.MESSAGE', {username: response.username});
-        return of(new fromActionsUser.UserSaveSuccess({message}));
+        const message = this.translate.instant('PROFILE.UPDATED.PHOTO');
+        return of(new LoginSuccess({
+          response, queryParams: {
+            returnUrl: 'profile'
+          }
+        }), new fromActionsUser.UserSaveSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
     ))
   );
@@ -120,7 +131,7 @@ export class UserEffects {
     switchMap((payload: any) => this.userService.delete(payload).pipe(
       switchMap((response: any) => {
         const message = this.translate.instant('USER.DELETED.MESSAGE', {username: response.username});
-        return of(new fromActionsUser.UserSaveSuccess({message, redirect: true}));
+        return of(new fromActionsUser.UserSaveSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
     ))
   );
@@ -164,13 +175,7 @@ export class UserEffects {
 
   @Effect({dispatch: false})
   saveSuccess$ = this.actions$.pipe(
-    ofType(fromActionsUser.UserActionTypes.userSaveSuccess),
-    tap((data: any) => {
-      if (data.payload.redirect) {
-        this.router.navigate(['users']);
-      }
-    })
-  );
+    ofType(fromActionsUser.UserActionTypes.userSaveSuccess));
 
   @Effect({dispatch: false})
   changePasswordSuccess$ = this.actions$.pipe(

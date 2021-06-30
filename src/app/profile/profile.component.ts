@@ -25,10 +25,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
   error: any;
   user: IUser | undefined;
   canChange = false;
-  image: string | undefined;
+  image: any;
   initials: string | undefined;
-  isLoading = false;
-  prevImg: string | undefined;
+  selectedImage: any;
 
   username: FormControl = new FormControl('', [
     Validators.required
@@ -71,7 +70,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
     user.lastName = fieldChange(this.lastName, this.user?.lastName);
     user.phone = fieldChange(this.phone, this.user?.phone);
 
-    this.user = undefined;
     this.store.dispatch(
       new fromActionsUser.UpdateUser(user)
     );
@@ -80,8 +78,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
   onSelectFile(target: any): void {
     if (target.files && target.files[0]) {
       const file = target.files[0];
-      this.prevImg = this.user?.image;
-      this.user = undefined;
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => this.image = reader.result;
+
       this.store.dispatch(
         new fromActionsUser.UpdatePhoto(file)
       );
@@ -112,8 +112,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      this.isLoading = state.isLoading;
-      if (state.selected && !this.isLoading) {
+      if (state.selected) {
         const user = state.selected;
         this.user = user;
         this.canChange = user?.provider === 'LOCAL';
@@ -130,23 +129,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
           this.form.controls[value.field].setErrors({incorrect: true});
         });
       } else if (state.errorMessage || state.message) {
-        if (state.message) {
-          this.findMe();
-        } else {
-          this.error = state.error;
-        }
-        const snackbarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
+        this.snackBar.open(state.errorMessage || state.message, 'OK', {
           duration: 5000
         });
-        if (state.message) {
-          const userStore: any = JSON.parse(localStorage.getItem('auth') as string);
-          if (userStore && this.user) {
-            if (userStore.user.image !== this.prevImg) {
-              userStore.user.image = this.user.image;
-              localStorage.setItem('auth', JSON.stringify(userStore));
-              snackbarRef.afterDismissed().subscribe(() => window.location.reload());
-            }
-          }
+        if (state.errorMessage) {
+          this.error = state.error;
         }
       }
     });

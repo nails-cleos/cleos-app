@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
-import { Label } from 'ng2-charts';
+import { Color, Label } from 'ng2-charts';
 import { ITracking } from '../../interfaces/reservation';
 import { barChartTimeOptions, trackingAverageChart } from '../../util/chart';
 
@@ -13,7 +13,6 @@ export class TrackingAverageChartComponent implements OnChanges {
   @Input() state: any;
   @Input() label: any;
 
-  isLoading = true;
   data: ITracking[] | undefined;
   error: any;
 
@@ -23,6 +22,11 @@ export class TrackingAverageChartComponent implements OnChanges {
   public barChartType: ChartType = 'bar';
   public barChartLegend = true;
   public barChartPlugins = [];
+  public barChartColors: Color[] = [
+    {
+      backgroundColor: 'rgba(103, 58, 183, 0.7)'
+    }
+  ];
 
   public barChartData: ChartDataSets[] = [
     {data: [3600, 4500], label: 'Min'},
@@ -39,7 +43,6 @@ export class TrackingAverageChartComponent implements OnChanges {
 
   private createChart(): void {
     if (this.state) {
-      this.isLoading = this.state.isLoading;
       if (this.state.errorMessage) {
         this.error = this.state.error;
         return;

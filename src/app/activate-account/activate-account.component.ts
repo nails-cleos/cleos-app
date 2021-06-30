@@ -17,20 +17,23 @@ export class ActivateAccountComponent implements OnInit, OnDestroy {
   getState: Observable<any>;
   subscription: Subscription | undefined;
 
+  lang: string;
+
   constructor(private snackBar: MatSnackBar, private store: Store<AppState>, private route: ActivatedRoute, private router: Router,
               private translate: TranslateService) {
     this.getState = this.store.select(selectAuthState);
+    this.lang = this.route.snapshot.queryParamMap.get('lang') || navigator.language;
   }
 
   ngOnInit(): void {
+    this.translate.use(this.lang);
     this.clean();
     this.subscribe();
   }
 
   activate(): void {
     const token: string | null = this.route.snapshot.queryParamMap.get('token');
-    const lang: string = this.route.snapshot.queryParamMap.get('lang') || navigator.language;
-    this.translate.use(lang);
+    this.translate.use(this.lang);
     this.store.dispatch(
       new fromActionsLogin.ActivateAccount(token)
     );
@@ -49,7 +52,6 @@ export class ActivateAccountComponent implements OnInit, OnDestroy {
 
         if (state.message) {
           snackBarRef.afterDismissed().subscribe(() => {
-            this.clean();
             this.router.navigate(['auth']);
           });
         }

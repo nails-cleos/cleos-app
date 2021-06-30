@@ -1,6 +1,6 @@
 import { AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { IUser, User } from '../../interfaces/user';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
@@ -40,8 +40,12 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   error: any;
 
   constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
-              private formBuilder: FormBuilder, private cdRef: ChangeDetectorRef) {
+              private formBuilder: FormBuilder, private cdRef: ChangeDetectorRef, private router: Router) {
     this.getState = this.store.select(selectUserState);
+  }
+
+  get userName(): string {
+    return this.user ? getUserName(this.user) : '';
   }
 
   ngOnInit(): void {
@@ -56,10 +60,6 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
-  }
-
-  get userName(): string {
-    return this.user ? getUserName(this.user) : '';
   }
 
   update(): void {
@@ -104,11 +104,15 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
         this.langValue.setValue(findFlag(this.flagList, state.selected.lang));
         this.cdRef.detectChanges();
       }
-      if (state.errorMessage) {
-        this.snackBar.open(state.errorMessage, 'OK', {
+      if (state.errorMessage || state.message) {
+        this.snackBar.open(state.errorMessage || state.message, 'OK', {
           duration: 5000
         });
-        this.error = state.error;
+        if (state.message) {
+          this.router.navigate(['users']);
+        } else {
+          this.error = state.error;
+        }
       }
     });
   }

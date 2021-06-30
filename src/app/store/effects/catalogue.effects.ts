@@ -23,6 +23,16 @@ export class CatalogueEffects {
   );
 
   @Effect()
+  getAllCatalogs$ = this.actions$.pipe(ofType(fromActionsCatalogue.CatalogueActionTypes.getAllCatalogs)).pipe(
+    map((action: any) => action.payload),
+    switchMap(() => this.catalogueService.getAllCatalogs().pipe(
+      switchMap((response: any) => response ? of(new fromActionsCatalogue.CatalogueSuccess(response))
+        : of(new fromActionsCatalogue.CatalogueFailure({error: {status: 'NO_CONTENT'}}))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({error: err.error})))
+    ))
+  );
+
+  @Effect()
   findOne$ = this.actions$.pipe(ofType(fromActionsCatalogue.CatalogueActionTypes.catalogueFind)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.catalogueService.getById(payload).pipe(
@@ -88,8 +98,7 @@ export class CatalogueEffects {
 
   @Effect({dispatch: false})
   saveSuccess$ = this.actions$.pipe(
-    ofType(fromActionsCatalogue.CatalogueActionTypes.catalogueSaveSuccess),
-    tap(() => this.router.navigate(['catalogues']))
+    ofType(fromActionsCatalogue.CatalogueActionTypes.catalogueSaveSuccess)
   );
 
   constructor(private readonly translate: TranslateService, private actions$: Actions,

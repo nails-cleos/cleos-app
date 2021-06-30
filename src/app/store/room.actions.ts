@@ -7,7 +7,6 @@ export enum RoomActionTypes {
   roomSuccess = '[Room] Success',
   roomSave = '[Room] Save',
   roomUpdate = '[Room] Update',
-  roomUpdateMe = '[Room] Update me',
   roomSaveSuccess = '[Room] Save Success',
   roomFailure = '[Room] Failure',
   roomSelected = '[Room] Selected',
@@ -47,13 +46,6 @@ export class RoomSave implements Action {
 
 export class RoomUpdate implements Action {
   readonly type = RoomActionTypes.roomUpdate;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class RoomUpdateMe implements Action {
-  readonly type = RoomActionTypes.roomUpdateMe;
 
   constructor(public payload: any) {
   }
@@ -104,7 +96,6 @@ export type All =
   | GetAllProfessional
   | RoomSave
   | RoomUpdate
-  | RoomUpdateMe
   | RoomSuccess
   | RoomSaveSuccess
   | RoomFailure
