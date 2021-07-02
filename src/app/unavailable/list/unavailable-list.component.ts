@@ -6,7 +6,6 @@ import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../i
 import { Observable, Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectUnavailableState } from '../../store/app.states';
 import * as fromActionsUnavailable from '../../store/unavailable.actions';
@@ -33,12 +32,11 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
-  error: any;
 
   language: string;
 
-  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
-              private store: Store<AppState>, private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
+              private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -91,23 +89,12 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
   }
 
   private subscribe(): void {
-    this.subscription = this.getState.subscribe((stateValue) => {
-      if (stateValue.errorMessage || stateValue.message) {
-        const snackBarRef = this.snackBar.open(stateValue.errorMessage || stateValue.message, 'OK', {
-          duration: 5000
-        });
-
-        if (stateValue.message) {
-          snackBarRef.afterDismissed().subscribe(() => {
-            this.clean();
-            this.getUnavailableList();
-          });
-        } else {
-          this.error = stateValue.error;
-          return;
-        }
+    this.subscription = this.getState.subscribe((state) => {
+      if (state.message) {
+        this.clean();
+        this.getUnavailableList();
       }
-      this.dataSource = stateValue.data?.content?.map((unavailable: IUnavailable) => {
+      this.dataSource = state.data?.content?.map((unavailable: IUnavailable) => {
         if (unavailable.duration) {
           const duration = convertDuration(unavailable.duration);
 
@@ -115,7 +102,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
         }
         return unavailable;
       });
-      this.resultsLength = stateValue.data?.totalElements;
+      this.resultsLength = state.data?.totalElements;
       if (this.resultsLength) {
         this.createPageSubscriptions();
       }

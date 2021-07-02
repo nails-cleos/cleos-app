@@ -4,7 +4,6 @@ import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../store/app.states';
 import { IUser, User } from '../interfaces/user';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import * as fromActionsUser from '../store/user.actions';
 import { fieldChange, valueChange } from '../util/validators';
 import { Location } from '@angular/common';
@@ -22,7 +21,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
   subscription: Subscription | undefined;
   form!: FormGroup;
   errors: any = [];
-  error: any;
   user: IUser | undefined;
   canChange = false;
   image: any;
@@ -42,7 +40,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   flagList: IFlag[] = flags();
 
-  constructor(private snackBar: MatSnackBar, private store: Store<AppState>, private formBuilder: FormBuilder, private location: Location,
+  constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private location: Location,
               private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectUserState);
   }
@@ -128,13 +126,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({incorrect: true});
         });
-      } else if (state.errorMessage || state.message) {
-        this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
-        });
-        if (state.errorMessage) {
-          this.error = state.error;
-        }
       }
     });
   }

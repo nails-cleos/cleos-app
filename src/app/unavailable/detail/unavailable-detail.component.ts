@@ -3,7 +3,6 @@ import { IUnavailable, Unavailable, UnavailableRepeatType } from '../../interfac
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectUnavailableState } from '../../store/app.states';
 import { fieldChange, valueChange } from '../../util/validators';
@@ -36,7 +35,6 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
   subscription: Subscription | undefined;
   getState: Observable<any>;
   errors: any = [];
-  error: any;
   durationTime: any;
   durationMax: any;
   minTime: any;
@@ -64,8 +62,8 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
 
   repeats = UnavailableRepeatType;
 
-  constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
-              private formBuilder: FormBuilder, private router: Router) {
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
+              private router: Router) {
     this.getState = this.store.select(selectUnavailableState);
   }
 
@@ -225,15 +223,8 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({incorrect: true});
         });
-      } else if (state.errorMessage || state.message) {
-        this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
-        });
-        if (state.message) {
-          this.router.navigate(['unavailable-list']);
-        } else {
-          this.error = state.error;
-        }
+      } else if (state.message) {
+        this.router.navigate(['unavailable-list']);
       }
     });
   }

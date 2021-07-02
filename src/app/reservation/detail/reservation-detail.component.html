@@ -1,4 +1,4 @@
-<mat-card *ngIf="!error; else errorBox">
+<mat-card>
   <mat-card-header>
     <mat-card-title>{{ 'RESERVATION.DETAIL.TITLE' | translate }}</mat-card-title>
     <mat-card-subtitle
@@ -6,12 +6,6 @@
     <ng-template #skeleton>
       <div class="ssc-line"></div>
     </ng-template>
-    <div fxFlex></div>
-    <div *ngIf="changeState && changeState.length">
-      <mat-fab-menu (onFabMenuItemSelected)="onChangeState($event)" [fabButtons]="changeState" color="primary"
-                    direction="left" icon="all_out">
-      </mat-fab-menu>
-    </div>
   </mat-card-header>
   <mat-card-content *ngIf="reservation; else boxSkeleton">
     <mat-divider></mat-divider>
@@ -66,7 +60,7 @@
       <mat-list-item>
         <mat-icon mat-list-icon>event</mat-icon>
         <div mat-line>{{start | date:'short':undefined:language}}</div>
-          <div mat-line>{{end | date:'short':undefined:language}}</div>
+        <div mat-line>{{end | date:'short':undefined:language}}</div>
       </mat-list-item>
       <mat-list-item>
         <mat-icon mat-list-icon>{{state}}</mat-icon>
@@ -151,12 +145,14 @@
   </ng-template>
   <mat-card-actions *ngIf="reservation; else buttonSkeleton">
     <div fxFlex></div>
-    <button appBackButton type="button" color="accent" mat-raised-button>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+    <button appBackButton color="accent" mat-raised-button type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
   </mat-card-actions>
   <ng-template #buttonSkeleton>
     <div class="ssc-head-line"></div>
   </ng-template>
 </mat-card>
-<ng-template #errorBox>
-  <app-error [error]="error"></app-error>
-</ng-template>
+<div id="action-button" *ngIf="changeState && changeState.length">
+  <mat-fab-menu (onFabMenuItemSelected)="onChangeState($event)" [fabButtons]="changeState" color="primary"
+                [direction]="direction" icon="all_out">
+  </mat-fab-menu>
+</div>

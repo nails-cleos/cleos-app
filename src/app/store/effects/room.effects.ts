@@ -35,7 +35,7 @@ export class RoomEffects {
   getAllProfessional$ = this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.getAllProfessional)).pipe(
     map((action: any) => action.payload),
     switchMap(() => this.userService.getAllProfessionals().pipe(
-      switchMap((response: any) => of(new fromActionsRoom.RoomSuccess(response))),
+      switchMap((response: any) => of(new fromActionsRoom.RoomSuccess(response ? response: []))),
       catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
     ))
   );
@@ -87,7 +87,7 @@ export class RoomEffects {
     ofType(fromActionsRoom.RoomActionTypes.roomSelected),
     tap((data: any) => {
       if (data.payload.redirect) {
-        this.router.navigate(['room', data.payload.room.id]);
+        this.router.navigate(['rooms', data.payload.room.id]);
       }
     })
   );

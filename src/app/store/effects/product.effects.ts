@@ -66,7 +66,7 @@ export class ProductEffects {
   @Effect({dispatch: false})
   selectedData$ = this.actions$.pipe(
     ofType(fromActionsProduct.ProductActionTypes.productSelected),
-    tap((data: any) => this.router.navigate(['product', data.payload.id]))
+    tap((data: any) => this.router.navigate(['products', data.payload.id]))
   );
 
   @Effect({dispatch: false})

@@ -2,6 +2,7 @@
   "COMMON": {
     "BUTTON": {
       "BACK": "Back",
+      "RETRY": "Retry",
       "NEXT": "Next",
       "PREVIOUS": "Previous",
       "TODAY": "Today",
@@ -65,6 +66,10 @@
     "DISCOUNT": {
       "MONEY": "Money",
       "PERCENTAGE": "Percentage"
+    },
+    "BACK": {
+      "TITLE": "You are about to go back",
+      "CONTENT": "You have changes on this page, if you go back, you will lose your changes. Are you sure to back off?"
     },
     "ERROR": {
       "NO_CONTENT": "No content"
@@ -504,7 +509,8 @@
       "PROFESSIONAL": {
         "FIELD": "Professional",
         "REQUIRED": "Professional is <b>required</b>",
-        "INVALID": "Professional is invalid"
+        "INVALID": "Professional is invalid",
+        "ADD_BUTTON": "Add professional"
       },
       "AVAILABILITY": {
         "FIELD": "Availability",

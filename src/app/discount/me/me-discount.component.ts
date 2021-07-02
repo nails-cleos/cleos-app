@@ -7,7 +7,6 @@ import { DiscountType, IUserDiscount } from '../../interfaces/discount';
 import { Observable, Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectDiscountState } from '../../store/app.states';
 import * as fromActionsDiscount from '../../store/discount.actions';
@@ -30,10 +29,9 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
-  error: any;
 
-  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
-              private store: Store<AppState>, private router: Router, private cdRef: ChangeDetectorRef,
+  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
+              private router: Router, private cdRef: ChangeDetectorRef,
               private breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
@@ -66,20 +64,9 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      if (state.errorMessage || state.message) {
-        const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
-        });
-
-        if (state.message) {
-          snackBarRef.afterDismissed().subscribe(() => {
-            this.clean();
-            this.getDiscounts();
-          });
-        } else {
-          this.error = state.error;
-          return;
-        }
+      if (state.message) {
+        this.clean();
+        this.getDiscounts();
       }
       this.dataSource = state.data?.content?.map((ud: IUserDiscount) => {
         if (ud && ud.discount) {

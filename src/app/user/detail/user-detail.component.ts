@@ -2,7 +2,6 @@ import { AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, OnInit }
 import { IUser, User } from '../../interfaces/user';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
 import * as fromActionsUser from '../../store/user.actions';
@@ -37,10 +36,9 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   phone: FormControl = new FormControl();
 
   flagList: IFlag[] = flags();
-  error: any;
 
-  constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
-              private formBuilder: FormBuilder, private cdRef: ChangeDetectorRef, private router: Router) {
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
+              private cdRef: ChangeDetectorRef, private router: Router) {
     this.getState = this.store.select(selectUserState);
   }
 
@@ -104,15 +102,8 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
         this.langValue.setValue(findFlag(this.flagList, state.selected.lang));
         this.cdRef.detectChanges();
       }
-      if (state.errorMessage || state.message) {
-        this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
-        });
-        if (state.message) {
-          this.router.navigate(['users']);
-        } else {
-          this.error = state.error;
-        }
+      if (state.message) {
+        this.router.navigate(['users']);
       }
     });
   }

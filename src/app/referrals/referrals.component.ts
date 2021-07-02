@@ -19,7 +19,6 @@ import { IUserDiscount } from '../interfaces/discount';
 export class ReferralsComponent implements OnInit, OnDestroy {
   getState: Observable<any>;
   subscription: Subscription | undefined;
-  error: any;
 
   user: IUserAll | undefined;
   referralMax: number | undefined;

@@ -1,5 +1,4 @@
 import { ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState, selectReservationState } from '../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
@@ -29,6 +28,9 @@ import { FormControl } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
 import { IProduct } from '../../interfaces/product';
 import { requireMatch, valueChange } from '../../util/validators';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { CalendarView } from 'angular-calendar';
+import { MatFabMenuDirection } from '@angular-material-extensions/fab-menu/lib/mat-fab-menu.component';
 
 export enum ReservationIconName {
   created = 'assignment',
@@ -59,7 +61,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   locale: string;
   language: string;
   isLoading = false;
-  error: any;
   changeState: any;
   professionalId: string | undefined;
   customerId: string | undefined;
@@ -75,9 +76,22 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
   public paginator: MatPaginator | undefined;
 
+  direction: MatFabMenuDirection = 'left';
+  tooltipPosition = 'below';
+
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private route: ActivatedRoute,
-              private store: Store<AppState>, private snackBar: MatSnackBar, private cdRef: ChangeDetectorRef, private router: Router) {
+              private store: Store<AppState>, private cdRef: ChangeDetectorRef, private router: Router,
+              private breakpointObserver: BreakpointObserver) {
     this.getState = this.store.select(selectReservationState);
+    breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small
+    ]).subscribe(result => {
+      if (result.matches) {
+        this.direction = 'bottom';
+        this.tooltipPosition = 'left';
+      }
+    });
     const userLang = this.translate.currentLang;
     this.language = userLang;
     const index = userLang.indexOf('-');
@@ -128,10 +142,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     return machine;
   }
 
-  private static createAction(tooltip: string, icon: string, id: string, color?: string): any {
-    return {tooltip, tooltipPosition: 'below', icon, id, color};
-  }
-
   private static createTransaction(target: string, action: any): any {
     return {target, action};
   }
@@ -177,6 +187,10 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  private createAction(tooltip: string, icon: string, id: string, color?: string): any {
+    return {tooltip, tooltipPosition: this.tooltipPosition, icon, id, color};
+  }
+
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       this.isLoading = state.isLoading;
@@ -209,12 +223,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         if (state.message) {
           const id: string | null = this.route.snapshot.paramMap.get('id');
           this.getReservation(id);
-        } else {
-          this.error = state.error;
         }
-        this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
-        });
       }
     });
   }
@@ -232,19 +241,19 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     const store = self.store;
     const translate = self.translate;
 
-    const approve = ReservationDetailComponent.createAction(translate.instant('RESERVATION.DETAIL.ACTION.APPROVE'),
+    const approve = this.createAction(translate.instant('RESERVATION.DETAIL.ACTION.APPROVE'),
       ReservationIconName.approved, 'approve', 'primary');
-    const start = ReservationDetailComponent.createAction(translate.instant('RESERVATION.DETAIL.ACTION.START'),
+    const start = this.createAction(translate.instant('RESERVATION.DETAIL.ACTION.START'),
       ReservationIconName.started, 'start', 'primary');
-    const complete = ReservationDetailComponent.createAction(translate.instant('RESERVATION.DETAIL.ACTION.COMPLETE'),
+    const complete = this.createAction(translate.instant('RESERVATION.DETAIL.ACTION.COMPLETE'),
       ReservationIconName.completed, 'complete', 'primary');
-    const edit = ReservationDetailComponent.createAction(translate.instant('RESERVATION.DETAIL.ACTION.EDIT'),
+    const edit = this.createAction(translate.instant('RESERVATION.DETAIL.ACTION.EDIT'),
       ReservationIconName.edit, 'edit', 'accent');
-    const cancel = ReservationDetailComponent.createAction(translate.instant('RESERVATION.DETAIL.ACTION.CANCEL'),
+    const cancel = this.createAction(translate.instant('RESERVATION.DETAIL.ACTION.CANCEL'),
       ReservationIconName.cancelled, 'cancel', 'warn');
-    const book = ReservationDetailComponent.createAction(translate.instant('RESERVATION.DETAIL.ACTION.BOOK'),
+    const book = this.createAction(translate.instant('RESERVATION.DETAIL.ACTION.BOOK'),
       ReservationIconName.book, 'book', 'primary');
-    const sendMessage = ReservationDetailComponent.createAction(translate.instant('RESERVATION.DETAIL.ACTION.SEND'),
+    const sendMessage = this.createAction(translate.instant('RESERVATION.DETAIL.ACTION.SEND'),
       ReservationIconName.send, 'send');
 
     let approveActions = [start, edit, cancel];
@@ -354,11 +363,11 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     const initialState = self.reservation?.state;
     const translate = self.translate;
 
-    const edit = ReservationDetailComponent.createAction(translate.instant('RESERVATION.DETAIL.ACTION.EDIT'),
+    const edit = this.createAction(translate.instant('RESERVATION.DETAIL.ACTION.EDIT'),
       ReservationIconName.edit, 'edit', 'accent');
-    const cancel = ReservationDetailComponent.createAction(translate.instant('RESERVATION.DETAIL.ACTION.CANCEL'),
+    const cancel = this.createAction(translate.instant('RESERVATION.DETAIL.ACTION.CANCEL'),
       ReservationIconName.cancelled, 'cancel', 'warn');
-    const book = ReservationDetailComponent.createAction(translate.instant('RESERVATION.DETAIL.ACTION.BOOK'),
+    const book = this.createAction(translate.instant('RESERVATION.DETAIL.ACTION.BOOK'),
       ReservationIconName.book, 'book', 'primary');
 
     const editTransaction = ReservationDetailComponent.createTransaction('edited', (): void => {

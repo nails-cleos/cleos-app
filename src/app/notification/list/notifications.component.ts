@@ -3,9 +3,8 @@ import { Store } from '@ngrx/store';
 import { AppState, selectNotificationState } from '../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
 import * as fromActionsNotification from '../../store/notification.actions';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { INotification } from '../../interfaces/notification';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
@@ -17,14 +16,12 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   notifications: INotification[] = [];
   getState: Observable<any>;
   subscription: Subscription | undefined;
-  error: any;
   page: number;
   language: string;
   showMore = false;
-  isLoading = false;
   loadingNotifications: [] | undefined;
 
-  constructor(private router: Router, private store: Store<AppState>, private snackBar: MatSnackBar, private translate: TranslateService) {
+  constructor(private router: Router, private store: Store<AppState>, private translate: TranslateService) {
     this.language = this.translate.currentLang;
     this.getState = this.store.select(selectNotificationState);
     this.page = -1;
@@ -72,21 +69,18 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       if (state.data) {
-        if (state.data.page.content[0].id) {
-          this.loadingNotifications = undefined;
-          this.notifications = this.notifications.concat(state.data.page.content);
-          this.showMore = !state.data.page.last;
+        if (state.data.page?.content?.length) {
+          if (state.data.page?.content[0]?.id) {
+            this.loadingNotifications = undefined;
+            this.notifications = this.notifications.concat(state.data.page.content);
+            this.showMore = !state.data.page.last;
+          } else {
+            this.loadingNotifications = state.data.page.content;
+          }
         } else {
-          this.loadingNotifications = state.data.page.content;
+          this.loadingNotifications = undefined;
         }
       }
-      if (state.errorMessage) {
-        this.snackBar.open(state.errorMessage, 'OK', {
-          duration: 5000
-        });
-        this.error = state.error;
-      }
-      this.isLoading = state.isLoading;
     });
   }
 }

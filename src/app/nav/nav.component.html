@@ -17,13 +17,15 @@
         <mat-nav-list>
           <mat-divider></mat-divider>
           <div *ngFor="let menu of menuItems; last as last">
-            <a (click)="drawer.toggle()" *ngIf="isHandset$ | async; else showMenu" [routerLink]="'/'+menu.path"
-               mat-list-item>
+            <a (click)="navigate(menu, drawer)" *ngIf="isHandset$ | async; else showMenu"
+               [routerLinkActiveOptions]="{ exact: false }" [routerLinkActive]="['active']"
+               [routerLink]="'/'+menu.path.split('/')[0]" mat-list-item>
               <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>
               <div mat-line>{{menu.name}}</div>
             </a>
             <ng-template #showMenu>
-              <a [routerLinkActive]="['active']" [routerLink]="'/'+menu.path" mat-list-item>
+              <a (click)="navigate(menu)" [routerLinkActiveOptions]="{ exact: false }" [routerLinkActive]="['active']"
+                 [routerLink]="'/'+menu.path.split('/')[0]" mat-list-item>
                 <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>
                 <div mat-line>{{menu.name}}</div>
               </a>
@@ -169,7 +171,10 @@
       <div *ngIf="isLoading" class="spinner-vertical" style="z-index: 999">
         <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
       </div>
-      <router-outlet></router-outlet>
+      <router-outlet *ngIf="!error; else errorBox"></router-outlet>
+      <ng-template #errorBox>
+        <app-error [error]="error"></app-error>
+      </ng-template>
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

@@ -1,6 +1,6 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div *ngIf="!error; else errorBox" fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <mat-card>
         <mat-card-header>
           <mat-card-title>{{ 'UNAVAILABLE.DETAIL.TITLE' | translate }}</mat-card-title>
@@ -23,13 +23,14 @@
               </mat-form-field>
 
               <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
-                <button (click)="picker.open()" mat-icon-button>
-                  <mat-icon>today</mat-icon>
-                </button>
                 <mat-form-field appearance="fill" color="primary" style="margin-right: 12px;">
                   <mat-label>{{ 'UNAVAILABLE.DETAIL.DATE.FIELD' | translate }}</mat-label>
+                  <button (click)="picker.open()" mat-icon-button matPrefix>
+                    <mat-icon>today</mat-icon>
+                  </button>
                   <label>
-                    <input (dateChange)="setDate($event)" (focus)="picker.open()" [formControl]="startDate" [matDatepickerFilter]="myFilter"
+                    <input (dateChange)="setDate($event)" (focus)="picker.open()" [formControl]="startDate"
+                           [matDatepickerFilter]="myFilter"
                            [matDatepicker]="picker" matInput
                            required>
                   </label>
@@ -87,7 +88,8 @@
             <div fxFlex></div>
             <button [disabled]="form.invalid || form.pristine" color="primary" mat-raised-button
                     type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
-            <button appBackButton type="button" color="accent" mat-raised-button>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <button [form]="form" appBackButton color="accent" mat-raised-button
+                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
           <ng-template #buttonSkeleton>
             <div class="ssc-head-line"></div>
@@ -95,8 +97,4 @@
         </form>
       </mat-card>
     </div>
-    <ng-template #errorBox>
-      <app-error [error]="error"></app-error>
-    </ng-template>
   </div>
-</div>

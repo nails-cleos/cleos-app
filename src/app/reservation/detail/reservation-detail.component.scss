@@ -4,3 +4,23 @@
 .mat-column-start {
   text-align: center;
 }
+
+@media all and (max-device-width: 812px) and (orientation: portrait) {
+  #action-button {
+    top: 90px;
+    right: 33px;
+    bottom: auto;
+    left: auto;
+    position: fixed;
+  }
+}
+
+@media not all and (max-device-width: 812px) and (orientation: portrait) {
+  #action-button {
+    top: 95px;
+    right: 50px;
+    bottom: auto;
+    left: auto;
+    position: fixed;
+  }
+}

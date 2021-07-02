@@ -12,8 +12,6 @@ import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../store/app.states';
 import { ReservationIconName } from '../detail/reservation-detail.component';
 import * as fromActionsReservation from '../../store/reservation.actions';
-import * as fromActionsProduct from '../../store/product.actions';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { getNow, newDate } from '../../util/dates';
 import { DialogComponent } from '../../dialog/dialog.component';
 import { map, startWith } from 'rxjs/operators';
@@ -43,7 +41,6 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   pageSize = PAGE_SIZE;
 
   language: string;
-  error: any;
 
   customers: IUserAll[] | undefined;
   filteredCustomer: Observable<IUser[] | undefined> | undefined;
@@ -56,8 +53,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   allStates: string[] = Object.keys(States);
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private router: Router,
-              private store: Store<AppState>, private snackBar: MatSnackBar, private cdRef: ChangeDetectorRef,
-              private breakpointObserver: BreakpointObserver) {
+              private store: Store<AppState>, private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -178,7 +174,6 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       this.customers = state.customers;
-      this.error = state.error;
       if (state.filter) {
         const now = getNow();
         this.dataSource = state.filter.content?.map((reservation: IReservationAll) => {
@@ -193,19 +188,16 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
           this.createPageSubscriptions();
         }
       }
-      if (state.errorMessage) {
-        this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
-        });
-        this.error = state.error;
-        return;
+      if (state.message) {
+        this.clean();
+        this.getReservations();
       }
     });
   }
 
   private clean(): void {
     this.store.dispatch(
-      new fromActionsProduct.Clean()
+      new fromActionsReservation.Clean()
     );
   }
 

@@ -40,19 +40,13 @@ export class CustomerReservationsChartComponent implements OnChanges {
 
   private createChart(): void {
     if (this.state) {
-      if (this.state.errorMessage) {
-        this.error = this.state.error;
+      const chartResult = customerReservationChart(this.state.dash, this.label);
+      if (this.state.errorMessage || !chartResult) {
+        this.error = {status: 'NO_CONTENT'};
         return;
       }
-      const chartResult = customerReservationChart(this.state.data, this.label);
-      if (chartResult) {
-        this.barChartData = chartResult.chartDataSet;
-        this.barChartLabels = chartResult.chartLabels;
-      } else {
-        this.error = {
-          status: 'NO_CONTENT'
-        };
-      }
+      this.barChartData = chartResult.chartDataSet;
+      this.barChartLabels = chartResult.chartLabels;
     }
   }
 }

@@ -223,7 +223,7 @@
 
 <ng-template [ngIfElse]="bigScreen" [ngIf]="smallScreen">
   <div *ngIf="canCreate; else cannotCreate">
-    <mat-vertical-stepper #stepper *ngIf="!error; else errorBox" [linear]="true">
+    <mat-vertical-stepper #stepper [linear]="true">
       <mat-step [editable]="!isEditing" [stepControl]="roomForm" state="room">
         <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.ADD.ROOM.FIELD' | translate }}</ng-template>
         <div *ngIf="!isEditing; else editing">
@@ -257,7 +257,8 @@
             </div>
           </div>
           <div>
-            <button [disabled]="isEditing" appBackButton mat-icon-button type="button">
+            <button [disabled]="isEditing" [form]="roomForm" appBackButton mat-icon-button
+                    type="button">
               <mat-icon>keyboard_return</mat-icon>
             </button>
             <button (click)="getProducts()" [disabled]="roomForm.invalid" color="primary" mat-icon-button type="button">
@@ -275,7 +276,7 @@
         <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.ADD.PRODUCT.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
         <div>
-          <button *ngIf="isEditing; else noEdit" appBackButton mat-icon-button type="button">
+          <button *ngIf="isEditing; else noEdit" [form]="productForm" appBackButton mat-icon-button type="button">
             <mat-icon>keyboard_return</mat-icon>
           </button>
           <ng-template #noEdit>
@@ -322,7 +323,7 @@
 
 <ng-template #bigScreen>
   <div *ngIf="canCreate; else cannotCreate">
-    <mat-horizontal-stepper #stepper *ngIf="!error; else errorBox" [linear]="true">
+    <mat-horizontal-stepper #stepper [linear]="true">
       <mat-step [editable]="!isEditing" [stepControl]="roomForm" state="room">
         <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.ADD.ROOM.FIELD' | translate }}</ng-template>
         <div *ngIf="!isEditing; else editing">
@@ -358,7 +359,8 @@
             </div>
           </div>
           <div class="divider">
-            <button [disabled]="isEditing" appBackButton mat-raised-button type="button">
+            <button [disabled]="isEditing" [form]="roomForm" appBackButton mat-raised-button
+                    type="button">
               <mat-icon>keyboard_return</mat-icon>
               {{ 'COMMON.BUTTON.BACK' | translate }}</button>
             <button (click)="getProducts()" [disabled]="roomForm.invalid" class="raised-button" color="primary"
@@ -379,7 +381,7 @@
         <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.ADD.PRODUCT.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
         <div class="divider">
-          <button *ngIf="isEditing; else noEdit" appBackButton mat-raised-button type="button">
+          <button *ngIf="isEditing; else noEdit" [form]="productForm" appBackButton mat-raised-button type="button">
             <mat-icon>keyboard_return</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}</button>
           <ng-template #noEdit>
@@ -426,8 +428,4 @@
   <ng-template #cannotCreate>
     <div class="ssc-square mb"></div>
   </ng-template>
-</ng-template>
-
-<ng-template #errorBox>
-  <app-error [error]="error"></app-error>
 </ng-template>

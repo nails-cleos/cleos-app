@@ -1,4 +1,4 @@
-<div *ngIf="!error; else errorBox" class="mat-elevation-z8">
+<div class="mat-elevation-z8">
   <table [dataSource]="dataSource" mat-table matSort matSortActive="name"
          matSortDirection="desc" matSortDisableClear>
     <ng-container matColumnDef="position">
@@ -103,10 +103,7 @@
   <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
 
   <button color="accent" id="add-button" mat-fab matTooltip="{{ 'UNAVAILABLE.ADD.TITLE' | translate }}"
-          routerLink="/unavailable">
+          routerLink="/unavailable/add">
     <mat-icon>add</mat-icon>
   </button>
 </div>
-<ng-template #errorBox>
-  <app-error [error]="error"></app-error>
-</ng-template>

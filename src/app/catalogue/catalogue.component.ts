@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectCatalogueState } from '../store/app.states';
 import * as fromActionsCatalogue from '../store/catalogue.actions';
@@ -28,7 +27,7 @@ export class CatalogueComponent implements OnInit, OnDestroy {
   home: FormControl = new FormControl();
   catalog: FormControl = new FormControl();
 
-  constructor(private snackBar: MatSnackBar, private store: Store<AppState>, private formBuilder: FormBuilder,
+  constructor(private store: Store<AppState>, private formBuilder: FormBuilder,
               private router: Router) {
     this.getState = this.store.select(selectCatalogueState);
   }
@@ -101,13 +100,8 @@ export class CatalogueComponent implements OnInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({incorrect: true});
         });
-      } else if (state.errorMessage || state.message) {
-        this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
-        });
-        if (state.message) {
-          this.router.navigate(['catalogues'])
-        }
+      } else if (state.message) {
+        this.router.navigate(['catalogues']);
       }
     });
   }

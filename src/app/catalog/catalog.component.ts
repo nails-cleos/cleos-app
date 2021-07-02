@@ -3,7 +3,6 @@ import { Observable, Subscription } from 'rxjs';
 import { ICatalogueAll } from '../interfaces/catalogue';
 import { Store } from '@ngrx/store';
 import { AppState, selectCatalogueState } from '../store/app.states';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import * as fromActionsCatalogue from '../store/catalogue.actions';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
@@ -22,13 +21,12 @@ export class CatalogComponent implements OnInit, OnDestroy {
 
   subscription: Subscription | undefined;
   getState: Observable<any>;
-  error: any;
   imageURL: any;
   viewerOpen = false;
 
   catalogues: ICatalogueAll[] = [];
 
-  constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>, private snackBar: MatSnackBar) {
+  constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>) {
     this.getState = this.store.select(selectCatalogueState);
   }
 
@@ -51,16 +49,6 @@ export class CatalogComponent implements OnInit, OnDestroy {
     this.subscription = this.getState.subscribe((state) => {
       if (state.data) {
         this.catalogues = state.data;
-      }
-      if (state.errorMessage || state.message) {
-        this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
-        });
-        this.error = state.error;
-        return;
-      }
-      if (state.error) {
-        this.error = state.error;
       }
     });
   }

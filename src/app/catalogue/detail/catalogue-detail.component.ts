@@ -24,7 +24,6 @@ export class CatalogueDetailComponent implements OnInit, AfterViewInit, OnDestro
   subscription: Subscription | undefined;
   getState: Observable<any>;
   errors: any = [];
-  error: any;
   file: any;
   img: any;
   showImg = true;
@@ -130,15 +129,8 @@ export class CatalogueDetailComponent implements OnInit, AfterViewInit, OnDestro
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({incorrect: true});
         });
-      } else if (state.errorMessage || state.message) {
-        this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
-        });
-        if (state.message) {
-          this.router.navigate(['catalogues']);
-        } else {
-          this.error = state.error;
-        }
+      } else if (state.message) {
+        this.router.navigate(['catalogues']);
       }
     });
   }

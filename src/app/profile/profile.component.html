@@ -1,6 +1,6 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div *ngIf="!error; else errorBox" fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <mat-card>
         <mat-card-header class="center">
           <mat-card-title>{{ 'PROFILE.TITLE' | translate }}</mat-card-title>
@@ -10,8 +10,8 @@
           </ng-template>
         </mat-card-header>
         <div class="center">
-          <div *ngIf="user; else circle" class="hoverable" mat-card-avatar [ngClass]="{'background': !image}">
-            <label for="fileInput" [ngClass]="{'pointer': canChange}">
+          <div *ngIf="user; else circle" [ngClass]="{'background': !image}" class="hoverable" mat-card-avatar>
+            <label [ngClass]="{'pointer': canChange}" for="fileInput">
               <img *ngIf="image; else showInitialsBlock" alt="profile" class="image"
                    src="{{image}}">
               <ng-template #showInitialsBlock>
@@ -90,7 +90,7 @@
             <div fxFlex></div>
             <button [disabled]="form.invalid" color="primary" mat-raised-button
                     type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
-            <button appBackButton color="accent" mat-raised-button
+            <button [form]="form" appBackButton color="accent" mat-raised-button
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
           <ng-template #buttonSkeleton>
@@ -99,9 +99,6 @@
         </form>
       </mat-card>
     </div>
-    <ng-template #errorBox>
-      <app-error [error]="error"></app-error>
-    </ng-template>
   </div>
 </div>
 

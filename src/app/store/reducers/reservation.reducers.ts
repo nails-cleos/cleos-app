@@ -13,6 +13,7 @@ import { Pagination } from '../../interfaces/pagination';
 
 export interface State {
   data: IReservation | IRoomReservation[] | IReservation[] | ICustomerReservation | IAvailableDTO | null;
+  dash: IReservation[] | null;
   filter: Pagination<IReservation> | null;
   page: Pagination<IReservation> | null;
   customerReservation: ICustomerReservation | null;
@@ -30,6 +31,7 @@ export interface State {
 
 export const initialState: State = {
   data: null,
+  dash: null,
   page: null,
   filter: null,
   customerReservation: null,
@@ -62,7 +64,7 @@ export const reducer = (state = initialState, action: All): State => {
     case ReservationActionTypes.getAll: {
       return {
         ...state,
-        data: null,
+        dash: null,
         errorMessage: null,
         error: null,
         subErrors: null,
@@ -94,8 +96,19 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
-    case ReservationActionTypes.getUpcomingReservation:
     case ReservationActionTypes.getAllGroupingByRoom: {
+      return {
+        ...state,
+        data: null,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        selected: null,
+        message: null,
+        isLoading: true
+      };
+    }
+    case ReservationActionTypes.getUpcomingReservation: {
       return {
         ...state,
         data: null,
@@ -171,6 +184,16 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
+    case ReservationActionTypes.reservationDashSuccess: {
+      return {
+        ...state,
+        dash: action.payload,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: null
+      };
+    }
     case ReservationActionTypes.reservationPageSuccess: {
       return {
         ...state,
@@ -209,7 +232,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: null,
         subErrors: null,
         message: null,
-        isLoading: false // ok
+        isLoading: false
       };
     }
     case ReservationActionTypes.customersSuccess: {

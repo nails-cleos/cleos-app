@@ -7,7 +7,6 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../store/app.states';
 import * as fromActionsRoom from '../../store/room.actions';
@@ -31,10 +30,9 @@ export class RoomsComponent implements OnInit, AfterViewInit {
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
-  error: any;
 
-  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
-              private store: Store<AppState>, private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
+              private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -61,19 +59,9 @@ export class RoomsComponent implements OnInit, AfterViewInit {
 
   subscribe(): void {
     this.getState.subscribe((stateValue) => {
-      if (stateValue.errorMessage || stateValue.message) {
-        const snackBarRef = this.snackBar.open(stateValue.errorMessage || stateValue.message, 'OK', {
-          duration: 5000
-        });
-
-        if (stateValue.message) {
-          snackBarRef.afterDismissed().subscribe(() => {
-            this.clean();
-            this.getRooms();
-          });
-        } else {
-          this.error = stateValue.error;
-        }
+      if (stateValue.message) {
+        this.clean();
+        this.getRooms();
       }
       this.dataSource = stateValue.data?.content;
       this.resultsLength = stateValue.data?.totalElements;

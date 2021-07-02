@@ -2,6 +2,7 @@
   "COMMON": {
     "BUTTON": {
       "BACK": "Volver",
+      "RETRY": "Reintentar",
       "NEXT": "Siguiente",
       "PREVIOUS": "Anterior",
       "TODAY": "Hoy",
@@ -65,6 +66,10 @@
     "DISCOUNT": {
       "MONEY": "Dinero",
       "PERCENTAGE": "Porcentaje"
+    },
+    "BACK": {
+      "TITLE": "Estas apunto de volver atrás",
+      "CONTENT": "Tiene cambios en esta página, si vuelves atrás, perderás tus cambios. ¿Estás seguro de volver atrás?"
     },
     "ERROR": {
       "NO_CONTENT": "Sin datos"
@@ -436,6 +441,10 @@
       "DESCRIPTION": {
         "FIELD": "Descripción"
       },
+      "SHOW": {
+        "HOME": "Mostar en principal",
+        "CATALOG": "Mostrar en catálogo"
+      },
       "FILE": {
         "DRAG_DROP": "Arrastrar y soltar el archivo aquí",
         "OR": "o",
@@ -500,7 +509,8 @@
       "PROFESSIONAL": {
         "FIELD": "Profesional",
         "REQUIRED": "Profesional es <b>requerido</b>",
-        "INVALID": "Profesional no valido"
+        "INVALID": "Profesional no valido",
+        "ADD_BUTTON": "Agregar profesional"
       },
       "AVAILABILITY": {
         "FIELD": "Disponibilidad",

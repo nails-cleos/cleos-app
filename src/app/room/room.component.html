@@ -1,6 +1,6 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div *ngIf="!error; else errorBox" fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <form (ngSubmit)="create()" [formGroup]="form" novalidate>
         <mat-card class="style-card">
           <mat-card-header>
@@ -19,26 +19,32 @@
                   {{errors['name']}}
                 </mat-error>
               </mat-form-field>
-              <mat-form-field *ngIf="professionals; else skeleton" appearance="fill">
-                <mat-label>{{ 'ROOM.ADD.PROFESSIONAL.FIELD' | translate }}</mat-label>
-                <label>
-                  <input [formControl]="professional" [matAutocomplete]="auto" matInput required type="text">
-                </label>
-                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
-                  <mat-option *ngFor="let professional of filteredOptions | async" [value]="professional">
-                    {{getProfessional(professional)}}
-                  </mat-option>
-                </mat-autocomplete>
-                <mat-error *ngIf="professional.hasError('required')"
-                           [innerHTML]="'ROOM.ADD.PROFESSIONAL.REQUIRED' | translate">
-                </mat-error>
-                <mat-error *ngIf="professional.hasError('requireMatch')"
-                           [innerHTML]="'ROOM.ADD.PROFESSIONAL.INVALID' | translate">
-                </mat-error>
-                <mat-error *ngIf="errors['professional']">
-                  {{errors['professional']}}
-                </mat-error>
-              </mat-form-field>
+              <div *ngIf="professionals; else skeleton" fxLayout="row" fxLayoutAlign="space-between center">
+                <mat-form-field appearance="fill">
+                  <mat-label>{{ 'ROOM.ADD.PROFESSIONAL.FIELD' | translate }}</mat-label>
+                  <label>
+                    <input [formControl]="professional" [matAutocomplete]="auto" matInput required type="text">
+                  </label>
+                  <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+                    <mat-option *ngFor="let professional of filteredOptions | async" [value]="professional">
+                      {{getProfessional(professional)}}
+                    </mat-option>
+                  </mat-autocomplete>
+                  <mat-error *ngIf="professional.hasError('required')"
+                             [innerHTML]="'ROOM.ADD.PROFESSIONAL.REQUIRED' | translate">
+                  </mat-error>
+                  <mat-error *ngIf="professional.hasError('requireMatch')"
+                             [innerHTML]="'ROOM.ADD.PROFESSIONAL.INVALID' | translate">
+                  </mat-error>
+                  <mat-error *ngIf="errors['professional']">
+                    {{errors['professional']}}
+                  </mat-error>
+                </mat-form-field>
+                <button (click)="addProfessional()" color="accent" mat-raised-button>
+                  <mat-icon matPrefix>person_add</mat-icon>
+                  <span fxHide.lt-sm fxShow>{{ 'ROOM.ADD.PROFESSIONAL.ADD_BUTTON' | translate }}</span>
+                </button>
+              </div>
               <ng-template #skeleton>
                 <div class="ssc-line"></div>
               </ng-template>
@@ -102,13 +108,11 @@
             <div fxFlex></div>
             <button [disabled]="form.invalid" color="primary" mat-raised-button
                     type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
-            <button appBackButton type="button" color="accent" mat-raised-button>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <button [form]="form" appBackButton color="accent" mat-raised-button
+                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
         </mat-card>
       </form>
     </div>
-    <ng-template #errorBox>
-      <app-error [error]="error"></app-error>
-    </ng-template>
   </div>
 </div>

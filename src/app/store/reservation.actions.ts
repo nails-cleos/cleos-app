@@ -13,6 +13,7 @@ export enum ReservationActionTypes {
   getRooms = '[Reservation] Get rooms',
   getUpcomingReservation = '[Reservation] Get upcoming reservation',
   reservationSuccess = '[Reservation] Success',
+  reservationDashSuccess = '[Reservation] Dash Success',
   reservationPageSuccess = '[Reservation] Page Success',
   reservationFilterPageSuccess = '[Reservation] Filter Page Success',
   customersSuccess = '[Reservation] Customers success',
@@ -101,6 +102,13 @@ export class GetUpcomingReservation implements Action {
 
 export class ReservationSuccess implements Action {
   readonly type = ReservationActionTypes.reservationSuccess;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class ReservationDashSuccess implements Action {
+  readonly type = ReservationActionTypes.reservationDashSuccess;
 
   constructor(public payload: any) {
   }
@@ -268,6 +276,7 @@ export type All =
   | GetUpcomingReservation
   | ReservationSave
   | ReservationSuccess
+  | ReservationDashSuccess
   | ReservationPageSuccess
   | ReservationFilterPageSuccess
   | CustomersSuccess

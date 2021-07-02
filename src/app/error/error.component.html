@@ -1,21 +1,34 @@
-<div class="flex-container" fxLayout="column" *ngIf="imageSrc; else noContent">
-  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div *ngIf="isCard; else cardBox">
-      <img alt="error" class="error" src="{{imageSrc}}">
+<div *ngIf="imageSrc; else noContent">
+  <div class="flex-container" fxLayout="column">
+    <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
+      <div *ngIf="isCard; else cardBox">
+        <img alt="error" class="error" src="{{imageSrc}}">
+      </div>
+      <ng-template #cardBox>
+        <mat-card>
+          <mat-card-header>
+          </mat-card-header>
+          <img alt="error" class="error" mat-card-image src="{{imageSrc}}">
+        </mat-card>
+      </ng-template>
     </div>
-    <ng-template #cardBox>
-      <mat-card>
-        <mat-card-header>
-        </mat-card-header>
-        <img alt="error" class="error" mat-card-image src="{{imageSrc}}">
-      </mat-card>
-    </ng-template>
+  </div>
+  <div fxLayout="row">
+    <div fxFlex></div>
+    <div class="only-button">
+      <button (click)="reload()" *ngIf="retry" color="accent" mat-raised-button type="button">
+        {{ 'COMMON.BUTTON.RETRY' | translate }}
+      </button>
+      <button appBackButton class="raised-button" mat-raised-button type="button">
+        {{ 'COMMON.BUTTON.BACK' | translate }}
+      </button>
+    </div>
   </div>
 </div>
 <ng-template #noContent>
   <div class="flex-container" fxLayout="column">
     <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-      <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%" *ngIf="isCard; else noContentCard">
+      <div *ngIf="isCard; else noContentCard" fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
         <div class="no-content bold">
           {{'COMMON.ERROR.NO_CONTENT' | translate}}
         </div>
