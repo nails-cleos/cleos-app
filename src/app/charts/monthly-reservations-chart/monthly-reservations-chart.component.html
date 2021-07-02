@@ -1,4 +1,4 @@
-<div *ngIf="!isLoading; else box" class="chartContainer">
+<div *ngIf="state; else box" class="chartContainer">
   <div *ngIf="!error; else errorBox">
     <canvas [chartType]="pieChartType"
             [data]="pieChartData"

@@ -4,12 +4,14 @@ import { IRoom, IRoomAll } from './room';
 import { CalendarEvent } from 'angular-calendar';
 import { ThemePalette } from '@angular/material/core';
 import { IUnavailableAll } from './unavailable';
+import { Pagination } from './pagination';
 
 export interface IReservation {
   id?: string;
   customerId?: string;
   customer?: IUser;
   productId?: string;
+  discountId?: string;
   product?: IProduct;
   roomId?: string;
   room?: IRoom;
@@ -31,6 +33,15 @@ export interface IRoomReservation {
   room: IRoomAll;
   reservations: IReservationAll[];
   unavailableList: IUnavailableAll[];
+}
+
+export interface ICustomerReservation {
+  reservations: Pagination<IReservationAll[]>;
+  upcoming: IReservationAll;
+}
+
+export interface IAvailableDTO {
+  start: string;
 }
 
 export interface IDay {
@@ -55,6 +66,16 @@ export interface IReservationSummary {
   icon?: string;
   isCurrency?: boolean;
   error?: any;
+}
+
+export interface ITracking {
+  reservation: IReservationAll;
+  createdTime?: string;
+  editedTime?: string;
+  approvedTime?: string;
+  startedTime?: string;
+  completedTime?: string;
+  cancelledTime?: string;
 }
 
 export class Reservation implements IReservation {
@@ -88,5 +109,12 @@ export class Calendar implements ICalendar {
   }
 }
 
-export const PAGE_SIZE = 10;
-export const MOBILE_PAGE_SIZE = 5;
+export enum States {
+  created = 'CREATED',
+  approved = 'APPROVED',
+  started = 'STARTED',
+  completed = 'COMPLETED',
+  cancelled = 'CANCELLED'
+}
+
+export const MAX_RESERVATION_MONTH = 3;

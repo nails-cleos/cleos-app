@@ -2,17 +2,19 @@ import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChi
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { Pagination } from '../../interfaces/pagination';
+import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
 import { Observable, Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectUnavailableState } from '../../store/app.states';
 import * as fromActionsUnavailable from '../../store/unavailable.actions';
 import { DialogComponent } from '../../dialog/dialog.component';
 import { convertDuration } from '../../util/dates';
-import { IUnavailable, PAGE_SIZE } from '../../interfaces/unavailable';
+import { IUnavailable } from '../../interfaces/unavailable';
+import { IUser } from '../../interfaces/user';
+import { getUserName } from '../../util/helper';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-unavailable-list',
@@ -28,38 +30,40 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
   subscription: Subscription | undefined;
   getState: Observable<any>;
 
-  resultsLength = 0;
+  resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
-  error: any;
 
   language: string;
 
-  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
-              private store: Store<AppState>, private cdRef: ChangeDetectorRef) {
+  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
+              private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+    breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small
+    ]).subscribe(result => {
+      if (result.matches) {
+        this.pageSize = MOBILE_PAGE_SIZE;
+      }
+    });
     this.getState = this.store.select(selectUnavailableState);
     this.language = this.translate.currentLang;
   }
 
   ngAfterViewInit(): void {
-    this.sort.sortChange.subscribe(() => {
-      this.getUnavailableList();
-    });
-
-    this.paginator?.page.subscribe(() => {
-      this.getUnavailableList();
-    });
-
     this.getUnavailableList();
-    this.cdRef.detectChanges();
   }
 
   ngOnInit(): void {
-    this.subscribe();
     this.clean();
+    this.subscribe();
   }
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+  }
+
+  getProfessionalName(professional: IUser): string {
+    return getUserName(professional);
   }
 
   edit(unavailable: IUnavailable): void {
@@ -70,7 +74,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
 
   delete(unavailable: IUnavailable): void {
     const title = this.translate.instant('UNAVAILABLE.DELETED.TITLE');
-    const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT', {name: unavailable.start});
+    const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT', {date: unavailable.start});
     const dialogRef = this.dialog.open(DialogComponent, {
       data: {title, content, value: unavailable}
     });
@@ -85,23 +89,12 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
   }
 
   private subscribe(): void {
-    this.subscription = this.getState.subscribe((stateValue) => {
-      if (stateValue.errorMessage || stateValue.message) {
-        const snackBarRef = this.snackBar.open(stateValue.errorMessage || stateValue.message, 'OK', {
-          duration: 5000
-        });
-
-        if (stateValue.message) {
-          snackBarRef.afterDismissed().subscribe(() => {
-            this.clean();
-            this.getUnavailableList();
-          });
-        } else {
-          this.error = stateValue.error;
-          return;
-        }
+    this.subscription = this.getState.subscribe((state) => {
+      if (state.message) {
+        this.clean();
+        this.getUnavailableList();
       }
-      this.dataSource = stateValue.data?.content?.map((unavailable: IUnavailable) => {
+      this.dataSource = state.data?.content?.map((unavailable: IUnavailable) => {
         if (unavailable.duration) {
           const duration = convertDuration(unavailable.duration);
 
@@ -109,7 +102,10 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
         }
         return unavailable;
       });
-      this.resultsLength = stateValue.data?.totalElements;
+      this.resultsLength = state.data?.totalElements;
+      if (this.resultsLength) {
+        this.createPageSubscriptions();
+      }
     });
   }
 
@@ -119,11 +115,22 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
     );
   }
 
-  private getUnavailableList(): void {
+  private createPageSubscriptions(): void {
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.getUnavailableList();
+    });
+    this.paginator?.page.subscribe(() => this.getUnavailableList(this.paginator.pageIndex));
+
+    this.cdRef.detectChanges();
+  }
+
+  private getUnavailableList(page: number = 0): void {
     const payload = {
       active: this.sort.active,
       direction: this.sort.direction,
-      page: this.paginator ? this.paginator.pageIndex : 0
+      size: this.pageSize,
+      page
     };
     this.store.dispatch(
       new fromActionsUnavailable.GetAll(payload)

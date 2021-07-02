@@ -28,8 +28,7 @@ export const reducer = (state = initialState, action: All): State => {
         data: {page: {content: [{}, {}, {}]}},
         errorMessage: null,
         subErrors: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case NotificationActionTypes.notificationSuccess: {
@@ -38,8 +37,7 @@ export const reducer = (state = initialState, action: All): State => {
         data: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null,
-        isLoading: false
+        message: null
       };
     }
     case NotificationActionTypes.notificationReadSuccess: {

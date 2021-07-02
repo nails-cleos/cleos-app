@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ICatalogue, ICatalogueAll, PAGE_SIZE } from '../interfaces/catalogue';
+import { ICatalogue, ICatalogueAll } from '../interfaces/catalogue';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +15,16 @@ export class CatalogueService {
 
   public getAll(): Observable<ICatalogue[]> {
     return this.http.get<ICatalogue[]>(this.url);
+  }
+
+  public getAllCatalogs(): Observable<ICatalogue[]> {
+    const params = new HttpParams().set('catalog', String(true));
+    return this.http.get<ICatalogue[]>(this.url, {params});
+  }
+
+  public getAllHome(): Observable<ICatalogue[]> {
+    const params = new HttpParams().set('home', String(true));
+    return this.http.get<ICatalogue[]>(this.url, {params});
   }
 
   public getById(id: string | null): Observable<ICatalogue | undefined> {

@@ -12,10 +12,12 @@ import { GeocoderResult } from '@agm/core';
 })
 export class GoogleMapComponent implements OnInit {
 
+  @Input() showDistance: boolean | undefined;
   @Input() addressFormGroup: FormGroup | undefined;
   @Input() public latitudeMarker: number | undefined;
   @Input() public longitudeMarker: number | undefined;
   @Output() addressEmitter = new EventEmitter<GeocoderResult>();
+  @Output() distanceEmitter = new EventEmitter<number>();
 
   public appearance = Appearance;
   public zoom: number;
@@ -23,14 +25,14 @@ export class GoogleMapComponent implements OnInit {
   public longitude: number;
   public isDraggable: boolean;
   public info: string | undefined;
-  public isLoading: boolean;
+  public isMapLoading: boolean;
 
   constructor(private geocodeService: GeocodeService) {
     this.latitude = -31.42008329999999;
     this.longitude = -64.1887761;
     this.zoom = 10;
     this.isDraggable = false;
-    this.isLoading = false;
+    this.isMapLoading = false;
   }
 
   ngOnInit(): void {
@@ -44,20 +46,29 @@ export class GoogleMapComponent implements OnInit {
   }
 
   markerDragEnd($event: any): void {
-    this.isLoading = true;
-    this.geocodeService.geocodeAddress($event.coords.lat, $event.coords.lng)
-      .subscribe(value => this.addressFormGroup?.get('address')?.setValue(value));
+    this.isMapLoading = true;
+    this.geocodeService.geocodeAddress($event.coords.lat, $event.coords.lng, this.showDistance)
+      .subscribe(value => {
+        if (value.address) {
+          this.addressFormGroup?.get('address')?.setValue(value.address);
+        }
+      });
   }
 
   private setCurrentPosition(): void {
-    this.isLoading = true;
+    this.isMapLoading = true;
     if (this.latitudeMarker && this.longitudeMarker) {
-      this.geocodeService.geocodeAddress(this.latitudeMarker, this.longitudeMarker)
+      this.geocodeService.geocodeAddress(this.latitudeMarker, this.longitudeMarker, this.showDistance)
         .subscribe(value => {
-          if (this.addressFormGroup) {
-            this.addressFormGroup.get('address')?.setValue(value);
-          } else {
-            this.setAddress(value);
+          if (value.distance) {
+            this.distanceEmitter.emit(value.distance);
+          }
+          if (value.address) {
+            if (this.addressFormGroup) {
+              this.addressFormGroup.get('address')?.setValue(value.address);
+            } else {
+              this.setAddress(value.address);
+            }
           }
         });
     } else {
@@ -65,7 +76,7 @@ export class GoogleMapComponent implements OnInit {
         navigator.geolocation.getCurrentPosition((position) => {
           this.latitude = position.coords.latitude;
           this.longitude = position.coords.longitude;
-          this.isLoading = false;
+          this.isMapLoading = false;
         });
       }
     }
@@ -76,7 +87,7 @@ export class GoogleMapComponent implements OnInit {
     this.longitudeMarker = this.longitude = value.geometry.location.lng();
     this.info = value.formatted_address;
     this.zoom = 15;
-    this.isLoading = false;
+    this.isMapLoading = false;
     this.addressEmitter.emit(value);
   }
 }

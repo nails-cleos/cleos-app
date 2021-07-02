@@ -1,15 +1,17 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../store/app.states';
 import * as fromActionsRoom from '../store/room.actions';
 import { IAddress, IAvailability, ILocation, IRoom, Room } from '../interfaces/room';
-import { IUser } from '../interfaces/user';
+import { IUser, IUserAll } from '../interfaces/user';
 import { map, startWith } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { requireMatch } from '../util/validators';
+import { getUserName } from '../util/helper';
+import { Router } from '@angular/router';
+import { Role } from '../interfaces/token';
 
 export enum IconName {
   calendarToday = 'calendar_today',
@@ -34,7 +36,6 @@ export class RoomComponent implements OnInit, OnDestroy {
   form!: FormGroup;
   room: IRoom = new Room();
   errors: any = [];
-  error: any;
 
   step = 0;
   icons: IIcon = {
@@ -43,7 +44,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     sunday: IconName.calendarToday
   };
 
-  professionals: IUser[] | undefined;
+  professionals: IUserAll[] | undefined;
   filteredOptions: Observable<IUser[] | undefined> | undefined;
 
   name: FormControl = new FormControl('', [
@@ -60,8 +61,8 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   addressDescription: FormControl = new FormControl();
 
-  constructor(private readonly translate: TranslateService, private snackBar: MatSnackBar, private store: Store<AppState>,
-              private formBuilder: FormBuilder) {
+  constructor(private readonly translate: TranslateService, private store: Store<AppState>,
+              private formBuilder: FormBuilder, private router: Router) {
     this.getState = this.store.select(selectRoomState);
   }
 
@@ -74,6 +75,10 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+  }
+
+  getProfessional(professional: IUser): string {
+    return getUserName(professional);
   }
 
   setStep(index: number): void {
@@ -91,7 +96,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.room.address = {
       name: this.address.value.formatted_address,
       description: this.addressDescription.value,
-      location : {
+      location: {
         x: location.lng(),
         y: location.lat()
       } as ILocation
@@ -103,7 +108,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   displayFn(user: IUser): string {
-    return user ? `${user.firstName} ${user.lastName}` : '';
+    return user ? getUserName(user) : '';
   }
 
   addAvailability(availability: IAvailability, step: number): void {
@@ -127,6 +132,10 @@ export class RoomComponent implements OnInit, OnDestroy {
       this.room.availabilities.splice(index, 1);
     }
     this.step = step;
+  }
+
+  addProfessional(): void {
+    this.router.navigate(['users', 'add'], {state: {role: Role.professional}});
   }
 
   private createForm(): void {
@@ -159,11 +168,8 @@ export class RoomComponent implements OnInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({incorrect: true});
         });
-      } else if (state.errorMessage) {
-        this.error = state.error;
-        this.snackBar.open(state.errorMessage, 'OK', {
-          duration: 5000
-        });
+      } else if (state.message) {
+        this.router.navigate(['rooms']);
       }
     });
   }
@@ -223,7 +229,6 @@ export class RoomComponent implements OnInit, OnDestroy {
   private _filter(name: string): IUser[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.professionals?.filter(option => option.firstName?.toLowerCase().indexOf(filterValue) === 0 ||
-      option.lastName?.toLowerCase().indexOf(filterValue) === 0);
+    return this.professionals?.filter(option => getUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
   }
 }

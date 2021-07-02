@@ -4,17 +4,22 @@
   <meta charset="utf-8">
   <title>Cleos</title>
   <base href="/">
-  <meta name="description" content="App to book an appointment to make your nail prettier">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="assets/icons/icon-512x512.png">
-  <link rel="apple-touch-icon" href="assets/icons/icon-512x512.png">
+  <meta content="App to book an appointment to make your nail prettier" name="description">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link href="assets/icons/icon-512x512.png" rel="icon" type="image/x-icon">
+  <link href="assets/icons/icon-512x512.png" rel="apple-touch-icon">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
-  <link rel="preload" as="image" href="assets/icons/icon-512x512.png"/>
-  <link rel="preload" as="image" href="assets/error.png"/>
-  <link rel="preload" as="image" href="assets/not_found.png"/>
+  <link as="image" href="assets/icons/icon-512x512.png" rel="preload"/>
+  <link as="image" href="assets/error.png" rel="preload"/>
+  <link as="image" href="assets/not_found.png" rel="preload"/>
 
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link rel="preconnect" href="http://localhsot" crossorigin="">
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link crossorigin="" href="http://localhsot" rel="preconnect">
+  <link href="manifest.webmanifest" rel="manifest">
+  <meta content="yes" name="mobile-web-app-capable">
+  <meta content="yes" name="apple-mobile-web-app-capable">
+  <meta content="#f7e6d8" name="theme-color">
 
   <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-YHY37JXMXT"></script>
   <script>
@@ -22,16 +27,18 @@
   </script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
     gtag('js', new Date());
 
     gtag('config', 'G-YHY37JXMXT');
   </script>
-  <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#1976d2">
 </head>
 <body class="mat-typography">
-  <app-root></app-root>
-  <noscript>Please enable JavaScript to continue using this application.</noscript>
+<app-root></app-root>
+<noscript>Please enable JavaScript to continue using this application.</noscript>
 </body>
 </html>

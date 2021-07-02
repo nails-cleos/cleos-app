@@ -3,7 +3,6 @@ import { Observable, Subscription } from 'rxjs';
 import { ICatalogueAll } from '../interfaces/catalogue';
 import { Store } from '@ngrx/store';
 import { AppState, selectCatalogueState } from '../store/app.states';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import * as fromActionsCatalogue from '../store/catalogue.actions';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
@@ -22,20 +21,19 @@ export class CatalogComponent implements OnInit, OnDestroy {
 
   subscription: Subscription | undefined;
   getState: Observable<any>;
-  error: any;
   imageURL: any;
   viewerOpen = false;
 
   catalogues: ICatalogueAll[] = [];
 
-  constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>, private snackBar: MatSnackBar) {
+  constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>) {
     this.getState = this.store.select(selectCatalogueState);
   }
 
   ngOnInit(): void {
     this.subscribe();
     this.clean();
-    this.getCatalogues();
+    this.getCatalogs();
   }
 
   ngOnDestroy(): void {
@@ -52,16 +50,6 @@ export class CatalogComponent implements OnInit, OnDestroy {
       if (state.data) {
         this.catalogues = state.data;
       }
-      if (state.errorMessage || state.message) {
-        this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
-        });
-        this.error = state.error;
-        return;
-      }
-      if (state.error) {
-        this.error = state.error;
-      }
     });
   }
 
@@ -71,9 +59,9 @@ export class CatalogComponent implements OnInit, OnDestroy {
     );
   }
 
-  private getCatalogues(): void {
+  private getCatalogs(): void {
     this.store.dispatch(
-      new fromActionsCatalogue.GetAll()
+      new fromActionsCatalogue.GetAllCatalogs()
     );
   }
 }

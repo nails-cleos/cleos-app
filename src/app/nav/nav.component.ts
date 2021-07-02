@@ -4,7 +4,18 @@ import { Observable, Subscription } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState, selectNotificationState } from '../store/app.states';
+import {
+  AppState,
+  selectAuthState,
+  selectCatalogueState,
+  selectDiscountState,
+  selectNotificationState,
+  selectProductState,
+  selectReservationState,
+  selectRoomState,
+  selectUnavailableState,
+  selectUserState
+} from '../store/app.states';
 import { IMenu, IUser, IUserAll } from '../interfaces/user';
 import * as fromActionsLogin from '../store/auth.actions';
 import * as fromActionsNotification from '../store/notification.actions';
@@ -13,6 +24,10 @@ import { TranslateService } from '@ngx-translate/core';
 import { Role } from '../interfaces/token';
 import { MessagingService } from '../services/messaging.service';
 import { environment } from '../../environments/environment';
+import { getUserImage, getUserName, getUserNameInitials } from '../util/helper';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSidenav } from '@angular/material/sidenav';
+import { NavigationService } from '../services/navigation.service';
 
 @Component({
   selector: 'app-nav',
@@ -43,27 +58,38 @@ export class NavComponent implements OnInit, OnDestroy {
   isProfessional = false;
   message: any;
 
-  showInitials = false;
+  image: string | undefined;
   initials: string | undefined;
   countNotifications = 0;
   plusNotification: string | undefined;
 
-  constructor(public translate: TranslateService, private breakpointObserver: BreakpointObserver, private router: Router,
-              private store: Store<AppState>, private messagingService: MessagingService) {
+  isLoading = true;
+  error: any;
+
+  constructor(public translate: TranslateService, private breakpointObserver: BreakpointObserver,
+              private router: Router, private store: Store<AppState>, private messagingService: MessagingService,
+              private snackBar: MatSnackBar, private navigation: NavigationService) {
     this.language = this.translate.currentLang;
     this.getState = this.store.select(selectAuthState);
     this.getNotificationState = this.store.select(selectNotificationState);
+    this.selectStore([selectRoomState, selectProductState, selectCatalogueState, selectDiscountState,
+      selectUnavailableState, selectUserState, selectReservationState]);
+    this.navigation.subscribe();
   }
 
   ngOnInit(): void {
     this.subscribe();
   }
 
+  ngOnDestroy(): void {
+    this.authSubscription?.unsubscribe();
+    this.notificationSubscription?.unsubscribe();
+  }
+
   logout(): void {
     this.store.dispatch(
       new fromActionsLogin.LogOut()
     );
-    this.router.navigate(['main']);
   }
 
   notification(notification: INotification): void {
@@ -88,34 +114,39 @@ export class NavComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
-    this.authSubscription?.unsubscribe();
-    this.notificationSubscription?.unsubscribe();
+  navigate(menu: IMenu, drawer?: MatSidenav): void {
+    drawer?.toggle();
+    this.error = undefined;
+    this.router.navigate([menu.path]);
+  }
+
+  private selectStore(states: any[]): void {
+    states.forEach(selectedState => this.store.select(selectedState)
+      .subscribe((state: any) => {
+        this.isLoading = state.isLoading;
+        this.error = state.error;
+        if (state.errorMessage || state.message) {
+          this.snackBar.open(state.errorMessage || state.message, 'OK', {
+            duration: 5000
+          });
+        }
+      }));
   }
 
   private subscribe(): void {
-    this.authSubscription = this.getState.subscribe((state) => {
+    this.authSubscription = this.getState.subscribe(state => {
       this.isAuthorized = state.isAuthenticated;
+      this.isLoading = state.isLoading;
       if (state.isAuthenticated) {
         this.getNotifications();
         const user: IUserAll = state.user;
-        this.translate.use(user.lang || navigator.language);
-        this.language = user.lang || navigator.language;
         this.currentUser = user;
         this.isProfessional = user.authorities.some(u => u.authority === Role.professional);
         this.menuItems = state.menus;
         this.canChangePassword = user?.provider === 'LOCAL';
-        if (user.firstName) {
-          this.username = `${user.firstName} ${user?.lastName}`;
-          this.initials = `${user.firstName.charAt(0)} ${user?.lastName?.charAt(0)}`;
-        } else {
-          this.username = user?.username;
-          this.initials = user?.username?.charAt(0);
-        }
-
-        if (!this.currentUser?.imageUrl) {
-          this.showInitials = true;
-        }
+        this.username = getUserName(user);
+        this.initials = getUserNameInitials(user);
+        this.image = getUserImage(user);
         this.messagingService.requestPermission(user.id);
         this.messagingService.receiveMessage();
         this.message = this.messagingService.currentMessage.subscribe((value: any) => {
@@ -138,14 +169,14 @@ export class NavComponent implements OnInit, OnDestroy {
             }
           }
         });
-      } else {
-        this.translate.use(navigator.language);
-        this.language = navigator.language;
+      }
+      if (this.router.url === '/') {
+        this.router.navigate([this.isAuthorized ? 'redirect' : 'main']);
       }
     });
 
     this.notificationSubscription = this.getNotificationState.subscribe((state) => {
-      if (state.data && state.data.page && state.data.page.content[0].id) {
+      if (state.data && state.data.page && state.data.page.content[0]?.id) {
         this.workDay = state.data.workDay;
         this.notifications = state.data.page.content;
         this.countNotifications = state.data.unread;
@@ -153,6 +184,7 @@ export class NavComponent implements OnInit, OnDestroy {
           this.plusNotification = '+9';
         }
       }
+      this.isLoading = state.isLoading;
     });
   }
 

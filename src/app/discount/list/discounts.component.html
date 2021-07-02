@@ -1,0 +1,96 @@
+<div class="mat-elevation-z8">
+  <table [dataSource]="dataSource" mat-table matSort matSortActive="name"
+         matSortDirection="asc" matSortDisableClear>
+    <ng-container matColumnDef="position">
+      <th *matHeaderCellDef mat-header-cell>#</th>
+      <td *matCellDef="let discount; let i = index;" mat-cell>
+        <div *ngIf="discount.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="name">
+      <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'DISCOUNT.LIST.COLUMN.NAME' | translate }}</th>
+      <td *matCellDef="let discount" mat-cell>
+        <div *ngIf="discount.id; else skeleton">{{discount.name}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="description">
+      <th *matHeaderCellDef fxHide.lt-sm fxShow
+          mat-header-cell>{{ 'DISCOUNT.LIST.COLUMN.DESCRIPTION' | translate }}</th>
+      <td *matCellDef="let discount" fxHide.lt-sm fxShow mat-cell>
+        <div *ngIf="discount.id; else skeleton">{{discount.description}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="type">
+      <th *matHeaderCellDef mat-header-cell
+          mat-sort-header>{{ 'DISCOUNT.LIST.COLUMN.TYPE' | translate }}</th>
+      <td *matCellDef="let discount">
+        <div *ngIf="discount.id; else skeleton">{{ 'COMMON.DISCOUNT.' + discount.type | translate}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="amount">
+      <th *matHeaderCellDef mat-header-cell
+          mat-sort-header>{{ 'DISCOUNT.LIST.COLUMN.AMOUNT' | translate }}</th>
+      <td *matCellDef="let discount">
+        <div *ngIf="discount.id; else skeleton">{{discount.amount}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+      <td *matCellDef="let discount" mat-cell>
+        <div *ngIf="discount.id; else skeleton">
+          <button (click)="edit(discount)" *ngIf="!discount.deleted" mat-icon-button
+                  matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
+            <mat-icon color="primary">edit</mat-icon>
+          </button>
+          <button (click)="sentToUsers(discount)" *ngIf="!discount.referral" mat-icon-button
+                  matTooltip="{{ 'COMMON.BUTTON.DISCOUNT.SEND' | translate }}" matTooltipPosition="right">
+            <mat-icon color="primary">switch_access_shortcut_add</mat-icon>
+          </button>
+          <button (click)="delete(discount)" *ngIf="!discount.referral" mat-icon-button
+                  matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
+            <mat-icon color="warn">delete</mat-icon>
+          </button>
+        </div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="noContent">
+      <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+        {{ 'DISCOUNT.LIST.ERROR.NO_CONTENT' | translate }}</td>
+    </ng-container>
+
+    <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
+
+    <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+    <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
+  </table>
+  <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+
+  <button color="accent" id="add-button" mat-fab matTooltip="{{ 'DISCOUNT.ADD.TITLE' | translate }}"
+          routerLink="/discounts/add">
+    <mat-icon>add</mat-icon>
+  </button>
+</div>

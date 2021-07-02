@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { map } from 'rxjs/operators';
-import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../store/app.states';
@@ -9,6 +9,8 @@ import { IReservationAll, IReservationSummary } from '../interfaces/reservation'
 import { IUserAll } from '../interfaces/user';
 import { TranslateService } from '@ngx-translate/core';
 import { ThemePalette } from '@angular/material/core';
+import { createDate, newDate, plusMonth } from '../util/dates';
+import { totalPrice } from '../util/helper';
 
 @Component({
   selector: 'app-dash',
@@ -19,10 +21,13 @@ export class DashComponent implements OnInit, OnDestroy {
   getState: Observable<any>;
   subscription: Subscription | undefined;
   state: any;
+  stateTracking: any;
   annualLabel: any;
   customerLabel: any;
   quantityLabel: any;
   lastMonthLabel: any;
+  trackingAverage: any;
+  trackingCompare: any;
 
   // @ts-ignore
   miniCardData: IReservationSummary[] = [{}, {}, {}, {}];
@@ -54,10 +59,19 @@ export class DashComponent implements OnInit, OnDestroy {
     this.customerLabel = this.translate.instant('DASHBOARD.CARD.LABEL.CUSTOMER');
     this.quantityLabel = this.translate.instant('DASHBOARD.CARD.LABEL.QUANTITY');
     this.lastMonthLabel = this.translate.instant('DASHBOARD.CARD.LABEL.LAST_MONTH');
+    this.trackingAverage = {
+      min: this.translate.instant('DASHBOARD.CARD.LABEL.MIN'),
+      avg: this.translate.instant('DASHBOARD.CARD.LABEL.AVG'),
+      max: this.translate.instant('DASHBOARD.CARD.LABEL.MAX')
+    };
+    this.trackingCompare = {
+      avg: this.translate.instant('DASHBOARD.CARD.LABEL.AVG'),
+      estimate: this.translate.instant('DASHBOARD.CARD.LABEL.ESTIMATE')
+    };
   }
 
   private static getSumReservationPrice(total: number, reservation: IReservationAll): number {
-    return total + reservation.product.price;
+    return total + totalPrice(reservation.product);
   }
 
   private static createMiniCard(title: string, value: number, isIncrease: boolean, color: ThemePalette, percentValue: number,
@@ -81,6 +95,7 @@ export class DashComponent implements OnInit, OnDestroy {
     this.clean();
     this.subscribe();
     this.getReservations();
+    this.getTracking();
   }
 
   ngOnDestroy(): void {
@@ -95,6 +110,7 @@ export class DashComponent implements OnInit, OnDestroy {
 
   private miniCardError(state: any, error: string): void {
     this.state = state;
+    this.stateTracking = state;
     const revenue = DashComponent.createErrorMiniCard('TOTAL_PRODUCT_SALES', error);
 
     const products = DashComponent.createErrorMiniCard('AVERAGE_PRODUCT_VALUE', error);
@@ -107,19 +123,21 @@ export class DashComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
+      if (state.tracking) {
+        this.stateTracking = state;
+      }
       if (state.errorMessage) {
         this.miniCardError(state, state.errorMessage);
       }
-      if (state.data && Array.isArray(state.data) && !state.data[0].reservations) {
+      if (state.dash) {
         this.state = state;
-        const now = new Date(new Date().setHours(0, 0));
-        const filterDate = new Date(now.setMonth(now.getMonth() - 1));
-        const prevFilterDate = new Date(now.setMonth(now.getMonth() - 1));
-        const completedList = this.state.data?.filter((r: IReservationAll) => r.state === 'COMPLETED');
+        const filterDate = plusMonth(createDate(), -1);
+        const prevFilterDate = plusMonth(createDate(), -2);
+        const completedList = this.state.dash?.filter((r: IReservationAll) => r.state === 'COMPLETED');
         if (completedList && completedList.length) {
-          const lastMonthList = completedList.filter((r: IReservationAll) => new Date(r.start) > filterDate);
+          const lastMonthList = completedList.filter((r: IReservationAll) => newDate(r.start) > filterDate);
           const prevMonthList = completedList.filter(
-            (r: IReservationAll) => new Date(r.start) > prevFilterDate && new Date(r.start) < filterDate
+            (r: IReservationAll) => newDate(r.start) > prevFilterDate && newDate(r.start) < filterDate
           );
           const totalRevenue = completedList.reduce(DashComponent.getSumReservationPrice, 0);
           const lastMonthRevenue = lastMonthList.reduce(DashComponent.getSumReservationPrice, 0);
@@ -129,7 +147,7 @@ export class DashComponent implements OnInit, OnDestroy {
           const lastMonthAvg = lastMonthList.length ? lastMonthRevenue / lastMonthList.length : 0;
           const prevMonthAvg = prevMonthList.length ? prevMonthRevenue / prevMonthList.length : 0;
 
-          const totalCustomers = completedList.filter((r: IReservationAll) => new Date(r.start) <= filterDate)
+          const totalCustomers = completedList.filter((r: IReservationAll) => newDate(r.start) <= filterDate)
             .reduce((unique: any[], o: IReservationAll) => {
               if (!unique.some(obj => obj.id === o.customer.id)) {
                 unique.push(o.customer);
@@ -137,7 +155,7 @@ export class DashComponent implements OnInit, OnDestroy {
               return unique;
             }, []);
 
-          const totalCustomersPrev = completedList.filter((r: IReservationAll) => new Date(r.start) <= prevFilterDate)
+          const totalCustomersPrev = completedList.filter((r: IReservationAll) => newDate(r.start) <= prevFilterDate)
             .reduce((unique: any[], o: IReservationAll) => {
               if (!unique.some(obj => obj.id === o.customer.id)) {
                 unique.push(o.customer);
@@ -200,6 +218,12 @@ export class DashComponent implements OnInit, OnDestroy {
   private getReservations(): void {
     this.store.dispatch(
       new fromActionsReservation.GetAll()
+    );
+  }
+
+  private getTracking(): void {
+    this.store.dispatch(
+      new fromActionsReservation.GetTracking()
     );
   }
 }

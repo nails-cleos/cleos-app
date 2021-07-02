@@ -1,4 +1,4 @@
-<div *ngIf="!error; else errorBox" class="flex-container" fxLayout="column">
+<div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <mat-card class="style-card">
@@ -30,6 +30,12 @@
                 </label>
                 <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
               </mat-form-field>
+              <div>
+                <mat-checkbox [formControl]="home"
+                              color="primary">{{ 'CATALOGUE.ADD.SHOW.HOME' | translate }}</mat-checkbox>
+                <mat-checkbox [formControl]="catalog"
+                              color="primary">{{ 'CATALOGUE.ADD.SHOW.CATALOG' | translate }}</mat-checkbox>
+              </div>
               <div (fileDropped)="onFileDropped($event)" *ngIf="!file && !showImg" appDragDrop class="container"
                    fxHide.lt-sm
                    fxShow>
@@ -97,7 +103,8 @@
             <div fxFlex></div>
             <button [disabled]="form.invalid || (!showImg && file?.progress !== 100)" color="primary" mat-raised-button
                     type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
-            <button color="accent" mat-raised-button appBackButton>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <button [form]="form" appBackButton color="accent" mat-raised-button
+                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
           <ng-template #buttonSkeleton>
             <div class="ssc-head-line"></div>
@@ -107,6 +114,3 @@
     </div>
   </div>
 </div>
-<ng-template #errorBox>
-  <app-error [error]="error"></app-error>
-</ng-template>

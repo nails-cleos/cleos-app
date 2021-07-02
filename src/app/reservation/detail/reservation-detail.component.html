@@ -1,19 +1,14 @@
-<mat-card *ngIf="!error; else errorBox">
+<mat-card>
   <mat-card-header>
     <mat-card-title>{{ 'RESERVATION.DETAIL.TITLE' | translate }}</mat-card-title>
     <mat-card-subtitle
-      *ngIf="reservation; else skeleton">{{reservation.customer.firstName}} {{reservation.customer.lastName}}</mat-card-subtitle>
+      *ngIf="reservation; else skeleton">{{customerName}}</mat-card-subtitle>
     <ng-template #skeleton>
       <div class="ssc-line"></div>
     </ng-template>
-    <div fxFlex></div>
-    <div *ngIf="changeState && changeState.length">
-      <mat-fab-menu (onFabMenuItemSelected)="onChangeState($event)" [fabButtons]="changeState" color="primary"
-                    direction="left" icon="all_out">
-      </mat-fab-menu>
-    </div>
   </mat-card-header>
   <mat-card-content *ngIf="reservation; else boxSkeleton">
+    <mat-divider></mat-divider>
     <mat-list>
       <div mat-subheader>{{ 'RESERVATION.DETAIL.ROOM.TITLE' | translate}}</div>
       <mat-list-item>
@@ -24,14 +19,14 @@
       <mat-list-item>
         <mat-icon mat-list-icon>person_pin</mat-icon>
         <div mat-line>{{ 'RESERVATION.DETAIL.ROOM.PROFESSIONAL' | translate}}</div>
-        <div mat-line>{{reservation.room.professional.firstName}} {{reservation.room.professional.lastName}}</div>
+        <div mat-line>{{professionalName}}</div>
       </mat-list-item>
       <mat-list-item>
         <mat-icon mat-list-icon>room</mat-icon>
         <div mat-line>{{ 'RESERVATION.DETAIL.ROOM.ADDRESS' | translate}}</div>
         <div mat-line>
-          <a target="_blank"
-             [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + reservation.room.address.name">
+          <a [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + reservation.room.address.name"
+             target="_blank">
             {{reservation.room.address.name}}
           </a>
         </div>
@@ -52,19 +47,44 @@
       <mat-list-item>
         <mat-icon mat-list-icon>attach_money</mat-icon>
         <div mat-line>{{ 'RESERVATION.DETAIL.PRODUCT.PRICE' | translate}}</div>
-        <div mat-line>{{reservation.product.price | number:'1.2-2'}}</div>
+        <div *ngIf="priceDiscount; else noDiscount" mat-line>
+          <span [class.strikethrough]="priceDiscount">{{reservation.product.price | number:'1.2-2'}}</span>
+          <span [@discountAnimation] class="raised-button bold">{{priceDiscount | number:'1.2-2'}}</span>
+        </div>
+        <ng-template #noDiscount>
+          <div mat-line>{{reservation.product.price | number:'1.2-2'}}</div>
+        </ng-template>
       </mat-list-item>
       <mat-divider></mat-divider>
       <div mat-subheader>{{ 'RESERVATION.DETAIL.APPOINTMENT' | translate}}</div>
       <mat-list-item>
         <mat-icon mat-list-icon>event</mat-icon>
-        <div mat-line>{{start | date:'short':undefined:language}}
-          - {{end | date:'short':undefined:language}}</div>
+        <div mat-line>{{start | date:'short':undefined:language}}</div>
+        <div mat-line>{{end | date:'short':undefined:language}}</div>
       </mat-list-item>
       <mat-list-item>
         <mat-icon mat-list-icon>{{state}}</mat-icon>
         <div mat-line>{{ 'RESERVATION.STATE.' + reservation.state | translate}}</div>
       </mat-list-item>
+      <div *ngIf="reservation.product.extras">
+        <mat-divider></mat-divider>
+        <div mat-subheader>{{ 'RESERVATION.DETAIL.PRODUCT.EXTRAS.TITLE' | translate}}</div>
+        <mat-list-item *ngIf="reservation.product.extras.description">
+          <mat-icon mat-list-icon>description</mat-icon>
+          <div mat-line>{{ 'RESERVATION.DETAIL.PRODUCT.EXTRAS.DESCRIPTION' | translate}}</div>
+          <div mat-line>{{reservation.product.extras.description}}</div>
+        </mat-list-item>
+        <mat-list-item *ngIf="reservation.product.extras.price">
+          <mat-icon mat-list-icon>attach_money</mat-icon>
+          <div mat-line>{{ 'RESERVATION.DETAIL.PRODUCT.EXTRAS.PRICE' | translate}}</div>
+          <div mat-line>{{reservation.product.extras.price}}</div>
+        </mat-list-item>
+        <mat-list-item *ngIf="total">
+          <mat-icon mat-list-icon>paid</mat-icon>
+          <div mat-line><span class="bold">{{ 'RESERVATION.DETAIL.PRODUCT.EXTRAS.TOTAL' | translate}}</span></div>
+          <div mat-line><span class="bold">{{total}}</span></div>
+        </mat-list-item>
+      </div>
       <mat-divider></mat-divider>
     </mat-list>
     <mat-list *ngIf="reservation.history">
@@ -82,7 +102,7 @@
           <th *matHeaderCellDef fxHide.lt-sm fxShow
               mat-header-cell> {{ 'RESERVATION.DETAIL.HISTORY.COLUMN.PROFESSIONAL' | translate }} </th>
           <td *matCellDef="let history" fxHide.lt-sm fxShow
-              mat-cell> {{history.room.professional.firstName}} {{history.room.professional.lastName}} </td>
+              mat-cell> {{getProfessionalName(history)}} </td>
         </ng-container>
 
         <ng-container matColumnDef="start">
@@ -104,11 +124,11 @@
         </ng-container>
 
         <ng-container matColumnDef="noContent">
-          <td class="no-content bold" mat-footer-cell *matFooterCellDef [attr.colspan]="displayedColumns.length">
+          <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
             {{ 'RESERVATION.DETAIL.HISTORY.ERROR.NO_CONTENT' | translate }}</td>
         </ng-container>
 
-        <tr mat-footer-row *matFooterRowDef="['noContent']" [hidden]="reservation.history.length > 0"></tr>
+        <tr *matFooterRowDef="['noContent']" [hidden]="reservation.history.length > 0" mat-footer-row></tr>
 
         <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
         <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
@@ -125,12 +145,14 @@
   </ng-template>
   <mat-card-actions *ngIf="reservation; else buttonSkeleton">
     <div fxFlex></div>
-    <button color="accent" mat-raised-button appBackButton>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+    <button appBackButton color="accent" mat-raised-button type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
   </mat-card-actions>
   <ng-template #buttonSkeleton>
     <div class="ssc-head-line"></div>
   </ng-template>
 </mat-card>
-<ng-template #errorBox>
-  <app-error [error]="error"></app-error>
-</ng-template>
+<div id="action-button" *ngIf="changeState && changeState.length">
+  <mat-fab-menu (onFabMenuItemSelected)="onChangeState($event)" [fabButtons]="changeState" color="primary"
+                [direction]="direction" icon="all_out">
+  </mat-fab-menu>
+</div>

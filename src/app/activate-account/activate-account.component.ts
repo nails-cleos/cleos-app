@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState } from '../store/app.states';
 import { Observable, Subscription } from 'rxjs';
@@ -17,20 +16,23 @@ export class ActivateAccountComponent implements OnInit, OnDestroy {
   getState: Observable<any>;
   subscription: Subscription | undefined;
 
-  constructor(private snackBar: MatSnackBar, private store: Store<AppState>, private route: ActivatedRoute, private router: Router,
+  lang: string;
+
+  constructor(private store: Store<AppState>, private route: ActivatedRoute, private router: Router,
               private translate: TranslateService) {
     this.getState = this.store.select(selectAuthState);
+    this.lang = this.route.snapshot.queryParamMap.get('lang') || navigator.language;
   }
 
   ngOnInit(): void {
+    this.translate.use(this.lang);
     this.clean();
     this.subscribe();
   }
 
   activate(): void {
     const token: string | null = this.route.snapshot.queryParamMap.get('token');
-    const lang: string = this.route.snapshot.queryParamMap.get('lang') || navigator.language;
-    this.translate.use(lang);
+    this.translate.use(this.lang);
     this.store.dispatch(
       new fromActionsLogin.ActivateAccount(token)
     );
@@ -42,17 +44,8 @@ export class ActivateAccountComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe((state) => {
-      if (state.errorMessage || state.message) {
-        const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
-        });
-
-        if (state.message) {
-          snackBarRef.afterDismissed().subscribe(() => {
-            this.clean();
-            this.router.navigate(['auth']);
-          });
-        }
+      if (state.message) {
+        this.router.navigate(['auth']);
       }
     });
   }

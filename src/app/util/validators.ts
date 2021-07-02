@@ -12,3 +12,5 @@ export const requireMatch = (control: AbstractControl): any => {
   }
   return null;
 };
+
+export const isEmpty = (obj: any): boolean => !Object.values(obj).some(element => element !== null);

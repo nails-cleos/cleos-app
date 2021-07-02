@@ -35,8 +35,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case RoomActionTypes.getAllProfessional: {
@@ -46,8 +45,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case RoomActionTypes.getMyRoom:
@@ -59,8 +57,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case RoomActionTypes.roomSuccess: {
@@ -70,8 +67,7 @@ export const reducer = (state = initialState, action: All): State => {
         professionals: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null,
-        isLoading: false
+        message: null
       };
     }
     case RoomActionTypes.roomSaveSuccess: {
@@ -79,6 +75,7 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         message: action.payload.message,
         errorMessage: null,
+        selected: null,
         subErrors: null,
         isLoading: false
       };
@@ -89,8 +86,7 @@ export const reducer = (state = initialState, action: All): State => {
         selected: action.payload.room,
         errorMessage: null,
         subErrors: null,
-        message: null,
-        isLoading: false
+        message: null
       };
     }
     case RoomActionTypes.roomFailure: {
@@ -103,7 +99,6 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false
       };
     }
-    case RoomActionTypes.roomUpdateMe:
     case RoomActionTypes.roomUpdate:
     case RoomActionTypes.roomSave:
     case RoomActionTypes.roomDelete: {

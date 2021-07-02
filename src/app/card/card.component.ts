@@ -1,12 +1,16 @@
-import { Component, Inject, Input, OnInit } from '@angular/core';
+import { Component, Inject, Input } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import {
   annualReservationChart,
+  barChartDefaultOptions,
+  barChartTimeOptions,
   customerReservationChart,
   lastMonthReservationChart,
   monthlyReservationChart,
   productReservationChart,
-  quantityProductChart
+  quantityProductChart,
+  trackingAverageChart,
+  trackingCompareChart
 } from '../util/chart';
 import { Color, Label, SingleDataSet } from 'ng2-charts';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
@@ -19,7 +23,9 @@ enum ChartTypeEnum {
   monthlyReservation,
   yearlyProductPrice,
   customerReservation,
-  lastMonthReservation
+  lastMonthReservation,
+  trackingAverage,
+  trackingCompare
 }
 
 @Component({
@@ -27,7 +33,7 @@ enum ChartTypeEnum {
   templateUrl: './card.component.html',
   styleUrls: ['./card.component.css']
 })
-export class CardComponent implements OnInit {
+export class CardComponent {
 
   @Input() title: string | undefined;
   @Input() type: string | undefined;
@@ -52,14 +58,11 @@ export class CardComponent implements OnInit {
     this.locale = index === -1 ? userLang : userLang.substr(0, index);
   }
 
-  ngOnInit(): void {
-  }
-
   onClick(): void {
     // @ts-ignore
     switch (ChartTypeEnum[snakeToCamel(this.type)]) {
       case ChartTypeEnum.quantityProduct.valueOf():
-        this.setBarChart(quantityProductChart(this.data, this.label));
+        this.setBarChart(quantityProductChart(this.data, this.label), barChartDefaultOptions());
         break;
       case ChartTypeEnum.productReservation.valueOf():
         const product = productReservationChart(this.data);
@@ -81,10 +84,16 @@ export class CardComponent implements OnInit {
         this.setLineChart(annualReservationChart(this.data, this.locale, this.label));
         break;
       case ChartTypeEnum.customerReservation.valueOf():
-        this.setBarChart(customerReservationChart(this.data, this.label));
+        this.setBarChart(customerReservationChart(this.data, this.label), barChartDefaultOptions());
         break;
       case ChartTypeEnum.lastMonthReservation.valueOf():
         this.setLineChart(lastMonthReservationChart(this.data, this.locale, this.label));
+        break;
+      case ChartTypeEnum.trackingAverage.valueOf():
+        this.setBarChart(trackingAverageChart(this.data, this.label), barChartTimeOptions());
+        break;
+      case ChartTypeEnum.trackingCompare.valueOf():
+        this.setBarChart(trackingCompareChart(this.data, this.label), barChartTimeOptions());
         break;
     }
     if (this.chartType) {
@@ -118,7 +127,7 @@ export class CardComponent implements OnInit {
     }
   }
 
-  private setBarChart(barChart: any): void {
+  private setBarChart(barChart: any, options: any): void {
     if (barChart) {
       this.chartDataSet = barChart.chartDataSet;
       this.chartLabels = barChart.chartLabels;
@@ -128,16 +137,7 @@ export class CardComponent implements OnInit {
           backgroundColor: 'rgba(103, 58, 183)'
         }
       ];
-      this.chartOptions = {
-        responsive: true,
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero: true
-            }
-          }]
-        }
-      };
+      this.chartOptions = options;
     }
   }
 }

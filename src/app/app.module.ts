@@ -35,6 +35,7 @@ import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFireMessagingModule } from '@angular/fire/messaging';
 import firebase from 'firebase';
+import { MatCarouselModule } from '@ngbmodule/material-carousel';
 
 // Providers
 import { httpInterceptorProviders } from './http-interceptors';
@@ -59,6 +60,9 @@ import { CatalogueService } from './services/catalogue.service';
 import { UnavailableService } from './services/unavailable.service';
 import { NavigationService } from './services/navigation.service';
 import { MessagingService } from './services/messaging.service';
+import { DiscountService } from './services/discount.service';
+import { TrackingService } from './services/tracking.service';
+import { MainService } from './services/main.service';
 
 // Reducers
 import { reducers } from './store/app.states';
@@ -72,6 +76,8 @@ import { ReservationEffects } from './store/effects/reservation.effects';
 import { NotificationEffects } from './store/effects/notification.effects';
 import { CatalogueEffects } from './store/effects/catalogue.effects';
 import { UnavailableEffects } from './store/effects/unavailable.effects';
+import { DiscountEffects } from './store/effects/discount.effects';
+import { MainEffects } from './store/effects/main.effects';
 
 // Directives
 import { DragDropDirective } from './directives/drag-drop.directive';
@@ -102,8 +108,8 @@ import { RoomComponent } from './room/room.component';
 import { RoomsComponent } from './room/list/rooms.component';
 import { RoomDetailComponent } from './room/detail/room-detail.component';
 import { ReservationComponent } from './reservation/reservation.component';
-import { AssignmentsComponent } from './assignment/assignments.component';
-import { ReservationDetailComponent } from './reservation/detail/reservation-detail.component';
+import { SearchComponent } from './reservation/search/search.component';
+import { CompleteDialogComponent, ReservationDetailComponent } from './reservation/detail/reservation-detail.component';
 import { AvailabilityComponent } from './availability/availability.component';
 import { ProductReservationsChartComponent } from './charts/product-reservation-chart/product-reservations-chart.component';
 import { MonthlyReservationsChartComponent } from './charts/monthly-reservations-chart/monthly-reservations-chart.component';
@@ -113,6 +119,7 @@ import { CustomerReservationsChartComponent } from './charts/customer-reservatio
 import { ReservationTableComponent } from './reservation/table/reservation-table.component';
 import { QuantityProductReservationsChartComponent } from './charts/quantity-product-reservations-chart/quantity-product-reservations-chart.component';
 import { LastMonthReservationsChartComponent } from './charts/last-month-reservations-chart/last-month-reservations-chart.component';
+import { TrackingAverageChartComponent } from './charts/tracking-average-chart/tracking-average-chart.component';
 import { NotificationsComponent } from './notification/list/notifications.component';
 import { RoomMeComponent } from './room/me/room-me.component';
 import { CalendarComponent } from './reservation/calendar/calendar.component';
@@ -127,6 +134,22 @@ import { UnavailableComponent } from './unavailable/unavailable.component';
 import { UnavailableDetailComponent } from './unavailable/detail/unavailable-detail.component';
 import { UnavailableListComponent } from './unavailable/list/unavailable-list.component';
 import { ReservationsComponent } from './reservation/list/reservations.component';
+import { MeReservationComponent } from './reservation/me/me-reservation.component';
+import { RedirectComponent } from './redirect/redirect.component';
+import {
+  BottomSheetReferralComponent,
+  BottomSheetShareComponent,
+  ReferralsComponent
+} from './referrals/referrals.component';
+import { DiscountComponent } from './discount/discount.component';
+import { DiscountDetailComponent } from './discount/detail/discount-detail.component';
+import { DiscountDialogComponent, DiscountsComponent } from './discount/list/discounts.component';
+import { MeDiscountComponent } from './discount/me/me-discount.component';
+import { TrackingCompareChartComponent } from './charts/tracking-compare-chart/tracking-compare-chart.component';
+import { MiniCardProductComponent } from './mini-card-product/mini-card-product.component';
+import { PrivacyComponent } from './privacy/privacy.component';
+import { TermsAndConditionsComponent } from './terms-and-conditions/terms-and-conditions.component';
+import { MainContentComponent } from './main/main-content/main-content.component';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
@@ -189,12 +212,13 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
     RoomsComponent,
     RoomDetailComponent,
     ReservationComponent,
-    AssignmentsComponent,
+    SearchComponent,
     ReservationDetailComponent,
     AvailabilityComponent,
     ProductReservationsChartComponent,
     MonthlyReservationsChartComponent,
     AnnualReservationsChartComponent,
+    TrackingAverageChartComponent,
     MiniCardComponent,
     CustomerReservationsChartComponent,
     ReservationTableComponent,
@@ -216,13 +240,29 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
     UnavailableListComponent,
     ReservationsComponent,
     DragDropDirective,
-    BackButtonDirective
+    BackButtonDirective,
+    MeReservationComponent,
+    RedirectComponent,
+    ReferralsComponent,
+    BottomSheetShareComponent,
+    BottomSheetReferralComponent,
+    DiscountComponent,
+    DiscountDetailComponent,
+    DiscountsComponent,
+    DiscountDialogComponent,
+    MeDiscountComponent,
+    CompleteDialogComponent,
+    TrackingCompareChartComponent,
+    MiniCardProductComponent,
+    PrivacyComponent,
+    TermsAndConditionsComponent,
+    MainContentComponent
   ],
   imports: [
     BrowserModule,
     StoreModule.forRoot(reducers, {metaReducers}),
     EffectsModule.forRoot([LoginEffects, UserEffects, ProductEffects, CatalogueEffects, RoomEffects, ReservationEffects,
-      NotificationEffects, UnavailableEffects]),
+      NotificationEffects, UnavailableEffects, DiscountEffects, MainEffects]),
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {
@@ -255,7 +295,7 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
     ReactiveFormsModule,
     AgmCoreModule.forRoot({
       apiKey: environment.googleMapKey,
-      libraries: ['places']
+      libraries: ['places', 'geometry']
     }),
     MatGoogleMapsAutocompleteModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
@@ -266,7 +306,8 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
     AngularFireDatabaseModule,
     AngularFireAuthModule,
     AngularFireMessagingModule,
-    AngularFireModule.initializeApp(environment.firebase)
+    AngularFireModule.initializeApp(environment.firebase),
+    MatCarouselModule.forRoot()
   ],
   providers: [
     {
@@ -282,6 +323,9 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
     ReservationService,
     CatalogueService,
     UnavailableService,
+    DiscountService,
+    TrackingService,
+    MainService,
     NavigationService,
     TranslationLoaderResolver,
     GeocodeService,

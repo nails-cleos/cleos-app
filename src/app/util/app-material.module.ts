@@ -33,6 +33,13 @@ import { OverlayModule } from '@angular/cdk/overlay';
 import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
 import { MatBadgeModule } from '@angular/material/badge';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
+import { ClipboardModule } from '@angular/cdk/clipboard';
+import { MatChipsModule } from '@angular/material/chips';
+import { ShareButtonsModule } from 'ngx-sharebuttons/buttons';
+import { ShareIconsModule } from 'ngx-sharebuttons/icons';
+import { NgxMatIntlTelInputModule } from 'ngx-mat-intl-tel-input';
 
 @NgModule({
   imports: [
@@ -70,7 +77,14 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     MatFabMenuModule,
     MatBadgeModule,
     MatRippleModule,
-    DragDropModule
+    DragDropModule,
+    MatProgressSpinnerModule,
+    MatBottomSheetModule,
+    ClipboardModule,
+    MatChipsModule,
+    ShareButtonsModule,
+    ShareIconsModule,
+    NgxMatIntlTelInputModule
   ],
   exports: [
     MatTableModule,
@@ -107,7 +121,14 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     MatFabMenuModule,
     MatBadgeModule,
     MatRippleModule,
-    DragDropModule
+    DragDropModule,
+    MatProgressSpinnerModule,
+    MatBottomSheetModule,
+    ClipboardModule,
+    MatChipsModule,
+    ShareButtonsModule,
+    ShareIconsModule,
+    NgxMatIntlTelInputModule
   ]
 })
 export class AppMaterialModule {

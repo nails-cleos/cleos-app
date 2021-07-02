@@ -2,6 +2,7 @@
   "COMMON": {
     "BUTTON": {
       "BACK": "Volver",
+      "RETRY": "Reintentar",
       "NEXT": "Siguiente",
       "PREVIOUS": "Anterior",
       "TODAY": "Hoy",
@@ -18,7 +19,15 @@
       "EDIT": "Editar",
       "DELETE": "Eliminar",
       "INVITE": "Enviar invitación",
-      "CLOSE": "Cerrar"
+      "CLOSE": "Cerrar",
+      "COPY": "Copiar",
+      "SHARE": "Compartir",
+      "COMPLETE": "Completar",
+      "DISCOUNT": {
+        "SHOW": "Mostrar descuentos",
+        "HIDE": "Ocultar descuentos",
+        "SEND": "Enviar descuento"
+      }
     },
     "COLUMN": {
       "ACTIONS": "Acciones"
@@ -54,6 +63,14 @@
       "INVALID": "La dirección es invalida",
       "DESCRIPTION": "Descripción"
     },
+    "DISCOUNT": {
+      "MONEY": "Dinero",
+      "PERCENTAGE": "Porcentaje"
+    },
+    "BACK": {
+      "TITLE": "Estas apunto de volver atrás",
+      "CONTENT": "Tiene cambios en esta página, si vuelves atrás, perderás tus cambios. ¿Estás seguro de volver atrás?"
+    },
     "ERROR": {
       "NO_CONTENT": "Sin datos"
     }
@@ -63,6 +80,7 @@
     "CHANGE_PASSWORD": "Cambiar contraseña",
     "SIGN_OUT": "Cerrar sesión",
     "SIGN_IN": "Ingresar",
+    "HOME": "Principal",
     "MINI_CARD": {
       "DURATION": "desde el mes pasado",
       "TOTAL_PRODUCT_SALES": "Ganancia total",
@@ -75,7 +93,11 @@
         "ANNUAL": "Reservas",
         "CUSTOMER": "Clientes",
         "QUANTITY": "Cantidad",
-        "LAST_MONTH": "Último mes"
+        "LAST_MONTH": "Último mes",
+        "MIN": "Mínimo",
+        "MAX": "Máximo",
+        "AVG": "Promedio",
+        "ESTIMATE": "Estimado"
       },
       "QUANTITY_PRODUCT": "Cantidad por servicio",
       "PRODUCT_RESERVATION": "Servicios",
@@ -83,6 +105,8 @@
       "YEARLY_PRODUCT_PRICE": "Ganancias anuales",
       "CUSTOMER_RESERVATION": "Reservas por cliente",
       "LAST_MONTH_RESERVATION": "Reservas en el último mes",
+      "TRACKING_AVERAGE": "Tiempo real del servicio",
+      "TRACKING_COMPARE": "Tiempo real/estimado",
       "RESERVATION": "Reservas",
       "EXPAND": "Expandir"
     }
@@ -132,12 +156,17 @@
         "MUST_MATCH": "Contraseña y confirmar contraseña deben coincidir"
       },
       "FIRST_NAME": {
-        "FIELD": "Nombre",
-        "REQUIRED": "Nombre es <b>requerido</b>"
+        "FIELD": "Nombre"
       },
       "LAST_NAME": {
-        "FIELD": "Apellido",
-        "REQUIRED": "Apellido es <b>requerido</b>"
+        "FIELD": "Apellido"
+      },
+      "PHONE": {
+        "FIELD": "Teléfono",
+        "INVALID": "Número de teléfono invalido"
+      },
+      "CODE": {
+        "FIELD": "Código de referido"
       },
       "OR": "O registrate con tu email",
       "SUCCESS": "Usuario {{username}} creado. Verifica tu email {{email}}",
@@ -220,16 +249,18 @@
         "REQUIRED": "Contraseña es <b>requerido</b>"
       },
       "FIRST_NAME": {
-        "FIELD": "Nombre",
-        "REQUIRED": "Nombre es <b>requerido</b>"
+        "FIELD": "Nombre"
       },
       "LAST_NAME": {
-        "FIELD": "Apellido",
-        "REQUIRED": "Apellido es <b>requerido</b>"
+        "FIELD": "Apellido"
       },
       "LANG": {
         "FIELD": "Idioma",
         "REQUIRED": "Idioma es <b>requerido</b>"
+      },
+      "PHONE": {
+        "FIELD": "Teléfono",
+        "INVALID": "Número de teléfono invalido"
       },
       "CUSTOMER": "Cliente {{username}} creado",
       "PROFESSIONAL": "Profesional {{username}} creado"
@@ -250,21 +281,23 @@
         "REQUIRED": "Contraseña es <b>requerido</b>"
       },
       "FIRST_NAME": {
-        "FIELD": "Nombre",
-        "REQUIRED": "Nombre es <b>requerido</b>"
+        "FIELD": "Nombre"
       },
       "LAST_NAME": {
-        "FIELD": "Apellido",
-        "REQUIRED": "Apellido es <b>requerido</b>"
+        "FIELD": "Apellido"
       },
       "LANG": {
         "FIELD": "Idioma",
         "REQUIRED": "Idioma es <b>requerido</b>"
+      },
+      "PHONE": {
+        "FIELD": "Teléfono",
+        "INVALID": "Número de teléfono invalido"
       }
     },
     "DELETED": {
       "TITLE": "Eliminar usuario",
-      "CONTENT": "¿Está seguro de eliminar el usuario {{firstName}} {{lastName}}?",
+      "CONTENT": "¿Está seguro de eliminar el usuario {{username}}?",
       "MESSAGE": "Usuario {{username}} eliminado"
     },
     "UPDATED": {
@@ -272,7 +305,7 @@
     },
     "ACTIVATION_RESEND": {
       "TITLE": "Reenviar código de activación",
-      "CONTENT": "¿Está seguro de reenviar el código de activación al usuario {{firstName}} {{lastName}}?",
+      "CONTENT": "¿Está seguro de reenviar el código de activación al usuario {{username}}?",
       "MESSAGE": "Código de activación enviado"
     },
     "CHANGE_PASSWORD": {
@@ -314,19 +347,22 @@
       "FIELD": "Nombre de usuario"
     },
     "FIRST_NAME": {
-      "FIELD": "Nombre",
-      "REQUIRED": "Nombre es <b>requerido</b>"
+      "FIELD": "Nombre"
     },
     "LAST_NAME": {
-      "FIELD": "Apellido",
-      "REQUIRED": "Apellido es <b>requerido</b>"
+      "FIELD": "Apellido"
     },
     "LANG": {
       "FIELD": "Idioma",
       "REQUIRED": "Idioma es <b>requerido</b>"
     },
+    "PHONE": {
+      "FIELD": "Teléfono",
+      "INVALID": "Número de teléfono invalido"
+    },
     "UPDATED": {
-      "MESSAGE": "Usuario {{username}} actualizado"
+      "MESSAGE": "Usuario {{username}} actualizado",
+      "PHOTO": "Foto de perfil actualizada"
     }
   },
   "PRODUCT": {
@@ -338,11 +374,11 @@
         "DURATION": "Duración"
       },
       "ERROR": {
-        "NO_CONTENT": "No hay productos"
+        "NO_CONTENT": "No hay servicios"
       }
     },
     "ADD": {
-      "TITLE": "Agregar producto",
+      "TITLE": "Agregar servicio",
       "NAME": {
         "FIELD": "Nombre",
         "REQUIRED": "Nombre es <b>requerido</b>"
@@ -362,10 +398,10 @@
       "DURABILITY": {
         "FIELD": "Durabilidad"
       },
-      "CREATED": "Producto {{name}} creado"
+      "CREATED": "Servicio {{name}} creado"
     },
     "DETAIL": {
-      "TITLE": "Actualizar producto",
+      "TITLE": "Actualizar servicio",
       "NAME": {
         "FIELD": "Nombre",
         "REQUIRED": "Nombre es <b>requerido</b>"
@@ -387,12 +423,12 @@
       }
     },
     "DELETED": {
-      "TITLE": "Eliminar producto",
-      "CONTENT": "¿Está seguro de eliminar el producto {{name}}?",
-      "MESSAGE": "Producto {{name}} eliminado"
+      "TITLE": "Eliminar servicio",
+      "CONTENT": "¿Está seguro de eliminar el servicio {{name}}?",
+      "MESSAGE": "Servicio {{name}} eliminado"
     },
     "UPDATED": {
-      "MESSAGE": "Producto {{name}} actualizado"
+      "MESSAGE": "Servicio {{name}} actualizado"
     }
   },
   "CATALOGUE": {
@@ -404,6 +440,10 @@
       },
       "DESCRIPTION": {
         "FIELD": "Descripción"
+      },
+      "SHOW": {
+        "HOME": "Mostar en principal",
+        "CATALOG": "Mostrar en catálogo"
       },
       "FILE": {
         "DRAG_DROP": "Arrastrar y soltar el archivo aquí",
@@ -469,7 +509,8 @@
       "PROFESSIONAL": {
         "FIELD": "Profesional",
         "REQUIRED": "Profesional es <b>requerido</b>",
-        "INVALID": "Profesional no valido"
+        "INVALID": "Profesional no valido",
+        "ADD_BUTTON": "Agregar profesional"
       },
       "AVAILABILITY": {
         "FIELD": "Disponibilidad",
@@ -680,7 +721,30 @@
         "TITLE": "Servicio",
         "NAME": "Nombre",
         "DURATION": "Duración",
-        "PRICE": "Precio"
+        "PRICE": "Precio",
+        "EXTRAS": {
+          "TITLE": "Adicionales",
+          "DESCRIPTION": "Descripción",
+          "PRICE": "Precio",
+          "TOTAL": "Total"
+        },
+        "COMPLETE": {
+          "TITLE": "Servicio",
+          "INVALID": "Servicio no valido",
+          "EXTRAS": {
+            "TITLE": "Adicionales",
+            "DESCRIPTION": {
+              "FIELD": "Descripción"
+            },
+            "PRICE": {
+              "FIELD": "Precio"
+            }
+          },
+          "DESCRIPTION": "<span class='bold'>Descripción:</span> {{description}}",
+          "TOTAL": "<span class='bold'>Total:</span>",
+          "DURATION": "<span class='bold'>Duración:</span> {{duration}}",
+          "DURABILITY": "<span class='bold'>Durabilidad:</span> {{durability}}"
+        }
       },
       "APPOINTMENT": "Cita",
       "HISTORY": {
@@ -706,7 +770,9 @@
         "START": "Iniciar",
         "EDIT": "Editar",
         "COMPLETE": "Completar",
-        "CANCEL": "Cancelar"
+        "CANCEL": "Cancelar",
+        "BOOK": "Reservar nuevamente",
+        "SEND": "Enviar Whatsapp"
       },
       "CHANGE_STATE": {
         "TITLE": "Cambio de estado",
@@ -715,7 +781,8 @@
           "EDIT": "editar la cita",
           "START": "iniciar la cita",
           "COMPLETE": "completar la cita",
-          "CANCEL": "cancelar la reserva"
+          "CANCEL": "cancelar la reserva",
+          "BOOK": "reservar nuevamente"
         },
         "CONTENT": "¿Está seguro de {{action}}?"
       }
@@ -727,6 +794,11 @@
         "START": "Inicio",
         "STATE": "Estado",
         "PRODUCT": "Servicio"
+      },
+      "CANCEL": {
+        "TITLE": "Cancelar reserva",
+        "CONTENT": "¿Está seguro de cancelar la reserva {{date}}?",
+        "MESSAGE": "Reserva {{date}} cancelada"
       },
       "ERROR": {
         "NO_CONTENT": "No hay reservas"
@@ -746,6 +818,93 @@
       "STARTED": "Empezada",
       "COMPLETED": "Completada",
       "CANCELLED": "Cancelada"
+    },
+    "CUSTOMER": {
+      "UPCOMING": {
+        "TITLE": "Próxima Reserva",
+        "START": "Inicio",
+        "END": "Fin",
+        "ROOM": "Sala",
+        "ADDRESS": "Dirección",
+        "PRODUCT": "Servicio",
+        "PRICE": "Precio",
+        "CREATED": "La reserva debe ser aprobada por: "
+      },
+      "NO_UPCOMING": {
+        "TITLE": "No hay próxima reserva"
+      },
+      "ADD": {
+        "ROOM": {
+          "FIELD": "Sala",
+          "REQUIRED": "Sala es <b>requerida</b>",
+          "INVALID": "Sala no valida",
+          "DETAIL": "Detalle",
+          "ADDRESS": {
+            "NAME": "<span class='bold'>Dirección:</span> {{name}}",
+            "DESCRIPTION": "<span class='bold'>Descripción:</span> {{description}}",
+            "DISTANCE": {
+              "KM": "<span class='bold'>Distancia:</span> {{distance}} Kilómetros",
+              "M": "<span class='bold'>Distancia:</span> {{distance}} Metros"
+            }
+          },
+          "PROFESSIONAL": {
+            "NAME": "<span class='bold'>Profesional:</span> {{name}}"
+          }
+        },
+        "PRODUCT": {
+          "FIELD": "Servicio",
+          "REQUIRED": "Servicio es <b>requerido</b>",
+          "INVALID": "Servicio no valido",
+          "DETAIL": "Detalle",
+          "DESCRIPTION": "<span class='bold'>Descripción:</span> {{description}}",
+          "PRICE": "<span class='bold'>Precio:</span>",
+          "DURATION": "<span class='bold'>Duración:</span> {{duration}}",
+          "DURABILITY": "<span class='bold'>Durabilidad:</span> {{durability}}",
+          "DISCOUNT": {
+            "FIELD": "Descuento",
+            "ADD": "Con descuento"
+          }
+        },
+        "DATE": {
+          "FIELD": "Elegí una fecha",
+          "REQUIRED": "Fecha es <b>requerida</b>"
+        },
+        "SCHEDULE": {
+          "FIELD": "Reservar una cita",
+          "REQUIRED": "Reservar una cita es <b>requerido</b>"
+        },
+        "PREVIEW": {
+          "TITLE": "Vista previa",
+          "ROOM": {
+            "TITLE": "Sala",
+            "NAME": "Nombre",
+            "PROFESSIONAL": "Profesional",
+            "ADDRESS": "Dirección"
+          },
+          "PRODUCT": {
+            "TITLE": "Servicio",
+            "NAME": "Nombre",
+            "DURATION": "Duración",
+            "PRICE": "Precio"
+          },
+          "APPOINTMENT": "Cita"
+        },
+        "UPCOMING": {
+          "ERROR": "El cliente ya tiene una reserva el {{date}}"
+        },
+        "NO_CONTENT": "No hay disponibilidad el <span class='bold'>{{date}}</span>"
+      }
+    },
+    "SEARCH": {
+      "TITLE": "Búsqueda",
+      "CUSTOMER": {
+        "FIELD": "Buscar por cliente",
+        "PLACEHOLDER": "Cliente"
+      },
+      "STATES": {
+        "FIELD": "Buscar por estados",
+        "PLACEHOLDER": "Estado"
+      }
     }
   },
   "NOTIFICATION": {
@@ -793,7 +952,7 @@
       "CREATED": "No disponible {{date}} creado"
     },
     "DETAIL": {
-      "TITLE": "Actualizar producto",
+      "TITLE": "Actualizar servicio",
       "DESCRIPTION": {
         "FIELD": "Descripción"
       },
@@ -820,6 +979,145 @@
     },
     "UPDATED": {
       "MESSAGE": "No disponible {{date}} actualizado"
+    }
+  },
+  "REFERRAL": {
+    "TITLE": "Referidos",
+    "MESSAGE": "Referí Cleos a tus amigos y obtené increíbles descuentos",
+    "DETAIL": "Obtendrás descuentos una vez que tu amigo cree una cuenta con tu código y asista a una cita",
+    "COPY": "Code copied",
+    "LINK": "Crea tu cuenta en Cleos. ¡Te la recomiendo! \uD83D\uDE0D\n\nSi usas mi código {{code}} o entrás acá {{url}}, ahorrá en un tu primer reserva. ¡Aprovechá!",
+    "INVITE": {
+      "TITLE": "Invitaciones",
+      "SEND": "Recibieron tu invitación",
+      "USED": "Asistieron a una cita"
+    }
+  },
+  "DISCOUNT": {
+    "LIST": {
+      "COLUMN": {
+        "NAME": "Nombre",
+        "DESCRIPTION": "Descripción",
+        "TYPE": "Tipo",
+        "AMOUNT": "Monto",
+        "USED": "Utilizado"
+      },
+      "DIALOG": {
+        "CUSTOMER": "Clientes"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No hay descuentos"
+      }
+    },
+    "ADD": {
+      "TITLE": "Agregar descuento",
+      "NAME": {
+        "FIELD": "Nombre",
+        "REQUIRED": "Nombre es <b>requerido</b>"
+      },
+      "DESCRIPTION": {
+        "FIELD": "Descripción"
+      },
+      "AMOUNT": {
+        "FIELD": "Monto",
+        "REQUIRED": "Monto es <b>requerido</b>",
+        "GREATER": "Monto debe ser mayor a 1"
+      },
+      "TYPE": {
+        "FIELD": "Tipo",
+        "REQUIRED": "Tipo es <b>requerido</b>"
+      },
+      "SEND": "Descuento {{name}} enviado",
+      "CREATED": "Descuento {{name}} creado"
+    },
+    "DETAIL": {
+      "TITLE": "Actualizar descuento",
+      "NAME": {
+        "FIELD": "Nombre",
+        "REQUIRED": "Nombre es <b>requerido</b>"
+      },
+      "DESCRIPTION": {
+        "FIELD": "Descripción"
+      },
+      "PRICE": {
+        "FIELD": "Monto",
+        "REQUIRED": "Monto es <b>requerido</b>",
+        "GREATER": "Monto debe ser mayor a 1"
+      },
+      "TYPE": {
+        "FIELD": "Tipo",
+        "REQUIRED": "Tipo es <b>requerido</b>"
+      }
+    },
+    "DELETED": {
+      "TITLE": "Eliminar descuento",
+      "CONTENT": "¿Está seguro de eliminar el descuento {{name}}?",
+      "MESSAGE": "Descuento {{name}} eliminado"
+    },
+    "UPDATED": {
+      "MESSAGE": "Descuento {{name}} actualizado"
+    }
+  },
+  "WHATSAPP": {
+    "SEND": {
+      "APPROVE": "♡ \uD83C\uDD43\uD83C\uDD44 \uD83C\uDD3F\uD83C\uDD41\uD83C\uDD3E\uD83C\uDD47\uD83C\uDD38\uD83C\uDD3C\uD83C\uDD3E \uD83C\uDD42\uD83C\uDD34\uD83C\uDD41\uD83C\uDD45\uD83C\uDD38\uD83C\uDD32\uD83C\uDD34:%0A♡ {{date}}"
+    }
+  },
+  "MAIN": {
+    "LEGALS": "© 2021 - CLEOS - Todos los derechos reservados.",
+    "SECTION": {
+      "STORY": "Historia",
+      "PRODUCT": "Servicios",
+      "BOOK": "Reservar",
+      "CONTACT": "Contacto",
+      "CATALOG": "Catálogo",
+      "ACCOUNT": "Mi cuenta",
+      "AUTH": "Ingresar",
+      "PRIVACY": "Privacidad",
+      "TERM_AND_CONDITIONS": "Términos y condiciones"
+    },
+    "STORY_DETAIL": "dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna\n      aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl\n      ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie\n      consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui\n      blandit\n      praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis\n      eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum.",
+    "BOOK": {
+      "DATE": {
+        "FIELD": "Elegí una fecha"
+      },
+      "PRODUCT": {
+        "FIELD": "Servicio",
+        "INVALID": "Servicio no valido"
+      }
+    },
+    "CONTACT": {
+      "TITLE": "Contactanos",
+      "ADDRESS": "San Martín 64 - 08 - Villa Carlos Paz, Córdoba, Argentina",
+      "PHONE": "+54 (351) 758-1773",
+      "MAIL": "espacio.cleos@gmail.com",
+      "SEND": {
+        "TITLE": "¿Tiene alguna pregunta? Nos encantaría saber de ti",
+        "MESSAGE": "Tu mensaje se envió con éxito"
+      },
+      "NAME": {
+        "FIELD": "Tu nombre",
+        "REQUIRED": "Tu nombre es requerido"
+      },
+      "EMAIL": {
+        "FIELD": "Tu email",
+        "REQUIRED": "Tu email es requerido",
+        "INVALID": "Email is invalid"
+      },
+      "SUBJECT": {
+        "FIELD": "Asunto",
+        "REQUIRED": "El asunto es requerido"
+      },
+      "BODY": {
+        "FIELD": "Mensaje",
+        "REQUIRED": "El mensaje es requerido"
+      }
+    }
+  },
+  "CARD": {
+    "PRODUCT": {
+      "DURATION": "<span class='bold'>Duración:</span> {{duration}}",
+      "DURABILITY": "<span class='bold'>Durabilidad:</span> {{durability}}"
     }
   },
   "APP": {

@@ -12,7 +12,6 @@ import { productReservationChart } from '../../util/chart';
 export class ProductReservationsChartComponent implements OnChanges {
   @Input() state: any;
 
-  isLoading = true;
   data: IReservationAll[] | undefined;
   error: any;
 
@@ -33,20 +32,13 @@ export class ProductReservationsChartComponent implements OnChanges {
 
   private createChart(): void {
     if (this.state) {
-      this.isLoading = this.state.isLoading;
-      if (this.state.errorMessage) {
-        this.error = this.state.error;
+      const chartResult = productReservationChart(this.state.dash);
+      if (this.state.errorMessage || !chartResult) {
+        this.error = {status: 'NO_CONTENT'};
         return;
       }
-      const chartResult = productReservationChart(this.state.data);
-      if (chartResult) {
-        this.radarChartData = chartResult.chartDataSet;
-        this.radarChartLabels = chartResult.chartLabels;
-      } else {
-        this.error = {
-          status: 'NO_CONTENT'
-        };
-      }
+      this.radarChartData = chartResult.chartDataSet;
+      this.radarChartLabels = chartResult.chartLabels;
     }
   }
 }

@@ -2,7 +2,7 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
 import { Color, Label } from 'ng2-charts';
 import { IReservationAll } from '../../interfaces/reservation';
-import { quantityProductChart } from '../../util/chart';
+import { barChartDefaultOptions, quantityProductChart } from '../../util/chart';
 
 @Component({
   selector: 'app-quantity-product-reservations-chart',
@@ -13,20 +13,10 @@ export class QuantityProductReservationsChartComponent implements OnChanges {
   @Input() state: any;
   @Input() label: any;
 
-  isLoading = true;
   data: IReservationAll[] | undefined;
   error: any;
 
-public barChartOptions: ChartOptions = {
-    responsive: true,
-    scales: {
-      yAxes: [{
-        ticks: {
-          beginAtZero: true
-        }
-      }]
-    }
-  };
+  public barChartOptions: ChartOptions = barChartDefaultOptions();
 
   public barChartLabels: Label[] = [];
   public barChartType: ChartType = 'bar';
@@ -49,20 +39,13 @@ public barChartOptions: ChartOptions = {
 
   private createChart(): void {
     if (this.state) {
-      this.isLoading = this.state.isLoading;
-      if (this.state.errorMessage) {
-        this.error = this.state.error;
+      const chartResult = quantityProductChart(this.state.dash, this.label);
+      if (this.state.errorMessage || !chartResult) {
+        this.error = {status: 'NO_CONTENT'};
         return;
       }
-      const chartResult = quantityProductChart(this.state.data, this.label);
-      if (chartResult) {
-        this.barChartData = chartResult.chartDataSet;
-        this.barChartLabels = chartResult.chartLabels;
-      } else {
-        this.error = {
-          status: 'NO_CONTENT'
-        };
-      }
+      this.barChartData = chartResult.chartDataSet;
+      this.barChartLabels = chartResult.chartLabels;
     }
   }
 }

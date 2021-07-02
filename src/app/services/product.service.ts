@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IProduct, PAGE_SIZE } from '../interfaces/product';
+import { IProduct, IProductDiscountDTO } from '../interfaces/product';
+import { PAGE_SIZE } from '../interfaces/pagination';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +14,8 @@ export class ProductService {
   constructor(private http: HttpClient) {
   }
 
-  public getAll(sort: string, direction: string, page: number): Observable<IProduct[]> {
-    let params = new HttpParams().set('page', String(page)).set('size', String(PAGE_SIZE));
+  public getAll(sort: string, direction: string, page: number, size: number = PAGE_SIZE): Observable<IProduct[]> {
+    let params = new HttpParams().set('page', String(page)).set('size', String(size));
     if (sort) {
       params = params.append('sort', sort);
     }
@@ -25,8 +26,16 @@ export class ProductService {
     return this.http.get<IProduct[]>(`${this.url}/pages`, {params});
   }
 
-  public getAllProducts(): Observable<IProduct[]> {
-    return this.http.get<IProduct[]>(this.url);
+  public getAllProducts(customerId?: string): Observable<IProductDiscountDTO[]> {
+    let params = new HttpParams();
+    if (customerId) {
+      params = params.append('customerId', customerId);
+    }
+    return this.http.get<IProductDiscountDTO[]>(this.url, {params});
+  }
+
+  public getProductList(): Observable<IProduct[]> {
+    return this.http.get<IProduct[]>(`${this.url}/list`);
   }
 
   public getById(id: string | null): Observable<IProduct | undefined> {

@@ -29,7 +29,6 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   subscription: Subscription | undefined;
   getState: Observable<any>;
-  error: any;
   drops: CdkDropList[] = [];
 
   catalogues: ICatalogueAll[] = [];
@@ -41,8 +40,8 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.subscribe();
     this.clean();
+    this.subscribe();
     this.getCatalogues();
   }
 
@@ -97,23 +96,9 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.catalogues = [...state.data];
         this.cdRef.detectChanges();
       }
-      if (state.errorMessage || state.message) {
-        const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
-        });
-
-        if (state.message) {
-          snackBarRef.afterDismissed().subscribe(() => {
-            this.clean();
-            this.getCatalogues();
-          });
-        } else {
-          this.error = state.error;
-          return;
-        }
-      }
-      if (state.error) {
-        this.error = state.error;
+      if (state.message) {
+        this.clean();
+        this.getCatalogues();
       }
     });
   }

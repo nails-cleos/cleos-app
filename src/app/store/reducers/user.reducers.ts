@@ -32,8 +32,18 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
+      };
+    }
+    case UserActionTypes.getAllCustomers: {
+      return {
+        ...state,
+        // @ts-ignore
+        data: [],
+        errorMessage: null,
+        subErrors: null,
+        selected: null,
+        message: null
       };
     }
     case UserActionTypes.findMe:
@@ -44,8 +54,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case UserActionTypes.userSuccess: {
@@ -54,8 +63,7 @@ export const reducer = (state = initialState, action: All): State => {
         data: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null,
-        isLoading: false
+        message: null
       };
     }
     case UserActionTypes.userSelected: {
@@ -64,8 +72,7 @@ export const reducer = (state = initialState, action: All): State => {
         selected: action.payload.user,
         errorMessage: null,
         subErrors: null,
-        message: null,
-        isLoading: false
+        message: null
       };
     }
     case UserActionTypes.changePasswordSuccess:
@@ -73,6 +80,7 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         message: action.payload.message,
+        selected: null,
         errorMessage: null,
         subErrors: null,
         isLoading: false
@@ -92,6 +100,7 @@ export const reducer = (state = initialState, action: All): State => {
     case UserActionTypes.changePassword:
     case UserActionTypes.saveUser:
     case UserActionTypes.updateUser:
+    case UserActionTypes.updatePhoto:
     case UserActionTypes.resendUserToken:
     case UserActionTypes.userDelete: {
       return {

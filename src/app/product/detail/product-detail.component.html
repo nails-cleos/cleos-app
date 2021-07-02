@@ -1,6 +1,6 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div *ngIf="!error; else errorBox" fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <mat-card>
         <mat-card-header>
           <mat-card-title>{{ 'PRODUCT.DETAIL.TITLE' | translate }}</mat-card-title>
@@ -15,7 +15,7 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PRODUCT.DETAIL.NAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input autocomplete="name" formControlName="name" matInput required>
+                  <input [formControl]="name" autocomplete="name" matInput required>
                 </label>
                 <mat-error *ngIf="name.hasError('required')" [innerHTML]="'PRODUCT.DETAIL.NAME.REQUIRED' | translate">
                 </mat-error>
@@ -26,7 +26,8 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PRODUCT.DETAIL.DESCRIPTION.FIELD' | translate }}</mat-label>
                 <label>
-                  <textarea #message formControlName="description" matInput maxlength="256"></textarea>
+                  <textarea #message formControlName="description" matInput
+                            maxlength="256"></textarea>
                 </label>
                 <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
               </mat-form-field>
@@ -36,7 +37,7 @@
                   <mat-icon matPrefix>attach_money</mat-icon> &nbsp;
                 </span>
                 <label>
-                  <input formControlName="price" matInput required step="1" type="number">
+                  <input [formControl]="price" matInput required step="1" type="number">
                 </label>
                 <mat-error *ngIf="price.hasError('required')" [innerHTML]="'PRODUCT.DETAIL.PRICE.REQUIRED' | translate">
                 </mat-error>
@@ -50,11 +51,11 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PRODUCT.DETAIL.DURATION.FIELD' | translate }}</mat-label>
                 <label>
-                  <input matInput name="duration" [format]="24" [formControl]="duration"
-                         [ngxTimepicker]="t" readonly/>
+                  <input [formControl]="duration" [format]="24" [ngxTimepicker]="t" matInput
+                         name="duration" readonly/>
                 </label>
                 <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
-                <ngx-material-timepicker [minutesGap]="15" #t
+                <ngx-material-timepicker #t [minutesGap]="15"
                                          [theme]="theme"></ngx-material-timepicker>
 
                 <mat-error *ngIf="duration.hasError('required')"
@@ -67,7 +68,7 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PRODUCT.DETAIL.DURABILITY.FIELD' | translate }}</mat-label>
                 <label>
-                  <input matInput formControlName="durability">
+                  <input formControlName="durability" matInput>
                 </label>
                 <mat-error *ngIf="errors['durability']">
                   {{errors['durability']}}
@@ -84,7 +85,8 @@
             <div fxFlex></div>
             <button [disabled]="form.invalid || form.pristine" color="primary" mat-raised-button
                     type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
-            <button color="accent" mat-raised-button appBackButton>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <button [form]="form" appBackButton color="accent" mat-raised-button
+                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
           <ng-template #buttonSkeleton>
             <div class="ssc-head-line"></div>
@@ -92,8 +94,5 @@
         </form>
       </mat-card>
     </div>
-    <ng-template #errorBox>
-      <app-error [error]="error"></app-error>
-    </ng-template>
   </div>
 </div>

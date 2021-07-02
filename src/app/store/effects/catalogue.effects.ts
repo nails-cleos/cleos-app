@@ -15,8 +15,16 @@ export class CatalogueEffects {
   getAll$ = this.actions$.pipe(ofType(fromActionsCatalogue.CatalogueActionTypes.getAll)).pipe(
     map((action: any) => action.payload),
     switchMap(() => this.catalogueService.getAll().pipe(
-      switchMap((response: any) => response ? of(new fromActionsCatalogue.CatalogueSuccess(response))
-        : of(new fromActionsCatalogue.CatalogueFailure({error: {status: 'NO_CONTENT'}}))),
+      switchMap((response: any) => of(new fromActionsCatalogue.CatalogueSuccess(response ? response : []))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({error: err.error})))
+    ))
+  );
+
+  @Effect()
+  getAllCatalogs$ = this.actions$.pipe(ofType(fromActionsCatalogue.CatalogueActionTypes.getAllCatalogs)).pipe(
+    map((action: any) => action.payload),
+    switchMap(() => this.catalogueService.getAllCatalogs().pipe(
+      switchMap((response: any) => of(new fromActionsCatalogue.CatalogueSuccess(response ? response : []))),
       catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({error: err.error})))
     ))
   );
@@ -77,7 +85,7 @@ export class CatalogueEffects {
   @Effect({dispatch: false})
   selectedData$ = this.actions$.pipe(
     ofType(fromActionsCatalogue.CatalogueActionTypes.catalogueSelected),
-    tap((data: any) => this.router.navigate(['catalogue', data.payload.id]))
+    tap((data: any) => this.router.navigate(['catalogues', data.payload.id]))
   );
 
   @Effect({dispatch: false})
@@ -87,11 +95,10 @@ export class CatalogueEffects {
 
   @Effect({dispatch: false})
   saveSuccess$ = this.actions$.pipe(
-    ofType(fromActionsCatalogue.CatalogueActionTypes.catalogueSaveSuccess),
-    tap(() => this.router.navigate(['catalogues']))
+    ofType(fromActionsCatalogue.CatalogueActionTypes.catalogueSaveSuccess)
   );
 
-  constructor(private readonly translate: TranslateService, private actions$: Actions, private catalogueService: CatalogueService,
-              private router: Router) {
+  constructor(private readonly translate: TranslateService, private actions$: Actions,
+              private catalogueService: CatalogueService, private router: Router) {
   }
 }

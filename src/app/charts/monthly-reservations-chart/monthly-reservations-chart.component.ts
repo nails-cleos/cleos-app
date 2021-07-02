@@ -13,7 +13,6 @@ import { TranslateService } from '@ngx-translate/core';
 export class MonthlyReservationsChartComponent implements OnChanges {
   @Input() state: any;
 
-  isLoading = true;
   data: IReservationAll[] | undefined;
   locale: string;
   error: any;
@@ -39,20 +38,13 @@ export class MonthlyReservationsChartComponent implements OnChanges {
 
   private createChart(): void {
     if (this.state) {
-      this.isLoading = this.state.isLoading;
-      if (this.state.errorMessage) {
-        this.error = this.state.error;
+      const chartResult = monthlyReservationChart(this.state.dash, this.locale);
+      if (this.state.errorMessage || !chartResult) {
+        this.error = {status: 'NO_CONTENT'};
         return;
       }
-      const chartResult = monthlyReservationChart(this.state.data, this.locale);
-      if (chartResult) {
-        this.pieChartData = chartResult.chartData;
-        this.pieChartLabels = chartResult.chartLabels;
-      } else {
-        this.error = {
-          status: 'NO_CONTENT'
-        };
-      }
+      this.pieChartData = chartResult.chartData;
+      this.pieChartLabels = chartResult.chartLabels;
     }
   }
 }

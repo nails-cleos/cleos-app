@@ -1,15 +1,14 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectProductState } from '../../store/app.states';
 import * as fromActionsProduct from '../../store/product.actions';
 import { fieldChange, valueChange } from '../../util/validators';
 import { IProduct, Product } from '../../interfaces/product';
 import { timeTheme } from '../../util/theme';
-import { convertDuration, getTime } from '../../util/dates';
+import { convertDuration, createDate, getTime } from '../../util/dates';
 
 @Component({
   selector: 'app-product-detail',
@@ -23,7 +22,6 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   subscription: Subscription | undefined;
   getState: Observable<any>;
   errors: any = [];
-  error: any;
   theme = timeTheme();
 
   name: FormControl = new FormControl('', [
@@ -36,8 +34,8 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     Validators.required
   ]);
 
-  constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
-              private formBuilder: FormBuilder) {
+  constructor(private route: ActivatedRoute, private store: Store<AppState>,
+              private formBuilder: FormBuilder, private router: Router) {
     this.getState = this.store.select(selectProductState);
   }
 
@@ -91,7 +89,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
         } as IProduct;
 
         const duration = convertDuration(state.selected.duration);
-        this.product.duration = getTime(new Date(new Date().setHours(duration.hour, duration.minute)));
+        this.product.duration = getTime(createDate(duration.hour, duration.minute));
         this.form.patchValue(this.product);
       }
       if (state.subErrors) {
@@ -99,11 +97,8 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({incorrect: true});
         });
-      } else if (state.errorMessage) {
-        this.snackBar.open(state.errorMessage, 'OK', {
-          duration: 5000
-        });
-        this.error = state.error;
+      } else if (state.message) {
+        this.router.navigate(['products']);
       }
     });
   }

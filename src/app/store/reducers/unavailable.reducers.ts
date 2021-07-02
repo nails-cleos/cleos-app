@@ -38,8 +38,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case UnavailableActionTypes.getAllProfessional: {
@@ -49,8 +48,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case UnavailableActionTypes.getRoom: {
@@ -60,8 +58,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case UnavailableActionTypes.unavailableFind: {
@@ -72,8 +69,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case UnavailableActionTypes.unavailableSuccess: {
@@ -83,14 +79,14 @@ export const reducer = (state = initialState, action: All): State => {
         professionals: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null,
-        isLoading: false
+        message: null
       };
     }
     case UnavailableActionTypes.unavailableSaveSuccess: {
       return {
         ...state,
         message: action.payload.message,
+        selected: null,
         errorMessage: null,
         subErrors: null,
         isLoading: false
@@ -102,8 +98,7 @@ export const reducer = (state = initialState, action: All): State => {
         selected: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null,
-        isLoading: false
+        message: null
       };
     }
     case UnavailableActionTypes.unavailableFailure: {
@@ -133,8 +128,7 @@ export const reducer = (state = initialState, action: All): State => {
         room: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null,
-        isLoading: false
+        message: null
       };
     }
     case UnavailableActionTypes.clean: {

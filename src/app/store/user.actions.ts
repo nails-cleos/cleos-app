@@ -2,6 +2,7 @@ import { Action } from '@ngrx/store';
 
 export enum UserActionTypes {
   getAll = '[User] Get all',
+  getAllCustomers = '[User] Get all customers',
   userSuccess = '[User] Success',
   userFailure = '[User] Failure',
   userSelected = '[User] Selected',
@@ -10,6 +11,7 @@ export enum UserActionTypes {
   setRole = '[User] Add role',
   saveUser = '[User] Save',
   updateUser = '[User] Update',
+  updatePhoto = '[User] Update photo',
   userSaveSuccess = '[User] Save Success',
   userDelete = '[User] Delete',
   resendUserToken = '[User] Resend user token',
@@ -23,6 +25,10 @@ export class GetAll implements Action {
 
   constructor(public payload: any) {
   }
+}
+
+export class GetAllCustomers implements Action {
+  readonly type = UserActionTypes.getAllCustomers;
 }
 
 export class UserSuccess implements Action {
@@ -78,6 +84,13 @@ export class UpdateUser implements Action {
   }
 }
 
+export class UpdatePhoto implements Action {
+  readonly type = UserActionTypes.updatePhoto;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class UserSaveSuccess implements Action {
   readonly type = UserActionTypes.userSaveSuccess;
 
@@ -119,6 +132,7 @@ export class Clean implements Action {
 
 export type All =
   | GetAll
+  | GetAllCustomers
   | UserSuccess
   | UserFailure
   | UserSelected
@@ -127,6 +141,7 @@ export type All =
   | SaveUser
   | SetRole
   | UpdateUser
+  | UpdatePhoto
   | UserSaveSuccess
   | DeleteUser
   | ResendToken

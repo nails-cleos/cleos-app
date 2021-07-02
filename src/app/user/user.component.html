@@ -1,7 +1,6 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
-      <mat-progress-bar *ngIf="isLoading" color="accent" mode="indeterminate"></mat-progress-bar>
       <mat-card>
         <mat-card-header>
           <mat-card-title>{{ 'USER.ADD.TITLE' | translate }}</mat-card-title>
@@ -21,7 +20,7 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.ADD.USERNAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input autocomplete="username" formControlName="username" matInput required>
+                  <input [formControl]="username" autocomplete="username" matInput required>
                 </label>
                 <mat-error *ngIf="username.hasError('required')" [innerHTML]="'USER.ADD.USERNAME.REQUIRED' | translate">
                 </mat-error>
@@ -32,7 +31,7 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.ADD.EMAIL.FIELD' | translate }}</mat-label>
                 <label>
-                  <input autocomplete="email" formControlName="email" matInput required>
+                  <input [formControl]="email" autocomplete="email" matInput required>
                 </label>
                 <mat-error *ngIf="email.hasError('email')">
                   {{ 'USER.ADD.EMAIL.VALID' | translate }}
@@ -44,36 +43,10 @@
                 </mat-error>
               </mat-form-field>
               <mat-form-field appearance="fill">
-                <mat-label>{{ 'USER.ADD.FIRST_NAME.FIELD' | translate }}</mat-label>
-                <label>
-                  <input autocomplete="username" formControlName="firstName" matInput required>
-                </label>
-                <mat-error *ngIf="firstName.hasError('required')"
-                           [innerHTML]="'USER.ADD.FIRST_NAME.REQUIRED' | translate">
-                </mat-error>
-                <mat-error *ngIf="errors['firstName']">
-                  {{errors['firstName']}}
-                </mat-error>
-              </mat-form-field>
-              <mat-form-field appearance="fill">
-                <mat-label>{{ 'USER.ADD.LAST_NAME.FIELD' | translate }}</mat-label>
-                <label>
-                  <input autocomplete="username" formControlName="lastName" matInput required>
-                </label>
-                <mat-error *ngIf="lastName.hasError('required')"
-                           [innerHTML]="'USER.ADD.LAST_NAME.REQUIRED' | translate">
-                </mat-error>
-                <mat-error *ngIf="errors['lastName']">
-                  {{errors['lastName']}}
-                </mat-error>
-              </mat-form-field>
-              <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.ADD.LANG.FIELD' | translate }}</mat-label>
                 <span *ngIf="select.value" [class]="'flag-icon  flag-icon-squared flag-icon-' + select.value.icon"
-                      class="margin-right-eight"
-                      matPrefix></span>
+                      class="margin-right-eight" matPrefix></span>
                 <mat-select #select [formControl]="lang" required>
-
                   <mat-option *ngFor="let lang of flagList" [value]="lang">
                     <span [class]="'flag-icon  flag-icon-squared flag-icon-' + lang.icon"></span>
                     {{ 'COMMON.LANG.' + lang.text | translate }}
@@ -82,13 +55,38 @@
                 <mat-error [innerHTML]="'USER.ADD.LANG.REQUIRED' | translate">
                 </mat-error>
               </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>{{ 'USER.ADD.FIRST_NAME.FIELD' | translate }}</mat-label>
+                <label>
+                  <input [formControl]="firstName" autocomplete="given-name" matInput>
+                </label>
+                <mat-error *ngIf="errors['firstName']">{{errors['firstName']}}</mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>{{ 'USER.ADD.LAST_NAME.FIELD' | translate }}</mat-label>
+                <label>
+                  <input [formControl]="lastName" autocomplete="family-name" matInput>
+                </label>
+                <mat-error *ngIf="errors['lastName']">{{errors['lastName']}}</mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>{{ 'USER.ADD.PHONE.FIELD' | translate }}</mat-label>
+                <ngx-mat-intl-tel-input [enablePlaceholder]="true" [enableSearch]="true" [formControl]="phone"
+                                        [preferredCountries]="['ar']" autocomplete="tel"
+                                        name="phone"></ngx-mat-intl-tel-input>
+                <mat-error *ngIf="phone.hasError('validatePhoneNumber')">
+                  {{ 'USER.ADD.PHONE.INVALID' | translate }}
+                </mat-error>
+                <mat-error *ngIf="errors['phone']">{{errors['phone']}}</mat-error>
+              </mat-form-field>
             </div>
           </mat-card-content>
           <mat-card-actions>
             <div fxFlex></div>
             <button [disabled]="form.invalid" color="primary" mat-raised-button
                     type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
-            <button color="accent" mat-raised-button appBackButton>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <button [form]="form" appBackButton color="accent" mat-raised-button
+                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
         </form>
       </mat-card>

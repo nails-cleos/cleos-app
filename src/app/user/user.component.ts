@@ -2,7 +2,6 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../store/app.states';
 import * as fromActionsUser from '../store/user.actions';
@@ -20,7 +19,6 @@ export class UserComponent implements OnInit, OnDestroy {
   form!: FormGroup;
   subscription: Subscription | undefined;
   getState: Observable<any>;
-  isLoading: boolean | undefined;
   errors: any = [];
 
   role: FormControl = new FormControl('', [
@@ -32,27 +30,26 @@ export class UserComponent implements OnInit, OnDestroy {
   email: FormControl = new FormControl('', [
     Validators.required, Validators.email
   ]);
-  firstName: FormControl = new FormControl('', [
-    Validators.required
-  ]);
-  lastName: FormControl = new FormControl('', [
-    Validators.required
-  ]);
   lang: FormControl = new FormControl('', [
     Validators.required
   ]);
+
+  firstName: FormControl = new FormControl();
+  lastName: FormControl = new FormControl();
+  phone: FormControl = new FormControl();
 
   flagList: IFlag[] = flags();
 
   extras: any;
 
-  constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
-              private formBuilder: FormBuilder, private router: Router, private cdRef: ChangeDetectorRef) {
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
+              private router: Router, private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectUserState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
     if (this.extras) {
       this.role.setValue(this.extras.role);
     }
+    console.log("aaaa")
   }
 
   ngOnDestroy(): void {
@@ -76,6 +73,7 @@ export class UserComponent implements OnInit, OnDestroy {
     user.firstName = this.firstName.value;
     user.lang = this.lang.value.value;
     user.lastName = this.lastName.value;
+    user.phone = this.phone.value;
     user.password = 'Ch4ng#';
 
     this.store.dispatch(
@@ -88,9 +86,10 @@ export class UserComponent implements OnInit, OnDestroy {
       role: this.role,
       username: this.username,
       email: this.email,
+      lang: this.lang,
       firstName: this.firstName,
       lastName: this.lastName,
-      lang: this.lang
+      phone: this.phone
     });
   }
 
@@ -107,10 +106,8 @@ export class UserComponent implements OnInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({incorrect: true});
         });
-      } else if (state.errorMessage) {
-        this.snackBar.open(state.errorMessage, 'OK', {
-          duration: 5000
-        });
+      } else if (state.message) {
+        this.router.navigate(['users']);
       }
     });
   }

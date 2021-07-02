@@ -15,7 +15,8 @@ export class UnavailableEffects {
   @Effect()
   getAll$ = this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.getAll)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.unavailableService.getAll(payload.active, payload.direction, payload.page).pipe(
+    switchMap((payload: any) => this.unavailableService.getAll(payload.active, payload.direction, payload.page,
+      payload.size).pipe(
       switchMap((response: any) => of(new fromActionsUnavailable.UnavailableSuccess(response))),
       catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({error: err.error})))
     ))
@@ -99,8 +100,7 @@ export class UnavailableEffects {
 
   @Effect({dispatch: false})
   saveSuccess$ = this.actions$.pipe(
-    ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableSaveSuccess),
-    tap(() => this.router.navigate(['unavailable-list']))
+    ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableSaveSuccess)
   );
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private unavailableService: UnavailableService,

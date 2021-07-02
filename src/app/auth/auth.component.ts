@@ -18,23 +18,28 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getState: Observable<any>;
   subscription: Subscription | undefined;
-  isLoading: any;
   code: string | undefined | null;
+  extras: any;
 
   constructor(private socialService: SocialAuthService, private store: Store<AppState>, private route: ActivatedRoute,
               private snackBar: MatSnackBar, private router: Router) {
     this.getState = this.store.select(selectAuthState);
+    this.extras = this.router.getCurrentNavigation()?.extras.state;
   }
 
   ngOnInit(): void {
+    this.clean();
     this.subscribe();
-    this.code = this.route.snapshot.queryParamMap.get('code');
   }
 
   ngAfterViewInit(): void {
     if (this.code) {
       this.authGroup.selectedIndex = 1;
     }
+  }
+
+  getCode($event: string): void {
+    this.code = $event;
   }
 
   socialSignIn(provider: string): void {
@@ -47,7 +52,12 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.socialService.signIn(id).then(socialUser => {
       this.store.dispatch(
-        new fromActionsLogin.SocialLogin({socialUser, code: this.code, queryParams: this.route.snapshot.queryParams})
+        new fromActionsLogin.SocialLogin({
+          socialUser,
+          code: this.code,
+          queryParams: this.route.snapshot.queryParams,
+          extras: this.extras
+        })
       );
     });
   }
@@ -58,9 +68,8 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe((state) => {
-      this.isLoading = state.isLoading;
       if (state.isAuthenticated) {
-        this.router.navigate(['main']);
+        this.router.navigate(['redirect']);
       }
       if (!state.subErrors && (state.errorMessage || state.message)) {
         const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
@@ -69,7 +78,6 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
         if (state.message) {
           snackBarRef.afterDismissed().subscribe(() => {
             this.clean();
-            location.reload();
           });
         }
       }

@@ -14,7 +14,8 @@ export class ProductEffects {
   @Effect()
   getAll$ = this.actions$.pipe(ofType(fromActionsProduct.ProductActionTypes.getAll)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.productService.getAll(payload.active, payload.direction, payload.page).pipe(
+    switchMap((payload: any) => this.productService.getAll(payload.active, payload.direction, payload.page,
+      payload.size).pipe(
       switchMap((response: any) => of(new fromActionsProduct.ProductSuccess(response))),
       catchError((err: HttpErrorResponse) => of(new fromActionsProduct.ProductFailure({error: err.error})))
     ))
@@ -65,7 +66,7 @@ export class ProductEffects {
   @Effect({dispatch: false})
   selectedData$ = this.actions$.pipe(
     ofType(fromActionsProduct.ProductActionTypes.productSelected),
-    tap((data: any) => this.router.navigate(['product', data.payload.id]))
+    tap((data: any) => this.router.navigate(['products', data.payload.id]))
   );
 
   @Effect({dispatch: false})
@@ -75,8 +76,7 @@ export class ProductEffects {
 
   @Effect({dispatch: false})
   saveSuccess$ = this.actions$.pipe(
-    ofType(fromActionsProduct.ProductActionTypes.productSaveSuccess),
-    tap(() => this.router.navigate(['products']))
+    ofType(fromActionsProduct.ProductActionTypes.productSaveSuccess)
   );
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private productService: ProductService,

@@ -2,6 +2,7 @@
   "COMMON": {
     "BUTTON": {
       "BACK": "Back",
+      "RETRY": "Retry",
       "NEXT": "Next",
       "PREVIOUS": "Previous",
       "TODAY": "Today",
@@ -18,7 +19,15 @@
       "EDIT": "Edit",
       "DELETE": "Delete",
       "INVITE": "Send invite",
-      "CLOSE": "Close"
+      "CLOSE": "Close",
+      "COPY": "Copy",
+      "SHARE": "Share",
+      "COMPLETE": "Complete",
+      "DISCOUNT": {
+        "SHOW": "Show discounts",
+        "HIDE": "Hide discounts",
+        "SEND": "Send discount"
+      }
     },
     "COLUMN": {
       "ACTIONS": "Actions"
@@ -54,6 +63,14 @@
       "INVALID": "Address is invalid",
       "DESCRIPTION": "Description"
     },
+    "DISCOUNT": {
+      "MONEY": "Money",
+      "PERCENTAGE": "Percentage"
+    },
+    "BACK": {
+      "TITLE": "You are about to go back",
+      "CONTENT": "You have changes on this page, if you go back, you will lose your changes. Are you sure to back off?"
+    },
     "ERROR": {
       "NO_CONTENT": "No content"
     }
@@ -63,6 +80,7 @@
     "CHANGE_PASSWORD": "Change password",
     "SIGN_OUT": "Sign out",
     "SIGN_IN": "Sign In",
+    "HOME": "Home",
     "MINI_CARD": {
       "DURATION": "since last month",
       "TOTAL_PRODUCT_SALES": "Total Product Sales",
@@ -75,7 +93,11 @@
         "ANNUAL": "Reservations",
         "CUSTOMER": "Customers",
         "QUANTITY": "Quantity",
-        "LAST_MONTH": "Last month"
+        "LAST_MONTH": "Last month",
+        "MIN": "Minimum",
+        "MAX": "Maximum",
+        "AVG": "Average",
+        "ESTIMATE": "Estimate"
       },
       "QUANTITY_PRODUCT": "Quantity Product",
       "PRODUCT_RESERVATION": "Product Reservation",
@@ -83,6 +105,8 @@
       "YEARLY_PRODUCT_PRICE": "Yearly products price",
       "CUSTOMER_RESERVATION": "Customer Reservation",
       "LAST_MONTH_RESERVATION": "Last Month Reservations",
+      "TRACKING_AVERAGE": "Real product time",
+      "TRACKING_COMPARE": "Time real/estimated",
       "RESERVATION": "Reservations",
       "EXPAND": "Expand"
     }
@@ -132,12 +156,17 @@
         "MUST_MATCH": "Password and confirm password must match"
       },
       "FIRST_NAME": {
-        "FIELD": "First name",
-        "REQUIRED": "First name is <b>required</b>"
+        "FIELD": "First name"
       },
       "LAST_NAME": {
-        "FIELD": "Last name",
-        "REQUIRED": "Last name is <b>required</b>"
+        "FIELD": "Last name"
+      },
+      "PHONE": {
+        "FIELD": "Phone",
+        "INVALID": "Invalid phone number"
+      },
+      "CODE": {
+        "FIELD": "Referral code"
       },
       "OR": "Or sign up with email",
       "SUCCESS": "User {{username}} created. Check your email {{email}}",
@@ -220,12 +249,14 @@
         "REQUIRED": "Password is <b>required</b>"
       },
       "FIRST_NAME": {
-        "FIELD": "First name",
-        "REQUIRED": "First name is <b>required</b>"
+        "FIELD": "First name"
       },
       "LAST_NAME": {
-        "FIELD": "Last name",
-        "REQUIRED": "Last name is <b>required</b>"
+        "FIELD": "Last name"
+      },
+      "PHONE": {
+        "FIELD": "Phone",
+        "INVALID": "Invalid phone number"
       },
       "LANG": {
         "FIELD": "Language",
@@ -250,21 +281,23 @@
         "REQUIRED": "Password is <b>required</b>"
       },
       "FIRST_NAME": {
-        "FIELD": "First name",
-        "REQUIRED": "First name is <b>required</b>"
+        "FIELD": "First name"
       },
       "LAST_NAME": {
-        "FIELD": "Last name",
-        "REQUIRED": "Last name is <b>required</b>"
+        "FIELD": "Last name"
       },
       "LANG": {
         "FIELD": "Language",
         "REQUIRED": "Language is <b>required</b>"
+      },
+      "PHONE": {
+        "FIELD": "Phone",
+        "INVALID": "Invalid phone number"
       }
     },
     "DELETED": {
       "TITLE": "Delete user",
-      "CONTENT": "Are you sure to delete user {{firstName}} {{lastName}}?",
+      "CONTENT": "Are you sure to delete user {{username}}?",
       "MESSAGE": "User {{username}} deleted"
     },
     "UPDATED": {
@@ -272,7 +305,7 @@
     },
     "ACTIVATION_RESEND": {
       "TITLE": "Resend activation code",
-      "CONTENT": "Are you sure to resend activation code to user {{firstName}} {{lastName}}?",
+      "CONTENT": "Are you sure to resend activation code to user {{username}}?",
       "MESSAGE": "Activation code sent"
     },
     "CHANGE_PASSWORD": {
@@ -314,19 +347,22 @@
       "FIELD": "Username"
     },
     "FIRST_NAME": {
-      "FIELD": "First name",
-      "REQUIRED": "First name is <b>required</b>"
+      "FIELD": "First name"
     },
     "LAST_NAME": {
-      "FIELD": "Last name",
-      "REQUIRED": "Last name is <b>required</b>"
+      "FIELD": "Last name"
     },
     "LANG": {
       "FIELD": "Language",
       "REQUIRED": "Language is <b>required</b>"
     },
+    "PHONE": {
+      "FIELD": "Phone",
+      "INVALID": "Invalid phone number"
+    },
     "UPDATED": {
-      "MESSAGE": "User {{username}} updated"
+      "MESSAGE": "User {{username}} updated",
+      "PHOTO": "Profile picture updated"
     }
   },
   "PRODUCT": {
@@ -405,6 +441,10 @@
       "DESCRIPTION": {
         "FIELD": "Description"
       },
+      "SHOW": {
+        "HOME": "Show in home",
+        "CATALOG": "Show in catalog"
+      },
       "FILE": {
         "DRAG_DROP": "Drag and drop file here",
         "OR": "or",
@@ -469,7 +509,8 @@
       "PROFESSIONAL": {
         "FIELD": "Professional",
         "REQUIRED": "Professional is <b>required</b>",
-        "INVALID": "Professional is invalid"
+        "INVALID": "Professional is invalid",
+        "ADD_BUTTON": "Add professional"
       },
       "AVAILABILITY": {
         "FIELD": "Availability",
@@ -680,7 +721,30 @@
         "TITLE": "Product",
         "NAME": "Name",
         "DURATION": "Duration",
-        "PRICE": "Price"
+        "PRICE": "Price",
+        "EXTRAS": {
+          "TITLE": "Extras",
+          "DESCRIPTION": "Description",
+          "PRICE": "Price",
+          "TOTAL": "Total"
+        },
+        "COMPLETE": {
+          "TITLE": "Product",
+          "INVALID": "Product is invalid",
+          "EXTRAS": {
+            "TITLE": "Extras",
+            "DESCRIPTION": {
+              "FIELD": "Description"
+            },
+            "PRICE": {
+              "FIELD": "Price"
+            }
+          },
+          "DESCRIPTION": "<span class='bold'>Description:</span> {{description}}",
+          "TOTAL": "<span class='bold'>Total:</span>",
+          "DURATION": "<span class='bold'>Duration:</span> {{duration}}",
+          "DURABILITY": "<span class='bold'>Durability:</span> {{durability}}"
+        }
       },
       "APPOINTMENT": "Appointment",
       "HISTORY": {
@@ -706,7 +770,9 @@
         "EDIT": "Edit",
         "START": "Start",
         "COMPLETE": "Complete",
-        "CANCEL": "Cancel"
+        "CANCEL": "Cancel",
+        "BOOK": "Book again",
+        "SEND": "Send Whatsapp"
       },
       "CHANGE_STATE": {
         "TITLE": "Change state",
@@ -715,7 +781,8 @@
           "EDIT": "edit the appointment",
           "START": "start the appointment",
           "COMPLETE": "complete the appointment",
-          "CANCEL": "cancel the reservation"
+          "CANCEL": "cancel the reservation",
+          "BOOK": "book again"
         },
         "CONTENT": "Are you sure to {{action}}?"
       }
@@ -727,6 +794,11 @@
         "START": "Start",
         "STATE": "State",
         "PRODUCT": "Product"
+      },
+      "CANCEL": {
+        "TITLE": "Cancel reservation",
+        "CONTENT": "Are you sure to cancel reservation {{date}}?",
+        "MESSAGE": "Reservation {{date}} cancelled"
       },
       "ERROR": {
         "NO_CONTENT": "No reservations"
@@ -746,6 +818,93 @@
       "STARTED": "Started",
       "COMPLETED": "Completed",
       "CANCELLED": "Cancelled"
+    },
+    "CUSTOMER": {
+      "UPCOMING": {
+        "TITLE": "Upcoming Reservation",
+        "START": "Start",
+        "END": "End",
+        "ROOM": "Room",
+        "ADDRESS": "Address",
+        "PRODUCT": "Product",
+        "PRICE": "Price",
+        "CREATED": "Reservation must be approved by: "
+      },
+      "NO_UPCOMING": {
+        "TITLE": "No upcoming reservations"
+      },
+      "ADD": {
+        "ROOM": {
+          "FIELD": "Room",
+          "REQUIRED": "Room is <b>required</b>",
+          "INVALID": "Room is invalid",
+          "DETAIL": "Detail",
+          "ADDRESS": {
+            "NAME": "<span class='bold'>Address:</span> {{name}}",
+            "DESCRIPTION": "<span class='bold'>Description:</span> {{description}}",
+            "DISTANCE": {
+              "KM": "<span class='bold'>Distance:</span> {{distance}} Kilometers",
+              "M": "<span class='bold'>Distance:</span> {{distance}} Meters"
+            }
+          },
+          "PROFESSIONAL": {
+            "NAME": "<span class='bold'>Professional:</span> {{name}}"
+          }
+        },
+        "PRODUCT": {
+          "FIELD": "Product",
+          "REQUIRED": "Product is <b>required</b>",
+          "INVALID": "Product is invalid",
+          "DETAIL": "Detail",
+          "DESCRIPTION": "<span class='bold'>Description:</span> {{description}}",
+          "PRICE": "<span class='bold'>Price:</span>",
+          "DURATION": "<span class='bold'>Duration:</span> {{duration}}",
+          "DURABILITY": "<span class='bold'>Durability:</span> {{durability}}",
+          "DISCOUNT": {
+            "FIELD": "Discount",
+            "ADD": "With discount"
+          }
+        },
+        "DATE": {
+          "FIELD": "Pick a date",
+          "REQUIRED": "Date is <b>required</b>"
+        },
+        "SCHEDULE": {
+          "FIELD": "Book an appointment",
+          "REQUIRED": "Book an appointment is <b>required</b>"
+        },
+        "PREVIEW": {
+          "TITLE": "Preview",
+          "ROOM": {
+            "TITLE": "Room",
+            "NAME": "Name",
+            "PROFESSIONAL": "Professional",
+            "ADDRESS": "Address"
+          },
+          "PRODUCT": {
+            "TITLE": "Product",
+            "NAME": "Name",
+            "DURATION": "Duration",
+            "PRICE": "Price"
+          },
+          "APPOINTMENT": "Appointment"
+        },
+        "UPCOMING": {
+          "ERROR": "Customer already has a reservation on {{date}}"
+        },
+        "NO_CONTENT": "No availability on <span class='bold'>{{date}}</span>"
+      }
+    },
+    "SEARCH": {
+      "TITLE": "Search",
+      "CUSTOMER": {
+        "FIELD": "Find by customer",
+        "PLACEHOLDER": "Customer"
+      },
+      "STATES": {
+        "FIELD": "Find by states",
+        "PLACEHOLDER": "State"
+      }
     }
   },
   "NOTIFICATION": {
@@ -820,6 +979,145 @@
     },
     "UPDATED": {
       "MESSAGE": "Unavailable {{date}} updated"
+    }
+  },
+  "REFERRAL": {
+    "TITLE": "Referrals",
+    "MESSAGE": "Referral Cleos to your friends and get incredible discounts",
+    "DETAIL": "You will get discounts once your friend creates an account with your code and attends an appointment",
+    "COPY": "Code copied",
+    "LINK": "Create your Cleos account. I recommend it! \uD83D\uDE0D\n\nIf you use my code {{code}} or enter here {{url}}, save on your first reservation. Take advantage of!",
+    "INVITE": {
+      "TITLE": "Invites",
+      "SEND": "Received your invitation",
+      "USED": "Attended to an appointment"
+    }
+  },
+  "DISCOUNT": {
+    "LIST": {
+      "COLUMN": {
+        "NAME": "Name",
+        "DESCRIPTION": "Description",
+        "TYPE": "Type",
+        "AMOUNT": "Amount",
+        "USED": "Used"
+      },
+      "DIALOG": {
+        "CUSTOMER": "Customers"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No discounts"
+      }
+    },
+    "ADD": {
+      "TITLE": "Add discount",
+      "NAME": {
+        "FIELD": "Name",
+        "REQUIRED": "Name is <b>required</b>"
+      },
+      "DESCRIPTION": {
+        "FIELD": "Description"
+      },
+      "AMOUNT": {
+        "FIELD": "Amount",
+        "REQUIRED": "Amount is <b>required</b>",
+        "GREATER": "Amount must be greater than 1"
+      },
+      "TYPE": {
+        "FIELD": "Type",
+        "REQUIRED": "Type is <b>required</b>"
+      },
+      "SEND": "Discount {{name}} send it",
+      "CREATED": "Discount {{name}} created"
+    },
+    "DETAIL": {
+      "TITLE": "Update discount",
+      "NAME": {
+        "FIELD": "Name",
+        "REQUIRED": "Name is <b>required</b>"
+      },
+      "DESCRIPTION": {
+        "FIELD": "Description"
+      },
+      "AMOUNT": {
+        "FIELD": "Amount",
+        "REQUIRED": "Amount is <b>required</b>",
+        "GREATER": "Amount must be greater than 1"
+      },
+      "TYPE": {
+        "FIELD": "Type",
+        "REQUIRED": "Type is <b>required</b>"
+      }
+    },
+    "DELETED": {
+      "TITLE": "Delete discount",
+      "CONTENT": "Are you sure to delete discount {{name}}?",
+      "MESSAGE": "Discount {{name}} deleted"
+    },
+    "UPDATED": {
+      "MESSAGE": "Discount {{name}} updated"
+    }
+  },
+  "WHATSAPP": {
+    "SEND": {
+      "APPROVE": "♡ \uD83C\uDD48\uD83C\uDD3E\uD83C\uDD44\uD83C\uDD41 \uD83C\uDD3D\uD83C\uDD34\uD83C\uDD47\uD83C\uDD43 \uD83C\uDD42\uD83C\uDD34\uD83C\uDD41\uD83C\uDD45\uD83C\uDD38\uD83C\uDD32\uD83C\uDD34:%0A♡ {{date}}"
+    }
+  },
+  "MAIN": {
+    "LEGALS": "© 2021 - CLEOS - All rights reserved.",
+    "SECTION": {
+      "STORY": "Story",
+      "PRODUCT": "Products",
+      "BOOK": "Book",
+      "CONTACT": "Contact",
+      "CATALOG": "Catalogs",
+      "ACCOUNT": "My account",
+      "AUTH": "Login",
+      "PRIVACY": "Privacy",
+      "TERM_AND_CONDITIONS": "Term and conditions"
+    },
+    "STORY_DETAIL": "dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna\n      aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl\n      ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie\n      consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui\n      blandit\n      praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis\n      eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum.",
+    "BOOK": {
+      "DATE": {
+        "FIELD": "Pick a date"
+      },
+      "PRODUCT": {
+        "FIELD": "Product",
+        "INVALID": "Product is invalid"
+      }
+    },
+    "CONTACT": {
+      "TITLE": "Contact us",
+      "ADDRESS": "San Martín 64 - 08 - Villa Carlos Paz, Córdoba, Argentina",
+      "PHONE": "+54 (351) 758-1773",
+      "MAIL": "espacio.cleos@gmail.com",
+      "SEND": {
+        "TITLE": "Have any questions? We would love to hear about you",
+        "MESSAGE": "Your message was sending successfully"
+      },
+      "NAME": {
+        "FIELD": "Your name",
+        "REQUIRED": "Your name is required"
+      },
+      "EMAIL": {
+        "FIELD": "Your email",
+        "REQUIRED": "Your email is required",
+        "INVALID": "Email is invalid"
+      },
+      "SUBJECT": {
+        "FIELD": "Subject",
+        "REQUIRED": "Subject is required"
+      },
+      "BODY": {
+        "FIELD": "Message",
+        "REQUIRED": "Message is required"
+      }
+    }
+  },
+  "CARD": {
+    "PRODUCT": {
+      "DURATION": "<span class='bold'>Duration:</span> {{duration}}",
+      "DURABILITY": "<span class='bold'>Durability:</span> {{durability}}"
     }
   },
   "APP": {

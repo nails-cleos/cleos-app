@@ -1,14 +1,14 @@
 import { AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { IUser, User } from '../../interfaces/user';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
 import * as fromActionsUser from '../../store/user.actions';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { fieldChange, valueChange } from '../../util/validators';
 import { findFlag, flags, IFlag } from '../../util/flags';
+import { getUserName } from '../../util/helper';
 
 @Component({
   selector: 'app-user-detail',
@@ -27,22 +27,23 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   email: FormControl = new FormControl('', [
     Validators.required, Validators.email
   ]);
-  firstName: FormControl = new FormControl('', [
-    Validators.required
-  ]);
-  lastName: FormControl = new FormControl('', [
-    Validators.required
-  ]);
   langValue: FormControl = new FormControl('', [
     Validators.required
   ]);
 
-  flagList: IFlag[] = flags();
-  error: any;
+  firstName: FormControl = new FormControl();
+  lastName: FormControl = new FormControl();
+  phone: FormControl = new FormControl();
 
-  constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
-              private formBuilder: FormBuilder, private cdRef: ChangeDetectorRef) {
+  flagList: IFlag[] = flags();
+
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
+              private cdRef: ChangeDetectorRef, private router: Router) {
     this.getState = this.store.select(selectUserState);
+  }
+
+  get userName(): string {
+    return this.user ? getUserName(this.user) : '';
   }
 
   ngOnInit(): void {
@@ -71,6 +72,7 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     user.firstName = fieldChange(this.firstName, this.user?.firstName);
     user.lastName = fieldChange(this.lastName, this.user?.lastName);
     user.lang = valueChange(this.langValue.value.value, this.user?.lang);
+    user.phone = fieldChange(this.phone, this.user?.phone);
 
     this.store.dispatch(new fromActionsUser.SaveUser({user}));
   }
@@ -79,9 +81,10 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     this.form = this.formBuilder.group({
       username: this.username,
       email: this.email,
+      langValue: this.langValue,
       firstName: this.firstName,
       lastName: this.lastName,
-      langValue: this.langValue
+      phone: this.phone
     });
   }
 
@@ -99,11 +102,8 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
         this.langValue.setValue(findFlag(this.flagList, state.selected.lang));
         this.cdRef.detectChanges();
       }
-      if (state.errorMessage) {
-        this.snackBar.open(state.errorMessage, 'OK', {
-          duration: 5000
-        });
-        this.error = state.error;
+      if (state.message) {
+        this.router.navigate(['users']);
       }
     });
   }

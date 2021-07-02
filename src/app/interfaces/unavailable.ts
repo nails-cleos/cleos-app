@@ -1,5 +1,11 @@
 import { IUser } from './user';
 
+export enum UnavailableRepeatType {
+  none = 'NONE',
+  onceAWeek = 'ONCE_A_WEEK',
+  everyDay = 'EVERY_DAY'
+}
+
 export interface IUnavailable {
   id?: string;
   description?: string;
@@ -25,5 +31,3 @@ export class Unavailable implements IUnavailable {
   constructor() {
   }
 }
-
-export const PAGE_SIZE = 10;

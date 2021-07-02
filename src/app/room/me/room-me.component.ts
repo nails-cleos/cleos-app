@@ -1,13 +1,22 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { AvailabilityDate, IAddress, IAvailability, IAvailabilityDate, ILocation, IRoom, Room } from '../../interfaces/room';
+import {
+  AvailabilityDate,
+  IAddress,
+  IAvailability,
+  IAvailabilityDate,
+  ILocation,
+  IRoom,
+  IRoomAll
+} from '../../interfaces/room';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { IconName, IIcon } from '../room.component';
 import { ActivatedRoute } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../store/app.states';
 import * as fromActionsRoom from '../../store/room.actions';
+import { createDate } from '../../util/dates';
+import { getUserName } from '../../util/helper';
 
 @Component({
   selector: 'app-room-me',
@@ -15,12 +24,11 @@ import * as fromActionsRoom from '../../store/room.actions';
   styleUrls: ['./room-me.component.scss']
 })
 export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
-  @Input() room: IRoom | undefined;
+  @Input() room: IRoomAll | undefined;
   getState: Observable<any>;
   subscription: Subscription | undefined;
   errors: any = [];
   professionalName: string | undefined;
-  error: any;
 
   step = 0;
   icons: IIcon = {
@@ -40,15 +48,14 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   ]);
   addressDescription: FormControl = new FormControl();
 
-  constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
-              private formBuilder: FormBuilder) {
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder) {
     this.getState = this.store.select(selectRoomState);
   }
 
   private static createAv(date: string | undefined): Date | undefined {
     if (date) {
       const startTime = date.split(':');
-      return new Date(new Date().setHours(Number(startTime[0]), Number(startTime[1])));
+      return createDate(Number(startTime[0]), Number(startTime[1]));
     }
     return undefined;
   }
@@ -74,22 +81,30 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.validate()) {
       return;
     }
-    const room: IRoom = new Room();
-    room.id = this.room?.id;
-    room.availabilities = this.availabilities;
-    const location = this.address.value.geometry.location;
-    room.address = {
-      name: this.address.value.formatted_address,
-      description: this.addressDescription.value,
-      location : {
-        x: location.lng(),
-        y: location.lat()
-      } as ILocation
-    } as IAddress;
+    if (this.room) {
+      const room: IRoom = {
+        id: this.room.id,
+        availabilities: this.availabilities,
+        address: {
+          name: this.room.address.name,
+          location: this.room.address.location,
+          description: this.addressDescription.value
+        } as IAddress,
+        professional: this.room.professional
+      };
 
-    this.store.dispatch(new fromActionsRoom.RoomUpdateMe(room));
-    this.room = undefined;
-    this.availabilities = [];
+      if (this.address.value && this.address.value.geometry && room.address) {
+        const location = this.address.value.geometry.location;
+        room.address.name = this.address.value.formatted_address;
+        room.address.location = {
+          x: location.lng(),
+          y: location.lat()
+        } as ILocation;
+      }
+
+      this.store.dispatch(new fromActionsRoom.RoomUpdate(room));
+      this.availabilities = [];
+    }
   }
 
   ignore(day: string, step: number): void {
@@ -164,26 +179,17 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
           id: state.selected.id,
           name: state.selected.name,
           address: state.selected.address
-        } as IRoom;
+        } as IRoomAll;
         this.addressDescription.setValue(this.room.address?.description);
-        this.professionalName = `${state.selected.professional.firstName} ${state.selected.professional.lastName}`;
+        this.professionalName = getUserName(state.selected.professional);
         this.getAvailabilities(state.selected.availabilities);
       }
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
         });
-      } else if (state.errorMessage || state.message) {
-        const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
-        });
-        if (state.message) {
-          snackBarRef.afterDismissed().subscribe(() => {
-            this.getRoom();
-          });
-        } else {
-          this.error = state.error;
-        }
+      } else if (state.message) {
+        this.getRoom();
       }
     });
   }

@@ -15,7 +15,7 @@
       <th *matHeaderCellDef mat-header-cell>{{ 'RESERVATION.PAGE.COLUMN.CUSTOMER' | translate }}</th>
       <td *matCellDef="let reservation" mat-cell>
         <div
-          *ngIf="reservation.id; else skeleton">{{reservation.customer.firstName}} {{reservation.customer.lastName}}</div>
+          *ngIf="reservation.id; else skeleton">{{getUsername(reservation.customer)}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
@@ -27,7 +27,7 @@
           mat-header-cell>{{ 'RESERVATION.PAGE.COLUMN.PROFESSIONAL' | translate }}</th>
       <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
         <div
-          *ngIf="reservation.id; else skeleton">{{reservation.room.professional.firstName}} {{reservation.room.professional.lastName}}</div>
+          *ngIf="reservation.id; else skeleton">{{getUsername(reservation.room.professional)}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>

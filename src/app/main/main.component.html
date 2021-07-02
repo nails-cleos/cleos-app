@@ -1,1 +1,96 @@
-<!--<a href="https://api.whatsapp.com/send?text=https://cleos.herokuapp.com/auth?code=1243" target="_blank">WA</a>-->
+<mat-toolbar class="position-fixed" color="primary">
+  <img alt="logo" mat-card-avatar src="../../assets/icons/icon-512x512.png">
+  <span>{{title}}</span>
+  <span class="mat-spacer"></span>
+  <span *ngIf="(isHandset$ | async) === false; else menuButton">
+    <button (click)="onNavigation('story')" color="accent" mat-button type="button">
+      <span>{{'MAIN.SECTION.STORY' | translate }}</span>
+    </button>
+    <button (click)="onNavigation('product')" color="accent" mat-button type="button">
+      <span>{{'MAIN.SECTION.PRODUCT' | translate }}</span>
+    </button>
+    <button (click)="onNavigation('book')" color="accent" mat-button type="button">
+      <span>{{'MAIN.SECTION.BOOK' | translate }}</span>
+    </button>
+    <button (click)="onNavigation('contact')" color="accent" mat-button type="button">
+      <span>{{'MAIN.SECTION.CONTACT' | translate }}</span>
+    </button>
+    <button [routerLinkActive]="['active']" [routerLink]="'/main/catalogs'" color="accent" mat-button type="button">
+      <span>{{'MAIN.SECTION.CATALOG' | translate }}</span>
+    </button>
+    <button *ngIf="isAuthenticated; else login" [routerLinkActive]="['active']" [routerLink]="'/redirect'"
+            color="accent"
+            mat-button type="button">
+      <span>{{'MAIN.SECTION.ACCOUNT' | translate }}</span>
+    </button>
+    <ng-template #login>
+      <button [routerLinkActive]="['active']" [routerLink]="'/auth'" color="accent" mat-button type="button">
+        <span>{{'MAIN.SECTION.AUTH' | translate }}</span>
+      </button>
+    </ng-template>
+  </span>
+  <ng-template #menuButton>
+    <button [matMenuTriggerFor]="menuLogged" color="accent" mat-icon-button>
+      <mat-icon>menu</mat-icon>
+    </button>
+    <mat-menu #menuLogged="matMenu">
+      <mat-nav-list>
+        <a (click)="onNavigation('story')" mat-list-item>
+          <mat-icon mat-list-icon>auto_stories</mat-icon>
+          <div mat-line>{{'MAIN.SECTION.STORY' | translate }}</div>
+        </a>
+        <mat-divider></mat-divider>
+        <a (click)="onNavigation('product')" mat-list-item>
+          <mat-icon mat-list-icon>home_repair_service</mat-icon>
+          <div mat-line>{{'MAIN.SECTION.PRODUCT' | translate }}</div>
+        </a>
+        <mat-divider></mat-divider>
+        <a (click)="onNavigation('book')" mat-list-item>
+          <mat-icon mat-list-icon>book_online</mat-icon>
+          <div mat-line>{{'MAIN.SECTION.BOOK' | translate }}</div>
+        </a>
+        <mat-divider></mat-divider>
+        <a (click)="onNavigation('contact')" mat-list-item>
+          <mat-icon mat-list-icon>contact_page</mat-icon>
+          <div mat-line>{{'MAIN.SECTION.CONTACT' | translate }}</div>
+        </a>
+        <mat-divider></mat-divider>
+        <a [routerLink]="'/main/catalogs'" mat-list-item>
+          <mat-icon mat-list-icon>collections</mat-icon>
+          <div mat-line>{{'MAIN.SECTION.CATALOG' | translate }}</div>
+        </a>
+        <mat-divider></mat-divider>
+        <a *ngIf="isAuthenticated; else login" [routerLinkActive]="['active']" [routerLink]="'/redirect'" mat-list-item>
+          <mat-icon mat-list-icon>person_pin</mat-icon>
+          <div mat-line>{{'MAIN.SECTION.ACCOUNT' | translate }}</div>
+        </a>
+        <ng-template #login>
+          <a [routerLink]="'/auth'" mat-list-item>
+            <mat-icon mat-list-icon>login</mat-icon>
+            <div mat-line>{{'MAIN.SECTION.AUTH' | translate }}</div>
+          </a>
+        </ng-template>
+      </mat-nav-list>
+    </mat-menu>
+  </ng-template>
+</mat-toolbar>
+<router-outlet></router-outlet>
+<mat-toolbar color="accent">
+  <mat-toolbar-row>
+        <span style="margin: auto;">
+          <button [routerLinkActive]="['active']" [routerLink]="'/main/privacy'" mat-button>
+            <span>{{'MAIN.SECTION.PRIVACY' | translate }}</span>
+          </button>
+          <button [routerLinkActive]="['active']" [routerLink]="'/main/term-and-conditions'" mat-button>
+            <span>{{'MAIN.SECTION.TERM_AND_CONDITIONS' | translate }}</span>
+          </button>
+          <button (click)="onNavigation('contact')" mat-button>
+            <span>{{'MAIN.SECTION.CONTACT' | translate }}</span>
+          </button>
+        </span>
+  </mat-toolbar-row>
+  <mat-toolbar-row>
+    <span style="margin: auto; font-size: small">{{'MAIN.LEGALS' | translate}}</span>
+  </mat-toolbar-row>
+</mat-toolbar>
+

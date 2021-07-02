@@ -1,96 +1,92 @@
-<div *ngIf="!error; else errorBox">
-  <div *ngIf="!isLoading; else box" class="scroll-container" #scrollContainer>
-    <div class="divider">
-      <div [ngSwitch]="selectView">
-        <div *ngSwitchCase="'WEEK'">
-          <button (viewDateChange)="previousWeek()" [(viewDate)]="viewDate" [disabled]="!days" [view]="calendarView"
-                  color="accent" mat-raised-button mwlCalendarPreviousView>
-            <mat-icon>navigate_before</mat-icon>
-            {{'COMMON.BUTTON.PREVIOUS' | translate}}
-          </button>
-          <button (viewDateChange)="today()" [(viewDate)]="viewDate" color="primary"
-                  mat-raised-button mwlCalendarToday>
-            <mat-icon>today</mat-icon>
-            {{'COMMON.BUTTON.TODAY' | translate}}
-          </button>
-          <button (viewDateChange)="nextWeek()" [(viewDate)]="viewDate" [disabled]="days >= 42" [view]="calendarView"
-                  color="accent" mat-raised-button mwlCalendarNextView>
-            {{'COMMON.BUTTON.NEXT' | translate}}
-            <mat-icon>navigate_next</mat-icon>
-          </button>
-          <div fxFlex></div>
-          <button color="accent" mat-raised-button routerLink="/reservation">
-            <mat-icon>add</mat-icon>
-            {{ 'COMMON.BUTTON.ADD' | translate }}
-          </button>
-        </div>
-        <div *ngSwitchCase="'DAY'">
-          <button (viewDateChange)="previousDay()" [(viewDate)]="viewDate" [disabled]="!days" [view]="calendarView"
-                  color="accent" mat-mini-fab mwlCalendarPreviousView>
-            <mat-icon>navigate_before</mat-icon>
-          </button>
-          <button (viewDateChange)="today()" [(viewDate)]="viewDate" color="primary" mat-mini-fab mwlCalendarToday>
-            <mat-icon>today</mat-icon>
-          </button>
-          <button (viewDateChange)="nextDay()" [(viewDate)]="viewDate" [disabled]="days >= 42" [view]="calendarView"
-                  color="accent" mat-mini-fab mwlCalendarNextView>
-            <mat-icon>navigate_next</mat-icon>
-          </button>
-          <div fxFlex></div>
-          <button color="accent" mat-mini-fab routerLink="/reservation">
-            <mat-icon>add</mat-icon>
-          </button>
-        </div>
+<div *ngIf="data && data.length && calendar && calendar.size; else errorBox" class="scroll-container">
+  <div class="divider">
+    <div [ngSwitch]="selectView">
+      <div *ngSwitchCase="'WEEK'">
+        <button (viewDateChange)="previousWeek()" [(viewDate)]="viewDate" [disabled]="!days" [view]="calendarView"
+                color="accent" mat-raised-button mwlCalendarPreviousView>
+          <mat-icon>navigate_before</mat-icon>
+          {{'COMMON.BUTTON.PREVIOUS' | translate}}
+        </button>
+        <button (viewDateChange)="today()" [(viewDate)]="viewDate" color="primary"
+                mat-raised-button mwlCalendarToday>
+          <mat-icon>today</mat-icon>
+          {{'COMMON.BUTTON.TODAY' | translate}}
+        </button>
+        <button (viewDateChange)="nextWeek()" [(viewDate)]="viewDate" [disabled]="days >= 42" [view]="calendarView"
+                color="accent" mat-raised-button mwlCalendarNextView>
+          {{'COMMON.BUTTON.NEXT' | translate}}
+          <mat-icon>navigate_next</mat-icon>
+        </button>
+        <div fxFlex></div>
+        <button color="accent" mat-raised-button routerLink="/reservation">
+          <mat-icon>book_online</mat-icon>
+          {{ 'COMMON.BUTTON.BOOK' | translate }}
+        </button>
       </div>
-
-    </div>
-    <div class="divider">
-      <mat-accordion>
-        <mat-expansion-panel *ngFor="let rr of data; let i = index"
-                             [expanded]="professionalId === rr.room.professional.id || i === 0">
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              <p class="bold">{{rr.room.name}}</p>
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <div [ngSwitch]="selectView">
-            <div *ngSwitchCase="'WEEK'">
-              <mwl-calendar-week-view
-                (eventClicked)="view($event.event)"
-                (hourSegmentClicked)="segmentClick($event.date, rr.room)"
-                [dayEndHour]="calendar.get(rr.room.id)!.day!.dayEndHour"
-                [dayEndMinute]="calendar.get(rr.room.id)!.day!.dayEndMinute"
-                [dayStartHour]="calendar.get(rr.room.id)!.day!.dayStartHour"
-                [dayStartMinute]="calendar.get(rr.room.id)!.day!.dayStartMinute"
-                [daysInWeek]="daysInWeek"
-                [events]="calendar.get(rr.room.id)!.events"
-                [hourSegments]="hourSegments"
-                [locale]="locale"
-                [viewDate]="viewDate"></mwl-calendar-week-view>
-            </div>
-            <div *ngSwitchCase="'DAY'">
-              <h3>{{ viewDate | calendarDate:(calendarView + 'ViewTitle'):locale }}</h3>
-              <mwl-calendar-day-view
-                (eventClicked)="view($event.event)"
-                (hourSegmentClicked)="segmentClick($event.date, rr.room)"
-                [dayEndHour]="calendar.get(rr.room.id)!.day!.dayEndHour"
-                [dayEndMinute]="calendar.get(rr.room.id)!.day!.dayEndMinute"
-                [dayStartHour]="calendar.get(rr.room.id)!.day!.dayStartHour"
-                [dayStartMinute]="calendar.get(rr.room.id)!.day!.dayStartMinute"
-                [events]="calendar.get(rr.room.id)!.events"
-                [hourSegments]="hourSegments"
-                [locale]="locale"
-                [viewDate]="viewDate"></mwl-calendar-day-view>
-            </div>
-          </div>
-        </mat-expansion-panel>
-      </mat-accordion>
+      <div *ngSwitchCase="'DAY'">
+        <button (viewDateChange)="previousDay()" [(viewDate)]="viewDate" [disabled]="!days" [view]="calendarView"
+                color="accent" mat-mini-fab mwlCalendarPreviousView>
+          <mat-icon>navigate_before</mat-icon>
+        </button>
+        <button (viewDateChange)="today()" [(viewDate)]="viewDate" color="primary" mat-mini-fab mwlCalendarToday>
+          <mat-icon>today</mat-icon>
+        </button>
+        <button (viewDateChange)="nextDay()" [(viewDate)]="viewDate" [disabled]="days >= 42" [view]="calendarView"
+                color="accent" mat-mini-fab mwlCalendarNextView>
+          <mat-icon>navigate_next</mat-icon>
+        </button>
+        <div fxFlex></div>
+        <button color="accent" mat-mini-fab routerLink="/reservation">
+          <mat-icon>book_online</mat-icon>
+        </button>
+      </div>
     </div>
   </div>
-  <ng-template #box>
-    <div class="ssc-square mb"></div>
-  </ng-template>
+  <div class="divider">
+    <mat-accordion>
+      <mat-expansion-panel *ngFor="let rr of data; let i = index"
+                           [expanded]="professionalId === rr.room.professional.id || i === 0">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <p class="bold">{{rr.room.name}}</p>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div [ngSwitch]="selectView">
+          <div *ngSwitchCase="'WEEK'">
+            <mwl-calendar-week-view
+              (eventClicked)="view($event.event)"
+              (hourSegmentClicked)="segmentClick($event.date, rr.room)"
+              [dayEndHour]="calendar.get(rr.room.id)!.day!.dayEndHour"
+              [dayEndMinute]="calendar.get(rr.room.id)!.day!.dayEndMinute"
+              [dayStartHour]="calendar.get(rr.room.id)!.day!.dayStartHour"
+              [dayStartMinute]="calendar.get(rr.room.id)!.day!.dayStartMinute"
+              [daysInWeek]="daysInWeek"
+              [events]="calendar.get(rr.room.id)!.events"
+              [hourSegments]="hourSegments"
+              [locale]="locale"
+              [viewDate]="viewDate"></mwl-calendar-week-view>
+          </div>
+          <div *ngSwitchCase="'DAY'">
+            <h3>{{ viewDate | calendarDate:(calendarView + 'ViewTitle'):locale }}</h3>
+            <mwl-calendar-day-view
+              (eventClicked)="view($event.event)"
+              (hourSegmentClicked)="segmentClick($event.date, rr.room)"
+              [dayEndHour]="calendar.get(rr.room.id)!.day!.dayEndHour"
+              [dayEndMinute]="calendar.get(rr.room.id)!.day!.dayEndMinute"
+              [dayStartHour]="calendar.get(rr.room.id)!.day!.dayStartHour"
+              [dayStartMinute]="calendar.get(rr.room.id)!.day!.dayStartMinute"
+              [events]="calendar.get(rr.room.id)!.events"
+              [hourSegments]="hourSegments"
+              [locale]="locale"
+              [viewDate]="viewDate"></mwl-calendar-day-view>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
 </div>
 <ng-template #errorBox>
-  <app-error [error]="error"></app-error>
+  <button class="only-button" color="accent" mat-raised-button routerLink="/rooms/add">
+    <mat-icon>add_business</mat-icon> &nbsp;{{ 'ROOM.ADD.TITLE' | translate }}
+  </button>
 </ng-template>

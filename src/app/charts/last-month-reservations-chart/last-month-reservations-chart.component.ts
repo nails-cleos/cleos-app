@@ -14,7 +14,6 @@ export class LastMonthReservationsChartComponent implements OnChanges {
   @Input() state: any;
   @Input() label: any;
 
-  isLoading = true;
   data: IReservationAll[] | undefined;
   locale: string;
   error: any;
@@ -48,20 +47,13 @@ export class LastMonthReservationsChartComponent implements OnChanges {
 
   private createChart(): void {
     if (this.state) {
-      this.isLoading = this.state.isLoading;
-      if (this.state.errorMessage) {
-        this.error = this.state.error;
+      const chartResult = lastMonthReservationChart(this.state.dash, this.locale, this.label);
+      if (this.state.errorMessage || !chartResult) {
+        this.error = {status: 'NO_CONTENT'};
         return;
       }
-      const chartResult = lastMonthReservationChart(this.state.data, this.locale, this.label);
-      if (chartResult) {
-        this.lineChartData = chartResult.chartDataSet;
-        this.lineChartLabels = chartResult.chartLabels;
-      } else {
-        this.error = {
-          status: 'NO_CONTENT'
-        };
-      }
+      this.lineChartData = chartResult.chartDataSet;
+      this.lineChartLabels = chartResult.chartLabels;
     }
   }
 }

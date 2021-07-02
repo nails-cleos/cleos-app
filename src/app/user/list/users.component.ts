@@ -1,20 +1,20 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { IUser, IUserAll, PAGE_SIZE } from '../../interfaces/user';
+import { IUser, IUserAll } from '../../interfaces/user';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import * as fromActionsUser from '../../store/user.actions';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../../dialog/dialog.component';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { Pagination } from '../../interfaces/pagination';
+import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
 import { TranslateService } from '@ngx-translate/core';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { Role } from '../../interfaces/token';
-import { snakeToCamel } from '../../util/helper';
+import { getUserName, snakeToCamel } from '../../util/helper';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 enum RoleIconName {
   roleCustomer = 'perm_identity',
@@ -45,37 +45,38 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   getState: Observable<any>;
 
   allRole: Role[] = [Role.customer, Role.professional, Role.admin];
-  error: any;
 
-  resultsLength = 0;
+  resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
 
-  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
-              private store: Store<AppState>, private cdRef: ChangeDetectorRef) {
+  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
+              private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+    breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small
+    ]).subscribe(result => {
+      if (result.matches) {
+        this.pageSize = MOBILE_PAGE_SIZE;
+      }
+    });
     this.getState = this.store.select(selectUserState);
   }
 
   ngOnInit(): void {
-    this.subscribe();
     this.clean();
+    this.subscribe();
   }
 
   ngAfterViewInit(): void {
-    this.sort.sortChange.subscribe(() => {
-      this.getUsers();
-      // this.paginator.pageIndex = 0;
-    });
-
-    this.paginator?.page.subscribe(() => {
-      this.getUsers();
-    });
-
     this.getUsers();
-    this.cdRef.detectChanges();
   }
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+  }
+
+  getUsername(user: IUser): string {
+    return getUserName(user);
   }
 
   edit(user: IUser): void {
@@ -87,7 +88,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   delete(user: IUser): void {
     this.noExpanded(user);
     const title = this.translate.instant('USER.DELETED.TITLE');
-    const content = this.translate.instant('USER.DELETED.CONTENT', {firstName: user.firstName, lastName: user.lastName});
+    const content = this.translate.instant('USER.DELETED.CONTENT', {username: getUserName(user)});
     const dialogRef = this.dialog.open(DialogComponent, {
       data: {title, content, value: user}
     });
@@ -104,7 +105,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   sendInvite(user: IUser): void {
     this.noExpanded(user);
     const title = this.translate.instant('USER.ACTIVATION_RESEND.TITLE');
-    const content = this.translate.instant('USER.ACTIVATION_RESEND.CONTENT', {firstName: user.firstName, lastName: user.lastName});
+    const content = this.translate.instant('USER.ACTIVATION_RESEND.CONTENT', {username: getUserName(user)});
     const dialogRef = this.dialog.open(DialogComponent, {
       data: {title, content, value: user}
     });
@@ -142,11 +143,22 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
-  private getUsers(): void {
+  private createPageSubscriptions(): void {
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.getUsers();
+    });
+    this.paginator?.page.subscribe(() => this.getUsers(this.paginator.pageIndex));
+
+    this.cdRef.detectChanges();
+  }
+
+  private getUsers(page: number = 0): void {
     const payload = {
       active: this.sort.active,
       direction: this.sort.direction,
-      page: this.paginator ? this.paginator.pageIndex : 0
+      size: this.pageSize,
+      page
     };
     this.store.dispatch(
       new fromActionsUser.GetAll(payload)
@@ -155,17 +167,9 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe((stateValue) => {
-      if (stateValue.errorMessage || stateValue.message) {
-        const snackBarRef = this.snackBar.open(stateValue.errorMessage || stateValue.message, 'OK', {
-          duration: 5000
-        });
-
-        if (stateValue.message) {
-          snackBarRef.afterDismissed().subscribe(() => {
-            this.clean();
-            this.getUsers();
-          });
-        }
+      if (stateValue.message) {
+        this.clean();
+        this.getUsers();
       }
       this.dataSource = stateValue.data?.content?.map((user: IUserAll) => {
         if (user.authorities) {
@@ -175,6 +179,9 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
         return user;
       });
       this.resultsLength = stateValue.data?.totalElements;
+      if (this.resultsLength) {
+        this.createPageSubscriptions();
+      }
     });
   }
 

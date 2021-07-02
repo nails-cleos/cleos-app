@@ -1,17 +1,27 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { IUnavailable, Unavailable } from '../../interfaces/unavailable';
+import { IUnavailable, Unavailable, UnavailableRepeatType } from '../../interfaces/unavailable';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectUnavailableState } from '../../store/app.states';
 import { fieldChange, valueChange } from '../../util/validators';
 import * as fromActionsUnavailable from '../../store/unavailable.actions';
-import { convertDuration, diffTime, getAvailability, getMinMaxDate, getTime } from '../../util/dates';
+import {
+  convertDuration,
+  createNewDate,
+  diffTime,
+  formatTime,
+  getAvailability,
+  getMinMaxDate,
+  getNow,
+  getTime,
+  newDate
+} from '../../util/dates';
 import { IRoomAll } from '../../interfaces/room';
 import { IUser } from '../../interfaces/user';
 import { timeTheme } from '../../util/theme';
+import { getUserName } from '../../util/helper';
 
 @Component({
   selector: 'app-unavailable-detail',
@@ -25,10 +35,8 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
   subscription: Subscription | undefined;
   getState: Observable<any>;
   errors: any = [];
-  error: any;
   durationTime: any;
   durationMax: any;
-  repeat = 'NONE';
   minTime: any;
   maxTime: any;
   theme = timeTheme();
@@ -48,8 +56,14 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
     Validators.required
   ]);
 
-  constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
-              private formBuilder: FormBuilder) {
+  repeat: FormControl = new FormControl('', [
+    Validators.required
+  ]);
+
+  repeats = UnavailableRepeatType;
+
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
+              private router: Router) {
     this.getState = this.store.select(selectUnavailableState);
   }
 
@@ -67,7 +81,7 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
   }
 
   myFilter = (d: Date | null): boolean => {
-    const now = new Date();
+    const now = getNow();
     const date = (d || now);
     let result = true;
     if (this.room) {
@@ -87,7 +101,7 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
   };
 
   setDate($event: any): void {
-    const date = new Date($event.value);
+    const date = newDate($event.value);
 
     let max;
     if (this.room) {
@@ -105,13 +119,12 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
 
     this.startTime.setValue('');
     this.duration.setValue('');
-    this.durationMax = `${diffHour}:${diffMinute}`;
+    this.durationMax = formatTime(diffHour, diffMinute);
   }
 
   setTime($event: any): void {
-    const date = this.startDate.value ? new Date(this.startDate.value) : new Date();
     const time = $event.split(':');
-    date.setHours(time[0], time[1]);
+    const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time[0], time[1]);
 
     let maxHour;
     let diffMin;
@@ -124,7 +137,7 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
     const {diffHour, diffMinute} = diffTime(date, Number(maxHour), Number(diffMin));
 
     this.duration.setValue('');
-    this.durationMax = `${diffHour}:${diffMinute}`;
+    this.durationMax = formatTime(diffHour, diffMinute);
   }
 
   getRoom(user: IUser): void {
@@ -139,19 +152,21 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
     }
     const unavailable: IUnavailable = new Unavailable();
     unavailable.id = this.unavailable?.id;
-    unavailable.start = this.startTime.value.toLocaleString('en-GB');
-    unavailable.description = valueChange(this.form.value?.description, this.unavailable?.description);
+    const time = this.startTime.value.split(':');
+    const date = createNewDate(this.startDate.value, time[0], time[1]);
 
-    unavailable.repeat = fieldChange(this.duration, this.unavailable?.duration);
+    unavailable.start = date.toLocaleString('en-GB');
+    unavailable.description = valueChange(this.form.value?.description, this.unavailable?.description);
+    unavailable.duration = fieldChange(this.duration, this.unavailable?.duration);
+    unavailable.repeat = fieldChange(this.repeat, this.unavailable?.repeat);
 
     this.store.dispatch(new fromActionsUnavailable.UnavailableUpdate(unavailable));
   }
 
   focusin(): void {
     if (this.room && this.startTime.value) {
-      const date = this.startDate.value ? new Date(this.startDate.value) : new Date();
       const time = this.startTime.value.split(':');
-      date.setHours(time[0], time[1]);
+      const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time[0], time[1]);
       const day = date.getDay();
       const {minDate, maxDate} = getMinMaxDate(day, date, this.room);
       this.minTime = getTime(minDate);
@@ -164,7 +179,8 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
       description: new FormControl(),
       startDate: this.startDate,
       startTime: this.startTime,
-      duration: this.duration
+      duration: this.duration,
+      repeat: this.repeat
     });
   }
 
@@ -174,26 +190,25 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
         this.room = state.room;
       }
       if (state.selected) {
-        const date = new Date(state.selected.start);
+        const date = newDate(state.selected.start);
         if (!this.room) {
           this.getRoom(state.selected.professional);
         }
         this.durationTime = convertDuration(state.selected.duration);
-        this.repeat = state.selected.repeat;
         this.unavailable = {
           id: state.selected.id,
           description: state.selected.description,
           startDate: date,
-          startTime: `${date.getHours()}:${date.getMinutes()}`,
-          duration: `${this.durationTime.hour}:${this.durationTime.minute}`,
-          repeat: this.repeat
+          startTime: getTime(date),
+          duration: formatTime(this.durationTime.hour, this.durationTime.minute),
+          repeat: state.selected.repeat
         } as IUnavailable;
         this.form.patchValue(this.unavailable);
 
-        this.professionalName = `${state.selected.professional.firstName} ${state.selected.professional.lastName}`;
+        this.professionalName = getUserName(state.selected.professional);
       }
       if (this.room && this.unavailable && this.unavailable.startDate) {
-        const date = new Date(this.unavailable.startDate);
+        const date = newDate(this.unavailable.startDate);
         const day = date.getDay();
         const {maxDate} = getMinMaxDate(day, date, this.room);
 
@@ -201,18 +216,15 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
         const diffMin = maxDate?.getMinutes();
 
         const {diffHour, diffMinute} = diffTime(date, maxHour, diffMin);
-        this.durationMax = `${diffHour}:${diffMinute}`;
+        this.durationMax = formatTime(diffHour, diffMinute);
       }
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({incorrect: true});
         });
-      } else if (state.errorMessage) {
-        this.snackBar.open(state.errorMessage, 'OK', {
-          duration: 5000
-        });
-        this.error = state.error;
+      } else if (state.message) {
+        this.router.navigate(['unavailable-list']);
       }
     });
   }

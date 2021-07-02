@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as fromActionsLogin from '../store/auth.actions';
 import { IUser } from '../interfaces/user';
@@ -12,6 +12,7 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./sign-in.component.scss']
 })
 export class SignInComponent implements OnInit {
+  @Input() extras: any;
 
   hide = true;
   form!: FormGroup;
@@ -32,7 +33,11 @@ export class SignInComponent implements OnInit {
     const password: string = this.form.get('password')?.value.trim();
 
     this.store.dispatch(
-      new fromActionsLogin.Login({username, password, queryParams: this.route.snapshot.queryParams})
+      new fromActionsLogin.Login({
+        username, password,
+        queryParams: this.route.snapshot.queryParams,
+        extras: this.extras
+      })
     );
   }
 

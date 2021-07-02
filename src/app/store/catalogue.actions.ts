@@ -2,6 +2,7 @@ import { Action } from '@ngrx/store';
 
 export enum CatalogueActionTypes {
   getAll = '[Catalogue] Get all',
+  getAllCatalogs = '[Catalogue] Get all catalogs',
   catalogueSuccess = '[Catalogue] Success',
   catalogueSave = '[Catalogue] Save',
   catalogueUpdate = '[Catalogue] Update',
@@ -16,6 +17,10 @@ export enum CatalogueActionTypes {
 
 export class GetAll implements Action {
   readonly type = CatalogueActionTypes.getAll;
+}
+
+export class GetAllCatalogs implements Action {
+  readonly type = CatalogueActionTypes.getAllCatalogs;
 }
 
 export class CatalogueSuccess implements Action {
@@ -87,6 +92,7 @@ export class Clean implements Action {
 
 export type All =
   | GetAll
+  | GetAllCatalogs
   | CatalogueSave
   | CatalogueUpdate
   | CatalogueUpdateAll

@@ -4,11 +4,11 @@ import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../store/app.states';
 import { IUser, User } from '../interfaces/user';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import * as fromActionsUser from '../store/user.actions';
 import { fieldChange, valueChange } from '../util/validators';
 import { Location } from '@angular/common';
 import { findFlag, flags, IFlag } from '../util/flags';
+import { getUserImage, getUserNameInitials } from '../util/helper';
 
 @Component({
   selector: 'app-profile',
@@ -21,29 +21,26 @@ export class ProfileComponent implements OnInit, OnDestroy {
   subscription: Subscription | undefined;
   form!: FormGroup;
   errors: any = [];
-  error: any;
   user: IUser | undefined;
   canChange = false;
-  showInitials = false;
+  image: any;
   initials: string | undefined;
-  isLoading = false;
+  selectedImage: any;
 
   username: FormControl = new FormControl('', [
-    Validators.required
-  ]);
-  firstName: FormControl = new FormControl('', [
-    Validators.required
-  ]);
-  lastName: FormControl = new FormControl('', [
     Validators.required
   ]);
   langValue: FormControl = new FormControl('', [
     Validators.required
   ]);
 
+  firstName: FormControl = new FormControl();
+  lastName: FormControl = new FormControl();
+  phone: FormControl = new FormControl();
+
   flagList: IFlag[] = flags();
 
-  constructor(private snackBar: MatSnackBar, private store: Store<AppState>, private formBuilder: FormBuilder, private location: Location,
+  constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private location: Location,
               private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectUserState);
   }
@@ -69,11 +66,24 @@ export class ProfileComponent implements OnInit, OnDestroy {
     user.username = fieldChange(this.username, this.user?.username);
     user.firstName = fieldChange(this.firstName, this.user?.firstName);
     user.lastName = fieldChange(this.lastName, this.user?.lastName);
+    user.phone = fieldChange(this.phone, this.user?.phone);
 
-    this.user = undefined;
     this.store.dispatch(
       new fromActionsUser.UpdateUser(user)
     );
+  }
+
+  onSelectFile(target: any): void {
+    if (target.files && target.files[0]) {
+      const file = target.files[0];
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => this.image = reader.result;
+
+      this.store.dispatch(
+        new fromActionsUser.UpdatePhoto(file)
+      );
+    }
   }
 
   private findMe(): void {
@@ -85,9 +95,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private createForm(): void {
     this.form = this.formBuilder.group({
       username: this.username,
+      langValue: this.langValue,
       firstName: this.firstName,
       lastName: this.lastName,
-      langValue: this.langValue
+      phone: this.phone
     });
   }
 
@@ -98,20 +109,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   private subscribe(): void {
-    this.subscription = this.getState.subscribe((state) => {
-      this.isLoading = state.isLoading;
-      if (state.selected && !this.isLoading) {
+    this.subscription = this.getState.subscribe(state => {
+      if (state.selected) {
         const user = state.selected;
         this.user = user;
         this.canChange = user?.provider === 'LOCAL';
-        if (user.firstName) {
-          this.initials = `${user.firstName.charAt(0)} ${user?.lastName?.charAt(0)}`;
-        } else {
-          this.initials = user?.username?.charAt(0);
-        }
-        if (!user.imageUrl) {
-          this.showInitials = true;
-        }
+        this.initials = getUserNameInitials(user);
+        this.image = getUserImage(user);
         this.form.patchValue(state.selected);
         const langValue = findFlag(this.flagList, state.selected.lang);
         this.langValue.setValue(langValue);
@@ -121,15 +125,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({incorrect: true});
-        });
-      } else if (state.errorMessage || state.message) {
-        if (state.message) {
-          this.findMe();
-        } else {
-          this.error = state.error;
-        }
-        this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
         });
       }
     });

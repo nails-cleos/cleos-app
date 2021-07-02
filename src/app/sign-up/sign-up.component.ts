@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { IUser, User } from '../interfaces/user';
 import { AppState, selectAuthState } from '../store/app.states';
 import { Store } from '@ngrx/store';
@@ -6,7 +6,8 @@ import * as fromActionsLogin from '../store/auth.actions';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { flags, IFlag } from '../util/flags';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-sign-up',
@@ -14,6 +15,7 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./sign-up.component.scss']
 })
 export class SignUpComponent implements OnInit, OnDestroy {
+  @Output() codeEvent = new EventEmitter<string>();
 
   @ViewChild('passwordComponent') passwordComponent: any;
   showError = false;
@@ -29,25 +31,28 @@ export class SignUpComponent implements OnInit, OnDestroy {
   email: FormControl = new FormControl('', [
     Validators.required, Validators.email
   ]);
-  firstName: FormControl = new FormControl('', [
-    Validators.required
-  ]);
-  lastName: FormControl = new FormControl('', [
-    Validators.required
-  ]);
   lang: FormControl = new FormControl('', [
     Validators.required
   ]);
 
+  firstName: FormControl = new FormControl();
+  lastName: FormControl = new FormControl();
+  phone: FormControl = new FormControl();
+  codeForm: FormControl = new FormControl();
+
   flagList: IFlag[] = flags();
 
   constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private route: ActivatedRoute,
-              private cdRef: ChangeDetectorRef) {
+              private cdRef: ChangeDetectorRef, private snackBar: MatSnackBar, private router: Router ) {
     this.getState = this.store.select(selectAuthState);
+    this.codeForm.valueChanges.subscribe(value => {
+      this.codeEvent.emit(value);
+    });
   }
 
   ngOnInit(): void {
     this.code = this.route.snapshot.queryParamMap.get('code');
+    this.codeForm.setValue(this.code);
     this.createForm();
     this.subscribe();
     this.cdRef.detectChanges();
@@ -65,11 +70,13 @@ export class SignUpComponent implements OnInit, OnDestroy {
     const user: IUser = new User();
     user.username = this.username.value;
     user.email = this.email.value;
-    user.firstName = this.firstName.value;
-    user.lastName = this.lastName.value;
     user.password = this.passwordComponent.passwordFormControl.value;
     user.lang = this.lang.value.value;
-    user.code = this.code;
+    user.firstName = this.firstName.value;
+    user.lastName = this.lastName.value;
+    user.phone = this.phone.value;
+    user.code = this.codeForm.value;
+
     this.store.dispatch(new fromActionsLogin.SignUp(user));
   }
 
@@ -82,9 +89,10 @@ export class SignUpComponent implements OnInit, OnDestroy {
     this.form = this.formBuilder.group({
       username: this.username,
       email: this.email,
+      lang: this.lang,
       firstName: this.firstName,
       lastName: this.lastName,
-      lang: this.lang
+      phone: this.phone
     });
   }
 
@@ -95,6 +103,15 @@ export class SignUpComponent implements OnInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field]?.setErrors({incorrect: true});
         });
+      } else if (state.errorMessage || state.message) {
+        const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
+          duration: 5000
+        });
+        if (state.message) {
+          snackBarRef.afterDismissed().subscribe(() => {
+            this.router.navigate(['auth']);
+          });
+        }
       }
     });
   }

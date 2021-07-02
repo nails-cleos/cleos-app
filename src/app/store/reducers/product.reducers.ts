@@ -32,8 +32,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case ProductActionTypes.productFind: {
@@ -44,8 +43,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null,
-        isLoading: true
+        message: null
       };
     }
     case ProductActionTypes.productSuccess: {
@@ -54,8 +52,7 @@ export const reducer = (state = initialState, action: All): State => {
         data: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null,
-        isLoading: false
+        message: null
       };
     }
     case ProductActionTypes.productSaveSuccess: {
@@ -63,6 +60,7 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         message: action.payload.message,
         errorMessage: null,
+        selected: null,
         subErrors: null,
         isLoading: false
       };
@@ -73,8 +71,7 @@ export const reducer = (state = initialState, action: All): State => {
         selected: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null,
-        isLoading: false
+        message: null
       };
     }
     case ProductActionTypes.productFailure: {

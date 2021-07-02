@@ -2,8 +2,8 @@ import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChi
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { Pagination } from '../../interfaces/pagination';
-import { IReservation, IReservationAll, MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/reservation';
+import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
+import { ICustomerReservation, IReservation, IReservationAll } from '../../interfaces/reservation';
 import { Observable, Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -13,9 +13,13 @@ import { AppState, selectReservationState } from '../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ReservationIconName } from '../detail/reservation-detail.component';
 import * as fromActionsReservation from '../../store/reservation.actions';
+import { convertDuration, createNewDate, newDate } from '../../util/dates';
+import { DiscountType, transitionAnimation } from '../../interfaces/discount';
+import { getUserName } from '../../util/helper';
 
 @Component({
   selector: 'app-reservations',
+  animations: [transitionAnimation],
   templateUrl: './reservations.component.html',
   styleUrls: ['./reservations.component.scss']
 })
@@ -27,15 +31,22 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   dataSource: any = new MatTableDataSource<Pagination<IReservationAll>>();
   getState: Observable<any>;
   subscription: Subscription | undefined;
+  data: ICustomerReservation | undefined;
+  upcoming: any;
+  noContent = false;
+  end: Date | undefined;
 
-  resultsLength = 0;
+  resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
 
   language: string;
   error: any;
 
+  priceDiscount: number | undefined;
+
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private router: Router,
-              private store: Store<AppState>, private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+              private store: Store<AppState>, private breakpointObserver: BreakpointObserver,
+              private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectReservationState);
     this.language = this.translate.currentLang;
     breakpointObserver.observe([
@@ -48,19 +59,26 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
     });
   }
 
+  get professionalName(): string {
+    return this.getProfessionalName(this.upcoming);
+  }
+
+  getProfessionalName(reservation: any): string {
+    return getUserName(reservation.room.professional);
+  }
+
   ngOnInit(): void {
+    this.clean();
     this.subscribe();
   }
 
   ngAfterViewInit(): void {
     this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
       this.getReservations();
-      // this.paginator.pageIndex = 0;
     });
 
-    this.paginator?.page.subscribe(() => {
-      this.getReservations();
-    });
+    this.paginator?.page.subscribe(() => this.getReservations(this.paginator.pageIndex));
 
     this.getReservations();
     this.cdRef.detectChanges();
@@ -76,28 +94,61 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   view(reservation: IReservation): void {
+    this.router.navigate(['reservation', reservation.id]);
+  }
+
+  edit(reservation: IReservationAll): void {
     this.router.navigate(['me', 'reservation', reservation.id]);
+  }
+
+  private clean(): void {
+    this.store.dispatch(
+      new fromActionsReservation.Clean()
+    );
   }
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       this.error = state.error;
-      if (state.page) {
-        this.dataSource = state.page?.content;
-        this.resultsLength = state.page?.totalElements;
+      this.data = state.customerReservation;
+      if (this.data) {
+        this.noContent = !state.isLoading && !this.data.upcoming;
+        this.dataSource = this.data.reservations?.content;
+        this.resultsLength = this.data.reservations?.totalElements;
+        this.upcoming = this.data.upcoming ? this.data.upcoming : this.upcoming;
+        if (this.upcoming) {
+          const duration = convertDuration(this.upcoming.product.duration);
+          this.end = newDate(this.upcoming.start);
+          this.end = createNewDate(this.end, this.end.getHours() + duration.hour, this.end.getMinutes() + duration.minute);
+          if (this.upcoming.product.discount && this.upcoming.product.discount.amount) {
+            let discount;
+            switch (this.upcoming.product.discount.type) {
+              case DiscountType.money: {
+                discount = this.upcoming.product.discount.amount;
+                break;
+              }
+              case DiscountType.percentage: {
+                discount = (this.upcoming.product.price / this.upcoming.product.discount.amount);
+              }
+            }
+            if (discount) {
+              this.priceDiscount = this.upcoming.product.price - discount;
+            }
+          }
+        }
       }
     });
   }
 
-  private getReservations(): void {
+  private getReservations(page: number = 0): void {
     const payload = {
       active: this.sort.active,
       direction: this.sort.direction,
-      page: this.paginator ? this.paginator.pageIndex : 0,
-      size: this.pageSize
+      size: this.pageSize,
+      page
     };
     this.store.dispatch(
-      new fromActionsReservation.GetAllMePage(payload)
+      new fromActionsReservation.GetCustomerReservations(payload)
     );
   }
 }

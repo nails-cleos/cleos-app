@@ -1,0 +1,27 @@
+<button (click)="onNoClick()" class="close-button" mat-icon-button>
+  <mat-icon class="close-icon">close</mat-icon>
+</button>
+<h1 mat-dialog-title>{{title}}</h1>
+<div *ngIf="allCustomers" mat-dialog-content>
+  <mat-form-field class="chip-list">
+    <mat-label>{{ 'DISCOUNT.LIST.DIALOG.CUSTOMER' | translate }}</mat-label>
+    <mat-chip-list #chipList aria-label="Customer selection">
+      <mat-chip (removed)="remove(customer)" *ngFor="let customer of customers" [removable]="true" [selectable]="true">
+        {{getName(customer)}}
+        <mat-icon matChipRemove>cancel</mat-icon>
+      </mat-chip>
+      <input #customerInput [formControl]="customerCtrl" [matAutocomplete]="auto" [matChipInputFor]="chipList">
+    </mat-chip-list>
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+      <mat-option *ngFor="let customer of sortCustomers(filteredCustomers | async)" [value]="customer">
+        {{getName(customer)}}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <div fxFlex></div>
+  <button (click)="doAction()" cdkFocusInitial color="primary"
+          mat-raised-button>{{ 'COMMON.BUTTON.DISCOUNT.SEND' | translate }}</button>
+  <button (click)="onNoClick()" mat-raised-button>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+</div>

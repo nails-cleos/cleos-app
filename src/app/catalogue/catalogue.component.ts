@@ -1,12 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectCatalogueState } from '../store/app.states';
 import * as fromActionsCatalogue from '../store/catalogue.actions';
 import { Catalogue, ICatalogue } from '../interfaces/catalogue';
 import { formatBytes } from '../util/file';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-catalogue',
@@ -24,7 +24,11 @@ export class CatalogueComponent implements OnInit, OnDestroy {
     Validators.required
   ]);
 
-  constructor(private snackBar: MatSnackBar, private store: Store<AppState>, private formBuilder: FormBuilder) {
+  home: FormControl = new FormControl();
+  catalog: FormControl = new FormControl();
+
+  constructor(private store: Store<AppState>, private formBuilder: FormBuilder,
+              private router: Router) {
     this.getState = this.store.select(selectCatalogueState);
   }
 
@@ -46,6 +50,8 @@ export class CatalogueComponent implements OnInit, OnDestroy {
     const catalogue: ICatalogue = new Catalogue();
     catalogue.name = this.name.value;
     catalogue.description = this.form.value.description;
+    catalogue.home = this.home.value;
+    catalogue.catalog = this.catalog.value;
 
     this.store.dispatch(
       new fromActionsCatalogue.CatalogueSave({catalogue, file: this.file})
@@ -75,7 +81,9 @@ export class CatalogueComponent implements OnInit, OnDestroy {
   private createForm(): void {
     this.form = this.formBuilder.group({
       name: this.name,
-      description: new FormControl()
+      description: new FormControl(),
+      home: this.home,
+      catalog: this.catalog
     });
   }
 
@@ -92,10 +100,8 @@ export class CatalogueComponent implements OnInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({incorrect: true});
         });
-      } else if (state.errorMessage) {
-        this.snackBar.open(state.errorMessage, 'OK', {
-          duration: 5000
-        });
+      } else if (state.message) {
+        this.router.navigate(['catalogues']);
       }
     });
   }

@@ -1,3 +1,5 @@
+import { IDiscount, IUserDiscount } from './discount';
+
 export interface IProduct {
   id?: string;
   name?: string;
@@ -16,11 +18,21 @@ export interface IProductAll {
   duration: string;
   description?: string;
   durability?: string;
+  discount?: IDiscount;
+  extras?: IExtras;
+}
+
+export interface IProductDiscountDTO {
+  products: IProductAll[];
+  discounts: IUserDiscount[];
+}
+
+export interface IExtras {
+  description?: string;
+  price?: number;
 }
 
 export class Product implements IProduct {
   constructor() {
   }
 }
-
-export const PAGE_SIZE = 10;
