@@ -9,7 +9,7 @@
     <div fxFlex></div>
     <div *ngIf="changeState && changeState.length">
       <mat-fab-menu (onFabMenuItemSelected)="onChangeState($event)" [fabButtons]="changeState" color="primary"
-                    direction="left" icon="all_out">
+                    [direction]="direction" icon="all_out">
       </mat-fab-menu>
     </div>
   </mat-card-header>
