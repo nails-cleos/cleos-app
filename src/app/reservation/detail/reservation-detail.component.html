@@ -6,12 +6,6 @@
     <ng-template #skeleton>
       <div class="ssc-line"></div>
     </ng-template>
-    <div fxFlex></div>
-    <div *ngIf="changeState && changeState.length">
-      <mat-fab-menu (onFabMenuItemSelected)="onChangeState($event)" [fabButtons]="changeState" color="primary"
-                    [direction]="direction" icon="all_out">
-      </mat-fab-menu>
-    </div>
   </mat-card-header>
   <mat-card-content *ngIf="reservation; else boxSkeleton">
     <mat-divider></mat-divider>
@@ -157,3 +151,8 @@
     <div class="ssc-head-line"></div>
   </ng-template>
 </mat-card>
+<div id="action-button" *ngIf="changeState && changeState.length">
+  <mat-fab-menu (onFabMenuItemSelected)="onChangeState($event)" [fabButtons]="changeState" color="primary"
+                [direction]="direction" icon="all_out">
+  </mat-fab-menu>
+</div>
