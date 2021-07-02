@@ -10,38 +10,38 @@
   </mat-grid-tile>
   <!--Charts-->
   <mat-grid-tile [colspan]="( cardLayout | async )?.chart?.cols" [rowspan]="( cardLayout | async )?.chart?.rows">
-    <app-card [data]="state?.data" [label]="quantityLabel" [title]="'DASHBOARD.CARD.QUANTITY_PRODUCT' | translate"
+    <app-card [data]="state?.dash" [label]="quantityLabel" [title]="'DASHBOARD.CARD.QUANTITY_PRODUCT' | translate"
               type="QUANTITY_PRODUCT">
       <app-quantity-product-reservations-chart [label]="quantityLabel"
                                                [state]="state"></app-quantity-product-reservations-chart>
     </app-card>
   </mat-grid-tile>
   <mat-grid-tile [colspan]="( cardLayout | async )?.chart?.cols" [rowspan]="( cardLayout | async )?.chart?.rows">
-    <app-card [data]="state?.data" [title]="'DASHBOARD.CARD.PRODUCT_RESERVATION' | translate"
+    <app-card [data]="state?.dash" [title]="'DASHBOARD.CARD.PRODUCT_RESERVATION' | translate"
               type="PRODUCT_RESERVATION">
       <app-product-reservations-chart [state]="state"></app-product-reservations-chart>
     </app-card>
   </mat-grid-tile>
   <mat-grid-tile [colspan]="( cardLayout | async )?.chart?.cols" [rowspan]="( cardLayout | async )?.chart?.rows">
-    <app-card [data]="state?.data" [title]="'DASHBOARD.CARD.MONTHLY_RESERVATION' | translate"
+    <app-card [data]="state?.dash" [title]="'DASHBOARD.CARD.MONTHLY_RESERVATION' | translate"
               type="MONTHLY_RESERVATION">
       <app-monthly-reservation-chart [state]="state"></app-monthly-reservation-chart>
     </app-card>
   </mat-grid-tile>
   <mat-grid-tile [colspan]="( cardLayout | async )?.chart?.cols" [rowspan]="( cardLayout | async )?.chart?.rows">
-    <app-card [data]="state?.data" [label]="annualLabel" [title]="'DASHBOARD.CARD.YEARLY_PRODUCT_PRICE' | translate"
+    <app-card [data]="state?.dash" [label]="annualLabel" [title]="'DASHBOARD.CARD.YEARLY_PRODUCT_PRICE' | translate"
               type="YEARLY_PRODUCT_PRICE">
       <app-annual-reservations-chart [label]="annualLabel" [state]="state"></app-annual-reservations-chart>
     </app-card>
   </mat-grid-tile>
   <mat-grid-tile [colspan]="( cardLayout | async )?.chart?.cols" [rowspan]="( cardLayout | async )?.chart?.rows">
-    <app-card [data]="state?.data" [label]="customerLabel" [title]="'DASHBOARD.CARD.CUSTOMER_RESERVATION' | translate"
+    <app-card [data]="state?.dash" [label]="customerLabel" [title]="'DASHBOARD.CARD.CUSTOMER_RESERVATION' | translate"
               type="CUSTOMER_RESERVATION">
       <app-customer-reservations-chart [label]="customerLabel" [state]="state"></app-customer-reservations-chart>
     </app-card>
   </mat-grid-tile>
   <mat-grid-tile [colspan]="( cardLayout | async )?.chart?.cols" [rowspan]="( cardLayout | async )?.chart?.rows">
-    <app-card [data]="state?.data" [label]="lastMonthLabel"
+    <app-card [data]="state?.dash" [label]="lastMonthLabel"
               [title]="'DASHBOARD.CARD.LAST_MONTH_RESERVATION' | translate" type="LAST_MONTH_RESERVATION">
       <app-last-month-reservations-chart [label]="lastMonthLabel" [state]="state"></app-last-month-reservations-chart>
     </app-card>

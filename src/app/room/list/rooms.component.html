@@ -1,4 +1,4 @@
-<div *ngIf="!error; else errorBox" class="mat-elevation-z8">
+<div class="mat-elevation-z8">
   <table [dataSource]="dataSource" mat-table matSort matSortActive="name"
          matSortDirection="desc" matSortDisableClear>
     <ng-container matColumnDef="position">
@@ -81,11 +81,11 @@
     </ng-container>
 
     <ng-container matColumnDef="noContent">
-      <td class="no-content bold" mat-footer-cell *matFooterCellDef [attr.colspan]="displayedColumns.length">
+      <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
         {{ 'ROOM.LIST.ERROR.NO_CONTENT' | translate }}</td>
     </ng-container>
 
-    <tr mat-footer-row *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0"></tr>
+    <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
 
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
     <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
@@ -96,6 +96,3 @@
     <mat-icon>add_business</mat-icon>
   </button>
 </div>
-<ng-template #errorBox>
-  <app-error [error]="error"></app-error>
-</ng-template>

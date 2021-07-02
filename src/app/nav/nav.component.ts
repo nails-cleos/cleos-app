@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subscription } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
@@ -25,6 +25,8 @@ import { Role } from '../interfaces/token';
 import { MessagingService } from '../services/messaging.service';
 import { environment } from '../../environments/environment';
 import { getUserImage, getUserName, getUserNameInitials } from '../util/helper';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSidenav } from '@angular/material/sidenav';
 
 @Component({
   selector: 'app-nav',
@@ -61,9 +63,11 @@ export class NavComponent implements OnInit, OnDestroy {
   plusNotification: string | undefined;
 
   isLoading = false;
+  error: any;
 
   constructor(public translate: TranslateService, private breakpointObserver: BreakpointObserver,
-              private router: Router, private store: Store<AppState>, private messagingService: MessagingService) {
+              private router: Router, private store: Store<AppState>, private messagingService: MessagingService,
+              private snackBar: MatSnackBar) {
     this.language = this.translate.currentLang;
     this.getState = this.store.select(selectAuthState);
     this.getNotificationState = this.store.select(selectNotificationState);
@@ -108,9 +112,22 @@ export class NavComponent implements OnInit, OnDestroy {
     }
   }
 
+  navigate(drawer?: MatSidenav): void {
+    drawer?.toggle();
+    this.error = undefined;
+  }
+
   private selectStore(states: any[]): void {
     states.forEach(selectedState => this.store.select(selectedState)
-      .subscribe((state: any) => this.isLoading = state.isLoading));
+      .subscribe((state: any) => {
+        this.isLoading = state.isLoading;
+        this.error = state.error;
+        if (state.errorMessage || state.message) {
+          this.snackBar.open(state.errorMessage || state.message, 'OK', {
+            duration: 5000
+          });
+        }
+      }));
   }
 
   private subscribe(): void {
@@ -156,7 +173,7 @@ export class NavComponent implements OnInit, OnDestroy {
     });
 
     this.notificationSubscription = this.getNotificationState.subscribe((state) => {
-      if (state.data && state.data.page && state.data.page.content[0].id) {
+      if (state.data && state.data.page && state.data.page.content[0]?.id) {
         this.workDay = state.data.workDay;
         this.notifications = state.data.page.content;
         this.countNotifications = state.data.unread;
@@ -164,6 +181,7 @@ export class NavComponent implements OnInit, OnDestroy {
           this.plusNotification = '+9';
         }
       }
+      this.isLoading = state.isLoading;
     });
   }
 

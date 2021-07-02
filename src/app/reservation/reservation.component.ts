@@ -4,7 +4,6 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { map, startWith } from 'rxjs/operators';
 import { IUser, IUserAll } from '../interfaces/user';
 import { Observable, Subscription } from 'rxjs';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState, selectReservationState } from '../store/app.states';
 import * as fromActionsReservation from '../store/reservation.actions';
@@ -42,7 +41,7 @@ import { Role } from '../interfaces/token';
 import { IUnavailableAll } from '../interfaces/unavailable';
 import { timeTheme } from '../util/theme';
 import { DiscountType, IUserDiscount, transitionAnimation } from '../interfaces/discount';
-import { getPriceDiscount, getUserName } from '../util/helper';
+import { getFullUserName, getPriceDiscount, getUserName } from '../util/helper';
 
 @Component({
   selector: 'app-reservation',
@@ -60,9 +59,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   getState: Observable<any>;
   subscription: Subscription | undefined;
   errors: any = [];
-
-  isLoading = false;
-  error: any;
 
   customerForm!: FormGroup;
   customers: IUserAll[] | undefined;
@@ -128,8 +124,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   isAdmin = false;
 
-  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
-              private store: Store<AppState>, private formBuilder: FormBuilder, private breakpointObserver: BreakpointObserver,
+  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
+              private formBuilder: FormBuilder, private breakpointObserver: BreakpointObserver,
               private router: Router, private route: ActivatedRoute, private adapter: DateAdapter<any>,
               private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectReservationState);
@@ -173,6 +169,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     });
+  }
+
+  get professionalName(): string {
+    return getUserName(this.room.value.professional);
   }
 
   ngOnInit(): void {
@@ -232,7 +232,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getUsername(user: any): string {
-    return getUserName(user);
+    return getFullUserName(user);
   }
 
   myFilter = (d: Date | null): boolean => {
@@ -572,7 +572,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      this.isLoading = state.isLoading;
       this.customers = state.customers;
       this.products = state.productDiscount?.products;
       this.discounts = state.productDiscount?.discounts.map((ud: IUserDiscount) => {
@@ -624,11 +623,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           this.customerForm.controls[value.field]?.setErrors({incorrect: true});
           this.roomForm.controls[value.field]?.setErrors({incorrect: true});
         });
-      } else if (state.errorMessage) {
-        this.error = state.error;
-        this.snackBar.open(state.errorMessage, 'OK', {
-          duration: 5000
-        });
       }
     });
   }
@@ -663,7 +657,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   private filterCustomer(name: string): IUser[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.customers?.filter(option => getUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
+    return this.customers?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
   }
 
   private filterProduct(name: string): IProduct[] | undefined {

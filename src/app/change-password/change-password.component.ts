@@ -1,13 +1,11 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState, selectUserState } from '../store/app.states';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as fromActionsUser from '../store/user.actions';
 import * as fromActionsLogin from '../store/auth.actions';
-import { Location } from '@angular/common';
 import { IUser } from '../interfaces/user';
 
 @Component({
@@ -31,8 +29,8 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
     Validators.required
   ]);
 
-  constructor(private snackBar: MatSnackBar, private store: Store<AppState>, private route: ActivatedRoute, private router: Router,
-              private formBuilder: FormBuilder, private location: Location) {
+  constructor(private store: Store<AppState>, private route: ActivatedRoute, private router: Router,
+              private formBuilder: FormBuilder) {
     this.getState = this.store.select(selectAuthState);
     this.getUserState = this.store.select(selectUserState);
   }
@@ -84,18 +82,10 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
       this.currentUser = state.user;
     });
     this.userSubscription = this.getUserState.subscribe((state) => {
-      if (state.errorMessage || state.message) {
-        const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
-        });
-
-        if (state.message) {
-          snackBarRef.afterDismissed().subscribe(() => {
-            this.store.dispatch(
-              new fromActionsLogin.LogOut()
-            );
-          });
-        }
+      if (state.message) {
+        this.store.dispatch(
+          new fromActionsLogin.LogOut()
+        );
       }
     });
   }

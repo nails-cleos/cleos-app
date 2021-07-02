@@ -1,5 +1,4 @@
 import { ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState, selectReservationState } from '../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
@@ -59,7 +58,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   locale: string;
   language: string;
   isLoading = false;
-  error: any;
   changeState: any;
   professionalId: string | undefined;
   customerId: string | undefined;
@@ -76,7 +74,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   public paginator: MatPaginator | undefined;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private route: ActivatedRoute,
-              private store: Store<AppState>, private snackBar: MatSnackBar, private cdRef: ChangeDetectorRef, private router: Router) {
+              private store: Store<AppState>, private cdRef: ChangeDetectorRef, private router: Router) {
     this.getState = this.store.select(selectReservationState);
     const userLang = this.translate.currentLang;
     this.language = userLang;
@@ -209,12 +207,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         if (state.message) {
           const id: string | null = this.route.snapshot.paramMap.get('id');
           this.getReservation(id);
-        } else {
-          this.error = state.error;
         }
-        this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
-        });
       }
     });
   }

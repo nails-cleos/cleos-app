@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-error',
@@ -10,6 +11,7 @@ export class ErrorComponent implements OnInit {
   @Input() error: any;
   @Input() isCard: boolean | undefined;
   imageSrc: string | undefined;
+  retry = false;
 
   constructor() {
   }
@@ -18,10 +20,15 @@ export class ErrorComponent implements OnInit {
     if (this.error.status !== 'NO_CONTENT') {
       if (this.error.status === 'NOT_FOUND') {
         this.imageSrc = './assets/not_found.png';
+        this.retry = false;
       } else {
         this.imageSrc = './assets/error.png';
+        this.retry = true;
       }
     }
   }
 
+  reload(): void {
+    window.location.reload();
+  }
 }

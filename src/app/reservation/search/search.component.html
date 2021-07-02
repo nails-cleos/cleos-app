@@ -1,4 +1,4 @@
-<div *ngIf="!error; else errorBox">
+<div>
   <div id="search-box">
     <div id="search-label">{{'RESERVATION.SEARCH.TITLE' | translate }}</div>
     <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
@@ -136,6 +136,3 @@
   </table>
   <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
 </div>
-<ng-template #errorBox>
-  <app-error [error]="error" [isCard]="true"></app-error>
-</ng-template>

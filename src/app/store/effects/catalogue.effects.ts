@@ -7,7 +7,6 @@ import * as fromActionsCatalogue from '../catalogue.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { CatalogueService } from '../../services/catalogue.service';
 import { Router } from '@angular/router';
-import { ProductService } from '../../services/product.service';
 
 @Injectable()
 export class CatalogueEffects {
@@ -16,8 +15,7 @@ export class CatalogueEffects {
   getAll$ = this.actions$.pipe(ofType(fromActionsCatalogue.CatalogueActionTypes.getAll)).pipe(
     map((action: any) => action.payload),
     switchMap(() => this.catalogueService.getAll().pipe(
-      switchMap((response: any) => response ? of(new fromActionsCatalogue.CatalogueSuccess(response))
-        : of(new fromActionsCatalogue.CatalogueFailure({error: {status: 'NO_CONTENT'}}))),
+      switchMap((response: any) => of(new fromActionsCatalogue.CatalogueSuccess(response ? response : []))),
       catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({error: err.error})))
     ))
   );
@@ -26,8 +24,7 @@ export class CatalogueEffects {
   getAllCatalogs$ = this.actions$.pipe(ofType(fromActionsCatalogue.CatalogueActionTypes.getAllCatalogs)).pipe(
     map((action: any) => action.payload),
     switchMap(() => this.catalogueService.getAllCatalogs().pipe(
-      switchMap((response: any) => response ? of(new fromActionsCatalogue.CatalogueSuccess(response))
-        : of(new fromActionsCatalogue.CatalogueFailure({error: {status: 'NO_CONTENT'}}))),
+      switchMap((response: any) => of(new fromActionsCatalogue.CatalogueSuccess(response ? response : []))),
       catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({error: err.error})))
     ))
   );

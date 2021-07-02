@@ -1,28 +1,23 @@
 <div class="content">
   <section class="section-style">
-    <div *ngIf="!error; else errorBox">
-      <app-image-viewer (close)="viewerOpen = false" [imageURL]="imageURL" [open]="viewerOpen"></app-image-viewer>
-      <mat-card>
-        <mat-card-content>
-          <mat-grid-list [cols]="(isHandset$ | async) ? 1 : 3" rowHeight="2:1">
-            <mat-grid-tile *ngFor="let catalogue of catalogues; let i = index;">
-              <mat-icon (click)="openImage(catalogue)" class="expand">open_in_full</mat-icon>
-              <mat-card class="catalogue-card mat-elevation-z6">
-                <img *ngIf="catalogue.id; else box" [alt]="catalogue.name" [matTooltip]="catalogue.name"
-                     [src]="'data:image/jpg;base64,'+ catalogue.blob"
-                     mat-card-sm-image
-                     matTooltipPosition="above"/>
-                <ng-template #box>
-                  <div class="ssc-square mb"></div>
-                </ng-template>
-              </mat-card>
-            </mat-grid-tile>
-          </mat-grid-list>
-        </mat-card-content>
-      </mat-card>
-    </div>
-    <ng-template #errorBox>
-      <app-error [error]="error"></app-error>
-    </ng-template>
+    <app-image-viewer (close)="viewerOpen = false" [imageURL]="imageURL" [open]="viewerOpen"></app-image-viewer>
+    <mat-card>
+      <mat-card-content>
+        <mat-grid-list [cols]="(isHandset$ | async) ? 1 : 3" rowHeight="2:1">
+          <mat-grid-tile *ngFor="let catalogue of catalogues; let i = index;">
+            <mat-icon (click)="openImage(catalogue)" class="expand">open_in_full</mat-icon>
+            <mat-card class="catalogue-card mat-elevation-z6">
+              <img *ngIf="catalogue.id; else box" [alt]="catalogue.name" [matTooltip]="catalogue.name"
+                   [src]="'data:image/jpg;base64,'+ catalogue.blob"
+                   mat-card-sm-image
+                   matTooltipPosition="above"/>
+              <ng-template #box>
+                <div class="ssc-square mb"></div>
+              </ng-template>
+            </mat-card>
+          </mat-grid-tile>
+        </mat-grid-list>
+      </mat-card-content>
+    </mat-card>
   </section>
 </div>

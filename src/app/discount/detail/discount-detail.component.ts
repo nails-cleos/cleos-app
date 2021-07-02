@@ -1,9 +1,8 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { IDiscount, Discount, DiscountType } from '../../interfaces/discount';
+import { Discount, DiscountType, IDiscount } from '../../interfaces/discount';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectDiscountState } from '../../store/app.states';
 import { fieldChange, valueChange } from '../../util/validators';
@@ -21,7 +20,6 @@ export class DiscountDetailComponent implements OnInit, AfterViewInit, OnDestroy
   subscription: Subscription | undefined;
   getState: Observable<any>;
   errors: any = [];
-  error: any;
 
   name: FormControl = new FormControl('', [
     Validators.required
@@ -35,8 +33,8 @@ export class DiscountDetailComponent implements OnInit, AfterViewInit, OnDestroy
 
   types = DiscountType;
 
-  constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
-              private formBuilder: FormBuilder, private router: Router) {
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
+              private router: Router) {
     this.getState = this.store.select(selectDiscountState);
   }
 
@@ -94,15 +92,8 @@ export class DiscountDetailComponent implements OnInit, AfterViewInit, OnDestroy
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({incorrect: true});
         });
-      } else if (state.errorMessage || state.message) {
-        this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
-        });
-        if (state.message) {
-          this.router.navigate(['discounts']);
-        } else {
-          this.error = state.error;
-        }
+      } else if (state.message) {
+        this.router.navigate(['discounts']);
       }
     });
   }

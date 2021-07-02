@@ -1,6 +1,6 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div *ngIf="!error; else errorBox" fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <mat-card>
         <mat-card-header>
           <mat-card-title>{{ 'PRODUCT.DETAIL.TITLE' | translate }}</mat-card-title>
@@ -85,7 +85,8 @@
             <div fxFlex></div>
             <button [disabled]="form.invalid || form.pristine" color="primary" mat-raised-button
                     type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
-            <button appBackButton type="button" color="accent" mat-raised-button>{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <button [form]="form" appBackButton color="accent" mat-raised-button
+                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
           <ng-template #buttonSkeleton>
             <div class="ssc-head-line"></div>
@@ -93,8 +94,5 @@
         </form>
       </mat-card>
     </div>
-    <ng-template #errorBox>
-      <app-error [error]="error"></app-error>
-    </ng-template>
   </div>
 </div>

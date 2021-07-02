@@ -12,7 +12,6 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { Observable, Subscription } from 'rxjs';
 import { IconName, IIcon } from '../room.component';
 import { ActivatedRoute } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../store/app.states';
 import * as fromActionsRoom from '../../store/room.actions';
@@ -30,7 +29,6 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   subscription: Subscription | undefined;
   errors: any = [];
   professionalName: string | undefined;
-  error: any;
 
   step = 0;
   icons: IIcon = {
@@ -50,8 +48,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   ]);
   addressDescription: FormControl = new FormControl();
 
-  constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
-              private formBuilder: FormBuilder) {
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder) {
     this.getState = this.store.select(selectRoomState);
   }
 
@@ -191,17 +188,8 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
         });
-      } else if (state.errorMessage || state.message) {
-        const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
-        });
-        if (state.message) {
-          snackBarRef.afterDismissed().subscribe(() => {
-            this.getRoom();
-          });
-        } else {
-          this.error = state.error;
-        }
+      } else if (state.message) {
+        this.getRoom();
       }
     });
   }

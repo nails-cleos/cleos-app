@@ -19,8 +19,7 @@ export class ReservationEffects {
   getAll$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getAll)).pipe(
     map((action: any) => action.payload),
     switchMap(() => this.reservationService.getAll().pipe(
-      switchMap((response: any) => response ? of(new fromActionsReservation.ReservationSuccess(response)) :
-        of(new fromActionsReservation.ReservationFailure({error: {status: 'NO_CONTENT', message: 'NO_CONTENT'}}))),
+      switchMap((response: any) => of(new fromActionsReservation.ReservationDashSuccess(response ? response : []))),
       catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
     ))
   );
@@ -60,8 +59,7 @@ export class ReservationEffects {
   getAllGroupingByRoom$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getAllGroupingByRoom)).pipe(
     map((action: any) => action.payload),
     switchMap(() => this.reservationService.getAllGroupingByRoom().pipe(
-      switchMap((response: any) => response ? of(new fromActionsReservation.ReservationSuccess(response)) :
-        of(new fromActionsReservation.ReservationFailure({error: {status: 'NO_CONTENT'}}))),
+      switchMap((response: any) => of(new fromActionsReservation.ReservationSuccess(response ? response : []))),
       catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
     ))
   );
@@ -222,8 +220,7 @@ export class ReservationEffects {
   getAllTracking$ = this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getTracking)).pipe(
     map((action: any) => action.payload),
     switchMap(() => this.trackingService.getAll().pipe(
-      switchMap((response: any) => response ? of(new fromActionsReservation.TrackingSuccess(response)) :
-        of(new fromActionsReservation.ReservationFailure({error: {status: 'NO_CONTENT', message: 'NO_CONTENT'}}))),
+      switchMap((response: any) => of(new fromActionsReservation.TrackingSuccess(response ? response : []))),
       catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
     ))
   );
@@ -237,6 +234,11 @@ export class ReservationEffects {
   @Effect({dispatch: false})
   dataSuccess$ = this.actions$.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.reservationSuccess)
+  );
+
+  @Effect({dispatch: false})
+  dashSuccess$ = this.actions$.pipe(
+    ofType(fromActionsReservation.ReservationActionTypes.reservationDashSuccess)
   );
 
   @Effect({dispatch: false})

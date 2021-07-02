@@ -1,5 +1,5 @@
-<div *ngIf="!error; else errorBox">
-  <div #scrollContainer *ngIf="data && data.length && calendar && calendar.size; else box" class="scroll-container">
+<div *ngIf="data; else errorBox">
+  <div *ngIf="data && data.length && calendar && calendar.size; else box" class="scroll-container">
     <div class="divider">
       <div [ngSwitch]="selectView">
         <div *ngSwitchCase="'WEEK'">
@@ -92,5 +92,7 @@
   </ng-template>
 </div>
 <ng-template #errorBox>
-  <app-error [error]="error"></app-error>
+  <button class="only-button" color="accent" mat-raised-button routerLink="/rooms">
+    <mat-icon>add_business</mat-icon> &nbsp;{{ 'ROOM.ADD.TITLE' | translate }}
+  </button>
 </ng-template>

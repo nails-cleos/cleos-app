@@ -58,9 +58,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   subscription: Subscription | undefined;
   errors: any = [];
 
-  isLoading = false;
-  error: any;
-
   productForm!: FormGroup;
   products: IProduct[] | undefined;
   discounts: IUserDiscount[] | undefined;
@@ -371,7 +368,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      this.isLoading = state.isLoading;
       this.products = state.productDiscount?.products;
       this.discounts = state.productDiscount?.discounts.map((ud: IUserDiscount) => {
         let title = ud.discount.name;
@@ -421,13 +417,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       }
 
       this.setSelectedIndex();
-
-      if (state.errorMessage) {
-        this.error = state.error;
-        this.snackBar.open(state.errorMessage, 'OK', {
-          duration: 5000
-        });
-      }
     });
   }
 

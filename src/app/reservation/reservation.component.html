@@ -234,7 +234,7 @@
 </ng-template>
 
 <ng-template [ngIfElse]="bigScreen" [ngIf]="smallScreen">
-  <mat-vertical-stepper #stepper *ngIf="!error; else errorBox" [linear]="true">
+  <mat-vertical-stepper #stepper [linear]="true">
     <mat-step [editable]="!isEditing" [stepControl]="customerForm" state="person_search">
       <ng-template matStepLabel>{{ 'RESERVATION.ADD.CUSTOMER.FIELD' | translate }}</ng-template>
       <div *ngIf="!isEditing; else editing">
@@ -242,10 +242,13 @@
           <div fxLayout="column" fxLayoutAlign="space-between start">
             <ng-container *ngTemplateOutlet="stepOne"></ng-container>
             <div class="vertical-divider"></div>
+            <button (click)="addCustomer()" *ngIf="isAdmin" color="accent" mat-raised-button>
+              <mat-icon>person_add</mat-icon>
+            </button>
           </div>
         </div>
         <div>
-          <button appBackButton mat-raised-button type="button">
+          <button [form]="customerForm" appBackButton mat-raised-button type="button">
             <mat-icon>keyboard_return</mat-icon>
           </button>
           <button (click)="getRooms()" [disabled]="customerForm.invalid" class="raised-button" color="primary"
@@ -289,7 +292,7 @@
           <mat-icon>arrow_upward</mat-icon>
         </button>
         <ng-template #editButton>
-          <button appBackButton mat-raised-button type="button">
+          <button [form]="roomForm" appBackButton mat-raised-button type="button">
             <mat-icon>keyboard_return</mat-icon>
           </button>
         </ng-template>
@@ -307,7 +310,7 @@
           <mat-icon>arrow_upward</mat-icon>
         </button>
         <ng-template #editButton>
-          <button appBackButton mat-raised-button type="button">
+          <button [form]="productForm" appBackButton mat-raised-button type="button">
             <mat-icon>keyboard_return</mat-icon>
           </button>
         </ng-template>
@@ -345,7 +348,7 @@
 </ng-template>
 
 <ng-template #bigScreen>
-  <mat-horizontal-stepper #stepper *ngIf="!error; else errorBox" [linear]="true">
+  <mat-horizontal-stepper #stepper [linear]="true">
     <mat-step [editable]="!isEditing" [stepControl]="customerForm" state="person_search">
       <ng-template matStepLabel>{{ 'RESERVATION.ADD.CUSTOMER.FIELD' | translate }}</ng-template>
       <div *ngIf="!isEditing; else editing">
@@ -360,7 +363,7 @@
           </div>
         </div>
         <div>
-          <button appBackButton mat-raised-button type="button">
+          <button [form]="customerForm" appBackButton mat-raised-button type="button">
             <mat-icon>keyboard_return</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
@@ -409,7 +412,7 @@
           <mat-icon>arrow_back</mat-icon>
         </button>
         <ng-template #editButton>
-          <button appBackButton mat-raised-button type="button">
+          <button [form]="roomForm" appBackButton mat-raised-button type="button">
             {{ 'COMMON.BUTTON.BACK' | translate }}
             <mat-icon>keyboard_return</mat-icon>
           </button>
@@ -430,7 +433,7 @@
           {{ 'COMMON.BUTTON.BACK' | translate }}
         </button>
         <ng-template #editButton>
-          <button appBackButton mat-raised-button type="button">
+          <button [form]="productForm" appBackButton mat-raised-button type="button">
             <mat-icon>keyboard_return</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
@@ -469,8 +472,4 @@
       </div>
     </mat-step>
   </mat-horizontal-stepper>
-</ng-template>
-
-<ng-template #errorBox>
-  <app-error [error]="error"></app-error>
 </ng-template>

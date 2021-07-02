@@ -38,19 +38,13 @@ export class MonthlyReservationsChartComponent implements OnChanges {
 
   private createChart(): void {
     if (this.state) {
-      if (this.state.errorMessage) {
-        this.error = this.state.error;
+      const chartResult = monthlyReservationChart(this.state.dash, this.locale);
+      if (this.state.errorMessage || !chartResult) {
+        this.error = {status: 'NO_CONTENT'};
         return;
       }
-      const chartResult = monthlyReservationChart(this.state.data, this.locale);
-      if (chartResult) {
-        this.pieChartData = chartResult.chartData;
-        this.pieChartLabels = chartResult.chartLabels;
-      } else {
-        this.error = {
-          status: 'NO_CONTENT'
-        };
-      }
+      this.pieChartData = chartResult.chartData;
+      this.pieChartLabels = chartResult.chartLabels;
     }
   }
 }

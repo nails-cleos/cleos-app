@@ -15,19 +15,18 @@ export class NotificationEffects {
   getAll$ = this.actions$.pipe(ofType(fromActionsNotification.NotificationActionTypes.notificationPage)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.notificationService.getAll(payload.active, payload.direction, payload.page).pipe(
-        switchMap((response: any) => response ? of(new fromActionsNotification.NotificationSuccess(response)) :
-          of(new fromActionsNotification.NotificationFailure({error: {status: 'NO_CONTENT', message: 'NO_CONTENT'}}))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsNotification.NotificationFailure({error: err.error})))
-      ))
+      switchMap((response: any) => of(new fromActionsNotification.NotificationSuccess(response ? response : {page: {content: []}}))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsNotification.NotificationFailure({error: err.error})))
+    ))
   );
 
   @Effect()
   readNotification$ = this.actions$.pipe(ofType(fromActionsNotification.NotificationActionTypes.notificationRead)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.notificationService.readNotification(payload.id).pipe(
-        switchMap(() => of(new fromActionsNotification.NotificationReadSuccess(payload))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsNotification.NotificationFailure({error: err.error})))
-      ))
+      switchMap(() => of(new fromActionsNotification.NotificationReadSuccess(payload))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsNotification.NotificationFailure({error: err.error})))
+    ))
   );
 
   @Effect()

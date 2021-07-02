@@ -3,7 +3,6 @@ import { IUser, IUserAll } from '../../interfaces/user';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import * as fromActionsUser from '../../store/user.actions';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
@@ -46,13 +45,12 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   getState: Observable<any>;
 
   allRole: Role[] = [Role.customer, Role.professional, Role.admin];
-  error: any;
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
 
-  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
-              private store: Store<AppState>, private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
+              private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -169,17 +167,9 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe((stateValue) => {
-      if (stateValue.errorMessage || stateValue.message) {
-        const snackBarRef = this.snackBar.open(stateValue.errorMessage || stateValue.message, 'OK', {
-          duration: 5000
-        });
-
-        if (stateValue.message) {
-          snackBarRef.afterDismissed().subscribe(() => {
-            this.clean();
-            this.getUsers();
-          });
-        }
+      if (stateValue.message) {
+        this.clean();
+        this.getUsers();
       }
       this.dataSource = stateValue.data?.content?.map((user: IUserAll) => {
         if (user.authorities) {

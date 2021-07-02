@@ -129,11 +129,11 @@ export class DashComponent implements OnInit, OnDestroy {
       if (state.errorMessage) {
         this.miniCardError(state, state.errorMessage);
       }
-      if (state.data && Array.isArray(state.data) && !state.data[0].reservations) {
+      if (state.dash) {
         this.state = state;
         const filterDate = plusMonth(createDate(), -1);
         const prevFilterDate = plusMonth(createDate(), -2);
-        const completedList = this.state.data?.filter((r: IReservationAll) => r.state === 'COMPLETED');
+        const completedList = this.state.dash?.filter((r: IReservationAll) => r.state === 'COMPLETED');
         if (completedList && completedList.length) {
           const lastMonthList = completedList.filter((r: IReservationAll) => newDate(r.start) > filterDate);
           const prevMonthList = completedList.filter(

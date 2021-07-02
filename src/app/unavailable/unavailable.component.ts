@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectUnavailableState } from '../store/app.states';
 import { IUnavailable, Unavailable, UnavailableRepeatType } from '../interfaces/unavailable';
@@ -67,8 +66,7 @@ export class UnavailableComponent implements OnInit, OnDestroy {
 
   repeats = UnavailableRepeatType;
 
-  constructor(private snackBar: MatSnackBar, private store: Store<AppState>, private formBuilder: FormBuilder,
-              private router: Router) {
+  constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private router: Router) {
     this.getState = this.store.select(selectUnavailableState);
   }
 
@@ -231,13 +229,8 @@ export class UnavailableComponent implements OnInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({incorrect: true});
         });
-      } else if (state.errorMessage || state.message) {
-        this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
-        });
-        if (state.message) {
-          this.router.navigate(['unavailable-list']);
-        }
+      } else if (state.message) {
+        this.router.navigate(['unavailable-list']);
       }
     });
   }

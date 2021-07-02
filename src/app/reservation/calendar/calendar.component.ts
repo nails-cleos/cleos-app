@@ -3,7 +3,6 @@ import { Store } from '@ngrx/store';
 import { AppState, selectAuthState, selectReservationState } from '../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Calendar, Day, ICalendar, IReservationAll, IRoomReservation } from '../../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -38,8 +37,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
   getState: Observable<any>;
   subscription: Subscription | undefined;
 
-  error: any;
-
   data: IRoomReservation[] | undefined;
   calendar: Map<string, ICalendar> = new Map<string, ICalendar>();
   dayStart: Date = createDate(9);
@@ -57,8 +54,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   colors: IState[] = stateColor();
 
-  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private snackBar: MatSnackBar,
-              private store: Store<AppState>, private router: Router, private breakpointObserver: BreakpointObserver) {
+  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
+              private router: Router, private breakpointObserver: BreakpointObserver) {
     this.getState = this.store.select(selectReservationState);
     breakpointObserver.observe([
       Breakpoints.XSmall,
@@ -245,17 +242,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
             56, this.viewDate, sunday, saturday, week));
         });
         stateValue.data.forEach((value: IRoomReservation) => this.addUnavailableList(value));
-      }
-      if (stateValue.errorMessage || stateValue.message) {
-        this.snackBar.open(stateValue.errorMessage || stateValue.message, 'OK', {
-          duration: 5000
-        });
-        if (stateValue.errorMessage) {
-          this.error = stateValue.error;
-        }
-      }
-      if (stateValue.error) {
-        this.error = stateValue.error;
       }
     });
   }
