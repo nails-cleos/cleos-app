@@ -12,7 +12,6 @@ import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../store/app.states';
 import { ReservationIconName } from '../detail/reservation-detail.component';
 import * as fromActionsReservation from '../../store/reservation.actions';
-import * as fromActionsProduct from '../../store/product.actions';
 import { getNow, newDate } from '../../util/dates';
 import { DialogComponent } from '../../dialog/dialog.component';
 import { map, startWith } from 'rxjs/operators';
@@ -189,12 +188,16 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
           this.createPageSubscriptions();
         }
       }
+      if (state.message) {
+        this.clean();
+        this.getReservations();
+      }
     });
   }
 
   private clean(): void {
     this.store.dispatch(
-      new fromActionsProduct.Clean()
+      new fromActionsReservation.Clean()
     );
   }
 

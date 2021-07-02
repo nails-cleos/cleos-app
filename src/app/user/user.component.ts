@@ -49,6 +49,7 @@ export class UserComponent implements OnInit, OnDestroy {
     if (this.extras) {
       this.role.setValue(this.extras.role);
     }
+    console.log("aaaa")
   }
 
   ngOnDestroy(): void {

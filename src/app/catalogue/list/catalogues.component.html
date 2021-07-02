@@ -5,7 +5,7 @@
         <mat-grid-tile *ngFor="let catalogue of catalogues; let i = index;">
           <cdk-drop-list [cdkDropListConnectedTo]="drops" [cdkDropListData]="i">
             <mat-card (cdkDragEntered)="entered($event)" [cdkDragData]="i" cdkDrag
-                      class="catalogue-card mat-elevation-z6">
+                      class="catalogue-card mat-elevation-z8">
               <mat-icon *ngIf="catalogue.home && !catalogue.catalog" color="primary">home</mat-icon>
               <mat-icon *ngIf="!catalogue.home && catalogue.catalog" color="primary">collections</mat-icon>
               <img *ngIf="catalogue.id; else box" [alt]="catalogue.name" [matTooltip]="catalogue.name"
@@ -36,13 +36,13 @@
   </mat-card>
 
   <button color="accent" id="add-button" mat-fab matTooltip="{{ 'CATALOGUE.ADD.TITLE' | translate }}"
-          routerLink="/catalogue">
+          routerLink="/catalogues/add">
     <mat-icon>add_a_photo</mat-icon>
   </button>
 </div>
 
 <ng-template #errorBox>
-  <button class="only-button" color="accent" mat-raised-button routerLink="/catalogue">
+  <button class="only-button" color="accent" mat-raised-button routerLink="/catalogues/add">
     <mat-icon>add_a_photo</mat-icon> &nbsp;{{ 'CATALOGUE.ADD.TITLE' | translate }}
   </button>
 </ng-template>

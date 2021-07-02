@@ -17,14 +17,15 @@
         <mat-nav-list>
           <mat-divider></mat-divider>
           <div *ngFor="let menu of menuItems; last as last">
-            <a (click)="navigate(drawer)" *ngIf="isHandset$ | async; else showMenu"
-               [routerLinkActive]="['active']" [routerLink]="'/'+menu.path" mat-list-item>
+            <a (click)="navigate(menu, drawer)" *ngIf="isHandset$ | async; else showMenu"
+               [routerLinkActiveOptions]="{ exact: false }" [routerLinkActive]="['active']"
+               [routerLink]="'/'+menu.path.split('/')[0]" mat-list-item>
               <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>
               <div mat-line>{{menu.name}}</div>
             </a>
             <ng-template #showMenu>
-              <a (click)="navigate()" [routerLinkActiveOptions]="{ exact: false }" [routerLinkActive]="['active']"
-                 [routerLink]="'/'+menu.path" mat-list-item>
+              <a (click)="navigate(menu)" [routerLinkActiveOptions]="{ exact: false }" [routerLinkActive]="['active']"
+                 [routerLink]="'/'+menu.path.split('/')[0]" mat-list-item>
                 <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>
                 <div mat-line>{{menu.name}}</div>
               </a>

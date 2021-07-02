@@ -13,14 +13,15 @@
       </ng-template>
     </div>
   </div>
-  <div fxLayout="row" *ngIf="retry">
+  <div fxLayout="row">
     <div fxFlex></div>
     <div class="only-button">
-      <button color="accent" mat-raised-button type="button" (click)="reload()">
+      <button (click)="reload()" *ngIf="retry" color="accent" mat-raised-button type="button">
         {{ 'COMMON.BUTTON.RETRY' | translate }}
       </button>
-      <button appBackButton class="raised-button" color="accent" mat-raised-button
-              type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+      <button appBackButton class="raised-button" mat-raised-button type="button">
+        {{ 'COMMON.BUTTON.BACK' | translate }}
+      </button>
     </div>
   </div>
 </div>

@@ -96,7 +96,7 @@ export class DiscountEffects {
   @Effect({dispatch: false})
   selectedData$ = this.actions$.pipe(
     ofType(fromActionsDiscount.DiscountActionTypes.discountSelected),
-    tap((data: any) => this.router.navigate(['discount', data.payload.id]))
+    tap((data: any) => this.router.navigate(['discounts', data.payload.id]))
   );
 
   @Effect({dispatch: false})

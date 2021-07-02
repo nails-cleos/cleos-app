@@ -81,12 +81,12 @@ const routes: Routes = [
         }
       },
       {
-        path: 'user/:id', component: UserDetailComponent, canActivate: [AuthGuardService], data: {
+        path: 'users/add', component: UserComponent, canActivate: [AuthGuardService], data: {
           roles: [Role.admin]
         }
       },
       {
-        path: 'user', component: UserComponent, canActivate: [AuthGuardService], data: {
+        path: 'users/:id', component: UserDetailComponent, canActivate: [AuthGuardService], data: {
           roles: [Role.admin]
         }
       },
@@ -96,12 +96,12 @@ const routes: Routes = [
         }
       },
       {
-        path: 'product', component: ProductComponent, canActivate: [AuthGuardService], data: {
+        path: 'products/add', component: ProductComponent, canActivate: [AuthGuardService], data: {
           roles: [Role.admin]
         }
       },
       {
-        path: 'product/:id', component: ProductDetailComponent, canActivate: [AuthGuardService], data: {
+        path: 'products/:id', component: ProductDetailComponent, canActivate: [AuthGuardService], data: {
           roles: [Role.admin]
         }
       },
@@ -111,12 +111,12 @@ const routes: Routes = [
         }
       },
       {
-        path: 'catalogue', component: CatalogueComponent, canActivate: [AuthGuardService], data: {
+        path: 'catalogues/add', component: CatalogueComponent, canActivate: [AuthGuardService], data: {
           roles: [Role.admin]
         }
       },
       {
-        path: 'catalogue/:id', component: CatalogueDetailComponent, canActivate: [AuthGuardService], data: {
+        path: 'catalogues/:id', component: CatalogueDetailComponent, canActivate: [AuthGuardService], data: {
           roles: [Role.admin]
         }
       },
@@ -126,12 +126,12 @@ const routes: Routes = [
         }
       },
       {
-        path: 'room', component: RoomComponent, canActivate: [AuthGuardService], data: {
+        path: 'rooms/add', component: RoomComponent, canActivate: [AuthGuardService], data: {
           roles: [Role.admin]
         }
       },
       {
-        path: 'room/:id', component: RoomDetailComponent, canActivate: [AuthGuardService], data: {
+        path: 'rooms/:id', component: RoomDetailComponent, canActivate: [AuthGuardService], data: {
           roles: [Role.admin]
         }
       },
@@ -141,17 +141,22 @@ const routes: Routes = [
         }
       },
       {
-        path: 'discount', component: DiscountComponent, canActivate: [AuthGuardService], data: {
+        path: 'discounts/add', component: DiscountComponent, canActivate: [AuthGuardService], data: {
           roles: [Role.admin]
         }
       },
       {
-        path: 'discount/:id', component: DiscountDetailComponent, canActivate: [AuthGuardService], data: {
+        path: 'discounts/:id', component: DiscountDetailComponent, canActivate: [AuthGuardService], data: {
           roles: [Role.admin]
         }
       },
       {
         path: 'me-room', component: RoomMeComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.professional]
+        }
+      },
+      {
+        path: 'reservation/search', component: SearchComponent, canActivate: [AuthGuardService], data: {
           roles: [Role.professional]
         }
       },
@@ -176,22 +181,17 @@ const routes: Routes = [
         }
       },
       {
-        path: 'search', component: SearchComponent, canActivate: [AuthGuardService], data: {
-          roles: [Role.professional]
-        }
-      },
-      {
         path: 'notifications', component: NotificationsComponent, canActivate: [AuthGuardService], data: {
           roles: [Role.admin, Role.professional, Role.customer]
         }
       },
       {
-        path: 'unavailable-list', component: UnavailableListComponent, canActivate: [AuthGuardService], data: {
+        path: 'unavailable', component: UnavailableListComponent, canActivate: [AuthGuardService], data: {
           roles: [Role.admin, Role.professional]
         }
       },
       {
-        path: 'unavailable', component: UnavailableComponent, canActivate: [AuthGuardService], data: {
+        path: 'unavailable/add', component: UnavailableComponent, canActivate: [AuthGuardService], data: {
           roles: [Role.admin, Role.professional]
         }
       },

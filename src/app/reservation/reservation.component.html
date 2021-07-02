@@ -240,11 +240,13 @@
       <div *ngIf="!isEditing; else editing">
         <div class="flex-container" fxLayout="column">
           <div fxLayout="column" fxLayoutAlign="space-between start">
-            <ng-container *ngTemplateOutlet="stepOne"></ng-container>
-            <div class="vertical-divider"></div>
-            <button (click)="addCustomer()" *ngIf="isAdmin" color="accent" mat-raised-button>
-              <mat-icon>person_add</mat-icon>
-            </button>
+            <div fxLayout="row" fxLayoutAlign="space-between center">
+              <ng-container *ngTemplateOutlet="stepOne"></ng-container>
+              <button (click)="addCustomer()" *ngIf="isAdmin" class="raised-button" color="accent" mat-mini-fab>
+                <mat-icon>person_add</mat-icon>
+              </button>
+              <div class="vertical-divider"></div>
+            </div>
           </div>
         </div>
         <div>

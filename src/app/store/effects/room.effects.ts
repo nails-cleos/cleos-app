@@ -87,7 +87,7 @@ export class RoomEffects {
     ofType(fromActionsRoom.RoomActionTypes.roomSelected),
     tap((data: any) => {
       if (data.payload.redirect) {
-        this.router.navigate(['room', data.payload.room.id]);
+        this.router.navigate(['rooms', data.payload.room.id]);
       }
     })
   );

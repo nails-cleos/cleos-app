@@ -85,7 +85,7 @@ export class CatalogueEffects {
   @Effect({dispatch: false})
   selectedData$ = this.actions$.pipe(
     ofType(fromActionsCatalogue.CatalogueActionTypes.catalogueSelected),
-    tap((data: any) => this.router.navigate(['catalogue', data.payload.id]))
+    tap((data: any) => this.router.navigate(['catalogues', data.payload.id]))
   );
 
   @Effect({dispatch: false})

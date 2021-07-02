@@ -226,11 +226,11 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   private subscribe(): void {
-    this.subscription = this.getState.subscribe((stateValue) => {
-      if (stateValue.data && Array.isArray(stateValue.data) && stateValue.data[0] &&
-        stateValue.data[0].room && stateValue.data[0].reservations) {
-        this.data = stateValue.data;
-        stateValue.data.forEach((value: IRoomReservation) => this.addReservations(value));
+    this.subscription = this.getState.subscribe((state) => {
+      if (state.data && Array.isArray(state.data) && state.data[0] &&
+        state.data[0].room && state.data[0].reservations) {
+        this.data = state.data;
+        state.data.forEach((value: IRoomReservation) => this.addReservations(value));
         this.calendar.forEach(calendar => {
           const {week, saturday, sunday} = getAvailability(calendar.room);
           const {min, max} = getStartEndDay(week, saturday, sunday);
@@ -241,7 +241,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
           calendar.events = calendar.events.concat(fillNotAvailable(unavailable, lunch, notWorking,
             56, this.viewDate, sunday, saturday, week));
         });
-        stateValue.data.forEach((value: IRoomReservation) => this.addUnavailableList(value));
+        state.data.forEach((value: IRoomReservation) => this.addUnavailableList(value));
       }
     });
   }

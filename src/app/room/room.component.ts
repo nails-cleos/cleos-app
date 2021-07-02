@@ -135,7 +135,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   addProfessional(): void {
-    this.router.navigate(['user'], {state: {role: Role.professional}});
+    this.router.navigate(['users', 'add'], {state: {role: Role.professional}});
   }
 
   private createForm(): void {

@@ -230,7 +230,7 @@ export class UnavailableComponent implements OnInit, OnDestroy {
           this.form.controls[value.field].setErrors({incorrect: true});
         });
       } else if (state.message) {
-        this.router.navigate(['unavailable-list']);
+        this.router.navigate(['unavailable']);
       }
     });
   }

@@ -401,7 +401,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   addCustomer(): void {
-    this.router.navigate(['user'], {state: {role: Role.customer}});
+    this.router.navigate(['users', 'add'], {state: {role: Role.customer}});
   }
 
   getAddress($event: GeocoderResult): void {

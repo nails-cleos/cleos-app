@@ -96,8 +96,19 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
-    case ReservationActionTypes.getUpcomingReservation:
     case ReservationActionTypes.getAllGroupingByRoom: {
+      return {
+        ...state,
+        data: null,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        selected: null,
+        message: null,
+        isLoading: true
+      };
+    }
+    case ReservationActionTypes.getUpcomingReservation: {
       return {
         ...state,
         data: null,
@@ -221,7 +232,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: null,
         subErrors: null,
         message: null,
-        isLoading: false // ok
+        isLoading: false
       };
     }
     case ReservationActionTypes.customersSuccess: {

@@ -92,7 +92,8 @@
   </table>
   <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
 
-  <button color="accent" id="add-button" mat-fab matTooltip="{{ 'ROOM.ADD.TITLE' | translate }}" routerLink="/room">
+  <button color="accent" id="add-button" mat-fab matTooltip="{{ 'ROOM.ADD.TITLE' | translate }}"
+          routerLink="/rooms/add">
     <mat-icon>add_business</mat-icon>
   </button>
 </div>

@@ -41,11 +41,11 @@
               </mat-form-field>
 
               <div *ngIf="room" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
-                <button (click)="picker.open()" mat-icon-button>
-                  <mat-icon>today</mat-icon>
-                </button>
                 <mat-form-field appearance="fill" color="primary" style="margin-right: 12px;">
                   <mat-label>{{ 'UNAVAILABLE.ADD.DATE.FIELD' | translate }}</mat-label>
+                  <button matPrefix (click)="picker.open()" mat-icon-button>
+                    <mat-icon>today</mat-icon>
+                  </button>
                   <label>
                     <input (dateChange)="setDate($event)" (focus)="picker.open()" [formControl]="startDate"
                            [matDatepickerFilter]="myFilter"

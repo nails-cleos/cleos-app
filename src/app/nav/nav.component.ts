@@ -27,6 +27,7 @@ import { environment } from '../../environments/environment';
 import { getUserImage, getUserName, getUserNameInitials } from '../util/helper';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSidenav } from '@angular/material/sidenav';
+import { NavigationService } from '../services/navigation.service';
 
 @Component({
   selector: 'app-nav',
@@ -62,17 +63,18 @@ export class NavComponent implements OnInit, OnDestroy {
   countNotifications = 0;
   plusNotification: string | undefined;
 
-  isLoading = false;
+  isLoading = true;
   error: any;
 
   constructor(public translate: TranslateService, private breakpointObserver: BreakpointObserver,
               private router: Router, private store: Store<AppState>, private messagingService: MessagingService,
-              private snackBar: MatSnackBar) {
+              private snackBar: MatSnackBar, private navigation: NavigationService) {
     this.language = this.translate.currentLang;
     this.getState = this.store.select(selectAuthState);
     this.getNotificationState = this.store.select(selectNotificationState);
     this.selectStore([selectRoomState, selectProductState, selectCatalogueState, selectDiscountState,
       selectUnavailableState, selectUserState, selectReservationState]);
+    this.navigation.subscribe();
   }
 
   ngOnInit(): void {
@@ -112,9 +114,10 @@ export class NavComponent implements OnInit, OnDestroy {
     }
   }
 
-  navigate(drawer?: MatSidenav): void {
+  navigate(menu: IMenu, drawer?: MatSidenav): void {
     drawer?.toggle();
     this.error = undefined;
+    this.router.navigate([menu.path]);
   }
 
   private selectStore(states: any[]): void {

@@ -34,6 +34,10 @@ export const reducer = (state = initialState, action: All): State => {
     case AuthActionTypes.socialLogin: {
       return {
         ...state,
+        errorMessage: null,
+        error: null,
+        message: null,
+        subErrors: null,
         isLoading: true
       };
     }

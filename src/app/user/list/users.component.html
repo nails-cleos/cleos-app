@@ -181,7 +181,8 @@
   </table>
   <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
 
-  <button color="accent" id="add-button" mat-fab matTooltip="{{ 'USER.ADD.TITLE' | translate }}" routerLink="/user">
+  <button color="accent" id="add-button" mat-fab matTooltip="{{ 'USER.ADD.TITLE' | translate }}"
+          routerLink="/users/add">
     <mat-icon>person_add</mat-icon>
   </button>
 </div>

@@ -168,7 +168,7 @@ export class UserEffects {
     ofType(fromActionsUser.UserActionTypes.userSelected),
     tap((data: any) => {
       if (!data.payload.profile) {
-        this.router.navigate(['user', data.payload.user.id]);
+        this.router.navigate(['users', data.payload.user.id]);
       }
     })
   );
