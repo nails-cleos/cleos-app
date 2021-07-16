@@ -63,6 +63,7 @@ import { MessagingService } from './services/messaging.service';
 import { DiscountService } from './services/discount.service';
 import { TrackingService } from './services/tracking.service';
 import { MainService } from './services/main.service';
+import { PaymentService } from './services/payment.service';
 
 // Reducers
 import { reducers } from './store/app.states';
@@ -78,6 +79,7 @@ import { CatalogueEffects } from './store/effects/catalogue.effects';
 import { UnavailableEffects } from './store/effects/unavailable.effects';
 import { DiscountEffects } from './store/effects/discount.effects';
 import { MainEffects } from './store/effects/main.effects';
+import { PaymentEffects } from './store/effects/payment.effects';
 
 // Directives
 import { DragDropDirective } from './directives/drag-drop.directive';
@@ -117,7 +119,9 @@ import { AnnualReservationsChartComponent } from './charts/annual-reservations-c
 import { MiniCardComponent } from './mini-card/mini-card.component';
 import { CustomerReservationsChartComponent } from './charts/customer-reservations-chart/customer-reservations-chart.component';
 import { ReservationTableComponent } from './reservation/table/reservation-table.component';
-import { QuantityProductReservationsChartComponent } from './charts/quantity-product-reservations-chart/quantity-product-reservations-chart.component';
+import {
+  QuantityProductReservationsChartComponent
+} from './charts/quantity-product-reservations-chart/quantity-product-reservations-chart.component';
 import { LastMonthReservationsChartComponent } from './charts/last-month-reservations-chart/last-month-reservations-chart.component';
 import { TrackingAverageChartComponent } from './charts/tracking-average-chart/tracking-average-chart.component';
 import { NotificationsComponent } from './notification/list/notifications.component';
@@ -150,6 +154,9 @@ import { MiniCardProductComponent } from './mini-card-product/mini-card-product.
 import { PrivacyComponent } from './privacy/privacy.component';
 import { TermsAndConditionsComponent } from './terms-and-conditions/terms-and-conditions.component';
 import { MainContentComponent } from './main/main-content/main-content.component';
+import { PaymentCompleteComponent } from './reservation/payment/complete/payment-complete.component';
+import { PaymentComponent } from './reservation/payment/payment.component';
+import { MoreInfoComponent } from './reservation/detail/more-info/more-info.component';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
@@ -256,13 +263,16 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
     MiniCardProductComponent,
     PrivacyComponent,
     TermsAndConditionsComponent,
-    MainContentComponent
+    MainContentComponent,
+    PaymentCompleteComponent,
+    PaymentComponent,
+    MoreInfoComponent
   ],
   imports: [
     BrowserModule,
     StoreModule.forRoot(reducers, {metaReducers}),
     EffectsModule.forRoot([LoginEffects, UserEffects, ProductEffects, CatalogueEffects, RoomEffects, ReservationEffects,
-      NotificationEffects, UnavailableEffects, DiscountEffects, MainEffects]),
+      NotificationEffects, UnavailableEffects, DiscountEffects, MainEffects, PaymentEffects]),
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {
@@ -326,6 +336,7 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
     DiscountService,
     TrackingService,
     MainService,
+    PaymentService,
     NavigationService,
     TranslationLoaderResolver,
     GeocodeService,

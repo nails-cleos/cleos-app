@@ -11,6 +11,7 @@
       "SEND": "Enviar",
       "CREATE": "Crear",
       "ADD": "Agregar",
+      "RESEND": "Re enviar",
       "IGNORE": "Ignorar",
       "UPDATE": "Actualizar",
       "CANCEL": "Cancelar",
@@ -23,6 +24,8 @@
       "COPY": "Copiar",
       "SHARE": "Compartir",
       "COMPLETE": "Completar",
+      "ML": "Pagar con ML",
+      "NOTIFY": "Notificar",
       "DISCOUNT": {
         "SHOW": "Mostrar descuentos",
         "HIDE": "Ocultar descuentos",
@@ -30,7 +33,8 @@
       }
     },
     "COLUMN": {
-      "ACTIONS": "Acciones"
+      "ACTIONS": "Acciones",
+      "LAST_UPDATE": "Última actualización"
     },
     "PAGINATOR": {
       "ITEMS_PER_PAGE_LABEL": "Items por página:",
@@ -66,6 +70,18 @@
     "DISCOUNT": {
       "MONEY": "Dinero",
       "PERCENTAGE": "Porcentaje"
+    },
+    "PAYMENT": {
+      "CASH": "Efectivo",
+      "ML": "Mercado Libre"
+    },
+    "STATUS": {
+      "ML": {
+        "NONE": "Pendiente",
+        "APPROVED": "Aprobado",
+        "REJECTED": "Rechazado",
+        "IN_PROCESS": "Pendiente"
+      }
     },
     "BACK": {
       "TITLE": "Estas apunto de volver atrás",
@@ -747,6 +763,11 @@
         }
       },
       "APPOINTMENT": "Cita",
+      "PAYMENT": {
+        "TITLE": "Pagos",
+        "PAID": "Pagado",
+        "TYPE": "Forma de pago"
+      },
       "HISTORY": {
         "TITLE": "Historial",
         "COLUMN": {
@@ -767,24 +788,35 @@
       },
       "ACTION": {
         "APPROVE": "Aprobar",
-        "START": "Iniciar",
         "EDIT": "Editar",
+        "PAY": "Pagar",
+        "START": "Iniciar",
         "COMPLETE": "Completar",
         "CANCEL": "Cancelar",
         "BOOK": "Reservar nuevamente",
-        "SEND": "Enviar Whatsapp"
+        "SEND": "Enviar Whatsapp",
+        "MORE": "Más"
       },
       "CHANGE_STATE": {
         "TITLE": "Cambio de estado",
         "ACTION": {
           "APPROVE": "aprobar la reserva",
           "EDIT": "editar la cita",
+          "PAY": "pagar la reserva",
           "START": "iniciar la cita",
           "COMPLETE": "completar la cita",
           "CANCEL": "cancelar la reserva",
           "BOOK": "reservar nuevamente"
         },
         "CONTENT": "¿Está seguro de {{action}}?"
+      },
+      "TRACKING": {
+        "TITLE": "Seguimiento",
+        "CREATED": "Creada",
+        "APPROVED": "Aprobada",
+        "STARTED": "Empezada",
+        "COMPLETED": "Completada",
+        "DURATION": "Duración de la cita"
       }
     },
     "PAGE": {
@@ -816,7 +848,12 @@
       "CREATED": "Creada",
       "APPROVED": "Aprobada",
       "STARTED": "Empezada",
+      "PAID": "Pagado",
+      "PARTIALLY_PAID": "Parcialmente pagado",
+      "PARTIALLYPAID": "Parcialmente pagado",
       "COMPLETED": "Completada",
+      "PARTIALLY_COMPLETED": "Parcialmente Completada",
+      "PARTIALLYCOMPLETED": "Parcialmente Completada",
       "CANCELLED": "Cancelada"
     },
     "CUSTOMER": {
@@ -828,7 +865,10 @@
         "ADDRESS": "Dirección",
         "PRODUCT": "Servicio",
         "PRICE": "Precio",
-        "CREATED": "La reserva debe ser aprobada por: "
+        "PAID": "Pagado",
+        "APPROVED": "Aprobado",
+        "CREATED": "La reserva debe ser aprobada por: ",
+        "PAY_NOW": "Pagá ahora y congela el precio"
       },
       "NO_UPCOMING": {
         "TITLE": "No hay próxima reserva"
@@ -952,7 +992,7 @@
       "CREATED": "No disponible {{date}} creado"
     },
     "DETAIL": {
-      "TITLE": "Actualizar servicio",
+      "TITLE": "Actualizar no disponible",
       "DESCRIPTION": {
         "FIELD": "Descripción"
       },
@@ -1058,9 +1098,30 @@
       "MESSAGE": "Descuento {{name}} actualizado"
     }
   },
+  "PAYMENT": {
+    "LIST": {
+      "COLUMN": {
+        "DESCRIPTION": "Descripción",
+        "AMOUNT": "Importe",
+        "TYPE": "Forma",
+        "STATUS": "Estado"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No hay pagos"
+      }
+    },
+    "ADD": {
+      "CREATED": "Pago completado",
+      "ERROR_TEXT": "Error",
+      "ERROR": "Pago incompleto.\n{{reason}}",
+      "RECREATE": "Link de pago regenerado"
+    },
+    "COPY": "¡Link copiado!"
+  },
   "WHATSAPP": {
     "SEND": {
-      "APPROVE": "♡ \uD83C\uDD43\uD83C\uDD44 \uD83C\uDD3F\uD83C\uDD41\uD83C\uDD3E\uD83C\uDD47\uD83C\uDD38\uD83C\uDD3C\uD83C\uDD3E \uD83C\uDD42\uD83C\uDD34\uD83C\uDD41\uD83C\uDD45\uD83C\uDD38\uD83C\uDD32\uD83C\uDD34:%0A♡ {{date}}"
+      "APPROVE": "♡ \uD83C\uDD43\uD83C\uDD44 \uD83C\uDD3F\uD83C\uDD41\uD83C\uDD3E\uD83C\uDD47\uD83C\uDD38\uD83C\uDD3C\uD83C\uDD3E \uD83C\uDD42\uD83C\uDD34\uD83C\uDD41\uD83C\uDD45\uD83C\uDD38\uD83C\uDD32\uD83C\uDD34:%0A♡ {{date}} Hs.",
+      "TOMORROW": "♕\uD835\uDC79\uD835\uDC86\uD835\uDC84\uD835\uDC90\uD835\uDC93\uD835\uDC85\uD835\uDC82\uD835\uDC95\uD835\uDC90\uD835\uDC93\uD835\uDC8A\uD835\uDC90 \uD835\uDC85\uD835\uDC86 \uD835\uDC95\uD835\uDC96\uD835\uDC93\uD835\uDC8F\uD835\uDC90♕%0Aℍ\uD835\uDD60\uD835\uDD5D\uD835\uDD52!!! \uD835\uDD44\uD835\uDD52ñ\uD835\uDD52\uD835\uDD5F\uD835\uDD52 {{date}} ℍ\uD835\uDD64 \uD835\uDD65\uD835\uDD56\uD835\uDD5Fé\uD835\uDD64 \uD835\uDD65\uD835\uDD66 \uD835\uDD64\uD835\uDD56\uD835\uDD64\uD835\uDD5Aó\uD835\uDD5F \uD835\uDD55\uD835\uDD56 \uD835\uDD66ñ\uD835\uDD52\uD835\uDD64 ♡♡♡  ℂ\uD835\uDD60\uD835\uDD5F\uD835\uDD57í\uD835\uDD63\uD835\uDD5E\uD835\uDD52\uD835\uDD5E\uD835\uDD56 \uD835\uDD62\uD835\uDD66\uD835\uDD56 \uD835\uDD52\uD835\uDD64\uD835\uDD5A\uD835\uDD64\uD835\uDD65\uD835\uDD5A\uD835\uDD63á\uD835\uDD64 \uD835\uDD61\uD835\uDD60\uD835\uDD63 \uD835\uDD57\uD835\uDD52\uD835\uDD67\uD835\uDD60\uD835\uDD63.%0A❀ \uD835\uDD39\uD835\uDD56\uD835\uDD64\uD835\uDD5A\uD835\uDD65\uD835\uDD60 ❀"
     }
   },
   "MAIN": {

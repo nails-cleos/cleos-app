@@ -45,6 +45,9 @@ import { NavComponent } from './nav/nav.component';
 import { PrivacyComponent } from './privacy/privacy.component';
 import { TermsAndConditionsComponent } from './terms-and-conditions/terms-and-conditions.component';
 import { MainContentComponent } from './main/main-content/main-content.component';
+import { PaymentCompleteComponent } from './reservation/payment/complete/payment-complete.component';
+import { PaymentComponent } from './reservation/payment/payment.component';
+import { MoreInfoComponent } from './reservation/detail/more-info/more-info.component';
 
 const routes: Routes = [
   {
@@ -157,7 +160,7 @@ const routes: Routes = [
       },
       {
         path: 'reservation/search', component: SearchComponent, canActivate: [AuthGuardService], data: {
-          roles: [Role.professional]
+          roles: [Role.admin, Role.professional]
         }
       },
       {
@@ -173,6 +176,11 @@ const routes: Routes = [
       {
         path: 'reservation/:id', component: ReservationDetailComponent, canActivate: [AuthGuardService], data: {
           roles: [Role.admin, Role.professional, Role.customer]
+        }, runGuardsAndResolvers: 'always'
+      },
+      {
+        path: 'reservation/:id/more-info', component: MoreInfoComponent, canActivate: [AuthGuardService], data: {
+          roles: [Role.admin, Role.professional]
         }, runGuardsAndResolvers: 'always'
       },
       {
@@ -205,6 +213,8 @@ const routes: Routes = [
           {path: 'reservations', component: ReservationsComponent},
           {path: 'reservation', component: MeReservationComponent},
           {path: 'reservation/:id', component: MeReservationComponent},
+          {path: 'reservation/:id/payment', component: PaymentComponent},
+          {path: 'reservation/:id/payment/:status', component: PaymentCompleteComponent},
           {path: 'referrals', component: ReferralsComponent},
           {path: 'discounts', component: MeDiscountComponent}
         ]

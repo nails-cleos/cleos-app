@@ -11,7 +11,7 @@
     "start:dev": "ng serve",
     "start:pwa": "node server.js",
     "build": "ng build --prod",
-    "build:pwa": "ng build --configuration=pwa --source-map",
+    "build:pwa": "ng build --configuration=pwa",
     "test": "ng test",
     "lint": "ng lint --fix",
     "eslint": "eslint src --fix",

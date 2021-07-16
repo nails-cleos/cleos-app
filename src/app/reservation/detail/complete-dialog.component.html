@@ -56,6 +56,16 @@
                   translate: {durability: product.value.durability}" mat-line>
       </div>
     </mat-list-item>
+    <mat-list-item *ngIf="totalToPaid > 0">
+      <mat-form-field appearance="fill">
+        <mat-label>{{ 'RESERVATION.DETAIL.PAYMENT.TYPE' | translate }}</mat-label>
+        <mat-select #select [formControl]="type">
+          <mat-option *ngFor="let t of types | keyvalue" [value]="t.value">
+            {{ 'COMMON.PAYMENT.' + t.value | translate }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </mat-list-item>
     <ng-template #skeleton>
       <div class="ssc-line"></div>
     </ng-template>

@@ -2,6 +2,7 @@ export interface Pagination<T> {
   content: Array<T>;
   totalElements: number;
   totalPages: number;
+  // eslint-disable-next-line id-blacklist
   number: number; // Page number
 }
 

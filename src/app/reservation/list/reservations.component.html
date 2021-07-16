@@ -3,18 +3,22 @@
     <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
       <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
         <mat-card *ngIf="!noContent; else noUpcoming">
-          <mat-card-header *ngIf="upcoming; else headSkeleton">
+          <span *ngIf="isPaid" [@stampAnimation]="{value: ':enter', params: {deg: -20}}"
+                class="stamp paid">{{ 'RESERVATION.CUSTOMER.UPCOMING.PAID' | translate }}</span>
+          <span *ngIf="upcoming?.state === 'APPROVED'" [@stampAnimation]="{value: ':enter', params: {deg: 20}}"
+                class="stamp approved">{{ 'RESERVATION.CUSTOMER.UPCOMING.APPROVED' | translate }}</span>
+          <mat-card-header *ngIf="upcoming.id; else headSkeleton">
             <mat-card-title>{{ 'RESERVATION.CUSTOMER.UPCOMING.TITLE' | translate }}</mat-card-title>
             <mat-card-subtitle>{{ upcoming.id }}</mat-card-subtitle>
           </mat-card-header>
           <ng-template #headSkeleton>
             <div class="ssc-head-line"></div>
           </ng-template>
-          <mat-divider *ngIf="upcoming"></mat-divider>
+          <mat-divider *ngIf="upcoming.id"></mat-divider>
           <mat-card-content>
             <div class="container">
               <table>
-                <tr *ngIf="upcoming; else skeleton">
+                <tr *ngIf="upcoming.id; else skeleton">
                   <td class="right">{{ 'RESERVATION.CUSTOMER.UPCOMING.START' | translate }}</td>
                   <td class="left">{{upcoming.start | date:'short':undefined:language}}</td>
                 </tr>
@@ -22,11 +26,11 @@
                   <td class="right">{{ 'RESERVATION.CUSTOMER.UPCOMING.END' | translate }}</td>
                   <td class="left">{{end | date:'short':undefined:language}}</td>
                 </tr>
-                <tr *ngIf="end; else skeleton">
+                <tr *ngIf="upcoming.id; else skeleton">
                   <td class="right">{{ 'RESERVATION.CUSTOMER.UPCOMING.ROOM' | translate }}</td>
                   <td class="left">{{upcoming.room.name}}</td>
                 </tr>
-                <tr *ngIf="end; else skeleton">
+                <tr *ngIf="upcoming.id; else skeleton">
                   <td class="right">{{ 'RESERVATION.CUSTOMER.UPCOMING.ADDRESS' | translate }}</td>
                   <td class="left">
                     <a [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + upcoming.room.address.name"
@@ -35,19 +39,23 @@
                     </a>
                   </td>
                 </tr>
-                <tr *ngIf="end; else skeleton">
+                <tr *ngIf="upcoming.id; else skeleton">
                   <td class="right">{{ 'RESERVATION.CUSTOMER.UPCOMING.PRODUCT' | translate }}</td>
                   <td class="left">{{upcoming.product.name}}</td>
                 </tr>
-                <tr *ngIf="end; else skeleton">
+                <tr *ngIf="upcoming.id; else skeleton">
                   <td class="right">{{ 'RESERVATION.CUSTOMER.UPCOMING.PRICE' | translate }}</td>
                   <td *ngIf="priceDiscount; else noDiscount" class="left">
-                    <span [class.strikethrough]="priceDiscount">$ {{priceDiscount | number:'1.2-2'}}</span>
+                    <span [class.strikethrough]="priceDiscount">$ {{price | number:'1.2-2'}}</span>
                     <span [@discountAnimation] class="raised-button bold">$ {{priceDiscount | number:'1.2-2'}}</span>
                   </td>
                   <ng-template #noDiscount>
-                    <td class="left">$ {{upcoming.product.price | number:'1.2-2'}}</td>
+                    <td class="left">$ {{price | number:'1.2-2'}}</td>
                   </ng-template>
+                </tr>
+                <tr *ngIf="paid">
+                  <td class="right">{{ 'RESERVATION.CUSTOMER.UPCOMING.PAID' | translate }}</td>
+                  <td class="left">$ {{paid | number:'1.2-2'}}</td>
                 </tr>
               </table>
               <div *ngIf="upcoming && upcoming.state === 'CREATED'" [style.color]="'#ff0000'">
@@ -55,13 +63,16 @@
                 {{professionalName}}
               </span>
               </div>
+              <div *ngIf="upcoming && upcoming.state === 'APPROVED'" [style.color]="'#ff0000'">
+                {{ 'RESERVATION.CUSTOMER.UPCOMING.PAY_NOW' | translate }}
+              </div>
             </div>
             <ng-template #skeleton>
               <div class="ssc-line"></div>
             </ng-template>
           </mat-card-content>
           <mat-divider *ngIf="upcoming"></mat-divider>
-          <mat-card-actions *ngIf="upcoming; else buttonSkeleton">
+          <mat-card-actions *ngIf="upcoming.id; else buttonSkeleton">
             <div fxFlex></div>
             <button (click)="edit(upcoming)" color="primary" mat-raised-button>
               <mat-icon>edit_calendar</mat-icon>

@@ -40,8 +40,9 @@ import { GeocoderResult } from '@agm/core';
 import { Role } from '../interfaces/token';
 import { IUnavailableAll } from '../interfaces/unavailable';
 import { timeTheme } from '../util/theme';
-import { DiscountType, IUserDiscount, transitionAnimation } from '../interfaces/discount';
+import { DiscountType, IUserDiscount } from '../interfaces/discount';
 import { getFullUserName, getPriceDiscount, getUserName } from '../util/helper';
+import { transitionAnimation } from '../util/animation';
 
 @Component({
   selector: 'app-reservation',
@@ -124,6 +125,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   isAdmin = false;
 
+  productId: string | undefined;
+
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private formBuilder: FormBuilder, private breakpointObserver: BreakpointObserver,
               private router: Router, private route: ActivatedRoute, private adapter: DateAdapter<any>,
@@ -145,9 +148,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.extras = this.router.getCurrentNavigation()?.extras.state;
     if (this.extras) {
+      this.productId = this.extras.product?.id;
       this.customer.setValue(this.extras.customer);
       this.room.setValue(this.extras.room);
-      this.product.setValue(this.extras.product);
       this.date.setValue(this.extras.date);
     }
     this.store.select(selectAuthState).subscribe((state: any) => {
@@ -574,6 +577,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscription = this.getState.subscribe(state => {
       this.customers = state.customers;
       this.products = state.productDiscount?.products;
+      if (this.products && this.productId) {
+        this.product.setValue(this.products.find(product => product.id === this.productId));
+        this.productId = this.product.value.id;
+      }
       this.discounts = state.productDiscount?.discounts.map((ud: IUserDiscount) => {
         let title = ud.discount.name;
         switch (ud.discount.type) {

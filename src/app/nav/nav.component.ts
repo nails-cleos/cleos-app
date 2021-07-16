@@ -10,6 +10,7 @@ import {
   selectCatalogueState,
   selectDiscountState,
   selectNotificationState,
+  selectPaymentState,
   selectProductState,
   selectReservationState,
   selectRoomState,
@@ -73,7 +74,7 @@ export class NavComponent implements OnInit, OnDestroy {
     this.getState = this.store.select(selectAuthState);
     this.getNotificationState = this.store.select(selectNotificationState);
     this.selectStore([selectRoomState, selectProductState, selectCatalogueState, selectDiscountState,
-      selectUnavailableState, selectUserState, selectReservationState]);
+      selectUnavailableState, selectUserState, selectReservationState, selectPaymentState]);
     this.navigation.subscribe();
   }
 
@@ -124,11 +125,13 @@ export class NavComponent implements OnInit, OnDestroy {
     states.forEach(selectedState => this.store.select(selectedState)
       .subscribe((state: any) => {
         this.isLoading = state.isLoading;
-        this.error = state.error;
-        if (state.errorMessage || state.message) {
-          this.snackBar.open(state.errorMessage || state.message, 'OK', {
-            duration: 5000
-          });
+        if (!state.subErrors) {
+          this.error = state.error;
+          if (state.errorMessage || state.message) {
+            this.snackBar.open(state.errorMessage || state.message, 'OK', {
+              duration: 5000
+            });
+          }
         }
       }));
   }

@@ -41,3 +41,32 @@
     }
   }
 }
+
+.stamp {
+  border: 4px solid transparent;
+  border-radius: 4px;
+  display: inline-block;
+  padding: 5px 2px;
+  line-height: 22px;
+  font-size: 24px;
+  font-family: 'Black Ops One', cursive;
+  text-transform: uppercase;
+  text-align: center;
+  opacity: 0.4;
+  width: auto;
+  position: absolute;
+  top: 40%;
+  left: 37%;
+}
+
+.paid {
+  box-shadow: 0 0 0 3px darkgreen, 0 0 0 2px darkgreen inset;
+  color: darkgreen;
+  transform: rotate(-20deg);
+}
+
+.approved {
+  box-shadow: 0 0 0 3px #a06c3f, 0 0 0 2px #a06c3f inset;
+  color: #a06c3f;
+  transform: rotate(20deg);
+}
