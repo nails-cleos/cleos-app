@@ -8,6 +8,10 @@
     </ng-template>
   </mat-card-header>
   <mat-card-content *ngIf="reservation; else boxSkeleton">
+    <div *ngIf="showFireworks" class="pyro">
+      <div class="before"></div>
+      <div class="after"></div>
+    </div>
     <mat-divider></mat-divider>
     <mat-list>
       <div mat-subheader>{{ 'RESERVATION.DETAIL.ROOM.TITLE' | translate}}</div>
@@ -33,6 +37,17 @@
         <div mat-line>{{reservation.room.address?.description}}</div>
       </mat-list-item>
       <mat-divider></mat-divider>
+      <div mat-subheader>{{ 'RESERVATION.DETAIL.APPOINTMENT' | translate}}</div>
+      <mat-list-item>
+        <mat-icon mat-list-icon>event</mat-icon>
+        <div mat-line>{{start | date:'short':undefined:language}}</div>
+        <div mat-line>{{end | date:'short':undefined:language}}</div>
+      </mat-list-item>
+      <mat-list-item>
+        <mat-icon mat-list-icon>{{state}}</mat-icon>
+        <div mat-line>{{ 'RESERVATION.STATE.' + reservation.state | translate}}</div>
+      </mat-list-item>
+      <mat-divider></mat-divider>
       <div mat-subheader>{{ 'RESERVATION.DETAIL.PRODUCT.TITLE' | translate}}</div>
       <mat-list-item>
         <mat-icon mat-list-icon>home_repair_service</mat-icon>
@@ -55,17 +70,6 @@
           <div mat-line>{{reservation.product.price | number:'1.2-2'}}</div>
         </ng-template>
       </mat-list-item>
-      <mat-divider></mat-divider>
-      <div mat-subheader>{{ 'RESERVATION.DETAIL.APPOINTMENT' | translate}}</div>
-      <mat-list-item>
-        <mat-icon mat-list-icon>event</mat-icon>
-        <div mat-line>{{start | date:'short':undefined:language}}</div>
-        <div mat-line>{{end | date:'short':undefined:language}}</div>
-      </mat-list-item>
-      <mat-list-item>
-        <mat-icon mat-list-icon>{{state}}</mat-icon>
-        <div mat-line>{{ 'RESERVATION.STATE.' + reservation.state | translate}}</div>
-      </mat-list-item>
       <div *ngIf="reservation.product.extras">
         <mat-divider></mat-divider>
         <div mat-subheader>{{ 'RESERVATION.DETAIL.PRODUCT.EXTRAS.TITLE' | translate}}</div>
@@ -79,12 +83,87 @@
           <div mat-line>{{ 'RESERVATION.DETAIL.PRODUCT.EXTRAS.PRICE' | translate}}</div>
           <div mat-line>{{reservation.product.extras.price}}</div>
         </mat-list-item>
+        <mat-divider></mat-divider>
         <mat-list-item *ngIf="total">
           <mat-icon mat-list-icon>paid</mat-icon>
           <div mat-line><span class="bold">{{ 'RESERVATION.DETAIL.PRODUCT.EXTRAS.TOTAL' | translate}}</span></div>
           <div mat-line><span class="bold">{{total}}</span></div>
         </mat-list-item>
       </div>
+      <mat-divider></mat-divider>
+    </mat-list>
+    <mat-list *ngIf="paymentPaid && paymentPaid.length">
+      <div class="divider">
+        <h1>{{ 'RESERVATION.DETAIL.PAYMENT.TITLE' | translate}}</h1>
+      </div>
+      <table [dataSource]="paymentPaid" mat-table>
+        <ng-container matColumnDef="position">
+          <th *matHeaderCellDef mat-header-cell>#</th>
+          <td *matCellDef="let payment; let i = index;" mat-cell>
+            <div *ngIf="payment.id; else skeleton">{{i + 1}} </div>
+            <ng-template #skeleton>
+              <div class="ssc-line"></div>
+            </ng-template>
+          </td>
+          <td *matFooterCellDef mat-footer-cell class="bold">{{ 'RESERVATION.DETAIL.PAYMENT.PAID' | translate}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="description">
+          <th *matHeaderCellDef mat-header-cell>{{ 'PAYMENT.LIST.COLUMN.DESCRIPTION' | translate }}</th>
+          <td *matCellDef="let payment" class="column-large-text" mat-cell>
+            <div *ngIf="payment.id; else skeleton">{{payment.description}}</div>
+            <ng-template #skeleton>
+              <div class="ssc-line"></div>
+            </ng-template>
+          </td>
+          <td *matFooterCellDef mat-footer-cell></td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'PAYMENT.LIST.COLUMN.STATUS' | translate }}</th>
+          <td *matCellDef="let payment" fxHide.lt-sm fxShow mat-cell>
+            <div *ngIf="payment.id; else skeleton">
+              {{'COMMON.STATUS.ML.' + (payment.status ? payment.status.toUpperCase() : 'NONE') | translate}}
+            </div>
+            <ng-template #skeleton>
+              <div class="ssc-line"></div>
+            </ng-template>
+          </td>
+          <td *matFooterCellDef fxHide.lt-sm fxShow mat-footer-cell></td>
+        </ng-container>
+
+        <ng-container matColumnDef="type">
+          <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'PAYMENT.LIST.COLUMN.TYPE' | translate }}</th>
+          <td *matCellDef="let payment" fxHide.lt-sm fxShow mat-cell>
+            <div *ngIf="payment.id; else skeleton">
+              {{'COMMON.PAYMENT.' + payment.type | translate}}
+            </div>
+            <ng-template #skeleton>
+              <div class="ssc-line"></div>
+            </ng-template>
+          </td>
+          <td *matFooterCellDef fxHide.lt-sm fxShow mat-footer-cell></td>
+        </ng-container>
+
+        <ng-container matColumnDef="amount">
+          <th *matHeaderCellDef mat-header-cell>{{ 'PAYMENT.LIST.COLUMN.AMOUNT' | translate }}</th>
+          <td *matCellDef="let payment" mat-cell>
+            <div *ngIf="payment.id; else skeleton">
+              <mat-icon matPrefix>attach_money</mat-icon>&nbsp;{{payment.amount | number:'1.2-2'}}
+            </div>
+            <ng-template #skeleton>
+              <div class="ssc-line"></div>
+            </ng-template>
+          </td>
+          <td *matFooterCellDef mat-footer-cell class="bold">
+            <mat-icon matPrefix>attach_money</mat-icon>&nbsp;{{getTotal() | number:'1.2-2'}}
+          </td>
+        </ng-container>
+
+        <tr *matHeaderRowDef="paymentDisplayedColumns" mat-header-row></tr>
+        <tr *matRowDef="let row; columns: paymentDisplayedColumns;" class="{{row.status}}" mat-row></tr>
+        <tr *matFooterRowDef="paymentDisplayedColumns" mat-footer-row></tr>
+      </table>
       <mat-divider></mat-divider>
     </mat-list>
     <mat-list *ngIf="reservation.history">
@@ -151,8 +230,8 @@
     <div class="ssc-head-line"></div>
   </ng-template>
 </mat-card>
-<div id="action-button" *ngIf="changeState && changeState.length">
-  <mat-fab-menu (onFabMenuItemSelected)="onChangeState($event)" [fabButtons]="changeState" color="primary"
-                [direction]="direction" icon="all_out">
+<div *ngIf="changeState && changeState.length" id="action-button">
+  <mat-fab-menu (onFabMenuItemSelected)="onChangeState($event)" [direction]="direction" [fabButtons]="changeState"
+                color="primary" icon="all_out">
   </mat-fab-menu>
 </div>

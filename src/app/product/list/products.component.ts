@@ -13,23 +13,28 @@ import * as fromActionsProduct from '../../store/product.actions';
 import { DialogComponent } from '../../dialog/dialog.component';
 import { convertDuration } from '../../util/dates';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { detailExpandAnimation } from '../../util/animation';
 
 @Component({
   selector: 'app-products',
   templateUrl: './products.component.html',
-  styleUrls: ['./products.component.scss']
+  styleUrls: ['./products.component.scss'],
+  animations: [detailExpandAnimation]
 })
 export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['position', 'name', 'price', 'durability', 'duration', 'actions'];
+  displayedColumns: string[] = ['position', 'name', 'price', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IProduct>>();
   subscription: Subscription | undefined;
   getState: Observable<any>;
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
+
+  expanded: IProduct | undefined;
+  language: string;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
@@ -41,6 +46,7 @@ export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.pageSize = MOBILE_PAGE_SIZE;
       }
     });
+    this.language = this.translate.currentLang;
     this.getState = this.store.select(selectProductState);
   }
 

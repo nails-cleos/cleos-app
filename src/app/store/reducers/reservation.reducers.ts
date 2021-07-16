@@ -10,6 +10,7 @@ import { IUser } from '../../interfaces/user';
 import { IProductDiscountDTO } from '../../interfaces/product';
 import { IRoom } from '../../interfaces/room';
 import { Pagination } from '../../interfaces/pagination';
+import { IPayment } from '../../interfaces/payment';
 
 export interface State {
   data: IReservation | IRoomReservation[] | IReservation[] | ICustomerReservation | IAvailableDTO | null;
@@ -20,7 +21,8 @@ export interface State {
   customers: IUser[] | null;
   rooms: IRoom[] | null;
   productDiscount: IProductDiscountDTO[] | null;
-  tracking: ITracking[] | null;
+  tracking: ITracking[] | ITracking | null;
+  payments: IPayment[] | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -39,6 +41,7 @@ export const initialState: State = {
   rooms: null,
   productDiscount: null,
   tracking: null,
+  payments: null,
   errorMessage: null,
   error: null,
   subErrors: null,
@@ -53,7 +56,7 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         // @ts-ignore
-        customerReservation: {reservations: {content: [{}, {}, {}], totalElements: 3}},
+        customerReservation: {reservations: {content: [{}, {}, {}], totalElements: 3}, upcoming: {}},
         errorMessage: null,
         error: null,
         subErrors: null,
@@ -165,10 +168,37 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
+    case ReservationActionTypes.edit: {
+      return {
+        ...state,
+        data: {} as IReservation,
+        page: null,
+        filter: null,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        selected: null,
+        message: null,
+        isLoading: true
+      };
+    }
+    case ReservationActionTypes.reservationFindPayments: {
+      return {
+        ...state,
+        payments: [{}, {}, {}],
+        page: null,
+        filter: null,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        selected: null,
+        message: null
+      };
+    }
     case ReservationActionTypes.approve:
-    case ReservationActionTypes.edit:
     case ReservationActionTypes.start:
     case ReservationActionTypes.complete:
+    case ReservationActionTypes.paymentComplete:
     case ReservationActionTypes.cancel:
     case ReservationActionTypes.customerCancel:
     case ReservationActionTypes.reservationFind: {
@@ -308,6 +338,17 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: true
       };
     }
+    case ReservationActionTypes.findTracking: {
+      return {
+        ...state,
+        tracking: null,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        selected: null,
+        message: null
+      };
+    }
     case ReservationActionTypes.getTracking: {
       return {
         ...state,
@@ -323,6 +364,16 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         tracking: action.payload,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: null
+      };
+    }
+    case ReservationActionTypes.reservationPaymentsSuccess: {
+      return {
+        ...state,
+        payments: action.payload,
         errorMessage: null,
         error: null,
         subErrors: null,

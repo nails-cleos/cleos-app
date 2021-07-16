@@ -1,7 +1,7 @@
 import { IAvailability } from '../interfaces/room';
 import { CalendarEvent } from 'angular-calendar';
 import { findStateColor } from './flags';
-import { createDate, createFullDate, createNewDate, getNow, greaterThanToday, isToday } from './dates';
+import { createDate, createFullDate, createNewDate, getNow, greaterOrEqualsThanToday, isToday } from './dates';
 
 export const fillNotAvailable = (unavailable: string, lunch: string, notWorking: string, daysInWeek: number,
                                  selectDate: Date, sunday: IAvailability, saturday: IAvailability, week: IAvailability,
@@ -33,7 +33,7 @@ export const fillNotAvailable = (unavailable: string, lunch: string, notWorking:
 
 export const newEvent = (title: string, color: string, start: Date, end?: Date, primary?: string,
                          id?: string): CalendarEvent | undefined => {
-  if (greaterThanToday(start)) {
+  if (greaterOrEqualsThanToday(start)) {
     return {
       id,
       start,

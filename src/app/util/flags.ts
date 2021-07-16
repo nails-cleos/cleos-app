@@ -44,8 +44,17 @@ export const stateColor = (): IState[] => [{
   name: 'CREATED',
   color: '#fdf8f3' // accent-lighter
 }, {
+  name: 'PARTIALLY_COMPLETED',
+  color: '#f7e6d8'
+}, {
   name: 'COMPLETED',
   color: '#dcedc8'
+}, {
+  name: 'PAID',
+  color: 'rgba(0, 158, 227, 0.4)'
+}, {
+  name: 'PARTIALLY_PAID',
+  color: 'rgba(0, 158, 227, 0.4)'
 }, {
   name: 'STARTED',
   color: '#b3e5fc'

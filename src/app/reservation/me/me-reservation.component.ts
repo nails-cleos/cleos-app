@@ -29,14 +29,15 @@ import {
 import { TranslateService } from '@ngx-translate/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
-import { AppState, selectReservationState } from '../../store/app.states';
+import { AppState, selectAuthState, selectReservationState } from '../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as fromActionsReservation from '../../store/reservation.actions';
 import { map, startWith } from 'rxjs/operators';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import { getPriceDiscount, getUserName, round } from '../../util/helper';
-import { DiscountType, IUserDiscount, transitionAnimation } from '../../interfaces/discount';
+import { DiscountType, IUserDiscount } from '../../interfaces/discount';
+import { transitionAnimation } from '../../util/animation';
 
 @Component({
   selector: 'app-me-reservation',
@@ -57,6 +58,9 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   getState: Observable<any>;
   subscription: Subscription | undefined;
   errors: any = [];
+
+  customerId: string | undefined;
+  productId: string | undefined;
 
   productForm!: FormGroup;
   products: IProduct[] | undefined;
@@ -106,6 +110,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
               private formBuilder: FormBuilder, private breakpointObserver: BreakpointObserver,
               private router: Router, private route: ActivatedRoute, private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectReservationState);
+    this.store.select(selectAuthState).subscribe((state: any) => this.customerId = state.user.id);
     const userLang = this.translate.currentLang;
     const index = userLang.indexOf('-');
     this.locale = index === -1 ? userLang : userLang.substr(0, index);
@@ -120,8 +125,8 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.maxDate = plusMonthDate(this.minDate, this.reservationMonths, this.minDate.getDate() + 1);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
     if (this.extras) {
+      this.productId = this.extras.product?.id;
       this.room.setValue(this.extras.room);
-      this.product.setValue(this.extras.product);
       this.date.setValue(this.extras.date);
     }
     this.product.valueChanges.subscribe(value => {
@@ -253,7 +258,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   create(): void {
     const reservation: IReservation = new Reservation();
-    reservation.customerId = this.room.value.id;
+    reservation.customerId = this.customerId;
     reservation.roomId = this.room.value.id;
     if (this.startDate) {
       reservation.start = this.startDate.toLocaleString('en-GB');
@@ -369,6 +374,10 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       this.products = state.productDiscount?.products;
+      if (this.products && this.productId) {
+        this.product.setValue(this.products.find(product => product.id === this.productId));
+        this.productId = this.product.value.id;
+      }
       this.discounts = state.productDiscount?.discounts.map((ud: IUserDiscount) => {
         let title = ud.discount.name;
         switch (ud.discount.type) {

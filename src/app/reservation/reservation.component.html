@@ -250,7 +250,7 @@
           </div>
         </div>
         <div>
-          <button [form]="customerForm" appBackButton mat-raised-button type="button">
+          <button [form]="customerForm" appBackButton color="accent" mat-raised-button type="button">
             <mat-icon>keyboard_return</mat-icon>
           </button>
           <button (click)="getRooms()" [disabled]="customerForm.invalid" class="raised-button" color="primary"
@@ -290,11 +290,11 @@
         </div>
       </div>
       <div class="divider">
-        <button (click)="goBack()" *ngIf="!isEditing; else editButton" mat-raised-button>
+        <button (click)="goBack()" *ngIf="!isEditing; else editButton" color="accent" mat-raised-button>
           <mat-icon>arrow_upward</mat-icon>
         </button>
         <ng-template #editButton>
-          <button [form]="roomForm" appBackButton mat-raised-button type="button">
+          <button [form]="roomForm" appBackButton color="accent" mat-raised-button type="button">
             <mat-icon>keyboard_return</mat-icon>
           </button>
         </ng-template>
@@ -308,11 +308,12 @@
       <ng-template matStepLabel>{{ 'RESERVATION.ADD.PRODUCT.FIELD' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepThree"></ng-container>
       <div class="divider">
-        <button (click)="goBack()" *ngIf="!isEditing || (isEditing && isAdmin); else editButton" mat-raised-button>
+        <button (click)="goBack()" *ngIf="!isEditing || (isEditing && isAdmin); else editButton" color="accent"
+                mat-raised-button>
           <mat-icon>arrow_upward</mat-icon>
         </button>
         <ng-template #editButton>
-          <button [form]="productForm" appBackButton mat-raised-button type="button">
+          <button [form]="productForm" appBackButton color="accent" mat-raised-button type="button">
             <mat-icon>keyboard_return</mat-icon>
           </button>
         </ng-template>
@@ -326,7 +327,7 @@
       <ng-template matStepLabel>{{ 'RESERVATION.ADD.SCHEDULE.FIELD' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepFour"></ng-container>
       <div class="divider">
-        <button (click)="goBack()" mat-raised-button>
+        <button (click)="goBack()" color="accent" mat-raised-button>
           <mat-icon>arrow_upward</mat-icon>
         </button>
         <button (click)="preview()" class="raised-button" color="primary" mat-raised-button type="button">
@@ -338,7 +339,7 @@
       <ng-template matStepLabel>{{ 'RESERVATION.ADD.PREVIEW.TITLE' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepFive"></ng-container>
       <div class="divider">
-        <button (click)="goBack()" mat-raised-button>
+        <button (click)="goBack()" color="accent" mat-raised-button>
           <mat-icon>arrow_upward</mat-icon>
         </button>
         <button (click)="create()" class="raised-button" color="primary" mat-raised-button type="button">
@@ -365,7 +366,7 @@
           </div>
         </div>
         <div>
-          <button [form]="customerForm" appBackButton mat-raised-button type="button">
+          <button [form]="customerForm" appBackButton color="accent" mat-raised-button type="button">
             <mat-icon>keyboard_return</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
@@ -409,12 +410,12 @@
         </div>
       </div>
       <div class="divider">
-        <button (click)="goBack()" *ngIf="!isEditing; else editButton" mat-raised-button>
+        <button (click)="goBack()" *ngIf="!isEditing; else editButton" color="accent" mat-raised-button>
           {{ 'COMMON.BUTTON.BACK' | translate }}
           <mat-icon>arrow_back</mat-icon>
         </button>
         <ng-template #editButton>
-          <button [form]="roomForm" appBackButton mat-raised-button type="button">
+          <button [form]="roomForm" appBackButton color="accent" mat-raised-button type="button">
             {{ 'COMMON.BUTTON.BACK' | translate }}
             <mat-icon>keyboard_return</mat-icon>
           </button>
@@ -430,12 +431,13 @@
       <ng-template matStepLabel>{{ 'RESERVATION.ADD.PRODUCT.FIELD' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepThree"></ng-container>
       <div>
-        <button (click)="goBack()" *ngIf="!isEditing || (isEditing && isAdmin); else editButton" mat-raised-button>
+        <button (click)="goBack()" *ngIf="!isEditing || (isEditing && isAdmin); else editButton" color="accent"
+                mat-raised-button>
           <mat-icon>arrow_back</mat-icon>
           {{ 'COMMON.BUTTON.BACK' | translate }}
         </button>
         <ng-template #editButton>
-          <button [form]="productForm" appBackButton mat-raised-button type="button">
+          <button [form]="productForm" appBackButton color="accent" mat-raised-button type="button">
             <mat-icon>keyboard_return</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
@@ -451,7 +453,7 @@
       <ng-template matStepLabel>{{ 'RESERVATION.ADD.SCHEDULE.FIELD' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepFour"></ng-container>
       <div class="divider">
-        <button (click)="goBack()" mat-raised-button>
+        <button (click)="goBack()" color="accent" mat-raised-button>
           <mat-icon>arrow_back</mat-icon>
           {{ 'COMMON.BUTTON.BACK' | translate }}</button>
         <button (click)="preview()" class="raised-button" color="primary"
@@ -464,7 +466,7 @@
       <ng-template matStepLabel>{{ 'RESERVATION.ADD.PREVIEW.TITLE' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepFive"></ng-container>
       <div class="divider">
-        <button (click)="goBack()" mat-raised-button>
+        <button (click)="goBack()" color="accent" mat-raised-button>
           <mat-icon>arrow_back</mat-icon>
           {{ 'COMMON.BUTTON.BACK' | translate }}</button>
         <button (click)="create()" class="raised-button" color="primary" mat-raised-button type="button">

@@ -109,4 +109,8 @@ export class ReservationService {
   public getUpcomingReservation(): Observable<ICustomerReservation> {
     return this.http.get<ICustomerReservation>(`${this.url}/upcoming`);
   }
+
+  public paymentComplete(reservationId: string): Observable<IReservation> {
+    return this.http.post<IReservation>(`${this.url}/${reservationId}/payment/complete`, null);
+  }
 }

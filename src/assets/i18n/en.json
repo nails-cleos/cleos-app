@@ -11,6 +11,7 @@
       "SEND": "Send",
       "CREATE": "Create",
       "ADD": "Add",
+      "RESEND": "Resend",
       "IGNORE": "Ignore",
       "UPDATE": "Update",
       "CANCEL": "Cancel",
@@ -23,6 +24,8 @@
       "COPY": "Copy",
       "SHARE": "Share",
       "COMPLETE": "Complete",
+      "ML": "ML payment",
+      "NOTIFY": "Notify",
       "DISCOUNT": {
         "SHOW": "Show discounts",
         "HIDE": "Hide discounts",
@@ -30,7 +33,8 @@
       }
     },
     "COLUMN": {
-      "ACTIONS": "Actions"
+      "ACTIONS": "Actions",
+      "LAST_UPDATE": "Last update"
     },
     "PAGINATOR": {
       "ITEMS_PER_PAGE_LABEL": "Items per page:",
@@ -66,6 +70,18 @@
     "DISCOUNT": {
       "MONEY": "Money",
       "PERCENTAGE": "Percentage"
+    },
+    "PAYMENT": {
+      "CASH": "Cash",
+      "ML": "Mercado Libre"
+    },
+    "STATUS": {
+      "ML": {
+        "NONE": "Pending",
+        "APPROVED": "Approved",
+        "REJECTED": "Rejected",
+        "IN_PROCESS": "In process"
+      }
     },
     "BACK": {
       "TITLE": "You are about to go back",
@@ -747,6 +763,11 @@
         }
       },
       "APPOINTMENT": "Appointment",
+      "PAYMENT": {
+        "TITLE": "Payments",
+        "PAID": "Paid",
+        "TYPE": "Payment type"
+      },
       "HISTORY": {
         "TITLE": "History",
         "COLUMN": {
@@ -768,23 +789,34 @@
       "ACTION": {
         "APPROVE": "Approve",
         "EDIT": "Edit",
+        "PAY": "Pay",
         "START": "Start",
         "COMPLETE": "Complete",
         "CANCEL": "Cancel",
         "BOOK": "Book again",
-        "SEND": "Send Whatsapp"
+        "SEND": "Send Whatsapp",
+        "MORE": "More"
       },
       "CHANGE_STATE": {
         "TITLE": "Change state",
         "ACTION": {
           "APPROVE": "approve the reservation",
           "EDIT": "edit the appointment",
+          "PAY": "pay the reservation",
           "START": "start the appointment",
           "COMPLETE": "complete the appointment",
           "CANCEL": "cancel the reservation",
           "BOOK": "book again"
         },
         "CONTENT": "Are you sure to {{action}}?"
+      },
+      "TRACKING": {
+        "TITLE": "Tracking",
+        "CREATED": "Created",
+        "APPROVED": "Approved",
+        "STARTED": "Started",
+        "COMPLETED": "Completed",
+        "DURATION": "Appointment duration"
       }
     },
     "PAGE": {
@@ -815,7 +847,12 @@
     "STATE": {
       "CREATED": "Created",
       "APPROVED": "Approved",
+      "PAID": "Paid",
+      "PARTIALLY_PAID": "Partially paid",
+      "PARTIALLYPAID": "Partially paid",
       "STARTED": "Started",
+      "PARTIALLY_COMPLETED": "Partially completed",
+      "PARTIALLYCOMPLETED": "Partially completed",
       "COMPLETED": "Completed",
       "CANCELLED": "Cancelled"
     },
@@ -828,7 +865,10 @@
         "ADDRESS": "Address",
         "PRODUCT": "Product",
         "PRICE": "Price",
-        "CREATED": "Reservation must be approved by: "
+        "PAID": "Paid",
+        "APPROVED": "Approved",
+        "CREATED": "Reservation must be approved by: ",
+        "PAY_NOW": "Pay now and freeze the price"
       },
       "NO_UPCOMING": {
         "TITLE": "No upcoming reservations"
@@ -1058,9 +1098,30 @@
       "MESSAGE": "Discount {{name}} updated"
     }
   },
+  "PAYMENT": {
+    "LIST": {
+      "COLUMN": {
+        "DESCRIPTION": "Description",
+        "AMOUNT": "Amount",
+        "TYPE": "Type",
+        "STATUS": "Status"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No payment"
+      }
+    },
+    "ADD": {
+      "CREATED": "Payment complete successfully",
+      "ERROR_TEXT": "Payment error",
+      "ERROR": "Payment incomplete.\n{{reason}}",
+      "RECREATE": "Payment link recreated"
+    },
+    "COPY": "Link copied!"
+  },
   "WHATSAPP": {
     "SEND": {
-      "APPROVE": "♡ \uD83C\uDD48\uD83C\uDD3E\uD83C\uDD44\uD83C\uDD41 \uD83C\uDD3D\uD83C\uDD34\uD83C\uDD47\uD83C\uDD43 \uD83C\uDD42\uD83C\uDD34\uD83C\uDD41\uD83C\uDD45\uD83C\uDD38\uD83C\uDD32\uD83C\uDD34:%0A♡ {{date}}"
+      "APPROVE": "♡ \uD83C\uDD48\uD83C\uDD3E\uD83C\uDD44\uD83C\uDD41 \uD83C\uDD3D\uD83C\uDD34\uD83C\uDD47\uD83C\uDD43 \uD83C\uDD42\uD83C\uDD34\uD83C\uDD41\uD83C\uDD45\uD83C\uDD38\uD83C\uDD32\uD83C\uDD34:%0A♡ {{date}}",
+      "TOMORROW": "♕\uD835\uDE3C\uD835\uDE65\uD835\uDE65\uD835\uDE64\uD835\uDE5E\uD835\uDE63\uD835\uDE69\uD835\uDE62\uD835\uDE5A\uD835\uDE63\uD835\uDE69 \uD835\uDE67\uD835\uDE5A\uD835\uDE62\uD835\uDE5E\uD835\uDE63\uD835\uDE59\uD835\uDE5A\uD835\uDE67♕%0Aℍ\uD835\uDD56\uD835\uDD5D\uD835\uDD5D\uD835\uDD60!!! \uD835\uDD4B\uD835\uDD60\uD835\uDD5E\uD835\uDD60\uD835\uDD63\uD835\uDD63\uD835\uDD60\uD835\uDD68 {{date}} \uD835\uDD6A\uD835\uDD60\uD835\uDD66 \uD835\uDD59\uD835\uDD52\uD835\uDD67\uD835\uDD56 \uD835\uDD6A\uD835\uDD60\uD835\uDD66\uD835\uDD63 \uD835\uDD5F\uD835\uDD52\uD835\uDD5A\uD835\uDD5D \uD835\uDD64\uD835\uDD56\uD835\uDD64\uD835\uDD64\uD835\uDD5A\uD835\uDD60\uD835\uDD5F ♡♡♡ ℂ\uD835\uDD60\uD835\uDD5F\uD835\uDD57\uD835\uDD5A\uD835\uDD63\uD835\uDD5E \uD835\uDD65\uD835\uDD59\uD835\uDD52\uD835\uDD65 \uD835\uDD6A\uD835\uDD60\uD835\uDD66 \uD835\uDD68\uD835\uDD5A\uD835\uDD5D\uD835\uDD5D \uD835\uDD52\uD835\uDD65\uD835\uDD65\uD835\uDD56\uD835\uDD5F\uD835\uDD55 \uD835\uDD61\uD835\uDD5D\uD835\uDD56\uD835\uDD52\uD835\uDD64\uD835\uDD56.%0A\uD835\uDD42\uD835\uDD5A\uD835\uDD64\uD835\uDD64\uD835\uDD56\uD835\uDD64"
     }
   },
   "MAIN": {

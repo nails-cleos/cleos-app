@@ -31,10 +31,6 @@ body {
   margin: 20px auto;
 }
 
-table {
-  width: 100%;
-}
-
 .full {
   width: 100%;
 }
@@ -47,8 +43,45 @@ table {
   margin-left: 10px;
 }
 
-th.mat-header-cell {
-  text-align: center !important;
+mat-header-cell, mat-cell {
+  justify-content: center;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: lightgrey;
+}
+
+/* offsets the header by the same amount of size/padding the sort button occupies */
+.mat-sort-header-container {
+  margin-left: 18px;
+}
+
+.mat-row, .mat-header-row {
+  border-bottom-width: 0px;
+}
+
+table {
+  width: 100%;
+}
+
+mat-table {
+  overflow-x: scroll;
+}
+
+tr.row:not(.expanded-row):hover {
+  background: whitesmoke;
+}
+
+tr.row:not(.expanded-row):active {
+  background: #efefef;
+}
+
+.row td {
+  border-bottom-width: 0;
+}
+
+.detail {
+  overflow: hidden;
+  display: flex;
 }
 
 .column-large-text {
@@ -70,7 +103,7 @@ th.mat-header-cell {
 .mat-column-position {
   flex: 0 0 5%;
   width: 5%;
-  text-align: center;
+  text-align: center !important;
 }
 
 .mat-column-actions {
@@ -188,7 +221,7 @@ pre {
 }
 
 .raised-button {
-  margin-left: 10px
+  margin: 7% 0 0 10px
 }
 
 .spinner-parent-center {
@@ -269,4 +302,8 @@ pre {
     background: rgba(235, 235, 235, 0.7);
     margin-top: -20px;
   }
+}
+
+.top {
+  margin-top: 2%;
 }

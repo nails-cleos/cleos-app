@@ -33,13 +33,16 @@
     </ng-container>
 
     <ng-container matColumnDef="used">
-      <th *matHeaderCellDef mat-header-cell
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
           mat-sort-header>{{ 'DISCOUNT.LIST.COLUMN.USED' | translate }}</th>
-      <td *matCellDef="let userDiscount">
+      <td *matCellDef="let userDiscount" fxHide.lt-sm fxShow>
         <div *ngIf="userDiscount.id; else skeleton">
-          <div *ngIf="userDiscount.used">
+          <div *ngIf="userDiscount.used; else notUsed">
             <mat-icon>done</mat-icon>
           </div>
+          <ng-template #notUsed>
+            <mat-icon>pending</mat-icon>
+          </ng-template>
         </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>

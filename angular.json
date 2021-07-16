@@ -44,6 +44,10 @@
           },
           "configurations": {
             "production": {
+              "index": {
+                "input": "src/index.prod.html",
+                "output": "index.html"
+              },
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -73,6 +77,10 @@
               "ngswConfigPath": "ngsw-config.json"
             },
             "staging": {
+              "index": {
+                "input": "src/index.staging.html",
+                "output": "index.html"
+              },
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -102,6 +110,10 @@
               "ngswConfigPath": "ngsw-config.json"
             },
             "pwa": {
+              "index": {
+                "input": "src/index.pwa.html",
+                "output": "index.html"
+              },
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",

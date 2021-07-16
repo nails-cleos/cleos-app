@@ -19,21 +19,25 @@ export enum ReservationActionTypes {
   customersSuccess = '[Reservation] Customers success',
   reservationProductsSuccess = '[Reservation] Products success',
   reservationRoomsSuccess = '[Reservation] Rooms success',
+  reservationPaymentsSuccess = '[Reservation] Payments success',
   reservationSave = '[Reservation] Save',
   reservationSaveSuccess = '[Reservation] Save Success',
   reservationsCustomerSuccess = '[Reservation] reservations customer Success',
   reservationFailure = '[Reservation] Failure',
   reservationSelected = '[Reservation] Selected',
   reservationFind = '[Reservation] Find',
+  reservationFindPayments = '[Reservation] Find payments',
   reservationDelete = '[Reservation] Delete',
   approve = '[Reservation] Approve',
   edit = '[Reservation] Edit',
   start = '[Reservation] Start',
   complete = '[Reservation] Complete',
+  paymentComplete = '[Reservation] Payment complete',
   cancel = '[Reservation] Cancel',
   customerCancel = '[Reservation] Customer cancel',
   stateSuccess = '[Reservation] State success',
   getTracking = '[Reservation] Get tracking',
+  findTracking = '[Reservation] Find tracking',
   trackingSuccess = '[Reservation] Tracking success',
   clean = '[Reservation] Clean'
 }
@@ -149,6 +153,13 @@ export class ReservationRoomsSuccess implements Action {
   }
 }
 
+export class ReservationPaymentsSuccess implements Action {
+  readonly type = ReservationActionTypes.reservationPaymentsSuccess;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class ReservationSave implements Action {
   readonly type = ReservationActionTypes.reservationSave;
 
@@ -191,6 +202,13 @@ export class ReservationFind implements Action {
   }
 }
 
+export class ReservationFindPayments implements Action {
+  readonly type = ReservationActionTypes.reservationFindPayments;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class DeleteReservation implements Action {
   readonly type = ReservationActionTypes.reservationDelete;
 
@@ -226,6 +244,13 @@ export class Complete implements Action {
   }
 }
 
+export class PaymentComplete implements Action {
+  readonly type = ReservationActionTypes.paymentComplete;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class Cancel implements Action {
   readonly type = ReservationActionTypes.cancel;
 
@@ -249,6 +274,13 @@ export class StateSuccess implements Action {
 
 export class GetTracking implements Action {
   readonly type = ReservationActionTypes.getTracking;
+}
+
+export class FindTracking implements Action {
+  readonly type = ReservationActionTypes.findTracking;
+
+  constructor(public payload: any) {
+  }
 }
 
 export class TrackingSuccess implements Action {
@@ -282,19 +314,23 @@ export type All =
   | CustomersSuccess
   | ReservationProductsSuccess
   | ReservationRoomsSuccess
+  | ReservationPaymentsSuccess
   | ReservationSaveSuccess
   | ReservationCustomerSuccess
   | ReservationFailure
   | ReservationFind
+  | ReservationFindPayments
   | ReservationSelected
   | DeleteReservation
   | Approve
   | Start
   | Edit
   | Complete
+  | PaymentComplete
   | Cancel
   | CustomerCancel
   | StateSuccess
   | GetTracking
+  | FindTracking
   | TrackingSuccess
   | Clean;

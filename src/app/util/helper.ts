@@ -1,6 +1,7 @@
 import { DiscountType, IDiscount } from '../interfaces/discount';
 import { IUser, IUserAll } from '../interfaces/user';
 import { IProductAll } from '../interfaces/product';
+import { IPayment } from '../interfaces/payment';
 
 export const snakeToCamel = (value: string): string =>
   value.toLowerCase().replace(/([-_]\w)/g, (g: string) => g[1].toUpperCase());
@@ -16,7 +17,7 @@ export const getPriceDiscount = (discount: IDiscount | undefined, price: number)
         break;
       }
       case DiscountType.percentage: {
-        value = (price / discount.amount);
+        value = (price * discount.amount / 100);
       }
     }
     if (value) {
@@ -24,6 +25,15 @@ export const getPriceDiscount = (discount: IDiscount | undefined, price: number)
     }
   }
   return undefined;
+};
+
+export const priceWithExtras = (product: IProductAll): number => {
+  let price = product.price;
+  if (product.extras && product.extras.price) {
+    price += product.extras.price;
+  }
+
+  return price;
 };
 
 export const totalPrice = (product: IProductAll): number => {
@@ -37,6 +47,17 @@ export const totalPrice = (product: IProductAll): number => {
   }
 
   return price;
+};
+
+export const totalPaid = (payments: IPayment[] | undefined): number => {
+  let total = 0;
+  payments?.forEach(payment => {
+    if (payment.status === 'approved' && payment.amount) {
+      total += payment.amount;
+    }
+  });
+
+  return total;
 };
 
 export const getUserName = (user: IUserAll | IUser): string => {

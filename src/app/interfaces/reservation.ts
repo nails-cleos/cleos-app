@@ -5,6 +5,7 @@ import { CalendarEvent } from 'angular-calendar';
 import { ThemePalette } from '@angular/material/core';
 import { IUnavailableAll } from './unavailable';
 import { Pagination } from './pagination';
+import { IPayment } from './payment';
 
 export interface IReservation {
   id?: string;
@@ -38,6 +39,7 @@ export interface IRoomReservation {
 export interface ICustomerReservation {
   reservations: Pagination<IReservationAll[]>;
   upcoming: IReservationAll;
+  currentReservationPayments: IPayment[];
 }
 
 export interface IAvailableDTO {
@@ -73,6 +75,7 @@ export interface ITracking {
   createdTime?: string;
   editedTime?: string;
   approvedTime?: string;
+  paidTime?: string;
   startedTime?: string;
   completedTime?: string;
   cancelledTime?: string;
@@ -112,8 +115,11 @@ export class Calendar implements ICalendar {
 export enum States {
   created = 'CREATED',
   approved = 'APPROVED',
+  partiallyPaid = 'PARTIALLY_PAID',
+  paid = 'PAID',
   started = 'STARTED',
   completed = 'COMPLETED',
+  partiallyCompleted = 'PARTIALLY_COMPLETED',
   cancelled = 'CANCELLED'
 }
 

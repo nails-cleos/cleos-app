@@ -3,6 +3,7 @@ export const environment = {
   appServer: 'https://cleos.herokuapp.com',
   title: 'Cleos',
   baseUrl: 'https://cleos-api.herokuapp.com/api',
+  mlUrl: 'https://www.mercadopago.com.ar/checkout/v1/redirect',
   googleClientId: '1075596698405-ujflh3nuhglps8br89a1gtk7obi333h9.apps.googleusercontent.com',
   facebookClientId: '523962545388946',
   firebase: {

@@ -1,19 +1,21 @@
-.mat-column-name {
-  flex: 0 0 15%;
-  width: 15%;
+[class*='mat-column-'] {
+  text-align: center;
 }
 
-.mat-column-description {
-  flex: 0 0 25%;
-  width: 25%;
+.mat-column-name {
+  flex: 0 0 55%;
+  width: 55%;
 }
 
 .mat-column-price {
-  flex: 0 0 15%;
-  width: 15%;
+  flex: 0 0 20%;
+  width: 20%;
 }
 
-.mat-column-duration {
-  flex: 0 0 15%;
-  width: 15%;
+tr.detail-row {
+  height: 0;
+}
+
+.detail-button {
+  margin-left: 10px
 }
