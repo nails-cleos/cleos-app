@@ -69,7 +69,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   locale: string;
   language: string;
   isLoading = false;
-  changeState: MatFabMenu[] | undefined;
+  changeState: MatFabMenu[] = [];
   professionalId: string | undefined;
   customerId: string | undefined;
   machine: any;

@@ -21,7 +21,7 @@
   "private": true,
   "dependencies": {
     "@agm/core": "^1.1.0",
-    "@angular-material-extensions/fab-menu": "^3.0.0",
+    "@angular-material-extensions/fab-menu": "^3.0.1",
     "@angular-material-extensions/google-maps-autocomplete": "^6.2.0",
     "@angular-material-extensions/password-strength": "^8.1.1",
     "@angular/animations": "^11.0.5",
