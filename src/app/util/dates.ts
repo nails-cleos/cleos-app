@@ -164,7 +164,7 @@ export const formatDateTime = (date: Date, locale: string): string => {
   return result.charAt(0).toUpperCase() + result.slice(1);
 };
 
-export const formatDateName = (date: Date, locale: string, measure: string): string => date.toLocaleDateString(locale, {
+export const formatDateName = (date: Date, locale: string, measure: any): string => date.toLocaleDateString(locale, {
   day: 'numeric', month: measure, weekday: measure, year: 'numeric'
 });
 

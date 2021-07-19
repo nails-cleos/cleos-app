@@ -2,7 +2,7 @@
   "COMMON": {
     "BUTTON": {
       "BACK": "Volver",
-      "RETRY": "Reintentar",
+      "RELOAD": "Recargar",
       "NEXT": "Siguiente",
       "PREVIOUS": "Anterior",
       "TODAY": "Hoy",

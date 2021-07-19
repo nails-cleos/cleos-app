@@ -2,7 +2,7 @@
   "COMMON": {
     "BUTTON": {
       "BACK": "Back",
-      "RETRY": "Retry",
+      "RELOAD": "Reload",
       "NEXT": "Next",
       "PREVIOUS": "Previous",
       "TODAY": "Today",
