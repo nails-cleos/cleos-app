@@ -31,7 +31,7 @@ import { map, startWith } from 'rxjs/operators';
 import { IProduct } from '../../interfaces/product';
 import { requireMatch, valueChange } from '../../util/validators';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { MatFabMenuDirection } from '@angular-material-extensions/fab-menu/lib/mat-fab-menu.component';
+import { MatFabMenu, MatFabMenuDirection } from '@angular-material-extensions/fab-menu/lib/mat-fab-menu.component';
 import { IPayment, PaymentType } from '../../interfaces/payment';
 import { transitionAnimation } from '../../util/animation';
 
@@ -69,7 +69,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   locale: string;
   language: string;
   isLoading = false;
-  changeState: any;
+  changeState: MatFabMenu[] | undefined;
   professionalId: string | undefined;
   customerId: string | undefined;
   machine: any;
@@ -180,7 +180,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     return ReservationIconName[snakeToCamel(name)];
   }
 
-  onChangeState(id: string | number): void {
+  onChangeState(id: any): void {
     if (['send', 'book', 'more'].indexOf(id.toString()) >= 0 && this.reservation) {
       this.machine.transition(snakeToCamel(this.reservation.state), id);
       return;
