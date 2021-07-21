@@ -36,6 +36,7 @@ import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFireMessagingModule } from '@angular/fire/messaging';
 import firebase from 'firebase';
 import { MatCarouselModule } from '@ngbmodule/material-carousel';
+import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
 
 // Providers
 import { httpInterceptorProviders } from './http-interceptors';
@@ -299,6 +300,7 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
     BrowserAnimationsModule,
     HttpClientModule,
     FormsModule,
+    MatFabMenuModule,
     AppMaterialModule,
     MatPasswordStrengthModule.forRoot(),
     FlexLayoutModule,

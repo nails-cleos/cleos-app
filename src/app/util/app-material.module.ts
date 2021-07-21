@@ -30,7 +30,6 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { OverlayModule } from '@angular/cdk/overlay';
-import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
 import { MatBadgeModule } from '@angular/material/badge';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -74,7 +73,6 @@ import { NgxMatIntlTelInputModule } from 'ngx-mat-intl-tel-input';
     MatCheckboxModule,
     MatSlideToggleModule,
     OverlayModule,
-    MatFabMenuModule,
     MatBadgeModule,
     MatRippleModule,
     DragDropModule,
@@ -118,7 +116,6 @@ import { NgxMatIntlTelInputModule } from 'ngx-mat-intl-tel-input';
     MatCheckboxModule,
     MatSlideToggleModule,
     OverlayModule,
-    MatFabMenuModule,
     MatBadgeModule,
     MatRippleModule,
     DragDropModule,
