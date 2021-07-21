@@ -127,7 +127,7 @@
 
       <ng-container matColumnDef="expandedDetail">
         <td *matCellDef="let reservation" [attr.colspan]="displayedColumns.length" fxHide fxShow.lt-sm>
-          <div [@detailExpand]="reservation == expandedReservation ? 'expanded' : 'collapsed'"
+          <div [@detailExpand]="reservation === expandedReservation ? 'expanded' : 'collapsed'"
                class="detail">
             <mat-list>
               <div fxHide fxShow.lt-sm mat-subheader>{{ 'RESERVATION.PAGE.COLUMN.STATE' | translate }}</div>

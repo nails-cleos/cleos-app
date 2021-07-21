@@ -55,7 +55,7 @@
 
     <ng-container matColumnDef="expandedDetail">
       <td *matCellDef="let product" [attr.colspan]="displayedColumns.length">
-        <div [@detailExpand]="product == expanded ? 'expanded' : 'collapsed'" class="detail">
+        <div [@detailExpand]="product === expanded ? 'expanded' : 'collapsed'" class="detail">
           <mat-list>
             <div fxHide fxShow.lt-sm mat-subheader>{{ 'PRODUCT.LIST.COLUMN.PRICE' | translate }}</div>
             <mat-list-item fxHide fxShow.lt-sm role="list">
