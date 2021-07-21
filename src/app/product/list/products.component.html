@@ -1,8 +1,9 @@
 <div class="mat-elevation-z8">
-  <table [dataSource]="dataSource" mat-table matSort matSortActive="name" matSortDirection="asc" matSortDisableClear>
+  <table [dataSource]="dataSource" mat-table matSort matSortActive="name" matSortDirection="asc" matSortDisableClear
+         multiTemplateDataRows>
     <ng-container matColumnDef="position">
       <th *matHeaderCellDef mat-header-cell>#</th>
-      <td *matCellDef="let product; let i = index;" mat-cell>
+      <td *matCellDef="let product; let i = dataIndex;" mat-cell>
         <div *ngIf="product.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -21,8 +22,9 @@
     </ng-container>
 
     <ng-container matColumnDef="price">
-      <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'PRODUCT.LIST.COLUMN.PRICE' | translate }}</th>
-      <td *matCellDef="let product" mat-cell>
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+          mat-sort-header>{{ 'PRODUCT.LIST.COLUMN.PRICE' | translate }}</th>
+      <td *matCellDef="let product" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="product.id; else skeleton">
           <mat-icon matPrefix>attach_money</mat-icon>&nbsp;{{product.price | number:'1.2-2'}}
         </div>
@@ -32,34 +34,9 @@
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="durability">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
-          mat-sort-header>{{ 'PRODUCT.LIST.COLUMN.DURABILITY' | translate }}</th>
-      <td *matCellDef="let product" fxHide.lt-sm fxShow mat-cell>
-        <div *ngIf="product.id; else skeleton">{{product.durability}}</div>
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="duration">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
-          mat-sort-header>{{ 'PRODUCT.LIST.COLUMN.DURATION' | translate }}</th>
-      <td *matCellDef="let product" class="column-large-text" fxHide.lt-sm fxShow mat-cell>
-        <div *ngIf="product.id; else skeleton">
-          <mat-icon matPrefix>timer</mat-icon>&nbsp;
-          {{product.hour | number:'2.0-0'}}:{{product.minute | number:'2.0-0'}}
-        </div>
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
-      </td>
-    </ng-container>
-
     <ng-container matColumnDef="actions">
-      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-      <td *matCellDef="let product" mat-cell>
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+      <td *matCellDef="let product" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="product.id; else skeleton">
           <button (click)="edit(product)" *ngIf="!product.deleted" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
@@ -76,15 +53,56 @@
       </td>
     </ng-container>
 
+    <ng-container matColumnDef="expandedDetail">
+      <td *matCellDef="let product" [attr.colspan]="displayedColumns.length">
+        <div [@detailExpand]="product == expanded ? 'expanded' : 'collapsed'" class="detail">
+          <mat-list>
+            <div fxHide fxShow.lt-sm mat-subheader>{{ 'PRODUCT.LIST.COLUMN.PRICE' | translate }}</div>
+            <mat-list-item fxHide fxShow.lt-sm role="list">
+              <mat-icon matPrefix>attach_money</mat-icon>&nbsp;{{product.price | number:'1.2-2'}}
+            </mat-list-item>
+            <div *ngIf="product.durability" mat-subheader>{{ 'PRODUCT.LIST.COLUMN.DURABILITY' | translate }}</div>
+            <mat-list-item *ngIf="product.durability" role="list">
+              <div mat-line>{{product.durability}}</div>
+            </mat-list-item>
+            <div mat-subheader>{{ 'PRODUCT.LIST.COLUMN.DURATION' | translate }}</div>
+            <mat-list-item role="list">
+              <mat-icon matPrefix>timer</mat-icon>&nbsp;
+              {{product.hour | number:'2.0-0'}}:{{product.minute | number:'2.0-0'}}
+            </mat-list-item>
+            <div mat-subheader>{{ 'COMMON.COLUMN.LAST_UPDATE' | translate }}</div>
+            <mat-list-item role="list">
+              <div mat-line>{{product.modifiedAt | date:'short':undefined:language}}</div>
+            </mat-list-item>
+            <div fxHide fxShow.lt-sm mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+            <mat-list-item fxHide fxShow.lt-sm role="list">
+              <button (click)="edit(product)" *ngIf="!product.deleted" color="primary"
+                      mat-raised-button>
+                <mat-icon>edit</mat-icon>
+                {{ 'COMMON.BUTTON.EDIT' | translate }}
+              </button>
+              <button (click)="delete(product)" *ngIf="!product.deleted" class="detail-button"
+                      color="warn" mat-raised-button>
+                <mat-icon>delete</mat-icon>
+                {{ 'COMMON.BUTTON.DELETE' | translate }}
+              </button>
+            </mat-list-item>
+          </mat-list>
+        </div>
+      </td>
+    </ng-container>
+
     <ng-container matColumnDef="noContent">
       <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
         {{ 'PRODUCT.LIST.ERROR.NO_CONTENT' | translate }}</td>
     </ng-container>
 
-    <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
-
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-    <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
+    <tr (click)="expanded = expanded === product ? null : product"
+        *matRowDef="let product; columns: displayedColumns;" class="row" mat-row></tr>
+    <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row></tr>
+
+    <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
   </table>
   <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
 

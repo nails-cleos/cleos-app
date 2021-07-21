@@ -42,20 +42,3 @@ export class Discount implements IDiscount {
   constructor() {
   }
 }
-
-export const transitionAnimation = trigger(
-  'discountAnimation',
-  [
-    transition(
-      ':enter', [
-        style({transform: 'translateX(100%)', opacity: 0}),
-        animate('2s', style({transform: 'translateX(0)', opacity: 1}))
-      ]
-    ),
-    transition(
-      ':leave', [
-        style({transform: 'translateX(0)', opacity: 1}),
-        animate('1s', style({transform: 'translateX(100%)', opacity: 0}))
-      ]
-    )]
-);

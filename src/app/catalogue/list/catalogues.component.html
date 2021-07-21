@@ -6,8 +6,8 @@
           <cdk-drop-list [cdkDropListConnectedTo]="drops" [cdkDropListData]="i">
             <mat-card (cdkDragEntered)="entered($event)" [cdkDragData]="i" cdkDrag
                       class="catalogue-card mat-elevation-z8">
-              <mat-icon *ngIf="catalogue.home && !catalogue.catalog" color="primary">home</mat-icon>
-              <mat-icon *ngIf="!catalogue.home && catalogue.catalog" color="primary">collections</mat-icon>
+              <mat-icon *ngIf="catalogue.home" color="primary">home</mat-icon>
+              <mat-icon *ngIf="catalogue.catalog" color="primary">collections</mat-icon>
               <img *ngIf="catalogue.id; else box" [alt]="catalogue.name" [matTooltip]="catalogue.name"
                    [src]="'data:image/jpg;base64,'+catalogue.blob"
                    mat-card-sm-image

@@ -14,12 +14,13 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ReservationIconName } from '../detail/reservation-detail.component';
 import * as fromActionsReservation from '../../store/reservation.actions';
 import { convertDuration, createNewDate, newDate } from '../../util/dates';
-import { DiscountType, transitionAnimation } from '../../interfaces/discount';
-import { getUserName } from '../../util/helper';
+import { getPriceDiscount, getUserName, priceWithExtras, snakeToCamel, totalPaid, totalPrice } from '../../util/helper';
+import { IPayment } from '../../interfaces/payment';
+import { stampAnimation, transitionAnimation } from '../../util/animation';
 
 @Component({
   selector: 'app-reservations',
-  animations: [transitionAnimation],
+  animations: [transitionAnimation, stampAnimation],
   templateUrl: './reservations.component.html',
   styleUrls: ['./reservations.component.scss']
 })
@@ -32,7 +33,12 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   getState: Observable<any>;
   subscription: Subscription | undefined;
   data: ICustomerReservation | undefined;
-  upcoming: any;
+  upcoming: any = {};
+  payments: IPayment[] | undefined;
+  paid = 0;
+  total = 0;
+  price = 0;
+  isPaid = false;
   noContent = false;
   end: Date | undefined;
 
@@ -90,7 +96,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
 
   getIcon(name: any): any {
     // @ts-ignore
-    return ReservationIconName[name];
+    return ReservationIconName[snakeToCamel(name)];
   }
 
   view(reservation: IReservation): void {
@@ -112,28 +118,22 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
       this.error = state.error;
       this.data = state.customerReservation;
       if (this.data) {
-        this.noContent = !state.isLoading && !this.data.upcoming;
+        this.noContent = !this.data.upcoming;
         this.dataSource = this.data.reservations?.content;
         this.resultsLength = this.data.reservations?.totalElements;
         this.upcoming = this.data.upcoming ? this.data.upcoming : this.upcoming;
-        if (this.upcoming) {
+        if (this.upcoming?.id) {
+          this.payments = this.data.currentReservationPayments ? this.data.currentReservationPayments : this.payments;
+          this.paid = totalPaid(this.payments);
+          this.total = totalPrice(this.upcoming.product);
+          this.price = priceWithExtras(this.upcoming.product);
           const duration = convertDuration(this.upcoming.product.duration);
           this.end = newDate(this.upcoming.start);
           this.end = createNewDate(this.end, this.end.getHours() + duration.hour, this.end.getMinutes() + duration.minute);
+          this.isPaid = this.total === this.paid;
           if (this.upcoming.product.discount && this.upcoming.product.discount.amount) {
-            let discount;
-            switch (this.upcoming.product.discount.type) {
-              case DiscountType.money: {
-                discount = this.upcoming.product.discount.amount;
-                break;
-              }
-              case DiscountType.percentage: {
-                discount = (this.upcoming.product.price / this.upcoming.product.discount.amount);
-              }
-            }
-            if (discount) {
-              this.priceDiscount = this.upcoming.product.price - discount;
-            }
+            this.priceDiscount = getPriceDiscount(this.upcoming.product.discount, this.upcoming.product.price);
+            this.isPaid = this.priceDiscount === this.paid;
           }
         }
       }

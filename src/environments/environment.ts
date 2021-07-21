@@ -7,6 +7,7 @@ export const environment = {
   appServer: 'http://localhost:4200',
   title: 'Cleos DEV',
   baseUrl: 'http://localhost:8080/api',
+  mlUrl: 'https://sandbox.mercadopago.com.ar/checkout/v1/redirect',
   googleClientId: '57757755712-1gcjdgbd0lkj4msirrmra9aglcb0vbmk.apps.googleusercontent.com',
   facebookClientId: '453309609006101',
   firebase: {
@@ -28,4 +29,4 @@ export const environment = {
  * This import should be commented out in production mode because it will have a negative impact
  * on performance if an error is thrown.
  */
-// import 'zone.js/dist/zone-error';  // Included with Angular CLI.
+// import 'zone.js/plugins/zone-error';  // Included with Angular CLI.

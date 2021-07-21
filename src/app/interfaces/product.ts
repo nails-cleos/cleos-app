@@ -9,6 +9,7 @@ export interface IProduct {
   duration?: string;
   durationDate?: Date;
   durability?: string;
+  modifiedAt?: string;
 }
 
 export interface IProductAll {

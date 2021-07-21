@@ -14,7 +14,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { getUserName } from '../../util/helper';
+import { getUserName, snakeToCamel } from '../../util/helper';
 
 @Component({
   selector: 'app-reservation-table',
@@ -76,7 +76,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
 
   getIcon(name: any): any {
     // @ts-ignore
-    return ReservationIconName[name];
+    return ReservationIconName[snakeToCamel(name)];
   }
 
   view(reservation: IReservation): void {

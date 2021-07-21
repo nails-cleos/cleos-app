@@ -18,13 +18,15 @@ import { map, startWith } from 'rxjs/operators';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { FormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { getUserName } from '../../util/helper';
+import { getFullUserName, getUserName, snakeToCamel } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { detailExpandAnimation } from '../../util/animation';
 
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
-  styleUrls: ['./search.component.scss']
+  styleUrls: ['./search.component.scss'],
+  animations: [detailExpandAnimation]
 })
 export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -36,6 +38,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   dataSource: any = new MatTableDataSource<Pagination<IReservationAll>>();
   getState: Observable<any>;
   subscription: Subscription | undefined;
+  expandedReservation: IReservation | undefined;
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
@@ -98,7 +101,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
 
   getIcon(name: any): any {
     // @ts-ignore
-    return ReservationIconName[name];
+    return ReservationIconName[snakeToCamel(name)];
   }
 
   view(reservation: IReservation): void {
@@ -127,7 +130,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   displayFnUser(user: IUser): string {
-    return user ? getUserName(user) : '';
+    return user ? getFullUserName(user) : '';
   }
 
   keyDownHandler(event: any): void {
@@ -224,7 +227,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   private filterCustomer(name: string): IUser[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.customers?.filter(option => getUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
+    return this.customers?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
   }
 
   private filterStates(value: string): string[] {

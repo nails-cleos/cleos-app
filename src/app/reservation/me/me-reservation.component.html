@@ -130,7 +130,7 @@
       <section>
         <div class="button-row">
           <button (click)="selectDate(datetime)" *ngFor="let datetime of sortTime(available.value)"
-                  [color]="eventSelected === datetime.date && time === datetime.time ? 'accent' : 'primary'"
+                  [color]="eventSelected === datetime.date && time === datetime.time ? 'primary' : undefined"
                   class="large"
                   mat-raised-button>
             {{datetime.time}}
@@ -257,7 +257,7 @@
             </div>
           </div>
           <div>
-            <button [disabled]="isEditing" [form]="roomForm" appBackButton mat-icon-button
+            <button [disabled]="isEditing" [form]="roomForm" appBackButton color="accent" mat-icon-button
                     type="button">
               <mat-icon>keyboard_return</mat-icon>
             </button>
@@ -276,11 +276,12 @@
         <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.ADD.PRODUCT.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
         <div>
-          <button *ngIf="isEditing; else noEdit" [form]="productForm" appBackButton mat-icon-button type="button">
+          <button *ngIf="isEditing; else noEdit" [form]="productForm" appBackButton color="accent" mat-icon-button
+                  type="button">
             <mat-icon>keyboard_return</mat-icon>
           </button>
           <ng-template #noEdit>
-            <button (click)="goBack()" [disabled]="isEditing" mat-icon-button type="button">
+            <button (click)="goBack()" [disabled]="isEditing" color="accent" mat-icon-button type="button">
               <mat-icon>arrow_upward</mat-icon>
             </button>
           </ng-template>
@@ -294,7 +295,7 @@
         <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.ADD.SCHEDULE.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepThree"></ng-container>
         <div>
-          <button (click)="goBack()" mat-icon-button>
+          <button (click)="goBack()" color="accent" mat-icon-button>
             <mat-icon>arrow_upward</mat-icon>
           </button>
           <button (click)="preview()" [disabled]="!eventSelected" color="primary" mat-icon-button type="button">
@@ -306,7 +307,7 @@
         <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.ADD.PREVIEW.TITLE' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepFour"></ng-container>
         <div>
-          <button (click)="goBack()" mat-button>
+          <button (click)="goBack()" color="accent" mat-button>
             <mat-icon>arrow_upward</mat-icon>
           </button>
           <button (click)="create()" color="primary" mat-button type="button">
@@ -359,7 +360,7 @@
             </div>
           </div>
           <div class="divider">
-            <button [disabled]="isEditing" [form]="roomForm" appBackButton mat-raised-button
+            <button [disabled]="isEditing" [form]="roomForm" appBackButton color="accent" mat-raised-button
                     type="button">
               <mat-icon>keyboard_return</mat-icon>
               {{ 'COMMON.BUTTON.BACK' | translate }}</button>
@@ -381,11 +382,12 @@
         <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.ADD.PRODUCT.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
         <div class="divider">
-          <button *ngIf="isEditing; else noEdit" [form]="productForm" appBackButton mat-raised-button type="button">
+          <button *ngIf="isEditing; else noEdit" [form]="productForm" appBackButton color="accent" mat-raised-button
+                  type="button">
             <mat-icon>keyboard_return</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}</button>
           <ng-template #noEdit>
-            <button (click)="goBack()" [disabled]="isEditing" mat-raised-button type="button">
+            <button (click)="goBack()" [disabled]="isEditing" color="accent" mat-raised-button type="button">
               <mat-icon>arrow_back</mat-icon>
               {{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </ng-template>
@@ -400,7 +402,7 @@
         <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.ADD.SCHEDULE.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepThree"></ng-container>
         <div class="divider">
-          <button (click)="goBack()" mat-raised-button type="button">
+          <button (click)="goBack()" color="accent" mat-raised-button type="button">
             <mat-icon>arrow_back</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}</button>
           <button (click)="preview()" [disabled]="!eventSelected" class="raised-button" color="primary"
@@ -414,7 +416,7 @@
         <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.ADD.PREVIEW.TITLE' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepFour"></ng-container>
         <div class="divider">
-          <button (click)="goBack()" mat-raised-button>
+          <button (click)="goBack()" color="accent" mat-raised-button>
             <mat-icon>arrow_back</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}</button>
           <button (click)="create()" class="raised-button" color="primary" mat-raised-button type="button">

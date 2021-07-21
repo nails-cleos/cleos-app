@@ -16,4 +16,8 @@ export class TrackingService {
   public getAll(): Observable<ITracking[]> {
     return this.http.get<ITracking[]>(this.url);
   }
+
+  public findByReservationId(reservationId: string): Observable<ITracking> {
+    return this.http.get<ITracking>(`${this.url}/reservations/${reservationId}`);
+  }
 }

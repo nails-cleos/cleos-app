@@ -148,7 +148,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.filteredOptions = this.professional.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this._filter(name) : this.professionals ? this.professionals.slice() : this.professionals)
+      map(name => name ? this.filter(name) : this.professionals ? this.professionals.slice() : this.professionals)
     );
   }
 
@@ -226,7 +226,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     return false;
   }
 
-  private _filter(name: string): IUser[] | undefined {
+  private filter(name: string): IUser[] | undefined {
     const filterValue = name.toLowerCase();
 
     return this.professionals?.filter(option => getUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
