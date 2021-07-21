@@ -320,7 +320,7 @@ $box-shadow: ();
 $box-shadow2: ();
 @for $i from 0 through $particles {
   $box-shadow: $box-shadow,
-  random($width) - math.div($width, 2) + px random($height)- math.div($height, 1.2) + px hsl(random(360), 100, 50);
+  random($width) - math.div($width, 2) + px random($height)- math.div($height, 1.2) + px hsl(random(360), 100%, 50%);
   $box-shadow2: $box-shadow2, 0 0 #000
 }
 
