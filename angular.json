@@ -32,7 +32,8 @@
               "src/favicon.ico",
               "src/assets",
               "src/manifest.webmanifest",
-              "src/firebase-messaging-sw.js"
+              "src/firebase-messaging-sw.js",
+              "src/firebase-messaging-sw-staging.js"
             ],
             "styles": [
               "node_modules/angular-calendar/css/angular-calendar.css",
@@ -188,7 +189,8 @@
               "src/favicon.ico",
               "src/assets",
               "src/manifest.webmanifest",
-              "src/firebase-messaging-sw.js"
+              "src/firebase-messaging-sw.js",
+              "src/firebase-messaging-sw-staging.js"
             ],
             "styles": [
               "node_modules/angular-calendar/css/angular-calendar.css",

@@ -113,7 +113,7 @@
 
     <ng-container matColumnDef="expandedDetail">
       <td *matCellDef="let user" [attr.colspan]="displayedColumns.length" mat-cell>
-        <div [@detailExpand]="user == expandedUser ? 'expanded' : 'collapsed'"
+        <div [@detailExpand]="user === expandedUser ? 'expanded' : 'collapsed'"
              class="user-detail">
           <mat-list>
             <div fxHide fxShow.lt-sm mat-subheader>{{ 'USER.LIST.COLUMN.USERNAME' | translate }}</div>
