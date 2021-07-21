@@ -1,8 +1,8 @@
 export const environment = {
   production: true,
-  appServer: 'https://cleos.herokuapp.com',
+  appServer: 'www.espaciocleos.com',
   title: 'Cleos',
-  baseUrl: 'https://cleos-api.herokuapp.com/api',
+  baseUrl: 'http://147.182.163.14/api',
   googleClientId: '1075596698405-ujflh3nuhglps8br89a1gtk7obi333h9.apps.googleusercontent.com',
   facebookClientId: '523962545388946',
   firebase: {
