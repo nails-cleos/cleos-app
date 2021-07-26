@@ -158,6 +158,7 @@ import { MainContentComponent } from './main/main-content/main-content.component
 import { PaymentCompleteComponent } from './reservation/payment/complete/payment-complete.component';
 import { PaymentComponent } from './reservation/payment/payment.component';
 import { MoreInfoComponent } from './reservation/detail/more-info/more-info.component';
+import { AngularFireAnalyticsModule } from '@angular/fire/analytics';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
@@ -191,7 +192,6 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
       minute: 'numeric'
     }).format(date);
   }
-
 }
 
 @NgModule({
@@ -314,11 +314,11 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
       enabled: environment.production,
       registrationStrategy: 'registerWhenStable:30000'
     }),
-
+    AngularFireModule.initializeApp(environment.firebase),
     AngularFireDatabaseModule,
     AngularFireAuthModule,
     AngularFireMessagingModule,
-    AngularFireModule.initializeApp(environment.firebase),
+    AngularFireAnalyticsModule,
     MatCarouselModule.forRoot()
   ],
   providers: [
@@ -354,6 +354,7 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
 })
 export class AppModule {
   constructor(swPush: SwPush) {
+    firebase.analytics();
     if (swPush.isEnabled) {
       navigator.serviceWorker
         .ready
