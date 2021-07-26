@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME
+        run: docker build . --file Dockerfile --tag $IMAGE_NAME --build-arg BUILD=build
 
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
@@ -68,6 +68,5 @@ jobs:
             docker pull docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME:${{ needs.push.outputs.version_name }}
             echo "Run Docker cleos"
             docker run -d -p 443:443 -p 80:80 --restart=unless-stopped \
-            -e BUILD=build \
             -v /opt/certs:/etc/nginx/certs \
             --name cleos docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME:${{ needs.push.outputs.version_name }}
