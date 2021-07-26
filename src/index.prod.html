@@ -21,7 +21,7 @@
   <meta content="yes" name="apple-mobile-web-app-capable">
   <meta content="#f7e6d8" name="theme-color">
 
-  <script type="text/javascript" src="https://sdk.mercadopago.com/js/v2"></script>
+  <script src="https://sdk.mercadopago.com/js/v2" type="text/javascript"></script>
   <script src="firebase-messaging-sw.js"></script>
 
   <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-YHY37JXMXT"></script>
@@ -38,6 +38,10 @@
     gtag('js', new Date());
 
     gtag('config', 'G-YHY37JXMXT');
+  </script>
+  <script type="text/javascript">
+    const tlJsHost = ((window.location.protocol === "https:") ? "https://secure.trust-provider.com/" : "http://www.trustlogo.com/");
+    document.write(unescape("<script src='" + tlJsHost + "trustlogo/javascript/trustlogo.js' type='text/javascript' %3E%3C/script%3E"));
   </script>
 </head>
 <body class="mat-typography">

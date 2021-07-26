@@ -10,7 +10,7 @@
     "start": "node server.js",
     "start:dev": "ng serve",
     "start:pwa": "node server.js",
-    "build": "ng build --configuration production",
+    "build": "ng build --configuration=production",
     "build:pwa": "ng build --configuration=pwa",
     "test": "ng test",
     "lint": "ng lint --fix",

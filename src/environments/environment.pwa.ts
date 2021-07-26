@@ -1,8 +1,8 @@
 export const environment = {
   production: false,
-  appServer: 'http://192.168.0.8:5000',
+  appServer: 'https://192.168.0.8:5000',
   title: 'Cleos PWA',
-  baseUrl: 'http://localhost:8080/api',
+  baseUrl: 'https://localhost:8443/api',
   mlUrl: 'https://sandbox.mercadopago.com.ar/checkout/v1/redirect',
   googleClientId: '57757755712-1gcjdgbd0lkj4msirrmra9aglcb0vbmk.apps.googleusercontent.com',
   facebookClientId: '453309609006101',
