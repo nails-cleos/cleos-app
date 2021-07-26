@@ -1,8 +1,8 @@
 export const environment = {
   production: true,
-  appServer: 'www.espaciocleos.com',
+  appServer: 'https://www.espaciocleos.com',
   title: 'Cleos',
-  baseUrl: 'http://147.182.163.14/api',
+  baseUrl: 'https://localhost:8443/api',
   mlUrl: 'https://www.mercadopago.com.ar/checkout/v1/redirect',
   googleClientId: '1075596698405-ujflh3nuhglps8br89a1gtk7obi333h9.apps.googleusercontent.com',
   facebookClientId: '523962545388946',
