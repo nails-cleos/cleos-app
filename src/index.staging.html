@@ -2,24 +2,107 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="App to book an appointment to make your nail prettier">
+  <meta name="keywords" content="Nails">
   <title>CLEOS STAGING</title>
   <base href="/">
-  <meta content="App to book an appointment to make your nail prettier" name="description">
-  <meta content="width=device-width, initial-scale=1" name="viewport">
-  <link href="assets/icons/icon-512x512.png" rel="icon" type="image/x-icon">
-  <link href="assets/icons/icon-512x512.png" rel="apple-touch-icon">
+
+  <!-- Android -->
+  <meta name="theme-color" content="#f7e6d8">
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <!-- iOS -->
+  <meta name="apple-mobile-web-app-title" content="CLEOS STAGING">
+  <meta name="apple-touch-fullscreen" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+  <!-- Windows  -->
+  <meta name="msapplication-navbutton-color" content="#f7e6d8">
+  <meta name="msapplication-TileColor" content="#f7e6d8">
+  <meta name="msapplication-TileImage" content="assets/icons/icon-144x144.png">
+  <meta name="msapplication-config" content="browserconfig.xml">
+
+  <!-- Pinned Sites  -->
+  <meta name="application-name" content="CLEOS STAGING">
+  <meta name="msapplication-tooltip" content="Espacio CLEOS STAGING">
+  <meta name="msapplication-starturl" content="/">
+
+  <!-- UC Mobile Browser  -->
+  <meta name="full-screen" content="yes">
+  <meta name="browsermode" content="application">
+
+  <!-- Disable night mode for this page  -->
+  <meta name="nightmode" content="disable">
+
+  <!-- Layout mode -->
+  <meta name="layoutmode" content="fitscreen">
+
+  <!-- imagemode - show image even in text only mode  -->
+  <meta name="imagemode" content="force">
+
+  <!-- Main Link Tags  -->
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/icon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/icon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="assets/icons/icon-96x96.png">
+
+  <!-- iOS  -->
+  <link rel="apple-touch-icon" href="assets/icons/icon-180x180.png">
+  <link rel="apple-touch-icon" sizes="57x57" href="assets/icons/icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="assets/icons/icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="assets/icons/icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="assets/icons/icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="assets/icons/icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="assets/icons/icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="assets/icons/icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/icon-180x180.png">
+  <link rel="apple-touch-icon-precomposed" href="assets/icons/icon-180x180-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" sizes="57x57" href="assets/icons/icon-57x57-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/icons/icon-72x72-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" sizes="76x76" href="assets/icons/icon-76x76-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/icons/icon-114x114-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" sizes="120x120" href="assets/icons/icon-120x120-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/icons/icon-144x144-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" sizes="152x152" href="assets/icons/icon-152x152-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" sizes="180x180" href="assets/icons/icon-180x180-precomposed.png">
+  <link rel="mask-icon" color="#000000" href="assets/icons/safari-pinned-tab.svg">
+  <link rel="apple-touch-startup-image" href="src/assets/icon.png">
+
+  <!-- Startup Image  -->
+  <link rel="apple-touch-startup-image" href="assets/icons/icon-384x384.png">
+
+  <!-- Pinned Tab  -->
+  <link rel="mask-icon" size="any" color="#000000" href="assets/icons/safari-pinned-tab.svg">
+
+  <!-- Android  -->
+  <link rel="icon" type="image/png" sizes="36x36" href="assets/icons/icon-36x36.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/icon-48x48.png">
+  <link rel="icon" type="image/png" sizes="72x72" href="assets/icons/icon-72x72.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="assets/icons/icon-96x96.png">
+  <link rel="icon" type="image/png" sizes="144x144" href="assets/icons/icon-144x144.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="256x256" href="assets/icons/icon-256x256.png">
+  <link rel="icon" type="image/png" sizes="384x384" href="assets/icons/icon-384x384.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512x512.png">
+
+  <!-- Others -->
+  <link href="favicon.ico" rel="shortcut icon" type="image/x-icon">
+
+  <!-- UC Browser  -->
+  <link rel="apple-touch-icon-precomposed" sizes="57x57" href="src/assets/icons/icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="assets/icons/icon-72x72.png">
+
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
-  <link as="image" href="assets/icons/icon-512x512.png" rel="preload"/>
+  <link as="image" href="src/assets/icon.png" rel="preload"/>
   <link as="image" href="assets/error.png" rel="preload"/>
   <link as="image" href="assets/not_found.png" rel="preload"/>
 
-  <link href="https://fonts.gstatic.com" rel="preconnect">
-  <link crossorigin="" href="http://localhost" rel="preconnect">
-  <link href="manifest.webmanifest" rel="manifest">
-  <meta content="yes" name="mobile-web-app-capable">
-  <meta content="yes" name="apple-mobile-web-app-capable">
-  <meta content="#f7e6d8" name="theme-color">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link rel="preconnect" crossorigin="" href="http://localhost">
+  <link rel="manifest" href="manifest.webmanifest">
 
   <script type="text/javascript" src="https://sdk.mercadopago.com/js/v2"></script>
   <script>
