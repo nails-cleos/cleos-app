@@ -2,7 +2,7 @@
   "name": "Cleos",
   "short_name": "Cleos",
   "theme_color": "#f7e6d8",
-  "background_color": "#fafafa",
+  "background_color": "#f7e6d8",
   "display": "standalone",
   "gcm_sender_id": "103953800507",
   "scope": "./",
