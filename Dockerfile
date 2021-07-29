@@ -18,9 +18,10 @@ ADD . .
 RUN npm run $BUILD
 
 ### STAGE 2: Deploy ###
-FROM nginx:1.17.1-alpine
+FROM nginx:1.17.1-alpine as nginx
+ARG NGINX
 
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY ${NGINX} /etc/nginx/nginx.conf
 COPY --from=build /usr/src/app/dist/cleos /usr/share/nginx/html
 
 EXPOSE 80
