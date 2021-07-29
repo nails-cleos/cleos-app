@@ -29,6 +29,7 @@ import { getUserImage, getUserName, getUserNameInitials } from '../util/helper';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSidenav } from '@angular/material/sidenav';
 import { NavigationService } from '../services/navigation.service';
+import { TokenService } from '../services/token.service';
 
 @Component({
   selector: 'app-nav',
@@ -69,7 +70,7 @@ export class NavComponent implements OnInit, OnDestroy {
 
   constructor(public translate: TranslateService, private breakpointObserver: BreakpointObserver,
               private router: Router, private store: Store<AppState>, private messagingService: MessagingService,
-              private snackBar: MatSnackBar, private navigation: NavigationService) {
+              private snackBar: MatSnackBar, private navigation: NavigationService, private tokenService: TokenService) {
     this.language = this.translate.currentLang;
     this.getState = this.store.select(selectAuthState);
     this.getNotificationState = this.store.select(selectNotificationState);
@@ -141,6 +142,8 @@ export class NavComponent implements OnInit, OnDestroy {
       this.isAuthorized = state.isAuthenticated;
       this.isLoading = state.isLoading;
       if (state.isAuthenticated) {
+        this.tokenService.token = state.token;
+        this.tokenService.user = state.user;
         this.getNotifications();
         const user: IUserAll = state.user;
         this.currentUser = user;

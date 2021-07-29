@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { AppState, selectAuthState } from '../store/app.states';
 import { Store } from '@ngrx/store';
 import { IUser } from '../interfaces/user';
+import { TokenService } from '../services/token.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -12,7 +13,7 @@ export class AuthInterceptor implements HttpInterceptor {
   currentUser!: IUser;
   token!: string;
 
-  constructor(private store: Store<AppState>) {
+  constructor(private store: Store<AppState>, private tokenService: TokenService) {
     this.getState = this.store.select(selectAuthState);
     this.getState.subscribe((state) => {
       this.currentUser = state.user;
@@ -21,10 +22,10 @@ export class AuthInterceptor implements HttpInterceptor {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    if (this.currentUser && this.token) {
+    if (this.tokenService.user && this.tokenService.token) {
       req = req.clone({
         setHeaders: {
-          authorization: `Bearer ${this.token}`
+          authorization: this.tokenService.createTokenHeader()
         }
       });
     }

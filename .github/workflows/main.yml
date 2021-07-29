@@ -69,5 +69,5 @@ jobs:
             docker pull docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME:${{ needs.push.outputs.version_name }}
             echo "Run Docker cleos"
             docker run -d -p 443:443 -p 80:80 --restart=unless-stopped \
-            -v /opt/certs:/etc/nginx/certs \
+            --mount type=bind,source=/opt/certs,target=/etc/nginx/certs \
             --name cleos docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME:${{ needs.push.outputs.version_name }}

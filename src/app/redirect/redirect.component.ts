@@ -4,6 +4,7 @@ import { Role } from '../interfaces/token';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState } from '../store/app.states';
+import { TokenService } from '../services/token.service';
 
 @Component({
   selector: 'app-redirect',
@@ -12,11 +13,13 @@ import { AppState, selectAuthState } from '../store/app.states';
 })
 export class RedirectComponent {
 
-  constructor(private router: Router, private store: Store<AppState>) {
+  constructor(private router: Router, private store: Store<AppState>, private tokenService: TokenService) {
     this.store.select(selectAuthState).subscribe((state: any) => {
       let redirectUrl = ['main'];
       if (state.isAuthenticated) {
         const user: IUserAll = state.user;
+        this.tokenService.token = state.token;
+        this.tokenService.user = state.user;
         if (RedirectComponent.isProfessionalOrAdmin(user.authorities)) {
           redirectUrl = ['dashboard'];
         } else {
