@@ -34,9 +34,9 @@
     </ng-container>
 
     <ng-container matColumnDef="start">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+      <th *matHeaderCellDef mat-header-cell
           mat-sort-header>{{ 'UNAVAILABLE.LIST.COLUMN.START' | translate }}</th>
-      <td *matCellDef="let unavailable" fxHide.lt-sm fxShow mat-cell>
+      <td *matCellDef="let unavailable" mat-cell>
         <div *ngIf="unavailable.id; else skeleton">{{unavailable.start | date:'short':undefined:language}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>

@@ -11,7 +11,7 @@ import { requireMatch, valueChange } from '../util/validators';
 import { IProduct } from '../interfaces/product';
 import { MatStepper } from '@angular/material/stepper';
 import { IAvailability, IRoom } from '../interfaces/room';
-import { IReservation, IReservationAll, Reservation } from '../interfaces/reservation';
+import { IReservation, IReservationAll, MAX_RESERVATION_MONTH, Reservation } from '../interfaces/reservation';
 import { CalendarEvent } from 'angular-calendar';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -24,11 +24,11 @@ import {
   createNewDate,
   Duration,
   formatTime,
-  getAvailability,
+  getAvailability, getDiffDay,
   getNow,
   getStartEndDay,
-  getTime,
-  IDuration,
+  getTime, greaterOrEqualsThan,
+  IDuration, isBetween,
   newDate,
   plusDay
 } from '../util/dates';
@@ -43,6 +43,7 @@ import { timeTheme } from '../util/theme';
 import { DiscountType, IUserDiscount } from '../interfaces/discount';
 import { getFullUserName, getPriceDiscount, getUserName } from '../util/helper';
 import { transitionAnimation } from '../util/animation';
+import { addMonths } from 'date-fns';
 
 @Component({
   selector: 'app-reservation',
@@ -127,6 +128,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   productId: string | undefined;
 
+  maxCalendarDate: Date;
+
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private formBuilder: FormBuilder, private breakpointObserver: BreakpointObserver,
               private router: Router, private route: ActivatedRoute, private adapter: DateAdapter<any>,
@@ -172,6 +175,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     });
+    this.maxCalendarDate = addMonths(getNow(), MAX_RESERVATION_MONTH);
   }
 
   get professionalName(): string {
@@ -290,12 +294,15 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const {week, saturday, sunday} = getAvailability(this.room.value);
 
+    const diffDay = getDiffDay(this.maxCalendarDate, date);
+
     this.setStartEndDay(week, saturday, sunday);
     const unavailable = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.UNAVAILABLE');
     const lunch = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.LUNCH');
     const notWorking = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.OUT_OF_WORK');
     this.events = this.events.concat(fillNotAvailable(unavailable, lunch, notWorking,
-      this.daysInWeek, date, sunday, saturday, week, true));
+      diffDay > this.daysInWeek ? this.daysInWeek : diffDay,
+      date, sunday, saturday, week, true));
     this.viewDate = date;
     this.store.dispatch(
       new fromActionsReservation.SearchReservation({date: this.date.value, roomId: this.room.value.id})
@@ -304,6 +311,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   segmentClick(date: Date, state: string, id?: string): void {
+    if (!this.dateIsValid(date)) {
+      return;
+    }
     this.errors.overlapping = false;
     const nowTime = date.toLocaleTimeString('en-GB').split(':');
     const duration = convertDuration(this.product.value.duration);
@@ -422,6 +432,18 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  beforeMonthViewRender({header}: any): void {
+    header.forEach((day: any) => {
+      if (!this.dateIsValid(day.date)) {
+        day.cssClass = 'cal-disabled';
+      }
+    });
+  }
+
+  private dateIsValid(date: Date): boolean {
+    return isBetween(getNow(), this.maxCalendarDate, date);
+  }
+
   private getReservation(id: string | null): void {
     this.store.dispatch(
       new fromActionsReservation.ReservationFind(id)
@@ -511,17 +533,25 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         const duration = convertDuration(it.duration);
         switch (it.repeat) {
           case 'NONE':
-            this.validateUnavailableEvent(start, duration, it);
+            if (!greaterOrEqualsThan(start, this.maxCalendarDate)) {
+              this.validateUnavailableEvent(start, duration, it);
+            }
             break;
           case 'ONCE_A_WEEK':
             for (let i = 0; i < weeks; i++) {
               const onceWeekDate = plusDay(start, +i * 7);
+              if (greaterOrEqualsThan(onceWeekDate, this.maxCalendarDate)) {
+                break;
+              }
               this.validateUnavailableEvent(onceWeekDate, duration, it);
             }
             break;
           case 'EVERY_DAY':
             for (let i = 0; i < weeks * 7; i++) {
               const everyDayDate = plusDay(start, +i);
+              if (greaterOrEqualsThan(everyDayDate, this.maxCalendarDate)) {
+                break;
+              }
               this.validateUnavailableEvent(everyDayDate, duration, it);
             }
             break;

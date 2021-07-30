@@ -3,12 +3,14 @@ import { Action } from '@ngrx/store';
 export enum AuthActionTypes {
   login = '[Auth] Login',
   socialLogin = '[Auth] Social Login',
+  refreshToken = '[Auth] Refresh token',
   loginSuccess = '[Auth] Login Success',
   loginFailure = '[Auth] Login Failure',
   signup = '[Auth] Signup',
   signupSuccess = '[Auth] Signup Success',
   signupFailure = '[Auth] Signup Failure',
   logout = '[Auth] Logout',
+  reLogin = '[Auth] Re login',
   activateAccount = '[Auth] Activate Account',
   forgotPassword = '[Auth] Forgot password',
   recoveryPassword = '[Auth] Recovery password',
@@ -24,6 +26,13 @@ export class Login implements Action {
 
 export class SocialLogin implements Action {
   readonly type = AuthActionTypes.socialLogin;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class RefreshToken implements Action {
+  readonly type = AuthActionTypes.refreshToken;
 
   constructor(public payload: any) {
   }
@@ -68,6 +77,10 @@ export class LogOut implements Action {
   readonly type = AuthActionTypes.logout;
 }
 
+export class ReLogin implements Action {
+  readonly type = AuthActionTypes.reLogin;
+}
+
 export class ActivateAccount implements Action {
   readonly type = AuthActionTypes.activateAccount;
 
@@ -97,12 +110,14 @@ export type All =
   | Login
   | SocialLogin
   | LoginSuccess
+  | RefreshToken
   | LoginFailure
   | SignUp
   | SignUpSuccess
   | SignUpFailure
   | ActivateAccount
   | LogOut
+  | ReLogin
   | ForgotPassword
   | RecoveryPassword
   | Clean;

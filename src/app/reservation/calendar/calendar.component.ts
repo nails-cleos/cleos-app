@@ -1,22 +1,35 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState, selectReservationState } from '../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
-import { Calendar, Day, ICalendar, IReservationAll, IRoomReservation } from '../../interfaces/reservation';
+import {
+  Calendar,
+  Day,
+  ICalendar,
+  IReservationAll,
+  IRoomReservation,
+  MAX_RESERVATION_MONTH
+} from '../../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import {
+  addPeriod,
+  CalendarPeriod,
   convertDuration,
   createDate,
   createNewDate,
+  endOfPeriod,
   formatTime,
   getAvailability,
+  getDiffDay,
   getNow,
-  getStartEndDay,
-  IDuration,
+  getStartEndDay, greaterOrEqualsThan,
+  IDuration, isBetween,
   newDate,
-  plusDay
+  plusDay,
+  startOfPeriod,
+  subPeriod
 } from '../../util/dates';
 import { IRoom, IRoomAll } from '../../interfaces/room';
 import { fillNotAvailable, getOverlapEvent, newEvent } from '../../util/event';
@@ -27,6 +40,7 @@ import { findStateColor, IState, stateColor } from '../../util/flags';
 import { IUserAll } from '../../interfaces/user';
 import { IUnavailableAll } from '../../interfaces/unavailable';
 import { getUserName } from '../../util/helper';
+import { addMonths } from 'date-fns';
 
 @Component({
   selector: 'app-calendar',
@@ -34,6 +48,8 @@ import { getUserName } from '../../util/helper';
   styleUrls: ['./calendar.component.scss']
 })
 export class CalendarComponent implements OnInit, OnDestroy {
+  @ViewChild('picker') picker: any;
+
   getState: Observable<any>;
   subscription: Subscription | undefined;
 
@@ -45,12 +61,17 @@ export class CalendarComponent implements OnInit, OnDestroy {
   lessDays = 3;
   hourSegments = 4;
   viewDate: Date = getNow();
+  today: Date = getNow();
+  maxDate: Date;
   calendarView: CalendarView = CalendarView.Week;
-  selectView = 'WEEK';
+  selectView: CalendarPeriod = 'week';
   days = 0;
   smallScreen: boolean | undefined;
   locale: string;
   professionalId: string | undefined;
+
+  prevBtnDisabled = false;
+  nextBtnDisabled = false;
 
   colors: IState[] = stateColor();
 
@@ -64,7 +85,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
       this.smallScreen = result.matches;
       if (this.smallScreen) {
         this.daysInWeek = 3;
-        this.selectView = 'DAY';
+        this.selectView = 'day';
         this.calendarView = CalendarView.Day;
         this.lessDays = 1;
       }
@@ -77,6 +98,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
       const user: IUserAll = state.user;
       this.professionalId = user.id;
     });
+    this.maxDate = addMonths(getNow(), MAX_RESERVATION_MONTH);
+    this.dateOrViewChanged();
   }
 
   ngOnInit(): void {
@@ -96,30 +119,55 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   segmentClick(date: Date, room?: IRoom): void {
-    if (date && room) {
+    if (date && room && this.dateIsValid(date)) {
       const data = {date, room};
       this.router.navigate(['reservation'], {state: data});
     }
   }
 
-  previousWeek(): void {
-    this.days -= 7;
+  selectDate(event: any): void {
+    this.changeDate(newDate(event.value));
   }
 
-  today(): void {
-    this.days = 0;
+  increment(): void {
+    this.changeDate(addPeriod(this.selectView, this.viewDate, 1));
+    this.picker.select(this.viewDate);
   }
 
-  nextWeek(): void {
-    this.days += 7;
+  decrement(): void {
+    this.changeDate(subPeriod(this.selectView, this.viewDate, 1));
+    this.picker.select(this.viewDate);
   }
 
-  previousDay(): void {
-    this.days--;
+  beforeMonthViewRender({header}: any): void {
+    header.forEach((day: any) => {
+      if (!this.dateIsValid(day.date)) {
+        day.cssClass = 'cal-disabled';
+      }
+    });
   }
 
-  nextDay(): void {
-    this.days++;
+  private changeDate(date: Date): void {
+    this.viewDate = date;
+    this.dateOrViewChanged();
+  }
+
+  private dateOrViewChanged(): void {
+    this.prevBtnDisabled = !this.dateIsValid(
+      endOfPeriod(this.selectView, subPeriod(this.selectView, this.viewDate, 1))
+    );
+    this.nextBtnDisabled = !this.dateIsValid(
+      startOfPeriod(this.selectView, addPeriod(this.selectView, this.viewDate, 1))
+    );
+    if (this.viewDate < this.today) {
+      this.changeDate(this.today);
+    } else if (this.viewDate > this.maxDate) {
+      this.changeDate(this.maxDate);
+    }
+  }
+
+  private dateIsValid(date: Date): boolean {
+    return isBetween(this.today, this.maxDate, date);
   }
 
   private addReservations(rr: IRoomReservation): void {
@@ -154,24 +202,32 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   private addUnavailableList(rr: IRoomReservation): void {
     const unavailableList: IUnavailableAll[] = rr.unavailableList;
-    const weeks = 56;
+    const days = 56;
     unavailableList.forEach(it => {
       if (it.duration) {
         const start = newDate(it.start);
         const duration = convertDuration(it.duration);
         switch (it.repeat) {
           case 'NONE':
-            this.validateUnavailableEvent(rr.room, start, duration, it);
+            if (!greaterOrEqualsThan(start, this.maxDate)) {
+              this.validateUnavailableEvent(rr.room, start, duration, it);
+            }
             break;
           case 'ONCE_A_WEEK':
-            for (let i = 0; i < weeks; i++) {
+            for (let i = 0; i < days; i++) {
               const onceWeekDate = plusDay(start, i * 7);
+              if (greaterOrEqualsThan(onceWeekDate, this.maxDate)) {
+                break;
+              }
               this.validateUnavailableEvent(rr.room, onceWeekDate, duration, it);
             }
             break;
           case 'EVERY_DAY':
-            for (let i = 0; i < weeks * 7; i++) {
+            for (let i = 0; i < days * 7; i++) {
               const everyDayDate = plusDay(start, i);
+              if (greaterOrEqualsThan(everyDayDate, this.maxDate)) {
+                break;
+              }
               this.validateUnavailableEvent(rr.room, everyDayDate, duration, it);
             }
             break;
@@ -239,7 +295,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
           const lunch = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.LUNCH');
           const notWorking = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.OUT_OF_WORK');
           calendar.events = calendar.events.concat(fillNotAvailable(unavailable, lunch, notWorking,
-            56, this.viewDate, sunday, saturday, week));
+            getDiffDay(this.maxDate, this.today), this.viewDate, sunday, saturday, week));
         });
         state.data.forEach((value: IRoomReservation) => this.addUnavailableList(value));
       }

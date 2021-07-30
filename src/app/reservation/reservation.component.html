@@ -68,7 +68,7 @@
           <mat-label>{{ 'RESERVATION.ADD.DATE.FIELD' | translate }}</mat-label>
           <label>
             <input (focus)="picker.open()" [formControl]="date" [matDatepickerFilter]="myFilter"
-                   [matDatepicker]="picker"
+                   [matDatepicker]="picker" [max]="maxCalendarDate"
                    matInput required>
           </label>
           <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
@@ -144,6 +144,7 @@
     [events]="events"
     [hourSegments]="hourSegments"
     [locale]="locale"
+    (beforeViewRender)="beforeMonthViewRender($event)"
     [viewDate]="viewDate"></mwl-calendar-week-view>
   <mat-error *ngIf="this.errors['schedule']" [innerHTML]="'RESERVATION.ADD.SCHEDULE.REQUIRED' | translate"
              class="divider"></mat-error>

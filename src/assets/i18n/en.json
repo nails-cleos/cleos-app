@@ -5,7 +5,7 @@
       "RELOAD": "Reload",
       "NEXT": "Next",
       "PREVIOUS": "Previous",
-      "TODAY": "Today",
+      "GOTO": "Go to",
       "YES": "Yes",
       "NO": "No",
       "SEND": "Send",
@@ -376,10 +376,14 @@
       "FIELD": "Phone",
       "INVALID": "Invalid phone number"
     },
+    "DOB": {
+      "FIELD": "Date of birth"
+    },
     "UPDATED": {
       "MESSAGE": "User {{username}} updated",
       "PHOTO": "Profile picture updated"
-    }
+    },
+    "INCOMPLETE": "Complete your profile"
   },
   "PRODUCT": {
     "LIST": {

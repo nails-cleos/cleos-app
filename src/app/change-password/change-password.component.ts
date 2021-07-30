@@ -84,7 +84,7 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
     this.userSubscription = this.getUserState.subscribe((state) => {
       if (state.message) {
         this.store.dispatch(
-          new fromActionsLogin.LogOut()
+          new fromActionsLogin.ReLogin()
         );
       }
     });
