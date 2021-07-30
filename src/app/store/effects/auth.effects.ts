@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Actions, Effect, ofType } from '@ngrx/effects';
+import { Actions, createEffect, Effect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
@@ -119,6 +119,15 @@ export class LoginEffects {
     tap(() => {
       localStorage.removeItem('auth');
       window.location.href = '/main';
+    })
+  );
+
+  @Effect({dispatch: false})
+  public reLogin$ = this.actions$.pipe(
+    ofType(AuthActionTypes.reLogin),
+    tap(() => {
+      localStorage.removeItem('auth');
+      window.location.href = '/auth';
     })
   );
 

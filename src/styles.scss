@@ -1,15 +1,15 @@
 @use "sass:math";
 
-@import '~@angular/material/theming';
-@import "theme";
-@import "~skeleton-screen-css";
+@import 'node_modules/@angular/material/theming';
+@import "src/theme";
+@import "node_modules/skeleton-screen-css";
 
-@import '~ngx-sharebuttons/themes/material/material-dark-theme';
-@import '~ngx-sharebuttons/themes/modern/modern-light-theme';
-@import '~ngx-sharebuttons/themes/circles/circles-dark-theme';
+@import 'node_modules/ngx-sharebuttons/themes/material/material-dark-theme';
+@import 'node_modules/ngx-sharebuttons/themes/modern/modern-light-theme';
+@import 'node_modules/ngx-sharebuttons/themes/circles/circles-dark-theme';
 
 $flag-icon-css-path: '~flag-icon-css/flags' !default;
-@import "~flag-icon-css/sass/flag-icon";
+@import "node_modules/flag-icon-css/sass/flag-icon";
 
 html, body {
   height: 100%;
@@ -308,6 +308,15 @@ pre {
 
 .top {
   margin-top: 2%;
+}
+
+.cal-disabled {
+  background-color: #eee;
+  pointer-events: none;
+}
+
+.cal-disabled .cal-day-number {
+  opacity: 0.1;
 }
 
 // fireworks

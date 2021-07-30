@@ -131,9 +131,10 @@
           </button>
         </ng-template>
 
-        <button [matMenuTriggerFor]="menuLogged" color="accent" mat-raised-button>
-          <mat-icon>person_pin</mat-icon>
-          <span *ngIf="(isHandset$ | async) === false">{{username | titlecase}}</span>
+        <button [matMenuTriggerFor]="menuLogged" [ngClass]="{'badge-padding': incomplete}" color="accent"
+                mat-icon-button>
+          <mat-icon matBadgeColor="warn" [matBadgeHidden]="!incomplete"
+                    [matBadge]="'*'">person_pin</mat-icon>
         </button>
         <mat-menu #menuLogged="matMenu">
           <mat-nav-list>
@@ -145,6 +146,7 @@
             <a [routerLink]="'/profile'" mat-list-item>
               <mat-icon mat-list-icon>settings</mat-icon>
               <div mat-line>{{'DASHBOARD.PROFILE' | translate }}</div>
+              <span *ngIf="incomplete" class="dot"></span>
             </a>
             <mat-divider></mat-divider>
             <a *ngIf="canChangePassword" [routerLink]="'/change-password'" mat-list-item>

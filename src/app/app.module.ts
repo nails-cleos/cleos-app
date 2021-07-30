@@ -52,6 +52,7 @@ import localeEs from '@angular/common/locales/es';
 // Services
 import { AuthGuardService } from './services/auth-guard.service';
 import { AuthService } from './services/auth.service';
+import { TokenService } from './services/token.service';
 import { UserService } from './services/user.service';
 import { ProductService } from './services/product.service';
 import { RoomService } from './services/room.service';
@@ -329,6 +330,7 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
     httpInterceptorProviders,
     AuthGuardService,
     AuthService,
+    TokenService,
     UserService,
     ProductService,
     RoomService,

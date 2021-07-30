@@ -257,11 +257,12 @@
             </div>
           </div>
           <div>
-            <button [disabled]="isEditing" [form]="roomForm" appBackButton color="accent" mat-icon-button
-                    type="button">
+            <button [disabled]="isEditing" [form]="roomForm" appBackButton class="icon-button" color="accent"
+                    mat-mini-fab type="button">
               <mat-icon>keyboard_return</mat-icon>
             </button>
-            <button (click)="getProducts()" [disabled]="roomForm.invalid" color="primary" mat-icon-button type="button">
+            <button (click)="getProducts()" [disabled]="roomForm.invalid" class="icon-button" color="primary"
+                    mat-mini-fab type="button">
               <mat-icon>arrow_downward</mat-icon>
             </button>
           </div>
@@ -281,11 +282,13 @@
             <mat-icon>keyboard_return</mat-icon>
           </button>
           <ng-template #noEdit>
-            <button (click)="goBack()" [disabled]="isEditing" color="accent" mat-icon-button type="button">
+            <button (click)="goBack()" [disabled]="isEditing" class="icon-button" color="accent" mat-mini-fab
+                    type="button">
               <mat-icon>arrow_upward</mat-icon>
             </button>
           </ng-template>
-          <button (click)="searchAvailability()" [disabled]="productForm.invalid" color="primary" mat-icon-button
+          <button (click)="searchAvailability()" [disabled]="productForm.invalid" class="icon-button" color="primary"
+                  mat-mini-fab
                   type="button">
             <mat-icon>arrow_downward</mat-icon>
           </button>
@@ -295,10 +298,11 @@
         <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.ADD.SCHEDULE.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepThree"></ng-container>
         <div>
-          <button (click)="goBack()" color="accent" mat-icon-button>
+          <button (click)="goBack()" class="icon-button" color="accent" mat-mini-fab>
             <mat-icon>arrow_upward</mat-icon>
           </button>
-          <button (click)="preview()" [disabled]="!eventSelected" color="primary" mat-icon-button type="button">
+          <button (click)="preview()" [disabled]="!eventSelected" class="icon-button" color="primary" mat-mini-fab
+                  type="button">
             <mat-icon>arrow_downward</mat-icon>
           </button>
         </div>
@@ -307,10 +311,10 @@
         <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.ADD.PREVIEW.TITLE' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepFour"></ng-container>
         <div>
-          <button (click)="goBack()" color="accent" mat-button>
+          <button (click)="goBack()" class="icon-button" color="accent" mat-mini-fab>
             <mat-icon>arrow_upward</mat-icon>
           </button>
-          <button (click)="create()" color="primary" mat-button type="button">
+          <button (click)="create()" class="icon-button" color="primary" mat-mini-fab type="button">
             <mat-icon>add_task</mat-icon>
           </button>
         </div>

@@ -23,7 +23,7 @@ export class ErrorInterceptor implements HttpInterceptor {
       }
       if ([401].indexOf(err.status) >= 0 && this.isAuthenticated) {
         this.store.dispatch(
-          new fromActionsLogin.LogOut()
+          new fromActionsLogin.ReLogin()
         );
       }
       return throwError(err);

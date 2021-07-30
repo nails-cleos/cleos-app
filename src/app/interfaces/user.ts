@@ -3,6 +3,7 @@ export interface IUser {
   firstName?: string;
   lastName?: string;
   phone?: string;
+  dob?: string;
   enabled?: boolean;
   deleted?: boolean;
   provider?: string;
@@ -15,6 +16,7 @@ export interface IUser {
   image?: any;
   code?: string | null;
   referralMax?: number;
+  completed?: boolean;
 }
 
 export interface IUserAll {
@@ -28,6 +30,7 @@ export interface IUserAll {
   imageUrl?: string;
   lang: string;
   phone?: string;
+  dob?: string;
   referralMax?: number;
 }
 

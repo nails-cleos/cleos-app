@@ -66,6 +66,12 @@ export const reducer = (state = initialState, action: All): State => {
         queryParams: action.payload.queryParams
       };
     }
+    case AuthActionTypes.refreshToken: {
+      return {
+        ...state,
+        token: action.payload.refreshToken
+      };
+    }
     case AuthActionTypes.signupSuccess: {
       return {
         ...state,
@@ -98,6 +104,7 @@ export const reducer = (state = initialState, action: All): State => {
         queryParams: null
       };
     }
+    case AuthActionTypes.reLogin:
     case AuthActionTypes.logout: {
       return initialState;
     }
