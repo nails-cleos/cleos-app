@@ -1,6 +1,7 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+      <span *ngIf="user && !user.completed" class="incomplete">{{ 'PROFILE.INCOMPLETE' | translate }}</span>
       <mat-card>
         <mat-card-header class="center">
           <mat-card-title>{{ 'PROFILE.TITLE' | translate }}</mat-card-title>
@@ -46,14 +47,14 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PROFILE.FIRST_NAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input [formControl]="firstName" [readonly]="!canChange" autocomplete="firstName" matInput>
+                  <input [formControl]="firstName" [readonly]="!canChange" autocomplete="given-name" matInput>
                 </label>
                 <mat-error *ngIf="errors['firstName']">{{errors['firstName']}}</mat-error>
               </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PROFILE.LAST_NAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input [formControl]="lastName" [readonly]="!canChange" autocomplete="lastName" matInput>
+                  <input [formControl]="lastName" [readonly]="!canChange" autocomplete="family-name" matInput>
                 </label>
                 <mat-error *ngIf="errors['lastName']">{{errors['lastName']}}</mat-error>
               </mat-form-field>
@@ -77,6 +78,19 @@
                                         name="phone"></ngx-mat-intl-tel-input>
                 <mat-error *ngIf="phone.hasError('validatePhoneNumber')">
                   {{ 'PROFILE.PHONE.INVALID' | translate }}r
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>{{ 'PROFILE.DOB.FIELD' | translate }}</mat-label>
+                <button (click)="picker.open()" mat-icon-button matPrefix>
+                  <mat-icon>today</mat-icon>
+                </button>
+                <label>
+                  <input (focus)="picker.open()" [formControl]="dob" [matDatepicker]="picker" matInput>
+                </label>
+                <mat-datepicker #picker startView="multi-year" touchUi></mat-datepicker>
+                <mat-error *ngIf="errors['dob']">
+                  {{errors['dob']}}
                 </mat-error>
               </mat-form-field>
             </div>

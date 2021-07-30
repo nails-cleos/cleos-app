@@ -67,6 +67,7 @@ export class NavComponent implements OnInit, OnDestroy {
 
   isLoading = true;
   error: any;
+  incomplete = false;
 
   constructor(public translate: TranslateService, private breakpointObserver: BreakpointObserver,
               private router: Router, private store: Store<AppState>, private messagingService: MessagingService,
@@ -144,6 +145,7 @@ export class NavComponent implements OnInit, OnDestroy {
       if (state.isAuthenticated) {
         this.tokenService.token = state.token;
         this.tokenService.user = state.user;
+        this.incomplete = !state.user.completed;
         this.getNotifications();
         const user: IUserAll = state.user;
         this.currentUser = user;

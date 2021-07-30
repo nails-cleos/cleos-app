@@ -9,6 +9,7 @@ import { fieldChange, valueChange } from '../util/validators';
 import { Location } from '@angular/common';
 import { findFlag, flags, IFlag } from '../util/flags';
 import { getUserImage, getUserNameInitials } from '../util/helper';
+import { createDateFromString, createNewDate } from '../util/dates';
 
 @Component({
   selector: 'app-profile',
@@ -25,7 +26,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
   canChange = false;
   image: any;
   initials: string | undefined;
-  selectedImage: any;
 
   username: FormControl = new FormControl('', [
     Validators.required
@@ -37,6 +37,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   firstName: FormControl = new FormControl();
   lastName: FormControl = new FormControl();
   phone: FormControl = new FormControl();
+  dob: FormControl = new FormControl();
 
   flagList: IFlag[] = flags();
 
@@ -67,6 +68,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     user.firstName = fieldChange(this.firstName, this.user?.firstName);
     user.lastName = fieldChange(this.lastName, this.user?.lastName);
     user.phone = fieldChange(this.phone, this.user?.phone);
+    user.dob = fieldChange(this.dob, this.user?.dob);
 
     this.store.dispatch(
       new fromActionsUser.UpdateUser(user)
@@ -98,7 +100,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
       langValue: this.langValue,
       firstName: this.firstName,
       lastName: this.lastName,
-      phone: this.phone
+      phone: this.phone,
+      dob: this.dob
     });
   }
 
@@ -117,6 +120,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.initials = getUserNameInitials(user);
         this.image = getUserImage(user);
         this.form.patchValue(state.selected);
+        if (state.selected.dob) {
+          this.dob.setValue(createDateFromString(state.selected.dob));
+        }
         const langValue = findFlag(this.flagList, state.selected.lang);
         this.langValue.setValue(langValue);
         this.cdRef.detectChanges();
@@ -126,6 +132,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({incorrect: true});
         });
+      }
+      if (state.message) {
+        this.clean();
+        this.findMe();
       }
     });
   }

@@ -4,6 +4,9 @@ import { Observable, of, timer, Subscription, Subject } from 'rxjs';
 import { shareReplay, switchMap, map, takeUntil } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { IUserAll } from '../interfaces/user';
+import { Store } from '@ngrx/store';
+import { AppState } from '../store/app.states';
+import * as fromActionsLogin from '../store/auth.actions';
 
 export interface RefreshTokenResponse {
   refreshToken: string;
@@ -21,7 +24,7 @@ export class TokenService {
   private myTokenSubscription: Subscription | undefined;
   private stopTimer: Subject<boolean> | undefined;
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(private http: HttpClient, private router: Router, private store: Store<AppState>) {
   }
 
   get tokenStream(): Observable<string> | undefined {
@@ -42,7 +45,12 @@ export class TokenService {
         takeUntil(myStopTimer),
         switchMap(() => this.refreshToken()),
         shareReplay(this.cacheSize));
-      this.myTokenSubscription = this.myTokenCache.subscribe(newToken => this.myToken = newToken.refreshToken, () => this.clear());
+      this.myTokenSubscription = this.myTokenCache.subscribe(newToken => {
+        this.store.dispatch(
+          new fromActionsLogin.RefreshToken(newToken)
+        );
+        this.myToken = newToken.refreshToken;
+      }, () => this.clear());
     }
   }
 

@@ -1,4 +1,18 @@
 import { IAvailability, IRoom } from '../interfaces/room';
+import {
+  subMonths,
+  addMonths,
+  addDays,
+  addWeeks,
+  subDays,
+  subWeeks,
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  startOfDay,
+  endOfDay
+} from 'date-fns';
 
 export interface IDuration {
   hour: number;
@@ -103,6 +117,11 @@ export const getDiffTime = (maxDate: Date, minDate: Date): string => {
   return `${hour}:${minute}`;
 };
 
+export const getDiffDay = (maxDate: Date, minDate: Date): number => {
+  const diff = maxDate.getTime() - minDate.getTime();
+  return Math.ceil(diff / (1000 * 3600 * 24));
+};
+
 export const getMinutesBetweenTimes = (date1: Date, date2: Date): number =>
   Math.abs(Math.round((date1.getTime() - date2.getTime()) / (1000 * 60)));
 
@@ -192,6 +211,11 @@ export const areEqualDate = (date1: Date, date2: Date): boolean =>
   date1.getFullYear() === date2.getFullYear() && date1.getMonth() === date2.getMonth()
   && date1.getDate() === date2.getDate();
 
+export const createDateFromString = (stringDate: string): Date => {
+  const date = stringDate.split('-');
+  return new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]));
+};
+
 export const createDate = (hour: number = 0, minute: number = 0, second: number = 0,
                            mili: number = 0): Date => createNewDate(new Date(), hour, minute, second, mili);
 
@@ -232,6 +256,29 @@ export const plusMonthDate = (date: Date, plus: number, day: number): Date => {
   return d;
 };
 
+export const greaterOrEqualsThan = (date1: Date, date2: Date): boolean => date1 >= date2;
+
 export const greaterOrEqualsThanToday = (date: Date): boolean => date >= createDate();
 
 export const greaterThanToday = (date: Date): boolean => date >= createDate(23, 59, 59, 99);
+
+export const isBetween = (min: Date, max: Date, date: Date): boolean =>
+  date >= min && date <= createNewDate(max, 23, 59, 59, 99);
+
+export type CalendarPeriod = 'day' | 'week' | 'month';
+
+export const addPeriod = (period: CalendarPeriod, date: Date, amount: number): Date => (
+  {day: addDays, week: addWeeks, month: addMonths}[period](date, amount)
+);
+
+export const subPeriod = (period: CalendarPeriod, date: Date, amount: number): Date => (
+  {day: subDays, week: subWeeks, month: subMonths}[period](date, amount)
+);
+
+export const startOfPeriod = (period: CalendarPeriod, date: Date): Date => (
+  {day: startOfDay, week: startOfWeek, month: startOfMonth}[period](date)
+);
+
+export const endOfPeriod = (period: CalendarPeriod, date: Date): Date => (
+  {day: endOfDay, week: endOfWeek, month: endOfMonth}[period](date)
+);
