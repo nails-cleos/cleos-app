@@ -224,7 +224,7 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
           this.form.controls[value.field].setErrors({incorrect: true});
         });
       } else if (state.message) {
-        this.router.navigate(['unavailable-list']);
+        this.router.navigate(['unavailable']);
       }
     });
   }

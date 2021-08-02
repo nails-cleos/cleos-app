@@ -9,16 +9,7 @@ import { TokenService } from '../services/token.service';
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
 
-  getState: Observable<any>;
-  currentUser!: IUser;
-  token!: string;
-
-  constructor(private store: Store<AppState>, private tokenService: TokenService) {
-    this.getState = this.store.select(selectAuthState);
-    this.getState.subscribe((state) => {
-      this.currentUser = state.user;
-      this.token = state.token;
-    });
+  constructor(private tokenService: TokenService) {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {

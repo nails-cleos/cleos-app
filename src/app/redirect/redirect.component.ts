@@ -15,18 +15,20 @@ export class RedirectComponent {
 
   constructor(private router: Router, private store: Store<AppState>, private tokenService: TokenService) {
     this.store.select(selectAuthState).subscribe((state: any) => {
-      let redirectUrl = ['main'];
-      if (state.isAuthenticated) {
-        const user: IUserAll = state.user;
-        this.tokenService.token = state.token;
-        this.tokenService.user = state.user;
-        if (RedirectComponent.isProfessionalOrAdmin(user.authorities)) {
-          redirectUrl = ['dashboard'];
-        } else {
-          redirectUrl = ['me', 'reservations'];
+      if (!state.isRefreshToken) {
+        let redirectUrl = ['main'];
+        if (state.isAuthenticated) {
+          const user: IUserAll = state.user;
+          this.tokenService.token = state.token;
+          this.tokenService.user = state.user;
+          if (RedirectComponent.isProfessionalOrAdmin(user.authorities)) {
+            redirectUrl = ['dashboard'];
+          } else {
+            redirectUrl = ['me', 'reservations'];
+          }
         }
+        this.router.navigate(redirectUrl);
       }
-      this.router.navigate(redirectUrl);
     });
   }
 
