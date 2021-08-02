@@ -10,8 +10,8 @@
 // have to load a single css file for Angular Material in your app.
 
 // Fonts
-@import 'https://fonts.googleapis.com/css?family=Material+Icons';
-@import url('https://fonts.googleapis.com/css?family=Belleza:300,400,500');
+@import 'https://fonts.googleapis.com/css?family=Material+Icons&display=swap';
+@import url('https://fonts.googleapis.com/css?family=Belleza:300,400,500&display=swap');
 
 $fontConfig: (
   display-4: mat.define-typography-level(112px, 112px, 300, 'Belleza', -0.0134em),

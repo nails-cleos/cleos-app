@@ -2,21 +2,21 @@ import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChi
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
-import { ICustomerReservation, IReservation, IReservationAll } from '../../interfaces/reservation';
+import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../../interfaces/pagination';
+import { ICustomerReservation, IReservation, IReservationAll } from '../../../interfaces/reservation';
 import { Observable, Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { AppState, selectReservationState } from '../../store/app.states';
+import { AppState, selectReservationState } from '../../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { ReservationIconName } from '../detail/reservation-detail.component';
-import * as fromActionsReservation from '../../store/reservation.actions';
-import { convertDuration, createNewDate, newDate } from '../../util/dates';
-import { getPriceDiscount, getUserName, priceWithExtras, snakeToCamel, totalPaid, totalPrice } from '../../util/helper';
-import { IPayment } from '../../interfaces/payment';
-import { stampAnimation, transitionAnimation } from '../../util/animation';
+import { ReservationIconName } from '../../../reservation/detail/reservation-detail.component';
+import * as fromActionsReservation from '../../../store/reservation.actions';
+import { convertDuration, createNewDate, newDate } from '../../../util/dates';
+import { getPriceDiscount, getUserName, priceWithExtras, snakeToCamel, totalPaid, totalPrice } from '../../../util/helper';
+import { IPayment } from '../../../interfaces/payment';
+import { stampAnimation, transitionAnimation } from '../../../util/animation';
 
 @Component({
   selector: 'app-reservations',

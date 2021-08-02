@@ -2,16 +2,16 @@ import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChi
 import { MatStepper } from '@angular/material/stepper';
 import { Observable, Subscription } from 'rxjs';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { requireMatch, valueChange } from '../../util/validators';
-import { IProduct } from '../../interfaces/product';
-import { IRoom } from '../../interfaces/room';
+import { requireMatch, valueChange } from '../../../util/validators';
+import { IProduct } from '../../../interfaces/product';
+import { IRoom } from '../../../interfaces/room';
 import {
   IAvailableDTO,
   IReservation,
   IReservationAll,
   MAX_RESERVATION_MONTH,
   Reservation
-} from '../../interfaces/reservation';
+} from '../../../interfaces/reservation';
 import {
   areEqualDate,
   convertDuration,
@@ -25,19 +25,19 @@ import {
   IDuration,
   newDate,
   plusMonthDate
-} from '../../util/dates';
+} from '../../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState, selectReservationState } from '../../store/app.states';
+import { AppState, selectAuthState, selectReservationState } from '../../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ActivatedRoute, Router } from '@angular/router';
-import * as fromActionsReservation from '../../store/reservation.actions';
+import * as fromActionsReservation from '../../../store/reservation.actions';
 import { map, startWith } from 'rxjs/operators';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
-import { getPriceDiscount, getUserName, round } from '../../util/helper';
-import { DiscountType, IUserDiscount } from '../../interfaces/discount';
-import { transitionAnimation } from '../../util/animation';
+import { getPriceDiscount, getUserName, round } from '../../../util/helper';
+import { DiscountType, IUserDiscount } from '../../../interfaces/discount';
+import { transitionAnimation } from '../../../util/animation';
 
 @Component({
   selector: 'app-me-reservation',

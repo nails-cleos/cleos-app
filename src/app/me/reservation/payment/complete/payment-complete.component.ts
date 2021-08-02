@@ -1,9 +1,9 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
-import { AppState, selectPaymentState } from '../../../store/app.states';
+import { AppState, selectPaymentState } from '../../../../store/app.states';
 import { Store } from '@ngrx/store';
-import * as fromActionsPayment from '../../../store/payment.actions';
+import * as fromActionsPayment from '../../../../store/payment.actions';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({

@@ -143,13 +143,13 @@
               <div mat-line>{{'DASHBOARD.HOME' | translate }}</div>
             </a>
             <mat-divider></mat-divider>
-            <a [routerLink]="'/profile'" mat-list-item>
+            <a [routerLink]="'/auth/profile'" mat-list-item>
               <mat-icon mat-list-icon>settings</mat-icon>
               <div mat-line>{{'DASHBOARD.PROFILE' | translate }}</div>
               <span *ngIf="incomplete" class="dot"></span>
             </a>
             <mat-divider></mat-divider>
-            <a *ngIf="canChangePassword" [routerLink]="'/change-password'" mat-list-item>
+            <a *ngIf="canChangePassword" [routerLink]="'/auth/change-password'" mat-list-item>
               <mat-icon mat-list-icon>mode_edit</mat-icon>
               <div mat-line>{{'DASHBOARD.CHANGE_PASSWORD' | translate }}</div>
             </a>

@@ -132,6 +132,7 @@ export class MainContentComponent implements OnInit, OnDestroy {
 
   setProduct(product: IProduct): void {
     this.product.setValue(product);
+    this.viewportScroller.scrollToAnchor('book');
   }
 
   sendEmail(): void {

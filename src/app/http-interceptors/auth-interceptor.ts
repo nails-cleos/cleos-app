@@ -1,9 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { AppState, selectAuthState } from '../store/app.states';
-import { Store } from '@ngrx/store';
-import { IUser } from '../interfaces/user';
 import { TokenService } from '../services/token.service';
 
 @Injectable()

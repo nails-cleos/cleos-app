@@ -103,7 +103,7 @@ export class UserEffects {
         const message = this.translate.instant('PROFILE.UPDATED.MESSAGE', {username: response.user.username});
         return of(new LoginSuccess({
           response, queryParams: {
-            returnUrl: 'profile'
+            returnUrl: 'auth/profile'
           }
         }), new fromActionsUser.UserSaveSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
@@ -118,7 +118,7 @@ export class UserEffects {
         const message = this.translate.instant('PROFILE.UPDATED.PHOTO');
         return of(new LoginSuccess({
           response, queryParams: {
-            returnUrl: 'profile'
+            returnUrl: '/auth/profile'
           }
         }), new fromActionsUser.UserSaveSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))

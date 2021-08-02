@@ -1,15 +1,15 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState, selectDiscountState } from '../store/app.states';
+import { AppState, selectAuthState, selectDiscountState } from '../../store/app.states';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
 import { MAT_BOTTOM_SHEET_DATA, MatBottomSheet } from '@angular/material/bottom-sheet';
-import { environment } from '../../environments/environment';
-import { IUserAll } from '../interfaces/user';
+import { environment } from '../../../environments/environment';
+import { IUserAll } from '../../interfaces/user';
 import { Observable, Subscription } from 'rxjs';
-import * as fromActionsDiscount from '../store/discount.actions';
-import { IUserDiscount } from '../interfaces/discount';
+import * as fromActionsDiscount from '../../store/discount.actions';
+import { IUserDiscount } from '../../interfaces/discount';
 
 @Component({
   selector: 'app-referrals',
