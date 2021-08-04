@@ -179,11 +179,14 @@ export class NavComponent implements OnInit, OnDestroy {
         });
       }
       if (this.router.url === '/') {
-        this.router.navigate(this.isAuthorized ? ['auth', 'redirect'] : ['main']);
-        if (this.isAuthorized && state.refresh) {
-          this.store.dispatch(
-            new fromActionsLogin.Redirect()
-          );
+        if (this.isAuthorized) {
+          if (!state.redirect) {
+            this.store.dispatch(
+              new fromActionsLogin.Redirect()
+            );
+          }
+        } else {
+          this.router.navigate(['main']);
         }
       }
     });

@@ -49,7 +49,6 @@ export class AuthGuardService implements CanActivate {
         this.store.dispatch(
           new fromActionsLogin.Redirect()
         );
-        this.router.navigate(['auth', 'redirect']);
         return false;
       }
     }

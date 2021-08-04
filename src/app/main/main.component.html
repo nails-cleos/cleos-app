@@ -19,7 +19,7 @@
       <span>{{'MAIN.SECTION.CATALOG' | translate }}</span>
     </button>
     <button (click)="redirect()" *ngIf="isAuthenticated; else login" [routerLinkActive]="['active']"
-            [routerLink]="'/auth/redirect'" color="accent" mat-button type="button">
+            color="accent" mat-button type="button">
       <span>{{'MAIN.SECTION.ACCOUNT' | translate }}</span>
     </button>
     <ng-template #login>
@@ -60,7 +60,7 @@
         </a>
         <mat-divider></mat-divider>
         <a (click)="redirect()" *ngIf="isAuthenticated; else login" [routerLinkActive]="['active']"
-           [routerLink]="'/auth/redirect'" mat-list-item>
+           mat-list-item>
           <mat-icon mat-list-icon>person_pin</mat-icon>
           <div mat-line>{{'MAIN.SECTION.ACCOUNT' | translate }}</div>
         </a>

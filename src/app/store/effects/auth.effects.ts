@@ -119,6 +119,11 @@ export class LoginEffects {
     })
   ), {dispatch: false});
 
+  redirect$ = createEffect(() => this.actions$.pipe(
+    ofType(AuthActionTypes.redirect),
+    tap(() => this.router.navigate(['auth', 'redirect']))
+  ), {dispatch: false});
+
   constructor(private readonly translate: TranslateService, private actions$: Actions, private authService: AuthService,
               private router: Router) {
   }
