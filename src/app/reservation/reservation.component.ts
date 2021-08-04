@@ -210,7 +210,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         start: this.start
       });
       const day = this.date.value.getDay();
-      console.log(day)
       let av: IAvailability;
       const {week, saturday, sunday} = getAvailability(this.room.value);
       switch (day) {
