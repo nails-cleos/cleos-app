@@ -21,7 +21,7 @@ import {
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { IUserAll } from '../../interfaces/user';
-import { DialogComponent } from '../../dialog/dialog.component';
+import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Role } from '../../interfaces/token';
@@ -185,9 +185,9 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       this.machine.transition(snakeToCamel(this.reservation.state), id);
       return;
     }
-    const title = this.translate.instant('RESERVATION.DETAIL.CHANGE_STATE.TITLE');
-    const action = this.translate.instant(`RESERVATION.DETAIL.CHANGE_STATE.ACTION.${String(id).toUpperCase()}`);
-    const content = this.translate.instant('RESERVATION.DETAIL.CHANGE_STATE.CONTENT', {action});
+    const title = this.translate.instant('RESERVATION.CHANGE_STATE.TITLE');
+    const action = this.translate.instant(`RESERVATION.CHANGE_STATE.ACTION.${String(id).toUpperCase()}`);
+    const content = this.translate.instant('RESERVATION.CHANGE_STATE.CONTENT', {action});
     const dialogRef = this.dialog.open(DialogComponent, {
       data: {title, content, value: id}
     });
@@ -268,22 +268,22 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     const store = self.store;
     const translate = self.translate;
 
-    const approve = this.createAction(translate.instant('RESERVATION.DETAIL.ACTION.APPROVE'),
+    const approve = this.createAction(translate.instant('RESERVATION.ACTION.APPROVE'),
       ReservationIconName.approved, 'approve', 'primary');
-    const start = this.createAction(translate.instant('RESERVATION.DETAIL.ACTION.START'),
+    const start = this.createAction(translate.instant('RESERVATION.ACTION.START'),
       ReservationIconName.started, 'start', 'primary');
-    const complete = this.createAction(translate.instant('RESERVATION.DETAIL.ACTION.COMPLETE'),
+    const complete = this.createAction(translate.instant('RESERVATION.ACTION.COMPLETE'),
       ReservationIconName.completed, 'complete', 'primary');
-    const edit = this.createAction(translate.instant('RESERVATION.DETAIL.ACTION.EDIT'),
+    const edit = this.createAction(translate.instant('RESERVATION.ACTION.EDIT'),
       ReservationIconName.edit, 'edit', 'accent');
-    const cancel = this.createAction(translate.instant('RESERVATION.DETAIL.ACTION.CANCEL'),
+    const cancel = this.createAction(translate.instant('RESERVATION.ACTION.CANCEL'),
       ReservationIconName.cancelled, 'cancel', 'warn');
-    const book = this.createAction(translate.instant('RESERVATION.DETAIL.ACTION.BOOK'),
+    const book = this.createAction(translate.instant('RESERVATION.ACTION.BOOK'),
       ReservationIconName.book, 'book', 'primary');
-    const sendMessage = this.createAction(translate.instant('RESERVATION.DETAIL.ACTION.SEND'),
+    const sendMessage = this.createAction(translate.instant('RESERVATION.ACTION.SEND'),
       ReservationIconName.send, 'send', 'green');
 
-    const more = this.createAction(translate.instant('RESERVATION.DETAIL.ACTION.MORE'),
+    const more = this.createAction(translate.instant('RESERVATION.ACTION.MORE'),
       ReservationIconName.more, 'more');
 
     let approveActions = [start, edit];
@@ -427,11 +427,11 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     const initialState = self.reservation?.state;
     const translate = self.translate;
 
-    const edit = this.createAction(translate.instant('RESERVATION.DETAIL.ACTION.EDIT'),
+    const edit = this.createAction(translate.instant('RESERVATION.ACTION.EDIT'),
       ReservationIconName.edit, 'edit', 'accent');
-    const cancel = this.createAction(translate.instant('RESERVATION.DETAIL.ACTION.CANCEL'),
+    const cancel = this.createAction(translate.instant('RESERVATION.ACTION.CANCEL'),
       ReservationIconName.cancelled, 'cancel', 'warn');
-    const book = this.createAction(translate.instant('RESERVATION.DETAIL.ACTION.BOOK'),
+    const book = this.createAction(translate.instant('RESERVATION.ACTION.BOOK'),
       ReservationIconName.book, 'book', 'primary');
 
     const editTransaction = ReservationDetailComponent.createTransaction('edited', (): void => {
@@ -472,7 +472,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       const paid = totalPaid(self.payments);
       const total = totalPrice(self.reservation.product);
       if (total > paid) {
-        const next = this.createAction(translate.instant('RESERVATION.DETAIL.ACTION.PAY'),
+        const next = this.createAction(translate.instant('RESERVATION.ACTION.PAY'),
           ReservationIconName.payment, 'pay', 'blue');
         approved.next = [...approved.next, next];
         partiallyCompleted.next = [...partiallyCompleted.next, next];

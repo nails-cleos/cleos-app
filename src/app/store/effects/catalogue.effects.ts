@@ -43,7 +43,7 @@ export class CatalogueEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.catalogueService.add(payload.catalogue, payload.file).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('CATALOGUE.ADD.CREATED', {name: response.name});
+        const message = this.translate.instant('CATALOGUE.CREATED', {name: response.name});
         return of(new fromActionsCatalogue.CatalogueSaveSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({error: err.error})))
     ))

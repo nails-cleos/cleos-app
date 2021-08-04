@@ -47,9 +47,9 @@ export class PaymentEffects {
       payload.preferenceId, payload.status).pipe(
       switchMap((response: any) => {
         if (response.status === 'approved') {
-          return of(new fromActionsPayment.PaymentSaveSuccess({message: this.translate.instant('PAYMENT.ADD.CREATED')}));
+          return of(new fromActionsPayment.PaymentSaveSuccess({message: this.translate.instant('PAYMENT.CREATED')}));
         }
-        const message = this.translate.instant('PAYMENT.ADD.ERROR', {reason: response.message});
+        const message = this.translate.instant('PAYMENT.ERROR', {reason: response.message});
         return of(new fromActionsPayment.PaymentNotComplete({message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({error: err.error})))
     ))
@@ -59,7 +59,7 @@ export class PaymentEffects {
   recreate$ = this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentRecreate)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.paymentService.recreate(payload).pipe(
-      switchMap(() => of(new fromActionsPayment.PaymentSaveSuccess({message: this.translate.instant('PAYMENT.ADD.RECREATE')}))),
+      switchMap(() => of(new fromActionsPayment.PaymentSaveSuccess({message: this.translate.instant('PAYMENT.RECREATE')}))),
       catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({error: err.error})))
     ))
   );
@@ -70,9 +70,9 @@ export class PaymentEffects {
     switchMap((payload: any) => this.paymentService.notify(payload.id, payload.reservationId, payload.preferenceId).pipe(
       switchMap((response: any) => {
         if (response.status === 'approved') {
-          return of(new fromActionsPayment.PaymentSaveSuccess({message: this.translate.instant('PAYMENT.ADD.CREATED')}));
+          return of(new fromActionsPayment.PaymentSaveSuccess({message: this.translate.instant('PAYMENT.CREATED')}));
         }
-        const message = this.translate.instant('PAYMENT.ADD.ERROR', {reason: response.status});
+        const message = this.translate.instant('PAYMENT.ERROR', {reason: response.status});
         return of(new fromActionsPayment.PaymentNotComplete({message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({error: err.error})))
     ))

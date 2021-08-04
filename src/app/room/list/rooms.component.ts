@@ -10,7 +10,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../store/app.states';
 import * as fromActionsRoom from '../../store/room.actions';
-import { DialogComponent } from '../../dialog/dialog.component';
+import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { IUser } from '../../interfaces/user';
 import { getUserName } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';

@@ -1,6 +1,6 @@
 <div *ngIf="showError" id="error-box">
   <mat-icon (click)="close()" id="close">close</mat-icon>
-  <div id="error-label">{{'PAYMENT.ADD.ERROR_TEXT' | translate }}</div>
+  <div id="error-label">{{'PAYMENT.ERROR_TEXT' | translate }}</div>
   <div id="error-text">{{errorMessage}}</div>
 </div>
 
@@ -17,7 +17,7 @@
     </ng-container>
 
     <ng-container matColumnDef="description">
-      <th *matHeaderCellDef mat-header-cell>{{ 'PAYMENT.LIST.COLUMN.DESCRIPTION' | translate }}</th>
+      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
       <td *matCellDef="let payment" class="column-large-text" mat-cell>
         <div *ngIf="payment.id; else skeleton">{{payment.description}}</div>
         <ng-template #skeleton>

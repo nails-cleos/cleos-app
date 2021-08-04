@@ -1,6 +1,6 @@
 <mat-card>
   <mat-card-header>
-    <mat-card-title>{{ 'RESERVATION.DETAIL.TITLE' | translate }}</mat-card-title>
+    <mat-card-title>{{ 'RESERVATION.DETAIL' | translate }}</mat-card-title>
     <mat-card-subtitle
       *ngIf="reservation; else skeleton">{{customerName}}</mat-card-subtitle>
     <ng-template #skeleton>
@@ -14,30 +14,30 @@
     </div>
     <mat-divider></mat-divider>
     <mat-list>
-      <div mat-subheader>{{ 'RESERVATION.DETAIL.ROOM.TITLE' | translate}}</div>
+      <div mat-subheader>{{ 'ROOM.FIELD' | translate}}</div>
       <mat-list-item>
         <mat-icon mat-list-icon>store</mat-icon>
-        <div mat-line>{{ 'RESERVATION.DETAIL.ROOM.NAME' | translate}}</div>
+        <div mat-line>{{ 'ROOM.NAME.FIELD' | translate}}</div>
         <div mat-line>{{reservation.room.name}}</div>
       </mat-list-item>
       <mat-list-item>
         <mat-icon mat-list-icon>person_pin</mat-icon>
-        <div mat-line>{{ 'RESERVATION.DETAIL.ROOM.PROFESSIONAL' | translate}}</div>
+        <div mat-line>{{ 'ROOM.PROFESSIONAL.FIELD' | translate}}</div>
         <div mat-line>{{professionalName}}</div>
       </mat-list-item>
       <mat-list-item>
         <mat-icon mat-list-icon>room</mat-icon>
-        <div mat-line>{{ 'RESERVATION.DETAIL.ROOM.ADDRESS' | translate}}</div>
+        <div mat-line>{{ 'COMMON.ADDRESS.FIELD' | translate}}</div>
         <div mat-line>
           <a [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + reservation.room.address.name"
-             target="_blank">
+             target="_blank" rel="noreferrer">
             {{reservation.room.address.name}}
           </a>
         </div>
         <div mat-line>{{reservation.room.address?.description}}</div>
       </mat-list-item>
       <mat-divider></mat-divider>
-      <div mat-subheader>{{ 'RESERVATION.DETAIL.APPOINTMENT' | translate}}</div>
+      <div mat-subheader>{{ 'RESERVATION.APPOINTMENT' | translate}}</div>
       <mat-list-item>
         <mat-icon mat-list-icon>event</mat-icon>
         <div mat-line>{{start | date:'short':undefined:language}}</div>
@@ -48,20 +48,20 @@
         <div mat-line>{{ 'RESERVATION.STATE.' + reservation.state | translate}}</div>
       </mat-list-item>
       <mat-divider></mat-divider>
-      <div mat-subheader>{{ 'RESERVATION.DETAIL.PRODUCT.TITLE' | translate}}</div>
+      <div mat-subheader>{{ 'PRODUCT.FIELD' | translate}}</div>
       <mat-list-item>
         <mat-icon mat-list-icon>home_repair_service</mat-icon>
-        <div mat-line>{{ 'RESERVATION.DETAIL.PRODUCT.NAME' | translate}}</div>
+        <div mat-line>{{ 'PRODUCT.NAME.FIELD' | translate}}</div>
         <div mat-line>{{reservation.product.name}}</div>
       </mat-list-item>
       <mat-list-item>
         <mat-icon mat-list-icon>timer</mat-icon>
-        <div mat-line>{{ 'RESERVATION.DETAIL.PRODUCT.DURATION' | translate}}</div>
+        <div mat-line>{{ 'PRODUCT.DURATION.FIELD' | translate}}</div>
         <div mat-line>{{duration.hour | number:'2.0-0'}}:{{duration.minute | number:'2.0-0'}}</div>
       </mat-list-item>
       <mat-list-item>
         <mat-icon mat-list-icon>attach_money</mat-icon>
-        <div mat-line>{{ 'RESERVATION.DETAIL.PRODUCT.PRICE' | translate}}</div>
+        <div mat-line>{{ 'PRODUCT.PRICE.FIELD' | translate}}</div>
         <div *ngIf="priceDiscount; else noDiscount" mat-line>
           <span [class.strikethrough]="priceDiscount">{{reservation.product.price | number:'1.2-2'}}</span>
           <span [@discountAnimation] class="raised-button bold">{{priceDiscount | number:'1.2-2'}}</span>
@@ -72,21 +72,21 @@
       </mat-list-item>
       <div *ngIf="reservation.product.extras">
         <mat-divider></mat-divider>
-        <div mat-subheader>{{ 'RESERVATION.DETAIL.PRODUCT.EXTRAS.TITLE' | translate}}</div>
+        <div mat-subheader>{{ 'RESERVATION.PRODUCT.EXTRAS.TITLE' | translate}}</div>
         <mat-list-item *ngIf="reservation.product.extras.description">
           <mat-icon mat-list-icon>description</mat-icon>
-          <div mat-line>{{ 'RESERVATION.DETAIL.PRODUCT.EXTRAS.DESCRIPTION' | translate}}</div>
+          <div mat-line>{{ 'RESERVATION.PRODUCT.EXTRAS.DESCRIPTION' | translate}}</div>
           <div mat-line>{{reservation.product.extras.description}}</div>
         </mat-list-item>
         <mat-list-item *ngIf="reservation.product.extras.price">
           <mat-icon mat-list-icon>attach_money</mat-icon>
-          <div mat-line>{{ 'RESERVATION.DETAIL.PRODUCT.EXTRAS.PRICE' | translate}}</div>
+          <div mat-line>{{ 'RESERVATION.PRODUCT.EXTRAS.PRICE' | translate}}</div>
           <div mat-line>{{reservation.product.extras.price}}</div>
         </mat-list-item>
         <mat-divider></mat-divider>
         <mat-list-item *ngIf="total">
           <mat-icon mat-list-icon>paid</mat-icon>
-          <div mat-line><span class="bold">{{ 'RESERVATION.DETAIL.PRODUCT.EXTRAS.TOTAL' | translate}}</span></div>
+          <div mat-line><span class="bold">{{ 'RESERVATION.PRODUCT.EXTRAS.TOTAL' | translate}}</span></div>
           <div mat-line><span class="bold">{{total}}</span></div>
         </mat-list-item>
       </div>
@@ -94,7 +94,7 @@
     </mat-list>
     <mat-list *ngIf="paymentPaid && paymentPaid.length">
       <div class="divider">
-        <h1>{{ 'RESERVATION.DETAIL.PAYMENT.TITLE' | translate}}</h1>
+        <h1>{{ 'RESERVATION.PAYMENT.TITLE' | translate}}</h1>
       </div>
       <table [dataSource]="paymentPaid" mat-table>
         <ng-container matColumnDef="position">
@@ -105,11 +105,11 @@
               <div class="ssc-line"></div>
             </ng-template>
           </td>
-          <td *matFooterCellDef mat-footer-cell class="bold">{{ 'RESERVATION.DETAIL.PAYMENT.PAID' | translate}}</td>
+          <td *matFooterCellDef mat-footer-cell class="bold">{{ 'RESERVATION.PAYMENT.PAID' | translate}}</td>
         </ng-container>
 
         <ng-container matColumnDef="description">
-          <th *matHeaderCellDef mat-header-cell>{{ 'PAYMENT.LIST.COLUMN.DESCRIPTION' | translate }}</th>
+          <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
           <td *matCellDef="let payment" class="column-large-text" mat-cell>
             <div *ngIf="payment.id; else skeleton">{{payment.description}}</div>
             <ng-template #skeleton>
@@ -168,7 +168,7 @@
     </mat-list>
     <mat-list *ngIf="reservation.history">
       <div class="divider">
-        <h1>{{ 'RESERVATION.DETAIL.HISTORY.TITLE' | translate}}</h1>
+        <h1>{{ 'RESERVATION.LIST.HISTORY.TITLE' | translate}}</h1>
       </div>
       <table [dataSource]="dataSource" mat-table>
         <ng-container matColumnDef="position">
@@ -179,24 +179,24 @@
 
         <ng-container matColumnDef="professional">
           <th *matHeaderCellDef fxHide.lt-sm fxShow
-              mat-header-cell> {{ 'RESERVATION.DETAIL.HISTORY.COLUMN.PROFESSIONAL' | translate }} </th>
+              mat-header-cell> {{ 'RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }} </th>
           <td *matCellDef="let history" fxHide.lt-sm fxShow
               mat-cell> {{getProfessionalName(history)}} </td>
         </ng-container>
 
         <ng-container matColumnDef="start">
-          <th *matHeaderCellDef mat-header-cell> {{ 'RESERVATION.DETAIL.HISTORY.COLUMN.START' | translate }} </th>
+          <th *matHeaderCellDef mat-header-cell> {{ 'RESERVATION.LIST.COLUMN.START' | translate }} </th>
           <td *matCellDef="let history" mat-cell> {{history.start | date:'short':undefined:language}} </td>
         </ng-container>
 
         <ng-container matColumnDef="product">
-          <th *matHeaderCellDef mat-header-cell> {{ 'RESERVATION.DETAIL.HISTORY.COLUMN.PRODUCT' | translate }} </th>
+          <th *matHeaderCellDef mat-header-cell> {{ 'RESERVATION.LIST.COLUMN.PRODUCT' | translate }} </th>
           <td *matCellDef="let history" mat-cell> {{history.product.name}} </td>
         </ng-container>
 
         <ng-container matColumnDef="state">
           <th *matHeaderCellDef fxHide.lt-sm fxShow
-              mat-header-cell> {{ 'RESERVATION.DETAIL.HISTORY.COLUMN.STATE' | translate }} </th>
+              mat-header-cell> {{ 'RESERVATION.LIST.COLUMN.STATE' | translate }} </th>
           <td *matCellDef="let history" fxHide.lt-sm fxShow mat-cell>
             <mat-icon matPrefix>{{getIcon(history.state)}}</mat-icon>&nbsp;
             {{ 'RESERVATION.STATE.' + history.state | translate}}</td>
@@ -204,7 +204,7 @@
 
         <ng-container matColumnDef="noContent">
           <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-            {{ 'RESERVATION.DETAIL.HISTORY.ERROR.NO_CONTENT' | translate }}</td>
+            {{ 'RESERVATION.LIST.HISTORY.ERROR.NO_CONTENT' | translate }}</td>
         </ng-container>
 
         <tr *matFooterRowDef="['noContent']" [hidden]="reservation.history.length > 0" mat-footer-row></tr>

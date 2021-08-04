@@ -50,7 +50,7 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
           })
         );
       } else {
-        const message = this.translate.instant('PAYMENT.ADD.ERROR', {reason: 'incomplete'});
+        const message = this.translate.instant('PAYMENT.ERROR', {reason: 'incomplete'});
         this.store.dispatch(
           new fromActionsPayment.PaymentNotComplete({message})
         );

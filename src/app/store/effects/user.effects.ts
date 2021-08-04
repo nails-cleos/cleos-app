@@ -61,14 +61,14 @@ export class UserEffects {
         case Role.customer:
           return this.userService.addCustomer(payload.user).pipe(
             switchMap((response: any) => {
-              const message = this.translate.instant('USER.ADD.CUSTOMER', {username: response.username});
+              const message = this.translate.instant('USER.CUSTOMER', {username: response.username});
               return of(new fromActionsUser.UserSaveSuccess({message}));
             }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
           );
         case Role.professional:
           return this.userService.addProfessional(payload.user).pipe(
             switchMap((response: any) => {
-              const message = this.translate.instant('USER.ADD.PROFESSIONAL', {username: response.username});
+              const message = this.translate.instant('USER.PROFESSIONAL', {username: response.username});
               return of(new fromActionsUser.UserSaveSuccess({message}));
             }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
           );
@@ -89,7 +89,7 @@ export class UserEffects {
     switchMap((payload: any) => this.userService.setRole(payload.user.id, payload.role).pipe(
       switchMap(() => {
         const role = this.translate.instant(`COMMON.ROLES.${payload.role}`);
-        const message = this.translate.instant(`USER.ROLE.${payload.action}`, {role, username: payload.user.username});
+        const message = this.translate.instant(`USER.ROLES.${payload.action}`, {role, username: payload.user.username});
         return of(new fromActionsUser.UserSaveSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
     ))

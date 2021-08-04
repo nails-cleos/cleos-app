@@ -54,7 +54,7 @@ export class RoomEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.roomService.add(payload).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('ROOM.ADD.CREATED', {name: response.name});
+        const message = this.translate.instant('ROOM.CREATED', {name: response.name});
         return of(new fromActionsRoom.RoomSaveSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
     ))

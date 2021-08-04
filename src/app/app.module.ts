@@ -1,9 +1,7 @@
 // Modules
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { AppRoutingModule } from './app-routing.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { AppMaterialModule } from './util/app-material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FlexLayoutModule } from '@angular/flex-layout';
@@ -25,16 +23,20 @@ import { AngularFireMessagingModule } from '@angular/fire/messaging';
 import firebase from 'firebase';
 import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
 import { AngularFireAnalyticsModule } from '@angular/fire/analytics';
+
+import { AppRoutingModule } from './app-routing.module';
+import { AppMaterialModule } from './util/app-material.module';
 import { AuthModule } from './auth/auth.module';
 import { MainModule } from './main/main.module';
 import { DashModule } from './dash/dash.module';
 import { ProductModule } from './product/product.module';
-import { SharedModule } from './util/SharedModule';
+import { SharedModule } from './shared/shared.module';
 import { UserModule } from './user/user.module';
 import { CatalogueModule } from './catalogue/catalogue.module';
 import { UnavailableModule } from './unavailable/unavailable.module';
 import { DiscountModule } from './discount/discount.module';
 import { RoomModule } from './room/room.module';
+import { ReservationModule } from './reservation/reservation.module';
 
 // Providers
 import { httpInterceptorProviders } from './http-interceptors';
@@ -69,13 +71,12 @@ import { DiscountEffects } from './store/effects/discount.effects';
 import { MainEffects } from './store/effects/main.effects';
 import { PaymentEffects } from './store/effects/payment.effects';
 
-// Directives
 // Components
 import { AppComponent } from './app.component';
 import { NavComponent } from './nav/nav.component';
-import { NotificationsComponent } from './notification/list/notifications.component';
 import { RedirectComponent } from './redirect/redirect.component';
-import { ReservationModule } from './reservation/reservation.module';
+import { NotificationModule } from './notification/notification.module';
+import { NavModule } from './nav/nav.module';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
@@ -103,10 +104,7 @@ registerLocaleData(localeEs, 'es');
 
 @NgModule({
   declarations: [
-    AppComponent,
-    NavComponent,
-    NotificationsComponent,
-    RedirectComponent
+    AppComponent
   ],
   imports: [
     BrowserModule,
@@ -131,6 +129,7 @@ registerLocaleData(localeEs, 'es');
     FlexLayoutModule,
     ReactiveFormsModule,
     SharedModule,
+    NavModule,
     AuthModule,
     MainModule,
     DashModule,
@@ -141,6 +140,7 @@ registerLocaleData(localeEs, 'es');
     DiscountModule,
     RoomModule,
     ReservationModule,
+    NotificationModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,
       registrationStrategy: 'registerWhenStable:30000'

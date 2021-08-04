@@ -1,0 +1,59 @@
+<form [formGroup]="availabilityForm" novalidate>
+  <mat-form-field class="margin-right-eight" appearance="fill">
+    <mat-label>{{ 'ROOM.START.FIELD' | translate }}</mat-label>
+    <label>
+      <input matInput name="start_time" [format]="24" [formControl]="start" [ngxTimepicker]="tStart" [max]="end.value"
+             required readonly/>
+    </label>
+    <span matPrefix><mat-icon (click)="tStart.open()" matPrefix>timer</mat-icon> &nbsp;</span>
+    <ngx-material-timepicker [minutesGap]="15" #tStart [theme]="theme"></ngx-material-timepicker>
+    <mat-error *ngIf="start.hasError('required')"
+               [innerHTML]="'ROOM.START.REQUIRED' | translate">
+    </mat-error>
+  </mat-form-field>
+  <mat-form-field class="margin-right-eight" appearance="fill">
+    <mat-label>{{ 'ROOM.END.FIELD' | translate }}</mat-label>
+    <label>
+      <input matInput name="end_time" [format]="24" [formControl]="end" [ngxTimepicker]="tEnd" [min]="start.value"
+             readonly/>
+    </label>
+    <span matPrefix><mat-icon (click)="tEnd.open()" matPrefix>timer</mat-icon> &nbsp;</span>
+    <ngx-material-timepicker [minutesGap]="15" #tEnd [theme]="theme"></ngx-material-timepicker>
+    <mat-error *ngIf="end.hasError('required')" [innerHTML]="'ROOM.END.REQUIRED' | translate">
+    </mat-error>
+  </mat-form-field>
+  <mat-checkbox (change)="checked = !checked" color="primary"
+                [checked]="checked">{{ 'ROOM.LUNCH.CHECK' | translate }}</mat-checkbox>
+  <div *ngIf="checked">
+    <div class="divider">
+      <mat-label>{{ 'ROOM.LUNCH.FIELD' | translate }}</mat-label>
+    </div>
+    <mat-form-field class="margin-right-eight" appearance="fill">
+      <mat-label>{{ 'ROOM.START.FIELD' | translate }}</mat-label>
+      <label>
+        <input matInput name="lunch_start_time" [format]="24" [formControl]="startLunch" [ngxTimepicker]="tLunchStart"
+               [min]="start.value" [max]="endLunch.value" readonly/>
+      </label>
+      <span matPrefix><mat-icon (click)="tLunchStart.open()" matPrefix>timer</mat-icon> &nbsp;</span>
+      <ngx-material-timepicker [minutesGap]="15" #tLunchStart [theme]="theme"></ngx-material-timepicker>
+    </mat-form-field>
+    <mat-form-field class="margin-right-eight" appearance="fill">
+      <mat-label>{{ 'ROOM.END.FIELD' | translate }}</mat-label>
+      <label>
+        <input matInput name="lunch_end_time" [format]="24" [formControl]="endLunch" [ngxTimepicker]="tLunchEnd"
+               [min]="startLunch.value" [max]="end.value" readonly/>
+      </label>
+      <span matPrefix><mat-icon (click)="tLunchEnd.open()" matPrefix>timer</mat-icon> &nbsp;</span>
+      <ngx-material-timepicker [minutesGap]="15" #tLunchEnd [theme]="theme"></ngx-material-timepicker>
+    </mat-form-field>
+  </div>
+  <div fxLayout="row" fxLayoutAlign="space-evenly end">
+    <div fxFlex></div>
+    <button (click)="create()" [disabled]="availabilityForm.invalid" color="primary" mat-button type="button">
+      {{ 'COMMON.BUTTON.ADD' | translate }}
+    </button>
+    <button (click)="ignore.emit()" color="warn" mat-button type="button">
+      {{ 'COMMON.BUTTON.IGNORE' | translate }}
+    </button>
+  </div>
+</form>

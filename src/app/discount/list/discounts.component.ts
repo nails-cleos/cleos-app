@@ -19,7 +19,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dial
 import { Store } from '@ngrx/store';
 import { AppState, selectDiscountState, selectUserState } from '../../store/app.states';
 import * as fromActionsDiscount from '../../store/discount.actions';
-import { DialogComponent } from '../../dialog/dialog.component';
+import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { FormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import * as fromActionsUser from '../../store/user.actions';

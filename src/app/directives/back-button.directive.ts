@@ -1,7 +1,7 @@
 import { Directive, HostListener, Input } from '@angular/core';
 import { NavigationService } from '../services/navigation.service';
 import { FormGroup } from '@angular/forms';
-import { DialogComponent } from '../dialog/dialog.component';
+import { DialogComponent } from '../shared/dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 

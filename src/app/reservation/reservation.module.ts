@@ -1,15 +1,11 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-import { ReservationRoutingModule } from './reservation-routing.module';
-import { SearchComponent } from './search/search.component';
-import { ReservationComponent } from './reservation.component';
-import { ReservationDetailComponent } from './detail/reservation-detail.component';
-import { MoreInfoComponent } from './detail/more-info/more-info.component';
-import { CalendarComponent } from './calendar/calendar.component';
-import { AppMaterialModule } from '../util/app-material.module';
 import { TranslateModule } from '@ngx-translate/core';
 import { HttpClientModule } from '@angular/common/http';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FlexLayoutModule } from '@angular/flex-layout';
+import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
+import { AgmCoreModule } from '@agm/core';
 import {
   CalendarDateFormatter,
   CalendarModule,
@@ -18,12 +14,17 @@ import {
   DateFormatterParams
 } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
-import { FlexLayoutModule } from '@angular/flex-layout';
-import { AgmCoreModule } from '@agm/core';
+
+import { AppMaterialModule } from '../util/app-material.module';
+import { SharedModule } from '../shared/shared.module';
+import { ReservationRoutingModule } from './reservation-routing.module';
 import { environment } from '../../environments/environment';
-import { SharedModule } from '../util/SharedModule';
+
+import { SearchComponent } from './search/search.component';
+import { ReservationComponent } from './reservation.component';
+import { CompleteDialogComponent, ReservationDetailComponent } from './detail/reservation-detail.component';
+import { MoreInfoComponent } from './detail/more-info/more-info.component';
+import { CalendarComponent } from './calendar/calendar.component';
 
 class CustomDateFormatter extends CalendarNativeDateFormatter {
 
@@ -41,7 +42,8 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
     ReservationComponent,
     ReservationDetailComponent,
     MoreInfoComponent,
-    CalendarComponent
+    CalendarComponent,
+    CompleteDialogComponent
   ],
   imports: [
     ReservationRoutingModule,

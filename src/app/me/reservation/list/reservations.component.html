@@ -4,11 +4,11 @@
       <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
         <mat-card *ngIf="!noContent; else noUpcoming">
           <span *ngIf="isPaid" [@stampAnimation]="{value: ':enter', params: {deg: -20}}"
-                class="stamp paid">{{ 'RESERVATION.CUSTOMER.UPCOMING.PAID' | translate }}</span>
+                class="stamp paid">{{ 'RESERVATION.UPCOMING.PAID' | translate }}</span>
           <span *ngIf="upcoming?.state === 'APPROVED'" [@stampAnimation]="{value: ':enter', params: {deg: 20}}"
-                class="stamp approved">{{ 'RESERVATION.CUSTOMER.UPCOMING.APPROVED' | translate }}</span>
+                class="stamp approved">{{ 'RESERVATION.UPCOMING.APPROVED' | translate }}</span>
           <mat-card-header *ngIf="upcoming.id; else headSkeleton">
-            <mat-card-title>{{ 'RESERVATION.CUSTOMER.UPCOMING.TITLE' | translate }}</mat-card-title>
+            <mat-card-title>{{ 'RESERVATION.UPCOMING.TITLE' | translate }}</mat-card-title>
             <mat-card-subtitle>{{ upcoming.id }}</mat-card-subtitle>
           </mat-card-header>
           <ng-template #headSkeleton>
@@ -19,32 +19,32 @@
             <div class="container">
               <table>
                 <tr *ngIf="upcoming.id; else skeleton">
-                  <td class="right">{{ 'RESERVATION.CUSTOMER.UPCOMING.START' | translate }}</td>
+                  <td class="right">{{ 'RESERVATION.UPCOMING.START' | translate }}</td>
                   <td class="left">{{upcoming.start | date:'short':undefined:language}}</td>
                 </tr>
                 <tr *ngIf="end; else skeleton">
-                  <td class="right">{{ 'RESERVATION.CUSTOMER.UPCOMING.END' | translate }}</td>
+                  <td class="right">{{ 'RESERVATION.UPCOMING.END' | translate }}</td>
                   <td class="left">{{end | date:'short':undefined:language}}</td>
                 </tr>
                 <tr *ngIf="upcoming.id; else skeleton">
-                  <td class="right">{{ 'RESERVATION.CUSTOMER.UPCOMING.ROOM' | translate }}</td>
+                  <td class="right">{{ 'ROOM.FIELD' | translate }}</td>
                   <td class="left">{{upcoming.room.name}}</td>
                 </tr>
                 <tr *ngIf="upcoming.id; else skeleton">
-                  <td class="right">{{ 'RESERVATION.CUSTOMER.UPCOMING.ADDRESS' | translate }}</td>
+                  <td class="right">{{ 'COMMON.ADDRESS.FIELD' | translate }}</td>
                   <td class="left">
                     <a [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + upcoming.room.address.name"
-                       target="_blank">
+                       target="_blank" rel="noreferrer">
                       {{upcoming.room.address.name}}
                     </a>
                   </td>
                 </tr>
                 <tr *ngIf="upcoming.id; else skeleton">
-                  <td class="right">{{ 'RESERVATION.CUSTOMER.UPCOMING.PRODUCT' | translate }}</td>
+                  <td class="right">{{ 'RESERVATION.UPCOMING.PRODUCT' | translate }}</td>
                   <td class="left">{{upcoming.product.name}}</td>
                 </tr>
                 <tr *ngIf="upcoming.id; else skeleton">
-                  <td class="right">{{ 'RESERVATION.CUSTOMER.UPCOMING.PRICE' | translate }}</td>
+                  <td class="right">{{ 'RESERVATION.UPCOMING.PRICE' | translate }}</td>
                   <td *ngIf="priceDiscount; else noDiscount" class="left">
                     <span [class.strikethrough]="priceDiscount">$ {{price | number:'1.2-2'}}</span>
                     <span [@discountAnimation] class="raised-button bold">$ {{priceDiscount | number:'1.2-2'}}</span>
@@ -54,17 +54,17 @@
                   </ng-template>
                 </tr>
                 <tr *ngIf="paid">
-                  <td class="right">{{ 'RESERVATION.CUSTOMER.UPCOMING.PAID' | translate }}</td>
+                  <td class="right">{{ 'RESERVATION.UPCOMING.PAID' | translate }}</td>
                   <td class="left">$ {{paid | number:'1.2-2'}}</td>
                 </tr>
               </table>
               <div *ngIf="upcoming && upcoming.state === 'CREATED'" [style.color]="'#ff0000'">
-                {{ 'RESERVATION.CUSTOMER.UPCOMING.CREATED' | translate }} <span class="bold">
+                {{ 'RESERVATION.UPCOMING.CREATED' | translate }} <span class="bold">
                 {{professionalName}}
               </span>
               </div>
               <div *ngIf="upcoming && upcoming.state === 'APPROVED'" [style.color]="'#ff0000'">
-                {{ 'RESERVATION.CUSTOMER.UPCOMING.PAY_NOW' | translate }}
+                {{ 'RESERVATION.UPCOMING.PAY_NOW' | translate }}
               </div>
             </div>
             <ng-template #skeleton>
@@ -90,7 +90,7 @@
         <ng-template #noUpcoming>
           <mat-card>
             <mat-card-header>
-              <mat-card-title>{{ 'RESERVATION.CUSTOMER.NO_UPCOMING.TITLE' | translate }}</mat-card-title>
+              <mat-card-title>{{ 'RESERVATION.UPCOMING.NO_UPCOMING.TITLE' | translate }}</mat-card-title>
             </mat-card-header>
             <mat-divider></mat-divider>
             <mat-card-actions>
@@ -120,7 +120,7 @@
 
     <ng-container matColumnDef="professional">
       <th *matHeaderCellDef fxHide.lt-sm fxShow
-          mat-header-cell>{{ 'RESERVATION.PAGE.COLUMN.PROFESSIONAL' | translate }}</th>
+          mat-header-cell>{{ 'RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</th>
       <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
         <div
           *ngIf="reservation.id; else skeleton">{{getProfessionalName(reservation)}}</div>
@@ -132,7 +132,7 @@
 
     <ng-container matColumnDef="start">
       <th *matHeaderCellDef mat-header-cell
-          mat-sort-header>{{ 'RESERVATION.PAGE.COLUMN.START' | translate }}</th>
+          mat-sort-header>{{ 'RESERVATION.LIST.COLUMN.START' | translate }}</th>
       <td *matCellDef="let reservation" mat-cell>
         <div *ngIf="reservation.id; else skeleton">{{reservation.start | date:'short':undefined:language}}</div>
         <ng-template #skeleton>
@@ -143,7 +143,7 @@
 
     <ng-container matColumnDef="state">
       <th *matHeaderCellDef mat-header-cell
-          mat-sort-header>{{ 'RESERVATION.PAGE.COLUMN.STATE' | translate }}</th>
+          mat-sort-header>{{ 'RESERVATION.LIST.COLUMN.STATE' | translate }}</th>
       <td *matCellDef="let reservation" mat-cell>
         <div *ngIf="reservation.id; else skeleton">
           <mat-icon matPrefix>{{getIcon(reservation.state)}}</mat-icon>&nbsp;
@@ -171,7 +171,7 @@
     </ng-container>
 
     <ng-container matColumnDef="product">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'RESERVATION.PAGE.COLUMN.PRODUCT' | translate }}</th>
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'RESERVATION.LIST.COLUMN.PRODUCT' | translate }}</th>
       <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="reservation.id; else skeleton">{{reservation.product.name}}</div>
         <ng-template #skeleton>
@@ -182,7 +182,7 @@
 
     <ng-container matColumnDef="noContent">
       <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-        {{ 'RESERVATION.PAGE.ERROR.NO_CONTENT' | translate }}</td>
+        {{ 'RESERVATION.LIST.ERROR.NO_CONTENT' | translate }}</td>
     </ng-container>
 
     <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>

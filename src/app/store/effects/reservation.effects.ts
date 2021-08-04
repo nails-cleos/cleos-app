@@ -142,7 +142,7 @@ export class ReservationEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.reservationService.add(payload.reservation).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('RESERVATION.ADD.CREATED', {date: response.start});
+        const message = this.translate.instant('RESERVATION.CREATED', {date: response.start});
         return of(new fromActionsReservation.ReservationSaveSuccess({
           message,
           id: response.id,
@@ -168,7 +168,7 @@ export class ReservationEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.reservationService.changeState(payload, 'approve').pipe(
       switchMap(() => {
-        const message = this.translate.instant('RESERVATION.DETAIL.STATE.APPROVE');
+        const message = this.translate.instant('RESERVATION.STATE.APPROVE');
         return of(new fromActionsReservation.StateSuccess({id: payload, message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
     ))
@@ -194,7 +194,7 @@ export class ReservationEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.reservationService.changeState(payload, 'start').pipe(
       switchMap(() => {
-        const message = this.translate.instant('RESERVATION.DETAIL.STATE.START');
+        const message = this.translate.instant('RESERVATION.STATE.START');
         return of(new fromActionsReservation.StateSuccess({id: payload, message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
     ))
@@ -206,7 +206,7 @@ export class ReservationEffects {
     switchMap((payload: any) =>
       this.reservationService.changeState(payload.reservationId, 'complete', payload.extras).pipe(
         switchMap(() => {
-          const message = this.translate.instant('RESERVATION.DETAIL.STATE.COMPLETE');
+          const message = this.translate.instant('RESERVATION.STATE.COMPLETE');
           return of(new fromActionsReservation.StateSuccess({id: payload, message}));
         }), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
       ))
@@ -218,7 +218,7 @@ export class ReservationEffects {
     switchMap((payload: any) =>
       this.reservationService.paymentComplete(payload).pipe(
         switchMap(() => {
-          const message = this.translate.instant('RESERVATION.DETAIL.STATE.COMPLETE');
+          const message = this.translate.instant('RESERVATION.STATE.COMPLETE');
           return of(new fromActionsReservation.StateSuccess({id: payload, message}));
         }), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
       ))
@@ -229,7 +229,7 @@ export class ReservationEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.reservationService.changeState(payload, 'cancel').pipe(
       switchMap(() => {
-        const message = this.translate.instant('RESERVATION.DETAIL.STATE.CANCEL');
+        const message = this.translate.instant('RESERVATION.STATE.CANCEL');
         return of(new fromActionsReservation.StateSuccess({id: payload, message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
     ))
@@ -240,7 +240,7 @@ export class ReservationEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.reservationService.changeState(payload, 'cancel/customer').pipe(
       switchMap(() => {
-        const message = this.translate.instant('RESERVATION.DETAIL.STATE.CANCEL');
+        const message = this.translate.instant('RESERVATION.STATE.CANCEL');
         return of(new fromActionsReservation.StateSuccess({id: payload, message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
     ))

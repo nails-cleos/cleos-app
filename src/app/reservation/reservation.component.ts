@@ -15,7 +15,7 @@ import { IReservation, IReservationAll, MAX_RESERVATION_MONTH, Reservation } fro
 import { CalendarEvent } from 'angular-calendar';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { DialogComponent } from '../dialog/dialog.component';
+import { DialogComponent } from '../shared/dialog/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import {
   convertDuration,
@@ -119,7 +119,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   isEditing = false;
   reservation: IReservationAll | undefined;
   showTime = false;
-  startDate: Date | undefined;
   minDate: any;
   maxDate: any;
   theme = timeTheme();
@@ -210,7 +209,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         ...this.productForm.controls,
         start: this.start
       });
-      const day = this.startDate?.getDay();
+      const day = this.date.value.getDay();
+      console.log(day)
       let av: IAvailability;
       const {week, saturday, sunday} = getAvailability(this.room.value);
       switch (day) {
@@ -297,9 +297,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const diffDay = getDiffDay(this.maxCalendarDate, date);
 
     this.setStartEndDay(week, saturday, sunday);
-    const unavailable = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.UNAVAILABLE');
-    const lunch = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.LUNCH');
-    const notWorking = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.OUT_OF_WORK');
+    const unavailable = this.translate.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
+    const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
+    const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
     this.events = this.events.concat(fillNotAvailable(unavailable, lunch, notWorking,
       diffDay > this.daysInWeek ? this.daysInWeek : diffDay,
       date, sunday, saturday, week, true));
@@ -321,7 +321,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const start = createNewDate(date, Number(nowTime[0]), Number(nowTime[1]));
     const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
 
-    const detail = this.translate.instant('RESERVATION.ADD.EVENT.DETAIL', {
+    const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
       customerName: getUserName(this.customer.value),
       productName: this.product.value.name,
       duration: formatTime(duration.hour, duration.minute)
@@ -336,22 +336,22 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       if (eventsOverlapping.length && eventsOverlapping[0] !== this.eventSelected) {
         const overlapping = eventsOverlapping.find(e => e.id);
         if (overlapping) {
-          this.errors.overlapping = this.translate.instant('RESERVATION.ADD.EVENT.OVERLAPPING.ERROR', {data: overlapping.title});
+          this.errors.overlapping = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.ERROR', {data: overlapping.title});
           return;
         }
         let message = '';
         eventsOverlapping.forEach(e => {
           message += `<div>${e.title}</div>`;
         });
-        title = this.translate.instant('RESERVATION.ADD.EVENT.OVERLAPPING.TITLE');
-        content = this.translate.instant('RESERVATION.ADD.EVENT.OVERLAPPING.CONTENT', {data: message});
+        title = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.TITLE');
+        content = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.CONTENT', {data: message});
       } else {
         if (!this.eventSelected && !id) {
-          title = this.translate.instant('RESERVATION.ADD.EVENT.TITLE');
-          content = this.translate.instant('RESERVATION.ADD.EVENT.CONTENT', {date: start.toLocaleString('en-GB')});
+          title = this.translate.instant('RESERVATION.EVENT.TITLE');
+          content = this.translate.instant('RESERVATION.EVENT.CONTENT', {date: start.toLocaleString('en-GB')});
         } else {
-          title = this.translate.instant('RESERVATION.ADD.EVENT.CHANGE.TITLE');
-          content = this.translate.instant('RESERVATION.ADD.EVENT.CHANGE.CONTENT', {date: start.toLocaleString('en-GB')});
+          title = this.translate.instant('RESERVATION.EVENT.CHANGE.TITLE');
+          content = this.translate.instant('RESERVATION.EVENT.CHANGE.CONTENT', {date: start.toLocaleString('en-GB')});
         }
       }
       this.createSelectEvent(title, content, event);
@@ -507,7 +507,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         }
         const duration = convertDuration(it.product.duration);
         const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
-        const detail = this.translate.instant('RESERVATION.ADD.EVENT.DETAIL', {
+        const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
           customerName: getUserName(it.customer),
           productName: it.product.name,
           duration: formatTime(duration.hour, duration.minute)
@@ -585,7 +585,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private createUnavailableEvent(id: string, start: Date, end: Date, duration: IDuration, description?: string): void {
-    const detail = this.translate.instant('RESERVATION.ADD.EVENT.UNAVAILABLE', {
+    const detail = this.translate.instant('RESERVATION.EVENT.UNAVAILABLE', {
       description: description ? description : '',
       duration: formatTime(duration.hour, duration.minute)
     });
@@ -638,7 +638,13 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.extras?.date && !this.eventSelected) {
           this.segmentClick(this.date.value, 'CREATED');
         } else if (this.reservation && this.date && this.myStepper.selectedIndex === 3) {
-          const date: Date = createNewDate(this.date.value, this.date.value.getHours(), this.date.value.getMinutes());
+          let date: Date;
+          if (this.start && this.start.value) {
+            const time = this.start.value.split(":");
+            date = createNewDate(this.date.value, Number(time[0]), Number(time[1]));
+          } else {
+            date = createNewDate(this.date.value, this.date.value.getHours(), this.date.value.getMinutes());
+          }
           this.segmentClick(date, this.reservation.state, this.reservation.id);
         }
       }
@@ -716,7 +722,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.room.setValue(reservation.room);
     this.date.setValue(date);
     this.start.setValue(getTime(date));
-    this.startDate = date;
     this.customer.setValue(reservation.customer);
     this.product.valueChanges.subscribe(value => {
       if (reservation.product.discount && reservation.product.discount.amount) {

@@ -7,7 +7,7 @@ import { MeReservationComponent } from './reservation/me/me-reservation.componen
 import { PaymentComponent } from './reservation/payment/payment.component';
 import { PaymentCompleteComponent } from './reservation/payment/complete/payment-complete.component';
 import { ReferralsComponent } from './referrals/referrals.component';
-import { MeDiscountComponent } from '../discount/me/me-discount.component';
+import { MeDiscountComponent } from './discount/me/me-discount.component';
 
 const routes: Routes = [      {
   path: '', canActivate: [AuthGuardService], data: {roles: [Role.customer]}, children: [

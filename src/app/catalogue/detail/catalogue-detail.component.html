@@ -3,7 +3,7 @@
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <mat-card class="style-card">
         <mat-card-header>
-          <mat-card-title>{{ 'CATALOGUE.DETAIL.TITLE' | translate }}</mat-card-title>
+          <mat-card-title>{{ 'CATALOGUE.DETAIL' | translate }}</mat-card-title>
           <mat-card-subtitle *ngIf="catalogue; else skeleton">{{catalogue.name}}</mat-card-subtitle>
           <ng-template #skeleton>
             <div class="ssc-line"></div>
@@ -13,18 +13,18 @@
           <mat-card-content *ngIf="catalogue; else boxSkeleton">
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <mat-form-field appearance="fill">
-                <mat-label>{{ 'CATALOGUE.DETAIL.NAME.FIELD' | translate }}</mat-label>
+                <mat-label>{{ 'CATALOGUE.NAME.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="name" autocomplete="name" matInput required>
                 </label>
-                <mat-error *ngIf="name.hasError('required')" [innerHTML]="'CATALOGUE.DETAIL.NAME.REQUIRED' | translate">
+                <mat-error *ngIf="name.hasError('required')" [innerHTML]="'CATALOGUE.NAME.REQUIRED' | translate">
                 </mat-error>
                 <mat-error *ngIf="errors['name']">
                   {{errors['name']}}
                 </mat-error>
               </mat-form-field>
               <mat-form-field appearance="fill">
-                <mat-label>{{ 'CATALOGUE.DETAIL.DESCRIPTION.FIELD' | translate }}</mat-label>
+                <mat-label>{{ 'CATALOGUE.DESCRIPTION.FIELD' | translate }}</mat-label>
                 <label>
                   <textarea #message formControlName="description" matInput maxlength="256"></textarea>
                 </label>
@@ -32,9 +32,9 @@
               </mat-form-field>
               <div>
                 <mat-checkbox [formControl]="home"
-                              color="primary">{{ 'CATALOGUE.ADD.SHOW.HOME' | translate }}</mat-checkbox>
+                              color="primary">{{ 'CATALOGUE.SHOW.HOME' | translate }}</mat-checkbox>
                 <mat-checkbox [formControl]="catalog"
-                              color="primary">{{ 'CATALOGUE.ADD.SHOW.CATALOG' | translate }}</mat-checkbox>
+                              color="primary">{{ 'CATALOGUE.SHOW.CATALOG' | translate }}</mat-checkbox>
               </div>
               <div (fileDropped)="onFileDropped($event)" *ngIf="!file && !showImg" appDragDrop class="container"
                    fxHide.lt-sm
@@ -52,14 +52,14 @@
                   </g>
                 </svg>
 
-                <h3>{{ 'CATALOGUE.DETAIL.FILE.DRAG_DROP' | translate }}</h3>
-                <h3>{{ 'CATALOGUE.DETAIL.FILE.OR' | translate }}</h3>
+                <h3>{{ 'CATALOGUE.FILE.DRAG_DROP' | translate }}</h3>
+                <h3>{{ 'CATALOGUE.FILE.OR' | translate }}</h3>
                 <button (click)="fileDropRef.click()" color="accent" mat-raised-button
-                        type="button">{{ 'CATALOGUE.DETAIL.FILE.CHOOSE' | translate }}</button>
+                        type="button">{{ 'CATALOGUE.FILE.CHOOSE' | translate }}</button>
               </div>
               <div fxHide fxShow.lt-sm>
                 <button (click)="fileInput.click()" color="accent" mat-raised-button
-                        type="button">{{ 'CATALOGUE.DETAIL.FILE.CHOOSE' | translate }}</button>
+                        type="button">{{ 'CATALOGUE.FILE.CHOOSE' | translate }}</button>
                 <input #fileInput (change)="fileBrowseHandler($event)" [multiple]="false" hidden id="file" type="file">
               </div>
 
@@ -87,7 +87,7 @@
             <div *ngIf="showImg" class="divider">
               <div class="container">
                 <mat-icon (click)="deleteImg()"
-                          [matTooltip]="'CATALOGUE.DETAIL.DELETE.BUTTON' | translate: {name: catalogue.name}"
+                          [matTooltip]="'CATALOGUE.DELETE.BUTTON' | translate: {name: catalogue.name}"
                           class="delete-img" color="warn">delete
                 </mat-icon>
                 <img [alt]="catalogue.name" [src]="'data:image/jpg;base64,'+img" mat-card-image>

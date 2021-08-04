@@ -307,9 +307,9 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   setDistance($event: number): void {
     this.distance = $event > 999 ?
-      this.translate.instant('RESERVATION.CUSTOMER.ADD.ROOM.ADDRESS.DISTANCE.KM',
+      this.translate.instant('ROOM.ADDRESS.DISTANCE.KM',
         {distance: round($event / 1000)}) :
-      this.translate.instant('RESERVATION.CUSTOMER.ADD.ROOM.ADDRESS.DISTANCE.M',
+      this.translate.instant('ROOM.ADDRESS.DISTANCE.M',
         {distance: round($event)});
   }
 
@@ -399,7 +399,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       }
       if (state.customerReservation && state.customerReservation.upcoming) {
         this.canCreate = false;
-        const message = this.translate.instant('RESERVATION.CUSTOMER.ADD.UPCOMING.ERROR',
+        const message = this.translate.instant('RESERVATION.UPCOMING.CUSTOMER.ERROR',
           {date: formatFullDateTime(newDate(state.customerReservation.upcoming.start), this.translate.currentLang)});
         const snackBarRef = this.snackBar.open(message, 'OK', {
           duration: 5000

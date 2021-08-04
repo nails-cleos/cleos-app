@@ -1,9 +1,9 @@
 <div>
   <div id="search-box">
-    <div id="search-label">{{'RESERVATION.SEARCH.TITLE' | translate }}</div>
+    <div id="search-label">{{'RESERVATION.SEARCH' | translate }}</div>
     <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
       <mat-form-field>
-        <mat-label>{{ 'RESERVATION.SEARCH.STATES.FIELD' | translate }}</mat-label>
+        <mat-label>{{ 'RESERVATION.STATE.SEARCH' | translate }}</mat-label>
         <mat-chip-list #chipList aria-label="Fruit selection">
           <mat-chip
             (removed)="remove(state)"
@@ -19,7 +19,7 @@
             [formControl]="state"
             [matAutocomplete]="auto"
             [matChipInputFor]="chipList"
-            placeholder="{{ 'RESERVATION.SEARCH.STATES.PLACEHOLDER' | translate }}">
+            placeholder="{{ 'RESERVATION.STATE.FIELD' | translate }}">
         </mat-chip-list>
         <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
           <mat-option *ngFor="let state of filteredStates | async" [value]="state">
@@ -28,10 +28,10 @@
         </mat-autocomplete>
       </mat-form-field>
       <mat-form-field>
-        <mat-label>{{ 'RESERVATION.SEARCH.CUSTOMER.FIELD' | translate }}</mat-label>
+        <mat-label>{{ 'RESERVATION.CUSTOMER.SEARCH' | translate }}</mat-label>
         <label>
           <input (keydown)="keyDownHandler($event)" [formControl]="customer" [matAutocomplete]="autoCustomer"
-                 autocomplete="off" matInput placeholder="{{ 'RESERVATION.SEARCH.CUSTOMER.PLACEHOLDER' | translate }}"
+                 autocomplete="off" matInput placeholder="{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}"
                  type="text">
         </label>
         <mat-autocomplete #autoCustomer="matAutocomplete" [displayWith]="displayFnUser">
@@ -60,7 +60,7 @@
       </ng-container>
 
       <ng-container matColumnDef="customer">
-        <th *matHeaderCellDef mat-header-cell>{{ 'RESERVATION.PAGE.COLUMN.CUSTOMER' | translate }}</th>
+        <th *matHeaderCellDef mat-header-cell>{{ 'RESERVATION.LIST.COLUMN.CUSTOMER' | translate }}</th>
         <td *matCellDef="let reservation" mat-cell>
           <div
             *ngIf="reservation.id; else skeleton">{{getCustomerName(reservation.customer)}}</div>
@@ -72,7 +72,7 @@
 
       <ng-container matColumnDef="start">
         <th *matHeaderCellDef mat-header-cell
-            mat-sort-header>{{ 'RESERVATION.PAGE.COLUMN.START' | translate }}</th>
+            mat-sort-header>{{ 'RESERVATION.LIST.COLUMN.START' | translate }}</th>
         <td *matCellDef="let reservation" mat-cell>
           <div *ngIf="reservation.id; else skeleton">{{reservation.start | date:'short':undefined:language}}</div>
           <ng-template #skeleton>
@@ -83,7 +83,7 @@
 
       <ng-container matColumnDef="state">
         <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
-            mat-sort-header>{{ 'RESERVATION.PAGE.COLUMN.STATE' | translate }}</th>
+            mat-sort-header>{{ 'RESERVATION.LIST.COLUMN.STATE' | translate }}</th>
         <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
           <div *ngIf="reservation.id; else skeleton">
             <mat-icon matPrefix>{{getIcon(reservation.state)}}</mat-icon>&nbsp;
@@ -97,7 +97,7 @@
 
       <ng-container matColumnDef="product">
         <th *matHeaderCellDef fxHide.lt-sm fxShow
-            mat-header-cell>{{ 'RESERVATION.PAGE.COLUMN.PRODUCT' | translate }}</th>
+            mat-header-cell>{{ 'RESERVATION.LIST.COLUMN.PRODUCT' | translate }}</th>
         <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
           <div *ngIf="reservation.id; else skeleton">{{reservation.product.name}}</div>
           <ng-template #skeleton>
@@ -130,13 +130,13 @@
           <div [@detailExpand]="reservation === expandedReservation ? 'expanded' : 'collapsed'"
                class="detail">
             <mat-list>
-              <div fxHide fxShow.lt-sm mat-subheader>{{ 'RESERVATION.PAGE.COLUMN.STATE' | translate }}</div>
+              <div fxHide fxShow.lt-sm mat-subheader>{{ 'RESERVATION.LIST.COLUMN.STATE' | translate }}</div>
               <mat-list-item fxHide fxShow.lt-sm role="list">
                 <div *ngIf="reservation.state" mat-line>
                   <mat-icon matPrefix>{{getIcon(reservation.state)}}</mat-icon>&nbsp;
                   {{ 'RESERVATION.STATE.' + reservation.state | translate}}</div>
               </mat-list-item>
-              <div fxHide fxShow.lt-sm mat-subheader>{{ 'RESERVATION.PAGE.COLUMN.PRODUCT' | translate }}</div>
+              <div fxHide fxShow.lt-sm mat-subheader>{{ 'RESERVATION.LIST.COLUMN.PRODUCT' | translate }}</div>
               <mat-list-item fxHide fxShow.lt-sm role="list">
                 <div mat-line>{{reservation.product?.name}}</div>
               </mat-list-item>
@@ -160,7 +160,7 @@
 
       <ng-container matColumnDef="noContent">
         <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-          {{ 'RESERVATION.PAGE.ERROR.NO_CONTENT' | translate }}</td>
+          {{ 'RESERVATION.LIST.ERROR.NO_CONTENT' | translate }}</td>
       </ng-container>
 
       <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>

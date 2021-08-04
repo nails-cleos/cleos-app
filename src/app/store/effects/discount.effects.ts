@@ -54,7 +54,7 @@ export class DiscountEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.discountService.send(payload.discountId, payload.customerIds).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('DISCOUNT.ADD.SEND', {name: response.name});
+        const message = this.translate.instant('DISCOUNT.SEND', {name: response.name});
         return of(new fromActionsDiscount.DiscountSaveSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({error: err.error})))
     ))
@@ -65,7 +65,7 @@ export class DiscountEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.discountService.add(payload).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('DISCOUNT.ADD.CREATED', {name: response.name});
+        const message = this.translate.instant('DISCOUNT.CREATED', {name: response.name});
         return of(new fromActionsDiscount.DiscountSaveSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({error: err.error})))
     ))

@@ -13,7 +13,7 @@ import { AppState, selectReservationState } from '../../store/app.states';
 import { ReservationIconName } from '../detail/reservation-detail.component';
 import * as fromActionsReservation from '../../store/reservation.actions';
 import { getNow, newDate } from '../../util/dates';
-import { DialogComponent } from '../../dialog/dialog.component';
+import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { map, startWith } from 'rxjs/operators';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { FormControl } from '@angular/forms';
@@ -109,8 +109,8 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   cancel(reservation: IReservationAll): void {
-    const title = this.translate.instant('RESERVATION.PAGE.CANCEL.TITLE');
-    const content = this.translate.instant('RESERVATION.PAGE.CANCEL.CONTENT', {date: reservation.start});
+    const title = this.translate.instant('RESERVATION.LIST.CANCEL.TITLE');
+    const content = this.translate.instant('RESERVATION.LIST.CANCEL.CONTENT', {date: reservation.start});
     const dialogRef = this.dialog.open(DialogComponent, {
       data: {title, content, value: reservation.id}
     });

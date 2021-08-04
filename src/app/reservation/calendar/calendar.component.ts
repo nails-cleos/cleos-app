@@ -178,7 +178,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
         const start = newDate(it.start);
         const duration = convertDuration(it.product.duration);
         const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
-        const detail = this.translate.instant('RESERVATION.ADD.EVENT.DETAIL', {
+        const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
           customerName: getUserName(it.customer),
           productName: it.product.name,
           duration: formatTime(duration.hour, duration.minute)
@@ -266,7 +266,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   private createUnavailableEvent(room: IRoomAll, events: CalendarEvent[], day: any, id: string, start: Date, end: Date,
                                  duration: IDuration, description?: string): void {
-    const detail = this.translate.instant('RESERVATION.ADD.EVENT.UNAVAILABLE', {
+    const detail = this.translate.instant('RESERVATION.EVENT.UNAVAILABLE', {
       description: description ? description : '',
       duration: formatTime(duration.hour, duration.minute)
     });
@@ -291,9 +291,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
           const {week, saturday, sunday} = getAvailability(calendar.room);
           const {min, max} = getStartEndDay(week, saturday, sunday);
           calendar.day = new Day(min.getHours() - 1, min.getMinutes(), max.getHours() + 1, max.getMinutes());
-          const unavailable = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.UNAVAILABLE');
-          const lunch = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.LUNCH');
-          const notWorking = this.translate.instant('RESERVATION.ADD.EVENT.MESSAGE.OUT_OF_WORK');
+          const unavailable = this.translate.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
+          const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
+          const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
           calendar.events = calendar.events.concat(fillNotAvailable(unavailable, lunch, notWorking,
             getDiffDay(this.maxDate, this.today), this.viewDate, sunday, saturday, week));
         });

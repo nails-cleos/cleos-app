@@ -12,7 +12,7 @@
     </ng-container>
 
     <ng-container matColumnDef="name">
-      <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'PRODUCT.LIST.COLUMN.NAME' | translate }}</th>
+      <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
       <td *matCellDef="let product" mat-cell>
         <div *ngIf="product.id; else skeleton">{{product.name}}</div>
         <ng-template #skeleton>
@@ -106,7 +106,7 @@
   </table>
   <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
 
-  <button color="accent" id="add-button" mat-fab matTooltip="{{ 'PRODUCT.ADD.TITLE' | translate }}"
+  <button color="accent" id="add-button" mat-fab matTooltip="{{ 'PRODUCT.TITLE' | translate }}"
           routerLink="/products/add">
     <mat-icon>add</mat-icon>
   </button>

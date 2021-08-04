@@ -34,7 +34,9 @@
     },
     "COLUMN": {
       "ACTIONS": "Acciones",
-      "LAST_UPDATE": "Última actualización"
+      "LAST_UPDATE": "Última actualización",
+      "NAME": "Nombre",
+      "DESCRIPTION": "Descripción"
     },
     "PAGINATOR": {
       "ITEMS_PER_PAGE_LABEL": "Items por página:",
@@ -135,51 +137,16 @@
         "FIELD": "Nombre de usuario o email",
         "ERROR": "Por favor ingrese un nombre de usuario o email"
       },
-      "PASSWORD": {
-        "FIELD": "Contraseña",
-        "ERROR": "Por favor ingrese una contraseña"
-      },
       "OR": "O ingresa con tu email",
       "NEW": "¿Nuevo en Cleos?",
       "FORGOT_PASSWORD": "¿Olvido su contraseña?"
     },
     "SIGN_UP": {
       "TITLE": "Registrar",
-      "USERNAME": {
-        "FIELD": "Nombre de usuario",
-        "REQUIRED": "Nombre de usuario es <b>requerido</b>"
-      },
-      "EMAIL": {
-        "FIELD": "Email",
-        "REQUIRED": "Email es <b>requerido</b>",
-        "VALID": "Ingrese un email valido"
-      },
-      "PASSWORD": {
-        "FIELD": "Contraseña",
-        "DETAIL": "Mostrar detalles de la contraseña",
-        "REQUIRED": "Contraseña es <b>requerido</b>",
-        "INVALID": "La contraseña no es valida",
-        "DIGIT": "Contener 1 o más dígitos",
-        "LOWER_CASE": "Contener 1 o más caracteres en minúscula",
-        "UPPER_CASE": "Contener 1 o más caracteres en mayúscula",
-        "MIN": "Tener 6 o más caracteres de longitud",
-        "MAX": "No tener más de 30 caracteres de longitud",
-        "SPECIAL": "Contener 1 o más caracteres especiales"
-      },
       "CONFIRM_PASSWORD": {
         "FIELD": "Confirmar contraseña",
         "REQUIRED": "Confirmar contraseña es <b>requerido</b>",
         "MUST_MATCH": "Contraseña y confirmar contraseña deben coincidir"
-      },
-      "FIRST_NAME": {
-        "FIELD": "Nombre"
-      },
-      "LAST_NAME": {
-        "FIELD": "Apellido"
-      },
-      "PHONE": {
-        "FIELD": "Teléfono",
-        "INVALID": "Número de teléfono invalido"
       },
       "CODE": {
         "FIELD": "Código de referido"
@@ -187,6 +154,19 @@
       "OR": "O registrate con tu email",
       "SUCCESS": "Usuario {{username}} creado. Verifica tu email {{email}}",
       "ALREADY": "¿Ya tienes Cleos?"
+    },
+    "PASSWORD": {
+      "FIELD": "Contraseña",
+      "ERROR": "Por favor ingrese una contraseña",
+      "DETAIL": "Mostrar detalles de la contraseña",
+      "REQUIRED": "La contraseña es <b>requerido</b>",
+      "INVALID": "La contraseña no es valida",
+      "DIGIT": "Contener 1 o más dígitos",
+      "LOWER_CASE": "Contener 1 o más caracteres en minúscula",
+      "UPPER_CASE": "Contener 1 o más caracteres en mayúscula",
+      "MIN": "Tener 6 o más caracteres de longitud",
+      "MAX": "No tener más de 30 caracteres de longitud",
+      "SPECIAL": "Contener 1 o más caracteres especiales"
     },
     "ACTIVATE_ACCOUNT": {
       "TITLE": "Activar cuenta",
@@ -205,18 +185,6 @@
     "RECOVERY_PASSWORD": {
       "TITLE": "Recuperar contraseña",
       "MESSAGE": "Contraseña actualizada",
-      "PASSWORD": {
-        "FIELD": "Contraseña",
-        "DETAIL": "Mostrar detalles de la contraseña",
-        "REQUIRED": "La contraseña es <b>requerido</b>",
-        "INVALID": "La contraseña no es valida",
-        "DIGIT": "Contener 1 o más dígitos",
-        "LOWER_CASE": "Contener 1 o más caracteres en minúscula",
-        "UPPER_CASE": "Contener 1 o más caracteres en mayúscula",
-        "MIN": "Tener 6 o más caracteres de longitud",
-        "MAX": "No tener más de 30 caracteres de longitud",
-        "SPECIAL": "Contener 1 o más caracteres especiales"
-      },
       "CONFIRM_PASSWORD": {
         "FIELD": "Confirmar contraseña",
         "REQUIRED": "Confirmar contraseña es <b>requerido</b>",
@@ -227,7 +195,6 @@
   "USER": {
     "LIST": {
       "COLUMN": {
-        "NAME": "Nombre",
         "USERNAME": "Nombre de usuario",
         "EMAIL": "Email",
         "PROVIDER": "Proveedor",
@@ -245,72 +212,41 @@
         "DELETED": "Eliminado"
       }
     },
-    "ADD": {
-      "TITLE": "Agregar usuario",
-      "ROLE": {
-        "FIELD": "Roles",
-        "REQUIRED": "Rol es <b>requerido</b>"
-      },
-      "USERNAME": {
-        "FIELD": "Nombre de usuario",
-        "REQUIRED": "Nombre de usuario es <b>requerido</b>"
-      },
-      "EMAIL": {
-        "FIELD": "Email",
-        "REQUIRED": "Email es <b>requerido</b>",
-        "VALID": "Ingrese un email valido"
-      },
-      "PASSWORD": {
-        "FIELD": "Contraseña",
-        "REQUIRED": "Contraseña es <b>requerido</b>"
-      },
-      "FIRST_NAME": {
-        "FIELD": "Nombre"
-      },
-      "LAST_NAME": {
-        "FIELD": "Apellido"
-      },
-      "LANG": {
-        "FIELD": "Idioma",
-        "REQUIRED": "Idioma es <b>requerido</b>"
-      },
-      "PHONE": {
-        "FIELD": "Teléfono",
-        "INVALID": "Número de teléfono invalido"
-      },
-      "CUSTOMER": "Cliente {{username}} creado",
-      "PROFESSIONAL": "Profesional {{username}} creado"
+    "TITLE": "Agregar usuario",
+    "ROLE": {
+      "FIELD": "Roles",
+      "REQUIRED": "Rol es <b>requerido</b>"
     },
-    "DETAIL": {
-      "TITLE": "Actualizar usuario",
-      "USERNAME": {
-        "FIELD": "Nombre de usuario",
-        "REQUIRED": "Nombre de usuario es <b>requerido</b>"
-      },
-      "EMAIL": {
-        "FIELD": "Email",
-        "REQUIRED": "Email es <b>requerido</b>",
-        "VALID": "Provide a valid email"
-      },
-      "PASSWORD": {
-        "FIELD": "Contraseña",
-        "REQUIRED": "Contraseña es <b>requerido</b>"
-      },
-      "FIRST_NAME": {
-        "FIELD": "Nombre"
-      },
-      "LAST_NAME": {
-        "FIELD": "Apellido"
-      },
-      "LANG": {
-        "FIELD": "Idioma",
-        "REQUIRED": "Idioma es <b>requerido</b>"
-      },
-      "PHONE": {
-        "FIELD": "Teléfono",
-        "INVALID": "Número de teléfono invalido"
-      }
+    "USERNAME": {
+      "FIELD": "Nombre de usuario",
+      "REQUIRED": "Nombre de usuario es <b>requerido</b>"
     },
+    "EMAIL": {
+      "FIELD": "Email",
+      "REQUIRED": "Email es <b>requerido</b>",
+      "VALID": "Ingrese un email valido"
+    },
+    "FIRST_NAME": {
+      "FIELD": "Nombre"
+    },
+    "LAST_NAME": {
+      "FIELD": "Apellido"
+    },
+    "PHONE": {
+      "FIELD": "Teléfono",
+      "INVALID": "Número de teléfono invalido"
+    },
+    "LANG": {
+      "FIELD": "Idioma",
+      "REQUIRED": "Idioma es <b>requerido</b>"
+    },
+    "DOB": {
+      "FIELD": "Fecha de nacimiento"
+    },
+    "CUSTOMER": "Cliente {{username}} creado",
+    "PROFESSIONAL": "Profesional {{username}} creado",
+    "DETAIL": "Actualizar usuario",
+    "PROFILE": "Perfil",
     "DELETED": {
       "TITLE": "Eliminar usuario",
       "CONTENT": "¿Está seguro de eliminar el usuario {{username}}?",
@@ -327,24 +263,9 @@
     "CHANGE_PASSWORD": {
       "TITLE": "Cambiar contraseña",
       "MESSAGE": "La contraseña se actualizo",
-      "USERNAME": {
-        "FIELD": "Nombre de usuario"
-      },
       "OLD_PASSWORD": {
         "FIELD": "Contraseña actual",
         "REQUIRED": "Contraseña actual es <b>requerido</b>"
-      },
-      "PASSWORD": {
-        "FIELD": "Contraseña",
-        "DETAIL": "Mostrar detalles de la contraseña",
-        "REQUIRED": "La contraseña es <b>requerido</b>",
-        "INVALID": "La contraseña no es valida",
-        "DIGIT": "Contener 1 o más dígitos",
-        "LOWER_CASE": "Contener 1 o más caracteres en minúscula",
-        "UPPER_CASE": "Contener 1 o más caracteres en mayúscula",
-        "MIN": "Tener 6 o más caracteres de longitud",
-        "MAX": "No tener más de 30 caracteres de longitud",
-        "SPECIAL": "Contener 1 o más caracteres especiales"
       },
       "CONFIRM_PASSWORD": {
         "FIELD": "Confirmar contraseña",
@@ -352,33 +273,12 @@
         "MUST_MATCH": "Contraseña y confirmar contraseña deben coincidir"
       }
     },
-    "ROLE": {
+    "ROLES": {
       "REMOVE": "Rol {{role}} eliminado de {{username}}",
       "ADD": "Role {{role}} agregado a {{username}}"
     }
   },
   "PROFILE": {
-    "TITLE": "Perfil",
-    "USERNAME": {
-      "FIELD": "Nombre de usuario"
-    },
-    "FIRST_NAME": {
-      "FIELD": "Nombre"
-    },
-    "LAST_NAME": {
-      "FIELD": "Apellido"
-    },
-    "LANG": {
-      "FIELD": "Idioma",
-      "REQUIRED": "Idioma es <b>requerido</b>"
-    },
-    "PHONE": {
-      "FIELD": "Teléfono",
-      "INVALID": "Número de teléfono invalido"
-    },
-    "DOB": {
-      "FIELD": "Fecha de nacimiento"
-    },
     "UPDATED": {
       "MESSAGE": "Usuario {{username}} actualizado",
       "PHOTO": "Foto de perfil actualizada"
@@ -388,7 +288,6 @@
   "PRODUCT": {
     "LIST": {
       "COLUMN": {
-        "NAME": "Nombre",
         "DURABILITY": "Durabilidad",
         "PRICE": "Precio",
         "DURATION": "Duración"
@@ -397,51 +296,31 @@
         "NO_CONTENT": "No hay servicios"
       }
     },
-    "ADD": {
-      "TITLE": "Agregar servicio",
-      "NAME": {
-        "FIELD": "Nombre",
-        "REQUIRED": "Nombre es <b>requerido</b>"
-      },
-      "DESCRIPTION": {
-        "FIELD": "Descripción"
-      },
-      "PRICE": {
-        "FIELD": "Precio",
-        "REQUIRED": "Precio es <b>requerido</b>",
-        "GREATER": "Precio debe ser mayor a 1"
-      },
-      "DURATION": {
-        "FIELD": "Duración",
-        "REQUIRED": "Duración es <b>requerido</b>"
-      },
-      "DURABILITY": {
-        "FIELD": "Durabilidad"
-      },
-      "CREATED": "Servicio {{name}} creado"
+    "TITLE": "Agregar servicio",
+    "FIELD": "Servicio",
+    "REQUIRED": "Servicio es <b>requerido</b>",
+    "INVALID": "Servicio no valido",
+    "NAME": {
+      "FIELD": "Nombre",
+      "REQUIRED": "Nombre es <b>requerido</b>"
     },
-    "DETAIL": {
-      "TITLE": "Actualizar servicio",
-      "NAME": {
-        "FIELD": "Nombre",
-        "REQUIRED": "Nombre es <b>requerido</b>"
-      },
-      "DESCRIPTION": {
-        "FIELD": "Descripción"
-      },
-      "PRICE": {
-        "FIELD": "Precio",
-        "REQUIRED": "Precio es <b>requerido</b>",
-        "GREATER": "Precio debe ser mayor a 1"
-      },
-      "DURATION": {
-        "FIELD": "Duración",
-        "REQUIRED": "Duración es <b>requerido</b>"
-      },
-      "DURABILITY": {
-        "FIELD": "Durabilidad"
-      }
+    "DESCRIPTION": {
+      "FIELD": "Descripción"
     },
+    "PRICE": {
+      "FIELD": "Precio",
+      "REQUIRED": "Precio es <b>requerido</b>",
+      "GREATER": "Precio debe ser mayor a 1"
+    },
+    "DURATION": {
+      "FIELD": "Duración",
+      "REQUIRED": "Duración es <b>requerido</b>"
+    },
+    "DURABILITY": {
+      "FIELD": "Durabilidad"
+    },
+    "CREATED": "Servicio {{name}} creado",
+    "DETAIL": "Actualizar servicio",
     "DELETED": {
       "TITLE": "Eliminar servicio",
       "CONTENT": "¿Está seguro de eliminar el servicio {{name}}?",
@@ -452,45 +331,29 @@
     }
   },
   "CATALOGUE": {
-    "ADD": {
-      "TITLE": "Agregar catálogo",
-      "NAME": {
-        "FIELD": "Nombre",
-        "REQUIRED": "Nombre es <b>requerido</b>"
-      },
-      "DESCRIPTION": {
-        "FIELD": "Descripción"
-      },
-      "SHOW": {
-        "HOME": "Mostar en principal",
-        "CATALOG": "Mostrar en catálogo"
-      },
-      "FILE": {
-        "DRAG_DROP": "Arrastrar y soltar el archivo aquí",
-        "OR": "o",
-        "CHOOSE": "Elegí un archivo"
-      },
-      "CREATED": "Catálogo {{name}} creado"
+    "TITLE": "Agregar catálogo",
+    "NAME": {
+      "FIELD": "Nombre",
+      "REQUIRED": "Nombre es <b>requerido</b>"
     },
-    "DETAIL": {
-      "TITLE": "Actualizar catálogo",
-      "NAME": {
-        "FIELD": "Nombre",
-        "REQUIRED": "Nombre es <b>requerido</b>"
-      },
-      "DESCRIPTION": {
-        "FIELD": "Descripción"
-      },
-      "FILE": {
-        "DRAG_DROP": "Arrastrar y soltar el archivo aquí",
-        "OR": "o",
-        "CHOOSE": "Elegí un archivo"
-      },
-      "DELETE": {
-        "BUTTON": "Eliminar imagen {{name}}",
-        "MESSAGE": "Imagen {{name}} eliminada",
-        "UNDO": "Deshacer"
-      }
+    "DESCRIPTION": {
+      "FIELD": "Descripción"
+    },
+    "SHOW": {
+      "HOME": "Mostar en principal",
+      "CATALOG": "Mostrar en catálogo"
+    },
+    "FILE": {
+      "DRAG_DROP": "Arrastrar y soltar el archivo aquí",
+      "OR": "o",
+      "CHOOSE": "Elegí un archivo"
+    },
+    "CREATED": "Catálogo {{name}} creado",
+    "DETAIL": "Actualizar catálogo",
+    "DELETE": {
+      "BUTTON": "Eliminar imagen {{name}}",
+      "MESSAGE": "Imagen {{name}} eliminada",
+      "UNDO": "Deshacer"
     },
     "DELETED": {
       "TITLE": "Eliminar catálogo",
@@ -507,7 +370,6 @@
   "ROOM": {
     "LIST": {
       "COLUMN": {
-        "NAME": "Nombre",
         "PROFESSIONAL": "Profesional",
         "AVAILABILITY": {
           "FIELD": "Disponibilidad",
@@ -520,133 +382,63 @@
         "NO_CONTENT": "No hay salas"
       }
     },
-    "ADD": {
-      "TITLE": "Agregar sala",
-      "NAME": {
-        "FIELD": "Nombre",
-        "REQUIRED": "Nombre es <b>requerido</b>"
-      },
-      "PROFESSIONAL": {
-        "FIELD": "Profesional",
-        "REQUIRED": "Profesional es <b>requerido</b>",
-        "INVALID": "Profesional no valido",
-        "ADD_BUTTON": "Agregar profesional"
-      },
-      "AVAILABILITY": {
-        "FIELD": "Disponibilidad",
-        "REQUIRED": "Al menos una disponibilidad es <b>requerida</b>"
-      },
-      "WEEK_TIME": {
-        "FIELD": "Disponibilidad semanal",
-        "DESCRIPTION": "Disponibilidad de trabajo semanal",
-        "REQUIRED": "Agregue o ignore la disponibilidad semanal"
-      },
-      "SATURDAY_TIME": {
-        "FIELD": "Disponibilidad los sábados",
-        "DESCRIPTION": "Disponibilidad de trabajo los sábados",
-        "REQUIRED": "Agregue o ignore la disponibilidad del sábado"
-      },
-      "SUNDAY_TIME": {
-        "FIELD": "Disponibilidad los domingos",
-        "DESCRIPTION": "Disponibilidad de trabajo los domingos",
-        "REQUIRED": "Agregue o ignore la disponibilidad del domingo"
-      },
-      "LUNCH": {
-        "FIELD": "Hora de almuerzo",
-        "CHECK": "Agregar hora de almuerzo"
-      },
-      "START": {
-        "FIELD": "Inicio",
-        "REQUIRED": "Inicio es <b>requerido</b>"
-      },
-      "END": {
-        "FIELD": "Fin",
-        "REQUIRED": "Fin es <b>requerido</b>"
-      },
-      "CREATED": "Sala {{name}} creada"
+    "TITLE": "Agregar sala",
+    "FIELD": "Sala",
+    "REQUIRED": "Sala es <b>requerida</b>",
+    "INVALID": "Sala no valida",
+    "NAME": {
+      "FIELD": "Nombre",
+      "REQUIRED": "Nombre es <b>requerido</b>"
     },
-    "DETAIL": {
-      "TITLE": "Actualizar sala",
-      "NAME": {
-        "FIELD": "Nombre",
-        "REQUIRED": "Nombre es <b>requerido</b>"
-      },
-      "PROFESSIONAL": {
-        "FIELD": "Profesional"
-      },
-      "AVAILABILITY": {
-        "FIELD": "Disponibilidad",
-        "REQUIRED": "Al menos una disponibilidad es <b>requerida</b>"
-      },
-      "WEEK_TIME": {
-        "FIELD": "Disponibilidad semanal",
-        "DESCRIPTION": "Disponibilidad de trabajo semanal",
-        "REQUIRED": "Agregue o ignore la disponibilidad semanal"
-      },
-      "SATURDAY_TIME": {
-        "FIELD": "Disponibilidad los sábados",
-        "DESCRIPTION": "Disponibilidad de trabajo los sábados",
-        "REQUIRED": "Agregue o ignore la disponibilidad del sábado"
-      },
-      "SUNDAY_TIME": {
-        "FIELD": "Disponibilidad los domingos",
-        "DESCRIPTION": "Disponibilidad de trabajo los domingos",
-        "REQUIRED": "Agregue o ignore la disponibilidad del domingo"
-      },
-      "LUNCH": {
-        "FIELD": "Hora de almuerzo",
-        "CHECK": "Agregar hora de almuerzo"
-      },
-      "START": {
-        "FIELD": "Inicio",
-        "REQUIRED": "Inicio es <b>requerido</b>"
-      },
-      "END": {
-        "FIELD": "Fin",
-        "REQUIRED": "Fin es <b>requerido</b>"
+    "PROFESSIONAL": {
+      "FIELD": "Profesional",
+      "NAME": "<span class='bold'>Profesional:</span> {{name}}",
+      "REQUIRED": "Profesional es <b>requerido</b>",
+      "INVALID": "Profesional no valido",
+      "ADD_BUTTON": "Agregar profesional"
+    },
+    "AVAILABILITY": {
+      "FIELD": "Disponibilidad",
+      "REQUIRED": "Al menos una disponibilidad es <b>requerida</b>"
+    },
+    "WEEK_TIME": {
+      "FIELD": "Disponibilidad semanal",
+      "DESCRIPTION": "Disponibilidad de trabajo semanal",
+      "REQUIRED": "Agregue o ignore la disponibilidad semanal"
+    },
+    "SATURDAY_TIME": {
+      "FIELD": "Disponibilidad los sábados",
+      "DESCRIPTION": "Disponibilidad de trabajo los sábados",
+      "REQUIRED": "Agregue o ignore la disponibilidad del sábado"
+    },
+    "SUNDAY_TIME": {
+      "FIELD": "Disponibilidad los domingos",
+      "DESCRIPTION": "Disponibilidad de trabajo los domingos",
+      "REQUIRED": "Agregue o ignore la disponibilidad del domingo"
+    },
+    "LUNCH": {
+      "FIELD": "Hora de almuerzo",
+      "CHECK": "Agregar hora de almuerzo"
+    },
+    "START": {
+      "FIELD": "Inicio",
+      "REQUIRED": "Inicio es <b>requerido</b>"
+    },
+    "END": {
+      "FIELD": "Fin",
+      "REQUIRED": "Fin es <b>requerido</b>"
+    },
+    "ADDRESS": {
+      "NAME": "<span class='bold'>Dirección:</span> {{name}}",
+      "DESCRIPTION": "<span class='bold'>Descripción:</span> {{description}}",
+      "DISTANCE": {
+        "KM": "<span class='bold'>Distancia:</span> {{distance}} Kilómetros",
+        "M": "<span class='bold'>Distancia:</span> {{distance}} Metros"
       }
     },
-    "ME": {
-      "TITLE": "Mi sala",
-      "NAME": {
-        "FIELD": "Nombre",
-        "REQUIRED": "Nombre es <b>requerido</b>"
-      },
-      "PROFESSIONAL": {
-        "FIELD": "Profesional"
-      },
-      "AVAILABILITY": {
-        "FIELD": "Disponibilidad",
-        "REQUIRED": "Al menos una disponibilidad es <b>requerida</b>"
-      },
-      "WEEK_TIME": {
-        "FIELD": "Disponibilidad semanal",
-        "DESCRIPTION": "Disponibilidad de trabajo semanal",
-        "REQUIRED": "Agregue o ignore la disponibilidad semanal"
-      },
-      "SATURDAY_TIME": {
-        "FIELD": "Disponibilidad los sábados",
-        "DESCRIPTION": "Disponibilidad de trabajo los sábados",
-        "REQUIRED": "Agregue o ignore la disponibilidad del sábado"
-      },
-      "SUNDAY_TIME": {
-        "FIELD": "Disponibilidad los domingos",
-        "DESCRIPTION": "Disponibilidad de trabajo los domingos",
-        "REQUIRED": "Agregue o ignore la disponibilidad del domingo"
-      },
-      "LUNCH": {
-        "FIELD": "Hora de almuerzo",
-        "CHECK": "Agregar hora de almuerzo"
-      },
-      "START": {
-        "FIELD": "Inicio",
-        "REQUIRED": "Inicio es <b>requerido</b>"
-      },
-      "END": {
-        "FIELD": "Fin",
-        "REQUIRED": "Fin es <b>requerido</b>"
-      }
-    },
+    "CREATED": "Sala {{name}} creada",
+    "DETAIL": "Actualizar sala",
+    "ME": "Mi sala",
     "DELETED": {
       "TITLE": "Eliminar sala",
       "CONTENT": "¿Está seguro de eliminar la sala {{name}}?",
@@ -657,173 +449,7 @@
     }
   },
   "RESERVATION": {
-    "ADD": {
-      "CUSTOMER": {
-        "FIELD": "Cliente",
-        "REQUIRED": "Cliente es <b>requerido</b>",
-        "INVALID": "Cliente no valido",
-        "ADD_BUTTON": "Agregar cliente"
-      },
-      "ROOM": {
-        "FIELD": "Sala",
-        "REQUIRED": "Sala es <b>requerida</b>",
-        "INVALID": "Sala no valida",
-        "ADDRESS": {
-          "NAME": "Dirección",
-          "DESCRIPTION": "Descripción"
-        }
-      },
-      "PRODUCT": {
-        "FIELD": "Servicio",
-        "REQUIRED": "Servicio es <b>requerido</b>",
-        "INVALID": "Servicio no valido"
-      },
-      "DATE": {
-        "FIELD": "Elegí una fecha",
-        "REQUIRED": "Fecha es <b>requerida</b>"
-      },
-      "START": {
-        "FIELD": "Elegí una hora",
-        "REQUIRED": "Hora es <b>requerido</b>"
-      },
-      "SCHEDULE": {
-        "FIELD": "Reservar una cita",
-        "REQUIRED": "Reservar una cita es <b>requerido</b>"
-      },
-      "PREVIEW": {
-        "TITLE": "Vista previa",
-        "CUSTOMER": "Cliente",
-        "ROOM": {
-          "TITLE": "Sala",
-          "NAME": "Nombre",
-          "PROFESSIONAL": "Profesional",
-          "ADDRESS": "Dirección"
-        },
-        "PRODUCT": {
-          "TITLE": "Servicio",
-          "NAME": "Nombre",
-          "DURATION": "Duración",
-          "PRICE": "Precio"
-        },
-        "APPOINTMENT": "Cita"
-      },
-      "EVENT": {
-        "OVERLAPPING": {
-          "TITLE": "Reserva superpuesta",
-          "CONTENT": "La nueva reserva se superpone con <div>{{data}}</div> ¿Está seguro de agregar la reserva?",
-          "ERROR": "La nueva reserva se superpone con <div>{{data}}</div>"
-        },
-        "DETAIL": "<div><b>Nombre del cliente:</b> {{customerName}}</div><div><b>Servicio:</b> {{productName}}</div><div><b>Duración:</b> {{duration}}</div>",
-        "TITLE": "Agregar nueva reserva",
-        "CONTENT": "¿Estás segura de añadir la reserva el {{date}}?",
-        "CHANGE": {
-          "TITLE": "Actualizar reserva",
-          "CONTENT": "¿Estás segura de cambiar la reserva al {{date}}?"
-        },
-        "MESSAGE": {
-          "UNAVAILABLE": "<b>No disponible</b>",
-          "LUNCH": "<b>Hora de almuerzo</b>",
-          "OUT_OF_WORK": "<b>Fuera del trabajo</b>"
-        },
-        "UNAVAILABLE": "<div><b>No disponible</b></div><div>{{description}}</div><div><b>Duración:</b> {{duration}}</div>"
-      },
-      "CREATED": "Reserva {{date}} creada"
-    },
-    "DETAIL": {
-      "TITLE": "Reserva del cliente",
-      "ROOM": {
-        "TITLE": "Sala",
-        "NAME": "Nombre",
-        "PROFESSIONAL": "Profesional",
-        "ADDRESS": "Dirección"
-      },
-      "PRODUCT": {
-        "TITLE": "Servicio",
-        "NAME": "Nombre",
-        "DURATION": "Duración",
-        "PRICE": "Precio",
-        "EXTRAS": {
-          "TITLE": "Adicionales",
-          "DESCRIPTION": "Descripción",
-          "PRICE": "Precio",
-          "TOTAL": "Total"
-        },
-        "COMPLETE": {
-          "TITLE": "Servicio",
-          "INVALID": "Servicio no valido",
-          "EXTRAS": {
-            "TITLE": "Adicionales",
-            "DESCRIPTION": {
-              "FIELD": "Descripción"
-            },
-            "PRICE": {
-              "FIELD": "Precio"
-            }
-          },
-          "DESCRIPTION": "<span class='bold'>Descripción:</span> {{description}}",
-          "TOTAL": "<span class='bold'>Total:</span>",
-          "DURATION": "<span class='bold'>Duración:</span> {{duration}}",
-          "DURABILITY": "<span class='bold'>Durabilidad:</span> {{durability}}"
-        }
-      },
-      "APPOINTMENT": "Cita",
-      "PAYMENT": {
-        "TITLE": "Pagos",
-        "PAID": "Pagado",
-        "TYPE": "Forma de pago"
-      },
-      "HISTORY": {
-        "TITLE": "Historial",
-        "COLUMN": {
-          "PROFESSIONAL": "Profesional",
-          "START": "Inicio",
-          "PRODUCT": "Servicio",
-          "STATE": "Estado"
-        },
-        "ERROR": {
-          "NO_CONTENT": "No hay historial"
-        }
-      },
-      "STATE": {
-        "APPROVE": "La reserva fue aprobada",
-        "START": "La reserva se inició",
-        "COMPLETE": "La reserva se completó",
-        "CANCEL": "La reserva se canceló"
-      },
-      "ACTION": {
-        "APPROVE": "Aprobar",
-        "EDIT": "Editar",
-        "PAY": "Pagar",
-        "START": "Iniciar",
-        "COMPLETE": "Completar",
-        "CANCEL": "Cancelar",
-        "BOOK": "Reservar nuevamente",
-        "SEND": "Enviar Whatsapp",
-        "MORE": "Más"
-      },
-      "CHANGE_STATE": {
-        "TITLE": "Cambio de estado",
-        "ACTION": {
-          "APPROVE": "aprobar la reserva",
-          "EDIT": "editar la cita",
-          "PAY": "pagar la reserva",
-          "START": "iniciar la cita",
-          "COMPLETE": "completar la cita",
-          "CANCEL": "cancelar la reserva",
-          "BOOK": "reservar nuevamente"
-        },
-        "CONTENT": "¿Está seguro de {{action}}?"
-      },
-      "TRACKING": {
-        "TITLE": "Seguimiento",
-        "CREATED": "Creada",
-        "APPROVED": "Aprobada",
-        "STARTED": "Empezada",
-        "COMPLETED": "Completada",
-        "DURATION": "Duración de la cita"
-      }
-    },
-    "PAGE": {
+    "LIST": {
       "COLUMN": {
         "CUSTOMER": "Cliente",
         "PROFESSIONAL": "Profesional",
@@ -838,7 +464,111 @@
       },
       "ERROR": {
         "NO_CONTENT": "No hay reservas"
+      },
+      "HISTORY": {
+        "TITLE": "Historial",
+        "ERROR": {
+          "NO_CONTENT": "No hay historial"
+        }
       }
+    },
+    "CUSTOMER": {
+      "FIELD": "Cliente",
+      "SEARCH": "Buscar por cliente",
+      "REQUIRED": "Cliente es <b>requerido</b>",
+      "INVALID": "Cliente no valido",
+      "ADD_BUTTON": "Agregar cliente"
+    },
+    "ROOM": {
+      "DETAIL": "Detalle"
+    },
+    "PRODUCT": {
+      "DETAIL": "Detalle",
+      "EXTRAS": {
+        "TITLE": "Adicionales",
+        "DESCRIPTION": "Descripción",
+        "PRICE": "Precio",
+        "TOTAL": "Total"
+      },
+      "COMPLETE": {
+        "DESCRIPTION": "<span class='bold'>Descripción:</span> {{description}}",
+        "TOTAL": "<span class='bold'>Total:</span>",
+        "DURATION": "<span class='bold'>Duración:</span> {{duration}}",
+        "DURABILITY": "<span class='bold'>Durabilidad:</span> {{durability}}"
+      },
+      "DISCOUNT": {
+        "FIELD": "Descuento",
+        "ADD": "Con descuento"
+      }
+    },
+    "DATE": {
+      "FIELD": "Elegí una fecha",
+      "REQUIRED": "Fecha es <b>requerida</b>"
+    },
+    "START": {
+      "FIELD": "Elegí una hora",
+      "REQUIRED": "Hora es <b>requerido</b>"
+    },
+    "SCHEDULE": {
+      "FIELD": "Reservar una cita",
+      "REQUIRED": "Reservar una cita es <b>requerido</b>"
+    },
+    "PREVIEW": "Vista previa",
+    "EVENT": {
+      "OVERLAPPING": {
+        "TITLE": "Reserva superpuesta",
+        "CONTENT": "La nueva reserva se superpone con <div>{{data}}</div> ¿Está seguro de agregar la reserva?",
+        "ERROR": "La nueva reserva se superpone con <div>{{data}}</div>"
+      },
+      "DETAIL": "<div><b>Nombre del cliente:</b> {{customerName}}</div><div><b>Servicio:</b> {{productName}}</div><div><b>Duración:</b> {{duration}}</div>",
+      "TITLE": "Agregar nueva reserva",
+      "CONTENT": "¿Estás segura de añadir la reserva el {{date}}?",
+      "CHANGE": {
+        "TITLE": "Actualizar reserva",
+        "CONTENT": "¿Estás segura de cambiar la reserva al {{date}}?"
+      },
+      "MESSAGE": {
+        "UNAVAILABLE": "<b>No disponible</b>",
+        "LUNCH": "<b>Hora de almuerzo</b>",
+        "OUT_OF_WORK": "<b>Fuera del trabajo</b>"
+      },
+      "UNAVAILABLE": "<div><b>No disponible</b></div><div>{{description}}</div><div><b>Duración:</b> {{duration}}</div>"
+    },
+    "CREATED": "Reserva {{date}} creada",
+    "DETAIL": "Reserva del cliente",
+    "APPOINTMENT": "Cita",
+    "PAYMENT": {
+      "TITLE": "Pagos",
+      "PAID": "Pagado",
+      "TYPE": "Forma de pago"
+    },
+    "ACTION": {
+      "APPROVE": "Aprobar",
+      "EDIT": "Editar",
+      "PAY": "Pagar",
+      "START": "Iniciar",
+      "COMPLETE": "Completar",
+      "CANCEL": "Cancelar",
+      "BOOK": "Reservar nuevamente",
+      "SEND": "Enviar Whatsapp",
+      "MORE": "Más"
+    },
+    "CHANGE_STATE": {
+      "TITLE": "Cambio de estado",
+      "ACTION": {
+        "APPROVE": "aprobar la reserva",
+        "EDIT": "editar la cita",
+        "PAY": "pagar la reserva",
+        "START": "iniciar la cita",
+        "COMPLETE": "completar la cita",
+        "CANCEL": "cancelar la reserva",
+        "BOOK": "reservar nuevamente"
+      },
+      "CONTENT": "¿Está seguro de {{action}}?"
+    },
+    "TRACKING": {
+      "TITLE": "Seguimiento",
+      "DURATION": "Duración de la cita"
     },
     "DELETED": {
       "TITLE": "Eliminar reserva",
@@ -849,6 +579,12 @@
       "MESSAGE": "Reserva {{date}} actualizada"
     },
     "STATE": {
+      "FIELD": "Estado",
+      "SEARCH": "Buscar por estados",
+      "APPROVE": "La reserva fue aprobada",
+      "START": "La reserva se inició",
+      "COMPLETE": "La reserva se completó",
+      "CANCEL": "La reserva se canceló",
       "CREATED": "Creada",
       "APPROVED": "Aprobada",
       "STARTED": "Empezada",
@@ -860,96 +596,25 @@
       "PARTIALLYCOMPLETED": "Parcialmente Completada",
       "CANCELLED": "Cancelada"
     },
-    "CUSTOMER": {
-      "UPCOMING": {
-        "TITLE": "Próxima Reserva",
-        "START": "Inicio",
-        "END": "Fin",
-        "ROOM": "Sala",
-        "ADDRESS": "Dirección",
-        "PRODUCT": "Servicio",
-        "PRICE": "Precio",
-        "PAID": "Pagado",
-        "APPROVED": "Aprobado",
-        "CREATED": "La reserva debe ser aprobada por: ",
-        "PAY_NOW": "Pagá ahora y congela el precio"
-      },
+    "UPCOMING": {
+      "TITLE": "Próxima Reserva",
+      "START": "Inicio",
+      "END": "Fin",
+      "PRODUCT": "Servicio",
+      "PRICE": "Precio",
+      "PAID": "Pagado",
+      "APPROVED": "Aprobado",
+      "CREATED": "La reserva debe ser aprobada por: ",
+      "PAY_NOW": "Pagá ahora y congela el precio",
       "NO_UPCOMING": {
         "TITLE": "No hay próxima reserva"
       },
-      "ADD": {
-        "ROOM": {
-          "FIELD": "Sala",
-          "REQUIRED": "Sala es <b>requerida</b>",
-          "INVALID": "Sala no valida",
-          "DETAIL": "Detalle",
-          "ADDRESS": {
-            "NAME": "<span class='bold'>Dirección:</span> {{name}}",
-            "DESCRIPTION": "<span class='bold'>Descripción:</span> {{description}}",
-            "DISTANCE": {
-              "KM": "<span class='bold'>Distancia:</span> {{distance}} Kilómetros",
-              "M": "<span class='bold'>Distancia:</span> {{distance}} Metros"
-            }
-          },
-          "PROFESSIONAL": {
-            "NAME": "<span class='bold'>Profesional:</span> {{name}}"
-          }
-        },
-        "PRODUCT": {
-          "FIELD": "Servicio",
-          "REQUIRED": "Servicio es <b>requerido</b>",
-          "INVALID": "Servicio no valido",
-          "DETAIL": "Detalle",
-          "DESCRIPTION": "<span class='bold'>Descripción:</span> {{description}}",
-          "PRICE": "<span class='bold'>Precio:</span>",
-          "DURATION": "<span class='bold'>Duración:</span> {{duration}}",
-          "DURABILITY": "<span class='bold'>Durabilidad:</span> {{durability}}",
-          "DISCOUNT": {
-            "FIELD": "Descuento",
-            "ADD": "Con descuento"
-          }
-        },
-        "DATE": {
-          "FIELD": "Elegí una fecha",
-          "REQUIRED": "Fecha es <b>requerida</b>"
-        },
-        "SCHEDULE": {
-          "FIELD": "Reservar una cita",
-          "REQUIRED": "Reservar una cita es <b>requerido</b>"
-        },
-        "PREVIEW": {
-          "TITLE": "Vista previa",
-          "ROOM": {
-            "TITLE": "Sala",
-            "NAME": "Nombre",
-            "PROFESSIONAL": "Profesional",
-            "ADDRESS": "Dirección"
-          },
-          "PRODUCT": {
-            "TITLE": "Servicio",
-            "NAME": "Nombre",
-            "DURATION": "Duración",
-            "PRICE": "Precio"
-          },
-          "APPOINTMENT": "Cita"
-        },
-        "UPCOMING": {
-          "ERROR": "El cliente ya tiene una reserva el {{date}}"
-        },
+      "CUSTOMER": {
+        "ERROR": "El cliente ya tiene una reserva el {{date}}",
         "NO_CONTENT": "No hay disponibilidad el <span class='bold'>{{date}}</span>"
       }
     },
-    "SEARCH": {
-      "TITLE": "Búsqueda",
-      "CUSTOMER": {
-        "FIELD": "Buscar por cliente",
-        "PLACEHOLDER": "Cliente"
-      },
-      "STATES": {
-        "FIELD": "Buscar por estados",
-        "PLACEHOLDER": "Estado"
-      }
-    }
+    "SEARCH": "Búsqueda"
   },
   "NOTIFICATION": {
     "TITLE": "Notificaciones",
@@ -959,7 +624,6 @@
     "LIST": {
       "COLUMN": {
         "PROFESSIONAL": "Profesional",
-        "DESCRIPTION": "Descripción",
         "START": "Inicio",
         "DURATION": "Duración",
         "REPEAT": "Repetir"
@@ -968,54 +632,27 @@
         "NO_CONTENT": "No hay eventos"
       }
     },
-    "ADD": {
-      "TITLE": "Agregar no disponible",
-      "DESCRIPTION": {
-        "FIELD": "Descripción"
-      },
-      "PROFESSIONAL": {
-        "FIELD": "Profesional",
-        "REQUIRED": "Profesional es <b>requerido</b>",
-        "INVALID": "Profesional no valido"
-      },
-      "DATE": {
-        "FIELD": "Elegí una fecha",
-        "REQUIRED": "Fecha es <b>requerida</b>"
-      },
-      "TIME": {
-        "FIELD": "Elegí una hora",
-        "REQUIRED": "Hora es <b>requerida</b>"
-      },
-      "DURATION": {
-        "FIELD": "Duración",
-        "REQUIRED": "Duración es <b>requerido</b>"
-      },
-      "REPEAT": {
-        "FIELD": "Repetir"
-      },
-      "CREATED": "No disponible {{date}} creado"
+    "TITLE": "Agregar no disponible",
+    "DESCRIPTION": {
+      "FIELD": "Descripción"
     },
-    "DETAIL": {
-      "TITLE": "Actualizar no disponible",
-      "DESCRIPTION": {
-        "FIELD": "Descripción"
-      },
-      "DATE": {
-        "FIELD": "Elegí una fecha",
-        "REQUIRED": "Fecha es <b>requerida</b>"
-      },
-      "TIME": {
-        "FIELD": "Elegí una hora",
-        "REQUIRED": "Hora es <b>requerida</b>"
-      },
-      "DURATION": {
-        "FIELD": "Duración",
-        "REQUIRED": "Duración es <b>requerido</b>"
-      },
-      "REPEAT": {
-        "FIELD": "Repetir"
-      }
+    "DATE": {
+      "FIELD": "Elegí una fecha",
+      "REQUIRED": "Fecha es <b>requerida</b>"
     },
+    "TIME": {
+      "FIELD": "Elegí una hora",
+      "REQUIRED": "Hora es <b>requerida</b>"
+    },
+    "DURATION": {
+      "FIELD": "Duración",
+      "REQUIRED": "Duración es <b>requerido</b>"
+    },
+    "REPEAT": {
+      "FIELD": "Repetir"
+    },
+    "CREATED": "No disponible {{date}} creado",
+    "DETAIL": "Actualizar no disponible",
     "DELETED": {
       "TITLE": "Eliminar no disponible",
       "CONTENT": "¿Está seguro de eliminar no disponible {{date}}?",
@@ -1040,8 +677,6 @@
   "DISCOUNT": {
     "LIST": {
       "COLUMN": {
-        "NAME": "Nombre",
-        "DESCRIPTION": "Descripción",
         "TYPE": "Tipo",
         "AMOUNT": "Monto",
         "USED": "Utilizado"
@@ -1053,46 +688,26 @@
         "NO_CONTENT": "No hay descuentos"
       }
     },
-    "ADD": {
-      "TITLE": "Agregar descuento",
-      "NAME": {
-        "FIELD": "Nombre",
-        "REQUIRED": "Nombre es <b>requerido</b>"
-      },
-      "DESCRIPTION": {
-        "FIELD": "Descripción"
-      },
-      "AMOUNT": {
-        "FIELD": "Monto",
-        "REQUIRED": "Monto es <b>requerido</b>",
-        "GREATER": "Monto debe ser mayor a 1"
-      },
-      "TYPE": {
-        "FIELD": "Tipo",
-        "REQUIRED": "Tipo es <b>requerido</b>"
-      },
-      "SEND": "Descuento {{name}} enviado",
-      "CREATED": "Descuento {{name}} creado"
+    "TITLE": "Agregar descuento",
+    "NAME": {
+      "FIELD": "Nombre",
+      "REQUIRED": "Nombre es <b>requerido</b>"
     },
-    "DETAIL": {
-      "TITLE": "Actualizar descuento",
-      "NAME": {
-        "FIELD": "Nombre",
-        "REQUIRED": "Nombre es <b>requerido</b>"
-      },
-      "DESCRIPTION": {
-        "FIELD": "Descripción"
-      },
-      "PRICE": {
-        "FIELD": "Monto",
-        "REQUIRED": "Monto es <b>requerido</b>",
-        "GREATER": "Monto debe ser mayor a 1"
-      },
-      "TYPE": {
-        "FIELD": "Tipo",
-        "REQUIRED": "Tipo es <b>requerido</b>"
-      }
+    "DESCRIPTION": {
+      "FIELD": "Descripción"
     },
+    "AMOUNT": {
+      "FIELD": "Monto",
+      "REQUIRED": "Monto es <b>requerido</b>",
+      "GREATER": "Monto debe ser mayor a 1"
+    },
+    "TYPE": {
+      "FIELD": "Tipo",
+      "REQUIRED": "Tipo es <b>requerido</b>"
+    },
+    "SEND": "Descuento {{name}} enviado",
+    "CREATED": "Descuento {{name}} creado",
+    "DETAIL": "Actualizar descuento",
     "DELETED": {
       "TITLE": "Eliminar descuento",
       "CONTENT": "¿Está seguro de eliminar el descuento {{name}}?",
@@ -1105,7 +720,6 @@
   "PAYMENT": {
     "LIST": {
       "COLUMN": {
-        "DESCRIPTION": "Descripción",
         "AMOUNT": "Importe",
         "TYPE": "Forma",
         "STATUS": "Estado"
@@ -1114,18 +728,17 @@
         "NO_CONTENT": "No hay pagos"
       }
     },
-    "ADD": {
-      "CREATED": "Pago completado",
-      "ERROR_TEXT": "Error",
-      "ERROR": "Pago incompleto.\n{{reason}}",
-      "RECREATE": "Link de pago regenerado"
-    },
+    "CREATED": "Pago completado",
+    "ERROR_TEXT": "Error",
+    "ERROR": "Pago incompleto.\n{{reason}}",
+    "RECREATE": "Link de pago regenerado",
     "COPY": "¡Link copiado!"
   },
   "WHATSAPP": {
     "SEND": {
       "APPROVE": "♡ \uD83C\uDD43\uD83C\uDD44 \uD83C\uDD3F\uD83C\uDD41\uD83C\uDD3E\uD83C\uDD47\uD83C\uDD38\uD83C\uDD3C\uD83C\uDD3E \uD83C\uDD42\uD83C\uDD34\uD83C\uDD41\uD83C\uDD45\uD83C\uDD38\uD83C\uDD32\uD83C\uDD34:%0A♡ {{date}} Hs.",
-      "TOMORROW": "♕\uD835\uDC79\uD835\uDC86\uD835\uDC84\uD835\uDC90\uD835\uDC93\uD835\uDC85\uD835\uDC82\uD835\uDC95\uD835\uDC90\uD835\uDC93\uD835\uDC8A\uD835\uDC90 \uD835\uDC85\uD835\uDC86 \uD835\uDC95\uD835\uDC96\uD835\uDC93\uD835\uDC8F\uD835\uDC90♕%0Aℍ\uD835\uDD60\uD835\uDD5D\uD835\uDD52!!! \uD835\uDD44\uD835\uDD52ñ\uD835\uDD52\uD835\uDD5F\uD835\uDD52 {{date}} ℍ\uD835\uDD64 \uD835\uDD65\uD835\uDD56\uD835\uDD5Fé\uD835\uDD64 \uD835\uDD65\uD835\uDD66 \uD835\uDD64\uD835\uDD56\uD835\uDD64\uD835\uDD5Aó\uD835\uDD5F \uD835\uDD55\uD835\uDD56 \uD835\uDD66ñ\uD835\uDD52\uD835\uDD64 ♡♡♡  ℂ\uD835\uDD60\uD835\uDD5F\uD835\uDD57í\uD835\uDD63\uD835\uDD5E\uD835\uDD52\uD835\uDD5E\uD835\uDD56 \uD835\uDD62\uD835\uDD66\uD835\uDD56 \uD835\uDD52\uD835\uDD64\uD835\uDD5A\uD835\uDD64\uD835\uDD65\uD835\uDD5A\uD835\uDD63á\uD835\uDD64 \uD835\uDD61\uD835\uDD60\uD835\uDD63 \uD835\uDD57\uD835\uDD52\uD835\uDD67\uD835\uDD60\uD835\uDD63.%0A❀ \uD835\uDD39\uD835\uDD56\uD835\uDD64\uD835\uDD5A\uD835\uDD65\uD835\uDD60 ❀"
+      "TOMORROW": "♕\uD835\uDC79\uD835\uDC86\uD835\uDC84\uD835\uDC90\uD835\uDC93\uD835\uDC85\uD835\uDC82\uD835\uDC95\uD835\uDC90\uD835\uDC93\uD835\uDC8A\uD835\uDC90 \uD835\uDC85\uD835\uDC86 \uD835\uDC95\uD835\uDC96\uD835\uDC93\uD835\uDC8F\uD835\uDC90♕%0Aℍ\uD835\uDD60\uD835\uDD5D\uD835\uDD52!!! \uD835\uDD44\uD835\uDD52ñ\uD835\uDD52\uD835\uDD5F\uD835\uDD52 {{date}} ℍ\uD835\uDD64 \uD835\uDD65\uD835\uDD56\uD835\uDD5Fé\uD835\uDD64 \uD835\uDD65\uD835\uDD66 \uD835\uDD64\uD835\uDD56\uD835\uDD64\uD835\uDD5Aó\uD835\uDD5F \uD835\uDD55\uD835\uDD56 \uD835\uDD66ñ\uD835\uDD52\uD835\uDD64 ♡♡♡  ℂ\uD835\uDD60\uD835\uDD5F\uD835\uDD57í\uD835\uDD63\uD835\uDD5E\uD835\uDD52\uD835\uDD5E\uD835\uDD56 \uD835\uDD62\uD835\uDD66\uD835\uDD56 \uD835\uDD52\uD835\uDD64\uD835\uDD5A\uD835\uDD64\uD835\uDD65\uD835\uDD5A\uD835\uDD63á\uD835\uDD64 \uD835\uDD61\uD835\uDD60\uD835\uDD63 \uD835\uDD57\uD835\uDD52\uD835\uDD67\uD835\uDD60\uD835\uDD63.%0A❀ \uD835\uDD39\uD835\uDD56\uD835\uDD64\uD835\uDD5A\uD835\uDD65\uD835\uDD60 ❀",
+      "HELLO": "ʜᴏʟᴀ ᴄʟᴇᴏꜱ! %0Aɴᴇᴄᴇꜱɪᴛᴏ ʜᴀᴄᴇʀ ᴜɴᴀ ᴄᴏɴꜱᴜʟᴛᴀ ♡"
     }
   },
   "MAIN": {
@@ -1154,7 +767,7 @@
     "CONTACT": {
       "TITLE": "Contactanos",
       "ADDRESS": "San Martín 64 - 08 - Villa Carlos Paz, Córdoba, Argentina",
-      "PHONE": "+54 (351) 758-1773",
+      "PHONE": "+54 (3541) 56-9953",
       "MAIL": "espacio.cleos@gmail.com",
       "SEND": {
         "TITLE": "¿Tiene alguna pregunta? Nos encantaría saber de ti",

@@ -12,7 +12,7 @@
     </ng-container>
 
     <ng-container matColumnDef="name">
-      <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'ROOM.LIST.COLUMN.NAME' | translate }}</th>
+      <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
       <td *matCellDef="let room" mat-cell>
         <div *ngIf="room.id; else skeleton">{{room.name}}</div>
         <ng-template #skeleton>
@@ -33,7 +33,7 @@
     </ng-container>
 
     <ng-container matColumnDef="address">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'ROOM.LIST.COLUMN.NAME' | translate }}</th>
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
       <td *matCellDef="let room" mat-cell>
         <div *ngIf="room.id; else skeleton">{{room.address?.name}}</div>
         <ng-template #skeleton>
@@ -92,7 +92,7 @@
   </table>
   <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
 
-  <button color="accent" id="add-button" mat-fab matTooltip="{{ 'ROOM.ADD.TITLE' | translate }}"
+  <button color="accent" id="add-button" mat-fab matTooltip="{{ 'ROOM.TITLE' | translate }}"
           routerLink="/rooms/add">
     <mat-icon>add_business</mat-icon>
   </button>
