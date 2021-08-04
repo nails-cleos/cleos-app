@@ -270,6 +270,6 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
   private filter(name: string): IUserAll[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.allCustomers?.filter(option => getUserName(option)?.toLowerCase().indexOf(filterValue));
+    return this.allCustomers?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
   }
 }
