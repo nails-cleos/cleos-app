@@ -15,7 +15,7 @@ export class RedirectComponent {
 
   constructor(private router: Router, private store: Store<AppState>, private tokenService: TokenService) {
     this.store.select(selectAuthState).subscribe((state: any) => {
-      if (!state.isRefreshToken) {
+      if (state.redirect) {
         let redirectUrl = ['main'];
         if (state.isAuthenticated) {
           const user: IUserAll = state.user;

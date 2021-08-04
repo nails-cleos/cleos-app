@@ -3,7 +3,7 @@ import { All, AuthActionTypes } from '../auth.actions';
 
 export interface State {
   isAuthenticated: boolean;
-  isRefreshToken: boolean;
+  redirect: boolean;
   isLoading: boolean;
   user: IUser | null;
   token: null;
@@ -17,7 +17,7 @@ export interface State {
 
 export const initialState: State = {
   isAuthenticated: false,
-  isRefreshToken: false,
+  redirect: false,
   isLoading: false,
   user: null,
   token: null,
@@ -41,7 +41,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
         subErrors: null,
         isLoading: true,
-        isRefreshToken: false
+        redirect: false
       };
     }
     case AuthActionTypes.loginFailure:
@@ -53,7 +53,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: action.payload.error,
         message: null,
         subErrors: action.payload.error.subErrors,
-        isRefreshToken: false
+        redirect: false
       };
     }
     case AuthActionTypes.loginSuccess: {
@@ -68,14 +68,20 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
         subErrors: null,
         queryParams: action.payload.queryParams,
-        isRefreshToken: false
+        redirect: false
       };
     }
     case AuthActionTypes.refreshToken: {
       return {
         ...state,
         token: action.payload.refreshToken,
-        isRefreshToken: true
+        redirect: false
+      };
+    }
+    case AuthActionTypes.redirect: {
+      return {
+        ...state,
+        redirect: true
       };
     }
     case AuthActionTypes.signupSuccess: {
@@ -86,7 +92,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         message: action.payload.message,
         subErrors: null,
-        isRefreshToken: false
+        redirect: false
       };
     }
     case AuthActionTypes.forgotPassword:
@@ -99,7 +105,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: action.payload.message,
         subErrors: null,
         isLoading: false,
-        isRefreshToken: false
+        redirect: false
       };
     }
     case AuthActionTypes.clean: {
@@ -110,7 +116,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
         subErrors: null,
         queryParams: null,
-        isRefreshToken: false
+        redirect: false
       };
     }
     case AuthActionTypes.reLogin:

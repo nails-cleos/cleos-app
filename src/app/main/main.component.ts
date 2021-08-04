@@ -7,6 +7,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
 import { ViewportScroller } from '@angular/common';
 import { Router } from '@angular/router';
+import * as fromActionsLogin from '../store/auth.actions';
 
 @Component({
   selector: 'app-main',
@@ -34,5 +35,11 @@ export class MainComponent {
     this.router.navigate(['main']).then(() => {
       this.viewportScroller.scrollToAnchor(elementId);
     });
+  }
+
+  redirect(): void {
+    this.store.dispatch(
+      new fromActionsLogin.Redirect()
+    );
   }
 }

@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Actions, Effect, ofType } from '@ngrx/effects';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import * as fromActionsMain from '../main.actions';
@@ -12,26 +12,23 @@ import { MainService } from '../../services/main.service';
 @Injectable()
 export class MainEffects {
 
-  @Effect()
-  getAllCatalogue$ = this.actions$.pipe(ofType(fromActionsMain.MainActionTypes.getAllCatalogue)).pipe(
+  getAllCatalogue$ = createEffect(() => this.actions$.pipe(ofType(fromActionsMain.MainActionTypes.getAllCatalogue)).pipe(
     map((action: any) => action.payload),
     switchMap(() => this.catalogueService.getAllHome().pipe(
       switchMap((response: any) => of(new fromActionsMain.CatalogueSuccess(response))),
       catchError((err: HttpErrorResponse) => of(new fromActionsMain.RequestFailure({error: err.error})))
     ))
-  );
+  ));
 
-  @Effect()
-  getAllProducts$ = this.actions$.pipe(ofType(fromActionsMain.MainActionTypes.getAllProducts)).pipe(
+  getAllProducts$ = createEffect(() => this.actions$.pipe(ofType(fromActionsMain.MainActionTypes.getAllProducts)).pipe(
     map((action: any) => action.payload),
     switchMap(() => this.productService.getProductList().pipe(
       switchMap((response: any) => of(new fromActionsMain.ProductsSuccess(response))),
       catchError((err: HttpErrorResponse) => of(new fromActionsMain.RequestFailure({error: err.error})))
     ))
-  );
+  ));
 
-  @Effect()
-  sendMessage$ = this.actions$.pipe(ofType(fromActionsMain.MainActionTypes.sendMessage)).pipe(
+  sendMessage$ = createEffect(() => this.actions$.pipe(ofType(fromActionsMain.MainActionTypes.sendMessage)).pipe(
     map((action: any) => action.payload),
     switchMap((payload) => this.mainService.sendMessage(payload).pipe(
       switchMap(() => {
@@ -40,22 +37,19 @@ export class MainEffects {
       }),
       catchError((err: HttpErrorResponse) => of(new fromActionsMain.RequestFailure({error: err.error})))
     ))
-  );
+  ));
 
-  @Effect({dispatch: false})
-  catalogueSuccess$ = this.actions$.pipe(
+  catalogueSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsMain.MainActionTypes.catalogueSuccess)
-  );
+  ), {dispatch: false});
 
-  @Effect({dispatch: false})
-  productDataSuccess$ = this.actions$.pipe(
+  productDataSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsMain.MainActionTypes.productSuccess)
-  );
+  ), {dispatch: false});
 
-  @Effect({dispatch: false})
-  requestSuccess$ = this.actions$.pipe(
+  requestSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsMain.MainActionTypes.requestSuccess)
-  );
+  ), {dispatch: false});
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private mainService: MainService,
               private catalogueService: CatalogueService, private productService: ProductService) {

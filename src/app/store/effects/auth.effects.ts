@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Actions, createEffect, Effect, ofType } from '@ngrx/effects';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
@@ -11,8 +11,7 @@ import { TranslateService } from '@ngx-translate/core';
 @Injectable()
 export class LoginEffects {
 
-  @Effect()
-  login$ = this.actions$.pipe(ofType(AuthActionTypes.login)).pipe(
+  login$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.login)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.authService.login(payload.username, payload.password).pipe(
       switchMap((response: any) => of(new LoginSuccess({
@@ -21,10 +20,9 @@ export class LoginEffects {
       }))),
       catchError((err: HttpErrorResponse) => of(new LoginFailure({error: err.error})))
     ))
-  );
+  ));
 
-  @Effect()
-  socialLogin$ = this.actions$.pipe(ofType(AuthActionTypes.socialLogin)).pipe(
+  socialLogin$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.socialLogin)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => {
       const user = payload.socialUser;
@@ -37,10 +35,9 @@ export class LoginEffects {
         catchError((err: HttpErrorResponse) => of(new LoginFailure({error: err.error})))
       );
     })
-  );
+  ));
 
-  @Effect()
-  signUp$ = this.actions$.pipe(ofType(AuthActionTypes.signup)).pipe(
+  signUp$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.signup)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.authService.signUp(payload).pipe(
       switchMap((response: any) => {
@@ -51,10 +48,9 @@ export class LoginEffects {
         return of(new SignUpSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new SignUpFailure({error: err.error})))
     ))
-  );
+  ));
 
-  @Effect()
-  activateAccount$ = this.actions$.pipe(ofType(AuthActionTypes.activateAccount)).pipe(
+  activateAccount$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.activateAccount)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.authService.activateAccount(payload).pipe(
       switchMap(() => {
@@ -62,10 +58,9 @@ export class LoginEffects {
         return of(new SignUpSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new SignUpFailure({error: err.error})))
     ))
-  );
+  ));
 
-  @Effect()
-  forgotPassword$ = this.actions$.pipe(ofType(AuthActionTypes.forgotPassword)).pipe(
+  forgotPassword$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.forgotPassword)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.authService.forgotPassword(payload).pipe(
       switchMap(() => {
@@ -74,10 +69,9 @@ export class LoginEffects {
       }),
       catchError((err: HttpErrorResponse) => of(new SignUpFailure({error: err.error})))
     ))
-  );
+  ));
 
-  @Effect()
-  recoveryPassword$ = this.actions$.pipe(ofType(AuthActionTypes.recoveryPassword)).pipe(
+  recoveryPassword$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.recoveryPassword)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.authService.recoveryPassword(payload.token, payload.password).pipe(
       switchMap(() => {
@@ -85,10 +79,9 @@ export class LoginEffects {
         return of(new SignUpSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new SignUpFailure({error: err.error})))
     ))
-  );
+  ));
 
-  @Effect({dispatch: false})
-  loginSuccess$ = this.actions$.pipe(
+  loginSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(AuthActionTypes.loginSuccess),
     tap((response: any) => {
       const redirectUrl = response.payload.response.user.changePassword
@@ -96,40 +89,40 @@ export class LoginEffects {
         : response.payload.queryParams.returnUrl || ['auth', 'redirect'];
       this.router.navigate(redirectUrl, {state: response.payload.extras});
     })
-  );
+  ), {dispatch: false});
 
-  @Effect({dispatch: false})
-  logInFailure$ = this.actions$.pipe(
+  logInFailure$ = createEffect(() => this.actions$.pipe(
     ofType(AuthActionTypes.loginFailure)
-  );
+  ), {dispatch: false});
 
-  @Effect({dispatch: false})
-  signUpSuccess$ = this.actions$.pipe(
+  signUpSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(AuthActionTypes.signupSuccess)
-  );
+  ), {dispatch: false});
 
-  @Effect({dispatch: false})
-  signUpFailure$ = this.actions$.pipe(
+  signUpFailure$ = createEffect(() => this.actions$.pipe(
     ofType(AuthActionTypes.signupFailure)
-  );
+  ), {dispatch: false});
 
-  @Effect({dispatch: false})
-  public logOut$ = this.actions$.pipe(
+  logOut$ = createEffect(() => this.actions$.pipe(
     ofType(AuthActionTypes.logout),
     tap(() => {
       localStorage.removeItem('auth');
       window.location.href = '/main';
     })
-  );
+  ), {dispatch: false});
 
-  @Effect({dispatch: false})
-  public reLogin$ = this.actions$.pipe(
+  reLogin$ = createEffect(() => this.actions$.pipe(
     ofType(AuthActionTypes.reLogin),
     tap(() => {
       localStorage.removeItem('auth');
       window.location.href = '/auth';
     })
-  );
+  ), {dispatch: false});
+
+  redirect$ = createEffect(() => this.actions$.pipe(
+    ofType(AuthActionTypes.redirect),
+    tap(() => this.router.navigate(['auth', 'redirect']))
+  ), {dispatch: false});
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private authService: AuthService,
               private router: Router) {

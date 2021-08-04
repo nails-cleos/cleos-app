@@ -277,7 +277,7 @@
         <ng-template matStepLabel>{{ 'PRODUCT.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
         <div>
-          <button *ngIf="isEditing; else noEdit" [form]="productForm" appBackButton color="accent" mat-icon-button
+          <button *ngIf="isEditing; else noEdit" [form]="productForm" appBackButton color="accent" mat-mini-fab
                   type="button">
             <mat-icon>keyboard_return</mat-icon>
           </button>
