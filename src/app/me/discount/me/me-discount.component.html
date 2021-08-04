@@ -1,0 +1,79 @@
+<div class="mat-elevation-z8">
+  <table [dataSource]="dataSource" mat-table matSort matSortActive="name"
+         matSortDirection="asc" matSortDisableClear>
+    <ng-container matColumnDef="position">
+      <th *matHeaderCellDef mat-header-cell>#</th>
+      <td *matCellDef="let userDiscount; let i = index;" mat-cell>
+        <div *ngIf="userDiscount.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="name">
+      <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
+      <td *matCellDef="let userDiscount" mat-cell>
+        <div *ngIf="userDiscount.id; else skeleton">{{userDiscount.discount.name}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="amount">
+      <th *matHeaderCellDef mat-header-cell
+          mat-sort-header>{{ 'DISCOUNT.LIST.COLUMN.AMOUNT' | translate }}</th>
+      <td *matCellDef="let userDiscount">
+        <div *ngIf="userDiscount.id; else skeleton" class="bold">{{userDiscount.symbol}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="used">
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+          mat-sort-header>{{ 'DISCOUNT.LIST.COLUMN.USED' | translate }}</th>
+      <td *matCellDef="let userDiscount" fxHide.lt-sm fxShow>
+        <div *ngIf="userDiscount.id; else skeleton">
+          <div *ngIf="userDiscount.used; else notUsed">
+            <mat-icon>done</mat-icon>
+          </div>
+          <ng-template #notUsed>
+            <mat-icon>pending</mat-icon>
+          </ng-template>
+        </div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+      <td *matCellDef="let userDiscount" mat-cell>
+        <div *ngIf="userDiscount.id; else skeleton">
+          <button (click)="useDiscount(userDiscount)" *ngIf="!userDiscount.used" mat-icon-button
+                  matTooltip="{{ 'COMMON.BUTTON.BOOK' | translate }}" matTooltipPosition="left">
+            <mat-icon color="primary">book_online</mat-icon>
+          </button>
+        </div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="noContent">
+      <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+        {{ 'DISCOUNT.LIST.ERROR.NO_CONTENT' | translate }}</td>
+    </ng-container>
+
+    <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
+
+    <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+    <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
+  </table>
+  <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+</div>

@@ -35,7 +35,7 @@ export class ProductEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.productService.add(payload).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('PRODUCT.ADD.CREATED', {name: response.name});
+        const message = this.translate.instant('PRODUCT.CREATED', {name: response.name});
         return of(new fromActionsProduct.ProductSaveSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsProduct.ProductFailure({error: err.error})))
     ))

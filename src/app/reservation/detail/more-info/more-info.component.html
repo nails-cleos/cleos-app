@@ -1,35 +1,35 @@
 <div class="divider">
-  <h1>{{ 'RESERVATION.DETAIL.TRACKING.TITLE' | translate}}</h1>
+  <h1>{{ 'RESERVATION.TRACKING.TITLE' | translate}}</h1>
 </div>
 <div *ngIf="tracking; else box">
   <div class="stepper-wrapper">
     <div [ngClass]="{'active': tracking.reservation.state === 'CREATED', 'completed': tracking.approvedTime}"
          class="stepper-item">
       <div class="step-counter">{{tracking.createdTime | date:'short':undefined:language}}</div>
-      <div class="step-name">{{'RESERVATION.DETAIL.TRACKING.CREATED' | translate}}</div>
+      <div class="step-name">{{'RESERVATION.STATE.CREATED' | translate}}</div>
     </div>
     <div [ngClass]="{
     'active': ['APPROVED', 'PAID', 'PARTIALLY_PAID'].indexOf(tracking.reservation.state) >= 0,
     'completed': tracking.startedTime
     }" class="stepper-item">
       <div class="step-counter">{{tracking.approvedTime | date:'short':undefined:language}}</div>
-      <div class="step-name">{{'RESERVATION.DETAIL.TRACKING.APPROVED' | translate}}</div>
+      <div class="step-name">{{'RESERVATION.STATE.APPROVED' | translate}}</div>
     </div>
     <div [ngClass]="{'active': tracking.reservation.state === 'STARTED', 'completed': tracking.completedTime}"
          class="stepper-item">
       <div class="step-counter">{{tracking.startedTime | date:'short':undefined:language}}</div>
-      <div class="step-name">{{'RESERVATION.DETAIL.TRACKING.STARTED' | translate}}</div>
+      <div class="step-name">{{'RESERVATION.STATE.STARTED' | translate}}</div>
     </div>
     <div [ngClass]="{
       'finish': ['COMPLETED', 'PARTIALLY_COMPLETED'].indexOf(tracking.reservation.state) >= 0,
       'completed': tracking.completedTime
       }" class="stepper-item">
       <div class="step-counter">{{tracking.completedTime | date:'short':undefined:language}}</div>
-      <div class="step-name">{{'RESERVATION.DETAIL.TRACKING.COMPLETED' | translate}}</div>
+      <div class="step-name">{{'RESERVATION.STATE.COMPLETED' | translate}}</div>
     </div>
   </div>
   <h4 *ngIf="totalTime">
-    <span class="bold">{{'RESERVATION.DETAIL.TRACKING.DURATION' | translate}}:</span> {{totalTime}}
+    <span class="bold">{{'RESERVATION.TRACKING.DURATION' | translate}}:</span> {{totalTime}}
   </h4>
 </div>
 <ng-template #box>
@@ -39,7 +39,7 @@
 <mat-divider></mat-divider>
 
 <div class="divider">
-  <h1>{{ 'RESERVATION.DETAIL.PAYMENT.TITLE' | translate}}</h1>
+  <h1>{{ 'RESERVATION.PAYMENT.TITLE' | translate}}</h1>
 </div>
 <div *ngIf="payments" class="mat-elevation-z8">
   <table [dataSource]="payments" mat-table>
@@ -54,7 +54,7 @@
     </ng-container>
 
     <ng-container matColumnDef="description">
-      <th *matHeaderCellDef mat-header-cell>{{ 'PAYMENT.LIST.COLUMN.DESCRIPTION' | translate }}</th>
+      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
       <td *matCellDef="let payment" mat-cell>
         <div *ngIf="payment.id; else skeleton">{{payment.description}}</div>
         <ng-template #skeleton>

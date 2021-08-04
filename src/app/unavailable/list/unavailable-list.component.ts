@@ -9,7 +9,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectUnavailableState } from '../../store/app.states';
 import * as fromActionsUnavailable from '../../store/unavailable.actions';
-import { DialogComponent } from '../../dialog/dialog.component';
+import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { convertDuration } from '../../util/dates';
 import { IUnavailable } from '../../interfaces/unavailable';
 import { IUser } from '../../interfaces/user';

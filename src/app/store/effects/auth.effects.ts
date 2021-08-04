@@ -92,9 +92,9 @@ export class LoginEffects {
     ofType(AuthActionTypes.loginSuccess),
     tap((response: any) => {
       const redirectUrl = response.payload.response.user.changePassword
-        ? 'change-password'
-        : response.payload.queryParams.returnUrl || 'redirect';
-      this.router.navigate([redirectUrl], {state: response.payload.extras});
+        ? ['change-password']
+        : response.payload.queryParams.returnUrl || ['auth', 'redirect'];
+      this.router.navigate(redirectUrl, {state: response.payload.extras});
     })
   );
 

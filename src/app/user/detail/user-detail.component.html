@@ -3,7 +3,7 @@
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <mat-card>
         <mat-card-header>
-          <mat-card-title>{{ 'USER.DETAIL.TITLE' | translate }}</mat-card-title>
+          <mat-card-title>{{ 'USER.DETAIL' | translate }}</mat-card-title>
           <mat-card-subtitle *ngIf="user; else skeleton">{{userName}}</mat-card-subtitle>
           <ng-template #skeleton>
             <div class="ssc-line"></div>
@@ -19,26 +19,26 @@
                 </label>
               </mat-form-field>
               <mat-form-field appearance="fill">
-                <mat-label>{{ 'USER.DETAIL.USERNAME.FIELD' | translate }}</mat-label>
+                <mat-label>{{ 'USER.USERNAME.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="username" autocomplete="username" matInput required>
                 </label>
-                <mat-error [innerHTML]="'USER.DETAIL.USERNAME.REQUIRED' | translate">
+                <mat-error [innerHTML]="'USER.USERNAME.REQUIRED' | translate">
                 </mat-error>
               </mat-form-field>
               <mat-form-field appearance="fill">
-                <mat-label>{{ 'USER.DETAIL.EMAIL.FIELD' | translate }}</mat-label>
+                <mat-label>{{ 'USER.EMAIL.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="email" autocomplete="username" matInput required>
                 </label>
                 <mat-error *ngIf="email.hasError('email')">
-                  {{ 'USER.DETAIL.EMAIL.VALID' | translate }}
+                  {{ 'USER.EMAIL.VALID' | translate }}
                 </mat-error>
-                <mat-error *ngIf="email.hasError('required')" [innerHTML]="'USER.DETAIL.EMAIL.REQUIRED' | translate">
+                <mat-error *ngIf="email.hasError('required')" [innerHTML]="'USER.EMAIL.REQUIRED' | translate">
                 </mat-error>
               </mat-form-field>
               <mat-form-field appearance="fill">
-                <mat-label>{{ 'USER.DETAIL.LANG.FIELD' | translate }}</mat-label>
+                <mat-label>{{ 'USER.LANG.FIELD' | translate }}</mat-label>
                 <span *ngIf="select.value" [class]="'flag-icon  flag-icon-squared flag-icon-' + select.value.icon"
                       class="margin-right-eight"
                       matPrefix></span>
@@ -49,28 +49,28 @@
                     {{ 'COMMON.LANG.' + lang.text | translate }}
                   </mat-option>
                 </mat-select>
-                <mat-error [innerHTML]="'USER.DETAIL.LANG.REQUIRED' | translate">
+                <mat-error [innerHTML]="'USER.LANG.REQUIRED' | translate">
                 </mat-error>
               </mat-form-field>
               <mat-form-field appearance="fill">
-                <mat-label>{{ 'USER.DETAIL.FIRST_NAME.FIELD' | translate }}</mat-label>
+                <mat-label>{{ 'USER.FIRST_NAME.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="firstName" autocomplete="firstName" matInput>
                 </label>
               </mat-form-field>
               <mat-form-field appearance="fill">
-                <mat-label>{{ 'USER.DETAIL.LAST_NAME.FIELD' | translate }}</mat-label>
+                <mat-label>{{ 'USER.LAST_NAME.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="lastName" autocomplete="lastName" matInput>
                 </label>
               </mat-form-field>
               <mat-form-field appearance="fill">
-                <mat-label>{{ 'USER.DETAIL.PHONE.FIELD' | translate }}</mat-label>
+                <mat-label>{{ 'USER.PHONE.FIELD' | translate }}</mat-label>
                 <ngx-mat-intl-tel-input [enablePlaceholder]="true" [enableSearch]="true"
                                         [formControl]="phone" [preferredCountries]="['ar']"
                                         name="phone"></ngx-mat-intl-tel-input>
                 <mat-error *ngIf="phone.hasError('validatePhoneNumber')">
-                  {{ 'USER.DETAIL.PHONE.INVALID' | translate }}
+                  {{ 'USER.PHONE.INVALID' | translate }}
                 </mat-error>
               </mat-form-field>
             </div>

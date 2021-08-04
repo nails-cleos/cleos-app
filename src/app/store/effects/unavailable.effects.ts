@@ -54,7 +54,7 @@ export class UnavailableEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.unavailableService.add(payload).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('UNAVAILABLE.ADD.CREATED', {date: response.start});
+        const message = this.translate.instant('UNAVAILABLE.CREATED', {date: response.start});
         return of(new fromActionsUnavailable.UnavailableSaveSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({error: err.error})))
     ))

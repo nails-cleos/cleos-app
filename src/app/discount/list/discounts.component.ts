@@ -19,7 +19,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dial
 import { Store } from '@ngrx/store';
 import { AppState, selectDiscountState, selectUserState } from '../../store/app.states';
 import * as fromActionsDiscount from '../../store/discount.actions';
-import { DialogComponent } from '../../dialog/dialog.component';
+import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { FormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import * as fromActionsUser from '../../store/user.actions';
@@ -270,6 +270,6 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
   private filter(name: string): IUserAll[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.allCustomers?.filter(option => getUserName(option)?.toLowerCase().indexOf(filterValue));
+    return this.allCustomers?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
   }
 }

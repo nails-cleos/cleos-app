@@ -81,8 +81,8 @@ export class CatalogueDetailComponent implements OnInit, AfterViewInit, OnDestro
   }
 
   deleteImg(): void {
-    const content = this.translate.instant('CATALOGUE.DETAIL.DELETE.MESSAGE', {name: this.catalogue?.name});
-    const undo = this.translate.instant('CATALOGUE.DETAIL.DELETE.UNDO');
+    const content = this.translate.instant('CATALOGUE.DELETE.MESSAGE', {name: this.catalogue?.name});
+    const undo = this.translate.instant('CATALOGUE.DELETE.UNDO');
     const snackBarRef = this.snackBar.open(content, undo, {
       duration: 5000
     });

@@ -24,7 +24,7 @@
 
     <ng-container matColumnDef="description">
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
-          mat-sort-header>{{ 'UNAVAILABLE.LIST.COLUMN.DESCRIPTION' | translate }}</th>
+          mat-sort-header>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
       <td *matCellDef="let unavailable" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="unavailable.id; else skeleton">{{unavailable.description}}</div>
         <ng-template #skeleton>
@@ -102,7 +102,7 @@
   </table>
   <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
 
-  <button color="accent" id="add-button" mat-fab matTooltip="{{ 'UNAVAILABLE.ADD.TITLE' | translate }}"
+  <button color="accent" id="add-button" mat-fab matTooltip="{{ 'UNAVAILABLE.TITLE' | translate }}"
           routerLink="/unavailable/add">
     <mat-icon>add</mat-icon>
   </button>
