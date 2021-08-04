@@ -78,6 +78,12 @@ export const reducer = (state = initialState, action: All): State => {
         isRefreshToken: true
       };
     }
+    case AuthActionTypes.redirect: {
+      return {
+        ...state,
+        isRefreshToken: false
+      };
+    }
     case AuthActionTypes.signupSuccess: {
       return {
         ...state,

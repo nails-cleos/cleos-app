@@ -6,6 +6,7 @@ import { AppState, selectAuthState } from '../store/app.states';
 import { Observable } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
+import * as fromActionsLogin from '../store/auth.actions';
 
 @Injectable({
   providedIn: 'root'
@@ -45,7 +46,10 @@ export class AuthGuardService implements CanActivate {
         this.snackBar.open(message, 'OK', {
           duration: 5000
         });
-        this.router.navigate(['redirect']);
+        this.store.dispatch(
+          new fromActionsLogin.Redirect()
+        );
+        this.router.navigate(['auth', 'redirect']);
         return false;
       }
     }

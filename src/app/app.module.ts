@@ -26,17 +26,6 @@ import { AngularFireAnalyticsModule } from '@angular/fire/analytics';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppMaterialModule } from './util/app-material.module';
-import { AuthModule } from './auth/auth.module';
-import { MainModule } from './main/main.module';
-import { DashModule } from './dash/dash.module';
-import { ProductModule } from './product/product.module';
-import { SharedModule } from './shared/shared.module';
-import { UserModule } from './user/user.module';
-import { CatalogueModule } from './catalogue/catalogue.module';
-import { UnavailableModule } from './unavailable/unavailable.module';
-import { DiscountModule } from './discount/discount.module';
-import { RoomModule } from './room/room.module';
-import { ReservationModule } from './reservation/reservation.module';
 
 // Providers
 import { httpInterceptorProviders } from './http-interceptors';
@@ -73,10 +62,6 @@ import { PaymentEffects } from './store/effects/payment.effects';
 
 // Components
 import { AppComponent } from './app.component';
-import { NavComponent } from './nav/nav.component';
-import { RedirectComponent } from './redirect/redirect.component';
-import { NotificationModule } from './notification/notification.module';
-import { NavModule } from './nav/nav.module';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
@@ -128,19 +113,6 @@ registerLocaleData(localeEs, 'es');
     AppMaterialModule,
     FlexLayoutModule,
     ReactiveFormsModule,
-    SharedModule,
-    NavModule,
-    AuthModule,
-    MainModule,
-    DashModule,
-    ProductModule,
-    UserModule,
-    CatalogueModule,
-    UnavailableModule,
-    DiscountModule,
-    RoomModule,
-    ReservationModule,
-    NotificationModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,
       registrationStrategy: 'registerWhenStable:30000'

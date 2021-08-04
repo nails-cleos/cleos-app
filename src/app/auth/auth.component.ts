@@ -69,6 +69,11 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscribe(): void {
     this.subscription = this.getState.subscribe((state) => {
       if (state.isAuthenticated) {
+        if (state.refresh) {
+          this.store.dispatch(
+            new fromActionsLogin.Redirect()
+          );
+        }
         this.router.navigate(['auth', 'redirect']);
       }
       if (!state.subErrors && (state.errorMessage || state.message)) {

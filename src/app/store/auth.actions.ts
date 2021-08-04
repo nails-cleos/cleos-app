@@ -4,6 +4,7 @@ export enum AuthActionTypes {
   login = '[Auth] Login',
   socialLogin = '[Auth] Social Login',
   refreshToken = '[Auth] Refresh token',
+  redirect = '[Auth] Redirect',
   loginSuccess = '[Auth] Login Success',
   loginFailure = '[Auth] Login Failure',
   signup = '[Auth] Signup',
@@ -36,6 +37,10 @@ export class RefreshToken implements Action {
 
   constructor(public payload: any) {
   }
+}
+
+export class Redirect implements Action {
+  readonly type = AuthActionTypes.redirect;
 }
 
 export class LoginSuccess implements Action {
@@ -111,6 +116,7 @@ export type All =
   | SocialLogin
   | LoginSuccess
   | RefreshToken
+  | Redirect
   | LoginFailure
   | SignUp
   | SignUpSuccess
