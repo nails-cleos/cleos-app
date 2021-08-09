@@ -191,6 +191,10 @@ export const formatDate = (date: Date, locale: string): string => date.toLocaleD
   day: 'numeric', month: 'short'
 }).replace(/ /g, '-').replace(/(?:^|\s|-)+\S/g, (c) => c.toUpperCase());
 
+export const formatDateTwoDigit = (date: Date, locale: string): string => date.toLocaleDateString(locale, {
+  day: '2-digit', month: '2-digit', year: '2-digit'
+});
+
 export const formatTime = (hour: number, minute: number): string => getTime(createDate(hour, minute));
 
 export const getNow = (): Date => new Date();

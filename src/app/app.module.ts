@@ -62,6 +62,7 @@ import { PaymentEffects } from './store/effects/payment.effects';
 
 // Components
 import { AppComponent } from './app.component';
+import { PromptUpdateService } from './services/prompt-update.service';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
@@ -138,7 +139,8 @@ registerLocaleData(localeEs, 'es');
       useValue: getAuthServiceConfigs()
     },
     MessagingService,
-    AsyncPipe
+    AsyncPipe,
+    PromptUpdateService
   ],
   bootstrap: [AppComponent],
   exports: [TranslateModule, AppMaterialModule]
@@ -146,10 +148,15 @@ registerLocaleData(localeEs, 'es');
 export class AppModule {
   constructor(swPush: SwPush) {
     firebase.analytics();
+    console.log(swPush.isEnabled)
     if (swPush.isEnabled) {
       navigator.serviceWorker
-        .ready
-        .then((registration) => firebase.messaging().useServiceWorker(registration));
+        .ready.then((registration) => firebase.messaging().useServiceWorker(registration));
+      swPush.notificationClicks.subscribe(
+        ({action, notification}) => {
+          console.log(action);
+          console.log(notification);
+        });
     }
   }
 }

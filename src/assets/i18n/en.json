@@ -429,6 +429,7 @@
       "REQUIRED": "End is <b>required</b>"
     },
     "ADDRESS": {
+      "FIELD": "Address",
       "NAME": "<span class='bold'>Address:</span> {{name}}",
       "DESCRIPTION": "<span class='bold'>Description:</span> {{description}}",
       "DISTANCE": {
@@ -493,6 +494,7 @@
       "COMPLETE": {
         "DESCRIPTION": "<span class='bold'>Description:</span> {{description}}",
         "TOTAL": "<span class='bold'>Total:</span>",
+        "PRICE": "<span class='bold'>Price:</span>",
         "DURATION": "<span class='bold'>Duration:</span> {{duration}}",
         "DURABILITY": "<span class='bold'>Durability:</span> {{durability}}"
       },

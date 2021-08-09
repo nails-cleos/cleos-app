@@ -93,7 +93,7 @@
       "type": "image/png"
     },
     {
-      "src": "assets/icons/icon-.png",
+      "src": "assets/icons/icon-384x384.png",
       "sizes": "384x384",
       "type": "image/png",
       "purpose": "any"
