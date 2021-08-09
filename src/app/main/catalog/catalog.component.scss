@@ -23,3 +23,8 @@ mat-card {
   z-index: 1 !important;
   cursor: pointer;
 }
+
+.mat-grid-tile .mat-figure {
+  justify-content: center !important;
+  align-items: center !important;
+}

@@ -129,6 +129,14 @@ a, u {
   margin: 10px 0 0 0;
 }
 
+.divider-padding {
+  padding: 10px 0 0 0;
+}
+
+.divider-padding-bottom {
+  padding-bottom: 10px;
+}
+
 @media all and (max-device-width: 812px) and (orientation: portrait) {
   #add-button {
     top: auto;

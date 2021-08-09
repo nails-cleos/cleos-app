@@ -23,8 +23,27 @@
         "files": [
           "/assets/**",
           "/*.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)"
+        ],
+        "urls": [
+          "https://fonts.googleapis.com/css?family=Material+Icons&display=swap",
+          "https://fonts.googleapis.com/css?family=Belleza:300,400,500&display=swap"
         ]
       }
     }
-  ]
+  ],
+  "dataGroups": [{
+    "name": "api-performance",
+    "urls": [
+      "https://www.espaciocleos.com/api/products",
+      "https://www.espaciocleos.com/api/products/*",
+      "https://www.espaciocleos.com/api/products/list",
+      "https://www.espaciocleos.com/api/products/list?customerId=*",
+      "https://www.espaciocleos.com/api/products/pages"
+    ],
+    "cacheConfig": {
+      "maxSize": 100,
+      "maxAge": "3d",
+      "strategy": "performance"
+    }
+  }]
 }

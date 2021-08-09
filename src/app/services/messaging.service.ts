@@ -64,11 +64,6 @@ export class MessagingService {
    * hook method when new notification received in foreground
    */
   receiveMessage(): void {
-    this.angularFireMessaging.messages.subscribe(
-      (payload) => {
-        console.log('new message received. ', payload);
-        // @ts-ignore
-        this.currentMessage.next(payload);
-      });
+    this.angularFireMessaging.messages.subscribe((payload: any) => this.currentMessage.next(payload));
   }
 }

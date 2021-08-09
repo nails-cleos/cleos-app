@@ -12,7 +12,10 @@
             <mat-card-subtitle>{{ upcoming.id }}</mat-card-subtitle>
           </mat-card-header>
           <ng-template #headSkeleton>
-            <div class="ssc-head-line"></div>
+            <div class="divider-padding-bottom">
+              <div class="ssc-head-line"></div>
+            </div>
+            <mat-divider></mat-divider>
           </ng-template>
           <mat-divider *ngIf="upcoming.id"></mat-divider>
           <mat-card-content>
@@ -34,7 +37,7 @@
                   <td class="right">{{ 'COMMON.ADDRESS.FIELD' | translate }}</td>
                   <td class="left">
                     <a [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + upcoming.room.address.name"
-                       target="_blank" rel="noreferrer">
+                       rel="noreferrer" target="_blank">
                       {{upcoming.room.address.name}}
                     </a>
                   </td>
@@ -84,7 +87,9 @@
             </button>
           </mat-card-actions>
           <ng-template #buttonSkeleton>
-            <div class="ssc-head-line"></div>
+            <div class="divider-padding">
+              <div class="ssc-head-line"></div>
+            </div>
           </ng-template>
         </mat-card>
         <ng-template #noUpcoming>
