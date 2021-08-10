@@ -16,10 +16,11 @@ import { EffectsModule } from '@ngrx/effects';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AsyncPipe, registerLocaleData } from '@angular/common';
 import { ServiceWorkerModule, SwPush } from '@angular/service-worker';
-import { AngularFireDatabaseModule } from '@angular/fire/database';
 import { AngularFireModule } from '@angular/fire';
-import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFireMessagingModule } from '@angular/fire/messaging';
+import firebase from 'firebase/app';
+import 'firebase/analytics';
+import 'firebase/messaging';
 import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
 import { AngularFireAnalyticsModule } from '@angular/fire/analytics';
 
@@ -119,8 +120,6 @@ registerLocaleData(localeEs, 'es');
       registrationStrategy: 'registerWhenStable:30000'
     }),
     AngularFireModule.initializeApp(environment.firebase),
-    AngularFireDatabaseModule,
-    AngularFireAuthModule,
     AngularFireMessagingModule,
     AngularFireAnalyticsModule
   ],
@@ -147,11 +146,10 @@ registerLocaleData(localeEs, 'es');
 })
 export class AppModule {
   constructor(swPush: SwPush, private router: Router) {
-    import('firebase/analytics');
+    firebase.analytics();
     if (swPush.isEnabled) {
       navigator.serviceWorker
-        .ready.then((registration) => import('firebase/messaging')
-        .then(messaging => messaging.useServiceWorker(registration)));
+        .ready.then((registration) => firebase.messaging().useServiceWorker(registration));
       swPush.notificationClicks.subscribe(({action, notification}) =>
         router.navigate(notification.data.onActionClick[action].url));
     }
