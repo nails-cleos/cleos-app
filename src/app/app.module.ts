@@ -63,6 +63,7 @@ import { PaymentEffects } from './store/effects/payment.effects';
 // Components
 import { AppComponent } from './app.component';
 import { PromptUpdateService } from './services/prompt-update.service';
+import { Router } from '@angular/router';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
@@ -146,17 +147,13 @@ registerLocaleData(localeEs, 'es');
   exports: [TranslateModule, AppMaterialModule]
 })
 export class AppModule {
-  constructor(swPush: SwPush) {
+  constructor(swPush: SwPush, private router: Router) {
     firebase.analytics();
-    console.log(swPush.isEnabled)
     if (swPush.isEnabled) {
       navigator.serviceWorker
         .ready.then((registration) => firebase.messaging().useServiceWorker(registration));
-      swPush.notificationClicks.subscribe(
-        ({action, notification}) => {
-          console.log(action);
-          console.log(notification);
-        });
+      swPush.notificationClicks.subscribe(({action, notification}) =>
+        router.navigate(notification.data.onActionClick[action].url));
     }
   }
 }
