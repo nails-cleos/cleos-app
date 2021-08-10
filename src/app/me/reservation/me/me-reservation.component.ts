@@ -197,7 +197,8 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     }
 
     this.startDate = newDate(this.eventSelected);
-    this.endDate = createNewDate(this.startDate, this.duration.hour, this.duration.minute);
+    this.endDate = createNewDate(this.startDate, this.startDate.getHours() + this.duration.hour,
+      this.startDate.getMinutes() + this.duration.minute);
 
     this.isPreview = true;
     this.myStepper.next();

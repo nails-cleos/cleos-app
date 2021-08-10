@@ -20,7 +20,6 @@ import { AngularFireDatabaseModule } from '@angular/fire/database';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFireMessagingModule } from '@angular/fire/messaging';
-import firebase from 'firebase';
 import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
 import { AngularFireAnalyticsModule } from '@angular/fire/analytics';
 
@@ -148,10 +147,11 @@ registerLocaleData(localeEs, 'es');
 })
 export class AppModule {
   constructor(swPush: SwPush, private router: Router) {
-    firebase.analytics();
+    import('firebase/analytics');
     if (swPush.isEnabled) {
       navigator.serviceWorker
-        .ready.then((registration) => firebase.messaging().useServiceWorker(registration));
+        .ready.then((registration) => import('firebase/messaging')
+        .then(messaging => messaging.useServiceWorker(registration)));
       swPush.notificationClicks.subscribe(({action, notification}) =>
         router.navigate(notification.data.onActionClick[action].url));
     }

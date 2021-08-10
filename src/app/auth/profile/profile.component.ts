@@ -9,7 +9,7 @@ import { fieldChange, valueChange } from '../../util/validators';
 import { Location } from '@angular/common';
 import { findFlag, flags, IFlag } from '../../util/flags';
 import { getUserImage, getUserNameInitials } from '../../util/helper';
-import { createDateFromString, createNewDate } from '../../util/dates';
+import { createDateFromString } from '../../util/dates';
 
 @Component({
   selector: 'app-profile',
