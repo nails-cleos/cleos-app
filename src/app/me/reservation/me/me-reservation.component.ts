@@ -278,6 +278,14 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.time = datetime.time;
   }
 
+  areEquals(datetime: any): boolean {
+    let result = false;
+    if (this.eventSelected) {
+      result = areEqualDate(this.eventSelected, datetime.date) && this.time === datetime.time;
+    }
+    return result;
+  }
+
   create(): void {
     const reservation: IReservation = new Reservation();
     reservation.customerId = this.customerId;
@@ -471,6 +479,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.time = getTime(date);
     this.room.setValue(reservation.room);
     this.date.setValue(date);
+    this.eventSelected = date;
     this.product.valueChanges.subscribe(value => {
       if (reservation.product.discount && reservation.product.discount.amount) {
         let discount;

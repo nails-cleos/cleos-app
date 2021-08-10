@@ -30,20 +30,5 @@
         ]
       }
     }
-  ],
-  "dataGroups": [{
-    "name": "api-performance",
-    "urls": [
-      "https://www.espaciocleos.com/api/products",
-      "https://www.espaciocleos.com/api/products/*",
-      "https://www.espaciocleos.com/api/products/list",
-      "https://www.espaciocleos.com/api/products/list?customerId=*",
-      "https://www.espaciocleos.com/api/products/pages"
-    ],
-    "cacheConfig": {
-      "maxSize": 100,
-      "maxAge": "3d",
-      "strategy": "performance"
-    }
-  }]
+  ]
 }

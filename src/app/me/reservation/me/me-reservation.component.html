@@ -130,7 +130,7 @@
       <section>
         <div class="button-row">
           <button (click)="selectDate(datetime)" *ngFor="let datetime of sortTime(available.value)"
-                  [color]="eventSelected === datetime.date && time === datetime.time ? 'primary' : undefined"
+                  [color]="areEquals(datetime) ? 'primary' : undefined"
                   class="large"
                   mat-raised-button>
             {{datetime.time}}
