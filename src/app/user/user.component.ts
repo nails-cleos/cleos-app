@@ -37,6 +37,7 @@ export class UserComponent implements OnInit, OnDestroy {
   firstName: FormControl = new FormControl();
   lastName: FormControl = new FormControl();
   phone: FormControl = new FormControl();
+  dob: FormControl = new FormControl();
 
   flagList: IFlag[] = flags();
 
@@ -74,6 +75,7 @@ export class UserComponent implements OnInit, OnDestroy {
     user.lastName = this.lastName.value;
     user.phone = this.phone.value;
     user.password = 'Ch4ng#';
+    user.dob = this.dob.value;
 
     this.store.dispatch(
       new fromActionsUser.SaveUser({user, role: this.role.value})
@@ -88,7 +90,8 @@ export class UserComponent implements OnInit, OnDestroy {
       lang: this.lang,
       firstName: this.firstName,
       lastName: this.lastName,
-      phone: this.phone
+      phone: this.phone,
+      dob: this.dob
     });
   }
 

@@ -1,7 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Availability, IAvailability, IAvailabilityDate } from '../../interfaces/room';
-import { timeTheme } from '../../util/theme';
 import { createDate, getTime } from '../../util/dates';
 
 @Component({
@@ -21,7 +20,6 @@ export class AvailabilityComponent implements OnChanges {
   startLunch: FormControl;
   endLunch: FormControl;
   checked!: boolean;
-  theme = timeTheme();
 
   constructor(private formBuilder: FormBuilder) {
     this.start = new FormControl('', [

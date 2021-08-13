@@ -24,8 +24,10 @@ import {
   getAvailability,
   getDiffDay,
   getNow,
-  getStartEndDay, greaterOrEqualsThan,
-  IDuration, isBetween,
+  getStartEndDay,
+  greaterOrEqualsThan,
+  IDuration,
+  isBetween,
   newDate,
   plusDay,
   startOfPeriod,
@@ -36,11 +38,11 @@ import { fillNotAvailable, getOverlapEvent, newEvent } from '../../util/event';
 import { Router } from '@angular/router';
 import { CalendarEvent, CalendarView } from 'angular-calendar';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { findStateColor, IState, stateColor } from '../../util/flags';
 import { IUserAll } from '../../interfaces/user';
 import { IUnavailableAll } from '../../interfaces/unavailable';
 import { getUserName } from '../../util/helper';
 import { addMonths } from 'date-fns';
+import { findStateColor, isDarkMode } from '../../util/theme';
 
 @Component({
   selector: 'app-calendar',
@@ -73,7 +75,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   prevBtnDisabled = false;
   nextBtnDisabled = false;
 
-  colors: IState[] = stateColor();
+  isDarkMode = false;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private router: Router, private breakpointObserver: BreakpointObserver) {
@@ -97,6 +99,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.store.select(selectAuthState).subscribe((state: any) => {
       const user: IUserAll = state.user;
       this.professionalId = user.id;
+      this.isDarkMode = isDarkMode(user.theme);
     });
     this.maxDate = addMonths(getNow(), MAX_RESERVATION_MONTH);
     this.dateOrViewChanged();
@@ -184,7 +187,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
           duration: formatTime(duration.hour, duration.minute)
         });
 
-        const color = findStateColor(it.state);
+        const color = findStateColor(it.state, this.isDarkMode);
         const event = newEvent(detail, color, start, end, '#000', `reservation/${it.id}`);
         if (event) {
           const calendar = this.calendar.get(rr.room.id);
@@ -271,7 +274,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
       duration: formatTime(duration.hour, duration.minute)
     });
 
-    const color = findStateColor('DEFAULT');
+    const color = findStateColor('DEFAULT', this.isDarkMode);
     const event = newEvent(detail, color, start, end, '#000', `unavailable/${id}`);
     if (event) {
       events = [...events, event];
@@ -295,7 +298,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
           const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
           const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
           calendar.events = calendar.events.concat(fillNotAvailable(unavailable, lunch, notWorking,
-            getDiffDay(this.maxDate, this.today), this.viewDate, sunday, saturday, week));
+            getDiffDay(this.maxDate, this.today), this.viewDate, sunday, saturday, week, this.isDarkMode));
         });
         state.data.forEach((value: IRoomReservation) => this.addUnavailableList(value));
       }

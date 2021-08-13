@@ -5,14 +5,6 @@
   text-align: center;
 }
 
-.row-is-canceled {
-  background-color: #ffb3b3;
-}
-
-.mat-card {
-  background-color: #fdf8f3;
-}
-
 .mat-card-header {
   justify-content: center;
 }
@@ -59,14 +51,10 @@
   left: 37%;
 }
 
-.paid {
-  box-shadow: 0 0 0 3px darkgreen, 0 0 0 2px darkgreen inset;
-  color: darkgreen;
+.stamp-paid {
   transform: rotate(-20deg);
 }
 
-.approved {
-  box-shadow: 0 0 0 3px #a06c3f, 0 0 0 2px #a06c3f inset;
-  color: #a06c3f;
+.stamp-approved {
   transform: rotate(20deg);
 }

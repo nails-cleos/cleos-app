@@ -43,14 +43,12 @@
               <div *ngIf="room" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
                 <mat-form-field appearance="fill" color="primary" style="margin-right: 12px;">
                   <mat-label>{{ 'UNAVAILABLE.DATE.FIELD' | translate }}</mat-label>
-                  <button matPrefix (click)="picker.open()" mat-icon-button>
+                  <button (click)="picker.open()" mat-icon-button matPrefix>
                     <mat-icon>today</mat-icon>
                   </button>
                   <label>
                     <input (dateChange)="setDate($event)" (focus)="picker.open()" [formControl]="startDate"
-                           [matDatepickerFilter]="myFilter"
-                           [matDatepicker]="picker" matInput
-                           required>
+                           [matDatepickerFilter]="myFilter" [matDatepicker]="picker" matInput required>
                   </label>
                   <mat-datepicker #picker touchUi></mat-datepicker>
                   <mat-error *ngIf="startDate.hasError('required')"
@@ -67,8 +65,8 @@
                            [ngxTimepicker]="time" matInput name="start_time" readonly required/>
                   </label>
                   <span matPrefix><mat-icon (click)="time.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
-                  <ngx-material-timepicker #time (timeSet)="setTime($event)" [minutesGap]="15"
-                                           [theme]="theme"></ngx-material-timepicker>
+                  <ngx-material-timepicker #time (timeSet)="setTime($event)"
+                                           [minutesGap]="15"></ngx-material-timepicker>
                   <mat-error *ngIf="startTime.hasError('required')"
                              [innerHTML]="'UNAVAILABLE.TIME.REQUIRED' | translate">
                   </mat-error>
@@ -82,7 +80,7 @@
                          name="duration" readonly required/>
                 </label>
                 <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
-                <ngx-material-timepicker #t [minutesGap]="15" [theme]="theme"></ngx-material-timepicker>
+                <ngx-material-timepicker #t [minutesGap]="15"></ngx-material-timepicker>
                 <mat-error *ngIf="duration.hasError('required')"
                            [innerHTML]="'UNAVAILABLE.DURATION.REQUIRED' | translate">
                 </mat-error>

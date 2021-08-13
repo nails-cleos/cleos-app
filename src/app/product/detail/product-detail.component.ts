@@ -7,7 +7,6 @@ import { AppState, selectProductState } from '../../store/app.states';
 import * as fromActionsProduct from '../../store/product.actions';
 import { fieldChange, valueChange } from '../../util/validators';
 import { IProduct, Product } from '../../interfaces/product';
-import { timeTheme } from '../../util/theme';
 import { convertDuration, createDate, getTime } from '../../util/dates';
 
 @Component({
@@ -22,7 +21,6 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   subscription: Subscription | undefined;
   getState: Observable<any>;
   errors: any = [];
-  theme = timeTheme();
 
   name: FormControl = new FormControl('', [
     Validators.required

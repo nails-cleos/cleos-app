@@ -24,26 +24,28 @@ import {
   createNewDate,
   Duration,
   formatTime,
-  getAvailability, getDiffDay,
+  getAvailability,
+  getDiffDay,
   getNow,
   getStartEndDay,
-  getTime, greaterOrEqualsThan,
-  IDuration, isBetween,
+  getTime,
+  greaterOrEqualsThan,
+  IDuration,
+  isBetween,
   newDate,
   plusDay
 } from '../util/dates';
 import { fillNotAvailable, getOverlapEvent, newEvent } from '../util/event';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DateAdapter } from '@angular/material/core';
-import { findStateColor } from '../util/flags';
 import { GeocoderResult } from '@agm/core';
 import { Role } from '../interfaces/token';
 import { IUnavailableAll } from '../interfaces/unavailable';
-import { timeTheme } from '../util/theme';
 import { DiscountType, IUserDiscount } from '../interfaces/discount';
 import { getFullUserName, getPriceDiscount, getUserName } from '../util/helper';
 import { transitionAnimation } from '../util/animation';
 import { addMonths } from 'date-fns';
+import { findStateColor, isDarkMode } from '../util/theme';
 
 @Component({
   selector: 'app-reservation',
@@ -121,9 +123,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   showTime = false;
   minDate: any;
   maxDate: any;
-  theme = timeTheme();
 
   isAdmin = false;
+  isDarkMode = false;
 
   productId: string | undefined;
 
@@ -159,6 +161,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       if (state.user) {
         const user: IUserAll = state.user;
         this.isAdmin = user.authorities.some(u => u.authority === Role.admin);
+        this.isDarkMode = isDarkMode(user.theme);
       }
     });
     this.customer.valueChanges.subscribe(() => {
@@ -301,7 +304,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
     this.events = this.events.concat(fillNotAvailable(unavailable, lunch, notWorking,
       diffDay > this.daysInWeek ? this.daysInWeek : diffDay,
-      date, sunday, saturday, week, true));
+      date, sunday, saturday, week, this.isDarkMode, true));
     this.viewDate = date;
     this.store.dispatch(
       new fromActionsReservation.SearchReservation({date: this.date.value, roomId: this.room.value.id})
@@ -326,7 +329,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       duration: formatTime(duration.hour, duration.minute)
     });
 
-    const event = newEvent(detail, findStateColor(state), start, end, '#000', id);
+    const event = newEvent(detail, findStateColor(state, this.isDarkMode), start, end, '#000', id);
 
     if (event) {
       let title;
@@ -512,7 +515,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           duration: formatTime(duration.hour, duration.minute)
         });
 
-        const color = findStateColor(it.state);
+        const color = findStateColor(it.state, this.isDarkMode);
         const event = newEvent(detail, color, start, end, '#000', it.id);
         if (event) {
           if (this.isEditing && this.reservation && this.reservation.id === it.id) {
@@ -589,7 +592,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       duration: formatTime(duration.hour, duration.minute)
     });
 
-    const color = findStateColor('DEFAULT');
+    const color = findStateColor('DEFAULT', this.isDarkMode);
     const event = newEvent(detail, color, start, end, '#000', `unavailable/${id}`);
     if (event) {
       this.events = [...this.events, event];
@@ -639,7 +642,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         } else if (this.reservation && this.date && this.myStepper.selectedIndex === 3) {
           let date: Date;
           if (this.start && this.start.value) {
-            const time = this.start.value.split(":");
+            const time = this.start.value.split(':');
             date = createNewDate(this.date.value, Number(time[0]), Number(time[1]));
           } else {
             date = createNewDate(this.date.value, this.date.value.getHours(), this.date.value.getMinutes());

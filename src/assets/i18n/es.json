@@ -99,6 +99,7 @@
     "SIGN_OUT": "Cerrar sesión",
     "SIGN_IN": "Ingresar",
     "HOME": "Principal",
+    "DARK_MODE": "Modo oscuro",
     "MINI_CARD": {
       "DURATION": "desde el mes pasado",
       "TOTAL_PRODUCT_SALES": "Ganancia total",
@@ -281,7 +282,9 @@
   "PROFILE": {
     "UPDATED": {
       "MESSAGE": "Usuario {{username}} actualizado",
-      "PHOTO": "Foto de perfil actualizada"
+      "PHOTO": "Foto de perfil actualizada",
+      "DARK_MODE_TRUE": "Modo oscuro activado",
+      "DARK_MODE_FALSE": "Modo oscuro desactivado"
     },
     "INCOMPLETE": "Completá todos los datos de tu perfil"
   },

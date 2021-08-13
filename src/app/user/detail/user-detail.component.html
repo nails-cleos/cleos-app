@@ -29,7 +29,7 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.EMAIL.FIELD' | translate }}</mat-label>
                 <label>
-                  <input [formControl]="email" autocomplete="username" matInput required>
+                  <input [formControl]="email" autocomplete="email" matInput required>
                 </label>
                 <mat-error *ngIf="email.hasError('email')">
                   {{ 'USER.EMAIL.VALID' | translate }}
@@ -55,13 +55,13 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.FIRST_NAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input [formControl]="firstName" autocomplete="firstName" matInput>
+                  <input [formControl]="firstName" autocomplete="given-name" matInput>
                 </label>
               </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.LAST_NAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input [formControl]="lastName" autocomplete="lastName" matInput>
+                  <input [formControl]="lastName" autocomplete="family-name" matInput>
                 </label>
               </mat-form-field>
               <mat-form-field appearance="fill">
@@ -72,6 +72,17 @@
                 <mat-error *ngIf="phone.hasError('validatePhoneNumber')">
                   {{ 'USER.PHONE.INVALID' | translate }}
                 </mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>{{ 'USER.DOB.FIELD' | translate }}</mat-label>
+                <button (click)="picker.open()" mat-icon-button matPrefix>
+                  <mat-icon>today</mat-icon>
+                </button>
+                <label>
+                  <input (focus)="picker.open()" [formControl]="dob" [matDatepicker]="picker" autocomplete="bday"
+                         matInput>
+                </label>
+                <mat-datepicker #picker startView="multi-year" touchUi></mat-datepicker>
               </mat-form-field>
             </div>
           </mat-card-content>

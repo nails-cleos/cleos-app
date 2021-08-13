@@ -19,9 +19,10 @@ export class AuthService {
     return this.performLogin(url, {username, password});
   }
 
-  public socialLogin(authToken: string, provider: string, code: string | undefined | null): Observable<Token> {
+  public socialLogin(authToken: string, provider: string, code: string | undefined | null,
+                     theme: string | undefined): Observable<Token> {
     const url = `${this.authUrl}/social/login`;
-    return this.performLogin(url, {token: authToken, provider, code});
+    return this.performLogin(url, {token: authToken, provider, code, theme});
   }
 
   public signUp(body: IUser): Observable<IUser> {

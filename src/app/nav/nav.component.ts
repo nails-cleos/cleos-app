@@ -17,9 +17,10 @@ import {
   selectUnavailableState,
   selectUserState
 } from '../store/app.states';
-import { IMenu, IUser, IUserAll } from '../interfaces/user';
+import { IMenu, IUser, IUserAll, User } from '../interfaces/user';
 import * as fromActionsLogin from '../store/auth.actions';
 import * as fromActionsNotification from '../store/notification.actions';
+import * as fromActionsUser from '../store/user.actions';
 import { INotification } from '../interfaces/notification';
 import { TranslateService } from '@ngx-translate/core';
 import { Role } from '../interfaces/token';
@@ -27,9 +28,11 @@ import { MessagingService } from '../services/messaging.service';
 import { environment } from '../../environments/environment';
 import { getUserImage, getUserName, getUserNameInitials } from '../util/helper';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatSidenav } from '@angular/material/sidenav';
 import { NavigationService } from '../services/navigation.service';
 import { TokenService } from '../services/token.service';
+import { CookieService } from 'ngx-cookie-service';
+import { OverlayContainer } from '@angular/cdk/overlay';
+import { getThemeName, isDarkMode, THEME } from '../util/theme';
 
 @Component({
   selector: 'app-nav',
@@ -69,9 +72,14 @@ export class NavComponent implements OnInit, OnDestroy {
   error: any;
   incomplete = false;
 
+  cssClass: string | undefined;
+  checked = false;
+
   constructor(public translate: TranslateService, private breakpointObserver: BreakpointObserver,
               private router: Router, private store: Store<AppState>, private messagingService: MessagingService,
-              private snackBar: MatSnackBar, private navigation: NavigationService, private tokenService: TokenService) {
+              private snackBar: MatSnackBar, private navigation: NavigationService, private tokenService: TokenService,
+              private cookieService: CookieService, private overlayContainer: OverlayContainer) {
+    this.cssClass = cookieService.get(THEME);
     this.language = this.translate.currentLang;
     this.getState = this.store.select(selectAuthState);
     this.getNotificationState = this.store.select(selectNotificationState);
@@ -117,10 +125,23 @@ export class NavComponent implements OnInit, OnDestroy {
     }
   }
 
-  navigate(menu: IMenu, drawer?: MatSidenav): void {
+  navigate(menu: IMenu, drawer?: any): void {
     drawer?.toggle();
     this.error = undefined;
     this.router.navigate([menu.path]);
+  }
+
+  setTheme(checked: boolean): void {
+    const theme: string = getThemeName(checked);
+    this.resetTheme(theme);
+    this.cookieService.set(THEME, theme);
+    const user: IUser = new User();
+    user.theme = theme;
+    const redirectUrl = this.router.url;
+    const message = this.translate.instant(`PROFILE.UPDATED.DARK_MODE_${checked.toString().toUpperCase()}`);
+    this.store.dispatch(
+      new fromActionsUser.UpdateUser({user, redirectUrl, message})
+    );
   }
 
   private selectStore(states: any[]): void {
@@ -149,6 +170,9 @@ export class NavComponent implements OnInit, OnDestroy {
         this.getNotifications();
         const user: IUserAll = state.user;
         this.currentUser = user;
+        const theme = getThemeName(isDarkMode(this.currentUser.theme));
+        this.resetTheme(theme);
+        this.cookieService.set(THEME, theme);
         this.isProfessional = user.authorities.some(u => u.authority === Role.professional);
         this.menuItems = state.menus;
         this.canChangePassword = user?.provider === 'LOCAL';
@@ -215,5 +239,19 @@ export class NavComponent implements OnInit, OnDestroy {
         new fromActionsNotification.GetAllPaged(payload)
       );
     }
+  }
+
+  private resetTheme(theme: string): void {
+    const body = document.getElementsByTagName('body')[0];
+
+    if (this.cssClass) {
+      body.classList.remove(this.cssClass);
+      this.overlayContainer.getContainerElement().classList.remove(this.cssClass);
+    }
+
+    this.cssClass = theme;
+    body.classList.add(this.cssClass);
+    this.overlayContainer.getContainerElement().classList.add(this.cssClass);
+    this.checked = isDarkMode(theme);
   }
 }

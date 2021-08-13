@@ -84,8 +84,7 @@
                    matInput name="start" readonly/>
           </label>
           <span matPrefix><mat-icon (click)="tStart.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
-          <ngx-material-timepicker #tStart (timeSet)="timeChange($event)" [minutesGap]="15"
-                                   [theme]="theme"></ngx-material-timepicker>
+          <ngx-material-timepicker #tStart (timeSet)="timeChange($event)" [minutesGap]="15"></ngx-material-timepicker>
           <mat-error *ngIf="start.hasError('required')"
                      [innerHTML]="'RESERVATION.START.REQUIRED' | translate">
           </mat-error>
@@ -135,6 +134,7 @@
 
 <ng-template #stepFour>
   <mwl-calendar-week-view
+    (beforeViewRender)="beforeMonthViewRender($event)"
     (hourSegmentClicked)="segmentClick($event.date, 'CREATED')"
     [dayEndHour]="dayEndHour"
     [dayEndMinute]="dayEndMinute"
@@ -144,7 +144,6 @@
     [events]="events"
     [hourSegments]="hourSegments"
     [locale]="locale"
-    (beforeViewRender)="beforeMonthViewRender($event)"
     [viewDate]="viewDate"></mwl-calendar-week-view>
   <mat-error *ngIf="this.errors['schedule']" [innerHTML]="'RESERVATION.SCHEDULE.REQUIRED' | translate"
              class="divider"></mat-error>
@@ -185,7 +184,7 @@
           <div mat-line>{{ 'COMMON.ADDRESS.FIELD' | translate}}</div>
           <div mat-line>
             <a [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + room.value.address.name"
-               target="_blank" rel="noreferrer">
+               rel="noreferrer" target="_blank">
               {{room.value.address.name}}
             </a>
           </div>

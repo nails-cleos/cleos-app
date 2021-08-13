@@ -11,7 +11,7 @@
           </ng-template>
         </mat-card-header>
         <div class="center">
-          <div *ngIf="user; else circle" [ngClass]="{'background': !image}" class="hoverable" mat-card-avatar>
+          <div *ngIf="user; else circle" [ngClass]="{'profile-background': !image}" class="hoverable" mat-card-avatar>
             <label [ngClass]="{'pointer': canChange}" for="fileInput">
               <img *ngIf="image; else showInitialsBlock" alt="profile" class="image"
                    src="{{image}}">
@@ -19,9 +19,9 @@
                 <div class="initials">{{ initials | uppercase }}</div>
               </ng-template>
               <div *ngIf="canChange" class="hover-text">Choose file</div>
-              <div *ngIf="canChange" class="background"></div>
-              <input (change)="onSelectFile($event.target)" *ngIf="canChange" accept="image/*" id="fileInput"
-                     type='file'>
+              <div *ngIf="canChange" class="profile-background"></div>
+              <input (change)="onSelectFile($event.target)" *ngIf="canChange" accept="image/*" autocomplete="photo"
+                     id="fileInput" type='file'>
             </label>
           </div>
         </div>
@@ -64,8 +64,8 @@
                       class="margin-right-eight" matPrefix></span>
                 <mat-select #select [formControl]="langValue" required>
                   <mat-option *ngFor="let lang of flagList" [value]="lang">
-                    <span [class]="'flag-icon  flag-icon-squared flag-icon-' + lang.icon"></span>
-                    {{ 'COMMON.LANG.' + lang.text | translate }}
+                    <span [class]="'flag-icon  flag-icon-squared flag-icon-' + lang.icon"
+                          autocomplete="language"></span>{{ 'COMMON.LANG.' + lang.text | translate }}
                   </mat-option>
                 </mat-select>
                 <mat-error [innerHTML]="'USER.LANG.REQUIRED' | translate">
@@ -86,7 +86,8 @@
                   <mat-icon>today</mat-icon>
                 </button>
                 <label>
-                  <input (focus)="picker.open()" [formControl]="dob" [matDatepicker]="picker" matInput>
+                  <input (focus)="picker.open()" [formControl]="dob" [matDatepicker]="picker" autocomplete="bday"
+                         matInput>
                 </label>
                 <mat-datepicker #picker startView="multi-year" touchUi></mat-datepicker>
                 <mat-error *ngIf="errors['dob']">

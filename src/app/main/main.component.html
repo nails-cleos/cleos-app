@@ -27,6 +27,17 @@
         <span>{{'MAIN.SECTION.AUTH' | translate }}</span>
       </button>
     </ng-template>
+    <button [matMenuTriggerFor]="settingMenu" color="accent" mat-icon-button>
+      <mat-icon>settings</mat-icon>
+    </button>
+    <mat-menu #settingMenu="matMenu">
+      <mat-nav-list>
+        <mat-list-item>
+            <mat-slide-toggle (change)="setTheme($event.checked)" [checked]="checked"
+                              mat-line>{{'DASHBOARD.DARK_MODE' | translate }}</mat-slide-toggle>
+        </mat-list-item>
+      </mat-nav-list>
+    </mat-menu>
   </span>
   <ng-template #menuButton>
     <button [matMenuTriggerFor]="menuLogged" color="accent" mat-icon-button>
@@ -58,6 +69,11 @@
           <mat-icon mat-list-icon>collections</mat-icon>
           <div mat-line>{{'MAIN.SECTION.CATALOG' | translate }}</div>
         </a>
+        <mat-divider></mat-divider>
+        <mat-list-item>
+          <mat-slide-toggle (change)="setTheme($event.checked)" [checked]="checked"
+                            mat-line>{{'DASHBOARD.DARK_MODE' | translate }}</mat-slide-toggle>
+        </mat-list-item>
         <mat-divider></mat-divider>
         <a (click)="redirect()" *ngIf="isAuthenticated; else login" [routerLinkActive]="['active']"
            mat-list-item>

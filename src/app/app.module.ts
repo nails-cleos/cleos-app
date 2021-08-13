@@ -26,6 +26,7 @@ import { AngularFireAnalyticsModule } from '@angular/fire/analytics';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppMaterialModule } from './util/app-material.module';
+import { Router } from '@angular/router';
 
 // Providers
 import { httpInterceptorProviders } from './http-interceptors';
@@ -37,12 +38,14 @@ import { PaginatorI18n } from './util/paginator';
 import { TranslationLoaderResolver } from './util/translation.resolver';
 import localeEn from '@angular/common/locales/en';
 import localeEs from '@angular/common/locales/es';
+import { CookieService } from 'ngx-cookie-service';
 
 // Services
 import { AuthGuardService } from './services/auth-guard.service';
 import { TokenService } from './services/token.service';
 import { NavigationService } from './services/navigation.service';
 import { MessagingService } from './services/messaging.service';
+import { PromptUpdateService } from './services/prompt-update.service';
 
 // Reducers
 import { reducers } from './store/app.states';
@@ -62,8 +65,6 @@ import { PaymentEffects } from './store/effects/payment.effects';
 
 // Components
 import { AppComponent } from './app.component';
-import { PromptUpdateService } from './services/prompt-update.service';
-import { Router } from '@angular/router';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
@@ -139,7 +140,8 @@ registerLocaleData(localeEs, 'es');
     },
     MessagingService,
     AsyncPipe,
-    PromptUpdateService
+    PromptUpdateService,
+    CookieService
   ],
   bootstrap: [AppComponent],
   exports: [TranslateModule, AppMaterialModule]

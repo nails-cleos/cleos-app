@@ -50,7 +50,7 @@
                          readonly/>
                 </label>
                 <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
-                <ngx-material-timepicker #t [minutesGap]="15" [theme]="theme"></ngx-material-timepicker>
+                <ngx-material-timepicker #t [minutesGap]="15"></ngx-material-timepicker>
                 <mat-error *ngIf="duration.hasError('required')"
                            [innerHTML]="'PRODUCT.DURATION.REQUIRED' | translate">
                 </mat-error>

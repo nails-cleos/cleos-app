@@ -17,10 +17,9 @@
     left: 0;
   }
 
-  h3 {
+  .catalogue-text {
     font-size: 20px;
     font-weight: 600;
-    color: #38424c;
   }
 }
 
@@ -47,14 +46,12 @@
       align-self: flex-end;
     }
 
-
     display: flex;
     flex-grow: 1;
 
     .name {
       font-size: 14px;
       font-weight: 500;
-      color: #353f4a;
       margin: 0;
     }
 

@@ -79,6 +79,19 @@
                 </mat-error>
                 <mat-error *ngIf="errors['phone']">{{errors['phone']}}</mat-error>
               </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>{{ 'USER.DOB.FIELD' | translate }}</mat-label>
+                <button (click)="picker.open()" mat-icon-button matPrefix>
+                  <mat-icon>today</mat-icon>
+                </button>
+                <label>
+                  <input (focus)="picker.open()" [formControl]="dob" [matDatepicker]="picker" matInput>
+                </label>
+                <mat-datepicker #picker startView="multi-year" touchUi></mat-datepicker>
+                <mat-error *ngIf="errors['dob']">
+                  {{errors['dob']}}
+                </mat-error>
+              </mat-form-field>
             </div>
           </mat-card-content>
           <mat-card-actions>

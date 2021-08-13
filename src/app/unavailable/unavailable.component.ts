@@ -20,7 +20,6 @@ import {
   newDate
 } from '../util/dates';
 import { IRoomAll } from '../interfaces/room';
-import { timeTheme } from '../util/theme';
 import { getUserName } from '../util/helper';
 import { Router } from '@angular/router';
 
@@ -38,7 +37,6 @@ export class UnavailableComponent implements OnInit, OnDestroy {
   minTime: any;
   maxTime: any;
   showDuration = false;
-  theme = timeTheme();
 
   professionals: IUserAll[] | undefined;
   room: IRoomAll | undefined;

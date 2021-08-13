@@ -88,14 +88,14 @@ export class UserEffects {
 
   update$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.updateUser)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.userService.updateMe(payload).pipe(
+    switchMap((payload: any) => this.userService.updateMe(payload.user).pipe(
       switchMap((response: any) => {
         const message = this.translate.instant('PROFILE.UPDATED.MESSAGE', {username: response.user.username});
         return of(new LoginSuccess({
           response, queryParams: {
-            returnUrl: 'auth/profile'
+            returnUrl: payload.redirectUrl
           }
-        }), new fromActionsUser.UserSaveSuccess({message}));
+        }), new fromActionsUser.UserSaveSuccess({message: payload.message ? payload.message : message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
     ))
   ));

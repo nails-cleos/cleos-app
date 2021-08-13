@@ -1,9 +1,9 @@
-<mat-sidenav-container>
-  <mat-sidenav #drawer [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
-               [mode]="(isHandset$ | async) ? 'over' : 'side'"
-               [opened]="(isHandset$ | async) === false" class="sidenav" fixedInViewport>
-    <mat-card style="padding: 16px 0 0 0">
-      <mat-card-header *ngIf="currentUser; else headerNoLogged" style="padding-left: 16px">
+<mat-drawer-container [hasBackdrop]="(isHandset$ | async)" autosize>
+  <mat-drawer #drawer [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+              [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="(isHandset$ | async) === false"
+              class="sidenav">
+    <mat-card class="mat-elevation-z0">
+      <mat-card-header *ngIf="currentUser; else headerNoLogged">
         <div class="circle" mat-card-avatar>
           <img *ngIf="image; else showInitialsBlock" alt="profile" src="{{image}}">
           <ng-template #showInitialsBlock>
@@ -16,7 +16,7 @@
       <mat-card-content *ngIf="currentUser; else contentNoLogged">
         <mat-nav-list>
           <mat-divider></mat-divider>
-          <div *ngFor="let menu of menuItems; last as last">
+          <div *ngFor="let menu of menuItems">
             <a (click)="navigate(menu, drawer)" *ngIf="isHandset$ | async; else showMenu"
                [routerLinkActive]="['active']" [routerLink]="'/'+menu.path" mat-list-item>
               <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>
@@ -29,12 +29,12 @@
                 <div mat-line>{{menu.name}}</div>
               </a>
             </ng-template>
-            <mat-divider *ngIf="!last"></mat-divider>
+            <mat-divider></mat-divider>
           </div>
         </mat-nav-list>
       </mat-card-content>
       <ng-template #headerNoLogged>
-        <mat-card-header style="padding-left: 16px">
+        <mat-card-header>
           <div class="circle" mat-card-avatar>
             <img alt="profile" src="../../assets/icons/icon-512x512.png">
           </div>
@@ -62,8 +62,8 @@
         </mat-card-content>
       </ng-template>
     </mat-card>
-  </mat-sidenav>
-  <mat-sidenav-content>
+  </mat-drawer>
+  <mat-drawer-content>
     <mat-toolbar color="primary">
       <button (click)="drawer.toggle()" *ngIf="isHandset$ | async"
               aria-label="Toggle sidenav" mat-icon-button type="button">
@@ -131,10 +131,9 @@
           </button>
         </ng-template>
 
-        <button [matMenuTriggerFor]="menuLogged" [ngClass]="{'badge-padding': incomplete}" color="accent"
-                mat-icon-button>
-          <mat-icon matBadgeColor="warn" [matBadgeHidden]="!incomplete"
-                    [matBadge]="'*'">person_pin</mat-icon>
+        <button [matMenuTriggerFor]="menuLogged" [ngClass]="{'badge-padding': incomplete}" mat-icon-button>
+          <mat-icon [matBadgeHidden]="!incomplete" [matBadge]="'*'" matBadgeColor="warn">person_pin
+          </mat-icon>
         </button>
         <mat-menu #menuLogged="matMenu">
           <mat-nav-list>
@@ -148,6 +147,11 @@
               <div mat-line>{{'DASHBOARD.PROFILE' | translate }}</div>
               <span *ngIf="incomplete" class="dot"></span>
             </a>
+            <mat-divider></mat-divider>
+            <mat-list-item>
+              <mat-slide-toggle (change)="setTheme($event.checked)" [checked]="checked"
+                                mat-line>{{'DASHBOARD.DARK_MODE' | translate }}</mat-slide-toggle>
+            </mat-list-item>
             <mat-divider></mat-divider>
             <a *ngIf="canChangePassword" [routerLink]="'/auth/change-password'" mat-list-item>
               <mat-icon mat-list-icon>mode_edit</mat-icon>
@@ -177,5 +181,5 @@
         <app-error [error]="error"></app-error>
       </ng-template>
     </div>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+  </mat-drawer-content>
+</mat-drawer-container>
