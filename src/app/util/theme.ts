@@ -1,3 +1,6 @@
+import { OverlayContainer } from '@angular/cdk/overlay';
+import { CookieService } from 'ngx-cookie-service';
+
 const dark = 'dark-theme';
 const light = 'light-theme';
 
@@ -32,13 +35,33 @@ const stateColor = (isDark: boolean): IState[] => [{
   color: isDark ? '#ffb3b3' : '#f08080' // warn-lighter
 }];
 
+export const findStateColor = (state: string, isDark: boolean): string => {
+  const value = stateColor(isDark).find(color => color.name === state);
+  return value ? value.color : findStateColor('DEFAULT', isDark);
+};
+
 export const THEME = 'theme';
 
 export const isDarkMode = (theme: string | undefined): boolean => theme === dark;
 
 export const getThemeName = (isDark: boolean): string => isDark ? dark : light;
 
-export const findStateColor = (state: string, isDark: boolean): string => {
-  const value = stateColor(isDark).find(color => color.name === state);
-  return value ? value.color : findStateColor('DEFAULT', isDark);
+export const getTheme = (theme: string | undefined): string => theme === dark ? dark : light;
+
+export const resetTheme = (theme: string | undefined, cssClass: string | undefined,
+                           overlayContainer: OverlayContainer, cookieService: CookieService): string => {
+  const body = document.getElementsByTagName('body')[0];
+
+  if (cssClass) {
+    body.classList.remove(cssClass);
+    overlayContainer.getContainerElement().classList.remove(cssClass);
+  }
+
+  cssClass = getTheme(theme ? theme : cookieService.get(THEME));
+  body.classList.add(cssClass);
+  overlayContainer.getContainerElement().classList.add(cssClass);
+
+  cookieService.set(THEME, cssClass);
+
+  return cssClass;
 };

@@ -13,7 +13,7 @@ import * as fromActionsUser from '../store/user.actions';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { CookieService } from 'ngx-cookie-service';
 import { TranslateService } from '@ngx-translate/core';
-import { getThemeName, isDarkMode, THEME } from '../util/theme';
+import { getThemeName, isDarkMode, resetTheme, THEME } from '../util/theme';
 
 @Component({
   selector: 'app-main',
@@ -33,12 +33,11 @@ export class MainComponent {
   constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
               private viewportScroller: ViewportScroller, private router: Router, private translate: TranslateService,
               private overlayContainer: OverlayContainer, private cookieService: CookieService) {
-    this.checked = cookieService.get(THEME) === 'dark-theme';
+    this.checked = isDarkMode(cookieService.get(THEME));
     this.store.select(selectAuthState).subscribe((state: any) => {
       this.isAuthenticated = state.isAuthenticated;
-      if (this.isAuthenticated && state.user.theme) {
-        this.resetTheme(state.user.theme);
-      }
+      this.resetTheme(state.user?.theme);
+      this.checked = isDarkMode(cookieService.get(THEME));
     });
   }
 
@@ -57,7 +56,6 @@ export class MainComponent {
   setTheme(checked: boolean): void {
     const theme: string = getThemeName(checked);
     this.resetTheme(theme);
-    this.cookieService.set(THEME, theme);
     if (this.isAuthenticated) {
       const user: IUser = new User();
       user.theme = theme;
@@ -69,17 +67,7 @@ export class MainComponent {
     }
   }
 
-  private resetTheme(theme: string): void {
-    const body = document.getElementsByTagName('body')[0];
-
-    if (this.cssClass) {
-      body.classList.remove(this.cssClass);
-      this.overlayContainer.getContainerElement().classList.remove(this.cssClass);
-    }
-
-    this.cssClass = theme;
-    body.classList.add(this.cssClass);
-    this.overlayContainer.getContainerElement().classList.add(this.cssClass);
-    this.checked = isDarkMode(theme);
+  private resetTheme(theme?: string): void {
+    this.cssClass = resetTheme(theme, this.cssClass, this.overlayContainer, this.cookieService);
   }
 }

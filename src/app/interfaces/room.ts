@@ -61,13 +61,3 @@ export class Room implements IRoom {
     this.availabilities = [];
   }
 }
-
-export class Address implements IAddress {
-  name: string;
-  location: ILocation;
-
-  constructor(name: string, location: ILocation) {
-    this.name = name;
-    this.location = location;
-  }
-}

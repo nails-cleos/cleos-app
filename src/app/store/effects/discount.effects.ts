@@ -31,7 +31,7 @@ export class DiscountEffects {
 
   getMyReferrals$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDiscount.DiscountActionTypes.getReferrals)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.discountService.getReferrals().pipe(
+    switchMap(() => this.discountService.getReferrals().pipe(
       switchMap((response: any) => of(new fromActionsDiscount.ReferralSuccess(response))),
       catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({error: err.error})))
     ))

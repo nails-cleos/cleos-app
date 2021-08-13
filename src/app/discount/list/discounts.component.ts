@@ -25,7 +25,7 @@ import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material
 import * as fromActionsUser from '../../store/user.actions';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { map, startWith } from 'rxjs/operators';
-import { getFullUserName, getUserName } from '../../util/helper';
+import { getFullUserName} from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({

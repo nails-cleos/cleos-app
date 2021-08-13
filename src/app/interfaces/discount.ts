@@ -1,5 +1,4 @@
-import { animate, style, transition, trigger } from '@angular/animations';
-import { IUser, IUserAll } from './user';
+import { IUserAll } from './user';
 
 export enum DiscountType {
   money = 'MONEY',

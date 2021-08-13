@@ -26,10 +26,6 @@ export class UnavailableService {
     return this.http.get<IUnavailable[]>(`${this.url}/pages`, {params});
   }
 
-  public getAllUnavailables(): Observable<IUnavailable[]> {
-    return this.http.get<IUnavailable[]>(this.url);
-  }
-
   public getById(id: string | null): Observable<IUnavailable | undefined> {
     const url = `${this.url}/${id}`;
     return this.http.get<IUnavailable>(url);

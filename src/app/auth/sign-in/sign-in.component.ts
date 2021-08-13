@@ -5,8 +5,6 @@ import { IUser } from '../../interfaces/user';
 import { AppState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute } from '@angular/router';
-import { CookieService } from 'ngx-cookie-service';
-import { THEME } from '../../util/theme';
 
 @Component({
   selector: 'app-sign-in',

@@ -32,7 +32,7 @@ import { NavigationService } from '../services/navigation.service';
 import { TokenService } from '../services/token.service';
 import { CookieService } from 'ngx-cookie-service';
 import { OverlayContainer } from '@angular/cdk/overlay';
-import { getThemeName, isDarkMode, THEME } from '../util/theme';
+import { getThemeName, isDarkMode, resetTheme, THEME } from '../util/theme';
 
 @Component({
   selector: 'app-nav',
@@ -79,7 +79,7 @@ export class NavComponent implements OnInit, OnDestroy {
               private router: Router, private store: Store<AppState>, private messagingService: MessagingService,
               private snackBar: MatSnackBar, private navigation: NavigationService, private tokenService: TokenService,
               private cookieService: CookieService, private overlayContainer: OverlayContainer) {
-    this.cssClass = cookieService.get(THEME);
+    this.checked = isDarkMode(cookieService.get(THEME));
     this.language = this.translate.currentLang;
     this.getState = this.store.select(selectAuthState);
     this.getNotificationState = this.store.select(selectNotificationState);
@@ -134,7 +134,6 @@ export class NavComponent implements OnInit, OnDestroy {
   setTheme(checked: boolean): void {
     const theme: string = getThemeName(checked);
     this.resetTheme(theme);
-    this.cookieService.set(THEME, theme);
     const user: IUser = new User();
     user.theme = theme;
     const redirectUrl = this.router.url;
@@ -170,9 +169,8 @@ export class NavComponent implements OnInit, OnDestroy {
         this.getNotifications();
         const user: IUserAll = state.user;
         this.currentUser = user;
-        const theme = getThemeName(isDarkMode(this.currentUser.theme));
-        this.resetTheme(theme);
-        this.cookieService.set(THEME, theme);
+        this.checked = isDarkMode(this.currentUser.theme);
+        this.resetTheme(this.currentUser.theme);
         this.isProfessional = user.authorities.some(u => u.authority === Role.professional);
         this.menuItems = state.menus;
         this.canChangePassword = user?.provider === 'LOCAL';
@@ -241,17 +239,7 @@ export class NavComponent implements OnInit, OnDestroy {
     }
   }
 
-  private resetTheme(theme: string): void {
-    const body = document.getElementsByTagName('body')[0];
-
-    if (this.cssClass) {
-      body.classList.remove(this.cssClass);
-      this.overlayContainer.getContainerElement().classList.remove(this.cssClass);
-    }
-
-    this.cssClass = theme;
-    body.classList.add(this.cssClass);
-    this.overlayContainer.getContainerElement().classList.add(this.cssClass);
-    this.checked = isDarkMode(theme);
+  private resetTheme(theme?: string): void {
+    this.cssClass = resetTheme(theme, this.cssClass, this.overlayContainer, this.cookieService);
   }
 }

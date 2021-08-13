@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { GeocoderResult, GeocoderStatus, LatLng, MapsAPILoader } from '@agm/core';
+import { GeocoderResult, GeocoderStatus, MapsAPILoader } from '@agm/core';
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { map, switchMap, tap } from 'rxjs/operators';
