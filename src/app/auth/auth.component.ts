@@ -6,6 +6,8 @@ import { AppState, selectAuthState } from '../store/app.states';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { THEME } from '../util/theme';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-auth',
@@ -22,7 +24,7 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   extras: any;
 
   constructor(private socialService: SocialAuthService, private store: Store<AppState>, private route: ActivatedRoute,
-              private snackBar: MatSnackBar, private router: Router) {
+              private snackBar: MatSnackBar, private router: Router, private cookieService: CookieService) {
     this.getState = this.store.select(selectAuthState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
   }
@@ -54,6 +56,7 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
       this.store.dispatch(
         new fromActionsLogin.SocialLogin({
           socialUser,
+          theme: this.cookieService.get(THEME),
           code: this.code,
           queryParams: this.route.snapshot.queryParams,
           extras: this.extras
@@ -68,7 +71,7 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe((state) => {
-      if (state.isAuthenticated && !state.redirect) {
+      if (state.isAuthenticated && !state.redirect && this.router.url.indexOf('returnUrl') === -1) {
         this.store.dispatch(
           new fromActionsLogin.Redirect()
         );

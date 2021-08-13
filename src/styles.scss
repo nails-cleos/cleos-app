@@ -1,15 +1,16 @@
-@use "sass:math";
+@use 'sass:math';
 
 @import 'node_modules/@angular/material/theming';
-@import "src/theme";
-@import "node_modules/skeleton-screen-css";
+@import 'src/theme';
+@import 'node_modules/skeleton-screen-css';
+@import 'styles-theme';
 
 @import 'node_modules/ngx-sharebuttons/themes/material/material-dark-theme';
 @import 'node_modules/ngx-sharebuttons/themes/modern/modern-light-theme';
 @import 'node_modules/ngx-sharebuttons/themes/circles/circles-dark-theme';
 
 $flag-icon-css-path: '~flag-icon-css/flags' !default;
-@import "node_modules/flag-icon-css/sass/flag-icon";
+@import 'node_modules/flag-icon-css/sass/flag-icon';
 
 html, body {
   height: 100%;
@@ -18,12 +19,11 @@ html, body {
 body {
   margin: 0 0 60px 0;
   height: 100vh;
-  font-family: Belleza, "Helvetica Neue", sans-serif;
-  background-color: #fafafa;
+  font-family: Bellefair, "Helvetica Neue", sans-serif;
 }
 
 @font-face {
-  font-family: Belleza, "Helvetica Neue", sans-serif;
+  font-family: Bellefair, 'Helvetica Neue', sans-serif !important;
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -49,7 +49,6 @@ mat-header-cell, mat-cell {
   justify-content: center;
   border-bottom-width: 1px;
   border-bottom-style: solid;
-  border-bottom-color: lightgrey;
 }
 
 /* offsets the header by the same amount of size/padding the sort button occupies */
@@ -58,7 +57,7 @@ mat-header-cell, mat-cell {
 }
 
 .mat-row, .mat-header-row {
-  border-bottom-width: 0px;
+  border-bottom-width: 0;
 }
 
 table {
@@ -67,14 +66,6 @@ table {
 
 mat-table {
   overflow-x: scroll;
-}
-
-tr.row:not(.expanded-row):hover {
-  background: whitesmoke;
-}
-
-tr.row:not(.expanded-row):active {
-  background: #efefef;
 }
 
 .row td {
@@ -197,7 +188,6 @@ a, u {
 .dot {
   height: 10px;
   width: 10px;
-  background-color: red;
   border-radius: 50%;
   display: inline-block;
 }
@@ -226,7 +216,6 @@ a, u {
 }
 
 pre {
-  background-color: red;
   padding: 15px;
 }
 
@@ -255,13 +244,12 @@ pre {
 
 .strikethrough:before {
   position: absolute;
-  content: "";
+  content: '';
   left: 0;
   top: 50%;
   right: 0;
   border-top: 2px solid;
   border-color: inherit;
-  color: red;
 
   -webkit-transform: rotate(-5deg);
   -moz-transform: rotate(-5deg);
@@ -276,20 +264,16 @@ pre {
   animation-fill-mode: forwards;
 }
 
-#search-box {
-  border: 1px solid #b3b3b3;
+fieldset {
+  border: 1px solid;
   border-radius: 25px;
   position: relative;
   margin: 10px 0 10px 0;
 }
 
-#search-label {
-  background-color: #fafafa;
-  position: absolute;
-  top: -10px;
-  left: 30px;
-  text-align: center;
-  padding: 0 20px;
+legend {
+  margin-left: 15px;
+  left: 50px;
 }
 
 .content {
@@ -304,12 +288,11 @@ pre {
 
   &::before {
     position: fixed;
-    content: "";
+    content: '';
     width: 100%;
     height: 100%;
     left: 0;
     z-index: 99;
-    background: rgba(235, 235, 235, 0.7);
     margin-top: -20px;
   }
 }
@@ -319,7 +302,6 @@ pre {
 }
 
 .cal-disabled {
-  background-color: #eee;
   pointer-events: none;
 }
 

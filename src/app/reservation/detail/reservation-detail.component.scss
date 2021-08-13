@@ -21,24 +21,3 @@
     position: fixed;
   }
 }
-
-.approved {
-  background-color: rgba(0, 158, 227, 0.4);;
-}
-
-.in_process {
-  background-color: rgba(255, 119, 51, 0.4);
-}
-
-.rejected {
-  background-color: rgba(242, 61, 79, 0.4);
-}
-
-::ng-deep .mat-blue {
-  background-color: #009ee3;
-}
-
-::ng-deep .mat-green {
-  background-color: #25D366;
-  color: #fff;
-}

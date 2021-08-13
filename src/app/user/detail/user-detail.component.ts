@@ -9,6 +9,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { fieldChange, valueChange } from '../../util/validators';
 import { findFlag, flags, IFlag } from '../../util/flags';
 import { getUserName } from '../../util/helper';
+import { createDateFromString } from '../../util/dates';
 
 @Component({
   selector: 'app-user-detail',
@@ -34,6 +35,7 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   firstName: FormControl = new FormControl();
   lastName: FormControl = new FormControl();
   phone: FormControl = new FormControl();
+  dob: FormControl = new FormControl();
 
   flagList: IFlag[] = flags();
 
@@ -73,6 +75,7 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     user.lastName = fieldChange(this.lastName, this.user?.lastName);
     user.lang = valueChange(this.langValue.value.value, this.user?.lang);
     user.phone = fieldChange(this.phone, this.user?.phone);
+    user.dob = fieldChange(this.dob, this.user?.dob);
 
     this.store.dispatch(new fromActionsUser.SaveUser({user}));
   }
@@ -84,7 +87,8 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       langValue: this.langValue,
       firstName: this.firstName,
       lastName: this.lastName,
-      phone: this.phone
+      phone: this.phone,
+      dob: this.dob
     });
   }
 
@@ -99,6 +103,9 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       if (state.selected) {
         this.user = state.selected;
         this.form.patchValue(state.selected);
+        if (state.selected.dob) {
+          this.dob.setValue(createDateFromString(state.selected.dob));
+        }
         this.langValue.setValue(findFlag(this.flagList, state.selected.lang));
         this.cdRef.detectChanges();
       }

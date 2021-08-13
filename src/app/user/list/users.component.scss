@@ -26,14 +26,6 @@ tr.user-detail-row {
   height: 0;
 }
 
-tr.user-row:not(.user-expanded-row):hover {
-  background: whitesmoke;
-}
-
-tr.user-row:not(.user-expanded-row):active {
-  background: #efefef;
-}
-
 .user-row td {
   border-bottom-width: 0;
 }

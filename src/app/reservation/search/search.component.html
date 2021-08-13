@@ -1,6 +1,6 @@
 <div>
-  <div id="search-box">
-    <div id="search-label">{{'RESERVATION.SEARCH' | translate }}</div>
+  <fieldset>
+    <legend>{{'RESERVATION.SEARCH' | translate }}</legend>
     <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
       <mat-form-field>
         <mat-label>{{ 'RESERVATION.STATE.SEARCH' | translate }}</mat-label>
@@ -41,7 +41,7 @@
         </mat-autocomplete>
       </mat-form-field>
     </div>
-  </div>
+  </fieldset>
 
   <div *ngIf="dataSource.loading$ | async" class="spinner-container">
     <mat-spinner></mat-spinner>

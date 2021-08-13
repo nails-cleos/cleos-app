@@ -2,11 +2,11 @@
   <div class="flex-container" fxLayout="column">
     <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
       <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
-        <mat-card *ngIf="!noContent; else noUpcoming">
+        <mat-card *ngIf="!noContent; else noUpcoming" class="upcoming">
           <span *ngIf="isPaid" [@stampAnimation]="{value: ':enter', params: {deg: -20}}"
-                class="stamp paid">{{ 'RESERVATION.UPCOMING.PAID' | translate }}</span>
+                class="stamp stamp-paid">{{ 'RESERVATION.UPCOMING.PAID' | translate }}</span>
           <span *ngIf="upcoming?.state === 'APPROVED'" [@stampAnimation]="{value: ':enter', params: {deg: 20}}"
-                class="stamp approved">{{ 'RESERVATION.UPCOMING.APPROVED' | translate }}</span>
+                class="stamp stamp-approved">{{ 'RESERVATION.UPCOMING.APPROVED' | translate }}</span>
           <mat-card-header *ngIf="upcoming.id; else headSkeleton">
             <mat-card-title>{{ 'RESERVATION.UPCOMING.TITLE' | translate }}</mat-card-title>
             <mat-card-subtitle>{{ upcoming.id }}</mat-card-subtitle>
@@ -61,12 +61,12 @@
                   <td class="left">$ {{paid | number:'1.2-2'}}</td>
                 </tr>
               </table>
-              <div *ngIf="upcoming && upcoming.state === 'CREATED'" [style.color]="'#ff0000'">
+              <div *ngIf="upcoming && upcoming.state === 'CREATED'" class="red-text">
                 {{ 'RESERVATION.UPCOMING.CREATED' | translate }} <span class="bold">
                 {{professionalName}}
               </span>
               </div>
-              <div *ngIf="upcoming && upcoming.state === 'APPROVED'" [style.color]="'#ff0000'">
+              <div *ngIf="upcoming && upcoming.state === 'APPROVED'" class="red-text">
                 {{ 'RESERVATION.UPCOMING.PAY_NOW' | translate }}
               </div>
             </div>

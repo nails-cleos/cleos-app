@@ -71,7 +71,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     user.dob = fieldChange(this.dob, this.user?.dob);
 
     this.store.dispatch(
-      new fromActionsUser.UpdateUser(user)
+      new fromActionsUser.UpdateUser({user, redirectUrl: 'auth/profile'})
     );
   }
 

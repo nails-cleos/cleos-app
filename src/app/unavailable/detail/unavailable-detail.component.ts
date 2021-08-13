@@ -20,7 +20,6 @@ import {
 } from '../../util/dates';
 import { IRoomAll } from '../../interfaces/room';
 import { IUser } from '../../interfaces/user';
-import { timeTheme } from '../../util/theme';
 import { getUserName } from '../../util/helper';
 
 @Component({
@@ -39,7 +38,6 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
   durationMax: any;
   minTime: any;
   maxTime: any;
-  theme = timeTheme();
 
   professionalName: string | undefined;
   room: IRoomAll | undefined;

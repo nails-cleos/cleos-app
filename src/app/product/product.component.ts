@@ -5,7 +5,6 @@ import { AppState, selectProductState } from '../store/app.states';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
 import { IProduct, Product } from '../interfaces/product';
-import { timeTheme } from '../util/theme';
 import { createDate, getTime } from '../util/dates';
 import { Router } from '@angular/router';
 
@@ -19,7 +18,6 @@ export class ProductComponent implements OnInit, OnDestroy {
   subscription: Subscription | undefined;
   form!: FormGroup;
   errors: any = [];
-  theme = timeTheme();
 
   name: FormControl = new FormControl('', [
     Validators.required

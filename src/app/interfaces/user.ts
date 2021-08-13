@@ -17,6 +17,7 @@ export interface IUser {
   code?: string | null;
   referralMax?: number;
   completed?: boolean;
+  theme?: string;
 }
 
 export interface IUserAll {
@@ -32,6 +33,7 @@ export interface IUserAll {
   phone?: string;
   dob?: string;
   referralMax?: number;
+  theme?: string;
 }
 
 export interface IAuthority {

@@ -2,33 +2,15 @@
   text-align: center;
 }
 
-.ml-button {
-  color: #009ee3;
-}
-
-.approved {
-  background-color: rgba(0, 158, 227, 0.4);;
-}
-
-.in_process {
-  background-color: rgba(255, 119, 51, 0.4);
-}
-
-.rejected {
-  background-color: rgba(242, 61, 79, 0.4);
-}
-
 #error-box {
-  border: 2px solid red;
+  border: 2px solid;
   border-radius: 25px;
   position: relative;
   width: 50%;
   margin: 10px auto 10px auto;
-  background-color: #ffb3b3;
 }
 
 #error-label {
-  background: linear-gradient(180deg, #fafafa 59%, #ffb3b3 41%);
   font-weight: bold;
   position: absolute;
   top: -13px;
@@ -45,10 +27,9 @@
 }
 
 #close {
-  background: linear-gradient(180deg, #fafafa 50%, #ffb3b3 50%);
-  position: absolute;
-  top: -13px;
-  right: 20px;
+  float: right;
+  margin-top: -29px;
+  margin-right: 20px;
   text-align: center;
   cursor: pointer;
 }

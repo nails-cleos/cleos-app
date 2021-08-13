@@ -4,11 +4,6 @@ export interface IFlag {
   text: string;
 }
 
-export interface IState {
-  name: string;
-  color: string;
-}
-
 export const flags = (): IFlag[] => [{
   icon: 'ar',
   value: 'es-AR',
@@ -38,35 +33,4 @@ export const findFlag = (flagList: IFlag[], lang: string): IFlag => {
     }
   }
   return value ? value : findFlag(flagList, 'en');
-};
-
-export const stateColor = (): IState[] => [{
-  name: 'CREATED',
-  color: '#fdf8f3' // accent-lighter
-}, {
-  name: 'PARTIALLY_COMPLETED',
-  color: '#f7e6d8'
-}, {
-  name: 'COMPLETED',
-  color: '#dcedc8'
-}, {
-  name: 'PAID',
-  color: 'rgba(0, 158, 227, 0.4)'
-}, {
-  name: 'PARTIALLY_PAID',
-  color: 'rgba(0, 158, 227, 0.4)'
-}, {
-  name: 'STARTED',
-  color: '#b3e5fc'
-}, {
-  name: 'APPROVED',
-  color: '#e3d3c5' // primary-lighter
-}, {
-  name: 'DEFAULT',
-  color: '#ffb3b3' // warn-lighter
-}];
-
-export const findStateColor = (state: string): string => {
-  const value = stateColor().find(color => color.name === state);
-  return value ? value.color : findStateColor('DEFAULT');
 };

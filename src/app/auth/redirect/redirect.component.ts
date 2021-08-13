@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { IAuthority, IUserAll } from '../interfaces/user';
-import { Role } from '../interfaces/token';
+import { IAuthority, IUserAll } from '../../interfaces/user';
+import { Role } from '../../interfaces/token';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState } from '../store/app.states';
-import { TokenService } from '../services/token.service';
+import { AppState, selectAuthState } from '../../store/app.states';
+import { TokenService } from '../../services/token.service';
 
 @Component({
   selector: 'app-redirect',

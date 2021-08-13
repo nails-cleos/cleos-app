@@ -18,7 +18,7 @@ import { SignInComponent } from './sign-in/sign-in.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ProfileComponent } from './profile/profile.component';
-import { RedirectComponent } from '../redirect/redirect.component';
+import { RedirectComponent } from './redirect/redirect.component';
 
 @NgModule({
   declarations: [

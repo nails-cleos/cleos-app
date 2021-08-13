@@ -37,7 +37,7 @@
                 <input #fileDropRef (change)="fileBrowseHandler($event)" [multiple]="false" id="fileDropRef"
                        type="file"/>
                 <svg height="64" viewBox="0 0 63 64" width="63" xmlns="http://www.w3.org/2000/svg">
-                  <g fill="#3B454F" fill-rule="nonzero">
+                  <g fill="#000" fill-rule="nonzero">
                     <path
                       d="M42.656 15.135a1.953 1.953 0 0 1-1.391-.578L31.5 4.795l-9.765 9.762a1.97 1.97 0 1 1-2.785-2.785L30.106.616a1.97 1.97 0 0 1 2.785 0l11.157 11.156a1.97 1.97 0 0 1-1.392 3.363z"/>
                     <path
@@ -47,8 +47,8 @@
                   </g>
                 </svg>
 
-                <h3>{{ 'CATALOGUE.FILE.DRAG_DROP' | translate }}</h3>
-                <h3>{{ 'CATALOGUE.FILE.OR' | translate }}</h3>
+                <h3 class="catalogue-text">{{ 'CATALOGUE.FILE.DRAG_DROP' | translate }}</h3>
+                <h3 class="catalogue-text">{{ 'CATALOGUE.FILE.OR' | translate }}</h3>
                 <button (click)="fileDropRef.click()" color="accent" mat-raised-button
                         type="button">{{ 'CATALOGUE.FILE.CHOOSE' | translate }}</button>
               </div>

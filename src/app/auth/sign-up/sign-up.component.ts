@@ -8,6 +8,8 @@ import { Observable, Subscription } from 'rxjs';
 import { flags, IFlag } from '../../util/flags';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { CookieService } from 'ngx-cookie-service';
+import { THEME } from '../../util/theme';
 
 @Component({
   selector: 'app-sign-up',
@@ -43,7 +45,8 @@ export class SignUpComponent implements OnInit, OnDestroy {
   flagList: IFlag[] = flags();
 
   constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private route: ActivatedRoute,
-              private cdRef: ChangeDetectorRef, private snackBar: MatSnackBar, private router: Router ) {
+              private cdRef: ChangeDetectorRef, private snackBar: MatSnackBar, private router: Router,
+              private cookieService: CookieService) {
     this.getState = this.store.select(selectAuthState);
     this.codeForm.valueChanges.subscribe(value => {
       this.codeEvent.emit(value);
@@ -76,6 +79,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
     user.lastName = this.lastName.value;
     user.phone = this.phone.value;
     user.code = this.codeForm.value;
+    user.theme = this.cookieService.get(THEME);
 
     this.store.dispatch(new fromActionsLogin.SignUp(user));
   }

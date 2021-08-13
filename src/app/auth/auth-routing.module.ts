@@ -8,7 +8,7 @@ import { AuthGuardService } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ProfileComponent } from './profile/profile.component';
-import { RedirectComponent } from '../redirect/redirect.component';
+import { RedirectComponent } from './redirect/redirect.component';
 
 const routes: Routes = [
   {path: '', component: AuthComponent, data: {error: 'error'}},

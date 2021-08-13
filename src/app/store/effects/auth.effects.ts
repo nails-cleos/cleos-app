@@ -26,8 +26,8 @@ export class LoginEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => {
       const user = payload.socialUser;
-      return this.authService.socialLogin(user.idToken || user.authToken, user.provider, payload.code).pipe(
-        switchMap((response: any) => of(new LoginSuccess({
+      return this.authService.socialLogin(user.idToken || user.authToken, user.provider, payload.code,
+        payload.theme).pipe(switchMap((response: any) => of(new LoginSuccess({
           response,
           queryParams: payload.queryParams,
           extras: payload.extras
@@ -86,7 +86,7 @@ export class LoginEffects {
     tap((response: any) => {
       const redirectUrl = response.payload.response.user.changePassword
         ? ['change-password']
-        : response.payload.queryParams.returnUrl || ['auth', 'redirect'];
+        : response.payload.queryParams.returnUrl?.split('/') || ['auth', 'redirect'];
       this.router.navigate(redirectUrl, {state: response.payload.extras});
     })
   ), {dispatch: false});

@@ -99,6 +99,7 @@
     "SIGN_OUT": "Sign out",
     "SIGN_IN": "Sign In",
     "HOME": "Home",
+    "DARK_MODE": "Dark mode",
     "MINI_CARD": {
       "DURATION": "since last month",
       "TOTAL_PRODUCT_SALES": "Total Product Sales",
@@ -281,7 +282,9 @@
   "PROFILE": {
     "UPDATED": {
       "MESSAGE": "User {{username}} updated",
-      "PHOTO": "Profile picture updated"
+      "PHOTO": "Profile picture updated",
+      "DARK_MODE_TRUE": "Dark mode on",
+      "DARK_MODE_FALSE": "Dark mode off"
     },
     "INCOMPLETE": "Complete your profile"
   },

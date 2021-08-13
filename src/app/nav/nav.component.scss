@@ -1,5 +1,16 @@
-mat-sidenav-container {
+mat-drawer-container {
   height: 100%;
+
+  .sidenav {
+    width: auto;
+  }
+
+  mat-card {
+    padding: 16px 0 0 0;
+    mat-card-header {
+      padding: 0 16px 0 16px;
+    }
+  }
 
   mat-toolbar {
     .align-right {
@@ -14,10 +25,6 @@ mat-sidenav-container {
       padding-right: 15%;
     }
   }
-}
-
-.sidenav {
-  width: auto;
 }
 
 .sidenav .mat-toolbar {
@@ -53,10 +60,6 @@ mat-sidenav-container {
   margin-right: 5%;
 }
 
-.mat-list-item.active {
-  color: #a06c3f;
-}
-
 .circle {
   border-radius: 50%;
   width: 60px;
@@ -64,7 +67,6 @@ mat-sidenav-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #a06c3f;
   overflow: hidden;
 
   .initials {
