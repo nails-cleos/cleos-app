@@ -1,11 +1,33 @@
 import { IAvailability } from '../interfaces/room';
 import { CalendarEvent } from 'angular-calendar';
-import { createDate, createFullDate, createNewDate, getNow, greaterOrEqualsThanToday, isToday } from './dates';
+import {
+  convertDuration,
+  createDate,
+  createFullDate,
+  createNewDate, formatTime,
+  getNow,
+  greaterOrEqualsThanToday, IDuration,
+  isToday
+} from './dates';
 import { findStateColor } from './theme';
+import { isSameMonth } from 'date-fns';
+import { getUserName } from './helper';
+
+export interface IMeta {
+  time?: boolean;
+}
+
+export class Meta implements IMeta {
+  time?: boolean;
+
+  constructor(time?: boolean) {
+    this.time = time;
+  }
+}
 
 export const fillNotAvailable = (unavailable: string, lunch: string, notWorking: string, daysInWeek: number,
                                  selectDate: Date, sunday: IAvailability, saturday: IAvailability, week: IAvailability,
-                                 isDarkMode: boolean, addToday: boolean = false): CalendarEvent[] => {
+                                 isDarkMode: boolean = false, addToday: boolean = false): CalendarEvent[] => {
   let events: CalendarEvent[] = [];
   const date = createFullDate(selectDate);
   const now = getNow();
@@ -32,7 +54,7 @@ export const fillNotAvailable = (unavailable: string, lunch: string, notWorking:
 };
 
 export const newEvent = (title: string, color: string, start: Date, end?: Date, primary?: string,
-                         id?: string): CalendarEvent | undefined => {
+                         id?: string, meta: IMeta = new Meta()): CalendarEvent | undefined => {
   if (greaterOrEqualsThanToday(start)) {
     return {
       id,
@@ -42,11 +64,24 @@ export const newEvent = (title: string, color: string, start: Date, end?: Date, 
       color: {
         primary,
         secondary: color
-      }
+      },
+      meta
     } as unknown as CalendarEvent;
   }
   return undefined;
 };
+
+export const monthEvent = (title: string, start: Date, duration: IDuration, id: string,
+                           color?: string): CalendarEvent | undefined => ({
+  id,
+  start,
+  title,
+  end: createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute),
+  color: {
+    primary: color,
+    secondary: '#000'
+  }, meta: new Meta(true)
+} as unknown as CalendarEvent);
 
 export const getOverlapEvent = (events: any[], eventStartDay: Date, eventEndDay: Date): CalendarEvent[] =>
   events.filter((eventA: CalendarEvent) => (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)

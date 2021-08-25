@@ -73,7 +73,7 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     user.email = fieldChange(this.email, this.user?.email);
     user.firstName = fieldChange(this.firstName, this.user?.firstName);
     user.lastName = fieldChange(this.lastName, this.user?.lastName);
-    user.lang = valueChange(this.langValue.value.value, this.user?.lang);
+    user.lang = valueChange(this.langValue.value.value, this.user?.locale);
     user.phone = fieldChange(this.phone, this.user?.phone);
     user.dob = fieldChange(this.dob, this.user?.dob);
 
@@ -106,7 +106,7 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
         if (state.selected.dob) {
           this.dob.setValue(createDateFromString(state.selected.dob));
         }
-        this.langValue.setValue(findFlag(this.flagList, state.selected.lang));
+        this.langValue.setValue(findFlag(this.flagList, state.selected.locale));
         this.cdRef.detectChanges();
       }
       if (state.message) {

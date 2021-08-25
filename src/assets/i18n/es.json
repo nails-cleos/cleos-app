@@ -4,6 +4,7 @@
       "BACK": "Volver",
       "RELOAD": "Recargar",
       "NEXT": "Siguiente",
+      "TODAY": "Hoy",
       "PREVIOUS": "Anterior",
       "GOTO": "Ir a",
       "YES": "Si",
@@ -17,6 +18,7 @@
       "CANCEL": "Cancelar",
       "BOOK": "Reservar",
       "VIEW": "Ver",
+      "REVIEW": "Opinar",
       "EDIT": "Editar",
       "DELETE": "Eliminar",
       "INVITE": "Enviar invitación",
@@ -26,6 +28,11 @@
       "COMPLETE": "Completar",
       "ML": "Pagar con ML",
       "NOTIFY": "Notificar",
+      "SELECT": "Seleccionar",
+      "EXPAND": {
+        "TRUE": "Presiona para mostrar menos",
+        "FALSE": "Presiona para mostrar más"
+      },
       "DISCOUNT": {
         "SHOW": "Mostrar descuentos",
         "HIDE": "Ocultar descuentos",
@@ -100,6 +107,7 @@
     "SIGN_IN": "Ingresar",
     "HOME": "Principal",
     "DARK_MODE": "Modo oscuro",
+    "TOTAL_RESERVATIONS": " - Reservas: {{total}}",
     "MINI_CARD": {
       "DURATION": "desde el mes pasado",
       "TOTAL_PRODUCT_SALES": "Ganancia total",
@@ -127,6 +135,7 @@
       "TRACKING_AVERAGE": "Tiempo real del servicio",
       "TRACKING_COMPARE": "Tiempo real/estimado",
       "RESERVATION": "Reservas",
+      "PAYMENT": "Forma de pago",
       "EXPAND": "Expandir"
     }
   },
@@ -520,12 +529,13 @@
     },
     "PREVIEW": "Vista previa",
     "EVENT": {
+      "CUSTOMER": "<b>{{customerName}}</b>",
       "OVERLAPPING": {
         "TITLE": "Reserva superpuesta",
         "CONTENT": "La nueva reserva se superpone con <div>{{data}}</div> ¿Está seguro de agregar la reserva?",
         "ERROR": "La nueva reserva se superpone con <div>{{data}}</div>"
       },
-      "DETAIL": "<div><b>Nombre del cliente:</b> {{customerName}}</div><div><b>Servicio:</b> {{productName}}</div><div><b>Duración:</b> {{duration}}</div>",
+      "DETAIL": "<div class='detail'><b>{{customerName}}</b></div><div class='detail'>{{productName}}</div>",
       "TITLE": "Agregar nueva reserva",
       "CONTENT": "¿Estás segura de añadir la reserva el {{date}}?",
       "CHANGE": {
@@ -537,7 +547,7 @@
         "LUNCH": "<b>Hora de almuerzo</b>",
         "OUT_OF_WORK": "<b>Fuera del trabajo</b>"
       },
-      "UNAVAILABLE": "<div><b>No disponible</b></div><div>{{description}}</div><div><b>Duración:</b> {{duration}}</div>"
+      "UNAVAILABLE": "<div class='detail'><b>No disponible</b></div><div class='detail'>{{description}}</div>"
     },
     "CREATED": "Reserva {{date}} creada",
     "DETAIL": "Reserva del cliente",
@@ -575,6 +585,9 @@
       "TITLE": "Seguimiento",
       "DURATION": "Duración de la cita"
     },
+    "REVIEW": {
+      "TITLE": "Opinión"
+    },
     "DELETED": {
       "TITLE": "Eliminar reserva",
       "CONTENT": "¿Está seguro de eliminar la reserva {{date}}?",
@@ -605,8 +618,6 @@
       "TITLE": "Próxima Reserva",
       "START": "Inicio",
       "END": "Fin",
-      "PRODUCT": "Servicio",
-      "PRICE": "Precio",
       "PAID": "Pagado",
       "APPROVED": "Aprobado",
       "CREATED": "La reserva debe ser aprobada por: ",
@@ -738,6 +749,28 @@
     "ERROR": "Pago incompleto.\n{{reason}}",
     "RECREATE": "Link de pago regenerado",
     "COPY": "¡Link copiado!"
+  },
+  "REVIEW": {
+    "TITLE": "Calificar",
+    "DETAIL": "Detalle",
+    "RATE": "Calificación {{rating}}/{{total}}",
+    "YOUR_RATE": "Tu calificación {{rating}}/{{total}}",
+    "RATING": {
+      "1": "Muy malo",
+      "2": "Malo",
+      "3": "Bueno",
+      "4": "Muy bueno",
+      "5": "Excelente"
+    },
+    "CREATED": "Opinión agregada"
+  },
+  "OVERVIEW": {
+    "MINI_CARD": {
+      "PRODUCTS": "Completadas/Canceladas",
+      "RESERVATIONS": "Próxima/Última",
+      "UPCOMING": "Próxima: {{next}}",
+      "PREVIOUS": "Última: {{last}}"
+    }
   },
   "WHATSAPP": {
     "SEND": {

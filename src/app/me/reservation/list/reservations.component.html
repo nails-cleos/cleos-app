@@ -3,7 +3,7 @@
     <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
       <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
         <mat-card *ngIf="!noContent; else noUpcoming" class="upcoming">
-          <span *ngIf="isPaid" [@stampAnimation]="{value: ':enter', params: {deg: -20}}"
+          <span *ngIf="price.isPaid" [@stampAnimation]="{value: ':enter', params: {deg: -20}}"
                 class="stamp stamp-paid">{{ 'RESERVATION.UPCOMING.PAID' | translate }}</span>
           <span *ngIf="upcoming?.state === 'APPROVED'" [@stampAnimation]="{value: ':enter', params: {deg: 20}}"
                 class="stamp stamp-approved">{{ 'RESERVATION.UPCOMING.APPROVED' | translate }}</span>
@@ -43,22 +43,22 @@
                   </td>
                 </tr>
                 <tr *ngIf="upcoming.id; else skeleton">
-                  <td class="right">{{ 'RESERVATION.UPCOMING.PRODUCT' | translate }}</td>
+                  <td class="right">{{ 'PRODUCT.FIELD' | translate }}</td>
                   <td class="left">{{upcoming.product.name}}</td>
                 </tr>
                 <tr *ngIf="upcoming.id; else skeleton">
-                  <td class="right">{{ 'RESERVATION.UPCOMING.PRICE' | translate }}</td>
-                  <td *ngIf="priceDiscount; else noDiscount" class="left">
-                    <span [class.strikethrough]="priceDiscount">$ {{price | number:'1.2-2'}}</span>
-                    <span [@discountAnimation] class="raised-button bold">$ {{priceDiscount | number:'1.2-2'}}</span>
+                  <td class="right">{{ 'PRODUCT.PRICE.FIELD' | translate }}</td>
+                  <td *ngIf="price.discount; else noDiscount" class="left">
+                    <span [class.strikethrough]="price.amount">$ {{price.amount | number:'1.2-2'}}</span>
+                    <span [@discountAnimation] class="raised-button bold">$ {{price.priceWithDiscount | number:'1.2-2'}}</span>
                   </td>
                   <ng-template #noDiscount>
-                    <td class="left">$ {{price | number:'1.2-2'}}</td>
+                    <td class="left">$ {{price.total | number:'1.2-2'}}</td>
                   </ng-template>
                 </tr>
-                <tr *ngIf="paid">
+                <tr *ngIf="price.totalPaid">
                   <td class="right">{{ 'RESERVATION.UPCOMING.PAID' | translate }}</td>
-                  <td class="left">$ {{paid | number:'1.2-2'}}</td>
+                  <td class="left">$ {{price.totalPaid | number:'1.2-2'}}</td>
                 </tr>
               </table>
               <div *ngIf="upcoming && upcoming.state === 'CREATED'" class="red-text">
@@ -77,11 +77,11 @@
           <mat-divider *ngIf="upcoming"></mat-divider>
           <mat-card-actions *ngIf="upcoming.id; else buttonSkeleton">
             <div fxFlex></div>
-            <button (click)="edit(upcoming)" color="primary" mat-raised-button>
+            <button [routerLink]="['/me', 'reservation', upcoming.id]" color="primary" mat-raised-button>
               <mat-icon>edit_calendar</mat-icon>
               {{ 'COMMON.BUTTON.EDIT' | translate }}
             </button>
-            <button (click)="view(upcoming)" color="primary" mat-raised-button>
+            <button [routerLink]="['/reservation', upcoming.id]" color="primary" mat-raised-button>
               <mat-icon>visibility</mat-icon>
               {{ 'COMMON.BUTTON.VIEW' | translate }}
             </button>
@@ -100,7 +100,7 @@
             <mat-divider></mat-divider>
             <mat-card-actions>
               <div fxFlex></div>
-              <button color="primary" mat-raised-button routerLink="/me/reservation">
+              <button [routerLink]="['/me', 'reservation']" color="primary" mat-raised-button>
                 <mat-icon>book_online</mat-icon>
                 {{ 'COMMON.BUTTON.CREATE' | translate }}
               </button>
@@ -146,6 +146,16 @@
       </td>
     </ng-container>
 
+    <ng-container matColumnDef="product">
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'RESERVATION.LIST.COLUMN.PRODUCT' | translate }}</th>
+      <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
+        <div *ngIf="reservation.id; else skeleton">{{reservation.product.name}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
     <ng-container matColumnDef="state">
       <th *matHeaderCellDef mat-header-cell
           mat-sort-header>{{ 'RESERVATION.LIST.COLUMN.STATE' | translate }}</th>
@@ -164,21 +174,15 @@
       <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
       <td *matCellDef="let reservation" mat-cell>
         <div *ngIf="reservation.id; else skeleton">
-          <button (click)="view(reservation)" *ngIf="!reservation.deleted" mat-icon-button
+          <button [routerLink]="['/reservation', reservation.id]" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
             <mat-icon color="primary">visibility</mat-icon>
           </button>
+          <button *ngIf="reservation.state === 'COMPLETED'" (click)="onRatingChanged(reservation)"
+                  mat-icon-button matTooltip="{{ 'COMMON.BUTTON.REVIEW' | translate }}" matTooltipPosition="right">
+            <mat-icon color="accent">reviews</mat-icon>
+          </button>
         </div>
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="product">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'RESERVATION.LIST.COLUMN.PRODUCT' | translate }}</th>
-      <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
-        <div *ngIf="reservation.id; else skeleton">{{reservation.product.name}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>

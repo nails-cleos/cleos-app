@@ -5,7 +5,8 @@ import { CalendarEvent } from 'angular-calendar';
 import { ThemePalette } from '@angular/material/core';
 import { IUnavailableAll } from './unavailable';
 import { Pagination } from './pagination';
-import { IPayment } from './payment';
+import { IPayment, IPaymentAll } from './payment';
+import { IReview } from './review';
 
 export interface IReservation {
   id?: string;
@@ -18,6 +19,7 @@ export interface IReservation {
   room?: IRoom;
   start?: string;
   state?: string;
+  review?: IReview;
 }
 
 export interface IReservationAll {
@@ -27,7 +29,13 @@ export interface IReservationAll {
   room: IRoomAll;
   start: string;
   state: string;
+  review?: IReview;
   history?: IReservationAll[];
+}
+
+export interface IPaymentReservation {
+  reservation: IReservationAll;
+  payments: IPaymentAll[];
 }
 
 export interface IRoomReservation {
@@ -51,6 +59,7 @@ export interface IDay {
   dayStartMinute: number;
   dayEndHour: number;
   dayEndMinute: number;
+  excludeDays: number[];
 }
 
 export interface ICalendar {
@@ -68,6 +77,19 @@ export interface IReservationSummary {
   icon?: string;
   isCurrency?: boolean;
   error?: any;
+}
+
+export interface IReservationOverview {
+  title: string;
+  primaryValue?: number | string;
+  primary?: IReservation;
+  secondaryValue?: number | string;
+  secondary?: IReservation;
+  color?: ThemePalette;
+  icon?: string;
+  split?: boolean;
+  error?: any;
+  link?: (reservation: IReservation | undefined) => void;
 }
 
 export interface ITracking {
@@ -91,12 +113,15 @@ export class Day implements IDay {
   dayStartMinute: number;
   dayEndHour: number;
   dayEndMinute: number;
+  excludeDays: number[];
 
-  constructor(dayStartHour: number = 9, dayStartMinute: number = 0, dayEndHour: number = 18, dayEndMinute: number = 0) {
+  constructor(dayStartHour: number = 9, dayStartMinute: number = 0, dayEndHour: number = 18, dayEndMinute: number = 0,
+              excludeDays: number[] = []) {
     this.dayStartHour = dayStartHour;
     this.dayStartMinute = dayStartMinute;
     this.dayEndHour = dayEndHour;
     this.dayEndMinute = dayEndMinute;
+    this.excludeDays = excludeDays;
   }
 }
 

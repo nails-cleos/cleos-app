@@ -1,0 +1,16 @@
+.hide {
+  visibility: hidden;
+}
+
+.none {
+  display: none;
+}
+
+div, p {
+  text-align: center;
+}
+
+mat-icon {
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}

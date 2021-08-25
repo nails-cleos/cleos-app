@@ -1,3 +1,5 @@
+import { getLocale } from './helper';
+
 export interface IFlag {
   icon: string;
   value: string;
@@ -6,7 +8,7 @@ export interface IFlag {
 
 export const flags = (): IFlag[] => [{
   icon: 'ar',
-  value: 'es-AR',
+  value: 'es_AR',
   text: 'ES'
 }, {
   icon: 'es',
@@ -14,7 +16,7 @@ export const flags = (): IFlag[] => [{
   text: 'ES'
 }, {
   icon: 'gb',
-  value: 'en-GB',
+  value: 'en_GB',
   text: 'EN'
 }, {
   icon: 'us',
@@ -25,8 +27,7 @@ export const flags = (): IFlag[] => [{
 export const findFlag = (flagList: IFlag[], lang: string): IFlag => {
   let value = flagList.find(flag => flag.value === lang);
   if (!value) {
-    const index = lang.indexOf('-');
-    const locale = index === -1 ? lang : lang.substr(0, index);
+    const locale = getLocale(lang);
     value = flagList.find(flag => flag.value === locale);
     if (!value) {
       value = flagList.find(flag => flag.value.startsWith(navigator.language) || navigator.language.startsWith(flag.value));

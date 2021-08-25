@@ -32,7 +32,8 @@ import { NavigationService } from '../services/navigation.service';
 import { TokenService } from '../services/token.service';
 import { CookieService } from 'ngx-cookie-service';
 import { OverlayContainer } from '@angular/cdk/overlay';
-import { getThemeName, isDarkMode, resetTheme, THEME } from '../util/theme';
+import { getThemeName, isDarkMode, resetTheme, Theme, THEME } from '../util/theme';
+import { ThemeService } from 'ng2-charts';
 
 @Component({
   selector: 'app-nav',
@@ -42,11 +43,11 @@ import { getThemeName, isDarkMode, resetTheme, THEME } from '../util/theme';
 export class NavComponent implements OnInit, OnDestroy {
   title = environment.title;
 
-  isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
-    .pipe(
-      map(result => result.matches),
-      shareReplay()
-    );
+  isHandset$: Observable<boolean> = this.breakpointObserver.observe([
+    Breakpoints.XSmall,
+    Breakpoints.Small,
+    Breakpoints.Medium
+  ]).pipe(map(result => result.matches), shareReplay());
 
   menuItems: IMenu[] = [];
   notifications: INotification[] = [];
@@ -78,8 +79,9 @@ export class NavComponent implements OnInit, OnDestroy {
   constructor(public translate: TranslateService, private breakpointObserver: BreakpointObserver,
               private router: Router, private store: Store<AppState>, private messagingService: MessagingService,
               private snackBar: MatSnackBar, private navigation: NavigationService, private tokenService: TokenService,
-              private cookieService: CookieService, private overlayContainer: OverlayContainer) {
-    this.checked = isDarkMode(cookieService.get(THEME));
+              private cookieService: CookieService, private overlayContainer: OverlayContainer,
+              private themeService: ThemeService) {
+    this.checked = isDarkMode(cookieService.get(THEME) as Theme);
     this.language = this.translate.currentLang;
     this.getState = this.store.select(selectAuthState);
     this.getNotificationState = this.store.select(selectNotificationState);
@@ -132,7 +134,7 @@ export class NavComponent implements OnInit, OnDestroy {
   }
 
   setTheme(checked: boolean): void {
-    const theme: string = getThemeName(checked);
+    const theme: Theme = getThemeName(checked);
     this.resetTheme(theme);
     const user: IUser = new User();
     user.theme = theme;
@@ -239,7 +241,7 @@ export class NavComponent implements OnInit, OnDestroy {
     }
   }
 
-  private resetTheme(theme?: string): void {
-    this.cssClass = resetTheme(theme, this.cssClass, this.overlayContainer, this.cookieService);
+  private resetTheme(theme?: Theme): void {
+    this.cssClass = resetTheme(theme, this.cssClass, this.overlayContainer, this.cookieService, this.themeService);
   }
 }

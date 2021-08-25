@@ -8,7 +8,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectAuthState, selectReservationState } from '../store/app.states';
 import * as fromActionsReservation from '../store/reservation.actions';
 import { requireMatch, valueChange } from '../util/validators';
-import { IProduct } from '../interfaces/product';
+import { IPrice, IProduct, Price } from '../interfaces/product';
 import { MatStepper } from '@angular/material/stepper';
 import { IAvailability, IRoom } from '../interfaces/room';
 import { IReservation, IReservationAll, MAX_RESERVATION_MONTH, Reservation } from '../interfaces/reservation';
@@ -35,14 +35,14 @@ import {
   newDate,
   plusDay
 } from '../util/dates';
-import { fillNotAvailable, getOverlapEvent, newEvent } from '../util/event';
+import { fillNotAvailable, getOverlapEvent, Meta, newEvent } from '../util/event';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DateAdapter } from '@angular/material/core';
 import { GeocoderResult } from '@agm/core';
 import { Role } from '../interfaces/token';
 import { IUnavailableAll } from '../interfaces/unavailable';
 import { DiscountType, IUserDiscount } from '../interfaces/discount';
-import { getFullUserName, getPriceDiscount, getUserName } from '../util/helper';
+import { getFullUserName, getPrice, getUserName, newDiscount, newPrice } from '../util/helper';
 import { transitionAnimation } from '../util/animation';
 import { addMonths } from 'date-fns';
 import { findStateColor, isDarkMode } from '../util/theme';
@@ -75,7 +75,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   products: IProduct[] | undefined;
   discounts: IUserDiscount[] | undefined;
   showDiscount = false;
-  priceDiscount: number | undefined;
+  price: IPrice;
   discount = new FormControl();
   filteredProduct: Observable<IProduct[] | undefined> | undefined;
   product: FormControl = new FormControl('', [
@@ -110,6 +110,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   lessDays = 3;
   hourSegments = 4;
   locale: string;
+  weekendDays: number[] = [0, 6];
 
   eventSelected: CalendarEvent | undefined;
   smallScreen: boolean | undefined;
@@ -135,10 +136,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
               private formBuilder: FormBuilder, private breakpointObserver: BreakpointObserver,
               private router: Router, private route: ActivatedRoute, private adapter: DateAdapter<any>,
               private cdRef: ChangeDetectorRef) {
+    this.price = new Price();
     this.getState = this.store.select(selectReservationState);
-    const userLang = this.translate.currentLang;
-    const index = userLang.indexOf('-');
-    this.locale = index === -1 ? userLang : userLang.substr(0, index);
+    this.locale = this.translate.currentLang;
     this.adapter.setLocale(this.locale);
     breakpointObserver.observe([
       Breakpoints.XSmall,
@@ -168,12 +168,16 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.discount.setValue(null);
       this.showDiscount = false;
     });
+    this.product.valueChanges.subscribe(value => {
+      if (value) {
+        this.price = newPrice(this.price, value.price);
+      }
+    });
     this.discount.valueChanges.subscribe(value => {
-      this.priceDiscount = undefined;
       if (value && this.discounts) {
         const userDiscount = this.discounts.find(d => d.id === value);
         if (userDiscount) {
-          this.priceDiscount = getPriceDiscount(userDiscount.discount, this.product.value.price);
+          this.price = newDiscount(this.price, userDiscount.discount);
         }
       }
     });
@@ -294,7 +298,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       date = now;
     }
 
-    const {week, saturday, sunday} = getAvailability(this.room.value);
+    const {week, saturday, sunday, exclude} = getAvailability(this.room.value);
+    this.weekendDays = exclude;
 
     const diffDay = getDiffDay(this.maxCalendarDate, date);
 
@@ -329,7 +334,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       duration: formatTime(duration.hour, duration.minute)
     });
 
-    const event = newEvent(detail, findStateColor(state, this.isDarkMode), start, end, '#000', id);
+    const meta = new Meta(true);
+    const event = newEvent(detail, findStateColor(state, this.isDarkMode), start, end, '#000', id, meta);
 
     if (event) {
       let title;
@@ -516,7 +522,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         });
 
         const color = findStateColor(it.state, this.isDarkMode);
-        const event = newEvent(detail, color, start, end, '#000', it.id);
+        const meta = new Meta(true);
+        const event = newEvent(detail, color, start, end, '#000', it.id, meta);
         if (event) {
           if (this.isEditing && this.reservation && this.reservation.id === it.id) {
             this.eventSelected = event;
@@ -578,22 +585,22 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
               this.events = [...this.events, value];
             }
           }
-          this.createUnavailableEvent(it.id, start, end, duration, it.description);
+          this.createUnavailableEvent(it.id, start, end, it.description);
         }
       });
     } else {
-      this.createUnavailableEvent(it.id, start, end, duration, it.description);
+      this.createUnavailableEvent(it.id, start, end, it.description);
     }
   }
 
-  private createUnavailableEvent(id: string, start: Date, end: Date, duration: IDuration, description?: string): void {
+  private createUnavailableEvent(id: string, start: Date, end: Date, description?: string): void {
     const detail = this.translate.instant('RESERVATION.EVENT.UNAVAILABLE', {
-      description: description ? description : '',
-      duration: formatTime(duration.hour, duration.minute)
+      description: description ? description : ''
     });
 
     const color = findStateColor('DEFAULT', this.isDarkMode);
-    const event = newEvent(detail, color, start, end, '#000', `unavailable/${id}`);
+    const meta = new Meta(true);
+    const event = newEvent(detail, color, start, end, '#000', `unavailable/${id}`, meta);
     if (event) {
       this.events = [...this.events, event];
     }
@@ -725,11 +732,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.date.setValue(date);
     this.start.setValue(getTime(date));
     this.customer.setValue(reservation.customer);
-    this.product.valueChanges.subscribe(value => {
-      if (reservation.product.discount && reservation.product.discount.amount) {
-        this.priceDiscount = getPriceDiscount(reservation.product.discount, value.price);
-      }
-    });
+    this.price = getPrice(this.reservation.product);
     this.product.setValue(reservation.product);
 
     this.myStepper.next();

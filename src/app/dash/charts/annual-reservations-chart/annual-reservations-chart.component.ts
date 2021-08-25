@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
 import { Color, Label } from 'ng2-charts';
-import { annualReservationChart } from '../../../util/chart';
+import { annualReservationChart, chartColors, defaultOptions } from '../../../util/chart';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
@@ -14,29 +14,18 @@ export class AnnualReservationsChartComponent implements OnChanges {
   @Input() label: any;
 
   error: any;
-  locale: string;
 
   public lineChartData: ChartDataSets[] = [
     {data: []}
   ];
   public lineChartLabels: Label[] = [];
-  public lineChartOptions: ChartOptions = {
-    responsive: true
-  };
-  public lineChartColors: Color[] = [
-    {
-      borderColor: 'rgb(103, 58, 183)',
-      backgroundColor: 'rgba(103, 58, 183,0.3)'
-    }
-  ];
+  public lineChartOptions: ChartOptions = defaultOptions();
+  public lineChartColors: Color[] = chartColors();
   public lineChartLegend = true;
   public lineChartType: ChartType = 'line';
   public lineChartPlugins = [];
 
   constructor(private translate: TranslateService) {
-    const userLang = translate.currentLang;
-    const index = userLang.indexOf('-');
-    this.locale = index === -1 ? userLang : userLang.substr(0, index);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -45,7 +34,7 @@ export class AnnualReservationsChartComponent implements OnChanges {
 
   private createChart(): void {
     if (this.state) {
-      const chartResult = annualReservationChart(this.state.dash, this.locale, this.label);
+      const chartResult = annualReservationChart(this.state.dash, this.translate.currentLang, this.label);
       if (this.state.errorMessage || !chartResult) {
         this.error = {status: 'NO_CONTENT'};
         return;

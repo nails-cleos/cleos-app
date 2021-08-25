@@ -1,8 +1,8 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
-import { Label } from 'ng2-charts';
+import { Color, Label } from 'ng2-charts';
 import { IReservationAll } from '../../../interfaces/reservation';
-import { productReservationChart } from '../../../util/chart';
+import { chartColors, defaultOptions, productReservationChart } from '../../../util/chart';
 
 @Component({
   selector: 'app-product-reservations-chart',
@@ -15,13 +15,11 @@ export class ProductReservationsChartComponent implements OnChanges {
   data: IReservationAll[] | undefined;
   error: any;
 
-  public radarChartOptions: ChartOptions = {
-    responsive: true
-  };
-
+  public radarChartOptions: ChartOptions = defaultOptions();
   public radarChartLabels: Label[] = [];
   public radarChartData: ChartDataSets[] = [];
   public radarChartType: ChartType = 'radar';
+  public radarChartColors: Color[] = chartColors();
 
   constructor() {
   }

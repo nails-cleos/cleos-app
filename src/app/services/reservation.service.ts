@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { ICustomerReservation, IReservation, IRoomReservation } from '../interfaces/reservation';
 import { getNow } from '../util/dates';
 import { PAGE_SIZE } from '../interfaces/pagination';
+import { IReview } from '../interfaces/review';
 
 @Injectable({
   providedIn: 'root'
@@ -112,5 +113,9 @@ export class ReservationService {
 
   public paymentComplete(reservationId: string): Observable<IReservation> {
     return this.http.post<IReservation>(`${this.url}/${reservationId}/payment/complete`, null);
+  }
+
+  public addReview(review: IReview): Observable<IReview> {
+    return this.http.post<IReview>(`${this.url}/${review.reservationId}/reviews`, review);
   }
 }

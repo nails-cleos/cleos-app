@@ -1,17 +1,17 @@
 import { IAvailability, IRoom } from '../interfaces/room';
 import {
-  subMonths,
-  addMonths,
   addDays,
+  addMonths,
   addWeeks,
-  subDays,
-  subWeeks,
-  startOfMonth,
+  endOfDay,
   endOfMonth,
-  startOfWeek,
   endOfWeek,
   startOfDay,
-  endOfDay
+  startOfMonth,
+  startOfWeek,
+  subDays,
+  subMonths,
+  subWeeks
 } from 'date-fns';
 
 export interface IDuration {
@@ -132,7 +132,17 @@ export const getAvailability = (room: IRoom): any => {
   const week: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'WEEK')[0];
   const saturday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'SATURDAY')[0];
   const sunday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'SUNDAY')[0];
-  return {week, saturday, sunday};
+  let exclude: number[] = [];
+  if (!week) {
+    exclude = [1, 2, 3, 4, 5];
+  }
+  if (!saturday) {
+    exclude = [...exclude, 6];
+  }
+  if (!sunday) {
+    exclude = [...exclude, 0];
+  }
+  return {week, saturday, sunday, exclude};
 };
 
 export const getMinMaxDate = (day: number, date: any, room: IRoom): any => {
@@ -187,9 +197,29 @@ export const formatDateName = (date: Date, locale: string, measure: any): string
   day: 'numeric', month: measure, weekday: measure, year: 'numeric'
 });
 
+export const formatDateNameKey = (date: Date, locale: string, measure: any): string => date.toLocaleDateString(locale, {
+  day: 'numeric', month: measure, hour: '2-digit', minute: '2-digit'
+}).replace(/(?:^|\s|-)+\S/g, (c) => c.toUpperCase());
+
 export const formatDate = (date: Date, locale: string): string => date.toLocaleDateString(locale, {
   day: 'numeric', month: 'short'
 }).replace(/ /g, '-').replace(/(?:^|\s|-)+\S/g, (c) => c.toUpperCase());
+
+export const monthViewTitle = (date: Date, locale: string = 'en'): string => date.toLocaleDateString(locale, {
+  year: 'numeric', month: 'long'
+}).replace(/^\w/, (c) => c.toUpperCase());
+
+export const columnHeader = (date: Date, locale: string = 'en'): string => date.toLocaleDateString(locale, {
+  weekday: 'long'
+}).replace(/^\w/, (c) => c.toUpperCase());
+
+export const dayViewTitle = (date: Date, locale: string = 'en'): string => date.toLocaleDateString(locale, {
+  day: 'numeric', month: 'long', weekday: 'long', year: 'numeric'
+}).replace(/^\w/, (c) => c.toUpperCase());
+
+export const formatDateMonth = (date: Date, locale: string = 'en'): string => date.toLocaleTimeString(locale, {
+  hour: '2-digit', minute: '2-digit'
+}).replace(/^\w/, (c) => c.toUpperCase());
 
 export const formatDateTwoDigit = (date: Date, locale: string): string => date.toLocaleDateString(locale, {
   day: '2-digit', month: '2-digit', year: '2-digit'

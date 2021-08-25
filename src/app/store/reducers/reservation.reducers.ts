@@ -380,6 +380,16 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
+    case ReservationActionTypes.reservationReview: {
+      return {
+        ...state,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: null,
+        isLoading: false
+      };
+    }
     case ReservationActionTypes.clean: {
       return initialState;
     }

@@ -12,7 +12,6 @@ import { DashRoutingModule } from './dash-routing.module';
 
 import { DashComponent } from './dash.component';
 import { MiniCardComponent } from './mini-card/mini-card.component';
-import { CardChartComponent, CardComponent } from './card/card.component';
 import {
   QuantityProductReservationsChartComponent
 } from './charts/quantity-product-reservations-chart/quantity-product-reservations-chart.component';
@@ -24,11 +23,11 @@ import { TrackingAverageChartComponent } from './charts/tracking-average-chart/t
 import { CustomerReservationsChartComponent } from './charts/customer-reservations-chart/customer-reservations-chart.component';
 import { TrackingCompareChartComponent } from './charts/tracking-compare-chart/tracking-compare-chart.component';
 import { ReservationTableComponent } from './reservation/table/reservation-table.component';
+import { CalendarModule, CalendarMonthModule } from 'angular-calendar';
 
 @NgModule({
   declarations: [
     DashComponent,
-    CardComponent,
     MiniCardComponent,
     ProductReservationsChartComponent,
     MonthlyReservationsChartComponent,
@@ -38,8 +37,7 @@ import { ReservationTableComponent } from './reservation/table/reservation-table
     CustomerReservationsChartComponent,
     QuantityProductReservationsChartComponent,
     LastMonthReservationsChartComponent,
-    ReservationTableComponent,
-    CardChartComponent
+    ReservationTableComponent
   ],
   imports: [
     DashRoutingModule,
@@ -51,7 +49,9 @@ import { ReservationTableComponent } from './reservation/table/reservation-table
     FormsModule,
     FlexLayoutModule,
     ReactiveFormsModule,
-    AppMaterialModule
+    AppMaterialModule,
+    CalendarMonthModule,
+    CalendarModule
   ]
 })
 export class DashModule {

@@ -1,5 +1,9 @@
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { CookieService } from 'ngx-cookie-service';
+import { ChartOptions } from 'chart.js';
+import { ThemeService } from 'ng2-charts';
+
+export type Theme = 'light-theme' | 'dark-theme';
 
 const dark = 'dark-theme';
 const light = 'light-theme';
@@ -35,21 +39,21 @@ const stateColor = (isDark: boolean): IState[] => [{
   color: isDark ? '#ffb3b3' : '#f08080' // warn-lighter
 }];
 
-export const findStateColor = (state: string, isDark: boolean): string => {
+export const findStateColor = (state: string, isDark: boolean = false): string => {
   const value = stateColor(isDark).find(color => color.name === state);
   return value ? value.color : findStateColor('DEFAULT', isDark);
 };
 
 export const THEME = 'theme';
 
-export const isDarkMode = (theme: string | undefined): boolean => theme === dark;
+export const isDarkMode = (theme: Theme | undefined): boolean => theme === dark;
 
-export const getThemeName = (isDark: boolean): string => isDark ? dark : light;
+export const getThemeName = (isDark: boolean): Theme => isDark ? dark : light;
 
-export const getTheme = (theme: string | undefined): string => theme === dark ? dark : light;
+export const getTheme = (theme: string | undefined): Theme => theme === dark ? dark : light;
 
-export const resetTheme = (theme: string | undefined, cssClass: string | undefined,
-                           overlayContainer: OverlayContainer, cookieService: CookieService): string => {
+export const resetTheme = (theme: Theme | undefined, cssClass: string | undefined, overlayContainer: OverlayContainer,
+                           cookieService: CookieService, themeService: ThemeService): string => {
   const body = document.getElementsByTagName('body')[0];
 
   if (cssClass) {
@@ -61,7 +65,32 @@ export const resetTheme = (theme: string | undefined, cssClass: string | undefin
   body.classList.add(cssClass);
   overlayContainer.getContainerElement().classList.add(cssClass);
 
+  selectedTheme(theme, themeService);
   cookieService.set(THEME, cssClass);
 
   return cssClass;
+};
+
+const selectedTheme = (value: Theme | undefined, themeService: ThemeService): void => {
+  let overrides: ChartOptions;
+  if (isDarkMode(value)) {
+    overrides = {
+      legend: {
+        labels: {fontColor: 'white'}
+      },
+      scales: {
+        xAxes: [{
+          ticks: {fontColor: 'white'},
+          gridLines: {color: 'rgba(255,255,255,0.1)'}
+        }],
+        yAxes: [{
+          ticks: {fontColor: 'white'},
+          gridLines: {color: 'rgba(255,255,255,0.1)'}
+        }]
+      }
+    };
+  } else {
+    overrides = {};
+  }
+  themeService.setColorschemesOptions(overrides);
 };

@@ -1,9 +1,9 @@
 import { All, UserActionTypes } from '../user.actions';
-import { IUser } from '../../interfaces/user';
+import { IOverview, IUser } from '../../interfaces/user';
 import { Pagination } from '../../interfaces/pagination';
 
 export interface State {
-  data: IUser | Pagination<IUser> | null;
+  data: IUser | Pagination<IUser> | IOverview | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -46,6 +46,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
+    case UserActionTypes.userOverview:
     case UserActionTypes.findMe:
     case UserActionTypes.findUser: {
       return {

@@ -1,7 +1,6 @@
 <div *ngIf="data && data.length && calendar && calendar.size; else errorBox" class="scroll-container">
   <div class="divider">
-    <button (click)="decrement()" [disabled]="prevBtnDisabled"
-            color="accent" mat-raised-button>
+    <button (click)="decrement()" [disabled]="prevBtnDisabled" color="accent" mat-raised-button>
       <mat-icon>navigate_before</mat-icon>
       <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.PREVIOUS' | translate}}</span>
     </button>
@@ -30,37 +29,21 @@
             <p class="bold">{{rr.room.name}}</p>
           </mat-panel-title>
         </mat-expansion-panel-header>
-        <div [ngSwitch]="selectView">
-          <div *ngSwitchCase="'week'">
-            <mwl-calendar-week-view
-              (eventClicked)="view($event.event)"
-              (hourSegmentClicked)="segmentClick($event.date, rr.room)"
-              [dayEndHour]="calendar.get(rr.room.id)!.day!.dayEndHour"
-              [dayEndMinute]="calendar.get(rr.room.id)!.day!.dayEndMinute"
-              [dayStartHour]="calendar.get(rr.room.id)!.day!.dayStartHour"
-              [dayStartMinute]="calendar.get(rr.room.id)!.day!.dayStartMinute"
-              [daysInWeek]="daysInWeek"
-              [events]="calendar.get(rr.room.id)!.events"
-              [hourSegments]="hourSegments"
-              [locale]="locale"
-              (beforeViewRender)="beforeMonthViewRender($event)"
-              [viewDate]="viewDate"></mwl-calendar-week-view>
-          </div>
-          <div *ngSwitchCase="'day'">
-            <h3>{{ viewDate | calendarDate:(calendarView + 'ViewTitle'):locale }}</h3>
-            <mwl-calendar-day-view
-              (eventClicked)="view($event.event)"
-              (hourSegmentClicked)="segmentClick($event.date, rr.room)"
-              [dayEndHour]="calendar.get(rr.room.id)!.day!.dayEndHour"
-              [dayEndMinute]="calendar.get(rr.room.id)!.day!.dayEndMinute"
-              [dayStartHour]="calendar.get(rr.room.id)!.day!.dayStartHour"
-              [dayStartMinute]="calendar.get(rr.room.id)!.day!.dayStartMinute"
-              [events]="calendar.get(rr.room.id)!.events"
-              [hourSegments]="hourSegments"
-              [locale]="locale"
-              [viewDate]="viewDate"></mwl-calendar-day-view>
-          </div>
-        </div>
+        <mwl-calendar-week-view
+          (beforeViewRender)="beforeMonthViewRender($event)"
+          (eventClicked)="view($event.event)"
+          (hourSegmentClicked)="segmentClick($event.date, rr.room)"
+          [dayEndHour]="calendar.get(rr.room.id)!.day!.dayEndHour"
+          [dayEndMinute]="calendar.get(rr.room.id)!.day!.dayEndMinute"
+          [dayStartHour]="calendar.get(rr.room.id)!.day!.dayStartHour"
+          [dayStartMinute]="calendar.get(rr.room.id)!.day!.dayStartMinute"
+          [daysInWeek]="daysInWeek"
+          [events]="calendar.get(rr.room.id)!.events"
+          [excludeDays]="calendar.get(rr.room.id)!.day!.excludeDays"
+          [hourSegments]="hourSegments"
+          [locale]="locale"
+          [weekendDays]="[]"
+          [viewDate]="viewDate"></mwl-calendar-week-view>
       </mat-expansion-panel>
     </mat-accordion>
   </div>

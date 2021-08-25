@@ -4,7 +4,7 @@ import { AppState, selectAuthState, selectReservationState } from '../../store/a
 import { Observable, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
 import * as fromActionsPayment from '../../store/payment.actions';
-import { IReservationAll } from '../../interfaces/reservation';
+import { IReservationAll, States } from '../../interfaces/reservation';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   convertDuration,
@@ -15,6 +15,7 @@ import {
   getTime,
   greaterThanToday,
   IDuration,
+  isToday,
   isTomorrow,
   newDate
 } from '../../util/dates';
@@ -25,10 +26,10 @@ import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Role } from '../../interfaces/token';
-import { getFullUserName, getPriceDiscount, getUserName, snakeToCamel, totalPaid, totalPrice } from '../../util/helper';
+import { getFullUserName, getPrice, getUserName, newExtra, newPrice, snakeToCamel } from '../../util/helper';
 import { FormControl } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
-import { IProduct } from '../../interfaces/product';
+import { IPrice, IProduct, Price } from '../../interfaces/product';
 import { requireMatch, valueChange } from '../../util/validators';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatFabMenu, MatFabMenuDirection } from '@angular-material-extensions/fab-menu/lib/mat-fab-menu.component';
@@ -58,40 +59,37 @@ export enum ReservationIconName {
   styleUrls: ['./reservation-detail.component.scss']
 })
 export class ReservationDetailComponent implements OnInit, OnDestroy {
-  getState: Observable<any>;
-  subscription: Subscription | undefined;
   reservation: IReservationAll | undefined;
   duration: IDuration = new Duration();
   start: Date = getNow();
   end: Date = getNow();
   state: string | undefined;
 
-  locale: string;
   language: string;
-  isLoading = false;
   changeState: MatFabMenu[] = [];
-  professionalId: string | undefined;
-  customerId: string | undefined;
-  machine: any;
 
   displayedColumns: string[] = ['position', 'professional', 'start', 'product', 'state'];
   dataSource: any;
   pageSize = 5;
-  user: IUserAll | undefined;
 
-  priceDiscount: number | undefined;
-  total: number | undefined;
+  price: IPrice;
 
-  public paginator: MatPaginator | undefined;
+  paginator: MatPaginator | undefined;
 
   direction: MatFabMenuDirection = 'left';
-  tooltipPosition = 'below';
-
   showFireworks = false;
 
-  payments: any;
   paymentPaid: any;
   paymentDisplayedColumns: string[] = ['position', 'description', 'status', 'type', 'amount'];
+
+  private payments: any;
+  private tooltipPosition = 'below';
+  private machine: any;
+  private customerId: string | undefined;
+  private professionalId: string | undefined;
+  private isLoading = false;
+  private getState: Observable<any>;
+  private subscription: Subscription | undefined;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private route: ActivatedRoute,
               private store: Store<AppState>, private cdRef: ChangeDetectorRef, private router: Router,
@@ -106,16 +104,13 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         this.tooltipPosition = 'left';
       }
     });
-    const userLang = this.translate.currentLang;
-    this.language = userLang;
-    const index = userLang.indexOf('-');
-    this.locale = index === -1 ? userLang : userLang.substr(0, index);
+    this.language = this.translate.currentLang;
+    this.price = new Price();
 
     this.store.select(selectAuthState).subscribe((state: any) => {
       const user: IUserAll = state.user;
       this.professionalId = user.authorities.some(u => u.authority === Role.professional) ? user.id : undefined;
       this.customerId = user.authorities.some(u => u.authority === Role.customer) ? user.id : undefined;
-      this.user = user;
     });
   }
 
@@ -203,8 +198,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     return this.paymentPaid?.map((p: IPayment) => p.amount).reduce((acc: number, value: number) => acc + value, 0);
   }
 
-  private createAction(tooltip: string, icon: string, id: string, color?: string): any {
-    return {tooltip, tooltipPosition: this.tooltipPosition, icon, id, color};
+  private createAction(tooltip: string, icon: string, id: string, color?: string): MatFabMenu {
+    return {tooltip, tooltipPosition: this.tooltipPosition, icon, id, color} as MatFabMenu;
   }
 
   private subscribe(): void {
@@ -226,7 +221,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         } else if (this.customerId && this.customerId === this.reservation?.customer.id) {
           this.customerMachine(this);
           this.changeState = this.machine.next(snakeToCamel(this.reservation.state));
-          if (this.reservation.state === 'COMPLETED') {
+          if (this.reservation.state === States.completed) {
             this.showFireworks = true;
             setTimeout(() => {
               this.showFireworks = false;
@@ -234,11 +229,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
           }
         }
         if (this.reservation && this.reservation.product) {
-          this.priceDiscount = getPriceDiscount(this.reservation.product.discount, this.reservation.product.price);
-          if (this.reservation.product.extras && this.reservation.product.extras.price) {
-            this.total = this.reservation.product.extras.price +
-              (this.priceDiscount ? this.priceDiscount : this.reservation.product.price);
-          }
+          this.price = getPrice(this.reservation.product);
         }
         this.dataSource = new MatTableDataSource<IReservationAll>(state.selected.history);
         this.cdRef.detectChanges();
@@ -286,7 +277,11 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     const more = this.createAction(translate.instant('RESERVATION.ACTION.MORE'),
       ReservationIconName.more, 'more');
 
-    let approveActions = [start, edit];
+    let approveActions: MatFabMenu[] = [];
+    if (self.reservation && isToday(newDate(self.reservation.start))) {
+      approveActions = [start];
+    }
+    approveActions = [...approveActions, edit];
     if (self.reservation && self.reservation.customer && self.reservation.customer.phone &&
       greaterThanToday(newDate(self.reservation.start))) {
       approveActions = [...approveActions, sendMessage];
@@ -469,9 +464,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     };
 
     if (self.payments && self.reservation) {
-      const paid = totalPaid(self.payments);
-      const total = totalPrice(self.reservation.product);
-      if (total > paid) {
+      const price = getPrice(self.reservation.product);
+      if (price.total > price.totalPaid) {
         const next = this.createAction(translate.instant('RESERVATION.ACTION.PAY'),
           ReservationIconName.payment, 'pay', 'blue');
         approved.next = [...approved.next, next];
@@ -531,44 +525,29 @@ export class CompleteDialogComponent implements OnInit, OnDestroy {
   subscription: Subscription | undefined;
 
   products: IProduct[] | undefined;
-  priceDiscount: number | undefined;
   filteredProduct: Observable<IProduct[] | undefined> | undefined;
   product: FormControl = new FormControl('', [requireMatch]);
 
   description: FormControl = new FormControl();
-  price: FormControl = new FormControl();
+  extraPrice: FormControl = new FormControl();
   type: FormControl = new FormControl(PaymentType.cash);
 
-  total = 0;
-  totalToPaid = 0;
-
   types = PaymentType;
+  price: IPrice;
 
   constructor(public dialogRef: MatDialogRef<CompleteDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
               private store: Store<AppState>) {
     this.getState = store.select(selectReservationState);
-    const paid: number = totalPaid(data.payments);
+    this.price = getPrice(data.reservation.product, data.payments);
+    this.product.setValue(data.reservation?.product);
     this.product.valueChanges.subscribe(value => {
       if (value) {
-        this.total = value.price + (this.price.value ? this.price.value : 0);
-        if (data.reservation.product) {
-          this.priceDiscount = getPriceDiscount(data.reservation.product.discount, this.total);
-        }
-        this.totalToPaid = (this.priceDiscount ? this.priceDiscount : this.total) - paid;
+        this.price = newPrice(this.price, value.price);
       }
     });
-    this.price.valueChanges.subscribe(value => {
-      if (value) {
-        this.total = this.product.value.price + value;
-        if (data.reservation.product) {
-          this.priceDiscount = getPriceDiscount(data.reservation.product.discount, this.total);
-        }
-      } else {
-        this.total = this.product.value.price;
-      }
-      this.totalToPaid = (this.priceDiscount ? this.priceDiscount : this.total) - paid;
+    this.extraPrice.valueChanges.subscribe(value => {
+      this.price = newExtra(this.price, value ? value : 0);
     });
-    this.product.setValue(data.reservation?.product);
   }
 
   get customerName(): string {
@@ -601,7 +580,7 @@ export class CompleteDialogComponent implements OnInit, OnDestroy {
   doAction(): void {
     const productId = valueChange(this.product.value.id, this.data.reservation.product.id);
     const description = this.description.value;
-    const price = this.price.value;
+    const price = this.extraPrice.value;
     const paymentType = this.type.value;
     this.dialogRef.close({description, price, productId, paymentType});
   }

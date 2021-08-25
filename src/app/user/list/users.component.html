@@ -92,6 +92,9 @@
                   matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="above">
             <mat-icon color="primary">edit</mat-icon>
           </button>
+          <button [routerLink]="['/users', user.id, 'overview']" mat-icon-button matTooltipPosition="above">
+            <mat-icon color="primary">analytics</mat-icon>
+          </button>
           <button (click)="delete(user)" *ngIf="!user.deleted"
                   mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}"

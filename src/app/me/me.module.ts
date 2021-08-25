@@ -19,6 +19,7 @@ import {
   ReferralsComponent
 } from './referrals/referrals.component';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
+import { ReviewDialogComponent } from './reservation/review/review-dialog.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import { MeDiscountComponent } from './discount/me/me-discount.component';
     ReferralsComponent,
     BottomSheetShareComponent,
     BottomSheetReferralComponent,
-    MeDiscountComponent
+    MeDiscountComponent,
+    ReviewDialogComponent
   ],
   imports: [
     MeRoutingModule,

@@ -62,12 +62,12 @@
       <mat-list-item>
         <mat-icon mat-list-icon>attach_money</mat-icon>
         <div mat-line>{{ 'PRODUCT.PRICE.FIELD' | translate}}</div>
-        <div *ngIf="priceDiscount; else noDiscount" mat-line>
-          <span [class.strikethrough]="priceDiscount">{{reservation.product.price | number:'1.2-2'}}</span>
-          <span [@discountAnimation] class="raised-button bold">{{priceDiscount | number:'1.2-2'}}</span>
+        <div *ngIf="price.discount; else noDiscount" mat-line>
+          <span [class.strikethrough]="price.discount">{{price.amount | number:'1.2-2'}}</span>
+          <span [@discountAnimation] class="raised-button bold">{{price.priceWithDiscount | number:'1.2-2'}}</span>
         </div>
         <ng-template #noDiscount>
-          <div mat-line>{{reservation.product.price | number:'1.2-2'}}</div>
+          <div mat-line>{{price.amount | number:'1.2-2'}}</div>
         </ng-template>
       </mat-list-item>
       <div *ngIf="reservation.product.extras">
@@ -78,16 +78,16 @@
           <div mat-line>{{ 'RESERVATION.PRODUCT.EXTRAS.DESCRIPTION' | translate}}</div>
           <div mat-line>{{reservation.product.extras.description}}</div>
         </mat-list-item>
-        <mat-list-item *ngIf="reservation.product.extras.price">
+        <mat-list-item *ngIf="price.extra">
           <mat-icon mat-list-icon>attach_money</mat-icon>
           <div mat-line>{{ 'RESERVATION.PRODUCT.EXTRAS.PRICE' | translate}}</div>
-          <div mat-line>{{reservation.product.extras.price}}</div>
+          <div mat-line>{{price.extra}}</div>
         </mat-list-item>
         <mat-divider></mat-divider>
-        <mat-list-item *ngIf="total">
+        <mat-list-item *ngIf="price.total">
           <mat-icon mat-list-icon>paid</mat-icon>
           <div mat-line><span class="bold">{{ 'RESERVATION.PRODUCT.EXTRAS.TOTAL' | translate}}</span></div>
-          <div mat-line><span class="bold">{{total}}</span></div>
+          <div mat-line><span class="bold">{{price.total}}</span></div>
         </mat-list-item>
       </div>
       <mat-divider></mat-divider>
@@ -161,7 +161,7 @@
         </ng-container>
 
         <tr *matHeaderRowDef="paymentDisplayedColumns" mat-header-row></tr>
-        <tr *matRowDef="let row; columns: paymentDisplayedColumns;" class="{{row.status}}" mat-row></tr>
+        <tr *matRowDef="let row; columns: paymentDisplayedColumns;" class="{{row.type.toLowerCase()}}" mat-row></tr>
         <tr *matFooterRowDef="paymentDisplayedColumns" mat-footer-row></tr>
       </table>
       <mat-divider></mat-divider>

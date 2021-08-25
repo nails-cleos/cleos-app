@@ -9,7 +9,7 @@ import { flags, IFlag } from '../../util/flags';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CookieService } from 'ngx-cookie-service';
-import { THEME } from '../../util/theme';
+import { Theme, THEME } from '../../util/theme';
 
 @Component({
   selector: 'app-sign-up',
@@ -79,7 +79,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
     user.lastName = this.lastName.value;
     user.phone = this.phone.value;
     user.code = this.codeForm.value;
-    user.theme = this.cookieService.get(THEME);
+    user.theme = this.cookieService.get(THEME) as Theme;
 
     this.store.dispatch(new fromActionsLogin.SignUp(user));
   }

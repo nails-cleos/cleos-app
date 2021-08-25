@@ -4,9 +4,16 @@ import {
   annualReservationChart,
   barChartDefaultOptions,
   barChartTimeOptions,
+  chartArrayColors,
+  chartColors,
   customerReservationChart,
+  defaultOptions,
+  IChartUtil,
   lastMonthReservationChart,
   monthlyReservationChart,
+  paymentChart,
+  pieChartPercentageOptions,
+  productChart,
   productReservationChart,
   quantityProductChart,
   trackingAverageChart,
@@ -25,7 +32,9 @@ enum ChartTypeEnum {
   customerReservation,
   lastMonthReservation,
   trackingAverage,
-  trackingCompare
+  trackingCompare,
+  productOverview,
+  paymentOverview
 }
 
 @Component({
@@ -41,59 +50,48 @@ export class CardComponent {
   @Input() data: any;
   @Input() expand = true;
 
-  locale: string;
-
   chartLabels: Label[] = [];
   chartDataSet: ChartDataSets[] | undefined;
   chartData: SingleDataSet | undefined;
   chartType: ChartType | undefined;
-  chartOptions: ChartOptions = {
-    responsive: true
-  };
-  chartColors: Color[] = [];
+  chartOptions: ChartOptions = defaultOptions();
+  chartColors: Color[] = chartColors();
 
   constructor(public translate: TranslateService, public dialog: MatDialog) {
-    const userLang = this.translate.currentLang;
-    const index = userLang.indexOf('-');
-    this.locale = index === -1 ? userLang : userLang.substr(0, index);
   }
 
   onClick(): void {
     // @ts-ignore
     switch (ChartTypeEnum[snakeToCamel(this.type)]) {
       case ChartTypeEnum.quantityProduct.valueOf():
-        this.setBarChart(quantityProductChart(this.data, this.label), barChartDefaultOptions());
-        break;
-      case ChartTypeEnum.productReservation.valueOf():
-        const product = productReservationChart(this.data);
-        if (product) {
-          this.chartDataSet = product.chartDataSet;
-          this.chartLabels = product.chartLabels;
-          this.chartType = 'radar';
-        }
-        break;
-      case ChartTypeEnum.monthlyReservation.valueOf():
-        const monthly = monthlyReservationChart(this.data, this.locale);
-        if (monthly) {
-          this.chartData = monthly.chartData;
-          this.chartLabels = monthly.chartLabels;
-          this.chartType = 'pie';
-        }
-        break;
-      case ChartTypeEnum.yearlyProductPrice.valueOf():
-        this.setLineChart(annualReservationChart(this.data, this.locale, this.label));
-        break;
-      case ChartTypeEnum.customerReservation.valueOf():
-        this.setBarChart(customerReservationChart(this.data, this.label), barChartDefaultOptions());
-        break;
-      case ChartTypeEnum.lastMonthReservation.valueOf():
-        this.setLineChart(lastMonthReservationChart(this.data, this.locale, this.label));
+        this.setChart('bar', quantityProductChart(this.data, this.label), barChartDefaultOptions());
         break;
       case ChartTypeEnum.trackingAverage.valueOf():
-        this.setBarChart(trackingAverageChart(this.data, this.label), barChartTimeOptions());
+        this.setChart('bar', trackingAverageChart(this.data, this.label), barChartTimeOptions());
         break;
       case ChartTypeEnum.trackingCompare.valueOf():
-        this.setBarChart(trackingCompareChart(this.data, this.label), barChartTimeOptions());
+        this.setChart('bar', trackingCompareChart(this.data, this.label), barChartTimeOptions());
+        break;
+      case ChartTypeEnum.customerReservation.valueOf():
+        this.setChart('bar', customerReservationChart(this.data, this.label), barChartDefaultOptions());
+        break;
+      case ChartTypeEnum.monthlyReservation.valueOf():
+        this.setChart('pie', monthlyReservationChart(this.data, this.translate.currentLang), defaultOptions(), chartArrayColors());
+        break;
+      case ChartTypeEnum.productOverview.valueOf():
+        this.setChart('pie', productChart(this.data), defaultOptions(), chartArrayColors());
+        break;
+      case ChartTypeEnum.paymentOverview.valueOf():
+        this.setChart('pie', paymentChart(this.data, this.translate), pieChartPercentageOptions(), chartArrayColors());
+        break;
+      case ChartTypeEnum.yearlyProductPrice.valueOf():
+        this.setChart('line', annualReservationChart(this.data, this.translate.currentLang, this.label));
+        break;
+      case ChartTypeEnum.lastMonthReservation.valueOf():
+        this.setChart('line', lastMonthReservationChart(this.data, this.translate.currentLang, this.label));
+        break;
+      case ChartTypeEnum.productReservation.valueOf():
+        this.setChart('radar', productReservationChart(this.data));
         break;
     }
     if (this.chartType) {
@@ -113,31 +111,14 @@ export class CardComponent {
     }
   }
 
-  private setLineChart(lineChart: any): void {
-    if (lineChart) {
-      this.chartDataSet = lineChart.chartDataSet;
-      this.chartLabels = lineChart.chartLabels;
-      this.chartType = 'line';
-      this.chartColors = [
-        {
-          borderColor: 'rgb(103, 58, 183)',
-          backgroundColor: 'rgba(103, 58, 183,0.3)'
-        }
-      ];
-    }
-  }
-
-  private setBarChart(barChart: any, options: any): void {
-    if (barChart) {
-      this.chartDataSet = barChart.chartDataSet;
-      this.chartLabels = barChart.chartLabels;
-      this.chartType = 'bar';
-      this.chartColors = [
-        {
-          backgroundColor: 'rgba(103, 58, 183)'
-        }
-      ];
-      this.chartOptions = options;
+  private setChart(type: ChartType, chart: IChartUtil | null, options?: ChartOptions, color?: Color[]): void {
+    if (chart) {
+      this.chartDataSet = chart.chartDataSet;
+      this.chartLabels = chart.chartLabels;
+      this.chartData = chart.chartData;
+      this.chartType = type;
+      this.chartColors = color || this.chartColors;
+      this.chartOptions = options || this.chartOptions;
     }
   }
 }
