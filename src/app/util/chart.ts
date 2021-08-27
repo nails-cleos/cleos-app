@@ -1,9 +1,10 @@
 import { IPaymentReservation, IReservationAll, ITracking, States } from '../interfaces/reservation';
 import { Color, Label, SingleDataSet } from 'ng2-charts';
 import { ChartDataSets, ChartOptions } from 'chart.js';
-import { convertDuration, formatDate, getNow, getSecondsBetweenTimes, newDate, plusDay, plusMonthDate } from './dates';
+import { convertDuration, formatDate, getNow, getSecondsBetweenTimes, newDate, plusMonthDate } from './dates';
 import { getPrice } from './helper';
 import { TranslateService } from '@ngx-translate/core';
+import { addDays } from 'date-fns';
 
 export interface IChartUtil {
   chartLabels: Label[];
@@ -109,7 +110,7 @@ export const lastMonthReservationChart = (result: IReservationAll[] | undefined,
     let labels: string[] = [];
 
     for (let i = 30; i >= 0; i--) {
-      const date = plusDay(getNow(), -i);
+      const date = addDays(getNow(), -i);
       const formattedDate = formatDate(date, locale);
       const total: number = completedList.filter(r => formatDate(newDate(r.start), locale) === formattedDate).length;
 

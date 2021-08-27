@@ -21,14 +21,13 @@ import {
   endOfPeriod,
   formatTime,
   getAvailability,
-  getDiffDay,
   getNow,
   getStartEndDay,
+  getWeekDay,
   greaterOrEqualsThan,
   IDuration,
   isBetween,
   newDate,
-  plusDay,
   startOfPeriod,
   subPeriod
 } from '../../util/dates';
@@ -40,9 +39,10 @@ import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { IUserAll } from '../../interfaces/user';
 import { IUnavailableAll } from '../../interfaces/unavailable';
 import { getUserName } from '../../util/helper';
-import { addMonths } from 'date-fns';
+import { addDays, addMonths } from 'date-fns';
 import { findStateColor, isDarkMode } from '../../util/theme';
 import { takeUntil } from 'rxjs/operators';
+import RRule from 'rrule';
 
 @Component({
   selector: 'app-calendar',
@@ -218,37 +218,49 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   private addUnavailableList(rr: IRoomReservation, darkMode: boolean): void {
     const unavailableList: IUnavailableAll[] = rr.unavailableList;
-    const days = 56;
+    let recurringEvents: any[] = [];
     unavailableList.forEach(it => {
       if (it.duration) {
         const start = newDate(it.start);
         const duration = convertDuration(it.duration);
-        switch (it.repeat) {
-          case 'NONE':
-            if (!greaterOrEqualsThan(start, this.maxDate)) {
-              this.validateUnavailableEvent(rr.room, start, duration, it, darkMode);
-            }
-            break;
-          case 'ONCE_A_WEEK':
-            for (let i = 0; i < days; i++) {
-              const onceWeekDate = plusDay(start, i * 7);
-              if (greaterOrEqualsThan(onceWeekDate, this.maxDate)) {
-                break;
-              }
-              this.validateUnavailableEvent(rr.room, onceWeekDate, duration, it, darkMode);
-            }
-            break;
-          case 'EVERY_DAY':
-            for (let i = 0; i < days * 7; i++) {
-              const everyDayDate = plusDay(start, i);
-              if (greaterOrEqualsThan(everyDayDate, this.maxDate)) {
-                break;
-              }
-              this.validateUnavailableEvent(rr.room, everyDayDate, duration, it, darkMode);
-            }
-            break;
+        if (it.repeat === 'NONE') {
+          if (!greaterOrEqualsThan(start, this.maxDate)) {
+            this.validateUnavailableEvent(rr.room, start, duration, it, darkMode);
+          }
+        } else {
+          let startDate;
+          let rrule;
+          switch (it.repeat) {
+            case 'ONCE_A_WEEK':
+              const byweekday = getWeekDay(start.getDay());
+              startDate = createNewDate(addDays(this.today, (start.getDay() + 7 - this.today.getDay()) % 7),
+                start.getHours(), start.getMinutes());
+              rrule = {
+                freq: RRule.WEEKLY,
+                byweekday
+              };
+              break;
+            case 'EVERY_DAY':
+              startDate = createNewDate(this.today, start.getHours(), start.getMinutes());
+              rrule = {
+                freq: RRule.DAILY
+              };
+              break;
+          }
+          recurringEvents = [...recurringEvents, {duration, it, startDate, rrule}];
         }
       }
+    });
+
+    recurringEvents.forEach(recurring => {
+      const rule: RRule = new RRule({
+        ...recurring.rrule,
+        dtstart: recurring.startDate,
+        until: this.maxDate
+      });
+
+      rule.all().forEach((date) =>
+        this.validateUnavailableEvent(rr.room, date, recurring.duration, recurring.it, darkMode));
     });
   }
 
@@ -272,20 +284,19 @@ export class CalendarComponent implements OnInit, OnDestroy {
                 events = [...events, value];
               }
             }
-            this.createUnavailableEvent(room, events, calendar.day, it.id, start, end, duration, darkMode, it.description);
+            this.createUnavailableEvent(room, events, calendar.day, it.id, start, end, darkMode, it.description);
           }
         });
       } else {
-        this.createUnavailableEvent(room, events, calendar.day, it.id, start, end, duration, darkMode, it.description);
+        this.createUnavailableEvent(room, events, calendar.day, it.id, start, end, darkMode, it.description);
       }
     }
   }
 
   private createUnavailableEvent(room: IRoomAll, events: CalendarEvent[], day: any, id: string, start: Date, end: Date,
-                                 duration: IDuration, darkMode: boolean, description?: string): void {
+                                 darkMode: boolean, description?: string): void {
     const detail = this.translate.instant('RESERVATION.EVENT.UNAVAILABLE', {
-      description: description ? description : '',
-      duration: formatTime(duration.hour, duration.minute)
+      description: description ? description : ''
     });
 
     const color = findStateColor('DEFAULT', darkMode);
@@ -321,8 +332,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
         const unavailable = this.translate.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
         const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
         const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
-        calendar.events = calendar.events.concat(fillNotAvailable(unavailable, lunch, notWorking,
-          getDiffDay(this.maxDate, this.today), this.viewDate, sunday, saturday, week, darkMode));
+        calendar.events = calendar.events.concat(fillNotAvailable(unavailable, lunch, notWorking, this.viewDate,
+          sunday, saturday, week, darkMode, false, this.maxDate));
       });
       this.data.forEach((value: IRoomReservation) => this.addUnavailableList(value, darkMode));
     }

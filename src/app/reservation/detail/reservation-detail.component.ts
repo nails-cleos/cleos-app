@@ -15,8 +15,6 @@ import {
   getTime,
   greaterThanToday,
   IDuration,
-  isToday,
-  isTomorrow,
   newDate
 } from '../../util/dates';
 import { MatTableDataSource } from '@angular/material/table';
@@ -35,6 +33,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatFabMenu, MatFabMenuDirection } from '@angular-material-extensions/fab-menu/lib/mat-fab-menu.component';
 import { IPayment, PaymentType } from '../../interfaces/payment';
 import { transitionAnimation } from '../../util/animation';
+import { isToday, isTomorrow } from 'date-fns';
 
 export enum ReservationIconName {
   created = 'assignment',

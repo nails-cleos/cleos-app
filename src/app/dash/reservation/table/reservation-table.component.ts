@@ -12,7 +12,6 @@ import { ReservationIconName } from '../../../reservation/detail/reservation-det
 import { DialogComponent } from '../../../shared/dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { getUserName, snakeToCamel } from '../../../util/helper';
 
@@ -27,17 +26,17 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
 
   displayedColumns: string[] = ['position', 'customer', 'professional', 'start', 'product', 'state', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IReservationAll>>();
-  getState: Observable<any>;
-  subscription: Subscription | undefined;
-
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
 
   language: string;
   error: any;
 
-  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private router: Router,
-              private store: Store<AppState>, private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+  private getState: Observable<any>;
+  private subscription: Subscription | undefined;
+
+  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
+              private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
     this.getState = this.store.select(selectReservationState);
     this.language = this.translate.currentLang;
     breakpointObserver.observe([
@@ -77,10 +76,6 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
   getIcon(name: any): any {
     // @ts-ignore
     return ReservationIconName[snakeToCamel(name)];
-  }
-
-  view(reservation: IReservation): void {
-    this.router.navigate(['reservation', reservation.id]);
   }
 
   delete(reservation: IReservation): void {

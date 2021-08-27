@@ -110,7 +110,7 @@
         <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
         <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
           <div *ngIf="reservation.id; else skeleton">
-            <button (click)="view(reservation)" *ngIf="!reservation.deleted" mat-icon-button
+            <button *ngIf="!reservation.deleted" [routerLink]="['/reservation', reservation.id]" mat-icon-button
                     matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
               <mat-icon color="primary">visibility</mat-icon>
             </button>
@@ -142,7 +142,7 @@
               </mat-list-item>
               <div fxHide fxShow.lt-sm mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
               <mat-list-item fxHide fxShow.lt-sm role="list">
-                <button (click)="view(reservation)" *ngIf="!reservation.deleted" color="primary"
+                <button *ngIf="!reservation.deleted" [routerLink]="['/reservation', reservation.id]" color="primary"
                         mat-raised-button>
                   <mat-icon>visibility</mat-icon>
                   {{ 'COMMON.BUTTON.VIEW' | translate }}

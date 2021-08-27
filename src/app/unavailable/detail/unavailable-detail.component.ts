@@ -11,8 +11,8 @@ import {
   convertDuration,
   createNewDate,
   diffTime,
+  filterDate,
   formatTime,
-  getAvailability,
   getMinMaxDate,
   getNow,
   getTime,
@@ -28,37 +28,35 @@ import { getUserName } from '../../util/helper';
   styleUrls: ['./unavailable-detail.component.scss']
 })
 export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDestroy {
-
   @Input() unavailable: IUnavailable | undefined;
+
   form!: FormGroup;
-  subscription: Subscription | undefined;
-  getState: Observable<any>;
+
+  professionalName: string | undefined;
+  room: IRoomAll | undefined;
+  startDate: FormControl = new FormControl('', [
+    Validators.required
+  ]);
+  startTime: FormControl = new FormControl('', [
+    Validators.required
+  ]);
+  duration: FormControl = new FormControl('', [
+    Validators.required
+  ]);
+  repeat: FormControl = new FormControl('', [
+    Validators.required
+  ]);
+  repeats = UnavailableRepeatType;
+
   errors: any = [];
+
   durationTime: any;
   durationMax: any;
   minTime: any;
   maxTime: any;
 
-  professionalName: string | undefined;
-  room: IRoomAll | undefined;
-
-  startDate: FormControl = new FormControl('', [
-    Validators.required
-  ]);
-
-  startTime: FormControl = new FormControl('', [
-    Validators.required
-  ]);
-
-  duration: FormControl = new FormControl('', [
-    Validators.required
-  ]);
-
-  repeat: FormControl = new FormControl('', [
-    Validators.required
-  ]);
-
-  repeats = UnavailableRepeatType;
+  private subscription: Subscription | undefined;
+  private getState: Observable<any>;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
               private router: Router) {
@@ -78,25 +76,7 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
     this.getUnavailable();
   }
 
-  myFilter = (d: Date | null): boolean => {
-    const now = getNow();
-    const date = (d || now);
-    let result = true;
-    if (this.room) {
-      const {week, saturday, sunday} = getAvailability(this.room);
-      const day = date.getDay();
-      if (!week) {
-        result = result && (day === 0 || day === 6);
-      }
-      if (!sunday) {
-        result = result && day !== 0;
-      }
-      if (!saturday) {
-        result = result && day !== 6;
-      }
-    }
-    return result;
-  };
+  myFilter = (d: Date | null): boolean => filterDate(true, d, this.room);
 
   setDate($event: any): void {
     const date = newDate($event.value);

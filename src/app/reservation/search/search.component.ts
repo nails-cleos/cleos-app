@@ -7,7 +7,6 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../store/app.states';
 import { ReservationIconName } from '../detail/reservation-detail.component';
@@ -36,27 +35,27 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
 
   displayedColumns: string[] = ['position', 'customer', 'start', 'state', 'product', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IReservationAll>>();
-  getState: Observable<any>;
-  subscription: Subscription | undefined;
   expandedReservation: IReservation | undefined;
-
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
 
   language: string;
 
-  customers: IUserAll[] | undefined;
   filteredCustomer: Observable<IUser[] | undefined> | undefined;
   customer: FormControl = new FormControl();
-  userId: string | undefined;
 
   state = new FormControl();
   filteredStates: Observable<string[]>;
   states: string[] = [States.created];
-  allStates: string[] = Object.keys(States);
 
-  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private router: Router,
-              private store: Store<AppState>, private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+  private allStates: string[] = Object.keys(States);
+  private userId: string | undefined;
+  private customers: IUserAll[] | undefined;
+  private getState: Observable<any>;
+  private subscription: Subscription | undefined;
+
+  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
+              private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -102,10 +101,6 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   getIcon(name: any): any {
     // @ts-ignore
     return ReservationIconName[snakeToCamel(name)];
-  }
-
-  view(reservation: IReservation): void {
-    this.router.navigate(['reservation', reservation.id]);
   }
 
   cancel(reservation: IReservationAll): void {

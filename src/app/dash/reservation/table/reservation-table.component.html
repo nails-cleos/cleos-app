@@ -73,7 +73,7 @@
       <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
       <td *matCellDef="let reservation" mat-cell>
         <div *ngIf="reservation.id; else skeleton">
-          <button (click)="view(reservation)" *ngIf="!reservation.deleted" mat-icon-button
+          <button [routerLink]="['/reservation', reservation.id]" *ngIf="!reservation.deleted" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
             <mat-icon color="primary">visibility</mat-icon>
           </button>

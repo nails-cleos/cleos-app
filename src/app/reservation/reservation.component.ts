@@ -23,17 +23,17 @@ import {
   createFullDate,
   createNewDate,
   Duration,
+  filterDateRoom,
   formatTime,
   getAvailability,
-  getDiffDay,
   getNow,
   getStartEndDay,
   getTime,
+  getWeekDay,
   greaterOrEqualsThan,
   IDuration,
   isBetween,
-  newDate,
-  plusDay
+  newDate
 } from '../util/dates';
 import { fillNotAvailable, getOverlapEvent, Meta, newEvent } from '../util/event';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -44,8 +44,9 @@ import { IUnavailableAll } from '../interfaces/unavailable';
 import { DiscountType, IUserDiscount } from '../interfaces/discount';
 import { getFullUserName, getPrice, getUserName, newDiscount, newPrice } from '../util/helper';
 import { transitionAnimation } from '../util/animation';
-import { addMonths } from 'date-fns';
+import { addDays, addMonths } from 'date-fns';
 import { findStateColor, isDarkMode } from '../util/theme';
+import RRule from 'rrule';
 
 @Component({
   selector: 'app-reservation',
@@ -60,8 +61,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() events: CalendarEvent[] = [];
   @ViewChild('stepper') myStepper!: MatStepper;
 
-  getState: Observable<any>;
-  subscription: Subscription | undefined;
   errors: any = [];
 
   customerForm!: FormGroup;
@@ -73,14 +72,15 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   productForm!: FormGroup;
   products: IProduct[] | undefined;
-  discounts: IUserDiscount[] | undefined;
-  showDiscount = false;
-  price: IPrice;
-  discount = new FormControl();
   filteredProduct: Observable<IProduct[] | undefined> | undefined;
   product: FormControl = new FormControl('', [
     Validators.required, requireMatch
   ]);
+
+  discounts: IUserDiscount[] | undefined;
+  discount = new FormControl();
+  showDiscount = false;
+  price: IPrice;
 
   roomForm!: FormGroup;
   rooms: IRoom[] | undefined;
@@ -98,39 +98,37 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     Validators.required
   ]);
 
-  reservations: IReservationAll[] | undefined;
-  unavailableList: IUnavailableAll[] | undefined;
   viewDate: Date = getNow();
-
   dayStartHour = 9;
   dayStartMinute = 0;
   dayEndHour = 18;
   dayEndMinute = 0;
   daysInWeek = 7;
-  lessDays = 3;
-  hourSegments = 4;
-  locale: string;
   weekendDays: number[] = [0, 6];
 
   eventSelected: CalendarEvent | undefined;
+  locale: string;
   smallScreen: boolean | undefined;
   isPreview = false;
   duration: IDuration = new Duration();
 
-  extras: any;
-
   isEditing = false;
-  reservation: IReservationAll | undefined;
-  showTime = false;
+  isAdmin = false;
+
   minDate: any;
   maxDate: any;
-
-  isAdmin = false;
-  isDarkMode = false;
-
-  productId: string | undefined;
-
+  showTime = false;
   maxCalendarDate: Date;
+
+  private productId: string | undefined;
+  private isDarkMode = false;
+  private readonly extras: any;
+  private lessDays = 3;
+  private reservations: IReservationAll[] | undefined;
+  private reservation: IReservationAll | undefined;
+  private unavailableList: IUnavailableAll[] | undefined;
+  private getState: Observable<any>;
+  private subscription: Subscription | undefined;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private formBuilder: FormBuilder, private breakpointObserver: BreakpointObserver,
@@ -248,25 +246,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     return getFullUserName(user);
   }
 
-  myFilter = (d: Date | null): boolean => {
-    const now = createDate();
-    const date = (d || now);
-    let result = date >= now;
-    if (this.room.value) {
-      const day = date.getDay();
-      const {week, saturday, sunday} = getAvailability(this.room.value);
-      if (!week) {
-        result = result && (day === 0 || day === 6);
-      }
-      if (!sunday) {
-        result = result && day !== 0;
-      }
-      if (!saturday) {
-        result = result && day !== 6;
-      }
-    }
-    return result;
-  };
+  myFilter = (d: Date | null): boolean => filterDateRoom(d, this.room.value, true);
 
   displayFnUser(user: IUser): string {
     return user ? getUserName(user) : '';
@@ -293,7 +273,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
     let date = newDate(this.date.value);
     const now = createDate();
-    date = plusDay(date, -this.lessDays);
+    date = addDays(date, -this.lessDays);
     if (date < createFullDate(now)) {
       date = now;
     }
@@ -301,15 +281,12 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const {week, saturday, sunday, exclude} = getAvailability(this.room.value);
     this.weekendDays = exclude;
 
-    const diffDay = getDiffDay(this.maxCalendarDate, date);
-
     this.setStartEndDay(week, saturday, sunday);
     const unavailable = this.translate.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
     const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
     const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
     this.events = this.events.concat(fillNotAvailable(unavailable, lunch, notWorking,
-      diffDay > this.daysInWeek ? this.daysInWeek : diffDay,
-      date, sunday, saturday, week, this.isDarkMode, true));
+      date, sunday, saturday, week, this.isDarkMode, true, addMonths(getNow(), MAX_RESERVATION_MONTH)));
     this.viewDate = date;
     this.store.dispatch(
       new fromActionsReservation.SearchReservation({date: this.date.value, roomId: this.room.value.id})
@@ -535,37 +512,49 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private addUnavailableList(): void {
-    const weeks = 56;
+    let recurringEvents: any[] = [];
     this.unavailableList?.forEach(it => {
       if (it.duration) {
         const start = newDate(it.start);
         const duration = convertDuration(it.duration);
-        switch (it.repeat) {
-          case 'NONE':
-            if (!greaterOrEqualsThan(start, this.maxCalendarDate)) {
-              this.validateUnavailableEvent(start, duration, it);
-            }
-            break;
-          case 'ONCE_A_WEEK':
-            for (let i = 0; i < weeks; i++) {
-              const onceWeekDate = plusDay(start, +i * 7);
-              if (greaterOrEqualsThan(onceWeekDate, this.maxCalendarDate)) {
-                break;
-              }
-              this.validateUnavailableEvent(onceWeekDate, duration, it);
-            }
-            break;
-          case 'EVERY_DAY':
-            for (let i = 0; i < weeks * 7; i++) {
-              const everyDayDate = plusDay(start, +i);
-              if (greaterOrEqualsThan(everyDayDate, this.maxCalendarDate)) {
-                break;
-              }
-              this.validateUnavailableEvent(everyDayDate, duration, it);
-            }
-            break;
+        if (it.repeat === 'NONE') {
+          if (!greaterOrEqualsThan(start, this.maxDate)) {
+            this.validateUnavailableEvent(start, duration, it);
+          }
+        } else {
+          let startDate;
+          let rrule;
+          switch (it.repeat) {
+            case 'ONCE_A_WEEK':
+              const byweekday = getWeekDay(start.getDay());
+              startDate = createNewDate(addDays(this.viewDate, (start.getDay() + 7 - this.viewDate.getDay()) % 7),
+                start.getHours(), start.getMinutes());
+              rrule = {
+                freq: RRule.WEEKLY,
+                byweekday
+              };
+              break;
+            case 'EVERY_DAY':
+              startDate = createNewDate(this.viewDate, start.getHours(), start.getMinutes());
+              rrule = {
+                freq: RRule.DAILY
+              };
+              break;
+          }
+          recurringEvents = [...recurringEvents, {duration, it, startDate, rrule}];
         }
       }
+    });
+
+    recurringEvents.forEach(recurring => {
+      const rule: RRule = new RRule({
+        ...recurring.rrule,
+        dtstart: recurring.startDate,
+        until: this.maxDate
+      });
+
+      rule.all().forEach((date) =>
+        this.validateUnavailableEvent(date, recurring.duration, recurring.it));
     });
   }
 

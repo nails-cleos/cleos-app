@@ -13,6 +13,7 @@ import {
   subMonths,
   subWeeks
 } from 'date-fns';
+import RRule, { Weekday } from 'rrule';
 
 export interface IDuration {
   hour: number;
@@ -40,9 +41,9 @@ export const convertDuration = (duration: string): IDuration => {
 
 export const getStartEndDay = (week: IAvailability, saturday: IAvailability, sunday: IAvailability): any => {
   const date: Date = new Date();
-  const weekMinMax = cetMinAndMax(week, date);
-  const saturdayMinMax = cetMinAndMax(saturday, date);
-  const sundayMinMax = cetMinAndMax(sunday, date);
+  const weekMinMax = getMinAndMax(week, date);
+  const saturdayMinMax = getMinAndMax(saturday, date);
+  const sundayMinMax = getMinAndMax(sunday, date);
 
   let min: Date = weekMinMax.min;
   let max: Date = weekMinMax.max;
@@ -70,7 +71,7 @@ export const getStartEndDay = (week: IAvailability, saturday: IAvailability, sun
   return {min, max};
 };
 
-export const cetMinAndMax = (availability: IAvailability, date: Date): any => {
+export const getMinAndMax = (availability: IAvailability, date: Date): any => {
   let min;
   let max;
   if (availability) {
@@ -115,11 +116,6 @@ export const getDiffTime = (maxDate: Date, minDate: Date): string => {
   const minute = `0${diffMinute}`.slice(-2);
 
   return `${hour}:${minute}`;
-};
-
-export const getDiffDay = (maxDate: Date, minDate: Date): number => {
-  const diff = maxDate.getTime() - minDate.getTime();
-  return Math.ceil(diff / (1000 * 3600 * 24));
 };
 
 export const getMinutesBetweenTimes = (date1: Date, date2: Date): number =>
@@ -229,22 +225,6 @@ export const formatTime = (hour: number, minute: number): string => getTime(crea
 
 export const getNow = (): Date => new Date();
 
-export const isToday = (date: Date): boolean => {
-  const now = getNow();
-  return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth()
-    && date.getDate() === now.getDate();
-};
-
-export const isTomorrow = (date: Date): boolean => {
-  const tomorrow = plusDay(getNow(), 1);
-  return date.getFullYear() === tomorrow.getFullYear() && date.getMonth() === tomorrow.getMonth()
-    && date.getDate() === tomorrow.getDate();
-};
-
-export const areEqualDate = (date1: Date, date2: Date): boolean =>
-  date1.getFullYear() === date2.getFullYear() && date1.getMonth() === date2.getMonth()
-  && date1.getDate() === date2.getDate();
-
 export const createDateFromString = (stringDate: string): Date => {
   const date = stringDate.split('-');
   return new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]));
@@ -269,23 +249,9 @@ export const createFullDate = (selectDate: Date): Date => {
 
 export const newDate = (value: number | string | Date): Date => new Date(value);
 
-export const plusDay = (date: Date, plus: number): Date => {
-  const d = new Date(date);
-  d.setDate(d.getDate() + plus);
-
-  return d;
-};
-
-export const plusMonth = (date: Date, plus: number): Date => {
-  const d = new Date(date);
-  d.setMonth(d.getMonth() + plus);
-
-  return d;
-};
-
 export const plusMonthDate = (date: Date, plus: number, day: number): Date => {
-  const d = new Date(date);
-  d.setMonth(d.getMonth() + plus, day);
+  const d = addMonths(new Date(date), plus);
+  d.setMonth(d.getMonth(), day);
 
   return d;
 };
@@ -316,3 +282,56 @@ export const startOfPeriod = (period: CalendarPeriod, date: Date): Date => (
 export const endOfPeriod = (period: CalendarPeriod, date: Date): Date => (
   {day: endOfDay, week: endOfWeek, month: endOfMonth}[period](date)
 );
+
+export const getWeekDay = (day: number): Weekday[] => {
+  let weekDay;
+  switch (day) {
+    case 1:
+      weekDay = [RRule.MO];
+      break;
+    case 2:
+      weekDay = [RRule.TU];
+      break;
+    case 3:
+      weekDay = [RRule.WE];
+      break;
+    case 4:
+      weekDay = [RRule.TH];
+      break;
+    case 5:
+      weekDay = [RRule.FR];
+      break;
+    case 6:
+      weekDay = [RRule.SA];
+      break;
+    default:
+      weekDay = [RRule.SU];
+      break;
+  }
+
+  return weekDay;
+};
+
+export const filterDateRoom = (d: Date | null, room?: IRoom, greaterAndEqual: boolean = false): boolean => {
+  const now = createDate();
+  const date = (d || now);
+  return filterDate(greaterAndEqual ? date >= now : date > now, date, room);
+};
+
+export const filterDate = (result: boolean, date: Date | null, room?: IRoom): boolean => {
+  date = date ? date : getNow();
+  if (room) {
+    const day = date.getDay();
+    const {week, saturday, sunday} = getAvailability(room);
+    if (!week) {
+      result = result && (day === 0 || day === 6);
+    }
+    if (!sunday) {
+      result = result && day !== 0;
+    }
+    if (!saturday) {
+      result = result && day !== 6;
+    }
+  }
+  return result;
+};

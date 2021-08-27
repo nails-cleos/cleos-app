@@ -64,6 +64,7 @@
     "path": "^0.12.7",
     "replace-in-file": "^6.2.0",
     "reselect": "^4.0.0",
+    "rrule": "^2.6.8",
     "rxjs": "~6.6.0",
     "rxjs-compat": "^6.6.3",
     "skeleton-screen-css": "^1.0.1",

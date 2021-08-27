@@ -13,14 +13,13 @@ import {
   Reservation
 } from '../../../interfaces/reservation';
 import {
-  areEqualDate,
   convertDuration,
   createNewDate,
   Duration,
+  filterDateRoom,
   formatDateName,
   formatDateTwoDigit,
   formatFullDateTime,
-  getAvailability,
   getNow,
   getTime,
   IDuration,
@@ -39,6 +38,7 @@ import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import { getPrice, getUserName, newDiscount, newPrice, round } from '../../../util/helper';
 import { DiscountType, IUserDiscount } from '../../../interfaces/discount';
 import { transitionAnimation } from '../../../util/animation';
+import { isEqual } from 'date-fns';
 
 @Component({
   selector: 'app-me-reservation',
@@ -52,27 +52,19 @@ import { transitionAnimation } from '../../../util/animation';
 export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('stepper') myStepper!: MatStepper;
 
-  reservationMonths = MAX_RESERVATION_MONTH;
-  maxDate: Date;
-  minDate: Date;
-
-  getState: Observable<any>;
-  subscription: Subscription | undefined;
   errors: any = [];
-
-  customerId: string | undefined;
-  productId: string | undefined;
 
   productForm!: FormGroup;
   productList: IProduct[] | undefined;
-  discounts: IUserDiscount[] | undefined;
-  showDiscount = false;
-  price: IPrice;
-  discount = new FormControl();
   filteredProduct: Observable<IProduct[] | undefined> | undefined;
   product: FormControl = new FormControl('', [
     Validators.required, requireMatch
   ]);
+
+  discounts: IUserDiscount[] | undefined;
+  showDiscount = false;
+  price: IPrice;
+  discount = new FormControl();
 
   roomForm!: FormGroup;
   rooms: IRoom[] | undefined;
@@ -87,25 +79,29 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   availableList = new Map<string, any[]>();
   eventSelected: Date | undefined;
-  time: any;
-  locale: string;
-
+  selectedIndex = 1;
   smallScreen: boolean | undefined;
   isPreview = false;
-  duration: IDuration = new Duration();
-
-  measure = 'long';
-  distance: string | undefined;
+  locale: string;
 
   isEditing = false;
-  reservation: IReservationAll | undefined;
-
+  canCreate = false;
+  distance: string | undefined;
+  maxDate: Date;
+  minDate: Date;
   startDate: Date | undefined;
   endDate: Date | undefined;
 
-  canCreate = false;
-  selectedIndex = 1;
-  extras: any;
+  private readonly extras: any;
+  private reservation: IReservationAll | undefined;
+  private measure = 'long';
+  private duration: IDuration = new Duration();
+  private time: any;
+  private customerId: string | undefined;
+  private productId: string | undefined;
+  private reservationMonths = MAX_RESERVATION_MONTH;
+  private getState: Observable<any>;
+  private subscription: Subscription | undefined;
 
   constructor(private readonly translate: TranslateService, private snackBar: MatSnackBar, private store: Store<AppState>,
               private formBuilder: FormBuilder, private breakpointObserver: BreakpointObserver,
@@ -239,25 +235,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.subscription?.unsubscribe();
   }
 
-  myFilter = (d: Date | null): boolean => {
-    const now = getNow();
-    const date = (d || now);
-    let result = date > now;
-    if (this.room.value) {
-      const day = date.getDay();
-      const {week, saturday, sunday} = getAvailability(this.room.value);
-      if (!week) {
-        result = result && (day === 0 || day === 6);
-      }
-      if (!sunday) {
-        result = result && day !== 0;
-      }
-      if (!saturday) {
-        result = result && day !== 6;
-      }
-    }
-    return result;
-  };
+  myFilter = (d: Date | null): boolean => filterDateRoom(d, this.room.value);
 
   displayFnProduct(product: IProduct): string {
     return product ? `${product.name}` : '';
@@ -275,7 +253,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   areEquals(datetime: any): boolean {
     let result = false;
     if (this.eventSelected) {
-      result = areEqualDate(this.eventSelected, datetime.date) && this.time === datetime.time;
+      result = isEqual(this.eventSelected, datetime.date) && this.time === datetime.time;
     }
     return result;
   }
@@ -448,7 +426,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     new Map([...this.availableList.entries()]
       .sort((a: any, b: any) => this.sortDate({key: a[0]}, {key: b[0]})))
       .forEach((value, key) => {
-        if (areEqualDate(this.date.value, newDate(key))) {
+        if (isEqual(this.date.value, newDate(key))) {
           this.selectedIndex = i;
         }
         i++;

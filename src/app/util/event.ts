@@ -1,17 +1,9 @@
 import { IAvailability } from '../interfaces/room';
 import { CalendarEvent } from 'angular-calendar';
-import {
-  convertDuration,
-  createDate,
-  createFullDate,
-  createNewDate, formatTime,
-  getNow,
-  greaterOrEqualsThanToday, IDuration,
-  isToday
-} from './dates';
+import { createDate, createNewDate, getNow, greaterOrEqualsThanToday, IDuration } from './dates';
 import { findStateColor } from './theme';
-import { isSameMonth } from 'date-fns';
-import { getUserName } from './helper';
+import RRule from 'rrule';
+import { isToday } from 'date-fns';
 
 export interface IMeta {
   time?: boolean;
@@ -25,30 +17,61 @@ export class Meta implements IMeta {
   }
 }
 
-export const fillNotAvailable = (unavailable: string, lunch: string, notWorking: string, daysInWeek: number,
+export const fillNotAvailable = (unavailable: string, lunch: string, notWorking: string,
                                  selectDate: Date, sunday: IAvailability, saturday: IAvailability, week: IAvailability,
-                                 isDarkMode: boolean = false, addToday: boolean = false): CalendarEvent[] => {
+                                 isDark: boolean = false, addToday: boolean = false, maxDate: Date): CalendarEvent[] => {
   let events: CalendarEvent[] = [];
-  const date = createFullDate(selectDate);
-  const now = getNow();
-  for (let i = 0; i < daysInWeek; i++) {
-    const day = date.getDay();
-    if (addToday && isToday(date)) {
-      const event = newEvent(notWorking, findStateColor('DEFAULT', isDarkMode), createDate(),
-        createDate(now.getHours(), now.getMinutes()));
-      if (event) {
-        events = [...events, event];
-      }
+  if (addToday && isToday(selectDate)) {
+    const now = getNow();
+    const event = newEvent(notWorking, findStateColor('DEFAULT', isDark), createDate(),
+      createDate(now.getHours(), now.getMinutes()));
+    if (event) {
+      events = [...events, event];
     }
-    if (day === 0) {
-      events = events.concat(createEvent(sunday, date, notWorking, unavailable, lunch, isDarkMode));
-    } else if (day === 6) {
-      events = events.concat(createEvent(saturday, date, notWorking, unavailable, lunch, isDarkMode));
-    } else {
-      events = events.concat(createEvent(week, date, notWorking, unavailable, lunch, isDarkMode));
-    }
-    date.setDate(date.getDate() + 1);
   }
+
+  const recurring = [{
+    availability: week,
+    rule: new RRule({
+      freq: RRule.WEEKLY,
+      byweekday: [RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR],
+      dtstart: selectDate,
+      until: maxDate
+    })
+  },
+    {
+      availability: saturday,
+      rule: new RRule({
+        freq: RRule.WEEKLY,
+        byweekday: [RRule.SA],
+        dtstart: selectDate,
+        until: maxDate
+      })
+    },
+    {
+      availability: sunday,
+      rule: new RRule({
+        freq: RRule.WEEKLY,
+        byweekday: [RRule.SU],
+        dtstart: selectDate,
+        until: maxDate
+      })
+    }];
+
+  return events.concat(recurringEvent(recurring, notWorking, unavailable, lunch, isDark));
+};
+
+const recurringEvent = (recurring: any[], notWorking: string, unavailable: string, lunch: string,
+                        isDark: boolean): CalendarEvent[] => {
+  let events: CalendarEvent[] = [];
+
+  recurring.forEach(r =>
+    r.rule.all().forEach((date: Date) => {
+      const event = createEvent(r.availability, date, notWorking, unavailable, lunch, isDark);
+      if (event) {
+        events = events.concat(event);
+      }
+    }));
 
   return events;
 };

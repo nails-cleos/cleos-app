@@ -9,13 +9,13 @@ import { IReservationAll, IReservationSummary, States } from '../interfaces/rese
 import { IUserAll } from '../interfaces/user';
 import { TranslateService } from '@ngx-translate/core';
 import { ThemePalette } from '@angular/material/core';
-import { convertDuration, createDate, getNow, newDate, plusMonth } from '../util/dates';
+import { convertDuration, createDate, getNow, newDate } from '../util/dates';
 import { getPrice, getUserName } from '../util/helper';
 import { CalendarEvent, CalendarView } from 'angular-calendar';
 import { findStateColor, isDarkMode } from '../util/theme';
 import { monthEvent } from '../util/event';
 import { Router } from '@angular/router';
-import { isSameDay, isSameMonth } from 'date-fns';
+import { addMonths, isSameDay, isSameMonth } from 'date-fns';
 
 @Component({
   selector: 'app-dash',
@@ -270,8 +270,8 @@ export class DashComponent implements OnInit, OnDestroy {
         if (!this.events.length) {
           this.createEvents(this.isDarkMode);
         }
-        const filterDate: Date = plusMonth(createDate(), -1);
-        const prevFilterDate: Date = plusMonth(createDate(), -2);
+        const filterDate: Date = addMonths(createDate(), -1);
+        const prevFilterDate: Date = addMonths(createDate(), -2);
         const completedList: IReservationAll[] = this.state.dash?.filter((r: IReservationAll) => r.state === States.completed);
         if (completedList && completedList.length) {
           const lastMonthList: IReservationAll[] = completedList.filter((r: IReservationAll) => newDate(r.start) > filterDate);

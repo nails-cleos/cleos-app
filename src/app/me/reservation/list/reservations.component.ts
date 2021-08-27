@@ -12,12 +12,13 @@ import { AppState, selectReservationState } from '../../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ReservationIconName } from '../../../reservation/detail/reservation-detail.component';
 import * as fromActionsReservation from '../../../store/reservation.actions';
-import { convertDuration, createNewDate, isToday, newDate } from '../../../util/dates';
+import { convertDuration, createNewDate, newDate } from '../../../util/dates';
 import { getPrice, getUserName, snakeToCamel } from '../../../util/helper';
 import { stampAnimation, transitionAnimation } from '../../../util/animation';
 import { IPrice, Price } from '../../../interfaces/product';
 import { IReview, Review } from '../../../interfaces/review';
 import { ReviewDialogComponent } from '../review/review-dialog.component';
+import { isToday } from 'date-fns';
 
 @Component({
   selector: 'app-reservations',

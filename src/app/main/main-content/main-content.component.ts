@@ -1,5 +1,4 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { environment } from '../../../environments/environment';
 import { IProduct } from '../../interfaces/product';
 import { map, startWith } from 'rxjs/operators';
 import { Observable, Subscription } from 'rxjs';
@@ -14,7 +13,7 @@ import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { IUserAll } from '../../interfaces/user';
 import { getUserName } from '../../util/helper';
-import { getNow, plusMonthDate } from '../../util/dates';
+import { filterDateRoom, getNow, plusMonthDate } from '../../util/dates';
 import { MAX_RESERVATION_MONTH } from '../../interfaces/reservation';
 import * as fromActionsMain from '../../store/main.actions';
 
@@ -25,24 +24,18 @@ import * as fromActionsMain from '../../store/main.actions';
 })
 export class MainContentComponent implements OnInit, OnDestroy {
 
-  title = environment.title;
   isHandset: any;
-  products: IProduct[] | undefined;
-  isAuthenticated = false;
-
-  subscription: Subscription | undefined;
-  getState: Observable<any>;
-
   slides: ISlide[] = [];
+
+  form!: FormGroup;
+  products: IProduct[] | undefined;
+  filteredProduct: Observable<IProduct[] | undefined> | undefined;
+  product: FormControl = new FormControl('', [requireMatch]);
 
   maxDate: Date;
   minDate: Date;
   date: FormControl = new FormControl();
 
-  filteredProduct: Observable<IProduct[] | undefined> | undefined;
-  product: FormControl = new FormControl('', [requireMatch]);
-
-  form!: FormGroup;
   name: FormControl = new FormControl('', [
     Validators.required
   ]);
@@ -55,6 +48,10 @@ export class MainContentComponent implements OnInit, OnDestroy {
   body: FormControl = new FormControl('', [
     Validators.required
   ]);
+
+  private isAuthenticated = false;
+  private subscription: Subscription | undefined;
+  private getState: Observable<any>;
 
   constructor(private store: Store<AppState>, private cdRef: ChangeDetectorRef,
               private viewportScroller: ViewportScroller, private translate: TranslateService, private router: Router,
@@ -95,11 +92,7 @@ export class MainContentComponent implements OnInit, OnDestroy {
     this.viewportScroller.scrollToAnchor(elementId);
   }
 
-  myFilter = (d: Date | null): boolean => {
-    const now = getNow();
-    const date = (d || now);
-    return date > now;
-  };
+  myFilter = (d: Date | null): boolean => filterDateRoom(d);
 
   displayFnProduct(product: IProduct): string {
     return product ? `${product.name}` : '';
