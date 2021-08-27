@@ -1,10 +1,11 @@
-import { IReservationAll, ITracking } from '../interfaces/reservation';
-import { Label, SingleDataSet } from 'ng2-charts';
-import { ChartDataSets } from 'chart.js';
+import { IPaymentReservation, IReservationAll, ITracking, States } from '../interfaces/reservation';
+import { Color, Label, SingleDataSet } from 'ng2-charts';
+import { ChartDataSets, ChartOptions } from 'chart.js';
 import { convertDuration, formatDate, getNow, getSecondsBetweenTimes, newDate, plusDay, plusMonthDate } from './dates';
-import { totalPrice } from './helper';
+import { getPrice } from './helper';
+import { TranslateService } from '@ngx-translate/core';
 
-interface IChartUtil {
+export interface IChartUtil {
   chartLabels: Label[];
   chartDataSet: ChartDataSets[];
   chartData: SingleDataSet;
@@ -17,8 +18,52 @@ export const customerReservationChart = (result: IReservationAll[] | undefined, 
 };
 
 export const quantityProductChart = (result: IReservationAll[] | undefined, label: string): IChartUtil | null => {
-  const completedList = result?.filter(r => r.state === 'COMPLETED');
+  const completedList = result?.filter(r => r.state === States.completed);
   return barChart(completedList, label, 'product', 'name');
+};
+
+export const productChart = (result: IPaymentReservation[] | undefined): IChartUtil | null => {
+  const completedList = result?.filter(r => r.reservation.state === States.completed);
+  if (completedList && completedList.length) {
+    const group = completedList.reduce((map, item) => {
+      let total = map.get(item.reservation.product.name) || 0;
+      map.set(item.reservation.product.name, ++total);
+
+      return map;
+    }, new Map<string, number>());
+
+    return {
+      chartData: Array.from(group.values()),
+      chartLabels: Array.from(group.keys())
+    } as IChartUtil;
+  }
+  return null;
+};
+
+export const paymentChart = (result: IPaymentReservation[] | undefined, translate: TranslateService): IChartUtil | null => {
+  const completedList = result?.filter(r => r.reservation.state === States.completed);
+  if (completedList && completedList.length) {
+    let total = 0;
+    const paymentMap = new Map<string, number>();
+    paymentMap.set(translate.instant('COMMON.PAYMENT.ML'), 0);
+    paymentMap.set(translate.instant('COMMON.PAYMENT.CASH'), 0);
+    const group = completedList.reduce((map, item) => {
+      const payments = item.payments.filter(p => p.status === 'approved');
+      payments.forEach(p => {
+        total += p.amount;
+        const type = translate.instant(`COMMON.PAYMENT.${p.type}`);
+        map.set(type, (map.get(type) || 0) + p.amount);
+      });
+
+      return map;
+    }, paymentMap);
+
+    return {
+      chartData: Array.from(group.values()),
+      chartLabels: Array.from(group.keys())
+    } as IChartUtil;
+  }
+  return null;
 };
 
 export const annualReservationChart = (result: IReservationAll[] | undefined, locale: string, label: string): IChartUtil | null => {
@@ -31,7 +76,7 @@ export const annualReservationChart = (result: IReservationAll[] | undefined, lo
 
       const price = map.get(key) || 0;
 
-      map.set(key, price + totalPrice(item.product));
+      map.set(key, price + getPrice(item.product).total);
 
       return map;
     }, new Map<string, number>());
@@ -83,7 +128,7 @@ export const lastMonthReservationChart = (result: IReservationAll[] | undefined,
 };
 
 export const productReservationChart = (result: IReservationAll[] | undefined): IChartUtil | null => {
-  const completedList = result?.filter(r => r.state === 'COMPLETED');
+  const completedList = result?.filter(r => r.state === States.completed);
   if (completedList && completedList.length) {
     const distRoom: Array<any> = [...new Set(completedList.map(x => x.room.name))];
 
@@ -148,7 +193,7 @@ export const monthlyReservationChart = (result: IReservationAll[] | undefined, l
 };
 
 export const trackingAverageChart = (result: ITracking[] | undefined, labels: any): IChartUtil | null => {
-  const completedList = result?.filter(r => r.reservation.state === 'COMPLETED');
+  const completedList = result?.filter(r => r.reservation.state === States.completed);
   if (completedList && completedList.length) {
     const group = completedList.reduce((map, item) => {
       if (item.startedTime && item.completedTime) {
@@ -185,7 +230,7 @@ export const trackingAverageChart = (result: ITracking[] | undefined, labels: an
 };
 
 export const trackingCompareChart = (result: ITracking[] | undefined, labels: any): IChartUtil | null => {
-  const completedList = result?.filter(r => r.reservation.state === 'COMPLETED');
+  const completedList = result?.filter(r => r.reservation.state === States.completed);
   if (completedList && completedList.length) {
     const group = completedList.reduce((map, item) => {
       if (item.startedTime && item.completedTime) {
@@ -250,7 +295,7 @@ const formatMonthYear = (date: Date, locale: string): string => date.toLocaleDat
 
 const completeWithDateFilter = (result: IReservationAll[] | undefined, now: Date, minusMonth: number): IReservationAll[] | undefined => {
   const filterDate = plusMonthDate(getNow(), -minusMonth, 0);
-  return result?.filter(r => r.state === 'COMPLETED' && newDate(r.start) > filterDate);
+  return result?.filter(r => r.state === States.completed && newDate(r.start) > filterDate);
 };
 
 const maxMinAvg = (arr: number[]): any => {
@@ -270,7 +315,7 @@ const maxMinAvg = (arr: number[]): any => {
   return {max, min, avg: sum / arr.length};
 };
 
-export const barChartTimeOptions = (): any => (
+export const barChartTimeOptions = (): ChartOptions => (
   {
     responsive: true,
     scales: {
@@ -295,7 +340,7 @@ const formatSecsAsHourMin = (d: any): string =>
 const barChatTimeLabel = (tooltipItem: any, data: any): string =>
   data.datasets[tooltipItem.datasetIndex].label + ': ' + formatSecsAsHourMin(tooltipItem.yLabel);
 
-export const barChartDefaultOptions = (): any => (
+export const barChartDefaultOptions = (): ChartOptions => (
   {
     responsive: true,
     scales: {
@@ -307,3 +352,68 @@ export const barChartDefaultOptions = (): any => (
     }
   }
 );
+
+export const pieChartPercentageOptions = (): ChartOptions => (
+  {
+    responsive: true,
+    tooltips: {
+      callbacks: {
+        label: (tooltipItem: any, data: any) => pieChatPercentageLabel(tooltipItem, data)
+      }
+    }
+  });
+
+const pieChatPercentageLabel = (tooltipItem: any, data: any): string => {
+  const values = data.datasets[tooltipItem.datasetIndex].data;
+  const total = values.reduce((a: number, b: number) => a + b);
+  return `${data.labels[tooltipItem.index]}: ${(values[tooltipItem.index] * 100 / total).toFixed(2)}%`;
+};
+
+export const defaultOptions = (): ChartOptions => ({
+  responsive: true
+});
+
+export const chartArrayColors = (): Color[] => ([{
+  backgroundColor: ['rgba(254, 205, 190, 0.6)', 'rgba(152, 109, 142, 0.6)', 'rgba(95, 147, 154, 0.6)', 'rgba(161, 202, 226, 0.6)'],
+  borderColor: ['#fff', '#fff', '#fff', '#fff'],
+  hoverBackgroundColor: ['rgba(254, 205, 190, 0.8)', 'rgba(152, 109, 142, 0.8)', 'rgba(95, 147, 154, 0.8)', 'rgba(161, 202, 226, 0.8)'],
+  hoverBorderColor: ['rgba(254, 205, 190, 1)', 'rgba(152, 109, 142, 1)', 'rgba(95, 147, 154, 1)', 'rgba(161, 202, 226, 1)']
+}]);
+
+export const chartColors = (): Color[] => ([{
+  backgroundColor: 'rgba(254, 205, 190, 0.6)',
+  borderColor: 'rgba(254, 205, 190, 1)',
+  pointBackgroundColor: 'rgba(254, 205, 190, 1)',
+  pointBorderColor: '#fff',
+  pointHoverBackgroundColor: '#fff',
+  pointHoverBorderColor: 'rgba(254, 205, 190, 0.8)',
+  hoverBackgroundColor: 'rgba(254, 205, 190, 0.8)',
+  hoverBorderColor: 'rgba(254, 205, 190, 1)'
+}, {
+  backgroundColor: 'rgba(152, 109, 142, 0.6)',
+  borderColor: 'rgba(152, 109, 142, 1)',
+  pointBackgroundColor: 'rgba(152, 109, 142, 1)',
+  pointBorderColor: '#fff',
+  pointHoverBackgroundColor: '#fff',
+  pointHoverBorderColor: 'rgba(152, 109, 142, 0.8)',
+  hoverBackgroundColor: 'rgba(152, 109, 142, 0.8)',
+  hoverBorderColor: 'rgba(152, 109, 142, 1)'
+}, {
+  backgroundColor: 'rgba(95, 147, 154, 0.6)',
+  borderColor: 'rgba(95, 147, 154, 1)',
+  pointBackgroundColor: 'rgba(95, 147, 154, 1)',
+  pointBorderColor: '#fff',
+  pointHoverBackgroundColor: '#fff',
+  pointHoverBorderColor: 'rgba(95, 147, 154, 0.8)',
+  hoverBackgroundColor: 'rgba(95, 147, 154, 0.8)',
+  hoverBorderColor: 'rgba(95, 147, 154, 1)'
+}, {
+  backgroundColor: 'rgba(161, 202, 226, 0.6)',
+  borderColor: 'rgba(161, 202, 226, 1)',
+  pointBackgroundColor: 'rgba(161, 202, 226, 1)',
+  pointBorderColor: '#fff',
+  pointHoverBackgroundColor: '#fff',
+  pointHoverBorderColor: 'rgba(161, 202, 226, 0.8)',
+  hoverBackgroundColor: 'rgba(161, 202, 226, 0.8)',
+  hoverBorderColor: 'rgba(161, 202, 226, 1)'
+}]);

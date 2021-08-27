@@ -98,14 +98,14 @@
             <span [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.PRICE' | translate"></span>
             <span [class.strikethrough]="discount.value"
                   class="raised-button">$ {{product.value.price | number:'1.2-2'}}</span>
-            <span *ngIf="priceDiscount" [@discountAnimation]
-                  class="raised-button bold">$ {{priceDiscount | number:'1.2-2'}}</span>
+            <span *ngIf="price.priceWithDiscount" [@discountAnimation]
+                  class="raised-button bold">$ {{price.priceWithDiscount | number:'1.2-2'}}</span>
           </div>
           <ng-template #editing>
             <span [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.PRICE' | translate"></span>
             <span
-              class="raised-button">$ {{(priceDiscount ? priceDiscount : product.value.price) | number:'1.2-2'}}</span>
-            <span *ngIf="priceDiscount"
+              class="raised-button">$ {{(price.priceWithDiscount ? price.priceWithDiscount : product.value.price) | number:'1.2-2'}}</span>
+            <span *ngIf="price.priceWithDiscount"
                   class="raised-button bold">{{'RESERVATION.PRODUCT.DISCOUNT.ADD' | translate}}</span>
           </ng-template>
           <div [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.DURATION' |
@@ -195,13 +195,13 @@
           <div mat-line>{{ 'PRODUCT.PRICE.FIELD' | translate}}</div>
           <div *ngIf="!isEditing; else editing" mat-line>
             <span [class.strikethrough]="discount.value">{{product.value.price | number:'1.2-2'}}</span>
-            <span *ngIf="priceDiscount" [@discountAnimation]
-                  class="raised-button bold">{{priceDiscount | number:'1.2-2'}}</span>
+            <span *ngIf="price.priceWithDiscount" [@discountAnimation]
+                  class="raised-button bold">{{price.priceWithDiscount | number:'1.2-2'}}</span>
           </div>
           <ng-template #editing>
             <div mat-line>
-              <span>{{(priceDiscount ? priceDiscount : product.value.price) | number:'1.2-2'}}</span>
-              <span *ngIf="priceDiscount" class="raised-button bold">
+              <span>{{(price.priceWithDiscount ? price.priceWithDiscount : product.value.price) | number:'1.2-2'}}</span>
+              <span *ngIf="price.priceWithDiscount" class="raised-button bold">
                 {{'RESERVATION.PRODUCT.DISCOUNT.ADD' | translate}}
               </span>
             </div>

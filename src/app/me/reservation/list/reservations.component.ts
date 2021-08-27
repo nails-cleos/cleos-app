@@ -3,20 +3,21 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../../interfaces/pagination';
-import { ICustomerReservation, IReservation, IReservationAll } from '../../../interfaces/reservation';
+import { ICustomerReservation, IReservationAll, States } from '../../../interfaces/reservation';
 import { Observable, Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ReservationIconName } from '../../../reservation/detail/reservation-detail.component';
 import * as fromActionsReservation from '../../../store/reservation.actions';
-import { convertDuration, createNewDate, newDate } from '../../../util/dates';
-import { getPriceDiscount, getUserName, priceWithExtras, snakeToCamel, totalPaid, totalPrice } from '../../../util/helper';
-import { IPayment } from '../../../interfaces/payment';
+import { convertDuration, createNewDate, isToday, newDate } from '../../../util/dates';
+import { getPrice, getUserName, snakeToCamel } from '../../../util/helper';
 import { stampAnimation, transitionAnimation } from '../../../util/animation';
+import { IPrice, Price } from '../../../interfaces/product';
+import { IReview, Review } from '../../../interfaces/review';
+import { ReviewDialogComponent } from '../review/review-dialog.component';
 
 @Component({
   selector: 'app-reservations',
@@ -34,11 +35,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   subscription: Subscription | undefined;
   data: ICustomerReservation | undefined;
   upcoming: any = {};
-  payments: IPayment[] | undefined;
-  paid = 0;
-  total = 0;
-  price = 0;
-  isPaid = false;
+  price: IPrice;
   noContent = false;
   end: Date | undefined;
 
@@ -47,12 +44,11 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
 
   language: string;
   error: any;
+  showReview = true;
 
-  priceDiscount: number | undefined;
-
-  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private router: Router,
-              private store: Store<AppState>, private breakpointObserver: BreakpointObserver,
-              private cdRef: ChangeDetectorRef) {
+  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
+              private breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef) {
+    this.price = new Price();
     this.getState = this.store.select(selectReservationState);
     this.language = this.translate.currentLang;
     breakpointObserver.observe([
@@ -99,12 +95,19 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
     return ReservationIconName[snakeToCamel(name)];
   }
 
-  view(reservation: IReservation): void {
-    this.router.navigate(['reservation', reservation.id]);
-  }
+  onRatingChanged(reservation: IReservationAll): void {
+    const dialogRef = this.dialog.open(ReviewDialogComponent, {data: reservation});
 
-  edit(reservation: IReservationAll): void {
-    this.router.navigate(['me', 'reservation', reservation.id]);
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.rating) {
+        const review: IReview = new Review(result.rating);
+        review.reservationId = reservation?.id;
+        review.detail = result.detail ? result.detail : this.translate.instant(`REVIEW.RATING.${result.rating}`);
+        this.store.dispatch(
+          new fromActionsReservation.ReservationReview(review)
+        );
+      }
+    });
   }
 
   private clean(): void {
@@ -119,22 +122,24 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
       this.data = state.customerReservation;
       if (this.data) {
         this.noContent = !this.data.upcoming;
-        this.dataSource = this.data.reservations?.content;
+        if (this.data.reservations) {
+          // @ts-ignore
+          this.dataSource = this.data.reservations.content?.map((reservation: IReservationAll) => {
+            if (this.showReview && reservation.state === States.completed
+              && isToday(newDate(reservation.start)) && !reservation.review) {
+              this.onRatingChanged(reservation);
+              this.showReview = false;
+            }
+            return reservation;
+          });
+        }
         this.resultsLength = this.data.reservations?.totalElements;
         this.upcoming = this.data.upcoming ? this.data.upcoming : this.upcoming;
         if (this.upcoming?.id) {
-          this.payments = this.data.currentReservationPayments ? this.data.currentReservationPayments : this.payments;
-          this.paid = totalPaid(this.payments);
-          this.total = totalPrice(this.upcoming.product);
-          this.price = priceWithExtras(this.upcoming.product);
+          this.price = getPrice(this.upcoming.product, this.data.currentReservationPayments);
           const duration = convertDuration(this.upcoming.product.duration);
           this.end = newDate(this.upcoming.start);
           this.end = createNewDate(this.end, this.end.getHours() + duration.hour, this.end.getMinutes() + duration.minute);
-          this.isPaid = this.total === this.paid;
-          if (this.upcoming.product.discount && this.upcoming.product.discount.amount) {
-            this.priceDiscount = getPriceDiscount(this.upcoming.product.discount, this.upcoming.product.price);
-            this.isPaid = this.priceDiscount === this.paid;
-          }
         }
       }
     });

@@ -13,7 +13,8 @@ import * as fromActionsUser from '../store/user.actions';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { CookieService } from 'ngx-cookie-service';
 import { TranslateService } from '@ngx-translate/core';
-import { getThemeName, isDarkMode, resetTheme, THEME } from '../util/theme';
+import { getThemeName, isDarkMode, resetTheme, Theme, THEME } from '../util/theme';
+import { ThemeService } from 'ng2-charts';
 
 @Component({
   selector: 'app-main',
@@ -32,12 +33,13 @@ export class MainComponent {
 
   constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
               private viewportScroller: ViewportScroller, private router: Router, private translate: TranslateService,
-              private overlayContainer: OverlayContainer, private cookieService: CookieService) {
-    this.checked = isDarkMode(cookieService.get(THEME));
+              private overlayContainer: OverlayContainer, private cookieService: CookieService,
+              private themeService: ThemeService) {
+    this.checked = isDarkMode(cookieService.get(THEME) as Theme);
     this.store.select(selectAuthState).subscribe((state: any) => {
       this.isAuthenticated = state.isAuthenticated;
       this.resetTheme(state.user?.theme);
-      this.checked = isDarkMode(cookieService.get(THEME));
+      this.checked = isDarkMode(cookieService.get(THEME) as Theme);
     });
   }
 
@@ -54,7 +56,7 @@ export class MainComponent {
   }
 
   setTheme(checked: boolean): void {
-    const theme: string = getThemeName(checked);
+    const theme: Theme = getThemeName(checked);
     this.resetTheme(theme);
     if (this.isAuthenticated) {
       const user: IUser = new User();
@@ -67,7 +69,7 @@ export class MainComponent {
     }
   }
 
-  private resetTheme(theme?: string): void {
-    this.cssClass = resetTheme(theme, this.cssClass, this.overlayContainer, this.cookieService);
+  private resetTheme(theme?: Theme): void {
+    this.cssClass = resetTheme(theme, this.cssClass, this.overlayContainer, this.cookieService, this.themeService);
   }
 }

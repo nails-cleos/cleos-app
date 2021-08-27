@@ -6,6 +6,7 @@ export enum UserActionTypes {
   userSuccess = '[User] Success',
   userFailure = '[User] Failure',
   userSelected = '[User] Selected',
+  userOverview = '[User] Overview',
   findUser = '[User] Find',
   findMe = '[User] Me',
   setRole = '[User] Add role',
@@ -47,6 +48,13 @@ export class UserFailure implements Action {
 
 export class UserSelected implements Action {
   readonly type = UserActionTypes.userSelected;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class UserOverview implements Action {
+  readonly type = UserActionTypes.userOverview;
 
   constructor(public payload: any) {
   }
@@ -136,6 +144,7 @@ export type All =
   | UserSuccess
   | UserFailure
   | UserSelected
+  | UserOverview
   | FindUser
   | FindMe
   | SaveUser

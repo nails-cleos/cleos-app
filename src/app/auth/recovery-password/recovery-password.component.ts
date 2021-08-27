@@ -6,6 +6,7 @@ import * as fromActionsLogin from '../../store/auth.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { getLocale } from '../../util/helper';
 
 @Component({
   selector: 'app-recovery-password',
@@ -18,16 +19,16 @@ export class RecoveryPasswordComponent implements OnInit, OnDestroy {
   getState: Observable<any>;
   subscription: Subscription | undefined;
   showError = false;
-  lang: string;
+  locale: string;
 
   constructor(private store: Store<AppState>, private route: ActivatedRoute, private translate: TranslateService,
               private router: Router, private snackBar: MatSnackBar) {
     this.getState = this.store.select(selectAuthState);
-    this.lang = this.route.snapshot.queryParamMap.get('lang') || navigator.language;
+    this.locale = getLocale(this.route.snapshot.queryParamMap.get('locale') || navigator.language);
   }
 
   ngOnInit(): void {
-    this.translate.use(this.lang);
+    this.translate.use(this.locale);
     this.clean();
     this.subscribe();
   }
@@ -42,7 +43,7 @@ export class RecoveryPasswordComponent implements OnInit, OnDestroy {
       return;
     }
     const token = this.route.snapshot.queryParamMap.get('token');
-    this.translate.use(this.lang);
+    this.translate.use(this.locale);
     this.store.dispatch(
       new fromActionsLogin.RecoveryPassword({token, password: this.passwordComponent.passwordFormControl.value})
     );

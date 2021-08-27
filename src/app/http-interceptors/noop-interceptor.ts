@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-import {
-  HttpEvent, HttpInterceptor, HttpHandler, HttpRequest
-} from '@angular/common/http';
+import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -13,8 +11,8 @@ export class NoopInterceptor implements HttpInterceptor {
     if (req.url.indexOf('i18n') === -1) {
       req = req.clone({url: `${environment.baseUrl}/${req.url}`});
     } else {
-      const index = req.url.indexOf('-');
-      const url = index === -1 ? req.url : `${req.url.substr(0, index)}.json`;
+      const match = req.url.match(/([-_])/);
+      const url = !match ? req.url : `${req.url.substr(0, match.index)}.json`;
       req = req.clone({url});
     }
 

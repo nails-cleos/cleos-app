@@ -59,3 +59,22 @@
   }
 }
 
+* { box-sizing: border-box; }
+
+.product-container {
+  width: 100%;/*whatever size you want your container*/
+  flex-flow: row wrap;
+  display: flex; /*Make sure to call this on your container*/
+  align-items: stretch; /*stretches all cards same height*/
+  justify-content: center; /*some space between cards*/
+}
+
+.card-wrap {
+  display: flex;
+  padding: 10px;
+}
+
+app-mini-card-product {
+  cursor: pointer;
+  flex: 0 0 100%;
+}

@@ -12,24 +12,24 @@
 
 // Fonts
 @import 'https://fonts.googleapis.com/css?family=Material+Icons&display=swap';
-@import url('https://fonts.googleapis.com/css?family=Bellefair:300,400,500&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Belleza:300,400,500&display=swap');
 
 $mat-theme-ignore-duplication-warnings: true;
 
 $fontConfig: (
-  display-4: mat.define-typography-level(112px, 112px, 300, 'Bellefair', -0.0134em),
-  display-3: mat.define-typography-level(56px, 56px, 400, 'Bellefair', -0.0089em),
-  display-2: mat.define-typography-level(45px, 48px, 400, 'Bellefair', 0.0000em),
-  display-1: mat.define-typography-level(34px, 40px, 400, 'Bellefair', 0.0074em),
-  headline: mat.define-typography-level(24px, 32px, 400, 'Bellefair', 0.0000em),
-  title: mat.define-typography-level(20px, 32px, 500, 'Bellefair', 0.0075em),
-  subheading-2: mat.define-typography-level(16px, 28px, 400, 'Bellefair', 0.0094em),
-  subheading-1: mat.define-typography-level(15px, 24px, 500, 'Bellefair', 0.0067em),
-  body-2: mat.define-typography-level(14px, 24px, 500, 'Bellefair', 0.0179em),
-  body-1: mat.define-typography-level(14px, 20px, 400, 'Bellefair', 0.0179em),
-  button: mat.define-typography-level(14px, 14px, 500, 'Bellefair', 0.0893em),
-  caption: mat.define-typography-level(12px, 20px, 400, 'Bellefair', 0.0333em),
-  input: mat.define-typography-level(inherit, 1.125, 400, 'Bellefair', 1.5px)
+  display-4: mat.define-typography-level(112px, 112px, 300, 'Belleza', -0.0134em),
+  display-3: mat.define-typography-level(56px, 56px, 400, 'Belleza', -0.0089em),
+  display-2: mat.define-typography-level(45px, 48px, 400, 'Belleza', 0.0000em),
+  display-1: mat.define-typography-level(34px, 40px, 400, 'Belleza', 0.0074em),
+  headline: mat.define-typography-level(24px, 32px, 400, 'Belleza', 0.0000em),
+  title: mat.define-typography-level(20px, 32px, 500, 'Belleza', 0.0075em),
+  subheading-2: mat.define-typography-level(16px, 28px, 400, 'Belleza', 0.0094em),
+  subheading-1: mat.define-typography-level(15px, 24px, 500, 'Belleza', 0.0067em),
+  body-2: mat.define-typography-level(14px, 24px, 500, 'Belleza', 0.0179em),
+  body-1: mat.define-typography-level(14px, 20px, 400, 'Belleza', 0.0179em),
+  button: mat.define-typography-level(14px, 14px, 500, 'Belleza', 0.0893em),
+  caption: mat.define-typography-level(12px, 20px, 400, 'Belleza', 0.0333em),
+  input: mat.define-typography-level(inherit, 1.125, 400, 'Belleza', 1.5px)
 );
 
 // Foreground Elements
@@ -44,6 +44,7 @@ $dark-focused: rgba($dark-primary-text, 0.12);
 
 $mat-light-theme-foreground: (
   base: $dark-text,
+  contrast: #ffffff,
   divider: $dark-dividers,
   dividers: $dark-dividers,
   disabled: $dark-disabled-text,
@@ -71,6 +72,7 @@ $light-focused: rgba($light-primary-text, 0.12);
 
 $mat-dark-theme-foreground: (
   base: $light-text,
+  contrast: #000000,
   divider: $light-dividers,
   dividers: $light-dividers,
   disabled: $light-disabled-text,
@@ -293,6 +295,6 @@ $altTheme: (
   font-family: 'Material Icons', 'Material Icons';
 
   .mat-badge-content {
-    font-family: 'Bellefair', "Helvetica Neue", sans-serif;
+    font-family: 'Belleza', "Helvetica Neue", sans-serif;
   }
 }

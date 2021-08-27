@@ -1,8 +1,7 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { IProduct } from '../../interfaces/product';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { map, shareReplay, startWith } from 'rxjs/operators';
+import { map, startWith } from 'rxjs/operators';
 import { Observable, Subscription } from 'rxjs';
 import { ICatalogue, ISlide, Slide } from '../../interfaces/catalogue';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -31,18 +30,6 @@ export class MainContentComponent implements OnInit, OnDestroy {
   products: IProduct[] | undefined;
   isAuthenticated = false;
 
-  cardLayout = this.breakpointObserver.observe(Breakpoints.Handset)
-    .pipe(
-      map(({matches}) => {
-        this.isHandset = matches;
-        if (matches) {
-          return {columns: 1};
-        }
-        return {columns: 4};
-      }),
-      shareReplay()
-    );
-
   subscription: Subscription | undefined;
   getState: Observable<any>;
 
@@ -69,10 +56,9 @@ export class MainContentComponent implements OnInit, OnDestroy {
     Validators.required
   ]);
 
-  constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, private viewportScroller: ViewportScroller,
-              private translate: TranslateService, private router: Router, private formBuilder: FormBuilder,
-              private snackBar: MatSnackBar) {
+  constructor(private store: Store<AppState>, private cdRef: ChangeDetectorRef,
+              private viewportScroller: ViewportScroller, private translate: TranslateService, private router: Router,
+              private formBuilder: FormBuilder, private snackBar: MatSnackBar) {
     this.getState = this.store.select(selectMainState);
     this.store.select(selectAuthState).subscribe((state: any) => {
       this.isAuthenticated = state.isAuthenticated;

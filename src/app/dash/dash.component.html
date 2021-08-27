@@ -1,3 +1,36 @@
+<!--Calendar-->
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>{{ viewDate | calendarDate:(view + 'ViewTitle'):locale }}<span
+      *ngIf="!isCalendarLoading" [innerHTML]="'DASHBOARD.TOTAL_RESERVATIONS' | translate: {total: total}"></span>
+    </mat-card-title>
+    <mat-card-subtitle *ngIf="!isCalendarLoading" class="calendar-title">
+      <button (viewDateChange)="closeOpenMonthViewDay()" [(viewDate)]="viewDate" [view]="view" color="accent"
+              mat-raised-button mwlCalendarPreviousView>
+        <mat-icon>navigate_before</mat-icon>
+        <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.PREVIOUS' | translate}}</span>
+      </button>
+      <button [(viewDate)]="viewDate" class="btn btn-outline-secondary" color="accent" mat-raised-button
+              mwlCalendarToday>
+        <mat-icon>today</mat-icon>
+        <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.TODAY' | translate}}</span>
+      </button>
+      <button (viewDateChange)="closeOpenMonthViewDay()" [(viewDate)]="viewDate" [view]="view" color="accent"
+              mat-raised-button mwlCalendarNextView>
+        <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.NEXT' | translate}}</span>
+        <mat-icon>navigate_next</mat-icon>
+      </button>
+    </mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content *ngIf="!isCalendarLoading; else calendarLoading">
+    <mwl-calendar-month-view (dayClicked)="dayClicked($event.day)" (eventClicked)="handleEvent($event.event)"
+                             [activeDayIsOpen]="activeDayIsOpen" [events]="events" [locale]="locale"
+                             [viewDate]="viewDate"></mwl-calendar-month-view>
+  </mat-card-content>
+  <ng-template #calendarLoading>
+    <div class="ssc-square mb"></div>
+  </ng-template>
+</mat-card>
 <mat-grid-list cols="{{ ( cardLayout | async )?.columns }}" rowHeight="200px">
   <!--Mini Cards-->
   <mat-grid-tile *ngFor="let mc of miniCardData" [colspan]="( cardLayout | async )?.miniCard?.cols"

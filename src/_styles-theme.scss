@@ -85,16 +85,114 @@
     }
   }
 
+  .cal-month-view {
+    .cal-header {
+      .cal-cell:hover {
+        background-color: mat.get-color-from-palette($background, loading) !important;
+      }
+
+      background-color: mat.get-color-from-palette($background, background);
+    }
+
+    .cal-cell-top:hover {
+      background-color: mat.get-color-from-palette($background, loading) !important;
+    }
+
+    .cal-day-cell:hover {
+      background-color: mat.get-color-from-palette($background, loading) !important;
+    }
+
+    .cal-day-cell:not(:last-child) {
+      border-right: 1px solid mat.get-color-from-palette($foreground, divider) !important;
+    }
+
+    .cal-cell {
+      border: 1px solid mat.get-color-from-palette($foreground, divider);
+      background-color: mat.get-color-from-palette($background, background);
+    }
+
+    .cal-open-day-events {
+      box-shadow: none;
+      background-color: mat.get-color-from-palette($background, background);
+      border-bottom: 1px solid mat.get-color-from-palette($foreground, divider);
+      border-left: 1px solid mat.get-color-from-palette($foreground, divider);
+      border-right: 1px solid mat.get-color-from-palette($foreground, divider);
+      color: mat.get-color-from-palette($foreground, base);
+    }
+
+    .cal-day-cell.cal-weekend .cal-day-number {
+      color: mat.get-color-from-palette($warn-palette) !important;
+    }
+
+    .cal-day-number {
+      color: mat.get-color-from-palette($foreground, base);
+    }
+
+    .cal-out-month .cal-day-number {
+      color: mat.get-color-from-palette($foreground, base);
+      opacity: 1;
+    }
+
+    .cal-day-cell.cal-today .cal-day-number {
+      color: mat.get-color-from-palette($foreground, base);
+      opacity: 1;
+    }
+
+    .cal-cell.cal-has-events.cal-open {
+      background-color: mat.get-color-from-palette($background, loading);
+      color: mat.get-color-from-palette($primary-palette, A100);
+    }
+
+    .cal-day-cell.cal-in-month.cal-has-events:hover {
+      background-color: mat.get-color-from-palette($background, loading) !important;
+    }
+
+    .cal-day-cell.cal-in-month.cal-has-events {
+      background-color: mat.get-color-from-palette($background, background) !important;
+    }
+
+    // The cal-event-highlight class was added to angular-calendar in version 0.26.0-alpha.26
+    // For earlier versions, you will need to specify the event secondary color in code (eg #8E24AA)
+    .cal-cell.cal-event-highlight {
+      background-color: mat.get-color-from-palette($primary-palette, 600) !important;
+    }
+
+    .cal-day-cell.cal-today.cal-open,
+    .cal-day-cell.cal-today {
+      background-color: mat.get-color-from-palette($primary-palette, 200);
+      color: mat.get-color-from-palette($primary-palette, A100);
+    }
+
+    .cal-day-badge {
+      background-color: mat.get-color-from-palette($accent-palette);
+      color: mat.get-color-from-palette($accent-palette, default-contrast);
+    }
+
+    .cal-event {
+      background-color: mat.get-color-from-palette($primary-palette, 600);
+      color: mat.get-color-from-palette($background, background);
+      border: 1px solid mat.get-color-from-palette($foreground, divider);
+    }
+
+    .cal-days {
+      border: 0 solid mat.get-color-from-palette($foreground, divider) !important;
+
+      .cal-cell-row {
+        border-bottom: 0 solid mat.get-color-from-palette($foreground, divider) !important;
+      }
+    }
+  }
+
   .cal-week-view {
     .cal-day-headers {
-      .cal-header:hover,
-      .cal-drag-over {
+      .cal-header:hover {
         background-color: mat.get-color-from-palette($background, hover);
       }
 
       background-color: mat.get-color-from-palette($background, background);
     }
 
+    .cal-header.cal-weekend b,
     .cal-header.cal-weekend span {
       color: mat.get-color-from-palette($warn-palette);
     }
@@ -140,6 +238,10 @@
       background-color: mat.get-color-from-palette($background, hover) !important;
     }
 
+    .cal-hour-segment.cal-after-hour-start .cal-time {
+      display: block;
+    }
+
     .cal-hour:not(:last-child) .cal-hour-segment,
     .cal-hour:last-child :not(:last-child) .cal-hour-segment {
       border-bottom: thin dashed mat.get-color-from-palette($primary-palette, lighter);
@@ -147,8 +249,8 @@
   }
 
   .cal-disabled {
-     background-color: mat.get-color-from-palette($background, disabled-button-toggle);
-   }
+    background-color: mat.get-color-from-palette($background, disabled-button-toggle);
+  }
 
   pre, .rejected, .dot {
     background-color: mat.get-color-from-palette($warn-palette) !important;
@@ -241,8 +343,16 @@
     color: mat.get-color-from-palette($primary-palette, 200);
   }
 
-  .approved {
+  .ml, .approved {
     background-color: mat.get-color-from-palette($background, approved) !important;
+  }
+
+  .cash {
+    background-color: mat.get-color-from-palette($background, success) !important;
+
+    td {
+      color: mat.get-color-from-palette($foreground, contrast) !important;
+    }
   }
 
   .in_process {

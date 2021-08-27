@@ -6,6 +6,7 @@ import { UsersComponent } from './list/users.component';
 import { TranslationLoaderResolver } from '../util/translation.resolver';
 import { UserComponent } from './user.component';
 import { UserDetailComponent } from './detail/user-detail.component';
+import { OverviewComponent } from './overview/overview.component';
 
 const routes: Routes = [
   {
@@ -22,6 +23,11 @@ const routes: Routes = [
   },
   {
     path: ':id', component: UserDetailComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.admin]
+    }
+  },
+  {
+    path: ':id/overview', component: OverviewComponent, canActivate: [AuthGuardService], data: {
       roles: [Role.admin]
     }
   }

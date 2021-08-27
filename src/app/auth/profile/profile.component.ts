@@ -63,7 +63,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       return;
     }
     const user: IUser = new User();
-    user.lang = valueChange(this.langValue.value.value, this.user?.lang);
+    user.lang = valueChange(this.langValue.value.value, this.user?.locale);
     user.username = fieldChange(this.username, this.user?.username);
     user.firstName = fieldChange(this.firstName, this.user?.firstName);
     user.lastName = fieldChange(this.lastName, this.user?.lastName);
@@ -123,7 +123,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
         if (state.selected.dob) {
           this.dob.setValue(createDateFromString(state.selected.dob));
         }
-        const langValue = findFlag(this.flagList, state.selected.lang);
+        const langValue = findFlag(this.flagList, state.selected.locale);
         this.langValue.setValue(langValue);
         this.cdRef.detectChanges();
       }

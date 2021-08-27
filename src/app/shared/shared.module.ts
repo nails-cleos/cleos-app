@@ -17,32 +17,63 @@ import { ErrorComponent } from './error/error.component';
 import { GoogleMapComponent } from './google-map/google-map.component';
 import { DialogComponent } from './dialog/dialog.component';
 import { GeocodeService } from '../services/geocode.service';
+import { RatingComponent } from './rating/rating.component';
+import { CalendarDateFormatter, CalendarEventTitleFormatter, CalendarModule, DateAdapter } from 'angular-calendar';
+import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
+import { getLocale } from '../util/helper';
+
+import { CardChartComponent, CardComponent } from './card/card.component';
+import { ChartsModule } from 'ng2-charts';
+import { CustomDateFormatter } from './CustomDateFormatter';
+import { CustomEventTitleFormatter } from './CustomEventTitleFormatter';
 
 @NgModule({
   imports: [
     CommonModule,
     AppMaterialModule,
     TranslateModule,
+    CalendarModule.forRoot({
+      provide: DateAdapter, useFactory: adapterFactory
+    }),
+    CalendarModule.forRoot({
+      provide: DateAdapter,
+      useFactory: adapterFactory
+    }, {
+      dateFormatter: {
+        provide: CalendarDateFormatter,
+        useClass: CustomDateFormatter
+      }, eventTitleFormatter: {
+        provide: CalendarEventTitleFormatter,
+        useClass: CustomEventTitleFormatter
+      }
+    }),
     AgmCoreModule.forRoot({
       apiKey: environment.googleMapKey,
       libraries: ['places', 'geometry']
     }),
     MatGoogleMapsAutocompleteModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    ChartsModule
   ],
   exports: [
     BackButtonDirective,
     MiniCardProductComponent,
     ErrorComponent,
     GoogleMapComponent,
-    DialogComponent
+    DialogComponent,
+    RatingComponent,
+    CardChartComponent,
+    CardComponent
   ],
   declarations: [
     BackButtonDirective,
     MiniCardProductComponent,
     ErrorComponent,
     GoogleMapComponent,
-    DialogComponent
+    DialogComponent,
+    RatingComponent,
+    CardChartComponent,
+    CardComponent
   ],
   providers: [
     GeocodeService
@@ -53,9 +84,9 @@ export class SharedModule {
     this.store.select(selectAuthState).subscribe((state: any) => {
       if (state.isAuthenticated) {
         const user: IUserAll = state.user;
-        this.translate.use(user.lang || navigator.language);
+        this.translate.use(getLocale(user.locale || navigator.language));
       } else {
-        this.translate.use(navigator.language);
+        this.translate.use(getLocale(navigator.language));
       }
     });
   }

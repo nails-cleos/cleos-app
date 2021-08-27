@@ -245,6 +245,16 @@ export class ReservationEffects {
     ))
   ));
 
+  review$ = createEffect(() => this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.reservationReview)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.reservationService.addReview(payload).pipe(
+      switchMap((response: any) => of(new fromActionsReservation.ReservationSaveSuccess({
+        message: this.translate.instant('REVIEW.CREATED'), id: response.id, isCustomer: true
+      }))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
+    ))
+  ));
+
   selectedData$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.reservationSelected),
     tap(() => this.router.navigate([this.router.url]))

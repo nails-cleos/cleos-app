@@ -119,9 +119,9 @@
         </div>
         <mat-form-field *ngIf="showDiscount && !isEditing" appearance="fill">
           <mat-label>{{ 'RESERVATION.PRODUCT.DISCOUNT.FIELD' | translate }}</mat-label>
-          <mat-select *ngFor="let cd of discounts" [formControl]="discount">
+          <mat-select [formControl]="discount">
             <mat-option>--</mat-option>
-            <mat-option [value]="cd.id">{{cd.title}}</mat-option>
+            <mat-option *ngFor="let cd of discounts" [value]="cd.id">{{cd.title}}</mat-option>
           </mat-select>
         </mat-form-field>
         <ng-template #skeleton>
@@ -143,6 +143,7 @@
     [daysInWeek]="daysInWeek"
     [events]="events"
     [hourSegments]="hourSegments"
+    [weekendDays]="weekendDays"
     [locale]="locale"
     [viewDate]="viewDate"></mwl-calendar-week-view>
   <mat-error *ngIf="this.errors['schedule']" [innerHTML]="'RESERVATION.SCHEDULE.REQUIRED' | translate"
@@ -207,13 +208,13 @@
           <div mat-line>{{ 'PRODUCT.PRICE.FIELD' | translate}}</div>
           <div *ngIf="!isEditing; else editing" mat-line>
             <span [class.strikethrough]="discount.value">{{product.value.price | number:'1.2-2'}}</span>
-            <span *ngIf="priceDiscount" [@discountAnimation]
-                  class="raised-button bold">{{priceDiscount | number:'1.2-2'}}</span>
+            <span *ngIf="price.priceWithDiscount" [@discountAnimation]
+                  class="raised-button bold">{{price.priceWithDiscount | number:'1.2-2'}}</span>
           </div>
           <ng-template #editing>
             <div mat-line>
-              <span>{{(priceDiscount ? priceDiscount : product.value.price) | number:'1.2-2'}}</span>
-              <span *ngIf="priceDiscount" class="raised-button bold">
+              <span>{{(price.priceWithDiscount ? price.priceWithDiscount : product.value.price) | number:'1.2-2'}}</span>
+              <span *ngIf="price.priceWithDiscount" class="raised-button bold">
                 {{'RESERVATION.PRODUCT.DISCOUNT.ADD' | translate}}
               </span>
             </div>

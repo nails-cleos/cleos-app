@@ -60,6 +60,11 @@ export class UserService {
     return this.http.post(this.customerUrl, user);
   }
 
+  public getOverview(id: string | null): Observable<IUser | undefined> {
+    const url = `${this.customerUrl}/${id ? id : 'me'}/reservations`;
+    return this.http.get<IUser>(url);
+  }
+
   public addProfessional(user: IUser): Observable<IUser> {
     return this.http.post(this.professionalUrl, user);
   }

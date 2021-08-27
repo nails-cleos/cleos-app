@@ -3,7 +3,7 @@ import { MatStepper } from '@angular/material/stepper';
 import { Observable, Subscription } from 'rxjs';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
-import { IProduct } from '../../../interfaces/product';
+import { IPrice, IProduct, Price } from '../../../interfaces/product';
 import { IRoom } from '../../../interfaces/room';
 import {
   IAvailableDTO,
@@ -36,7 +36,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as fromActionsReservation from '../../../store/reservation.actions';
 import { map, startWith } from 'rxjs/operators';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
-import { getPriceDiscount, getUserName, round } from '../../../util/helper';
+import { getPrice, getUserName, newDiscount, newPrice, round } from '../../../util/helper';
 import { DiscountType, IUserDiscount } from '../../../interfaces/discount';
 import { transitionAnimation } from '../../../util/animation';
 
@@ -67,7 +67,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   productList: IProduct[] | undefined;
   discounts: IUserDiscount[] | undefined;
   showDiscount = false;
-  priceDiscount: number | undefined;
+  price: IPrice;
   discount = new FormControl();
   filteredProduct: Observable<IProduct[] | undefined> | undefined;
   product: FormControl = new FormControl('', [
@@ -112,9 +112,8 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
               private router: Router, private route: ActivatedRoute, private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectReservationState);
     this.store.select(selectAuthState).subscribe((state: any) => this.customerId = state.user.id);
-    const userLang = this.translate.currentLang;
-    const index = userLang.indexOf('-');
-    this.locale = index === -1 ? userLang : userLang.substr(0, index);
+    this.price = new Price();
+    this.locale = this.translate.currentLang;
     breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small])
       .subscribe(result => this.smallScreen = result.matches);
     this.minDate = getNow();
@@ -126,12 +125,8 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       this.date.setValue(this.extras.date);
     }
     this.product.valueChanges.subscribe(value => {
-      this.priceDiscount = undefined;
-      if (value && this.discount.value && this.discounts) {
-        const userDiscount = this.discounts.find(d => d.id === this.discount.value);
-        if (userDiscount) {
-          this.priceDiscount = getPriceDiscount(userDiscount.discount, value.price);
-        }
+      if (value) {
+        this.price = newPrice(this.price, value.price);
       }
       if (this.extras && this.extras.discount) {
         this.showDiscount = true;
@@ -139,11 +134,10 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       }
     });
     this.discount.valueChanges.subscribe(value => {
-      this.priceDiscount = undefined;
       if (value && this.discounts) {
         const userDiscount = this.discounts.find(d => d.id === value);
         if (userDiscount) {
-          this.priceDiscount = getPriceDiscount(userDiscount.discount, this.product.value.price);
+          this.price = newDiscount(this.price, userDiscount.discount);
         }
       }
     });
@@ -480,23 +474,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.room.setValue(reservation.room);
     this.date.setValue(date);
     this.eventSelected = date;
-    this.product.valueChanges.subscribe(value => {
-      if (reservation.product.discount && reservation.product.discount.amount) {
-        let discount;
-        switch (reservation.product.discount.type) {
-          case DiscountType.money: {
-            discount = reservation.product.discount.amount;
-            break;
-          }
-          case DiscountType.percentage: {
-            discount = (value.price / reservation.product.discount.amount);
-          }
-        }
-        if (discount) {
-          this.priceDiscount = value.price - discount;
-        }
-      }
-    });
+    this.price = getPrice(this.reservation.product);
     this.product.setValue(reservation.product);
     this.duration = convertDuration(reservation.product.duration);
 

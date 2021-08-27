@@ -1,0 +1,16 @@
+<div>
+  <button (click)="onClick(i + 1)" *ngFor="let ratingId of ratingArr;index as i" [color]="color"
+          [id]="'star_' + i" mat-icon-button>
+    <mat-icon (mouseleave)="onHover(-1)" (mouseover)="onHover(i + 1)" [ngStyle]="{'background': background}">
+      {{showIcon(i + 1)}}
+    </mat-icon>
+  </button>
+</div>
+<p [ngClass]="rating < 1 && hover < 1 ? 'hide' : 'none'">
+  text
+</p>
+<p *ngIf="rating > 0 && hover < 1" [innerHTML]="rate | translate:{rating: rating, total: 5}"></p>
+<p *ngIf="hover > 0">
+  {{'REVIEW.RATING.' + hover | translate}}
+</p>
+<p *ngIf="detail">{{detail}}</p>

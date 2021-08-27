@@ -7,13 +7,8 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
 import { AgmCoreModule } from '@agm/core';
 import {
-  CalendarDateFormatter,
   CalendarModule,
-  CalendarNativeDateFormatter,
-  DateAdapter,
-  DateFormatterParams
 } from 'angular-calendar';
-import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 
 import { AppMaterialModule } from '../util/app-material.module';
 import { SharedModule } from '../shared/shared.module';
@@ -25,16 +20,6 @@ import { ReservationComponent } from './reservation.component';
 import { CompleteDialogComponent, ReservationDetailComponent } from './detail/reservation-detail.component';
 import { MoreInfoComponent } from './detail/more-info/more-info.component';
 import { CalendarComponent } from './calendar/calendar.component';
-
-class CustomDateFormatter extends CalendarNativeDateFormatter {
-
-  public dayViewHour({date, locale}: DateFormatterParams): string {
-    return new Intl.DateTimeFormat(locale, {
-      hour: 'numeric',
-      minute: 'numeric'
-    }).format(date);
-  }
-}
 
 @NgModule({
   declarations: [
@@ -56,18 +41,7 @@ class CustomDateFormatter extends CalendarNativeDateFormatter {
     TranslateModule,
     MatFabMenuModule,
     FlexLayoutModule,
-    CalendarModule.forRoot({
-      provide: DateAdapter, useFactory: adapterFactory
-    }),
-    CalendarModule.forRoot({
-      provide: DateAdapter,
-      useFactory: adapterFactory
-    }, {
-      dateFormatter: {
-        provide: CalendarDateFormatter,
-        useClass: CustomDateFormatter
-      }
-    }),
+    CalendarModule,
     AgmCoreModule.forRoot({
       apiKey: environment.googleMapKey,
       libraries: ['places', 'geometry']

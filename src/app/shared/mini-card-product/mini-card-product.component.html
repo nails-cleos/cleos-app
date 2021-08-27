@@ -1,15 +1,28 @@
 <mat-card class="mini-dashboard-card mat-elevation-z8">
-  <mat-card-header>
+  <mat-card-header (click)="click($event)"
+                   matTooltip="{{'COMMON.BUTTON.EXPAND.' + expand.toString().toUpperCase() | translate}}"
+                   matTooltipPosition="above">
     <mat-card-title class="card-text-color">
       {{card.name}}
     </mat-card-title>
     <mat-card-subtitle class="card-text-color">{{card.price | currency:'$':'symbol':'0.0' }}</mat-card-subtitle>
   </mat-card-header>
-  <mat-card-content class="dashboard-card-content card-text-color">
+  <mat-card-content (click)="click($event)" [@detailExpand]="expand ? 'expanded' : 'collapsed'"
+                    class="dashboard-card-content card-text-color detail">
     <div>{{card.description}}</div>
     <div class="divider"></div>
     <div *ngIf="card.duration" [innerHTML]="'CARD.PRODUCT.DURATION' | translate: {duration: time}"></div>
     <div *ngIf="card.durability"
          [innerHTML]="'CARD.PRODUCT.DURABILITY' | translate: {durability: card.durability}"></div>
+    <div *ngIf="card.rating">
+      <app-rating [notEmpty]="true" [rate]="'REVIEW.RATE'" [rating]="card.rating" class="card-text-color"
+                  color="primary"></app-rating>
+    </div>
   </mat-card-content>
+  <mat-card-actions class="card-text-color">
+    <button mat-button>
+      <mat-icon matPrefix>done</mat-icon>
+      {{'COMMON.BUTTON.SELECT' | translate}}
+    </button>
+  </mat-card-actions>
 </mat-card>

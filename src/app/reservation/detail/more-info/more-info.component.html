@@ -32,6 +32,17 @@
     <span class="bold">{{'RESERVATION.TRACKING.DURATION' | translate}}:</span> {{totalTime}}
   </h4>
 </div>
+
+<mat-divider></mat-divider>
+
+<div class="divider">
+  <h1>{{ 'RESERVATION.REVIEW.TITLE' | translate}}</h1>
+</div>
+<div *ngIf="reservation; else box">
+  <app-rating *ngIf="reservation.review" [detail]="reservation.review.detail" [rating]="reservation.review.rating"
+              color="primary"></app-rating>
+</div>
+
 <ng-template #box>
   <div class="ssc-square mb"></div>
 </ng-template>

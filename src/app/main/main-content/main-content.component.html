@@ -20,11 +20,11 @@
   </section>
   <section class="section-style" id="product">
     <h1 class="title">{{ 'MAIN.SECTION.PRODUCT' | translate }}</h1>
-    <mat-grid-list [rowHeight]="'1:1'" cols="{{ ( cardLayout | async )?.columns }}">
-      <mat-grid-tile *ngFor="let product of products" [colspan]="1" [rowspan]="1">
+    <div class="product-container">
+      <div *ngFor="let product of products" class="card-wrap">
         <app-mini-card-product (click)="setProduct(product)" [card]="product"></app-mini-card-product>
-      </mat-grid-tile>
-    </mat-grid-list>
+      </div>
+    </div>
   </section>
   <section class="section-style" id="book">
     <h1 class="title">{{ 'MAIN.SECTION.BOOK' | translate }}</h1>
@@ -36,7 +36,7 @@
           <label>
             <input (focus)="picker.open()" [formControl]="date" [matDatepickerFilter]="myFilter"
                    [matDatepicker]="picker" [max]="maxDate" [min]="minDate"
-                   matInput required>
+                   matInput>
           </label>
           <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
           <mat-datepicker #picker touchUi></mat-datepicker>
@@ -45,8 +45,7 @@
           <mat-label>{{ 'MAIN.BOOK.PRODUCT.FIELD' | translate }}</mat-label>
           <label>
             <input (keydown)="keyDownHandler($event, product)" [formControl]="product"
-                   [matAutocomplete]="autoProduct"
-                   matInput required type="text">
+                   [matAutocomplete]="autoProduct" matInput type="text">
           </label>
           <mat-autocomplete #autoProduct="matAutocomplete" [displayWith]="displayFnProduct">
             <mat-option *ngFor="let product of filteredProduct | async" [value]="product">
@@ -146,7 +145,7 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'MAIN.CONTACT.BODY.FIELD' | translate }}</mat-label>
                 <label>
-                  <textarea #message [formControl]="body" [tabIndex]="4" matInput maxlength="256"></textarea>
+                  <textarea #message [formControl]="body" [tabIndex]="4" matInput maxlength="256" required></textarea>
                 </label>
                 <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
                 <mat-error *ngIf="body.hasError('required')"

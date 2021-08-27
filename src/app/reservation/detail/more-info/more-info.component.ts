@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { IPaymentAll } from '../../../interfaces/payment';
-import { ITracking } from '../../../interfaces/reservation';
+import { IReservationAll, ITracking } from '../../../interfaces/reservation';
 import * as fromActionsReservation from '../../../store/reservation.actions';
 import * as fromActionsPayment from '../../../store/payment.actions';
 import { TranslateService } from '@ngx-translate/core';
@@ -27,6 +27,7 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
 
   displayedColumns: string[] = ['position', 'description', 'amount', 'status', 'actions'];
   payments: IPaymentAll[] | undefined;
+  reservation: IReservationAll | undefined;
 
   language: string;
 
@@ -70,6 +71,7 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
     this.subscription = this.getState.subscribe(state => {
       this.payments = state.payments;
       this.tracking = state.tracking;
+      this.reservation = state.selected;
       if (this.tracking && this.tracking.startedTime && this.tracking.completedTime) {
         this.totalTime = getDiffTime(newDate(this.tracking.startedTime), newDate(this.tracking.completedTime));
       }
@@ -93,6 +95,12 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
       this.payments = undefined;
       this.store.dispatch(
         new fromActionsReservation.ReservationFindPayments(this.reservationId)
+      );
+    }
+    if (!this.reservation) {
+      this.reservation = undefined;
+      this.store.dispatch(
+        new fromActionsReservation.ReservationFind(this.reservationId)
       );
     }
   }

@@ -23,6 +23,7 @@ export class UserEffects {
       catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
     ))
   ));
+
   getAllCustomers$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.getAllCustomers)).pipe(
     map((action: any) => action.payload),
     switchMap(() => this.userService.getAllCustomers().pipe(
@@ -30,6 +31,7 @@ export class UserEffects {
       catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
     ))
   ));
+
   findOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.findUser)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.userService.getById(payload).pipe(
@@ -42,6 +44,14 @@ export class UserEffects {
     map((action: any) => action.payload),
     switchMap(() => this.userService.getMe().pipe(
       switchMap((response: any) => of(new fromActionsUser.UserSelected({user: response, profile: true}))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
+    ))
+  ));
+
+  overviewData$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.userOverview)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.userService.getOverview(payload).pipe(
+      switchMap((response: any) => of(new fromActionsUser.UserSuccess(response))),
       catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
     ))
   ));
