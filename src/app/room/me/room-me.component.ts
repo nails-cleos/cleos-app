@@ -10,13 +10,14 @@ import {
 } from '../../interfaces/room';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
-import { IconName, IIcon } from '../room.component';
+import { IIcon } from '../room.component';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../store/app.states';
 import * as fromActionsRoom from '../../store/room.actions';
 import { createDate } from '../../util/dates';
 import { getUserName } from '../../util/helper';
+import { RoomIconName } from '../../util/icon';
 
 @Component({
   selector: 'app-room-me',
@@ -32,9 +33,9 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   step = 0;
   icons: IIcon = {
-    week: IconName.eventBusy,
-    saturday: IconName.eventBusy,
-    sunday: IconName.eventBusy
+    week: RoomIconName.eventBusy,
+    saturday: RoomIconName.eventBusy,
+    sunday: RoomIconName.eventBusy
   };
   weekDate?: IAvailabilityDate;
   satDate?: IAvailabilityDate;
@@ -108,7 +109,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ignore(day: string, step: number): void {
-    this.setIcon(day, IconName.eventBusy);
+    this.setIcon(day, RoomIconName.eventBusy);
     const index = this.availabilities.findIndex((e) => e.day === day);
     if (index > -1) {
       this.availabilities.splice(index, 1);
@@ -117,7 +118,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   addAvailability(availability: IAvailability, step: number): void {
-    this.setIcon(availability.day, IconName.eventAvailable);
+    this.setIcon(availability.day, RoomIconName.eventAvailable);
     const index = this.availabilities.findIndex((e) => e.day === availability.day);
 
     if (index !== -1) {
@@ -131,7 +132,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   validate(): boolean {
     let step = -1;
     this.errors = [];
-    switch (IconName.calendarToday) {
+    switch (RoomIconName.calendarToday) {
       case this.icons.week:
         step = 0;
         break;
@@ -217,7 +218,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  private setIcon(day: string, icon: IconName): void {
+  private setIcon(day: string, icon: RoomIconName): void {
     switch (day) {
       case 'WEEK':
         this.icons.week = icon;

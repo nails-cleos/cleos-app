@@ -1,0 +1,30 @@
+export enum ReservationIconName {
+  created = 'assignment',
+  approved = 'done',
+  send = 'sms',
+  started = 'play_arrow',
+  completed = 'done_all',
+  cancelled = 'clear',
+  edit = 'edit_calendar',
+  book = 'book_online',
+  paid = 'price_check',
+  partiallyPaid = 'request_quote',
+  payment = 'payment',
+  partiallyCompleted = 'rule',
+  more = 'read_more'
+}
+
+export enum RoomIconName {
+  calendarToday = 'calendar_today',
+  eventAvailable = 'event_available',
+  eventBusy = 'event_busy'
+}
+
+export enum RoleIconName {
+  roleCustomer = 'perm_identity',
+  roleProfessional = 'manage_accounts',
+  roleAdmin = 'supervisor_account'
+}
+
+export type ReservationIconKey = keyof typeof ReservationIconName;
+export type RoleIconKey = keyof typeof RoleIconName;

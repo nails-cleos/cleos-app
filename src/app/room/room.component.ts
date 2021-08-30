@@ -12,17 +12,12 @@ import { requireMatch } from '../util/validators';
 import { getUserName } from '../util/helper';
 import { Router } from '@angular/router';
 import { Role } from '../interfaces/token';
-
-export enum IconName {
-  calendarToday = 'calendar_today',
-  eventAvailable = 'event_available',
-  eventBusy = 'event_busy'
-}
+import { RoomIconName } from '../util/icon';
 
 export interface IIcon {
-  week: IconName;
-  saturday: IconName;
-  sunday: IconName;
+  week: RoomIconName;
+  saturday: RoomIconName;
+  sunday: RoomIconName;
 }
 
 @Component({
@@ -39,9 +34,9 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   step = 0;
   icons: IIcon = {
-    week: IconName.calendarToday,
-    saturday: IconName.calendarToday,
-    sunday: IconName.calendarToday
+    week: RoomIconName.calendarToday,
+    saturday: RoomIconName.calendarToday,
+    sunday: RoomIconName.calendarToday
   };
 
   professionals: IUserAll[] | undefined;
@@ -112,7 +107,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   addAvailability(availability: IAvailability, step: number): void {
-    this.setIcon(availability.day, IconName.eventAvailable);
+    this.setIcon(availability.day, RoomIconName.eventAvailable);
 
     const index = this.room.availabilities.findIndex((e) => e.day === availability.day);
 
@@ -126,7 +121,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   ignore(day: string, step: number): void {
-    this.setIcon(day, IconName.eventBusy);
+    this.setIcon(day, RoomIconName.eventBusy);
     const index = this.room.availabilities.findIndex((e) => e.day === day);
     if (index > -1) {
       this.room.availabilities.splice(index, 1);
@@ -180,7 +175,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     );
   }
 
-  private setIcon(day: string, icon: IconName): void {
+  private setIcon(day: string, icon: RoomIconName): void {
     switch (day) {
       case 'WEEK':
         this.icons.week = icon;
@@ -200,7 +195,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     }
     let step = -1;
     this.errors = [];
-    switch (IconName.calendarToday) {
+    switch (RoomIconName.calendarToday) {
       case this.icons.week:
         step = 0;
         break;

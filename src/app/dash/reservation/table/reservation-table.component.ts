@@ -8,12 +8,12 @@ import * as fromActionsReservation from '../../../store/reservation.actions';
 import { IReservation, IReservationAll } from '../../../interfaces/reservation';
 import { MatTableDataSource } from '@angular/material/table';
 import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../../interfaces/pagination';
-import { ReservationIconName } from '../../../reservation/detail/reservation-detail.component';
 import { DialogComponent } from '../../../shared/dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { getUserName, snakeToCamel } from '../../../util/helper';
+import { ReservationIconKey, ReservationIconName } from '../../../util/icon';
 
 @Component({
   selector: 'app-reservation-table',
@@ -74,8 +74,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
   }
 
   getIcon(name: any): any {
-    // @ts-ignore
-    return ReservationIconName[snakeToCamel(name)];
+    return ReservationIconName[snakeToCamel(name) as ReservationIconKey];
   }
 
   delete(reservation: IReservation): void {

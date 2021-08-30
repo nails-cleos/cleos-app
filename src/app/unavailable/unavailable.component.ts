@@ -21,6 +21,7 @@ import {
 import { IRoomAll } from '../interfaces/room';
 import { getUserName } from '../util/helper';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-unavailable',
@@ -62,7 +63,8 @@ export class UnavailableComponent implements OnInit, OnDestroy {
   private getState: Observable<any>;
   private subscription: Subscription | undefined;
 
-  constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private router: Router) {
+  constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private router: Router,
+              private translate: TranslateService) {
     this.getState = this.store.select(selectUnavailableState);
   }
 
@@ -115,19 +117,19 @@ export class UnavailableComponent implements OnInit, OnDestroy {
       const day = date.getDay();
       const {minDate, maxDate} = getMinMaxDate(day, $event.value, this.room);
       max = maxDate;
-      this.minTime = getTime(minDate);
-      this.maxTime = getTime(maxDate);
+      this.minTime = getTime(minDate, this.translate.currentLang);
+      this.maxTime = getTime(maxDate, this.translate.currentLang);
     }
 
     const maxHour = max?.getHours();
     const diffMin = max?.getMinutes();
 
-    const {diffHour, diffMinute} = diffTime(date, maxHour, diffMin);
+    const d = diffTime(date, maxHour, diffMin);
 
     this.startTime.setValue('');
     this.duration.setValue('');
     this.showDuration = false;
-    this.durationMax = formatTime(diffHour, diffMinute);
+    this.durationMax = formatTime(d, this.translate.currentLang);
   }
 
   setTime($event: any): void {
@@ -142,11 +144,11 @@ export class UnavailableComponent implements OnInit, OnDestroy {
       diffMin = max[1];
     }
 
-    const {diffHour, diffMinute} = diffTime(date, Number(maxHour), Number(diffMin));
+    const d = diffTime(date, Number(maxHour), Number(diffMin));
 
     this.duration.setValue('');
     this.showDuration = true;
-    this.durationMax = formatTime(diffHour, diffMinute);
+    this.durationMax = formatTime(d, this.translate.currentLang);
   }
 
   getRoom(user: IUser): void {
@@ -161,8 +163,8 @@ export class UnavailableComponent implements OnInit, OnDestroy {
       const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time[0], time[1]);
       const day = date.getDay();
       const {minDate, maxDate} = getMinMaxDate(day, date, this.room);
-      this.minTime = getTime(minDate);
-      this.maxTime = getTime(maxDate);
+      this.minTime = getTime(minDate, this.translate.currentLang);
+      this.maxTime = getTime(maxDate, this.translate.currentLang);
     }
   }
 

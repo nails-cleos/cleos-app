@@ -38,7 +38,6 @@ export const reducer = (state = initialState, action: All): State => {
     case PaymentActionTypes.paymentByReservation: {
       return {
         ...state,
-        // @ts-ignore
         errorMessage: null,
         subErrors: null,
         // @ts-ignore
@@ -49,8 +48,7 @@ export const reducer = (state = initialState, action: All): State => {
     case PaymentActionTypes.paymentFind: {
       return {
         ...state,
-        // @ts-ignore
-        data: {},
+        data: {} as IPayment,
         errorMessage: null,
         subErrors: null,
         selected: null,

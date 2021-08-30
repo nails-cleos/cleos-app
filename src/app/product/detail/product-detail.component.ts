@@ -7,7 +7,8 @@ import { AppState, selectProductState } from '../../store/app.states';
 import * as fromActionsProduct from '../../store/product.actions';
 import { fieldChange, valueChange } from '../../util/validators';
 import { IProduct, Product } from '../../interfaces/product';
-import { convertDuration, createDate, getTime } from '../../util/dates';
+import { formatDuration } from '../../util/dates';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-product-detail',
@@ -32,8 +33,8 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     Validators.required
   ]);
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>,
-              private formBuilder: FormBuilder, private router: Router) {
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
+              private router: Router, private translate: TranslateService) {
     this.getState = this.store.select(selectProductState);
   }
 
@@ -86,8 +87,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
           durability: state.selected.durability
         } as IProduct;
 
-        const duration = convertDuration(state.selected.duration);
-        this.product.duration = getTime(createDate(duration.hour, duration.minute));
+        this.product.duration = formatDuration(state.selected.duration, this.translate.currentLang);
         this.form.patchValue(this.product);
       }
       if (state.subErrors) {

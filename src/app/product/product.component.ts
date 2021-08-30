@@ -7,6 +7,7 @@ import { Observable, Subscription } from 'rxjs';
 import { IProduct, Product } from '../interfaces/product';
 import { createDate, getTime } from '../util/dates';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-product',
@@ -27,9 +28,10 @@ export class ProductComponent implements OnInit, OnDestroy {
   ]);
   duration: FormControl;
 
-  constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private router: Router) {
+  constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private router: Router,
+              private translate: TranslateService) {
     this.getState = this.store.select(selectProductState);
-    const d = getTime(createDate());
+    const d = getTime(createDate(), this.translate.currentLang);
 
     this.duration = new FormControl(d, [
       Validators.required

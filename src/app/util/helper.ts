@@ -3,7 +3,7 @@ import { IUser, IUserAll } from '../interfaces/user';
 import { IPrice, IProductAll, Price } from '../interfaces/product';
 import { IPayment } from '../interfaces/payment';
 
-export const snakeToCamel = (value: string): string =>
+export const snakeToCamel = (value: string = ''): string =>
   value.toLowerCase().replace(/([-_]\w)/g, (g: string) => g[1].toUpperCase());
 
 export const getUserName = (user: IUserAll | IUser | undefined): string => {

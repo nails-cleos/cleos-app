@@ -19,7 +19,6 @@ import {
   convertDuration,
   createNewDate,
   endOfPeriod,
-  formatTime,
   getAvailability,
   getNow,
   getStartEndDay,
@@ -195,8 +194,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
         const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
         const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
           customerName: getUserName(it.customer),
-          productName: it.product.name,
-          duration: formatTime(duration.hour, duration.minute)
+          productName: it.product.name
         });
 
         const color = findStateColor(it.state, darkMode);

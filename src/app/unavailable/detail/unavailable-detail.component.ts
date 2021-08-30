@@ -8,10 +8,10 @@ import { AppState, selectUnavailableState } from '../../store/app.states';
 import { fieldChange, valueChange } from '../../util/validators';
 import * as fromActionsUnavailable from '../../store/unavailable.actions';
 import {
-  convertDuration,
   createNewDate,
   diffTime,
   filterDate,
+  formatDuration,
   formatTime,
   getMinMaxDate,
   getNow,
@@ -21,6 +21,7 @@ import {
 import { IRoomAll } from '../../interfaces/room';
 import { IUser } from '../../interfaces/user';
 import { getUserName } from '../../util/helper';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-unavailable-detail',
@@ -50,7 +51,6 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
 
   errors: any = [];
 
-  durationTime: any;
   durationMax: any;
   minTime: any;
   maxTime: any;
@@ -59,7 +59,7 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
   private getState: Observable<any>;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
-              private router: Router) {
+              private router: Router, private translate: TranslateService) {
     this.getState = this.store.select(selectUnavailableState);
   }
 
@@ -86,18 +86,18 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
       const day = date.getDay();
       const {minDate, maxDate} = getMinMaxDate(day, $event.value, this.room);
       max = maxDate;
-      this.minTime = getTime(minDate);
-      this.maxTime = getTime(maxDate);
+      this.minTime = getTime(minDate, this.translate.currentLang);
+      this.maxTime = getTime(maxDate, this.translate.currentLang);
     }
 
     const maxHour = max?.getHours();
     const diffMin = max?.getMinutes();
 
-    const {diffHour, diffMinute} = diffTime(date, maxHour, diffMin);
+    const duration = diffTime(date, maxHour, diffMin);
 
     this.startTime.setValue('');
     this.duration.setValue('');
-    this.durationMax = formatTime(diffHour, diffMinute);
+    this.durationMax = formatTime(duration, this.translate.currentLang);
   }
 
   setTime($event: any): void {
@@ -112,10 +112,10 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
       diffMin = max[1];
     }
 
-    const {diffHour, diffMinute} = diffTime(date, Number(maxHour), Number(diffMin));
+    const duration = diffTime(date, Number(maxHour), Number(diffMin));
 
     this.duration.setValue('');
-    this.durationMax = formatTime(diffHour, diffMinute);
+    this.durationMax = formatTime(duration, this.translate.currentLang);
   }
 
   getRoom(user: IUser): void {
@@ -147,8 +147,8 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
       const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time[0], time[1]);
       const day = date.getDay();
       const {minDate, maxDate} = getMinMaxDate(day, date, this.room);
-      this.minTime = getTime(minDate);
-      this.maxTime = getTime(maxDate);
+      this.minTime = getTime(minDate, this.translate.currentLang);
+      this.maxTime = getTime(maxDate, this.translate.currentLang);
     }
   }
 
@@ -172,13 +172,12 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
         if (!this.room) {
           this.getRoom(state.selected.professional);
         }
-        this.durationTime = convertDuration(state.selected.duration);
         this.unavailable = {
           id: state.selected.id,
           description: state.selected.description,
           startDate: date,
-          startTime: getTime(date),
-          duration: formatTime(this.durationTime.hour, this.durationTime.minute),
+          startTime: getTime(date, this.translate.currentLang),
+          duration: formatDuration(state.selected.duration, this.translate.currentLang),
           repeat: state.selected.repeat
         } as IUnavailable;
         this.form.patchValue(this.unavailable);
@@ -193,8 +192,8 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
         const maxHour = maxDate?.getHours();
         const diffMin = maxDate?.getMinutes();
 
-        const {diffHour, diffMinute} = diffTime(date, maxHour, diffMin);
-        this.durationMax = formatTime(diffHour, diffMinute);
+        const d = diffTime(date, maxHour, diffMin);
+        this.durationMax = formatTime(d, this.translate.currentLang);
       }
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {

@@ -11,9 +11,10 @@ import {
   createNewDate,
   Duration,
   formatDateTime,
+  formatDuration,
   getNow,
   getTime,
-  greaterThanToday,
+  greaterOrEqualsThanToday,
   IDuration,
   newDate
 } from '../../util/dates';
@@ -34,22 +35,7 @@ import { MatFabMenu, MatFabMenuDirection } from '@angular-material-extensions/fa
 import { IPayment, PaymentType } from '../../interfaces/payment';
 import { transitionAnimation } from '../../util/animation';
 import { isToday, isTomorrow } from 'date-fns';
-
-export enum ReservationIconName {
-  created = 'assignment',
-  approved = 'done',
-  send = 'sms',
-  started = 'play_arrow',
-  completed = 'done_all',
-  cancelled = 'clear',
-  edit = 'edit_calendar',
-  book = 'book_online',
-  paid = 'price_check',
-  partiallyPaid = 'request_quote',
-  payment = 'payment',
-  partiallyCompleted = 'rule',
-  more = 'read_more'
-}
+import { ReservationIconKey, ReservationIconName } from '../../util/icon';
 
 @Component({
   selector: 'app-reservation-detail',
@@ -170,8 +156,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   }
 
   getIcon(name: any): any {
-    // @ts-ignore
-    return ReservationIconName[snakeToCamel(name)];
+    return ReservationIconName[snakeToCamel(name) as ReservationIconKey];
   }
 
   onChangeState(id: any): void {
@@ -211,8 +196,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         this.start = newDate(state.selected.start);
         this.end = createNewDate(this.start, this.start.getHours() + this.duration.hour,
           this.start.getMinutes() + this.duration.minute);
-        // @ts-ignore
-        this.state = ReservationIconName[snakeToCamel(state.selected.state)];
+        this.state = ReservationIconName[snakeToCamel(state.selected.state) as ReservationIconKey];
         this.reservation = state.selected;
         if (this.professionalId && this.professionalId === this.reservation?.room.professional.id) {
           this.professionalMachine(this);
@@ -282,7 +266,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     }
     approveActions = [...approveActions, edit];
     if (self.reservation && self.reservation.customer && self.reservation.customer.phone &&
-      greaterThanToday(newDate(self.reservation.start))) {
+      greaterOrEqualsThanToday(newDate(self.reservation.start))) {
       approveActions = [...approveActions, sendMessage];
     }
     approveActions = [...approveActions, more, cancel];
@@ -299,7 +283,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         const startDate = newDate(self.reservation.start);
         let message;
         if (isTomorrow(startDate)) {
-          const date = getTime(startDate);
+          const date = getTime(startDate, this.translate.currentLang);
           message = translate.instant('WHATSAPP.SEND.TOMORROW', {date});
         } else {
           const date = formatDateTime(startDate, self.language);
@@ -535,7 +519,7 @@ export class CompleteDialogComponent implements OnInit, OnDestroy {
   price: IPrice;
 
   constructor(public dialogRef: MatDialogRef<CompleteDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
-              private store: Store<AppState>) {
+              private store: Store<AppState>, private translate: TranslateService) {
     this.getState = store.select(selectReservationState);
     this.price = getPrice(data.reservation.product, data.payments);
     this.product.setValue(data.reservation?.product);
@@ -554,8 +538,7 @@ export class CompleteDialogComponent implements OnInit, OnDestroy {
   }
 
   get durationTime(): string {
-    const duration = convertDuration(this.product.value.duration);
-    return getTime(createNewDate(getNow(), duration.hour, duration.minute));
+    return formatDuration(this.product.value.duration, this.translate.currentLang);
   }
 
   ngOnInit(): void {

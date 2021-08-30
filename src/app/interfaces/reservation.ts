@@ -45,7 +45,7 @@ export interface IRoomReservation {
 }
 
 export interface ICustomerReservation {
-  reservations: Pagination<IReservationAll[]>;
+  reservations: Pagination<IReservationAll>;
   upcoming: IReservationAll;
   currentReservationPayments: IPayment[];
 }
@@ -147,5 +147,7 @@ export enum States {
   partiallyCompleted = 'PARTIALLY_COMPLETED',
   cancelled = 'CANCELLED'
 }
+
+export type StatesKey = keyof typeof States;
 
 export const MAX_RESERVATION_MONTH = 3;

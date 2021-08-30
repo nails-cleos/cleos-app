@@ -1,7 +1,8 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Availability, IAvailability, IAvailabilityDate } from '../../interfaces/room';
 import { createDate, getTime } from '../../util/dates';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-availability',
@@ -21,7 +22,7 @@ export class AvailabilityComponent implements OnChanges {
   endLunch: FormControl;
   checked!: boolean;
 
-  constructor(private formBuilder: FormBuilder) {
+  constructor(private formBuilder: FormBuilder, private translate: TranslateService) {
     this.start = new FormControl('', [
       Validators.required
     ]);
@@ -47,13 +48,13 @@ export class AvailabilityComponent implements OnChanges {
     const startLunch = this.dates?.startLunchDate || createDate(13, 0);
     const endLunch = this.dates?.endLunchDate || createDate(14, 0);
 
-    this.start.setValue(getTime(start));
-    this.end.setValue(getTime(end));
+    this.start.setValue(getTime(start, this.translate.currentLang));
+    this.end.setValue(getTime(end, this.translate.currentLang));
 
     if (this.dates?.startLunchDate && this.dates?.endLunchDate) {
       this.checked = true;
-      this.startLunch.setValue(getTime(startLunch));
-      this.endLunch.setValue(getTime(endLunch));
+      this.startLunch.setValue(getTime(startLunch, this.translate.currentLang));
+      this.endLunch.setValue(getTime(endLunch, this.translate.currentLang));
     }
   }
 

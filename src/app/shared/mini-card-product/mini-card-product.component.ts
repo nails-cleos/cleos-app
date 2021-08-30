@@ -1,7 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { IProduct } from '../../interfaces/product';
-import { convertDuration, createDate, getTime } from '../../util/dates';
+import { formatDuration } from '../../util/dates';
 import { detailExpandAnimation } from '../../util/animation';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-mini-card-product',
@@ -14,14 +15,13 @@ export class MiniCardProductComponent implements OnInit {
   time: string | undefined;
   expand: boolean;
 
-  constructor() {
+  constructor(private translate: TranslateService) {
     this.expand = false;
   }
 
   ngOnInit(): void {
     if (this.card && this.card.duration) {
-      const duration = convertDuration(this.card.duration);
-      this.time = getTime(createDate(duration.hour, duration.minute));
+      this.time = formatDuration(this.card.duration, this.translate.currentLang);
     }
   }
 

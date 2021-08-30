@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
-import { IReservation, IReservationAll, States } from '../../interfaces/reservation';
+import { IReservation, IReservationAll, States, StatesKey } from '../../interfaces/reservation';
 import { Observable, Subscription } from 'rxjs';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -9,7 +9,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../store/app.states';
-import { ReservationIconName } from '../detail/reservation-detail.component';
 import * as fromActionsReservation from '../../store/reservation.actions';
 import { getNow, newDate } from '../../util/dates';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
@@ -20,6 +19,7 @@ import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material
 import { getFullUserName, getUserName, snakeToCamel } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
+import { ReservationIconKey, ReservationIconName } from '../../util/icon';
 
 @Component({
   selector: 'app-search',
@@ -66,8 +66,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     });
     this.getState = this.store.select(selectReservationState);
     this.language = this.translate.currentLang;
-    // @ts-ignore
-    this.allStates = this.allStates.filter(s => States[s] !== States.created);
+    this.allStates = this.allStates.filter(s => States[s as StatesKey] !== States.created);
     this.filteredStates = this.state.valueChanges.pipe(
       startWith(null),
       map((state: string | null) => state ? this.filterStates(state) : this.allStates.slice()));
@@ -99,8 +98,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   getIcon(name: any): any {
-    // @ts-ignore
-    return ReservationIconName[snakeToCamel(name)];
+    return ReservationIconName[snakeToCamel(name) as ReservationIconKey];
   }
 
   cancel(reservation: IReservationAll): void {
@@ -149,11 +147,9 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   selected(event: MatAutocompleteSelectedEvent): void {
-    // @ts-ignore
-    const state = States[event.option.value];
+    const state = States[event.option.value as StatesKey];
     this.states = [...this.states, state];
-    // @ts-ignore
-    this.allStates = this.allStates.filter(s => States[s] !== state);
+    this.allStates = this.allStates.filter(s => States[s as StatesKey] !== state);
     this.stateInput.nativeElement.value = '';
     this.state.setValue(null);
     this.getReservations();

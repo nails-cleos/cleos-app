@@ -37,6 +37,8 @@ enum ChartTypeEnum {
   paymentOverview
 }
 
+type ChartTypeKey = keyof typeof ChartTypeEnum;
+
 @Component({
   selector: 'app-card',
   templateUrl: './card.component.html',
@@ -61,8 +63,7 @@ export class CardComponent {
   }
 
   onClick(): void {
-    // @ts-ignore
-    switch (ChartTypeEnum[snakeToCamel(this.type)]) {
+    switch (ChartTypeEnum[snakeToCamel(this.type) as ChartTypeKey]) {
       case ChartTypeEnum.quantityProduct.valueOf():
         this.setChart('bar', quantityProductChart(this.data, this.label), barChartDefaultOptions());
         break;

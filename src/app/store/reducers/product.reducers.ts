@@ -38,8 +38,7 @@ export const reducer = (state = initialState, action: All): State => {
     case ProductActionTypes.productFind: {
       return {
         ...state,
-        // @ts-ignore
-        data: {},
+        data: {} as IProduct,
         errorMessage: null,
         subErrors: null,
         selected: null,

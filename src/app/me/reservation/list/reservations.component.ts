@@ -10,7 +10,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { ReservationIconName } from '../../../reservation/detail/reservation-detail.component';
+import { ReservationIconKey, ReservationIconName } from '../../../util/icon';
 import * as fromActionsReservation from '../../../store/reservation.actions';
 import { convertDuration, createNewDate, newDate } from '../../../util/dates';
 import { getPrice, getUserName, snakeToCamel } from '../../../util/helper';
@@ -92,8 +92,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   getIcon(name: any): any {
-    // @ts-ignore
-    return ReservationIconName[snakeToCamel(name)];
+    return ReservationIconName[snakeToCamel(name) as ReservationIconKey];
   }
 
   onRatingChanged(reservation: IReservationAll): void {
@@ -124,7 +123,6 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
       if (this.data) {
         this.noContent = !this.data.upcoming;
         if (this.data.reservations) {
-          // @ts-ignore
           this.dataSource = this.data.reservations.content?.map((reservation: IReservationAll) => {
             if (this.showReview && reservation.state === States.completed
               && isToday(newDate(reservation.start)) && !reservation.review) {

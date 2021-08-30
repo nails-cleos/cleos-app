@@ -87,7 +87,7 @@ export const getMinAndMax = (availability: IAvailability, date: Date): any => {
   return {min, max};
 };
 
-export const diffTime = (time: Date, maxHour = 24, diffMin = 0): any => {
+export const diffTime = (time: Date, maxHour = 24, diffMin = 0): IDuration => {
   const date = new Date();
   date.setHours(time.getHours(), time.getMinutes());
 
@@ -101,7 +101,7 @@ export const diffTime = (time: Date, maxHour = 24, diffMin = 0): any => {
   const minutes = (hours - diffHour) * 60;
   const diffMinute = Math.round(minutes);
 
-  return {diffHour, diffMinute};
+  return new Duration(diffHour, diffMinute);
 };
 
 export const getDiffTime = (maxDate: Date, minDate: Date): string => {
@@ -170,12 +170,9 @@ export const getMinMaxDate = (day: number, date: any, room: IRoom): any => {
   return {minDate, maxDate};
 };
 
-export const getTime = (time: Date): string => {
-  const hours = `0${time.getHours()}`.slice(-2);
-  const minutes = `0${time.getMinutes()}`.slice(-2);
-
-  return `${hours}:${minutes}`;
-};
+export const getTime = (date: Date, locale: string): string => date.toLocaleTimeString(locale, {
+  hour: '2-digit', minute: '2-digit'
+});
 
 export const formatFullDateTime = (date: Date, locale: string): string => date.toLocaleDateString(locale, {
   day: 'numeric', month: 'long', weekday: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
@@ -221,7 +218,13 @@ export const formatDateTwoDigit = (date: Date, locale: string): string => date.t
   day: '2-digit', month: '2-digit', year: '2-digit'
 });
 
-export const formatTime = (hour: number, minute: number): string => getTime(createDate(hour, minute));
+export const formatDuration = (duration: string, locale: string): string => {
+  const d: IDuration = convertDuration(duration);
+  return formatTime(d, locale);
+};
+
+export const formatTime = (duration: IDuration, locale: string): string =>
+  getTime(createDate(duration.hour, duration.minute), locale);
 
 export const getNow = (): Date => new Date();
 
@@ -259,8 +262,6 @@ export const plusMonthDate = (date: Date, plus: number, day: number): Date => {
 export const greaterOrEqualsThan = (date1: Date, date2: Date): boolean => date1 >= date2;
 
 export const greaterOrEqualsThanToday = (date: Date): boolean => date >= createDate();
-
-export const greaterThanToday = (date: Date): boolean => date >= createDate(23, 59, 59, 99);
 
 export const isBetween = (min: Date, max: Date, date: Date): boolean =>
   date >= min && date <= createNewDate(max, 23, 59, 59, 99);

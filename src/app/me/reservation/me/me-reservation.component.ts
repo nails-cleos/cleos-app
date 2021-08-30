@@ -19,6 +19,7 @@ import {
   filterDateRoom,
   formatDateName,
   formatDateTwoDigit,
+  formatDuration,
   formatFullDateTime,
   getNow,
   getTime,
@@ -144,8 +145,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   get durationTime(): string {
-    const duration = convertDuration(this.product.value.duration);
-    return getTime(createNewDate(getNow(), duration.hour, duration.minute));
+    return formatDuration(this.product.value.duration, this.locale);
   }
 
   get products(): void {
@@ -410,7 +410,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
           const key = createNewDate(date).toString();
 
           let dates: any = group.get(key) || [];
-          dates = [...dates, {time: getTime(newDate(item.start)), date}];
+          dates = [...dates, {time: getTime(newDate(item.start), this.locale), date}];
           group.set(key, dates);
 
           return group;
@@ -448,7 +448,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   private setData(reservation: IReservationAll): void {
     this.reservation = reservation;
     const date = newDate(reservation.start);
-    this.time = getTime(date);
+    this.time = getTime(date, this.locale);
     this.room.setValue(reservation.room);
     this.date.setValue(date);
     this.eventSelected = date;

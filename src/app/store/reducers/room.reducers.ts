@@ -52,8 +52,7 @@ export const reducer = (state = initialState, action: All): State => {
     case RoomActionTypes.roomFind: {
       return {
         ...state,
-        // @ts-ignore
-        data: {},
+        data: {} as IRoom,
         errorMessage: null,
         subErrors: null,
         selected: null,

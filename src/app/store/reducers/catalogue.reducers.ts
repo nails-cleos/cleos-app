@@ -39,8 +39,7 @@ export const reducer = (state = initialState, action: All): State => {
     case CatalogueActionTypes.catalogueFind: {
       return {
         ...state,
-        // @ts-ignore
-        data: {},
+        data: {} as ICatalogue,
         errorMessage: null,
         subErrors: null,
         selected: null,

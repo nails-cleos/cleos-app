@@ -1,9 +1,9 @@
 import { All, UserActionTypes } from '../user.actions';
-import { IOverview, IUser } from '../../interfaces/user';
+import { IOverview, IUser, IUserAll } from '../../interfaces/user';
 import { Pagination } from '../../interfaces/pagination';
 
 export interface State {
-  data: IUser | Pagination<IUser> | IOverview | null;
+  data: IUser | IUserAll[] | Pagination<IUser> | IOverview | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -38,8 +38,7 @@ export const reducer = (state = initialState, action: All): State => {
     case UserActionTypes.getAllCustomers: {
       return {
         ...state,
-        // @ts-ignore
-        data: [],
+        data: [] as IUserAll[],
         errorMessage: null,
         subErrors: null,
         selected: null,

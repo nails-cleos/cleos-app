@@ -15,12 +15,7 @@ import { Role } from '../../interfaces/token';
 import { getUserName, snakeToCamel } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
-
-enum RoleIconName {
-  roleCustomer = 'perm_identity',
-  roleProfessional = 'manage_accounts',
-  roleAdmin = 'supervisor_account'
-}
+import { RoleIconName, RoleIconKey } from '../../util/icon';
 
 @Component({
   selector: 'app-users',
@@ -114,8 +109,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getIcon(name: any): any {
-    const iconName = snakeToCamel(name);
-    // @ts-ignore
+    const iconName: RoleIconKey = snakeToCamel(name) as RoleIconKey;
     return RoleIconName[iconName];
   }
 

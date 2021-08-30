@@ -41,8 +41,7 @@ export const reducer = (state = initialState, action: All): State => {
     case DiscountActionTypes.getReferrals: {
       return {
         ...state,
-        // @ts-ignore
-        referrals: [],
+        referrals: [] as unknown as IReferral,
         errorMessage: null,
         subErrors: null,
         selected: null,
@@ -62,8 +61,7 @@ export const reducer = (state = initialState, action: All): State => {
     case DiscountActionTypes.discountFind: {
       return {
         ...state,
-        // @ts-ignore
-        data: {},
+        data: {} as IDiscount,
         errorMessage: null,
         subErrors: null,
         selected: null,
