@@ -58,9 +58,9 @@ export class DiscountDetailComponent implements OnInit, AfterViewInit, OnDestroy
     const discount: IDiscount = new Discount();
     discount.id = this.discount?.id;
     discount.name = fieldChange(this.name, this.discount?.name);
+    discount.description = valueChange(this.form.value?.description, this.discount?.description);
     discount.type = fieldChange(this.type, this.discount?.type);
     discount.amount = fieldChange(this.amount, this.discount?.amount);
-    discount.description = valueChange(this.form.value?.description, this.discount?.description);
 
     this.store.dispatch(new fromActionsDiscount.DiscountUpdate(discount));
   }

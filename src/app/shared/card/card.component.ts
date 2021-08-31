@@ -23,6 +23,7 @@ import { Color, Label, SingleDataSet } from 'ng2-charts';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
 import { TranslateService } from '@ngx-translate/core';
 import { snakeToCamel } from '../../util/helper';
+import { IChart } from '../../interfaces/dash';
 
 enum ChartTypeEnum {
   quantityProduct,
@@ -131,7 +132,7 @@ export class CardComponent {
 })
 export class CardChartComponent {
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: any) {
+    @Inject(MAT_DIALOG_DATA) public data: IChart) {
   }
 }
 

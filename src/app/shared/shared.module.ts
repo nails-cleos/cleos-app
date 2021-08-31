@@ -26,6 +26,7 @@ import { CardChartComponent, CardComponent } from './card/card.component';
 import { ChartsModule } from 'ng2-charts';
 import { CustomDateFormatter } from './CustomDateFormatter';
 import { CustomEventTitleFormatter } from './CustomEventTitleFormatter';
+import { FlexLayoutModule } from '@angular/flex-layout';
 
 @NgModule({
   imports: [
@@ -53,7 +54,8 @@ import { CustomEventTitleFormatter } from './CustomEventTitleFormatter';
     }),
     MatGoogleMapsAutocompleteModule,
     ReactiveFormsModule,
-    ChartsModule
+    ChartsModule,
+    FlexLayoutModule
   ],
   exports: [
     BackButtonDirective,
@@ -63,7 +65,8 @@ import { CustomEventTitleFormatter } from './CustomEventTitleFormatter';
     DialogComponent,
     RatingComponent,
     CardChartComponent,
-    CardComponent
+    CardComponent,
+    FlexLayoutModule
   ],
   declarations: [
     BackButtonDirective,

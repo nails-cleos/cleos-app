@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { FlexLayoutModule } from '@angular/flex-layout';
 import { ChartsModule } from 'ng2-charts';
 
 import { AppMaterialModule } from '../util/app-material.module';
@@ -33,7 +32,6 @@ import { PaymentsChartComponent } from './overview/chart/payments-chart/payments
     TranslateModule,
     HttpClientModule,
     FormsModule,
-    FlexLayoutModule,
     ReactiveFormsModule,
     AppMaterialModule,
     ChartsModule

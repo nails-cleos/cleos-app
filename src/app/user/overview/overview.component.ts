@@ -1,11 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { map, takeUntil } from 'rxjs/operators';
+import { map} from 'rxjs/operators';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState, selectUserState } from '../../store/app.states';
+import { AppState, selectUserState } from '../../store/app.states';
 import { IOverview, IUserAll } from '../../interfaces/user';
 import { getUserImage, getUserName, getUserNameInitials } from '../../util/helper';
-import { Observable, Subject, Subscriber, Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import * as fromActionsUser from '../../store/user.actions';
 import { ActivatedRoute, Router } from '@angular/router';
 import {

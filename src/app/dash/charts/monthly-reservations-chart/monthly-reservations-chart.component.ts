@@ -2,7 +2,7 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ChartOptions, ChartType } from 'chart.js';
 import { Color, Label, SingleDataSet } from 'ng2-charts';
 import { IReservationAll } from '../../../interfaces/reservation';
-import { chartArrayColors, chartColors, defaultOptions, monthlyReservationChart } from '../../../util/chart';
+import { chartArrayColors, defaultOptions, monthlyReservationChart } from '../../../util/chart';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({

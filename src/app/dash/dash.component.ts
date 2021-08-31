@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { map } from 'rxjs/operators';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Observable, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { BreakpointObserver, Breakpoints, BreakpointState } from '@angular/cdk/layout';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState, selectReservationState } from '../store/app.states';
 import * as fromActionsReservation from '../store/reservation.actions';
@@ -43,47 +43,49 @@ export class DashComponent implements OnInit, OnDestroy {
   miniCardData: IReservationSummary[] = [{} as IReservationSummary, {} as IReservationSummary,
     {} as IReservationSummary, {} as IReservationSummary];
 
-  cardLayout = this.breakpointObserver.observe([
-    Breakpoints.XSmall,
-    Breakpoints.Small,
-    Breakpoints.Medium
-  ]).pipe(
-    map((r) => {
-      if (r.breakpoints[Breakpoints.Medium]) {
-        return {
-          columns: 2,
-          miniCard: {cols: 1, rows: 1},
-          calendar: {cols: 2, rows: 4},
-          chart: {cols: 2, rows: 2},
-          table: {cols: 2, rows: 4}
-        };
-      }
-      if (r.matches) {
-        return {
-          columns: 1,
-          miniCard: {cols: 1, rows: 1},
-          calendar: {cols: 1, rows: 4},
-          chart: {cols: 1, rows: 2},
-          table: {cols: 1, rows: 3}
-        };
-      }
+  cardLayout = {
+    columns: 2,
+    miniCard: {cols: 1, rows: 1},
+    calendar: {cols: 2, rows: 4},
+    chart: {cols: 2, rows: 2},
+    table: {cols: 2, rows: 4}
+  };
 
-      return {
-        columns: 4,
-        miniCard: {cols: 1, rows: 1},
-        calendar: {cols: 4, rows: 4},
-        chart: {cols: 2, rows: 2},
-        table: {cols: 4, rows: 4}
-      };
-    })
-  );
-
+  private destroy$ = new Subject();
   private getState: Observable<any>;
   private subscription: Subscription | undefined;
   private isDarkMode: boolean | undefined;
 
   constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
               private readonly translate: TranslateService, private router: Router) {
+    this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium])
+      .pipe(takeUntil(this.destroy$)).subscribe((state: BreakpointState) => {
+      if (state.breakpoints[Breakpoints.Medium]) {
+        this.cardLayout = {
+          columns: 2,
+          miniCard: {cols: 1, rows: 1},
+          calendar: {cols: 2, rows: 4},
+          chart: {cols: 2, rows: 2},
+          table: {cols: 2, rows: 4}
+        };
+      } else if (state.matches) {
+        this.cardLayout = {
+          columns: 1,
+          miniCard: {cols: 1, rows: 1},
+          calendar: {cols: 1, rows: 4},
+          chart: {cols: 1, rows: 2},
+          table: {cols: 1, rows: 3}
+        };
+      } else {
+        this.cardLayout = {
+          columns: 4,
+          miniCard: {cols: 1, rows: 1},
+          calendar: {cols: 4, rows: 4},
+          chart: {cols: 2, rows: 2},
+          table: {cols: 4, rows: 4}
+        };
+      }
+    });
     this.getState = this.store.select(selectReservationState);
     this.store.select(selectAuthState).subscribe((state: any) => {
       const darkMode: boolean = isDarkMode(state.user?.theme);
@@ -221,6 +223,7 @@ export class DashComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.destroy$.next();
   }
 
   handleEvent(event: CalendarEvent): void {

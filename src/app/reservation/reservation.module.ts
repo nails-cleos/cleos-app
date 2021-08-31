@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
 import { AgmCoreModule } from '@agm/core';
 import {
@@ -40,7 +39,6 @@ import { CalendarComponent } from './calendar/calendar.component';
     AppMaterialModule,
     TranslateModule,
     MatFabMenuModule,
-    FlexLayoutModule,
     CalendarModule,
     AgmCoreModule.forRoot({
       apiKey: environment.googleMapKey,

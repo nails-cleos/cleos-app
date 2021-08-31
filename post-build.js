@@ -12,7 +12,7 @@ if (process.env.ENVIRONMENT === 'production') {
   command = exec('ng build --configuration=pwa');
 }
 
-if (command != undefined) {
+if (command !== undefined) {
   command.stdout.on('data', (data) => {
     console.log(data);
   });

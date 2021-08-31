@@ -190,6 +190,10 @@ export const formatDateName = (date: Date, locale: string, measure: any): string
   day: 'numeric', month: measure, weekday: measure, year: 'numeric'
 });
 
+export const reservationDateTime = (date: Date, locale: string): string => date.toLocaleDateString(locale, {
+  day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit'
+});
+
 export const formatDateNameKey = (date: Date, locale: string, measure: any): string => date.toLocaleDateString(locale, {
   day: 'numeric', month: measure, hour: '2-digit', minute: '2-digit'
 }).replace(/(?:^|\s|-)+\S/g, (c) => c.toUpperCase());

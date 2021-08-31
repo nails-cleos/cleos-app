@@ -64,8 +64,8 @@
                       class="margin-right-eight" matPrefix></span>
                 <mat-select #select [formControl]="langValue" required>
                   <mat-option *ngFor="let lang of flagList" [value]="lang">
-                    <span [class]="'flag-icon  flag-icon-squared flag-icon-' + lang.icon"
-                          autocomplete="language"></span>{{ 'COMMON.LANG.' + lang.text | translate }}
+                    <span [class]="'flag-icon  flag-icon-squared flag-icon-' + lang.icon">
+                    </span>{{ 'COMMON.LANG.' + lang.text | translate }}
                   </mat-option>
                 </mat-select>
                 <mat-error [innerHTML]="'USER.LANG.REQUIRED' | translate">
