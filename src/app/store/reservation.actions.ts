@@ -1,7 +1,6 @@
 import { Action } from '@ngrx/store';
 
 export enum ReservationActionTypes {
-  getAll = '[Reservation] Get all',
   getAllPage = '[Reservation] Get all page',
   getCustomerReservations = '[Reservation] Get customer reservations',
   getAllFilterPage = '[Reservation] Get all filter page',
@@ -13,7 +12,6 @@ export enum ReservationActionTypes {
   getRooms = '[Reservation] Get rooms',
   getUpcomingReservation = '[Reservation] Get upcoming reservation',
   reservationSuccess = '[Reservation] Success',
-  reservationDashSuccess = '[Reservation] Dash Success',
   reservationPageSuccess = '[Reservation] Page Success',
   reservationFilterPageSuccess = '[Reservation] Filter Page Success',
   customersSuccess = '[Reservation] Customers success',
@@ -36,15 +34,10 @@ export enum ReservationActionTypes {
   cancel = '[Reservation] Cancel',
   customerCancel = '[Reservation] Customer cancel',
   stateSuccess = '[Reservation] State success',
-  getTracking = '[Reservation] Get tracking',
   findTracking = '[Reservation] Find tracking',
   trackingSuccess = '[Reservation] Tracking success',
   reservationReview = '[Reservation] Review',
   clean = '[Reservation] Clean'
-}
-
-export class GetAll implements Action {
-  readonly type = ReservationActionTypes.getAll;
 }
 
 export class GetAllPage implements Action {
@@ -107,13 +100,6 @@ export class GetUpcomingReservation implements Action {
 
 export class ReservationSuccess implements Action {
   readonly type = ReservationActionTypes.reservationSuccess;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class ReservationDashSuccess implements Action {
-  readonly type = ReservationActionTypes.reservationDashSuccess;
 
   constructor(public payload: any) {
   }
@@ -273,10 +259,6 @@ export class StateSuccess implements Action {
   }
 }
 
-export class GetTracking implements Action {
-  readonly type = ReservationActionTypes.getTracking;
-}
-
 export class FindTracking implements Action {
   readonly type = ReservationActionTypes.findTracking;
 
@@ -303,7 +285,6 @@ export class Clean implements Action {
 }
 
 export type All =
-  | GetAll
   | GetAllPage
   | GetCustomerReservations
   | GetAllFilterPage
@@ -316,7 +297,6 @@ export type All =
   | GetUpcomingReservation
   | ReservationSave
   | ReservationSuccess
-  | ReservationDashSuccess
   | ReservationPageSuccess
   | ReservationFilterPageSuccess
   | CustomersSuccess
@@ -338,7 +318,6 @@ export type All =
   | Cancel
   | CustomerCancel
   | StateSuccess
-  | GetTracking
   | FindTracking
   | TrackingSuccess
   | ReservationReview

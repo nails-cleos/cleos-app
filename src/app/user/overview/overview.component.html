@@ -78,15 +78,13 @@
       </mat-card>
     </mat-grid-tile>
     <mat-grid-tile [colspan]="( layout | async )?.chart?.cols" [rowspan]="( layout | async )?.chart?.rows">
-      <app-card [data]="state?.data?.reservations" [title]="'DASHBOARD.CARD.QUANTITY_PRODUCT' | translate"
-                type="PRODUCT_OVERVIEW">
-        <app-products-chart [state]="state"></app-products-chart>
+      <app-card [chart]="productChart" [title]="'DASHBOARD.CARD.QUANTITY_PRODUCT' | translate">
+        <app-overview-chart [chartSummary]="productChart" [error]="productError"></app-overview-chart>
       </app-card>
     </mat-grid-tile>
     <mat-grid-tile [colspan]="( layout | async )?.chart?.cols" [rowspan]="( layout | async )?.chart?.rows">
-      <app-card [data]="state?.data?.reservations" [title]="'DASHBOARD.CARD.PAYMENT' | translate"
-                type="PAYMENT_OVERVIEW">
-        <app-payments-chart [state]="state"></app-payments-chart>
+      <app-card [chart]="paymentChart" [title]="'DASHBOARD.CARD.PAYMENT' | translate">
+        <app-overview-chart [chartSummary]="paymentChart" [error]="paymentError"></app-overview-chart>
       </app-card>
     </mat-grid-tile>
   </mat-grid-list>

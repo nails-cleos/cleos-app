@@ -20,6 +20,13 @@ import {
 } from './referrals/referrals.component';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
 import { ReviewDialogComponent } from './reservation/review/review-dialog.component';
+import { MatChipsModule } from '@angular/material/chips';
+import { ShareButtonsModule } from 'ngx-sharebuttons/buttons';
+import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
+import { ShareIconsModule } from 'ngx-sharebuttons/icons';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatStepperModule } from '@angular/material/stepper';
 
 @NgModule({
   declarations: [
@@ -42,7 +49,14 @@ import { ReviewDialogComponent } from './reservation/review/review-dialog.compon
     ReactiveFormsModule,
     AppMaterialModule,
     TranslateModule,
-    FlexLayoutModule
+    FlexLayoutModule,
+    MatChipsModule,
+    ShareButtonsModule,
+    MatBottomSheetModule,
+    ShareIconsModule,
+    MatProgressBarModule,
+    MatTabsModule,
+    MatStepperModule
   ]
 })
 export class MeModule {

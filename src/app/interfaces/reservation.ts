@@ -71,11 +71,11 @@ export interface ICalendar {
 export interface IReservationSummary {
   title: string;
   value?: number;
-  isIncrease?: boolean;
+  increase?: boolean;
   color?: ThemePalette;
   percentValue?: number;
   icon?: string;
-  isCurrency?: boolean;
+  currency?: boolean;
   error?: any;
 }
 

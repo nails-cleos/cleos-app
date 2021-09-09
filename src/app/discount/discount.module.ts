@@ -11,6 +11,7 @@ import { DiscountRoutingModule } from './discount-routing.module';
 import { DiscountComponent } from './discount.component';
 import { DiscountDialogComponent, DiscountsComponent } from './list/discounts.component';
 import { DiscountDetailComponent } from './detail/discount-detail.component';
+import { MatChipsModule } from '@angular/material/chips';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { DiscountDetailComponent } from './detail/discount-detail.component';
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    AppMaterialModule
+    AppMaterialModule,
+    MatChipsModule
   ]
 })
 export class DiscountModule {

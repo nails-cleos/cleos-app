@@ -116,24 +116,7 @@
       "NEW_CUSTOMERS_RESERVATION": "Reservas de nuevos clientes"
     },
     "CARD": {
-      "LABEL": {
-        "ANNUAL": "Reservas",
-        "CUSTOMER": "Clientes",
-        "QUANTITY": "Cantidad",
-        "LAST_MONTH": "Último mes",
-        "MIN": "Mínimo",
-        "MAX": "Máximo",
-        "AVG": "Promedio",
-        "ESTIMATE": "Estimado"
-      },
       "QUANTITY_PRODUCT": "Cantidad por servicio",
-      "PRODUCT_RESERVATION": "Servicios",
-      "MONTHLY_RESERVATION": "Reservas mensuales",
-      "YEARLY_PRODUCT_PRICE": "Ganancias anuales",
-      "CUSTOMER_RESERVATION": "Reservas por cliente",
-      "LAST_MONTH_RESERVATION": "Reservas en el último mes",
-      "TRACKING_AVERAGE": "Tiempo real del servicio",
-      "TRACKING_COMPARE": "Tiempo real/estimado",
       "RESERVATION": "Reservas",
       "PAYMENT": "Forma de pago",
       "EXPAND": "Expandir"

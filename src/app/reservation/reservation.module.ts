@@ -19,6 +19,9 @@ import { ReservationComponent } from './reservation.component';
 import { CompleteDialogComponent, ReservationDetailComponent } from './detail/reservation-detail.component';
 import { MoreInfoComponent } from './detail/more-info/more-info.component';
 import { CalendarComponent } from './calendar/calendar.component';
+import { MatStepperModule } from '@angular/material/stepper';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 @NgModule({
   declarations: [
@@ -43,7 +46,10 @@ import { CalendarComponent } from './calendar/calendar.component';
     AgmCoreModule.forRoot({
       apiKey: environment.googleMapKey,
       libraries: ['places', 'geometry']
-    })
+    }),
+    MatStepperModule,
+    MatChipsModule,
+    MatExpansionModule
   ]
 })
 export class ReservationModule {

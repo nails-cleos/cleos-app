@@ -13,6 +13,8 @@ import { RoomComponent } from './room.component';
 import { RoomMeComponent } from './me/room-me.component';
 import { RoomDetailComponent } from './detail/room-detail.component';
 import { AvailabilityComponent } from './availability/availability.component';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @NgModule({
   declarations: [
@@ -30,7 +32,9 @@ import { AvailabilityComponent } from './availability/availability.component';
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    AppMaterialModule
+    AppMaterialModule,
+    MatExpansionModule,
+    MatCheckboxModule
   ]
 })
 export class RoomModule {

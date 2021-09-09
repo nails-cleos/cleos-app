@@ -9,6 +9,7 @@ import * as unavailable from './reducers/unavailable.reducers';
 import * as discount from './reducers/discount.reducers';
 import * as main from './reducers/main.reducers';
 import * as payment from './reducers/payment.reducers';
+import * as dashboard from './reducers/dashboard.reducers';
 import { createFeatureSelector } from '@ngrx/store';
 
 export interface AppState {
@@ -23,6 +24,7 @@ export interface AppState {
   discountState: discount.State;
   mainState: main.State;
   paymentState: payment.State;
+  dashboardState: dashboard.State;
 }
 
 export const reducers = {
@@ -36,7 +38,8 @@ export const reducers = {
   unavailable: unavailable.reducer,
   discount: discount.reducer,
   main: main.reducer,
-  payment: payment.reducer
+  payment: payment.reducer,
+  dashboard: dashboard.reducer
 };
 
 export const selectAuthState = createFeatureSelector<AppState>('auth');
@@ -50,3 +53,4 @@ export const selectUnavailableState = createFeatureSelector<AppState>('unavailab
 export const selectDiscountState = createFeatureSelector<AppState>('discount');
 export const selectMainState = createFeatureSelector<AppState>('main');
 export const selectPaymentState = createFeatureSelector<AppState>('payment');
+export const selectDashboardState = createFeatureSelector<AppState>('dashboard');

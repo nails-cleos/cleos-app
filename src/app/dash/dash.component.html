@@ -36,64 +36,19 @@
   <mat-grid-tile *ngFor="let mc of miniCardData" [colspan]="cardLayout.miniCard?.cols"
                  [rowspan]="cardLayout.miniCard?.rows">
     <app-mini-card [color]="mc.color" [duration]="'DASHBOARD.MINI_CARD.DURATION' | translate" [error]="mc.error"
-                   [icon]="mc.icon"
-                   [isCurrency]="mc. isCurrency" [isIncrease]="mc.isIncrease"
+                   [icon]="mc.icon" [isCurrency]="mc.currency" [isIncrease]="mc.increase"
                    [percentValue]="mc.percentValue" [title]="mc.title | translate"
                    [value]="mc.value"></app-mini-card>
   </mat-grid-tile>
   <!--Charts-->
-  <mat-grid-tile [colspan]="cardLayout.chart?.cols" [rowspan]="cardLayout.chart?.rows">
-    <app-card [data]="state?.dash" [label]="quantityLabel" [title]="'DASHBOARD.CARD.QUANTITY_PRODUCT' | translate"
-              type="QUANTITY_PRODUCT">
-      <app-quantity-product-reservations-chart [label]="quantityLabel"
-                                               [state]="state"></app-quantity-product-reservations-chart>
-    </app-card>
-  </mat-grid-tile>
-  <mat-grid-tile [colspan]="cardLayout.chart?.cols" [rowspan]="cardLayout.chart?.rows">
-    <app-card [data]="state?.dash" [title]="'DASHBOARD.CARD.PRODUCT_RESERVATION' | translate"
-              type="PRODUCT_RESERVATION">
-      <app-product-reservations-chart [state]="state"></app-product-reservations-chart>
-    </app-card>
-  </mat-grid-tile>
-  <mat-grid-tile [colspan]="cardLayout.chart?.cols" [rowspan]="cardLayout.chart?.rows">
-    <app-card [data]="state?.dash" [title]="'DASHBOARD.CARD.MONTHLY_RESERVATION' | translate"
-              type="MONTHLY_RESERVATION">
-      <app-monthly-reservation-chart [state]="state"></app-monthly-reservation-chart>
-    </app-card>
-  </mat-grid-tile>
-  <mat-grid-tile [colspan]="cardLayout.chart?.cols" [rowspan]="cardLayout.chart?.rows">
-    <app-card [data]="state?.dash" [label]="annualLabel" [title]="'DASHBOARD.CARD.YEARLY_PRODUCT_PRICE' | translate"
-              type="YEARLY_PRODUCT_PRICE">
-      <app-annual-reservations-chart [label]="annualLabel" [state]="state"></app-annual-reservations-chart>
-    </app-card>
-  </mat-grid-tile>
-  <mat-grid-tile [colspan]="cardLayout.chart?.cols" [rowspan]="cardLayout.chart?.rows">
-    <app-card [data]="state?.dash" [label]="customerLabel" [title]="'DASHBOARD.CARD.CUSTOMER_RESERVATION' | translate"
-              type="CUSTOMER_RESERVATION">
-      <app-customer-reservations-chart [label]="customerLabel" [state]="state"></app-customer-reservations-chart>
-    </app-card>
-  </mat-grid-tile>
-  <mat-grid-tile [colspan]="cardLayout.chart?.cols" [rowspan]="cardLayout.chart?.rows">
-    <app-card [data]="state?.dash" [label]="lastMonthLabel"
-              [title]="'DASHBOARD.CARD.LAST_MONTH_RESERVATION' | translate" type="LAST_MONTH_RESERVATION">
-      <app-last-month-reservations-chart [label]="lastMonthLabel" [state]="state"></app-last-month-reservations-chart>
-    </app-card>
-  </mat-grid-tile>
-  <mat-grid-tile [colspan]="cardLayout.chart?.cols" [rowspan]="cardLayout.chart?.rows">
-    <app-card [data]="state?.tracking" [label]="trackingAverage"
-              [title]="'DASHBOARD.CARD.TRACKING_AVERAGE' | translate" type="TRACKING_AVERAGE">
-      <app-tracking-average-chart [label]="trackingAverage" [state]="stateTracking"></app-tracking-average-chart>
-    </app-card>
-  </mat-grid-tile>
-  <mat-grid-tile [colspan]="cardLayout.chart?.cols" [rowspan]="cardLayout.chart?.rows">
-    <app-card [data]="state?.tracking" [label]="trackingCompare"
-              [title]="'DASHBOARD.CARD.TRACKING_COMPARE' | translate" type="TRACKING_COMPARE">
-      <app-tracking-compare-chart [label]="trackingCompare" [state]="stateTracking"></app-tracking-compare-chart>
+  <mat-grid-tile *ngFor="let chart of charts" [colspan]="cardLayout.chart?.cols" [rowspan]="cardLayout.chart?.rows">
+    <app-card [chart]="chart" [title]="chart.title" [isDark]="isDarkMode">
+      <app-dashboard-chart [chartSummary]="chart" [state]="state" [isDark]="isDarkMode"></app-dashboard-chart>
     </app-card>
   </mat-grid-tile>
   <!--Table-->
   <mat-grid-tile [colspan]="cardLayout.table?.cols" [rowspan]="cardLayout.table?.rows">
-    <app-card [expand]="false" [title]="'DASHBOARD.CARD.RESERVATION' | translate" type="RESERVATION">
+    <app-card [expand]="false" [title]="'DASHBOARD.CARD.RESERVATION' | translate">
       <app-reservation-table></app-reservation-table>
     </app-card>
   </mat-grid-tile>

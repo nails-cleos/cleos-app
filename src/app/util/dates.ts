@@ -206,6 +206,10 @@ export const monthViewTitle = (date: Date, locale: string = 'en'): string => dat
   year: 'numeric', month: 'long'
 }).replace(/^\w/, (c) => c.toUpperCase());
 
+export const formatMonthYear = (date: Date, locale: string): string => date.toLocaleDateString(locale, {
+  month: 'short', year: 'numeric'
+}).replace(/ /g, '-').replace(/^\w/, (c) => c.toUpperCase());
+
 export const columnHeader = (date: Date, locale: string = 'en'): string => date.toLocaleDateString(locale, {
   weekday: 'long'
 }).replace(/^\w/, (c) => c.toUpperCase());

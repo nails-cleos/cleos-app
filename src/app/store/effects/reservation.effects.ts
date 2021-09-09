@@ -16,14 +16,6 @@ import { PaymentService } from '../../services/payment.service';
 @Injectable()
 export class ReservationEffects {
 
-  getAll$ = createEffect(() => this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getAll)).pipe(
-    map((action: any) => action.payload),
-    switchMap(() => this.reservationService.getAll().pipe(
-      switchMap((response: any) => of(new fromActionsReservation.ReservationDashSuccess(response ? response : []))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
-    ))
-  ));
-
   getAllPage$ = createEffect(() => this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getAllPage)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) =>
@@ -229,14 +221,6 @@ export class ReservationEffects {
     ))
   ));
 
-  getAllTracking$ = createEffect(() => this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getTracking)).pipe(
-    map((action: any) => action.payload),
-    switchMap(() => this.trackingService.getAll().pipe(
-      switchMap((response: any) => of(new fromActionsReservation.TrackingSuccess(response ? response : []))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
-    ))
-  ));
-
   findTracking$ = createEffect(() => this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.findTracking)).pipe(
     map((action: any) => action.payload),
     switchMap((payload) => this.trackingService.findByReservationId(payload.reservationId).pipe(
@@ -264,10 +248,6 @@ export class ReservationEffects {
     ofType(fromActionsReservation.ReservationActionTypes.reservationSuccess)
   ), {dispatch: false});
 
-  dashSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsReservation.ReservationActionTypes.reservationDashSuccess)
-  ), {dispatch: false});
-
   dataPageSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.reservationPageSuccess)
   ), {dispatch: false});
@@ -291,7 +271,7 @@ export class ReservationEffects {
   saveSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.reservationSaveSuccess),
     tap((data: any) => this.router.navigate(
-      data.payload.isCustomer ? ['me', 'reservations'] : data.payload.deleted ? ['calendar'] : ['reservation', data.payload.id]
+      data.payload.isCustomer ? ['me', 'reservations'] : data.payload.deleted ? ['dashboard'] : ['reservation', data.payload.id]
     ))
   ), {dispatch: false});
 

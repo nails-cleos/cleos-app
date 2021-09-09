@@ -10,6 +10,7 @@ import { SharedModule } from '../shared/shared.module';
 import { NotificationRoutingModule } from './notification-routing.module';
 
 import { NotificationsComponent } from './list/notifications.component';
+import { MatRippleModule } from '@angular/material/core';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { NotificationsComponent } from './list/notifications.component';
     FormsModule,
     ReactiveFormsModule,
     AppMaterialModule,
-    MatCarouselModule.forRoot()
+    MatCarouselModule.forRoot(),
+    MatRippleModule
   ]
 })
 export class NotificationModule {

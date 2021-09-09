@@ -79,13 +79,14 @@ const selectedTheme = (value: Theme | undefined, themeService: ThemeService): vo
         labels: {fontColor: 'white'}
       },
       scales: {
+        gridLines: {color: 'rgba(255, 255, 255, 0.1)'},
         xAxes: [{
           ticks: {fontColor: 'white'},
-          gridLines: {color: 'rgba(255,255,255,0.1)'}
+          gridLines: {color: 'rgba(255, 255, 255, 0.1)'},
         }],
         yAxes: [{
           ticks: {fontColor: 'white'},
-          gridLines: {color: 'rgba(255,255,255,0.1)'}
+          gridLines: {color: 'rgba(255, 255, 255, 0.1)'}
         }]
       }
     };

@@ -12,6 +12,9 @@ import { DragDropDirective } from '../directives/drag-drop.directive';
 import { CatalogueComponent } from './catalogue.component';
 import { CataloguesComponent } from './list/catalogues.component';
 import { CatalogueDetailComponent } from './detail/catalogue-detail.component';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @NgModule({
   declarations: [
@@ -28,7 +31,10 @@ import { CatalogueDetailComponent } from './detail/catalogue-detail.component';
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    AppMaterialModule
+    AppMaterialModule,
+    MatCheckboxModule,
+    MatProgressBarModule,
+    DragDropModule
   ]
 })
 export class CatalogueModule {

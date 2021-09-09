@@ -14,6 +14,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { getUserName, snakeToCamel } from '../../../util/helper';
 import { ReservationIconKey, ReservationIconName } from '../../../util/icon';
+import { newDate, reservationDateTime } from '../../../util/dates';
 
 @Component({
   selector: 'app-reservation-table',
@@ -28,8 +29,6 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
   dataSource: any = new MatTableDataSource<Pagination<IReservationAll>>();
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
-
-  language: string;
   error: any;
 
   private getState: Observable<any>;
@@ -38,7 +37,6 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
     this.getState = this.store.select(selectReservationState);
-    this.language = this.translate.currentLang;
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -75,6 +73,10 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
 
   getIcon(name: any): any {
     return ReservationIconName[snakeToCamel(name) as ReservationIconKey];
+  }
+
+  getDateTime(date: string): string {
+    return reservationDateTime(newDate(date), this.translate.currentLang);
   }
 
   delete(reservation: IReservation): void {

@@ -11,31 +11,15 @@ import { DashRoutingModule } from './dash-routing.module';
 
 import { DashComponent } from './dash.component';
 import { MiniCardComponent } from './mini-card/mini-card.component';
-import {
-  QuantityProductReservationsChartComponent
-} from './charts/quantity-product-reservations-chart/quantity-product-reservations-chart.component';
-import { LastMonthReservationsChartComponent } from './charts/last-month-reservations-chart/last-month-reservations-chart.component';
-import { ProductReservationsChartComponent } from './charts/product-reservation-chart/product-reservations-chart.component';
-import { MonthlyReservationsChartComponent } from './charts/monthly-reservations-chart/monthly-reservations-chart.component';
-import { AnnualReservationsChartComponent } from './charts/annual-reservations-chart/annual-reservations-chart.component';
-import { TrackingAverageChartComponent } from './charts/tracking-average-chart/tracking-average-chart.component';
-import { CustomerReservationsChartComponent } from './charts/customer-reservations-chart/customer-reservations-chart.component';
-import { TrackingCompareChartComponent } from './charts/tracking-compare-chart/tracking-compare-chart.component';
 import { ReservationTableComponent } from './reservation/table/reservation-table.component';
 import { CalendarModule, CalendarMonthModule } from 'angular-calendar';
+import { DashboardChartComponent } from './charts/dashboard-chart/dashboard-chart.component';
 
 @NgModule({
   declarations: [
     DashComponent,
     MiniCardComponent,
-    ProductReservationsChartComponent,
-    MonthlyReservationsChartComponent,
-    AnnualReservationsChartComponent,
-    TrackingAverageChartComponent,
-    TrackingCompareChartComponent,
-    CustomerReservationsChartComponent,
-    QuantityProductReservationsChartComponent,
-    LastMonthReservationsChartComponent,
+    DashboardChartComponent,
     ReservationTableComponent
   ],
   imports: [

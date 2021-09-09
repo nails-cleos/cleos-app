@@ -75,17 +75,14 @@
       <div *ngIf="username; else login">
         <button *ngIf="isProfessional && workDay.length; else workDayIcon" [matMenuTriggerFor]="menuWorkDay"
                 class="badge-padding" mat-icon-button>
-          <mat-icon [matBadgeHidden]="!workDay.length"
-                    [matBadge]="workDay.length"
-                    matBadgeColor="warn">
+          <mat-icon [matBadgeHidden]="!workDay.length" [matBadge]="workDay.length" matBadgeColor="warn">
             work
           </mat-icon>
         </button>
         <button *ngIf="notifications.length; else notificationIcon" [matMenuTriggerFor]="menuNotification"
                 class="badge-padding" mat-icon-button>
           <mat-icon [matBadgeHidden]="!countNotifications"
-                    [matBadge]="plusNotification ? plusNotification : countNotifications"
-                    matBadgeColor="warn">
+                    [matBadge]="plusNotification ? plusNotification : countNotifications" matBadgeColor="warn">
             notifications
           </mat-icon>
         </button>

@@ -14,7 +14,6 @@ import { IPayment } from '../../interfaces/payment';
 
 export interface State {
   data: IReservation | IRoomReservation[] | IReservation[] | ICustomerReservation | IAvailableDTO | null;
-  dash: IReservation[] | null;
   filter: Pagination<IReservation> | null;
   page: Pagination<IReservation> | null;
   customerReservation: ICustomerReservation | null;
@@ -33,9 +32,8 @@ export interface State {
 
 export const initialState: State = {
   data: null,
-  dash: null,
-  page: null,
   filter: null,
+  page: null,
   customerReservation: null,
   customers: null,
   rooms: null,
@@ -57,17 +55,6 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         // @ts-ignore
         customerReservation: {reservations: {content: [{}, {}, {}], totalElements: 3}, upcoming: {}},
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case ReservationActionTypes.getAll: {
-      return {
-        ...state,
-        dash: null,
         errorMessage: null,
         error: null,
         subErrors: null,
@@ -214,16 +201,6 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
-    case ReservationActionTypes.reservationDashSuccess: {
-      return {
-        ...state,
-        dash: action.payload,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null
-      };
-    }
     case ReservationActionTypes.reservationPageSuccess: {
       return {
         ...state,
@@ -339,17 +316,6 @@ export const reducer = (state = initialState, action: All): State => {
       };
     }
     case ReservationActionTypes.findTracking: {
-      return {
-        ...state,
-        tracking: null,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case ReservationActionTypes.getTracking: {
       return {
         ...state,
         tracking: null,

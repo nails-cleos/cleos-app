@@ -18,6 +18,9 @@ import { ChangePasswordComponent } from './change-password/change-password.compo
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ProfileComponent } from './profile/profile.component';
 import { RedirectComponent } from './redirect/redirect.component';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { NgxMatIntlTelInputModule } from 'ngx-mat-intl-tel-input';
 
 @NgModule({
   declarations: [
@@ -40,7 +43,10 @@ import { RedirectComponent } from './redirect/redirect.component';
     FormsModule,
     ReactiveFormsModule,
     MatPasswordStrengthModule.forRoot(),
-    AppMaterialModule
+    AppMaterialModule,
+    MatTabsModule,
+    MatSlideToggleModule,
+    NgxMatIntlTelInputModule
   ]
 })
 export class AuthModule {

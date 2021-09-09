@@ -62,10 +62,6 @@ export class ReservationService {
     return this.http.get<IReservation[]>(`${this.url}/filter`, {params});
   }
 
-  public getAll(): Observable<IReservation[]> {
-    return this.http.get<IReservation[]>(this.url);
-  }
-
   public getAllGroupingByRoom(): Observable<IReservation[]> {
     const params = new HttpParams().set('date', getNow().toISOString().slice(0, 10));
     return this.http.get<any>(`${this.url}/rooms`, {params});
