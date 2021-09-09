@@ -37,7 +37,7 @@ export class DashComponent implements OnInit, OnDestroy {
     {} as IReservationSummary, {} as IReservationSummary];
 
   charts: IChartSummary[] = [{} as IChartSummary, {} as IChartSummary, {} as IChartSummary,
-    {} as IChartSummary, {} as IChartSummary, {} as IChartSummary];
+    {} as IChartSummary, {} as IChartSummary, {} as IChartSummary, {} as IChartSummary, {} as IChartSummary];
 
   cardLayout = {
     columns: 2,
