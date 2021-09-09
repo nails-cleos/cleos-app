@@ -32,7 +32,8 @@ import {
   greaterOrEqualsThan,
   IDuration,
   isBetween,
-  newDate
+  newDate,
+  reservationDateTime
 } from '../util/dates';
 import { fillNotAvailable, getOverlapEvent, Meta, newEvent } from '../util/event';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -43,7 +44,7 @@ import { IUnavailableAll } from '../interfaces/unavailable';
 import { DiscountType, IUserDiscount } from '../interfaces/discount';
 import { getFullUserName, getPrice, getUserName, newDiscount, newPrice } from '../util/helper';
 import { transitionAnimation } from '../util/animation';
-import { addDays, addMonths } from 'date-fns';
+import { addDays, addMonths, isEqual } from 'date-fns';
 import { findStateColor, isDarkMode } from '../util/theme';
 import RRule from 'rrule';
 
@@ -186,6 +187,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     return getUserName(this.room.value.professional);
   }
 
+  getDateTime(date: Date | string | undefined): string {
+    return date ? reservationDateTime(newDate(date), this.locale) : '';
+  }
+
   ngOnInit(): void {
     this.createForm();
     this.clean();
@@ -305,14 +310,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const start = createNewDate(date, Number(nowTime[0]), Number(nowTime[1]));
     const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
-
-    const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
-      customerName: getUserName(this.customer.value),
-      productName: this.product.value.name
-    });
-
-    const meta = new Meta(true);
-    const event = newEvent(detail, findStateColor(state, this.isDarkMode), start, end, '#000', id, meta);
+    const event = this.createNewEvent(start, end, state, id);
 
     if (event) {
       let title;
@@ -423,6 +421,16 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         day.cssClass = 'cal-disabled';
       }
     });
+  }
+
+  private createNewEvent(start: Date, end: Date, state: string, id: string | undefined): CalendarEvent | undefined {
+    const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
+      customerName: getUserName(this.customer.value),
+      productName: this.product.value.name
+    });
+
+    const meta = new Meta(true);
+    return newEvent(detail, findStateColor(state, this.isDarkMode), start, end, '#000', id, meta);
   }
 
   private dateIsValid(date: Date): boolean {
@@ -643,7 +651,18 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
             } else {
               date = createNewDate(this.date.value, this.date.value.getHours(), this.date.value.getMinutes());
             }
-            this.segmentClick(date, this.reservation.state, this.reservation.id);
+            if (isEqual(newDate(this.reservation.start), date)) {
+              const duration = convertDuration(this.reservation.product.duration);
+              const end = createNewDate(date, date.getHours() + duration.hour,
+                date.getMinutes() + duration.minute);
+              const event = this.createNewEvent(date, end, this.reservation.state, this.reservation.id);
+              if (event) {
+                this.eventSelected = event;
+                this.events = [...this.events, event];
+              }
+            } else {
+              this.segmentClick(date, this.reservation.state, this.reservation.id);
+            }
           }
         }
       }

@@ -59,7 +59,7 @@
     <mat-list-item *ngIf="!price.isPaid">
       <mat-form-field appearance="fill">
         <mat-label>{{ 'RESERVATION.PAYMENT.TYPE' | translate }}</mat-label>
-        <mat-select #select [formControl]="type">
+        <mat-select [formControl]="type">
           <mat-option *ngFor="let t of types | keyvalue" [value]="t.value">
             {{ 'COMMON.PAYMENT.' + t.value | translate }}
           </mat-option>

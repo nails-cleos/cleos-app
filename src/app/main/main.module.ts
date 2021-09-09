@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatCarouselModule } from '@ngbmodule/material-carousel';
 
 import { AppMaterialModule } from '../util/app-material.module';
@@ -16,6 +15,8 @@ import { CatalogComponent } from './catalog/catalog.component';
 import { PrivacyComponent } from './privacy/privacy.component';
 import { ImageViewerComponent } from './image-viewer/image-viewer.component';
 import { TermsAndConditionsComponent } from './terms-and-conditions/terms-and-conditions.component';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @NgModule({
   declarations: [
@@ -33,10 +34,11 @@ import { TermsAndConditionsComponent } from './terms-and-conditions/terms-and-co
     TranslateModule,
     HttpClientModule,
     FormsModule,
-    FlexLayoutModule,
     ReactiveFormsModule,
     AppMaterialModule,
-    MatCarouselModule.forRoot()
+    MatCarouselModule.forRoot(),
+    MatToolbarModule,
+    MatSlideToggleModule
   ]
 })
 export class MainModule {

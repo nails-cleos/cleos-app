@@ -72,8 +72,7 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'USER.PHONE.FIELD' | translate }}</mat-label>
                 <ngx-mat-intl-tel-input [enablePlaceholder]="true" [enableSearch]="true" [formControl]="phone"
-                                        [preferredCountries]="['ar']" autocomplete="tel"
-                                        name="phone"></ngx-mat-intl-tel-input>
+                                        [preferredCountries]="['ar']" name="phone"></ngx-mat-intl-tel-input>
                 <mat-error *ngIf="phone.hasError('validatePhoneNumber')">
                   {{ 'USER.PHONE.INVALID' | translate }}
                 </mat-error>

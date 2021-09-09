@@ -1,11 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { map, takeUntil } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState, selectUserState } from '../../store/app.states';
+import { AppState, selectUserState } from '../../store/app.states';
 import { IOverview, IUserAll } from '../../interfaces/user';
 import { getUserImage, getUserName, getUserNameInitials } from '../../util/helper';
-import { Observable, Subject, Subscriber, Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import * as fromActionsUser from '../../store/user.actions';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -18,6 +18,8 @@ import {
 import { ThemePalette } from '@angular/material/core';
 import { formatDateNameKey, newDate } from '../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
+import { IChartSummary } from '../../interfaces/dashboard';
+import { paymentChart, productChart } from '../../util/chart';
 
 @Component({
   selector: 'app-overview',
@@ -32,6 +34,10 @@ export class OverviewComponent implements OnInit, OnDestroy {
   username: string | undefined;
   miniCardData: IReservationOverview[] = [{} as IReservationOverview, {} as IReservationOverview];
   measure = 'long';
+  paymentChart: IChartSummary | undefined;
+  paymentError: any;
+  productChart: IChartSummary | undefined;
+  productError: any;
 
   layout = this.breakpointObserver.observe([
     Breakpoints.XSmall,
@@ -112,6 +118,16 @@ export class OverviewComponent implements OnInit, OnDestroy {
 
         this.miniCardData = [this.getReservationDates(completedList, this.state.data),
           this.getProducts(completedList, this.state.data)];
+        if (this.state.data.reservations) {
+          this.paymentChart = paymentChart(completedList, this.translate);
+          if (!this.paymentChart) {
+            this.paymentError = {status: 'NO_CONTENT'};
+          }
+          this.productChart = productChart(completedList);
+          if (!this.productChart) {
+            this.productError = {status: 'NO_CONTENT'};
+          }
+        }
       }
     });
   }

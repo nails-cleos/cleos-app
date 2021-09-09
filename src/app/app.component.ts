@@ -8,6 +8,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { resetTheme, Theme } from './util/theme';
 import { getLocale } from './util/helper';
 import { ThemeService } from 'ng2-charts';
+import { DateAdapter } from '@angular/material/core';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -19,7 +20,7 @@ export class AppComponent implements OnInit {
 
   constructor(private store: Store<AppState>, private translate: TranslateService,
               private overlayContainer: OverlayContainer, private cookieService: CookieService,
-              private themeService: ThemeService) {
+              private themeService: ThemeService, private dateAdapter: DateAdapter<any>) {
     this.store.select(selectAuthState).subscribe((state: any) => {
       if (state.isAuthenticated) {
         const user: IUserAll = state.user;
@@ -28,6 +29,7 @@ export class AppComponent implements OnInit {
       } else {
         this.translate.use(getLocale(navigator.language));
       }
+      this.dateAdapter.setLocale(this.translate.currentLang);
     });
   }
 

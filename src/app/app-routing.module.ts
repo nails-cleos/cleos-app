@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { TranslationLoaderResolver } from './util/translation.resolver';
-import { RatingComponent } from './shared/rating/rating.component';
 
 const routes: Routes = [
   {path: 'main', loadChildren: () => import('./main/main.module').then(m => m.MainModule)},

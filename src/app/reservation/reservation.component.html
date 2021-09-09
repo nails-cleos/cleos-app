@@ -225,8 +225,8 @@
         <mat-list-item>
           <mat-icon mat-list-icon>event</mat-icon>
           <div mat-line>
-            <div>{{eventSelected?.start?.toLocaleString(locale)}}</div>
-            <div>{{eventSelected?.end?.toLocaleString(locale)}}</div>
+            <div>{{getDateTime(eventSelected?.start)}}</div>
+            <div>{{getDateTime(eventSelected?.end)}}</div>
           </div>
         </mat-list-item>
       </mat-list>

@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
 import { AgmCoreModule } from '@agm/core';
 import {
@@ -20,6 +19,9 @@ import { ReservationComponent } from './reservation.component';
 import { CompleteDialogComponent, ReservationDetailComponent } from './detail/reservation-detail.component';
 import { MoreInfoComponent } from './detail/more-info/more-info.component';
 import { CalendarComponent } from './calendar/calendar.component';
+import { MatStepperModule } from '@angular/material/stepper';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 @NgModule({
   declarations: [
@@ -40,12 +42,14 @@ import { CalendarComponent } from './calendar/calendar.component';
     AppMaterialModule,
     TranslateModule,
     MatFabMenuModule,
-    FlexLayoutModule,
     CalendarModule,
     AgmCoreModule.forRoot({
       apiKey: environment.googleMapKey,
       libraries: ['places', 'geometry']
-    })
+    }),
+    MatStepperModule,
+    MatChipsModule,
+    MatExpansionModule
   ]
 })
 export class ReservationModule {

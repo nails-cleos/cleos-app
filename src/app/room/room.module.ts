@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { FlexLayoutModule } from '@angular/flex-layout';
 
 import { AppMaterialModule } from '../util/app-material.module';
 import { SharedModule } from '../shared/shared.module';
@@ -14,6 +13,8 @@ import { RoomComponent } from './room.component';
 import { RoomMeComponent } from './me/room-me.component';
 import { RoomDetailComponent } from './detail/room-detail.component';
 import { AvailabilityComponent } from './availability/availability.component';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @NgModule({
   declarations: [
@@ -30,9 +31,10 @@ import { AvailabilityComponent } from './availability/availability.component';
     TranslateModule,
     HttpClientModule,
     FormsModule,
-    FlexLayoutModule,
     ReactiveFormsModule,
-    AppMaterialModule
+    AppMaterialModule,
+    MatExpansionModule,
+    MatCheckboxModule
   ]
 })
 export class RoomModule {

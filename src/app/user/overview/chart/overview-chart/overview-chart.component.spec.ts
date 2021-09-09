@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PaymentsChartComponent } from './payments-chart.component';
+import { OverviewChartComponent } from './overview-chart.component';
 
 describe('PaymentsChartComponent', () => {
-  let component: PaymentsChartComponent;
-  let fixture: ComponentFixture<PaymentsChartComponent>;
+  let component: OverviewChartComponent;
+  let fixture: ComponentFixture<OverviewChartComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ PaymentsChartComponent ]
+      declarations: [ OverviewChartComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(PaymentsChartComponent);
+    fixture = TestBed.createComponent(OverviewChartComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

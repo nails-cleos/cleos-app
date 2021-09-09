@@ -11,8 +11,7 @@
           <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
             <mat-list>
               <mat-list-item (click)="notification(not)" *ngFor="let not of notifications; last as last"
-                             class="pointer"
-                             matRipple>
+                             class="pointer" matRipple>
                 <div [matTooltip]="not.message" [ngClass]="{ 'gray-text': not.read}" mat-line>
                   <span *ngIf="!not.read" class="dot"></span>{{not.message}}
                 </div>

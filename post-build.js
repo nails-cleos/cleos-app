@@ -12,9 +12,9 @@ if (process.env.ENVIRONMENT === 'production') {
   command = exec('ng build --configuration=pwa');
 }
 
-if (command != undefined) {
+if (command !== undefined) {
   command.stdout.on('data', (data) => {
-    console.log(data);
+    console.info(data);
   });
 
   command.stderr.on('data', (data) => {
@@ -22,7 +22,7 @@ if (command != undefined) {
   });
 
   command.on('close', (code) => {
-    console.log(`child process exited with code ${code}`);
+    console.info(`child process exited with code ${code}`);
   });
 } else {
   console.error('process.env.ENVIRONMENT: ' + process.env.ENVIRONMENT);

@@ -19,6 +19,7 @@ import { DialogComponent } from './dialog/dialog.component';
 import { GeocodeService } from '../services/geocode.service';
 import { RatingComponent } from './rating/rating.component';
 import { CalendarDateFormatter, CalendarEventTitleFormatter, CalendarModule, DateAdapter } from 'angular-calendar';
+import { DateAdapter as Adapter } from '@angular/material/core';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { getLocale } from '../util/helper';
 
@@ -26,6 +27,7 @@ import { CardChartComponent, CardComponent } from './card/card.component';
 import { ChartsModule } from 'ng2-charts';
 import { CustomDateFormatter } from './CustomDateFormatter';
 import { CustomEventTitleFormatter } from './CustomEventTitleFormatter';
+import { FlexLayoutModule } from '@angular/flex-layout';
 
 @NgModule({
   imports: [
@@ -53,7 +55,8 @@ import { CustomEventTitleFormatter } from './CustomEventTitleFormatter';
     }),
     MatGoogleMapsAutocompleteModule,
     ReactiveFormsModule,
-    ChartsModule
+    ChartsModule,
+    FlexLayoutModule
   ],
   exports: [
     BackButtonDirective,
@@ -63,7 +66,8 @@ import { CustomEventTitleFormatter } from './CustomEventTitleFormatter';
     DialogComponent,
     RatingComponent,
     CardChartComponent,
-    CardComponent
+    CardComponent,
+    FlexLayoutModule
   ],
   declarations: [
     BackButtonDirective,
@@ -80,7 +84,7 @@ import { CustomEventTitleFormatter } from './CustomEventTitleFormatter';
   ]
 })
 export class SharedModule {
-  constructor(private store: Store<AppState>, private translate: TranslateService) {
+  constructor(private store: Store<AppState>, private translate: TranslateService, private dateAdapter: Adapter<any>) {
     this.store.select(selectAuthState).subscribe((state: any) => {
       if (state.isAuthenticated) {
         const user: IUserAll = state.user;
@@ -88,6 +92,7 @@ export class SharedModule {
       } else {
         this.translate.use(getLocale(navigator.language));
       }
+      this.dateAdapter.setLocale(this.translate.currentLang);
     });
   }
 }

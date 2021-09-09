@@ -65,6 +65,7 @@ import { PaymentEffects } from './store/effects/payment.effects';
 
 // Components
 import { AppComponent } from './app.component';
+import { DashboardEffects } from './store/effects/dashboard.effects';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
@@ -87,6 +88,9 @@ export const localStorageSyncReducer =
 
 const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
 
+const effects = [LoginEffects, UserEffects, ProductEffects, CatalogueEffects, RoomEffects, ReservationEffects,
+  NotificationEffects, UnavailableEffects, DiscountEffects, MainEffects, PaymentEffects, DashboardEffects];
+
 registerLocaleData(localeEn, 'en');
 registerLocaleData(localeEs, 'es');
 
@@ -97,10 +101,9 @@ registerLocaleData(localeEs, 'es');
   imports: [
     BrowserModule,
     StoreModule.forRoot(reducers, {metaReducers}),
-    EffectsModule.forRoot([LoginEffects, UserEffects, ProductEffects, CatalogueEffects, RoomEffects, ReservationEffects,
-      NotificationEffects, UnavailableEffects, DiscountEffects, MainEffects, PaymentEffects]),
+    EffectsModule.forRoot(effects),
     TranslateModule.forRoot({
-      defaultLanguage: 'en',
+      defaultLanguage: 'es',
       loader: {
         provide: TranslateLoader,
         useFactory: httpLoaderFactory,

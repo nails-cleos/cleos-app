@@ -16,7 +16,8 @@ import {
   getTime,
   greaterOrEqualsThanToday,
   IDuration,
-  newDate
+  newDate,
+  reservationDateTime
 } from '../../util/dates';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -182,6 +183,10 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     return this.paymentPaid?.map((p: IPayment) => p.amount).reduce((acc: number, value: number) => acc + value, 0);
   }
 
+  getDateTime(date: Date): string {
+    return reservationDateTime(date, this.language);
+  }
+
   private createAction(tooltip: string, icon: string, id: string, color?: string): MatFabMenu {
     return {tooltip, tooltipPosition: this.tooltipPosition, icon, id, color} as MatFabMenu;
   }
@@ -281,14 +286,21 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     const sendMessageTransaction = ReservationDetailComponent.createTransaction('send', (): void => {
       if (self.reservation && self.reservation.start) {
         const startDate = newDate(self.reservation.start);
-        let message;
-        if (isTomorrow(startDate)) {
-          const date = getTime(startDate, this.translate.currentLang);
-          message = translate.instant('WHATSAPP.SEND.TOMORROW', {date});
-        } else {
-          const date = formatDateTime(startDate, self.language);
-          message = translate.instant('WHATSAPP.SEND.APPROVE', {date});
+        let key;
+        let date = getTime(startDate, this.language);
+        switch (true) {
+          case isToday(startDate):
+            key = 'TODAY';
+            break;
+          case isTomorrow(startDate):
+            key = 'TOMORROW';
+            break;
+          default:
+            date = formatDateTime(startDate, self.language);
+            key = 'APPROVE';
+            break;
         }
+        const message = translate.instant(`WHATSAPP.SEND.${key}`, {date});
         window.open(`https://api.whatsapp.com/send?phone=+${self.reservation.customer?.phone}&text=${message}`, '_blank');
       }
     });

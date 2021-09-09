@@ -3,21 +3,21 @@
 </button>
 <h1 mat-dialog-title>{{data.title}}</h1>
 <div mat-dialog-content>
-  <div *ngIf="data.chartDataSet">
-    <canvas [chartType]="data.chartType" [colors]="data.colors"
-            [datasets]="data.chartDataSet"
-            [labels]="data.chartLabels"
+  <div *ngIf="data.chart.dataSet">
+    <canvas [chartType]="data.chart.type" [colors]="data.chart.colors"
+            [datasets]="data.chart.dataSet"
+            [labels]="data.chart.labels"
             [legend]="true"
-            [options]="data.options"
+            [options]="data.chart.options"
             baseChart class="block">
     </canvas>
   </div>
-  <div *ngIf="data.chartData">
-    <canvas [chartType]="data.chartType" [colors]="data.colors"
-            [data]="data.chartData"
-            [labels]="data.chartLabels"
+  <div *ngIf="data.chart.data">
+    <canvas [chartType]="data.chart.type" [colors]="data.chart.colors"
+            [data]="data.chart.data"
+            [labels]="data.chart.labels"
             [legend]="true"
-            [options]="data.options"
+            [options]="data.chart.options"
             baseChart class="display: block">
     </canvas>
   </div>

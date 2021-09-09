@@ -30,7 +30,7 @@
         <div mat-line>{{ 'COMMON.ADDRESS.FIELD' | translate}}</div>
         <div mat-line>
           <a [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + reservation.room.address.name"
-             target="_blank" rel="noreferrer">
+             rel="noreferrer" target="_blank">
             {{reservation.room.address.name}}
           </a>
         </div>
@@ -40,8 +40,8 @@
       <div mat-subheader>{{ 'RESERVATION.APPOINTMENT' | translate}}</div>
       <mat-list-item>
         <mat-icon mat-list-icon>event</mat-icon>
-        <div mat-line>{{start | date:'short':undefined:language}}</div>
-        <div mat-line>{{end | date:'short':undefined:language}}</div>
+        <div mat-line>{{getDateTime(start)}}</div>
+        <div mat-line>{{getDateTime(end)}}</div>
       </mat-list-item>
       <mat-list-item>
         <mat-icon mat-list-icon>{{state}}</mat-icon>
@@ -105,7 +105,7 @@
               <div class="ssc-line"></div>
             </ng-template>
           </td>
-          <td *matFooterCellDef mat-footer-cell class="bold">{{ 'RESERVATION.PAYMENT.PAID' | translate}}</td>
+          <td *matFooterCellDef class="bold" mat-footer-cell>{{ 'RESERVATION.PAYMENT.PAID' | translate}}</td>
         </ng-container>
 
         <ng-container matColumnDef="description">
@@ -155,7 +155,7 @@
               <div class="ssc-line"></div>
             </ng-template>
           </td>
-          <td *matFooterCellDef mat-footer-cell class="bold">
+          <td *matFooterCellDef class="bold" mat-footer-cell>
             <mat-icon matPrefix>attach_money</mat-icon>&nbsp;{{getTotal() | number:'1.2-2'}}
           </td>
         </ng-container>

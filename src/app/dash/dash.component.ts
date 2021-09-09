@@ -1,21 +1,20 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { map } from 'rxjs/operators';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Observable, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { BreakpointObserver, Breakpoints, BreakpointState } from '@angular/cdk/layout';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState, selectReservationState } from '../store/app.states';
+import { AppState, selectAuthState, selectDashboardState } from '../store/app.states';
+import * as fromActionsDashboard from '../store/dashboard.actions';
 import * as fromActionsReservation from '../store/reservation.actions';
-import { IReservationAll, IReservationSummary, States } from '../interfaces/reservation';
-import { IUserAll } from '../interfaces/user';
+import { IReservationSummary, States } from '../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
-import { ThemePalette } from '@angular/material/core';
-import { convertDuration, createDate, getNow, newDate } from '../util/dates';
-import { getPrice, getUserName } from '../util/helper';
+import { getNow, newDate } from '../util/dates';
 import { CalendarEvent, CalendarView } from 'angular-calendar';
 import { findStateColor, isDarkMode } from '../util/theme';
-import { monthEvent } from '../util/event';
+import { Meta, monthEvent } from '../util/event';
 import { Router } from '@angular/router';
-import { addMonths, isSameDay, isSameMonth } from 'date-fns';
+import { isSameDay, isSameMonth } from 'date-fns';
+import { IChartSummary } from '../interfaces/dashboard';
 
 @Component({
   selector: 'app-dash',
@@ -24,13 +23,6 @@ import { addMonths, isSameDay, isSameMonth } from 'date-fns';
 })
 export class DashComponent implements OnInit, OnDestroy {
   state: any;
-  stateTracking: any;
-  annualLabel: any;
-  customerLabel: any;
-  quantityLabel: any;
-  lastMonthLabel: any;
-  trackingAverage: any;
-  trackingCompare: any;
 
   view: CalendarView = CalendarView.Month;
   viewDate: Date;
@@ -39,52 +31,57 @@ export class DashComponent implements OnInit, OnDestroy {
   events: CalendarEvent[] = [];
   isCalendarLoading = true;
   totalReservation: number;
+  isDarkMode?: boolean;
 
   miniCardData: IReservationSummary[] = [{} as IReservationSummary, {} as IReservationSummary,
     {} as IReservationSummary, {} as IReservationSummary];
 
-  cardLayout = this.breakpointObserver.observe([
-    Breakpoints.XSmall,
-    Breakpoints.Small,
-    Breakpoints.Medium
-  ]).pipe(
-    map((r) => {
-      if (r.breakpoints[Breakpoints.Medium]) {
-        return {
+  charts: IChartSummary[] = [{} as IChartSummary, {} as IChartSummary, {} as IChartSummary,
+    {} as IChartSummary, {} as IChartSummary, {} as IChartSummary];
+
+  cardLayout = {
+    columns: 2,
+    miniCard: {cols: 1, rows: 1},
+    calendar: {cols: 2, rows: 4},
+    chart: {cols: 2, rows: 2},
+    table: {cols: 2, rows: 4}
+  };
+
+  private destroy$ = new Subject();
+  private getState: Observable<any>;
+  private subscription: Subscription | undefined;
+
+  constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
+              private readonly translate: TranslateService, private router: Router) {
+    this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium])
+      .pipe(takeUntil(this.destroy$)).subscribe((state: BreakpointState) => {
+      if (state.breakpoints[Breakpoints.Medium]) {
+        this.cardLayout = {
           columns: 2,
           miniCard: {cols: 1, rows: 1},
           calendar: {cols: 2, rows: 4},
           chart: {cols: 2, rows: 2},
           table: {cols: 2, rows: 4}
         };
-      }
-      if (r.matches) {
-        return {
+      } else if (state.matches) {
+        this.cardLayout = {
           columns: 1,
           miniCard: {cols: 1, rows: 1},
           calendar: {cols: 1, rows: 4},
           chart: {cols: 1, rows: 2},
           table: {cols: 1, rows: 3}
         };
+      } else {
+        this.cardLayout = {
+          columns: 4,
+          miniCard: {cols: 1, rows: 1},
+          calendar: {cols: 4, rows: 4},
+          chart: {cols: 2, rows: 2},
+          table: {cols: 4, rows: 4}
+        };
       }
-
-      return {
-        columns: 4,
-        miniCard: {cols: 1, rows: 1},
-        calendar: {cols: 4, rows: 4},
-        chart: {cols: 2, rows: 2},
-        table: {cols: 4, rows: 4}
-      };
-    })
-  );
-
-  private getState: Observable<any>;
-  private subscription: Subscription | undefined;
-  private isDarkMode: boolean | undefined;
-
-  constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
-              private readonly translate: TranslateService, private router: Router) {
-    this.getState = this.store.select(selectReservationState);
+    });
+    this.getState = this.store.select(selectDashboardState);
     this.store.select(selectAuthState).subscribe((state: any) => {
       const darkMode: boolean = isDarkMode(state.user?.theme);
       if (this.isDarkMode !== undefined && darkMode !== this.isDarkMode) {
@@ -92,38 +89,14 @@ export class DashComponent implements OnInit, OnDestroy {
       }
       this.isDarkMode = darkMode;
     });
-    this.annualLabel = this.translate.instant('DASHBOARD.CARD.LABEL.ANNUAL');
-    this.customerLabel = this.translate.instant('DASHBOARD.CARD.LABEL.CUSTOMER');
-    this.quantityLabel = this.translate.instant('DASHBOARD.CARD.LABEL.QUANTITY');
-    this.lastMonthLabel = this.translate.instant('DASHBOARD.CARD.LABEL.LAST_MONTH');
-    this.trackingAverage = {
-      min: this.translate.instant('DASHBOARD.CARD.LABEL.MIN'),
-      avg: this.translate.instant('DASHBOARD.CARD.LABEL.AVG'),
-      max: this.translate.instant('DASHBOARD.CARD.LABEL.MAX')
-    };
-    this.trackingCompare = {
-      avg: this.translate.instant('DASHBOARD.CARD.LABEL.AVG'),
-      estimate: this.translate.instant('DASHBOARD.CARD.LABEL.ESTIMATE')
-    };
     this.viewDate = getNow();
     this.locale = this.translate.currentLang;
     this.totalReservation = 0;
   }
 
   get total(): number {
-    return this.state?.dash?.filter((r: IReservationAll) => isSameMonth(newDate(r.start), this.viewDate)).length;
-  }
-
-  private static getSumReservationPrice(total: number, reservation: IReservationAll): number {
-    return total + getPrice(reservation.product).total;
-  }
-
-  private static createMiniCard(title: string, value: number, isIncrease: boolean, color: ThemePalette, percentValue: number,
-                                icon: string, isCurrency: boolean): IReservationSummary {
-    return {
-      title: `DASHBOARD.MINI_CARD.${title}`,
-      value, isIncrease, color, percentValue, icon, isCurrency
-    };
+    return this.events?.filter((event: CalendarEvent) => event.meta.state !== States.cancelled
+      && isSameMonth(event.start, this.viewDate)).length;
   }
 
   private static createErrorMiniCard(title: string, message: string): IReservationSummary {
@@ -135,92 +108,15 @@ export class DashComponent implements OnInit, OnDestroy {
     };
   }
 
-  private static revenue(totalRevenue: number, lastMonthRevenue: number, prevMonthRevenue: number): IReservationSummary {
-    return DashComponent.createMiniCard('TOTAL_PRODUCT_SALES', totalRevenue,
-      lastMonthRevenue >= prevMonthRevenue, 'primary',
-      Math.abs((lastMonthRevenue - prevMonthRevenue) / Math.abs(prevMonthRevenue)), 'payments', true);
-  }
-
-  private static products(completedList: IReservationAll[], lastMonthList: IReservationAll[],
-                          prevMonthList: IReservationAll[], totalRevenue: number, lastMonthRevenue: number,
-                          prevMonthRevenue: number): IReservationSummary {
-    const totalAvg = completedList.length ? totalRevenue / completedList.length : 0;
-    const lastMonthAvg = lastMonthList.length ? lastMonthRevenue / lastMonthList.length : 0;
-    const prevMonthAvg = prevMonthList.length ? prevMonthRevenue / prevMonthList.length : 0;
-
-    return DashComponent.createMiniCard('AVERAGE_PRODUCT_VALUE', Number((totalAvg).toFixed(2)),
-      lastMonthAvg >= prevMonthAvg, 'accent',
-      Math.abs((lastMonthAvg - prevMonthAvg) / Math.abs(prevMonthAvg)), 'local_atm', true);
-  }
-
-  private static totalProducts(completedList: IReservationAll[], lastMonthList: IReservationAll[],
-                               prevMonthList: IReservationAll[]): IReservationSummary {
-    return DashComponent.createMiniCard('TOTAL_PRODUCTS', completedList.length,
-      lastMonthList.length >= prevMonthList.length, 'primary',
-      Math.abs((lastMonthList.length - prevMonthList.length) / Math.abs(prevMonthList.length)), 'home_repair_service', false);
-  }
-
-  private static customer(completedList: IReservationAll[], lastMonthList: IReservationAll[],
-                          prevMonthList: IReservationAll[], filterDate: Date, prevFilterDate: Date): IReservationSummary {
-
-    const totalCustomers = completedList.filter((r: IReservationAll) => newDate(r.start) <= filterDate)
-      .reduce((unique: any[], o: IReservationAll) => {
-        if (!unique.some(obj => obj.id === o.customer.id)) {
-          unique.push(o.customer);
-        }
-        return unique;
-      }, []);
-
-    const totalCustomersPrev = completedList.filter((r: IReservationAll) => newDate(r.start) <= prevFilterDate)
-      .reduce((unique: any[], o: IReservationAll) => {
-        if (!unique.some(obj => obj.id === o.customer.id)) {
-          unique.push(o.customer);
-        }
-        return unique;
-      }, []);
-
-    const lastMonthCustomers = lastMonthList.reduce((unique: any[], o: IReservationAll) => {
-      if (!unique.some(obj => obj.id === o.customer.id)) {
-        unique.push(o.customer);
-      }
-      return unique;
-    }, []);
-
-    const prevMonthCustomers = prevMonthList.reduce((unique: any[], o: IReservationAll) => {
-      if (!unique.some(obj => obj.id === o.customer.id)) {
-        unique.push(o.customer);
-      }
-      return unique;
-    }, []);
-
-    let lastMonthCounter = 0;
-    lastMonthCustomers.forEach((val: IUserAll) => {
-      if (!totalCustomers.some((c: IUserAll) => c.id === val.id)) {
-        lastMonthCounter++;
-      }
-    });
-
-    let prevCounter = 0;
-    prevMonthCustomers.forEach((val: IUserAll) => {
-      if (!totalCustomersPrev.some((c: IUserAll) => c.id === val.id)) {
-        prevCounter++;
-      }
-    });
-
-    return DashComponent.createMiniCard('NEW_CUSTOMERS_RESERVATION', lastMonthCounter,
-      lastMonthCounter >= prevCounter, 'accent', Math.abs((lastMonthCounter - prevCounter) / prevCounter),
-      'portrait', false);
-  }
-
   ngOnInit(): void {
     this.clean();
     this.subscribe();
-    this.getReservations();
-    this.getTracking();
+    this.getSummaries();
   }
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.destroy$.next();
   }
 
   handleEvent(event: CalendarEvent): void {
@@ -242,11 +138,13 @@ export class DashComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsReservation.Clean()
     );
+    this.store.dispatch(
+      new fromActionsDashboard.Clean()
+    );
   }
 
   private miniCardError(state: any, error: string): void {
     this.state = state;
-    this.stateTracking = state;
     const revenue = DashComponent.createErrorMiniCard('TOTAL_PRODUCT_SALES', error);
 
     const products = DashComponent.createErrorMiniCard('AVERAGE_PRODUCT_VALUE', error);
@@ -259,40 +157,25 @@ export class DashComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      if (state.tracking) {
-        this.stateTracking = state;
-      }
       if (state.errorMessage) {
         this.miniCardError(state, state.errorMessage);
-      }
-      if (state.dash) {
         this.state = state;
-        if (!this.events.length) {
+      }
+      if (state.data && (state.data.miniCardSummaries || state.data.chartSummaries || state.data.calendarSummaries)) {
+        this.state = state;
+        if (!this.events.length && state.data.calendarSummaries) {
           this.createEvents(this.isDarkMode);
         }
-        const filterDate: Date = addMonths(createDate(), -1);
-        const prevFilterDate: Date = addMonths(createDate(), -2);
-        const completedList: IReservationAll[] = this.state.dash?.filter((r: IReservationAll) => r.state === States.completed);
-        if (completedList && completedList.length) {
-          const lastMonthList: IReservationAll[] = completedList.filter((r: IReservationAll) => newDate(r.start) > filterDate);
-          const prevMonthList: IReservationAll[] = completedList.filter(
-            (r: IReservationAll) => newDate(r.start) > prevFilterDate && newDate(r.start) < filterDate
-          );
-          const totalRevenue: number = completedList.reduce(DashComponent.getSumReservationPrice, 0);
-          const lastMonthRevenue: number = lastMonthList.reduce(DashComponent.getSumReservationPrice, 0);
-          const prevMonthRevenue: number = prevMonthList.reduce(DashComponent.getSumReservationPrice, 0);
-
-          const revenue = DashComponent.revenue(totalRevenue, lastMonthRevenue, prevMonthRevenue);
-          const products = DashComponent.products(completedList, lastMonthList, prevMonthList, totalRevenue,
-            lastMonthRevenue, prevMonthRevenue);
-          const totalProducts = DashComponent.totalProducts(completedList, lastMonthList, prevMonthList);
-
-          const customer = DashComponent.customer(completedList, lastMonthList, prevMonthList, filterDate, prevFilterDate);
-
-          this.miniCardData = [revenue, products, totalProducts, customer];
-        } else {
-          this.miniCardError(state, 'NO_CONTENT');
-          this.isCalendarLoading = false;
+        if (state.data.miniCardSummaries || state.data.chartSummaries) {
+          if (state.data.chartSummaries && state.data.chartSummaries.length) {
+            this.charts = state.data.chartSummaries;
+          }
+          if (state.data.miniCardSummaries && state.data.miniCardSummaries.length) {
+            this.miniCardData = state.data.miniCardSummaries;
+          } else {
+            this.miniCardError(state, 'NO_CONTENT');
+            this.isCalendarLoading = false;
+          }
         }
       }
     });
@@ -300,15 +183,13 @@ export class DashComponent implements OnInit, OnDestroy {
 
   private createEvents(darkMode: boolean = false): void {
     this.events = [];
-    this.state.dash?.forEach((it: IReservationAll) => {
+    this.state.data?.calendarSummaries?.forEach((it: any) => {
       const start = newDate(it.start);
+      const end = newDate(it.end);
       this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, this.viewDate);
-      const duration = convertDuration(it.product.duration);
-      const detail = this.translate.instant('RESERVATION.EVENT.CUSTOMER', {
-        customerName: getUserName(it.customer)
-      });
 
-      const event = monthEvent(detail, start, duration, it.id, findStateColor(it.state, darkMode));
+      const event = monthEvent(it.title, start, end, it.reservationId, findStateColor(it.state, darkMode),
+        new Meta(true, it.state));
       if (event) {
         this.events = [...this.events, event];
       }
@@ -316,15 +197,12 @@ export class DashComponent implements OnInit, OnDestroy {
     this.isCalendarLoading = false;
   }
 
-  private getReservations(): void {
+  private getSummaries(): void {
     this.store.dispatch(
-      new fromActionsReservation.GetAll()
+      new fromActionsDashboard.GetEvents()
     );
-  }
-
-  private getTracking(): void {
     this.store.dispatch(
-      new fromActionsReservation.GetTracking()
+      new fromActionsDashboard.GetCards()
     );
   }
 }

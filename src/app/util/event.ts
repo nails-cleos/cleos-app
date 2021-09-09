@@ -7,13 +7,16 @@ import { isToday } from 'date-fns';
 
 export interface IMeta {
   time?: boolean;
+  state?: string;
 }
 
 export class Meta implements IMeta {
   time?: boolean;
+  state?: string;
 
-  constructor(time?: boolean) {
+  constructor(time?: boolean, state?: string) {
     this.time = time;
+    this.state = state;
   }
 }
 
@@ -94,16 +97,17 @@ export const newEvent = (title: string, color: string, start: Date, end?: Date, 
   return undefined;
 };
 
-export const monthEvent = (title: string, start: Date, duration: IDuration, id: string,
-                           color?: string): CalendarEvent | undefined => ({
+export const monthEvent = (title: string, start: Date, end: Date, id: string,
+                           color?: string, meta: Meta = new Meta(true)): CalendarEvent | undefined => ({
   id,
   start,
   title,
-  end: createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute),
+  end,
   color: {
     primary: color,
     secondary: '#000'
-  }, meta: new Meta(true)
+  },
+  meta
 } as unknown as CalendarEvent);
 
 export const getOverlapEvent = (events: any[], eventStartDay: Date, eventEndDay: Date): CalendarEvent[] =>
@@ -115,15 +119,15 @@ export const getOverlapEvent = (events: any[], eventStartDay: Date, eventEndDay:
 // private isAnOverlapEvent(eventStartDay: Date, eventEndDay: Date): CalendarEvent | undefined {
 //   return this.events.find((eventA: CalendarEvent) => {
 //     if (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end) {
-//       console.log('start-time in between any of the events');
+//       console.info('start-time in between any of the events');
 //       return eventA;
 //     }
 //     if (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end) {
-//       console.log('end-time in between any of the events');
+//       console.info('end-time in between any of the events');
 //       return eventA;
 //     }
 //     if (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end) {
-//       console.log('any of the events in between/on the start-time and end-time');
+//       console.info('any of the events in between/on the start-time and end-time');
 //       return eventA;
 //     }
 //     return null;
