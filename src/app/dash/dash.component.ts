@@ -14,7 +14,7 @@ import { findStateColor, isDarkMode } from '../util/theme';
 import { Meta, monthEvent } from '../util/event';
 import { Router } from '@angular/router';
 import { isSameDay, isSameMonth } from 'date-fns';
-import { IChartSummary } from '../interfaces/dashboard';
+import { IChart } from '../interfaces/dashboard';
 
 @Component({
   selector: 'app-dash',
@@ -36,8 +36,8 @@ export class DashComponent implements OnInit, OnDestroy {
   miniCardData: IReservationSummary[] = [{} as IReservationSummary, {} as IReservationSummary,
     {} as IReservationSummary, {} as IReservationSummary];
 
-  charts: IChartSummary[] = [{} as IChartSummary, {} as IChartSummary, {} as IChartSummary,
-    {} as IChartSummary, {} as IChartSummary, {} as IChartSummary, {} as IChartSummary, {} as IChartSummary];
+  charts: IChart[] = [{} as IChart, {} as IChart, {} as IChart,
+    {} as IChart, {} as IChart, {} as IChart, {} as IChart, {} as IChart];
 
   cardLayout = {
     columns: 2,

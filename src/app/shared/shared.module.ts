@@ -28,6 +28,7 @@ import { ChartsModule } from 'ng2-charts';
 import { CustomDateFormatter } from './CustomDateFormatter';
 import { CustomEventTitleFormatter } from './CustomEventTitleFormatter';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { ChartComponent } from './chart/chart.component';
 
 @NgModule({
   imports: [
@@ -67,7 +68,8 @@ import { FlexLayoutModule } from '@angular/flex-layout';
     RatingComponent,
     CardChartComponent,
     CardComponent,
-    FlexLayoutModule
+    FlexLayoutModule,
+    ChartComponent
   ],
   declarations: [
     BackButtonDirective,
@@ -77,7 +79,8 @@ import { FlexLayoutModule } from '@angular/flex-layout';
     DialogComponent,
     RatingComponent,
     CardChartComponent,
-    CardComponent
+    CardComponent,
+    ChartComponent
   ],
   providers: [
     GeocodeService

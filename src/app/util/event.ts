@@ -64,21 +64,6 @@ export const fillNotAvailable = (unavailable: string, lunch: string, notWorking:
   return events.concat(recurringEvent(recurring, notWorking, unavailable, lunch, isDark));
 };
 
-const recurringEvent = (recurring: any[], notWorking: string, unavailable: string, lunch: string,
-                        isDark: boolean): CalendarEvent[] => {
-  let events: CalendarEvent[] = [];
-
-  recurring.forEach(r =>
-    r.rule.all().forEach((date: Date) => {
-      const event = createEvent(r.availability, date, notWorking, unavailable, lunch, isDark);
-      if (event) {
-        events = events.concat(event);
-      }
-    }));
-
-  return events;
-};
-
 export const newEvent = (title: string, color: string, start: Date, end?: Date, primary?: string,
                          id?: string, meta: IMeta = new Meta()): CalendarEvent | undefined => {
   if (greaterOrEqualsThanToday(start)) {
@@ -133,6 +118,21 @@ export const getOverlapEvent = (events: any[], eventStartDay: Date, eventEndDay:
 //     return null;
 //   });
 // }
+
+const recurringEvent = (recurring: any[], notWorking: string, unavailable: string, lunch: string,
+                        isDark: boolean): CalendarEvent[] => {
+  let events: CalendarEvent[] = [];
+
+  recurring.forEach(r =>
+    r.rule.all().forEach((date: Date) => {
+      const event = createEvent(r.availability, date, notWorking, unavailable, lunch, isDark);
+      if (event) {
+        events = events.concat(event);
+      }
+    }));
+
+  return events;
+};
 
 const createEvent = (it: IAvailability, date: Date, notWorking: string, unavailable: string,
                      lunch: string, isDarkMode: boolean): CalendarEvent[] => {

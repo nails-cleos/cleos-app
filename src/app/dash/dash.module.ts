@@ -13,13 +13,11 @@ import { DashComponent } from './dash.component';
 import { MiniCardComponent } from './mini-card/mini-card.component';
 import { ReservationTableComponent } from './reservation/table/reservation-table.component';
 import { CalendarModule, CalendarMonthModule } from 'angular-calendar';
-import { DashboardChartComponent } from './charts/dashboard-chart/dashboard-chart.component';
 
 @NgModule({
   declarations: [
     DashComponent,
     MiniCardComponent,
-    DashboardChartComponent,
     ReservationTableComponent
   ],
   imports: [

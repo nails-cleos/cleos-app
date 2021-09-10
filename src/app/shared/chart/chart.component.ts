@@ -1,15 +1,15 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { createChart, IChartUtil } from '../../../util/chart';
-import { IChartSummary } from '../../../interfaces/dashboard';
+import { createChart, IChartUtil } from '../../util/chart';
+import { IChart } from '../../interfaces/dashboard';
 
 @Component({
-  selector: 'app-dashboard-chart',
-  templateUrl: './dashboard-chart.component.html',
-  styleUrls: ['./dashboard-chart.component.scss']
+  selector: 'app-chart',
+  templateUrl: './chart.component.html',
+  styleUrls: ['./chart.component.scss']
 })
-export class DashboardChartComponent implements OnChanges {
+export class ChartComponent implements OnChanges {
   @Input() state: any;
-  @Input() chartSummary?: IChartSummary;
+  @Input() chartSummary?: IChart;
   @Input() isDark?: boolean;
 
   chart: IChartUtil | undefined;

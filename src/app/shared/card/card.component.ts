@@ -1,7 +1,7 @@
 import { Component, Inject, Input } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { createChart, IChartUtil } from '../../util/chart';
-import { IChartSummary } from '../../interfaces/dashboard';
+import { IChart } from '../../interfaces/dashboard';
 
 @Component({
   selector: 'app-card',
@@ -11,7 +11,7 @@ import { IChartSummary } from '../../interfaces/dashboard';
 export class CardComponent {
   @Input() title: string | undefined;
   @Input() expand = true;
-  @Input() chart?: IChartSummary;
+  @Input() chart?: IChart;
   @Input() isDark?: boolean;
 
   constructor(public dialog: MatDialog) {

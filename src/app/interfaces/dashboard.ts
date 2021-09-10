@@ -21,7 +21,7 @@ export interface IReservationSummary {
 
 export interface ICardSummary {
   miniCardSummaries?: IReservationSummary[];
-  chartSummaries?: IChartSummary[];
+  chartSummaries?: IChart[];
 }
 
 export interface ICalendarSummary {
@@ -32,7 +32,7 @@ export interface ICalendarSummary {
   state: string;
 }
 
-export interface IChartSummary {
+export interface IChart {
   title: string;
   type?: ChartType;
   labels?: Label[];

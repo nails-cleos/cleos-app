@@ -1,5 +1,6 @@
-import { IPaymentReservation } from './reservation';
+import { IPaymentReservation, IReservationOverview } from './reservation';
 import { Theme } from '../util/theme';
+import { IChart } from './dashboard';
 
 export interface IUser {
   id?: string;
@@ -53,7 +54,8 @@ export interface IMenu {
 
 export interface IOverview {
   customer: IUserAll;
-  reservations: IPaymentReservation[];
+  miniCardOverview: IReservationOverview[];
+  chartOverview: IChart[];
 }
 
 export class User implements IUser {
