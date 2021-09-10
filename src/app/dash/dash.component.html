@@ -43,7 +43,7 @@
   <!--Charts-->
   <mat-grid-tile *ngFor="let chart of charts" [colspan]="cardLayout.chart?.cols" [rowspan]="cardLayout.chart?.rows">
     <app-card [chart]="chart" [title]="chart.title" [isDark]="isDarkMode">
-      <app-dashboard-chart [chartSummary]="chart" [state]="state" [isDark]="isDarkMode"></app-dashboard-chart>
+      <app-chart [chartSummary]="chart" [state]="state" [isDark]="isDarkMode"></app-chart>
     </app-card>
   </mat-grid-tile>
   <!--Table-->

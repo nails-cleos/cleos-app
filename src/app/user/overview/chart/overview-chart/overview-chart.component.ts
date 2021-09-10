@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { createChart, IChartUtil } from '../../../../util/chart';
-import { IChartSummary } from '../../../../interfaces/dashboard';
+import { IChart } from '../../../../interfaces/dashboard';
 
 @Component({
   selector: 'app-overview-chart',
@@ -8,7 +8,7 @@ import { IChartSummary } from '../../../../interfaces/dashboard';
   styleUrls: ['./overview-chart.component.scss']
 })
 export class OverviewChartComponent implements OnChanges {
-  @Input() chartSummary: IChartSummary | undefined;
+  @Input() chartSummary: IChart | undefined;
   @Input() error: any;
 
   chart: IChartUtil | undefined;

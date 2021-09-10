@@ -137,7 +137,6 @@ export const newDiscount = (price: IPrice, productDiscount: IDiscount): IPrice =
   return new Price(price.amount, discount, price.extra, total, price.totalPaid, priceWithDiscount, price.priceWithExtras);
 };
 
-
 const totalPaid = (payments: IPayment[] | undefined): number => {
   let total = 0;
   payments?.forEach(payment => {

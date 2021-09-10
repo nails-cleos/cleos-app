@@ -107,7 +107,7 @@ export class UnavailableComponent implements OnInit, OnDestroy {
     return user ? getUserName(user) : '';
   }
 
-  myFilter = (d: Date | null): boolean => filterDateRoom(d, this.room, true);
+  myFilter = (d: Date | null): boolean => filterDateRoom(d, this.room);
 
   setDate($event: any): void {
     const date = newDate($event.value);

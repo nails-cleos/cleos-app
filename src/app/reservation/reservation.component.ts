@@ -251,7 +251,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     return getFullUserName(user);
   }
 
-  myFilter = (d: Date | null): boolean => filterDateRoom(d, this.room.value, true);
+  myFilter = (d: Date | null): boolean => filterDateRoom(d, this.room.value);
 
   displayFnUser(user: IUser): string {
     return user ? getUserName(user) : '';

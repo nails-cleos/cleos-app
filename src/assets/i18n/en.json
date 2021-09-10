@@ -116,9 +116,7 @@
       "NEW_CUSTOMERS_RESERVATION": "New Customers Reservation"
     },
     "CARD": {
-      "QUANTITY_PRODUCT": "Quantity Product",
       "RESERVATION": "Reservations",
-      "PAYMENT": "Payment",
       "EXPAND": "Expand"
     }
   },
@@ -746,14 +744,6 @@
       "5": "Excellent"
     },
     "CREATED": "Review saved"
-  },
-  "OVERVIEW": {
-    "MINI_CARD": {
-      "PRODUCTS": "Completed/Cancelled",
-      "RESERVATIONS": "Upcoming/Previous",
-      "UPCOMING": "Upcoming: {{next}}",
-      "PREVIOUS": "Previous: {{last}}"
-    }
   },
   "WHATSAPP": {
     "SEND": {

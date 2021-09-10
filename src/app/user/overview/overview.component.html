@@ -56,11 +56,12 @@
             </div>
             <div *ngIf="mc.split; else noSplit" class="text-center">
               <div *ngIf="mc.link; else noLink">
-                <h3 (click)="mc.link(mc.primary)" class="pointer">{{mc.primaryValue}}</h3>
-                <h3 (click)="mc.link(mc.secondary)" class="pointer">{{mc.secondaryValue}}</h3>
+                <h3 (click)="mc.link(mc.primaryId)" [ngClass]="{'pointer': mc.primaryId}"
+                    class="no-bottom">{{mc.primaryValue}}</h3>
+                <h3 (click)="mc.link(mc.secondaryId)" [ngClass]="{'pointer': mc.secondaryId}">{{mc.secondaryValue}}</h3>
               </div>
               <ng-template #noLink>
-                <h3>{{mc.primaryValue}}</h3>
+                <h3 class="no-bottom">{{mc.primaryValue}}</h3>
                 <h3>{{mc.secondaryValue}}</h3>
               </ng-template>
             </div>
@@ -77,14 +78,10 @@
         </ng-template>
       </mat-card>
     </mat-grid-tile>
-    <mat-grid-tile [colspan]="( layout | async )?.chart?.cols" [rowspan]="( layout | async )?.chart?.rows">
-      <app-card [chart]="productChart" [title]="'DASHBOARD.CARD.QUANTITY_PRODUCT' | translate">
-        <app-overview-chart [chartSummary]="productChart" [error]="productError"></app-overview-chart>
-      </app-card>
-    </mat-grid-tile>
-    <mat-grid-tile [colspan]="( layout | async )?.chart?.cols" [rowspan]="( layout | async )?.chart?.rows">
-      <app-card [chart]="paymentChart" [title]="'DASHBOARD.CARD.PAYMENT' | translate">
-        <app-overview-chart [chartSummary]="paymentChart" [error]="paymentError"></app-overview-chart>
+    <mat-grid-tile *ngFor="let chart of charts" [colspan]="( layout | async )?.chart?.cols"
+                   [rowspan]="( layout | async )?.chart?.rows">
+      <app-card [chart]="chart" [title]="chart.title">
+        <app-chart [chartSummary]="chart" [state]="state"></app-chart>
       </app-card>
     </mat-grid-tile>
   </mat-grid-list>

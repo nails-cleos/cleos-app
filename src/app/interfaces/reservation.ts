@@ -82,14 +82,14 @@ export interface IReservationSummary {
 export interface IReservationOverview {
   title: string;
   primaryValue?: number | string;
-  primary?: IReservation;
+  primaryId?: string;
   secondaryValue?: number | string;
-  secondary?: IReservation;
+  secondaryId?: string;
   color?: ThemePalette;
   icon?: string;
   split?: boolean;
   error?: any;
-  link?: (reservation: IReservation | undefined) => void;
+  link?: (reservationId: string | undefined) => void;
 }
 
 export interface ITracking {

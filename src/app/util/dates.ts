@@ -71,22 +71,6 @@ export const getStartEndDay = (week: IAvailability, saturday: IAvailability, sun
   return {min, max};
 };
 
-export const getMinAndMax = (availability: IAvailability, date: Date): any => {
-  let min;
-  let max;
-  if (availability) {
-    if (availability.start) {
-      const start = availability.start.split(':');
-      min = new Date(date.setHours(Number(start[0]), Number(start[1])));
-    }
-    if (availability.end) {
-      const end = availability.end.split(':');
-      max = new Date(date.setHours(Number(end[0]), Number(end[1])));
-    }
-  }
-  return {min, max};
-};
-
 export const diffTime = (time: Date, maxHour = 24, diffMin = 0): IDuration => {
   const date = new Date();
   date.setHours(time.getHours(), time.getMinutes());
@@ -117,12 +101,6 @@ export const getDiffTime = (maxDate: Date, minDate: Date): string => {
 
   return `${hour}:${minute}`;
 };
-
-export const getMinutesBetweenTimes = (date1: Date, date2: Date): number =>
-  Math.abs(Math.round((date1.getTime() - date2.getTime()) / (1000 * 60)));
-
-export const getSecondsBetweenTimes = (date1: Date, date2: Date): number =>
-  Math.abs(Math.round((date1.getTime() - date2.getTime()) / 1000));
 
 export const getAvailability = (room: IRoom): any => {
   const week: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'WEEK')[0];
@@ -198,17 +176,9 @@ export const formatDateNameKey = (date: Date, locale: string, measure: any): str
   day: 'numeric', month: measure, hour: '2-digit', minute: '2-digit'
 }).replace(/(?:^|\s|-)+\S/g, (c) => c.toUpperCase());
 
-export const formatDate = (date: Date, locale: string): string => date.toLocaleDateString(locale, {
-  day: 'numeric', month: 'short'
-}).replace(/ /g, '-').replace(/(?:^|\s|-)+\S/g, (c) => c.toUpperCase());
-
 export const monthViewTitle = (date: Date, locale: string = 'en'): string => date.toLocaleDateString(locale, {
   year: 'numeric', month: 'long'
 }).replace(/^\w/, (c) => c.toUpperCase());
-
-export const formatMonthYear = (date: Date, locale: string): string => date.toLocaleDateString(locale, {
-  month: 'short', year: 'numeric'
-}).replace(/ /g, '-').replace(/^\w/, (c) => c.toUpperCase());
 
 export const columnHeader = (date: Date, locale: string = 'en'): string => date.toLocaleDateString(locale, {
   weekday: 'long'
@@ -321,10 +291,10 @@ export const getWeekDay = (day: number): Weekday[] => {
   return weekDay;
 };
 
-export const filterDateRoom = (d: Date | null, room?: IRoom, greaterAndEqual: boolean = false): boolean => {
+export const filterDateRoom = (d: Date | null, room?: IRoom): boolean => {
   const now = createDate();
   const date = (d || now);
-  return filterDate(greaterAndEqual ? date >= now : date > now, date, room);
+  return filterDate(date >= now, date, room);
 };
 
 export const filterDate = (result: boolean, date: Date | null, room?: IRoom): boolean => {
@@ -344,3 +314,22 @@ export const filterDate = (result: boolean, date: Date | null, room?: IRoom): bo
   }
   return result;
 };
+
+const getMinAndMax = (availability: IAvailability, date: Date): any => {
+  let min;
+  let max;
+  if (availability) {
+    if (availability.start) {
+      const start = availability.start.split(':');
+      min = new Date(date.setHours(Number(start[0]), Number(start[1])));
+    }
+    if (availability.end) {
+      const end = availability.end.split(':');
+      max = new Date(date.setHours(Number(end[0]), Number(end[1])));
+    }
+  }
+  return {min, max};
+};
+
+const getMinutesBetweenTimes = (date1: Date, date2: Date): number =>
+  Math.abs(Math.round((date1.getTime() - date2.getTime()) / (1000 * 60)));

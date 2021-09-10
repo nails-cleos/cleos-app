@@ -1,8 +1,6 @@
-import { IPaymentReservation, States } from '../interfaces/reservation';
 import { Color, Label, SingleDataSet } from 'ng2-charts';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
-import { TranslateService } from '@ngx-translate/core';
-import { IChartSummary } from '../interfaces/dashboard';
+import { IChart } from '../interfaces/dashboard';
 
 export interface IChartUtil {
   labels: Label[];
@@ -13,57 +11,7 @@ export interface IChartUtil {
   options: ChartOptions;
 }
 
-export const productChart = (result: IPaymentReservation[] | undefined): IChartSummary | undefined => {
-  const completedList = result?.filter(r => r.reservation.state === States.completed);
-  if (completedList && completedList.length) {
-    const group = completedList.reduce((map, item) => {
-      let total = map.get(item.reservation.product.name) || 0;
-      map.set(item.reservation.product.name, ++total);
-
-      return map;
-    }, new Map<string, number>());
-
-    return {
-      labels: Array.from(group.keys()),
-      data: Array.from(group.values()),
-      type: 'pie',
-      colors: 'COLORS_ARRAY',
-      options: 'PERCENTAGE_CHART'
-    } as IChartSummary;
-  }
-  return undefined;
-};
-
-export const paymentChart = (completedList: IPaymentReservation[] | undefined,
-                             translate: TranslateService): IChartSummary | undefined => {
-  if (completedList && completedList.length) {
-    let total = 0;
-    const paymentMap = new Map<string, number>();
-    paymentMap.set(translate.instant('COMMON.PAYMENT.ML'), 0);
-    paymentMap.set(translate.instant('COMMON.PAYMENT.CASH'), 0);
-    const group = completedList.reduce((map, item) => {
-      const payments = item.payments.filter(p => p.status === 'approved');
-      payments.forEach(p => {
-        total += p.amount;
-        const type = translate.instant(`COMMON.PAYMENT.${p.type}`);
-        map.set(type, (map.get(type) || 0) + p.amount);
-      });
-
-      return map;
-    }, paymentMap);
-
-    return {
-      labels: Array.from(group.keys()),
-      data: Array.from(group.values()),
-      type: 'pie',
-      colors: 'COLORS_ARRAY',
-      options: 'PERCENTAGE_CHART'
-    } as IChartSummary;
-  }
-  return undefined;
-};
-
-export const createChart = (chart: IChartSummary, isDark?: boolean): IChartUtil => {
+export const createChart = (chart: IChart, isDark?: boolean): IChartUtil => {
   let dataSet: ChartDataSets[] = [];
   if (chart.dataSet && chart.dataSet.length) {
     chart.dataSet.forEach(value => {
@@ -189,7 +137,7 @@ const pieChartPercentageOptions = (): ChartOptions => ({
 
 const pieChatPercentageLabel = (tooltipItem: any, data: any): string => {
   const values = data.datasets[tooltipItem.datasetIndex].data;
-  const total = values.reduce((a: number, b: number) => a + b);
+  const total = values.reduce((a: string, b: string) => Number(a) + Number(b));
   return `${data.labels[tooltipItem.index]}: ${(values[tooltipItem.index] * 100 / total).toFixed(2)}%`;
 };
 
