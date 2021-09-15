@@ -33,6 +33,9 @@ export const createChart = (chart: IChart, isDark?: boolean): IChartUtil => {
   }
   let options;
   switch (chart.options) {
+    case 'NO_LABEL':
+      options = barChartNoLabelOptions();
+      break;
     case 'BAR_CHART':
     case 'LINE_CHART':
       options = barChartDefaultOptions();
@@ -103,6 +106,24 @@ const barChartDefaultOptions = (): ChartOptions => ({
   }
 });
 
+const barChartNoLabelOptions = (): ChartOptions => ({
+  responsive: true,
+  scales: {
+    yAxes: [{
+      ticks: {
+        // @ts-ignore
+        precision: 0,
+        beginAtZero: true
+      }
+    }],
+    xAxes: [{
+      ticks: {
+        callback: () => ''
+      }
+    }]
+  }
+});
+
 const barChartTimeOptions = (): ChartOptions => ({
   responsive: true,
   scales: {
@@ -151,10 +172,16 @@ const barChatTimeLabel = (tooltipItem: any, data: any): string =>
   data.datasets[tooltipItem.datasetIndex].label + ': ' + formatSecsAsHourMin(tooltipItem.yLabel);
 
 const chartArrayColors = (): Color[] => ([{
-  backgroundColor: ['rgba(254, 205, 190, 0.6)', 'rgba(152, 109, 142, 0.6)', 'rgba(95, 147, 154, 0.6)', 'rgba(161, 202, 226, 0.6)'],
+  hoverBackgroundColor: ['rgba(254, 205, 190, 0.6)', 'rgba(152, 109, 142, 0.6)', 'rgba(95, 147, 154, 0.6)',
+    'rgba(161, 202, 226, 0.6)', 'rgba(242, 213, 239, 0.6)', 'rgba(203, 239, 227, 0.6)', 'rgba(194, 213, 167, 0.6)',
+    'rgba(176, 171, 202, 0.6)', 'rgba(226, 169, 190, 0.6)', 'rgba(163, 214, 212, 0.6)'],
   borderColor: ['#fff', '#fff', '#fff', '#fff'],
-  hoverBackgroundColor: ['rgba(254, 205, 190, 0.8)', 'rgba(152, 109, 142, 0.8)', 'rgba(95, 147, 154, 0.8)', 'rgba(161, 202, 226, 0.8)'],
-  hoverBorderColor: ['rgba(254, 205, 190, 1)', 'rgba(152, 109, 142, 1)', 'rgba(95, 147, 154, 1)', 'rgba(161, 202, 226, 1)']
+  backgroundColor: ['rgba(254, 205, 190, 0.8)', 'rgba(152, 109, 142, 0.8)', 'rgba(95, 147, 154, 0.8)',
+    'rgba(161, 202, 226, 0.8)', 'rgba(242, 213, 239, 0.8)', 'rgba(203, 239, 227, 0.8)', 'rgba(194, 213, 167, 0.8)',
+    'rgba(176, 171, 202, 0.8)', 'rgba(226, 169, 190, 0.8)', 'rgba(163, 214, 212, 0.8)'],
+  hoverBorderColor: ['rgb(254, 205, 190)', 'rgb(152, 109, 142)', 'rgb(95, 147, 154)',
+    'rgb(161, 202, 226)', 'rgb(242, 213, 239)', 'rgb(203, 239, 227)', 'rgb(194, 213, 167)',
+    'rgb(176, 171, 202)', 'rgb(226, 169, 190)', 'rgb(163, 214, 212)']
 }]);
 
 const chartColors = (): Color[] => ([{

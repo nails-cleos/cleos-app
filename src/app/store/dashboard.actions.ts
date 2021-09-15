@@ -10,6 +10,9 @@ export enum DashboardActionTypes {
 
 export class GetEvents implements Action {
   readonly type = DashboardActionTypes.dashboardEvents;
+
+  constructor(public payload: any) {
+  }
 }
 
 export class GetCards implements Action {
