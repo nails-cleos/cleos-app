@@ -118,7 +118,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   minDate: any;
   maxDate: any;
-  showTime = false;
   maxCalendarDate: Date;
 
   private productId: string | undefined;
@@ -155,6 +154,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.customer.setValue(this.extras.customer);
       this.room.setValue(this.extras.room);
       this.date.setValue(this.extras.date);
+      this.start.setValue(getTime(this.extras.date, this.locale));
     }
     this.store.select(selectAuthState).subscribe((state: any) => {
       if (state.user) {
@@ -213,12 +213,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       } else {
         this.getProductList();
       }
-    }
-    if (this.showTime) {
-      this.productForm = this.formBuilder.group({
-        ...this.productForm.controls,
-        start: this.start
-      });
       const day = this.date.value.getDay();
       let av: IAvailability;
       const {week, saturday, sunday} = getAvailability(this.room.value);
@@ -462,7 +456,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.productForm = this.formBuilder.group({
       product: this.product,
       discount: this.discount,
-      date: this.date
+      date: this.date,
+      start: this.start
     });
     this.roomForm = this.formBuilder.group({
       room: this.room
@@ -735,7 +730,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private setData(reservation: IReservationAll): void {
     this.reservation = reservation;
-    this.showTime = true;
+    this.isPreview = false;
     const date = newDate(reservation.start);
     this.room.setValue(reservation.room);
     this.date.setValue(date);

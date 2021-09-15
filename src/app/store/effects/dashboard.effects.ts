@@ -14,7 +14,7 @@ export class DashboardEffects {
 
   getEvents$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.dashboardEvents)).pipe(
     map((action: any) => action.payload),
-    switchMap(() => this.dashboardService.getEvents().pipe(
+    switchMap((payload: any) => this.dashboardService.getEvents(payload).pipe(
       switchMap((response: any) => of(new fromActionsDashboard.DashboardSuccess(response ? response : []))),
       catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashboardFailure({error: err.error})))
     ))
@@ -34,6 +34,6 @@ export class DashboardEffects {
 
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private router: Router,
-              private dashboardService: DashboardService, private trackingService: TrackingService) {
+              private dashboardService: DashboardService) {
   }
 }

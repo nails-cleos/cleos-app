@@ -5,18 +5,18 @@
       *ngIf="!isCalendarLoading" [innerHTML]="'DASHBOARD.TOTAL_RESERVATIONS' | translate: {total: total}"></span>
     </mat-card-title>
     <mat-card-subtitle *ngIf="!isCalendarLoading" class="calendar-title">
-      <button (viewDateChange)="closeOpenMonthViewDay()" [(viewDate)]="viewDate" [view]="view" color="accent"
-              mat-raised-button mwlCalendarPreviousView>
+      <button (click)="changeDate()" (viewDateChange)="closeOpenMonthViewDay()" [(viewDate)]="viewDate" [view]="view"
+              color="accent" mat-raised-button mwlCalendarPreviousView>
         <mat-icon>navigate_before</mat-icon>
         <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.PREVIOUS' | translate}}</span>
       </button>
-      <button [(viewDate)]="viewDate" class="btn btn-outline-secondary" color="accent" mat-raised-button
-              mwlCalendarToday>
+      <button (click)="changeDate()" [(viewDate)]="viewDate" class="btn btn-outline-secondary" color="accent"
+              mat-raised-button mwlCalendarToday>
         <mat-icon>today</mat-icon>
         <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.TODAY' | translate}}</span>
       </button>
-      <button (viewDateChange)="closeOpenMonthViewDay()" [(viewDate)]="viewDate" [view]="view" color="accent"
-              mat-raised-button mwlCalendarNextView>
+      <button (click)="changeDate()" (viewDateChange)="closeOpenMonthViewDay()" [(viewDate)]="viewDate" [view]="view"
+              color="accent" mat-raised-button mwlCalendarNextView>
         <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.NEXT' | translate}}</span>
         <mat-icon>navigate_next</mat-icon>
       </button>
@@ -42,8 +42,8 @@
   </mat-grid-tile>
   <!--Charts-->
   <mat-grid-tile *ngFor="let chart of charts" [colspan]="cardLayout.chart?.cols" [rowspan]="cardLayout.chart?.rows">
-    <app-card [chart]="chart" [title]="chart.title" [isDark]="isDarkMode">
-      <app-chart [chartSummary]="chart" [state]="state" [isDark]="isDarkMode"></app-chart>
+    <app-card [chart]="chart" [isDark]="isDarkMode" [title]="chart.title">
+      <app-chart [chartSummary]="chart" [isDark]="isDarkMode" [state]="state"></app-chart>
     </app-card>
   </mat-grid-tile>
   <!--Table-->

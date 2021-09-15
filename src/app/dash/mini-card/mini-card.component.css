@@ -19,9 +19,18 @@
   color: grey;
 }
 
+.card-icon {
+  margin-right: 0 !important;
+  vertical-align: middle;
+  transform: scale(2.2);
+}
+
 .avatar-icon {
-  margin: 15px;
-  transform: scale(2);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
 }
 
 .duration {
@@ -33,10 +42,11 @@
   margin-top: 10px;
 }
 
-.card-icon {
-  margin-right: 15px;
-}
-
 .card-header {
   justify-content: center;
+}
+
+.trending {
+  margin-right: 0 !important;
+  vertical-align: middle;
 }

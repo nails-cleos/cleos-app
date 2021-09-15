@@ -134,6 +134,10 @@ export class DashComponent implements OnInit, OnDestroy {
     this.activeDayIsOpen = false;
   }
 
+  changeDate(): void {
+    this.getEvents();
+  }
+
   private clean(): void {
     this.store.dispatch(
       new fromActionsReservation.Clean()
@@ -198,11 +202,17 @@ export class DashComponent implements OnInit, OnDestroy {
   }
 
   private getSummaries(): void {
-    this.store.dispatch(
-      new fromActionsDashboard.GetEvents()
-    );
+    this.getEvents();
     this.store.dispatch(
       new fromActionsDashboard.GetCards()
+    );
+  }
+
+  private getEvents(): void {
+    this.events = [];
+    this.isCalendarLoading = true;
+    this.store.dispatch(
+      new fromActionsDashboard.GetEvents(this.viewDate)
     );
   }
 }
