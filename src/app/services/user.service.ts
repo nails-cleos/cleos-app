@@ -18,13 +18,17 @@ export class UserService {
   constructor(private http: HttpClient) {
   }
 
-  public getAll(sort: string, direction: string, page: number, size: number = PAGE_SIZE): Observable<IUser[]> {
+  public getAll(sort: string, direction: string, page: number, size: number = PAGE_SIZE,
+                filter: string): Observable<IUser[]> {
     let params = new HttpParams().set('page', String(page)).set('size', String(size));
     if (sort) {
       params = params.append('sort', sort);
     }
     if (direction) {
       params = params.append('direction', direction);
+    }
+    if (filter) {
+      params = params.append('filter', filter);
     }
 
     return this.http.get<IUser[]>(`${this.url}/pages`, {params});

@@ -153,8 +153,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.productId = this.extras.product?.id;
       this.customer.setValue(this.extras.customer);
       this.room.setValue(this.extras.room);
-      this.date.setValue(this.extras.date);
-      this.start.setValue(getTime(this.extras.date, this.locale));
+      if (this.extras.date) {
+        this.date.setValue(this.extras.date);
+        this.start.setValue(getTime(this.extras.date, this.locale));
+      }
     }
     this.store.select(selectAuthState).subscribe((state: any) => {
       if (state.user) {
