@@ -1,3 +1,9 @@
+<mat-form-field appearance="fill">
+  <mat-label>{{ 'COMMON.LABEL.FILTER' | translate }}</mat-label>
+  <label>
+    <input (keyup)="applyFilter($event)" [formNoValidate]="true" autocomplete="off" matInput type="text">
+  </label>
+</mat-form-field>
 <div class="mat-elevation-z8">
   <table [dataSource]="dataSource" mat-table matSort matSortActive="username" matSortDirection="desc"
          matSortDisableClear multiTemplateDataRows>
@@ -85,26 +91,23 @@
     </ng-container>
 
     <ng-container matColumnDef="actions">
-      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-      <td *matCellDef="let user" mat-cell>
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+      <td *matCellDef="let user" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="user.id; else skeleton">
-          <button (click)="edit(user)" *ngIf="!user.deleted" mat-icon-button
-                  matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="above">
+          <button (click)="edit(user)" *ngIf="!user.deleted" mat-icon-button>
             <mat-icon color="primary">edit</mat-icon>
           </button>
           <button [routerLink]="['/users', user.id, 'overview']" mat-icon-button>
             <mat-icon color="primary">analytics</mat-icon>
           </button>
-          <button (click)="delete(user)" *ngIf="!user.deleted"
-                  mat-icon-button
-                  matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}"
-                  matTooltipPosition="above">
+          <button (click)="book(user)" *ngIf="!user.deleted" mat-icon-button>
+            <mat-icon color="accent">today</mat-icon>
+          </button>
+          <button (click)="delete(user)" *ngIf="!user.deleted" mat-icon-button>
             <mat-icon color="warn">delete</mat-icon>
           </button>
           <button (click)="sendInvite(user)" *ngIf="!user.deleted && !user.enabled && user.provider === 'LOCAL'"
-                  mat-icon-button
-                  matTooltip="{{ 'COMMON.BUTTON.INVITE' | translate }}"
-                  matTooltipPosition="above">
+                  mat-icon-button>
             <mat-icon color="accent">forward_to_inbox</mat-icon>
           </button>
         </div>
@@ -165,6 +168,25 @@
                 </div>
               </div>
             </div>
+            <div fxHide fxShow.lt-sm mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+            <div fxHide fxShow.lt-sm>
+              <button (click)="edit(user)" *ngIf="!user.deleted" mat-icon-button>
+                <mat-icon color="primary">edit</mat-icon>
+              </button>
+              <button *ngIf="!user.deleted" [routerLink]="['/users', user.id, 'overview']" mat-icon-button>
+                <mat-icon color="primary">analytics</mat-icon>
+              </button>
+              <button (click)="book(user)" *ngIf="!user.deleted" mat-icon-button>
+                <mat-icon color="accent">today</mat-icon>
+              </button>
+              <button (click)="delete(user)" *ngIf="!user.deleted" mat-icon-button>
+                <mat-icon color="warn">delete</mat-icon>
+              </button>
+              <button (click)="sendInvite(user)" *ngIf="!user.deleted && !user.enabled && user.provider === 'LOCAL'"
+                      mat-icon-button>
+                <mat-icon color="accent">forward_to_inbox</mat-icon>
+              </button>
+            </div>
           </mat-list>
         </div>
       </td>
@@ -172,7 +194,8 @@
 
     <ng-container matColumnDef="noContent">
       <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-        {{ 'USER.LIST.ERROR.NO_CONTENT' | translate }}</td>
+        {{ 'USER.LIST.ERROR.NO_CONTENT' | translate }} '{{filter}}'
+      </td>
     </ng-container>
 
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>

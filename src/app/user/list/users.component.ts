@@ -16,6 +16,7 @@ import { getUserName, snakeToCamel } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
 import { RoleIconName, RoleIconKey } from '../../util/icon';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-users',
@@ -29,17 +30,19 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
 
   displayedColumns: string[] = ['position', 'name', 'username', 'email', 'provider', 'status', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IUser>>();
-  subscription: Subscription | undefined;
-  expandedUser: IUser | undefined;
-  getState: Observable<any>;
 
-  allRole: Role[] = [Role.customer, Role.professional, Role.admin];
+  expandedUser: IUser | undefined;
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
+  filter: string | undefined;
+
+  private subscription: Subscription | undefined;
+  private getState: Observable<any>;
+  private allRole: Role[] = [Role.customer, Role.professional, Role.admin];
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+              private router: Router, private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -66,6 +69,12 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getUsername(user: IUser): string {
     return getUserName(user);
+  }
+
+  applyFilter(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.filter = filterValue.trim().toLowerCase();
+    this.getUsers(0);
   }
 
   edit(user: IUser): void {
@@ -125,6 +134,11 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
+  book(customer: IUser): void {
+    const data = {customer};
+    this.router.navigate(['reservation'], {state: data});
+  }
+
   private clean(): void {
     this.store.dispatch(
       new fromActionsUser.Clean()
@@ -146,6 +160,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
       active: this.sort.active,
       direction: this.sort.direction,
       size: this.pageSize,
+      filter: this.filter,
       page
     };
     this.store.dispatch(
