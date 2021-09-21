@@ -49,8 +49,14 @@
           mat-sort-header>{{ 'UNAVAILABLE.LIST.COLUMN.DURATION' | translate }}</th>
       <td *matCellDef="let unavailable" class="column-large-text" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="unavailable.id; else skeleton">
-          <mat-icon matPrefix>timer</mat-icon>&nbsp;
-          {{unavailable.hour | number:'2.0-0'}}:{{unavailable.minute | number:'2.0-0'}}
+          <div *ngIf="!unavailable.allDay; else allDay">
+            <mat-icon matPrefix>timer</mat-icon>&nbsp;
+            {{unavailable.hour | number:'2.0-0'}}:{{unavailable.minute | number:'2.0-0'}}
+          </div>
+          <ng-template #allDay>
+            <mat-icon matPrefix>timer</mat-icon>&nbsp;
+            {{'UNAVAILABLE.ALL_DAY.CHECK' | translate}}
+          </ng-template>
         </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -91,11 +97,11 @@
     </ng-container>
 
     <ng-container matColumnDef="noContent">
-      <td class="no-content bold" mat-footer-cell *matFooterCellDef [attr.colspan]="displayedColumns.length">
+      <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
         {{ 'UNAVAILABLE.LIST.ERROR.NO_CONTENT' | translate }}</td>
     </ng-container>
 
-    <tr mat-footer-row *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0"></tr>
+    <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
 
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
     <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>

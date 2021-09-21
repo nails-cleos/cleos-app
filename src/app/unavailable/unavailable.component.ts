@@ -9,6 +9,7 @@ import { IUser, IUserAll } from '../interfaces/user';
 import { requireMatch } from '../util/validators';
 import { map, startWith } from 'rxjs/operators';
 import {
+  API_LOCALE,
   createNewDate,
   diffTime,
   filterDateRoom,
@@ -21,7 +22,6 @@ import {
 import { IRoomAll } from '../interfaces/room';
 import { getUserName } from '../util/helper';
 import { Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-unavailable',
@@ -50,6 +50,8 @@ export class UnavailableComponent implements OnInit, OnDestroy {
   repeat: FormControl = new FormControl('', [
     Validators.required
   ]);
+  allDay: FormControl = new FormControl();
+
   repeats = UnavailableRepeatType;
 
   errors: any = [];
@@ -62,10 +64,17 @@ export class UnavailableComponent implements OnInit, OnDestroy {
 
   private getState: Observable<any>;
   private subscription: Subscription | undefined;
+  private readonly extras: any;
 
-  constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private router: Router,
-              private translate: TranslateService) {
+  constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private router: Router) {
     this.getState = this.store.select(selectUnavailableState);
+    this.extras = this.router.getCurrentNavigation()?.extras.state;
+    if (this.extras) {
+      this.room = this.extras.room;
+      this.professional.setValue(this.extras.room.professional);
+      this.startDate.setValue(this.extras.date);
+      this.startTime.setValue(getTime(this.extras.date, API_LOCALE));
+    }
   }
 
   ngOnInit(): void {
@@ -97,6 +106,7 @@ export class UnavailableComponent implements OnInit, OnDestroy {
     unavailable.start = date.toLocaleString('en-GB');
     unavailable.repeat = this.repeat.value;
     unavailable.duration = this.duration.value;
+    unavailable.allDay = this.allDay.value;
 
     this.store.dispatch(
       new fromActionsUnavailable.UnavailableSave(unavailable)
@@ -117,8 +127,8 @@ export class UnavailableComponent implements OnInit, OnDestroy {
       const day = date.getDay();
       const {minDate, maxDate} = getMinMaxDate(day, $event.value, this.room);
       max = maxDate;
-      this.minTime = getTime(minDate, this.translate.currentLang);
-      this.maxTime = getTime(maxDate, this.translate.currentLang);
+      this.minTime = getTime(minDate, API_LOCALE);
+      this.maxTime = getTime(maxDate, API_LOCALE);
     }
 
     const maxHour = max?.getHours();
@@ -126,10 +136,10 @@ export class UnavailableComponent implements OnInit, OnDestroy {
 
     const d = diffTime(date, maxHour, diffMin);
 
-    this.startTime.setValue('');
-    this.duration.setValue('');
+    this.startTime.setValue(undefined);
+    this.duration.setValue(undefined);
     this.showDuration = false;
-    this.durationMax = formatTime(d, this.translate.currentLang);
+    this.durationMax = formatTime(d, API_LOCALE);
   }
 
   setTime($event: any): void {
@@ -146,9 +156,9 @@ export class UnavailableComponent implements OnInit, OnDestroy {
 
     const d = diffTime(date, Number(maxHour), Number(diffMin));
 
-    this.duration.setValue('');
+    this.duration.setValue(undefined);
     this.showDuration = true;
-    this.durationMax = formatTime(d, this.translate.currentLang);
+    this.durationMax = formatTime(d, API_LOCALE);
   }
 
   getRoom(user: IUser): void {
@@ -163,8 +173,8 @@ export class UnavailableComponent implements OnInit, OnDestroy {
       const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time[0], time[1]);
       const day = date.getDay();
       const {minDate, maxDate} = getMinMaxDate(day, date, this.room);
-      this.minTime = getTime(minDate, this.translate.currentLang);
-      this.maxTime = getTime(maxDate, this.translate.currentLang);
+      this.minTime = getTime(minDate, API_LOCALE);
+      this.maxTime = getTime(maxDate, API_LOCALE);
     }
   }
 
@@ -175,7 +185,21 @@ export class UnavailableComponent implements OnInit, OnDestroy {
       startDate: this.startDate,
       startTime: this.startTime,
       duration: this.duration,
-      repeat: this.repeat
+      repeat: this.repeat,
+      allDay: this.allDay
+    });
+    this.allDay.valueChanges.subscribe(value => {
+      if (value) {
+        this.duration.clearValidators();
+        this.duration.updateValueAndValidity();
+        this.startTime.clearValidators();
+        this.startTime.updateValueAndValidity();
+      } else {
+        this.duration.setValidators(Validators.required);
+        this.duration.updateValueAndValidity();
+        this.startTime.setValidators(Validators.required);
+        this.startTime.updateValueAndValidity();
+      }
     });
     this.filteredOptions = this.professional.valueChanges.pipe(
       startWith(''),

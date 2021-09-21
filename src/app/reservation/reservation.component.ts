@@ -25,17 +25,17 @@ import {
   Duration,
   filterDateRoom,
   getAvailability,
+  getDuration,
   getNow,
   getStartEndDay,
   getTime,
-  getWeekDay,
   greaterOrEqualsThan,
   IDuration,
   isBetween,
   newDate,
   reservationDateTime
 } from '../util/dates';
-import { fillNotAvailable, getOverlapEvent, Meta, newEvent } from '../util/event';
+import { createRecurringEvent, fillNotAvailable, getOverlapEvent, Meta, newEvent } from '../util/event';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DateAdapter } from '@angular/material/core';
 import { GeocoderResult } from '@agm/core';
@@ -94,9 +94,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     Validators.required
   ]);
 
-  start: FormControl = new FormControl('', [
-    Validators.required
-  ]);
+  start: FormControl = new FormControl('');
 
   viewDate: Date = getNow();
   dayStartHour = 9;
@@ -518,34 +516,15 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   private addUnavailableList(): void {
     let recurringEvents: any[] = [];
     this.unavailableList?.forEach(it => {
-      if (it.duration) {
+      if (it.duration || it.allDay) {
         const start = newDate(it.start);
-        const duration = convertDuration(it.duration);
+        const duration = getDuration(it.duration, this.room.value, newDate(it.start));
         if (it.repeat === 'NONE') {
           if (!greaterOrEqualsThan(start, this.maxDate)) {
             this.validateUnavailableEvent(start, duration, it);
           }
         } else {
-          let startDate;
-          let rrule;
-          switch (it.repeat) {
-            case 'ONCE_A_WEEK':
-              const byweekday = getWeekDay(start.getDay());
-              startDate = createNewDate(addDays(this.viewDate, (start.getDay() + 7 - this.viewDate.getDay()) % 7),
-                start.getHours(), start.getMinutes());
-              rrule = {
-                freq: RRule.WEEKLY,
-                byweekday
-              };
-              break;
-            case 'EVERY_DAY':
-              startDate = createNewDate(this.viewDate, start.getHours(), start.getMinutes());
-              rrule = {
-                freq: RRule.DAILY
-              };
-              break;
-          }
-          recurringEvents = [...recurringEvents, {duration, it, startDate, rrule}];
+          recurringEvents = [...recurringEvents, createRecurringEvent(it.repeat, start, this.viewDate, it, duration)];
         }
       }
     });
@@ -638,7 +617,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           this.unavailableList = state.data.unavailableList;
           this.addReservations();
           this.addUnavailableList();
-          if (this.extras?.date && !this.eventSelected) {
+          if ((this.extras?.date || this.start.value && this.myStepper.selectedIndex === 3) && !this.eventSelected) {
             this.segmentClick(this.date.value, 'CREATED');
           } else if (this.reservation && this.date && this.myStepper.selectedIndex === 3) {
             let date: Date;

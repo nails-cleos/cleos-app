@@ -648,6 +648,9 @@
       "FIELD": "Duración",
       "REQUIRED": "Duración es <b>requerido</b>"
     },
+    "ALL_DAY": {
+      "CHECK": "Todo el día"
+    },
     "REPEAT": {
       "FIELD": "Repetir"
     },

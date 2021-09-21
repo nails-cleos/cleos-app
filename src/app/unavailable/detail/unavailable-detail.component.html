@@ -37,7 +37,9 @@
                              [innerHTML]="'UNAVAILABLE.DATE.REQUIRED' | translate">
                   </mat-error>
                 </mat-form-field>
-                <mat-form-field appearance="fill" style="margin-right: 12px;">
+                <mat-checkbox [formControl]="allDay"
+                              color="primary">{{ 'UNAVAILABLE.ALL_DAY.CHECK' | translate }}</mat-checkbox>
+                <mat-form-field *ngIf="!allDay.value" appearance="fill" style="margin-right: 12px;">
                   <mat-label>{{ 'UNAVAILABLE.TIME.FIELD' | translate }}</mat-label>
                   <label>
                     <input (focusin)="focusin()" [formControl]="startTime" [format]="24" [max]="maxTime" [min]="minTime"
@@ -52,7 +54,7 @@
                 </mat-form-field>
               </div>
 
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="fill" *ngIf="!allDay.value">
                 <mat-label>{{ 'UNAVAILABLE.DURATION.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="duration" [format]="24" [max]="durationMax" [ngxTimepicker]="t" matInput

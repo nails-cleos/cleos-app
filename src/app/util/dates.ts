@@ -1,4 +1,4 @@
-import { IAvailability, IRoom } from '../interfaces/room';
+import { IAvailability, IAvailabilityAll, IRoom } from '../interfaces/room';
 import {
   addDays,
   addMonths,
@@ -15,6 +15,8 @@ import {
 } from 'date-fns';
 import RRule, { Weekday } from 'rrule';
 
+export const API_LOCALE = 'en-GB';
+
 export interface IDuration {
   hour: number;
   minute: number;
@@ -29,6 +31,34 @@ export class Duration implements IDuration {
     this.minute = minute;
   }
 }
+
+export const getDuration = (duration: string, room: IRoom, date: Date): IDuration => {
+  if (duration) {
+    return convertDuration(duration);
+  }
+  const {week, saturday, sunday} = getAvailability(room);
+  let av: IAvailabilityAll;
+  switch (date.getDay()) {
+    case 0:
+      av = sunday;
+      break;
+    case 6:
+      av = saturday;
+      break;
+    default:
+      av = week;
+      break;
+  }
+  const start = timeToDateTime(av.start, date);
+  const end = timeToDateTime(av.end, date);
+
+  const hours = (getMinutesBetweenTimes(start, end) / 60);
+  const diffHour = Math.floor(hours);
+  const minutes = (hours - diffHour) * 60;
+  const diffMinute = Math.round(minutes);
+
+  return new Duration(diffHour, diffMinute);
+};
 
 export const convertDuration = (duration: string): IDuration => {
   const hIndex = duration.indexOf('H');
@@ -120,9 +150,7 @@ export const getAvailability = (room: IRoom): any => {
 };
 
 export const getMinMaxDate = (day: number, date: any, room: IRoom): any => {
-  let minDate;
-  let maxDate;
-  let av: IAvailability;
+  let av: IAvailabilityAll;
   const {week, saturday, sunday} = getAvailability(room);
   switch (day) {
     case 0:
@@ -135,15 +163,11 @@ export const getMinMaxDate = (day: number, date: any, room: IRoom): any => {
       av = week;
       break;
   }
-  if (av.start) {
-    const avStart = av.start.split(':');
-    minDate = new Date(new Date(date).setHours(Number(avStart[0]), Number(avStart[1])));
-  }
+  const avStart = av.start.split(':');
+  const minDate = new Date(new Date(date).setHours(Number(avStart[0]), Number(avStart[1])));
 
-  if (av.end) {
-    const avEnd = av.end.split(':');
-    maxDate = new Date(new Date(date).setHours(Number(avEnd[0]), Number(avEnd[1])));
-  }
+  const avEnd = av.end.split(':');
+  const maxDate = new Date(new Date(date).setHours(Number(avEnd[0]), Number(avEnd[1])));
 
   return {minDate, maxDate};
 };
@@ -333,3 +357,8 @@ const getMinAndMax = (availability: IAvailability, date: Date): any => {
 
 const getMinutesBetweenTimes = (date1: Date, date2: Date): number =>
   Math.abs(Math.round((date1.getTime() - date2.getTime()) / (1000 * 60)));
+
+const timeToDateTime = (stringTime: string, date: Date): Date => {
+  const time = stringTime.split(':');
+  return createNewDate(date, Number(time[0]), Number(time[1]));
+};

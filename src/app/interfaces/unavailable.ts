@@ -16,6 +16,7 @@ export interface IUnavailable {
   duration?: string;
   startDate?: Date;
   startTime?: string;
+  allDay?: boolean;
 }
 
 export interface IUnavailableAll {
@@ -25,6 +26,7 @@ export interface IUnavailableAll {
   duration: string;
   professional: IUser;
   repeat: string;
+  allDay: boolean;
 }
 
 export class Unavailable implements IUnavailable {

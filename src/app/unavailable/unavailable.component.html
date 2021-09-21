@@ -58,11 +58,13 @@
                     {{errors['startDate']}}
                   </mat-error>
                 </mat-form-field>
-                <mat-form-field appearance="fill" style="margin-right: 12px;">
+                <mat-checkbox [formControl]="allDay"
+                              color="primary">{{ 'UNAVAILABLE.ALL_DAY.CHECK' | translate }}</mat-checkbox>
+                <mat-form-field *ngIf="!allDay.value" appearance="fill" style="margin-right: 12px;">
                   <mat-label>{{ 'UNAVAILABLE.TIME.FIELD' | translate }}</mat-label>
                   <label>
                     <input (focusin)="focusin()" [formControl]="startTime" [format]="24" [max]="maxTime" [min]="minTime"
-                           [ngxTimepicker]="time" matInput name="start_time" readonly required/>
+                           [ngxTimepicker]="time" matInput name="start_time" readonly/>
                   </label>
                   <span matPrefix><mat-icon (click)="time.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
                   <ngx-material-timepicker #time (timeSet)="setTime($event)"
@@ -73,11 +75,11 @@
                 </mat-form-field>
               </div>
 
-              <mat-form-field *ngIf="showDuration" appearance="fill">
+              <mat-form-field *ngIf="showDuration && !allDay.value" appearance="fill">
                 <mat-label>{{ 'UNAVAILABLE.DURATION.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="duration" [format]="24" [max]="durationMax" [ngxTimepicker]="t" matInput
-                         name="duration" readonly required/>
+                         name="duration" readonly/>
                 </label>
                 <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
                 <ngx-material-timepicker #t [minutesGap]="15"></ngx-material-timepicker>

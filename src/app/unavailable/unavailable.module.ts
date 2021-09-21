@@ -11,6 +11,7 @@ import { UnavailableRoutingModule } from './unavailable-routing.module';
 import { UnavailableComponent } from './unavailable.component';
 import { UnavailableDetailComponent } from './detail/unavailable-detail.component';
 import { UnavailableListComponent } from './list/unavailable-list.component';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { UnavailableListComponent } from './list/unavailable-list.component';
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    AppMaterialModule
+    AppMaterialModule,
+    MatCheckboxModule
   ]
 })
 export class UnavailableModule {

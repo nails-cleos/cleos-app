@@ -68,8 +68,7 @@
           <mat-label>{{ 'RESERVATION.DATE.FIELD' | translate }}</mat-label>
           <label>
             <input (focus)="picker.open()" [formControl]="date" [matDatepickerFilter]="myFilter"
-                   [matDatepicker]="picker" [max]="maxCalendarDate"
-                   matInput required>
+                   [matDatepicker]="picker" [max]="maxCalendarDate" matInput required>
           </label>
           <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
           <mat-datepicker #picker touchUi></mat-datepicker>
@@ -85,9 +84,6 @@
           </label>
           <span matPrefix><mat-icon (click)="tStart.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
           <ngx-material-timepicker #tStart (timeSet)="timeChange($event)" [minutesGap]="15"></ngx-material-timepicker>
-          <mat-error *ngIf="start.hasError('required')"
-                     [innerHTML]="'RESERVATION.START.REQUIRED' | translate">
-          </mat-error>
         </mat-form-field>
         <div>
           <mat-form-field *ngIf="products; else skeleton" appearance="fill">
