@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -6,9 +6,8 @@ import { Store } from '@ngrx/store';
 import { AppState, selectProductState } from '../../store/app.states';
 import * as fromActionsProduct from '../../store/product.actions';
 import { fieldChange, valueChange } from '../../util/validators';
-import { IProduct, Product } from '../../interfaces/product';
-import { formatDuration } from '../../util/dates';
-import { TranslateService } from '@ngx-translate/core';
+import { IProduct, IProductGroup, Product, ProductGroup } from '../../interfaces/product';
+import { API_LOCALE, createNewDate, formatDuration, getNow, getTime } from '../../util/dates';
 
 @Component({
   selector: 'app-product-detail',
@@ -16,25 +15,24 @@ import { TranslateService } from '@ngx-translate/core';
   styleUrls: ['./product-detail.component.scss']
 })
 export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('inputName') inputName: ElementRef<HTMLInputElement> | undefined;
+  @Input() group: IProductGroup | undefined;
 
-  @Input() product: IProduct | undefined;
   form!: FormGroup;
-  subscription: Subscription | undefined;
-  getState: Observable<any>;
-  errors: any = [];
 
   name: FormControl = new FormControl('', [
     Validators.required
   ]);
-  price: FormControl = new FormControl('', [
-    Validators.required, Validators.min(1)
-  ]);
-  duration: FormControl = new FormControl('', [
-    Validators.required
-  ]);
+  selected = new FormControl(0);
+  products: IProduct[] = [];
+
+  errors: any = [];
+
+  private subscription: Subscription | undefined;
+  private getState: Observable<any>;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
-              private router: Router, private translate: TranslateService) {
+              private router: Router) {
     this.getState = this.store.select(selectProductState);
   }
 
@@ -55,40 +53,102 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     if (this.form.invalid) {
       return;
     }
-    const product: IProduct = new Product();
-    product.id = this.product?.id;
-    product.name = fieldChange(this.name, this.product?.name);
-    product.description = valueChange(this.form.value?.description, this.product?.description);
-    product.price = fieldChange(this.price, this.product?.price);
-    product.duration = fieldChange(this.duration, this.product?.duration);
-    product.durability = valueChange(this.form.value?.durability, this.product?.durability);
+    let hasError = false;
+    this.products = this.products.map((tab: IProduct) => {
+      const errors: any = {};
+      if (!tab.name || tab.name.trim().length === 0) {
+        errors.name = 'REQUIRED';
+        hasError = true;
+      }
+      if (!tab.price) {
+        errors.price = 'REQUIRED';
+        hasError = true;
+      } else if (tab.price <= 0) {
+        errors.price = 'GREATER';
+        hasError = true;
+      }
+      if (!tab.duration || tab.duration.trim().length === 0) {
+        errors.duration = 'REQUIRED';
+        hasError = true;
+      }
+      return Object.assign({}, tab, {errors});
+    });
 
-    this.store.dispatch(new fromActionsProduct.ProductUpdate(product));
+    if (hasError) {
+      return;
+    }
+
+    const group: IProductGroup = new ProductGroup();
+    group.id = this.group?.id;
+    group.name = fieldChange(this.name, this.group?.name);
+    group.description = valueChange(this.form.value?.description, this.group?.description);
+    group.durability = valueChange(this.form.value?.durability, this.group?.durability);
+    group.products = this.products;
+
+    this.store.dispatch(new fromActionsProduct.ProductUpdate(group));
+  }
+
+  addTab(): void {
+    if (this.inputName) {
+      const product: IProduct = new Product(this.inputName.nativeElement.value);
+      this.inputName.nativeElement.value = '';
+
+      this.products.push(product);
+      this.selected.setValue(this.products.length - 1);
+    }
+  }
+
+  removeTab(index: number): void {
+    this.products.splice(index, 1);
+  }
+
+  setValue(product: IProduct, attribute: string, $event: any): void {
+    // @ts-ignore
+    product[attribute] = $event.target.value;
+  }
+
+  setTime(product: IProduct, $event: any): void {
+    const time = $event.split(':');
+    const date = createNewDate(getNow(), time[0], time[1]);
+    product.duration = getTime(date, API_LOCALE);
+  }
+
+  setPrimary(tab: IProduct): void {
+    this.products = this.products.map(t => {
+      t.primary = false;
+      return t;
+    });
+
+    tab.primary = true;
   }
 
   private createForm(): void {
     this.form = this.formBuilder.group({
       name: this.name,
       description: new FormControl(),
-      durability: new FormControl(),
-      price: this.price,
-      duration: this.duration
+      durability: new FormControl()
     });
   }
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
-        this.product = {
+        this.group = {
           id: state.selected.id,
           name: state.selected.name,
           description: state.selected.description,
-          price: state.selected.price,
           durability: state.selected.durability
-        } as IProduct;
+        } as IProductGroup;
+        this.form.patchValue(this.group);
 
-        this.product.duration = formatDuration(state.selected.duration, this.translate.currentLang);
-        this.form.patchValue(this.product);
+        this.products = [...state.selected.products?.map((p: IProduct) => {
+          if (p.duration) {
+            const duration = formatDuration(p.duration, API_LOCALE);
+
+            return Object.assign({}, p, {duration, errors: {}});
+          }
+          return Object.assign({}, p, {errors: {}});
+        })];
       }
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
@@ -102,7 +162,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   private getProduct(): void {
-    if (!this.product) {
+    if (!this.group) {
       const id = this.route.snapshot.paramMap.get('id');
       this.store.dispatch(
         new fromActionsProduct.ProductFind(id)

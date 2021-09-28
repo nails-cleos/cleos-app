@@ -30,8 +30,8 @@
       "NOTIFY": "Notify",
       "SELECT": "Select",
       "EXPAND": {
-        "TRUE": "Click to show more",
-        "FALSE": "Click to show less"
+        "TRUE": "Click to show less",
+        "FALSE": "Click to show more"
       },
       "DISCOUNT": {
         "SHOW": "Show discounts",
@@ -289,10 +289,16 @@
         "DURATION": "Duration"
       },
       "ERROR": {
-        "NO_CONTENT": "No products"
+        "NO_CONTENT": "No products",
+        "REQUIRED": "At least one product is required"
       }
     },
-    "TITLE": "Add product",
+    "TITLE": "Add products",
+    "GROUP": {
+      "FIELD": "Product type",
+      "REQUIRED": "Product type is <b>required</b>",
+      "INVALID": "Product type is invalid"
+    },
     "FIELD": "Product",
     "REQUIRED": "Product is <b>required</b>",
     "INVALID": "Product is invalid",
@@ -315,8 +321,11 @@
     "DURABILITY": {
       "FIELD": "Durability"
     },
+    "PRIMARY": {
+      "CHECK": "Primary"
+    },
     "CREATED": "Product {{name}} created",
-    "DETAIL": "Update product",
+    "DETAIL": "Update products",
     "DELETED": {
       "TITLE": "Delete product",
       "CONTENT": "Are you sure to delete product {{name}}?",

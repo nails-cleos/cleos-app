@@ -25,7 +25,8 @@ export interface ICardSummary {
 }
 
 export interface ICalendarSummary {
-  reservationId: string;
+  reservationId?: string;
+  unavailableId?: string;
   title: string;
   start: string;
   end: string;

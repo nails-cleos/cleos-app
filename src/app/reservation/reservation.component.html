@@ -59,7 +59,7 @@
 
 <ng-template #stepThree>
   <form [formGroup]="productForm">
-    <div *ngIf="!products?.length; else data" class="no-content bold">
+    <div *ngIf="!groups?.length; else data" class="no-content bold">
       {{'PRODUCT.LIST.ERROR.NO_CONTENT' | translate}}
     </div>
     <ng-template #data>
@@ -85,8 +85,29 @@
           <span matPrefix><mat-icon (click)="tStart.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
           <ngx-material-timepicker #tStart (timeSet)="timeChange($event)" [minutesGap]="15"></ngx-material-timepicker>
         </mat-form-field>
+        <mat-form-field *ngIf="groups; else skeleton" appearance="fill">
+          <mat-label>{{ 'PRODUCT.GROUP.FIELD' | translate }}</mat-label>
+          <label>
+            <input (keydown)="keyDownGroup($event)" [formControl]="group" [matAutocomplete]="autoGroup"
+                   matInput required type="text">
+          </label>
+          <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
+            <mat-option *ngFor="let group of filteredGroup | async" [value]="group">
+              {{group.name}}
+            </mat-option>
+          </mat-autocomplete>
+          <mat-error *ngIf="group.hasError('required')"
+                     [innerHTML]="'PRODUCT.GROUP.REQUIRED' | translate">
+          </mat-error>
+          <mat-error *ngIf="group.hasError('requireMatch')"
+                     [innerHTML]="'PRODUCT.GROUP.INVALID' | translate">
+          </mat-error>
+          <mat-error *ngIf="errors['group']">
+            {{errors['group']}}
+          </mat-error>
+        </mat-form-field>
         <div>
-          <mat-form-field *ngIf="products; else skeleton" appearance="fill">
+          <mat-form-field *ngIf="products" appearance="fill">
             <mat-label>{{ 'PRODUCT.FIELD' | translate }}</mat-label>
             <label>
               <input (keydown)="keyDownHandler($event, product)" [formControl]="product" [matAutocomplete]="autoProduct"
@@ -113,7 +134,7 @@
             <mat-icon>redeem</mat-icon>
           </button>
         </div>
-        <mat-form-field *ngIf="showDiscount && !isEditing" appearance="fill">
+        <mat-form-field *ngIf="product.value && showDiscount && !isEditing" appearance="fill">
           <mat-label>{{ 'RESERVATION.PRODUCT.DISCOUNT.FIELD' | translate }}</mat-label>
           <mat-select [formControl]="discount">
             <mat-option>--</mat-option>
@@ -131,6 +152,7 @@
 <ng-template #stepFour>
   <mwl-calendar-week-view
     (beforeViewRender)="beforeMonthViewRender($event)"
+    (eventTimesChanged)="eventTimesChanged($event)"
     (hourSegmentClicked)="segmentClick($event.date, 'CREATED')"
     [dayEndHour]="dayEndHour"
     [dayEndMinute]="dayEndMinute"
@@ -140,6 +162,7 @@
     [events]="events"
     [hourSegments]="4"
     [locale]="locale"
+    [refresh]="refresh"
     [viewDate]="viewDate"
     [weekendDays]="weekendDays"></mwl-calendar-week-view>
   <mat-error *ngIf="this.errors['schedule']" [innerHTML]="'RESERVATION.SCHEDULE.REQUIRED' | translate"

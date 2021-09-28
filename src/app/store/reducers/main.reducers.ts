@@ -1,10 +1,10 @@
 import { All, MainActionTypes } from '../main.actions';
 import { ICatalogue } from '../../interfaces/catalogue';
-import { IProduct } from '../../interfaces/product';
+import { IProduct, IProductGroup } from '../../interfaces/product';
 
 export interface State {
   catalogue: ICatalogue[] | null;
-  products: IProduct[] | null;
+  groups: IProductGroup[] | null;
   errorMessage: string | null;
   error: any;
   message: string | null;
@@ -13,7 +13,7 @@ export interface State {
 
 export const initialState: State = {
   catalogue: null,
-  products: null,
+  groups: null,
   errorMessage: null,
   error: null,
   message: null,
@@ -35,7 +35,7 @@ export const reducer = (state = initialState, action: All): State => {
     case MainActionTypes.getAllProducts: {
       return {
         ...state,
-        products: null,
+        groups: null,
         errorMessage: null,
         message: null,
         isLoading: true
@@ -61,7 +61,7 @@ export const reducer = (state = initialState, action: All): State => {
     case MainActionTypes.productSuccess: {
       return {
         ...state,
-        products: action.payload,
+        groups: action.payload,
         errorMessage: null,
         message: null,
         isLoading: false

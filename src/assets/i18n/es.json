@@ -289,10 +289,16 @@
         "DURATION": "Duración"
       },
       "ERROR": {
-        "NO_CONTENT": "No hay servicios"
+        "NO_CONTENT": "No hay servicios",
+        "REQUIRED": "Se requiere al menos un producto"
       }
     },
-    "TITLE": "Agregar servicio",
+    "TITLE": "Agregar servicios",
+    "GROUP": {
+      "FIELD": "Tipo de servicio",
+      "REQUIRED": "Tipo de servicio es <b>requerido</b>",
+      "INVALID": "Tipo de servicio no valido"
+    },
     "FIELD": "Servicio",
     "REQUIRED": "Servicio es <b>requerido</b>",
     "INVALID": "Servicio no valido",
@@ -315,8 +321,11 @@
     "DURABILITY": {
       "FIELD": "Durabilidad"
     },
+    "PRIMARY": {
+      "CHECK": "Principal"
+    },
     "CREATED": "Servicio {{name}} creado",
-    "DETAIL": "Actualizar servicio",
+    "DETAIL": "Actualizar servicios",
     "DELETED": {
       "TITLE": "Eliminar servicio",
       "CONTENT": "¿Está seguro de eliminar el servicio {{name}}?",

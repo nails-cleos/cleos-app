@@ -120,7 +120,7 @@ export class DashComponent implements OnInit, OnDestroy {
   }
 
   handleEvent(event: CalendarEvent): void {
-    this.router.navigate(['reservation', event.id]);
+    this.router.navigate(event.meta.route);
   }
 
   dayClicked({date, events}: { date: Date; events: CalendarEvent[] }): void {
@@ -189,11 +189,12 @@ export class DashComponent implements OnInit, OnDestroy {
     this.events = [];
     this.state.data?.calendarSummaries?.forEach((it: any) => {
       const start = newDate(it.start);
-      const end = newDate(it.end);
-      this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, this.viewDate);
+      const end = it.end ? newDate(it.end) : null;
+      this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNow());
 
-      const event = monthEvent(it.title, start, end, it.reservationId, findStateColor(it.state, darkMode),
-        new Meta(true, it.state));
+      const route = it.reservationId ? ['reservation', it.reservationId] : ['unavailable', it.unavailableId];
+      const event = monthEvent(it.title, start, end, it.reservationId || it.unavailableId, findStateColor(it.state, darkMode),
+        new Meta(true, it.state, route));
       if (event) {
         this.events = [...this.events, event];
       }

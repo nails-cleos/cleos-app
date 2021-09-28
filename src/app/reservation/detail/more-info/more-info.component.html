@@ -39,8 +39,11 @@
   <h1>{{ 'RESERVATION.REVIEW.TITLE' | translate}}</h1>
 </div>
 <div *ngIf="reservation; else box">
-  <app-rating *ngIf="reservation.review" [detail]="reservation.review.detail" [rating]="reservation.review.rating"
-              color="primary"></app-rating>
+  <app-rating *ngIf="reservation.review; else noRating" [detail]="reservation.review.detail"
+              [rating]="reservation.review.rating" color="primary"></app-rating>
+  <ng-template #noRating>
+    <app-rating [rating]="0" color="primary"></app-rating>
+  </ng-template>
 </div>
 
 <ng-template #box>
@@ -125,7 +128,7 @@
     <tr *matFooterRowDef="['noContent']" [hidden]="payments.length > 0" mat-footer-row></tr>
 
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-    <tr *matRowDef="let row; columns: displayedColumns;" class="{{row.status}}" mat-row></tr>
+    <tr *matRowDef="let row; columns: displayedColumns;" class="{{row.type?.toLowerCase()}}" mat-row></tr>
   </table>
 </div>
 <div class="top">

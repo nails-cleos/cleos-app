@@ -21,8 +21,9 @@
   <section class="section-style" id="product">
     <h1 class="title">{{ 'MAIN.SECTION.PRODUCT' | translate }}</h1>
     <div class="product-container">
-      <div *ngFor="let product of products" class="card-wrap">
-        <app-mini-card-product (click)="setProduct(product)" [card]="product"></app-mini-card-product>
+      <div *ngFor="let group of groups" class="card-wrap">
+        <app-mini-card-product-group (groupEvent)="setGroup($event)" (productEvent)="setProduct($event)"
+                                     [card]="group"></app-mini-card-product-group>
       </div>
     </div>
   </section>
@@ -41,7 +42,23 @@
           <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
           <mat-datepicker #picker touchUi></mat-datepicker>
         </mat-form-field>
-        <mat-form-field *ngIf="products; else skeleton" appearance="fill">
+        <mat-form-field *ngIf="groups; else skeleton" appearance="fill">
+          <mat-label>{{ 'PRODUCT.GROUP.FIELD' | translate }}</mat-label>
+          <label>
+            <input (keydown)="keyDownGroup($event)" [formControl]="group" [matAutocomplete]="autoGroup"
+                   matInput type="text">
+          </label>
+          <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
+            <mat-option *ngFor="let group of filteredGroup | async" [value]="group">
+              {{group.name}}
+            </mat-option>
+          </mat-autocomplete>
+          <mat-icon matSuffix>format_list_bulleted</mat-icon>
+          <mat-error *ngIf="group.hasError('requireMatch')"
+                     [innerHTML]="'PRODUCT.GROUP.INVALID' | translate">
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field *ngIf="products" appearance="fill">
           <mat-label>{{ 'MAIN.BOOK.PRODUCT.FIELD' | translate }}</mat-label>
           <label>
             <input (keydown)="keyDownHandler($event, product)" [formControl]="product"

@@ -3,7 +3,7 @@ import { MatStepper } from '@angular/material/stepper';
 import { Observable, Subscription } from 'rxjs';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
-import { IPrice, IProduct, Price } from '../../../interfaces/product';
+import { IPrice, IProduct, IProductGroup, Price } from '../../../interfaces/product';
 import { IRoom } from '../../../interfaces/room';
 import {
   IAvailableDTO,
@@ -56,6 +56,11 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   errors: any = [];
 
   productForm!: FormGroup;
+  groups: IProductGroup[] | undefined;
+  filteredGroup: Observable<IProductGroup[] | undefined> | undefined;
+  group: FormControl = new FormControl('', [
+    Validators.required, requireMatch
+  ]);
   productList: IProduct[] | undefined;
   filteredProduct: Observable<IProduct[] | undefined> | undefined;
   product: FormControl = new FormControl('', [
@@ -237,6 +242,10 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d, this.room.value);
 
+  displayFnGroup(group: IProductGroup): string {
+    return group ? `${group.name}` : '';
+  }
+
   displayFnProduct(product: IProduct): string {
     return product ? `${product.name}` : '';
   }
@@ -312,6 +321,12 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     }
   }
 
+  keyDownGroup(event: any): void {
+    this.productList = undefined;
+    this.keyDownHandler(event, this.product);
+    this.keyDownHandler(event, this.group);
+  }
+
   private getReservation(id: string | null): void {
     this.store.dispatch(
       new fromActionsReservation.ReservationFind(id)
@@ -345,7 +360,14 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.roomForm = this.formBuilder.group({
       room: this.room
     });
-
+    this.filteredGroup = this.group.valueChanges.pipe(startWith(''), map(value => {
+      if (typeof value === 'string') {
+        return value;
+      }
+      this.productList = value.products;
+      this.product.setValue('');
+      return value.name;
+    }), map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups));
     this.filteredProduct = this.product.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
@@ -366,10 +388,18 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      this.productList = state.productDiscount?.products;
-      if (this.productList && this.productId) {
-        this.product.setValue(this.productList.find(product => product.id === this.productId));
-        this.productId = this.product.value.id;
+      this.groups = state.productDiscount?.groups;
+      if (this.groups && this.productId && !this.group.value) {
+        this.group.setValue(this.groups?.find(group => {
+          const product = group.products?.find(p => p.id === this.productId);
+          if (product) {
+            this.productList = group.products;
+            this.product.setValue(product);
+            this.productId = this.product.value.id;
+            return group;
+          }
+          return undefined;
+        }));
       }
       this.discounts = state.productDiscount?.discounts.map((ud: IUserDiscount) => {
         let title = ud.discount.name;
@@ -433,6 +463,12 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       });
   }
 
+  private filterGroup(name: string): IProductGroup[] | undefined {
+    const filterValue = name.toLowerCase();
+
+    return this.groups?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
+  }
+
   private filterProduct(name: string): IProduct[] | undefined {
     const filterValue = name.toLowerCase();
 
@@ -453,6 +489,13 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.date.setValue(date);
     this.eventSelected = date;
     this.price = getPrice(this.reservation.product);
+    this.group.setValue(this.groups?.find(group => {
+      const product = group.products?.find(p => p.id === reservation.product.id);
+      if (product) {
+        return group;
+      }
+      return undefined;
+    }));
     this.product.setValue(reservation.product);
     this.duration = convertDuration(reservation.product.duration);
 

@@ -1,13 +1,13 @@
 import { Pagination } from '../../interfaces/pagination';
 import { All, ProductActionTypes } from '../product.actions';
-import { IProduct } from '../../interfaces/product';
+import { IProductGroup } from '../../interfaces/product';
 
 export interface State {
-  data: IProduct | Pagination<IProduct> | null;
+  data: IProductGroup | Pagination<IProductGroup> | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
-  selected: IProduct | null;
+  selected: IProductGroup | null;
   message: string | null;
   isLoading: boolean;
 }
@@ -38,7 +38,7 @@ export const reducer = (state = initialState, action: All): State => {
     case ProductActionTypes.productFind: {
       return {
         ...state,
-        data: {} as IProduct,
+        data: {} as IProductGroup,
         errorMessage: null,
         subErrors: null,
         selected: null,

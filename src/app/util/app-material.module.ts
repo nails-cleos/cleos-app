@@ -19,6 +19,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 const materialModules = [
   NgxMaterialTimepickerModule,
@@ -40,7 +41,8 @@ const materialModules = [
   MatSelectModule,
   MatSortModule,
   MatTableModule,
-  MatTooltipModule
+  MatTooltipModule,
+  MatCheckboxModule
 ];
 
 @NgModule({

@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { IProduct } from '../../interfaces/product';
+import { IProduct, IProductGroup } from '../../interfaces/product';
 import { map, startWith } from 'rxjs/operators';
 import { Observable, Subscription } from 'rxjs';
 import { ICatalogue, ISlide, Slide } from '../../interfaces/catalogue';
@@ -28,6 +28,9 @@ export class MainContentComponent implements OnInit, OnDestroy {
   slides: ISlide[] = [];
 
   form!: FormGroup;
+  groups: IProductGroup[] | undefined;
+  filteredGroup: Observable<IProductGroup[] | undefined> | undefined;
+  group: FormControl = new FormControl('', [requireMatch]);
   products: IProduct[] | undefined;
   filteredProduct: Observable<IProduct[] | undefined> | undefined;
   product: FormControl = new FormControl('', [requireMatch]);
@@ -76,6 +79,14 @@ export class MainContentComponent implements OnInit, OnDestroy {
     this.getCatalogues();
     this.getProducts();
 
+    this.filteredGroup = this.group.valueChanges.pipe(startWith(''), map(value => {
+      if (typeof value === 'string') {
+        return value;
+      }
+      this.products = value.products;
+      this.product.setValue('');
+      return value.name;
+    }), map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups));
     this.filteredProduct = this.product.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
@@ -94,6 +105,10 @@ export class MainContentComponent implements OnInit, OnDestroy {
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d);
 
+  displayFnGroup(group: IProductGroup): string {
+    return group ? `${group.name}` : '';
+  }
+
   displayFnProduct(product: IProduct): string {
     return product ? `${product.name}` : '';
   }
@@ -104,9 +119,19 @@ export class MainContentComponent implements OnInit, OnDestroy {
     }
   }
 
+  keyDownGroup(event: any): void {
+    this.products = undefined;
+    this.keyDownHandler(event, this.product);
+    this.keyDownHandler(event, this.group);
+  }
+
   book(): void {
     const data = {date: this.date.value, product: this.product.value};
     this.router.navigate(['me', 'reservation'], {state: data});
+  }
+
+  setGroup(group: IProductGroup): void {
+    this.group.setValue(group);
   }
 
   setProduct(product: IProduct): void {
@@ -134,8 +159,8 @@ export class MainContentComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      if (state.products) {
-        this.products = state.products;
+      if (state.groups) {
+        this.groups = state.groups;
       }
       if (state.catalogue && Array.from(state.catalogue)) {
         state.catalogue.forEach((value: ICatalogue) => {
@@ -171,10 +196,15 @@ export class MainContentComponent implements OnInit, OnDestroy {
     );
   }
 
+  private filterGroup(name: string): IProductGroup[] | undefined {
+    const filterValue = name.toLowerCase();
+
+    return this.groups?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
+  }
+
   private filterProduct(name: string): IProduct[] | undefined {
     const filterValue = name.toLowerCase();
 
     return this.products?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
   }
-
 }

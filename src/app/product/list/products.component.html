@@ -21,12 +21,15 @@
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="price">
+    <ng-container matColumnDef="durability">
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
-          mat-sort-header>{{ 'PRODUCT.LIST.COLUMN.PRICE' | translate }}</th>
+          mat-sort-header>{{ 'PRODUCT.LIST.COLUMN.DURABILITY' | translate }}</th>
       <td *matCellDef="let product" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="product.id; else skeleton">
-          <mat-icon matPrefix>attach_money</mat-icon>&nbsp;{{product.price | number:'1.2-2'}}
+          <div *ngIf="product.durability; else noDurability">{{product.durability}}</div>
+          <ng-template #noDurability>
+            <div>-</div>
+          </ng-template>
         </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -38,7 +41,7 @@
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
       <td *matCellDef="let product" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="product.id; else skeleton">
-          <button (click)="edit(product)" *ngIf="!product.deleted" mat-icon-button
+          <button [routerLink]="'/products/'+ product.id" *ngIf="!product.deleted" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
             <mat-icon color="primary">edit</mat-icon>
           </button>
@@ -57,19 +60,6 @@
       <td *matCellDef="let product" [attr.colspan]="displayedColumns.length">
         <div [@detailExpand]="product === expanded ? 'expanded' : 'collapsed'" class="detail">
           <mat-list>
-            <div fxHide fxShow.lt-sm mat-subheader>{{ 'PRODUCT.LIST.COLUMN.PRICE' | translate }}</div>
-            <mat-list-item fxHide fxShow.lt-sm role="list">
-              <mat-icon matPrefix>attach_money</mat-icon>&nbsp;{{product.price | number:'1.2-2'}}
-            </mat-list-item>
-            <div *ngIf="product.durability" mat-subheader>{{ 'PRODUCT.LIST.COLUMN.DURABILITY' | translate }}</div>
-            <mat-list-item *ngIf="product.durability" role="list">
-              <div mat-line>{{product.durability}}</div>
-            </mat-list-item>
-            <div mat-subheader>{{ 'PRODUCT.LIST.COLUMN.DURATION' | translate }}</div>
-            <mat-list-item role="list">
-              <mat-icon matPrefix>timer</mat-icon>&nbsp;
-              {{product.hour | number:'2.0-0'}}:{{product.minute | number:'2.0-0'}}
-            </mat-list-item>
             <div mat-subheader>{{ 'COMMON.COLUMN.LAST_UPDATE' | translate }}</div>
             <mat-list-item role="list">
               <div mat-line>{{product.modifiedAt | date:'short':undefined:language}}</div>
