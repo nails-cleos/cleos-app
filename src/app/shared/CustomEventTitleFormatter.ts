@@ -13,10 +13,13 @@ export class CustomEventTitleFormatter extends CalendarEventTitleFormatter {
   month(event: CalendarEvent): string {
     const meta: IMeta = event.meta;
     if (meta.time) {
-      const end = event.end ? ` - ${formatDateMonth(event.end, this.translate.currentLang)}` : '';
-      return `<b>${formatDateMonth(event.start, this.translate.currentLang)}${end}</b> ${
-        event.title
-      }`;
+      if (event.end) {
+        const start = formatDateMonth(event.start, this.translate.currentLang);
+        const end = formatDateMonth(event.end, this.translate.currentLang);
+        return `<b>${start} - ${end}</b> ${event.title}`;
+      } else {
+        return `<b>${this.translate.instant('UNAVAILABLE.ALL_DAY.CHECK')}</b> ${event.title}`;
+      }
     } else {
       return event.title;
     }

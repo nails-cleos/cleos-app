@@ -4,20 +4,20 @@
       <mat-card>
         <mat-card-header>
           <mat-card-title>{{ 'PRODUCT.DETAIL' | translate }}</mat-card-title>
-          <mat-card-subtitle *ngIf="product; else skeleton">{{product.name}}</mat-card-subtitle>
+          <mat-card-subtitle *ngIf="group; else skeleton">{{group.name}}</mat-card-subtitle>
           <ng-template #skeleton>
             <div class="ssc-line"></div>
           </ng-template>
         </mat-card-header>
         <form (ngSubmit)="update()" [formGroup]="form" novalidate>
-          <mat-card-content *ngIf="product; else boxSkeleton">
+          <mat-card-content *ngIf="group; else boxSkeleton">
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <mat-form-field appearance="fill">
-                <mat-label>{{ 'PRODUCT.NAME.FIELD' | translate }}</mat-label>
+                <mat-label>{{ 'PRODUCT.GROUP.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="name" autocomplete="name" matInput required>
                 </label>
-                <mat-error *ngIf="name.hasError('required')" [innerHTML]="'PRODUCT.NAME.REQUIRED' | translate">
+                <mat-error *ngIf="name.hasError('required')" [innerHTML]="'PRODUCT.GROUP.REQUIRED' | translate">
                 </mat-error>
                 <mat-error *ngIf="errors['name']">
                   {{errors['name']}}
@@ -26,53 +26,80 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PRODUCT.DESCRIPTION.FIELD' | translate }}</mat-label>
                 <label>
-                  <textarea #message formControlName="description" matInput
-                            maxlength="256"></textarea>
+                  <textarea #message formControlName="description" matInput maxlength="256"></textarea>
                 </label>
                 <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
-              </mat-form-field>
-              <mat-form-field appearance="fill">
-                <mat-label>{{ 'PRODUCT.PRICE.FIELD' | translate }}</mat-label>
-                <span matPrefix>
-                  <mat-icon matPrefix>attach_money</mat-icon> &nbsp;
-                </span>
-                <label>
-                  <input [formControl]="price" matInput required step="1" type="number">
-                </label>
-                <mat-error *ngIf="price.hasError('required')" [innerHTML]="'PRODUCT.PRICE.REQUIRED' | translate">
-                </mat-error>
-                <mat-error *ngIf="price.hasError('min')">
-                  {{ 'PRODUCT.PRICE.GREATER' | translate }}
-                </mat-error>
-                <mat-error *ngIf="errors['price']">
-                  {{errors['price']}}
-                </mat-error>
-              </mat-form-field>
-              <mat-form-field appearance="fill">
-                <mat-label>{{ 'PRODUCT.DURATION.FIELD' | translate }}</mat-label>
-                <label>
-                  <input [formControl]="duration" [format]="24" [ngxTimepicker]="t" matInput
-                         name="duration" readonly/>
-                </label>
-                <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
-                <ngx-material-timepicker #t [minutesGap]="15"></ngx-material-timepicker>
-
-                <mat-error *ngIf="duration.hasError('required')"
-                           [innerHTML]="'PRODUCT.DURATION.REQUIRED' | translate">
-                </mat-error>
-                <mat-error *ngIf="errors['duration']">
-                  {{errors['duration']}}
-                </mat-error>
               </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'PRODUCT.DURABILITY.FIELD' | translate }}</mat-label>
                 <label>
                   <input formControlName="durability" matInput>
                 </label>
-                <mat-error *ngIf="errors['durability']">
-                  {{errors['durability']}}
-                </mat-error>
+                <mat-error *ngIf="errors['durability']">{{errors['durability']}}</mat-error>
               </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>{{ 'PRODUCT.FIELD' | translate }}</mat-label>
+                <label>
+                  <input #inputName matInput>
+                </label>
+                <button (click)="addTab()" [attr.aria-label]="'Add product'"
+                        [disabled]="!inputName.value" color="primary" mat-icon-button matSuffix type="button">
+                  <mat-icon>inventory</mat-icon>
+                </button>
+              </mat-form-field>
+
+              <mat-tab-group (selectedIndexChange)="selected.setValue($event)" [selectedIndex]="selected.value">
+                <mat-tab *ngFor="let tab of products; let index = index" [label]="tab.name || ''">
+                  <mat-form-field appearance="fill" class="tab-field">
+                    <mat-label>{{ 'PRODUCT.FIELD' | translate }}</mat-label>
+                    <label>
+                      <input (change)="setValue(tab, 'name', $event)" [value]="tab.name" matInput required>
+                    </label>
+                    <mat-hint *ngIf="tab.errors['name']" [innerHTML]="'PRODUCT.' + tab.errors['name'] | translate"
+                              class="mat-error">
+                    </mat-hint>
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="tab-field">
+                    <mat-label>{{ 'PRODUCT.DESCRIPTION.FIELD' | translate }}</mat-label>
+                    <label>
+                      <input (change)="setValue(tab, 'description', $event)" [value]="tab.description" matInput>
+                    </label>
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="tab-field">
+                    <mat-label>{{ 'PRODUCT.PRICE.FIELD' | translate }}</mat-label>
+                    <span matPrefix><mat-icon matPrefix>attach_money</mat-icon> &nbsp;</span>
+                    <label>
+                      <input (change)="setValue(tab, 'price', $event)" [value]="tab.price" matInput required
+                             step="1" type="number">
+                    </label>
+                    <mat-hint *ngIf="tab.errors['price']"
+                              [innerHTML]="'PRODUCT.PRICE.' + tab.errors['price'] | translate" class="mat-error">
+                    </mat-hint>
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="tab-field">
+                    <mat-label>{{ 'PRODUCT.DURATION.FIELD' | translate }}</mat-label>
+                    <label>
+                      <input [format]="24" [ngxTimepicker]="t" [value]="tab.duration || ''" matInput readonly
+                             required/>
+                    </label>
+                    <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
+                    <ngx-material-timepicker #t (timeSet)="setTime(tab, $event)"
+                                             [minutesGap]="15"></ngx-material-timepicker>
+                    <mat-hint *ngIf="tab.errors['duration']"
+                              [innerHTML]="'PRODUCT.DURATION.' + tab.errors['duration'] | translate" class="mat-error">
+                    </mat-hint>
+                  </mat-form-field>
+                  <mat-checkbox (change)="setPrimary(tab)" [checked]="tab.primary" [disabled]="tab.primary"
+                                color="primary">{{ 'PRODUCT.PRIMARY.CHECK' | translate }}</mat-checkbox>
+                  <div class="divider">
+                    <button (click)="removeTab(index)" [disabled]="products.length === 1 || tab.primary"
+                            class="tab-field" color="warn" mat-raised-button type="button">
+                      <mat-icon>delete</mat-icon>
+                      {{'COMMON.BUTTON.DELETE' | translate}}
+                    </button>
+                  </div>
+                </mat-tab>
+              </mat-tab-group>
             </div>
           </mat-card-content>
           <ng-template #boxSkeleton>
@@ -80,12 +107,14 @@
             <div class="ssc-square mb"></div>
             <div class="ssc-hr"></div>
           </ng-template>
-          <mat-card-actions *ngIf="product; else buttonSkeleton">
+          <mat-card-actions *ngIf="group; else buttonSkeleton">
             <div fxFlex></div>
-            <button [disabled]="form.invalid || form.pristine" color="primary" mat-raised-button
-                    type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
-            <button [form]="form" appBackButton color="accent" mat-raised-button
-                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <button [disabled]="form.invalid" color="primary" mat-raised-button type="submit">
+              {{ 'COMMON.BUTTON.UPDATE' | translate }}
+            </button>
+            <button [form]="form" appBackButton color="accent" mat-raised-button type="button">
+              {{ 'COMMON.BUTTON.BACK' | translate }}
+            </button>
           </mat-card-actions>
           <ng-template #buttonSkeleton>
             <div class="ssc-head-line"></div>

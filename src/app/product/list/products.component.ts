@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
-import { IProduct } from '../../interfaces/product';
+import { IProduct, IProductGroup } from '../../interfaces/product';
 import { Observable, Subscription } from 'rxjs';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -11,7 +11,6 @@ import { AppState, selectProductState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
 import * as fromActionsProduct from '../../store/product.actions';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
-import { convertDuration } from '../../util/dates';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
 
@@ -25,15 +24,15 @@ export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['position', 'name', 'price', 'actions'];
-  dataSource: any = new MatTableDataSource<Pagination<IProduct>>();
+  displayedColumns: string[] = ['position', 'name', 'durability', 'actions'];
+  dataSource: any = new MatTableDataSource<Pagination<IProductGroup>>();
   subscription: Subscription | undefined;
   getState: Observable<any>;
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
 
-  expanded: IProduct | undefined;
+  expanded: IProductGroup | undefined;
   language: string;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
@@ -91,14 +90,7 @@ export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.clean();
         this.getProducts();
       }
-      this.dataSource = stateValue.data?.content?.map((product: IProduct) => {
-        if (product.duration) {
-          const duration = convertDuration(product.duration);
-
-          return Object.assign({}, product, {hour: duration.hour, minute: duration.minute});
-        }
-        return product;
-      });
+      this.dataSource = stateValue.data?.content;
       this.resultsLength = stateValue.data?.totalElements;
       if (this.resultsLength) {
         this.createPageSubscriptions();

@@ -29,7 +29,7 @@
 
 <ng-template #stepTwo>
   <form [formGroup]="productForm">
-    <div *ngIf="!productList?.length; else data" class="no-content bold">
+    <div *ngIf="!groups?.length; else data" class="no-content bold">
       {{'PRODUCT.LIST.ERROR.NO_CONTENT' | translate}}
     </div>
     <ng-template #data>
@@ -47,8 +47,29 @@
                      [innerHTML]="'RESERVATION.DATE.REQUIRED' | translate">
           </mat-error>
         </mat-form-field>
+        <mat-form-field *ngIf="groups; else skeleton" appearance="fill">
+          <mat-label>{{ 'PRODUCT.GROUP.FIELD' | translate }}</mat-label>
+          <label>
+            <input (keydown)="keyDownGroup($event)" [formControl]="group" [matAutocomplete]="autoGroup"
+                   matInput required type="text">
+          </label>
+          <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
+            <mat-option *ngFor="let group of filteredGroup | async" [value]="group">
+              {{group.name}}
+            </mat-option>
+          </mat-autocomplete>
+          <mat-error *ngIf="group.hasError('required')"
+                     [innerHTML]="'PRODUCT.GROUP.REQUIRED' | translate">
+          </mat-error>
+          <mat-error *ngIf="group.hasError('requireMatch')"
+                     [innerHTML]="'PRODUCT.GROUP.INVALID' | translate">
+          </mat-error>
+          <mat-error *ngIf="errors['group']">
+            {{errors['group']}}
+          </mat-error>
+        </mat-form-field>
         <div>
-          <mat-form-field *ngIf="productList; else skeleton" appearance="fill">
+          <mat-form-field *ngIf="productList" appearance="fill">
             <mat-label>{{ 'PRODUCT.FIELD' | translate }}</mat-label>
             <label>
               <input (keydown)="keyDownHandler($event, product)" [formControl]="product" [matAutocomplete]="autoProduct"
@@ -77,11 +98,11 @@
             <mat-icon>redeem</mat-icon>
           </button>
         </div>
-        <mat-form-field *ngIf="showDiscount && !isEditing" appearance="fill">
+        <mat-form-field *ngIf="product.value && showDiscount && !isEditing" appearance="fill">
           <mat-label>{{ 'RESERVATION.PRODUCT.DISCOUNT.FIELD' | translate }}</mat-label>
-          <mat-select *ngFor="let cd of discounts" [formControl]="discount">
+          <mat-select [formControl]="discount">
             <mat-option>--</mat-option>
-            <mat-option [value]="cd.id">{{cd.title}}</mat-option>
+            <mat-option *ngFor="let cd of discounts" [value]="cd.id">{{cd.title}}</mat-option>
           </mat-select>
         </mat-form-field>
         <mat-list-item *ngIf="product.value">

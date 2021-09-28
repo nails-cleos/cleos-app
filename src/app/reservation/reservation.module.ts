@@ -5,9 +5,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
 import { AgmCoreModule } from '@agm/core';
-import {
-  CalendarModule,
-} from 'angular-calendar';
+import { CalendarModule } from 'angular-calendar';
 
 import { AppMaterialModule } from '../util/app-material.module';
 import { SharedModule } from '../shared/shared.module';
@@ -18,10 +16,11 @@ import { SearchComponent } from './search/search.component';
 import { ReservationComponent } from './reservation.component';
 import { CompleteDialogComponent, ReservationDetailComponent } from './detail/reservation-detail.component';
 import { MoreInfoComponent } from './detail/more-info/more-info.component';
-import { CalendarComponent } from './calendar/calendar.component';
+import { CalendarComponent, CalendarDialogComponent } from './calendar/calendar.component';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MatRadioModule } from '@angular/material/radio';
 
 @NgModule({
   declarations: [
@@ -30,7 +29,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
     ReservationDetailComponent,
     MoreInfoComponent,
     CalendarComponent,
-    CompleteDialogComponent
+    CompleteDialogComponent,
+    CalendarDialogComponent
   ],
   imports: [
     ReservationRoutingModule,
@@ -43,6 +43,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
     TranslateModule,
     MatFabMenuModule,
     CalendarModule,
+    MatRadioModule,
     AgmCoreModule.forRoot({
       apiKey: environment.googleMapKey,
       libraries: ['places', 'geometry']

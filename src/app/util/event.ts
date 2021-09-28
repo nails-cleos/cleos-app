@@ -1,24 +1,52 @@
 import { IAvailability } from '../interfaces/room';
 import { CalendarEvent } from 'angular-calendar';
-import { createDate, createNewDate, getNow, greaterOrEqualsThanToday, IDuration } from './dates';
+import { createDate, createNewDate, getNow, getWeekDay, greaterOrEqualsThanToday, IDuration } from './dates';
 import { findStateColor } from './theme';
 import RRule from 'rrule';
-import { isToday } from 'date-fns';
+import { addDays, isToday } from 'date-fns';
+import { IUnavailableAll } from '../interfaces/unavailable';
 
 export interface IMeta {
   time?: boolean;
   state?: string;
+  route?: string[];
 }
 
 export class Meta implements IMeta {
   time?: boolean;
   state?: string;
+  route?: string[];
 
-  constructor(time?: boolean, state?: string) {
+  constructor(time?: boolean, state?: string, route?: string[]) {
     this.time = time;
     this.state = state;
+    this.route = route;
   }
 }
+
+export const createRecurringEvent = (repeat: string, start: Date, date: Date, it: IUnavailableAll,
+                                     duration: IDuration): any => {
+  let startDate;
+  let rrule;
+  switch (repeat) {
+    case 'ONCE_A_WEEK':
+      const byweekday = getWeekDay(start.getDay());
+      startDate = createNewDate(addDays(date, (start.getDay() + 7 - date.getDay()) % 7),
+        start.getHours(), start.getMinutes());
+      rrule = {
+        freq: RRule.WEEKLY,
+        byweekday
+      };
+      break;
+    case 'EVERY_DAY':
+      startDate = createNewDate(date, start.getHours(), start.getMinutes());
+      rrule = {
+        freq: RRule.DAILY
+      };
+      break;
+  }
+  return {duration, it, startDate, rrule};
+};
 
 export const fillNotAvailable = (unavailable: string, lunch: string, notWorking: string,
                                  selectDate: Date, sunday: IAvailability, saturday: IAvailability, week: IAvailability,
@@ -65,13 +93,14 @@ export const fillNotAvailable = (unavailable: string, lunch: string, notWorking:
 };
 
 export const newEvent = (title: string, color: string, start: Date, end?: Date, primary?: string,
-                         id?: string, meta: IMeta = new Meta()): CalendarEvent | undefined => {
+                         id?: string, meta: IMeta = new Meta(), draggable: boolean = false): CalendarEvent | undefined => {
   if (greaterOrEqualsThanToday(start)) {
     return {
       id,
       start,
       end,
       title,
+      draggable,
       color: {
         primary,
         secondary: color
@@ -82,7 +111,7 @@ export const newEvent = (title: string, color: string, start: Date, end?: Date, 
   return undefined;
 };
 
-export const monthEvent = (title: string, start: Date, end: Date, id: string,
+export const monthEvent = (title: string, start: Date, end: Date | null, id: string,
                            color?: string, meta: Meta = new Meta(true)): CalendarEvent | undefined => ({
   id,
   start,
@@ -227,14 +256,6 @@ const createLunchEvent = (it: IAvailability, date: Date, unavailable: string, lu
       const end = createNewDate(date, lunchEndHour, lunchEndMinute);
       return newEvent(lunch, findStateColor('DEFAULT', isDarkMode), start, end);
     }
-  } else if (isToday(date)) {
-    if (hour > 23) {
-      hour = 23;
-      minute = 59;
-    }
-    const start = createNewDate(date);
-    const end = createNewDate(date, hour, minute);
-    return newEvent(lunch, findStateColor('DEFAULT', isDarkMode), start, end);
   }
 
   return undefined;

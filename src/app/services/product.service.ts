@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IProduct, IProductDiscountDTO } from '../interfaces/product';
+import { IProductDiscountDTO, IProductGroup } from '../interfaces/product';
 import { PAGE_SIZE } from '../interfaces/pagination';
 
 @Injectable({
@@ -14,7 +14,7 @@ export class ProductService {
   constructor(private http: HttpClient) {
   }
 
-  public getAll(sort: string, direction: string, page: number, size: number = PAGE_SIZE): Observable<IProduct[]> {
+  public getAll(sort: string, direction: string, page: number, size: number = PAGE_SIZE): Observable<IProductGroup[]> {
     let params = new HttpParams().set('page', String(page)).set('size', String(size));
     if (sort) {
       params = params.append('sort', sort);
@@ -23,7 +23,7 @@ export class ProductService {
       params = params.append('direction', direction);
     }
 
-    return this.http.get<IProduct[]>(`${this.url}/pages`, {params});
+    return this.http.get<IProductGroup[]>(`${this.url}/pages`, {params});
   }
 
   public getAllProducts(customerId?: string): Observable<IProductDiscountDTO[]> {
@@ -34,26 +34,26 @@ export class ProductService {
     return this.http.get<IProductDiscountDTO[]>(this.url, {params});
   }
 
-  public getProductList(): Observable<IProduct[]> {
-    return this.http.get<IProduct[]>(`${this.url}/list`);
+  public getProductList(): Observable<IProductGroup[]> {
+    return this.http.get<IProductGroup[]>(`${this.url}/list`);
   }
 
-  public getById(id: string | null): Observable<IProduct | undefined> {
+  public getById(id: string | null): Observable<IProductGroup | undefined> {
     const url = `${this.url}/${id}`;
-    return this.http.get<IProduct>(url);
+    return this.http.get<IProductGroup>(url);
   }
 
-  public add(product: IProduct): Observable<IProduct> {
-    return this.http.post<IProduct>(this.url, product);
+  public add(product: IProductGroup): Observable<IProductGroup> {
+    return this.http.post<IProductGroup>(this.url, product);
   }
 
-  public delete(id: string | null): Observable<IProduct> {
+  public delete(id: string | null): Observable<IProductGroup> {
     const url = `${this.url}/${id}`;
-    return this.http.delete<IProduct>(url);
+    return this.http.delete<IProductGroup>(url);
   }
 
-  public update(product: IProduct): Observable<IProduct> {
+  public update(product: IProductGroup): Observable<IProductGroup> {
     const url = `${this.url}/${product.id}`;
-    return this.http.patch<IProduct>(url, product);
+    return this.http.patch<IProductGroup>(url, product);
   }
 }

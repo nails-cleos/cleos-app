@@ -1,5 +1,13 @@
 import { IDiscount, IUserDiscount } from './discount';
 
+export interface IProductGroup {
+  id?: string;
+  name?: string;
+  description?: string;
+  durability?: string;
+  products?: IProduct[];
+}
+
 export interface IProduct {
   id?: string;
   name?: string;
@@ -8,9 +16,10 @@ export interface IProduct {
   description?: string;
   duration?: string;
   durationDate?: Date;
-  durability?: string;
   modifiedAt?: string;
   rating?: number;
+  primary: boolean;
+  errors?: any;
 }
 
 export interface IProductAll {
@@ -19,7 +28,6 @@ export interface IProductAll {
   price: number;
   duration: string;
   description?: string;
-  durability?: string;
   discount?: IDiscount;
   extras?: IExtras;
 }
@@ -69,6 +77,20 @@ export class Price implements IPrice {
 }
 
 export class Product implements IProduct {
+  name: string;
+  primary: boolean;
+  description: string;
+  errors: any;
+
+  constructor(name: string, primary: boolean = false) {
+    this.name = name;
+    this.primary = primary;
+    this.description = '';
+    this.errors = {};
+  }
+}
+
+export class ProductGroup implements IProductGroup {
   constructor() {
   }
 }

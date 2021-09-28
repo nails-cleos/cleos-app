@@ -3,11 +3,29 @@
 
 <mat-dialog-content>
   <div fxLayout="column">
-    <mat-form-field *ngIf="products; else skeleton" appearance="fill">
+    <mat-form-field *ngIf="groups; else skeleton" appearance="fill">
+      <mat-label>{{ 'PRODUCT.GROUP.FIELD' | translate }}</mat-label>
+      <label>
+        <input (keydown)="keyDownHandler($event, group)" [formControl]="group" [matAutocomplete]="autoGroup"
+               matInput required type="text">
+      </label>
+      <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
+        <mat-option *ngFor="let group of filteredGroup | async" [value]="group">
+          {{group.name}}
+        </mat-option>
+      </mat-autocomplete>
+      <mat-error *ngIf="group.hasError('required')"
+                 [innerHTML]="'PRODUCT.GROUP.REQUIRED' | translate">
+      </mat-error>
+      <mat-error *ngIf="group.hasError('requireMatch')"
+                 [innerHTML]="'PRODUCT.GROUP.INVALID' | translate">
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field *ngIf="products" appearance="fill">
       <mat-label>{{ 'PRODUCT.FIELD' | translate }}</mat-label>
       <label>
-        <input (keydown)="keyDownHandler($event)" [formControl]="product" [matAutocomplete]="autoProduct"
-               matInput type="text">
+        <input (keydown)="keyDownHandler($event, product)" [formControl]="product" [matAutocomplete]="autoProduct"
+               matInput type="text" required>
       </label>
       <mat-autocomplete #autoProduct="matAutocomplete" [displayWith]="displayFnProduct">
         <mat-option *ngFor="let product of filteredProduct | async" [value]="product">
@@ -15,6 +33,9 @@
         </mat-option>
       </mat-autocomplete>
       <mat-icon matSuffix>home_repair_service</mat-icon>
+      <mat-error *ngIf="product.hasError('required')"
+                 [innerHTML]="'PRODUCT.REQUIRED' | translate">
+      </mat-error>
       <mat-error *ngIf="product.hasError('requireMatch')"
                  [innerHTML]="'PRODUCT.INVALID' | translate">
       </mat-error>
@@ -75,7 +96,7 @@
 <mat-divider></mat-divider>
 <div mat-dialog-actions>
   <div fxFlex></div>
-  <button (click)="doAction()" cdkFocusInitial color="primary"
+  <button [disabled]="group.invalid || product.invalid" (click)="doAction()" cdkFocusInitial color="primary"
           mat-raised-button>{{ 'COMMON.BUTTON.COMPLETE' | translate }}</button>
   <button (click)="onNoClick()" mat-raised-button>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
 </div>

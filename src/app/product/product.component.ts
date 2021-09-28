@@ -1,13 +1,12 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import * as fromActionsProduct from '../store/product.actions';
 import { AppState, selectProductState } from '../store/app.states';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
-import { IProduct, Product } from '../interfaces/product';
-import { createDate, getTime } from '../util/dates';
+import { IProduct, IProductGroup, Product, ProductGroup } from '../interfaces/product';
+import { API_LOCALE, createNewDate, getNow, getTime } from '../util/dates';
 import { Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-product',
@@ -15,27 +14,22 @@ import { TranslateService } from '@ngx-translate/core';
   styleUrls: ['./product.component.scss']
 })
 export class ProductComponent implements OnInit, OnDestroy {
-  getState: Observable<any>;
-  subscription: Subscription | undefined;
-  form!: FormGroup;
-  errors: any = [];
+  @ViewChild('inputName') inputName: ElementRef<HTMLInputElement> | undefined;
 
+  form!: FormGroup;
   name: FormControl = new FormControl('', [
     Validators.required
   ]);
-  price: FormControl = new FormControl('', [
-    Validators.required, Validators.min(1)
-  ]);
-  duration: FormControl;
+  selected = new FormControl(0);
+  products: IProduct[] = [];
 
-  constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private router: Router,
-              private translate: TranslateService) {
+  errors: any = [];
+
+  private getState: Observable<any>;
+  private subscription: Subscription | undefined;
+
+  constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private router: Router) {
     this.getState = this.store.select(selectProductState);
-    const d = getTime(createDate(), this.translate.currentLang);
-
-    this.duration = new FormControl(d, [
-      Validators.required
-    ]);
   }
 
   ngOnInit(): void {
@@ -49,29 +43,85 @@ export class ProductComponent implements OnInit, OnDestroy {
   }
 
   create(): void {
-    if (this.form.invalid) {
+    let hasError = false;
+    if (!this.products.length) {
+      hasError = true;
+      this.errors.products = 'REQUIRED';
+    }
+    this.products = this.products.map((tab: IProduct) => {
+      const errors: any = {};
+      if (!tab.name || tab.name.trim().length === 0) {
+        errors.name = 'REQUIRED';
+        hasError = true;
+      }
+      if (!tab.price) {
+        errors.price = 'REQUIRED';
+        hasError = true;
+      } else if (tab.price <= 0) {
+        errors.price = 'GREATER';
+        hasError = true;
+      }
+      if (!tab.duration || tab.duration.trim().length === 0) {
+        errors.duration = 'REQUIRED';
+        hasError = true;
+      }
+      return Object.assign({}, tab, {errors});
+    });
+
+    if (hasError || this.form.invalid) {
       return;
     }
 
-    const product: IProduct = new Product();
-    product.name = this.name.value;
-    product.description = this.form.value.description;
-    product.price = this.price.value;
-    product.duration = this.duration.value;
-    product.durability = this.form.value.durability;
+    const group: IProductGroup = new ProductGroup();
+    group.name = this.name.value;
+    group.description = this.form.value.description;
+    group.durability = this.form.value.durability;
+    group.products = this.products;
 
     this.store.dispatch(
-      new fromActionsProduct.ProductSave(product)
+      new fromActionsProduct.ProductSave(group)
     );
+  }
+
+  addTab(): void {
+    if (this.inputName) {
+      const product: IProduct = new Product(this.inputName.nativeElement.value, !this.products.length);
+      this.inputName.nativeElement.value = '';
+
+      this.products.push(product);
+      this.selected.setValue(this.products.length - 1);
+    }
+  }
+
+  removeTab(index: number): void {
+    this.products.splice(index, 1);
+  }
+
+  setValue(product: IProduct, attribute: string, $event: any): void {
+    // @ts-ignore
+    product[attribute] = $event.target.value;
+  }
+
+  setTime(product: IProduct, $event: any): void {
+    const time = $event.split(':');
+    const date = createNewDate(getNow(), time[0], time[1]);
+    product.duration = getTime(date, API_LOCALE);
+  }
+
+  setPrimary(tab: IProduct): void {
+    this.products = this.products.map(t => {
+      t.primary = false;
+      return t;
+    });
+
+    tab.primary = true;
   }
 
   private createForm(): void {
     this.form = this.formBuilder.group({
       name: this.name,
       description: new FormControl(),
-      durability: new FormControl(),
-      price: this.price,
-      duration: this.duration
+      durability: new FormControl()
     });
   }
 

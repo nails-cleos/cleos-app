@@ -12,7 +12,7 @@ import {
   MAX_RESERVATION_MONTH
 } from '../../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import {
   addPeriod,
   CalendarPeriod,
@@ -20,9 +20,9 @@ import {
   createNewDate,
   endOfPeriod,
   getAvailability,
+  getDuration,
   getNow,
   getStartEndDay,
-  getWeekDay,
   greaterOrEqualsThan,
   IDuration,
   isBetween,
@@ -31,17 +31,18 @@ import {
   subPeriod
 } from '../../util/dates';
 import { IRoom, IRoomAll } from '../../interfaces/room';
-import { fillNotAvailable, getOverlapEvent, Meta, newEvent } from '../../util/event';
+import { createRecurringEvent, fillNotAvailable, getOverlapEvent, Meta, newEvent } from '../../util/event';
 import { Router } from '@angular/router';
 import { CalendarEvent } from 'angular-calendar';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { IUserAll } from '../../interfaces/user';
 import { IUnavailableAll } from '../../interfaces/unavailable';
 import { getUserName } from '../../util/helper';
-import { addDays, addMonths } from 'date-fns';
+import { addMonths } from 'date-fns';
 import { findStateColor, isDarkMode } from '../../util/theme';
 import { takeUntil } from 'rxjs/operators';
 import RRule from 'rrule';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-calendar',
@@ -133,9 +134,15 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   segmentClick(date: Date, room?: IRoom): void {
+    const data = {date, room};
     if (date && room && this.dateIsValid(date)) {
-      const data = {date, room};
-      this.router.navigate(['reservation'], {state: data});
+      const dialogRef = this.dialog.open(CalendarDialogComponent);
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.router.navigate(result.split(','), {state: data});
+        }
+      });
     }
   }
 
@@ -218,34 +225,15 @@ export class CalendarComponent implements OnInit, OnDestroy {
     const unavailableList: IUnavailableAll[] = rr.unavailableList;
     let recurringEvents: any[] = [];
     unavailableList.forEach(it => {
-      if (it.duration) {
+      if (it.duration || it.allDay) {
         const start = newDate(it.start);
-        const duration = convertDuration(it.duration);
+        const duration = getDuration(it.duration, rr.room, newDate(it.start));
         if (it.repeat === 'NONE') {
           if (!greaterOrEqualsThan(start, this.maxDate)) {
             this.validateUnavailableEvent(rr.room, start, duration, it, darkMode);
           }
         } else {
-          let startDate;
-          let rrule;
-          switch (it.repeat) {
-            case 'ONCE_A_WEEK':
-              const byweekday = getWeekDay(start.getDay());
-              startDate = createNewDate(addDays(this.today, (start.getDay() + 7 - this.today.getDay()) % 7),
-                start.getHours(), start.getMinutes());
-              rrule = {
-                freq: RRule.WEEKLY,
-                byweekday
-              };
-              break;
-            case 'EVERY_DAY':
-              startDate = createNewDate(this.today, start.getHours(), start.getMinutes());
-              rrule = {
-                freq: RRule.DAILY
-              };
-              break;
-          }
-          recurringEvents = [...recurringEvents, {duration, it, startDate, rrule}];
+          recurringEvents = [...recurringEvents, createRecurringEvent(it.repeat, start, this.today, it, duration)];
         }
       }
     });
@@ -348,5 +336,22 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsReservation.GetAllGroupingByRoom()
     );
+  }
+}
+
+@Component({
+  selector: 'app-calendar-dialog',
+  templateUrl: './calendar-dialog.component.html',
+  styleUrls: ['./calendar-dialog.component.scss']
+})
+export class CalendarDialogComponent {
+
+  radio: FormControl = new FormControl('reservation');
+
+  constructor(public dialogRef: MatDialogRef<CalendarDialogComponent>) {
+  }
+
+  onNoClick(): void {
+    this.dialogRef.close();
   }
 }

@@ -27,9 +27,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Role } from '../../interfaces/token';
 import { getFullUserName, getPrice, getUserName, newExtra, newPrice, snakeToCamel } from '../../util/helper';
-import { FormControl } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
-import { IPrice, IProduct, Price } from '../../interfaces/product';
+import { IPrice, IProduct, IProductGroup, Price } from '../../interfaces/product';
 import { requireMatch, valueChange } from '../../util/validators';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatFabMenu, MatFabMenuDirection } from '@angular-material-extensions/fab-menu/lib/mat-fab-menu.component';
@@ -516,9 +516,11 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   templateUrl: './complete-dialog.component.html'
 })
 export class CompleteDialogComponent implements OnInit, OnDestroy {
-  getState: Observable<any>;
-  subscription: Subscription | undefined;
-
+  groups: IProductGroup[] | undefined;
+  filteredGroup: Observable<IProductGroup[] | undefined> | undefined;
+  group: FormControl = new FormControl('', [
+    Validators.required, requireMatch
+  ]);
   products: IProduct[] | undefined;
   filteredProduct: Observable<IProduct[] | undefined> | undefined;
   product: FormControl = new FormControl('', [requireMatch]);
@@ -529,6 +531,9 @@ export class CompleteDialogComponent implements OnInit, OnDestroy {
 
   types = PaymentType;
   price: IPrice;
+
+  private getState: Observable<any>;
+  private subscription: Subscription | undefined;
 
   constructor(public dialogRef: MatDialogRef<CompleteDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
               private store: Store<AppState>, private translate: TranslateService) {
@@ -556,7 +561,19 @@ export class CompleteDialogComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.getProducts();
     this.subscribe();
-    this.filteredProduct = this.product.valueChanges.pipe(
+    this.filteredGroup = this.group.valueChanges.pipe(
+      startWith(''),
+      map(value => {
+        if (typeof value === 'string') {
+          return value;
+        }
+        this.products = value.products;
+        this.product.setValue('');
+        return value.name;
+      }),
+      map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups)
+    );
+    this.filteredProduct = this.product?.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filterProduct(name) : this.products ? this.products.slice() : this.products)
@@ -579,20 +596,31 @@ export class CompleteDialogComponent implements OnInit, OnDestroy {
     this.dialogRef.close({description, price, productId, paymentType});
   }
 
+  displayFnGroup(group: IProductGroup): string {
+    return group ? `${group.name}` : '';
+  }
+
   displayFnProduct(product: IProduct): string {
     return product ? `${product.name}` : '';
   }
 
-  keyDownHandler(event: any): void {
+  keyDownHandler(event: any, form: FormControl): void {
     if (event.code === 'Backspace') {
-      this.product.setValue('');
+      form.setValue('');
     }
   }
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       if (state.productDiscount) {
-        this.products = state.productDiscount.products;
+        this.groups = state.productDiscount.groups;
+        this.group.setValue(this.groups?.find(group => {
+          if (group.products?.find(product => product.id === this.product.value.id)) {
+            this.products = group.products;
+            return group;
+          }
+          return undefined;
+        }));
       }
     });
   }
@@ -601,6 +629,12 @@ export class CompleteDialogComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsReservation.GetAllProducts()
     );
+  }
+
+  private filterGroup(name: string): IProductGroup[] | undefined {
+    const filterValue = name.toLowerCase();
+
+    return this.groups?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 
   private filterProduct(name: string): IProduct[] | undefined {

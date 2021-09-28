@@ -12,7 +12,6 @@ import { DragDropDirective } from '../directives/drag-drop.directive';
 import { CatalogueComponent } from './catalogue.component';
 import { CataloguesComponent } from './list/catalogues.component';
 import { CatalogueDetailComponent } from './detail/catalogue-detail.component';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
@@ -32,7 +31,6 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     FormsModule,
     ReactiveFormsModule,
     AppMaterialModule,
-    MatCheckboxModule,
     MatProgressBarModule,
     DragDropModule
   ]

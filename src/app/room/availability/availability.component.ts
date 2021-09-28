@@ -48,13 +48,13 @@ export class AvailabilityComponent implements OnChanges {
     const startLunch = this.dates?.startLunchDate || createDate(13, 0);
     const endLunch = this.dates?.endLunchDate || createDate(14, 0);
 
-    this.start.setValue(getTime(start, this.translate.currentLang));
-    this.end.setValue(getTime(end, this.translate.currentLang));
+    this.start.setValue(getTime(start, 'es'));
+    this.end.setValue(getTime(end, 'es'));
 
     if (this.dates?.startLunchDate && this.dates?.endLunchDate) {
       this.checked = true;
-      this.startLunch.setValue(getTime(startLunch, this.translate.currentLang));
-      this.endLunch.setValue(getTime(endLunch, this.translate.currentLang));
+      this.startLunch.setValue(getTime(startLunch, 'es'));
+      this.endLunch.setValue(getTime(endLunch, 'es'));
     }
   }
 

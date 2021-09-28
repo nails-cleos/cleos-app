@@ -1,0 +1,13 @@
+<h1 mat-dialog-title>{{'COMMON.COLUMN.ACTIONS' | translate}}</h1>
+<div mat-dialog-content>
+  <mat-radio-group [formControl]="radio" aria-label="Select an option">
+    <mat-radio-button value="reservation">{{'COMMON.BUTTON.BOOK' | translate}}</mat-radio-button>
+    <mat-radio-button value="unavailable,add">{{'UNAVAILABLE.TITLE' | translate}}</mat-radio-button>
+  </mat-radio-group>
+</div>
+<div mat-dialog-actions>
+  <button (click)="onNoClick()" mat-button>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+  <button [mat-dialog-close]="radio.value" cdkFocusInitial color="primary"
+          mat-button>Ok
+  </button>
+</div>

@@ -25,6 +25,14 @@ export interface IAvailability {
   endLunch?: string;
 }
 
+export interface IAvailabilityAll {
+  day: string;
+  start: string;
+  end: string;
+  startLunch?: string;
+  endLunch?: string;
+}
+
 export interface IAvailabilityDate {
   startDate?: Date;
   endDate?: Date;

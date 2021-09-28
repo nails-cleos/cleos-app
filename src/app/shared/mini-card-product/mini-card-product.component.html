@@ -1,26 +1,43 @@
-<mat-card class="mini-dashboard-card mat-elevation-z8">
+<mat-card class="mat-elevation-z8">
   <mat-card-header (click)="click($event)"
                    matTooltip="{{'COMMON.BUTTON.EXPAND.' + expand.toString().toUpperCase() | translate}}"
                    matTooltipPosition="above">
-    <mat-card-title class="card-text-color">
+    <mat-card-title>
       {{card.name}}
     </mat-card-title>
-    <mat-card-subtitle class="card-text-color">{{card.price | currency:'$':'symbol':'0.0' }}</mat-card-subtitle>
   </mat-card-header>
-  <mat-card-content (click)="click($event)" [@detailExpand]="expand ? 'expanded' : 'collapsed'"
-                    class="dashboard-card-content card-text-color detail">
-    <div>{{card.description}}</div>
-    <div class="divider"></div>
-    <div *ngIf="card.duration" [innerHTML]="'CARD.PRODUCT.DURATION' | translate: {duration: time}"></div>
+  <mat-card-content class="dashboard-card-content">
+    <div (click)="click($event)">{{card.description}}</div>
     <div *ngIf="card.durability"
          [innerHTML]="'CARD.PRODUCT.DURABILITY' | translate: {durability: card.durability}"></div>
-    <div *ngIf="card.rating">
-      <app-rating [notEmpty]="true" [rate]="'REVIEW.RATE'" [rating]="card.rating" class="card-text-color"
-                  color="primary"></app-rating>
+    <div [@detailExpand]="expand ? 'expanded' : 'collapsed'" class="divider detail">
+      <div class="product-container">
+        <div *ngFor="let product of products" class="card-wrap">
+          <mat-card (click)="setProduct(product)" class="mini-dashboard-card">
+            <mat-card-header>
+              <mat-card-title class="card-text-color">
+                {{product.name}}
+              </mat-card-title>
+              <mat-card-subtitle class="card-text-color">
+                {{product.price | currency:'$':'symbol':'0.0' }}
+              </mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content class="card-text-color">
+              <div>{{product.description}}</div>
+              <div *ngIf="product.duration"
+                   [innerHTML]="'CARD.PRODUCT.DURATION' | translate: {duration: product.duration}"></div>
+              <div *ngIf="product.rating">
+                <app-rating [notEmpty]="true" [rate]="'REVIEW.RATE'" [rating]="product.rating" class="card-text-color"
+                            color="primary"></app-rating>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
     </div>
   </mat-card-content>
-  <mat-card-actions class="card-text-color">
-    <button mat-button>
+  <mat-card-actions>
+    <button (click)="setGroup()" mat-button>
       <mat-icon matPrefix>done</mat-icon>
       {{'COMMON.BUTTON.SELECT' | translate}}
     </button>
