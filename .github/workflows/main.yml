@@ -71,3 +71,26 @@ jobs:
             docker run -d -p 443:443 -p 80:80 --restart=unless-stopped \
             --mount type=bind,source=/opt/certs,target=/etc/nginx/certs \
             --name cleos docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME:${{ needs.push.outputs.version_name }}
+
+  update-version:
+    needs: deploy
+
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+      - name: Get project
+      - uses: actions/checkout@v1
+      - name: Update develop version
+        run: |
+          git stash
+          git config --local user.email "espaciocleos@gmail.com"
+          git config --local user.name "Espacio Cleos"
+          git checkout develop
+          # make file runnable, might not be necessary
+          chmod +x "${GITHUB_WORKSPACE}/version-update.sh"
+
+          # run script
+          "${GITHUB_WORKSPACE}/version-update.sh"
+          git commit -am "Update version"
+          git push
