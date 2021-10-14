@@ -180,6 +180,10 @@ export const formatFullDateTime = (date: Date, locale: string): string => date.t
   day: 'numeric', month: 'long', weekday: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
 });
 
+export const formatFullDate = (date: Date, locale: string): string => date.toLocaleDateString(locale, {
+  day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+});
+
 export const formatDateTime = (date: Date, locale: string): string => {
   const result = date.toLocaleDateString(locale, {
     day: 'numeric', month: 'long', weekday: 'long', hour: '2-digit', minute: '2-digit'

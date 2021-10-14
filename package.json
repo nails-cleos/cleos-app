@@ -11,7 +11,7 @@
     "start:dev": "ng serve",
     "start:pwa": " docker run -d -p 443:443 -p 80:80 --restart=unless-stopped --mount type=bind,source=D:\\Documentos\\Chanchito\\Certs\\localhost,target=/etc/nginx/certs --name nails-app nails-app ",
     "build": "ng build --configuration=production",
-    "build:pwa": "docker build -t nails-app --build-arg BUILD=ng build --configuration=pwa --build-arg NGINX=nginx-staging.conf .",
+    "build:pwa": "docker build -t nails-app --build-arg BUILD_CONFIG=--configuration=pwa --build-arg NGINX=nginx-staging.conf .",
     "test": "ng test",
     "lint": "ng lint --fix",
     "eslint": "eslint src --fix",

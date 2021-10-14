@@ -50,7 +50,8 @@
                   <td class="right">{{ 'PRODUCT.PRICE.FIELD' | translate }}</td>
                   <td *ngIf="price.discount; else noDiscount" class="left">
                     <span [class.strikethrough]="price.amount">$ {{price.amount | number:'1.2-2'}}</span>
-                    <span [@discountAnimation] class="raised-button bold">$ {{price.priceWithDiscount | number:'1.2-2'}}</span>
+                    <span [@discountAnimation]
+                          class="raised-button bold">$ {{price.priceWithDiscount | number:'1.2-2'}}</span>
                   </td>
                   <ng-template #noDiscount>
                     <td class="left">$ {{price.total | number:'1.2-2'}}</td>
@@ -77,6 +78,11 @@
           <mat-divider *ngIf="upcoming"></mat-divider>
           <mat-card-actions *ngIf="upcoming.id; else buttonSkeleton">
             <div fxFlex></div>
+            <button *ngIf="upcoming?.state === 'APPROVED' || upcoming?.state === 'PARTIALLY_PAID'"
+                    [routerLink]="['/me', 'reservation', upcoming.id, 'payment']" mat-raised-button>
+              <mat-icon class="ml-button" color="primary">payment</mat-icon>
+              {{ 'COMMON.BUTTON.ML' | translate }}
+            </button>
             <button [routerLink]="['/me', 'reservation', upcoming.id]" color="primary" mat-raised-button>
               <mat-icon>edit_calendar</mat-icon>
               {{ 'COMMON.BUTTON.EDIT' | translate }}
@@ -178,7 +184,7 @@
                   matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
             <mat-icon color="primary">visibility</mat-icon>
           </button>
-          <button *ngIf="reservation.state === 'COMPLETED'" (click)="onRatingChanged(reservation)"
+          <button (click)="onRatingChanged(reservation)" *ngIf="reservation.state === 'COMPLETED'"
                   mat-icon-button matTooltip="{{ 'COMMON.BUTTON.REVIEW' | translate }}" matTooltipPosition="right">
             <mat-icon color="accent">reviews</mat-icon>
           </button>

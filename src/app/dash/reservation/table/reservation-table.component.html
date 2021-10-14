@@ -76,7 +76,7 @@
                   matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
             <mat-icon color="primary">visibility</mat-icon>
           </button>
-          <button (click)="delete(reservation)" *ngIf="!reservation.deleted" fxHide.lt-sm fxShow mat-icon-button
+          <button (click)="delete(reservation)" *ngIf="isAdmin && !reservation.deleted" fxHide.lt-sm fxShow mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
             <mat-icon color="warn">delete</mat-icon>
           </button>

@@ -2,7 +2,7 @@ import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChi
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { Store } from '@ngrx/store';
-import { AppState, selectReservationState } from '../../../store/app.states';
+import { AppState, selectAuthState, selectReservationState } from '../../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../../store/reservation.actions';
 import { IReservation, IReservationAll } from '../../../interfaces/reservation';
@@ -15,6 +15,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { getUserName, snakeToCamel } from '../../../util/helper';
 import { ReservationIconKey, ReservationIconName } from '../../../util/icon';
 import { newDate, reservationDateTime } from '../../../util/dates';
+import { Role } from '../../../interfaces/token';
 
 @Component({
   selector: 'app-reservation-table',
@@ -30,6 +31,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
   error: any;
+  isAdmin = false;
 
   private getState: Observable<any>;
   private subscription: Subscription | undefined;
@@ -37,6 +39,8 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
     this.getState = this.store.select(selectReservationState);
+    this.store.select(selectAuthState).subscribe((state: any) =>
+      this.isAdmin = state.user?.authorities.some((u: { authority: Role }) => u.authority === Role.admin));
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small

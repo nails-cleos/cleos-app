@@ -15,7 +15,9 @@ RUN ngcc
 
 ADD . .
 
-RUN npm run $BUILD
+RUN if [[ -z "$BUILD_CONFIG" ]] ; then BUILD_CONFIG=--configuration=production ; fi
+
+RUN npm run $BUILD_CONFIG
 
 ### STAGE 2: Deploy ###
 FROM nginx:1.17.1-alpine as nginx

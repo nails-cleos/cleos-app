@@ -1,6 +1,14 @@
 import { IAvailability } from '../interfaces/room';
 import { CalendarEvent } from 'angular-calendar';
-import { createDate, createNewDate, getNow, getWeekDay, greaterOrEqualsThanToday, IDuration } from './dates';
+import {
+  createDate,
+  createNewDate,
+  getNow,
+  getWeekDay,
+  greaterOrEqualsThan,
+  greaterOrEqualsThanToday,
+  IDuration
+} from './dates';
 import { findStateColor } from './theme';
 import RRule from 'rrule';
 import { addDays, isToday } from 'date-fns';
@@ -28,10 +36,11 @@ export const createRecurringEvent = (repeat: string, start: Date, date: Date, it
                                      duration: IDuration): any => {
   let startDate;
   let rrule;
+  const finalDate = greaterOrEqualsThan(date, start) ? date : start;
   switch (repeat) {
     case 'ONCE_A_WEEK':
       const byweekday = getWeekDay(start.getDay());
-      startDate = createNewDate(addDays(date, (start.getDay() + 7 - date.getDay()) % 7),
+      startDate = createNewDate(addDays(finalDate, (start.getDay() + 7 - date.getDay()) % 7),
         start.getHours(), start.getMinutes());
       rrule = {
         freq: RRule.WEEKLY,
@@ -39,7 +48,7 @@ export const createRecurringEvent = (repeat: string, start: Date, date: Date, it
       };
       break;
     case 'EVERY_DAY':
-      startDate = createNewDate(date, start.getHours(), start.getMinutes());
+      startDate = createNewDate(finalDate, start.getHours(), start.getMinutes());
       rrule = {
         freq: RRule.DAILY
       };

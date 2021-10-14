@@ -13,6 +13,7 @@ import {
   diffTime,
   filterDate,
   formatDuration,
+  formatFullDate,
   formatTime,
   getMinMaxDate,
   getNow,
@@ -22,6 +23,9 @@ import {
 import { IRoomAll } from '../../interfaces/room';
 import { IUser } from '../../interfaces/user';
 import { getUserName } from '../../util/helper';
+import { DialogComponent } from '../../shared/dialog/dialog.component';
+import { TranslateService } from '@ngx-translate/core';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-unavailable-detail',
@@ -60,7 +64,7 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
   private getState: Observable<any>;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
-              private router: Router) {
+              private router: Router, private readonly translate: TranslateService, public dialog: MatDialog) {
     this.getState = this.store.select(selectUnavailableState);
   }
 
@@ -154,6 +158,24 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
     }
   }
 
+  delete(): void {
+    const title = this.translate.instant('UNAVAILABLE.DELETED.TITLE');
+    const date = this.unavailable?.startDate ? formatFullDate(this.unavailable.startDate, this.translate.currentLang)
+      : this.unavailable?.start;
+    const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT', {date});
+    const dialogRef = this.dialog.open(DialogComponent, {
+      data: {title, content, value: this.unavailable}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.store.dispatch(
+          new fromActionsUnavailable.DeleteUnavailable(result.id)
+        );
+      }
+    });
+  }
+
   private createForm(): void {
     this.form = this.formBuilder.group({
       description: new FormControl(),
@@ -191,6 +213,7 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
         this.unavailable = {
           id: state.selected.id,
           description: state.selected.description,
+          start: state.selected.start,
           startDate: date,
           startTime: getTime(date, API_LOCALE),
           duration: state.selected.duration ? formatDuration(state.selected.duration, API_LOCALE) : '',
