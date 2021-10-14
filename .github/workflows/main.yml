@@ -79,13 +79,14 @@ jobs:
     if: github.event_name == 'push'
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
-      - name: Update develop version
+      - name: Update version
         run: |
           git stash
-          git config --local user.email "espaciocleos@gmail.com"
-          git config --local user.name "Espacio Cleos"
+          git config --global user.email "espaciocleos@gmail.com"
+          git config --global user.name "Espacio Cleos"
+          git fetch
           git checkout develop
           # make file runnable, might not be necessary
           chmod +x "${GITHUB_WORKSPACE}/version-update.sh"
