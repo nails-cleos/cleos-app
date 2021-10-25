@@ -94,9 +94,14 @@ export class DashComponent implements OnInit, OnDestroy {
     this.totalReservation = 0;
   }
 
-  get total(): number {
-    return this.events?.filter((event: CalendarEvent) => event.meta.state !== States.cancelled
+  get completed(): number {
+    return this.events?.filter((event: CalendarEvent) => event.meta.state === States.completed
       && isSameMonth(event.start, this.viewDate)).length;
+  }
+
+  get upcoming(): number {
+    return this.events?.filter((event: CalendarEvent) => event.meta.state && event.meta.state !== States.completed
+      && event.meta.state !== States.cancelled && isSameMonth(event.start, this.viewDate)).length;
   }
 
   private static createErrorMiniCard(title: string, message: string): IReservationSummary {

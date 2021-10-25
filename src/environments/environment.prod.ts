@@ -2,6 +2,7 @@ export const environment = {
   production: true,
   appServer: 'https://www.espaciocleos.com',
   title: 'Cleos',
+  version: require('../../package.json').version,
   baseUrl: 'https://espaciocleos.com:8443/api',
   mlUrl: 'https://www.mercadopago.com.ar/checkout/v1/redirect',
   googleClientId: '1075596698405-ujflh3nuhglps8br89a1gtk7obi333h9.apps.googleusercontent.com',

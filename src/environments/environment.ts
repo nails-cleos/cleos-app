@@ -6,6 +6,7 @@ export const environment = {
   production: false,
   appServer: 'http://localhost:4200',
   title: 'Cleos DEV',
+  version: require('../../package.json').version + '-dev',
   baseUrl: 'http://localhost:8080/api',
   mlUrl: 'https://sandbox.mercadopago.com.ar/checkout/v1/redirect',
   googleClientId: '57757755712-1gcjdgbd0lkj4msirrmra9aglcb0vbmk.apps.googleusercontent.com',

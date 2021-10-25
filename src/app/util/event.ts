@@ -1,6 +1,7 @@
 import { IAvailability } from '../interfaces/room';
 import { CalendarEvent } from 'angular-calendar';
 import {
+  API_LOCALE,
   createDate,
   createNewDate,
   getNow,
@@ -183,7 +184,7 @@ const createEvent = (it: IAvailability, date: Date, notWorking: string, unavaila
     }
   } else {
     const now = getNow();
-    const nowTime = now.toLocaleTimeString('en-GB').split(':');
+    const nowTime = now.toLocaleTimeString(API_LOCALE).split(':');
     const hour = Number(nowTime[0]);
     const minute = Number(nowTime[1]);
     if (it.start) {
@@ -237,7 +238,7 @@ const createEvent = (it: IAvailability, date: Date, notWorking: string, unavaila
 const createLunchEvent = (it: IAvailability, date: Date, unavailable: string, lunch: string,
                           isDarkMode: boolean): CalendarEvent | undefined => {
   const now = getNow();
-  const nowTime = now.toLocaleTimeString('en-GB').split(':');
+  const nowTime = now.toLocaleTimeString(API_LOCALE).split(':');
   let hour = Number(nowTime[0]);
   let minute = Number(nowTime[1]);
 

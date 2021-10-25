@@ -1,9 +1,9 @@
 <div class="mat-elevation-z8">
-  <table [dataSource]="dataSource" mat-table matSort matSortActive="name"
-         matSortDirection="desc" matSortDisableClear>
+  <table [dataSource]="dataSource" mat-table matSort matSortActive="name" matSortDirection="desc" matSortDisableClear
+         multiTemplateDataRows>
     <ng-container matColumnDef="position">
       <th *matHeaderCellDef mat-header-cell>#</th>
-      <td *matCellDef="let unavailable; let i = index;" mat-cell>
+      <td *matCellDef="let unavailable; let i = dataIndex;" mat-cell>
         <div *ngIf="unavailable.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -78,8 +78,8 @@
     </ng-container>
 
     <ng-container matColumnDef="actions">
-      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-      <td *matCellDef="let unavailable" mat-cell>
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+      <td *matCellDef="let unavailable" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="unavailable.id; else skeleton">
           <button (click)="edit(unavailable)" *ngIf="!unavailable.deleted" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
@@ -96,15 +96,62 @@
       </td>
     </ng-container>
 
+    <ng-container matColumnDef="expandedDetail">
+      <td *matCellDef="let unavailable" [attr.colspan]="displayedColumns.length" mat-cell>
+        <div [@detailExpand]="unavailable === expandedUnavailable ? 'expanded' : 'collapsed'"
+             class="unavailable-detail">
+          <mat-list>
+            <div fxHide fxShow.lt-sm mat-subheader>{{ 'UNAVAILABLE.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
+            <mat-list-item fxHide fxShow.lt-sm role="list">
+              <div mat-line>{{getProfessionalName(unavailable.professional)}}</div>
+            </mat-list-item>
+            <div *ngIf="unavailable.description" fxHide fxShow.lt-sm
+                 mat-subheader>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</div>
+            <mat-list-item *ngIf="unavailable.description" fxHide fxShow.lt-sm role="list">
+              <div mat-line>{{unavailable.description}}</div>
+            </mat-list-item>
+            <div fxHide fxShow.lt-sm mat-subheader>{{ 'UNAVAILABLE.LIST.COLUMN.DURATION' | translate }}</div>
+            <mat-list-item fxHide fxShow.lt-sm role="list">
+              <div *ngIf="!unavailable.allDay; else allDay" mat-line>
+                <mat-icon matPrefix>timer</mat-icon>&nbsp;
+                {{unavailable.hour | number:'2.0-0'}}:{{unavailable.minute | number:'2.0-0'}}
+              </div>
+              <ng-template #allDay>
+                <div mat-line>
+                  <mat-icon matPrefix>timer</mat-icon>&nbsp;
+                  {{'UNAVAILABLE.ALL_DAY.CHECK' | translate}}
+                </div>
+              </ng-template>
+            </mat-list-item>
+            <div fxHide fxShow.lt-sm mat-subheader>{{ 'UNAVAILABLE.LIST.COLUMN.REPEAT' | translate }}</div>
+            <mat-list-item fxHide fxShow.lt-sm role="list">
+              <div mat-line>{{ 'COMMON.REPEAT.' + unavailable.repeat | translate}}              </div>
+            </mat-list-item>
+            <div fxHide fxShow.lt-sm mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+            <div fxHide fxShow.lt-sm>
+              <button (click)="edit(unavailable)" *ngIf="!unavailable.deleted" mat-icon-button>
+                <mat-icon color="primary">edit</mat-icon>
+              </button>
+              <button (click)="delete(unavailable)" *ngIf="!unavailable.deleted" mat-icon-button>
+                <mat-icon color="warn">delete</mat-icon>
+              </button>
+            </div>
+          </mat-list>
+        </div>
+      </td>
+    </ng-container>
+
     <ng-container matColumnDef="noContent">
       <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
         {{ 'UNAVAILABLE.LIST.ERROR.NO_CONTENT' | translate }}</td>
     </ng-container>
 
-    <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
-
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-    <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
+    <tr (click)="expandedUnavailable = expandedUnavailable === unavailable ? null : unavailable"
+        *matRowDef="let unavailable; columns: displayedColumns;" class="unavailable-row" mat-row></tr>
+    <tr *matRowDef="let row; columns: ['expandedDetail']" class="unavailable-detail-row" mat-row></tr>
+
+    <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
   </table>
   <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
 

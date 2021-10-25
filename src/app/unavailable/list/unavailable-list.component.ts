@@ -15,11 +15,13 @@ import { IUnavailable } from '../../interfaces/unavailable';
 import { IUser } from '../../interfaces/user';
 import { getUserName } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { detailExpandAnimation } from '../../util/animation';
 
 @Component({
   selector: 'app-unavailable-list',
   templateUrl: './unavailable-list.component.html',
-  styleUrls: ['./unavailable-list.component.scss']
+  styleUrls: ['./unavailable-list.component.scss'],
+  animations: [detailExpandAnimation]
 })
 export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -29,6 +31,8 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
   dataSource: any = new MatTableDataSource<Pagination<IUnavailable>>();
   subscription: Subscription | undefined;
   getState: Observable<any>;
+
+  expandedUnavailable: IUnavailable | undefined;
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;

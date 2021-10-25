@@ -2,3 +2,15 @@
   text-align: center !important;
 }
 
+tr.unavailable-detail-row {
+  height: 0;
+}
+
+.unavailable-row td {
+  border-bottom-width: 0;
+}
+
+.unavailable-detail {
+  overflow: hidden;
+  display: flex;
+}

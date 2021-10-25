@@ -13,6 +13,7 @@ import {
   Reservation
 } from '../../../interfaces/reservation';
 import {
+  API_LOCALE,
   convertDuration,
   createNewDate,
   Duration,
@@ -272,7 +273,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     reservation.customerId = this.customerId;
     reservation.roomId = this.room.value.id;
     if (this.startDate) {
-      reservation.start = this.startDate.toLocaleString('en-GB');
+      reservation.start = this.startDate.toLocaleString(API_LOCALE);
     }
 
     if (this.isEditing && this.reservation) {

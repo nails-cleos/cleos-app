@@ -1,6 +1,6 @@
 ### STAGE 1: Build ###
 FROM node:14.17-alpine as build
-ARG BUILD
+ARG BUILD_CONFIG=build
 
 WORKDIR /usr/src/app
 
@@ -15,13 +15,11 @@ RUN ngcc
 
 ADD . .
 
-RUN if [[ -z "$BUILD_CONFIG" ]] ; then BUILD_CONFIG=--configuration=production ; fi
-
-RUN npm run build $BUILD_CONFIG
+RUN npm run ${BUILD_CONFIG}
 
 ### STAGE 2: Deploy ###
 FROM nginx:1.17.1-alpine as nginx
-ARG NGINX
+ARG NGINX=nginx.conf
 
 COPY ${NGINX} /etc/nginx/nginx.conf
 COPY --from=build /usr/src/app/dist/cleos /usr/share/nginx/html

@@ -97,13 +97,18 @@ export class UnavailableComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const time = this.startTime.value.split(':');
-    const date = createNewDate(this.startDate.value, time[0], time[1]);
+    let date: Date;
+    if (!this.allDay.value) {
+      const time = this.startTime.value.split(':');
+      date = createNewDate(this.startDate.value, time[0], time[1]);
+    } else {
+      date = createNewDate(this.startDate.value);
+    }
 
     const unavailable: IUnavailable = new Unavailable();
     unavailable.professionalId = this.professional.value.id;
     unavailable.description = this.form.value.description;
-    unavailable.start = date.toLocaleString('en-GB');
+    unavailable.start = date.toLocaleString(API_LOCALE);
     unavailable.repeat = this.repeat.value;
     unavailable.duration = this.duration.value;
     unavailable.allDay = this.allDay.value;
