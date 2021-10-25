@@ -70,5 +70,5 @@ jobs:
 
           # run script
           "${GITHUB_WORKSPACE}/version-update.sh" true
-          git commit -am "Update snapshot version"
+          git commit -am "Update rc version"
           git push
