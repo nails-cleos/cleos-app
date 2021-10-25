@@ -45,6 +45,9 @@ jobs:
 
       - name: Create tag
         run: |
+          git config --global user.email "espaciocleos@gmail.com"
+          git config --global user.name "Espacio Cleos"
+          git fetch
           echo "Create tag v${{ needs.version.outputs.version_name }}"
           git tag -a "v${{ needs.version.outputs.version_name }}" -m "New release for v${{ needs.version.outputs.version_name }}"
           git push --tags
