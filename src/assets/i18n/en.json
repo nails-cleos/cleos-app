@@ -110,7 +110,10 @@
     "SIGN_IN": "Sign In",
     "HOME": "Home",
     "DARK_MODE": "Dark mode",
-    "TOTAL_RESERVATIONS": " - Reservations: {{total}}",
+    "RESERVATION": {
+      "COMPLETED": "Completed: {{completed}}",
+      "UPCOMING": "Upcoming: {{upcoming}}"
+    },
     "MINI_CARD": {
       "DURATION": "since last month",
       "TOTAL_PRODUCT_SALES": "Total Product Sales",

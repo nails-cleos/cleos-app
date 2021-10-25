@@ -36,7 +36,7 @@ const routes: Routes = [
   },
   {
     path: ':id/more-info', component: MoreInfoComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.professional]
+      roles: [Role.professional]
     }, runGuardsAndResolvers: 'always'
   }];
 

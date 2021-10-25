@@ -24,6 +24,7 @@ import { ThemeService } from 'ng2-charts';
 export class MainComponent {
   title = environment.title;
   isAuthenticated = false;
+  appVersion = environment.version;
 
   cssClass: string | undefined;
   checked = false;

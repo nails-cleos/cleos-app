@@ -135,10 +135,16 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
     }
     const unavailable: IUnavailable = new Unavailable();
     unavailable.id = this.unavailable?.id;
-    const time = this.startTime.value.split(':');
-    const date = createNewDate(this.startDate.value, time[0], time[1]);
 
-    unavailable.start = date.toLocaleString('en-GB');
+    let date: Date;
+    if (!this.allDay.value) {
+      const time = this.startTime.value.split(':');
+      date = createNewDate(this.startDate.value, time[0], time[1]);
+    } else {
+      date = createNewDate(this.startDate.value);
+    }
+
+    unavailable.start = date.toLocaleString(API_LOCALE);
     unavailable.description = valueChange(this.form.value?.description, this.unavailable?.description);
     unavailable.duration = fieldChange(this.duration, this.unavailable?.duration);
     unavailable.repeat = fieldChange(this.repeat, this.unavailable?.repeat);

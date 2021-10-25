@@ -1,6 +1,6 @@
 {
   "name": "cleos",
-  "version": "1.0.1",
+  "version": "1.0.1-rc",
   "engines": {
     "node": "14.17.0",
     "npm": "6.14.13"
@@ -11,12 +11,13 @@
     "start:dev": "ng serve",
     "start:pwa": " docker run -d -p 443:443 -p 80:80 --restart=unless-stopped --mount type=bind,source=D:\\Documentos\\Chanchito\\Certs\\localhost,target=/etc/nginx/certs --name nails-app nails-app ",
     "build": "ng build --configuration=production",
-    "build:pwa": "docker build -t nails-app --build-arg BUILD_CONFIG=--configuration=pwa --build-arg NGINX=nginx-staging.conf .",
+    "build-pwa": "ng build --configuration=pwa",
+    "build:pwa": "docker build -t nails-app --build-arg BUILD_CONFIG=build-pwa --build-arg NGINX=nginx-staging.conf .",
     "test": "ng test",
     "lint": "ng lint --fix",
     "eslint": "eslint src --fix",
     "e2e": "ng e2e",
-    "heroku-postbuild": "node post-build.js"
+    "heroku-postbuild": "ng build --configuration=staging"
   },
   "private": true,
   "dependencies": {
@@ -85,7 +86,7 @@
     "@ngrx/schematics": "^12.3.0",
     "@types/googlemaps": "^3.43.3",
     "@types/jasmine": "~3.6.0",
-    "@types/node": "^12.11.1",
+    "@types/node": "^12.20.34",
     "@typescript-eslint/eslint-plugin": "4.28.2",
     "@typescript-eslint/parser": "4.28.2",
     "codelyzer": "^6.0.0",

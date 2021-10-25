@@ -1,8 +1,13 @@
 <!--Calendar-->
 <mat-card>
   <mat-card-header>
-    <mat-card-title>{{ viewDate | calendarDate:(view + 'ViewTitle'):locale }}<span
-      *ngIf="!isCalendarLoading" [innerHTML]="'DASHBOARD.TOTAL_RESERVATIONS' | translate: {total: total}"></span>
+    <mat-card-title>{{ viewDate | calendarDate:(view + 'ViewTitle'):locale }}
+      <div *ngIf="!isCalendarLoading">
+        <div [innerHTML]="'DASHBOARD.RESERVATION.COMPLETED' | translate: {completed: completed}">
+        </div>
+        <div [innerHTML]="'DASHBOARD.RESERVATION.UPCOMING' | translate: {upcoming: upcoming}">
+        </div>
+      </div>
     </mat-card-title>
     <mat-card-subtitle *ngIf="!isCalendarLoading" class="calendar-title">
       <button (click)="changeDate()" (viewDateChange)="closeOpenMonthViewDay()" [(viewDate)]="viewDate" [view]="view"

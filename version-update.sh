@@ -1,26 +1,30 @@
 #!/bin/bash
 
+FILENAME="package.json"
+IS_SNAPSHOT=$1
+SNAPSHOT="-rc"
+
 replace()
 {
   local REPLACE=$1
-  local FILE=$2
+  LAST_VERSION=$(echo "$REPLACE" | xargs)
 
-  sed -i "/version/c\  \"version\": \"$REPLACE\"," $FILE
+  sed -i "/version/c\  \"version\": \"$LAST_VERSION\"," $FILENAME
+
+  echo "$LAST_VERSION"
 }
 
-PACKAGE_VERSION=$(cat package.json \
+PACKAGE_VERSION=$(cat "$FILENAME" \
   | grep version \
   | head -1 \
   | awk -F: '{ print $2 }' \
   | sed 's/[",]//g')
 
-NEW_VERSION=$(echo $PACKAGE_VERSION | \
+if [ "$IS_SNAPSHOT" ]; then
+  NEW_VERSION=$(echo "$PACKAGE_VERSION" | \
     gawk -F"." '{$NF+=1}{print $0RT}' OFS="." ORS="")
-
-# set CURRENT version by extracting version from package.json.
-if [ -z "$PACKAGE_VERSION" ]; then
-  CURRENT=$(cat package.json | jsonValue version)
-  CURRENT=`echo $PACKAGE_VERSION` # this command actually trim the string WTF!!!
+  replace "$NEW_VERSION$SNAPSHOT"
+else
+  RELEASE_VERSION=${PACKAGE_VERSION%"$SNAPSHOT"}
+  replace "$RELEASE_VERSION"
 fi
-
-replace "$NEW_VERSION" "package.json"

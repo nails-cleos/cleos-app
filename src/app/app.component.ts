@@ -16,7 +16,7 @@ import { DateAdapter } from '@angular/material/core';
 })
 export class AppComponent implements OnInit {
 
-  cssClass: string | undefined;
+  private cssClass: string | undefined;
 
   constructor(private store: Store<AppState>, private translate: TranslateService,
               private overlayContainer: OverlayContainer, private cookieService: CookieService,

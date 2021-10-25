@@ -1,89 +1,66 @@
-name: Deploy
+name: Update version
 
 on:
   push:
-    tags:
-      - v1.*.*
-
-env:
-  IMAGE_NAME: cleos
+    branches:
+      - main
+    tags-ignore:
+      - "**"
 
 jobs:
-  push:
+  version:
+    if: github.event_name == 'push'
+
     runs-on: ubuntu-latest
     outputs:
-      version_name: ${{ steps.push_image.outputs.VERSION_NAME }}
+      version_name: ${{ steps.version.outputs.VERSION_NAME }}
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME --build-arg NGINX=nginx.conf
-
-      - name: Log into registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
-
-      - name: Push image
-        id: push_image
+      - name: Release version
+        id: version
         run: |
-          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
-          # Change all uppercase to lowercase
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-          # Strip git ref prefix from version
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          # Use Docker `latest` tag convention
-          [ "$VERSION" == "master" ] && VERSION=latest
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
+          git config --global user.email "espaciocleos@gmail.com"
+          git config --global user.name "Espacio Cleos"
+          git fetch
+          # make file runnable, might not be necessary
+          chmod +x "${GITHUB_WORKSPACE}/version-update.sh"
+
+          # run script
+          VERSION=$("${GITHUB_WORKSPACE}/version-update.sh")
           echo "::set-output name=VERSION_NAME::$VERSION"
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
+          git commit -am "Update release version $VERSION"
+          git push
 
-  deploy:
-    needs: push
+  release:
+    needs: version
 
-    runs-on: ubuntu-latest
     if: github.event_name == 'push'
 
-    steps:
-      - name: SSH connector
-        id: deploy
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSHKEY }}
-          envs: IMAGE_NAME
-          script: |
-            echo "Stop cleos image"
-            docker stop cleos
-            echo "Remove cleos container"
-            docker rm cleos
-            echo "Remove image cleos"
-            docker rmi docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME:${{ needs.push.outputs.version_name }}
-            echo "Log into registry"
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
-            echo "Pull image"
-            docker pull docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME:${{ needs.push.outputs.version_name }}
-            echo "Run Docker cleos"
-            docker run -d -p 443:443 -p 80:80 --restart=unless-stopped \
-            --mount type=bind,source=/opt/certs,target=/etc/nginx/certs \
-            --name cleos docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME:${{ needs.push.outputs.version_name }}
-
-  update-version:
-    needs: deploy
-
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Update version
+      - name: Create tag
         run: |
-          git stash
+          echo "Create tag v${{ needs.version.outputs.version_name }}"
+          git tag -a "v${{ needs.version.outputs.version_name }}" -m "New release for v${{ needs.version.outputs.version_name }}"
+          git push --tags
+
+  snapshot:
+    needs: [ version, release ]
+
+    if: github.event_name == 'push'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Update rc version
+        run: |
           git config --global user.email "espaciocleos@gmail.com"
           git config --global user.name "Espacio Cleos"
           git fetch
@@ -92,6 +69,6 @@ jobs:
           chmod +x "${GITHUB_WORKSPACE}/version-update.sh"
 
           # run script
-          "${GITHUB_WORKSPACE}/version-update.sh"
-          git commit -am "Update version"
+          "${GITHUB_WORKSPACE}/version-update.sh" true
+          git commit -am "Update rc version"
           git push
