@@ -1,23 +1,21 @@
-name: Release
+name: Develop
 
 on:
   push:
     branches:
-      - main
+      - develop
     tags-ignore:
       - "**"
 
 jobs:
-  version:
+  snapshot:
     if: github.event_name == 'push'
-
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Release version
-        id: version
+      - name: Update rc version
         run: |
           git config --global user.email "espaciocleos@gmail.com"
           git config --global user.name "Espacio Cleos"
@@ -26,6 +24,6 @@ jobs:
           chmod +x "${GITHUB_WORKSPACE}/version-update.sh"
 
           # run script
-          VERSION=$("${GITHUB_WORKSPACE}/version-update.sh")
-          git commit -am "Update release version $VERSION"
+          "${GITHUB_WORKSPACE}/version-update.sh" true
+          git commit -am "Update rc version"
           git push
