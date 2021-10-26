@@ -12,8 +12,6 @@ jobs:
     if: github.event_name == 'push'
 
     runs-on: ubuntu-latest
-    outputs:
-      version_name: ${{ steps.version.outputs.VERSION_NAME }}
 
     steps:
       - uses: actions/checkout@v2
@@ -29,7 +27,6 @@ jobs:
 
           # run script
           VERSION=$("${GITHUB_WORKSPACE}/version-update.sh")
-          echo "::set-output name=VERSION_NAME::$VERSION"
           git commit -am "Update release version $VERSION"
           git push
 
@@ -42,15 +39,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Create tag
-        run: |
-          git config --global user.email "espaciocleos@gmail.com"
-          git config --global user.name "Espacio Cleos"
-          git fetch
-          echo "Create tag v${{ needs.version.outputs.version_name }}"
-          git tag -a "v${{ needs.version.outputs.version_name }}" -m "New release for v${{ needs.version.outputs.version_name }}"
-          git push --tags
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v5.6
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create a GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          name: New release for ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
 
   snapshot:
     needs: [ version, release ]
