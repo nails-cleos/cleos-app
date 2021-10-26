@@ -1,8 +1,11 @@
 name: Deploy
 
 on:
-  release:
-    types: [published]
+  workflow_run:
+    workflows: [ "Release" ]
+    branches: [ main ]
+    tags: [ v1.*.* ]
+    types: [ completed ]
 
 env:
   IMAGE_NAME: cleos
