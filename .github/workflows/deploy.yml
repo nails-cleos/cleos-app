@@ -1,9 +1,8 @@
 name: Deploy
 
 on:
-  push:
-    tags:
-      - v1.*.*
+  release:
+    types: [published]
 
 env:
   IMAGE_NAME: cleos
