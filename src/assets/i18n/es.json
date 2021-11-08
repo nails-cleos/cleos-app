@@ -100,7 +100,9 @@
       "NO_CONTENT": "Sin datos"
     },
     "LABEL": {
-      "FILTER": "Filtrar"
+      "FILTER": "Filtrar",
+      "PRICE": "Precio",
+      "TOTAL": "Total"
     }
   },
   "DASHBOARD": {
@@ -494,13 +496,15 @@
     "PRODUCT": {
       "DETAIL": "Detalle",
       "EXTRAS": {
-        "TITLE": "Adicionales",
+        "TITLE": "Extras",
         "DESCRIPTION": "Descripción",
         "PRICE": "Precio",
         "TOTAL": "Total"
       },
       "COMPLETE": {
         "DESCRIPTION": "<span class='bold'>Descripción:</span> {{description}}",
+        "GROUP": "<span class='bold'>Tipo de servicio:</span> {{name}}",
+        "NAME": "<span class='bold'>Servicio:</span> {{name}}",
         "TOTAL": "<span class='bold'>Total:</span>",
         "PRICE": "<span class='bold'>Price:</span>",
         "DURATION": "<span class='bold'>Duración:</span> {{duration}}",
@@ -675,6 +679,45 @@
     },
     "UPDATED": {
       "MESSAGE": "No disponible {{date}} actualizado"
+    }
+  },
+  "ADDITIONAL": {
+    "LIST": {
+      "COLUMN": {
+        "PRICE": "Precio",
+        "DURATION": "Duración"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No hay adicionales"
+      }
+    },
+    "FIELD": "Adicionales",
+    "TITLE": "Agregar adicional",
+    "NAME": {
+      "FIELD": "Nombre",
+      "REQUIRED": "Nombre es <b>requerido</b>"
+    },
+    "DESCRIPTION": {
+      "FIELD": "Descripción"
+    },
+    "PRICE": {
+      "FIELD": "Precio",
+      "REQUIRED": "Precio es <b>requerido</b>",
+      "GREATER": "Precio debe ser mayor a 1"
+    },
+    "DURATION": {
+      "FIELD": "Duración",
+      "REQUIRED": "Duración es <b>requerido</b>"
+    },
+    "CREATED": "adicional {{name}} creado",
+    "DETAIL": "Actualizar adicional",
+    "DELETED": {
+      "TITLE": "Eliminar adicional",
+      "CONTENT": "¿Está seguro de eliminar adicional {{name}}?",
+      "MESSAGE": "Adicional {{name}} eliminado"
+    },
+    "UPDATED": {
+      "MESSAGE": "Adicional {{name}} actualizado"
     }
   },
   "REFERRAL": {

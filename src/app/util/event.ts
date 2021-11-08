@@ -286,7 +286,7 @@ const lunchEvent = (hour: number, lunchStartHour: number, minute: number, lunchS
   if ((lunchHour || lunchHour === 0) && (lunchMinute || lunchMinute === 0)) {
     const start = createNewDate(date, lunchHour, lunchMinute);
     const end = createNewDate(date, lunchEndHour, lunchEndMinute);
-    return newEvent(lunch, findStateColor('DEFAULT', isDarkMode), start, end, undefined, 'LUNCH');
+    return newEvent(lunch, findStateColor('DEFAULT', isDarkMode), start, end);
   }
 
   return undefined;

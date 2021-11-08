@@ -62,6 +62,7 @@ import { UnavailableEffects } from './store/effects/unavailable.effects';
 import { DiscountEffects } from './store/effects/discount.effects';
 import { MainEffects } from './store/effects/main.effects';
 import { PaymentEffects } from './store/effects/payment.effects';
+import { AdditionalEffects } from './store/effects/additional.effects';
 
 // Components
 import { AppComponent } from './app.component';
@@ -89,7 +90,8 @@ export const localStorageSyncReducer =
 const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
 
 const effects = [LoginEffects, UserEffects, ProductEffects, CatalogueEffects, RoomEffects, ReservationEffects,
-  NotificationEffects, UnavailableEffects, DiscountEffects, MainEffects, PaymentEffects, DashboardEffects];
+  NotificationEffects, UnavailableEffects, DiscountEffects, MainEffects, PaymentEffects, DashboardEffects,
+  AdditionalEffects];
 
 registerLocaleData(localeEn, 'en');
 registerLocaleData(localeEs, 'es');

@@ -11,6 +11,7 @@ import { IProductDiscountDTO } from '../../interfaces/product';
 import { IRoom } from '../../interfaces/room';
 import { Pagination } from '../../interfaces/pagination';
 import { IPayment } from '../../interfaces/payment';
+import { IAdditional } from '../../interfaces/additional';
 
 export interface State {
   data: IReservation | IRoomReservation[] | IReservation[] | ICustomerReservation | IAvailableDTO | null;
@@ -19,6 +20,7 @@ export interface State {
   customerReservation: ICustomerReservation | null;
   customers: IUser[] | null;
   rooms: IRoom[] | null;
+  additional: IAdditional[] | null;
   productDiscount: IProductDiscountDTO[] | null;
   tracking: ITracking[] | ITracking | null;
   payments: IPayment[] | null;
@@ -37,6 +39,7 @@ export const initialState: State = {
   customerReservation: null,
   customers: null,
   rooms: null,
+  additional: null,
   productDiscount: null,
   tracking: null,
   payments: null,
@@ -137,6 +140,17 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         rooms: null,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        selected: null,
+        message: null
+      };
+    }
+    case ReservationActionTypes.getAdditional: {
+      return {
+        ...state,
+        additional: null,
         errorMessage: null,
         error: null,
         subErrors: null,
@@ -266,6 +280,16 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         productDiscount: action.payload,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: null
+      };
+    }
+    case ReservationActionTypes.reservationAdditionalSuccess: {
+      return {
+        ...state,
+        additional: action.payload,
         errorMessage: null,
         error: null,
         subErrors: null,

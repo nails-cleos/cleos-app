@@ -10,6 +10,7 @@ import * as discount from './reducers/discount.reducers';
 import * as main from './reducers/main.reducers';
 import * as payment from './reducers/payment.reducers';
 import * as dashboard from './reducers/dashboard.reducers';
+import * as additional from './reducers/additional.reducers';
 import { createFeatureSelector } from '@ngrx/store';
 
 export interface AppState {
@@ -25,6 +26,7 @@ export interface AppState {
   mainState: main.State;
   paymentState: payment.State;
   dashboardState: dashboard.State;
+  additionalState: additional.State;
 }
 
 export const reducers = {
@@ -39,7 +41,8 @@ export const reducers = {
   discount: discount.reducer,
   main: main.reducer,
   payment: payment.reducer,
-  dashboard: dashboard.reducer
+  dashboard: dashboard.reducer,
+  additional: additional.reducer
 };
 
 export const selectAuthState = createFeatureSelector<AppState>('auth');
@@ -54,3 +57,4 @@ export const selectDiscountState = createFeatureSelector<AppState>('discount');
 export const selectMainState = createFeatureSelector<AppState>('main');
 export const selectPaymentState = createFeatureSelector<AppState>('payment');
 export const selectDashboardState = createFeatureSelector<AppState>('dashboard');
+export const selectAdditionalState = createFeatureSelector<AppState>('additional');

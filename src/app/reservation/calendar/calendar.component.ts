@@ -16,7 +16,6 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import {
   addPeriod,
   CalendarPeriod,
-  convertDuration,
   createNewDate,
   endOfPeriod,
   getAvailability,
@@ -27,6 +26,7 @@ import {
   IDuration,
   isBetween,
   newDate,
+  reservationDuration,
   startOfPeriod,
   subPeriod
 } from '../../util/dates';
@@ -197,7 +197,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     reservations.forEach(it => {
       if (it.product.duration) {
         const start = newDate(it.start);
-        const duration = convertDuration(it.product.duration);
+        const duration = reservationDuration(it);
         const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
         const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
           customerName: getUserName(it.customer),

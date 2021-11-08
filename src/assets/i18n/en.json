@@ -100,7 +100,9 @@
       "NO_CONTENT": "No content"
     },
     "LABEL": {
-      "FILTER": "Filter"
+      "FILTER": "Filter",
+      "PRICE": "Price",
+      "TOTAL": "Total"
     }
   },
   "DASHBOARD": {
@@ -501,6 +503,8 @@
       },
       "COMPLETE": {
         "DESCRIPTION": "<span class='bold'>Description:</span> {{description}}",
+        "GROUP": "<span class='bold'>Product type:</span> {{name}}",
+        "NAME": "<span class='bold'>Product:</span> {{name}}",
         "TOTAL": "<span class='bold'>Total:</span>",
         "PRICE": "<span class='bold'>Price:</span>",
         "DURATION": "<span class='bold'>Duration:</span> {{duration}}",
@@ -675,6 +679,45 @@
     },
     "UPDATED": {
       "MESSAGE": "Unavailable {{date}} updated"
+    }
+  },
+  "ADDITIONAL": {
+    "LIST": {
+      "COLUMN": {
+        "PRICE": "Price",
+        "DURATION": "Duration"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No additional"
+      }
+    },
+    "FIELD": "Additional",
+    "TITLE": "Add additional",
+    "NAME": {
+      "FIELD": "Name",
+      "REQUIRED": "Name is <b>required</b>"
+    },
+    "DESCRIPTION": {
+      "FIELD": "Description"
+    },
+    "PRICE": {
+      "FIELD": "Price",
+      "REQUIRED": "Price is <b>required</b>",
+      "GREATER": "Price must be greater than 1"
+    },
+    "DURATION": {
+      "FIELD": "Duration",
+      "REQUIRED": "Duration is <b>required</b>"
+    },
+    "CREATED": "Additional {{name}} created",
+    "DETAIL": "Update additional",
+    "DELETED": {
+      "TITLE": "Delete additional",
+      "CONTENT": "Are you sure to delete additional {{name}}?",
+      "MESSAGE": "Additional {{name}} deleted"
+    },
+    "UPDATED": {
+      "MESSAGE": "Additional {{name}} updated"
     }
   },
   "REFERRAL": {

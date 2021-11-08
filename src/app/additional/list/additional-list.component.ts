@@ -1,0 +1,134 @@
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
+import { IAdditional } from '../../interfaces/additional';
+import { Observable, Subscription } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
+import { MatDialog } from '@angular/material/dialog';
+import { Store } from '@ngrx/store';
+import { AppState, selectAdditionalState } from '../../store/app.states';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import * as fromActionsAdditional from '../../store/additional.actions';
+import { DialogComponent } from '../../shared/dialog/dialog.component';
+import { convertDuration } from '../../util/dates';
+import { detailExpandAnimation } from '../../util/animation';
+
+@Component({
+  selector: 'app-additional-list',
+  templateUrl: './additional-list.component.html',
+  styleUrls: ['./additional-list.component.scss'],
+  animations: [detailExpandAnimation]
+})
+export class AdditionalListComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+
+  displayedColumns: string[] = ['position', 'name', 'description', 'price', 'duration', 'actions'];
+  dataSource: any = new MatTableDataSource<Pagination<IAdditional>>();
+  subscription: Subscription | undefined;
+  getState: Observable<any>;
+
+  expandedAdditional: IAdditional | undefined;
+
+  resultsLength = DEFAULT_LENGTH;
+  pageSize = PAGE_SIZE;
+
+  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
+              private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+    breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small
+    ]).subscribe(result => {
+      if (result.matches) {
+        this.pageSize = MOBILE_PAGE_SIZE;
+      }
+    });
+    this.getState = this.store.select(selectAdditionalState);
+  }
+
+  ngAfterViewInit(): void {
+    this.getAdditionalList();
+  }
+
+  ngOnInit(): void {
+    this.clean();
+    this.subscribe();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+  }
+
+  edit(additional: IAdditional): void {
+    this.store.dispatch(
+      new fromActionsAdditional.AdditionalSelected(additional)
+    );
+  }
+
+  delete(additional: IAdditional): void {
+    const title = this.translate.instant('ADDITIONAL.DELETED.TITLE');
+    const content = this.translate.instant('ADDITIONAL.DELETED.CONTENT', {name: additional.name});
+    const dialogRef = this.dialog.open(DialogComponent, {
+      data: {title, content, value: additional}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.store.dispatch(
+          new fromActionsAdditional.DeleteAdditional(result.id)
+        );
+      }
+    });
+  }
+
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe((state) => {
+      if (state.message) {
+        this.clean();
+        this.getAdditionalList();
+      }
+      this.dataSource = state.data?.content?.map((additional: IAdditional) => {
+        if (additional.duration) {
+          const duration = convertDuration(additional.duration);
+
+          return Object.assign({}, additional, {hour: duration.hour, minute: duration.minute});
+        }
+        return additional;
+      });
+      this.resultsLength = state.data?.totalElements;
+      if (this.resultsLength) {
+        this.createPageSubscriptions();
+      }
+    });
+  }
+
+  private clean(): void {
+    this.store.dispatch(
+      new fromActionsAdditional.Clean()
+    );
+  }
+
+  private createPageSubscriptions(): void {
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.getAdditionalList();
+    });
+    this.paginator?.page.subscribe(() => this.getAdditionalList(this.paginator.pageIndex));
+
+    this.cdRef.detectChanges();
+  }
+
+  private getAdditionalList(page: number = 0): void {
+    const payload = {
+      active: this.sort.active,
+      direction: this.sort.direction,
+      size: this.pageSize,
+      page
+    };
+    this.store.dispatch(
+      new fromActionsAdditional.GetAll(payload)
+    );
+  }
+}

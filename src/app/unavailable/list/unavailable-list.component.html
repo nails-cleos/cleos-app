@@ -147,8 +147,10 @@
     </ng-container>
 
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+    <tr *matRowDef="let additional; columns: displayedColumns;" fxHide.lt-sm fxShow mat-row></tr>
     <tr (click)="expandedUnavailable = expandedUnavailable === unavailable ? null : unavailable"
-        *matRowDef="let unavailable; columns: displayedColumns;" class="unavailable-row" mat-row></tr>
+        *matRowDef="let unavailable; columns: displayedColumns;" class="unavailable-row"
+        fxHide fxShow.lt-sm mat-row></tr>
     <tr *matRowDef="let row; columns: ['expandedDetail']" class="unavailable-detail-row" mat-row></tr>
 
     <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>

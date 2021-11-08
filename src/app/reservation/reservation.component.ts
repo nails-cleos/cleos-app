@@ -25,6 +25,7 @@ import {
   createNewDate,
   Duration,
   filterDateRoom,
+  formatTime,
   getAvailability,
   getDuration,
   getNow,
@@ -34,7 +35,9 @@ import {
   IDuration,
   isBetween,
   newDate,
-  reservationDateTime
+  reservationDateTime,
+  reservationDuration,
+  totalDuration
 } from '../util/dates';
 import { createRecurringEvent, fillNotAvailable, getOverlapEvent, Meta, newEvent } from '../util/event';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -43,11 +46,13 @@ import { GeocoderResult } from '@agm/core';
 import { Role } from '../interfaces/token';
 import { IUnavailableAll } from '../interfaces/unavailable';
 import { DiscountType, IUserDiscount } from '../interfaces/discount';
-import { getFullUserName, getPrice, getUserName, newDiscount, newPrice } from '../util/helper';
+import { getFullUserName, getPrice, getUserName, newAdditional, newDiscount, newPrice } from '../util/helper';
 import { transitionAnimation } from '../util/animation';
 import { addDays, addMonths, isEqual } from 'date-fns';
 import { findStateColor, isDarkMode } from '../util/theme';
 import RRule from 'rrule';
+import { IAdditionalAll } from '../interfaces/additional';
+import { MatListOption } from '@angular/material/list';
 
 @Component({
   selector: 'app-reservation',
@@ -101,6 +106,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   ]);
 
   start: FormControl = new FormControl('');
+
+  additionalList: IAdditionalAll[] = [];
+  additionalSelected: IAdditionalAll[] = [];
 
   viewDate: Date = getNow();
   dayStartHour = 9;
@@ -282,7 +290,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.productForm.invalid) {
       return;
     }
-    this.duration = convertDuration(this.product.value.duration);
+    this.duration = totalDuration(this.product.value, this.additionalSelected);
     this.events = [];
 
     let date = newDate(this.date.value);
@@ -315,10 +323,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.errors.overlapping = false;
     const nowTime = date.toLocaleTimeString(API_LOCALE).split(':');
-    const duration = convertDuration(this.product.value.duration);
 
     const start = createNewDate(date, Number(nowTime[0]), Number(nowTime[1]));
-    const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
+    const end = createNewDate(start, start.getHours() + this.duration.hour,
+      start.getMinutes() + this.duration.minute);
     const event = this.createNewEvent(start, end, state, id);
 
     if (event) {
@@ -367,6 +375,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     reservation.roomId = this.room.value.id;
     if (this.eventSelected) {
       reservation.start = this.eventSelected.start.toLocaleString(API_LOCALE);
+      reservation.additionalIds = this.additionalSelected?.map(value => value.id);
 
       if (this.isEditing && this.reservation) {
         reservation.id = this.reservation.id;
@@ -409,6 +418,14 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.myStepper.next();
   }
 
+  getAdditional(): void {
+    if (this.productForm.invalid) {
+      return;
+    }
+    this.getAdditionalList();
+    this.myStepper.next();
+  }
+
   addCustomer(): void {
     this.router.navigate(['users', 'add'], {state: {role: Role.customer}});
   }
@@ -448,6 +465,19 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.refresh.next();
   }
 
+  onChange(options: MatListOption[]): void {
+    this.additionalSelected = options.map(o => o.value);
+    this.price = newAdditional(this.price, this.additionalSelected);
+  }
+
+  isSelected(it: IAdditionalAll): boolean {
+    return this.additionalSelected.filter(el => el.id === it.id).length > 0;
+  }
+
+  getDuration(duration: string): string {
+    return formatTime(convertDuration(duration), this.locale);
+  }
+
   private createNewEvent(start: Date, end: Date, state: string, id: string | undefined): CalendarEvent | undefined {
     const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
       customerName: getUserName(this.customer.value),
@@ -477,6 +507,12 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   private getProductList(): void {
     this.store.dispatch(
       new fromActionsReservation.GetAllProducts({customerId: this.customer.value.id})
+    );
+  }
+
+  private getAdditionalList(): void {
+    this.store.dispatch(
+      new fromActionsReservation.GetAllAdditional()
     );
   }
 
@@ -535,7 +571,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         if (start < getNow()) {
           return;
         }
-        const duration = convertDuration(it.product.duration);
+        const duration = reservationDuration(it);
         const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
         const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
           customerName: getUserName(it.customer),
@@ -626,6 +662,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       this.customers = state.customers;
+      this.additionalList = state.additional;
       this.groups = state.productDiscount?.groups;
       if (this.groups && this.productId && !this.group.value) {
         this.group.setValue(this.groups?.find(group => {
@@ -664,7 +701,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           this.unavailableList = state.data.unavailableList;
           this.addReservations();
           this.addUnavailableList();
-          if (this.reservationId && this.reservation && this.date && this.myStepper.selectedIndex === 3) {
+          if (this.reservationId && this.reservation && this.date && this.myStepper.selectedIndex === 4) {
             let date: Date;
             if (this.start && this.start.value) {
               const time = this.start.value.split(':');
@@ -673,7 +710,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
               date = createNewDate(this.date.value, this.date.value.getHours(), this.date.value.getMinutes());
             }
             if (isEqual(newDate(this.reservation.start), date)) {
-              const duration = convertDuration(this.reservation.product.duration);
+              const duration = reservationDuration(this.reservation);
               const end = createNewDate(date, date.getHours() + duration.hour,
                 date.getMinutes() + duration.minute);
               const event = this.createNewEvent(date, end, this.reservation.state, this.reservation.id);
@@ -684,7 +721,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
             } else {
               this.segmentClick(date, this.reservation.state, this.reservation.id);
             }
-          } else if ((this.extras?.date || this.start.value && this.myStepper.selectedIndex === 3) && !this.eventSelected) {
+          } else if ((this.extras?.date || this.start.value && this.myStepper.selectedIndex === 4) && !this.eventSelected) {
             this.segmentClick(this.date.value, 'CREATED');
           }
         }
@@ -770,7 +807,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.date.setValue(date);
     this.start.setValue(getTime(date, this.locale));
     this.customer.setValue(reservation.customer);
-    this.price = getPrice(this.reservation.product);
+    this.price = getPrice(this.reservation);
+    this.additionalSelected = this.reservation.additional ? this.reservation.additional : [];
     this.group.setValue(this.groups?.find(group => {
       const product = group.products?.find(p => p.id === reservation.product.id);
       if (product) {

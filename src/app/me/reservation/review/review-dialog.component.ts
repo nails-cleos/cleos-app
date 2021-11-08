@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { convertDuration, createNewDate, newDate } from '../../../util/dates';
+import { createNewDate, newDate, reservationDuration } from '../../../util/dates';
 import { getPrice, getUserName } from '../../../util/helper';
 import { IReview } from '../../../interfaces/review';
 import { IReservationAll } from '../../../interfaces/reservation';
@@ -32,8 +32,8 @@ export class ReviewDialogComponent {
   constructor(public dialogRef: MatDialogRef<ReviewDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: IReservationAll,
               private translate: TranslateService) {
     this.reservation = data;
-    this.price = getPrice(data.product);
-    const duration = convertDuration(data.product.duration);
+    this.price = getPrice(data);
+    const duration = reservationDuration(data);
     const start = newDate(data.start);
     this.end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
     this.review = data.review;

@@ -14,6 +14,9 @@ import {
   subWeeks
 } from 'date-fns';
 import RRule, { Weekday } from 'rrule';
+import { IReservationAll } from '../interfaces/reservation';
+import { IProductAll } from '../interfaces/product';
+import { IAdditionalAll } from '../interfaces/additional';
 
 export const API_LOCALE = 'en-GB';
 
@@ -60,6 +63,30 @@ export const getDuration = (duration: string, room: IRoom, date: Date): IDuratio
   return new Duration(diffHour, diffMinute);
 };
 
+export const reservationDuration = (reservation?: IReservationAll): IDuration => {
+  let durations: IDuration[] = [];
+  if (reservation) {
+    if (reservation.additional && reservation.additional.length) {
+      durations = reservation.additional.map(value => convertDuration(value.duration));
+    }
+    durations = [...durations, convertDuration(reservation.product.duration)];
+  }
+
+  return sumDurations(durations);
+};
+
+export const totalDuration = (product?: IProductAll, additional?: IAdditionalAll[]): IDuration => {
+  let durations: IDuration[] = [];
+  if (additional && additional.length) {
+    durations = additional.map(value => convertDuration(value.duration));
+  }
+  if (product) {
+    durations = [...durations, convertDuration(product.duration)];
+  }
+
+  return sumDurations(durations);
+};
+
 export const convertDuration = (duration: string): IDuration => {
   const hIndex = duration.indexOf('H');
   const mIndex = duration.indexOf('M');
@@ -67,6 +94,17 @@ export const convertDuration = (duration: string): IDuration => {
   const minute = mIndex > -1 ? Number(duration.slice(hIndex > -1 ? hIndex + 1 : 2, mIndex)) : 0;
 
   return new Duration(hour, minute);
+};
+
+export const sumDurations = (durations: IDuration[]): IDuration => {
+  let hours = 0;
+  let minutes = 0;
+  durations.forEach(value => {
+    hours += value.hour;
+    minutes += value.minute;
+  });
+
+  return timeConvert(minutes, hours);
 };
 
 export const getStartEndDay = (week: IAvailability, saturday: IAvailability, sunday: IAvailability): any => {
@@ -109,13 +147,7 @@ export const diffTime = (time: Date, maxHour = 24, diffMin = 0): IDuration => {
   maxDate.setHours(maxHour, diffMin);
 
   const diff = getMinutesBetweenTimes(maxDate, date);
-
-  const hours = (diff / 60);
-  const diffHour = Math.floor(hours);
-  const minutes = (hours - diffHour) * 60;
-  const diffMinute = Math.round(minutes);
-
-  return new Duration(diffHour, diffMinute);
+  return timeConvert(diff);
 };
 
 export const getDiffTime = (maxDate: Date, minDate: Date): string => {
@@ -365,4 +397,13 @@ const getMinutesBetweenTimes = (date1: Date, date2: Date): number =>
 const timeToDateTime = (stringTime: string, date: Date): Date => {
   const time = stringTime.split(':');
   return createNewDate(date, Number(time[0]), Number(time[1]));
+};
+
+const timeConvert = (time: number, hour: number = 0) => {
+  const hours = (time / 60);
+  const diffHour = Math.floor(hours);
+  const minutes = (hours - diffHour) * 60;
+  const diffMinute = Math.round(minutes);
+
+  return new Duration(diffHour + hour, diffMinute);
 };

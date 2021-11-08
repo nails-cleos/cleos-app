@@ -1,0 +1,141 @@
+<div class="mat-elevation-z8">
+  <table [dataSource]="dataSource" mat-table matSort matSortActive="name" matSortDirection="desc" matSortDisableClear
+         multiTemplateDataRows>
+    <ng-container matColumnDef="position">
+      <th *matHeaderCellDef mat-header-cell>#</th>
+      <td *matCellDef="let additional; let i = dataIndex;" mat-cell>
+        <div *ngIf="additional.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="name">
+      <th *matHeaderCellDef mat-header-cell
+          mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
+      <td *matCellDef="let additional" mat-cell>
+        <div *ngIf="additional.id; else skeleton">{{additional.name}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="description">
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+          mat-sort-header>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
+      <td *matCellDef="let additional" fxHide.lt-sm fxShow mat-cell>
+        <div *ngIf="additional.id; else skeleton">{{additional.description}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="price">
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+          mat-sort-header>{{ 'ADDITIONAL.LIST.COLUMN.PRICE' | translate }}</th>
+      <td *matCellDef="let additional" fxHide.lt-sm fxShow mat-cell>
+        <div *ngIf="additional.id; else skeleton">
+          <span matPrefix><mat-icon matPrefix>attach_money</mat-icon> &nbsp;</span>
+          {{additional.price | number:'1.2-2'}}
+        </div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="duration">
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+          mat-sort-header>{{ 'ADDITIONAL.LIST.COLUMN.DURATION' | translate }}</th>
+      <td *matCellDef="let additional" class="column-large-text" fxHide.lt-sm fxShow mat-cell>
+        <div *ngIf="additional.id; else skeleton">
+          <mat-icon matPrefix>timer</mat-icon>&nbsp;
+          {{additional.hour | number:'2.0-0'}}:{{additional.minute | number:'2.0-0'}}
+        </div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+      <td *matCellDef="let additional" fxHide.lt-sm fxShow mat-cell>
+        <div *ngIf="additional.id; else skeleton">
+          <button (click)="edit(additional)" *ngIf="!additional.deleted" mat-icon-button
+                  matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
+            <mat-icon color="primary">edit</mat-icon>
+          </button>
+          <button (click)="delete(additional)" *ngIf="!additional.deleted" mat-icon-button
+                  matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
+            <mat-icon color="warn">delete</mat-icon>
+          </button>
+        </div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="expandedDetail">
+      <td *matCellDef="let additional" [attr.colspan]="displayedColumns.length" mat-cell>
+        <div [@detailExpand]="additional === expandedAdditional ? 'expanded' : 'collapsed'"
+             class="additional-detail">
+          <mat-list>
+            <div *ngIf="additional.description" fxHide fxShow.lt-sm
+                 mat-subheader>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</div>
+            <mat-list-item *ngIf="additional.description" fxHide fxShow.lt-sm role="list">
+              <div mat-line>{{additional.description}}</div>
+            </mat-list-item>
+            <div fxHide fxShow.lt-sm mat-subheader>{{ 'ADDITIONAL.LIST.COLUMN.PRICE' | translate }}</div>
+            <mat-list-item fxHide fxShow.lt-sm role="list">
+              <div mat-line>
+                <span matPrefix><mat-icon matPrefix>attach_money</mat-icon> &nbsp;</span>
+                {{additional.price | number:'1.2-2'}}
+              </div>
+            </mat-list-item>
+            <div fxHide fxShow.lt-sm mat-subheader>{{ 'ADDITIONAL.LIST.COLUMN.DURATION' | translate }}</div>
+            <mat-list-item fxHide fxShow.lt-sm role="list">
+              <div mat-line>
+                <mat-icon matPrefix>timer</mat-icon>&nbsp;
+                {{additional.hour | number:'2.0-0'}}:{{additional.minute | number:'2.0-0'}}
+              </div>
+            </mat-list-item>
+            <div fxHide fxShow.lt-sm mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+            <div fxHide fxShow.lt-sm>
+              <button (click)="edit(additional)" *ngIf="!additional.deleted" mat-icon-button>
+                <mat-icon color="primary">edit</mat-icon>
+              </button>
+              <button (click)="delete(additional)" *ngIf="!additional.deleted" mat-icon-button>
+                <mat-icon color="warn">delete</mat-icon>
+              </button>
+            </div>
+          </mat-list>
+        </div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="noContent">
+      <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+        {{ 'ADDITIONAL.LIST.ERROR.NO_CONTENT' | translate }}</td>
+    </ng-container>
+
+    <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+    <tr *matRowDef="let additional; columns: displayedColumns;" fxHide.lt-sm fxShow mat-row></tr>
+    <tr (click)="expandedAdditional = expandedAdditional === additional ? null : additional"
+        *matRowDef="let additional; columns: displayedColumns;" class="additional-row"
+        fxHide fxShow.lt-sm mat-row></tr>
+    <tr *matRowDef="let row; columns: ['expandedDetail']" class="additional-detail-row" mat-row></tr>
+
+    <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
+  </table>
+  <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+
+  <button color="accent" id="add-button" mat-fab matTooltip="{{ 'ADDITIONAL.TITLE' | translate }}"
+          routerLink="/additional/add">
+    <mat-icon>add</mat-icon>
+  </button>
+</div>
