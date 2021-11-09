@@ -308,7 +308,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
     const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
     this.events = this.events.concat(fillNotAvailable(unavailable, lunch, notWorking,
-      date, sunday, saturday, week, this.isDarkMode, true, addMonths(getNow(), MAX_RESERVATION_MONTH)));
+      date, sunday, saturday, week, this.isDarkMode, addMonths(getNow(), MAX_RESERVATION_MONTH)));
     this.unavailableEventLength = this.events.length;
     this.viewDate = date;
     this.store.dispatch(
@@ -322,6 +322,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
     this.errors.overlapping = false;
+    this.date.setValue(date);
+    this.start.setValue(getTime(date, this.locale));
     const nowTime = date.toLocaleTimeString(API_LOCALE).split(':');
 
     const start = createNewDate(date, Number(nowTime[0]), Number(nowTime[1]));
@@ -592,8 +594,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     let recurringEvents: any[] = [];
     this.unavailableList?.forEach(it => {
       if (it.duration || it.allDay) {
-        const start = newDate(it.start);
-        const duration = getDuration(it.duration, this.room.value, newDate(it.start));
+        const startDate = newDate(it.start);
+        const start = it.allDay ? createNewDate(startDate) : startDate;
+        const duration = getDuration(it.allDay, it.duration);
         if (it.repeat === 'NONE') {
           if (!greaterOrEqualsThan(start, this.maxDate)) {
             this.validateUnavailableEvent(start, duration, it);
@@ -608,7 +611,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       const rule: RRule = new RRule({
         ...recurring.rrule,
         dtstart: recurring.startDate,
-        until: this.maxCalendarDate
+        until: recurring.end
       });
 
       rule.all().forEach((date) =>
@@ -632,22 +635,24 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
               this.events = [...this.events, value];
             }
           }
-          this.createUnavailableEvent(it.id, start, end, it.description);
+          if (!this.events.find(ce => ce.id === `unavailable/${it.id}`)) {
+            this.createUnavailableEvent(it, start, end);
+          }
         }
       });
     } else {
-      this.createUnavailableEvent(it.id, start, end, it.description);
+      this.createUnavailableEvent(it, start, end);
     }
   }
 
-  private createUnavailableEvent(id: string, start: Date, end: Date, description?: string): void {
+  private createUnavailableEvent(it: IUnavailableAll, start: Date, end: Date): void {
     const detail = this.translate.instant('RESERVATION.EVENT.UNAVAILABLE', {
-      description: description ? description : ''
+      description: it.description ? it.description : ''
     });
 
     const color = findStateColor('DEFAULT', this.isDarkMode);
-    const meta = new Meta(true);
-    const event = newEvent(detail, color, start, end, '#000', `unavailable/${id}`, meta);
+    const meta = new Meta(!it.allDay);
+    const event = newEvent(detail, color, start, end, '#000', `unavailable/${it.id}`, meta);
     if (event) {
       this.events = [...this.events, event];
     }

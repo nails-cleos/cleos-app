@@ -653,8 +653,8 @@
       "FIELD": "Descripción"
     },
     "DATE": {
-      "FIELD": "Elegí una fecha",
-      "REQUIRED": "Fecha es <b>requerida</b>"
+      "FIELD": "Elegí fecha inicio",
+      "REQUIRED": "Inicio es <b>requerido</b>"
     },
     "TIME": {
       "FIELD": "Elegí una hora",
@@ -669,6 +669,11 @@
     },
     "REPEAT": {
       "FIELD": "Repetir"
+    },
+    "END": {
+      "FIELD": "Elegí fecha fin",
+      "REQUIRED": "Fecha fin es <b>requerido</b>",
+      "GREATER": "Fecha fin debe ser mayor que inicio"
     },
     "CREATED": "No disponible {{date}} creado",
     "DETAIL": "Actualizar no disponible",

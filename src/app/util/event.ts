@@ -8,12 +8,12 @@ import {
   getWeekDay,
   greaterOrEqualsThan,
   greaterOrEqualsThanToday,
-  IDuration
+  IDuration, newDate
 } from './dates';
 import { findStateColor } from './theme';
 import RRule from 'rrule';
 import { addDays, isToday } from 'date-fns';
-import { IUnavailableAll } from '../interfaces/unavailable';
+import { IUnavailableAll, UnavailableRepeatType } from '../interfaces/unavailable';
 
 export interface IMeta {
   time?: boolean;
@@ -35,42 +35,29 @@ export class Meta implements IMeta {
 
 export const createRecurringEvent = (repeat: string, start: Date, date: Date, it: IUnavailableAll,
                                      duration: IDuration): any => {
-  let startDate;
   let rrule;
   const finalDate = greaterOrEqualsThan(date, start) ? date : start;
+  const startDate = createNewDate(finalDate, start.getHours(), start.getMinutes());
+  const end = addDays(newDate(it.end), 1);
   switch (repeat) {
-    case 'ONCE_A_WEEK':
-      const byweekday = getWeekDay(start.getDay());
-      startDate = createNewDate(addDays(finalDate, (start.getDay() + 7 - date.getDay()) % 7),
-        start.getHours(), start.getMinutes());
+    case UnavailableRepeatType.onceAWeek:
       rrule = {
         freq: RRule.WEEKLY,
-        byweekday
+        byweekday: getWeekDay(start.getDay())
       };
       break;
-    case 'EVERY_DAY':
-      startDate = createNewDate(finalDate, start.getHours(), start.getMinutes());
+    case UnavailableRepeatType.everyDay:
       rrule = {
         freq: RRule.DAILY
       };
       break;
   }
-  return {duration, it, startDate, rrule};
+  return {duration, it, startDate, rrule, end};
 };
 
 export const fillNotAvailable = (unavailable: string, lunch: string, notWorking: string,
                                  selectDate: Date, sunday: IAvailability, saturday: IAvailability, week: IAvailability,
-                                 isDark: boolean = false, addToday: boolean = false, maxDate: Date): CalendarEvent[] => {
-  let events: CalendarEvent[] = [];
-  if (addToday && isToday(selectDate)) {
-    const now = getNow();
-    const event = newEvent(notWorking, findStateColor('DEFAULT', isDark), createDate(),
-      createDate(now.getHours(), now.getMinutes()));
-    if (event) {
-      events = [...events, event];
-    }
-  }
-
+                                 isDark: boolean = false, maxDate: Date): CalendarEvent[] => {
   const recurring = [{
     availability: week,
     rule: new RRule({
@@ -99,7 +86,7 @@ export const fillNotAvailable = (unavailable: string, lunch: string, notWorking:
       })
     }];
 
-  return events.concat(recurringEvent(recurring, notWorking, unavailable, lunch, isDark));
+  return recurringEvent(recurring, notWorking, unavailable, lunch, isDark);
 };
 
 export const newEvent = (title: string, color: string, start: Date, end?: Date, primary?: string,
@@ -191,23 +178,10 @@ const createEvent = (it: IAvailability, date: Date, notWorking: string, unavaila
       const start = it.start.split(':');
       const endHour = Number(start[0]);
       const endMinute = Number(start[1]);
-      let startHour: number | null = 0;
-      let startMinute: number | null = 0;
-      if (isToday(date)) {
-        if (hour < endHour || (hour === endHour && minute < endMinute)) {
-          startHour = hour;
-          startMinute = minute;
-        } else {
-          startHour = null;
-          startMinute = null;
-        }
-      }
-      if ((startHour || startHour === 0) && (startMinute || startMinute === 0)) {
-        const eventBefore = newEvent(notWorking, findStateColor('DEFAULT', isDarkMode),
-          createNewDate(date, startHour, startMinute), createNewDate(date, endHour, endMinute));
-        if (eventBefore) {
-          events = [...events, eventBefore];
-        }
+      const eventBefore = newEvent(notWorking, findStateColor('DEFAULT', isDarkMode),
+        createNewDate(date), createNewDate(date, endHour, endMinute));
+      if (eventBefore) {
+        events = [...events, eventBefore];
       }
     }
     if (it.end) {

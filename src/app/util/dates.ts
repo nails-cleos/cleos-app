@@ -35,33 +35,8 @@ export class Duration implements IDuration {
   }
 }
 
-export const getDuration = (duration: string, room: IRoom, date: Date): IDuration => {
-  if (duration) {
-    return convertDuration(duration);
-  }
-  const {week, saturday, sunday} = getAvailability(room);
-  let av: IAvailabilityAll;
-  switch (date.getDay()) {
-    case 0:
-      av = sunday;
-      break;
-    case 6:
-      av = saturday;
-      break;
-    default:
-      av = week;
-      break;
-  }
-  const start = timeToDateTime(av.start, date);
-  const end = timeToDateTime(av.end, date);
-
-  const hours = (getMinutesBetweenTimes(start, end) / 60);
-  const diffHour = Math.floor(hours);
-  const minutes = (hours - diffHour) * 60;
-  const diffMinute = Math.round(minutes);
-
-  return new Duration(diffHour, diffMinute);
-};
+export const getDuration = (allDay: boolean, duration: string): IDuration =>
+  allDay ? new Duration(23, 59) : convertDuration(duration);
 
 export const reservationDuration = (reservation?: IReservationAll): IDuration => {
   let durations: IDuration[] = [];
@@ -105,6 +80,15 @@ export const sumDurations = (durations: IDuration[]): IDuration => {
   });
 
   return timeConvert(minutes, hours);
+};
+
+export const getEnd = (start: Date, strDuration?: string): Date => {
+  if (strDuration) {
+    const duration = convertDuration(strDuration);
+    return createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
+  }
+
+  return createNewDate(start, 23, 59, 59, 99);
 };
 
 export const getStartEndDay = (week: IAvailability, saturday: IAvailability, sunday: IAvailability): any => {
@@ -302,7 +286,7 @@ export const greaterOrEqualsThan = (date1: Date, date2: Date): boolean => date1 
 export const greaterOrEqualsThanToday = (date: Date): boolean => date >= createDate();
 
 export const isBetween = (min: Date, max: Date, date: Date): boolean =>
-  date >= min && date <= createNewDate(max, 23, 59, 59, 99);
+  date >= createNewDate(min) && date <= createNewDate(max, 23, 59, 59, 99);
 
 export type CalendarPeriod = 'day' | 'week' | 'month';
 
@@ -322,33 +306,9 @@ export const endOfPeriod = (period: CalendarPeriod, date: Date): Date => (
   {day: endOfDay, week: endOfWeek, month: endOfMonth}[period](date)
 );
 
-export const getWeekDay = (day: number): Weekday[] => {
-  let weekDay;
-  switch (day) {
-    case 1:
-      weekDay = [RRule.MO];
-      break;
-    case 2:
-      weekDay = [RRule.TU];
-      break;
-    case 3:
-      weekDay = [RRule.WE];
-      break;
-    case 4:
-      weekDay = [RRule.TH];
-      break;
-    case 5:
-      weekDay = [RRule.FR];
-      break;
-    case 6:
-      weekDay = [RRule.SA];
-      break;
-    default:
-      weekDay = [RRule.SU];
-      break;
-  }
-
-  return weekDay;
+export const getWeekDay = (day: number): Weekday => {
+  const days = [RRule.SU, RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR, RRule.SA];
+  return days[day];
 };
 
 export const filterDateRoom = (d: Date | null, room?: IRoom): boolean => {

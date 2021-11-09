@@ -358,8 +358,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   isSelected(it: IAdditionalAll): boolean {
-    console.log(this.additionalSelected);
-    console.log(it);
     return this.additionalSelected.filter(el => el.id === it.id).length > 0;
   }
 

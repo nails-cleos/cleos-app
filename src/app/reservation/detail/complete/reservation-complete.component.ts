@@ -2,9 +2,9 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../../store/app.states';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import * as fromActionsReservation from '../../../store/reservation.actions';
-import { IReservationAll } from '../../../interfaces/reservation';
+import { IReservationAll, States } from '../../../interfaces/reservation';
 import { IPrice, IProduct, IProductGroup, Price } from '../../../interfaces/product';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
@@ -52,7 +52,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   private subscription: Subscription | undefined;
 
   constructor(private store: Store<AppState>, private route: ActivatedRoute, private formBuilder: FormBuilder,
-              private readonly translate: TranslateService) {
+              private readonly translate: TranslateService, private router: Router) {
     this.getState = this.store.select(selectReservationState);
     this.price = new Price();
     this.product.valueChanges.subscribe(value => {
@@ -117,9 +117,12 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       const price = this.extraPrice.value;
       const paymentType = this.type.value;
       const additionalIds = this.additionalSelected.map(additional => additional.id);
+      console.log(reservationId)
       this.store.dispatch(
-        new fromActionsReservation.Complete({reservationId,
-          extras: {productId, description, price, paymentType, additionalIds}})
+        new fromActionsReservation.Complete({
+          reservationId,
+          extras: {productId, description, price, paymentType, additionalIds}
+        })
       );
     }
   }

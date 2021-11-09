@@ -653,8 +653,8 @@
       "FIELD": "Description"
     },
     "DATE": {
-      "FIELD": "Pick a date",
-      "REQUIRED": "Date is <b>required</b>"
+      "FIELD": "Pick start date",
+      "REQUIRED": "Start is <b>required</b>"
     },
     "TIME": {
       "FIELD": "Pick a time",
@@ -669,6 +669,11 @@
     },
     "REPEAT": {
       "FIELD": "Repeat"
+    },
+    "END": {
+      "FIELD": "Pick end date",
+      "REQUIRED": "End date is <b>required</b>",
+      "GREATER": "End must be greater than start"
     },
     "CREATED": "Unavailable {{date}} created",
     "DETAIL": "Update unavailable",

@@ -105,6 +105,7 @@ export class ReservationService {
   }
 
   public changeState(reservationId: string, event: string, extras?: any): Observable<IReservation> {
+    console.log(reservationId)
     return this.http.post<IReservation>(`${this.url}/${reservationId}/${event}`, extras);
   }
 

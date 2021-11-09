@@ -195,7 +195,7 @@ export class ReservationEffects {
       this.reservationService.changeState(payload.reservationId, 'complete', payload.extras).pipe(
         switchMap(() => {
           const message = this.translate.instant('RESERVATION.STATE.COMPLETE');
-          return of(new fromActionsReservation.StateSuccess({id: payload, message}));
+          return of(new fromActionsReservation.ReservationCompleteSuccess({id: payload.reservationId, message}));
         }), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
       ))
   ));
@@ -287,6 +287,11 @@ export class ReservationEffects {
 
   stateSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.stateSuccess)
+  ), {dispatch: false});
+
+  reservationComplete$ = createEffect(() => this.actions$.pipe(
+    ofType(fromActionsReservation.ReservationActionTypes.reservationCompleteSuccess),
+    tap((data: any) => this.router.navigate(['reservation', data.payload.id]))
   ), {dispatch: false});
 
   reservationCustomersSuccess$ = createEffect(() => this.actions$.pipe(

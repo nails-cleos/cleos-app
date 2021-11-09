@@ -226,8 +226,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
     let recurringEvents: any[] = [];
     unavailableList.forEach(it => {
       if (it.duration || it.allDay) {
-        const start = newDate(it.start);
-        const duration = getDuration(it.duration, rr.room, newDate(it.start));
+        const startDate = newDate(it.start);
+        const start = it.allDay ? createNewDate(startDate) : startDate;
+        const duration = getDuration(it.allDay, it.duration);
         if (it.repeat === 'NONE') {
           if (!greaterOrEqualsThan(start, this.maxDate)) {
             this.validateUnavailableEvent(rr.room, start, duration, it, darkMode);
@@ -242,7 +243,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
       const rule: RRule = new RRule({
         ...recurring.rrule,
         dtstart: recurring.startDate,
-        until: this.maxDate
+        until: recurring.end
       });
 
       rule.all().forEach((date) =>
@@ -270,24 +271,26 @@ export class CalendarComponent implements OnInit, OnDestroy {
                 events = [...events, value];
               }
             }
-            this.createUnavailableEvent(room, events, calendar.day, it.id, start, end, darkMode, it.description);
+            if (events.find(ce => ce.id !== `unavailable/${it.id}`)) {
+              this.createUnavailableEvent(room, events, calendar.day, it, start, end, darkMode);
+            }
           }
         });
       } else {
-        this.createUnavailableEvent(room, events, calendar.day, it.id, start, end, darkMode, it.description);
+        this.createUnavailableEvent(room, events, calendar.day, it, start, end, darkMode);
       }
     }
   }
 
-  private createUnavailableEvent(room: IRoomAll, events: CalendarEvent[], day: any, id: string, start: Date, end: Date,
-                                 darkMode: boolean, description?: string): void {
+  private createUnavailableEvent(room: IRoomAll, events: CalendarEvent[], day: any, it: IUnavailableAll, start: Date,
+                                 end: Date, darkMode: boolean): void {
     const detail = this.translate.instant('RESERVATION.EVENT.UNAVAILABLE', {
-      description: description ? description : ''
+      description: it.description ? it.description : ''
     });
 
     const color = findStateColor('DEFAULT', darkMode);
-    const meta = new Meta(true);
-    const event = newEvent(detail, color, start, end, '#000', `unavailable/${id}`, meta);
+    const meta = new Meta(!it.allDay);
+    const event = newEvent(detail, color, start, end, '#000', `unavailable/${it.id}`, meta);
     if (event) {
       events = [...events, event];
       const calendar = new Calendar(room, events);
@@ -319,7 +322,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
         const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
         const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
         calendar.events = calendar.events.concat(fillNotAvailable(unavailable, lunch, notWorking, this.viewDate,
-          sunday, saturday, week, darkMode, false, this.maxDate));
+          sunday, saturday, week, darkMode, this.maxDate));
       });
       this.data.forEach((value: IRoomReservation) => this.addUnavailableList(value, darkMode));
     }

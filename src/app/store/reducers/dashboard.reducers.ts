@@ -11,7 +11,7 @@ export interface State {
 }
 
 const initialState: State = {
-  data: {calendarSummaries: undefined, miniCardSummaries: undefined, chartSummaries: undefined},
+  data: {calendarSummary: undefined, miniCardSummaries: undefined, chartSummaries: undefined},
   errorMessage: null,
   error: null,
   subErrors: null,
@@ -33,7 +33,7 @@ export const reducer = (state = initialState, action: All): State => {
     case DashboardActionTypes.dashboardEvents: {
       return {
         ...state,
-        data: {calendarSummaries: undefined},
+        data: {calendarSummary: undefined},
         errorMessage: null,
         error: null,
         subErrors: null,

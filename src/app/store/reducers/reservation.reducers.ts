@@ -297,6 +297,7 @@ export const reducer = (state = initialState, action: All): State => {
       };
     }
     case ReservationActionTypes.stateSuccess:
+    case ReservationActionTypes.reservationCompleteSuccess:
     case ReservationActionTypes.reservationSaveSuccess: {
       return {
         ...state,

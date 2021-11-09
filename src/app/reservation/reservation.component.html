@@ -151,7 +151,6 @@
 
 <ng-template #stepFour>
   <div *ngIf="additionalList; else skeleton">
-    <mat-label>{{ 'ADDITIONAL.FIELD' | translate }}</mat-label>
     <mat-selection-list #additional (selectionChange)="onChange(additional.selectedOptions.selected)" class="app-class">
       <mat-divider></mat-divider>
       <mat-list-option *ngFor="let it of additionalList" [selected]="isSelected(it)" [value]="it"

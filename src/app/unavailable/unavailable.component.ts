@@ -41,6 +41,9 @@ export class UnavailableComponent implements OnInit, OnDestroy {
   startDate: FormControl = new FormControl('', [
     Validators.required
   ]);
+  endDate: FormControl = new FormControl('', [
+    Validators.required
+  ]);
   startTime: FormControl = new FormControl('', [
     Validators.required
   ]);
@@ -61,6 +64,7 @@ export class UnavailableComponent implements OnInit, OnDestroy {
   maxTime: any;
 
   showDuration = false;
+  showEnd = false;
 
   private getState: Observable<any>;
   private subscription: Subscription | undefined;
@@ -112,6 +116,9 @@ export class UnavailableComponent implements OnInit, OnDestroy {
     unavailable.repeat = this.repeat.value;
     unavailable.duration = this.duration.value;
     unavailable.allDay = this.allDay.value;
+    if (this.endDate.value) {
+      unavailable.end = createNewDate(this.endDate.value).toLocaleString(API_LOCALE);
+    }
 
     this.store.dispatch(
       new fromActionsUnavailable.UnavailableSave(unavailable)
@@ -191,7 +198,8 @@ export class UnavailableComponent implements OnInit, OnDestroy {
       startTime: this.startTime,
       duration: this.duration,
       repeat: this.repeat,
-      allDay: this.allDay
+      allDay: this.allDay,
+      endDate: this.endDate
     });
     this.allDay.valueChanges.subscribe(value => {
       if (value) {
@@ -204,6 +212,17 @@ export class UnavailableComponent implements OnInit, OnDestroy {
         this.duration.updateValueAndValidity();
         this.startTime.setValidators(Validators.required);
         this.startTime.updateValueAndValidity();
+      }
+    });
+    this.repeat.valueChanges.subscribe(value => {
+      if (value && (value === UnavailableRepeatType.onceAWeek || value === UnavailableRepeatType.everyDay)) {
+        this.endDate.setValidators(Validators.required);
+        this.endDate.updateValueAndValidity();
+        this.showEnd = true;
+      } else {
+        this.endDate.clearValidators();
+        this.endDate.updateValueAndValidity();
+        this.showEnd = false;
       }
     });
     this.filteredOptions = this.professional.valueChanges.pipe(
