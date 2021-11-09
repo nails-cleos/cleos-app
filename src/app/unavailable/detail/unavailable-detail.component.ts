@@ -42,6 +42,9 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
   startDate: FormControl = new FormControl('', [
     Validators.required
   ]);
+  endDate: FormControl = new FormControl('', [
+    Validators.required
+  ]);
   startTime: FormControl = new FormControl('', [
     Validators.required
   ]);
@@ -59,6 +62,7 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
   durationMax: any;
   minTime: any;
   maxTime: any;
+  showEnd = false;
 
   private subscription: Subscription | undefined;
   private getState: Observable<any>;
@@ -149,6 +153,9 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
     unavailable.duration = fieldChange(this.duration, this.unavailable?.duration);
     unavailable.repeat = fieldChange(this.repeat, this.unavailable?.repeat);
     unavailable.allDay = this.allDay.value;
+    if (this.endDate.value) {
+      unavailable.end = createNewDate(this.endDate.value).toLocaleString(API_LOCALE);
+    }
 
     this.store.dispatch(new fromActionsUnavailable.UnavailableUpdate(unavailable));
   }
@@ -189,7 +196,8 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
       startTime: this.startTime,
       duration: this.duration,
       repeat: this.repeat,
-      allDay: this.allDay
+      allDay: this.allDay,
+      endDate: this.endDate
     });
     this.allDay.valueChanges.subscribe(value => {
       if (value) {
@@ -202,6 +210,17 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
         this.duration.updateValueAndValidity();
         this.startTime.setValidators(Validators.required);
         this.startTime.updateValueAndValidity();
+      }
+    });
+    this.repeat.valueChanges.subscribe(value => {
+      if (value && (value === UnavailableRepeatType.onceAWeek || value === UnavailableRepeatType.everyDay)) {
+        this.endDate.setValidators(Validators.required);
+        this.endDate.updateValueAndValidity();
+        this.showEnd = true;
+      } else {
+        this.endDate.clearValidators();
+        this.endDate.updateValueAndValidity();
+        this.showEnd = false;
       }
     });
   }
@@ -220,13 +239,17 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
           id: state.selected.id,
           description: state.selected.description,
           start: state.selected.start,
+          end: state.selected.end,
           startDate: date,
+          endDate: newDate(state.selected.end),
           startTime: getTime(date, API_LOCALE),
           duration: state.selected.duration ? formatDuration(state.selected.duration, API_LOCALE) : '',
           repeat: state.selected.repeat,
           allDay: state.selected.allDay
         } as IUnavailable;
         this.form.patchValue(this.unavailable);
+        this.showEnd = this.unavailable.repeat === UnavailableRepeatType.everyDay ||
+          this.unavailable.repeat === UnavailableRepeatType.onceAWeek;
 
         this.professionalName = getUserName(state.selected.professional);
       }

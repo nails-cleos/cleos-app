@@ -13,8 +13,10 @@ export interface IUnavailable {
   professional?: IUser;
   repeat?: string;
   start?: string;
+  end?: string;
   duration?: string;
   startDate?: Date;
+  endDate?: Date;
   startTime?: string;
   allDay?: boolean;
 }
@@ -23,6 +25,7 @@ export interface IUnavailableAll {
   id: string;
   description?: string;
   start: string;
+  end: string;
   duration: string;
   professional: IUser;
   repeat: string;

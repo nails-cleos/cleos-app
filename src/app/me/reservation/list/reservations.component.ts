@@ -12,7 +12,7 @@ import { AppState, selectReservationState } from '../../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ReservationIconKey, ReservationIconName } from '../../../util/icon';
 import * as fromActionsReservation from '../../../store/reservation.actions';
-import { convertDuration, createNewDate, newDate } from '../../../util/dates';
+import { createNewDate, newDate, reservationDuration } from '../../../util/dates';
 import { getPrice, getUserName, snakeToCamel } from '../../../util/helper';
 import { stampAnimation, transitionAnimation } from '../../../util/animation';
 import { IPrice, Price } from '../../../interfaces/product';
@@ -46,6 +46,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   language: string;
   error: any;
   showReview = true;
+  rowSpan = 0;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef) {
@@ -134,9 +135,18 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         this.resultsLength = this.data.reservations?.totalElements;
         this.upcoming = this.data.upcoming ? this.data.upcoming : this.upcoming;
+        if (this.upcoming.additional) {
+          if (this.upcoming.additional.length) {
+            if (this.upcoming.additional.length > 1) {
+              this.rowSpan = this.upcoming.additional.length - 1;
+            } else {
+              this.rowSpan = 1;
+            }
+          }
+        }
         if (this.upcoming?.id) {
-          this.price = getPrice(this.upcoming.product, this.data.currentReservationPayments);
-          const duration = convertDuration(this.upcoming.product.duration);
+          this.price = getPrice(this.upcoming, this.data.currentReservationPayments);
+          const duration = reservationDuration(this.upcoming);
           this.end = newDate(this.upcoming.start);
           this.end = createNewDate(this.end, this.end.getHours() + duration.hour, this.end.getMinutes() + duration.minute);
         }

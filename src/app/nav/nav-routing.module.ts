@@ -28,6 +28,9 @@ const routes: Routes = [{
     path: 'unavailable',
     loadChildren: () => import('../unavailable/unavailable.module').then(m => m.UnavailableModule)
   }, {
+    path: 'additional',
+    loadChildren: () => import('../additional/additional.module').then(m => m.AdditionalModule)
+  }, {
     path: 'me', loadChildren: () => import('../me/me.module').then(m => m.MeModule)
   }]
 }];

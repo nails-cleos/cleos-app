@@ -1,7 +1,9 @@
 import { DiscountType, IDiscount } from '../interfaces/discount';
 import { IUser, IUserAll } from '../interfaces/user';
-import { IPrice, IProductAll, Price } from '../interfaces/product';
+import { IPrice, Price } from '../interfaces/product';
 import { IPayment } from '../interfaces/payment';
+import { IReservationAll } from '../interfaces/reservation';
+import { IAdditionalAll } from '../interfaces/additional';
 
 export const snakeToCamel = (value: string = ''): string =>
   value.toLowerCase().replace(/([-_]\w)/g, (g: string) => g[1].toUpperCase());
@@ -85,24 +87,35 @@ export const getLocale = (userLang: string): string => {
 
 export const round = (value: number): number => Math.round((value + Number.EPSILON) * 100) / 100;
 
-export const getPrice = (product: IProductAll, payments?: IPayment[] | undefined): IPrice => {
+export const getPrice = (reservation: IReservationAll, payments?: IPayment[] | undefined): IPrice => {
+  const product = reservation.product;
   let total = product.price;
   let priceWithDiscount;
   let priceWithExtras = product.price;
+  let priceWithAdditional = product.price;
   let discount;
   let extras;
+  let additional;
   if (product.extras && product.extras.price) {
     extras = product.extras.price;
     total += extras;
     priceWithExtras += extras;
   }
+
+  if (reservation.additional && reservation.additional.length) {
+    additional = reservation.additional.map(a => a.price).reduce((p, c) => p + c);
+    total += additional;
+    priceWithAdditional += additional;
+  }
+
   if (product.discount) {
     discount = getDiscount(product.discount, product.price);
     priceWithDiscount = product.price - discount;
     total = total - discount;
   }
 
-  return new Price(product.price, discount, extras, total, totalPaid(payments), priceWithDiscount, priceWithExtras);
+  return new Price(product.price, discount, extras, additional, total, totalPaid(payments), priceWithDiscount,
+    priceWithExtras, priceWithAdditional);
 };
 
 export const newPrice = (price: IPrice, amount: number): IPrice => {
@@ -110,31 +123,55 @@ export const newPrice = (price: IPrice, amount: number): IPrice => {
   let priceWithDiscount;
   const discount = price.discount;
   const extras = price.extra;
+  const additional = price.additional;
   const priceWithExtras = amount + extras;
+  const priceWithAdditional = amount + additional;
   if (extras) {
     total += extras;
   }
+
+  if (additional) {
+    total += additional;
+  }
+
   if (discount) {
     priceWithDiscount = amount - discount;
     total = total - discount;
   }
 
-  return new Price(amount, discount, extras, total, price.totalPaid, priceWithDiscount, priceWithExtras);
+  return new Price(amount, discount, extras, additional, total, price.totalPaid, priceWithDiscount, priceWithExtras,
+    priceWithAdditional);
 };
 
 export const newExtra = (price: IPrice, extras: number): IPrice => {
-  const total = price.amount - price.discount + extras;
+  const total = price.amount - price.discount + extras + price.additional;
   const priceWithExtras = price.amount + extras;
 
-  return new Price(price.amount, price.discount, extras, total, price.totalPaid, price.priceWithDiscount, priceWithExtras);
+  return new Price(price.amount, price.discount, extras, price.additional, total, price.totalPaid,
+    price.priceWithDiscount, priceWithExtras, price.priceWithAdditional);
 };
 
 export const newDiscount = (price: IPrice, productDiscount: IDiscount): IPrice => {
   const discount = getDiscount(productDiscount, price.amount);
-  const total = price.amount - discount + price.extra;
+  const total = price.amount - discount + price.extra + price.additional;
   const priceWithDiscount = price.amount - discount;
 
-  return new Price(price.amount, discount, price.extra, total, price.totalPaid, priceWithDiscount, price.priceWithExtras);
+  return new Price(price.amount, discount, price.extra, price.additional, total, price.totalPaid, priceWithDiscount,
+    price.priceWithExtras, price.priceWithAdditional);
+};
+
+export const newAdditional = (price: IPrice, additionalList: IAdditionalAll[]): IPrice => {
+  let total = price.amount - price.discount + price.extra;
+  let priceWithAdditional = price.amount;
+  let additional;
+  if (additionalList && additionalList.length) {
+    additional = additionalList.map(a => a.price).reduce((p, c) => p + c);
+    total += additional;
+    priceWithAdditional += additional;
+  }
+
+  return new Price(price.amount, price.discount, price.extra, additional, total, price.totalPaid,
+    price.priceWithDiscount, price.priceWithExtras, priceWithAdditional);
 };
 
 const totalPaid = (payments: IPayment[] | undefined): number => {

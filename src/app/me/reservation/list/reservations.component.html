@@ -54,8 +54,20 @@
                           class="raised-button bold">$ {{price.priceWithDiscount | number:'1.2-2'}}</span>
                   </td>
                   <ng-template #noDiscount>
-                    <td class="left">$ {{price.total | number:'1.2-2'}}</td>
+                    <td class="left">$ {{price.amount | number:'1.2-2'}}</td>
                   </ng-template>
+                </tr>
+                <tr *ngIf="rowSpan">
+                  <td [rowSpan]="rowSpan" class="right">{{ 'ADDITIONAL.FIELD' | translate }}</td>
+                  <td class="left">
+                    <div *ngFor="let additional of upcoming.additional">
+                      {{additional.name}} - ${{additional.price | number:'1.2-2'}}
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="rowSpan">
+                  <td class="right">{{ 'COMMON.LABEL.TOTAL' | translate }}</td>
+                  <td class="left bold">${{price.total | number:'1.2-2'}}</td>
                 </tr>
                 <tr *ngIf="price.totalPaid">
                   <td class="right">{{ 'RESERVATION.UPCOMING.PAID' | translate }}</td>
@@ -81,15 +93,15 @@
             <button *ngIf="upcoming?.state === 'APPROVED' || upcoming?.state === 'PARTIALLY_PAID'"
                     [routerLink]="['/me', 'reservation', upcoming.id, 'payment']" mat-raised-button>
               <mat-icon class="ml-button" color="primary">payment</mat-icon>
-              {{ 'COMMON.BUTTON.ML' | translate }}
+              <span fxHide.lt-sm fxShow>{{ 'COMMON.BUTTON.ML' | translate }}</span>
             </button>
             <button [routerLink]="['/me', 'reservation', upcoming.id]" color="primary" mat-raised-button>
               <mat-icon>edit_calendar</mat-icon>
-              {{ 'COMMON.BUTTON.EDIT' | translate }}
+              <span fxHide.lt-sm fxShow>{{ 'COMMON.BUTTON.EDIT' | translate }}</span>
             </button>
             <button [routerLink]="['/reservation', upcoming.id]" color="primary" mat-raised-button>
               <mat-icon>visibility</mat-icon>
-              {{ 'COMMON.BUTTON.VIEW' | translate }}
+              <span fxHide.lt-sm fxShow>{{ 'COMMON.BUTTON.VIEW' | translate }}</span>
             </button>
           </mat-card-actions>
           <ng-template #buttonSkeleton>

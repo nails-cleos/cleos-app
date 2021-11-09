@@ -7,6 +7,7 @@ import { ReservationComponent } from './reservation.component';
 import { ReservationDetailComponent } from './detail/reservation-detail.component';
 import { MoreInfoComponent } from './detail/more-info/more-info.component';
 import { CalendarComponent } from './calendar/calendar.component';
+import { ReservationCompleteComponent } from './detail/complete/reservation-complete.component';
 
 const routes: Routes = [
   {
@@ -32,6 +33,11 @@ const routes: Routes = [
   {
     path: ':id', component: ReservationDetailComponent, canActivate: [AuthGuardService], data: {
       roles: [Role.admin, Role.professional, Role.customer]
+    }, runGuardsAndResolvers: 'always'
+  },
+  {
+    path: ':id/complete', component: ReservationCompleteComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.professional]
     }, runGuardsAndResolvers: 'always'
   },
   {

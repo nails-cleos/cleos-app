@@ -7,6 +7,7 @@ import { IUnavailableAll } from './unavailable';
 import { Pagination } from './pagination';
 import { IPayment, IPaymentAll } from './payment';
 import { IReview } from './review';
+import { IAdditionalAll } from './additional';
 
 export interface IReservation {
   id?: string;
@@ -14,6 +15,7 @@ export interface IReservation {
   customer?: IUser;
   productId?: string;
   discountId?: string;
+  additionalIds?: string[];
   product?: IProduct;
   roomId?: string;
   room?: IRoom;
@@ -31,6 +33,7 @@ export interface IReservationAll {
   state: string;
   review?: IReview;
   history?: IReservationAll[];
+  additional?: IAdditionalAll[];
 }
 
 export interface IPaymentReservation {

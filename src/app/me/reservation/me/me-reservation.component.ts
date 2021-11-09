@@ -22,11 +22,14 @@ import {
   formatDateTwoDigit,
   formatDuration,
   formatFullDateTime,
+  formatTime,
   getNow,
   getTime,
   IDuration,
   newDate,
-  plusMonthDate
+  plusMonthDate,
+  reservationDuration,
+  totalDuration
 } from '../../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -37,10 +40,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as fromActionsReservation from '../../../store/reservation.actions';
 import { map, startWith } from 'rxjs/operators';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
-import { getPrice, getUserName, newDiscount, newPrice, round } from '../../../util/helper';
+import { getPrice, getUserName, newAdditional, newDiscount, newPrice, round } from '../../../util/helper';
 import { DiscountType, IUserDiscount } from '../../../interfaces/discount';
 import { transitionAnimation } from '../../../util/animation';
 import { isEqual } from 'date-fns';
+import { IAdditionalAll } from '../../../interfaces/additional';
+import { MatListOption } from '@angular/material/list';
 
 @Component({
   selector: 'app-me-reservation',
@@ -84,6 +89,9 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     Validators.required
   ]);
 
+  additionalList: IAdditionalAll[] = [];
+  additionalSelected: IAdditionalAll[] = [];
+
   availableList = new Map<string, any[]>();
   eventSelected: Date | undefined;
   selectedIndex = 1;
@@ -98,6 +106,8 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   minDate: Date;
   startDate: Date | undefined;
   endDate: Date | undefined;
+  additionalDuration: string | undefined;
+  totalDuration: string | undefined;
 
   private readonly extras: any;
   private reservation: IReservationAll | undefined;
@@ -164,6 +174,16 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     return;
   }
 
+  get additional(): void {
+    if (this.productForm.invalid) {
+      return;
+    }
+    this.getAdditionalList();
+    this.myStepper.next();
+
+    return;
+  }
+
   get availability(): void {
     if (this.productForm.invalid) {
       return;
@@ -172,13 +192,16 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       this.eventSelected = undefined;
       this.time = undefined;
     }
-    this.duration = convertDuration(this.product.value.duration);
+    this.duration = totalDuration(this.product.value, this.additionalSelected);
+    this.totalDuration = formatTime(this.duration, this.locale);
+    this.additionalDuration = formatTime(totalDuration(undefined, this.additionalSelected), this.locale);
 
     this.store.dispatch(
       new fromActionsReservation.CustomerSearchReservation({
         date: this.date.value,
         roomId: this.room.value.id,
-        productId: this.product.value.id
+        productId: this.product.value.id,
+        additionalIds: this.additionalSelected?.map(additional => additional.id)
       })
     );
     this.myStepper.next();
@@ -207,10 +230,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.myStepper.previous();
 
     return;
-  }
-
-  get dateNoContent(): string | null {
-    return this.date.value ? formatDateName(this.date.value, this.translate.currentLang, this.measure) : null;
   }
 
   ngOnInit(): void {
@@ -255,6 +274,10 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     return room ? `${room.name}` : '';
   }
 
+  dateNoContent(date?: any): string {
+    return formatDateName(createNewDate(date ? date : this.date.value), this.translate.currentLang, this.measure);
+  }
+
   selectDate(datetime: any): void {
     this.eventSelected = datetime.date;
     this.time = datetime.time;
@@ -275,6 +298,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     if (this.startDate) {
       reservation.start = this.startDate.toLocaleString(API_LOCALE);
     }
+    reservation.additionalIds = this.additionalSelected?.map(value => value.id);
 
     if (this.isEditing && this.reservation) {
       reservation.id = this.reservation.id;
@@ -328,6 +352,19 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.keyDownHandler(event, this.group);
   }
 
+  onChange(options: MatListOption[]): void {
+    this.additionalSelected = options.map(o => o.value);
+    this.price = newAdditional(this.price, this.additionalSelected);
+  }
+
+  isSelected(it: IAdditionalAll): boolean {
+    return this.additionalSelected.filter(el => el.id === it.id).length > 0;
+  }
+
+  getDuration(duration: string): string {
+    return formatTime(convertDuration(duration), this.locale);
+  }
+
   private getReservation(id: string | null): void {
     this.store.dispatch(
       new fromActionsReservation.ReservationFind(id)
@@ -349,6 +386,12 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   private getProductList(): void {
     this.store.dispatch(
       new fromActionsReservation.GetAllProducts()
+    );
+  }
+
+  private getAdditionalList(): void {
+    this.store.dispatch(
+      new fromActionsReservation.GetAllAdditional()
     );
   }
 
@@ -389,6 +432,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
+      this.additionalList = state.additional;
       this.groups = state.productDiscount?.groups;
       if (this.groups && this.productId && !this.group.value) {
         this.group.setValue(this.groups?.find(group => {
@@ -436,7 +480,9 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
         this.canCreate = true;
       }
       if (state.data && Array.isArray(state.data)) {
-        this.availableList = state.data.reduce((group: Map<string, string[]>, item: IAvailableDTO) => {
+        this.availableList = new Map<string, any[]>();
+        this.availableList.set(createNewDate(this.date.value).toString(), []);
+        state.data.reduce((group: Map<string, string[]>, item: IAvailableDTO) => {
           const date = newDate(item.start);
           const key = createNewDate(date).toString();
 
@@ -445,10 +491,10 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
           group.set(key, dates);
 
           return group;
-        }, new Map<string, any[]>());
-      }
+        }, this.availableList);
 
-      this.setSelectedIndex();
+        this.setSelectedIndex();
+      }
     });
   }
 
@@ -489,7 +535,8 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.room.setValue(reservation.room);
     this.date.setValue(date);
     this.eventSelected = date;
-    this.price = getPrice(this.reservation.product);
+    this.additionalSelected = reservation.additional ? reservation.additional : [];
+    this.price = getPrice(reservation);
     this.group.setValue(this.groups?.find(group => {
       const product = group.products?.find(p => p.id === reservation.product.id);
       if (product) {
@@ -498,7 +545,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       return undefined;
     }));
     this.product.setValue(reservation.product);
-    this.duration = convertDuration(reservation.product.duration);
+    this.duration = reservationDuration(reservation);
 
     this.myStepper.next();
   }
