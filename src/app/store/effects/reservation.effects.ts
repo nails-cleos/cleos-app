@@ -12,6 +12,7 @@ import { ProductService } from '../../services/product.service';
 import { RoomService } from '../../services/room.service';
 import { TrackingService } from '../../services/tracking.service';
 import { PaymentService } from '../../services/payment.service';
+import { AdditionalService } from '../../services/additional.service';
 
 @Injectable()
 export class ReservationEffects {
@@ -66,7 +67,8 @@ export class ReservationEffects {
   customerSearch = createEffect(() =>
     this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.customerSearchReservation)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.reservationService.customerSearch(payload.roomId, payload.productId, payload.date).pipe(
+      switchMap((payload: any) => this.reservationService.customerSearch(payload.roomId, payload.productId,
+        payload.date, payload.additionalIds).pipe(
         switchMap((response: any) => of(new fromActionsReservation.ReservationSuccess(response ? response : []))),
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
       ))
@@ -92,6 +94,14 @@ export class ReservationEffects {
     map((action: any) => action.payload),
     switchMap(() => this.roomService.getAllRooms().pipe(
       switchMap((response: any) => of(new fromActionsReservation.ReservationRoomsSuccess(response))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
+    ))
+  ));
+
+  getAllAdditional$ = createEffect(() => this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getAdditional)).pipe(
+    map((action: any) => action.payload),
+    switchMap(() => this.additionalService.getAllAdditional().pipe(
+      switchMap((response: any) => of(new fromActionsReservation.ReservationAdditionalSuccess(response))),
       catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
     ))
   ));
@@ -185,7 +195,7 @@ export class ReservationEffects {
       this.reservationService.changeState(payload.reservationId, 'complete', payload.extras).pipe(
         switchMap(() => {
           const message = this.translate.instant('RESERVATION.STATE.COMPLETE');
-          return of(new fromActionsReservation.StateSuccess({id: payload, message}));
+          return of(new fromActionsReservation.ReservationCompleteSuccess({id: payload.reservationId, message}));
         }), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
       ))
   ));
@@ -279,8 +289,17 @@ export class ReservationEffects {
     ofType(fromActionsReservation.ReservationActionTypes.stateSuccess)
   ), {dispatch: false});
 
+  reservationComplete$ = createEffect(() => this.actions$.pipe(
+    ofType(fromActionsReservation.ReservationActionTypes.reservationCompleteSuccess),
+    tap((data: any) => this.router.navigate(['reservation', data.payload.id]))
+  ), {dispatch: false});
+
   reservationCustomersSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.reservationsCustomerSuccess)
+  ), {dispatch: false});
+
+  reservationAdditionalSuccess$ = createEffect(() => this.actions$.pipe(
+    ofType(fromActionsReservation.ReservationActionTypes.reservationAdditionalSuccess)
   ), {dispatch: false});
 
   trackingSuccess$ = createEffect(() => this.actions$.pipe(
@@ -294,6 +313,7 @@ export class ReservationEffects {
   constructor(private readonly translate: TranslateService, private actions$: Actions, private router: Router,
               private reservationService: ReservationService, private userService: UserService,
               private productService: ProductService, private roomService: RoomService,
-              private trackingService: TrackingService, private paymentService: PaymentService) {
+              private additionalService: AdditionalService, private trackingService: TrackingService,
+              private paymentService: PaymentService) {
   }
 }

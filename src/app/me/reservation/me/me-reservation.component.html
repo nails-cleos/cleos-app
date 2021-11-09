@@ -145,31 +145,55 @@
 </ng-template>
 
 <ng-template #stepThree>
+  <div *ngIf="additionalList; else skeleton">
+    <mat-selection-list #additional (selectionChange)="onChange(additional.selectedOptions.selected)" class="app-class">
+      <mat-divider></mat-divider>
+      <mat-list-option *ngFor="let it of additionalList" [selected]="isSelected(it)" [value]="it"
+                       checkboxPosition="before">
+        <div mat-subheader>{{it.name}}</div>
+        <div mat-line>${{it.price | number:'1.2-2'}}</div>
+        <div *ngIf="it.description" mat-line>{{it.description}}</div>
+        <div class="additional-line" mat-line>{{'ADDITIONAL.DURATION.FIELD' | translate}}
+          : {{getDuration(it.duration)}}</div>
+        <mat-divider></mat-divider>
+      </mat-list-option>
+    </mat-selection-list>
+  </div>
+  <ng-template #skeleton>
+    <div class="ssc-line"></div>
+  </ng-template>
+</ng-template>
+
+<ng-template #stepFour>
   <mat-tab-group *ngIf="availableList.size; else empty" [selectedIndex]="selectedIndex" backgroundColor="accent"
                  color="primary" mat-align-tabs="center">
     <mat-tab *ngFor="let available of availableList | keyvalue: sortDate" [label]="formatKey(available.key)">
       <section>
-        <div class="button-row">
-          <button (click)="selectDate(datetime)" *ngFor="let datetime of sortTime(available.value)"
-                  [color]="areEquals(datetime) ? 'primary' : undefined"
-                  class="large"
-                  mat-raised-button>
-            {{datetime.time}}
-          </button>
-        </div>
+        <ng-container [ngTemplateOutletContext]="{available:available}"
+                      [ngTemplateOutlet]="available.value.length ? noEmpty : empty"></ng-container>
       </section>
     </mat-tab>
   </mat-tab-group>
-  <ng-template #empty>
+  <ng-template #noEmpty let-available='available'>
+    <div class="button-row">
+      <button (click)="selectDate(datetime)" *ngFor="let datetime of sortTime(available.value)"
+              [color]="areEquals(datetime) ? 'primary' : undefined"
+              class="large"
+              mat-raised-button>
+        {{datetime.time}}
+      </button>
+    </div>
+  </ng-template>
+  <ng-template #empty let-available='available'>
     <div class="no-content divider">
-      <p [innerHTML]="'RESERVATION.UPCOMING.CUSTOMER.NO_CONTENT' | translate:{date: dateNoContent}"></p>
+      <p [innerHTML]="'RESERVATION.UPCOMING.CUSTOMER.NO_CONTENT' | translate:{date: dateNoContent(available?.key)}"></p>
     </div>
   </ng-template>
   <mat-error *ngIf="this.errors['schedule']" [innerHTML]="'RESERVATION.SCHEDULE.REQUIRED' | translate"
              class="divider"></mat-error>
 </ng-template>
 
-<ng-template #stepFour>
+<ng-template #stepFive>
   <mat-card *ngIf="isPreview">
     <mat-card-header>
       <mat-card-title>{{ 'RESERVATION.PREVIEW' | translate }}</mat-card-title>
@@ -228,6 +252,28 @@
             </div>
           </ng-template>
         </mat-list-item>
+        <div *ngIf="additionalSelected.length">
+          <mat-divider></mat-divider>
+          <div mat-subheader>{{ 'ADDITIONAL.FIELD' | translate}}</div>
+          <mat-list-item>
+            <mat-icon mat-list-icon>add_post</mat-icon>
+            <div mat-line>
+              <div *ngFor="let it of additionalSelected">
+                {{it.name}} - ${{it.price | number:'1.2-2'}}
+              </div>
+            </div>
+          </mat-list-item>
+          <mat-list-item>
+            <mat-icon mat-list-icon>timer</mat-icon>
+            <div mat-line>{{ 'PRODUCT.DURATION.FIELD' | translate}}</div>
+            <div mat-line>{{additionalDuration}}</div>
+          </mat-list-item>
+          <mat-list-item>
+            <mat-icon mat-list-icon>attach_money</mat-icon>
+            <div mat-line>{{ 'COMMON.LABEL.PRICE' | translate}}</div>
+            <div mat-line>{{price.additional}}</div>
+          </mat-list-item>
+        </div>
         <mat-divider></mat-divider>
         <div mat-subheader>{{ 'RESERVATION.APPOINTMENT' | translate}}</div>
         <mat-list-item>
@@ -236,6 +282,16 @@
             <div>{{startDate?.toLocaleString(locale)}}</div>
             <div>{{endDate?.toLocaleString(locale)}}</div>
           </div>
+        </mat-list-item>
+        <mat-list-item>
+          <mat-icon mat-list-icon>timer</mat-icon>
+          <div mat-line>{{ 'PRODUCT.DURATION.FIELD' | translate}}</div>
+          <div mat-line>{{totalDuration}}</div>
+        </mat-list-item>
+        <mat-list-item *ngIf="price.total">
+          <mat-icon mat-list-icon>paid</mat-icon>
+          <div mat-line><span class="bold">{{ 'COMMON.LABEL.TOTAL' | translate}}</span></div>
+          <div mat-line><span class="bold">{{price.total}}</span></div>
         </mat-list-item>
       </mat-list>
     </mat-card-content>
@@ -308,16 +364,28 @@
               <mat-icon>arrow_upward</mat-icon>
             </button>
           </ng-template>
-          <button (click)="availability" [disabled]="productForm.invalid" class="icon-button" color="primary"
+          <button (click)="additional" [disabled]="productForm.invalid" class="icon-button" color="primary"
                   mat-mini-fab
                   type="button">
             <mat-icon>arrow_downward</mat-icon>
           </button>
         </div>
       </mat-step>
+      <mat-step state="post_add">
+        <ng-template matStepLabel>{{ 'ADDITIONAL.FIELD' | translate }}</ng-template>
+        <ng-container *ngTemplateOutlet="stepThree"></ng-container>
+        <div class="divider">
+          <button (click)="back" color="accent" mat-raised-button>
+            <mat-icon>arrow_upward</mat-icon>
+          </button>
+          <button (click)="availability" class="raised-button" color="primary" mat-raised-button type="button">
+            <mat-icon>arrow_downward</mat-icon>
+          </button>
+        </div>
+      </mat-step>
       <mat-step state="book_online">
         <ng-template matStepLabel>{{ 'RESERVATION.SCHEDULE.FIELD' | translate }}</ng-template>
-        <ng-container *ngTemplateOutlet="stepThree"></ng-container>
+        <ng-container *ngTemplateOutlet="stepFour"></ng-container>
         <div>
           <button (click)="back" class="icon-button" color="accent" mat-mini-fab>
             <mat-icon>arrow_upward</mat-icon>
@@ -330,7 +398,7 @@
       </mat-step>
       <mat-step state="preview">
         <ng-template matStepLabel>{{ 'RESERVATION.PREVIEW' | translate }}</ng-template>
-        <ng-container *ngTemplateOutlet="stepFour"></ng-container>
+        <ng-container *ngTemplateOutlet="stepFive"></ng-container>
         <div>
           <button (click)="back" class="icon-button" color="accent" mat-mini-fab>
             <mat-icon>arrow_upward</mat-icon>
@@ -416,16 +484,30 @@
               <mat-icon>arrow_back</mat-icon>
               {{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </ng-template>
-          <button (click)="availability" [disabled]="productForm.invalid" class="raised-button" color="primary"
+          <button (click)="additional" [disabled]="productForm.invalid" class="raised-button" color="primary"
                   mat-raised-button type="button">
             {{ 'COMMON.BUTTON.NEXT' | translate }}
             <mat-icon>arrow_forward</mat-icon>
           </button>
         </div>
       </mat-step>
+      <mat-step state="post_add">
+        <ng-template matStepLabel>{{ 'ADDITIONAL.FIELD' | translate }}</ng-template>
+        <ng-container *ngTemplateOutlet="stepFour"></ng-container>
+        <div>
+          <button (click)="back" color="accent" mat-raised-button>
+            <mat-icon>arrow_back</mat-icon>
+            {{ 'COMMON.BUTTON.BACK' | translate }}
+          </button>
+          <button (click)="availability" class="raised-button" color="primary" mat-raised-button type="button">
+            <mat-icon>arrow_forward</mat-icon>
+            {{ 'COMMON.BUTTON.NEXT' | translate }}
+          </button>
+        </div>
+      </mat-step>
       <mat-step state="book_online">
         <ng-template matStepLabel>{{ 'RESERVATION.SCHEDULE.FIELD' | translate }}</ng-template>
-        <ng-container *ngTemplateOutlet="stepThree"></ng-container>
+        <ng-container *ngTemplateOutlet="stepFour"></ng-container>
         <div class="divider">
           <button (click)="back" color="accent" mat-raised-button type="button">
             <mat-icon>arrow_back</mat-icon>
@@ -439,7 +521,7 @@
       </mat-step>
       <mat-step state="preview">
         <ng-template matStepLabel>{{ 'RESERVATION.PREVIEW' | translate }}</ng-template>
-        <ng-container *ngTemplateOutlet="stepFour"></ng-container>
+        <ng-container *ngTemplateOutlet="stepFive"></ng-container>
         <div class="divider">
           <button (click)="back" color="accent" mat-raised-button>
             <mat-icon>arrow_back</mat-icon>

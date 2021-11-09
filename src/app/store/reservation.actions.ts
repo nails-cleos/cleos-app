@@ -10,12 +10,14 @@ export enum ReservationActionTypes {
   getCustomers = '[Reservation] Get customers',
   getProducts = '[Reservation] Get products',
   getRooms = '[Reservation] Get rooms',
+  getAdditional = '[Reservation] Get additional',
   getUpcomingReservation = '[Reservation] Get upcoming reservation',
   reservationSuccess = '[Reservation] Success',
   reservationPageSuccess = '[Reservation] Page Success',
   reservationFilterPageSuccess = '[Reservation] Filter Page Success',
   customersSuccess = '[Reservation] Customers success',
   reservationProductsSuccess = '[Reservation] Products success',
+  reservationAdditionalSuccess = '[Reservation] Additional success',
   reservationRoomsSuccess = '[Reservation] Rooms success',
   reservationPaymentsSuccess = '[Reservation] Payments success',
   reservationSave = '[Reservation] Save',
@@ -37,6 +39,7 @@ export enum ReservationActionTypes {
   findTracking = '[Reservation] Find tracking',
   trackingSuccess = '[Reservation] Tracking success',
   reservationReview = '[Reservation] Review',
+  reservationCompleteSuccess = '[Reservation] Complete success',
   clean = '[Reservation] Clean'
 }
 
@@ -94,6 +97,10 @@ export class GetAllRooms implements Action {
   readonly type = ReservationActionTypes.getRooms;
 }
 
+export class GetAllAdditional implements Action {
+  readonly type = ReservationActionTypes.getAdditional;
+}
+
 export class GetUpcomingReservation implements Action {
   readonly type = ReservationActionTypes.getUpcomingReservation;
 }
@@ -135,6 +142,13 @@ export class ReservationProductsSuccess implements Action {
 
 export class ReservationRoomsSuccess implements Action {
   readonly type = ReservationActionTypes.reservationRoomsSuccess;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class ReservationAdditionalSuccess implements Action {
+  readonly type = ReservationActionTypes.reservationAdditionalSuccess;
 
   constructor(public payload: any) {
   }
@@ -259,6 +273,13 @@ export class StateSuccess implements Action {
   }
 }
 
+export class ReservationCompleteSuccess implements Action {
+  readonly type = ReservationActionTypes.reservationCompleteSuccess;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class FindTracking implements Action {
   readonly type = ReservationActionTypes.findTracking;
 
@@ -294,6 +315,7 @@ export type All =
   | GetAllCustomers
   | GetAllProducts
   | GetAllRooms
+  | GetAllAdditional
   | GetUpcomingReservation
   | ReservationSave
   | ReservationSuccess
@@ -302,6 +324,7 @@ export type All =
   | CustomersSuccess
   | ReservationProductsSuccess
   | ReservationRoomsSuccess
+  | ReservationAdditionalSuccess
   | ReservationPaymentsSuccess
   | ReservationSaveSuccess
   | ReservationCustomerSuccess
@@ -321,4 +344,5 @@ export type All =
   | FindTracking
   | TrackingSuccess
   | ReservationReview
+  | ReservationCompleteSuccess
   | Clean;

@@ -8,13 +8,16 @@ import * as fromActionsDashboard from '../store/dashboard.actions';
 import * as fromActionsReservation from '../store/reservation.actions';
 import { IReservationSummary, States } from '../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
-import { getNow, newDate } from '../util/dates';
+import { createNewDate, getEnd, getNow, getWeekDay, newDate, plusMonthDate } from '../util/dates';
 import { CalendarEvent, CalendarView } from 'angular-calendar';
 import { findStateColor, isDarkMode } from '../util/theme';
 import { Meta, monthEvent } from '../util/event';
 import { Router } from '@angular/router';
-import { isSameDay, isSameMonth } from 'date-fns';
-import { IChart } from '../interfaces/dashboard';
+import { addDays, isSameDay, isSameMonth } from 'date-fns';
+import { ICalendarReservations, ICalendarUnavailable, IChart } from '../interfaces/dashboard';
+import RRule, { ByWeekday } from 'rrule';
+import { UnavailableRepeatType } from '../interfaces/unavailable';
+import { Frequency } from 'rrule/dist/esm/src/types';
 
 @Component({
   selector: 'app-dash',
@@ -170,9 +173,9 @@ export class DashComponent implements OnInit, OnDestroy {
         this.miniCardError(state, state.errorMessage);
         this.state = state;
       }
-      if (state.data && (state.data.miniCardSummaries || state.data.chartSummaries || state.data.calendarSummaries)) {
+      if (state.data && (state.data.miniCardSummaries || state.data.chartSummaries || state.data.calendarSummary)) {
         this.state = state;
-        if (!this.events.length && state.data.calendarSummaries) {
+        if (!this.events.length && state.data.calendarSummary) {
           this.createEvents(this.isDarkMode);
         }
         if (state.data.miniCardSummaries || state.data.chartSummaries) {
@@ -192,18 +195,66 @@ export class DashComponent implements OnInit, OnDestroy {
 
   private createEvents(darkMode: boolean = false): void {
     this.events = [];
-    this.state.data?.calendarSummaries?.forEach((it: any) => {
+    this.state.data?.calendarSummary.reservations?.forEach((it: ICalendarReservations) => {
       const start = newDate(it.start);
       const end = it.end ? newDate(it.end) : null;
       this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNow());
 
-      const route = it.reservationId ? ['reservation', it.reservationId] : ['unavailable', it.unavailableId];
-      const event = monthEvent(it.title, start, end, it.reservationId || it.unavailableId, findStateColor(it.state, darkMode),
-        new Meta(true, it.state, route));
+      const event = monthEvent(it.title, start, end, it.reservationId, findStateColor(it.state, darkMode),
+        new Meta(true, it.state, ['reservation', it.reservationId]));
       if (event) {
         this.events = [...this.events, event];
       }
     });
+    let recurring: any[] = [];
+    this.state.data?.calendarSummary.unavailable?.forEach((it: ICalendarUnavailable) => {
+      const start = newDate(it.start);
+      this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNow());
+      const title = it.duration ? it.title : `${this.translate.instant('UNAVAILABLE.ALL_DAY.CHECK')} - ${it.title}`;
+
+      if (it.repeat === UnavailableRepeatType.none) {
+        const end = getEnd(start, it.duration);
+        const event = monthEvent(title, start, end, it.unavailableId, findStateColor('DEFAULT', darkMode),
+          new Meta(!!it.duration, undefined, ['unavailable', it.unavailableId]));
+        if (event) {
+          this.events = [...this.events, event];
+        }
+      } else {
+        let freq: Frequency | undefined;
+        let byweekday: ByWeekday | undefined;
+        switch (it.repeat) {
+          case UnavailableRepeatType.onceAWeek:
+            freq = RRule.WEEKLY;
+            byweekday = getWeekDay(start.getDay());
+            break;
+          case UnavailableRepeatType.everyDay:
+            freq = RRule.DAILY;
+            break;
+        }
+        recurring = [...recurring, {
+          unavailableId: it.unavailableId,
+          title,
+          duration: it.duration,
+          rule: new RRule({
+            freq,
+            byweekday,
+            dtstart: start,
+            until: addDays(newDate(it.end), 1)
+          })
+        }];
+      }
+    });
+
+    recurring.forEach(r =>
+      r.rule.all().forEach((date: Date) => {
+        const end = getEnd(date, r.duration);
+        const event = monthEvent(r.title, date, end, r.unavailableId, findStateColor('DEFAULT', darkMode),
+          new Meta(!!r.duration, undefined, ['unavailable', r.unavailableId]));
+        if (event) {
+          this.events = [...this.events, event];
+        }
+      }));
+
     this.isCalendarLoading = false;
   }
 

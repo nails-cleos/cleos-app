@@ -150,6 +150,26 @@
 </ng-template>
 
 <ng-template #stepFour>
+  <div *ngIf="additionalList; else skeleton">
+    <mat-selection-list #additional (selectionChange)="onChange(additional.selectedOptions.selected)" class="app-class">
+      <mat-divider></mat-divider>
+      <mat-list-option *ngFor="let it of additionalList" [selected]="isSelected(it)" [value]="it"
+                       checkboxPosition="before">
+        <div mat-subheader>{{it.name}}</div>
+        <div mat-line>${{it.price | number:'1.2-2'}}</div>
+        <div *ngIf="it.description" mat-line>{{it.description}}</div>
+        <div class="additional-line" mat-line>{{'ADDITIONAL.DURATION.FIELD' | translate}}
+          : {{getDuration(it.duration)}}</div>
+        <mat-divider></mat-divider>
+      </mat-list-option>
+    </mat-selection-list>
+  </div>
+  <ng-template #skeleton>
+    <div class="ssc-line"></div>
+  </ng-template>
+</ng-template>
+
+<ng-template #stepFive>
   <mwl-calendar-week-view
     (beforeViewRender)="beforeMonthViewRender($event)"
     (eventTimesChanged)="eventTimesChanged($event)"
@@ -173,7 +193,7 @@
   </mat-error>
 </ng-template>
 
-<ng-template #stepFive>
+<ng-template #stepSix>
   <mat-card *ngIf="isPreview">
     <mat-card-header>
       <mat-card-title>{{ 'RESERVATION.PREVIEW' | translate }}</mat-card-title>
@@ -239,6 +259,29 @@
             </div>
           </ng-template>
         </mat-list-item>
+        <div *ngIf="additionalSelected.length">
+          <mat-divider></mat-divider>
+          <div mat-subheader>{{ 'ADDITIONAL.FIELD' | translate}}</div>
+          <mat-list-item>
+            <mat-icon mat-list-icon>add_post</mat-icon>
+            <div mat-line>
+              <div *ngFor="let it of additionalSelected">
+                {{it.name}} - ${{it.price | number:'1.2-2'}}
+              </div>
+            </div>
+          </mat-list-item>
+          <mat-list-item *ngIf="price.additional">
+            <mat-icon mat-list-icon>attach_money</mat-icon>
+            <div mat-line>{{ 'COMMON.LABEL.PRICE' | translate}}</div>
+            <div mat-line>{{price.additional}}</div>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+          <mat-list-item *ngIf="price.total">
+            <mat-icon mat-list-icon>paid</mat-icon>
+            <div mat-line><span class="bold">{{ 'COMMON.LABEL.TOTAL' | translate}}</span></div>
+            <div mat-line><span class="bold">{{price.total}}</span></div>
+          </mat-list-item>
+        </div>
         <mat-divider></mat-divider>
         <div mat-subheader>{{ 'RESERVATION.APPOINTMENT' | translate}}</div>
         <mat-list-item>
@@ -337,15 +380,27 @@
             <mat-icon>keyboard_return</mat-icon>
           </button>
         </ng-template>
-        <button (click)="searchAvailability()" [disabled]="productForm.invalid" class="raised-button" color="primary"
+        <button (click)="getAdditional()" [disabled]="productForm.invalid" class="raised-button" color="primary"
                 mat-raised-button type="button">
+          <mat-icon>arrow_downward</mat-icon>
+        </button>
+      </div>
+    </mat-step>
+    <mat-step state="post_add">
+      <ng-template matStepLabel>{{ 'ADDITIONAL.FIELD' | translate }}</ng-template>
+      <ng-container *ngTemplateOutlet="stepFour"></ng-container>
+      <div class="divider">
+        <button (click)="goBack()" color="accent" mat-raised-button>
+          <mat-icon>arrow_upward</mat-icon>
+        </button>
+        <button (click)="searchAvailability()" class="raised-button" color="primary" mat-raised-button type="button">
           <mat-icon>arrow_downward</mat-icon>
         </button>
       </div>
     </mat-step>
     <mat-step state="book_online">
       <ng-template matStepLabel>{{ 'RESERVATION.SCHEDULE.FIELD' | translate }}</ng-template>
-      <ng-container *ngTemplateOutlet="stepFour"></ng-container>
+      <ng-container *ngTemplateOutlet="stepFive"></ng-container>
       <div class="divider">
         <button (click)="goBack()" color="accent" mat-raised-button>
           <mat-icon>arrow_upward</mat-icon>
@@ -357,7 +412,7 @@
     </mat-step>
     <mat-step state="preview">
       <ng-template matStepLabel>{{ 'RESERVATION.PREVIEW' | translate }}</ng-template>
-      <ng-container *ngTemplateOutlet="stepFive"></ng-container>
+      <ng-container *ngTemplateOutlet="stepSix"></ng-container>
       <div class="divider">
         <button (click)="goBack()" color="accent" mat-raised-button>
           <mat-icon>arrow_upward</mat-icon>
@@ -462,8 +517,22 @@
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
         </ng-template>
-        <button (click)="searchAvailability()" [disabled]="productForm.invalid" class="raised-button" color="primary"
+        <button (click)="getAdditional()" [disabled]="productForm.invalid" class="raised-button" color="primary"
                 mat-raised-button type="button">
+          <mat-icon>arrow_forward</mat-icon>
+          {{ 'COMMON.BUTTON.NEXT' | translate }}
+        </button>
+      </div>
+    </mat-step>
+    <mat-step state="post_add">
+      <ng-template matStepLabel>{{ 'ADDITIONAL.FIELD' | translate }}</ng-template>
+      <ng-container *ngTemplateOutlet="stepFour"></ng-container>
+      <div>
+        <button (click)="goBack()" color="accent" mat-raised-button>
+          <mat-icon>arrow_back</mat-icon>
+          {{ 'COMMON.BUTTON.BACK' | translate }}
+        </button>
+        <button (click)="searchAvailability()" class="raised-button" color="primary" mat-raised-button type="button">
           <mat-icon>arrow_forward</mat-icon>
           {{ 'COMMON.BUTTON.NEXT' | translate }}
         </button>
@@ -471,7 +540,7 @@
     </mat-step>
     <mat-step state="book_online">
       <ng-template matStepLabel>{{ 'RESERVATION.SCHEDULE.FIELD' | translate }}</ng-template>
-      <ng-container *ngTemplateOutlet="stepFour"></ng-container>
+      <ng-container *ngTemplateOutlet="stepFive"></ng-container>
       <div class="divider">
         <button (click)="goBack()" color="accent" mat-raised-button>
           <mat-icon>arrow_back</mat-icon>
@@ -484,7 +553,7 @@
     </mat-step>
     <mat-step state="preview">
       <ng-template matStepLabel>{{ 'RESERVATION.PREVIEW' | translate }}</ng-template>
-      <ng-container *ngTemplateOutlet="stepFive"></ng-container>
+      <ng-container *ngTemplateOutlet="stepSix"></ng-container>
       <div class="divider">
         <button (click)="goBack()" color="accent" mat-raised-button>
           <mat-icon>arrow_back</mat-icon>

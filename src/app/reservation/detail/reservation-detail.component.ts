@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState, selectReservationState } from '../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
@@ -7,33 +7,29 @@ import * as fromActionsPayment from '../../store/payment.actions';
 import { IReservationAll, States } from '../../interfaces/reservation';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-  convertDuration,
   createNewDate,
   Duration,
   formatDateTime,
-  formatDuration,
   getNow,
   getTime,
   greaterOrEqualsThanToday,
   IDuration,
   newDate,
-  reservationDateTime
+  reservationDateTime,
+  reservationDuration
 } from '../../util/dates';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { IUserAll } from '../../interfaces/user';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { Role } from '../../interfaces/token';
-import { getFullUserName, getPrice, getUserName, newExtra, newPrice, snakeToCamel } from '../../util/helper';
-import { FormControl, Validators } from '@angular/forms';
-import { map, startWith } from 'rxjs/operators';
-import { IPrice, IProduct, IProductGroup, Price } from '../../interfaces/product';
-import { requireMatch, valueChange } from '../../util/validators';
+import { getFullUserName, getPrice, getUserName, snakeToCamel } from '../../util/helper';
+import { IPrice, Price } from '../../interfaces/product';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatFabMenu, MatFabMenuDirection } from '@angular-material-extensions/fab-menu/lib/mat-fab-menu.component';
-import { IPayment, PaymentType } from '../../interfaces/payment';
+import { IPayment } from '../../interfaces/payment';
 import { transitionAnimation } from '../../util/animation';
 import { isToday, isTomorrow } from 'date-fns';
 import { ReservationIconKey, ReservationIconName } from '../../util/icon';
@@ -197,7 +193,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       this.payments = state.payments;
       this.paymentPaid = state.payments?.filter((p: IPayment) => p.status === 'approved');
       if (state.selected) {
-        this.duration = convertDuration(state.selected.product.duration);
+        this.duration = reservationDuration(state.selected);
         this.start = newDate(state.selected.start);
         this.end = createNewDate(this.start, this.start.getHours() + this.duration.hour,
           this.start.getMinutes() + this.duration.minute);
@@ -217,7 +213,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
           }
         }
         if (this.reservation && this.reservation.product) {
-          this.price = getPrice(this.reservation.product);
+          this.price = getPrice(this.reservation);
         }
         this.dataSource = new MatTableDataSource<IReservationAll>(state.selected.history);
         this.cdRef.detectChanges();
@@ -317,22 +313,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     });
 
     const completeTransaction = ReservationDetailComponent.createTransaction('completed', (): void => {
-      const dialogRef = self.dialog.open(CompleteDialogComponent, {
-        disableClose: true,
-        data: {
-          reservation: self.reservation,
-          payments: self.payments
-        }
-      });
-
-      dialogRef.afterClosed().subscribe(result => {
-        if (result) {
-          self.reservation = undefined;
-          self.store.dispatch(
-            new fromActionsReservation.Complete({reservationId, extras: result})
-          );
-        }
-      });
+      self.router.navigate(['reservation', reservationId, 'complete']);
     });
 
     const moreTransaction = ReservationDetailComponent.createTransaction('more', (): void => {
@@ -459,7 +440,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     };
 
     if (self.payments && self.reservation) {
-      const price = getPrice(self.reservation.product);
+      const price = getPrice(self.reservation);
       if (price.total > price.totalPaid) {
         const next = this.createAction(translate.instant('RESERVATION.ACTION.PAY'),
           ReservationIconName.payment, 'pay', 'blue');
@@ -507,139 +488,5 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         next: []
       }
     }, initialState);
-  }
-}
-
-@Component({
-  selector: 'app-complete-dialog-component',
-  animations: [transitionAnimation],
-  templateUrl: './complete-dialog.component.html'
-})
-export class CompleteDialogComponent implements OnInit, OnDestroy {
-  groups: IProductGroup[] | undefined;
-  filteredGroup: Observable<IProductGroup[] | undefined> | undefined;
-  group: FormControl = new FormControl('', [
-    Validators.required, requireMatch
-  ]);
-  products: IProduct[] | undefined;
-  filteredProduct: Observable<IProduct[] | undefined> | undefined;
-  product: FormControl = new FormControl('', [requireMatch]);
-
-  description: FormControl = new FormControl();
-  extraPrice: FormControl = new FormControl();
-  type: FormControl = new FormControl(PaymentType.cash);
-
-  types = PaymentType;
-  price: IPrice;
-
-  private getState: Observable<any>;
-  private subscription: Subscription | undefined;
-
-  constructor(public dialogRef: MatDialogRef<CompleteDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
-              private store: Store<AppState>, private translate: TranslateService) {
-    this.getState = store.select(selectReservationState);
-    this.price = getPrice(data.reservation.product, data.payments);
-    this.product.setValue(data.reservation?.product);
-    this.product.valueChanges.subscribe(value => {
-      if (value) {
-        this.price = newPrice(this.price, value.price);
-      }
-    });
-    this.extraPrice.valueChanges.subscribe(value => {
-      this.price = newExtra(this.price, value ? value : 0);
-    });
-  }
-
-  get customerName(): string {
-    return this.data.reservation ? getUserName(this.data.reservation.customer) : '';
-  }
-
-  get durationTime(): string {
-    return formatDuration(this.product.value.duration, this.translate.currentLang);
-  }
-
-  ngOnInit(): void {
-    this.getProducts();
-    this.subscribe();
-    this.filteredGroup = this.group.valueChanges.pipe(
-      startWith(''),
-      map(value => {
-        if (typeof value === 'string') {
-          return value;
-        }
-        this.products = value.products;
-        this.product.setValue('');
-        return value.name;
-      }),
-      map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups)
-    );
-    this.filteredProduct = this.product?.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterProduct(name) : this.products ? this.products.slice() : this.products)
-    );
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  onNoClick(): void {
-    this.dialogRef.close();
-  }
-
-  doAction(): void {
-    const productId = valueChange(this.product.value.id, this.data.reservation.product.id);
-    const description = this.description.value;
-    const price = this.extraPrice.value;
-    const paymentType = this.type.value;
-    this.dialogRef.close({description, price, productId, paymentType});
-  }
-
-  displayFnGroup(group: IProductGroup): string {
-    return group ? `${group.name}` : '';
-  }
-
-  displayFnProduct(product: IProduct): string {
-    return product ? `${product.name}` : '';
-  }
-
-  keyDownHandler(event: any, form: FormControl): void {
-    if (event.code === 'Backspace') {
-      form.setValue('');
-    }
-  }
-
-  private subscribe(): void {
-    this.subscription = this.getState.subscribe(state => {
-      if (state.productDiscount) {
-        this.groups = state.productDiscount.groups;
-        this.group.setValue(this.groups?.find(group => {
-          if (group.products?.find(product => product.id === this.product.value.id)) {
-            this.products = group.products;
-            return group;
-          }
-          return undefined;
-        }));
-      }
-    });
-  }
-
-  private getProducts(): void {
-    this.store.dispatch(
-      new fromActionsReservation.GetAllProducts()
-    );
-  }
-
-  private filterGroup(name: string): IProductGroup[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.groups?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-  private filterProduct(name: string): IProduct[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.products?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 }

@@ -72,10 +72,15 @@ export class ReservationService {
     return this.http.get<IRoomReservation>(`${this.url}/rooms/${roomId}`, {params});
   }
 
-  public customerSearch(roomId: string, productId: string, date: Date): Observable<IRoomReservation> {
+  public customerSearch(roomId: string, productId: string, date: Date, additionalIds?: string[]): Observable<IRoomReservation> {
     let params = new HttpParams().set('date', date.toISOString().slice(0, 10));
     params = params.append('roomId', roomId);
     params = params.append('productId', productId);
+    if (additionalIds && additionalIds.length) {
+      additionalIds.forEach(id => {
+        params = params.append('additionalIds', id);
+      });
+    }
 
     return this.http.get<IRoomReservation>(`${this.url}/search`, {params});
   }
@@ -100,6 +105,7 @@ export class ReservationService {
   }
 
   public changeState(reservationId: string, event: string, extras?: any): Observable<IReservation> {
+    console.log(reservationId)
     return this.http.post<IReservation>(`${this.url}/${reservationId}/${event}`, extras);
   }
 

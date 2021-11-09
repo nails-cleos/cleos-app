@@ -5,7 +5,7 @@ import { SingleDataSet } from 'ng2-charts/lib/base-chart.directive';
 
 
 export interface IEventSummary {
-  calendarSummaries?: ICalendarSummary[];
+  calendarSummary?: ICalendarSummary;
 }
 
 export interface IReservationSummary {
@@ -25,12 +25,25 @@ export interface ICardSummary {
 }
 
 export interface ICalendarSummary {
-  reservationId?: string;
-  unavailableId?: string;
+  reservations: ICalendarReservations;
+  unavailable: ICalendarUnavailable;
+}
+
+export interface ICalendarReservations {
+  reservationId: string;
   title: string;
   start: string;
   end: string;
   state: string;
+}
+
+export interface ICalendarUnavailable {
+  unavailableId: string;
+  title: string;
+  start: string;
+  end: string;
+  duration?: string;
+  repeat: string;
 }
 
 export interface IChart {

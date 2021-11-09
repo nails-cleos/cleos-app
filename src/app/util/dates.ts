@@ -14,6 +14,9 @@ import {
   subWeeks
 } from 'date-fns';
 import RRule, { Weekday } from 'rrule';
+import { IReservationAll } from '../interfaces/reservation';
+import { IProductAll } from '../interfaces/product';
+import { IAdditionalAll } from '../interfaces/additional';
 
 export const API_LOCALE = 'en-GB';
 
@@ -32,32 +35,31 @@ export class Duration implements IDuration {
   }
 }
 
-export const getDuration = (duration: string, room: IRoom, date: Date): IDuration => {
-  if (duration) {
-    return convertDuration(duration);
-  }
-  const {week, saturday, sunday} = getAvailability(room);
-  let av: IAvailabilityAll;
-  switch (date.getDay()) {
-    case 0:
-      av = sunday;
-      break;
-    case 6:
-      av = saturday;
-      break;
-    default:
-      av = week;
-      break;
-  }
-  const start = timeToDateTime(av.start, date);
-  const end = timeToDateTime(av.end, date);
+export const getDuration = (allDay: boolean, duration: string): IDuration =>
+  allDay ? new Duration(23, 59) : convertDuration(duration);
 
-  const hours = (getMinutesBetweenTimes(start, end) / 60);
-  const diffHour = Math.floor(hours);
-  const minutes = (hours - diffHour) * 60;
-  const diffMinute = Math.round(minutes);
+export const reservationDuration = (reservation?: IReservationAll): IDuration => {
+  let durations: IDuration[] = [];
+  if (reservation) {
+    if (reservation.additional && reservation.additional.length) {
+      durations = reservation.additional.map(value => convertDuration(value.duration));
+    }
+    durations = [...durations, convertDuration(reservation.product.duration)];
+  }
 
-  return new Duration(diffHour, diffMinute);
+  return sumDurations(durations);
+};
+
+export const totalDuration = (product?: IProductAll, additional?: IAdditionalAll[]): IDuration => {
+  let durations: IDuration[] = [];
+  if (additional && additional.length) {
+    durations = additional.map(value => convertDuration(value.duration));
+  }
+  if (product) {
+    durations = [...durations, convertDuration(product.duration)];
+  }
+
+  return sumDurations(durations);
 };
 
 export const convertDuration = (duration: string): IDuration => {
@@ -67,6 +69,26 @@ export const convertDuration = (duration: string): IDuration => {
   const minute = mIndex > -1 ? Number(duration.slice(hIndex > -1 ? hIndex + 1 : 2, mIndex)) : 0;
 
   return new Duration(hour, minute);
+};
+
+export const sumDurations = (durations: IDuration[]): IDuration => {
+  let hours = 0;
+  let minutes = 0;
+  durations.forEach(value => {
+    hours += value.hour;
+    minutes += value.minute;
+  });
+
+  return timeConvert(minutes, hours);
+};
+
+export const getEnd = (start: Date, strDuration?: string): Date => {
+  if (strDuration) {
+    const duration = convertDuration(strDuration);
+    return createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
+  }
+
+  return createNewDate(start, 23, 59, 59, 99);
 };
 
 export const getStartEndDay = (week: IAvailability, saturday: IAvailability, sunday: IAvailability): any => {
@@ -109,13 +131,7 @@ export const diffTime = (time: Date, maxHour = 24, diffMin = 0): IDuration => {
   maxDate.setHours(maxHour, diffMin);
 
   const diff = getMinutesBetweenTimes(maxDate, date);
-
-  const hours = (diff / 60);
-  const diffHour = Math.floor(hours);
-  const minutes = (hours - diffHour) * 60;
-  const diffMinute = Math.round(minutes);
-
-  return new Duration(diffHour, diffMinute);
+  return timeConvert(diff);
 };
 
 export const getDiffTime = (maxDate: Date, minDate: Date): string => {
@@ -270,7 +286,7 @@ export const greaterOrEqualsThan = (date1: Date, date2: Date): boolean => date1 
 export const greaterOrEqualsThanToday = (date: Date): boolean => date >= createDate();
 
 export const isBetween = (min: Date, max: Date, date: Date): boolean =>
-  date >= min && date <= createNewDate(max, 23, 59, 59, 99);
+  date >= createNewDate(min) && date <= createNewDate(max, 23, 59, 59, 99);
 
 export type CalendarPeriod = 'day' | 'week' | 'month';
 
@@ -290,33 +306,9 @@ export const endOfPeriod = (period: CalendarPeriod, date: Date): Date => (
   {day: endOfDay, week: endOfWeek, month: endOfMonth}[period](date)
 );
 
-export const getWeekDay = (day: number): Weekday[] => {
-  let weekDay;
-  switch (day) {
-    case 1:
-      weekDay = [RRule.MO];
-      break;
-    case 2:
-      weekDay = [RRule.TU];
-      break;
-    case 3:
-      weekDay = [RRule.WE];
-      break;
-    case 4:
-      weekDay = [RRule.TH];
-      break;
-    case 5:
-      weekDay = [RRule.FR];
-      break;
-    case 6:
-      weekDay = [RRule.SA];
-      break;
-    default:
-      weekDay = [RRule.SU];
-      break;
-  }
-
-  return weekDay;
+export const getWeekDay = (day: number): Weekday => {
+  const days = [RRule.SU, RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR, RRule.SA];
+  return days[day];
 };
 
 export const filterDateRoom = (d: Date | null, room?: IRoom): boolean => {
@@ -365,4 +357,13 @@ const getMinutesBetweenTimes = (date1: Date, date2: Date): number =>
 const timeToDateTime = (stringTime: string, date: Date): Date => {
   const time = stringTime.split(':');
   return createNewDate(date, Number(time[0]), Number(time[1]));
+};
+
+const timeConvert = (time: number, hour: number = 0) => {
+  const hours = (time / 60);
+  const diffHour = Math.floor(hours);
+  const minutes = (hours - diffHour) * 60;
+  const diffMinute = Math.round(minutes);
+
+  return new Duration(diffHour + hour, diffMinute);
 };

@@ -14,13 +14,14 @@ import { environment } from '../../environments/environment';
 
 import { SearchComponent } from './search/search.component';
 import { ReservationComponent } from './reservation.component';
-import { CompleteDialogComponent, ReservationDetailComponent } from './detail/reservation-detail.component';
+import { ReservationDetailComponent } from './detail/reservation-detail.component';
 import { MoreInfoComponent } from './detail/more-info/more-info.component';
 import { CalendarComponent, CalendarDialogComponent } from './calendar/calendar.component';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatRadioModule } from '@angular/material/radio';
+import { ReservationCompleteComponent } from './detail/complete/reservation-complete.component';
 
 @NgModule({
   declarations: [
@@ -29,8 +30,8 @@ import { MatRadioModule } from '@angular/material/radio';
     ReservationDetailComponent,
     MoreInfoComponent,
     CalendarComponent,
-    CompleteDialogComponent,
-    CalendarDialogComponent
+    CalendarDialogComponent,
+    ReservationCompleteComponent
   ],
   imports: [
     ReservationRoutingModule,

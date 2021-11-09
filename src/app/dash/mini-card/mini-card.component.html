@@ -1,6 +1,6 @@
 <mat-card class="dashboard-card">
-  <div *ngIf="value || error; else box">
-    <div *ngIf="value; else errorBox">
+  <div *ngIf="value || value === 0 || error; else box">
+    <div *ngIf="value || value === 0; else errorBox">
       <mat-card-header class="card-header">
         <mat-card-title>
           <h1 *ngIf="isCurrency; else noCurrency" class="value-text">{{value | currency:'$':'symbol':'0.0' }}</h1>
