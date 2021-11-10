@@ -53,6 +53,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   private customers: IUserAll[] | undefined;
   private getState: Observable<any>;
   private subscription: Subscription | undefined;
+  private paginatorSubscription: Subscription | undefined;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
@@ -95,6 +96,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.paginatorSubscription?.unsubscribe();
   }
 
   getIcon(name: any): any {
@@ -160,7 +162,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
       this.paginator.pageIndex = 0;
       this.getReservations();
     });
-    this.paginator?.page.subscribe(() => this.getReservations(this.paginator.pageIndex));
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getReservations(this.paginator.pageIndex));
 
     this.cdRef.detectChanges();
   }
@@ -178,7 +180,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
           return reservation;
         });
         this.resultsLength = state.filter?.totalElements;
-        if (this.resultsLength) {
+        if (!this.paginatorSubscription && this.resultsLength) {
           this.createPageSubscriptions();
         }
       }

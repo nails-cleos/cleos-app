@@ -34,6 +34,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { getThemeName, isDarkMode, resetTheme, Theme, THEME } from '../util/theme';
 import { ThemeService } from 'ng2-charts';
+import { formatFullDate, newDate } from '../util/dates';
 
 @Component({
   selector: 'app-nav',
@@ -115,7 +116,7 @@ export class NavComponent implements OnInit, OnDestroy {
       if (this.countNotifications < 10) {
         this.plusNotification = undefined;
       }
-      this.notifications.forEach(value => {
+      this.notifications = this.notifications.map(value => {
         if (value.id === notification.id) {
           return Object.assign({}, value, {read: true});
         }

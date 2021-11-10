@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, retry } from 'rxjs/operators';
+import { catchError, retryWhen } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState } from '../store/app.states';
 import * as fromActionsLogin from '../store/auth.actions';
+
+import { genericRetryStrategy } from '../util/rxjs';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
@@ -16,7 +18,7 @@ export class ErrorInterceptor implements HttpInterceptor {
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    return next.handle(request).pipe(retry(2), catchError(err => {
+    return next.handle(request).pipe(retryWhen(genericRetryStrategy()), catchError(err => {
       if ([0].indexOf(err.status) !== -1) {
         const message = err?.error?.message || err.statusText;
         return throwError({error: {message}});

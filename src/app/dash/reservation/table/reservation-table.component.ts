@@ -35,6 +35,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
 
   private getState: Observable<any>;
   private subscription: Subscription | undefined;
+  private paginatorSubscription: Subscription | undefined;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
@@ -61,7 +62,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
       this.getReservations();
     });
 
-    this.paginator?.page.subscribe(() => this.getReservations(this.paginator.pageIndex));
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getReservations(this.paginator.pageIndex));
 
     this.getReservations();
     this.cdRef.detectChanges();
@@ -69,6 +70,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.paginatorSubscription?.unsubscribe();
   }
 
   getUsername(user: any): string {

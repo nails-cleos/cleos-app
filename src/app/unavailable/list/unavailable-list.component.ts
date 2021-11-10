@@ -29,8 +29,6 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
 
   displayedColumns: string[] = ['position', 'professional', 'description', 'start', 'duration', 'repeat', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IUnavailable>>();
-  subscription: Subscription | undefined;
-  getState: Observable<any>;
 
   expandedUnavailable: IUnavailable | undefined;
 
@@ -38,6 +36,10 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
   pageSize = PAGE_SIZE;
 
   language: string;
+
+  private subscription: Subscription | undefined;
+  private paginatorSubscription: Subscription | undefined;
+  private getState: Observable<any>;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
@@ -64,6 +66,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.paginatorSubscription?.unsubscribe();
   }
 
   getProfessionalName(professional: IUser): string {
@@ -107,7 +110,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
         return unavailable;
       });
       this.resultsLength = state.data?.totalElements;
-      if (this.resultsLength) {
+      if (!this.paginatorSubscription && this.resultsLength) {
         this.createPageSubscriptions();
       }
     });
@@ -124,7 +127,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
       this.paginator.pageIndex = 0;
       this.getUnavailableList();
     });
-    this.paginator?.page.subscribe(() => this.getUnavailableList(this.paginator.pageIndex));
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getUnavailableList(this.paginator.pageIndex));
 
     this.cdRef.detectChanges();
   }
