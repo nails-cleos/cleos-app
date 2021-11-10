@@ -25,7 +25,7 @@ import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material
 import * as fromActionsUser from '../../store/user.actions';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { map, startWith } from 'rxjs/operators';
-import { getFullUserName} from '../../util/helper';
+import { getFullUserName } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
@@ -39,11 +39,13 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   displayedColumns: string[] = ['position', 'name', 'description', 'type', 'amount', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IDiscount>>();
-  subscription: Subscription | undefined;
-  getState: Observable<any>;
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
+
+  private subscription: Subscription | undefined;
+  private paginatorSubscription: Subscription | undefined;
+  private getState: Observable<any>;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
@@ -69,6 +71,7 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.paginatorSubscription?.unsubscribe();
   }
 
   edit(discount: IDiscount): void {
@@ -119,7 +122,7 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       this.dataSource = stateValue.data?.content;
       this.resultsLength = stateValue.data?.totalElements;
-      if (this.resultsLength) {
+      if (!this.paginatorSubscription && this.resultsLength) {
         this.createPageSubscriptions();
       }
     });
@@ -136,7 +139,7 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
       this.paginator.pageIndex = 0;
       this.getDiscounts();
     });
-    this.paginator?.page.subscribe(() => this.getDiscounts(this.paginator.pageIndex));
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getDiscounts(this.paginator.pageIndex));
 
     this.cdRef.detectChanges();
   }
@@ -163,14 +166,15 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
   @ViewChild('customerInput') customerInput!: ElementRef<HTMLInputElement>;
   @ViewChild('auto') matAutocomplete!: MatAutocomplete;
 
-  getState: Observable<any>;
-  subscription: Subscription | undefined;
-  discount: IDiscountAll;
   title: string | undefined;
   customerCtrl = new FormControl();
   filteredCustomers: Observable<IUser[] | undefined> | undefined;
   customers: IUserAll[] = [];
   allCustomers: IUserAll[] | undefined;
+
+  private getState: Observable<any>;
+  private subscription: Subscription | undefined;
+  private discount: IDiscountAll;
 
   constructor(public dialogRef: MatDialogRef<DiscountDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
               private store: Store<AppState>, private cdRef: ChangeDetectorRef) {

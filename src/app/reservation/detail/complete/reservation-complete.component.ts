@@ -117,7 +117,6 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       const price = this.extraPrice.value;
       const paymentType = this.type.value;
       const additionalIds = this.additionalSelected.map(additional => additional.id);
-      console.log(reservationId)
       this.store.dispatch(
         new fromActionsReservation.Complete({
           reservationId,

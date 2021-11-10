@@ -9,7 +9,7 @@ import { AppMaterialModule } from '../util/app-material.module';
 import { SharedModule } from '../shared/shared.module';
 import { NotificationRoutingModule } from './notification-routing.module';
 
-import { NotificationsComponent } from './list/notifications.component';
+import { NotificationsComponent } from './notifications.component';
 import { MatRippleModule } from '@angular/material/core';
 
 @NgModule({

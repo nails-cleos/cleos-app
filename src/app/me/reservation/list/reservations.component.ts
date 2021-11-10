@@ -32,9 +32,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
 
   displayedColumns: string[] = ['position', 'professional', 'start', 'product', 'state', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IReservationAll>>();
-  getState: Observable<any>;
-  subscription: Subscription | undefined;
-  data: ICustomerReservation | undefined;
+
   upcoming: any = {};
   price: IPrice;
   noContent = false;
@@ -45,8 +43,13 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
 
   language: string;
   error: any;
-  showReview = true;
+
   rowSpan = 0;
+
+  private data: ICustomerReservation | undefined;
+  private showReview = true;
+  private getState: Observable<any>;
+  private subscription: Subscription | undefined;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef) {

@@ -38,6 +38,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   filter: string | undefined;
 
   private subscription: Subscription | undefined;
+  private paginatorSubscription: Subscription | undefined;
   private getState: Observable<any>;
   private allRole: Role[] = [Role.customer, Role.professional, Role.admin];
 
@@ -65,6 +66,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.paginatorSubscription?.unsubscribe();
   }
 
   getUsername(user: IUser): string {
@@ -150,7 +152,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
       this.paginator.pageIndex = 0;
       this.getUsers();
     });
-    this.paginator?.page.subscribe(() => this.getUsers(this.paginator.pageIndex));
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getUsers(this.paginator.pageIndex));
 
     this.cdRef.detectChanges();
   }
@@ -182,7 +184,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
         return user;
       });
       this.resultsLength = stateValue.data?.totalElements;
-      if (this.resultsLength) {
+      if (this.resultsLength && !this.paginatorSubscription) {
         this.createPageSubscriptions();
       }
     });
