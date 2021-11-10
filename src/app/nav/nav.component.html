@@ -116,9 +116,9 @@
         </ng-template>
         <mat-menu #menuWorkDay="matMenu" xPosition="before">
           <mat-list>
-            <mat-list-item (click)="notification(not)" *ngFor="let not of workDay" class="pointer" matRipple>
+            <mat-list-item (click)="notification(not)" *ngFor="let not of workDay; last as isLast" class="pointer" matRipple>
               <div [matTooltip]="not.message" mat-line>{{not.message}}</div>
-              <mat-divider class="divider"></mat-divider>
+              <mat-divider *ngIf="!isLast" class="divider"></mat-divider>
             </mat-list-item>
           </mat-list>
         </mat-menu>

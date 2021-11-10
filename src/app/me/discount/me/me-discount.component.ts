@@ -24,11 +24,13 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
 
   displayedColumns: string[] = ['position', 'name', 'amount', 'used', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IUserDiscount>>();
-  subscription: Subscription | undefined;
-  getState: Observable<any>;
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
+
+  private subscription: Subscription | undefined;
+  private paginatorSubscription: Subscription | undefined;
+  private getState: Observable<any>;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private router: Router, private cdRef: ChangeDetectorRef,
@@ -55,6 +57,7 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.paginatorSubscription?.unsubscribe();
   }
 
   useDiscount(discount: IUserDiscount): void {
@@ -84,7 +87,7 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
         return ud;
       });
       this.resultsLength = state.data?.totalElements;
-      if (this.resultsLength) {
+      if (!this.paginatorSubscription && this.resultsLength) {
         this.createPageSubscriptions();
       }
     });
@@ -101,7 +104,7 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
       this.paginator.pageIndex = 0;
       this.getDiscounts();
     });
-    this.paginator?.page.subscribe(() => this.getDiscounts(this.paginator.pageIndex));
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getDiscounts(this.paginator.pageIndex));
 
     this.cdRef.detectChanges();
   }

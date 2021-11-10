@@ -1,8 +1,8 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
 import { IRoom } from '../../interfaces/room';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { TranslateService } from '@ngx-translate/core';
@@ -20,16 +20,19 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
   templateUrl: './rooms.component.html',
   styleUrls: ['./rooms.component.scss']
 })
-export class RoomsComponent implements OnInit, AfterViewInit {
+export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
   displayedColumns: string[] = ['position', 'name', 'professional', 'address', 'availability', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IRoom>>();
-  getState: Observable<any>;
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
+
+  private subscription: Subscription | undefined;
+  private paginatorSubscription: Subscription | undefined;
+  private getState: Observable<any>;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
@@ -53,19 +56,24 @@ export class RoomsComponent implements OnInit, AfterViewInit {
     this.subscribe();
   }
 
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+    this.paginatorSubscription?.unsubscribe();
+  }
+
   getProfessionalName(professional: IUser): string {
     return getUserName(professional);
   }
 
   subscribe(): void {
-    this.getState.subscribe((stateValue) => {
+    this.subscription = this.getState.subscribe((stateValue) => {
       if (stateValue.message) {
         this.clean();
         this.getRooms();
       }
       this.dataSource = stateValue.data?.content;
       this.resultsLength = stateValue.data?.totalElements;
-      if (this.resultsLength) {
+      if (!this.paginatorSubscription && this.resultsLength) {
         this.createPageSubscriptions();
       }
     });
@@ -104,7 +112,7 @@ export class RoomsComponent implements OnInit, AfterViewInit {
       this.paginator.pageIndex = 0;
       this.getRooms();
     });
-    this.paginator?.page.subscribe(() => this.getRooms(this.paginator.pageIndex));
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getRooms(this.paginator.pageIndex));
 
     this.cdRef.detectChanges();
   }

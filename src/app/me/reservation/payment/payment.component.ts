@@ -15,15 +15,15 @@ import { environment } from '../../../../environments/environment';
   styleUrls: ['./payment.component.scss']
 })
 export class PaymentComponent implements OnInit, OnDestroy {
-  getState: Observable<any>;
-  subscription: Subscription | undefined;
-  reservationId: any;
-
   displayedColumns: string[] = ['position', 'description', 'amount', 'status', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IPayment>>();
 
   errorMessage: string | undefined;
   showError = false;
+
+  private getState: Observable<any>;
+  private subscription: Subscription | undefined;
+  private reservationId: any;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private router: Router) {
     this.getState = this.store.select(selectPaymentState);

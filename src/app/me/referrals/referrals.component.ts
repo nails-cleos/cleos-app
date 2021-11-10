@@ -17,16 +17,15 @@ import { IUserDiscount } from '../../interfaces/discount';
   styleUrls: ['./referrals.component.scss']
 })
 export class ReferralsComponent implements OnInit, OnDestroy {
-  getState: Observable<any>;
-  subscription: Subscription | undefined;
-
   user: IUserAll | undefined;
-  referralMax: number | undefined;
-
-  referrals = 0;
-  referralsUsed = 0;
   showInvites = false;
   showShare = false;
+
+  private getState: Observable<any>;
+  private subscription: Subscription | undefined;
+  private referralMax: number | undefined;
+  private referrals = 0;
+  private referralsUsed = 0;
 
   constructor(private store: Store<AppState>, private clipboard: Clipboard, private snackBar: MatSnackBar,
               private translate: TranslateService, private bottomSheet: MatBottomSheet) {

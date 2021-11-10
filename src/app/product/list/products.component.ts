@@ -26,14 +26,16 @@ export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   displayedColumns: string[] = ['position', 'name', 'durability', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IProductGroup>>();
-  subscription: Subscription | undefined;
-  getState: Observable<any>;
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
 
   expanded: IProductGroup | undefined;
   language: string;
+
+  private subscription: Subscription | undefined;
+  private paginatorSubscription: Subscription | undefined;
+  private getState: Observable<any>;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
@@ -60,6 +62,7 @@ export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.paginatorSubscription?.unsubscribe();
   }
 
   edit(product: IProduct): void {
@@ -92,7 +95,7 @@ export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       this.dataSource = stateValue.data?.content;
       this.resultsLength = stateValue.data?.totalElements;
-      if (this.resultsLength) {
+      if (!this.paginatorSubscription && this.resultsLength) {
         this.createPageSubscriptions();
       }
     });
@@ -109,7 +112,7 @@ export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
       this.paginator.pageIndex = 0;
       this.getProducts();
     });
-    this.paginator?.page.subscribe(() => this.getProducts(this.paginator.pageIndex));
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getProducts(this.paginator.pageIndex));
 
     this.cdRef.detectChanges();
   }
