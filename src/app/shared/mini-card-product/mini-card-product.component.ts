@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { IProduct, IProductGroup } from '../../interfaces/product';
 import { detailExpandAnimation } from '../../util/animation';
 import { TranslateService } from '@ngx-translate/core';
-import { MatSelectionListChange } from '@angular/material/list';
 import { formatDuration } from '../../util/dates';
 
 @Component({

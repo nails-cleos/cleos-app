@@ -44,6 +44,7 @@ export interface ICalendarUnavailable {
   end: string;
   duration?: string;
   repeat: string;
+  allDay: boolean;
 }
 
 export interface IChart {

@@ -19,10 +19,10 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
 
   showError = false;
   form!: FormGroup;
-  subscription: Subscription | undefined;
+  subscription?: Subscription;
   getState: Observable<any>;
-  currentUser: IUser | undefined;
-  userSubscription: Subscription | undefined;
+  currentUser?: IUser;
+  userSubscription?: Subscription;
   getUserState: Observable<any>;
 
   oldPassword: FormControl = new FormControl('', [

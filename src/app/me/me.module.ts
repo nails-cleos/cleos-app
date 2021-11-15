@@ -27,6 +27,7 @@ import { ShareIconsModule } from 'ngx-sharebuttons/icons';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatStepperModule } from '@angular/material/stepper';
+import { UpcomingComponent } from './reservation/upcoming/upcoming.component';
 
 @NgModule({
   declarations: [
@@ -38,7 +39,8 @@ import { MatStepperModule } from '@angular/material/stepper';
     BottomSheetShareComponent,
     BottomSheetReferralComponent,
     MeDiscountComponent,
-    ReviewDialogComponent
+    ReviewDialogComponent,
+    UpcomingComponent
   ],
   imports: [
     MeRoutingModule,

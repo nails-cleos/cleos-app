@@ -26,7 +26,7 @@ export class MainComponent {
   isAuthenticated = false;
   appVersion = environment.version;
 
-  cssClass: string | undefined;
+  cssClass?: string;
   checked = false;
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)

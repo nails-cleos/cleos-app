@@ -126,7 +126,8 @@
     "CARD": {
       "RESERVATION": "Reservations",
       "EXPAND": "Expand"
-    }
+    },
+    "FIELD": "Tablero"
   },
   "AUTH": {
     "FORBIDDEN": "User not have the necessary permissions",
@@ -211,6 +212,7 @@
         "DELETED": "Deleted"
       }
     },
+    "FIELD": "Users",
     "TITLE": "Add user",
     "ROLE": {
       "FIELD": "Roles",
@@ -648,6 +650,7 @@
         "NO_CONTENT": "No events"
       }
     },
+    "FIELD": "Unavailable",
     "TITLE": "Add unavailable",
     "DESCRIPTION": {
       "FIELD": "Description"

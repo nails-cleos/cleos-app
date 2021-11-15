@@ -19,13 +19,13 @@ import { createDateFromString } from '../../util/dates';
 export class ProfileComponent implements OnInit, OnDestroy {
 
   getState: Observable<any>;
-  subscription: Subscription | undefined;
+  subscription?: Subscription;
   form!: FormGroup;
   errors: any = [];
-  user: IUser | undefined;
+  user?: IUser;
   canChange = false;
   image: any;
-  initials: string | undefined;
+  initials?: string;
 
   username: FormControl = new FormControl('', [
     Validators.required

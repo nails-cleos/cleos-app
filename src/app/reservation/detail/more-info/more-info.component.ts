@@ -21,19 +21,19 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class MoreInfoComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = ['position', 'description', 'amount', 'status', 'actions'];
 
-  tracking: ITracking | undefined;
-  payments: IPaymentAll[] | undefined;
-  reservation: IReservationAll | undefined;
+  tracking?: ITracking;
+  payments?: IPaymentAll[];
+  reservation?: IReservationAll;
 
   language: string;
-  totalTime: string | undefined;
+  totalTime?: string;
 
   private paymentGetState: Observable<any>;
-  private paymentSubscription: Subscription | undefined;
+  private paymentSubscription?: Subscription;
   private reservationId: any;
 
   private getState: Observable<any>;
-  private subscription: Subscription | undefined;
+  private subscription?: Subscription;
 
   constructor(private store: Store<AppState>, private route: ActivatedRoute, private translate: TranslateService,
               private clipboard: Clipboard, private snackBar: MatSnackBar) {

@@ -15,7 +15,7 @@ import { Router } from '@angular/router';
 })
 export class CatalogueComponent implements OnInit, OnDestroy {
   getState: Observable<any>;
-  subscription: Subscription | undefined;
+  subscription?: Subscription;
   form!: FormGroup;
   errors: any = [];
   file: any;

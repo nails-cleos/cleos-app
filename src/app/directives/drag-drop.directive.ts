@@ -4,7 +4,7 @@ import { Directive, HostBinding, HostListener, Output, EventEmitter } from '@ang
   selector: '[appDragDrop]'
 })
 export class DragDropDirective {
-  @HostBinding('class.fileover') fileOver: boolean | undefined;
+  @HostBinding('class.fileover') fileOver?: boolean;
   @Output() fileDropped = new EventEmitter<any>();
 
   // Dragover listener

@@ -18,11 +18,11 @@ export class PaymentComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = ['position', 'description', 'amount', 'status', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IPayment>>();
 
-  errorMessage: string | undefined;
+  errorMessage?: string;
   showError = false;
 
   private getState: Observable<any>;
-  private subscription: Subscription | undefined;
+  private subscription?: Subscription;
   private reservationId: any;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private router: Router) {

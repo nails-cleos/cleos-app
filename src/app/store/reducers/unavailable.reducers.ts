@@ -115,6 +115,7 @@ export const reducer = (state = initialState, action: All): State => {
     case UnavailableActionTypes.unavailableDelete: {
       return {
         ...state,
+        error: null,
         errorMessage: null,
         subErrors: null,
         message: null,

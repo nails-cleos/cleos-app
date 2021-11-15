@@ -14,7 +14,7 @@ import { Router } from '@angular/router';
 })
 export class DiscountComponent implements OnInit, OnDestroy {
   getState: Observable<any>;
-  subscription: Subscription | undefined;
+  subscription?: Subscription;
   form!: FormGroup;
   errors: any = [];
 

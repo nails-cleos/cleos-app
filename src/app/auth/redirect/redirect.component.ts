@@ -32,7 +32,7 @@ export class RedirectComponent {
     });
   }
 
-  private static isProfessionalOrAdmin(authorities: IAuthority[] | undefined): boolean {
+  private static isProfessionalOrAdmin(authorities?: IAuthority[]): boolean {
     return !!authorities && authorities.length > 0 &&
       authorities.some(u => (u.authority === Role.professional || u.authority === Role.admin));
   }

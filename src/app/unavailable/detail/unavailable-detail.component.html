@@ -36,6 +36,9 @@
                   <mat-error *ngIf="startDate.hasError('required')"
                              [innerHTML]="'UNAVAILABLE.DATE.REQUIRED' | translate">
                   </mat-error>
+                  <mat-error *ngIf="errors['startDate']">
+                    {{errors['startDate']}}
+                  </mat-error>
                 </mat-form-field>
                 <mat-checkbox [formControl]="allDay"
                               color="primary">{{ 'UNAVAILABLE.ALL_DAY.CHECK' | translate }}</mat-checkbox>
