@@ -1,0 +1,179 @@
+{
+  "RESERVATION": {
+    "PREVIEW": "Vista previa",
+    "APPOINTMENT": "Cita",
+    "SEARCH": "Búsqueda",
+    "LIST": {
+      "CANCEL": {
+        "TITLE": "Cancelar reserva",
+        "CONTENT": "¿Está seguro de cancelar la reserva {{date}}?",
+        "MESSAGE": "Reserva {{date}} cancelada"
+      },
+      "HISTORY": {
+        "TITLE": "Historial",
+        "ERROR": {
+          "NO_CONTENT": "No hay historial"
+        }
+      }
+    },
+    "CUSTOMER": {
+      "FIELD": "Cliente",
+      "DETAIL": "Reserva del cliente",
+      "SEARCH": "Buscar por cliente",
+      "REQUIRED": "Cliente es <b>requerido</b>",
+      "INVALID": "Cliente no valido",
+      "ADD_BUTTON": "Agregar cliente"
+    },
+    "ROOM": {
+      "TITLE": "Agregar sala",
+      "DETAIL": "Detalle",
+      "NAME": {
+        "FIELD": "Nombre"
+      },
+      "PROFESSIONAL": {
+        "FIELD": "Profesional"
+      }
+    },
+    "PRODUCT": {
+      "NO_CONTENT": "No hay servicios",
+      "NAME": {
+        "FIELD": "Nombre"
+      },
+      "DURATION": {
+        "FIELD": "Duración"
+      },
+      "PRICE": {
+        "FIELD": "Precio"
+      },
+      "EXTRAS": {
+        "TITLE": "Extras",
+        "DESCRIPTION": "Descripción",
+        "PRICE": "Precio",
+        "TOTAL": "Total"
+      },
+      "COMPLETE": {
+        "DESCRIPTION": "<span class='bold'>Descripción:</span> {{description}}",
+        "GROUP": "<span class='bold'>Tipo de servicio:</span> {{name}}",
+        "NAME": "<span class='bold'>Servicio:</span> {{name}}",
+        "TOTAL": "<span class='bold'>Total:</span>",
+        "PRICE": "<span class='bold'>Price:</span>",
+        "DURABILITY": "<span class='bold'>Durabilidad:</span> {{durability}}"
+      },
+      "DISCOUNT": {
+        "FIELD": "Descuento",
+        "ADD": "Con descuento"
+      }
+    },
+    "DATE": {
+      "FIELD": "Elegí una fecha",
+      "REQUIRED": "Fecha es <b>requerida</b>"
+    },
+    "START": {
+      "FIELD": "Elegí una hora",
+      "REQUIRED": "Hora es <b>requerido</b>"
+    },
+    "SCHEDULE": {
+      "FIELD": "Reservar una cita",
+      "REQUIRED": "Reservar una cita es <b>requerido</b>"
+    },
+    "EVENT": {
+      "CUSTOMER": "<b>{{customerName}}</b>",
+      "OVERLAPPING": {
+        "TITLE": "Reserva superpuesta",
+        "CONTENT": "La nueva reserva se superpone con <div>{{data}}</div> ¿Está seguro de agregar la reserva?",
+        "ERROR": "La nueva reserva se superpone con <div>{{data}}</div>"
+      },
+      "DETAIL": "<div class='detail'><b>{{customerName}}</b></div><div class='detail'>{{productName}}</div>",
+      "TITLE": "Agregar nueva reserva",
+      "CONTENT": "¿Estás segura de añadir la reserva el {{date}}?",
+      "CHANGE": {
+        "TITLE": "Actualizar reserva",
+        "CONTENT": "¿Estás segura de cambiar la reserva al {{date}}?"
+      },
+      "MESSAGE": {
+        "UNAVAILABLE": "<b>No disponible</b>",
+        "LUNCH": "<b>Hora de almuerzo</b>",
+        "OUT_OF_WORK": "<b>Fuera del trabajo</b>"
+      },
+      "UNAVAILABLE": "<div class='detail'><b>No disponible</b></div><div class='detail'>{{description}}</div>"
+    },
+    "PAYMENT": {
+      "TITLE": "Pagos",
+      "PAID": "Pagado",
+      "TYPE": "Forma de pago"
+    },
+    "ACTION": {
+      "APPROVE": "Aprobar",
+      "EDIT": "Editar",
+      "PAY": "Pagar",
+      "START": "Iniciar",
+      "COMPLETE": "Completar",
+      "CANCEL": "Cancelar",
+      "BOOK": "Reservar nuevamente",
+      "SEND": "Enviar Whatsapp",
+      "MORE": "Más"
+    },
+    "CHANGE_STATE": {
+      "TITLE": "Cambio de estado",
+      "ACTION": {
+        "APPROVE": "aprobar la reserva",
+        "EDIT": "editar la cita",
+        "PAY": "pagar la reserva",
+        "START": "iniciar la cita",
+        "COMPLETE": "completar la cita",
+        "CANCEL": "cancelar la reserva",
+        "BOOK": "reservar nuevamente"
+      },
+      "CONTENT": "¿Está seguro de {{action}}?"
+    },
+    "TRACKING": {
+      "TITLE": "Seguimiento",
+      "DURATION": "Duración de la cita"
+    },
+    "REVIEW": {
+      "TITLE": "Opinión"
+    },
+    "DELETED": {
+      "TITLE": "Eliminar reserva",
+      "CONTENT": "¿Está seguro de eliminar la reserva {{date}}?",
+      "MESSAGE": "Reserva {{date}} eliminada"
+    },
+    "STATE": {
+      "FIELD": "Estado",
+      "SEARCH": "Buscar por estados",
+      "APPROVE": "La reserva fue aprobada",
+      "START": "La reserva se inició",
+      "COMPLETE": "La reserva se completó",
+      "CANCEL": "La reserva se canceló"
+    },
+    "UNAVAILABLE": {
+      "TITLE": "Agregar no disponible"
+    },
+    "ADDITIONAL": {
+      "DURATION": {
+        "FIELD": "Duración"
+      }
+    }
+  },
+  "PAYMENT": {
+    "RECREATE": "Link de pago regenerado",
+    "COPY": "¡Link copiado!",
+    "LIST": {
+      "COLUMN": {
+        "AMOUNT": "Importe",
+        "TYPE": "Forma",
+        "STATUS": "Estado"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No hay pagos"
+      }
+    }
+  },
+  "WHATSAPP": {
+    "SEND": {
+      "APPROVE": "♡ \uD83C\uDD43\uD83C\uDD44 \uD83C\uDD3F\uD83C\uDD41\uD83C\uDD3E\uD83C\uDD47\uD83C\uDD38\uD83C\uDD3C\uD83C\uDD3E \uD83C\uDD42\uD83C\uDD34\uD83C\uDD41\uD83C\uDD45\uD83C\uDD38\uD83C\uDD32\uD83C\uDD34:%0A♡ {{date}} Hs.",
+      "TODAY": "♕\uD835\uDC79\uD835\uDC86\uD835\uDC84\uD835\uDC90\uD835\uDC93\uD835\uDC85\uD835\uDC82\uD835\uDC95\uD835\uDC90\uD835\uDC93\uD835\uDC8A\uD835\uDC90 \uD835\uDC85\uD835\uDC86 \uD835\uDC95\uD835\uDC96\uD835\uDC93\uD835\uDC8F\uD835\uDC90♕%0Aℍ\uD835\uDD60\uD835\uDD5D\uD835\uDD52!!! ℍ\uD835\uDD60\uD835\uDD6A {{date}} ℍ\uD835\uDD64 \uD835\uDD65\uD835\uDD56\uD835\uDD5Fé\uD835\uDD64 \uD835\uDD65\uD835\uDD66 \uD835\uDD64\uD835\uDD56\uD835\uDD64\uD835\uDD5Aó\uD835\uDD5F \uD835\uDD55\uD835\uDD56 \uD835\uDD66ñ\uD835\uDD52\uD835\uDD64 ♡♡♡  ℂ\uD835\uDD60\uD835\uDD5F\uD835\uDD57í\uD835\uDD63\uD835\uDD5E\uD835\uDD52\uD835\uDD5E\uD835\uDD56 \uD835\uDD62\uD835\uDD66\uD835\uDD56 \uD835\uDD52\uD835\uDD64\uD835\uDD5A\uD835\uDD64\uD835\uDD65\uD835\uDD5A\uD835\uDD63á\uD835\uDD64 \uD835\uDD61\uD835\uDD60\uD835\uDD63 \uD835\uDD57\uD835\uDD52\uD835\uDD67\uD835\uDD60\uD835\uDD63.%0A❀ \uD835\uDD39\uD835\uDD56\uD835\uDD64\uD835\uDD5A\uD835\uDD65\uD835\uDD60 ❀",
+      "TOMORROW": "♕\uD835\uDC79\uD835\uDC86\uD835\uDC84\uD835\uDC90\uD835\uDC93\uD835\uDC85\uD835\uDC82\uD835\uDC95\uD835\uDC90\uD835\uDC93\uD835\uDC8A\uD835\uDC90 \uD835\uDC85\uD835\uDC86 \uD835\uDC95\uD835\uDC96\uD835\uDC93\uD835\uDC8F\uD835\uDC90♕%0Aℍ\uD835\uDD60\uD835\uDD5D\uD835\uDD52!!! \uD835\uDD44\uD835\uDD52ñ\uD835\uDD52\uD835\uDD5F\uD835\uDD52 {{date}} ℍ\uD835\uDD64 \uD835\uDD65\uD835\uDD56\uD835\uDD5Fé\uD835\uDD64 \uD835\uDD65\uD835\uDD66 \uD835\uDD64\uD835\uDD56\uD835\uDD64\uD835\uDD5Aó\uD835\uDD5F \uD835\uDD55\uD835\uDD56 \uD835\uDD66ñ\uD835\uDD52\uD835\uDD64 ♡♡♡  ℂ\uD835\uDD60\uD835\uDD5F\uD835\uDD57í\uD835\uDD63\uD835\uDD5E\uD835\uDD52\uD835\uDD5E\uD835\uDD56 \uD835\uDD62\uD835\uDD66\uD835\uDD56 \uD835\uDD52\uD835\uDD64\uD835\uDD5A\uD835\uDD64\uD835\uDD65\uD835\uDD5A\uD835\uDD63á\uD835\uDD64 \uD835\uDD61\uD835\uDD60\uD835\uDD63 \uD835\uDD57\uD835\uDD52\uD835\uDD67\uD835\uDD60\uD835\uDD63.%0A❀ \uD835\uDD39\uD835\uDD56\uD835\uDD64\uD835\uDD5A\uD835\uDD65\uD835\uDD60 ❀"
+    }
+  }
+}

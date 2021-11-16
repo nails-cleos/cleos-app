@@ -1,0 +1,129 @@
+{
+  "ME": {
+    "RESERVATION": {
+      "PREVIEW": "Preview",
+      "APPOINTMENT": "Appointment",
+      "UPCOMING": {
+        "TITLE": "Upcoming Reservation",
+        "START": "Start",
+        "END": "End",
+        "PAID": "Paid",
+        "APPROVED": "Approved",
+        "CREATED": "Reservation must be approved by: ",
+        "PAY_NOW": "Pay now and freeze the price",
+        "NO_UPCOMING": {
+          "TITLE": "No upcoming reservations"
+        },
+        "CUSTOMER": {
+          "ERROR": "Customer already has a reservation on {{date}}",
+          "NO_CONTENT": "No availability on <span class='bold'>{{date}}</span>"
+        }
+      },
+      "PRODUCT": {
+        "DETAIL": "Detail",
+        "NO_CONTENT": "No products",
+        "DISCOUNT": {
+          "FIELD": "Discount",
+          "ADD": "With discount"
+        },
+        "COMPLETE": {
+          "DESCRIPTION": "<span class='bold'>Description:</span> {{description}}",
+          "PRICE": "<span class='bold'>Price:</span>",
+          "DURATION": "<span class='bold'>Duration:</span> {{duration}}",
+          "DURABILITY": "<span class='bold'>Durability:</span> {{durability}}"
+        },
+        "NAME": {
+          "FIELD": "Name"
+        },
+        "DURATION": {
+          "FIELD": "Duration"
+        },
+        "PRICE": {
+          "FIELD": "Price"
+        }
+      },
+      "DATE": {
+        "FIELD": "Pick a date",
+        "REQUIRED": "Date is <b>required</b>"
+      },
+      "ADDITIONAL": {
+        "DURATION": {
+          "FIELD": "Duration"
+        }
+      },
+      "SCHEDULE": {
+        "FIELD": "Book an appointment",
+        "REQUIRED": "Book an appointment is <b>required</b>"
+      },
+      "ROOM": {
+        "DETAIL": "Detail",
+        "NAME": {
+          "FIELD": "Name"
+        },
+        "PROFESSIONAL": {
+          "FIELD": "Professional",
+          "NAME": "<span class='bold'>Professional:</span> {{name}}"
+        },
+        "ADDRESS": {
+          "NAME": "<span class='bold'>Address:</span> {{name}}",
+          "DESCRIPTION": "<span class='bold'>Description:</span> {{description}}",
+          "DISTANCE": {
+            "KM": "<span class='bold'>Distance:</span> {{distance}} Kilometers",
+            "M": "<span class='bold'>Distance:</span> {{distance}} Meters"
+          }
+        }
+      }
+    },
+    "PAYMENT": {
+      "CREATED": "Payment complete successfully",
+      "ERROR_TEXT": "Payment error",
+      "ERROR": "Payment incomplete.\n{{reason}}",
+      "LIST": {
+        "COLUMN": {
+          "AMOUNT": "Amount",
+          "STATUS": "Status"
+        },
+        "ERROR": {
+          "NO_CONTENT": "No payment"
+        }
+      }
+    },
+    "REFERRAL": {
+      "TITLE": "Referrals",
+      "MESSAGE": "Referral Cleos to your friends and get incredible discounts",
+      "DETAIL": "You will get discounts once your friend creates an account with your code and attends an appointment",
+      "COPY": "Code copied",
+      "LINK": "Create your Cleos account. I recommend it! \uD83D\uDE0D\n\nIf you use my code {{code}} or enter here {{url}}, save on your first reservation. Take advantage of!",
+      "INVITE": {
+        "TITLE": "Invites",
+        "SEND": "Received your invitation",
+        "USED": "Attended to an appointment"
+      }
+    },
+    "REVIEW": {
+      "TITLE": "Review",
+      "DETAIL": "Detail",
+      "RATE": "Rating {{rating}}/{{total}}",
+      "YOUR_RATE": "Your rating {{rating}}/{{total}}",
+      "CREATED": "Review saved",
+      "RATING": {
+        "1": "Very bad",
+        "2": "Bad",
+        "3": "Good",
+        "4": "Very good",
+        "5": "Excellent"
+      }
+    },
+    "DISCOUNT": {
+      "LIST": {
+        "COLUMN": {
+          "AMOUNT": "Amount",
+          "USED": "Used"
+        },
+        "ERROR": {
+          "NO_CONTENT": "No discounts"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "MAIN": {
+    "LEGALS": "© 2021 - CLEOS - All rights reserved.",
+    "STORY_DETAIL": "dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna\n      aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl\n      ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie\n      consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui\n      blandit\n      praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis\n      eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum.",
+    "SECTION": {
+      "STORY": "Story",
+      "PRODUCT": "Products",
+      "BOOK": "Book",
+      "CONTACT": "Contact",
+      "CATALOG": "Catalogs",
+      "ACCOUNT": "My account",
+      "AUTH": "Login",
+      "PRIVACY": "Privacy",
+      "TERM_AND_CONDITIONS": "Term and conditions"
+    },
+    "BOOK": {
+      "DATE": {
+        "FIELD": "Pick a date"
+      }
+    },
+    "CONTACT": {
+      "TITLE": "Contact us",
+      "ADDRESS": "San Martín 64 - 08 - Villa Carlos Paz, Córdoba, Argentina",
+      "PHONE": "+54 (3541) 56-9953",
+      "MAIL": "espacio.cleos@gmail.com",
+      "SEND": {
+        "TITLE": "Have any questions? We would love to hear about you",
+        "MESSAGE": "Your message was sending successfully",
+        "HELLO": "ʜᴇʟʟᴏ ᴄʟᴇᴏꜱ! %0Aɪ ʜᴀᴠᴇ ᴀ ᴅᴏᴜʙᴛ ♡"
+      },
+      "NAME": {
+        "FIELD": "Your name",
+        "REQUIRED": "Your name is required"
+      },
+      "EMAIL": {
+        "FIELD": "Your email",
+        "REQUIRED": "Your email is required",
+        "INVALID": "Email is invalid"
+      },
+      "SUBJECT": {
+        "FIELD": "Subject",
+        "REQUIRED": "Subject is required"
+      },
+      "BODY": {
+        "FIELD": "Message",
+        "REQUIRED": "Message is required"
+      }
+    }
+  },
+  "CARD": {
+    "PRODUCT": {
+      "DURATION": "<span class='bold'>Duration:</span> {{duration}}",
+      "DURABILITY": "<span class='bold'>Durability:</span> {{durability}}"
+    }
+  }
+}

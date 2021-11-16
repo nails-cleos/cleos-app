@@ -18,7 +18,7 @@ export class CustomEventTitleFormatter extends CalendarEventTitleFormatter {
         const end = formatDateMonth(event.end, this.translate.currentLang);
         return `<b>${start} - ${end}</b> ${event.title}`;
       } else {
-        return `<b>${this.translate.instant('UNAVAILABLE.ALL_DAY.CHECK')}</b> ${event.title}`;
+        return `<b>${this.translate.instant('COMMON.ALL_DAY.CHECK')}</b> ${event.title}`;
       }
     } else {
       return event.title;

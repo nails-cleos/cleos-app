@@ -1,0 +1,179 @@
+{
+  "RESERVATION": {
+    "PREVIEW": "Preview",
+    "APPOINTMENT": "Appointment",
+    "SEARCH": "Search",
+    "LIST": {
+      "CANCEL": {
+        "TITLE": "Cancel reservation",
+        "CONTENT": "Are you sure to cancel reservation {{date}}?",
+        "MESSAGE": "Reservation {{date}} cancelled"
+      },
+      "HISTORY": {
+        "TITLE": "History",
+        "ERROR": {
+          "NO_CONTENT": "No histories"
+        }
+      }
+    },
+    "CUSTOMER": {
+      "FIELD": "Customer",
+      "DETAIL": "Customer reservation",
+      "SEARCH": "Find by customer",
+      "REQUIRED": "Customer is <b>required</b>",
+      "INVALID": "Customer is invalid",
+      "ADD_BUTTON": "Add customer"
+    },
+    "ROOM": {
+      "TITLE": "Add room",
+      "DETAIL": "Detail",
+      "NAME": {
+        "FIELD": "Name"
+      },
+      "PROFESSIONAL": {
+        "FIELD": "Professional"
+      }
+    },
+    "PRODUCT": {
+      "NO_CONTENT": "No products",
+      "NAME": {
+        "FIELD": "Name"
+      },
+      "DURATION": {
+        "FIELD": "Duration"
+      },
+      "PRICE": {
+        "FIELD": "Price"
+      },
+      "EXTRAS": {
+        "TITLE": "Extras",
+        "DESCRIPTION": "Description",
+        "PRICE": "Price",
+        "TOTAL": "Total"
+      },
+      "COMPLETE": {
+        "DESCRIPTION": "<span class='bold'>Description:</span> {{description}}",
+        "GROUP": "<span class='bold'>Product type:</span> {{name}}",
+        "NAME": "<span class='bold'>Product:</span> {{name}}",
+        "TOTAL": "<span class='bold'>Total:</span>",
+        "PRICE": "<span class='bold'>Price:</span>",
+        "DURABILITY": "<span class='bold'>Durability:</span> {{durability}}"
+      },
+      "DISCOUNT": {
+        "FIELD": "Discount",
+        "ADD": "With discount"
+      }
+    },
+    "DATE": {
+      "FIELD": "Pick a date",
+      "REQUIRED": "Date is <b>required</b>"
+    },
+    "START": {
+      "FIELD": "Pick a time",
+      "REQUIRED": "Time is <b>required</b>"
+    },
+    "SCHEDULE": {
+      "FIELD": "Book an appointment",
+      "REQUIRED": "Book an appointment is <b>required</b>"
+    },
+    "EVENT": {
+      "CUSTOMER": "<b>{{customerName}}</b>",
+      "OVERLAPPING": {
+        "TITLE": "Reservation overlapping",
+        "CONTENT": "The new reservation is overlapping with <div>{{data}}</div> Are you sure to add reservation?",
+        "ERROR": "The new reservation is overlapping with <div>{{data}}</div>"
+      },
+      "DETAIL": "<div class='detail'><b>{{customerName}}</b></div><div class='detail'>{{productName}}</div>",
+      "TITLE": "Add new reservation",
+      "CONTENT": "Are you sure to add reservation on {{date}}?",
+      "CHANGE": {
+        "TITLE": "Update reservation",
+        "CONTENT": "Are you sure to change reservation to {{date}}?"
+      },
+      "MESSAGE": {
+        "UNAVAILABLE": "<b>Unavailable</b>",
+        "LUNCH": "<b>Lunch time</b>",
+        "OUT_OF_WORK": "<b>Out of work</b>"
+      },
+      "UNAVAILABLE": "<div class='detail'><b>Unavailable</b></div><div class='detail'>{{description}}</div>"
+    },
+    "PAYMENT": {
+      "TITLE": "Payments",
+      "PAID": "Paid",
+      "TYPE": "Payment type"
+    },
+    "ACTION": {
+      "APPROVE": "Approve",
+      "EDIT": "Edit",
+      "PAY": "Pay",
+      "START": "Start",
+      "COMPLETE": "Complete",
+      "CANCEL": "Cancel",
+      "BOOK": "Book again",
+      "SEND": "Send Whatsapp",
+      "MORE": "More"
+    },
+    "CHANGE_STATE": {
+      "TITLE": "Change state",
+      "ACTION": {
+        "APPROVE": "approve the reservation",
+        "EDIT": "edit the appointment",
+        "PAY": "pay the reservation",
+        "START": "start the appointment",
+        "COMPLETE": "complete the appointment",
+        "CANCEL": "cancel the reservation",
+        "BOOK": "book again"
+      },
+      "CONTENT": "Are you sure to {{action}}?"
+    },
+    "TRACKING": {
+      "TITLE": "Tracking",
+      "DURATION": "Appointment duration"
+    },
+    "REVIEW": {
+      "TITLE": "Review"
+    },
+    "DELETED": {
+      "TITLE": "Delete reservation",
+      "CONTENT": "Are you sure to delete reservation {{date}}?",
+      "MESSAGE": "Reservation {{date}} deleted"
+    },
+    "STATE": {
+      "FIELD": "State",
+      "SEARCH": "Find by states",
+      "APPROVE": "Reservation approved",
+      "START": "Reservation started",
+      "COMPLETE": "Reservation completed",
+      "CANCEL": "Reservation cancelled"
+    },
+    "UNAVAILABLE": {
+      "TITLE": "Add unavailable"
+    },
+    "ADDITIONAL": {
+      "DURATION": {
+        "FIELD": "Duration"
+      }
+    }
+  },
+  "PAYMENT": {
+    "RECREATE": "Payment link recreated",
+    "COPY": "Link copied!",
+    "LIST": {
+      "COLUMN": {
+        "AMOUNT": "Amount",
+        "TYPE": "Type",
+        "STATUS": "Status"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No payment"
+      }
+    }
+  },
+  "WHATSAPP": {
+    "SEND": {
+      "APPROVE": "♡ \uD83C\uDD48\uD83C\uDD3E\uD83C\uDD44\uD83C\uDD41 \uD83C\uDD3D\uD83C\uDD34\uD83C\uDD47\uD83C\uDD43 \uD83C\uDD42\uD83C\uDD34\uD83C\uDD41\uD83C\uDD45\uD83C\uDD38\uD83C\uDD32\uD83C\uDD34:%0A♡ {{date}}",
+      "TODAY": "♕\uD835\uDE3C\uD835\uDE65\uD835\uDE65\uD835\uDE64\uD835\uDE5E\uD835\uDE63\uD835\uDE69\uD835\uDE62\uD835\uDE5A\uD835\uDE63\uD835\uDE69 \uD835\uDE67\uD835\uDE5A\uD835\uDE62\uD835\uDE5E\uD835\uDE63\uD835\uDE59\uD835\uDE5A\uD835\uDE67♕%0Aℍ\uD835\uDD56\uD835\uDD5D\uD835\uDD5D\uD835\uDD60!!! \uD835\uDD4B\uD835\uDD60\uD835\uDD55\uD835\uDD52\uD835\uDD6A {{date}}\uD835\uDD6A\uD835\uDD60\uD835\uDD66 \uD835\uDD59\uD835\uDD52\uD835\uDD67\uD835\uDD56 \uD835\uDD6A\uD835\uDD60\uD835\uDD66\uD835\uDD63 \uD835\uDD5F\uD835\uDD52\uD835\uDD5A\uD835\uDD5D \uD835\uDD64\uD835\uDD56\uD835\uDD64\uD835\uDD64\uD835\uDD5A\uD835\uDD60\uD835\uDD5F ♡♡♡ ℂ\uD835\uDD60\uD835\uDD5F\uD835\uDD57\uD835\uDD5A\uD835\uDD63\uD835\uDD5E \uD835\uDD65\uD835\uDD59\uD835\uDD52\uD835\uDD65 \uD835\uDD6A\uD835\uDD60\uD835\uDD66 \uD835\uDD68\uD835\uDD5A\uD835\uDD5D\uD835\uDD5D \uD835\uDD52\uD835\uDD65\uD835\uDD65\uD835\uDD56\uD835\uDD5F\uD835\uDD55 \uD835\uDD61\uD835\uDD5D\uD835\uDD56\uD835\uDD52\uD835\uDD64\uD835\uDD56.%0A\uD835\uDD42\uD835\uDD5A\uD835\uDD64\uD835\uDD64\uD835\uDD56\uD835\uDD64 ❀",
+      "TOMORROW": "♕\uD835\uDE3C\uD835\uDE65\uD835\uDE65\uD835\uDE64\uD835\uDE5E\uD835\uDE63\uD835\uDE69\uD835\uDE62\uD835\uDE5A\uD835\uDE63\uD835\uDE69 \uD835\uDE67\uD835\uDE5A\uD835\uDE62\uD835\uDE5E\uD835\uDE63\uD835\uDE59\uD835\uDE5A\uD835\uDE67♕%0Aℍ\uD835\uDD56\uD835\uDD5D\uD835\uDD5D\uD835\uDD60!!! \uD835\uDD4B\uD835\uDD60\uD835\uDD5E\uD835\uDD60\uD835\uDD63\uD835\uDD63\uD835\uDD60\uD835\uDD68 {{date}}\uD835\uDD6A\uD835\uDD60\uD835\uDD66 \uD835\uDD59\uD835\uDD52\uD835\uDD67\uD835\uDD56 \uD835\uDD6A\uD835\uDD60\uD835\uDD66\uD835\uDD63 \uD835\uDD5F\uD835\uDD52\uD835\uDD5A\uD835\uDD5D \uD835\uDD64\uD835\uDD56\uD835\uDD64\uD835\uDD64\uD835\uDD5A\uD835\uDD60\uD835\uDD5F ♡♡♡ ℂ\uD835\uDD60\uD835\uDD5F\uD835\uDD57\uD835\uDD5A\uD835\uDD63\uD835\uDD5E \uD835\uDD65\uD835\uDD59\uD835\uDD52\uD835\uDD65 \uD835\uDD6A\uD835\uDD60\uD835\uDD66 \uD835\uDD68\uD835\uDD5A\uD835\uDD5D\uD835\uDD5D \uD835\uDD52\uD835\uDD65\uD835\uDD65\uD835\uDD56\uD835\uDD5F\uD835\uDD55 \uD835\uDD61\uD835\uDD5D\uD835\uDD56\uD835\uDD52\uD835\uDD64\uD835\uDD56.%0A\uD835\uDD42\uD835\uDD5A\uD835\uDD64\uD835\uDD64\uD835\uDD56\uD835\uDD64 ❀"
+    }
+  }
+}

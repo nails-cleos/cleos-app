@@ -9,11 +9,11 @@
           <mat-card-content>
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <mat-form-field appearance="fill">
-                <mat-label>{{ 'PRODUCT.GROUP.FIELD' | translate }}</mat-label>
+                <mat-label>{{ 'COMMON.PRODUCT.GROUP.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="name" autocomplete="name" matInput required>
                 </label>
-                <mat-error *ngIf="name.hasError('required')" [innerHTML]="'PRODUCT.GROUP.REQUIRED' | translate">
+                <mat-error *ngIf="name.hasError('required')" [innerHTML]="'COMMON.PRODUCT.GROUP.REQUIRED' | translate">
                 </mat-error>
                 <mat-error *ngIf="errors['name']">
                   {{errors['name']}}
@@ -36,7 +36,7 @@
                 </mat-error>
               </mat-form-field>
               <mat-form-field appearance="fill">
-                <mat-label>{{ 'PRODUCT.FIELD' | translate }}</mat-label>
+                <mat-label>{{ 'COMMON.PRODUCT.FIELD' | translate }}</mat-label>
                 <label>
                   <input #inputName matInput>
                 </label>
@@ -52,7 +52,7 @@
               <mat-tab-group (selectedIndexChange)="selected.setValue($event)" [selectedIndex]="selected.value">
                 <mat-tab *ngFor="let tab of products; let index = index" [label]="tab.name || ''">
                   <mat-form-field appearance="fill" class="tab-field">
-                    <mat-label>{{ 'PRODUCT.FIELD' | translate }}</mat-label>
+                    <mat-label>{{ 'COMMON.PRODUCT.FIELD' | translate }}</mat-label>
                     <label>
                       <input (change)="setValue(tab, 'name', $event)" [value]="tab.name" matInput required>
                     </label>

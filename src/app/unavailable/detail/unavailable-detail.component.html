@@ -9,7 +9,7 @@
           <mat-card-content *ngIf="unavailable; else boxSkeleton">
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <mat-form-field appearance="fill">
-                <mat-label>{{ 'ROOM.PROFESSIONAL.FIELD' | translate }}</mat-label>
+                <mat-label>{{ 'UNAVAILABLE.PROFESSIONAL.FIELD' | translate }}</mat-label>
                 <label>
                   <input [value]="professionalName" disabled matInput type="text">
                 </label>
@@ -41,7 +41,7 @@
                   </mat-error>
                 </mat-form-field>
                 <mat-checkbox [formControl]="allDay"
-                              color="primary">{{ 'UNAVAILABLE.ALL_DAY.CHECK' | translate }}</mat-checkbox>
+                              color="primary">{{ 'COMMON.ALL_DAY.CHECK' | translate }}</mat-checkbox>
                 <mat-form-field *ngIf="!allDay.value" appearance="fill" style="margin-right: 12px;">
                   <mat-label>{{ 'UNAVAILABLE.TIME.FIELD' | translate }}</mat-label>
                   <label>

@@ -1,0 +1,71 @@
+{
+  "ROOM": {
+    "TITLE": "Add room",
+    "CREATED": "Room {{name}} created",
+    "DETAIL": "Update room",
+    "ME": "My room",
+    "LIST": {
+      "COLUMN": {
+        "PROFESSIONAL": "Professional",
+        "AVAILABILITY": {
+          "FIELD": "Availability",
+          "WEEK": "Week",
+          "SATURDAY": "Saturday",
+          "SUNDAY": "Sunday"
+        }
+      },
+      "ERROR": {
+        "NO_CONTENT": "No rooms"
+      }
+    },
+    "NAME": {
+      "FIELD": "Name",
+      "REQUIRED": "Name is <b>required</b>"
+    },
+    "PROFESSIONAL": {
+      "FIELD": "Professional",
+      "REQUIRED": "Professional is <b>required</b>",
+      "INVALID": "Professional is invalid",
+      "ADD_BUTTON": "Add professional"
+    },
+    "AVAILABILITY": {
+      "FIELD": "Availability",
+      "REQUIRED": "At least one availability is <b>required</b>"
+    },
+    "WEEK_TIME": {
+      "FIELD": "Week availability",
+      "DESCRIPTION": "Week working time availability",
+      "REQUIRED": "Add or ignore week working time"
+    },
+    "SATURDAY_TIME": {
+      "FIELD": "Saturday availability",
+      "DESCRIPTION": "Saturday working time availability",
+      "REQUIRED": "Add or ignore saturday working time"
+    },
+    "SUNDAY_TIME": {
+      "FIELD": "Sunday availability",
+      "DESCRIPTION": "Sunday working time availability",
+      "REQUIRED": "Add or ignore sunday working time"
+    },
+    "LUNCH": {
+      "FIELD": "Lunch time",
+      "CHECK": "Add lunch time"
+    },
+    "START": {
+      "FIELD": "Start",
+      "REQUIRED": "Start is <b>required</b>"
+    },
+    "END": {
+      "FIELD": "End",
+      "REQUIRED": "End is <b>required</b>"
+    },
+    "DELETED": {
+      "TITLE": "Delete room",
+      "CONTENT": "Are you sure to delete room {{name}}?",
+      "MESSAGE": "Room {{name}} deleted"
+    },
+    "UPDATED": {
+      "MESSAGE": "Room {{name}} updated"
+    }
+  }
+}

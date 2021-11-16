@@ -1,0 +1,78 @@
+{
+  "AUTH": {
+    "FORBIDDEN": "User not have the necessary permissions",
+    "SIGN_IN": {
+      "TITLE": "Sign In",
+      "USERNAME": {
+        "FIELD": "Username or email",
+        "ERROR": "Please provide a valid username or email"
+      },
+      "OR": "Or sign in with email",
+      "NEW": "New to Cleos?",
+      "FORGOT_PASSWORD": "Forgot password?"
+    },
+    "SIGN_UP": {
+      "TITLE": "Sign up",
+      "CONFIRM_PASSWORD": {
+        "FIELD": "Confirm password",
+        "REQUIRED": "Confirm password is <b>required</b>",
+        "MUST_MATCH": "Password and confirm password must match"
+      },
+      "CODE": {
+        "FIELD": "Referral code"
+      },
+      "OR": "Or sign up with email",
+      "SUCCESS": "User {{username}} created. Check your email {{email}}",
+      "ALREADY": "Already on Cleos?"
+    },
+    "PASSWORD": {
+      "FIELD": "Password",
+      "ERROR": "Please provide a valid password",
+      "DETAIL": "Show password details",
+      "REQUIRED": "Password is <b>required</b>",
+      "INVALID": "Password is not valid",
+      "DIGIT": "Contains at least one digit character",
+      "LOWER_CASE": "Contains at least one lower character",
+      "UPPER_CASE": "Contains at least one upper character",
+      "MIN": "Contains at least 6 characters",
+      "MAX": "Contains no more than 30 characters",
+      "SPECIAL": "Contains at least one special character"
+    },
+    "ACTIVATE_ACCOUNT": {
+      "TITLE": "Activate account",
+      "CONTENT": "Welcome to Cleos",
+      "BUTTON": "Activate",
+      "MESSAGE": "Account activated"
+    },
+    "FORGOT_PASSWORD": {
+      "TITLE": "Forgot password",
+      "MESSAGE": "Check your email in order to change your password",
+      "USERNAME": {
+        "FIELD": "Username or email",
+        "ERROR": "Please provide a valid username or email"
+      }
+    },
+    "RECOVERY_PASSWORD": {
+      "TITLE": "Recovery password",
+      "MESSAGE": "Password updated",
+      "CONFIRM_PASSWORD": {
+        "FIELD": "Confirm password",
+        "REQUIRED": "Confirm password is <b>required</b>",
+        "MUST_MATCH": "Password and confirm password must match"
+      }
+    },
+    "CHANGE_PASSWORD": {
+      "TITLE": "Change password",
+      "MESSAGE": "Password updated",
+      "OLD_PASSWORD": {
+        "FIELD": "Old password",
+        "REQUIRED": "Old password is <b>required</b>"
+      },
+      "CONFIRM_PASSWORD": {
+        "FIELD": "Confirm password",
+        "REQUIRED": "Confirm password is <b>required</b>",
+        "MUST_MATCH": "New password and confirm password must match"
+      }
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "USER": {
+    "FIELD": "Users",
+    "TITLE": "Add user",
+    "CUSTOMER": "Customer {{username}} created",
+    "PROFESSIONAL": "Professional {{username}} created",
+    "DETAIL": "Update user",
+    "LIST": {
+      "COLUMN": {
+        "USERNAME": "Username",
+        "EMAIL": "Email",
+        "PROVIDER": "Provider",
+        "STATUS": "Status",
+        "DETAIL": {
+          "TITLE": "Roles"
+        }
+      },
+      "ERROR": {
+        "NO_CONTENT": "No users"
+      },
+      "STATUS": {
+        "ENABLED": "Verified",
+        "DISABLED": "Not verified",
+        "DELETED": "Deleted"
+      }
+    },
+    "ROLE": {
+      "FIELD": "Roles",
+      "REQUIRED": "Role is <b>required</b>"
+    },
+    "DELETED": {
+      "TITLE": "Delete user",
+      "CONTENT": "Are you sure to delete user {{username}}?",
+      "MESSAGE": "User {{username}} deleted"
+    },
+    "UPDATED": {
+      "MESSAGE": "User {{username}} updated"
+    },
+    "ACTIVATION_RESEND": {
+      "TITLE": "Resend activation code",
+      "CONTENT": "Are you sure to resend activation code to user {{username}}?",
+      "MESSAGE": "Activation code sent"
+    },
+    "ROLES": {
+      "REMOVE": "Role {{role}} removed to {{username}}",
+      "ADD": "Role {{role}} added to {{username}}"
+    }
+  }
+}

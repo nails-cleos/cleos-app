@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
-import { HttpClientModule } from '@angular/common/http';
+import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCarouselModule } from '@ngbmodule/material-carousel';
 
@@ -17,6 +17,11 @@ import { ImageViewerComponent } from './image-viewer/image-viewer.component';
 import { TermsAndConditionsComponent } from './terms-and-conditions/terms-and-conditions.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { MiniCardProductComponent } from './mini-card-product/mini-card-product.component';
+
+export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
+  new TranslateHttpLoader(http, './assets/i18n/main/', '.json');
 
 @NgModule({
   declarations: [
@@ -25,21 +30,31 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
     MainContentComponent,
     CatalogComponent,
     PrivacyComponent,
-    TermsAndConditionsComponent
+    TermsAndConditionsComponent,
+    MiniCardProductComponent
   ],
   imports: [
     MainRoutingModule,
     SharedModule,
     CommonModule,
-    TranslateModule,
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
     AppMaterialModule,
     MatCarouselModule.forRoot(),
     MatToolbarModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    TranslateModule.forChild({
+      loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient]},
+      isolate: false,
+      extend: true
+    })
   ]
 })
 export class MainModule {
+  constructor(protected translateService: TranslateService) {
+    const currentLang = translateService.currentLang;
+    translateService.currentLang = '';
+    translateService.use(currentLang);
+  }
 }

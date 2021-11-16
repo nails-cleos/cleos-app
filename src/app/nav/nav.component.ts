@@ -140,7 +140,7 @@ export class NavComponent implements OnInit, OnDestroy {
     const user: IUser = new User();
     user.theme = theme;
     const redirectUrl = this.router.url;
-    const message = this.translate.instant(`PROFILE.UPDATED.DARK_MODE_${checked.toString().toUpperCase()}`);
+    const message = this.translate.instant(`COMMON.PROFILE.UPDATED.DARK_MODE_${checked.toString().toUpperCase()}`);
     this.store.dispatch(
       new fromActionsUser.UpdateUser({user, redirectUrl, message})
     );

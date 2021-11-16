@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
-import { HttpClientModule } from '@angular/common/http';
+import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatPasswordStrengthModule } from '@angular-material-extensions/password-strength';
 
@@ -21,6 +21,11 @@ import { RedirectComponent } from './redirect/redirect.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { NgxMatIntlTelInputModule } from 'ngx-mat-intl-tel-input';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { httpInterceptorProviders } from '../http-interceptors';
+
+export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
+  new TranslateHttpLoader(http, './assets/i18n/auth/', '.json');
 
 @NgModule({
   declarations: [
@@ -38,7 +43,6 @@ import { NgxMatIntlTelInputModule } from 'ngx-mat-intl-tel-input';
     AuthRoutingModule,
     SharedModule,
     CommonModule,
-    TranslateModule,
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
@@ -46,8 +50,18 @@ import { NgxMatIntlTelInputModule } from 'ngx-mat-intl-tel-input';
     AppMaterialModule,
     MatTabsModule,
     MatSlideToggleModule,
-    NgxMatIntlTelInputModule
+    NgxMatIntlTelInputModule,
+    TranslateModule.forChild({
+      loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient]},
+      isolate: false,
+      extend: true
+    })
   ]
 })
 export class AuthModule {
+  constructor(protected translateService: TranslateService) {
+    const currentLang = translateService.currentLang;
+    translateService.currentLang = '';
+    translateService.use(currentLang);
+  }
 }

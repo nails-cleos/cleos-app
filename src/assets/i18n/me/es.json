@@ -1,0 +1,129 @@
+{
+  "ME": {
+    "RESERVATION": {
+      "PREVIEW": "Vista previa",
+      "APPOINTMENT": "Cita",
+      "UPCOMING": {
+        "TITLE": "Próxima Reserva",
+        "START": "Inicio",
+        "END": "Fin",
+        "PAID": "Pagado",
+        "APPROVED": "Aprobado",
+        "CREATED": "La reserva debe ser aprobada por: ",
+        "PAY_NOW": "Pagá ahora y congela el precio",
+        "NO_UPCOMING": {
+          "TITLE": "No hay próxima reserva"
+        },
+        "CUSTOMER": {
+          "ERROR": "El cliente ya tiene una reserva el {{date}}",
+          "NO_CONTENT": "No hay disponibilidad el <span class='bold'>{{date}}</span>"
+        }
+      },
+      "PRODUCT": {
+        "DETAIL": "Detalle",
+        "NO_CONTENT": "No hay servicios",
+        "DISCOUNT": {
+          "FIELD": "Descuento",
+          "ADD": "Con descuento"
+        },
+        "COMPLETE": {
+          "DESCRIPTION": "<span class='bold'>Descripción:</span> {{description}}",
+          "PRICE": "<span class='bold'>Price:</span>",
+          "DURATION": "<span class='bold'>Duración:</span> {{duration}}",
+          "DURABILITY": "<span class='bold'>Durabilidad:</span> {{durability}}"
+        },
+        "NAME": {
+          "FIELD": "Nombre"
+        },
+        "DURATION": {
+          "FIELD": "Duración"
+        },
+        "PRICE": {
+          "FIELD": "Precio"
+        }
+      },
+      "DATE": {
+        "FIELD": "Elegí una fecha",
+        "REQUIRED": "Fecha es <b>requerida</b>"
+      },
+      "ADDITIONAL": {
+        "DURATION": {
+          "FIELD": "Duración"
+        }
+      },
+      "SCHEDULE": {
+        "FIELD": "Reservar una cita",
+        "REQUIRED": "Reservar una cita es <b>requerido</b>"
+      },
+      "ROOM": {
+        "DETAIL": "Detalle",
+        "NAME": {
+          "FIELD": "Nombre"
+        },
+        "PROFESSIONAL": {
+          "FIELD": "Profesional",
+          "NAME": "<span class='bold'>Profesional:</span> {{name}}"
+        },
+        "ADDRESS": {
+          "NAME": "<span class='bold'>Dirección:</span> {{name}}",
+          "DESCRIPTION": "<span class='bold'>Descripción:</span> {{description}}",
+          "DISTANCE": {
+            "KM": "<span class='bold'>Distancia:</span> {{distance}} Kilómetros",
+            "M": "<span class='bold'>Distancia:</span> {{distance}} Metros"
+          }
+        }
+      }
+    },
+    "PAYMENT": {
+      "CREATED": "Pago completado",
+      "ERROR_TEXT": "Error",
+      "ERROR": "Pago incompleto.\n{{reason}}",
+      "LIST": {
+        "COLUMN": {
+          "AMOUNT": "Importe",
+          "STATUS": "Estado"
+        },
+        "ERROR": {
+          "NO_CONTENT": "No hay pagos"
+        }
+      }
+    },
+    "REFERRAL": {
+      "TITLE": "Referidos",
+      "MESSAGE": "Referí Cleos a tus amigos y obtené increíbles descuentos",
+      "DETAIL": "Obtendrás descuentos una vez que tu amigo cree una cuenta con tu código y asista a una cita",
+      "COPY": "Code copied",
+      "LINK": "Crea tu cuenta en Cleos. ¡Te la recomiendo! \uD83D\uDE0D\n\nSi usas mi código {{code}} o entrás acá {{url}}, ahorrá en un tu primer reserva. ¡Aprovechá!",
+      "INVITE": {
+        "TITLE": "Invitaciones",
+        "SEND": "Recibieron tu invitación",
+        "USED": "Asistieron a una cita"
+      }
+    },
+    "REVIEW": {
+      "TITLE": "Calificar",
+      "DETAIL": "Detalle",
+      "RATE": "Calificación {{rating}}/{{total}}",
+      "YOUR_RATE": "Tu calificación {{rating}}/{{total}}",
+      "CREATED": "Opinión agregada",
+      "RATING": {
+        "1": "Muy malo",
+        "2": "Malo",
+        "3": "Bueno",
+        "4": "Muy bueno",
+        "5": "Excelente"
+      }
+    },
+    "DISCOUNT": {
+      "LIST": {
+        "COLUMN": {
+          "AMOUNT": "Monto",
+          "USED": "Utilizado"
+        },
+        "ERROR": {
+          "NO_CONTENT": "No hay descuentos"
+        }
+      }
+    }
+  }
+}

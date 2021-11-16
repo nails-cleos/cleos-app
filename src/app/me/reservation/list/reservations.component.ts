@@ -97,7 +97,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
       if (result && result.rating) {
         const review: IReview = new Review(result.rating);
         review.reservationId = reservation?.id;
-        review.detail = result.detail ? result.detail : this.translate.instant(`REVIEW.RATING.${result.rating}`);
+        review.detail = result.detail ? result.detail : this.translate.instant(`ME.REVIEW.RATING.${result.rating}`);
         this.store.dispatch(
           new fromActionsReservation.ReservationReview(review)
         );

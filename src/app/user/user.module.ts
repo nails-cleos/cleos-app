@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
-import { HttpClientModule } from '@angular/common/http';
+import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ChartsModule } from 'ng2-charts';
 
@@ -15,6 +15,10 @@ import { UserDetailComponent } from './detail/user-detail.component';
 import { OverviewComponent } from './overview/overview.component';
 import { OverviewChartComponent } from './overview/chart/overview-chart/overview-chart.component';
 import { NgxMatIntlTelInputModule } from 'ngx-mat-intl-tel-input';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+
+export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
+  new TranslateHttpLoader(http, './assets/i18n/user/', '.json');
 
 @NgModule({
   declarations: [
@@ -28,14 +32,23 @@ import { NgxMatIntlTelInputModule } from 'ngx-mat-intl-tel-input';
     UserRoutingModule,
     SharedModule,
     CommonModule,
-    TranslateModule,
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
     AppMaterialModule,
     ChartsModule,
-    NgxMatIntlTelInputModule
+    NgxMatIntlTelInputModule,
+    TranslateModule.forChild({
+      loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient]},
+      isolate: false,
+      extend: true
+    })
   ]
 })
 export class UserModule {
+  constructor(protected translateService: TranslateService) {
+    const currentLang = translateService.currentLang;
+    translateService.currentLang = '';
+    translateService.use(currentLang);
+  }
 }

@@ -208,7 +208,7 @@ export class DashComponent implements OnInit, OnDestroy {
     this.state.data?.calendarSummary.unavailable?.forEach((it: ICalendarUnavailable) => {
       const start = newDate(it.start);
       this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNow());
-      const title = it.duration ? it.title : `${this.translate.instant('UNAVAILABLE.ALL_DAY.CHECK')} - ${it.title}`;
+      const title = it.duration ? it.title : `${this.translate.instant('COMMON.ALL_DAY.CHECK')} - ${it.title}`;
 
       if (it.repeat === UnavailableRepeatType.none) {
         const end = getEnd(start, it.duration);

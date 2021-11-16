@@ -1,0 +1,56 @@
+{
+  "MAIN": {
+    "LEGALS": "© 2021 - CLEOS - Todos los derechos reservados.",
+    "STORY_DETAIL": "dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna\n      aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl\n      ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie\n      consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui\n      blandit\n      praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis\n      eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum.",
+    "SECTION": {
+      "STORY": "Historia",
+      "PRODUCT": "Servicios",
+      "BOOK": "Reservar",
+      "CONTACT": "Contacto",
+      "CATALOG": "Catálogo",
+      "ACCOUNT": "Mi cuenta",
+      "AUTH": "Ingresar",
+      "PRIVACY": "Privacidad",
+      "TERM_AND_CONDITIONS": "Términos y condiciones"
+    },
+    "BOOK": {
+      "DATE": {
+        "FIELD": "Elegí una fecha"
+      }
+    },
+    "CONTACT": {
+      "TITLE": "Contactanos",
+      "ADDRESS": "San Martín 64 - 08 - Villa Carlos Paz, Córdoba, Argentina",
+      "PHONE": "+54 (3541) 56-9953",
+      "MAIL": "espacio.cleos@gmail.com",
+      "SEND": {
+        "TITLE": "¿Tiene alguna pregunta? Nos encantaría saber de ti",
+        "MESSAGE": "Tu mensaje se envió con éxito",
+        "HELLO": "ʜᴏʟᴀ ᴄʟᴇᴏꜱ! %0Aɴᴇᴄᴇꜱɪᴛᴏ ʜᴀᴄᴇʀ ᴜɴᴀ ᴄᴏɴꜱᴜʟᴛᴀ ♡"
+      },
+      "NAME": {
+        "FIELD": "Tu nombre",
+        "REQUIRED": "Tu nombre es requerido"
+      },
+      "EMAIL": {
+        "FIELD": "Tu email",
+        "REQUIRED": "Tu email es requerido",
+        "INVALID": "Email is invalid"
+      },
+      "SUBJECT": {
+        "FIELD": "Asunto",
+        "REQUIRED": "El asunto es requerido"
+      },
+      "BODY": {
+        "FIELD": "Mensaje",
+        "REQUIRED": "El mensaje es requerido"
+      }
+    }
+  },
+  "CARD": {
+    "PRODUCT": {
+      "DURATION": "<span class='bold'>Duración:</span> {{duration}}",
+      "DURABILITY": "<span class='bold'>Durabilidad:</span> {{durability}}"
+    }
+  }
+}

@@ -97,7 +97,7 @@
             </mat-list-item>
             <mat-list-item>
               <button color="primary" mat-button routerLink="/notifications">
-                {{'NOTIFICATION.LOAD_MORE' | translate}}
+                {{'COMMON.NOTIFICATION.LOAD_MORE' | translate}}
               </button>
             </mat-list-item>
           </mat-list>
@@ -148,7 +148,7 @@
             <mat-divider></mat-divider>
             <mat-list-item>
               <mat-slide-toggle (change)="setTheme($event.checked)" [checked]="checked"
-                                mat-line>{{'DASHBOARD.DARK_MODE' | translate }}</mat-slide-toggle>
+                                mat-line>{{'COMMON.DASHBOARD.DARK_MODE' | translate }}</mat-slide-toggle>
             </mat-list-item>
             <mat-divider></mat-divider>
             <a *ngIf="canChangePassword" [routerLink]="'/auth/change-password'" mat-list-item>

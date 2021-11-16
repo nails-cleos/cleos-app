@@ -43,7 +43,7 @@
           <mat-datepicker #picker touchUi></mat-datepicker>
         </mat-form-field>
         <mat-form-field *ngIf="groups; else skeleton" appearance="fill">
-          <mat-label>{{ 'PRODUCT.GROUP.FIELD' | translate }}</mat-label>
+          <mat-label>{{ 'COMMON.PRODUCT.GROUP.FIELD' | translate }}</mat-label>
           <label>
             <input (keydown)="keyDownGroup($event)" [formControl]="group" [matAutocomplete]="autoGroup"
                    matInput type="text">
@@ -55,11 +55,11 @@
           </mat-autocomplete>
           <mat-icon matSuffix>format_list_bulleted</mat-icon>
           <mat-error *ngIf="group.hasError('requireMatch')"
-                     [innerHTML]="'PRODUCT.GROUP.INVALID' | translate">
+                     [innerHTML]="'COMMON.PRODUCT.GROUP.INVALID' | translate">
           </mat-error>
         </mat-form-field>
         <mat-form-field *ngIf="products" appearance="fill">
-          <mat-label>{{ 'MAIN.BOOK.PRODUCT.FIELD' | translate }}</mat-label>
+          <mat-label>{{ 'COMMON.PRODUCT.FIELD' | translate }}</mat-label>
           <label>
             <input (keydown)="keyDownHandler($event, product)" [formControl]="product"
                    [matAutocomplete]="autoProduct" matInput type="text">
@@ -71,7 +71,7 @@
           </mat-autocomplete>
           <mat-icon matSuffix>home_repair_service</mat-icon>
           <mat-error *ngIf="product.hasError('requireMatch')"
-                     [innerHTML]="'MAIN.BOOK.PRODUCT.INVALID' | translate">
+                     [innerHTML]="'COMMON.PRODUCT.INVALID' | translate">
           </mat-error>
         </mat-form-field>
         <div [ngClass]="{'last': isHandset}">
@@ -112,7 +112,7 @@
           </p>
           <div fxLayout="row" fxLayoutAlign="center center">
             <a
-              [href]="'https://api.whatsapp.com/send?phone=' + ('MAIN.CONTACT.PHONE' | translate) + '&text=' + ('WHATSAPP.SEND.HELLO' | translate)"
+              [href]="'https://api.whatsapp.com/send?phone=' + ('MAIN.CONTACT.PHONE' | translate) + '&text=' + ('MAIN.CONTACT.SEND.HELLO' | translate)"
               mat-icon-button rel="noreferrer" target="_blank">
               <i aria-hidden="true" class="fa fa-whatsapp i-size-24"></i>
             </a>
