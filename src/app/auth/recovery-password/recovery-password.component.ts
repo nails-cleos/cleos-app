@@ -17,7 +17,7 @@ export class RecoveryPasswordComponent implements OnInit, OnDestroy {
   @ViewChild('passwordComponent') passwordComponent: any;
 
   getState: Observable<any>;
-  subscription: Subscription | undefined;
+  subscription?: Subscription;
   showError = false;
   locale: string;
 

@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
-import { HttpClientModule } from '@angular/common/http';
+import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
 import { AgmCoreModule } from '@agm/core';
@@ -22,6 +22,10 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatRadioModule } from '@angular/material/radio';
 import { ReservationCompleteComponent } from './detail/complete/reservation-complete.component';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+
+export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
+  new TranslateHttpLoader(http, './assets/i18n/reservation/', '.json');
 
 @NgModule({
   declarations: [
@@ -41,7 +45,6 @@ import { ReservationCompleteComponent } from './detail/complete/reservation-comp
     FormsModule,
     ReactiveFormsModule,
     AppMaterialModule,
-    TranslateModule,
     MatFabMenuModule,
     CalendarModule,
     MatRadioModule,
@@ -51,8 +54,18 @@ import { ReservationCompleteComponent } from './detail/complete/reservation-comp
     }),
     MatStepperModule,
     MatChipsModule,
-    MatExpansionModule
+    MatExpansionModule,
+    TranslateModule.forChild({
+      loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient]},
+      isolate: false,
+      extend: true
+    })
   ]
 })
 export class ReservationModule {
+  constructor(protected translateService: TranslateService) {
+    const currentLang = translateService.currentLang;
+    translateService.currentLang = '';
+    translateService.use(currentLang);
+  }
 }

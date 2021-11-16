@@ -34,7 +34,6 @@ import { CookieService } from 'ngx-cookie-service';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { getThemeName, isDarkMode, resetTheme, Theme, THEME } from '../util/theme';
 import { ThemeService } from 'ng2-charts';
-import { formatFullDate, newDate } from '../util/dates';
 
 @Component({
   selector: 'app-nav',
@@ -54,27 +53,28 @@ export class NavComponent implements OnInit, OnDestroy {
   notifications: INotification[] = [];
   workDay: INotification[] = [];
   currentUser!: IUser | null;
-  username: string | undefined;
+  username?: string;
   getState: Observable<any>;
   getNotificationState: Observable<any>;
   canChangePassword = false;
-  authSubscription: Subscription | undefined;
-  notificationSubscription: Subscription | undefined;
+  authSubscription?: Subscription;
+  notificationSubscription?: Subscription;
   language: string;
   isAuthorized = false;
   isProfessional = false;
+  isAdmin = false;
   message: any;
 
-  image: string | undefined;
-  initials: string | undefined;
+  image?: string;
+  initials?: string;
   countNotifications = 0;
-  plusNotification: string | undefined;
+  plusNotification?: string;
 
   isLoading = true;
   error: any;
   incomplete = false;
 
-  cssClass: string | undefined;
+  cssClass?: string;
   checked = false;
 
   constructor(public translate: TranslateService, private breakpointObserver: BreakpointObserver,
@@ -140,25 +140,24 @@ export class NavComponent implements OnInit, OnDestroy {
     const user: IUser = new User();
     user.theme = theme;
     const redirectUrl = this.router.url;
-    const message = this.translate.instant(`PROFILE.UPDATED.DARK_MODE_${checked.toString().toUpperCase()}`);
+    const message = this.translate.instant(`COMMON.PROFILE.UPDATED.DARK_MODE_${checked.toString().toUpperCase()}`);
     this.store.dispatch(
       new fromActionsUser.UpdateUser({user, redirectUrl, message})
     );
   }
 
   private selectStore(states: any[]): void {
-    states.forEach(selectedState => this.store.select(selectedState)
-      .subscribe((state: any) => {
-        this.isLoading = state.isLoading;
-        if (!state.subErrors) {
-          this.error = state.error;
-          if (state.errorMessage || state.message) {
-            this.snackBar.open(state.errorMessage || state.message, 'OK', {
-              duration: 5000
-            });
-          }
+    states.forEach(selectedState => this.store.select(selectedState).subscribe((state: any) => {
+      this.isLoading = state.isLoading;
+      if (!state.subErrors) {
+        this.error = state.error;
+        if (state.errorMessage || state.message) {
+          this.snackBar.open(state.errorMessage || state.message, 'OK', {
+            duration: 5000
+          });
         }
-      }));
+      }
+    }));
   }
 
   private subscribe(): void {
@@ -175,6 +174,7 @@ export class NavComponent implements OnInit, OnDestroy {
         this.checked = isDarkMode(this.currentUser.theme);
         this.resetTheme(this.currentUser.theme);
         this.isProfessional = user.authorities.some(u => u.authority === Role.professional);
+        this.isAdmin = user.authorities.some(u => u.authority === Role.admin);
         this.menuItems = state.menus;
         this.canChangePassword = user?.provider === 'LOCAL';
         this.username = getUserName(user);

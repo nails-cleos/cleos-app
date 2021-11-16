@@ -318,6 +318,20 @@
     }
   }
 
+  .active-link {
+    color: mat.get-color-from-palette($primary-palette) !important;
+  }
+
+  mat-drawer-container {
+    .footer {
+      border-top: 2px solid mat.get-color-from-palette($background, disabled-button);
+
+      a {
+        color: mat.get-color-from-palette($foreground, base);
+      }
+    }
+  }
+
   .stepper-item .step-counter {
     background: mat.get-color-from-palette($background, unselected-chip) !important;
   }

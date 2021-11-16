@@ -2,118 +2,23 @@
   <div class="flex-container" fxLayout="column">
     <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
       <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
-        <mat-card *ngIf="!noContent; else noUpcoming" class="upcoming">
-          <span *ngIf="price.isPaid" [@stampAnimation]="{value: ':enter', params: {deg: -20}}"
-                class="stamp stamp-paid">{{ 'RESERVATION.UPCOMING.PAID' | translate }}</span>
-          <span *ngIf="upcoming?.state === 'APPROVED'" [@stampAnimation]="{value: ':enter', params: {deg: 20}}"
-                class="stamp stamp-approved">{{ 'RESERVATION.UPCOMING.APPROVED' | translate }}</span>
-          <mat-card-header *ngIf="upcoming.id; else headSkeleton">
-            <mat-card-title>{{ 'RESERVATION.UPCOMING.TITLE' | translate }}</mat-card-title>
-            <mat-card-subtitle>{{ upcoming.id }}</mat-card-subtitle>
-          </mat-card-header>
-          <ng-template #headSkeleton>
-            <div class="divider-padding-bottom">
-              <div class="ssc-head-line"></div>
-            </div>
-            <mat-divider></mat-divider>
+        <div *ngIf="!noContent; else noUpcoming">
+          <div *ngIf="upcoming && upcoming.length > 1; else onlyOne">
+            <mat-card-title>{{ 'ME.RESERVATION.UPCOMING.TITLE' | translate }}</mat-card-title>
+            <mat-tab-group class="mat-elevation-z4">
+              <mat-tab *ngFor="let up of upcoming" label="{{up.start  | date:'short':undefined:language}}">
+                <app-upcoming [upcoming]="up" [showHeader]="false"></app-upcoming>
+              </mat-tab>
+            </mat-tab-group>
+          </div>
+          <ng-template #onlyOne>
+            <app-upcoming *ngIf="upcoming" [upcoming]="upcoming[0]" [showHeader]="true"></app-upcoming>
           </ng-template>
-          <mat-divider *ngIf="upcoming.id"></mat-divider>
-          <mat-card-content>
-            <div class="container">
-              <table>
-                <tr *ngIf="upcoming.id; else skeleton">
-                  <td class="right">{{ 'RESERVATION.UPCOMING.START' | translate }}</td>
-                  <td class="left">{{upcoming.start | date:'short':undefined:language}}</td>
-                </tr>
-                <tr *ngIf="end; else skeleton">
-                  <td class="right">{{ 'RESERVATION.UPCOMING.END' | translate }}</td>
-                  <td class="left">{{end | date:'short':undefined:language}}</td>
-                </tr>
-                <tr *ngIf="upcoming.id; else skeleton">
-                  <td class="right">{{ 'ROOM.FIELD' | translate }}</td>
-                  <td class="left">{{upcoming.room.name}}</td>
-                </tr>
-                <tr *ngIf="upcoming.id; else skeleton">
-                  <td class="right">{{ 'COMMON.ADDRESS.FIELD' | translate }}</td>
-                  <td class="left">
-                    <a [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + upcoming.room.address.name"
-                       rel="noreferrer" target="_blank">
-                      {{upcoming.room.address.name}}
-                    </a>
-                  </td>
-                </tr>
-                <tr *ngIf="upcoming.id; else skeleton">
-                  <td class="right">{{ 'PRODUCT.FIELD' | translate }}</td>
-                  <td class="left">{{upcoming.product.name}}</td>
-                </tr>
-                <tr *ngIf="upcoming.id; else skeleton">
-                  <td class="right">{{ 'PRODUCT.PRICE.FIELD' | translate }}</td>
-                  <td *ngIf="price.discount; else noDiscount" class="left">
-                    <span [class.strikethrough]="price.amount">$ {{price.amount | number:'1.2-2'}}</span>
-                    <span [@discountAnimation]
-                          class="raised-button bold">$ {{price.priceWithDiscount | number:'1.2-2'}}</span>
-                  </td>
-                  <ng-template #noDiscount>
-                    <td class="left">$ {{price.amount | number:'1.2-2'}}</td>
-                  </ng-template>
-                </tr>
-                <tr *ngIf="rowSpan">
-                  <td [rowSpan]="rowSpan" class="right">{{ 'ADDITIONAL.FIELD' | translate }}</td>
-                  <td class="left">
-                    <div *ngFor="let additional of upcoming.additional">
-                      {{additional.name}} - ${{additional.price | number:'1.2-2'}}
-                    </div>
-                  </td>
-                </tr>
-                <tr *ngIf="rowSpan">
-                  <td class="right">{{ 'COMMON.LABEL.TOTAL' | translate }}</td>
-                  <td class="left bold">${{price.total | number:'1.2-2'}}</td>
-                </tr>
-                <tr *ngIf="price.totalPaid">
-                  <td class="right">{{ 'RESERVATION.UPCOMING.PAID' | translate }}</td>
-                  <td class="left">$ {{price.totalPaid | number:'1.2-2'}}</td>
-                </tr>
-              </table>
-              <div *ngIf="upcoming && upcoming.state === 'CREATED'" class="red-text">
-                {{ 'RESERVATION.UPCOMING.CREATED' | translate }} <span class="bold">
-                {{professionalName}}
-              </span>
-              </div>
-              <div *ngIf="upcoming && upcoming.state === 'APPROVED'" class="red-text">
-                {{ 'RESERVATION.UPCOMING.PAY_NOW' | translate }}
-              </div>
-            </div>
-            <ng-template #skeleton>
-              <div class="ssc-line"></div>
-            </ng-template>
-          </mat-card-content>
-          <mat-divider *ngIf="upcoming"></mat-divider>
-          <mat-card-actions *ngIf="upcoming.id; else buttonSkeleton">
-            <div fxFlex></div>
-            <button *ngIf="upcoming?.state === 'APPROVED' || upcoming?.state === 'PARTIALLY_PAID'"
-                    [routerLink]="['/me', 'reservation', upcoming.id, 'payment']" mat-raised-button>
-              <mat-icon class="ml-button" color="primary">payment</mat-icon>
-              <span fxHide.lt-sm fxShow>{{ 'COMMON.BUTTON.ML' | translate }}</span>
-            </button>
-            <button [routerLink]="['/me', 'reservation', upcoming.id]" color="primary" mat-raised-button>
-              <mat-icon>edit_calendar</mat-icon>
-              <span fxHide.lt-sm fxShow>{{ 'COMMON.BUTTON.EDIT' | translate }}</span>
-            </button>
-            <button [routerLink]="['/reservation', upcoming.id]" color="primary" mat-raised-button>
-              <mat-icon>visibility</mat-icon>
-              <span fxHide.lt-sm fxShow>{{ 'COMMON.BUTTON.VIEW' | translate }}</span>
-            </button>
-          </mat-card-actions>
-          <ng-template #buttonSkeleton>
-            <div class="divider-padding">
-              <div class="ssc-head-line"></div>
-            </div>
-          </ng-template>
-        </mat-card>
+        </div>
         <ng-template #noUpcoming>
           <mat-card>
             <mat-card-header>
-              <mat-card-title>{{ 'RESERVATION.UPCOMING.NO_UPCOMING.TITLE' | translate }}</mat-card-title>
+              <mat-card-title>{{ 'ME.RESERVATION.UPCOMING.NO_UPCOMING.TITLE' | translate }}</mat-card-title>
             </mat-card-header>
             <mat-divider></mat-divider>
             <mat-card-actions>
@@ -143,7 +48,7 @@
 
     <ng-container matColumnDef="professional">
       <th *matHeaderCellDef fxHide.lt-sm fxShow
-          mat-header-cell>{{ 'RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</th>
+          mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</th>
       <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
         <div
           *ngIf="reservation.id; else skeleton">{{getProfessionalName(reservation)}}</div>
@@ -155,7 +60,7 @@
 
     <ng-container matColumnDef="start">
       <th *matHeaderCellDef mat-header-cell
-          mat-sort-header>{{ 'RESERVATION.LIST.COLUMN.START' | translate }}</th>
+          mat-sort-header>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</th>
       <td *matCellDef="let reservation" mat-cell>
         <div *ngIf="reservation.id; else skeleton">{{reservation.start | date:'short':undefined:language}}</div>
         <ng-template #skeleton>
@@ -165,7 +70,7 @@
     </ng-container>
 
     <ng-container matColumnDef="product">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'RESERVATION.LIST.COLUMN.PRODUCT' | translate }}</th>
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.PRODUCT' | translate }}</th>
       <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="reservation.id; else skeleton">{{reservation.product.name}}</div>
         <ng-template #skeleton>
@@ -176,11 +81,11 @@
 
     <ng-container matColumnDef="state">
       <th *matHeaderCellDef mat-header-cell
-          mat-sort-header>{{ 'RESERVATION.LIST.COLUMN.STATE' | translate }}</th>
+          mat-sort-header>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</th>
       <td *matCellDef="let reservation" mat-cell>
         <div *ngIf="reservation.id; else skeleton">
           <mat-icon matPrefix>{{getIcon(reservation.state)}}</mat-icon>&nbsp;
-          {{ 'RESERVATION.STATE.' + reservation.state | translate}}
+          {{ 'COMMON.STATUS.RESERVATION.' + reservation.state | translate}}
         </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -209,7 +114,7 @@
 
     <ng-container matColumnDef="noContent">
       <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-        {{ 'RESERVATION.LIST.ERROR.NO_CONTENT' | translate }}</td>
+        {{ 'COMMON.RESERVATION.LIST.ERROR.NO_CONTENT' | translate }}</td>
     </ng-container>
 
     <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>

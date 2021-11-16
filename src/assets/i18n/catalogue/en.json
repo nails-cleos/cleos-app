@@ -1,0 +1,39 @@
+{
+  "CATALOGUE": {
+    "TITLE": "Add catalogue",
+    "CREATED": "Catalogue {{name}} created",
+    "DETAIL": "Update catalogue",
+    "NAME": {
+      "FIELD": "Name",
+      "REQUIRED": "Name is <b>required</b>"
+    },
+    "DESCRIPTION": {
+      "FIELD": "Description"
+    },
+    "SHOW": {
+      "HOME": "Show in home",
+      "CATALOG": "Show in catalog"
+    },
+    "FILE": {
+      "DRAG_DROP": "Drag and drop file here",
+      "OR": "or",
+      "CHOOSE": "Choose a file"
+    },
+    "DELETE": {
+      "BUTTON": "Delete image {{name}}",
+      "MESSAGE": "Image {{name}} deleted",
+      "UNDO": "Undo"
+    },
+    "DELETED": {
+      "TITLE": "Delete catalogue",
+      "CONTENT": "Are you sure to delete catalogue {{name}}?",
+      "MESSAGE": "Catalogue {{name}} deleted"
+    },
+    "UPDATED": {
+      "ALL": {
+        "MESSAGE": "Sorted catalogs"
+      },
+      "MESSAGE": "Catalogue {{name}} updated"
+    }
+  }
+}

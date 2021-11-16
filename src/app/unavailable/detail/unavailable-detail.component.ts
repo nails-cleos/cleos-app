@@ -8,7 +8,7 @@ import { AppState, selectUnavailableState } from '../../store/app.states';
 import { fieldChange, valueChange } from '../../util/validators';
 import * as fromActionsUnavailable from '../../store/unavailable.actions';
 import {
-  API_LOCALE,
+  API_LOCALE, createEndDate,
   createNewDate,
   diffTime,
   filterDate,
@@ -241,7 +241,7 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
           start: state.selected.start,
           end: state.selected.end,
           startDate: date,
-          endDate: newDate(state.selected.end),
+          endDate: createEndDate(state.selected.end),
           startTime: getTime(date, API_LOCALE),
           duration: state.selected.duration ? formatDuration(state.selected.duration, API_LOCALE) : '',
           repeat: state.selected.repeat,

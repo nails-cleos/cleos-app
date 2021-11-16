@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../../store/app.states';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as fromActionsReservation from '../../../store/reservation.actions';
-import { IReservationAll, States } from '../../../interfaces/reservation';
+import { IReservationAll} from '../../../interfaces/reservation';
 import { IPrice, IProduct, IProductGroup, Price } from '../../../interfaces/product';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';

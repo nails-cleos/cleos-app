@@ -63,8 +63,8 @@
       </ng-template>
     </mat-card>
   </mat-drawer>
-  <mat-drawer-content>
-    <mat-toolbar color="primary">
+  <mat-drawer-content class="page-wrap">
+    <mat-toolbar class="header" color="primary">
       <button (click)="drawer.toggle()" *ngIf="isHandset$ | async"
               aria-label="Toggle sidenav" mat-icon-button type="button">
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
@@ -97,7 +97,7 @@
             </mat-list-item>
             <mat-list-item>
               <button color="primary" mat-button routerLink="/notifications">
-                {{'NOTIFICATION.LOAD_MORE' | translate}}
+                {{'COMMON.NOTIFICATION.LOAD_MORE' | translate}}
               </button>
             </mat-list-item>
           </mat-list>
@@ -116,7 +116,8 @@
         </ng-template>
         <mat-menu #menuWorkDay="matMenu" xPosition="before">
           <mat-list>
-            <mat-list-item (click)="notification(not)" *ngFor="let not of workDay; last as isLast" class="pointer" matRipple>
+            <mat-list-item (click)="notification(not)" *ngFor="let not of workDay; last as isLast" class="pointer"
+                           matRipple>
               <div [matTooltip]="not.message" mat-line>{{not.message}}</div>
               <mat-divider *ngIf="!isLast" class="divider"></mat-divider>
             </mat-list-item>
@@ -147,7 +148,7 @@
             <mat-divider></mat-divider>
             <mat-list-item>
               <mat-slide-toggle (change)="setTheme($event.checked)" [checked]="checked"
-                                mat-line>{{'DASHBOARD.DARK_MODE' | translate }}</mat-slide-toggle>
+                                mat-line>{{'COMMON.DASHBOARD.DARK_MODE' | translate }}</mat-slide-toggle>
             </mat-list-item>
             <mat-divider></mat-divider>
             <a *ngIf="canChangePassword" [routerLink]="'/auth/change-password'" mat-list-item>
@@ -169,14 +170,32 @@
         </button>
       </ng-template>
     </mat-toolbar>
-    <div [ngClass]="{'loading': isLoading}" class="grid-container">
+    <main [ngClass]="{'loading': isLoading}" class="content">
       <div *ngIf="isLoading" class="spinner-vertical" style="z-index: 999">
         <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
       </div>
-      <router-outlet *ngIf="!error; else errorBox"></router-outlet>
+      <div class="grid-container">
+        <router-outlet *ngIf="!error; else errorBox"></router-outlet>
+      </div>
       <ng-template #errorBox>
         <app-error [error]="error"></app-error>
       </ng-template>
-    </div>
+    </main>
+    <footer>
+      <mat-toolbar *ngIf="(isHandset$ | async) && (isProfessional || isAdmin)" class="footer">
+        <a routerLink="/reservation/calendar" [routerLinkActive]="['active-link']">
+          <mat-icon>event</mat-icon>
+        </a>
+        <a routerLink="/dashboard" [routerLinkActive]="['active-link']">
+          <mat-icon>dashboard</mat-icon>
+        </a>
+        <a *ngIf="isAdmin" routerLink="/users/add" [routerLinkActive]="['active-link']">
+          <mat-icon>person_add</mat-icon>
+        </a>
+        <a routerLink="/unavailable/add" [routerLinkActive]="['active-link']">
+          <mat-icon>event_busy</mat-icon>
+        </a>
+      </mat-toolbar>
+    </footer>
   </mat-drawer-content>
 </mat-drawer-container>

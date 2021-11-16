@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
-import { HttpClientModule } from '@angular/common/http';
+import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppMaterialModule } from '../util/app-material.module';
@@ -14,6 +14,10 @@ import { CataloguesComponent } from './list/catalogues.component';
 import { CatalogueDetailComponent } from './detail/catalogue-detail.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+
+export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
+  new TranslateHttpLoader(http, './assets/i18n/catalogue/', '.json');
 
 @NgModule({
   declarations: [
@@ -26,14 +30,23 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     CatalogueRoutingModule,
     SharedModule,
     CommonModule,
-    TranslateModule,
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
     AppMaterialModule,
     MatProgressBarModule,
-    DragDropModule
+    DragDropModule,
+    TranslateModule.forChild({
+      loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient]},
+      isolate: false,
+      extend: true
+    })
   ]
 })
 export class CatalogueModule {
+  constructor(protected translateService: TranslateService) {
+    const currentLang = translateService.currentLang;
+    translateService.currentLang = '';
+    translateService.use(currentLang);
+  }
 }

@@ -48,9 +48,8 @@ import { IUnavailableAll } from '../interfaces/unavailable';
 import { DiscountType, IUserDiscount } from '../interfaces/discount';
 import { getFullUserName, getPrice, getUserName, newAdditional, newDiscount, newPrice } from '../util/helper';
 import { transitionAnimation } from '../util/animation';
-import { addDays, addMonths, isEqual } from 'date-fns';
+import { addDays, addMonths, isEqual, isSameDay } from 'date-fns';
 import { findStateColor, isDarkMode } from '../util/theme';
-import RRule from 'rrule';
 import { IAdditionalAll } from '../interfaces/additional';
 import { MatListOption } from '@angular/material/list';
 
@@ -70,20 +69,20 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   errors: any = [];
 
   customerForm!: FormGroup;
-  customers: IUserAll[] | undefined;
-  filteredCustomer: Observable<IUser[] | undefined> | undefined;
+  customers?: IUserAll[];
+  filteredCustomer?: Observable<IUser[] | undefined>;
   customer: FormControl = new FormControl('', [
     Validators.required, requireMatch
   ]);
 
   productForm!: FormGroup;
-  groups: IProductGroup[] | undefined;
-  filteredGroup: Observable<IProductGroup[] | undefined> | undefined;
+  groups?: IProductGroup[];
+  filteredGroup?: Observable<IProductGroup[] | undefined>;
   group: FormControl = new FormControl('', [
     Validators.required, requireMatch
   ]);
-  products: IProduct[] | undefined;
-  filteredProduct: Observable<IProduct[] | undefined> | undefined;
+  products?: IProduct[];
+  filteredProduct?: Observable<IProduct[] | undefined>;
   product: FormControl = new FormControl('', [
     Validators.required, requireMatch
   ]);
@@ -602,19 +601,13 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
             this.validateUnavailableEvent(start, duration, it);
           }
         } else {
-          recurringEvents = [...recurringEvents, createRecurringEvent(it.repeat, start, this.viewDate, it, duration)];
+          recurringEvents = [...recurringEvents, createRecurringEvent(start, this.viewDate, it, duration)];
         }
       }
     });
 
     recurringEvents.forEach(recurring => {
-      const rule: RRule = new RRule({
-        ...recurring.rrule,
-        dtstart: recurring.startDate,
-        until: recurring.end
-      });
-
-      rule.all().forEach((date) =>
+      recurring.rrule.all().forEach((date: Date) =>
         this.validateUnavailableEvent(date, recurring.duration, recurring.it));
     });
   }
@@ -635,7 +628,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
               this.events = [...this.events, value];
             }
           }
-          if (!this.events.find(ce => ce.id === `unavailable/${it.id}`)) {
+          if (!this.events.find(ce => ce.id === `unavailable/${it.id}` && isSameDay(value.start, ce.start))) {
             this.createUnavailableEvent(it, start, end);
           }
         }

@@ -57,7 +57,7 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         // @ts-ignore
-        customerReservation: {reservations: {content: [{}, {}, {}], totalElements: 3}, upcoming: {}},
+        customerReservation: {reservations: {content: [{}, {}, {}], totalElements: 3}, upcoming: [{}]},
         errorMessage: null,
         error: null,
         subErrors: null,

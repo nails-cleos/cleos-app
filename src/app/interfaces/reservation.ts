@@ -1,5 +1,5 @@
 import { IUser, IUserAll } from './user';
-import { IProduct, IProductAll } from './product';
+import { IPrice, IProduct, IProductAll } from './product';
 import { IRoom, IRoomAll } from './room';
 import { CalendarEvent } from 'angular-calendar';
 import { ThemePalette } from '@angular/material/core';
@@ -36,6 +36,13 @@ export interface IReservationAll {
   additional?: IAdditionalAll[];
 }
 
+export interface IUpcomingAll extends IReservationAll{
+  payments: IPayment[];
+  price: IPrice;
+  end: Date;
+  rowSpan: number;
+}
+
 export interface IPaymentReservation {
   reservation: IReservationAll;
   payments: IPaymentAll[];
@@ -49,8 +56,7 @@ export interface IRoomReservation {
 
 export interface ICustomerReservation {
   reservations: Pagination<IReservationAll>;
-  upcoming: IReservationAll;
-  currentReservationPayments: IPayment[];
+  upcoming: IUpcomingAll[];
 }
 
 export interface IAvailableDTO {
@@ -92,7 +98,7 @@ export interface IReservationOverview {
   icon?: string;
   split?: boolean;
   error?: any;
-  link?: (reservationId: string | undefined) => void;
+  link?: (reservationId?: string) => void;
 }
 
 export interface ITracking {

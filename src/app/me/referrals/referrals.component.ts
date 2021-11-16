@@ -49,7 +49,7 @@ export class ReferralsComponent implements OnInit, OnDestroy {
   copy(): void {
     if (this.user) {
       this.clipboard.copy(this.user.id);
-      this.snackBar.open(this.translate.instant('REFERRAL.COPY'), 'OK', {
+      this.snackBar.open(this.translate.instant('ME.REFERRAL.COPY'), 'OK', {
         duration: 5000
       });
     }
@@ -102,7 +102,7 @@ export class BottomSheetShareComponent {
   image = `${this.url}/assets/icons/icon-512x512.png`;
 
   constructor(@Inject(MAT_BOTTOM_SHEET_DATA) public data: { code: string }, private translate: TranslateService) {
-    this.message = this.translate.instant('REFERRAL.LINK', {
+    this.message = this.translate.instant('ME.REFERRAL.LINK', {
       code: data.code,
       url: `${this.url}/auth?code=${data.code}`
     });

@@ -4,7 +4,7 @@
       <form (ngSubmit)="complete()" [formGroup]="form" novalidate>
         <mat-card class="style-card">
           <mat-card-header>
-            <mat-card-title>{{ 'RESERVATION.DETAIL' | translate }}</mat-card-title>
+            <mat-card-title>{{ 'RESERVATION.CUSTOMER.DETAIL' | translate }}</mat-card-title>
             <mat-card-subtitle
               *ngIf="reservation; else skeleton">{{customerName}}</mat-card-subtitle>
             <ng-template #skeleton>
@@ -14,7 +14,7 @@
           <mat-card-content *ngIf="reservation; else boxSkeleton">
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <mat-form-field *ngIf="groups; else skeleton" appearance="fill">
-                <mat-label>{{ 'PRODUCT.GROUP.FIELD' | translate }}</mat-label>
+                <mat-label>{{ 'COMMON.PRODUCT.GROUP.FIELD' | translate }}</mat-label>
                 <label>
                   <input (keydown)="keyDownHandler($event, group)" [formControl]="group" [matAutocomplete]="autoGroup"
                          matInput required type="text">
@@ -25,14 +25,14 @@
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="group.hasError('required')"
-                           [innerHTML]="'PRODUCT.GROUP.REQUIRED' | translate">
+                           [innerHTML]="'COMMON.PRODUCT.GROUP.REQUIRED' | translate">
                 </mat-error>
                 <mat-error *ngIf="group.hasError('requireMatch')"
-                           [innerHTML]="'PRODUCT.GROUP.INVALID' | translate">
+                           [innerHTML]="'COMMON.PRODUCT.GROUP.INVALID' | translate">
                 </mat-error>
               </mat-form-field>
               <mat-form-field *ngIf="products" appearance="fill">
-                <mat-label>{{ 'PRODUCT.FIELD' | translate }}</mat-label>
+                <mat-label>{{ 'COMMON.PRODUCT.FIELD' | translate }}</mat-label>
                 <label>
                   <input (keydown)="keyDownHandler($event, product)" [formControl]="product"
                          [matAutocomplete]="autoProduct"
@@ -45,10 +45,10 @@
                 </mat-autocomplete>
                 <mat-icon matSuffix>home_repair_service</mat-icon>
                 <mat-error *ngIf="product.hasError('required')"
-                           [innerHTML]="'PRODUCT.REQUIRED' | translate">
+                           [innerHTML]="'COMMON.PRODUCT.REQUIRED' | translate">
                 </mat-error>
                 <mat-error *ngIf="product.hasError('requireMatch')"
-                           [innerHTML]="'PRODUCT.INVALID' | translate">
+                           [innerHTML]="'COMMON.PRODUCT.INVALID' | translate">
                 </mat-error>
               </mat-form-field>
               <mat-form-field appearance="fill">
@@ -71,7 +71,7 @@
               <mat-list>
                 <mat-list-item *ngIf="product.value">
                   <mat-icon mat-list-icon>home_repair_service</mat-icon>
-                  <div class="bold" mat-subheader>{{ 'PRODUCT.FIELD' | translate}}</div>
+                  <div class="bold" mat-subheader>{{ 'COMMON.PRODUCT.FIELD' | translate}}</div>
                 </mat-list-item>
                 <mat-list-item *ngIf="product.value" style="text-align: center">
                   <div [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.GROUP' |
@@ -96,7 +96,7 @@
                 </mat-list-item>
                 <mat-list-item *ngIf="additionalList && additionalList.length">
                   <mat-icon mat-list-icon>add_post</mat-icon>
-                  <div class="bold" mat-subheader>{{ 'ADDITIONAL.FIELD' | translate}}</div>
+                  <div class="bold" mat-subheader>{{ 'COMMON.ADDITIONAL.FIELD' | translate}}</div>
                 </mat-list-item>
                 <mat-list-item *ngIf="additionalList && additionalList.length">
                   <mat-selection-list #additional (selectionChange)="onChange(additional.selectedOptions.selected)">

@@ -15,8 +15,8 @@ import { API_LOCALE, createNewDate, formatDuration, getNow, getTime } from '../.
   styleUrls: ['./product-detail.component.scss']
 })
 export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild('inputName') inputName: ElementRef<HTMLInputElement> | undefined;
-  @Input() group: IProductGroup | undefined;
+  @ViewChild('inputName') inputName?: ElementRef<HTMLInputElement>;
+  @Input() group?: IProductGroup;
 
   form!: FormGroup;
 
@@ -28,7 +28,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   errors: any = [];
 
-  private subscription: Subscription | undefined;
+  private subscription?: Subscription;
   private getState: Observable<any>;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,

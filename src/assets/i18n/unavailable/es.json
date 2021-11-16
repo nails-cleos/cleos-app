@@ -1,0 +1,55 @@
+{
+  "UNAVAILABLE": {
+    "FIELD": "Ocupado",
+    "TITLE": "Agregar no disponible",
+    "CREATED": "No disponible {{date}} creado",
+    "DETAIL": "Actualizar no disponible",
+    "LIST": {
+      "COLUMN": {
+        "PROFESSIONAL": "Profesional",
+        "START": "Inicio",
+        "DURATION": "Duración",
+        "REPEAT": "Repetir"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No hay eventos"
+      }
+    },
+    "DESCRIPTION": {
+      "FIELD": "Descripción"
+    },
+    "PROFESSIONAL": {
+      "FIELD": "Profesional",
+      "REQUIRED": "Profesional es <b>requerido</b>",
+      "INVALID": "Profesional no valido"
+    },
+    "DATE": {
+      "FIELD": "Elegí fecha inicio",
+      "REQUIRED": "Inicio es <b>requerido</b>"
+    },
+    "TIME": {
+      "FIELD": "Elegí una hora",
+      "REQUIRED": "Hora es <b>requerida</b>"
+    },
+    "DURATION": {
+      "FIELD": "Duración",
+      "REQUIRED": "Duración es <b>requerido</b>"
+    },
+    "REPEAT": {
+      "FIELD": "Repetir"
+    },
+    "END": {
+      "FIELD": "Elegí fecha fin",
+      "REQUIRED": "Fecha fin es <b>requerido</b>",
+      "GREATER": "Fecha fin debe ser mayor que inicio"
+    },
+    "DELETED": {
+      "TITLE": "Eliminar no disponible",
+      "CONTENT": "¿Está seguro de eliminar no disponible {{date}}?",
+      "MESSAGE": "No disponible {{date}} eliminado"
+    },
+    "UPDATED": {
+      "MESSAGE": "No disponible {{date}} actualizado"
+    }
+  }
+}

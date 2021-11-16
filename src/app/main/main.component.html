@@ -34,7 +34,7 @@
       <mat-nav-list>
         <mat-list-item>
             <mat-slide-toggle (change)="setTheme($event.checked)" [checked]="checked"
-                              mat-line>{{'DASHBOARD.DARK_MODE' | translate }}</mat-slide-toggle>
+                              mat-line>{{'COMMON.DASHBOARD.DARK_MODE' | translate }}</mat-slide-toggle>
         </mat-list-item>
       </mat-nav-list>
     </mat-menu>
@@ -72,7 +72,7 @@
         <mat-divider></mat-divider>
         <mat-list-item>
           <mat-slide-toggle (change)="setTheme($event.checked)" [checked]="checked"
-                            mat-line>{{'DASHBOARD.DARK_MODE' | translate }}</mat-slide-toggle>
+                            mat-line>{{'COMMON.DASHBOARD.DARK_MODE' | translate }}</mat-slide-toggle>
         </mat-list-item>
         <mat-divider></mat-divider>
         <a (click)="redirect()" *ngIf="isAuthenticated; else login" [routerLinkActive]="['active']"

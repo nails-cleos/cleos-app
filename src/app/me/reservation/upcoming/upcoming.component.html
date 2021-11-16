@@ -1,0 +1,108 @@
+<mat-card *ngIf="upcoming" class="upcoming">
+  <span *ngIf="upcoming.price?.isPaid" [@stampAnimation]="{value: ':enter', params: {deg: -20}}"
+        class="stamp stamp-paid">{{ 'ME.RESERVATION.UPCOMING.PAID' | translate }}</span>
+  <span *ngIf="upcoming.state === 'APPROVED'" [@stampAnimation]="{value: ':enter', params: {deg: 20}}"
+        class="stamp stamp-approved">{{ 'ME.RESERVATION.UPCOMING.APPROVED' | translate }}</span>
+  <mat-card-header *ngIf="upcoming.id; else headSkeleton">
+    <mat-card-title *ngIf="showHeader">{{ 'ME.RESERVATION.UPCOMING.TITLE' | translate }}</mat-card-title>
+    <mat-card-subtitle>{{ upcoming.id }}</mat-card-subtitle>
+  </mat-card-header>
+  <ng-template #headSkeleton>
+    <div class="divider-padding-bottom">
+      <div class="ssc-head-line"></div>
+    </div>
+    <mat-divider></mat-divider>
+  </ng-template>
+  <mat-divider *ngIf="upcoming.id"></mat-divider>
+  <mat-card-content>
+    <div class="container">
+      <table>
+        <tr *ngIf="upcoming.id; else skeleton">
+          <td class="right">{{ 'ME.RESERVATION.UPCOMING.START' | translate }}</td>
+          <td class="left">{{upcoming.start | date:'short':undefined:language}}</td>
+        </tr>
+        <tr *ngIf="upcoming.end; else skeleton">
+          <td class="right">{{ 'ME.RESERVATION.UPCOMING.END' | translate }}</td>
+          <td class="left">{{upcoming.end | date:'short':undefined:language}}</td>
+        </tr>
+        <tr *ngIf="upcoming.id; else skeleton">
+          <td class="right">{{ 'COMMON.ROOM.FIELD' | translate }}</td>
+          <td class="left">{{upcoming.room.name}}</td>
+        </tr>
+        <tr *ngIf="upcoming.id; else skeleton">
+          <td class="right">{{ 'COMMON.ADDRESS.FIELD' | translate }}</td>
+          <td class="left">
+            <a [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + upcoming.room.address.name"
+               rel="noreferrer" target="_blank">
+              {{upcoming.room.address.name}}
+            </a>
+          </td>
+        </tr>
+        <tr *ngIf="upcoming.id; else skeleton">
+          <td class="right">{{ 'COMMON.PRODUCT.FIELD' | translate }}</td>
+          <td class="left">{{upcoming.product.name}}</td>
+        </tr>
+        <tr *ngIf="upcoming.price; else skeleton">
+          <td class="right">{{ 'ME.RESERVATION.PRODUCT.PRICE.FIELD' | translate }}</td>
+          <td *ngIf="upcoming.price.discount; else noDiscount" class="left">
+            <span [class.strikethrough]="upcoming.price.amount">$ {{upcoming.price.amount | number:'1.2-2'}}</span>
+            <span [@discountAnimation]
+                  class="raised-button bold">$ {{upcoming.price.priceWithDiscount | number:'1.2-2'}}</span>
+          </td>
+          <ng-template #noDiscount>
+            <td class="left">$ {{upcoming.price.amount | number:'1.2-2'}}</td>
+          </ng-template>
+        </tr>
+        <tr *ngIf="upcoming.rowSpan">
+          <td [rowSpan]="upcoming.rowSpan" class="right">{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</td>
+          <td class="left">
+            <div *ngFor="let additional of upcoming.additional">
+              {{additional.name}} - ${{additional.price | number:'1.2-2'}}
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="upcoming.rowSpan">
+          <td class="right">{{ 'COMMON.LABEL.TOTAL' | translate }}</td>
+          <td class="left bold">${{upcoming.price?.total | number:'1.2-2'}}</td>
+        </tr>
+        <tr *ngIf="upcoming.price && upcoming.price.totalPaid">
+          <td class="right">{{ 'ME.RESERVATION.UPCOMING.PAID' | translate }}</td>
+          <td class="left">$ {{upcoming.price.totalPaid | number:'1.2-2'}}</td>
+        </tr>
+      </table>
+      <div *ngIf="upcoming.state === 'CREATED'" class="red-text">
+        {{ 'ME.RESERVATION.UPCOMING.CREATED' | translate }} <span class="bold">
+                {{professionalName}}
+              </span>
+      </div>
+      <div *ngIf="upcoming.state === 'APPROVED'" class="red-text">
+        {{ 'ME.RESERVATION.UPCOMING.PAY_NOW' | translate }}
+      </div>
+    </div>
+    <ng-template #skeleton>
+      <div class="ssc-line"></div>
+    </ng-template>
+  </mat-card-content>
+  <mat-divider></mat-divider>
+  <mat-card-actions *ngIf="upcoming.id; else buttonSkeleton">
+    <div fxFlex></div>
+    <button *ngIf="upcoming.state === 'APPROVED' || upcoming.state === 'PARTIALLY_PAID'"
+            [routerLink]="['/me', 'reservation', upcoming.id, 'payment']" mat-raised-button>
+      <mat-icon class="ml-button" color="primary">payment</mat-icon>
+      <span fxHide.lt-sm fxShow>{{ 'COMMON.BUTTON.ML' | translate }}</span>
+    </button>
+    <button [routerLink]="['/me', 'reservation', upcoming.id]" color="primary" mat-raised-button>
+      <mat-icon>edit_calendar</mat-icon>
+      <span fxHide.lt-sm fxShow>{{ 'COMMON.BUTTON.EDIT' | translate }}</span>
+    </button>
+    <button [routerLink]="['/reservation', upcoming.id]" color="primary" mat-raised-button>
+      <mat-icon>visibility</mat-icon>
+      <span fxHide.lt-sm fxShow>{{ 'COMMON.BUTTON.VIEW' | translate }}</span>
+    </button>
+  </mat-card-actions>
+  <ng-template #buttonSkeleton>
+    <div class="divider-padding">
+      <div class="ssc-head-line"></div>
+    </div>
+  </ng-template>
+</mat-card>

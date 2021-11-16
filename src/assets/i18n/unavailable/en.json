@@ -1,0 +1,55 @@
+{
+  "UNAVAILABLE": {
+    "FIELD": "Unavailable",
+    "TITLE": "Add unavailable",
+    "CREATED": "Unavailable {{date}} created",
+    "DETAIL": "Update unavailable",
+    "LIST": {
+      "COLUMN": {
+        "PROFESSIONAL": "Professional",
+        "START": "Start",
+        "DURATION": "Duration",
+        "REPEAT": "Repeat"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No events"
+      }
+    },
+    "DESCRIPTION": {
+      "FIELD": "Description"
+    },
+    "PROFESSIONAL": {
+      "FIELD": "Professional",
+      "REQUIRED": "Professional is <b>required</b>",
+      "INVALID": "Professional is invalid"
+    },
+    "DATE": {
+      "FIELD": "Pick start date",
+      "REQUIRED": "Start is <b>required</b>"
+    },
+    "TIME": {
+      "FIELD": "Pick a time",
+      "REQUIRED": "Time is <b>required</b>"
+    },
+    "DURATION": {
+      "FIELD": "Duration",
+      "REQUIRED": "Duration is <b>required</b>"
+    },
+    "REPEAT": {
+      "FIELD": "Repeat"
+    },
+    "END": {
+      "FIELD": "Pick end date",
+      "REQUIRED": "End date is <b>required</b>",
+      "GREATER": "End must be greater than start"
+    },
+    "DELETED": {
+      "TITLE": "Delete unavailable",
+      "CONTENT": "Are you sure to delete unavailable {{date}}?",
+      "MESSAGE": "Unavailable {{date}} deleted"
+    },
+    "UPDATED": {
+      "MESSAGE": "Unavailable {{date}} updated"
+    }
+  }
+}

@@ -3,7 +3,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../../interfaces/pagination';
-import { ICustomerReservation, IReservationAll, States } from '../../../interfaces/reservation';
+import { ICustomerReservation, IReservationAll, IUpcomingAll, States } from '../../../interfaces/reservation';
 import { Observable, Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -12,10 +12,9 @@ import { AppState, selectReservationState } from '../../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ReservationIconKey, ReservationIconName } from '../../../util/icon';
 import * as fromActionsReservation from '../../../store/reservation.actions';
-import { createNewDate, newDate, reservationDuration } from '../../../util/dates';
-import { getPrice, getUserName, snakeToCamel } from '../../../util/helper';
+import { newDate } from '../../../util/dates';
+import { getUserName, snakeToCamel } from '../../../util/helper';
 import { stampAnimation, transitionAnimation } from '../../../util/animation';
-import { IPrice, Price } from '../../../interfaces/product';
 import { IReview, Review } from '../../../interfaces/review';
 import { ReviewDialogComponent } from '../review/review-dialog.component';
 import { isToday } from 'date-fns';
@@ -33,10 +32,9 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   displayedColumns: string[] = ['position', 'professional', 'start', 'product', 'state', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IReservationAll>>();
 
-  upcoming: any = {};
-  price: IPrice;
+  upcoming?: IUpcomingAll[];
   noContent = false;
-  end: Date | undefined;
+  dates?: Date[];
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
@@ -44,16 +42,13 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   language: string;
   error: any;
 
-  rowSpan = 0;
-
-  private data: ICustomerReservation | undefined;
+  private data?: ICustomerReservation;
   private showReview = true;
   private getState: Observable<any>;
-  private subscription: Subscription | undefined;
+  private subscription?: Subscription;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef) {
-    this.price = new Price();
     this.getState = this.store.select(selectReservationState);
     this.language = this.translate.currentLang;
     breakpointObserver.observe([
@@ -64,10 +59,6 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
         this.pageSize = MOBILE_PAGE_SIZE;
       }
     });
-  }
-
-  get professionalName(): string {
-    return this.getProfessionalName(this.upcoming);
   }
 
   getProfessionalName(reservation: any): string {
@@ -106,7 +97,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
       if (result && result.rating) {
         const review: IReview = new Review(result.rating);
         review.reservationId = reservation?.id;
-        review.detail = result.detail ? result.detail : this.translate.instant(`REVIEW.RATING.${result.rating}`);
+        review.detail = result.detail ? result.detail : this.translate.instant(`ME.REVIEW.RATING.${result.rating}`);
         this.store.dispatch(
           new fromActionsReservation.ReservationReview(review)
         );
@@ -125,7 +116,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
       this.error = state.error;
       this.data = state.customerReservation;
       if (this.data) {
-        this.noContent = !this.data.upcoming;
+        this.noContent = !this.data.upcoming || !this.data.upcoming.length;
         if (this.data.reservations) {
           this.dataSource = this.data.reservations.content?.map((reservation: IReservationAll) => {
             if (this.showReview && reservation.state === States.completed
@@ -137,21 +128,9 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
           });
         }
         this.resultsLength = this.data.reservations?.totalElements;
-        this.upcoming = this.data.upcoming ? this.data.upcoming : this.upcoming;
-        if (this.upcoming.additional) {
-          if (this.upcoming.additional.length) {
-            if (this.upcoming.additional.length > 1) {
-              this.rowSpan = this.upcoming.additional.length - 1;
-            } else {
-              this.rowSpan = 1;
-            }
-          }
-        }
-        if (this.upcoming?.id) {
-          this.price = getPrice(this.upcoming, this.data.currentReservationPayments);
-          const duration = reservationDuration(this.upcoming);
-          this.end = newDate(this.upcoming.start);
-          this.end = createNewDate(this.end, this.end.getHours() + duration.hour, this.end.getMinutes() + duration.minute);
+        if (this.data.upcoming && this.data.upcoming.length) {
+          this.upcoming = this.data.upcoming;
+          this.dates = this.upcoming?.map(upcoming => newDate(upcoming.start));
         }
       }
     });

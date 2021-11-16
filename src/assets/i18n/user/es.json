@@ -1,0 +1,49 @@
+{
+  "USER": {
+    "FIELD": "Usuarios",
+    "TITLE": "Agregar usuario",
+    "CUSTOMER": "Cliente {{username}} creado",
+    "PROFESSIONAL": "Profesional {{username}} creado",
+    "DETAIL": "Actualizar usuario",
+    "LIST": {
+      "COLUMN": {
+        "USERNAME": "Nombre de usuario",
+        "EMAIL": "Email",
+        "PROVIDER": "Proveedor",
+        "STATUS": "Estado",
+        "DETAIL": {
+          "TITLE": "Roles"
+        }
+      },
+      "ERROR": {
+        "NO_CONTENT": "No hay usuarios"
+      },
+      "STATUS": {
+        "ENABLED": "Verificado",
+        "DISABLED": "No verificado",
+        "DELETED": "Eliminado"
+      }
+    },
+    "ROLE": {
+      "FIELD": "Roles",
+      "REQUIRED": "Rol es <b>requerido</b>"
+    },
+    "DELETED": {
+      "TITLE": "Eliminar usuario",
+      "CONTENT": "¿Está seguro de eliminar el usuario {{username}}?",
+      "MESSAGE": "Usuario {{username}} eliminado"
+    },
+    "UPDATED": {
+      "MESSAGE": "Usuario {{username}} actualizado"
+    },
+    "ACTIVATION_RESEND": {
+      "TITLE": "Reenviar código de activación",
+      "CONTENT": "¿Está seguro de reenviar el código de activación al usuario {{username}}?",
+      "MESSAGE": "Código de activación enviado"
+    },
+    "ROLES": {
+      "REMOVE": "Rol {{role}} eliminado de {{username}}",
+      "ADD": "Role {{role}} agregado a {{username}}"
+    }
+  }
+}

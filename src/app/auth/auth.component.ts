@@ -19,8 +19,8 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('authGroup') authGroup: any;
 
   getState: Observable<any>;
-  subscription: Subscription | undefined;
-  code: string | undefined | null;
+  subscription?: Subscription;
+  code?: string | null;
   extras: any;
 
   constructor(private socialService: SocialAuthService, private store: Store<AppState>, private route: ActivatedRoute,

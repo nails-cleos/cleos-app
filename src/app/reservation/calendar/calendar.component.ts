@@ -41,7 +41,6 @@ import { getUserName } from '../../util/helper';
 import { addMonths } from 'date-fns';
 import { findStateColor, isDarkMode } from '../../util/theme';
 import { takeUntil } from 'rxjs/operators';
-import RRule from 'rrule';
 import { FormControl } from '@angular/forms';
 
 @Component({
@@ -52,19 +51,19 @@ import { FormControl } from '@angular/forms';
 export class CalendarComponent implements OnInit, OnDestroy {
   @ViewChild('picker') picker: any;
 
-  data: IRoomReservation[] | undefined;
-  calendar: Map<string, ICalendar> | undefined;
+  data?: IRoomReservation[];
+  calendar?: Map<string, ICalendar>;
   daysInWeek = 7;
   hourSegments = 4;
   viewDate: Date = getNow();
   today: Date = getNow();
   maxDate: Date;
   locale: string;
-  professionalId: string | undefined;
+  professionalId?: string;
   prevBtnDisabled = false;
   nextBtnDisabled = false;
 
-  private isDarkMode: boolean | undefined;
+  private isDarkMode?: boolean;
   private selectView: CalendarPeriod = 'day';
   private getState: Observable<any>;
   private destroy$ = new Subject();
@@ -234,19 +233,13 @@ export class CalendarComponent implements OnInit, OnDestroy {
             this.validateUnavailableEvent(rr.room, start, duration, it, darkMode);
           }
         } else {
-          recurringEvents = [...recurringEvents, createRecurringEvent(it.repeat, start, this.today, it, duration)];
+          recurringEvents = [...recurringEvents, createRecurringEvent(start, this.today, it, duration)];
         }
       }
     });
 
     recurringEvents.forEach(recurring => {
-      const rule: RRule = new RRule({
-        ...recurring.rrule,
-        dtstart: recurring.startDate,
-        until: recurring.end
-      });
-
-      rule.all().forEach((date) =>
+      recurring.rrule.all().forEach((date: Date) =>
         this.validateUnavailableEvent(rr.room, date, recurring.duration, recurring.it, darkMode));
     });
   }

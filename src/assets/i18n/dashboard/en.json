@@ -1,0 +1,25 @@
+{
+  "DASHBOARD": {
+    "FIELD": "Tablero",
+    "PROFILE": "Profile",
+    "CHANGE_PASSWORD": "Change password",
+    "SIGN_OUT": "Sign out",
+    "SIGN_IN": "Sign In",
+    "HOME": "Home",
+    "RESERVATION": {
+      "COMPLETED": "Completed: {{completed}}",
+      "UPCOMING": "Upcoming: {{upcoming}}"
+    },
+    "MINI_CARD": {
+      "DURATION": "since last month",
+      "TOTAL_PRODUCT_SALES": "Total Product Sales",
+      "AVERAGE_PRODUCT_VALUE": "Average Product Value",
+      "TOTAL_PRODUCTS": "Total Products",
+      "NEW_CUSTOMERS_RESERVATION": "New Customers Reservation"
+    },
+    "CARD": {
+      "RESERVATION": "Reservations",
+      "EXPAND": "Expand"
+    }
+  }
+}

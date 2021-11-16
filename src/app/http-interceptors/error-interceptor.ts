@@ -8,7 +8,7 @@ import * as fromActionsLogin from '../store/auth.actions';
 
 import { genericRetryStrategy } from '../util/rxjs';
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class ErrorInterceptor implements HttpInterceptor {
 
   isAuthenticated = false;

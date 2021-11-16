@@ -27,5 +27,5 @@ jobs:
 
           # run script
           VERSION=$("${GITHUB_WORKSPACE}/version-update.sh")
-          git commit -am "Update release version $VERSION"
+          git commit -am "Release version $VERSION"
           git push

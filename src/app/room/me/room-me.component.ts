@@ -25,11 +25,11 @@ import { RoomIconName } from '../../util/icon';
   styleUrls: ['./room-me.component.scss']
 })
 export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
-  @Input() room: IRoomAll | undefined;
+  @Input() room?: IRoomAll;
   getState: Observable<any>;
-  subscription: Subscription | undefined;
+  subscription?: Subscription;
   errors: any = [];
-  professionalName: string | undefined;
+  professionalName?: string;
 
   step = 0;
   icons: IIcon = {
@@ -53,7 +53,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.getState = this.store.select(selectRoomState);
   }
 
-  private static createAv(date: string | undefined): Date | undefined {
+  private static createAv(date?: string): Date | undefined {
     if (date) {
       const startTime = date.split(':');
       return createDate(Number(startTime[0]), Number(startTime[1]));

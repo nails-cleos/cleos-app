@@ -1,0 +1,25 @@
+{
+  "DASHBOARD": {
+    "FIELD": "Tablero",
+    "PROFILE": "Perfil",
+    "CHANGE_PASSWORD": "Cambiar contraseña",
+    "SIGN_OUT": "Cerrar sesión",
+    "SIGN_IN": "Ingresar",
+    "HOME": "Principal",
+    "RESERVATION": {
+      "COMPLETED": "Completas: {{completed}}",
+      "UPCOMING": "Próximas: {{upcoming}}"
+    },
+    "MINI_CARD": {
+      "DURATION": "desde el mes pasado",
+      "TOTAL_PRODUCT_SALES": "Ganancia total",
+      "AVERAGE_PRODUCT_VALUE": "Ganancia promedio",
+      "TOTAL_PRODUCTS": "Total de servicios",
+      "NEW_CUSTOMERS_RESERVATION": "Reservas de nuevos clientes"
+    },
+    "CARD": {
+      "RESERVATION": "Reservas",
+      "EXPAND": "Expandir"
+    }
+  }
+}

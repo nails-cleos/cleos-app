@@ -7,7 +7,6 @@ import * as fromActionsDashboard from '../dashboard.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { DashboardService } from '../../services/dashboard.service';
 import { Router } from '@angular/router';
-import { TrackingService } from '../../services/tracking.service';
 
 @Injectable()
 export class DashboardEffects {
