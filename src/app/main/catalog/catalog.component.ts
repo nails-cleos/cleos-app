@@ -19,7 +19,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
       shareReplay()
     );
 
-  subscription: Subscription | undefined;
+  subscription?: Subscription;
   getState: Observable<any>;
   imageURL: any;
   viewerOpen = false;

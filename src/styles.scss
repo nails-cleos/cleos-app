@@ -129,9 +129,9 @@ a, u {
 
 @media all and (max-device-width: 812px) and (orientation: portrait) {
   #add-button {
-    top: auto;
-    right: 20px;
-    bottom: 20px;
+    top: 80px;
+    right: 30px;
+    bottom: auto;
     left: auto;
     position: fixed;
   }

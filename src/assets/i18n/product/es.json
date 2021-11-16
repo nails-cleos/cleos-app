@@ -1,0 +1,48 @@
+{
+  "PRODUCT": {
+    "TITLE": "Agregar servicios",
+    "CREATED": "Servicio {{name}} creado",
+    "DETAIL": "Actualizar servicios",
+    "LIST": {
+      "COLUMN": {
+        "DURABILITY": "Durabilidad",
+        "PRICE": "Precio",
+        "DURATION": "Duración"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No hay servicios",
+        "REQUIRED": "Se requiere al menos un producto"
+      }
+    },
+    "NAME": {
+      "FIELD": "Nombre",
+      "REQUIRED": "Nombre es <b>requerido</b>"
+    },
+    "DESCRIPTION": {
+      "FIELD": "Descripción"
+    },
+    "PRICE": {
+      "FIELD": "Precio",
+      "REQUIRED": "Precio es <b>requerido</b>",
+      "GREATER": "Precio debe ser mayor a 1"
+    },
+    "DURATION": {
+      "FIELD": "Duración",
+      "REQUIRED": "Duración es <b>requerido</b>"
+    },
+    "DURABILITY": {
+      "FIELD": "Durabilidad"
+    },
+    "PRIMARY": {
+      "CHECK": "Principal"
+    },
+    "DELETED": {
+      "TITLE": "Eliminar servicio",
+      "CONTENT": "¿Está seguro de eliminar el servicio {{name}}?",
+      "MESSAGE": "Servicio {{name}} eliminado"
+    },
+    "UPDATED": {
+      "MESSAGE": "Servicio {{name}} actualizado"
+    }
+  }
+}

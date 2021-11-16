@@ -67,8 +67,17 @@ import { AdditionalEffects } from './store/effects/additional.effects';
 // Components
 import { AppComponent } from './app.component';
 import { DashboardEffects } from './store/effects/dashboard.effects';
+import { Observable } from 'rxjs/Observable';
+import { of } from 'rxjs/observable/of';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
+
+export class CustomTranslateLoader implements TranslateLoader {
+  public getTranslation(lang: string): Observable<any> {
+    console.log(lang)
+    return of({KEY: 'value'});
+  }
+}
 
 export const getAuthServiceConfigs = (): SocialAuthServiceConfig => ({
   autoLogin: false,
@@ -106,11 +115,9 @@ registerLocaleData(localeEs, 'es');
     EffectsModule.forRoot(effects),
     TranslateModule.forRoot({
       defaultLanguage: 'es',
-      loader: {
-        provide: TranslateLoader,
-        useFactory: httpLoaderFactory,
-        deps: [HttpClient]
-      }
+      loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient], useClass: CustomTranslateLoader},
+      isolate: false,
+      extend: true
     }),
     AppRoutingModule,
     SocialLoginModule,

@@ -30,11 +30,11 @@ export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
 
-  expanded: IProductGroup | undefined;
+  expanded?: IProductGroup;
   language: string;
 
-  private subscription: Subscription | undefined;
-  private paginatorSubscription: Subscription | undefined;
+  private subscription?: Subscription;
+  private paginatorSubscription?: Subscription;
   private getState: Observable<any>;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,

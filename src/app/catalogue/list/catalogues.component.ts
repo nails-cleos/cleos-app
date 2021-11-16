@@ -27,7 +27,7 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
       shareReplay()
     );
 
-  subscription: Subscription | undefined;
+  subscription?: Subscription;
   getState: Observable<any>;
   drops: CdkDropList[] = [];
 

@@ -8,14 +8,14 @@ import { TranslateService } from '@ngx-translate/core';
   styleUrls: ['./mini-card.component.css']
 })
 export class MiniCardComponent implements OnInit {
-  @Input() icon: string | undefined;
+  @Input() icon?: string;
   @Input() title!: string;
-  @Input() value: number | undefined;
-  @Input() color: ThemePalette | undefined;
-  @Input() isIncrease: boolean | undefined;
-  @Input() isCurrency: boolean | undefined;
-  @Input() duration: string | undefined;
-  @Input() percentValue: number | undefined;
+  @Input() value?: number;
+  @Input() color?: ThemePalette;
+  @Input() isIncrease?: boolean;
+  @Input() isCurrency?: boolean;
+  @Input() duration?: string;
+  @Input() percentValue?: number;
   @Input() error: any;
 
   locale: string;

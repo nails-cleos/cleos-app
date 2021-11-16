@@ -7,12 +7,13 @@ mat-drawer-container {
 
   mat-card {
     padding: 16px 0 0 0;
+
     mat-card-header {
       padding: 0 16px 0 16px;
     }
   }
 
-  mat-toolbar {
+  .header {
     .align-right {
       flex: 1 1 auto;
     }
@@ -23,6 +24,22 @@ mat-drawer-container {
 
     .badge-padding {
       padding-right: 15%;
+    }
+  }
+
+  .footer {
+    z-index: 1000;
+
+    a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+
+      span {
+        display: block;
+        font-size: 16px;
+      }
     }
   }
 }
@@ -83,7 +100,36 @@ img {
   height: 60px;
 }
 
-::ng-deep .mat-list .mat-list-item .mat-line{
+::ng-deep .mat-list .mat-list-item .mat-line {
   word-wrap: break-word;
   white-space: pre-wrap;
 }
+
+
+.all-wrap {
+  min-height: 100vh;
+}
+
+.page-wrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content {
+  flex: 1;
+  -webkit-flex: 1 1 auto;
+  overflow-y: auto;
+  height: 0;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+
+  > *:not(router-outlet) {
+    flex: 1;
+    display: block;
+  }
+}
+

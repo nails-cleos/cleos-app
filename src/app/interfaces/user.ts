@@ -1,4 +1,4 @@
-import { IPaymentReservation, IReservationOverview } from './reservation';
+import { IReservationOverview } from './reservation';
 import { Theme } from '../util/theme';
 import { IChart } from './dashboard';
 

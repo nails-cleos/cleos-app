@@ -1,0 +1,40 @@
+{
+  "ADDITIONAL": {
+    "TITLE": "Add additional",
+    "CREATED": "Additional {{name}} created",
+    "DETAIL": "Update additional",
+    "LIST": {
+      "COLUMN": {
+        "PRICE": "Price",
+        "DURATION": "Duration"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No additional"
+      }
+    },
+    "NAME": {
+      "FIELD": "Name",
+      "REQUIRED": "Name is <b>required</b>"
+    },
+    "DESCRIPTION": {
+      "FIELD": "Description"
+    },
+    "PRICE": {
+      "FIELD": "Price",
+      "REQUIRED": "Price is <b>required</b>",
+      "GREATER": "Price must be greater than 1"
+    },
+    "DURATION": {
+      "FIELD": "Duration",
+      "REQUIRED": "Duration is <b>required</b>"
+    },
+    "DELETED": {
+      "TITLE": "Delete additional",
+      "CONTENT": "Are you sure to delete additional {{name}}?",
+      "MESSAGE": "Additional {{name}} deleted"
+    },
+    "UPDATED": {
+      "MESSAGE": "Additional {{name}} updated"
+    }
+  }
+}

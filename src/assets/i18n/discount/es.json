@@ -1,0 +1,44 @@
+{
+  "DISCOUNT": {
+    "TITLE": "Agregar descuento",
+    "SEND": "Descuento {{name}} enviado",
+    "CREATED": "Descuento {{name}} creado",
+    "DETAIL": "Actualizar descuento",
+    "LIST": {
+      "COLUMN": {
+        "TYPE": "Tipo",
+        "AMOUNT": "Monto"
+      },
+      "DIALOG": {
+        "CUSTOMER": "Clientes"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No hay descuentos"
+      }
+    },
+    "NAME": {
+      "FIELD": "Nombre",
+      "REQUIRED": "Nombre es <b>requerido</b>"
+    },
+    "DESCRIPTION": {
+      "FIELD": "Descripción"
+    },
+    "AMOUNT": {
+      "FIELD": "Monto",
+      "REQUIRED": "Monto es <b>requerido</b>",
+      "GREATER": "Monto debe ser mayor a 1"
+    },
+    "TYPE": {
+      "FIELD": "Tipo",
+      "REQUIRED": "Tipo es <b>requerido</b>"
+    },
+    "DELETED": {
+      "TITLE": "Eliminar descuento",
+      "CONTENT": "¿Está seguro de eliminar el descuento {{name}}?",
+      "MESSAGE": "Descuento {{name}} eliminado"
+    },
+    "UPDATED": {
+      "MESSAGE": "Descuento {{name}} actualizado"
+    }
+  }
+}

@@ -15,7 +15,7 @@ import { getLocale } from '../../util/helper';
 export class ActivateAccountComponent implements OnInit, OnDestroy {
 
   getState: Observable<any>;
-  subscription: Subscription | undefined;
+  subscription?: Subscription;
 
   locale: string;
 

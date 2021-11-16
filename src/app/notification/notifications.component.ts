@@ -16,10 +16,10 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   notifications: INotification[] = [];
   language: string;
   showMore = false;
-  loadingNotifications: [] | undefined;
+  loadingNotifications?: [];
 
   private getState: Observable<any>;
-  private subscription: Subscription | undefined;
+  private subscription?: Subscription;
   private page: number;
 
   constructor(private router: Router, private store: Store<AppState>, private translate: TranslateService) {

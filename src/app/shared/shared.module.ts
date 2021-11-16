@@ -12,7 +12,6 @@ import { AppState, selectAuthState } from '../store/app.states';
 import { IUserAll } from '../interfaces/user';
 import { environment } from '../../environments/environment';
 
-import { MiniCardProductComponent } from './mini-card-product/mini-card-product.component';
 import { ErrorComponent } from './error/error.component';
 import { GoogleMapComponent } from './google-map/google-map.component';
 import { DialogComponent } from './dialog/dialog.component';
@@ -29,6 +28,7 @@ import { CustomDateFormatter } from './CustomDateFormatter';
 import { CustomEventTitleFormatter } from './CustomEventTitleFormatter';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { ChartComponent } from './chart/chart.component';
+import { httpInterceptorProviders } from '../http-interceptors';
 
 @NgModule({
   imports: [
@@ -61,7 +61,6 @@ import { ChartComponent } from './chart/chart.component';
   ],
   exports: [
     BackButtonDirective,
-    MiniCardProductComponent,
     ErrorComponent,
     GoogleMapComponent,
     DialogComponent,
@@ -73,7 +72,6 @@ import { ChartComponent } from './chart/chart.component';
   ],
   declarations: [
     BackButtonDirective,
-    MiniCardProductComponent,
     ErrorComponent,
     GoogleMapComponent,
     DialogComponent,
@@ -83,6 +81,7 @@ import { ChartComponent } from './chart/chart.component';
     ChartComponent
   ],
   providers: [
+    httpInterceptorProviders,
     GeocodeService
   ]
 })

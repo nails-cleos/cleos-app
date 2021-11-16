@@ -34,8 +34,8 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
   isAdmin = false;
 
   private getState: Observable<any>;
-  private subscription: Subscription | undefined;
-  private paginatorSubscription: Subscription | undefined;
+  private subscription?: Subscription;
+  private paginatorSubscription?: Subscription;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {

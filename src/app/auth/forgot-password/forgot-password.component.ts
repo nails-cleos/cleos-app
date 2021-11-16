@@ -15,7 +15,7 @@ import { Router } from '@angular/router';
 export class ForgotPasswordComponent implements OnInit, OnDestroy {
 
   getState: Observable<any>;
-  subscription: Subscription | undefined;
+  subscription?: Subscription;
 
   form!: FormGroup;
 

@@ -39,7 +39,7 @@ export class CardComponent {
 })
 export class CardChartComponent {
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { chart: IChartUtil, title: string }) {
+    @Inject(MAT_DIALOG_DATA) public data: { chart: IChartUtil; title: string }) {
   }
 }
 

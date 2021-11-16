@@ -23,7 +23,7 @@
 
     <ng-container matColumnDef="amount">
       <th *matHeaderCellDef mat-header-cell
-          mat-sort-header>{{ 'DISCOUNT.LIST.COLUMN.AMOUNT' | translate }}</th>
+          mat-sort-header>{{ 'ME.DISCOUNT.LIST.COLUMN.AMOUNT' | translate }}</th>
       <td *matCellDef="let userDiscount">
         <div *ngIf="userDiscount.id; else skeleton" class="bold">{{userDiscount.symbol}}</div>
         <ng-template #skeleton>
@@ -34,7 +34,7 @@
 
     <ng-container matColumnDef="used">
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
-          mat-sort-header>{{ 'DISCOUNT.LIST.COLUMN.USED' | translate }}</th>
+          mat-sort-header>{{ 'ME.DISCOUNT.LIST.COLUMN.USED' | translate }}</th>
       <td *matCellDef="let userDiscount" fxHide.lt-sm fxShow>
         <div *ngIf="userDiscount.id; else skeleton">
           <div *ngIf="userDiscount.used; else notUsed">
@@ -67,7 +67,7 @@
 
     <ng-container matColumnDef="noContent">
       <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-        {{ 'DISCOUNT.LIST.ERROR.NO_CONTENT' | translate }}</td>
+        {{ 'ME.DISCOUNT.LIST.ERROR.NO_CONTENT' | translate }}</td>
     </ng-container>
 
     <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>

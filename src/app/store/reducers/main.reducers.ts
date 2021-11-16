@@ -1,6 +1,6 @@
 import { All, MainActionTypes } from '../main.actions';
 import { ICatalogue } from '../../interfaces/catalogue';
-import { IProduct, IProductGroup } from '../../interfaces/product';
+import { IProductGroup } from '../../interfaces/product';
 
 export interface State {
   catalogue: ICatalogue[] | null;

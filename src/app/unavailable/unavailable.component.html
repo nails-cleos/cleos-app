@@ -9,7 +9,7 @@
           <mat-card-content>
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <mat-form-field *ngIf="professionals; else skeleton" appearance="fill">
-                <mat-label>{{ 'ROOM.PROFESSIONAL.FIELD' | translate }}</mat-label>
+                <mat-label>{{ 'UNAVAILABLE.PROFESSIONAL.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="professional" [matAutocomplete]="auto" matInput required type="text">
                 </label>
@@ -20,10 +20,10 @@
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="professional.hasError('required')"
-                           [innerHTML]="'ROOM.PROFESSIONAL.REQUIRED' | translate">
+                           [innerHTML]="'UNAVAILABLE.PROFESSIONAL.REQUIRED' | translate">
                 </mat-error>
                 <mat-error *ngIf="professional.hasError('requireMatch')"
-                           [innerHTML]="'ROOM.PROFESSIONAL.INVALID' | translate">
+                           [innerHTML]="'UNAVAILABLE.PROFESSIONAL.INVALID' | translate">
                 </mat-error>
                 <mat-error *ngIf="errors['professional']">
                   {{errors['professional']}}
@@ -59,7 +59,7 @@
                   </mat-error>
                 </mat-form-field>
                 <mat-checkbox [formControl]="allDay"
-                              color="primary">{{ 'UNAVAILABLE.ALL_DAY.CHECK' | translate }}</mat-checkbox>
+                              color="primary">{{ 'COMMON.ALL_DAY.CHECK' | translate }}</mat-checkbox>
                 <mat-form-field *ngIf="!allDay.value" appearance="fill" style="margin-right: 12px;">
                   <mat-label>{{ 'UNAVAILABLE.TIME.FIELD' | translate }}</mat-label>
                   <label>

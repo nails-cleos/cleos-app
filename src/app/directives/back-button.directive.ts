@@ -9,7 +9,7 @@ import { MatDialog } from '@angular/material/dialog';
   selector: '[appBackButton]'
 })
 export class BackButtonDirective {
-  @Input() form: FormGroup | undefined;
+  @Input() form?: FormGroup;
 
   constructor(private navigation: NavigationService, private translate: TranslateService, public dialog: MatDialog) {
   }

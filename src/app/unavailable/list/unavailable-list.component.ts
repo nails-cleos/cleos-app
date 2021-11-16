@@ -30,15 +30,15 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
   displayedColumns: string[] = ['position', 'professional', 'description', 'start', 'duration', 'repeat', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IUnavailable>>();
 
-  expandedUnavailable: IUnavailable | undefined;
+  expandedUnavailable?: IUnavailable;
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
 
   language: string;
 
-  private subscription: Subscription | undefined;
-  private paginatorSubscription: Subscription | undefined;
+  private subscription?: Subscription;
+  private paginatorSubscription?: Subscription;
   private getState: Observable<any>;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,

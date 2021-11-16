@@ -1,0 +1,40 @@
+{
+  "ADDITIONAL": {
+    "TITLE": "Agregar adicional",
+    "CREATED": "adicional {{name}} creado",
+    "DETAIL": "Actualizar adicional",
+    "LIST": {
+      "COLUMN": {
+        "PRICE": "Precio",
+        "DURATION": "Duración"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No hay adicionales"
+      }
+    },
+    "NAME": {
+      "FIELD": "Nombre",
+      "REQUIRED": "Nombre es <b>requerido</b>"
+    },
+    "DESCRIPTION": {
+      "FIELD": "Descripción"
+    },
+    "PRICE": {
+      "FIELD": "Precio",
+      "REQUIRED": "Precio es <b>requerido</b>",
+      "GREATER": "Precio debe ser mayor a 1"
+    },
+    "DURATION": {
+      "FIELD": "Duración",
+      "REQUIRED": "Duración es <b>requerido</b>"
+    },
+    "DELETED": {
+      "TITLE": "Eliminar adicional",
+      "CONTENT": "¿Está seguro de eliminar adicional {{name}}?",
+      "MESSAGE": "Adicional {{name}} eliminado"
+    },
+    "UPDATED": {
+      "MESSAGE": "Adicional {{name}} actualizado"
+    }
+  }
+}

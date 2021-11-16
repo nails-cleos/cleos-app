@@ -19,9 +19,9 @@ import { MatDialog } from '@angular/material/dialog';
 })
 export class CatalogueDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  @Input() catalogue: ICatalogue | undefined;
+  @Input() catalogue?: ICatalogue;
   form!: FormGroup;
-  subscription: Subscription | undefined;
+  subscription?: Subscription;
   getState: Observable<any>;
   errors: any = [];
   file: any;

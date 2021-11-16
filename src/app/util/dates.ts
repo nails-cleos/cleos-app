@@ -35,8 +35,8 @@ export class Duration implements IDuration {
   }
 }
 
-export const getDuration = (allDay: boolean, duration: string): IDuration =>
-  allDay ? new Duration(23, 59) : convertDuration(duration);
+export const getDuration = (allDay: boolean, duration?: string): IDuration =>
+  allDay || !duration ? new Duration(23, 59) : convertDuration(duration);
 
 export const reservationDuration = (reservation?: IReservationAll): IDuration => {
   let durations: IDuration[] = [];
@@ -264,6 +264,12 @@ export const createNewDate = (date: Date, hour: number = 0, minute: number = 0, 
 
   return d;
 };
+
+export const createEndDate = (stringDate: string): Date => {
+  const d = stringDate.split('-');
+  return new Date(Number(d[0]), Number(d[1]) - 1, Number(d[2]), 23, 59, 59, 99);
+};
+
 
 export const createFullDate = (selectDate: Date): Date => {
   const date = new Date();

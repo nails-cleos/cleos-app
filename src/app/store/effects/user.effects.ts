@@ -100,7 +100,7 @@ export class UserEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.userService.updateMe(payload.user).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('PROFILE.UPDATED.MESSAGE', {username: response.user.username});
+        const message = this.translate.instant('COMMON.PROFILE.UPDATED.MESSAGE', {username: response.user.username});
         return of(new LoginSuccess({
           response, queryParams: {
             returnUrl: payload.redirectUrl
@@ -114,7 +114,7 @@ export class UserEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.userService.updateMePhoto(payload).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('PROFILE.UPDATED.PHOTO');
+        const message = this.translate.instant('COMMON.PROFILE.UPDATED.PHOTO');
         return of(new LoginSuccess({
           response, queryParams: {
             returnUrl: '/auth/profile'

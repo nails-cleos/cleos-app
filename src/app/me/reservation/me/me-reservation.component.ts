@@ -62,25 +62,25 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   errors: any = [];
 
   productForm!: FormGroup;
-  groups: IProductGroup[] | undefined;
-  filteredGroup: Observable<IProductGroup[] | undefined> | undefined;
+  groups?: IProductGroup[];
+  filteredGroup?: Observable<IProductGroup[] | undefined>;
   group: FormControl = new FormControl('', [
     Validators.required, requireMatch
   ]);
-  productList: IProduct[] | undefined;
-  filteredProduct: Observable<IProduct[] | undefined> | undefined;
+  productList?: IProduct[];
+  filteredProduct?: Observable<IProduct[] | undefined>;
   product: FormControl = new FormControl('', [
     Validators.required, requireMatch
   ]);
 
-  discounts: IUserDiscount[] | undefined;
+  discounts?: IUserDiscount[];
   showDiscount = false;
   price: IPrice;
   discount = new FormControl();
 
   roomForm!: FormGroup;
-  rooms: IRoom[] | undefined;
-  filteredRoom: Observable<IRoom[] | undefined> | undefined;
+  rooms?: IRoom[];
+  filteredRoom?: Observable<IRoom[] | undefined>;
   room: FormControl = new FormControl('', [
     Validators.required, requireMatch
   ]);
@@ -93,32 +93,32 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   additionalSelected: IAdditionalAll[] = [];
 
   availableList = new Map<string, any[]>();
-  eventSelected: Date | undefined;
+  eventSelected?: Date;
   selectedIndex = 1;
-  smallScreen: boolean | undefined;
+  smallScreen?: boolean;
   isPreview = false;
   locale: string;
 
   isEditing = false;
   canCreate = false;
-  distance: string | undefined;
+  distance?: string;
   maxDate: Date;
   minDate: Date;
-  startDate: Date | undefined;
-  endDate: Date | undefined;
-  additionalDuration: string | undefined;
-  totalDuration: string | undefined;
+  startDate?: Date;
+  endDate?: Date;
+  additionalDuration?: string;
+  totalDuration?: string;
 
   private readonly extras: any;
-  private reservation: IReservationAll | undefined;
+  private reservation?: IReservationAll;
   private measure = 'long';
   private duration: IDuration = new Duration();
   private time: any;
-  private customerId: string | undefined;
-  private productId: string | undefined;
+  private customerId?: string;
+  private productId?: string;
   private reservationMonths = MAX_RESERVATION_MONTH;
   private getState: Observable<any>;
-  private subscription: Subscription | undefined;
+  private subscription?: Subscription;
 
   constructor(private readonly translate: TranslateService, private snackBar: MatSnackBar, private store: Store<AppState>,
               private formBuilder: FormBuilder, private breakpointObserver: BreakpointObserver,
@@ -334,9 +334,9 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   setDistance($event: number): void {
     this.distance = $event > 999 ?
-      this.translate.instant('ROOM.ADDRESS.DISTANCE.KM',
+      this.translate.instant('ME.RESERVATION.ROOM.ADDRESS.DISTANCE.KM',
         {distance: round($event / 1000)}) :
-      this.translate.instant('ROOM.ADDRESS.DISTANCE.M',
+      this.translate.instant('ME.RESERVATION.ROOM.ADDRESS.DISTANCE.M',
         {distance: round($event)});
   }
 
@@ -465,10 +465,10 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       if (state.selected) {
         this.setData(state.selected);
       }
-      if (state.customerReservation && state.customerReservation.upcoming) {
+      if (state.customerReservation && state.customerReservation.upcoming && state.customerReservation.upcoming.length) {
         this.canCreate = false;
-        const message = this.translate.instant('RESERVATION.UPCOMING.CUSTOMER.ERROR',
-          {date: formatFullDateTime(newDate(state.customerReservation.upcoming.start), this.translate.currentLang)});
+        const message = this.translate.instant('ME.RESERVATION.UPCOMING.CUSTOMER.ERROR',
+          {date: formatFullDateTime(newDate(state.customerReservation.upcoming[0].start), this.translate.currentLang)});
         const snackBarRef = this.snackBar.open(message, 'OK', {
           duration: 5000
         });

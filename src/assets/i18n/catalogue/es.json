@@ -1,0 +1,39 @@
+{
+  "CATALOGUE": {
+    "TITLE": "Agregar catálogo",
+    "CREATED": "Catálogo {{name}} creado",
+    "DETAIL": "Actualizar catálogo",
+    "NAME": {
+      "FIELD": "Nombre",
+      "REQUIRED": "Nombre es <b>requerido</b>"
+    },
+    "DESCRIPTION": {
+      "FIELD": "Descripción"
+    },
+    "SHOW": {
+      "HOME": "Mostar en principal",
+      "CATALOG": "Mostrar en catálogo"
+    },
+    "FILE": {
+      "DRAG_DROP": "Arrastrar y soltar el archivo aquí",
+      "OR": "o",
+      "CHOOSE": "Elegí un archivo"
+    },
+    "DELETE": {
+      "BUTTON": "Eliminar imagen {{name}}",
+      "MESSAGE": "Imagen {{name}} eliminada",
+      "UNDO": "Deshacer"
+    },
+    "DELETED": {
+      "TITLE": "Eliminar catálogo",
+      "CONTENT": "¿Está seguro de eliminar el catálogo {{name}}?",
+      "MESSAGE": "Catálogo {{name}} eliminado"
+    },
+    "UPDATED": {
+      "ALL": {
+        "MESSAGE": "Catálogos ordenados"
+      },
+      "MESSAGE": "Catálogo {{name}} actualizado"
+    }
+  }
+}

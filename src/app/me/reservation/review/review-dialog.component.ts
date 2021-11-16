@@ -16,8 +16,8 @@ import { transitionAnimation } from '../../../util/animation';
   styleUrls: ['./review-dialog.component.scss']
 })
 export class ReviewDialogComponent {
-  reservation: IReservationAll | undefined;
-  end: Date | undefined;
+  reservation?: IReservationAll;
+  end?: Date;
   language: string;
 
   price: IPrice;
@@ -25,7 +25,7 @@ export class ReviewDialogComponent {
   hover = -1;
   starCount = 5;
 
-  review: IReview | undefined;
+  review?: IReview;
 
   detail = new FormControl();
 

@@ -1,0 +1,78 @@
+{
+  "AUTH": {
+    "FORBIDDEN": "El usuario no tiene los permisos necesarios",
+    "SIGN_IN": {
+      "TITLE": "Ingresar",
+      "USERNAME": {
+        "FIELD": "Nombre de usuario o email",
+        "ERROR": "Por favor ingrese un nombre de usuario o email"
+      },
+      "OR": "O ingresa con tu email",
+      "NEW": "¿Nuevo en Cleos?",
+      "FORGOT_PASSWORD": "¿Olvido su contraseña?"
+    },
+    "SIGN_UP": {
+      "TITLE": "Registrar",
+      "CONFIRM_PASSWORD": {
+        "FIELD": "Confirmar contraseña",
+        "REQUIRED": "Confirmar contraseña es <b>requerido</b>",
+        "MUST_MATCH": "Contraseña y confirmar contraseña deben coincidir"
+      },
+      "CODE": {
+        "FIELD": "Código de referido"
+      },
+      "OR": "O registrate con tu email",
+      "SUCCESS": "Usuario {{username}} creado. Verifica tu email {{email}}",
+      "ALREADY": "¿Ya tienes Cleos?"
+    },
+    "PASSWORD": {
+      "FIELD": "Contraseña",
+      "ERROR": "Por favor ingrese una contraseña",
+      "DETAIL": "Mostrar detalles de la contraseña",
+      "REQUIRED": "La contraseña es <b>requerido</b>",
+      "INVALID": "La contraseña no es valida",
+      "DIGIT": "Contener 1 o más dígitos",
+      "LOWER_CASE": "Contener 1 o más caracteres en minúscula",
+      "UPPER_CASE": "Contener 1 o más caracteres en mayúscula",
+      "MIN": "Tener 6 o más caracteres de longitud",
+      "MAX": "No tener más de 30 caracteres de longitud",
+      "SPECIAL": "Contener 1 o más caracteres especiales"
+    },
+    "ACTIVATE_ACCOUNT": {
+      "TITLE": "Activar cuenta",
+      "CONTENT": "Bienvenido a Cleos",
+      "BUTTON": "Activar",
+      "MESSAGE": "Cuenta activada"
+    },
+    "FORGOT_PASSWORD": {
+      "TITLE": "Olvido su contraseña",
+      "MESSAGE": "Revisa tu email para cambiar tu contraseña",
+      "USERNAME": {
+        "FIELD": "Nombre de usuario o email",
+        "ERROR": "Por favor ingrese un nombre de usuario o email"
+      }
+    },
+    "RECOVERY_PASSWORD": {
+      "TITLE": "Recuperar contraseña",
+      "MESSAGE": "Contraseña actualizada",
+      "CONFIRM_PASSWORD": {
+        "FIELD": "Confirmar contraseña",
+        "REQUIRED": "Confirmar contraseña es <b>requerido</b>",
+        "MUST_MATCH": "Contraseña y confirmar contraseña deben coincidir"
+      }
+    },
+    "CHANGE_PASSWORD": {
+      "TITLE": "Cambiar contraseña",
+      "MESSAGE": "La contraseña se actualizo",
+      "OLD_PASSWORD": {
+        "FIELD": "Contraseña actual",
+        "REQUIRED": "Contraseña actual es <b>requerido</b>"
+      },
+      "CONFIRM_PASSWORD": {
+        "FIELD": "Confirmar contraseña",
+        "REQUIRED": "Confirmar contraseña es <b>requerido</b>",
+        "MUST_MATCH": "Contraseña y confirmar contraseña deben coincidir"
+      }
+    }
+  }
+}

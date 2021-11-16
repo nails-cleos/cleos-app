@@ -43,8 +43,8 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
 
-  private subscription: Subscription | undefined;
-  private paginatorSubscription: Subscription | undefined;
+  private subscription?: Subscription;
+  private paginatorSubscription?: Subscription;
   private getState: Observable<any>;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
@@ -166,14 +166,14 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
   @ViewChild('customerInput') customerInput!: ElementRef<HTMLInputElement>;
   @ViewChild('auto') matAutocomplete!: MatAutocomplete;
 
-  title: string | undefined;
+  title?: string;
   customerCtrl = new FormControl();
-  filteredCustomers: Observable<IUser[] | undefined> | undefined;
+  filteredCustomers?: Observable<IUser[] | undefined>;
   customers: IUserAll[] = [];
-  allCustomers: IUserAll[] | undefined;
+  allCustomers?: IUserAll[];
 
   private getState: Observable<any>;
-  private subscription: Subscription | undefined;
+  private subscription?: Subscription;
   private discount: IDiscountAll;
 
   constructor(public dialogRef: MatDialogRef<DiscountDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,

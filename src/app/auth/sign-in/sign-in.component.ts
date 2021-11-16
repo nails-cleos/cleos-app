@@ -16,7 +16,7 @@ export class SignInComponent implements OnInit {
 
   hide = true;
   form!: FormGroup;
-  user: IUser | undefined;
+  user?: IUser;
 
   constructor(private formBuilder: FormBuilder, private store: Store<AppState>, private route: ActivatedRoute) {
   }
