@@ -6,9 +6,7 @@ import { Role } from '../interfaces/token';
 import { IRoom } from '../interfaces/room';
 import { PAGE_SIZE } from '../interfaces/pagination';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class UserService {
 
   private url = 'users';

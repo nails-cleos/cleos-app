@@ -1,11 +1,7 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { MatCarouselModule } from '@ngbmodule/material-carousel';
-
-import { AppMaterialModule } from '../util/app-material.module';
 import { SharedModule } from '../shared/shared.module';
 import { MainRoutingModule } from './main-routing.module';
 
@@ -19,6 +15,14 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { MiniCardProductComponent } from './mini-card-product/mini-card-product.component';
+import { EffectsModule } from '@ngrx/effects';
+import { MainEffects } from '../store/effects/main.effects';
+import { MainService } from '../services/main.service';
+import { CatalogueService } from '../services/catalogue.service';
+import { ProductService } from '../services/product.service';
+import { CatalogueEffects } from '../store/effects/catalogue.effects';
+import { UserEffects } from '../store/effects/user.effects';
+import { UserService } from '../services/user.service';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
   new TranslateHttpLoader(http, './assets/i18n/main/', '.json');
@@ -36,11 +40,6 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
   imports: [
     MainRoutingModule,
     SharedModule,
-    CommonModule,
-    HttpClientModule,
-    FormsModule,
-    ReactiveFormsModule,
-    AppMaterialModule,
     MatCarouselModule.forRoot(),
     MatToolbarModule,
     MatSlideToggleModule,
@@ -48,7 +47,14 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
       loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient]},
       isolate: false,
       extend: true
-    })
+    }),
+    EffectsModule.forFeature([MainEffects, CatalogueEffects, UserEffects])
+  ],
+  providers: [
+    MainService,
+    CatalogueService,
+    ProductService,
+    UserService
   ]
 })
 export class MainModule {

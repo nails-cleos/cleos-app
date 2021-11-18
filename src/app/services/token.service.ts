@@ -12,9 +12,7 @@ export interface RefreshTokenResponse {
   refreshToken: string;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class TokenService {
   private myTokenCache: Observable<RefreshTokenResponse> | undefined;
   private readonly cacheSize = 1;

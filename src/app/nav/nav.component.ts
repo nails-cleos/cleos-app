@@ -1,11 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Observable, Subscription } from 'rxjs';
-import { map, shareReplay } from 'rxjs/operators';
+import { Observable, Subject, Subscription } from 'rxjs';
+import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import {
-  AppState, selectAdditionalState,
+  AppState,
+  selectAdditionalState,
   selectAuthState,
   selectCatalogueState,
   selectDiscountState,
@@ -54,16 +55,13 @@ export class NavComponent implements OnInit, OnDestroy {
   workDay: INotification[] = [];
   currentUser!: IUser | null;
   username?: string;
-  getState: Observable<any>;
-  getNotificationState: Observable<any>;
+
   canChangePassword = false;
-  authSubscription?: Subscription;
-  notificationSubscription?: Subscription;
+
   language: string;
-  isAuthorized = false;
+
   isProfessional = false;
   isAdmin = false;
-  message: any;
 
   image?: string;
   initials?: string;
@@ -74,8 +72,16 @@ export class NavComponent implements OnInit, OnDestroy {
   error: any;
   incomplete = false;
 
-  cssClass?: string;
   checked = false;
+
+  private getState: Observable<any>;
+  private getNotificationState: Observable<any>;
+  private authSubscription?: Subscription;
+  private notificationSubscription?: Subscription;
+  private isAuthorized = false;
+  private message: any;
+  private cssClass?: string;
+  private authSubject: Subject<boolean> = new Subject<boolean>();
 
   constructor(public translate: TranslateService, private breakpointObserver: BreakpointObserver,
               private router: Router, private store: Store<AppState>, private messagingService: MessagingService,
@@ -93,6 +99,11 @@ export class NavComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscribe();
+    this.authSubject.pipe(distinctUntilChanged()).subscribe(v => {
+      if (v) {
+        this.getNotifications();
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -164,11 +175,11 @@ export class NavComponent implements OnInit, OnDestroy {
     this.authSubscription = this.getState.subscribe(state => {
       this.isAuthorized = state.isAuthenticated;
       this.isLoading = state.isLoading;
+      this.authSubject.next(this.isAuthorized);
       if (state.isAuthenticated) {
         this.tokenService.token = state.token;
         this.tokenService.user = state.user;
         this.incomplete = !state.user.completed;
-        this.getNotifications();
         const user: IUserAll = state.user;
         this.currentUser = user;
         this.checked = isDarkMode(this.currentUser.theme);

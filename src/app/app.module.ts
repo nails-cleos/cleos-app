@@ -2,9 +2,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { FlexLayoutModule } from '@angular/flex-layout';
+import { HttpClient } from '@angular/common/http';
 import {
   FacebookLoginProvider,
   GoogleLoginProvider,
@@ -25,7 +23,6 @@ import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
 import { AngularFireAnalyticsModule } from '@angular/fire/analytics';
 
 import { AppRoutingModule } from './app-routing.module';
-import { AppMaterialModule } from './util/app-material.module';
 import { Router } from '@angular/router';
 
 // Providers
@@ -50,34 +47,11 @@ import { PromptUpdateService } from './services/prompt-update.service';
 // Reducers
 import { reducers } from './store/app.states';
 
-// Effects
-import { LoginEffects } from './store/effects/auth.effects';
-import { UserEffects } from './store/effects/user.effects';
-import { ProductEffects } from './store/effects/product.effects';
-import { RoomEffects } from './store/effects/room.effects';
-import { ReservationEffects } from './store/effects/reservation.effects';
-import { NotificationEffects } from './store/effects/notification.effects';
-import { CatalogueEffects } from './store/effects/catalogue.effects';
-import { UnavailableEffects } from './store/effects/unavailable.effects';
-import { DiscountEffects } from './store/effects/discount.effects';
-import { MainEffects } from './store/effects/main.effects';
-import { PaymentEffects } from './store/effects/payment.effects';
-import { AdditionalEffects } from './store/effects/additional.effects';
-
 // Components
 import { AppComponent } from './app.component';
-import { DashboardEffects } from './store/effects/dashboard.effects';
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
+import { SharedModule } from './shared/shared.module';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
-
-export class CustomTranslateLoader implements TranslateLoader {
-  public getTranslation(lang: string): Observable<any> {
-    console.log(lang)
-    return of({KEY: 'value'});
-  }
-}
 
 export const getAuthServiceConfigs = (): SocialAuthServiceConfig => ({
   autoLogin: false,
@@ -98,10 +72,6 @@ export const localStorageSyncReducer =
 
 const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
 
-const effects = [LoginEffects, UserEffects, ProductEffects, CatalogueEffects, RoomEffects, ReservationEffects,
-  NotificationEffects, UnavailableEffects, DiscountEffects, MainEffects, PaymentEffects, DashboardEffects,
-  AdditionalEffects];
-
 registerLocaleData(localeEn, 'en');
 registerLocaleData(localeEs, 'es');
 
@@ -112,22 +82,18 @@ registerLocaleData(localeEs, 'es');
   imports: [
     BrowserModule,
     StoreModule.forRoot(reducers, {metaReducers}),
-    EffectsModule.forRoot(effects),
+    EffectsModule.forRoot([]),
     TranslateModule.forRoot({
       defaultLanguage: 'es',
-      loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient], useClass: CustomTranslateLoader},
+      loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient]},
       isolate: false,
       extend: true
     }),
     AppRoutingModule,
     SocialLoginModule,
     BrowserAnimationsModule,
-    HttpClientModule,
-    FormsModule,
     MatFabMenuModule,
-    AppMaterialModule,
-    FlexLayoutModule,
-    ReactiveFormsModule,
+    SharedModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,
       registrationStrategy: 'registerWhenStable:30000'
@@ -156,7 +122,7 @@ registerLocaleData(localeEs, 'es');
     CookieService
   ],
   bootstrap: [AppComponent],
-  exports: [TranslateModule, AppMaterialModule]
+  exports: [TranslateModule]
 })
 export class AppModule {
   constructor(swPush: SwPush, private router: Router) {

@@ -4,9 +4,7 @@ import { Observable } from 'rxjs';
 import { IDiscount, IUserDiscount } from '../interfaces/discount';
 import { PAGE_SIZE } from '../interfaces/pagination';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class DiscountService {
 
   url = 'discounts';

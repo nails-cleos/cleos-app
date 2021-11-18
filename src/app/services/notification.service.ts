@@ -3,9 +3,7 @@ import { Observable } from 'rxjs';
 import { INotification, PAGE_SIZE } from '../interfaces/notification';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class NotificationService {
 
   private url = 'notifications';
