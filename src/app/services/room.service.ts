@@ -4,9 +4,7 @@ import { Observable } from 'rxjs';
 import { IRoom } from '../interfaces/room';
 import { PAGE_SIZE } from '../interfaces/pagination';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class RoomService {
 
   url = 'rooms';

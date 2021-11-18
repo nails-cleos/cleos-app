@@ -1,11 +1,7 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { MatCarouselModule } from '@ngbmodule/material-carousel';
-
-import { AppMaterialModule } from '../util/app-material.module';
 import { SharedModule } from '../shared/shared.module';
 import { NavRoutingModule } from './nav-routing.module';
 
@@ -16,6 +12,14 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatRippleModule } from '@angular/material/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { EffectsModule } from '@ngrx/effects';
+import { LoginEffects } from '../store/effects/auth.effects';
+import { NotificationEffects } from '../store/effects/notification.effects';
+import { UserEffects } from '../store/effects/user.effects';
+import { AuthService } from '../services/auth.service';
+import { NotificationService } from '../services/notification.service';
+import { UserService } from '../services/user.service';
+import { TokenService } from '../services/token.service';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
   new TranslateHttpLoader(http, './assets/i18n/dashboard/', '.json');
@@ -27,11 +31,6 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
   imports: [
     NavRoutingModule,
     SharedModule,
-    CommonModule,
-    HttpClientModule,
-    FormsModule,
-    ReactiveFormsModule,
-    AppMaterialModule,
     MatCarouselModule.forRoot(),
     MatSidenavModule,
     MatToolbarModule,
@@ -42,7 +41,14 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
       loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient]},
       isolate: false,
       extend: true
-    })
+    }),
+    EffectsModule.forFeature([LoginEffects, NotificationEffects, UserEffects])
+  ],
+  providers: [
+    AuthService,
+    NotificationService,
+    UserService,
+    TokenService
   ]
 })
 export class NavModule {

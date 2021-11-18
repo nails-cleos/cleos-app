@@ -1,11 +1,6 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ChartsModule } from 'ng2-charts';
-
-import { AppMaterialModule } from '../util/app-material.module';
+import { HttpClient } from '@angular/common/http';
 import { SharedModule } from '../shared/shared.module';
 import { DashRoutingModule } from './dash-routing.module';
 
@@ -14,6 +9,17 @@ import { MiniCardComponent } from './mini-card/mini-card.component';
 import { ReservationTableComponent } from './reservation/table/reservation-table.component';
 import { CalendarModule, CalendarMonthModule } from 'angular-calendar';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { DashboardService } from '../services/dashboard.service';
+import { EffectsModule } from '@ngrx/effects';
+import { DashboardEffects } from '../store/effects/dashboard.effects';
+import { ReservationEffects } from '../store/effects/reservation.effects';
+import { ReservationService } from '../services/reservation.service';
+import { PaymentService } from '../services/payment.service';
+import { ProductService } from '../services/product.service';
+import { RoomService } from '../services/room.service';
+import { UserService } from '../services/user.service';
+import { AdditionalService } from '../services/additional.service';
+import { TrackingService } from '../services/tracking.service';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
   new TranslateHttpLoader(http, './assets/i18n/dashboard/', '.json');
@@ -27,19 +33,24 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
   imports: [
     DashRoutingModule,
     SharedModule,
-    CommonModule,
-    ChartsModule,
-    HttpClientModule,
-    FormsModule,
-    ReactiveFormsModule,
-    AppMaterialModule,
     CalendarMonthModule,
     CalendarModule,
     TranslateModule.forChild({
       loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient]},
       isolate: false,
       extend: true
-    })
+    }),
+    EffectsModule.forFeature([DashboardEffects, ReservationEffects])
+  ],
+  providers: [
+    DashboardService,
+    ReservationService,
+    PaymentService,
+    ProductService,
+    RoomService,
+    UserService,
+    AdditionalService,
+    TrackingService
   ]
 })
 export class DashModule {

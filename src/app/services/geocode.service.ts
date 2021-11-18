@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { GeocoderResult, GeocoderStatus, MapsAPILoader } from '@agm/core';
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
+import { Observable, of } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
-import { fromPromise } from 'rxjs/observable/fromPromise';
+import { fromPromise } from 'rxjs/internal-compatibility';
 
 declare let google: any;
 
@@ -26,7 +25,7 @@ export class GeocodeService {
               const currentLat = position.coords.latitude;
               const currentLong = position.coords.longitude;
               const currentLatLng = new google.maps.LatLng(currentLat, currentLong);
-              const distance =  google.maps.geometry.spherical.computeDistanceBetween(latLng, currentLatLng);
+              const distance = google.maps.geometry.spherical.computeDistanceBetween(latLng, currentLatLng);
               observer.next({distance});
             });
           }
@@ -50,11 +49,10 @@ export class GeocodeService {
 
   private waitForMapsToLoad(): Observable<boolean> {
     if (!this.geocoder) {
-      return fromPromise(this.mapLoader.load())
-        .pipe(
-          tap(() => this.initGeocoder()),
-          map(() => true)
-        );
+      return fromPromise(this.mapLoader.load()).pipe(
+        tap(() => this.initGeocoder()),
+        map(() => true)
+      );
     }
     return of(true);
   }

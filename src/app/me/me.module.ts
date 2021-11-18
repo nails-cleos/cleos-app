@@ -1,11 +1,6 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { FlexLayoutModule } from '@angular/flex-layout';
-
-import { AppMaterialModule } from '../util/app-material.module';
+import { HttpClient } from '@angular/common/http';
 import { SharedModule } from '../shared/shared.module';
 import { MeRoutingModule } from './me-routing.module';
 
@@ -29,6 +24,18 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatStepperModule } from '@angular/material/stepper';
 import { UpcomingComponent } from './reservation/upcoming/upcoming.component';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { EffectsModule } from '@ngrx/effects';
+import { PaymentEffects } from '../store/effects/payment.effects';
+import { PaymentService } from '../services/payment.service';
+import { ReservationService } from '../services/reservation.service';
+import { ProductService } from '../services/product.service';
+import { RoomService } from '../services/room.service';
+import { UserService } from '../services/user.service';
+import { AdditionalService } from '../services/additional.service';
+import { TrackingService } from '../services/tracking.service';
+import { ReservationEffects } from '../store/effects/reservation.effects';
+import { DiscountEffects } from '../store/effects/discount.effects';
+import { DiscountService } from '../services/discount.service';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
   new TranslateHttpLoader(http, './assets/i18n/me/', '.json');
@@ -49,12 +56,6 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
   imports: [
     MeRoutingModule,
     SharedModule,
-    CommonModule,
-    HttpClientModule,
-    FormsModule,
-    ReactiveFormsModule,
-    AppMaterialModule,
-    FlexLayoutModule,
     MatChipsModule,
     ShareButtonsModule,
     MatBottomSheetModule,
@@ -66,7 +67,18 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
       loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient]},
       isolate: false,
       extend: true
-    })
+    }),
+    EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects])
+  ],
+  providers: [
+    ReservationService,
+    PaymentService,
+    ProductService,
+    RoomService,
+    UserService,
+    AdditionalService,
+    TrackingService,
+    DiscountService
   ]
 })
 export class MeModule {

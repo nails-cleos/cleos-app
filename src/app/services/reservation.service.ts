@@ -6,9 +6,7 @@ import { getNow } from '../util/dates';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { IReview } from '../interfaces/review';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class ReservationService {
 
   url = 'reservations';

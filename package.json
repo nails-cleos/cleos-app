@@ -1,6 +1,6 @@
 {
   "name": "cleos",
-  "version": "1.0.4",
+  "version": "1.0.5-rc",
   "engines": {
     "node": "14.17.0",
     "npm": "6.14.13"
@@ -13,6 +13,7 @@
     "build": "ng build --configuration=production",
     "build-pwa": "ng build --configuration=pwa",
     "build:pwa": "docker build -t nails-app --build-arg BUILD_CONFIG=build-pwa --build-arg NGINX=nginx-staging.conf .",
+    "build:source": "ng build --source-map",
     "test": "ng test",
     "lint": "ng lint --fix",
     "eslint": "eslint src --fix",

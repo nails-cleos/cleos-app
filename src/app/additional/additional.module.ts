@@ -1,5 +1,4 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 import { AdditionalRoutingModule } from './additional-routing.module';
 import { AdditionalComponent } from './additional.component';
@@ -7,10 +6,11 @@ import { AdditionalListComponent } from './list/additional-list.component';
 import { AdditionalDetailComponent } from './detail/additional-detail.component';
 import { SharedModule } from '../shared/shared.module';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AppMaterialModule } from '../util/app-material.module';
+import { HttpClient } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { EffectsModule } from '@ngrx/effects';
+import { AdditionalEffects } from '../store/effects/additional.effects';
+import { AdditionalService } from '../services/additional.service';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
   new TranslateHttpLoader(http, './assets/i18n/additional/', '.json');
@@ -24,16 +24,15 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
   imports: [
     AdditionalRoutingModule,
     SharedModule,
-    CommonModule,
-    HttpClientModule,
-    FormsModule,
-    ReactiveFormsModule,
-    AppMaterialModule,
     TranslateModule.forChild({
       loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient]},
       isolate: false,
       extend: true
-    })
+    }),
+    EffectsModule.forFeature([AdditionalEffects])
+  ],
+  providers: [
+    AdditionalService
   ]
 })
 export class AdditionalModule {

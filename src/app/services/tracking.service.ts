@@ -3,9 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ITracking } from '../interfaces/reservation';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class TrackingService {
 
   url = 'tracking';

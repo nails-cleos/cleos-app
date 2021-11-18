@@ -4,9 +4,7 @@ import { Observable } from 'rxjs';
 import { IUnavailable } from '../interfaces/unavailable';
 import { PAGE_SIZE } from '../interfaces/pagination';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class UnavailableService {
 
   url = 'unavailable';

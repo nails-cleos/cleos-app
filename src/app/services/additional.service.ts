@@ -4,9 +4,7 @@ import { PAGE_SIZE } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
 import { IAdditional } from '../interfaces/additional';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class AdditionalService {
 
   url = 'additional';

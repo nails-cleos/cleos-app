@@ -1,10 +1,6 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
-import { AppMaterialModule } from '../util/app-material.module';
+import { HttpClient } from '@angular/common/http';
 import { SharedModule } from '../shared/shared.module';
 import { DiscountRoutingModule } from './discount-routing.module';
 
@@ -13,6 +9,11 @@ import { DiscountDialogComponent, DiscountsComponent } from './list/discounts.co
 import { DiscountDetailComponent } from './detail/discount-detail.component';
 import { MatChipsModule } from '@angular/material/chips';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { EffectsModule } from '@ngrx/effects';
+import { DiscountEffects } from '../store/effects/discount.effects';
+import { DiscountService } from '../services/discount.service';
+import { UserEffects } from '../store/effects/user.effects';
+import { UserService } from '../services/user.service';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
   new TranslateHttpLoader(http, './assets/i18n/discount/', '.json');
@@ -27,17 +28,17 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
   imports: [
     DiscountRoutingModule,
     SharedModule,
-    CommonModule,
-    HttpClientModule,
-    FormsModule,
-    ReactiveFormsModule,
-    AppMaterialModule,
     MatChipsModule,
     TranslateModule.forChild({
       loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient]},
       isolate: false,
       extend: true
-    })
+    }),
+    EffectsModule.forFeature([DiscountEffects, UserEffects])
+  ],
+  providers: [
+    DiscountService,
+    UserService
   ]
 })
 export class DiscountModule {

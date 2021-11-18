@@ -1,10 +1,6 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
-import { AppMaterialModule } from '../util/app-material.module';
+import { HttpClient } from '@angular/common/http';
 import { SharedModule } from '../shared/shared.module';
 import { RoomRoutingModule } from './room-routing.module';
 
@@ -15,6 +11,10 @@ import { RoomDetailComponent } from './detail/room-detail.component';
 import { AvailabilityComponent } from './availability/availability.component';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { EffectsModule } from '@ngrx/effects';
+import { RoomEffects } from '../store/effects/room.effects';
+import { RoomService } from '../services/room.service';
+import { UserService } from '../services/user.service';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
   new TranslateHttpLoader(http, './assets/i18n/room/', '.json');
@@ -30,17 +30,17 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
   imports: [
     RoomRoutingModule,
     SharedModule,
-    CommonModule,
-    HttpClientModule,
-    FormsModule,
-    ReactiveFormsModule,
-    AppMaterialModule,
     MatExpansionModule,
     TranslateModule.forChild({
       loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient]},
       isolate: false,
       extend: true
-    })
+    }),
+    EffectsModule.forFeature([RoomEffects])
+  ],
+  providers: [
+    RoomService,
+    UserService
   ]
 })
 export class RoomModule {
