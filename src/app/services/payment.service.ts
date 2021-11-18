@@ -4,9 +4,7 @@ import { PAGE_SIZE } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
 import { IPayment } from '../interfaces/payment';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class PaymentService {
 
   url = 'payments';

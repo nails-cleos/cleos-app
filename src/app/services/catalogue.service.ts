@@ -3,9 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ICatalogue, ICatalogueAll } from '../interfaces/catalogue';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class CatalogueService {
 
   url = 'catalogues';

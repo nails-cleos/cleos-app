@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AgmCoreModule } from '@agm/core';
 import { MatGoogleMapsAutocompleteModule } from '@angular-material-extensions/google-maps-autocomplete';
@@ -29,6 +29,7 @@ import { CustomEventTitleFormatter } from './CustomEventTitleFormatter';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { ChartComponent } from './chart/chart.component';
 import { httpInterceptorProviders } from '../http-interceptors';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   imports: [
@@ -57,9 +58,19 @@ import { httpInterceptorProviders } from '../http-interceptors';
     MatGoogleMapsAutocompleteModule,
     ReactiveFormsModule,
     ChartsModule,
-    FlexLayoutModule
+    FlexLayoutModule,
+    HttpClientModule,
+    FormsModule
   ],
   exports: [
+    AppMaterialModule,
+    CommonModule,
+    ReactiveFormsModule,
+    AppMaterialModule,
+    FlexLayoutModule,
+    HttpClientModule,
+    ChartsModule,
+    FormsModule,
     BackButtonDirective,
     ErrorComponent,
     GoogleMapComponent,
@@ -67,7 +78,6 @@ import { httpInterceptorProviders } from '../http-interceptors';
     RatingComponent,
     CardChartComponent,
     CardComponent,
-    FlexLayoutModule,
     ChartComponent
   ],
   declarations: [

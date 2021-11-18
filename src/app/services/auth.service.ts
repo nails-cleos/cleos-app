@@ -4,9 +4,7 @@ import { Token } from '../interfaces/token';
 import { IUser } from '../interfaces/user';
 import { Observable } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class AuthService {
 
   private authUrl = 'auth';
