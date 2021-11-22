@@ -10,6 +10,8 @@ export enum ProductActionTypes {
   productSelected = '[Product] Selected',
   productFind = '[Product] Find',
   productDelete = '[Product] Delete',
+  productHistory = '[Product] history',
+  productHistorySuccess = '[Product] history success',
   clean = '[Product] Clean'
 }
 
@@ -76,6 +78,20 @@ export class DeleteProduct implements Action {
   }
 }
 
+export class ProductHistory implements Action {
+  readonly type = ProductActionTypes.productHistory;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class ProductHistorySuccess implements Action {
+  readonly type = ProductActionTypes.productHistorySuccess;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class Clean implements Action {
   readonly type = ProductActionTypes.clean;
 }
@@ -90,4 +106,6 @@ export type All =
   | ProductFind
   | ProductSelected
   | DeleteProduct
+  | ProductHistory
+  | ProductHistorySuccess
   | Clean;

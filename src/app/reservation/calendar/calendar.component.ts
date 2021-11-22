@@ -147,16 +147,15 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   selectDate(event: any): void {
     this.changeDate(newDate(event.value));
+    this.getReservations();
   }
 
   increment(): void {
-    this.changeDate(addPeriod(this.selectView, this.viewDate, this.daysInWeek));
-    this.picker.select(this.viewDate);
+    this.picker.select(addPeriod(this.selectView, this.viewDate, this.daysInWeek));
   }
 
   decrement(): void {
-    this.changeDate(subPeriod(this.selectView, this.viewDate, this.daysInWeek));
-    this.picker.select(this.viewDate);
+    this.picker.select(subPeriod(this.selectView, this.viewDate, this.daysInWeek));
   }
 
   beforeMonthViewRender({header}: any): void {
@@ -330,7 +329,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   private getReservations(): void {
     this.store.dispatch(
-      new fromActionsReservation.GetAllGroupingByRoom()
+      new fromActionsReservation.GetAllGroupingByRoom({days: this.daysInWeek, date: this.viewDate})
     );
   }
 }

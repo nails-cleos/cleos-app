@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IProductDiscountDTO, IProductGroup } from '../interfaces/product';
+import { IProductAll, IProductDiscountDTO, IProductGroup } from '../interfaces/product';
 import { PAGE_SIZE } from '../interfaces/pagination';
 
 @Injectable()
@@ -53,5 +53,10 @@ export class ProductService {
   public update(product: IProductGroup): Observable<IProductGroup> {
     const url = `${this.url}/${product.id}`;
     return this.http.patch<IProductGroup>(url, product);
+  }
+
+  public getHistory(id: string, productId: string): Observable<IProductAll[] | undefined> {
+    const url = `${this.url}/${id}/products/${productId}/histories`;
+    return this.http.get<IProductAll[]>(url);
   }
 }

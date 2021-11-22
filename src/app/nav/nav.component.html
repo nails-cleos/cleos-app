@@ -183,16 +183,16 @@
     </main>
     <footer>
       <mat-toolbar *ngIf="(isHandset$ | async) && (isProfessional || isAdmin)" class="footer">
-        <a routerLink="/reservation/calendar" [routerLinkActive]="['active-link']">
+        <a [routerLinkActive]="['active-link']" routerLink="/reservation/calendar">
           <mat-icon>event</mat-icon>
         </a>
-        <a routerLink="/dashboard" [routerLinkActive]="['active-link']">
+        <a [routerLinkActive]="['active-link']" routerLink="/dashboard">
           <mat-icon>dashboard</mat-icon>
         </a>
-        <a *ngIf="isAdmin" routerLink="/users/add" [routerLinkActive]="['active-link']">
-          <mat-icon>person_add</mat-icon>
+        <a *ngIf="isAdmin" [routerLinkActive]="['active-link']" routerLink="/reservation/search">
+          <mat-icon>find_in_page</mat-icon>
         </a>
-        <a routerLink="/unavailable/add" [routerLinkActive]="['active-link']">
+        <a [routerLinkActive]="['active-link']" routerLink="/unavailable/add">
           <mat-icon>event_busy</mat-icon>
         </a>
       </mat-toolbar>

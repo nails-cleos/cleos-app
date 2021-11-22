@@ -311,7 +311,11 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.unavailableEventLength = this.events.length;
     this.viewDate = date;
     this.store.dispatch(
-      new fromActionsReservation.SearchReservation({date: this.date.value, roomId: this.room.value.id})
+      new fromActionsReservation.SearchReservation({
+        date: this.date.value,
+        roomId: this.room.value.id,
+        days: this.daysInWeek
+      })
     );
     this.myStepper.next();
   }

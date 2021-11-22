@@ -7,7 +7,8 @@
       "COLUMN": {
         "DURABILITY": "Durability",
         "PRICE": "Price",
-        "DURATION": "Duration"
+        "DURATION": "Duration",
+        "DATE": "Updated"
       },
       "ERROR": {
         "NO_CONTENT": "No products",
