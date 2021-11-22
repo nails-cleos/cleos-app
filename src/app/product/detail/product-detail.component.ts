@@ -165,7 +165,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     if (!this.group) {
       const id = this.route.snapshot.paramMap.get('id');
       this.store.dispatch(
-        new fromActionsProduct.ProductFind(id)
+        new fromActionsProduct.ProductFind({id, path: 'edit'})
       );
     }
   }

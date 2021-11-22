@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ICustomerReservation, IReservation, IRoomReservation } from '../interfaces/reservation';
-import { getNow } from '../util/dates';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { IReview } from '../interfaces/review';
 
@@ -10,6 +9,7 @@ import { IReview } from '../interfaces/review';
 export class ReservationService {
 
   url = 'reservations';
+  urlV1 = 'v1/reservations';
 
   constructor(private http: HttpClient) {
   }
@@ -60,14 +60,16 @@ export class ReservationService {
     return this.http.get<IReservation[]>(`${this.url}/filter`, {params});
   }
 
-  public getAllGroupingByRoom(): Observable<IReservation[]> {
-    const params = new HttpParams().set('date', getNow().toISOString().slice(0, 10));
-    return this.http.get<any>(`${this.url}/rooms`, {params});
+  public getAllGroupingByRoom(days: number, date: Date): Observable<IReservation[]> {
+    let params = new HttpParams().set('date', date.toISOString().slice(0, 10));
+    params = params.append('days', days);
+    return this.http.get<any>(`${this.urlV1}/rooms`, {params});
   }
 
-  public search(roomId: string, date: Date): Observable<IRoomReservation> {
-    const params = new HttpParams().set('date', date.toISOString().slice(0, 10));
-    return this.http.get<IRoomReservation>(`${this.url}/rooms/${roomId}`, {params});
+  public search(roomId: string, days: number, date: Date): Observable<IRoomReservation> {
+    let params = new HttpParams().set('date', date.toISOString().slice(0, 10));
+    params = params.append('days', days);
+    return this.http.get<IRoomReservation>(`${this.urlV1}/rooms/${roomId}`, {params});
   }
 
   public customerSearch(roomId: string, productId: string, date: Date, additionalIds?: string[]): Observable<IRoomReservation> {

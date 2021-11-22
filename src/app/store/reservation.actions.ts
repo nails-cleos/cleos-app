@@ -66,6 +66,9 @@ export class GetAllFilterPage implements Action {
 
 export class GetAllGroupingByRoom implements Action {
   readonly type = ReservationActionTypes.getAllGroupingByRoom;
+
+  constructor(public payload: any) {
+  }
 }
 
 export class SearchReservation implements Action {

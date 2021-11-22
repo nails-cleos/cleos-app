@@ -1,9 +1,10 @@
 import { Pagination } from '../../interfaces/pagination';
 import { All, ProductActionTypes } from '../product.actions';
-import { IProductGroup } from '../../interfaces/product';
+import { IProductAll, IProductGroup } from '../../interfaces/product';
 
 export interface State {
   data: IProductGroup | Pagination<IProductGroup> | null;
+  history: IProductAll[] | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -14,6 +15,7 @@ export interface State {
 
 export const initialState: State = {
   data: null,
+  history: null,
   errorMessage: null,
   error: null,
   subErrors: null,
@@ -67,7 +69,7 @@ export const reducer = (state = initialState, action: All): State => {
     case ProductActionTypes.productSelected: {
       return {
         ...state,
-        selected: action.payload,
+        selected: action.payload.product,
         errorMessage: null,
         subErrors: null,
         message: null
@@ -92,6 +94,25 @@ export const reducer = (state = initialState, action: All): State => {
         subErrors: null,
         message: null,
         isLoading: true
+      };
+    }
+    case ProductActionTypes.productHistory: {
+      return {
+        ...state,
+        history: [{} as IProductAll, {} as IProductAll, {} as IProductAll],
+        errorMessage: null,
+        subErrors: null,
+        selected: null,
+        message: null
+      };
+    }
+    case ProductActionTypes.productHistorySuccess: {
+      return {
+        ...state,
+        history: action.payload,
+        errorMessage: null,
+        subErrors: null,
+        message: null
       };
     }
     case ProductActionTypes.clean: {

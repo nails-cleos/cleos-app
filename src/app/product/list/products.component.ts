@@ -65,12 +65,6 @@ export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription?.unsubscribe();
   }
 
-  edit(product: IProduct): void {
-    this.store.dispatch(
-      new fromActionsProduct.ProductSelected(product)
-    );
-  }
-
   delete(product: IProduct): void {
     const title = this.translate.instant('PRODUCT.DELETED.TITLE');
     const content = this.translate.instant('PRODUCT.DELETED.CONTENT', {name: product.name});

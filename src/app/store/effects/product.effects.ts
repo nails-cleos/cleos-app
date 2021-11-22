@@ -22,8 +22,8 @@ export class ProductEffects {
 
   findOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsProduct.ProductActionTypes.productFind)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.productService.getById(payload).pipe(
-      switchMap((product: any) => of(new fromActionsProduct.ProductSelected(product))),
+    switchMap((payload: any) => this.productService.getById(payload.id).pipe(
+      switchMap((product: any) => of(new fromActionsProduct.ProductSelected({product, path: payload.path}))),
       catchError((err: HttpErrorResponse) => of(new fromActionsProduct.ProductFailure({error: err.error})))
     ))
   ));
@@ -58,9 +58,17 @@ export class ProductEffects {
     ))
   ));
 
+  history$ = createEffect(() => this.actions$.pipe(ofType(fromActionsProduct.ProductActionTypes.productHistory)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.productService.getHistory(payload.id, payload.productId).pipe(
+      switchMap((product: any) => of(new fromActionsProduct.ProductHistorySuccess(product))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsProduct.ProductFailure({error: err.error})))
+    ))
+  ));
+
   selectedData$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsProduct.ProductActionTypes.productSelected),
-    tap((data: any) => this.router.navigate(['products', data.payload.id]))
+    tap((data: any) => this.router.navigate(['products', data.payload.product.id, data.payload.path]))
   ), {dispatch: false});
 
   dataSuccess$ = createEffect(() => this.actions$.pipe(
@@ -69,6 +77,10 @@ export class ProductEffects {
 
   saveSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsProduct.ProductActionTypes.productSaveSuccess)
+  ), {dispatch: false});
+
+  historySuccess$ = createEffect(() => this.actions$.pipe(
+    ofType(fromActionsProduct.ProductActionTypes.productHistorySuccess)
   ), {dispatch: false});
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private productService: ProductService,

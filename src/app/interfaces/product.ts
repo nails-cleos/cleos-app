@@ -20,6 +20,8 @@ export interface IProduct {
   rating?: number;
   primary: boolean;
   errors?: any;
+  history?: IProductAll[];
+  showHistory?: boolean;
 }
 
 export interface IProductAll {
@@ -30,6 +32,9 @@ export interface IProductAll {
   description?: string;
   discount?: IDiscount;
   extras?: IExtras;
+  primary?: boolean;
+  createdAt?: string;
+  productId?: string;
 }
 
 export interface IProductDiscountDTO {
