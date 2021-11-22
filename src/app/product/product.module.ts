@@ -12,6 +12,12 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { EffectsModule } from '@ngrx/effects';
 import { ProductEffects } from '../store/effects/product.effects';
 import { ProductService } from '../services/product.service';
+import { ProductViewComponent } from './view/product-view.component';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { ProductTableComponent } from './table/product-table.component';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
   new TranslateHttpLoader(http, './assets/i18n/product/', '.json');
@@ -20,7 +26,9 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
   declarations: [
     ProductComponent,
     ProductsComponent,
-    ProductDetailComponent
+    ProductDetailComponent,
+    ProductViewComponent,
+    ProductTableComponent
   ],
   imports: [
     ProductRoutingModule,
@@ -31,7 +39,11 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
       isolate: false,
       extend: true
     }),
-    EffectsModule.forFeature([ProductEffects])
+    EffectsModule.forFeature([ProductEffects]),
+    MatExpansionModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule
   ],
   providers: [
     ProductService

@@ -5,6 +5,7 @@ import { Role } from '../interfaces/token';
 import { ProductsComponent } from './list/products.component';
 import { ProductComponent } from './product.component';
 import { ProductDetailComponent } from './detail/product-detail.component';
+import { ProductViewComponent } from './view/product-view.component';
 
 const routes: Routes = [
   {
@@ -18,7 +19,12 @@ const routes: Routes = [
     }
   },
   {
-    path: ':id', component: ProductDetailComponent, canActivate: [AuthGuardService], data: {
+    path: ':id/edit', component: ProductDetailComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.admin]
+    }
+  },
+  {
+    path: ':id/view', component: ProductViewComponent, canActivate: [AuthGuardService], data: {
       roles: [Role.admin]
     }
   }];

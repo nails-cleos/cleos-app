@@ -50,7 +50,7 @@ export class ReservationEffects {
   getAllGroupingByRoom$ = createEffect(() =>
     this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getAllGroupingByRoom)).pipe(
       map((action: any) => action.payload),
-      switchMap(() => this.reservationService.getAllGroupingByRoom().pipe(
+      switchMap((payload) => this.reservationService.getAllGroupingByRoom(payload.days, payload.date).pipe(
         switchMap((response: any) => of(new fromActionsReservation.ReservationSuccess(response ? response : []))),
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
       ))
@@ -58,7 +58,7 @@ export class ReservationEffects {
 
   search = createEffect(() => this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.searchReservation)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.reservationService.search(payload.roomId, payload.date).pipe(
+    switchMap((payload: any) => this.reservationService.search(payload.roomId, payload.days, payload.date).pipe(
       switchMap((response: any) => of(new fromActionsReservation.ReservationSuccess(response ? response : []))),
       catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
     ))

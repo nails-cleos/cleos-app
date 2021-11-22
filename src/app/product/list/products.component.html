@@ -41,9 +41,13 @@
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
       <td *matCellDef="let product" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="product.id; else skeleton">
-          <button [routerLink]="'/products/'+ product.id" *ngIf="!product.deleted" mat-icon-button
+          <button *ngIf="!product.deleted" [routerLink]="'/products/'+ product.id + '/edit'" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
             <mat-icon color="primary">edit</mat-icon>
+          </button>
+          <button *ngIf="!product.deleted" [routerLink]="'/products/'+ product.id + '/view'" mat-icon-button
+                  matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
+            <mat-icon color="accent">visibility</mat-icon>
           </button>
           <button (click)="delete(product)" *ngIf="!product.deleted" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
@@ -66,10 +70,15 @@
             </mat-list-item>
             <div fxHide fxShow.lt-sm mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
             <mat-list-item fxHide fxShow.lt-sm role="list">
-              <button (click)="edit(product)" *ngIf="!product.deleted" color="primary"
+              <button *ngIf="!product.deleted" [routerLink]="'/products/'+ product.id + '/edit'" color="primary"
                       mat-raised-button>
                 <mat-icon>edit</mat-icon>
                 {{ 'COMMON.BUTTON.EDIT' | translate }}
+              </button>
+              <button [routerLink]="'/products/'+ product.id + '/view'" class="detail-button" color="accent"
+                      mat-raised-button>
+                <mat-icon>visibility</mat-icon>
+                {{ 'COMMON.BUTTON.VIEW' | translate }}
               </button>
               <button (click)="delete(product)" *ngIf="!product.deleted" class="detail-button"
                       color="warn" mat-raised-button>
