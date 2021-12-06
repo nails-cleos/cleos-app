@@ -97,7 +97,7 @@
           <button (click)="edit(user)" *ngIf="!user.deleted" mat-icon-button>
             <mat-icon color="primary">edit</mat-icon>
           </button>
-          <button [routerLink]="['/users', user.id, 'overview']" mat-icon-button>
+          <button *ngIf="!user.deleted" [routerLink]="['/users', user.id, 'overview']" mat-icon-button>
             <mat-icon color="primary">analytics</mat-icon>
           </button>
           <button (click)="book(user)" *ngIf="!user.deleted" mat-icon-button>
@@ -109,6 +109,10 @@
           <button (click)="sendInvite(user)" *ngIf="!user.deleted && !user.enabled && user.provider === 'LOCAL'"
                   mat-icon-button>
             <mat-icon color="accent">forward_to_inbox</mat-icon>
+          </button>
+          <button (click)="restore(user)" *ngIf="user.deleted"
+                  mat-icon-button>
+            <mat-icon color="primary">restore_from_trash</mat-icon>
           </button>
         </div>
         <ng-template #skeleton>
@@ -155,12 +159,12 @@
                 <mat-list-item *ngFor="let it of user.authorities" role="list">
                   <mat-icon mat-list-icon>{{getIcon(it.authority)}}</mat-icon>
                   <div mat-line>{{ 'COMMON.ROLES.' + it.authority | translate}}</div>
-                  <button (click)="removeRole(user, it.authority)" color="warn" mat-icon-button>
+                  <button (click)="removeRole(user, it.authority)" *ngIf="!user.deleted" color="warn" mat-icon-button>
                     <mat-icon mat-list-icon>clear</mat-icon>
                   </button>
                 </mat-list-item>
               </div>
-              <div class="flex-child">
+              <div *ngIf="!user.deleted" class="flex-child">
                 <div *ngFor="let role of user.missing">
                   <button (click)="addRole(user, role)" color="primary" mat-icon-button>
                     <mat-icon mat-list-icon>{{getIcon(role)}}</mat-icon>
@@ -169,22 +173,26 @@
               </div>
             </div>
             <div fxHide fxShow.lt-sm mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
-            <div fxHide fxShow.lt-sm>
-              <button (click)="edit(user)" *ngIf="!user.deleted" mat-icon-button>
+            <div *ngIf="!user.deleted" fxHide fxShow.lt-sm>
+              <button (click)="edit(user)" mat-icon-button>
                 <mat-icon color="primary">edit</mat-icon>
               </button>
-              <button *ngIf="!user.deleted" [routerLink]="['/users', user.id, 'overview']" mat-icon-button>
+              <button [routerLink]="['/users', user.id, 'overview']" mat-icon-button>
                 <mat-icon color="primary">analytics</mat-icon>
               </button>
-              <button (click)="book(user)" *ngIf="!user.deleted" mat-icon-button>
+              <button (click)="book(user)" mat-icon-button>
                 <mat-icon color="accent">today</mat-icon>
               </button>
-              <button (click)="delete(user)" *ngIf="!user.deleted" mat-icon-button>
+              <button (click)="delete(user)" mat-icon-button>
                 <mat-icon color="warn">delete</mat-icon>
               </button>
-              <button (click)="sendInvite(user)" *ngIf="!user.deleted && !user.enabled && user.provider === 'LOCAL'"
-                      mat-icon-button>
+              <button (click)="sendInvite(user)" *ngIf="!user.enabled && user.provider === 'LOCAL'" mat-icon-button>
                 <mat-icon color="accent">forward_to_inbox</mat-icon>
+              </button>
+            </div>
+            <div *ngIf="user.deleted" fxHide fxShow.lt-sm>
+              <button (click)="restore(user)" *ngIf="user.deleted" mat-icon-button>
+                <mat-icon color="primary">restore_from_trash</mat-icon>
               </button>
             </div>
           </mat-list>
@@ -200,7 +208,7 @@
 
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
     <tr (click)="expandedUser = expandedUser === user ? null : user" *matRowDef="let user; columns: displayedColumns;"
-        class="user-row" mat-row></tr>
+        [ngClass]="{'deadLine': user.deleted}" class="user-row" mat-row></tr>
     <tr *matRowDef="let row; columns: ['expandedDetail']" class="user-detail-row" mat-row></tr>
 
     <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>

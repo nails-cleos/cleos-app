@@ -35,6 +35,7 @@
       }
     },
     "PRODUCT": {
+      "DETAIL": "Detail",
       "NO_CONTENT": "No products",
       "NAME": {
         "FIELD": "Name"
@@ -57,6 +58,7 @@
         "NAME": "<span class='bold'>Product:</span> {{name}}",
         "TOTAL": "<span class='bold'>Total:</span>",
         "PRICE": "<span class='bold'>Price:</span>",
+        "DURATION": "<span class='bold'>Duration:</span> {{duration}}",
         "DURABILITY": "<span class='bold'>Durability:</span> {{durability}}"
       },
       "DISCOUNT": {

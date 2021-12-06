@@ -141,6 +141,37 @@
             <mat-option *ngFor="let cd of discounts" [value]="cd.id">{{cd.title}}</mat-option>
           </mat-select>
         </mat-form-field>
+        <mat-list-item *ngIf="product.value">
+          <mat-icon mat-list-icon>home_repair_service</mat-icon>
+          <div class="bold" mat-subheader>{{ 'RESERVATION.PRODUCT.DETAIL' | translate}}</div>
+          <mat-divider></mat-divider>
+        </mat-list-item>
+        <mat-list-item *ngIf="product.value">
+          <div *ngIf="product.value.description" [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.DESCRIPTION' |
+                  translate: {description: product.value.description}"
+               mat-line>
+          </div>
+          <div *ngIf="!isEditing; else editing" mat-line>
+            <span [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.PRICE' | translate"></span>
+            <span [class.strikethrough]="discount.value"
+                  class="raised-button">$ {{product.value.price | number:'1.2-2'}}</span>
+            <span *ngIf="price.priceWithDiscount" [@discountAnimation]
+                  class="raised-button bold">$ {{price.priceWithDiscount | number:'1.2-2'}}</span>
+          </div>
+          <ng-template #editing>
+            <span [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.PRICE' | translate"></span>
+            <span
+              class="raised-button">$ {{(price.priceWithDiscount ? price.priceWithDiscount : product.value.price) | number:'1.2-2'}}</span>
+            <span *ngIf="price.priceWithDiscount"
+                  class="raised-button bold">{{'RESERVATION.PRODUCT.DISCOUNT.ADD' | translate}}</span>
+          </ng-template>
+          <div [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.DURATION' |
+                  translate: {duration: durationTime}" mat-line>
+          </div>
+          <div *ngIf="group.value.durability" [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.DURABILITY' |
+                  translate: {durability: group.value.durability}" mat-line>
+          </div>
+        </mat-list-item>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>

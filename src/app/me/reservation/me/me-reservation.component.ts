@@ -46,6 +46,7 @@ import { transitionAnimation } from '../../../util/animation';
 import { isEqual } from 'date-fns';
 import { IAdditionalAll } from '../../../interfaces/additional';
 import { MatListOption } from '@angular/material/list';
+import { MatDatepicker } from '@angular/material/datepicker';
 
 @Component({
   selector: 'app-me-reservation',
@@ -58,6 +59,7 @@ import { MatListOption } from '@angular/material/list';
 })
 export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('stepper') myStepper!: MatStepper;
+  @ViewChild('picker') datePicker!: MatDatepicker<Date>;
 
   errors: any = [];
 
@@ -85,7 +87,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     Validators.required, requireMatch
   ]);
 
-  date: FormControl = new FormControl('', [
+  startDate: FormControl = new FormControl('', [
     Validators.required
   ]);
 
@@ -103,8 +105,9 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   canCreate = false;
   distance?: string;
   maxDate: Date;
+  maxDateFormat: string;
   minDate: Date;
-  startDate?: Date;
+  date?: Date;
   endDate?: Date;
   additionalDuration?: string;
   totalDuration?: string;
@@ -131,11 +134,12 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       .subscribe(result => this.smallScreen = result.matches);
     this.minDate = getNow();
     this.maxDate = plusMonthDate(this.minDate, this.reservationMonths, this.minDate.getDate() + 1);
+    this.maxDateFormat = formatDateTwoDigit(this.maxDate, this.locale);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
     if (this.extras) {
       this.productId = this.extras.product?.id;
       this.room.setValue(this.extras.room);
-      this.date.setValue(this.extras.date);
+      this.startDate.setValue(this.extras.date);
     }
     this.product.valueChanges.subscribe(value => {
       if (value) {
@@ -188,7 +192,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     if (this.productForm.invalid) {
       return;
     }
-    if (this.eventSelected !== this.date.value) {
+    if (this.eventSelected !== this.startDate.value) {
       this.eventSelected = undefined;
       this.time = undefined;
     }
@@ -198,7 +202,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
     this.store.dispatch(
       new fromActionsReservation.CustomerSearchReservation({
-        date: this.date.value,
+        date: this.startDate.value,
         roomId: this.room.value.id,
         productId: this.product.value.id,
         additionalIds: this.additionalSelected?.map(additional => additional.id)
@@ -215,9 +219,9 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       return;
     }
 
-    this.startDate = newDate(this.eventSelected);
-    this.endDate = createNewDate(this.startDate, this.startDate.getHours() + this.duration.hour,
-      this.startDate.getMinutes() + this.duration.minute);
+    this.date = newDate(this.eventSelected);
+    this.endDate = createNewDate(this.date, this.date.getHours() + this.duration.hour,
+      this.date.getMinutes() + this.duration.minute);
 
     this.isPreview = true;
     this.myStepper.next();
@@ -275,7 +279,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   dateNoContent(date?: any): string {
-    return formatDateName(createNewDate(date ? date : this.date.value), this.translate.currentLang, this.measure);
+    return formatDateName(createNewDate(date ? date : this.startDate.value), this.translate.currentLang, this.measure);
   }
 
   selectDate(datetime: any): void {
@@ -295,8 +299,8 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     const reservation: IReservation = new Reservation();
     reservation.customerId = this.customerId;
     reservation.roomId = this.room.value.id;
-    if (this.startDate) {
-      reservation.start = this.startDate.toLocaleString(API_LOCALE);
+    if (this.date) {
+      reservation.start = this.date.toLocaleString(API_LOCALE);
     }
     reservation.additionalIds = this.additionalSelected?.map(value => value.id);
 
@@ -399,7 +403,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.productForm = this.formBuilder.group({
       product: this.product,
       discount: this.discount,
-      date: this.date
+      startDate: this.startDate
     });
     this.roomForm = this.formBuilder.group({
       room: this.room
@@ -481,7 +485,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       }
       if (state.data && Array.isArray(state.data)) {
         this.availableList = new Map<string, any[]>();
-        this.availableList.set(createNewDate(this.date.value).toString(), []);
+        this.availableList.set(createNewDate(this.startDate.value).toString(), []);
         state.data.reduce((group: Map<string, string[]>, item: IAvailableDTO) => {
           const date = newDate(item.start);
           const key = createNewDate(date).toString();
@@ -495,6 +499,21 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
         this.setSelectedIndex();
       }
+      if (state.subErrors) {
+        state.subErrors.forEach((value: any) => {
+          switch (value.field) {
+            case 'startDate':
+              this.myStepper.selectedIndex = 1;
+              break;
+            default:
+              this.myStepper.selectedIndex = 0;
+              break;
+          }
+          this.eventSelected = undefined;
+          this.errors[value.field] = value.message;
+          this.productForm.controls[value.field]?.setErrors({incorrect: true});
+        });
+      }
     });
   }
 
@@ -503,7 +522,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     new Map([...this.availableList.entries()]
       .sort((a: any, b: any) => this.sortDate({key: a[0]}, {key: b[0]})))
       .forEach((value, key) => {
-        if (isEqual(this.date.value, newDate(key))) {
+        if (isEqual(this.startDate.value, newDate(key))) {
           this.selectedIndex = i;
         }
         i++;
@@ -533,7 +552,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     const date = newDate(reservation.start);
     this.time = getTime(date, this.locale);
     this.room.setValue(reservation.room);
-    this.date.setValue(date);
+    this.startDate.setValue(date);
     this.eventSelected = date;
     this.additionalSelected = reservation.additional ? reservation.additional : [];
     this.price = getPrice(reservation);
@@ -548,5 +567,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.duration = reservationDuration(reservation);
 
     this.myStepper.next();
+    this.datePicker.open();
   }
 }

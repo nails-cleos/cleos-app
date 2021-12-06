@@ -44,7 +44,9 @@
       },
       "DATE": {
         "FIELD": "Elegí una fecha",
-        "REQUIRED": "Fecha es <b>requerida</b>"
+        "REQUIRED": "Fecha es <b>requerida</b>",
+        "GREATER": "La fecha debe ser mayor a hoy",
+        "LESS": "La fecha debe ser menor a {{maxDate}}"
       },
       "ADDITIONAL": {
         "DURATION": {
