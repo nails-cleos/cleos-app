@@ -33,6 +33,11 @@
       "CONTENT": "Are you sure to delete user {{username}}?",
       "MESSAGE": "User {{username}} deleted"
     },
+    "RESTORE": {
+      "TITLE": "Restore user",
+      "CONTENT": "Are you sure to restore user {{username}}?",
+      "MESSAGE": "User {{username}} restored"
+    },
     "UPDATED": {
       "MESSAGE": "User {{username}} updated"
     },

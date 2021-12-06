@@ -134,6 +134,16 @@ export class UserEffects {
     ))
   ));
 
+  restore$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.userRestore)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.userService.restore(payload).pipe(
+      switchMap((response: any) => {
+        const message = this.translate.instant('USER.RESTORE.MESSAGE', {username: response.username});
+        return of(new fromActionsUser.UserSaveSuccess({message}));
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
+    ))
+  ));
+
   resend$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.resendUserToken)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.userService.resend(payload).pipe(

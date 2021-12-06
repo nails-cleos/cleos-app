@@ -33,6 +33,11 @@
       "CONTENT": "¿Está seguro de eliminar el usuario {{username}}?",
       "MESSAGE": "Usuario {{username}} eliminado"
     },
+    "RESTORE": {
+      "TITLE": "Recuperar usuario",
+      "CONTENT": "¿Está seguro de recuperar el usuario {{username}}?",
+      "MESSAGE": "Usuario {{username}} recuperado"
+    },
     "UPDATED": {
       "MESSAGE": "Usuario {{username}} actualizado"
     },
