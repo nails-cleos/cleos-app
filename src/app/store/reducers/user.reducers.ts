@@ -102,6 +102,7 @@ export const reducer = (state = initialState, action: All): State => {
     case UserActionTypes.updateUser:
     case UserActionTypes.updatePhoto:
     case UserActionTypes.resendUserToken:
+    case UserActionTypes.userRestore:
     case UserActionTypes.userDelete: {
       return {
         ...state,

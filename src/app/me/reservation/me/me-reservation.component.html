@@ -37,14 +37,23 @@
         <mat-form-field appearance="fill">
           <mat-label>{{ 'ME.RESERVATION.DATE.FIELD' | translate }}</mat-label>
           <label>
-            <input (focus)="picker.open()" [formControl]="date" [matDatepickerFilter]="myFilter"
+            <input (focus)="picker.open()" [formControl]="startDate" [matDatepickerFilter]="myFilter"
                    [matDatepicker]="picker" [max]="maxDate" [min]="minDate"
                    matInput required>
           </label>
           <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
           <mat-datepicker #picker touchUi></mat-datepicker>
-          <mat-error *ngIf="product.hasError('required')"
+          <mat-error *ngIf="startDate.hasError('required')"
                      [innerHTML]="'ME.RESERVATION.DATE.REQUIRED' | translate">
+          </mat-error>
+          <mat-error *ngIf="startDate.hasError('matDatepickerMin')"
+                     [innerHTML]="'ME.RESERVATION.DATE.GREATER' | translate">
+          </mat-error>
+          <mat-error *ngIf="startDate.hasError('matDatepickerMax')"
+                     [innerHTML]="'ME.RESERVATION.DATE.LESS' | translate: {maxDate: maxDateFormat}">
+          </mat-error>
+          <mat-error *ngIf="errors['startDate']">
+            {{errors['startDate']}}
           </mat-error>
         </mat-form-field>
         <mat-form-field *ngIf="groups; else skeleton" appearance="fill">
@@ -132,8 +141,8 @@
           <div [innerHTML]="'ME.RESERVATION.PRODUCT.COMPLETE.DURATION' |
                   translate: {duration: durationTime}" mat-line>
           </div>
-          <div *ngIf="product.value.durability" [innerHTML]="'ME.RESERVATION.PRODUCT.COMPLETE.DURABILITY' |
-                  translate: {durability: product.value.durability}" mat-line>
+          <div *ngIf="group.value.durability" [innerHTML]="'ME.RESERVATION.PRODUCT.COMPLETE.DURABILITY' |
+                  translate: {durability: group.value.durability}" mat-line>
           </div>
         </mat-list-item>
         <ng-template #skeleton>
@@ -186,7 +195,8 @@
   </ng-template>
   <ng-template #empty let-available='available'>
     <div class="no-content divider">
-      <p [innerHTML]="'ME.RESERVATION.UPCOMING.CUSTOMER.NO_CONTENT' | translate:{date: dateNoContent(available?.key)}"></p>
+      <p
+        [innerHTML]="'ME.RESERVATION.UPCOMING.CUSTOMER.NO_CONTENT' | translate:{date: dateNoContent(available?.key)}"></p>
     </div>
   </ng-template>
   <mat-error *ngIf="this.errors['schedule']" [innerHTML]="'ME.RESERVATION.SCHEDULE.REQUIRED' | translate"
@@ -196,7 +206,7 @@
 <ng-template #stepFive>
   <mat-card *ngIf="isPreview">
     <mat-card-header>
-      <mat-card-title>{{ 'COMMON.RESERVATION.LIST.ERROR.NO_CONTENT' | translate }}</mat-card-title>
+      <mat-card-title>{{ 'ME.RESERVATION.PREVIEW' | translate }}</mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <mat-list>
@@ -279,7 +289,7 @@
         <mat-list-item>
           <mat-icon mat-list-icon>event</mat-icon>
           <div mat-line>
-            <div>{{startDate?.toLocaleString(locale)}}</div>
+            <div>{{date?.toLocaleString(locale)}}</div>
             <div>{{endDate?.toLocaleString(locale)}}</div>
           </div>
         </mat-list-item>

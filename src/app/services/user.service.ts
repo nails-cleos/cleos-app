@@ -76,6 +76,11 @@ export class UserService {
     return this.http.delete<IUser>(url);
   }
 
+  public restore(user: IUser): Observable<IUser> {
+    const url = `${this.url}/${user.id}`;
+    return this.http.patch<IUser>(url, user);
+  }
+
   public resend(id: string | null): Observable<any> {
     const url = `${this.url}/${id}/token`;
     return this.http.post(url, null);

@@ -1,5 +1,5 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { IUser, IUserAll } from '../../interfaces/user';
+import { IUser, IUserAll, User } from '../../interfaces/user';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
@@ -15,7 +15,7 @@ import { Role } from '../../interfaces/token';
 import { getUserName, snakeToCamel } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
-import { RoleIconName, RoleIconKey } from '../../util/icon';
+import { RoleIconKey, RoleIconName } from '../../util/icon';
 import { Router } from '@angular/router';
 
 @Component({
@@ -114,6 +114,26 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
       if (result) {
         this.store.dispatch(
           new fromActionsUser.ResendToken(result.id)
+        );
+      }
+    });
+  }
+
+  restore(user: IUser): void {
+    this.noExpanded(user);
+    const title = this.translate.instant('USER.RESTORE.TITLE');
+    const content = this.translate.instant('USER.RESTORE.CONTENT', {username: getUserName(user)});
+    const dialogRef = this.dialog.open(DialogComponent, {
+      data: {title, content, value: user}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const restoreUser: IUser = new User();
+        restoreUser.id = result.id;
+        restoreUser.deleted = false;
+        this.store.dispatch(
+          new fromActionsUser.RestoreUser(restoreUser)
         );
       }
     });

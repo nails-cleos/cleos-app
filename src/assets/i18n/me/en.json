@@ -44,7 +44,9 @@
       },
       "DATE": {
         "FIELD": "Pick a date",
-        "REQUIRED": "Date is <b>required</b>"
+        "REQUIRED": "Date is <b>required</b>",
+        "GREATER": "Date must be greater than today",
+        "LESS": "Date must be less than {{maxDate}}"
       },
       "ADDITIONAL": {
         "DURATION": {

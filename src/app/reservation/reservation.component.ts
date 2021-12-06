@@ -24,7 +24,7 @@ import {
   createFullDate,
   createNewDate,
   Duration,
-  filterDateRoom,
+  filterDateRoom, formatDuration,
   formatTime,
   getAvailability,
   getDuration,
@@ -202,6 +202,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     return getUserName(this.room.value.professional);
   }
 
+  get durationTime(): string {
+    return formatDuration(this.product.value.duration, this.locale);
+  }
+
   getDateTime(date: Date | string | undefined): string {
     return date ? reservationDateTime(newDate(date), this.locale) : '';
   }
@@ -339,11 +343,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       let content;
       const eventsOverlapping = getOverlapEvent(this.events, start, end);
       if (eventsOverlapping.length && eventsOverlapping[0] !== this.eventSelected) {
-        const overlapping = eventsOverlapping.find(e => e.id);
-        if (overlapping) {
-          this.errors.overlapping = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.ERROR', {data: overlapping.title});
-          return;
-        }
         let message = '';
         eventsOverlapping.forEach(e => {
           message += `<div>${e.title}</div>`;
