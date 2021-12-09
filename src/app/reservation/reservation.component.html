@@ -60,7 +60,7 @@
 <ng-template #stepThree>
   <form [formGroup]="productForm">
     <div *ngIf="!groups?.length; else data" class="no-content bold">
-      {{'|' | translate}}
+      {{'RESERVATION.PRODUCT.NO_CONTENT' | translate}}
     </div>
     <ng-template #data>
       <div fxLayout="column" fxLayoutAlign="space-evenly start">
