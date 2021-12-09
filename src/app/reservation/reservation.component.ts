@@ -810,14 +810,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.customer.setValue(reservation.customer);
     this.price = getPrice(this.reservation);
     this.additionalSelected = this.reservation.additional ? this.reservation.additional : [];
-    this.group.setValue(this.groups?.find(group => {
-      const product = group.products?.find(p => p.id === reservation.product.id);
-      if (product) {
-        return group;
-      }
-      return undefined;
-    }));
-    this.product.setValue(reservation.product);
+    this.productId = reservation.product.id;
 
     this.myStepper.next();
     if (!this.isAdmin) {
