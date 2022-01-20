@@ -11,7 +11,13 @@ import { requireMatch, valueChange } from '../util/validators';
 import { IPrice, IProduct, IProductGroup, Price } from '../interfaces/product';
 import { MatStepper } from '@angular/material/stepper';
 import { IAvailability, IRoom } from '../interfaces/room';
-import { IReservation, IReservationAll, MAX_RESERVATION_MONTH, Reservation } from '../interfaces/reservation';
+import {
+  ICustomerLastReservation,
+  IReservation,
+  IReservationAll,
+  MAX_RESERVATION_MONTH,
+  Reservation
+} from '../interfaces/reservation';
 import { CalendarEvent, CalendarEventTimesChangedEvent } from 'angular-calendar';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -24,7 +30,8 @@ import {
   createFullDate,
   createNewDate,
   Duration,
-  filterDateRoom, formatDuration,
+  filterDateRoom,
+  formatDuration,
   formatTime,
   getAvailability,
   getDuration,
@@ -46,7 +53,15 @@ import { GeocoderResult } from '@agm/core';
 import { Role } from '../interfaces/token';
 import { IUnavailableAll } from '../interfaces/unavailable';
 import { DiscountType, IUserDiscount } from '../interfaces/discount';
-import { getFullUserName, getPrice, getUserName, newAdditional, newDiscount, newPrice } from '../util/helper';
+import {
+  getFullUserName,
+  getPrice,
+  getProductDurability,
+  getUserName,
+  newAdditional,
+  newDiscount,
+  newPrice
+} from '../util/helper';
 import { transitionAnimation } from '../util/animation';
 import { addDays, addMonths, isEqual, isSameDay } from 'date-fns';
 import { findStateColor, isDarkMode } from '../util/theme';
@@ -74,6 +89,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   customer: FormControl = new FormControl('', [
     Validators.required, requireMatch
   ]);
+  customerInfo?: ICustomerLastReservation;
 
   productForm!: FormGroup;
   groups?: IProductGroup[];
@@ -87,14 +103,14 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     Validators.required, requireMatch
   ]);
 
-  discounts: IUserDiscount[] | undefined;
+  discounts?: IUserDiscount[];
   discount = new FormControl();
   showDiscount = false;
   price: IPrice;
 
   roomForm!: FormGroup;
-  rooms: IRoom[] | undefined;
-  filteredRoom: Observable<IRoom[] | undefined> | undefined;
+  rooms?: IRoom[];
+  filteredRoom?: Observable<IRoom[] | undefined>;
   room: FormControl = new FormControl('', [
     Validators.required, requireMatch
   ]);
@@ -119,19 +135,20 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   unavailableEventLength = 0;
   refresh: Subject<any> = new Subject();
 
-  eventSelected: CalendarEvent | undefined;
+  eventSelected?: CalendarEvent;
   locale: string;
-  smallScreen: boolean | undefined;
+  smallScreen?: boolean;
   isPreview = false;
   duration: IDuration = new Duration();
 
   isEditing = false;
   isAdmin = false;
-  reservationId: string | undefined;
+  reservationId?: string;
 
   minDate: any;
   maxDate: any;
   maxCalendarDate: Date;
+  durability?: string;
 
   private productId: string | undefined;
   private isDarkMode = false;
@@ -178,7 +195,13 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         this.isDarkMode = isDarkMode(user.theme);
       }
     });
-    this.customer.valueChanges.subscribe(() => {
+    this.customer.valueChanges.subscribe((value) => {
+      this.customerInfo = undefined;
+      if (value) {
+        this.store.dispatch(
+          new fromActionsReservation.GetCustomerInfo(value.id)
+        );
+      }
       this.discount.setValue(null);
       this.showDiscount = false;
     });
@@ -204,6 +227,13 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get durationTime(): string {
     return formatDuration(this.product.value.duration, this.locale);
+  }
+
+  get productDetail(): string {
+    if (this.customerInfo) {
+      return this.customerInfo.product.name;
+    }
+    return '';
   }
 
   getDateTime(date: Date | string | undefined): string {
@@ -544,6 +574,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         return value;
       }
       this.products = value.products;
+      this.durability = getProductDurability(value.durabilityMin, value.durabilityMax, this.translate);
       this.product.setValue('');
       return value.name;
     }), map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups));
@@ -662,6 +693,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
+      this.customerInfo = state.customer;
       this.customers = state.customers;
       this.additionalList = state.additional;
       this.groups = state.productDiscount?.groups;

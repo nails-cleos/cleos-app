@@ -1,11 +1,13 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
-import { IProduct, IProductAll, IProductGroup } from '../../interfaces/product';
+import { IProduct, IProductGroup } from '../../interfaces/product';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectProductState } from '../../store/app.states';
 import * as fromActionsProduct from '../../store/product.actions';
 import { API_LOCALE, formatDuration } from '../../util/dates';
+import { groupDurability } from '../../util/helper';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-product-view',
@@ -19,7 +21,7 @@ export class ProductViewComponent implements OnInit, AfterViewInit, OnDestroy {
   private getState: Observable<any>;
   private productId?: string;
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>) {
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private translate: TranslateService) {
     this.getState = this.store.select(selectProductState);
   }
 
@@ -63,7 +65,9 @@ export class ProductViewComponent implements OnInit, AfterViewInit, OnDestroy {
           id: state.selected.id,
           name: state.selected.name,
           description: state.selected.description,
-          durability: state.selected.durability,
+          durability: groupDurability(state.selected, this.translate),
+          durabilityMin: state.selected.durabilityMin,
+          durabilityMax: state.selected.durabilityMax,
           products
         } as IProductGroup;
       }

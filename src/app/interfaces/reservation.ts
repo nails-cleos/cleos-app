@@ -5,7 +5,7 @@ import { CalendarEvent } from 'angular-calendar';
 import { ThemePalette } from '@angular/material/core';
 import { IUnavailableAll } from './unavailable';
 import { Pagination } from './pagination';
-import { IPayment, IPaymentAll } from './payment';
+import { IPayment } from './payment';
 import { IReview } from './review';
 import { IAdditionalAll } from './additional';
 
@@ -41,11 +41,6 @@ export interface IUpcomingAll extends IReservationAll{
   price: IPrice;
   end: Date;
   rowSpan: number;
-}
-
-export interface IPaymentReservation {
-  reservation: IReservationAll;
-  payments: IPaymentAll[];
 }
 
 export interface IRoomReservation {
@@ -110,6 +105,12 @@ export interface ITracking {
   startedTime?: string;
   completedTime?: string;
   cancelledTime?: string;
+}
+
+export interface ICustomerLastReservation {
+  product: IProductAll;
+  days: number;
+  professionalName: string;
 }
 
 export class Reservation implements IReservation {

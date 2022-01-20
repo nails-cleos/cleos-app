@@ -8,6 +8,7 @@ export enum ReservationActionTypes {
   searchReservation = '[Reservation] Search reservation',
   customerSearchReservation = '[Reservation] Customer search reservation',
   getCustomers = '[Reservation] Get customers',
+  getCustomerInfo = '[Reservation] Get customer info',
   getProducts = '[Reservation] Get products',
   getRooms = '[Reservation] Get rooms',
   getAdditional = '[Reservation] Get additional',
@@ -16,6 +17,7 @@ export enum ReservationActionTypes {
   reservationPageSuccess = '[Reservation] Page Success',
   reservationFilterPageSuccess = '[Reservation] Filter Page Success',
   customersSuccess = '[Reservation] Customers success',
+  customerSuccess = '[Reservation] Customer success',
   reservationProductsSuccess = '[Reservation] Products success',
   reservationAdditionalSuccess = '[Reservation] Additional success',
   reservationRoomsSuccess = '[Reservation] Rooms success',
@@ -89,6 +91,13 @@ export class GetAllCustomers implements Action {
   readonly type = ReservationActionTypes.getCustomers;
 }
 
+export class GetCustomerInfo implements Action {
+  readonly type = ReservationActionTypes.getCustomerInfo;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class GetAllProducts implements Action {
   readonly type = ReservationActionTypes.getProducts;
 
@@ -131,6 +140,13 @@ export class ReservationFilterPageSuccess implements Action {
 
 export class CustomersSuccess implements Action {
   readonly type = ReservationActionTypes.customersSuccess;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class CustomerSuccess implements Action {
+  readonly type = ReservationActionTypes.customerSuccess;
 
   constructor(public payload: any) {
   }
@@ -316,6 +332,7 @@ export type All =
   | SearchReservation
   | CustomerSearchReservation
   | GetAllCustomers
+  | GetCustomerInfo
   | GetAllProducts
   | GetAllRooms
   | GetAllAdditional
@@ -325,6 +342,7 @@ export type All =
   | ReservationPageSuccess
   | ReservationFilterPageSuccess
   | CustomersSuccess
+  | CustomerSuccess
   | ReservationProductsSuccess
   | ReservationRoomsSuccess
   | ReservationAdditionalSuccess

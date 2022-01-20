@@ -22,6 +22,21 @@
         {{errors['customer']}}
       </mat-error>
     </mat-form-field>
+    <div class="vertical-divider"></div>
+    <div *ngIf="customerInfo">
+      <mat-list>
+        <mat-list-item>
+          <div mat-line>{{ 'RESERVATION.CUSTOMER.INFO.DAYS' | translate: {days: customerInfo.days} }}</div>
+          <div [innerHTML]="'RESERVATION.CUSTOMER.INFO.PROFESSIONAL_NAME' |
+                  translate: {professional: customerInfo.professionalName}" mat-line></div>
+          <div [innerHTML]="'RESERVATION.CUSTOMER.INFO.PRODUCT' |
+                  translate: {product: productDetail}" mat-line></div>
+        </mat-list-item>
+      </mat-list>
+    </div>
+    <div *ngIf="!customerInfo && customer.value">
+      <div mat-subheader>{{ 'RESERVATION.CUSTOMER.INFO.NONE' | translate}}</div>
+    </div>
     <ng-template #skeleton>
       <div class="ssc-line"></div>
     </ng-template>
@@ -168,9 +183,7 @@
           <div [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.DURATION' |
                   translate: {duration: durationTime}" mat-line>
           </div>
-          <div *ngIf="group.value.durability" [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.DURABILITY' |
-                  translate: {durability: group.value.durability}" mat-line>
-          </div>
+          <div *ngIf="durability" [innerHTML]="durability" mat-line></div>
         </mat-list-item>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -334,7 +347,7 @@
       <div *ngIf="!isEditing; else editing">
         <div class="flex-container" fxLayout="column">
           <div fxLayout="column" fxLayoutAlign="space-between start">
-            <div fxLayout="row" fxLayoutAlign="space-between center">
+            <div fxLayout="row" fxLayoutAlign="space-between start">
               <ng-container *ngTemplateOutlet="stepOne"></ng-container>
               <button (click)="addCustomer()" *ngIf="isAdmin" class="raised-button" color="accent" mat-mini-fab>
                 <mat-icon>person_add</mat-icon>
@@ -461,15 +474,13 @@
     <mat-step [editable]="!isEditing" [stepControl]="customerForm" state="person_search">
       <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</ng-template>
       <div *ngIf="!isEditing; else editing">
-        <div class="flex-container" fxLayout="row">
-          <div fxLayout="row" fxLayoutAlign="space-between center">
-            <ng-container *ngTemplateOutlet="stepOne"></ng-container>
-            <div class="vertical-divider"></div>
-            <button (click)="addCustomer()" *ngIf="isAdmin" color="accent" mat-raised-button>
-              <mat-icon>person_add</mat-icon>
-              {{ 'RESERVATION.CUSTOMER.ADD_BUTTON' | translate }}
-            </button>
-          </div>
+        <div class="flex-container" fxLayout="row" fxLayoutAlign="space-between start">
+          <ng-container *ngTemplateOutlet="stepOne"></ng-container>
+          <div class="vertical-divider"></div>
+          <button (click)="addCustomer()" *ngIf="isAdmin" color="accent" mat-raised-button>
+            <mat-icon>person_add</mat-icon>
+            {{ 'RESERVATION.CUSTOMER.ADD_BUTTON' | translate }}
+          </button>
         </div>
         <div>
           <button [form]="customerForm" appBackButton color="accent" mat-raised-button type="button">

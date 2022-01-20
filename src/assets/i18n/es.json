@@ -162,6 +162,15 @@
       "FIELD": "Servicio",
       "REQUIRED": "Servicio es <b>requerido</b>",
       "INVALID": "Servicio no valido",
+      "DURABILITY": {
+        "TITLE": {
+          "DIFFERENT": "<span class='bold'>Durabilidad:</span> {{min}} a {{max}} días",
+          "EQUAL": "<span class='bold'>Durabilidad:</span> {{value}} días"
+        },
+        "DIFFERENT": "{{min}} a {{max}} días",
+        "EQUAL": "{{min}} días",
+        "NONE": "-"
+      },
       "GROUP": {
         "FIELD": "Tipo de servicio",
         "REQUIRED": "Tipo de servicio es <b>requerido</b>",

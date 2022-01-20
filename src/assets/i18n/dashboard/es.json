@@ -8,7 +8,12 @@
     "HOME": "Principal",
     "RESERVATION": {
       "COMPLETED": "Completas: {{completed}}",
-      "UPCOMING": "Próximas: {{upcoming}}"
+      "UPCOMING": "Próximas: {{upcoming}}",
+      "DELETED": {
+        "TITLE": "Eliminar reserva",
+        "CONTENT": "¿Está seguro de eliminar la reserva {{date}}?",
+        "MESSAGE": "Reserva {{date}} eliminada"
+      }
     },
     "MINI_CARD": {
       "DURATION": "desde el mes pasado",

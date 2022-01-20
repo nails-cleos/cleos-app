@@ -82,7 +82,8 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     group.id = this.group?.id;
     group.name = fieldChange(this.name, this.group?.name);
     group.description = valueChange(this.form.value?.description, this.group?.description);
-    group.durability = valueChange(this.form.value?.durability, this.group?.durability);
+    group.durabilityMin = valueChange(this.form.value?.durabilityMin, this.group?.durabilityMin);
+    group.durabilityMax = valueChange(this.form.value?.durabilityMax, this.group?.durabilityMax);
     group.products = this.products;
 
     this.store.dispatch(new fromActionsProduct.ProductUpdate(group));
@@ -126,7 +127,8 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     this.form = this.formBuilder.group({
       name: this.name,
       description: new FormControl(),
-      durability: new FormControl()
+      durabilityMin: new FormControl(),
+      durabilityMax: new FormControl()
     });
   }
 
@@ -137,7 +139,8 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
           id: state.selected.id,
           name: state.selected.name,
           description: state.selected.description,
-          durability: state.selected.durability
+          durabilityMin: state.selected.durabilityMin,
+          durabilityMax: state.selected.durabilityMax
         } as IProductGroup;
         this.form.patchValue(this.group);
 
