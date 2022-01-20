@@ -162,6 +162,15 @@
       "FIELD": "Product",
       "REQUIRED": "Product is <b>required</b>",
       "INVALID": "Product is invalid",
+      "DURABILITY": {
+        "TITLE": {
+          "DIFFERENT": "<span class='bold'>Durability:</span> {{min}} to {{max}} days",
+          "EQUAL": "<span class='bold'>Durability:</span> {{value}} days"
+        },
+        "DIFFERENT": "{{min}} to {{max}} days",
+        "EQUAL": "{{min}} days",
+        "NONE": "-"
+      },
       "GROUP": {
         "FIELD": "Product type",
         "REQUIRED": "Product type is <b>required</b>",

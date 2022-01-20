@@ -8,8 +8,7 @@
   </mat-card-header>
   <mat-card-content class="dashboard-card-content">
     <div (click)="click($event)">{{card.description}}</div>
-    <div *ngIf="card.durability"
-         [innerHTML]="'CARD.PRODUCT.DURABILITY' | translate: {durability: card.durability}"></div>
+    <div *ngIf="durability" [innerHTML]="durability" mat-line></div>
     <div [@detailExpand]="expand ? 'expanded' : 'collapsed'" class="divider detail">
       <div class="product-container">
         <div *ngFor="let product of products" class="card-wrap">

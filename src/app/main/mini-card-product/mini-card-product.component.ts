@@ -3,6 +3,7 @@ import { IProduct, IProductGroup } from '../../interfaces/product';
 import { detailExpandAnimation } from '../../util/animation';
 import { TranslateService } from '@ngx-translate/core';
 import { formatDuration } from '../../util/dates';
+import { getProductDurability } from '../../util/helper';
 
 @Component({
   selector: 'app-mini-card-product-group',
@@ -18,6 +19,7 @@ export class MiniCardProductComponent implements OnInit {
   time: string | undefined;
   expand: boolean;
   products: IProduct[] | undefined;
+  durability: string | undefined;
 
   constructor(private translate: TranslateService) {
     this.expand = true;
@@ -25,6 +27,9 @@ export class MiniCardProductComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.card) {
+      if (this.card.durabilityMin && this.card.durabilityMax) {
+        this.durability = getProductDurability(this.card.durabilityMin, this.card.durabilityMax, this.translate);
+      }
       this.products = this.card.products?.map(product => {
         if (product.duration) {
           const duration = formatDuration(product.duration, this.translate.currentLang);

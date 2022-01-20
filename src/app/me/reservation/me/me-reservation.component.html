@@ -141,9 +141,7 @@
           <div [innerHTML]="'ME.RESERVATION.PRODUCT.COMPLETE.DURATION' |
                   translate: {duration: durationTime}" mat-line>
           </div>
-          <div *ngIf="group.value.durability" [innerHTML]="'ME.RESERVATION.PRODUCT.COMPLETE.DURABILITY' |
-                  translate: {durability: group.value.durability}" mat-line>
-          </div>
+          <div *ngIf="durability" [innerHTML]="durability" mat-line></div>
         </mat-list-item>
         <ng-template #skeleton>
           <div class="ssc-line"></div>

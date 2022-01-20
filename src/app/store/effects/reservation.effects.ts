@@ -82,6 +82,14 @@ export class ReservationEffects {
     ))
   ));
 
+  getCustomerInfo = createEffect(() => this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getCustomerInfo)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload) => this.userService.getCustomerInformation(payload).pipe(
+      switchMap((response: any) => of(new fromActionsReservation.CustomerSuccess(response))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
+    ))
+  ));
+
   getAllProducts$ = createEffect(() => this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getProducts)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.productService.getAllProducts(payload?.customerId).pipe(
@@ -268,6 +276,10 @@ export class ReservationEffects {
 
   customersSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.customersSuccess)
+  ), {dispatch: false});
+
+  customerSuccess$ = createEffect(() => this.actions$.pipe(
+    ofType(fromActionsReservation.ReservationActionTypes.customerSuccess)
   ), {dispatch: false});
 
   productsSuccess$ = createEffect(() => this.actions$.pipe(

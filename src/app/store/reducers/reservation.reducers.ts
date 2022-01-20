@@ -1,6 +1,6 @@
 import { All, ReservationActionTypes } from '../reservation.actions';
 import {
-  IAvailableDTO,
+  IAvailableDTO, ICustomerLastReservation,
   ICustomerReservation,
   IReservation,
   IRoomReservation,
@@ -19,6 +19,7 @@ export interface State {
   page: Pagination<IReservation> | null;
   customerReservation: ICustomerReservation | null;
   customers: IUser[] | null;
+  customer: ICustomerLastReservation | null;
   rooms: IRoom[] | null;
   additional: IAdditional[] | null;
   productDiscount: IProductDiscountDTO[] | null;
@@ -38,6 +39,7 @@ export const initialState: State = {
   page: null,
   customerReservation: null,
   customers: null,
+  customer: null,
   rooms: null,
   additional: null,
   productDiscount: null,
@@ -129,6 +131,17 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         customers: null,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        selected: null,
+        message: null
+      };
+    }
+    case ReservationActionTypes.getCustomerInfo: {
+      return {
+        ...state,
+        customer: null,
         errorMessage: null,
         error: null,
         subErrors: null,
@@ -260,6 +273,16 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         customers: action.payload,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: null
+      };
+    }
+    case ReservationActionTypes.customerSuccess: {
+      return {
+        ...state,
+        customer: action.payload,
         errorMessage: null,
         error: null,
         subErrors: null,

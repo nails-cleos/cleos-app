@@ -22,7 +22,13 @@
       "SEARCH": "Buscar por cliente",
       "REQUIRED": "Cliente es <b>requerido</b>",
       "INVALID": "Cliente no valido",
-      "ADD_BUTTON": "Agregar cliente"
+      "ADD_BUTTON": "Agregar cliente",
+      "INFO": {
+        "NONE": "El cliente no tiene reservas",
+        "DAYS": "La última reserva fue hace {{days}} días",
+        "PROFESSIONAL_NAME": "<span class='bold'>Profesional:</span> {{professional}}",
+        "PRODUCT": "<span class='bold'>Servicio:</span> {{product}}"
+      }
     },
     "ROOM": {
       "TITLE": "Agregar sala",
@@ -58,8 +64,7 @@
         "NAME": "<span class='bold'>Servicio:</span> {{name}}",
         "TOTAL": "<span class='bold'>Total:</span>",
         "PRICE": "<span class='bold'>Price:</span>",
-        "DURATION": "<span class='bold'>Duración:</span> {{duration}}",
-        "DURABILITY": "<span class='bold'>Durabilidad:</span> {{durability}}"
+        "DURATION": "<span class='bold'>Duración:</span> {{duration}}"
       },
       "DISCOUNT": {
         "FIELD": "Descuento",
@@ -134,11 +139,6 @@
     },
     "REVIEW": {
       "TITLE": "Opinión"
-    },
-    "DELETED": {
-      "TITLE": "Eliminar reserva",
-      "CONTENT": "¿Está seguro de eliminar la reserva {{date}}?",
-      "MESSAGE": "Reserva {{date}} eliminada"
     },
     "STATE": {
       "FIELD": "Estado",

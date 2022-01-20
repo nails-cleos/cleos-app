@@ -13,6 +13,7 @@ import * as fromActionsProduct from '../../store/product.actions';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
+import { getProductDurability, groupDurability } from '../../util/helper';
 
 @Component({
   selector: 'app-products',
@@ -87,7 +88,10 @@ export class ProductsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.clean();
         this.getProducts();
       }
-      this.dataSource = stateValue.data?.content;
+      this.dataSource = stateValue.data?.content?.map((group: IProductGroup) => {
+        const durability: string = groupDurability(group, this.translate);
+        return Object.assign({}, group, {durability});
+      });
       this.resultsLength = stateValue.data?.totalElements;
       if (!this.paginatorSubscription && this.resultsLength) {
         this.createPageSubscriptions();

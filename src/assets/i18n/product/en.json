@@ -32,7 +32,13 @@
       "REQUIRED": "Duration is <b>required</b>"
     },
     "DURABILITY": {
-      "FIELD": "Durability"
+      "FIELD": "Durability",
+      "MIN": {
+        "FIELD": "Durability minimum"
+      },
+      "MAX": {
+        "FIELD": "Durability maximum"
+      }
     },
     "PRIMARY": {
       "CHECK": "Primary"

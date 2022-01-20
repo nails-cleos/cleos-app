@@ -8,7 +8,12 @@
     "HOME": "Home",
     "RESERVATION": {
       "COMPLETED": "Completed: {{completed}}",
-      "UPCOMING": "Upcoming: {{upcoming}}"
+      "UPCOMING": "Upcoming: {{upcoming}}",
+      "DELETED": {
+        "TITLE": "Delete reservation",
+        "CONTENT": "Are you sure to delete reservation {{date}}?",
+        "MESSAGE": "Reservation {{date}} deleted"
+      }
     },
     "MINI_CARD": {
       "DURATION": "since last month",

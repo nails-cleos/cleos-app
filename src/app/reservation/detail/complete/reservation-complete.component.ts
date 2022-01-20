@@ -9,7 +9,14 @@ import { IPrice, IProduct, IProductGroup, Price } from '../../../interfaces/prod
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IPaymentAll, PaymentType } from '../../../interfaces/payment';
-import { getFullUserName, getPrice, newAdditional, newExtra, newPrice } from '../../../util/helper';
+import {
+  getFullUserName,
+  getPrice,
+  getProductDurability,
+  newAdditional,
+  newExtra,
+  newPrice
+} from '../../../util/helper';
 import { formatTime, totalDuration } from '../../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
 import { map, startWith } from 'rxjs/operators';
@@ -24,19 +31,19 @@ import { MatListOption } from '@angular/material/list';
   animations: [transitionAnimation]
 })
 export class ReservationCompleteComponent implements OnInit, OnDestroy {
-  reservation: IReservationAll | undefined;
-  payments: IPaymentAll[] | undefined;
-  additionalList: IAdditionalAll[] | undefined;
+  reservation?: IReservationAll;
+  payments?: IPaymentAll[];
+  additionalList?: IAdditionalAll[];
   additionalSelected: IAdditionalAll[] = [];
 
   form!: FormGroup;
-  groups: IProductGroup[] | undefined;
-  filteredGroup: Observable<IProductGroup[] | undefined> | undefined;
+  groups?: IProductGroup[];
+  filteredGroup?: Observable<IProductGroup[] | undefined>;
   group: FormControl = new FormControl('', [
     Validators.required, requireMatch
   ]);
   products: IProduct[] | undefined;
-  filteredProduct: Observable<IProduct[] | undefined> | undefined;
+  filteredProduct?: Observable<IProduct[] | undefined>;
   product: FormControl = new FormControl('', [requireMatch]);
 
   description: FormControl = new FormControl();
@@ -46,10 +53,11 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   types = PaymentType;
   price: IPrice;
 
-  private reservationId: any;
+  durability?: string;
 
+  private reservationId: any;
   private getState: Observable<any>;
-  private subscription: Subscription | undefined;
+  private subscription?: Subscription;
 
   constructor(private store: Store<AppState>, private route: ActivatedRoute, private formBuilder: FormBuilder,
               private readonly translate: TranslateService, private router: Router) {
@@ -93,6 +101,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
           return value;
         }
         this.products = value.products;
+        this.durability = getProductDurability(value.durabilityMin, value.durabilityMax, this.translate);
         this.product.setValue('');
         return value.name;
       }),
