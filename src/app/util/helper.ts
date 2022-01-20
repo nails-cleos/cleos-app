@@ -1,9 +1,10 @@
 import { DiscountType, IDiscount } from '../interfaces/discount';
 import { IUser, IUserAll } from '../interfaces/user';
-import { IPrice, Price } from '../interfaces/product';
+import { IPrice, IProductGroup, Price } from '../interfaces/product';
 import { IPayment } from '../interfaces/payment';
 import { IReservationAll } from '../interfaces/reservation';
 import { IAdditionalAll } from '../interfaces/additional';
+import { TranslateService } from '@ngx-translate/core';
 
 export const snakeToCamel = (value: string = ''): string =>
   value.toLowerCase().replace(/([-_]\w)/g, (g: string) => g[1].toUpperCase());
@@ -172,6 +173,29 @@ export const newAdditional = (price: IPrice, additionalList: IAdditionalAll[]): 
 
   return new Price(price.amount, price.discount, price.extra, additional, total, price.totalPaid,
     price.priceWithDiscount, price.priceWithExtras, priceWithAdditional);
+};
+
+export const getProductDurability = (min: number, max: number, translate: TranslateService): string | undefined => {
+  if (!min && !max) {
+    return undefined;
+  }
+  if (min !== max) {
+    return translate.instant('COMMON.PRODUCT.DURABILITY.TITLE.DIFFERENT', {min, max});
+  }
+  return translate.instant('COMMON.PRODUCT.DURABILITY.TITLE.EQUAL', {value: min});
+};
+
+export const groupDurability = (group: IProductGroup, translate: TranslateService): string => {
+  const min = group.durabilityMin;
+  const max = group.durabilityMax;
+  let key = 'COMMON.PRODUCT.DURABILITY.EQUAL';
+  if (!min && !max) {
+    key = 'COMMON.PRODUCT.DURABILITY.NONE';
+  } else if (min !== max) {
+    key = 'COMMON.PRODUCT.DURABILITY.DIFFERENT';
+  }
+
+  return translate.instant(key, {min, max});
 };
 
 const totalPaid = (payments: IPayment[] | undefined): number => {

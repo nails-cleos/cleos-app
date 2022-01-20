@@ -75,7 +75,8 @@ export class ProductComponent implements OnInit, OnDestroy {
     const group: IProductGroup = new ProductGroup();
     group.name = this.name.value;
     group.description = this.form.value.description;
-    group.durability = this.form.value.durability;
+    group.durabilityMin = this.form.value.durabilityMin;
+    group.durabilityMax = this.form.value.durabilityMax;
     group.products = this.products;
 
     this.store.dispatch(
@@ -121,7 +122,8 @@ export class ProductComponent implements OnInit, OnDestroy {
     this.form = this.formBuilder.group({
       name: this.name,
       description: new FormControl(),
-      durability: new FormControl()
+      durabilityMin: new FormControl(),
+      durabilityMax: new FormControl()
     });
   }
 

@@ -5,6 +5,8 @@ export interface IProductGroup {
   name?: string;
   description?: string;
   durability?: string;
+  durabilityMin?: number;
+  durabilityMax?: number;
   products?: IProduct[];
 }
 

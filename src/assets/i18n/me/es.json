@@ -29,8 +29,7 @@
         "COMPLETE": {
           "DESCRIPTION": "<span class='bold'>Descripción:</span> {{description}}",
           "PRICE": "<span class='bold'>Price:</span>",
-          "DURATION": "<span class='bold'>Duración:</span> {{duration}}",
-          "DURABILITY": "<span class='bold'>Durabilidad:</span> {{durability}}"
+          "DURATION": "<span class='bold'>Duración:</span> {{duration}}"
         },
         "NAME": {
           "FIELD": "Nombre"

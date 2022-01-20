@@ -5,6 +5,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Role } from '../interfaces/token';
 import { IRoom } from '../interfaces/room';
 import { PAGE_SIZE } from '../interfaces/pagination';
+import { ICustomerLastReservation } from '../interfaces/reservation';
 
 @Injectable()
 export class UserService {
@@ -12,6 +13,7 @@ export class UserService {
   private url = 'users';
   private professionalUrl = 'professionals';
   private customerUrl = 'customers';
+  private customerUrlV1 = 'v1/customers';
 
   constructor(private http: HttpClient) {
   }
@@ -97,6 +99,10 @@ export class UserService {
 
   public getAllCustomers(): Observable<IUser[]> {
     return this.http.get<IUser[]>(this.customerUrl);
+  }
+
+  public getCustomerInformation(id: string): Observable<ICustomerLastReservation[]> {
+    return this.http.get<ICustomerLastReservation[]>(`${this.customerUrlV1}/${id}/info`);
   }
 
   public setRole(userId: string, role: Role): Observable<IUser> {

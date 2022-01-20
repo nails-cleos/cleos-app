@@ -30,13 +30,26 @@
                 </label>
                 <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
               </mat-form-field>
-              <mat-form-field appearance="fill">
-                <mat-label>{{ 'PRODUCT.DURABILITY.FIELD' | translate }}</mat-label>
-                <label>
-                  <input formControlName="durability" matInput>
-                </label>
-                <mat-error *ngIf="errors['durability']">{{errors['durability']}}</mat-error>
-              </mat-form-field>
+              <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
+                <mat-form-field appearance="fill" style="margin-right: 12px;">
+                  <mat-label>{{ 'PRODUCT.DURABILITY.MIN.FIELD' | translate }}</mat-label>
+                  <label>
+                    <input formControlName="durabilityMin" matInput>
+                  </label>
+                  <mat-error *ngIf="errors['durabilityMin']">
+                    {{errors['durabilityMin']}}
+                  </mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="fill" style="margin-right: 12px;">
+                  <mat-label>{{ 'PRODUCT.DURABILITY.MAX.FIELD' | translate }}</mat-label>
+                  <label>
+                    <input formControlName="durabilityMax" matInput>
+                  </label>
+                  <mat-error *ngIf="errors['durabilityMax']">
+                    {{errors['durabilityMax']}}
+                  </mat-error>
+                </mat-form-field>
+              </div>
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'COMMON.PRODUCT.FIELD' | translate }}</mat-label>
                 <label>

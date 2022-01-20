@@ -22,7 +22,13 @@
       "SEARCH": "Find by customer",
       "REQUIRED": "Customer is <b>required</b>",
       "INVALID": "Customer is invalid",
-      "ADD_BUTTON": "Add customer"
+      "ADD_BUTTON": "Add customer",
+      "INFO": {
+        "NONE": "Customer has no reservations",
+        "DAYS": "Last reservation was {{days}} days ago",
+        "PROFESSIONAL_NAME": "<span class='bold'>Professional:</span> {{professional}}",
+        "PRODUCT": "<span class='bold'>Product:</span> {{product}}"
+      }
     },
     "ROOM": {
       "TITLE": "Add room",
@@ -58,8 +64,7 @@
         "NAME": "<span class='bold'>Product:</span> {{name}}",
         "TOTAL": "<span class='bold'>Total:</span>",
         "PRICE": "<span class='bold'>Price:</span>",
-        "DURATION": "<span class='bold'>Duration:</span> {{duration}}",
-        "DURABILITY": "<span class='bold'>Durability:</span> {{durability}}"
+        "DURATION": "<span class='bold'>Duration:</span> {{duration}}"
       },
       "DISCOUNT": {
         "FIELD": "Discount",
@@ -134,11 +139,6 @@
     },
     "REVIEW": {
       "TITLE": "Review"
-    },
-    "DELETED": {
-      "TITLE": "Delete reservation",
-      "CONTENT": "Are you sure to delete reservation {{date}}?",
-      "MESSAGE": "Reservation {{date}} deleted"
     },
     "STATE": {
       "FIELD": "State",

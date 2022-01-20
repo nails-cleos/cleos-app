@@ -90,9 +90,7 @@
                     <span *ngIf="price.priceWithDiscount" [@discountAnimation]
                           class="vertical-divider bold">$ {{price.priceWithDiscount | number:'1.2-2'}}</span>
                   </div>
-                  <div *ngIf="product.value.durability" [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.DURABILITY' |
-                  translate: {durability: product.value.durability}" mat-line>
-                  </div>
+                  <div *ngIf="durability" [innerHTML]="durability" mat-line></div>
                 </mat-list-item>
                 <mat-list-item *ngIf="additionalList && additionalList.length">
                   <mat-icon mat-list-icon>add_post</mat-icon>

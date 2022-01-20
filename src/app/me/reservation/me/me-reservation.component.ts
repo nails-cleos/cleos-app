@@ -40,7 +40,15 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as fromActionsReservation from '../../../store/reservation.actions';
 import { map, startWith } from 'rxjs/operators';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
-import { getPrice, getUserName, newAdditional, newDiscount, newPrice, round } from '../../../util/helper';
+import {
+  getPrice,
+  getProductDurability,
+  getUserName,
+  newAdditional,
+  newDiscount,
+  newPrice,
+  round
+} from '../../../util/helper';
 import { DiscountType, IUserDiscount } from '../../../interfaces/discount';
 import { transitionAnimation } from '../../../util/animation';
 import { isEqual } from 'date-fns';
@@ -111,6 +119,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   endDate?: Date;
   additionalDuration?: string;
   totalDuration?: string;
+  durability?: string;
 
   private readonly extras: any;
   private reservation?: IReservationAll;
@@ -413,6 +422,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
         return value;
       }
       this.productList = value.products;
+      this.durability = getProductDurability(value.durabilityMin, value.durabilityMax, this.translate);
       this.product.setValue('');
       return value.name;
     }), map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups));
