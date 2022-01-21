@@ -197,7 +197,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.customer.valueChanges.subscribe((value) => {
       this.customerInfo = undefined;
-      if (value) {
+      if (value && value.id) {
         this.store.dispatch(
           new fromActionsReservation.GetCustomerInfo(value.id)
         );
