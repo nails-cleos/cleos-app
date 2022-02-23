@@ -9,7 +9,7 @@ export enum ReservationActionTypes {
   customerSearchReservation = '[Reservation] Customer search reservation',
   getCustomers = '[Reservation] Get customers',
   getCustomerInfo = '[Reservation] Get customer info',
-  getProducts = '[Reservation] Get products',
+  getServices = '[Reservation] Get services',
   getRooms = '[Reservation] Get rooms',
   getAdditional = '[Reservation] Get additional',
   getUpcomingReservation = '[Reservation] Get upcoming reservation',
@@ -98,8 +98,8 @@ export class GetCustomerInfo implements Action {
   }
 }
 
-export class GetAllProducts implements Action {
-  readonly type = ReservationActionTypes.getProducts;
+export class GetAllServices implements Action {
+  readonly type = ReservationActionTypes.getServices;
 
   constructor(public payload?: any) {
   }
@@ -333,7 +333,7 @@ export type All =
   | CustomerSearchReservation
   | GetAllCustomers
   | GetCustomerInfo
-  | GetAllProducts
+  | GetAllServices
   | GetAllRooms
   | GetAllAdditional
   | GetUpcomingReservation

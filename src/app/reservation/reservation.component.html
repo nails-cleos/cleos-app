@@ -107,7 +107,7 @@
                    matInput required type="text">
           </label>
           <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
-            <mat-option *ngFor="let group of filteredGroup | async" [value]="group">
+            <mat-option *ngFor="let group of filteredGroup | async " [value]="group">
               {{group.name}}
             </mat-option>
           </mat-autocomplete>

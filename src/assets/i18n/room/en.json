@@ -3,7 +3,6 @@
     "TITLE": "Add room",
     "CREATED": "Room {{name}} created",
     "DETAIL": "Update room",
-    "ME": "My room",
     "LIST": {
       "COLUMN": {
         "PROFESSIONAL": "Professional",
@@ -66,6 +65,33 @@
     },
     "UPDATED": {
       "MESSAGE": "Room {{name}} updated"
+    },
+    "CURRENCY": {
+      "FIELD": "Currency"
+    },
+    "ME": {
+      "TITLE": "My room",
+      "SERVICES": {
+        "TITLE": "My services",
+        "ADD": "Add price",
+        "ALL": "All",
+        "SELECTED": "Selected",
+        "ADDITIONAL": {
+          "TITLE": "Additional"
+        },
+        "PRODUCT": {
+          "TITLE": "Product"
+        },
+        "PRICE": {
+          "TEXT": "What is the price of {{name}}?",
+          "FIELD": "Price",
+          "REQUIRED": "Price is <b>required</b>",
+          "GREATER": "Price must be greater than 1"
+        },
+        "UPDATE": {
+          "MESSAGE": "Room services updated"
+        }
+      }
     }
   }
 }

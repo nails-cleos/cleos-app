@@ -8,16 +8,10 @@ import { Store } from '@ngrx/store';
 import { AppState, selectAuthState, selectReservationState } from '../store/app.states';
 import * as fromActionsReservation from '../store/reservation.actions';
 import { requireMatch, valueChange } from '../util/validators';
-import { IPrice, IProduct, IProductGroup, Price } from '../interfaces/product';
+import { IGroupService, IPrice, IProduct, IProductGroup, Price } from '../interfaces/product';
 import { MatStepper } from '@angular/material/stepper';
-import { IAvailability, IRoom } from '../interfaces/room';
-import {
-  ICustomerLastReservation,
-  IReservation,
-  IReservationAll,
-  MAX_RESERVATION_MONTH,
-  Reservation
-} from '../interfaces/reservation';
+import { IAvailability, IRoom, IService } from '../interfaces/room';
+import { ICustomerLastReservation, IReservation, IReservationAll, MAX_RESERVATION_MONTH, Reservation } from '../interfaces/reservation';
 import { CalendarEvent, CalendarEventTimesChangedEvent } from 'angular-calendar';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -54,6 +48,7 @@ import { Role } from '../interfaces/token';
 import { IUnavailableAll } from '../interfaces/unavailable';
 import { DiscountType, IUserDiscount } from '../interfaces/discount';
 import {
+  createProductGroupService,
   getFullUserName,
   getPrice,
   getProductDurability,
@@ -92,13 +87,13 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   customerInfo?: ICustomerLastReservation;
 
   productForm!: FormGroup;
-  groups?: IProductGroup[];
-  filteredGroup?: Observable<IProductGroup[] | undefined>;
+  groups?: IGroupService[];
+  filteredGroup?: Observable<IGroupService[] | undefined>;
   group: FormControl = new FormControl('', [
     Validators.required, requireMatch
   ]);
-  products?: IProduct[];
-  filteredProduct?: Observable<IProduct[] | undefined>;
+  products?: IService[];
+  filteredProduct?: Observable<IService[] | undefined>;
   product: FormControl = new FormControl('', [
     Validators.required, requireMatch
   ]);
@@ -456,7 +451,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.productForm.invalid) {
       return;
     }
-    this.getAdditionalList();
     this.myStepper.next();
   }
 
@@ -540,13 +534,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private getProductList(): void {
     this.store.dispatch(
-      new fromActionsReservation.GetAllProducts({customerId: this.customer.value.id})
-    );
-  }
-
-  private getAdditionalList(): void {
-    this.store.dispatch(
-      new fromActionsReservation.GetAllAdditional()
+      new fromActionsReservation.GetAllServices({roomId: this.room.value.id, customerId: this.customer.value.id})
     );
   }
 
@@ -695,8 +683,12 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscription = this.getState.subscribe(state => {
       this.customerInfo = state.customer;
       this.customers = state.customers;
-      this.additionalList = state.additional;
-      this.groups = state.productDiscount?.groups;
+      this.additionalList = state.productDiscount?.additionalList;
+      if (state.productDiscount?.products) {
+        const groupMap = createProductGroupService(new Map<string, IGroupService>(), state.productDiscount.products,
+          this.room.value.currency);
+        this.groups = Array.from(groupMap.values());
+      }
       if (this.groups && this.productId && !this.group.value) {
         this.group.setValue(this.groups?.find(group => {
           const product = group.products?.find(p => p.id === this.productId);
@@ -814,13 +806,13 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.customers?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
   }
 
-  private filterGroup(name: string): IProductGroup[] | undefined {
+  private filterGroup(name: string): IGroupService[] | undefined {
     const filterValue = name.toLowerCase();
 
     return this.groups?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 
-  private filterProduct(name: string): IProduct[] | undefined {
+  private filterProduct(name: string): IService[] | undefined {
     const filterValue = name.toLowerCase();
 
     return this.products?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);

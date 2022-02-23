@@ -1,0 +1,50 @@
+.section-heading {
+  padding: 5px 10px;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.drag-container {
+  width: 45%;
+  margin: 0 25px 25px 0;
+  display: inline-block;
+  vertical-align: top;
+  padding: 15px;
+  border-radius: 5px;
+}
+
+.item-list {
+  min-height: 60px;
+  border-radius: 4px;
+  display: block;
+}
+
+.item-box {
+  padding: 8px 10px;
+  margin-bottom: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  cursor: move;
+  font-size: 14px;
+  border-radius: 20px;
+}
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 20px;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.item-list.cdk-drop-list-dragging .item-box:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}

@@ -102,6 +102,7 @@ $light-bg-alpha-80: rgba(#fafafa, 0.8);
 $dark-bg-tooltip: lighten(#2c2c2c, 20%);
 $dark-bg-alpha-4: rgba(#2c2c2c, 0.04);
 $dark-bg-alpha-12: rgba(#2c2c2c, 0.12);
+$dark-bg-alpha-20: rgba(#2c2c2c, 0.20);
 $dark-bg-alpha-70: rgba(#2c2c2c, 0.70);
 
 // Background palette for light themes.
@@ -111,6 +112,7 @@ $mat-light-theme-background: (
   app-bar: $light-bg-darker-5,
   hover: $dark-bg-alpha-12,
   hoverable: $dark-bg-alpha-70,
+  shadow: $dark-bg-alpha-20,
   card: $light-bg-lighter-5,
   dialog: $light-bg-lighter-5,
   tooltip: $dark-bg-tooltip,
@@ -137,6 +139,7 @@ $dark-bg-lighter-30: lighten($dark-background, 30%);
 $dark-bg-alpha-80: rgba(#2c2c2c, 0.8);
 $light-bg-alpha-4: rgba(#fafafa, 0.04);
 $light-bg-alpha-12: rgba(#fafafa, 0.12);
+$light-bg-alpha-20: rgba(#fafafa, 0.20);
 $light-bg-alpha-70: rgba(#fafafa, 0.70);
 
 // Background palette for dark themes.
@@ -146,6 +149,7 @@ $mat-dark-theme-background: (
   app-bar: $dark-bg-lighter-5,
   hover: $light-bg-alpha-12,
   hoverable: $light-bg-alpha-70,
+  shadow: $light-bg-alpha-20,
   card: $dark-bg-lighter-5,
   dialog: $dark-bg-lighter-5,
   tooltip: $dark-bg-lighter-20,

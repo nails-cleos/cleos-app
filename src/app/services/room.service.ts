@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IRoom } from '../interfaces/room';
+import { IRoom, IRoomService, IServicePrice } from '../interfaces/room';
 import { PAGE_SIZE } from '../interfaces/pagination';
 
 @Injectable()
 export class RoomService {
 
   url = 'rooms';
+  urlV1 = `v1/${this.url}`;
 
   constructor(private http: HttpClient) {
   }
@@ -32,6 +33,10 @@ export class RoomService {
     return this.http.get<IRoom>(`${this.url}/me`);
   }
 
+  public getMyService(): Observable<IRoomService> {
+    return this.http.get<IRoomService>(`${this.urlV1}/me/services`);
+  }
+
   public getById(id: string | null): Observable<IRoom | undefined> {
     const url = `${this.url}/${id}`;
     return this.http.get<IRoom>(url);
@@ -49,5 +54,9 @@ export class RoomService {
   public update(room: IRoom): Observable<IRoom> {
     const url = `${this.url}/${room.id}`;
     return this.http.patch<IRoom>(url, room);
+  }
+
+  public updateService(prices: IServicePrice[]): Observable<IServicePrice[]> {
+    return this.http.patch<IServicePrice[]>(`${this.urlV1}/me/services`, prices);
   }
 }

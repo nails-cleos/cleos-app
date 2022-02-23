@@ -171,7 +171,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
-    case ReservationActionTypes.getProducts: {
+    case ReservationActionTypes.getServices: {
       return {
         ...state,
         productDiscount: null,

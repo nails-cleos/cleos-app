@@ -97,7 +97,8 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
           location: this.room.address.location,
           description: this.addressDescription.value
         } as IAddress,
-        professional: this.room.professional
+        professional: this.room.professional,
+        currency: this.room.currency
       };
 
       if (this.address.value && this.address.value.geometry) {

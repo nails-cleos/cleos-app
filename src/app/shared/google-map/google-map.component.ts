@@ -3,6 +3,7 @@ import { Appearance } from '@angular-material-extensions/google-maps-autocomplet
 import { ControlContainer, FormGroup, NgForm } from '@angular/forms';
 import { GeocodeService } from '../../services/geocode.service';
 import { GeocoderResult } from '@agm/core';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-google-map',
@@ -26,6 +27,7 @@ export class GoogleMapComponent implements OnInit {
   public isDraggable: boolean;
   public info: string | undefined;
   public isMapLoading: boolean;
+  showMap = environment.production;
 
   constructor(private geocodeService: GeocodeService) {
     this.latitude = -31.42008329999999;

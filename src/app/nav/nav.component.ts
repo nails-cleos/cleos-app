@@ -18,7 +18,7 @@ import {
   selectUnavailableState,
   selectUserState
 } from '../store/app.states';
-import { IMenu, IUser, IUserAll, User } from '../interfaces/user';
+import { IMenu, ISubMenu, IUser, IUserAll, User } from '../interfaces/user';
 import * as fromActionsLogin from '../store/auth.actions';
 import * as fromActionsNotification from '../store/notification.actions';
 import * as fromActionsUser from '../store/user.actions';
@@ -73,6 +73,7 @@ export class NavComponent implements OnInit, OnDestroy {
   incomplete = false;
 
   checked = false;
+  step = 0;
 
   private getState: Observable<any>;
   private getNotificationState: Observable<any>;
@@ -139,10 +140,14 @@ export class NavComponent implements OnInit, OnDestroy {
     }
   }
 
-  navigate(menu: IMenu, drawer?: any): void {
+  navigate(menu: ISubMenu, drawer?: any): void {
     drawer?.toggle();
     this.error = undefined;
     this.router.navigate([menu.path]);
+  }
+
+  setStep(index: number) {
+    this.step = index;
   }
 
   setTheme(checked: boolean): void {

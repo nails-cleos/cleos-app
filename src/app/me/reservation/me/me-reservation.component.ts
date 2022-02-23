@@ -191,7 +191,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     if (this.productForm.invalid) {
       return;
     }
-    this.getAdditionalList();
     this.myStepper.next();
 
     return;
@@ -398,13 +397,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private getProductList(): void {
     this.store.dispatch(
-      new fromActionsReservation.GetAllProducts()
-    );
-  }
-
-  private getAdditionalList(): void {
-    this.store.dispatch(
-      new fromActionsReservation.GetAllAdditional()
+      new fromActionsReservation.GetAllServices({roomId: this.room.value.id})
     );
   }
 
@@ -446,7 +439,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      this.additionalList = state.additional;
+      this.additionalList = state.productDiscount?.additional;
       this.groups = state.productDiscount?.groups;
       if (this.groups && this.productId && !this.group.value) {
         this.group.setValue(this.groups?.find(group => {

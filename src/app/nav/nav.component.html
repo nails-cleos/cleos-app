@@ -15,23 +15,90 @@
       </mat-card-header>
       <mat-card-content *ngIf="currentUser; else contentNoLogged">
         <mat-nav-list>
-          <mat-divider></mat-divider>
-          <div *ngFor="let menu of menuItems">
-            <a (click)="navigate(menu, drawer)" *ngIf="isHandset$ | async; else showMenu"
-               [routerLinkActive]="['active']" [routerLink]="'/'+menu.path" mat-list-item>
-              <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>
-              <div mat-line>{{menu.name}}</div>
-            </a>
-            <ng-template #showMenu>
-              <a (click)="navigate(menu)" [routerLinkActive]="['active']"
-                 [routerLink]="'/'+menu.path" mat-list-item>
+          <div *ngFor="let menu of menuItems; let i = index">
+            <div *ngIf="menu.subMenus && menu.subMenus.length; else items">
+              <mat-expansion-panel #rla="routerLinkActive" (opened)="setStep(i)" [class.mat-elevation-z0]="true"
+                                   [expanded]="step === i" [ngClass]="{ 'active': rla.isActive}"
+                                   [routerLinkActiveOptions]="{ exact: true }" routerLinkActive>
+                <mat-expansion-panel-header>
+                  <mat-panel-title class="active-header-title">
+                    <mat-icon>{{menu.icon}}</mat-icon>&nbsp;{{menu.name}}
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-nav-list *ngFor="let subMenu of menu.subMenus">
+                  <a (click)="navigate(subMenu, drawer)" *ngIf="isHandset$ | async; else showSubMenu"
+                     [routerLink]="'/'+subMenu.path" mat-list-item>
+                    <mat-icon mat-list-icon>{{subMenu.icon}}</mat-icon>
+                    <div mat-line>{{subMenu.name}}</div>
+                  </a>
+                  <ng-template #showSubMenu>
+                    <a (click)="navigate(subMenu)" [routerLinkActiveOptions]="{ exact: true }"
+                       [routerLinkActive]="'active'" [routerLink]="'/'+subMenu.path"
+                       mat-list-item>
+                      <mat-icon mat-list-icon>{{subMenu.icon}}</mat-icon>
+                      <div mat-line>{{subMenu.name}}</div>
+                    </a>
+                  </ng-template>
+                </mat-nav-list>
+              </mat-expansion-panel>
+            </div>
+            <ng-template #items>
+              <a (click)="navigate(menu, drawer)" *ngIf="isHandset$ | async; else showMenu"
+                 [routerLinkActive]="['active']" [routerLink]="'/'+menu.path" mat-list-item>
                 <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>
                 <div mat-line>{{menu.name}}</div>
               </a>
+              <ng-template #showMenu>
+                <a (click)="navigate(menu)" [routerLinkActive]="['active']"
+                   [routerLink]="'/'+menu.path" mat-list-item>
+                  <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>
+                  <div mat-line>{{menu.name}}</div>
+                </a>
+              </ng-template>
             </ng-template>
-            <mat-divider></mat-divider>
           </div>
         </mat-nav-list>
+        <!--        <mat-nav-list>-->
+        <!--          <div *ngFor="let menu of menuItems">-->
+        <!--            <div *ngIf="menu.subMenus && menu.subMenus.length; else items">-->
+        <!--              <mat-divider></mat-divider>-->
+        <!--              <mat-list-item (click)="showSubSubMenu = !showSubSubMenu" [routerLinkActive]="['active']">-->
+        <!--                <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>-->
+        <!--                <div mat-line>{{menu.name}}</div>-->
+        <!--              </mat-list-item>-->
+        <!--              <div class="submenu" [ngClass]="{'expanded' : showSubSubMenu}">-->
+        <!--                <mat-list-item *ngFor="let subMenu of menu.subMenus">-->
+        <!--                  <a (click)="navigate(subMenu, drawer)" *ngIf="isHandset$ | async; else showMenu"-->
+        <!--                     [routerLinkActive]="['active']" [routerLink]="'/'+subMenu.path" mat-list-item>-->
+        <!--                    <mat-icon mat-list-icon>{{subMenu.icon}}</mat-icon>-->
+        <!--                    <div mat-line>{{subMenu.name}}</div>-->
+        <!--                  </a>-->
+        <!--                  <ng-template #showMenu>-->
+        <!--                    <a (click)="navigate(subMenu)" [routerLinkActive]="['active']"-->
+        <!--                       [routerLink]="'/'+subMenu.path" mat-list-item>-->
+        <!--                      <mat-icon mat-list-icon>{{subMenu.icon}}</mat-icon>-->
+        <!--                      <div mat-line>{{subMenu.name}}</div>-->
+        <!--                    </a>-->
+        <!--                  </ng-template>-->
+        <!--                </mat-list-item>-->
+        <!--              </div>-->
+        <!--            </div>-->
+        <!--            <ng-template #items>-->
+        <!--              <a (click)="navigate(menu, drawer)" *ngIf="isHandset$ | async; else showMenu"-->
+        <!--                 [routerLinkActive]="['active']" [routerLink]="'/'+menu.path" mat-list-item>-->
+        <!--                <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>-->
+        <!--                <div mat-line>{{menu.name}}</div>-->
+        <!--              </a>-->
+        <!--              <ng-template #showMenu>-->
+        <!--                <a (click)="navigate(menu)" [routerLinkActive]="['active']"-->
+        <!--                   [routerLink]="'/'+menu.path" mat-list-item>-->
+        <!--                  <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>-->
+        <!--                  <div mat-line>{{menu.name}}</div>-->
+        <!--                </a>-->
+        <!--              </ng-template>-->
+        <!--            </ng-template>-->
+        <!--          </div>-->
+        <!--        </mat-nav-list>-->
       </mat-card-content>
       <ng-template #headerNoLogged>
         <mat-card-header>

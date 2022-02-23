@@ -30,6 +30,8 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   subscription?: Subscription;
   errors: any = [];
   professionalName?: string;
+  currencyCode?: string;
+  currencyIcon?: string;
 
   step = 0;
   icons: IIcon = {
@@ -91,7 +93,8 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
           location: this.room.address.location,
           description: this.addressDescription.value
         } as IAddress,
-        professional: this.room.professional
+        professional: this.room.professional,
+        currency: this.room.currency
       };
 
       if (this.address.value && this.address.value.geometry && room.address) {
@@ -183,6 +186,8 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
         } as IRoomAll;
         this.addressDescription.setValue(this.room.address?.description);
         this.professionalName = getUserName(state.selected.professional);
+        this.currencyCode = state.selected.currency.code;
+        this.currencyIcon = state.selected.currency.icon;
         this.getAvailabilities(state.selected.availabilities);
       }
       if (state.subErrors) {

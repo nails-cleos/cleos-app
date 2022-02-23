@@ -3,7 +3,6 @@
     "TITLE": "Agregar sala",
     "CREATED": "Sala {{name}} creada",
     "DETAIL": "Actualizar sala",
-    "ME": "Mi sala",
     "LIST": {
       "COLUMN": {
         "PROFESSIONAL": "Profesional",
@@ -66,6 +65,33 @@
     },
     "UPDATED": {
       "MESSAGE": "Sala {{name}} actualizada"
+    },
+    "CURRENCY": {
+      "FIELD": "Moneda"
+    },
+    "ME": {
+      "TITLE": "Mi Sala",
+      "SERVICES": {
+        "TITLE": "Mis servicios",
+        "ADD": "Agregar precio",
+        "ALL": "Todos",
+        "SELECTED": "Seleccionados",
+        "ADDITIONAL": {
+          "TITLE": "Adicionales"
+        },
+        "PRODUCT": {
+          "TITLE": "Servicios"
+        },
+        "PRICE": {
+          "TEXT": "¿Cuál es el precio para {{name}}?",
+          "FIELD": "Precio",
+          "REQUIRED": "Precio es <b>requerido</b>",
+          "GREATER": "Precio debe ser mayor a 1"
+        },
+        "UPDATE": {
+          "MESSAGE": "Servicios de la sala actualizados"
+        }
+      }
     }
   }
 }

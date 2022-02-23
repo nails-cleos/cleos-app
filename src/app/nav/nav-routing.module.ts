@@ -31,6 +31,9 @@ const routes: Routes = [{
     path: 'additional',
     loadChildren: () => import('../additional/additional.module').then(m => m.AdditionalModule)
   }, {
+    path: 'currency',
+    loadChildren: () => import('../currency/currency.module').then(m => m.CurrencyModule)
+  }, {
     path: 'me', loadChildren: () => import('../me/me.module').then(m => m.MeModule)
   }]
 }];

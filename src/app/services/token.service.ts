@@ -14,13 +14,13 @@ export interface RefreshTokenResponse {
 
 @Injectable()
 export class TokenService {
-  private myTokenCache: Observable<RefreshTokenResponse> | undefined;
+  private myTokenCache?: Observable<RefreshTokenResponse>;
   private readonly cacheSize = 1;
   private readonly refreshInterval = 45000; // 45 sec
-  private myToken: string | undefined;
+  private myToken?: string;
   private myUser: any;
-  private myTokenSubscription: Subscription | undefined;
-  private stopTimer: Subject<boolean> | undefined;
+  private myTokenSubscription?: Subscription;
+  private stopTimer?: Subject<boolean>;
 
   constructor(private http: HttpClient, private router: Router, private store: Store<AppState>) {
   }
