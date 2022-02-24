@@ -175,7 +175,7 @@
   <mat-tab-group *ngIf="availableList.size; else empty" [selectedIndex]="selectedIndex" backgroundColor="accent"
                  color="primary" mat-align-tabs="center">
     <mat-tab *ngFor="let available of availableList | keyvalue: sortDate" [label]="formatKey(available.key)">
-      <section>
+      <section class="button-container">
         <ng-container [ngTemplateOutletContext]="{available:available}"
                       [ngTemplateOutlet]="available.value.length ? noEmpty : empty"></ng-container>
       </section>
@@ -184,9 +184,7 @@
   <ng-template #noEmpty let-available='available'>
     <div class="button-row">
       <button (click)="selectDate(datetime)" *ngFor="let datetime of sortTime(available.value)"
-              [color]="areEquals(datetime) ? 'primary' : undefined"
-              class="large"
-              mat-raised-button>
+              [color]="areEquals(datetime) ? 'primary' : undefined" class="large" mat-raised-button>
         {{datetime.time}}
       </button>
     </div>
@@ -411,7 +409,7 @@
           <button (click)="back" class="icon-button" color="accent" mat-mini-fab>
             <mat-icon>arrow_upward</mat-icon>
           </button>
-          <button (click)="create()" class="icon-button" color="primary" mat-mini-fab type="button">
+          <button (click)="create" class="icon-button" color="primary" mat-mini-fab type="button">
             <mat-icon>add_task</mat-icon>
           </button>
         </div>
@@ -534,7 +532,7 @@
           <button (click)="back" color="accent" mat-raised-button>
             <mat-icon>arrow_back</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}</button>
-          <button (click)="create()" class="raised-button" color="primary" mat-raised-button type="button">
+          <button (click)="create" class="raised-button" color="primary" mat-raised-button type="button">
             {{ 'COMMON.BUTTON.BOOK' | translate }}
             <mat-icon>add_task</mat-icon>
           </button>

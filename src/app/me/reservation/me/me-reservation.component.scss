@@ -17,13 +17,21 @@ section {
 }
 
 .mat-raised-button.large {
-  width: 60px;
-  height: 60px;
+  width: fit-content;
   line-height: 60px;
+}
+
+.button-container {
+  margin: auto;
+  padding: 10px;
 }
 
 ::ng-deep .mat-form-field .mat-form-field-subscript-wrapper {
   overflow: visible;
+}
+
+::ng-deep mat-tab-body {
+  text-align: center;
 }
 
 .raised-button {
