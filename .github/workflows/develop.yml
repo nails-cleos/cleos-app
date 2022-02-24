@@ -7,6 +7,9 @@ on:
     tags-ignore:
       - "**"
 
+env:
+  VERSION_PART: '1'
+
 jobs:
   snapshot:
     if: github.event_name == 'push'
@@ -24,6 +27,6 @@ jobs:
           chmod +x "${GITHUB_WORKSPACE}/version-update.sh"
 
           # run script
-          "${GITHUB_WORKSPACE}/version-update.sh" true
+          "${GITHUB_WORKSPACE}/version-update.sh" true $VERSION_PART
           git commit -am "Update rc version"
           git push
