@@ -1,10 +1,11 @@
 import { DiscountType, IDiscount } from '../interfaces/discount';
 import { IUser, IUserAll } from '../interfaces/user';
-import { IPrice, IProductGroup, Price } from '../interfaces/product';
+import { GroupService, IGroupService, IPrice, IProductAll, IProductGroup, Price } from '../interfaces/product';
 import { IPayment } from '../interfaces/payment';
 import { IReservationAll } from '../interfaces/reservation';
 import { IAdditionalAll } from '../interfaces/additional';
 import { TranslateService } from '@ngx-translate/core';
+import { ServiceType } from '../interfaces/room';
 
 export const snakeToCamel = (value: string = ''): string =>
   value.toLowerCase().replace(/([-_]\w)/g, (g: string) => g[1].toUpperCase());
@@ -196,6 +197,26 @@ export const groupDurability = (group: IProductGroup, translate: TranslateServic
   }
 
   return translate.instant(key, {min, max});
+};
+
+export const createProductGroupService = (groups: Map<string, GroupService>, list: IProductAll[], currency: string,
+                                          isSelected: boolean = false): Map<string, GroupService> => {
+  list.forEach((product: IProductAll) => {
+    const groupId = product.group.id;
+    const mapGroup = groups.get(groupId);
+    const keyGroup: IGroupService = mapGroup ? mapGroup : new GroupService(groupId, product.group.name);
+
+    product = Object.assign({}, product, {currency, type: ServiceType.product});
+
+    if (isSelected) {
+      keyGroup.selectedProducts = [...keyGroup.selectedProducts, product];
+    } else {
+      keyGroup.products = [...keyGroup.products, product];
+    }
+    groups.set(groupId, keyGroup);
+  });
+
+  return groups;
 };
 
 const totalPaid = (payments: IPayment[] | undefined): number => {

@@ -4,7 +4,7 @@
       <form (ngSubmit)="update()" [formGroup]="form" novalidate>
         <mat-card class="style-card">
           <mat-card-header>
-            <mat-card-title>{{ 'ROOM.ME' | translate }}</mat-card-title>
+            <mat-card-title>{{ 'ROOM.ME.TITLE' | translate }}</mat-card-title>
             <mat-card-subtitle *ngIf="room; else skeleton">{{room.name}}</mat-card-subtitle>
             <ng-template #skeleton>
               <div class="ssc-line"></div>
@@ -22,6 +22,13 @@
                 <mat-label>{{ 'ROOM.PROFESSIONAL.FIELD' | translate }}</mat-label>
                 <label>
                   <input [value]="professionalName" disabled matInput type="text">
+                </label>
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>{{ 'ROOM.CURRENCY.FIELD' | translate }}</mat-label>
+                <mat-icon matPrefix>{{currencyIcon}}</mat-icon>
+                <label>
+                  <input [value]="currencyCode" disabled matInput>
                 </label>
               </mat-form-field>
               <mat-label class="divider">{{ 'ROOM.AVAILABILITY.FIELD' | translate }}</mat-label>

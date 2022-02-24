@@ -1,0 +1,73 @@
+<div class="flex-container" fxLayout="column">
+  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
+    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+      <mat-card class="style-card">
+        <mat-card-content>
+          <h2>{{'ROOM.ME.SERVICES.ADDITIONAL.TITLE' | translate}}</h2>
+          <div *ngIf="(selectedAdditional.length && !additional.length) || (!selectedAdditional.length && additional.length)
+      || (selectedAdditional.length && additional.length); else boxSkeleton" fxLayout="row"
+               fxLayoutAlign="space-evenly stretch">
+            <div class="drag-container">
+              <div class="section-heading">{{ 'ROOM.ME.SERVICES.ALL' | translate }}</div>
+              <div #additionalList="cdkDropList" (cdkDropListDropped)="drop($event, false)"
+                   [cdkDropListConnectedTo]="[selectedAdditionalList]" [cdkDropListData]="additional" cdkDropList
+                   class="item-list">
+                <div *ngFor="let item of additional" cdkDrag class="item-box">{{item.name}}</div>
+              </div>
+            </div>
+
+            <div class="drag-container">
+              <div class="section-heading">{{ 'ROOM.ME.SERVICES.SELECTED' | translate }}</div>
+              <div #selectedAdditionalList="cdkDropList" (cdkDropListDropped)="drop($event,true)"
+                   [cdkDropListConnectedTo]="[additionalList]" [cdkDropListData]="selectedAdditional" cdkDropList
+                   class="item-list">
+                <div (click)="changePrice(item)" *ngFor="let item of selectedAdditional" cdkDrag class="item-box">
+                  {{item.name}} - {{item.currency}} {{item.price}}
+                </div>
+              </div>
+            </div>
+          </div>
+          <h2>{{'ROOM.ME.SERVICES.PRODUCT.TITLE' | translate}}</h2>
+          <div *ngIf="groups.size; else boxSkeleton">
+            <div *ngFor="let group of groups | keyvalue">
+              <div fxLayout="row" fxLayoutAlign="space-evenly stretch">
+                <div class="drag-container">
+                  <div class="section-heading">{{group.value.name}}</div>
+                  <div #productList="cdkDropList" (cdkDropListDropped)="drop($event, false)"
+                       [cdkDropListConnectedTo]="[selectedProductList]" [cdkDropListData]="group.value.products"
+                       cdkDropList
+                       class="item-list">
+                    <div *ngFor="let item of group.value.products" cdkDrag class="item-box">{{item.name}}</div>
+                  </div>
+                </div>
+                <div class="drag-container">
+                  <div class="section-heading">{{group.value.name}}</div>
+                  <div #selectedProductList="cdkDropList" (cdkDropListDropped)="drop($event,true)"
+                       [cdkDropListConnectedTo]="[productList]" [cdkDropListData]="group.value.selectedProducts"
+                       cdkDropList
+                       class="item-list">
+                    <div (click)="changePrice(item)" *ngFor="let item of group.value.selectedProducts" cdkDrag
+                         class="item-box">
+                      {{item.name}} - {{item.currency}} {{item.price}}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <ng-template #boxSkeleton>
+            <div class="ssc-square mb"></div>
+          </ng-template>
+        </mat-card-content>
+        <mat-card-actions>
+          <div fxFlex></div>
+          <button (click)="save()" class="margin-right-eight" color="primary"
+                  mat-raised-button>{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
+          <button appBackButton class="margin-right-eight" color="accent"
+                  mat-raised-button type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+</div>
+

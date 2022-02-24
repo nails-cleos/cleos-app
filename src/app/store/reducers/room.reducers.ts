@@ -1,10 +1,11 @@
 import { Pagination } from '../../interfaces/pagination';
 import { All, RoomActionTypes } from '../room.actions';
-import { IRoom } from '../../interfaces/room';
+import { IRoom, IRoomService } from '../../interfaces/room';
 import { IUser } from '../../interfaces/user';
 
 export interface State {
   data: IRoom | Pagination<IRoom> | null;
+  services: IRoomService | null;
   professionals: IUser[] | null;
   errorMessage: string | null;
   error: any;
@@ -16,6 +17,7 @@ export interface State {
 
 export const initialState: State = {
   data: null,
+  services: null,
   professionals: null,
   errorMessage: null,
   error: null,
@@ -59,6 +61,22 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
+    case RoomActionTypes.getMyService: {
+      return {
+        ...state,
+        services: {
+          currency: {},
+          products: [],
+          selectedProducts: [],
+          additionalList: [],
+          selectedAdditionalList: []
+        } as IRoomService,
+        errorMessage: null,
+        subErrors: null,
+        selected: null,
+        message: null
+      };
+    }
     case RoomActionTypes.roomSuccess: {
       return {
         ...state,
@@ -88,6 +106,15 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
+    case RoomActionTypes.roomServiceSelected: {
+      return {
+        ...state,
+        services: action.payload,
+        errorMessage: null,
+        subErrors: null,
+        message: null
+      };
+    }
     case RoomActionTypes.roomFailure: {
       return {
         ...state,
@@ -98,6 +125,7 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false
       };
     }
+    case RoomActionTypes.roomServiceUpdate:
     case RoomActionTypes.roomUpdate:
     case RoomActionTypes.roomSave:
     case RoomActionTypes.roomDelete: {

@@ -90,9 +90,9 @@ export class ReservationEffects {
     ))
   ));
 
-  getAllProducts$ = createEffect(() => this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getProducts)).pipe(
+  getAllProducts$ = createEffect(() => this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getServices)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.productService.getAllProducts(payload?.customerId).pipe(
+    switchMap((payload: any) => this.productService.getAllProducts(payload?.roomId, payload?.customerId).pipe(
       switchMap((response: any) => of(new fromActionsReservation.ReservationProductsSuccess(response))),
       catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
     ))

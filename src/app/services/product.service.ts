@@ -8,6 +8,7 @@ import { PAGE_SIZE } from '../interfaces/pagination';
 export class ProductService {
 
   url = 'products';
+  urlV1 = 'v1/products';
 
   constructor(private http: HttpClient) {
   }
@@ -24,12 +25,12 @@ export class ProductService {
     return this.http.get<IProductGroup[]>(`${this.url}/pages`, {params});
   }
 
-  public getAllProducts(customerId?: string): Observable<IProductDiscountDTO[]> {
-    let params = new HttpParams();
+  public getAllProducts(roomId: string, customerId?: string): Observable<IProductDiscountDTO[]> {
+    let params = new HttpParams().set('roomId', roomId);
     if (customerId) {
       params = params.append('customerId', customerId);
     }
-    return this.http.get<IProductDiscountDTO[]>(this.url, {params});
+    return this.http.get<IProductDiscountDTO[]>(this.urlV1, {params});
   }
 
   public getProductList(): Observable<IProductGroup[]> {

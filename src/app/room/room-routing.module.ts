@@ -6,6 +6,7 @@ import { RoomsComponent } from './list/rooms.component';
 import { RoomComponent } from './room.component';
 import { RoomMeComponent } from './me/room-me.component';
 import { RoomDetailComponent } from './detail/room-detail.component';
+import { AddServiceComponent } from './me/add-service/add-service.component';
 
 const routes: Routes = [
   {
@@ -20,6 +21,11 @@ const routes: Routes = [
   },
   {
     path: 'me', component: RoomMeComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.professional]
+    }
+  },
+  {
+    path: 'me/services', component: AddServiceComponent, canActivate: [AuthGuardService], data: {
       roles: [Role.professional]
     }
   },

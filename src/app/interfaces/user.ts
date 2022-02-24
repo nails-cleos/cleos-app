@@ -35,6 +35,7 @@ export interface IUserAll {
   authorities: IAuthority[];
   imageUrl?: string;
   image?: any;
+  lang?: string;
   locale: string;
   phone?: string;
   dob?: string;
@@ -46,7 +47,11 @@ export interface IAuthority {
   authority: string;
 }
 
-export interface IMenu {
+export interface IMenu extends ISubMenu {
+  subMenus: ISubMenu[];
+}
+
+export interface ISubMenu {
   name: string;
   path: string;
   icon: string;

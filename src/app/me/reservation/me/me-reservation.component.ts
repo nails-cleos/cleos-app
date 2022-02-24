@@ -3,8 +3,8 @@ import { MatStepper } from '@angular/material/stepper';
 import { Observable, Subscription } from 'rxjs';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
-import { IPrice, IProduct, IProductGroup, Price } from '../../../interfaces/product';
-import { IRoom } from '../../../interfaces/room';
+import { IGroupService, IPrice, IProduct, IProductGroup, Price } from '../../../interfaces/product';
+import { IRoom, IService } from '../../../interfaces/room';
 import {
   IAvailableDTO,
   IReservation,
@@ -41,6 +41,7 @@ import * as fromActionsReservation from '../../../store/reservation.actions';
 import { map, startWith } from 'rxjs/operators';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import {
+  createProductGroupService,
   getPrice,
   getProductDurability,
   getUserName,
@@ -72,13 +73,13 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   errors: any = [];
 
   productForm!: FormGroup;
-  groups?: IProductGroup[];
-  filteredGroup?: Observable<IProductGroup[] | undefined>;
+  groups?: IGroupService[];
+  filteredGroup?: Observable<IGroupService[] | undefined>;
   group: FormControl = new FormControl('', [
     Validators.required, requireMatch
   ]);
-  productList?: IProduct[];
-  filteredProduct?: Observable<IProduct[] | undefined>;
+  productList?: IService[];
+  filteredProduct?: Observable<IService[] | undefined>;
   product: FormControl = new FormControl('', [
     Validators.required, requireMatch
   ]);
@@ -191,8 +192,10 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     if (this.productForm.invalid) {
       return;
     }
-    this.getAdditionalList();
     this.myStepper.next();
+    if (!this.additionalList || !this.additionalList.length) {
+      return this.availability;
+    }
 
     return;
   }
@@ -241,6 +244,33 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   get back(): void {
     this.isPreview = false;
     this.myStepper.previous();
+
+    return;
+  }
+
+  get create(): void {
+    const reservation: IReservation = new Reservation();
+    reservation.customerId = this.customerId;
+    reservation.roomId = this.room.value.id;
+    if (this.date) {
+      reservation.start = this.date.toLocaleString(API_LOCALE);
+    }
+    reservation.additionalIds = this.additionalSelected?.map(value => value.id);
+
+    if (this.isEditing && this.reservation) {
+      reservation.id = this.reservation.id;
+      reservation.productId = valueChange(this.product.value.id, this.reservation.product.id);
+
+      this.store.dispatch(
+        new fromActionsReservation.Edit({reservation, isCustomer: true})
+      );
+    } else {
+      reservation.productId = this.product.value.id;
+      reservation.discountId = this.discount.value;
+      this.store.dispatch(
+        new fromActionsReservation.ReservationSave({reservation, isCustomer: true})
+      );
+    }
 
     return;
   }
@@ -302,31 +332,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       result = isEqual(this.eventSelected, datetime.date) && this.time === datetime.time;
     }
     return result;
-  }
-
-  create(): void {
-    const reservation: IReservation = new Reservation();
-    reservation.customerId = this.customerId;
-    reservation.roomId = this.room.value.id;
-    if (this.date) {
-      reservation.start = this.date.toLocaleString(API_LOCALE);
-    }
-    reservation.additionalIds = this.additionalSelected?.map(value => value.id);
-
-    if (this.isEditing && this.reservation) {
-      reservation.id = this.reservation.id;
-      reservation.productId = valueChange(this.product.value.id, this.reservation.product.id);
-
-      this.store.dispatch(
-        new fromActionsReservation.Edit({reservation, isCustomer: true})
-      );
-    } else {
-      reservation.productId = this.product.value.id;
-      reservation.discountId = this.discount.value;
-      this.store.dispatch(
-        new fromActionsReservation.ReservationSave({reservation, isCustomer: true})
-      );
-    }
   }
 
   sortDate(a: any, b: any): number {
@@ -398,13 +403,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private getProductList(): void {
     this.store.dispatch(
-      new fromActionsReservation.GetAllProducts()
-    );
-  }
-
-  private getAdditionalList(): void {
-    this.store.dispatch(
-      new fromActionsReservation.GetAllAdditional()
+      new fromActionsReservation.GetAllServices({roomId: this.room.value.id})
     );
   }
 
@@ -446,8 +445,12 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      this.additionalList = state.additional;
-      this.groups = state.productDiscount?.groups;
+      this.additionalList = state.productDiscount?.additionalList;
+      if (state.productDiscount?.products) {
+        const groupMap = createProductGroupService(new Map<string, IGroupService>(), state.productDiscount.products,
+          this.room.value.currency);
+        this.groups = Array.from(groupMap.values());
+      }
       if (this.groups && this.productId && !this.group.value) {
         this.group.setValue(this.groups?.find(group => {
           const product = group.products?.find(p => p.id === this.productId);
@@ -539,13 +542,13 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       });
   }
 
-  private filterGroup(name: string): IProductGroup[] | undefined {
+  private filterGroup(name: string): IGroupService[] | undefined {
     const filterValue = name.toLowerCase();
 
     return this.groups?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 
-  private filterProduct(name: string): IProduct[] | undefined {
+  private filterProduct(name: string): IService[] | undefined {
     const filterValue = name.toLowerCase();
 
     return this.productList?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);

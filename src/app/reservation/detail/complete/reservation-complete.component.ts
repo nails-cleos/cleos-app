@@ -2,21 +2,14 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../../store/app.states';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import * as fromActionsReservation from '../../../store/reservation.actions';
-import { IReservationAll} from '../../../interfaces/reservation';
+import { IReservationAll } from '../../../interfaces/reservation';
 import { IPrice, IProduct, IProductGroup, Price } from '../../../interfaces/product';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IPaymentAll, PaymentType } from '../../../interfaces/payment';
-import {
-  getFullUserName,
-  getPrice,
-  getProductDurability,
-  newAdditional,
-  newExtra,
-  newPrice
-} from '../../../util/helper';
+import { getFullUserName, getPrice, getProductDurability, newAdditional, newExtra, newPrice } from '../../../util/helper';
 import { formatTime, totalDuration } from '../../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
 import { map, startWith } from 'rxjs/operators';
@@ -60,7 +53,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
 
   constructor(private store: Store<AppState>, private route: ActivatedRoute, private formBuilder: FormBuilder,
-              private readonly translate: TranslateService, private router: Router) {
+              private readonly translate: TranslateService) {
     this.getState = this.store.select(selectReservationState);
     this.price = new Price();
     this.product.valueChanges.subscribe(value => {
@@ -88,7 +81,6 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.createForm();
     this.getProducts();
-    this.getAdditionalList();
     this.subscribe();
     this.route.params.subscribe(routeParams => {
       this.reservationId = routeParams.id;
@@ -162,7 +154,6 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     this.subscription = this.getState.subscribe(state => {
       this.payments = state.payments;
       this.reservation = state.selected;
-      this.additionalList = state.additional;
       if (this.reservation) {
         this.price = getPrice(this.reservation, this.payments);
         this.product.setValue(this.reservation.product);
@@ -171,6 +162,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
         }
       }
       if (state.productDiscount) {
+        this.additionalList = state.additional;
         this.groups = state.productDiscount.groups;
         this.group.setValue(this.groups?.find(group => {
           if (group.products?.find(product => product.id === this.product.value.id)) {
@@ -194,14 +186,9 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   }
 
   private getProducts(): void {
+    // TODO get roomId
     this.store.dispatch(
-      new fromActionsReservation.GetAllProducts()
-    );
-  }
-
-  private getAdditionalList(): void {
-    this.store.dispatch(
-      new fromActionsReservation.GetAllAdditional()
+      new fromActionsReservation.GetAllServices()
     );
   }
 

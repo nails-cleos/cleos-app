@@ -20,6 +20,7 @@ import { AuthService } from '../services/auth.service';
 import { NotificationService } from '../services/notification.service';
 import { UserService } from '../services/user.service';
 import { TokenService } from '../services/token.service';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
   new TranslateHttpLoader(http, './assets/i18n/dashboard/', '.json');
@@ -42,7 +43,8 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
       isolate: false,
       extend: true
     }),
-    EffectsModule.forFeature([LoginEffects, NotificationEffects, UserEffects])
+    EffectsModule.forFeature([LoginEffects, NotificationEffects, UserEffects]),
+    MatExpansionModule
   ],
   providers: [
     AuthService,

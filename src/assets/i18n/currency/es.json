@@ -1,0 +1,33 @@
+{
+  "CURRENCY": {
+    "TITLE": "Agregar moneda",
+    "CREATED": "moneda {{code}} creada",
+    "DETAIL": "Actualizar moneda",
+    "LIST": {
+      "COLUMN": {
+        "CODE": "Código"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No hay monedas"
+      }
+    },
+    "CODE": {
+      "FIELD": "Código",
+      "REQUIRED": "Código es <b>requerido</b>"
+    },
+    "NAME": {
+      "FIELD": "Nombre"
+    },
+    "ICON": {
+      "FIELD": "Icon"
+    },
+    "DELETED": {
+      "TITLE": "Eliminar moneda",
+      "CONTENT": "¿Está seguro de eliminar moneda {{code}}?",
+      "MESSAGE": "Moneda {{code}} eliminada"
+    },
+    "UPDATED": {
+      "MESSAGE": "Moneda {{code}} actualizada"
+    }
+  }
+}

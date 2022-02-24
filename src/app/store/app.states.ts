@@ -11,6 +11,7 @@ import * as main from './reducers/main.reducers';
 import * as payment from './reducers/payment.reducers';
 import * as dashboard from './reducers/dashboard.reducers';
 import * as additional from './reducers/additional.reducers';
+import * as currency from './reducers/currency.reducers';
 import { createFeatureSelector } from '@ngrx/store';
 
 export interface AppState {
@@ -27,6 +28,7 @@ export interface AppState {
   paymentState: payment.State;
   dashboardState: dashboard.State;
   additionalState: additional.State;
+  currencyState: currency.State;
 }
 
 export const reducers = {
@@ -42,7 +44,8 @@ export const reducers = {
   main: main.reducer,
   payment: payment.reducer,
   dashboard: dashboard.reducer,
-  additional: additional.reducer
+  additional: additional.reducer,
+  currency: currency.reducer
 };
 
 export const selectAuthState = createFeatureSelector<AppState>('auth');
@@ -58,3 +61,4 @@ export const selectMainState = createFeatureSelector<AppState>('main');
 export const selectPaymentState = createFeatureSelector<AppState>('payment');
 export const selectDashboardState = createFeatureSelector<AppState>('dashboard');
 export const selectAdditionalState = createFeatureSelector<AppState>('additional');
+export const selectCurrencyState = createFeatureSelector<AppState>('currency');

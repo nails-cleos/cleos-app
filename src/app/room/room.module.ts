@@ -15,6 +15,8 @@ import { EffectsModule } from '@ngrx/effects';
 import { RoomEffects } from '../store/effects/room.effects';
 import { RoomService } from '../services/room.service';
 import { UserService } from '../services/user.service';
+import { AddServiceComponent, PriceDialogComponent } from './me/add-service/add-service.component';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
   new TranslateHttpLoader(http, './assets/i18n/room/', '.json');
@@ -25,7 +27,9 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
     RoomComponent,
     RoomMeComponent,
     RoomDetailComponent,
-    AvailabilityComponent
+    AvailabilityComponent,
+    AddServiceComponent,
+    PriceDialogComponent
   ],
   imports: [
     RoomRoutingModule,
@@ -36,7 +40,8 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
       isolate: false,
       extend: true
     }),
-    EffectsModule.forFeature([RoomEffects])
+    EffectsModule.forFeature([RoomEffects]),
+    DragDropModule
   ],
   providers: [
     RoomService,

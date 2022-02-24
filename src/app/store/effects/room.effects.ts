@@ -29,6 +29,15 @@ export class RoomEffects {
     ))
   ));
 
+  getMyRoomService$ = createEffect(() => this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.getMyService)).pipe(
+    map((action: any) => action.payload),
+    switchMap(() => this.roomService.getMyService().pipe(
+      switchMap((room: any) => of(new fromActionsRoom.RoomServiceSelected(room))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
+    ))
+  ));
+
+
   getAllProfessional$ = createEffect(() => this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.getAllProfessional)).pipe(
     map((action: any) => action.payload),
     switchMap(() => this.userService.getAllProfessionals().pipe(
@@ -62,6 +71,14 @@ export class RoomEffects {
         const message = this.translate.instant('ROOM.UPDATED.MESSAGE', {name: response.name});
         return of(new fromActionsRoom.RoomSaveSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
+    ))
+  ));
+
+  updateServices$ = createEffect(() => this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.roomServiceUpdate)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.roomService.updateService(payload).pipe(
+      switchMap(() => of(new fromActionsRoom.RoomSaveSuccess({message: this.translate.instant('ROOM.ME.SERVICES.UPDATE.MESSAGE')}))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
     ))
   ));
 

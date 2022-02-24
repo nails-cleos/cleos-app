@@ -109,4 +109,3 @@ export class AdditionalDetailComponent implements OnInit, AfterViewInit, OnDestr
     }
   }
 }
-
