@@ -17,6 +17,8 @@ const routes: Routes = [{
   }, {
     path: 'discounts', loadChildren: () => import('../discount/discount.module').then(m => m.DiscountModule)
   }, {
+    path: 'offices', loadChildren: () => import('../office/office.module').then(m => m.OfficeModule)
+  }, {
     path: 'rooms', loadChildren: () => import('../room/room.module').then(m => m.RoomModule)
   }, {
     path: 'reservation',

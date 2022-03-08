@@ -54,13 +54,6 @@ export class ProductComponent implements OnInit, OnDestroy {
         errors.name = 'REQUIRED';
         hasError = true;
       }
-      if (!tab.price) {
-        errors.price = 'REQUIRED';
-        hasError = true;
-      } else if (tab.price <= 0) {
-        errors.price = 'GREATER';
-        hasError = true;
-      }
       if (!tab.duration || tab.duration.trim().length === 0) {
         errors.duration = 'REQUIRED';
         hasError = true;

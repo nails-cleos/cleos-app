@@ -32,6 +32,7 @@
     },
     "ROOM": {
       "TITLE": "Agregar sala",
+      "NO_CONTENT": "No hay salas",
       "DETAIL": "Detalle",
       "NAME": {
         "FIELD": "Nombre"

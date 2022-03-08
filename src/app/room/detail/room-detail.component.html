@@ -5,7 +5,7 @@
         <mat-card class="style-card">
           <mat-card-header>
             <mat-card-title>{{ 'ROOM.DETAIL' | translate }}</mat-card-title>
-            <mat-card-subtitle *ngIf="room; else skeleton">{{room.name}}</mat-card-subtitle>
+            <mat-card-subtitle *ngIf="room; else skeleton">{{room.id}}</mat-card-subtitle>
             <ng-template #skeleton>
               <div class="ssc-line"></div>
             </ng-template>
@@ -13,18 +13,22 @@
           <mat-card-content *ngIf="room; else boxSkeleton">
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <mat-form-field appearance="fill">
-                <mat-label>{{ 'ROOM.NAME.FIELD' | translate }}</mat-label>
+                <mat-label>{{ 'ROOM.CURRENCY.FIELD' | translate }}</mat-label>
+                <mat-icon matPrefix>{{room.currency.icon}}</mat-icon>
                 <label>
-                  <input [formControl]="name" autocomplete="name" matInput required>
+                  <input [value]="room.currency.code" disabled matInput>
                 </label>
-                <mat-error *ngIf="name.hasError('required')" [innerHTML]="'ROOM.NAME.REQUIRED' | translate">
-                </mat-error>
-                <mat-error *ngIf="errors['name']">
-                  {{errors['name']}}
-                </mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>{{ 'ROOM.OFFICE.FIELD' | translate }}</mat-label>
+                <mat-icon matPrefix>store</mat-icon>
+                <label>
+                  <input [value]="room.office.name" disabled matInput type="text">
+                </label>
               </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'ROOM.PROFESSIONAL.FIELD' | translate }}</mat-label>
+                <mat-icon matPrefix>group</mat-icon>
                 <label>
                   <input [value]="professionalName" disabled matInput type="text">
                 </label>

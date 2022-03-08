@@ -12,11 +12,13 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import * as fromActionsCurrency from '../../store/currency.actions';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { detailExpandAnimation } from '../../util/animation';
 
 @Component({
   selector: 'app-currency-list',
   templateUrl: './currency-list.component.html',
-  styleUrls: ['./currency-list.component.scss']
+  styleUrls: ['./currency-list.component.scss'],
+  animations: [detailExpandAnimation]
 })
 export class CurrencyListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -24,6 +26,7 @@ export class CurrencyListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   displayedColumns: string[] = ['position', 'code', 'name', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<ICurrency>>();
+  expanded?: ICurrency;
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;

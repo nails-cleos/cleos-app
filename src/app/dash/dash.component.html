@@ -1,3 +1,13 @@
+<mat-card *ngIf="mapDashboard?.size" style="margin-bottom: 8px">
+  <mat-card-header>
+    <mat-select [formControl]="selectedDash">
+      <mat-option *ngFor="let dashboard of mapDashboard | keyvalue" [value]="dashboard.key">
+        {{dashboard.key}}
+      </mat-option>
+    </mat-select>
+  </mat-card-header>
+</mat-card>
+
 <!--Calendar-->
 <mat-card>
   <mat-card-header>
@@ -40,7 +50,7 @@
   <!--Mini Cards-->
   <mat-grid-tile *ngFor="let mc of miniCardData" [colspan]="cardLayout.miniCard?.cols"
                  [rowspan]="cardLayout.miniCard?.rows">
-    <app-mini-card [color]="mc.color" [duration]="'DASHBOARD.MINI_CARD.DURATION' | translate" [error]="mc.error"
+    <app-mini-card [isLoading]="isLoading" [color]="mc.color" [duration]="'DASHBOARD.MINI_CARD.DURATION' | translate" [error]="mc.error"
                    [icon]="mc.icon" [isCurrency]="mc.currency" [isIncrease]="mc.increase"
                    [percentValue]="mc.percentValue" [title]="mc.title | translate"
                    [value]="mc.value"></app-mini-card>
@@ -48,13 +58,13 @@
   <!--Charts-->
   <mat-grid-tile *ngFor="let chart of charts" [colspan]="cardLayout.chart?.cols" [rowspan]="cardLayout.chart?.rows">
     <app-card [chart]="chart" [isDark]="isDarkMode" [title]="chart.title">
-      <app-chart [chartSummary]="chart" [isDark]="isDarkMode" [state]="state"></app-chart>
+      <app-chart [isLoading]="isLoading"  [chartSummary]="chart" [isDark]="isDarkMode" [state]="state"></app-chart>
     </app-card>
   </mat-grid-tile>
   <!--Table-->
-  <mat-grid-tile [colspan]="cardLayout.table?.cols" [rowspan]="cardLayout.table?.rows">
+  <mat-grid-tile *ngIf="roomId" [colspan]="cardLayout.table?.cols" [rowspan]="cardLayout.table?.rows">
     <app-card [expand]="false" [title]="'DASHBOARD.CARD.RESERVATION' | translate">
-      <app-reservation-table></app-reservation-table>
+      <app-reservation-table [roomId]="roomId"></app-reservation-table>
     </app-card>
   </mat-grid-tile>
 </mat-grid-list>

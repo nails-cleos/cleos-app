@@ -8,22 +8,66 @@
           </mat-card-header>
           <mat-card-content>
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-              <mat-form-field appearance="fill">
-                <mat-label>{{ 'ROOM.NAME.FIELD' | translate }}</mat-label>
-                <label>
-                  <input [formControl]="name" autocomplete="name" matInput required>
-                </label>
-                <mat-error *ngIf="name.hasError('required')" [innerHTML]="'ROOM.NAME.REQUIRED' | translate">
-                </mat-error>
-                <mat-error *ngIf="errors['name']">
-                  {{errors['name']}}
-                </mat-error>
-              </mat-form-field>
+              <div *ngIf="currencies; else skeleton" fxLayout="row" fxLayoutAlign="space-between center">
+                <mat-form-field appearance="fill">
+                  <mat-label>{{ 'ROOM.CURRENCY.FIELD' | translate }}</mat-label>
+                  <label>
+                    <input (keydown)="keyDownHandler($event, currency)" [formControl]="currency"
+                           [matAutocomplete]="auto" matInput required type="text">
+                  </label>
+                  <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayCurrencyFn">
+                    <mat-option *ngFor="let currency of filteredCurrencyOptions | async" [value]="currency">
+                      {{currency.code}}
+                    </mat-option>
+                  </mat-autocomplete>
+                  <mat-error *ngIf="currency.hasError('required')"
+                             [innerHTML]="'ROOM.CURRENCY.REQUIRED' | translate">
+                  </mat-error>
+                  <mat-error *ngIf="currency.hasError('requireMatch')"
+                             [innerHTML]="'ROOM.CURRENCY.INVALID' | translate">
+                  </mat-error>
+                  <mat-error *ngIf="errors['currency']">
+                    {{errors['currency']}}
+                  </mat-error>
+                </mat-form-field>
+                <button (click)="addCurrency()" color="accent" mat-raised-button>
+                  <mat-icon matPrefix>add_card</mat-icon>
+                  <span fxHide.lt-sm fxShow>{{ 'ROOM.CURRENCY.ADD_BUTTON' | translate }}</span>
+                </button>
+              </div>
+              <div *ngIf="offices; else skeleton" fxLayout="row" fxLayoutAlign="space-between center">
+                <mat-form-field appearance="fill">
+                  <mat-label>{{ 'ROOM.OFFICE.FIELD' | translate }}</mat-label>
+                  <label>
+                    <input (keydown)="keyDownHandler($event, office)" [formControl]="office" [matAutocomplete]="auto"
+                           matInput required type="text">
+                  </label>
+                  <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayOfficeFn">
+                    <mat-option *ngFor="let office of filteredOfficeOptions | async" [value]="office">
+                      {{office.name}}
+                    </mat-option>
+                  </mat-autocomplete>
+                  <mat-error *ngIf="office.hasError('required')"
+                             [innerHTML]="'ROOM.OFFICE.REQUIRED' | translate">
+                  </mat-error>
+                  <mat-error *ngIf="office.hasError('requireMatch')"
+                             [innerHTML]="'ROOM.OFFICE.INVALID' | translate">
+                  </mat-error>
+                  <mat-error *ngIf="errors['office']">
+                    {{errors['office']}}
+                  </mat-error>
+                </mat-form-field>
+                <button (click)="addOffice()" color="accent" mat-raised-button>
+                  <mat-icon matPrefix>add_business</mat-icon>
+                  <span fxHide.lt-sm fxShow>{{ 'ROOM.OFFICE.ADD_BUTTON' | translate }}</span>
+                </button>
+              </div>
               <div *ngIf="professionals; else skeleton" fxLayout="row" fxLayoutAlign="space-between center">
                 <mat-form-field appearance="fill">
                   <mat-label>{{ 'ROOM.PROFESSIONAL.FIELD' | translate }}</mat-label>
                   <label>
-                    <input [formControl]="professional" [matAutocomplete]="auto" matInput required type="text">
+                    <input (keydown)="keyDownHandler($event, professional)" [formControl]="professional"
+                           [matAutocomplete]="auto" matInput required type="text">
                   </label>
                   <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
                     <mat-option *ngFor="let professional of filteredOptions | async" [value]="professional">
@@ -41,14 +85,13 @@
                   </mat-error>
                 </mat-form-field>
                 <button (click)="addProfessional()" color="accent" mat-raised-button>
-                  <mat-icon matPrefix>person_add</mat-icon>
+                  <mat-icon matPrefix>person_add_alt_1</mat-icon>
                   <span fxHide.lt-sm fxShow>{{ 'ROOM.PROFESSIONAL.ADD_BUTTON' | translate }}</span>
                 </button>
               </div>
               <ng-template #skeleton>
                 <div class="ssc-line"></div>
               </ng-template>
-              <!--              <mat-label class="divider">{{ 'ROOM.AVAILABILITY.FIELD' | translate }}</mat-label>-->
               <mat-accordion class="divider headers-align" multi>
                 <mat-expansion-panel (opened)="setStep(0)" [expanded]="step === 0" hideToggle>
                   <mat-expansion-panel-header>

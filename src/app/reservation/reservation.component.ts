@@ -49,6 +49,8 @@ import { IUnavailableAll } from '../interfaces/unavailable';
 import { DiscountType, IUserDiscount } from '../interfaces/discount';
 import {
   createProductGroupService,
+  createRoomOffice,
+  currencySymbol,
   getFullUserName,
   getPrice,
   getProductDurability,
@@ -62,6 +64,7 @@ import { addDays, addMonths, isEqual, isSameDay } from 'date-fns';
 import { findStateColor, isDarkMode } from '../util/theme';
 import { IAdditionalAll } from '../interfaces/additional';
 import { MatListOption } from '@angular/material/list';
+import { IOffice } from '../interfaces/office';
 
 @Component({
   selector: 'app-reservation',
@@ -104,6 +107,11 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   price: IPrice;
 
   roomForm!: FormGroup;
+  offices?: IOffice[];
+  filteredOffice?: Observable<IOffice[] | undefined>;
+  office: FormControl = new FormControl('', [
+    Validators.required, requireMatch
+  ]);
   roomList?: IRoom[];
   filteredRoom?: Observable<IRoom[] | undefined>;
   room: FormControl = new FormControl('', [
@@ -146,6 +154,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   durability?: string;
 
   private productId: string | undefined;
+  private roomId: string | undefined;
   private isDarkMode = false;
   private readonly extras: any;
   private lessDays = 3;
@@ -177,7 +186,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.extras) {
       this.productId = this.extras.product?.id;
       this.customer.setValue(this.extras.customer);
-      this.room.setValue(this.extras.room);
+      this.roomId = this.extras.room?.id;
       if (this.extras.date) {
         this.date.setValue(this.extras.date);
         this.start.setValue(getTime(this.extras.date, this.locale));
@@ -335,11 +344,13 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.isEditing && this.reservation) {
         reservation.id = this.reservation.id;
         reservation.productId = valueChange(this.product.value.id, this.reservation.product.id);
+        reservation.roomId = valueChange(this.room.value.id, this.reservation.room.id);
         this.store.dispatch(
           new fromActionsReservation.Edit({reservation, isCustomer: false})
         );
       } else {
         reservation.productId = this.product.value.id;
+        reservation.roomId = this.room.value.id;
         reservation.discountId = this.discount.value;
         this.store.dispatch(
           new fromActionsReservation.ReservationSave({reservation, isCustomer: false})
@@ -425,12 +436,12 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     return product ? `${product.name}` : '';
   }
 
+  displayFnOffice(office: IOffice): string {
+    return office ? `${office.name}` : '';
+  }
+
   displayFnRoom(room: IRoom): string {
-    if (room) {
-      return `${room.name}`;
-    } else {
-      return '';
-    }
+    return room.address ? room.address.name : '';
   }
 
   segmentClick(date: Date, state: string, id?: string): void {
@@ -496,6 +507,12 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.keyDownHandler(event, this.group);
   }
 
+  keyDownOffice(event: any): void {
+    this.roomList = undefined;
+    this.keyDownHandler(event, this.room);
+    this.keyDownHandler(event, this.office);
+  }
+
   beforeMonthViewRender({header}: any): void {
     header.forEach((day: any) => {
       if (!this.dateIsValid(day.date)) {
@@ -521,6 +538,14 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getDuration(duration: string): string {
     return formatTime(convertDuration(duration), this.locale);
+  }
+
+  getRoomName(room: IRoom): string {
+    return room.address ? room.address.name : '';
+  }
+
+  getCurrencySymbol(): string {
+    return currencySymbol(this.room.value.currency);
   }
 
   private createNewEvent(start: Date, end: Date, state: string, id: string | undefined): CalendarEvent | undefined {
@@ -574,24 +599,58 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filterCustomer(name) : this.customers ? this.customers.slice() : this.customers)
     );
-    this.filteredGroup = this.group.valueChanges.pipe(startWith(''), map(value => {
-      if (typeof value === 'string') {
-        return value;
+    this.filteredGroup = this.group.valueChanges.pipe(startWith(''),
+      map(value => typeof value === 'string' ? value : value.name),
+      map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups));
+    this.group.valueChanges.subscribe(value => {
+      if (!value) {
+        return;
       }
       this.productList = value.products;
+      const product = value.products?.find((p: IProductGroup) => p.id === this.productId);
+      if (product) {
+        this.productList = value.products;
+        this.product.setValue(product);
+        this.productId = this.product.value.id;
+      } else {
+        if (this.productList?.length === 1) {
+          this.product.setValue(this.productList[0]);
+        } else {
+          this.product.setValue('');
+        }
+      }
       this.durability = getProductDurability(value.durabilityMin, value.durabilityMax, this.translate);
-      this.product.setValue('');
-      return value.name;
-    }), map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups));
+    });
     this.filteredProduct = this.product?.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filterProduct(name) : this.productList ? this.productList.slice() : this.productList)
     );
+    this.filteredOffice = this.office.valueChanges.pipe(startWith(''),
+      map(value => typeof value === 'string' ? value : value.name),
+      map(name => name ? this.filterOffice(name) : this.offices ? this.offices.slice() : this.offices));
+    this.office.valueChanges.subscribe(value => {
+      if (!value) {
+        return;
+      }
+      this.roomList = value.rooms;
+      const room = value.rooms?.find((o: IOffice) => o.id === this.roomId);
+      if (room) {
+        this.roomList = value.rooms;
+        this.room.setValue(room);
+        this.roomId = this.room.value.id;
+      } else {
+        if (this.roomList?.length === 1) {
+          this.room.setValue(this.roomList[0]);
+        } else {
+          this.room.setValue('');
+        }
+      }
+    });
     this.filteredRoom = this.room.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterRoom(name) : this.roomList ? this.roomList.slice() : this.roomList)
+      map(addressName => addressName ? this.filterRoom(addressName) : this.roomList ? this.roomList.slice() : this.roomList)
     );
   }
 
@@ -698,25 +757,21 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
+      this.offices = Array.from(createRoomOffice(state.rooms)?.values() || []);
+      if (this.offices && this.roomId && !this.office.value) {
+        this.office.setValue(this.offices?.find(office => office.rooms?.find(o => o.id === this.roomId) ? office : undefined));
+      } else if (this.offices && this.offices.length === 1) {
+        this.office.setValue(this.offices[0]);
+      }
       this.customerInfo = state.customer;
       this.customers = state.customers;
       this.additionalList = state.productDiscount?.additionalList;
       if (state.productDiscount?.products) {
-        const groupMap = createProductGroupService(new Map<string, IGroupService>(), state.productDiscount.products,
-          this.room.value.currency);
-        this.groups = Array.from(groupMap.values());
+        this.groups = Array.from(createProductGroupService(new Map<string, IGroupService>(), state.productDiscount.products,
+          this.room.value.currency).values());
       }
       if (this.groups && this.productId && !this.group.value) {
-        this.group.setValue(this.groups?.find(group => {
-          const product = group.products?.find(p => p.id === this.productId);
-          if (product) {
-            this.productList = group.products;
-            this.product.setValue(product);
-            this.productId = product.id;
-            return group;
-          }
-          return undefined;
-        }));
+        this.group.setValue(this.groups?.find(group => group.products?.find(p => p.id === this.productId) ? group : undefined));
       }
       this.discounts = state.productDiscount?.discounts.map((ud: IUserDiscount) => {
         let title = ud.discount.name;
@@ -730,10 +785,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         }
         return Object.assign({}, ud, {title});
       });
-      this.roomList = state.rooms;
-      if (this.roomList?.length === 1) {
-        this.room.setValue(this.roomList[0]);
-      }
       if (state.selected) {
         this.setData(state.selected);
       }
@@ -835,10 +886,16 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.productList?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 
-  private filterRoom(name: string): IRoom[] | undefined {
+  private filterOffice(name: string): IOffice[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.roomList?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
+    return this.offices?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
+  }
+
+  private filterRoom(addressName: string): IRoom[] | undefined {
+    const filterValue = addressName.toLowerCase();
+
+    return this.roomList?.filter(option => option.address?.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 
   private setData(reservation: IReservationAll): void {
@@ -852,6 +909,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.price = getPrice(this.reservation);
     this.additionalSelected = this.reservation.additional ? this.reservation.additional : [];
     this.productId = reservation.product.id;
+    this.roomId = reservation.room.id;
 
     this.myStepper.next();
     if (!this.isAdmin) {

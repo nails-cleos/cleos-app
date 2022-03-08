@@ -23,9 +23,6 @@ export class AdditionalDetailComponent implements OnInit, AfterViewInit, OnDestr
   name: FormControl = new FormControl('', [
     Validators.required
   ]);
-  price: FormControl = new FormControl('', [
-    Validators.required, Validators.min(1)
-  ]);
   duration: FormControl = new FormControl('', [
     Validators.required
   ]);
@@ -61,7 +58,6 @@ export class AdditionalDetailComponent implements OnInit, AfterViewInit, OnDestr
     additional.id = this.additional?.id;
 
     additional.name = fieldChange(this.name, this.additional?.name);
-    additional.price = this.price.value;
     additional.description = valueChange(this.form.value?.description, this.additional?.description);
     additional.duration = fieldChange(this.duration, this.additional?.duration);
 
@@ -72,7 +68,6 @@ export class AdditionalDetailComponent implements OnInit, AfterViewInit, OnDestr
     this.form = this.formBuilder.group({
       name: this.name,
       description: new FormControl(),
-      price: this.price,
       duration: this.duration
     });
   }
@@ -84,7 +79,6 @@ export class AdditionalDetailComponent implements OnInit, AfterViewInit, OnDestr
           id: state.selected.id,
           name: state.selected.name,
           description: state.selected.description,
-          price: state.selected.price,
           duration: formatDuration(state.selected.duration, API_LOCALE)
         } as IAdditional;
         this.form.patchValue(this.additional);

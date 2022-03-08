@@ -14,8 +14,9 @@ import { findStateColor, isDarkMode } from '../util/theme';
 import { getFrequency, Meta, monthEvent } from '../util/event';
 import { Router } from '@angular/router';
 import { isSameDay, isSameMonth } from 'date-fns';
-import { ICalendarReservations, ICalendarUnavailable, IChart } from '../interfaces/dashboard';
+import { ICalendarReservations, ICalendarUnavailable, IChart, IDashboard } from '../interfaces/dashboard';
 import { UnavailableRepeatType } from '../interfaces/unavailable';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-dash',
@@ -25,12 +26,17 @@ import { UnavailableRepeatType } from '../interfaces/unavailable';
 export class DashComponent implements OnInit, OnDestroy {
   state: any;
 
+  mapDashboard?: Map<string, IDashboard>;
+  selectedDash = new FormControl();
+  roomId?: string;
+
   view: CalendarView = CalendarView.Month;
   viewDate: Date;
   activeDayIsOpen = false;
   locale: string;
   events: CalendarEvent[] = [];
   isCalendarLoading = true;
+  isLoading: any;
   totalReservation: number;
   isDarkMode?: boolean;
 
@@ -118,6 +124,16 @@ export class DashComponent implements OnInit, OnDestroy {
     this.clean();
     this.subscribe();
     this.getSummaries();
+    this.selectedDash.valueChanges.subscribe(value => {
+      if (value) {
+        this.isCalendarLoading = true;
+        this.isLoading = true;
+        setTimeout(() => {
+          this.isLoading = false;
+          this.createDashboards();
+        }, 1000);
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -144,6 +160,25 @@ export class DashComponent implements OnInit, OnDestroy {
     this.getEvents();
   }
 
+  private createDashboards(): void {
+    if (this.selectedDash) {
+      const state: IDashboard | undefined = this.mapDashboard?.get(this.selectedDash.value);
+      if (state) {
+        this.roomId = state.roomId;
+        this.state = state;
+        this.createEvents(this.isDarkMode);
+        if (state.chartSummaries && state.chartSummaries.length) {
+          this.charts = state.chartSummaries;
+        }
+        if (state.miniCardSummaries && state.miniCardSummaries.length) {
+          this.miniCardData = state.miniCardSummaries;
+        } else {
+          this.miniCardError('NO_CONTENT');
+        }
+      }
+    }
+  }
+
   private clean(): void {
     this.store.dispatch(
       new fromActionsReservation.Clean()
@@ -153,8 +188,7 @@ export class DashComponent implements OnInit, OnDestroy {
     );
   }
 
-  private miniCardError(state: any, error: string): void {
-    this.state = state;
+  private miniCardError(error: string): void {
     const revenue = DashComponent.createErrorMiniCard('TOTAL_PRODUCT_SALES', error);
 
     const products = DashComponent.createErrorMiniCard('AVERAGE_PRODUCT_VALUE', error);
@@ -168,32 +202,23 @@ export class DashComponent implements OnInit, OnDestroy {
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       if (state.errorMessage) {
-        this.miniCardError(state, state.errorMessage);
         this.state = state;
+        this.miniCardError(state.errorMessage);
       }
-      if (state.data && (state.data.miniCardSummaries || state.data.chartSummaries || state.data.calendarSummary)) {
-        this.state = state;
-        if (!this.events.length && state.data.calendarSummary) {
-          this.createEvents(this.isDarkMode);
-        }
-        if (state.data.miniCardSummaries || state.data.chartSummaries) {
-          if (state.data.chartSummaries && state.data.chartSummaries.length) {
-            this.charts = state.data.chartSummaries;
-          }
-          if (state.data.miniCardSummaries && state.data.miniCardSummaries.length) {
-            this.miniCardData = state.data.miniCardSummaries;
-          } else {
-            this.miniCardError(state, 'NO_CONTENT');
-            this.isCalendarLoading = false;
-          }
-        }
+      this.mapDashboard = state.data;
+      // @ts-ignore
+      const [firstKey] = this.mapDashboard?.keys();
+      if (this.selectedDash.value) {
+        this.createDashboards();
+      } else if (firstKey) {
+        this.selectedDash.setValue(firstKey);
       }
     });
   }
 
   private createEvents(darkMode: boolean = false): void {
     this.events = [];
-    this.state.data?.calendarSummary.reservations?.forEach((it: ICalendarReservations) => {
+    this.state?.calendarSummary.reservations?.forEach((it: ICalendarReservations) => {
       const start = newDate(it.start);
       const end = it.end ? newDate(it.end) : null;
       this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNow());
@@ -205,7 +230,7 @@ export class DashComponent implements OnInit, OnDestroy {
       }
     });
     let recurring: any[] = [];
-    this.state.data?.calendarSummary.unavailable?.forEach((it: ICalendarUnavailable) => {
+    this.state?.calendarSummary.unavailable?.forEach((it: ICalendarUnavailable) => {
       const start = newDate(it.start);
       this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNow());
       const title = it.duration ? it.title : `${this.translate.instant('COMMON.ALL_DAY.CHECK')} - ${it.title}`;

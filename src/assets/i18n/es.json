@@ -57,6 +57,7 @@
     "ROLES": {
       "ROLE_CUSTOMER": "Cliente",
       "ROLE_PROFESSIONAL": "Profesional",
+      "ROLE_MANAGER": "Manager",
       "ROLE_ADMIN": "Admin"
     },
     "REPEAT": {
@@ -183,7 +184,12 @@
     "ROOM": {
       "FIELD": "Sala",
       "REQUIRED": "Sala es <b>requerida</b>",
-      "INVALID": "Sala no valida"
+      "INVALID": "Sala no valida",
+      "OFFICE": {
+        "FIELD": "Oficina",
+        "REQUIRED": "Oficina es <b>requerido</b>",
+        "INVALID": "Oficina no valida"
+      }
     },
     "DASHBOARD": {
       "DARK_MODE": "Modo oscuro"

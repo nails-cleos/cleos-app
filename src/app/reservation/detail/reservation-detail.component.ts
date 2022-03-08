@@ -25,7 +25,7 @@ import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Role } from '../../interfaces/token';
-import { getFullUserName, getPrice, getUserName, snakeToCamel } from '../../util/helper';
+import { currencySymbol, getFullUserName, getPrice, getUserName, snakeToCamel } from '../../util/helper';
 import { IPrice, Price } from '../../interfaces/product';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatFabMenu, MatFabMenuDirection } from '@angular-material-extensions/fab-menu/lib/mat-fab-menu.component';
@@ -109,6 +109,10 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
   get professionalName(): string {
     return this.reservation ? getUserName(this.reservation.room.professional) : '';
+  }
+
+  get currencySymbol(): string {
+    return this.reservation ? currencySymbol(this.reservation.room.currency) : '';
   }
 
   private static createMachine(stateMachineDefinition: any, initialState: any): any {

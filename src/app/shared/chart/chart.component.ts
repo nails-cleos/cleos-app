@@ -11,9 +11,11 @@ export class ChartComponent implements OnChanges {
   @Input() state: any;
   @Input() chartSummary?: IChart;
   @Input() isDark?: boolean;
+  @Input() isLoading: any | boolean;
 
   chart: IChartUtil | undefined;
   error: any;
+  loading = true;
 
   constructor() {
   }
@@ -28,6 +30,7 @@ export class ChartComponent implements OnChanges {
         this.error = {status: 'NO_CONTENT'};
         return;
       }
+      this.error = undefined;
       this.chart = createChart(this.chartSummary, this.isDark);
     }
   }

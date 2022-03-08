@@ -36,7 +36,7 @@ export interface IReservationAll {
   additional?: IAdditionalAll[];
 }
 
-export interface IUpcomingAll extends IReservationAll{
+export interface IUpcomingAll extends IReservationAll {
   payments: IPayment[];
   price: IPrice;
   end: Date;

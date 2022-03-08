@@ -45,29 +45,29 @@
         <tr *ngIf="upcoming.price; else skeleton">
           <td class="right">{{ 'ME.RESERVATION.PRODUCT.PRICE.FIELD' | translate }}</td>
           <td *ngIf="upcoming.price.discount; else noDiscount" class="left">
-            <span [class.strikethrough]="upcoming.price.amount">$ {{upcoming.price.amount | number:'1.2-2'}}</span>
+            <span [class.strikethrough]="upcoming.price.amount">{{getCurrencySymbol()}} {{upcoming.price.amount | number:'1.2-2'}}</span>
             <span [@discountAnimation]
-                  class="raised-button bold">$ {{upcoming.price.priceWithDiscount | number:'1.2-2'}}</span>
+                  class="raised-button bold">{{getCurrencySymbol()}} {{upcoming.price.priceWithDiscount | number:'1.2-2'}}</span>
           </td>
           <ng-template #noDiscount>
-            <td class="left">$ {{upcoming.price.amount | number:'1.2-2'}}</td>
+            <td class="left">{{getCurrencySymbol()}} {{upcoming.price.amount | number:'1.2-2'}}</td>
           </ng-template>
         </tr>
         <tr *ngIf="upcoming.rowSpan">
           <td [rowSpan]="upcoming.rowSpan" class="right">{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</td>
           <td class="left">
             <div *ngFor="let additional of upcoming.additional">
-              {{additional.name}} - ${{additional.price | number:'1.2-2'}}
+              {{additional.name}} - {{getCurrencySymbol()}} {{additional.price | number:'1.2-2'}}
             </div>
           </td>
         </tr>
         <tr *ngIf="upcoming.rowSpan">
           <td class="right">{{ 'COMMON.LABEL.TOTAL' | translate }}</td>
-          <td class="left bold">${{upcoming.price?.total | number:'1.2-2'}}</td>
+          <td class="left bold">{{getCurrencySymbol()}} {{upcoming.price?.total | number:'1.2-2'}}</td>
         </tr>
         <tr *ngIf="upcoming.price && upcoming.price.totalPaid">
           <td class="right">{{ 'ME.RESERVATION.UPCOMING.PAID' | translate }}</td>
-          <td class="left">$ {{upcoming.price.totalPaid | number:'1.2-2'}}</td>
+          <td class="left">{{getCurrencySymbol()}} {{upcoming.price.totalPaid | number:'1.2-2'}}</td>
         </tr>
       </table>
       <div *ngIf="upcoming.state === 'CREATED'" class="red-text">

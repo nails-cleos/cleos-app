@@ -14,18 +14,21 @@ import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { IUser } from '../../interfaces/user';
 import { getUserName } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { detailExpandAnimation } from '../../util/animation';
 
 @Component({
   selector: 'app-rooms',
   templateUrl: './rooms.component.html',
-  styleUrls: ['./rooms.component.scss']
+  styleUrls: ['./rooms.component.scss'],
+  animations: [detailExpandAnimation]
 })
 export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['position', 'name', 'professional', 'address', 'availability', 'actions'];
+  displayedColumns: string[] = ['position', 'currency', 'office', 'professional', 'address', 'availability', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IRoom>>();
+  expanded?: IRoom;
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
@@ -87,7 +90,7 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   delete(room: IRoom): void {
     const title = this.translate.instant('ROOM.DELETED.TITLE');
-    const content = this.translate.instant('ROOM.DELETED.CONTENT', {name: room.name});
+    const content = this.translate.instant('ROOM.DELETED.CONTENT', {name: room.address?.name});
     const dialogRef = this.dialog.open(DialogComponent, {
       data: {title, content, value: room}
     });

@@ -1,0 +1,64 @@
+<div class="flex-container" fxLayout="column">
+  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
+    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+      <form (ngSubmit)="create()" [formGroup]="form" novalidate>
+        <mat-card class="style-card">
+          <mat-card-header>
+            <mat-card-title>{{ 'OFFICE.TITLE' | translate }}</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+              <mat-form-field appearance="fill">
+                <mat-label>{{ 'OFFICE.NAME.FIELD' | translate }}</mat-label>
+                <label>
+                  <input [formControl]="name" autocomplete="name" matInput required>
+                </label>
+                <mat-error *ngIf="name.hasError('required')" [innerHTML]="'OFFICE.NAME.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['name']">
+                  {{errors['name']}}
+                </mat-error>
+              </mat-form-field>
+              <div *ngIf="managers; else skeleton" fxLayout="row" fxLayoutAlign="space-between center">
+                <mat-form-field appearance="fill">
+                  <mat-label>{{ 'OFFICE.MANAGER.FIELD' | translate }}</mat-label>
+                  <label>
+                    <input [formControl]="manager" [matAutocomplete]="auto" matInput required type="text">
+                  </label>
+                  <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+                    <mat-option *ngFor="let manager of filteredOptions | async" [value]="manager">
+                      {{getManager(manager)}}
+                    </mat-option>
+                  </mat-autocomplete>
+                  <mat-error *ngIf="manager.hasError('required')"
+                             [innerHTML]="'OFFICE.MANAGER.REQUIRED' | translate">
+                  </mat-error>
+                  <mat-error *ngIf="manager.hasError('requireMatch')"
+                             [innerHTML]="'OFFICE.MANAGER.INVALID' | translate">
+                  </mat-error>
+                  <mat-error *ngIf="errors['manager']">
+                    {{errors['manager']}}
+                  </mat-error>
+                </mat-form-field>
+                <button (click)="addManager()" color="accent" mat-raised-button>
+                  <mat-icon matPrefix>person_add</mat-icon>
+                  <span fxHide.lt-sm fxShow>{{ 'OFFICE.MANAGER.ADD_BUTTON' | translate }}</span>
+                </button>
+              </div>
+              <ng-template #skeleton>
+                <div class="ssc-line"></div>
+              </ng-template>
+            </div>
+          </mat-card-content>
+          <mat-card-actions>
+            <div fxFlex></div>
+            <button [disabled]="form.invalid" color="primary" mat-raised-button
+                    type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
+            <button [form]="form" appBackButton color="accent" mat-raised-button
+                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+          </mat-card-actions>
+        </mat-card>
+      </form>
+    </div>
+  </div>
+</div>

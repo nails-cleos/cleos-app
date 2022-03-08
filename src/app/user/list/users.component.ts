@@ -40,7 +40,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscription: Subscription | undefined;
   private paginatorSubscription: Subscription | undefined;
   private getState: Observable<any>;
-  private allRole: Role[] = [Role.customer, Role.professional, Role.admin];
+  private allRole: Role[] = [Role.customer, Role.professional, Role.manager, Role.admin];
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private router: Router, private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {

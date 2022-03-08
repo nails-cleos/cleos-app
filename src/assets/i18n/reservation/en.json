@@ -32,6 +32,7 @@
     },
     "ROOM": {
       "TITLE": "Add room",
+      "NO_CONTENT": "No Rooms",
       "DETAIL": "Detail",
       "NAME": {
         "FIELD": "Name"

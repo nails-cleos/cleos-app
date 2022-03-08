@@ -7,7 +7,7 @@ import { Role } from '../interfaces/token';
 const routes: Routes = [
   {
     path: '', component: DashComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.professional]
+      roles: [Role.admin, Role.manager, Role.professional]
     }
   }
 ];

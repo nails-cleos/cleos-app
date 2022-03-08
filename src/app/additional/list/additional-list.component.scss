@@ -2,15 +2,19 @@
   text-align: center !important;
 }
 
-tr.additional-detail-row {
+.mat-column-name {
+  flex: 0 0 55%;
+  width: 55%;
+}
+
+tr.detail-row {
   height: 0;
 }
 
-.additional-row td {
-  border-bottom-width: 0;
+.detail-button {
+  margin-left: 10px
 }
 
-.additional-detail {
-  overflow: hidden;
-  display: flex;
+.detail-button {
+  margin-left: 10px
 }

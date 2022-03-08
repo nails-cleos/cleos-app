@@ -1,3 +1,17 @@
 [class*='mat-column-'] {
   text-align: center;
 }
+
+.mat-column-address {
+  flex: 0 0 55%;
+  width: 55%;
+}
+
+tr.detail-row {
+  height: 0;
+}
+
+.detail-button {
+  margin-left: 10px
+}
+

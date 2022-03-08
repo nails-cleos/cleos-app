@@ -57,6 +57,7 @@
     "ROLES": {
       "ROLE_CUSTOMER": "Customer",
       "ROLE_PROFESSIONAL": "Professional",
+      "ROLE_MANAGER": "Manager",
       "ROLE_ADMIN": "Admin"
     },
     "REPEAT": {
@@ -183,7 +184,12 @@
     "ROOM": {
       "FIELD": "Room",
       "REQUIRED": "Room is <b>required</b>",
-      "INVALID": "Room is invalid"
+      "INVALID": "Room is invalid",
+      "OFFICE": {
+        "FIELD": "Office",
+        "REQUIRED": "Office is <b>required</b>",
+        "INVALID": "Office is invalid"
+      }
     },
     "DASHBOARD": {
       "DARK_MODE": "Dark mode"

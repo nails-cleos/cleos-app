@@ -58,6 +58,7 @@
       },
       "ROOM": {
         "DETAIL": "Detalle",
+        "NO_CONTENT": "No hay salas",
         "NAME": {
           "FIELD": "Nombre"
         },

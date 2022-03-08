@@ -9,8 +9,10 @@ import {
   selectAdditionalState,
   selectAuthState,
   selectCatalogueState,
+  selectCurrencyState,
   selectDiscountState,
   selectNotificationState,
+  selectOfficeState,
   selectPaymentState,
   selectProductState,
   selectReservationState,
@@ -18,7 +20,7 @@ import {
   selectUnavailableState,
   selectUserState
 } from '../store/app.states';
-import { IMenu, ISubMenu, IUser, IUserAll, User } from '../interfaces/user';
+import { IMenu, IUser, IUserAll, User } from '../interfaces/user';
 import * as fromActionsLogin from '../store/auth.actions';
 import * as fromActionsNotification from '../store/notification.actions';
 import * as fromActionsUser from '../store/user.actions';
@@ -61,6 +63,7 @@ export class NavComponent implements OnInit, OnDestroy {
   language: string;
 
   isProfessional = false;
+  isManager = false;
   isAdmin = false;
 
   image?: string;
@@ -94,7 +97,8 @@ export class NavComponent implements OnInit, OnDestroy {
     this.getState = this.store.select(selectAuthState);
     this.getNotificationState = this.store.select(selectNotificationState);
     this.selectStore([selectRoomState, selectProductState, selectCatalogueState, selectDiscountState,
-      selectUnavailableState, selectUserState, selectReservationState, selectPaymentState, selectAdditionalState]);
+      selectUnavailableState, selectUserState, selectReservationState, selectPaymentState, selectAdditionalState,
+      selectCurrencyState, selectOfficeState]);
     this.navigation.subscribe();
   }
 
@@ -140,13 +144,13 @@ export class NavComponent implements OnInit, OnDestroy {
     }
   }
 
-  navigate(menu: ISubMenu, drawer?: any): void {
+  navigate(menu: IMenu, drawer?: any): void {
     drawer?.toggle();
     this.error = undefined;
     this.router.navigate([menu.path]);
   }
 
-  setStep(index: number) {
+  setStep(index: number): void {
     this.step = index;
   }
 
@@ -190,6 +194,7 @@ export class NavComponent implements OnInit, OnDestroy {
         this.checked = isDarkMode(this.currentUser.theme);
         this.resetTheme(this.currentUser.theme);
         this.isProfessional = user.authorities.some(u => u.authority === Role.professional);
+        this.isManager = user.authorities.some(u => u.authority === Role.manager);
         this.isAdmin = user.authorities.some(u => u.authority === Role.admin);
         this.menuItems = state.menus;
         this.canChangePassword = user?.provider === 'LOCAL';

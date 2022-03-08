@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { Store } from '@ngrx/store';
@@ -22,7 +22,8 @@ import { Role } from '../../../interfaces/token';
   templateUrl: './reservation-table.component.html',
   styleUrls: ['./reservation-table.component.scss']
 })
-export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestroy {
+export class ReservationTableComponent implements AfterViewInit, OnInit, OnChanges, OnDestroy {
+  @Input() roomId: any;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -57,15 +58,14 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
   }
 
   ngAfterViewInit(): void {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getReservations();
-    });
-
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getReservations(this.paginator.pageIndex));
-
     this.getReservations();
-    this.cdRef.detectChanges();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this.sort) {
+      this.paginator.pageIndex = 0;
+      this.getReservations(0);
+    }
   }
 
   ngOnDestroy(): void {
@@ -107,12 +107,16 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
       if (state.page) {
         this.dataSource = state.page?.content;
         this.resultsLength = state.page?.totalElements;
+        if (!this.paginatorSubscription && this.resultsLength) {
+          this.createPageSubscriptions();
+        }
       }
     });
   }
 
   private getReservations(page: number = 0): void {
     const payload = {
+      roomId: this.roomId,
       active: this.sort.active,
       direction: this.sort.direction,
       size: this.pageSize,
@@ -121,5 +125,15 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnDestr
     this.store.dispatch(
       new fromActionsReservation.GetAllPage(payload)
     );
+  }
+
+  private createPageSubscriptions(): void {
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.getReservations();
+    });
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getReservations(this.paginator.pageIndex));
+
+    this.cdRef.detectChanges();
   }
 }

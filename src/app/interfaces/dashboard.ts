@@ -3,6 +3,14 @@ import { ChartDataSets, ChartType } from 'chart.js';
 import { Label } from 'ng2-charts';
 import { SingleDataSet } from 'ng2-charts/lib/base-chart.directive';
 
+export interface IDashboard {
+  roomName?: string;
+  roomId?: string;
+  calendarSummary?: ICalendarSummary;
+  miniCardSummaries?: IReservationSummary[];
+  chartSummaries?: IChart[];
+  error?: any;
+}
 
 export interface IEventSummary {
   calendarSummary?: ICalendarSummary;

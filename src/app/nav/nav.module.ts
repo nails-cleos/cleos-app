@@ -21,13 +21,15 @@ import { NotificationService } from '../services/notification.service';
 import { UserService } from '../services/user.service';
 import { TokenService } from '../services/token.service';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MenuItemComponent } from './menu-item/menu-item.component';
 
 export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
   new TranslateHttpLoader(http, './assets/i18n/dashboard/', '.json');
 
 @NgModule({
   declarations: [
-    NavComponent
+    NavComponent,
+    MenuItemComponent
   ],
   imports: [
     NavRoutingModule,
