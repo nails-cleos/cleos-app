@@ -84,10 +84,8 @@ export class LoginEffects {
   loginSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(AuthActionTypes.loginSuccess),
     tap((response: any) => {
-      const redirectUrl = response.payload.response.user.changePassword
-        ? ['change-password']
-        : response.payload.queryParams.returnUrl?.split('/') || ['auth', 'redirect'];
-      this.router.navigate(redirectUrl, {state: response.payload.extras});
+      const redirectUrl = response.payload.queryParams.returnUrl?.split('/') || ['auth', 'redirect'];
+      this.router.navigate(redirectUrl, {state: response.payload.extras}).then(() => window.location.reload());;
     })
   ), {dispatch: false});
 

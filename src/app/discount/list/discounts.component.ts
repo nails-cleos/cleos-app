@@ -9,7 +9,7 @@ import {
   ViewChild
 } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
 import { DiscountType, IDiscount, IDiscountAll } from '../../interfaces/discount';
@@ -27,11 +27,13 @@ import { IUser, IUserAll } from '../../interfaces/user';
 import { map, startWith } from 'rxjs/operators';
 import { getFullUserName } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { detailExpandAnimation } from '../../util/animation';
 
 @Component({
   selector: 'app-discounts',
   templateUrl: './discounts.component.html',
-  styleUrls: ['./discounts.component.scss']
+  styleUrls: ['./discounts.component.scss'],
+  animations: [detailExpandAnimation]
 })
 export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -39,6 +41,7 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   displayedColumns: string[] = ['position', 'name', 'description', 'type', 'amount', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IDiscount>>();
+  expanded?: IDiscount;
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
@@ -46,6 +49,7 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscription?: Subscription;
   private paginatorSubscription?: Subscription;
   private getState: Observable<any>;
+  private lastSort?: Sort;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
@@ -135,9 +139,12 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private createPageSubscriptions(): void {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getDiscounts();
+    this.sort.sortChange.subscribe((a) => {
+      if (a !== this.lastSort) {
+        this.paginator.pageIndex = 0;
+        this.getDiscounts();
+      }
+      this.lastSort = a;
     });
     this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getDiscounts(this.paginator.pageIndex));
 

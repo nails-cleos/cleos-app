@@ -5,7 +5,7 @@
     "DETAIL": "Update currency",
     "LIST": {
       "COLUMN": {
-        "CODE": "Code",
+        "CODE": "Code"
       },
       "ERROR": {
         "NO_CONTENT": "No currency"

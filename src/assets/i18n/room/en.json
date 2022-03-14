@@ -30,12 +30,6 @@
       "INVALID": "Professional is invalid",
       "ADD_BUTTON": "Add professional"
     },
-    "CURRENCY": {
-      "FIELD": "Currency",
-      "REQUIRED": "Currency is <b>required</b>",
-      "INVALID": "Currency is invalid",
-      "ADD_BUTTON": "Add currency"
-    },
     "OFFICE": {
       "FIELD": "Office",
       "REQUIRED": "Office is <b>required</b>",

@@ -29,13 +29,13 @@ import { Router } from '@angular/router';
 import { httpInterceptorProviders } from './http-interceptors';
 import { environment } from '../environments/environment';
 import { localStorageSync } from 'ngrx-store-localstorage';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { PaginatorI18n } from './util/paginator';
 import { TranslationLoaderResolver } from './util/translation.resolver';
 import localeEn from '@angular/common/locales/en';
 import localeEs from '@angular/common/locales/es';
 import { CookieService } from 'ngx-cookie-service';
+import { TranslateLoaderFactory } from './shared/translate-loader.factory';
 
 // Services
 import { AuthGuardService } from './services/auth-guard.service';
@@ -50,8 +50,6 @@ import { reducers } from './store/app.states';
 // Components
 import { AppComponent } from './app.component';
 import { SharedModule } from './shared/shared.module';
-
-export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
 export const getAuthServiceConfigs = (): SocialAuthServiceConfig => ({
   autoLogin: false,
@@ -85,7 +83,10 @@ registerLocaleData(localeEs, 'es');
     EffectsModule.forRoot([]),
     TranslateModule.forRoot({
       defaultLanguage: 'es',
-      loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient]},
+      loader: {
+        provide: TranslateLoader,
+        useClass: TranslateLoaderFactory.forModule('common')
+      },
       isolate: false,
       extend: true
     }),

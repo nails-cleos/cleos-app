@@ -36,9 +36,7 @@ import { TrackingService } from '../services/tracking.service';
 import { ReservationEffects } from '../store/effects/reservation.effects';
 import { DiscountEffects } from '../store/effects/discount.effects';
 import { DiscountService } from '../services/discount.service';
-
-export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
-  new TranslateHttpLoader(http, './assets/i18n/me/', '.json');
+import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
 
 @NgModule({
   declarations: [
@@ -64,7 +62,10 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
     MatTabsModule,
     MatStepperModule,
     TranslateModule.forChild({
-      loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient]},
+      loader: {
+        provide: TranslateLoader,
+        useClass: TranslateLoaderFactory.forModule('me')
+      },
       isolate: false,
       extend: true
     }),

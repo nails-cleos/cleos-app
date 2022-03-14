@@ -13,7 +13,7 @@
           <mat-card-content *ngIf="room; else boxSkeleton">
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <mat-form-field appearance="fill">
-                <mat-label>{{ 'ROOM.CURRENCY.FIELD' | translate }}</mat-label>
+                <mat-label>{{ 'COMMON.CURRENCY.FIELD' | translate }}</mat-label>
                 <mat-icon matPrefix>{{room.currency.icon}}</mat-icon>
                 <label>
                   <input [value]="room.currency.code" disabled matInput>

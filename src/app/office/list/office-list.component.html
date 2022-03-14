@@ -61,14 +61,11 @@
             </mat-list-item>
             <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
             <mat-list-item role="list">
-              <button (click)="edit(office)" *ngIf="!office.deleted" color="primary" mat-raised-button>
+              <button (click)="edit(office)" *ngIf="!office.deleted" color="primary" mat-icon-button>
                 <mat-icon>edit</mat-icon>
-                {{ 'COMMON.BUTTON.EDIT' | translate }}
               </button>
-              <button (click)="delete(office)" *ngIf="!office.deleted" class="detail-button" color="warn"
-                      mat-raised-button>
+              <button (click)="delete(office)" *ngIf="!office.deleted" color="warn" mat-icon-button>
                 <mat-icon>delete</mat-icon>
-                {{ 'COMMON.BUTTON.DELETE' | translate }}
               </button>
             </mat-list-item>
           </mat-list>

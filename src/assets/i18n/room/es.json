@@ -30,12 +30,6 @@
       "INVALID": "Profesional no valido",
       "ADD_BUTTON": "Agregar profesional"
     },
-    "CURRENCY": {
-      "FIELD": "Moneda",
-      "REQUIRED": "Moneda es <b>requerido</b>",
-      "INVALID": "Moneda no valido",
-      "ADD_BUTTON": "Agregar moneda"
-    },
     "OFFICE": {
       "FIELD": "Oficina",
       "REQUIRED": "Oficina es <b>requerido</b>",

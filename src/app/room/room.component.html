@@ -10,7 +10,7 @@
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <div *ngIf="currencies; else skeleton" fxLayout="row" fxLayoutAlign="space-between center">
                 <mat-form-field appearance="fill">
-                  <mat-label>{{ 'ROOM.CURRENCY.FIELD' | translate }}</mat-label>
+                  <mat-label>{{ 'COMMON.CURRENCY.FIELD' | translate }}</mat-label>
                   <label>
                     <input (keydown)="keyDownHandler($event, currency)" [formControl]="currency"
                            [matAutocomplete]="auto" matInput required type="text">
@@ -21,10 +21,10 @@
                     </mat-option>
                   </mat-autocomplete>
                   <mat-error *ngIf="currency.hasError('required')"
-                             [innerHTML]="'ROOM.CURRENCY.REQUIRED' | translate">
+                             [innerHTML]="'COMMON.CURRENCY.REQUIRED' | translate">
                   </mat-error>
                   <mat-error *ngIf="currency.hasError('requireMatch')"
-                             [innerHTML]="'ROOM.CURRENCY.INVALID' | translate">
+                             [innerHTML]="'COMMON.CURRENCY.INVALID' | translate">
                   </mat-error>
                   <mat-error *ngIf="errors['currency']">
                     {{errors['currency']}}
@@ -32,7 +32,7 @@
                 </mat-form-field>
                 <button (click)="addCurrency()" color="accent" mat-raised-button>
                   <mat-icon matPrefix>add_card</mat-icon>
-                  <span fxHide.lt-sm fxShow>{{ 'ROOM.CURRENCY.ADD_BUTTON' | translate }}</span>
+                  <span fxHide.lt-sm fxShow>{{ 'COMMON.CURRENCY.ADD_BUTTON' | translate }}</span>
                 </button>
               </div>
               <div *ngIf="offices; else skeleton" fxLayout="row" fxLayoutAlign="space-between center">

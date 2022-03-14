@@ -6,6 +6,9 @@ import { AppState, selectDiscountState } from '../store/app.states';
 import { Discount, DiscountType, IDiscount } from '../interfaces/discount';
 import * as fromActionsDiscount from '../store/discount.actions';
 import { Router } from '@angular/router';
+import { ICurrency, ICurrencyAll } from '../interfaces/currency';
+import { requireMatch } from '../util/validators';
+import { map, startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'app-discount',
@@ -28,6 +31,12 @@ export class DiscountComponent implements OnInit, OnDestroy {
     Validators.required
   ]);
 
+  currencies?: ICurrencyAll[];
+  filteredCurrencyOptions?: Observable<ICurrency[] | undefined>;
+  currency: FormControl = new FormControl('', [
+    Validators.required, requireMatch
+  ]);
+
   types = DiscountType;
 
   constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private router: Router) {
@@ -38,6 +47,7 @@ export class DiscountComponent implements OnInit, OnDestroy {
     this.createForm();
     this.clean();
     this.subscribe();
+    this.getCurrencies();
   }
 
   ngOnDestroy(): void {
@@ -54,19 +64,40 @@ export class DiscountComponent implements OnInit, OnDestroy {
     discount.description = this.form.value.description;
     discount.amount = this.amount.value;
     discount.type = this.type.value;
+    discount.currencyId = this.currency.value.id;
 
     this.store.dispatch(
       new fromActionsDiscount.DiscountSave(discount)
     );
   }
 
+  displayCurrencyFn(currency: ICurrencyAll): string {
+    return currency ? currency.code : '';
+  }
+
+  keyDownHandler(event: any, form: FormControl): void {
+    if (event.code === 'Backspace') {
+      form.setValue('');
+    }
+  }
+
+  addCurrency(): void {
+    this.router.navigate(['currency', 'add']);
+  }
+
   private createForm(): void {
     this.form = this.formBuilder.group({
       name: this.name,
+      currency: this.currency,
       description: new FormControl(),
       amount: this.amount,
       type: this.type
     });
+    this.filteredCurrencyOptions = this.currency.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value.code),
+      map(name => name ? this.filterCurrency(name) : this.currencies ? this.currencies.slice() : this.currencies)
+    );
   }
 
   private clean(): void {
@@ -77,6 +108,7 @@ export class DiscountComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
+      this.currencies = state.currencies;
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
@@ -86,5 +118,17 @@ export class DiscountComponent implements OnInit, OnDestroy {
         this.router.navigate(['discounts']);
       }
     });
+  }
+
+  private getCurrencies(): void {
+    this.store.dispatch(
+      new fromActionsDiscount.GetCurrencies()
+    );
+  }
+
+  private filterCurrency(name: string): ICurrency[] | undefined {
+    const filterValue = name.toLowerCase();
+
+    return this.currencies?.filter(option => option.code?.toLowerCase().indexOf(filterValue) === 0);
   }
 }

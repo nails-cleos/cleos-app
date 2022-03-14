@@ -199,29 +199,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         this.isDarkMode = isDarkMode(user.theme);
       }
     });
-    this.customer.valueChanges.subscribe((value) => {
-      this.customerInfo = undefined;
-      if (value && value.id) {
-        this.store.dispatch(
-          new fromActionsReservation.GetCustomerInfo(value.id)
-        );
-      }
-      this.discount.setValue(null);
-      this.showDiscount = false;
-    });
-    this.product.valueChanges.subscribe(value => {
-      if (value) {
-        this.price = newPrice(this.price, value.price);
-      }
-    });
-    this.discount.valueChanges.subscribe(value => {
-      if (value && this.discounts) {
-        const userDiscount = this.discounts.find(d => d.id === value);
-        if (userDiscount) {
-          this.price = newDiscount(this.price, userDiscount.discount);
-        }
-      }
-    });
     this.maxCalendarDate = addMonths(getNow(), MAX_RESERVATION_MONTH);
   }
 
@@ -367,6 +344,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.createForm();
+    this.createFilters();
     this.clean();
     this.subscribe();
     this.route.params.subscribe(routeParams => {
@@ -593,15 +571,41 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.roomForm = this.formBuilder.group({
       room: this.room
     });
+    this.valueChanges();
+  }
 
-    this.filteredCustomer = this.customer.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterCustomer(name) : this.customers ? this.customers.slice() : this.customers)
-    );
-    this.filteredGroup = this.group.valueChanges.pipe(startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups));
+  private valueChanges(): void {
+    this.customer.valueChanges.subscribe((value) => {
+      this.customerInfo = undefined;
+      if (value && value.id) {
+        this.store.dispatch(
+          new fromActionsReservation.GetCustomerInfo(value.id)
+        );
+      }
+      this.cleanProduct();
+    });
+    this.office.valueChanges.subscribe(value => {
+      if (!value) {
+        return;
+      }
+      this.roomList = value.rooms;
+      const room = value.rooms?.find((o: IOffice) => o.id === this.roomId);
+      if (room) {
+        this.roomList = value.rooms;
+        this.room.setValue(room);
+        this.roomId = this.room.value.id;
+      } else {
+        if (this.roomList?.length === 1) {
+          this.room.setValue(this.roomList[0]);
+        } else {
+          this.room.setValue('');
+        }
+      }
+    });
+    this.room.valueChanges.subscribe(() => {
+      this.group.setValue('');
+      this.cleanProduct();
+    });
     this.group.valueChanges.subscribe(value => {
       if (!value) {
         return;
@@ -621,6 +625,39 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       this.durability = getProductDurability(value.durabilityMin, value.durabilityMax, this.translate);
     });
+    this.product.valueChanges.subscribe(value => {
+      if (value) {
+        this.price = newPrice(this.price, value.price);
+      }
+    });
+    this.discount.valueChanges.subscribe(value => {
+      if (value && this.discounts) {
+        const userDiscount = this.discounts.find(d => d.id === value);
+        if (userDiscount) {
+          this.price = newDiscount(this.price, userDiscount.discount);
+        }
+      }
+    });
+  }
+
+  private cleanProduct(): void {
+    this.price = new Price();
+    this.discount.setValue(undefined);
+    this.product.setValue('');
+    this.showDiscount = false;
+    this.productList = undefined;
+  }
+
+  private createFilters(): void {
+    this.filteredCustomer = this.customer.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value.name),
+      map(name => name ? this.filterCustomer(name) : this.customers ? this.customers.slice() : this.customers)
+    );
+    this.filteredGroup = this.group.valueChanges.pipe(startWith(''),
+      map(value => typeof value === 'string' ? value : value.name),
+      map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups)
+    );
     this.filteredProduct = this.product?.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
@@ -628,25 +665,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     );
     this.filteredOffice = this.office.valueChanges.pipe(startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterOffice(name) : this.offices ? this.offices.slice() : this.offices));
-    this.office.valueChanges.subscribe(value => {
-      if (!value) {
-        return;
-      }
-      this.roomList = value.rooms;
-      const room = value.rooms?.find((o: IOffice) => o.id === this.roomId);
-      if (room) {
-        this.roomList = value.rooms;
-        this.room.setValue(room);
-        this.roomId = this.room.value.id;
-      } else {
-        if (this.roomList?.length === 1) {
-          this.room.setValue(this.roomList[0]);
-        } else {
-          this.room.setValue('');
-        }
-      }
-    });
+      map(name => name ? this.filterOffice(name) : this.offices ? this.offices.slice() : this.offices)
+    );
     this.filteredRoom = this.room.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),

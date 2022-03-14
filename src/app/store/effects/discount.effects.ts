@@ -7,6 +7,7 @@ import * as fromActionsDiscount from '../discount.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { DiscountService } from '../../services/discount.service';
 import { Router } from '@angular/router';
+import { CurrencyService } from '../../services/currency.service';
 
 @Injectable()
 export class DiscountEffects {
@@ -33,6 +34,14 @@ export class DiscountEffects {
     map((action: any) => action.payload),
     switchMap(() => this.discountService.getReferrals().pipe(
       switchMap((response: any) => of(new fromActionsDiscount.ReferralSuccess(response))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({error: err.error})))
+    ))
+  ));
+
+  getCurrencies = createEffect(() => this.actions$.pipe(ofType(fromActionsDiscount.DiscountActionTypes.getCurrencies)).pipe(
+    map((action: any) => action.payload),
+    switchMap(() => this.currencyService.getAllCurrency().pipe(
+      switchMap((response: any) => of(new fromActionsDiscount.CurrencySuccess(response))),
       catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({error: err.error})))
     ))
   ));
@@ -99,6 +108,6 @@ export class DiscountEffects {
   ), {dispatch: false});
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private discountService: DiscountService,
-              private router: Router) {
+              private currencyService: CurrencyService, private router: Router) {
   }
 }

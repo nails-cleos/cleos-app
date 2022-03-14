@@ -79,12 +79,12 @@
             <a (click)="drawer.toggle()" *ngIf="isHandset$ | async; else showMenu" [routerLink]="'/main'"
                mat-list-item>
               <mat-icon mat-list-icon>main</mat-icon>
-              <div mat-line>{{'DASHBOARD.HOME' | translate }}</div>
+              <div mat-line>{{'COMMON.DASHBOARD.HOME' | translate }}</div>
             </a>
             <ng-template #showMenu>
               <a [routerLinkActive]="['active']" [routerLink]="'/main'" mat-list-item>
                 <mat-icon mat-list-icon>home</mat-icon>
-                <div mat-line>{{'DASHBOARD.HOME' | translate }}</div>
+                <div mat-line>{{'COMMON.DASHBOARD.HOME' | translate }}</div>
               </a>
             </ng-template>
             <mat-divider></mat-divider>
@@ -167,7 +167,7 @@
           <mat-nav-list>
             <a [routerLinkActive]="['active']" [routerLink]="'/main'" mat-list-item>
               <mat-icon mat-list-icon>home</mat-icon>
-              <div mat-line>{{'DASHBOARD.HOME' | translate }}</div>
+              <div mat-line>{{'COMMON.DASHBOARD.HOME' | translate }}</div>
             </a>
             <mat-divider></mat-divider>
             <a [routerLink]="'/auth/profile'" mat-list-item>
@@ -196,7 +196,7 @@
       <ng-template #login>
         <button color="accent" mat-raised-button routerLink="/main">
           <mat-icon>home</mat-icon>
-          <span *ngIf="(isHandset$ | async) === false">{{'DASHBOARD.HOME' | translate }}</span>
+          <span *ngIf="(isHandset$ | async) === false">{{'COMMON.DASHBOARD.HOME' | translate }}</span>
         </button>
       </ng-template>
     </mat-toolbar>

@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { HttpClient } from '@angular/common/http';
 import { SharedModule } from '../shared/shared.module';
 import { DiscountRoutingModule } from './discount-routing.module';
 
@@ -8,15 +7,13 @@ import { DiscountComponent } from './discount.component';
 import { DiscountDialogComponent, DiscountsComponent } from './list/discounts.component';
 import { DiscountDetailComponent } from './detail/discount-detail.component';
 import { MatChipsModule } from '@angular/material/chips';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { EffectsModule } from '@ngrx/effects';
 import { DiscountEffects } from '../store/effects/discount.effects';
 import { DiscountService } from '../services/discount.service';
 import { UserEffects } from '../store/effects/user.effects';
 import { UserService } from '../services/user.service';
-
-export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
-  new TranslateHttpLoader(http, './assets/i18n/discount/', '.json');
+import { CurrencyService } from '../services/currency.service';
+import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
 
 @NgModule({
   declarations: [
@@ -30,7 +27,10 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
     SharedModule,
     MatChipsModule,
     TranslateModule.forChild({
-      loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient]},
+      loader: {
+        provide: TranslateLoader,
+        useClass: TranslateLoaderFactory.forModule('discount')
+      },
       isolate: false,
       extend: true
     }),
@@ -38,7 +38,8 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
   ],
   providers: [
     DiscountService,
-    UserService
+    UserService,
+    CurrencyService
   ]
 })
 export class DiscountModule {

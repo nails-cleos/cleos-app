@@ -71,19 +71,14 @@
             <div fxHide fxShow.lt-sm mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
             <mat-list-item fxHide fxShow.lt-sm role="list">
               <button *ngIf="!product.deleted" [routerLink]="'/products/'+ product.id + '/edit'" color="primary"
-                      mat-raised-button>
+                      mat-icon-button>
                 <mat-icon>edit</mat-icon>
-                {{ 'COMMON.BUTTON.EDIT' | translate }}
               </button>
-              <button [routerLink]="'/products/'+ product.id + '/view'" class="detail-button" color="accent"
-                      mat-raised-button>
+              <button [routerLink]="'/products/'+ product.id + '/view'" color="accent" mat-icon-button>
                 <mat-icon>visibility</mat-icon>
-                {{ 'COMMON.BUTTON.VIEW' | translate }}
               </button>
-              <button (click)="delete(product)" *ngIf="!product.deleted" class="detail-button"
-                      color="warn" mat-raised-button>
+              <button (click)="delete(product)" *ngIf="!product.deleted" color="warn" mat-icon-button>
                 <mat-icon>delete</mat-icon>
-                {{ 'COMMON.BUTTON.DELETE' | translate }}
               </button>
             </mat-list-item>
           </mat-list>

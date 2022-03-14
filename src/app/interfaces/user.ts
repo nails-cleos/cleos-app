@@ -42,6 +42,7 @@ export interface IUserAll {
   dob?: string;
   referralMax?: number;
   theme?: Theme;
+  changePassword: boolean;
 }
 
 export interface IAuthority {

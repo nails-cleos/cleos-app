@@ -5,7 +5,6 @@
     "CHANGE_PASSWORD": "Change password",
     "SIGN_OUT": "Sign out",
     "SIGN_IN": "Sign In",
-    "HOME": "Home",
     "RESERVATION": {
       "COMPLETED": "Completed: {{completed}}",
       "UPCOMING": "Upcoming: {{upcoming}}",

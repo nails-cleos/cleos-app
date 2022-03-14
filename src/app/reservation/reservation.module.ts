@@ -29,9 +29,7 @@ import { UserService } from '../services/user.service';
 import { AdditionalService } from '../services/additional.service';
 import { PaymentEffects } from '../store/effects/payment.effects';
 import { TrackingService } from '../services/tracking.service';
-
-export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
-  new TranslateHttpLoader(http, './assets/i18n/reservation/', '.json');
+import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
 
 @NgModule({
   declarations: [
@@ -57,7 +55,10 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
     MatChipsModule,
     MatExpansionModule,
     TranslateModule.forChild({
-      loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient]},
+      loader: {
+        provide: TranslateLoader,
+        useClass: TranslateLoaderFactory.forModule('reservation')
+      },
       isolate: false,
       extend: true
     }),

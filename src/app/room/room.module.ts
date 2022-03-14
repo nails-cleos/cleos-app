@@ -17,9 +17,7 @@ import { RoomService } from '../services/room.service';
 import { UserService } from '../services/user.service';
 import { AddServiceComponent, PriceDialogComponent } from './me/add-service/add-service.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-
-export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
-  new TranslateHttpLoader(http, './assets/i18n/room/', '.json');
+import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
 
 @NgModule({
   declarations: [
@@ -36,7 +34,10 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
     SharedModule,
     MatExpansionModule,
     TranslateModule.forChild({
-      loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient]},
+      loader: {
+        provide: TranslateLoader,
+        useClass: TranslateLoaderFactory.forModule('room')
+      },
       isolate: false,
       extend: true
     }),

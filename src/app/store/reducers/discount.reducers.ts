@@ -1,10 +1,12 @@
 import { Pagination } from '../../interfaces/pagination';
 import { All, DiscountActionTypes } from '../discount.actions';
 import { IDiscount, IReferral, IUserDiscount } from '../../interfaces/discount';
+import { ICurrency } from '../../interfaces/currency';
 
 export interface State {
   data: IDiscount | Pagination<IDiscount> | Pagination<IUserDiscount> | null;
-  referrals: IReferral | null;
+  referrals: IReferral[] | null;
+  currencies: ICurrency[] | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -16,6 +18,7 @@ export interface State {
 export const initialState: State = {
   data: null,
   referrals: null,
+  currencies: null,
   errorMessage: null,
   error: null,
   subErrors: null,
@@ -41,7 +44,17 @@ export const reducer = (state = initialState, action: All): State => {
     case DiscountActionTypes.getReferrals: {
       return {
         ...state,
-        referrals: [] as unknown as IReferral,
+        referrals: [],
+        errorMessage: null,
+        subErrors: null,
+        selected: null,
+        message: null
+      };
+    }
+    case DiscountActionTypes.getCurrencies: {
+      return {
+        ...state,
+        currencies: [],
         errorMessage: null,
         subErrors: null,
         selected: null,
@@ -81,6 +94,15 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         referrals: action.payload,
+        errorMessage: null,
+        subErrors: null,
+        message: null
+      };
+    }
+    case DiscountActionTypes.currencySuccess: {
+      return {
+        ...state,
+        currencies: action.payload,
         errorMessage: null,
         subErrors: null,
         message: null
