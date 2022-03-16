@@ -39,11 +39,31 @@ const getMap = (a: Map<string, IDashboard>, b: IDashboard) => {
   return res;
 };
 
+const cleanEventMap = (data: Map<string, IDashboard>): Map<string, IDashboard> => {
+  data.forEach((value, key) => {
+    value.calendarSummary = undefined;
+    data.set(key, value);
+  });
+
+  return data;
+};
+
+const cleanCardMap = (data: Map<string, IDashboard>): Map<string, IDashboard> => {
+  data.forEach((value, key) => {
+    value.chartSummaries = undefined;
+    value.miniCardSummaries = undefined;
+    data.set(key, value);
+  });
+
+  return data;
+};
+
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
     case DashboardActionTypes.dashboardEvents: {
       return {
         ...state,
+        data: cleanEventMap(state.data),
         errorMessage: null,
         error: null,
         subErrors: null,
@@ -53,6 +73,7 @@ export const reducer = (state = initialState, action: All): State => {
     case DashboardActionTypes.dashboardCards: {
       return {
         ...state,
+        data: cleanCardMap(state.data),
         errorMessage: null,
         error: null,
         subErrors: null,

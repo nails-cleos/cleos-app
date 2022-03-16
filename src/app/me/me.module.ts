@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { HttpClient } from '@angular/common/http';
 import { SharedModule } from '../shared/shared.module';
 import { MeRoutingModule } from './me-routing.module';
 
@@ -8,11 +7,7 @@ import { ReservationsComponent } from './reservation/list/reservations.component
 import { MeReservationComponent } from './reservation/me/me-reservation.component';
 import { PaymentComponent } from './reservation/payment/payment.component';
 import { PaymentCompleteComponent } from './reservation/payment/complete/payment-complete.component';
-import {
-  BottomSheetReferralComponent,
-  BottomSheetShareComponent,
-  ReferralsComponent
-} from './referrals/referrals.component';
+import { BottomSheetReferralComponent, BottomSheetShareComponent, ReferralsComponent } from './referrals/referrals.component';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
 import { ReviewDialogComponent } from './reservation/review/review-dialog.component';
 import { MatChipsModule } from '@angular/material/chips';
@@ -23,7 +18,6 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatStepperModule } from '@angular/material/stepper';
 import { UpcomingComponent } from './reservation/upcoming/upcoming.component';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { EffectsModule } from '@ngrx/effects';
 import { PaymentEffects } from '../store/effects/payment.effects';
 import { PaymentService } from '../services/payment.service';

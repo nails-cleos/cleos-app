@@ -8,14 +8,12 @@ import { IChart } from '../../interfaces/dashboard';
   styleUrls: ['./chart.component.scss']
 })
 export class ChartComponent implements OnChanges {
-  @Input() state: any;
+  @Input() error: any;
   @Input() chartSummary?: IChart;
   @Input() isDark?: boolean;
   @Input() isLoading: any | boolean;
 
   chart: IChartUtil | undefined;
-  error: any;
-  loading = true;
 
   constructor() {
   }
@@ -25,13 +23,11 @@ export class ChartComponent implements OnChanges {
   }
 
   private createChart(): void {
-    if (this.state) {
-      if (!this.chartSummary || this.state.errorMessage || !this.chartSummary.type) {
-        this.error = {status: 'NO_CONTENT'};
-        return;
-      }
-      this.error = undefined;
-      this.chart = createChart(this.chartSummary, this.isDark);
+    if (!this.chartSummary || this.error || !this.chartSummary.type) {
+      this.error = {status: 'NO_CONTENT'};
+      return;
     }
+    this.error = undefined;
+    this.chart = createChart(this.chartSummary, this.isDark);
   }
 }

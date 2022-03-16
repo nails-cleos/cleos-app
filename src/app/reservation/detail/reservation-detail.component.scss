@@ -2,6 +2,11 @@
   text-align: center;
 }
 
+.mat-column-description {
+  flex: 0 0 45%;
+  width: 45%;
+}
+
 @media all and (max-device-width: 812px) and (orientation: portrait) {
   #action-button {
     top: 90px;

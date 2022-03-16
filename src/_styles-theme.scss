@@ -416,6 +416,11 @@
     border: solid 1px mat.get-color-from-palette($background, background);
     color: mat.get-color-from-palette($foreground, text);
   }
+
+  .spinner:before {
+    border: 2px solid mat.get-color-from-palette($primary-palette);
+    border-top-color: mat.get-color-from-palette($background, hover);
+  }
 }
 
 @mixin theme($theme) {

@@ -2,13 +2,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClient } from '@angular/common/http';
-import {
-  FacebookLoginProvider,
-  GoogleLoginProvider,
-  SocialAuthServiceConfig,
-  SocialLoginModule
-} from 'angularx-social-login';
+import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthServiceConfig, SocialLoginModule } from 'angularx-social-login';
 import { ActionReducer, MetaReducer, StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';

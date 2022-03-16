@@ -1,4 +1,4 @@
-<div *ngIf="!isLoading && state; else box" class="chartContainer">
+<div *ngIf="!isLoading; else box" class="chartContainer">
   <div *ngIf="chart && !error; else errorBox">
     <div *ngIf="chart.dataSet && chart.dataSet.length && chart.type">
       <canvas [chartType]="chart.type" [colors]="chart.colors"

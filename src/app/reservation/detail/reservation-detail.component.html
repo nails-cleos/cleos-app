@@ -3,6 +3,8 @@
     <mat-card-title>{{ 'RESERVATION.CUSTOMER.DETAIL' | translate }}</mat-card-title>
     <mat-card-subtitle
       *ngIf="reservation; else skeleton">{{customerName}}</mat-card-subtitle>
+    <mat-card-subtitle
+      *ngIf="reservation?.configuration?.canCustomerChange">{{reservation?.configuration?.reference}}</mat-card-subtitle>
     <ng-template #skeleton>
       <div class="ssc-line"></div>
     </ng-template>
@@ -192,9 +194,10 @@
       </div>
       <table [dataSource]="dataSource" mat-table>
         <ng-container matColumnDef="position">
-          <th *matHeaderCellDef mat-header-cell>#</th>
-          <td *matCellDef="let history; let i = index;"
-              mat-cell> {{((paginator?.pageIndex || 0) * pageSize) + i + 1}} </td>
+          <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>#</th>
+          <td *matCellDef="let history; let i = index;" fxHide.lt-sm fxShow mat-cell>
+            {{((paginator?.pageIndex || 0) * pageSize) + i + 1}}
+          </td>
         </ng-container>
 
         <ng-container matColumnDef="professional">

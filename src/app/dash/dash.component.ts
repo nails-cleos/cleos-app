@@ -25,6 +25,7 @@ import { FormControl } from '@angular/forms';
 })
 export class DashComponent implements OnInit, OnDestroy {
   state: any;
+  error: any;
 
   mapDashboard?: Map<string, IDashboard>;
   selectedDash = new FormControl();
@@ -129,7 +130,6 @@ export class DashComponent implements OnInit, OnDestroy {
         this.isCalendarLoading = true;
         this.isLoading = true;
         setTimeout(() => {
-          this.isLoading = false;
           this.createDashboards();
         }, 1000);
       }
@@ -157,18 +157,23 @@ export class DashComponent implements OnInit, OnDestroy {
   }
 
   changeDate(): void {
-    this.getEvents();
+    this.getSummaries();
   }
 
   private createDashboards(): void {
     if (this.selectedDash) {
       const state: IDashboard | undefined = this.mapDashboard?.get(this.selectedDash.value);
       if (state) {
+        this.error = state.error;
         this.roomId = state.roomId;
         this.state = state;
         this.createEvents(this.isDarkMode);
         if (state.chartSummaries && state.chartSummaries.length) {
           this.charts = state.chartSummaries;
+          this.isLoading = false;
+        } else {
+          this.charts = [{} as IChart, {} as IChart, {} as IChart,
+            {} as IChart, {} as IChart, {} as IChart, {} as IChart, {} as IChart];
         }
         if (state.miniCardSummaries && state.miniCardSummaries.length) {
           this.miniCardData = state.miniCardSummaries;
@@ -203,67 +208,73 @@ export class DashComponent implements OnInit, OnDestroy {
     this.subscription = this.getState.subscribe(state => {
       if (state.errorMessage) {
         this.state = state;
+        this.error = state.errorMessage;
         this.miniCardError(state.errorMessage);
       }
       this.mapDashboard = state.data;
-      // @ts-ignore
-      const [firstKey] = this.mapDashboard?.keys();
       if (this.selectedDash.value) {
         this.createDashboards();
-      } else if (firstKey) {
-        this.selectedDash.setValue(firstKey);
+      } else {
+        // @ts-ignore
+        const [firstKey] = this.mapDashboard?.keys();
+        if (firstKey) {
+          this.selectedDash.setValue(firstKey);
+        }
       }
     });
   }
 
   private createEvents(darkMode: boolean = false): void {
     this.events = [];
-    this.state?.calendarSummary.reservations?.forEach((it: ICalendarReservations) => {
-      const start = newDate(it.start);
-      const end = it.end ? newDate(it.end) : null;
-      this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNow());
+    if (this.state.calendarSummary) {
+      this.state.calendarSummary.reservations?.forEach((it: ICalendarReservations) => {
+        const start = newDate(it.start);
+        const end = it.end ? newDate(it.end) : null;
+        this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNow());
 
-      const event = monthEvent(it.title, start, end, it.reservationId, findStateColor(it.state, darkMode),
-        new Meta(true, it.state, ['reservation', it.reservationId]));
-      if (event) {
-        this.events = [...this.events, event];
-      }
-    });
-    let recurring: any[] = [];
-    this.state?.calendarSummary.unavailable?.forEach((it: ICalendarUnavailable) => {
-      const start = newDate(it.start);
-      this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNow());
-      const title = it.duration ? it.title : `${this.translate.instant('COMMON.ALL_DAY.CHECK')} - ${it.title}`;
-
-      if (it.repeat === UnavailableRepeatType.none) {
-        const end = getEnd(start, it.duration);
-        const event = monthEvent(title, start, end, it.unavailableId, findStateColor('DEFAULT', darkMode),
-          new Meta(!!it.duration, undefined, ['unavailable', it.unavailableId]));
+        const event = monthEvent(it.title, start, end, it.reservationId, findStateColor(it.state, darkMode),
+          new Meta(true, it.state, ['reservation', it.reservationId]));
         if (event) {
           this.events = [...this.events, event];
         }
-      } else {
-        recurring = [...recurring, getFrequency(it.repeat, start, it.unavailableId, title, it.end, it.duration)];
-      }
-    });
+      });
+      let recurring: any[] = [];
+      this.state.calendarSummary.unavailable?.forEach((it: ICalendarUnavailable) => {
+        const start = newDate(it.start);
+        this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNow());
+        const title = it.duration ? it.title : `${this.translate.instant('COMMON.ALL_DAY.CHECK')} - ${it.title}`;
 
-    recurring.forEach(r =>
-      r.rule.all().forEach((date: Date) => {
-        const end = getEnd(date, r.duration);
-        const event = monthEvent(r.title, date, end, r.unavailableId, findStateColor('DEFAULT', darkMode),
-          new Meta(!!r.duration, undefined, ['unavailable', r.unavailableId]));
-        if (event) {
-          this.events = [...this.events, event];
+        if (it.repeat === UnavailableRepeatType.none) {
+          const end = getEnd(start, it.duration);
+          const event = monthEvent(title, start, end, it.unavailableId, findStateColor('DEFAULT', darkMode),
+            new Meta(!!it.duration, undefined, ['unavailable', it.unavailableId]));
+          if (event) {
+            this.events = [...this.events, event];
+          }
+        } else {
+          recurring = [...recurring, getFrequency(it.repeat, start, it.unavailableId, title, it.end, it.duration)];
         }
-      }));
+      });
 
-    this.isCalendarLoading = false;
+      recurring.forEach(r =>
+        r.rule.all().forEach((date: Date) => {
+          const end = getEnd(date, r.duration);
+          const event = monthEvent(r.title, date, end, r.unavailableId, findStateColor('DEFAULT', darkMode),
+            new Meta(!!r.duration, undefined, ['unavailable', r.unavailableId]));
+          if (event) {
+            this.events = [...this.events, event];
+          }
+        }));
+
+      this.isCalendarLoading = false;
+    }
   }
 
   private getSummaries(): void {
     this.getEvents();
+    this.isLoading = true;
     this.store.dispatch(
-      new fromActionsDashboard.GetCards()
+      new fromActionsDashboard.GetCards(this.viewDate)
     );
   }
 

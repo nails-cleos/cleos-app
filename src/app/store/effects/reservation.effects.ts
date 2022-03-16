@@ -239,6 +239,16 @@ export class ReservationEffects {
     ))
   ));
 
+  changeCustomer$ = createEffect(() => this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.changeCustomer)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.reservationService.changeCustomer(payload.reservationId, payload.customerId).pipe(
+      switchMap(() => {
+        const message = this.translate.instant('RESERVATION.STATE.CHANGE_CUSTOMER');
+        return of(new fromActionsReservation.StateSuccess({id: payload.reservationId, message}));
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
+    ))
+  ));
+
   findTracking$ = createEffect(() => this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.findTracking)).pipe(
     map((action: any) => action.payload),
     switchMap((payload) => this.trackingService.findByReservationId(payload.reservationId).pipe(

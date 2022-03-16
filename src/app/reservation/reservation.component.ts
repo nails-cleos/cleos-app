@@ -128,6 +128,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   additionalList: IAdditionalAll[] = [];
   additionalSelected: IAdditionalAll[] = [];
 
+  configurationForm!: FormGroup;
+  customerChange: FormControl = new FormControl();
+  reference: FormControl = new FormControl();
+
   viewDate: Date = getNow();
   dayStartHour = 9;
   dayStartMinute = 0;
@@ -217,8 +221,61 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     return '';
   }
 
-  get availability(): void {
+  get back(): void {
+    if (this.isPreview) {
+      this.isPreview = false;
+    } else {
+      this.eventSelected = undefined;
+    }
+    this.myStepper.previous();
+
+    return;
+  }
+
+  get callStepTwo(): void {
+    if (this.customerForm.invalid) {
+      return;
+    }
+    this.getRoomList();
+    this.myStepper.next();
+
+    return;
+  }
+
+  get callStepThree(): void {
+    if (this.roomForm.invalid) {
+      return;
+    }
+    this.getProductList();
+    this.myStepper.next();
+
+    return;
+  }
+
+  get callStepFour(): void {
     if (this.productForm.invalid) {
+      return;
+    }
+    this.myStepper.next();
+    if (!this.additionalList || !this.additionalList.length) {
+      return this.callStepFive;
+    }
+
+    return;
+  }
+
+  get callStepFive(): void {
+    this.myStepper.next();
+
+    if (this.isEditing) {
+      return this.callStepSix;
+    }
+
+    return;
+  }
+
+  get callStepSix(): void {
+    if (this.configurationForm.invalid) {
       return;
     }
     this.duration = totalDuration(this.product.value, this.additionalSelected);
@@ -254,7 +311,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     return;
   }
 
-  get preview(): void {
+  get callStepSeven(): void {
     this.errors.schedule = false;
     this.errors.overlapping = false;
     if (!this.eventSelected) {
@@ -263,49 +320,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.isPreview = true;
     this.myStepper.next();
-
-    return;
-  }
-
-  get back(): void {
-    if (this.isPreview) {
-      this.isPreview = false;
-    } else {
-      this.eventSelected = undefined;
-    }
-    this.myStepper.previous();
-
-    return;
-  }
-
-  get products(): void {
-    if (this.roomForm.invalid) {
-      return;
-    }
-    this.getProductList();
-    this.myStepper.next();
-
-    return;
-  }
-
-  get rooms(): void {
-    if (this.customerForm.invalid) {
-      return;
-    }
-    this.getRoomList();
-    this.myStepper.next();
-
-    return;
-  }
-
-  get additional(): void {
-    if (this.productForm.invalid) {
-      return;
-    }
-    this.myStepper.next();
-    if (!this.additionalList || !this.additionalList.length) {
-      return this.availability;
-    }
 
     return;
   }
@@ -329,6 +343,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         reservation.productId = this.product.value.id;
         reservation.roomId = this.room.value.id;
         reservation.discountId = this.discount.value;
+        reservation.canCustomerChange = this.customerChange.value;
+        reservation.reference = this.reference.value;
         this.store.dispatch(
           new fromActionsReservation.ReservationSave({reservation, isCustomer: false})
         );
@@ -571,6 +587,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.roomForm = this.formBuilder.group({
       room: this.room
     });
+    this.configurationForm = this.formBuilder.group({
+      customerChange: this.customerChange,
+      reference: this.reference
+    });
     this.valueChanges();
   }
 
@@ -636,6 +656,15 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         if (userDiscount) {
           this.price = newDiscount(this.price, userDiscount.discount);
         }
+      }
+    });
+    this.customerChange.valueChanges.subscribe((value) => {
+      if (value) {
+        this.reference.setValidators([Validators.required]);
+        this.reference.updateValueAndValidity();
+      } else {
+        this.reference.setValidators([]);
+        this.reference.updateValueAndValidity();
       }
     });
   }
@@ -930,6 +959,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.additionalSelected = this.reservation.additional ? this.reservation.additional : [];
     this.productId = reservation.product.id;
     this.roomId = reservation.room.id;
+    if (reservation.configuration) {
+      this.reference.setValue(reservation.configuration.reference);
+      this.customerChange.setValue(reservation.configuration.canCustomerChange);
+    }
 
     this.myStepper.next();
     if (!this.isAdmin) {

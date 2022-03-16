@@ -18,7 +18,7 @@ import { IChart } from '../../interfaces/dashboard';
   styleUrls: ['./overview.component.scss']
 })
 export class OverviewComponent implements OnInit, OnDestroy {
-  state: any;
+  error: any;
   image: any;
   user: IUserAll | undefined;
   initials: string | undefined;
@@ -91,7 +91,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
           });
         }
         if (state.data.chartOverview && state.data.chartOverview.length) {
-          this.state = state;
+          this.error = state.error_message;
           this.charts = state.data.chartOverview;
         }
       }

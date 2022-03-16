@@ -1,5 +1,5 @@
 import { IUser } from './user';
-import { ICurrency } from './currency';
+import { ICurrency, ICurrencyAll } from './currency';
 import { IProduct } from './product';
 import { IAdditional } from './additional';
 import { IOffice } from './office';
@@ -56,7 +56,7 @@ export interface IRoomAll {
   professional: IUser;
   availabilities: IAvailability[];
   address: IAddress;
-  currency: ICurrency;
+  currency: ICurrencyAll;
   office: IOffice;
 }
 

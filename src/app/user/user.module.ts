@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { HttpClient } from '@angular/common/http';
 import { SharedModule } from '../shared/shared.module';
 import { UserRoutingModule } from './user-routing.module';
 
@@ -10,7 +9,6 @@ import { UserDetailComponent } from './detail/user-detail.component';
 import { OverviewComponent } from './overview/overview.component';
 import { OverviewChartComponent } from './overview/chart/overview-chart/overview-chart.component';
 import { NgxMatIntlTelInputModule } from 'ngx-mat-intl-tel-input';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { EffectsModule } from '@ngrx/effects';
 import { UserEffects } from '../store/effects/user.effects';
 import { UserService } from '../services/user.service';

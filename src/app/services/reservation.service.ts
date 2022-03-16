@@ -108,6 +108,10 @@ export class ReservationService {
     return this.http.post<IReservation>(`${this.url}/${reservationId}/${event}`, extras);
   }
 
+  public changeCustomer(reservationId: string, customerId: string): Observable<IReservation> {
+    return this.http.patch<IReservation>(`${this.urlV1}/${reservationId}/customers/${customerId}`, null);
+  }
+
   public getUpcomingReservation(): Observable<ICustomerReservation> {
     return this.http.get<ICustomerReservation>(`${this.url}/upcoming`);
   }

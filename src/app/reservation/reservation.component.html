@@ -242,6 +242,27 @@
 </ng-template>
 
 <ng-template #stepFive>
+  <form [formGroup]="configurationForm">
+    <div>
+      <mat-checkbox [formControl]="customerChange"
+                    color="primary">{{ 'RESERVATION.CONFIGURATION.CUSTOMER_CHANGE.FIELD' | translate }}</mat-checkbox>
+    </div>
+    <mat-form-field appearance="fill">
+      <mat-label>{{ 'RESERVATION.CONFIGURATION.REFERENCE.FIELD' | translate }}</mat-label>
+      <label>
+        <input [formControl]="reference" [required]="customerChange.value" matInput>
+      </label>
+      <mat-error *ngIf="reference.hasError('required')"
+                 [innerHTML]="'RESERVATION.CONFIGURATION.REFERENCE.REQUIRED' | translate">
+      </mat-error>
+      <mat-error *ngIf="errors['reference']">
+        {{errors['reference']}}
+      </mat-error>
+    </mat-form-field>
+  </form>
+</ng-template>
+
+<ng-template #stepSix>
   <mwl-calendar-week-view
     (beforeViewRender)="beforeMonthViewRender($event)"
     (eventTimesChanged)="eventTimesChanged($event)"
@@ -265,7 +286,7 @@
   </mat-error>
 </ng-template>
 
-<ng-template #stepSix>
+<ng-template #stepSeven>
   <mat-card *ngIf="isPreview">
     <mat-card-header>
       <mat-card-title>{{ 'RESERVATION.PREVIEW' | translate }}</mat-card-title>
@@ -354,6 +375,19 @@
             <div mat-line><span class="bold">{{price.total}}</span></div>
           </mat-list-item>
         </div>
+        <div>
+          <mat-divider></mat-divider>
+          <div mat-subheader>{{ 'RESERVATION.CONFIGURATION.TITLE' | translate}}</div>
+          <mat-list-item>
+            <mat-icon mat-list-icon>settings</mat-icon>
+            <div mat-line>
+              <mat-checkbox [checked]="customerChange.value" color="primary" disabled>
+                {{ 'RESERVATION.CONFIGURATION.CUSTOMER_CHANGE.FIELD' | translate }}
+              </mat-checkbox>
+            </div>
+            <div *ngIf="reference.value" mat-line>{{reference.value}}</div>
+          </mat-list-item>
+        </div>
         <mat-divider></mat-divider>
         <div mat-subheader>{{ 'RESERVATION.APPOINTMENT' | translate}}</div>
         <mat-list-item>
@@ -388,7 +422,7 @@
           <button [form]="customerForm" appBackButton color="accent" mat-raised-button type="button">
             <mat-icon>keyboard_return</mat-icon>
           </button>
-          <button (click)="rooms" [disabled]="customerForm.invalid" class="raised-button" color="primary"
+          <button (click)="callStepTwo" [disabled]="customerForm.invalid" class="raised-button" color="primary"
                   mat-raised-button type="button">
             <mat-icon>arrow_downward</mat-icon>
           </button>
@@ -433,7 +467,7 @@
             <mat-icon>keyboard_return</mat-icon>
           </button>
         </ng-template>
-        <button (click)="products" [disabled]="roomForm.invalid" class="raised-button" color="primary"
+        <button (click)="callStepThree" [disabled]="roomForm.invalid" class="raised-button" color="primary"
                 mat-raised-button type="button">
           <mat-icon>arrow_downward</mat-icon>
         </button>
@@ -452,7 +486,7 @@
             <mat-icon>keyboard_return</mat-icon>
           </button>
         </ng-template>
-        <button (click)="additional" [disabled]="productForm.invalid" class="raised-button" color="primary"
+        <button (click)="callStepFour" [disabled]="productForm.invalid" class="raised-button" color="primary"
                 mat-raised-button type="button">
           <mat-icon>arrow_downward</mat-icon>
         </button>
@@ -465,26 +499,41 @@
         <button (click)="back" color="accent" mat-raised-button>
           <mat-icon>arrow_upward</mat-icon>
         </button>
-        <button (click)="availability" class="raised-button" color="primary" mat-raised-button type="button">
+        <button (click)="callStepFive" class="raised-button" color="primary" mat-raised-button type="button">
+          <mat-icon>arrow_downward</mat-icon>
+        </button>
+      </div>
+    </mat-step>
+    <mat-step [editable]="!isEditing" [stepControl]="configurationForm" state="settings">
+      <ng-template matStepLabel>{{ 'RESERVATION.CONFIGURATION.TITLE' | translate }}</ng-template>
+      <div class="flex-container" fxLayout="row" fxLayoutAlign="space-between start">
+        <ng-container *ngTemplateOutlet="stepFive"></ng-container>
+      </div>
+      <div>
+        <button [form]="configurationForm" appBackButton color="accent" mat-raised-button type="button">
+          <mat-icon>keyboard_return</mat-icon>
+        </button>
+        <button (click)="callStepSix" [disabled]="configurationForm.invalid" class="raised-button" color="primary"
+                mat-raised-button type="button">
           <mat-icon>arrow_downward</mat-icon>
         </button>
       </div>
     </mat-step>
     <mat-step state="book_online">
       <ng-template matStepLabel>{{ 'RESERVATION.SCHEDULE.FIELD' | translate }}</ng-template>
-      <ng-container *ngTemplateOutlet="stepFive"></ng-container>
+      <ng-container *ngTemplateOutlet="stepSix"></ng-container>
       <div class="divider">
         <button (click)="back" color="accent" mat-raised-button>
           <mat-icon>arrow_upward</mat-icon>
         </button>
-        <button (click)="preview" class="raised-button" color="primary" mat-raised-button type="button">
+        <button (click)="callStepSeven" class="raised-button" color="primary" mat-raised-button type="button">
           <mat-icon>arrow_downward</mat-icon>
         </button>
       </div>
     </mat-step>
     <mat-step state="preview">
       <ng-template matStepLabel>{{ 'RESERVATION.PREVIEW' | translate }}</ng-template>
-      <ng-container *ngTemplateOutlet="stepSix"></ng-container>
+      <ng-container *ngTemplateOutlet="stepSeven"></ng-container>
       <div class="divider">
         <button (click)="back" color="accent" mat-raised-button>
           <mat-icon>arrow_upward</mat-icon>
@@ -515,7 +564,7 @@
             <mat-icon>keyboard_return</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
-          <button (click)="rooms" [disabled]="customerForm.invalid" class="raised-button" color="primary"
+          <button (click)="callStepTwo" [disabled]="customerForm.invalid" class="raised-button" color="primary"
                   mat-raised-button type="button">
             <mat-icon>arrow_forward</mat-icon>
             {{ 'COMMON.BUTTON.NEXT' | translate }}
@@ -565,7 +614,7 @@
             <mat-icon>keyboard_return</mat-icon>
           </button>
         </ng-template>
-        <button (click)="products" [disabled]="roomForm.invalid" class="raised-button" color="primary"
+        <button (click)="callStepThree" [disabled]="roomForm.invalid" class="raised-button" color="primary"
                 mat-raised-button type="button">
           <mat-icon>arrow_forward</mat-icon>
           {{ 'COMMON.BUTTON.NEXT' | translate }}
@@ -587,7 +636,7 @@
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
         </ng-template>
-        <button (click)="additional" [disabled]="productForm.invalid" class="raised-button" color="primary"
+        <button (click)="callStepFour" [disabled]="productForm.invalid" class="raised-button" color="primary"
                 mat-raised-button type="button">
           <mat-icon>arrow_forward</mat-icon>
           {{ 'COMMON.BUTTON.NEXT' | translate }}
@@ -602,7 +651,24 @@
           <mat-icon>arrow_back</mat-icon>
           {{ 'COMMON.BUTTON.BACK' | translate }}
         </button>
-        <button (click)="availability" class="raised-button" color="primary" mat-raised-button type="button">
+        <button (click)="callStepFive" class="raised-button" color="primary" mat-raised-button type="button">
+          <mat-icon>arrow_forward</mat-icon>
+          {{ 'COMMON.BUTTON.NEXT' | translate }}
+        </button>
+      </div>
+    </mat-step>
+    <mat-step [editable]="!isEditing" [stepControl]="configurationForm" state="settings">
+      <ng-template matStepLabel>{{ 'RESERVATION.CONFIGURATION.TITLE' | translate }}</ng-template>
+      <div class="flex-container" fxLayout="row" fxLayoutAlign="space-between start">
+        <ng-container *ngTemplateOutlet="stepFive"></ng-container>
+      </div>
+      <div>
+        <button [form]="configurationForm" appBackButton color="accent" mat-raised-button type="button">
+          <mat-icon>keyboard_return</mat-icon>
+          {{ 'COMMON.BUTTON.BACK' | translate }}
+        </button>
+        <button (click)="callStepSix" [disabled]="configurationForm.invalid" class="raised-button" color="primary"
+                mat-raised-button type="button">
           <mat-icon>arrow_forward</mat-icon>
           {{ 'COMMON.BUTTON.NEXT' | translate }}
         </button>
@@ -610,12 +676,12 @@
     </mat-step>
     <mat-step state="book_online">
       <ng-template matStepLabel>{{ 'RESERVATION.SCHEDULE.FIELD' | translate }}</ng-template>
-      <ng-container *ngTemplateOutlet="stepFive"></ng-container>
+      <ng-container *ngTemplateOutlet="stepSix"></ng-container>
       <div class="divider">
         <button (click)="back" color="accent" mat-raised-button>
           <mat-icon>arrow_back</mat-icon>
           {{ 'COMMON.BUTTON.BACK' | translate }}</button>
-        <button (click)="preview" class="raised-button" color="primary"
+        <button (click)="callStepSeven" class="raised-button" color="primary"
                 mat-raised-button type="button">
           <mat-icon>arrow_forward</mat-icon>
           {{ 'COMMON.BUTTON.NEXT' | translate }}</button>
@@ -623,7 +689,7 @@
     </mat-step>
     <mat-step state="preview">
       <ng-template matStepLabel>{{ 'RESERVATION.PREVIEW' | translate }}</ng-template>
-      <ng-container *ngTemplateOutlet="stepSix"></ng-container>
+      <ng-container *ngTemplateOutlet="stepSeven"></ng-container>
       <div class="divider">
         <button (click)="back" color="accent" mat-raised-button>
           <mat-icon>arrow_back</mat-icon>

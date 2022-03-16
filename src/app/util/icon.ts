@@ -11,7 +11,8 @@ export enum ReservationIconName {
   partiallyPaid = 'request_quote',
   payment = 'payment',
   partiallyCompleted = 'rule',
-  more = 'read_more'
+  more = 'read_more',
+  change = 'switch_account'
 }
 
 export enum RoomIconName {

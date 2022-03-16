@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { HttpClient } from '@angular/common/http';
 import { SharedModule } from '../shared/shared.module';
 import { DashRoutingModule } from './dash-routing.module';
 
@@ -8,7 +7,6 @@ import { DashComponent } from './dash.component';
 import { MiniCardComponent } from './mini-card/mini-card.component';
 import { ReservationTableComponent } from './reservation/table/reservation-table.component';
 import { CalendarModule, CalendarMonthModule } from 'angular-calendar';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { DashboardService } from '../services/dashboard.service';
 import { EffectsModule } from '@ngrx/effects';
 import { DashboardEffects } from '../store/effects/dashboard.effects';

@@ -36,9 +36,13 @@ const routes: Routes = [
     }, runGuardsAndResolvers: 'always'
   },
   {
-    path: ':id/complete', component: ReservationCompleteComponent, canActivate: [AuthGuardService], data: {
+    path: ':id/rooms/:roomId/customer/:customerId/complete',
+    component: ReservationCompleteComponent,
+    canActivate: [AuthGuardService],
+    data: {
       roles: [Role.professional]
-    }, runGuardsAndResolvers: 'always'
+    },
+    runGuardsAndResolvers: 'always'
   },
   {
     path: ':id/more-info', component: MoreInfoComponent, canActivate: [AuthGuardService], data: {
