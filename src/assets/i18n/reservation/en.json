@@ -150,7 +150,8 @@
       "APPROVE": "Reservation approved",
       "START": "Reservation started",
       "COMPLETE": "Reservation completed",
-      "CANCEL": "Reservation cancelled"
+      "CANCEL": "Reservation cancelled",
+      "CHANGE_CUSTOMER": "Customer changed"
     },
     "UNAVAILABLE": {
       "TITLE": "Add unavailable"

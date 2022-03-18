@@ -150,7 +150,8 @@
       "APPROVE": "La reserva fue aprobada",
       "START": "La reserva se inició",
       "COMPLETE": "La reserva se completó",
-      "CANCEL": "La reserva se canceló"
+      "CANCEL": "La reserva se canceló",
+      "CHANGE_CUSTOMER": "Cliente actualizado"
     },
     "UNAVAILABLE": {
       "TITLE": "Agregar no disponible"
