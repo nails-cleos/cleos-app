@@ -7,7 +7,7 @@ import { Observable, Subscription } from 'rxjs';
 import * as fromActionsRoom from '../../../store/room.actions';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { IService, IServicePrice, ServicePrice, ServiceType } from '../../../interfaces/room';
-import { GroupService, IGroupService, IProductAll } from '../../../interfaces/product';
+import { IGroupService } from '../../../interfaces/product';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { createProductGroupService } from '../../../util/helper';
 
@@ -23,6 +23,7 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
   groups: Map<string, IGroupService> = new Map<string, IGroupService>();
   errors: any = [];
 
+  private roomId?: string;
   private getState: Observable<any>;
   private subscription?: Subscription;
 
@@ -76,7 +77,7 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
       });
     }
     this.store.dispatch(
-      new fromActionsRoom.UpdateMyServices(prices)
+      new fromActionsRoom.UpdateMyServices({id: this.roomId, prices})
     );
   }
 
@@ -129,27 +130,13 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  private createProductGroupService(list: IProductAll[], currency: string, isSelected: boolean): void {
-    list.forEach((product: IProductAll) => {
-      const groupId = product.group.id;
-      const mapGroup = this.groups.get(groupId);
-      const keyGroup: IGroupService = mapGroup ? mapGroup : new GroupService(groupId, product.group.name);
-
-      product = Object.assign({}, product, {currency, type: ServiceType.product});
-
-      if (isSelected) {
-        keyGroup.selectedProducts = [...keyGroup.selectedProducts, product];
-      } else {
-        keyGroup.products = [...keyGroup.products, product];
-      }
-      this.groups.set(groupId, keyGroup);
-    });
-  }
-
   private getServices(): void {
-    this.store.dispatch(
-      new fromActionsRoom.GetMyServices()
-    );
+    this.route.params.subscribe((routeParams) => {
+      this.roomId = routeParams.id;
+      this.store.dispatch(
+        new fromActionsRoom.GetMyServices({id: this.roomId})
+      );
+    });
   }
 }
 
@@ -165,7 +152,7 @@ export class PriceDialogComponent implements OnInit {
   ]);
 
   constructor(public dialogRef: MatDialogRef<PriceDialogComponent>, private formBuilder: FormBuilder,
-              @Inject(MAT_DIALOG_DATA) public data: { name: string; price: number, currentPrice?: number }) {
+              @Inject(MAT_DIALOG_DATA) public data: { name: string; price: number; currentPrice?: number }) {
   }
 
   ngOnInit(): void {

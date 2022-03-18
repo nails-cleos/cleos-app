@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { HttpClient } from '@angular/common/http';
 import { SharedModule } from '../shared/shared.module';
 import { ProductRoutingModule } from './product-routing.module';
 
@@ -8,7 +7,6 @@ import { ProductComponent } from './product.component';
 import { ProductsComponent } from './list/products.component';
 import { ProductDetailComponent } from './detail/product-detail.component';
 import { MatTabsModule } from '@angular/material/tabs';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { EffectsModule } from '@ngrx/effects';
 import { ProductEffects } from '../store/effects/product.effects';
 import { ProductService } from '../services/product.service';
@@ -18,9 +16,7 @@ import { ProductTableComponent } from './table/product-table.component';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
-
-export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
-  new TranslateHttpLoader(http, './assets/i18n/product/', '.json');
+import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
 
 @NgModule({
   declarations: [
@@ -35,7 +31,10 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
     SharedModule,
     MatTabsModule,
     TranslateModule.forChild({
-      loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient]},
+      loader: {
+        provide: TranslateLoader,
+        useClass: TranslateLoaderFactory.forModule('product')
+      },
       isolate: false,
       extend: true
     }),

@@ -81,7 +81,7 @@
     <mat-grid-tile *ngFor="let chart of charts" [colspan]="( layout | async )?.chart?.cols"
                    [rowspan]="( layout | async )?.chart?.rows">
       <app-card [chart]="chart" [title]="chart.title">
-        <app-chart [chartSummary]="chart" [state]="state"></app-chart>
+        <app-chart [chartSummary]="chart" [error]="error"></app-chart>
       </app-card>
     </mat-grid-tile>
   </mat-grid-list>

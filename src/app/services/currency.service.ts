@@ -4,9 +4,7 @@ import { PAGE_SIZE } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
 import { ICurrency } from '../interfaces/currency';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class CurrencyService {
 
   url = 'currency';

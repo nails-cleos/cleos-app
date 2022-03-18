@@ -23,6 +23,8 @@
       "REQUIRED": "Customer is <b>required</b>",
       "INVALID": "Customer is invalid",
       "ADD_BUTTON": "Add customer",
+      "CHANGE": "Change customer",
+      "UPDATE": "Update customer",
       "INFO": {
         "NONE": "Customer has no reservations",
         "DAYS": "Last reservation was {{days}} days ago",
@@ -32,6 +34,7 @@
     },
     "ROOM": {
       "TITLE": "Add room",
+      "NO_CONTENT": "No Rooms",
       "DETAIL": "Detail",
       "NAME": {
         "FIELD": "Name"
@@ -118,7 +121,8 @@
       "CANCEL": "Cancel",
       "BOOK": "Book again",
       "SEND": "Send Whatsapp",
-      "MORE": "More"
+      "MORE": "More",
+      "CHANGE": "Change customer"
     },
     "CHANGE_STATE": {
       "TITLE": "Change state",
@@ -146,7 +150,8 @@
       "APPROVE": "Reservation approved",
       "START": "Reservation started",
       "COMPLETE": "Reservation completed",
-      "CANCEL": "Reservation cancelled"
+      "CANCEL": "Reservation cancelled",
+      "CHANGE_CUSTOMER": "Customer changed"
     },
     "UNAVAILABLE": {
       "TITLE": "Add unavailable"
@@ -154,6 +159,16 @@
     "ADDITIONAL": {
       "DURATION": {
         "FIELD": "Duration"
+      }
+    },
+    "CONFIGURATION": {
+      "TITLE": "Configuration",
+      "REFERENCE": {
+        "FIELD": "Reference",
+        "REQUIRED": "Reference is <b>required</b>"
+      },
+      "CUSTOMER_CHANGE": {
+        "FIELD": "Can customer change"
       }
     }
   },

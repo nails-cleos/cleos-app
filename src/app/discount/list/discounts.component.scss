@@ -1,3 +1,15 @@
 [class*='mat-column-'] {
   text-align: center;
 }
+
+tr.detail-row {
+  height: 0;
+}
+
+table {
+  width: 100%;
+}
+
+mat-table {
+  overflow-x: scroll;
+}

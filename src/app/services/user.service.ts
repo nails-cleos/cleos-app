@@ -13,7 +13,8 @@ export class UserService {
   private url = 'users';
   private professionalUrl = 'professionals';
   private customerUrl = 'customers';
-  private customerUrlV1 = 'v1/customers';
+  private customerUrlV1 = `v1/${this.customerUrl}`;
+  private officeUrlV1 = `v1/offices/managers`;
 
   constructor(private http: HttpClient) {
   }
@@ -73,6 +74,10 @@ export class UserService {
     return this.http.post(this.professionalUrl, user);
   }
 
+  public addManager(user: IUser): Observable<IUser> {
+    return this.http.post(this.officeUrlV1, user);
+  }
+
   public delete(id: string | null): Observable<IUser> {
     const url = `${this.url}/${id}`;
     return this.http.delete<IUser>(url);
@@ -97,6 +102,10 @@ export class UserService {
     return this.http.get<IUser[]>(this.professionalUrl);
   }
 
+  public getAllManagers(): Observable<IUser[]> {
+    return this.http.get<IUser[]>(this.officeUrlV1);
+  }
+
   public getAllCustomers(): Observable<IUser[]> {
     return this.http.get<IUser[]>(this.customerUrl);
   }
@@ -110,6 +119,9 @@ export class UserService {
     switch (role) {
       case Role.admin:
         roleName = 'admin';
+        break;
+      case Role.manager:
+        roleName = 'manager';
         break;
       case Role.professional:
         roleName = 'professional';

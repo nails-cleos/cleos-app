@@ -58,6 +58,7 @@
       },
       "ROOM": {
         "DETAIL": "Detail",
+        "NO_CONTENT": "No rooms",
         "NAME": {
           "FIELD": "Name"
         },

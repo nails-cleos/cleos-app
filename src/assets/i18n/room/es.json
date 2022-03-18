@@ -5,6 +5,9 @@
     "DETAIL": "Actualizar sala",
     "LIST": {
       "COLUMN": {
+        "CURRENCY": "Moneda",
+        "OFFICE": "Oficina",
+        "ADDRESS": "Dirección",
         "PROFESSIONAL": "Profesional",
         "AVAILABILITY": {
           "FIELD": "Disponibilidad",
@@ -26,6 +29,12 @@
       "REQUIRED": "Profesional es <b>requerido</b>",
       "INVALID": "Profesional no valido",
       "ADD_BUTTON": "Agregar profesional"
+    },
+    "OFFICE": {
+      "FIELD": "Oficina",
+      "REQUIRED": "Oficina es <b>requerido</b>",
+      "INVALID": "Oficina no valido",
+      "ADD_BUTTON": "Agregar oficina"
     },
     "AVAILABILITY": {
       "FIELD": "Disponibilidad",
@@ -65,9 +74,6 @@
     },
     "UPDATED": {
       "MESSAGE": "Sala {{name}} actualizada"
-    },
-    "CURRENCY": {
-      "FIELD": "Moneda"
     },
     "ME": {
       "TITLE": "Mi Sala",

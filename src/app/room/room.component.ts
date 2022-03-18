@@ -13,6 +13,8 @@ import { getUserName } from '../util/helper';
 import { Router } from '@angular/router';
 import { Role } from '../interfaces/token';
 import { RoomIconName } from '../util/icon';
+import { ICurrency, ICurrencyAll } from '../interfaces/currency';
+import { IOffice, IOfficeAll } from '../interfaces/office';
 
 export interface IIcon {
   week: RoomIconName;
@@ -26,8 +28,6 @@ export interface IIcon {
   styleUrls: ['./room.component.scss']
 })
 export class RoomComponent implements OnInit, OnDestroy {
-  getState: Observable<any>;
-  subscription: Subscription | undefined;
   form!: FormGroup;
   room: IRoom = new Room();
   errors: any = [];
@@ -39,12 +39,8 @@ export class RoomComponent implements OnInit, OnDestroy {
     sunday: RoomIconName.calendarToday
   };
 
-  professionals: IUserAll[] | undefined;
-  filteredOptions: Observable<IUser[] | undefined> | undefined;
-
-  name: FormControl = new FormControl('', [
-    Validators.required
-  ]);
+  professionals?: IUserAll[];
+  filteredOptions?: Observable<IUser[] | undefined>;
 
   professional: FormControl = new FormControl('', [
     Validators.required, requireMatch
@@ -56,6 +52,23 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   addressDescription: FormControl = new FormControl();
 
+  currencies?: ICurrencyAll[];
+  filteredCurrencyOptions?: Observable<ICurrency[] | undefined>;
+
+  currency: FormControl = new FormControl('', [
+    Validators.required, requireMatch
+  ]);
+
+  offices?: IOfficeAll[];
+  filteredOfficeOptions?: Observable<IOffice[] | undefined>;
+
+  office: FormControl = new FormControl('', [
+    Validators.required, requireMatch
+  ]);
+
+  private getState: Observable<any>;
+  private subscription?: Subscription;
+
   constructor(private readonly translate: TranslateService, private store: Store<AppState>,
               private formBuilder: FormBuilder, private router: Router) {
     this.getState = this.store.select(selectRoomState);
@@ -65,7 +78,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.createForm();
     this.clean();
     this.subscribe();
-    this.getProfessionals();
+    this.getRoomInfo();
   }
 
   ngOnDestroy(): void {
@@ -85,8 +98,9 @@ export class RoomComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.room.name = this.name.value;
     this.room.professionalId = this.professional.value.id;
+    this.room.officeId = this.office.value.id;
+    this.room.currencyId = this.currency.value.id;
     const location = this.address.value.geometry.location;
     this.room.address = {
       name: this.address.value.formatted_address,
@@ -104,6 +118,20 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   displayFn(user: IUser): string {
     return user ? getUserName(user) : '';
+  }
+
+  displayCurrencyFn(currency: ICurrencyAll): string {
+    return currency ? currency.code : '';
+  }
+
+  displayOfficeFn(office: IOfficeAll): string {
+    return office ? office.name : '';
+  }
+
+  keyDownHandler(event: any, form: FormControl): void {
+    if (event.code === 'Backspace') {
+      form.setValue('');
+    }
   }
 
   addAvailability(availability: IAvailability, step: number): void {
@@ -133,10 +161,19 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.router.navigate(['users', 'add'], {state: {role: Role.professional}});
   }
 
+  addCurrency(): void {
+    this.router.navigate(['currency', 'add']);
+  }
+
+  addOffice(): void {
+    this.router.navigate(['offices', 'add']);
+  }
+
   private createForm(): void {
     this.form = this.formBuilder.group({
-      name: this.name,
       professional: this.professional,
+      currency: this.currency,
+      office: this.office,
       address: this.address,
       addressDescription: this.addressDescription
     });
@@ -144,6 +181,16 @@ export class RoomComponent implements OnInit, OnDestroy {
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filter(name) : this.professionals ? this.professionals.slice() : this.professionals)
+    );
+    this.filteredCurrencyOptions = this.currency.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value.code),
+      map(name => name ? this.filterCurrency(name) : this.currencies ? this.currencies.slice() : this.currencies)
+    );
+    this.filteredOfficeOptions = this.office.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value.namme),
+      map(name => name ? this.filterOffice(name) : this.offices ? this.offices.slice() : this.offices)
     );
   }
 
@@ -155,9 +202,9 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      if (state.professionals) {
-        this.professionals = state.professionals;
-      }
+      this.professionals = state.professionals;
+      this.currencies = state.currencies;
+      this.offices = state.offices;
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
@@ -169,9 +216,9 @@ export class RoomComponent implements OnInit, OnDestroy {
     });
   }
 
-  private getProfessionals(): void {
+  private getRoomInfo(): void {
     this.store.dispatch(
-      new fromActionsRoom.GetAllProfessional()
+      new fromActionsRoom.GetRoomInfo()
     );
   }
 
@@ -225,5 +272,17 @@ export class RoomComponent implements OnInit, OnDestroy {
     const filterValue = name.toLowerCase();
 
     return this.professionals?.filter(option => getUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
+  }
+
+  private filterCurrency(name: string): ICurrency[] | undefined {
+    const filterValue = name.toLowerCase();
+
+    return this.currencies?.filter(option => option.code?.toLowerCase().indexOf(filterValue) === 0);
+  }
+
+  private filterOffice(name: string): IOffice[] | undefined {
+    const filterValue = name.toLowerCase();
+
+    return this.offices?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 }

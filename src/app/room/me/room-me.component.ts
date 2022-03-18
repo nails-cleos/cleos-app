@@ -1,13 +1,5 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import {
-  AvailabilityDate,
-  IAddress,
-  IAvailability,
-  IAvailabilityDate,
-  ILocation,
-  IRoom,
-  IRoomAll
-} from '../../interfaces/room';
+import { AvailabilityDate, IAddress, IAvailability, IAvailabilityDate, ILocation, IRoom, IRoomAll } from '../../interfaces/room';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { IIcon } from '../room.component';
@@ -30,8 +22,6 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   subscription?: Subscription;
   errors: any = [];
   professionalName?: string;
-  currencyCode?: string;
-  currencyIcon?: string;
 
   step = 0;
   icons: IIcon = {
@@ -94,7 +84,8 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
           description: this.addressDescription.value
         } as IAddress,
         professional: this.room.professional,
-        currency: this.room.currency
+        currency: this.room.currency,
+        office: this.room.office
       };
 
       if (this.address.value && this.address.value.geometry && room.address) {
@@ -169,11 +160,14 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private getRoom(): void {
-    if (!this.room) {
-      this.store.dispatch(
-        new fromActionsRoom.GetMyRoom()
-      );
-    }
+    this.route.params.subscribe((routeParams) => {
+      const id = routeParams.id;
+      if (!this.room || this.room.id !== id) {
+        this.store.dispatch(
+          new fromActionsRoom.RoomFind({id})
+        );
+      }
+    });
   }
 
   private subscribe(): void {
@@ -181,13 +175,13 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
       if (state.selected) {
         this.room = {
           id: state.selected.id,
-          name: state.selected.name,
-          address: state.selected.address
+          name: state.selected.name, // TODO remove room.name
+          address: state.selected.address,
+          currency: state.selected.currency,
+          office: state.selected.office
         } as IRoomAll;
         this.addressDescription.setValue(this.room.address?.description);
         this.professionalName = getUserName(state.selected.professional);
-        this.currencyCode = state.selected.currency.code;
-        this.currencyIcon = state.selected.currency.icon;
         this.getAvailabilities(state.selected.availabilities);
       }
       if (state.subErrors) {

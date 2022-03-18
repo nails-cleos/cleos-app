@@ -30,21 +30,6 @@
                 </label>
                 <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
               </mat-form-field>
-              <mat-form-field appearance="fill" class="tab-field">
-                <mat-label>{{ 'ADDITIONAL.PRICE.FIELD' | translate }}</mat-label>
-                <span matPrefix><mat-icon matPrefix>attach_money</mat-icon> &nbsp;</span>
-                <label>
-                  <input [formControl]="price" type="number" step="1" matInput required>
-                </label>
-                <mat-error *ngIf="price.hasError('required')" [innerHTML]="'ADDITIONAL.PRICE.REQUIRED' | translate">
-                </mat-error>
-                <mat-error *ngIf="price.hasError('min')">
-                  {{ 'ADDITIONAL.PRICE.GREATER' | translate }}
-                </mat-error>
-                <mat-error *ngIf="errors['price']">
-                  {{errors['price']}}
-                </mat-error>
-              </mat-form-field>
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'ADDITIONAL.DURATION.FIELD' | translate }}</mat-label>
                 <label>

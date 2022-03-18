@@ -25,7 +25,7 @@ export class AdditionalListComponent implements OnInit, AfterViewInit, OnDestroy
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['position', 'name', 'description', 'price', 'duration', 'actions'];
+  displayedColumns: string[] = ['position', 'name', 'description', 'duration', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IAdditional>>();
 
   expandedAdditional: IAdditional | undefined;

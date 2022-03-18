@@ -7,6 +7,7 @@ export interface Token {
 
 export enum Role {
   admin = 'ROLE_ADMIN',
-  customer = 'ROLE_CUSTOMER',
-  professional = 'ROLE_PROFESSIONAL'
+  manager = 'ROLE_MANAGER',
+  professional = 'ROLE_PROFESSIONAL',
+  customer = 'ROLE_CUSTOMER'
 }

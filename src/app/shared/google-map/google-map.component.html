@@ -1,5 +1,6 @@
 <div *ngIf="showMap">
-  <div *ngIf="addressFormGroup" [formGroup]="addressFormGroup" class="divider" fxLayout="column" fxLayoutAlign="space-evenly stretch">
+  <div *ngIf="addressFormGroup" [formGroup]="addressFormGroup" class="divider" fxLayout="column"
+       fxLayoutAlign="space-evenly stretch">
     <mat-google-maps-autocomplete [addressLabelText]="'COMMON.ADDRESS.FIELD' | translate"
                                   [appearance]="appearance.FILL"
                                   [invalidErrorText]="'COMMON.ADDRESS.INVALID' | translate"
@@ -15,7 +16,8 @@
       <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
     </mat-form-field>
   </div>
-  <agm-map *ngIf="!isMapLoading; else box" [latitude]="latitudeMarker || latitude" [longitude]="longitudeMarker || longitude"
+  <agm-map *ngIf="!isMapLoading; else box" [latitude]="latitudeMarker || latitude"
+           [longitude]="longitudeMarker || longitude"
            [zoom]="zoom"
            class="divider">
     <agm-marker (dragEnd)="markerDragEnd($event)" *ngIf="latitudeMarker && longitudeMarker" [latitude]="latitudeMarker"

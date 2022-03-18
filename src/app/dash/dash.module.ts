@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { HttpClient } from '@angular/common/http';
 import { SharedModule } from '../shared/shared.module';
 import { DashRoutingModule } from './dash-routing.module';
 
@@ -8,7 +7,6 @@ import { DashComponent } from './dash.component';
 import { MiniCardComponent } from './mini-card/mini-card.component';
 import { ReservationTableComponent } from './reservation/table/reservation-table.component';
 import { CalendarModule, CalendarMonthModule } from 'angular-calendar';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { DashboardService } from '../services/dashboard.service';
 import { EffectsModule } from '@ngrx/effects';
 import { DashboardEffects } from '../store/effects/dashboard.effects';
@@ -20,9 +18,7 @@ import { RoomService } from '../services/room.service';
 import { UserService } from '../services/user.service';
 import { AdditionalService } from '../services/additional.service';
 import { TrackingService } from '../services/tracking.service';
-
-export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
-  new TranslateHttpLoader(http, './assets/i18n/dashboard/', '.json');
+import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
 
 @NgModule({
   declarations: [
@@ -36,7 +32,10 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
     CalendarMonthModule,
     CalendarModule,
     TranslateModule.forChild({
-      loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient]},
+      loader: {
+        provide: TranslateLoader,
+        useClass: TranslateLoaderFactory.forModule('dashboard')
+      },
       isolate: false,
       extend: true
     }),

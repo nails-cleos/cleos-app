@@ -143,14 +143,11 @@
               <div fxHide fxShow.lt-sm mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
               <mat-list-item fxHide fxShow.lt-sm role="list">
                 <button *ngIf="!reservation.deleted" [routerLink]="['/reservation', reservation.id]" color="primary"
-                        mat-raised-button>
+                        mat-icon-button>
                   <mat-icon>visibility</mat-icon>
-                  {{ 'COMMON.BUTTON.VIEW' | translate }}
                 </button>
-                <button (click)="cancel(reservation)" *ngIf="reservation.deadLine" class="raised-button" color="warn"
-                        mat-raised-button>
+                <button (click)="cancel(reservation)" *ngIf="reservation.deadLine" color="warn" mat-icon-button>
                   <mat-icon>close</mat-icon>
-                  {{ 'COMMON.BUTTON.CANCEL' | translate }}
                 </button>
               </mat-list-item>
             </mat-list>

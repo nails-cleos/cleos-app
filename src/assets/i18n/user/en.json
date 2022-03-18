@@ -4,6 +4,7 @@
     "TITLE": "Add user",
     "CUSTOMER": "Customer {{username}} created",
     "PROFESSIONAL": "Professional {{username}} created",
+    "MANAGER": "Manager {{username}} created",
     "DETAIL": "Update user",
     "LIST": {
       "COLUMN": {

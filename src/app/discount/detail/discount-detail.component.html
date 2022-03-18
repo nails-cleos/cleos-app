@@ -24,6 +24,13 @@
                 </mat-error>
               </mat-form-field>
               <mat-form-field appearance="fill">
+                <mat-label>{{ 'COMMON.CURRENCY.FIELD' | translate }}</mat-label>
+                <mat-icon matPrefix>{{discount.currency.icon}}</mat-icon>
+                <label>
+                  <input [value]="discount.currency.code" disabled matInput>
+                </label>
+              </mat-form-field>
+              <mat-form-field appearance="fill">
                 <mat-label>{{ 'DISCOUNT.DESCRIPTION.FIELD' | translate }}</mat-label>
                 <label>
                   <textarea #message formControlName="description" matInput maxlength="256"></textarea>

@@ -1,4 +1,5 @@
 import { IUserAll } from './user';
+import { ICurrency } from './currency';
 
 export enum DiscountType {
   money = 'MONEY',
@@ -12,6 +13,8 @@ export interface IDiscount {
   amount?: number;
   type?: string;
   deleted?: boolean;
+  currency?: ICurrency;
+  currencyId?: string;
 }
 
 export interface IDiscountAll {
@@ -19,6 +22,7 @@ export interface IDiscountAll {
   name: string;
   amount: number;
   type: DiscountType;
+  currency: ICurrency;
   description?: string;
 }
 

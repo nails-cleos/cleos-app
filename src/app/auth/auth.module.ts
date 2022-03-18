@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { HttpClient } from '@angular/common/http';
 import { MatPasswordStrengthModule } from '@angular-material-extensions/password-strength';
 
 import { SharedModule } from '../shared/shared.module';
@@ -18,18 +17,32 @@ import { RedirectComponent } from './redirect/redirect.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { NgxMatIntlTelInputModule } from 'ngx-mat-intl-tel-input';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { EffectsModule } from '@ngrx/effects';
-import { CatalogueEffects } from '../store/effects/catalogue.effects';
-import { CatalogueService } from '../services/catalogue.service';
 import { LoginEffects } from '../store/effects/auth.effects';
 import { AuthService } from '../services/auth.service';
 import { UserEffects } from '../store/effects/user.effects';
 import { UserService } from '../services/user.service';
 import { TokenService } from '../services/token.service';
+import { Observable, concat, from } from 'rxjs';
+import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
 
-export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
-  new TranslateHttpLoader(http, './assets/i18n/auth/', '.json');
+export class LazyTranslateLoader2 implements TranslateLoader {
+  getTranslation(lang: string): Observable<any> {
+    console.log(lang);
+    const match = lang.match(/([-_])/);
+    const currentLang = !match ? lang : lang.substr(0, match.index);
+
+    const c = concat(
+      import(`../../assets/i18n/${currentLang}.json`));
+    const d = concat(
+      import(`../../assets/i18n/auth/${currentLang}.json`));
+
+    // return forkJoin(a, b);
+    return from(import(`../../assets/i18n/auth/${currentLang}.json`));
+    // return merge(import(`../../assets/i18n/auth/${url}.json`), import(`../../assets/i18n/${url}.json`));
+  }
+}
+
 
 @NgModule({
   declarations: [
@@ -51,7 +64,10 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
     MatSlideToggleModule,
     NgxMatIntlTelInputModule,
     TranslateModule.forChild({
-      loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient]},
+      loader: {
+        provide: TranslateLoader,
+        useClass: TranslateLoaderFactory.forModule('auth')
+      },
       isolate: false,
       extend: true
     }),

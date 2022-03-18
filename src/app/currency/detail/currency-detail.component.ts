@@ -15,7 +15,7 @@ import * as fromActionsCurrency from '../../store/currency.actions';
   styleUrls: ['./currency-detail.component.scss']
 })
 export class CurrencyDetailComponent implements OnInit, AfterViewInit, OnDestroy {
-  @Input() currency: ICurrency | undefined;
+  @Input() currency?: ICurrency;
 
   form!: FormGroup;
 
@@ -28,7 +28,7 @@ export class CurrencyDetailComponent implements OnInit, AfterViewInit, OnDestroy
   errors: any = [];
   icons = ['attach_money', 'euro', 'currency_pound'];
 
-  private subscription: Subscription | undefined;
+  private subscription?: Subscription;
   private getState: Observable<any>;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,

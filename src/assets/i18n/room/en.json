@@ -5,6 +5,9 @@
     "DETAIL": "Update room",
     "LIST": {
       "COLUMN": {
+        "CURRENCY": "Currency",
+        "OFFICE": "Office",
+        "ADDRESS": "Address",
         "PROFESSIONAL": "Professional",
         "AVAILABILITY": {
           "FIELD": "Availability",
@@ -26,6 +29,12 @@
       "REQUIRED": "Professional is <b>required</b>",
       "INVALID": "Professional is invalid",
       "ADD_BUTTON": "Add professional"
+    },
+    "OFFICE": {
+      "FIELD": "Office",
+      "REQUIRED": "Office is <b>required</b>",
+      "INVALID": "Office is invalid",
+      "ADD_BUTTON": "Add office"
     },
     "AVAILABILITY": {
       "FIELD": "Availability",
@@ -65,9 +74,6 @@
     },
     "UPDATED": {
       "MESSAGE": "Room {{name}} updated"
-    },
-    "CURRENCY": {
-      "FIELD": "Currency"
     },
     "ME": {
       "TITLE": "My room",

@@ -8,7 +8,7 @@ on:
       - "**"
 
 env:
-  VERSION_PART: '1'
+  VERSION_PART: '0'
 
 jobs:
   snapshot:

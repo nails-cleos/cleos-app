@@ -1,19 +1,11 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import {
-  AvailabilityDate,
-  IAddress,
-  IAvailability,
-  IAvailabilityDate,
-  ILocation,
-  IRoomAll
-} from '../../interfaces/room';
+import { AvailabilityDate, IAddress, IAvailability, IAvailabilityDate, ILocation, IRoomAll } from '../../interfaces/room';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../store/app.states';
 import * as fromActionsRoom from '../../store/room.actions';
-import { fieldChange } from '../../util/validators';
 import { IIcon } from '../room.component';
 import { createDate } from '../../util/dates';
 import { getUserName } from '../../util/helper';
@@ -25,33 +17,32 @@ import { RoomIconName } from '../../util/icon';
   styleUrls: ['./room-detail.component.scss']
 })
 export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
-  @Input() room: IRoomAll | undefined;
-  form!: FormGroup;
-  getState: Observable<any>;
-  subscription: Subscription | undefined;
-  errors: any = [];
-  professionalName: string | undefined;
+  @Input() room?: IRoomAll;
 
+  form!: FormGroup;
+
+  errors: any = [];
+  professionalName?: string;
   step = 0;
+
   icons: IIcon = {
     week: RoomIconName.eventBusy,
     saturday: RoomIconName.eventBusy,
     sunday: RoomIconName.eventBusy
   };
+
   weekDate?: IAvailabilityDate;
   satDate?: IAvailabilityDate;
   sunDate?: IAvailabilityDate;
-
-  availabilities: IAvailability[] = [];
-
-  name: FormControl = new FormControl('', [
-    Validators.required
-  ]);
 
   address: FormControl = new FormControl('', [
     Validators.required
   ]);
   addressDescription: FormControl = new FormControl();
+
+  private getState: Observable<any>;
+  private subscription?: Subscription;
+  private availabilities: IAvailability[] = [];
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
               private router: Router) {
@@ -90,7 +81,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.room) {
       const room: IRoomAll = {
         id: this.room.id,
-        name: fieldChange(this.name, this.room?.name),
+        name: '', // TODO remove room.name
         availabilities: this.availabilities,
         address: {
           name: this.room.address.name,
@@ -98,7 +89,8 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
           description: this.addressDescription.value
         } as IAddress,
         professional: this.room.professional,
-        currency: this.room.currency
+        currency: this.room.currency,
+        office: this.room.office
       };
 
       if (this.address.value && this.address.value.geometry) {
@@ -137,7 +129,6 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private createForm(): void {
     this.form = this.formBuilder.group({
-      name: this.name,
       address: this.address,
       addressDescription: this.addressDescription
     });
@@ -147,7 +138,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.room) {
       const id = this.route.snapshot.paramMap.get('id');
       this.store.dispatch(
-        new fromActionsRoom.RoomFind(id)
+        new fromActionsRoom.RoomFind({id, redirect: true})
       );
     }
   }
@@ -157,8 +148,9 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       if (state.selected) {
         this.room = {
           id: state.selected.id,
-          name: state.selected.name,
-          address: state.selected.address
+          address: state.selected.address,
+          currency: state.selected.currency,
+          office: state.selected.office
         } as IRoomAll;
         this.professionalName = getUserName(state.selected.professional);
         this.addressDescription.setValue(this.room.address?.description);

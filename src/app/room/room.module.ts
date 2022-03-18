@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { HttpClient } from '@angular/common/http';
 import { SharedModule } from '../shared/shared.module';
 import { RoomRoutingModule } from './room-routing.module';
 
@@ -10,16 +9,13 @@ import { RoomMeComponent } from './me/room-me.component';
 import { RoomDetailComponent } from './detail/room-detail.component';
 import { AvailabilityComponent } from './availability/availability.component';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { EffectsModule } from '@ngrx/effects';
 import { RoomEffects } from '../store/effects/room.effects';
 import { RoomService } from '../services/room.service';
 import { UserService } from '../services/user.service';
 import { AddServiceComponent, PriceDialogComponent } from './me/add-service/add-service.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-
-export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
-  new TranslateHttpLoader(http, './assets/i18n/room/', '.json');
+import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
 
 @NgModule({
   declarations: [
@@ -36,7 +32,10 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
     SharedModule,
     MatExpansionModule,
     TranslateModule.forChild({
-      loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient]},
+      loader: {
+        provide: TranslateLoader,
+        useClass: TranslateLoaderFactory.forModule('room')
+      },
       isolate: false,
       extend: true
     }),

@@ -67,6 +67,13 @@ export class UserEffects {
               return of(new fromActionsUser.UserSaveSuccess({message}));
             }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
           );
+        case Role.manager:
+          return this.userService.addManager(payload.user).pipe(
+            switchMap((response: any) => {
+              const message = this.translate.instant('USER.MANAGER', {username: response.username});
+              return of(new fromActionsUser.UserSaveSuccess({message}));
+            }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
+          );
         case Role.professional:
           return this.userService.addProfessional(payload.user).pipe(
             switchMap((response: any) => {

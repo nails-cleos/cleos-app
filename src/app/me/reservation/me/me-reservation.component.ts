@@ -5,13 +5,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IGroupService, IPrice, IProduct, IProductGroup, Price } from '../../../interfaces/product';
 import { IRoom, IService } from '../../../interfaces/room';
-import {
-  IAvailableDTO,
-  IReservation,
-  IReservationAll,
-  MAX_RESERVATION_MONTH,
-  Reservation
-} from '../../../interfaces/reservation';
+import { IAvailableDTO, IReservation, IReservationAll, MAX_RESERVATION_MONTH, Reservation } from '../../../interfaces/reservation';
 import {
   API_LOCALE,
   convertDuration,
@@ -28,7 +22,6 @@ import {
   IDuration,
   newDate,
   plusMonthDate,
-  reservationDuration,
   totalDuration
 } from '../../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
@@ -42,6 +35,7 @@ import { map, startWith } from 'rxjs/operators';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import {
   createProductGroupService,
+  createRoomOffice, currencySymbol,
   getPrice,
   getProductDurability,
   getUserName,
@@ -56,6 +50,7 @@ import { isEqual } from 'date-fns';
 import { IAdditionalAll } from '../../../interfaces/additional';
 import { MatListOption } from '@angular/material/list';
 import { MatDatepicker } from '@angular/material/datepicker';
+import { IOffice } from '../../../interfaces/office';
 
 @Component({
   selector: 'app-me-reservation',
@@ -90,7 +85,12 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   discount = new FormControl();
 
   roomForm!: FormGroup;
-  rooms?: IRoom[];
+  offices?: IOffice[];
+  filteredOffice?: Observable<IOffice[] | undefined>;
+  office: FormControl = new FormControl('', [
+    Validators.required, requireMatch
+  ]);
+  roomList?: IRoom[];
   filteredRoom?: Observable<IRoom[] | undefined>;
   room: FormControl = new FormControl('', [
     Validators.required, requireMatch
@@ -291,10 +291,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   ngAfterViewInit(): void {
-    if (this.isEditing) {
-      this.getProductList();
-      this.cdRef.detectChanges();
-    } else {
+    if (!this.isEditing) {
       this.getUpcomingReservation();
     }
   }
@@ -313,8 +310,12 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     return product ? `${product.name}` : '';
   }
 
+  displayFnOffice(office: IOffice): string {
+    return office ? `${office.name}` : '';
+  }
+
   displayFnRoom(room: IRoom): string {
-    return room ? `${room.name}` : '';
+    return room.address ? room.address.name : '';
   }
 
   dateNoContent(date?: any): string {
@@ -370,6 +371,12 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.keyDownHandler(event, this.group);
   }
 
+  keyDownOffice(event: any): void {
+    this.roomList = undefined;
+    this.keyDownHandler(event, this.room);
+    this.keyDownHandler(event, this.office);
+  }
+
   onChange(options: MatListOption[]): void {
     this.additionalSelected = options.map(o => o.value);
     this.price = newAdditional(this.price, this.additionalSelected);
@@ -381,6 +388,14 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   getDuration(duration: string): string {
     return formatTime(convertDuration(duration), this.locale);
+  }
+
+  getRoomName(room: IRoom): string {
+    return room.address ? room.address.name : '';
+  }
+
+  getCurrencySymbol(): string {
+    return currencySymbol(this.room.value.currency);
   }
 
   private getReservation(id: string | null): void {
@@ -416,24 +431,54 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.roomForm = this.formBuilder.group({
       room: this.room
     });
-    this.filteredGroup = this.group.valueChanges.pipe(startWith(''), map(value => {
-      if (typeof value === 'string') {
-        return value;
+    this.filteredGroup = this.group.valueChanges.pipe(startWith(''),
+      map(value => typeof value === 'string' ? value : value.name),
+      map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups));
+    this.group.valueChanges.subscribe(value => {
+      if (!value) {
+        return;
       }
       this.productList = value.products;
+      const product = value.products?.find((p: IProductGroup) => p.id === this.productId);
+      if (product) {
+        this.productList = value.products;
+        this.product.setValue(product);
+        this.productId = this.product.value.id;
+      } else {
+        if (this.productList?.length === 1) {
+          this.product.setValue(this.productList[0]);
+        } else {
+          this.product.setValue('');
+        }
+      }
       this.durability = getProductDurability(value.durabilityMin, value.durabilityMax, this.translate);
-      this.product.setValue('');
-      return value.name;
-    }), map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups));
+    });
+
     this.filteredProduct = this.product.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filterProduct(name) : this.productList ? this.productList.slice() : this.productList)
     );
+    this.filteredOffice = this.office.valueChanges.pipe(startWith(''),
+      map(value => typeof value === 'string' ? value : value.name),
+      map(name => name ? this.filterOffice(name) : this.offices ? this.offices.slice() : this.offices));
+
+    this.office.valueChanges.subscribe(value => {
+      if (!value) {
+        return;
+      }
+      this.roomList = value.rooms;
+      if (this.roomList?.length === 1) {
+        this.room.setValue(this.roomList[0]);
+      } else {
+        this.room.setValue('');
+      }
+    });
+
     this.filteredRoom = this.room.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterRoom(name) : this.rooms ? this.rooms.slice() : this.rooms)
+      map(name => name ? this.filterRoom(name) : this.roomList ? this.roomList.slice() : this.roomList)
     );
   }
 
@@ -447,21 +492,15 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.subscription = this.getState.subscribe(state => {
       this.additionalList = state.productDiscount?.additionalList;
       if (state.productDiscount?.products) {
-        const groupMap = createProductGroupService(new Map<string, IGroupService>(), state.productDiscount.products,
-          this.room.value.currency);
-        this.groups = Array.from(groupMap.values());
+        this.groups = Array.from(createProductGroupService(new Map<string, IGroupService>(), state.productDiscount.products,
+          this.room.value.currency).values());
       }
       if (this.groups && this.productId && !this.group.value) {
-        this.group.setValue(this.groups?.find(group => {
-          const product = group.products?.find(p => p.id === this.productId);
-          if (product) {
-            this.productList = group.products;
-            this.product.setValue(product);
-            this.productId = this.product.value.id;
-            return group;
-          }
-          return undefined;
-        }));
+        this.group.setValue(this.groups?.find(group => group.products?.find(p => p.id === this.productId) ? group : undefined));
+        if (this.reservation) {
+          this.myStepper.next();
+          this.datePicker?.open();
+        }
       }
       this.discounts = state.productDiscount?.discounts.map((ud: IUserDiscount) => {
         let title = ud.discount.name;
@@ -475,9 +514,9 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
         }
         return Object.assign({}, ud, {title});
       });
-      this.rooms = state.rooms;
-      if (this.rooms?.length === 1) {
-        this.room.setValue(this.rooms[0]);
+      this.offices = Array.from(createRoomOffice(state.rooms)?.values() || []);
+      if (this.offices && this.offices.length === 1) {
+        this.office.setValue(this.offices[0]);
       }
       if (state.selected) {
         this.setData(state.selected);
@@ -554,32 +593,30 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     return this.productList?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 
-  private filterRoom(name: string): IRoom[] | undefined {
+  private filterOffice(name: string): IOffice[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.rooms?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
+    return this.offices?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
+  }
+
+  private filterRoom(addressName: string): IRoom[] | undefined {
+    const filterValue = addressName.toLowerCase();
+
+    return this.roomList?.filter(option => option.address?.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 
   private setData(reservation: IReservationAll): void {
     this.reservation = reservation;
+    this.room.setValue(reservation.room);
+    this.getProductList();
+    this.cdRef.detectChanges();
+
     const date = newDate(reservation.start);
     this.time = getTime(date, this.locale);
-    this.room.setValue(reservation.room);
     this.startDate.setValue(date);
     this.eventSelected = date;
     this.additionalSelected = reservation.additional ? reservation.additional : [];
     this.price = getPrice(reservation);
-    this.group.setValue(this.groups?.find(group => {
-      const product = group.products?.find(p => p.id === reservation.product.id);
-      if (product) {
-        return group;
-      }
-      return undefined;
-    }));
-    this.product.setValue(reservation.product);
-    this.duration = reservationDuration(reservation);
-
-    this.myStepper.next();
-    this.datePicker.open();
+    this.productId = reservation.product.id;
   }
 }

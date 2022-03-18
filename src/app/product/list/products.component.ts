@@ -13,7 +13,7 @@ import * as fromActionsProduct from '../../store/product.actions';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
-import { getProductDurability, groupDurability } from '../../util/helper';
+import { groupDurability } from '../../util/helper';
 
 @Component({
   selector: 'app-products',

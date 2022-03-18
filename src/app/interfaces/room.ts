@@ -1,16 +1,20 @@
 import { IUser } from './user';
-import { ICurrency } from './currency';
+import { ICurrency, ICurrencyAll } from './currency';
 import { IProduct } from './product';
 import { IAdditional } from './additional';
+import { IOffice } from './office';
 
 export interface IRoom {
   id?: string;
   name?: string;
   professionalId?: string;
   professional?: IUser;
+  currencyId?: string;
+  currency?: ICurrency;
+  officeId?: string;
+  office?: IOffice;
   availabilities: IAvailability[];
   address?: IAddress;
-  currency?: ICurrency;
 }
 
 export interface IRoomService {
@@ -19,6 +23,12 @@ export interface IRoomService {
   selectedProducts: IProduct[];
   additionalList: IAdditional[];
   selectedAdditionalList: IAdditional[];
+}
+
+export interface IRoomInfo {
+  currencies: ICurrency[];
+  professionals: IUser[];
+  offices: IOffice[];
 }
 
 export interface IServicePrice {
@@ -46,7 +56,8 @@ export interface IRoomAll {
   professional: IUser;
   availabilities: IAvailability[];
   address: IAddress;
-  currency: ICurrency;
+  currency: ICurrencyAll;
+  office: IOffice;
 }
 
 export interface IAvailability {

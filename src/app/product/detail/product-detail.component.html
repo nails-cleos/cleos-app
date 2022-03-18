@@ -79,17 +79,6 @@
                     </label>
                   </mat-form-field>
                   <mat-form-field appearance="fill" class="tab-field">
-                    <mat-label>{{ 'PRODUCT.PRICE.FIELD' | translate }}</mat-label>
-                    <span matPrefix><mat-icon matPrefix>attach_money</mat-icon> &nbsp;</span>
-                    <label>
-                      <input (change)="setValue(tab, 'price', $event)" [value]="tab.price" matInput required
-                             step="1" type="number">
-                    </label>
-                    <mat-hint *ngIf="tab.errors['price']"
-                              [innerHTML]="'PRODUCT.PRICE.' + tab.errors['price'] | translate" class="mat-error">
-                    </mat-hint>
-                  </mat-form-field>
-                  <mat-form-field appearance="fill" class="tab-field">
                     <mat-label>{{ 'PRODUCT.DURATION.FIELD' | translate }}</mat-label>
                     <label>
                       <input [format]="24" [ngxTimepicker]="t" [value]="tab.duration || ''" matInput readonly

@@ -27,7 +27,7 @@ export class GoogleMapComponent implements OnInit {
   public isDraggable: boolean;
   public info: string | undefined;
   public isMapLoading: boolean;
-  showMap = environment.production;
+  public showMap = environment.production;
 
   constructor(private geocodeService: GeocodeService) {
     this.latitude = -31.42008329999999;
@@ -38,13 +38,14 @@ export class GoogleMapComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.addressFormGroup) {
+    if (this.addressFormGroup && this.showMap) {
       this.addressFormGroup.get('address')?.valueChanges.subscribe(value => {
         this.setAddress(value);
       });
       this.isDraggable = true;
     }
     this.setCurrentPosition();
+    this.mockResponse();
   }
 
   markerDragEnd($event: any): void {
@@ -91,5 +92,37 @@ export class GoogleMapComponent implements OnInit {
     this.zoom = 15;
     this.isMapLoading = false;
     this.addressEmitter.emit(value);
+  }
+
+  private mockResponse(): void {
+    if (!this.showMap && !this.addressFormGroup?.get('address')?.value) {
+      const value = {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        address_components: [],
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        formatted_address: 'Mock address',
+        geometry: {
+          location: {
+            lat: () => this.latitude,
+            lng: () => this.longitude,
+            toJSON: () => 'toJSON mock',
+            toString: () => 'toString mock'
+          },
+          bounds: null,
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          location_type: null,
+          viewport: null
+        },
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        partial_match: true,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        place_id: 'Mock placeId',
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        postcode_localities: ['Mock postcode'],
+        types: ['Mock type']
+      } as unknown as GeocoderResult;
+      this.addressEmitter.emit(value);
+      this.addressFormGroup?.get('address')?.setValue(value);
+    }
   }
 }

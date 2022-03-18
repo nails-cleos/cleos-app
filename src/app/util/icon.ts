@@ -11,7 +11,8 @@ export enum ReservationIconName {
   partiallyPaid = 'request_quote',
   payment = 'payment',
   partiallyCompleted = 'rule',
-  more = 'read_more'
+  more = 'read_more',
+  change = 'switch_account'
 }
 
 export enum RoomIconName {
@@ -21,9 +22,10 @@ export enum RoomIconName {
 }
 
 export enum RoleIconName {
-  roleCustomer = 'perm_identity',
-  roleProfessional = 'manage_accounts',
-  roleAdmin = 'supervisor_account'
+  roleCustomer = 'person',
+  roleProfessional = 'group',
+  roleManager = 'supervisor_account',
+  roleAdmin = 'manage_accounts'
 }
 
 export type ReservationIconKey = keyof typeof ReservationIconName;
