@@ -9,8 +9,10 @@ import {
   selectAdditionalState,
   selectAuthState,
   selectCatalogueState,
+  selectCurrencyState,
   selectDiscountState,
   selectNotificationState,
+  selectOfficeState,
   selectPaymentState,
   selectProductState,
   selectReservationState,
@@ -61,6 +63,7 @@ export class NavComponent implements OnInit, OnDestroy {
   language: string;
 
   isProfessional = false;
+  isManager = false;
   isAdmin = false;
 
   image?: string;
@@ -73,6 +76,7 @@ export class NavComponent implements OnInit, OnDestroy {
   incomplete = false;
 
   checked = false;
+  step = 0;
 
   private getState: Observable<any>;
   private getNotificationState: Observable<any>;
@@ -93,7 +97,8 @@ export class NavComponent implements OnInit, OnDestroy {
     this.getState = this.store.select(selectAuthState);
     this.getNotificationState = this.store.select(selectNotificationState);
     this.selectStore([selectRoomState, selectProductState, selectCatalogueState, selectDiscountState,
-      selectUnavailableState, selectUserState, selectReservationState, selectPaymentState, selectAdditionalState]);
+      selectUnavailableState, selectUserState, selectReservationState, selectPaymentState, selectAdditionalState,
+      selectCurrencyState, selectOfficeState]);
     this.navigation.subscribe();
   }
 
@@ -145,6 +150,10 @@ export class NavComponent implements OnInit, OnDestroy {
     this.router.navigate([menu.path]);
   }
 
+  setStep(index: number): void {
+    this.step = index;
+  }
+
   setTheme(checked: boolean): void {
     const theme: Theme = getThemeName(checked);
     this.resetTheme(theme);
@@ -185,6 +194,7 @@ export class NavComponent implements OnInit, OnDestroy {
         this.checked = isDarkMode(this.currentUser.theme);
         this.resetTheme(this.currentUser.theme);
         this.isProfessional = user.authorities.some(u => u.authority === Role.professional);
+        this.isManager = user.authorities.some(u => u.authority === Role.manager);
         this.isAdmin = user.authorities.some(u => u.authority === Role.admin);
         this.menuItems = state.menus;
         this.canChangePassword = user?.provider === 'LOCAL';

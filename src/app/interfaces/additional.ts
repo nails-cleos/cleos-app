@@ -1,3 +1,5 @@
+import { IService } from './room';
+
 export interface IAdditional {
   id?: string;
   name?: string;
@@ -8,10 +10,7 @@ export interface IAdditional {
   durationDate?: Date;
 }
 
-export interface IAdditionalAll {
-  id: string;
-  name: string;
-  price: number;
+export interface IAdditionalAll extends IService {
   duration: string;
   description?: string;
 }

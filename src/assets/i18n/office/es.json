@@ -1,0 +1,34 @@
+{
+  "OFFICE": {
+    "TITLE": "Agregar oficina",
+    "CREATED": "Oficina {{name}} creada",
+    "DETAIL": "Actualizar oficina",
+    "ROOMS": "Salas",
+    "LIST": {
+      "COLUMN": {
+        "MANAGER": "Manager"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No hay oficinas"
+      }
+    },
+    "NAME": {
+      "FIELD": "Nombre",
+      "REQUIRED": "Nombre es <b>requerido</b>"
+    },
+    "MANAGER": {
+      "FIELD": "Manager",
+      "REQUIRED": "Manager es <b>requerido</b>",
+      "INVALID": "Manager no valido",
+      "ADD_BUTTON": "Agregar manager"
+    },
+    "DELETED": {
+      "TITLE": "Eliminar oficina",
+      "CONTENT": "¿Está seguro de eliminar la oficina {{name}}?",
+      "MESSAGE": "Oficina {{name}} eliminada"
+    },
+    "UPDATED": {
+      "MESSAGE": "Oficina {{name}} actualizada"
+    }
+  }
+}

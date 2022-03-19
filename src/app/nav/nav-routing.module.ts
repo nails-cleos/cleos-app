@@ -17,6 +17,8 @@ const routes: Routes = [{
   }, {
     path: 'discounts', loadChildren: () => import('../discount/discount.module').then(m => m.DiscountModule)
   }, {
+    path: 'offices', loadChildren: () => import('../office/office.module').then(m => m.OfficeModule)
+  }, {
     path: 'rooms', loadChildren: () => import('../room/room.module').then(m => m.RoomModule)
   }, {
     path: 'reservation',
@@ -30,6 +32,9 @@ const routes: Routes = [{
   }, {
     path: 'additional',
     loadChildren: () => import('../additional/additional.module').then(m => m.AdditionalModule)
+  }, {
+    path: 'currency',
+    loadChildren: () => import('../currency/currency.module').then(m => m.CurrencyModule)
   }, {
     path: 'me', loadChildren: () => import('../me/me.module').then(m => m.MeModule)
   }]

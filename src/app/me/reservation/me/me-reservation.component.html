@@ -1,26 +1,54 @@
 <ng-template #stepOne>
   <form [formGroup]="roomForm">
-    <mat-form-field *ngIf="rooms; else skeleton" appearance="fill">
-      <mat-label>{{ 'COMMON.ROOM.FIELD' | translate }}</mat-label>
-      <label>
-        <input (keydown)="keyDownHandler($event, room)" [formControl]="room" [matAutocomplete]="autoRoom" matInput
-               required type="text">
-      </label>
-      <mat-autocomplete #autoRoom="matAutocomplete" [displayWith]="displayFnRoom">
-        <mat-option *ngFor="let room of filteredRoom | async" [value]="room">
-          {{room.name}}
-        </mat-option>
-      </mat-autocomplete>
-      <mat-error *ngIf="room.hasError('required')"
-                 [innerHTML]="'COMMON.ROOM.REQUIRED' | translate">
-      </mat-error>
-      <mat-error *ngIf="room.hasError('requireMatch')"
-                 [innerHTML]="'COMMON.ROOM.INVALID' | translate">
-      </mat-error>
-      <mat-error *ngIf="errors['room']">
-        {{errors['room']}}
-      </mat-error>
-    </mat-form-field>
+    <div *ngIf="!offices?.length; else data" class="no-content bold">
+      {{'ME.RESERVATION.ROOM.NO_CONTENT' | translate}}
+    </div>
+    <ng-template #data>
+      <div fxLayout="column" fxLayoutAlign="space-evenly start">
+        <mat-form-field *ngIf="offices; else skeleton" appearance="fill">
+          <mat-label>{{ 'COMMON.ROOM.OFFICE.FIELD' | translate }}</mat-label>
+          <label>
+            <input (keydown)="keyDownOffice($event)" [formControl]="office" [matAutocomplete]="autoOffice"
+                   matInput required type="text">
+          </label>
+          <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
+            <mat-option *ngFor="let office of filteredOffice | async " [value]="office">
+              {{office.name}}
+            </mat-option>
+          </mat-autocomplete>
+          <mat-error *ngIf="office.hasError('required')"
+                     [innerHTML]="'COMMON.ROOM.OFFICE.REQUIRED' | translate">
+          </mat-error>
+          <mat-error *ngIf="office.hasError('requireMatch')"
+                     [innerHTML]="'COMMON.ROOM.OFFICE.INVALID' | translate">
+          </mat-error>
+          <mat-error *ngIf="errors['office']">
+            {{errors['office']}}
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field *ngIf="roomList" appearance="fill">
+          <mat-label>{{ 'COMMON.ROOM.FIELD' | translate }}</mat-label>
+          <label>
+            <input (keydown)="keyDownHandler($event, room)" [formControl]="room" [matAutocomplete]="autoRoom" matInput
+                   required type="text">
+          </label>
+          <mat-autocomplete #autoRoom="matAutocomplete" [displayWith]="displayFnRoom">
+            <mat-option *ngFor="let room of filteredRoom | async" [value]="room">
+              {{getRoomName(room)}}
+            </mat-option>
+          </mat-autocomplete>
+          <mat-error *ngIf="room.hasError('required')"
+                     [innerHTML]="'COMMON.ROOM.REQUIRED' | translate">
+          </mat-error>
+          <mat-error *ngIf="room.hasError('requireMatch')"
+                     [innerHTML]="'COMMON.ROOM.INVALID' | translate">
+          </mat-error>
+          <mat-error *ngIf="errors['room']">
+            {{errors['room']}}
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </ng-template>
     <ng-template #skeleton>
       <div class="ssc-line"></div>
     </ng-template>
@@ -127,14 +155,14 @@
           <div *ngIf="!isEditing; else editing" mat-line>
             <span [innerHTML]="'ME.RESERVATION.PRODUCT.COMPLETE.PRICE' | translate"></span>
             <span [class.strikethrough]="discount.value"
-                  class="raised-button">$ {{product.value.price | number:'1.2-2'}}</span>
+                  class="raised-button">{{getCurrencySymbol()}} {{product.value.price | number:'1.2-2'}}</span>
             <span *ngIf="price.priceWithDiscount" [@discountAnimation]
-                  class="raised-button bold">$ {{price.priceWithDiscount | number:'1.2-2'}}</span>
+                  class="raised-button bold">{{getCurrencySymbol()}} {{price.priceWithDiscount | number:'1.2-2'}}</span>
           </div>
           <ng-template #editing>
             <span [innerHTML]="'ME.RESERVATION.PRODUCT.COMPLETE.PRICE' | translate"></span>
             <span
-              class="raised-button">$ {{(price.priceWithDiscount ? price.priceWithDiscount : product.value.price) | number:'1.2-2'}}</span>
+              class="raised-button">{{getCurrencySymbol()}} {{(price.priceWithDiscount ? price.priceWithDiscount : product.value.price) | number:'1.2-2'}}</span>
             <span *ngIf="price.priceWithDiscount"
                   class="raised-button bold">{{'ME.RESERVATION.PRODUCT.DISCOUNT.ADD' | translate}}</span>
           </ng-template>
@@ -158,7 +186,7 @@
       <mat-list-option *ngFor="let it of additionalList" [selected]="isSelected(it)" [value]="it"
                        checkboxPosition="before">
         <div mat-subheader>{{it.name}}</div>
-        <div mat-line>${{it.price | number:'1.2-2'}}</div>
+        <div mat-line>{{getCurrencySymbol()}} {{it.price | number:'1.2-2'}}</div>
         <div *ngIf="it.description" mat-line>{{it.description}}</div>
         <div class="additional-line" mat-line>{{'ME.RESERVATION.ADDITIONAL.DURATION.FIELD' | translate}}
           : {{getDuration(it.duration)}}</div>
@@ -175,7 +203,7 @@
   <mat-tab-group *ngIf="availableList.size; else empty" [selectedIndex]="selectedIndex" backgroundColor="accent"
                  color="primary" mat-align-tabs="center">
     <mat-tab *ngFor="let available of availableList | keyvalue: sortDate" [label]="formatKey(available.key)">
-      <section>
+      <section class="button-container">
         <ng-container [ngTemplateOutletContext]="{available:available}"
                       [ngTemplateOutlet]="available.value.length ? noEmpty : empty"></ng-container>
       </section>
@@ -184,9 +212,7 @@
   <ng-template #noEmpty let-available='available'>
     <div class="button-row">
       <button (click)="selectDate(datetime)" *ngFor="let datetime of sortTime(available.value)"
-              [color]="areEquals(datetime) ? 'primary' : undefined"
-              class="large"
-              mat-raised-button>
+              [color]="areEquals(datetime) ? 'primary' : undefined" class="large" mat-raised-button>
         {{datetime.time}}
       </button>
     </div>
@@ -244,7 +270,7 @@
           <div mat-line>{{durationTime}}</div>
         </mat-list-item>
         <mat-list-item>
-          <mat-icon mat-list-icon>attach_money</mat-icon>
+          <mat-icon mat-list-icon>{{room.value.currency.icon}}</mat-icon>
           <div mat-line>{{ 'ME.RESERVATION.PRODUCT.PRICE.FIELD' | translate}}</div>
           <div *ngIf="!isEditing; else editing" mat-line>
             <span [class.strikethrough]="discount.value">{{product.value.price | number:'1.2-2'}}</span>
@@ -267,7 +293,7 @@
             <mat-icon mat-list-icon>add_post</mat-icon>
             <div mat-line>
               <div *ngFor="let it of additionalSelected">
-                {{it.name}} - ${{it.price | number:'1.2-2'}}
+                {{it.name}} - {{getCurrencySymbol()}} {{it.price | number:'1.2-2'}}
               </div>
             </div>
           </mat-list-item>
@@ -277,7 +303,7 @@
             <div mat-line>{{additionalDuration}}</div>
           </mat-list-item>
           <mat-list-item>
-            <mat-icon mat-list-icon>attach_money</mat-icon>
+            <mat-icon mat-list-icon>{{room.value.currency.icon}}</mat-icon>
             <div mat-line>{{ 'COMMON.LABEL.PRICE' | translate}}</div>
             <div mat-line>{{price.additional}}</div>
           </mat-list-item>
@@ -297,7 +323,7 @@
           <div mat-line>{{totalDuration}}</div>
         </mat-list-item>
         <mat-list-item *ngIf="price.total">
-          <mat-icon mat-list-icon>paid</mat-icon>
+          <mat-icon class="bold" mat-list-icon>{{room.value.currency.icon}}</mat-icon>
           <div mat-line><span class="bold">{{ 'COMMON.LABEL.TOTAL' | translate}}</span></div>
           <div mat-line><span class="bold">{{price.total}}</span></div>
         </mat-list-item>
@@ -411,7 +437,7 @@
           <button (click)="back" class="icon-button" color="accent" mat-mini-fab>
             <mat-icon>arrow_upward</mat-icon>
           </button>
-          <button (click)="create()" class="icon-button" color="primary" mat-mini-fab type="button">
+          <button (click)="create" class="icon-button" color="primary" mat-mini-fab type="button">
             <mat-icon>add_task</mat-icon>
           </button>
         </div>
@@ -534,7 +560,7 @@
           <button (click)="back" color="accent" mat-raised-button>
             <mat-icon>arrow_back</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}</button>
-          <button (click)="create()" class="raised-button" color="primary" mat-raised-button type="button">
+          <button (click)="create" class="raised-button" color="primary" mat-raised-button type="button">
             {{ 'COMMON.BUTTON.BOOK' | translate }}
             <mat-icon>add_task</mat-icon>
           </button>

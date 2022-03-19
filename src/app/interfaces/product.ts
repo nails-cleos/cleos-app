@@ -1,4 +1,6 @@
 import { IDiscount, IUserDiscount } from './discount';
+import { IAdditionalAll } from './additional';
+import { IService } from './room';
 
 export interface IProductGroup {
   id?: string;
@@ -8,6 +10,15 @@ export interface IProductGroup {
   durabilityMin?: number;
   durabilityMax?: number;
   products?: IProduct[];
+}
+
+export interface IProductGroupAll {
+  id: string;
+  name: string;
+  description?: string;
+  durability?: string;
+  durabilityMin?: number;
+  durabilityMax?: number;
 }
 
 export interface IProduct {
@@ -26,10 +37,14 @@ export interface IProduct {
   showHistory?: boolean;
 }
 
-export interface IProductAll {
+export interface IGroupService {
   id: string;
   name: string;
-  price: number;
+  products: IService[];
+  selectedProducts: IService[];
+}
+
+export interface IProductAll extends IService {
   duration: string;
   description?: string;
   discount?: IDiscount;
@@ -37,11 +52,13 @@ export interface IProductAll {
   primary?: boolean;
   createdAt?: string;
   productId?: string;
+  group: IProductGroupAll;
 }
 
 export interface IProductDiscountDTO {
   products: IProductAll[];
   discounts: IUserDiscount[];
+  additionalList: IAdditionalAll[];
 }
 
 export interface IExtras {
@@ -105,5 +122,19 @@ export class Product implements IProduct {
 
 export class ProductGroup implements IProductGroup {
   constructor() {
+  }
+}
+
+export class GroupService implements IGroupService {
+  id: string;
+  name: string;
+  products: IService[];
+  selectedProducts: IService[];
+
+  constructor(id: string, name: string) {
+    this.id = id;
+    this.name = name;
+    this.products = [];
+    this.selectedProducts = [];
   }
 }

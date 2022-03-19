@@ -1,8 +1,8 @@
 import { All, DashboardActionTypes } from '../dashboard.actions';
-import { ICardSummary, IEventSummary } from '../../interfaces/dashboard';
+import { IDashboard } from '../../interfaces/dashboard';
 
 export interface State {
-  data: ICardSummary | IEventSummary;
+  data: Map<string, IDashboard>;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -11,7 +11,7 @@ export interface State {
 }
 
 const initialState: State = {
-  data: {calendarSummary: undefined, miniCardSummaries: undefined, chartSummaries: undefined},
+  data: new Map<string, IDashboard>(),
   errorMessage: null,
   error: null,
   subErrors: null,
@@ -19,13 +19,43 @@ const initialState: State = {
   isLoading: false
 };
 
-const merge = (a: ICardSummary | IEventSummary, b: ICardSummary | IEventSummary) => {
-    const res = {};
-    Object.keys({...a, ...b}).map(key => {
-      // @ts-ignore
-      res[key] = b[key] || a[key];
-    });
-    return res;
+const merge = (a: IDashboard, b: IDashboard) => {
+  const res = {};
+  Object.keys({...a, ...b}).map(key => {
+    // @ts-ignore
+    res[key] = b[key] || a[key];
+  });
+  return res;
+};
+
+const getMap = (a: Map<string, IDashboard>, b: IDashboard) => {
+  const res = new Map<string, IDashboard>();
+  Object.keys({...a, ...b}).map(key => {
+    // @ts-ignore
+    const data = b[key];
+    const values = a.get(data.roomName);
+    res.set(data.roomName, merge(data, values || {}));
+  });
+  return res;
+};
+
+const cleanEventMap = (data: Map<string, IDashboard>): Map<string, IDashboard> => {
+  data.forEach((value, key) => {
+    value.calendarSummary = undefined;
+    data.set(key, value);
+  });
+
+  return data;
+};
+
+const cleanCardMap = (data: Map<string, IDashboard>): Map<string, IDashboard> => {
+  data.forEach((value, key) => {
+    value.chartSummaries = undefined;
+    value.miniCardSummaries = undefined;
+    data.set(key, value);
+  });
+
+  return data;
 };
 
 export const reducer = (state = initialState, action: All): State => {
@@ -33,7 +63,7 @@ export const reducer = (state = initialState, action: All): State => {
     case DashboardActionTypes.dashboardEvents: {
       return {
         ...state,
-        data: {calendarSummary: undefined},
+        data: cleanEventMap(state.data),
         errorMessage: null,
         error: null,
         subErrors: null,
@@ -43,7 +73,7 @@ export const reducer = (state = initialState, action: All): State => {
     case DashboardActionTypes.dashboardCards: {
       return {
         ...state,
-        data: {miniCardSummaries: undefined, chartSummaries: undefined},
+        data: cleanCardMap(state.data),
         errorMessage: null,
         error: null,
         subErrors: null,
@@ -53,7 +83,7 @@ export const reducer = (state = initialState, action: All): State => {
     case DashboardActionTypes.dashboardSuccess: {
       return {
         ...state,
-        data: merge(state.data, action.payload),
+        data: getMap(state.data, action.payload),
         errorMessage: null,
         error: null,
         subErrors: null,

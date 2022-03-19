@@ -1,6 +1,6 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState, selectReservationState } from '../../store/app.states';
+import { AppState, selectAuthState, selectReservationState, selectUserState } from '../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
 import * as fromActionsPayment from '../../store/payment.actions';
@@ -20,12 +20,12 @@ import {
 } from '../../util/dates';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { IUserAll } from '../../interfaces/user';
+import { IUser, IUserAll } from '../../interfaces/user';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Role } from '../../interfaces/token';
-import { getFullUserName, getPrice, getUserName, snakeToCamel } from '../../util/helper';
+import { currencySymbol, getFullUserName, getPrice, getUserName, snakeToCamel } from '../../util/helper';
 import { IPrice, Price } from '../../interfaces/product';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatFabMenu, MatFabMenuDirection } from '@angular-material-extensions/fab-menu/lib/mat-fab-menu.component';
@@ -33,6 +33,11 @@ import { IPayment } from '../../interfaces/payment';
 import { transitionAnimation } from '../../util/animation';
 import { isToday, isTomorrow } from 'date-fns';
 import { ReservationIconKey, ReservationIconName } from '../../util/icon';
+import { DiscountDialogComponent } from '../../discount/list/discounts.component';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { map, startWith } from 'rxjs/operators';
+import * as fromActionsUser from '../../store/user.actions';
+import { requireMatch } from '../../util/validators';
 
 @Component({
   selector: 'app-reservation-detail',
@@ -72,6 +77,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   private isLoading = false;
   private getState: Observable<any>;
   private subscription: Subscription | undefined;
+  private small = false;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private route: ActivatedRoute,
               private store: Store<AppState>, private cdRef: ChangeDetectorRef, private router: Router,
@@ -82,6 +88,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       Breakpoints.Small
     ]).subscribe(result => {
       if (result.matches) {
+        this.small = true;
         this.direction = 'bottom';
         this.tooltipPosition = 'left';
       }
@@ -109,6 +116,10 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
   get professionalName(): string {
     return this.reservation ? getUserName(this.reservation.room.professional) : '';
+  }
+
+  get currencySymbol(): string {
+    return this.reservation ? currencySymbol(this.reservation.room.currency) : '';
   }
 
   private static createMachine(stateMachineDefinition: any, initialState: any): any {
@@ -157,7 +168,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   }
 
   onChangeState(id: any): void {
-    if (['send', 'book', 'more'].indexOf(id.toString()) >= 0 && this.reservation) {
+    if (['send', 'book', 'more', 'change'].indexOf(id.toString()) >= 0 && this.reservation) {
       this.machine.transition(snakeToCamel(this.reservation.state), id);
       return;
     }
@@ -238,8 +249,14 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   }
 
   private professionalMachine(self: this): any {
-    const reservationId = self.reservation?.id;
-    const initialState = self.reservation?.state;
+    if (!self.reservation) {
+      return;
+    }
+    const reservation: IReservationAll = self.reservation;
+    const reservationId = reservation.id;
+    const roomId = reservation.room.id;
+    const customerId = reservation.customer.id;
+    const initialState = reservation.state;
     const store = self.store;
     const translate = self.translate;
 
@@ -257,17 +274,18 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       ReservationIconName.book, 'book', 'primary');
     const sendMessage = this.createAction(translate.instant('RESERVATION.ACTION.SEND'),
       ReservationIconName.send, 'send', 'green');
+    const change = this.createAction(translate.instant('RESERVATION.ACTION.CHANGE'),
+      ReservationIconName.change, 'change', 'accent');
 
     const more = this.createAction(translate.instant('RESERVATION.ACTION.MORE'),
       ReservationIconName.more, 'more');
 
     let approveActions: MatFabMenu[] = [];
-    if (self.reservation && isToday(newDate(self.reservation.start))) {
+    if (isToday(newDate(reservation.start))) {
       approveActions = [start];
     }
     approveActions = [...approveActions, edit];
-    if (self.reservation && self.reservation.customer && self.reservation.customer.phone &&
-      greaterOrEqualsThanToday(newDate(self.reservation.start))) {
+    if (reservation.customer.phone && greaterOrEqualsThanToday(newDate(reservation.start))) {
       approveActions = [...approveActions, sendMessage];
     }
     approveActions = [...approveActions, more, cancel];
@@ -280,8 +298,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     });
 
     const sendMessageTransaction = ReservationDetailComponent.createTransaction('send', (): void => {
-      if (self.reservation && self.reservation.start) {
-        const startDate = newDate(self.reservation.start);
+      if (reservation.start) {
+        const startDate = newDate(reservation.start);
         let key;
         let date = getTime(startDate, this.language);
         switch (true) {
@@ -297,7 +315,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
             break;
         }
         const message = translate.instant(`WHATSAPP.SEND.${key}`, {date});
-        window.open(`https://api.whatsapp.com/send?phone=+${self.reservation.customer?.phone}&text=${message}`, '_blank');
+        window.open(`https://api.whatsapp.com/send?phone=+${reservation.customer?.phone}&text=${message}`, '_blank');
       }
     });
 
@@ -313,12 +331,15 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     });
 
     const completeTransaction = ReservationDetailComponent.createTransaction('completed', (): void => {
-      self.router.navigate(['reservation', reservationId, 'complete']);
+      self.router.navigate(['reservation', reservationId, 'rooms', roomId, 'customer', customerId, 'complete']);
     });
 
     const moreTransaction = ReservationDetailComponent.createTransaction('more', (): void => {
       self.router.navigate(['reservation', reservationId, 'more-info']);
     });
+
+    const changeCustomerTransaction = ReservationDetailComponent
+      .createTransaction('change', (): void => self.changeUser(reservation));
 
     const cancelTransaction = ReservationDetailComponent.createTransaction('cancelled', (): void => {
       self.reservation = undefined;
@@ -335,9 +356,9 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     });
 
     const bookTransaction = ReservationDetailComponent.createTransaction('booked', (): void => {
-      const customer = self.reservation?.customer;
-      const room = self.reservation?.room;
-      const product = self.reservation?.product;
+      const customer = reservation.customer;
+      const room = reservation.room;
+      const product = reservation.product;
       const data = {customer, room, product};
       this.router.navigate(['reservation'], {state: data});
     });
@@ -351,6 +372,21 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         more: moreTransaction
       },
       next: approveActions
+    };
+
+    let completeActions: MatFabMenu[] = [book];
+    if (reservation.configuration?.canCustomerChange) {
+      completeActions = [...completeActions, change];
+    }
+    completeActions = [...completeActions, more];
+
+    const completed = {
+      transitions: {
+        book: bookTransaction,
+        more: moreTransaction,
+        change: changeCustomerTransaction
+      },
+      next: completeActions
     };
 
     this.machine = ReservationDetailComponent.createMachine({
@@ -380,13 +416,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         },
         next: [complete, more]
       },
-      completed: {
-        transitions: {
-          book: bookTransaction,
-          more: moreTransaction
-        },
-        next: [book, more]
-      },
+      completed,
       cancelled: {
         next: []
       }
@@ -394,8 +424,12 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   }
 
   private customerMachine(self: this): any {
-    const reservationId = self.reservation?.id;
-    const initialState = self.reservation?.state;
+    if (!self.reservation) {
+      return;
+    }
+    const reservation: IReservationAll = self.reservation;
+    const reservationId = reservation.id;
+    const initialState = reservation.state;
     const translate = self.translate;
 
     const edit = this.createAction(translate.instant('RESERVATION.ACTION.EDIT'),
@@ -417,8 +451,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     });
 
     const bookTransaction = ReservationDetailComponent.createTransaction('booked', (): void => {
-      const room = self.reservation?.room;
-      const product = self.reservation?.product;
+      const room = reservation.room;
+      const product = reservation.product;
       const data = {room, product};
       this.router.navigate(['me', 'reservation'], {state: data});
     });
@@ -439,8 +473,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       next: [] as any[]
     };
 
-    if (self.payments && self.reservation) {
-      const price = getPrice(self.reservation);
+    if (self.payments) {
+      const price = getPrice(reservation);
       if (price.total > price.totalPaid) {
         const next = this.createAction(translate.instant('RESERVATION.ACTION.PAY'),
           ReservationIconName.payment, 'pay', 'blue');
@@ -488,5 +522,119 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         next: []
       }
     }, initialState);
+  }
+
+  private changeUser(reservation: IReservationAll): void {
+    const dialogRef = this.dialog.open(ChangeCustomerDialogComponent, {
+      width: '70vw',
+      disableClose: true,
+      data: {
+        customerId: reservation.customer.id,
+        small: this.small
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.reservation = undefined;
+        this.store.dispatch(
+          new fromActionsReservation.ChangeCustomer({customerId: result.customerId, reservationId: reservation.id})
+        );
+      }
+    });
+  }
+}
+
+@Component({
+  selector: 'app-change-customer-dialog-component',
+  templateUrl: './change-customer-dialog.component.html'
+})
+export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
+  customerForm!: FormGroup;
+  customers?: IUserAll[];
+  filteredCustomer?: Observable<IUser[] | undefined>;
+  customer: FormControl = new FormControl('', [
+    Validators.required, requireMatch
+  ]);
+
+  private getState: Observable<any>;
+  private subscription?: Subscription;
+
+  constructor(public dialogRef: MatDialogRef<DiscountDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
+              private store: Store<AppState>, private formBuilder: FormBuilder) {
+    this.getState = this.store.select(selectUserState);
+  }
+
+  ngOnInit(): void {
+    this.clean();
+    this.createForm();
+    this.createFilters();
+    this.subscribe();
+    this.getCustomers();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+  }
+
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
+
+  doAction(): void {
+    this.dialogRef.close({customerId: this.customer.value.id});
+  }
+
+  displayFnUser(user: IUser): string {
+    return user ? getUserName(user) : '';
+  }
+
+  keyDownHandler(event: any): void {
+    if (event.code === 'Backspace') {
+      this.customer.setValue('');
+    }
+  }
+
+  getUsername(user: any): string {
+    return getFullUserName(user);
+  }
+
+  private createForm(): void {
+    this.customerForm = this.formBuilder.group({
+      customer: this.customer
+    });
+  }
+
+  private createFilters(): void {
+    this.filteredCustomer = this.customer.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value.name),
+      map(name => name ? this.filterCustomer(name) : this.customers ? this.customers.slice() : this.customers)
+    );
+  }
+
+  private filterCustomer(name: string): IUser[] | undefined {
+    const filterValue = name.toLowerCase();
+
+    return this.customers?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
+  }
+
+  private getCustomers(): void {
+    this.store.dispatch(
+      new fromActionsUser.GetAllCustomers()
+    );
+  }
+
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe(state => {
+      this.customers = state.data;
+      this.customer.setValue(this.customers?.find(customer => customer.id === this.data.customerId));
+    });
+  }
+
+  private clean(): void {
+    this.store.dispatch(
+      new fromActionsUser.Clean()
+    );
   }
 }

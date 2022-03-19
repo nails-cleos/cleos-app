@@ -17,6 +17,7 @@ export class MiniCardComponent implements OnInit {
   @Input() duration?: string;
   @Input() percentValue?: number;
   @Input() error: any;
+  @Input() isLoading: any | boolean;
 
   locale: string;
 

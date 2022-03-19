@@ -14,22 +14,52 @@
         <mat-card-subtitle>{{currentUser.email}}</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content *ngIf="currentUser; else contentNoLogged">
+        <!--<div class="basic-container">
+          <span *ngFor="let item of menuItems">
+            &lt;!&ndash; Handle branch node buttons here &ndash;&gt;
+            <span *ngIf="item.subMenus && item.subMenus.length > 0">
+              <button mat-raised-button color="primary" [matMenuTriggerFor]="menu2.childMenu">
+                {{item.name}}
+                <mat-icon>expand_more</mat-icon>
+              </button>
+              <app-menu-item #menu2 [items]="item.subMenus"></app-menu-item>
+            </span>
+            &lt;!&ndash; Leaf node buttons here &ndash;&gt;
+            <span *ngIf="!item.subMenus || item.subMenus.length === 0">
+              <button mat-button color="primary" [routerLink]="item.path">
+                {{item.name}}
+              </button>
+            </span>
+          </span>
+        </div>-->
         <mat-nav-list>
-          <mat-divider></mat-divider>
-          <div *ngFor="let menu of menuItems">
-            <a (click)="navigate(menu, drawer)" *ngIf="isHandset$ | async; else showMenu"
-               [routerLinkActive]="['active']" [routerLink]="'/'+menu.path" mat-list-item>
-              <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>
-              <div mat-line>{{menu.name}}</div>
-            </a>
-            <ng-template #showMenu>
-              <a (click)="navigate(menu)" [routerLinkActive]="['active']"
-                 [routerLink]="'/'+menu.path" mat-list-item>
+          <div *ngFor="let menu of menuItems; let i = index">
+            <div *ngIf="menu.subMenus && menu.subMenus.length; else items">
+              <mat-expansion-panel #rla="routerLinkActive" (opened)="setStep(i)" [class.mat-elevation-z0]="true"
+                                   [expanded]="step === i" [ngClass]="{ 'active': rla.isActive}"
+                                   [routerLinkActiveOptions]="{ exact: true }" routerLinkActive>
+                <mat-expansion-panel-header>
+                  <mat-panel-title class="active-header-title">
+                    <mat-icon>{{menu.icon}}</mat-icon>&nbsp;{{menu.name}}
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <app-menu-item [items]="menu.subMenus" [drawer]="drawer"></app-menu-item>
+              </mat-expansion-panel>
+            </div>
+            <ng-template #items>
+              <a (click)="navigate(menu, drawer)" *ngIf="isHandset$ | async; else showMenu"
+                 [routerLinkActive]="['active']" [routerLink]="'/'+menu.path" mat-list-item>
                 <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>
                 <div mat-line>{{menu.name}}</div>
               </a>
+              <ng-template #showMenu>
+                <a (click)="navigate(menu)" [routerLinkActive]="['active']"
+                   [routerLink]="'/'+menu.path" mat-list-item>
+                  <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>
+                  <div mat-line>{{menu.name}}</div>
+                </a>
+              </ng-template>
             </ng-template>
-            <mat-divider></mat-divider>
           </div>
         </mat-nav-list>
       </mat-card-content>
@@ -49,12 +79,12 @@
             <a (click)="drawer.toggle()" *ngIf="isHandset$ | async; else showMenu" [routerLink]="'/main'"
                mat-list-item>
               <mat-icon mat-list-icon>main</mat-icon>
-              <div mat-line>{{'DASHBOARD.HOME' | translate }}</div>
+              <div mat-line>{{'COMMON.DASHBOARD.HOME' | translate }}</div>
             </a>
             <ng-template #showMenu>
               <a [routerLinkActive]="['active']" [routerLink]="'/main'" mat-list-item>
                 <mat-icon mat-list-icon>home</mat-icon>
-                <div mat-line>{{'DASHBOARD.HOME' | translate }}</div>
+                <div mat-line>{{'COMMON.DASHBOARD.HOME' | translate }}</div>
               </a>
             </ng-template>
             <mat-divider></mat-divider>
@@ -137,7 +167,7 @@
           <mat-nav-list>
             <a [routerLinkActive]="['active']" [routerLink]="'/main'" mat-list-item>
               <mat-icon mat-list-icon>home</mat-icon>
-              <div mat-line>{{'DASHBOARD.HOME' | translate }}</div>
+              <div mat-line>{{'COMMON.DASHBOARD.HOME' | translate }}</div>
             </a>
             <mat-divider></mat-divider>
             <a [routerLink]="'/auth/profile'" mat-list-item>
@@ -166,7 +196,7 @@
       <ng-template #login>
         <button color="accent" mat-raised-button routerLink="/main">
           <mat-icon>home</mat-icon>
-          <span *ngIf="(isHandset$ | async) === false">{{'DASHBOARD.HOME' | translate }}</span>
+          <span *ngIf="(isHandset$ | async) === false">{{'COMMON.DASHBOARD.HOME' | translate }}</span>
         </button>
       </ng-template>
     </mat-toolbar>
@@ -182,7 +212,7 @@
       </ng-template>
     </main>
     <footer>
-      <mat-toolbar *ngIf="(isHandset$ | async) && (isProfessional || isAdmin)" class="footer">
+      <mat-toolbar *ngIf="(isHandset$ | async) && (isProfessional || isManager || isAdmin)" class="footer">
         <a [routerLinkActive]="['active-link']" routerLink="/reservation/calendar">
           <mat-icon>event</mat-icon>
         </a>

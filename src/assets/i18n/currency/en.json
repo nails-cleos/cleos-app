@@ -1,0 +1,33 @@
+{
+  "CURRENCY": {
+    "TITLE": "Add currency",
+    "CREATED": "Currency {{code}} created",
+    "DETAIL": "Update currency",
+    "LIST": {
+      "COLUMN": {
+        "CODE": "Code"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No currency"
+      }
+    },
+    "CODE": {
+      "FIELD": "Code",
+      "REQUIRED": "Code is <b>required</b>"
+    },
+    "ICON": {
+      "FIELD": "Icon"
+    },
+    "NAME": {
+      "FIELD": "Name"
+    },
+    "DELETED": {
+      "TITLE": "Delete currency",
+      "CONTENT": "Are you sure to delete currency {{code}}?",
+      "MESSAGE": "Currency {{code}} deleted"
+    },
+    "UPDATED": {
+      "MESSAGE": "Currency {{code}} updated"
+    }
+  }
+}

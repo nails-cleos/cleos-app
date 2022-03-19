@@ -1,11 +1,15 @@
 import { Pagination } from '../../interfaces/pagination';
 import { All, RoomActionTypes } from '../room.actions';
-import { IRoom } from '../../interfaces/room';
+import { IRoom, IRoomService } from '../../interfaces/room';
 import { IUser } from '../../interfaces/user';
+import { ICurrency } from '../../interfaces/currency';
 
 export interface State {
   data: IRoom | Pagination<IRoom> | null;
+  services: IRoomService | null;
   professionals: IUser[] | null;
+  currencies: ICurrency[] | null;
+  offices: IUser[] | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -16,7 +20,10 @@ export interface State {
 
 export const initialState: State = {
   data: null,
+  services: null,
   professionals: null,
+  currencies: null,
+  offices: null,
   errorMessage: null,
   error: null,
   subErrors: null,
@@ -38,17 +45,18 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
-    case RoomActionTypes.getAllProfessional: {
+    case RoomActionTypes.getRoomInfo: {
       return {
         ...state,
         professionals: null,
+        currencies: null,
+        offices: null,
         errorMessage: null,
         subErrors: null,
         selected: null,
         message: null
       };
     }
-    case RoomActionTypes.getMyRoom:
     case RoomActionTypes.roomFind: {
       return {
         ...state,
@@ -59,11 +67,37 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
+    case RoomActionTypes.getMyService: {
+      return {
+        ...state,
+        services: {
+          currency: {},
+          products: [],
+          selectedProducts: [],
+          additionalList: [],
+          selectedAdditionalList: []
+        } as IRoomService,
+        errorMessage: null,
+        subErrors: null,
+        selected: null,
+        message: null
+      };
+    }
+    case RoomActionTypes.roomInfoSuccess: {
+      return {
+        ...state,
+        professionals: action.payload.professionals,
+        offices: action.payload.offices,
+        currencies: action.payload.currencies,
+        errorMessage: null,
+        subErrors: null,
+        message: null
+      };
+    }
     case RoomActionTypes.roomSuccess: {
       return {
         ...state,
         data: action.payload,
-        professionals: action.payload,
         errorMessage: null,
         subErrors: null,
         message: null
@@ -88,6 +122,15 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
+    case RoomActionTypes.roomServiceSelected: {
+      return {
+        ...state,
+        services: action.payload,
+        errorMessage: null,
+        subErrors: null,
+        message: null
+      };
+    }
     case RoomActionTypes.roomFailure: {
       return {
         ...state,
@@ -98,6 +141,7 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false
       };
     }
+    case RoomActionTypes.roomServiceUpdate:
     case RoomActionTypes.roomUpdate:
     case RoomActionTypes.roomSave:
     case RoomActionTypes.roomDelete: {

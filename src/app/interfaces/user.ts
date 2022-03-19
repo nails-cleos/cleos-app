@@ -1,6 +1,7 @@
 import { IReservationOverview } from './reservation';
 import { Theme } from '../util/theme';
 import { IChart } from './dashboard';
+import { MatMenuPanel } from '@angular/material/menu';
 
 export interface IUser {
   id?: string;
@@ -35,11 +36,13 @@ export interface IUserAll {
   authorities: IAuthority[];
   imageUrl?: string;
   image?: any;
+  lang?: string;
   locale: string;
   phone?: string;
   dob?: string;
   referralMax?: number;
   theme?: Theme;
+  changePassword: boolean;
 }
 
 export interface IAuthority {
@@ -50,6 +53,8 @@ export interface IMenu {
   name: string;
   path: string;
   icon: string;
+  subMenus: IMenu[];
+  tooltip?: string;
 }
 
 export interface IOverview {

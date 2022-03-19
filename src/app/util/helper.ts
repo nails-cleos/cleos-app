@@ -1,10 +1,13 @@
 import { DiscountType, IDiscount } from '../interfaces/discount';
 import { IUser, IUserAll } from '../interfaces/user';
-import { IPrice, IProductGroup, Price } from '../interfaces/product';
+import { GroupService, IGroupService, IPrice, IProductAll, IProductGroup, Price } from '../interfaces/product';
 import { IPayment } from '../interfaces/payment';
 import { IReservationAll } from '../interfaces/reservation';
 import { IAdditionalAll } from '../interfaces/additional';
 import { TranslateService } from '@ngx-translate/core';
+import { IRoom, IRoomAll, ServiceType } from '../interfaces/room';
+import { IOffice } from '../interfaces/office';
+import { ICurrency } from '../interfaces/currency';
 
 export const snakeToCamel = (value: string = ''): string =>
   value.toLowerCase().replace(/([-_]\w)/g, (g: string) => g[1].toUpperCase());
@@ -196,6 +199,62 @@ export const groupDurability = (group: IProductGroup, translate: TranslateServic
   }
 
   return translate.instant(key, {min, max});
+};
+
+export const createProductGroupService = (groups: Map<string, GroupService>, list: IProductAll[], currency: string,
+                                          isSelected: boolean = false): Map<string, GroupService> => {
+  list.forEach((product: IProductAll) => {
+    const groupId = product.group.id;
+    const mapGroup = groups.get(groupId);
+    const keyGroup: IGroupService = mapGroup ? mapGroup : new GroupService(groupId, product.group.name);
+
+    product = Object.assign({}, product, {currency, type: ServiceType.product});
+
+    if (isSelected) {
+      keyGroup.selectedProducts = [...keyGroup.selectedProducts, product];
+    } else {
+      keyGroup.products = [...keyGroup.products, product];
+    }
+    groups.set(groupId, keyGroup);
+  });
+
+  return groups;
+};
+
+export const createRoomOffice = (rooms: IRoom[] | undefined): Map<string, IOffice> | undefined =>
+  rooms?.reduce((oMap: Map<string, IOffice>, room: IRoom) => {
+    const officeId = room.office?.id;
+    if (officeId) {
+      let of = oMap.get(officeId);
+      if (of && of.rooms) {
+        of.rooms = [...of.rooms, room];
+      } else if (room.office) {
+        of = Object.assign({}, room.office, {rooms: [room]});
+      } else {
+        return oMap;
+      }
+      oMap.set(officeId, of);
+    }
+    return oMap;
+  }, new Map<string, IOffice>());
+
+export const roomName = (room: IRoom | IRoomAll): string => {
+  if (room.address) {
+    return `${room.currency?.code} - ${room.address.name}`;
+  }
+
+  return '';
+};
+
+export const currencySymbol = (currency: ICurrency): string => {
+  switch (currency.icon) {
+    case 'euro':
+      return '€';
+    case 'currency_pound':
+      return '£';
+    default:
+      return '$';
+  }
 };
 
 const totalPaid = (payments: IPayment[] | undefined): number => {

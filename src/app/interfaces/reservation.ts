@@ -22,6 +22,8 @@ export interface IReservation {
   start?: string;
   state?: string;
   review?: IReview;
+  canCustomerChange?: boolean;
+  reference?: string;
 }
 
 export interface IReservationAll {
@@ -34,9 +36,15 @@ export interface IReservationAll {
   review?: IReview;
   history?: IReservationAll[];
   additional?: IAdditionalAll[];
+  configuration?: IConfigurationReservation;
 }
 
-export interface IUpcomingAll extends IReservationAll{
+export interface IConfigurationReservation {
+  canCustomerChange: boolean;
+  reference: string;
+}
+
+export interface IUpcomingAll extends IReservationAll {
   payments: IPayment[];
   price: IPrice;
   end: Date;

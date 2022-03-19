@@ -21,7 +21,7 @@ export class DashboardEffects {
 
   getCards$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.dashboardCards)).pipe(
     map((action: any) => action.payload),
-    switchMap(() => this.dashboardService.getCards().pipe(
+    switchMap((payload: any) => this.dashboardService.getCards(payload).pipe(
       switchMap((response: any) => of(new fromActionsDashboard.DashboardSuccess(response ? response : []))),
       catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashboardFailure({error: err.error})))
     ))

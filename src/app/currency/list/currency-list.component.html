@@ -1,0 +1,95 @@
+<div class="mat-elevation-z8">
+  <table [dataSource]="dataSource" mat-table matSort matSortActive="code" matSortDirection="asc" matSortDisableClear
+         multiTemplateDataRows>
+    <ng-container matColumnDef="position">
+      <th *matHeaderCellDef mat-header-cell>#</th>
+      <td *matCellDef="let currency; let i = dataIndex;" mat-cell>
+        <div *ngIf="currency.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="code">
+      <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'CURRENCY.LIST.COLUMN.CODE' | translate }}</th>
+      <td *matCellDef="let currency" mat-cell>
+        <div *ngIf="currency.id; else skeleton">{{currency.code}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="name">
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+          mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
+      <td *matCellDef="let currency" fxHide.lt-sm fxShow mat-cell>
+        <div *ngIf="currency.id; else skeleton">{{currency.name}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+      <td *matCellDef="let currency" fxHide.lt-sm fxShow mat-cell>
+        <div *ngIf="currency.id; else skeleton">
+          <button (click)="edit(currency)" *ngIf="!currency.deleted" mat-icon-button
+                  matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
+            <mat-icon color="primary">edit</mat-icon>
+          </button>
+          <button (click)="delete(currency)" mat-icon-button
+                  matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
+            <mat-icon color="warn">delete</mat-icon>
+          </button>
+        </div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="expandedDetail">
+      <td *matCellDef="let currency" [attr.colspan]="displayedColumns.length" fxHide fxShow.lt-sm>
+        <div [@detailExpand]="currency === expanded ? 'expanded' : 'collapsed'" class="detail" fxHide fxShow.lt-sm>
+          <mat-list>
+            <div mat-subheader>{{ 'COMMON.COLUMN.NAME' | translate }}</div>
+            <mat-list-item role="list">
+              <mat-icon mat-list-icon>{{currency.icon}}</mat-icon>
+              <div mat-line>{{currency.name}}</div>
+            </mat-list-item>
+            <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+            <mat-list-item role="list">
+              <button (click)="edit(currency)" *ngIf="!currency.deleted" color="primary" mat-icon-button>
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button (click)="delete(currency)" *ngIf="!currency.deleted" color="warn" mat-icon-button>
+                <mat-icon>delete</mat-icon>
+              </button>
+            </mat-list-item>
+          </mat-list>
+        </div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="noContent">
+      <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+        {{ 'CURRENCY.LIST.ERROR.NO_CONTENT' | translate }}</td>
+    </ng-container>
+
+    <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+    <tr (click)="expanded = expanded === currency ? null : currency"
+        *matRowDef="let currency; columns: displayedColumns;" class="row" mat-row></tr>
+    <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row></tr>
+
+    <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
+  </table>
+  <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+
+  <button color="accent" id="add-button" mat-fab matTooltip="{{ 'CURRENCY.TITLE' | translate }}"
+          routerLink="/currency/add">
+    <mat-icon>add</mat-icon>
+  </button>
+</div>

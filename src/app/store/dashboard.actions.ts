@@ -17,6 +17,9 @@ export class GetEvents implements Action {
 
 export class GetCards implements Action {
   readonly type = DashboardActionTypes.dashboardCards;
+
+  constructor(public payload: any) {
+  }
 }
 
 export class DashboardSuccess implements Action {

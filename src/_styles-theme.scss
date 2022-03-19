@@ -19,6 +19,12 @@
     }
   }
 
+  .active {
+    .active-header-title {
+      color: mat.get-color-from-palette($primary-palette);
+    }
+  }
+
   .mat-list-item.active {
     color: mat.get-color-from-palette($primary-palette);
   }
@@ -393,6 +399,27 @@
   #error-box {
     border-color: mat.get-color-from-palette($warn-palette, darker);
     background-color: mat.get-color-from-palette($warn-palette);
+  }
+
+  .drag-container {
+    background-color: mat.get-color-from-palette($background, hover);
+  }
+
+  .cdk-drag-preview {
+    box-shadow: 0 5px 5px -3px mat.get-color-from-palette($background, shadow),
+    0 8px 10px 1px mat.get-color-from-palette($background, hover),
+    0 3px 14px 2px mat.get-color-from-palette($background, hover);
+  }
+
+  .item-box {
+    background: mat.get-color-from-palette($background, background);
+    border: solid 1px mat.get-color-from-palette($background, background);
+    color: mat.get-color-from-palette($foreground, text);
+  }
+
+  .spinner:before {
+    border: 2px solid mat.get-color-from-palette($primary-palette);
+    border-top-color: mat.get-color-from-palette($background, hover);
   }
 }
 

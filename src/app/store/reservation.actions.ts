@@ -5,14 +5,30 @@ export enum ReservationActionTypes {
   getCustomerReservations = '[Reservation] Get customer reservations',
   getAllFilterPage = '[Reservation] Get all filter page',
   getAllGroupingByRoom = '[Reservation] Get all grouping by room',
-  searchReservation = '[Reservation] Search reservation',
-  customerSearchReservation = '[Reservation] Customer search reservation',
   getCustomers = '[Reservation] Get customers',
   getCustomerInfo = '[Reservation] Get customer info',
-  getProducts = '[Reservation] Get products',
+  getServices = '[Reservation] Get services',
   getRooms = '[Reservation] Get rooms',
   getAdditional = '[Reservation] Get additional',
   getUpcomingReservation = '[Reservation] Get upcoming reservation',
+  searchReservation = '[Reservation] Search reservation',
+  customerSearchReservation = '[Reservation] Customer search reservation',
+  reservationFind = '[Reservation] Find',
+  reservationFindPayments = '[Reservation] Find payments',
+  findTracking = '[Reservation] Find tracking',
+  reservationSave = '[Reservation] Save',
+  reservationSelected = '[Reservation] Selected',
+  reservationDelete = '[Reservation] Delete',
+  reservationReview = '[Reservation] Review',
+  approve = '[Reservation] Approve',
+  edit = '[Reservation] Edit',
+  start = '[Reservation] Start',
+  complete = '[Reservation] Complete',
+  paymentComplete = '[Reservation] Payment complete',
+  cancel = '[Reservation] Cancel',
+  customerCancel = '[Reservation] Customer cancel',
+  changeCustomer = '[Reservation] Change customer reservation',
+  stateSuccess = '[Reservation] State success',
   reservationSuccess = '[Reservation] Success',
   reservationPageSuccess = '[Reservation] Page Success',
   reservationFilterPageSuccess = '[Reservation] Filter Page Success',
@@ -22,25 +38,10 @@ export enum ReservationActionTypes {
   reservationAdditionalSuccess = '[Reservation] Additional success',
   reservationRoomsSuccess = '[Reservation] Rooms success',
   reservationPaymentsSuccess = '[Reservation] Payments success',
-  reservationSave = '[Reservation] Save',
   reservationSaveSuccess = '[Reservation] Save Success',
   reservationsCustomerSuccess = '[Reservation] reservations customer Success',
-  reservationFailure = '[Reservation] Failure',
-  reservationSelected = '[Reservation] Selected',
-  reservationFind = '[Reservation] Find',
-  reservationFindPayments = '[Reservation] Find payments',
-  reservationDelete = '[Reservation] Delete',
-  approve = '[Reservation] Approve',
-  edit = '[Reservation] Edit',
-  start = '[Reservation] Start',
-  complete = '[Reservation] Complete',
-  paymentComplete = '[Reservation] Payment complete',
-  cancel = '[Reservation] Cancel',
-  customerCancel = '[Reservation] Customer cancel',
-  stateSuccess = '[Reservation] State success',
-  findTracking = '[Reservation] Find tracking',
   trackingSuccess = '[Reservation] Tracking success',
-  reservationReview = '[Reservation] Review',
+  reservationFailure = '[Reservation] Failure',
   reservationCompleteSuccess = '[Reservation] Complete success',
   clean = '[Reservation] Clean'
 }
@@ -98,8 +99,8 @@ export class GetCustomerInfo implements Action {
   }
 }
 
-export class GetAllProducts implements Action {
-  readonly type = ReservationActionTypes.getProducts;
+export class GetAllServices implements Action {
+  readonly type = ReservationActionTypes.getServices;
 
   constructor(public payload?: any) {
   }
@@ -320,6 +321,13 @@ export class ReservationReview implements Action {
   }
 }
 
+export class ChangeCustomer implements Action {
+  readonly type = ReservationActionTypes.changeCustomer;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class Clean implements Action {
   readonly type = ReservationActionTypes.clean;
 }
@@ -333,7 +341,7 @@ export type All =
   | CustomerSearchReservation
   | GetAllCustomers
   | GetCustomerInfo
-  | GetAllProducts
+  | GetAllServices
   | GetAllRooms
   | GetAllAdditional
   | GetUpcomingReservation
@@ -366,4 +374,5 @@ export type All =
   | TrackingSuccess
   | ReservationReview
   | ReservationCompleteSuccess
+  | ChangeCustomer
   | Clean;

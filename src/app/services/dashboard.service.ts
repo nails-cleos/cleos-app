@@ -11,8 +11,9 @@ export class DashboardService {
   constructor(private http: HttpClient) {
   }
 
-  public getCards(): Observable<ICardSummary> {
-    return this.http.get<ICardSummary>(`${this.url}/cards`);
+  public getCards(date: Date): Observable<ICardSummary> {
+    const params = new HttpParams().set('date', date.toISOString().slice(0, 10));
+    return this.http.get<ICardSummary>(`${this.url}/cards`, {params});
   }
 
   public getEvents(date: Date): Observable<IEventSummary> {

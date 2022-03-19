@@ -2,14 +2,17 @@ import { Action } from '@ngrx/store';
 
 export enum RoomActionTypes {
   getAll = '[Room] Get all',
-  getMyRoom = '[Room] Get my room',
-  getAllProfessional = '[Room] Get all professional',
+  getMyService = '[Room] Get my services',
+  getRoomInfo = '[Room] Get room info',
+  roomInfoSuccess = '[Room] Info Success',
   roomSuccess = '[Room] Success',
   roomSave = '[Room] Save',
   roomUpdate = '[Room] Update',
+  roomServiceUpdate = '[Room] Service update',
   roomSaveSuccess = '[Room] Save Success',
   roomFailure = '[Room] Failure',
   roomSelected = '[Room] Selected',
+  roomServiceSelected = '[Room] Selected services',
   roomFind = '[Room] Find',
   roomDelete = '[Room] Delete',
   clean = '[Room] Clean'
@@ -22,12 +25,22 @@ export class GetAll implements Action {
   }
 }
 
-export class GetMyRoom implements Action {
-  readonly type = RoomActionTypes.getMyRoom;
+export class GetMyServices implements Action {
+  readonly type = RoomActionTypes.getMyService;
+
+  constructor(public payload: any) {
+  }
 }
 
-export class GetAllProfessional implements Action {
-  readonly type = RoomActionTypes.getAllProfessional;
+export class GetRoomInfo implements Action {
+  readonly type = RoomActionTypes.getRoomInfo;
+}
+
+export class RoomInfoSuccess implements Action {
+  readonly type = RoomActionTypes.roomInfoSuccess;
+
+  constructor(public payload: any) {
+  }
 }
 
 export class RoomSuccess implements Action {
@@ -46,6 +59,13 @@ export class RoomSave implements Action {
 
 export class RoomUpdate implements Action {
   readonly type = RoomActionTypes.roomUpdate;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class UpdateMyServices implements Action {
+  readonly type = RoomActionTypes.roomServiceUpdate;
 
   constructor(public payload: any) {
   }
@@ -72,6 +92,13 @@ export class RoomSelected implements Action {
   }
 }
 
+export class RoomServiceSelected implements Action {
+  readonly type = RoomActionTypes.roomServiceSelected;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class RoomFind implements Action {
   readonly type = RoomActionTypes.roomFind;
 
@@ -92,14 +119,17 @@ export class Clean implements Action {
 
 export type All =
   | GetAll
-  | GetMyRoom
-  | GetAllProfessional
+  | GetMyServices
+  | GetRoomInfo
+  | RoomInfoSuccess
   | RoomSave
   | RoomUpdate
+  | UpdateMyServices
   | RoomSuccess
   | RoomSaveSuccess
   | RoomFailure
   | RoomFind
   | RoomSelected
+  | RoomServiceSelected
   | DeleteRoom
   | Clean;

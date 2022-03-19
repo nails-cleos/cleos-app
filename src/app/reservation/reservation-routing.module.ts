@@ -12,37 +12,41 @@ import { ReservationCompleteComponent } from './detail/complete/reservation-comp
 const routes: Routes = [
   {
     path: 'search', component: SearchComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.professional]
+      roles: [Role.admin, Role.manager, Role.professional]
     }
   },
   {
     path: 'calendar', component: CalendarComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.professional]
+      roles: [Role.admin, Role.manager, Role.professional]
     }
   },
   {
     path: '', component: ReservationComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.professional] // TODO Customer not allowed
+      roles: [Role.admin, Role.manager, Role.professional] // TODO Customer not allowed
     }
   },
   {
     path: ':id/edit', component: ReservationComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.professional] // TODO Customer not allowed
+      roles: [Role.admin, Role.manager, Role.professional] // TODO Customer not allowed
     }
   },
   {
     path: ':id', component: ReservationDetailComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.professional, Role.customer]
+      roles: [Role.admin, Role.manager, Role.professional, Role.customer]
     }, runGuardsAndResolvers: 'always'
   },
   {
-    path: ':id/complete', component: ReservationCompleteComponent, canActivate: [AuthGuardService], data: {
+    path: ':id/rooms/:roomId/customer/:customerId/complete',
+    component: ReservationCompleteComponent,
+    canActivate: [AuthGuardService],
+    data: {
       roles: [Role.professional]
-    }, runGuardsAndResolvers: 'always'
+    },
+    runGuardsAndResolvers: 'always'
   },
   {
     path: ':id/more-info', component: MoreInfoComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.professional]
+      roles: [Role.professional, Role.manager]
     }, runGuardsAndResolvers: 'always'
   }];
 

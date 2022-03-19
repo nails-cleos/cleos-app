@@ -8,14 +8,6 @@ import { environment } from '../../environments/environment';
 export class NoopInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    if (req.url.indexOf('i18n') === -1) {
-      req = req.clone({url: `${environment.baseUrl}/${req.url}`});
-    } else {
-      const match = req.url.match(/([-_])/);
-      const url = !match ? req.url : `${req.url.substr(0, match.index)}.json`;
-      req = req.clone({url});
-    }
-
-    return next.handle(req);
+    return next.handle(req.clone({url: `${environment.baseUrl}/${req.url}`}));
   }
 }

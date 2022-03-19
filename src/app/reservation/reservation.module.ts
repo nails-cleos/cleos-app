@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { HttpClient } from '@angular/common/http';
 import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
 import { AgmCoreModule } from '@agm/core';
 import { CalendarModule } from 'angular-calendar';
@@ -10,7 +9,7 @@ import { environment } from '../../environments/environment';
 
 import { SearchComponent } from './search/search.component';
 import { ReservationComponent } from './reservation.component';
-import { ReservationDetailComponent } from './detail/reservation-detail.component';
+import { ChangeCustomerDialogComponent, ReservationDetailComponent } from './detail/reservation-detail.component';
 import { MoreInfoComponent } from './detail/more-info/more-info.component';
 import { CalendarComponent, CalendarDialogComponent } from './calendar/calendar.component';
 import { MatStepperModule } from '@angular/material/stepper';
@@ -18,7 +17,6 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatRadioModule } from '@angular/material/radio';
 import { ReservationCompleteComponent } from './detail/complete/reservation-complete.component';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { EffectsModule } from '@ngrx/effects';
 import { PaymentService } from '../services/payment.service';
 import { ReservationEffects } from '../store/effects/reservation.effects';
@@ -29,9 +27,7 @@ import { UserService } from '../services/user.service';
 import { AdditionalService } from '../services/additional.service';
 import { PaymentEffects } from '../store/effects/payment.effects';
 import { TrackingService } from '../services/tracking.service';
-
-export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
-  new TranslateHttpLoader(http, './assets/i18n/reservation/', '.json');
+import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
 
 @NgModule({
   declarations: [
@@ -41,7 +37,8 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
     MoreInfoComponent,
     CalendarComponent,
     CalendarDialogComponent,
-    ReservationCompleteComponent
+    ReservationCompleteComponent,
+    ChangeCustomerDialogComponent
   ],
   imports: [
     ReservationRoutingModule,
@@ -57,7 +54,10 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
     MatChipsModule,
     MatExpansionModule,
     TranslateModule.forChild({
-      loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient]},
+      loader: {
+        provide: TranslateLoader,
+        useClass: TranslateLoaderFactory.forModule('reservation')
+      },
       isolate: false,
       extend: true
     }),

@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { IUpcomingAll } from '../../../interfaces/reservation';
-import { getPrice, getUserName } from '../../../util/helper';
+import { currencySymbol, getPrice, getUserName } from '../../../util/helper';
 import { TranslateService } from '@ngx-translate/core';
 import { stampAnimation, transitionAnimation } from '../../../util/animation';
 import { createNewDate, newDate, reservationDuration } from '../../../util/dates';
@@ -27,10 +27,14 @@ export class UpcomingComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.createChart();
+    this.loadUpcoming();
   }
 
-  private createChart(): void {
+  getCurrencySymbol(): string {
+    return this.upcoming ? currencySymbol(this.upcoming.room.currency) : '';
+  }
+
+  private loadUpcoming(): void {
     if (this.upcoming && this.upcoming.id) {
       let rowSpan = 0;
       if (this.upcoming.additional) {

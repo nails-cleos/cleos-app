@@ -26,7 +26,7 @@
                            [expanded]="professionalId === rr.room.professional.id || i === 0">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <p class="bold">{{rr.room.name}}</p>
+            <p class="bold">{{getRoomName(rr.room)}}</p>
           </mat-panel-title>
         </mat-expansion-panel-header>
         <mwl-calendar-week-view

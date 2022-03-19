@@ -6,26 +6,32 @@ import { RoomsComponent } from './list/rooms.component';
 import { RoomComponent } from './room.component';
 import { RoomMeComponent } from './me/room-me.component';
 import { RoomDetailComponent } from './detail/room-detail.component';
+import { AddServiceComponent } from './me/add-service/add-service.component';
 
 const routes: Routes = [
   {
     path: '', component: RoomsComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin]
+      roles: [Role.admin, Role.manager]
     }
   },
   {
     path: 'add', component: RoomComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin]
+      roles: [Role.admin, Role.manager]
     }
   },
   {
-    path: 'me', component: RoomMeComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.professional]
+    path: ':id/services', component: AddServiceComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.manager]
+    }
+  },
+  {
+    path: 'me/:id', component: RoomMeComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.professional, Role.manager]
     }
   },
   {
     path: ':id', component: RoomDetailComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin]
+      roles: [Role.admin, Role.manager]
     }
   }
 ];

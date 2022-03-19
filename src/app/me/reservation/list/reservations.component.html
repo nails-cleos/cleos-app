@@ -7,12 +7,13 @@
             <mat-card-title>{{ 'ME.RESERVATION.UPCOMING.TITLE' | translate }}</mat-card-title>
             <mat-tab-group class="mat-elevation-z4">
               <mat-tab *ngFor="let up of upcoming" label="{{up.start  | date:'short':undefined:language}}">
-                <app-upcoming [upcoming]="up" [showHeader]="false"></app-upcoming>
+                <app-upcoming [showHeader]="false" [upcoming]="up"></app-upcoming>
               </mat-tab>
             </mat-tab-group>
           </div>
           <ng-template #onlyOne>
-            <app-upcoming *ngIf="upcoming" [upcoming]="upcoming[0]" [showHeader]="true"></app-upcoming>
+            <app-upcoming *ngIf="upcoming" [showHeader]="true"
+                          [upcoming]="upcoming[0]"></app-upcoming>
           </ng-template>
         </div>
         <ng-template #noUpcoming>
@@ -70,7 +71,8 @@
     </ng-container>
 
     <ng-container matColumnDef="product">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.PRODUCT' | translate }}</th>
+      <th *matHeaderCellDef fxHide.lt-sm fxShow
+          mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.PRODUCT' | translate }}</th>
       <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="reservation.id; else skeleton">{{reservation.product.name}}</div>
         <ng-template #skeleton>

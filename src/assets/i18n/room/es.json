@@ -3,9 +3,11 @@
     "TITLE": "Agregar sala",
     "CREATED": "Sala {{name}} creada",
     "DETAIL": "Actualizar sala",
-    "ME": "Mi sala",
     "LIST": {
       "COLUMN": {
+        "CURRENCY": "Moneda",
+        "OFFICE": "Oficina",
+        "ADDRESS": "Dirección",
         "PROFESSIONAL": "Profesional",
         "AVAILABILITY": {
           "FIELD": "Disponibilidad",
@@ -27,6 +29,12 @@
       "REQUIRED": "Profesional es <b>requerido</b>",
       "INVALID": "Profesional no valido",
       "ADD_BUTTON": "Agregar profesional"
+    },
+    "OFFICE": {
+      "FIELD": "Oficina",
+      "REQUIRED": "Oficina es <b>requerido</b>",
+      "INVALID": "Oficina no valido",
+      "ADD_BUTTON": "Agregar oficina"
     },
     "AVAILABILITY": {
       "FIELD": "Disponibilidad",
@@ -66,6 +74,30 @@
     },
     "UPDATED": {
       "MESSAGE": "Sala {{name}} actualizada"
+    },
+    "ME": {
+      "TITLE": "Mi Sala",
+      "SERVICES": {
+        "TITLE": "Mis servicios",
+        "ADD": "Agregar precio",
+        "ALL": "Todos",
+        "SELECTED": "Seleccionados",
+        "ADDITIONAL": {
+          "TITLE": "Adicionales"
+        },
+        "PRODUCT": {
+          "TITLE": "Servicios"
+        },
+        "PRICE": {
+          "TEXT": "¿Cuál es el precio para {{name}}?",
+          "FIELD": "Precio",
+          "REQUIRED": "Precio es <b>requerido</b>",
+          "GREATER": "Precio debe ser mayor a 1"
+        },
+        "UPDATE": {
+          "MESSAGE": "Servicios de la sala actualizados"
+        }
+      }
     }
   }
 }

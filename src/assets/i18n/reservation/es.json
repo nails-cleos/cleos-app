@@ -23,6 +23,8 @@
       "REQUIRED": "Cliente es <b>requerido</b>",
       "INVALID": "Cliente no valido",
       "ADD_BUTTON": "Agregar cliente",
+      "CHANGE": "Cambiar cliente",
+      "UPDATE": "Actualizar cliente",
       "INFO": {
         "NONE": "El cliente no tiene reservas",
         "DAYS": "La última reserva fue hace {{days}} días",
@@ -32,6 +34,7 @@
     },
     "ROOM": {
       "TITLE": "Agregar sala",
+      "NO_CONTENT": "No hay salas",
       "DETAIL": "Detalle",
       "NAME": {
         "FIELD": "Nombre"
@@ -118,7 +121,8 @@
       "CANCEL": "Cancelar",
       "BOOK": "Reservar nuevamente",
       "SEND": "Enviar Whatsapp",
-      "MORE": "Más"
+      "MORE": "Más",
+      "CHANGE": "Cambiar cliente"
     },
     "CHANGE_STATE": {
       "TITLE": "Cambio de estado",
@@ -146,7 +150,8 @@
       "APPROVE": "La reserva fue aprobada",
       "START": "La reserva se inició",
       "COMPLETE": "La reserva se completó",
-      "CANCEL": "La reserva se canceló"
+      "CANCEL": "La reserva se canceló",
+      "CHANGE_CUSTOMER": "Cliente actualizado"
     },
     "UNAVAILABLE": {
       "TITLE": "Agregar no disponible"
@@ -154,6 +159,16 @@
     "ADDITIONAL": {
       "DURATION": {
         "FIELD": "Duración"
+      }
+    },
+    "CONFIGURATION": {
+      "TITLE": "Configuración",
+      "REFERENCE": {
+        "FIELD": "Referencia",
+        "REQUIRED": "La referencia es <b>requerida</b>"
+      },
+      "CUSTOMER_CHANGE": {
+        "FIELD": "Se puede cambiar el cliente"
       }
     }
   },

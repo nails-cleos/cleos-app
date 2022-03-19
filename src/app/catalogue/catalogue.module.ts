@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { HttpClient } from '@angular/common/http';
 import { SharedModule } from '../shared/shared.module';
 import { CatalogueRoutingModule } from './catalogue-routing.module';
 import { DragDropDirective } from '../directives/drag-drop.directive';
@@ -10,13 +9,10 @@ import { CataloguesComponent } from './list/catalogues.component';
 import { CatalogueDetailComponent } from './detail/catalogue-detail.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { EffectsModule } from '@ngrx/effects';
 import { CatalogueEffects } from '../store/effects/catalogue.effects';
 import { CatalogueService } from '../services/catalogue.service';
-
-export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
-  new TranslateHttpLoader(http, './assets/i18n/catalogue/', '.json');
+import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
 
 @NgModule({
   declarations: [
@@ -31,7 +27,10 @@ export const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
     MatProgressBarModule,
     DragDropModule,
     TranslateModule.forChild({
-      loader: {provide: TranslateLoader, useFactory: httpLoaderFactory, deps: [HttpClient]},
+      loader: {
+        provide: TranslateLoader,
+        useClass: TranslateLoaderFactory.forModule('catalogue')
+      },
       isolate: false,
       extend: true
     }),

@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { Discount, DiscountType, IDiscount } from '../../interfaces/discount';
+import { Discount, DiscountType, IDiscount, IDiscountAll } from '../../interfaces/discount';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -14,11 +14,9 @@ import * as fromActionsDiscount from '../../store/discount.actions';
   styleUrls: ['./discount-detail.component.scss']
 })
 export class DiscountDetailComponent implements OnInit, AfterViewInit, OnDestroy {
+  @Input() discount?: IDiscountAll;
 
-  @Input() discount: IDiscount | undefined;
   form!: FormGroup;
-  subscription: Subscription | undefined;
-  getState: Observable<any>;
   errors: any = [];
 
   name: FormControl = new FormControl('', [
@@ -32,6 +30,9 @@ export class DiscountDetailComponent implements OnInit, AfterViewInit, OnDestroy
   ]);
 
   types = DiscountType;
+
+  private subscription?: Subscription;
+  private getState: Observable<any>;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
               private router: Router) {
@@ -82,8 +83,9 @@ export class DiscountDetailComponent implements OnInit, AfterViewInit, OnDestroy
           name: state.selected.name,
           description: state.selected.description,
           amount: state.selected.amount,
-          type: state.selected.type
-        } as IDiscount;
+          type: state.selected.type,
+          currency: state.selected.currency
+        } as IDiscountAll;
 
         this.form.patchValue(this.discount);
       }

@@ -4,9 +4,11 @@ export enum DiscountActionTypes {
   getAll = '[Discount] Get all',
   getMyDiscounts = '[Discount] get my discounts',
   getReferrals = '[Discount] get my referrals',
+  getCurrencies = '[Discount] get currencies',
   addDiscount = '[Discount] Add discount',
   discountSuccess = '[Discount] Success',
   referralSuccess = '[Discount] referral Success',
+  currencySuccess = '[Discount] currency Success',
   discountSave = '[Discount] Save',
   discountUpdate = '[Discount] Update',
   discountSaveSuccess = '[Discount] Save Success',
@@ -35,6 +37,10 @@ export class GetReferrals implements Action {
   readonly type = DiscountActionTypes.getReferrals;
 }
 
+export class GetCurrencies implements Action {
+  readonly type = DiscountActionTypes.getCurrencies;
+}
+
 export class AddDiscount implements Action {
   readonly type = DiscountActionTypes.addDiscount;
 
@@ -51,6 +57,13 @@ export class DiscountSuccess implements Action {
 
 export class ReferralSuccess implements Action {
   readonly type = DiscountActionTypes.referralSuccess;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class CurrencySuccess implements Action {
+  readonly type = DiscountActionTypes.currencySuccess;
 
   constructor(public payload: any) {
   }
@@ -113,11 +126,13 @@ export type All =
   | GetAll
   | GetMyDiscounts
   | GetReferrals
+  | GetCurrencies
   | AddDiscount
   | DiscountSave
   | DiscountUpdate
   | DiscountSuccess
   | ReferralSuccess
+  | CurrencySuccess
   | DiscountSaveSuccess
   | DiscountFailure
   | DiscountFind

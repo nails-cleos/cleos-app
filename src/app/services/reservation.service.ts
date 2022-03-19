@@ -14,7 +14,7 @@ export class ReservationService {
   constructor(private http: HttpClient) {
   }
 
-  public getAllPage(sort: string, direction: string, page: number, size: number = PAGE_SIZE): Observable<IReservation[]> {
+  public getAllPage(roomId: string, sort: string, direction: string, page: number, size: number = PAGE_SIZE): Observable<IReservation[]> {
     let params = new HttpParams().set('page', String(page)).set('size', String(size));
     if (sort) {
       params = params.append('sort', sort);
@@ -23,7 +23,7 @@ export class ReservationService {
       params = params.append('direction', direction);
     }
 
-    return this.http.get<IReservation[]>(`${this.url}/pages`, {params});
+    return this.http.get<IReservation[]>(`${this.urlV1}/rooms/${roomId}/pages`, {params});
   }
 
   public getCustomerReservations(sort: string, direction: string, page: number,
@@ -106,6 +106,10 @@ export class ReservationService {
 
   public changeState(reservationId: string, event: string, extras?: any): Observable<IReservation> {
     return this.http.post<IReservation>(`${this.url}/${reservationId}/${event}`, extras);
+  }
+
+  public changeCustomer(reservationId: string, customerId: string): Observable<IReservation> {
+    return this.http.patch<IReservation>(`${this.urlV1}/${reservationId}/customers/${customerId}`, null);
   }
 
   public getUpcomingReservation(): Observable<ICustomerReservation> {

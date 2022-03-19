@@ -2,14 +2,15 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../../store/app.states';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import * as fromActionsReservation from '../../../store/reservation.actions';
-import { IReservationAll} from '../../../interfaces/reservation';
-import { IPrice, IProduct, IProductGroup, Price } from '../../../interfaces/product';
+import { IReservationAll } from '../../../interfaces/reservation';
+import { IGroupService, IPrice, IProduct, IProductGroup, Price } from '../../../interfaces/product';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IPaymentAll, PaymentType } from '../../../interfaces/payment';
 import {
+  createProductGroupService,
   getFullUserName,
   getPrice,
   getProductDurability,
@@ -23,6 +24,7 @@ import { map, startWith } from 'rxjs/operators';
 import { transitionAnimation } from '../../../util/animation';
 import { IAdditionalAll } from '../../../interfaces/additional';
 import { MatListOption } from '@angular/material/list';
+import { IService } from '../../../interfaces/room';
 
 @Component({
   selector: 'app-reservation-complete',
@@ -37,14 +39,16 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   additionalSelected: IAdditionalAll[] = [];
 
   form!: FormGroup;
-  groups?: IProductGroup[];
-  filteredGroup?: Observable<IProductGroup[] | undefined>;
+  groups?: IGroupService[];
+  filteredGroup?: Observable<IGroupService[] | undefined>;
   group: FormControl = new FormControl('', [
     Validators.required, requireMatch
   ]);
-  products: IProduct[] | undefined;
-  filteredProduct?: Observable<IProduct[] | undefined>;
-  product: FormControl = new FormControl('', [requireMatch]);
+  products?: IService[];
+  filteredProduct?: Observable<IService[] | undefined>;
+  product: FormControl = new FormControl('', [
+    Validators.required, requireMatch
+  ]);
 
   description: FormControl = new FormControl();
   extraPrice: FormControl = new FormControl();
@@ -56,11 +60,13 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   durability?: string;
 
   private reservationId: any;
+  private roomId: any;
+  private customerId: any;
   private getState: Observable<any>;
   private subscription?: Subscription;
 
   constructor(private store: Store<AppState>, private route: ActivatedRoute, private formBuilder: FormBuilder,
-              private readonly translate: TranslateService, private router: Router) {
+              private readonly translate: TranslateService) {
     this.getState = this.store.select(selectReservationState);
     this.price = new Price();
     this.product.valueChanges.subscribe(value => {
@@ -87,31 +93,16 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.createForm();
-    this.getProducts();
-    this.getAdditionalList();
     this.subscribe();
     this.route.params.subscribe(routeParams => {
+      console.log(routeParams);
       this.reservationId = routeParams.id;
+      this.roomId = routeParams.roomId;
+      this.customerId = routeParams.customerId;
       this.getReservation();
+      this.getProducts();
     });
-    this.filteredGroup = this.group.valueChanges.pipe(
-      startWith(''),
-      map(value => {
-        if (typeof value === 'string') {
-          return value;
-        }
-        this.products = value.products;
-        this.durability = getProductDurability(value.durabilityMin, value.durabilityMax, this.translate);
-        this.product.setValue('');
-        return value.name;
-      }),
-      map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups)
-    );
-    this.filteredProduct = this.product?.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterProduct(name) : this.products ? this.products.slice() : this.products)
-    );
+    this.createFilters();
   }
 
   ngOnDestroy(): void {
@@ -162,7 +153,6 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     this.subscription = this.getState.subscribe(state => {
       this.payments = state.payments;
       this.reservation = state.selected;
-      this.additionalList = state.additional;
       if (this.reservation) {
         this.price = getPrice(this.reservation, this.payments);
         this.product.setValue(this.reservation.product);
@@ -171,14 +161,18 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
         }
       }
       if (state.productDiscount) {
-        this.groups = state.productDiscount.groups;
-        this.group.setValue(this.groups?.find(group => {
-          if (group.products?.find(product => product.id === this.product.value.id)) {
-            this.products = group.products;
-            return group;
-          }
-          return undefined;
-        }));
+        this.additionalList = state.productDiscount.additionalList;
+        if (state.productDiscount?.products && this.reservation) {
+          const productId = this.reservation.product.id;
+          this.groups = Array.from(createProductGroupService(new Map<string, IGroupService>(), state.productDiscount.products,
+            this.reservation.room.currency.code).values());
+          this.group.setValue(this.groups?.find(group => {
+            if (group.products?.find(product => product.id === productId)) {
+              return group;
+            }
+            return undefined;
+          }));
+        }
       }
     });
   }
@@ -191,33 +185,68 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       extraPrice: this.extraPrice,
       type: this.type
     });
+    this.valueChange();
+  }
+
+  private valueChange(): void {
+    this.group.valueChanges.subscribe(value => {
+      if (!value) {
+        return;
+      }
+      this.products = value.products;
+      const product = value.products?.find((p: IProductGroup) => p.id === this.reservation?.product?.id);
+      if (product) {
+        this.products = value.products;
+        this.product.setValue(product);
+      } else {
+        if (this.products?.length === 1) {
+          this.product.setValue(this.products[0]);
+        } else {
+          this.product.setValue('');
+        }
+      }
+      this.durability = getProductDurability(value.durabilityMin, value.durabilityMax, this.translate);
+    });
+    this.product.valueChanges.subscribe(value => {
+      if (value) {
+        this.price = newPrice(this.price, value.price);
+      }
+    });
+  }
+
+  private createFilters(): void {
+    this.filteredGroup = this.group.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value.name),
+      map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups)
+    );
+    this.filteredProduct = this.product.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value.name),
+      map(name => name ? this.filterProduct(name) : this.products ? this.products.slice() : this.products)
+    );
   }
 
   private getProducts(): void {
     this.store.dispatch(
-      new fromActionsReservation.GetAllProducts()
+      new fromActionsReservation.GetAllServices({roomId: this.roomId, customerId: this.customerId})
     );
   }
 
-  private getAdditionalList(): void {
-    this.store.dispatch(
-      new fromActionsReservation.GetAllAdditional()
-    );
-  }
-
-  private filterGroup(name: string): IProductGroup[] | undefined {
+  private filterGroup(name: string): IGroupService[] | undefined {
     const filterValue = name.toLowerCase();
 
     return this.groups?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 
-  private filterProduct(name: string): IProduct[] | undefined {
+  private filterProduct(name: string): IService[] | undefined {
     const filterValue = name.toLowerCase();
 
     return this.products?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 
   private getReservation(): void {
+    console.log('RESERVATION', this.reservation);
     if (!this.payments) {
       this.payments = undefined;
       this.store.dispatch(

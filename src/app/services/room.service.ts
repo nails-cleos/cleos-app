@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IRoom } from '../interfaces/room';
+import { IRoom, IRoomInfo, IRoomService, IServicePrice } from '../interfaces/room';
 import { PAGE_SIZE } from '../interfaces/pagination';
 
 @Injectable()
 export class RoomService {
 
   url = 'rooms';
+  urlV1 = `v1/${this.url}`;
 
   constructor(private http: HttpClient) {
   }
@@ -28,8 +29,12 @@ export class RoomService {
     return this.http.get<IRoom[]>(this.url);
   }
 
-  public getMyRoom(): Observable<IRoom> {
-    return this.http.get<IRoom>(`${this.url}/me`);
+  public getMyService(id: string): Observable<IRoomService> {
+    return this.http.get<IRoomService>(`${this.urlV1}/${id}/services`);
+  }
+
+  public getRoomInfo(): Observable<IRoomInfo> {
+    return this.http.get<IRoomInfo>(`${this.urlV1}/info`);
   }
 
   public getById(id: string | null): Observable<IRoom | undefined> {
@@ -49,5 +54,9 @@ export class RoomService {
   public update(room: IRoom): Observable<IRoom> {
     const url = `${this.url}/${room.id}`;
     return this.http.patch<IRoom>(url, room);
+  }
+
+  public updateService(id: string, prices: IServicePrice[]): Observable<IServicePrice[]> {
+    return this.http.patch<IServicePrice[]>(`${this.urlV1}/${id}/services`, prices);
   }
 }

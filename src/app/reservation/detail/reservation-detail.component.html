@@ -3,6 +3,8 @@
     <mat-card-title>{{ 'RESERVATION.CUSTOMER.DETAIL' | translate }}</mat-card-title>
     <mat-card-subtitle
       *ngIf="reservation; else skeleton">{{customerName}}</mat-card-subtitle>
+    <mat-card-subtitle
+      *ngIf="reservation?.configuration?.canCustomerChange">{{reservation?.configuration?.reference}}</mat-card-subtitle>
     <ng-template #skeleton>
       <div class="ssc-line"></div>
     </ng-template>
@@ -60,7 +62,7 @@
         <div mat-line>{{duration.hour | number:'2.0-0'}}:{{duration.minute | number:'2.0-0'}}</div>
       </mat-list-item>
       <mat-list-item>
-        <mat-icon mat-list-icon>attach_money</mat-icon>
+        <mat-icon mat-list-icon>{{reservation.room.currency.icon}}</mat-icon>
         <div mat-line>{{ 'RESERVATION.PRODUCT.PRICE.FIELD' | translate}}</div>
         <div *ngIf="price.discount; else noDiscount" mat-line>
           <span [class.strikethrough]="price.discount">{{price.amount | number:'1.2-2'}}</span>
@@ -79,7 +81,7 @@
           <div mat-line>{{reservation.product.extras.description}}</div>
         </mat-list-item>
         <mat-list-item *ngIf="price.extra">
-          <mat-icon mat-list-icon>attach_money</mat-icon>
+          <mat-icon mat-list-icon>{{reservation.room.currency.icon}}</mat-icon>
           <div mat-line>{{ 'RESERVATION.PRODUCT.EXTRAS.PRICE' | translate}}</div>
           <div mat-line>{{price.extra}}</div>
         </mat-list-item>
@@ -92,12 +94,12 @@
           <mat-icon mat-list-icon>add_post</mat-icon>
           <div mat-line>
             <div *ngFor="let it of reservation.additional">
-              {{it.name}} - ${{it.price | number:'1.2-2'}}
+              {{it.name}} - {{currencySymbol}} {{it.price | number:'1.2-2'}}
             </div>
           </div>
         </mat-list-item>
         <mat-list-item>
-          <mat-icon mat-list-icon>attach_money</mat-icon>
+          <mat-icon mat-list-icon>{{reservation.room.currency.icon}}</mat-icon>
           <div mat-line>{{ 'COMMON.LABEL.PRICE' | translate}}</div>
           <div mat-line>{{price.additional}}</div>
         </mat-list-item>
@@ -105,7 +107,7 @@
       <div *ngIf="reservation.product.extras || (reservation.additional && reservation.additional.length)">
         <mat-divider></mat-divider>
         <mat-list-item *ngIf="price.total">
-          <mat-icon mat-list-icon>paid</mat-icon>
+          <mat-icon class="bold" mat-list-icon>{{reservation.room.currency.icon}}</mat-icon>
           <div mat-line><span class="bold">{{ 'COMMON.LABEL.TOTAL' | translate}}</span></div>
           <div mat-line><span class="bold">{{price.total}}</span></div>
         </mat-list-item>
@@ -192,9 +194,10 @@
       </div>
       <table [dataSource]="dataSource" mat-table>
         <ng-container matColumnDef="position">
-          <th *matHeaderCellDef mat-header-cell>#</th>
-          <td *matCellDef="let history; let i = index;"
-              mat-cell> {{((paginator?.pageIndex || 0) * pageSize) + i + 1}} </td>
+          <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>#</th>
+          <td *matCellDef="let history; let i = index;" fxHide.lt-sm fxShow mat-cell>
+            {{((paginator?.pageIndex || 0) * pageSize) + i + 1}}
+          </td>
         </ng-container>
 
         <ng-container matColumnDef="professional">

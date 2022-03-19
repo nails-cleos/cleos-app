@@ -171,14 +171,13 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
-    case ReservationActionTypes.getProducts: {
+    case ReservationActionTypes.getServices: {
       return {
         ...state,
         productDiscount: null,
         errorMessage: null,
         error: null,
         subErrors: null,
-        selected: null,
         message: null
       };
     }
@@ -205,7 +204,6 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        selected: null,
         message: null
       };
     }

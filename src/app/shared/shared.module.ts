@@ -65,6 +65,7 @@ import { HttpClientModule } from '@angular/common/http';
   exports: [
     AppMaterialModule,
     CommonModule,
+    TranslateModule,
     ReactiveFormsModule,
     AppMaterialModule,
     FlexLayoutModule,

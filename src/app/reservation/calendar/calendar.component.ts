@@ -3,14 +3,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectAuthState, selectReservationState } from '../../store/app.states';
 import { Observable, Subject } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
-import {
-  Calendar,
-  Day,
-  ICalendar,
-  IReservationAll,
-  IRoomReservation,
-  MAX_RESERVATION_MONTH
-} from '../../interfaces/reservation';
+import { Calendar, Day, ICalendar, IReservationAll, IRoomReservation, MAX_RESERVATION_MONTH } from '../../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import {
@@ -37,7 +30,7 @@ import { CalendarEvent } from 'angular-calendar';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { IUserAll } from '../../interfaces/user';
 import { IUnavailableAll } from '../../interfaces/unavailable';
-import { getUserName } from '../../util/helper';
+import { getUserName, roomName } from '../../util/helper';
 import { addMonths } from 'date-fns';
 import { findStateColor, isDarkMode } from '../../util/theme';
 import { takeUntil } from 'rxjs/operators';
@@ -164,6 +157,10 @@ export class CalendarComponent implements OnInit, OnDestroy {
         day.cssClass = 'cal-disabled';
       }
     });
+  }
+
+  getRoomName(room: IRoomAll): string {
+    return roomName(room);
   }
 
   private changeDate(date: Date): void {

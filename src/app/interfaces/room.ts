@@ -1,12 +1,53 @@
 import { IUser } from './user';
+import { ICurrency, ICurrencyAll } from './currency';
+import { IProduct } from './product';
+import { IAdditional } from './additional';
+import { IOffice } from './office';
 
 export interface IRoom {
   id?: string;
   name?: string;
   professionalId?: string;
   professional?: IUser;
+  currencyId?: string;
+  currency?: ICurrency;
+  officeId?: string;
+  office?: IOffice;
   availabilities: IAvailability[];
   address?: IAddress;
+}
+
+export interface IRoomService {
+  currency: ICurrency;
+  products: IProduct[];
+  selectedProducts: IProduct[];
+  additionalList: IAdditional[];
+  selectedAdditionalList: IAdditional[];
+}
+
+export interface IRoomInfo {
+  currencies: ICurrency[];
+  professionals: IUser[];
+  offices: IOffice[];
+}
+
+export interface IServicePrice {
+  keyId: string;
+  value: number;
+  type: ServiceType;
+}
+
+export interface IService {
+  id: string;
+  name: string;
+  currency?: string;
+  price: number;
+  type: ServiceType;
+}
+
+export enum ServiceType {
+  product = 'PRODUCT',
+  additional = 'ADDITIONAL'
 }
 
 export interface IRoomAll {
@@ -15,6 +56,8 @@ export interface IRoomAll {
   professional: IUser;
   availabilities: IAvailability[];
   address: IAddress;
+  currency: ICurrencyAll;
+  office: IOffice;
 }
 
 export interface IAvailability {
@@ -53,6 +96,7 @@ export interface ILocation {
 
 export class Availability implements IAvailability {
   day = '';
+
   constructor() {
   }
 }
@@ -67,5 +111,17 @@ export class Room implements IRoom {
 
   constructor() {
     this.availabilities = [];
+  }
+}
+
+export class ServicePrice implements IServicePrice {
+  keyId: string;
+  type: ServiceType;
+  value: number;
+
+  constructor(keyId: string, value: number, type: ServiceType) {
+    this.keyId = keyId;
+    this.value = value;
+    this.type = type;
   }
 }

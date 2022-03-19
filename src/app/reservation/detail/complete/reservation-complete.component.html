@@ -69,11 +69,11 @@
                 <div class="ssc-line"></div>
               </ng-template>
               <mat-list>
-                <mat-list-item *ngIf="product.value">
+                <mat-list-item *ngIf="group.value && product.value">
                   <mat-icon mat-list-icon>home_repair_service</mat-icon>
                   <div class="bold" mat-subheader>{{ 'COMMON.PRODUCT.FIELD' | translate}}</div>
                 </mat-list-item>
-                <mat-list-item *ngIf="product.value" style="text-align: center">
+                <mat-list-item *ngIf="group.value && product.value" style="text-align: center">
                   <div [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.GROUP' |
                   translate: {name: group.value.name}" mat-line>
                   </div>

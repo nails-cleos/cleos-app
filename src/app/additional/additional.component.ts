@@ -18,9 +18,6 @@ export class AdditionalComponent implements OnInit, OnDestroy {
   name: FormControl = new FormControl('', [
     Validators.required
   ]);
-  price: FormControl = new FormControl('', [
-    Validators.required, Validators.min(1)
-  ]);
   duration: FormControl = new FormControl('', [
     Validators.required
   ]);
@@ -52,7 +49,6 @@ export class AdditionalComponent implements OnInit, OnDestroy {
     const additional: IAdditional = new Additional();
     additional.name = this.name.value;
     additional.description = this.form.value.description;
-    additional.price = this.price.value;
     additional.duration = this.duration.value;
 
     this.store.dispatch(
@@ -64,7 +60,6 @@ export class AdditionalComponent implements OnInit, OnDestroy {
     this.form = this.formBuilder.group({
       description: new FormControl(),
       name: this.name,
-      price: this.price,
       duration: this.duration
     });
   }

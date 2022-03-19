@@ -21,19 +21,21 @@ export class RedirectComponent {
           const user: IUserAll = state.user;
           this.tokenService.token = state.token;
           this.tokenService.user = state.user;
-          if (RedirectComponent.isProfessionalOrAdmin(user.authorities)) {
+          if (user.changePassword) {
+            redirectUrl = ['auth', 'change-password'];
+          } else if (RedirectComponent.hasRoomOrAdmin(user.authorities)) {
             redirectUrl = ['dashboard'];
           } else {
             redirectUrl = ['me', 'reservations'];
           }
         }
-        this.router.navigate(redirectUrl);
+        this.router.navigate(redirectUrl).then(() => window.location.reload());
       }
     });
   }
 
-  private static isProfessionalOrAdmin(authorities?: IAuthority[]): boolean {
+  private static hasRoomOrAdmin(authorities?: IAuthority[]): boolean {
     return !!authorities && authorities.length > 0 &&
-      authorities.some(u => (u.authority === Role.professional || u.authority === Role.admin));
+      authorities.some(u => (u.authority === Role.professional || u.authority === Role.manager || u.authority === Role.admin));
   }
 }

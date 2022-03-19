@@ -5,7 +5,6 @@
     "CHANGE_PASSWORD": "Cambiar contraseña",
     "SIGN_OUT": "Cerrar sesión",
     "SIGN_IN": "Ingresar",
-    "HOME": "Principal",
     "RESERVATION": {
       "COMPLETED": "Completas: {{completed}}",
       "UPCOMING": "Próximas: {{upcoming}}",

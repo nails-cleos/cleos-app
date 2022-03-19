@@ -1,0 +1,34 @@
+{
+  "OFFICE": {
+    "TITLE": "Add office",
+    "CREATED": "Office {{name}} created",
+    "DETAIL": "Update office",
+    "ROOMS": "Rooms",
+    "LIST": {
+      "COLUMN": {
+        "MANAGER": "Manager"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No offices"
+      }
+    },
+    "NAME": {
+      "FIELD": "Name",
+      "REQUIRED": "Name is <b>required</b>"
+    },
+    "MANAGER": {
+      "FIELD": "Manager",
+      "REQUIRED": "Manager is <b>required</b>",
+      "INVALID": "Manager is invalid",
+      "ADD_BUTTON": "Add manager"
+    },
+    "DELETED": {
+      "TITLE": "Delete office",
+      "CONTENT": "Are you sure to delete office {{name}}?",
+      "MESSAGE": "Office {{name}} deleted"
+    },
+    "UPDATED": {
+      "MESSAGE": "Office {{name}} updated"
+    }
+  }
+}
