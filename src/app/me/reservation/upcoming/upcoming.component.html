@@ -27,7 +27,7 @@
         </tr>
         <tr *ngIf="upcoming.id; else skeleton">
           <td class="right">{{ 'COMMON.ROOM.FIELD' | translate }}</td>
-          <td class="left">{{upcoming.room.name}}</td>
+          <td class="left">{{roomName}}</td>
         </tr>
         <tr *ngIf="upcoming.id; else skeleton">
           <td class="right">{{ 'COMMON.ADDRESS.FIELD' | translate }}</td>
@@ -88,8 +88,8 @@
     <div fxFlex></div>
     <button *ngIf="upcoming.state === 'APPROVED' || upcoming.state === 'PARTIALLY_PAID'"
             [routerLink]="['/me', 'reservation', upcoming.id, 'payment']" mat-raised-button>
-      <mat-icon class="ml-button" color="primary">payment</mat-icon>
-      <span fxHide.lt-sm fxShow>{{ 'COMMON.BUTTON.ML' | translate }}</span>
+      <mat-icon class="payment-button" color="primary">payment</mat-icon>
+      <span fxHide.lt-sm fxShow>{{ 'COMMON.BUTTON.PAYMENT' | translate }}</span>
     </button>
     <button [routerLink]="['/me', 'reservation', upcoming.id]" color="primary" mat-raised-button>
       <mat-icon>edit_calendar</mat-icon>

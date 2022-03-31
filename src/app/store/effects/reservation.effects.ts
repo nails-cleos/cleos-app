@@ -92,7 +92,7 @@ export class ReservationEffects {
 
   getAllProducts$ = createEffect(() => this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getServices)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.productService.getAllProducts(payload?.roomId, payload?.customerId).pipe(
+    switchMap((payload: any) => this.productService.getAllProducts(payload.roomId, payload?.customerId).pipe(
       switchMap((response: any) => of(new fromActionsReservation.ReservationProductsSuccess(response))),
       catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
     ))
@@ -125,7 +125,7 @@ export class ReservationEffects {
 
   findOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.reservationFind)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.reservationService.getById(payload).pipe(
+    switchMap((payload: any) => this.reservationService.getById(payload.id).pipe(
       switchMap((reservation: any) => of(new fromActionsReservation.ReservationSelected(reservation))),
       catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
     ))
@@ -135,6 +135,14 @@ export class ReservationEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.paymentService.findByReservationId(payload).pipe(
       switchMap((reservation: any) => of(new fromActionsReservation.ReservationPaymentsSuccess(reservation ? reservation : []))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
+    ))
+  ));
+
+  findHistory$ = createEffect(() => this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.reservationFindHistory)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.reservationService.findHistory(payload.id).pipe(
+      switchMap((reservation: any) => of(new fromActionsReservation.ReservationHistorySuccess(reservation ? reservation : []))),
       catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
     ))
   ));

@@ -10,6 +10,8 @@ import * as fromActionsRoom from '../../store/room.actions';
 import { createDate } from '../../util/dates';
 import { getUserName } from '../../util/helper';
 import { RoomIconName } from '../../util/icon';
+import { IPaymentType, paymentOptions } from '../../interfaces/payment';
+import { MatListOption } from '@angular/material/list';
 
 @Component({
   selector: 'app-room-me',
@@ -18,8 +20,6 @@ import { RoomIconName } from '../../util/icon';
 })
 export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() room?: IRoomAll;
-  getState: Observable<any>;
-  subscription?: Subscription;
   errors: any = [];
   professionalName?: string;
 
@@ -33,13 +33,18 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   satDate?: IAvailabilityDate;
   sunDate?: IAvailabilityDate;
 
-  availabilities: IAvailability[] = [];
-
   form!: FormGroup;
   address: FormControl = new FormControl('', [
     Validators.required
   ]);
   addressDescription: FormControl = new FormControl();
+
+  paymentOptions: IPaymentType[] = paymentOptions();
+
+  private getState: Observable<any>;
+  private subscription?: Subscription;
+  private availabilities: IAvailability[] = [];
+  private paymentTypes: string[] = [];
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder) {
     this.getState = this.store.select(selectRoomState);
@@ -78,6 +83,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
       const room: IRoom = {
         id: this.room.id,
         availabilities: this.availabilities,
+        paymentTypes: this.paymentTypes,
         address: {
           name: this.room.address.name,
           location: this.room.address.location,
@@ -121,6 +127,14 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.availabilities = [...this.availabilities, availability];
 
     this.step = step;
+  }
+
+  onChange(options: MatListOption[]): void {
+    this.paymentTypes = options.map(o => o.value);
+  }
+
+  isSelected(it: IPaymentType): boolean {
+    return it.checked || this.paymentTypes.includes(it.name);
   }
 
   validate(): boolean {
@@ -175,11 +189,11 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
       if (state.selected) {
         this.room = {
           id: state.selected.id,
-          name: state.selected.name, // TODO remove room.name
           address: state.selected.address,
           currency: state.selected.currency,
           office: state.selected.office
         } as IRoomAll;
+        this.paymentTypes = state.selected.paymentTypes;
         this.addressDescription.setValue(this.room.address?.description);
         this.professionalName = getUserName(state.selected.professional);
         this.getAvailabilities(state.selected.availabilities);

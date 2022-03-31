@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
-import { IPayment } from '../interfaces/payment';
+import { IPayment, IPaymentStatus, PaymentStatus } from '../interfaces/payment';
 
 @Injectable()
 export class PaymentService {
@@ -29,20 +29,19 @@ export class PaymentService {
     return this.http.get<IPayment>(url);
   }
 
-  public add(mlPaymentId: string, reservationId: string, preferenceId: string, status: string): Observable<IPayment> {
-    return this.http.post<IPayment>(`reservations/${reservationId}/${this.url}/${status}`,
-      {preferenceId, mlPaymentId});
+  public add(reservationId: string, status: string, paymentStatus: IPaymentStatus): Observable<IPayment> {
+    return this.http.post<IPayment>(`reservations/${reservationId}/${this.url}/${status}`, paymentStatus);
   }
 
-  public recreate(id: string): Observable<IPayment> {
-    return this.http.patch<IPayment>(`${this.url}/${id}`, null);
+  public recreate(id: string, paymentType: string): Observable<IPayment> {
+    return this.http.patch<IPayment>(`${this.url}/${id}/types/${paymentType}`, null);
   }
 
   public findByReservationId(reservationId: string): Observable<IPayment[]> {
     return this.http.get<IPayment[]>(`reservations/${reservationId}/${this.url}`);
   }
 
-  public notify(id: string, reservationId: string, preferenceId: string): Observable<IPayment> {
-    return this.http.patch<IPayment>(`reservations/${reservationId}/${this.url}/${id}`, {preferenceId});
+  public notify(id: string, reservationId: string, preferenceId: string, paymentType: string): Observable<IPayment> {
+    return this.http.patch<IPayment>(`reservations/${reservationId}/${this.url}/${id}`, {preferenceId, paymentType});
   }
 }

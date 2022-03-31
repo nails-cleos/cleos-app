@@ -5,6 +5,7 @@ export const environment = {
   version: require('../../package.json').version,
   baseUrl: 'https://espaciocleos.com:8443/api',
   mlUrl: 'https://www.mercadopago.com.ar/checkout/v1/redirect',
+  paypalUrl: 'https://paypal.com/checkoutnow',
   googleClientId: '1075596698405-ujflh3nuhglps8br89a1gtk7obi333h9.apps.googleusercontent.com',
   facebookClientId: '523962545388946',
   firebase: {

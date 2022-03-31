@@ -26,7 +26,9 @@
       "COPY": "Copiar",
       "SHARE": "Compartir",
       "COMPLETE": "Completar",
+      "PAYMENT": "Pagar",
       "ML": "Pagar con ML",
+      "PAYPAL": "Pagar con PayPal",
       "NOTIFY": "Notificar",
       "SELECT": "Seleccionar",
       "EXPAND": {
@@ -43,7 +45,8 @@
       "ACTIONS": "Acciones",
       "LAST_UPDATE": "Última actualización",
       "NAME": "Nombre",
-      "DESCRIPTION": "Descripción"
+      "DESCRIPTION": "Descripción",
+      "TYPE": "Tipo"
     },
     "PAGINATOR": {
       "ITEMS_PER_PAGE_LABEL": "Items por página:",
@@ -83,11 +86,13 @@
       "PERCENTAGE": "Porcentaje"
     },
     "PAYMENT": {
+      "CREATED": "Pago completado",
       "CASH": "Efectivo",
-      "ML": "Mercado Libre"
+      "ML": "Mercado Libre",
+      "PAYPAL": "PayPal"
     },
     "STATUS": {
-      "ML": {
+      "PAYMENT": {
         "NONE": "Pendiente",
         "APPROVED": "Aprobado",
         "REJECTED": "Rechazado",

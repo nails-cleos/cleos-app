@@ -38,11 +38,10 @@ export class PaymentEffects {
 
   save$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentSave)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.paymentService.add(payload.mlPaymentId, payload.reservationId,
-      payload.preferenceId, payload.status).pipe(
+    switchMap((payload: any) => this.paymentService.add(payload.reservationId, payload.status, payload.paymentStatus).pipe(
       switchMap((response: any) => {
         if (response.status === 'approved') {
-          return of(new fromActionsPayment.PaymentSaveSuccess({message: this.translate.instant('PAYMENT.CREATED')}));
+          return of(new fromActionsPayment.PaymentSaveSuccess({message: this.translate.instant('COMMON.PAYMENT.CREATED')}));
         }
         const message = this.translate.instant('PAYMENT.ERROR', {reason: response.message});
         return of(new fromActionsPayment.PaymentNotComplete({message}));
@@ -52,7 +51,7 @@ export class PaymentEffects {
 
   recreate$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentRecreate)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.paymentService.recreate(payload).pipe(
+    switchMap((payload: any) => this.paymentService.recreate(payload.id, payload.paymentType).pipe(
       switchMap(() => of(new fromActionsPayment.PaymentSaveSuccess({message: this.translate.instant('PAYMENT.RECREATE')}))),
       catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({error: err.error})))
     ))
@@ -60,10 +59,10 @@ export class PaymentEffects {
 
   notify$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentNotify)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.paymentService.notify(payload.id, payload.reservationId, payload.preferenceId).pipe(
+    switchMap((payload: any) => this.paymentService.notify(payload.id, payload.reservationId, payload.preferenceId, payload.type).pipe(
       switchMap((response: any) => {
         if (response.status === 'approved') {
-          return of(new fromActionsPayment.PaymentSaveSuccess({message: this.translate.instant('PAYMENT.CREATED')}));
+          return of(new fromActionsPayment.PaymentSaveSuccess({message: this.translate.instant('COMMON.PAYMENT.CREATED')}));
         }
         const message = this.translate.instant('PAYMENT.ERROR', {reason: response.status});
         return of(new fromActionsPayment.PaymentNotComplete({message}));

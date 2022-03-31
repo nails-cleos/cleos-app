@@ -16,11 +16,13 @@ import { getUserName, snakeToCamel } from '../../../util/helper';
 import { ReservationIconKey, ReservationIconName } from '../../../util/icon';
 import { newDate, reservationDateTime } from '../../../util/dates';
 import { Role } from '../../../interfaces/token';
+import { detailExpandAnimation } from '../../../util/animation';
 
 @Component({
   selector: 'app-reservation-table',
   templateUrl: './reservation-table.component.html',
-  styleUrls: ['./reservation-table.component.scss']
+  styleUrls: ['./reservation-table.component.scss'],
+  animations: [detailExpandAnimation]
 })
 export class ReservationTableComponent implements AfterViewInit, OnInit, OnChanges, OnDestroy {
   @Input() roomId: any;
@@ -29,6 +31,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
 
   displayedColumns: string[] = ['position', 'customer', 'professional', 'start', 'product', 'state', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IReservationAll>>();
+  expanded?: IReservationAll;
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
   error: any;

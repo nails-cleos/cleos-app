@@ -3,7 +3,7 @@ import { AppState, selectPaymentState, selectReservationState } from '../../../s
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { IPaymentAll } from '../../../interfaces/payment';
+import { IPaymentAll, PaymentType } from '../../../interfaces/payment';
 import { IReservationAll, ITracking } from '../../../interfaces/reservation';
 import * as fromActionsReservation from '../../../store/reservation.actions';
 import * as fromActionsPayment from '../../../store/payment.actions';
@@ -19,7 +19,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   styleUrls: ['./more-info.component.scss']
 })
 export class MoreInfoComponent implements OnInit, OnDestroy {
-  displayedColumns: string[] = ['position', 'description', 'amount', 'status', 'actions'];
+  displayedColumns: string[] = ['position', 'description', 'amount', 'type', 'status', 'actions'];
 
   tracking?: ITracking;
   payments?: IPaymentAll[];
@@ -57,12 +57,23 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
 
   resend(payment: IPaymentAll): void {
     this.store.dispatch(
-      new fromActionsPayment.PaymentRecreate(payment.id)
+      new fromActionsPayment.PaymentRecreate({id: payment.id, paymentType: payment.type})
     );
   }
 
   copy(payment: IPaymentAll): void {
-    this.clipboard.copy(`${environment.mlUrl}?pref_id=${payment.preferenceId}`);
+    let url;
+    switch (payment.type) {
+      case PaymentType.ml:
+        url = `${environment.mlUrl}?pref_id=${payment.preferenceId}`;
+        break;
+      case PaymentType.paypal:
+        url = `${environment.paypalUrl}?token=${payment.preferenceId}`;
+        break;
+      default:
+        return;
+    }
+    this.clipboard.copy(url);
     this.snackBar.open(this.translate.instant('PAYMENT.COPY'), 'OK', {
       duration: 5000
     });
@@ -101,7 +112,7 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
     if (!this.reservation) {
       this.reservation = undefined;
       this.store.dispatch(
-        new fromActionsReservation.ReservationFind(this.reservationId)
+        new fromActionsReservation.ReservationFind({id: this.reservationId})
       );
     }
   }

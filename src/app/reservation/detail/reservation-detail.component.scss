@@ -7,6 +7,10 @@
   width: 45%;
 }
 
+tr.detail-row {
+  height: 0;
+}
+
 @media all and (max-device-width: 812px) and (orientation: portrait) {
   #action-button {
     top: 90px;

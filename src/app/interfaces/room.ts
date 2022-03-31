@@ -6,7 +6,6 @@ import { IOffice } from './office';
 
 export interface IRoom {
   id?: string;
-  name?: string;
   professionalId?: string;
   professional?: IUser;
   currencyId?: string;
@@ -15,6 +14,7 @@ export interface IRoom {
   office?: IOffice;
   availabilities: IAvailability[];
   address?: IAddress;
+  paymentTypes?: string[];
 }
 
 export interface IRoomService {
@@ -52,12 +52,12 @@ export enum ServiceType {
 
 export interface IRoomAll {
   id: string;
-  name: string;
   professional: IUser;
   availabilities: IAvailability[];
   address: IAddress;
   currency: ICurrencyAll;
   office: IOffice;
+  paymentTypes: string[];
 }
 
 export interface IAvailability {

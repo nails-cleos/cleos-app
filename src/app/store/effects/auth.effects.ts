@@ -81,44 +81,47 @@ export class LoginEffects {
     ))
   ));
 
-  loginSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(AuthActionTypes.loginSuccess),
+  loginSuccess$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.loginSuccess),
     tap((response: any) => {
-      const redirectUrl = response.payload.queryParams.returnUrl?.split('/') || ['auth', 'redirect'];
-      this.router.navigate(redirectUrl, {state: response.payload.extras}).then(() => window.location.reload());;
+      const decodedURI = decodeURIComponent(decodeURI(response.payload.queryParams.returnUrl));
+      const paramsIndex = decodedURI.indexOf('?');
+      if (paramsIndex > -1) {
+        const queryParams = JSON.parse('{"' + decodeURI(decodedURI?.slice(paramsIndex + 1)
+          ?.replace(/&/g, '","')?.replace(/=/g, '":"')) + '"}');
+        this.router.navigate(decodedURI?.slice(0, paramsIndex)?.split('/'),
+          {state: response.payload.extras, queryParams}).then(() => window.location.reload());
+      } else {
+        const redirectUrl = decodedURI?.split('/') || ['auth', 'redirect'];
+        this.router.navigate(redirectUrl, {state: response.payload.extras}).then(() => window.location.reload());
+      }
+
     })
   ), {dispatch: false});
 
-  logInFailure$ = createEffect(() => this.actions$.pipe(
-    ofType(AuthActionTypes.loginFailure)
+  logInFailure$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.loginFailure)
   ), {dispatch: false});
 
-  signUpSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(AuthActionTypes.signupSuccess)
+  signUpSuccess$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.signupSuccess)
   ), {dispatch: false});
 
-  signUpFailure$ = createEffect(() => this.actions$.pipe(
-    ofType(AuthActionTypes.signupFailure)
+  signUpFailure$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.signupFailure)
   ), {dispatch: false});
 
-  logOut$ = createEffect(() => this.actions$.pipe(
-    ofType(AuthActionTypes.logout),
+  logOut$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.logout),
     tap(() => {
       localStorage.removeItem('auth');
       window.location.href = '/main';
     })
   ), {dispatch: false});
 
-  reLogin$ = createEffect(() => this.actions$.pipe(
-    ofType(AuthActionTypes.reLogin),
+  reLogin$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.reLogin),
     tap(() => {
       localStorage.removeItem('auth');
       window.location.href = '/auth';
     })
   ), {dispatch: false});
 
-  redirect$ = createEffect(() => this.actions$.pipe(
-    ofType(AuthActionTypes.redirect),
+  redirect$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.redirect),
     tap(() => this.router.navigate(['auth', 'redirect']))
   ), {dispatch: false});
 

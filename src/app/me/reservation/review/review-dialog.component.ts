@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { createNewDate, newDate, reservationDuration } from '../../../util/dates';
-import { getPrice, getUserName } from '../../../util/helper';
+import { getPrice, getUserName, roomName } from '../../../util/helper';
 import { IReview } from '../../../interfaces/review';
 import { IReservationAll } from '../../../interfaces/reservation';
 import { IPrice } from '../../../interfaces/product';
@@ -42,6 +42,10 @@ export class ReviewDialogComponent {
 
   get professionalName(): string {
     return getUserName(this.reservation?.room.professional);
+  }
+
+  get roomName(): string {
+    return this.reservation ? roomName(this.reservation.room) : '';
   }
 
   onNoClick(): void {

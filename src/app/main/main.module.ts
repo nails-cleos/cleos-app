@@ -22,6 +22,8 @@ import { CatalogueEffects } from '../store/effects/catalogue.effects';
 import { UserEffects } from '../store/effects/user.effects';
 import { UserService } from '../services/user.service';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { LoginEffects } from '../store/effects/auth.effects';
+import { AuthService } from '../services/auth.service';
 
 @NgModule({
   declarations: [
@@ -47,13 +49,14 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
       isolate: false,
       extend: true
     }),
-    EffectsModule.forFeature([MainEffects, CatalogueEffects, UserEffects])
+    EffectsModule.forFeature([MainEffects, CatalogueEffects, UserEffects, LoginEffects])
   ],
   providers: [
     MainService,
     CatalogueService,
     ProductService,
-    UserService
+    UserService,
+    AuthService
   ]
 })
 export class MainModule {
