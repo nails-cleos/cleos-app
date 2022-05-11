@@ -28,7 +28,6 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
 
 export class LazyTranslateLoader2 implements TranslateLoader {
   getTranslation(lang: string): Observable<any> {
-    console.log(lang);
     const match = lang.match(/([-_])/);
     const currentLang = !match ? lang : lang.substr(0, match.index);
 

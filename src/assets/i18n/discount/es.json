@@ -6,7 +6,6 @@
     "DETAIL": "Actualizar descuento",
     "LIST": {
       "COLUMN": {
-        "TYPE": "Tipo",
         "AMOUNT": "Monto"
       },
       "DIALOG": {

@@ -1,7 +1,7 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
-      <form (ngSubmit)="create()" [formGroup]="form" novalidate>
+      <form (ngSubmit)="create" [formGroup]="form" novalidate>
         <mat-card class="style-card">
           <mat-card-header>
             <mat-card-title>{{ 'ROOM.TITLE' | translate }}</mat-card-title>
@@ -92,6 +92,21 @@
               <ng-template #skeleton>
                 <div class="ssc-line"></div>
               </ng-template>
+              <mat-list>
+                <mat-list-item>
+                  <div mat-subheader>{{ 'ROOM.PAYMENT_OPTION' | translate }}</div>
+                  <mat-divider></mat-divider>
+                </mat-list-item>
+                <mat-list-item>
+                  <mat-selection-list #paymentType (selectionChange)="onChange(paymentType.selectedOptions.selected)">
+                    <mat-list-option *ngFor="let option of paymentOptions" [disabled]="option.disabled"
+                                     [selected]="isSelected(option)" [value]="option.name" color="primary" mat-line>
+                      <div mat-line>{{option.name}}</div>
+                    </mat-list-option>
+                  </mat-selection-list>
+                </mat-list-item>
+                <mat-divider></mat-divider>
+              </mat-list>
               <mat-accordion class="divider headers-align" multi>
                 <mat-expansion-panel (opened)="setStep(0)" [expanded]="step === 0" hideToggle>
                   <mat-expansion-panel-header>

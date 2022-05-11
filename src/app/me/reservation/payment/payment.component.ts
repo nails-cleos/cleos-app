@@ -3,7 +3,7 @@ import { AppState, selectPaymentState } from '../../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { IPayment } from '../../../interfaces/payment';
+import { IPayment, IPaymentAll, PaymentType } from '../../../interfaces/payment';
 import * as fromActionsPayment from '../../../store/payment.actions';
 import { MatTableDataSource } from '@angular/material/table';
 import { Pagination } from '../../../interfaces/pagination';
@@ -15,7 +15,7 @@ import { environment } from '../../../../environments/environment';
   styleUrls: ['./payment.component.scss']
 })
 export class PaymentComponent implements OnInit, OnDestroy {
-  displayedColumns: string[] = ['position', 'description', 'amount', 'status', 'actions'];
+  displayedColumns: string[] = ['position', 'description', 'type', 'amount', 'status', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IPayment>>();
 
   errorMessage?: string;
@@ -41,17 +41,29 @@ export class PaymentComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  pay(payment: IPayment): void {
-    this.store.dispatch(
-      new fromActionsPayment.PaymentSend(`${environment.mlUrl}?pref_id=${payment.preferenceId}`)
-    );
+  pay(payment: IPaymentAll): void {
+    let url;
+    switch (payment.type) {
+      case PaymentType.ml:
+        url = `${environment.mlUrl}?pref_id=${payment.preferenceId}`;
+        break;
+      case PaymentType.paypal:
+        url = `${environment.paypalUrl}?token=${payment.preferenceId}`;
+        break;
+    }
+    if (url) {
+      this.store.dispatch(
+        new fromActionsPayment.PaymentSend(url)
+      );
+    }
   }
 
   notify(payment: IPayment): void {
     this.store.dispatch(
       new fromActionsPayment.PaymentNotify({
         id: payment.id, reservationId: this.reservationId,
-        preferenceId: payment.preferenceId
+        preferenceId: payment.preferenceId,
+        type: payment.type
       })
     );
   }

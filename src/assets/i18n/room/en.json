@@ -3,6 +3,7 @@
     "TITLE": "Add room",
     "CREATED": "Room {{name}} created",
     "DETAIL": "Update room",
+    "PAYMENT_OPTION": "Payment options",
     "LIST": {
       "COLUMN": {
         "CURRENCY": "Currency",

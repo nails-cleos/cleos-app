@@ -77,6 +77,16 @@
       </td>
     </ng-container>
 
+    <ng-container matColumnDef="type">
+      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
+      <td *matCellDef="let payment" mat-cell>
+        <div *ngIf="payment.id; else skeleton">{{payment.type}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
     <ng-container matColumnDef="amount">
       <th *matHeaderCellDef mat-header-cell>{{ 'PAYMENT.LIST.COLUMN.AMOUNT' | translate }}</th>
       <td *matCellDef="let payment" mat-cell>
@@ -93,7 +103,7 @@
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'PAYMENT.LIST.COLUMN.STATUS' | translate }}</th>
       <td *matCellDef="let payment" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="payment.id; else skeleton">
-          {{'COMMON.STATUS.ML.' + (payment.status ? payment.status.toUpperCase() : 'NONE') | translate}}
+          {{'COMMON.STATUS.PAYMENT.' + (payment.status ? payment.status.toUpperCase() : 'NONE') | translate}}
         </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>

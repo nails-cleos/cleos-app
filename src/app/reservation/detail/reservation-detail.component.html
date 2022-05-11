@@ -20,7 +20,7 @@
       <mat-list-item>
         <mat-icon mat-list-icon>store</mat-icon>
         <div mat-line>{{ 'RESERVATION.ROOM.NAME.FIELD' | translate}}</div>
-        <div mat-line>{{reservation.room.name}}</div>
+        <div mat-line>{{roomName}}</div>
       </mat-list-item>
       <mat-list-item>
         <mat-icon mat-list-icon>person_pin</mat-icon>
@@ -32,8 +32,7 @@
         <div mat-line>{{ 'COMMON.ADDRESS.FIELD' | translate}}</div>
         <div mat-line>
           <a [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + reservation.room.address.name"
-             rel="noreferrer" target="_blank">
-            {{reservation.room.address.name}}
+             rel="noreferrer" target="_blank">{{reservation.room.address.name}}
           </a>
         </div>
         <div mat-line>{{reservation.room.address?.description}}</div>
@@ -118,10 +117,10 @@
       <div class="divider">
         <h1>{{ 'RESERVATION.PAYMENT.TITLE' | translate}}</h1>
       </div>
-      <table [dataSource]="paymentPaid" mat-table>
+      <table [dataSource]="paymentPaid" mat-table multiTemplateDataRows>
         <ng-container matColumnDef="position">
           <th *matHeaderCellDef mat-header-cell>#</th>
-          <td *matCellDef="let payment; let i = index;" mat-cell>
+          <td *matCellDef="let payment; let i = dataIndex;" mat-cell>
             <div *ngIf="payment.id; else skeleton">{{i + 1}} </div>
             <ng-template #skeleton>
               <div class="ssc-line"></div>
@@ -145,7 +144,7 @@
           <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'PAYMENT.LIST.COLUMN.STATUS' | translate }}</th>
           <td *matCellDef="let payment" fxHide.lt-sm fxShow mat-cell>
             <div *ngIf="payment.id; else skeleton">
-              {{'COMMON.STATUS.ML.' + (payment.status ? payment.status.toUpperCase() : 'NONE') | translate}}
+              {{'COMMON.STATUS.PAYMENT.' + (payment.status ? payment.status.toUpperCase() : 'NONE') | translate}}
             </div>
             <ng-template #skeleton>
               <div class="ssc-line"></div>
@@ -155,7 +154,7 @@
         </ng-container>
 
         <ng-container matColumnDef="type">
-          <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'PAYMENT.LIST.COLUMN.TYPE' | translate }}</th>
+          <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
           <td *matCellDef="let payment" fxHide.lt-sm fxShow mat-cell>
             <div *ngIf="payment.id; else skeleton">
               {{'COMMON.PAYMENT.' + payment.type | translate}}
@@ -182,21 +181,48 @@
           </td>
         </ng-container>
 
+        <ng-container matColumnDef="expandedDetail">
+          <td *matCellDef="let payment" [attr.colspan]="paymentDisplayedColumns.length">
+            <div [@detailExpand]="payment === paymentExpanded ? 'expanded' : 'collapsed'" class="detail">
+              <mat-list>
+                <div mat-subheader>{{ 'COMMON.COLUMN.TYPE' | translate }}</div>
+                <mat-list-item role="list">
+                  <div mat-line>{{'COMMON.PAYMENT.' + payment.type | translate}}</div>
+                </mat-list-item>
+                <div mat-subheader>{{ 'PAYMENT.LIST.COLUMN.STATUS' | translate }}</div>
+                <mat-list-item role="list">
+                  <div mat-line>
+                    {{'COMMON.STATUS.PAYMENT.' + (payment.status ? payment.status.toUpperCase() : 'NONE') | translate}}
+                  </div>
+                </mat-list-item>
+              </mat-list>
+            </div>
+            <mat-divider [inset]="true"></mat-divider>
+          </td>
+        </ng-container>
+
         <tr *matHeaderRowDef="paymentDisplayedColumns" mat-header-row></tr>
-        <tr *matRowDef="let row; columns: paymentDisplayedColumns;" class="{{row.type.toLowerCase()}}" mat-row></tr>
+        <tr (click)="paymentExpanded = paymentExpanded === payment ? null : payment"
+            *matRowDef="let payment; columns: paymentDisplayedColumns;" class="row {{payment.type.toLowerCase()}}"
+            mat-row></tr>
+        <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row></tr>
         <tr *matFooterRowDef="paymentDisplayedColumns" mat-footer-row></tr>
       </table>
-      <mat-divider></mat-divider>
     </mat-list>
-    <mat-list *ngIf="reservation.history">
+    <mat-list *ngIf="history">
       <div class="divider">
         <h1>{{ 'RESERVATION.LIST.HISTORY.TITLE' | translate}}</h1>
       </div>
-      <table [dataSource]="dataSource" mat-table>
+      <table [dataSource]="dataSource" mat-table multiTemplateDataRows>
         <ng-container matColumnDef="position">
           <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>#</th>
-          <td *matCellDef="let history; let i = index;" fxHide.lt-sm fxShow mat-cell>
-            {{((paginator?.pageIndex || 0) * pageSize) + i + 1}}
+          <td *matCellDef="let history; let i = dataIndex;" fxHide.lt-sm fxShow mat-cell>
+            <div *ngIf="history.id; else skeleton">
+              {{((paginator?.pageIndex || 0) * pageSize) + i + 1}}
+            </div>
+            <ng-template #skeleton>
+              <div class="ssc-line"></div>
+            </ng-template>
           </td>
         </ng-container>
 
@@ -204,25 +230,71 @@
           <th *matHeaderCellDef fxHide.lt-sm fxShow
               mat-header-cell> {{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }} </th>
           <td *matCellDef="let history" fxHide.lt-sm fxShow
-              mat-cell> {{getProfessionalName(history)}} </td>
+              mat-cell>
+            <div *ngIf="history.id; else skeleton">{{getProfessionalName(history)}}</div>
+            <ng-template #skeleton>
+              <div class="ssc-line"></div>
+            </ng-template>
+          </td>
         </ng-container>
 
         <ng-container matColumnDef="start">
           <th *matHeaderCellDef mat-header-cell> {{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }} </th>
-          <td *matCellDef="let history" mat-cell> {{history.start | date:'short':undefined:language}} </td>
+          <td *matCellDef="let history" mat-cell>
+            <div *ngIf="history.id; else skeleton">
+              {{history.start | date:'short':undefined:language}}
+            </div>
+            <ng-template #skeleton>
+              <div class="ssc-line"></div>
+            </ng-template>
+          </td>
         </ng-container>
 
         <ng-container matColumnDef="product">
           <th *matHeaderCellDef mat-header-cell> {{ 'COMMON.RESERVATION.LIST.COLUMN.PRODUCT' | translate }} </th>
-          <td *matCellDef="let history" mat-cell> {{history.product.name}} </td>
+          <td *matCellDef="let history" mat-cell>
+            <div *ngIf="history.id; else skeleton">
+              {{history.product.name}}
+            </div>
+            <ng-template #skeleton>
+              <div class="ssc-line"></div>
+            </ng-template>
+          </td>
         </ng-container>
 
         <ng-container matColumnDef="state">
           <th *matHeaderCellDef fxHide.lt-sm fxShow
               mat-header-cell> {{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }} </th>
           <td *matCellDef="let history" fxHide.lt-sm fxShow mat-cell>
-            <mat-icon matPrefix>{{getIcon(history.state)}}</mat-icon>&nbsp;
-            {{ 'COMMON.STATUS.RESERVATION.' + history.state | translate}}</td>
+            <div *ngIf="history.id; else skeleton">
+              <mat-icon matPrefix>{{getIcon(history.state)}}</mat-icon>&nbsp;
+              {{ 'COMMON.STATUS.RESERVATION.' + history.state | translate}}
+            </div>
+            <ng-template #skeleton>
+              <div class="ssc-line"></div>
+            </ng-template>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="expandedDetail">
+          <td *matCellDef="let history" [attr.colspan]="displayedColumns.length">
+            <div [@detailExpand]="history === expanded ? 'expanded' : 'collapsed'" class="detail">
+              <mat-list *ngIf="history.id">
+                <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
+                <mat-list-item role="list">
+                  <div mat-line>{{getProfessionalName(history)}}</div>
+                </mat-list-item>
+                <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</div>
+                <mat-list-item role="list">
+                  <div mat-line>
+                    <mat-icon matPrefix>{{getIcon(history.state)}}</mat-icon>&nbsp;
+                    {{ 'COMMON.STATUS.RESERVATION.' + history.state | translate}}
+                  </div>
+                </mat-list-item>
+              </mat-list>
+            </div>
+            <mat-divider [inset]="true"></mat-divider>
+          </td>
         </ng-container>
 
         <ng-container matColumnDef="noContent">
@@ -230,13 +302,15 @@
             {{ 'RESERVATION.LIST.HISTORY.ERROR.NO_CONTENT' | translate }}</td>
         </ng-container>
 
-        <tr *matFooterRowDef="['noContent']" [hidden]="reservation.history.length > 0" mat-footer-row></tr>
+        <tr *matFooterRowDef="['noContent']" [hidden]="history.length > 0" mat-footer-row></tr>
 
         <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-        <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
+        <tr (click)="expanded = expanded === history ? null : history"
+            *matRowDef="let history; columns: displayedColumns;" class="row" mat-row></tr>
+        <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row></tr>
       </table>
 
-      <mat-paginator *ngIf="reservation.history.length" [pageSize]="pageSize" showFirstLastButtons></mat-paginator>
+      <mat-paginator [pageSize]="pageSize" showFirstLastButtons></mat-paginator>
       <mat-divider></mat-divider>
     </mat-list>
   </mat-card-content>

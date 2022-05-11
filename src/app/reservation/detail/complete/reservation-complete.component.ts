@@ -54,7 +54,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   extraPrice: FormControl = new FormControl();
   type: FormControl = new FormControl(PaymentType.cash);
 
-  types = PaymentType;
+  types: string[] = Object.values(PaymentType);
   price: IPrice;
 
   durability?: string;
@@ -95,7 +95,6 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     this.createForm();
     this.subscribe();
     this.route.params.subscribe(routeParams => {
-      console.log(routeParams);
       this.reservationId = routeParams.id;
       this.roomId = routeParams.roomId;
       this.customerId = routeParams.customerId;
@@ -159,6 +158,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
         if (this.reservation.additional) {
           this.additionalSelected = this.reservation.additional;
         }
+        this.types = this.reservation.room.paymentTypes;
       }
       if (state.productDiscount) {
         this.additionalList = state.productDiscount.additionalList;
@@ -246,7 +246,6 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   }
 
   private getReservation(): void {
-    console.log('RESERVATION', this.reservation);
     if (!this.payments) {
       this.payments = undefined;
       this.store.dispatch(
@@ -256,7 +255,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     if (!this.reservation) {
       this.reservation = undefined;
       this.store.dispatch(
-        new fromActionsReservation.ReservationFind(this.reservationId)
+        new fromActionsReservation.ReservationFind({id: this.reservationId})
       );
     }
   }

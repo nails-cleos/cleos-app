@@ -1,6 +1,7 @@
 import { All, ReservationActionTypes } from '../reservation.actions';
 import {
-  IAvailableDTO, ICustomerLastReservation,
+  IAvailableDTO,
+  ICustomerLastReservation,
   ICustomerReservation,
   IReservation,
   IRoomReservation,
@@ -25,6 +26,7 @@ export interface State {
   productDiscount: IProductDiscountDTO[] | null;
   tracking: ITracking[] | ITracking | null;
   payments: IPayment[] | null;
+  history: IReservation[] | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -45,6 +47,7 @@ export const initialState: State = {
   productDiscount: null,
   tracking: null,
   payments: null,
+  history: null,
   errorMessage: null,
   error: null,
   subErrors: null,
@@ -199,6 +202,18 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         payments: [{}, {}, {}],
+        page: null,
+        filter: null,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: null
+      };
+    }
+    case ReservationActionTypes.reservationFindHistory: {
+      return {
+        ...state,
+        history: [{}, {}, {}],
         page: null,
         filter: null,
         errorMessage: null,
@@ -386,6 +401,16 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         payments: action.payload,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: null
+      };
+    }
+    case ReservationActionTypes.reservationHistorySuccess: {
+      return {
+        ...state,
+        history: action.payload,
         errorMessage: null,
         error: null,
         subErrors: null,

@@ -10,22 +10,19 @@ env:
 jobs:
   push:
     runs-on: ubuntu-latest
-    outputs:
-      version_name: ${{ steps.push_image.outputs.VERSION_NAME }}
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME
+        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USER }}/$IMAGE_NAME
 
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 
       - name: Push image
-        id: push_image
         run: |
-          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
+          IMAGE_ID=${{ secrets.DOCKER_USER }}/$IMAGE_NAME
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           # Strip git ref prefix from version
@@ -33,11 +30,8 @@ jobs:
           # Strip "v" prefix from tag name
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
           # Use Docker `latest` tag convention
-          [ "$VERSION" == "main" ] && VERSION=latest
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
-          echo "::set-output name=VERSION_NAME::$VERSION"
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+          # [ "$VERSION" == "main" ] && VERSION=latest
+          docker tag ${{ secrets.DOCKER_USER }}/$IMAGE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
 
   deploy:
@@ -55,15 +49,9 @@ jobs:
           key: ${{ secrets.SSHKEY }}
           envs: IMAGE_NAME
           script: |
-            echo "Log into registry"
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
-            echo "Pull image"
-            docker pull docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME:${{ needs.push.outputs.version_name }}
-            echo "Stop cleos image"
-            docker stop cleos
-            echo "Remove cleos container"
-            docker rm cleos
-            echo "Run Docker cleos"
-            docker run -d -p 443:443 -p 80:80 --restart=unless-stopped \
-            --mount type=bind,source=/opt/certs,target=/etc/nginx/certs \
-            --name cleos docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME:${{ needs.push.outputs.version_name }}
+            echo "Log into Docker"
+            docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+            echo "Docker pull"
+            docker-compose pull
+            echo "Run docker compose"
+            docker-compose --env-file /home/cleos/env.list up --build -d

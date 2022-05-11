@@ -8,6 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { IRoom, IRoomAll, ServiceType } from '../interfaces/room';
 import { IOffice } from '../interfaces/office';
 import { ICurrency } from '../interfaces/currency';
+import { IStep } from '../interfaces/step';
 
 export const snakeToCamel = (value: string = ''): string =>
   value.toLowerCase().replace(/([-_]\w)/g, (g: string) => g[1].toUpperCase());
@@ -45,7 +46,6 @@ export const getFullUserName = (user: IUserAll | IUser): string => {
   }
 
   names = [...names, `(${user.email})`];
-
   return names.join(' ');
 };
 
@@ -238,13 +238,8 @@ export const createRoomOffice = (rooms: IRoom[] | undefined): Map<string, IOffic
     return oMap;
   }, new Map<string, IOffice>());
 
-export const roomName = (room: IRoom | IRoomAll): string => {
-  if (room.address) {
-    return `${room.currency?.code} - ${room.address.name}`;
-  }
-
-  return '';
-};
+export const roomName = (room: IRoom | IRoomAll): string =>
+  room.currency && room.office ? `${room.office.name} - ${room.currency.code} (${currencySymbol(room.currency)})` : '';
 
 export const currencySymbol = (currency: ICurrency): string => {
   switch (currency.icon) {
@@ -255,6 +250,19 @@ export const currencySymbol = (currency: ICurrency): string => {
     default:
       return '$';
   }
+};
+
+export const getStep = (steps: IStep[], index: number): IStep | undefined => steps.find(s => s.order === index);
+
+export const getBackIndex = (steps: IStep[], current: number): number => {
+  let index = -1;
+  for (const step of steps.slice(0, current).reverse()) {
+    if (step.enable) {
+      index = step.order;
+      break;
+    }
+  }
+  return index;
 };
 
 const totalPaid = (payments: IPayment[] | undefined): number => {

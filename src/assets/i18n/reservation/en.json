@@ -178,7 +178,6 @@
     "LIST": {
       "COLUMN": {
         "AMOUNT": "Amount",
-        "TYPE": "Type",
         "STATUS": "Status"
       },
       "ERROR": {

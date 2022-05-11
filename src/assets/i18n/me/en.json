@@ -77,7 +77,6 @@
       }
     },
     "PAYMENT": {
-      "CREATED": "Payment complete successfully",
       "ERROR_TEXT": "Payment error",
       "ERROR": "Payment incomplete.\n{{reason}}",
       "LIST": {

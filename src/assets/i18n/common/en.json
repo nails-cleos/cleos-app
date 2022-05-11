@@ -26,7 +26,9 @@
       "COPY": "Copy",
       "SHARE": "Share",
       "COMPLETE": "Complete",
+      "PAYMENT": "Payment",
       "ML": "ML payment",
+      "PAYPAL": "PayPal payment",
       "NOTIFY": "Notify",
       "SELECT": "Select",
       "EXPAND": {
@@ -43,7 +45,8 @@
       "ACTIONS": "Actions",
       "LAST_UPDATE": "Last update",
       "NAME": "Name",
-      "DESCRIPTION": "Description"
+      "DESCRIPTION": "Description",
+      "TYPE": "Type"
     },
     "PAGINATOR": {
       "ITEMS_PER_PAGE_LABEL": "Items per page:",
@@ -83,11 +86,13 @@
       "PERCENTAGE": "Percentage"
     },
     "PAYMENT": {
+      "CREATED": "Payment complete successfully",
       "CASH": "Cash",
-      "ML": "Mercado Libre"
+      "ML": "Mercado Libre",
+      "PAYPAL": "PayPal"
     },
     "STATUS": {
-      "ML": {
+      "PAYMENT": {
         "NONE": "Pending",
         "APPROVED": "Approved",
         "REJECTED": "Rejected",

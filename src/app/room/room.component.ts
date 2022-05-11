@@ -15,6 +15,8 @@ import { Role } from '../interfaces/token';
 import { RoomIconName } from '../util/icon';
 import { ICurrency, ICurrencyAll } from '../interfaces/currency';
 import { IOffice, IOfficeAll } from '../interfaces/office';
+import { MatListOption } from '@angular/material/list';
+import { IPaymentType, paymentOptions } from '../interfaces/payment';
 
 export interface IIcon {
   week: RoomIconName;
@@ -66,12 +68,39 @@ export class RoomComponent implements OnInit, OnDestroy {
     Validators.required, requireMatch
   ]);
 
+  paymentOptions: IPaymentType[] = paymentOptions();
+
   private getState: Observable<any>;
   private subscription?: Subscription;
+  private paymentTypes: string[] = [];
 
   constructor(private readonly translate: TranslateService, private store: Store<AppState>,
               private formBuilder: FormBuilder, private router: Router) {
     this.getState = this.store.select(selectRoomState);
+  }
+
+  get create(): void {
+    if (this.validate()) {
+      return;
+    }
+
+    this.room.professionalId = this.professional.value.id;
+    this.room.officeId = this.office.value.id;
+    this.room.currencyId = this.currency.value.id;
+    this.room.paymentTypes = this.paymentTypes;
+    const location = this.address.value.geometry.location;
+    this.room.address = {
+      name: this.address.value.formatted_address,
+      description: this.addressDescription.value,
+      location: {
+        x: location.lng(),
+        y: location.lat()
+      } as ILocation
+    } as IAddress;
+
+    return this.store.dispatch(
+      new fromActionsRoom.RoomSave(this.room)
+    );
   }
 
   ngOnInit(): void {
@@ -91,29 +120,6 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   setStep(index: number): void {
     this.step = index;
-  }
-
-  create(): void {
-    if (this.validate()) {
-      return;
-    }
-
-    this.room.professionalId = this.professional.value.id;
-    this.room.officeId = this.office.value.id;
-    this.room.currencyId = this.currency.value.id;
-    const location = this.address.value.geometry.location;
-    this.room.address = {
-      name: this.address.value.formatted_address,
-      description: this.addressDescription.value,
-      location: {
-        x: location.lng(),
-        y: location.lat()
-      } as ILocation
-    } as IAddress;
-
-    this.store.dispatch(
-      new fromActionsRoom.RoomSave(this.room)
-    );
   }
 
   displayFn(user: IUser): string {
@@ -167,6 +173,14 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   addOffice(): void {
     this.router.navigate(['offices', 'add']);
+  }
+
+  onChange(options: MatListOption[]): void {
+    this.paymentTypes = options.map(o => o.value);
+  }
+
+  isSelected(it: IPaymentType): boolean {
+    return it.checked || this.paymentTypes.includes(it.name);
   }
 
   private createForm(): void {
