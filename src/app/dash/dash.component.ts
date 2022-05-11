@@ -76,8 +76,8 @@ export class DashComponent implements OnInit, OnDestroy {
           columns: 1,
           miniCard: {cols: 1, rows: 1},
           calendar: {cols: 1, rows: 4},
-          chart: {cols: 1, rows: 2},
-          table: {cols: 1, rows: 3}
+          chart: {cols: 1, rows: 1.5},
+          table: {cols: 1, rows: 4.5}
         };
       } else {
         this.cardLayout = {
@@ -172,6 +172,9 @@ export class DashComponent implements OnInit, OnDestroy {
           this.charts = state.chartSummaries;
           this.isLoading = false;
         } else {
+          if (state.error) {
+            this.isLoading = false;
+          }
           this.charts = [{} as IChart, {} as IChart, {} as IChart,
             {} as IChart, {} as IChart, {} as IChart, {} as IChart, {} as IChart];
         }

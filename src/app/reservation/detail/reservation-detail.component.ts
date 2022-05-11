@@ -25,12 +25,12 @@ import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Role } from '../../interfaces/token';
-import { currencySymbol, getFullUserName, getPrice, getUserName, snakeToCamel } from '../../util/helper';
+import { currencySymbol, getFullUserName, getPrice, getUserName, roomName, snakeToCamel } from '../../util/helper';
 import { IPrice, Price } from '../../interfaces/product';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatFabMenu, MatFabMenuDirection } from '@angular-material-extensions/fab-menu/lib/mat-fab-menu.component';
 import { IPayment } from '../../interfaces/payment';
-import { transitionAnimation } from '../../util/animation';
+import { detailExpandAnimation, transitionAnimation } from '../../util/animation';
 import { isToday, isTomorrow } from 'date-fns';
 import { ReservationIconKey, ReservationIconName } from '../../util/icon';
 import { DiscountDialogComponent } from '../../discount/list/discounts.component';
@@ -41,12 +41,15 @@ import { requireMatch } from '../../util/validators';
 
 @Component({
   selector: 'app-reservation-detail',
-  animations: [transitionAnimation],
+  animations: [transitionAnimation, detailExpandAnimation],
   templateUrl: './reservation-detail.component.html',
   styleUrls: ['./reservation-detail.component.scss']
 })
 export class ReservationDetailComponent implements OnInit, OnDestroy {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+
   reservation: IReservationAll | undefined;
+  history: IReservationAll[] | undefined;
   duration: IDuration = new Duration();
   start: Date = getNow();
   end: Date = getNow();
@@ -57,17 +60,17 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
   displayedColumns: string[] = ['position', 'professional', 'start', 'product', 'state'];
   dataSource: any;
+  expanded?: IReservationAll;
   pageSize = 5;
 
   price: IPrice;
-
-  paginator: MatPaginator | undefined;
 
   direction: MatFabMenuDirection = 'left';
   showFireworks = false;
 
   paymentPaid: any;
   paymentDisplayedColumns: string[] = ['position', 'description', 'status', 'type', 'amount'];
+  paymentExpanded?: IPayment;
 
   private payments: any;
   private tooltipPosition = 'below';
@@ -103,13 +106,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
-    this.paginator = mp;
-    if (this.dataSource) {
-      this.dataSource.paginator = this.paginator;
-    }
-  }
-
   get customerName(): string {
     return this.reservation ? getFullUserName(this.reservation.customer) : '';
   }
@@ -120,6 +116,10 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
   get currencySymbol(): string {
     return this.reservation ? currencySymbol(this.reservation.room.currency) : '';
+  }
+
+  get roomName(): string {
+    return this.reservation ? roomName(this.reservation.room) : '';
   }
 
   private static createMachine(stateMachineDefinition: any, initialState: any): any {
@@ -226,9 +226,10 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         if (this.reservation && this.reservation.product) {
           this.price = getPrice(this.reservation);
         }
-        this.dataSource = new MatTableDataSource<IReservationAll>(state.selected.history);
-        this.cdRef.detectChanges();
       }
+      this.history = state.history;
+      this.dataSource = new MatTableDataSource(state.history);
+      this.dataSource.paginator = this.paginator;
       if (state.errorMessage || state.message) {
         if (state.message) {
           const id: string | null = this.route.snapshot.paramMap.get('id');
@@ -241,10 +242,13 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   private getReservation(id: string | null): void {
     this.reservation = undefined;
     this.store.dispatch(
-      new fromActionsReservation.ReservationFind(id)
+      new fromActionsReservation.ReservationFind({id})
     );
     this.store.dispatch(
       new fromActionsReservation.ReservationFindPayments(id)
+    );
+    this.store.dispatch(
+      new fromActionsReservation.ReservationFindHistory({id})
     );
   }
 
@@ -327,7 +331,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     });
 
     const editTransaction = ReservationDetailComponent.createTransaction('edited', (): void => {
-      self.router.navigate(['reservation', reservationId, 'edit']);
+      self.router.navigate(['reservation', reservationId, 'edit'], {state: {roomId}});
     });
 
     const completeTransaction = ReservationDetailComponent.createTransaction('completed', (): void => {

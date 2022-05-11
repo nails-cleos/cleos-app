@@ -5,6 +5,7 @@ import { AppState, selectPaymentState } from '../../../../store/app.states';
 import { Store } from '@ngrx/store';
 import * as fromActionsPayment from '../../../../store/payment.actions';
 import { TranslateService } from '@ngx-translate/core';
+import { PaymentStatus, PaymentType } from '../../../../interfaces/payment';
 
 @Component({
   selector: 'app-payment-complete',
@@ -18,13 +19,15 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
   paymentId: any;
   preferenceId: any;
   reservationId: any;
+  payerId: any;
 
   constructor(private route: ActivatedRoute, private router: Router, private store: Store<AppState>,
               private translate: TranslateService) {
     this.getState = this.store.select(selectPaymentState);
     this.route.queryParams.subscribe(params => {
-      this.paymentId = params.payment_id;
+      this.paymentId = params.payment_id || params.paymentId;
       this.preferenceId = params.preference_id;
+      this.payerId = params.PayerID;
     });
   }
 
@@ -40,21 +43,27 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
     setTimeout(() => {
       this.reservationId = this.route.snapshot.paramMap.get('id');
       const status = this.route.snapshot.paramMap.get('status');
-      if (this.paymentId && this.paymentId !== 'null' && this.preferenceId && this.preferenceId !== 'null') {
+      if (this.paymentId && this.paymentId !== 'null') {
+        let type;
+        let referenceId;
+        if (this.preferenceId && this.preferenceId !== 'null') {
+          type = PaymentType.ml;
+          referenceId = this.preferenceId;
+        } else if (this.payerId && this.paymentId !== 'null') {
+          type = PaymentType.paypal;
+          referenceId = this.payerId;
+        } else {
+          const message = this.translate.instant('ME.PAYMENT.ERROR', {reason: 'incomplete'});
+          this.store.dispatch(
+            new fromActionsPayment.PaymentNotComplete({message})
+          );
+          this.router.navigate(['me', 'reservation', this.reservationId, 'payment']);
+          return;
+        }
+        const paymentStatus = new PaymentStatus(this.paymentId, type, referenceId);
         this.store.dispatch(
-          new fromActionsPayment.PaymentSave({
-            reservationId: this.reservationId,
-            status,
-            preferenceId: this.preferenceId,
-            mlPaymentId: this.paymentId
-          })
+          new fromActionsPayment.PaymentSave({reservationId: this.reservationId, status, paymentStatus})
         );
-      } else {
-        const message = this.translate.instant('ME.PAYMENT.ERROR', {reason: 'incomplete'});
-        this.store.dispatch(
-          new fromActionsPayment.PaymentNotComplete({message})
-        );
-        this.router.navigate(['me', 'reservation', this.reservationId, 'payment']);
       }
     }, 500);
   }

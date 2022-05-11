@@ -10,6 +10,8 @@ import { IIcon } from '../room.component';
 import { createDate } from '../../util/dates';
 import { getUserName } from '../../util/helper';
 import { RoomIconName } from '../../util/icon';
+import { IPaymentType, paymentOptions } from '../../interfaces/payment';
+import { MatListOption } from '@angular/material/list';
 
 @Component({
   selector: 'app-room-detail',
@@ -40,9 +42,12 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   ]);
   addressDescription: FormControl = new FormControl();
 
+  paymentOptions: IPaymentType[] = paymentOptions();
+
   private getState: Observable<any>;
   private subscription?: Subscription;
   private availabilities: IAvailability[] = [];
+  private paymentTypes: string[] = [];
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
               private router: Router) {
@@ -81,8 +86,8 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.room) {
       const room: IRoomAll = {
         id: this.room.id,
-        name: '', // TODO remove room.name
         availabilities: this.availabilities,
+        paymentTypes: this.paymentTypes,
         address: {
           name: this.room.address.name,
           location: this.room.address.location,
@@ -127,6 +132,14 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     this.step = step;
   }
 
+  onChange(options: MatListOption[]): void {
+    this.paymentTypes = options.map(o => o.value);
+  }
+
+  isSelected(it: IPaymentType): boolean {
+    return it.checked || this.paymentTypes.includes(it.name);
+  }
+
   private createForm(): void {
     this.form = this.formBuilder.group({
       address: this.address,
@@ -152,6 +165,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
           currency: state.selected.currency,
           office: state.selected.office
         } as IRoomAll;
+        this.paymentTypes = state.selected.paymentTypes;
         this.professionalName = getUserName(state.selected.professional);
         this.addressDescription.setValue(this.room.address?.description);
         this.address.setValue(this.room.address?.name);

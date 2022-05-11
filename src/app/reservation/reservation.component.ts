@@ -51,13 +51,16 @@ import {
   createProductGroupService,
   createRoomOffice,
   currencySymbol,
+  getBackIndex,
   getFullUserName,
   getPrice,
   getProductDurability,
+  getStep,
   getUserName,
   newAdditional,
   newDiscount,
-  newPrice
+  newPrice,
+  roomName
 } from '../util/helper';
 import { transitionAnimation } from '../util/animation';
 import { addDays, addMonths, isEqual, isSameDay } from 'date-fns';
@@ -65,6 +68,7 @@ import { findStateColor, isDarkMode } from '../util/theme';
 import { IAdditionalAll } from '../interfaces/additional';
 import { MatListOption } from '@angular/material/list';
 import { IOffice } from '../interfaces/office';
+import { IStep, Step } from '../interfaces/step';
 
 @Component({
   selector: 'app-reservation',
@@ -167,6 +171,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   private unavailableList: IUnavailableAll[] | undefined;
   private getState: Observable<any>;
   private subscription: Subscription | undefined;
+  private steps: IStep[];
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private formBuilder: FormBuilder, private breakpointObserver: BreakpointObserver,
@@ -204,6 +209,14 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
     this.maxCalendarDate = addMonths(getNow(), MAX_RESERVATION_MONTH);
+    const preview = new Step(6, 'preview', () => this.create);
+    const book = new Step(5, 'book_online', () => this.callStepSeven, preview);
+    const settings = new Step(4, 'settings', () => this.callStepSix, book);
+    const additional = new Step(3, 'post_add', () => this.callStepFive, settings, false);
+    const product = new Step(2, 'home_repair_service', () => this.callStepFour, additional);
+    const room = new Step(1, 'room', () => this.callStepThree, product);
+    const customer = new Step(0, 'person_search', () => this.callStepTwo, room);
+    this.steps = [customer, room, product, additional, settings, book, preview];
   }
 
   get professionalName(): string {
@@ -221,14 +234,17 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     return '';
   }
 
+  get roomName(): string {
+    return roomName(this.room.value);
+  }
+
   get back(): void {
     if (this.isPreview) {
       this.isPreview = false;
     } else {
       this.eventSelected = undefined;
     }
-    this.myStepper.previous();
-
+    this.myStepper.selectedIndex = getBackIndex(this.steps, this.myStepper.selectedIndex);
     return;
   }
 
@@ -237,9 +253,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
     this.getRoomList();
-    this.myStepper.next();
-
-    return;
+    return this.completeAndNext();
   }
 
   get callStepThree(): void {
@@ -247,31 +261,18 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
     this.getProductList();
-    this.myStepper.next();
-
-    return;
+    return this.completeAndNext();
   }
 
   get callStepFour(): void {
     if (this.productForm.invalid) {
       return;
     }
-    this.myStepper.next();
-    if (!this.additionalList || !this.additionalList.length) {
-      return this.callStepFive;
-    }
-
-    return;
+    return this.completeAndNext();
   }
 
   get callStepFive(): void {
-    this.myStepper.next();
-
-    if (this.isEditing) {
-      return this.callStepSix;
-    }
-
-    return;
+    return this.completeAndNext();
   }
 
   get callStepSix(): void {
@@ -306,9 +307,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         days: this.daysInWeek
       })
     );
-    this.myStepper.next();
-
-    return;
+    return this.completeAndNext();
   }
 
   get callStepSeven(): void {
@@ -319,9 +318,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
     this.isPreview = true;
-    this.myStepper.next();
-
-    return;
+    return this.completeAndNext();
   }
 
   get create(): void {
@@ -350,12 +347,15 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         );
       }
     }
-
     return;
   }
 
-  getDateTime(date: Date | string | undefined): string {
-    return date ? reservationDateTime(newDate(date), this.locale) : '';
+  private static goNext(step: IStep): void {
+    const nextStep = step.next;
+    if (nextStep && !nextStep.enable) {
+      nextStep.call();
+    }
+    return;
   }
 
   ngOnInit(): void {
@@ -368,7 +368,23 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       if (reservationId) {
         this.reservationId = reservationId;
         this.isEditing = true;
-        this.getReservation();
+        this.steps = this.steps.map(value => {
+          switch (value.order) {
+            case 0:
+              value.enable = false;
+              return value;
+            case 1:
+              const enable = !(this.isEditing && !this.isAdmin);
+              value.enable = enable;
+              return value;
+            case 4:
+              value.enable = false;
+              return value;
+            default:
+              return value;
+          }
+        });
+        this.getReservation(reservationId);
       } else {
         this.getCustomers();
       }
@@ -410,6 +426,25 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+  }
+
+  getStepName(index: number): string {
+    const step = getStep(this.steps, index);
+    return step ? step.name : '';
+  }
+
+  getStepEnabled(index: number): boolean {
+    const step = getStep(this.steps, index);
+    return !!step?.enable;
+  }
+
+  getStepCompleted(index: number): boolean {
+    const step = getStep(this.steps, index);
+    return !!step?.completed;
+  }
+
+  getDateTime(date: Date | string | undefined): string {
+    return date ? reservationDateTime(newDate(date), this.locale) : '';
   }
 
   getUsername(user: any): string {
@@ -556,9 +591,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     return isBetween(getNow(), this.maxCalendarDate, date);
   }
 
-  private getReservation(): void {
+  private getReservation(id: string | null): void {
     this.store.dispatch(
-      new fromActionsReservation.ReservationFind(this.reservationId)
+      new fromActionsReservation.ReservationFind({id})
     );
   }
 
@@ -569,9 +604,12 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private getProductList(): void {
-    this.store.dispatch(
-      new fromActionsReservation.GetAllServices({roomId: this.room.value.id, customerId: this.customer.value.id})
-    );
+    const roomId = this.room?.value?.id || this.roomId;
+    if (roomId) {
+      this.store.dispatch(
+        new fromActionsReservation.GetAllServices({roomId, customerId: this.customer.value?.id})
+      );
+    }
   }
 
   private createForm(): void {
@@ -612,8 +650,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       const room = value.rooms?.find((o: IOffice) => o.id === this.roomId);
       if (room) {
         this.roomList = value.rooms;
-        this.room.setValue(room);
-        this.roomId = this.room.value.id;
+        if (this.room.value.id !== this.roomId) {
+          this.room.setValue(room);
+          this.roomId = this.room.value.id;
+        }
       } else {
         if (this.roomList?.length === 1) {
           this.room.setValue(this.roomList[0]);
@@ -622,7 +662,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     });
-    this.room.valueChanges.subscribe(() => {
+    this.room.valueChanges.subscribe((value) => {
+      if (value && !this.groups) {
+        this.getProductList();
+      }
       this.group.setValue('');
       this.cleanProduct();
     });
@@ -815,6 +858,15 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.customerInfo = state.customer;
       this.customers = state.customers;
       this.additionalList = state.productDiscount?.additionalList;
+      if (this.additionalList && this.additionalList.length) {
+        this.steps = this.steps.map(value => {
+          if (value.order === 3) {
+            value.enable = true;
+            return value;
+          }
+          return value;
+        });
+      }
       if (state.productDiscount?.products) {
         this.groups = Array.from(createProductGroupService(new Map<string, IGroupService>(), state.productDiscount.products,
           this.room.value.currency).values());
@@ -947,7 +999,26 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.roomList?.filter(option => option.address?.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 
+  private completeAndNext(): void {
+    setTimeout(() => {
+      const step = getStep(this.steps, this.myStepper.selectedIndex);
+      if (step) {
+        this.completeStep(step);
+        ReservationComponent.goNext(step);
+      }
+    }, 100);
+  }
+
+  private completeStep(step: IStep): void {
+    this.myStepper.next();
+    step.completed = true;
+    this.steps[step.order] = step;
+  }
+
   private setData(reservation: IReservationAll): void {
+    if (!this.reservation) {
+      this.completeAndNext();
+    }
     this.reservation = reservation;
     this.isPreview = false;
     const date = newDate(reservation.start);
@@ -962,11 +1033,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     if (reservation.configuration) {
       this.reference.setValue(reservation.configuration.reference);
       this.customerChange.setValue(reservation.configuration.canCustomerChange);
-    }
-
-    this.myStepper.next();
-    if (!this.isAdmin) {
-      this.myStepper.next();
     }
   }
 }

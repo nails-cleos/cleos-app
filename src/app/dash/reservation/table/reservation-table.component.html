@@ -1,8 +1,9 @@
 <div *ngIf="!error; else errorBox">
-  <table [dataSource]="dataSource" mat-table matSort matSortActive="start" matSortDirection="desc" matSortDisableClear>
+  <table [dataSource]="dataSource" mat-table matSort matSortActive="start" matSortDirection="desc" matSortDisableClear
+         multiTemplateDataRows>
     <ng-container matColumnDef="position">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>#</th>
-      <td *matCellDef="let reservation; let i = index;" fxHide.lt-sm fxShow mat-cell>
+      <th *matHeaderCellDef mat-header-cell>#</th>
+      <td *matCellDef="let reservation; let i = dataIndex;">
         <div *ngIf="reservation.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -45,7 +46,8 @@
     </ng-container>
 
     <ng-container matColumnDef="product">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.PRODUCT' | translate }}</th>
+      <th *matHeaderCellDef fxHide.lt-sm fxShow
+          mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.PRODUCT' | translate }}</th>
       <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="reservation.id; else skeleton">{{reservation.product.name}}</div>
         <ng-template #skeleton>
@@ -69,14 +71,14 @@
     </ng-container>
 
     <ng-container matColumnDef="actions">
-      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-      <td *matCellDef="let reservation" mat-cell>
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+      <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="reservation.id; else skeleton">
           <button *ngIf="!reservation.deleted" [routerLink]="['/reservation', reservation.id]" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
             <mat-icon color="primary">visibility</mat-icon>
           </button>
-          <button (click)="delete(reservation)" *ngIf="isAdmin && !reservation.deleted" fxHide.lt-sm fxShow mat-icon-button
+          <button (click)="delete(reservation)" *ngIf="isAdmin && !reservation.deleted" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
             <mat-icon color="warn">delete</mat-icon>
           </button>
@@ -87,15 +89,54 @@
       </td>
     </ng-container>
 
+    <ng-container matColumnDef="expandedDetail">
+      <td *matCellDef="let reservation" [attr.colspan]="displayedColumns.length" fxHide fxShow.lt-sm>
+        <div [@detailExpand]="reservation === expanded ? 'expanded' : 'collapsed'" class="detail" fxHide fxShow.lt-sm>
+          <mat-list *ngIf="reservation.id">
+            <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
+            <mat-list-item role="list">
+              <div mat-line>{{getUsername(reservation.room.professional)}}</div>
+            </mat-list-item>
+            <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</div>
+            <mat-list-item role="list">
+              <div mat-line>{{getDateTime(reservation.start)}}</div>
+            </mat-list-item>
+            <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.PRODUCT' | translate }}</div>
+            <mat-list-item role="list">
+              <div mat-line>{{reservation.product.name}}</div>
+            </mat-list-item>
+            <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</div>
+            <mat-list-item role="list">
+              <div mat-line>
+                <mat-icon matPrefix>{{getIcon(reservation.state)}}</mat-icon>&nbsp;
+                {{ 'COMMON.STATUS.RESERVATION.' + reservation.state | translate}}
+              </div>
+            </mat-list-item>
+            <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+            <mat-list-item role="list">
+              <button [routerLink]="['/reservation', reservation.id]" color="primary" mat-icon-button>
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button (click)="delete(reservation)" *ngIf="!reservation.deleted" color="warn" mat-icon-button>
+                <mat-icon>delete</mat-icon>
+              </button>
+            </mat-list-item>
+          </mat-list>
+        </div>
+      </td>
+    </ng-container>
+
     <ng-container matColumnDef="noContent">
       <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
         {{ 'COMMON.RESERVATION.LIST.ERROR.NO_CONTENT' | translate }}</td>
     </ng-container>
 
-    <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
-
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-    <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
+    <tr (click)="expanded = expanded === currency ? null : currency"
+        *matRowDef="let currency; columns: displayedColumns;" class="row" mat-row></tr>
+    <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row></tr>
+
+    <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
   </table>
   <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
 </div>

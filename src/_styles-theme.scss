@@ -363,7 +363,7 @@
     color: mat.get-color-from-palette($primary-palette, 200);
   }
 
-  .ml, .approved {
+  .ml, .paypal, .approved {
     background-color: mat.get-color-from-palette($background, approved) !important;
   }
 
@@ -379,7 +379,7 @@
     background-color: mat.get-color-from-palette($background, in-progress) !important;
   }
 
-  .ml-button {
+  .payment-button {
     color: #009ee3 !important;
   }
 

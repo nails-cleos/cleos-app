@@ -33,6 +33,21 @@
                   <input [value]="professionalName" disabled matInput type="text">
                 </label>
               </mat-form-field>
+              <mat-list>
+                <mat-list-item>
+                  <div mat-subheader>{{ 'ROOM.PAYMENT_OPTION' | translate }}</div>
+                  <mat-divider></mat-divider>
+                </mat-list-item>
+                <mat-list-item>
+                  <mat-selection-list #paymentType (selectionChange)="onChange(paymentType.selectedOptions.selected)">
+                    <mat-list-option *ngFor="let option of paymentOptions" [disabled]="option.disabled"
+                                     [selected]="isSelected(option)" [value]="option.name" color="primary" mat-line>
+                      <div mat-line>{{option.name}}</div>
+                    </mat-list-option>
+                  </mat-selection-list>
+                </mat-list-item>
+                <mat-divider></mat-divider>
+              </mat-list>
               <mat-label class="divider">{{ 'ROOM.AVAILABILITY.FIELD' | translate }}</mat-label>
               <mat-accordion class="headers-align" multi>
                 <mat-expansion-panel (opened)="setStep(0)" [expanded]="step === 0" hideToggle>

@@ -26,6 +26,16 @@
       </td>
     </ng-container>
 
+    <ng-container matColumnDef="type">
+      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
+      <td *matCellDef="let payment" class="column-large-text" mat-cell>
+        <div *ngIf="payment.id; else skeleton">{{payment.type}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
     <ng-container matColumnDef="amount">
       <th *matHeaderCellDef mat-header-cell>{{ 'ME.PAYMENT.LIST.COLUMN.AMOUNT' | translate }}</th>
       <td *matCellDef="let payment" mat-cell>
@@ -42,7 +52,7 @@
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'ME.PAYMENT.LIST.COLUMN.STATUS' | translate }}</th>
       <td *matCellDef="let payment" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="payment.id; else skeleton">
-          {{'COMMON.STATUS.ML.' + (payment.status ? payment.status.toUpperCase() : 'NONE') | translate}}
+          {{'COMMON.STATUS.PAYMENT.' + (payment.status ? payment.status.toUpperCase() : 'NONE') | translate}}
         </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -55,11 +65,11 @@
       <td *matCellDef="let payment" mat-cell>
         <div *ngIf="payment.id; else skeleton">
           <button (click)="pay(payment)" *ngIf="payment.status !== 'approved'" mat-icon-button
-                  matTooltip="{{ 'COMMON.BUTTON.ML' | translate }}" matTooltipPosition="above">
-            <mat-icon class="ml-button" color="primary">payment</mat-icon>
+                  matTooltip="{{ 'COMMON.BUTTON.' + payment.type | translate }}" matTooltipPosition="above">
+            <mat-icon class="payment-button" color="primary">payment</mat-icon>
           </button>
           <button (click)="notify(payment)" *ngIf="payment.status !== 'approved'" mat-icon-button
-                  matTooltip="{{ 'COMMON.BUTTON.NOTIFY' | translate }}" matTooltipPosition="above">
+                  matTooltip="{{ 'COMMON.BUTTON.NOTIFY'| translate }}" matTooltipPosition="above">
             <mat-icon color="primary">update</mat-icon>
           </button>
         </div>

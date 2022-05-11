@@ -178,7 +178,6 @@
     "LIST": {
       "COLUMN": {
         "AMOUNT": "Importe",
-        "TYPE": "Forma",
         "STATUS": "Estado"
       },
       "ERROR": {

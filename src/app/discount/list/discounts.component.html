@@ -32,7 +32,7 @@
     </ng-container>
 
     <ng-container matColumnDef="type">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'DISCOUNT.LIST.COLUMN.TYPE' | translate }}</th>
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
       <td *matCellDef="let discount" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="discount.id; else skeleton">{{ 'COMMON.DISCOUNT.' + discount.type | translate}}</div>
         <ng-template #skeleton>
@@ -81,7 +81,7 @@
       <td *matCellDef="let discount" [attr.colspan]="displayedColumns.length" fxHide fxShow.lt-sm>
         <div [@detailExpand]="discount === expanded ? 'expanded' : 'collapsed'" class="detail" fxHide fxShow.lt-sm>
           <mat-list>
-            <div mat-subheader>{{ 'DISCOUNT.LIST.COLUMN.TYPE' | translate }}</div>
+            <div mat-subheader>{{ 'COMMON.COLUMN.TYPE' | translate }}</div>
             <mat-list-item role="list">
               <div mat-line>{{ 'COMMON.DISCOUNT.' + discount.type | translate}}</div>
             </mat-list-item>

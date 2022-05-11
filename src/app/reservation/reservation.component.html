@@ -303,23 +303,19 @@
         <mat-list-item>
           <mat-icon mat-list-icon>store</mat-icon>
           <div mat-line>{{ 'RESERVATION.ROOM.NAME.FIELD' | translate}}</div>
-          <div mat-line>{{room.value.name}}</div>
+          <div mat-line>{{roomName}}</div>
         </mat-list-item>
         <mat-list-item>
           <mat-icon mat-list-icon>person_pin</mat-icon>
           <div mat-line>{{ 'RESERVATION.ROOM.PROFESSIONAL.FIELD' | translate}}</div>
-          <div mat-line>
-            {{getUsername(room.value.professional)}}
-          </div>
+          <div mat-line>{{getUsername(room.value.professional)}}</div>
         </mat-list-item>
         <mat-list-item>
           <mat-icon mat-list-icon>room</mat-icon>
           <div mat-line>{{ 'COMMON.ADDRESS.FIELD' | translate}}</div>
           <div mat-line>
             <a [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + room.value.address.name"
-               rel="noreferrer" target="_blank">
-              {{room.value.address.name}}
-            </a>
+               rel="noreferrer" target="_blank">{{room.value.address.name}}</a>
           </div>
           <div mat-line>{{room.value.address.description}}</div>
         </mat-list-item>
@@ -404,7 +400,8 @@
 
 <ng-template [ngIfElse]="bigScreen" [ngIf]="smallScreen">
   <mat-vertical-stepper #stepper [linear]="true">
-    <mat-step [editable]="!isEditing" [stepControl]="customerForm" state="person_search">
+    <mat-step [completed]="getStepCompleted(0)" [editable]="getStepEnabled(0)" [state]="getStepName(0)"
+              [stepControl]="customerForm">
       <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</ng-template>
       <div *ngIf="!isEditing; else editing">
         <div class="flex-container" fxLayout="column">
@@ -434,7 +431,8 @@
         </div>
       </ng-template>
     </mat-step>
-    <mat-step [editable]="!(isEditing && !isAdmin)" [stepControl]="roomForm" state="room">
+    <mat-step [completed]="getStepCompleted(1)" [editable]="getStepEnabled(1)" [state]="getStepName(1)"
+              [stepControl]="roomForm">
       <ng-template matStepLabel>{{ 'COMMON.ROOM.FIELD' | translate }}</ng-template>
       <div class="flex-container" fxLayout="column">
         <div fxLayout="column" fxLayoutAlign="space-between start">
@@ -473,7 +471,8 @@
         </button>
       </div>
     </mat-step>
-    <mat-step [stepControl]="productForm" state="home_repair_service">
+    <mat-step [completed]="getStepCompleted(2)" [editable]="getStepEnabled(2)" [state]="getStepName(2)"
+              [stepControl]="productForm">
       <ng-template matStepLabel>{{ 'COMMON.PRODUCT.FIELD' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepThree"></ng-container>
       <div class="divider">
@@ -492,7 +491,7 @@
         </button>
       </div>
     </mat-step>
-    <mat-step state="post_add">
+    <mat-step [completed]="getStepCompleted(3)" [editable]="getStepEnabled(3)" [state]="getStepName(3)">
       <ng-template matStepLabel>{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepFour"></ng-container>
       <div class="divider">
@@ -504,7 +503,8 @@
         </button>
       </div>
     </mat-step>
-    <mat-step [editable]="!isEditing" [stepControl]="configurationForm" state="settings">
+    <mat-step [completed]="getStepCompleted(4)" [editable]="getStepEnabled(4)" [state]="getStepName(4)"
+              [stepControl]="configurationForm">
       <ng-template matStepLabel>{{ 'RESERVATION.CONFIGURATION.TITLE' | translate }}</ng-template>
       <div class="flex-container" fxLayout="row" fxLayoutAlign="space-between start">
         <ng-container *ngTemplateOutlet="stepFive"></ng-container>
@@ -519,7 +519,7 @@
         </button>
       </div>
     </mat-step>
-    <mat-step state="book_online">
+    <mat-step [completed]="getStepCompleted(5)" [editable]="getStepEnabled(5)" [state]="getStepName(5)">
       <ng-template matStepLabel>{{ 'RESERVATION.SCHEDULE.FIELD' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepSix"></ng-container>
       <div class="divider">
@@ -531,7 +531,7 @@
         </button>
       </div>
     </mat-step>
-    <mat-step state="preview">
+    <mat-step [completed]="getStepCompleted(6)" [editable]="getStepEnabled(6)" [state]="getStepName(6)">
       <ng-template matStepLabel>{{ 'RESERVATION.PREVIEW' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepSeven"></ng-container>
       <div class="divider">
@@ -548,7 +548,8 @@
 
 <ng-template #bigScreen>
   <mat-horizontal-stepper #stepper [linear]="true">
-    <mat-step [editable]="!isEditing" [stepControl]="customerForm" state="person_search">
+    <mat-step [completed]="getStepCompleted(0)" [editable]="getStepEnabled(0)" [state]="getStepName(0)"
+              [stepControl]="customerForm">
       <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</ng-template>
       <div *ngIf="!isEditing; else editing">
         <div class="flex-container" fxLayout="row" fxLayoutAlign="space-between start">
@@ -577,7 +578,8 @@
         </div>
       </ng-template>
     </mat-step>
-    <mat-step [editable]="!(isEditing && !isAdmin)" [stepControl]="roomForm" state="room">
+    <mat-step [completed]="getStepCompleted(1)" [editable]="getStepEnabled(1)" [state]="getStepName(0)"
+              [stepControl]="roomForm">
       <ng-template matStepLabel>{{ 'COMMON.ROOM.FIELD' | translate }}</ng-template>
       <div class="flex-container" fxLayout="row">
         <div fxLayout="row" fxLayoutAlign="space-between start">
@@ -621,7 +623,8 @@
         </button>
       </div>
     </mat-step>
-    <mat-step [stepControl]="productForm" state="home_repair_service">
+    <mat-step [completed]="getStepCompleted(2)" [editable]="getStepEnabled(2)" [state]="getStepName(2)"
+              [stepControl]="productForm">
       <ng-template matStepLabel>{{ 'COMMON.PRODUCT.FIELD' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepThree"></ng-container>
       <div>
@@ -643,7 +646,7 @@
         </button>
       </div>
     </mat-step>
-    <mat-step state="post_add">
+    <mat-step [completed]="getStepCompleted(3)" [editable]="getStepEnabled(3)" [state]="getStepName(3)">
       <ng-template matStepLabel>{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepFour"></ng-container>
       <div>
@@ -657,7 +660,8 @@
         </button>
       </div>
     </mat-step>
-    <mat-step [editable]="!isEditing" [stepControl]="configurationForm" state="settings">
+    <mat-step [completed]="getStepCompleted(4)" [editable]="getStepEnabled(4)" [state]="getStepName(2)"
+              [stepControl]="configurationForm">
       <ng-template matStepLabel>{{ 'RESERVATION.CONFIGURATION.TITLE' | translate }}</ng-template>
       <div class="flex-container" fxLayout="row" fxLayoutAlign="space-between start">
         <ng-container *ngTemplateOutlet="stepFive"></ng-container>
@@ -674,7 +678,7 @@
         </button>
       </div>
     </mat-step>
-    <mat-step state="book_online">
+    <mat-step [completed]="getStepCompleted(5)" [editable]="getStepEnabled(5)" [state]="getStepName(5)">
       <ng-template matStepLabel>{{ 'RESERVATION.SCHEDULE.FIELD' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepSix"></ng-container>
       <div class="divider">
@@ -687,7 +691,7 @@
           {{ 'COMMON.BUTTON.NEXT' | translate }}</button>
       </div>
     </mat-step>
-    <mat-step state="preview">
+    <mat-step [completed]="getStepCompleted(6)" [editable]="getStepEnabled(6)" [state]="getStepName(6)">
       <ng-template matStepLabel>{{ 'RESERVATION.PREVIEW' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepSeven"></ng-container>
       <div class="divider">

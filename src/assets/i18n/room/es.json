@@ -3,6 +3,7 @@
     "TITLE": "Agregar sala",
     "CREATED": "Sala {{name}} creada",
     "DETAIL": "Actualizar sala",
+    "PAYMENT_OPTION": "Opciones de pago",
     "LIST": {
       "COLUMN": {
         "CURRENCY": "Moneda",

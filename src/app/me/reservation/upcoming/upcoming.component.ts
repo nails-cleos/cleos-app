@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { IUpcomingAll } from '../../../interfaces/reservation';
-import { currencySymbol, getPrice, getUserName } from '../../../util/helper';
+import { currencySymbol, getPrice, getUserName, roomName } from '../../../util/helper';
 import { TranslateService } from '@ngx-translate/core';
 import { stampAnimation, transitionAnimation } from '../../../util/animation';
 import { createNewDate, newDate, reservationDuration } from '../../../util/dates';
@@ -24,6 +24,10 @@ export class UpcomingComponent implements OnChanges {
 
   get professionalName(): string {
     return this.upcoming ? getUserName(this.upcoming.room.professional) : '';
+  }
+
+  get roomName(): string {
+    return this.upcoming ? roomName(this.upcoming.room) : '';
   }
 
   ngOnChanges(changes: SimpleChanges): void {

@@ -31,6 +31,8 @@ import { ReservationEffects } from '../store/effects/reservation.effects';
 import { DiscountEffects } from '../store/effects/discount.effects';
 import { DiscountService } from '../services/discount.service';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { CurrencyService } from '../services/currency.service';
+import { CurrencyEffects } from '../store/effects/currency.effects';
 
 @NgModule({
   declarations: [
@@ -63,7 +65,7 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
       isolate: false,
       extend: true
     }),
-    EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects])
+    EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects, CurrencyEffects])
   ],
   providers: [
     ReservationService,
@@ -73,7 +75,8 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
     UserService,
     AdditionalService,
     TrackingService,
-    DiscountService
+    DiscountService,
+    CurrencyService
   ]
 })
 export class MeModule {

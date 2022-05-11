@@ -86,8 +86,11 @@ export class ReservationService {
   }
 
   public getById(id: string | null): Observable<IReservation | undefined> {
-    const url = `${this.url}/${id}`;
-    return this.http.get<IReservation>(url);
+    return this.http.get<IReservation>(`${this.url}/${id}`);
+  }
+
+  public findHistory(id: string | null): Observable<IReservation | undefined> {
+    return this.http.get<IReservation>(`${this.url}/${id}/history`);
   }
 
   public add(reservation: IReservation): Observable<IReservation> {

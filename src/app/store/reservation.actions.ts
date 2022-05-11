@@ -15,6 +15,7 @@ export enum ReservationActionTypes {
   customerSearchReservation = '[Reservation] Customer search reservation',
   reservationFind = '[Reservation] Find',
   reservationFindPayments = '[Reservation] Find payments',
+  reservationFindHistory = '[Reservation] Find history',
   findTracking = '[Reservation] Find tracking',
   reservationSave = '[Reservation] Save',
   reservationSelected = '[Reservation] Selected',
@@ -38,6 +39,7 @@ export enum ReservationActionTypes {
   reservationAdditionalSuccess = '[Reservation] Additional success',
   reservationRoomsSuccess = '[Reservation] Rooms success',
   reservationPaymentsSuccess = '[Reservation] Payments success',
+  reservationHistorySuccess = '[Reservation] History success',
   reservationSaveSuccess = '[Reservation] Save Success',
   reservationsCustomerSuccess = '[Reservation] reservations customer Success',
   trackingSuccess = '[Reservation] Tracking success',
@@ -181,6 +183,13 @@ export class ReservationPaymentsSuccess implements Action {
   }
 }
 
+export class ReservationHistorySuccess implements Action {
+  readonly type = ReservationActionTypes.reservationHistorySuccess;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class ReservationSave implements Action {
   readonly type = ReservationActionTypes.reservationSave;
 
@@ -225,6 +234,13 @@ export class ReservationFind implements Action {
 
 export class ReservationFindPayments implements Action {
   readonly type = ReservationActionTypes.reservationFindPayments;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class ReservationFindHistory implements Action {
+  readonly type = ReservationActionTypes.reservationFindHistory;
 
   constructor(public payload: any) {
   }
@@ -355,11 +371,13 @@ export type All =
   | ReservationRoomsSuccess
   | ReservationAdditionalSuccess
   | ReservationPaymentsSuccess
+  | ReservationHistorySuccess
   | ReservationSaveSuccess
   | ReservationCustomerSuccess
   | ReservationFailure
   | ReservationFind
   | ReservationFindPayments
+  | ReservationFindHistory
   | ReservationSelected
   | DeleteReservation
   | Approve
