@@ -5,7 +5,7 @@ import { AppState, selectProductState } from '../store/app.states';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
 import { IProduct, IProductGroup, Product, ProductGroup } from '../interfaces/product';
-import { API_LOCALE, createNewDate, getNow, getTime } from '../util/dates';
+import { createNewDate, getNow, getTime } from '../util/dates';
 import { Router } from '@angular/router';
 
 @Component({
@@ -32,17 +32,7 @@ export class ProductComponent implements OnInit, OnDestroy {
     this.getState = this.store.select(selectProductState);
   }
 
-  ngOnInit(): void {
-    this.createForm();
-    this.clean();
-    this.subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  create(): void {
+  get create(): void {
     let hasError = false;
     if (!this.products.length) {
       hasError = true;
@@ -72,12 +62,12 @@ export class ProductComponent implements OnInit, OnDestroy {
     group.durabilityMax = this.form.value.durabilityMax;
     group.products = this.products;
 
-    this.store.dispatch(
+    return this.store.dispatch(
       new fromActionsProduct.ProductSave(group)
     );
   }
 
-  addTab(): void {
+  get addTab(): void {
     if (this.inputName) {
       const product: IProduct = new Product(this.inputName.nativeElement.value, !this.products.length);
       this.inputName.nativeElement.value = '';
@@ -85,6 +75,17 @@ export class ProductComponent implements OnInit, OnDestroy {
       this.products.push(product);
       this.selected.setValue(this.products.length - 1);
     }
+    return;
+  }
+
+  ngOnInit(): void {
+    this.createForm();
+    this.clean();
+    this.subscribe();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 
   removeTab(index: number): void {
@@ -99,7 +100,7 @@ export class ProductComponent implements OnInit, OnDestroy {
   setTime(product: IProduct, $event: any): void {
     const time = $event.split(':');
     const date = createNewDate(getNow(), time[0], time[1]);
-    product.duration = getTime(date, API_LOCALE);
+    product.duration = getTime(date);
   }
 
   setPrimary(tab: IProduct): void {

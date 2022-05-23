@@ -421,6 +421,14 @@
     border: 2px solid mat.get-color-from-palette($primary-palette);
     border-top-color: mat.get-color-from-palette($background, hover);
   }
+
+  .warning {
+    color: mat.get-color-from-palette($warn-palette, darker);
+  }
+
+  .success {
+    color: mat.get-color-from-palette($background, success)
+  }
 }
 
 @mixin theme($theme) {

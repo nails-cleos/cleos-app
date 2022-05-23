@@ -53,19 +53,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit(): void {
-    this.code = this.route.snapshot.queryParamMap.get('code');
-    this.codeForm.setValue(this.code);
-    this.createForm();
-    this.subscribe();
-    this.cdRef.detectChanges();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  register(): void {
+  get register(): void {
     if (this.form.invalid || this.passwordComponent.passwordFormControl.invalid
       || this.passwordComponent.passwordConfirmationFormControl.invalid) {
       return;
@@ -81,12 +69,24 @@ export class SignUpComponent implements OnInit, OnDestroy {
     user.code = this.codeForm.value;
     user.theme = this.cookieService.get(THEME) as Theme;
 
-    this.store.dispatch(new fromActionsLogin.SignUp(user));
+    return this.store.dispatch(new fromActionsLogin.SignUp(user));
   }
 
-  onStrengthChanged(): void {
+  get onStrengthChanged(): void {
     this.showError = true;
-    this.passwordComponent.passwordConfirmationFormControl.updateValueAndValidity();
+    return this.passwordComponent.passwordConfirmationFormControl.updateValueAndValidity();
+  }
+
+  ngOnInit(): void {
+    this.code = this.route.snapshot.queryParamMap.get('code');
+    this.codeForm.setValue(this.code);
+    this.createForm();
+    this.subscribe();
+    this.cdRef.detectChanges();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 
   private createForm(): void {

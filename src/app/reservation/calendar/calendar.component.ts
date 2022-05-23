@@ -19,6 +19,7 @@ import {
   IDuration,
   isBetween,
   newDate,
+  newDateTimestamp,
   reservationDuration,
   startOfPeriod,
   subPeriod
@@ -108,6 +109,14 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.dateOrViewChanged();
   }
 
+  get increment(): void {
+    return this.picker.select(addPeriod(this.selectView, this.viewDate, this.daysInWeek));
+  }
+
+  get decrement(): void {
+    return this.picker.select(subPeriod(this.selectView, this.viewDate, this.daysInWeek));
+  }
+
   ngOnInit(): void {
     this.subscribe();
     this.clean();
@@ -143,14 +152,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.getReservations();
   }
 
-  increment(): void {
-    this.picker.select(addPeriod(this.selectView, this.viewDate, this.daysInWeek));
-  }
-
-  decrement(): void {
-    this.picker.select(subPeriod(this.selectView, this.viewDate, this.daysInWeek));
-  }
-
   beforeMonthViewRender({header}: any): void {
     header.forEach((day: any) => {
       if (!this.dateIsValid(day.date)) {
@@ -159,8 +160,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
     });
   }
 
-  getRoomName(room: IRoomAll): string {
-    return roomName(room);
+  sortData(data: IRoomReservation[]): IRoomReservation[] {
+    return data.slice().sort((a, b) =>
+      roomName(a.room) > roomName(b.room) ? 1 : -1);
   }
 
   private changeDate(date: Date): void {
@@ -191,7 +193,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.calendar?.set(rr.room.id, new Calendar(rr.room, []));
     reservations.forEach(it => {
       if (it.product.duration) {
-        const start = newDate(it.start);
+        const start = newDateTimestamp(it.timestamp);
         const duration = reservationDuration(it);
         const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
         const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
@@ -200,7 +202,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
         });
 
         const color = findStateColor(it.state, darkMode);
-        const meta = new Meta(true);
+        const meta = new Meta(true, it.room.timeZone);
         const event = newEvent(detail, color, start, end, '#000', `reservation/${it.id}`, meta);
         if (event) {
           const calendar = this.calendar?.get(rr.room.id);
@@ -221,7 +223,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     let recurringEvents: any[] = [];
     unavailableList.forEach(it => {
       if (it.duration || it.allDay) {
-        const startDate = newDate(it.start);
+        const startDate = newDateTimestamp(it.timestamp);
         const start = it.allDay ? createNewDate(startDate) : startDate;
         const duration = getDuration(it.allDay, it.duration);
         if (it.repeat === 'NONE') {
@@ -278,7 +280,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     });
 
     const color = findStateColor('DEFAULT', darkMode);
-    const meta = new Meta(!it.allDay);
+    const meta = new Meta(!it.allDay, room.timeZone);
     const event = newEvent(detail, color, start, end, '#000', `unavailable/${it.id}`, meta);
     if (event) {
       events = [...events, event];
@@ -303,15 +305,15 @@ export class CalendarComponent implements OnInit, OnDestroy {
       this.calendar = new Map<string, ICalendar>();
       this.data.forEach((value: IRoomReservation) => this.addReservations(value, darkMode));
       this.calendar.forEach(calendar => {
+        const timeZone = calendar.room.timeZone;
         const {week, saturday, sunday, exclude} = getAvailability(calendar.room);
-        const {min, max} = getStartEndDay(week, saturday, sunday);
-        calendar.day = new Day(min.getHours() - 1, min.getMinutes(),
-          max.getHours() + 1, max.getMinutes(), exclude);
+        const {min, max} = getStartEndDay(week, saturday, sunday, timeZone);
+        calendar.day = new Day(min, max, getNow(), exclude);
         const unavailable = this.translate.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
         const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
         const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
         calendar.events = calendar.events.concat(fillNotAvailable(unavailable, lunch, notWorking, this.viewDate,
-          sunday, saturday, week, darkMode, this.maxDate));
+          sunday, saturday, week, darkMode, this.maxDate, timeZone));
       });
       this.data.forEach((value: IRoomReservation) => this.addUnavailableList(value, darkMode));
     }
@@ -343,7 +345,7 @@ export class CalendarDialogComponent {
   constructor(public dialogRef: MatDialogRef<CalendarDialogComponent>) {
   }
 
-  onNoClick(): void {
-    this.dialogRef.close();
+  get onNoClick(): void {
+    return this.dialogRef.close();
   }
 }

@@ -1,4 +1,4 @@
-<button (click)="onNoClick()" class="close-button" mat-icon-button>
+<button (click)="onNoClick" class="close-button" mat-icon-button>
   <mat-icon class="close-icon">close</mat-icon>
 </button>
 <h1 mat-dialog-title>{{title}}</h1>
@@ -21,7 +21,7 @@
 </div>
 <div mat-dialog-actions>
   <div fxFlex></div>
-  <button (click)="doAction()" cdkFocusInitial color="primary"
+  <button (click)="doAction" cdkFocusInitial color="primary"
           mat-raised-button>{{ 'COMMON.BUTTON.DISCOUNT.SEND' | translate }}</button>
-  <button (click)="onNoClick()" mat-raised-button>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+  <button (click)="onNoClick" mat-raised-button>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
 </div>

@@ -1,9 +1,10 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { IUpcomingAll } from '../../../interfaces/reservation';
-import { currencySymbol, getPrice, getUserName, roomName } from '../../../util/helper';
+import { getPrice, openDialog } from '../../../util/helper';
 import { TranslateService } from '@ngx-translate/core';
 import { stampAnimation, transitionAnimation } from '../../../util/animation';
-import { createNewDate, newDate, reservationDuration } from '../../../util/dates';
+import { createNewDate, isSameTimeZone, newDateTimestamp, reservationDuration } from '../../../util/dates';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-upcoming',
@@ -17,25 +18,23 @@ export class UpcomingComponent implements OnChanges {
 
   language: string;
 
-  constructor(private readonly translate: TranslateService) {
+  constructor(private readonly translate: TranslateService, public dialog: MatDialog) {
     this.language = translate.currentLang;
     this.showHeader = false;
   }
 
-  get professionalName(): string {
-    return this.upcoming ? getUserName(this.upcoming.room.professional) : '';
-  }
-
-  get roomName(): string {
-    return this.upcoming ? roomName(this.upcoming.room) : '';
+  get showTimeZone(): boolean {
+    return this.upcoming ? !isSameTimeZone(this.upcoming.room.timeZone) : false;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     this.loadUpcoming();
   }
 
-  getCurrencySymbol(): string {
-    return this.upcoming ? currencySymbol(this.upcoming.room.currency) : '';
+  openDialog(reservationDate: Date): void {
+    if (this.upcoming) {
+      openDialog(this.upcoming.room, this.language, this.translate, this.dialog, reservationDate);
+    }
   }
 
   private loadUpcoming(): void {
@@ -52,10 +51,11 @@ export class UpcomingComponent implements OnChanges {
       }
       const price = getPrice(this.upcoming, this.upcoming.payments);
       const duration = reservationDuration(this.upcoming);
-      const start = newDate(this.upcoming.start);
-      const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
+      const start = newDateTimestamp(this.upcoming.timestamp);
+      const end = createNewDate(start, start.getHours() + duration.hour,
+        start.getMinutes() + duration.minute);
 
-      this.upcoming = Object.assign({}, this.upcoming, {rowSpan, price, end});
+      this.upcoming = Object.assign({}, this.upcoming, {rowSpan, price, end, start});
     }
   }
 }

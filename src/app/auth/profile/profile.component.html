@@ -30,7 +30,7 @@
             <div class="center ssc-circle mb w-60"></div>
           </div>
         </ng-template>
-        <form (ngSubmit)="update()" [formGroup]="form" novalidate>
+        <form (ngSubmit)="update" [formGroup]="form" novalidate>
           <mat-card-content *ngIf="user; else boxSkeleton">
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <mat-form-field appearance="fill">

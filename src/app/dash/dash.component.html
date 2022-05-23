@@ -24,19 +24,19 @@
       </ng-template>
     </mat-card-title>
     <mat-card-subtitle class="calendar-title">
-      <button (click)="changeDate()" (viewDateChange)="closeOpenMonthViewDay()" [(viewDate)]="viewDate"
+      <button (click)="changeDate" (viewDateChange)="closeOpenMonthViewDay" [(viewDate)]="viewDate"
               [class.spinner]="isLoading || isCalendarLoading" [disabled]="isLoading || isCalendarLoading" [view]="view"
               color="accent" mat-raised-button mwlCalendarPreviousView>
         <mat-icon>navigate_before</mat-icon>
         <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.PREVIOUS' | translate}}</span>
       </button>
-      <button (click)="changeDate()" [(viewDate)]="viewDate" [class.spinner]="isLoading || isCalendarLoading"
+      <button (click)="changeDate" [(viewDate)]="viewDate" [class.spinner]="isLoading || isCalendarLoading"
               [disabled]="isLoading || isCalendarLoading" class="btn btn-outline-secondary" color="accent"
               mat-raised-button mwlCalendarToday>
         <mat-icon>today</mat-icon>
         <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.TODAY' | translate}}</span>
       </button>
-      <button (click)="changeDate()" (viewDateChange)="closeOpenMonthViewDay()" [(viewDate)]="viewDate"
+      <button (click)="changeDate" (viewDateChange)="closeOpenMonthViewDay" [(viewDate)]="viewDate"
               [class.spinner]="isLoading || isCalendarLoading" [disabled]="isLoading || isCalendarLoading" [view]="view"
               color="accent" mat-raised-button mwlCalendarNextView>
         <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.NEXT' | translate}}</span>

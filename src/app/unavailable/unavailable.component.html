@@ -1,7 +1,7 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
-      <form (ngSubmit)="create()" [formGroup]="form" novalidate>
+      <form (ngSubmit)="create" [formGroup]="form" novalidate>
         <mat-card class="style-card">
           <mat-card-header>
             <mat-card-title>{{ 'UNAVAILABLE.TITLE' | translate }}</mat-card-title>
@@ -11,12 +11,13 @@
               <mat-form-field *ngIf="professionals; else skeleton" appearance="fill">
                 <mat-label>{{ 'UNAVAILABLE.PROFESSIONAL.FIELD' | translate }}</mat-label>
                 <label>
-                  <input [formControl]="professional" [matAutocomplete]="auto" matInput required type="text">
+                  <input (keydown)="keyDownHandler($event)" [formControl]="professional" [matAutocomplete]="auto"
+                         matInput required type="text">
                 </label>
                 <mat-autocomplete #auto="matAutocomplete" (optionSelected)="getRoom($event.option.value)"
                                   [displayWith]="displayFn">
                   <mat-option *ngFor="let professional of filteredOptions | async" [value]="professional">
-                    {{getProfessionalName(professional)}}
+                    {{professional | userName}}
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="professional.hasError('required')"
@@ -40,7 +41,7 @@
                 <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
               </mat-form-field>
 
-              <div *ngIf="room" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
+              <div *ngIf="professional.valid" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
                 <mat-form-field appearance="fill" color="primary" style="margin-right: 12px;">
                   <mat-label>{{ 'UNAVAILABLE.DATE.FIELD' | translate }}</mat-label>
                   <button (click)="picker.open()" mat-icon-button matPrefix>
@@ -63,7 +64,7 @@
                 <mat-form-field *ngIf="!allDay.value" appearance="fill" style="margin-right: 12px;">
                   <mat-label>{{ 'UNAVAILABLE.TIME.FIELD' | translate }}</mat-label>
                   <label>
-                    <input (focusin)="focusin()" [formControl]="startTime" [format]="24" [max]="maxTime" [min]="minTime"
+                    <input (focusin)="focusin" [formControl]="startTime" [format]="24" [max]="maxTime" [min]="minTime"
                            [ngxTimepicker]="time" matInput name="start_time" readonly/>
                   </label>
                   <span matPrefix><mat-icon (click)="time.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
@@ -91,7 +92,7 @@
                 </mat-error>
               </mat-form-field>
 
-              <mat-form-field *ngIf="room" appearance="fill">
+              <mat-form-field *ngIf="professional.valid" appearance="fill">
                 <mat-label>{{ 'UNAVAILABLE.REPEAT.FIELD' | translate }}</mat-label>
                 <mat-select [formControl]="repeat" required>
                   <mat-option *ngFor="let t of repeats | keyvalue" [value]="t.value">

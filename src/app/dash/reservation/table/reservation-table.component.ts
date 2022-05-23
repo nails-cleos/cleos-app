@@ -12,9 +12,8 @@ import { DialogComponent } from '../../../shared/dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { getUserName, snakeToCamel } from '../../../util/helper';
-import { ReservationIconKey, ReservationIconName } from '../../../util/icon';
-import { newDate, reservationDateTime } from '../../../util/dates';
+import { openDialog } from '../../../util/helper';
+import { isSameTimeZone, newDateTimestamp } from '../../../util/dates';
 import { Role } from '../../../interfaces/token';
 import { detailExpandAnimation } from '../../../util/animation';
 
@@ -36,6 +35,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
   pageSize = PAGE_SIZE;
   error: any;
   isAdmin = false;
+  locale: string;
 
   private getState: Observable<any>;
   private subscription?: Subscription;
@@ -44,6 +44,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
     this.getState = this.store.select(selectReservationState);
+    this.locale = this.translate.currentLang;
     this.store.select(selectAuthState).subscribe((state: any) =>
       this.isAdmin = state.user?.authorities.some((u: { authority: Role }) => u.authority === Role.admin));
     breakpointObserver.observe([
@@ -76,21 +77,18 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
     this.paginatorSubscription?.unsubscribe();
   }
 
-  getUsername(user: any): string {
-    return getUserName(user);
+  showTimeZone(reservation: IReservationAll): boolean {
+    return !isSameTimeZone(reservation.room.timeZone);
   }
 
-  getIcon(name: any): any {
-    return ReservationIconName[snakeToCamel(name) as ReservationIconKey];
-  }
-
-  getDateTime(date: string): string {
-    return reservationDateTime(newDate(date), this.translate.currentLang);
+  openDialog(reservation: IReservationAll): void {
+    const time = newDateTimestamp(reservation.timestamp);
+    openDialog(reservation.room, this.locale, this.translate, this.dialog, time);
   }
 
   delete(reservation: IReservation): void {
     const title = this.translate.instant('RESERVATION.DELETED.TITLE');
-    const content = this.translate.instant('RESERVATION.DELETED.CONTENT', {date: reservation.start});
+    const content = this.translate.instant('RESERVATION.DELETED.CONTENT', {date: newDateTimestamp(reservation.timestamp)});
     const dialogRef = this.dialog.open(DialogComponent, {
       data: {title, content, value: reservation}
     });

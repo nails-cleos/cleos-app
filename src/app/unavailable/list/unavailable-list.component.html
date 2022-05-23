@@ -15,7 +15,7 @@
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
           mat-sort-header>{{ 'UNAVAILABLE.LIST.COLUMN.PROFESSIONAL' | translate }}</th>
       <td *matCellDef="let unavailable" fxHide.lt-sm fxShow mat-cell>
-        <div *ngIf="unavailable.id; else skeleton">{{getProfessionalName(unavailable.professional)}}</div>
+        <div *ngIf="unavailable.id; else skeleton">{{unavailable?.professional | userName}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
@@ -37,7 +37,12 @@
       <th *matHeaderCellDef mat-header-cell
           mat-sort-header>{{ 'UNAVAILABLE.LIST.COLUMN.START' | translate }}</th>
       <td *matCellDef="let unavailable" mat-cell>
-        <div *ngIf="unavailable.id; else skeleton">{{unavailable.start | date:'short':undefined:language}}</div>
+        <div *ngIf="unavailable.id; else skeleton">
+          {{unavailable | timeDetail | date:'short':unavailable.timeZone:language}}
+          <button (click)="openDialog(unavailable)" *ngIf="showTimeZone(unavailable)" mat-icon-button type="button">
+            <mat-icon>info_outline</mat-icon>
+          </button>
+        </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
@@ -51,7 +56,7 @@
         <div *ngIf="unavailable.id; else skeleton">
           <div *ngIf="!unavailable.allDay; else allDay">
             <mat-icon matPrefix>timer</mat-icon>&nbsp;
-            {{unavailable.hour | number:'2.0-0'}}:{{unavailable.minute | number:'2.0-0'}}
+            {{unavailable.duration | durationTime}}
           </div>
           <ng-template #allDay>
             <mat-icon matPrefix>timer</mat-icon>&nbsp;
@@ -103,7 +108,7 @@
           <mat-list>
             <div fxHide fxShow.lt-sm mat-subheader>{{ 'UNAVAILABLE.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
             <mat-list-item fxHide fxShow.lt-sm role="list">
-              <div mat-line>{{getProfessionalName(unavailable.professional)}}</div>
+              <div mat-line>{{unavailable?.professional | userName}}</div>
             </mat-list-item>
             <div *ngIf="unavailable.description" fxHide fxShow.lt-sm
                  mat-subheader>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</div>

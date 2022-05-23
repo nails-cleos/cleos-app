@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { IProduct, IProductGroup } from '../../interfaces/product';
 import { detailExpandAnimation } from '../../util/animation';
 import { TranslateService } from '@ngx-translate/core';
-import { formatDuration } from '../../util/dates';
 import { getProductDurability } from '../../util/helper';
 
 @Component({
@@ -25,29 +24,22 @@ export class MiniCardProductComponent implements OnInit {
     this.expand = true;
   }
 
+  get setGroup(): void {
+    return this.groupEvent.emit(this.card);
+  }
+
   ngOnInit(): void {
     if (this.card) {
       if (this.card.durabilityMin && this.card.durabilityMax) {
         this.durability = getProductDurability(this.card.durabilityMin, this.card.durabilityMax, this.translate);
       }
-      this.products = this.card.products?.map(product => {
-        if (product.duration) {
-          const duration = formatDuration(product.duration, this.translate.currentLang);
-
-          return Object.assign({}, product, {duration});
-        }
-        return product;
-      });
+      this.products = this.card.products;
     }
   }
 
   click($event: MouseEvent): void {
     this.expand = !this.expand;
     $event.stopPropagation();
-  }
-
-  setGroup(): void {
-    this.groupEvent.emit(this.card);
   }
 
   setProduct(product: IProduct): void {

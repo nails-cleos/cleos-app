@@ -6,7 +6,7 @@
   </mat-radio-group>
 </div>
 <div mat-dialog-actions>
-  <button (click)="onNoClick()" mat-button>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+  <button (click)="onNoClick" mat-button>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
   <button [mat-dialog-close]="radio.value" cdkFocusInitial color="primary"
           mat-button>Ok
   </button>

@@ -11,10 +11,9 @@ import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../store/app.states';
 import * as fromActionsRoom from '../../store/room.actions';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
-import { IUser } from '../../interfaces/user';
-import { getUserName } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
+import { getTimeZone, ITimeZone } from '../../util/dates';
 
 @Component({
   selector: 'app-rooms',
@@ -26,7 +25,7 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['position', 'currency', 'office', 'professional', 'address', 'availability', 'actions'];
+  displayedColumns: string[] = ['position', 'currency', 'office', 'professional', 'address', 'gmt', 'availability', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IRoom>>();
   expanded?: IRoom;
 
@@ -64,8 +63,12 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription?.unsubscribe();
   }
 
-  getProfessionalName(professional: IUser): string {
-    return getUserName(professional);
+  getTimeZone(timeZone?: string): ITimeZone {
+    return getTimeZone(timeZone);
+  }
+
+  getGMT(timeZone?: string): string {
+    return this.getTimeZone(timeZone).gmt;
   }
 
   subscribe(): void {

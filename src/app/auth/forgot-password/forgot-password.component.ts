@@ -34,8 +34,8 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  forgotPassword(): void {
-    this.store.dispatch(
+  get forgotPassword(): void {
+    return this.store.dispatch(
       new fromActionsLogin.ForgotPassword(this.form.get('username')?.value.trim())
     );
   }

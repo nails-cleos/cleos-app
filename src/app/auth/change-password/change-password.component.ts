@@ -35,18 +35,7 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
     this.getUserState = this.store.select(selectUserState);
   }
 
-  ngOnInit(): void {
-    this.clean();
-    this.createForm();
-    this.subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.userSubscription?.unsubscribe();
-  }
-
-  changePassword(): void {
+  get changePassword(): void {
     if (this.form.invalid || this.passwordComponent.passwordFormControl.invalid
       || this.passwordComponent.passwordConfirmationFormControl.invalid) {
       return;
@@ -58,11 +47,23 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
         password: this.passwordComponent.passwordFormControl.value
       })
     );
+    return;
   }
 
-  onStrengthChanged(): void {
+  ngOnInit(): void {
+    this.clean();
+    this.createForm();
+    this.subscribe();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+    this.userSubscription?.unsubscribe();
+  }
+
+  get onStrengthChanged(): void {
     this.showError = true;
-    this.passwordComponent.passwordConfirmationFormControl.updateValueAndValidity();
+    return this.passwordComponent.passwordConfirmationFormControl.updateValueAndValidity();
   }
 
   private clean(): void {

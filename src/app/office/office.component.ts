@@ -39,6 +39,25 @@ export class OfficeComponent implements OnInit, OnDestroy {
     this.getState = this.store.select(selectOfficeState);
   }
 
+  get create(): void {
+    if (this.form.invalid) {
+      return;
+    }
+
+    const office: IOffice = new Office();
+    office.name = this.name.value;
+    office.managerId = this.manager.value.id;
+
+    return this.store.dispatch(
+      new fromActionsOffice.OfficeSave(office)
+    );
+  }
+
+  get addManager(): void {
+    this.router.navigate(['users', 'add'], {state: {role: Role.manager}});
+    return;
+  }
+
   ngOnInit(): void {
     this.createForm();
     this.clean();
@@ -50,30 +69,8 @@ export class OfficeComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  getManager(manager: IUser): string {
-    return getUserName(manager);
-  }
-
-  create(): void {
-    if (this.form.invalid) {
-      return;
-    }
-
-    const office: IOffice = new Office();
-    office.name = this.name.value;
-    office.managerId = this.manager.value.id;
-
-    this.store.dispatch(
-      new fromActionsOffice.OfficeSave(office)
-    );
-  }
-
   displayFn(user: IUser): string {
     return user ? getUserName(user) : '';
-  }
-
-  addManager(): void {
-    this.router.navigate(['users', 'add'], {state: {role: Role.manager}});
   }
 
   private createForm(): void {

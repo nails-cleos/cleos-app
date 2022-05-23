@@ -102,6 +102,12 @@ export class NavComponent implements OnInit, OnDestroy {
     this.navigation.subscribe();
   }
 
+  get logout(): void {
+    return this.store.dispatch(
+      new fromActionsLogin.LogOut()
+    );
+  }
+
   ngOnInit(): void {
     this.subscribe();
     this.authSubject.pipe(distinctUntilChanged()).subscribe(v => {
@@ -114,12 +120,6 @@ export class NavComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.authSubscription?.unsubscribe();
     this.notificationSubscription?.unsubscribe();
-  }
-
-  logout(): void {
-    this.store.dispatch(
-      new fromActionsLogin.LogOut()
-    );
   }
 
   notification(notification: INotification): void {

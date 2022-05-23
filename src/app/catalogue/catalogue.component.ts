@@ -32,17 +32,7 @@ export class CatalogueComponent implements OnInit, OnDestroy {
     this.getState = this.store.select(selectCatalogueState);
   }
 
-  ngOnInit(): void {
-    this.createForm();
-    this.clean();
-    this.subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  create(): void {
+  get create(): void {
     if (this.form.invalid) {
       return;
     }
@@ -53,9 +43,24 @@ export class CatalogueComponent implements OnInit, OnDestroy {
     catalogue.home = this.home.value;
     catalogue.catalog = this.catalog.value;
 
-    this.store.dispatch(
+    return this.store.dispatch(
       new fromActionsCatalogue.CatalogueSave({catalogue, file: this.file})
     );
+  }
+
+  get deleteFile(): void {
+    this.file = undefined;
+    return;
+  }
+
+  ngOnInit(): void {
+    this.createForm();
+    this.clean();
+    this.subscribe();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 
   onFileDropped(files: any): void {
@@ -68,10 +73,6 @@ export class CatalogueComponent implements OnInit, OnDestroy {
     $event.target.files[0].progress = 0;
     this.file = $event.target.files[0];
     this.uploadFilesSimulator();
-  }
-
-  deleteFile(): void {
-    this.file = undefined;
   }
 
   formatBytes(bytes: any, decimals: number): string {

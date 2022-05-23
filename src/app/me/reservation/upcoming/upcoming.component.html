@@ -19,15 +19,23 @@
       <table>
         <tr *ngIf="upcoming.id; else skeleton">
           <td class="right">{{ 'ME.RESERVATION.UPCOMING.START' | translate }}</td>
-          <td class="left">{{upcoming.start | date:'short':undefined:language}}</td>
+          <td class="left">{{upcoming.start | date:'short':upcoming.room.timeZone:language}}
+            <button (click)="openDialog(upcoming.start)" *ngIf="showTimeZone" mat-icon-button type="button">
+              <mat-icon>info_outline</mat-icon>
+            </button>
+          </td>
         </tr>
         <tr *ngIf="upcoming.end; else skeleton">
           <td class="right">{{ 'ME.RESERVATION.UPCOMING.END' | translate }}</td>
-          <td class="left">{{upcoming.end | date:'short':undefined:language}}</td>
+          <td class="left">{{upcoming.end | date:'short':upcoming.room.timeZone:language}}
+            <button (click)="openDialog(upcoming.end)" *ngIf="showTimeZone" mat-icon-button type="button">
+              <mat-icon>info_outline</mat-icon>
+            </button>
+          </td>
         </tr>
         <tr *ngIf="upcoming.id; else skeleton">
           <td class="right">{{ 'COMMON.ROOM.FIELD' | translate }}</td>
-          <td class="left">{{roomName}}</td>
+          <td class="left">{{upcoming?.room | roomName}}</td>
         </tr>
         <tr *ngIf="upcoming.id; else skeleton">
           <td class="right">{{ 'COMMON.ADDRESS.FIELD' | translate }}</td>
@@ -45,35 +53,38 @@
         <tr *ngIf="upcoming.price; else skeleton">
           <td class="right">{{ 'ME.RESERVATION.PRODUCT.PRICE.FIELD' | translate }}</td>
           <td *ngIf="upcoming.price.discount; else noDiscount" class="left">
-            <span [class.strikethrough]="upcoming.price.amount">{{getCurrencySymbol()}} {{upcoming.price.amount | number:'1.2-2'}}</span>
-            <span [@discountAnimation]
-                  class="raised-button bold">{{getCurrencySymbol()}} {{upcoming.price.priceWithDiscount | number:'1.2-2'}}</span>
+            <span [class.strikethrough]="upcoming.price.amount">
+              {{upcoming?.room | currencySymbol}} {{upcoming.price.amount | number:'1.2-2'}}
+            </span>
+            <span [@discountAnimation] class="raised-button bold">
+              {{upcoming?.room | currencySymbol}} {{upcoming.price.priceWithDiscount | number:'1.2-2'}}
+            </span>
           </td>
           <ng-template #noDiscount>
-            <td class="left">{{getCurrencySymbol()}} {{upcoming.price.amount | number:'1.2-2'}}</td>
+            <td class="left">{{upcoming?.room | currencySymbol}} {{upcoming.price.amount | number:'1.2-2'}}</td>
           </ng-template>
         </tr>
         <tr *ngIf="upcoming.rowSpan">
           <td [rowSpan]="upcoming.rowSpan" class="right">{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</td>
           <td class="left">
             <div *ngFor="let additional of upcoming.additional">
-              {{additional.name}} - {{getCurrencySymbol()}} {{additional.price | number:'1.2-2'}}
+              {{additional.name}} - {{upcoming?.room | currencySymbol}} {{additional.price | number:'1.2-2'}}
             </div>
           </td>
         </tr>
         <tr *ngIf="upcoming.rowSpan">
           <td class="right">{{ 'COMMON.LABEL.TOTAL' | translate }}</td>
-          <td class="left bold">{{getCurrencySymbol()}} {{upcoming.price?.total | number:'1.2-2'}}</td>
+          <td class="left bold">{{upcoming?.room | currencySymbol}} {{upcoming.price?.total | number:'1.2-2'}}</td>
         </tr>
         <tr *ngIf="upcoming.price && upcoming.price.totalPaid">
           <td class="right">{{ 'ME.RESERVATION.UPCOMING.PAID' | translate }}</td>
-          <td class="left">{{getCurrencySymbol()}} {{upcoming.price.totalPaid | number:'1.2-2'}}</td>
+          <td class="left">{{upcoming?.room | currencySymbol}} {{upcoming.price.totalPaid | number:'1.2-2'}}</td>
         </tr>
       </table>
-      <div *ngIf="upcoming.state === 'CREATED'" class="red-text">
-        {{ 'ME.RESERVATION.UPCOMING.CREATED' | translate }} <span class="bold">
-                {{professionalName}}
-              </span>
+      <div *ngIf="upcoming.state === 'CREATED'" class="red-text">{{ 'ME.RESERVATION.UPCOMING.CREATED' | translate }}
+        <span class="bold">
+          {{upcoming?.room?.professional | userName}}
+        </span>
       </div>
       <div *ngIf="upcoming.state === 'APPROVED'" class="red-text">
         {{ 'ME.RESERVATION.UPCOMING.PAY_NOW' | translate }}

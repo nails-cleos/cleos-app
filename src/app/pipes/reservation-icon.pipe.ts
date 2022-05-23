@@ -1,0 +1,14 @@
+import { Pipe, PipeTransform } from '@angular/core';
+import { ReservationIconKey, ReservationIconName } from '../util/icon';
+import { snakeToCamel } from '../util/helper';
+
+@Pipe({
+  name: 'reservationIcon'
+})
+export class ReservationIconPipe implements PipeTransform {
+
+  transform(name?: string): any {
+    return name ? ReservationIconName[snakeToCamel(name) as ReservationIconKey] : '';
+  }
+
+}

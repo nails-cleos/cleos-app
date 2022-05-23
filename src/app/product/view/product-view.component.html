@@ -57,7 +57,7 @@
                 <mat-form-field appearance="fill" class="tab-field">
                   <mat-label>{{ 'PRODUCT.DURATION.FIELD' | translate }}</mat-label>
                   <label>
-                    <input [value]="tab.duration || ''" matInput readonly/>
+                    <input [value]="tab.duration | durationTime" matInput readonly/>
                   </label>
                 </mat-form-field>
                 <div>
@@ -82,7 +82,7 @@
         </ng-template>
         <mat-card-actions *ngIf="group; else buttonSkeleton">
           <div fxFlex></div>
-          <button (click)="edit()" color="primary" mat-raised-button type="button">
+          <button (click)="edit" color="primary" mat-raised-button type="button">
             {{ 'COMMON.BUTTON.EDIT' | translate }}
           </button>
           <button appBackButton color="accent" mat-raised-button type="button">

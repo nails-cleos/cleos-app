@@ -8,6 +8,7 @@ import { MatGoogleMapsAutocompleteModule } from '@angular-material-extensions/go
 
 import { AppMaterialModule } from '../util/app-material.module';
 import { BackButtonDirective } from '../directives/back-button.directive';
+import { SortByPipe } from '../pipes/sort-by.pipe';
 import { AppState, selectAuthState } from '../store/app.states';
 import { IUserAll } from '../interfaces/user';
 import { environment } from '../../environments/environment';
@@ -30,6 +31,13 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { ChartComponent } from './chart/chart.component';
 import { httpInterceptorProviders } from '../http-interceptors';
 import { HttpClientModule } from '@angular/common/http';
+import { UserNamePipe } from '../pipes/user-name.pipe';
+import { TimeDetailPipe } from '../pipes/time-detail.pipe';
+import { TimeZoneSnackBarComponent } from './snak/time-zone/time-zone-snack-bar.component';
+import { DurationTimePipe } from '../pipes/durationTime.pipe';
+import { RoomNamePipe } from '../pipes/room-name.pipe';
+import { CurrencySymbolPipe } from '../pipes/currency-symbol.pipe';
+import { ReservationIconPipe } from '../pipes/reservation-icon.pipe';
 
 @NgModule({
   imports: [
@@ -73,23 +81,39 @@ import { HttpClientModule } from '@angular/common/http';
     ChartsModule,
     FormsModule,
     BackButtonDirective,
+    SortByPipe,
+    UserNamePipe,
+    TimeDetailPipe,
+    DurationTimePipe,
+    RoomNamePipe,
+    CurrencySymbolPipe,
+    ReservationIconPipe,
     ErrorComponent,
     GoogleMapComponent,
     DialogComponent,
     RatingComponent,
     CardChartComponent,
     CardComponent,
-    ChartComponent
+    ChartComponent,
+    TimeZoneSnackBarComponent
   ],
   declarations: [
     BackButtonDirective,
+    SortByPipe,
+    UserNamePipe,
+    TimeDetailPipe,
+    DurationTimePipe,
+    RoomNamePipe,
+    CurrencySymbolPipe,
+    ReservationIconPipe,
     ErrorComponent,
     GoogleMapComponent,
     DialogComponent,
     RatingComponent,
     CardChartComponent,
     CardComponent,
-    ChartComponent
+    ChartComponent,
+    TimeZoneSnackBarComponent
   ],
   providers: [
     httpInterceptorProviders,

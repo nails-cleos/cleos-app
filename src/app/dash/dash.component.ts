@@ -8,7 +8,7 @@ import * as fromActionsDashboard from '../store/dashboard.actions';
 import * as fromActionsReservation from '../store/reservation.actions';
 import { IReservationSummary, States } from '../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
-import { getEnd, getNow, newDate } from '../util/dates';
+import { getEnd, getNow, newDateTimestamp } from '../util/dates';
 import { CalendarEvent, CalendarView } from 'angular-calendar';
 import { findStateColor, isDarkMode } from '../util/theme';
 import { getFrequency, Meta, monthEvent } from '../util/event';
@@ -112,6 +112,15 @@ export class DashComponent implements OnInit, OnDestroy {
       && event.meta.state !== States.cancelled && isSameMonth(event.start, this.viewDate)).length;
   }
 
+  get closeOpenMonthViewDay(): void {
+    this.activeDayIsOpen = false;
+    return;
+  }
+
+  get changeDate(): void {
+    return this.getSummaries();
+  }
+
   private static createErrorMiniCard(title: string, message: string): IReservationSummary {
     return {
       title: `DASHBOARD.MINI_CARD.${title}`,
@@ -150,14 +159,6 @@ export class DashComponent implements OnInit, OnDestroy {
       this.activeDayIsOpen = !((isSameDay(this.viewDate, date) && this.activeDayIsOpen) || events.length === 0);
       this.viewDate = date;
     }
-  }
-
-  closeOpenMonthViewDay(): void {
-    this.activeDayIsOpen = false;
-  }
-
-  changeDate(): void {
-    this.getSummaries();
   }
 
   private createDashboards(): void {
@@ -231,31 +232,32 @@ export class DashComponent implements OnInit, OnDestroy {
     this.events = [];
     if (this.state.calendarSummary) {
       this.state.calendarSummary.reservations?.forEach((it: ICalendarReservations) => {
-        const start = newDate(it.start);
-        const end = it.end ? newDate(it.end) : null;
+        const start = newDateTimestamp(it.start);
+        const end = it.end ? newDateTimestamp(it.end) : null;
         this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNow());
 
         const event = monthEvent(it.title, start, end, it.reservationId, findStateColor(it.state, darkMode),
-          new Meta(true, it.state, ['reservation', it.reservationId]));
+          new Meta(true, this.state.timeZone, it.state, ['reservation', it.reservationId]));
         if (event) {
           this.events = [...this.events, event];
         }
       });
       let recurring: any[] = [];
       this.state.calendarSummary.unavailable?.forEach((it: ICalendarUnavailable) => {
-        const start = newDate(it.start);
+        const start = newDateTimestamp(it.start);
         this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNow());
         const title = it.duration ? it.title : `${this.translate.instant('COMMON.ALL_DAY.CHECK')} - ${it.title}`;
 
         if (it.repeat === UnavailableRepeatType.none) {
           const end = getEnd(start, it.duration);
           const event = monthEvent(title, start, end, it.unavailableId, findStateColor('DEFAULT', darkMode),
-            new Meta(!!it.duration, undefined, ['unavailable', it.unavailableId]));
+            new Meta(!!it.duration, this.state.timeZone, undefined, ['unavailable', it.unavailableId]));
           if (event) {
             this.events = [...this.events, event];
           }
         } else {
-          recurring = [...recurring, getFrequency(it.repeat, start, it.unavailableId, title, it.end, it.duration)];
+          recurring = [...recurring, getFrequency(it.repeat, start, it.unavailableId, title, newDateTimestamp(it.end)
+            .toISOString(), it.duration)];
         }
       });
 
@@ -263,7 +265,7 @@ export class DashComponent implements OnInit, OnDestroy {
         r.rule.all().forEach((date: Date) => {
           const end = getEnd(date, r.duration);
           const event = monthEvent(r.title, date, end, r.unavailableId, findStateColor('DEFAULT', darkMode),
-            new Meta(!!r.duration, undefined, ['unavailable', r.unavailableId]));
+            new Meta(!!r.duration, this.state.timeZone, undefined, ['unavailable', r.unavailableId]));
           if (event) {
             this.events = [...this.events, event];
           }

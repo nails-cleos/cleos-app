@@ -1,6 +1,6 @@
 <div *ngIf="data && data.length && calendar && calendar.size; else errorBox" class="scroll-container">
   <div class="divider">
-    <button (click)="decrement()" [disabled]="prevBtnDisabled" color="accent" mat-raised-button>
+    <button (click)="decrement" [disabled]="prevBtnDisabled" color="accent" mat-raised-button>
       <mat-icon>navigate_before</mat-icon>
       <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.PREVIOUS' | translate}}</span>
     </button>
@@ -10,7 +10,7 @@
       <mat-icon>today</mat-icon>
       <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.GOTO' | translate}}</span>
     </button>
-    <button (click)="increment()" [disabled]="nextBtnDisabled" color="accent" mat-raised-button>
+    <button (click)="increment" [disabled]="nextBtnDisabled" color="accent" mat-raised-button>
       <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.NEXT' | translate}}</span>
       <mat-icon>navigate_next</mat-icon>
     </button>
@@ -22,11 +22,11 @@
   </div>
   <div class="divider">
     <mat-accordion>
-      <mat-expansion-panel *ngFor="let rr of data; let i = index"
+      <mat-expansion-panel *ngFor="let rr of sortData(data); let i = index"
                            [expanded]="professionalId === rr.room.professional.id || i === 0">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <p class="bold">{{getRoomName(rr.room)}}</p>
+            <p class="bold">{{rr.room | roomName}}</p>
           </mat-panel-title>
         </mat-expansion-panel-header>
         <mwl-calendar-week-view

@@ -36,6 +36,20 @@ export class CurrencyDetailComponent implements OnInit, AfterViewInit, OnDestroy
     this.getState = this.store.select(selectCurrencyState);
   }
 
+  get update(): void {
+    if (this.form.invalid) {
+      return;
+    }
+    const currency: ICurrency = new Currency();
+    currency.id = this.currency?.id;
+
+    currency.code = fieldChange(this.code, this.currency?.code);
+    currency.name = fieldChange(this.name, this.currency?.name);
+    currency.icon = fieldChange(this.icon, this.currency?.icon);
+
+    return this.store.dispatch(new fromActionsCurrency.CurrencyUpdate(currency));
+  }
+
   ngOnInit(): void {
     this.createForm();
     this.subscribe();
@@ -47,20 +61,6 @@ export class CurrencyDetailComponent implements OnInit, AfterViewInit, OnDestroy
 
   ngAfterViewInit(): void {
     this.getCurrency();
-  }
-
-  update(): void {
-    if (this.form.invalid) {
-      return;
-    }
-    const currency: ICurrency = new Currency();
-    currency.id = this.currency?.id;
-
-    currency.code = fieldChange(this.code, this.currency?.code);
-    currency.name = fieldChange(this.name, this.currency?.name);
-    currency.icon = fieldChange(this.icon, this.currency?.icon);
-
-    this.store.dispatch(new fromActionsCurrency.CurrencyUpdate(currency));
   }
 
   private createForm(): void {

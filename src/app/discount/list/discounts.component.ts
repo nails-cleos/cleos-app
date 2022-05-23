@@ -1,13 +1,4 @@
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  Inject,
-  OnDestroy,
-  OnInit,
-  ViewChild
-} from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -190,6 +181,15 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
     this.setSymbol();
   }
 
+  get onNoClick(): void {
+    return this.dialogRef.close();
+  }
+
+  get doAction(): void {
+    const customerIds = this.customers.map(({id}) => id);
+    return this.dialogRef.close({discountId: this.discount.id, customerIds});
+  }
+
   ngOnInit(): void {
     this.clean();
     this.subscribe();
@@ -207,15 +207,6 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
-  }
-
-  onNoClick(): void {
-    this.dialogRef.close();
-  }
-
-  doAction(): void {
-    const customerIds = this.customers.map(({id}) => id);
-    this.dialogRef.close({discountId: this.discount.id, customerIds});
   }
 
   remove(customer: IUserAll): void {

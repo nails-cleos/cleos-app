@@ -36,6 +36,30 @@ export class ReferralsComponent implements OnInit, OnDestroy {
     this.getState = this.store.select(selectDiscountState);
   }
 
+  get copy(): void {
+    if (this.user) {
+      this.clipboard.copy(this.user.id);
+      this.snackBar.open(this.translate.instant('ME.REFERRAL.COPY'), 'OK', {
+        duration: 5000
+      });
+    }
+    return;
+  }
+
+  get openBottomSheetShare(): void {
+    this.bottomSheet.open(BottomSheetShareComponent, {
+      data: {code: this.user?.id}
+    });
+    return;
+  }
+
+  get openBottomSheetReferral(): void {
+    this.bottomSheet.open(BottomSheetReferralComponent, {
+      data: {referralMax: this.referralMax, referrals: this.referrals, referralsUsed: this.referralsUsed}
+    });
+    return;
+  }
+
   ngOnInit(): void {
     this.clean();
     this.subscribe();
@@ -44,27 +68,6 @@ export class ReferralsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
-  }
-
-  copy(): void {
-    if (this.user) {
-      this.clipboard.copy(this.user.id);
-      this.snackBar.open(this.translate.instant('ME.REFERRAL.COPY'), 'OK', {
-        duration: 5000
-      });
-    }
-  }
-
-  openBottomSheetShare(): void {
-    this.bottomSheet.open(BottomSheetShareComponent, {
-      data: {code: this.user?.id}
-    });
-  }
-
-  openBottomSheetReferral(): void {
-    this.bottomSheet.open(BottomSheetReferralComponent, {
-      data: {referralMax: this.referralMax, referrals: this.referrals, referralsUsed: this.referralsUsed}
-    });
   }
 
   private clean(): void {

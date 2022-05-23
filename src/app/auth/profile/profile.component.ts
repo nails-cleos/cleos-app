@@ -46,19 +46,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.getState = this.store.select(selectUserState);
   }
 
-  ngOnInit(): void {
-    this.createForm();
-    this.clean();
-    this.findMe();
-    this.subscribe();
-    this.cdRef.detectChanges();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  update(): void {
+  get update(): void {
     if (this.form.invalid) {
       return;
     }
@@ -70,9 +58,21 @@ export class ProfileComponent implements OnInit, OnDestroy {
     user.phone = fieldChange(this.phone, this.user?.phone);
     user.dob = fieldChange(this.dob, this.user?.dob);
 
-    this.store.dispatch(
+    return this.store.dispatch(
       new fromActionsUser.UpdateUser({user, redirectUrl: 'auth/profile'})
     );
+  }
+
+  ngOnInit(): void {
+    this.createForm();
+    this.clean();
+    this.findMe();
+    this.subscribe();
+    this.cdRef.detectChanges();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 
   onSelectFile(target: any): void {

@@ -223,6 +223,17 @@
       "UPDATED": {
         "MESSAGE": "Reservation {{date}} updated"
       }
+    },
+    "TIME_ZONE": {
+      "TITLE": "Time zone",
+      "ROOM_INFO": "You are in a different time zone than <b>{{value}}</b>. <br><br>Your time: <b>{{localTime}}</b><br>Room time: <b>{{timeZoneTime}}</b>{{arg}}",
+      "PROFESSIONAL_INFO": "You are in a different time zone than <b>{{value}}</b>. <br><br>Your time: <b>{{localTime}}</b><br>Professional time: <b>{{timeZoneTime}}{{arg}}</b>",
+      "ACTION": "Dismiss",
+      "WARNING": "Warning",
+      "DATE": {
+        "LOCAL": "Your time <b>{{date}}</b>",
+        "ROOM": "Room time <b>{{date}}</b>"
+      }
     }
   },
   "REVIEW": {

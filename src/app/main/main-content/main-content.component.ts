@@ -72,6 +72,21 @@ export class MainContentComponent implements OnInit, OnDestroy {
     this.maxDate = plusMonthDate(this.minDate, MAX_RESERVATION_MONTH, this.minDate.getDate() + 1);
   }
 
+  get book(): void {
+    const data = {date: this.date.value, product: this.product.value};
+    this.router.navigate(['me', 'reservation'], {state: data});
+    return;
+  }
+
+  get sendEmail(): void {
+    if (this.form.invalid) {
+      return;
+    }
+    return this.store.dispatch(
+      new fromActionsMain.SendMessage(this.form.value)
+    );
+  }
+
   ngOnInit(): void {
     this.clean();
     this.createForm();
@@ -125,11 +140,6 @@ export class MainContentComponent implements OnInit, OnDestroy {
     this.keyDownHandler(event, this.group);
   }
 
-  book(): void {
-    const data = {date: this.date.value, product: this.product.value};
-    this.router.navigate(['me', 'reservation'], {state: data});
-  }
-
   setGroup(group: IProductGroup): void {
     this.group.setValue(group);
   }
@@ -137,15 +147,6 @@ export class MainContentComponent implements OnInit, OnDestroy {
   setProduct(product: IProduct): void {
     this.product.setValue(product);
     this.viewportScroller.scrollToAnchor('book');
-  }
-
-  sendEmail(): void {
-    if (this.form.invalid) {
-      return;
-    }
-    this.store.dispatch(
-      new fromActionsMain.SendMessage(this.form.value)
-    );
   }
 
   private createForm(): void {

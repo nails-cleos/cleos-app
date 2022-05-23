@@ -17,7 +17,7 @@ export class CardComponent {
   constructor(public dialog: MatDialog) {
   }
 
-  onClick(): void {
+  get onClick(): void {
     if (this.chart) {
       const chart = createChart(this.chart, this.isDark);
       this.dialog.open(CardChartComponent, {
@@ -29,6 +29,7 @@ export class CardComponent {
         }
       });
     }
+    return;
   }
 }
 

@@ -1,6 +1,8 @@
 <h1 mat-dialog-title>{{data.title}}</h1>
-<div mat-dialog-content [innerHTML]="data.content"></div>
+<div [innerHTML]="data.content" mat-dialog-content></div>
 <div mat-dialog-actions>
-  <button mat-button (click)="onNoClick()" cdkFocusInitial>{{ 'COMMON.BUTTON.NO' | translate }}</button>
-  <button mat-button [mat-dialog-close]="data.value">{{ 'COMMON.BUTTON.YES' | translate }}</button>
+  <button (click)="onNoClick" *ngIf="!data.hideNoButton" cdkFocusInitial
+          mat-button>{{ 'COMMON.BUTTON.NO' | translate }}</button>
+  <button *ngIf="!data.hideOkButton" [mat-dialog-close]="data.value"
+          mat-button>{{ 'COMMON.BUTTON.YES' | translate }}</button>
 </div>
