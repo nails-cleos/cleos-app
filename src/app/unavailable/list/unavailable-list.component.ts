@@ -10,12 +10,12 @@ import { Store } from '@ngrx/store';
 import { AppState, selectUnavailableState } from '../../store/app.states';
 import * as fromActionsUnavailable from '../../store/unavailable.actions';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
-import { convertDuration } from '../../util/dates';
-import { IUnavailable } from '../../interfaces/unavailable';
-import { IUser } from '../../interfaces/user';
-import { getUserName } from '../../util/helper';
+import { convertDuration, isSameTimeZone, newDateTimestamp } from '../../util/dates';
+import { IUnavailable, IUnavailableAll } from '../../interfaces/unavailable';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
+import { IReservationAll } from '../../interfaces/reservation';
+import { createDialog, getUserName, openDialog } from '../../util/helper';
 
 @Component({
   selector: 'app-unavailable-list',
@@ -69,10 +69,6 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
     this.paginatorSubscription?.unsubscribe();
   }
 
-  getProfessionalName(professional: IUser): string {
-    return getUserName(professional);
-  }
-
   edit(unavailable: IUnavailable): void {
     this.store.dispatch(
       new fromActionsUnavailable.UnavailableSelected(unavailable)
@@ -81,7 +77,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
 
   delete(unavailable: IUnavailable): void {
     const title = this.translate.instant('UNAVAILABLE.DELETED.TITLE');
-    const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT', {date: unavailable.start});
+    const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT', {date: newDateTimestamp(unavailable.timestamp)});
     const dialogRef = this.dialog.open(DialogComponent, {
       data: {title, content, value: unavailable}
     });
@@ -95,20 +91,24 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
     });
   }
 
+  showTimeZone(unavailable: IUnavailableAll): boolean {
+    return !isSameTimeZone(unavailable.professional.timeZone);
+  }
+
+  openDialog(unavailable: IUnavailableAll): void {
+    const time = newDateTimestamp(unavailable.timestamp);
+    const name = getUserName(unavailable.professional);
+    const timeZone = unavailable.professional.timeZone;
+    createDialog('PROFESSIONAL_INFO', name, this.language, this.translate, this.dialog, timeZone, time);
+  }
+
   private subscribe(): void {
     this.subscription = this.getState.subscribe((state) => {
       if (state.message) {
         this.clean();
         this.getUnavailableList();
       }
-      this.dataSource = state.data?.content?.map((unavailable: IUnavailable) => {
-        if (unavailable.duration) {
-          const duration = convertDuration(unavailable.duration);
-
-          return Object.assign({}, unavailable, {hour: duration.hour, minute: duration.minute});
-        }
-        return unavailable;
-      });
+      this.dataSource = state.data?.content;
       this.resultsLength = state.data?.totalElements;
       if (!this.paginatorSubscription && this.resultsLength) {
         this.createPageSubscriptions();

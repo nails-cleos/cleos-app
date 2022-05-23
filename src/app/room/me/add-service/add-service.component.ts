@@ -31,6 +31,23 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
     this.getState = this.store.select(selectRoomState);
   }
 
+  get save(): void {
+    let prices: IServicePrice[] = [];
+    this.selectedAdditional.forEach(additional => {
+      const price = new ServicePrice(additional.id, additional.price, ServiceType.additional);
+      prices = [...prices, price];
+    });
+    for (const [, value] of this.groups) {
+      value.selectedProducts.forEach(product => {
+        const price = new ServicePrice(product.id, product.price, ServiceType.product);
+        prices = [...prices, price];
+      });
+    }
+    return this.store.dispatch(
+      new fromActionsRoom.UpdateMyServices({id: this.roomId, prices})
+    );
+  }
+
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
   }
@@ -62,23 +79,6 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
     }
-  }
-
-  save(): void {
-    let prices: IServicePrice[] = [];
-    this.selectedAdditional.forEach(additional => {
-      const price = new ServicePrice(additional.id, additional.price, ServiceType.additional);
-      prices = [...prices, price];
-    });
-    for (const [, value] of this.groups) {
-      value.selectedProducts.forEach(product => {
-        const price = new ServicePrice(product.id, product.price, ServiceType.product);
-        prices = [...prices, price];
-      });
-    }
-    this.store.dispatch(
-      new fromActionsRoom.UpdateMyServices({id: this.roomId, prices})
-    );
   }
 
   changePrice(service: IService): void {
@@ -155,6 +155,15 @@ export class PriceDialogComponent implements OnInit {
               @Inject(MAT_DIALOG_DATA) public data: { name: string; price: number; currentPrice?: number }) {
   }
 
+  get onNoClick(): void {
+    return this.dialogRef.close();
+  }
+
+  get submit(): void {
+    this.data.price = this.price.value;
+    return this.dialogRef.close(this.data);
+  }
+
   ngOnInit(): void {
     this.form = this.formBuilder.group({
       price: this.price
@@ -163,14 +172,5 @@ export class PriceDialogComponent implements OnInit {
     if (this.data.currentPrice) {
       this.price.setValue(this.data.currentPrice);
     }
-  }
-
-  onNoClick(): void {
-    this.dialogRef.close();
-  }
-
-  submit(): void {
-    this.data.price = this.price.value;
-    this.dialogRef.close(this.data);
   }
 }

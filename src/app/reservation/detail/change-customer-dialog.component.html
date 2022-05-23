@@ -28,13 +28,13 @@
 <div mat-dialog-actions>
   <div fxFlex></div>
   <div *ngIf="data.small; else largeButton">
-    <button (click)="doAction()" cdkFocusInitial color="primary" [disabled]="customerForm.invalid"
+    <button (click)="doAction" cdkFocusInitial color="primary" [disabled]="customerForm.invalid"
             mat-icon-button><mat-icon>published_with_changes</mat-icon></button>
-    <button (click)="onNoClick()" mat-icon-button><mat-icon>clear</mat-icon></button>
+    <button (click)="onNoClick" mat-icon-button><mat-icon>clear</mat-icon></button>
   </div>
   <ng-template #largeButton>
-    <button (click)="doAction()" cdkFocusInitial color="primary" [disabled]="customerForm.invalid"
+    <button (click)="doAction" cdkFocusInitial color="primary" [disabled]="customerForm.invalid"
             mat-raised-button>{{ 'RESERVATION.CUSTOMER.UPDATE' | translate }}</button>
-    <button (click)="onNoClick()" mat-raised-button>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+    <button (click)="onNoClick" mat-raised-button>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
   </ng-template>
 </div>

@@ -9,7 +9,7 @@
             <div class="ssc-line"></div>
           </ng-template>
         </mat-card-header>
-        <form (ngSubmit)="update()" [formGroup]="form" novalidate>
+        <form (ngSubmit)="update" [formGroup]="form" novalidate>
           <mat-card-content *ngIf="office; else boxSkeleton">
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <mat-form-field appearance="fill">
@@ -32,7 +32,7 @@
               <div *ngIf="office.rooms" mat-subheader>{{ 'OFFICE.ROOMS' | translate }}</div>
               <mat-list *ngIf="office.rooms">
                 <mat-list-item *ngFor="let room of office.rooms; let i = index; let last = last">
-                  {{i + 1}}. {{getRoomName(room)}}
+                  {{i + 1}}. {{room | roomName}}
                   <mat-divider *ngIf="!last"></mat-divider>
                 </mat-list-item>
               </mat-list>

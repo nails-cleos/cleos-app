@@ -1,7 +1,7 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
-      <form (ngSubmit)="create()" [formGroup]="form" novalidate>
+      <form (ngSubmit)="create" [formGroup]="form" novalidate>
         <mat-card class="style-card">
           <mat-card-header>
             <mat-card-title>{{ 'OFFICE.TITLE' | translate }}</mat-card-title>
@@ -27,7 +27,7 @@
                   </label>
                   <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
                     <mat-option *ngFor="let manager of filteredOptions | async" [value]="manager">
-                      {{getManager(manager)}}
+                      {{manager | userName}}
                     </mat-option>
                   </mat-autocomplete>
                   <mat-error *ngIf="manager.hasError('required')"
@@ -40,7 +40,7 @@
                     {{errors['manager']}}
                   </mat-error>
                 </mat-form-field>
-                <button (click)="addManager()" color="accent" mat-raised-button>
+                <button (click)="addManager" color="accent" mat-raised-button>
                   <mat-icon matPrefix>person_add</mat-icon>
                   <span fxHide.lt-sm fxShow>{{ 'OFFICE.MANAGER.ADD_BUTTON' | translate }}</span>
                 </button>

@@ -5,7 +5,7 @@
         <mat-card-header>
           <mat-card-title>{{ 'UNAVAILABLE.DETAIL' | translate }}</mat-card-title>
         </mat-card-header>
-        <form (ngSubmit)="update()" [formGroup]="form" novalidate>
+        <form (ngSubmit)="update" [formGroup]="form" novalidate>
           <mat-card-content *ngIf="unavailable; else boxSkeleton">
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <mat-form-field appearance="fill">
@@ -45,7 +45,7 @@
                 <mat-form-field *ngIf="!allDay.value" appearance="fill" style="margin-right: 12px;">
                   <mat-label>{{ 'UNAVAILABLE.TIME.FIELD' | translate }}</mat-label>
                   <label>
-                    <input (focusin)="focusin()" [formControl]="startTime" [format]="24" [max]="maxTime" [min]="minTime"
+                    <input (focusin)="focusin" [formControl]="startTime" [format]="24" [max]="maxTime" [min]="minTime"
                            [ngxTimepicker]="time" matInput name="start_time" readonly required/>
                   </label>
                   <span matPrefix><mat-icon (click)="time.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
@@ -109,7 +109,7 @@
           </ng-template>
           <mat-card-actions *ngIf="unavailable; else buttonSkeleton">
             <div fxFlex></div>
-            <button (click)="delete()" color="warn" mat-raised-button
+            <button (click)="delete" color="warn" mat-raised-button
                     type="button">{{ 'COMMON.BUTTON.DELETE' | translate }}</button>
             <button [disabled]="form.invalid || form.pristine" color="primary" mat-raised-button
                     type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>

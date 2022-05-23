@@ -9,7 +9,7 @@
             <div class="ssc-line"></div>
           </ng-template>
         </mat-card-header>
-        <form (ngSubmit)="update()" [formGroup]="form" novalidate>
+        <form (ngSubmit)="update" [formGroup]="form" novalidate>
           <mat-card-content *ngIf="catalogue; else boxSkeleton">
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <mat-form-field appearance="fill">
@@ -70,7 +70,7 @@
                     <mat-card-subtitle> {{ formatBytes(file.size, 0) }}</mat-card-subtitle>
                   </mat-card-title-group>
                   <div fxFlex></div>
-                  <button (click)="deleteFile()" color="warn" mat-icon-button>
+                  <button (click)="deleteFile" color="warn" mat-icon-button>
                     <mat-icon>delete</mat-icon>
                   </button>
                 </mat-card-header>
@@ -85,7 +85,7 @@
             </div>
             <div *ngIf="showImg" class="divider">
               <div class="container">
-                <mat-icon (click)="deleteImg()"
+                <mat-icon (click)="deleteImg"
                           [matTooltip]="'CATALOGUE.DELETE.BUTTON' | translate: {name: catalogue.name}"
                           class="delete-img" color="warn">delete
                 </mat-icon>

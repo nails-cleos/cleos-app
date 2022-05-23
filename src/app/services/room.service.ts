@@ -25,8 +25,12 @@ export class RoomService {
     return this.http.get<IRoom[]>(`${this.url}/pages`, {params});
   }
 
-  public getAllRooms(): Observable<IRoom[]> {
-    return this.http.get<IRoom[]>(this.url);
+  public getAllRooms(customerId?: string): Observable<IRoom[]> {
+    let params;
+    if (customerId) {
+      params = new HttpParams().set('customerId', customerId);
+    }
+    return this.http.get<IRoom[]>(this.urlV1, {params});
   }
 
   public getMyService(id: string): Observable<IRoomService> {

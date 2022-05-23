@@ -44,16 +44,16 @@ export class MainComponent {
     });
   }
 
+  get redirect(): void {
+    return this.store.dispatch(
+      new fromActionsLogin.Redirect()
+    );
+  }
+
   onNavigation(elementId: string): void {
     this.router.navigate(['main']).then(() => {
       this.viewportScroller.scrollToAnchor(elementId);
     });
-  }
-
-  redirect(): void {
-    this.store.dispatch(
-      new fromActionsLogin.Redirect()
-    );
   }
 
   setTheme(checked: boolean): void {

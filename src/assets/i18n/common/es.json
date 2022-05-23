@@ -223,6 +223,17 @@
       "UPDATED": {
         "MESSAGE": "Reserva {{date}} actualizada"
       }
+    },
+    "TIME_ZONE": {
+      "TITLE": "Zona horaria",
+      "ROOM_INFO": "Tu estas en una zona horaria diferente a <b>{{value}}</b>. <br><br>Hora local: <b>{{localTime}}</b><br>Hora de la sala: <b>{{timeZoneTime}}</b>{{arg}}",
+      "PROFESSIONAL_INFO": "Tu estas en una zona horaria diferente a <b>{{value}}</b>. <br><br>Hora local: <b>{{localTime}}</b><br>Hora del profesional: <b>{{timeZoneTime}}</b>{{arg}}",
+      "ACTION": "Ocultar",
+      "WARNING": "Atención",
+      "DATE": {
+        "LOCAL": "Tu hora <b>{{date}}</b>",
+        "ROOM": "Hora en la sala <b>{{date}}</b>"
+      }
     }
   },
   "REVIEW": {

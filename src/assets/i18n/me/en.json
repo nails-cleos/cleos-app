@@ -60,7 +60,8 @@
         "DETAIL": "Detail",
         "NO_CONTENT": "No rooms",
         "NAME": {
-          "FIELD": "Name"
+          "FIELD": "Name",
+          "NAME": "<span class='bold'>Name:</span> {{name}}"
         },
         "PROFESSIONAL": {
           "FIELD": "Professional",

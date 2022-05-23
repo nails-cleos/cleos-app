@@ -15,6 +15,10 @@ export class ErrorComponent implements OnInit {
   constructor() {
   }
 
+  get reload(): void {
+    return window.location.reload();
+  }
+
   ngOnInit(): void {
     if (this.error.status !== 'NO_CONTENT') {
       if (this.error.status === 'NOT_FOUND') {
@@ -25,9 +29,5 @@ export class ErrorComponent implements OnInit {
         this.retry = true;
       }
     }
-  }
-
-  reload(): void {
-    window.location.reload();
   }
 }

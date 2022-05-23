@@ -10,10 +10,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { ReservationIconKey, ReservationIconName } from '../../../util/icon';
 import * as fromActionsReservation from '../../../store/reservation.actions';
-import { newDate } from '../../../util/dates';
-import { getUserName, snakeToCamel } from '../../../util/helper';
+import { isSameTimeZone, newDate, newDateTimestamp } from '../../../util/dates';
+import { openDialog } from '../../../util/helper';
 import { stampAnimation, transitionAnimation } from '../../../util/animation';
 import { IReview, Review } from '../../../interfaces/review';
 import { ReviewDialogComponent } from '../review/review-dialog.component';
@@ -61,8 +60,8 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
     });
   }
 
-  getProfessionalName(reservation: any): string {
-    return getUserName(reservation.room.professional);
+  showTimeZone(reservation: IReservationAll): boolean {
+    return !isSameTimeZone(reservation.room.timeZone);
   }
 
   ngOnInit(): void {
@@ -86,10 +85,6 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  getIcon(name: any): any {
-    return ReservationIconName[snakeToCamel(name) as ReservationIconKey];
-  }
-
   onRatingChanged(reservation: IReservationAll): void {
     const dialogRef = this.dialog.open(ReviewDialogComponent, {data: reservation});
 
@@ -103,6 +98,11 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
         );
       }
     });
+  }
+
+  openDialog(reservation: IReservationAll): void {
+    const time = newDateTimestamp(reservation.timestamp);
+    openDialog(reservation.room, this.language, this.translate, this.dialog, time);
   }
 
   private clean(): void {

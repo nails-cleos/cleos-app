@@ -25,18 +25,20 @@ export class ActivateAccountComponent implements OnInit, OnDestroy {
     this.locale = getLocale(this.route.snapshot.queryParamMap.get('locale') || navigator.language);
   }
 
-  ngOnInit(): void {
-    this.translate.use(this.locale);
-    this.clean();
-    this.subscribe();
-  }
-
-  activate(): void {
+  get activate(): void {
     const token: string | null = this.route.snapshot.queryParamMap.get('token');
     this.translate.use(this.locale);
     this.store.dispatch(
       new fromActionsLogin.ActivateAccount(token)
     );
+
+    return;
+  }
+
+  ngOnInit(): void {
+    this.translate.use(this.locale);
+    this.clean();
+    this.subscribe();
   }
 
   ngOnDestroy(): void {

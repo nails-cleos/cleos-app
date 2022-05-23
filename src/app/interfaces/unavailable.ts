@@ -17,14 +17,17 @@ export interface IUnavailable {
   duration?: string;
   startDate?: Date;
   endDate?: Date;
-  startTime?: string;
+  startTime?: string | Date;
   allDay?: boolean;
+  timeZone?: string;
+  timestamp?: number;
 }
 
 export interface IUnavailableAll {
   id: string;
   description?: string;
   start: string;
+  timestamp: number;
   end: string;
   duration: string;
   professional: IUser;

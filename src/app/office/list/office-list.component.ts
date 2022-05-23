@@ -10,8 +10,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectOfficeState } from '../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { IUser } from '../../interfaces/user';
-import { getUserName } from '../../util/helper';
 import * as fromActionsOffice from '../../store/office.actions';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { detailExpandAnimation } from '../../util/animation';
@@ -62,10 +60,6 @@ export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
     this.paginatorSubscription?.unsubscribe();
-  }
-
-  getOfficeManager(manager: IUser): string {
-    return getUserName(manager);
   }
 
   subscribe(): void {

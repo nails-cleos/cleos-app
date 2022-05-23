@@ -8,6 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { UnavailableService } from '../../services/unavailable.service';
 import { Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
+import { newDateTimestamp } from '../../util/dates';
 
 @Injectable()
 export class UnavailableEffects {
@@ -50,7 +51,7 @@ export class UnavailableEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.unavailableService.add(payload).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('UNAVAILABLE.CREATED', {date: response.start});
+        const message = this.translate.instant('UNAVAILABLE.CREATED', {date: newDateTimestamp(response.timestamp)});
         return of(new fromActionsUnavailable.UnavailableSaveSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({error: err.error})))
     ))
@@ -60,7 +61,7 @@ export class UnavailableEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.unavailableService.update(payload).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('UNAVAILABLE.UPDATED.MESSAGE', {date: response.start});
+        const message = this.translate.instant('UNAVAILABLE.UPDATED.MESSAGE', {date: newDateTimestamp(response.timestamp)});
         return of(new fromActionsUnavailable.UnavailableSaveSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({error: err.error})))
     ))
@@ -70,7 +71,7 @@ export class UnavailableEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.unavailableService.delete(payload).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('UNAVAILABLE.DELETED.MESSAGE', {date: response.start});
+        const message = this.translate.instant('UNAVAILABLE.DELETED.MESSAGE', {date: newDateTimestamp(response.timestamp)});
         return of(new fromActionsUnavailable.UnavailableSaveSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({error: err.error})))
     ))

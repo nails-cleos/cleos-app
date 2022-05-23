@@ -14,12 +14,13 @@ import {
   diffTime,
   filterDateRoom,
   formatTime,
+  getCurrentTimeZone,
   getMinMaxDate,
   getNow,
   getTime,
   newDate
 } from '../util/dates';
-import { IRoomAll } from '../interfaces/room';
+import { IRoom, IRoomAll } from '../interfaces/room';
 import { getUserName } from '../util/helper';
 import { Router } from '@angular/router';
 
@@ -31,9 +32,10 @@ import { Router } from '@angular/router';
 export class UnavailableComponent implements OnInit, OnDestroy {
   form!: FormGroup;
 
-  professionals: IUserAll[] | undefined;
-  room: IRoomAll | undefined;
-  filteredOptions: Observable<IUser[] | undefined> | undefined;
+  professionals?: IUserAll[];
+  rooms: IRoomAll[] = [];
+  filteredOptions?: Observable<IUser[] | undefined>;
+  roomAvailability?: IRoomAll;
 
   professional: FormControl = new FormControl('', [
     Validators.required, requireMatch
@@ -67,36 +69,20 @@ export class UnavailableComponent implements OnInit, OnDestroy {
   showEnd = false;
 
   private getState: Observable<any>;
-  private subscription: Subscription | undefined;
+  private subscription?: Subscription;
   private readonly extras: any;
 
   constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private router: Router) {
     this.getState = this.store.select(selectUnavailableState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
     if (this.extras) {
-      this.room = this.extras.room;
+      this.rooms = [this.extras.room];
       this.professional.setValue(this.extras.room.professional);
-      this.startDate.setValue(this.extras.date);
-      this.startTime.setValue(getTime(this.extras.date, API_LOCALE));
+      this.setValues(this.extras.date, getTime(this.extras.date));
     }
   }
 
-  ngOnInit(): void {
-    this.createForm();
-    this.clean();
-    this.subscribe();
-    this.getProfessionals();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  getProfessionalName(professional: IUser): string {
-    return getUserName(professional);
-  }
-
-  create(): void {
+  get create(): void {
     if (this.form.invalid) {
       return;
     }
@@ -113,6 +99,7 @@ export class UnavailableComponent implements OnInit, OnDestroy {
     unavailable.professionalId = this.professional.value.id;
     unavailable.description = this.form.value.description;
     unavailable.start = date.toLocaleString(API_LOCALE);
+    unavailable.timeZone = getCurrentTimeZone();
     unavailable.repeat = this.repeat.value;
     unavailable.duration = this.duration.value;
     unavailable.allDay = this.allDay.value;
@@ -120,27 +107,55 @@ export class UnavailableComponent implements OnInit, OnDestroy {
       unavailable.end = createNewDate(this.endDate.value).toLocaleString(API_LOCALE);
     }
 
-    this.store.dispatch(
+    return this.store.dispatch(
       new fromActionsUnavailable.UnavailableSave(unavailable)
     );
+  }
+
+  get focusin(): void {
+    if (this.rooms.length && this.startTime.value) {
+      const time = this.startTime.value.split(':');
+      const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time[0], time[1]);
+      const day = date.getDay();
+      const {minDate, maxDate, roomAvailability} = getMinMaxDate(day, date, this.rooms);
+
+      this.setValues(this.startDate.value, this.startTime.value, getTime(minDate), getTime(maxDate), this.showDuration,
+        this.duration.value, roomAvailability);
+    }
+    return;
+  }
+
+  ngOnInit(): void {
+    this.createForm();
+    this.clean();
+    this.subscribe();
+    this.getProfessionals();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 
   displayFn(user: IUser): string {
     return user ? getUserName(user) : '';
   }
 
-  myFilter = (d: Date | null): boolean => filterDateRoom(d, this.room);
+  myFilter = (d: Date | null): boolean => filterDateRoom(d, this.roomAvailability);
 
   setDate($event: any): void {
     const date = newDate($event.value);
 
     let max;
-    if (this.room) {
+    let maxTime;
+    let minTime;
+    let availability;
+    if (this.rooms.length) {
       const day = date.getDay();
-      const {minDate, maxDate} = getMinMaxDate(day, $event.value, this.room);
+      const {minDate, maxDate, roomAvailability} = getMinMaxDate(day, $event.value, this.rooms);
       max = maxDate;
-      this.minTime = getTime(minDate, API_LOCALE);
-      this.maxTime = getTime(maxDate, API_LOCALE);
+      minTime = getTime(minDate);
+      maxTime = getTime(maxDate);
+      availability = roomAvailability;
     }
 
     const maxHour = max?.getHours();
@@ -148,10 +163,7 @@ export class UnavailableComponent implements OnInit, OnDestroy {
 
     const d = diffTime(date, maxHour, diffMin);
 
-    this.startTime.setValue(undefined);
-    this.duration.setValue(undefined);
-    this.showDuration = false;
-    this.durationMax = formatTime(d, API_LOCALE);
+    this.setValues($event.value, undefined, minTime, maxTime, false, formatTime(d), availability);
   }
 
   setTime($event: any): void {
@@ -168,9 +180,8 @@ export class UnavailableComponent implements OnInit, OnDestroy {
 
     const d = diffTime(date, Number(maxHour), Number(diffMin));
 
-    this.duration.setValue(undefined);
-    this.showDuration = true;
-    this.durationMax = formatTime(d, API_LOCALE);
+    this.setValues(this.startDate.value, $event, this.minTime, this.maxTime, true, formatTime(d),
+      this.roomAvailability);
   }
 
   getRoom(user: IUser): void {
@@ -179,15 +190,27 @@ export class UnavailableComponent implements OnInit, OnDestroy {
     );
   }
 
-  focusin(): void {
-    if (this.room && this.startTime.value) {
-      const time = this.startTime.value.split(':');
-      const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time[0], time[1]);
-      const day = date.getDay();
-      const {minDate, maxDate} = getMinMaxDate(day, date, this.room);
-      this.minTime = getTime(minDate, API_LOCALE);
-      this.maxTime = getTime(maxDate, API_LOCALE);
+  keyDownHandler(event: any): void {
+    if (event.code === 'Backspace') {
+      this.professional.setValue('');
+      this.setValues();
     }
+  }
+
+  private setValues(startDate?: any, startTime?: any, minTime?: string, maxTime?: string, showDuration: boolean = false,
+                    durationMax?: any, roomAvailability?: IRoomAll): void {
+    this.startDate.setValue(startDate);
+    this.startTime.setValue(startTime);
+    this.minTime = minTime;
+    this.maxTime = maxTime;
+    this.showDuration = showDuration;
+    this.durationMax = durationMax;
+    this.roomAvailability = roomAvailability;
+    this.duration.setValue(undefined);
+    this.endDate.setValue(undefined);
+    this.repeat.setValue(undefined);
+    this.allDay.setValue(startDate ? this.allDay.value : false);
+    this.showEnd = false;
   }
 
   private createForm(): void {
@@ -250,7 +273,7 @@ export class UnavailableComponent implements OnInit, OnDestroy {
         this.professionals = state.professionals;
       }
       if (state.room) {
-        this.room = state.room;
+        this.rooms = state.room;
       }
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
@@ -266,6 +289,6 @@ export class UnavailableComponent implements OnInit, OnDestroy {
   private filter(name: string): IUser[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.professionals?.filter(option => getUserName(option)?.toLowerCase().indexOf(filterValue));
+    return this.professionals?.filter(option => getUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
   }
 }

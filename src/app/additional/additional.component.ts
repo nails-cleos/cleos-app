@@ -31,17 +31,7 @@ export class AdditionalComponent implements OnInit, OnDestroy {
     this.getState = this.store.select(selectAdditionalState);
   }
 
-  ngOnInit(): void {
-    this.createForm();
-    this.clean();
-    this.subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  create(): void {
+  get create(): void {
     if (this.form.invalid) {
       return;
     }
@@ -54,6 +44,18 @@ export class AdditionalComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsAdditional.AdditionalSave(additional)
     );
+
+    return;
+  }
+
+  ngOnInit(): void {
+    this.createForm();
+    this.clean();
+    this.subscribe();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 
   private createForm(): void {

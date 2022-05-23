@@ -43,18 +43,7 @@ export class DiscountComponent implements OnInit, OnDestroy {
     this.getState = this.store.select(selectDiscountState);
   }
 
-  ngOnInit(): void {
-    this.createForm();
-    this.clean();
-    this.subscribe();
-    this.getCurrencies();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  create(): void {
+  get create(): void {
     if (this.form.invalid) {
       return;
     }
@@ -66,9 +55,20 @@ export class DiscountComponent implements OnInit, OnDestroy {
     discount.type = this.type.value;
     discount.currencyId = this.currency.value.id;
 
-    this.store.dispatch(
+    return this.store.dispatch(
       new fromActionsDiscount.DiscountSave(discount)
     );
+  }
+
+  ngOnInit(): void {
+    this.createForm();
+    this.clean();
+    this.subscribe();
+    this.getCurrencies();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 
   displayCurrencyFn(currency: ICurrencyAll): string {
@@ -79,10 +79,6 @@ export class DiscountComponent implements OnInit, OnDestroy {
     if (event.code === 'Backspace') {
       form.setValue('');
     }
-  }
-
-  addCurrency(): void {
-    this.router.navigate(['currency', 'add']);
   }
 
   private createForm(): void {

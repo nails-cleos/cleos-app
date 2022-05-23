@@ -92,7 +92,7 @@ export class LoginEffects {
           {state: response.payload.extras, queryParams}).then(() => window.location.reload());
       } else {
         const redirectUrl = decodedURI?.split('/') || ['auth', 'redirect'];
-        this.router.navigate(redirectUrl, {state: response.payload.extras}).then(() => window.location.reload());
+        this.router.navigate(redirectUrl, {state: response.payload.extras});
       }
 
     })

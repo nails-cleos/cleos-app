@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { createNewDate, newDate, reservationDuration } from '../../../util/dates';
-import { getPrice, getUserName, roomName } from '../../../util/helper';
+import { getPrice } from '../../../util/helper';
 import { IReview } from '../../../interfaces/review';
 import { IReservationAll } from '../../../interfaces/reservation';
 import { IPrice } from '../../../interfaces/product';
@@ -40,20 +40,12 @@ export class ReviewDialogComponent {
     this.language = this.translate.currentLang;
   }
 
-  get professionalName(): string {
-    return getUserName(this.reservation?.room.professional);
+  get onNoClick(): void {
+    return this.dialogRef.close();
   }
 
-  get roomName(): string {
-    return this.reservation ? roomName(this.reservation.room) : '';
-  }
-
-  onNoClick(): void {
-    this.dialogRef.close();
-  }
-
-  doAction(): void {
-    this.dialogRef.close({rating: this.rating, detail: this.detail.value});
+  get doAction(): void {
+    return this.dialogRef.close({rating: this.rating, detail: this.detail.value});
   }
 
   onRatingHover(hover: number): void {

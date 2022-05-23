@@ -2,7 +2,7 @@
   <mat-card-header>
     <mat-card-title>{{ 'RESERVATION.CUSTOMER.DETAIL' | translate }}</mat-card-title>
     <mat-card-subtitle
-      *ngIf="reservation; else skeleton">{{customerName}}</mat-card-subtitle>
+      *ngIf="reservation; else skeleton">{{reservation?.customer | userName}}</mat-card-subtitle>
     <mat-card-subtitle
       *ngIf="reservation?.configuration?.canCustomerChange">{{reservation?.configuration?.reference}}</mat-card-subtitle>
     <ng-template #skeleton>
@@ -20,12 +20,12 @@
       <mat-list-item>
         <mat-icon mat-list-icon>store</mat-icon>
         <div mat-line>{{ 'RESERVATION.ROOM.NAME.FIELD' | translate}}</div>
-        <div mat-line>{{roomName}}</div>
+        <div mat-line>{{reservation?.room | roomName}}</div>
       </mat-list-item>
       <mat-list-item>
         <mat-icon mat-list-icon>person_pin</mat-icon>
         <div mat-line>{{ 'RESERVATION.ROOM.PROFESSIONAL.FIELD' | translate}}</div>
-        <div mat-line>{{professionalName}}</div>
+        <div mat-line>{{reservation?.room?.professional | userName}}</div>
       </mat-list-item>
       <mat-list-item>
         <mat-icon mat-list-icon>room</mat-icon>
@@ -41,11 +41,21 @@
       <div mat-subheader>{{ 'RESERVATION.APPOINTMENT' | translate}}</div>
       <mat-list-item>
         <mat-icon mat-list-icon>event</mat-icon>
-        <div mat-line>{{getDateTime(start)}}</div>
-        <div mat-line>{{getDateTime(end)}}</div>
+        <div mat-line>
+          {{start | date:'short':reservation.room.timeZone:language}}
+          <button (click)="openDialog(start)" *ngIf="showTimeZone()" mat-icon-button type="button">
+            <mat-icon>info_outline</mat-icon>
+          </button>
+        </div>
+        <div mat-line>
+          {{end | date:'short':reservation.room.timeZone:language}}
+          <button (click)="openDialog(end)" *ngIf="showTimeZone()" mat-icon-button type="button">
+            <mat-icon>info_outline</mat-icon>
+          </button>
+        </div>
       </mat-list-item>
       <mat-list-item>
-        <mat-icon mat-list-icon>{{state}}</mat-icon>
+        <mat-icon mat-list-icon>{{state | reservationIcon}}</mat-icon>
         <div mat-line>{{ 'COMMON.STATUS.RESERVATION.' + reservation.state | translate}}</div>
       </mat-list-item>
       <mat-divider></mat-divider>
@@ -93,7 +103,7 @@
           <mat-icon mat-list-icon>add_post</mat-icon>
           <div mat-line>
             <div *ngFor="let it of reservation.additional">
-              {{it.name}} - {{currencySymbol}} {{it.price | number:'1.2-2'}}
+              {{it.name}} - {{reservation.room | currencySymbol}} {{it.price | number:'1.2-2'}}
             </div>
           </div>
         </mat-list-item>
@@ -177,7 +187,7 @@
             </ng-template>
           </td>
           <td *matFooterCellDef class="bold" mat-footer-cell>
-            <mat-icon matPrefix>attach_money</mat-icon>&nbsp;{{getTotal() | number:'1.2-2'}}
+            <mat-icon matPrefix>attach_money</mat-icon>&nbsp;{{total | number:'1.2-2'}}
           </td>
         </ng-container>
 
@@ -231,7 +241,7 @@
               mat-header-cell> {{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }} </th>
           <td *matCellDef="let history" fxHide.lt-sm fxShow
               mat-cell>
-            <div *ngIf="history.id; else skeleton">{{getProfessionalName(history)}}</div>
+            <div *ngIf="history.id; else skeleton">{{history?.room?.professional | userName}}</div>
             <ng-template #skeleton>
               <div class="ssc-line"></div>
             </ng-template>
@@ -242,7 +252,10 @@
           <th *matHeaderCellDef mat-header-cell> {{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }} </th>
           <td *matCellDef="let history" mat-cell>
             <div *ngIf="history.id; else skeleton">
-              {{history.start | date:'short':undefined:language}}
+              {{history | timeDetail | date:'short':history.room.timeZone:language}}
+              <button (click)="openHistoryDialog(history)" *ngIf="showTimeZone(history)" mat-icon-button type="button">
+                <mat-icon>info_outline</mat-icon>
+              </button>
             </div>
             <ng-template #skeleton>
               <div class="ssc-line"></div>
@@ -267,7 +280,7 @@
               mat-header-cell> {{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }} </th>
           <td *matCellDef="let history" fxHide.lt-sm fxShow mat-cell>
             <div *ngIf="history.id; else skeleton">
-              <mat-icon matPrefix>{{getIcon(history.state)}}</mat-icon>&nbsp;
+              <mat-icon matPrefix>{{history.state | reservationIcon}}</mat-icon>&nbsp;
               {{ 'COMMON.STATUS.RESERVATION.' + history.state | translate}}
             </div>
             <ng-template #skeleton>
@@ -282,12 +295,12 @@
               <mat-list *ngIf="history.id">
                 <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
                 <mat-list-item role="list">
-                  <div mat-line>{{getProfessionalName(history)}}</div>
+                  <div mat-line>{{history?.room?.professional | userName}}</div>
                 </mat-list-item>
                 <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</div>
                 <mat-list-item role="list">
                   <div mat-line>
-                    <mat-icon matPrefix>{{getIcon(history.state)}}</mat-icon>&nbsp;
+                    <mat-icon matPrefix>{{history.state | reservationIcon}}</mat-icon>&nbsp;
                     {{ 'COMMON.STATUS.RESERVATION.' + history.state | translate}}
                   </div>
                 </mat-list-item>

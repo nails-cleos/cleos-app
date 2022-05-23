@@ -27,6 +27,23 @@ export class RecoveryPasswordComponent implements OnInit, OnDestroy {
     this.locale = getLocale(this.route.snapshot.queryParamMap.get('locale') || navigator.language);
   }
 
+  get recoveryPassword(): void {
+    if (this.passwordComponent.passwordFormControl.invalid
+      || this.passwordComponent.passwordConfirmationFormControl.invalid) {
+      return;
+    }
+    const token = this.route.snapshot.queryParamMap.get('token');
+    this.translate.use(this.locale);
+    return this.store.dispatch(
+      new fromActionsLogin.RecoveryPassword({token, password: this.passwordComponent.passwordFormControl.value})
+    );
+  }
+
+  get onStrengthChanged(): void {
+    this.showError = true;
+    return this.passwordComponent.passwordConfirmationFormControl.updateValueAndValidity();
+  }
+
   ngOnInit(): void {
     this.translate.use(this.locale);
     this.clean();
@@ -35,23 +52,6 @@ export class RecoveryPasswordComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
-  }
-
-  recoveryPassword(): void {
-    if (this.passwordComponent.passwordFormControl.invalid
-      || this.passwordComponent.passwordConfirmationFormControl.invalid) {
-      return;
-    }
-    const token = this.route.snapshot.queryParamMap.get('token');
-    this.translate.use(this.locale);
-    this.store.dispatch(
-      new fromActionsLogin.RecoveryPassword({token, password: this.passwordComponent.passwordFormControl.value})
-    );
-  }
-
-  onStrengthChanged(): void {
-    this.showError = true;
-    this.passwordComponent.passwordConfirmationFormControl.updateValueAndValidity();
   }
 
   private clean(): void {

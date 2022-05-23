@@ -24,7 +24,7 @@
             <mat-card-content class="card-text-color">
               <div>{{product.description}}</div>
               <div *ngIf="product.duration"
-                   [innerHTML]="'CARD.PRODUCT.DURATION' | translate: {duration: product.duration}"></div>
+                   [innerHTML]="'CARD.PRODUCT.DURATION' | translate: {duration: product.duration | durationTime}"></div>
               <div *ngIf="product.rating">
                 <app-rating [notEmpty]="true" [rate]="'REVIEW.RATE'" [rating]="product.rating" class="card-text-color"
                             color="primary"></app-rating>
@@ -36,7 +36,7 @@
     </div>
   </mat-card-content>
   <mat-card-actions>
-    <button (click)="setGroup()" mat-button>
+    <button (click)="setGroup" mat-button>
       <mat-icon matPrefix>done</mat-icon>
       {{'COMMON.BUTTON.SELECT' | translate}}
     </button>

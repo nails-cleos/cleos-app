@@ -39,6 +39,20 @@ export class DiscountDetailComponent implements OnInit, AfterViewInit, OnDestroy
     this.getState = this.store.select(selectDiscountState);
   }
 
+  get update(): void {
+    if (this.form.invalid) {
+      return;
+    }
+    const discount: IDiscount = new Discount();
+    discount.id = this.discount?.id;
+    discount.name = fieldChange(this.name, this.discount?.name);
+    discount.description = valueChange(this.form.value?.description, this.discount?.description);
+    discount.type = fieldChange(this.type, this.discount?.type);
+    discount.amount = fieldChange(this.amount, this.discount?.amount);
+
+    return this.store.dispatch(new fromActionsDiscount.DiscountUpdate(discount));
+  }
+
   ngOnInit(): void {
     this.createForm();
     this.subscribe();
@@ -50,20 +64,6 @@ export class DiscountDetailComponent implements OnInit, AfterViewInit, OnDestroy
 
   ngAfterViewInit(): void {
     this.getDiscount();
-  }
-
-  update(): void {
-    if (this.form.invalid) {
-      return;
-    }
-    const discount: IDiscount = new Discount();
-    discount.id = this.discount?.id;
-    discount.name = fieldChange(this.name, this.discount?.name);
-    discount.description = valueChange(this.form.value?.description, this.discount?.description);
-    discount.type = fieldChange(this.type, this.discount?.type);
-    discount.amount = fieldChange(this.amount, this.discount?.amount);
-
-    this.store.dispatch(new fromActionsDiscount.DiscountUpdate(discount));
   }
 
   private createForm(): void {
