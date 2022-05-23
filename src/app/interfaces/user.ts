@@ -24,6 +24,7 @@ export interface IUser {
   referralMax?: number;
   completed?: boolean;
   theme?: Theme;
+  timeZone?: string;
 }
 
 export interface IUserAll {
@@ -43,6 +44,7 @@ export interface IUserAll {
   referralMax?: number;
   theme?: Theme;
   changePassword: boolean;
+  timeZone: string;
 }
 
 export interface IAuthority {

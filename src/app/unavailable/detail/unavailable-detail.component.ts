@@ -20,7 +20,7 @@ import {
   getMinMaxDate,
   getNow,
   getTime,
-  newDate
+  newDate, newDateTimestamp
 } from '../../util/dates';
 import { IRoomAll } from '../../interfaces/room';
 import { IUser } from '../../interfaces/user';
@@ -39,8 +39,10 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
 
   form!: FormGroup;
 
-  professionalName: string | undefined;
-  room: IRoomAll | undefined;
+  professionalName?: string;
+  rooms: IRoomAll[] = [];
+  roomAvailability?: IRoomAll;
+
   startDate: FormControl = new FormControl('', [
     Validators.required
   ]);
@@ -66,7 +68,7 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
   maxTime: any;
   showEnd = false;
 
-  private subscription: Subscription | undefined;
+  private subscription?: Subscription;
   private getState: Observable<any>;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
@@ -122,13 +124,14 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
   }
 
   get focusin(): void {
-    if (this.room && this.startTime.value) {
+    if (this.rooms.length && this.startTime.value) {
       const time = this.startTime.value.split(':');
       const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time[0], time[1]);
       const day = date.getDay();
-      const {minDate, maxDate} = getMinMaxDate(day, date, this.room);
-      this.minTime = getTime(minDate, API_LOCALE);
-      this.maxTime = getTime(maxDate, API_LOCALE);
+      const {minDate, maxDate, roomAvailability} = getMinMaxDate(day, date, this.rooms);
+
+      this.setValues(this.startDate.value, this.startTime.value, getTime(minDate), getTime(maxDate),
+        this.duration.value, roomAvailability);
     }
     return;
   }
@@ -146,28 +149,29 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
     this.getUnavailable();
   }
 
-  myFilter = (d: Date | null): boolean => filterDate(true, d, this.room);
+  myFilter = (d: Date | null): boolean => filterDate(true, d, this.roomAvailability);
 
   setDate($event: any): void {
     const date = newDate($event.value);
 
     let max;
-    if (this.room) {
+    let maxTime;
+    let minTime;
+    let availability;
+    if (this.rooms) {
       const day = date.getDay();
-      const {minDate, maxDate} = getMinMaxDate(day, $event.value, this.room);
+      const {minDate, maxDate, roomAvailability} = getMinMaxDate(day, $event.value, this.rooms);
       max = maxDate;
-      this.minTime = getTime(minDate, API_LOCALE);
-      this.maxTime = getTime(maxDate, API_LOCALE);
+      minTime = getTime(minDate);
+      maxTime = getTime(maxDate);
+      availability = roomAvailability;
     }
 
     const maxHour = max?.getHours();
     const diffMin = max?.getMinutes();
 
     const duration = diffTime(date, maxHour, diffMin);
-
-    this.startTime.setValue('');
-    this.duration.setValue('');
-    this.durationMax = formatTime(duration, API_LOCALE);
+    this.setValues($event.value, undefined, minTime, maxTime, formatTime(duration), availability);
   }
 
   setTime($event: any): void {
@@ -184,14 +188,29 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
 
     const duration = diffTime(date, Number(maxHour), Number(diffMin));
 
-    this.duration.setValue('');
-    this.durationMax = formatTime(duration, API_LOCALE);
+    this.setValues(this.startDate.value, $event, this.minTime, this.maxTime, formatTime(duration),
+      this.roomAvailability);
   }
 
   getRoom(user: IUser): void {
     this.store.dispatch(
       new fromActionsUnavailable.GetRoom(user.id)
     );
+  }
+
+  private setValues(startDate?: any, startTime?: any, minTime?: string, maxTime?: string, durationMax?: any,
+                    roomAvailability?: IRoomAll): void {
+    this.startDate.setValue(startDate);
+    this.startTime.setValue(startTime);
+    this.minTime = minTime;
+    this.maxTime = maxTime;
+    this.durationMax = durationMax;
+    this.roomAvailability = roomAvailability;
+    this.duration.setValue(undefined);
+    this.endDate.setValue(undefined);
+    this.repeat.setValue(undefined);
+    this.allDay.setValue(startDate ? this.allDay.value : false);
+    this.showEnd = false;
   }
 
   private createForm(): void {
@@ -233,11 +252,11 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       if (state.room) {
-        this.room = state.room;
+        this.rooms = state.room;
       }
       if (state.selected) {
-        const date = newDate(state.selected.start);
-        if (!this.room) {
+        const date = newDateTimestamp(state.selected.timestamp);
+        if (!this.rooms.length) {
           this.getRoom(state.selected.professional);
         }
         this.unavailable = {
@@ -247,8 +266,8 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
           end: state.selected.end,
           startDate: date,
           endDate: createEndDate(state.selected.end),
-          startTime: getTime(date, API_LOCALE),
-          duration: state.selected.duration ? formatDuration(state.selected.duration, API_LOCALE) : '',
+          startTime: getTime(date),
+          duration: state.selected.duration ? formatDuration(state.selected.duration) : '',
           repeat: state.selected.repeat,
           allDay: state.selected.allDay
         } as IUnavailable;
@@ -258,16 +277,16 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
 
         this.professionalName = getUserName(state.selected.professional);
       }
-      if (this.room && this.unavailable && this.unavailable.startDate) {
+      if (this.rooms.length && this.unavailable && this.unavailable.startDate) {
         const date = newDate(this.unavailable.startDate);
         const day = date.getDay();
-        const {maxDate} = getMinMaxDate(day, date, this.room);
+        const {maxDate} = getMinMaxDate(day, date, this.rooms);
 
         const maxHour = maxDate?.getHours();
         const diffMin = maxDate?.getMinutes();
 
         const d = diffTime(date, maxHour, diffMin);
-        this.durationMax = formatTime(d, API_LOCALE);
+        this.durationMax = formatTime(d);
       }
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {

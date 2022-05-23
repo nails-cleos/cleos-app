@@ -10,10 +10,12 @@ import { Store } from '@ngrx/store';
 import { AppState, selectUnavailableState } from '../../store/app.states';
 import * as fromActionsUnavailable from '../../store/unavailable.actions';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
-import { convertDuration } from '../../util/dates';
-import { IUnavailable } from '../../interfaces/unavailable';
+import { convertDuration, isSameTimeZone, newDateTimestamp } from '../../util/dates';
+import { IUnavailable, IUnavailableAll } from '../../interfaces/unavailable';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
+import { IReservationAll } from '../../interfaces/reservation';
+import { createDialog, getUserName, openDialog } from '../../util/helper';
 
 @Component({
   selector: 'app-unavailable-list',
@@ -87,6 +89,17 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
         );
       }
     });
+  }
+
+  showTimeZone(unavailable: IUnavailableAll): boolean {
+    return !isSameTimeZone(unavailable.professional.timeZone);
+  }
+
+  openDialog(unavailable: IUnavailableAll): void {
+    const time = newDateTimestamp(unavailable.timestamp);
+    const name = getUserName(unavailable.professional);
+    const timeZone = unavailable.professional.timeZone;
+    createDialog('PROFESSIONAL_INFO', name, this.language, this.translate, this.dialog, timeZone, time);
   }
 
   private subscribe(): void {

@@ -425,6 +425,10 @@
   .warning {
     color: mat.get-color-from-palette($warn-palette, darker);
   }
+
+  .success {
+    color: mat.get-color-from-palette($background, success)
+  }
 }
 
 @mixin theme($theme) {

@@ -5,7 +5,7 @@ import { AppState, selectProductState } from '../store/app.states';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
 import { IProduct, IProductGroup, Product, ProductGroup } from '../interfaces/product';
-import { API_LOCALE, createNewDate, getNow, getTime } from '../util/dates';
+import { createNewDate, getNow, getTime } from '../util/dates';
 import { Router } from '@angular/router';
 
 @Component({
@@ -100,7 +100,7 @@ export class ProductComponent implements OnInit, OnDestroy {
   setTime(product: IProduct, $event: any): void {
     const time = $event.split(':');
     const date = createNewDate(getNow(), time[0], time[1]);
-    product.duration = getTime(date, API_LOCALE);
+    product.duration = getTime(date);
   }
 
   setPrimary(tab: IProduct): void {

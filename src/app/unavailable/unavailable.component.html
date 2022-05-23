@@ -11,7 +11,8 @@
               <mat-form-field *ngIf="professionals; else skeleton" appearance="fill">
                 <mat-label>{{ 'UNAVAILABLE.PROFESSIONAL.FIELD' | translate }}</mat-label>
                 <label>
-                  <input [formControl]="professional" [matAutocomplete]="auto" matInput required type="text">
+                  <input (keydown)="keyDownHandler($event)" [formControl]="professional" [matAutocomplete]="auto"
+                         matInput required type="text">
                 </label>
                 <mat-autocomplete #auto="matAutocomplete" (optionSelected)="getRoom($event.option.value)"
                                   [displayWith]="displayFn">
@@ -40,7 +41,7 @@
                 <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
               </mat-form-field>
 
-              <div *ngIf="room" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
+              <div *ngIf="professional.valid" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
                 <mat-form-field appearance="fill" color="primary" style="margin-right: 12px;">
                   <mat-label>{{ 'UNAVAILABLE.DATE.FIELD' | translate }}</mat-label>
                   <button (click)="picker.open()" mat-icon-button matPrefix>
@@ -91,7 +92,7 @@
                 </mat-error>
               </mat-form-field>
 
-              <mat-form-field *ngIf="room" appearance="fill">
+              <mat-form-field *ngIf="professional.valid" appearance="fill">
                 <mat-label>{{ 'UNAVAILABLE.REPEAT.FIELD' | translate }}</mat-label>
                 <mat-select [formControl]="repeat" required>
                   <mat-option *ngFor="let t of repeats | keyvalue" [value]="t.value">

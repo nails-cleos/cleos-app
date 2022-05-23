@@ -6,7 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectAdditionalState } from '../../store/app.states';
 import { MatDialog } from '@angular/material/dialog';
-import { API_LOCALE, formatDuration } from '../../util/dates';
+import { formatDuration } from '../../util/dates';
 import * as fromActionsAdditional from '../../store/additional.actions';
 import { fieldChange, valueChange } from '../../util/validators';
 
@@ -80,7 +80,7 @@ export class AdditionalDetailComponent implements OnInit, AfterViewInit, OnDestr
           id: state.selected.id,
           name: state.selected.name,
           description: state.selected.description,
-          duration: formatDuration(state.selected.duration, API_LOCALE)
+          duration: formatDuration(state.selected.duration)
         } as IAdditional;
         this.form.patchValue(this.additional);
       }

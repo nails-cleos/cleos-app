@@ -1,4 +1,4 @@
-import { IAvailability, IAvailabilityAll, IRoom } from '../interfaces/room';
+import { IAvailability, IAvailabilityAll, IRoom, IRoomAll } from '../interfaces/room';
 import {
   addDays,
   addMonths,
@@ -6,6 +6,7 @@ import {
   endOfDay,
   endOfMonth,
   endOfWeek,
+  isSameDay,
   startOfDay,
   startOfMonth,
   startOfWeek,
@@ -184,30 +185,63 @@ export const getAvailability = (room: IRoom): any => {
   return {week, saturday, sunday, exclude};
 };
 
-export const getMinMaxDate = (day: number, date: any, room: IRoom): any => {
-  let av: IAvailabilityAll;
-  const {week, saturday, sunday} = getAvailability(room);
-  switch (day) {
-    case 0:
-      av = sunday;
-      break;
-    case 6:
-      av = saturday;
-      break;
-    default:
-      av = week;
-      break;
+export const getMinMaxDate = (day: number, date: any, rooms: IRoomAll[]): any => {
+  let minDate: Date | undefined;
+  let maxDate: Date | undefined;
+
+  let weekAv: any;
+  let saturdayAv: any;
+  let sundayAv: any;
+
+  rooms.forEach(room => {
+    let av: IAvailabilityAll;
+    const {week, saturday, sunday} = getAvailability(room);
+
+    weekAv = weekAv ?? week;
+    saturdayAv = saturdayAv ?? saturday;
+    sundayAv = sundayAv ?? sunday;
+
+    switch (day) {
+      case 0:
+        av = sunday;
+        break;
+      case 6:
+        av = saturday;
+        break;
+      default:
+        av = week;
+        break;
+    }
+    const {min, max} = getMinAndMax(av, date, room.timeZone);
+
+    if (!minDate || min.getTime() < minDate.getTime()) {
+      minDate = min;
+    }
+
+    if (!maxDate || max.getTime() > maxDate.getTime()) {
+      maxDate = max;
+    }
+  });
+
+  const roomAvailability = {
+    availabilities: [weekAv, saturdayAv, sundayAv].filter(av => av !== undefined)
+  } as IRoom;
+
+  minDate = minDate ?? createNewDate(date);
+  maxDate = maxDate ?? createNewDate(date, 23, 59);
+
+  if (isSameDay(minDate, date) && isSameDay(maxDate, date)) {
+    return {minDate, maxDate, roomAvailability};
   }
-  const avStart = av.start.split(':');
-  const minDate = new Date(new Date(date).setHours(Number(avStart[0]), Number(avStart[1])));
 
-  const avEnd = av.end.split(':');
-  const maxDate = new Date(new Date(date).setHours(Number(avEnd[0]), Number(avEnd[1])));
+  if (isSameDay(minDate, date)) {
+    return {minDate, maxDate: createNewDate(date, 23, 59), roomAvailability};
+  }
 
-  return {minDate, maxDate};
+  return {minDate: createNewDate(date), maxDate, roomAvailability};
 };
 
-export const getTime = (date: Date, locale: string): string => date.toLocaleTimeString(locale, {
+export const getTime = (date: Date, locale: string = API_LOCALE): string => date.toLocaleTimeString(locale, {
   hour: '2-digit', minute: '2-digit'
 });
 
@@ -263,12 +297,12 @@ export const formatDateTwoDigit = (date: Date, locale: string): string => date.t
   day: '2-digit', month: '2-digit', year: '2-digit'
 });
 
-export const formatDuration = (duration: string, locale: string): string => {
+export const formatDuration = (duration: string, locale: string = API_LOCALE): string => {
   const d: IDuration = convertDuration(duration);
   return formatTime(d, locale);
 };
 
-export const formatTime = (duration: IDuration, locale: string): string =>
+export const formatTime = (duration: IDuration, locale: string = API_LOCALE): string =>
   getTime(createDate(duration.hour, duration.minute), locale);
 
 export const getNow = (): Date => new Date();
@@ -293,7 +327,6 @@ export const createFullDate = (selectDate: Date): Date => {
   return date;
 };
 
-// TODO fine
 export const newDateTimestamp = (value: number, timeZone: string = getCurrentTimeZone()): Date => {
   const date = new Date(value * 1000);
   return utcToZonedTime(date, timeZone);

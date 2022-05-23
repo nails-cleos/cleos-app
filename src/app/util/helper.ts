@@ -9,9 +9,10 @@ import { IRoom, IRoomAll, ServiceType } from '../interfaces/room';
 import { IOffice } from '../interfaces/office';
 import { ICurrency } from '../interfaces/currency';
 import { IStep } from '../interfaces/step';
-import { getTimeZone, localeTimeZoneDate, newDateTimestamp } from './dates';
+import { getTime, getTimeZone, localeTimeZoneDate } from './dates';
 import { DialogComponent } from '../shared/dialog/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { isSameDay } from 'date-fns';
 
 export const snakeToCamel = (value: string = ''): string =>
   value.toLowerCase().replace(/([-_]\w)/g, (g: string) => g[1].toUpperCase());
@@ -288,11 +289,29 @@ export const getBackIndex = (steps: IStep[], current: number): number => {
 
 export const openDialog = (myRoom: IRoomAll, locale: string, translate: TranslateService,
                            dialog: MatDialog, time?: Date): void => {
-  const localDate = localeTimeZoneDate(locale, time);
-  const date = localeTimeZoneDate(locale, time, myRoom.timeZone);
   const room = roomName(myRoom);
+  createDialog('ROOM_INFO', room, locale, translate, dialog, myRoom.timeZone, time);
+};
+
+export const createDialog = (key: string, value: string, locale: string, translate: TranslateService,
+                             dialog: MatDialog, timeZone?: string, time?: Date): void => {
+  const localDate = new Date(localeTimeZoneDate('en-US', time));
+  const date = new Date(localeTimeZoneDate('en-US', time, timeZone));
+
+  const localTime = getTime(localDate, locale);
+  const timeZoneTime = getTime(date, locale);
+  let arg = '';
+
+  if (!isSameDay(localDate, date)) {
+    if (localDate.getTime() > date.getTime()) {
+      arg = ' <b><sup class="warning">-1D</sup></b>';
+    } else {
+      arg = ' <b><sup class="success">+1D</sup></b>';
+    }
+  }
+
   const title = translate.instant('COMMON.TIME_ZONE.TITLE');
-  const content = translate.instant('COMMON.TIME_ZONE.INFO', {localDate, date, room});
+  const content = translate.instant(`COMMON.TIME_ZONE.${key}`, {localTime, timeZoneTime, value, arg});
   dialog.open(DialogComponent, {
     data: {title, content, hideNoButton: true, hideOkButton: true}
   });

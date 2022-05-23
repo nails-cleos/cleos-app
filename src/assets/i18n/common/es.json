@@ -226,7 +226,8 @@
     },
     "TIME_ZONE": {
       "TITLE": "Zona horaria",
-      "INFO": "Tu estas en una zona horaria diferente a <b>{{room}}</b>. <br><br>Hora local: <b>{{localDate}}</b><br>Hora sala: <b>{{date}}</b>",
+      "ROOM_INFO": "Tu estas en una zona horaria diferente a <b>{{value}}</b>. <br><br>Hora local: <b>{{localTime}}</b><br>Hora de la sala: <b>{{timeZoneTime}}</b>{{arg}}",
+      "PROFESSIONAL_INFO": "Tu estas en una zona horaria diferente a <b>{{value}}</b>. <br><br>Hora local: <b>{{localTime}}</b><br>Hora del profesional: <b>{{timeZoneTime}}</b>{{arg}}",
       "ACTION": "Ocultar",
       "WARNING": "Atención",
       "DATE": {

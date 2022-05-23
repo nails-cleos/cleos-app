@@ -17,7 +17,7 @@ export interface IUnavailable {
   duration?: string;
   startDate?: Date;
   endDate?: Date;
-  startTime?: string;
+  startTime?: string | Date;
   allDay?: boolean;
   timeZone?: string;
 }

@@ -7,7 +7,7 @@ import { AppState, selectProductState } from '../../store/app.states';
 import * as fromActionsProduct from '../../store/product.actions';
 import { fieldChange, valueChange } from '../../util/validators';
 import { IProduct, IProductGroup, Product, ProductGroup } from '../../interfaces/product';
-import { API_LOCALE, createNewDate, getNow, getTime } from '../../util/dates';
+import { createNewDate, getNow, getTime } from '../../util/dates';
 
 @Component({
   selector: 'app-product-detail',
@@ -105,7 +105,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   setTime(product: IProduct, $event: any): void {
     const time = $event.split(':');
     const date = createNewDate(getNow(), time[0], time[1]);
-    product.duration = getTime(date, API_LOCALE);
+    product.duration = getTime(date);
   }
 
   setPrimary(tab: IProduct): void {
