@@ -1,11 +1,10 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
-import { IProduct, IProductGroup } from '../../interfaces/product';
+import { IProductGroup } from '../../interfaces/product';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectProductState } from '../../store/app.states';
 import * as fromActionsProduct from '../../store/product.actions';
-import { API_LOCALE, formatDuration } from '../../util/dates';
 import { groupDurability } from '../../util/helper';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -25,6 +24,12 @@ export class ProductViewComponent implements OnInit, AfterViewInit, OnDestroy {
     this.getState = this.store.select(selectProductState);
   }
 
+  get edit(): void {
+    return this.store.dispatch(
+      new fromActionsProduct.ProductSelected({product: this.group, path: 'edit'})
+    );
+  }
+
   ngOnInit(): void {
     this.subscribe();
   }
@@ -37,12 +42,6 @@ export class ProductViewComponent implements OnInit, AfterViewInit, OnDestroy {
     this.getProduct();
   }
 
-  edit(): void {
-    this.store.dispatch(
-      new fromActionsProduct.ProductSelected({product: this.group, path: 'edit'})
-    );
-  }
-
   getHistory(productId?: string): void {
     this.productId = productId;
     this.store.dispatch(
@@ -53,14 +52,7 @@ export class ProductViewComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
-        const products = [...state.selected.products?.map((p: IProduct) => {
-          if (p.duration) {
-            const duration = formatDuration(p.duration, API_LOCALE);
-
-            return Object.assign({}, p, {duration, history: [], showHistory: false});
-          }
-          return p;
-        })];
+        const products = [...state.selected.products];
         this.group = {
           id: state.selected.id,
           name: state.selected.name,

@@ -4,12 +4,12 @@
       <mat-card>
         <mat-card-header>
           <mat-card-title>{{ 'USER.DETAIL' | translate }}</mat-card-title>
-          <mat-card-subtitle *ngIf="user; else skeleton">{{userName}}</mat-card-subtitle>
+          <mat-card-subtitle *ngIf="user; else skeleton">{{user | userName}}</mat-card-subtitle>
           <ng-template #skeleton>
             <div class="ssc-line"></div>
           </ng-template>
         </mat-card-header>
-        <form (ngSubmit)="update()" [formGroup]="form" novalidate>
+        <form (ngSubmit)="update" [formGroup]="form" novalidate>
           <mat-card-content *ngIf="user; else boxSkeleton">
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <mat-form-field appearance="fill">

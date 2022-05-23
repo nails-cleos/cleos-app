@@ -60,7 +60,8 @@
         "DETAIL": "Detalle",
         "NO_CONTENT": "No hay salas",
         "NAME": {
-          "FIELD": "Nombre"
+          "FIELD": "Nombre",
+          "NAME": "<span class='bold'>Nombre:</span> {{name}}"
         },
         "PROFESSIONAL": {
           "FIELD": "Profesional",

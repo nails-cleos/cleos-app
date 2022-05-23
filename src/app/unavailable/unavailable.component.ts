@@ -14,6 +14,7 @@ import {
   diffTime,
   filterDateRoom,
   formatTime,
+  getCurrentTimeZone,
   getMinMaxDate,
   getNow,
   getTime,
@@ -81,22 +82,7 @@ export class UnavailableComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnInit(): void {
-    this.createForm();
-    this.clean();
-    this.subscribe();
-    this.getProfessionals();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  getProfessionalName(professional: IUser): string {
-    return getUserName(professional);
-  }
-
-  create(): void {
+  get create(): void {
     if (this.form.invalid) {
       return;
     }
@@ -113,6 +99,7 @@ export class UnavailableComponent implements OnInit, OnDestroy {
     unavailable.professionalId = this.professional.value.id;
     unavailable.description = this.form.value.description;
     unavailable.start = date.toLocaleString(API_LOCALE);
+    unavailable.timeZone = getCurrentTimeZone();
     unavailable.repeat = this.repeat.value;
     unavailable.duration = this.duration.value;
     unavailable.allDay = this.allDay.value;
@@ -120,9 +107,32 @@ export class UnavailableComponent implements OnInit, OnDestroy {
       unavailable.end = createNewDate(this.endDate.value).toLocaleString(API_LOCALE);
     }
 
-    this.store.dispatch(
+    return this.store.dispatch(
       new fromActionsUnavailable.UnavailableSave(unavailable)
     );
+  }
+
+  get focusin(): void {
+    if (this.room && this.startTime.value) {
+      const time = this.startTime.value.split(':');
+      const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time[0], time[1]);
+      const day = date.getDay();
+      const {minDate, maxDate} = getMinMaxDate(day, date, this.room);
+      this.minTime = getTime(minDate, API_LOCALE);
+      this.maxTime = getTime(maxDate, API_LOCALE);
+    }
+    return;
+  }
+
+  ngOnInit(): void {
+    this.createForm();
+    this.clean();
+    this.subscribe();
+    this.getProfessionals();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 
   displayFn(user: IUser): string {
@@ -177,17 +187,6 @@ export class UnavailableComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsUnavailable.GetRoom(user.id)
     );
-  }
-
-  focusin(): void {
-    if (this.room && this.startTime.value) {
-      const time = this.startTime.value.split(':');
-      const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time[0], time[1]);
-      const day = date.getDay();
-      const {minDate, maxDate} = getMinMaxDate(day, date, this.room);
-      this.minTime = getTime(minDate, API_LOCALE);
-      this.maxTime = getTime(maxDate, API_LOCALE);
-    }
   }
 
   private createForm(): void {
@@ -266,6 +265,6 @@ export class UnavailableComponent implements OnInit, OnDestroy {
   private filter(name: string): IUser[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.professionals?.filter(option => getUserName(option)?.toLowerCase().indexOf(filterValue));
+    return this.professionals?.filter(option => getUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
   }
 }

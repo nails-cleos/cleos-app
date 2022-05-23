@@ -19,12 +19,14 @@ export interface IUnavailable {
   endDate?: Date;
   startTime?: string;
   allDay?: boolean;
+  timeZone?: string;
 }
 
 export interface IUnavailableAll {
   id: string;
   description?: string;
   start: string;
+  timestamp: number;
   end: string;
   duration: string;
   professional: IUser;

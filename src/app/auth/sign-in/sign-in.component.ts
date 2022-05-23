@@ -21,24 +21,24 @@ export class SignInComponent implements OnInit {
   constructor(private formBuilder: FormBuilder, private store: Store<AppState>, private route: ActivatedRoute) {
   }
 
-  ngOnInit(): void {
-    this.createForm();
-  }
-
-  signIn(): void {
+  get signIn(): void {
     if (this.form.invalid) {
       return;
     }
     const username: string = this.form.get('username')?.value.trim();
     const password: string = this.form.get('password')?.value.trim();
 
-    this.store.dispatch(
+    return this.store.dispatch(
       new fromActionsLogin.Login({
         username, password,
         queryParams: this.route.snapshot.queryParams,
         extras: this.extras
       })
     );
+  }
+
+  ngOnInit(): void {
+    this.createForm();
   }
 
   private createForm(): void {

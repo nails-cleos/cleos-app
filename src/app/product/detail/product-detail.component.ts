@@ -7,7 +7,7 @@ import { AppState, selectProductState } from '../../store/app.states';
 import * as fromActionsProduct from '../../store/product.actions';
 import { fieldChange, valueChange } from '../../util/validators';
 import { IProduct, IProductGroup, Product, ProductGroup } from '../../interfaces/product';
-import { API_LOCALE, createNewDate, formatDuration, getNow, getTime } from '../../util/dates';
+import { API_LOCALE, createNewDate, getNow, getTime } from '../../util/dates';
 
 @Component({
   selector: 'app-product-detail',
@@ -36,20 +36,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     this.getState = this.store.select(selectProductState);
   }
 
-  ngOnInit(): void {
-    this.createForm();
-    this.subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  ngAfterViewInit(): void {
-    this.getProduct();
-  }
-
-  update(): void {
+  get update(): void {
     if (this.form.invalid) {
       return;
     }
@@ -79,10 +66,10 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     group.durabilityMax = valueChange(this.form.value?.durabilityMax, this.group?.durabilityMax);
     group.products = this.products;
 
-    this.store.dispatch(new fromActionsProduct.ProductUpdate(group));
+    return this.store.dispatch(new fromActionsProduct.ProductUpdate(group));
   }
 
-  addTab(): void {
+  get addTab(): void {
     if (this.inputName) {
       const product: IProduct = new Product(this.inputName.nativeElement.value);
       this.inputName.nativeElement.value = '';
@@ -90,6 +77,20 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
       this.products.push(product);
       this.selected.setValue(this.products.length - 1);
     }
+    return;
+  }
+
+  ngOnInit(): void {
+    this.createForm();
+    this.subscribe();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+  }
+
+  ngAfterViewInit(): void {
+    this.getProduct();
   }
 
   removeTab(index: number): void {
@@ -137,14 +138,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
         } as IProductGroup;
         this.form.patchValue(this.group);
 
-        this.products = [...state.selected.products?.map((p: IProduct) => {
-          if (p.duration) {
-            const duration = formatDuration(p.duration, API_LOCALE);
-
-            return Object.assign({}, p, {duration, errors: {}});
-          }
-          return Object.assign({}, p, {errors: {}});
-        })];
+        this.products = [...state.selected.products?.map((p: IProduct) => Object.assign({}, p, {errors: {}}))];
       }
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {

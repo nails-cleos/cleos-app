@@ -50,7 +50,7 @@ export class AdditionalDetailComponent implements OnInit, AfterViewInit, OnDestr
     this.getAdditional();
   }
 
-  update(): void {
+  get update(): void {
     if (this.form.invalid) {
       return;
     }
@@ -62,6 +62,7 @@ export class AdditionalDetailComponent implements OnInit, AfterViewInit, OnDestr
     additional.duration = fieldChange(this.duration, this.additional?.duration);
 
     this.store.dispatch(new fromActionsAdditional.AdditionalUpdate(additional));
+    return;
   }
 
   private createForm(): void {

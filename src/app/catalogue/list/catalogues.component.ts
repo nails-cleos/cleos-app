@@ -39,6 +39,12 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.getState = this.store.select(selectCatalogueState);
   }
 
+  get finish(): void {
+    return this.store.dispatch(
+      new fromActionsCatalogue.CatalogueUpdateAll(this.catalogues)
+    );
+  }
+
   ngOnInit(): void {
     this.clean();
     this.subscribe();
@@ -60,12 +66,6 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   entered($event: CdkDragEnter): void {
     moveItemInArray(this.catalogues, $event.item.data, $event.container.data);
-  }
-
-  finish(): void {
-    this.store.dispatch(
-      new fromActionsCatalogue.CatalogueUpdateAll(this.catalogues)
-    );
   }
 
   edit(catalogue: ICatalogueAll): void {

@@ -52,18 +52,7 @@ export class UserComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  ngOnInit(): void {
-    this.createForm();
-    this.clean();
-    this.subscribe();
-    this.cdRef.detectChanges();
-  }
-
-  create(): void {
+  get create(): void {
     if (this.form.invalid) {
       return;
     }
@@ -77,9 +66,20 @@ export class UserComponent implements OnInit, OnDestroy {
     user.password = 'Ch4ng#';
     user.dob = this.dob.value;
 
-    this.store.dispatch(
+    return this.store.dispatch(
       new fromActionsUser.SaveUser({user, role: this.role.value})
     );
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+  }
+
+  ngOnInit(): void {
+    this.createForm();
+    this.clean();
+    this.subscribe();
+    this.cdRef.detectChanges();
   }
 
   private createForm(): void {

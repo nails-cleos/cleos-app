@@ -12,6 +12,7 @@ export interface IRoom {
   currency?: ICurrency;
   officeId?: string;
   office?: IOffice;
+  timeZone?: string;
   availabilities: IAvailability[];
   address?: IAddress;
   paymentTypes?: string[];
@@ -57,6 +58,7 @@ export interface IRoomAll {
   address: IAddress;
   currency: ICurrencyAll;
   office: IOffice;
+  timeZone: string;
   paymentTypes: string[];
 }
 

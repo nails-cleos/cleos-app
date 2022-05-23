@@ -18,7 +18,7 @@
     <button [routerLinkActive]="['active']" [routerLink]="'/main/catalogs'" color="accent" mat-button type="button">
       <span>{{'MAIN.SECTION.CATALOG' | translate }}</span>
     </button>
-    <button (click)="redirect()" *ngIf="isAuthenticated; else login" [routerLinkActive]="['active']"
+    <button (click)="redirect" *ngIf="isAuthenticated; else login" [routerLinkActive]="['active']"
             color="accent" mat-button type="button">
       <span>{{'MAIN.SECTION.ACCOUNT' | translate }}</span>
     </button>
@@ -75,7 +75,7 @@
                             mat-line>{{'COMMON.DASHBOARD.DARK_MODE' | translate }}</mat-slide-toggle>
         </mat-list-item>
         <mat-divider></mat-divider>
-        <a (click)="redirect()" *ngIf="isAuthenticated; else login" [routerLinkActive]="['active']"
+        <a (click)="redirect" *ngIf="isAuthenticated; else login" [routerLinkActive]="['active']"
            mat-list-item>
           <mat-icon mat-list-icon>person_pin</mat-icon>
           <div mat-line>{{'MAIN.SECTION.ACCOUNT' | translate }}</div>

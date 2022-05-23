@@ -12,8 +12,6 @@ import * as fromActionsUnavailable from '../../store/unavailable.actions';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { convertDuration } from '../../util/dates';
 import { IUnavailable } from '../../interfaces/unavailable';
-import { IUser } from '../../interfaces/user';
-import { getUserName } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
 
@@ -67,10 +65,6 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
     this.paginatorSubscription?.unsubscribe();
-  }
-
-  getProfessionalName(professional: IUser): string {
-    return getUserName(professional);
   }
 
   edit(unavailable: IUnavailable): void {

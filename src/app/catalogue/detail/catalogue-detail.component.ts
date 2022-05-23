@@ -41,6 +41,39 @@ export class CatalogueDetailComponent implements OnInit, AfterViewInit, OnDestro
     this.getState = this.store.select(selectCatalogueState);
   }
 
+  get update(): void {
+    if (this.form.invalid) {
+      return;
+    }
+    const catalogue: ICatalogue = new Catalogue();
+    catalogue.id = this.catalogue?.id;
+    catalogue.name = fieldChange(this.name, this.catalogue?.name);
+    catalogue.description = fieldChange(this.form.value?.description, this.catalogue?.description);
+    catalogue.home = fieldChange(this.home, this.catalogue?.home);
+    catalogue.catalog = fieldChange(this.catalog, this.catalogue?.catalog);
+
+    return this.store.dispatch(new fromActionsCatalogue.CatalogueUpdate({catalogue, file: this.file}));
+  }
+
+  get deleteFile(): void {
+    this.file = undefined;
+    return;
+  }
+
+  get deleteImg(): void {
+    const content = this.translate.instant('CATALOGUE.DELETE.MESSAGE', {name: this.catalogue?.name});
+    const undo = this.translate.instant('CATALOGUE.DELETE.UNDO');
+    const snackBarRef = this.snackBar.open(content, undo, {
+      duration: 5000
+    });
+    snackBarRef.onAction().subscribe(() => {
+      this.showImg = true;
+    });
+
+    this.showImg = false;
+    return;
+  }
+
   ngOnInit(): void {
     this.createForm();
     this.subscribe();
@@ -54,20 +87,6 @@ export class CatalogueDetailComponent implements OnInit, AfterViewInit, OnDestro
     this.getCatalogue();
   }
 
-  update(): void {
-    if (this.form.invalid) {
-      return;
-    }
-    const catalogue: ICatalogue = new Catalogue();
-    catalogue.id = this.catalogue?.id;
-    catalogue.name = fieldChange(this.name, this.catalogue?.name);
-    catalogue.description = fieldChange(this.form.value?.description, this.catalogue?.description);
-    catalogue.home = fieldChange(this.home, this.catalogue?.home);
-    catalogue.catalog = fieldChange(this.catalog, this.catalogue?.catalog);
-
-    this.store.dispatch(new fromActionsCatalogue.CatalogueUpdate({catalogue, file: this.file}));
-  }
-
   onFileDropped(files: any): void {
     files[0].progress = 0;
     this.file = files[0];
@@ -78,23 +97,6 @@ export class CatalogueDetailComponent implements OnInit, AfterViewInit, OnDestro
     $event.target.files[0].progress = 0;
     this.file = $event.target.files[0];
     this.uploadFilesSimulator();
-  }
-
-  deleteImg(): void {
-    const content = this.translate.instant('CATALOGUE.DELETE.MESSAGE', {name: this.catalogue?.name});
-    const undo = this.translate.instant('CATALOGUE.DELETE.UNDO');
-    const snackBarRef = this.snackBar.open(content, undo, {
-      duration: 5000
-    });
-    snackBarRef.onAction().subscribe(() => {
-      this.showImg = true;
-    });
-
-    this.showImg = false;
-  }
-
-  deleteFile(): void {
-    this.file = undefined;
   }
 
   formatBytes(bytes: any, decimals: number): string {

@@ -29,6 +29,11 @@ export class PaymentComponent implements OnInit, OnDestroy {
     this.getState = this.store.select(selectPaymentState);
   }
 
+  get close(): void {
+    this.showError = false;
+    return;
+  }
+
   ngOnInit(): void {
     this.subscribe();
     this.route.params.subscribe(routeParams => {
@@ -66,10 +71,6 @@ export class PaymentComponent implements OnInit, OnDestroy {
         type: payment.type
       })
     );
-  }
-
-  close(): void {
-    this.showError = false;
   }
 
   private subscribe(): void {

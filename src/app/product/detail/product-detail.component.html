@@ -9,7 +9,7 @@
             <div class="ssc-line"></div>
           </ng-template>
         </mat-card-header>
-        <form (ngSubmit)="update()" [formGroup]="form" novalidate>
+        <form (ngSubmit)="update" [formGroup]="form" novalidate>
           <mat-card-content *ngIf="group; else boxSkeleton">
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <mat-form-field appearance="fill">
@@ -55,7 +55,7 @@
                 <label>
                   <input #inputName matInput>
                 </label>
-                <button (click)="addTab()" [attr.aria-label]="'Add product'"
+                <button (click)="addTab" [attr.aria-label]="'Add product'"
                         [disabled]="!inputName.value" color="primary" mat-icon-button matSuffix type="button">
                   <mat-icon>inventory</mat-icon>
                 </button>
@@ -81,8 +81,8 @@
                   <mat-form-field appearance="fill" class="tab-field">
                     <mat-label>{{ 'PRODUCT.DURATION.FIELD' | translate }}</mat-label>
                     <label>
-                      <input [format]="24" [ngxTimepicker]="t" [value]="tab.duration || ''" matInput readonly
-                             required/>
+                      <input [format]="24" [ngxTimepicker]="t" [value]="tab.duration | durationTime" matInput
+                             readonly required/>
                     </label>
                     <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
                     <ngx-material-timepicker #t (timeSet)="setTime(tab, $event)"

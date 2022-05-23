@@ -30,7 +30,7 @@
                     {{errors['currency']}}
                   </mat-error>
                 </mat-form-field>
-                <button (click)="addCurrency()" color="accent" mat-raised-button>
+                <button (click)="addCurrency" color="accent" mat-raised-button>
                   <mat-icon matPrefix>add_card</mat-icon>
                   <span fxHide.lt-sm fxShow>{{ 'COMMON.CURRENCY.ADD_BUTTON' | translate }}</span>
                 </button>
@@ -57,7 +57,7 @@
                     {{errors['office']}}
                   </mat-error>
                 </mat-form-field>
-                <button (click)="addOffice()" color="accent" mat-raised-button>
+                <button (click)="addOffice" color="accent" mat-raised-button>
                   <mat-icon matPrefix>add_business</mat-icon>
                   <span fxHide.lt-sm fxShow>{{ 'ROOM.OFFICE.ADD_BUTTON' | translate }}</span>
                 </button>
@@ -71,7 +71,7 @@
                   </label>
                   <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
                     <mat-option *ngFor="let professional of filteredOptions | async" [value]="professional">
-                      {{getProfessional(professional)}}
+                      {{professional | userName}}
                     </mat-option>
                   </mat-autocomplete>
                   <mat-error *ngIf="professional.hasError('required')"
@@ -84,11 +84,32 @@
                     {{errors['professional']}}
                   </mat-error>
                 </mat-form-field>
-                <button (click)="addProfessional()" color="accent" mat-raised-button>
+                <button (click)="addProfessional" color="accent" mat-raised-button>
                   <mat-icon matPrefix>person_add_alt_1</mat-icon>
                   <span fxHide.lt-sm fxShow>{{ 'ROOM.PROFESSIONAL.ADD_BUTTON' | translate }}</span>
                 </button>
               </div>
+              <mat-form-field appearance="fill">
+                <mat-label>{{ 'ROOM.TIME_ZONE.FIELD' | translate }}</mat-label>
+                <label>
+                  <input (keydown)="keyDownHandler($event, timeZone)" [formControl]="timeZone"
+                         [matAutocomplete]="auto" matInput required type="text">
+                </label>
+                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayTimeZoneFn">
+                  <mat-option *ngFor="let timeZone of filteredTimeZoneOptions | async" [value]="timeZone">
+                    {{timeZone.label}}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="timeZone.hasError('required')"
+                           [innerHTML]="'ROOM.TIME_ZONE.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="timeZone.hasError('requireMatch')"
+                           [innerHTML]="'ROOM.TIME_ZONE.INVALID' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['timeZone']">
+                  {{errors['timeZone']}}
+                </mat-error>
+              </mat-form-field>
               <ng-template #skeleton>
                 <div class="ssc-line"></div>
               </ng-template>
@@ -160,6 +181,7 @@
               <mat-error *ngIf="errors['availability']" [innerHTML]="'ROOM.AVAILABILITY.REQUIRED' | translate"
                          class="divider"></mat-error>
               <app-google-map [addressFormGroup]="form"></app-google-map>
+              <mat-error *ngIf="errors['location']" class="divider">{{errors['location']}}</mat-error>
             </div>
           </mat-card-content>
           <mat-card-actions>

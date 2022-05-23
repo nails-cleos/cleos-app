@@ -8,6 +8,8 @@ import { Pagination } from './pagination';
 import { IPayment } from './payment';
 import { IReview } from './review';
 import { IAdditionalAll } from './additional';
+import { addHours, isSameDay } from 'date-fns';
+import { createNewDate, getNow } from '../util/dates';
 
 export interface IReservation {
   id?: string;
@@ -20,6 +22,8 @@ export interface IReservation {
   roomId?: string;
   room?: IRoom;
   start?: string;
+  timestamp?: number;
+  timeZone?: string;
   state?: string;
   review?: IReview;
   canCustomerChange?: boolean;
@@ -31,7 +35,8 @@ export interface IReservationAll {
   customer: IUserAll;
   product: IProductAll;
   room: IRoomAll;
-  start: string;
+  start: Date;
+  timestamp: number;
   state: string;
   review?: IReview;
   history?: IReservationAll[];
@@ -75,7 +80,7 @@ export interface IDay {
 }
 
 export interface ICalendar {
-  room: IRoom;
+  room: IRoomAll;
   day?: IDay;
   events: CalendarEvent[];
 }
@@ -133,12 +138,24 @@ export class Day implements IDay {
   dayEndMinute: number;
   excludeDays: number[];
 
-  constructor(dayStartHour: number = 9, dayStartMinute: number = 0, dayEndHour: number = 18, dayEndMinute: number = 0,
-              excludeDays: number[] = []) {
-    this.dayStartHour = dayStartHour;
-    this.dayStartMinute = dayStartMinute;
-    this.dayEndHour = dayEndHour;
-    this.dayEndMinute = dayEndMinute;
+  constructor(startDate: Date = createNewDate(getNow(), 9), endDate: Date = createNewDate(getNow(), 18),
+              today: Date = getNow(), excludeDays: number[] = []) {
+    const startView = addHours(startDate, -1);
+    const endView = addHours(endDate, 1);
+    this.dayStartHour = startView.getHours();
+    this.dayStartMinute = startView.getMinutes();
+    this.dayEndHour = endView.getHours();
+    this.dayEndMinute = endView.getMinutes();
+    if (!isSameDay(startView, endView)) {
+      if (isSameDay(today, startView)) {
+        this.dayEndHour = 23;
+        this.dayEndMinute = 45;
+      } else if (isSameDay(today, endView)) {
+        this.dayStartHour = 0;
+        this.dayStartMinute = 15;
+      }
+    }
+
     this.excludeDays = excludeDays;
   }
 }
@@ -146,10 +163,10 @@ export class Day implements IDay {
 export class Calendar implements ICalendar {
 
   events: CalendarEvent[];
-  room: IRoom;
+  room: IRoomAll;
   day: any;
 
-  constructor(room: IRoom, events: CalendarEvent[]) {
+  constructor(room: IRoomAll, events: CalendarEvent[]) {
     this.events = events;
     this.room = room;
   }

@@ -8,20 +8,21 @@ import { IRoom, IService } from '../../../interfaces/room';
 import { IAvailableDTO, IReservation, IReservationAll, MAX_RESERVATION_MONTH, Reservation } from '../../../interfaces/reservation';
 import {
   API_LOCALE,
-  convertDuration,
   createNewDate,
   Duration,
   filterDateRoom,
   formatDateName,
   formatDateTwoDigit,
-  formatDuration,
   formatFullDateTime,
   formatTime,
+  getCurrentTimeZone,
   getNow,
   getTime,
   IDuration,
+  isSameTimeZone,
   newDate,
   plusMonthDate,
+  stringDateUTCToTimeZone,
   totalDuration
 } from '../../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
@@ -36,7 +37,6 @@ import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import {
   createProductGroupService,
   createRoomOffice,
-  currencySymbol,
   getBackIndex,
   getPrice,
   getProductDurability,
@@ -45,7 +45,8 @@ import {
   newAdditional,
   newDiscount,
   newPrice,
-  roomName,
+  openDialog,
+  roomDetail,
   round
 } from '../../../util/helper';
 import { DiscountType, IUserDiscount } from '../../../interfaces/discount';
@@ -56,6 +57,8 @@ import { MatListOption } from '@angular/material/list';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { IOffice } from '../../../interfaces/office';
 import { IStep, Step } from '../../../interfaces/step';
+import { TimeZoneSnackBarComponent } from '../../../shared/snak/time-zone/time-zone-snack-bar.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-me-reservation',
@@ -138,10 +141,11 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   private getState: Observable<any>;
   private subscription?: Subscription;
   private steps: IStep[];
+  private dismiss = false;
 
   constructor(private readonly translate: TranslateService, private snackBar: MatSnackBar, private store: Store<AppState>,
               private formBuilder: FormBuilder, private breakpointObserver: BreakpointObserver,
-              private router: Router, private route: ActivatedRoute) {
+              private router: Router, private route: ActivatedRoute, public dialog: MatDialog) {
     this.getState = this.store.select(selectReservationState);
     this.store.select(selectAuthState).subscribe((state: any) => this.customerId = state.user.id);
     this.price = new Price();
@@ -169,12 +173,8 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     return getUserName(this.room.value.professional);
   }
 
-  get roomName(): string {
-    return roomName(this.room.value);
-  }
-
-  get durationTime(): string {
-    return formatDuration(this.product.value.duration, this.locale);
+  get roomDetail(): string {
+    return roomDetail(this.room.value);
   }
 
   get products(): void {
@@ -261,6 +261,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     reservation.roomId = this.room.value.id;
     if (this.date) {
       reservation.start = this.date.toLocaleString(API_LOCALE);
+      reservation.timeZone = getCurrentTimeZone();
     }
     reservation.additionalIds = this.additionalSelected?.map(value => value.id);
 
@@ -282,19 +283,8 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     return;
   }
 
-  getStepName(index: number): string {
-    const step = getStep(this.steps, index);
-    return step ? step.name : '';
-  }
-
-  getStepEnabled(index: number): boolean {
-    const step = getStep(this.steps, index);
-    return !!step?.enable;
-  }
-
-  getStepCompleted(index: number): boolean {
-    const step = getStep(this.steps, index);
-    return !!step?.completed;
+  get showTimeZone(): boolean {
+    return !isSameTimeZone(this.room.value.timeZone);
   }
 
   ngOnInit(): void {
@@ -331,6 +321,25 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+  }
+
+  getStepName(index: number): string {
+    const step = getStep(this.steps, index);
+    return step ? step.name : '';
+  }
+
+  getStepEnabled(index: number): boolean {
+    const step = getStep(this.steps, index);
+    return !!step?.enable;
+  }
+
+  getStepCompleted(index: number): boolean {
+    const step = getStep(this.steps, index);
+    return !!step?.completed;
+  }
+
+  openDialog(reservationDate?: Date): void {
+    openDialog(this.room.value, this.locale, this.translate, this.dialog, reservationDate);
   }
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d, this.room.value);
@@ -419,18 +428,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     return this.additionalSelected.filter(el => el.id === it.id).length > 0;
   }
 
-  getDuration(duration: string): string {
-    return formatTime(convertDuration(duration), this.locale);
-  }
-
-  getRoomName(room: IRoom): string {
-    return room.address ? room.address.name : '';
-  }
-
-  getCurrencySymbol(): string {
-    return currencySymbol(this.room.value.currency);
-  }
-
   private getReservation(id: string | null): void {
     this.store.dispatch(
       new fromActionsReservation.ReservationFind({id})
@@ -481,8 +478,19 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     });
 
     this.room.valueChanges.subscribe(value => {
-      if (value && !this.groups) {
-        this.getProductList();
+      if (value) {
+        if (!this.dismiss && !isSameTimeZone(value.timeZone)) {
+          const now = getNow();
+          const snack = this.snackBar.openFromComponent(TimeZoneSnackBarComponent, {
+            data: {date: now, timeZone: value.timeZone}
+          });
+          snack.afterDismissed().subscribe(() => {
+            this.dismiss = true;
+          });
+        }
+        if (!this.groups) {
+          this.getProductList();
+        }
       }
     });
 
@@ -613,11 +621,11 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
         this.availableList = new Map<string, any[]>();
         this.availableList.set(createNewDate(this.startDate.value).toString(), []);
         state.data.reduce((group: Map<string, string[]>, item: IAvailableDTO) => {
-          const date = newDate(item.start);
+          const date = stringDateUTCToTimeZone(item.start);
           const key = createNewDate(date).toString();
 
           let dates: any = group.get(key) || [];
-          dates = [...dates, {time: getTime(newDate(item.start), this.locale), date}];
+          dates = [...dates, {time: getTime(date, this.locale), date}];
           group.set(key, dates);
 
           return group;

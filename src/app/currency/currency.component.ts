@@ -31,17 +31,7 @@ export class CurrencyComponent implements OnInit, OnDestroy {
     this.getState = this.store.select(selectCurrencyState);
   }
 
-  ngOnInit(): void {
-    this.createForm();
-    this.clean();
-    this.subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  create(): void {
+  get create(): void {
     if (this.form.invalid) {
       return;
     }
@@ -51,9 +41,19 @@ export class CurrencyComponent implements OnInit, OnDestroy {
     currency.code = this.code.value;
     currency.icon = this.icon.value;
 
-    this.store.dispatch(
+    return this.store.dispatch(
       new fromActionsCurrency.CurrencySave(currency)
     );
+  }
+
+  ngOnInit(): void {
+    this.createForm();
+    this.clean();
+    this.subscribe();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 
   private createForm(): void {

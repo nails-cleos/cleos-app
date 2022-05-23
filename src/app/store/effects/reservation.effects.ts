@@ -13,6 +13,7 @@ import { RoomService } from '../../services/room.service';
 import { TrackingService } from '../../services/tracking.service';
 import { PaymentService } from '../../services/payment.service';
 import { AdditionalService } from '../../services/additional.service';
+import { newDateTimestamp } from '../../util/dates';
 
 @Injectable()
 export class ReservationEffects {
@@ -100,7 +101,7 @@ export class ReservationEffects {
 
   getAllRooms$ = createEffect(() => this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getRooms)).pipe(
     map((action: any) => action.payload),
-    switchMap(() => this.roomService.getAllRooms().pipe(
+    switchMap((payload: any) => this.roomService.getAllRooms(payload.customerId).pipe(
       switchMap((response: any) => of(new fromActionsReservation.ReservationRoomsSuccess(response))),
       catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
     ))
@@ -151,7 +152,7 @@ export class ReservationEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.reservationService.add(payload.reservation).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('COMMON.RESERVATION.CREATED', {date: response.start});
+        const message = this.translate.instant('COMMON.RESERVATION.CREATED', {date: newDateTimestamp(response.timestamp)});
         return of(new fromActionsReservation.ReservationSaveSuccess({
           message,
           id: response.id,
@@ -165,7 +166,7 @@ export class ReservationEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.reservationService.delete(payload).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('RESERVATION.DELETED.MESSAGE', {date: response.start});
+        const message = this.translate.instant('RESERVATION.DELETED.MESSAGE', {date: newDateTimestamp(response.timestamp)});
         return of(new fromActionsReservation.ReservationSaveSuccess({message, deleted: true}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
     ))
@@ -185,7 +186,7 @@ export class ReservationEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.reservationService.update(payload.reservation).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('COMMON.RESERVATION.UPDATED.MESSAGE', {date: response.start});
+        const message = this.translate.instant('COMMON.RESERVATION.UPDATED.MESSAGE', {date: newDateTimestamp(response.timestamp)});
         return of(new fromActionsReservation.ReservationSaveSuccess({
           message,
           id: response.id,

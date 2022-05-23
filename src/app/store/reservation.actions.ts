@@ -110,6 +110,9 @@ export class GetAllServices implements Action {
 
 export class GetAllRooms implements Action {
   readonly type = ReservationActionTypes.getRooms;
+
+  constructor(public payload?: any) {
+  }
 }
 
 export class GetAllAdditional implements Action {

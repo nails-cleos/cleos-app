@@ -9,7 +9,7 @@
       </label>
       <mat-autocomplete #autoCustomer="matAutocomplete" [displayWith]="displayFnUser">
         <mat-option *ngFor="let customer of filteredCustomer | async" [value]="customer">
-          {{getUsername(customer)}}
+          {{customer | userName}}
         </mat-option>
       </mat-autocomplete>
       <mat-error *ngIf="customer.hasError('required')"
@@ -79,7 +79,7 @@
           </label>
           <mat-autocomplete #autoRoom="matAutocomplete" [displayWith]="displayFnRoom">
             <mat-option *ngFor="let room of filteredRoom | async" [value]="room">
-              {{getRoomName(room)}}
+              {{room | roomName}}
             </mat-option>
           </mat-autocomplete>
           <mat-error *ngIf="room.hasError('required')"
@@ -135,7 +135,7 @@
                    matInput required type="text">
           </label>
           <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
-            <mat-option *ngFor="let group of filteredGroup | async " [value]="group">
+            <mat-option *ngFor="let group of filteredGroup | async | sortBy: 'asc':'name'" [value]="group">
               {{group.name}}
             </mat-option>
           </mat-autocomplete>
@@ -157,7 +157,7 @@
                      matInput required type="text">
             </label>
             <mat-autocomplete #autoProduct="matAutocomplete" [displayWith]="displayFnProduct">
-              <mat-option *ngFor="let product of filteredProduct | async" [value]="product">
+              <mat-option *ngFor="let product of filteredProduct | async | sortBy: 'asc':'name'" [value]="product">
                 {{product.name}}
               </mat-option>
             </mat-autocomplete>
@@ -197,19 +197,19 @@
           <div *ngIf="!isEditing; else editing" mat-line>
             <span [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.PRICE' | translate"></span>
             <span [class.strikethrough]="discount.value"
-                  class="raised-button">{{getCurrencySymbol()}} {{product.value.price | number:'1.2-2'}}</span>
+                  class="raised-button">{{room.value | currencySymbol}} {{product.value.price | number:'1.2-2'}}</span>
             <span *ngIf="price.priceWithDiscount" [@discountAnimation]
-                  class="raised-button bold">{{getCurrencySymbol()}} {{price.priceWithDiscount | number:'1.2-2'}}</span>
+                  class="raised-button bold">{{room.value | currencySymbol}} {{price.priceWithDiscount | number:'1.2-2'}}</span>
           </div>
           <ng-template #editing>
             <span [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.PRICE' | translate"></span>
             <span
-              class="raised-button">{{getCurrencySymbol()}} {{(price.priceWithDiscount ? price.priceWithDiscount : product.value.price) | number:'1.2-2'}}</span>
+              class="raised-button">{{room.value | currencySymbol}} {{(price.priceWithDiscount ? price.priceWithDiscount : product.value.price) | number:'1.2-2'}}</span>
             <span *ngIf="price.priceWithDiscount"
                   class="raised-button bold">{{'RESERVATION.PRODUCT.DISCOUNT.ADD' | translate}}</span>
           </ng-template>
           <div [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.DURATION' |
-                  translate: {duration: durationTime}" mat-line>
+                  translate: {duration: product.value.duration | durationTime}" mat-line>
           </div>
           <div *ngIf="durability" [innerHTML]="durability" mat-line></div>
         </mat-list-item>
@@ -228,10 +228,10 @@
       <mat-list-option *ngFor="let it of additionalList" [selected]="isSelected(it)" [value]="it"
                        checkboxPosition="before">
         <div mat-subheader>{{it.name}}</div>
-        <div mat-line>{{getCurrencySymbol()}} {{it.price | number:'1.2-2'}}</div>
+        <div mat-line>{{room.value | currencySymbol}} {{it.price | number:'1.2-2'}}</div>
         <div *ngIf="it.description" mat-line>{{it.description}}</div>
         <div class="additional-line" mat-line>{{'RESERVATION.ADDITIONAL.DURATION.FIELD' | translate}}
-          : {{getDuration(it.duration)}}</div>
+          : {{it.duration | durationTime}}</div>
         <mat-divider></mat-divider>
       </mat-list-option>
     </mat-selection-list>
@@ -267,10 +267,10 @@
     (beforeViewRender)="beforeMonthViewRender($event)"
     (eventTimesChanged)="eventTimesChanged($event)"
     (hourSegmentClicked)="segmentClick($event.date, 'CREATED')"
-    [dayEndHour]="dayEndHour"
-    [dayEndMinute]="dayEndMinute"
-    [dayStartHour]="dayStartHour"
-    [dayStartMinute]="dayStartMinute"
+    [dayEndHour]="day.dayEndHour"
+    [dayEndMinute]="day.dayEndMinute"
+    [dayStartHour]="day.dayStartHour"
+    [dayStartMinute]="day.dayStartMinute"
     [daysInWeek]="daysInWeek"
     [events]="events"
     [hourSegments]="4"
@@ -296,19 +296,19 @@
         <div mat-subheader>{{ 'RESERVATION.CUSTOMER.FIELD' | translate}}</div>
         <mat-list-item>
           <mat-icon mat-list-icon>wash</mat-icon>
-          <div mat-line>{{getUsername(customer.value)}}</div>
+          <div mat-line>{{customer.value | userName}}</div>
         </mat-list-item>
         <mat-divider></mat-divider>
         <div mat-subheader>{{ 'COMMON.ROOM.FIELD' | translate}}</div>
         <mat-list-item>
           <mat-icon mat-list-icon>store</mat-icon>
           <div mat-line>{{ 'RESERVATION.ROOM.NAME.FIELD' | translate}}</div>
-          <div mat-line>{{roomName}}</div>
+          <div mat-line>{{room.value | roomName}}</div>
         </mat-list-item>
         <mat-list-item>
           <mat-icon mat-list-icon>person_pin</mat-icon>
           <div mat-line>{{ 'RESERVATION.ROOM.PROFESSIONAL.FIELD' | translate}}</div>
-          <div mat-line>{{getUsername(room.value.professional)}}</div>
+          <div mat-line>{{room.value.professional | userName}}</div>
         </mat-list-item>
         <mat-list-item>
           <mat-icon mat-list-icon>room</mat-icon>
@@ -355,7 +355,7 @@
             <mat-icon mat-list-icon>add_post</mat-icon>
             <div mat-line>
               <div *ngFor="let it of additionalSelected">
-                {{it.name}} - {{getCurrencySymbol()}} {{it.price | number:'1.2-2'}}
+                {{it.name}} - {{room.value | currencySymbol}} {{it.price | number:'1.2-2'}}
               </div>
             </div>
           </mat-list-item>
@@ -389,8 +389,18 @@
         <mat-list-item>
           <mat-icon mat-list-icon>event</mat-icon>
           <div mat-line>
-            <div>{{getDateTime(eventSelected?.start)}}</div>
-            <div>{{getDateTime(eventSelected?.end)}}</div>
+            <div>
+              {{eventSelected?.start | date:'short':room.value.timeZone:locale}}
+              <button (click)="openDialog(eventSelected?.start)" *ngIf="showTimeZone" mat-icon-button type="button">
+                <mat-icon>info_outline</mat-icon>
+              </button>
+            </div>
+            <div>
+              {{eventSelected?.end | date:'short':room.value.timeZone:locale}}
+              <button (click)="openDialog(eventSelected?.end)" *ngIf="showTimeZone" mat-icon-button type="button">
+                <mat-icon>info_outline</mat-icon>
+              </button>
+            </div>
           </div>
         </mat-list-item>
       </mat-list>
@@ -408,7 +418,7 @@
           <div fxLayout="column" fxLayoutAlign="space-between start">
             <div fxLayout="row" fxLayoutAlign="space-between start">
               <ng-container *ngTemplateOutlet="stepOne"></ng-container>
-              <button (click)="addCustomer()" *ngIf="isAdmin" class="raised-button" color="accent" mat-mini-fab>
+              <button (click)="addCustomer" *ngIf="isAdmin" class="raised-button" color="accent" mat-mini-fab>
                 <mat-icon>person_add</mat-icon>
               </button>
               <div class="vertical-divider"></div>
@@ -437,6 +447,12 @@
       <div class="flex-container" fxLayout="column">
         <div fxLayout="column" fxLayoutAlign="space-between start">
           <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
+          <mat-form-field *ngIf="room.value">
+            <mat-label>{{ 'RESERVATION.ROOM.DETAIL' | translate }}</mat-label>
+            <label>
+              <input [value]="roomDetail" disabled matInput type="text">
+            </label>
+          </mat-form-field>
           <mat-form-field *ngIf="room.value && room.value.address && room.value.address.location">
             <mat-label>{{ 'COMMON.ADDRESS.FIELD' | translate }}</mat-label>
             <label>
@@ -555,7 +571,7 @@
         <div class="flex-container" fxLayout="row" fxLayoutAlign="space-between start">
           <ng-container *ngTemplateOutlet="stepOne"></ng-container>
           <div class="vertical-divider"></div>
-          <button (click)="addCustomer()" *ngIf="isAdmin" color="accent" mat-raised-button>
+          <button (click)="addCustomer" *ngIf="isAdmin" color="accent" mat-raised-button>
             <mat-icon>person_add</mat-icon>
             {{ 'RESERVATION.CUSTOMER.ADD_BUTTON' | translate }}
           </button>
@@ -585,6 +601,12 @@
         <div fxLayout="row" fxLayoutAlign="space-between start">
           <div fxLayout="column" fxLayoutAlign="space-between start">
             <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
+            <mat-form-field *ngIf="room.value">
+              <mat-label>{{ 'RESERVATION.ROOM.DETAIL' | translate }}</mat-label>
+              <label>
+                <input [value]="roomDetail" disabled matInput type="text">
+              </label>
+            </mat-form-field>
             <mat-form-field *ngIf="room.value && room.value.address && room.value.address.location">
               <mat-label>{{ 'COMMON.ADDRESS.FIELD' | translate }}</mat-label>
               <label>

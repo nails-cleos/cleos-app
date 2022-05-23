@@ -15,7 +15,7 @@
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
           mat-sort-header>{{ 'UNAVAILABLE.LIST.COLUMN.PROFESSIONAL' | translate }}</th>
       <td *matCellDef="let unavailable" fxHide.lt-sm fxShow mat-cell>
-        <div *ngIf="unavailable.id; else skeleton">{{getProfessionalName(unavailable.professional)}}</div>
+        <div *ngIf="unavailable.id; else skeleton">{{unavailable?.professional | userName}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
@@ -103,7 +103,7 @@
           <mat-list>
             <div fxHide fxShow.lt-sm mat-subheader>{{ 'UNAVAILABLE.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
             <mat-list-item fxHide fxShow.lt-sm role="list">
-              <div mat-line>{{getProfessionalName(unavailable.professional)}}</div>
+              <div mat-line>{{unavailable?.professional | userName}}</div>
             </mat-list-item>
             <div *ngIf="unavailable.description" fxHide fxShow.lt-sm
                  mat-subheader>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</div>

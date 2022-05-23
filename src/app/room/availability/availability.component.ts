@@ -42,6 +42,20 @@ export class AvailabilityComponent implements OnChanges {
     });
   }
 
+  get create(): void {
+    const availability: IAvailability = new Availability();
+    availability.day = this.day;
+    availability.start = this.start.value;
+    availability.end = this.end.value;
+
+    if (this.checked) {
+      availability.startLunch = this.startLunch.value;
+      availability.endLunch = this.endLunch.value;
+    }
+
+    return this.availability.emit(availability);
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     const start = this.dates?.startDate || createDate(9, 0);
     const end = this.dates?.endDate || createDate(18, 0);
@@ -56,19 +70,5 @@ export class AvailabilityComponent implements OnChanges {
       this.startLunch.setValue(getTime(startLunch, 'es'));
       this.endLunch.setValue(getTime(endLunch, 'es'));
     }
-  }
-
-  create(): void {
-    const availability: IAvailability = new Availability();
-    availability.day = this.day;
-    availability.start = this.start.value;
-    availability.end = this.end.value;
-
-    if (this.checked) {
-      availability.startLunch = this.startLunch.value;
-      availability.endLunch = this.endLunch.value;
-    }
-
-    this.availability.emit(availability);
   }
 }

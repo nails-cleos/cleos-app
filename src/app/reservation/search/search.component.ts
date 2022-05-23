@@ -10,16 +10,15 @@ import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../store/app.states';
 import * as fromActionsReservation from '../../store/reservation.actions';
-import { getNow, newDate } from '../../util/dates';
+import { getNow, isSameTimeZone, newDate, newDateTimestamp } from '../../util/dates';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { map, startWith } from 'rxjs/operators';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { FormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { getFullUserName, getUserName, snakeToCamel } from '../../util/helper';
+import { getFullUserName, openDialog } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
-import { ReservationIconKey, ReservationIconName } from '../../util/icon';
 
 @Component({
   selector: 'app-search',
@@ -99,8 +98,13 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     this.paginatorSubscription?.unsubscribe();
   }
 
-  getIcon(name: any): any {
-    return ReservationIconName[snakeToCamel(name) as ReservationIconKey];
+  openDialog(reservation: IReservationAll): void {
+    const time = newDateTimestamp(reservation.timestamp);
+    openDialog(reservation.room, this.language, this.translate, this.dialog, time);
+  }
+
+  showTimeZone(reservation: IReservation): boolean {
+    return !isSameTimeZone(reservation?.room?.timeZone);
   }
 
   cancel(reservation: IReservationAll): void {
@@ -118,10 +122,6 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
         );
       }
     });
-  }
-
-  getCustomerName(customer: any): string {
-    return getUserName(customer);
   }
 
   displayFnUser(user: IUser): string {

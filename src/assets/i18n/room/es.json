@@ -10,6 +10,7 @@
         "OFFICE": "Oficina",
         "ADDRESS": "Dirección",
         "PROFESSIONAL": "Profesional",
+        "TIME_ZONE": "Zona horaria",
         "AVAILABILITY": {
           "FIELD": "Disponibilidad",
           "WEEK": "Semanal",
@@ -36,6 +37,11 @@
       "REQUIRED": "Oficina es <b>requerido</b>",
       "INVALID": "Oficina no valido",
       "ADD_BUTTON": "Agregar oficina"
+    },
+    "TIME_ZONE": {
+      "FIELD": "Zona horaria",
+      "REQUIRED": "Zona horaria es <b>requerida</b>",
+      "INVALID": "Zona horaria no valida"
     },
     "AVAILABILITY": {
       "FIELD": "Disponibilidad",

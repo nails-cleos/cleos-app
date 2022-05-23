@@ -17,6 +17,8 @@ import { ICurrency, ICurrencyAll } from '../interfaces/currency';
 import { IOffice, IOfficeAll } from '../interfaces/office';
 import { MatListOption } from '@angular/material/list';
 import { IPaymentType, paymentOptions } from '../interfaces/payment';
+import timezones from 'timezones-list';
+import { getCurrentTimeZone } from '../util/dates';
 
 export interface IIcon {
   week: RoomIconName;
@@ -68,6 +70,14 @@ export class RoomComponent implements OnInit, OnDestroy {
     Validators.required, requireMatch
   ]);
 
+  timeZoneList = timezones;
+  filteredTimeZoneOptions?: Observable<any[] | undefined>;
+
+  timeZone: FormControl = new FormControl('', [
+    Validators.required, requireMatch
+  ]);
+
+
   paymentOptions: IPaymentType[] = paymentOptions();
 
   private getState: Observable<any>;
@@ -87,6 +97,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.room.professionalId = this.professional.value.id;
     this.room.officeId = this.office.value.id;
     this.room.currencyId = this.currency.value.id;
+    this.room.timeZone = this.timeZone.value.tzCode;
     this.room.paymentTypes = this.paymentTypes;
     const location = this.address.value.geometry.location;
     this.room.address = {
@@ -103,6 +114,21 @@ export class RoomComponent implements OnInit, OnDestroy {
     );
   }
 
+  get addProfessional(): void {
+    this.router.navigate(['users', 'add'], {state: {role: Role.professional}});
+    return;
+  }
+
+  get addCurrency(): void {
+    this.router.navigate(['currency', 'add']);
+    return;
+  }
+
+  get addOffice(): void {
+    this.router.navigate(['offices', 'add']);
+    return;
+  }
+
   ngOnInit(): void {
     this.createForm();
     this.clean();
@@ -112,10 +138,6 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
-  }
-
-  getProfessional(professional: IUser): string {
-    return getUserName(professional);
   }
 
   setStep(index: number): void {
@@ -132,6 +154,10 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   displayOfficeFn(office: IOfficeAll): string {
     return office ? office.name : '';
+  }
+
+  displayTimeZoneFn(timeZone: any): string {
+    return timeZone ? timeZone.label : '';
   }
 
   keyDownHandler(event: any, form: FormControl): void {
@@ -163,18 +189,6 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.step = step;
   }
 
-  addProfessional(): void {
-    this.router.navigate(['users', 'add'], {state: {role: Role.professional}});
-  }
-
-  addCurrency(): void {
-    this.router.navigate(['currency', 'add']);
-  }
-
-  addOffice(): void {
-    this.router.navigate(['offices', 'add']);
-  }
-
   onChange(options: MatListOption[]): void {
     this.paymentTypes = options.map(o => o.value);
   }
@@ -188,9 +202,12 @@ export class RoomComponent implements OnInit, OnDestroy {
       professional: this.professional,
       currency: this.currency,
       office: this.office,
+      timeZone: this.timeZone,
       address: this.address,
       addressDescription: this.addressDescription
     });
+    const currentTimeZone = getCurrentTimeZone().toLowerCase();
+    this.timeZone.setValue(this.timeZoneList.find(timeZone => timeZone.label.toLowerCase().indexOf(currentTimeZone) === 0));
     this.filteredOptions = this.professional.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
@@ -205,6 +222,11 @@ export class RoomComponent implements OnInit, OnDestroy {
       startWith(''),
       map(value => typeof value === 'string' ? value : value.namme),
       map(name => name ? this.filterOffice(name) : this.offices ? this.offices.slice() : this.offices)
+    );
+    this.filteredTimeZoneOptions = this.timeZone.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value.label),
+      map(name => name ? this.filterTimeZone(name) : this.timeZoneList ? this.timeZoneList.slice() : this.timeZoneList)
     );
   }
 
@@ -298,5 +320,11 @@ export class RoomComponent implements OnInit, OnDestroy {
     const filterValue = name.toLowerCase();
 
     return this.offices?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
+  }
+
+  private filterTimeZone(name: string): any[] | undefined {
+    const filterValue = name.toLowerCase();
+
+    return this.timeZoneList?.filter(option => option.label?.toLowerCase().indexOf(filterValue) >= 0);
   }
 }

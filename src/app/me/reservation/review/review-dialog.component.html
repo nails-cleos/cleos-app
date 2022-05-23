@@ -1,4 +1,4 @@
-<button (click)="onNoClick()" class="close-button" mat-icon-button>
+<button (click)="onNoClick" class="close-button" mat-icon-button>
   <mat-icon class="close-icon">close</mat-icon>
 </button>
 <h1 mat-dialog-title>{{ 'ME.REVIEW.TITLE' | translate }}</h1>
@@ -16,7 +16,7 @@
       </tr>
       <tr *ngIf="reservation && reservation">
         <td class="right">{{ 'COMMON.ROOM.FIELD' | translate }}</td>
-        <td class="left">{{roomName}}</td>
+        <td class="left">{{reservation?.room | roomName}}</td>
       </tr>
       <tr *ngIf="reservation">
         <td class="right">{{ 'COMMON.ADDRESS.FIELD' | translate }}</td>
@@ -56,7 +56,7 @@
 <mat-divider class="divider-padding"></mat-divider>
 <div mat-dialog-actions>
   <div fxFlex></div>
-  <button (click)="doAction()" *ngIf="!review" [disabled]="rating < 1" cdkFocusInitial color="primary"
+  <button (click)="doAction" *ngIf="!review" [disabled]="rating < 1" cdkFocusInitial color="primary"
           mat-raised-button>{{ 'COMMON.BUTTON.ADD' | translate }}</button>
-  <button (click)="onNoClick()" color="accent" mat-raised-button>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+  <button (click)="onNoClick" color="accent" mat-raised-button>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
 </div>

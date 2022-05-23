@@ -6,7 +6,8 @@
           <div *ngIf="upcoming && upcoming.length > 1; else onlyOne">
             <mat-card-title>{{ 'ME.RESERVATION.UPCOMING.TITLE' | translate }}</mat-card-title>
             <mat-tab-group class="mat-elevation-z4">
-              <mat-tab *ngFor="let up of upcoming" label="{{up.start  | date:'short':undefined:language}}">
+              <mat-tab *ngFor="let up of upcoming"
+                       label="{{up | timeDetail | date:'short':up.room.timeZone:language}}">
                 <app-upcoming [showHeader]="false" [upcoming]="up"></app-upcoming>
               </mat-tab>
             </mat-tab-group>
@@ -52,7 +53,7 @@
           mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</th>
       <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
         <div
-          *ngIf="reservation.id; else skeleton">{{getProfessionalName(reservation)}}</div>
+          *ngIf="reservation.id; else skeleton">{{reservation?.room?.professional | userName}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
@@ -63,7 +64,12 @@
       <th *matHeaderCellDef mat-header-cell
           mat-sort-header>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</th>
       <td *matCellDef="let reservation" mat-cell>
-        <div *ngIf="reservation.id; else skeleton">{{reservation.start | date:'short':undefined:language}}</div>
+        <div *ngIf="reservation.id; else skeleton">
+          {{reservation | timeDetail | date:'short':reservation.room.timeZone:language}}
+          <button (click)="openDialog(reservation)" *ngIf="showTimeZone(reservation)" mat-icon-button type="button">
+            <mat-icon>info_outline</mat-icon>
+          </button>
+        </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
@@ -86,7 +92,7 @@
           mat-sort-header>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</th>
       <td *matCellDef="let reservation" mat-cell>
         <div *ngIf="reservation.id; else skeleton">
-          <mat-icon matPrefix>{{getIcon(reservation.state)}}</mat-icon>&nbsp;
+          <mat-icon matPrefix>{{reservation.state | reservationIcon}}</mat-icon>&nbsp;
           {{ 'COMMON.STATUS.RESERVATION.' + reservation.state | translate}}
         </div>
         <ng-template #skeleton>

@@ -4,6 +4,7 @@ import { Label } from 'ng2-charts';
 import { SingleDataSet } from 'ng2-charts/lib/base-chart.directive';
 
 export interface IDashboard {
+  timeZone?: string;
   roomName?: string;
   roomId?: string;
   calendarSummary?: ICalendarSummary;
@@ -40,16 +41,16 @@ export interface ICalendarSummary {
 export interface ICalendarReservations {
   reservationId: string;
   title: string;
-  start: string;
-  end: string;
+  start: number;
+  end: number;
   state: string;
 }
 
 export interface ICalendarUnavailable {
   unavailableId: string;
   title: string;
-  start: string;
-  end: string;
+  start: number;
+  end: number;
   duration?: string;
   repeat: string;
   allDay: boolean;

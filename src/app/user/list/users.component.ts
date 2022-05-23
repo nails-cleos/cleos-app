@@ -69,10 +69,6 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription?.unsubscribe();
   }
 
-  getUsername(user: IUser): string {
-    return getUserName(user);
-  }
-
   applyFilter(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
     this.filter = filterValue.trim().toLowerCase();

@@ -10,6 +10,7 @@
         "OFFICE": "Office",
         "ADDRESS": "Address",
         "PROFESSIONAL": "Professional",
+        "TIME_ZONE": "Time zone",
         "AVAILABILITY": {
           "FIELD": "Availability",
           "WEEK": "Week",
@@ -36,6 +37,11 @@
       "REQUIRED": "Office is <b>required</b>",
       "INVALID": "Office is invalid",
       "ADD_BUTTON": "Add office"
+    },
+    "TIME_ZONE": {
+      "FIELD": "Time zone",
+      "REQUIRED": "Time zone is <b>required</b>",
+      "INVALID": "Time zone is invalid"
     },
     "AVAILABILITY": {
       "FIELD": "Availability",

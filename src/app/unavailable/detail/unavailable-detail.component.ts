@@ -8,13 +8,15 @@ import { AppState, selectUnavailableState } from '../../store/app.states';
 import { fieldChange, valueChange } from '../../util/validators';
 import * as fromActionsUnavailable from '../../store/unavailable.actions';
 import {
-  API_LOCALE, createEndDate,
+  API_LOCALE,
+  createEndDate,
   createNewDate,
   diffTime,
   filterDate,
   formatDuration,
   formatFullDate,
   formatTime,
+  getCurrentTimeZone,
   getMinMaxDate,
   getNow,
   getTime,
@@ -70,6 +72,65 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
               private router: Router, private readonly translate: TranslateService, public dialog: MatDialog) {
     this.getState = this.store.select(selectUnavailableState);
+  }
+
+  get delete(): void {
+    const title = this.translate.instant('UNAVAILABLE.DELETED.TITLE');
+    const date = this.unavailable?.startDate ? formatFullDate(this.unavailable.startDate, this.translate.currentLang)
+      : this.unavailable?.start;
+    const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT', {date});
+    const dialogRef = this.dialog.open(DialogComponent, {
+      data: {title, content, value: this.unavailable}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.store.dispatch(
+          new fromActionsUnavailable.DeleteUnavailable(result.id)
+        );
+      }
+    });
+    return;
+  }
+
+  get update(): void {
+    if (this.form.invalid) {
+      return;
+    }
+    const unavailable: IUnavailable = new Unavailable();
+    unavailable.id = this.unavailable?.id;
+
+    let date: Date;
+    if (!this.allDay.value) {
+      const time = this.startTime.value.split(':');
+      date = createNewDate(this.startDate.value, time[0], time[1]);
+    } else {
+      date = createNewDate(this.startDate.value);
+    }
+
+    unavailable.timeZone = getCurrentTimeZone();
+    unavailable.start = date.toLocaleString(API_LOCALE);
+    unavailable.description = valueChange(this.form.value?.description, this.unavailable?.description);
+    unavailable.duration = fieldChange(this.duration, this.unavailable?.duration);
+    unavailable.repeat = fieldChange(this.repeat, this.unavailable?.repeat);
+    unavailable.allDay = this.allDay.value;
+    if (this.endDate.value) {
+      unavailable.end = createNewDate(this.endDate.value).toLocaleString(API_LOCALE);
+    }
+
+    return this.store.dispatch(new fromActionsUnavailable.UnavailableUpdate(unavailable));
+  }
+
+  get focusin(): void {
+    if (this.room && this.startTime.value) {
+      const time = this.startTime.value.split(':');
+      const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time[0], time[1]);
+      const day = date.getDay();
+      const {minDate, maxDate} = getMinMaxDate(day, date, this.room);
+      this.minTime = getTime(minDate, API_LOCALE);
+      this.maxTime = getTime(maxDate, API_LOCALE);
+    }
+    return;
   }
 
   ngOnInit(): void {
@@ -131,62 +192,6 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
     this.store.dispatch(
       new fromActionsUnavailable.GetRoom(user.id)
     );
-  }
-
-  update(): void {
-    if (this.form.invalid) {
-      return;
-    }
-    const unavailable: IUnavailable = new Unavailable();
-    unavailable.id = this.unavailable?.id;
-
-    let date: Date;
-    if (!this.allDay.value) {
-      const time = this.startTime.value.split(':');
-      date = createNewDate(this.startDate.value, time[0], time[1]);
-    } else {
-      date = createNewDate(this.startDate.value);
-    }
-
-    unavailable.start = date.toLocaleString(API_LOCALE);
-    unavailable.description = valueChange(this.form.value?.description, this.unavailable?.description);
-    unavailable.duration = fieldChange(this.duration, this.unavailable?.duration);
-    unavailable.repeat = fieldChange(this.repeat, this.unavailable?.repeat);
-    unavailable.allDay = this.allDay.value;
-    if (this.endDate.value) {
-      unavailable.end = createNewDate(this.endDate.value).toLocaleString(API_LOCALE);
-    }
-
-    this.store.dispatch(new fromActionsUnavailable.UnavailableUpdate(unavailable));
-  }
-
-  focusin(): void {
-    if (this.room && this.startTime.value) {
-      const time = this.startTime.value.split(':');
-      const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time[0], time[1]);
-      const day = date.getDay();
-      const {minDate, maxDate} = getMinMaxDate(day, date, this.room);
-      this.minTime = getTime(minDate, API_LOCALE);
-      this.maxTime = getTime(maxDate, API_LOCALE);
-    }
-  }
-
-  delete(): void {
-    const title = this.translate.instant('UNAVAILABLE.DELETED.TITLE');
-    const date = this.unavailable?.startDate ? formatFullDate(this.unavailable.startDate, this.translate.currentLang)
-      : this.unavailable?.start;
-    const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT', {date});
-    const dialogRef = this.dialog.open(DialogComponent, {
-      data: {title, content, value: this.unavailable}
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.store.dispatch(
-          new fromActionsUnavailable.DeleteUnavailable(result.id)
-        );
-      }
-    });
   }
 
   private createForm(): void {

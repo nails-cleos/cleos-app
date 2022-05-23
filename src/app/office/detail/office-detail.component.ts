@@ -7,8 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { IOffice, Office } from '../../interfaces/office';
 import { fieldChange } from '../../util/validators';
 import * as fromActionsOffice from '../../store/office.actions';
-import { getUserName, roomName } from '../../util/helper';
-import { IRoom } from '../../interfaces/room';
+import { getUserName } from '../../util/helper';
 
 @Component({
   selector: 'app-office-detail',
@@ -34,6 +33,18 @@ export class OfficeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     this.getState = this.store.select(selectOfficeState);
   }
 
+  get update(): void {
+    if (this.form.invalid) {
+      return;
+    }
+    const office: IOffice = new Office();
+    office.id = this.office?.id;
+
+    office.name = fieldChange(this.name, this.office?.name);
+
+    return this.store.dispatch(new fromActionsOffice.OfficeUpdate(office));
+  }
+
   ngOnInit(): void {
     this.createForm();
     this.subscribe();
@@ -45,22 +56,6 @@ export class OfficeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.getOffice();
-  }
-
-  getRoomName(room: IRoom): string {
-    return roomName(room);
-  }
-
-  update(): void {
-    if (this.form.invalid) {
-      return;
-    }
-    const office: IOffice = new Office();
-    office.id = this.office?.id;
-
-    office.name = fieldChange(this.name, this.office?.name);
-
-    this.store.dispatch(new fromActionsOffice.OfficeUpdate(office));
   }
 
   private createForm(): void {

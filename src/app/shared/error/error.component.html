@@ -16,7 +16,7 @@
   <div fxLayout="row">
     <div fxFlex></div>
     <div class="only-button">
-      <button (click)="reload()" *ngIf="retry" color="primary" mat-raised-button type="button">
+      <button (click)="reload" *ngIf="retry" color="primary" mat-raised-button type="button">
         {{ 'COMMON.BUTTON.RELOAD' | translate }}
       </button>
       <button appBackButton class="raised-button" color="accent" mat-raised-button type="button">

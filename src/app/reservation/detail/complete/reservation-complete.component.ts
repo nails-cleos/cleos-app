@@ -79,10 +79,6 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     });
   }
 
-  get customerName(): string {
-    return this.reservation ? getFullUserName(this.reservation.customer) : '';
-  }
-
   get durationTime(): string {
     if (this.reservation) {
       const duration = totalDuration(this.product.value, this.reservation.additional);
@@ -108,7 +104,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  complete(): void {
+  get complete(): void {
     if (this.reservation) {
       const reservationId = this.reservation.id;
       const productId = valueChange(this.product.value.id, this.reservation?.product.id);
@@ -123,6 +119,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
         })
       );
     }
+    return;
   }
 
   displayFnGroup(group: IProductGroup): string {

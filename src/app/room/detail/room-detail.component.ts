@@ -7,7 +7,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../store/app.states';
 import * as fromActionsRoom from '../../store/room.actions';
 import { IIcon } from '../room.component';
-import { createDate } from '../../util/dates';
+import { createDate, getTimeZone } from '../../util/dates';
 import { getUserName } from '../../util/helper';
 import { RoomIconName } from '../../util/icon';
 import { IPaymentType, paymentOptions } from '../../interfaces/payment';
@@ -54,7 +54,41 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     this.getState = this.store.select(selectRoomState);
   }
 
-  private static createAv(date: string | undefined): Date | undefined {
+  get update(): void {
+    if (this.validate()) {
+      return;
+    }
+    if (this.room) {
+      const room: IRoomAll = {
+        id: this.room.id,
+        availabilities: this.availabilities,
+        paymentTypes: this.paymentTypes,
+        address: {
+          name: this.room.address.name,
+          location: this.room.address.location,
+          description: this.addressDescription.value
+        } as IAddress,
+        professional: this.room.professional,
+        currency: this.room.currency,
+        office: this.room.office,
+        timeZone: this.room.timeZone
+      };
+
+      if (this.address.value && this.address.value.geometry) {
+        const location = this.address.value.geometry.location;
+        room.address.name = this.address.value.formatted_address;
+        room.address.location = {
+          x: location.lng(),
+          y: location.lat()
+        } as ILocation;
+      }
+
+      this.store.dispatch(new fromActionsRoom.RoomUpdate(room));
+    }
+    return;
+  }
+
+  private static createAv(date?: string): Date | undefined {
     if (date) {
       const startTime = date.split(':');
       return createDate(Number(startTime[0]), Number(startTime[1]));
@@ -77,38 +111,6 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   setStep(index: number): void {
     this.step = index;
-  }
-
-  update(): void {
-    if (this.validate()) {
-      return;
-    }
-    if (this.room) {
-      const room: IRoomAll = {
-        id: this.room.id,
-        availabilities: this.availabilities,
-        paymentTypes: this.paymentTypes,
-        address: {
-          name: this.room.address.name,
-          location: this.room.address.location,
-          description: this.addressDescription.value
-        } as IAddress,
-        professional: this.room.professional,
-        currency: this.room.currency,
-        office: this.room.office
-      };
-
-      if (this.address.value && this.address.value.geometry) {
-        const location = this.address.value.geometry.location;
-        room.address.name = this.address.value.formatted_address;
-        room.address.location = {
-          x: location.lng(),
-          y: location.lat()
-        } as ILocation;
-      }
-
-      this.store.dispatch(new fromActionsRoom.RoomUpdate(room));
-    }
   }
 
   addAvailability(availability: IAvailability, step: number): void {
@@ -159,11 +161,13 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
+        const roomTimeZone = getTimeZone(state.selected.timeZone);
         this.room = {
           id: state.selected.id,
           address: state.selected.address,
           currency: state.selected.currency,
-          office: state.selected.office
+          office: state.selected.office,
+          timeZone: roomTimeZone.label
         } as IRoomAll;
         this.paymentTypes = state.selected.paymentTypes;
         this.professionalName = getUserName(state.selected.professional);

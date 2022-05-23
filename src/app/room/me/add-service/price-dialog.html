@@ -1,4 +1,4 @@
-<form (ngSubmit)="submit()" [formGroup]="form" novalidate>
+<form (ngSubmit)="submit" [formGroup]="form" novalidate>
   <h1 mat-dialog-title>{{ 'ROOM.ME.SERVICES.ADD' | translate }}</h1>
   <div mat-dialog-content>
     <p>{{ 'ROOM.ME.SERVICES.PRICE.TEXT' | translate: {name: data.name} }}</p>
@@ -15,7 +15,7 @@
     </mat-form-field>
   </div>
   <div mat-dialog-actions>
-    <button (click)="onNoClick()" color="accent" mat-raised-button
+    <button (click)="onNoClick" color="accent" mat-raised-button
             type="button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
     <button cdkFocusInitial color="primary" mat-raised-button type="submit">Ok
     </button>

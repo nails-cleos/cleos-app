@@ -75,7 +75,7 @@
           </mat-error>
         </mat-form-field>
         <div [ngClass]="{'last': isHandset}">
-          <button (click)="book()" [disabled]="!product.value && !date.value" color="primary" mat-raised-button
+          <button (click)="book" [disabled]="!product.value && !date.value" color="primary" mat-raised-button
                   type="button">
             <mat-icon>book_online</mat-icon>
             {{'COMMON.BUTTON.BOOK' | translate}}
@@ -127,7 +127,7 @@
         <mat-divider [vertical]="true"></mat-divider>
         <div class="div-right">
           <h2 class="bold no-content">{{'MAIN.CONTACT.SEND.TITLE' | translate}}</h2>
-          <form (ngSubmit)="sendEmail()" [formGroup]="form" novalidate>
+          <form (ngSubmit)="sendEmail" [formGroup]="form" novalidate>
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'MAIN.CONTACT.NAME.FIELD' | translate }}</mat-label>

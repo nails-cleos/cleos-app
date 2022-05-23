@@ -17,6 +17,7 @@ import RRule, { Weekday } from 'rrule';
 import { IReservationAll } from '../interfaces/reservation';
 import { IProductAll } from '../interfaces/product';
 import { IAdditionalAll } from '../interfaces/additional';
+import { utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz';
 
 export const API_LOCALE = 'en-GB';
 
@@ -32,6 +33,24 @@ export class Duration implements IDuration {
   constructor(hour: number = 0, minute: number = 0) {
     this.hour = hour;
     this.minute = minute;
+  }
+}
+
+export interface ITimeZone {
+  label: string;
+  tzCode: string;
+  gmt: string;
+}
+
+export class TimeZone implements ITimeZone {
+  label: string;
+  tzCode: string;
+  gmt: string;
+
+  constructor(label: string, tzCode: string, gmt: string = '') {
+    this.label = label;
+    this.tzCode = tzCode;
+    this.gmt = gmt;
   }
 }
 
@@ -91,11 +110,11 @@ export const getEnd = (start: Date, strDuration?: string): Date => {
   return createNewDate(start, 23, 59, 59, 99);
 };
 
-export const getStartEndDay = (week: IAvailability, saturday: IAvailability, sunday: IAvailability): any => {
+export const getStartEndDay = (week: IAvailability, saturday: IAvailability, sunday: IAvailability, timeZone: string): any => {
   const date: Date = new Date();
-  const weekMinMax = getMinAndMax(week, date);
-  const saturdayMinMax = getMinAndMax(saturday, date);
-  const sundayMinMax = getMinAndMax(sunday, date);
+  const weekMinMax = getMinAndMax(week, date, timeZone);
+  const saturdayMinMax = getMinAndMax(saturday, date, timeZone);
+  const sundayMinMax = getMinAndMax(sunday, date, timeZone);
 
   let min: Date = weekMinMax.min;
   let max: Date = weekMinMax.max;
@@ -212,9 +231,13 @@ export const formatDateName = (date: Date, locale: string, measure: any): string
   day: 'numeric', month: measure, weekday: measure, year: 'numeric'
 });
 
-export const reservationDateTime = (date: Date, locale: string): string => date.toLocaleDateString(locale, {
-  day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit'
-});
+export const localeTimeZoneDate = (locale: string, date?: Date | string, timeZone: string = getCurrentTimeZone()): string =>
+  date ? reservationDateTime(newDate(date), locale, timeZone) : '';
+
+export const reservationDateTime = (date: Date, locale: string, timeZone: string = getCurrentTimeZone()): string =>
+  date.toLocaleDateString(locale, {
+    day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit', timeZone
+  });
 
 export const formatDateNameKey = (date: Date, locale: string, measure: any): string => date.toLocaleDateString(locale, {
   day: 'numeric', month: measure, hour: '2-digit', minute: '2-digit'
@@ -258,18 +281,10 @@ export const createDateFromString = (stringDate: string): Date => {
 export const createDate = (hour: number = 0, minute: number = 0, second: number = 0,
                            mili: number = 0): Date => createNewDate(new Date(), hour, minute, second, mili);
 
-export const createNewDate = (date: Date, hour: number = 0, minute: number = 0, second: number = 0, mili: number = 0): Date => {
-  const d = new Date(date);
-  d.setHours(hour, minute, second, mili);
-
-  return d;
-};
-
 export const createEndDate = (stringDate: string): Date => {
   const d = stringDate.split('-');
   return new Date(Number(d[0]), Number(d[1]) - 1, Number(d[2]), 23, 59, 59, 99);
 };
-
 
 export const createFullDate = (selectDate: Date): Date => {
   const date = new Date();
@@ -277,6 +292,27 @@ export const createFullDate = (selectDate: Date): Date => {
 
   return date;
 };
+
+// TODO fine
+export const newDateTimestamp = (value: number, timeZone: string = getCurrentTimeZone()): Date => {
+  const date = new Date(value * 1000);
+  return utcToZonedTime(date, timeZone);
+};
+
+export const dateToUTC = (date: Date, timeZone: string = getCurrentTimeZone()): Date => zonedTimeToUtc(date, timeZone);
+
+export const createNewDate = (date: Date, hour: number = 0, minute: number = 0, second: number = 0, mili: number = 0): Date => {
+  const d = new Date(date);
+  d.setHours(hour, minute, second, mili);
+
+  return d;
+};
+
+export const dateToTimestamp = (date: Date = new Date()): number => parseInt(`${date.getTime() / 1000}`, 10);
+
+export const stringDateUTCToTimeZone = (date: string): Date => new Date(`${date}.000z`);
+
+export const isSameTimeZone = (timeZone: string = getCurrentTimeZone()): boolean => timeZone === getCurrentTimeZone();
 
 export const newDate = (value: number | string | Date): Date => new Date(value);
 
@@ -341,17 +377,34 @@ export const filterDate = (result: boolean, date: Date | null, room?: IRoom): bo
   return result;
 };
 
-const getMinAndMax = (availability: IAvailability, date: Date): any => {
+export const getTimeZoneFromDate = (date: Date, timezone?: string): ITimeZone => {
+  const currentTimeZone: string = getCurrentTimeZone();
+  const currentGMT = getGMT(currentTimeZone, date);
+
+  if (timezone) {
+    const gmt = getGMT(timezone, date);
+    return new TimeZone(`${timezone} (${gmt})`, timezone, gmt !== currentGMT ? gmt : '');
+  }
+
+  return new TimeZone(`${currentTimeZone} (${currentGMT})`, currentTimeZone);
+};
+
+export const getTimeZone = (timezone?: string): ITimeZone => {
+  const date = new Date();
+  return getTimeZoneFromDate(date, timezone);
+};
+
+const getMinAndMax = (availability: IAvailability, date: Date, timeZone: string): any => {
   let min;
   let max;
   if (availability) {
     if (availability.start) {
       const start = availability.start.split(':');
-      min = new Date(date.setHours(Number(start[0]), Number(start[1])));
+      min = dateToUTC(createNewDate(date, Number(start[0]), Number(start[1])), timeZone);
     }
     if (availability.end) {
       const end = availability.end.split(':');
-      max = new Date(date.setHours(Number(end[0]), Number(end[1])));
+      max = dateToUTC(createNewDate(date, Number(end[0]), Number(end[1])), timeZone);
     }
   }
   return {min, max};
@@ -359,11 +412,6 @@ const getMinAndMax = (availability: IAvailability, date: Date): any => {
 
 const getMinutesBetweenTimes = (date1: Date, date2: Date): number =>
   Math.abs(Math.round((date1.getTime() - date2.getTime()) / (1000 * 60)));
-
-const timeToDateTime = (stringTime: string, date: Date): Date => {
-  const time = stringTime.split(':');
-  return createNewDate(date, Number(time[0]), Number(time[1]));
-};
 
 const timeConvert = (time: number, hour: number = 0) => {
   const hours = (time / 60);
@@ -373,3 +421,23 @@ const timeConvert = (time: number, hour: number = 0) => {
 
   return new Duration(diffHour + hour, diffMinute);
 };
+
+const getGMT = (timeZone: string, date: Date): string => {
+  let gmt = date.toLocaleTimeString('en-US', {timeZone, timeZoneName: 'short'}).split(' ')[2];
+  if (gmt.indexOf(':') === -1) {
+    gmt = `${gmt}:00`;
+  }
+
+  if (gmt.length === 8) {
+    gmt = gmt.slice(0, 4) + '0' + gmt.slice(4);
+  }
+
+  return gmt;
+};
+
+const getUTC = (timeZone: string, date: Date): string => getGMT(timeZone, date).replace('GMT', '');
+
+export const timestamp = (date: Date, timeZone: string = getCurrentTimeZone()): Date =>
+  new Date(`${date.toISOString().split('T')[0]}T${getTime(date, API_LOCALE)}:00.000${getUTC(timeZone, date)}`);
+
+export const getCurrentTimeZone = (): string => Intl.DateTimeFormat().resolvedOptions().timeZone;

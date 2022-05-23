@@ -14,8 +14,10 @@ import {
   getTime,
   greaterOrEqualsThanToday,
   IDuration,
+  isSameTimeZone,
+  localeTimeZoneDate,
   newDate,
-  reservationDateTime,
+  newDateTimestamp,
   reservationDuration
 } from '../../util/dates';
 import { MatTableDataSource } from '@angular/material/table';
@@ -25,14 +27,14 @@ import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Role } from '../../interfaces/token';
-import { currencySymbol, getFullUserName, getPrice, getUserName, roomName, snakeToCamel } from '../../util/helper';
+import { getFullUserName, getPrice, getUserName, openDialog, snakeToCamel } from '../../util/helper';
 import { IPrice, Price } from '../../interfaces/product';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatFabMenu, MatFabMenuDirection } from '@angular-material-extensions/fab-menu/lib/mat-fab-menu.component';
 import { IPayment } from '../../interfaces/payment';
 import { detailExpandAnimation, transitionAnimation } from '../../util/animation';
 import { isToday, isTomorrow } from 'date-fns';
-import { ReservationIconKey, ReservationIconName } from '../../util/icon';
+import { ReservationIconName } from '../../util/icon';
 import { DiscountDialogComponent } from '../../discount/list/discounts.component';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
@@ -106,20 +108,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  get customerName(): string {
-    return this.reservation ? getFullUserName(this.reservation.customer) : '';
-  }
-
-  get professionalName(): string {
-    return this.reservation ? getUserName(this.reservation.room.professional) : '';
-  }
-
-  get currencySymbol(): string {
-    return this.reservation ? currencySymbol(this.reservation.room.currency) : '';
-  }
-
-  get roomName(): string {
-    return this.reservation ? roomName(this.reservation.room) : '';
+  get total(): number {
+    return this.paymentPaid?.map((p: IPayment) => p.amount).reduce((acc: number, value: number) => acc + value, 0);
   }
 
   private static createMachine(stateMachineDefinition: any, initialState: any): any {
@@ -148,8 +138,18 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     return {target, action};
   }
 
-  getProfessionalName(history: any): string {
-    return getUserName(history.room.professional);
+  openHistoryDialog(history: IReservationAll): void {
+    this.openDialog(this.getDateTimeDetail(history));
+  }
+
+  openDialog(reservationDate: Date): void {
+    if (this.reservation) {
+      openDialog(this.reservation.room, this.language, this.translate, this.dialog, reservationDate);
+    }
+  }
+
+  showTimeZone(reservation: IReservationAll | undefined = this.reservation): boolean {
+    return !isSameTimeZone(reservation?.room.timeZone);
   }
 
   ngOnInit(): void {
@@ -161,10 +161,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
-  }
-
-  getIcon(name: any): any {
-    return ReservationIconName[snakeToCamel(name) as ReservationIconKey];
   }
 
   onChangeState(id: any): void {
@@ -186,12 +182,12 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  getTotal(): number {
-    return this.paymentPaid?.map((p: IPayment) => p.amount).reduce((acc: number, value: number) => acc + value, 0);
+  private getDateTimeDetail(reservation: IReservationAll): Date {
+    return newDateTimestamp(reservation.timestamp);
   }
 
-  getDateTime(date: Date): string {
-    return reservationDateTime(date, this.language);
+  private getDateTime(reservationDate: Date, timeZone?: string): string {
+    return localeTimeZoneDate(this.language, reservationDate, timeZone);
   }
 
   private createAction(tooltip: string, icon: string, id: string, color?: string): MatFabMenu {
@@ -205,10 +201,10 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       this.paymentPaid = state.payments?.filter((p: IPayment) => p.status === 'approved');
       if (state.selected) {
         this.duration = reservationDuration(state.selected);
-        this.start = newDate(state.selected.start);
+        this.start = newDateTimestamp(state.selected.timestamp);
         this.end = createNewDate(this.start, this.start.getHours() + this.duration.hour,
           this.start.getMinutes() + this.duration.minute);
-        this.state = ReservationIconName[snakeToCamel(state.selected.state) as ReservationIconKey];
+        this.state = state.selected.state;
         this.reservation = state.selected;
         if (this.professionalId && this.professionalId === this.reservation?.room.professional.id) {
           this.professionalMachine(this);
@@ -569,6 +565,14 @@ export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
     this.getState = this.store.select(selectUserState);
   }
 
+  get onNoClick(): void {
+    return this.dialogRef.close();
+  }
+
+  get doAction(): void {
+    return this.dialogRef.close({customerId: this.customer.value.id});
+  }
+
   ngOnInit(): void {
     this.clean();
     this.createForm();
@@ -579,14 +583,6 @@ export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
-  }
-
-  onNoClick(): void {
-    this.dialogRef.close();
-  }
-
-  doAction(): void {
-    this.dialogRef.close({customerId: this.customer.value.id});
   }
 
   displayFnUser(user: IUser): string {

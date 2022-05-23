@@ -1,4 +1,4 @@
-<form (ngSubmit)="register()" [formGroup]="form" novalidate>
+<form (ngSubmit)="register" [formGroup]="form" novalidate>
   <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
     <mat-form-field appearance="fill">
       <mat-label>{{ 'COMMON.USER.USERNAME.FIELD' | translate }}</mat-label>
@@ -29,7 +29,7 @@
       <mat-label>{{ 'AUTH.PASSWORD.FIELD' | translate }}</mat-label>
       <mat-pass-toggle-visibility #togglePass matSuffix></mat-pass-toggle-visibility>
       <label>
-        <input #passwordInput (focusout)="onStrengthChanged()" [formControl]="passwordComponent.passwordFormControl"
+        <input #passwordInput (focusout)="onStrengthChanged" [formControl]="passwordComponent.passwordFormControl"
                [tabIndex]="3" [type]="togglePass.type"
                autocomplete="new-password" matInput required>
       </label>

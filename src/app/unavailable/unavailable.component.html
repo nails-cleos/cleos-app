@@ -1,7 +1,7 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
-      <form (ngSubmit)="create()" [formGroup]="form" novalidate>
+      <form (ngSubmit)="create" [formGroup]="form" novalidate>
         <mat-card class="style-card">
           <mat-card-header>
             <mat-card-title>{{ 'UNAVAILABLE.TITLE' | translate }}</mat-card-title>
@@ -16,7 +16,7 @@
                 <mat-autocomplete #auto="matAutocomplete" (optionSelected)="getRoom($event.option.value)"
                                   [displayWith]="displayFn">
                   <mat-option *ngFor="let professional of filteredOptions | async" [value]="professional">
-                    {{getProfessionalName(professional)}}
+                    {{professional | userName}}
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="professional.hasError('required')"
@@ -63,7 +63,7 @@
                 <mat-form-field *ngIf="!allDay.value" appearance="fill" style="margin-right: 12px;">
                   <mat-label>{{ 'UNAVAILABLE.TIME.FIELD' | translate }}</mat-label>
                   <label>
-                    <input (focusin)="focusin()" [formControl]="startTime" [format]="24" [max]="maxTime" [min]="minTime"
+                    <input (focusin)="focusin" [formControl]="startTime" [format]="24" [max]="maxTime" [min]="minTime"
                            [ngxTimepicker]="time" matInput name="start_time" readonly/>
                   </label>
                   <span matPrefix><mat-icon (click)="time.open()" matPrefix>schedule</mat-icon> &nbsp;</span>

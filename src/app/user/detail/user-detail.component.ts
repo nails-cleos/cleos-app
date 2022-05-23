@@ -8,7 +8,6 @@ import * as fromActionsUser from '../../store/user.actions';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { fieldChange, valueChange } from '../../util/validators';
 import { findFlag, flags, IFlag } from '../../util/flags';
-import { getUserName } from '../../util/helper';
 import { createDateFromString } from '../../util/dates';
 
 @Component({
@@ -44,25 +43,7 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     this.getState = this.store.select(selectUserState);
   }
 
-  get userName(): string {
-    return this.user ? getUserName(this.user) : '';
-  }
-
-  ngOnInit(): void {
-    this.createForm();
-    this.clean();
-    this.subscribe();
-  }
-
-  ngAfterViewInit(): void {
-    this.getUser();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  update(): void {
+  get update(): void {
     if (this.form.invalid) {
       return;
     }
@@ -77,7 +58,21 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     user.phone = fieldChange(this.phone, this.user?.phone);
     user.dob = fieldChange(this.dob, this.user?.dob);
 
-    this.store.dispatch(new fromActionsUser.SaveUser({user}));
+    return this.store.dispatch(new fromActionsUser.SaveUser({user}));
+  }
+
+  ngOnInit(): void {
+    this.createForm();
+    this.clean();
+    this.subscribe();
+  }
+
+  ngAfterViewInit(): void {
+    this.getUser();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 
   private createForm(): void {
