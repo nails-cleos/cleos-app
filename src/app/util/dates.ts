@@ -327,7 +327,7 @@ export const createFullDate = (selectDate: Date): Date => {
   return date;
 };
 
-export const newDateTimestamp = (value: number, timeZone: string = getCurrentTimeZone()): Date => {
+export const newDateTimestamp = (value: number = 0, timeZone: string = getCurrentTimeZone()): Date => {
   const date = new Date(value * 1000);
   return utcToZonedTime(date, timeZone);
 };

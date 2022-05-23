@@ -77,7 +77,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
 
   delete(unavailable: IUnavailable): void {
     const title = this.translate.instant('UNAVAILABLE.DELETED.TITLE');
-    const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT', {date: unavailable.start});
+    const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT', {date: newDateTimestamp(unavailable.timestamp)});
     const dialogRef = this.dialog.open(DialogComponent, {
       data: {title, content, value: unavailable}
     });
@@ -108,14 +108,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
         this.clean();
         this.getUnavailableList();
       }
-      this.dataSource = state.data?.content?.map((unavailable: IUnavailable) => {
-        if (unavailable.duration) {
-          const duration = convertDuration(unavailable.duration);
-
-          return Object.assign({}, unavailable, {hour: duration.hour, minute: duration.minute});
-        }
-        return unavailable;
-      });
+      this.dataSource = state.data?.content;
       this.resultsLength = state.data?.totalElements;
       if (!this.paginatorSubscription && this.resultsLength) {
         this.createPageSubscriptions();

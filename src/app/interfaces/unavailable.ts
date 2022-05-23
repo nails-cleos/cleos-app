@@ -20,6 +20,7 @@ export interface IUnavailable {
   startTime?: string | Date;
   allDay?: boolean;
   timeZone?: string;
+  timestamp?: number;
 }
 
 export interface IUnavailableAll {

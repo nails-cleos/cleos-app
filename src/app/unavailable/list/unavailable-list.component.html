@@ -56,7 +56,7 @@
         <div *ngIf="unavailable.id; else skeleton">
           <div *ngIf="!unavailable.allDay; else allDay">
             <mat-icon matPrefix>timer</mat-icon>&nbsp;
-            {{unavailable.hour | number:'2.0-0'}}:{{unavailable.minute | number:'2.0-0'}}
+            {{unavailable.duration | durationTime}}
           </div>
           <ng-template #allDay>
             <mat-icon matPrefix>timer</mat-icon>&nbsp;
