@@ -1,0 +1,7 @@
+{
+  "/api/*": {
+    "target": "https://cleos-api:8443/",
+    "secure": true,
+    "changeOrigin": true
+  }
+}

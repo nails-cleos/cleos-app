@@ -56,7 +56,5 @@ jobs:
           script: |
             echo "Log into Docker"
             docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
-            echo "Docker pull"
-            docker-compose pull
-            echo "Run docker compose"
-            docker-compose --env-file /home/cleos/env.list up --build -d
+            echo "Run start script"
+            "sh ~/start.sh"

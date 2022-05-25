@@ -1,8 +1,0 @@
-  User-agent: Googlebot
-  Disallow: /
-
-  User-agent: *
-  Allow: /main/*
-  Allow: /auth
-
-  Sitemap: https://nails.com/sitemap.xml
