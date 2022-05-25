@@ -57,4 +57,4 @@ jobs:
             echo "Log into Docker"
             docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
             echo "Run start script"
-            "${GITHUB_WORKSPACE}/start.sh"
+            "/home/cleos/start.sh"
