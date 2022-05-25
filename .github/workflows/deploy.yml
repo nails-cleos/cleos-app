@@ -57,4 +57,4 @@ jobs:
             echo "Log into Docker"
             docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
             echo "Run start script"
-            "sh ~/start.sh"
+            "${GITHUB_WORKSPACE}/start.sh"
