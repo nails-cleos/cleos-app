@@ -1,148 +1,363 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="App to book an appointment to make your nail prettier">
-  <meta name="keywords" content="nails,appointment,cleos">
-  <title>Cleos</title>
-  <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "url": "https://espaciocleos.com/",
-      "logo": "https://espaciocleos.com/assets/icons/icon-512x512.png"
-    }
-  </script>
-  <base href="/">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+    <meta
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+      name="viewport"
+    />
+    <meta
+      content="App to book an appointment to make your nail prettier"
+      name="description"
+    />
+    <meta content="nails,appointment,cleos,biab,acrylic,french,gel,polish,tips,acrygel,onychophagia,manicure,softgel,art,dual,pretty" name="keywords"/>
+    <meta content="noindex" name="googlebot"/>
+    <meta
+      content="origin-when-crossorigin"
+      id="meta_referrer"
+      name="referrer"
+    />
 
-  <!-- Android -->
-  <meta name="theme-color" content="#f7e6d8">
-  <meta name="mobile-web-app-capable" content="yes">
+    <title id="pageTitle">Espacio Cleos</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Espacio Cleos",
+        "url": "https://www.espaciocleos.com/",
+        "logo": "https://www.espaciocleos.com/assets/icons/icon-256x256.png"
+        "foundingDate": "2019",
+        "founders": [
+          {
+            "@type": "Person",
+            "name": "Carla Lujan"
+          }
+        ],
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "customer support",
+          "telephone": "[+54-351-7581773]",
+          "email": "espacio.cleos@gmail.com"
+        },
+        "sameAs": [
+          "https://www.instagram.com/espacio.cleos",
+          "https://www.facebook.com/espacio.cleos"
+        ]
+      }
+    </script>
+    <base href="/"/>
 
-  <!-- iOS -->
-  <meta name="apple-mobile-web-app-title" content="Cleos">
-  <meta name="apple-touch-fullscreen" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <!-- Android -->
+    <meta content="#f7e6d8" name="theme-color"/>
+    <meta content="yes" name="mobile-web-app-capable"/>
 
-  <!-- Windows  -->
-  <meta name="msapplication-navbutton-color" content="#f7e6d8">
-  <meta name="msapplication-TileColor" content="#f7e6d8">
-  <meta name="msapplication-TileImage" content="assets/icons/icon-144x144.png">
-  <meta name="msapplication-config" content="browserconfig.xml">
+    <!-- iOS -->
+    <meta content="Cleos" name="apple-mobile-web-app-title"/>
+    <meta content="yes" name="apple-touch-fullscreen"/>
+    <meta content="yes" name="apple-mobile-web-app-capable"/>
+    <meta content="#f7e6d8" name="apple-mobile-web-app-status-bar-style"/>
 
-  <!-- Pinned Sites  -->
-  <meta name="application-name" content="Cleos">
-  <meta name="msapplication-tooltip" content="Espacio Cleos">
-  <meta name="msapplication-starturl" content="/">
+    <!-- Windows  -->
+    <meta content="#f7e6d8" name="msapplication-navbutton-color"/>
+    <meta content="#f7e6d8" name="msapplication-TileColor"/>
+    <meta
+      content="assets/icons/icon-144x144.png"
+      name="msapplication-TileImage"
+    />
+    <meta content="browserconfig.xml" name="msapplication-config"/>
 
-  <!-- UC Mobile Browser  -->
-  <meta name="full-screen" content="yes">
-  <meta name="browsermode" content="application">
+    <!-- Pinned Sites  -->
+    <meta content="Cleos" name="application-name"/>
+    <meta content="Espacio Cleos" name="msapplication-tooltip"/>
+    <meta content="/" name="msapplication-starturl"/>
 
-  <!-- Disable night mode for this page  -->
-  <meta name="nightmode" content="disable">
+    <!-- UC Mobile Browser  -->
+    <meta content="yes" name="full-screen"/>
+    <meta content="application" name="browsermode"/>
 
-  <!-- Layout mode -->
-  <meta name="layoutmode" content="fitscreen">
+    <!-- Disable night mode for this page  -->
+    <meta content="disable" name="nightmode"/>
 
-  <!-- imagemode - show image even in text only mode  -->
-  <meta name="imagemode" content="force">
+    <!-- Layout mode -->
+    <meta content="fitscreen" name="layoutmode"/>
 
-  <!-- Main Link Tags  -->
-  <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/icon-16x16.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/icon-32x32.png">
-  <link rel="icon" type="image/png" sizes="96x96" href="assets/icons/icon-96x96.png">
+    <!-- imagemode - show image even in text only mode  -->
+    <meta content="force" name="imagemode"/>
 
-  <!-- Google -->
-  <meta property="og:title" content="Espacio cleos" />
-  <meta property="og:url" content="https://www.espaciocleos.com/main/" />
-  <meta property="og:description" content="App to book an appointment to make your nail prettier" />
-  <meta property="og:image" content="assets/icons/icon-512x512.png" />
-  <meta property="og:type" content="website" />
-  <meta property="og:locale" content="es_ES" />
-  <meta property="og:locale:alternate" content="en_GB" />
-  <meta property="og:locale:alternate" content="en_US" />
-  <meta property="og:locale:alternate" content="es_ES" />
-  <meta property="og:locale:alternate" content="es_AR" />
+    <!-- Main Link Tags  -->
+    <link
+      href="assets/icons/icon-16x16.png"
+      rel="icon"
+      sizes="16x16"
+      type="image/png"
+    />
+    <link
+      href="assets/icons/icon-32x32.png"
+      rel="icon"
+      sizes="32x32"
+      type="image/png"
+    />
+    <link
+      href="assets/icons/icon-96x96.png"
+      rel="icon"
+      sizes="96x96"
+      type="image/png"
+    />
 
-  <!-- iOS  -->
-  <link rel="apple-touch-icon" href="assets/icons/icon-180x180.png">
-  <link rel="apple-touch-icon" sizes="57x57" href="assets/icons/icon-57x57.png">
-  <link rel="apple-touch-icon" sizes="72x72" href="assets/icons/icon-72x72.png">
-  <link rel="apple-touch-icon" sizes="76x76" href="assets/icons/icon-76x76.png">
-  <link rel="apple-touch-icon" sizes="114x114" href="assets/icons/icon-114x114.png">
-  <link rel="apple-touch-icon" sizes="120x120" href="assets/icons/icon-120x120.png">
-  <link rel="apple-touch-icon" sizes="144x144" href="assets/icons/icon-144x144.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="assets/icons/icon-152x152.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/icon-180x180.png">
-  <link rel="apple-touch-icon-precomposed" href="assets/icons/icon-180x180-precomposed.png">
-  <link rel="apple-touch-icon-precomposed" sizes="57x57" href="assets/icons/icon-57x57-precomposed.png">
-  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/icons/icon-72x72-precomposed.png">
-  <link rel="apple-touch-icon-precomposed" sizes="76x76" href="assets/icons/icon-76x76-precomposed.png">
-  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/icons/icon-114x114-precomposed.png">
-  <link rel="apple-touch-icon-precomposed" sizes="120x120" href="assets/icons/icon-120x120-precomposed.png">
-  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/icons/icon-144x144-precomposed.png">
-  <link rel="apple-touch-icon-precomposed" sizes="152x152" href="assets/icons/icon-152x152-precomposed.png">
-  <link rel="apple-touch-icon-precomposed" sizes="180x180" href="assets/icons/icon-180x180-precomposed.png">
-  <link rel="mask-icon" color="#000000" href="assets/icons/safari-pinned-tab.svg">
-  <link rel="apple-touch-startup-image" href="assets/icons/icon-512x512.png">
+    <!-- Whatsapp -->
+    <meta content="EspacioCleos.com" property="og:site_name"/>
+    <meta content="Espacio Cleos" property="og:title"/>
+    <meta content="https://www.espaciocleos.com/" property="og:url"/>
+    <meta
+      content="App to book an appointment to make your nail prettier"
+      property="og:description"
+    />
+    <meta
+      content="App to book an appointment to make your nail prettier"
+      property="description"
+    />
+    <meta
+      content="https://www.espaciocleos.com/assets/icons/icon-256x256.png"
+      itemprop="image"
+      property="og:image"
+    />
+    <meta content="website" property="og:type"/>
+    <meta content="image/jpeg" property="og:image:type"/>
+    <meta content="256" property="og:image:width"/>
+    <meta content="256" property="og:image:height"/>
+    <meta content="es_ES" property="og:locale"/>
+    <meta content="en_GB" property="og:locale:alternate"/>
+    <meta content="en_US" property="og:locale:alternate"/>
+    <meta content="es_ES" property="og:locale:alternate"/>
+    <meta content="es_AR" property="og:locale:alternate"/>
+    <meta content="1653523200" property="og:updated_time"/>
 
-  <!-- Startup Image  -->
-  <link rel="apple-touch-startup-image" href="assets/icons/icon-384x384.png">
+    <!-- iOS  -->
+    <link href="assets/icons/icon-180x180.png" rel="apple-touch-icon"/>
+    <link
+      href="assets/icons/icon-57x57.png"
+      rel="apple-touch-icon"
+      sizes="57x57"
+    />
+    <link
+      href="assets/icons/icon-72x72.png"
+      rel="apple-touch-icon"
+      sizes="72x72"
+    />
+    <link
+      href="assets/icons/icon-76x76.png"
+      rel="apple-touch-icon"
+      sizes="76x76"
+    />
+    <link
+      href="assets/icons/icon-114x114.png"
+      rel="apple-touch-icon"
+      sizes="114x114"
+    />
+    <link
+      href="assets/icons/icon-120x120.png"
+      rel="apple-touch-icon"
+      sizes="120x120"
+    />
+    <link
+      href="assets/icons/icon-144x144.png"
+      rel="apple-touch-icon"
+      sizes="144x144"
+    />
+    <link
+      href="assets/icons/icon-152x152.png"
+      rel="apple-touch-icon"
+      sizes="152x152"
+    />
+    <link
+      href="assets/icons/icon-180x180.png"
+      rel="apple-touch-icon"
+      sizes="180x180"
+    />
+    <link
+      href="assets/icons/icon-180x180-precomposed.png"
+      rel="apple-touch-icon-precomposed"
+    />
+    <link
+      href="assets/icons/icon-57x57-precomposed.png"
+      rel="apple-touch-icon-precomposed"
+      sizes="57x57"
+    />
+    <link
+      href="assets/icons/icon-72x72-precomposed.png"
+      rel="apple-touch-icon-precomposed"
+      sizes="72x72"
+    />
+    <link
+      href="assets/icons/icon-76x76-precomposed.png"
+      rel="apple-touch-icon-precomposed"
+      sizes="76x76"
+    />
+    <link
+      href="assets/icons/icon-114x114-precomposed.png"
+      rel="apple-touch-icon-precomposed"
+      sizes="114x114"
+    />
+    <link
+      href="assets/icons/icon-120x120-precomposed.png"
+      rel="apple-touch-icon-precomposed"
+      sizes="120x120"
+    />
+    <link
+      href="assets/icons/icon-144x144-precomposed.png"
+      rel="apple-touch-icon-precomposed"
+      sizes="144x144"
+    />
+    <link
+      href="assets/icons/icon-152x152-precomposed.png"
+      rel="apple-touch-icon-precomposed"
+      sizes="152x152"
+    />
+    <link
+      href="assets/icons/icon-180x180-precomposed.png"
+      rel="apple-touch-icon-precomposed"
+      sizes="180x180"
+    />
+    <link
+      color="#000000"
+      href="assets/icons/safari-pinned-tab.svg"
+      rel="mask-icon"
+    />
+    <link
+      href="assets/icons/icon-512x512.png"
+      rel="apple-touch-startup-image"
+    />
 
-  <!-- Pinned Tab  -->
-  <link rel="mask-icon" sizes="any" color="#000000" href="assets/icons/safari-pinned-tab.svg">
+    <!-- Startup Image  -->
+    <link
+      href="assets/icons/icon-384x384.png"
+      rel="apple-touch-startup-image"
+    />
 
-  <!-- Android  -->
-  <link rel="icon" type="image/png" sizes="36x36" href="assets/icons/icon-36x36.png">
-  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/icon-48x48.png">
-  <link rel="icon" type="image/png" sizes="72x72" href="assets/icons/icon-72x72.png">
-  <link rel="icon" type="image/png" sizes="96x96" href="assets/icons/icon-96x96.png">
-  <link rel="icon" type="image/png" sizes="144x144" href="assets/icons/icon-144x144.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192x192.png">
-  <link rel="icon" type="image/png" sizes="256x256" href="assets/icons/icon-256x256.png">
-  <link rel="icon" type="image/png" sizes="384x384" href="assets/icons/icon-384x384.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512x512.png">
+    <!-- Pinned Tab  -->
+    <link
+      color="#000000"
+      href="assets/icons/safari-pinned-tab.svg"
+      rel="mask-icon"
+      sizes="any"
+    />
 
-  <!-- Others -->
-  <link href="favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <!-- Android  -->
+    <link
+      href="assets/icons/icon-36x36.png"
+      rel="icon"
+      sizes="36x36"
+      type="image/png"
+    />
+    <link
+      href="assets/icons/icon-48x48.png"
+      rel="icon"
+      sizes="48x48"
+      type="image/png"
+    />
+    <link
+      href="assets/icons/icon-72x72.png"
+      rel="icon"
+      sizes="72x72"
+      type="image/png"
+    />
+    <link
+      href="assets/icons/icon-96x96.png"
+      rel="icon"
+      sizes="96x96"
+      type="image/png"
+    />
+    <link
+      href="assets/icons/icon-144x144.png"
+      rel="icon"
+      sizes="144x144"
+      type="image/png"
+    />
+    <link
+      href="assets/icons/icon-192x192.png"
+      rel="icon"
+      sizes="192x192"
+      type="image/png"
+    />
+    <link
+      href="assets/icons/icon-256x256.png"
+      rel="icon"
+      sizes="256x256"
+      type="image/png"
+    />
+    <link
+      href="assets/icons/icon-384x384.png"
+      rel="icon"
+      sizes="384x384"
+      type="image/png"
+    />
+    <link
+      href="assets/icons/icon-512x512.png"
+      rel="icon"
+      sizes="512x512"
+      type="image/png"
+    />
 
-  <!-- UC Browser  -->
-  <link rel="apple-touch-icon-precomposed" sizes="57x57" href="assets/icons/icon-57x57.png">
-  <link rel="apple-touch-icon" sizes="72x72" href="assets/icons/icon-72x72.png">
+    <!-- Others -->
+    <link href="favicon.ico" rel="shortcut icon" type="image/x-icon"/>
 
-  <link rel="preload" as="image" href="assets/icons/icon-512x512.png"/>
-  <link rel="preload" as="font" href="styles.scss"/>
-  <link rel="stylesheet" as="style" href="styles.scss">
-  <link rel="stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- UC Browser  -->
+    <link
+      href="assets/icons/icon-57x57.png"
+      rel="apple-touch-icon-precomposed"
+      sizes="57x57"
+    />
+    <link
+      href="assets/icons/icon-72x72.png"
+      rel="apple-touch-icon"
+      sizes="72x72"
+    />
 
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link rel="preconnect" crossorigin="" href="http://localhost">
-  <link rel="manifest" href="manifest.webmanifest">
+    <link as="image" href="assets/icons/icon-512x512.png" rel="preload"/>
+    <link as="font" href="styles.scss" rel="preload"/>
+    <link as="style" href="styles.scss" rel="stylesheet"/>
+    <link
+      as="style"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+      rel="stylesheet"
+    />
 
-  <script src="https://sdk.mercadopago.com/js/v2" type="text/javascript"></script>
+    <link href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link crossorigin="" href="http://localhost" rel="preconnect"/>
+    <link href="manifest.webmanifest" rel="manifest"/>
 
-  <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-YHY37JXMXT"></script>
-  <script>
-    var global = window;
-  </script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
+    <script
+      src="https://sdk.mercadopago.com/js/v2"
+      type="text/javascript"
+    ></script>
 
-    function gtag() {
-      dataLayer.push(arguments);
-    }
+    <script
+      async=""
+      src="https://www.googletagmanager.com/gtag/js?id=G-YHY37JXMXT"
+    ></script>
+    <script>
+      var global = window;
+    </script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
 
-    gtag('js', new Date());
+      function gtag() {
+        dataLayer.push(arguments);
+      }
 
-    gtag('config', 'G-YHY37JXMXT');
-  </script>
-</head>
-<body class="mat-typography mat-app-background">
-<app-root></app-root>
-<noscript>Please enable JavaScript to continue using this application.</noscript>
-</body>
+      gtag("js", new Date());
+
+      gtag("config", "G-YHY37JXMXT");
+    </script>
+    <link
+      href="https://www.espaciocleos.com/assets/icons/icon-256x256.png"
+      rel="shortcut icon"
+    />
+  </head>
+
+  <body class="mat-typography mat-app-background">
+    <app-root></app-root>
+    <noscript>Please enable JavaScript to continue using this application.</noscript>
+  </body>
 </html>
