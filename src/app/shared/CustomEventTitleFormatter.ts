@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { dateToTimestamp, formatDateMonth, getTimeZone, isSameTimeZone, newDateTimestamp } from '../util/dates';
 import { IMeta } from '../util/event';
+import { ReservationIconKey, ReservationIconName } from '../util/icon';
+import { snakeToCamel } from '../util/helper';
 
 @Injectable()
 export class CustomEventTitleFormatter extends CalendarEventTitleFormatter {
@@ -40,7 +42,13 @@ export class CustomEventTitleFormatter extends CalendarEventTitleFormatter {
   }
 
   week(event: CalendarEvent): string {
-    return CustomEventTitleFormatter.eventTitle(event, this.translate.currentLang);
+    let result = CustomEventTitleFormatter.eventTitle(event, this.translate.currentLang);
+    if (event.meta.state) {
+      result = `<div class="material-icons">
+        ${ReservationIconName[snakeToCamel(event.meta.state) as ReservationIconKey]}
+      </div>&nbsp; ${result}`;
+    }
+    return result;
   }
 
   day(event: CalendarEvent): string {

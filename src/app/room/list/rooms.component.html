@@ -38,17 +38,6 @@
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="professional">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
-          mat-sort-header>{{ 'ROOM.LIST.COLUMN.PROFESSIONAL' | translate }}</th>
-      <td *matCellDef="let room" fxHide.lt-sm fxShow mat-cell>
-        <div *ngIf="room.id; else skeleton">{{room?.professional | userName}}</div>
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
-      </td>
-    </ng-container>
-
     <ng-container matColumnDef="address">
       <th *matHeaderCellDef mat-header-cell>{{ 'ROOM.LIST.COLUMN.ADDRESS' | translate }}</th>
       <td *matCellDef="let room" mat-cell>
@@ -111,7 +100,7 @@
       <td *matCellDef="let room" [attr.colspan]="displayedColumns.length" fxHide fxShow.lt-sm>
         <div [@detailExpand]="room === expanded ? 'expanded' : 'collapsed'" class="detail">
           <mat-list *ngIf="room.id">
-            <div mat-subheader>{{ 'ROOM.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
+            <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
             <mat-list-item role="list">
               <div mat-line>{{room?.professional | userName}}</div>
             </mat-list-item>

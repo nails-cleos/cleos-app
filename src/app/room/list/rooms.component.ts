@@ -25,7 +25,7 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['position', 'currency', 'office', 'professional', 'address', 'gmt', 'availability', 'actions'];
+  displayedColumns: string[] = ['position', 'currency', 'office', 'address', 'gmt', 'availability', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IRoom>>();
   expanded?: IRoom;
 

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AvailabilityDate, IAddress, IAvailability, IAvailabilityDate, ILocation, IRoomAll } from '../../interfaces/room';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
@@ -8,10 +8,14 @@ import { AppState, selectRoomState } from '../../store/app.states';
 import * as fromActionsRoom from '../../store/room.actions';
 import { IIcon } from '../room.component';
 import { createDate, getTimeZone } from '../../util/dates';
-import { getUserName } from '../../util/helper';
+import { getFullUserName } from '../../util/helper';
 import { RoomIconName } from '../../util/icon';
 import { IPaymentType, paymentOptions } from '../../interfaces/payment';
 import { MatListOption } from '@angular/material/list';
+import { IUser, IUserAll } from '../../interfaces/user';
+import { Role } from '../../interfaces/token';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { map, startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'app-room-detail',
@@ -19,13 +23,20 @@ import { MatListOption } from '@angular/material/list';
   styleUrls: ['./room-detail.component.scss']
 })
 export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('professionalInput') professionalInput!: ElementRef<HTMLInputElement>;
   @Input() room?: IRoomAll;
 
   form!: FormGroup;
 
   errors: any = [];
-  professionalName?: string;
   step = 0;
+
+  professional = new FormControl('', [
+    Validators.required
+  ])
+  filteredProfessionals?: Observable<IUser[] | undefined>;
+  professionals: IUserAll[] = [];
+  allProfessional?: IUserAll[];
 
   icons: IIcon = {
     week: RoomIconName.eventBusy,
@@ -55,7 +66,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   get update(): void {
-    if (this.validate()) {
+    if (!this.isValid()) {
       return;
     }
     if (this.room) {
@@ -68,7 +79,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
           location: this.room.address.location,
           description: this.addressDescription.value
         } as IAddress,
-        professional: this.room.professional,
+        professionalIds: this.professionals.map(({id}) => id),
         currency: this.room.currency,
         office: this.room.office,
         timeZone: this.room.timeZone
@@ -85,6 +96,11 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
       this.store.dispatch(new fromActionsRoom.RoomUpdate(room));
     }
+    return;
+  }
+
+  get addProfessional(): void {
+    this.router.navigate(['users', 'add'], {state: {role: Role.professional}});
     return;
   }
 
@@ -142,11 +158,42 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     return it.checked || this.paymentTypes.includes(it.name);
   }
 
+  remove(professional: IUserAll): void {
+    const index = this.professionals.indexOf(professional);
+    if (index >= 0) {
+      this.professionals.splice(index, 1);
+      this.allProfessional?.push(professional);
+      this.professional.setValue(null);
+    }
+  }
+
+  selected(event: MatAutocompleteSelectedEvent): void {
+    const professional = event.option.value;
+    this.professionals.push(professional);
+    this.allProfessional = this.allProfessional?.filter(c => c.id !== professional.id);
+    this.professionalInput.nativeElement.value = '';
+    this.professional.setValue(null);
+  }
+
+  sortProfessionals(data: any): IUser[] {
+    return data.sort((a: any, b: any) => {
+      const aName = getFullUserName(a).toUpperCase();
+      const bName = getFullUserName(b).toUpperCase();
+      return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
+    });
+  }
+
   private createForm(): void {
     this.form = this.formBuilder.group({
+      professional: this.professional,
       address: this.address,
       addressDescription: this.addressDescription
     });
+    this.filteredProfessionals = this.professional.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value ? value.name : ''),
+      map(name => name ? this.filter(name) : (this.allProfessional ? this.allProfessional.slice() : this.allProfessional))
+    );
   }
 
   private getRoom(): void {
@@ -163,17 +210,21 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       if (state.selected) {
         const roomTimeZone = getTimeZone(state.selected.timeZone);
         this.room = {
-          id: state.selected.id,
-          address: state.selected.address,
-          currency: state.selected.currency,
-          office: state.selected.office,
+          id: state.selected.room.id,
+          address: state.selected.room.address,
+          currency: state.selected.room.currency,
+          office: state.selected.room.office,
           timeZone: roomTimeZone.label
         } as IRoomAll;
-        this.paymentTypes = state.selected.paymentTypes;
-        this.professionalName = getUserName(state.selected.professional);
+        this.paymentTypes = state.selected.room.paymentTypes;
+        this.allProfessional = state.selected.professionals;
+        state.selected.room.professionals.forEach((professional: IUserAll) => {
+          this.professionals.push(professional);
+          this.allProfessional = this.allProfessional?.filter(c => c.id !== professional.id);
+        });
         this.addressDescription.setValue(this.room.address?.description);
         this.address.setValue(this.room.address?.name);
-        this.getAvailabilities(state.selected.availabilities);
+        this.getAvailabilities(state.selected.room.availabilities);
         this.form.patchValue(this.room);
       }
       if (state.subErrors) {
@@ -224,10 +275,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private validate(): boolean {
-    if (this.form.invalid) {
-      return true;
-    }
+  private isValid(): boolean {
     let step = -1;
     this.errors = [];
     switch (RoomIconName.calendarToday) {
@@ -244,15 +292,31 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     if (step > -1) {
       this.errors[`day${step}`] = true;
       this.setStep(step);
-      return true;
+      return false;
     }
 
     if (this.availabilities.length === 0) {
       this.errors.availability = true;
       this.setStep(0);
-      return true;
+      return false;
     }
 
-    return false;
+    if (this.professionals.length === 0) {
+      this.errors.professionals = true;
+      document.getElementById('professionals')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+        inline: 'nearest'
+      });
+      return false;
+    }
+
+    return true;
+  }
+
+  private filter(name: string): IUserAll[] | undefined {
+    const filterValue = name.toLowerCase();
+
+    return this.allProfessional?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
   }
 }

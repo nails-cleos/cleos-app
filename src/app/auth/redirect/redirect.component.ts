@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState } from '../../store/app.states';
 import { TokenService } from '../../services/token.service';
+import { isRoomAdmin } from '../../util/helper';
 
 @Component({
   selector: 'app-redirect',
@@ -25,6 +26,8 @@ export class RedirectComponent {
             redirectUrl = ['auth', 'change-password'];
           } else if (RedirectComponent.hasRoomOrAdmin(user.authorities)) {
             redirectUrl = ['dashboard'];
+          } else if (isRoomAdmin(user.authorities)) {
+            redirectUrl = ['events'];
           } else {
             redirectUrl = ['me', 'reservations'];
           }

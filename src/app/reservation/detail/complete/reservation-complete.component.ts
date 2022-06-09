@@ -2,22 +2,14 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../../store/app.states';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import * as fromActionsReservation from '../../../store/reservation.actions';
 import { IReservationAll } from '../../../interfaces/reservation';
 import { IGroupService, IPrice, IProduct, IProductGroup, Price } from '../../../interfaces/product';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IPaymentAll, PaymentType } from '../../../interfaces/payment';
-import {
-  createProductGroupService,
-  getFullUserName,
-  getPrice,
-  getProductDurability,
-  newAdditional,
-  newExtra,
-  newPrice
-} from '../../../util/helper';
+import { createProductGroupService, getPrice, getProductDurability, newAdditional, newExtra, newPrice } from '../../../util/helper';
 import { formatTime, totalDuration } from '../../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
 import { map, startWith } from 'rxjs/operators';
@@ -64,9 +56,10 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   private customerId: any;
   private getState: Observable<any>;
   private subscription?: Subscription;
+  private readonly isDashboard = false;
 
   constructor(private store: Store<AppState>, private route: ActivatedRoute, private formBuilder: FormBuilder,
-              private readonly translate: TranslateService) {
+              private readonly translate: TranslateService, private router: Router) {
     this.getState = this.store.select(selectReservationState);
     this.price = new Price();
     this.product.valueChanges.subscribe(value => {
@@ -77,6 +70,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     this.extraPrice.valueChanges.subscribe(value => {
       this.price = newExtra(this.price, value ? value : 0);
     });
+    this.isDashboard = this.router.getCurrentNavigation()?.extras?.state?.data?.isDashboard;
   }
 
   get durationTime(): string {
@@ -85,6 +79,25 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       return formatTime(duration, this.translate.currentLang);
     }
     return '';
+  }
+
+  get complete(): void {
+    if (this.reservation) {
+      const reservationId = this.reservation.id;
+      const productId = valueChange(this.product.value.id, this.reservation?.product.id);
+      const description = this.description.value;
+      const price = this.extraPrice.value;
+      const paymentType = this.type.value;
+      const additionalIds = this.additionalSelected.map(additional => additional.id);
+      this.store.dispatch(
+        new fromActionsReservation.Complete({
+          reservationId,
+          extras: {productId, description, price, paymentType, additionalIds},
+          isDashboard: this.isDashboard
+        })
+      );
+    }
+    return;
   }
 
   ngOnInit(): void {
@@ -102,24 +115,6 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
-  }
-
-  get complete(): void {
-    if (this.reservation) {
-      const reservationId = this.reservation.id;
-      const productId = valueChange(this.product.value.id, this.reservation?.product.id);
-      const description = this.description.value;
-      const price = this.extraPrice.value;
-      const paymentType = this.type.value;
-      const additionalIds = this.additionalSelected.map(additional => additional.id);
-      this.store.dispatch(
-        new fromActionsReservation.Complete({
-          reservationId,
-          extras: {productId, description, price, paymentType, additionalIds}
-        })
-      );
-    }
-    return;
   }
 
   displayFnGroup(group: IProductGroup): string {

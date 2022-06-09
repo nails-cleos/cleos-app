@@ -8,14 +8,13 @@ import { ReservationRoutingModule } from './reservation-routing.module';
 import { environment } from '../../environments/environment';
 
 import { SearchComponent } from './search/search.component';
-import { ReservationComponent } from './reservation.component';
+import { ReservationComponent, SelectProfessionalDialogComponent } from './reservation.component';
 import { ChangeCustomerDialogComponent, ReservationDetailComponent } from './detail/reservation-detail.component';
 import { MoreInfoComponent } from './detail/more-info/more-info.component';
-import { CalendarComponent, CalendarDialogComponent } from './calendar/calendar.component';
+import { CalendarComponent } from './calendar/calendar.component';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { MatRadioModule } from '@angular/material/radio';
 import { ReservationCompleteComponent } from './detail/complete/reservation-complete.component';
 import { EffectsModule } from '@ngrx/effects';
 import { PaymentService } from '../services/payment.service';
@@ -36,16 +35,15 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
     ReservationDetailComponent,
     MoreInfoComponent,
     CalendarComponent,
-    CalendarDialogComponent,
     ReservationCompleteComponent,
-    ChangeCustomerDialogComponent
+    ChangeCustomerDialogComponent,
+    SelectProfessionalDialogComponent
   ],
   imports: [
     ReservationRoutingModule,
     SharedModule,
     MatFabMenuModule,
     CalendarModule,
-    MatRadioModule,
     AgmCoreModule.forRoot({
       apiKey: environment.googleMapKey,
       libraries: ['places', 'geometry']

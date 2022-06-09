@@ -17,17 +17,17 @@ const routes: Routes = [
   {path: 'forgot-password', component: ForgotPasswordComponent},
   {
     path: 'change-password', component: ChangePasswordComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.manager, Role.professional, Role.customer]
+      roles: [Role.admin, Role.manager, Role.professional, Role.customer, Role.roomAdmin]
     }
   },
   {
     path: 'profile', component: ProfileComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.manager, Role.professional, Role.customer]
+      roles: [Role.admin, Role.manager, Role.professional, Role.customer, Role.roomAdmin]
     }
   },
   {
     path: 'redirect', component: RedirectComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.manager, Role.professional, Role.customer]
+      roles: [Role.admin, Role.manager, Role.professional, Role.customer, Role.roomAdmin]
     }
   }
 ];

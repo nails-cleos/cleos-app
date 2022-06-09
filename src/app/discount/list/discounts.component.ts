@@ -234,10 +234,6 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
     });
   }
 
-  getName(customer: any): string {
-    return getFullUserName(customer);
-  }
-
   private setSymbol(): void {
     this.title = this.discount.name;
     switch (this.discount.type) {

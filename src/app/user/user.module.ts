@@ -13,6 +13,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { UserEffects } from '../store/effects/user.effects';
 import { UserService } from '../services/user.service';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { NgxMatColorPickerModule } from '@angular-material-components/color-picker';
 
 @NgModule({
   declarations: [
@@ -34,7 +35,8 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
       isolate: false,
       extend: true
     }),
-    EffectsModule.forFeature([UserEffects])
+    EffectsModule.forFeature([UserEffects]),
+    NgxMatColorPickerModule
   ],
   providers: [
     UserService

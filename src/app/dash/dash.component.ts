@@ -237,7 +237,7 @@ export class DashComponent implements OnInit, OnDestroy {
         this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNow());
 
         const event = monthEvent(it.title, start, end, it.reservationId, findStateColor(it.state, darkMode),
-          new Meta(true, this.state.timeZone, it.state, ['reservation', it.reservationId]));
+          new Meta(true, this.state.timeZone, it.state, ['reservation', it.reservationId]), darkMode);
         if (event) {
           this.events = [...this.events, event];
         }
@@ -251,7 +251,7 @@ export class DashComponent implements OnInit, OnDestroy {
         if (it.repeat === UnavailableRepeatType.none) {
           const end = getEnd(start, it.duration);
           const event = monthEvent(title, start, end, it.unavailableId, findStateColor('DEFAULT', darkMode),
-            new Meta(!!it.duration, this.state.timeZone, undefined, ['unavailable', it.unavailableId]));
+            new Meta(!!it.duration, this.state.timeZone, undefined, ['unavailable', it.unavailableId]), darkMode);
           if (event) {
             this.events = [...this.events, event];
           }
@@ -265,7 +265,7 @@ export class DashComponent implements OnInit, OnDestroy {
         r.rule.all().forEach((date: Date) => {
           const end = getEnd(date, r.duration);
           const event = monthEvent(r.title, date, end, r.unavailableId, findStateColor('DEFAULT', darkMode),
-            new Meta(!!r.duration, this.state.timeZone, undefined, ['unavailable', r.unavailableId]));
+            new Meta(!!r.duration, this.state.timeZone, undefined, ['unavailable', r.unavailableId]), darkMode);
           if (event) {
             this.events = [...this.events, event];
           }

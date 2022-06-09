@@ -1,7 +1,6 @@
 import { IReservationOverview } from './reservation';
 import { Theme } from '../util/theme';
 import { IChart } from './dashboard';
-import { MatMenuPanel } from '@angular/material/menu';
 
 export interface IUser {
   id?: string;
@@ -25,6 +24,8 @@ export interface IUser {
   completed?: boolean;
   theme?: Theme;
   timeZone?: string;
+  lightColor?: string;
+  darkColor?: string;
 }
 
 export interface IUserAll {
@@ -45,6 +46,8 @@ export interface IUserAll {
   theme?: Theme;
   changePassword: boolean;
   timeZone: string;
+  lightColor?: string;
+  darkColor?: string;
 }
 
 export interface IAuthority {

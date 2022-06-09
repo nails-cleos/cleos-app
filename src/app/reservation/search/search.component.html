@@ -66,7 +66,7 @@
             mat-sort-header>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</th>
         <td *matCellDef="let reservation" mat-cell>
           <div *ngIf="reservation.id; else skeleton">
-            {{reservation | timeDetail | date:'short':reservation.room.timeZone:language}}
+            {{reservation.timestamp | timeDetail | date:'short':reservation.room.timeZone:language}}
             <button (click)="openDialog(reservation)" *ngIf="showTimeZone(reservation)" mat-icon-button type="button">
               <mat-icon>info_outline</mat-icon>
             </button>

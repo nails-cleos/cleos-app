@@ -22,17 +22,17 @@ const routes: Routes = [
   },
   {
     path: '', component: ReservationComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.manager, Role.professional] // TODO Customer not allowed
+      roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional] // TODO Customer not allowed
     }
   },
   {
     path: ':id/edit', component: ReservationComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.manager, Role.professional] // TODO Customer not allowed
+      roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional] // TODO Customer not allowed
     }
   },
   {
     path: ':id', component: ReservationDetailComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.manager, Role.professional, Role.customer]
+      roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional, Role.customer]
     }, runGuardsAndResolvers: 'always'
   },
   {
@@ -40,13 +40,13 @@ const routes: Routes = [
     component: ReservationCompleteComponent,
     canActivate: [AuthGuardService],
     data: {
-      roles: [Role.professional]
+      roles: [Role.professional, Role.roomAdmin]
     },
     runGuardsAndResolvers: 'always'
   },
   {
     path: ':id/more-info', component: MoreInfoComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.professional, Role.manager]
+      roles: [Role.professional, Role.manager, Role.roomAdmin]
     }, runGuardsAndResolvers: 'always'
   }];
 

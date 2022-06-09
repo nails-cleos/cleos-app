@@ -243,7 +243,7 @@
         </mat-list-item>
         <mat-list-item>
           <mat-icon mat-list-icon>person_pin</mat-icon>
-          <div mat-line>{{ 'ME.RESERVATION.ROOM.PROFESSIONAL.FIELD' | translate}}</div>
+          <div mat-line>{{ 'COMMON.PROFESSIONAL.FIELD' | translate}}</div>
           <div mat-line>{{room.value.professional | userName}}</div>
         </mat-list-item>
         <mat-list-item>
@@ -356,7 +356,7 @@
                 <mat-divider></mat-divider>
               </mat-list-item>
               <mat-list-item *ngIf="room.value && room.value.address && room.value.professional">
-                <div [innerHTML]="'ME.RESERVATION.ROOM.PROFESSIONAL.NAME' |
+                <div [innerHTML]="'ME.RESERVATION.COMMON.PROFESSIONAL.NAME' |
                   translate: {name: professionalName}" mat-line>
                 </div>
                 <div [innerHTML]="'ME.RESERVATION.ROOM.NAME.NAME' | translate: {name: roomDetail}" mat-line></div>
@@ -477,7 +477,7 @@
                   <mat-divider></mat-divider>
                 </mat-list-item>
                 <mat-list-item *ngIf="room.value && room.value.address && room.value.professional">
-                  <div [innerHTML]="'ME.RESERVATION.ROOM.PROFESSIONAL.NAME' |
+                  <div [innerHTML]="'ME.RESERVATION.COMMON.PROFESSIONAL.NAME' |
                   translate: {name: professionalName}" mat-line>
                   </div>
                   <div [innerHTML]="'ME.RESERVATION.ROOM.NAME.NAME' | translate: {name: roomDetail}" mat-line></div>

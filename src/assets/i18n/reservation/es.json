@@ -38,10 +38,10 @@
       "DETAIL": "Detalle",
       "NAME": {
         "FIELD": "Nombre"
-      },
-      "PROFESSIONAL": {
-        "FIELD": "Profesional"
       }
+    },
+    "PROFESSIONAL": {
+      "SELECT": "Select professional"
     },
     "PRODUCT": {
       "DETAIL": "Detalle",
@@ -93,7 +93,7 @@
         "CONTENT": "La nueva reserva se superpone con <div>{{data}}</div> ¿Está seguro de agregar la reserva?",
         "ERROR": "La nueva reserva se superpone con <div>{{data}}</div>"
       },
-      "DETAIL": "<div class='detail'><b>{{customerName}}</b></div><div class='detail'>{{productName}}</div>",
+      "DETAIL": "<div class='detail'><b>{{professionalName}}</b></div><div class='detail'>{{productName}}</div><div class='detail'>{{customerName}}</div>",
       "TITLE": "Agregar nueva reserva",
       "CONTENT": "¿Estás segura de añadir la reserva el {{date}}?",
       "CHANGE": {
@@ -105,7 +105,7 @@
         "LUNCH": "<b>Hora de almuerzo</b>",
         "OUT_OF_WORK": "<b>Fuera del trabajo</b>"
       },
-      "UNAVAILABLE": "<div class='detail'><b>No disponible</b></div><div class='detail'>{{description}}</div>"
+      "UNAVAILABLE": "<div class='detail'><b>{{professionalName}} no disponible</b></div><div class='detail'>{{description}}</div>"
     },
     "PAYMENT": {
       "TITLE": "Pagos",
@@ -147,14 +147,8 @@
     "STATE": {
       "FIELD": "Estado",
       "SEARCH": "Buscar por estados",
-      "APPROVE": "La reserva fue aprobada",
-      "START": "La reserva se inició",
-      "COMPLETE": "La reserva se completó",
       "CANCEL": "La reserva se canceló",
       "CHANGE_CUSTOMER": "Cliente actualizado"
-    },
-    "UNAVAILABLE": {
-      "TITLE": "Agregar no disponible"
     },
     "ADDITIONAL": {
       "DURATION": {

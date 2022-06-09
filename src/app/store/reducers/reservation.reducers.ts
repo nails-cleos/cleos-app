@@ -163,6 +163,18 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
+    case ReservationActionTypes.findRooms: {
+      return {
+        ...state,
+        rooms: null,
+        isLoading: true,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        selected: null,
+        message: null
+      };
+    }
     case ReservationActionTypes.getAdditional: {
       return {
         ...state,
@@ -309,7 +321,8 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null
+        message: null,
+        isLoading: false
       };
     }
     case ReservationActionTypes.reservationProductsSuccess: {

@@ -9,6 +9,8 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { fieldChange, valueChange } from '../../util/validators';
 import { findFlag, flags, IFlag } from '../../util/flags';
 import { createDateFromString } from '../../util/dates';
+import { Color } from '@angular-material-components/color-picker';
+import { lightenDarkenColor } from '../../util/color';
 
 @Component({
   selector: 'app-user-detail',
@@ -35,7 +37,10 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   lastName: FormControl = new FormControl();
   phone: FormControl = new FormControl();
   dob: FormControl = new FormControl();
+  darkColor: FormControl = new FormControl();
+  lightColor: FormControl = new FormControl();
 
+  showColors = false;
   flagList: IFlag[] = flags();
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
@@ -58,6 +63,16 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     user.phone = fieldChange(this.phone, this.user?.phone);
     user.dob = fieldChange(this.dob, this.user?.dob);
 
+    if (this.lightColor.value) {
+      const color = this.lightColor.value;
+      user.lightColor = `${color.r},${color.g},${color.b}`;
+    }
+
+    if (this.darkColor.value) {
+      const color = this.darkColor.value;
+      user.darkColor = `${color.r},${color.g},${color.b}`;
+    }
+
     return this.store.dispatch(new fromActionsUser.SaveUser({user}));
   }
 
@@ -75,6 +90,10 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
+  lightenDarkenColor(color: Color, isDark: boolean): string {
+    return lightenDarkenColor(`#${color.hex}`, isDark ? 50 : -50);
+  }
+
   private createForm(): void {
     this.form = this.formBuilder.group({
       username: this.username,
@@ -83,7 +102,9 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       firstName: this.firstName,
       lastName: this.lastName,
       phone: this.phone,
-      dob: this.dob
+      dob: this.dob,
+      darkColor: this.darkColor,
+      lightColor: this.lightColor
     });
   }
 
@@ -98,6 +119,18 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       if (state.selected) {
         this.user = state.selected;
         this.form.patchValue(state.selected);
+
+        const roles = ['ROLE_PROFESSIONAL', 'ROLE_MANAGER'];
+        this.showColors = state.selected.authorities?.some((au: any) => roles.includes(au.authority));
+
+        if (state.selected.lightColor) {
+          const rgb = state.selected.lightColor.split(',');
+          this.lightColor.setValue(new Color(Number(rgb[0]), Number(rgb[1]), Number(rgb[2])));
+        }
+        if (state.selected.darkColor) {
+          const rgb = state.selected.darkColor.split(',');
+          this.darkColor.setValue(new Color(Number(rgb[0]), Number(rgb[1]), Number(rgb[2])));
+        }
         if (state.selected.dob) {
           this.dob.setValue(createDateFromString(state.selected.dob));
         }

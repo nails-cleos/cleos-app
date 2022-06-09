@@ -15,7 +15,6 @@ import {
   greaterOrEqualsThanToday,
   IDuration,
   isSameTimeZone,
-  localeTimeZoneDate,
   newDate,
   newDateTimestamp,
   reservationDuration
@@ -27,7 +26,7 @@ import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Role } from '../../interfaces/token';
-import { getFullUserName, getPrice, getUserName, openDialog, snakeToCamel } from '../../util/helper';
+import { getFullUserName, getPrice, getUserName, isProfessional, openDialog, snakeToCamel } from '../../util/helper';
 import { IPrice, Price } from '../../interfaces/product';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatFabMenu, MatFabMenuDirection } from '@angular-material-extensions/fab-menu/lib/mat-fab-menu.component';
@@ -77,11 +76,11 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   private payments: any;
   private tooltipPosition = 'below';
   private machine: any;
-  private customerId: string | undefined;
-  private professionalId: string | undefined;
+  private customerId?: string;
+  private professionalId?: string;
   private isLoading = false;
   private getState: Observable<any>;
-  private subscription: Subscription | undefined;
+  private subscription?: Subscription;
   private small = false;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private route: ActivatedRoute,
@@ -138,8 +137,12 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     return {target, action};
   }
 
+  private static getDateTimeDetail(reservation: IReservationAll): Date {
+    return newDateTimestamp(reservation.timestamp);
+  }
+
   openHistoryDialog(history: IReservationAll): void {
-    this.openDialog(this.getDateTimeDetail(history));
+    this.openDialog(ReservationDetailComponent.getDateTimeDetail(history));
   }
 
   openDialog(reservationDate: Date): void {
@@ -182,14 +185,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  private getDateTimeDetail(reservation: IReservationAll): Date {
-    return newDateTimestamp(reservation.timestamp);
-  }
-
-  private getDateTime(reservationDate: Date, timeZone?: string): string {
-    return localeTimeZoneDate(this.language, reservationDate, timeZone);
-  }
-
   private createAction(tooltip: string, icon: string, id: string, color?: string): MatFabMenu {
     return {tooltip, tooltipPosition: this.tooltipPosition, icon, id, color} as MatFabMenu;
   }
@@ -206,9 +201,9 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
           this.start.getMinutes() + this.duration.minute);
         this.state = state.selected.state;
         this.reservation = state.selected;
-        if (this.professionalId && this.professionalId === this.reservation?.room.professional.id) {
+        if (this.professionalId && isProfessional(this.professionalId, this.reservation?.room?.professionals)) {
           this.professionalMachine(this);
-          this.changeState = this.machine.next(snakeToCamel(this.reservation.state));
+          this.changeState = this.machine.next(snakeToCamel(this.reservation?.state));
         } else if (this.customerId && this.customerId === this.reservation?.customer.id) {
           this.customerMachine(this);
           this.changeState = this.machine.next(snakeToCamel(this.reservation.state));
@@ -593,10 +588,6 @@ export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
     if (event.code === 'Backspace') {
       this.customer.setValue('');
     }
-  }
-
-  getUsername(user: any): string {
-    return getFullUserName(user);
   }
 
   private createForm(): void {

@@ -258,6 +258,14 @@
     background-color: mat.get-color-from-palette($background, disabled-button-toggle);
   }
 
+  .cal-custom-event:hover {
+    box-shadow: -10px 15px 25px 1px mat.get-color-from-palette($background, hoverable) !important;
+  }
+
+  .cal-custom-event:after {
+    background: mat.get-color-from-palette($background, hoverable);
+  }
+
   pre, .rejected, .dot {
     background-color: mat.get-color-from-palette($warn-palette) !important;
   }
@@ -280,6 +288,14 @@
 
   .green-text {
     color: mat.get-color-from-palette($background, success);
+  }
+
+  .red-text {
+    color: mat.get-color-from-palette($warn-palette);
+  }
+
+  .contrast-text {
+    color: mat.get-color-from-palette($foreground, contrast) !important;
   }
 
   .mini-dashboard-card {

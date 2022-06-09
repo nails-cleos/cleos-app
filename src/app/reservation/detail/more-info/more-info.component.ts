@@ -8,7 +8,7 @@ import { IReservationAll, ITracking } from '../../../interfaces/reservation';
 import * as fromActionsReservation from '../../../store/reservation.actions';
 import * as fromActionsPayment from '../../../store/payment.actions';
 import { TranslateService } from '@ngx-translate/core';
-import { getDiffTime, newDate } from '../../../util/dates';
+import { getDiffTime, newDate, newDateTimestamp } from '../../../util/dates';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { environment } from '../../../../environments/environment';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -84,8 +84,8 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
       this.payments = state.payments;
       this.tracking = state.tracking;
       this.reservation = state.selected;
-      if (this.tracking && this.tracking.startedTime && this.tracking.completedTime) {
-        this.totalTime = getDiffTime(newDate(this.tracking.startedTime), newDate(this.tracking.completedTime));
+      if (this.tracking && this.tracking.startedTimestamp && this.tracking.completedTimestamp) {
+        this.totalTime = getDiffTime(newDateTimestamp(this.tracking.startedTimestamp), newDateTimestamp(this.tracking.completedTimestamp));
       }
     });
     this.paymentSubscription = this.paymentGetState.subscribe(state => {

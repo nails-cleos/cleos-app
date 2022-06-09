@@ -1,8 +1,9 @@
 import { All, DashboardActionTypes } from '../dashboard.actions';
-import { IDashboard } from '../../interfaces/dashboard';
+import { IDashboard, IRoomEvents } from '../../interfaces/dashboard';
 
 export interface State {
   data: Map<string, IDashboard>;
+  dashboard: IRoomEvents | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -12,6 +13,7 @@ export interface State {
 
 const initialState: State = {
   data: new Map<string, IDashboard>(),
+  dashboard: null,
   errorMessage: null,
   error: null,
   subErrors: null,
@@ -60,7 +62,7 @@ const cleanCardMap = (data: Map<string, IDashboard>): Map<string, IDashboard> =>
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case DashboardActionTypes.dashboardEvents: {
+    case DashboardActionTypes.dashEvents: {
       return {
         ...state,
         data: cleanEventMap(state.data),
@@ -70,7 +72,18 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
-    case DashboardActionTypes.dashboardCards: {
+    case DashboardActionTypes.dashboardEvents: {
+      return {
+        ...state,
+        // @ts-ignore
+        dashboard: {availability: {}},
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: null
+      };
+    }
+    case DashboardActionTypes.dashCards: {
       return {
         ...state,
         data: cleanCardMap(state.data),
@@ -80,7 +93,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
-    case DashboardActionTypes.dashboardSuccess: {
+    case DashboardActionTypes.dashSuccess: {
       return {
         ...state,
         data: getMap(state.data, action.payload),
@@ -91,7 +104,18 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false
       };
     }
-    case DashboardActionTypes.dashboardFailure: {
+    case DashboardActionTypes.eventSuccess: {
+      return {
+        ...state,
+        dashboard: action.payload,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: null,
+        isLoading: false
+      };
+    }
+    case DashboardActionTypes.dashFailure: {
       return {
         ...state,
         errorMessage: action.payload.error.message,

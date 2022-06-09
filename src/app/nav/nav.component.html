@@ -1,8 +1,9 @@
 <mat-drawer-container [hasBackdrop]="(isHandset$ | async)" autosize>
   <mat-drawer #drawer [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
-              [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="(isHandset$ | async) === false"
+              [mode]="(isHandset$ | async) ? 'over' : 'side'"
+              [opened]="(isHandset$ | async) === false"
               class="sidenav">
-    <mat-card class="mat-elevation-z0">
+    <mat-card *ngIf="showInformation" class="mat-elevation-z0">
       <mat-card-header *ngIf="currentUser; else headerNoLogged">
         <div class="circle" mat-card-avatar>
           <img *ngIf="image; else showInitialsBlock" alt="profile" src="{{image}}">
@@ -10,7 +11,7 @@
             <div class="initials">{{ initials | uppercase }}</div>
           </ng-template>
         </div>
-        <mat-card-title>{{username | uppercase}}</mat-card-title>
+        <mat-card-title>{{currentUser | userName | uppercase}}</mat-card-title>
         <mat-card-subtitle>{{currentUser.email}}</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content *ngIf="currentUser; else contentNoLogged">
@@ -25,7 +26,7 @@
                     <mat-icon>{{menu.icon}}</mat-icon>&nbsp;{{menu.name}}
                   </mat-panel-title>
                 </mat-expansion-panel-header>
-                <app-menu-item [items]="menu.subMenus" [drawer]="drawer"></app-menu-item>
+                <app-menu-item [drawer]="drawer" [items]="menu.subMenus"></app-menu-item>
               </mat-expansion-panel>
             </div>
             <ng-template #items>
@@ -77,24 +78,25 @@
   </mat-drawer>
   <mat-drawer-content class="page-wrap">
     <mat-toolbar class="header" color="primary">
-      <button (click)="drawer.toggle()" *ngIf="isHandset$ | async"
+      <button (click)="drawer.toggle()" *ngIf="(isHandset$ | async) && showInformation"
               aria-label="Toggle sidenav" mat-icon-button type="button">
-        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+        <mat-icon *ngIf="showInformation" aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
       <img alt="logo" mat-card-avatar src="../../assets/icons/icon-512x512.png">
       <span>{{title}}</span>
       <span class="align-right"></span>
-      <div *ngIf="username; else login">
+      <div *ngIf="currentUser?.username; else login">
         <button *ngIf="isProfessional && workDay.length; else workDayIcon" [matMenuTriggerFor]="menuWorkDay"
                 class="badge-padding" mat-icon-button>
           <mat-icon [matBadgeHidden]="!workDay.length" [matBadge]="workDay.length" matBadgeColor="warn">
             work
           </mat-icon>
         </button>
-        <button *ngIf="notifications.length; else notificationIcon" [matMenuTriggerFor]="menuNotification"
-                class="badge-padding" mat-icon-button>
+        <button *ngIf="notifications.length && showInformation; else notificationIcon"
+                [matMenuTriggerFor]="menuNotification" class="badge-padding" mat-icon-button>
           <mat-icon [matBadgeHidden]="!countNotifications"
-                    [matBadge]="plusNotification ? plusNotification : countNotifications" matBadgeColor="warn">
+                    [matBadge]="plusNotification ? plusNotification : countNotifications"
+                    matBadgeColor="warn">
             notifications
           </mat-icon>
         </button>
@@ -115,7 +117,8 @@
           </mat-list>
         </mat-menu>
         <ng-template #notificationIcon>
-          <button [matMenuTriggerFor]="menuNoNotification" class="badge-padding" mat-icon-button>
+          <button *ngIf="showInformation" [matMenuTriggerFor]="menuNoNotification" class="badge-padding"
+                  mat-icon-button>
             <mat-icon>notifications</mat-icon>
           </button>
           <mat-menu #menuNoNotification="matMenu" xPosition="before">

@@ -10,6 +10,8 @@ import { Location } from '@angular/common';
 import { findFlag, flags, IFlag } from '../../util/flags';
 import { getUserImage, getUserNameInitials } from '../../util/helper';
 import { createDateFromString } from '../../util/dates';
+import { Color } from '@angular-material-components/color-picker';
+import { lightenDarkenColor } from '../../util/color';
 
 @Component({
   selector: 'app-profile',
@@ -38,6 +40,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
   lastName: FormControl = new FormControl();
   phone: FormControl = new FormControl();
   dob: FormControl = new FormControl();
+  darkColor: FormControl = new FormControl();
+  lightColor: FormControl = new FormControl();
+
+  showColors = false;
 
   flagList: IFlag[] = flags();
 
@@ -57,6 +63,16 @@ export class ProfileComponent implements OnInit, OnDestroy {
     user.lastName = fieldChange(this.lastName, this.user?.lastName);
     user.phone = fieldChange(this.phone, this.user?.phone);
     user.dob = fieldChange(this.dob, this.user?.dob);
+
+    if (this.lightColor.value) {
+      const color = this.lightColor.value;
+      user.lightColor = `${color.r},${color.g},${color.b}`;
+    }
+
+    if (this.darkColor.value) {
+      const color = this.darkColor.value;
+      user.darkColor = `${color.r},${color.g},${color.b}`;
+    }
 
     return this.store.dispatch(
       new fromActionsUser.UpdateUser({user, redirectUrl: 'auth/profile'})
@@ -88,6 +104,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
   }
 
+  lightenDarkenColor(color: Color, isDark: boolean): string {
+    return lightenDarkenColor(`#${color.hex}`, isDark ? 50 : -50);
+  }
+
   private findMe(): void {
     this.store.dispatch(
       new fromActionsUser.FindMe()
@@ -101,7 +121,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
       firstName: this.firstName,
       lastName: this.lastName,
       phone: this.phone,
-      dob: this.dob
+      dob: this.dob,
+      darkColor: this.darkColor,
+      lightColor: this.lightColor
     });
   }
 
@@ -120,6 +142,18 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.initials = getUserNameInitials(user);
         this.image = getUserImage(user);
         this.form.patchValue(state.selected);
+
+        const roles = ['ROLE_PROFESSIONAL', 'ROLE_MANAGER'];
+        this.showColors = state.selected.authorities?.some((au: any) => roles.includes(au.authority));
+
+        if (state.selected.lightColor) {
+          const rgb = state.selected.lightColor.split(',');
+          this.lightColor.setValue(new Color(Number(rgb[0]), Number(rgb[1]), Number(rgb[2])));
+        }
+        if (state.selected.darkColor) {
+          const rgb = state.selected.darkColor.split(',');
+          this.darkColor.setValue(new Color(Number(rgb[0]), Number(rgb[1]), Number(rgb[2])));
+        }
         if (state.selected.dob) {
           this.dob.setValue(createDateFromString(state.selected.dob));
         }

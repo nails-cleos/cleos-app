@@ -6,8 +6,8 @@ import { IOffice } from './office';
 
 export interface IRoom {
   id?: string;
-  professionalId?: string;
-  professional?: IUser;
+  professionalIds?: string[];
+  professionals?: IUser[];
   currencyId?: string;
   currency?: ICurrency;
   officeId?: string;
@@ -53,7 +53,8 @@ export enum ServiceType {
 
 export interface IRoomAll {
   id: string;
-  professional: IUser;
+  professionalIds?: string[];
+  professionals?: IUser[];
   availabilities: IAvailability[];
   address: IAddress;
   currency: ICurrencyAll;
