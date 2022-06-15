@@ -62,23 +62,26 @@
                   <span fxHide.lt-sm fxShow>{{ 'ROOM.OFFICE.ADD_BUTTON' | translate }}</span>
                 </button>
               </div>
-              <div *ngIf="professionals; else skeleton" fxLayout="row" fxLayoutAlign="space-between center">
-                <mat-form-field appearance="fill">
-                  <mat-label>{{ 'ROOM.PROFESSIONAL.FIELD' | translate }}</mat-label>
-                  <label>
-                    <input (keydown)="keyDownHandler($event, professional)" [formControl]="professional"
-                           [matAutocomplete]="auto" matInput required type="text">
-                  </label>
-                  <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
-                    <mat-option *ngFor="let professional of filteredOptions | async" [value]="professional">
+              <div *ngIf="allProfessional; else skeleton" fxLayout="row" fxLayoutAlign="space-between center">
+                <mat-form-field class="chip-list">
+                  <mat-label>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</mat-label>
+                  <mat-chip-list #chipList aria-label="Professional selection">
+                    <mat-chip (removed)="remove(professional)" *ngFor="let professional of professionals" [removable]="true" [selectable]="true">
+                      {{professional | userName}}
+                      <mat-icon matChipRemove>cancel</mat-icon>
+                    </mat-chip>
+                    <input #professionalInput [formControl]="professional" [matAutocomplete]="auto" [matChipInputFor]="chipList">
+                  </mat-chip-list>
+                  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+                    <mat-option *ngFor="let professional of sortProfessionals(filteredProfessionals | async)" [value]="professional">
                       {{professional | userName}}
                     </mat-option>
                   </mat-autocomplete>
                   <mat-error *ngIf="professional.hasError('required')"
-                             [innerHTML]="'ROOM.PROFESSIONAL.REQUIRED' | translate">
+                             [innerHTML]="'COMMON.PROFESSIONAL.REQUIRED' | translate">
                   </mat-error>
                   <mat-error *ngIf="professional.hasError('requireMatch')"
-                             [innerHTML]="'ROOM.PROFESSIONAL.INVALID' | translate">
+                             [innerHTML]="'COMMON.PROFESSIONAL.INVALID' | translate">
                   </mat-error>
                   <mat-error *ngIf="errors['professional']">
                     {{errors['professional']}}
@@ -86,7 +89,7 @@
                 </mat-form-field>
                 <button (click)="addProfessional" color="accent" mat-raised-button>
                   <mat-icon matPrefix>person_add_alt_1</mat-icon>
-                  <span fxHide.lt-sm fxShow>{{ 'ROOM.PROFESSIONAL.ADD_BUTTON' | translate }}</span>
+                  <span fxHide.lt-sm fxShow>{{ 'COMMON.PROFESSIONAL.ADD_BUTTON' | translate }}</span>
                 </button>
               </div>
               <mat-form-field appearance="fill">

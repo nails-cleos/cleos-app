@@ -31,6 +31,7 @@
       "PAYPAL": "PayPal payment",
       "NOTIFY": "Notify",
       "SELECT": "Select",
+      "UNAVAILABLE": "Add unavailable",
       "EXPAND": {
         "TRUE": "Click to show less",
         "FALSE": "Click to show more"
@@ -222,6 +223,11 @@
       },
       "UPDATED": {
         "MESSAGE": "Reservation {{date}} updated"
+      },
+      "STATE": {
+        "APPROVE": "Reservation approved",
+        "START": "Reservation started",
+        "COMPLETE": "Reservation completed"
       }
     },
     "TIME_ZONE": {
@@ -233,6 +239,23 @@
       "DATE": {
         "LOCAL": "Your time <b>{{date}}</b>",
         "ROOM": "Room time <b>{{date}}</b>"
+      }
+    },
+    "PROFESSIONAL": {
+      "FIELD": "Professional",
+      "REQUIRED": "Professional is <b>required</b>",
+      "INVALID": "Professional is invalid",
+      "ADD_BUTTON": "Add professional",
+      "COLOR": {
+        "RESERVATION": "10:00 - 12:00 Customer",
+        "DARK": {
+          "FIELD": "Dark mode",
+          "RESERVATION": "This is how reservations will look in dark mode"
+        },
+        "LIGHT": {
+          "FIELD": "Light mode",
+          "RESERVATION": "This is how reservations will look in light mode"
+        }
       }
     }
   },

@@ -25,6 +25,7 @@ import { detailExpandAnimation } from '../../../util/animation';
 })
 export class ReservationTableComponent implements AfterViewInit, OnInit, OnChanges, OnDestroy {
   @Input() roomId: any;
+  @Input() professionalId: any;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -118,6 +119,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
   private getReservations(page: number = 0): void {
     const payload = {
       roomId: this.roomId,
+      professionalId: this.professionalId,
       active: this.sort.active,
       direction: this.sort.direction,
       size: this.pageSize,

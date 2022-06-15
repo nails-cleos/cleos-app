@@ -38,6 +38,10 @@ import { DurationTimePipe } from '../pipes/durationTime.pipe';
 import { RoomNamePipe } from '../pipes/room-name.pipe';
 import { CurrencySymbolPipe } from '../pipes/currency-symbol.pipe';
 import { ReservationIconPipe } from '../pipes/reservation-icon.pipe';
+import { ConvertHMPipe } from '../pipes/conver-hm.pipe';
+import { CounterComponent } from '../util/counter/counter.component';
+import { CalendarDialogComponent } from './calendar-dialog/calendar-dialog.component';
+import { MatRadioModule } from '@angular/material/radio';
 
 @NgModule({
   imports: [
@@ -68,7 +72,8 @@ import { ReservationIconPipe } from '../pipes/reservation-icon.pipe';
     ChartsModule,
     FlexLayoutModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    MatRadioModule
   ],
   exports: [
     AppMaterialModule,
@@ -88,6 +93,7 @@ import { ReservationIconPipe } from '../pipes/reservation-icon.pipe';
     RoomNamePipe,
     CurrencySymbolPipe,
     ReservationIconPipe,
+    ConvertHMPipe,
     ErrorComponent,
     GoogleMapComponent,
     DialogComponent,
@@ -95,7 +101,9 @@ import { ReservationIconPipe } from '../pipes/reservation-icon.pipe';
     CardChartComponent,
     CardComponent,
     ChartComponent,
-    TimeZoneSnackBarComponent
+    TimeZoneSnackBarComponent,
+    CounterComponent,
+    CalendarDialogComponent
   ],
   declarations: [
     BackButtonDirective,
@@ -106,6 +114,7 @@ import { ReservationIconPipe } from '../pipes/reservation-icon.pipe';
     RoomNamePipe,
     CurrencySymbolPipe,
     ReservationIconPipe,
+    ConvertHMPipe,
     ErrorComponent,
     GoogleMapComponent,
     DialogComponent,
@@ -113,7 +122,9 @@ import { ReservationIconPipe } from '../pipes/reservation-icon.pipe';
     CardChartComponent,
     CardComponent,
     ChartComponent,
-    TimeZoneSnackBarComponent
+    TimeZoneSnackBarComponent,
+    CounterComponent,
+    CalendarDialogComponent
   ],
   providers: [
     httpInterceptorProviders,

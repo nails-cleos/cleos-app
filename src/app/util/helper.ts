@@ -1,5 +1,5 @@
 import { DiscountType, IDiscount } from '../interfaces/discount';
-import { IUser, IUserAll } from '../interfaces/user';
+import { IAuthority, IUser, IUserAll } from '../interfaces/user';
 import { GroupService, IGroupService, IPrice, IProductAll, IProductGroup, Price } from '../interfaces/product';
 import { IPayment } from '../interfaces/payment';
 import { IReservationAll } from '../interfaces/reservation';
@@ -13,6 +13,11 @@ import { getTime, getTimeZone, localeTimeZoneDate } from './dates';
 import { DialogComponent } from '../shared/dialog/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { isSameDay } from 'date-fns';
+import { Role } from '../interfaces/token';
+import { ColorEvent } from '../interfaces/dashboard';
+
+export const isRoomAdmin = (authorities?: IAuthority[]): boolean => !!authorities && authorities.length === 1 &&
+  authorities.some(u => (u.authority === Role.roomAdmin));
 
 export const snakeToCamel = (value: string = ''): string =>
   value.toLowerCase().replace(/([-_]\w)/g, (g: string) => g[1].toUpperCase());
@@ -316,6 +321,9 @@ export const createDialog = (key: string, value: string, locale: string, transla
     data: {title, content, hideNoButton: true, hideOkButton: true}
   });
 };
+
+export const isProfessional = (id: string, professionals?: IUser[]): boolean =>
+  professionals ? professionals?.some(professional => professional.id === id) : false;
 
 const totalPaid = (payments: IPayment[] | undefined): number => {
   let total = 0;

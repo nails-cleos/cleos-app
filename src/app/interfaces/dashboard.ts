@@ -2,11 +2,15 @@ import { ThemePalette } from '@angular/material/core';
 import { ChartDataSets, ChartType } from 'chart.js';
 import { Label } from 'ng2-charts';
 import { SingleDataSet } from 'ng2-charts/lib/base-chart.directive';
+import { EventColor } from 'calendar-utils';
+import { IAvailability } from './room';
 
 export interface IDashboard {
   timeZone?: string;
   roomName?: string;
   roomId?: string;
+  professionalName?: string;
+  professionalId?: string;
   calendarSummary?: ICalendarSummary;
   miniCardSummaries?: IReservationSummary[];
   chartSummaries?: IChart[];
@@ -34,14 +38,16 @@ export interface ICardSummary {
 }
 
 export interface ICalendarSummary {
-  reservations: ICalendarReservations;
-  unavailable: ICalendarUnavailable;
+  reservations: ICalendarReservations[];
+  unavailable: ICalendarUnavailable[];
 }
 
 export interface ICalendarReservations {
   reservationId: string;
+  customerId: string;
   title: string;
   start: number;
+  started: number;
   end: number;
   state: string;
 }
@@ -65,4 +71,33 @@ export interface IChart {
   label?: string;
   options?: string;
   colors?: string;
+}
+
+export interface IRoomEvents {
+  availability: IAvailability;
+  timeZone: string;
+  roomId: string;
+  roomName: string;
+  professionals: IProfessionalEvent[];
+  error?: any;
+}
+
+export interface IProfessionalEvent {
+  id: string;
+  name: string;
+  imageUrl?: string;
+  image?: any;
+  lightColor?: string;
+  darkColor?: string;
+  calendarSummary: ICalendarSummary;
+}
+
+export class ColorEvent implements EventColor {
+  primary: string;
+  secondary: string;
+
+  constructor(primary: string, secondary: string) {
+    this.primary = primary;
+    this.secondary = secondary;
+  }
 }

@@ -83,7 +83,7 @@
       </table>
       <div *ngIf="upcoming.state === 'CREATED'" class="red-text">{{ 'ME.RESERVATION.UPCOMING.CREATED' | translate }}
         <span class="bold">
-          {{upcoming?.room?.professional | userName}}
+          {{upcoming?.professional | userName}}
         </span>
       </div>
       <div *ngIf="upcoming.state === 'APPROVED'" class="red-text">

@@ -24,6 +24,20 @@
     "CARD": {
       "RESERVATION": "Reservas",
       "EXPAND": "Expandir"
+    },
+    "ROOM": {
+      "NO_OPEN": "La sala no abre el {{date}}",
+      "VIEW": "Ver",
+      "MORE_INFO": "Más",
+      "APPROVE": "Aprobar",
+      "START": "Iniciar",
+      "COMPLETE": "Completar",
+      "OPEN_IN": "Abre en",
+      "CLOSE_IN": "Cierra en",
+      "CLOSED": "Cerrado",
+      "STARTED": "<div>Iniciado {startText}</div>",
+      "ELAPSED": "<div>Transcurrido {elapsedText}</div>",
+      "FINISH_IN": "<div>Finaliza en {finishText}</div>"
     }
   }
 }

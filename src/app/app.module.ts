@@ -30,6 +30,7 @@ import localeEn from '@angular/common/locales/en';
 import localeEs from '@angular/common/locales/es';
 import { CookieService } from 'ngx-cookie-service';
 import { TranslateLoaderFactory } from './shared/translate-loader.factory';
+import { MAT_COLOR_FORMATS, NGX_MAT_COLOR_FORMATS, NgxMatColorPickerModule } from '@angular-material-components/color-picker';
 
 // Services
 import { AuthGuardService } from './services/auth-guard.service';
@@ -95,7 +96,8 @@ registerLocaleData(localeEs, 'es');
     }),
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireMessagingModule,
-    AngularFireAnalyticsModule
+    AngularFireAnalyticsModule,
+    NgxMatColorPickerModule
   ],
   providers: [
     {
@@ -114,7 +116,11 @@ registerLocaleData(localeEs, 'es');
     MessagingService,
     AsyncPipe,
     PromptUpdateService,
-    CookieService
+    CookieService,
+    {
+      provide: MAT_COLOR_FORMATS,
+      useValue: NGX_MAT_COLOR_FORMATS
+    }
   ],
   bootstrap: [AppComponent],
   exports: [TranslateModule]

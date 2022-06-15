@@ -16,6 +16,7 @@ import { UserService } from '../services/user.service';
 import { AddServiceComponent, PriceDialogComponent } from './me/add-service/add-service.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { MatChipsModule } from '@angular/material/chips';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
       extend: true
     }),
     EffectsModule.forFeature([RoomEffects]),
-    DragDropModule
+    DragDropModule,
+    MatChipsModule
   ],
   providers: [
     RoomService,

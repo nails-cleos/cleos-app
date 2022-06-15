@@ -59,6 +59,7 @@ import { IOffice } from '../../../interfaces/office';
 import { IStep, Step } from '../../../interfaces/step';
 import { TimeZoneSnackBarComponent } from '../../../shared/snak/time-zone/time-zone-snack-bar.component';
 import { MatDialog } from '@angular/material/dialog';
+import { Role } from '../../../interfaces/token';
 
 @Component({
   selector: 'app-me-reservation',
@@ -265,18 +266,19 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     }
     reservation.additionalIds = this.additionalSelected?.map(value => value.id);
 
+    const role = Role.customer;
     if (this.isEditing && this.reservation) {
       reservation.id = this.reservation.id;
       reservation.productId = valueChange(this.product.value.id, this.reservation.product.id);
 
       this.store.dispatch(
-        new fromActionsReservation.Edit({reservation, isCustomer: true})
+        new fromActionsReservation.Edit({reservation, role})
       );
     } else {
       reservation.productId = this.product.value.id;
       reservation.discountId = this.discount.value;
       this.store.dispatch(
-        new fromActionsReservation.ReservationSave({reservation, isCustomer: true})
+        new fromActionsReservation.ReservationSave({reservation, role})
       );
     }
 
@@ -436,7 +438,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private getRoomList(): void {
     this.store.dispatch(
-      new fromActionsReservation.GetAllRooms()
+      new fromActionsReservation.GetAllRooms({})
     );
   }
 

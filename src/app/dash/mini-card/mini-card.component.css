@@ -21,7 +21,6 @@
 
 .card-icon {
   margin-right: 0 !important;
-  vertical-align: middle;
   transform: scale(2.2);
 }
 
@@ -48,5 +47,4 @@
 
 .trending {
   margin-right: 0 !important;
-  vertical-align: middle;
 }

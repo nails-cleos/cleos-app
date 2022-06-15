@@ -27,19 +27,40 @@
                 </label>
               </mat-form-field>
               <mat-form-field appearance="fill">
-                <mat-label>{{ 'ROOM.PROFESSIONAL.FIELD' | translate }}</mat-label>
-                <mat-icon matPrefix>group</mat-icon>
-                <label>
-                  <input [value]="professionalName" disabled matInput type="text">
-                </label>
-              </mat-form-field>
-              <mat-form-field appearance="fill">
                 <mat-label>{{ 'ROOM.TIME_ZONE.FIELD' | translate }}</mat-label>
                 <mat-icon matPrefix>public</mat-icon>
                 <label>
                   <input [value]="room.timeZone" disabled matInput type="text">
                 </label>
               </mat-form-field>
+              <div *ngIf="allProfessional; else skeleton" fxLayout="row" fxLayoutAlign="space-between center"
+                   id="professionals">
+                <div class="chip-list" fxLayout="column" fxLayoutAlign="space-around stretch">
+                  <mat-form-field>
+                    <mat-label>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</mat-label>
+                    <mat-chip-list #chipList aria-label="Professional selection" required>
+                      <mat-chip (removed)="remove(professional)" *ngFor="let professional of professionals"
+                                [removable]="true" [selectable]="true">
+                        {{professional | userName}}
+                        <mat-icon matChipRemove>cancel</mat-icon>
+                      </mat-chip>
+                      <input #professionalInput [formControl]="professional" [matAutocomplete]="auto"
+                             [matChipInputFor]="chipList">
+                    </mat-chip-list>
+                    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+                      <mat-option *ngFor="let professional of sortProfessionals(filteredProfessionals | async)"
+                                  [value]="professional">
+                        {{professional | userName}}
+                      </mat-option>
+                    </mat-autocomplete>
+                  </mat-form-field>
+                  <mat-error *ngIf="errors['professionals']" [innerHTML]="'COMMON.PROFESSIONAL.REQUIRED' | translate">
+                  </mat-error>
+                </div>
+                <button (click)="addProfessional" color="accent" mat-raised-button>
+                  <mat-icon matPrefix>person_add_alt_1</mat-icon>
+                </button>
+              </div>
               <mat-list>
                 <mat-list-item>
                   <div mat-subheader>{{ 'ROOM.PAYMENT_OPTION' | translate }}</div>

@@ -21,6 +21,8 @@ export interface IReservation {
   product?: IProduct;
   roomId?: string;
   room?: IRoom;
+  professionalId?: string;
+  professional?: IUser;
   start?: string;
   timestamp?: number;
   timeZone?: string;
@@ -35,6 +37,7 @@ export interface IReservationAll {
   customer: IUserAll;
   product: IProductAll;
   room: IRoomAll;
+  professional: IUserAll;
   start: Date;
   timestamp: number;
   state: string;
@@ -111,13 +114,13 @@ export interface IReservationOverview {
 
 export interface ITracking {
   reservation: IReservationAll;
-  createdTime?: string;
-  editedTime?: string;
-  approvedTime?: string;
-  paidTime?: string;
-  startedTime?: string;
-  completedTime?: string;
-  cancelledTime?: string;
+  createdTimestamp?: number;
+  editedTimestamp?: number;
+  approvedTimestamp?: number;
+  paidTimestamp?: number;
+  startedTimestamp?: number;
+  completedTimestamp?: number;
+  cancelledTimestamp?: number;
 }
 
 export interface ICustomerLastReservation {
@@ -139,9 +142,9 @@ export class Day implements IDay {
   excludeDays: number[];
 
   constructor(startDate: Date = createNewDate(getNow(), 9), endDate: Date = createNewDate(getNow(), 18),
-              today: Date = getNow(), excludeDays: number[] = []) {
-    const startView = addHours(startDate, -1);
-    const endView = addHours(endDate, 1);
+              today: Date = getNow(), excludeDays: number[] = [], plusHour: number = 0) {
+    const startView = addHours(startDate, -plusHour);
+    const endView = addHours(endDate, plusHour);
     this.dayStartHour = startView.getHours();
     this.dayStartMinute = startView.getMinutes();
     this.dayEndHour = endView.getHours();

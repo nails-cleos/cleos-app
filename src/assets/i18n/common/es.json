@@ -31,6 +31,7 @@
       "PAYPAL": "Pagar con PayPal",
       "NOTIFY": "Notificar",
       "SELECT": "Seleccionar",
+      "UNAVAILABLE": "Agregar no disponible",
       "EXPAND": {
         "TRUE": "Presiona para mostrar menos",
         "FALSE": "Presiona para mostrar más"
@@ -222,6 +223,11 @@
       },
       "UPDATED": {
         "MESSAGE": "Reserva {{date}} actualizada"
+      },
+      "STATE": {
+        "APPROVE": "La reserva fue aprobada",
+        "START": "La reserva se inició",
+        "COMPLETE": "La reserva se completó"
       }
     },
     "TIME_ZONE": {
@@ -233,6 +239,23 @@
       "DATE": {
         "LOCAL": "Tu hora <b>{{date}}</b>",
         "ROOM": "Hora en la sala <b>{{date}}</b>"
+      }
+    },
+    "PROFESSIONAL": {
+      "FIELD": "Profesional",
+      "REQUIRED": "Profesional es <b>requerido</b>",
+      "INVALID": "Profesional no valido",
+      "ADD_BUTTON": "Agregar profesional",
+      "COLOR": {
+        "RESERVATION": "10:00 - 12:00 Cliente",
+        "DARK": {
+          "FIELD": "Color oscuro",
+          "RESERVATION": "Así se van a ver las reservas en modo oscuro"
+        },
+        "LIGHT": {
+          "FIELD": "Color claro",
+          "RESERVATION": "Así se van a ver las reservas en modo claro"
+        }
       }
     }
   },
