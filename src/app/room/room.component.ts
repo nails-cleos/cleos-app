@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
@@ -9,7 +9,7 @@ import { IUser, IUserAll } from '../interfaces/user';
 import { map, startWith } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { requireMatch } from '../util/validators';
-import { getUserName } from '../util/helper';
+import { getFullUserName } from '../util/helper';
 import { Router } from '@angular/router';
 import { Role } from '../interfaces/token';
 import { RoomIconName } from '../util/icon';
@@ -19,6 +19,7 @@ import { MatListOption } from '@angular/material/list';
 import { IPaymentType, paymentOptions } from '../interfaces/payment';
 import timezones from 'timezones-list';
 import { getCurrentTimeZone } from '../util/dates';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 
 export interface IIcon {
   week: RoomIconName;
@@ -32,6 +33,8 @@ export interface IIcon {
   styleUrls: ['./room.component.scss']
 })
 export class RoomComponent implements OnInit, OnDestroy {
+  @ViewChild('professionalInput') professionalInput!: ElementRef<HTMLInputElement>;
+
   form!: FormGroup;
   room: IRoom = new Room();
   errors: any = [];
@@ -43,12 +46,10 @@ export class RoomComponent implements OnInit, OnDestroy {
     sunday: RoomIconName.calendarToday
   };
 
-  professionals?: IUserAll[];
-  filteredOptions?: Observable<IUser[] | undefined>;
-
-  professional: FormControl = new FormControl('', [
-    Validators.required, requireMatch
-  ]);
+  professional = new FormControl();
+  filteredProfessionals?: Observable<IUser[] | undefined>;
+  professionals: IUserAll[] = [];
+  allProfessional?: IUserAll[];
 
   address: FormControl = new FormControl('', [
     Validators.required
@@ -94,7 +95,7 @@ export class RoomComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.room.professionalId = this.professional.value.id;
+    this.room.professionalIds = this.professionals.map(({id}) => id);
     this.room.officeId = this.office.value.id;
     this.room.currencyId = this.currency.value.id;
     this.room.timeZone = this.timeZone.value.tzCode;
@@ -142,10 +143,6 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   setStep(index: number): void {
     this.step = index;
-  }
-
-  displayFn(user: IUser): string {
-    return user ? getUserName(user) : '';
   }
 
   displayCurrencyFn(currency: ICurrencyAll): string {
@@ -197,6 +194,31 @@ export class RoomComponent implements OnInit, OnDestroy {
     return it.checked || this.paymentTypes.includes(it.name);
   }
 
+  remove(professional: IUserAll): void {
+    const index = this.professionals.indexOf(professional);
+    if (index >= 0) {
+      this.professionals.splice(index, 1);
+      this.allProfessional?.push(professional);
+      this.professional.setValue(null);
+    }
+  }
+
+  selected(event: MatAutocompleteSelectedEvent): void {
+    const professional = event.option.value;
+    this.professionals.push(professional);
+    this.allProfessional = this.allProfessional?.filter(c => c.id !== professional.id);
+    this.professionalInput.nativeElement.value = '';
+    this.professional.setValue(null);
+  }
+
+  sortProfessionals(data: any): IUser[] {
+    return data.sort((a: any, b: any) => {
+      const aName = getFullUserName(a).toUpperCase();
+      const bName = getFullUserName(b).toUpperCase();
+      return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
+    });
+  }
+
   private createForm(): void {
     this.form = this.formBuilder.group({
       professional: this.professional,
@@ -208,10 +230,10 @@ export class RoomComponent implements OnInit, OnDestroy {
     });
     const currentTimeZone = getCurrentTimeZone().toLowerCase();
     this.timeZone.setValue(this.timeZoneList.find(timeZone => timeZone.label.toLowerCase().indexOf(currentTimeZone) === 0));
-    this.filteredOptions = this.professional.valueChanges.pipe(
+    this.filteredProfessionals = this.professional.valueChanges.pipe(
       startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filter(name) : this.professionals ? this.professionals.slice() : this.professionals)
+      map(value => typeof value === 'string' ? value : value ? value.name : ''),
+      map(name => name ? this.filter(name) : (this.allProfessional ? this.allProfessional.slice() : this.allProfessional))
     );
     this.filteredCurrencyOptions = this.currency.valueChanges.pipe(
       startWith(''),
@@ -238,7 +260,7 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      this.professionals = state.professionals;
+      this.allProfessional = state.professionals;
       this.currencies = state.currencies;
       this.offices = state.offices;
       if (state.subErrors) {
@@ -304,10 +326,10 @@ export class RoomComponent implements OnInit, OnDestroy {
     return false;
   }
 
-  private filter(name: string): IUser[] | undefined {
+  private filter(name: string): IUserAll[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.professionals?.filter(option => getUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
+    return this.allProfessional?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
   }
 
   private filterCurrency(name: string): ICurrency[] | undefined {

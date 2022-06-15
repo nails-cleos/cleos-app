@@ -25,7 +25,7 @@
       <th *matHeaderCellDef fxHide.lt-sm fxShow
           mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</th>
       <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
-        <div *ngIf="reservation.id; else skeleton">{{reservation?.room?.professional | userName}}</div>
+        <div *ngIf="reservation.id; else skeleton">{{reservation?.professional | userName}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
@@ -37,7 +37,7 @@
           mat-sort-header>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</th>
       <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="reservation.id; else skeleton">
-          {{reservation | timeDetail | date:'short':reservation.room.timeZone:locale}}
+          {{reservation.timestamp | timeDetail | date:'short':reservation.room.timeZone:locale}}
           <button (click)="openDialog(reservation)" *ngIf="showTimeZone(reservation)" mat-icon-button type="button">
             <mat-icon>info_outline</mat-icon>
           </button>
@@ -103,7 +103,7 @@
             <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</div>
             <mat-list-item role="list">
               <div mat-line>
-                {{reservation | timeDetail | date:'short':reservation.room.timeZone:locale}}
+                {{reservation.timestamp | timeDetail | date:'short':reservation.room.timeZone:locale}}
                 <button (click)="openDialog(reservation)" *ngIf="showTimeZone(reservation)" mat-icon-button
                         type="button">
                   <mat-icon>info_outline</mat-icon>

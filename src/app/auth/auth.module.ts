@@ -23,24 +23,8 @@ import { AuthService } from '../services/auth.service';
 import { UserEffects } from '../store/effects/user.effects';
 import { UserService } from '../services/user.service';
 import { TokenService } from '../services/token.service';
-import { Observable, concat, from } from 'rxjs';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
-
-export class LazyTranslateLoader2 implements TranslateLoader {
-  getTranslation(lang: string): Observable<any> {
-    const match = lang.match(/([-_])/);
-    const currentLang = !match ? lang : lang.substr(0, match.index);
-
-    const c = concat(
-      import(`../../assets/i18n/${currentLang}.json`));
-    const d = concat(
-      import(`../../assets/i18n/auth/${currentLang}.json`));
-
-    // return forkJoin(a, b);
-    return from(import(`../../assets/i18n/auth/${currentLang}.json`));
-    // return merge(import(`../../assets/i18n/auth/${url}.json`), import(`../../assets/i18n/${url}.json`));
-  }
-}
+import { NgxMatColorPickerModule } from '@angular-material-components/color-picker';
 
 
 @NgModule({
@@ -70,7 +54,8 @@ export class LazyTranslateLoader2 implements TranslateLoader {
       isolate: false,
       extend: true
     }),
-    EffectsModule.forFeature([LoginEffects, UserEffects])
+    EffectsModule.forFeature([LoginEffects, UserEffects]),
+    NgxMatColorPickerModule
   ],
   providers: [
     AuthService,

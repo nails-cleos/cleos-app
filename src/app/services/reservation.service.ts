@@ -9,12 +9,13 @@ import { IReview } from '../interfaces/review';
 export class ReservationService {
 
   url = 'reservations';
-  urlV1 = 'v1/reservations';
+  urlV1 = `v1/${this.url}`;
 
   constructor(private http: HttpClient) {
   }
 
-  public getAllPage(roomId: string, sort: string, direction: string, page: number, size: number = PAGE_SIZE): Observable<IReservation[]> {
+  public getAllPage(page: number, roomId?: string, professionalId?: string, sort?: string, direction?: string,
+                    size: number = PAGE_SIZE): Observable<IReservation[]> {
     let params = new HttpParams().set('page', String(page)).set('size', String(size));
     if (sort) {
       params = params.append('sort', sort);
@@ -23,7 +24,11 @@ export class ReservationService {
       params = params.append('direction', direction);
     }
 
-    return this.http.get<IReservation[]>(`${this.urlV1}/rooms/${roomId}/pages`, {params});
+    if (roomId) {
+      return this.http.get<IReservation[]>(`${this.urlV1}/rooms/${roomId}/pages`, {params});
+    }
+
+    return this.http.get<IReservation[]>(`${this.urlV1}/professionals/${professionalId}/pages`, {params});
   }
 
   public getCustomerReservations(sort: string, direction: string, page: number,
@@ -60,15 +65,21 @@ export class ReservationService {
     return this.http.get<IReservation[]>(`${this.url}/filter`, {params});
   }
 
-  public getAllGroupingByRoom(days: number, date: Date): Observable<IReservation[]> {
-    let params = new HttpParams().set('date', date.toISOString().slice(0, 10));
-    params = params.append('days', days);
-    return this.http.get<any>(`${this.urlV1}/rooms`, {params});
+  public getAllGroupingByRoom(days: number, date: Date, roomId: string, professionalId?: string): Observable<IReservation> {
+    let params = new HttpParams().set('date', date.toISOString().slice(0, 10))
+      .append('days', days);
+    if (professionalId) {
+      params = params.append('professionalId', professionalId);
+    }
+    return this.http.get<any>(`${this.urlV1}/rooms/${roomId}`, {params});
   }
 
-  public search(roomId: string, days: number, date: Date): Observable<IRoomReservation> {
+  public search(roomId: string, days: number, date: Date, professionalId?: string): Observable<IRoomReservation> {
     let params = new HttpParams().set('date', date.toISOString().slice(0, 10));
     params = params.append('days', days);
+    if (professionalId) {
+      params = params.append('professionalId', professionalId);
+    }
     return this.http.get<IRoomReservation>(`${this.urlV1}/rooms/${roomId}`, {params});
   }
 
@@ -98,13 +109,11 @@ export class ReservationService {
   }
 
   public delete(id: string | null): Observable<IReservation> {
-    const url = `${this.url}/${id}`;
-    return this.http.delete<IReservation>(url);
+    return this.http.delete<IReservation>(`${this.url}/${id}`);
   }
 
   public update(reservation: IReservation): Observable<IReservation> {
-    const url = `${this.url}/${reservation.id}`;
-    return this.http.patch<IReservation>(url, reservation);
+    return this.http.patch<IReservation>(`${this.url}/${reservation.id}`, reservation);
   }
 
   public changeState(reservationId: string, event: string, extras?: any): Observable<IReservation> {

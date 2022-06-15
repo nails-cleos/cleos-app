@@ -18,6 +18,7 @@ import RRule, { ByWeekday } from 'rrule';
 import { isToday } from 'date-fns';
 import { UnavailableRepeatType } from '../interfaces/unavailable';
 import { Frequency } from 'rrule/dist/esm/src/types';
+import { createEventColor } from './color';
 
 export interface IMeta {
   time?: boolean;
@@ -31,12 +32,14 @@ export class Meta implements IMeta {
   timeZone?: string;
   state?: string;
   route?: string[];
+  professionalId?: string;
 
-  constructor(time?: boolean, timeZone?: string, state?: string, route?: string[]) {
+  constructor(time?: boolean, timeZone?: string, state?: string, route?: string[], professionalId?: string) {
     this.time = time;
     this.timeZone = timeZone;
     this.state = state;
     this.route = route;
+    this.professionalId = professionalId;
   }
 }
 
@@ -91,7 +94,7 @@ export const fillNotAvailable = (unavailable: string, lunch: string, notWorking:
   return recurringEvent(recurring, notWorking, unavailable, lunch, isDark, timeZone);
 };
 
-export const newEvent = (title: string, color: string, start: Date, end?: Date, primary?: string,
+export const newEvent = (title: string, color: string, start: Date, end: Date, isDarkMode: boolean,
                          id?: string, meta: IMeta = new Meta(), draggable: boolean = false): CalendarEvent | undefined => {
   if (greaterOrEqualsThanToday(start)) {
     return {
@@ -100,34 +103,37 @@ export const newEvent = (title: string, color: string, start: Date, end?: Date, 
       end,
       title,
       draggable,
-      color: {
-        primary,
-        secondary: color
-      },
+      color: createEventColor(color, isDarkMode),
       meta
     } as unknown as CalendarEvent;
   }
   return undefined;
 };
 
-export const monthEvent = (title: string, start: Date, end: Date | null, id: string,
-                           color?: string, meta: Meta = new Meta(true)): CalendarEvent | undefined => ({
+export const monthEvent = (title: string, start: Date, end: Date | null, id: string, color: string,
+                           meta: Meta = new Meta(true), isDarkMode: boolean): CalendarEvent | undefined => ({
   id,
   start,
   title,
   end,
-  color: {
-    primary: color,
-    secondary: '#000'
-  },
+  color: createEventColor(color, isDarkMode),
   meta
 } as unknown as CalendarEvent);
 
-export const getOverlapEvent = (events: any[], eventStartDay: Date, eventEndDay: Date): CalendarEvent[] =>
-  events.filter((eventA: CalendarEvent) => (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
+export const getOverlapEvent = (events: any[], eventStartDay: Date, eventEndDay: Date,
+                                professionalId?: string): CalendarEvent[] => {
+  if (professionalId) {
+    return events.filter((eventA: CalendarEvent) => ((eventA.meta?.professionalId === professionalId) && (
+      (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
+      || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
+      || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end)
+    )));
+  }
+  return events.filter((eventA: CalendarEvent) => (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
     || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
     || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end)
   );
+};
 
 // private isAnOverlapEvent(eventStartDay: Date, eventEndDay: Date): CalendarEvent | undefined {
 //   return this.events.find((eventA: CalendarEvent) => {
@@ -168,7 +174,7 @@ const createEvent = (it: IAvailability, date: Date, notWorking: string, unavaila
   const newDate = dateToUTC(createNewDate(date), timeZone);
   if (!it) {
     const event = newEvent(notWorking, findStateColor('DEFAULT', isDarkMode), newDate,
-      createNewDate(date, 23, 59), undefined, 'NOT_WORKING_ALL_DAY');
+      createNewDate(date, 23, 59), isDarkMode, 'NOT_WORKING_ALL_DAY');
     if (event) {
       events = [...events, event];
     }
@@ -182,7 +188,7 @@ const createEvent = (it: IAvailability, date: Date, notWorking: string, unavaila
       const endHour = Number(start[0]);
       const endMinute = Number(start[1]);
       const eventBefore = newEvent(notWorking, findStateColor('DEFAULT', isDarkMode),
-        newDate, dateToUTC(createNewDate(date, endHour, endMinute), timeZone));
+        newDate, dateToUTC(createNewDate(date, endHour, endMinute), timeZone), isDarkMode);
       if (eventBefore) {
         events = [...events, eventBefore];
       }
@@ -199,7 +205,7 @@ const createEvent = (it: IAvailability, date: Date, notWorking: string, unavaila
       }
       const eventAfter = newEvent(notWorking, findStateColor('DEFAULT', isDarkMode),
         dateToUTC(createNewDate(date, startHour, startMinute), timeZone),
-        dateToUTC(createNewDate(date, 23, 59), timeZone));
+        dateToUTC(createNewDate(date, 23, 59), timeZone), isDarkMode);
       if (eventAfter) {
         events = [...events, eventAfter];
       }
@@ -238,11 +244,11 @@ const createLunchEvent = (it: IAvailability, date: Date, unavailable: string, lu
       }
       const start = dateToUTC(createDate(), timeZone);
       const end = dateToUTC(createDate(hour, minute), timeZone);
-      return newEvent(unavailable, findStateColor('DEFAULT', isDarkMode), start, end);
+      return newEvent(unavailable, findStateColor('DEFAULT', isDarkMode), start, end, isDarkMode);
     } else {
       const start = dateToUTC(createNewDate(date, lunchStartHour, lunchStartMinute), timeZone);
       const end = dateToUTC(createNewDate(date, lunchEndHour, lunchEndMinute), timeZone);
-      return newEvent(lunch, findStateColor('DEFAULT', isDarkMode), start, end);
+      return newEvent(lunch, findStateColor('DEFAULT', isDarkMode), start, end, isDarkMode);
     }
   }
 
@@ -265,7 +271,7 @@ const lunchEvent = (hour: number, lunchStartHour: number, minute: number, lunchS
   if ((lunchHour || lunchHour === 0) && (lunchMinute || lunchMinute === 0)) {
     const start = dateToUTC(createNewDate(date, lunchHour, lunchMinute), timeZone);
     const end = dateToUTC(createNewDate(date, lunchEndHour, lunchEndMinute), timeZone);
-    return newEvent(lunch, findStateColor('DEFAULT', isDarkMode), start, end);
+    return newEvent(lunch, findStateColor('DEFAULT', isDarkMode), start, end, isDarkMode);
   }
 
   return undefined;

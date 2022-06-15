@@ -9,7 +9,6 @@
         "CURRENCY": "Moneda",
         "OFFICE": "Oficina",
         "ADDRESS": "Dirección",
-        "PROFESSIONAL": "Profesional",
         "TIME_ZONE": "Zona horaria",
         "AVAILABILITY": {
           "FIELD": "Disponibilidad",
@@ -25,12 +24,6 @@
     "NAME": {
       "FIELD": "Nombre",
       "REQUIRED": "Nombre es <b>requerido</b>"
-    },
-    "PROFESSIONAL": {
-      "FIELD": "Profesional",
-      "REQUIRED": "Profesional es <b>requerido</b>",
-      "INVALID": "Profesional no valido",
-      "ADD_BUTTON": "Agregar profesional"
     },
     "OFFICE": {
       "FIELD": "Oficina",

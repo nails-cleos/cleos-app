@@ -38,7 +38,7 @@
           mat-sort-header>{{ 'UNAVAILABLE.LIST.COLUMN.START' | translate }}</th>
       <td *matCellDef="let unavailable" mat-cell>
         <div *ngIf="unavailable.id; else skeleton">
-          {{unavailable | timeDetail | date:'short':unavailable.timeZone:language}}
+          {{unavailable.timestamp | timeDetail | date:'short':unavailable.timeZone:language}}
           <button (click)="openDialog(unavailable)" *ngIf="showTimeZone(unavailable)" mat-icon-button type="button">
             <mat-icon>info_outline</mat-icon>
           </button>

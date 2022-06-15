@@ -8,8 +8,7 @@ import { IUnavailableAll } from '../interfaces/unavailable';
 })
 export class TimeDetailPipe implements PipeTransform {
 
-  transform(reservation: IReservationAll | IUnavailableAll, timeZone?: string): Date {
-    return newDateTimestamp(reservation.timestamp, timeZone);
+  transform(timestamp?: number, timeZone?: string): Date {
+    return newDateTimestamp(timestamp, timeZone);
   }
-
 }

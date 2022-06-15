@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, Inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
@@ -22,7 +22,7 @@ import {
 } from '../interfaces/reservation';
 import { CalendarEvent, CalendarEventTimesChangedEvent } from 'angular-calendar';
 import { TranslateService } from '@ngx-translate/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { DialogComponent } from '../shared/dialog/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import {
@@ -30,7 +30,8 @@ import {
   createDate,
   createFullDate,
   createNewDate,
-  dateToTimestamp, dateToUTC,
+  dateToTimestamp,
+  dateToUTC,
   Duration,
   filterDateRoom,
   getAvailability,
@@ -71,7 +72,7 @@ import {
   roomDetail
 } from '../util/helper';
 import { transitionAnimation } from '../util/animation';
-import { addDays, addMonths, isEqual, isSameDay, isToday } from 'date-fns';
+import { addDays, addMonths, isEqual, isSameDay } from 'date-fns';
 import { findStateColor, isDarkMode } from '../util/theme';
 import { IAdditionalAll } from '../interfaces/additional';
 import { MatListOption } from '@angular/material/list';
@@ -79,6 +80,7 @@ import { IOffice } from '../interfaces/office';
 import { IStep, Step } from '../interfaces/step';
 import { TimeZoneSnackBarComponent } from '../shared/snak/time-zone/time-zone-snack-bar.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { DiscountDialogComponent } from '../discount/list/discounts.component';
 
 @Component({
   selector: 'app-reservation',
@@ -120,7 +122,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   showDiscount = false;
   price: IPrice;
 
-  roomForm!: FormGroup;
+  officeForm!: FormGroup;
   offices?: IOffice[];
   filteredOffice?: Observable<IOffice[] | undefined>;
   office: FormControl = new FormControl('', [
@@ -131,7 +133,12 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   room: FormControl = new FormControl('', [
     Validators.required, requireMatch
   ]);
-  address: string | undefined;
+  professionalList?: IUser[];
+  filteredProfessional?: Observable<IUser[] | undefined>;
+  professional: FormControl = new FormControl('', [
+    requireMatch
+  ]);
+  address?: string;
 
   date: FormControl = new FormControl('', [
     Validators.required
@@ -168,16 +175,18 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   maxCalendarDate: Date;
   durability?: string;
 
-  private productId: string | undefined;
-  private roomId: string | undefined;
+  private productId?: string;
+  private roomId?: string;
+  private professionalId?: string;
   private isDarkMode = false;
+  private readonly isDashboard = false;
   private readonly extras: any;
   private lessDays = 3;
-  private reservations: IReservationAll[] | undefined;
-  private reservation: IReservationAll | undefined;
-  private unavailableList: IUnavailableAll[] | undefined;
+  private reservations?: IReservationAll[];
+  private reservation?: IReservationAll;
+  private unavailableList?: IUnavailableAll[];
   private getState: Observable<any>;
-  private subscription: Subscription | undefined;
+  private subscription?: Subscription;
   private steps: IStep[];
   private dismiss = false;
 
@@ -205,6 +214,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.productId = this.extras.product?.id;
       this.customer.setValue(this.extras.customer);
       this.roomId = this.extras.room?.id;
+      this.professionalId = this.extras.professionalId;
+      this.isDashboard = this.extras.isDashboard;
       if (this.extras.date) {
         this.date.setValue(this.extras.date);
         this.start.setValue(getTime(this.extras.date, this.locale));
@@ -258,7 +269,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   get callStepThree(): void {
-    if (this.roomForm.invalid) {
+    if (this.officeForm.invalid) {
       return;
     }
     this.getProductList();
@@ -296,7 +307,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.weekendDays = exclude;
 
     const {min, max} = getStartEndDay(week, saturday, sunday, timeZone);
-    this.day = new Day(min, max, getNow(), exclude);
+    this.day = new Day(min, max, getNow(), exclude, 1);
     const unavailable = this.translate.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
     const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
     const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
@@ -308,6 +319,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       new fromActionsReservation.SearchReservation({
         date: this.date.value,
         roomId: this.room.value.id,
+        professionalId: this.professional.value.id,
         days: this.daysInWeek
       })
     );
@@ -329,26 +341,30 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const reservation: IReservation = new Reservation();
     reservation.customerId = this.customer.value.id;
     reservation.roomId = this.room.value.id;
+    reservation.professionalId = this.professional.value.id;
     if (this.eventSelected) {
       reservation.start = this.eventSelected.start.toLocaleString(API_LOCALE);
       reservation.timeZone = getCurrentTimeZone();
       reservation.additionalIds = this.additionalSelected?.map(value => value.id);
 
+      const role = this.isDashboard ? Role.roomAdmin : Role.professional;
       if (this.isEditing && this.reservation) {
         reservation.id = this.reservation.id;
         reservation.productId = valueChange(this.product.value.id, this.reservation.product.id);
         reservation.roomId = valueChange(this.room.value.id, this.reservation.room.id);
+        reservation.professionalId = valueChange(this.professional.value.id, this.reservation.professional.id);
         this.store.dispatch(
-          new fromActionsReservation.Edit({reservation, isCustomer: false})
+          new fromActionsReservation.Edit({reservation, role})
         );
       } else {
         reservation.productId = this.product.value.id;
         reservation.roomId = this.room.value.id;
+        reservation.professionalId = this.professional.value.id;
         reservation.discountId = this.discount.value;
         reservation.canCustomerChange = this.customerChange.value;
         reservation.reference = this.reference.value;
         this.store.dispatch(
-          new fromActionsReservation.ReservationSave({reservation, isCustomer: false})
+          new fromActionsReservation.ReservationSave({reservation, role})
         );
       }
     }
@@ -483,6 +499,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     return room.address ? room.address.name : '';
   }
 
+  displayFnProfessional(professional: IUser): string {
+    return professional ? getFullUserName(professional) : '';
+  }
+
   openDialog(reservationDate?: Date): void {
     openDialog(this.room.value, this.locale, this.translate, this.dialog, reservationDate);
   }
@@ -491,37 +511,23 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.dateIsValid(date)) {
       return;
     }
-    this.errors.overlapping = false;
-    this.date.setValue(date);
-    this.start.setValue(getTime(date, this.locale));
-    const nowTime = date.toLocaleTimeString(API_LOCALE).split(':');
-
-    const start = createNewDate(date, Number(nowTime[0]), Number(nowTime[1]));
-    const end = createNewDate(start, start.getHours() + this.duration.hour,
-      start.getMinutes() + this.duration.minute);
-    const event = this.createNewEvent(start, end, state, this.room.value.timeZone, id);
-
-    if (event) {
-      let title;
-      let content;
-      const eventsOverlapping = getOverlapEvent(this.events, start, end);
-      if (eventsOverlapping.length && eventsOverlapping[0] !== this.eventSelected) {
-        let message = '';
-        eventsOverlapping.forEach(e => {
-          message += `<div>${e.title}</div>`;
-        });
-        title = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.TITLE');
-        content = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.CONTENT', {data: message});
-      } else {
-        if (!this.eventSelected && !id) {
-          title = this.translate.instant('RESERVATION.EVENT.TITLE');
-          content = this.translate.instant('RESERVATION.EVENT.CONTENT', {date: start.toLocaleString(API_LOCALE)});
-        } else {
-          title = this.translate.instant('RESERVATION.EVENT.CHANGE.TITLE');
-          content = this.translate.instant('RESERVATION.EVENT.CHANGE.CONTENT', {date: start.toLocaleString(API_LOCALE)});
+    if (!this.professionalId) {
+      const dialogRef = this.dialog.open(SelectProfessionalDialogComponent, {
+        disableClose: true,
+        data: {
+          professionals: this.professionalList,
+          small: this.smallScreen
         }
-      }
-      this.createSelectEvent(title, content, event);
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.professional.setValue(result.professional);
+          this.createEvent(date, state, id);
+        }
+      });
+    } else {
+      this.createEvent(date, state, id);
     }
   }
 
@@ -547,9 +553,20 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   keyDownOffice(event: any): void {
-    this.roomList = undefined;
-    this.keyDownHandler(event, this.room);
-    this.keyDownHandler(event, this.office);
+    if (event.code === 'Backspace') {
+      this.office.setValue('');
+      this.keyDownRoom(event);
+    }
+  }
+
+  keyDownRoom(event: any): void {
+    if (event.code === 'Backspace') {
+      this.professionalList = undefined;
+      this.roomId = undefined;
+      this.professionalId = undefined;
+      this.keyDownHandler(event, this.professional);
+      this.keyDownHandler(event, this.room);
+    }
   }
 
   beforeMonthViewRender({header}: any): void {
@@ -575,15 +592,51 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.additionalSelected.filter(el => el.id === it.id).length > 0;
   }
 
+  private createEvent(date: Date, state: string, id?: string): void {
+    this.errors.overlapping = false;
+    this.date.setValue(date);
+    this.start.setValue(getTime(date, this.locale));
+    const nowTime = date.toLocaleTimeString(API_LOCALE).split(':');
+
+    const start = createNewDate(date, Number(nowTime[0]), Number(nowTime[1]));
+    const end = createNewDate(start, start.getHours() + this.duration.hour,
+      start.getMinutes() + this.duration.minute);
+    const event = this.createNewEvent(start, end, state, this.room.value.timeZone, id);
+
+    if (event) {
+      let title;
+      let content;
+      const eventsOverlapping = getOverlapEvent(this.events, start, end, this.professionalId);
+      if (eventsOverlapping.length && eventsOverlapping[0] !== this.eventSelected) {
+        let message = '';
+        eventsOverlapping.forEach(e => {
+          message += `<div>${e.title}</div>`;
+        });
+        title = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.TITLE');
+        content = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.CONTENT', {data: message});
+      } else {
+        if (!this.eventSelected && !id) {
+          title = this.translate.instant('RESERVATION.EVENT.TITLE');
+          content = this.translate.instant('RESERVATION.EVENT.CONTENT', {date: start.toLocaleString(API_LOCALE)});
+        } else {
+          title = this.translate.instant('RESERVATION.EVENT.CHANGE.TITLE');
+          content = this.translate.instant('RESERVATION.EVENT.CHANGE.CONTENT', {date: start.toLocaleString(API_LOCALE)});
+        }
+      }
+      this.createSelectEvent(title, content, event);
+    }
+  }
+
   private createNewEvent(start: Date, end: Date, state: string, timeZone: string = getCurrentTimeZone(),
                          id?: string): CalendarEvent | undefined {
     const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
       customerName: getUserName(this.customer.value),
-      productName: this.product.value.name
+      productName: this.product.value.name,
+      professionalName: getUserName(this.professional.value)
     });
 
-    const meta = new Meta(true, timeZone);
-    return newEvent(detail, findStateColor(state, this.isDarkMode), start, end, '#000', id, meta, true);
+    const meta = new Meta(true, timeZone, undefined, undefined, this.professional.value.id);
+    return newEvent(detail, findStateColor(state, this.isDarkMode), start, end, this.isDarkMode, id, meta, true);
   }
 
   private dateIsValid(date: Date): boolean {
@@ -621,8 +674,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       date: this.date,
       start: this.start
     });
-    this.roomForm = this.formBuilder.group({
-      room: this.room
+    this.officeForm = this.formBuilder.group({
+      office: this.office,
+      room: this.room,
+      professional: this.professional
     });
     this.configurationForm = this.formBuilder.group({
       customerChange: this.customerChange,
@@ -672,10 +727,26 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
             this.dismiss = true;
           });
         }
+        this.professionalList = value.professionals;
+        const professional = value.professionals?.find((o: IRoom) => o.id === this.professionalId);
+        if (professional) {
+          this.professionalList = value.professionals;
+          if (this.professional.value.id !== this.professionalId) {
+            this.professional.setValue(professional);
+            this.professionalId = this.professional.value.id;
+          }
+        } else {
+          if (this.professionalList?.length === 1) {
+            this.professional.setValue(this.professionalList[0]);
+          } else {
+            this.professional.setValue('');
+          }
+        }
       }
       this.group.setValue('');
       this.cleanProduct();
     });
+    this.professional.valueChanges.subscribe(value => this.professionalId = value ? value.id : undefined);
     this.group.valueChanges.subscribe(value => {
       if (!value) {
         return;
@@ -695,11 +766,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       this.durability = getProductDurability(value.durabilityMin, value.durabilityMax, this.translate);
     });
-    this.product.valueChanges.subscribe(value => {
-      if (value) {
-        this.price = newPrice(this.price, value.price);
-      }
-    });
+    this.product.valueChanges.subscribe(value => this.price = value ?? newPrice(this.price, value.price));
     this.discount.valueChanges.subscribe(value => {
       if (value && this.discounts) {
         const userDiscount = this.discounts.find(d => d.id === value);
@@ -751,6 +818,12 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       map(value => typeof value === 'string' ? value : value.name),
       map(addressName => addressName ? this.filterRoom(addressName) : this.roomList ? this.roomList.slice() : this.roomList)
     );
+    this.filteredProfessional = this.professional.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value.name),
+      map(addressName => addressName ? this.filterProfessional(addressName) : this.professionalList
+        ? this.professionalList.slice() : this.professionalList)
+    );
   }
 
   private clean(): void {
@@ -774,12 +847,13 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
         const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
           customerName: getUserName(it.customer),
-          productName: it.product.name
+          productName: it.product.name,
+          professionalName: getUserName(it.professional)
         });
 
         const color = findStateColor(it.state, this.isDarkMode);
-        const meta = new Meta(true, timeZone);
-        const event = newEvent(detail, color, start, end, '#000', it.id, meta);
+        const meta = new Meta(true, timeZone, undefined, undefined, it.professional.id);
+        const event = newEvent(detail, color, start, end, this.isDarkMode, it.id, meta);
         if (event) {
           this.events = [...this.events, event];
         }
@@ -838,12 +912,13 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private createUnavailableEvent(it: IUnavailableAll, start: Date, end: Date): void {
     const detail = this.translate.instant('RESERVATION.EVENT.UNAVAILABLE', {
-      description: it.description ? it.description : ''
+      description: it.description ? it.description : '',
+      professionalName: getUserName(it.professional)
     });
 
     const color = findStateColor('DEFAULT', this.isDarkMode);
-    const meta = new Meta(!it.allDay, this.room.value.timeZone);
-    const event = newEvent(detail, color, start, end, '#000', `unavailable/${it.id}`, meta);
+    const meta = new Meta(!it.allDay, this.room.value.timeZone, undefined, undefined, it.professional.id);
+    const event = newEvent(detail, color, start, end, this.isDarkMode, `unavailable/${it.id}`, meta);
     if (event) {
       this.events = [...this.events, event];
     }
@@ -860,8 +935,14 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.offices = Array.from(createRoomOffice(state.rooms)?.values() || []);
       if (this.offices && this.roomId && !this.office.value) {
         this.office.setValue(this.offices?.find(office => office.rooms?.find(o => o.id === this.roomId) ? office : undefined));
-      } else if (this.offices && this.offices.length === 1) {
+      } else if (this.offices && this.offices.length === 1 && !this.office.value) {
         this.office.setValue(this.offices[0]);
+      } else if (this.offices && this.professionalId && !this.office.value) {
+        this.offices.find(office => {
+          const room = office.rooms?.find(r => r.professionals?.find(o => o.id === this.professionalId) ? r : undefined);
+          this.roomId = room?.id;
+          return room ? office : undefined;
+        });
       }
       this.customerInfo = state.customer;
       this.customers = state.customers;
@@ -944,7 +1025,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           this.eventSelected = undefined;
           this.errors[value.field] = value.message;
           this.customerForm.controls[value.field]?.setErrors({incorrect: true});
-          this.roomForm.controls[value.field]?.setErrors({incorrect: true});
+          this.officeForm.controls[value.field]?.setErrors({incorrect: true});
         });
       }
     });
@@ -997,6 +1078,12 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.roomList?.filter(option => option.address?.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 
+  private filterProfessional(name: string): IUser[] | undefined {
+    const filterValue = name.toLowerCase();
+
+    return this.professionalList?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
+  }
+
   private completeAndNext(): void {
     setTimeout(() => {
       const step = getStep(this.steps, this.myStepper.selectedIndex);
@@ -1021,6 +1108,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isPreview = false;
     const date = newDate(reservation.start);
     this.room.setValue(reservation.room);
+    this.professional.setValue(reservation.professional);
     this.date.setValue(date);
     this.start.setValue(getTime(date, this.locale));
     this.customer.setValue(reservation.customer);
@@ -1028,9 +1116,71 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.additionalSelected = this.reservation.additional ? this.reservation.additional : [];
     this.productId = reservation.product.id;
     this.roomId = reservation.room.id;
+    this.professionalId = reservation.professional.id;
     if (reservation.configuration) {
       this.reference.setValue(reservation.configuration.reference);
       this.customerChange.setValue(reservation.configuration.canCustomerChange);
     }
+  }
+}
+
+@Component({
+  selector: 'app-select-professional-dialog-component',
+  templateUrl: './select-professional-dialog.component.html'
+})
+export class SelectProfessionalDialogComponent implements OnInit {
+  professionalForm!: FormGroup;
+  professionals?: IUser[];
+  filteredProfessional?: Observable<IUser[] | undefined>;
+  professional: FormControl = new FormControl('', [
+    Validators.required, requireMatch
+  ]);
+
+  constructor(public dialogRef: MatDialogRef<DiscountDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
+              private formBuilder: FormBuilder) {
+    this.professionals = data.professionals;
+  }
+
+  get onNoClick(): void {
+    return this.dialogRef.close();
+  }
+
+  get doAction(): void {
+    return this.dialogRef.close({professional: this.professional.value});
+  }
+
+  ngOnInit(): void {
+    this.createForm();
+    this.createFilters();
+  }
+
+  displayFnUser(user: IUser): string {
+    return user ? getUserName(user) : '';
+  }
+
+  keyDownHandler(event: any): void {
+    if (event.code === 'Backspace') {
+      this.professional.setValue('');
+    }
+  }
+
+  private createForm(): void {
+    this.professionalForm = this.formBuilder.group({
+      professional: this.professional
+    });
+  }
+
+  private createFilters(): void {
+    this.filteredProfessional = this.professional.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value.name),
+      map(name => name ? this.filterProfessional(name) : this.professionals ? this.professionals.slice() : this.professionals)
+    );
+  }
+
+  private filterProfessional(name: string): IUser[] | undefined {
+    const filterValue = name.toLowerCase();
+
+    return this.professionals?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
   }
 }

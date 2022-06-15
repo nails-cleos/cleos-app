@@ -84,6 +84,57 @@
                 </label>
                 <mat-datepicker #picker startView="multi-year" touchUi></mat-datepicker>
               </mat-form-field>
+              <mat-form-field *ngIf="showColors" appearance="fill">
+                <mat-label>{{ 'COMMON.PROFESSIONAL.COLOR.DARK.FIELD' | translate }}</mat-label>
+                <input [formControl]="darkColor" [ngxMatColorPicker]="pickerDark" matInput>
+                <ngx-mat-color-toggle [for]="pickerDark" matSuffix></ngx-mat-color-toggle>
+                <ngx-mat-color-picker #pickerDark [touchUi]="true"></ngx-mat-color-picker>
+              </mat-form-field>
+              <mat-form-field *ngIf="showColors" appearance="fill">
+                <mat-label>{{ 'COMMON.PROFESSIONAL.COLOR.LIGHT.FIELD' | translate }}</mat-label>
+                <input [formControl]="lightColor" [ngxMatColorPicker]="picker" matInput>
+                <ngx-mat-color-toggle [for]="picker" matSuffix></ngx-mat-color-toggle>
+                <ngx-mat-color-picker #picker [touchUi]="true"></ngx-mat-color-picker>
+              </mat-form-field>
+              <div style="width: 100%; display: table;">
+                <div style="display: table-row">
+                  <div style="display: table-cell;">
+                    <mat-card *ngIf="darkColor.value" [style.background-color]="'#363636'">
+                      <mat-card-header>
+                        <mat-card-subtitle [style.color]="'#fafafa'">
+                          {{ 'COMMON.PROFESSIONAL.COLOR.DARK.RESERVATION' | translate }}
+                        </mat-card-subtitle>
+                      </mat-card-header>
+                      <mat-card-content>
+                        <div
+                          [style.background-color]="'rgb(' + darkColor.value.r + ',' + darkColor.value.g + ',' + darkColor.value.b + ')'"
+                          [style.border-color]="lightenDarkenColor(darkColor.value, true)"
+                          [style.color]="'#000'"
+                          class="reservation-example">
+                          {{ 'COMMON.PROFESSIONAL.COLOR.RESERVATION' | translate }}
+                        </div>
+                      </mat-card-content>
+                    </mat-card>
+                  </div>
+                  <div style="display: table-cell;">
+                    <mat-card *ngIf="lightColor.value" [style.background-color]="'#fafafa'">
+                      <mat-card-header>
+                        <mat-card-subtitle [style.color]="'#363636'">
+                          {{ 'COMMON.PROFESSIONAL.COLOR.LIGHT.RESERVATION' | translate }}
+                        </mat-card-subtitle>
+                      </mat-card-header>
+                      <mat-card-content>
+                        <div
+                          [style.background-color]="'rgb(' + lightColor.value.r + ',' + lightColor.value.g + ',' + lightColor.value.b + ')'"
+                          [style.border-color]="lightenDarkenColor(lightColor.value, false)"
+                          [style.color]="'#fff'" class="reservation-example">
+                          {{ 'COMMON.PROFESSIONAL.COLOR.RESERVATION' | translate }}
+                        </div>
+                      </mat-card-content>
+                    </mat-card>
+                  </div>
+                </div>
+              </div>
             </div>
           </mat-card-content>
           <ng-template #boxSkeleton>

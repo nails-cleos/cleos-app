@@ -111,6 +111,16 @@ export const getEnd = (start: Date, strDuration?: string): Date => {
   return createNewDate(start, 23, 59, 59, 99);
 };
 
+export const getRoomStartEndDay = (availability: IAvailability, timeZone: string,
+                                   viewDate: Date = getNow()): { min: Date; max: Date } => {
+  const availabilityMinMax = getMinAndMax(availability, viewDate, timeZone);
+
+  const min: Date = availabilityMinMax.min;
+  const max: Date = availabilityMinMax.max;
+
+  return min && max ? formatMinMax(min, max) : {min, max};
+};
+
 export const getStartEndDay = (week: IAvailability, saturday: IAvailability, sunday: IAvailability, timeZone: string): any => {
   const date: Date = new Date();
   const weekMinMax = getMinAndMax(week, date, timeZone);
@@ -134,13 +144,7 @@ export const getStartEndDay = (week: IAvailability, saturday: IAvailability, sun
     max = sundayMinMax.max;
   }
 
-  if ([15, 45].indexOf(min.getMinutes()) > 0 || [15, 45].indexOf(max.getMinutes()) > 0) {
-    min.setHours(min.getHours() + 1, 0);
-  } else {
-    min.setHours(min.getHours(), 0);
-  }
-
-  return {min, max};
+  return formatMinMax(min, max);
 };
 
 export const diffTime = (time: Date, maxHour = 24, diffMin = 0): IDuration => {
@@ -341,7 +345,7 @@ export const createNewDate = (date: Date, hour: number = 0, minute: number = 0, 
   return d;
 };
 
-export const dateToTimestamp = (date: Date = new Date()): number => parseInt(`${date.getTime() / 1000}`, 10);
+export const dateToTimestamp = (date: Date = getNow()): number => parseInt(`${date.getTime() / 1000}`, 10);
 
 export const stringDateUTCToTimeZone = (date: string): Date => new Date(`${date}.000z`);
 
@@ -443,7 +447,7 @@ const getMinAndMax = (availability: IAvailability, date: Date, timeZone: string)
   return {min, max};
 };
 
-const getMinutesBetweenTimes = (date1: Date, date2: Date): number =>
+export const getMinutesBetweenTimes = (date1: Date, date2: Date): number =>
   Math.abs(Math.round((date1.getTime() - date2.getTime()) / (1000 * 60)));
 
 const timeConvert = (time: number, hour: number = 0) => {
@@ -474,3 +478,13 @@ export const timestamp = (date: Date, timeZone: string = getCurrentTimeZone()): 
   new Date(`${date.toISOString().split('T')[0]}T${getTime(date, API_LOCALE)}:00.000${getUTC(timeZone, date)}`);
 
 export const getCurrentTimeZone = (): string => Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+const formatMinMax = (min: Date, max: Date): { min: Date; max: Date } => {
+  if ([15, 45].indexOf(min.getMinutes()) > 0 || [15, 45].indexOf(max.getMinutes()) > 0) {
+    min.setHours(min.getHours() + 1, 0);
+  } else {
+    min.setHours(min.getHours(), 0);
+  }
+
+  return {min, max};
+};

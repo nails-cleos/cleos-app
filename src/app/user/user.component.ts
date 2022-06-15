@@ -7,6 +7,8 @@ import { AppState, selectUserState } from '../store/app.states';
 import * as fromActionsUser from '../store/user.actions';
 import { IUser, User } from '../interfaces/user';
 import { flags, IFlag } from '../util/flags';
+import { Color } from '@angular-material-components/color-picker';
+import { lightenDarkenColor } from '../util/color';
 
 @Component({
   selector: 'app-user',
@@ -38,6 +40,8 @@ export class UserComponent implements OnInit, OnDestroy {
   lastName: FormControl = new FormControl();
   phone: FormControl = new FormControl();
   dob: FormControl = new FormControl();
+  darkColor: FormControl = new FormControl();
+  lightColor: FormControl = new FormControl();
 
   flagList: IFlag[] = flags();
 
@@ -66,6 +70,16 @@ export class UserComponent implements OnInit, OnDestroy {
     user.password = 'Ch4ng#';
     user.dob = this.dob.value;
 
+    if (this.lightColor.value) {
+      const color = this.lightColor.value;
+      user.lightColor = `${color.r},${color.g},${color.b}`;
+    }
+
+    if (this.darkColor.value) {
+      const color = this.darkColor.value;
+      user.darkColor = `${color.r},${color.g},${color.b}`;
+    }
+
     return this.store.dispatch(
       new fromActionsUser.SaveUser({user, role: this.role.value})
     );
@@ -82,6 +96,10 @@ export class UserComponent implements OnInit, OnDestroy {
     this.cdRef.detectChanges();
   }
 
+  lightenDarkenColor(color: Color, isDark: boolean): string {
+    return lightenDarkenColor(`#${color.hex}`, isDark ? 50 : -50);
+  }
+
   private createForm(): void {
     this.form = this.formBuilder.group({
       role: this.role,
@@ -91,7 +109,9 @@ export class UserComponent implements OnInit, OnDestroy {
       firstName: this.firstName,
       lastName: this.lastName,
       phone: this.phone,
-      dob: this.dob
+      dob: this.dob,
+      darkColor: this.darkColor,
+      lightColor: this.lightColor
     });
   }
 

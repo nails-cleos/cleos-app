@@ -3,28 +3,44 @@
 </div>
 <div *ngIf="tracking; else box">
   <div class="stepper-wrapper">
-    <div [ngClass]="{'active': tracking.reservation.state === 'CREATED', 'completed': tracking.approvedTime}"
+    <div [ngClass]="{'active': tracking.reservation.state === 'CREATED', 'completed': tracking.approvedTimestamp}"
          class="stepper-item">
-      <div class="step-counter">{{tracking.createdTime | date:'short':undefined:language}}</div>
+      <div class="step-counter">
+        <span *ngIf="tracking.createdTimestamp">
+          {{tracking.createdTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:language}}
+        </span>
+      </div>
       <div class="step-name">{{'COMMON.STATUS.RESERVATION.CREATED' | translate}}</div>
     </div>
     <div [ngClass]="{
-    'active': ['APPROVED', 'PAID', 'PARTIALLY_PAID'].indexOf(tracking.reservation.state) >= 0,
-    'completed': tracking.startedTime
+     'active': ['APPROVED', 'PAID', 'PARTIALLY_PAID'].indexOf(tracking.reservation.state) >= 0,
+     'completed': tracking.startedTimestamp
     }" class="stepper-item">
-      <div class="step-counter">{{tracking.approvedTime | date:'short':undefined:language}}</div>
+      <div class="step-counter">
+        <span *ngIf="tracking.approvedTimestamp">
+          {{tracking.approvedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:language}}
+        </span>
+      </div>
       <div class="step-name">{{'COMMON.STATUS.RESERVATION.APPROVED' | translate}}</div>
     </div>
-    <div [ngClass]="{'active': tracking.reservation.state === 'STARTED', 'completed': tracking.completedTime}"
+    <div [ngClass]="{'active': tracking.reservation.state === 'STARTED', 'completed': tracking.completedTimestamp}"
          class="stepper-item">
-      <div class="step-counter">{{tracking.startedTime | date:'short':undefined:language}}</div>
+      <div class="step-counter">
+        <span *ngIf="tracking.startedTimestamp">
+          {{tracking.startedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:language}}
+        </span>
+      </div>
       <div class="step-name">{{'COMMON.STATUS.RESERVATION.STARTED' | translate}}</div>
     </div>
     <div [ngClass]="{
       'finish': ['COMPLETED', 'PARTIALLY_COMPLETED'].indexOf(tracking.reservation.state) >= 0,
-      'completed': tracking.completedTime
+      'completed': tracking.completedTimestamp
       }" class="stepper-item">
-      <div class="step-counter">{{tracking.completedTime | date:'short':undefined:language}}</div>
+      <div class="step-counter">
+        <span *ngIf="tracking.completedTimestamp">
+          {{tracking.completedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:language}}
+        </span>
+      </div>
       <div class="step-name">{{'COMMON.STATUS.RESERVATION.COMPLETED' | translate}}</div>
     </div>
   </div>

@@ -9,7 +9,6 @@
         "CURRENCY": "Currency",
         "OFFICE": "Office",
         "ADDRESS": "Address",
-        "PROFESSIONAL": "Professional",
         "TIME_ZONE": "Time zone",
         "AVAILABILITY": {
           "FIELD": "Availability",
@@ -25,12 +24,6 @@
     "NAME": {
       "FIELD": "Name",
       "REQUIRED": "Name is <b>required</b>"
-    },
-    "PROFESSIONAL": {
-      "FIELD": "Professional",
-      "REQUIRED": "Professional is <b>required</b>",
-      "INVALID": "Professional is invalid",
-      "ADD_BUTTON": "Add professional"
     },
     "OFFICE": {
       "FIELD": "Office",

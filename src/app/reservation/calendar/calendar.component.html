@@ -1,10 +1,86 @@
-<div *ngIf="data && data.length && calendar && calendar.size; else errorBox" class="scroll-container">
+<div>
+  <fieldset>
+    <legend>{{'RESERVATION.SEARCH' | translate }}</legend>
+    <form [formGroup]="officeForm">
+      <div *ngIf="!offices?.length; else dataOffice">
+        <button class="only-button" color="accent" mat-raised-button routerLink="/rooms/add">
+          <mat-icon>add_business</mat-icon> &nbsp;{{ 'RESERVATION.ROOM.TITLE' | translate }}
+        </button>
+      </div>
+      <ng-template #dataOffice>
+        <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
+          <mat-form-field *ngIf="offices; else skeleton" appearance="fill">
+            <mat-label>{{ 'COMMON.ROOM.OFFICE.FIELD' | translate }}</mat-label>
+            <label>
+              <input (keydown)="keyDownOffice($event)" [formControl]="office" [matAutocomplete]="autoOffice"
+                     matInput required type="text">
+            </label>
+            <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
+              <mat-option *ngFor="let office of filteredOffice | async " [value]="office">
+                {{office.name}}
+              </mat-option>
+            </mat-autocomplete>
+            <mat-error *ngIf="office.hasError('required')"
+                       [innerHTML]="'COMMON.ROOM.OFFICE.REQUIRED' | translate">
+            </mat-error>
+            <mat-error *ngIf="office.hasError('requireMatch')"
+                       [innerHTML]="'COMMON.ROOM.OFFICE.INVALID' | translate">
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field *ngIf="roomList" appearance="fill">
+            <mat-label>{{ 'COMMON.ROOM.FIELD' | translate }}</mat-label>
+            <label>
+              <input (keydown)="keyDownRoom($event)" [formControl]="room" [matAutocomplete]="autoRoom" matInput
+                     required type="text">
+            </label>
+            <mat-autocomplete #autoRoom="matAutocomplete" [displayWith]="displayFnRoom">
+              <mat-option *ngFor="let room of filteredRoom | async" [value]="room">
+                {{room | roomName}}
+              </mat-option>
+            </mat-autocomplete>
+            <mat-error *ngIf="room.hasError('required')"
+                       [innerHTML]="'COMMON.ROOM.REQUIRED' | translate">
+            </mat-error>
+            <mat-error *ngIf="room.hasError('requireMatch')"
+                       [innerHTML]="'COMMON.ROOM.INVALID' | translate">
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field *ngIf="professionalList" appearance="fill">
+            <mat-label>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</mat-label>
+            <label>
+              <input (keydown)="keyDownHandler($event, professional)" [formControl]="professional"
+                     [matAutocomplete]="autoProfessional" matInput type="text">
+            </label>
+            <mat-autocomplete #autoProfessional="matAutocomplete" [displayWith]="displayFnProfessional">
+              <mat-option *ngFor="let professional of filteredProfessional | async" [value]="professional">
+                {{professional | userName}}
+              </mat-option>
+            </mat-autocomplete>
+            <mat-error *ngIf="professional.hasError('requireMatch')"
+                       [innerHTML]="'COMMON.ROOM.INVALID' | translate">
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </ng-template>
+      <ng-template #skeleton>
+        <div class="ssc-line"></div>
+      </ng-template>
+    </form>
+    <button (click)="search" [disabled]="officeForm.invalid" class="only-button" color="accent" mat-raised-button>
+      <mat-icon matPrefix>search</mat-icon>
+      <span fxHide.lt-sm fxShow>{{ 'RESERVATION.SEARCH' | translate }}</span>
+    </button>
+  </fieldset>
+</div>
+
+<div *ngIf="data && calendar" class="scroll-container">
   <div class="divider">
     <button (click)="decrement" [disabled]="prevBtnDisabled" color="accent" mat-raised-button>
       <mat-icon>navigate_before</mat-icon>
       <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.PREVIOUS' | translate}}</span>
     </button>
-    <input (dateChange)="selectDate($event)" [matDatepicker]="picker" [max]="maxDate" [min]="today" hidden matInput>
+    <input (dateChange)="selectDate($event)" [matDatepicker]="picker" [max]="maxDate" [min]="today" [value]="viewDate"
+           hidden matInput>
     <mat-datepicker #picker touchUi></mat-datepicker>
     <button (click)="picker.open()" color="primary" mat-raised-button>
       <mat-icon>today</mat-icon>
@@ -21,35 +97,20 @@
     </button>
   </div>
   <div class="divider">
-    <mat-accordion>
-      <mat-expansion-panel *ngFor="let rr of sortData(data); let i = index"
-                           [expanded]="professionalId === rr.room.professional.id || i === 0">
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            <p class="bold">{{rr.room | roomName}}</p>
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-        <mwl-calendar-week-view
-          (beforeViewRender)="beforeMonthViewRender($event)"
-          (eventClicked)="view($event.event)"
-          (hourSegmentClicked)="segmentClick($event.date, rr.room)"
-          [dayEndHour]="calendar.get(rr.room.id)!.day!.dayEndHour"
-          [dayEndMinute]="calendar.get(rr.room.id)!.day!.dayEndMinute"
-          [dayStartHour]="calendar.get(rr.room.id)!.day!.dayStartHour"
-          [dayStartMinute]="calendar.get(rr.room.id)!.day!.dayStartMinute"
-          [daysInWeek]="daysInWeek"
-          [events]="calendar.get(rr.room.id)!.events"
-          [excludeDays]="calendar.get(rr.room.id)!.day!.excludeDays"
-          [hourSegments]="hourSegments"
-          [locale]="locale"
-          [weekendDays]="[]"
-          [viewDate]="viewDate"></mwl-calendar-week-view>
-      </mat-expansion-panel>
-    </mat-accordion>
+    <mwl-calendar-week-view
+      (beforeViewRender)="beforeMonthViewRender($event)"
+      (eventClicked)="view($event.event)"
+      (hourSegmentClicked)="segmentClick($event.date, calendar.room)"
+      [dayEndHour]="calendar.day!.dayEndHour"
+      [dayEndMinute]="calendar.day!.dayEndMinute"
+      [dayStartHour]="calendar.day!.dayStartHour"
+      [dayStartMinute]="calendar.day!.dayStartMinute"
+      [daysInWeek]="daysInWeek"
+      [events]="calendar.events"
+      [excludeDays]="calendar.day!.excludeDays"
+      [hourSegments]="hourSegments"
+      [locale]="locale"
+      [viewDate]="viewDate"
+      [weekendDays]="[]"></mwl-calendar-week-view>
   </div>
 </div>
-<ng-template #errorBox>
-  <button class="only-button" color="accent" mat-raised-button routerLink="/rooms/add">
-    <mat-icon>add_business</mat-icon> &nbsp;{{ 'RESERVATION.ROOM.TITLE' | translate }}
-  </button>
-</ng-template>

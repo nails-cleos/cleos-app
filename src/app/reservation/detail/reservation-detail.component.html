@@ -24,8 +24,8 @@
       </mat-list-item>
       <mat-list-item>
         <mat-icon mat-list-icon>person_pin</mat-icon>
-        <div mat-line>{{ 'RESERVATION.ROOM.PROFESSIONAL.FIELD' | translate}}</div>
-        <div mat-line>{{reservation?.room?.professional | userName}}</div>
+        <div mat-line>{{ 'COMMON.PROFESSIONAL.FIELD' | translate}}</div>
+        <div mat-line>{{reservation?.professional | userName}}</div>
       </mat-list-item>
       <mat-list-item>
         <mat-icon mat-list-icon>room</mat-icon>
@@ -241,7 +241,7 @@
               mat-header-cell> {{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }} </th>
           <td *matCellDef="let history" fxHide.lt-sm fxShow
               mat-cell>
-            <div *ngIf="history.id; else skeleton">{{history?.room?.professional | userName}}</div>
+            <div *ngIf="history.id; else skeleton">{{history?.professional | userName}}</div>
             <ng-template #skeleton>
               <div class="ssc-line"></div>
             </ng-template>
@@ -252,7 +252,7 @@
           <th *matHeaderCellDef mat-header-cell> {{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }} </th>
           <td *matCellDef="let history" mat-cell>
             <div *ngIf="history.id; else skeleton">
-              {{history | timeDetail | date:'short':history.room.timeZone:language}}
+              {{history.timestamp | timeDetail | date:'short':history.room.timeZone:language}}
               <button (click)="openHistoryDialog(history)" *ngIf="showTimeZone(history)" mat-icon-button type="button">
                 <mat-icon>info_outline</mat-icon>
               </button>
@@ -295,7 +295,7 @@
               <mat-list *ngIf="history.id">
                 <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
                 <mat-list-item role="list">
-                  <div mat-line>{{history?.room?.professional | userName}}</div>
+                  <div mat-line>{{history?.professional | userName}}</div>
                 </mat-list-item>
                 <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</div>
                 <mat-list-item role="list">

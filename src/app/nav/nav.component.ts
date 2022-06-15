@@ -29,7 +29,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Role } from '../interfaces/token';
 import { MessagingService } from '../services/messaging.service';
 import { environment } from '../../environments/environment';
-import { getUserImage, getUserName, getUserNameInitials } from '../util/helper';
+import { getUserImage, getUserName, getUserNameInitials, isRoomAdmin } from '../util/helper';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NavigationService } from '../services/navigation.service';
 import { TokenService } from '../services/token.service';
@@ -37,6 +37,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { getThemeName, isDarkMode, resetTheme, Theme, THEME } from '../util/theme';
 import { ThemeService } from 'ng2-charts';
+import { RedirectComponent } from '../auth/redirect/redirect.component';
 
 @Component({
   selector: 'app-nav',
@@ -56,9 +57,9 @@ export class NavComponent implements OnInit, OnDestroy {
   notifications: INotification[] = [];
   workDay: INotification[] = [];
   currentUser!: IUser | null;
-  username?: string;
 
   canChangePassword = false;
+  showInformation = true;
 
   language: string;
 
@@ -191,6 +192,7 @@ export class NavComponent implements OnInit, OnDestroy {
         this.incomplete = !state.user.completed;
         const user: IUserAll = state.user;
         this.currentUser = user;
+        this.showInformation = !isRoomAdmin(user.authorities);
         this.checked = isDarkMode(this.currentUser.theme);
         this.resetTheme(this.currentUser.theme);
         this.isProfessional = user.authorities.some(u => u.authority === Role.professional);
@@ -198,7 +200,6 @@ export class NavComponent implements OnInit, OnDestroy {
         this.isAdmin = user.authorities.some(u => u.authority === Role.admin);
         this.menuItems = state.menus;
         this.canChangePassword = user?.provider === 'LOCAL';
-        this.username = getUserName(user);
         this.initials = getUserNameInitials(user);
         this.image = getUserImage(user);
         this.messagingService.requestPermission(user.id);

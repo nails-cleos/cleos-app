@@ -42,7 +42,7 @@ export class RoomService {
   }
 
   public getById(id: string | null): Observable<IRoom | undefined> {
-    const url = `${this.url}/${id}`;
+    const url = `${this.urlV1}/${id}`;
     return this.http.get<IRoom>(url);
   }
 

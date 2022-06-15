@@ -29,7 +29,6 @@
   #contact {
     mat-icon {
       margin-right: 0 !important;
-      vertical-align: middle;
     }
 
     .i-size-24 {
@@ -59,10 +58,12 @@
   }
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 .product-container {
-  width: 100%;/*whatever size you want your container*/
+  width: 100%; /*whatever size you want your container*/
   flex-flow: row wrap;
   display: flex; /*Make sure to call this on your container*/
   align-items: stretch; /*stretches all cards same height*/
