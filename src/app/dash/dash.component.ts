@@ -17,6 +17,8 @@ import { isSameDay, isSameMonth } from 'date-fns';
 import { ICalendarReservations, ICalendarUnavailable, IChart, IDashboard } from '../interfaces/dashboard';
 import { UnavailableRepeatType } from '../interfaces/unavailable';
 import { FormControl } from '@angular/forms';
+import { IAuthority } from '../interfaces/user';
+import { Role } from '../interfaces/token';
 
 @Component({
   selector: 'app-dash',
@@ -30,6 +32,7 @@ export class DashComponent implements OnInit, OnDestroy {
   mapDashboard?: Map<string, IDashboard>;
   selectedDash = new FormControl();
   roomId?: string;
+  professionalId?: string;
 
   view: CalendarView = CalendarView.Month;
   viewDate: Date;
@@ -61,34 +64,6 @@ export class DashComponent implements OnInit, OnDestroy {
 
   constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
               private readonly translate: TranslateService, private router: Router) {
-    this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium])
-      .pipe(takeUntil(this.destroy$)).subscribe((state: BreakpointState) => {
-      if (state.breakpoints[Breakpoints.Medium]) {
-        this.cardLayout = {
-          columns: 2,
-          miniCard: {cols: 1, rows: 1},
-          calendar: {cols: 2, rows: 4},
-          chart: {cols: 2, rows: 2},
-          table: {cols: 2, rows: 4}
-        };
-      } else if (state.matches) {
-        this.cardLayout = {
-          columns: 1,
-          miniCard: {cols: 1, rows: 1},
-          calendar: {cols: 1, rows: 4},
-          chart: {cols: 1, rows: 1.5},
-          table: {cols: 1, rows: 4.5}
-        };
-      } else {
-        this.cardLayout = {
-          columns: 4,
-          miniCard: {cols: 1, rows: 1},
-          calendar: {cols: 4, rows: 4},
-          chart: {cols: 2, rows: 2},
-          table: {cols: 4, rows: 4}
-        };
-      }
-    });
     this.getState = this.store.select(selectDashboardState);
     this.store.select(selectAuthState).subscribe((state: any) => {
       const darkMode: boolean = isDarkMode(state.user?.theme);
@@ -96,6 +71,36 @@ export class DashComponent implements OnInit, OnDestroy {
         this.createEvents(darkMode);
       }
       this.isDarkMode = darkMode;
+      const isManager = state.user?.authorities?.some((au: IAuthority) => [Role.admin as string, Role.manager as string]
+        .includes(au.authority));
+      this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium])
+        .pipe(takeUntil(this.destroy$)).subscribe((breakpointState: BreakpointState) => {
+        if (breakpointState.breakpoints[Breakpoints.Medium]) {
+          this.cardLayout = {
+            columns: 2,
+            miniCard: isManager ? {cols: 1, rows: 1} : {cols: 0, rows: 0},
+            calendar: {cols: 2, rows: 4},
+            chart: {cols: 2, rows: 2},
+            table: {cols: 2, rows: 4}
+          };
+        } else if (breakpointState.matches) {
+          this.cardLayout = {
+            columns: 1,
+            miniCard: isManager ? {cols: 1, rows: 1} : {cols: 0, rows: 0},
+            calendar: {cols: 1, rows: 4},
+            chart: {cols: 1, rows: 1.5},
+            table: {cols: 1, rows: 4.5}
+          };
+        } else {
+          this.cardLayout = {
+            columns: 4,
+            miniCard: isManager ? {cols: 1, rows: 1} : {cols: 0, rows: 0},
+            calendar: {cols: 4, rows: 4},
+            chart: {cols: 2, rows: 2},
+            table: {cols: 4, rows: 4}
+          };
+        }
+      });
     });
     this.viewDate = getNow();
     this.locale = this.translate.currentLang;
@@ -167,22 +172,30 @@ export class DashComponent implements OnInit, OnDestroy {
       if (state) {
         this.error = state.error;
         this.roomId = state.roomId;
+        this.professionalId = state.professionalId;
         this.state = state;
         this.createEvents(this.isDarkMode);
-        if (state.chartSummaries && state.chartSummaries.length) {
-          this.charts = state.chartSummaries;
+        if (!state.chartSummaries && !state.miniCardSummaries) {
           this.isLoading = false;
-        } else {
-          if (state.error) {
-            this.isLoading = false;
-          }
           this.charts = [{} as IChart, {} as IChart, {} as IChart,
             {} as IChart, {} as IChart, {} as IChart, {} as IChart, {} as IChart];
-        }
-        if (state.miniCardSummaries && state.miniCardSummaries.length) {
-          this.miniCardData = state.miniCardSummaries;
-        } else {
           this.miniCardError('NO_CONTENT');
+        } else {
+          if (state.chartSummaries && state.chartSummaries.length) {
+            this.charts = state.chartSummaries;
+            this.isLoading = false;
+          } else {
+            if (state.error) {
+              this.isLoading = false;
+            }
+            this.charts = [{} as IChart, {} as IChart, {} as IChart,
+              {} as IChart, {} as IChart, {} as IChart, {} as IChart, {} as IChart];
+          }
+          if (state.miniCardSummaries && state.miniCardSummaries.length) {
+            this.miniCardData = state.miniCardSummaries;
+          } else {
+            this.miniCardError('NO_CONTENT');
+          }
         }
       }
     }

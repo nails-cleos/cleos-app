@@ -31,12 +31,13 @@ const merge = (a: IDashboard, b: IDashboard) => {
 };
 
 const getMap = (a: Map<string, IDashboard>, b: IDashboard) => {
-  const res = new Map<string, IDashboard>();
+  const res = a;
   Object.keys({...a, ...b}).map(key => {
     // @ts-ignore
     const data = b[key];
-    const values = a.get(data.roomName);
-    res.set(data.roomName, merge(data, values || {}));
+    const dashKey = data.roomName || data.professionalName;
+    const values = a.get(dashKey);
+    res.set(dashKey, merge(data, values || {}));
   });
   return res;
 };

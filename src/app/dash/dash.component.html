@@ -70,9 +70,9 @@
     </app-card>
   </mat-grid-tile>
   <!--Table-->
-  <mat-grid-tile *ngIf="roomId" [colspan]="cardLayout.table?.cols" [rowspan]="cardLayout.table?.rows">
+  <mat-grid-tile *ngIf="roomId || professionalId" [colspan]="cardLayout.table?.cols" [rowspan]="cardLayout.table?.rows">
     <app-card [expand]="false" [title]="'DASHBOARD.CARD.RESERVATION' | translate">
-      <app-reservation-table [roomId]="roomId"></app-reservation-table>
+      <app-reservation-table [roomId]="roomId" [professionalId]="professionalId"></app-reservation-table>
     </app-card>
   </mat-grid-tile>
 </mat-grid-list>

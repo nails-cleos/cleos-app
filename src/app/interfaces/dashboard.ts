@@ -9,6 +9,8 @@ export interface IDashboard {
   timeZone?: string;
   roomName?: string;
   roomId?: string;
+  professionalName?: string;
+  professionalId?: string;
   calendarSummary?: ICalendarSummary;
   miniCardSummaries?: IReservationSummary[];
   chartSummaries?: IChart[];

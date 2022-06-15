@@ -22,7 +22,7 @@ export class CustomEventTitleFormatter extends CalendarEventTitleFormatter {
         const tz = getTimeZone(timeZone);
         const startTimeZone = formatDateMonth(newDateTimestamp(dateToTimestamp(event.start), timeZone), locale);
         const endTimeZone = event.end ? ` - ${formatDateMonth(newDateTimestamp(dateToTimestamp(event.end), timeZone), locale)}` : '';
-        return `<b>${start}${end}</b><br><b>${startTimeZone}${endTimeZone} ${tz.gmt}</b> ${event.title}`;
+        return `(${startTimeZone}${endTimeZone} ${tz.gmt}) <b>${start}${end}</b>&nbsp; ${event.title}`;
       }
       return `<b>${start}${end}</b> ${event.title}`;
     }
