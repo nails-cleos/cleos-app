@@ -35,7 +35,7 @@ import { detailExpandAnimation, transitionAnimation } from '../../util/animation
 import { isToday, isTomorrow } from 'date-fns';
 import { ReservationIconName } from '../../util/icon';
 import { DiscountDialogComponent } from '../../discount/list/discounts.component';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
 import * as fromActionsUser from '../../store/user.actions';
 import { requireMatch } from '../../util/validators';
@@ -547,10 +547,10 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   templateUrl: './change-customer-dialog.component.html'
 })
 export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
-  customerForm!: FormGroup;
+  customerForm!: UntypedFormGroup;
   customers?: IUserAll[];
   filteredCustomer?: Observable<IUser[] | undefined>;
-  customer: FormControl = new FormControl('', [
+  customer: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
 
@@ -558,7 +558,7 @@ export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
 
   constructor(public dialogRef: MatDialogRef<DiscountDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
-              private store: Store<AppState>, private formBuilder: FormBuilder) {
+              private store: Store<AppState>, private formBuilder: UntypedFormBuilder) {
     this.getState = this.store.select(selectUserState);
   }
 

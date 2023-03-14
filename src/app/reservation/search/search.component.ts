@@ -14,7 +14,7 @@ import { getNow, isSameTimeZone, newDate, newDateTimestamp } from '../../util/da
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { map, startWith } from 'rxjs/operators';
 import { IUser, IUserAll } from '../../interfaces/user';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { getFullUserName, openDialog } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -41,9 +41,9 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   language: string;
 
   filteredCustomer: Observable<IUser[] | undefined> | undefined;
-  customer: FormControl = new FormControl();
+  customer: UntypedFormControl = new UntypedFormControl();
 
-  state = new FormControl();
+  state = new UntypedFormControl();
   filteredStates: Observable<string[]>;
   states: string[] = [States.created];
 

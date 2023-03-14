@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AppState, selectDiscountState } from '../store/app.states';
 import { Discount, DiscountType, IDiscount } from '../interfaces/discount';
@@ -18,28 +18,28 @@ import { map, startWith } from 'rxjs/operators';
 export class DiscountComponent implements OnInit, OnDestroy {
   getState: Observable<any>;
   subscription?: Subscription;
-  form!: FormGroup;
+  form!: UntypedFormGroup;
   errors: any = [];
 
-  name: FormControl = new FormControl('', [
+  name: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  amount: FormControl = new FormControl('', [
+  amount: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, Validators.min(1)
   ]);
-  type: FormControl = new FormControl('', [
+  type: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
 
   currencies?: ICurrencyAll[];
   filteredCurrencyOptions?: Observable<ICurrency[] | undefined>;
-  currency: FormControl = new FormControl('', [
+  currency: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
 
   types = DiscountType;
 
-  constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private router: Router) {
+  constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router) {
     this.getState = this.store.select(selectDiscountState);
   }
 
@@ -75,7 +75,7 @@ export class DiscountComponent implements OnInit, OnDestroy {
     return currency ? currency.code : '';
   }
 
-  keyDownHandler(event: any, form: FormControl): void {
+  keyDownHandler(event: any, form: UntypedFormControl): void {
     if (event.code === 'Backspace') {
       form.setValue('');
     }
@@ -85,7 +85,7 @@ export class DiscountComponent implements OnInit, OnDestroy {
     this.form = this.formBuilder.group({
       name: this.name,
       currency: this.currency,
-      description: new FormControl(),
+      description: new UntypedFormControl(),
       amount: this.amount,
       type: this.type
     });

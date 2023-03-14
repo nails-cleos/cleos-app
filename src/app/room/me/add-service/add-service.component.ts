@@ -8,7 +8,7 @@ import * as fromActionsRoom from '../../../store/room.actions';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { IService, IServicePrice, ServicePrice, ServiceType } from '../../../interfaces/room';
 import { IGroupService } from '../../../interfaces/product';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { createProductGroupService } from '../../../util/helper';
 
 @Component({
@@ -146,12 +146,12 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
 })
 export class PriceDialogComponent implements OnInit {
 
-  form!: FormGroup;
-  price: FormControl = new FormControl('', [
+  form!: UntypedFormGroup;
+  price: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
 
-  constructor(public dialogRef: MatDialogRef<PriceDialogComponent>, private formBuilder: FormBuilder,
+  constructor(public dialogRef: MatDialogRef<PriceDialogComponent>, private formBuilder: UntypedFormBuilder,
               @Inject(MAT_DIALOG_DATA) public data: { name: string; price: number; currentPrice?: number }) {
   }
 

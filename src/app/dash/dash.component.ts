@@ -16,7 +16,7 @@ import { Router } from '@angular/router';
 import { isSameDay, isSameMonth } from 'date-fns';
 import { ICalendarReservations, ICalendarUnavailable, IChart, IDashboard } from '../interfaces/dashboard';
 import { UnavailableRepeatType } from '../interfaces/unavailable';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { IAuthority } from '../interfaces/user';
 import { Role } from '../interfaces/token';
 
@@ -29,7 +29,7 @@ export class DashComponent implements OnInit, OnDestroy {
   state: any;
   error: any;
   mapDashboard?: Map<string, IDashboard>;
-  selectedDash = new FormControl();
+  selectedDash = new UntypedFormControl();
   roomId?: string;
   professionalId?: string;
 

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Appearance } from '@angular-material-extensions/google-maps-autocomplete';
-import { ControlContainer, FormGroup, NgForm } from '@angular/forms';
+import { ControlContainer, UntypedFormGroup, NgForm } from '@angular/forms';
 import { GeocodeService } from '../../services/geocode.service';
 import { GeocoderResult } from '@agm/core';
 import { environment } from '../../../environments/environment';
@@ -14,7 +14,7 @@ import { environment } from '../../../environments/environment';
 export class GoogleMapComponent implements OnInit {
 
   @Input() showDistance: boolean | undefined;
-  @Input() addressFormGroup: FormGroup | undefined;
+  @Input() addressFormGroup: UntypedFormGroup | undefined;
   @Input() public latitudeMarker: number | undefined;
   @Input() public longitudeMarker: number | undefined;
   @Output() addressEmitter = new EventEmitter<GeocoderResult>();

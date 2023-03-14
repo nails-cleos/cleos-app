@@ -3,7 +3,7 @@ import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
 import { IUser, User } from '../../interfaces/user';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import * as fromActionsUser from '../../store/user.actions';
 import { fieldChange, valueChange } from '../../util/validators';
 import { Location } from '@angular/common';
@@ -22,32 +22,32 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   getState: Observable<any>;
   subscription?: Subscription;
-  form!: FormGroup;
+  form!: UntypedFormGroup;
   errors: any = [];
   user?: IUser;
   canChange = false;
   image: any;
   initials?: string;
 
-  username: FormControl = new FormControl('', [
+  username: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  langValue: FormControl = new FormControl('', [
+  langValue: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
 
-  firstName: FormControl = new FormControl();
-  lastName: FormControl = new FormControl();
-  phone: FormControl = new FormControl();
-  dob: FormControl = new FormControl();
-  darkColor: FormControl = new FormControl();
-  lightColor: FormControl = new FormControl();
+  firstName: UntypedFormControl = new UntypedFormControl();
+  lastName: UntypedFormControl = new UntypedFormControl();
+  phone: UntypedFormControl = new UntypedFormControl();
+  dob: UntypedFormControl = new UntypedFormControl();
+  darkColor: UntypedFormControl = new UntypedFormControl();
+  lightColor: UntypedFormControl = new UntypedFormControl();
 
   showColors = false;
 
   flagList: IFlag[] = flags();
 
-  constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private location: Location,
+  constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private location: Location,
               private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectUserState);
   }

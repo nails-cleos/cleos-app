@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectAdditionalState } from '../store/app.states';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Additional, IAdditional } from '../interfaces/additional';
 import { Router } from '@angular/router';
 import * as fromActionsAdditional from '../store/additional.actions';
@@ -13,12 +13,12 @@ import * as fromActionsAdditional from '../store/additional.actions';
   styleUrls: ['./additional.component.scss']
 })
 export class AdditionalComponent implements OnInit, OnDestroy {
-  form!: FormGroup;
+  form!: UntypedFormGroup;
 
-  name: FormControl = new FormControl('', [
+  name: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  duration: FormControl = new FormControl('', [
+  duration: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
 
@@ -27,7 +27,7 @@ export class AdditionalComponent implements OnInit, OnDestroy {
   private getState: Observable<any>;
   private subscription: Subscription | undefined;
 
-  constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private router: Router) {
+  constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router) {
     this.getState = this.store.select(selectAdditionalState);
   }
 
@@ -60,7 +60,7 @@ export class AdditionalComponent implements OnInit, OnDestroy {
 
   private createForm(): void {
     this.form = this.formBuilder.group({
-      description: new FormControl(),
+      description: new UntypedFormControl(),
       name: this.name,
       duration: this.duration
     });

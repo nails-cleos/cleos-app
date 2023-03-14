@@ -35,7 +35,7 @@ import { createRoomOffice, getFullUserName, getUserName, roomName } from '../../
 import { addMonths } from 'date-fns';
 import { findStateColor, isDarkMode } from '../../util/theme';
 import { map, startWith, takeUntil } from 'rxjs/operators';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { IOffice } from '../../interfaces/office';
 import { requireMatch } from '../../util/validators';
 import { CalendarDialogComponent } from '../../shared/calendar-dialog/calendar-dialog.component';
@@ -60,20 +60,20 @@ export class CalendarComponent implements OnInit, OnDestroy {
   prevBtnDisabled = false;
   nextBtnDisabled = false;
 
-  officeForm!: FormGroup;
+  officeForm!: UntypedFormGroup;
   offices?: IOffice[];
   filteredOffice?: Observable<IOffice[] | undefined>;
-  office: FormControl = new FormControl('', [
+  office: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
   roomList?: IRoom[];
   filteredRoom?: Observable<IRoom[] | undefined>;
-  room: FormControl = new FormControl('', [
+  room: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
   professionalList?: IUser[];
   filteredProfessional?: Observable<IUser[] | undefined>;
-  professional: FormControl = new FormControl('', [
+  professional: UntypedFormControl = new UntypedFormControl('', [
     requireMatch
   ]);
 
@@ -87,7 +87,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private router: Router, private breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef,
-              private formBuilder: FormBuilder) {
+              private formBuilder: UntypedFormBuilder) {
     this.getState = this.store.select(selectReservationState);
     const CALENDAR_RESPONSIVE = {
       xsmall: {
@@ -169,7 +169,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     return professional ? getFullUserName(professional) : '';
   }
 
-  keyDownHandler(event: any, form: FormControl): void {
+  keyDownHandler(event: any, form: UntypedFormControl): void {
     if (event.code === 'Backspace') {
       form.setValue('');
     }

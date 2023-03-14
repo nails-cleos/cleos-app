@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../store/app.states';
 import * as fromActionsRoom from '../store/room.actions';
@@ -39,7 +39,7 @@ export interface IIcon {
 export class RoomComponent implements OnInit, OnDestroy {
   @ViewChild('professionalInput') professionalInput!: ElementRef<HTMLInputElement>;
 
-  form!: FormGroup;
+  form!: UntypedFormGroup;
   room: IRoom = new Room();
   errors: any = [];
 
@@ -54,35 +54,35 @@ export class RoomComponent implements OnInit, OnDestroy {
     sunday: RoomIconName.calendarToday
   };
 
-  professional = new FormControl();
+  professional = new UntypedFormControl();
   filteredProfessionals?: Observable<IUser[] | undefined>;
   professionals: IUserAll[] = [];
   allProfessional?: IUserAll[];
 
-  address: FormControl = new FormControl('', [
+  address: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
 
-  addressDescription: FormControl = new FormControl();
+  addressDescription: UntypedFormControl = new UntypedFormControl();
 
   currencies?: ICurrencyAll[];
   filteredCurrencyOptions?: Observable<ICurrency[] | undefined>;
 
-  currency: FormControl = new FormControl('', [
+  currency: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
 
   offices?: IOfficeAll[];
   filteredOfficeOptions?: Observable<IOffice[] | undefined>;
 
-  office: FormControl = new FormControl('', [
+  office: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
 
   timeZoneList = timezones;
   filteredTimeZoneOptions?: Observable<any[] | undefined>;
 
-  timeZone: FormControl = new FormControl('', [
+  timeZone: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
 
@@ -94,7 +94,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   private paymentTypes: string[] = [];
 
   constructor(private readonly translate: TranslateService, private store: Store<AppState>,
-              private formBuilder: FormBuilder, private router: Router) {
+              private formBuilder: UntypedFormBuilder, private router: Router) {
     this.getState = this.store.select(selectRoomState);
   }
 
@@ -165,7 +165,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     return timeZone ? timeZone.label : '';
   }
 
-  keyDownHandler(event: any, form: FormControl): void {
+  keyDownHandler(event: any, form: UntypedFormControl): void {
     if (event.code === 'Backspace') {
       form.setValue('');
     }

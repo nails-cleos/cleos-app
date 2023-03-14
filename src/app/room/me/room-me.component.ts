@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChi
 import {
   AvailabilityDate, IAddress, IAvailability, IAvailabilityDate, ILocation, IRoom, IRoomAll
 } from '../../interfaces/room';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { IIcon } from '../room.component';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -30,7 +30,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   errors: any = [];
   step = 0;
 
-  professional = new FormControl('', [
+  professional = new UntypedFormControl('', [
     Validators.required
   ]);
   filteredProfessionals?: Observable<IUser[] | undefined>;
@@ -54,11 +54,11 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   satDate?: IAvailabilityDate;
   sunDate?: IAvailabilityDate;
 
-  form!: FormGroup;
-  address: FormControl = new FormControl('', [
+  form!: UntypedFormGroup;
+  address: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  addressDescription: FormControl = new FormControl();
+  addressDescription: UntypedFormControl = new UntypedFormControl();
 
   paymentOptions: IPaymentType[] = paymentOptions();
 
@@ -67,7 +67,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   private availabilities: IAvailability[] = [];
   private paymentTypes: string[] = [];
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
               private router: Router) {
     this.getState = this.store.select(selectRoomState);
   }

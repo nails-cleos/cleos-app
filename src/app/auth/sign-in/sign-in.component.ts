@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import * as fromActionsLogin from '../../store/auth.actions';
 import { IUser } from '../../interfaces/user';
 import { AppState } from '../../store/app.states';
@@ -15,10 +15,10 @@ export class SignInComponent implements OnInit {
   @Input() extras: any;
 
   hide = true;
-  form!: FormGroup;
+  form!: UntypedFormGroup;
   user?: IUser;
 
-  constructor(private formBuilder: FormBuilder, private store: Store<AppState>, private route: ActivatedRoute) {
+  constructor(private formBuilder: UntypedFormBuilder, private store: Store<AppState>, private route: ActivatedRoute) {
   }
 
   get signIn(): void {

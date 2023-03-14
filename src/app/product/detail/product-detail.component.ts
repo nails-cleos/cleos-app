@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -19,12 +19,12 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   @ViewChild('inputName') inputName?: ElementRef<HTMLInputElement>;
   @Input() group?: IProductGroup;
 
-  form!: FormGroup;
+  form!: UntypedFormGroup;
 
-  name: FormControl = new FormControl('', [
+  name: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  selected = new FormControl(0);
+  selected = new UntypedFormControl(0);
   products: IProduct[] = [];
 
   errors: any = [];
@@ -32,7 +32,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   private subscription?: Subscription;
   private getState: Observable<any>;
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
               private router: Router) {
     this.getState = this.store.select(selectProductState);
   }
@@ -121,9 +121,9 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   private createForm(): void {
     this.form = this.formBuilder.group({
       name: this.name,
-      description: new FormControl(),
-      durabilityMin: new FormControl(),
-      durabilityMax: new FormControl()
+      description: new UntypedFormControl(),
+      durabilityMin: new UntypedFormControl(),
+      durabilityMax: new UntypedFormControl()
     });
   }
 

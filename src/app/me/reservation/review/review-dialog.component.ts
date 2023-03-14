@@ -5,7 +5,7 @@ import { IReview } from '../../../interfaces/review';
 import { IReservationAll } from '../../../interfaces/reservation';
 import { IPrice } from '../../../interfaces/product';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { transitionAnimation } from '../../../util/animation';
 
@@ -27,7 +27,7 @@ export class ReviewDialogComponent {
 
   review?: IReview;
 
-  detail = new FormControl();
+  detail = new UntypedFormControl();
 
   constructor(public dialogRef: MatDialogRef<ReviewDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: IReservationAll,
               private translate: TranslateService) {

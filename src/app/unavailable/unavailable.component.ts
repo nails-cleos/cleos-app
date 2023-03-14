@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AppState, selectUnavailableState } from '../store/app.states';
 import { IUnavailable, Unavailable, UnavailableRepeatType } from '../interfaces/unavailable';
@@ -30,32 +30,32 @@ import { Router } from '@angular/router';
   styleUrls: ['./unavailable.component.scss']
 })
 export class UnavailableComponent implements OnInit, OnDestroy {
-  form!: FormGroup;
+  form!: UntypedFormGroup;
 
   professionals?: IUserAll[];
   rooms: IRoomAll[] = [];
   filteredOptions?: Observable<IUser[] | undefined>;
   roomAvailability?: IRoomAll;
 
-  professional: FormControl = new FormControl('', [
+  professional: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
-  startDate: FormControl = new FormControl('', [
+  startDate: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  endDate: FormControl = new FormControl('', [
+  endDate: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  startTime: FormControl = new FormControl('', [
+  startTime: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  duration: FormControl = new FormControl('', [
+  duration: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  repeat: FormControl = new FormControl('', [
+  repeat: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  allDay: FormControl = new FormControl();
+  allDay: UntypedFormControl = new UntypedFormControl();
 
   repeats = UnavailableRepeatType;
 
@@ -72,7 +72,7 @@ export class UnavailableComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
   private readonly extras: any;
 
-  constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private router: Router) {
+  constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router) {
     this.getState = this.store.select(selectUnavailableState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
     if (this.extras) {
@@ -216,7 +216,7 @@ export class UnavailableComponent implements OnInit, OnDestroy {
   private createForm(): void {
     this.form = this.formBuilder.group({
       professional: this.professional,
-      description: new FormControl(),
+      description: new UntypedFormControl(),
       startDate: this.startDate,
       startTime: this.startTime,
       duration: this.duration,

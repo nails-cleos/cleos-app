@@ -2,7 +2,7 @@ import {
   AfterViewInit, ChangeDetectorRef, Component, Inject, Input, OnDestroy, OnInit, ViewChild
 } from '@angular/core';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
 import { IUser, IUserAll } from '../interfaces/user';
 import { Observable, Subject, Subscription } from 'rxjs';
@@ -63,61 +63,61 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   errors: any = [];
 
-  customerForm!: FormGroup;
+  customerForm!: UntypedFormGroup;
   customers?: IUserAll[];
   filteredCustomer?: Observable<IUser[] | undefined>;
-  customer: FormControl = new FormControl('', [
+  customer: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
   customerInfo?: ICustomerLastReservation;
 
-  productForm!: FormGroup;
+  productForm!: UntypedFormGroup;
   groups?: IGroupService[];
   filteredGroup?: Observable<IGroupService[] | undefined>;
-  group: FormControl = new FormControl('', [
+  group: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
   productList?: IService[];
   filteredProduct?: Observable<IService[] | undefined>;
-  product: FormControl = new FormControl('', [
+  product: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
 
   discounts?: IUserDiscount[];
-  discount = new FormControl();
+  discount = new UntypedFormControl();
   showDiscount = false;
   price: IPrice;
 
-  officeForm!: FormGroup;
+  officeForm!: UntypedFormGroup;
   offices?: IOffice[];
   filteredOffice?: Observable<IOffice[] | undefined>;
-  office: FormControl = new FormControl('', [
+  office: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
   roomList?: IRoom[];
   filteredRoom?: Observable<IRoom[] | undefined>;
-  room: FormControl = new FormControl('', [
+  room: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
   professionalList?: IUser[];
   filteredProfessional?: Observable<IUser[] | undefined>;
-  professional: FormControl = new FormControl('', [
+  professional: UntypedFormControl = new UntypedFormControl('', [
     requireMatch
   ]);
   address?: string;
 
-  date: FormControl = new FormControl('', [
+  date: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
 
-  start: FormControl = new FormControl('');
+  start: UntypedFormControl = new UntypedFormControl('');
 
   additionalList: IAdditionalAll[] = [];
   additionalSelected: IAdditionalAll[] = [];
 
-  configurationForm!: FormGroup;
-  customerChange: FormControl = new FormControl();
-  reference: FormControl = new FormControl();
+  configurationForm!: UntypedFormGroup;
+  customerChange: UntypedFormControl = new UntypedFormControl();
+  reference: UntypedFormControl = new UntypedFormControl();
 
   viewDate: Date = getNow();
   daysInWeek = 7;
@@ -157,7 +157,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   private dismiss = false;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private formBuilder: FormBuilder, private breakpointObserver: BreakpointObserver,
+              private formBuilder: UntypedFormBuilder, private breakpointObserver: BreakpointObserver,
               private router: Router, private route: ActivatedRoute, private adapter: DateAdapter<any>,
               private cdRef: ChangeDetectorRef, private snackBar: MatSnackBar) {
     this.price = new Price();
@@ -496,7 +496,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.date.value.setHours(time[0], time[1]);
   }
 
-  keyDownHandler(event: any, form: FormControl): void {
+  keyDownHandler(event: any, form: UntypedFormControl): void {
     if (event.code === 'Backspace') {
       form.setValue('');
     }
@@ -1120,15 +1120,15 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   templateUrl: './select-professional-dialog.component.html'
 })
 export class SelectProfessionalDialogComponent implements OnInit {
-  professionalForm!: FormGroup;
+  professionalForm!: UntypedFormGroup;
   professionals?: IUser[];
   filteredProfessional?: Observable<IUser[] | undefined>;
-  professional: FormControl = new FormControl('', [
+  professional: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
 
   constructor(public dialogRef: MatDialogRef<DiscountDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
-              private formBuilder: FormBuilder) {
+              private formBuilder: UntypedFormBuilder) {
     this.professionals = data.professionals;
   }
 

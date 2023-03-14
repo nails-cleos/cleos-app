@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChi
 import {
   AvailabilityDate, IAddress, IAvailability, IAvailabilityDate, ILocation, IRoomAll
 } from '../../interfaces/room';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -28,12 +28,12 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('professionalInput') professionalInput!: ElementRef<HTMLInputElement>;
   @Input() room?: IRoomAll;
 
-  form!: FormGroup;
+  form!: UntypedFormGroup;
 
   errors: any = [];
   step = 0;
 
-  professional = new FormControl('', [
+  professional = new UntypedFormControl('', [
     Validators.required
   ])
   filteredProfessionals?: Observable<IUser[] | undefined>;
@@ -58,10 +58,10 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   satDate?: IAvailabilityDate;
   sunDate?: IAvailabilityDate;
 
-  address: FormControl = new FormControl('', [
+  address: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  addressDescription: FormControl = new FormControl();
+  addressDescription: UntypedFormControl = new UntypedFormControl();
 
   paymentOptions: IPaymentType[] = paymentOptions();
 
@@ -70,7 +70,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   private availabilities: IAvailability[] = [];
   private paymentTypes: string[] = [];
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
               private router: Router) {
     this.getState = this.store.select(selectRoomState);
   }

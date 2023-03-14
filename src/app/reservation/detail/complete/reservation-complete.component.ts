@@ -6,7 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as fromActionsReservation from '../../../store/reservation.actions';
 import { IReservationAll } from '../../../interfaces/reservation';
 import { IGroupService, IPrice, IProduct, IProductGroup, Price } from '../../../interfaces/product';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IPaymentAll, PaymentType } from '../../../interfaces/payment';
 import { createProductGroupService, getPrice, getProductDurability, newAdditional, newExtra, newPrice } from '../../../util/helper';
@@ -30,21 +30,21 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   additionalList?: IAdditionalAll[];
   additionalSelected: IAdditionalAll[] = [];
 
-  form!: FormGroup;
+  form!: UntypedFormGroup;
   groups?: IGroupService[];
   filteredGroup?: Observable<IGroupService[] | undefined>;
-  group: FormControl = new FormControl('', [
+  group: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
   products?: IService[];
   filteredProduct?: Observable<IService[] | undefined>;
-  product: FormControl = new FormControl('', [
+  product: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
 
-  description: FormControl = new FormControl();
-  extraPrice: FormControl = new FormControl();
-  type: FormControl = new FormControl(PaymentType.cash);
+  description: UntypedFormControl = new UntypedFormControl();
+  extraPrice: UntypedFormControl = new UntypedFormControl();
+  type: UntypedFormControl = new UntypedFormControl(PaymentType.cash);
 
   types: string[] = Object.values(PaymentType);
   price: IPrice;
@@ -58,7 +58,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
   private readonly isDashboard = false;
 
-  constructor(private store: Store<AppState>, private route: ActivatedRoute, private formBuilder: FormBuilder,
+  constructor(private store: Store<AppState>, private route: ActivatedRoute, private formBuilder: UntypedFormBuilder,
               private readonly translate: TranslateService, private router: Router) {
     this.getState = this.store.select(selectReservationState);
     this.price = new Price();
@@ -125,7 +125,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     return product ? `${product.name}` : '';
   }
 
-  keyDownHandler(event: any, form: FormControl): void {
+  keyDownHandler(event: any, form: UntypedFormControl): void {
     if (event.code === 'Backspace') {
       form.setValue('');
     }

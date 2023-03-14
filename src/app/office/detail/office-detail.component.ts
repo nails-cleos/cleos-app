@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectOfficeState } from '../../store/app.states';
@@ -17,18 +17,18 @@ import { getUserName } from '../../util/helper';
 export class OfficeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() office?: IOffice;
 
-  form!: FormGroup;
+  form!: UntypedFormGroup;
   errors: any = [];
   managerName?: string;
 
-  name: FormControl = new FormControl('', [
+  name: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
 
   private getState: Observable<any>;
   private subscription?: Subscription;
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
               private router: Router) {
     this.getState = this.store.select(selectOfficeState);
   }

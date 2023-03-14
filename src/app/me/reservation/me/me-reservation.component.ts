@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatStepper } from '@angular/material/stepper';
 import { Observable, Subscription } from 'rxjs';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IGroupService, IPrice, IProduct, IProductGroup, Price } from '../../../interfaces/product';
 import { IRoom, IService } from '../../../interfaces/room';
@@ -54,42 +54,42 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   errors: any = [];
 
-  productForm!: FormGroup;
+  productForm!: UntypedFormGroup;
   groups?: IGroupService[];
   filteredGroup?: Observable<IGroupService[] | undefined>;
-  group: FormControl = new FormControl('', [
+  group: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
   productList?: IService[];
   filteredProduct?: Observable<IService[] | undefined>;
-  product: FormControl = new FormControl('', [
+  product: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
 
   discounts?: IUserDiscount[];
   showDiscount = false;
   price: IPrice;
-  discount = new FormControl();
+  discount = new UntypedFormControl();
 
-  roomForm!: FormGroup;
+  roomForm!: UntypedFormGroup;
   offices?: IOffice[];
   filteredOffice?: Observable<IOffice[] | undefined>;
-  office: FormControl = new FormControl('', [
+  office: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
   roomList?: IRoom[];
   filteredRoom?: Observable<IRoom[] | undefined>;
-  room: FormControl = new FormControl('', [
+  room: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
 
-  startDate: FormControl = new FormControl('', [
+  startDate: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
 
   professionalList?: IUser[];
   filteredProfessional?: Observable<IUser[] | undefined>;
-  professional: FormControl = new FormControl('', [
+  professional: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
 
@@ -133,7 +133,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   constructor(private readonly translate: TranslateService, private snackBar: MatSnackBar,
               private store: Store<AppState>,
-              private formBuilder: FormBuilder, private breakpointObserver: BreakpointObserver,
+              private formBuilder: UntypedFormBuilder, private breakpointObserver: BreakpointObserver,
               private router: Router, private route: ActivatedRoute, public dialog: MatDialog) {
     this.getState = this.store.select(selectReservationState);
     this.store.select(selectAuthState).subscribe((state: any) => this.customerId = state.user.id);
@@ -398,7 +398,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
         { distance: round($event) });
   }
 
-  keyDownHandler(event: any, form: FormControl): void {
+  keyDownHandler(event: any, form: UntypedFormControl): void {
     if (event.code === 'Backspace') {
       form.setValue('');
     }

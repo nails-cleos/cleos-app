@@ -1,6 +1,6 @@
-import { AbstractControl, FormControl } from '@angular/forms';
+import { AbstractControl, UntypedFormControl } from '@angular/forms';
 
-export const fieldChange = (formControl: FormControl, value: any | undefined): any | undefined =>
+export const fieldChange = (formControl: UntypedFormControl, value: any | undefined): any | undefined =>
   formControl && formControl.dirty && value !== formControl.value ? formControl.value : null;
 
 export const valueChange = (newValue: any, oldValue: any | undefined): any | undefined => oldValue !== newValue ? newValue : null;
