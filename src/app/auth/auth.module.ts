@@ -16,7 +16,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { RedirectComponent } from './redirect/redirect.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { NgxMatIntlTelInputModule } from 'ngx-mat-intl-tel-input';
+import { NgxMatIntlTelInputComponent } from 'ngx-mat-intl-tel-input';
 import { EffectsModule } from '@ngrx/effects';
 import { LoginEffects } from '../store/effects/auth.effects';
 import { AuthService } from '../services/auth.service';
@@ -45,7 +45,7 @@ import { NgxMatColorPickerModule } from '@angular-material-components/color-pick
     MatPasswordStrengthModule.forRoot(),
     MatTabsModule,
     MatSlideToggleModule,
-    NgxMatIntlTelInputModule,
+    NgxMatIntlTelInputComponent,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
