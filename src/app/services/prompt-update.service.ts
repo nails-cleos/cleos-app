@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { SwUpdate } from '@angular/service-worker';
+import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
+import {filter, map} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -7,10 +8,12 @@ import { SwUpdate } from '@angular/service-worker';
 export class PromptUpdateService {
 
   constructor(updates: SwUpdate) {
-    updates.available.subscribe(event => {
-      if (event.current !== event.available) {
-        updates.activateUpdate().then(() => document.location.reload());
-      }
-    });
+    updates.versionUpdates.pipe(
+      filter((evt): evt is VersionReadyEvent => evt.type === 'VERSION_READY'),
+      map(evt => ({
+        type: 'UPDATE_AVAILABLE',
+        current: evt.currentVersion,
+        available: evt.latestVersion,
+      })));
   }
 }
