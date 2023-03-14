@@ -24,7 +24,7 @@
               <div class="divider">
                 <p>
                   {{ 'AUTH.SIGN_IN.NEW' | translate }}
-                  <a (click)="authGroup.selectedIndex=1" [routerLink]="">{{ 'AUTH.SIGN_UP.TITLE' | translate }}!</a>
+                  <a (click)="authGroup.selectedIndex=1" [routerLink]="[]">{{ 'AUTH.SIGN_UP.TITLE' | translate }}!</a>
                 </p>
               </div>
             </mat-card-content>
@@ -50,7 +50,7 @@
               <div class="divider">
                 <p>
                   {{ 'AUTH.SIGN_UP.ALREADY' | translate }}
-                  <a (click)="authGroup.selectedIndex=0" [routerLink]="">{{ 'AUTH.SIGN_IN.TITLE' | translate }}!</a>
+                  <a (click)="authGroup.selectedIndex=0" [routerLink]="[]">{{ 'AUTH.SIGN_IN.TITLE' | translate }}!</a>
                 </p>
               </div>
             </mat-card-content>
