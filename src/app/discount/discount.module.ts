@@ -6,7 +6,7 @@ import { DiscountRoutingModule } from './discount-routing.module';
 import { DiscountComponent } from './discount.component';
 import { DiscountDialogComponent, DiscountsComponent } from './list/discounts.component';
 import { DiscountDetailComponent } from './detail/discount-detail.component';
-import { MatChipsModule } from '@angular/material/chips';
+import { MatLegacyChipsModule as MatChipsModule } from '@angular/material/legacy-chips';
 import { EffectsModule } from '@ngrx/effects';
 import { DiscountEffects } from '../store/effects/discount.effects';
 import { DiscountService } from '../services/discount.service';

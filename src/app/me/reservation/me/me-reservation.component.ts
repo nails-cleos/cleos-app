@@ -14,7 +14,7 @@ import {
   stringDateUTCToTimeZone, totalDuration
 } from '../../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState, selectReservationState } from '../../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -30,12 +30,12 @@ import { DiscountType, IUserDiscount } from '../../../interfaces/discount';
 import { transitionAnimation } from '../../../util/animation';
 import { isEqual } from 'date-fns';
 import { IAdditionalAll } from '../../../interfaces/additional';
-import { MatListOption } from '@angular/material/list';
+import { MatLegacyListOption as MatListOption } from '@angular/material/legacy-list';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { IOffice } from '../../../interfaces/office';
 import { IStep, Step } from '../../../interfaces/step';
 import { TimeZoneSnackBarComponent } from '../../../shared/snak/time-zone/time-zone-snack-bar.component';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { Role } from '../../../interfaces/token';
 import { IUser } from "../../../interfaces/user";
 

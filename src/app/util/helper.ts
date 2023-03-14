@@ -11,7 +11,7 @@ import { ICurrency } from '../interfaces/currency';
 import { IStep } from '../interfaces/step';
 import { getTime, getTimeZone, localeTimeZoneDate } from './dates';
 import { DialogComponent } from '../shared/dialog/dialog.component';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { isSameDay } from 'date-fns';
 import { Role } from '../interfaces/token';
 import { ColorEvent } from '../interfaces/dashboard';

@@ -10,7 +10,7 @@ import { AppState, selectAuthState, selectMainState } from '../../store/app.stat
 import { ViewportScroller } from '@angular/common';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
 import { IUserAll } from '../../interfaces/user';
 import { getUserName } from '../../util/helper';
 import { filterDateRoom, getNow, plusMonthDate } from '../../util/dates';

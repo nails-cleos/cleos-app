@@ -7,7 +7,7 @@ import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } 
 import { Observable, Subscription } from 'rxjs';
 import { flags, IFlag } from '../../util/flags';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
 import { CookieService } from 'ngx-cookie-service';
 import { Theme, THEME } from '../../util/theme';
 

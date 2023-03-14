@@ -7,7 +7,7 @@ import { DragDropDirective } from '../directives/drag-drop.directive';
 import { CatalogueComponent } from './catalogue.component';
 import { CataloguesComponent } from './list/catalogues.component';
 import { CatalogueDetailComponent } from './detail/catalogue-detail.component';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatLegacyProgressBarModule as MatProgressBarModule } from '@angular/material/legacy-progress-bar';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { EffectsModule } from '@ngrx/effects';
 import { CatalogueEffects } from '../store/effects/catalogue.effects';

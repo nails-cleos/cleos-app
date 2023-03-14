@@ -19,7 +19,7 @@ import { getFrequency } from '../util/event';
 import { Day, IReservation, MAX_RESERVATION_MONTH, States } from '../interfaces/reservation';
 import { addMonths, isSameDay, isToday } from 'date-fns';
 import { Router } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { getProfessionalColor } from '../util/color';
 import { CalendarDialogComponent } from '../shared/calendar-dialog/calendar-dialog.component';
 
