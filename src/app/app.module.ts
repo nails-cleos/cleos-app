@@ -24,7 +24,7 @@ import { Router } from '@angular/router';
 import { httpInterceptorProviders } from './http-interceptors';
 import { environment } from '../environments/environment';
 import { localStorageSync } from 'ngrx-store-localstorage';
-import { MatLegacyPaginatorIntl as MatPaginatorIntl } from '@angular/material/legacy-paginator';
+import { MatPaginatorIntl } from '@angular/material/paginator';
 import { PaginatorI18n } from './util/paginator';
 import { TranslationLoaderResolver } from './util/translation.resolver';
 import localeEn from '@angular/common/locales/en';
@@ -96,7 +96,7 @@ registerLocaleData(localeEs, 'es');
       enabled: environment.production,
       registrationStrategy: 'registerWhenStable:30000'
     }),
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    AngularFireModule.initializeApp(environment.firebase),
     AngularFireMessagingModule,
     AngularFireAnalyticsModule,
     NgxMatColorPickerModule

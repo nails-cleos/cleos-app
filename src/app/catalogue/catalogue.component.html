@@ -2,7 +2,7 @@
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <form (ngSubmit)="create" [formGroup]="form" novalidate>
-        <mat-card class="style-card">
+        <mat-card appearance="outlined" class="style-card">
           <mat-card-header>
             <mat-card-title>{{ 'CATALOGUE.TITLE' | translate }}</mat-card-title>
           </mat-card-header>
@@ -58,7 +58,7 @@
                 <input #fileInput (change)="fileBrowseHandler($event)" [multiple]="false" hidden id="file" type="file">
               </div>
 
-              <mat-card *ngIf="file" class="divider">
+              <mat-card appearance="outlined" *ngIf="file" class="divider">
                 <mat-card-header>
                   <mat-icon class="icon-display" mat-card-avatar>image</mat-icon>
                   <mat-card-title-group>

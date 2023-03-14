@@ -15,7 +15,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { map, startWith } from 'rxjs/operators';
 import { transitionAnimation } from '../../../util/animation';
 import { IAdditionalAll } from '../../../interfaces/additional';
-import { MatLegacyListOption as MatListOption } from '@angular/material/legacy-list';
+import { MatListOption } from '@angular/material/list';
 import { IService } from '../../../interfaces/room';
 
 @Component({

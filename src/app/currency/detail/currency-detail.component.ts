@@ -5,7 +5,7 @@ import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectCurrencyState } from '../../store/app.states';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { fieldChange } from '../../util/validators';
 import * as fromActionsCurrency from '../../store/currency.actions';
 

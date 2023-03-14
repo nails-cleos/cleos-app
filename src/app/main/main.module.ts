@@ -10,7 +10,7 @@ import { PrivacyComponent } from './privacy/privacy.component';
 import { ImageViewerComponent } from './image-viewer/image-viewer.component';
 import { TermsAndConditionsComponent } from './terms-and-conditions/terms-and-conditions.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatLegacySlideToggleModule as MatSlideToggleModule } from '@angular/material/legacy-slide-toggle';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MiniCardProductComponent } from './mini-card-product/mini-card-product.component';
 import { EffectsModule } from '@ngrx/effects';
 import { MainEffects } from '../store/effects/main.effects';
@@ -23,6 +23,7 @@ import { UserService } from '../services/user.service';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { LoginEffects } from '../store/effects/auth.effects';
 import { AuthService } from '../services/auth.service';
+import { MatCarouselModule } from "ng-mat-carousel";
 
 @NgModule({
   declarations: [
@@ -47,7 +48,8 @@ import { AuthService } from '../services/auth.service';
       isolate: false,
       extend: true
     }),
-    EffectsModule.forFeature([MainEffects, CatalogueEffects, UserEffects, LoginEffects])
+    EffectsModule.forFeature([MainEffects, CatalogueEffects, UserEffects, LoginEffects]),
+    MatCarouselModule.forRoot()
   ],
   providers: [
     MainService,

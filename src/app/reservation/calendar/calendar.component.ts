@@ -5,7 +5,7 @@ import { Observable, Subject } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
 import { Calendar, Day, ICalendar, IReservationAll, IRoomReservation, MAX_RESERVATION_MONTH } from '../../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import {
   addPeriod,
   CalendarPeriod,

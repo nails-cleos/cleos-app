@@ -13,7 +13,7 @@ import { ChangeCustomerDialogComponent, ReservationDetailComponent } from './det
 import { MoreInfoComponent } from './detail/more-info/more-info.component';
 import { CalendarComponent } from './calendar/calendar.component';
 import { MatStepperModule } from '@angular/material/stepper';
-import { MatLegacyChipsModule as MatChipsModule } from '@angular/material/legacy-chips';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { ReservationCompleteComponent } from './detail/complete/reservation-complete.component';
 import { EffectsModule } from '@ngrx/effects';

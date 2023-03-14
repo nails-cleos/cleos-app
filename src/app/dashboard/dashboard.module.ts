@@ -17,7 +17,7 @@ import { UserService } from '../services/user.service';
 import { AdditionalService } from '../services/additional.service';
 import { TrackingService } from '../services/tracking.service';
 import { DayViewSchedulerComponent } from './day-view-scheduler.component';
-import { MatLegacyRadioModule as MatRadioModule } from '@angular/material/legacy-radio';
+import { MatRadioModule } from '@angular/material/radio';
 
 @NgModule({
   declarations: [

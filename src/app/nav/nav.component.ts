@@ -30,7 +30,7 @@ import { Role } from '../interfaces/token';
 import { MessagingService } from '../services/messaging.service';
 import { environment } from '../../environments/environment';
 import { getUserImage, getUserNameInitials, isRoomAdmin } from '../util/helper';
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { NavigationService } from '../services/navigation.service';
 import { TokenService } from '../services/token.service';
 import { CookieService } from 'ngx-cookie-service';

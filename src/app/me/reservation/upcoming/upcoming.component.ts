@@ -4,7 +4,7 @@ import { getPrice, openDialog } from '../../../util/helper';
 import { TranslateService } from '@ngx-translate/core';
 import { stampAnimation, transitionAnimation } from '../../../util/animation';
 import { createNewDate, isSameTimeZone, newDateTimestamp, reservationDuration } from '../../../util/dates';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-upcoming',

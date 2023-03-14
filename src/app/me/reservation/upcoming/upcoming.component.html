@@ -1,4 +1,4 @@
-<mat-card *ngIf="upcoming" class="upcoming">
+<mat-card appearance="outlined" *ngIf="upcoming" class="upcoming">
   <span *ngIf="upcoming.price?.isPaid" [@stampAnimation]="{value: ':enter', params: {deg: -20}}"
         class="stamp stamp-paid">{{ 'ME.RESERVATION.UPCOMING.PAID' | translate }}</span>
   <span *ngIf="upcoming.state === 'APPROVED'" [@stampAnimation]="{value: ':enter', params: {deg: 20}}"

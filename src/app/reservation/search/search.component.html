@@ -4,15 +4,15 @@
     <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
       <mat-form-field>
         <mat-label>{{ 'RESERVATION.STATE.SEARCH' | translate }}</mat-label>
-        <mat-chip-list #chipList aria-label="Fruit selection">
-          <mat-chip (removed)="remove(state)" *ngFor="let state of states" [removable]="true" [selectable]="true"
+        <mat-chip-grid #chipList aria-label="Fruit selection">
+          <mat-chip-row (removed)="remove(state)" *ngFor="let state of states" [removable]="true"
                     color="primary">
             {{ 'COMMON.STATUS.RESERVATION.' + state.toUpperCase() | translate}}
             <mat-icon matChipRemove>cancel</mat-icon>
-          </mat-chip>
+          </mat-chip-row>
           <input #stateInput [formControl]="state" [matAutocomplete]="auto" [matChipInputFor]="chipList"
                  placeholder="{{ 'RESERVATION.STATE.FIELD' | translate }}">
-        </mat-chip-list>
+        </mat-chip-grid>
         <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
           <mat-option *ngFor="let state of filteredStates | async" [value]="state">
             {{ 'COMMON.STATUS.RESERVATION.' + state.toUpperCase() | translate}}

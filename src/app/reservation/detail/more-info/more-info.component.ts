@@ -11,7 +11,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { getDiffTime, newDate, newDateTimestamp } from '../../../util/dates';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { environment } from '../../../../environments/environment';
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-more-info',

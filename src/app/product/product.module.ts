@@ -6,15 +6,15 @@ import { ProductRoutingModule } from './product-routing.module';
 import { ProductComponent } from './product.component';
 import { ProductsComponent } from './list/products.component';
 import { ProductDetailComponent } from './detail/product-detail.component';
-import { MatLegacyTabsModule as MatTabsModule } from '@angular/material/legacy-tabs';
+import { MatTabsModule } from '@angular/material/tabs';
 import { EffectsModule } from '@ngrx/effects';
 import { ProductEffects } from '../store/effects/product.effects';
 import { ProductService } from '../services/product.service';
 import { ProductViewComponent } from './view/product-view.component';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { ProductTableComponent } from './table/product-table.component';
-import { MatLegacyTableModule as MatTableModule } from '@angular/material/legacy-table';
-import { MatLegacyPaginatorModule as MatPaginatorModule } from '@angular/material/legacy-paginator';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
 

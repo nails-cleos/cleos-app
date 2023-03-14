@@ -27,7 +27,7 @@ import { IUser } from '../../interfaces/user';
 import { getUserName } from '../../util/helper';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-unavailable-detail',

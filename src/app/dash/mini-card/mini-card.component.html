@@ -1,4 +1,4 @@
-<mat-card class="dashboard-card">
+<mat-card appearance="outlined" class="dashboard-card">
   <div *ngIf="!isLoading && (value || value === 0 || error); else box">
     <div *ngIf="value || value === 0; else errorBox">
       <mat-card-header class="card-header">

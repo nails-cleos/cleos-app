@@ -1,11 +1,11 @@
 <div class="carousel">
-<!--  <mat-carousel *ngIf="slides && slides.length; else loading" [autoplay]="true" [hideArrows]="true"-->
-<!--                [hideIndicators]="false" [interval]="3000" [loop]="true"-->
-<!--                [maintainAspectRatio]="false" [slides]="slides.length" [useKeyboard]="true" [useMouseWheel]="false"-->
-<!--                color="primary" orientation="ltr" timings="250ms ease-in">-->
-<!--    <mat-carousel-slide #matCarouselSlide *ngFor="let slide of slides; let i = index"-->
-<!--                        [image]="slide.image"></mat-carousel-slide>-->
-<!--  </mat-carousel>-->
+  <mat-carousel *ngIf="slides && slides.length; else loading" [autoplay]="true" [hideArrows]="true"
+                [hideIndicators]="false" [interval]="3000" [loop]="true"
+                [maintainAspectRatio]="false" [slides]="slides.length" [useKeyboard]="true" [useMouseWheel]="false"
+                color="primary" orientation="ltr" timings="250ms ease-in">
+    <mat-carousel-slide #matCarouselSlide *ngFor="let slide of slides; let i = index"
+                        [image]="slide.image"></mat-carousel-slide>
+  </mat-carousel>
   <ng-template #loading>
     <div class="spinner-parent-vertical">
       <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
@@ -89,7 +89,7 @@
   </section>
   <section class="section-style last" id="contact">
     <h1 class="title">{{ 'MAIN.SECTION.CONTACT' | translate }}</h1>
-    <mat-card>
+    <mat-card appearance="outlined">
       <mat-card-content fxLayout="row" fxLayout.lt-sm="column" fxLayoutAlign="space-evenly stretch">
         <div class="div-left">
           <h2 class="bold no-content">{{'MAIN.CONTACT.TITLE' | translate}}</h2>

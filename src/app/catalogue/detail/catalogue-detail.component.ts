@@ -3,14 +3,14 @@ import { Catalogue, ICatalogue } from '../../interfaces/catalogue';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { AppState, selectCatalogueState } from '../../store/app.states';
 import { fieldChange } from '../../util/validators';
 import * as fromActionsCatalogue from '../../store/catalogue.actions';
 import { formatBytes } from '../../util/file';
 import { TranslateService } from '@ngx-translate/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-catalogue-detail',

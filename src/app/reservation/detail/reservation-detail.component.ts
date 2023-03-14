@@ -19,12 +19,12 @@ import {
   newDateTimestamp,
   reservationDuration
 } from '../../util/dates';
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
-import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialog as MatDialog, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Role } from '../../interfaces/token';
 import { getFullUserName, getPrice, getUserName, isProfessional, openDialog, snakeToCamel } from '../../util/helper';
 import { IPrice, Price } from '../../interfaces/product';

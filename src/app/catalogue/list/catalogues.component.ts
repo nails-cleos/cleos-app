@@ -5,13 +5,13 @@ import { Observable, Subscription } from 'rxjs';
 import { AppState, selectCatalogueState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
 import * as fromActionsCatalogue from '../../store/catalogue.actions';
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ICatalogueAll } from '../../interfaces/catalogue';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-catalogue-list',

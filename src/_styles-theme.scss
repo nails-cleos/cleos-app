@@ -25,11 +25,11 @@
     }
   }
 
-  .mat-list-item.active {
+  .mat-mdc-list-item.active {
     color: mat.get-color-from-palette($primary-palette);
   }
 
-  .mat-row:hover {
+  .mat-mdc-row:hover {
     background-color: mat.get-color-from-palette($background, hover);
   }
 

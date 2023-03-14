@@ -5,7 +5,7 @@ import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectAdditionalState } from '../../store/app.states';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { formatDuration } from '../../util/dates';
 import * as fromActionsAdditional from '../../store/additional.actions';
 import { fieldChange, valueChange } from '../../util/validators';

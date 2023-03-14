@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { IPayment, IPaymentAll, PaymentType } from '../../../interfaces/payment';
 import * as fromActionsPayment from '../../../store/payment.actions';
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
+import { MatTableDataSource } from '@angular/material/table';
 import { Pagination } from '../../../interfaces/pagination';
 import { environment } from '../../../../environments/environment';
 

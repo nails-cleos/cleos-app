@@ -5,7 +5,7 @@ import { Store } from '@ngrx/store';
 import * as fromActionsLogin from '../../store/auth.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { getLocale } from '../../util/helper';
 
 @Component({

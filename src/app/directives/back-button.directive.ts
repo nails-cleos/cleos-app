@@ -3,7 +3,7 @@ import { NavigationService } from '../services/navigation.service';
 import { UntypedFormGroup } from '@angular/forms';
 import { DialogComponent } from '../shared/dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 
 @Directive({
   selector: '[appBackButton]'

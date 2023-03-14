@@ -15,11 +15,11 @@ import { Role } from '../interfaces/token';
 import { RoomIconName } from '../util/icon';
 import { ICurrency, ICurrencyAll } from '../interfaces/currency';
 import { IOffice, IOfficeAll } from '../interfaces/office';
-import { MatLegacyListOption as MatListOption } from '@angular/material/legacy-list';
+import { MatListOption } from '@angular/material/list';
 import { IPaymentType, paymentOptions } from '../interfaces/payment';
 import timezones from 'timezones-list';
 import { getCurrentTimeZone } from '../util/dates';
-import { MatLegacyAutocompleteSelectedEvent as MatAutocompleteSelectedEvent } from '@angular/material/legacy-autocomplete';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 
 export interface IIcon {
   monday: RoomIconName;

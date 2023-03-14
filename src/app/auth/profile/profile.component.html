@@ -2,7 +2,7 @@
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <span *ngIf="user && !user.completed" class="incomplete">{{ 'COMMON.PROFILE.INCOMPLETE' | translate }}</span>
-      <mat-card>
+      <mat-card appearance="outlined">
         <mat-card-header class="center">
           <mat-card-title>{{ 'COMMON.PROFILE.FIELD' | translate }}</mat-card-title>
           <mat-card-subtitle *ngIf="user; else skeleton">{{user.email}}</mat-card-subtitle>
@@ -110,7 +110,7 @@
               <div style="width: 100%; display: table;">
                 <div style="display: table-row">
                   <div style="display: table-cell;">
-                    <mat-card *ngIf="darkColor.value" [style.background-color]="'#363636'">
+                    <mat-card appearance="outlined" *ngIf="darkColor.value" [style.background-color]="'#363636'">
                       <mat-card-header>
                         <mat-card-subtitle [style.color]="'#fafafa'">
                           {{ 'COMMON.PROFESSIONAL.COLOR.DARK.RESERVATION' | translate }}
@@ -128,7 +128,7 @@
                     </mat-card>
                   </div>
                   <div style="display: table-cell;">
-                    <mat-card *ngIf="lightColor.value" [style.background-color]="'#fafafa'">
+                    <mat-card appearance="outlined" *ngIf="lightColor.value" [style.background-color]="'#fafafa'">
                       <mat-card-header>
                         <mat-card-subtitle [style.color]="'#363636'">
                           {{ 'COMMON.PROFESSIONAL.COLOR.LIGHT.RESERVATION' | translate }}

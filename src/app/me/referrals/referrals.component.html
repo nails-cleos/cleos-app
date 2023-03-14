@@ -1,7 +1,7 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
-      <mat-card>
+      <mat-card appearance="outlined">
         <mat-card-header fxLayout="row" fxLayoutAlign="center">
           <mat-card-title>{{ 'ME.REFERRAL.TITLE' | translate }}</mat-card-title>
         </mat-card-header>
@@ -19,9 +19,9 @@
                 <div class="box-text bold">
                   {{user.id}}
                 </div>
-                <mat-chip-list class="box-button">
-                  <mat-chip (click)="copy" [disabled]="!showShare">{{'COMMON.BUTTON.COPY' | translate }}</mat-chip>
-                </mat-chip-list>
+                <mat-chip-listbox class="box-button">
+                  <mat-chip-option (click)="copy" [disabled]="!showShare">{{'COMMON.BUTTON.COPY' | translate }}</mat-chip-option>
+                </mat-chip-listbox>
               </div>
             </div>
           </div>

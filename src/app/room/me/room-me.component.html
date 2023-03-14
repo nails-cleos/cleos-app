@@ -2,7 +2,7 @@
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <form (ngSubmit)="update" [formGroup]="form" novalidate>
-        <mat-card class="style-card">
+        <mat-card appearance="outlined" class="style-card">
           <mat-card-header>
             <mat-card-title>{{ 'ROOM.ME.TITLE' | translate }}</mat-card-title>
             <mat-card-subtitle *ngIf="room; else skeleton">{{room.id}}</mat-card-subtitle>
@@ -38,15 +38,15 @@
                 <div class="chip-list" fxLayout="column" fxLayoutAlign="space-around stretch">
                   <mat-form-field>
                     <mat-label>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</mat-label>
-                    <mat-chip-list #chipList aria-label="Professional selection" required>
-                      <mat-chip (removed)="remove(professional)" *ngFor="let professional of professionals"
-                                [removable]="true" [selectable]="true">
+                    <mat-chip-grid #chipList aria-label="Professional selection" required>
+                      <mat-chip-row (removed)="remove(professional)" *ngFor="let professional of professionals"
+                                [removable]="true">
                         {{professional | userName}}
                         <mat-icon matChipRemove>cancel</mat-icon>
-                      </mat-chip>
+                      </mat-chip-row>
                       <input #professionalInput [formControl]="professional" [matAutocomplete]="auto"
                              [matChipInputFor]="chipList">
-                    </mat-chip-list>
+                    </mat-chip-grid>
                     <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
                       <mat-option *ngFor="let professional of sortProfessionals(filteredProfessionals | async)"
                                   [value]="professional">

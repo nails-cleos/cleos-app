@@ -3,7 +3,7 @@
               [mode]="(isHandset$ | async) ? 'over' : 'side'"
               [opened]="(isHandset$ | async) === false"
               class="sidenav">
-    <mat-card *ngIf="showInformation" class="mat-elevation-z0">
+    <mat-card appearance="outlined" *ngIf="showInformation" class="mat-elevation-z0">
       <mat-card-header *ngIf="currentUser; else headerNoLogged">
         <div class="circle" mat-card-avatar>
           <img *ngIf="image; else showInitialsBlock" alt="profile" src="{{image}}">
