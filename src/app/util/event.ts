@@ -14,10 +14,9 @@ import {
   IDuration
 } from './dates';
 import { findStateColor } from './theme';
-import RRule, { ByWeekday } from 'rrule';
+import { Frequency, RRule, ByWeekday } from 'rrule';
 import { isToday } from 'date-fns';
 import { UnavailableRepeatType } from '../interfaces/unavailable';
-import { Frequency } from 'rrule/dist/esm/src/types';
 import { createEventColor } from './color';
 
 export interface IMeta {

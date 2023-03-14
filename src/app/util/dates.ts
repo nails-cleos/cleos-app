@@ -14,7 +14,7 @@ import {
   subMonths,
   subWeeks
 } from 'date-fns';
-import RRule, { Weekday } from 'rrule';
+import { RRule, Weekday } from 'rrule';
 import { IReservationAll } from '../interfaces/reservation';
 import { IProductAll } from '../interfaces/product';
 import { IAdditionalAll } from '../interfaces/additional';

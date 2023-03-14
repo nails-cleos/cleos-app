@@ -2,7 +2,7 @@
   <mat-card-header>
     <mat-card-title>{{ 'RESERVATION.CUSTOMER.DETAIL' | translate }}</mat-card-title>
     <mat-card-subtitle
-      *ngIf="reservation; else skeleton">{{reservation?.customer | userName}}</mat-card-subtitle>
+      *ngIf="reservation; else skeleton">{{reservation.customer | userName}}</mat-card-subtitle>
     <mat-card-subtitle
       *ngIf="reservation?.configuration?.canCustomerChange">{{reservation?.configuration?.reference}}</mat-card-subtitle>
     <ng-template #skeleton>
@@ -20,12 +20,12 @@
       <mat-list-item>
         <mat-icon mat-list-icon>store</mat-icon>
         <div mat-line>{{ 'RESERVATION.ROOM.NAME.FIELD' | translate}}</div>
-        <div mat-line>{{reservation?.room | roomName}}</div>
+        <div mat-line>{{reservation.room | roomName}}</div>
       </mat-list-item>
       <mat-list-item>
         <mat-icon mat-list-icon>person_pin</mat-icon>
         <div mat-line>{{ 'COMMON.PROFESSIONAL.FIELD' | translate}}</div>
-        <div mat-line>{{reservation?.professional | userName}}</div>
+        <div mat-line>{{reservation.professional | userName}}</div>
       </mat-list-item>
       <mat-list-item>
         <mat-icon mat-list-icon>room</mat-icon>
@@ -35,7 +35,7 @@
              rel="noreferrer" target="_blank">{{reservation.room.address.name}}
           </a>
         </div>
-        <div mat-line>{{reservation.room.address?.description}}</div>
+        <div mat-line>{{reservation.room.address.description}}</div>
       </mat-list-item>
       <mat-divider></mat-divider>
       <div mat-subheader>{{ 'RESERVATION.APPOINTMENT' | translate}}</div>
@@ -228,7 +228,7 @@
           <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>#</th>
           <td *matCellDef="let history; let i = dataIndex;" fxHide.lt-sm fxShow mat-cell>
             <div *ngIf="history.id; else skeleton">
-              {{((paginator?.pageIndex || 0) * pageSize) + i + 1}}
+              {{((paginator.pageIndex || 0) * pageSize) + i + 1}}
             </div>
             <ng-template #skeleton>
               <div class="ssc-line"></div>

@@ -1,6 +1,6 @@
 @use 'sass:map';
 @use '@angular/material' as mat;
-@import "~angular-calendar/scss/angular-calendar.scss";
+@import "angular-calendar/scss/angular-calendar.scss";
 
 @mixin color($theme) {
   // Get the color config from the theme.

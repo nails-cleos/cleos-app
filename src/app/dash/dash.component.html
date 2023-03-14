@@ -55,8 +55,8 @@
 </mat-card>
 <mat-grid-list cols="{{cardLayout.columns }}" rowHeight="200px">
   <!--Mini Cards-->
-  <mat-grid-tile *ngFor="let mc of miniCardData" [colspan]="cardLayout.miniCard?.cols"
-                 [rowspan]="cardLayout.miniCard?.rows">
+  <mat-grid-tile *ngFor="let mc of miniCardData" [colspan]="cardLayout.miniCard.cols"
+                 [rowspan]="cardLayout.miniCard.rows">
     <app-mini-card [color]="mc.color" [duration]="'DASHBOARD.MINI_CARD.DURATION' | translate" [error]="mc.error"
                    [icon]="mc.icon"
                    [isCurrency]="mc.currency" [isIncrease]="mc.increase" [isLoading]="isLoading"
@@ -64,13 +64,13 @@
                    [value]="mc.value"></app-mini-card>
   </mat-grid-tile>
   <!--Charts-->
-  <mat-grid-tile *ngFor="let chart of charts" [colspan]="cardLayout.chart?.cols" [rowspan]="cardLayout.chart?.rows">
+  <mat-grid-tile *ngFor="let chart of charts" [colspan]="cardLayout.chart.cols" [rowspan]="cardLayout.chart.rows">
     <app-card [chart]="chart" [isDark]="isDarkMode" [title]="chart.title">
       <app-chart [chartSummary]="chart" [error]="error" [isDark]="isDarkMode" [isLoading]="isLoading"></app-chart>
     </app-card>
   </mat-grid-tile>
   <!--Table-->
-  <mat-grid-tile *ngIf="roomId || professionalId" [colspan]="cardLayout.table?.cols" [rowspan]="cardLayout.table?.rows">
+  <mat-grid-tile *ngIf="roomId || professionalId" [colspan]="cardLayout.table.cols" [rowspan]="cardLayout.table.rows">
     <app-card [expand]="false" [title]="'DASHBOARD.CARD.RESERVATION' | translate">
       <app-reservation-table [roomId]="roomId" [professionalId]="professionalId"></app-reservation-table>
     </app-card>

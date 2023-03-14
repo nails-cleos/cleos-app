@@ -79,10 +79,10 @@ const radarChartDefaultOptions = (isDark?: boolean): ChartOptions => {
     }
   } as ChartOptions;
   if (isDark) {
-    Object.assign(options.scale, {gridLines: {color: 'rgba(255, 255, 255, 0.1)'}});
-    Object.assign(options.scale, {angleLines: {color: 'rgba(255, 255, 255, 0.1)'}});
-    Object.assign(options.scale?.pointLabels, {fontColor: 'white'});
-    Object.assign(options.scale?.ticks, {backdropColor: '#393939', fontColor: 'white'});
+    Object.assign({}, options.scale, {gridLines: {color: 'rgba(255, 255, 255, 0.1)'}});
+    Object.assign({}, options.scale, {angleLines: {color: 'rgba(255, 255, 255, 0.1)'}});
+    Object.assign({}, options.scale?.pointLabels, {fontColor: 'white'});
+    Object.assign({}, options.scale?.ticks, {backdropColor: '#393939', fontColor: 'white'});
   }
 
   return options;

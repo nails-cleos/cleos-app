@@ -16,7 +16,7 @@
       </tr>
       <tr *ngIf="reservation && reservation">
         <td class="right">{{ 'COMMON.ROOM.FIELD' | translate }}</td>
-        <td class="left">{{reservation?.room | roomName}}</td>
+        <td class="left">{{reservation.room | roomName}}</td>
       </tr>
       <tr *ngIf="reservation">
         <td class="right">{{ 'COMMON.ADDRESS.FIELD' | translate }}</td>

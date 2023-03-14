@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { MatCarouselModule } from '@ngbmodule/material-carousel';
 import { SharedModule } from '../shared/shared.module';
 import { MainRoutingModule } from './main-routing.module';
 
@@ -38,7 +37,6 @@ import { AuthService } from '../services/auth.service';
   imports: [
     MainRoutingModule,
     SharedModule,
-    MatCarouselModule.forRoot(),
     MatToolbarModule,
     MatSlideToggleModule,
     TranslateModule.forChild({

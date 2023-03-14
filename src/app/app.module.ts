@@ -8,13 +8,14 @@ import { EffectsModule } from '@ngrx/effects';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AsyncPipe, registerLocaleData } from '@angular/common';
 import { ServiceWorkerModule, SwPush } from '@angular/service-worker';
-import { AngularFireModule } from '@angular/fire';
-import { AngularFireMessagingModule } from '@angular/fire/messaging';
-import firebase from 'firebase/app';
-import 'firebase/analytics';
-import 'firebase/messaging';
+import { AngularFireModule, FirebaseApp } from '@angular/fire/compat';
+import { AngularFireMessagingModule } from '@angular/fire/compat/messaging';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/analytics';
+import { getMessaging } from "firebase/messaging";
+
 import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
-import { AngularFireAnalyticsModule } from '@angular/fire/analytics';
+import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
 
 import { AppRoutingModule } from './app-routing.module';
 import { Router } from '@angular/router';
@@ -45,6 +46,7 @@ import { reducers } from './store/app.states';
 // Components
 import { AppComponent } from './app.component';
 import { SharedModule } from './shared/shared.module';
+import {initializeApp, provideFirebaseApp } from '@angular/fire/app';
 
 export const getAuthServiceConfigs = (): SocialAuthServiceConfig => ({
   autoLogin: false,
@@ -94,7 +96,7 @@ registerLocaleData(localeEs, 'es');
       enabled: environment.production,
       registrationStrategy: 'registerWhenStable:30000'
     }),
-    AngularFireModule.initializeApp(environment.firebase),
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
     AngularFireMessagingModule,
     AngularFireAnalyticsModule,
     NgxMatColorPickerModule
@@ -126,11 +128,12 @@ registerLocaleData(localeEs, 'es');
   exports: [TranslateModule]
 })
 export class AppModule {
-  constructor(swPush: SwPush, private router: Router) {
+  constructor(swPush: SwPush, private router: Router, firebaseApp: FirebaseApp) {
     firebase.analytics();
     if (swPush.isEnabled) {
-      navigator.serviceWorker
-        .ready.then((registration) => firebase.messaging().useServiceWorker(registration));
+      const messaging = getMessaging(firebaseApp)
+      // navigator.serviceWorker
+      //   .ready.then((registration) => messaging.useServiceWorker(registration));
       swPush.notificationClicks.subscribe(({action, notification}) =>
         router.navigate(notification.data.onActionClick[action].url));
     }

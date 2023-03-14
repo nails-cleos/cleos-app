@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { AngularFireDatabase } from '@angular/fire/database';
-import { AngularFireAuth } from '@angular/fire/auth';
-import { AngularFireMessaging } from '@angular/fire/messaging';
+import { AngularFireDatabase } from '@angular/fire/compat/database';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { AngularFireMessaging } from '@angular/fire/compat/messaging';
 import { take } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
 import { AppState } from '../store/app.states';
@@ -17,12 +17,10 @@ export class MessagingService {
 
   constructor(private angularFireDB: AngularFireDatabase, private angularFireAuth: AngularFireAuth,
               private angularFireMessaging: AngularFireMessaging, private store: Store<AppState>) {
-    this.angularFireMessaging.messages.subscribe(
-      // @ts-ignore
-      (m: AngularFireMessaging) => {
-        m.onMessage = m.onMessage.bind(m);
-        m.onTokenRefresh = m.onTokenRefresh.bind(m);
-      });
+  }
+
+  listen() {
+    this.angularFireMessaging.messages.subscribe((message) => { console.log(message); });
   }
 
   /**
