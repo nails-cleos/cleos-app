@@ -276,11 +276,11 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       ReservationIconName.more, 'more');
 
     let approveActions: MatFabMenu[] = [];
-    if (isToday(newDate(reservation.start))) {
+    if (isToday(newDate(self.start))) {
       approveActions = [start];
     }
     approveActions = [...approveActions, edit];
-    if (reservation.customer.phone && greaterOrEqualsThanToday(newDate(reservation.start))) {
+    if (reservation.customer.phone && greaterOrEqualsThanToday(newDate(self.start))) {
       approveActions = [...approveActions, sendMessage];
     }
     approveActions = [...approveActions, more, cancel];
@@ -293,8 +293,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     });
 
     const sendMessageTransaction = ReservationDetailComponent.createTransaction('send', (): void => {
-      if (reservation.start) {
-        const startDate = newDate(reservation.start);
+      if (self.start) {
+        const startDate = newDate(self.start);
         let key;
         let date = getTime(startDate, this.language);
         switch (true) {
@@ -354,7 +354,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       const customer = reservation.customer;
       const room = reservation.room;
       const product = reservation.product;
-      const data = {customer, room, product};
+      const professional = reservation.professional;
+      const data = {customer, room, product, professional};
       this.router.navigate(['reservation'], {state: data});
     });
 
@@ -448,7 +449,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     const bookTransaction = ReservationDetailComponent.createTransaction('booked', (): void => {
       const room = reservation.room;
       const product = reservation.product;
-      const data = {room, product};
+      const professional = reservation.professional;
+      const data = {room, product, professional};
       this.router.navigate(['me', 'reservation'], {state: data});
     });
 
@@ -468,7 +470,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       next: [] as any[]
     };
 
-    if (self.payments) {
+    if (self.payments && self.payments.length) {
       const price = getPrice(reservation);
       if (price.total > price.totalPaid) {
         const next = this.createAction(translate.instant('RESERVATION.ACTION.PAY'),

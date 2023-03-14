@@ -5,12 +5,13 @@ import { Observable } from 'rxjs';
 @Injectable()
 export class MainService {
 
-  url = 'contacts';
+  private url = 'contacts';
+  private urlV1 = `v1/${this.url}`;
 
   constructor(private http: HttpClient) {
   }
 
   public sendMessage(body: any): Observable<any> {
-    return this.http.post<any>(this.url, body);
+    return this.http.post<any>(this.urlV1, body);
   }
 }

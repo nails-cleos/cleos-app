@@ -166,9 +166,9 @@
       }
     },
     "PRODUCT": {
-      "FIELD": "Product",
-      "REQUIRED": "Product is <b>required</b>",
-      "INVALID": "Product is invalid",
+      "FIELD": "Service",
+      "REQUIRED": "Service is <b>required</b>",
+      "INVALID": "Service is invalid",
       "DURABILITY": {
         "TITLE": {
           "DIFFERENT": "<span class='bold'>Durability:</span> {{min}} to {{max}} days",
@@ -179,9 +179,9 @@
         "NONE": "-"
       },
       "GROUP": {
-        "FIELD": "Product type",
-        "REQUIRED": "Product type is <b>required</b>",
-        "INVALID": "Product type is invalid"
+        "FIELD": "Service type",
+        "REQUIRED": "Service type is <b>required</b>",
+        "INVALID": "Service type is invalid"
       }
     },
     "ADDITIONAL": {
@@ -215,7 +215,7 @@
           "PROFESSIONAL": "Professional",
           "START": "Start",
           "STATE": "State",
-          "PRODUCT": "Product"
+          "PRODUCT": "Service"
         },
         "ERROR": {
           "NO_CONTENT": "No reservations"

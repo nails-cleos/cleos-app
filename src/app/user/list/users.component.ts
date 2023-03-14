@@ -28,7 +28,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['position', 'name', 'username', 'email', 'provider', 'status', 'actions'];
+  displayedColumns: string[] = ['position', 'firstName', 'username', 'email', 'provider', 'status', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IUser>>();
 
   expandedUser: IUser | undefined;

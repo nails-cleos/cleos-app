@@ -67,7 +67,7 @@
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'COMMON.USER.PHONE.FIELD' | translate }}</mat-label>
                 <ngx-mat-intl-tel-input [enablePlaceholder]="true" [enableSearch]="true"
-                                        [formControl]="phone" [preferredCountries]="['ar']"
+                                        [formControl]="phone" [preferredCountries]="['nl']"
                                         name="phone"></ngx-mat-intl-tel-input>
                 <mat-error *ngIf="phone.hasError('validatePhoneNumber')">
                   {{ 'COMMON.USER.PHONE.INVALID' | translate }}

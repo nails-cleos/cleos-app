@@ -22,7 +22,7 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['position', 'name', 'amount', 'used', 'actions'];
+  displayedColumns: string[] = ['position', 'discount.name', 'discount.amount', 'used', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IUserDiscount>>();
 
   resultsLength = DEFAULT_LENGTH;

@@ -36,7 +36,7 @@
     </div>
   </div>
   <div class="divider"></div>
-  <table [dataSource]="dataSource" mat-table matSort matSortActive="start"
+  <table [dataSource]="dataSource" mat-table matSort matSortActive="timestamp"
          matSortDirection="desc" matSortDisableClear>
     <ng-container matColumnDef="position">
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>#</th>
@@ -53,14 +53,14 @@
           mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</th>
       <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
         <div
-          *ngIf="reservation.id; else skeleton">{{reservation?.room?.professional | userName}}</div>
+          *ngIf="reservation.id; else skeleton">{{reservation?.professional | userName}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="start">
+    <ng-container matColumnDef="timestamp">
       <th *matHeaderCellDef mat-header-cell
           mat-sort-header>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</th>
       <td *matCellDef="let reservation" mat-cell>

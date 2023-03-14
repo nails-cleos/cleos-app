@@ -104,7 +104,7 @@
             </mat-option>
           </mat-autocomplete>
           <mat-error *ngIf="professional.hasError('requireMatch')"
-                     [innerHTML]="'COMMON.ROOM.INVALID' | translate">
+                     [innerHTML]="'COMMON.PROFESSIONAL.INVALID' | translate">
           </mat-error>
           <mat-error *ngIf="errors['professional']">
             {{errors['professional']}}
@@ -215,14 +215,14 @@
           <div *ngIf="!isEditing; else editing" mat-line>
             <span [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.PRICE' | translate"></span>
             <span [class.strikethrough]="discount.value"
-                  class="raised-button">{{room.value | currencySymbol}} {{product.value.price | number:'1.2-2'}}</span>
+                  class="raised-button">{{room.value.currency | currencySymbol}} {{product.value.price | number:'1.2-2'}}</span>
             <span *ngIf="price.priceWithDiscount" [@discountAnimation]
-                  class="raised-button bold">{{room.value | currencySymbol}} {{price.priceWithDiscount | number:'1.2-2'}}</span>
+                  class="raised-button bold">{{room.value.currency | currencySymbol}} {{price.priceWithDiscount | number:'1.2-2'}}</span>
           </div>
           <ng-template #editing>
             <span [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.PRICE' | translate"></span>
             <span
-              class="raised-button">{{room.value | currencySymbol}} {{(price.priceWithDiscount ? price.priceWithDiscount : product.value.price) | number:'1.2-2'}}</span>
+              class="raised-button">{{room.value.currency | currencySymbol}} {{(price.priceWithDiscount ? price.priceWithDiscount : product.value.price) | number:'1.2-2'}}</span>
             <span *ngIf="price.priceWithDiscount"
                   class="raised-button bold">{{'RESERVATION.PRODUCT.DISCOUNT.ADD' | translate}}</span>
           </ng-template>
@@ -246,7 +246,7 @@
       <mat-list-option *ngFor="let it of additionalList" [selected]="isSelected(it)" [value]="it"
                        checkboxPosition="before">
         <div mat-subheader>{{it.name}}</div>
-        <div mat-line>{{room.value | currencySymbol}} {{it.price | number:'1.2-2'}}</div>
+        <div mat-line>{{room.value.currency | currencySymbol}} {{it.price | number:'1.2-2'}}</div>
         <div *ngIf="it.description" mat-line>{{it.description}}</div>
         <div class="additional-line" mat-line>{{'RESERVATION.ADDITIONAL.DURATION.FIELD' | translate}}
           : {{it.duration | durationTime}}</div>
@@ -373,7 +373,7 @@
             <mat-icon mat-list-icon>add_post</mat-icon>
             <div mat-line>
               <div *ngFor="let it of additionalSelected">
-                {{it.name}} - {{room.value | currencySymbol}} {{it.price | number:'1.2-2'}}
+                {{it.name}} - {{room.value.currency | currencySymbol}} {{it.price | number:'1.2-2'}}
               </div>
             </div>
           </mat-list-item>

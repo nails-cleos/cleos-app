@@ -80,14 +80,14 @@
                   <mat-form-field appearance="fill" class="tab-field">
                     <mat-label>{{ 'PRODUCT.DURATION.FIELD' | translate }}</mat-label>
                     <label>
-                      <input [format]="24" [ngxTimepicker]="t" [value]="tab.duration || ''" matInput readonly
+                      <input [format]="24" [ngxTimepicker]="t" [value]="tab.time || ''" matInput readonly
                              required/>
                     </label>
                     <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
                     <ngx-material-timepicker #t (timeSet)="setTime(tab, $event)"
                                              [minutesGap]="15"></ngx-material-timepicker>
-                    <mat-hint *ngIf="tab.errors['duration']"
-                              [innerHTML]="'PRODUCT.DURATION.' + tab.errors['duration'] | translate" class="mat-error">
+                    <mat-hint *ngIf="tab.errors['time']"
+                              [innerHTML]="'PRODUCT.DURATION.' + tab.errors['time'] | translate" class="mat-error">
                     </mat-hint>
                   </mat-form-field>
                   <mat-checkbox (change)="setPrimary(tab)" [checked]="tab.primary" [disabled]="tab.primary"

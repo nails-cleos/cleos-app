@@ -259,6 +259,7 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
         if (!this.rooms.length) {
           this.getRoom(state.selected.professional);
         }
+        console.log("RESERVATION START", state.selected.start)
         this.unavailable = {
           id: state.selected.id,
           description: state.selected.description,

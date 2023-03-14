@@ -199,7 +199,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   segmentClick(date: Date, room?: IRoom): void {
-    const data = {date, room};
+    const data = {date, room, professionalId: this.professionalSelectedId};
     if (date && room && this.dateIsValid(date)) {
       const dialogRef = this.dialog.open(CalendarDialogComponent);
 
@@ -445,14 +445,14 @@ export class CalendarComponent implements OnInit, OnDestroy {
       this.addReservations(this.data, darkMode);
       if (this.calendar) {
         const timeZone = this.calendar.room.timeZone;
-        const {week, saturday, sunday, exclude} = getAvailability(this.calendar.room);
-        const {min, max} = getStartEndDay(week, saturday, sunday, timeZone);
+        const {monday, tuesday, wednesday, thursday, friday, saturday, sunday, exclude} = getAvailability(this.calendar.room);
+        const {min, max} = getStartEndDay(monday, tuesday, wednesday, thursday, friday, saturday, sunday, timeZone);
         this.calendar.day = new Day(min, max, getNow(), exclude, 1);
         const unavailable = this.translate.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
         const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
         const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
         this.calendar.events = this.calendar.events.concat(fillNotAvailable(unavailable, lunch, notWorking, this.viewDate,
-          sunday, saturday, week, darkMode, this.maxDate, timeZone));
+          sunday, saturday, friday, thursday, wednesday, tuesday, monday, darkMode, this.maxDate, timeZone));
         this.addUnavailableList(this.data, darkMode);
       }
     }

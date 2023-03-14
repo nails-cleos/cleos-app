@@ -1,5 +1,5 @@
 <div class="mat-elevation-z8">
-  <table [dataSource]="dataSource" mat-table matSort matSortActive="name"
+  <table [dataSource]="dataSource" mat-table matSort matSortActive="discount.name"
          matSortDirection="asc" matSortDisableClear>
     <ng-container matColumnDef="position">
       <th *matHeaderCellDef mat-header-cell>#</th>
@@ -11,7 +11,7 @@
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="name">
+    <ng-container matColumnDef="discount.name">
       <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
       <td *matCellDef="let userDiscount" mat-cell>
         <div *ngIf="userDiscount.id; else skeleton">{{userDiscount.discount.name}}</div>
@@ -21,7 +21,7 @@
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="amount">
+    <ng-container matColumnDef="discount.amount">
       <th *matHeaderCellDef mat-header-cell
           mat-sort-header>{{ 'ME.DISCOUNT.LIST.COLUMN.AMOUNT' | translate }}</th>
       <td *matCellDef="let userDiscount">

@@ -173,6 +173,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
       if (state.filter) {
         const now = getNow();
         this.dataSource = state.filter.content?.map((reservation: IReservationAll) => {
+          console.log("RESERVATION START", reservation.start)
           if (reservation.start && [String(States.created), String(States.approved)].includes(reservation.state)) {
             const deadLine = newDate(reservation.start) < now;
             return Object.assign({}, reservation, {deadLine});

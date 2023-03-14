@@ -1,7 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { newDateTimestamp } from '../util/dates';
-import { IReservationAll } from '../interfaces/reservation';
-import { IUnavailableAll } from '../interfaces/unavailable';
 
 @Pipe({
   name: 'timeDetail'

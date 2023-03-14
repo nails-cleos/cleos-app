@@ -1,23 +1,10 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CalendarEvent } from 'angular-calendar';
 import { Observable, Subscription } from 'rxjs';
 import { AppState, selectAuthState, selectDashboardState } from '../store/app.states';
 import {
-  addPeriod,
-  API_LOCALE,
-  createNewDate,
-  dateToTimestamp,
-  endOfPeriod,
-  getCurrentTimeZone,
-  getEnd,
-  getMinutesBetweenTimes,
-  getNow,
-  getRoomStartEndDay,
-  isBetween,
-  newDate,
-  newDateTimestamp,
-  startOfPeriod,
-  subPeriod
+  addPeriod, API_LOCALE, createNewDate, dateToTimestamp, endOfPeriod, getCurrentTimeZone, getEnd,
+  getMinutesBetweenTimes, getNow, getRoomStartEndDay, isBetween, newDate, newDateTimestamp, startOfPeriod, subPeriod
 } from '../util/dates';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
@@ -32,8 +19,7 @@ import { getFrequency } from '../util/event';
 import { Day, IReservation, MAX_RESERVATION_MONTH, States } from '../interfaces/reservation';
 import { addMonths, isSameDay, isToday } from 'date-fns';
 import { Router } from '@angular/router';
-import { FormControl } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { getProfessionalColor } from '../util/color';
 import { CalendarDialogComponent } from '../shared/calendar-dialog/calendar-dialog.component';
 
@@ -143,6 +129,7 @@ export class DashboardComponent implements OnInit {
 
   professionalChanged({event, newProfessional}: any): void {
     const endTime = event.end ? event.end.getTime() / 1000 : 0;
+    console.log("RESERVATION START", event.start)
     const startTime = event.start.getTime() / 1000;
     const time = Math.abs(endTime - startTime);
     const oldIndex = this.professionals.findIndex((professional) => professional.id === event.meta.professional.id);

@@ -54,31 +54,34 @@
           <td class="right">{{ 'ME.RESERVATION.PRODUCT.PRICE.FIELD' | translate }}</td>
           <td *ngIf="upcoming.price.discount; else noDiscount" class="left">
             <span [class.strikethrough]="upcoming.price.amount">
-              {{upcoming?.room | currencySymbol}} {{upcoming.price.amount | number:'1.2-2'}}
+              {{upcoming?.room?.currency | currencySymbol}} {{upcoming.price.amount | number:'1.2-2'}}
             </span>
             <span [@discountAnimation] class="raised-button bold">
-              {{upcoming?.room | currencySymbol}} {{upcoming.price.priceWithDiscount | number:'1.2-2'}}
+              {{upcoming?.room?.currency | currencySymbol}} {{upcoming.price.priceWithDiscount | number:'1.2-2'}}
             </span>
           </td>
           <ng-template #noDiscount>
-            <td class="left">{{upcoming?.room | currencySymbol}} {{upcoming.price.amount | number:'1.2-2'}}</td>
+            <td
+              class="left">{{upcoming?.room?.currency | currencySymbol}} {{upcoming.price.amount | number:'1.2-2'}}</td>
           </ng-template>
         </tr>
         <tr *ngIf="upcoming.rowSpan">
           <td [rowSpan]="upcoming.rowSpan" class="right">{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</td>
           <td class="left">
             <div *ngFor="let additional of upcoming.additional">
-              {{additional.name}} - {{upcoming?.room | currencySymbol}} {{additional.price | number:'1.2-2'}}
+              {{additional.name}} - {{upcoming?.room?.currency | currencySymbol}} {{additional.price | number:'1.2-2'}}
             </div>
           </td>
         </tr>
         <tr *ngIf="upcoming.rowSpan">
           <td class="right">{{ 'COMMON.LABEL.TOTAL' | translate }}</td>
-          <td class="left bold">{{upcoming?.room | currencySymbol}} {{upcoming.price?.total | number:'1.2-2'}}</td>
+          <td
+            class="left bold">{{upcoming?.room?.currency | currencySymbol}} {{upcoming.price?.total | number:'1.2-2'}}</td>
         </tr>
         <tr *ngIf="upcoming.price && upcoming.price.totalPaid">
           <td class="right">{{ 'ME.RESERVATION.UPCOMING.PAID' | translate }}</td>
-          <td class="left">{{upcoming?.room | currencySymbol}} {{upcoming.price.totalPaid | number:'1.2-2'}}</td>
+          <td
+            class="left">{{upcoming?.room?.currency | currencySymbol}} {{upcoming.price.totalPaid | number:'1.2-2'}}</td>
         </tr>
       </table>
       <div *ngIf="upcoming.state === 'CREATED'" class="red-text">{{ 'ME.RESERVATION.UPCOMING.CREATED' | translate }}
@@ -86,9 +89,9 @@
           {{upcoming?.professional | userName}}
         </span>
       </div>
-      <div *ngIf="upcoming.state === 'APPROVED'" class="red-text">
-        {{ 'ME.RESERVATION.UPCOMING.PAY_NOW' | translate }}
-      </div>
+      <!--      <div *ngIf="upcoming.state === 'APPROVED'" class="red-text">-->
+      <!--        {{ 'ME.RESERVATION.UPCOMING.PAY_NOW' | translate }}-->
+      <!--      </div>-->
     </div>
     <ng-template #skeleton>
       <div class="ssc-line"></div>
@@ -97,8 +100,9 @@
   <mat-divider></mat-divider>
   <mat-card-actions *ngIf="upcoming.id; else buttonSkeleton">
     <div fxFlex></div>
-    <button *ngIf="upcoming.state === 'APPROVED' || upcoming.state === 'PARTIALLY_PAID'"
-            [routerLink]="['/me', 'reservation', upcoming.id, 'payment']" mat-raised-button>
+    <button
+      *ngIf="upcoming.payments && upcoming.payments.length && (upcoming.state === 'APPROVED' || upcoming.state === 'PARTIALLY_PAID')"
+      [routerLink]="['/me', 'reservation', upcoming.id, 'payment']" mat-raised-button>
       <mat-icon class="payment-button" color="primary">payment</mat-icon>
       <span fxHide.lt-sm fxShow>{{ 'COMMON.BUTTON.PAYMENT' | translate }}</span>
     </button>

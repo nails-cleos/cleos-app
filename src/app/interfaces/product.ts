@@ -27,6 +27,7 @@ export interface IProduct {
   price?: number;
   deleted?: boolean;
   description?: string;
+  time?: string;
   duration?: string;
   durationDate?: Date;
   modifiedAt?: string;

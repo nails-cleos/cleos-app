@@ -1,5 +1,7 @@
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AvailabilityDate, IAddress, IAvailability, IAvailabilityDate, ILocation, IRoom, IRoomAll } from '../../interfaces/room';
+import {
+  AvailabilityDate, IAddress, IAvailability, IAvailabilityDate, ILocation, IRoom, IRoomAll
+} from '../../interfaces/room';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { IIcon } from '../room.component';
@@ -16,7 +18,6 @@ import { IUser, IUserAll } from '../../interfaces/user';
 import { Role } from '../../interfaces/token';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { map, startWith } from 'rxjs/operators';
-import { ViewportScroller } from '@angular/common';
 
 @Component({
   selector: 'app-room-me',
@@ -37,11 +38,19 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   allProfessional?: IUserAll[];
 
   icons: IIcon = {
-    week: RoomIconName.eventBusy,
+    monday: RoomIconName.eventBusy,
+    tuesday: RoomIconName.eventBusy,
+    wednesday: RoomIconName.eventBusy,
+    thursday: RoomIconName.eventBusy,
+    friday: RoomIconName.eventBusy,
     saturday: RoomIconName.eventBusy,
     sunday: RoomIconName.eventBusy
   };
-  weekDate?: IAvailabilityDate;
+  monDate?: IAvailabilityDate;
+  tueDate?: IAvailabilityDate;
+  wedDate?: IAvailabilityDate;
+  thuDate?: IAvailabilityDate;
+  friDate?: IAvailabilityDate;
   satDate?: IAvailabilityDate;
   sunDate?: IAvailabilityDate;
 
@@ -59,7 +68,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   private paymentTypes: string[] = [];
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
-              private router: Router, private viewportScroller: ViewportScroller) {
+              private router: Router) {
     this.getState = this.store.select(selectRoomState);
   }
 
@@ -186,14 +195,26 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
     let step = -1;
     this.errors = [];
     switch (RoomIconName.calendarToday) {
-      case this.icons.week:
+      case this.icons.monday:
         step = 0;
         break;
-      case this.icons.saturday:
+      case this.icons.tuesday:
         step = 1;
         break;
-      case this.icons.sunday:
+      case this.icons.wednesday:
         step = 2;
+        break;
+      case this.icons.thursday:
+        step = 3;
+        break;
+      case this.icons.friday:
+        step = 4;
+        break;
+      case this.icons.saturday:
+        step = 5;
+        break;
+      case this.icons.sunday:
+        step = 6;
         break;
     }
     if (step > -1) {
@@ -287,8 +308,20 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
       availability.endLunchDate = RoomMeComponent.createAv(av.endLunch);
 
       switch (av.day) {
-        case 'WEEK':
-          this.weekDate = availability;
+        case 'MONDAY':
+          this.monDate = availability;
+          break;
+        case 'TUESDAY':
+          this.tueDate = availability;
+          break;
+        case 'WEDNESDAY':
+          this.wedDate = availability;
+          break;
+        case 'THURSDAY':
+          this.thuDate = availability;
+          break;
+        case 'FRIDAY':
+          this.friDate = availability;
           break;
         case 'SATURDAY':
           this.satDate = availability;
@@ -301,8 +334,20 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private setIcon(day: string, icon: RoomIconName): void {
     switch (day) {
-      case 'WEEK':
-        this.icons.week = icon;
+      case 'MONDAY':
+        this.icons.monday = icon;
+        break;
+      case 'TUESDAY':
+        this.icons.tuesday = icon;
+        break;
+      case 'WEDNESDAY':
+        this.icons.wednesday = icon;
+        break;
+      case 'THURSDAY':
+        this.icons.thursday = icon;
+        break;
+      case 'FRIDAY':
+        this.icons.friday = icon;
         break;
       case 'SATURDAY':
         this.icons.saturday = icon;

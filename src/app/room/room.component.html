@@ -135,20 +135,84 @@
                 <mat-expansion-panel (opened)="setStep(0)" [expanded]="step === 0" hideToggle>
                   <mat-expansion-panel-header>
                     <mat-panel-title>
-                      {{ 'ROOM.WEEK_TIME.FIELD' | translate }}
+                      {{ 'ROOM.MONDAY_TIME.FIELD' | translate }}
                     </mat-panel-title>
                     <mat-panel-description fxHide.lt-sm fxShow>
-                      {{ 'ROOM.WEEK_TIME.DESCRIPTION' | translate }}
-                      <mat-icon>{{icons.week}}</mat-icon>
+                      {{ 'ROOM.MONDAY_TIME.DESCRIPTION' | translate }}
+                      <mat-icon>{{icons.monday}}</mat-icon>
                     </mat-panel-description>
                   </mat-expansion-panel-header>
-                  <app-availability (availability)="addAvailability($event, 1)" (ignore)="ignore('WEEK', 1)"
-                                    [day]="'WEEK'"></app-availability>
+                  <app-availability (availability)="addAvailability($event, 1)" (ignore)="ignore('MONDAY', 1)"
+                                    [day]="'MONDAY'"></app-availability>
                   <mat-error *ngIf="errors['day0']">
-                    {{ 'ROOM.WEEK_TIME.REQUIRED' | translate }}
+                    {{ 'ROOM.MONDAY_TIME.REQUIRED' | translate }}
                   </mat-error>
                 </mat-expansion-panel>
                 <mat-expansion-panel (opened)="setStep(1)" [expanded]="step === 1" hideToggle>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      {{ 'ROOM.TUESDAY_TIME.FIELD' | translate }}
+                    </mat-panel-title>
+                    <mat-panel-description fxHide.lt-sm fxShow>
+                      {{ 'ROOM.TUESDAY_TIME.DESCRIPTION' | translate }}
+                      <mat-icon>{{icons.tuesday}}</mat-icon>
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <app-availability (availability)="addAvailability($event, 2)" (ignore)="ignore('TUESDAY', 2)"
+                                    [day]="'TUESDAY'"></app-availability>
+                  <mat-error *ngIf="errors['day1']">
+                    {{ 'ROOM.TUESDAY_TIME.REQUIRED' | translate }}
+                  </mat-error>
+                </mat-expansion-panel>
+                <mat-expansion-panel (opened)="setStep(2)" [expanded]="step === 2" hideToggle>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      {{ 'ROOM.WEDNESDAY_TIME.FIELD' | translate }}
+                    </mat-panel-title>
+                    <mat-panel-description fxHide.lt-sm fxShow>
+                      {{ 'ROOM.WEDNESDAY_TIME.DESCRIPTION' | translate }}
+                      <mat-icon>{{icons.wednesday}}</mat-icon>
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <app-availability (availability)="addAvailability($event, 3)" (ignore)="ignore('WEDNESDAY', 3)"
+                                    [day]="'WEDNESDAY'"></app-availability>
+                  <mat-error *ngIf="errors['day2']">
+                    {{ 'ROOM.WEDNESDAY_TIME.REQUIRED' | translate }}
+                  </mat-error>
+                </mat-expansion-panel>
+                <mat-expansion-panel (opened)="setStep(3)" [expanded]="step === 3" hideToggle>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      {{ 'ROOM.THURSDAY_TIME.FIELD' | translate }}
+                    </mat-panel-title>
+                    <mat-panel-description fxHide.lt-sm fxShow>
+                      {{ 'ROOM.THURSDAY_TIME.DESCRIPTION' | translate }}
+                      <mat-icon>{{icons.thursday}}</mat-icon>
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <app-availability (availability)="addAvailability($event, 4)" (ignore)="ignore('THURSDAY', 4)"
+                                    [day]="'THURSDAY'"></app-availability>
+                  <mat-error *ngIf="errors['day3']">
+                    {{ 'ROOM.THURSDAY_TIME.REQUIRED' | translate }}
+                  </mat-error>
+                </mat-expansion-panel>
+                <mat-expansion-panel (opened)="setStep(4)" [expanded]="step === 4" hideToggle>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      {{ 'ROOM.FRIDAY_TIME.FIELD' | translate }}
+                    </mat-panel-title>
+                    <mat-panel-description fxHide.lt-sm fxShow>
+                      {{ 'ROOM.FRIDAY_TIME.DESCRIPTION' | translate }}
+                      <mat-icon>{{icons.friday}}</mat-icon>
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <app-availability (availability)="addAvailability($event, 5)" (ignore)="ignore('FRIDAY', 5)"
+                                    [day]="'FRIDAY'"></app-availability>
+                  <mat-error *ngIf="errors['day4']">
+                    {{ 'ROOM.FRIDAY_TIME.REQUIRED' | translate }}
+                  </mat-error>
+                </mat-expansion-panel>
+                <mat-expansion-panel (opened)="setStep(5)" [expanded]="step === 5" hideToggle>
                   <mat-expansion-panel-header>
                     <mat-panel-title>
                       {{ 'ROOM.SATURDAY_TIME.FIELD' | translate }}
@@ -158,13 +222,13 @@
                       <mat-icon>{{icons.saturday}}</mat-icon>
                     </mat-panel-description>
                   </mat-expansion-panel-header>
-                  <app-availability (availability)="addAvailability($event, 2)" (ignore)="ignore('SATURDAY', 2)"
+                  <app-availability (availability)="addAvailability($event, 6)" (ignore)="ignore('SATURDAY', 6)"
                                     [day]="'SATURDAY'"></app-availability>
-                  <mat-error *ngIf="errors['day1']">
+                  <mat-error *ngIf="errors['day5']">
                     {{ 'ROOM.SATURDAY_TIME.REQUIRED' | translate }}
                   </mat-error>
                 </mat-expansion-panel>
-                <mat-expansion-panel (opened)="setStep(2)" [expanded]="step === 2" hideToggle>
+                <mat-expansion-panel (opened)="setStep(6)" [expanded]="step === 6" hideToggle>
                   <mat-expansion-panel-header>
                     <mat-panel-title>
                       {{ 'ROOM.SUNDAY_TIME.FIELD' | translate }}
@@ -174,9 +238,9 @@
                       <mat-icon>{{icons.sunday}}</mat-icon>
                     </mat-panel-description>
                   </mat-expansion-panel-header>
-                  <app-availability (availability)="addAvailability($event, 3)" (ignore)="ignore('SUNDAY', 3)"
+                  <app-availability (availability)="addAvailability($event, 7)" (ignore)="ignore('SUNDAY', 7)"
                                     [day]="'SUNDAY'"></app-availability>
-                  <mat-error *ngIf="errors['day2']">
+                  <mat-error *ngIf="errors['day6']">
                     {{ 'ROOM.SUNDAY_TIME.REQUIRED' | translate }}
                   </mat-error>
                 </mat-expansion-panel>

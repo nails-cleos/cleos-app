@@ -73,7 +73,7 @@ export class ReservationEffects {
     this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.customerSearchReservation)).pipe(
       map((action: any) => action.payload),
       switchMap((payload: any) => this.reservationService.customerSearch(payload.roomId, payload.productId,
-        payload.date, payload.additionalIds).pipe(
+        payload.date, payload.professionalId, payload.additionalIds).pipe(
         switchMap((response: any) => of(new fromActionsReservation.ReservationSuccess(response ? response : []))),
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
       ))

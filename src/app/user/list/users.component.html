@@ -17,7 +17,7 @@
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="name">
+    <ng-container matColumnDef="firstName">
       <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
       <td *matCellDef="let user" mat-cell>
         <div *ngIf="user.id; else skeleton">{{user | userName}}</div>
@@ -61,8 +61,7 @@
     </ng-container>
 
     <ng-container matColumnDef="status">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
-          mat-sort-header>{{ 'USER.LIST.COLUMN.STATUS' | translate }}</th>
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'USER.LIST.COLUMN.STATUS' | translate }}</th>
       <td *matCellDef="let user" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="user.id; else skeleton">
           <div *ngIf="!user.deleted; else deleteBlock">

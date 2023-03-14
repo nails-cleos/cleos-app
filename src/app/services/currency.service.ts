@@ -7,8 +7,8 @@ import { ICurrency } from '../interfaces/currency';
 @Injectable()
 export class CurrencyService {
 
-  url = 'currency';
-  urlV1 = `v1/${this.url}`;
+  private url = 'currency';
+  private urlV1 = `v1/${this.url}`;
 
   constructor(private http: HttpClient) {
   }

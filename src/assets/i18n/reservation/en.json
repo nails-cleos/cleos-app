@@ -29,7 +29,7 @@
         "NONE": "Customer has no reservations",
         "DAYS": "Last reservation was {{days}} days ago",
         "PROFESSIONAL_NAME": "<span class='bold'>Professional:</span> {{professional}}",
-        "PRODUCT": "<span class='bold'>Product:</span> {{product}}"
+        "PRODUCT": "<span class='bold'>Service:</span> {{product}}"
       }
     },
     "ROOM": {
@@ -45,7 +45,7 @@
     },
     "PRODUCT": {
       "DETAIL": "Detail",
-      "NO_CONTENT": "No products",
+      "NO_CONTENT": "No services",
       "NAME": {
         "FIELD": "Name"
       },
@@ -63,8 +63,8 @@
       },
       "COMPLETE": {
         "DESCRIPTION": "<span class='bold'>Description:</span> {{description}}",
-        "GROUP": "<span class='bold'>Product type:</span> {{name}}",
-        "NAME": "<span class='bold'>Product:</span> {{name}}",
+        "GROUP": "<span class='bold'>Service type:</span> {{name}}",
+        "NAME": "<span class='bold'>Service:</span> {{name}}",
         "TOTAL": "<span class='bold'>Total:</span>",
         "PRICE": "<span class='bold'>Price:</span>",
         "DURATION": "<span class='bold'>Duration:</span> {{duration}}"

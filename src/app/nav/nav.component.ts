@@ -29,7 +29,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Role } from '../interfaces/token';
 import { MessagingService } from '../services/messaging.service';
 import { environment } from '../../environments/environment';
-import { getUserImage, getUserName, getUserNameInitials, isRoomAdmin } from '../util/helper';
+import { getUserImage, getUserNameInitials, isRoomAdmin } from '../util/helper';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NavigationService } from '../services/navigation.service';
 import { TokenService } from '../services/token.service';
@@ -37,7 +37,6 @@ import { CookieService } from 'ngx-cookie-service';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { getThemeName, isDarkMode, resetTheme, Theme, THEME } from '../util/theme';
 import { ThemeService } from 'ng2-charts';
-import { RedirectComponent } from '../auth/redirect/redirect.component';
 
 @Component({
   selector: 'app-nav',

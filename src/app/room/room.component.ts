@@ -22,7 +22,11 @@ import { getCurrentTimeZone } from '../util/dates';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 
 export interface IIcon {
-  week: RoomIconName;
+  monday: RoomIconName;
+  tuesday: RoomIconName;
+  wednesday: RoomIconName;
+  thursday: RoomIconName;
+  friday: RoomIconName;
   saturday: RoomIconName;
   sunday: RoomIconName;
 }
@@ -41,7 +45,11 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   step = 0;
   icons: IIcon = {
-    week: RoomIconName.calendarToday,
+    monday: RoomIconName.calendarToday,
+    tuesday: RoomIconName.calendarToday,
+    wednesday: RoomIconName.calendarToday,
+    thursday: RoomIconName.calendarToday,
+    friday: RoomIconName.calendarToday,
     saturday: RoomIconName.calendarToday,
     sunday: RoomIconName.calendarToday
   };
@@ -282,8 +290,20 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   private setIcon(day: string, icon: RoomIconName): void {
     switch (day) {
-      case 'WEEK':
-        this.icons.week = icon;
+      case 'MONDAY':
+        this.icons.monday = icon;
+        break;
+      case 'TUESDAY':
+        this.icons.tuesday = icon;
+        break;
+      case 'WEDNESDAY':
+        this.icons.wednesday = icon;
+        break;
+      case 'THURSDAY':
+        this.icons.thursday = icon;
+        break;
+      case 'FRIDAY':
+        this.icons.friday = icon;
         break;
       case 'SATURDAY':
         this.icons.saturday = icon;
@@ -301,14 +321,26 @@ export class RoomComponent implements OnInit, OnDestroy {
     let step = -1;
     this.errors = [];
     switch (RoomIconName.calendarToday) {
-      case this.icons.week:
+      case this.icons.monday:
         step = 0;
         break;
-      case this.icons.saturday:
+      case this.icons.tuesday:
         step = 1;
         break;
-      case this.icons.sunday:
+      case this.icons.wednesday:
         step = 2;
+        break;
+      case this.icons.thursday:
+        step = 3;
+        break;
+      case this.icons.friday:
+        step = 4;
+        break;
+      case this.icons.saturday:
+        step = 5;
+        break;
+      case this.icons.sunday:
+        step = 6;
         break;
     }
     if (step > -1) {

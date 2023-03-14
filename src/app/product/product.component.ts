@@ -44,8 +44,8 @@ export class ProductComponent implements OnInit, OnDestroy {
         errors.name = 'REQUIRED';
         hasError = true;
       }
-      if (!tab.duration || tab.duration.trim().length === 0) {
-        errors.duration = 'REQUIRED';
+      if (!tab.time || tab.time.trim().length === 0) {
+        errors.time = 'REQUIRED';
         hasError = true;
       }
       return Object.assign({}, tab, {errors});
@@ -100,7 +100,7 @@ export class ProductComponent implements OnInit, OnDestroy {
   setTime(product: IProduct, $event: any): void {
     const time = $event.split(':');
     const date = createNewDate(getNow(), time[0], time[1]);
-    product.duration = getTime(date);
+    product.time = getTime(date);
   }
 
   setPrimary(tab: IProduct): void {

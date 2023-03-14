@@ -39,6 +39,7 @@ export interface IServicePrice {
 }
 
 export interface IService {
+  key: string;
   id: string;
   name: string;
   currency?: string;

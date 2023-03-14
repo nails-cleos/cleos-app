@@ -116,7 +116,7 @@ export const reducer = (state = initialState, action: All): State => {
     case RoomActionTypes.roomSelected: {
       return {
         ...state,
-        selected: action.payload.room,
+        selected: action.payload.roomInfo,
         errorMessage: null,
         subErrors: null,
         message: null

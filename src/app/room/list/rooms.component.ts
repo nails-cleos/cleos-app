@@ -87,15 +87,15 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   edit(room: IRoom): void {
     this.store.dispatch(
-      new fromActionsRoom.RoomSelected({room, redirect: true})
+      new fromActionsRoom.RoomSelected({ roomInfo: { room }, redirect: true })
     );
   }
 
   delete(room: IRoom): void {
     const title = this.translate.instant('ROOM.DELETED.TITLE');
-    const content = this.translate.instant('ROOM.DELETED.CONTENT', {name: room.address?.name});
+    const content = this.translate.instant('ROOM.DELETED.CONTENT', { name: room.address?.name });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: {title, content, value: room}
+      data: { title, content, value: room }
     });
 
     dialogRef.afterClosed().subscribe(result => {

@@ -1,8 +1,8 @@
 {
   "PRODUCT": {
-    "TITLE": "Add products",
-    "CREATED": "Product {{name}} created",
-    "DETAIL": "Update products",
+    "TITLE": "Add services",
+    "CREATED": "Service {{name}} created",
+    "DETAIL": "Update services",
     "LIST": {
       "COLUMN": {
         "DURABILITY": "Durability",
@@ -11,8 +11,8 @@
         "DATE": "Updated"
       },
       "ERROR": {
-        "NO_CONTENT": "No products",
-        "REQUIRED": "At least one product is required"
+        "NO_CONTENT": "No services",
+        "REQUIRED": "At least one service is required"
       }
     },
     "NAME": {
@@ -44,12 +44,12 @@
       "CHECK": "Primary"
     },
     "DELETED": {
-      "TITLE": "Delete product",
-      "CONTENT": "Are you sure to delete product {{name}}?",
-      "MESSAGE": "Product {{name}} deleted"
+      "TITLE": "Delete service",
+      "CONTENT": "Are you sure to delete service {{name}}?",
+      "MESSAGE": "Service {{name}} deleted"
     },
     "UPDATED": {
-      "MESSAGE": "Product {{name}} updated"
+      "MESSAGE": "Service {{name}} updated"
     }
   }
 }

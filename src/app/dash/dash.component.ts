@@ -28,7 +28,6 @@ import { Role } from '../interfaces/token';
 export class DashComponent implements OnInit, OnDestroy {
   state: any;
   error: any;
-
   mapDashboard?: Map<string, IDashboard>;
   selectedDash = new FormControl();
   roomId?: string;
@@ -229,6 +228,9 @@ export class DashComponent implements OnInit, OnDestroy {
         this.miniCardError(state.errorMessage);
       }
       this.mapDashboard = state.data;
+      if (state.data) {
+        this.isCalendarLoading = false;
+      }
       if (this.selectedDash.value) {
         this.createDashboards();
       } else {

@@ -84,7 +84,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   get complete(): void {
     if (this.reservation) {
       const reservationId = this.reservation.id;
-      const productId = valueChange(this.product.value.id, this.reservation?.product.id);
+      const productId = valueChange(this.product.value.id, this.reservation?.product.key);
       const description = this.description.value;
       const price = this.extraPrice.value;
       const paymentType = this.type.value;
@@ -147,15 +147,14 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       if (this.reservation) {
         this.price = getPrice(this.reservation, this.payments);
         this.product.setValue(this.reservation.product);
-        if (this.reservation.additional) {
-          this.additionalSelected = this.reservation.additional;
-        }
+        this.additionalSelected = this.reservation.additional ? this.reservation.additional
+          .map(ad => Object.assign({}, ad, { id: ad.key })) : [];
         this.types = this.reservation.room.paymentTypes;
       }
       if (state.productDiscount) {
         this.additionalList = state.productDiscount.additionalList;
         if (state.productDiscount?.products && this.reservation) {
-          const productId = this.reservation.product.id;
+          const productId = this.reservation.product.key;
           this.groups = Array.from(createProductGroupService(new Map<string, IGroupService>(), state.productDiscount.products,
             this.reservation.room.currency.code).values());
           this.group.setValue(this.groups?.find(group => {
@@ -186,7 +185,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
         return;
       }
       this.products = value.products;
-      const product = value.products?.find((p: IProductGroup) => p.id === this.reservation?.product?.id);
+      const product = value.products?.find((p: IProductGroup) => p.id === this.reservation?.product?.key);
       if (product) {
         this.products = value.products;
         this.product.setValue(product);

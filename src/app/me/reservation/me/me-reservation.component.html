@@ -47,6 +47,27 @@
             {{errors['room']}}
           </mat-error>
         </mat-form-field>
+        <mat-form-field *ngIf="professionalList" appearance="fill">
+          <mat-label>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</mat-label>
+          <label>
+            <input (keydown)="keyDownHandler($event, professional)" [formControl]="professional"
+                   [matAutocomplete]="autoProfessional" matInput required type="text">
+          </label>
+          <mat-autocomplete #autoProfessional="matAutocomplete" [displayWith]="displayFnProfessional">
+            <mat-option *ngFor="let professional of filteredProfessional | async" [value]="professional">
+              {{professional | userName}}
+            </mat-option>
+          </mat-autocomplete>
+          <mat-error *ngIf="professional.hasError('required')"
+                     [innerHTML]="'COMMON.PROFESSIONAL.REQUIRED' | translate">
+          </mat-error>
+          <mat-error *ngIf="professional.hasError('requireMatch')"
+                     [innerHTML]="'COMMON.PROFESSIONAL.INVALID' | translate">
+          </mat-error>
+          <mat-error *ngIf="errors['professional']">
+            {{errors['professional']}}
+          </mat-error>
+        </mat-form-field>
       </div>
     </ng-template>
     <ng-template #skeleton>
@@ -244,7 +265,7 @@
         <mat-list-item>
           <mat-icon mat-list-icon>person_pin</mat-icon>
           <div mat-line>{{ 'COMMON.PROFESSIONAL.FIELD' | translate}}</div>
-          <div mat-line>{{room.value.professional | userName}}</div>
+          <div mat-line>{{professional.value | userName}}</div>
         </mat-list-item>
         <mat-list-item>
           <mat-icon mat-list-icon>room</mat-icon>
@@ -350,13 +371,13 @@
           <div class="flex-container full" fxLayout="column">
             <div class="full" fxLayout="column" fxLayoutAlign="space-between start">
               <ng-container *ngTemplateOutlet="stepOne"></ng-container>
-              <mat-list-item *ngIf="room.value && room.value.address">
+              <mat-list-item *ngIf="room.value && room.value.address && professional.value">
                 <mat-icon mat-list-icon>room</mat-icon>
                 <div class="bold" mat-subheader>{{ 'ME.RESERVATION.ROOM.DETAIL' | translate}}</div>
                 <mat-divider></mat-divider>
               </mat-list-item>
-              <mat-list-item *ngIf="room.value && room.value.address && room.value.professional">
-                <div [innerHTML]="'ME.RESERVATION.COMMON.PROFESSIONAL.NAME' |
+              <mat-list-item *ngIf="room.value && room.value.address && professional.value">
+                <div [innerHTML]="'ME.RESERVATION.ROOM.PROFESSIONAL.NAME' |
                   translate: {name: professionalName}" mat-line>
                 </div>
                 <div [innerHTML]="'ME.RESERVATION.ROOM.NAME.NAME' | translate: {name: roomDetail}" mat-line></div>
@@ -382,8 +403,8 @@
                     mat-mini-fab type="button">
               <mat-icon>keyboard_return</mat-icon>
             </button>
-            <button (click)="products" [disabled]="roomForm.invalid" class="icon-button" color="primary"
-                    mat-mini-fab type="button">
+            <button (click)="callStepTwo" [disabled]="roomForm.invalid" class="icon-button"
+                    color="primary" mat-mini-fab type="button">
               <mat-icon>arrow_downward</mat-icon>
             </button>
           </div>
@@ -409,7 +430,7 @@
               <mat-icon>arrow_upward</mat-icon>
             </button>
           </ng-template>
-          <button (click)="additional" [disabled]="productForm.invalid" class="icon-button" color="primary"
+          <button (click)="callStepThree" [disabled]="productForm.invalid" class="icon-button" color="primary"
                   mat-mini-fab
                   type="button">
             <mat-icon>arrow_downward</mat-icon>
@@ -423,7 +444,7 @@
           <button (click)="back" color="accent" mat-raised-button>
             <mat-icon>arrow_upward</mat-icon>
           </button>
-          <button (click)="availability" class="raised-button" color="primary" mat-raised-button type="button">
+          <button (click)="callStepFour" class="raised-button" color="primary" mat-raised-button type="button">
             <mat-icon>arrow_downward</mat-icon>
           </button>
         </div>
@@ -435,7 +456,7 @@
           <button (click)="back" class="icon-button" color="accent" mat-mini-fab>
             <mat-icon>arrow_upward</mat-icon>
           </button>
-          <button (click)="preview" [disabled]="!eventSelected" class="icon-button" color="primary" mat-mini-fab
+          <button (click)="callStepFive" [disabled]="!eventSelected" class="icon-button" color="primary" mat-mini-fab
                   type="button">
             <mat-icon>arrow_downward</mat-icon>
           </button>
@@ -471,13 +492,13 @@
             <div class="full" fxLayout="row" fxLayoutAlign="space-between start">
               <div class="middle" fxLayout="column">
                 <ng-container *ngTemplateOutlet="stepOne"></ng-container>
-                <mat-list-item *ngIf="room.value && room.value.address">
+                <mat-list-item *ngIf="room.value && room.value.address && professional.value">
                   <mat-icon mat-list-icon>room</mat-icon>
                   <div class="bold" mat-subheader>{{ 'ME.RESERVATION.ROOM.DETAIL' | translate}}</div>
                   <mat-divider></mat-divider>
                 </mat-list-item>
-                <mat-list-item *ngIf="room.value && room.value.address && room.value.professional">
-                  <div [innerHTML]="'ME.RESERVATION.COMMON.PROFESSIONAL.NAME' |
+                <mat-list-item *ngIf="room.value && room.value.address && professional.value">
+                  <div [innerHTML]="'ME.RESERVATION.ROOM.PROFESSIONAL.NAME' |
                   translate: {name: professionalName}" mat-line>
                   </div>
                   <div [innerHTML]="'ME.RESERVATION.ROOM.NAME.NAME' | translate: {name: roomDetail}" mat-line></div>
@@ -504,7 +525,8 @@
                     type="button">
               <mat-icon>keyboard_return</mat-icon>
               {{ 'COMMON.BUTTON.BACK' | translate }}</button>
-            <button (click)="products" [disabled]="roomForm.invalid" class="raised-button" color="primary"
+            <button (click)="callStepTwo" [disabled]="roomForm.invalid" class="raised-button"
+                    color="primary"
                     mat-raised-button
                     type="button">
               {{ 'COMMON.BUTTON.NEXT' | translate }}
@@ -532,7 +554,7 @@
               <mat-icon>arrow_back</mat-icon>
               {{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </ng-template>
-          <button (click)="additional" [disabled]="productForm.invalid" class="raised-button" color="primary"
+          <button (click)="callStepThree" [disabled]="productForm.invalid" class="raised-button" color="primary"
                   mat-raised-button type="button">
             {{ 'COMMON.BUTTON.NEXT' | translate }}
             <mat-icon>arrow_forward</mat-icon>
@@ -547,7 +569,7 @@
             <mat-icon>arrow_back</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
-          <button (click)="availability" class="raised-button" color="primary" mat-raised-button type="button">
+          <button (click)="callStepFour" class="raised-button" color="primary" mat-raised-button type="button">
             <mat-icon>arrow_forward</mat-icon>
             {{ 'COMMON.BUTTON.NEXT' | translate }}
           </button>
@@ -560,7 +582,7 @@
           <button (click)="back" color="accent" mat-raised-button type="button">
             <mat-icon>arrow_back</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}</button>
-          <button (click)="preview" [disabled]="!eventSelected" class="raised-button" color="primary"
+          <button (click)="callStepFive" [disabled]="!eventSelected" class="raised-button" color="primary"
                   mat-raised-button type="button">
             {{ 'COMMON.BUTTON.NEXT' | translate }}
             <mat-icon>arrow_forward</mat-icon>

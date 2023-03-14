@@ -7,7 +7,8 @@ import { IAdditional } from '../interfaces/additional';
 @Injectable()
 export class AdditionalService {
 
-  url = 'additional';
+  private url = 'additional'
+  private urlV1 = `v1/${this.url}`;
 
   constructor(private http: HttpClient) {
   }
@@ -21,29 +22,29 @@ export class AdditionalService {
       params = params.append('direction', direction);
     }
 
-    return this.http.get<IAdditional[]>(`${this.url}/pages`, {params});
+    return this.http.get<IAdditional[]>(`${this.urlV1}/pages`, {params});
   }
 
   public getAllAdditional(): Observable<IAdditional[]> {
-    return this.http.get<IAdditional[]>(this.url);
+    return this.http.get<IAdditional[]>(this.urlV1);
   }
 
   public getById(id: string | null): Observable<IAdditional | undefined> {
-    const url = `${this.url}/${id}`;
+    const url = `${this.urlV1}/${id}`;
     return this.http.get<IAdditional>(url);
   }
 
   public add(additional: IAdditional): Observable<IAdditional> {
-    return this.http.post<IAdditional>(this.url, additional);
+    return this.http.post<IAdditional>(this.urlV1, additional);
   }
 
   public delete(id: string | null): Observable<IAdditional> {
-    const url = `${this.url}/${id}`;
+    const url = `${this.urlV1}/${id}`;
     return this.http.delete<IAdditional>(url);
   }
 
   public update(additional: IAdditional): Observable<IAdditional> {
-    const url = `${this.url}/${additional.id}`;
+    const url = `${this.urlV1}/${additional.id}`;
     return this.http.patch<IAdditional>(url, additional);
   }
 }

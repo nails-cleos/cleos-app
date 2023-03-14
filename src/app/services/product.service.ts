@@ -7,8 +7,8 @@ import { PAGE_SIZE } from '../interfaces/pagination';
 @Injectable()
 export class ProductService {
 
-  url = 'products';
-  urlV1 = 'v1/products';
+  private url = 'products';
+  private urlV1 = `v1/${this.url}`;
 
   constructor(private http: HttpClient) {
   }
@@ -22,7 +22,7 @@ export class ProductService {
       params = params.append('direction', direction);
     }
 
-    return this.http.get<IProductGroup[]>(`${this.url}/pages`, {params});
+    return this.http.get<IProductGroup[]>(`${this.urlV1}/pages`, {params});
   }
 
   public getAllProducts(roomId: string, customerId?: string): Observable<IProductDiscountDTO[]> {
@@ -34,30 +34,30 @@ export class ProductService {
   }
 
   public getProductList(): Observable<IProductGroup[]> {
-    return this.http.get<IProductGroup[]>(`${this.url}/list`);
+    return this.http.get<IProductGroup[]>(`${this.urlV1}/list`);
   }
 
   public getById(id: string | null): Observable<IProductGroup | undefined> {
-    const url = `${this.url}/${id}`;
+    const url = `${this.urlV1}/${id}`;
     return this.http.get<IProductGroup>(url);
   }
 
   public add(product: IProductGroup): Observable<IProductGroup> {
-    return this.http.post<IProductGroup>(this.url, product);
+    return this.http.post<IProductGroup>(this.urlV1, product);
   }
 
   public delete(id: string | null): Observable<IProductGroup> {
-    const url = `${this.url}/${id}`;
+    const url = `${this.urlV1}/${id}`;
     return this.http.delete<IProductGroup>(url);
   }
 
   public update(product: IProductGroup): Observable<IProductGroup> {
-    const url = `${this.url}/${product.id}`;
+    const url = `${this.urlV1}/${product.id}`;
     return this.http.patch<IProductGroup>(url, product);
   }
 
   public getHistory(id: string, productId: string): Observable<IProductAll[] | undefined> {
-    const url = `${this.url}/${id}/products/${productId}/histories`;
+    const url = `${this.urlV1}/${id}/products/${productId}/histories`;
     return this.http.get<IProductAll[]>(url);
   }
 }

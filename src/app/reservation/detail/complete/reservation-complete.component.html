@@ -86,7 +86,7 @@
                   <div mat-line>
                     <span [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.PRICE' | translate"></span>
                     <span [class.strikethrough]="price.discount"
-                          class="vertical-divider">$ {{price.priceWithExtras | number:'1.2-2'}}</span>
+                          class="vertical-divider">$ {{price.amount | number:'1.2-2'}}</span>
                     <span *ngIf="price.priceWithDiscount" [@discountAnimation]
                           class="vertical-divider bold">$ {{price.priceWithDiscount | number:'1.2-2'}}</span>
                   </div>

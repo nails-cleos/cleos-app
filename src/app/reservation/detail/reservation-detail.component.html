@@ -103,7 +103,7 @@
           <mat-icon mat-list-icon>add_post</mat-icon>
           <div mat-line>
             <div *ngFor="let it of reservation.additional">
-              {{it.name}} - {{reservation.room | currencySymbol}} {{it.price | number:'1.2-2'}}
+              {{it.name}} - {{reservation.room.currency | currencySymbol}} {{it.price | number:'1.2-2'}}
             </div>
           </div>
         </mat-list-item>
