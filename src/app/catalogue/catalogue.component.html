@@ -49,11 +49,11 @@
 
                 <h3 class="catalogue-text">{{ 'CATALOGUE.FILE.DRAG_DROP' | translate }}</h3>
                 <h3 class="catalogue-text">{{ 'CATALOGUE.FILE.OR' | translate }}</h3>
-                <button (click)="fileDropRef.click()" color="accent" mat-raised-button
+                <button (click)="fileDropRef.click()" color="accent" mat-fab extended class="icon-button"
                         type="button">{{ 'CATALOGUE.FILE.CHOOSE' | translate }}</button>
               </div>
               <div fxHide fxShow.lt-sm>
-                <button (click)="fileInput.click()" color="accent" mat-raised-button
+                <button (click)="fileInput.click()" color="accent" mat-fab extended class="icon-button"
                         type="button">{{ 'CATALOGUE.FILE.CHOOSE' | translate }}</button>
                 <input #fileInput (change)="fileBrowseHandler($event)" [multiple]="false" hidden id="file" type="file">
               </div>
@@ -82,9 +82,9 @@
           </mat-card-content>
           <mat-card-actions>
             <div fxFlex></div>
-            <button [disabled]="form.invalid || file?.progress !== 100" color="primary" mat-raised-button
-                    type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
-            <button [form]="form" appBackButton color="accent" mat-raised-button
+            <button [disabled]="form.invalid || file?.progress !== 100" color="primary" mat-fab extended
+                    class="icon-button" type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
+            <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
         </mat-card>

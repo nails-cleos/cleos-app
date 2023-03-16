@@ -40,9 +40,12 @@
                     {{errors['manager']}}
                   </mat-error>
                 </mat-form-field>
-                <button (click)="addManager" color="accent" mat-fab extended>
+                <button fxShow.lt-sm fxHide (click)="addManager" color="accent" mat-fab>
                   <mat-icon matPrefix>person_add</mat-icon>
-                  <span fxHide.lt-sm fxShow>{{ 'OFFICE.MANAGER.ADD_BUTTON' | translate }}</span>
+                </button>
+                <button fxHide.lt-sm fxShow (click)="addManager" color="accent" mat-fab extended>
+                  <mat-icon matPrefix>person_add</mat-icon>
+                  <span>{{ 'OFFICE.MANAGER.ADD_BUTTON' | translate }}</span>
                 </button>
               </div>
               <ng-template #skeleton>
@@ -52,9 +55,9 @@
           </mat-card-content>
           <mat-card-actions>
             <div fxFlex></div>
-            <button [disabled]="form.invalid" color="primary" mat-raised-button
+            <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button"
                     type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
-            <button [form]="form" appBackButton color="accent" mat-raised-button
+            <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
         </mat-card>

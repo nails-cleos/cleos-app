@@ -25,6 +25,7 @@ import { UserService } from '../services/user.service';
 import { TokenService } from '../services/token.service';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { NgxMatColorPickerModule } from '@angular-material-components/color-picker';
+import { GoogleSigninButtonModule } from "@abacritt/angularx-social-login";
 
 
 @NgModule({
@@ -39,24 +40,25 @@ import { NgxMatColorPickerModule } from '@angular-material-components/color-pick
     ProfileComponent,
     RedirectComponent
   ],
-  imports: [
-    AuthRoutingModule,
-    SharedModule,
-    MatPasswordStrengthModule.forRoot(),
-    MatTabsModule,
-    MatSlideToggleModule,
-    NgxMatIntlTelInputComponent,
-    TranslateModule.forChild({
-      loader: {
-        provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('auth')
-      },
-      isolate: false,
-      extend: true
-    }),
-    EffectsModule.forFeature([LoginEffects, UserEffects]),
-    NgxMatColorPickerModule
-  ],
+    imports: [
+        AuthRoutingModule,
+        SharedModule,
+        MatPasswordStrengthModule.forRoot(),
+        MatTabsModule,
+        MatSlideToggleModule,
+        NgxMatIntlTelInputComponent,
+        TranslateModule.forChild({
+            loader: {
+                provide: TranslateLoader,
+                useClass: TranslateLoaderFactory.forModule('auth')
+            },
+            isolate: false,
+            extend: true
+        }),
+        EffectsModule.forFeature([LoginEffects, UserEffects]),
+        NgxMatColorPickerModule,
+        GoogleSigninButtonModule
+    ],
   providers: [
     AuthService,
     UserService,

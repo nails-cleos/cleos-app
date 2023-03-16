@@ -98,7 +98,7 @@ export class DashboardComponent implements OnInit {
       if (professional.imageUrl.indexOf('http') >= 0) {
         image = professional.imageUrl;
       } else if (professional.image) {
-        image = `data:image/jpg;base64,${professional.image}`;
+        image = `data:image/jpg;base64,${ professional.image }`;
       }
     }
 
@@ -120,14 +120,14 @@ export class DashboardComponent implements OnInit {
     this.getEvents();
   }
 
-  eventTimesChanged({event, newStart, newEnd}: any): void {
+  eventTimesChanged({ event, newStart, newEnd }: any): void {
     event.start = newStart;
     event.end = newEnd;
     this.events = [...this.events];
     this.updateEvent(event.id, event.start);
   }
 
-  professionalChanged({event, newProfessional}: any): void {
+  professionalChanged({ event, newProfessional }: any): void {
     const endTime = event.end ? event.end.getTime() / 1000 : 0;
     console.log("RESERVATION START", event.start)
     const startTime = event.start.getTime() / 1000;
@@ -161,13 +161,13 @@ export class DashboardComponent implements OnInit {
   }
 
   segmentClick(date: Date, professionalId: string): void {
-    const data = {date, professionalId, isDashboard: true};
+    const data = { date, professionalId, isDashboard: true };
     if (date && professionalId && this.dateIsValid(date)) {
       const dialogRef = this.dialog.open(CalendarDialogComponent);
 
       dialogRef.afterClosed().subscribe(result => {
         if (result) {
-          this.router.navigate(result.split(','), {state: data});
+          this.router.navigate(result.split(','), { state: data });
         }
       });
     }
@@ -175,34 +175,38 @@ export class DashboardComponent implements OnInit {
 
   private createTitle(calendarEvent: CalendarEvent, now: Date = getNow()): CalendarEvent {
     const matcher = calendarEvent.title.match(/(?<=<b>\s*).*?(?=\s*<\/b>)/gs);
-    const title = matcher ? `<b>${matcher[0]}</b>` : calendarEvent.title;
+    const title = matcher ? `<b>${ matcher[0] }</b>` : calendarEvent.title;
 
     if (calendarEvent.meta.state === States.started && calendarEvent.end) {
+      const dateTime = calendarEvent.meta.started instanceof Date ? calendarEvent.meta.started
+        : newDateTimestamp(calendarEvent.meta.started);
+      console.log(calendarEvent)
+      console.log(dateTime)
       const startTime = calendarEvent.start.getTime();
-      const startedTime = calendarEvent.meta.started.getTime();
+      const startedTime = dateTime.getTime();
       const nowTime = now.getTime();
       const endTime = calendarEvent.end.getTime();
 
-      const diffStart = getMinutesBetweenTimes(calendarEvent.start, calendarEvent.meta.started);
+      const diffStart = getMinutesBetweenTimes(calendarEvent.start, dateTime);
       let startText;
       if (startTime > startedTime) {
-        startText = `<span class="green-text"><b id="start">-${diffStart} min.</b></span>`;
+        startText = `<span class="green-text"><b id="start">-${ diffStart } min.</b></span>`;
       } else if (startTime < startedTime) {
-        startText = `<span class="red-text"><b id="start">+${diffStart} min.</b></span>`;
+        startText = `<span class="red-text"><b id="start">+${ diffStart } min.</b></span>`;
       } else {
         startText = '<span><b id="start">0 min.</b></span>';
       }
 
       const start = this.startedText.replace('{startText}', startText);
 
-      const diffElapsed = getMinutesBetweenTimes(now, calendarEvent.meta.started);
+      const diffElapsed = getMinutesBetweenTimes(now, dateTime);
       const duration = getMinutesBetweenTimes(calendarEvent.end, calendarEvent.start);
 
       let elapsedText;
       if (duration > diffElapsed) {
-        elapsedText = `<span class="green-text"><b id="elapsed">${diffElapsed} min.</b></span>`;
+        elapsedText = `<span class="green-text"><b id="elapsed">${ diffElapsed } min.</b></span>`;
       } else if (duration < diffElapsed) {
-        elapsedText = `<span class="red-text"><b id="elapsed">+${diffElapsed} min.</b></span>`;
+        elapsedText = `<span class="red-text"><b id="elapsed">+${ diffElapsed } min.</b></span>`;
       } else {
         elapsedText = '<span><b id="elapsed">0 min.</b></span>';
       }
@@ -212,16 +216,16 @@ export class DashboardComponent implements OnInit {
       const diffFinish = getMinutesBetweenTimes(calendarEvent.end, now);
       let finishText;
       if (endTime > nowTime) {
-        finishText = `<span class="green-text"><b id="finish">-${diffFinish} min.</b></span>`;
+        finishText = `<span class="green-text"><b id="finish">-${ diffFinish } min.</b></span>`;
       } else if (endTime < nowTime) {
-        finishText = `<span class="red-text"><b id="finish">+${diffFinish} min.</b></span>`;
+        finishText = `<span class="red-text"><b id="finish">+${ diffFinish } min.</b></span>`;
       } else {
         finishText = '<span><b id="finish">0 min.</b></span>';
       }
 
       const timeFinish = this.finishInText.replace('{finishText}', finishText);
 
-      calendarEvent.title = `${title} <div class="timing"> ${start} ${timeElapsed} ${timeFinish}</div>`;
+      calendarEvent.title = `${ title } <div class="timing"> ${ start } ${ timeElapsed } ${ timeFinish }</div>`;
     }
 
     const isNow = isToday(calendarEvent.start);
@@ -231,21 +235,21 @@ export class DashboardComponent implements OnInit {
 
     if (!calendarEvent.actions) {
       calendarEvent.actions = [{
-        label: `<div class="mat-raised-button"><div class="material-icons">visibility</div>&nbsp;${this.viewText}</div>`,
-        onClick: ({event}: { event: CalendarEvent }): void => {
+        label: `<div class="mat-raised-button"><div class="material-icons">visibility</div>&nbsp;${ this.viewText }</div>`,
+        onClick: ({ event }: { event: CalendarEvent }): void => {
           this.eventClick(event, 'VIEW');
         }
       }, {
-        label: `<div class="mat-raised-button"><div class="material-icons">read_more</div>&nbsp;${this.moreText}</div>`,
-        onClick: ({event}: { event: CalendarEvent }): void => {
+        label: `<div class="mat-raised-button"><div class="material-icons">read_more</div>&nbsp;${ this.moreText }</div>`,
+        onClick: ({ event }: { event: CalendarEvent }): void => {
           this.eventClick(event, 'MORE_INFO');
         }
       }];
 
       if (showApprove) {
         calendarEvent.actions = [{
-          label: `<div class="mat-raised-button"><div class="material-icons">done</div>&nbsp;${this.approveText}</div>`,
-          onClick: ({event}: { event: CalendarEvent }): void => {
+          label: `<div class="mat-raised-button"><div class="material-icons">done</div>&nbsp;${ this.approveText }</div>`,
+          onClick: ({ event }: { event: CalendarEvent }): void => {
             this.eventClick(event, 'APPROVE');
           }
         }, ...calendarEvent.actions];
@@ -253,8 +257,8 @@ export class DashboardComponent implements OnInit {
 
       if (showStart) {
         calendarEvent.actions = [{
-          label: `<div class="mat-raised-button"><div class="material-icons">play_arrow</div>&nbsp;${this.startText}</div>`,
-          onClick: ({event}: { event: CalendarEvent }): void => {
+          label: `<div class="mat-raised-button"><div class="material-icons">play_arrow</div>&nbsp;${ this.startText }</div>`,
+          onClick: ({ event }: { event: CalendarEvent }): void => {
             this.eventClick(event, 'START');
           }
         }, ...calendarEvent.actions];
@@ -262,8 +266,8 @@ export class DashboardComponent implements OnInit {
 
       if (showComplete) {
         calendarEvent.actions = [{
-          label: `<div class="mat-raised-button"><div class="material-icons">done_all</div>&nbsp;${this.completeText}</div>`,
-          onClick: ({event}: { event: CalendarEvent }): void => {
+          label: `<div class="mat-raised-button"><div class="material-icons">done_all</div>&nbsp;${ this.completeText }</div>`,
+          onClick: ({ event }: { event: CalendarEvent }): void => {
             this.eventClick(event, 'COMPLETE');
           }
         }, ...calendarEvent.actions];
@@ -274,7 +278,7 @@ export class DashboardComponent implements OnInit {
   }
 
   private updateEvent(id: string, dateStart?: Date, professionalId?: string): void {
-    const reservation: IReservation = {id};
+    const reservation: IReservation = { id };
     if (dateStart) {
       const start = dateStart.toLocaleString(API_LOCALE);
       const timeZone = getCurrentTimeZone();
@@ -325,7 +329,8 @@ export class DashboardComponent implements OnInit {
     this.events = [];
     this.professionals = [];
     if (this.dashboard?.professionals) {
-      const {min, max} = getRoomStartEndDay(this.dashboard.availability, this.dashboard.timeZone, this.viewDate);
+      console.log(this.dashboard?.professionals)
+      const { min, max } = getRoomStartEndDay(this.dashboard.availability, this.dashboard.timeZone, this.viewDate);
       this.day = new Day(min, max, this.viewDate, []);
       this.endDate = createNewDate(this.endDate, this.day.dayEndHour, this.day.dayEndMinute);
       this.startDate = createNewDate(this.startDate, this.day.dayStartHour, this.day.dayStartMinute);
@@ -349,8 +354,15 @@ export class DashboardComponent implements OnInit {
 
           const event = {
             start, end, color, title, draggable, id: it.reservationId,
-            meta: {professional, started, time: true, customerId: it.customerId, state: it.state, viewDate: this.viewDate},
-            resizable: {beforeStart: true, afterEnd: true}
+            meta: {
+              professional,
+              started,
+              time: true,
+              customerId: it.customerId,
+              state: it.state,
+              viewDate: this.viewDate
+            },
+            resizable: { beforeStart: true, afterEnd: true }
           } as CalendarEvent;
 
           this.events = [...this.events, this.createTitle(event)];
@@ -362,13 +374,13 @@ export class DashboardComponent implements OnInit {
         let recurring: any[] = [];
         professionalEvent.calendarSummary.unavailable?.forEach(it => {
           const start = newDateTimestamp(it.start);
-          const title = it.duration ? it.title : `${this.translate.instant('COMMON.ALL_DAY.CHECK')} - ${it.title}`;
+          const title = it.duration ? it.title : `${ this.translate.instant('COMMON.ALL_DAY.CHECK') } - ${ it.title }`;
 
           if (it.repeat === UnavailableRepeatType.none) {
             const end = getEnd(start, it.duration);
             const event = {
               start, end, title: it.title, id: it.unavailableId, color: professional.color, draggable: true,
-              meta: {professional, time: true}, resizable: {beforeStart: true, afterEnd: true}
+              meta: { professional, time: true }, resizable: { beforeStart: true, afterEnd: true }
             } as CalendarEvent;
 
             this.events = [...this.events, event];
@@ -386,8 +398,8 @@ export class DashboardComponent implements OnInit {
               id: r.unavailableId,
               color: professional.color,
               draggable: true,
-              meta: {professional, time: true},
-              resizable: {beforeStart: true, afterEnd: true}
+              meta: { professional, time: true },
+              resizable: { beforeStart: true, afterEnd: true }
             } as CalendarEvent;
             this.events = [...this.events, event];
           })
@@ -436,7 +448,7 @@ export class DashboardComponent implements OnInit {
         break;
       case 'COMPLETE':
         this.router.navigate(['reservation', reservationId, 'rooms', this.dashboard?.roomId,
-          'customer', event.meta.customerId, 'complete'], {state: {data: {isDashboard: true}}});
+          'customer', event.meta.customerId, 'complete'], { state: { data: { isDashboard: true } } });
         break;
       case 'MORE_INFO':
         this.router.navigate(['reservation', reservationId, 'more-info']);

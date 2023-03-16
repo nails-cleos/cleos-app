@@ -82,7 +82,7 @@
               aria-label="Toggle sidenav" mat-icon-button type="button">
         <mat-icon *ngIf="showInformation" aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
-      <img alt="logo" mat-card-avatar src="../../assets/icons/icon-512x512.png">
+      <img alt="logo" src="../../assets/icons/icon-512x512.png">
       <span>{{title}}</span>
       <span class="align-right"></span>
       <div *ngIf="currentUser?.username; else login">
@@ -163,11 +163,6 @@
               <div mat-line>{{'DASHBOARD.PROFILE' | translate }}</div>
             </a>
             <mat-divider></mat-divider>
-            <mat-list-item>
-              <mat-slide-toggle (change)="setTheme($event.checked)" [checked]="checked"
-                                mat-line>{{'COMMON.DASHBOARD.DARK_MODE' | translate }}</mat-slide-toggle>
-            </mat-list-item>
-            <mat-divider></mat-divider>
             <a *ngIf="canChangePassword" [routerLink]="'/auth/change-password'" mat-list-item>
               <mat-icon matListItemIcon>mode_edit</mat-icon>
               <div mat-line>{{'DASHBOARD.CHANGE_PASSWORD' | translate }}</div>
@@ -177,14 +172,24 @@
               <mat-icon matListItemIcon>exit_to_app</mat-icon>
               <div mat-line>{{'DASHBOARD.SIGN_OUT' | translate }}</div>
             </a>
+            <mat-divider></mat-divider>
+            <mat-list-item>
+              <mat-slide-toggle (change)="setTheme($event.checked)" [checked]="checked"
+                                mat-line>{{'COMMON.DASHBOARD.DARK_MODE' | translate }}</mat-slide-toggle>
+            </mat-list-item>
           </mat-nav-list>
         </mat-menu>
       </div>
       <ng-template #login>
-        <button color="accent" mat-fab extended routerLink="/main">
+        <button *ngIf="(isHandset$ | async) === false; else mini" color="accent" mat-fab extended routerLink="/main">
           <mat-icon>home</mat-icon>
-          <span *ngIf="(isHandset$ | async) === false">{{'COMMON.DASHBOARD.HOME' | translate }}</span>
+          <span>{{'COMMON.DASHBOARD.HOME' | translate }}</span>
         </button>
+        <ng-template #mini>
+          <button color="accent" mat-fab routerLink="/main">
+            <mat-icon>home</mat-icon>
+          </button>
+        </ng-template>
       </ng-template>
     </mat-toolbar>
     <main [ngClass]="{'loading': isLoading}" class="content">

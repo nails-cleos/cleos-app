@@ -431,8 +431,7 @@
             </button>
           </ng-template>
           <button (click)="callStepThree" [disabled]="productForm.invalid" class="icon-button" color="primary"
-                  mat-mini-fab
-                  type="button">
+                  mat-mini-fab type="button">
             <mat-icon>arrow_downward</mat-icon>
           </button>
         </div>
@@ -441,10 +440,10 @@
         <ng-template matStepLabel>{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepThree"></ng-container>
         <div class="divider">
-          <button (click)="back" color="accent" mat-raised-button>
+          <button (click)="back" color="accent" class="icon-button" mat-mini-fab>
             <mat-icon>arrow_upward</mat-icon>
           </button>
-          <button (click)="callStepFour" class="raised-button" color="primary" mat-raised-button type="button">
+          <button (click)="callStepFour" class="icon-button" color="primary" mat-mini-fab type="button">
             <mat-icon>arrow_downward</mat-icon>
           </button>
         </div>

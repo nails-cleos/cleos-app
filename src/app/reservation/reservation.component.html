@@ -191,7 +191,7 @@
             </mat-error>
           </mat-form-field>
           <button (click)="showDiscount = !showDiscount" *ngIf="product.value && !isEditing && discounts?.length"
-                  class="raised-button" mat-fab extended type="button">
+                  class="icon-button" mat-fab extended type="button">
             {{ 'COMMON.BUTTON.DISCOUNT.' + (showDiscount ? 'HIDE' : 'SHOW') | translate }}
             <mat-icon>redeem</mat-icon>
           </button>
@@ -447,11 +447,11 @@
           </div>
         </div>
         <div class="flex-container">
-          <button [form]="customerForm" appBackButton color="accent" mat-fab type="button">
+          <button [form]="customerForm" appBackButton color="accent" class="icon-button" mat-fab type="button">
             <mat-icon>keyboard_return</mat-icon>
           </button>
           <button (click)="callStepTwo" [disabled]="customerForm.invalid" color="primary"
-                  mat-fab type="button">
+                  class="icon-button" mat-fab type="button">
             <mat-icon>arrow_downward</mat-icon>
           </button>
         </div>
@@ -494,15 +494,16 @@
         </div>
       </div>
       <div class="divider">
-        <button (click)="back" *ngIf="!isEditing; else editButton" color="accent" mat-fab>
+        <button (click)="back" *ngIf="!isEditing; else editButton" color="accent" class="icon-button" mat-fab>
           <mat-icon>arrow_upward</mat-icon>
         </button>
         <ng-template #editButton>
-          <button [form]="officeForm" appBackButton color="accent" mat-fab type="button">
+          <button [form]="officeForm" appBackButton color="accent" class="icon-button" mat-fab type="button">
             <mat-icon>keyboard_return</mat-icon>
           </button>
         </ng-template>
-        <button (click)="callStepThree" [disabled]="officeForm.invalid" color="primary" mat-fab type="button">
+        <button (click)="callStepThree" [disabled]="officeForm.invalid" color="primary" class="icon-button" mat-fab
+                type="button">
           <mat-icon>arrow_downward</mat-icon>
         </button>
       </div>
@@ -513,15 +514,16 @@
       <ng-container *ngTemplateOutlet="stepThree"></ng-container>
       <div class="divider">
         <button (click)="back" *ngIf="!isEditing || (isEditing && isAdmin); else editButton" color="accent"
-                mat-fab>
+                class="icon-button" mat-fab>
           <mat-icon>arrow_upward</mat-icon>
         </button>
         <ng-template #editButton>
-          <button [form]="productForm" appBackButton color="accent" mat-fab type="button">
+          <button [form]="productForm" appBackButton color="accent" class="icon-button" mat-fab type="button">
             <mat-icon>keyboard_return</mat-icon>
           </button>
         </ng-template>
-        <button (click)="callStepFour" [disabled]="productForm.invalid" color="primary" mat-fab type="button">
+        <button (click)="callStepFour" [disabled]="productForm.invalid" color="primary" class="icon-button" mat-fab
+                type="button">
           <mat-icon>arrow_downward</mat-icon>
         </button>
       </div>
@@ -530,10 +532,10 @@
       <ng-template matStepLabel>{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepFour"></ng-container>
       <div class="divider">
-        <button (click)="back" color="accent" mat-fab>
+        <button (click)="back" color="accent" class="icon-button" mat-fab>
           <mat-icon>arrow_upward</mat-icon>
         </button>
-        <button (click)="callStepFive" color="primary" mat-fab type="button">
+        <button (click)="callStepFive" color="primary" class="icon-button" mat-fab type="button">
           <mat-icon>arrow_downward</mat-icon>
         </button>
       </div>
@@ -545,10 +547,10 @@
         <ng-container *ngTemplateOutlet="stepFive"></ng-container>
       </div>
       <div>
-        <button (click)="back" color="accent" mat-fab>
+        <button (click)="back" color="accent" class="icon-button" mat-fab>
           <mat-icon>arrow_upward</mat-icon>
         </button>
-        <button (click)="callStepSix" [disabled]="configurationForm.invalid" color="primary" mat-fab
+        <button (click)="callStepSix" [disabled]="configurationForm.invalid" color="primary" class="icon-button" mat-fab
                 type="button">
           <mat-icon>arrow_downward</mat-icon>
         </button>
@@ -558,10 +560,10 @@
       <ng-template matStepLabel>{{ 'RESERVATION.SCHEDULE.FIELD' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepSix"></ng-container>
       <div class="divider">
-        <button (click)="back" color="accent" mat-fab>
+        <button (click)="back" color="accent" class="icon-button" mat-fab>
           <mat-icon>arrow_upward</mat-icon>
         </button>
-        <button (click)="callStepSeven" color="primary" mat-fab type="button">
+        <button (click)="callStepSeven" color="primary" class="icon-button" mat-fab type="button">
           <mat-icon>arrow_downward</mat-icon>
         </button>
       </div>
@@ -570,10 +572,10 @@
       <ng-template matStepLabel>{{ 'RESERVATION.PREVIEW' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepSeven"></ng-container>
       <div class="divider">
-        <button (click)="back" color="accent" mat-fab>
+        <button (click)="back" color="accent" class="icon-button" mat-fab>
           <mat-icon>arrow_upward</mat-icon>
         </button>
-        <button (click)="create" color="primary" mat-fab type="button">
+        <button (click)="create" color="primary" class="icon-button" mat-fab type="button">
           <mat-icon>add_task</mat-icon>
         </button>
       </div>
@@ -590,18 +592,18 @@
         <div class="flex-container" fxLayout="row" fxLayoutAlign="space-between start">
           <ng-container *ngTemplateOutlet="stepOne"></ng-container>
           <div class="vertical-divider"></div>
-          <button (click)="addCustomer" *ngIf="isAdmin" color="accent" mat-fab extended>
+          <button (click)="addCustomer" *ngIf="isAdmin" color="accent" class="icon-button" mat-fab extended>
             <mat-icon>person_add</mat-icon>
             {{ 'RESERVATION.CUSTOMER.ADD_BUTTON' | translate }}
           </button>
         </div>
         <div>
-          <button [form]="customerForm" appBackButton color="accent" mat-fab extended type="button">
+          <button [form]="customerForm" appBackButton color="accent" class="icon-button" mat-fab extended type="button">
             <mat-icon>keyboard_return</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
           <button (click)="callStepTwo" [disabled]="customerForm.invalid" color="primary"
-                  mat-fab extended type="button">
+                  class="icon-button" mat-fab extended type="button">
             <mat-icon>arrow_forward</mat-icon>
             {{ 'COMMON.BUTTON.NEXT' | translate }}
           </button>
@@ -647,18 +649,18 @@
         </div>
       </div>
       <div class="divider">
-        <button (click)="back" *ngIf="!isEditing; else editButton" color="accent" mat-fab extended>
+        <button (click)="back" *ngIf="!isEditing; else editButton" color="accent" class="icon-button" mat-fab extended>
           {{ 'COMMON.BUTTON.BACK' | translate }}
           <mat-icon>arrow_back</mat-icon>
         </button>
         <ng-template #editButton>
-          <button [form]="officeForm" appBackButton color="accent" mat-fab extended type="button">
+          <button [form]="officeForm" appBackButton color="accent" class="icon-button" mat-fab extended type="button">
             {{ 'COMMON.BUTTON.BACK' | translate }}
             <mat-icon>keyboard_return</mat-icon>
           </button>
         </ng-template>
         <button (click)="callStepThree" [disabled]="officeForm.invalid" color="primary"
-                mat-fab extended type="button">
+                class="icon-button" mat-fab extended type="button">
           <mat-icon>arrow_forward</mat-icon>
           {{ 'COMMON.BUTTON.NEXT' | translate }}
         </button>
@@ -670,18 +672,18 @@
       <ng-container *ngTemplateOutlet="stepThree"></ng-container>
       <div>
         <button (click)="back" *ngIf="!isEditing || (isEditing && isAdmin); else editButton" color="accent"
-                mat-raised-button>
+                mat-fab extended class="icon-button">
           <mat-icon>arrow_back</mat-icon>
           {{ 'COMMON.BUTTON.BACK' | translate }}
         </button>
         <ng-template #editButton>
-          <button [form]="productForm" appBackButton color="accent" mat-raised-button type="button">
+          <button [form]="productForm" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
             <mat-icon>keyboard_return</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
         </ng-template>
         <button (click)="callStepFour" [disabled]="productForm.invalid" color="primary"
-                mat-raised-button type="button">
+                mat-fab extended class="icon-button" type="button">
           <mat-icon>arrow_forward</mat-icon>
           {{ 'COMMON.BUTTON.NEXT' | translate }}
         </button>
@@ -691,11 +693,11 @@
       <ng-template matStepLabel>{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepFour"></ng-container>
       <div>
-        <button (click)="back" color="accent" mat-raised-button>
+        <button (click)="back" color="accent" mat-fab extended class="icon-button">
           <mat-icon>arrow_back</mat-icon>
           {{ 'COMMON.BUTTON.BACK' | translate }}
         </button>
-        <button (click)="callStepFive" color="primary" mat-raised-button type="button">
+        <button (click)="callStepFive" color="primary" mat-fab extended class="icon-button" type="button">
           <mat-icon>arrow_forward</mat-icon>
           {{ 'COMMON.BUTTON.NEXT' | translate }}
         </button>
@@ -708,12 +710,12 @@
         <ng-container *ngTemplateOutlet="stepFive"></ng-container>
       </div>
       <div>
-        <button (click)="back" color="accent" mat-raised-button>
+        <button (click)="back" color="accent" mat-fab extended class="icon-button">
           <mat-icon>arrow_back</mat-icon>
           {{ 'COMMON.BUTTON.BACK' | translate }}
         </button>
         <button (click)="callStepSix" [disabled]="configurationForm.invalid" color="primary"
-                mat-raised-button type="button">
+                mat-fab extended class="icon-button" type="button">
           <mat-icon>arrow_forward</mat-icon>
           {{ 'COMMON.BUTTON.NEXT' | translate }}
         </button>
@@ -723,11 +725,11 @@
       <ng-template matStepLabel>{{ 'RESERVATION.SCHEDULE.FIELD' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepSix"></ng-container>
       <div class="divider">
-        <button (click)="back" color="accent" mat-raised-button>
+        <button (click)="back" color="accent" mat-fab extended class="icon-button">
           <mat-icon>arrow_back</mat-icon>
           {{ 'COMMON.BUTTON.BACK' | translate }}</button>
         <button (click)="callStepSeven" color="primary"
-                mat-raised-button type="button">
+                mat-fab extended class="icon-button" type="button">
           <mat-icon>arrow_forward</mat-icon>
           {{ 'COMMON.BUTTON.NEXT' | translate }}</button>
       </div>
@@ -736,10 +738,10 @@
       <ng-template matStepLabel>{{ 'RESERVATION.PREVIEW' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepSeven"></ng-container>
       <div class="divider">
-        <button (click)="back" color="accent" mat-raised-button>
+        <button (click)="back" color="accent" mat-fab extended class="icon-button">
           <mat-icon>arrow_back</mat-icon>
           {{ 'COMMON.BUTTON.BACK' | translate }}</button>
-        <button (click)="create" color="primary" mat-raised-button type="button">
+        <button (click)="create" color="primary" mat-fab extended class="icon-button" type="button">
           <mat-icon>add_task</mat-icon>
           {{ 'COMMON.BUTTON.BOOK' | translate }}
         </button>

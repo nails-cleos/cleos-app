@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthService } from 'angularx-social-login';
+import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthService } from '@abacritt/angularx-social-login';
 import { Store } from '@ngrx/store';
 import * as fromActionsLogin from '../store/auth.actions';
 import { AppState, selectAuthState } from '../store/app.states';

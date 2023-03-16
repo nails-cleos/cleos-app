@@ -30,6 +30,10 @@
 .box-button {
   margin-right: 2%;
   float: right;
+
+  mat-chip-option {
+    border-radius: 24px;
+  }
 }
 
 .divider {

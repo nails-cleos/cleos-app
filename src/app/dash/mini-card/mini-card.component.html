@@ -14,11 +14,18 @@
       </mat-card-header>
       <h3 class="title-text">{{title}}</h3>
       <div class="difference-text">
+        <span *ngIf="isInfinity; else showPercentage" [ngClass]="{ 'green-text': isIncrease, 'red-text': !isIncrease }">
+          {{ isIncrease ? '+' : '-' }}∞
+          <mat-icon *ngIf="isIncrease" class="trending" matSuffix>trending_up</mat-icon>
+          <mat-icon *ngIf="!isIncrease" class="trending" matSuffix>trending_down</mat-icon>
+        </span>
+        <ng-template #showPercentage>
         <span [ngClass]="{ 'green-text': isIncrease, 'red-text': !isIncrease }">
           {{ isIncrease ? '+' : '-' }}{{ percentValue | percent:'1.0-2':locale }}
           <mat-icon *ngIf="isIncrease" class="trending" matSuffix>trending_up</mat-icon>
           <mat-icon *ngIf="!isIncrease" class="trending" matSuffix>trending_down</mat-icon>
         </span>
+        </ng-template>
         <p class="duration">{{duration}}</p>
       </div>
     </div>

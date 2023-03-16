@@ -26,19 +26,20 @@
     </mat-grid-tile>
   </mat-grid-list>
   <div class="divider">
-    <button (click)="finish" color="primary" mat-raised-button>
+    <button (click)="finish" color="primary" mat-fab extended class="icon-button">
       {{ 'COMMON.BUTTON.UPDATE' | translate }}
     </button>
   </div>
 
-  <button color="accent" id="add-button" mat-fab matTooltip="{{ 'CATALOGUE.TITLE' | translate }}"
+  <button color="accent" id="add-button" mat-fab extended class="icon-button"
+          matTooltip="{{ 'CATALOGUE.TITLE' | translate }}"
           routerLink="/catalogues/add">
     <mat-icon>add_a_photo</mat-icon>
   </button>
 </div>
 
 <ng-template #emptyCatalogue>
-  <button class="only-button" color="accent" mat-fab extended routerLink="/catalogues/add">
+  <button class="only-button icon-button" color="accent" mat-fab extended routerLink="/catalogues/add">
     <mat-icon>add_a_photo</mat-icon> &nbsp;{{ 'CATALOGUE.TITLE' | translate }}
   </button>
 </ng-template>

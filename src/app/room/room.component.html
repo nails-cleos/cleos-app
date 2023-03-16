@@ -30,9 +30,12 @@
                     {{errors['currency']}}
                   </mat-error>
                 </mat-form-field>
-                <button (click)="addCurrency" color="accent" mat-raised-button>
+                <button fxShow.lt-sm fxHide (click)="addCurrency" color="accent" mat-fab>
                   <mat-icon matPrefix>add_card</mat-icon>
-                  <span fxHide.lt-sm fxShow>{{ 'COMMON.CURRENCY.ADD_BUTTON' | translate }}</span>
+                </button>
+                <button fxHide.lt-sm fxShow (click)="addCurrency" color="accent" mat-fab extended>
+                  <mat-icon matPrefix>add_card</mat-icon>
+                  <span>{{ 'COMMON.CURRENCY.ADD_BUTTON' | translate }}</span>
                 </button>
               </div>
               <div *ngIf="offices; else skeleton" fxLayout="row" fxLayoutAlign="space-between center">
@@ -57,9 +60,12 @@
                     {{errors['office']}}
                   </mat-error>
                 </mat-form-field>
-                <button (click)="addOffice" color="accent" mat-raised-button>
+                <button fxShow.lt-sm fxHide (click)="addOffice" color="accent" mat-fab>
                   <mat-icon matPrefix>add_business</mat-icon>
-                  <span fxHide.lt-sm fxShow>{{ 'ROOM.OFFICE.ADD_BUTTON' | translate }}</span>
+                </button>
+                <button fxHide.lt-sm fxShow (click)="addOffice" color="accent" mat-fab extended>
+                  <mat-icon matPrefix>add_business</mat-icon>
+                  <span>{{ 'ROOM.OFFICE.ADD_BUTTON' | translate }}</span>
                 </button>
               </div>
               <div *ngIf="allProfessional; else skeleton" fxLayout="row" fxLayoutAlign="space-between center">
@@ -90,9 +96,12 @@
                     {{errors['professional']}}
                   </mat-error>
                 </mat-form-field>
-                <button (click)="addProfessional" color="accent" mat-raised-button>
+                <button fxShow.lt-sm fxHide (click)="addProfessional" color="accent" mat-fab>
                   <mat-icon matPrefix>person_add_alt_1</mat-icon>
-                  <span fxHide.lt-sm fxShow>{{ 'COMMON.PROFESSIONAL.ADD_BUTTON' | translate }}</span>
+                </button>
+                <button fxHide.lt-sm fxShow (click)="addProfessional" color="accent" mat-fab extended>
+                  <mat-icon matPrefix>person_add_alt_1</mat-icon>
+                  <span>{{ 'COMMON.PROFESSIONAL.ADD_BUTTON' | translate }}</span>
                 </button>
               </div>
               <mat-form-field appearance="fill">
@@ -254,9 +263,9 @@
           </mat-card-content>
           <mat-card-actions>
             <div fxFlex></div>
-            <button [disabled]="form.invalid" color="primary" mat-raised-button
+            <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button"
                     type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
-            <button [form]="form" appBackButton color="accent" mat-raised-button
+            <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
         </mat-card>

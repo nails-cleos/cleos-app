@@ -2,7 +2,12 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthServiceConfig, SocialLoginModule } from 'angularx-social-login';
+import {
+  FacebookLoginProvider,
+  GoogleLoginProvider,
+  SocialAuthServiceConfig,
+  SocialLoginModule
+} from '@abacritt/angularx-social-login';
 import { ActionReducer, MetaReducer, StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -21,7 +26,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { Router } from '@angular/router';
 
 // Providers
-import { httpInterceptorProviders } from './http-interceptors';
 import { environment } from '../environments/environment';
 import { localStorageSync } from 'ngrx-store-localstorage';
 import { MatPaginatorIntl } from '@angular/material/paginator';
@@ -31,7 +35,11 @@ import localeEn from '@angular/common/locales/en';
 import localeEs from '@angular/common/locales/es';
 import { CookieService } from 'ngx-cookie-service';
 import { TranslateLoaderFactory } from './shared/translate-loader.factory';
-import { MAT_COLOR_FORMATS, NGX_MAT_COLOR_FORMATS, NgxMatColorPickerModule } from '@angular-material-components/color-picker';
+import {
+  MAT_COLOR_FORMATS,
+  NGX_MAT_COLOR_FORMATS,
+  NgxMatColorPickerModule
+} from '@angular-material-components/color-picker';
 
 // Services
 import { AuthGuardService } from './services/auth-guard.service';
@@ -62,7 +70,7 @@ export const getAuthServiceConfigs = (): SocialAuthServiceConfig => ({
 } as SocialAuthServiceConfig);
 
 export const localStorageSyncReducer =
-  (reducer: ActionReducer<any>): ActionReducer<any> => localStorageSync({keys: ['auth'], rehydrate: true})(reducer);
+  (reducer: ActionReducer<any>): ActionReducer<any> => localStorageSync({ keys: ['auth'], rehydrate: true })(reducer);
 
 const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
 
@@ -75,7 +83,7 @@ registerLocaleData(localeEs, 'es');
   ],
   imports: [
     BrowserModule,
-    StoreModule.forRoot(reducers, {metaReducers}),
+    StoreModule.forRoot(reducers, { metaReducers }),
     EffectsModule.forRoot([]),
     TranslateModule.forRoot({
       defaultLanguage: 'es',
@@ -105,7 +113,6 @@ registerLocaleData(localeEs, 'es');
       provide: MatPaginatorIntl, deps: [TranslateService],
       useFactory: (translateService: TranslateService) => new PaginatorI18n(translateService).getPaginatorIntl()
     },
-    httpInterceptorProviders,
     AuthGuardService,
     TokenService,
     NavigationService,
@@ -133,7 +140,7 @@ export class AppModule {
       const messaging = getMessaging(firebaseApp)
       // navigator.serviceWorker
       //   .ready.then((registration) => messaging.useServiceWorker(registration));
-      swPush.notificationClicks.subscribe(({action, notification}) =>
+      swPush.notificationClicks.subscribe(({ action, notification }) =>
         router.navigate(notification.data.onActionClick[action].url));
     }
   }

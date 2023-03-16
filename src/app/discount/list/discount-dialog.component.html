@@ -1,5 +1,5 @@
 <button (click)="onNoClick" class="close-button" mat-icon-button>
-  <mat-icon class="close-icon">close</mat-icon>
+  <mat-icon>close</mat-icon>
 </button>
 <h1 mat-dialog-title>{{title}}</h1>
 <div *ngIf="allCustomers" mat-dialog-content>
@@ -22,6 +22,6 @@
 <div mat-dialog-actions>
   <div fxFlex></div>
   <button (click)="doAction" cdkFocusInitial color="primary"
-          mat-raised-button>{{ 'COMMON.BUTTON.DISCOUNT.SEND' | translate }}</button>
-  <button (click)="onNoClick" mat-raised-button>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+          mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.DISCOUNT.SEND' | translate }}</button>
+  <button (click)="onNoClick" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
 </div>

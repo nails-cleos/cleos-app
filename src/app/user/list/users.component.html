@@ -125,23 +125,22 @@
         <div [@detailExpand]="user === expandedUser ? 'expanded' : 'collapsed'"
              class="user-detail">
           <mat-list>
-            <div fxHide fxShow.lt-sm mat-subheader>{{ 'USER.LIST.COLUMN.USERNAME' | translate }}</div>
+            <div fxHide fxShow.lt-sm matListItemTitle>{{ 'USER.LIST.COLUMN.USERNAME' | translate }}</div>
             <mat-list-item fxHide fxShow.lt-sm role="list">
-              <div mat-line>{{user.username}}</div>
+              <div matListItemLine>{{user.username}}</div>
             </mat-list-item>
-            <div fxHide fxShow.lt-sm mat-subheader>{{ 'USER.LIST.COLUMN.EMAIL' | translate }}</div>
+            <div fxHide fxShow.lt-sm matListItemTitle>{{ 'USER.LIST.COLUMN.EMAIL' | translate }}</div>
             <mat-list-item fxHide fxShow.lt-sm role="list">
               <div mat-line>{{user.email}}</div>
             </mat-list-item>
-            <div fxHide fxShow.lt-sm mat-subheader>{{ 'USER.LIST.COLUMN.PROVIDER' | translate }}</div>
+            <div fxHide fxShow.lt-sm matListItemTitle>{{ 'USER.LIST.COLUMN.PROVIDER' | translate }}</div>
             <mat-list-item fxHide fxShow.lt-sm role="list">
-              <div mat-line>{{user.provider}}</div>
+              <div matListItemLine>{{user.provider}}</div>
             </mat-list-item>
-            <div fxHide fxShow.lt-sm mat-subheader>{{ 'USER.LIST.COLUMN.STATUS' | translate }}</div>
+            <div fxHide fxShow.lt-sm matListItemTitle>{{ 'USER.LIST.COLUMN.STATUS' | translate }}</div>
             <mat-list-item fxHide fxShow.lt-sm role="list">
-              <div *ngIf="!user.deleted; else deleteBlock" mat-line>
-                <mat-icon matListItemIcon
-                          *ngIf="user.enabled || user.provider !== 'LOCAL'; else elseBlock">
+              <div *ngIf="!user.deleted; else deleteBlock">
+                <mat-icon matListItemIcon *ngIf="user.enabled || user.provider !== 'LOCAL'; else elseBlock">
                   verified_user
                 </mat-icon>
                 <ng-template #elseBlock>
@@ -152,8 +151,8 @@
                 <mat-icon color="accent">delete_outline</mat-icon>
               </ng-template>
             </mat-list-item>
-            <div mat-subheader>{{ 'USER.LIST.COLUMN.DETAIL.TITLE' | translate }}</div>
-            <div class="flex-container">
+            <div fxHide.lt-sm fxShow matListItemTitle>{{ 'USER.LIST.COLUMN.DETAIL.TITLE' | translate }}</div>
+            <div class="flex-container" fxHide.lt-sm fxShow>
               <div class="flex-child">
                 <mat-list-item *ngFor="let it of user.authorities" role="list">
                   <mat-icon matListItemIcon>{{getIcon(it.authority)}}</mat-icon>
@@ -172,7 +171,7 @@
                 </mat-list-item>
               </div>
             </div>
-            <div fxHide fxShow.lt-sm mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+            <div fxHide fxShow.lt-sm matListItemTitle>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
             <div *ngIf="!user.deleted" fxHide fxShow.lt-sm>
               <button (click)="edit(user)" mat-icon-button>
                 <mat-icon color="primary">edit</mat-icon>

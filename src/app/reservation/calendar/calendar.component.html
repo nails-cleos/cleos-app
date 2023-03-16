@@ -66,34 +66,49 @@
         <div class="ssc-line"></div>
       </ng-template>
     </form>
-    <button (click)="search" [disabled]="officeForm.invalid" class="only-button" color="accent" mat-fab extended>
+    <button fxShow.lt-sm fxHide (click)="search" [disabled]="officeForm.invalid" class="only-button" color="accent" mat-fab>
       <mat-icon matPrefix>search</mat-icon>
-      <span fxHide.lt-sm fxShow>{{ 'RESERVATION.SEARCH' | translate }}</span>
+    </button>
+    <button fxHide.lt-sm fxShow (click)="search" [disabled]="officeForm.invalid" class="only-button" color="accent" mat-fab extended>
+      <mat-icon matPrefix>search</mat-icon>
+      <span>{{ 'RESERVATION.SEARCH' | translate }}</span>
     </button>
   </fieldset>
 </div>
 
 <div *ngIf="data && calendar" class="scroll-container">
   <div class="divider">
-    <button (click)="decrement" [disabled]="prevBtnDisabled" color="accent" mat-fab extended>
+    <button fxShow.lt-sm fxHide (click)="decrement" [disabled]="prevBtnDisabled" color="accent" mat-fab>
       <mat-icon>navigate_before</mat-icon>
-      <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.PREVIOUS' | translate}}</span>
+    </button>
+    <button fxHide.lt-sm fxShow (click)="decrement" [disabled]="prevBtnDisabled" color="accent" mat-fab extended>
+      <mat-icon>navigate_before</mat-icon>
+      <span>{{'COMMON.BUTTON.PREVIOUS' | translate}}</span>
     </button>
     <input (dateChange)="selectDate($event)" [matDatepicker]="picker" [max]="maxDate" [min]="today" [value]="viewDate"
            hidden matInput>
     <mat-datepicker #picker touchUi></mat-datepicker>
-    <button (click)="picker.open()" color="primary" mat-fab extended>
+    <button fxShow.lt-sm fxHide (click)="picker.open()" color="primary" mat-fab>
       <mat-icon>today</mat-icon>
-      <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.GOTO' | translate}}</span>
     </button>
-    <button (click)="increment" [disabled]="nextBtnDisabled" color="accent" mat-fab extended>
-      <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.NEXT' | translate}}</span>
+    <button fxHide.lt-sm fxShow (click)="picker.open()" color="primary" mat-fab extended>
+      <mat-icon>today</mat-icon>
+      <span>{{'COMMON.BUTTON.GOTO' | translate}}</span>
+    </button>
+    <button fxShow.lt-sm fxHide (click)="increment" [disabled]="nextBtnDisabled" color="accent" mat-fab>
       <mat-icon>navigate_next</mat-icon>
     </button>
+    <button fxHide.lt-sm fxShow (click)="increment" [disabled]="nextBtnDisabled" color="accent" mat-fab extended>
+      <mat-icon>navigate_next</mat-icon>
+      <span>{{'COMMON.BUTTON.NEXT' | translate}}</span>
+    </button>
     <div fxFlex></div>
-    <button color="accent" mat-fab extended routerLink="/reservation">
+    <button fxShow.lt-sm fxHide color="accent" mat-fab routerLink="/reservation">
       <mat-icon>book_online</mat-icon>
-      <span fxHide.lt-sm fxShow>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
+    </button>
+    <button fxHide.lt-sm fxShow color="accent" mat-fab extended routerLink="/reservation">
+      <mat-icon>book_online</mat-icon>
+      <span>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
     </button>
   </div>
   <div class="divider">

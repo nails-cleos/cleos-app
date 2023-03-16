@@ -38,7 +38,7 @@
   </div>
   <ng-template #largeButton>
     <button (click)="doAction" [disabled]="professionalForm.invalid" cdkFocusInitial color="primary"
-            mat-raised-button>{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
-    <button (click)="onNoClick" mat-raised-button>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+            mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
+    <button (click)="onNoClick" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
   </ng-template>
 </div>

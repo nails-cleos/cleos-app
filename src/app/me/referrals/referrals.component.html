@@ -29,8 +29,8 @@
         <mat-card-actions>
           <div fxFlex></div>
           <button (click)="openBottomSheetShare" [disabled]="!showShare" color="primary"
-                  mat-raised-button>{{'COMMON.BUTTON.SHARE' | translate }}</button>
-          <button (click)="openBottomSheetReferral" [disabled]="!showInvites" mat-flat-button>
+                  mat-fab extended class="icon-button">{{'COMMON.BUTTON.SHARE' | translate }}</button>
+          <button (click)="openBottomSheetReferral" [disabled]="!showInvites" mat-fab extended class="icon-button">
             {{'ME.REFERRAL.INVITE.TITLE' | translate }}
           </button>
         </mat-card-actions>

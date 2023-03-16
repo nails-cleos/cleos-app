@@ -40,7 +40,7 @@
                     <mat-label>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</mat-label>
                     <mat-chip-grid #chipList aria-label="Professional selection" required>
                       <mat-chip-row (removed)="remove(professional)" *ngFor="let professional of professionals"
-                                [removable]="true">
+                                    [removable]="true">
                         {{professional | userName}}
                         <mat-icon matChipRemove>cancel</mat-icon>
                       </mat-chip-row>
@@ -57,28 +57,26 @@
                   <mat-error *ngIf="errors['professionals']" [innerHTML]="'COMMON.PROFESSIONAL.REQUIRED' | translate">
                   </mat-error>
                 </div>
-                <button (click)="addProfessional" color="accent" mat-raised-button>
+                <button fxShow.lt-sm fxHide (click)="addProfessional" color="accent" mat-fab class="icon-button">
                   <mat-icon matPrefix>person_add_alt_1</mat-icon>
+                </button>
+                <button fxHide.lt-sm fxShow (click)="addProfessional" color="accent" mat-fab extended class="icon-button">
+                  <mat-icon matPrefix>person_add_alt_1</mat-icon>
+                  <span>{{ 'COMMON.PROFESSIONAL.ADD_BUTTON' | translate }}</span>
                 </button>
               </div>
               <mat-list>
                 <mat-list-item>
-                  <div mat-subheader>{{ 'ROOM.PAYMENT_OPTION' | translate }}</div>
+                  <div matListItemTitle>{{ 'ROOM.PAYMENT_OPTION' | translate }}</div>
                   <mat-divider></mat-divider>
-                </mat-list-item>
-                <mat-list-item>
                   <mat-selection-list #paymentType (selectionChange)="onChange(paymentType.selectedOptions.selected)">
                     <mat-list-option *ngFor="let option of paymentOptions" [disabled]="option.disabled"
-                                     [selected]="isSelected(option)" [value]="option.name" color="primary" mat-line>
-                      <div mat-line>{{option.name}}</div>
+                                     [selected]="isSelected(option)" [value]="option.name" color="primary">
+                      <div matListItemLine>{{option.name}}</div>
                     </mat-list-option>
                   </mat-selection-list>
                 </mat-list-item>
                 <mat-divider></mat-divider>
-                <mat-list-item>
-                  <div mat-subheader>{{ 'ROOM.AVAILABILITY.FIELD' | translate }}</div>
-                  <mat-divider></mat-divider>
-                </mat-list-item>
               </mat-list>
               <mat-accordion class="headers-align" multi>
                 <mat-expansion-panel (opened)="setStep(0)" [expanded]="step === 0" hideToggle>
@@ -207,8 +205,10 @@
           </ng-template>
           <mat-card-actions *ngIf="room; else buttonSkeleton">
             <div fxFlex></div>
-            <button color="primary" mat-fab extended type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
-            <button [form]="form" appBackButton color="accent" mat-raised-button type="button">
+            <button color="primary" mat-fab extended class="icon-button" type="submit">
+              {{ 'COMMON.BUTTON.UPDATE' | translate }}
+            </button>
+            <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
               {{ 'COMMON.BUTTON.BACK' | translate }}
             </button>
           </mat-card-actions>

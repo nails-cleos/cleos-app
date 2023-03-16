@@ -96,38 +96,38 @@
       <td *matCellDef="let reservation" [attr.colspan]="displayedColumns.length" fxHide fxShow.lt-sm>
         <div [@detailExpand]="reservation === expanded ? 'expanded' : 'collapsed'" class="detail" fxHide fxShow.lt-sm>
           <mat-list *ngIf="reservation.id">
-            <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
+            <div matListItemTitle>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
             <mat-list-item role="list">
-              <div mat-line>{{reservation?.professional | userName}}</div>
+              <div matListItemLine>{{reservation?.professional | userName}}</div>
             </mat-list-item>
-            <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</div>
+            <div matListItemTitle>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</div>
             <mat-list-item role="list">
-              <div mat-line>
+              <div matListItemLine>
                 {{reservation.timestamp | timeDetail | date:'short':reservation.room.timeZone:locale}}
                 <button (click)="openDialog(reservation)" *ngIf="showTimeZone(reservation)" mat-icon-button
                         type="button">
-                  <mat-icon>info_outline</mat-icon>
+                  <mat-icon matListItemIcon>info_outline</mat-icon>
                 </button>
               </div>
             </mat-list-item>
-            <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.PRODUCT' | translate }}</div>
+            <div matListItemTitle>{{ 'COMMON.RESERVATION.LIST.COLUMN.PRODUCT' | translate }}</div>
             <mat-list-item role="list">
-              <div mat-line>{{reservation.product.name}}</div>
+              <div matListItemLine>{{reservation.product.name}}</div>
             </mat-list-item>
-            <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</div>
+            <div matListItemTitle>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</div>
             <mat-list-item role="list">
-              <div mat-line>
+              <div matListItemLine>
                 <mat-icon matPrefix>{{reservation.state | reservationIcon}}</mat-icon>&nbsp;
                 {{ 'COMMON.STATUS.RESERVATION.' + reservation.state | translate}}
               </div>
             </mat-list-item>
-            <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+            <div matListItemTitle>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
             <mat-list-item role="list">
               <button [routerLink]="['/reservation', reservation.id]" color="primary" mat-icon-button>
-                <mat-icon>visibility</mat-icon>
+                <mat-icon matListItemIcon>visibility</mat-icon>
               </button>
               <button (click)="delete(reservation)" *ngIf="!reservation.deleted" color="warn" mat-icon-button>
-                <mat-icon>delete</mat-icon>
+                <mat-icon matListItemIcon>delete</mat-icon>
               </button>
             </mat-list-item>
           </mat-list>

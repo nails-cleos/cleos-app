@@ -92,6 +92,7 @@ export interface IReservationSummary {
   title: string;
   value?: number;
   increase?: boolean;
+  infinity?: boolean;
   color?: ThemePalette;
   percentValue?: number;
   icon?: string;

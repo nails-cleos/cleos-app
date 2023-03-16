@@ -125,9 +125,6 @@ $mat-light-theme-background: (
   unselected-chip: $light-bg-darker-10,
   disabled-list-option: $light-bg-darker-10,
   loading: $light-bg-alpha-80,
-  success: #44A244,
-  in-progress: rgba(#844f29, 0.4),
-  approved: rgba(0, 158, 227, 0.4)
 );
 
 // Dark bg
@@ -162,9 +159,6 @@ $mat-dark-theme-background: (
   unselected-chip: $dark-bg-lighter-20,
   disabled-list-option: $dark-bg-lighter-10,
   loading: $dark-bg-alpha-80,
-  success: #90EE90,
-  in-progress: rgba(#a06c3f, 0.4),
-  approved: rgb(0, 158, 227)
 );
 
 @include mat.all-component-typographies($fontConfig);
@@ -257,9 +251,8 @@ $theme: mat.define-light-theme((
     accent: $theme-accent,
     warn: $theme-warn
   ),
-  is-dark: false,
-  foreground: $mat-light-theme-foreground,
-  background: $mat-light-theme-background,
+  typography: $fontConfig,
+  density: 0,
 ));
 
 $altTheme: mat.define-dark-theme((
@@ -268,9 +261,8 @@ $altTheme: mat.define-dark-theme((
     accent: $theme-accent,
     warn: $theme-warn-dark
   ),
-  is-dark: true,
-  foreground: $mat-dark-theme-foreground,
-  background: $mat-dark-theme-background,
+  typography: $fontConfig,
+  density: 0,
 ));
 
 .light-theme {
@@ -279,7 +271,7 @@ $altTheme: mat.define-dark-theme((
 }
 
 .dark-theme {
-  @include mat.all-component-colors($altTheme);
+  @include mat.all-component-themes($altTheme);
   @include style.theme($altTheme);
 }
 

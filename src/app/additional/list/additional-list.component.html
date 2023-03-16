@@ -71,24 +71,24 @@
         <div [@detailExpand]="additional === expandedAdditional ? 'expanded' : 'collapsed'"
              class="detail" fxHide fxShow.lt-sm>
           <mat-list>
-            <div *ngIf="additional.description" mat-subheader>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</div>
+            <div *ngIf="additional.description" matListItemTitle>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</div>
             <mat-list-item *ngIf="additional.description" role="list">
-              <div mat-line>{{additional.description}}</div>
+              <div matListItemLine>{{additional.description}}</div>
             </mat-list-item>
-            <div mat-subheader>{{ 'ADDITIONAL.LIST.COLUMN.DURATION' | translate }}</div>
+            <div matListItemTitle>{{ 'ADDITIONAL.LIST.COLUMN.DURATION' | translate }}</div>
             <mat-list-item role="list">
-              <div mat-line>
+              <div matListItemLine>
                 <mat-icon matPrefix>timer</mat-icon>&nbsp;
                 {{additional.hour | number:'2.0-0'}}:{{additional.minute | number:'2.0-0'}}
               </div>
             </mat-list-item>
-            <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+            <div matListItemTitle>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
             <mat-list-item role="list">
               <button (click)="edit(additional)" *ngIf="!additional.deleted" color="primary" mat-icon-button>
-                <mat-icon>edit</mat-icon>
+                <mat-icon matListItemIcon>edit</mat-icon>
               </button>
               <button (click)="delete(additional)" *ngIf="!additional.deleted" color="warn" mat-icon-button>
-                <mat-icon>delete</mat-icon>
+                <mat-icon matListItemIcon>delete</mat-icon>
               </button>
             </mat-list-item>
           </mat-list>

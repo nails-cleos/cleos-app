@@ -124,20 +124,20 @@
       <ng-container matColumnDef="expandedDetail">
         <td *matCellDef="let reservation" [attr.colspan]="displayedColumns.length" fxHide fxShow.lt-sm>
           <div [@detailExpand]="reservation === expandedReservation ? 'expanded' : 'collapsed'"
-               class="detail">
+               class="detail" fxHide fxShow.lt-sm>
             <mat-list>
-              <div fxHide fxShow.lt-sm mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</div>
-              <mat-list-item fxHide fxShow.lt-sm role="list">
-                <div *ngIf="reservation.state" mat-line>
+              <div matListItemTitle>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</div>
+              <mat-list-item role="list">
+                <div *ngIf="reservation.state" matListItemLine>
                   <mat-icon matPrefix>{{reservation.state | reservationIcon}}</mat-icon>&nbsp;
                   {{ 'COMMON.STATUS.RESERVATION.' + reservation.state | translate}}</div>
               </mat-list-item>
-              <div fxHide fxShow.lt-sm mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.PRODUCT' | translate }}</div>
-              <mat-list-item fxHide fxShow.lt-sm role="list">
-                <div mat-line>{{reservation.product?.name}}</div>
+              <div matListItemTitle>{{ 'COMMON.RESERVATION.LIST.COLUMN.PRODUCT' | translate }}</div>
+              <mat-list-item role="list">
+                <div matListItemLine>{{reservation.product?.name}}</div>
               </mat-list-item>
-              <div fxHide fxShow.lt-sm mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
-              <mat-list-item fxHide fxShow.lt-sm role="list">
+              <div matListItemTitle>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+              <mat-list-item role="list">
                 <button *ngIf="!reservation.deleted" [routerLink]="['/reservation', reservation.id]" color="primary"
                         mat-icon-button>
                   <mat-icon>visibility</mat-icon>

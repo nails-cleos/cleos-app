@@ -70,16 +70,16 @@
           <div mat-line>{{'MAIN.SECTION.CATALOG' | translate }}</div>
         </a>
         <mat-divider></mat-divider>
-        <mat-list-item>
-          <mat-slide-toggle (change)="setTheme($event.checked)" [checked]="checked"
-                            mat-line>{{'COMMON.DASHBOARD.DARK_MODE' | translate }}</mat-slide-toggle>
-        </mat-list-item>
-        <mat-divider></mat-divider>
         <a (click)="redirect" *ngIf="isAuthenticated; else login" [routerLinkActive]="['active']"
            mat-list-item>
           <mat-icon matListItemIcon>person_pin</mat-icon>
           <div mat-line>{{'MAIN.SECTION.ACCOUNT' | translate }}</div>
         </a>
+        <mat-divider></mat-divider>
+        <mat-list-item>
+          <mat-slide-toggle (change)="setTheme($event.checked)" [checked]="checked"
+                            mat-line>{{'COMMON.DASHBOARD.DARK_MODE' | translate }}</mat-slide-toggle>
+        </mat-list-item>
         <ng-template #login>
           <a [routerLink]="'/auth'" mat-list-item>
             <mat-icon matListItemIcon>login</mat-icon>
