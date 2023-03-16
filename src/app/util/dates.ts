@@ -55,6 +55,11 @@ export class TimeZone implements ITimeZone {
   }
 }
 
+export const daysOfWeek: string[] = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+
+export const findDayOfWeek = (day: string): number => daysOfWeek.findIndex(x => x === day);
+
+
 export const getDuration = (allDay: boolean, duration?: string): IDuration =>
   allDay || !duration ? new Duration(23, 59) : convertDuration(duration);
 

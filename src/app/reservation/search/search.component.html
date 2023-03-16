@@ -39,7 +39,7 @@
     <mat-spinner></mat-spinner>
   </div>
   <div class="mat-elevation-z8">
-    <table [dataSource]="dataSource" mat-table matSort matSortActive="start" matSortDirection="desc" matSortDisableClear
+    <table [dataSource]="dataSource" mat-table matSort matSortActive="timestamp" matSortDirection="desc" matSortDisableClear
            multiTemplateDataRows>
       <ng-container matColumnDef="position">
         <th *matHeaderCellDef mat-header-cell>#</th>
@@ -61,7 +61,7 @@
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="start">
+      <ng-container matColumnDef="timestamp">
         <th *matHeaderCellDef mat-header-cell
             mat-sort-header>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</th>
         <td *matCellDef="let reservation" mat-cell>

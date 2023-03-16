@@ -207,7 +207,7 @@
           </ng-template>
           <mat-card-actions *ngIf="room; else buttonSkeleton">
             <div fxFlex></div>
-            <button color="primary" mat-raised-button type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
+            <button color="primary" mat-fab extended type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
             <button [form]="form" appBackButton color="accent" mat-raised-button type="button">
               {{ 'COMMON.BUTTON.BACK' | translate }}
             </button>

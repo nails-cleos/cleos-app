@@ -19,27 +19,36 @@
                   {{errors['name']}}
                 </mat-error>
               </mat-form-field>
-              <mat-form-field appearance="fill">
-                <mat-label>{{ 'COMMON.CURRENCY.FIELD' | translate }}</mat-label>
-                <label>
-                  <input (keydown)="keyDownHandler($event, currency)" [formControl]="currency"
-                         [matAutocomplete]="auto" matInput required type="text">
-                </label>
-                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayCurrencyFn">
-                  <mat-option *ngFor="let currency of filteredCurrencyOptions | async" [value]="currency">
-                    {{currency.code}}
-                  </mat-option>
-                </mat-autocomplete>
-                <mat-error *ngIf="currency.hasError('required')"
-                           [innerHTML]="'COMMON.CURRENCY.REQUIRED' | translate">
-                </mat-error>
-                <mat-error *ngIf="currency.hasError('requireMatch')"
-                           [innerHTML]="'COMMON.CURRENCY.INVALID' | translate">
-                </mat-error>
-                <mat-error *ngIf="errors['currency']">
-                  {{errors['currency']}}
-                </mat-error>
-              </mat-form-field>
+              <div *ngIf="currencies; else skeleton" fxLayout="row" fxLayoutAlign="space-between center">
+                <mat-form-field appearance="fill">
+                  <mat-label>{{ 'COMMON.CURRENCY.FIELD' | translate }}</mat-label>
+                  <label>
+                    <input (keydown)="keyDownHandler($event, currency)" [formControl]="currency"
+                           [matAutocomplete]="auto" matInput required type="text">
+                  </label>
+                  <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayCurrencyFn">
+                    <mat-option *ngFor="let currency of filteredCurrencyOptions | async" [value]="currency">
+                      {{currency.code}}
+                    </mat-option>
+                  </mat-autocomplete>
+                  <mat-error *ngIf="currency.hasError('required')"
+                             [innerHTML]="'COMMON.CURRENCY.REQUIRED' | translate">
+                  </mat-error>
+                  <mat-error *ngIf="currency.hasError('requireMatch')"
+                             [innerHTML]="'COMMON.CURRENCY.INVALID' | translate">
+                  </mat-error>
+                  <mat-error *ngIf="errors['currency']">
+                    {{errors['currency']}}
+                  </mat-error>
+                </mat-form-field>
+                <button (click)="addCurrency" color="accent" mat-fab extended>
+                  <mat-icon matPrefix>add_card</mat-icon>
+                  <span fxHide.lt-sm fxShow>{{ 'COMMON.CURRENCY.ADD_BUTTON' | translate }}</span>
+                </button>
+              </div>
+              <ng-template #skeleton>
+                <div class="ssc-line"></div>
+              </ng-template>
               <mat-form-field appearance="fill">
                 <mat-label>{{ 'DISCOUNT.DESCRIPTION.FIELD' | translate }}</mat-label>
                 <label>

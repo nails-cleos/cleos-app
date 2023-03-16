@@ -32,7 +32,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild('stateInput') stateInput!: ElementRef<HTMLInputElement>;
   @ViewChild('auto') matAutocomplete!: MatAutocomplete;
 
-  displayedColumns: string[] = ['position', 'customer', 'start', 'state', 'product', 'actions'];
+  displayedColumns: string[] = ['position', 'customer', 'timestamp', 'state', 'product', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IReservationAll>>();
   expandedReservation: IReservation | undefined;
   resultsLength = DEFAULT_LENGTH;

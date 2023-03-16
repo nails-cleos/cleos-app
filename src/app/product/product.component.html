@@ -94,7 +94,7 @@
                                 color="primary">{{ 'PRODUCT.PRIMARY.CHECK' | translate }}</mat-checkbox>
                   <div class="divider">
                     <button (click)="removeTab(index)" [disabled]="products.length === 1 || tab.primary"
-                            class="tab-field" color="warn" mat-raised-button type="button">
+                            class="tab-field" color="warn" mat-fab extended type="button">
                       <mat-icon>delete</mat-icon>
                       {{'COMMON.BUTTON.DELETE' | translate}}
                     </button>

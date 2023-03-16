@@ -252,22 +252,26 @@ $mat-warn-dark: (
 $theme-warn-dark: mat.define-palette($mat-warn-dark, main, lighter, darker);
 
 $theme: mat.define-light-theme((
-  primary: $theme-primary,
-  accent: $theme-accent,
-  warn: $theme-warn,
+  color: (
+    primary: $theme-primary,
+    accent: $theme-accent,
+    warn: $theme-warn
+  ),
   is-dark: false,
   foreground: $mat-light-theme-foreground,
   background: $mat-light-theme-background,
 ));
 
-$altTheme: (
-  primary: $theme-primary,
-  accent: $theme-accent,
-  warn: $theme-warn-dark,
+$altTheme: mat.define-dark-theme((
+  color: (
+    primary: $theme-primary,
+    accent: $theme-accent,
+    warn: $theme-warn-dark
+  ),
   is-dark: true,
   foreground: $mat-dark-theme-foreground,
   background: $mat-dark-theme-background,
-);
+));
 
 .light-theme {
   @include mat.all-component-themes($theme);

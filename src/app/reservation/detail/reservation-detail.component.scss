@@ -8,7 +8,7 @@
 }
 
 tr.detail-row {
-  height: 0;
+  height: 0 !important;
 }
 
 @media all and (max-device-width: 812px) and (orientation: portrait) {

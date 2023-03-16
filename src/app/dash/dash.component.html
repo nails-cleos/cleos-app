@@ -1,12 +1,12 @@
-<mat-card appearance="outlined" *ngIf="mapDashboard?.size" style="margin-bottom: 8px">
-  <mat-card-header>
+<mat-form-field appearance="fill" *ngIf="mapDashboard?.size" style="margin-bottom: 8px; width: 100%;">
+<!--  <mat-card-header>-->
     <mat-select [formControl]="selectedDash">
       <mat-option *ngFor="let dashboard of mapDashboard | keyvalue" [value]="dashboard.key">
         {{dashboard.key}}
       </mat-option>
     </mat-select>
-  </mat-card-header>
-</mat-card>
+<!--  </mat-card-header>-->
+</mat-form-field>
 
 <!--Calendar-->
 <mat-card appearance="outlined">
@@ -26,19 +26,19 @@
     <mat-card-subtitle class="calendar-title">
       <button (click)="changeDate" (viewDateChange)="closeOpenMonthViewDay" [(viewDate)]="viewDate"
               [class.spinner]="isLoading || isCalendarLoading" [disabled]="isLoading || isCalendarLoading" [view]="view"
-              color="accent" mat-raised-button mwlCalendarPreviousView>
+              color="accent" mat-fab extended mwlCalendarPreviousView>
         <mat-icon>navigate_before</mat-icon>
         <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.PREVIOUS' | translate}}</span>
       </button>
       <button (click)="changeDate" [(viewDate)]="viewDate" [class.spinner]="isLoading || isCalendarLoading"
               [disabled]="isLoading || isCalendarLoading" class="btn btn-outline-secondary" color="accent"
-              mat-raised-button mwlCalendarToday>
+              mat-fab extended mwlCalendarToday>
         <mat-icon>today</mat-icon>
         <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.TODAY' | translate}}</span>
       </button>
       <button (click)="changeDate" (viewDateChange)="closeOpenMonthViewDay" [(viewDate)]="viewDate"
               [class.spinner]="isLoading || isCalendarLoading" [disabled]="isLoading || isCalendarLoading" [view]="view"
-              color="accent" mat-raised-button mwlCalendarNextView>
+              color="accent" mat-fab extended mwlCalendarNextView>
         <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.NEXT' | translate}}</span>
         <mat-icon>navigate_next</mat-icon>
       </button>

@@ -70,37 +70,36 @@
               </ng-template>
               <mat-list>
                 <mat-list-item *ngIf="group.value && product.value">
-                  <mat-icon mat-list-icon>home_repair_service</mat-icon>
-                  <div class="bold" mat-subheader>{{ 'COMMON.PRODUCT.FIELD' | translate}}</div>
+                  <mat-icon matListItemIcon>home_repair_service</mat-icon>
+                  <div class="bold" matListItemTitle>{{ 'COMMON.PRODUCT.FIELD' | translate}}</div>
                 </mat-list-item>
                 <mat-list-item *ngIf="group.value && product.value" style="text-align: center">
                   <div [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.GROUP' |
-                  translate: {name: group.value.name}" mat-line>
+                  translate: {name: group.value.name}" matListItemLine>
                   </div>
                   <div [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.NAME' |
-                  translate: {name: product.value.name}" mat-line>
+                  translate: {name: product.value.name}" matListItemLine>
                   </div>
                   <div *ngIf="product.value.description" [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.DESCRIPTION' |
-                  translate: {description: product.value.description}" mat-line>
+                  translate: {description: product.value.description}" matListItemLine>
                   </div>
-                  <div mat-line>
+                  <div matListItemTitle>
                     <span [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.PRICE' | translate"></span>
                     <span [class.strikethrough]="price.discount"
                           class="vertical-divider">$ {{price.amount | number:'1.2-2'}}</span>
                     <span *ngIf="price.priceWithDiscount" [@discountAnimation]
                           class="vertical-divider bold">$ {{price.priceWithDiscount | number:'1.2-2'}}</span>
                   </div>
-                  <div *ngIf="durability" [innerHTML]="durability" mat-line></div>
+                  <div *ngIf="durability" [innerHTML]="durability" matListItemLine></div>
                 </mat-list-item>
                 <mat-list-item *ngIf="additionalList && additionalList.length">
-                  <mat-icon mat-list-icon>add_post</mat-icon>
-                  <div class="bold" mat-subheader>{{ 'COMMON.ADDITIONAL.FIELD' | translate}}</div>
-                </mat-list-item>
-                <mat-list-item *ngIf="additionalList && additionalList.length">
-                  <mat-selection-list #additional (selectionChange)="onChange(additional.selectedOptions.selected)">
+                  <mat-icon matListItemIcon>add_post</mat-icon>
+                  <div class="bold" matListItemTitle>{{ 'COMMON.ADDITIONAL.FIELD' | translate}}</div>
+                  <mat-selection-list *ngIf="additionalList && additionalList.length" #additional
+                                      (selectionChange)="onChange(additional.selectedOptions.selected)">
                     <mat-list-option *ngFor="let it of additionalList" [selected]="isSelected(it)"
-                                     [value]="it" checkboxPosition="before" mat-line>
-                      <div mat-line> {{it.name}} - ${{it.price | number:'1.2-2'}}</div>
+                                     [value]="it" checkboxPosition="before">
+                      <div matListItemLine>{{it.name}} - ${{it.price | number:'1.2-2'}}</div>
                     </mat-list-option>
                   </mat-selection-list>
                 </mat-list-item>

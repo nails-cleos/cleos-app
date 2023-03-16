@@ -66,14 +66,17 @@
                 <mat-form-field class="chip-list">
                   <mat-label>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</mat-label>
                   <mat-chip-grid #chipList aria-label="Professional selection">
-                    <mat-chip-row (removed)="remove(professional)" *ngFor="let professional of professionals" [removable]="true">
+                    <mat-chip-row (removed)="remove(professional)" *ngFor="let professional of professionals"
+                                  [removable]="true">
                       {{professional | userName}}
                       <mat-icon matChipRemove>cancel</mat-icon>
                     </mat-chip-row>
-                    <input #professionalInput [formControl]="professional" [matAutocomplete]="auto" [matChipInputFor]="chipList">
+                    <input #professionalInput [formControl]="professional" [matAutocomplete]="auto"
+                           [matChipInputFor]="chipList">
                   </mat-chip-grid>
                   <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-                    <mat-option *ngFor="let professional of sortProfessionals(filteredProfessionals | async)" [value]="professional">
+                    <mat-option *ngFor="let professional of sortProfessionals(filteredProfessionals | async)"
+                                [value]="professional">
                       {{professional | userName}}
                     </mat-option>
                   </mat-autocomplete>
@@ -118,14 +121,12 @@
               </ng-template>
               <mat-list>
                 <mat-list-item>
-                  <div mat-subheader>{{ 'ROOM.PAYMENT_OPTION' | translate }}</div>
+                  <div matListItemTitle>{{ 'ROOM.PAYMENT_OPTION' | translate }}</div>
                   <mat-divider></mat-divider>
-                </mat-list-item>
-                <mat-list-item>
                   <mat-selection-list #paymentType (selectionChange)="onChange(paymentType.selectedOptions.selected)">
                     <mat-list-option *ngFor="let option of paymentOptions" [disabled]="option.disabled"
-                                     [selected]="isSelected(option)" [value]="option.name" color="primary" mat-line>
-                      <div mat-line>{{option.name}}</div>
+                                     [selected]="isSelected(option)" [value]="option.name" color="primary">
+                      <div matListItemLine>{{option.name}}</div>
                     </mat-list-option>
                   </mat-selection-list>
                 </mat-list-item>

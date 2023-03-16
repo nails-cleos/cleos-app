@@ -66,9 +66,9 @@ table {
 
 /* TODO(mdc-migration): The following rule targets internal classes of tabs that may no longer apply for the MDC version. */
 /* TODO(mdc-migration): The following rule targets internal classes of tabs that may no longer apply for the MDC version. */
-mat-table {
-  overflow-x: scroll;
-}
+//mat-table {
+//  overflow-x: scroll;
+//}
 
 .row td {
   border-bottom-width: 0;
@@ -94,22 +94,21 @@ mat-table {
   hyphens: auto;
 }
 
-.mat-column-position {
-  flex: 0 0 5%;
-  width: 5%;
-  text-align: center !important;
-}
-
-.mat-column-actions {
-  flex: 0 0 15%;
-  width: 15%;
-  text-align: center;
-}
-
-.mat-cell-position {
-  text-align: center;
-  justify-content: center;
-}
+//.mat-column-actions {
+//  flex: 0 0 15%;
+//  width: 15%;
+//  text-align: center;
+//  word-wrap: break-word !important;
+//  white-space: unset !important;
+//  overflow-wrap: break-word;
+//
+//  word-break: break-word;
+//
+//  -ms-hyphens: auto;
+//  -moz-hyphens: auto;
+//  -webkit-hyphens: auto;
+//  hyphens: auto;
+//}
 
 a, u {
   text-decoration: none;

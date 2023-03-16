@@ -5,7 +5,7 @@ import {
   createDate,
   createEndDate,
   createNewDate,
-  dateToUTC,
+  dateToUTC, daysOfWeek,
   getCurrentTimeZone,
   getNow,
   getWeekDay,
@@ -139,11 +139,10 @@ export const getOverlapEvent = (events: any[], eventStartDay: Date, eventEndDay:
 const recurringEvent = (recurring: any[], notWorking: string, unavailable: string, lunch: string,
                         isDark: boolean, timeZone: string): CalendarEvent[] => {
   let events: CalendarEvent[] = [];
-  const weekday = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
 
   recurring.forEach(r =>
     r.rule.all().forEach((date: Date) => {
-      const availability = r.availabilityList.find((a: IAvailability) => a?.day === weekday[date.getDay()]);
+      const availability = r.availabilityList.find((a: IAvailability) => a?.day === daysOfWeek[date.getDay()]);
       const event = createEvent(availability, date, notWorking, unavailable, lunch, isDark, timeZone);
       if (event) {
         events = events.concat(event);

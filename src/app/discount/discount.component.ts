@@ -60,6 +60,11 @@ export class DiscountComponent implements OnInit, OnDestroy {
     );
   }
 
+  get addCurrency(): void {
+    this.router.navigate(['currency', 'add']);
+    return;
+  }
+
   ngOnInit(): void {
     this.createForm();
     this.clean();

@@ -140,8 +140,8 @@
             <div fxHide fxShow.lt-sm mat-subheader>{{ 'USER.LIST.COLUMN.STATUS' | translate }}</div>
             <mat-list-item fxHide fxShow.lt-sm role="list">
               <div *ngIf="!user.deleted; else deleteBlock" mat-line>
-                <mat-icon
-                  *ngIf="user.enabled || user.provider !== 'LOCAL'; else elseBlock">
+                <mat-icon matListItemIcon
+                          *ngIf="user.enabled || user.provider !== 'LOCAL'; else elseBlock">
                   verified_user
                 </mat-icon>
                 <ng-template #elseBlock>
@@ -156,19 +156,20 @@
             <div class="flex-container">
               <div class="flex-child">
                 <mat-list-item *ngFor="let it of user.authorities" role="list">
-                  <mat-icon mat-list-icon>{{getIcon(it.authority)}}</mat-icon>
-                  <div mat-line>{{ 'COMMON.ROLES.' + it.authority | translate}}</div>
-                  <button (click)="removeRole(user, it.authority)" *ngIf="!user.deleted" color="warn" mat-icon-button>
-                    <mat-icon mat-list-icon>clear</mat-icon>
-                  </button>
+                  <mat-icon matListItemIcon>{{getIcon(it.authority)}}</mat-icon>
+                  <div matListItemTitle>{{ 'COMMON.ROLES.' + it.authority | translate}}
+                    <button (click)="removeRole(user, it.authority)" *ngIf="!user.deleted" color="warn" mat-icon-button>
+                      <mat-icon>person_remove</mat-icon>
+                    </button>
+                  </div>
                 </mat-list-item>
               </div>
               <div *ngIf="!user.deleted" class="flex-child">
-                <div *ngFor="let role of user.missing">
-                  <button (click)="addRole(user, role)" color="primary" mat-icon-button>
-                    <mat-icon mat-list-icon>{{getIcon(role)}}</mat-icon>
+                <mat-list-item *ngFor="let role of user.missing">
+                  <mat-icon matListItemIcon>{{getIcon(role)}}</mat-icon>
+                  <button (click)="addRole(user, role)" color="primary" mat-button>
                     {{'COMMON.BUTTON.ADD' | translate}} {{ 'COMMON.ROLES.' + role | translate | lowercase}}</button>
-                </div>
+                </mat-list-item>
               </div>
             </div>
             <div fxHide fxShow.lt-sm mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
@@ -208,7 +209,8 @@
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
     <tr (click)="expandedUser = expandedUser === user ? null : user" *matRowDef="let user; columns: displayedColumns;"
         [ngClass]="{'deadLine': user.deleted}" class="user-row" mat-row></tr>
-    <tr *matRowDef="let row; columns: ['expandedDetail']" class="user-detail-row" mat-row></tr>
+    <tr *matRowDef="let row; columns: ['expandedDetail']" class="user-detail-row"
+        [class.user-expanded-row]="expandedUser === row" mat-row></tr>
 
     <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
   </table>

@@ -199,7 +199,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   segmentClick(date: Date, room?: IRoom): void {
-    const data = {date, room, professionalId: this.professionalSelectedId};
+    const data = {date, room, professional: this.professional.value};
     if (date && room && this.dateIsValid(date)) {
       const dialogRef = this.dialog.open(CalendarDialogComponent);
 

@@ -3,7 +3,7 @@
     <legend>{{'RESERVATION.SEARCH' | translate }}</legend>
     <form [formGroup]="officeForm">
       <div *ngIf="!offices?.length; else dataOffice">
-        <button class="only-button" color="accent" mat-raised-button routerLink="/rooms/add">
+        <button class="only-button" color="accent" mat-fab extended routerLink="/rooms/add">
           <mat-icon>add_business</mat-icon> &nbsp;{{ 'RESERVATION.ROOM.TITLE' | translate }}
         </button>
       </div>
@@ -66,7 +66,7 @@
         <div class="ssc-line"></div>
       </ng-template>
     </form>
-    <button (click)="search" [disabled]="officeForm.invalid" class="only-button" color="accent" mat-raised-button>
+    <button (click)="search" [disabled]="officeForm.invalid" class="only-button" color="accent" mat-fab extended>
       <mat-icon matPrefix>search</mat-icon>
       <span fxHide.lt-sm fxShow>{{ 'RESERVATION.SEARCH' | translate }}</span>
     </button>
@@ -75,23 +75,23 @@
 
 <div *ngIf="data && calendar" class="scroll-container">
   <div class="divider">
-    <button (click)="decrement" [disabled]="prevBtnDisabled" color="accent" mat-raised-button>
+    <button (click)="decrement" [disabled]="prevBtnDisabled" color="accent" mat-fab extended>
       <mat-icon>navigate_before</mat-icon>
       <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.PREVIOUS' | translate}}</span>
     </button>
     <input (dateChange)="selectDate($event)" [matDatepicker]="picker" [max]="maxDate" [min]="today" [value]="viewDate"
            hidden matInput>
     <mat-datepicker #picker touchUi></mat-datepicker>
-    <button (click)="picker.open()" color="primary" mat-raised-button>
+    <button (click)="picker.open()" color="primary" mat-fab extended>
       <mat-icon>today</mat-icon>
       <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.GOTO' | translate}}</span>
     </button>
-    <button (click)="increment" [disabled]="nextBtnDisabled" color="accent" mat-raised-button>
+    <button (click)="increment" [disabled]="nextBtnDisabled" color="accent" mat-fab extended>
       <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.NEXT' | translate}}</span>
       <mat-icon>navigate_next</mat-icon>
     </button>
     <div fxFlex></div>
-    <button color="accent" mat-raised-button routerLink="/reservation">
+    <button color="accent" mat-fab extended routerLink="/reservation">
       <mat-icon>book_online</mat-icon>
       <span fxHide.lt-sm fxShow>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
     </button>

@@ -75,7 +75,7 @@
           </mat-error>
         </mat-form-field>
         <div [ngClass]="{'last': isHandset}">
-          <button (click)="book" [disabled]="!product.value && !date.value" color="primary" mat-raised-button
+          <button (click)="book" [disabled]="!product.value && !date.value" color="primary" mat-fab extended
                   type="button">
             <mat-icon>book_online</mat-icon>
             {{'COMMON.BUTTON.BOOK' | translate}}
@@ -170,7 +170,7 @@
                 </mat-error>
               </mat-form-field>
               <div fxFlex></div>
-              <button [disabled]="form.invalid" [tabIndex]="5" color="primary" mat-raised-button type="submit">
+              <button [disabled]="form.invalid" [tabIndex]="5" color="primary" mat-fab extended type="submit">
                 <mat-icon>send</mat-icon>
                 {{'COMMON.BUTTON.SEND' | translate}}
               </button>
