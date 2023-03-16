@@ -1,24 +1,24 @@
-import { Color, Label, SingleDataSet } from 'ng2-charts';
-import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
+import { ChartConfiguration, ChartData, ChartOptions, ChartType, TooltipItem } from 'chart.js';
 import { IChart } from '../interfaces/dashboard';
 
 export interface IChartUtil {
-  labels: Label[];
-  dataSet: ChartDataSets[];
-  data?: SingleDataSet;
+  labels: any[];
+  dataSet: ChartConfiguration['data'];
+  data?: ChartData;
   type: ChartType;
-  colors: Color[];
+  // TODO color is not used
+  colors: any[];
   options: ChartOptions;
 }
 
 export const createChart = (chart: IChart, isDark?: boolean): IChartUtil => {
-  let dataSet: ChartDataSets[] = [];
+  let dataSet: any[] = [];
   if (chart.dataSet && chart.dataSet.length) {
     chart.dataSet.forEach(value => {
-      dataSet = [...dataSet, {data: value.data, label: value.label, type: value.type}];
+      dataSet = [...dataSet, { data: value.data, label: value.label, type: value.type }];
     });
   }
-  let data: SingleDataSet | undefined;
+  let data: any | undefined;
   if (chart.data) {
     data = chart.data;
   }
@@ -54,10 +54,15 @@ export const createChart = (chart: IChart, isDark?: boolean): IChartUtil => {
       options = defaultOptions();
   }
 
+  const charData: ChartConfiguration['data'] = {
+    datasets: dataSet
+  }
+
   return {
     labels: chart.labels || [],
     type: chart.type || 'bar',
-    dataSet, data, colors, options
+    dataSet: charData,
+    data, colors, options
   };
 };
 
@@ -65,11 +70,12 @@ const defaultOptions = (): ChartOptions => ({
   responsive: true
 });
 
-const radarChartDefaultOptions = (isDark?: boolean): ChartOptions => {
+const radarChartDefaultOptions = (isDark?: boolean): ChartOptions<'radar'> => {
   const options = {
     responsive: true,
-    scale: {
+    scales: {
       pointLabels: {
+        // @ts-ignore
         callback: value => formatLabel(value)
       },
       ticks: {
@@ -77,101 +83,95 @@ const radarChartDefaultOptions = (isDark?: boolean): ChartOptions => {
         precision: 0
       }
     }
-  } as ChartOptions;
+  } as ChartOptions<'radar'>;
   if (isDark) {
-    Object.assign({}, options.scale, {gridLines: {color: 'rgba(255, 255, 255, 0.1)'}});
-    Object.assign({}, options.scale, {angleLines: {color: 'rgba(255, 255, 255, 0.1)'}});
-    Object.assign({}, options.scale?.pointLabels, {fontColor: 'white'});
-    Object.assign({}, options.scale?.ticks, {backdropColor: '#393939', fontColor: 'white'});
+    Object.assign({}, options.scales, { gridLines: { color: 'rgba(255, 255, 255, 0.1)' } });
+    Object.assign({}, options.scales, { angleLines: { color: 'rgba(255, 255, 255, 0.1)' } });
+    Object.assign({}, options.scales?.pointLabels, { color: 'white' });
+    Object.assign({}, options.scales?.ticks, { backdropColor: '#393939', color: 'white' });
   }
 
   return options;
 };
 
-const barChartDefaultOptions = (): ChartOptions => ({
+const barChartDefaultOptions = (): ChartOptions<'bar'> => ({
   responsive: true,
   scales: {
-    yAxes: [{
-      ticks: {
-        // @ts-ignore
-        precision: 0,
-        beginAtZero: true
-      }
-    }],
-    xAxes: [{
+    y: {
+      beginAtZero: true
+    },
+    x: {
       ticks: {
         callback: value => formatLabel(value)
       }
-    }]
+    }
   }
 });
 
-const barChartNoLabelOptions = (): ChartOptions => ({
+const barChartNoLabelOptions = (): ChartOptions<'bar'> => ({
   responsive: true,
   scales: {
-    yAxes: [{
-      ticks: {
-        // @ts-ignore
-        precision: 0,
-        beginAtZero: true
-      }
-    }],
-    xAxes: [{
+    y: {
+      beginAtZero: true
+    },
+    x: {
       ticks: {
         callback: () => ''
       }
-    }]
+    }
   }
 });
 
-const barChartTimeOptions = (): ChartOptions => ({
+const barChartTimeOptions = (): ChartOptions<'bar'> => ({
   responsive: true,
   scales: {
-    yAxes: [{
+    y: {
+      beginAtZero: true,
       ticks: {
-        beginAtZero: true,
         callback: (v: any) => formatSecsAsHourMin(v),
         stepSize: 1800
       }
-    }],
-    xAxes: [{
+    },
+    x: {
       ticks: {
         callback: value => formatLabel(value)
       }
-    }]
+    }
   },
-  tooltips: {
-    callbacks: {
-      label: (tooltipItem: any, data: any) => barChatTimeLabel(tooltipItem, data)
+  plugins: {
+    tooltip: {
+      callbacks: {
+        label: (tooltipItem: any) => barChatTimeLabel(tooltipItem)
+      }
     }
   }
 });
 
-const pieChartPercentageOptions = (): ChartOptions => ({
+const pieChartPercentageOptions = (): ChartOptions<'pie'> => ({
   responsive: true,
-  tooltips: {
-    callbacks: {
-      label: (tooltipItem: any, data: any) => pieChatPercentageLabel(tooltipItem, data)
+  plugins: {
+    tooltip: {
+      callbacks: {
+        label: (tooltipItem) => pieChatPercentageLabel(tooltipItem)
+      }
     }
   }
 });
 
-const pieChatPercentageLabel = (tooltipItem: any, data: any): string => {
-  const values = data.datasets[tooltipItem.datasetIndex].data;
-  const total = values.reduce((a: string, b: string) => Number(a) + Number(b));
-  return `${data.labels[tooltipItem.index]}: ${(values[tooltipItem.index] * 100 / total).toFixed(2)}%`;
+const pieChatPercentageLabel = (tooltipItem: TooltipItem<'pie'>): string => {
+  const total = tooltipItem.dataset.data.reduce((a, b) => a + b);
+  return `${ tooltipItem.label }: ${ (Number(tooltipItem.raw) * 100 / total).toFixed(2) }%`;
 };
 
 const formatLabel = (value: string | number): string | number =>
-  String(value).length > 10 ? `${String(value).substring(0, 15)}...` : value;
+  String(value).length > 10 ? `${ String(value).substring(0, 15) }...` : value;
 
 const formatSecsAsHourMin = (d: any): string =>
   new Date(d * 1000).toISOString().substr(11, 5);
 
-const barChatTimeLabel = (tooltipItem: any, data: any): string =>
-  data.datasets[tooltipItem.datasetIndex].label + ': ' + formatSecsAsHourMin(tooltipItem.yLabel);
+const barChatTimeLabel = (tooltipItem: any): string => tooltipItem.label + ': ' + formatSecsAsHourMin(tooltipItem.raw);
 
-const chartArrayColors = (): Color[] => ([{
+const chartArrayColors = (): any[] => ([{
   hoverBackgroundColor: ['rgba(254, 205, 190, 0.6)', 'rgba(152, 109, 142, 0.6)', 'rgba(95, 147, 154, 0.6)',
     'rgba(161, 202, 226, 0.6)', 'rgba(242, 213, 239, 0.6)', 'rgba(203, 239, 227, 0.6)', 'rgba(194, 213, 167, 0.6)',
     'rgba(176, 171, 202, 0.6)', 'rgba(226, 169, 190, 0.6)', 'rgba(163, 214, 212, 0.6)'],
@@ -184,7 +184,7 @@ const chartArrayColors = (): Color[] => ([{
     'rgb(176, 171, 202)', 'rgb(226, 169, 190)', 'rgb(163, 214, 212)']
 }]);
 
-const chartColors = (): Color[] => ([{
+const chartColors = (): any[] => ([{
   backgroundColor: 'rgba(254, 205, 190, 0.6)',
   borderColor: 'rgba(254, 205, 190, 1)',
   pointBackgroundColor: 'rgba(254, 205, 190, 1)',

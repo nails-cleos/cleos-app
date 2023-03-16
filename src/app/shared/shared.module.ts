@@ -24,7 +24,7 @@ import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { getLocale } from '../util/helper';
 
 import { CardChartComponent, CardComponent } from './card/card.component';
-import { ChartsModule } from 'ng2-charts';
+import { NgChartsModule } from 'ng2-charts';
 import { CustomDateFormatter } from './CustomDateFormatter';
 import { CustomEventTitleFormatter } from './CustomEventTitleFormatter';
 import { FlexLayoutModule } from '@angular/flex-layout';
@@ -69,7 +69,7 @@ import { MatRadioModule } from '@angular/material/radio';
     }),
     MatGoogleMapsAutocompleteModule,
     ReactiveFormsModule,
-    ChartsModule,
+    NgChartsModule,
     FlexLayoutModule,
     HttpClientModule,
     FormsModule,
@@ -83,7 +83,7 @@ import { MatRadioModule } from '@angular/material/radio';
     AppMaterialModule,
     FlexLayoutModule,
     HttpClientModule,
-    ChartsModule,
+    NgChartsModule,
     FormsModule,
     BackButtonDirective,
     SortByPipe,

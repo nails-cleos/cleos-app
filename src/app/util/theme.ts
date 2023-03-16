@@ -75,19 +75,20 @@ const selectedTheme = (value: Theme | undefined, themeService: ThemeService): vo
   let overrides: ChartOptions;
   if (isDarkMode(value)) {
     overrides = {
+      // @ts-ignore
       legend: {
-        labels: {fontColor: 'white'}
+        labels: { color: 'white' }
       },
       scales: {
-        gridLines: {color: 'rgba(255, 255, 255, 0.1)'},
-        xAxes: [{
-          ticks: {fontColor: 'white'},
-          gridLines: {color: 'rgba(255, 255, 255, 0.1)'},
-        }],
-        yAxes: [{
-          ticks: {fontColor: 'white'},
-          gridLines: {color: 'rgba(255, 255, 255, 0.1)'}
-        }]
+        // gridLines: { color: 'rgba(255, 255, 255, 0.1)' },
+        x: {
+          ticks: { color: 'white' },
+          // gridLines: { color: 'rgba(255, 255, 255, 0.1)' },
+        },
+        y: {
+          ticks: { color: 'white' },
+          // gridLines: { color: 'rgba(255, 255, 255, 0.1)' }
+        }
       }
     };
   } else {
