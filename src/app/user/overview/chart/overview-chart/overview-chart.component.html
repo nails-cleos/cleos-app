@@ -1,7 +1,7 @@
 <div *ngIf="chartSummary || error; else box" class="chartContainer">
-  <div *ngIf="chart && chart.data && !error; else errorBox">
+  <div *ngIf="chart && chart.charData && !error; else errorBox">
     <canvas [type]="chart.type"
-            [data]="chart.data"
+            [datasets]="chart.charData.datasets"
             [labels]="chart.labels"
             [legend]="true"
             [options]="chart.options"

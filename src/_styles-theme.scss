@@ -314,29 +314,6 @@
   @if ($isDark) {
     .success,
     .green-text {
-      color: #90EE90;
-    }
-
-    .stamp-paid {
-      box-shadow: 0 0 0 3px #90EE90, 0 0 0 2px #90EE90 inset;
-      color: #90EE90;
-    }
-
-    ::ng-deep .mat-green,
-    .cash {
-      background-color: #90EE90 !important;
-    }
-
-    .in_process {
-      background-color: rgba(#a06c3f, 0.4) !important;
-    }
-
-    .ml, .paypal, .approved {
-      background-color: rgb(0, 158, 227) !important;
-    }
-  } @else {
-    .success,
-    .green-text {
       color: #44A244;
     }
 
@@ -345,8 +322,16 @@
       color: #44A244;
     }
 
-    ::ng-deep .mat-green,
     .cash {
+      background-color: #44A244 !important;
+
+      td {
+        color: mat.get-color-from-palette($foreground, contrast) !important;
+      }
+    }
+
+    ::ng-deep .mat-green {
+      color: mat.get-color-from-palette($background, background);
       background-color: #44A244 !important;
     }
 
@@ -357,16 +342,37 @@
     .ml, .paypal, .approved {
       background-color: rgba(0, 158, 227, 0.4) !important;
     }
-  }
-
-  .cash {
-    td {
-      color: mat.get-color-from-palette($foreground, contrast) !important;
+  } @else {
+    .success,
+    .green-text {
+      color: #90EE90;
     }
-  }
 
-  ::ng-deep .mat-green {
-    color: mat.get-color-from-palette($background, background);
+    .stamp-paid {
+      box-shadow: 0 0 0 3px #90EE90, 0 0 0 2px #90EE90 inset;
+      color: #90EE90;
+    }
+
+    .cash {
+      background-color: #90EE90 !important;
+
+      td {
+        color: mat.get-color-from-palette($foreground, contrast) !important;
+      }
+    }
+
+    ::ng-deep .mat-green {
+      color: mat.get-color-from-palette($background, background);
+      background-color: #90EE90 !important;
+    }
+
+    .in_process {
+      background-color: rgba(#a06c3f, 0.4) !important;
+    }
+
+    .ml, .paypal, .approved {
+      background-color: rgb(0, 158, 227) !important;
+    }
   }
 
   .stepper-item .step-counter {

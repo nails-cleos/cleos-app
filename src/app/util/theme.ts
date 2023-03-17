@@ -1,7 +1,7 @@
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { CookieService } from 'ngx-cookie-service';
 import { ChartOptions } from 'chart.js';
-import { ThemeService } from 'ng2-charts';
+import { ThemeService } from "ng2-charts";
 
 export type Theme = 'light-theme' | 'dark-theme';
 
@@ -73,26 +73,24 @@ const stateColor = (isDark: boolean): IState[] => [{
 
 const selectedTheme = (value: Theme | undefined, themeService: ThemeService): void => {
   let overrides: ChartOptions;
+  console.log(themeService)
   if (isDarkMode(value)) {
     overrides = {
-      // @ts-ignore
-      legend: {
-        labels: { color: 'white' }
-      },
-      scales: {
-        // gridLines: { color: 'rgba(255, 255, 255, 0.1)' },
-        x: {
-          ticks: { color: 'white' },
-          // gridLines: { color: 'rgba(255, 255, 255, 0.1)' },
+      plugins: {
+        title: {
+          color: 'white'
         },
-        y: {
-          ticks: { color: 'white' },
-          // gridLines: { color: 'rgba(255, 255, 255, 0.1)' }
+        legend: {
+          labels: {
+            color: 'white'
+          }
         }
       }
     };
   } else {
-    overrides = {};
+    overrides = {
+      scales: undefined
+    };
   }
   themeService.setColorschemesOptions(overrides);
 };

@@ -1,24 +1,15 @@
 <button [mat-dialog-close]="true" class="close-button" mat-icon-button>
-  <mat-icon class="close-icon">close</mat-icon>
+  <mat-icon>close</mat-icon>
 </button>
 <h1 mat-dialog-title>{{data.title}}</h1>
 <div mat-dialog-content>
-  <div *ngIf="data.chart.dataSet && data.chart.dataSet.datasets">
+  <div>
     <canvas [type]="data.chart.type"
-            [datasets]="data.chart.dataSet.datasets"
+            [datasets]="data.chart.charData.datasets"
             [labels]="data.chart.labels"
             [legend]="true"
             [options]="data.chart.options"
             baseChart class="block">
-    </canvas>
-  </div>
-  <div *ngIf="data.chart.data">
-    <canvas [type]="data.chart.type"
-            [data]="data.chart.data"
-            [labels]="data.chart.labels"
-            [legend]="true"
-            [options]="data.chart.options"
-            baseChart class="display: block">
     </canvas>
   </div>
 </div>

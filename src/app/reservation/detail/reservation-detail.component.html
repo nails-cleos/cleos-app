@@ -192,16 +192,19 @@
         </ng-container>
 
         <ng-container matColumnDef="expandedDetail">
-          <td *matCellDef="let payment" [attr.colspan]="paymentDisplayedColumns.length">
-            <div [@detailExpand]="payment === paymentExpanded ? 'expanded' : 'collapsed'" class="detail">
+          <td *matCellDef="let payment" [attr.colspan]="paymentDisplayedColumns.length" fxHide fxShow.lt-sm>
+            <div [@detailExpand]="payment === paymentExpanded ? 'expanded' : 'collapsed'" class="detail" fxHide
+                 fxShow.lt-sm>
               <mat-list>
                 <div mat-subheader>{{ 'COMMON.COLUMN.TYPE' | translate }}</div>
                 <mat-list-item role="list">
-                  <div mat-line>{{'COMMON.PAYMENT.' + payment.type | translate}}</div>
+                  <div matListItemLine>{{'COMMON.PAYMENT.' + payment.type | translate}}</div>
                 </mat-list-item>
+              </mat-list>
+              <mat-list>
                 <div mat-subheader>{{ 'PAYMENT.LIST.COLUMN.STATUS' | translate }}</div>
                 <mat-list-item role="list">
-                  <div mat-line>
+                  <div matListItemLine>
                     {{'COMMON.STATUS.PAYMENT.' + (payment.status ? payment.status.toUpperCase() : 'NONE') | translate}}
                   </div>
                 </mat-list-item>
@@ -213,7 +216,8 @@
 
         <tr *matHeaderRowDef="paymentDisplayedColumns" mat-header-row></tr>
         <tr (click)="paymentExpanded = paymentExpanded === payment ? null : payment"
-            *matRowDef="let payment; columns: paymentDisplayedColumns;" class="row {{payment.type.toLowerCase()}}"
+            *matRowDef="let payment; columns: paymentDisplayedColumns;"
+            [ngClass]="'cash row'"
             mat-row></tr>
         <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row></tr>
         <tr *matFooterRowDef="paymentDisplayedColumns" mat-footer-row></tr>
@@ -290,16 +294,18 @@
         </ng-container>
 
         <ng-container matColumnDef="expandedDetail">
-          <td *matCellDef="let history" [attr.colspan]="displayedColumns.length">
-            <div [@detailExpand]="history === expanded ? 'expanded' : 'collapsed'" class="detail">
+          <td *matCellDef="let history" [attr.colspan]="displayedColumns.length" fxHide fxShow.lt-sm>
+            <div [@detailExpand]="history === expanded ? 'expanded' : 'collapsed'" class="detail" fxHide fxShow.lt-sm>
               <mat-list *ngIf="history.id">
-                <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
+                <div matListItemTitle>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
                 <mat-list-item role="list">
-                  <div mat-line>{{history?.professional | userName}}</div>
+                  <div matListItemLine>{{history?.professional | userName}}</div>
                 </mat-list-item>
-                <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</div>
+              </mat-list>
+              <mat-list *ngIf="history.id">
+                <div matListItemTitle>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</div>
                 <mat-list-item role="list">
-                  <div mat-line>
+                  <div matListItemLine>
                     <mat-icon matPrefix>{{history.state | reservationIcon}}</mat-icon>&nbsp;
                     {{ 'COMMON.STATUS.RESERVATION.' + history.state | translate}}
                   </div>

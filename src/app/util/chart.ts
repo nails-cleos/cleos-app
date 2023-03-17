@@ -1,28 +1,15 @@
-import { ChartConfiguration, ChartData, ChartOptions, ChartType, TooltipItem } from 'chart.js';
+import { ChartConfiguration, ChartOptions, ChartType, TooltipItem } from 'chart.js';
 import { IChart } from '../interfaces/dashboard';
 
 export interface IChartUtil {
   labels: any[];
-  dataSet: ChartConfiguration['data'];
-  data?: ChartData;
+  charData: ChartConfiguration['data'];
   type: ChartType;
-  // TODO color is not used
-  colors: any[];
   options: ChartOptions;
 }
 
 export const createChart = (chart: IChart, isDark?: boolean): IChartUtil => {
-  let dataSet: any[] = [];
-  if (chart.dataSet && chart.dataSet.length) {
-    chart.dataSet.forEach(value => {
-      dataSet = [...dataSet, { data: value.data, label: value.label, type: value.type }];
-    });
-  }
-  let data: any | undefined;
-  if (chart.data) {
-    data = chart.data;
-  }
-  let colors;
+  let colors: any[];
   switch (chart.colors) {
     case 'COLORS_ARRAY':
       colors = chartArrayColors();
@@ -34,11 +21,11 @@ export const createChart = (chart: IChart, isDark?: boolean): IChartUtil => {
   let options;
   switch (chart.options) {
     case 'NO_LABEL':
-      options = barChartNoLabelOptions();
+      options = barChartNoLabelOptions(isDark);
       break;
     case 'BAR_CHART':
     case 'LINE_CHART':
-      options = barChartDefaultOptions();
+      options = barChartDefaultOptions(isDark);
       break;
     case 'RADAR_CHART':
       options = radarChartDefaultOptions(isDark);
@@ -47,22 +34,43 @@ export const createChart = (chart: IChart, isDark?: boolean): IChartUtil => {
       options = pieChartPercentageOptions();
       break;
     case 'TIME_CHART':
-      options = barChartTimeOptions();
+      options = barChartTimeOptions(isDark);
       break;
     case 'CHART':
     default:
       options = defaultOptions();
   }
 
+  let dataSet: any[] = [];
+  if (chart.dataSet && chart.dataSet.length) {
+    chart.dataSet.forEach((value, i) => {
+      const color = colors[i % 10]
+      dataSet = [...dataSet, {
+        data: value.data,
+        label: value.label,
+        type: value.type,
+        backgroundColor: color.backgroundColor,
+        hoverBackgroundColor: color.hoverBackgroundColor,
+        borderColor: color.borderColor,
+        hoverBorderColor: color.hoverBorderColor,
+        pointBackgroundColor: color.pointBackgroundColor,
+        pointBorderColor: color.pointBorderColor,
+        pointHoverBackgroundColor: color.pointHoverBackgroundColor,
+        pointHoverBorderColor: color.pointHoverBorderColor
+      }];
+    });
+  }
+
   const charData: ChartConfiguration['data'] = {
+    labels: chart.labels || [],
     datasets: dataSet
   }
 
   return {
     labels: chart.labels || [],
     type: chart.type || 'bar',
-    dataSet: charData,
-    data, colors, options
+    charData,
+    options
   };
 };
 
@@ -71,81 +79,184 @@ const defaultOptions = (): ChartOptions => ({
 });
 
 const radarChartDefaultOptions = (isDark?: boolean): ChartOptions<'radar'> => {
-  const options = {
-    responsive: true,
-    scales: {
-      pointLabels: {
-        // @ts-ignore
-        callback: value => formatLabel(value)
-      },
-      ticks: {
-        suggestedMin: 0,
-        precision: 0
+  let options: ChartOptions<'radar'>
+  if (isDark) {
+    options = {
+      responsive: true,
+      scales: {
+        r: {
+          grid: {
+            color: 'rgba(0, 0, 0, 0.1)'
+          },
+          angleLines: {
+            display: true,
+            color: 'white'
+          },
+          suggestedMin: 0,
+          pointLabels: {
+            color: 'white'
+          },
+          ticks: {
+            // stepSize: 1,
+            display: true,
+            color: 'white',
+            backdropColor: '#424242'
+          }
+        }
       }
     }
-  } as ChartOptions<'radar'>;
+  } else {
+    options = {
+      responsive: true,
+      scales: {
+        r: {
+          angleLines: {
+            display: true,
+            color: 'black'
+          },
+          suggestedMin: 0,
+          ticks: {
+            stepSize: 1,
+            display: true
+          }
+        }
+      }
+    }
+  }
+  return options;
+};
+
+const barChartDefaultOptions = (isDark?: boolean): ChartOptions<'bar'> => {
+  let options: ChartOptions<'bar'>;
   if (isDark) {
-    Object.assign({}, options.scales, { gridLines: { color: 'rgba(255, 255, 255, 0.1)' } });
-    Object.assign({}, options.scales, { angleLines: { color: 'rgba(255, 255, 255, 0.1)' } });
-    Object.assign({}, options.scales?.pointLabels, { color: 'white' });
-    Object.assign({}, options.scales?.ticks, { backdropColor: '#393939', color: 'white' });
+    options = {
+      responsive: true,
+      scales: {
+        y: {
+          ticks: { color: 'white' },
+          grid: { color: 'rgba(255,255,255,0.1)' },
+          beginAtZero: true
+        },
+        x: {
+          ticks: { color: 'white' },
+          grid: { color: 'rgba(255,255,255,0.1)' }
+        }
+      },
+      plugins: {
+        legend: {
+          display: true,
+        }
+      }
+    }
+  } else {
+    options = {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      },
+      plugins: {
+        legend: {
+          display: true,
+        }
+      }
+    }
+  }
+  return options;
+};
+
+const barChartNoLabelOptions = (isDark?: boolean): ChartOptions<'bar'> => {
+  let options: ChartOptions<'bar'>;
+  if (isDark) {
+    options = {
+      responsive: true,
+      scales: {
+        y: {
+          ticks: { color: 'white' },
+          grid: { color: 'rgba(255,255,255,0.1)' },
+          beginAtZero: true
+        },
+        x: {
+          ticks: {
+            color: 'white',
+            callback: () => ''
+          },
+          grid: { color: 'rgba(255,255,255,0.1)' }
+        }
+      }
+    }
+  } else {
+    options = {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
+        },
+        x: {
+          ticks: {
+            callback: () => ''
+          }
+        }
+      }
+    }
   }
 
   return options;
 };
 
-const barChartDefaultOptions = (): ChartOptions<'bar'> => ({
-  responsive: true,
-  scales: {
-    y: {
-      beginAtZero: true
-    },
-    x: {
-      ticks: {
-        callback: value => formatLabel(value)
+const barChartTimeOptions = (isDark?: boolean): ChartOptions<'bar'> => {
+  let options: ChartOptions<'bar'>
+  if (isDark) {
+    options = {
+      responsive: true,
+      scales: {
+        y: {
+          grid: { color: 'rgba(255,255,255,0.1)' },
+          beginAtZero: true,
+          ticks: {
+            callback: (v: any) => formatSecsAsHourMin(v),
+            stepSize: 1800,
+            color: 'white'
+          }
+        },
+        x: {
+          ticks: { color: 'white' },
+          grid: { color: 'rgba(255,255,255,0.1)' }
+        }
+      },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: (tooltipItem: any) => barChatTimeLabel(tooltipItem)
+          }
+        }
+      }
+    }
+  } else {
+    options = {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: (v: any) => formatSecsAsHourMin(v),
+            stepSize: 1800
+          }
+        }
+      },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: (tooltipItem: any) => barChatTimeLabel(tooltipItem)
+          }
+        }
       }
     }
   }
-});
 
-const barChartNoLabelOptions = (): ChartOptions<'bar'> => ({
-  responsive: true,
-  scales: {
-    y: {
-      beginAtZero: true
-    },
-    x: {
-      ticks: {
-        callback: () => ''
-      }
-    }
-  }
-});
-
-const barChartTimeOptions = (): ChartOptions<'bar'> => ({
-  responsive: true,
-  scales: {
-    y: {
-      beginAtZero: true,
-      ticks: {
-        callback: (v: any) => formatSecsAsHourMin(v),
-        stepSize: 1800
-      }
-    },
-    x: {
-      ticks: {
-        callback: value => formatLabel(value)
-      }
-    }
-  },
-  plugins: {
-    tooltip: {
-      callbacks: {
-        label: (tooltipItem: any) => barChatTimeLabel(tooltipItem)
-      }
-    }
-  }
-});
+  return options;
+};
 
 const pieChartPercentageOptions = (): ChartOptions<'pie'> => ({
   responsive: true,
@@ -175,7 +286,7 @@ const chartArrayColors = (): any[] => ([{
   hoverBackgroundColor: ['rgba(254, 205, 190, 0.6)', 'rgba(152, 109, 142, 0.6)', 'rgba(95, 147, 154, 0.6)',
     'rgba(161, 202, 226, 0.6)', 'rgba(242, 213, 239, 0.6)', 'rgba(203, 239, 227, 0.6)', 'rgba(194, 213, 167, 0.6)',
     'rgba(176, 171, 202, 0.6)', 'rgba(226, 169, 190, 0.6)', 'rgba(163, 214, 212, 0.6)'],
-  borderColor: ['#fff', '#fff', '#fff', '#fff'],
+  borderColor: ['#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff'],
   backgroundColor: ['rgba(254, 205, 190, 0.8)', 'rgba(152, 109, 142, 0.8)', 'rgba(95, 147, 154, 0.8)',
     'rgba(161, 202, 226, 0.8)', 'rgba(242, 213, 239, 0.8)', 'rgba(203, 239, 227, 0.8)', 'rgba(194, 213, 167, 0.8)',
     'rgba(176, 171, 202, 0.8)', 'rgba(226, 169, 190, 0.8)', 'rgba(163, 214, 212, 0.8)'],

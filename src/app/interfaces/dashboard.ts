@@ -64,7 +64,6 @@ export interface IChart {
   title: string;
   type?: ChartType;
   labels?: any[];
-  data?: any;
   dataSet?: any[];
   label?: string;
   options?: string;
