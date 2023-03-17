@@ -4,10 +4,13 @@ import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/c
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class NoopInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    return next.handle(req.clone({url: `${environment.baseUrl}/${req.url}`}));
+    if (!req.url.includes('maps.googleapis.com')) {
+      return next.handle(req.clone({ url: `${ environment.baseUrl }/${ req.url }` }));
+    }
+    return next.handle(req);
   }
 }

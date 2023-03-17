@@ -3,15 +3,13 @@ import { CommonModule } from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { AgmCoreModule } from '@agm/core';
-import { MatGoogleMapsAutocompleteModule } from '@angular-material-extensions/google-maps-autocomplete';
+// import { MatGoogleMapsAutocompleteModule } from '@angular-material-extensions/google-maps-autocomplete';
 
 import { AppMaterialModule } from '../util/app-material.module';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { SortByPipe } from '../pipes/sort-by.pipe';
 import { AppState, selectAuthState } from '../store/app.states';
 import { IUserAll } from '../interfaces/user';
-import { environment } from '../../environments/environment';
 
 import { ErrorComponent } from './error/error.component';
 import { GoogleMapComponent } from './google-map/google-map.component';
@@ -30,7 +28,7 @@ import { CustomEventTitleFormatter } from './CustomEventTitleFormatter';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { ChartComponent } from './chart/chart.component';
 import { httpInterceptorProviders } from '../http-interceptors';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientJsonpModule, HttpClientModule } from '@angular/common/http';
 import { UserNamePipe } from '../pipes/user-name.pipe';
 import { TimeDetailPipe } from '../pipes/time-detail.pipe';
 import { TimeZoneSnackBarComponent } from './snak/time-zone/time-zone-snack-bar.component';
@@ -42,6 +40,7 @@ import { ConvertHMPipe } from '../pipes/convert-hm.pipe';
 import { CounterComponent } from '../util/counter/counter.component';
 import { CalendarDialogComponent } from './calendar-dialog/calendar-dialog.component';
 import { MatRadioModule } from '@angular/material/radio';
+import { GoogleMapsModule } from "@angular/google-maps";
 
 @NgModule({
   imports: [
@@ -63,15 +62,13 @@ import { MatRadioModule } from '@angular/material/radio';
         useClass: CustomEventTitleFormatter
       }
     }),
-    AgmCoreModule.forRoot({
-      apiKey: environment.googleMapKey,
-      libraries: ['places', 'geometry']
-    }),
-    MatGoogleMapsAutocompleteModule,
+    GoogleMapsModule,
+    // MatGoogleMapsAutocompleteModule,
     ReactiveFormsModule,
     NgChartsModule,
     FlexLayoutModule,
     HttpClientModule,
+    HttpClientJsonpModule,
     FormsModule,
     MatRadioModule
   ],
@@ -83,6 +80,7 @@ import { MatRadioModule } from '@angular/material/radio';
     AppMaterialModule,
     FlexLayoutModule,
     HttpClientModule,
+    HttpClientJsonpModule,
     NgChartsModule,
     FormsModule,
     BackButtonDirective,

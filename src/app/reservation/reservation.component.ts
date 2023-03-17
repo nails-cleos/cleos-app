@@ -29,7 +29,6 @@ import {
 import { createRecurringEvent, fillNotAvailable, getOverlapEvent, Meta, newEvent } from '../util/event';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DateAdapter } from '@angular/material/core';
-import { GeocoderResult } from '@agm/core';
 import { Role } from '../interfaces/token';
 import { IUnavailableAll } from '../interfaces/unavailable';
 import { DiscountType, IUserDiscount } from '../interfaces/discount';
@@ -47,6 +46,7 @@ import { IStep, Step } from '../interfaces/step';
 import { TimeZoneSnackBarComponent } from '../shared/snak/time-zone/time-zone-snack-bar.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DiscountDialogComponent } from '../discount/list/discounts.component';
+import GeocoderResult = google.maps.GeocoderResult;
 
 @Component({
   selector: 'app-reservation',

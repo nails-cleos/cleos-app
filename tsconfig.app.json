@@ -5,7 +5,7 @@
     "outDir": "./out-tsc/app",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "types": ["googlemaps", "node"]
+    "types": ["google.maps", "node"]
   },
   "files": [
     "src/main.ts"

@@ -73,7 +73,6 @@ const stateColor = (isDark: boolean): IState[] => [{
 
 const selectedTheme = (value: Theme | undefined, themeService: ThemeService): void => {
   let overrides: ChartOptions;
-  console.log(themeService)
   if (isDarkMode(value)) {
     overrides = {
       plugins: {

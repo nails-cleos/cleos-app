@@ -11,15 +11,17 @@ export class RequestOptionInterceptor implements HttpInterceptor {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    req = req.clone({headers: req.headers.set('Content-Type', 'application/json')});
+    if (!req.url.includes('maps.googleapis.com')) {
+      req = req.clone({ headers: req.headers.set('Content-Type', 'application/json') });
 
-    if (!req.headers.has('Accept')) {
-      req = req.clone({headers: req.headers.set('Accept', 'application/json')});
-    }
+      if (!req.headers.has('Accept')) {
+        req = req.clone({ headers: req.headers.set('Accept', 'application/json') });
+      }
 
-    const user: IUserAll = this.tokenService.user;
-    if (user && user.lang) {
-      req = req.clone({headers: req.headers.set('Accept-Language', user.lang)});
+      const user: IUserAll = this.tokenService.user;
+      if (user && user.lang) {
+        req = req.clone({ headers: req.headers.set('Accept-Language', user.lang) });
+      }
     }
 
     return next.handle(req);

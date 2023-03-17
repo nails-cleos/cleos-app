@@ -1,13 +1,14 @@
 <div *ngIf="showMap">
   <div *ngIf="addressFormGroup" [formGroup]="addressFormGroup" class="divider" fxLayout="column"
        fxLayoutAlign="space-evenly stretch">
-    <mat-google-maps-autocomplete [addressLabelText]="'COMMON.ADDRESS.FIELD' | translate"
-                                  [appearance]="appearance.FILL"
-                                  [invalidErrorText]="'COMMON.ADDRESS.INVALID' | translate"
-                                  formControlName="address"
-                                  placeholderText=""
-                                  type="address">
-    </mat-google-maps-autocomplete>
+    <!--    TODO add autocomplete -->
+    <!--    <mat-google-maps-autocomplete [addressLabelText]="'COMMON.ADDRESS.FIELD' | translate"-->
+    <!--                                  [appearance]="appearance.FILL"-->
+    <!--                                  [invalidErrorText]="'COMMON.ADDRESS.INVALID' | translate"-->
+    <!--                                  formControlName="address"-->
+    <!--                                  placeholderText=""-->
+    <!--                                  type="address">-->
+    <!--    </mat-google-maps-autocomplete>-->
     <mat-form-field appearance="fill">
       <mat-label>{{ 'COMMON.ADDRESS.DESCRIPTION' | translate }}</mat-label>
       <label>
@@ -16,15 +17,14 @@
       <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
     </mat-form-field>
   </div>
-  <agm-map *ngIf="!isMapLoading; else box" [latitude]="latitudeMarker || latitude"
-           [longitude]="longitudeMarker || longitude"
-           [zoom]="zoom"
-           class="divider">
-    <agm-marker (dragEnd)="markerDragEnd($event)" *ngIf="latitudeMarker && longitudeMarker" [latitude]="latitudeMarker"
-                [longitude]="longitudeMarker" [markerDraggable]="isDraggable">
-      <agm-info-window>{{info}}</agm-info-window>
-    </agm-marker>
-  </agm-map>
+  <div *ngIf="isMapLoading | async; else box">
+    <google-map [zoom]="zoom" [options]="options" class="divider">
+      <map-marker #marker="mapMarker" [options]="markerOptions" (mapDragend)="markerDragEnd($event)"
+                  (mapClick)="openInfoWindow(marker)">
+      </map-marker>
+      <map-info-window>{{info}}</map-info-window>
+    </google-map>
+  </div>
   <ng-template #box>
     <div class="ssc-square mb"></div>
   </ng-template>
