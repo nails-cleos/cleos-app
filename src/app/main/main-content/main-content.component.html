@@ -32,7 +32,7 @@
     <fieldset>
       <legend>{{'MAIN.SECTION.BOOK' | translate }}</legend>
       <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
-        <mat-form-field appearance="fill">
+        <mat-form-field appearance="outline">
           <mat-label>{{ 'MAIN.BOOK.DATE.FIELD' | translate }}</mat-label>
           <label>
             <input (focus)="picker.open()" [formControl]="date" [matDatepickerFilter]="myFilter"
@@ -42,7 +42,7 @@
           <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
           <mat-datepicker #picker touchUi></mat-datepicker>
         </mat-form-field>
-        <mat-form-field *ngIf="groups; else skeleton" appearance="fill">
+        <mat-form-field *ngIf="groups; else skeleton" appearance="outline">
           <mat-label>{{ 'COMMON.PRODUCT.GROUP.FIELD' | translate }}</mat-label>
           <label>
             <input (keydown)="keyDownGroup($event)" [formControl]="group" [matAutocomplete]="autoGroup"
@@ -58,7 +58,7 @@
                      [innerHTML]="'COMMON.PRODUCT.GROUP.INVALID' | translate">
           </mat-error>
         </mat-form-field>
-        <mat-form-field *ngIf="products" appearance="fill">
+        <mat-form-field *ngIf="products" appearance="outline">
           <mat-label>{{ 'COMMON.PRODUCT.FIELD' | translate }}</mat-label>
           <label>
             <input (keydown)="keyDownHandler($event, product)" [formControl]="product"
@@ -129,7 +129,7 @@
           <h2 class="bold no-content">{{'MAIN.CONTACT.SEND.TITLE' | translate}}</h2>
           <form (ngSubmit)="sendEmail" [formGroup]="form" novalidate>
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'MAIN.CONTACT.NAME.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="name" [tabIndex]="1" autocomplete="name" matInput required>
@@ -138,7 +138,7 @@
                            [innerHTML]="'MAIN.CONTACT.NAME.REQUIRED' | translate">
                 </mat-error>
               </mat-form-field>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'MAIN.CONTACT.EMAIL.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="email" [tabIndex]="2" autocomplete="email" matInput required>
@@ -150,7 +150,7 @@
                            [innerHTML]="'MAIN.CONTACT.EMAIL.REQUIRED' | translate">
                 </mat-error>
               </mat-form-field>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'MAIN.CONTACT.SUBJECT.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="subject" [tabIndex]="3" autocomplete="subject" matInput required>
@@ -159,7 +159,7 @@
                            [innerHTML]="'MAIN.CONTACT.SUBJECT.REQUIRED' | translate">
                 </mat-error>
               </mat-form-field>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'MAIN.CONTACT.BODY.FIELD' | translate }}</mat-label>
                 <label>
                   <textarea #message [formControl]="body" [tabIndex]="4" matInput maxlength="256" required></textarea>

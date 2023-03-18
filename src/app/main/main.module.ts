@@ -23,7 +23,7 @@ import { UserService } from '../services/user.service';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { LoginEffects } from '../store/effects/auth.effects';
 import { AuthService } from '../services/auth.service';
-import { MatCarouselModule } from "ng-mat-carousel";
+import { MatCarouselModule } from "@magloft/material-carousel";
 
 @NgModule({
   declarations: [

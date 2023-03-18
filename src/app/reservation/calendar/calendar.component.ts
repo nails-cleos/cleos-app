@@ -153,8 +153,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscription.next();
-    this.destroy$.next();
+    this.subscription.unsubscribe();
+    this.destroy$.unsubscribe();
   }
 
   displayFnOffice(office: IOffice): string {

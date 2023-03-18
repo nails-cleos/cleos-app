@@ -5,12 +5,12 @@
 @import 'node_modules/skeleton-screen-css';
 @import 'styles-theme';
 
-@import 'node_modules/ngx-sharebuttons/themes/material/material-dark-theme';
-@import 'node_modules/ngx-sharebuttons/themes/modern/modern-light-theme';
-@import 'node_modules/ngx-sharebuttons/themes/circles/circles-dark-theme';
+@import 'node_modules/ngx-sharebuttons/themes/material';
+@import 'node_modules/ngx-sharebuttons/themes/modern';
+@import 'node_modules/ngx-sharebuttons/themes/circles';
 
 $flag-icon-css-path: '~flag-icon-css/flags' !default;
-@import 'node_modules/flag-icon-css/sass/flag-icon';
+@import 'node_modules/flag-icon-css/sass/flag-icons';
 
 html, body {
   height: 100%;

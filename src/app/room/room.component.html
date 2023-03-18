@@ -9,7 +9,7 @@
           <mat-card-content>
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <div *ngIf="currencies; else skeleton" fxLayout="row" fxLayoutAlign="space-between center">
-                <mat-form-field appearance="fill">
+                <mat-form-field appearance="outline">
                   <mat-label>{{ 'COMMON.CURRENCY.FIELD' | translate }}</mat-label>
                   <label>
                     <input (keydown)="keyDownHandler($event, currency)" [formControl]="currency"
@@ -39,7 +39,7 @@
                 </button>
               </div>
               <div *ngIf="offices; else skeleton" fxLayout="row" fxLayoutAlign="space-between center">
-                <mat-form-field appearance="fill">
+                <mat-form-field appearance="outline">
                   <mat-label>{{ 'ROOM.OFFICE.FIELD' | translate }}</mat-label>
                   <label>
                     <input (keydown)="keyDownHandler($event, office)" [formControl]="office" [matAutocomplete]="auto"
@@ -104,7 +104,7 @@
                   <span>{{ 'COMMON.PROFESSIONAL.ADD_BUTTON' | translate }}</span>
                 </button>
               </div>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'ROOM.TIME_ZONE.FIELD' | translate }}</mat-label>
                 <label>
                   <input (keydown)="keyDownHandler($event, timeZone)" [formControl]="timeZone"

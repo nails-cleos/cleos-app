@@ -11,8 +11,8 @@
 // have to load a single css file for Angular Material in your app.
 
 // Fonts
-@import 'https://fonts.googleapis.com/css?family=Material+Icons&display=swap';
-@import url('https://fonts.googleapis.com/css?family=Belleza:300,400,500&display=swap');
+@import 'https://fonts.googleapis.com/icon?family=Material+Icons+Outlined';
+@import url('https://fonts.googleapis.com/css2?family=Belleza:wght@300;400;500&display=swap');
 
 $mat-theme-ignore-duplication-warnings: true;
 
@@ -36,14 +36,14 @@ $fontConfig: (
 
 // Light Theme Text
 $dark-text: #000000;
-$dark-primary-text: $dark-text;
+$dark-primary-text: rgba($dark-text, 0.87);
 $dark-accent-text: rgba($dark-primary-text, 0.54);
 $dark-disabled-text: rgba($dark-primary-text, 0.38);
 $dark-dividers: rgba($dark-primary-text, 0.12);
 $dark-focused: rgba($dark-primary-text, 0.12);
 
 $mat-light-theme-foreground: (
-  base: $dark-text,
+  base: black,
   contrast: #ffffff,
   divider: $dark-dividers,
   dividers: $dark-dividers,
@@ -161,47 +161,48 @@ $mat-dark-theme-background: (
   loading: $dark-bg-alpha-80,
 );
 
+@include mat.slide-toggle-density(-1);
+
 @include mat.all-component-typographies($fontConfig);
 @include mat.core();
 
 // Theme Config
 
 body {
-  --primary-color: #a06c3f;
-  --primary-lighter-color: #e3d3c5;
-  --primary-darker-color: #844f29;
-  --text-primary-color: #{$light-primary-text};
+  --primary-color: #a9a397;
+  --primary-lighter-color: #e5e3e0;
+  --primary-darker-color: #8f887a;
+  --text-primary-color: #{$dark-primary-text};
   --text-primary-lighter-color: #{$dark-primary-text};
-  --text-primary-darker-color: #{$light-primary-text};
+  --text-primary-darker-color: #{$dark-primary-text};
 }
-
 $mat-primary: (
-  main: #a06c3f,
-  lighter: #e3d3c5,
-  darker: #844f29,
-  200: #a06c3f, // For slide toggle,
+  main: #a9a397,
+  lighter: #e5e3e0,
+  darker: #8f887a,
+  200: #a9a397, // For slide toggle,
   contrast : (
-    main: $light-primary-text,
+    main: $dark-primary-text,
     lighter: $dark-primary-text,
-    darker: $light-primary-text,
+    darker: $dark-primary-text,
   )
 );
 $theme-primary: mat.define-palette($mat-primary, main, lighter, darker);
 
+
 body {
-  --accent-color: #fedbd0;
-  --accent-lighter-color: #fff4f1;
-  --accent-darker-color: #fecdbe;
+  --accent-color: #dcc8c2;
+  --accent-lighter-color: #f5efed;
+  --accent-darker-color: #ceb4ac;
   --text-accent-color: #{$dark-primary-text};
   --text-accent-lighter-color: #{$dark-primary-text};
   --text-accent-darker-color: #{$dark-primary-text};
 }
-
 $mat-accent: (
-  main: #fedbd0,
-  lighter: #fff4f1,
-  darker: #fecdbe,
-  200: #fedbd0, // For slide toggle,
+  main: #dcc8c2,
+  lighter: #f5efed,
+  darker: #ceb4ac,
+  200: #dcc8c2, // For slide toggle,
   contrast : (
     main: $dark-primary-text,
     lighter: $dark-primary-text,
@@ -291,10 +292,25 @@ $altTheme: mat.define-dark-theme((
 }
 
 .material-icons {
+  font-family: 'Material Icons Outlined', 'Material Icons', sans-serif;
+  font-weight: normal;
+  font-style: normal;
   font-size: 24px;
-  font-family: 'Material Icons', 'Material Icons', sans-serif;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
 
   .mat-badge-content {
     font-family: 'Belleza', "Helvetica Neue", sans-serif;
+  }
+
+  .mat-slide-toggle-thumb {
+    background-color: red !important;
   }
 }

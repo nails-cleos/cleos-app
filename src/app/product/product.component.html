@@ -8,7 +8,7 @@
           </mat-card-header>
           <mat-card-content>
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.PRODUCT.GROUP.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="name" autocomplete="name" matInput required>
@@ -19,7 +19,7 @@
                   {{errors['name']}}
                 </mat-error>
               </mat-form-field>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'PRODUCT.DESCRIPTION.FIELD' | translate }}</mat-label>
                 <label>
                   <textarea #message formControlName="description" matInput maxlength="256"></textarea>
@@ -27,7 +27,7 @@
                 <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
               </mat-form-field>
               <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
-                <mat-form-field appearance="fill" style="margin-right: 12px;">
+                <mat-form-field appearance="outline" style="margin-right: 12px;">
                   <mat-label>{{ 'PRODUCT.DURABILITY.MIN.FIELD' | translate }}</mat-label>
                   <label>
                     <input formControlName="durabilityMin" matInput>
@@ -36,7 +36,7 @@
                     {{errors['durabilityMin']}}
                   </mat-error>
                 </mat-form-field>
-                <mat-form-field appearance="fill" style="margin-right: 12px;">
+                <mat-form-field appearance="outline" style="margin-right: 12px;">
                   <mat-label>{{ 'PRODUCT.DURABILITY.MAX.FIELD' | translate }}</mat-label>
                   <label>
                     <input formControlName="durabilityMax" matInput>
@@ -46,7 +46,7 @@
                   </mat-error>
                 </mat-form-field>
               </div>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.PRODUCT.FIELD' | translate }}</mat-label>
                 <label>
                   <input #inputName matInput>
@@ -62,7 +62,7 @@
               </mat-form-field>
               <mat-tab-group (selectedIndexChange)="selected.setValue($event)" [selectedIndex]="selected.value">
                 <mat-tab *ngFor="let tab of products; let index = index" [label]="tab.name || ''">
-                  <mat-form-field appearance="fill" class="tab-field">
+                  <mat-form-field appearance="outline" class="tab-field">
                     <mat-label>{{ 'COMMON.PRODUCT.FIELD' | translate }}</mat-label>
                     <label>
                       <input (change)="setValue(tab, 'name', $event)" [value]="tab.name" matInput required>
@@ -71,13 +71,13 @@
                               class="mat-error">
                     </mat-hint>
                   </mat-form-field>
-                  <mat-form-field appearance="fill" class="tab-field">
+                  <mat-form-field appearance="outline" class="tab-field">
                     <mat-label>{{ 'PRODUCT.DESCRIPTION.FIELD' | translate }}</mat-label>
                     <label>
                       <input (change)="setValue(tab, 'description', $event)" [value]="tab.description" matInput>
                     </label>
                   </mat-form-field>
-                  <mat-form-field appearance="fill" class="tab-field">
+                  <mat-form-field appearance="outline" class="tab-field">
                     <mat-label>{{ 'PRODUCT.DURATION.FIELD' | translate }}</mat-label>
                     <label>
                       <input [format]="24" [ngxTimepicker]="t" [value]="tab.time || ''" matInput readonly

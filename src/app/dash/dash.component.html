@@ -1,4 +1,4 @@
-<mat-form-field appearance="fill" *ngIf="mapDashboard?.size" style="margin-bottom: 8px; width: 100%;">
+<mat-form-field appearance="outline" *ngIf="mapDashboard?.size" style="margin-bottom: 8px; width: 100%;">
 <!--  <mat-card-header>-->
     <mat-select [formControl]="selectedDash">
       <mat-option *ngFor="let dashboard of mapDashboard | keyvalue" [value]="dashboard.key">

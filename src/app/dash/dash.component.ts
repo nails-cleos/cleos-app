@@ -151,7 +151,7 @@ export class DashComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
-    this.destroy$.next();
+    this.destroy$.unsubscribe();
   }
 
   handleEvent(event: CalendarEvent): void {

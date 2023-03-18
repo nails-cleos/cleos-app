@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
-import { fromPromise } from 'rxjs/internal-compatibility';
+import { catchError, map, tap } from 'rxjs/operators';
 import { HttpClient } from "@angular/common/http";
 import { environment } from "../../environments/environment";
 import { MapGeocoder } from "@angular/google-maps";
+import { fromPromise } from "rxjs-compat/observable/fromPromise";
 
 declare let google: any;
 

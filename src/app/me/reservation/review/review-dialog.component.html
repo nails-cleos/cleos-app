@@ -44,7 +44,7 @@
   <ng-template #noReview>
     <app-rating (ratingHover)="onRatingHover($event)" (ratingUpdated)="onRatingChanged($event)" [hover]="hover"
                 [rating]="rating" [starCount]="starCount" color="accent"></app-rating>
-    <mat-form-field appearance="fill">
+    <mat-form-field appearance="outline">
       <mat-label>{{ 'ME.REVIEW.DETAIL' | translate }}</mat-label>
       <label>
         <textarea #message [formControl]="detail" matInput maxlength="256"></textarea>

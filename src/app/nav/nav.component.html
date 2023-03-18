@@ -156,7 +156,9 @@
             </a>
             <mat-divider></mat-divider>
             <a [routerLink]="'/auth/profile'" mat-list-item>
-              <mat-icon *ngIf="incomplete; else complete" matListItemIcon matBadgeColor="warn" [matBadge]="'*'">settings</mat-icon>
+              <mat-icon *ngIf="incomplete; else complete" matListItemIcon matBadgeColor="warn" [matBadge]="'*'">
+                settings
+              </mat-icon>
               <ng-template #complete>
                 <mat-icon matListItemIcon>settings</mat-icon>
               </ng-template>
@@ -174,7 +176,7 @@
             </a>
             <mat-divider></mat-divider>
             <mat-list-item>
-              <mat-slide-toggle (change)="setTheme($event.checked)" [checked]="checked"
+              <mat-slide-toggle (change)="setTheme($event.checked)" [checked]="checked" color="accent"
                                 mat-line>{{'COMMON.DASHBOARD.DARK_MODE' | translate }}</mat-slide-toggle>
             </mat-list-item>
           </mat-nav-list>

@@ -8,7 +8,7 @@
           </mat-card-header>
           <mat-card-content>
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'OFFICE.NAME.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="name" autocomplete="name" matInput required>
@@ -20,7 +20,7 @@
                 </mat-error>
               </mat-form-field>
               <div *ngIf="managers; else skeleton" fxLayout="row" fxLayoutAlign="space-between center">
-                <mat-form-field appearance="fill">
+                <mat-form-field appearance="outline">
                   <mat-label>{{ 'OFFICE.MANAGER.FIELD' | translate }}</mat-label>
                   <label>
                     <input [formControl]="manager" [matAutocomplete]="auto" matInput required type="text">

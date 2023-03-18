@@ -536,7 +536,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   eventTimesChanged({ event, newStart, newEnd }: CalendarEventTimesChangedEvent): void {
     event.start = newStart;
     event.end = newEnd;
-    this.refresh.next();
+    console.log(event)
+    this.refresh.next(event);
   }
 
   onChange(options: MatListOption[]): void {

@@ -12,21 +12,21 @@
           </mat-card-header>
           <mat-card-content *ngIf="room; else boxSkeleton">
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.CURRENCY.FIELD' | translate }}</mat-label>
                 <mat-icon matPrefix>{{room.currency.icon}}</mat-icon>
                 <label>
                   <input [value]="room.currency.code" disabled matInput>
                 </label>
               </mat-form-field>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'ROOM.OFFICE.FIELD' | translate }}</mat-label>
                 <mat-icon matPrefix>store</mat-icon>
                 <label>
                   <input [value]="room.office.name" disabled matInput type="text">
                 </label>
               </mat-form-field>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'ROOM.TIME_ZONE.FIELD' | translate }}</mat-label>
                 <mat-icon matPrefix>public</mat-icon>
                 <label>

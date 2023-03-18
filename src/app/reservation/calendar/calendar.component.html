@@ -9,7 +9,7 @@
       </div>
       <ng-template #dataOffice>
         <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
-          <mat-form-field *ngIf="offices; else skeleton" appearance="fill">
+          <mat-form-field *ngIf="offices; else skeleton" appearance="outline">
             <mat-label>{{ 'COMMON.ROOM.OFFICE.FIELD' | translate }}</mat-label>
             <label>
               <input (keydown)="keyDownOffice($event)" [formControl]="office" [matAutocomplete]="autoOffice"
@@ -27,7 +27,7 @@
                        [innerHTML]="'COMMON.ROOM.OFFICE.INVALID' | translate">
             </mat-error>
           </mat-form-field>
-          <mat-form-field *ngIf="roomList" appearance="fill">
+          <mat-form-field *ngIf="roomList" appearance="outline">
             <mat-label>{{ 'COMMON.ROOM.FIELD' | translate }}</mat-label>
             <label>
               <input (keydown)="keyDownRoom($event)" [formControl]="room" [matAutocomplete]="autoRoom" matInput
@@ -45,7 +45,7 @@
                        [innerHTML]="'COMMON.ROOM.INVALID' | translate">
             </mat-error>
           </mat-form-field>
-          <mat-form-field *ngIf="professionalList" appearance="fill">
+          <mat-form-field *ngIf="professionalList" appearance="outline">
             <mat-label>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</mat-label>
             <label>
               <input (keydown)="keyDownHandler($event, professional)" [formControl]="professional"

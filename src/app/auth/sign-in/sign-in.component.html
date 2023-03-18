@@ -1,6 +1,6 @@
 <form (ngSubmit)="signIn" [formGroup]="form" novalidate>
   <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-    <mat-form-field appearance="fill">
+    <mat-form-field appearance="outline">
       <mat-label>{{ 'AUTH.SIGN_IN.USERNAME.FIELD' | translate }}</mat-label>
       <label>
         <input matInput required formControlName="username" autocomplete="username" [tabIndex]="1">
@@ -9,7 +9,7 @@
         {{ 'AUTH.SIGN_IN.USERNAME.ERROR' | translate }}
       </mat-error>
     </mat-form-field>
-    <mat-form-field appearance="fill">
+    <mat-form-field appearance="outline">
       <mat-label>{{ 'AUTH.PASSWORD.FIELD' | translate }}</mat-label>
       <label>
         <input matInput required [type]="hide ? 'password' : 'text'" autocomplete="current-password"

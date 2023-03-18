@@ -11,14 +11,14 @@
         </mat-card-header>
         <mat-card-content *ngIf="group; else boxSkeleton">
           <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-            <mat-form-field appearance="fill">
+            <mat-form-field appearance="outline">
               <mat-label>{{ 'PRODUCT.DESCRIPTION.FIELD' | translate }}</mat-label>
               <label>
                 <textarea #message [value]="group.description" matInput readonly></textarea>
               </label>
               <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
             </mat-form-field>
-            <mat-form-field appearance="fill">
+            <mat-form-field appearance="outline">
               <mat-label>{{ 'PRODUCT.DURABILITY.FIELD' | translate }}</mat-label>
               <label>
                 <input [value]="group.durability" matInput readonly>
@@ -35,26 +35,26 @@
                     {{tab.id}}
                   </mat-panel-description>
                 </mat-expansion-panel-header>
-                <mat-form-field appearance="fill" class="tab-field">
+                <mat-form-field appearance="outline" class="tab-field">
                   <mat-label>{{ 'COMMON.PRODUCT.FIELD' | translate }}</mat-label>
                   <label>
                     <input [value]="tab.name" matInput readonly>
                   </label>
                 </mat-form-field>
-                <mat-form-field appearance="fill" class="tab-field">
+                <mat-form-field appearance="outline" class="tab-field">
                   <mat-label>{{ 'PRODUCT.DESCRIPTION.FIELD' | translate }}</mat-label>
                   <label>
                     <input [value]="tab.description" matInput readonly>
                   </label>
                 </mat-form-field>
-                <mat-form-field appearance="fill" class="tab-field">
+                <mat-form-field appearance="outline" class="tab-field">
                   <mat-label>{{ 'PRODUCT.PRICE.FIELD' | translate }}</mat-label>
                   <span matPrefix><mat-icon matPrefix>attach_money</mat-icon> &nbsp;</span>
                   <label>
                     <input [value]="tab.price | number:'1.2-2'" matInput readonly>
                   </label>
                 </mat-form-field>
-                <mat-form-field appearance="fill" class="tab-field">
+                <mat-form-field appearance="outline" class="tab-field">
                   <mat-label>{{ 'PRODUCT.DURATION.FIELD' | translate }}</mat-label>
                   <label>
                     <input [value]="tab.duration | durationTime" matInput readonly/>
