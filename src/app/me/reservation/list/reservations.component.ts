@@ -17,8 +17,7 @@ import { stampAnimation, transitionAnimation } from '../../../util/animation';
 import { IReview, Review } from '../../../interfaces/review';
 import { ReviewDialogComponent } from '../review/review-dialog.component';
 import { isToday } from 'date-fns';
-import { logEvent } from "firebase/analytics";
-import firebase from "firebase/compat";
+import { AngularFireAnalytics } from "@angular/fire/compat/analytics";
 
 @Component({
   selector: 'app-reservations',
@@ -48,7 +47,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   private subscription?: Subscription;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef) {
+              private breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef, private analytic: AngularFireAnalytics) {
     this.getState = this.store.select(selectReservationState);
     this.language = this.translate.currentLang;
     breakpointObserver.observe([
@@ -59,12 +58,10 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
         this.pageSize = MOBILE_PAGE_SIZE;
       }
     });
-    // console.log("User login")
-    // const analytics = firebase.analytics();
-    // logEvent(analytics, 'screen_view', {
-    //   firebase_screen: 'User redirect page',
-    //   firebase_screen_class: 'ReservationsComponent'
-    // });
+    analytic.logEvent('screen_view', {
+      firebase_screen: 'Main reservation page',
+      firebase_screen_class: 'ReservationsComponent'
+    });
   }
 
   showTimeZone(reservation: IReservationAll): boolean {
@@ -93,13 +90,13 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   onRatingChanged(reservation: IReservationAll): void {
-    const dialogRef = this.dialog.open(ReviewDialogComponent, {data: reservation});
+    const dialogRef = this.dialog.open(ReviewDialogComponent, { data: reservation });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && result.rating) {
         const review: IReview = new Review(result.rating);
         review.reservationId = reservation?.id;
-        review.detail = result.detail ? result.detail : this.translate.instant(`ME.REVIEW.RATING.${result.rating}`);
+        review.detail = result.detail ? result.detail : this.translate.instant(`ME.REVIEW.RATING.${ result.rating }`);
         this.store.dispatch(
           new fromActionsReservation.ReservationReview(review)
         );

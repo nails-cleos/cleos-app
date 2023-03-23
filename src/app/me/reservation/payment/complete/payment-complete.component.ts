@@ -43,6 +43,7 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
     setTimeout(() => {
       this.reservationId = this.route.snapshot.paramMap.get('id');
       const status = this.route.snapshot.paramMap.get('status');
+      // TODO analytic payment option
       if (this.paymentId && this.paymentId !== 'null') {
         let type;
         let referenceId;

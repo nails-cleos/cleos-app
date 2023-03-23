@@ -16,7 +16,6 @@ import { ServiceWorkerModule, SwPush } from '@angular/service-worker';
 import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
 import { AppRoutingModule } from './app-routing.module';
 import { Router } from '@angular/router';
-import { initializeApp } from "firebase/app";
 
 // Providers
 import { environment } from '../environments/environment';
@@ -47,7 +46,11 @@ import { reducers } from './store/app.states';
 // Components
 import { AppComponent } from './app.component';
 import { SharedModule } from './shared/shared.module';
-initializeApp(environment.firebase);
+import { AngularFireModule } from "@angular/fire/compat";
+import { AngularFireMessagingModule } from "@angular/fire/compat/messaging";
+import { AngularFireAnalyticsModule } from "@angular/fire/compat/analytics";
+import { AngularFireAuthModule } from "@angular/fire/compat/auth";
+import { AngularFireDatabaseModule } from "@angular/fire/compat/database";
 
 export const getAuthServiceConfigs = (): SocialAuthServiceConfig => ({
   autoLogin: false,
@@ -100,7 +103,12 @@ registerLocaleData(localeEs, 'es');
       enabled: environment.production,
       registrationStrategy: 'registerWhenStable:30000'
     }),
-    NgxMatColorPickerModule
+    NgxMatColorPickerModule,
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFireAuthModule,
+    AngularFireMessagingModule,
+    AngularFireAnalyticsModule,
+    AngularFireDatabaseModule
   ],
   providers: [
     {
@@ -125,7 +133,7 @@ registerLocaleData(localeEs, 'es');
     }
   ],
   bootstrap: [AppComponent],
-  exports: [TranslateModule]
+  exports: [TranslateModule, AngularFireMessagingModule]
 })
 export class AppModule {
   constructor(swPush: SwPush, private router: Router) {

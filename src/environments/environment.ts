@@ -21,7 +21,8 @@ export const environment = {
     messagingSenderId: "364998384255",
     appId: "1:364998384255:web:a39b48b0b30392aefcbd4a",
     measurementId: "G-Q2NR1R8MWQ",
-    vapidKey: "BJOQTLLmUxq8uJ3aE19sB7Hhda7MAx0K7aI5A9BXfA2TJyaMHU7rbLDyAGTSe-8dahCyj7zJVK8VqWHeE3PFTc8"
+    vapidKey: "BJOQTLLmUxq8uJ3aE19sB7Hhda7MAx0K7aI5A9BXfA2TJyaMHU7rbLDyAGTSe-8dahCyj7zJVK8VqWHeE3PFTc8",
+    databaseURL: "https://nails-cleos-dev-default-rtdb.europe-west1.firebasedatabase.app"
   },
   googleMapKey: 'AIzaSyBVYE6eWD4Ekmb4xdWz_N4QKk5p4Q8oIcc'
 };

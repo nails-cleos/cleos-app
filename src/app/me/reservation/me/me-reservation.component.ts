@@ -40,6 +40,7 @@ import { Role } from '../../../interfaces/token';
 import { IUser } from "../../../interfaces/user";
 import { IBank } from "../../../interfaces/bank";
 import { PaymentType } from "../../../interfaces/payment";
+import { AngularFireAnalytics } from "@angular/fire/compat/analytics";
 
 @Component({
   selector: 'app-me-reservation',
@@ -148,7 +149,8 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   constructor(private readonly translate: TranslateService, private snackBar: MatSnackBar,
               private store: Store<AppState>,
               private formBuilder: UntypedFormBuilder, private breakpointObserver: BreakpointObserver,
-              private router: Router, private route: ActivatedRoute, public dialog: MatDialog) {
+              private router: Router, private route: ActivatedRoute, public dialog: MatDialog,
+              private analytic: AngularFireAnalytics) {
     this.getState = this.store.select(selectReservationState);
     this.store.select(selectAuthState).subscribe((state: any) => this.customerId = state.user.id);
     this.price = new Price();
@@ -316,6 +318,10 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.route.params.subscribe(routeParams => {
       const reservationId = routeParams.id;
       if (reservationId) {
+        this.analytic.logEvent('screen_view', {
+          firebase_screen: `Edit customer reservation ${reservationId}`,
+          firebase_screen_class: 'MeReservationComponent'
+        });
         this.reservationId = reservationId;
         this.isEditing = true;
         this.steps = this.steps.map(value => {
@@ -688,6 +694,10 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
         this.setData(state.selected);
       }
       if (state.customerReservation && state.customerReservation.upcoming && state.customerReservation.upcoming.length) {
+        this.analytic.logEvent('screen_view', {
+          firebase_screen: 'Customer cannot create a reservation',
+          firebase_screen_class: 'MeReservationComponent'
+        });
         this.canCreate = false;
         const date = newDateTimestamp(state.customerReservation.upcoming[0].timestamp,
           state.customerReservation.upcoming[0].room.timeZone)
@@ -705,7 +715,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       } else {
         this.canCreate = true;
         this.firstTime = state.customerReservation && state.customerReservation.firstTime;
-        console.log(this.firstTime)
         if (this.firstTime) {
           this.type.setValidators([Validators.required])
         }
@@ -845,6 +854,10 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   private completeAndNext(): void {
     setTimeout(() => {
       const step = getStep(this.steps, this.myStepper.selectedIndex);
+      this.analytic.logEvent('screen_view', {
+        firebase_screen: `Customer reservation. Step: ${step?.name}`,
+        firebase_screen_class: 'MeReservationComponent'
+      });
       if (step) {
         this.completeStep(step);
         MeReservationComponent.goNext(step);

@@ -33,7 +33,6 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/firebase-messaging-sw.js",
               "src/manifest.json",
               "src/styles.scss",
               "src/sitemap.xml"
@@ -60,10 +59,6 @@
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.prod.ts"
-                },
-                {
-                  "replace": "src/firebase-messaging-sw.js",
-                  "with": "src/firebase-messaging-sw-prod.js"
                 },
                 {
                   "replace": "src/manifest.json",
@@ -202,7 +197,6 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/firebase-messaging-sw.js",
               "src/manifest.json",
               "src/styles.scss",
               "src/sitemap.xml"

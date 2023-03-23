@@ -12,6 +12,7 @@ import { AppState, selectDiscountState } from '../../../store/app.states';
 import * as fromActionsDiscount from '../../../store/discount.actions';
 import { Router } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { AngularFireAnalytics } from "@angular/fire/compat/analytics";
 
 @Component({
   selector: 'app-me-discount',
@@ -33,7 +34,7 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
   private getState: Observable<any>;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private router: Router, private cdRef: ChangeDetectorRef,
+              private router: Router, private cdRef: ChangeDetectorRef, private analytic: AngularFireAnalytics,
               private breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
@@ -44,6 +45,10 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
     this.getState = this.store.select(selectDiscountState);
+    this.analytic.logEvent('screen_view', {
+      firebase_screen: 'Referral page',
+      firebase_screen_class: 'ReferralsComponent'
+    });
   }
 
   ngAfterViewInit(): void {
