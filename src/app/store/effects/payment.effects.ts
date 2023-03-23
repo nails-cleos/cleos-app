@@ -36,6 +36,22 @@ export class PaymentEffects {
     ))
   ));
 
+  createOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentCreate)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.paymentService.create(payload.reservationId, payload.type, payload.percentage).pipe(
+      switchMap((payment: any) => of(new fromActionsPayment.PaymentSuccess(payment))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({error: err.error})))
+    ))
+  ));
+
+  paymentBankList$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentBankList)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.paymentService.getBankList(payload).pipe(
+      switchMap((payment: any) => of(new fromActionsPayment.PaymentBankListSuccess(payment))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({error: err.error})))
+    ))
+  ));
+
   save$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentSave)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.paymentService.add(payload.reservationId, payload.status, payload.paymentStatus).pipe(
@@ -82,6 +98,10 @@ export class PaymentEffects {
 
   dataSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsPayment.PaymentActionTypes.paymentSuccess)
+  ), {dispatch: false});
+
+  paymentBankListSuccess$ = createEffect(() => this.actions$.pipe(
+    ofType(fromActionsPayment.PaymentActionTypes.paymentBankListSuccess)
   ), {dispatch: false});
 
   saveSuccess$ = createEffect(() => this.actions$.pipe(

@@ -90,7 +90,9 @@
       "CREATED": "Payment complete successfully",
       "CASH": "Cash",
       "ML": "Mercado Libre",
-      "PAYPAL": "PayPal"
+      "PAYPAL": "PayPal",
+      "IDEAL": "iDeal",
+      "TRANSFER": "Wire Transfer"
     },
     "STATUS": {
       "PAYMENT": {

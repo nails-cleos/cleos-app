@@ -1,45 +1,51 @@
 import { Injectable } from '@angular/core';
-import { AngularFireDatabase } from '@angular/fire/compat/database';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { AngularFireMessaging } from '@angular/fire/compat/messaging';
-import { take } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
 import { AppState } from '../store/app.states';
 import { Store } from '@ngrx/store';
+import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import { environment } from "../../environments/environment";
 import * as fromActionsNotification from '../store/notification.actions';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MessagingService {
+  currentMessage?: BehaviorSubject<any>;
 
-  currentMessage = new BehaviorSubject(null);
-
-  constructor(private angularFireDB: AngularFireDatabase, private angularFireAuth: AngularFireAuth,
-              private angularFireMessaging: AngularFireMessaging, private store: Store<AppState>) {
-  }
-
-  listen() {
-    this.angularFireMessaging.messages.subscribe((message) => { console.log(message); });
+  constructor(private store: Store<AppState>) {
   }
 
   /**
    * update token in firebase database
    *
    * @param userId userId as a key
-   * @param token token as a value
    */
-  updateToken(userId: any, token: any): void {
+  updateToken(userId: any, token: string): void {
     this.store.dispatch(
       new fromActionsNotification.NotificationSubscribe(token)
     );
-    this.angularFireAuth.authState.pipe(take(1)).subscribe(
-      () => {
-        const data = {};
-        // @ts-ignore
-        data[userId] = token;
-        this.angularFireDB.object('fcmTokens/').update(data);
-      });
+    // this.angularFireAuth.authState.pipe(take(1)).subscribe(
+    //   () => {
+    //     const data = {};
+    //     // @ts-ignore
+    //     data[userId] = token;
+    //     this.angularFireDB.object('fcmTokens/').update(data);
+    //   });
+  }
+
+  /**
+   * hook method when new notification received in foreground
+   */
+  receiveMessage(): void {
+    const messaging = getMessaging();
+    onMessage(messaging, (payload) => {
+      console.log('Message received. ', payload);
+      if (this.currentMessage) {
+        this.currentMessage.next(payload)
+      } else {
+        this.currentMessage = new BehaviorSubject<any>(payload)
+      }
+    });
   }
 
   /**
@@ -47,21 +53,27 @@ export class MessagingService {
    *
    * @param userId userId
    */
-  requestPermission(userId: any): void {
-    this.angularFireMessaging.requestToken.subscribe(
-      (token) => {
-        this.updateToken(userId, token);
-      },
-      (err) => {
-        console.error('Unable to get permission to notify.', err);
-      }
-    );
-  }
+  // requestPermission(userId: any): void {
+  // Notification.requestPermission().then((permission) => {
+  //   console.log(permission)
+  //   if (permission === 'granted') {
+  //     this.updateToken(userId);
+  //   }
+  // });
+  // }
 
-  /**
-   * hook method when new notification received in foreground
-   */
-  receiveMessage(): void {
-    this.angularFireMessaging.messages.subscribe((payload: any) => this.currentMessage.next(payload));
+  requestPermission(userId: any) {
+    const messaging = getMessaging();
+    getToken(messaging,
+      { vapidKey: environment.firebase.vapidKey }).then(
+      (currentToken) => {
+        if (currentToken) {
+          this.updateToken(userId, currentToken);
+        } else {
+          console.warn('No registration token available. Request permission to generate one.');
+        }
+      }).catch((err) => {
+      console.error('An error occurred while retrieving token. ', err);
+    });
   }
 }

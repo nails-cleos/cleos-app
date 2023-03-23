@@ -101,27 +101,34 @@
   <mat-card-actions *ngIf="upcoming.id; else buttonSkeleton">
     <div fxFlex></div>
     <button fxShow.lt-sm fxHide class="icon-button"
-      *ngIf="upcoming.payments && upcoming.payments.length && (upcoming.state === 'APPROVED' || upcoming.state === 'PARTIALLY_PAID')"
-      [routerLink]="['/me', 'reservation', upcoming.id, 'payment']" mat-fab>
+            *ngIf="upcoming.room.paymentTypes.length > 1 && upcoming.state !== 'PAID'"
+            [routerLink]="['/me', 'reservation', upcoming.id, 'payment', 'option']" [queryParams]="{types:paymentTypes}"
+            mat-fab>
       <mat-icon class="payment-button" color="primary">payment</mat-icon>
     </button>
     <button fxHide.lt-sm fxShow class="icon-button"
-      *ngIf="upcoming.payments && upcoming.payments.length && (upcoming.state === 'APPROVED' || upcoming.state === 'PARTIALLY_PAID')"
-      [routerLink]="['/me', 'reservation', upcoming.id, 'payment']" mat-fab extended>
+            *ngIf="upcoming.room.paymentTypes.length > 1 && upcoming.state !== 'PAID'"
+            [routerLink]="['/me', 'reservation', upcoming.id, 'payment', 'option']"
+            [queryParams]="{types:paymentTypes}"
+            mat-fab extended>
       <mat-icon class="payment-button" color="primary">payment</mat-icon>
       <span>{{ 'COMMON.BUTTON.PAYMENT' | translate }}</span>
     </button>
-    <button fxShow.lt-sm fxHide class="icon-button" [routerLink]="['/me', 'reservation', upcoming.id]" color="primary" mat-fab>
+    <button fxShow.lt-sm fxHide class="icon-button" [routerLink]="['/me', 'reservation', upcoming.id]" color="primary"
+            mat-fab>
       <mat-icon>edit_calendar</mat-icon>
     </button>
-    <button fxHide.lt-sm fxShow class="icon-button" [routerLink]="['/me', 'reservation', upcoming.id]" color="primary" mat-fab extended>
+    <button fxHide.lt-sm fxShow class="icon-button" [routerLink]="['/me', 'reservation', upcoming.id]" color="primary"
+            mat-fab extended>
       <mat-icon>edit_calendar</mat-icon>
       <span>{{ 'COMMON.BUTTON.EDIT' | translate }}</span>
     </button>
-    <button fxShow.lt-sm fxHide class="icon-button" [routerLink]="['/reservation', upcoming.id]" color="primary" mat-fab>
+    <button fxShow.lt-sm fxHide class="icon-button" [routerLink]="['/reservation', upcoming.id]" color="primary"
+            mat-fab>
       <mat-icon>visibility</mat-icon>
     </button>
-    <button fxHide.lt-sm fxShow class="icon-button" [routerLink]="['/reservation', upcoming.id]" color="primary" mat-fab extended>
+    <button fxHide.lt-sm fxShow class="icon-button" [routerLink]="['/reservation', upcoming.id]" color="primary" mat-fab
+            extended>
       <mat-icon>visibility</mat-icon>
       <span>{{ 'COMMON.BUTTON.VIEW' | translate }}</span>
     </button>

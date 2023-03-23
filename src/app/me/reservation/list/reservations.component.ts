@@ -17,6 +17,8 @@ import { stampAnimation, transitionAnimation } from '../../../util/animation';
 import { IReview, Review } from '../../../interfaces/review';
 import { ReviewDialogComponent } from '../review/review-dialog.component';
 import { isToday } from 'date-fns';
+import { logEvent } from "firebase/analytics";
+import firebase from "firebase/compat";
 
 @Component({
   selector: 'app-reservations',
@@ -57,6 +59,12 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
         this.pageSize = MOBILE_PAGE_SIZE;
       }
     });
+    // console.log("User login")
+    // const analytics = firebase.analytics();
+    // logEvent(analytics, 'screen_view', {
+    //   firebase_screen: 'User redirect page',
+    //   firebase_screen_class: 'ReservationsComponent'
+    // });
   }
 
   showTimeZone(reservation: IReservationAll): boolean {

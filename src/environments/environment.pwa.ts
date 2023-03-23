@@ -6,6 +6,7 @@ export const environment = {
   baseUrl: 'https://nails.com:8443/api',
   mlUrl: 'https://sandbox.mercadopago.com.ar/checkout/v1/redirect',
   paypalUrl: 'https://sandbox.paypal.com/checkoutnow',
+  paypalClientId: 'AYQf9jG1MjUXAvV0JmBzth6lYuZdl37de84J8U92PmNyH_dbefKq6EEvGkNgh1VdA6mU2U81AY6xbfn0',
   googleClientId: '57757755712-1gcjdgbd0lkj4msirrmra9aglcb0vbmk.apps.googleusercontent.com',
   facebookClientId: '453309609006101',
   firebase: {

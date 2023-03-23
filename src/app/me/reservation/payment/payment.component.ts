@@ -47,18 +47,21 @@ export class PaymentComponent implements OnInit, OnDestroy {
   }
 
   pay(payment: IPaymentAll): void {
-    let url;
-    switch (payment.type) {
-      case PaymentType.ml:
-        url = `${environment.mlUrl}?pref_id=${payment.preferenceId}`;
-        break;
-      case PaymentType.paypal:
-        url = `${environment.paypalUrl}?token=${payment.preferenceId}`;
-        break;
-    }
-    if (url) {
+    // let url;
+    // switch (payment.type) {
+    //   case PaymentType.ml:
+    //     url = `${ environment.mlUrl }?pref_id=${ payment.preferenceId }`;
+    //     break;
+    //   case PaymentType.paypal:
+    //     url = `${ environment.paypalUrl }?token=${ payment.preferenceId }`;
+    //     break;
+    //   case PaymentType.ideal:
+    //     url = payment.preferenceId
+    //     break
+    // }
+    if (payment.link) {
       this.store.dispatch(
-        new fromActionsPayment.PaymentSend(url)
+        new fromActionsPayment.PaymentSend(payment.link)
       );
     }
   }

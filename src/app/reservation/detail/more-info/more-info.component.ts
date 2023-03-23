@@ -70,6 +70,9 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
       case PaymentType.paypal:
         url = `${environment.paypalUrl}?token=${payment.preferenceId}`;
         break;
+      case PaymentType.ideal:
+        url = payment.preferenceId;
+        break;
       default:
         return;
     }

@@ -52,6 +52,7 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
         } else if (this.payerId && this.paymentId !== 'null') {
           type = PaymentType.paypal;
           referenceId = this.payerId;
+          // TODO add ideal
         } else {
           const message = this.translate.instant('ME.PAYMENT.ERROR', {reason: 'incomplete'});
           this.store.dispatch(

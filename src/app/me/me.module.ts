@@ -33,6 +33,7 @@ import { DiscountService } from '../services/discount.service';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { CurrencyService } from '../services/currency.service';
 import { CurrencyEffects } from '../store/effects/currency.effects';
+import { OptionComponent } from './reservation/payment/option/option.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import { CurrencyEffects } from '../store/effects/currency.effects';
     BottomSheetReferralComponent,
     MeDiscountComponent,
     ReviewDialogComponent,
-    UpcomingComponent
+    UpcomingComponent,
+    OptionComponent
   ],
   imports: [
     MeRoutingModule,

@@ -13,6 +13,7 @@ import { IRoom } from '../../interfaces/room';
 import { Pagination } from '../../interfaces/pagination';
 import { IPayment } from '../../interfaces/payment';
 import { IAdditional } from '../../interfaces/additional';
+import { IBank } from "../../interfaces/bank";
 
 export interface State {
   data: IReservation | IRoomReservation[] | IReservation[] | ICustomerReservation | IAvailableDTO | null;
@@ -27,6 +28,7 @@ export interface State {
   tracking: ITracking[] | ITracking | null;
   payments: IPayment[] | null;
   history: IReservation[] | null;
+  banks: IBank[] | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -48,6 +50,7 @@ export const initialState: State = {
   tracking: null,
   payments: null,
   history: null,
+  banks: null,
   errorMessage: null,
   error: null,
   subErrors: null,
@@ -62,7 +65,7 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         // @ts-ignore
-        customerReservation: {reservations: {content: [{}, {}, {}], totalElements: 3}, upcoming: [{}]},
+        customerReservation: { reservations: { content: [{}, {}, {}], totalElements: 3 }, upcoming: [{}] },
         errorMessage: null,
         error: null,
         subErrors: null,
@@ -74,7 +77,7 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         // @ts-ignore
-        filter: {content: [{}, {}, {}], totalElements: 3},
+        filter: { content: [{}, {}, {}], totalElements: 3 },
         errorMessage: null,
         error: null,
         subErrors: null,
@@ -86,7 +89,7 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         // @ts-ignore
-        page: {content: [{}, {}, {}], totalElements: 3},
+        page: { content: [{}, {}, {}], totalElements: 3 },
         errorMessage: null,
         error: null,
         subErrors: null,
@@ -226,6 +229,19 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         history: [{}, {}, {}],
+        page: null,
+        filter: null,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: null
+      };
+    }
+    case ReservationActionTypes.paymentBankList: {
+      return {
+        ...state,
+        // @ts-ignore
+        banks: [{}, {}, {}],
         page: null,
         filter: null,
         errorMessage: null,
@@ -424,6 +440,16 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         history: action.payload,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: null
+      };
+    }
+    case ReservationActionTypes.paymentBankListSuccess: {
+      return {
+        ...state,
+        banks: action.payload,
         errorMessage: null,
         error: null,
         subErrors: null,

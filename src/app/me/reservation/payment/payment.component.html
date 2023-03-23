@@ -29,7 +29,7 @@
     <ng-container matColumnDef="type">
       <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
       <td *matCellDef="let payment" class="column-large-text" mat-cell>
-        <div *ngIf="payment.id; else skeleton">{{payment.type}}</div>
+        <div *ngIf="payment.id; else skeleton">{{ 'COMMON.PAYMENT.' + payment.type | translate }}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
@@ -70,7 +70,7 @@
           </button>
           <button (click)="notify(payment)" *ngIf="payment.status !== 'approved'" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.NOTIFY'| translate }}" matTooltipPosition="above">
-            <mat-icon color="primary">update</mat-icon>
+            <mat-icon color="primary">published_with_changes</mat-icon>
           </button>
         </div>
         <ng-template #skeleton>

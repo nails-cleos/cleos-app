@@ -16,6 +16,7 @@ export class UpcomingComponent implements OnChanges {
   @Input() upcoming: IUpcomingAll | undefined;
   @Input() showHeader: boolean;
 
+  paymentTypes?: string[];
   language: string;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog) {
@@ -55,7 +56,9 @@ export class UpcomingComponent implements OnChanges {
       const end = createNewDate(start, start.getHours() + duration.hour,
         start.getMinutes() + duration.minute);
 
-      this.upcoming = Object.assign({}, this.upcoming, {rowSpan, price, end, start});
+      this.paymentTypes = this.upcoming.room.paymentTypes.filter(it => it !== 'CASH');
+
+      this.upcoming = Object.assign({}, this.upcoming, { rowSpan, price, end, start });
     }
   }
 }

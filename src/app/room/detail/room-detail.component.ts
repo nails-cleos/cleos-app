@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import {
-  AvailabilityDate, IAddress, IAvailability, IAvailabilityDate, ILocation, IRoomAll
+  AvailabilityDate, IAvailability, IAvailabilityDate, IRoom, IRoomAll
 } from '../../interfaces/room';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
@@ -10,7 +10,7 @@ import { AppState, selectRoomState } from '../../store/app.states';
 import * as fromActionsRoom from '../../store/room.actions';
 import { IIcon } from '../room.component';
 import { createDate, getTimeZone } from '../../util/dates';
-import { getFullUserName } from '../../util/helper';
+import { areEquals, getFullUserName } from '../../util/helper';
 import { RoomIconName } from '../../util/icon';
 import { IPaymentType, paymentOptions } from '../../interfaces/payment';
 import { MatListOption } from '@angular/material/list';
@@ -70,6 +70,10 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   private availabilities: IAvailability[] = [];
   private paymentTypes: string[] = [];
 
+  private currentAvailabilities: IAvailability[] = [];
+  private currentPaymentTypes: string[] = [];
+  private currentProfessionalIds: string[] = [];
+
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
               private router: Router) {
     this.getState = this.store.select(selectRoomState);
@@ -80,28 +84,34 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
     if (this.room) {
-      const room: IRoomAll = {
+      const room: IRoom = {
         id: this.room.id,
-        availabilities: this.availabilities,
-        paymentTypes: this.paymentTypes,
-        address: {
-          name: this.room.address.name,
-          location: this.room.address.location,
-          description: this.addressDescription.value
-        } as IAddress,
-        professionalIds: this.professionals.map(({ id }) => id),
         currency: this.room.currency,
         office: this.room.office,
         timeZone: this.room.timeZone
       };
 
+      const newProfessionalIds = this.professionals.map(({ id }) => id);
+      if (!areEquals(newProfessionalIds, this.currentProfessionalIds)) {
+        room.professionalIds = newProfessionalIds;
+      }
+
+      if (this.paymentTypes !== this.currentPaymentTypes) {
+        room.paymentTypes = this.paymentTypes;
+      }
+      if (!areEquals(this.availabilities, this.currentAvailabilities)) {
+        room.availabilities = this.availabilities;
+      }
+
       if (this.address.value && this.address.value.geometry) {
         const location = this.address.value.geometry.location;
-        room.address.name = this.address.value.formatted_address;
-        room.address.location = {
-          x: location.lng(),
-          y: location.lat()
-        } as ILocation;
+        room.address = {
+          name: this.address.value.formatted_address,
+          location: {
+            x: location.lng(),
+            y: location.lat()
+          }
+        }
       }
 
       this.store.dispatch(new fromActionsRoom.RoomUpdate(room));
@@ -226,12 +236,14 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
           office: state.selected.room.office,
           timeZone: roomTimeZone.label
         } as IRoomAll;
+        this.currentPaymentTypes = state.selected.room.paymentTypes;
         this.paymentTypes = state.selected.room.paymentTypes;
         this.allProfessional = state.selected.professionals;
         state.selected.room.professionals.forEach((professional: IUserAll) => {
           this.professionals.push(professional);
           this.allProfessional = this.allProfessional?.filter(c => c.id !== professional.id);
         });
+        this.currentProfessionalIds = this.professionals.map(({ id }) => id);
         this.addressDescription.setValue(this.room.address?.description);
         this.address.setValue(this.room.address?.name);
         this.getAvailabilities(state.selected.room.availabilities);
@@ -251,6 +263,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private getAvailabilities(availabilities: IAvailability[]): void {
     availabilities.forEach((av: IAvailability) => {
+      this.currentAvailabilities = [...this.currentAvailabilities, av];
       this.addAvailability(av, 0);
 
       const availability: IAvailabilityDate = new AvailabilityDate();

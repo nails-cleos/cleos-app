@@ -10,7 +10,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../store/app.states';
 import * as fromActionsRoom from '../../store/room.actions';
 import { createDate, getTimeZone } from '../../util/dates';
-import { getFullUserName } from '../../util/helper';
+import { areEquals, getFullUserName } from '../../util/helper';
 import { RoomIconName } from '../../util/icon';
 import { IPaymentType, paymentOptions } from '../../interfaces/payment';
 import { MatListOption } from '@angular/material/list';
@@ -66,6 +66,9 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscription?: Subscription;
   private availabilities: IAvailability[] = [];
   private paymentTypes: string[] = [];
+  private currentAvailabilities: IAvailability[] = [];
+  private currentPaymentTypes: string[] = [];
+  private currentProfessionalIds: string[] = [];
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
               private router: Router) {
@@ -79,26 +82,34 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.room) {
       const room: IRoom = {
         id: this.room.id,
-        availabilities: this.availabilities,
         paymentTypes: this.paymentTypes,
-        address: {
-          name: this.room.address.name,
-          location: this.room.address.location,
-          description: this.addressDescription.value
-        } as IAddress,
-        professionalIds: this.professionals.map(({id}) => id),
         currency: this.room.currency,
         office: this.room.office,
         timeZone: this.room.timeZone
       };
 
-      if (this.address.value && this.address.value.geometry && room.address) {
+      const newProfessionalIds = this.professionals.map(({ id }) => id);
+      if (!areEquals(newProfessionalIds, this.currentProfessionalIds)) {
+        room.professionalIds = newProfessionalIds;
+      }
+
+      if (this.paymentTypes !== this.currentPaymentTypes) {
+        room.paymentTypes = this.paymentTypes;
+      }
+      if (!areEquals(this.availabilities, this.currentAvailabilities)) {
+        room.availabilities = this.availabilities;
+      }
+
+      if (this.address.value && this.address.value.geometry) {
         const location = this.address.value.geometry.location;
-        room.address.name = this.address.value.formatted_address;
-        room.address.location = {
-          x: location.lng(),
-          y: location.lat()
-        } as ILocation;
+        room.address = {
+          name: this.address.value.formatted_address,
+          description: this.addressDescription.value,
+          location: {
+            x: location.lng(),
+            y: location.lat()
+          }
+        }
       }
 
       this.store.dispatch(new fromActionsRoom.RoomUpdate(room));
@@ -278,12 +289,14 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
           timeZone: roomTimeZone.label
         } as IRoomAll;
         this.paymentTypes = state.selected.room.paymentTypes;
+        this.currentPaymentTypes = state.selected.room.paymentTypes;
         this.addressDescription.setValue(this.room.address?.description);
         this.allProfessional = state.selected.professionals;
         state.selected.room.professionals.forEach((professional: IUserAll) => {
           this.professionals.push(professional);
           this.allProfessional = this.allProfessional?.filter(c => c.id !== professional.id);
         });
+        this.currentProfessionalIds = this.professionals.map(({ id }) => id);
 
         this.getAvailabilities(state.selected.room.availabilities);
       }
@@ -299,6 +312,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private getAvailabilities(availabilities: IAvailability[]): void {
     availabilities.forEach((av: IAvailability) => {
+      this.currentAvailabilities = [...this.currentAvailabilities, av];
       this.addAvailability(av, 0);
 
       const availability: IAvailabilityDate = new AvailabilityDate();

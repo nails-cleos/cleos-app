@@ -13,17 +13,10 @@ import { EffectsModule } from '@ngrx/effects';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AsyncPipe, registerLocaleData } from '@angular/common';
 import { ServiceWorkerModule, SwPush } from '@angular/service-worker';
-import { AngularFireModule, FirebaseApp } from '@angular/fire/compat';
-import { AngularFireMessagingModule } from '@angular/fire/compat/messaging';
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/analytics';
-import { getMessaging } from "firebase/messaging";
-
 import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
-import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
-
 import { AppRoutingModule } from './app-routing.module';
 import { Router } from '@angular/router';
+import { initializeApp } from "firebase/app";
 
 // Providers
 import { environment } from '../environments/environment';
@@ -54,6 +47,7 @@ import { reducers } from './store/app.states';
 // Components
 import { AppComponent } from './app.component';
 import { SharedModule } from './shared/shared.module';
+initializeApp(environment.firebase);
 
 export const getAuthServiceConfigs = (): SocialAuthServiceConfig => ({
   autoLogin: false,
@@ -66,8 +60,11 @@ export const getAuthServiceConfigs = (): SocialAuthServiceConfig => ({
       id: FacebookLoginProvider.PROVIDER_ID,
       provider: new FacebookLoginProvider(environment.facebookClientId)
     }
-  ]
-} as SocialAuthServiceConfig);
+  ],
+  onError: (err) => {
+    console.error(err);
+  }
+});
 
 export const localStorageSyncReducer =
   (reducer: ActionReducer<any>): ActionReducer<any> => localStorageSync({ keys: ['auth'], rehydrate: true })(reducer);
@@ -103,9 +100,6 @@ registerLocaleData(localeEs, 'es');
       enabled: environment.production,
       registrationStrategy: 'registerWhenStable:30000'
     }),
-    AngularFireModule.initializeApp(environment.firebase),
-    AngularFireMessagingModule,
-    AngularFireAnalyticsModule,
     NgxMatColorPickerModule
   ],
   providers: [
@@ -134,10 +128,8 @@ registerLocaleData(localeEs, 'es');
   exports: [TranslateModule]
 })
 export class AppModule {
-  constructor(swPush: SwPush, private router: Router, firebaseApp: FirebaseApp) {
-    firebase.analytics();
+  constructor(swPush: SwPush, private router: Router) {
     if (swPush.isEnabled) {
-      const messaging = getMessaging(firebaseApp)
       // navigator.serviceWorker
       //   .ready.then((registration) => messaging.useServiceWorker(registration));
       swPush.notificationClicks.subscribe(({ action, notification }) =>

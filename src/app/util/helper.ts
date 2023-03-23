@@ -14,7 +14,6 @@ import { DialogComponent } from '../shared/dialog/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { isSameDay } from 'date-fns';
 import { Role } from '../interfaces/token';
-import { ColorEvent } from '../interfaces/dashboard';
 
 export const isRoomAdmin = (authorities?: IAuthority[]): boolean => !!authorities && authorities.length === 1 &&
   authorities.some(u => (u.authority === Role.roomAdmin));
@@ -54,7 +53,7 @@ export const getFullUserName = (user: IUserAll | IUser): string => {
     names = [user.username];
   }
 
-  names = [...names, `(${user.email})`];
+  names = [...names, `(${ user.email })`];
   return names.join(' ');
 };
 
@@ -86,7 +85,7 @@ export const getUserImage = (user: IUser | IUserAll | undefined): string | undef
     if (user.imageUrl.indexOf('http') >= 0) {
       image = user.imageUrl;
     } else if (user.image) {
-      image = `data:image/jpg;base64,${user.image}`;
+      image = `data:image/jpg;base64,${ user.image }`;
     }
   }
 
@@ -192,9 +191,9 @@ export const getProductDurability = (min: number, max: number, translate: Transl
     return undefined;
   }
   if (min !== max) {
-    return translate.instant('COMMON.PRODUCT.DURABILITY.TITLE.DIFFERENT', {min, max});
+    return translate.instant('COMMON.PRODUCT.DURABILITY.TITLE.DIFFERENT', { min, max });
   }
-  return translate.instant('COMMON.PRODUCT.DURABILITY.TITLE.EQUAL', {value: min});
+  return translate.instant('COMMON.PRODUCT.DURABILITY.TITLE.EQUAL', { value: min });
 };
 
 export const groupDurability = (group: IProductGroup, translate: TranslateService): string => {
@@ -207,7 +206,7 @@ export const groupDurability = (group: IProductGroup, translate: TranslateServic
     key = 'COMMON.PRODUCT.DURABILITY.DIFFERENT';
   }
 
-  return translate.instant(key, {min, max});
+  return translate.instant(key, { min, max });
 };
 
 export const createProductGroupService = (groups: Map<string, GroupService>, list: IProductAll[], currency: string,
@@ -217,7 +216,7 @@ export const createProductGroupService = (groups: Map<string, GroupService>, lis
     const mapGroup = groups.get(groupId);
     const keyGroup: IGroupService = mapGroup ? mapGroup : new GroupService(groupId, product.group.name);
 
-    product = Object.assign({}, product, {currency, type: ServiceType.product});
+    product = Object.assign({}, product, { currency, type: ServiceType.product });
 
     if (isSelected) {
       keyGroup.selectedProducts = [...keyGroup.selectedProducts, product];
@@ -238,7 +237,7 @@ export const createRoomOffice = (rooms: IRoom[] | undefined): Map<string, IOffic
       if (of && of.rooms) {
         of.rooms = [...of.rooms, room];
       } else if (room.office) {
-        of = Object.assign({}, room.office, {rooms: [room]});
+        of = Object.assign({}, room.office, { rooms: [room] });
       } else {
         return oMap;
       }
@@ -251,21 +250,21 @@ export const roomName = (room: IRoom | IRoomAll): string => {
   const gmt = roomGMT(room);
   const currency = roomCurrency(room);
   return room.currency && room.office ?
-    `${room.office.name} - ${currency}${gmt}` : '';
+    `${ room.office.name } - ${ currency }${ gmt }` : '';
 };
 
 export const roomDetail = (room: IRoom | IRoomAll): string => {
   const gmt = roomGMT(room);
   const currency = roomCurrency(room);
-  return `${currency}${gmt}`;
+  return `${ currency }${ gmt }`;
 };
 
 export const roomCurrency = (room: IRoom | IRoomAll): string =>
-  room.currency ? `${room.currency.code} (${currencySymbol(room.currency)})` : '';
+  room.currency ? `${ room.currency.code } (${ currencySymbol(room.currency) })` : '';
 
 export const roomGMT = (room: IRoom | IRoomAll): string => {
   const tz = getTimeZone(room.timeZone);
-  return tz.gmt ? ` - (${tz.gmt})` : '';
+  return tz.gmt ? ` - (${ tz.gmt })` : '';
 };
 
 export const currencySymbol = (currency: ICurrency): string => {
@@ -316,9 +315,9 @@ export const createDialog = (key: string, value: string, locale: string, transla
   }
 
   const title = translate.instant('COMMON.TIME_ZONE.TITLE');
-  const content = translate.instant(`COMMON.TIME_ZONE.${key}`, {localTime, timeZoneTime, value, arg});
+  const content = translate.instant(`COMMON.TIME_ZONE.${ key }`, { localTime, timeZoneTime, value, arg });
   dialog.open(DialogComponent, {
-    data: {title, content, hideNoButton: true, hideOkButton: true}
+    data: { title, content, hideNoButton: true, hideOkButton: true }
   });
 };
 
@@ -335,6 +334,13 @@ const totalPaid = (payments: IPayment[] | undefined): number => {
 
   return total;
 };
+
+export const areEquals = (array1: any[], array2: any[]): boolean => (array1.length === array2.length &&
+  array1.every((element_1) => array2.some((element_2) =>
+      Object.keys(element_1).every((key) => element_1[key] === element_2[key])
+    )
+  )
+);
 
 const getDiscount = (discount: IDiscount, price: number): number => {
   let value = 0;

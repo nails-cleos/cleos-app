@@ -75,11 +75,13 @@
             "M": "<span class='bold'>Distancia:</span> {{distance}} Metros"
           }
         }
-      }
+      },
+      "PAYMENT_MESSAGE": "Si pagas, la reserva está aprobada. De lo contrario, debe esperar hasta que {{professional}} la apruebe."
     },
     "PAYMENT": {
       "ERROR_TEXT": "Error",
       "ERROR": "Pago incompleto.\n{{reason}}",
+      "DETAIL": "Detalle de pago",
       "LIST": {
         "COLUMN": {
           "AMOUNT": "Importe",
@@ -88,6 +90,16 @@
         "ERROR": {
           "NO_CONTENT": "No hay pagos"
         }
+      },
+      "TYPE": {
+        "FIELD": "Forma de pago",
+        "REQUIRED": "Forma de pago es <b>requerido</b>",
+        "NO_CONTENT": "No hay forma de pago"
+      },
+      "BANK": {
+        "FIELD": "Banco",
+        "REQUIRED": "Banco es <b>requerido</b>",
+        "INVALID": "Banco es invalido"
       }
     },
     "REFERRAL": {

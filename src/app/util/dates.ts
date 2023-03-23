@@ -208,36 +208,38 @@ export const getDiffTime = (maxDate: Date, minDate: Date): string => {
 };
 
 export const getAvailability = (room: IRoom): any => {
-  const monday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'MONDAY')[0];
-  const tuesday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'TUESDAY')[0];
-  const wednesday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'WEDNESDAY')[0];
-  const thursday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'THURSDAY')[0];
-  const friday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'FRIDAY')[0];
-  const saturday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'SATURDAY')[0];
-  const sunday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'SUNDAY')[0];
-  let exclude: number[] = [];
-  if (!monday) {
-    exclude = [...exclude, 1];
+  if (room.availabilities) {
+    const monday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'MONDAY')[0];
+    const tuesday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'TUESDAY')[0];
+    const wednesday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'WEDNESDAY')[0];
+    const thursday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'THURSDAY')[0];
+    const friday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'FRIDAY')[0];
+    const saturday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'SATURDAY')[0];
+    const sunday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'SUNDAY')[0];
+    let exclude: number[] = [];
+    if (!monday) {
+      exclude = [...exclude, 1];
+    }
+    if (!tuesday) {
+      exclude = [...exclude, 2];
+    }
+    if (!wednesday) {
+      exclude = [...exclude, 3];
+    }
+    if (!thursday) {
+      exclude = [...exclude, 4];
+    }
+    if (!friday) {
+      exclude = [...exclude, 5];
+    }
+    if (!saturday) {
+      exclude = [...exclude, 6];
+    }
+    if (!sunday) {
+      exclude = [...exclude, 0];
+    }
+    return { monday, tuesday, wednesday, thursday, friday, saturday, sunday, exclude };
   }
-  if (!tuesday) {
-    exclude = [...exclude, 2];
-  }
-  if (!wednesday) {
-    exclude = [...exclude, 3];
-  }
-  if (!thursday) {
-    exclude = [...exclude, 4];
-  }
-  if (!friday) {
-    exclude = [...exclude, 5];
-  }
-  if (!saturday) {
-    exclude = [...exclude, 6];
-  }
-  if (!sunday) {
-    exclude = [...exclude, 0];
-  }
-  return { monday, tuesday, wednesday, thursday, friday, saturday, sunday, exclude };
 };
 
 export const getMinMaxDate = (day: number, date: any, rooms: IRoomAll[]): any => {

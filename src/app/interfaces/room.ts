@@ -13,7 +13,7 @@ export interface IRoom {
   officeId?: string;
   office?: IOffice;
   timeZone?: string;
-  availabilities: IAvailability[];
+  availabilities?: IAvailability[];
   address?: IAddress;
   paymentTypes?: string[];
 }

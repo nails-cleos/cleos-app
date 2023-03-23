@@ -90,7 +90,9 @@
       "CREATED": "Pago completado",
       "CASH": "Efectivo",
       "ML": "Mercado Libre",
-      "PAYPAL": "PayPal"
+      "PAYPAL": "PayPal",
+      "IDEAL": "iDeal",
+      "TRANSFER": "Transferencia bancaria"
     },
     "STATUS": {
       "PAYMENT": {

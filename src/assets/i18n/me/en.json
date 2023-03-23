@@ -75,11 +75,13 @@
             "M": "<span class='bold'>Distance:</span> {{distance}} Meters"
           }
         }
-      }
+      },
+      "PAYMENT_MESSAGE": "If you pay, the reservation is approved. Otherwise, you need to wait until {{professional}} approved."
     },
     "PAYMENT": {
       "ERROR_TEXT": "Payment error",
       "ERROR": "Payment incomplete.\n{{reason}}",
+      "DETAIL": "Payment detail",
       "LIST": {
         "COLUMN": {
           "AMOUNT": "Amount",
@@ -88,6 +90,16 @@
         "ERROR": {
           "NO_CONTENT": "No payment"
         }
+      },
+      "TYPE": {
+        "FIELD": "Payment Type",
+        "REQUIRED": "Payment Type is <b>required</b>",
+        "NO_CONTENT": "No Payment type"
+      },
+      "BANK": {
+        "FIELD": "Bank",
+        "REQUIRED": "Bank is <b>required</b>",
+        "INVALID": "Bank is invalid"
       }
     },
     "REFERRAL": {

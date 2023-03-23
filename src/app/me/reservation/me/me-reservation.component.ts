@@ -38,6 +38,8 @@ import { TimeZoneSnackBarComponent } from '../../../shared/snak/time-zone/time-z
 import { MatDialog } from '@angular/material/dialog';
 import { Role } from '../../../interfaces/token';
 import { IUser } from "../../../interfaces/user";
+import { IBank } from "../../../interfaces/bank";
+import { PaymentType } from "../../../interfaces/payment";
 
 @Component({
   selector: 'app-me-reservation',
@@ -66,6 +68,9 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     Validators.required, requireMatch
   ]);
 
+  eventGroup!: UntypedFormGroup;
+  event: UntypedFormControl = new UntypedFormControl('', [Validators.required])
+
   discounts?: IUserDiscount[];
   showDiscount = false;
   price: IPrice;
@@ -93,18 +98,27 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     Validators.required, requireMatch
   ]);
 
+  typeForm!: UntypedFormGroup;
+  types?: string[]
+  type: UntypedFormControl = new UntypedFormControl('');
+
+  bankList?: IBank[];
+  filteredBank?: Observable<IBank[] | undefined>;
+  bank: UntypedFormControl = new UntypedFormControl('');
+
   additionalList: IAdditionalAll[] = [];
   additionalSelected: IAdditionalAll[] = [];
 
   availableList = new Map<string, any[]>();
-  eventSelected?: Date;
   selectedIndex = 1;
   smallScreen?: boolean;
   isPreview = false;
+  isPayment = false;
   locale: string;
 
   isEditing = false;
   canCreate = false;
+  firstTime = true;
   distance?: string;
   maxDate: Date;
   maxDateFormat: string;
@@ -152,12 +166,13 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       this.room.setValue(this.extras.room);
       this.startDate.setValue(this.extras.date);
     }
-    const preview = new Step(4, 'preview', () => this.create);
-    const book = new Step(3, 'book_online', () => this.callStepFive, preview);
+    const preview = new Step(5, 'preview', () => this.create);
+    const payment = new Step(4, 'payment', () => this.callStepSix, preview);
+    const book = new Step(3, 'book_online', () => this.callStepFive, payment);
     const additional = new Step(2, 'post_add', () => this.callStepFour, book, false);
     const product = new Step(1, 'home_repair_service', () => this.callStepThree, additional);
     const room = new Step(0, 'room', () => this.callStepTwo, product);
-    this.steps = [room, product, additional, book, preview];
+    this.steps = [room, product, additional, book, payment, preview];
   }
 
   get professionalName(): string {
@@ -169,12 +184,15 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   get callStepTwo(): void {
-    console.log("products")
     if (this.roomForm.invalid) {
       return;
     }
     this.professionalId = this.professional.value.id;
     this.roomId = this.room.value.id;
+    this.types = this.room.value.paymentTypes.filter((p: PaymentType) => ![PaymentType.cash, PaymentType.transfer].includes(p));
+    if (this.types?.includes(PaymentType.ideal)) {
+      this.getBankList();
+    }
     this.getProductList();
     return this.completeAndNext();
   }
@@ -191,8 +209,8 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     if (this.productForm.invalid) {
       return;
     }
-    if (this.eventSelected !== this.startDate.value) {
-      this.eventSelected = undefined;
+    if (this.event.value !== this.startDate.value) {
+      this.event.setValue(undefined)
       this.time = undefined;
     }
     this.duration = totalDuration(this.product.value, this.additionalSelected);
@@ -212,14 +230,23 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   get callStepFive(): void {
-    if (!this.eventSelected) {
+    if (this.eventGroup.invalid) {
       this.errors.schedule = true;
       return;
     }
 
-    this.date = newDate(this.eventSelected);
+    this.date = newDate(this.event.value);
     this.endDate = createNewDate(this.date, this.date.getHours() + this.duration.hour,
       this.date.getMinutes() + this.duration.minute);
+
+    this.isPayment = true;
+    return this.completeAndNext();
+  }
+
+  get callStepSix(): void {
+    if (this.typeForm.invalid) {
+      return;
+    }
 
     this.isPreview = true;
     return this.completeAndNext();
@@ -228,8 +255,11 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   get back(): void {
     if (this.isPreview) {
       this.isPreview = false;
+    }
+    if (this.isPayment) {
+      this.isPayment = false;
     } else {
-      this.eventSelected = undefined;
+      this.event.setValue(undefined);
     }
     this.myStepper.selectedIndex = getBackIndex(this.steps, this.myStepper.selectedIndex);
     return;
@@ -248,14 +278,14 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
     const role = Role.customer;
     if (this.isEditing && this.reservation) {
+      // TODO paid ??
       reservation.id = this.reservation.id;
       reservation.productId = valueChange(this.product.value.id, this.reservation.product.id);
 
       this.store.dispatch(
         new fromActionsReservation.Edit({ reservation, role })
       );
-    }
-    else {
+    } else {
       reservation.productId = this.product.value.id;
       reservation.discountId = this.discount.value;
       this.store.dispatch(
@@ -299,8 +329,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
           }
         });
         this.getReservation(reservationId);
-      }
-      else {
+      } else {
         this.getRoomList();
       }
     });
@@ -338,15 +367,15 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   myFilter = (d: Date | null): boolean => filterDateRoom(d, this.room.value);
 
   displayFnGroup(group: IProductGroup): string {
-    return group ? `${group.name}` : '';
+    return group ? `${ group.name }` : '';
   }
 
   displayFnProduct(product: IProduct): string {
-    return product ? `${product.name}` : '';
+    return product ? `${ product.name }` : '';
   }
 
   displayFnOffice(office: IOffice): string {
-    return office ? `${office.name}` : '';
+    return office ? `${ office.name }` : '';
   }
 
   displayFnRoom(room: IRoom): string {
@@ -357,19 +386,23 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     return professional ? getFullUserName(professional) : '';
   }
 
+  displayFnBank(bank: IBank): string {
+    return bank ? `${ bank.name }` : '';
+  }
+
   dateNoContent(date?: any): string {
     return formatDateName(createNewDate(date ? date : this.startDate.value), this.translate.currentLang, this.measure);
   }
 
   selectDate(datetime: any): void {
-    this.eventSelected = datetime.date;
+    this.event.setValue(datetime.date);
     this.time = datetime.time;
   }
 
   areEquals(datetime: any): boolean {
     let result = false;
-    if (this.eventSelected) {
-      result = isEqual(this.eventSelected, datetime.date) && this.time === datetime.time;
+    if (this.event.value) {
+      result = isEqual(this.event.value, datetime.date) && this.time === datetime.time;
     }
     return result;
   }
@@ -449,6 +482,12 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     );
   }
 
+  private getBankList(): void {
+    this.store.dispatch(
+      new fromActionsReservation.PaymentBankList(PaymentType.ideal)
+    );
+  }
+
   private createForm(): void {
     this.productForm = this.formBuilder.group({
       product: this.product,
@@ -458,6 +497,13 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.roomForm = this.formBuilder.group({
       room: this.room,
       professional: this.professional
+    });
+    this.eventGroup = this.formBuilder.group({
+      event: this.event
+    });
+    this.typeForm = this.formBuilder.group({
+      type: this.type,
+      bank: this.bank
     });
     this.valueChange();
   }
@@ -474,12 +520,10 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
           this.room.setValue(room);
           this.roomId = this.room.value.id;
         }
-      }
-      else {
+      } else {
         if (this.roomList?.length === 1) {
           this.room.setValue(this.roomList[0]);
-        }
-        else {
+        } else {
           this.room.setValue('');
         }
       }
@@ -503,12 +547,10 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
             this.professional.setValue(professional);
             this.professionalId = this.professional.value.id;
           }
-        }
-        else {
+        } else {
           if (this.professionalList?.length === 1) {
             this.professional.setValue(this.professionalList[0]);
-          }
-          else {
+          } else {
             this.professional.setValue('');
           }
         }
@@ -529,12 +571,10 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       if (product) {
         this.product.setValue(product);
         this.productId = this.product.value.id;
-      }
-      else {
+      } else {
         if (this.productList?.length === 1) {
           this.product.setValue(this.productList[0]);
-        }
-        else {
+        } else {
           this.product.setValue('');
         }
       }
@@ -557,6 +597,13 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
         if (userDiscount) {
           this.price = newDiscount(this.price, userDiscount.discount);
         }
+      }
+    });
+
+    this.typeForm.valueChanges.subscribe(value => {
+      console.log(value?.type)
+      if (value?.type === 'IDEAL') {
+        this.bank.setValidators([Validators.required, requireMatch])
       }
     });
   }
@@ -587,6 +634,10 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       map(addressName => addressName ? this.filterProfessional(addressName) : this.professionalList
         ? this.professionalList.slice() : this.professionalList)
     );
+
+    this.filteredBank = this.bank.valueChanges.pipe(startWith(''),
+      map(value => typeof value === 'string' ? value : value.name),
+      map(name => name ? this.filterBank(name) : this.bankList ? this.bankList.slice() : this.bankList));
   }
 
   private clean(): void {
@@ -597,15 +648,12 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
+      console.log(state)
       this.additionalList = state.productDiscount?.additionalList;
       if (this.additionalList && this.additionalList.length) {
-        this.steps = this.steps.map(value => {
-          if (value.order === 2) {
-            value.enable = true;
-            return value;
-          }
-          return value;
-        });
+        const sp = this.steps[2];
+        sp.enable = true;
+        this.steps[2] = sp;
       }
       if (state.productDiscount?.products) {
         this.groups = Array.from(
@@ -619,14 +667,15 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
           this.datePicker?.open();
         }
       }
+      this.bankList = state.banks
       this.discounts = state.productDiscount?.discounts.map((ud: IUserDiscount) => {
         let title = ud.discount.name;
         switch (ud.discount.type) {
           case DiscountType.money:
-            title = `$ ${ud.discount.amount} ${title}`;
+            title = `$ ${ ud.discount.amount } ${ title }`;
             break;
           case DiscountType.percentage:
-            title = `${ud.discount.amount} % ${title}`;
+            title = `${ ud.discount.amount } % ${ title }`;
             break;
         }
         return Object.assign({}, ud, { title });
@@ -653,9 +702,13 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
           this.clean();
           this.router.navigate(['me', 'reservations']);
         });
-      }
-      else {
+      } else {
         this.canCreate = true;
+        this.firstTime = state.customerReservation && state.customerReservation.firstTime;
+        console.log(this.firstTime)
+        if (this.firstTime) {
+          this.type.setValidators([Validators.required])
+        }
       }
       // Multiple professionals
       // if (state.data) {
@@ -701,7 +754,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
               this.myStepper.selectedIndex = 0;
               break;
           }
-          this.eventSelected = undefined;
+          this.event.setValue(undefined);
           this.errors[value.field] = value.message;
           this.productForm.controls[value.field]?.setErrors({ incorrect: true });
         });
@@ -751,6 +804,12 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     return this.professionalList?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
   }
 
+  private filterBank(name: string): IBank[] | undefined {
+    const filterValue = name.toLowerCase();
+
+    return this.bankList?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
+  }
+
   private completeStep(step: IStep): void {
     this.myStepper.next();
     step.completed = true;
@@ -764,7 +823,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.reservation = reservation;
     this.isPreview = false;
     const date = newDateTimestamp(reservation.timestamp, this.reservation.room.timeZone)
-    this.eventSelected = date;
+    this.event.setValue(date);
     this.time = getTime(date, this.locale)
     this.room.setValue(reservation.room);
     this.professional.setValue(reservation.professional);
@@ -777,6 +836,9 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.professionalId = reservation.professional.id;
     if (this.isEditing) {
       this.getProductList();
+      const sp = this.steps[4];
+      sp.enable = false;
+      this.steps[4] = sp;
     }
   }
 

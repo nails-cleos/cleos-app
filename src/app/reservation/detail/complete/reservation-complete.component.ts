@@ -9,7 +9,14 @@ import { IGroupService, IPrice, IProduct, IProductGroup, Price } from '../../../
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IPaymentAll, PaymentType } from '../../../interfaces/payment';
-import { createProductGroupService, getPrice, getProductDurability, newAdditional, newExtra, newPrice } from '../../../util/helper';
+import {
+  createProductGroupService,
+  getPrice,
+  getProductDurability,
+  newAdditional,
+  newExtra,
+  newPrice
+} from '../../../util/helper';
 import { formatTime, totalDuration } from '../../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
 import { map, startWith } from 'rxjs/operators';
@@ -45,8 +52,9 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   description: UntypedFormControl = new UntypedFormControl();
   extraPrice: UntypedFormControl = new UntypedFormControl();
   type: UntypedFormControl = new UntypedFormControl(PaymentType.cash);
+  transfer: UntypedFormControl = new UntypedFormControl();
 
-  types: string[] = Object.values(PaymentType);
+  types: string[] = [PaymentType.cash, PaymentType.transfer];
   price: IPrice;
 
   durability?: string;
@@ -89,10 +97,11 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       const price = this.extraPrice.value;
       const paymentType = this.type.value;
       const additionalIds = this.additionalSelected.map(additional => additional.id);
+      const transfer = this.transfer.value;
       this.store.dispatch(
         new fromActionsReservation.Complete({
           reservationId,
-          extras: {productId, description, price, paymentType, additionalIds},
+          extras: {productId, description, price, paymentType, additionalIds, transfer},
           isDashboard: this.isDashboard
         })
       );
@@ -149,7 +158,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
         this.product.setValue(this.reservation.product);
         this.additionalSelected = this.reservation.additional ? this.reservation.additional
           .map(ad => Object.assign({}, ad, { id: ad.key })) : [];
-        this.types = this.reservation.room.paymentTypes;
+        this.types = [...this.reservation.room.paymentTypes, PaymentType.transfer];
       }
       if (state.productDiscount) {
         this.additionalList = state.productDiscount.additionalList;
@@ -174,7 +183,8 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       product: this.product,
       description: this.description,
       extraPrice: this.extraPrice,
-      type: this.type
+      type: this.type,
+      transfer: this.transfer
     });
     this.valueChange();
   }

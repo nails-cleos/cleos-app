@@ -119,6 +119,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   customerChange: UntypedFormControl = new UntypedFormControl();
   reference: UntypedFormControl = new UntypedFormControl();
 
+  eventGroup!: UntypedFormGroup;
+  event: UntypedFormControl = new UntypedFormControl('', [Validators.required])
+
   viewDate: Date = getNow();
   daysInWeek = 7;
   weekendDays: number[] = [0, 6];
@@ -126,7 +129,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   day: IDay;
   refresh: Subject<any> = new Subject();
 
-  eventSelected?: CalendarEvent;
   locale: string;
   smallScreen?: boolean;
   isPreview = false;
@@ -221,7 +223,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.isPreview = false;
     }
     else {
-      this.eventSelected = undefined;
+      this.event.setValue(undefined)
     }
     this.myStepper.selectedIndex = getBackIndex(this.steps, this.myStepper.selectedIndex);
     return;
@@ -298,7 +300,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   get callStepSeven(): void {
     this.errors.schedule = false;
     this.errors.overlapping = false;
-    if (!this.eventSelected) {
+    if (!this.event.value) {
       this.errors.schedule = true;
       return;
     }
@@ -311,8 +313,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     reservation.customerId = this.customer.value.id;
     reservation.roomId = this.room.value.id;
     reservation.professionalId = this.professional.value.id;
-    if (this.eventSelected) {
-      reservation.start = this.eventSelected.start.toLocaleString(API_LOCALE);
+    if (this.event.value) {
+      reservation.start = this.event.value.start.toLocaleString(API_LOCALE);
       reservation.timeZone = getCurrentTimeZone();
       reservation.additionalIds = this.additionalSelected?.map(value => value.id);
 
@@ -351,7 +353,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private static goNext(step: IStep): void {
-    console.log("NEXT")
     const nextStep = step.next;
     if (nextStep && !nextStep.enable) {
       nextStep.call();
@@ -536,7 +537,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   eventTimesChanged({ event, newStart, newEnd }: CalendarEventTimesChangedEvent): void {
     event.start = newStart;
     event.end = newEnd;
-    console.log(event)
     this.refresh.next(event);
   }
 
@@ -564,7 +564,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       let title;
       let content;
       const eventsOverlapping = getOverlapEvent(this.events, start, end, this.professionalId);
-      if (eventsOverlapping.length && eventsOverlapping[0] !== this.eventSelected) {
+      if (eventsOverlapping.length && eventsOverlapping[0] !== this.event.value) {
         let message = '';
         eventsOverlapping.forEach(e => {
           message += `<div>${e.title}</div>`;
@@ -573,7 +573,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         content = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.CONTENT', { data: message });
       }
       else {
-        if (!this.eventSelected && !id) {
+        if (!this.event.value && !id) {
           title = this.translate.instant('RESERVATION.EVENT.TITLE');
           content = this.translate.instant('RESERVATION.EVENT.CONTENT', { date: start.toLocaleString(API_LOCALE) });
         }
@@ -642,6 +642,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.configurationForm = this.formBuilder.group({
       customerChange: this.customerChange,
       reference: this.reference
+    });
+    this.eventGroup = this.formBuilder.group({
+      event: this.event
     });
     this.valueChanges();
   }
@@ -745,9 +748,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       if (value && this.discounts) {
         const userDiscount = this.discounts.find(d => d.id === value);
         if (userDiscount) {
-          console.log(this.price.priceWithDiscount)
           this.price = newDiscount(this.price, userDiscount.discount);
-          console.log(this.price)
         }
       }
     });
@@ -812,6 +813,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private addReservations(): void {
     this.reservations?.forEach(it => {
+      console.log(it)
       if (it.id === this.reservationId) {
         return;
       }
@@ -933,9 +935,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.customers = state.customers;
       this.additionalList = state.productDiscount?.additionalList;
       if (this.additionalList && this.additionalList.length) {
-        // const sp = this.steps[3];
-        // sp.enable = true;
-        // this.steps[3] = sp;
+        const sp = this.steps[3];
+        sp.enable = true;
+        this.steps[3] = sp;
       }
       if (state.productDiscount?.products) {
         this.groups = Array.from(
@@ -977,15 +979,14 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
             else {
               date = createNewDate(this.date.value, this.date.value.getHours(), this.date.value.getMinutes());
             }
-            console.log("RESERVATION START", this.reservation.start)
-            if (isEqual(newDate(this.reservation.start), date)) {
+            if (isEqual(newDateTimestamp(this.reservation.timestamp), date)) {
               const duration = reservationDuration(this.reservation);
               const end = createNewDate(date, date.getHours() + duration.hour,
                 date.getMinutes() + duration.minute);
               const event = this.createNewEvent(date, end, this.reservation.state, this.reservation.room.timeZone,
                 this.reservation.id);
               if (event) {
-                this.eventSelected = event;
+                this.event.setValue(event)
                 this.events = [...this.events, event];
               }
             }
@@ -993,7 +994,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
               this.segmentClick(date, this.reservation.state, this.reservation.id);
             }
           }
-          else if ((this.extras?.date || this.start.value && this.myStepper.selectedIndex === 4) && !this.eventSelected) {
+          else if ((this.extras?.date || this.start.value && this.myStepper.selectedIndex === 4) && !this.event.value) {
             this.segmentClick(this.date.value, 'CREATED');
           }
         }
@@ -1011,7 +1012,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
               this.myStepper.selectedIndex = 0;
               break;
           }
-          this.eventSelected = undefined;
+          this.event.setValue(undefined);
           this.errors[value.field] = value.message;
           this.customerForm.controls[value.field]?.setErrors({ incorrect: true });
           this.officeForm.controls[value.field]?.setErrors({ incorrect: true });
@@ -1027,11 +1028,11 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        if (this.eventSelected) {
-          const i = this.events.indexOf(this.eventSelected);
+        if (this.event.value) {
+          const i = this.events.indexOf(this.event.value);
           this.events.splice(i, 1);
         }
-        this.eventSelected = event;
+        this.event.setValue(event);
         this.events = [...this.events, event];
       }
     });
@@ -1076,7 +1077,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   private completeAndNext(): void {
     setTimeout(() => {
       const step = getStep(this.steps, this.myStepper.selectedIndex);
-      console.log("Complete", step)
       if (step) {
         this.completeStep(step);
         ReservationComponent.goNext(step);
@@ -1085,7 +1085,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private completeStep(step: IStep): void {
-    console.log("stepper", this.myStepper)
     this.myStepper.selectedIndex = step.order + 1;
     step.completed = true;
     this.steps[step.order] = step;

@@ -68,6 +68,8 @@ export interface IRoomReservation {
 export interface ICustomerReservation {
   reservations: Pagination<IReservationAll>;
   upcoming: IUpcomingAll[];
+
+  firstTime: boolean;
 }
 
 export interface IAvailableDTO {

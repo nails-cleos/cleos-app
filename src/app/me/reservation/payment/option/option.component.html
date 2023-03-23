@@ -1,0 +1,161 @@
+<ng-template #stepOne>
+  <form [formGroup]="typeForm">
+    <div *ngIf="!types?.length; else data" class="no-content bold">
+      {{'ME.PAYMENT.TYPE.NO_CONTENT' | translate}}
+    </div>
+    <ng-template #data>
+      <div fxLayout="column" fxLayoutAlign="space-evenly start">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'ME.PAYMENT.TYPE.FIELD' | translate }}</mat-label>
+          <mat-select [formControl]="type" required>
+            <mat-option *ngFor="let t of types" [value]="t">
+              {{ 'COMMON.PAYMENT.' + t | translate }}
+            </mat-option>
+          </mat-select>
+          <mat-error [innerHTML]="'ME.PAYMENT.TYPE.REQUIRED' | translate">
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field *ngIf="bankList?.length && type.value === 'IDEAL'" appearance="outline">
+          <mat-label>{{ 'ME.PAYMENT.BANK.FIELD' | translate }}</mat-label>
+          <label>
+            <input (keydown)="keyDownHandler($event, bank)" [formControl]="bank" [matAutocomplete]="autoBank" matInput
+                   required type="text">
+          </label>
+          <mat-autocomplete #autoBank="matAutocomplete" [displayWith]="displayFnBank">
+            <mat-option *ngFor="let bank of filteredBank | async" [value]="bank">
+<!--              <mat-icon matSuffix>search</mat-icon>-->
+              <img matSuffix class="icon" [src]="bank.logos[0].url" style="width: 28px" [alt]="bank.id">
+              {{bank.name}}
+            </mat-option>
+          </mat-autocomplete>
+          <mat-error *ngIf="bank.hasError('required')"
+                     [innerHTML]="'ME.PAYMENT.BANK.REQUIRED' | translate">
+          </mat-error>
+          <mat-error *ngIf="bank.hasError('requireMatch')"
+                     [innerHTML]="'ME.PAYMENT.BANK.INVALID' | translate">
+          </mat-error>
+          <mat-error *ngIf="errors['bank']">
+            {{errors['bank']}}
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </ng-template>
+  </form>
+</ng-template>
+
+<ng-template #stepTwo>
+  <mat-card appearance="outlined" *ngIf="payment && payment.id; else skeleton">
+    <mat-card-header>
+      <mat-card-title>{{ 'ME.RESERVATION.PREVIEW' | translate }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-list>
+        <mat-divider></mat-divider>
+        <div matListItemTitle>{{ 'ME.PAYMENT.DETAIL' | translate}}</div>
+        <mat-list-item>
+          <mat-icon matListItemIcon>account_balance</mat-icon>
+          <div mat-line>{{ 'ME.PAYMENT.TYPE.FIELD' | translate}}</div>
+          <div mat-line>{{type.value}}</div>
+        </mat-list-item>
+        <mat-list-item *ngIf="bank.value">
+          <mat-icon matListItemIcon>person_pin</mat-icon>
+          <div mat-line>{{ 'COMMON.PROFESSIONAL.FIELD' | translate}}</div>
+          <div mat-line>{{bank.value.name}}</div>
+        </mat-list-item>
+        <mat-divider></mat-divider>
+        <div mat-subheader>{{ 'COMMON.PRODUCT.FIELD' | translate}}</div>
+        <mat-list-item>
+          <mat-icon matListItemIcon>home_repair_service</mat-icon>
+          <div mat-line>{{ 'ME.RESERVATION.PRODUCT.NAME.FIELD' | translate}}</div>
+          <div mat-line>{{payment.reservation?.product?.name}}</div>
+        </mat-list-item>
+        <mat-list-item>
+          <mat-icon matListItemIcon>timer</mat-icon>
+          <div mat-line>{{ 'ME.RESERVATION.PRODUCT.DURATION.FIELD' | translate}}</div>
+          <div mat-line>{{payment.reservation?.product?.duration | durationTime}}</div>
+        </mat-list-item>
+        <mat-list-item>
+          <mat-icon matListItemIcon>{{payment.reservation?.room?.currency?.icon}}</mat-icon>
+          <div mat-line><span class="bold">{{ 'COMMON.LABEL.TOTAL' | translate}}</span></div>
+          <div mat-line><span class="bold">{{payment.amount}}</span></div>
+        </mat-list-item>
+      </mat-list>
+    </mat-card-content>
+  </mat-card>
+  <ng-template #skeleton>
+    <div class="ssc-line"></div>
+  </ng-template>
+</ng-template>
+
+
+<ng-template [ngIfElse]="bigScreen" [ngIf]="smallScreen">
+  <mat-vertical-stepper #stepper [linear]="true">
+    <mat-step [completed]="getStepCompleted(0)" [editable]="true" [state]="getStepName(0)"
+              [stepControl]="typeForm">
+      <ng-template matStepLabel>{{ 'ME.PAYMENT.TYPE.FIELD' | translate }}</ng-template>
+      <div class="flex-container full" fxLayout="column">
+        <div class="full" fxLayout="column" fxLayoutAlign="space-between start">
+          <ng-container *ngTemplateOutlet="stepOne"></ng-container>
+        </div>
+      </div>
+      <div>
+        <button [form]="typeForm" appBackButton class="icon-button" color="accent" mat-mini-fab type="button">
+          <mat-icon>keyboard_return</mat-icon>
+        </button>
+        <button (click)="callStepTwo" [disabled]="typeForm.invalid" class="icon-button" color="primary" mat-mini-fab type="button">
+          <mat-icon>arrow_downward</mat-icon>
+        </button>
+      </div>
+    </mat-step>
+    <mat-step [completed]="getStepCompleted(1)" [editable]="true" [state]="getStepName(1)">
+      <ng-template matStepLabel>{{ 'ME.RESERVATION.PREVIEW' | translate }}</ng-template>
+      <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
+      <div>
+        <button (click)="back" class="icon-button" color="accent" mat-mini-fab>
+          <mat-icon>arrow_upward</mat-icon>
+        </button>
+        <button (click)="pay" class="icon-button" [disabled]="!payment?.id" color="primary" mat-mini-fab type="button">
+          <mat-icon>credit_score</mat-icon>
+        </button>
+      </div>
+    </mat-step>
+  </mat-vertical-stepper>
+</ng-template>
+
+<ng-template #bigScreen>
+  <mat-horizontal-stepper #stepper [linear]="true">
+    <mat-step [completed]="getStepCompleted(0)" [editable]="true" [state]="getStepName(0)"
+              [stepControl]="typeForm">
+      <ng-template matStepLabel>{{ 'ME.PAYMENT.TYPE.FIELD' | translate }}</ng-template>
+      <div class="flex-container" fxLayout="row">
+        <div class="full" fxLayout="row" fxLayoutAlign="space-between start">
+          <div class="middle" fxLayout="column">
+            <ng-container *ngTemplateOutlet="stepOne"></ng-container>
+          </div>
+        </div>
+      </div>
+      <div class="divider">
+        <button [form]="typeForm" appBackButton color="accent" mat-fab extended type="button">
+          <mat-icon>keyboard_return</mat-icon>
+          {{ 'COMMON.BUTTON.BACK' | translate }}</button>
+        <button (click)="callStepTwo" [disabled]="typeForm.invalid" class="raised-button" color="primary" mat-fab extended type="button">
+          {{ 'COMMON.BUTTON.NEXT' | translate }}
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+    </mat-step>
+    <mat-step [completed]="getStepCompleted(1)" [editable]="true" [state]="getStepName(1)">
+      <ng-template matStepLabel>{{ 'ME.RESERVATION.PREVIEW' | translate }}</ng-template>
+      <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
+      <div class="divider">
+        <button (click)="back" color="accent" mat-fab extended>
+          <mat-icon>arrow_back</mat-icon>
+          {{ 'COMMON.BUTTON.BACK' | translate }}</button>
+        <button (click)="pay" [disabled]="!payment?.id" class="raised-button" color="primary" mat-fab extended type="button">
+          {{ 'COMMON.BUTTON.PAYMENT' | translate }}
+          <mat-icon>credit_score</mat-icon>
+        </button>
+      </div>
+    </mat-step>
+  </mat-horizontal-stepper>
+</ng-template>

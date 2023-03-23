@@ -83,7 +83,6 @@ export class NavComponent implements OnInit, OnDestroy {
   private authSubscription?: Subscription;
   private notificationSubscription?: Subscription;
   private isAuthorized = false;
-  private message: any;
   private cssClass?: string;
   private authSubject: Subject<boolean> = new Subject<boolean>();
 
@@ -203,7 +202,7 @@ export class NavComponent implements OnInit, OnDestroy {
         this.image = getUserImage(user);
         this.messagingService.requestPermission(user.id);
         this.messagingService.receiveMessage();
-        this.message = this.messagingService.currentMessage.subscribe((value: any) => {
+        this.messagingService.currentMessage?.subscribe((value: any) => {
           if (value) {
             const notification = {
               id: value.data.id,

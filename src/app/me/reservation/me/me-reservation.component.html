@@ -249,6 +249,53 @@
 </ng-template>
 
 <ng-template #stepFive>
+  <form [formGroup]="typeForm">
+    <div *ngIf="!types?.length; else data" class="no-content bold">
+      {{'ME.PAYMENT.TYPE.NO_CONTENT' | translate}}
+    </div>
+    <ng-template #data>
+      <div fxLayout="column" fxLayoutAlign="space-evenly start">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'ME.PAYMENT.TYPE.FIELD' | translate }}</mat-label>
+          <mat-select [formControl]="type" [required]="firstTime">
+            <mat-option *ngIf="!firstTime">--</mat-option>
+            <mat-option *ngFor="let t of types" [value]="t">
+              {{ 'COMMON.PAYMENT.' + t | translate }}
+            </mat-option>
+          </mat-select>
+          <mat-error [innerHTML]="'ME.PAYMENT.TYPE.REQUIRED' | translate">
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field *ngIf="bankList?.length && type.value === 'IDEAL'" appearance="outline">
+          <img *ngIf="bank.value" matPrefix [src]="bank.value.logos[0].url" style="width: 28px"
+               [alt]="bank.value.id">
+          <mat-label>{{ 'ME.PAYMENT.BANK.FIELD' | translate }}</mat-label>
+          <label>
+            <input (keydown)="keyDownHandler($event, bank)" [formControl]="bank" [matAutocomplete]="autoBank" matInput
+                   required type="text">
+          </label>
+          <mat-autocomplete #autoBank="matAutocomplete" [displayWith]="displayFnBank">
+            <mat-option *ngFor="let bank of filteredBank | async" [value]="bank">
+              <img [src]="bank.logos[0].url" style="width: 28px" [alt]="bank.id">
+              {{bank.name}}
+            </mat-option>
+          </mat-autocomplete>
+          <mat-error *ngIf="bank.hasError('required')"
+                     [innerHTML]="'ME.PAYMENT.BANK.REQUIRED' | translate">
+          </mat-error>
+          <mat-error *ngIf="bank.hasError('requireMatch')"
+                     [innerHTML]="'ME.PAYMENT.BANK.INVALID' | translate">
+          </mat-error>
+          <mat-error *ngIf="errors['bank']">
+            {{errors['bank']}}
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </ng-template>
+  </form>
+</ng-template>
+
+<ng-template #stepSix>
   <mat-card appearance="outlined" *ngIf="isPreview">
     <mat-card-header>
       <mat-card-title>{{ 'ME.RESERVATION.PREVIEW' | translate }}</mat-card-title>
@@ -436,7 +483,8 @@
           </button>
         </div>
       </mat-step>
-      <mat-step [completed]="getStepCompleted(2)" [editable]="getStepEnabled(2)" [state]="getStepName(2)">
+      <mat-step [completed]="getStepCompleted(2)" [editable]="getStepEnabled(2)" [state]="getStepName(2)"
+                [optional]="true">
         <ng-template matStepLabel>{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepThree"></ng-container>
         <div class="divider">
@@ -448,22 +496,38 @@
           </button>
         </div>
       </mat-step>
-      <mat-step [completed]="getStepCompleted(3)" [editable]="getStepEnabled(3)" [state]="getStepName(3)">
+      <mat-step [completed]="getStepCompleted(3)" [editable]="getStepEnabled(3)" [state]="getStepName(3)"
+                [stepControl]="eventGroup">
         <ng-template matStepLabel>{{ 'ME.RESERVATION.SCHEDULE.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepFour"></ng-container>
         <div>
           <button (click)="back" class="icon-button" color="accent" mat-mini-fab>
             <mat-icon>arrow_upward</mat-icon>
           </button>
-          <button (click)="callStepFive" [disabled]="!eventSelected" class="icon-button" color="primary" mat-mini-fab
+          <button (click)="callStepFive" [disabled]="eventGroup.invalid" class="icon-button" color="primary"
+                  mat-mini-fab
                   type="button">
             <mat-icon>arrow_downward</mat-icon>
           </button>
         </div>
       </mat-step>
-      <mat-step [completed]="getStepCompleted(4)" [editable]="getStepEnabled(4)" [state]="getStepName(4)">
-        <ng-template matStepLabel>{{ 'ME.RESERVATION.PREVIEW' | translate }}</ng-template>
+      <mat-step [completed]="getStepCompleted(4)" [editable]="getStepEnabled(4)" [state]="getStepName(4)"
+                [optional]="!firstTime" [stepControl]="typeForm">
+        <ng-template matStepLabel>{{ 'ME.PAYMENT.DETAIL' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepFive"></ng-container>
+        <div>
+          <button (click)="back" class="icon-button" color="accent" mat-mini-fab>
+            <mat-icon>arrow_upward</mat-icon>
+          </button>
+          <button (click)="callStepSix" [disabled]="typeForm.invalid" class="icon-button" color="primary" mat-mini-fab
+                  type="button">
+            <mat-icon>arrow_downward</mat-icon>
+          </button>
+        </div>
+      </mat-step>
+      <mat-step [completed]="getStepCompleted(5)" [editable]="getStepEnabled(5)" [state]="getStepName(5)">
+        <ng-template matStepLabel>{{ 'ME.RESERVATION.PREVIEW' | translate }}</ng-template>
+        <ng-container *ngTemplateOutlet="stepSix"></ng-container>
         <div>
           <button (click)="back" class="icon-button" color="accent" mat-mini-fab>
             <mat-icon>arrow_upward</mat-icon>
@@ -558,7 +622,8 @@
           </button>
         </div>
       </mat-step>
-      <mat-step [completed]="getStepCompleted(2)" [editable]="getStepEnabled(2)" [state]="getStepName(2)">
+      <mat-step [completed]="getStepCompleted(2)" [editable]="getStepEnabled(2)" [state]="getStepName(2)"
+                [optional]="true">
         <ng-template matStepLabel>{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepThree"></ng-container>
         <div>
@@ -572,23 +637,39 @@
           </button>
         </div>
       </mat-step>
-      <mat-step [completed]="getStepCompleted(3)" [editable]="getStepEnabled(3)" [state]="getStepName(3)">
+      <mat-step [completed]="getStepCompleted(3)" [editable]="getStepEnabled(3)" [state]="getStepName(3)"
+                [stepControl]="eventGroup">
         <ng-template matStepLabel>{{ 'ME.RESERVATION.SCHEDULE.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepFour"></ng-container>
         <div class="divider">
           <button (click)="back" color="accent" mat-fab extended type="button">
             <mat-icon>arrow_back</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}</button>
-          <button (click)="callStepFive" [disabled]="!eventSelected" class="raised-button" color="primary"
+          <button (click)="callStepFive" [disabled]="eventGroup.invalid" class="raised-button" color="primary"
                   mat-fab extended type="button">
             {{ 'COMMON.BUTTON.NEXT' | translate }}
             <mat-icon>arrow_forward</mat-icon>
           </button>
         </div>
       </mat-step>
-      <mat-step [completed]="getStepCompleted(4)" [editable]="getStepEnabled(4)" [state]="getStepName(4)">
-        <ng-template matStepLabel>{{ 'ME.RESERVATION.PREVIEW' | translate }}</ng-template>
+      <mat-step [completed]="getStepCompleted(4)" [editable]="getStepEnabled(4)" [state]="getStepName(4)"
+                [optional]="!firstTime" [stepControl]="typeForm">
+        <ng-template matStepLabel>{{ 'ME.PAYMENT.DETAIL' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepFive"></ng-container>
+        <div class="divider">
+          <button (click)="back" color="accent" mat-fab extended>
+            <mat-icon>arrow_back</mat-icon>
+            {{ 'COMMON.BUTTON.BACK' | translate }}</button>
+          <button (click)="callStepSix" [disabled]="typeForm.invalid" class="raised-button" color="primary" mat-fab
+                  extended type="button">
+            {{ 'COMMON.BUTTON.NEXT' | translate }}
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+        </div>
+      </mat-step>
+      <mat-step [completed]="getStepCompleted(5)" [editable]="getStepEnabled(5)" [state]="getStepName(5)">
+        <ng-template matStepLabel>{{ 'ME.RESERVATION.PREVIEW' | translate }}</ng-template>
+        <ng-container *ngTemplateOutlet="stepSix"></ng-container>
         <div class="divider">
           <button (click)="back" color="accent" mat-fab extended>
             <mat-icon>arrow_back</mat-icon>

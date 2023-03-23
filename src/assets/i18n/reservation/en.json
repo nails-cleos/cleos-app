@@ -110,7 +110,10 @@
     "PAYMENT": {
       "TITLE": "Payments",
       "PAID": "Paid",
-      "TYPE": "Payment type"
+      "TYPE": "Payment type",
+      "TRANSFER": {
+        "FIELD": "Transfer reference"
+      }
     },
     "ACTION": {
       "APPROVE": "Approve",

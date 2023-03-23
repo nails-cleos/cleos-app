@@ -174,12 +174,14 @@ export class RoomComponent implements OnInit, OnDestroy {
   addAvailability(availability: IAvailability, step: number): void {
     this.setIcon(availability.day, RoomIconName.eventAvailable);
 
-    const index = this.room.availabilities.findIndex((e) => e.day === availability.day);
+    if (this.room.availabilities) {
+      const index = this.room.availabilities.findIndex((e) => e.day === availability.day);
 
-    if (index === -1) {
-      this.room.availabilities = [...this.room.availabilities, availability];
-    } else {
-      this.room.availabilities[index] = availability;
+      if (index === -1) {
+        this.room.availabilities = [...this.room.availabilities, availability];
+      } else {
+        this.room.availabilities[index] = availability;
+      }
     }
 
     this.step = step;
@@ -187,9 +189,11 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   ignore(day: string, step: number): void {
     this.setIcon(day, RoomIconName.eventBusy);
-    const index = this.room.availabilities.findIndex((e) => e.day === day);
-    if (index > -1) {
-      this.room.availabilities.splice(index, 1);
+    if (this.room.availabilities) {
+      const index = this.room.availabilities.findIndex((e) => e.day === day);
+      if (index > -1) {
+        this.room.availabilities.splice(index, 1);
+      }
     }
     this.step = step;
   }
@@ -349,7 +353,7 @@ export class RoomComponent implements OnInit, OnDestroy {
       return true;
     }
 
-    if (this.room.availabilities.length === 0) {
+    if (!this.room.availabilities || this.room.availabilities.length === 0) {
       this.errors.availability = true;
       this.setStep(0);
       return true;

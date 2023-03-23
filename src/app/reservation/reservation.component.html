@@ -411,14 +411,14 @@
           <mat-icon matListItemIcon>event</mat-icon>
           <div mat-line>
             <div>
-              {{eventSelected?.start | date:'short':room.value.timeZone:locale}}
-              <button (click)="openDialog(eventSelected?.start)" *ngIf="showTimeZone" mat-icon-button type="button">
+              {{event.value.start | date:'short':room.value.timeZone:locale}}
+              <button (click)="openDialog(event.value?.start)" *ngIf="showTimeZone" mat-icon-button type="button">
                 <mat-icon>info_outline</mat-icon>
               </button>
             </div>
             <div>
-              {{eventSelected?.end | date:'short':room.value.timeZone:locale}}
-              <button (click)="openDialog(eventSelected?.end)" *ngIf="showTimeZone" mat-icon-button type="button">
+              {{event.value?.end | date:'short':room.value.timeZone:locale}}
+              <button (click)="openDialog(event.value?.end)" *ngIf="showTimeZone" mat-icon-button type="button">
                 <mat-icon>info_outline</mat-icon>
               </button>
             </div>
@@ -528,7 +528,8 @@
         </button>
       </div>
     </mat-step>
-    <mat-step [completed]="getStepCompleted(3)" [editable]="getStepEnabled(3)" [state]="getStepName(3)">
+    <mat-step [completed]="getStepCompleted(3)" [editable]="getStepEnabled(3)" [state]="getStepName(3)"
+              [optional]="true">
       <ng-template matStepLabel>{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepFour"></ng-container>
       <div class="divider">
@@ -556,14 +557,15 @@
         </button>
       </div>
     </mat-step>
-    <mat-step [completed]="getStepCompleted(5)" [editable]="getStepEnabled(5)" [state]="getStepName(5)">
+    <mat-step [completed]="getStepCompleted(5)" [editable]="getStepEnabled(5)" [state]="getStepName(5)"
+    [stepControl]="eventGroup">
       <ng-template matStepLabel>{{ 'RESERVATION.SCHEDULE.FIELD' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepSix"></ng-container>
       <div class="divider">
         <button (click)="back" color="accent" class="icon-button" mat-fab>
           <mat-icon>arrow_upward</mat-icon>
         </button>
-        <button (click)="callStepSeven" color="primary" class="icon-button" mat-fab type="button">
+        <button (click)="callStepSeven" [disabled]="eventGroup.invalid" color="primary" class="icon-button" mat-fab type="button">
           <mat-icon>arrow_downward</mat-icon>
         </button>
       </div>
@@ -689,7 +691,8 @@
         </button>
       </div>
     </mat-step>
-    <mat-step [completed]="getStepCompleted(3)" [editable]="getStepEnabled(3)" [state]="getStepName(3)">
+    <mat-step [completed]="getStepCompleted(3)" [editable]="getStepEnabled(3)" [state]="getStepName(3)"
+    [optional]="true">
       <ng-template matStepLabel>{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepFour"></ng-container>
       <div>
@@ -721,14 +724,15 @@
         </button>
       </div>
     </mat-step>
-    <mat-step [completed]="getStepCompleted(5)" [editable]="getStepEnabled(5)" [state]="getStepName(5)">
+    <mat-step [completed]="getStepCompleted(5)" [editable]="getStepEnabled(5)" [state]="getStepName(5)"
+    [stepControl]="eventGroup">
       <ng-template matStepLabel>{{ 'RESERVATION.SCHEDULE.FIELD' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepSix"></ng-container>
       <div class="divider">
         <button (click)="back" color="accent" mat-fab extended class="icon-button">
           <mat-icon>arrow_back</mat-icon>
           {{ 'COMMON.BUTTON.BACK' | translate }}</button>
-        <button (click)="callStepSeven" color="primary"
+        <button (click)="callStepSeven" [disabled]="eventGroup.invalid" color="primary"
                 mat-fab extended class="icon-button" type="button">
           <mat-icon>arrow_forward</mat-icon>
           {{ 'COMMON.BUTTON.NEXT' | translate }}</button>

@@ -4,7 +4,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
 // import { MatGoogleMapsAutocompleteModule } from '@angular-material-extensions/google-maps-autocomplete';
-
 import { AppMaterialModule } from '../util/app-material.module';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { SortByPipe } from '../pipes/sort-by.pipe';
