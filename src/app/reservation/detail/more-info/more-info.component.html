@@ -131,11 +131,11 @@
       <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
       <td *matCellDef="let payment" mat-cell>
         <div *ngIf="payment.id; else skeleton">
-          <button (click)="resend(payment)" *ngIf="payment.status !== 'approved'" mat-icon-button
+          <button (click)="resend(payment)" *ngIf="payment.status !== 'APPROVED'" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.RESEND' | translate }}" matTooltipPosition="above">
             <mat-icon color="primary">autorenew</mat-icon>
           </button>
-          <button (click)="copy(payment)" *ngIf="payment.status !== 'approved'" mat-icon-button
+          <button (click)="copy(payment)" *ngIf="payment.status !== 'APPROVED'" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.COPY' | translate }}" matTooltipPosition="above">
             <mat-icon color="primary">content_copy</mat-icon>
           </button>

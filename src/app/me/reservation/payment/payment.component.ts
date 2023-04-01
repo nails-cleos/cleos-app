@@ -47,18 +47,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
   }
 
   pay(payment: IPaymentAll): void {
-    // let url;
-    // switch (payment.type) {
-    //   case PaymentType.ml:
-    //     url = `${ environment.mlUrl }?pref_id=${ payment.preferenceId }`;
-    //     break;
-    //   case PaymentType.paypal:
-    //     url = `${ environment.paypalUrl }?token=${ payment.preferenceId }`;
-    //     break;
-    //   case PaymentType.ideal:
-    //     url = payment.preferenceId
-    //     break
-    // }
+    console.log(payment.link)
     if (payment.link) {
       this.store.dispatch(
         new fromActionsPayment.PaymentSend(payment.link)
@@ -79,6 +68,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       this.dataSource = state.selected;
+      console.log(state)
       if (state.message) {
         this.clean();
         this.router.navigate(['reservation', this.reservationId]);
@@ -92,7 +82,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
   private getPayments(): void {
     if (!this.dataSource) {
       this.store.dispatch(
-        new fromActionsPayment.PaymentFindByReservationId(this.reservationId)
+        new fromActionsPayment.PaymentFindByReservationId({ reservationId: this.reservationId, redirect: true })
       );
     }
   }

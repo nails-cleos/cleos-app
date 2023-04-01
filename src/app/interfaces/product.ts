@@ -78,6 +78,7 @@ export interface IPrice {
   priceWithExtras: number;
   priceWithAdditional: number;
   isPaid: boolean;
+  toPaid: number;
 }
 
 export class Price implements IPrice {
@@ -91,9 +92,11 @@ export class Price implements IPrice {
   priceWithExtras: number;
   priceWithAdditional: number;
   isPaid: boolean;
+  toPaid: number;
 
   constructor(price: number = 0, discount: number = 0, extra: number = 0, additional: number = 0, total: number = 0,
-              totalPaid: number = 0, priceWithDiscount: number = 0, priceWithExtras = 0, priceWithAdditional = 0) {
+              totalPaid: number = 0, priceWithDiscount: number = 0, priceWithExtras = 0, priceWithAdditional = 0,
+              toPaid: number = 0) {
     this.amount = price;
     this.discount = discount;
     this.extra = extra;
@@ -103,6 +106,7 @@ export class Price implements IPrice {
     this.priceWithDiscount = priceWithDiscount;
     this.priceWithExtras = priceWithExtras;
     this.priceWithAdditional = priceWithAdditional;
+    this.toPaid = toPaid;
     this.isPaid = this.amount > 0 && this.totalPaid >= this.total;
   }
 }

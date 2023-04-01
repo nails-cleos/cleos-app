@@ -62,24 +62,12 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
   }
 
   copy(payment: IPaymentAll): void {
-    let url;
-    switch (payment.type) {
-      case PaymentType.ml:
-        url = `${environment.mlUrl}?pref_id=${payment.preferenceId}`;
-        break;
-      case PaymentType.paypal:
-        url = `${environment.paypalUrl}?token=${payment.preferenceId}`;
-        break;
-      case PaymentType.ideal:
-        url = payment.preferenceId;
-        break;
-      default:
-        return;
+    if (payment.link) {
+      this.clipboard.copy(payment.link);
+      this.snackBar.open(this.translate.instant('PAYMENT.COPY'), 'OK', {
+        duration: 5000
+      });
     }
-    this.clipboard.copy(url);
-    this.snackBar.open(this.translate.instant('PAYMENT.COPY'), 'OK', {
-      duration: 5000
-    });
   }
 
   private subscribe(): void {

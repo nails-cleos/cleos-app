@@ -158,7 +158,8 @@ export class ReservationEffects {
       switchMap((response: any) => of(new fromActionsReservation.ReservationSaveSuccess({
         message: this.translate.instant('COMMON.RESERVATION.CREATED', {date: newDateTimestamp(response.timestamp)}),
         id: response.id,
-        role: payload.role
+        role: payload.role,
+        paymentLink: response.paymentLink
       }))), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({
         error: err.error
       })))
@@ -341,6 +342,10 @@ export class ReservationEffects {
   saveSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.reservationSaveSuccess),
     tap((data: any) => {
+      if (data.payload.paymentLink) {
+        window.open(data.payload.paymentLink, '_self');
+        return;
+      }
       let navigation: string[] = [];
       switch (data.payload.role) {
         case Role.customer:

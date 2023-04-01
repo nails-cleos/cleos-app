@@ -82,6 +82,8 @@
       "ERROR_TEXT": "Error",
       "ERROR": "Pago incompleto.\n{{reason}}",
       "DETAIL": "Detalle de pago",
+      "DEPOSIT_30": "Pagar un depósito del 30% de la reserva",
+      "TOTAL": "Pagar total de la reserva",
       "LIST": {
         "COLUMN": {
           "AMOUNT": "Importe",

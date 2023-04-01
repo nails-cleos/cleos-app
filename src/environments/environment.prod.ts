@@ -4,9 +4,6 @@ export const environment = {
   title: 'Cleos',
   version: require('../../package.json').version,
   baseUrl: 'https://nailscleos.nl:8443/api',
-  mlUrl: 'https://www.mercadopago.com.ar/checkout/v1/redirect',
-  paypalUrl: 'https://paypal.com/checkoutnow',
-  paypalClientId: 'AYQf9jG1MjUXAvV0JmBzth6lYuZdl37de84J8U92PmNyH_dbefKq6EEvGkNgh1VdA6mU2U81AY6xbfn0',
   googleClientId: '174727853234-hoc8nq88jjpn8fj3sjkaj7ook2egbmq4.apps.googleusercontent.com',
   facebookClientId: '523962545388946',
   firebase: {

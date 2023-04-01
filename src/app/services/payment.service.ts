@@ -4,6 +4,7 @@ import { PAGE_SIZE } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
 import { IPayment, IPaymentStatus, PaymentType } from '../interfaces/payment';
 import { IBank } from "../interfaces/bank";
+import { IReservationPayment } from "../interfaces/reservation";
 
 @Injectable()
 export class PaymentService {
@@ -37,9 +38,8 @@ export class PaymentService {
     return this.http.post<IPayment>(`${ this.reservationUrlV1 }/${ reservationId }/${ this.url }/${ status }`, paymentStatus);
   }
 
-  public create(reservationId: string, type: string, percentage: string): Observable<IPayment> {
-    const params = new HttpParams().set('type', type).set('percentage', percentage);
-    return this.http.get<IPayment>(`${ this.urlV1 }/reservations/${ reservationId }`, { params });
+  public create(reservationId: string, payment: IReservationPayment): Observable<IPayment> {
+    return this.http.post<IPayment>(`${ this.urlV1 }/reservations/${ reservationId }`,  payment);
   }
 
   public recreate(id: string, paymentType: string): Observable<IPayment> {

@@ -6,13 +6,14 @@ import { AppState, selectPaymentState } from "../../../../store/app.states";
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from "@angular/forms";
 import { Observable, Subscription } from "rxjs";
 import { requireMatch } from "../../../../util/validators";
-import { IBank } from "../../../../interfaces/bank";
+import { banks, IBank } from "../../../../interfaces/bank";
 import { map, startWith } from "rxjs/operators";
 import { BreakpointObserver, Breakpoints } from "@angular/cdk/layout";
-import { getBackIndex, getStep } from "../../../../util/helper";
+import { getBackIndex, getPrice, getStep } from "../../../../util/helper";
 import { IStep, Step } from "../../../../interfaces/step";
 import { MatStepper } from "@angular/material/stepper";
-import { IPaymentAll, PaymentType } from "../../../../interfaces/payment";
+import { IPaymentAll } from "../../../../interfaces/payment";
+import { IPrice } from "../../../../interfaces/product";
 
 @Component({
   selector: 'app-option',
@@ -31,11 +32,14 @@ export class OptionComponent implements OnInit, OnDestroy {
     Validators.required
   ]);
 
-  bankList?: IBank[];
+  bankList?: IBank[] = banks();
   filteredBank?: Observable<IBank[] | undefined>;
   bank: UntypedFormControl = new UntypedFormControl('');
+  percentage: UntypedFormControl = new UntypedFormControl('');
 
   payment?: IPaymentAll;
+
+  price?: IPrice;
 
   private readonly steps: IStep[];
 
@@ -69,12 +73,17 @@ export class OptionComponent implements OnInit, OnDestroy {
     if (this.typeForm.invalid) {
       return;
     }
-    this.store.dispatch(
-      new fromActionsPayment.PaymentCreate({
-        reservationId: this.reservationId,
+
+    const payload = {
+      reservationId: this.reservationId,
+      payment : {
         type: this.type.value,
-        percentage: 'TOTAL'
-      })
+        percentage: this.percentage.value,
+        bic: this.bank.value.bic
+      }
+    }
+    this.store.dispatch(
+      new fromActionsPayment.PaymentCreate(payload)
     );
     return this.completeAndNext();
   }
@@ -87,114 +96,6 @@ export class OptionComponent implements OnInit, OnDestroy {
     const preview = new Step(1, 'preview', () => this.pay);
     const type = new Step(0, 'type', () => this.callStepTwo, preview);
     this.steps = [type, preview];
-    // console.log(1)
-    // loadScript({
-    //   'client-id': environment.paypalClientId,
-    //   'components': 'buttons,payment-fields,marks,funding-eligibility',
-    //   'enable-funding': 'ideal',
-    //   'currency': "EUR"
-    // }).then((paypal) => {
-    //   if (paypal) {
-    //     // @ts-ignore
-    //     paypal.Marks({
-    //       fundingSource: paypal?.FUNDING?.IDEAL
-    //     }).render('#ideal-mark');
-    //
-    //     // @ts-ignore
-    //     paypal.PaymentFields({
-    //       fundingSource: paypal?.FUNDING?.IDEAL,
-    //       style: {
-    //         variables: {
-    //           fontFamily: "'Helvetica Neue', Arial, sans-serif",
-    //           fontSizeBase: "0.9375rem",
-    //           fontSizeSm: "0.93rem",
-    //           fontSizeM: "0.93rem",
-    //           fontSizeLg: "1.0625rem",
-    //           textColor: "#2c2e2f",
-    //           colorTextPlaceholder: "#2c2e2f",
-    //           colorBackground: "#fff",
-    //           colorInfo: "#0dcaf0",
-    //           colorDanger: "#d20000",
-    //           borderRadius: "0.2rem",
-    //           borderColor: "#dfe1e5",
-    //           borderWidth: "1px",
-    //           borderFocusColor: "black",
-    //           spacingUnit: "10px",
-    //         },
-    //         rules: {
-    //           ".Input": {},
-    //           ".Input:hover": {},
-    //           ".Input:focus": {
-    //           },
-    //           ".Input:active": {},
-    //           ".Input--invalid": {},
-    //           ".Label": {},
-    //           ".Error": {
-    //             marginTop: '2px',
-    //           },
-    //         },
-    //       },
-    //       fields: {
-    //         name: {
-    //           value: "",
-    //         },
-    //       },
-    //     })
-    //       .render("#ideal-fields");
-    //
-    //     // @ts-ignore
-    //
-    //     paypal.Buttons({
-    //       fundingSource: paypal.FUNDING?.IDEAL,
-    //       style: {
-    //         label: "pay",
-    //       },
-    //       createOrder(data, actions) {
-    //         const order = {
-    //           purchase_units: [
-    //             {
-    //               amount: {
-    //                 currency_code: "EUR",
-    //                 value: "49.99",
-    //               },
-    //             },
-    //           ],
-    //         };
-    //         return actions.order.create(order);
-    //       },
-    //       // @ts-ignore
-    //       onApprove(data, actions) {
-    //         fetch(`/capture/${data.orderID}`, {
-    //           method: "post",
-    //         })
-    //           .then((res) => res.json())
-    //           .then((data) => {
-    //             console.log(data);
-    //             // swal(
-    //             //   "Order Captured!",
-    //             //   `Id: ${data.id}, ${Object.keys(data.payment_source)[0]}, ${
-    //             //     data.purchase_units[0].payments.captures[0].amount.currency_code
-    //             //   } ${data.purchase_units[0].payments.captures[0].amount.value}`,
-    //             //   "success"
-    //             // );
-    //           })
-    //           .catch(console.error);
-    //       },
-    //       onCancel(data, actions) {
-    //         console.log(data);
-    //         // swal("Order Canceled", `ID: ${data.orderID}`, "warning");
-    //       },
-    //       onError(err) {
-    //         console.error(err);
-    //       },
-    //     }).render("#ideal-btn");
-    //   } else {
-    //     console.error("PayPal is null")
-    //   }
-    // })
-    //   .catch((err) => {
-    //     console.error("failed to load the PayPal JS SDK script", err);
-    //   });
   }
 
   ngOnInit(): void {
@@ -207,7 +108,7 @@ export class OptionComponent implements OnInit, OnDestroy {
     this.createForm();
     this.subscribe();
     this.clean();
-    this.getBanks();
+    this.getPaymentFindByReservationId();
   }
 
   ngOnDestroy(): void {
@@ -236,8 +137,12 @@ export class OptionComponent implements OnInit, OnDestroy {
 
   private subscribe() {
     this.subscription = this.getState.subscribe(state => {
-      console.log(state)
-      this.bankList = state.banks
+      if (state.selected && state.selected[0].reservation) {
+        this.price = getPrice(state.selected[0].reservation, state.selected);
+        if (this.price?.totalPaid > 0) {
+          this.percentage.setValue('TOTAL');
+        }
+      }
       this.payment = state.data;
     });
   }
@@ -245,13 +150,15 @@ export class OptionComponent implements OnInit, OnDestroy {
   private createForm(): void {
     this.typeForm = this.formBuilder.group({
       type: this.type,
-      bank: this.bank
+      bank: this.bank,
+      percentage: this.percentage
     });
 
     this.typeForm.valueChanges.subscribe(value => {
       if (value?.type === 'IDEAL') {
-        this.bank.setValidators([Validators.required, requireMatch])
+        this.bank.setValidators([Validators.required, requireMatch]);
       }
+      this.percentage.setValidators([Validators.required]);
     })
 
     this.filteredBank = this.bank.valueChanges.pipe(startWith(''),
@@ -281,9 +188,9 @@ export class OptionComponent implements OnInit, OnDestroy {
     }, 100);
   }
 
-  private getBanks() {
+  private getPaymentFindByReservationId() {
     this.store.dispatch(
-      new fromActionsPayment.PaymentBankList(PaymentType.ideal)
+      new fromActionsPayment.PaymentFindByReservationId({ reservationId: this.reservationId })
     )
   }
 

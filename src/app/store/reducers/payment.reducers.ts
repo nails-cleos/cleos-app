@@ -2,11 +2,9 @@ import { Pagination } from '../../interfaces/pagination';
 import { All, PaymentActionTypes } from '../payment.actions';
 import { IPayment } from '../../interfaces/payment';
 import { IBank } from "../../interfaces/bank";
-import { ReservationActionTypes } from "../reservation.actions";
 
 export interface State {
   data: IPayment | Pagination<IPayment> | null;
-  banks: IBank[] | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -17,7 +15,6 @@ export interface State {
 
 export const initialState: State = {
   data: null,
-  banks: null,
   errorMessage: null,
   error: null,
   subErrors: null,
@@ -60,17 +57,6 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
-    case PaymentActionTypes.paymentBankList: {
-      return {
-        ...state,
-        // @ts-ignore
-        banks: [{}, {}, {}],
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
     case PaymentActionTypes.paymentSuccess: {
       return {
         ...state,
@@ -90,15 +76,6 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false
       };
     }
-    case PaymentActionTypes.paymentBankListSuccess: {
-      return {
-        ...state,
-        banks: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
     case PaymentActionTypes.paymentNotComplete: {
       return {
         ...state,
@@ -111,7 +88,7 @@ export const reducer = (state = initialState, action: All): State => {
     case PaymentActionTypes.paymentSelected: {
       return {
         ...state,
-        selected: action.payload,
+        selected: action.payload.payment,
         errorMessage: null,
         subErrors: null,
         message: null

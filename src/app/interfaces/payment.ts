@@ -15,6 +15,11 @@ export enum PaymentType {
   transfer = 'TRANSFER'
 }
 
+export enum PaymentPercentage {
+  deposit_30 = 'DEPOSIT_30',
+  total = 'TOTAL'
+}
+
 export const paymentOptions = (): IPaymentType[] => [{
   name: PaymentType.cash,
   disabled: true,
@@ -37,6 +42,7 @@ export interface IPaymentStatus {
   paymentId: string;
   paymentType: string;
   preferenceId: string;
+  reason?: string;
 }
 
 export interface IPayment {
@@ -70,10 +76,12 @@ export class PaymentStatus implements IPaymentStatus {
   paymentId: string;
   paymentType: string;
   preferenceId: string;
+  reason?: string;
 
-  constructor(paymentId: string, type: string, referenceId: string) {
+  constructor(paymentId: string, type: string, referenceId: string, reason?: string) {
     this.paymentId = paymentId;
     this.paymentType = type;
     this.preferenceId = referenceId;
+    this.reason = reason
   }
 }

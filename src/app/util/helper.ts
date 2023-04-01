@@ -186,6 +186,13 @@ export const newAdditional = (price: IPrice, additionalList: IAdditionalAll[]): 
     price.priceWithDiscount, price.priceWithExtras, priceWithAdditional);
 };
 
+export const newPercentage = (price: IPrice, percentage: number): IPrice => {
+  const toPaid = price.total * percentage / 100;
+
+  return new Price(price.amount, price.discount, price.extra, price.additional, price.total, price.totalPaid,
+    price.priceWithDiscount, price.priceWithExtras, price.priceWithAdditional, toPaid)
+}
+
 export const getProductDurability = (min: number, max: number, translate: TranslateService): string | undefined => {
   if (!min && !max) {
     return undefined;
@@ -327,7 +334,7 @@ export const isProfessional = (id: string, professionals?: IUser[]): boolean =>
 const totalPaid = (payments: IPayment[] | undefined): number => {
   let total = 0;
   payments?.forEach(payment => {
-    if (payment.status === 'approved' && payment.amount) {
+    if (payment.status === 'APPROVED' && payment.amount) {
       total += payment.amount;
     }
   });

@@ -24,7 +24,7 @@ import { map, startWith } from 'rxjs/operators';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import {
   createProductGroupService, createRoomOffice, getBackIndex, getFullUserName, getPrice, getProductDurability, getStep,
-  getUserName, newAdditional, newDiscount, newPrice, openDialog, roomDetail, round
+  getUserName, newAdditional, newDiscount, newPercentage, newPrice, openDialog, roomDetail, round
 } from '../../../util/helper';
 import { DiscountType, IUserDiscount } from '../../../interfaces/discount';
 import { transitionAnimation } from '../../../util/animation';
@@ -38,7 +38,7 @@ import { TimeZoneSnackBarComponent } from '../../../shared/snak/time-zone/time-z
 import { MatDialog } from '@angular/material/dialog';
 import { Role } from '../../../interfaces/token';
 import { IUser } from "../../../interfaces/user";
-import { IBank } from "../../../interfaces/bank";
+import { banks, IBank } from "../../../interfaces/bank";
 import { PaymentType } from "../../../interfaces/payment";
 import { AngularFireAnalytics } from "@angular/fire/compat/analytics";
 
@@ -103,9 +103,10 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   types?: string[]
   type: UntypedFormControl = new UntypedFormControl('');
 
-  bankList?: IBank[];
+  bankList?: IBank[] = banks();
   filteredBank?: Observable<IBank[] | undefined>;
   bank: UntypedFormControl = new UntypedFormControl('');
+  percentage: UntypedFormControl = new UntypedFormControl('');
 
   additionalList: IAdditionalAll[] = [];
   additionalSelected: IAdditionalAll[] = [];
@@ -192,9 +193,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.professionalId = this.professional.value.id;
     this.roomId = this.room.value.id;
     this.types = this.room.value.paymentTypes.filter((p: PaymentType) => ![PaymentType.cash, PaymentType.transfer].includes(p));
-    if (this.types?.includes(PaymentType.ideal)) {
-      this.getBankList();
-    }
     this.getProductList();
     return this.completeAndNext();
   }
@@ -280,7 +278,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
     const role = Role.customer;
     if (this.isEditing && this.reservation) {
-      // TODO paid ??
       reservation.id = this.reservation.id;
       reservation.productId = valueChange(this.product.value.id, this.reservation.product.id);
 
@@ -290,6 +287,14 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     } else {
       reservation.productId = this.product.value.id;
       reservation.discountId = this.discount.value;
+      if (this.firstTime || this.type.value) {
+        reservation.payment = {
+          type: this.type.value,
+          bic: this.bank.value.id,
+          countryCode: 'en_NL',
+          percentage: this.percentage.value
+        }
+      }
       this.store.dispatch(
         new fromActionsReservation.ReservationSave({ reservation, role })
       );
@@ -488,12 +493,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     );
   }
 
-  private getBankList(): void {
-    this.store.dispatch(
-      new fromActionsReservation.PaymentBankList(PaymentType.ideal)
-    );
-  }
-
   private createForm(): void {
     this.productForm = this.formBuilder.group({
       product: this.product,
@@ -509,7 +508,8 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     });
     this.typeForm = this.formBuilder.group({
       type: this.type,
-      bank: this.bank
+      bank: this.bank,
+      percentage: this.percentage
     });
     this.valueChange();
   }
@@ -607,10 +607,25 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     });
 
     this.typeForm.valueChanges.subscribe(value => {
-      console.log(value?.type)
       if (value?.type === 'IDEAL') {
-        this.bank.setValidators([Validators.required, requireMatch])
+        this.bank.setValidators([Validators.required, requireMatch]);
       }
+      this.percentage.setValidators([Validators.required]);
+    });
+
+    this.percentage.valueChanges.subscribe(value => {
+      let percentage;
+      switch (value) {
+        case 'TOTAL':
+          percentage = 100;
+          break;
+        case 'DEPOSIT_30':
+          percentage = 30;
+          break;
+        default:
+          percentage = 0;
+      }
+      this.price = newPercentage(this.price, percentage);
     });
   }
 
@@ -673,7 +688,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
           this.datePicker?.open();
         }
       }
-      this.bankList = state.banks
       this.discounts = state.productDiscount?.discounts.map((ud: IUserDiscount) => {
         let title = ud.discount.name;
         switch (ud.discount.type) {

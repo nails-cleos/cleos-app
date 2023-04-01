@@ -45,7 +45,7 @@ export class UpcomingComponent implements OnChanges {
       if (this.upcoming.additional) {
         if (this.upcoming.additional.length) {
           if (this.upcoming.additional.length > 1) {
-            rowSpan = this.upcoming.additional.length - 1;
+            rowSpan = (this.upcoming.additional.length / 2) >> 0
           } else {
             rowSpan = 1;
           }

@@ -3,7 +3,6 @@ import { Store } from '@ngrx/store';
 import { AppState, selectAuthState, selectReservationState, selectUserState } from '../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
-import * as fromActionsPayment from '../../store/payment.actions';
 import { IReservationAll, States } from '../../interfaces/reservation';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -108,7 +107,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   }
 
   get total(): number {
-    return this.paymentPaid?.map((p: IPayment) => p.amount).reduce((acc: number, value: number) => acc + value, 0);
+    return this.paymentPaid?.filter((p: IPayment) => p.status === 'APPROVED')?.map((p: IPayment) => p.amount)
+      .reduce((acc: number, value: number) => acc + value, 0);
   }
 
   private static createMachine(stateMachineDefinition: any, initialState: any): any {
@@ -134,7 +134,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   }
 
   private static createTransaction(target: string, action: any): any {
-    return {target, action};
+    return { target, action };
   }
 
   private static getDateTimeDetail(reservation: IReservationAll): Date {
@@ -172,10 +172,10 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       return;
     }
     const title = this.translate.instant('RESERVATION.CHANGE_STATE.TITLE');
-    const action = this.translate.instant(`RESERVATION.CHANGE_STATE.ACTION.${String(id).toUpperCase()}`);
-    const content = this.translate.instant('RESERVATION.CHANGE_STATE.CONTENT', {action});
+    const action = this.translate.instant(`RESERVATION.CHANGE_STATE.ACTION.${ String(id).toUpperCase() }`);
+    const content = this.translate.instant('RESERVATION.CHANGE_STATE.CONTENT', { action });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: {title, content, value: id}
+      data: { title, content, value: id }
     });
 
     dialogRef.afterClosed().subscribe(event => {
@@ -186,14 +186,14 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   }
 
   private createAction(tooltip: string, icon: string, id: string, color?: string): MatFabMenu {
-    return {tooltip, tooltipPosition: this.tooltipPosition, icon, id, color} as MatFabMenu;
+    return { tooltip, tooltipPosition: this.tooltipPosition, icon, id, color } as MatFabMenu;
   }
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       this.isLoading = state.isLoading;
       this.payments = state.payments;
-      this.paymentPaid = state.payments?.filter((p: IPayment) => p.status === 'approved');
+      this.paymentPaid = state.payments;
       if (state.selected) {
         this.duration = reservationDuration(state.selected);
         this.start = newDateTimestamp(state.selected.timestamp);
@@ -233,13 +233,13 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   private getReservation(id: string | null): void {
     this.reservation = undefined;
     this.store.dispatch(
-      new fromActionsReservation.ReservationFind({id})
+      new fromActionsReservation.ReservationFind({ id })
     );
     this.store.dispatch(
       new fromActionsReservation.ReservationFindPayments(id)
     );
     this.store.dispatch(
-      new fromActionsReservation.ReservationFindHistory({id})
+      new fromActionsReservation.ReservationFindHistory({ id })
     );
   }
 
@@ -309,8 +309,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
             key = 'APPROVE';
             break;
         }
-        const message = translate.instant(`WHATSAPP.SEND.${key}`, {date});
-        window.open(`https://api.whatsapp.com/send?phone=+${reservation.customer?.phone}&text=${message}`, '_blank');
+        const message = translate.instant(`WHATSAPP.SEND.${ key }`, { date });
+        window.open(`https://api.whatsapp.com/send?phone=+${ reservation.customer?.phone }&text=${ message }`, '_blank');
       }
     });
 
@@ -322,7 +322,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     });
 
     const editTransaction = ReservationDetailComponent.createTransaction('edited', (): void => {
-      self.router.navigate(['reservation', reservationId, 'edit'], {state: {roomId}});
+      self.router.navigate(['reservation', reservationId, 'edit'], { state: { roomId } });
     });
 
     const completeTransaction = ReservationDetailComponent.createTransaction('completed', (): void => {
@@ -355,8 +355,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       const room = reservation.room;
       const product = reservation.product;
       const professional = reservation.professional;
-      const data = {customer, room, product, professional};
-      this.router.navigate(['reservation'], {state: data});
+      const data = { customer, room, product, professional };
+      this.router.navigate(['reservation'], { state: data });
     });
 
     const approved = {
@@ -450,8 +450,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       const room = reservation.room;
       const product = reservation.product;
       const professional = reservation.professional;
-      const data = {room, product, professional};
-      this.router.navigate(['me', 'reservation'], {state: data});
+      const data = { room, product, professional };
+      this.router.navigate(['me', 'reservation'], { state: data });
     });
 
     const approved = {
@@ -479,9 +479,11 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         partiallyCompleted.next = [...partiallyCompleted.next, next];
 
         const transaction = ReservationDetailComponent.createTransaction('paid',
-          (): void => self.store.dispatch(
-            new fromActionsPayment.PaymentSelected(self.payments)
-          ));
+          (): void => {
+            const types = reservation.room.paymentTypes.filter(it => it !== 'CASH');
+            this.router.navigate(['/me', 'reservation', reservation.id, 'payment', 'option'],
+              { queryParams: { types } })
+          });
         approved.transitions.pay = transaction;
         partiallyCompleted.transitions.pay = transaction;
       }
@@ -535,7 +537,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       if (result) {
         this.reservation = undefined;
         this.store.dispatch(
-          new fromActionsReservation.ChangeCustomer({customerId: result.customerId, reservationId: reservation.id})
+          new fromActionsReservation.ChangeCustomer({ customerId: result.customerId, reservationId: reservation.id })
         );
       }
     });
@@ -567,7 +569,7 @@ export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
   }
 
   get doAction(): void {
-    return this.dialogRef.close({customerId: this.customer.value.id});
+    return this.dialogRef.close({ customerId: this.customer.value.id });
   }
 
   ngOnInit(): void {

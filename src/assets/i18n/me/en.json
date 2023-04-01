@@ -82,6 +82,8 @@
       "ERROR_TEXT": "Payment error",
       "ERROR": "Payment incomplete.\n{{reason}}",
       "DETAIL": "Payment detail",
+      "DEPOSIT_30": "Pay a 30% deposit of the reservation",
+      "TOTAL": "Pay total of the reservation",
       "LIST": {
         "COLUMN": {
           "AMOUNT": "Amount",

@@ -20,6 +20,7 @@ const routes: Routes = [{
     { path: 'reservation/:id/payment', component: PaymentComponent },
     { path: 'reservation/:id/payment/option', component: OptionComponent },
     { path: 'reservation/:id/payment/:status', component: PaymentCompleteComponent },
+    { path: 'reservation/:id/payment/:id/:status', component: PaymentCompleteComponent },
     { path: 'reservation/:id/review', component: ReviewDialogComponent },
     { path: 'referrals', component: ReferralsComponent },
     { path: 'discounts', component: MeDiscountComponent },

@@ -38,7 +38,6 @@ import { ReservationIconPipe } from '../pipes/reservation-icon.pipe';
 import { ConvertHMPipe } from '../pipes/convert-hm.pipe';
 import { CounterComponent } from '../util/counter/counter.component';
 import { CalendarDialogComponent } from './calendar-dialog/calendar-dialog.component';
-import { MatRadioModule } from '@angular/material/radio';
 import { GoogleMapsModule } from "@angular/google-maps";
 
 @NgModule({
@@ -68,8 +67,7 @@ import { GoogleMapsModule } from "@angular/google-maps";
     FlexLayoutModule,
     HttpClientModule,
     HttpClientJsonpModule,
-    FormsModule,
-    MatRadioModule
+    FormsModule
   ],
   exports: [
     AppMaterialModule,

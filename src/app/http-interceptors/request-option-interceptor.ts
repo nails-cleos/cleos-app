@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { TokenService } from '../services/token.service';
 import { IUserAll } from '../interfaces/user';
+import { isExternalUrl } from "./index";
 
 @Injectable()
 export class RequestOptionInterceptor implements HttpInterceptor {
@@ -11,8 +12,11 @@ export class RequestOptionInterceptor implements HttpInterceptor {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    if (!req.url.includes('maps.googleapis.com')) {
-      req = req.clone({ headers: req.headers.set('Content-Type', 'application/json') });
+    if (!isExternalUrl(req.url)) {
+      console.log(req.headers)
+      if (!req.headers.has('Content-Type') && !req.headers.has('Upload')) {
+        req = req.clone({ headers: req.headers.set('Content-Type', 'application/json') });
+      }
 
       if (!req.headers.has('Accept')) {
         req = req.clone({ headers: req.headers.set('Accept', 'application/json') });

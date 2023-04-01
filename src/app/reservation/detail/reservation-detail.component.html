@@ -205,7 +205,7 @@
                 <div mat-subheader>{{ 'PAYMENT.LIST.COLUMN.STATUS' | translate }}</div>
                 <mat-list-item role="list">
                   <div matListItemLine>
-                    {{'COMMON.STATUS.PAYMENT.' + (payment.status ? payment.status.toUpperCase() : 'NONE') | translate}}
+                    {{'COMMON.STATUS.PAYMENT.' + (payment.status || 'NONE') | translate}}
                   </div>
                 </mat-list-item>
               </mat-list>
@@ -217,7 +217,7 @@
         <tr *matHeaderRowDef="paymentDisplayedColumns" mat-header-row></tr>
         <tr (click)="paymentExpanded = paymentExpanded === payment ? null : payment"
             *matRowDef="let payment; columns: paymentDisplayedColumns;"
-            [ngClass]="'cash row'"
+            [ngClass]="{'cash row': payment.status === 'APPROVED'}"
             mat-row></tr>
         <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row></tr>
         <tr *matFooterRowDef="paymentDisplayedColumns" mat-footer-row></tr>

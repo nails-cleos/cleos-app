@@ -49,26 +49,26 @@ import { OptionComponent } from './reservation/payment/option/option.component';
     UpcomingComponent,
     OptionComponent
   ],
-  imports: [
-    MeRoutingModule,
-    SharedModule,
-    MatChipsModule,
-    ShareButtonsModule,
-    MatBottomSheetModule,
-    ShareIconsModule,
-    MatProgressBarModule,
-    MatTabsModule,
-    MatStepperModule,
-    TranslateModule.forChild({
-      loader: {
-        provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('me')
-      },
-      isolate: false,
-      extend: true
-    }),
-    EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects, CurrencyEffects])
-  ],
+    imports: [
+        MeRoutingModule,
+        SharedModule,
+        MatChipsModule,
+        ShareButtonsModule,
+        MatBottomSheetModule,
+        ShareIconsModule,
+        MatProgressBarModule,
+        MatTabsModule,
+        MatStepperModule,
+        TranslateModule.forChild({
+            loader: {
+                provide: TranslateLoader,
+                useClass: TranslateLoaderFactory.forModule('me')
+            },
+            isolate: false,
+            extend: true
+        }),
+        EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects, CurrencyEffects])
+    ],
   providers: [
     ReservationService,
     PaymentService,
