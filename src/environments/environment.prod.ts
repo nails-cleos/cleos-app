@@ -3,7 +3,7 @@ export const environment = {
   appServer: 'https://www.nailscleos.nl',
   title: 'Cleos',
   version: require('../../package.json').version,
-  baseUrl: 'https://nailscleos.nl:8443/api',
+  baseUrl: 'https://18.197.192.75:8443/api',
   googleClientId: '174727853234-hoc8nq88jjpn8fj3sjkaj7ook2egbmq4.apps.googleusercontent.com',
   facebookClientId: '523962545388946',
   firebase: {
