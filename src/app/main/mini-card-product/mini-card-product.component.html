@@ -1,4 +1,4 @@
-<mat-card class="mat-elevation-z8">
+<mat-card appearance="outlined" class="mat-elevation-z8">
   <mat-card-header (click)="click($event)"
                    matTooltip="{{'COMMON.BUTTON.EXPAND.' + expand.toString().toUpperCase() | translate}}"
                    matTooltipPosition="above">
@@ -12,7 +12,7 @@
     <div [@detailExpand]="expand ? 'expanded' : 'collapsed'" class="divider detail">
       <div class="product-container">
         <div *ngFor="let product of products" class="card-wrap">
-          <mat-card (click)="setProduct(product)" class="mini-dashboard-card">
+          <mat-card appearance="outlined" (click)="setProduct(product)" class="mini-dashboard-card">
             <mat-card-header>
               <mat-card-title class="card-text-color">
                 {{product.name}}

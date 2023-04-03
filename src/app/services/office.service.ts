@@ -9,7 +9,8 @@ import { IOffice } from '../interfaces/office';
 })
 export class OfficeService {
 
-  urlV1 = 'v1/offices';
+  private url = 'offices';
+  private urlV1 = `v1/${this.url}`;
 
   constructor(private http: HttpClient) {
   }

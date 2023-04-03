@@ -13,6 +13,7 @@ export enum PaymentActionTypes {
   paymentSelected = '[Payment] Selected',
   paymentByReservation = '[Payment] Find by reservation',
   paymentFind = '[Payment] Find',
+  paymentCreate = '[Payment] Create',
   clean = '[Payment] Clean'
 }
 
@@ -100,6 +101,13 @@ export class PaymentFind implements Action {
   }
 }
 
+export class PaymentCreate implements Action {
+  readonly type = PaymentActionTypes.paymentCreate;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class Clean implements Action {
   readonly type = PaymentActionTypes.clean;
 }
@@ -117,4 +125,5 @@ export type All =
   | PaymentFindByReservationId
   | PaymentFind
   | PaymentSelected
+  | PaymentCreate
   | Clean;

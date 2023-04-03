@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthService } from 'angularx-social-login';
+import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthService } from '@abacritt/angularx-social-login';
 import { Store } from '@ngrx/store';
 import * as fromActionsLogin from '../store/auth.actions';
 import { AppState, selectAuthState } from '../store/app.states';
@@ -44,27 +44,6 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
     this.code = $event;
   }
 
-  socialSignIn(provider: string): void {
-    let id = '';
-    if (provider === 'google') {
-      id = GoogleLoginProvider.PROVIDER_ID;
-    } else if (provider === 'facebook') {
-      id = FacebookLoginProvider.PROVIDER_ID;
-    }
-
-    this.socialService.signIn(id).then(socialUser => {
-      this.store.dispatch(
-        new fromActionsLogin.SocialLogin({
-          socialUser,
-          theme: this.cookieService.get(THEME),
-          code: this.code,
-          queryParams: this.route.snapshot.queryParams,
-          extras: this.extras
-        })
-      );
-    });
-  }
-
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
   }
@@ -86,6 +65,17 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
           });
         }
       }
+    });
+    this.socialService.authState.subscribe((socialUser) => {
+      this.store.dispatch(
+        new fromActionsLogin.SocialLogin({
+          socialUser,
+          theme: this.cookieService.get(THEME),
+          code: this.code,
+          queryParams: this.route.snapshot.queryParams,
+          extras: this.extras
+        })
+      );
     });
   }
 

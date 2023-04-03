@@ -1,14 +1,14 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
-      <mat-card>
+      <mat-card appearance="outlined">
         <mat-card-header>
           <mat-card-title>{{ 'USER.TITLE' | translate }}</mat-card-title>
         </mat-card-header>
         <form (ngSubmit)="create" [formGroup]="form" novalidate>
           <mat-card-content>
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'USER.ROLE.FIELD' | translate }}</mat-label>
                 <mat-select [formControl]="role" required>
                   <mat-option value="ROLE_CUSTOMER">{{ 'COMMON.ROLES.ROLE_CUSTOMER' | translate }}</mat-option>
@@ -18,7 +18,7 @@
                 <mat-error [innerHTML]="'USER.ROLE.REQUIRED' | translate">
                 </mat-error>
               </mat-form-field>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.USER.USERNAME.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="username" autocomplete="username" matInput required>
@@ -30,7 +30,7 @@
                   {{errors['username']}}
                 </mat-error>
               </mat-form-field>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.USER.EMAIL.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="email" autocomplete="email" matInput required>
@@ -44,7 +44,7 @@
                   {{errors['email']}}
                 </mat-error>
               </mat-form-field>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.USER.LANG.FIELD' | translate }}</mat-label>
                 <span *ngIf="select.value" [class]="'flag-icon  flag-icon-squared flag-icon-' + select.value.icon"
                       class="margin-right-eight" matPrefix></span>
@@ -57,30 +57,30 @@
                 <mat-error [innerHTML]="'COMMON.USER.LANG.REQUIRED' | translate">
                 </mat-error>
               </mat-form-field>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.USER.FIRST_NAME.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="firstName" autocomplete="given-name" matInput>
                 </label>
                 <mat-error *ngIf="errors['firstName']">{{errors['firstName']}}</mat-error>
               </mat-form-field>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.USER.LAST_NAME.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="lastName" autocomplete="family-name" matInput>
                 </label>
                 <mat-error *ngIf="errors['lastName']">{{errors['lastName']}}</mat-error>
               </mat-form-field>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.USER.PHONE.FIELD' | translate }}</mat-label>
                 <ngx-mat-intl-tel-input [enablePlaceholder]="true" [enableSearch]="true" [formControl]="phone"
-                                        [preferredCountries]="['ar']" name="phone"></ngx-mat-intl-tel-input>
+                                        [preferredCountries]="['nl']" name="phone"></ngx-mat-intl-tel-input>
                 <mat-error *ngIf="phone.hasError('validatePhoneNumber')">
                   {{ 'COMMON.USER.PHONE.INVALID' | translate }}
                 </mat-error>
                 <mat-error *ngIf="errors['phone']">{{errors['phone']}}</mat-error>
               </mat-form-field>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.USER.DOB.FIELD' | translate }}</mat-label>
                 <button (click)="picker.open()" mat-icon-button matPrefix>
                   <mat-icon>today</mat-icon>
@@ -93,13 +93,13 @@
                   {{errors['dob']}}
                 </mat-error>
               </mat-form-field>
-              <mat-form-field *ngIf="['ROLE_PROFESSIONAL', 'ROLE_MANAGER'].indexOf(role.value) === 0" appearance="fill">
+              <mat-form-field *ngIf="['ROLE_PROFESSIONAL', 'ROLE_MANAGER'].indexOf(role.value) === 0" appearance="outline">
                 <mat-label>{{ 'COMMON.PROFESSIONAL.COLOR.DARK.FIELD' | translate }}</mat-label>
                 <input [formControl]="darkColor" [ngxMatColorPicker]="pickerDark" matInput>
                 <ngx-mat-color-toggle [for]="pickerDark" matSuffix></ngx-mat-color-toggle>
                 <ngx-mat-color-picker #pickerDark [touchUi]="true"></ngx-mat-color-picker>
               </mat-form-field>
-              <mat-form-field *ngIf="['ROLE_PROFESSIONAL', 'ROLE_MANAGER'].indexOf(role.value) === 0" appearance="fill">
+              <mat-form-field *ngIf="['ROLE_PROFESSIONAL', 'ROLE_MANAGER'].indexOf(role.value) === 0" appearance="outline">
                 <mat-label>{{ 'COMMON.PROFESSIONAL.COLOR.LIGHT.FIELD' | translate }}</mat-label>
                 <input [formControl]="lightColor" [ngxMatColorPicker]="picker" matInput>
                 <ngx-mat-color-toggle [for]="picker" matSuffix></ngx-mat-color-toggle>
@@ -108,7 +108,7 @@
               <div style="width: 100%; display: table;">
                 <div style="display: table-row">
                   <div style="display: table-cell;">
-                    <mat-card *ngIf="darkColor.value" [style.background-color]="'#363636'">
+                    <mat-card appearance="outlined" *ngIf="darkColor.value" [style.background-color]="'#363636'">
                       <mat-card-header>
                         <mat-card-subtitle [style.color]="'#fafafa'">
                           {{ 'COMMON.PROFESSIONAL.COLOR.DARK.RESERVATION' | translate }}
@@ -126,7 +126,7 @@
                     </mat-card>
                   </div>
                   <div style="display: table-cell;">
-                    <mat-card *ngIf="lightColor.value" [style.background-color]="'#fafafa'">
+                    <mat-card appearance="outlined" *ngIf="lightColor.value" [style.background-color]="'#fafafa'">
                       <mat-card-header>
                         <mat-card-subtitle [style.color]="'#363636'">
                           {{ 'COMMON.PROFESSIONAL.COLOR.LIGHT.RESERVATION' | translate }}
@@ -148,9 +148,9 @@
           </mat-card-content>
           <mat-card-actions>
             <div fxFlex></div>
-            <button [disabled]="form.invalid" color="primary" mat-raised-button
+            <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button"
                     type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
-            <button [form]="form" appBackButton color="accent" mat-raised-button
+            <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
         </form>

@@ -18,7 +18,7 @@ export class RoomEffects {
     switchMap((payload: any) => this.roomService.getAll(payload.active, payload.direction, payload.page,
       payload.size).pipe(
       switchMap((response: any) => of(new fromActionsRoom.RoomSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
+      catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({ error: err.error })))
     ))
   ));
 
@@ -26,7 +26,7 @@ export class RoomEffects {
     map((action: any) => action.payload),
     switchMap((payload) => this.roomService.getMyService(payload.id).pipe(
       switchMap((room: any) => of(new fromActionsRoom.RoomServiceSelected(room))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
+      catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({ error: err.error })))
     ))
   ));
 
@@ -34,14 +34,14 @@ export class RoomEffects {
     map((action: any) => action.payload),
     switchMap(() => this.roomService.getRoomInfo().pipe(
       switchMap((response: any) => of(new fromActionsRoom.RoomInfoSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
+      catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({ error: err.error })))
     ))
   ));
 
   findOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.roomFind)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.roomService.getById(payload.id).pipe(
-      switchMap((room: any) => of(new fromActionsRoom.RoomSelected({room, redirect: payload.redirect}))),
+      switchMap((roomInfo: any) => of(new fromActionsRoom.RoomSelected({roomInfo, redirect: payload.redirect}))),
       catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
     ))
   ));
@@ -50,9 +50,9 @@ export class RoomEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.roomService.add(payload).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('ROOM.CREATED', {name: roomName(response)});
-        return of(new fromActionsRoom.RoomSaveSuccess({message}));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
+        const message = this.translate.instant('ROOM.CREATED', { name: roomName(response) });
+        return of(new fromActionsRoom.RoomSaveSuccess({ message }));
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({ error: err.error })))
     ))
   ));
 
@@ -60,27 +60,29 @@ export class RoomEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.roomService.update(payload).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('ROOM.UPDATED.MESSAGE', {name: roomName(response)});
-        return of(new fromActionsRoom.RoomSaveSuccess({message}));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
+        const message = this.translate.instant('ROOM.UPDATED.MESSAGE', { name: roomName(response) });
+        return of(new fromActionsRoom.RoomSaveSuccess({ message }));
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({ error: err.error })))
     ))
   ));
 
-  updateServices$ = createEffect(() => this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.roomServiceUpdate)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.roomService.updateService(payload.id, payload.prices).pipe(
-      switchMap(() => of(new fromActionsRoom.RoomSaveSuccess({message: this.translate.instant('ROOM.ME.SERVICES.UPDATE.MESSAGE')}))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
-    ))
-  ));
+  updateServices$ = createEffect(
+    () => this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.roomServiceUpdate)).pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.roomService.updateService(payload.id, payload.prices).pipe(
+        switchMap(() => of(
+          new fromActionsRoom.RoomSaveSuccess({ message: this.translate.instant('ROOM.ME.SERVICES.UPDATE.MESSAGE') }))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({ error: err.error })))
+      ))
+    ));
 
   delete$ = createEffect(() => this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.roomDelete)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.roomService.delete(payload).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('ROOM.DELETED.MESSAGE', {name: roomName(response)});
-        return of(new fromActionsRoom.RoomSaveSuccess({message}));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
+        const message = this.translate.instant('ROOM.DELETED.MESSAGE', { name: roomName(response) });
+        return of(new fromActionsRoom.RoomSaveSuccess({ message }));
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({ error: err.error })))
     ))
   ));
 
@@ -88,18 +90,18 @@ export class RoomEffects {
     ofType(fromActionsRoom.RoomActionTypes.roomSelected),
     tap((data: any) => {
       if (data.payload.redirect) {
-        this.router.navigate(['rooms', data.payload.room.id]);
+        this.router.navigate(['rooms', data.payload.roomInfo.room.id]);
       }
     })
-  ), {dispatch: false});
+  ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsRoom.RoomActionTypes.roomSuccess)
-  ), {dispatch: false});
+  ), { dispatch: false });
 
   saveSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsRoom.RoomActionTypes.roomSaveSuccess)
-  ), {dispatch: false});
+  ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private roomService: RoomService,
               private userService: UserService, private router: Router) {

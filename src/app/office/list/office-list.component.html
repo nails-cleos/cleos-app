@@ -57,15 +57,15 @@
           <mat-list>
             <div mat-subheader>{{ 'OFFICE.LIST.COLUMN.MANAGER' | translate }}</div>
             <mat-list-item role="list">
-              <div mat-line>{{office.manager | userName}}</div>
+              <div matListItemLine>{{office.manager | userName}}</div>
             </mat-list-item>
             <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
             <mat-list-item role="list">
               <button (click)="edit(office)" *ngIf="!office.deleted" color="primary" mat-icon-button>
-                <mat-icon>edit</mat-icon>
+                <mat-icon matListItemIcon>edit</mat-icon>
               </button>
               <button (click)="delete(office)" *ngIf="!office.deleted" color="warn" mat-icon-button>
-                <mat-icon>delete</mat-icon>
+                <mat-icon matListItemIcon>delete</mat-icon>
               </button>
             </mat-list-item>
           </mat-list>

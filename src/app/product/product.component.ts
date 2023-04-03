@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import * as fromActionsProduct from '../store/product.actions';
 import { AppState, selectProductState } from '../store/app.states';
 import { Store } from '@ngrx/store';
@@ -16,11 +16,11 @@ import { Router } from '@angular/router';
 export class ProductComponent implements OnInit, OnDestroy {
   @ViewChild('inputName') inputName: ElementRef<HTMLInputElement> | undefined;
 
-  form!: FormGroup;
-  name: FormControl = new FormControl('', [
+  form!: UntypedFormGroup;
+  name: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  selected = new FormControl(0);
+  selected = new UntypedFormControl(0);
   products: IProduct[] = [];
 
   errors: any = [];
@@ -28,7 +28,7 @@ export class ProductComponent implements OnInit, OnDestroy {
   private getState: Observable<any>;
   private subscription: Subscription | undefined;
 
-  constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private router: Router) {
+  constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router) {
     this.getState = this.store.select(selectProductState);
   }
 
@@ -44,8 +44,8 @@ export class ProductComponent implements OnInit, OnDestroy {
         errors.name = 'REQUIRED';
         hasError = true;
       }
-      if (!tab.duration || tab.duration.trim().length === 0) {
-        errors.duration = 'REQUIRED';
+      if (!tab.time || tab.time.trim().length === 0) {
+        errors.time = 'REQUIRED';
         hasError = true;
       }
       return Object.assign({}, tab, {errors});
@@ -100,7 +100,7 @@ export class ProductComponent implements OnInit, OnDestroy {
   setTime(product: IProduct, $event: any): void {
     const time = $event.split(':');
     const date = createNewDate(getNow(), time[0], time[1]);
-    product.duration = getTime(date);
+    product.time = getTime(date);
   }
 
   setPrimary(tab: IProduct): void {
@@ -115,9 +115,9 @@ export class ProductComponent implements OnInit, OnDestroy {
   private createForm(): void {
     this.form = this.formBuilder.group({
       name: this.name,
-      description: new FormControl(),
-      durabilityMin: new FormControl(),
-      durabilityMax: new FormControl()
+      description: new UntypedFormControl(),
+      durabilityMin: new UntypedFormControl(),
+      durabilityMax: new UntypedFormControl()
     });
   }
 

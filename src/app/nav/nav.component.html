@@ -3,7 +3,7 @@
               [mode]="(isHandset$ | async) ? 'over' : 'side'"
               [opened]="(isHandset$ | async) === false"
               class="sidenav">
-    <mat-card *ngIf="showInformation" class="mat-elevation-z0">
+    <mat-card appearance="outlined" *ngIf="showInformation" class="mat-elevation-z0">
       <mat-card-header *ngIf="currentUser; else headerNoLogged">
         <div class="circle" mat-card-avatar>
           <img *ngIf="image; else showInitialsBlock" alt="profile" src="{{image}}">
@@ -20,7 +20,7 @@
             <div *ngIf="menu.subMenus && menu.subMenus.length; else items">
               <mat-expansion-panel #rla="routerLinkActive" (opened)="setStep(i)" [class.mat-elevation-z0]="true"
                                    [expanded]="step === i" [ngClass]="{ 'active': rla.isActive}"
-                                   [routerLinkActiveOptions]="{ exact: true }" routerLinkActive>
+                                   [routerLinkActiveOptions]="{ exact: true }" [routerLinkActive]="menu.name">
                 <mat-expansion-panel-header>
                   <mat-panel-title class="active-header-title">
                     <mat-icon>{{menu.icon}}</mat-icon>&nbsp;{{menu.name}}
@@ -32,13 +32,13 @@
             <ng-template #items>
               <a (click)="navigate(menu, drawer)" *ngIf="isHandset$ | async; else showMenu"
                  [routerLinkActive]="['active']" [routerLink]="'/'+menu.path" mat-list-item>
-                <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>
+                <mat-icon matListItemIcon>{{menu.icon}}</mat-icon>
                 <div mat-line>{{menu.name}}</div>
               </a>
               <ng-template #showMenu>
                 <a (click)="navigate(menu)" [routerLinkActive]="['active']"
                    [routerLink]="'/'+menu.path" mat-list-item>
-                  <mat-icon mat-list-icon>{{menu.icon}}</mat-icon>
+                  <mat-icon matListItemIcon>{{menu.icon}}</mat-icon>
                   <div mat-line>{{menu.name}}</div>
                 </a>
               </ng-template>
@@ -51,8 +51,8 @@
           <div class="circle" mat-card-avatar>
             <img alt="profile" src="../../assets/icons/icon-512x512.png">
           </div>
-          <mat-card-title>Espacio Cleos</mat-card-title>
-          <mat-card-subtitle>@espacio.cleos</mat-card-subtitle>
+          <mat-card-title>Nails Cleos</mat-card-title>
+          <mat-card-subtitle>@nails.cleos</mat-card-subtitle>
         </mat-card-header>
       </ng-template>
       <ng-template #contentNoLogged>
@@ -61,12 +61,12 @@
             <mat-divider></mat-divider>
             <a (click)="drawer.toggle()" *ngIf="isHandset$ | async; else showMenu" [routerLink]="'/main'"
                mat-list-item>
-              <mat-icon mat-list-icon>main</mat-icon>
+              <mat-icon matListItemIcon>main</mat-icon>
               <div mat-line>{{'COMMON.DASHBOARD.HOME' | translate }}</div>
             </a>
             <ng-template #showMenu>
               <a [routerLinkActive]="['active']" [routerLink]="'/main'" mat-list-item>
-                <mat-icon mat-list-icon>home</mat-icon>
+                <mat-icon matListItemIcon>home</mat-icon>
                 <div mat-line>{{'COMMON.DASHBOARD.HOME' | translate }}</div>
               </a>
             </ng-template>
@@ -82,7 +82,7 @@
               aria-label="Toggle sidenav" mat-icon-button type="button">
         <mat-icon *ngIf="showInformation" aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
-      <img alt="logo" mat-card-avatar src="../../assets/icons/icon-512x512.png">
+      <img alt="logo" src="../../assets/icons/icon-512x512.png">
       <span>{{title}}</span>
       <span class="align-right"></span>
       <div *ngIf="currentUser?.username; else login">
@@ -151,38 +151,47 @@
         <mat-menu #menuLogged="matMenu">
           <mat-nav-list>
             <a [routerLinkActive]="['active']" [routerLink]="'/main'" mat-list-item>
-              <mat-icon mat-list-icon>home</mat-icon>
+              <mat-icon matListItemIcon>home</mat-icon>
               <div mat-line>{{'COMMON.DASHBOARD.HOME' | translate }}</div>
             </a>
             <mat-divider></mat-divider>
             <a [routerLink]="'/auth/profile'" mat-list-item>
-              <mat-icon mat-list-icon>settings</mat-icon>
+              <mat-icon *ngIf="incomplete; else complete" matListItemIcon matBadgeColor="warn" [matBadge]="'*'">
+                settings
+              </mat-icon>
+              <ng-template #complete>
+                <mat-icon matListItemIcon>settings</mat-icon>
+              </ng-template>
               <div mat-line>{{'DASHBOARD.PROFILE' | translate }}</div>
-              <span *ngIf="incomplete" class="dot"></span>
             </a>
             <mat-divider></mat-divider>
-            <mat-list-item>
-              <mat-slide-toggle (change)="setTheme($event.checked)" [checked]="checked"
-                                mat-line>{{'COMMON.DASHBOARD.DARK_MODE' | translate }}</mat-slide-toggle>
-            </mat-list-item>
-            <mat-divider></mat-divider>
             <a *ngIf="canChangePassword" [routerLink]="'/auth/change-password'" mat-list-item>
-              <mat-icon mat-list-icon>mode_edit</mat-icon>
+              <mat-icon matListItemIcon>mode_edit</mat-icon>
               <div mat-line>{{'DASHBOARD.CHANGE_PASSWORD' | translate }}</div>
             </a>
             <mat-divider></mat-divider>
             <a (click)="logout" mat-list-item>
-              <mat-icon mat-list-icon>exit_to_app</mat-icon>
+              <mat-icon matListItemIcon>exit_to_app</mat-icon>
               <div mat-line>{{'DASHBOARD.SIGN_OUT' | translate }}</div>
             </a>
+            <mat-divider></mat-divider>
+            <mat-list-item>
+              <mat-slide-toggle (change)="setTheme($event.checked)" [checked]="checked" color="accent"
+                                mat-line>{{'COMMON.DASHBOARD.DARK_MODE' | translate }}</mat-slide-toggle>
+            </mat-list-item>
           </mat-nav-list>
         </mat-menu>
       </div>
       <ng-template #login>
-        <button color="accent" mat-raised-button routerLink="/main">
+        <button *ngIf="(isHandset$ | async) === false; else mini" color="accent" mat-fab extended routerLink="/main">
           <mat-icon>home</mat-icon>
-          <span *ngIf="(isHandset$ | async) === false">{{'COMMON.DASHBOARD.HOME' | translate }}</span>
+          <span>{{'COMMON.DASHBOARD.HOME' | translate }}</span>
         </button>
+        <ng-template #mini>
+          <button color="accent" mat-fab routerLink="/main">
+            <mat-icon>home</mat-icon>
+          </button>
+        </ng-template>
       </ng-template>
     </mat-toolbar>
     <main [ngClass]="{'loading': isLoading}" class="content">

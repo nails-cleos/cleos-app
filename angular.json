@@ -26,12 +26,14 @@
             "outputPath": "dist/cleos",
             "index": "src/index.html",
             "main": "src/main.ts",
-            "polyfills": "src/polyfills.ts",
+            "polyfills": [
+              "zone.js"
+            ],
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/manifest.webmanifest",
+              "src/manifest.json",
               "src/styles.scss",
               "src/sitemap.xml"
             ],
@@ -57,6 +59,10 @@
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.prod.ts"
+                },
+                {
+                  "replace": "src/manifest.json",
+                  "with": "src/manifest-prod.json"
                 }
               ],
               "optimization": true,
@@ -183,13 +189,15 @@
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "main": "src/test.ts",
-            "polyfills": "src/polyfills.ts",
+            "polyfills": [
+              "zone.js"
+            ],
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/manifest.webmanifest",
+              "src/manifest.json",
               "src/styles.scss",
               "src/sitemap.xml"
             ],
@@ -233,5 +241,12 @@
       }
     }
   },
-  "defaultProject": "cleos"
+  "schematics": {
+    "@angular-eslint/schematics:application": {
+      "setParserOptionsProject": true
+    },
+    "@angular-eslint/schematics:library": {
+      "setParserOptionsProject": true
+    }
+  }
 }

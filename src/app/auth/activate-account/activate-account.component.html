@@ -1,7 +1,7 @@
 <div class="flex-container" fxLayout="column">
   <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" class="card-container">
     <div fxFlex.lt-sm="80%" fxFlex="50%" fxFlex.gt-lg="40%">
-      <mat-card>
+      <mat-card appearance="outlined">
         <mat-card-header>
           <mat-card-title>{{ 'AUTH.ACTIVATE_ACCOUNT.TITLE' | translate }}</mat-card-title>
         </mat-card-header>
@@ -12,7 +12,7 @@
         </mat-card-content>
         <mat-card-actions>
           <div fxFlex></div>
-          <button mat-raised-button color="primary" (click)="activate">
+          <button mat-fab extended class="icon-button" color="primary" (click)="activate">
             {{ 'AUTH.ACTIVATE_ACCOUNT.BUTTON' | translate }}
           </button>
         </mat-card-actions>

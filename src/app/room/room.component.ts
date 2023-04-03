@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../store/app.states';
 import * as fromActionsRoom from '../store/room.actions';
@@ -22,7 +22,11 @@ import { getCurrentTimeZone } from '../util/dates';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 
 export interface IIcon {
-  week: RoomIconName;
+  monday: RoomIconName;
+  tuesday: RoomIconName;
+  wednesday: RoomIconName;
+  thursday: RoomIconName;
+  friday: RoomIconName;
   saturday: RoomIconName;
   sunday: RoomIconName;
 }
@@ -35,46 +39,50 @@ export interface IIcon {
 export class RoomComponent implements OnInit, OnDestroy {
   @ViewChild('professionalInput') professionalInput!: ElementRef<HTMLInputElement>;
 
-  form!: FormGroup;
+  form!: UntypedFormGroup;
   room: IRoom = new Room();
   errors: any = [];
 
   step = 0;
   icons: IIcon = {
-    week: RoomIconName.calendarToday,
+    monday: RoomIconName.calendarToday,
+    tuesday: RoomIconName.calendarToday,
+    wednesday: RoomIconName.calendarToday,
+    thursday: RoomIconName.calendarToday,
+    friday: RoomIconName.calendarToday,
     saturday: RoomIconName.calendarToday,
     sunday: RoomIconName.calendarToday
   };
 
-  professional = new FormControl();
+  professional = new UntypedFormControl();
   filteredProfessionals?: Observable<IUser[] | undefined>;
   professionals: IUserAll[] = [];
   allProfessional?: IUserAll[];
 
-  address: FormControl = new FormControl('', [
+  address: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
 
-  addressDescription: FormControl = new FormControl();
+  addressDescription: UntypedFormControl = new UntypedFormControl();
 
   currencies?: ICurrencyAll[];
   filteredCurrencyOptions?: Observable<ICurrency[] | undefined>;
 
-  currency: FormControl = new FormControl('', [
+  currency: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
 
   offices?: IOfficeAll[];
   filteredOfficeOptions?: Observable<IOffice[] | undefined>;
 
-  office: FormControl = new FormControl('', [
+  office: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
 
   timeZoneList = timezones;
   filteredTimeZoneOptions?: Observable<any[] | undefined>;
 
-  timeZone: FormControl = new FormControl('', [
+  timeZone: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
 
@@ -86,7 +94,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   private paymentTypes: string[] = [];
 
   constructor(private readonly translate: TranslateService, private store: Store<AppState>,
-              private formBuilder: FormBuilder, private router: Router) {
+              private formBuilder: UntypedFormBuilder, private router: Router) {
     this.getState = this.store.select(selectRoomState);
   }
 
@@ -157,7 +165,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     return timeZone ? timeZone.label : '';
   }
 
-  keyDownHandler(event: any, form: FormControl): void {
+  keyDownHandler(event: any, form: UntypedFormControl): void {
     if (event.code === 'Backspace') {
       form.setValue('');
     }
@@ -166,12 +174,14 @@ export class RoomComponent implements OnInit, OnDestroy {
   addAvailability(availability: IAvailability, step: number): void {
     this.setIcon(availability.day, RoomIconName.eventAvailable);
 
-    const index = this.room.availabilities.findIndex((e) => e.day === availability.day);
+    if (this.room.availabilities) {
+      const index = this.room.availabilities.findIndex((e) => e.day === availability.day);
 
-    if (index === -1) {
-      this.room.availabilities = [...this.room.availabilities, availability];
-    } else {
-      this.room.availabilities[index] = availability;
+      if (index === -1) {
+        this.room.availabilities = [...this.room.availabilities, availability];
+      } else {
+        this.room.availabilities[index] = availability;
+      }
     }
 
     this.step = step;
@@ -179,9 +189,11 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   ignore(day: string, step: number): void {
     this.setIcon(day, RoomIconName.eventBusy);
-    const index = this.room.availabilities.findIndex((e) => e.day === day);
-    if (index > -1) {
-      this.room.availabilities.splice(index, 1);
+    if (this.room.availabilities) {
+      const index = this.room.availabilities.findIndex((e) => e.day === day);
+      if (index > -1) {
+        this.room.availabilities.splice(index, 1);
+      }
     }
     this.step = step;
   }
@@ -282,8 +294,20 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   private setIcon(day: string, icon: RoomIconName): void {
     switch (day) {
-      case 'WEEK':
-        this.icons.week = icon;
+      case 'MONDAY':
+        this.icons.monday = icon;
+        break;
+      case 'TUESDAY':
+        this.icons.tuesday = icon;
+        break;
+      case 'WEDNESDAY':
+        this.icons.wednesday = icon;
+        break;
+      case 'THURSDAY':
+        this.icons.thursday = icon;
+        break;
+      case 'FRIDAY':
+        this.icons.friday = icon;
         break;
       case 'SATURDAY':
         this.icons.saturday = icon;
@@ -301,14 +325,26 @@ export class RoomComponent implements OnInit, OnDestroy {
     let step = -1;
     this.errors = [];
     switch (RoomIconName.calendarToday) {
-      case this.icons.week:
+      case this.icons.monday:
         step = 0;
         break;
-      case this.icons.saturday:
+      case this.icons.tuesday:
         step = 1;
         break;
-      case this.icons.sunday:
+      case this.icons.wednesday:
         step = 2;
+        break;
+      case this.icons.thursday:
+        step = 3;
+        break;
+      case this.icons.friday:
+        step = 4;
+        break;
+      case this.icons.saturday:
+        step = 5;
+        break;
+      case this.icons.sunday:
+        step = 6;
         break;
     }
     if (step > -1) {
@@ -317,7 +353,7 @@ export class RoomComponent implements OnInit, OnDestroy {
       return true;
     }
 
-    if (this.room.availabilities.length === 0) {
+    if (!this.room.availabilities || this.room.availabilities.length === 0) {
       this.errors.availability = true;
       this.setStep(0);
       return true;

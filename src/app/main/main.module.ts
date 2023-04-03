@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { MatCarouselModule } from '@ngbmodule/material-carousel';
 import { SharedModule } from '../shared/shared.module';
 import { MainRoutingModule } from './main-routing.module';
 
@@ -24,6 +23,7 @@ import { UserService } from '../services/user.service';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { LoginEffects } from '../store/effects/auth.effects';
 import { AuthService } from '../services/auth.service';
+import { MatCarouselModule } from "@magloft/material-carousel";
 
 @NgModule({
   declarations: [
@@ -38,7 +38,6 @@ import { AuthService } from '../services/auth.service';
   imports: [
     MainRoutingModule,
     SharedModule,
-    MatCarouselModule.forRoot(),
     MatToolbarModule,
     MatSlideToggleModule,
     TranslateModule.forChild({
@@ -49,7 +48,8 @@ import { AuthService } from '../services/auth.service';
       isolate: false,
       extend: true
     }),
-    EffectsModule.forFeature([MainEffects, CatalogueEffects, UserEffects, LoginEffects])
+    EffectsModule.forFeature([MainEffects, CatalogueEffects, UserEffects, LoginEffects]),
+    MatCarouselModule.forRoot()
   ],
   providers: [
     MainService,

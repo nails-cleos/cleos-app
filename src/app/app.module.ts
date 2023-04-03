@@ -2,25 +2,22 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthServiceConfig, SocialLoginModule } from 'angularx-social-login';
+import {
+  FacebookLoginProvider,
+  GoogleLoginProvider,
+  SocialAuthServiceConfig,
+  SocialLoginModule
+} from '@abacritt/angularx-social-login';
 import { ActionReducer, MetaReducer, StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AsyncPipe, registerLocaleData } from '@angular/common';
 import { ServiceWorkerModule, SwPush } from '@angular/service-worker';
-import { AngularFireModule } from '@angular/fire';
-import { AngularFireMessagingModule } from '@angular/fire/messaging';
-import firebase from 'firebase/app';
-import 'firebase/analytics';
-import 'firebase/messaging';
 import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
-import { AngularFireAnalyticsModule } from '@angular/fire/analytics';
-
 import { AppRoutingModule } from './app-routing.module';
 import { Router } from '@angular/router';
 
 // Providers
-import { httpInterceptorProviders } from './http-interceptors';
 import { environment } from '../environments/environment';
 import { localStorageSync } from 'ngrx-store-localstorage';
 import { MatPaginatorIntl } from '@angular/material/paginator';
@@ -30,7 +27,11 @@ import localeEn from '@angular/common/locales/en';
 import localeEs from '@angular/common/locales/es';
 import { CookieService } from 'ngx-cookie-service';
 import { TranslateLoaderFactory } from './shared/translate-loader.factory';
-import { MAT_COLOR_FORMATS, NGX_MAT_COLOR_FORMATS, NgxMatColorPickerModule } from '@angular-material-components/color-picker';
+import {
+  MAT_COLOR_FORMATS,
+  NGX_MAT_COLOR_FORMATS,
+  NgxMatColorPickerModule
+} from '@angular-material-components/color-picker';
 
 // Services
 import { AuthGuardService } from './services/auth-guard.service';
@@ -45,6 +46,11 @@ import { reducers } from './store/app.states';
 // Components
 import { AppComponent } from './app.component';
 import { SharedModule } from './shared/shared.module';
+import { AngularFireModule } from "@angular/fire/compat";
+import { AngularFireMessagingModule } from "@angular/fire/compat/messaging";
+import { AngularFireAnalyticsModule } from "@angular/fire/compat/analytics";
+import { AngularFireAuthModule } from "@angular/fire/compat/auth";
+import { AngularFireDatabaseModule } from "@angular/fire/compat/database";
 
 export const getAuthServiceConfigs = (): SocialAuthServiceConfig => ({
   autoLogin: false,
@@ -57,11 +63,14 @@ export const getAuthServiceConfigs = (): SocialAuthServiceConfig => ({
       id: FacebookLoginProvider.PROVIDER_ID,
       provider: new FacebookLoginProvider(environment.facebookClientId)
     }
-  ]
-} as SocialAuthServiceConfig);
+  ],
+  onError: (err) => {
+    console.error(err);
+  }
+});
 
 export const localStorageSyncReducer =
-  (reducer: ActionReducer<any>): ActionReducer<any> => localStorageSync({keys: ['auth'], rehydrate: true})(reducer);
+  (reducer: ActionReducer<any>): ActionReducer<any> => localStorageSync({ keys: ['auth'], rehydrate: true })(reducer);
 
 const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
 
@@ -74,7 +83,7 @@ registerLocaleData(localeEs, 'es');
   ],
   imports: [
     BrowserModule,
-    StoreModule.forRoot(reducers, {metaReducers}),
+    StoreModule.forRoot(reducers, { metaReducers }),
     EffectsModule.forRoot([]),
     TranslateModule.forRoot({
       defaultLanguage: 'es',
@@ -94,17 +103,18 @@ registerLocaleData(localeEs, 'es');
       enabled: environment.production,
       registrationStrategy: 'registerWhenStable:30000'
     }),
+    NgxMatColorPickerModule,
     AngularFireModule.initializeApp(environment.firebase),
+    AngularFireAuthModule,
     AngularFireMessagingModule,
     AngularFireAnalyticsModule,
-    NgxMatColorPickerModule
+    AngularFireDatabaseModule
   ],
   providers: [
     {
       provide: MatPaginatorIntl, deps: [TranslateService],
       useFactory: (translateService: TranslateService) => new PaginatorI18n(translateService).getPaginatorIntl()
     },
-    httpInterceptorProviders,
     AuthGuardService,
     TokenService,
     NavigationService,
@@ -123,15 +133,14 @@ registerLocaleData(localeEs, 'es');
     }
   ],
   bootstrap: [AppComponent],
-  exports: [TranslateModule]
+  exports: [TranslateModule, AngularFireMessagingModule]
 })
 export class AppModule {
   constructor(swPush: SwPush, private router: Router) {
-    firebase.analytics();
     if (swPush.isEnabled) {
-      navigator.serviceWorker
-        .ready.then((registration) => firebase.messaging().useServiceWorker(registration));
-      swPush.notificationClicks.subscribe(({action, notification}) =>
+      // navigator.serviceWorker
+      //   .ready.then((registration) => messaging.useServiceWorker(registration));
+      swPush.notificationClicks.subscribe(({ action, notification }) =>
         router.navigate(notification.data.onActionClick[action].url));
     }
   }

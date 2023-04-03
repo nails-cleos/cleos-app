@@ -13,6 +13,7 @@ export class MiniCardComponent implements OnInit {
   @Input() value?: number;
   @Input() color?: ThemePalette;
   @Input() isIncrease?: boolean;
+  @Input() isInfinity?: boolean;
   @Input() isCurrency?: boolean;
   @Input() duration?: string;
   @Input() percentValue?: number;

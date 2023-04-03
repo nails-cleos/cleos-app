@@ -29,6 +29,7 @@
       "PAYMENT": "Payment",
       "ML": "ML payment",
       "PAYPAL": "PayPal payment",
+      "IDEAL": "iDeal payment",
       "NOTIFY": "Notify",
       "SELECT": "Select",
       "UNAVAILABLE": "Add unavailable",
@@ -87,17 +88,27 @@
       "PERCENTAGE": "Percentage"
     },
     "PAYMENT": {
-      "CREATED": "Payment complete successfully",
+      "PENDING": "Payment pending",
+      "SUCCESS": "Payment complete successfully",
       "CASH": "Cash",
       "ML": "Mercado Libre",
-      "PAYPAL": "PayPal"
+      "PAYPAL": "PayPal",
+      "IDEAL": "iDeal",
+      "TRANSFER": "Wire Transfer",
+      "CANCELLATION_POLICY": "1) Less than 24 hours’ notice will result in a fee of 100% of the reserved service price.\n2) “No show” will likewise be charged 100% of the booked service price.\n3) Between 24 hours and 1 week notice will result in a fee of 30% of the reserved service price.\n4) Cancellation of an appointment made within 1 week prior will  result in a discount voucher for the paid amount.",
+      "EDIT_POLICY": ""
     },
     "STATUS": {
       "PAYMENT": {
         "NONE": "Pending",
         "APPROVED": "Approved",
         "REJECTED": "Rejected",
-        "IN_PROCESS": "In process"
+        "FAILURE": "Rejected",
+        "CANCELLED": "Cancelled",
+        "IN_PROCESS": "In process",
+        "PENDING": "Pending",
+        "CREATED": "Created",
+        "UNKNOWN": "Unknown"
       },
       "RESERVATION": {
         "CREATED": "Created",
@@ -166,9 +177,9 @@
       }
     },
     "PRODUCT": {
-      "FIELD": "Product",
-      "REQUIRED": "Product is <b>required</b>",
-      "INVALID": "Product is invalid",
+      "FIELD": "Service",
+      "REQUIRED": "Service is <b>required</b>",
+      "INVALID": "Service is invalid",
       "DURABILITY": {
         "TITLE": {
           "DIFFERENT": "<span class='bold'>Durability:</span> {{min}} to {{max}} days",
@@ -179,9 +190,9 @@
         "NONE": "-"
       },
       "GROUP": {
-        "FIELD": "Product type",
-        "REQUIRED": "Product type is <b>required</b>",
-        "INVALID": "Product type is invalid"
+        "FIELD": "Service type",
+        "REQUIRED": "Service type is <b>required</b>",
+        "INVALID": "Service type is invalid"
       }
     },
     "ADDITIONAL": {
@@ -215,7 +226,7 @@
           "PROFESSIONAL": "Professional",
           "START": "Start",
           "STATE": "State",
-          "PRODUCT": "Product"
+          "PRODUCT": "Service"
         },
         "ERROR": {
           "NO_CONTENT": "No reservations"

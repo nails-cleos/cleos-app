@@ -89,7 +89,7 @@ export class TokenService {
   }
 
   private refreshToken(): Observable<RefreshTokenResponse> {
-    return this.http.get<RefreshTokenResponse>('auth/refresh', {
+    return this.http.get<RefreshTokenResponse>('v1/auth/refresh', {
       headers: this.createHeader()
     });
   }

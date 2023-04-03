@@ -29,7 +29,7 @@
     <ng-container matColumnDef="type">
       <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
       <td *matCellDef="let payment" class="column-large-text" mat-cell>
-        <div *ngIf="payment.id; else skeleton">{{payment.type}}</div>
+        <div *ngIf="payment.id; else skeleton">{{ 'COMMON.PAYMENT.' + payment.type | translate }}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
@@ -52,7 +52,7 @@
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'ME.PAYMENT.LIST.COLUMN.STATUS' | translate }}</th>
       <td *matCellDef="let payment" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="payment.id; else skeleton">
-          {{'COMMON.STATUS.PAYMENT.' + (payment.status ? payment.status.toUpperCase() : 'NONE') | translate}}
+          {{'COMMON.STATUS.PAYMENT.' + (payment.status || 'NONE') | translate}}
         </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -64,13 +64,13 @@
       <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
       <td *matCellDef="let payment" mat-cell>
         <div *ngIf="payment.id; else skeleton">
-          <button (click)="pay(payment)" *ngIf="payment.status !== 'approved'" mat-icon-button
+          <button (click)="pay(payment)" *ngIf="payment.status !== 'APPROVED'" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.' + payment.type | translate }}" matTooltipPosition="above">
-            <mat-icon class="payment-button" color="primary">payment</mat-icon>
+            <mat-icon [svgIcon]="payment.type" class="svg-icon"></mat-icon>
           </button>
-          <button (click)="notify(payment)" *ngIf="payment.status !== 'approved'" mat-icon-button
+          <button (click)="notify(payment)" *ngIf="payment.status !== 'APPROVED'" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.NOTIFY'| translate }}" matTooltipPosition="above">
-            <mat-icon color="primary">update</mat-icon>
+            <mat-icon color="primary">published_with_changes</mat-icon>
           </button>
         </div>
         <ng-template #skeleton>
@@ -92,6 +92,7 @@
 </div>
 <div class="top">
   <div fxFlex></div>
-  <button appBackButton color="accent" mat-raised-button type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+  <button appBackButton color="accent" mat-fab extended class="icon-button"
+          type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
 </div>
 

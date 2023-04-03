@@ -73,7 +73,7 @@ export class ReservationEffects {
     this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.customerSearchReservation)).pipe(
       map((action: any) => action.payload),
       switchMap((payload: any) => this.reservationService.customerSearch(payload.roomId, payload.productId,
-        payload.date, payload.additionalIds).pipe(
+        payload.date, payload.professionalId, payload.additionalIds).pipe(
         switchMap((response: any) => of(new fromActionsReservation.ReservationSuccess(response ? response : []))),
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
       ))
@@ -158,7 +158,8 @@ export class ReservationEffects {
       switchMap((response: any) => of(new fromActionsReservation.ReservationSaveSuccess({
         message: this.translate.instant('COMMON.RESERVATION.CREATED', {date: newDateTimestamp(response.timestamp)}),
         id: response.id,
-        role: payload.role
+        role: payload.role,
+        paymentLink: response.paymentLink
       }))), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({
         error: err.error
       })))
@@ -297,6 +298,13 @@ export class ReservationEffects {
       catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
     ))
   ));
+  paymentBankList$ = createEffect(() => this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.paymentBankList)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.paymentService.getBankList(payload).pipe(
+      switchMap((response: any) => of(new fromActionsReservation.PaymentBankListSuccess(response))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
+    ))
+  ));
 
   selectedData$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.reservationSelected),
@@ -334,6 +342,10 @@ export class ReservationEffects {
   saveSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.reservationSaveSuccess),
     tap((data: any) => {
+      if (data.payload.paymentLink) {
+        window.open(data.payload.paymentLink, '_self');
+        return;
+      }
       let navigation: string[] = [];
       switch (data.payload.role) {
         case Role.customer:
@@ -371,6 +383,10 @@ export class ReservationEffects {
 
   trackingSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.trackingSuccess)
+  ), {dispatch: false});
+
+  paymentBankListSuccess$ = createEffect(() => this.actions$.pipe(
+    ofType(fromActionsReservation.ReservationActionTypes.paymentBankListSuccess)
   ), {dispatch: false});
 
   paymentsSuccess$ = createEffect(() => this.actions$.pipe(

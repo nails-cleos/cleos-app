@@ -17,7 +17,6 @@ import { UserService } from '../services/user.service';
 import { AdditionalService } from '../services/additional.service';
 import { TrackingService } from '../services/tracking.service';
 import { DayViewSchedulerComponent } from './day-view-scheduler.component';
-import { MatRadioModule } from '@angular/material/radio';
 
 @NgModule({
   declarations: [
@@ -37,8 +36,7 @@ import { MatRadioModule } from '@angular/material/radio';
       isolate: false,
       extend: true
     }),
-    EffectsModule.forFeature([DashboardEffects, ReservationEffects]),
-    MatRadioModule
+    EffectsModule.forFeature([DashboardEffects, ReservationEffects])
   ],
   providers: [
     DashboardService,

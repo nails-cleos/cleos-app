@@ -1,7 +1,7 @@
 <h1 mat-dialog-title>{{'RESERVATION.PROFESSIONAL.SELECT' | translate }}</h1>
 <div mat-dialog-content>
   <form [formGroup]="professionalForm">
-    <mat-form-field *ngIf="professionals; else skeleton" appearance="fill">
+    <mat-form-field *ngIf="professionals; else skeleton" appearance="outline">
       <mat-label>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</mat-label>
       <label>
         <input (keydown)="keyDownHandler($event)" [formControl]="professional" [matAutocomplete]="autoProfessional"
@@ -38,7 +38,7 @@
   </div>
   <ng-template #largeButton>
     <button (click)="doAction" [disabled]="professionalForm.invalid" cdkFocusInitial color="primary"
-            mat-raised-button>{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
-    <button (click)="onNoClick" mat-raised-button>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+            mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
+    <button (click)="onNoClick" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
   </ng-template>
 </div>

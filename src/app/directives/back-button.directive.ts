@@ -1,6 +1,6 @@
 import { Directive, HostListener, Input } from '@angular/core';
 import { NavigationService } from '../services/navigation.service';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { DialogComponent } from '../shared/dialog/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -9,7 +9,7 @@ import { MatDialog } from '@angular/material/dialog';
   selector: '[appBackButton]'
 })
 export class BackButtonDirective {
-  @Input() form?: FormGroup;
+  @Input() form?: UntypedFormGroup;
 
   constructor(private navigation: NavigationService, private translate: TranslateService, public dialog: MatDialog) {
   }

@@ -29,6 +29,7 @@
       "PAYMENT": "Pagar",
       "ML": "Pagar con ML",
       "PAYPAL": "Pagar con PayPal",
+      "IDEAL": "Pagar con iDeal",
       "NOTIFY": "Notificar",
       "SELECT": "Seleccionar",
       "UNAVAILABLE": "Agregar no disponible",
@@ -87,17 +88,25 @@
       "PERCENTAGE": "Porcentaje"
     },
     "PAYMENT": {
-      "CREATED": "Pago completado",
+      "PENDING": "Pago pendiente",
+      "SUCCESS": "Pago completado",
       "CASH": "Efectivo",
       "ML": "Mercado Libre",
-      "PAYPAL": "PayPal"
+      "PAYPAL": "PayPal",
+      "IDEAL": "iDeal",
+      "TRANSFER": "Transferencia bancaria"
     },
     "STATUS": {
       "PAYMENT": {
         "NONE": "Pendiente",
         "APPROVED": "Aprobado",
         "REJECTED": "Rechazado",
-        "IN_PROCESS": "Pendiente"
+        "FAILURE": "Rechazado",
+        "CANCELLED": "Cancelado",
+        "IN_PROCESS": "Pendiente",
+        "PENDING": "Pendiente",
+        "CREATED": "Creado",
+        "UNKNOWN": "Desconocido"
       },
       "RESERVATION": {
         "CREATED": "Creada",

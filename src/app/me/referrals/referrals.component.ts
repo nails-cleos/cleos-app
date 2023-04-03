@@ -10,6 +10,7 @@ import { IUserAll } from '../../interfaces/user';
 import { Observable, Subscription } from 'rxjs';
 import * as fromActionsDiscount from '../../store/discount.actions';
 import { IUserDiscount } from '../../interfaces/discount';
+import { AngularFireAnalytics } from "@angular/fire/compat/analytics";
 
 @Component({
   selector: 'app-referrals',
@@ -28,12 +29,17 @@ export class ReferralsComponent implements OnInit, OnDestroy {
   private referralsUsed = 0;
 
   constructor(private store: Store<AppState>, private clipboard: Clipboard, private snackBar: MatSnackBar,
-              private translate: TranslateService, private bottomSheet: MatBottomSheet) {
+              private translate: TranslateService, private bottomSheet: MatBottomSheet,
+              private analytic: AngularFireAnalytics) {
     this.store.select(selectAuthState).subscribe((state: any) => {
       this.user = state.user;
       this.referralMax = this.user && this.user.referralMax ? this.user.referralMax : 5;
     });
     this.getState = this.store.select(selectDiscountState);
+    this.analytic.logEvent('screen_view', {
+      firebase_screen: 'Referral page',
+      firebase_screen_class: 'ReferralsComponent'
+    });
   }
 
   get copy(): void {
@@ -48,14 +54,14 @@ export class ReferralsComponent implements OnInit, OnDestroy {
 
   get openBottomSheetShare(): void {
     this.bottomSheet.open(BottomSheetShareComponent, {
-      data: {code: this.user?.id}
+      data: { code: this.user?.id }
     });
     return;
   }
 
   get openBottomSheetReferral(): void {
     this.bottomSheet.open(BottomSheetReferralComponent, {
-      data: {referralMax: this.referralMax, referrals: this.referrals, referralsUsed: this.referralsUsed}
+      data: { referralMax: this.referralMax, referrals: this.referrals, referralsUsed: this.referralsUsed }
     });
     return;
   }
@@ -102,12 +108,12 @@ export class ReferralsComponent implements OnInit, OnDestroy {
 export class BottomSheetShareComponent {
   message: any;
   url = environment.appServer;
-  image = `${this.url}/assets/icons/icon-512x512.png`;
+  image = `${ this.url }/assets/icons/icon-512x512.png`;
 
   constructor(@Inject(MAT_BOTTOM_SHEET_DATA) public data: { code: string }, private translate: TranslateService) {
     this.message = this.translate.instant('ME.REFERRAL.LINK', {
       code: data.code,
-      url: `${this.url}/auth?code=${data.code}`
+      url: `${ this.url }/auth?code=${ data.code }`
     });
   }
 }

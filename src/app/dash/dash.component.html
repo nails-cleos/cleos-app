@@ -1,15 +1,15 @@
-<mat-card *ngIf="mapDashboard?.size" style="margin-bottom: 8px">
-  <mat-card-header>
+<mat-form-field appearance="outline" *ngIf="mapDashboard?.size" style="margin-bottom: 8px; width: 100%;">
+<!--  <mat-card-header>-->
     <mat-select [formControl]="selectedDash">
       <mat-option *ngFor="let dashboard of mapDashboard | keyvalue" [value]="dashboard.key">
         {{dashboard.key}}
       </mat-option>
     </mat-select>
-  </mat-card-header>
-</mat-card>
+<!--  </mat-card-header>-->
+</mat-form-field>
 
 <!--Calendar-->
-<mat-card>
+<mat-card appearance="outlined">
   <mat-card-header>
     <mat-card-title>{{ viewDate | calendarDate:(view + 'ViewTitle'):locale }}
       <div *ngIf="!isCalendarLoading; else skeleton">
@@ -24,22 +24,37 @@
       </ng-template>
     </mat-card-title>
     <mat-card-subtitle class="calendar-title">
-      <button (click)="changeDate" (viewDateChange)="closeOpenMonthViewDay" [(viewDate)]="viewDate"
+      <button  fxShow.lt-sm fxHide (click)="changeDate" (viewDateChange)="closeOpenMonthViewDay" [(viewDate)]="viewDate"
               [class.spinner]="isLoading || isCalendarLoading" [disabled]="isLoading || isCalendarLoading" [view]="view"
-              color="accent" mat-raised-button mwlCalendarPreviousView>
+              color="accent" mat-fab mwlCalendarPreviousView>
         <mat-icon>navigate_before</mat-icon>
-        <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.PREVIOUS' | translate}}</span>
       </button>
-      <button (click)="changeDate" [(viewDate)]="viewDate" [class.spinner]="isLoading || isCalendarLoading"
-              [disabled]="isLoading || isCalendarLoading" class="btn btn-outline-secondary" color="accent"
-              mat-raised-button mwlCalendarToday>
-        <mat-icon>today</mat-icon>
-        <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.TODAY' | translate}}</span>
-      </button>
-      <button (click)="changeDate" (viewDateChange)="closeOpenMonthViewDay" [(viewDate)]="viewDate"
+      <button fxHide.lt-sm fxShow (click)="changeDate" (viewDateChange)="closeOpenMonthViewDay" [(viewDate)]="viewDate"
               [class.spinner]="isLoading || isCalendarLoading" [disabled]="isLoading || isCalendarLoading" [view]="view"
-              color="accent" mat-raised-button mwlCalendarNextView>
-        <span fxHide.lt-sm fxShow>{{'COMMON.BUTTON.NEXT' | translate}}</span>
+              color="accent" mat-fab extended mwlCalendarPreviousView>
+        <mat-icon>navigate_before</mat-icon>
+        <span>{{'COMMON.BUTTON.PREVIOUS' | translate}}</span>
+      </button>
+      <button fxShow.lt-sm fxHide (click)="changeDate" [(viewDate)]="viewDate" [class.spinner]="isLoading || isCalendarLoading"
+              [disabled]="isLoading || isCalendarLoading" class="btn btn-outline-secondary" color="accent"
+              mat-fab mwlCalendarToday>
+        <mat-icon>today</mat-icon>
+      </button>
+      <button fxHide.lt-sm fxShow (click)="changeDate" [(viewDate)]="viewDate" [class.spinner]="isLoading || isCalendarLoading"
+              [disabled]="isLoading || isCalendarLoading" class="btn btn-outline-secondary" color="accent"
+              mat-fab extended mwlCalendarToday>
+        <mat-icon>today</mat-icon>
+        <span>{{'COMMON.BUTTON.TODAY' | translate}}</span>
+      </button>
+      <button fxShow.lt-sm fxHide (click)="changeDate" (viewDateChange)="closeOpenMonthViewDay" [(viewDate)]="viewDate"
+              [class.spinner]="isLoading || isCalendarLoading" [disabled]="isLoading || isCalendarLoading" [view]="view"
+              color="accent" mat-fab mwlCalendarNextView>
+        <mat-icon>navigate_next</mat-icon>
+      </button>
+      <button fxHide.lt-sm fxShow (click)="changeDate" (viewDateChange)="closeOpenMonthViewDay" [(viewDate)]="viewDate"
+              [class.spinner]="isLoading || isCalendarLoading" [disabled]="isLoading || isCalendarLoading" [view]="view"
+              color="accent" mat-fab extended mwlCalendarNextView>
+        <span>{{'COMMON.BUTTON.NEXT' | translate}}</span>
         <mat-icon>navigate_next</mat-icon>
       </button>
     </mat-card-subtitle>
@@ -55,22 +70,22 @@
 </mat-card>
 <mat-grid-list cols="{{cardLayout.columns }}" rowHeight="200px">
   <!--Mini Cards-->
-  <mat-grid-tile *ngFor="let mc of miniCardData" [colspan]="cardLayout.miniCard?.cols"
-                 [rowspan]="cardLayout.miniCard?.rows">
+  <mat-grid-tile *ngFor="let mc of miniCardData" [colspan]="cardLayout.miniCard.cols"
+                 [rowspan]="cardLayout.miniCard.rows">
     <app-mini-card [color]="mc.color" [duration]="'DASHBOARD.MINI_CARD.DURATION' | translate" [error]="mc.error"
-                   [icon]="mc.icon"
+                   [icon]="mc.icon" [isInfinity]="mc.infinity"
                    [isCurrency]="mc.currency" [isIncrease]="mc.increase" [isLoading]="isLoading"
                    [percentValue]="mc.percentValue" [title]="mc.title | translate"
                    [value]="mc.value"></app-mini-card>
   </mat-grid-tile>
   <!--Charts-->
-  <mat-grid-tile *ngFor="let chart of charts" [colspan]="cardLayout.chart?.cols" [rowspan]="cardLayout.chart?.rows">
+  <mat-grid-tile *ngFor="let chart of charts" [colspan]="cardLayout.chart.cols" [rowspan]="cardLayout.chart.rows">
     <app-card [chart]="chart" [isDark]="isDarkMode" [title]="chart.title">
       <app-chart [chartSummary]="chart" [error]="error" [isDark]="isDarkMode" [isLoading]="isLoading"></app-chart>
     </app-card>
   </mat-grid-tile>
   <!--Table-->
-  <mat-grid-tile *ngIf="roomId || professionalId" [colspan]="cardLayout.table?.cols" [rowspan]="cardLayout.table?.rows">
+  <mat-grid-tile *ngIf="roomId || professionalId" [colspan]="cardLayout.table.cols" [rowspan]="cardLayout.table.rows">
     <app-card [expand]="false" [title]="'DASHBOARD.CARD.RESERVATION' | translate">
       <app-reservation-table [roomId]="roomId" [professionalId]="professionalId"></app-reservation-table>
     </app-card>

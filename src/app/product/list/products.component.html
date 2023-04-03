@@ -66,19 +66,19 @@
           <mat-list>
             <div mat-subheader>{{ 'COMMON.COLUMN.LAST_UPDATE' | translate }}</div>
             <mat-list-item role="list">
-              <div mat-line>{{product.modifiedAt | date:'short':undefined:language}}</div>
+              <div matListItemLine>{{product.modifiedAt | date:'short':undefined:language}}</div>
             </mat-list-item>
             <div fxHide fxShow.lt-sm mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
             <mat-list-item fxHide fxShow.lt-sm role="list">
               <button *ngIf="!product.deleted" [routerLink]="'/products/'+ product.id + '/edit'" color="primary"
                       mat-icon-button>
-                <mat-icon>edit</mat-icon>
+                <mat-icon matListItemIcon>edit</mat-icon>
               </button>
               <button [routerLink]="'/products/'+ product.id + '/view'" color="accent" mat-icon-button>
-                <mat-icon>visibility</mat-icon>
+                <mat-icon matListItemIcon>visibility</mat-icon>
               </button>
               <button (click)="delete(product)" *ngIf="!product.deleted" color="warn" mat-icon-button>
-                <mat-icon>delete</mat-icon>
+                <mat-icon matListItemIcon>delete</mat-icon>
               </button>
             </mat-list-item>
           </mat-list>

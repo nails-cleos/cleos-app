@@ -1,21 +1,12 @@
 <div *ngIf="!isLoading; else box" class="chartContainer">
   <div *ngIf="chart && !error; else errorBox">
-    <div *ngIf="chart.dataSet && chart.dataSet.length && chart.type">
-      <canvas [chartType]="chart.type" [colors]="chart.colors"
-              [datasets]="chart.dataSet"
+    <div>
+      <canvas [type]="chart.type"
+              [datasets]="chart.charData.datasets"
               [labels]="chart.labels"
               [legend]="true"
               [options]="chart.options"
               baseChart class="block">
-      </canvas>
-    </div>
-    <div *ngIf="chart.data && chart.type">
-      <canvas [chartType]="chart.type" [colors]="chart.colors"
-              [data]="chart.data"
-              [labels]="chart.labels"
-              [legend]="true"
-              [options]="chart.options"
-              baseChart class="display: block">
       </canvas>
     </div>
   </div>

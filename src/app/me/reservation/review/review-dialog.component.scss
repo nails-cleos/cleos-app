@@ -1,12 +1,12 @@
-.mat-card-actions {
+.mat-mdc-card-actions {
   text-align: center;
 }
 
-.mat-card-header {
+.mat-mdc-card-header {
   justify-content: center;
 }
 
-.mat-card-content {
+.mat-mdc-card-content {
   .container {
     margin: auto;
     text-align: center;
@@ -33,33 +33,9 @@
 
 .close-button {
   float: right;
-  top: -24px;
-  right: -24px;
+  z-index: 9999;
 }
 
-.close-icon {
-  transition: 1s ease-in-out;
-}
-
-.close-icon:hover {
-  transform: rotate(180deg);
-}
-
-::ng-deep .icon-outside .close-button {
-  float: right;
-  top: -52px;
-  right: -52px;
-}
-
-::ng-deep .icon-outside .mat-dialog-container {
-  overflow: unset
-}
-
-.mat-button-wrapper {
-  cursor: not-allowed;
-  pointer-events: all !important;
-}
-
-.mat-dialog-content {
+.mat-mdc-dialog-content {
   text-align: center;
 }

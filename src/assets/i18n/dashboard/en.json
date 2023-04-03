@@ -16,9 +16,9 @@
     },
     "MINI_CARD": {
       "DURATION": "since last month",
-      "TOTAL_PRODUCT_SALES": "Total Product Sales",
-      "AVERAGE_PRODUCT_VALUE": "Average Product Value",
-      "TOTAL_PRODUCTS": "Total Products",
+      "TOTAL_PRODUCT_SALES": "Total Service Sales",
+      "AVERAGE_PRODUCT_VALUE": "Average Service Value",
+      "TOTAL_PRODUCTS": "Total Services",
       "NEW_CUSTOMERS_RESERVATION": "New Customers Reservation"
     },
     "CARD": {

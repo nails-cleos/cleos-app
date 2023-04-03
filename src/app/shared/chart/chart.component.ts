@@ -29,5 +29,6 @@ export class ChartComponent implements OnChanges {
     }
     this.error = undefined;
     this.chart = createChart(this.chartSummary, this.isDark);
+    console.log(this.chart)
   }
 }

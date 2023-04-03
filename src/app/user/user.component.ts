@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -18,36 +18,36 @@ import { lightenDarkenColor } from '../util/color';
 export class UserComponent implements OnInit, OnDestroy {
 
   hide = false;
-  form!: FormGroup;
+  form!: UntypedFormGroup;
   subscription: Subscription | undefined;
   getState: Observable<any>;
   errors: any = [];
 
-  role: FormControl = new FormControl('', [
+  role: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  username: FormControl = new FormControl('', [
+  username: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  email: FormControl = new FormControl('', [
+  email: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, Validators.email
   ]);
-  lang: FormControl = new FormControl('', [
+  lang: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
 
-  firstName: FormControl = new FormControl();
-  lastName: FormControl = new FormControl();
-  phone: FormControl = new FormControl();
-  dob: FormControl = new FormControl();
-  darkColor: FormControl = new FormControl();
-  lightColor: FormControl = new FormControl();
+  firstName: UntypedFormControl = new UntypedFormControl();
+  lastName: UntypedFormControl = new UntypedFormControl();
+  phone: UntypedFormControl = new UntypedFormControl();
+  dob: UntypedFormControl = new UntypedFormControl();
+  darkColor: UntypedFormControl = new UntypedFormControl();
+  lightColor: UntypedFormControl = new UntypedFormControl();
 
   flagList: IFlag[] = flags();
 
   extras: any;
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
               private router: Router, private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectUserState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;

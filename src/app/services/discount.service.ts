@@ -7,7 +7,8 @@ import { PAGE_SIZE } from '../interfaces/pagination';
 @Injectable()
 export class DiscountService {
 
-  url = 'discounts';
+  private url = 'discounts';
+  private urlV1 = `v1/${this.url}`;
 
   constructor(private http: HttpClient) {
   }
@@ -21,33 +22,33 @@ export class DiscountService {
       params = params.append('direction', direction);
     }
 
-    return this.http.get<IDiscount[]>(`${this.url}/${path}`, {params});
+    return this.http.get<IDiscount[]>(`${this.urlV1}/${path}`, {params});
   }
 
   public getReferrals(): Observable<IUserDiscount[]> {
-    return this.http.get<IUserDiscount[]>(`${this.url}/me/referrals`);
+    return this.http.get<IUserDiscount[]>(`${this.urlV1}/me/referrals`);
   }
 
   public getById(id: string | null): Observable<IDiscount | undefined> {
-    const url = `${this.url}/${id}`;
+    const url = `${this.urlV1}/${id}`;
     return this.http.get<IDiscount>(url);
   }
 
   public add(discount: IDiscount): Observable<IDiscount> {
-    return this.http.post<IDiscount>(this.url, discount);
+    return this.http.post<IDiscount>(this.urlV1, discount);
   }
 
   public send(id: string, customersDiscount: string[]): Observable<IDiscount> {
-    return this.http.post<IDiscount>(`${this.url}/${id}/customers`, customersDiscount);
+    return this.http.post<IDiscount>(`${this.urlV1}/${id}/customers`, customersDiscount);
   }
 
   public delete(id: string | null): Observable<IDiscount> {
-    const url = `${this.url}/${id}`;
+    const url = `${this.urlV1}/${id}`;
     return this.http.delete<IDiscount>(url);
   }
 
   public update(discount: IDiscount): Observable<IDiscount> {
-    const url = `${this.url}/${discount.id}`;
+    const url = `${this.urlV1}/${discount.id}`;
     return this.http.patch<IDiscount>(url, discount);
   }
 }

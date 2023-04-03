@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Currency, ICurrency } from '../../interfaces/currency';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -17,13 +17,13 @@ import * as fromActionsCurrency from '../../store/currency.actions';
 export class CurrencyDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() currency?: ICurrency;
 
-  form!: FormGroup;
+  form!: UntypedFormGroup;
 
-  code: FormControl = new FormControl('', [
+  code: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  name: FormControl = new FormControl('');
-  icon: FormControl = new FormControl('');
+  name: UntypedFormControl = new UntypedFormControl('');
+  icon: UntypedFormControl = new UntypedFormControl('');
 
   errors: any = [];
   icons = ['attach_money', 'euro', 'currency_pound'];
@@ -31,7 +31,7 @@ export class CurrencyDetailComponent implements OnInit, AfterViewInit, OnDestroy
   private subscription?: Subscription;
   private getState: Observable<any>;
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
               private router: Router, public dialog: MatDialog) {
     this.getState = this.store.select(selectCurrencyState);
   }

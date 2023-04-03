@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
-import { AgmCoreModule } from '@agm/core';
 import { CalendarModule } from 'angular-calendar';
 import { SharedModule } from '../shared/shared.module';
 import { ReservationRoutingModule } from './reservation-routing.module';
@@ -44,10 +43,6 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
     SharedModule,
     MatFabMenuModule,
     CalendarModule,
-    AgmCoreModule.forRoot({
-      apiKey: environment.googleMapKey,
-      libraries: ['places', 'geometry']
-    }),
     MatStepperModule,
     MatChipsModule,
     MatExpansionModule,

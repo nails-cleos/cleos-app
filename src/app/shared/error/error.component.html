@@ -5,7 +5,7 @@
         <img alt="error" class="error" src="{{imageSrc}}">
       </div>
       <ng-template #cardBox>
-        <mat-card>
+        <mat-card appearance="outlined">
           <mat-card-header>
           </mat-card-header>
           <img alt="error" class="error" mat-card-image src="{{imageSrc}}">
@@ -16,10 +16,10 @@
   <div fxLayout="row">
     <div fxFlex></div>
     <div class="only-button">
-      <button (click)="reload" *ngIf="retry" color="primary" mat-raised-button type="button">
+      <button (click)="reload" *ngIf="retry" color="primary" mat-fab extended class="icon-button" type="button">
         {{ 'COMMON.BUTTON.RELOAD' | translate }}
       </button>
-      <button appBackButton class="raised-button" color="accent" mat-raised-button type="button">
+      <button appBackButton color="accent" mat-fab extended class="icon-button" type="button">
         {{ 'COMMON.BUTTON.BACK' | translate }}
       </button>
     </div>
@@ -34,7 +34,7 @@
         </div>
       </div>
       <ng-template #noContentCard>
-        <mat-card>
+        <mat-card appearance="outlined">
           <mat-card-content>
             <div class="no-content bold">
               {{'COMMON.ERROR.NO_CONTENT' | translate}}

@@ -14,7 +14,7 @@ import { getNow, isSameTimeZone, newDate, newDateTimestamp } from '../../util/da
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { map, startWith } from 'rxjs/operators';
 import { IUser, IUserAll } from '../../interfaces/user';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { getFullUserName, openDialog } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -32,7 +32,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild('stateInput') stateInput!: ElementRef<HTMLInputElement>;
   @ViewChild('auto') matAutocomplete!: MatAutocomplete;
 
-  displayedColumns: string[] = ['position', 'customer', 'start', 'state', 'product', 'actions'];
+  displayedColumns: string[] = ['position', 'customer', 'timestamp', 'state', 'product', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IReservationAll>>();
   expandedReservation: IReservation | undefined;
   resultsLength = DEFAULT_LENGTH;
@@ -41,9 +41,9 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   language: string;
 
   filteredCustomer: Observable<IUser[] | undefined> | undefined;
-  customer: FormControl = new FormControl();
+  customer: UntypedFormControl = new UntypedFormControl();
 
-  state = new FormControl();
+  state = new UntypedFormControl();
   filteredStates: Observable<string[]>;
   states: string[] = [States.created];
 
@@ -173,6 +173,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
       if (state.filter) {
         const now = getNow();
         this.dataSource = state.filter.content?.map((reservation: IReservationAll) => {
+          console.log("RESERVATION START", reservation.start)
           if (reservation.start && [String(States.created), String(States.approved)].includes(reservation.state)) {
             const deadLine = newDate(reservation.start) < now;
             return Object.assign({}, reservation, {deadLine});

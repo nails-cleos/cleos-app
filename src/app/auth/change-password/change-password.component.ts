@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState, selectUserState } from '../../store/app.states';
@@ -18,19 +18,19 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
   @ViewChild('passwordComponent') passwordComponent: any;
 
   showError = false;
-  form!: FormGroup;
+  form!: UntypedFormGroup;
   subscription?: Subscription;
   getState: Observable<any>;
   currentUser?: IUser;
   userSubscription?: Subscription;
   getUserState: Observable<any>;
 
-  oldPassword: FormControl = new FormControl('', [
+  oldPassword: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
 
   constructor(private store: Store<AppState>, private route: ActivatedRoute, private router: Router,
-              private formBuilder: FormBuilder) {
+              private formBuilder: UntypedFormBuilder) {
     this.getState = this.store.select(selectAuthState);
     this.getUserState = this.store.select(selectUserState);
   }

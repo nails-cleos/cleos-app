@@ -11,12 +11,13 @@ import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import * as fromActionsReservation from '../../../store/reservation.actions';
-import { isSameTimeZone, newDate, newDateTimestamp } from '../../../util/dates';
+import { isSameTimeZone, newDateTimestamp } from '../../../util/dates';
 import { openDialog } from '../../../util/helper';
 import { stampAnimation, transitionAnimation } from '../../../util/animation';
 import { IReview, Review } from '../../../interfaces/review';
 import { ReviewDialogComponent } from '../review/review-dialog.component';
 import { isToday } from 'date-fns';
+import { AngularFireAnalytics } from "@angular/fire/compat/analytics";
 
 @Component({
   selector: 'app-reservations',
@@ -28,12 +29,11 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['position', 'professional', 'start', 'product', 'state', 'actions'];
+  displayedColumns: string[] = ['position', 'professional', 'timestamp', 'product', 'state', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IReservationAll>>();
 
   upcoming?: IUpcomingAll[];
   noContent = false;
-  dates?: Date[];
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
@@ -47,7 +47,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   private subscription?: Subscription;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef) {
+              private breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef, private analytic: AngularFireAnalytics) {
     this.getState = this.store.select(selectReservationState);
     this.language = this.translate.currentLang;
     breakpointObserver.observe([
@@ -57,6 +57,10 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
       if (result.matches) {
         this.pageSize = MOBILE_PAGE_SIZE;
       }
+    });
+    analytic.logEvent('screen_view', {
+      firebase_screen: 'Main reservation page',
+      firebase_screen_class: 'ReservationsComponent'
     });
   }
 
@@ -86,13 +90,13 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   onRatingChanged(reservation: IReservationAll): void {
-    const dialogRef = this.dialog.open(ReviewDialogComponent, {data: reservation});
+    const dialogRef = this.dialog.open(ReviewDialogComponent, { data: reservation });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && result.rating) {
         const review: IReview = new Review(result.rating);
         review.reservationId = reservation?.id;
-        review.detail = result.detail ? result.detail : this.translate.instant(`ME.REVIEW.RATING.${result.rating}`);
+        review.detail = result.detail ? result.detail : this.translate.instant(`ME.REVIEW.RATING.${ result.rating }`);
         this.store.dispatch(
           new fromActionsReservation.ReservationReview(review)
         );
@@ -120,7 +124,8 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
         if (this.data.reservations) {
           this.dataSource = this.data.reservations.content?.map((reservation: IReservationAll) => {
             if (this.showReview && reservation.state === States.completed
-              && isToday(newDate(reservation.start)) && !reservation.review) {
+              && isToday(newDateTimestamp(reservation.timestamp, reservation.room.timeZone))
+              && !reservation.review) {
               this.onRatingChanged(reservation);
               this.showReview = false;
             }
@@ -130,7 +135,6 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
         this.resultsLength = this.data.reservations?.totalElements;
         if (this.data.upcoming && this.data.upcoming.length) {
           this.upcoming = this.data.upcoming;
-          this.dates = this.upcoming?.map(upcoming => newDate(upcoming.start));
         }
       }
     });

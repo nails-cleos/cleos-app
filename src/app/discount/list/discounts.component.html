@@ -87,7 +87,7 @@
             </mat-list-item>
             <div mat-subheader>{{ 'DISCOUNT.LIST.COLUMN.AMOUNT' | translate }}</div>
             <mat-list-item role="list">
-              <mat-icon *ngIf="discount.currency" mat-list-icon>{{discount.currency.icon}}</mat-icon>
+              <mat-icon *ngIf="discount.currency" matListItemIcon>{{discount.currency.icon}}</mat-icon>
               <div mat-line>{{discount.amount}}</div>
             </mat-list-item>
             <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>

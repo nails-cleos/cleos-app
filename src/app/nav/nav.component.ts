@@ -29,7 +29,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Role } from '../interfaces/token';
 import { MessagingService } from '../services/messaging.service';
 import { environment } from '../../environments/environment';
-import { getUserImage, getUserName, getUserNameInitials, isRoomAdmin } from '../util/helper';
+import { getUserImage, getUserNameInitials, isRoomAdmin } from '../util/helper';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NavigationService } from '../services/navigation.service';
 import { TokenService } from '../services/token.service';
@@ -37,7 +37,6 @@ import { CookieService } from 'ngx-cookie-service';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { getThemeName, isDarkMode, resetTheme, Theme, THEME } from '../util/theme';
 import { ThemeService } from 'ng2-charts';
-import { RedirectComponent } from '../auth/redirect/redirect.component';
 
 @Component({
   selector: 'app-nav',
@@ -84,7 +83,6 @@ export class NavComponent implements OnInit, OnDestroy {
   private authSubscription?: Subscription;
   private notificationSubscription?: Subscription;
   private isAuthorized = false;
-  private message: any;
   private cssClass?: string;
   private authSubject: Subject<boolean> = new Subject<boolean>();
 
@@ -135,7 +133,7 @@ export class NavComponent implements OnInit, OnDestroy {
       }
       this.notifications = this.notifications.map(value => {
         if (value.id === notification.id) {
-          return Object.assign({}, value, {read: true});
+          return Object.assign({}, value, { read: true });
         }
         return value;
       });
@@ -161,9 +159,9 @@ export class NavComponent implements OnInit, OnDestroy {
     const user: IUser = new User();
     user.theme = theme;
     const redirectUrl = this.router.url;
-    const message = this.translate.instant(`COMMON.PROFILE.UPDATED.DARK_MODE_${checked.toString().toUpperCase()}`);
+    const message = this.translate.instant(`COMMON.PROFILE.UPDATED.DARK_MODE_${ checked.toString().toUpperCase() }`);
     this.store.dispatch(
-      new fromActionsUser.UpdateUser({user, redirectUrl, message})
+      new fromActionsUser.UpdateUser({ user, redirectUrl, message })
     );
   }
 
@@ -204,7 +202,7 @@ export class NavComponent implements OnInit, OnDestroy {
         this.image = getUserImage(user);
         this.messagingService.requestPermission(user.id);
         this.messagingService.receiveMessage();
-        this.message = this.messagingService.currentMessage.subscribe((value: any) => {
+        this.messagingService.currentMessage?.subscribe((value: any) => {
           if (value) {
             const notification = {
               id: value.data.id,

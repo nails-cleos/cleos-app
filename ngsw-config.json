@@ -9,7 +9,7 @@
         "files": [
           "/favicon.ico",
           "/index.html",
-          "/manifest.webmanifest",
+          "/manifest.json",
           "/*.css",
           "/*.js"
         ]
@@ -25,7 +25,7 @@
           "/*.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)"
         ],
         "urls": [
-          "https://fonts.googleapis.com/css?family=Material+Icons&display=swap",
+          "https://fonts.googleapis.com/css?family=Material+Icons+Outlined&display=swap",
           "https://fonts.googleapis.com/css?family=Belleza:300,400,500&display=swap"
         ]
       }

@@ -2,13 +2,13 @@
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <form (ngSubmit)="create" [formGroup]="form" novalidate>
-        <mat-card class="style-card">
+        <mat-card appearance="outlined" class="style-card">
           <mat-card-header>
             <mat-card-title>{{ 'UNAVAILABLE.TITLE' | translate }}</mat-card-title>
           </mat-card-header>
           <mat-card-content>
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-              <mat-form-field *ngIf="professionals; else skeleton" appearance="fill">
+              <mat-form-field *ngIf="professionals; else skeleton" appearance="outline">
                 <mat-label>{{ 'UNAVAILABLE.PROFESSIONAL.FIELD' | translate }}</mat-label>
                 <label>
                   <input (keydown)="keyDownHandler($event)" [formControl]="professional" [matAutocomplete]="auto"
@@ -33,7 +33,7 @@
               <ng-template #skeleton>
                 <div class="ssc-line"></div>
               </ng-template>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'UNAVAILABLE.DESCRIPTION.FIELD' | translate }}</mat-label>
                 <label>
                   <textarea #message formControlName="description" matInput maxlength="256"></textarea>
@@ -42,7 +42,7 @@
               </mat-form-field>
 
               <div *ngIf="professional.valid" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
-                <mat-form-field appearance="fill" color="primary" style="margin-right: 12px;">
+                <mat-form-field appearance="outline" color="primary" style="margin-right: 12px;">
                   <mat-label>{{ 'UNAVAILABLE.DATE.FIELD' | translate }}</mat-label>
                   <button (click)="picker.open()" mat-icon-button matPrefix>
                     <mat-icon>today</mat-icon>
@@ -61,7 +61,7 @@
                 </mat-form-field>
                 <mat-checkbox [formControl]="allDay"
                               color="primary">{{ 'COMMON.ALL_DAY.CHECK' | translate }}</mat-checkbox>
-                <mat-form-field *ngIf="!allDay.value" appearance="fill" style="margin-right: 12px;">
+                <mat-form-field *ngIf="!allDay.value" appearance="outline" style="margin-right: 12px;">
                   <mat-label>{{ 'UNAVAILABLE.TIME.FIELD' | translate }}</mat-label>
                   <label>
                     <input (focusin)="focusin" [formControl]="startTime" [format]="24" [max]="maxTime" [min]="minTime"
@@ -76,7 +76,7 @@
                 </mat-form-field>
               </div>
 
-              <mat-form-field *ngIf="showDuration && !allDay.value" appearance="fill">
+              <mat-form-field *ngIf="showDuration && !allDay.value" appearance="outline">
                 <mat-label>{{ 'UNAVAILABLE.DURATION.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="duration" [format]="24" [max]="durationMax" [ngxTimepicker]="t" matInput
@@ -92,7 +92,7 @@
                 </mat-error>
               </mat-form-field>
 
-              <mat-form-field *ngIf="professional.valid" appearance="fill">
+              <mat-form-field *ngIf="professional.valid" appearance="outline">
                 <mat-label>{{ 'UNAVAILABLE.REPEAT.FIELD' | translate }}</mat-label>
                 <mat-select [formControl]="repeat" required>
                   <mat-option *ngFor="let t of repeats | keyvalue" [value]="t.value">
@@ -100,7 +100,7 @@
                   </mat-option>
                 </mat-select>
               </mat-form-field>
-              <mat-form-field *ngIf="showEnd" appearance="fill" color="primary" style="margin-right: 12px;">
+              <mat-form-field *ngIf="showEnd" appearance="outline" color="primary" style="margin-right: 12px;">
                 <mat-label>{{ 'UNAVAILABLE.END.FIELD' | translate }}</mat-label>
                 <button (click)="picker.open()" mat-icon-button matPrefix>
                   <mat-icon>today</mat-icon>
@@ -124,9 +124,9 @@
           </mat-card-content>
           <mat-card-actions>
             <div fxFlex></div>
-            <button [disabled]="form.invalid" color="primary" mat-raised-button
+            <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button"
                     type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
-            <button [form]="form" appBackButton color="accent" mat-raised-button
+            <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
         </mat-card>

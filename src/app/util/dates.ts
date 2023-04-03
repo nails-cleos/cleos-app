@@ -14,7 +14,7 @@ import {
   subMonths,
   subWeeks
 } from 'date-fns';
-import RRule, { Weekday } from 'rrule';
+import { RRule, Weekday } from 'rrule';
 import { IReservationAll } from '../interfaces/reservation';
 import { IProductAll } from '../interfaces/product';
 import { IAdditionalAll } from '../interfaces/additional';
@@ -54,6 +54,11 @@ export class TimeZone implements ITimeZone {
     this.gmt = gmt;
   }
 }
+
+export const daysOfWeek: string[] = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+
+export const findDayOfWeek = (day: string): number => daysOfWeek.findIndex(x => x === day);
+
 
 export const getDuration = (allDay: boolean, duration?: string): IDuration =>
   allDay || !duration ? new Duration(23, 59) : convertDuration(duration);
@@ -118,18 +123,36 @@ export const getRoomStartEndDay = (availability: IAvailability, timeZone: string
   const min: Date = availabilityMinMax.min;
   const max: Date = availabilityMinMax.max;
 
-  return min && max ? formatMinMax(min, max) : {min, max};
+  return min && max ? formatMinMax(min, max) : { min, max };
 };
 
-export const getStartEndDay = (week: IAvailability, saturday: IAvailability, sunday: IAvailability, timeZone: string): any => {
+export const getStartEndDay = (monday: IAvailability, tuesday: IAvailability, wednesday: IAvailability,
+                               thursday: IAvailability, friday: IAvailability, saturday: IAvailability,
+                               sunday: IAvailability, timeZone: string): any => {
   const date: Date = new Date();
-  const weekMinMax = getMinAndMax(week, date, timeZone);
+  const mondayMinMax = getMinAndMax(monday, date, timeZone);
+  const tuesdayMinMax = getMinAndMax(tuesday, date, timeZone);
+  const wednesdayMinMax = getMinAndMax(wednesday, date, timeZone);
+  const thursdayMinMax = getMinAndMax(thursday, date, timeZone);
+  const fridayMinMax = getMinAndMax(friday, date, timeZone);
   const saturdayMinMax = getMinAndMax(saturday, date, timeZone);
   const sundayMinMax = getMinAndMax(sunday, date, timeZone);
 
-  let min: Date = weekMinMax.min;
-  let max: Date = weekMinMax.max;
+  let min: Date = mondayMinMax.min;
+  let max: Date = mondayMinMax.max;
 
+  if (!min || tuesdayMinMax.min < min) {
+    min = tuesdayMinMax.min;
+  }
+  if (!max || wednesdayMinMax.min < min) {
+    min = wednesdayMinMax.min;
+  }
+  if (!max || thursdayMinMax.min < min) {
+    min = thursdayMinMax.min;
+  }
+  if (!max || fridayMinMax.min < min) {
+    min = fridayMinMax.min;
+  }
   if (!min || saturdayMinMax.min < min) {
     min = saturdayMinMax.min;
   }
@@ -137,6 +160,18 @@ export const getStartEndDay = (week: IAvailability, saturday: IAvailability, sun
     min = sundayMinMax.min;
   }
 
+  if (!max || tuesdayMinMax.max > max) {
+    max = tuesdayMinMax.max;
+  }
+  if (wednesdayMinMax.max > max) {
+    max = wednesdayMinMax.max;
+  }
+  if (!max || thursdayMinMax.max > max) {
+    max = thursdayMinMax.max;
+  }
+  if (fridayMinMax.max > max) {
+    max = fridayMinMax.max;
+  }
   if (!max || saturdayMinMax.max > max) {
     max = saturdayMinMax.max;
   }
@@ -173,35 +208,61 @@ export const getDiffTime = (maxDate: Date, minDate: Date): string => {
 };
 
 export const getAvailability = (room: IRoom): any => {
-  const week: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'WEEK')[0];
-  const saturday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'SATURDAY')[0];
-  const sunday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'SUNDAY')[0];
-  let exclude: number[] = [];
-  if (!week) {
-    exclude = [1, 2, 3, 4, 5];
+  if (room.availabilities) {
+    const monday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'MONDAY')[0];
+    const tuesday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'TUESDAY')[0];
+    const wednesday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'WEDNESDAY')[0];
+    const thursday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'THURSDAY')[0];
+    const friday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'FRIDAY')[0];
+    const saturday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'SATURDAY')[0];
+    const sunday: IAvailability = room.availabilities.filter((el: IAvailability) => el.day === 'SUNDAY')[0];
+    let exclude: number[] = [];
+    if (!monday) {
+      exclude = [...exclude, 1];
+    }
+    if (!tuesday) {
+      exclude = [...exclude, 2];
+    }
+    if (!wednesday) {
+      exclude = [...exclude, 3];
+    }
+    if (!thursday) {
+      exclude = [...exclude, 4];
+    }
+    if (!friday) {
+      exclude = [...exclude, 5];
+    }
+    if (!saturday) {
+      exclude = [...exclude, 6];
+    }
+    if (!sunday) {
+      exclude = [...exclude, 0];
+    }
+    return { monday, tuesday, wednesday, thursday, friday, saturday, sunday, exclude };
   }
-  if (!saturday) {
-    exclude = [...exclude, 6];
-  }
-  if (!sunday) {
-    exclude = [...exclude, 0];
-  }
-  return {week, saturday, sunday, exclude};
 };
 
 export const getMinMaxDate = (day: number, date: any, rooms: IRoomAll[]): any => {
   let minDate: Date | undefined;
   let maxDate: Date | undefined;
 
-  let weekAv: any;
+  let mondayAv: any;
+  let tuesdayAv: any;
+  let wednesdayAv: any;
+  let thursdayAv: any;
+  let fridayAv: any;
   let saturdayAv: any;
   let sundayAv: any;
 
   rooms.forEach(room => {
     let av: IAvailabilityAll;
-    const {week, saturday, sunday} = getAvailability(room);
+    const { monday, tuesday, wednesday, thursday, friday, saturday, sunday } = getAvailability(room);
 
-    weekAv = weekAv ?? week;
+    mondayAv = mondayAv ?? monday;
+    tuesdayAv = tuesdayAv ?? tuesday;
+    wednesdayAv = wednesdayAv ?? wednesday;
+    thursdayAv = thursdayAv ?? thursday;
+    fridayAv = fridayAv ?? friday;
     saturdayAv = saturdayAv ?? saturday;
     sundayAv = sundayAv ?? sunday;
 
@@ -209,14 +270,26 @@ export const getMinMaxDate = (day: number, date: any, rooms: IRoomAll[]): any =>
       case 0:
         av = sunday;
         break;
-      case 6:
-        av = saturday;
+      case 1:
+        av = monday;
+        break;
+      case 2:
+        av = tuesday;
+        break;
+      case 3:
+        av = wednesday;
+        break;
+      case 4:
+        av = thursday;
+        break;
+      case 5:
+        av = friday;
         break;
       default:
-        av = week;
+        av = saturday;
         break;
     }
-    const {min, max} = getMinAndMax(av, date, room.timeZone);
+    const { min, max } = getMinAndMax(av, date, room.timeZone);
 
     if (!minDate || min.getTime() < minDate.getTime()) {
       minDate = min;
@@ -228,21 +301,22 @@ export const getMinMaxDate = (day: number, date: any, rooms: IRoomAll[]): any =>
   });
 
   const roomAvailability = {
-    availabilities: [weekAv, saturdayAv, sundayAv].filter(av => av !== undefined)
+    availabilities: [mondayAv, tuesdayAv, wednesdayAv, thursdayAv, fridayAv, saturdayAv, sundayAv].filter(
+      av => av !== undefined)
   } as IRoom;
 
   minDate = minDate ?? createNewDate(date);
   maxDate = maxDate ?? createNewDate(date, 23, 59);
 
   if (isSameDay(minDate, date) && isSameDay(maxDate, date)) {
-    return {minDate, maxDate, roomAvailability};
+    return { minDate, maxDate, roomAvailability };
   }
 
   if (isSameDay(minDate, date)) {
-    return {minDate, maxDate: createNewDate(date, 23, 59), roomAvailability};
+    return { minDate, maxDate: createNewDate(date, 23, 59), roomAvailability };
   }
 
-  return {minDate: createNewDate(date), maxDate, roomAvailability};
+  return { minDate: createNewDate(date), maxDate, roomAvailability };
 };
 
 export const getTime = (date: Date, locale: string = API_LOCALE): string => date.toLocaleTimeString(locale, {
@@ -269,7 +343,8 @@ export const formatDateName = (date: Date, locale: string, measure: any): string
   day: 'numeric', month: measure, weekday: measure, year: 'numeric'
 });
 
-export const localeTimeZoneDate = (locale: string, date?: Date | string, timeZone: string = getCurrentTimeZone()): string =>
+export const localeTimeZoneDate = (locale: string, date?: Date | string,
+                                   timeZone: string = getCurrentTimeZone()): string =>
   date ? reservationDateTime(newDate(date), locale, timeZone) : '';
 
 export const reservationDateTime = (date: Date, locale: string, timeZone: string = getCurrentTimeZone()): string =>
@@ -311,6 +386,8 @@ export const formatTime = (duration: IDuration, locale: string = API_LOCALE): st
 
 export const getNow = (): Date => new Date();
 
+export const getNowTimeZone = (timeZone: string = getCurrentTimeZone()): Date => utcToZonedTime(new Date(), timeZone);
+
 export const createDateFromString = (stringDate: string): Date => {
   const date = stringDate.split('-');
   return new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]));
@@ -338,7 +415,8 @@ export const newDateTimestamp = (value: number = 0, timeZone: string = getCurren
 
 export const dateToUTC = (date: Date, timeZone: string = getCurrentTimeZone()): Date => zonedTimeToUtc(date, timeZone);
 
-export const createNewDate = (date: Date, hour: number = 0, minute: number = 0, second: number = 0, mili: number = 0): Date => {
+export const createNewDate = (date: Date, hour: number = 0, minute: number = 0, second: number = 0,
+                              mili: number = 0): Date => {
   const d = new Date(date);
   d.setHours(hour, minute, second, mili);
 
@@ -370,19 +448,19 @@ export const isBetween = (min: Date, max: Date, date: Date): boolean =>
 export type CalendarPeriod = 'day' | 'week' | 'month';
 
 export const addPeriod = (period: CalendarPeriod, date: Date, amount: number): Date => (
-  {day: addDays, week: addWeeks, month: addMonths}[period](date, amount)
+  { day: addDays, week: addWeeks, month: addMonths }[period](date, amount)
 );
 
 export const subPeriod = (period: CalendarPeriod, date: Date, amount: number): Date => (
-  {day: subDays, week: subWeeks, month: subMonths}[period](date, amount)
+  { day: subDays, week: subWeeks, month: subMonths }[period](date, amount)
 );
 
 export const startOfPeriod = (period: CalendarPeriod, date: Date): Date => (
-  {day: startOfDay, week: startOfWeek, month: startOfMonth}[period](date)
+  { day: startOfDay, week: startOfWeek, month: startOfMonth }[period](date)
 );
 
 export const endOfPeriod = (period: CalendarPeriod, date: Date): Date => (
-  {day: endOfDay, week: endOfWeek, month: endOfMonth}[period](date)
+  { day: endOfDay, week: endOfWeek, month: endOfMonth }[period](date)
 );
 
 export const getWeekDay = (day: number): Weekday => {
@@ -400,9 +478,21 @@ export const filterDate = (result: boolean, date: Date | null, room?: IRoom): bo
   date = date ? date : getNow();
   if (room) {
     const day = date.getDay();
-    const {week, saturday, sunday} = getAvailability(room);
-    if (!week) {
-      result = result && (day === 0 || day === 6);
+    const { monday, tuesday, wednesday, thursday, friday, saturday, sunday } = getAvailability(room);
+    if (!monday) {
+      result = result && day !== 1;
+    }
+    if (!tuesday) {
+      result = result && day !== 2;
+    }
+    if (!wednesday) {
+      result = result && day !== 3;
+    }
+    if (!thursday) {
+      result = result && day !== 4;
+    }
+    if (!friday) {
+      result = result && day !== 5;
     }
     if (!sunday) {
       result = result && day !== 0;
@@ -444,7 +534,7 @@ const getMinAndMax = (availability: IAvailability, date: Date, timeZone: string)
       max = dateToUTC(createNewDate(date, Number(end[0]), Number(end[1])), timeZone);
     }
   }
-  return {min, max};
+  return { min, max };
 };
 
 export const getMinutesBetweenTimes = (date1: Date, date2: Date): number =>
@@ -460,7 +550,7 @@ const timeConvert = (time: number, hour: number = 0) => {
 };
 
 const getGMT = (timeZone: string, date: Date): string => {
-  let gmt = date.toLocaleTimeString('en-US', {timeZone, timeZoneName: 'short'}).split(' ')[2];
+  let gmt = date.toLocaleTimeString('en-US', { timeZone, timeZoneName: 'short' }).split(' ')[2];
   if (gmt.indexOf(':') === -1) {
     gmt = `${gmt}:00`;
   }
@@ -482,9 +572,10 @@ export const getCurrentTimeZone = (): string => Intl.DateTimeFormat().resolvedOp
 const formatMinMax = (min: Date, max: Date): { min: Date; max: Date } => {
   if ([15, 45].indexOf(min.getMinutes()) > 0 || [15, 45].indexOf(max.getMinutes()) > 0) {
     min.setHours(min.getHours() + 1, 0);
-  } else {
+  }
+  else {
     min.setHours(min.getHours(), 0);
   }
 
-  return {min, max};
+  return { min, max };
 };

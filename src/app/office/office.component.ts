@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { IUser, IUserAll } from '../interfaces/user';
 import { requireMatch } from '../util/validators';
 import { TranslateService } from '@ngx-translate/core';
@@ -19,15 +19,15 @@ import { IOffice, Office } from '../interfaces/office';
   styleUrls: ['./office.component.scss']
 })
 export class OfficeComponent implements OnInit, OnDestroy {
-  form!: FormGroup;
+  form!: UntypedFormGroup;
   errors: any = [];
   managers?: IUserAll[];
   filteredOptions?: Observable<IUser[] | undefined>;
 
-  name: FormControl = new FormControl('', [
+  name: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  manager: FormControl = new FormControl('', [
+  manager: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
 
@@ -35,7 +35,7 @@ export class OfficeComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
 
   constructor(private readonly translate: TranslateService, private store: Store<AppState>,
-              private formBuilder: FormBuilder, private router: Router) {
+              private formBuilder: UntypedFormBuilder, private router: Router) {
     this.getState = this.store.select(selectOfficeState);
   }
 

@@ -14,7 +14,10 @@ export class NavigationService {
   subscribe(): void {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        this.history.push(event.urlAfterRedirects);
+        if (!event.urlAfterRedirects.includes('/payment/success?')
+          && !event.urlAfterRedirects.includes('/payment/failure?')) {
+          this.history.push(event.urlAfterRedirects);
+        }
       }
     });
   }

@@ -3,7 +3,7 @@ import { IUser, User } from '../../interfaces/user';
 import { AppState, selectAuthState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
 import * as fromActionsLogin from '../../store/auth.actions';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { flags, IFlag } from '../../util/flags';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -21,30 +21,30 @@ export class SignUpComponent implements OnInit, OnDestroy {
 
   @ViewChild('passwordComponent') passwordComponent: any;
   showError = false;
-  form!: FormGroup;
+  form!: UntypedFormGroup;
   subscription: Subscription | undefined;
   getState: Observable<any>;
   errors: any = [];
   code: string | undefined | null;
 
-  username: FormControl = new FormControl('', [
+  username: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  email: FormControl = new FormControl('', [
+  email: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, Validators.email
   ]);
-  lang: FormControl = new FormControl('', [
+  lang: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
 
-  firstName: FormControl = new FormControl();
-  lastName: FormControl = new FormControl();
-  phone: FormControl = new FormControl();
-  codeForm: FormControl = new FormControl();
+  firstName: UntypedFormControl = new UntypedFormControl();
+  lastName: UntypedFormControl = new UntypedFormControl();
+  phone: UntypedFormControl = new UntypedFormControl();
+  codeForm: UntypedFormControl = new UntypedFormControl();
 
   flagList: IFlag[] = flags();
 
-  constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private route: ActivatedRoute,
+  constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private route: ActivatedRoute,
               private cdRef: ChangeDetectorRef, private snackBar: MatSnackBar, private router: Router,
               private cookieService: CookieService) {
     this.getState = this.store.select(selectAuthState);

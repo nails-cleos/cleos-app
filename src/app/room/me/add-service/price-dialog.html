@@ -2,7 +2,7 @@
   <h1 mat-dialog-title>{{ 'ROOM.ME.SERVICES.ADD' | translate }}</h1>
   <div mat-dialog-content>
     <p>{{ 'ROOM.ME.SERVICES.PRICE.TEXT' | translate: {name: data.name} }}</p>
-    <mat-form-field appearance="fill">
+    <mat-form-field appearance="outline">
       <mat-label>{{ 'ROOM.ME.SERVICES.PRICE.FIELD' | translate }}</mat-label>
       <label>
         <input [formControl]="price" matInput min="1" required type="number">
@@ -15,9 +15,9 @@
     </mat-form-field>
   </div>
   <div mat-dialog-actions>
-    <button (click)="onNoClick" color="accent" mat-raised-button
+    <button (click)="onNoClick" color="accent"mat-fab extended class="icon-button"
             type="button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
-    <button cdkFocusInitial color="primary" mat-raised-button type="submit">Ok
+    <button cdkFocusInitial color="primary"mat-fab extended class="icon-button" type="submit">Ok
     </button>
   </div>
 </form>

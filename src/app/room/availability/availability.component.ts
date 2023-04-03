@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Availability, IAvailability, IAvailabilityDate } from '../../interfaces/room';
 import { createDate, getTime } from '../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
@@ -15,24 +15,24 @@ export class AvailabilityComponent implements OnChanges {
   @Output() availability = new EventEmitter<IAvailability>();
   @Output() ignore = new EventEmitter();
 
-  availabilityForm!: FormGroup;
-  start: FormControl;
-  end: FormControl;
-  startLunch: FormControl;
-  endLunch: FormControl;
+  availabilityForm!: UntypedFormGroup;
+  start: UntypedFormControl;
+  end: UntypedFormControl;
+  startLunch: UntypedFormControl;
+  endLunch: UntypedFormControl;
   checked!: boolean;
 
-  constructor(private formBuilder: FormBuilder, private translate: TranslateService) {
-    this.start = new FormControl('', [
+  constructor(private formBuilder: UntypedFormBuilder, private translate: TranslateService) {
+    this.start = new UntypedFormControl('', [
       Validators.required
     ]);
 
-    this.end = new FormControl('', [
+    this.end = new UntypedFormControl('', [
       Validators.required
     ]);
 
-    this.startLunch = new FormControl();
-    this.endLunch = new FormControl();
+    this.startLunch = new UntypedFormControl();
+    this.endLunch = new UntypedFormControl();
 
     this.availabilityForm = this.formBuilder.group({
       start: this.start,

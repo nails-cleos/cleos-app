@@ -1,7 +1,7 @@
 <h1 mat-dialog-title>{{'RESERVATION.CUSTOMER.CHANGE' | translate }}</h1>
 <div mat-dialog-content>
   <form [formGroup]="customerForm">
-    <mat-form-field *ngIf="customers; else skeleton" appearance="fill">
+    <mat-form-field *ngIf="customers; else skeleton" appearance="outline">
       <mat-label>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</mat-label>
       <label>
         <input (keydown)="keyDownHandler($event)" [formControl]="customer" [matAutocomplete]="autoCustomer"
@@ -29,12 +29,16 @@
   <div fxFlex></div>
   <div *ngIf="data.small; else largeButton">
     <button (click)="doAction" cdkFocusInitial color="primary" [disabled]="customerForm.invalid"
-            mat-icon-button><mat-icon>published_with_changes</mat-icon></button>
-    <button (click)="onNoClick" mat-icon-button><mat-icon>clear</mat-icon></button>
+            mat-icon-button>
+      <mat-icon>published_with_changes</mat-icon>
+    </button>
+    <button (click)="onNoClick" mat-icon-button>
+      <mat-icon>clear</mat-icon>
+    </button>
   </div>
   <ng-template #largeButton>
-    <button (click)="doAction" cdkFocusInitial color="primary" [disabled]="customerForm.invalid"
-            mat-raised-button>{{ 'RESERVATION.CUSTOMER.UPDATE' | translate }}</button>
-    <button (click)="onNoClick" mat-raised-button>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+    <button (click)="doAction" cdkFocusInitial color="primary" [disabled]="customerForm.invalid" mat-fab extended
+            class="icon-button">{{ 'RESERVATION.CUSTOMER.UPDATE' | translate }}</button>
+    <button (click)="onNoClick" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
   </ng-template>
 </div>

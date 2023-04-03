@@ -1,7 +1,7 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
-      <mat-card class="style-card">
+      <mat-card appearance="outlined" class="style-card">
         <mat-card-content>
           <h2>{{'ROOM.ME.SERVICES.ADDITIONAL.TITLE' | translate}}</h2>
           <div *ngIf="(selectedAdditional.length && !additional.length) || (!selectedAdditional.length && additional.length)
@@ -61,10 +61,10 @@
         </mat-card-content>
         <mat-card-actions>
           <div fxFlex></div>
-          <button (click)="save" class="margin-right-eight" color="primary"
-                  mat-raised-button>{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
-          <button appBackButton class="margin-right-eight" color="accent"
-                  mat-raised-button type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+          <button (click)="save" class="margin-right-eight" color="primary" mat-fab extended
+                  class="icon-button">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
+          <button appBackButton class="margin-right-eight" color="accent" mat-fab extended class="icon-button"
+                  type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
         </mat-card-actions>
       </mat-card>
     </div>
