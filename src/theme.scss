@@ -3,16 +3,16 @@
 * https://materialtheme.arcsine.dev
 * Fork at: https://materialtheme.arcsine.dev/?c=YHBhbGV0dGU$YHByaW1hcnk$YF48I2EwNmMzZiIsIj9lcjwjZTNkM2M1IiwiO2VyPCM4NDRmMjl$LCIlPmBePCNmN2U2ZDgiLCI~ZXI8I2ZkZjhmMyIsIjtlcjwjZjNkYmM4fiwid2Fybj5gXjwjZmYwMDAwIiwiP2VyPCNmZmIzYjMiLCI7ZXI8I2ZmMDAwMH4sIj9UZXh0PCMwMDAwMDAiLCI~PTwjZmFmYWZhIiwiO1RleHQ8I2ZmZmZmZiIsIjs9PCMyYzJjMmN$LCJmb250cz5bYEA8KC00fixgQDwoLTN$LGBAPCgtMn4sYEA8KC0xfixgQDxoZWFkbGluZX4sYEA8dGl0bGV$LGBAPHN1YiktMn4sYEA8c3ViKS0xfixgQDxib2R5LTJ$LGBAPGJvZHktMX4sYEA8YnV0dG9ufixgQDxjYXB0aW9ufixgQDxpbnB1dCIsInNpemU$bnVsbH1dLCJpY29uczxGaWxsZWQiLCI~bmVzcz50cnVlLCJ2ZXJzaW9uPjExfQ==
 */
-@use '~@angular/material' as mat;
+@use '@angular/material' as mat;
 @use './styles-theme' as style;
 
-@import '~@angular/material/theming';
+@import '@angular/material/theming';
 // Include the common styles for Angular Material. We include this here so that you only
 // have to load a single css file for Angular Material in your app.
 
 // Fonts
-@import 'https://fonts.googleapis.com/css?family=Material+Icons&display=swap';
-@import url('https://fonts.googleapis.com/css?family=Belleza:300,400,500&display=swap');
+@import 'https://fonts.googleapis.com/icon?family=Material+Icons+Outlined';
+@import url('https://fonts.googleapis.com/css2?family=Belleza:wght@300;400;500&display=swap');
 
 $mat-theme-ignore-duplication-warnings: true;
 
@@ -36,14 +36,14 @@ $fontConfig: (
 
 // Light Theme Text
 $dark-text: #000000;
-$dark-primary-text: $dark-text;
+$dark-primary-text: rgba($dark-text, 0.87);
 $dark-accent-text: rgba($dark-primary-text, 0.54);
 $dark-disabled-text: rgba($dark-primary-text, 0.38);
 $dark-dividers: rgba($dark-primary-text, 0.12);
 $dark-focused: rgba($dark-primary-text, 0.12);
 
 $mat-light-theme-foreground: (
-  base: $dark-text,
+  base: black,
   contrast: #ffffff,
   divider: $dark-dividers,
   dividers: $dark-dividers,
@@ -125,9 +125,6 @@ $mat-light-theme-background: (
   unselected-chip: $light-bg-darker-10,
   disabled-list-option: $light-bg-darker-10,
   loading: $light-bg-alpha-80,
-  success: #44A244,
-  in-progress: rgba(#844f29, 0.4),
-  approved: rgba(0, 158, 227, 0.4)
 );
 
 // Dark bg
@@ -162,52 +159,50 @@ $mat-dark-theme-background: (
   unselected-chip: $dark-bg-lighter-20,
   disabled-list-option: $dark-bg-lighter-10,
   loading: $dark-bg-alpha-80,
-  success: #90EE90,
-  in-progress: rgba(#a06c3f, 0.4),
-  approved: rgb(0, 158, 227)
 );
 
-// Compute font config
-@include mat.core($fontConfig);
+@include mat.slide-toggle-density(-1);
+
+@include mat.all-component-typographies($fontConfig);
+@include mat.core();
 
 // Theme Config
 
 body {
-  --primary-color: #a06c3f;
-  --primary-lighter-color: #e3d3c5;
-  --primary-darker-color: #844f29;
-  --text-primary-color: #{$light-primary-text};
+  --primary-color: #a9a397;
+  --primary-lighter-color: #e5e3e0;
+  --primary-darker-color: #8f887a;
+  --text-primary-color: #{$dark-primary-text};
   --text-primary-lighter-color: #{$dark-primary-text};
-  --text-primary-darker-color: #{$light-primary-text};
+  --text-primary-darker-color: #{$dark-primary-text};
 }
-
 $mat-primary: (
-  main: #a06c3f,
-  lighter: #e3d3c5,
-  darker: #844f29,
-  200: #a06c3f, // For slide toggle,
+  main: #a9a397,
+  lighter: #e5e3e0,
+  darker: #8f887a,
+  200: #a9a397, // For slide toggle,
   contrast : (
-    main: $light-primary-text,
+    main: $dark-primary-text,
     lighter: $dark-primary-text,
-    darker: $light-primary-text,
+    darker: $dark-primary-text,
   )
 );
 $theme-primary: mat.define-palette($mat-primary, main, lighter, darker);
 
+
 body {
-  --accent-color: #fedbd0;
-  --accent-lighter-color: #fff4f1;
-  --accent-darker-color: #fecdbe;
+  --accent-color: #dcc8c2;
+  --accent-lighter-color: #f5efed;
+  --accent-darker-color: #ceb4ac;
   --text-accent-color: #{$dark-primary-text};
   --text-accent-lighter-color: #{$dark-primary-text};
   --text-accent-darker-color: #{$dark-primary-text};
 }
-
 $mat-accent: (
-  main: #fedbd0,
-  lighter: #fff4f1,
-  darker: #fecdbe,
-  200: #fedbd0, // For slide toggle,
+  main: #dcc8c2,
+  lighter: #f5efed,
+  darker: #ceb4ac,
+  200: #dcc8c2, // For slide toggle,
   contrast : (
     main: $dark-primary-text,
     lighter: $dark-primary-text,
@@ -252,22 +247,24 @@ $mat-warn-dark: (
 $theme-warn-dark: mat.define-palette($mat-warn-dark, main, lighter, darker);
 
 $theme: mat.define-light-theme((
-  primary: $theme-primary,
-  accent: $theme-accent,
-  warn: $theme-warn,
-  is-dark: false,
-  foreground: $mat-light-theme-foreground,
-  background: $mat-light-theme-background,
+  color: (
+    primary: $theme-primary,
+    accent: $theme-accent,
+    warn: $theme-warn
+  ),
+  typography: $fontConfig,
+  density: 0,
 ));
 
-$altTheme: (
-  primary: $theme-primary,
-  accent: $theme-accent,
-  warn: $theme-warn-dark,
-  is-dark: true,
-  foreground: $mat-dark-theme-foreground,
-  background: $mat-dark-theme-background,
-);
+$altTheme: mat.define-dark-theme((
+  color: (
+    primary: $theme-primary,
+    accent: $theme-accent,
+    warn: $theme-warn-dark
+  ),
+  typography: $fontConfig,
+  density: 0,
+));
 
 .light-theme {
   @include mat.all-component-themes($theme);
@@ -275,30 +272,45 @@ $altTheme: (
 }
 
 .dark-theme {
-  @include mat.all-component-colors($altTheme);
+  @include mat.all-component-themes($altTheme);
   @include style.theme($altTheme);
 }
 
 // Specific component overrides, pieces that are not in line with the general theming
 
 // Handle buttons appropriately, with respect to line-height
-.mat-raised-button, .mat-stroked-button, .mat-flat-button {
+.mat-mdc-raised-button, .mat-mdc-outlined-button, .mat-mdc-unelevated-button {
   padding: 0 1.15em;
   margin: 0 .65em;
   min-width: 3em;
   line-height: 36.4px
 }
 
-.mat-standard-chip {
+.mat-mdc-standard-chip {
   padding: .5em .85em;
   min-height: 2.5em;
 }
 
 .material-icons {
+  font-family: 'Material Icons Outlined', 'Material Icons', sans-serif;
+  font-weight: normal;
+  font-style: normal;
   font-size: 24px;
-  font-family: 'Material Icons', 'Material Icons', sans-serif;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
 
   .mat-badge-content {
     font-family: 'Belleza', "Helvetica Neue", sans-serif;
+  }
+
+  .mat-slide-toggle-thumb {
+    background-color: red !important;
   }
 }

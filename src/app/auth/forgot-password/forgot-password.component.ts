@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AppState, selectAuthState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
 import * as fromActionsLogin from '../../store/auth.actions';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
@@ -17,9 +17,9 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
   getState: Observable<any>;
   subscription?: Subscription;
 
-  form!: FormGroup;
+  form!: UntypedFormGroup;
 
-  constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private snackBar: MatSnackBar,
+  constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private snackBar: MatSnackBar,
               private router: Router) {
     this.getState = this.store.select(selectAuthState);
   }

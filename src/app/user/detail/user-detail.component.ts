@@ -5,7 +5,7 @@ import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
 import * as fromActionsUser from '../../store/user.actions';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { fieldChange, valueChange } from '../../util/validators';
 import { findFlag, flags, IFlag } from '../../util/flags';
 import { createDateFromString } from '../../util/dates';
@@ -20,30 +20,30 @@ import { lightenDarkenColor } from '../../util/color';
 export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Input() user: IUser | undefined;
-  form!: FormGroup;
+  form!: UntypedFormGroup;
   getState: Observable<any>;
   subscription: Subscription | undefined;
-  username: FormControl = new FormControl('', [
+  username: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  email: FormControl = new FormControl('', [
+  email: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, Validators.email
   ]);
-  langValue: FormControl = new FormControl('', [
+  langValue: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
 
-  firstName: FormControl = new FormControl();
-  lastName: FormControl = new FormControl();
-  phone: FormControl = new FormControl();
-  dob: FormControl = new FormControl();
-  darkColor: FormControl = new FormControl();
-  lightColor: FormControl = new FormControl();
+  firstName: UntypedFormControl = new UntypedFormControl();
+  lastName: UntypedFormControl = new UntypedFormControl();
+  phone: UntypedFormControl = new UntypedFormControl();
+  dob: UntypedFormControl = new UntypedFormControl();
+  darkColor: UntypedFormControl = new UntypedFormControl();
+  lightColor: UntypedFormControl = new UntypedFormControl();
 
   showColors = false;
   flagList: IFlag[] = flags();
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
               private cdRef: ChangeDetectorRef, private router: Router) {
     this.getState = this.store.select(selectUserState);
   }

@@ -6,27 +6,28 @@ import { ICatalogue, ICatalogueAll } from '../interfaces/catalogue';
 @Injectable()
 export class CatalogueService {
 
-  url = 'catalogues';
+  private url = 'catalogues';
+  private urlV1 = `v1/${this.url}`;
 
   constructor(private http: HttpClient) {
   }
 
   public getAll(): Observable<ICatalogue[]> {
-    return this.http.get<ICatalogue[]>(this.url);
+    return this.http.get<ICatalogue[]>(this.urlV1);
   }
 
   public getAllCatalogs(): Observable<ICatalogue[]> {
     const params = new HttpParams().set('catalog', String(true));
-    return this.http.get<ICatalogue[]>(this.url, {params});
+    return this.http.get<ICatalogue[]>(this.urlV1, {params});
   }
 
   public getAllHome(): Observable<ICatalogue[]> {
     const params = new HttpParams().set('home', String(true));
-    return this.http.get<ICatalogue[]>(this.url, {params});
+    return this.http.get<ICatalogue[]>(this.urlV1, {params});
   }
 
   public getById(id: string | null): Observable<ICatalogue | undefined> {
-    const url = `${this.url}/${id}`;
+    const url = `${this.urlV1}/${id}`;
     return this.http.get<ICatalogue>(url);
   }
 
@@ -35,16 +36,16 @@ export class CatalogueService {
     formData.append('file', file);
     const blob = new Blob([JSON.stringify(catalogue)], {type: 'application/json'});
     formData.append('catalogue', blob);
-    return this.http.post<ICatalogue>(this.url, formData);
+    return this.http.post<ICatalogue>(this.urlV1, formData);
   }
 
   public delete(id: string | null): Observable<ICatalogue> {
-    const url = `${this.url}/${id}`;
+    const url = `${this.urlV1}/${id}`;
     return this.http.delete<ICatalogue>(url);
   }
 
   public update(catalogue: ICatalogue, file: any): Observable<ICatalogue> {
-    const url = `${this.url}/${catalogue.id}`;
+    const url = `${this.urlV1}/${catalogue.id}`;
     const formData = new FormData();
     formData.append('file', file);
     const blob = new Blob([JSON.stringify(catalogue)], {type: 'application/json'});
@@ -62,6 +63,6 @@ export class CatalogueService {
       data = [...data, catalogue];
     });
 
-    return this.http.put<ICatalogueAll[]>(`${this.url}/order`, data);
+    return this.http.put<ICatalogueAll[]>(`${this.urlV1}/order`, data);
   }
 }

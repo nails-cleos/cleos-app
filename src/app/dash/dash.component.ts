@@ -16,7 +16,7 @@ import { Router } from '@angular/router';
 import { isSameDay, isSameMonth } from 'date-fns';
 import { ICalendarReservations, ICalendarUnavailable, IChart, IDashboard } from '../interfaces/dashboard';
 import { UnavailableRepeatType } from '../interfaces/unavailable';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { IAuthority } from '../interfaces/user';
 import { Role } from '../interfaces/token';
 
@@ -28,9 +28,8 @@ import { Role } from '../interfaces/token';
 export class DashComponent implements OnInit, OnDestroy {
   state: any;
   error: any;
-
   mapDashboard?: Map<string, IDashboard>;
-  selectedDash = new FormControl();
+  selectedDash = new UntypedFormControl();
   roomId?: string;
   professionalId?: string;
 
@@ -152,7 +151,7 @@ export class DashComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
-    this.destroy$.next();
+    this.destroy$.unsubscribe();
   }
 
   handleEvent(event: CalendarEvent): void {
@@ -183,6 +182,7 @@ export class DashComponent implements OnInit, OnDestroy {
         } else {
           if (state.chartSummaries && state.chartSummaries.length) {
             this.charts = state.chartSummaries;
+            console.log(this.charts)
             this.isLoading = false;
           } else {
             if (state.error) {
@@ -229,6 +229,9 @@ export class DashComponent implements OnInit, OnDestroy {
         this.miniCardError(state.errorMessage);
       }
       this.mapDashboard = state.data;
+      if (state.data) {
+        this.isCalendarLoading = false;
+      }
       if (this.selectedDash.value) {
         this.createDashboards();
       } else {

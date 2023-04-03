@@ -1,4 +1,4 @@
-import { ConvertHMPipe } from './conver-hm.pipe';
+import { ConvertHMPipe } from './convert-hm.pipe';
 
 describe('ConvertHMPipe', () => {
   it('create an instance', () => {

@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -7,7 +7,8 @@ import { AppState, selectProductState } from '../../store/app.states';
 import * as fromActionsProduct from '../../store/product.actions';
 import { fieldChange, valueChange } from '../../util/validators';
 import { IProduct, IProductGroup, Product, ProductGroup } from '../../interfaces/product';
-import { createNewDate, getNow, getTime } from '../../util/dates';
+import { createNewDate, formatDuration, getNow, getTime } from '../../util/dates';
+import { DurationTimePipe } from "../../pipes/durationTime.pipe";
 
 @Component({
   selector: 'app-product-detail',
@@ -18,12 +19,12 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   @ViewChild('inputName') inputName?: ElementRef<HTMLInputElement>;
   @Input() group?: IProductGroup;
 
-  form!: FormGroup;
+  form!: UntypedFormGroup;
 
-  name: FormControl = new FormControl('', [
+  name: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  selected = new FormControl(0);
+  selected = new UntypedFormControl(0);
   products: IProduct[] = [];
 
   errors: any = [];
@@ -31,7 +32,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   private subscription?: Subscription;
   private getState: Observable<any>;
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
               private router: Router) {
     this.getState = this.store.select(selectProductState);
   }
@@ -47,11 +48,11 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
         errors.name = 'REQUIRED';
         hasError = true;
       }
-      if (!tab.duration || tab.duration.trim().length === 0) {
-        errors.duration = 'REQUIRED';
+      if (!tab.time || tab.time.trim().length === 0) {
+        errors.time = 'REQUIRED';
         hasError = true;
       }
-      return Object.assign({}, tab, {errors});
+      return Object.assign({}, tab, { errors });
     });
 
     if (hasError) {
@@ -105,7 +106,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   setTime(product: IProduct, $event: any): void {
     const time = $event.split(':');
     const date = createNewDate(getNow(), time[0], time[1]);
-    product.duration = getTime(date);
+    product.time = getTime(date);
   }
 
   setPrimary(tab: IProduct): void {
@@ -120,14 +121,15 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   private createForm(): void {
     this.form = this.formBuilder.group({
       name: this.name,
-      description: new FormControl(),
-      durabilityMin: new FormControl(),
-      durabilityMax: new FormControl()
+      description: new UntypedFormControl(),
+      durabilityMin: new UntypedFormControl(),
+      durabilityMax: new UntypedFormControl()
     });
   }
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
+      console.log(state.selected)
       if (state.selected) {
         this.group = {
           id: state.selected.id,
@@ -138,14 +140,16 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
         } as IProductGroup;
         this.form.patchValue(this.group);
 
-        this.products = [...state.selected.products?.map((p: IProduct) => Object.assign({}, p, {errors: {}}))];
+        this.products = [...state.selected.products?.map(
+          (p: IProduct) => Object.assign({}, p, { time: formatDuration(p.duration!!), errors: {} }))];
       }
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({incorrect: true});
+          this.form.controls[value.field].setErrors({ incorrect: true });
         });
-      } else if (state.message) {
+      }
+      else if (state.message) {
         this.router.navigate(['products']);
       }
     });
@@ -155,7 +159,7 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
     if (!this.group) {
       const id = this.route.snapshot.paramMap.get('id');
       this.store.dispatch(
-        new fromActionsProduct.ProductFind({id, path: 'edit'})
+        new fromActionsProduct.ProductFind({ id, path: 'edit' })
       );
     }
   }

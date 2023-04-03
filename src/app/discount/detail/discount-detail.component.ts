@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Discount, DiscountType, IDiscount, IDiscountAll } from '../../interfaces/discount';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -16,16 +16,16 @@ import * as fromActionsDiscount from '../../store/discount.actions';
 export class DiscountDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() discount?: IDiscountAll;
 
-  form!: FormGroup;
+  form!: UntypedFormGroup;
   errors: any = [];
 
-  name: FormControl = new FormControl('', [
+  name: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  amount: FormControl = new FormControl('', [
+  amount: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, Validators.min(1)
   ]);
-  type: FormControl = new FormControl('', [
+  type: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
 
@@ -34,7 +34,7 @@ export class DiscountDetailComponent implements OnInit, AfterViewInit, OnDestroy
   private subscription?: Subscription;
   private getState: Observable<any>;
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
               private router: Router) {
     this.getState = this.store.select(selectDiscountState);
   }
@@ -69,7 +69,7 @@ export class DiscountDetailComponent implements OnInit, AfterViewInit, OnDestroy
   private createForm(): void {
     this.form = this.formBuilder.group({
       name: this.name,
-      description: new FormControl(),
+      description: new UntypedFormControl(),
       amount: this.amount,
       type: this.type
     });

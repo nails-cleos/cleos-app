@@ -1,7 +1,7 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
-      <mat-card>
+      <mat-card appearance="outlined">
         <mat-card-header>
           <mat-card-title>{{ 'CURRENCY.DETAIL' | translate }}</mat-card-title>
           <mat-card-subtitle *ngIf="currency; else skeleton">{{currency.code}}</mat-card-subtitle>
@@ -12,7 +12,7 @@
         <form (ngSubmit)="update" [formGroup]="form" novalidate>
           <mat-card-content *ngIf="currency; else boxSkeleton">
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'CURRENCY.CODE.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="code" matInput required>
@@ -23,7 +23,7 @@
                   {{errors['code']}}
                 </mat-error>
               </mat-form-field>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'CURRENCY.NAME.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="name" matInput>
@@ -32,7 +32,7 @@
                   {{errors['name']}}
                 </mat-error>
               </mat-form-field>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'CURRENCY.ICON.FIELD' | translate }}</mat-label>
                 <mat-select [formControl]="icon">
                   <mat-select-trigger>
@@ -53,9 +53,9 @@
           </ng-template>
           <mat-card-actions *ngIf="currency; else buttonSkeleton">
             <div fxFlex></div>
-            <button [disabled]="form.invalid || form.pristine" color="primary" mat-raised-button
+            <button [disabled]="form.invalid || form.pristine" color="primary" mat-fab extended class="icon-button"
                     type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
-            <button [form]="form" appBackButton color="accent" mat-raised-button
+            <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
           <ng-template #buttonSkeleton>

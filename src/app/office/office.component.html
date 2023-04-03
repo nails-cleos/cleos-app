@@ -2,13 +2,13 @@
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <form (ngSubmit)="create" [formGroup]="form" novalidate>
-        <mat-card class="style-card">
+        <mat-card appearance="outlined" class="style-card">
           <mat-card-header>
             <mat-card-title>{{ 'OFFICE.TITLE' | translate }}</mat-card-title>
           </mat-card-header>
           <mat-card-content>
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'OFFICE.NAME.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="name" autocomplete="name" matInput required>
@@ -20,7 +20,7 @@
                 </mat-error>
               </mat-form-field>
               <div *ngIf="managers; else skeleton" fxLayout="row" fxLayoutAlign="space-between center">
-                <mat-form-field appearance="fill">
+                <mat-form-field appearance="outline">
                   <mat-label>{{ 'OFFICE.MANAGER.FIELD' | translate }}</mat-label>
                   <label>
                     <input [formControl]="manager" [matAutocomplete]="auto" matInput required type="text">
@@ -40,9 +40,12 @@
                     {{errors['manager']}}
                   </mat-error>
                 </mat-form-field>
-                <button (click)="addManager" color="accent" mat-raised-button>
+                <button fxShow.lt-sm fxHide (click)="addManager" color="accent" mat-fab>
                   <mat-icon matPrefix>person_add</mat-icon>
-                  <span fxHide.lt-sm fxShow>{{ 'OFFICE.MANAGER.ADD_BUTTON' | translate }}</span>
+                </button>
+                <button fxHide.lt-sm fxShow (click)="addManager" color="accent" mat-fab extended>
+                  <mat-icon matPrefix>person_add</mat-icon>
+                  <span>{{ 'OFFICE.MANAGER.ADD_BUTTON' | translate }}</span>
                 </button>
               </div>
               <ng-template #skeleton>
@@ -52,9 +55,9 @@
           </mat-card-content>
           <mat-card-actions>
             <div fxFlex></div>
-            <button [disabled]="form.invalid" color="primary" mat-raised-button
+            <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button"
                     type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
-            <button [form]="form" appBackButton color="accent" mat-raised-button
+            <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
         </mat-card>

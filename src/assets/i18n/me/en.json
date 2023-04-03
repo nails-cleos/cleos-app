@@ -21,7 +21,7 @@
       },
       "PRODUCT": {
         "DETAIL": "Detail",
-        "NO_CONTENT": "No products",
+        "NO_CONTENT": "No services",
         "DISCOUNT": {
           "FIELD": "Discount",
           "ADD": "With discount"
@@ -75,11 +75,15 @@
             "M": "<span class='bold'>Distance:</span> {{distance}} Meters"
           }
         }
-      }
+      },
+      "PAYMENT_MESSAGE": "If you pay, the reservation is approved. Otherwise, you need to wait until {{professional}} approved."
     },
     "PAYMENT": {
       "ERROR_TEXT": "Payment error",
       "ERROR": "Payment incomplete.\n{{reason}}",
+      "DETAIL": "Payment detail",
+      "DEPOSIT_30": "Pay a 30% deposit of the reservation",
+      "TOTAL": "Pay total of the reservation",
       "LIST": {
         "COLUMN": {
           "AMOUNT": "Amount",
@@ -88,6 +92,16 @@
         "ERROR": {
           "NO_CONTENT": "No payment"
         }
+      },
+      "TYPE": {
+        "FIELD": "Payment Type",
+        "REQUIRED": "Payment Type is <b>required</b>",
+        "NO_CONTENT": "No Payment type"
+      },
+      "BANK": {
+        "FIELD": "Bank",
+        "REQUIRED": "Bank is <b>required</b>",
+        "INVALID": "Bank is invalid"
       }
     },
     "REFERRAL": {

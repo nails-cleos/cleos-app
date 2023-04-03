@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectCurrencyState } from '../store/app.states';
@@ -13,13 +13,13 @@ import * as fromActionsCurrency from '../store/currency.actions';
   styleUrls: ['./currency.component.scss']
 })
 export class CurrencyComponent implements OnInit, OnDestroy {
-  form!: FormGroup;
+  form!: UntypedFormGroup;
 
-  code: FormControl = new FormControl('', [
+  code: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  name: FormControl = new FormControl('');
-  icon: FormControl = new FormControl('');
+  name: UntypedFormControl = new UntypedFormControl('');
+  icon: UntypedFormControl = new UntypedFormControl('');
 
   errors: any = [];
   icons = ['attach_money', 'euro', 'currency_pound'];
@@ -27,7 +27,7 @@ export class CurrencyComponent implements OnInit, OnDestroy {
   private getState: Observable<any>;
   private subscription: Subscription | undefined;
 
-  constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private router: Router) {
+  constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router) {
     this.getState = this.store.select(selectCurrencyState);
   }
 

@@ -1,3 +1,5 @@
+import { IReservationAll } from "./reservation";
+
 export interface IPaymentType {
   name: string;
   disabled: boolean;
@@ -7,7 +9,15 @@ export interface IPaymentType {
 export enum PaymentType {
   cash = 'CASH',
   ml = 'ML',
-  paypal = 'PAYPAL'
+  paypal = 'PAYPAL',
+
+  ideal = 'IDEAL',
+  transfer = 'TRANSFER'
+}
+
+export enum PaymentPercentage {
+  deposit_30 = 'DEPOSIT_30',
+  total = 'TOTAL'
 }
 
 export const paymentOptions = (): IPaymentType[] => [{
@@ -22,12 +32,17 @@ export const paymentOptions = (): IPaymentType[] => [{
   name: PaymentType.paypal,
   disabled: false,
   checked: false
+}, {
+  name: PaymentType.ideal,
+  disabled: false,
+  checked: false
 }];
 
 export interface IPaymentStatus {
   paymentId: string;
   paymentType: string;
   preferenceId: string;
+  reason?: string;
 }
 
 export interface IPayment {
@@ -48,6 +63,8 @@ export interface IPaymentAll {
   type: string;
   paymentId: string;
   preferenceId: string;
+  reservation?: IReservationAll;
+  link?: string;
 }
 
 export class Payment implements IPayment {
@@ -59,10 +76,12 @@ export class PaymentStatus implements IPaymentStatus {
   paymentId: string;
   paymentType: string;
   preferenceId: string;
+  reason?: string;
 
-  constructor(paymentId: string, type: string, referenceId: string) {
+  constructor(paymentId: string, type: string, referenceId: string, reason?: string) {
     this.paymentId = paymentId;
     this.paymentType = type;
     this.preferenceId = referenceId;
+    this.reason = reason
   }
 }

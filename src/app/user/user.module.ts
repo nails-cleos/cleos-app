@@ -8,7 +8,7 @@ import { UsersComponent } from './list/users.component';
 import { UserDetailComponent } from './detail/user-detail.component';
 import { OverviewComponent } from './overview/overview.component';
 import { OverviewChartComponent } from './overview/chart/overview-chart/overview-chart.component';
-import { NgxMatIntlTelInputModule } from 'ngx-mat-intl-tel-input';
+import { NgxMatIntlTelInputComponent } from 'ngx-mat-intl-tel-input';
 import { EffectsModule } from '@ngrx/effects';
 import { UserEffects } from '../store/effects/user.effects';
 import { UserService } from '../services/user.service';
@@ -26,7 +26,7 @@ import { NgxMatColorPickerModule } from '@angular-material-components/color-pick
   imports: [
     UserRoutingModule,
     SharedModule,
-    NgxMatIntlTelInputModule,
+    NgxMatIntlTelInputComponent,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,

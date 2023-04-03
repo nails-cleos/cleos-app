@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Additional, IAdditional } from '../../interfaces/additional';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -18,12 +18,12 @@ import { fieldChange, valueChange } from '../../util/validators';
 export class AdditionalDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() additional: IAdditional | undefined;
 
-  form!: FormGroup;
+  form!: UntypedFormGroup;
 
-  name: FormControl = new FormControl('', [
+  name: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  duration: FormControl = new FormControl('', [
+  duration: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
 
@@ -32,7 +32,7 @@ export class AdditionalDetailComponent implements OnInit, AfterViewInit, OnDestr
   private subscription: Subscription | undefined;
   private getState: Observable<any>;
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
               private router: Router, public dialog: MatDialog) {
     this.getState = this.store.select(selectAdditionalState);
   }
@@ -68,7 +68,7 @@ export class AdditionalDetailComponent implements OnInit, AfterViewInit, OnDestr
   private createForm(): void {
     this.form = this.formBuilder.group({
       name: this.name,
-      description: new FormControl(),
+      description: new UntypedFormControl(),
       duration: this.duration
     });
   }

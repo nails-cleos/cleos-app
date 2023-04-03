@@ -5,12 +5,12 @@
 @import 'node_modules/skeleton-screen-css';
 @import 'styles-theme';
 
-@import 'node_modules/ngx-sharebuttons/themes/material/material-dark-theme';
-@import 'node_modules/ngx-sharebuttons/themes/modern/modern-light-theme';
-@import 'node_modules/ngx-sharebuttons/themes/circles/circles-dark-theme';
+@import 'node_modules/ngx-sharebuttons/themes/material';
+@import 'node_modules/ngx-sharebuttons/themes/modern';
+@import 'node_modules/ngx-sharebuttons/themes/circles';
 
 $flag-icon-css-path: '~flag-icon-css/flags' !default;
-@import 'node_modules/flag-icon-css/sass/flag-icon';
+@import 'node_modules/flag-icon-css/sass/flag-icons';
 
 html, body {
   height: 100%;
@@ -56,16 +56,12 @@ mat-header-cell, mat-cell {
   margin-left: 18px;
 }
 
-.mat-row, .mat-header-row {
+.mat-mdc-row, .mat-mdc-header-row {
   border-bottom-width: 0;
 }
 
 table {
   width: 100%;
-}
-
-mat-table {
-  overflow-x: scroll;
 }
 
 .row td {
@@ -92,30 +88,29 @@ mat-table {
   hyphens: auto;
 }
 
-.mat-column-position {
-  flex: 0 0 5%;
-  width: 5%;
-  text-align: center !important;
-}
-
-.mat-column-actions {
-  flex: 0 0 15%;
-  width: 15%;
-  text-align: center;
-}
-
-.mat-cell-position {
-  text-align: center;
-  justify-content: center;
-}
+//.mat-column-actions {
+//  flex: 0 0 15%;
+//  width: 15%;
+//  text-align: center;
+//  word-wrap: break-word !important;
+//  white-space: unset !important;
+//  overflow-wrap: break-word;
+//
+//  word-break: break-word;
+//
+//  -ms-hyphens: auto;
+//  -moz-hyphens: auto;
+//  -webkit-hyphens: auto;
+//  hyphens: auto;
+//}
 
 a, u {
   text-decoration: none;
 }
 
 .divider,
-.mat-card-content,
-.mat-form-field {
+.mat-mdc-card-content,
+.mat-mdc-form-field {
   margin: 10px 0 0 0;
 }
 
@@ -195,7 +190,7 @@ a, u {
   color: gray;
 }
 
-.mat-raised-button {
+.mat-mdc-raised-button {
   .mat-icon {
     display: inherit !important;
     margin-right: 5px
@@ -523,4 +518,12 @@ span.cal-event-actions {
 
 .cal-custom-event:hover .timing {
   opacity: 0;
+}
+
+.icon-button {
+  margin: 5px 0 5px 10px
+}
+
+.svg-icon {
+  vertical-align: middle;
 }

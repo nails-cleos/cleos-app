@@ -1,5 +1,5 @@
 <button (click)="onNoClick" class="close-button" mat-icon-button>
-  <mat-icon class="close-icon">close</mat-icon>
+  <mat-icon>close</mat-icon>
 </button>
 <h1 mat-dialog-title>{{ 'ME.REVIEW.TITLE' | translate }}</h1>
 <mat-divider class="divider-padding"></mat-divider>
@@ -16,7 +16,7 @@
       </tr>
       <tr *ngIf="reservation && reservation">
         <td class="right">{{ 'COMMON.ROOM.FIELD' | translate }}</td>
-        <td class="left">{{reservation?.room | roomName}}</td>
+        <td class="left">{{reservation.room | roomName}}</td>
       </tr>
       <tr *ngIf="reservation">
         <td class="right">{{ 'COMMON.ADDRESS.FIELD' | translate }}</td>
@@ -44,7 +44,7 @@
   <ng-template #noReview>
     <app-rating (ratingHover)="onRatingHover($event)" (ratingUpdated)="onRatingChanged($event)" [hover]="hover"
                 [rating]="rating" [starCount]="starCount" color="accent"></app-rating>
-    <mat-form-field appearance="fill">
+    <mat-form-field appearance="outline">
       <mat-label>{{ 'ME.REVIEW.DETAIL' | translate }}</mat-label>
       <label>
         <textarea #message [formControl]="detail" matInput maxlength="256"></textarea>
@@ -57,6 +57,6 @@
 <div mat-dialog-actions>
   <div fxFlex></div>
   <button (click)="doAction" *ngIf="!review" [disabled]="rating < 1" cdkFocusInitial color="primary"
-          mat-raised-button>{{ 'COMMON.BUTTON.ADD' | translate }}</button>
-  <button (click)="onNoClick" color="accent" mat-raised-button>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+          mat-fab extended>{{ 'COMMON.BUTTON.ADD' | translate }}</button>
+  <button (click)="onNoClick" color="accent" mat-fab extended>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
 </div>

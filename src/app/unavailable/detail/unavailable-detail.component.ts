@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { IUnavailable, Unavailable, UnavailableRepeatType } from '../../interfaces/unavailable';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -37,28 +37,28 @@ import { MatDialog } from '@angular/material/dialog';
 export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() unavailable: IUnavailable | undefined;
 
-  form!: FormGroup;
+  form!: UntypedFormGroup;
 
   professionalName?: string;
   rooms: IRoomAll[] = [];
   roomAvailability?: IRoomAll;
 
-  startDate: FormControl = new FormControl('', [
+  startDate: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  endDate: FormControl = new FormControl('', [
+  endDate: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  startTime: FormControl = new FormControl('', [
+  startTime: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  duration: FormControl = new FormControl('', [
+  duration: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  repeat: FormControl = new FormControl('', [
+  repeat: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  allDay: FormControl = new FormControl();
+  allDay: UntypedFormControl = new UntypedFormControl();
   repeats = UnavailableRepeatType;
 
   errors: any = [];
@@ -71,7 +71,7 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
   private subscription?: Subscription;
   private getState: Observable<any>;
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
               private router: Router, private readonly translate: TranslateService, public dialog: MatDialog) {
     this.getState = this.store.select(selectUnavailableState);
   }
@@ -215,7 +215,7 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
 
   private createForm(): void {
     this.form = this.formBuilder.group({
-      description: new FormControl(),
+      description: new UntypedFormControl(),
       startDate: this.startDate,
       startTime: this.startTime,
       duration: this.duration,
@@ -259,6 +259,7 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
         if (!this.rooms.length) {
           this.getRoom(state.selected.professional);
         }
+        console.log("RESERVATION START", state.selected.start)
         this.unavailable = {
           id: state.selected.id,
           description: state.selected.description,

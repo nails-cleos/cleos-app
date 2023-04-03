@@ -2,18 +2,18 @@
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <form (ngSubmit)="complete" [formGroup]="form" novalidate>
-        <mat-card class="style-card">
+        <mat-card appearance="outlined" class="style-card">
           <mat-card-header>
             <mat-card-title>{{ 'RESERVATION.CUSTOMER.DETAIL' | translate }}</mat-card-title>
             <mat-card-subtitle
-              *ngIf="reservation; else skeleton">{{reservation?.customer | userName}}</mat-card-subtitle>
+              *ngIf="reservation; else skeleton">{{reservation.customer | userName}}</mat-card-subtitle>
             <ng-template #skeleton>
               <div class="ssc-line"></div>
             </ng-template>
           </mat-card-header>
           <mat-card-content *ngIf="reservation; else boxSkeleton">
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-              <mat-form-field *ngIf="groups; else skeleton" appearance="fill">
+              <mat-form-field *ngIf="groups; else skeleton" appearance="outline">
                 <mat-label>{{ 'COMMON.PRODUCT.GROUP.FIELD' | translate }}</mat-label>
                 <label>
                   <input (keydown)="keyDownHandler($event, group)" [formControl]="group" [matAutocomplete]="autoGroup"
@@ -31,7 +31,7 @@
                            [innerHTML]="'COMMON.PRODUCT.GROUP.INVALID' | translate">
                 </mat-error>
               </mat-form-field>
-              <mat-form-field *ngIf="products" appearance="fill">
+              <mat-form-field *ngIf="products" appearance="outline">
                 <mat-label>{{ 'COMMON.PRODUCT.FIELD' | translate }}</mat-label>
                 <label>
                   <input (keydown)="keyDownHandler($event, product)" [formControl]="product"
@@ -51,14 +51,14 @@
                            [innerHTML]="'COMMON.PRODUCT.INVALID' | translate">
                 </mat-error>
               </mat-form-field>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'RESERVATION.PRODUCT.EXTRAS.DESCRIPTION' | translate }}</mat-label>
                 <label>
                   <textarea #message [formControl]="description" matInput maxlength="256"></textarea>
                 </label>
                 <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
               </mat-form-field>
-              <mat-form-field appearance="fill">
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'RESERVATION.PRODUCT.EXTRAS.PRICE' | translate }}</mat-label>
                 <span matPrefix><mat-icon matPrefix>attach_money</mat-icon> &nbsp;</span>
                 <label>
@@ -70,37 +70,36 @@
               </ng-template>
               <mat-list>
                 <mat-list-item *ngIf="group.value && product.value">
-                  <mat-icon mat-list-icon>home_repair_service</mat-icon>
-                  <div class="bold" mat-subheader>{{ 'COMMON.PRODUCT.FIELD' | translate}}</div>
+                  <mat-icon matListItemIcon>home_repair_service</mat-icon>
+                  <div class="bold" matListItemTitle>{{ 'COMMON.PRODUCT.FIELD' | translate}}</div>
                 </mat-list-item>
                 <mat-list-item *ngIf="group.value && product.value" style="text-align: center">
                   <div [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.GROUP' |
-                  translate: {name: group.value.name}" mat-line>
+                  translate: {name: group.value.name}" matListItemLine>
                   </div>
                   <div [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.NAME' |
-                  translate: {name: product.value.name}" mat-line>
+                  translate: {name: product.value.name}" matListItemLine>
                   </div>
                   <div *ngIf="product.value.description" [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.DESCRIPTION' |
-                  translate: {description: product.value.description}" mat-line>
+                  translate: {description: product.value.description}" matListItemLine>
                   </div>
-                  <div mat-line>
+                  <div matListItemTitle>
                     <span [innerHTML]="'RESERVATION.PRODUCT.COMPLETE.PRICE' | translate"></span>
                     <span [class.strikethrough]="price.discount"
-                          class="vertical-divider">$ {{price.priceWithExtras | number:'1.2-2'}}</span>
+                          class="vertical-divider">$ {{price.amount | number:'1.2-2'}}</span>
                     <span *ngIf="price.priceWithDiscount" [@discountAnimation]
                           class="vertical-divider bold">$ {{price.priceWithDiscount | number:'1.2-2'}}</span>
                   </div>
-                  <div *ngIf="durability" [innerHTML]="durability" mat-line></div>
+                  <div *ngIf="durability" [innerHTML]="durability" matListItemLine></div>
                 </mat-list-item>
                 <mat-list-item *ngIf="additionalList && additionalList.length">
-                  <mat-icon mat-list-icon>add_post</mat-icon>
-                  <div class="bold" mat-subheader>{{ 'COMMON.ADDITIONAL.FIELD' | translate}}</div>
-                </mat-list-item>
-                <mat-list-item *ngIf="additionalList && additionalList.length">
-                  <mat-selection-list #additional (selectionChange)="onChange(additional.selectedOptions.selected)">
+                  <mat-icon matListItemIcon>add_post</mat-icon>
+                  <div class="bold" matListItemTitle>{{ 'COMMON.ADDITIONAL.FIELD' | translate}}</div>
+                  <mat-selection-list *ngIf="additionalList && additionalList.length" #additional
+                                      (selectionChange)="onChange(additional.selectedOptions.selected)">
                     <mat-list-option *ngFor="let it of additionalList" [selected]="isSelected(it)"
-                                     [value]="it" checkboxPosition="before" mat-line>
-                      <div mat-line> {{it.name}} - ${{it.price | number:'1.2-2'}}</div>
+                                     [value]="it" checkboxPosition="before">
+                      <div matListItemLine>{{it.name}} - ${{it.price | number:'1.2-2'}}</div>
                     </mat-list-option>
                   </mat-selection-list>
                 </mat-list-item>
@@ -111,17 +110,23 @@
                     <span class="vertical-divider bold">$ {{price.total | number:'1.2-2'}}</span>
                   </div>
                 </mat-list-item>
-                <mat-list-item *ngIf="!price.isPaid" class="divider">
-                  <mat-form-field mat-line appearance="fill">
-                    <mat-label>{{ 'RESERVATION.PAYMENT.TYPE' | translate }}</mat-label>
-                    <mat-select [formControl]="type">
-                      <mat-option *ngFor="let t of types" [value]="t">
-                        {{ 'COMMON.PAYMENT.' + t | translate }}
-                      </mat-option>
-                    </mat-select>
-                  </mat-form-field>
-                </mat-list-item>
               </mat-list>
+              <div *ngIf="!price.isPaid" fxLayout="column" fxLayoutAlign="space-evenly stretch">
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'RESERVATION.PAYMENT.TYPE' | translate }}</mat-label>
+                  <mat-select [formControl]="type">
+                    <mat-option *ngFor="let t of types" [value]="t">
+                      {{ 'COMMON.PAYMENT.' + t | translate }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field appearance="outline" *ngIf="type.value === 'TRANSFER'">
+                  <mat-label>{{ 'RESERVATION.PAYMENT.TRANSFER.FIELD' | translate }}</mat-label>
+                  <label>
+                    <input [formControl]="transfer" matInput>
+                  </label>
+                </mat-form-field>
+              </div>
               <ng-template #skeleton>
                 <div class="ssc-line"></div>
               </ng-template>
@@ -135,8 +140,8 @@
           <mat-card-actions *ngIf="reservation; else buttonSkeleton">
             <div fxFlex></div>
             <button [disabled]="group.invalid || product.invalid" cdkFocusInitial color="primary"
-                    mat-raised-button>{{ 'COMMON.BUTTON.COMPLETE' | translate }}</button>
-            <button appBackButton color="accent" mat-raised-button
+                    mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.COMPLETE' | translate }}</button>
+            <button appBackButton color="accent" mat-fab extended class="icon-button"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </mat-card-actions>
           <ng-template #buttonSkeleton>

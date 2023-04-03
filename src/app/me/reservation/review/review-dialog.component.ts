@@ -1,13 +1,14 @@
 import { Component, Inject } from '@angular/core';
-import { createNewDate, newDate, reservationDuration } from '../../../util/dates';
+import { createNewDate, newDate, newDateTimestamp, reservationDuration } from '../../../util/dates';
 import { getPrice } from '../../../util/helper';
 import { IReview } from '../../../interfaces/review';
 import { IReservationAll } from '../../../interfaces/reservation';
 import { IPrice } from '../../../interfaces/product';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { transitionAnimation } from '../../../util/animation';
+import { AngularFireAnalytics } from "@angular/fire/compat/analytics";
 
 @Component({
   selector: 'app-review-dialog',
@@ -27,20 +28,25 @@ export class ReviewDialogComponent {
 
   review?: IReview;
 
-  detail = new FormControl();
+  detail = new UntypedFormControl();
 
   constructor(public dialogRef: MatDialogRef<ReviewDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: IReservationAll,
-              private translate: TranslateService) {
-    this.reservation = data;
+              private translate: TranslateService, private analytic: AngularFireAnalytics) {
+    const start = newDateTimestamp(data.timestamp, data.room.timeZone)
+    this.reservation = Object.assign({}, data, { start });
     this.price = getPrice(data);
     const duration = reservationDuration(data);
-    const start = newDate(data.start);
     this.end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
     this.review = data.review;
     this.language = this.translate.currentLang;
+    this.analytic.logEvent('screen_view', {
+      firebase_screen: 'Review page',
+      firebase_screen_class: 'ReviewDialogComponent'
+    });
   }
 
   get onNoClick(): void {
+    console.log("test")
     return this.dialogRef.close();
   }
 

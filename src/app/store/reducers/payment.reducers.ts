@@ -1,6 +1,7 @@
 import { Pagination } from '../../interfaces/pagination';
 import { All, PaymentActionTypes } from '../payment.actions';
 import { IPayment } from '../../interfaces/payment';
+import { IBank } from "../../interfaces/bank";
 
 export interface State {
   data: IPayment | Pagination<IPayment> | null;
@@ -45,6 +46,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
+    case PaymentActionTypes.paymentCreate:
     case PaymentActionTypes.paymentFind: {
       return {
         ...state,
@@ -86,7 +88,7 @@ export const reducer = (state = initialState, action: All): State => {
     case PaymentActionTypes.paymentSelected: {
       return {
         ...state,
-        selected: action.payload,
+        selected: action.payload.payment,
         errorMessage: null,
         subErrors: null,
         message: null

@@ -6,16 +6,17 @@ import { ITracking } from '../interfaces/reservation';
 @Injectable()
 export class TrackingService {
 
-  url = 'tracking';
+  private url = 'tracking';
+  private urlV1 = `v1/${this.url}`;
 
   constructor(private http: HttpClient) {
   }
 
   public getAll(): Observable<ITracking[]> {
-    return this.http.get<ITracking[]>(this.url);
+    return this.http.get<ITracking[]>(this.urlV1);
   }
 
   public findByReservationId(reservationId: string): Observable<ITracking> {
-    return this.http.get<ITracking>(`${this.url}/reservations/${reservationId}`);
+    return this.http.get<ITracking>(`${this.urlV1}/reservations/${reservationId}`);
   }
 }

@@ -13,7 +13,7 @@ export interface IRoom {
   officeId?: string;
   office?: IOffice;
   timeZone?: string;
-  availabilities: IAvailability[];
+  availabilities?: IAvailability[];
   address?: IAddress;
   paymentTypes?: string[];
 }
@@ -39,6 +39,7 @@ export interface IServicePrice {
 }
 
 export interface IService {
+  key: string;
   id: string;
   name: string;
   currency?: string;

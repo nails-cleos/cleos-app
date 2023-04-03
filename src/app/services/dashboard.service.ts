@@ -15,12 +15,12 @@ export class DashboardService {
 
   public getCards(date: Date): Observable<ICardSummary> {
     const params = new HttpParams().set('date', date.toISOString().slice(0, 10));
-    return this.http.get<ICardSummary>(`${this.url}/cards`, {params});
+    return this.http.get<ICardSummary>(`${this.urlV1}/cards`, {params});
   }
 
   public getEvents(date: Date): Observable<IEventSummary> {
     const params = new HttpParams().set('date', date.toISOString().slice(0, 10));
-    return this.http.get<IEventSummary>(`${this.url}/events`, {params});
+    return this.http.get<IEventSummary>(`${this.urlV1}/events`, {params});
   }
 
   public meEvents(date: Date): Observable<IRoomEvents> {

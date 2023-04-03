@@ -94,8 +94,8 @@
     </ng-container>
 
     <ng-container matColumnDef="type">
-      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
-      <td *matCellDef="let payment" mat-cell>
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
+      <td *matCellDef="let payment" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="payment.id; else skeleton">{{payment.type}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -131,11 +131,11 @@
       <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
       <td *matCellDef="let payment" mat-cell>
         <div *ngIf="payment.id; else skeleton">
-          <button (click)="resend(payment)" *ngIf="payment.status !== 'approved'" mat-icon-button
+          <button (click)="resend(payment)" *ngIf="payment.status !== 'APPROVED'" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.RESEND' | translate }}" matTooltipPosition="above">
             <mat-icon color="primary">autorenew</mat-icon>
           </button>
-          <button (click)="copy(payment)" *ngIf="payment.status !== 'approved'" mat-icon-button
+          <button (click)="copy(payment)" *ngIf="payment.status !== 'APPROVED'" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.COPY' | translate }}" matTooltipPosition="above">
             <mat-icon color="primary">content_copy</mat-icon>
           </button>
@@ -159,5 +159,5 @@
 </div>
 <div class="top">
   <div fxFlex></div>
-  <button appBackButton color="accent" mat-raised-button type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+  <button appBackButton color="accent" mat-fab extended type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
 </div>

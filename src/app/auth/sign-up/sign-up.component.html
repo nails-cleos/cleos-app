@@ -1,6 +1,6 @@
 <form (ngSubmit)="register" [formGroup]="form" novalidate>
   <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-    <mat-form-field appearance="fill">
+    <mat-form-field appearance="outline">
       <mat-label>{{ 'COMMON.USER.USERNAME.FIELD' | translate }}</mat-label>
       <label>
         <input [formControl]="username" [tabIndex]="1" autocomplete="username" matInput required>
@@ -11,7 +11,7 @@
         {{errors['username']}}
       </mat-error>
     </mat-form-field>
-    <mat-form-field appearance="fill">
+    <mat-form-field appearance="outline">
       <mat-label>{{ 'COMMON.USER.EMAIL.FIELD' | translate }}</mat-label>
       <label>
         <input [formControl]="email" [tabIndex]="2" autocomplete="email" matInput required>
@@ -25,7 +25,7 @@
         {{errors['email']}}
       </mat-error>
     </mat-form-field>
-    <mat-form-field [color]="passwordComponent.color" appearance="fill">
+    <mat-form-field [color]="passwordComponent.color" appearance="outline">
       <mat-label>{{ 'AUTH.PASSWORD.FIELD' | translate }}</mat-label>
       <mat-pass-toggle-visibility #togglePass matSuffix></mat-pass-toggle-visibility>
       <label>
@@ -56,7 +56,7 @@
                                 [specialCharsCriteriaMsg]="'AUTH.PASSWORD.SPECIAL' | translate"
                                 [upperCaseCriteriaMsg]="'AUTH.PASSWORD.UPPER_CASE' | translate">
     </mat-password-strength-info>
-    <mat-form-field appearance="fill">
+    <mat-form-field appearance="outline">
       <mat-label>{{ 'AUTH.SIGN_UP.CONFIRM_PASSWORD.FIELD' | translate }}</mat-label>
       <mat-pass-toggle-visibility #toggleConfirm matSuffix></mat-pass-toggle-visibility>
       <label>
@@ -73,7 +73,7 @@
         {{errors['confirmPassword']}}
       </mat-error>
     </mat-form-field>
-    <mat-form-field appearance="fill">
+    <mat-form-field appearance="outline">
       <mat-label>{{ 'COMMON.USER.LANG.FIELD' | translate }}</mat-label>
       <span *ngIf="select.value" [class]="'flag-icon  flag-icon-squared flag-icon-' + select.value.icon"
             class="margin-right-eight" matPrefix></span>
@@ -86,7 +86,7 @@
       <mat-error [innerHTML]="'COMMON.USER.LANG.REQUIRED' | translate">
       </mat-error>
     </mat-form-field>
-    <mat-form-field appearance="fill">
+    <mat-form-field appearance="outline">
       <mat-label>{{ 'COMMON.USER.FIRST_NAME.FIELD' | translate }}</mat-label>
       <label>
         <input [formControl]="firstName" [tabIndex]="6" autocomplete="given-name" matInput>
@@ -95,23 +95,23 @@
         {{errors['firstName']}}
       </mat-error>
     </mat-form-field>
-    <mat-form-field appearance="fill">
+    <mat-form-field appearance="outline">
       <mat-label>{{ 'COMMON.USER.LAST_NAME.FIELD' | translate }}</mat-label>
       <label>
         <input [formControl]="lastName" [tabIndex]="7" autocomplete="family-name" matInput>
       </label>
       <mat-error *ngIf="errors['lastName']">{{errors['lastName']}}</mat-error>
     </mat-form-field>
-    <mat-form-field appearance="fill">
+    <mat-form-field appearance="outline">
       <mat-label>{{ 'COMMON.USER.PHONE.FIELD' | translate }}</mat-label>
       <ngx-mat-intl-tel-input [enablePlaceholder]="true" [enableSearch]="true" [formControl]="phone"
-                              [preferredCountries]="['ar']" name="phone"></ngx-mat-intl-tel-input>
+                              [preferredCountries]="['nl']" name="phone"></ngx-mat-intl-tel-input>
       <mat-error *ngIf="phone.hasError('validatePhoneNumber')">
         {{ 'COMMON.USER.PHONE.INVALID' | translate }}
       </mat-error>
       <mat-error *ngIf="errors['phone']">{{errors['phone']}}</mat-error>
     </mat-form-field>
-    <mat-form-field appearance="fill">
+    <mat-form-field appearance="outline">
       <mat-label>{{ 'AUTH.SIGN_UP.CODE.FIELD' | translate }}</mat-label>
       <label>
         <input [formControl]="codeForm" [tabIndex]="9" matInput>
@@ -122,7 +122,7 @@
     <div fxFlex></div>
     <button [disabled]="form.invalid || passwordComponent.passwordConfirmationFormControl.invalid ||
      passwordComponent.passwordFormControl.invalid"
-            [tabIndex]="10" color="accent" fxFlex mat-raised-button
+            [tabIndex]="10" color="accent" fxFlex mat-fab extended
             type="submit">{{ 'AUTH.SIGN_UP.TITLE' | translate }}</button>
   </div>
 </form>

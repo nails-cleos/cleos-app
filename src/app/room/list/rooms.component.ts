@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
-import { IRoom } from '../../interfaces/room';
+import { IAvailability, IAvailabilityAll, IRoom } from '../../interfaces/room';
 import { Observable, Subscription } from 'rxjs';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -13,7 +13,7 @@ import * as fromActionsRoom from '../../store/room.actions';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
-import { getTimeZone, ITimeZone } from '../../util/dates';
+import { findDayOfWeek, getTimeZone, ITimeZone } from '../../util/dates';
 
 @Component({
   selector: 'app-rooms',
@@ -25,7 +25,7 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['position', 'currency', 'office', 'address', 'gmt', 'availability', 'actions'];
+  displayedColumns: string[] = ['position', 'currency', 'office', 'address', 'timeZone', 'availability', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IRoom>>();
   expanded?: IRoom;
 
@@ -77,7 +77,26 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.clean();
         this.getRooms();
       }
-      this.dataSource = stateValue.data?.content;
+      this.dataSource = stateValue.data?.content?.map((r: IRoom) => {
+        if (r && r.availabilities && r.availabilities.length) {
+          const availabilities = r.availabilities.map((i: IAvailability) =>
+            Object.assign({}, i, { order: findDayOfWeek(i.day) }));
+          return Object.assign({}, r, { availabilities });
+        }
+        return r;
+      });
+      // this.dataSource = stateValue.data?.content?.map((r: any) => {
+      //   const map = new Map<string, string[]>();
+      //   console.log(r)
+      //   r.availabilities?.reduce((group: any, item: IAvailabilityAll) => {
+      //     const key = `${item.start} - ${item.end}`;
+      //     let day: any = group.get(key) || [];
+      //     day = [...day, item.day];
+      //     group.set(key, day);
+      //     return group;
+      //   }, map)
+      //   return Object.assign({}, r, {times: map})
+      // });
       this.resultsLength = stateValue.data?.totalElements;
       if (!this.paginatorSubscription && this.resultsLength) {
         this.createPageSubscriptions();
@@ -87,15 +106,15 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   edit(room: IRoom): void {
     this.store.dispatch(
-      new fromActionsRoom.RoomSelected({room, redirect: true})
+      new fromActionsRoom.RoomSelected({ roomInfo: { room }, redirect: true })
     );
   }
 
   delete(room: IRoom): void {
     const title = this.translate.instant('ROOM.DELETED.TITLE');
-    const content = this.translate.instant('ROOM.DELETED.CONTENT', {name: room.address?.name});
+    const content = this.translate.instant('ROOM.DELETED.CONTENT', { name: room.address?.name });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: {title, content, value: room}
+      data: { title, content, value: room }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -134,4 +153,6 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
       new fromActionsRoom.GetAll(payload)
     );
   }
+
+  sortFn = (a: IAvailabilityAll, b: IAvailabilityAll): number => findDayOfWeek(a.day) - findDayOfWeek(b.day)
 }

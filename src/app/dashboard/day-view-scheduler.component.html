@@ -2,7 +2,7 @@
   <div class="cal-day-headers" role="row">
     <div *ngFor="let professional of professionals; trackBy: trackByProfessionalId" class="cal-header"
          role="columnheader" tabindex="0">
-      <mat-card [style.background-color]="professional.color.secondary"
+      <mat-card appearance="outlined" [style.background-color]="professional.color.secondary"
                 [style.border-color]="professional.color.primary"
                 [style.border]="'3px solid'" class="mat-elevation-z0">
         <mat-card-header>

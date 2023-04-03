@@ -5,6 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { stampAnimation, transitionAnimation } from '../../../util/animation';
 import { createNewDate, isSameTimeZone, newDateTimestamp, reservationDuration } from '../../../util/dates';
 import { MatDialog } from '@angular/material/dialog';
+import { AngularFireAnalytics } from "@angular/fire/compat/analytics";
 
 @Component({
   selector: 'app-upcoming',
@@ -16,6 +17,7 @@ export class UpcomingComponent implements OnChanges {
   @Input() upcoming: IUpcomingAll | undefined;
   @Input() showHeader: boolean;
 
+  paymentTypes?: string[];
   language: string;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog) {
@@ -43,7 +45,7 @@ export class UpcomingComponent implements OnChanges {
       if (this.upcoming.additional) {
         if (this.upcoming.additional.length) {
           if (this.upcoming.additional.length > 1) {
-            rowSpan = this.upcoming.additional.length - 1;
+            rowSpan = (this.upcoming.additional.length / 2) >> 0
           } else {
             rowSpan = 1;
           }
@@ -55,7 +57,9 @@ export class UpcomingComponent implements OnChanges {
       const end = createNewDate(start, start.getHours() + duration.hour,
         start.getMinutes() + duration.minute);
 
-      this.upcoming = Object.assign({}, this.upcoming, {rowSpan, price, end, start});
+      this.paymentTypes = this.upcoming.room.paymentTypes.filter(it => it !== 'CASH');
+
+      this.upcoming = Object.assign({}, this.upcoming, { rowSpan, price, end, start });
     }
   }
 }

@@ -8,20 +8,20 @@ export const environment = {
   title: 'Cleos DEV',
   version: require('../../package.json').version + '-dev',
   baseUrl: 'http://localhost:8080/api',
-  mlUrl: 'https://sandbox.mercadopago.com.ar/checkout/v1/redirect',
-  paypalUrl: 'https://sandbox.paypal.com/checkoutnow',
-  googleClientId: '57757755712-1gcjdgbd0lkj4msirrmra9aglcb0vbmk.apps.googleusercontent.com',
-  facebookClientId: '453309609006101',
+  googleClientId: 'xxxx.apps.googleusercontent.com',
+  facebookClientId: 'xxxx',
   firebase: {
-    apiKey: 'AIzaSyDJC3gPZDvzcrMBExPPDV3rimiU05M064g',
-    authDomain: 'nails-dev-app.firebaseapp.com',
-    projectId: 'nails-dev-app',
-    storageBucket: 'nails-dev-app.appspot.com',
-    messagingSenderId: '1070844237569',
-    appId: '1:1070844237569:web:45b694e3fc0255af982d00',
-    measurementId: 'G-54BCEHX29Q'
+    apiKey: "xxx",
+    authDomain: "nails-cleos-dev.firebaseapp.com",
+    projectId: "nails-cleos-dev",
+    storageBucket: "nails-cleos-dev.appspot.com",
+    messagingSenderId: "xxxx",
+    appId: "xxxx",
+    measurementId: "G-xxx",
+    vapidKey: "xxxx",
+    databaseURL: "https://nails-cleos-dev-default-rtdb.europe-west1.firebasedatabase.app"
   },
-  googleMapKey: 'AIzaSyBVYE6eWD4Ekmb4xdWz_N4QKk5p4Q8oIcc'
+  googleMapKey: 'AIzaSyAkKXZ_Qi3MLge6Jjhi1bw0OXawDAbJgXc'
 };
 
 /*

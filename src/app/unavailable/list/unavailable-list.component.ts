@@ -10,12 +10,11 @@ import { Store } from '@ngrx/store';
 import { AppState, selectUnavailableState } from '../../store/app.states';
 import * as fromActionsUnavailable from '../../store/unavailable.actions';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
-import { convertDuration, isSameTimeZone, newDateTimestamp } from '../../util/dates';
+import { isSameTimeZone, newDateTimestamp } from '../../util/dates';
 import { IUnavailable, IUnavailableAll } from '../../interfaces/unavailable';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
-import { IReservationAll } from '../../interfaces/reservation';
-import { createDialog, getUserName, openDialog } from '../../util/helper';
+import { createDialog, getUserName } from '../../util/helper';
 
 @Component({
   selector: 'app-unavailable-list',
@@ -27,7 +26,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['position', 'professional', 'description', 'start', 'duration', 'repeat', 'actions'];
+  displayedColumns: string[] = ['position', 'professional', 'description', 'timestamp', 'duration', 'repeat', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IUnavailable>>();
 
   expandedUnavailable?: IUnavailable;

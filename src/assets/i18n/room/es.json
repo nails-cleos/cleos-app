@@ -12,7 +12,11 @@
         "TIME_ZONE": "Zona horaria",
         "AVAILABILITY": {
           "FIELD": "Disponibilidad",
-          "WEEK": "Semanal",
+          "MONDAY": "Lunes",
+          "TUESDAY": "Martes`",
+          "WEDNESDAY": "Miércoles",
+          "THURSDAY": "Jueves",
+          "FRIDAY": "Viernes",
           "SATURDAY": "Sábado",
           "SUNDAY": "Domingo"
         }
@@ -40,10 +44,30 @@
       "FIELD": "Disponibilidad",
       "REQUIRED": "Al menos una disponibilidad es <b>requerida</b>"
     },
-    "WEEK_TIME": {
-      "FIELD": "Disponibilidad semanal",
-      "DESCRIPTION": "Disponibilidad de trabajo semanal",
-      "REQUIRED": "Agregue o ignore la disponibilidad semanal"
+    "MONDAY_TIME": {
+      "FIELD": "Disponibilidad los lunes",
+      "DESCRIPTION": "Disponibilidad de trabajo los lunes",
+      "REQUIRED": "Agregue o ignore la disponibilidad del lunes"
+    },
+    "TUESDAY_TIME": {
+      "FIELD": "Disponibilidad los martes",
+      "DESCRIPTION": "Disponibilidad de trabajo los martes",
+      "REQUIRED": "Agregue o ignore la disponibilidad del martes"
+    },
+    "WEDNESDAY_TIME": {
+      "FIELD": "Disponibilidad los miércoles",
+      "DESCRIPTION": "Disponibilidad de trabajo los miércoles",
+      "REQUIRED": "Agregue o ignore la disponibilidad del miércoles"
+    },
+    "THURSDAY_TIME": {
+      "FIELD": "Disponibilidad los jueves",
+      "DESCRIPTION": "Disponibilidad de trabajo los jueves",
+      "REQUIRED": "Agregue o ignore la disponibilidad del jueves"
+    },
+    "FRIDAY_TIME": {
+      "FIELD": "Disponibilidad los viernes",
+      "DESCRIPTION": "Disponibilidad de trabajo los viernes",
+      "REQUIRED": "Agregue o ignore la disponibilidad del viernes"
     },
     "SATURDAY_TIME": {
       "FIELD": "Disponibilidad los sábados",

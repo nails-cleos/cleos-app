@@ -11,7 +11,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectDiscountState, selectUserState } from '../../store/app.states';
 import * as fromActionsDiscount from '../../store/discount.actions';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import * as fromActionsUser from '../../store/user.actions';
 import { IUser, IUserAll } from '../../interfaces/user';
@@ -165,7 +165,7 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
   @ViewChild('auto') matAutocomplete!: MatAutocomplete;
 
   title?: string;
-  customerCtrl = new FormControl();
+  customerCtrl = new UntypedFormControl();
   filteredCustomers?: Observable<IUser[] | undefined>;
   customers: IUserAll[] = [];
   allCustomers?: IUserAll[];

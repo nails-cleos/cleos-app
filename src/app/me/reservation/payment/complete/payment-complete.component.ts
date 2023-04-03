@@ -20,6 +20,8 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
   preferenceId: any;
   reservationId: any;
   payerId: any;
+  token: any;
+  reason: any;
 
   constructor(private route: ActivatedRoute, private router: Router, private store: Store<AppState>,
               private translate: TranslateService) {
@@ -28,6 +30,8 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
       this.paymentId = params.payment_id || params.paymentId;
       this.preferenceId = params.preference_id;
       this.payerId = params.PayerID;
+      this.token = params.token;
+      this.reason = params.reason || params.errorcode;
     });
   }
 
@@ -43,33 +47,39 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
     setTimeout(() => {
       this.reservationId = this.route.snapshot.paramMap.get('id');
       const status = this.route.snapshot.paramMap.get('status');
+      // TODO analytic payment option
+      let type;
+      let referenceId;
       if (this.paymentId && this.paymentId !== 'null') {
-        let type;
-        let referenceId;
         if (this.preferenceId && this.preferenceId !== 'null') {
           type = PaymentType.ml;
           referenceId = this.preferenceId;
         } else if (this.payerId && this.paymentId !== 'null') {
           type = PaymentType.paypal;
           referenceId = this.payerId;
-        } else {
-          const message = this.translate.instant('ME.PAYMENT.ERROR', {reason: 'incomplete'});
-          this.store.dispatch(
-            new fromActionsPayment.PaymentNotComplete({message})
-          );
-          this.router.navigate(['me', 'reservation', this.reservationId, 'payment']);
-          return;
         }
-        const paymentStatus = new PaymentStatus(this.paymentId, type, referenceId);
-        this.store.dispatch(
-          new fromActionsPayment.PaymentSave({reservationId: this.reservationId, status, paymentStatus})
-        );
+      } else if (this.token) {
+        type = PaymentType.ideal;
+        referenceId = this.token;
       }
+      if (!type || !referenceId) {
+        const message = this.translate.instant('ME.PAYMENT.ERROR', {reason: 'incomplete'});
+        this.store.dispatch(
+          new fromActionsPayment.PaymentNotComplete({message})
+        );
+        this.router.navigate(['me', 'reservation', this.reservationId, 'payment']);
+        return;
+      }
+      const paymentStatus = new PaymentStatus(this.paymentId, type, referenceId, this.reason);
+      this.store.dispatch(
+        new fromActionsPayment.PaymentSave({reservationId: this.reservationId, status, paymentStatus})
+      );
     }, 500);
   }
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
+      console.log(state)
       if (state.message) {
         this.router.navigate(['reservation', this.reservationId]);
       } else if (state.subErrors) {

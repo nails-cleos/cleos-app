@@ -110,7 +110,10 @@
     "PAYMENT": {
       "TITLE": "Pagos",
       "PAID": "Pagado",
-      "TYPE": "Forma de pago"
+      "TYPE": "Forma de pago",
+      "TRANSFER": {
+        "FIELD": "Referencia de transferencia"
+      }
     },
     "ACTION": {
       "APPROVE": "Aprobar",

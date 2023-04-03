@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Catalogue, ICatalogue } from '../../interfaces/catalogue';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -20,7 +20,7 @@ import { MatDialog } from '@angular/material/dialog';
 export class CatalogueDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Input() catalogue?: ICatalogue;
-  form!: FormGroup;
+  form!: UntypedFormGroup;
   subscription?: Subscription;
   getState: Observable<any>;
   errors: any = [];
@@ -28,15 +28,15 @@ export class CatalogueDetailComponent implements OnInit, AfterViewInit, OnDestro
   img: any;
   showImg = true;
 
-  name: FormControl = new FormControl('', [
+  name: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
 
-  home: FormControl = new FormControl();
-  catalog: FormControl = new FormControl();
+  home: UntypedFormControl = new UntypedFormControl();
+  catalog: UntypedFormControl = new UntypedFormControl();
 
   constructor(private route: ActivatedRoute, private snackBar: MatSnackBar, private store: Store<AppState>,
-              private formBuilder: FormBuilder, private translate: TranslateService, public dialog: MatDialog,
+              private formBuilder: UntypedFormBuilder, private translate: TranslateService, public dialog: MatDialog,
               private router: Router) {
     this.getState = this.store.select(selectCatalogueState);
   }
@@ -106,7 +106,7 @@ export class CatalogueDetailComponent implements OnInit, AfterViewInit, OnDestro
   private createForm(): void {
     this.form = this.formBuilder.group({
       name: this.name,
-      description: new FormControl(),
+      description: new UntypedFormControl(),
       home: this.home,
       catalog: this.catalog
     });

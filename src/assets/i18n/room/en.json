@@ -12,7 +12,11 @@
         "TIME_ZONE": "Time zone",
         "AVAILABILITY": {
           "FIELD": "Availability",
-          "WEEK": "Week",
+          "MONDAY": "Monday",
+          "TUESDAY": "Tuesday",
+          "WEDNESDAY": "Wednesday",
+          "THURSDAY": "Thursday",
+          "FRIDAY": "Friday",
           "SATURDAY": "Saturday",
           "SUNDAY": "Sunday"
         }
@@ -40,10 +44,30 @@
       "FIELD": "Availability",
       "REQUIRED": "At least one availability is <b>required</b>"
     },
-    "WEEK_TIME": {
-      "FIELD": "Week availability",
-      "DESCRIPTION": "Week working time availability",
-      "REQUIRED": "Add or ignore week working time"
+    "MONDAY_TIME": {
+      "FIELD": "Monday availability",
+      "DESCRIPTION": "Monday working time availability",
+      "REQUIRED": "Add or ignore Monday working time"
+    },
+    "TUESDAY_TIME": {
+      "FIELD": "Tuesday availability",
+      "DESCRIPTION": "Tuesday working time availability",
+      "REQUIRED": "Add or ignore Tuesday working time"
+    },
+    "WEDNESDAY_TIME": {
+      "FIELD": "Wednesday availability",
+      "DESCRIPTION": "Wednesday working time availability",
+      "REQUIRED": "Add or ignore Wednesday working time"
+    },
+    "THURSDAY_TIME": {
+      "FIELD": "Thursday availability",
+      "DESCRIPTION": "Thursday working time availability",
+      "REQUIRED": "Add or ignore Thursday working time"
+    },
+    "FRIDAY_TIME": {
+      "FIELD": "Friday availability",
+      "DESCRIPTION": "Friday working time availability",
+      "REQUIRED": "Add or ignore Friday working time"
     },
     "SATURDAY_TIME": {
       "FIELD": "Saturday availability",
@@ -86,7 +110,7 @@
           "TITLE": "Additional"
         },
         "PRODUCT": {
-          "TITLE": "Product"
+          "TITLE": "Service"
         },
         "PRICE": {
           "TEXT": "What is the price of {{name}}?",

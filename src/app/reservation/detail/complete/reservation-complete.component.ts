@@ -6,10 +6,17 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as fromActionsReservation from '../../../store/reservation.actions';
 import { IReservationAll } from '../../../interfaces/reservation';
 import { IGroupService, IPrice, IProduct, IProductGroup, Price } from '../../../interfaces/product';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IPaymentAll, PaymentType } from '../../../interfaces/payment';
-import { createProductGroupService, getPrice, getProductDurability, newAdditional, newExtra, newPrice } from '../../../util/helper';
+import {
+  createProductGroupService,
+  getPrice,
+  getProductDurability,
+  newAdditional,
+  newExtra,
+  newPrice
+} from '../../../util/helper';
 import { formatTime, totalDuration } from '../../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
 import { map, startWith } from 'rxjs/operators';
@@ -30,23 +37,24 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   additionalList?: IAdditionalAll[];
   additionalSelected: IAdditionalAll[] = [];
 
-  form!: FormGroup;
+  form!: UntypedFormGroup;
   groups?: IGroupService[];
   filteredGroup?: Observable<IGroupService[] | undefined>;
-  group: FormControl = new FormControl('', [
+  group: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
   products?: IService[];
   filteredProduct?: Observable<IService[] | undefined>;
-  product: FormControl = new FormControl('', [
+  product: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
 
-  description: FormControl = new FormControl();
-  extraPrice: FormControl = new FormControl();
-  type: FormControl = new FormControl(PaymentType.cash);
+  description: UntypedFormControl = new UntypedFormControl();
+  extraPrice: UntypedFormControl = new UntypedFormControl();
+  type: UntypedFormControl = new UntypedFormControl(PaymentType.cash);
+  transfer: UntypedFormControl = new UntypedFormControl();
 
-  types: string[] = Object.values(PaymentType);
+  types: string[] = [PaymentType.cash, PaymentType.transfer];
   price: IPrice;
 
   durability?: string;
@@ -58,7 +66,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
   private readonly isDashboard = false;
 
-  constructor(private store: Store<AppState>, private route: ActivatedRoute, private formBuilder: FormBuilder,
+  constructor(private store: Store<AppState>, private route: ActivatedRoute, private formBuilder: UntypedFormBuilder,
               private readonly translate: TranslateService, private router: Router) {
     this.getState = this.store.select(selectReservationState);
     this.price = new Price();
@@ -84,15 +92,16 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   get complete(): void {
     if (this.reservation) {
       const reservationId = this.reservation.id;
-      const productId = valueChange(this.product.value.id, this.reservation?.product.id);
+      const productId = valueChange(this.product.value.id, this.reservation?.product.key);
       const description = this.description.value;
       const price = this.extraPrice.value;
       const paymentType = this.type.value;
       const additionalIds = this.additionalSelected.map(additional => additional.id);
+      const transfer = this.transfer.value;
       this.store.dispatch(
         new fromActionsReservation.Complete({
           reservationId,
-          extras: {productId, description, price, paymentType, additionalIds},
+          extras: {productId, description, price, paymentType, additionalIds, transfer},
           isDashboard: this.isDashboard
         })
       );
@@ -125,7 +134,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     return product ? `${product.name}` : '';
   }
 
-  keyDownHandler(event: any, form: FormControl): void {
+  keyDownHandler(event: any, form: UntypedFormControl): void {
     if (event.code === 'Backspace') {
       form.setValue('');
     }
@@ -147,15 +156,14 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       if (this.reservation) {
         this.price = getPrice(this.reservation, this.payments);
         this.product.setValue(this.reservation.product);
-        if (this.reservation.additional) {
-          this.additionalSelected = this.reservation.additional;
-        }
-        this.types = this.reservation.room.paymentTypes;
+        this.additionalSelected = this.reservation.additional ? this.reservation.additional
+          .map(ad => Object.assign({}, ad, { id: ad.key })) : [];
+        this.types = [...this.reservation.room.paymentTypes, PaymentType.transfer];
       }
       if (state.productDiscount) {
         this.additionalList = state.productDiscount.additionalList;
         if (state.productDiscount?.products && this.reservation) {
-          const productId = this.reservation.product.id;
+          const productId = this.reservation.product.key;
           this.groups = Array.from(createProductGroupService(new Map<string, IGroupService>(), state.productDiscount.products,
             this.reservation.room.currency.code).values());
           this.group.setValue(this.groups?.find(group => {
@@ -175,7 +183,8 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       product: this.product,
       description: this.description,
       extraPrice: this.extraPrice,
-      type: this.type
+      type: this.type,
+      transfer: this.transfer
     });
     this.valueChange();
   }
@@ -186,7 +195,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
         return;
       }
       this.products = value.products;
-      const product = value.products?.find((p: IProductGroup) => p.id === this.reservation?.product?.id);
+      const product = value.products?.find((p: IProductGroup) => p.id === this.reservation?.product?.key);
       if (product) {
         this.products = value.products;
         this.product.setValue(product);

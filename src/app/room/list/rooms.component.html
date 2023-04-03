@@ -1,5 +1,5 @@
 <div class="mat-elevation-z8">
-  <table [dataSource]="dataSource" mat-table matSort matSortActive="name" matSortDirection="desc" matSortDisableClear
+  <table [dataSource]="dataSource" mat-table matSort matSortActive="office" matSortDirection="desc" matSortDisableClear
          multiTemplateDataRows>
     <ng-container matColumnDef="position">
       <th *matHeaderCellDef mat-header-cell>#</th>
@@ -17,8 +17,8 @@
       <td *matCellDef="let room" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="room.id; else skeleton">
           <mat-list-item>
-            <mat-icon mat-list-icon>{{room.currency.icon}}</mat-icon>
-            <div mat-line>{{room.currency.code}}</div>
+            <mat-icon matListItemIcon>{{room.currency.icon}}</mat-icon>
+            <div matListItemLine>{{room.currency.code}}</div>
           </mat-list-item>
         </div>
         <ng-template #skeleton>
@@ -39,7 +39,7 @@
     </ng-container>
 
     <ng-container matColumnDef="address">
-      <th *matHeaderCellDef mat-header-cell>{{ 'ROOM.LIST.COLUMN.ADDRESS' | translate }}</th>
+      <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'ROOM.LIST.COLUMN.ADDRESS' | translate }}</th>
       <td *matCellDef="let room" mat-cell>
         <div *ngIf="room.id; else skeleton">{{room.address?.name}}</div>
         <ng-template #skeleton>
@@ -48,8 +48,8 @@
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="gmt">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'ROOM.LIST.COLUMN.TIME_ZONE' | translate }}</th>
+    <ng-container matColumnDef="timeZone">
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell mat-sort-header>{{ 'ROOM.LIST.COLUMN.TIME_ZONE' | translate }}</th>
       <td *matCellDef="let room" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="room.id; else skeleton">{{getTimeZone(room.timeZone).label}}</div>
         <ng-template #skeleton>
@@ -59,15 +59,14 @@
     </ng-container>
 
     <ng-container matColumnDef="availability">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
-          mat-sort-header>{{ 'ROOM.LIST.COLUMN.AVAILABILITY.FIELD' | translate }}</th>
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'ROOM.LIST.COLUMN.AVAILABILITY.FIELD' | translate }}</th>
       <td *matCellDef="let room" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="room.id; else skeleton">
           <mat-list>
-            <mat-list-item *ngFor="let availability of room.availabilities">
-              <mat-icon mat-list-icon>date_range</mat-icon>
-              <div mat-line>{{ 'ROOM.LIST.COLUMN.AVAILABILITY.' + availability.day | translate}}:
-                {{availability.start.slice(0, 5)}} - {{availability.end.slice(0, 5)}}</div>
+            <mat-list-item *ngFor="let availability of room.availabilities | sortBy: 'asc':'order'">
+              <mat-icon matListItemIcon>date_range</mat-icon>
+              <div matListItemTitle>{{ 'ROOM.LIST.COLUMN.AVAILABILITY.' + availability.day | translate}}</div>
+              <div matListItemLine>{{availability.start}} - {{availability.end}}</div>
             </mat-list-item>
           </mat-list>
         </div>
@@ -100,23 +99,23 @@
       <td *matCellDef="let room" [attr.colspan]="displayedColumns.length" fxHide fxShow.lt-sm>
         <div [@detailExpand]="room === expanded ? 'expanded' : 'collapsed'" class="detail">
           <mat-list *ngIf="room.id">
-            <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
+            <div mat-subheader>{{ 'ROOM.LIST.COLUMN.ADDRESS' | translate }}</div>
             <mat-list-item role="list">
-              <div mat-line>{{room?.professional | userName}}</div>
+              <div matListItemLine>{{room.address?.name}}</div>
             </mat-list-item>
             <div mat-subheader>{{ 'ROOM.LIST.COLUMN.CURRENCY' | translate }}</div>
             <mat-list-item role="list">
-              <mat-icon mat-list-icon>{{room.currency.icon}}</mat-icon>
-              <div mat-line>{{room.currency.code}}</div>
+              <mat-icon matListItemIcon>{{room.currency.icon}}</mat-icon>
+              <div matListItemLine>{{room.currency.code}}</div>
             </mat-list-item>
             <div mat-subheader>{{ 'ROOM.LIST.COLUMN.OFFICE' | translate }}</div>
             <mat-list-item role="list">
-              <div mat-line>{{room.office.name}}</div>
+              <div matListItemLine>{{room.office.name}}</div>
             </mat-list-item>
             <div *ngIf="getGMT(room.timeZone) as gmt">
               <div mat-subheader>{{ 'ROOM.LIST.COLUMN.TIME_ZONE' | translate }}</div>
               <mat-list-item role="list">
-                <div mat-line>{{gmt}}</div>
+                <div matListItemLine>{{gmt}}</div>
               </mat-list-item>
             </div>
             <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>

@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { MatCarouselModule } from '@ngbmodule/material-carousel';
 import { SharedModule } from '../shared/shared.module';
 import { NotificationRoutingModule } from './notification-routing.module';
 
@@ -18,7 +17,6 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
   imports: [
     NotificationRoutingModule,
     SharedModule,
-    MatCarouselModule.forRoot(),
     MatRippleModule,
     TranslateModule.forChild({
       loader: {

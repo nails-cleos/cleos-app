@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
@@ -9,7 +9,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 })
 export class CalendarDialogComponent {
 
-  radio: FormControl = new FormControl('reservation');
+  radio: UntypedFormControl = new UntypedFormControl('reservation');
 
   constructor(public dialogRef: MatDialogRef<CalendarDialogComponent>) {
   }

@@ -5,7 +5,7 @@ import {
   createDate,
   createEndDate,
   createNewDate,
-  dateToUTC,
+  dateToUTC, daysOfWeek,
   getCurrentTimeZone,
   getNow,
   getWeekDay,
@@ -14,10 +14,9 @@ import {
   IDuration
 } from './dates';
 import { findStateColor } from './theme';
-import RRule, { ByWeekday } from 'rrule';
+import { Frequency, RRule, ByWeekday } from 'rrule';
 import { isToday } from 'date-fns';
 import { UnavailableRepeatType } from '../interfaces/unavailable';
-import { Frequency } from 'rrule/dist/esm/src/types';
 import { createEventColor } from './color';
 
 export interface IMeta {
@@ -60,42 +59,25 @@ export const getFrequency = (repeat: string, start: Date, unavailableId: string,
 });
 
 export const fillNotAvailable = (unavailable: string, lunch: string, notWorking: string,
-                                 selectDate: Date, sunday: IAvailability, saturday: IAvailability, week: IAvailability,
-                                 isDark: boolean = false, maxDate: Date,
+                                 selectDate: Date, sunday: IAvailability, saturday: IAvailability,
+                                 friday: IAvailability, thursday: IAvailability, wednesday: IAvailability,
+                                 tuesday: IAvailability, monday: IAvailability, isDark: boolean = false, maxDate: Date,
                                  timeZone: string = getCurrentTimeZone()): CalendarEvent[] => {
   const recurring = [{
-    availability: week,
+    availabilityList: [monday, tuesday, wednesday, thursday, friday, saturday, sunday],
     rule: new RRule({
       freq: RRule.WEEKLY,
-      byweekday: [RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR],
+      byweekday: [RRule.SU, RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR, RRule.SA],
       dtstart: selectDate,
       until: maxDate
     })
-  },
-    {
-      availability: saturday,
-      rule: new RRule({
-        freq: RRule.WEEKLY,
-        byweekday: [RRule.SA],
-        dtstart: selectDate,
-        until: maxDate
-      })
-    },
-    {
-      availability: sunday,
-      rule: new RRule({
-        freq: RRule.WEEKLY,
-        byweekday: [RRule.SU],
-        dtstart: selectDate,
-        until: maxDate
-      })
-    }];
-
+  }];
   return recurringEvent(recurring, notWorking, unavailable, lunch, isDark, timeZone);
 };
 
 export const newEvent = (title: string, color: string, start: Date, end: Date, isDarkMode: boolean,
-                         id?: string, meta: IMeta = new Meta(), draggable: boolean = false): CalendarEvent | undefined => {
+                         id?: string, meta: IMeta = new Meta(),
+                         draggable: boolean = false): CalendarEvent | undefined => {
   if (greaterOrEqualsThanToday(start)) {
     return {
       id,
@@ -129,9 +111,10 @@ export const getOverlapEvent = (events: any[], eventStartDay: Date, eventEndDay:
       || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end)
     )));
   }
-  return events.filter((eventA: CalendarEvent) => (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
-    || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
-    || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end)
+  return events.filter(
+    (eventA: CalendarEvent) => (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
+      || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
+      || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end)
   );
 };
 
@@ -159,7 +142,8 @@ const recurringEvent = (recurring: any[], notWorking: string, unavailable: strin
 
   recurring.forEach(r =>
     r.rule.all().forEach((date: Date) => {
-      const event = createEvent(r.availability, date, notWorking, unavailable, lunch, isDark, timeZone);
+      const availability = r.availabilityList.find((a: IAvailability) => a?.day === daysOfWeek[date.getDay()]);
+      const event = createEvent(availability, date, notWorking, unavailable, lunch, isDark, timeZone);
       if (event) {
         events = events.concat(event);
       }
@@ -255,7 +239,8 @@ const createLunchEvent = (it: IAvailability, date: Date, unavailable: string, lu
   return undefined;
 };
 
-const lunchEvent = (hour: number, lunchStartHour: number, minute: number, lunchStartMinute: number, lunchEndHour: number,
+const lunchEvent = (hour: number, lunchStartHour: number, minute: number, lunchStartMinute: number,
+                    lunchEndHour: number,
                     lunchEndMinute: number, date: Date, lunch: string, isDarkMode: boolean,
                     timeZone: string): CalendarEvent | undefined => {
   let lunchHour;

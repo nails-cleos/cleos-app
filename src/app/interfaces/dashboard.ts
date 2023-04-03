@@ -1,7 +1,5 @@
 import { ThemePalette } from '@angular/material/core';
-import { ChartDataSets, ChartType } from 'chart.js';
-import { Label } from 'ng2-charts';
-import { SingleDataSet } from 'ng2-charts/lib/base-chart.directive';
+import { ChartType } from 'chart.js';
 import { EventColor } from 'calendar-utils';
 import { IAvailability } from './room';
 
@@ -65,9 +63,8 @@ export interface ICalendarUnavailable {
 export interface IChart {
   title: string;
   type?: ChartType;
-  labels?: Label[];
-  data?: SingleDataSet;
-  dataSet?: ChartDataSets[];
+  labels?: any[];
+  dataSet?: any[];
   label?: string;
   options?: string;
   colors?: string;

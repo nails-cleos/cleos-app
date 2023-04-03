@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AppState, selectCatalogueState } from '../store/app.states';
 import * as fromActionsCatalogue from '../store/catalogue.actions';
@@ -16,18 +16,18 @@ import { Router } from '@angular/router';
 export class CatalogueComponent implements OnInit, OnDestroy {
   getState: Observable<any>;
   subscription?: Subscription;
-  form!: FormGroup;
+  form!: UntypedFormGroup;
   errors: any = [];
   file: any;
 
-  name: FormControl = new FormControl('', [
+  name: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
 
-  home: FormControl = new FormControl();
-  catalog: FormControl = new FormControl();
+  home: UntypedFormControl = new UntypedFormControl();
+  catalog: UntypedFormControl = new UntypedFormControl();
 
-  constructor(private store: Store<AppState>, private formBuilder: FormBuilder,
+  constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
               private router: Router) {
     this.getState = this.store.select(selectCatalogueState);
   }
@@ -82,7 +82,7 @@ export class CatalogueComponent implements OnInit, OnDestroy {
   private createForm(): void {
     this.form = this.formBuilder.group({
       name: this.name,
-      description: new FormControl(),
+      description: new UntypedFormControl(),
       home: this.home,
       catalog: this.catalog
     });

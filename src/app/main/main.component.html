@@ -46,43 +46,43 @@
     <mat-menu #menuLogged="matMenu">
       <mat-nav-list>
         <a (click)="onNavigation('story')" mat-list-item>
-          <mat-icon mat-list-icon>auto_stories</mat-icon>
+          <mat-icon matListItemIcon>auto_stories</mat-icon>
           <div mat-line>{{'MAIN.SECTION.STORY' | translate }}</div>
         </a>
         <mat-divider></mat-divider>
         <a (click)="onNavigation('product')" mat-list-item>
-          <mat-icon mat-list-icon>home_repair_service</mat-icon>
+          <mat-icon matListItemIcon>home_repair_service</mat-icon>
           <div mat-line>{{'MAIN.SECTION.PRODUCT' | translate }}</div>
         </a>
         <mat-divider></mat-divider>
         <a (click)="onNavigation('book')" mat-list-item>
-          <mat-icon mat-list-icon>book_online</mat-icon>
+          <mat-icon matListItemIcon>book_online</mat-icon>
           <div mat-line>{{'MAIN.SECTION.BOOK' | translate }}</div>
         </a>
         <mat-divider></mat-divider>
         <a (click)="onNavigation('contact')" mat-list-item>
-          <mat-icon mat-list-icon>contact_page</mat-icon>
+          <mat-icon matListItemIcon>contact_page</mat-icon>
           <div mat-line>{{'MAIN.SECTION.CONTACT' | translate }}</div>
         </a>
         <mat-divider></mat-divider>
         <a [routerLink]="'/main/catalogs'" mat-list-item>
-          <mat-icon mat-list-icon>collections</mat-icon>
+          <mat-icon matListItemIcon>collections</mat-icon>
           <div mat-line>{{'MAIN.SECTION.CATALOG' | translate }}</div>
+        </a>
+        <mat-divider></mat-divider>
+        <a (click)="redirect" *ngIf="isAuthenticated; else login" [routerLinkActive]="['active']"
+           mat-list-item>
+          <mat-icon matListItemIcon>person_pin</mat-icon>
+          <div mat-line>{{'MAIN.SECTION.ACCOUNT' | translate }}</div>
         </a>
         <mat-divider></mat-divider>
         <mat-list-item>
           <mat-slide-toggle (change)="setTheme($event.checked)" [checked]="checked"
                             mat-line>{{'COMMON.DASHBOARD.DARK_MODE' | translate }}</mat-slide-toggle>
         </mat-list-item>
-        <mat-divider></mat-divider>
-        <a (click)="redirect" *ngIf="isAuthenticated; else login" [routerLinkActive]="['active']"
-           mat-list-item>
-          <mat-icon mat-list-icon>person_pin</mat-icon>
-          <div mat-line>{{'MAIN.SECTION.ACCOUNT' | translate }}</div>
-        </a>
         <ng-template #login>
           <a [routerLink]="'/auth'" mat-list-item>
-            <mat-icon mat-list-icon>login</mat-icon>
+            <mat-icon matListItemIcon>login</mat-icon>
             <div mat-line>{{'MAIN.SECTION.AUTH' | translate }}</div>
           </a>
         </ng-template>

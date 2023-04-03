@@ -1,6 +1,8 @@
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AvailabilityDate, IAddress, IAvailability, IAvailabilityDate, ILocation, IRoomAll } from '../../interfaces/room';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import {
+  AvailabilityDate, IAvailability, IAvailabilityDate, IRoom, IRoomAll
+} from '../../interfaces/room';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -8,7 +10,7 @@ import { AppState, selectRoomState } from '../../store/app.states';
 import * as fromActionsRoom from '../../store/room.actions';
 import { IIcon } from '../room.component';
 import { createDate, getTimeZone } from '../../util/dates';
-import { getFullUserName } from '../../util/helper';
+import { areEquals, getFullUserName } from '../../util/helper';
 import { RoomIconName } from '../../util/icon';
 import { IPaymentType, paymentOptions } from '../../interfaces/payment';
 import { MatListOption } from '@angular/material/list';
@@ -26,12 +28,12 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('professionalInput') professionalInput!: ElementRef<HTMLInputElement>;
   @Input() room?: IRoomAll;
 
-  form!: FormGroup;
+  form!: UntypedFormGroup;
 
   errors: any = [];
   step = 0;
 
-  professional = new FormControl('', [
+  professional = new UntypedFormControl('', [
     Validators.required
   ])
   filteredProfessionals?: Observable<IUser[] | undefined>;
@@ -39,19 +41,27 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   allProfessional?: IUserAll[];
 
   icons: IIcon = {
-    week: RoomIconName.eventBusy,
+    monday: RoomIconName.eventBusy,
+    tuesday: RoomIconName.eventBusy,
+    wednesday: RoomIconName.eventBusy,
+    thursday: RoomIconName.eventBusy,
+    friday: RoomIconName.eventBusy,
     saturday: RoomIconName.eventBusy,
     sunday: RoomIconName.eventBusy
   };
 
-  weekDate?: IAvailabilityDate;
+  monDate?: IAvailabilityDate;
+  tueDate?: IAvailabilityDate;
+  wedDate?: IAvailabilityDate;
+  thuDate?: IAvailabilityDate;
+  friDate?: IAvailabilityDate;
   satDate?: IAvailabilityDate;
   sunDate?: IAvailabilityDate;
 
-  address: FormControl = new FormControl('', [
+  address: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  addressDescription: FormControl = new FormControl();
+  addressDescription: UntypedFormControl = new UntypedFormControl();
 
   paymentOptions: IPaymentType[] = paymentOptions();
 
@@ -60,7 +70,11 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   private availabilities: IAvailability[] = [];
   private paymentTypes: string[] = [];
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
+  private currentAvailabilities: IAvailability[] = [];
+  private currentPaymentTypes: string[] = [];
+  private currentProfessionalIds: string[] = [];
+
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
               private router: Router) {
     this.getState = this.store.select(selectRoomState);
   }
@@ -70,28 +84,34 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
     if (this.room) {
-      const room: IRoomAll = {
+      const room: IRoom = {
         id: this.room.id,
-        availabilities: this.availabilities,
-        paymentTypes: this.paymentTypes,
-        address: {
-          name: this.room.address.name,
-          location: this.room.address.location,
-          description: this.addressDescription.value
-        } as IAddress,
-        professionalIds: this.professionals.map(({id}) => id),
         currency: this.room.currency,
         office: this.room.office,
         timeZone: this.room.timeZone
       };
 
+      const newProfessionalIds = this.professionals.map(({ id }) => id);
+      if (!areEquals(newProfessionalIds, this.currentProfessionalIds)) {
+        room.professionalIds = newProfessionalIds;
+      }
+
+      if (this.paymentTypes !== this.currentPaymentTypes) {
+        room.paymentTypes = this.paymentTypes;
+      }
+      if (!areEquals(this.availabilities, this.currentAvailabilities)) {
+        room.availabilities = this.availabilities;
+      }
+
       if (this.address.value && this.address.value.geometry) {
         const location = this.address.value.geometry.location;
-        room.address.name = this.address.value.formatted_address;
-        room.address.location = {
-          x: location.lng(),
-          y: location.lat()
-        } as ILocation;
+        room.address = {
+          name: this.address.value.formatted_address,
+          location: {
+            x: location.lng(),
+            y: location.lat()
+          }
+        }
       }
 
       this.store.dispatch(new fromActionsRoom.RoomUpdate(room));
@@ -100,7 +120,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   get addProfessional(): void {
-    this.router.navigate(['users', 'add'], {state: {role: Role.professional}});
+    this.router.navigate(['users', 'add'], { state: { role: Role.professional } });
     return;
   }
 
@@ -118,6 +138,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.createForm();
+    this.clean();
     this.subscribe();
   }
 
@@ -192,17 +213,16 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     this.filteredProfessionals = this.professional.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value ? value.name : ''),
-      map(name => name ? this.filter(name) : (this.allProfessional ? this.allProfessional.slice() : this.allProfessional))
+      map(
+        name => name ? this.filter(name) : (this.allProfessional ? this.allProfessional.slice() : this.allProfessional))
     );
   }
 
   private getRoom(): void {
-    if (!this.room) {
-      const id = this.route.snapshot.paramMap.get('id');
-      this.store.dispatch(
-        new fromActionsRoom.RoomFind({id, redirect: true})
-      );
-    }
+    const id = this.route.snapshot.paramMap.get('id');
+    this.store.dispatch(
+      new fromActionsRoom.RoomFind({ id, redirect: true })
+    );
   }
 
   private subscribe(): void {
@@ -216,12 +236,14 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
           office: state.selected.room.office,
           timeZone: roomTimeZone.label
         } as IRoomAll;
+        this.currentPaymentTypes = state.selected.room.paymentTypes;
         this.paymentTypes = state.selected.room.paymentTypes;
         this.allProfessional = state.selected.professionals;
         state.selected.room.professionals.forEach((professional: IUserAll) => {
           this.professionals.push(professional);
           this.allProfessional = this.allProfessional?.filter(c => c.id !== professional.id);
         });
+        this.currentProfessionalIds = this.professionals.map(({ id }) => id);
         this.addressDescription.setValue(this.room.address?.description);
         this.address.setValue(this.room.address?.name);
         this.getAvailabilities(state.selected.room.availabilities);
@@ -230,9 +252,10 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({incorrect: true});
+          this.form.controls[value.field].setErrors({ incorrect: true });
         });
-      } else if (state.message) {
+      }
+      else if (state.message) {
         this.router.navigate(['rooms']);
       }
     });
@@ -240,6 +263,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private getAvailabilities(availabilities: IAvailability[]): void {
     availabilities.forEach((av: IAvailability) => {
+      this.currentAvailabilities = [...this.currentAvailabilities, av];
       this.addAvailability(av, 0);
 
       const availability: IAvailabilityDate = new AvailabilityDate();
@@ -249,8 +273,20 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       availability.endLunchDate = RoomDetailComponent.createAv(av.endLunch);
 
       switch (av.day) {
-        case 'WEEK':
-          this.weekDate = availability;
+        case 'MONDAY':
+          this.monDate = availability;
+          break;
+        case 'TUESDAY':
+          this.tueDate = availability;
+          break;
+        case 'WEDNESDAY':
+          this.wedDate = availability;
+          break;
+        case 'THURSDAY':
+          this.thuDate = availability;
+          break;
+        case 'FRIDAY':
+          this.friDate = availability;
           break;
         case 'SATURDAY':
           this.satDate = availability;
@@ -263,8 +299,20 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private setIcon(day: string, icon: RoomIconName): void {
     switch (day) {
-      case 'WEEK':
-        this.icons.week = icon;
+      case 'MONDAY':
+        this.icons.monday = icon;
+        break;
+      case 'TUESDAY':
+        this.icons.tuesday = icon;
+        break;
+      case 'WEDNESDAY':
+        this.icons.wednesday = icon;
+        break;
+      case 'THURSDAY':
+        this.icons.thursday = icon;
+        break;
+      case 'FRIDAY':
+        this.icons.friday = icon;
         break;
       case 'SATURDAY':
         this.icons.saturday = icon;
@@ -279,14 +327,26 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     let step = -1;
     this.errors = [];
     switch (RoomIconName.calendarToday) {
-      case this.icons.week:
+      case this.icons.monday:
         step = 0;
         break;
-      case this.icons.saturday:
+      case this.icons.tuesday:
         step = 1;
         break;
-      case this.icons.sunday:
+      case this.icons.wednesday:
         step = 2;
+        break;
+      case this.icons.thursday:
+        step = 3;
+        break;
+      case this.icons.friday:
+        step = 4;
+        break;
+      case this.icons.saturday:
+        step = 5;
+        break;
+      case this.icons.sunday:
+        step = 6;
         break;
     }
     if (step > -1) {
@@ -318,5 +378,11 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     const filterValue = name.toLowerCase();
 
     return this.allProfessional?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
+  }
+
+  private clean(): void {
+    this.store.dispatch(
+      new fromActionsRoom.Clean()
+    );
   }
 }

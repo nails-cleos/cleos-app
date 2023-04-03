@@ -2,7 +2,7 @@
   <h1 class="mat-h1">Overview</h1>
   <mat-grid-list [cols]="(layout | async)?.columns" rowHeight="200px">
     <mat-grid-tile [colspan]="(layout | async)?.miniCard?.cols" [rowspan]="(layout | async)?.miniCard?.rows">
-      <mat-card class="dashboard-card">
+      <mat-card appearance="outlined" class="dashboard-card">
         <mat-card-content class="dashboard-card-content">
           <div *ngIf="user; else circle" class="center-circle circle profile-background">
             <img *ngIf="image; else showInitialsBlock" [src]="image" alt="Profile" mat-card-image>
@@ -17,7 +17,7 @@
       </mat-card>
     </mat-grid-tile>
     <mat-grid-tile [colspan]="(layout | async)?.miniCard?.cols" [rowspan]="(layout | async)?.miniCard?.rows">
-      <mat-card class="dashboard-card">
+      <mat-card appearance="outlined" class="dashboard-card">
         <mat-card-header *ngIf="user; else skeletonTitle" class="card-header">
           <mat-card-title>{{username}}</mat-card-title>
         </mat-card-header>
@@ -45,7 +45,7 @@
     </mat-grid-tile>
     <mat-grid-tile *ngFor="let mc of miniCardData; let i = index" [colspan]="( layout | async )?.miniCard?.cols"
                    [rowspan]="( layout | async )?.miniCard?.rows">
-      <mat-card class="dashboard-card">
+      <mat-card appearance="outlined" class="dashboard-card">
         <div *ngIf="mc.title; else box">
           <mat-card-header class="card-header">
             <mat-card-title>{{mc.title | translate}}</mat-card-title>
@@ -88,5 +88,5 @@
 </div>
 <div class="grid-container">
   <div fxFlex></div>
-  <button appBackButton color="accent" mat-raised-button type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+  <button appBackButton color="accent" mat-fab extended type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
 </div>

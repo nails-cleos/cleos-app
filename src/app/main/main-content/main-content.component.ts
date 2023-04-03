@@ -3,7 +3,7 @@ import { IProduct, IProductGroup } from '../../interfaces/product';
 import { map, startWith } from 'rxjs/operators';
 import { Observable, Subscription } from 'rxjs';
 import { ICatalogue, ISlide, Slide } from '../../interfaces/catalogue';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { requireMatch } from '../../util/validators';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState, selectMainState } from '../../store/app.states';
@@ -27,28 +27,28 @@ export class MainContentComponent implements OnInit, OnDestroy {
   isHandset: any;
   slides: ISlide[] = [];
 
-  form!: FormGroup;
+  form!: UntypedFormGroup;
   groups: IProductGroup[] | undefined;
   filteredGroup: Observable<IProductGroup[] | undefined> | undefined;
-  group: FormControl = new FormControl('', [requireMatch]);
+  group: UntypedFormControl = new UntypedFormControl('', [requireMatch]);
   products: IProduct[] | undefined;
   filteredProduct: Observable<IProduct[] | undefined> | undefined;
-  product: FormControl = new FormControl('', [requireMatch]);
+  product: UntypedFormControl = new UntypedFormControl('', [requireMatch]);
 
   maxDate: Date;
   minDate: Date;
-  date: FormControl = new FormControl();
+  date: UntypedFormControl = new UntypedFormControl();
 
-  name: FormControl = new FormControl('', [
+  name: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  email: FormControl = new FormControl('', [
+  email: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, Validators.email
   ]);
-  subject: FormControl = new FormControl('', [
+  subject: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  body: FormControl = new FormControl('', [
+  body: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
 
@@ -58,7 +58,7 @@ export class MainContentComponent implements OnInit, OnDestroy {
 
   constructor(private store: Store<AppState>, private cdRef: ChangeDetectorRef,
               private viewportScroller: ViewportScroller, private translate: TranslateService, private router: Router,
-              private formBuilder: FormBuilder, private snackBar: MatSnackBar) {
+              private formBuilder: UntypedFormBuilder, private snackBar: MatSnackBar) {
     this.getState = this.store.select(selectMainState);
     this.store.select(selectAuthState).subscribe((state: any) => {
       this.isAuthenticated = state.isAuthenticated;
@@ -128,7 +128,7 @@ export class MainContentComponent implements OnInit, OnDestroy {
     return product ? `${product.name}` : '';
   }
 
-  keyDownHandler(event: any, form: FormControl): void {
+  keyDownHandler(event: any, form: UntypedFormControl): void {
     if (event.code === 'Backspace') {
       form.setValue('');
     }
