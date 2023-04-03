@@ -5,17 +5,26 @@ on:
     tags: [ v*.*.* ]
 
 env:
-  IMAGE_NAME: nails-cleos
+  IMAGE_NAME: d1d8fh8tgyhz8m
+  AWS_REGION: eu-central-1
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_DEFAULT_REGION: us-east-1
-      AWS_DEFAULT_OUTPUT: json
+    permissions:
+      id-token: write
+      contents: read
     steps:
-      - uses: actions/checkout@v2
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+      - name: Set up aws credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-session-name: GitHub-Action-Role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: actions/checkout@v3
       - name: Deploy
         run: ./scripts/amplify-deploy.sh ${{env.IMAGE_NAME}} main
