@@ -20,7 +20,7 @@ jobs:
 
       - name: Update rc version
         run: |
-          git config --global user.email "espaciocleos@gmail.com"
+          git config --global user.email "nails.cloes@gmail.com"
           git config --global user.name "Espacio Cleos"
           git fetch
           # make file runnable, might not be necessary

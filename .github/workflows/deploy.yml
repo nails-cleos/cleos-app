@@ -5,56 +5,17 @@ on:
     tags: [ v*.*.* ]
 
 env:
-  IMAGE_NAME: cleos
+  IMAGE_NAME: nails-cleos
 
 jobs:
-  push:
+  deploy:
     runs-on: ubuntu-latest
-
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_DEFAULT_OUTPUT: json
     steps:
       - uses: actions/checkout@v2
-
-      - name: Docker Login
-        env:
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: |
-          docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-
-      - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USER }}/$IMAGE_NAME
-
-      - name: Push image
-        run: |
-          IMAGE_ID=${{ secrets.DOCKER_USER }}/$IMAGE_NAME
-          # Change all uppercase to lowercase
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-          # Strip git ref prefix from version
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          docker tag ${{ secrets.DOCKER_USER }}/$IMAGE_NAME $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
-          # Use Docker `latest` tag convention
-          docker tag ${{ secrets.DOCKER_USER }}/$IMAGE_NAME $IMAGE_ID:latest
-          docker push $IMAGE_ID:latest
-
-  deploy:
-    needs: push
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: SSH connector
-        id: deploy
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSHKEY }}
-          envs: IMAGE_NAME
-          script: |
-            echo "Log into Docker"
-            docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
-            echo "Run start script"
-            "/home/cleos/start.sh"
+      - name: Deploy
+        run: ./scripts/amplify-deploy.sh ${{env.IMAGE_NAME}} main

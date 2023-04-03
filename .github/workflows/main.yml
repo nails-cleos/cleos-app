@@ -19,7 +19,7 @@ jobs:
       - name: Release version
         id: version
         run: |
-          git config --global user.email "espaciocleos@gmail.com"
+          git config --global user.email "nails.cleos@gmail.com"
           git config --global user.name "Espacio Cleos"
           git fetch
           # make file runnable, might not be necessary
