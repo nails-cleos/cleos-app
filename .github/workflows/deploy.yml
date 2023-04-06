@@ -1,13 +1,8 @@
 name: Deploy
 
-#on:
-#  push:
-#    tags: [ v*.*.* ]
-
 on:
   push:
-    branches:
-      - aws_deploy
+    tags: [ v*.*.* ]
 
 env:
   IMAGE_NAME: d1d8fh8tgyhz8m
@@ -32,4 +27,4 @@ jobs:
 
       - uses: actions/checkout@v3
       - name: Deploy
-        run: ./scripts/amplify-deploy.sh ${{env.IMAGE_NAME}} aws_deploy
+        run: ./scripts/amplify-deploy.sh ${{env.IMAGE_NAME}} main
