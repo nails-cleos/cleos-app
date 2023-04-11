@@ -180,8 +180,6 @@ export class DashboardComponent implements OnInit {
     if (calendarEvent.meta.state === States.started && calendarEvent.end) {
       const dateTime = calendarEvent.meta.started instanceof Date ? calendarEvent.meta.started
         : newDateTimestamp(calendarEvent.meta.started);
-      console.log(calendarEvent)
-      console.log(dateTime)
       const startTime = calendarEvent.start.getTime();
       const startedTime = dateTime.getTime();
       const nowTime = now.getTime();
@@ -329,7 +327,6 @@ export class DashboardComponent implements OnInit {
     this.events = [];
     this.professionals = [];
     if (this.dashboard?.professionals) {
-      console.log(this.dashboard?.professionals)
       const { min, max } = getRoomStartEndDay(this.dashboard.availability, this.dashboard.timeZone, this.viewDate);
       this.day = new Day(min, max, this.viewDate, []);
       this.endDate = createNewDate(this.endDate, this.day.dayEndHour, this.day.dayEndMinute);

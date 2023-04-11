@@ -129,7 +129,6 @@ export class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      console.log(state.selected)
       if (state.selected) {
         this.group = {
           id: state.selected.id,

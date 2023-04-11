@@ -18,6 +18,8 @@ import { IUser, IUserAll } from '../../interfaces/user';
 import { Role } from '../../interfaces/token';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { map, startWith } from 'rxjs/operators';
+import PlaceResult = google.maps.places.PlaceResult;
+import PlaceGeometry = google.maps.places.PlaceGeometry;
 
 @Component({
   selector: 'app-room-detail',
@@ -57,11 +59,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   friDate?: IAvailabilityDate;
   satDate?: IAvailabilityDate;
   sunDate?: IAvailabilityDate;
-
-  address: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required
-  ]);
-  addressDescription: UntypedFormControl = new UntypedFormControl();
+  addressFormGroup!: UntypedFormGroup;
 
   paymentOptions: IPaymentType[] = paymentOptions();
 
@@ -73,6 +71,13 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   private currentAvailabilities: IAvailability[] = [];
   private currentPaymentTypes: string[] = [];
   private currentProfessionalIds: string[] = [];
+  private geometry?: PlaceGeometry;
+  private formattedAddress?: string;
+
+  private address: UntypedFormControl = new UntypedFormControl('', [
+    Validators.required
+  ]);
+  private addressDescription: UntypedFormControl = new UntypedFormControl();
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
               private router: Router) {
@@ -103,17 +108,17 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
         room.availabilities = this.availabilities;
       }
 
-      if (this.address.value && this.address.value.geometry) {
-        const location = this.address.value.geometry.location;
+      const location = this.geometry?.location;
+      if (this.formattedAddress && location) {
         room.address = {
-          name: this.address.value.formatted_address,
+          name: this.formattedAddress,
+          description: this.addressDescription.value,
           location: {
             x: location.lng(),
             y: location.lat()
           }
         }
       }
-
       this.store.dispatch(new fromActionsRoom.RoomUpdate(room));
     }
     return;
@@ -204,11 +209,19 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  getAddress(placeResult: PlaceResult) {
+    this.geometry = placeResult.geometry;
+    this.formattedAddress = placeResult.formatted_address;
+  }
+
   private createForm(): void {
-    this.form = this.formBuilder.group({
-      professional: this.professional,
+    this.addressFormGroup = this.formBuilder.group({
       address: this.address,
       addressDescription: this.addressDescription
+    });
+    this.form = this.formBuilder.group({
+      professional: this.professional,
+      addressFormGroup: this.addressFormGroup
     });
     this.filteredProfessionals = this.professional.valueChanges.pipe(
       startWith(''),

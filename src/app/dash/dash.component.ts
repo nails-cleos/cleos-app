@@ -182,7 +182,6 @@ export class DashComponent implements OnInit, OnDestroy {
         } else {
           if (state.chartSummaries && state.chartSummaries.length) {
             this.charts = state.chartSummaries;
-            console.log(this.charts)
             this.isLoading = false;
           } else {
             if (state.error) {

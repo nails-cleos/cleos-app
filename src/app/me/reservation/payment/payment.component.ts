@@ -47,7 +47,6 @@ export class PaymentComponent implements OnInit, OnDestroy {
   }
 
   pay(payment: IPaymentAll): void {
-    console.log(payment.link)
     if (payment.link) {
       this.store.dispatch(
         new fromActionsPayment.PaymentSend(payment.link)
@@ -68,7 +67,6 @@ export class PaymentComponent implements OnInit, OnDestroy {
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       this.dataSource = state.selected;
-      console.log(state)
       if (state.message) {
         this.clean();
         this.router.navigate(['reservation', this.reservationId]);
