@@ -257,13 +257,13 @@
               </mat-accordion>
               <mat-error *ngIf="errors['availability']" [innerHTML]="'ROOM.AVAILABILITY.REQUIRED' | translate"
                          class="divider"></mat-error>
-              <app-google-map [addressFormGroup]="form"></app-google-map>
+              <app-google-map [addressFormGroup]="form" (addressEmitter)="getAddress($event)"></app-google-map>
               <mat-error *ngIf="errors['location']" class="divider">{{errors['location']}}</mat-error>
             </div>
           </mat-card-content>
           <mat-card-actions>
             <div fxFlex></div>
-            <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button"
+            <button  color="primary" mat-fab extended class="icon-button"
                     type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
             <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>

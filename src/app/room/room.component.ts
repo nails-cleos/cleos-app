@@ -20,6 +20,8 @@ import { IPaymentType, paymentOptions } from '../interfaces/payment';
 import timezones from 'timezones-list';
 import { getCurrentTimeZone } from '../util/dates';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import PlaceResult = google.maps.places.PlaceResult;
+import PlaceGeometry = google.maps.places.PlaceGeometry;
 
 export interface IIcon {
   monday: RoomIconName;
@@ -92,6 +94,8 @@ export class RoomComponent implements OnInit, OnDestroy {
   private getState: Observable<any>;
   private subscription?: Subscription;
   private paymentTypes: string[] = [];
+  private geometry?: PlaceGeometry;
+  private formattedAddress?: string;
 
   constructor(private readonly translate: TranslateService, private store: Store<AppState>,
               private formBuilder: UntypedFormBuilder, private router: Router) {
@@ -108,13 +112,13 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.room.currencyId = this.currency.value.id;
     this.room.timeZone = this.timeZone.value.tzCode;
     this.room.paymentTypes = this.paymentTypes;
-    const location = this.address.value.geometry.location;
+    const location = this.geometry?.location;
     this.room.address = {
-      name: this.address.value.formatted_address,
+      name: this.formattedAddress,
       description: this.addressDescription.value,
       location: {
-        x: location.lng(),
-        y: location.lat()
+        x: location?.lng(),
+        y: location?.lat()
       } as ILocation
     } as IAddress;
 
@@ -229,6 +233,11 @@ export class RoomComponent implements OnInit, OnDestroy {
       const bName = getFullUserName(b).toUpperCase();
       return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
     });
+  }
+
+  getAddress(placeResult: PlaceResult) {
+    this.geometry = placeResult.geometry;
+    this.formattedAddress = placeResult.formatted_address;
   }
 
   private createForm(): void {

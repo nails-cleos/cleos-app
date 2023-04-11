@@ -1,6 +1,6 @@
 {
   "name": "cleos",
-  "version": "1.0.1-rc",
+  "version": "1.0.1",
   "engines": {
     "node": "16.19.1",
     "npm": "8.19.3"
@@ -12,6 +12,7 @@
     "start:pwa": " docker run -d -p 443:443 -p 80:80 --restart=unless-stopped --mount type=bind,source=D:\\Documentos\\Chanchito\\Certs\\localhost,target=/etc/nginx/certs --name nails-app nails-app ",
     "build": "ng build --configuration=production",
     "build-pwa": "ng build --configuration=pwa",
+    "build-development": "ng build --configuration=development",
     "build:pwa": "docker build -t nails-app --build-arg BUILD_CONFIG=build-pwa --build-arg NGINX=nginx-staging.conf .",
     "build:source": "ng build --source-map",
     "test": "ng test",
@@ -88,7 +89,7 @@
     "@angular/compiler-cli": "^15.2.3",
     "@angular/localize": "^15.2.3",
     "@ngrx/schematics": "^15.4.0",
-    "@types/google.maps": "^3.52.3",
+    "@types/google.maps": "^3.52.5",
     "@types/jasmine": "~4.3.1",
     "@types/node": "^18.15.3",
     "@typescript-eslint/eslint-plugin": "^5.55.0",

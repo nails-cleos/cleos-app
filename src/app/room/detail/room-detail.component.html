@@ -60,7 +60,8 @@
                 <button fxShow.lt-sm fxHide (click)="addProfessional" color="accent" mat-fab class="icon-button">
                   <mat-icon matPrefix>person_add_alt_1</mat-icon>
                 </button>
-                <button fxHide.lt-sm fxShow (click)="addProfessional" color="accent" mat-fab extended class="icon-button">
+                <button fxHide.lt-sm fxShow (click)="addProfessional" color="accent" mat-fab extended
+                        class="icon-button">
                   <mat-icon matPrefix>person_add_alt_1</mat-icon>
                   <span>{{ 'COMMON.PROFESSIONAL.ADD_BUTTON' | translate }}</span>
                 </button>
@@ -194,8 +195,9 @@
               </mat-accordion>
               <mat-error *ngIf="errors['availability']" [innerHTML]="'ROOM.AVAILABILITY.REQUIRED' | translate"
                          class="divider"></mat-error>
-              <app-google-map [addressFormGroup]="form" [latitudeMarker]="room.address.location.y"
-                              [longitudeMarker]="room.address.location.x"></app-google-map>
+              <app-google-map [addressFormGroup]="addressFormGroup" [latitudeMarker]="room.address.location.y"
+                              [longitudeMarker]="room.address.location.x" (addressEmitter)="getAddress($event)">
+              </app-google-map>
             </div>
           </mat-card-content>
           <ng-template #boxSkeleton>

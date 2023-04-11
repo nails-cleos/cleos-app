@@ -46,7 +46,7 @@ import { IStep, Step } from '../interfaces/step';
 import { TimeZoneSnackBarComponent } from '../shared/snak/time-zone/time-zone-snack-bar.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DiscountDialogComponent } from '../discount/list/discounts.component';
-import GeocoderResult = google.maps.GeocoderResult;
+import PlaceResult = google.maps.places.PlaceResult;
 
 @Component({
   selector: 'app-reservation',
@@ -488,7 +488,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  getAddress($event: GeocoderResult): void {
+  getAddress($event: PlaceResult): void {
     this.address = $event.formatted_address;
   }
 
@@ -813,7 +813,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private addReservations(): void {
     this.reservations?.forEach(it => {
-      console.log(it)
       if (it.id === this.reservationId) {
         return;
       }

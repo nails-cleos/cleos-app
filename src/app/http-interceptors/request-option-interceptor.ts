@@ -13,7 +13,6 @@ export class RequestOptionInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     if (!isExternalUrl(req.url)) {
-      console.log(req.headers)
       if (!req.headers.has('Content-Type') && !req.headers.has('Upload')) {
         req = req.clone({ headers: req.headers.set('Content-Type', 'application/json') });
       }

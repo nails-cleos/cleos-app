@@ -3,6 +3,7 @@ export const environment = {
   appServer: 'https://cleos-staging.herokuapp.com',
   title: 'CLEOS STAGING',
   version: require('../../package.json').version + '-staging',
+  baseUrl: 'http://localhost:8080/api',
   googleClientId: '364998384255-kk09n0fq6p79s7oim94ljevf8bb0etip.apps.googleusercontent.com',
   facebookClientId: '453309609006101',
   firebase: {
