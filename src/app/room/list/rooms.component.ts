@@ -87,7 +87,6 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
       });
       // this.dataSource = stateValue.data?.content?.map((r: any) => {
       //   const map = new Map<string, string[]>();
-      //   console.log(r)
       //   r.availabilities?.reduce((group: any, item: IAvailabilityAll) => {
       //     const key = `${item.start} - ${item.end}`;
       //     let day: any = group.get(key) || [];

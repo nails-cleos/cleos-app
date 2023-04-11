@@ -46,7 +46,6 @@ export class ReviewDialogComponent {
   }
 
   get onNoClick(): void {
-    console.log("test")
     return this.dialogRef.close();
   }
 

@@ -669,7 +669,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      console.log(state)
       this.additionalList = state.productDiscount?.additionalList;
       if (this.additionalList && this.additionalList.length) {
         const sp = this.steps[2];

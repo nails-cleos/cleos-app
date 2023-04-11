@@ -1,7 +1,5 @@
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import {
-  AvailabilityDate, IAddress, IAvailability, IAvailabilityDate, ILocation, IRoom, IRoomAll
-} from '../../interfaces/room';
+import { AvailabilityDate, IAvailability, IAvailabilityDate, IRoom, IRoomAll } from '../../interfaces/room';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { IIcon } from '../room.component';
@@ -18,6 +16,8 @@ import { IUser, IUserAll } from '../../interfaces/user';
 import { Role } from '../../interfaces/token';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { map, startWith } from 'rxjs/operators';
+import PlaceResult = google.maps.places.PlaceResult;
+import PlaceGeometry = google.maps.places.PlaceGeometry;
 
 @Component({
   selector: 'app-room-me',
@@ -55,6 +55,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   sunDate?: IAvailabilityDate;
 
   form!: UntypedFormGroup;
+  addressFormGroup!: UntypedFormGroup;
   address: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
@@ -69,6 +70,8 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   private currentAvailabilities: IAvailability[] = [];
   private currentPaymentTypes: string[] = [];
   private currentProfessionalIds: string[] = [];
+  private geometry?: PlaceGeometry;
+  private formattedAddress?: string;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
               private router: Router) {
@@ -100,10 +103,10 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
         room.availabilities = this.availabilities;
       }
 
-      if (this.address.value && this.address.value.geometry) {
-        const location = this.address.value.geometry.location;
+      const location = this.geometry?.location;
+      if (this.formattedAddress && location) {
         room.address = {
-          name: this.address.value.formatted_address,
+          name: this.formattedAddress,
           description: this.addressDescription.value,
           location: {
             x: location.lng(),
@@ -253,11 +256,19 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
     return false;
   }
 
+  getAddress(placeResult: PlaceResult) {
+    this.geometry = placeResult.geometry;
+    this.formattedAddress = placeResult.formatted_address;
+  }
+
   private createForm(): void {
-    this.form = this.formBuilder.group({
-      professional: this.professional,
+    this.addressFormGroup = this.formBuilder.group({
       address: this.address,
       addressDescription: this.addressDescription
+    });
+    this.form = this.formBuilder.group({
+      professional: this.professional,
+      addressFormGroup: this.addressFormGroup
     });
     this.filteredProfessionals = this.professional.valueChanges.pipe(
       startWith(''),
@@ -291,6 +302,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.paymentTypes = state.selected.room.paymentTypes;
         this.currentPaymentTypes = state.selected.room.paymentTypes;
         this.addressDescription.setValue(this.room.address?.description);
+        this.address.setValue(this.room.address?.name);
         this.allProfessional = state.selected.professionals;
         state.selected.room.professionals.forEach((professional: IUserAll) => {
           this.professionals.push(professional);
