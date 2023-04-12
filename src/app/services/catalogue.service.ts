@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ICatalogue, ICatalogueAll } from '../interfaces/catalogue';
 
@@ -36,7 +36,9 @@ export class CatalogueService {
     formData.append('file', file);
     const blob = new Blob([JSON.stringify(catalogue)], {type: 'application/json'});
     formData.append('catalogue', blob);
-    return this.http.post<ICatalogue>(this.urlV1, formData);
+
+    const headers = new HttpHeaders().set('Upload', 'true');
+    return this.http.post<ICatalogue>(this.urlV1, formData, {headers});
   }
 
   public delete(id: string | null): Observable<ICatalogue> {
@@ -50,7 +52,8 @@ export class CatalogueService {
     formData.append('file', file);
     const blob = new Blob([JSON.stringify(catalogue)], {type: 'application/json'});
     formData.append('catalogue', blob);
-    return this.http.patch<ICatalogue>(url, formData);
+    const headers = new HttpHeaders().set('Upload', 'true');
+    return this.http.patch<ICatalogue>(url, formData, {headers});
   }
 
   updateAll(catalogues: ICatalogueAll[]): Observable<ICatalogueAll[]> {

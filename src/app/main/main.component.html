@@ -3,37 +3,37 @@
   <span>{{title}}</span>
   <span class="mat-spacer"></span>
   <span *ngIf="(isHandset$ | async) === false; else menuButton">
-    <button (click)="onNavigation('story')" color="accent" mat-button type="button">
+    <button (click)="onNavigation('story')" mat-button type="button">
       <span>{{'MAIN.SECTION.STORY' | translate }}</span>
     </button>
-    <button (click)="onNavigation('product')" color="accent" mat-button type="button">
+    <button (click)="onNavigation('product')" mat-button type="button">
       <span>{{'MAIN.SECTION.PRODUCT' | translate }}</span>
     </button>
-    <button (click)="onNavigation('book')" color="accent" mat-button type="button">
+    <button (click)="onNavigation('book')" mat-button type="button">
       <span>{{'MAIN.SECTION.BOOK' | translate }}</span>
     </button>
-    <button (click)="onNavigation('contact')" color="accent" mat-button type="button">
+    <button (click)="onNavigation('contact')" mat-button type="button">
       <span>{{'MAIN.SECTION.CONTACT' | translate }}</span>
     </button>
-    <button [routerLinkActive]="['active']" [routerLink]="'/main/catalogs'" color="accent" mat-button type="button">
+    <button [routerLinkActive]="['active']" [routerLink]="'/main/catalogs'" mat-button type="button">
       <span>{{'MAIN.SECTION.CATALOG' | translate }}</span>
     </button>
     <button (click)="redirect" *ngIf="isAuthenticated; else login" [routerLinkActive]="['active']"
-            color="accent" mat-button type="button">
+            mat-button type="button">
       <span>{{'MAIN.SECTION.ACCOUNT' | translate }}</span>
     </button>
     <ng-template #login>
-      <button [routerLinkActive]="['active']" [routerLink]="'/auth'" color="accent" mat-button type="button">
+      <button [routerLinkActive]="['active']" [routerLink]="'/auth'" mat-button type="button">
         <span>{{'MAIN.SECTION.AUTH' | translate }}</span>
       </button>
     </ng-template>
-    <button [matMenuTriggerFor]="settingMenu" color="accent" mat-icon-button>
+    <button [matMenuTriggerFor]="settingMenu" mat-icon-button>
       <mat-icon>settings</mat-icon>
     </button>
     <mat-menu #settingMenu="matMenu">
       <mat-nav-list>
         <mat-list-item>
-            <mat-slide-toggle (change)="setTheme($event.checked)" [checked]="checked"
+            <mat-slide-toggle (change)="setTheme($event.checked)" [checked]="checked" color="accent"
                               mat-line>{{'COMMON.DASHBOARD.DARK_MODE' | translate }}</mat-slide-toggle>
         </mat-list-item>
       </mat-nav-list>
@@ -77,7 +77,7 @@
         </a>
         <mat-divider></mat-divider>
         <mat-list-item>
-          <mat-slide-toggle (change)="setTheme($event.checked)" [checked]="checked"
+          <mat-slide-toggle color="accent" (change)="setTheme($event.checked)" [checked]="checked"
                             mat-line>{{'COMMON.DASHBOARD.DARK_MODE' | translate }}</mat-slide-toggle>
         </mat-list-item>
         <ng-template #login>

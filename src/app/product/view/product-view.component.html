@@ -48,13 +48,6 @@
                   </label>
                 </mat-form-field>
                 <mat-form-field appearance="outline" class="tab-field">
-                  <mat-label>{{ 'PRODUCT.PRICE.FIELD' | translate }}</mat-label>
-                  <span matPrefix><mat-icon matPrefix>attach_money</mat-icon> &nbsp;</span>
-                  <label>
-                    <input [value]="tab.price | number:'1.2-2'" matInput readonly>
-                  </label>
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="tab-field">
                   <mat-label>{{ 'PRODUCT.DURATION.FIELD' | translate }}</mat-label>
                   <label>
                     <input [value]="tab.duration | durationTime" matInput readonly/>
@@ -82,11 +75,11 @@
         </ng-template>
         <mat-card-actions *ngIf="group; else buttonSkeleton">
           <div fxFlex></div>
-          <button (click)="edit" color="primary" mat-fab extended class="icon-button" type="button">
-            {{ 'COMMON.BUTTON.EDIT' | translate }}
-          </button>
           <button appBackButton color="accent" mat-fab extended class="icon-button" type="button">
             {{ 'COMMON.BUTTON.BACK' | translate }}
+          </button>
+          <button (click)="edit" color="primary" mat-fab extended class="icon-button" type="button">
+            {{ 'COMMON.BUTTON.EDIT' | translate }}
           </button>
         </mat-card-actions>
         <ng-template #buttonSkeleton>

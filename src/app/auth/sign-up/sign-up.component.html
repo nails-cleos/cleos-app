@@ -25,54 +25,8 @@
         {{errors['email']}}
       </mat-error>
     </mat-form-field>
-    <mat-form-field [color]="passwordComponent.color" appearance="outline">
-      <mat-label>{{ 'AUTH.PASSWORD.FIELD' | translate }}</mat-label>
-      <mat-pass-toggle-visibility #togglePass matSuffix></mat-pass-toggle-visibility>
-      <label>
-        <input #passwordInput (focusout)="onStrengthChanged" [formControl]="passwordComponent.passwordFormControl"
-               [tabIndex]="3" [type]="togglePass.type"
-               autocomplete="new-password" matInput required>
-      </label>
-      <mat-hint align="end" aria-live="polite">
-        {{passwordInput.value.length}} / {{passwordComponent.max}}
-      </mat-hint>
-    </mat-form-field>
-    <mat-error *ngIf="showError && passwordComponent.passwordFormControl.hasError('required')"
-               [innerHTML]="'AUTH.PASSWORD.REQUIRED' | translate">
-    </mat-error>
-    <mat-error *ngIf="showError && passwordComponent.passwordFormControl.hasError('pattern')">
-      {{ 'AUTH.PASSWORD.INVALID' | translate }}
-    </mat-error>
-    <mat-error *ngIf="showError && passwordComponent.passwordFormControl.hasError('maxlength')">
-      {{ 'AUTH.PASSWORD.MAX' | translate }}
-    </mat-error>
-    <mat-password-strength #passwordComponent [min]="6" [password]="passwordInput.value">
-    </mat-password-strength>
-    <mat-slide-toggle #toggle class="divider">{{ 'AUTH.PASSWORD.DETAIL' | translate }}</mat-slide-toggle>
-    <mat-password-strength-info *ngIf="toggle.checked" [digitsCriteriaMsg]="'AUTH.PASSWORD.DIGIT' | translate"
-                                [lowerCaseCriteriaMsg]="'AUTH.PASSWORD.LOWER_CASE' | translate"
-                                [minCharsCriteriaMsg]="'AUTH.PASSWORD.MIN' | translate"
-                                [passwordComponent]="passwordComponent"
-                                [specialCharsCriteriaMsg]="'AUTH.PASSWORD.SPECIAL' | translate"
-                                [upperCaseCriteriaMsg]="'AUTH.PASSWORD.UPPER_CASE' | translate">
-    </mat-password-strength-info>
-    <mat-form-field appearance="outline">
-      <mat-label>{{ 'AUTH.SIGN_UP.CONFIRM_PASSWORD.FIELD' | translate }}</mat-label>
-      <mat-pass-toggle-visibility #toggleConfirm matSuffix></mat-pass-toggle-visibility>
-      <label>
-        <input [formControl]="passwordComponent.passwordConfirmationFormControl" [tabIndex]="4"
-               [type]="toggleConfirm.type" autocomplete="new-password" matInput required>
-      </label>
-      <mat-error *ngIf="passwordComponent.passwordConfirmationFormControl.hasError('required')"
-                 [innerHTML]="'AUTH.SIGN_UP.CONFIRM_PASSWORD.REQUIRED' | translate">
-      </mat-error>
-      <mat-error *ngIf="passwordComponent.passwordConfirmationFormControl.hasError('notConfirmed')">
-        {{ 'AUTH.SIGN_UP.CONFIRM_PASSWORD.MUST_MATCH' | translate }}
-      </mat-error>
-      <mat-error *ngIf="errors['confirmPassword']">
-        {{errors['confirmPassword']}}
-      </mat-error>
-    </mat-form-field>
+    <app-password [formGroup]="passwordFormGroup" [label]="'AUTH.PASSWORD.FIELD'"
+                  [confirmLabel]="'AUTH.SIGN_UP.CONFIRM_PASSWORD'"></app-password>
     <mat-form-field appearance="outline">
       <mat-label>{{ 'COMMON.USER.LANG.FIELD' | translate }}</mat-label>
       <span *ngIf="select.value" [class]="'flag-icon  flag-icon-squared flag-icon-' + select.value.icon"
@@ -114,15 +68,13 @@
     <mat-form-field appearance="outline">
       <mat-label>{{ 'AUTH.SIGN_UP.CODE.FIELD' | translate }}</mat-label>
       <label>
-        <input [formControl]="codeForm" [tabIndex]="9" matInput>
+        <input [formControl]="codeForm" [tabIndex]="9" matInput autocomplete="one-time-code">
       </label>
     </mat-form-field>
   </div>
   <div fxLayout="row">
     <div fxFlex></div>
-    <button [disabled]="form.invalid || passwordComponent.passwordConfirmationFormControl.invalid ||
-     passwordComponent.passwordFormControl.invalid"
-            [tabIndex]="10" color="accent" fxFlex mat-fab extended
-            type="submit">{{ 'AUTH.SIGN_UP.TITLE' | translate }}</button>
+    <button [disabled]="form.invalid || passwordFormGroup.invalid" [tabIndex]="10" color="accent" fxFlex mat-fab
+            extended type="submit">{{ 'AUTH.SIGN_UP.TITLE' | translate }}</button>
   </div>
 </form>

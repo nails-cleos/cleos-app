@@ -7,6 +7,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { getLocale } from '../../util/helper';
+import { FormBuilder, FormControl, UntypedFormGroup } from "@angular/forms";
 
 @Component({
   selector: 'app-recovery-password',
@@ -16,13 +17,15 @@ import { getLocale } from '../../util/helper';
 export class RecoveryPasswordComponent implements OnInit, OnDestroy {
   @ViewChild('passwordComponent') passwordComponent: any;
 
+  passwordFormGroup!: UntypedFormGroup;
+
   getState: Observable<any>;
   subscription?: Subscription;
   showError = false;
   locale: string;
 
   constructor(private store: Store<AppState>, private route: ActivatedRoute, private translate: TranslateService,
-              private router: Router, private snackBar: MatSnackBar) {
+              private router: Router, private snackBar: MatSnackBar, private formBuilder: FormBuilder) {
     this.getState = this.store.select(selectAuthState);
     this.locale = getLocale(this.route.snapshot.queryParamMap.get('locale') || navigator.language);
   }
@@ -39,15 +42,14 @@ export class RecoveryPasswordComponent implements OnInit, OnDestroy {
     );
   }
 
-  get onStrengthChanged(): void {
-    this.showError = true;
-    return this.passwordComponent.passwordConfirmationFormControl.updateValueAndValidity();
-  }
-
   ngOnInit(): void {
     this.translate.use(this.locale);
     this.clean();
     this.subscribe();
+    this.passwordFormGroup = this.formBuilder.group({
+      password: new FormControl(''),
+      confirmPassword: new FormControl('')
+    });
   }
 
   ngOnDestroy(): void {

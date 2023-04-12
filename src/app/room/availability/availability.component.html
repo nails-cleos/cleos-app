@@ -49,11 +49,11 @@
   </div>
   <div fxLayout="row" fxLayoutAlign="space-evenly end">
     <div fxFlex></div>
+    <button (click)="ignore.emit()" color="accent" mat-button type="button">
+      {{ 'COMMON.BUTTON.IGNORE' | translate }}
+    </button>
     <button (click)="create" [disabled]="availabilityForm.invalid" color="primary" mat-button type="button">
       {{ 'COMMON.BUTTON.ADD' | translate }}
-    </button>
-    <button (click)="ignore.emit()" color="warn" mat-button type="button">
-      {{ 'COMMON.BUTTON.IGNORE' | translate }}
     </button>
   </div>
 </form>

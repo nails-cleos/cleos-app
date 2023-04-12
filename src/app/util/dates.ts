@@ -427,7 +427,13 @@ export const dateToTimestamp = (date: Date = getNow()): number => parseInt(`${da
 
 export const stringDateUTCToTimeZone = (date: string): Date => new Date(`${date}.000z`);
 
-export const isSameTimeZone = (timeZone: string = getCurrentTimeZone()): boolean => timeZone === getCurrentTimeZone();
+export const isSameTimeZone = (timeZone: string = getCurrentTimeZone()): boolean => {
+  if (getCurrentTimeZone() === timeZone) {
+    return true;
+  }
+  const date = new Date();
+  return getGMT(timeZone, date) === getGMT(getCurrentTimeZone(), date)
+};
 
 export const newDate = (value: number | string | Date): Date => new Date(value);
 

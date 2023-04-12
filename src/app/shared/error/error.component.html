@@ -16,11 +16,11 @@
   <div fxLayout="row">
     <div fxFlex></div>
     <div class="only-button">
-      <button (click)="reload" *ngIf="retry" color="primary" mat-fab extended class="icon-button" type="button">
-        {{ 'COMMON.BUTTON.RELOAD' | translate }}
-      </button>
       <button appBackButton color="accent" mat-fab extended class="icon-button" type="button">
         {{ 'COMMON.BUTTON.BACK' | translate }}
+      </button>
+      <button (click)="reload" *ngIf="retry" color="primary" mat-fab extended class="icon-button" type="button">
+        {{ 'COMMON.BUTTON.RELOAD' | translate }}
       </button>
     </div>
   </div>
