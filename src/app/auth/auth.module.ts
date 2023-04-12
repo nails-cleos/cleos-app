@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { MatPasswordStrengthModule } from '@angular-material-extensions/password-strength';
 
 import { SharedModule } from '../shared/shared.module';
 import { AuthRoutingModule } from './auth-routing.module';
@@ -43,7 +42,6 @@ import { GoogleSigninButtonModule } from "@abacritt/angularx-social-login";
     imports: [
         AuthRoutingModule,
         SharedModule,
-        MatPasswordStrengthModule.forRoot(),
         MatTabsModule,
         MatSlideToggleModule,
         NgxMatIntlTelInputComponent,

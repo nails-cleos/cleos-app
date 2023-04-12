@@ -38,6 +38,7 @@ import { ConvertHMPipe } from '../pipes/convert-hm.pipe';
 import { CounterComponent } from '../util/counter/counter.component';
 import { CalendarDialogComponent } from './calendar-dialog/calendar-dialog.component';
 import { GoogleMapsModule } from "@angular/google-maps";
+import { PasswordComponent } from './password/password.component';
 
 @NgModule({
   imports: [
@@ -96,7 +97,8 @@ import { GoogleMapsModule } from "@angular/google-maps";
     ChartComponent,
     TimeZoneSnackBarComponent,
     CounterComponent,
-    CalendarDialogComponent
+    CalendarDialogComponent,
+    PasswordComponent
   ],
   declarations: [
     BackButtonDirective,
@@ -117,7 +119,8 @@ import { GoogleMapsModule } from "@angular/google-maps";
     ChartComponent,
     TimeZoneSnackBarComponent,
     CounterComponent,
-    CalendarDialogComponent
+    CalendarDialogComponent,
+    PasswordComponent
   ],
   providers: [
     httpInterceptorProviders,

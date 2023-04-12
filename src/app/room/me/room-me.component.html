@@ -206,10 +206,10 @@
           </ng-template>
           <mat-card-actions *ngIf="room; else buttonSkeleton">
             <div fxFlex></div>
-            <button color="primary" mat-fab extended class="icon-button"
-                    type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
             <button [form]="form" appBackButton color="accent"
                     mat-fab extended class="icon-button" type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <button color="primary" mat-fab extended class="icon-button"
+                    type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
           </mat-card-actions>
           <ng-template #buttonSkeleton>
             <div class="ssc-head-line"></div>

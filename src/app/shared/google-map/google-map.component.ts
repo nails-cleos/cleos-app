@@ -4,6 +4,7 @@ import { GeocodeService } from '../../services/geocode.service';
 import { MapInfoWindow, MapMarker } from "@angular/google-maps";
 import PlaceResult = google.maps.places.PlaceResult;
 import MapMouseEvent = google.maps.MapMouseEvent;
+import { environment } from "../../../environments/environment";
 
 @Component({
   selector: 'app-google-map',
@@ -32,7 +33,6 @@ export class GoogleMapComponent implements OnInit, AfterViewInit {
 
   public center: google.maps.LatLngLiteral;
   public zoom: number;
-  public showMap = true;
 
   constructor(private geocodeService: GeocodeService) {
     this.latitude = 51.926517;
@@ -45,15 +45,15 @@ export class GoogleMapComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    if (this.addressFormGroup && this.showMap) {
+    if (this.addressFormGroup) {
       this.isDraggable = true;
     }
-    this.mockResponse();
   }
 
   ngAfterViewInit(): void {
     this.geocodeService.createMap().subscribe((isMapReady) => {
       this.isMapReady = isMapReady;
+      this.mockResponse();
       if (isMapReady) {
         this.setCurrentPosition();
         this.setAutocomplete();
@@ -145,7 +145,7 @@ export class GoogleMapComponent implements OnInit, AfterViewInit {
   }
 
   private mockResponse(): void {
-    if (!this.showMap && !this.addressFormGroup?.get('address')?.value) {
+    if (!this.isMapReady && !this.addressFormGroup?.get('address')?.value) {
       const value = {
         address_components: [],
         formatted_address: 'Mock address',

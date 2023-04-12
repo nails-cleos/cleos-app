@@ -53,10 +53,10 @@
           </ng-template>
           <mat-card-actions *ngIf="currency; else buttonSkeleton">
             <div fxFlex></div>
-            <button [disabled]="form.invalid || form.pristine" color="primary" mat-fab extended class="icon-button"
-                    type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
             <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <button [disabled]="form.invalid || form.pristine" color="primary" mat-fab extended class="icon-button"
+                    type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
           </mat-card-actions>
           <ng-template #buttonSkeleton>
             <div class="ssc-head-line"></div>
