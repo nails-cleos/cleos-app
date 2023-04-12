@@ -1,6 +1,6 @@
 import * as auth from './reducers/auth.reducers';
 import * as user from './reducers/user.reducers';
-import * as product from './reducers/product.reducers';
+import * as treatment from './reducers/treatment.reducers';
 import * as catalogue from './reducers/catalogue.reducers';
 import * as room from './reducers/room.reducers';
 import * as reservation from './reducers/reservation.reducers';
@@ -18,7 +18,7 @@ import { createFeatureSelector } from '@ngrx/store';
 export interface AppState {
   authState: auth.State;
   userState: user.State;
-  productState: product.State;
+  treatmentState: treatment.State;
   catalogueState: catalogue.State;
   roomState: room.State;
   reservationState: reservation.State;
@@ -36,7 +36,7 @@ export interface AppState {
 export const reducers = {
   auth: auth.reducer,
   user: user.reducer,
-  product: product.reducer,
+  treatment: treatment.reducer,
   catalogue: catalogue.reducer,
   room: room.reducer,
   reservation: reservation.reducer,
@@ -53,7 +53,7 @@ export const reducers = {
 
 export const selectAuthState = createFeatureSelector<AppState>('auth');
 export const selectUserState = createFeatureSelector<AppState>('user');
-export const selectProductState = createFeatureSelector<AppState>('product');
+export const selectTreatmentState = createFeatureSelector<AppState>('treatment');
 export const selectCatalogueState = createFeatureSelector<AppState>('catalogue');
 export const selectRoomState = createFeatureSelector<AppState>('room');
 export const selectReservationState = createFeatureSelector<AppState>('reservation');

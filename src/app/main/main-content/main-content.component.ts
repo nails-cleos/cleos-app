@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { IProduct, IProductGroup } from '../../interfaces/product';
+import { ITreatment, ITreatmentGroup } from '../../interfaces/treatment';
 import { map, startWith } from 'rxjs/operators';
 import { Observable, Subscription } from 'rxjs';
 import { ICatalogue, ISlide, Slide } from '../../interfaces/catalogue';
@@ -28,12 +28,12 @@ export class MainContentComponent implements OnInit, OnDestroy {
   slides: ISlide[] = [];
 
   form!: UntypedFormGroup;
-  groups: IProductGroup[] | undefined;
-  filteredGroup: Observable<IProductGroup[] | undefined> | undefined;
+  groups: ITreatmentGroup[] | undefined;
+  filteredGroup: Observable<ITreatmentGroup[] | undefined> | undefined;
   group: UntypedFormControl = new UntypedFormControl('', [requireMatch]);
-  products: IProduct[] | undefined;
-  filteredProduct: Observable<IProduct[] | undefined> | undefined;
-  product: UntypedFormControl = new UntypedFormControl('', [requireMatch]);
+  treatments: ITreatment[] | undefined;
+  filteredTreatment: Observable<ITreatment[] | undefined> | undefined;
+  treatment: UntypedFormControl = new UntypedFormControl('', [requireMatch]);
 
   maxDate: Date;
   minDate: Date;
@@ -73,7 +73,7 @@ export class MainContentComponent implements OnInit, OnDestroy {
   }
 
   get book(): void {
-    const data = {date: this.date.value, product: this.product.value};
+    const data = {date: this.date.value, treatment: this.treatment.value};
     this.router.navigate(['me', 'reservation'], {state: data});
     return;
   }
@@ -92,20 +92,20 @@ export class MainContentComponent implements OnInit, OnDestroy {
     this.createForm();
     this.subscribe();
     this.getCatalogues();
-    this.getProducts();
+    this.getTreatments();
 
     this.filteredGroup = this.group.valueChanges.pipe(startWith(''), map(value => {
       if (typeof value === 'string') {
         return value;
       }
-      this.products = value.products;
-      this.product.setValue('');
+      this.treatments = value.treatments;
+      this.treatment.setValue('');
       return value.name;
     }), map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups));
-    this.filteredProduct = this.product.valueChanges.pipe(
+    this.filteredTreatment = this.treatment.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterProduct(name) : this.products ? this.products.slice() : this.products)
+      map(name => name ? this.filterTreatment(name) : this.treatments ? this.treatments.slice() : this.treatments)
     );
     this.cdRef.detectChanges();
   }
@@ -114,18 +114,14 @@ export class MainContentComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  onNavigation(elementId: string): void {
-    this.viewportScroller.scrollToAnchor(elementId);
-  }
-
   myFilter = (d: Date | null): boolean => filterDateRoom(d);
 
-  displayFnGroup(group: IProductGroup): string {
+  displayFnGroup(group: ITreatmentGroup): string {
     return group ? `${group.name}` : '';
   }
 
-  displayFnProduct(product: IProduct): string {
-    return product ? `${product.name}` : '';
+  displayFnTreatment(treatment: ITreatment): string {
+    return treatment ? `${treatment.name}` : '';
   }
 
   keyDownHandler(event: any, form: UntypedFormControl): void {
@@ -135,17 +131,17 @@ export class MainContentComponent implements OnInit, OnDestroy {
   }
 
   keyDownGroup(event: any): void {
-    this.products = undefined;
-    this.keyDownHandler(event, this.product);
+    this.treatments = undefined;
+    this.keyDownHandler(event, this.treatment);
     this.keyDownHandler(event, this.group);
   }
 
-  setGroup(group: IProductGroup): void {
+  setGroup(group: ITreatmentGroup): void {
     this.group.setValue(group);
   }
 
-  setProduct(product: IProduct): void {
-    this.product.setValue(product);
+  setTreatment(treatment: ITreatment): void {
+    this.treatment.setValue(treatment);
     this.viewportScroller.scrollToAnchor('book');
   }
 
@@ -191,21 +187,21 @@ export class MainContentComponent implements OnInit, OnDestroy {
     );
   }
 
-  private getProducts(): void {
+  private getTreatments(): void {
     this.store.dispatch(
-      new fromActionsMain.GetAllProducts()
+      new fromActionsMain.GetAllTreatments()
     );
   }
 
-  private filterGroup(name: string): IProductGroup[] | undefined {
+  private filterGroup(name: string): ITreatmentGroup[] | undefined {
     const filterValue = name.toLowerCase();
 
     return this.groups?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 
-  private filterProduct(name: string): IProduct[] | undefined {
+  private filterTreatment(name: string): ITreatment[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.products?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
+    return this.treatments?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 }

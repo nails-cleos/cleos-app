@@ -29,7 +29,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['position', 'customer', 'professional', 'timestamp', 'product', 'state', 'actions'];
+  displayedColumns: string[] = ['position', 'customer', 'professional', 'timestamp', 'treatment', 'state', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IReservationAll>>();
   expanded?: IReservationAll;
   resultsLength = DEFAULT_LENGTH;

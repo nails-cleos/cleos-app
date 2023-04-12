@@ -29,11 +29,11 @@
         </td>
       </tr>
       <tr *ngIf="reservation">
-        <td class="right">{{ 'COMMON.PRODUCT.FIELD' | translate }}</td>
-        <td class="left">{{reservation.product.name}}</td>
+        <td class="right">{{ 'COMMON.TREATMENT.FIELD' | translate }}</td>
+        <td class="left">{{reservation.treatment.name}}</td>
       </tr>
       <tr *ngIf="reservation">
-        <td class="right">{{ 'ME.RESERVATION.PRODUCT.PRICE.FIELD' | translate }}</td>
+        <td class="right">{{ 'ME.RESERVATION.TREATMENT.PRICE.FIELD' | translate }}</td>
         <td class="left">$ {{price.total | number:'1.2-2'}}</td>
       </tr>
     </table>

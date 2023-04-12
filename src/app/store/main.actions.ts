@@ -2,10 +2,10 @@ import { Action } from '@ngrx/store';
 
 export enum MainActionTypes {
   getAllCatalogue = '[Main] Get all',
-  getAllProducts = '[Main] Get all products',
+  getAllTreatments = '[Main] Get all treatments',
   sendMessage =  '[Main] Send message',
   catalogueSuccess = '[Main] Catalogue Success',
-  productSuccess = '[Main] Product success',
+  treatmentSuccess = '[Main] Treatment success',
   requestSuccess = '[Main] Success',
   requestFailure = '[Main] Failure',
   clean = '[Main] Clean'
@@ -15,8 +15,8 @@ export class GetAllCatalogue implements Action {
   readonly type = MainActionTypes.getAllCatalogue;
 }
 
-export class GetAllProducts implements Action {
-  readonly type = MainActionTypes.getAllProducts;
+export class GetAllTreatments implements Action {
+  readonly type = MainActionTypes.getAllTreatments;
 }
 
 export class SendMessage implements Action {
@@ -33,8 +33,8 @@ export class CatalogueSuccess implements Action {
   }
 }
 
-export class ProductsSuccess implements Action {
-  readonly type = MainActionTypes.productSuccess;
+export class TreatmentsSuccess implements Action {
+  readonly type = MainActionTypes.treatmentSuccess;
 
   constructor(public payload: any) {
   }
@@ -60,9 +60,9 @@ export class Clean implements Action {
 
 export type All =
   | GetAllCatalogue
-  | GetAllProducts
+  | GetAllTreatments
   | SendMessage
-  | ProductsSuccess
+  | TreatmentsSuccess
   | CatalogueSuccess
   | RequestSuccess
   | RequestFailure

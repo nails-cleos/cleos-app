@@ -26,7 +26,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Role } from '../../interfaces/token';
 import { getFullUserName, getPrice, getUserName, isProfessional, openDialog, snakeToCamel } from '../../util/helper';
-import { IPrice, Price } from '../../interfaces/product';
+import { IPrice, Price } from '../../interfaces/treatment';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatFabMenu, MatFabMenuDirection } from '@angular-material-extensions/fab-menu/lib/mat-fab-menu.component';
 import { IPayment } from '../../interfaces/payment';
@@ -58,7 +58,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   language: string;
   changeState: MatFabMenu[] = [];
 
-  displayedColumns: string[] = ['position', 'professional', 'start', 'product', 'state'];
+  displayedColumns: string[] = ['position', 'professional', 'start', 'treatment', 'state'];
   dataSource: any;
   expanded?: IReservationAll;
   pageSize = 5;
@@ -214,7 +214,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
             }, 5000);
           }
         }
-        if (this.reservation && this.reservation.product) {
+        if (this.reservation && this.reservation.treatment) {
           this.price = getPrice(this.reservation);
         }
       }
@@ -353,9 +353,9 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     const bookTransaction = ReservationDetailComponent.createTransaction('booked', (): void => {
       const customer = reservation.customer;
       const room = reservation.room;
-      const product = reservation.product;
+      const treatment = reservation.treatment;
       const professional = reservation.professional;
-      const data = { customer, room, product, professional };
+      const data = { customer, room, treatment, professional };
       this.router.navigate(['reservation'], { state: data });
     });
 
@@ -448,9 +448,9 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
     const bookTransaction = ReservationDetailComponent.createTransaction('booked', (): void => {
       const room = reservation.room;
-      const product = reservation.product;
+      const treatment = reservation.treatment;
       const professional = reservation.professional;
-      const data = { room, product, professional };
+      const data = { room, treatment, professional };
       this.router.navigate(['me', 'reservation'], { state: data });
     });
 

@@ -59,20 +59,20 @@
         <div mat-line>{{ 'COMMON.STATUS.RESERVATION.' + reservation.state | translate}}</div>
       </mat-list-item>
       <mat-divider></mat-divider>
-      <div mat-subheader>{{ 'COMMON.PRODUCT.FIELD' | translate}}</div>
+      <div mat-subheader>{{ 'COMMON.TREATMENT.FIELD' | translate}}</div>
       <mat-list-item>
         <mat-icon matListItemIcon>home_repair_service</mat-icon>
-        <div mat-line>{{ 'RESERVATION.PRODUCT.NAME.FIELD' | translate}}</div>
-        <div mat-line>{{reservation.product.name}}</div>
+        <div mat-line>{{ 'RESERVATION.TREATMENT.NAME.FIELD' | translate}}</div>
+        <div mat-line>{{reservation.treatment.name}}</div>
       </mat-list-item>
       <mat-list-item>
         <mat-icon matListItemIcon>timer</mat-icon>
-        <div mat-line>{{ 'RESERVATION.PRODUCT.DURATION.FIELD' | translate}}</div>
+        <div mat-line>{{ 'RESERVATION.TREATMENT.DURATION.FIELD' | translate}}</div>
         <div mat-line>{{duration.hour | number:'2.0-0'}}:{{duration.minute | number:'2.0-0'}}</div>
       </mat-list-item>
       <mat-list-item>
         <mat-icon matListItemIcon>{{reservation.room.currency.icon}}</mat-icon>
-        <div mat-line>{{ 'RESERVATION.PRODUCT.PRICE.FIELD' | translate}}</div>
+        <div mat-line>{{ 'RESERVATION.TREATMENT.PRICE.FIELD' | translate}}</div>
         <div *ngIf="price.discount; else noDiscount" mat-line>
           <span [class.strikethrough]="price.discount">{{price.amount | number:'1.2-2'}}</span>
           <span [@discountAnimation] class="raised-button bold">{{price.priceWithDiscount | number:'1.2-2'}}</span>
@@ -81,17 +81,17 @@
           <div mat-line>{{price.amount | number:'1.2-2'}}</div>
         </ng-template>
       </mat-list-item>
-      <div *ngIf="reservation.product.extras">
+      <div *ngIf="reservation.treatment.extras">
         <mat-divider></mat-divider>
-        <div mat-subheader>{{ 'RESERVATION.PRODUCT.EXTRAS.TITLE' | translate}}</div>
-        <mat-list-item *ngIf="reservation.product.extras.description">
+        <div mat-subheader>{{ 'RESERVATION.TREATMENT.EXTRAS.TITLE' | translate}}</div>
+        <mat-list-item *ngIf="reservation.treatment.extras.description">
           <mat-icon matListItemIcon>description</mat-icon>
-          <div mat-line>{{ 'RESERVATION.PRODUCT.EXTRAS.DESCRIPTION' | translate}}</div>
-          <div mat-line>{{reservation.product.extras.description}}</div>
+          <div mat-line>{{ 'RESERVATION.TREATMENT.EXTRAS.DESCRIPTION' | translate}}</div>
+          <div mat-line>{{reservation.treatment.extras.description}}</div>
         </mat-list-item>
         <mat-list-item *ngIf="price.extra">
           <mat-icon matListItemIcon>{{reservation.room.currency.icon}}</mat-icon>
-          <div mat-line>{{ 'RESERVATION.PRODUCT.EXTRAS.PRICE' | translate}}</div>
+          <div mat-line>{{ 'RESERVATION.TREATMENT.EXTRAS.PRICE' | translate}}</div>
           <div mat-line>{{price.extra}}</div>
         </mat-list-item>
         <mat-divider></mat-divider>
@@ -113,7 +113,7 @@
           <div mat-line>{{price.additional}}</div>
         </mat-list-item>
       </div>
-      <div *ngIf="reservation.product.extras || (reservation.additional && reservation.additional.length)">
+      <div *ngIf="reservation.treatment.extras || (reservation.additional && reservation.additional.length)">
         <mat-divider></mat-divider>
         <mat-list-item *ngIf="price.total">
           <mat-icon class="bold" matListItemIcon>{{reservation.room.currency.icon}}</mat-icon>
@@ -267,11 +267,11 @@
           </td>
         </ng-container>
 
-        <ng-container matColumnDef="product">
-          <th *matHeaderCellDef mat-header-cell> {{ 'COMMON.RESERVATION.LIST.COLUMN.PRODUCT' | translate }} </th>
+        <ng-container matColumnDef="treatment">
+          <th *matHeaderCellDef mat-header-cell> {{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }} </th>
           <td *matCellDef="let history" mat-cell>
             <div *ngIf="history.id; else skeleton">
-              {{history.product.name}}
+              {{history.treatment.name}}
             </div>
             <ng-template #skeleton>
               <div class="ssc-line"></div>

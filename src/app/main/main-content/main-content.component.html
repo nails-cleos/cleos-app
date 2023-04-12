@@ -18,12 +18,12 @@
     <div [innerHTML]="'MAIN.STORY_DETAIL' | translate" class="large-text">
     </div>
   </section>
-  <section class="section-style" id="product">
-    <h1 class="title">{{ 'MAIN.SECTION.PRODUCT' | translate }}</h1>
-    <div class="product-container">
+  <section class="section-style" id="treatment">
+    <h1 class="title">{{ 'MAIN.SECTION.TREATMENT' | translate }}</h1>
+    <div class="treatment-container">
       <div *ngFor="let group of groups" class="card-wrap">
-        <app-mini-card-product-group (groupEvent)="setGroup($event)" (productEvent)="setProduct($event)"
-                                     [card]="group"></app-mini-card-product-group>
+        <app-mini-card-treatment-group (groupEvent)="setGroup($event)" (treatmentEvent)="setTreatment($event)"
+                                     [card]="group"></app-mini-card-treatment-group>
       </div>
     </div>
   </section>
@@ -43,7 +43,7 @@
           <mat-datepicker #picker touchUi></mat-datepicker>
         </mat-form-field>
         <mat-form-field *ngIf="groups; else skeleton" appearance="outline">
-          <mat-label>{{ 'COMMON.PRODUCT.GROUP.FIELD' | translate }}</mat-label>
+          <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
           <label>
             <input (keydown)="keyDownGroup($event)" [formControl]="group" [matAutocomplete]="autoGroup"
                    matInput type="text">
@@ -55,27 +55,27 @@
           </mat-autocomplete>
           <mat-icon matSuffix>format_list_bulleted</mat-icon>
           <mat-error *ngIf="group.hasError('requireMatch')"
-                     [innerHTML]="'COMMON.PRODUCT.GROUP.INVALID' | translate">
+                     [innerHTML]="'COMMON.TREATMENT.GROUP.INVALID' | translate">
           </mat-error>
         </mat-form-field>
-        <mat-form-field *ngIf="products" appearance="outline">
-          <mat-label>{{ 'COMMON.PRODUCT.FIELD' | translate }}</mat-label>
+        <mat-form-field *ngIf="treatments" appearance="outline">
+          <mat-label>{{ 'COMMON.TREATMENT.FIELD' | translate }}</mat-label>
           <label>
-            <input (keydown)="keyDownHandler($event, product)" [formControl]="product"
-                   [matAutocomplete]="autoProduct" matInput type="text">
+            <input (keydown)="keyDownHandler($event, treatment)" [formControl]="treatment"
+                   [matAutocomplete]="autoTreatment" matInput type="text">
           </label>
-          <mat-autocomplete #autoProduct="matAutocomplete" [displayWith]="displayFnProduct">
-            <mat-option *ngFor="let product of filteredProduct | async" [value]="product">
-              {{product.name}}
+          <mat-autocomplete #autoTreatment="matAutocomplete" [displayWith]="displayFnTreatment">
+            <mat-option *ngFor="let treatment of filteredTreatment | async" [value]="treatment">
+              {{treatment.name}}
             </mat-option>
           </mat-autocomplete>
           <mat-icon matSuffix>home_repair_service</mat-icon>
-          <mat-error *ngIf="product.hasError('requireMatch')"
-                     [innerHTML]="'COMMON.PRODUCT.INVALID' | translate">
+          <mat-error *ngIf="treatment.hasError('requireMatch')"
+                     [innerHTML]="'COMMON.TREATMENT.INVALID' | translate">
           </mat-error>
         </mat-form-field>
         <div [ngClass]="{'last': isHandset}">
-          <button (click)="book" [disabled]="!product.value && !date.value" color="primary" mat-fab extended
+          <button (click)="book" [disabled]="!treatment.value && !date.value" color="primary" mat-fab extended
                   type="button">
             <mat-icon>book_online</mat-icon>
             {{'COMMON.BUTTON.BOOK' | translate}}

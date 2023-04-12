@@ -1,0 +1,91 @@
+<div class="flex-container" fxLayout="column">
+  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
+    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+      <mat-card appearance="outlined">
+        <mat-card-header>
+          <mat-card-title *ngIf="group; else skeleton">{{group.name}}</mat-card-title>
+          <mat-card-subtitle *ngIf="group; else skeleton">{{group.id}}</mat-card-subtitle>
+          <ng-template #skeleton>
+            <div class="ssc-line"></div>
+          </ng-template>
+        </mat-card-header>
+        <mat-card-content *ngIf="group; else boxSkeleton">
+          <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'TREATMENT.DESCRIPTION.FIELD' | translate }}</mat-label>
+              <label>
+                <textarea #message [value]="group.description" matInput readonly></textarea>
+              </label>
+              <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'TREATMENT.DURABILITY.FIELD' | translate }}</mat-label>
+              <label>
+                <input [value]="group.durability" matInput readonly>
+              </label>
+            </mat-form-field>
+
+            <mat-accordion>
+              <mat-expansion-panel *ngFor="let tab of group.treatments; let i = index" [expanded]="i === 0">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    {{tab.name}}
+                  </mat-panel-title>
+                  <mat-panel-description fxHide.lt-sm fxShow>
+                    {{tab.id}}
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+                <mat-form-field appearance="outline" class="tab-field">
+                  <mat-label>{{ 'COMMON.TREATMENT.FIELD' | translate }}</mat-label>
+                  <label>
+                    <input [value]="tab.name" matInput readonly>
+                  </label>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="tab-field">
+                  <mat-label>{{ 'TREATMENT.DESCRIPTION.FIELD' | translate }}</mat-label>
+                  <label>
+                    <input [value]="tab.description" matInput readonly>
+                  </label>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="tab-field">
+                  <mat-label>{{ 'TREATMENT.DURATION.FIELD' | translate }}</mat-label>
+                  <label>
+                    <input [value]="tab.duration | durationTime" matInput readonly/>
+                  </label>
+                </mat-form-field>
+                <div>
+                  <mat-checkbox [checked]="tab.primary" [disabled]="true"
+                                color="primary">{{ 'TREATMENT.PRIMARY.CHECK' | translate }}</mat-checkbox>
+                  <div fxFlex></div>
+                  <button (click)="getHistory(tab.id)" mat-icon-button>
+                    <mat-icon>timeline</mat-icon>
+                  </button>
+                </div>
+                <div *ngIf="tab.history && tab.showHistory">
+                  <app-treatment-table [treatment]="tab.history"></app-treatment-table>
+                </div>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </div>
+        </mat-card-content>
+        <ng-template #boxSkeleton>
+          <div class="ssc-hr"></div>
+          <div class="ssc-square mb"></div>
+          <div class="ssc-hr"></div>
+        </ng-template>
+        <mat-card-actions *ngIf="group; else buttonSkeleton">
+          <div fxFlex></div>
+          <button appBackButton color="accent" mat-fab extended class="icon-button" type="button">
+            {{ 'COMMON.BUTTON.BACK' | translate }}
+          </button>
+          <button (click)="edit" color="primary" mat-fab extended class="icon-button" type="button">
+            {{ 'COMMON.BUTTON.EDIT' | translate }}
+          </button>
+        </mat-card-actions>
+        <ng-template #buttonSkeleton>
+          <div class="ssc-head-line"></div>
+        </ng-template>
+      </mat-card>
+    </div>
+  </div>
+</div>

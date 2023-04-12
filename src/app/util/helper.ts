@@ -1,6 +1,6 @@
 import { DiscountType, IDiscount } from '../interfaces/discount';
 import { IAuthority, IUser, IUserAll } from '../interfaces/user';
-import { GroupService, IGroupService, IPrice, IProductAll, IProductGroup, Price } from '../interfaces/product';
+import { GroupService, IGroupService, IPrice, ITreatmentAll, ITreatmentGroup, Price } from '../interfaces/treatment';
 import { IPayment } from '../interfaces/payment';
 import { IReservationAll } from '../interfaces/reservation';
 import { IAdditionalAll } from '../interfaces/additional';
@@ -14,6 +14,7 @@ import { DialogComponent } from '../shared/dialog/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { isSameDay } from 'date-fns';
 import { Role } from '../interfaces/token';
+import { TreatmentService } from "../services/treatment.service";
 
 export const isRoomAdmin = (authorities?: IAuthority[]): boolean => !!authorities && authorities.length === 1 &&
   authorities.some(u => (u.authority === Role.roomAdmin));
@@ -100,16 +101,16 @@ export const getLocale = (userLang: string): string => {
 export const round = (value: number): number => Math.round((value + Number.EPSILON) * 100) / 100;
 
 export const getPrice = (reservation: IReservationAll, payments?: IPayment[] | undefined): IPrice => {
-  const product = reservation.product;
-  let total = product.price;
+  const treatment = reservation.treatment;
+  let total = treatment.price;
   let priceWithDiscount;
-  let priceWithExtras = product.price;
-  let priceWithAdditional = product.price;
+  let priceWithExtras = treatment.price;
+  let priceWithAdditional = treatment.price;
   let discount;
   let extras;
   let additional;
-  if (product.extras && product.extras.price) {
-    extras = product.extras.price;
+  if (treatment.extras && treatment.extras.price) {
+    extras = treatment.extras.price;
     total += extras;
     priceWithExtras += extras;
   }
@@ -120,13 +121,13 @@ export const getPrice = (reservation: IReservationAll, payments?: IPayment[] | u
     priceWithAdditional += additional;
   }
 
-  if (product.discount) {
-    discount = getDiscount(product.discount, product.price);
-    priceWithDiscount = product.price - discount;
+  if (treatment.discount) {
+    discount = getDiscount(treatment.discount, treatment.price);
+    priceWithDiscount = treatment.price - discount;
     total = total - discount;
   }
 
-  return new Price(product.price, discount, extras, additional, total, totalPaid(payments), priceWithDiscount,
+  return new Price(treatment.price, discount, extras, additional, total, totalPaid(payments), priceWithDiscount,
     priceWithExtras, priceWithAdditional);
 };
 
@@ -163,8 +164,8 @@ export const newExtra = (price: IPrice, extras: number): IPrice => {
     price.priceWithDiscount, priceWithExtras, price.priceWithAdditional);
 };
 
-export const newDiscount = (price: IPrice, productDiscount: IDiscount): IPrice => {
-  const discount = getDiscount(productDiscount, price.amount);
+export const newDiscount = (price: IPrice, treatmentDiscount: IDiscount): IPrice => {
+  const discount = getDiscount(treatmentDiscount, price.amount);
   const total = price.amount - discount + price.extra + price.additional;
   const priceWithDiscount = price.amount - discount;
 
@@ -193,42 +194,42 @@ export const newPercentage = (price: IPrice, percentage: number): IPrice => {
     price.priceWithDiscount, price.priceWithExtras, price.priceWithAdditional, toPaid)
 }
 
-export const getProductDurability = (min: number, max: number, translate: TranslateService): string | undefined => {
+export const getTreatmentDurability = (min: number, max: number, translate: TranslateService): string | undefined => {
   if (!min && !max) {
     return undefined;
   }
   if (min !== max) {
-    return translate.instant('COMMON.PRODUCT.DURABILITY.TITLE.DIFFERENT', { min, max });
+    return translate.instant('COMMON.TREATMENT.DURABILITY.TITLE.DIFFERENT', { min, max });
   }
-  return translate.instant('COMMON.PRODUCT.DURABILITY.TITLE.EQUAL', { value: min });
+  return translate.instant('COMMON.TREATMENT.DURABILITY.TITLE.EQUAL', { value: min });
 };
 
-export const groupDurability = (group: IProductGroup, translate: TranslateService): string => {
+export const groupDurability = (group: ITreatmentGroup, translate: TranslateService): string => {
   const min = group.durabilityMin;
   const max = group.durabilityMax;
-  let key = 'COMMON.PRODUCT.DURABILITY.EQUAL';
+  let key = 'COMMON.TREATMENT.DURABILITY.EQUAL';
   if (!min && !max) {
-    key = 'COMMON.PRODUCT.DURABILITY.NONE';
+    key = 'COMMON.TREATMENT.DURABILITY.NONE';
   } else if (min !== max) {
-    key = 'COMMON.PRODUCT.DURABILITY.DIFFERENT';
+    key = 'COMMON.TREATMENT.DURABILITY.DIFFERENT';
   }
 
   return translate.instant(key, { min, max });
 };
 
-export const createProductGroupService = (groups: Map<string, GroupService>, list: IProductAll[], currency: string,
-                                          isSelected: boolean = false): Map<string, GroupService> => {
-  list.forEach((product: IProductAll) => {
-    const groupId = product.group.id;
+export const createTreatmentGroupService = (groups: Map<string, GroupService>, list: ITreatmentAll[], currency: string,
+                                            isSelected: boolean = false): Map<string, GroupService> => {
+  list.forEach((treatment: ITreatmentAll) => {
+    const groupId = treatment.group.id;
     const mapGroup = groups.get(groupId);
-    const keyGroup: IGroupService = mapGroup ? mapGroup : new GroupService(groupId, product.group.name);
+    const keyGroup: IGroupService = mapGroup ? mapGroup : new GroupService(groupId, treatment.group.name);
 
-    product = Object.assign({}, product, { currency, type: ServiceType.product });
+    treatment = Object.assign({}, treatment, { currency, type: ServiceType.treatment });
 
     if (isSelected) {
-      keyGroup.selectedProducts = [...keyGroup.selectedProducts, product];
+      keyGroup.selectedTreatments = [...keyGroup.selectedTreatments, treatment];
     } else {
-      keyGroup.products = [...keyGroup.products, product];
+      keyGroup.treatments = [...keyGroup.treatments, treatment];
     }
     groups.set(groupId, keyGroup);
   });

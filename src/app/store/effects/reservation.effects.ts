@@ -8,7 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { ReservationService } from '../../services/reservation.service';
 import { Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
-import { ProductService } from '../../services/product.service';
+import { TreatmentService } from '../../services/treatment.service';
 import { RoomService } from '../../services/room.service';
 import { TrackingService } from '../../services/tracking.service';
 import { PaymentService } from '../../services/payment.service';
@@ -72,7 +72,7 @@ export class ReservationEffects {
   customerSearch = createEffect(() =>
     this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.customerSearchReservation)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.reservationService.customerSearch(payload.roomId, payload.productId,
+      switchMap((payload: any) => this.reservationService.customerSearch(payload.roomId, payload.treatmentId,
         payload.date, payload.professionalId, payload.additionalIds).pipe(
         switchMap((response: any) => of(new fromActionsReservation.ReservationSuccess(response ? response : []))),
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
@@ -95,10 +95,10 @@ export class ReservationEffects {
     ))
   ));
 
-  getAllProducts$ = createEffect(() => this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getServices)).pipe(
+  getAllTreatments$ = createEffect(() => this.actions$.pipe(ofType(fromActionsReservation.ReservationActionTypes.getServices)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.productService.getAllProducts(payload.roomId, payload?.customerId).pipe(
-      switchMap((response: any) => of(new fromActionsReservation.ReservationProductsSuccess(response))),
+    switchMap((payload: any) => this.treatmentService.getAllTreatments(payload.roomId, payload?.customerId).pipe(
+      switchMap((response: any) => of(new fromActionsReservation.ReservationTreatmentsSuccess(response))),
       catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({error: err.error})))
     ))
   ));
@@ -331,8 +331,8 @@ export class ReservationEffects {
     ofType(fromActionsReservation.ReservationActionTypes.customerSuccess)
   ), {dispatch: false});
 
-  productsSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsReservation.ReservationActionTypes.reservationProductsSuccess)
+  treatmentsSuccess$ = createEffect(() => this.actions$.pipe(
+    ofType(fromActionsReservation.ReservationActionTypes.reservationTreatmentsSuccess)
   ), {dispatch: false});
 
   roomsSuccess$ = createEffect(() => this.actions$.pipe(
@@ -395,7 +395,7 @@ export class ReservationEffects {
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private router: Router,
               private reservationService: ReservationService, private userService: UserService,
-              private productService: ProductService, private roomService: RoomService,
+              private treatmentService: TreatmentService, private roomService: RoomService,
               private additionalService: AdditionalService, private trackingService: TrackingService,
               private paymentService: PaymentService) {
   }

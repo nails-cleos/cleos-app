@@ -174,7 +174,7 @@
         "FIELD": "Fecha de nacimiento"
       }
     },
-    "PRODUCT": {
+    "TREATMENT": {
       "FIELD": "Servicio",
       "REQUIRED": "Servicio es <b>requerido</b>",
       "INVALID": "Servicio no valido",
@@ -224,7 +224,7 @@
           "PROFESSIONAL": "Profesional",
           "START": "Inicio",
           "STATE": "Estado",
-          "PRODUCT": "Servicio"
+          "TREATMENT": "Servicio"
         },
         "ERROR": {
           "NO_CONTENT": "No hay reservas"

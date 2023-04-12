@@ -62,7 +62,7 @@
   box-sizing: border-box;
 }
 
-.product-container {
+.treatment-container {
   width: 100%; /*whatever size you want your container*/
   flex-flow: row wrap;
   display: flex; /*Make sure to call this on your container*/
@@ -75,7 +75,7 @@
   padding: 10px;
 }
 
-app-mini-card-product-group {
+app-mini-card-treatment-group {
   cursor: pointer;
   flex: 0 0 100%;
 }

@@ -29,7 +29,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['position', 'professional', 'timestamp', 'product', 'state', 'actions'];
+  displayedColumns: string[] = ['position', 'professional', 'timestamp', 'treatment', 'state', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IReservationAll>>();
 
   upcoming?: IUpcomingAll[];

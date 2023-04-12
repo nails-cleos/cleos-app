@@ -327,13 +327,13 @@ export class CalendarComponent implements OnInit, OnDestroy {
     const reservations: IReservationAll[] = rr.reservations;
     this.calendar = new Calendar(rr.room, []);
     reservations.forEach(it => {
-      if (it.product.duration) {
+      if (it.treatment.duration) {
         const start = newDateTimestamp(it.timestamp);
         const duration = reservationDuration(it);
         const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
         const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
           customerName: getUserName(it.customer),
-          productName: it.product.name,
+          treatmentName: it.treatment.name,
           professionalName: getUserName(it.professional)
         });
 

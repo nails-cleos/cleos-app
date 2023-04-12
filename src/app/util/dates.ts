@@ -16,7 +16,7 @@ import {
 } from 'date-fns';
 import { RRule, Weekday } from 'rrule';
 import { IReservationAll } from '../interfaces/reservation';
-import { IProductAll } from '../interfaces/product';
+import { ITreatmentAll } from '../interfaces/treatment';
 import { IAdditionalAll } from '../interfaces/additional';
 import { utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz';
 
@@ -69,19 +69,19 @@ export const reservationDuration = (reservation?: IReservationAll): IDuration =>
     if (reservation.additional && reservation.additional.length) {
       durations = reservation.additional.map(value => convertDuration(value.duration));
     }
-    durations = [...durations, convertDuration(reservation.product.duration)];
+    durations = [...durations, convertDuration(reservation.treatment.duration)];
   }
 
   return sumDurations(durations);
 };
 
-export const totalDuration = (product?: IProductAll, additional?: IAdditionalAll[]): IDuration => {
+export const totalDuration = (treatment?: ITreatmentAll, additional?: IAdditionalAll[]): IDuration => {
   let durations: IDuration[] = [];
   if (additional && additional.length) {
     durations = additional.map(value => convertDuration(value.duration));
   }
-  if (product) {
-    durations = [...durations, convertDuration(product.duration)];
+  if (treatment) {
+    durations = [...durations, convertDuration(treatment.duration)];
   }
 
   return sumDurations(durations);

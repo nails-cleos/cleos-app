@@ -29,7 +29,7 @@
         "NONE": "El cliente no tiene reservas",
         "DAYS": "La última reserva fue hace {{days}} días",
         "PROFESSIONAL_NAME": "<span class='bold'>Profesional:</span> {{professional}}",
-        "PRODUCT": "<span class='bold'>Servicio:</span> {{product}}"
+        "TREATMENT": "<span class='bold'>Servicio:</span> {{treatment}}"
       }
     },
     "ROOM": {
@@ -43,7 +43,7 @@
     "PROFESSIONAL": {
       "SELECT": "Select professional"
     },
-    "PRODUCT": {
+    "TREATMENT": {
       "DETAIL": "Detalle",
       "NO_CONTENT": "No hay servicios",
       "NAME": {
@@ -93,7 +93,7 @@
         "CONTENT": "La nueva reserva se superpone con <div>{{data}}</div> ¿Está seguro de agregar la reserva?",
         "ERROR": "La nueva reserva se superpone con <div>{{data}}</div>"
       },
-      "DETAIL": "<div class='detail'><b>{{professionalName}}</b></div><div class='detail'>{{productName}}</div><div class='detail'>{{customerName}}</div>",
+      "DETAIL": "<div class='detail'><b>{{professionalName}}</b></div><div class='detail'>{{treatmentName}}</div><div class='detail'>{{customerName}}</div>",
       "TITLE": "Agregar nueva reserva",
       "CONTENT": "¿Estás segura de añadir la reserva el {{date}}?",
       "CHANGE": {

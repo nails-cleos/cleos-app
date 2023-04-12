@@ -29,7 +29,7 @@
         "NONE": "Customer has no reservations",
         "DAYS": "Last reservation was {{days}} days ago",
         "PROFESSIONAL_NAME": "<span class='bold'>Professional:</span> {{professional}}",
-        "PRODUCT": "<span class='bold'>Service:</span> {{product}}"
+        "TREATMENT": "<span class='bold'>Service:</span> {{treatment}}"
       }
     },
     "ROOM": {
@@ -43,7 +43,7 @@
     "PROFESSIONAL": {
       "SELECT": "Select professional"
     },
-    "PRODUCT": {
+    "TREATMENT": {
       "DETAIL": "Detail",
       "NO_CONTENT": "No services",
       "NAME": {
@@ -93,7 +93,7 @@
         "CONTENT": "The new reservation is overlapping with <div>{{data}}</div> Are you sure to add reservation?",
         "ERROR": "The new reservation is overlapping with <div>{{data}}</div>"
       },
-      "DETAIL": "<div class='detail'><b>{{professionalName}}</b></div><div class='detail'>{{productName}}</div><div class='detail'>{{customerName}}</div>",
+      "DETAIL": "<div class='detail'><b>{{professionalName}}</b></div><div class='detail'>{{treatmentName}}</div><div class='detail'>{{customerName}}</div>",
       "TITLE": "Add new reservation",
       "CONTENT": "Are you sure to add reservation on {{date}}?",
       "CHANGE": {

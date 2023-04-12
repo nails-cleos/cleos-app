@@ -19,6 +19,7 @@ import { UnavailableRepeatType } from '../interfaces/unavailable';
 import { UntypedFormControl } from '@angular/forms';
 import { IAuthority } from '../interfaces/user';
 import { Role } from '../interfaces/token';
+import { TreatmentService } from "../services/treatment.service";
 
 @Component({
   selector: 'app-dash',
@@ -210,14 +211,14 @@ export class DashComponent implements OnInit, OnDestroy {
   }
 
   private miniCardError(error: string): void {
-    const revenue = DashComponent.createErrorMiniCard('TOTAL_PRODUCT_SALES', error);
+    const revenue = DashComponent.createErrorMiniCard('TOTAL_TREATMENT_SALES', error);
 
-    const products = DashComponent.createErrorMiniCard('AVERAGE_PRODUCT_VALUE', error);
+    const treatments = DashComponent.createErrorMiniCard('AVERAGE_TREATMENT_VALUE', error);
 
-    const totalProducts = DashComponent.createErrorMiniCard('TOTAL_PRODUCTS', error);
+    const totalTreatments = DashComponent.createErrorMiniCard('TOTAL_TREATMENTS', error);
 
     const customer = DashComponent.createErrorMiniCard('NEW_CUSTOMERS_RESERVATION', error);
-    this.miniCardData = [revenue, products, totalProducts, customer];
+    this.miniCardData = [revenue, treatments, totalTreatments, customer];
   }
 
   private subscribe(): void {

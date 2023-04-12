@@ -7,9 +7,9 @@ import { Observable, Subscription } from 'rxjs';
 import * as fromActionsRoom from '../../../store/room.actions';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { IService, IServicePrice, ServicePrice, ServiceType } from '../../../interfaces/room';
-import { IGroupService } from '../../../interfaces/product';
+import { IGroupService } from '../../../interfaces/treatment';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { createProductGroupService } from '../../../util/helper';
+import { createTreatmentGroupService } from '../../../util/helper';
 
 @Component({
   selector: 'app-add-service',
@@ -38,8 +38,8 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
       prices = [...prices, price];
     });
     for (const [, value] of this.groups) {
-      value.selectedProducts.forEach(product => {
-        const price = new ServicePrice(product.id, product.price, ServiceType.product);
+      value.selectedTreatments.forEach(treatment => {
+        const price = new ServicePrice(treatment.id, treatment.price, ServiceType.treatment);
         prices = [...prices, price];
       });
     }
@@ -93,12 +93,12 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
             const price = s.price;
             this.selectedAdditional[i] = Object.assign({}, service, {price});
           }
-        } else if (s.type === ServiceType.product) {
+        } else if (s.type === ServiceType.treatment) {
           for (const [, value] of this.groups) {
-            const i = value.selectedProducts.indexOf(service);
+            const i = value.selectedTreatments.indexOf(service);
             if (i > -1) {
               const price = s.price;
-              value.selectedProducts[i] = Object.assign({}, service, {price});
+              value.selectedTreatments[i] = Object.assign({}, service, {price});
               break;
             }
           }
@@ -117,8 +117,8 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
           Object.assign({}, value, {currency, type: ServiceType.additional}));
 
         this.groups = new Map<string, IGroupService>();
-        this.groups = createProductGroupService(this.groups, state.services.products, currency);
-        this.groups = createProductGroupService(this.groups, state.services.selectedProducts, currency, true);
+        this.groups = createTreatmentGroupService(this.groups, state.services.treatments, currency);
+        this.groups = createTreatmentGroupService(this.groups, state.services.selectedTreatments, currency, true);
       }
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {

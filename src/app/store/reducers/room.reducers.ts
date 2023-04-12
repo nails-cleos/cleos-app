@@ -72,8 +72,8 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         services: {
           currency: {},
-          products: [],
-          selectedProducts: [],
+          treatments: [],
+          selectedTreatments: [],
           additionalList: [],
           selectedAdditionalList: []
         } as IRoomService,

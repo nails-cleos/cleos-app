@@ -84,11 +84,11 @@ export class ReservationService {
     return this.http.get<IRoomReservation>(`${this.urlV1}/rooms/${roomId}`, { params });
   }
 
-  public customerSearch(roomId: string, productId: string, date: Date, professionalId: string,
+  public customerSearch(roomId: string, treatmentId: string, date: Date, professionalId: string,
                         additionalIds?: string[]): Observable<IRoomReservation> {
     let params = new HttpParams().set('date', date.toISOString().slice(0, 10));
     params = params.append('roomId', roomId);
-    params = params.append('productId', productId);
+    params = params.append('treatmentId', treatmentId);
     if (additionalIds && additionalIds.length) {
       additionalIds.forEach(id => {
         params = params.append('additionalIds', id);

@@ -1,5 +1,5 @@
 import { IUser, IUserAll } from './user';
-import { IPrice, IProduct, IProductAll } from './product';
+import { IPrice, ITreatment, ITreatmentAll } from './treatment';
 import { IRoom, IRoomAll } from './room';
 import { CalendarEvent } from 'angular-calendar';
 import { ThemePalette } from '@angular/material/core';
@@ -15,10 +15,10 @@ export interface IReservation {
   id?: string;
   customerId?: string;
   customer?: IUser;
-  productId?: string;
+  treatmentId?: string;
   discountId?: string;
   additionalIds?: string[];
-  product?: IProduct;
+  treatment?: ITreatment;
   roomId?: string;
   room?: IRoom;
   professionalId?: string;
@@ -45,7 +45,7 @@ export interface IReservationPayment {
 export interface IReservationAll {
   id: string;
   customer: IUserAll;
-  product: IProductAll;
+  treatment: ITreatmentAll;
   room: IRoomAll;
   professional: IUserAll;
   start: Date;
@@ -137,7 +137,7 @@ export interface ITracking {
 }
 
 export interface ICustomerLastReservation {
-  product: IProductAll;
+  treatment: ITreatmentAll;
   days: number;
   professionalName: string;
 }
