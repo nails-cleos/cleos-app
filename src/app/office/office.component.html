@@ -55,10 +55,10 @@
           </mat-card-content>
           <mat-card-actions>
             <div fxFlex></div>
-            <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button"
-                    type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
             <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button"
+                    type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
           </mat-card-actions>
         </mat-card>
       </form>

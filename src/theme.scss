@@ -177,18 +177,42 @@ body {
   --text-primary-darker-color: #{$dark-primary-text};
 }
 $mat-primary: (
-  main: #a9a397,
-  lighter: #e5e3e0,
-  darker: #8f887a,
-  200: #a9a397, // For slide toggle,
+  //main: #a9a397,
+  //lighter: #e5e3e0,
+  //darker: #8f887a,
+  //200: #a9a397, // For slide toggle
+  50: #f5f4f3,
+  100: #e5e3e0,
+  200: #d4d1cb,
+  300: #c3bfb6,
+  400: #b6b1a7,
+  500: #a9a397,
+  600: #a29b8f,
+  700: #989184,
+  800: #8f887a,
+  900: #7e7769,
+  A100: #fffcf8,
+  A200: #fceac7,
+  A400: #ffd991,
+  A700: #ffd078,
   contrast : (
-    main: $dark-primary-text,
-    lighter: $dark-primary-text,
-    darker: $dark-primary-text,
+    50 : $dark-primary-text,
+    100 : $dark-primary-text,
+    200 : $dark-primary-text,
+    300 : $dark-primary-text,
+    400 : $dark-primary-text,
+    500 : $dark-primary-text,
+    600 : $dark-primary-text,
+    700 : $dark-primary-text,
+    800 : $dark-primary-text,
+    900 : $light-primary-text,
+    A100 : $dark-primary-text,
+    A200 : $dark-primary-text,
+    A400 : $dark-primary-text,
+    A700 : $dark-primary-text,
   )
 );
-$theme-primary: mat.define-palette($mat-primary, main, lighter, darker);
-
+$theme-primary: mat.define-palette($mat-primary);
 
 body {
   --accent-color: #dcc8c2;
@@ -199,17 +223,47 @@ body {
   --text-accent-darker-color: #{$dark-primary-text};
 }
 $mat-accent: (
-  main: #dcc8c2,
-  lighter: #f5efed,
-  darker: #ceb4ac,
-  200: #dcc8c2, // For slide toggle,
-  contrast : (
-    main: $dark-primary-text,
-    lighter: $dark-primary-text,
-    darker: $dark-primary-text,
+  //main: #bfa59d,
+  //lighter: #ece4e2,
+  //darker: #a98a81,
+  //200: #bfa59d, // For slide toggle
+  //contrast : (
+  //  main: $dark-primary-text,
+  //  lighter: $dark-primary-text,
+  //  darker: $dark-primary-text,
+  //)
+  50 : #fbf8f8,
+  100 : #f5efed,
+  200 : #eee4e1,
+  300 : #e7d9d4,
+  400 : #e1d0cb,
+  500 : #dcc8c2,
+  600 : #d8c2bc,
+  700 : #d3bbb4,
+  800 : #ceb4ac,
+  900 : #c5a79f,
+  A100 : #ffffff,
+  A200 : #ffffff,
+  A400 : #ffffff,
+  A700 : #ffefeb,
+  contrast: (
+    50 : $dark-primary-text,
+    100 : $dark-primary-text,
+    200 : $dark-primary-text,
+    300 : $dark-primary-text,
+    400 : $dark-primary-text,
+    500 : $dark-primary-text,
+    600 : $dark-primary-text,
+    700 : $dark-primary-text,
+    800 : $dark-primary-text,
+    900 : $dark-primary-text,
+    A100 : $dark-primary-text,
+    A200 : $dark-primary-text,
+    A400 : $dark-primary-text,
+    A700 : $dark-primary-text,
   )
 );
-$theme-accent: mat.define-palette($mat-accent, main, lighter, darker);
+$theme-accent: mat.define-palette($mat-accent);
 
 body {
   --warn-color: #ff0000;
@@ -221,30 +275,90 @@ body {
 }
 
 $mat-warn: (
-  main: #ff0000,
-  lighter: #ffb3b3,
-  darker: #f08080,
-  200: #ff0000, // For slide toggle,
-  contrast : (
-    main: $light-primary-text,
-    lighter: $dark-primary-text,
-    darker: $light-primary-text,
+  //main: #ff0000,
+  //lighter: #ffb3b3,
+  //darker: #f08080,
+  //200: #ff0000, // For slide toggle
+  //contrast : (
+  //  main: $light-primary-text,
+  //  lighter: $dark-primary-text,
+  //  darker: $light-primary-text,
+  //)
+  50 : #ffe0e0,
+  100 : #ffb3b3,
+  200 : #ff8080,
+  300 : #ff4d4d,
+  400 : #ff2626,
+  500 : #ff0000,
+  600 : #ff0000,
+  700 : #ff0000,
+  800 : #ff0000,
+  900 : #ff0000,
+  A100 : #ffffff,
+  A200 : #fff2f2,
+  A400 : #ffbfbf,
+  A700 : #ffa6a6,
+  contrast: (
+    50 : $dark-primary-text,
+    100 : $dark-primary-text,
+    200 : $dark-primary-text,
+    300 : $dark-primary-text,
+    400 : $light-primary-text,
+    500 : $light-primary-text,
+    600 : $light-primary-text,
+    700 : $light-primary-text,
+    800 : $light-primary-text,
+    900 : $light-primary-text,
+    A100 : $dark-primary-text,
+    A200 : $dark-primary-text,
+    A400 : $dark-primary-text,
+    A700 : $dark-primary-text,
   )
 );
-$theme-warn: mat.define-palette($mat-warn, main, lighter, darker);
+$theme-warn: mat.define-palette($mat-warn);
 
 $mat-warn-dark: (
-  main: #f08080,
-  lighter: #ffb3b3,
-  darker: #ff0000,
-  200: #ff0000, // For slide toggle,
-  contrast : (
-    main: $light-primary-text,
-    lighter: $dark-primary-text,
-    darker: $light-primary-text,
+  //main: #f08080,
+  //lighter: #ffb3b3,
+  //darker: #ff0000,
+  //200: #ff0000, // For slide toggle
+  //contrast : (
+  //  main: $light-primary-text,
+  //  lighter: $dark-primary-text,
+  //  darker: $light-primary-text,
+  //)
+  50 : #fdf0f0,
+  100 : #fbd9d9,
+  200 : #f8c0c0,
+  300 : #f5a6a6,
+  400 : #f29393,
+  500 : #f08080,
+  600 : #ee7878,
+  700 : #ec6d6d,
+  800 : #e96363,
+  900 : #e55050,
+  A100 : #ffffff,
+  A200 : #ffffff,
+  A400 : #ffdcdc,
+  A700 : #ffc3c3,
+  contrast: (
+    50 : $dark-primary-text,
+    100 : $dark-primary-text,
+    200 : $dark-primary-text,
+    300 : $dark-primary-text,
+    400 : $dark-primary-text,
+    500 : $dark-primary-text,
+    600 : $dark-primary-text,
+    700 : $dark-primary-text,
+    800 : $dark-primary-text,
+    900 : $light-primary-text,
+    A100 : $dark-primary-text,
+    A200 : $dark-primary-text,
+    A400 : $dark-primary-text,
+    A700 : $dark-primary-text,
   )
 );
-$theme-warn-dark: mat.define-palette($mat-warn-dark, main, lighter, darker);
+$theme-warn-dark: mat.define-palette($mat-warn-dark);
 
 $theme: mat.define-light-theme((
   color: (
@@ -269,11 +383,13 @@ $altTheme: mat.define-dark-theme((
 .light-theme {
   @include mat.all-component-themes($theme);
   @include style.theme($theme);
+  @include mat.strong-focus-indicators-theme($theme);
 }
 
 .dark-theme {
   @include mat.all-component-themes($altTheme);
   @include style.theme($altTheme);
+  @include mat.strong-focus-indicators-theme($altTheme);
 }
 
 // Specific component overrides, pieces that are not in line with the general theming

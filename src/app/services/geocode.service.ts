@@ -15,15 +15,19 @@ export class GeocodeService {
   }
 
   public createMap(): Observable<boolean> {
-    return this.httpClient.jsonp(
-      `https://maps.googleapis.com/maps/api/js?libraries=geometry,places&key=${ environment.googleMapKey }&sensor=false`,
-      'callback')
-      .pipe(map(() => true),
-        catchError((e) => {
-          console.error(e)
-          return of(false)
-        }),
-      );
+    const showMap = environment.production;
+    if (showMap) {
+      return this.httpClient.jsonp(
+        `https://maps.googleapis.com/maps/api/js?libraries=geometry,places&key=${ environment.googleMapKey }&sensor=false`,
+        'callback')
+        .pipe(map(() => true),
+          catchError((e) => {
+            console.error(e)
+            return of(false)
+          }),
+        );
+    }
+    return new Observable((observer) => observer.next(false));
   }
 
   geocodeAddress(lat: number, lng: number, showDistance: boolean | undefined): Observable<any> {

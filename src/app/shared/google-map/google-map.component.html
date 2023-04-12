@@ -1,4 +1,4 @@
-<div *ngIf="showMap">
+<div *ngIf="isMapReady">
   <div *ngIf="addressFormGroup" [formGroup]="addressFormGroup" class="divider" fxLayout="column"
        fxLayoutAlign="space-evenly stretch">
     <input>
@@ -19,6 +19,7 @@
       <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
     </mat-form-field>
   </div>
+</div>
   <div *ngIf="isMapReady; else box">
     <google-map [zoom]="zoom" class="divider" [center]="center" height="400" width="400"
                 style="display: flex; justify-content: center;">
@@ -31,4 +32,3 @@
   <ng-template #box>
     <div class="ssc-square mb"></div>
   </ng-template>
-</div>

@@ -1,9 +1,9 @@
-import { ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { IUser, User } from '../../interfaces/user';
 import { AppState, selectAuthState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
 import * as fromActionsLogin from '../../store/auth.actions';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { flags, IFlag } from '../../util/flags';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -19,9 +19,8 @@ import { Theme, THEME } from '../../util/theme';
 export class SignUpComponent implements OnInit, OnDestroy {
   @Output() codeEvent = new EventEmitter<string>();
 
-  @ViewChild('passwordComponent') passwordComponent: any;
-  showError = false;
   form!: UntypedFormGroup;
+  passwordFormGroup!: UntypedFormGroup
   subscription: Subscription | undefined;
   getState: Observable<any>;
   errors: any = [];
@@ -54,27 +53,20 @@ export class SignUpComponent implements OnInit, OnDestroy {
   }
 
   get register(): void {
-    if (this.form.invalid || this.passwordComponent.passwordFormControl.invalid
-      || this.passwordComponent.passwordConfirmationFormControl.invalid) {
+    if (this.form.invalid || this.passwordFormGroup.invalid) {
       return;
     }
     const user: IUser = new User();
     user.username = this.username.value;
     user.email = this.email.value;
-    user.password = this.passwordComponent.passwordFormControl.value;
+    user.password = this.passwordFormGroup.get('password')?.value;
     user.lang = this.lang.value.value;
     user.firstName = this.firstName.value;
     user.lastName = this.lastName.value;
     user.phone = this.phone.value;
     user.code = this.codeForm.value;
     user.theme = this.cookieService.get(THEME) as Theme;
-
     return this.store.dispatch(new fromActionsLogin.SignUp(user));
-  }
-
-  get onStrengthChanged(): void {
-    this.showError = true;
-    return this.passwordComponent.passwordConfirmationFormControl.updateValueAndValidity();
   }
 
   ngOnInit(): void {
@@ -97,6 +89,10 @@ export class SignUpComponent implements OnInit, OnDestroy {
       firstName: this.firstName,
       lastName: this.lastName,
       phone: this.phone
+    });
+    this.passwordFormGroup = this.formBuilder.group({
+      password: new FormControl(''),
+      confirmPassword: new FormControl('')
     });
   }
 

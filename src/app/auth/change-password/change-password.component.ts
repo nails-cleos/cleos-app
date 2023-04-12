@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState, selectUserState } from '../../store/app.states';
@@ -17,8 +17,9 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
 
   @ViewChild('passwordComponent') passwordComponent: any;
 
-  showError = false;
+  hideOld = true;
   form!: UntypedFormGroup;
+  passwordFormGroup!: UntypedFormGroup
   subscription?: Subscription;
   getState: Observable<any>;
   currentUser?: IUser;
@@ -36,15 +37,14 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
   }
 
   get changePassword(): void {
-    if (this.form.invalid || this.passwordComponent.passwordFormControl.invalid
-      || this.passwordComponent.passwordConfirmationFormControl.invalid) {
+    if (this.form.invalid || this.passwordFormGroup.invalid) {
       return;
     }
     this.store.dispatch(
       new fromActionsUser.ChangePassword({
         username: this.currentUser?.username,
         oldPassword: this.oldPassword.value,
-        password: this.passwordComponent.passwordFormControl.value
+        password: this.passwordFormGroup.get('password')?.value
       })
     );
     return;
@@ -61,11 +61,6 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
     this.userSubscription?.unsubscribe();
   }
 
-  get onStrengthChanged(): void {
-    this.showError = true;
-    return this.passwordComponent.passwordConfirmationFormControl.updateValueAndValidity();
-  }
-
   private clean(): void {
     this.store.dispatch(
       new fromActionsUser.Clean()
@@ -75,6 +70,10 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
   private createForm(): void {
     this.form = this.formBuilder.group({
       oldPassword: this.oldPassword
+    });
+    this.passwordFormGroup = this.formBuilder.group({
+      password: new FormControl(''),
+      confirmPassword: new FormControl('')
     });
   }
 

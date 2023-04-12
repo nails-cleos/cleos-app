@@ -22,6 +22,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from "@angular/material/radio";
 import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
+import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 
 const materialModules = [
   NgxMaterialTimepickerModule,
@@ -45,7 +46,8 @@ const materialModules = [
   MatTableModule,
   MatTooltipModule,
   MatCheckboxModule,
-  MatRadioModule
+  MatRadioModule,
+  MatSlideToggleModule
 ];
 
 @NgModule({
