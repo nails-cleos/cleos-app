@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { AppState, selectAuthState } from './store/app.states';
 import { IUserAll } from './interfaces/user';
 import { Store } from '@ngrx/store';
@@ -8,7 +8,8 @@ import { CookieService } from 'ngx-cookie-service';
 import { resetTheme, Theme } from './util/theme';
 import { getLocale } from './util/helper';
 import { ThemeService } from 'ng2-charts';
-import { DateAdapter } from '@angular/material/core';
+import { DateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -20,16 +21,18 @@ export class AppComponent implements OnInit {
 
   constructor(private store: Store<AppState>, private translate: TranslateService,
               private overlayContainer: OverlayContainer, private cookieService: CookieService,
-              private themeService: ThemeService, private dateAdapter: DateAdapter<any>) {
+              private themeService: ThemeService, private dateAdapter: DateAdapter<Date>,
+              @Inject(MAT_DATE_LOCALE) private locale: string) {
     this.store.select(selectAuthState).subscribe((state: any) => {
       if (state.isAuthenticated) {
         const user: IUserAll = state.user;
-        this.translate.use(getLocale(user.locale || navigator.language));
         this.resetTheme(user.theme);
+        this.locale = user.locale || navigator.language;
       } else {
-        this.translate.use(getLocale(navigator.language));
+        this.locale = navigator.language;
       }
-      this.dateAdapter.setLocale(this.translate.currentLang);
+      this.dateAdapter.setLocale(this.locale);
+      this.translate.use(getLocale(this.locale));
     });
   }
 

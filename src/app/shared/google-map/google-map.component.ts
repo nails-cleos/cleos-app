@@ -1,10 +1,9 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { ControlContainer, NgForm, UntypedFormGroup } from '@angular/forms';
-import { GeocodeService } from '../../services/geocode.service';
+import { GeocodeService, MapStatus } from '../../services/geocode.service';
 import { MapInfoWindow, MapMarker } from "@angular/google-maps";
 import PlaceResult = google.maps.places.PlaceResult;
 import MapMouseEvent = google.maps.MapMouseEvent;
-import { environment } from "../../../environments/environment";
 
 @Component({
   selector: 'app-google-map',
@@ -29,7 +28,7 @@ export class GoogleMapComponent implements OnInit, AfterViewInit {
   public longitude: number;
   public isDraggable: boolean;
   public info: any;
-  public isMapReady: boolean;
+  public mapStatus: MapStatus;
 
   public center: google.maps.LatLngLiteral;
   public zoom: number;
@@ -38,7 +37,7 @@ export class GoogleMapComponent implements OnInit, AfterViewInit {
     this.latitude = 51.926517;
     this.longitude = 4.462456;
     this.isDraggable = false;
-    this.isMapReady = false;
+    this.mapStatus = MapStatus.LOADING;
     this.markerOptions = { draggable: this.isDraggable }
     this.center = { lat: this.latitude, lng: this.longitude }
     this.zoom = 10;
@@ -51,12 +50,16 @@ export class GoogleMapComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.geocodeService.createMap().subscribe((isMapReady) => {
-      this.isMapReady = isMapReady;
-      this.mockResponse();
-      if (isMapReady) {
-        this.setCurrentPosition();
-        this.setAutocomplete();
+    this.geocodeService.createMap().subscribe((mapStatus) => {
+      this.mapStatus = mapStatus;
+      switch (mapStatus) {
+        case MapStatus.READY:
+          this.setCurrentPosition();
+          this.setAutocomplete();
+          break;
+        case MapStatus.NOT_AVAILABLE:
+          this.mockResponse();
+          break;
       }
     });
   }
@@ -145,7 +148,7 @@ export class GoogleMapComponent implements OnInit, AfterViewInit {
   }
 
   private mockResponse(): void {
-    if (!this.isMapReady && !this.addressFormGroup?.get('address')?.value) {
+    if (!this.addressFormGroup?.get('address')?.value) {
       const value = {
         address_components: [],
         formatted_address: 'Mock address',
@@ -165,6 +168,7 @@ export class GoogleMapComponent implements OnInit, AfterViewInit {
         postcode_localities: ['Mock postcode'],
         types: ['Mock type']
       } as unknown as PlaceResult;
+      this.addressFormGroup?.get('address')?.setValue(value.formatted_address)
       this.addressEmitter.emit(value);
     }
   }

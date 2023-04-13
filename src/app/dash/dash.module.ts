@@ -13,7 +13,7 @@ import { DashboardEffects } from '../store/effects/dashboard.effects';
 import { ReservationEffects } from '../store/effects/reservation.effects';
 import { ReservationService } from '../services/reservation.service';
 import { PaymentService } from '../services/payment.service';
-import { ProductService } from '../services/product.service';
+import { TreatmentService } from '../services/treatment.service';
 import { RoomService } from '../services/room.service';
 import { UserService } from '../services/user.service';
 import { AdditionalService } from '../services/additional.service';
@@ -45,7 +45,7 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
     DashboardService,
     ReservationService,
     PaymentService,
-    ProductService,
+    TreatmentService,
     RoomService,
     UserService,
     AdditionalService,

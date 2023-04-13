@@ -11,12 +11,12 @@ import { ImageViewerComponent } from './image-viewer/image-viewer.component';
 import { TermsAndConditionsComponent } from './terms-and-conditions/terms-and-conditions.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MiniCardProductComponent } from './mini-card-product/mini-card-product.component';
+import { MiniCardTreatmentComponent } from './mini-card-treatment/mini-card-treatment.component';
 import { EffectsModule } from '@ngrx/effects';
 import { MainEffects } from '../store/effects/main.effects';
 import { MainService } from '../services/main.service';
 import { CatalogueService } from '../services/catalogue.service';
-import { ProductService } from '../services/product.service';
+import { TreatmentService } from '../services/treatment.service';
 import { CatalogueEffects } from '../store/effects/catalogue.effects';
 import { UserEffects } from '../store/effects/user.effects';
 import { UserService } from '../services/user.service';
@@ -33,7 +33,7 @@ import { MatCarouselModule } from "@magloft/material-carousel";
     CatalogComponent,
     PrivacyComponent,
     TermsAndConditionsComponent,
-    MiniCardProductComponent
+    MiniCardTreatmentComponent
   ],
   imports: [
     MainRoutingModule,
@@ -54,7 +54,7 @@ import { MatCarouselModule } from "@magloft/material-carousel";
   providers: [
     MainService,
     CatalogueService,
-    ProductService,
+    TreatmentService,
     UserService,
     AuthService
   ]

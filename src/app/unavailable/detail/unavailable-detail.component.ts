@@ -20,7 +20,9 @@ import {
   getMinMaxDate,
   getNow,
   getTime,
-  newDate, newDateTimestamp
+  getTimeNumber,
+  newDate,
+  newDateTimestamp
 } from '../../util/dates';
 import { IRoomAll } from '../../interfaces/room';
 import { IUser } from '../../interfaces/user';
@@ -80,9 +82,9 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
     const title = this.translate.instant('UNAVAILABLE.DELETED.TITLE');
     const date = this.unavailable?.startDate ? formatFullDate(this.unavailable.startDate, this.translate.currentLang)
       : this.unavailable?.start;
-    const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT', {date});
+    const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT', { date });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: {title, content, value: this.unavailable}
+      data: { title, content, value: this.unavailable }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -104,8 +106,8 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
 
     let date: Date;
     if (!this.allDay.value) {
-      const time = this.startTime.value.split(':');
-      date = createNewDate(this.startDate.value, time[0], time[1]);
+      const time = getTimeNumber(this.startTime.value);
+      date = createNewDate(this.startDate.value, time!.hour, time!.minute);
     } else {
       date = createNewDate(this.startDate.value);
     }
@@ -125,10 +127,10 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
 
   get focusin(): void {
     if (this.rooms.length && this.startTime.value) {
-      const time = this.startTime.value.split(':');
-      const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time[0], time[1]);
+      const time = getTimeNumber(this.startTime.value);
+      const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time!.hour, time!.minute);
       const day = date.getDay();
-      const {minDate, maxDate, roomAvailability} = getMinMaxDate(day, date, this.rooms);
+      const { minDate, maxDate, roomAvailability } = getMinMaxDate(day, date, this.rooms);
 
       this.setValues(this.startDate.value, this.startTime.value, getTime(minDate), getTime(maxDate),
         this.duration.value, roomAvailability);
@@ -160,7 +162,7 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
     let availability;
     if (this.rooms) {
       const day = date.getDay();
-      const {minDate, maxDate, roomAvailability} = getMinMaxDate(day, $event.value, this.rooms);
+      const { minDate, maxDate, roomAvailability } = getMinMaxDate(day, $event.value, this.rooms);
       max = maxDate;
       minTime = getTime(minDate);
       maxTime = getTime(maxDate);
@@ -175,15 +177,15 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
   }
 
   setTime($event: any): void {
-    const time = $event.split(':');
-    const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time[0], time[1]);
+    const time = getTimeNumber($event);
+    const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time!.hour, time!.minute);
 
     let maxHour;
     let diffMin;
-    const max = this.maxTime?.split(':');
+    const max = getTimeNumber(this.maxTime);
     if (max) {
-      maxHour = max[0];
-      diffMin = max[1];
+      maxHour = max.hour;
+      diffMin = max.minute;
     }
 
     const duration = diffTime(date, Number(maxHour), Number(diffMin));
@@ -281,7 +283,7 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
       if (this.rooms.length && this.unavailable && this.unavailable.startDate) {
         const date = newDate(this.unavailable.startDate);
         const day = date.getDay();
-        const {maxDate} = getMinMaxDate(day, date, this.rooms);
+        const { maxDate } = getMinMaxDate(day, date, this.rooms);
 
         const maxHour = maxDate?.getHours();
         const diffMin = maxDate?.getMinutes();
@@ -292,7 +294,7 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({incorrect: true});
+          this.form.controls[value.field].setErrors({ incorrect: true });
         });
       } else if (state.message) {
         this.router.navigate(['unavailable']);

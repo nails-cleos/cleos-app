@@ -7,7 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../store/app.states';
 import * as fromActionsRoom from '../../store/room.actions';
-import { createDate, getTimeZone } from '../../util/dates';
+import { createDate, getTimeNumber, getTimeZone } from '../../util/dates';
 import { areEquals, getFullUserName } from '../../util/helper';
 import { RoomIconName } from '../../util/icon';
 import { IPaymentType, paymentOptions } from '../../interfaces/payment';
@@ -18,6 +18,7 @@ import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { map, startWith } from 'rxjs/operators';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
+import { goTo } from "../../util/animation";
 
 @Component({
   selector: 'app-room-me',
@@ -122,14 +123,14 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   get addProfessional(): void {
-    this.router.navigate(['users', 'add'], {state: {role: Role.professional}});
+    this.router.navigate(['users', 'add'], { state: { role: Role.professional } });
     return;
   }
 
   private static createAv(date?: string): Date | undefined {
     if (date) {
-      const startTime = date.split(':');
-      return createDate(Number(startTime[0]), Number(startTime[1]));
+      const startTime = getTimeNumber(date)!;
+      return createDate(startTime.hour, startTime.minute);
     }
     return undefined;
   }
@@ -232,7 +233,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
         break;
     }
     if (step > -1) {
-      this.errors[`day${step}`] = true;
+      this.errors[`day${ step }`] = true;
       this.setStep(step);
       return true;
     }
@@ -245,12 +246,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (this.professionals.length === 0) {
       this.errors.professionals = true;
-      document.getElementById('professionals')?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-        inline: 'nearest'
-      });
-      return true;
+      return goTo('professionals');;
     }
 
     return false;
@@ -282,7 +278,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
       const id = routeParams.id;
       if (!this.room || this.room.id !== id) {
         this.store.dispatch(
-          new fromActionsRoom.RoomFind({id})
+          new fromActionsRoom.RoomFind({ id })
         );
       }
     });

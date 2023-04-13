@@ -1,6 +1,6 @@
 import { IUser } from './user';
 import { ICurrency, ICurrencyAll } from './currency';
-import { IProduct } from './product';
+import { ITreatment } from './treatment';
 import { IAdditional } from './additional';
 import { IOffice } from './office';
 
@@ -20,8 +20,8 @@ export interface IRoom {
 
 export interface IRoomService {
   currency: ICurrency;
-  products: IProduct[];
-  selectedProducts: IProduct[];
+  treatments: ITreatment[];
+  selectedTreatments: ITreatment[];
   additionalList: IAdditional[];
   selectedAdditionalList: IAdditional[];
 }
@@ -48,7 +48,7 @@ export interface IService {
 }
 
 export enum ServiceType {
-  product = 'PRODUCT',
+  treatment = 'TREATMENT',
   additional = 'ADDITIONAL'
 }
 

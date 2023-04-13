@@ -4,7 +4,6 @@ import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
 import { CalendarModule } from 'angular-calendar';
 import { SharedModule } from '../shared/shared.module';
 import { ReservationRoutingModule } from './reservation-routing.module';
-import { environment } from '../../environments/environment';
 
 import { SearchComponent } from './search/search.component';
 import { ReservationComponent, SelectProfessionalDialogComponent } from './reservation.component';
@@ -19,7 +18,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { PaymentService } from '../services/payment.service';
 import { ReservationEffects } from '../store/effects/reservation.effects';
 import { ReservationService } from '../services/reservation.service';
-import { ProductService } from '../services/product.service';
+import { TreatmentService } from '../services/treatment.service';
 import { RoomService } from '../services/room.service';
 import { UserService } from '../services/user.service';
 import { AdditionalService } from '../services/additional.service';
@@ -54,12 +53,12 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
       isolate: false,
       extend: true
     }),
-    EffectsModule.forFeature([ReservationEffects, PaymentEffects])
+    EffectsModule.forFeature([ReservationEffects, PaymentEffects]),
   ],
   providers: [
     ReservationService,
     PaymentService,
-    ProductService,
+    TreatmentService,
     RoomService,
     UserService,
     AdditionalService,

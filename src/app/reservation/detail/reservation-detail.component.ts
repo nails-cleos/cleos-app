@@ -10,6 +10,7 @@ import {
   Duration,
   formatDateTime,
   getNow,
+  getReservationGMT,
   getTime,
   greaterOrEqualsThanToday,
   IDuration,
@@ -26,7 +27,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Role } from '../../interfaces/token';
 import { getFullUserName, getPrice, getUserName, isProfessional, openDialog, snakeToCamel } from '../../util/helper';
-import { IPrice, Price } from '../../interfaces/product';
+import { IPrice, Price } from '../../interfaces/treatment';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatFabMenu, MatFabMenuDirection } from '@angular-material-extensions/fab-menu/lib/mat-fab-menu.component';
 import { IPayment } from '../../interfaces/payment';
@@ -54,11 +55,10 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   start: Date = getNow();
   end: Date = getNow();
   state: string | undefined;
-
-  language: string;
+  locale: string;
   changeState: MatFabMenu[] = [];
 
-  displayedColumns: string[] = ['position', 'professional', 'start', 'product', 'state'];
+  displayedColumns: string[] = ['position', 'professional', 'start', 'treatment', 'state'];
   dataSource: any;
   expanded?: IReservationAll;
   pageSize = 5;
@@ -82,6 +82,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
   private small = false;
 
+  private readonly language: string;
+
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private route: ActivatedRoute,
               private store: Store<AppState>, private cdRef: ChangeDetectorRef, private router: Router,
               private breakpointObserver: BreakpointObserver) {
@@ -97,13 +99,19 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       }
     });
     this.language = this.translate.currentLang;
+    this.locale = this.translate.currentLang;
     this.price = new Price();
 
     this.store.select(selectAuthState).subscribe((state: any) => {
       const user: IUserAll = state.user;
+      this.locale = user.locale;
       this.professionalId = user.authorities.some(u => u.authority === Role.professional) ? user.id : undefined;
       this.customerId = user.authorities.some(u => u.authority === Role.customer) ? user.id : undefined;
     });
+  }
+
+  get GMT(): string {
+    return getReservationGMT(this.reservation)
   }
 
   get total(): number {
@@ -214,7 +222,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
             }, 5000);
           }
         }
-        if (this.reservation && this.reservation.product) {
+        if (this.reservation && this.reservation.treatment) {
           this.price = getPrice(this.reservation);
         }
       }
@@ -296,7 +304,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       if (self.start) {
         const startDate = newDate(self.start);
         let key;
-        let date = getTime(startDate, this.language);
+        let date = getTime(startDate, self.language);
         switch (true) {
           case isToday(startDate):
             key = 'TODAY';
@@ -353,9 +361,9 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     const bookTransaction = ReservationDetailComponent.createTransaction('booked', (): void => {
       const customer = reservation.customer;
       const room = reservation.room;
-      const product = reservation.product;
+      const treatment = reservation.treatment;
       const professional = reservation.professional;
-      const data = { customer, room, product, professional };
+      const data = { customer, room, treatment, professional };
       this.router.navigate(['reservation'], { state: data });
     });
 
@@ -448,9 +456,9 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
     const bookTransaction = ReservationDetailComponent.createTransaction('booked', (): void => {
       const room = reservation.room;
-      const product = reservation.product;
+      const treatment = reservation.treatment;
       const professional = reservation.professional;
-      const data = { room, product, professional };
+      const data = { room, treatment, professional };
       this.router.navigate(['me', 'reservation'], { state: data });
     });
 

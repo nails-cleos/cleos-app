@@ -1,6 +1,6 @@
 // Modules
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
   FacebookLoginProvider,
@@ -24,7 +24,9 @@ import { MatPaginatorIntl } from '@angular/material/paginator';
 import { PaginatorI18n } from './util/paginator';
 import { TranslationLoaderResolver } from './util/translation.resolver';
 import localeEn from '@angular/common/locales/en';
+import localeEnExtra from '@angular/common/locales/extra/en';
 import localeEs from '@angular/common/locales/es';
+import localeEsExtra from '@angular/common/locales/extra/es';
 import { CookieService } from 'ngx-cookie-service';
 import { TranslateLoaderFactory } from './shared/translate-loader.factory';
 import {
@@ -74,8 +76,8 @@ export const localStorageSyncReducer =
 
 const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
 
-registerLocaleData(localeEn, 'en');
-registerLocaleData(localeEs, 'es');
+registerLocaleData(localeEn, 'en', localeEnExtra);
+registerLocaleData(localeEs, 'es', localeEsExtra);
 
 @NgModule({
   declarations: [
@@ -86,7 +88,7 @@ registerLocaleData(localeEs, 'es');
     StoreModule.forRoot(reducers, { metaReducers }),
     EffectsModule.forRoot([]),
     TranslateModule.forRoot({
-      defaultLanguage: 'es',
+      defaultLanguage: 'en',
       loader: {
         provide: TranslateLoader,
         useClass: TranslateLoaderFactory.forModule('common')
@@ -130,7 +132,12 @@ registerLocaleData(localeEs, 'es');
     {
       provide: MAT_COLOR_FORMATS,
       useValue: NGX_MAT_COLOR_FORMATS
-    }
+    },
+    {
+      provide: LOCALE_ID,
+      useValue: "en-GB"
+    },
+    TranslateService
   ],
   bootstrap: [AppComponent],
   exports: [TranslateModule, AngularFireMessagingModule]

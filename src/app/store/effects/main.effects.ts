@@ -6,7 +6,7 @@ import { catchError, map, switchMap } from 'rxjs/operators';
 import * as fromActionsMain from '../main.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { CatalogueService } from '../../services/catalogue.service';
-import { ProductService } from '../../services/product.service';
+import { TreatmentService } from '../../services/treatment.service';
 import { MainService } from '../../services/main.service';
 
 @Injectable()
@@ -20,10 +20,10 @@ export class MainEffects {
     ))
   ));
 
-  getAllProducts$ = createEffect(() => this.actions$.pipe(ofType(fromActionsMain.MainActionTypes.getAllProducts)).pipe(
+  getAllTreatments$ = createEffect(() => this.actions$.pipe(ofType(fromActionsMain.MainActionTypes.getAllTreatments)).pipe(
     map((action: any) => action.payload),
-    switchMap(() => this.productService.getProductList().pipe(
-      switchMap((response: any) => of(new fromActionsMain.ProductsSuccess(response))),
+    switchMap(() => this.treatmentService.getTreatmentList().pipe(
+      switchMap((response: any) => of(new fromActionsMain.TreatmentsSuccess(response))),
       catchError((err: HttpErrorResponse) => of(new fromActionsMain.RequestFailure({error: err.error})))
     ))
   ));
@@ -43,8 +43,8 @@ export class MainEffects {
     ofType(fromActionsMain.MainActionTypes.catalogueSuccess)
   ), {dispatch: false});
 
-  productDataSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsMain.MainActionTypes.productSuccess)
+  treatmentDataSuccess$ = createEffect(() => this.actions$.pipe(
+    ofType(fromActionsMain.MainActionTypes.treatmentSuccess)
   ), {dispatch: false});
 
   requestSuccess$ = createEffect(() => this.actions$.pipe(
@@ -52,6 +52,6 @@ export class MainEffects {
   ), {dispatch: false});
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private mainService: MainService,
-              private catalogueService: CatalogueService, private productService: ProductService) {
+              private catalogueService: CatalogueService, private treatmentService: TreatmentService) {
   }
 }

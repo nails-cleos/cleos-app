@@ -5,19 +5,19 @@ import { AppState, selectReservationState } from '../../../store/app.states';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as fromActionsReservation from '../../../store/reservation.actions';
 import { IReservationAll } from '../../../interfaces/reservation';
-import { IGroupService, IPrice, IProduct, IProductGroup, Price } from '../../../interfaces/product';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../interfaces/treatment';
+import { FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IPaymentAll, PaymentType } from '../../../interfaces/payment';
 import {
-  createProductGroupService,
+  createTreatmentGroupService,
   getPrice,
-  getProductDurability,
+  getTreatmentDurability,
   newAdditional,
   newExtra,
   newPrice
 } from '../../../util/helper';
-import { formatTime, totalDuration } from '../../../util/dates';
+import { API_LOCALE, getNowTimeZone, getTime, getTimeNumber } from '../../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
 import { map, startWith } from 'rxjs/operators';
 import { transitionAnimation } from '../../../util/animation';
@@ -43,10 +43,18 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   group: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
   ]);
-  products?: IService[];
-  filteredProduct?: Observable<IService[] | undefined>;
-  product: UntypedFormControl = new UntypedFormControl('', [
+  treatments?: IService[];
+  filteredTreatment?: Observable<IService[] | undefined>;
+  treatment: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
+  ]);
+
+  date: FormControl<Date> = new UntypedFormControl('', [
+    Validators.required
+  ]);
+
+  time: UntypedFormControl = new UntypedFormControl('', [
+    Validators.required
   ]);
 
   description: UntypedFormControl = new UntypedFormControl();
@@ -70,7 +78,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
               private readonly translate: TranslateService, private router: Router) {
     this.getState = this.store.select(selectReservationState);
     this.price = new Price();
-    this.product.valueChanges.subscribe(value => {
+    this.treatment.valueChanges.subscribe(value => {
       if (value) {
         this.price = newPrice(this.price, value.price);
       }
@@ -81,27 +89,20 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     this.isDashboard = this.router.getCurrentNavigation()?.extras?.state?.data?.isDashboard;
   }
 
-  get durationTime(): string {
-    if (this.reservation) {
-      const duration = totalDuration(this.product.value, this.reservation.additional);
-      return formatTime(duration, this.translate.currentLang);
-    }
-    return '';
-  }
-
   get complete(): void {
     if (this.reservation) {
       const reservationId = this.reservation.id;
-      const productId = valueChange(this.product.value.id, this.reservation?.product.key);
+      const treatmentId = valueChange(this.treatment.value.id, this.reservation?.treatment.key);
       const description = this.description.value;
       const price = this.extraPrice.value;
       const paymentType = this.type.value;
       const additionalIds = this.additionalSelected.map(additional => additional.id);
       const transfer = this.transfer.value;
+      const dateTime = this.date.value.toLocaleString(API_LOCALE);
       this.store.dispatch(
         new fromActionsReservation.Complete({
           reservationId,
-          extras: {productId, description, price, paymentType, additionalIds, transfer},
+          extras: { treatmentId, description, price, paymentType, additionalIds, transfer, dateTime },
           isDashboard: this.isDashboard
         })
       );
@@ -116,8 +117,11 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       this.reservationId = routeParams.id;
       this.roomId = routeParams.roomId;
       this.customerId = routeParams.customerId;
+      const dateTime = getNowTimeZone();
+      this.date.setValue(dateTime);
+      this.time.setValue(getTime(dateTime, this.translate.currentLang));
       this.getReservation();
-      this.getProducts();
+      this.getTreatments();
     });
     this.createFilters();
   }
@@ -126,12 +130,12 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  displayFnGroup(group: IProductGroup): string {
-    return group ? `${group.name}` : '';
+  displayFnGroup(group: ITreatmentGroup): string {
+    return group ? `${ group.name }` : '';
   }
 
-  displayFnProduct(product: IProduct): string {
-    return product ? `${product.name}` : '';
+  displayFnTreatment(treatment: ITreatment): string {
+    return treatment ? `${ treatment.name }` : '';
   }
 
   keyDownHandler(event: any, form: UntypedFormControl): void {
@@ -149,25 +153,30 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     return this.additionalSelected.filter(el => el.id === it.id).length > 0;
   }
 
+  timeChange($event: string): void {
+    const time = getTimeNumber($event)!;
+    this.date.value.setHours(time.hour, time.minute, 0);
+  }
+
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       this.payments = state.payments;
       this.reservation = state.selected;
       if (this.reservation) {
         this.price = getPrice(this.reservation, this.payments);
-        this.product.setValue(this.reservation.product);
+        this.treatment.setValue(this.reservation.treatment);
         this.additionalSelected = this.reservation.additional ? this.reservation.additional
           .map(ad => Object.assign({}, ad, { id: ad.key })) : [];
         this.types = [...this.reservation.room.paymentTypes, PaymentType.transfer];
       }
-      if (state.productDiscount) {
-        this.additionalList = state.productDiscount.additionalList;
-        if (state.productDiscount?.products && this.reservation) {
-          const productId = this.reservation.product.key;
-          this.groups = Array.from(createProductGroupService(new Map<string, IGroupService>(), state.productDiscount.products,
+      if (state.treatmentDiscount) {
+        this.additionalList = state.treatmentDiscount.additionalList;
+        if (state.treatmentDiscount?.treatments && this.reservation) {
+          const treatmentId = this.reservation.treatment.key;
+          this.groups = Array.from(createTreatmentGroupService(new Map<string, IGroupService>(), state.treatmentDiscount.treatments,
             this.reservation.room.currency.code).values());
           this.group.setValue(this.groups?.find(group => {
-            if (group.products?.find(product => product.id === productId)) {
+            if (group.treatments?.find(treatment => treatment.id === treatmentId)) {
               return group;
             }
             return undefined;
@@ -180,11 +189,13 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   private createForm(): void {
     this.form = this.formBuilder.group({
       group: this.group,
-      product: this.product,
+      treatment: this.treatment,
       description: this.description,
       extraPrice: this.extraPrice,
       type: this.type,
-      transfer: this.transfer
+      transfer: this.transfer,
+      date: this.date,
+      time: this.time
     });
     this.valueChange();
   }
@@ -194,21 +205,21 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       if (!value) {
         return;
       }
-      this.products = value.products;
-      const product = value.products?.find((p: IProductGroup) => p.id === this.reservation?.product?.key);
-      if (product) {
-        this.products = value.products;
-        this.product.setValue(product);
+      this.treatments = value.treatments;
+      const treatment = value.treatments?.find((p: ITreatmentGroup) => p.id === this.reservation?.treatment?.key);
+      if (treatment) {
+        this.treatments = value.treatments;
+        this.treatment.setValue(treatment);
       } else {
-        if (this.products?.length === 1) {
-          this.product.setValue(this.products[0]);
+        if (this.treatments?.length === 1) {
+          this.treatment.setValue(this.treatments[0]);
         } else {
-          this.product.setValue('');
+          this.treatment.setValue('');
         }
       }
-      this.durability = getProductDurability(value.durabilityMin, value.durabilityMax, this.translate);
+      this.durability = getTreatmentDurability(value.durabilityMin, value.durabilityMax, this.translate);
     });
-    this.product.valueChanges.subscribe(value => {
+    this.treatment.valueChanges.subscribe(value => {
       if (value) {
         this.price = newPrice(this.price, value.price);
       }
@@ -221,16 +232,16 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups)
     );
-    this.filteredProduct = this.product.valueChanges.pipe(
+    this.filteredTreatment = this.treatment.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterProduct(name) : this.products ? this.products.slice() : this.products)
+      map(name => name ? this.filterTreatment(name) : this.treatments ? this.treatments.slice() : this.treatments)
     );
   }
 
-  private getProducts(): void {
+  private getTreatments(): void {
     this.store.dispatch(
-      new fromActionsReservation.GetAllServices({roomId: this.roomId, customerId: this.customerId})
+      new fromActionsReservation.GetAllServices({ roomId: this.roomId, customerId: this.customerId })
     );
   }
 
@@ -240,10 +251,10 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     return this.groups?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 
-  private filterProduct(name: string): IService[] | undefined {
+  private filterTreatment(name: string): IService[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.products?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
+    return this.treatments?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 
   private getReservation(): void {
@@ -256,7 +267,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     if (!this.reservation) {
       this.reservation = undefined;
       this.store.dispatch(
-        new fromActionsReservation.ReservationFind({id: this.reservationId})
+        new fromActionsReservation.ReservationFind({ id: this.reservationId })
       );
     }
   }

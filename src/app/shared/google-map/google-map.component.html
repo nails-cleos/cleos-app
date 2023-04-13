@@ -1,26 +1,25 @@
-<div *ngIf="isMapReady">
-  <div *ngIf="addressFormGroup" [formGroup]="addressFormGroup" class="divider" fxLayout="column"
-       fxLayoutAlign="space-evenly stretch">
-    <input>
-    <mat-form-field appearance="outline" hidden>
-      <mat-label>{{ 'COMMON.ADDRESS.FIELD' | translate }}</mat-label>
-      <label>
-        <input formControlName="address" matInput #addressText type="address">
-      </label>
-      <mat-error *ngIf="addressFormGroup.get('address')?.hasError('requireMatch')"
-                 [innerHTML]="'COMMON.CURRENCY.INVALID' | translate">
-      </mat-error>
-    </mat-form-field>
-    <mat-form-field appearance="outline">
-      <mat-label>{{ 'COMMON.ADDRESS.DESCRIPTION' | translate }}</mat-label>
-      <label>
-        <textarea #message formControlName="addressDescription" matInput maxlength="256"></textarea>
-      </label>
-      <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
-    </mat-form-field>
-  </div>
-</div>
-  <div *ngIf="isMapReady; else box">
+<div [ngSwitch]="mapStatus">
+  <div *ngSwitchCase="'READY'">
+    <div *ngIf="addressFormGroup" [formGroup]="addressFormGroup" class="divider" fxLayout="column"
+         fxLayoutAlign="space-evenly stretch">
+      <input>
+      <mat-form-field appearance="outline" hidden>
+        <mat-label>{{ 'COMMON.ADDRESS.FIELD' | translate }}</mat-label>
+        <label>
+          <input formControlName="address" matInput #addressText type="address">
+        </label>
+        <mat-error *ngIf="addressFormGroup.get('address')?.hasError('requireMatch')"
+                   [innerHTML]="'COMMON.CURRENCY.INVALID' | translate">
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'COMMON.ADDRESS.DESCRIPTION' | translate }}</mat-label>
+        <label>
+          <textarea #message formControlName="addressDescription" matInput maxlength="256"></textarea>
+        </label>
+        <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
+      </mat-form-field>
+    </div>
     <google-map [zoom]="zoom" class="divider" [center]="center" height="400" width="400"
                 style="display: flex; justify-content: center;">
       <map-marker *ngIf="markerPosition" #marker="mapMarker" [position]="markerPosition"
@@ -29,6 +28,7 @@
       <map-info-window [innerHTML]="info"></map-info-window>
     </google-map>
   </div>
-  <ng-template #box>
-    <div class="ssc-square mb"></div>
-  </ng-template>
+  <div *ngSwitchCase="'LOADING'" class="ssc-square mb"></div>
+  <div *ngSwitchDefault></div>
+</div>
+

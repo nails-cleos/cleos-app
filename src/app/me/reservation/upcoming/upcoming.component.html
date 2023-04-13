@@ -47,11 +47,11 @@
           </td>
         </tr>
         <tr *ngIf="upcoming.id; else skeleton">
-          <td class="right">{{ 'COMMON.PRODUCT.FIELD' | translate }}</td>
-          <td class="left">{{upcoming.product.name}}</td>
+          <td class="right">{{ 'COMMON.TREATMENT.FIELD' | translate }}</td>
+          <td class="left">{{upcoming.treatment.name}}</td>
         </tr>
         <tr *ngIf="upcoming.price; else skeleton">
-          <td class="right">{{ 'ME.RESERVATION.PRODUCT.PRICE.FIELD' | translate }}</td>
+          <td class="right">{{ 'ME.RESERVATION.TREATMENT.PRICE.FIELD' | translate }}</td>
           <td *ngIf="upcoming.price.discount; else noDiscount" class="left">
             <span [class.strikethrough]="upcoming.price.amount">
               {{upcoming.room.currency | currencySymbol}} {{upcoming.price.amount | number:'1.2-2'}}

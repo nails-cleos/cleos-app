@@ -3,7 +3,7 @@ import { createNewDate, newDate, newDateTimestamp, reservationDuration } from '.
 import { getPrice } from '../../../util/helper';
 import { IReview } from '../../../interfaces/review';
 import { IReservationAll } from '../../../interfaces/reservation';
-import { IPrice } from '../../../interfaces/product';
+import { IPrice } from '../../../interfaces/treatment';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { UntypedFormControl } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
