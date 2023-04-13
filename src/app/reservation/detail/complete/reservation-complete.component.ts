@@ -99,7 +99,6 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       const additionalIds = this.additionalSelected.map(additional => additional.id);
       const transfer = this.transfer.value;
       const dateTime = this.date.value.toLocaleString(API_LOCALE);
-      console.log(dateTime)
       this.store.dispatch(
         new fromActionsReservation.Complete({
           reservationId,
