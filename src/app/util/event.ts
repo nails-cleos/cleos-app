@@ -1,20 +1,21 @@
 import { IAvailability } from '../interfaces/room';
 import { CalendarEvent } from 'angular-calendar';
 import {
-  API_LOCALE,
   createDate,
   createEndDate,
   createNewDate,
-  dateToUTC, daysOfWeek,
+  dateToUTC,
+  daysOfWeek,
   getCurrentTimeZone,
   getNow,
+  getTimeNumber,
   getWeekDay,
   greaterOrEqualsThan,
   greaterOrEqualsThanToday,
   IDuration
 } from './dates';
 import { findStateColor } from './theme';
-import { Frequency, RRule, ByWeekday } from 'rrule';
+import { ByWeekday, Frequency, RRule } from 'rrule';
 import { isToday } from 'date-fns';
 import { UnavailableRepeatType } from '../interfaces/unavailable';
 import { createEventColor } from './color';
@@ -47,7 +48,7 @@ export const createRecurringEvent = (start: Date, date: Date, it: any, duration:
   const startDate = createNewDate(finalDate, start.getHours(), start.getMinutes());
   const end = createEndDate(it.end);
 
-  return {duration, it, rrule: createRule(it.repeat, startDate, end)};
+  return { duration, it, rrule: createRule(it.repeat, startDate, end) };
 };
 
 export const getFrequency = (repeat: string, start: Date, unavailableId: string, title: string, end: string,
@@ -164,13 +165,13 @@ const createEvent = (it: IAvailability, date: Date, notWorking: string, unavaila
     }
   } else {
     const now = getNow();
-    const nowTime = now.toLocaleTimeString(API_LOCALE).split(':');
-    const hour = Number(nowTime[0]);
-    const minute = Number(nowTime[1]);
+    const nowTime = getTimeNumber(now)!;
+    const hour = nowTime.hour;
+    const minute = nowTime.minute;
     if (it.start) {
-      const start = it.start.split(':');
-      const endHour = Number(start[0]);
-      const endMinute = Number(start[1]);
+      const start = getTimeNumber(it.start)!;
+      const endHour = start.hour;
+      const endMinute = start.minute;
       const eventBefore = newEvent(notWorking, findStateColor('DEFAULT', isDarkMode),
         newDate, dateToUTC(createNewDate(date, endHour, endMinute), timeZone), isDarkMode);
       if (eventBefore) {
@@ -178,9 +179,9 @@ const createEvent = (it: IAvailability, date: Date, notWorking: string, unavaila
       }
     }
     if (it.end) {
-      const end = it.end.split(':');
-      const endHour = Number(end[0]);
-      const endMinute = Number(end[1]);
+      const end = getTimeNumber(it.end)!;
+      const endHour = end.hour;
+      const endMinute = end.minute;
       let startHour = endHour;
       let startMinute = endMinute;
       if (isToday(date) && (hour > endHour || (hour === endHour && minute > endMinute))) {
@@ -206,17 +207,17 @@ const createEvent = (it: IAvailability, date: Date, notWorking: string, unavaila
 const createLunchEvent = (it: IAvailability, date: Date, unavailable: string, lunch: string,
                           isDarkMode: boolean, timeZone: string): CalendarEvent | undefined => {
   const now = getNow();
-  const nowTime = now.toLocaleTimeString(API_LOCALE).split(':');
-  let hour = Number(nowTime[0]);
-  let minute = Number(nowTime[1]);
+  const nowTime = getTimeNumber(now)!;
+  let hour = nowTime.hour;
+  let minute = nowTime.minute;
 
   if (it.startLunch && it.endLunch) {
-    const lunchStart = it.startLunch.split(':');
-    const lunchEnd = it.endLunch.split(':');
-    const lunchEndHour = Number(lunchEnd[0]);
-    const lunchEndMinute = Number(lunchEnd[1]);
-    const lunchStartHour = Number(lunchStart[0]);
-    const lunchStartMinute = Number(lunchStart[1]);
+    const lunchStart = getTimeNumber(it.startLunch)!;
+    const lunchEnd = getTimeNumber(it.endLunch)!;
+    const lunchEndHour = lunchEnd.hour;
+    const lunchEndMinute = lunchEnd.minute;
+    const lunchStartHour = lunchStart.hour;
+    const lunchStartMinute = lunchStart.minute;
 
     if (isToday(date)) {
       if (hour > 23) {

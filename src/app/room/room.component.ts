@@ -22,6 +22,7 @@ import { getCurrentTimeZone } from '../util/dates';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
+import { goTo } from "../util/animation";
 
 export interface IIcon {
   monday: RoomIconName;
@@ -329,10 +330,15 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   private validate(): boolean {
     if (this.form.invalid) {
-      return true;
+      return goTo('fields');
     }
-    let step = -1;
     this.errors = [];
+    if (this.professionals.length === 0) {
+      this.errors.professionals = true;
+      return goTo('professionals');
+    }
+
+    let step = -1;
     switch (RoomIconName.calendarToday) {
       case this.icons.monday:
         step = 0;

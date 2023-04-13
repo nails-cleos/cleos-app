@@ -15,7 +15,7 @@ import {
   subWeeks
 } from 'date-fns';
 import { RRule, Weekday } from 'rrule';
-import { IReservationAll } from '../interfaces/reservation';
+import { IReservation, IReservationAll } from '../interfaces/reservation';
 import { ITreatmentAll } from '../interfaces/treatment';
 import { IAdditionalAll } from '../interfaces/additional';
 import { utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz';
@@ -201,10 +201,10 @@ export const getDiffTime = (maxDate: Date, minDate: Date): string => {
   const minutes = (hours - diffHour) * 60;
   const diffMinute = Math.round(minutes);
 
-  const hour = `0${diffHour}`.slice(-2);
-  const minute = `0${diffMinute}`.slice(-2);
+  const hour = `0${ diffHour }`.slice(-2);
+  const minute = `0${ diffMinute }`.slice(-2);
 
-  return `${hour}:${minute}`;
+  return `${ hour }:${ minute }`;
 };
 
 export const getAvailability = (room: IRoom): any => {
@@ -352,10 +352,6 @@ export const reservationDateTime = (date: Date, locale: string, timeZone: string
     day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit', timeZone
   });
 
-export const formatDateNameKey = (date: Date, locale: string, measure: any): string => date.toLocaleDateString(locale, {
-  day: 'numeric', month: measure, hour: '2-digit', minute: '2-digit'
-}).replace(/(?:^|\s|-)+\S/g, (c) => c.toUpperCase());
-
 export const monthViewTitle = (date: Date, locale: string = 'en'): string => date.toLocaleDateString(locale, {
   year: 'numeric', month: 'long'
 }).replace(/^\w/, (c) => c.toUpperCase());
@@ -423,9 +419,30 @@ export const createNewDate = (date: Date, hour: number = 0, minute: number = 0, 
   return d;
 };
 
-export const dateToTimestamp = (date: Date = getNow()): number => parseInt(`${date.getTime() / 1000}`, 10);
+export const getTimeNumber = (date: any) => {
+  if (date instanceof Date) {
+    const time = getTime(date).split(':');
 
-export const stringDateUTCToTimeZone = (date: string): Date => new Date(`${date}.000z`);
+    return { hour: Number(time[0]), minute: Number(time[1]) };
+  } else if (date) {
+    const time = date.split(':');
+    let hour = Number(time[0]);
+    if (isNaN(time[1])) {
+      const format = time[1].slice(2).trim();
+      if (format.toLowerCase() === 'pm' || format.toLowerCase() === 'p.m.') {
+        hour += 12;
+      }
+      return { hour: hour, minute: Number(time[1].slice(0, 2)) };
+    }
+    return { hour: hour, minute: Number(time[1]) };
+  }
+
+  return undefined;
+}
+
+export const dateToTimestamp = (date: Date = getNow()): number => parseInt(`${ date.getTime() / 1000 }`, 10);
+
+export const stringDateUTCToTimeZone = (date: string): Date => new Date(`${ date }.000z`);
 
 export const isSameTimeZone = (timeZone: string = getCurrentTimeZone()): boolean => {
   if (getCurrentTimeZone() === timeZone) {
@@ -516,10 +533,10 @@ export const getTimeZoneFromDate = (date: Date, timezone?: string): ITimeZone =>
 
   if (timezone) {
     const gmt = getGMT(timezone, date);
-    return new TimeZone(`${timezone} (${gmt})`, timezone, gmt !== currentGMT ? gmt : '');
+    return new TimeZone(`${ timezone } (${ gmt })`, timezone, gmt !== currentGMT ? gmt : '');
   }
 
-  return new TimeZone(`${currentTimeZone} (${currentGMT})`, currentTimeZone);
+  return new TimeZone(`${ currentTimeZone } (${ currentGMT })`, currentTimeZone);
 };
 
 export const getTimeZone = (timezone?: string): ITimeZone => {
@@ -532,12 +549,12 @@ const getMinAndMax = (availability: IAvailability, date: Date, timeZone: string)
   let max;
   if (availability) {
     if (availability.start) {
-      const start = availability.start.split(':');
-      min = dateToUTC(createNewDate(date, Number(start[0]), Number(start[1])), timeZone);
+      const start = getTimeNumber(availability.start)!;
+      min = dateToUTC(createNewDate(date, start.hour, start.minute), timeZone);
     }
     if (availability.end) {
-      const end = availability.end.split(':');
-      max = dateToUTC(createNewDate(date, Number(end[0]), Number(end[1])), timeZone);
+      const end = getTimeNumber(availability.end)!;
+      max = dateToUTC(createNewDate(date, end.hour, end.minute), timeZone);
     }
   }
   return { min, max };
@@ -545,6 +562,19 @@ const getMinAndMax = (availability: IAvailability, date: Date, timeZone: string)
 
 export const getMinutesBetweenTimes = (date1: Date, date2: Date): number =>
   Math.abs(Math.round((date1.getTime() - date2.getTime()) / (1000 * 60)));
+
+export const getReservationGMT = (reservation?: IReservationAll | IReservation): string => {
+  let timeZone;
+  if (reservation?.room?.timeZone) {
+    timeZone = reservation.room.timeZone;
+  } else {
+    timeZone = getCurrentTimeZone();
+  }
+
+  const date = newDateTimestamp(reservation?.timestamp)
+
+  return getUTC(timeZone, date);
+}
 
 const timeConvert = (time: number, hour: number = 0) => {
   const hours = (time / 60);
@@ -558,7 +588,7 @@ const timeConvert = (time: number, hour: number = 0) => {
 const getGMT = (timeZone: string, date: Date): string => {
   let gmt = date.toLocaleTimeString('en-US', { timeZone, timeZoneName: 'short' }).split(' ')[2];
   if (gmt.indexOf(':') === -1) {
-    gmt = `${gmt}:00`;
+    gmt = `${ gmt }:00`;
   }
 
   if (gmt.length === 8) {
@@ -571,15 +601,14 @@ const getGMT = (timeZone: string, date: Date): string => {
 const getUTC = (timeZone: string, date: Date): string => getGMT(timeZone, date).replace('GMT', '');
 
 export const timestamp = (date: Date, timeZone: string = getCurrentTimeZone()): Date =>
-  new Date(`${date.toISOString().split('T')[0]}T${getTime(date, API_LOCALE)}:00.000${getUTC(timeZone, date)}`);
+  new Date(`${ date.toISOString().split('T')[0] }T${ getTime(date, API_LOCALE) }:00.000${ getUTC(timeZone, date) }`);
 
 export const getCurrentTimeZone = (): string => Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 const formatMinMax = (min: Date, max: Date): { min: Date; max: Date } => {
   if ([15, 45].indexOf(min.getMinutes()) > 0 || [15, 45].indexOf(max.getMinutes()) > 0) {
     min.setHours(min.getHours() + 1, 0);
-  }
-  else {
+  } else {
     min.setHours(min.getHours(), 0);
   }
 

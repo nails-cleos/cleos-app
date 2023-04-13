@@ -5,7 +5,7 @@ import { AppState, selectTreatmentState } from '../store/app.states';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
 import { ITreatment, ITreatmentGroup, Treatment, TreatmentGroup } from '../interfaces/treatment';
-import { createNewDate, getNow, getTime } from '../util/dates';
+import { createNewDate, getNow, getTime, getTimeNumber } from '../util/dates';
 import { Router } from '@angular/router';
 
 @Component({
@@ -48,7 +48,7 @@ export class TreatmentComponent implements OnInit, OnDestroy {
         errors.time = 'REQUIRED';
         hasError = true;
       }
-      return Object.assign({}, tab, {errors});
+      return Object.assign({}, tab, { errors });
     });
 
     if (hasError || this.form.invalid) {
@@ -98,8 +98,8 @@ export class TreatmentComponent implements OnInit, OnDestroy {
   }
 
   setTime(treatment: ITreatment, $event: any): void {
-    const time = $event.split(':');
-    const date = createNewDate(getNow(), time[0], time[1]);
+    const time = getTimeNumber($event)!;
+    const date = createNewDate(getNow(), time.hour, time.minute);
     treatment.time = getTime(date);
   }
 
@@ -132,7 +132,7 @@ export class TreatmentComponent implements OnInit, OnDestroy {
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({incorrect: true});
+          this.form.controls[value.field].setErrors({ incorrect: true });
         });
       } else if (state.message) {
         this.router.navigate(['treatments']);

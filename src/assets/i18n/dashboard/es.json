@@ -16,9 +16,9 @@
     },
     "MINI_CARD": {
       "DURATION": "desde el mes pasado",
-      "TOTAL_PRODUCT_SALES": "Ganancia total",
-      "AVERAGE_PRODUCT_VALUE": "Ganancia promedio",
-      "TOTAL_PRODUCTS": "Total de servicios",
+      "TOTAL_TREATMENT_SALES": "Ganancia total",
+      "AVERAGE_TREATMENT_VALUE": "Ganancia promedio",
+      "TOTAL_TREATMENTS": "Total de tratamientos",
       "NEW_CUSTOMERS_RESERVATION": "Reservas de nuevos clientes"
     },
     "CARD": {

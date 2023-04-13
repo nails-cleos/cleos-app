@@ -44,6 +44,10 @@
       "FIELD": "Disponibilidad",
       "REQUIRED": "Al menos una disponibilidad es <b>requerida</b>"
     },
+    "PROFESSIONAL": {
+      "FIELD": "Profesional",
+      "REQUIRED": "Al menos un profesional es <b>requerida</b>"
+    },
     "MONDAY_TIME": {
       "FIELD": "Disponibilidad los lunes",
       "DESCRIPTION": "Disponibilidad de trabajo los lunes",
@@ -102,7 +106,7 @@
     "ME": {
       "TITLE": "Mi Sala",
       "SERVICES": {
-        "TITLE": "Mis servicios",
+        "TITLE": "Mis tratamientos",
         "ADD": "Agregar precio",
         "ALL": "Todos",
         "SELECTED": "Seleccionados",
@@ -110,7 +114,7 @@
           "TITLE": "Adicionales"
         },
         "TREATMENT": {
-          "TITLE": "Servicios"
+          "TITLE": "Tratamientos"
         },
         "PRICE": {
           "TEXT": "¿Cuál es el precio para {{name}}?",
@@ -119,7 +123,7 @@
           "GREATER": "Precio debe ser mayor a 1"
         },
         "UPDATE": {
-          "MESSAGE": "Servicios de la sala actualizados"
+          "MESSAGE": "Tratamientos de la sala actualizados"
         }
       }
     }

@@ -6,7 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as fromActionsReservation from '../../../store/reservation.actions';
 import { IReservationAll } from '../../../interfaces/reservation';
 import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../interfaces/treatment';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IPaymentAll, PaymentType } from '../../../interfaces/payment';
 import {
@@ -17,7 +17,7 @@ import {
   newExtra,
   newPrice
 } from '../../../util/helper';
-import { formatTime, totalDuration } from '../../../util/dates';
+import { API_LOCALE, getNowTimeZone, getTime, getTimeNumber } from '../../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
 import { map, startWith } from 'rxjs/operators';
 import { transitionAnimation } from '../../../util/animation';
@@ -47,6 +47,14 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   filteredTreatment?: Observable<IService[] | undefined>;
   treatment: UntypedFormControl = new UntypedFormControl('', [
     Validators.required, requireMatch
+  ]);
+
+  date: FormControl<Date> = new UntypedFormControl('', [
+    Validators.required
+  ]);
+
+  time: UntypedFormControl = new UntypedFormControl('', [
+    Validators.required
   ]);
 
   description: UntypedFormControl = new UntypedFormControl();
@@ -81,14 +89,6 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     this.isDashboard = this.router.getCurrentNavigation()?.extras?.state?.data?.isDashboard;
   }
 
-  get durationTime(): string {
-    if (this.reservation) {
-      const duration = totalDuration(this.treatment.value, this.reservation.additional);
-      return formatTime(duration, this.translate.currentLang);
-    }
-    return '';
-  }
-
   get complete(): void {
     if (this.reservation) {
       const reservationId = this.reservation.id;
@@ -98,10 +98,12 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       const paymentType = this.type.value;
       const additionalIds = this.additionalSelected.map(additional => additional.id);
       const transfer = this.transfer.value;
+      const dateTime = this.date.value.toLocaleString(API_LOCALE);
+      console.log(dateTime)
       this.store.dispatch(
         new fromActionsReservation.Complete({
           reservationId,
-          extras: {treatmentId, description, price, paymentType, additionalIds, transfer},
+          extras: { treatmentId, description, price, paymentType, additionalIds, transfer, dateTime },
           isDashboard: this.isDashboard
         })
       );
@@ -116,6 +118,9 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       this.reservationId = routeParams.id;
       this.roomId = routeParams.roomId;
       this.customerId = routeParams.customerId;
+      const dateTime = getNowTimeZone();
+      this.date.setValue(dateTime);
+      this.time.setValue(getTime(dateTime, this.translate.currentLang));
       this.getReservation();
       this.getTreatments();
     });
@@ -127,11 +132,11 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   }
 
   displayFnGroup(group: ITreatmentGroup): string {
-    return group ? `${group.name}` : '';
+    return group ? `${ group.name }` : '';
   }
 
   displayFnTreatment(treatment: ITreatment): string {
-    return treatment ? `${treatment.name}` : '';
+    return treatment ? `${ treatment.name }` : '';
   }
 
   keyDownHandler(event: any, form: UntypedFormControl): void {
@@ -147,6 +152,11 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
 
   isSelected(it: IAdditionalAll): boolean {
     return this.additionalSelected.filter(el => el.id === it.id).length > 0;
+  }
+
+  timeChange($event: string): void {
+    const time = getTimeNumber($event)!;
+    this.date.value.setHours(time.hour, time.minute, 0);
   }
 
   private subscribe(): void {
@@ -184,7 +194,9 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       description: this.description,
       extraPrice: this.extraPrice,
       type: this.type,
-      transfer: this.transfer
+      transfer: this.transfer,
+      date: this.date,
+      time: this.time
     });
     this.valueChange();
   }
@@ -230,7 +242,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
 
   private getTreatments(): void {
     this.store.dispatch(
-      new fromActionsReservation.GetAllServices({roomId: this.roomId, customerId: this.customerId})
+      new fromActionsReservation.GetAllServices({ roomId: this.roomId, customerId: this.customerId })
     );
   }
 
@@ -256,7 +268,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     if (!this.reservation) {
       this.reservation = undefined;
       this.store.dispatch(
-        new fromActionsReservation.ReservationFind({id: this.reservationId})
+        new fromActionsReservation.ReservationFind({ id: this.reservationId })
       );
     }
   }

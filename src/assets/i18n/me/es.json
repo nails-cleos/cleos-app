@@ -21,7 +21,7 @@
       },
       "TREATMENT": {
         "DETAIL": "Detalle",
-        "NO_CONTENT": "No hay servicios",
+        "NO_CONTENT": "No hay tratamientos",
         "DISCOUNT": {
           "FIELD": "Descuento",
           "ADD": "Con descuento"

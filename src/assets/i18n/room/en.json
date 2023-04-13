@@ -44,6 +44,10 @@
       "FIELD": "Availability",
       "REQUIRED": "At least one availability is <b>required</b>"
     },
+    "PROFESSIONAL": {
+      "FIELD": "Professional",
+      "REQUIRED": "At least one professional is <b>required</b>"
+    },
     "MONDAY_TIME": {
       "FIELD": "Monday availability",
       "DESCRIPTION": "Monday working time availability",

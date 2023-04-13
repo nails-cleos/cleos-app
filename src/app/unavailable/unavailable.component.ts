@@ -18,9 +18,10 @@ import {
   getMinMaxDate,
   getNow,
   getTime,
+  getTimeNumber,
   newDate
 } from '../util/dates';
-import { IRoom, IRoomAll } from '../interfaces/room';
+import { IRoomAll } from '../interfaces/room';
 import { getUserName } from '../util/helper';
 import { Router } from '@angular/router';
 
@@ -89,8 +90,8 @@ export class UnavailableComponent implements OnInit, OnDestroy {
 
     let date: Date;
     if (!this.allDay.value) {
-      const time = this.startTime.value.split(':');
-      date = createNewDate(this.startDate.value, time[0], time[1]);
+      const time = getTimeNumber(this.startTime.value)!;
+      date = createNewDate(this.startDate.value, time.hour, time.minute);
     } else {
       date = createNewDate(this.startDate.value);
     }
@@ -114,10 +115,10 @@ export class UnavailableComponent implements OnInit, OnDestroy {
 
   get focusin(): void {
     if (this.rooms.length && this.startTime.value) {
-      const time = this.startTime.value.split(':');
-      const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time[0], time[1]);
+      const time = getTimeNumber(this.startTime.value)!;
+      const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time.hour, time.minute);
       const day = date.getDay();
-      const {minDate, maxDate, roomAvailability} = getMinMaxDate(day, date, this.rooms);
+      const { minDate, maxDate, roomAvailability } = getMinMaxDate(day, date, this.rooms);
 
       this.setValues(this.startDate.value, this.startTime.value, getTime(minDate), getTime(maxDate), this.showDuration,
         this.duration.value, roomAvailability);
@@ -151,7 +152,7 @@ export class UnavailableComponent implements OnInit, OnDestroy {
     let availability;
     if (this.rooms.length) {
       const day = date.getDay();
-      const {minDate, maxDate, roomAvailability} = getMinMaxDate(day, $event.value, this.rooms);
+      const { minDate, maxDate, roomAvailability } = getMinMaxDate(day, $event.value, this.rooms);
       max = maxDate;
       minTime = getTime(minDate);
       maxTime = getTime(maxDate);
@@ -167,15 +168,15 @@ export class UnavailableComponent implements OnInit, OnDestroy {
   }
 
   setTime($event: any): void {
-    const time = $event.split(':');
-    const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time[0], time[1]);
+    const time = getTimeNumber($event)!;
+    const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time.hour, time.minute);
 
     let maxHour;
     let diffMin;
-    const max = this.maxTime?.split(':');
+    const max = getTimeNumber(this.maxTime);
     if (max) {
-      maxHour = max[0];
-      diffMin = max[1];
+      maxHour = max.hour;
+      diffMin = max.minute;
     }
 
     const d = diffTime(date, Number(maxHour), Number(diffMin));
@@ -278,7 +279,7 @@ export class UnavailableComponent implements OnInit, OnDestroy {
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({incorrect: true});
+          this.form.controls[value.field].setErrors({ incorrect: true });
         });
       } else if (state.message) {
         this.router.navigate(['unavailable']);

@@ -57,7 +57,7 @@
                 </button>
                 <mat-hint *ngIf="errors['treatments']"
                           [innerHTML]="'TREATMENT.LIST.ERROR.REQUIRED' | translate"
-                          class="mat-error">
+                          class="mat-mdc-form-field-error">
                 </mat-hint>
               </mat-form-field>
               <mat-tab-group (selectedIndexChange)="selected.setValue($event)" [selectedIndex]="selected.value">
@@ -68,7 +68,7 @@
                       <input (change)="setValue(tab, 'name', $event)" [value]="tab.name" matInput required>
                     </label>
                     <mat-hint *ngIf="tab.errors['name']" [innerHTML]="'TREATMENT.' + tab.errors['name'] | translate"
-                              class="mat-error">
+                              class="mat-mdc-form-field-error">
                     </mat-hint>
                   </mat-form-field>
                   <mat-form-field appearance="outline" class="tab-field">
@@ -87,7 +87,7 @@
                     <ngx-material-timepicker #t (timeSet)="setTime(tab, $event)"
                                              [minutesGap]="15"></ngx-material-timepicker>
                     <mat-hint *ngIf="tab.errors['time']"
-                              [innerHTML]="'TREATMENT.DURATION.' + tab.errors['time'] | translate" class="mat-error">
+                              [innerHTML]="'TREATMENT.DURATION.' + tab.errors['time'] | translate" class="mat-mdc-form-field-error">
                     </mat-hint>
                   </mat-form-field>
                   <mat-checkbox (change)="setPrimary(tab)" [checked]="tab.primary" [disabled]="tab.primary"

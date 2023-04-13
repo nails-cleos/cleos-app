@@ -7,8 +7,7 @@ import { AppState, selectTreatmentState } from '../../store/app.states';
 import * as fromActionsTreatment from '../../store/treatment.actions';
 import { fieldChange, valueChange } from '../../util/validators';
 import { ITreatment, ITreatmentGroup, Treatment, TreatmentGroup } from '../../interfaces/treatment';
-import { createNewDate, formatDuration, getNow, getTime } from '../../util/dates';
-import { DurationTimePipe } from "../../pipes/durationTime.pipe";
+import { createNewDate, formatDuration, getNow, getTime, getTimeNumber } from '../../util/dates';
 
 @Component({
   selector: 'app-treatment-detail',
@@ -104,8 +103,8 @@ export class TreatmentDetailComponent implements OnInit, AfterViewInit, OnDestro
   }
 
   setTime(treatment: ITreatment, $event: any): void {
-    const time = $event.split(':');
-    const date = createNewDate(getNow(), time[0], time[1]);
+    const time = getTimeNumber($event)!;
+    const date = createNewDate(getNow(), time.hour, time.minute);
     treatment.time = getTime(date);
   }
 
@@ -147,8 +146,7 @@ export class TreatmentDetailComponent implements OnInit, AfterViewInit, OnDestro
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
-      }
-      else if (state.message) {
+      } else if (state.message) {
         this.router.navigate(['treatments']);
       }
     });

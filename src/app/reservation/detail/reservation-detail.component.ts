@@ -10,6 +10,7 @@ import {
   Duration,
   formatDateTime,
   getNow,
+  getReservationGMT,
   getTime,
   greaterOrEqualsThanToday,
   IDuration,
@@ -54,8 +55,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   start: Date = getNow();
   end: Date = getNow();
   state: string | undefined;
-
-  language: string;
+  locale: string;
   changeState: MatFabMenu[] = [];
 
   displayedColumns: string[] = ['position', 'professional', 'start', 'treatment', 'state'];
@@ -82,6 +82,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
   private small = false;
 
+  private readonly language: string;
+
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private route: ActivatedRoute,
               private store: Store<AppState>, private cdRef: ChangeDetectorRef, private router: Router,
               private breakpointObserver: BreakpointObserver) {
@@ -97,13 +99,19 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       }
     });
     this.language = this.translate.currentLang;
+    this.locale = this.translate.currentLang;
     this.price = new Price();
 
     this.store.select(selectAuthState).subscribe((state: any) => {
       const user: IUserAll = state.user;
+      this.locale = user.locale;
       this.professionalId = user.authorities.some(u => u.authority === Role.professional) ? user.id : undefined;
       this.customerId = user.authorities.some(u => u.authority === Role.customer) ? user.id : undefined;
     });
+  }
+
+  get GMT(): string {
+    return getReservationGMT(this.reservation)
   }
 
   get total(): number {
@@ -296,7 +304,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       if (self.start) {
         const startDate = newDate(self.start);
         let key;
-        let date = getTime(startDate, this.language);
+        let date = getTime(startDate, self.language);
         switch (true) {
           case isToday(startDate):
             key = 'TODAY';

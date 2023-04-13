@@ -286,6 +286,8 @@ export const currencySymbol = (currency: ICurrency): string => {
   }
 };
 
+export const getIndex = (steps: IStep[], name: string): number | undefined => steps.find(s => s.name === name)?.order;
+
 export const getStep = (steps: IStep[], index: number): IStep | undefined => steps.find(s => s.order === index);
 
 export const getBackIndex = (steps: IStep[], current: number): number => {

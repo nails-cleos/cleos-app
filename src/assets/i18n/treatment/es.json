@@ -1,8 +1,8 @@
 {
   "TREATMENT": {
-    "TITLE": "Agregar servicios",
-    "CREATED": "Servicio {{name}} creado",
-    "DETAIL": "Actualizar servicios",
+    "TITLE": "Agregar tratamientos",
+    "CREATED": "Tratamiento {{name}} creado",
+    "DETAIL": "Actualizar tratamientos",
     "LIST": {
       "COLUMN": {
         "DURABILITY": "Durabilidad",
@@ -11,7 +11,7 @@
         "DATE": "Actualizado"
       },
       "ERROR": {
-        "NO_CONTENT": "No hay servicios",
+        "NO_CONTENT": "No hay tratamientos",
         "REQUIRED": "Se requiere al menos un tratamiento"
       }
     },
@@ -44,12 +44,12 @@
       "CHECK": "Principal"
     },
     "DELETED": {
-      "TITLE": "Eliminar servicio",
-      "CONTENT": "¿Está seguro de eliminar el servicio {{name}}?",
-      "MESSAGE": "Servicio {{name}} eliminado"
+      "TITLE": "Eliminar tratamiento",
+      "CONTENT": "¿Está seguro de eliminar el tratamiento {{name}}?",
+      "MESSAGE": "Tratamiento {{name}} eliminado"
     },
     "UPDATED": {
-      "MESSAGE": "Servicio {{name}} actualizado"
+      "MESSAGE": "Tratamiento {{name}} actualizado"
     }
   }
 }

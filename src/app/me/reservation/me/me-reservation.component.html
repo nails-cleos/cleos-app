@@ -130,7 +130,8 @@
           <mat-form-field *ngIf="treatmentList" appearance="outline">
             <mat-label>{{ 'COMMON.TREATMENT.FIELD' | translate }}</mat-label>
             <label>
-              <input (keydown)="keyDownHandler($event, treatment)" [formControl]="treatment" [matAutocomplete]="autoTreatment"
+              <input (keydown)="keyDownHandler($event, treatment)" [formControl]="treatment"
+                     [matAutocomplete]="autoTreatment"
                      matInput required type="text">
             </label>
             <mat-autocomplete #autoTreatment="matAutocomplete" [displayWith]="displayFnTreatment">
@@ -206,10 +207,10 @@
       <mat-divider></mat-divider>
       <mat-list-option *ngFor="let it of additionalList" [selected]="isSelected(it)" [value]="it"
                        checkboxPosition="before">
-        <div mat-subheader>{{it.name}}</div>
-        <div mat-line>{{room.value.currency | currencySymbol}} {{it.price | number:'1.2-2'}}</div>
-        <div *ngIf="it.description" mat-line>{{it.description}}</div>
-        <div class="additional-line" mat-line>{{'ME.RESERVATION.ADDITIONAL.DURATION.FIELD' | translate}}
+        <div matListItemTitle>{{it.name}}</div>
+        <div matListItemLine>{{room.value.currency | currencySymbol}} {{it.price | number:'1.2-2'}}</div>
+        <div *ngIf="it.description" class="description" matListItemLine>{{it.description}}</div>
+        <div class="additional-line" matListItemLine>{{'ME.RESERVATION.ADDITIONAL.DURATION.FIELD' | translate}}
           : {{it.duration | durationTime}}</div>
         <mat-divider></mat-divider>
       </mat-list-option>
