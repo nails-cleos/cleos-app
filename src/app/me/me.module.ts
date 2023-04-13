@@ -22,7 +22,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { PaymentEffects } from '../store/effects/payment.effects';
 import { PaymentService } from '../services/payment.service';
 import { ReservationService } from '../services/reservation.service';
-import { ProductService } from '../services/product.service';
+import { TreatmentService } from '../services/treatment.service';
 import { RoomService } from '../services/room.service';
 import { UserService } from '../services/user.service';
 import { AdditionalService } from '../services/additional.service';
@@ -72,7 +72,7 @@ import { OptionComponent } from './reservation/payment/option/option.component';
   providers: [
     ReservationService,
     PaymentService,
-    ProductService,
+    TreatmentService,
     RoomService,
     UserService,
     AdditionalService,

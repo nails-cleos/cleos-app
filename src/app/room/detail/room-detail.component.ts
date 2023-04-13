@@ -1,7 +1,5 @@
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import {
-  AvailabilityDate, IAvailability, IAvailabilityDate, IRoom, IRoomAll
-} from '../../interfaces/room';
+import { AvailabilityDate, IAvailability, IAvailabilityDate, IRoom, IRoomAll } from '../../interfaces/room';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,7 +7,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../store/app.states';
 import * as fromActionsRoom from '../../store/room.actions';
 import { IIcon } from '../room.component';
-import { createDate, getTimeZone } from '../../util/dates';
+import { createDate, getTimeNumber, getTimeZone } from '../../util/dates';
 import { areEquals, getFullUserName } from '../../util/helper';
 import { RoomIconName } from '../../util/icon';
 import { IPaymentType, paymentOptions } from '../../interfaces/payment';
@@ -131,8 +129,8 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private static createAv(date?: string): Date | undefined {
     if (date) {
-      const startTime = date.split(':');
-      return createDate(Number(startTime[0]), Number(startTime[1]));
+      const startTime = getTimeNumber(date)!;
+      return createDate(startTime.hour, startTime.minute);
     }
     return undefined;
   }
@@ -267,8 +265,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
-      }
-      else if (state.message) {
+      } else if (state.message) {
         this.router.navigate(['rooms']);
       }
     });
@@ -363,7 +360,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
         break;
     }
     if (step > -1) {
-      this.errors[`day${step}`] = true;
+      this.errors[`day${ step }`] = true;
       this.setStep(step);
       return false;
     }

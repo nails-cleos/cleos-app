@@ -19,7 +19,7 @@
           "NO_CONTENT": "No availability on <span class='bold'>{{date}}</span>"
         }
       },
-      "PRODUCT": {
+      "TREATMENT": {
         "DETAIL": "Detail",
         "NO_CONTENT": "No services",
         "DISCOUNT": {

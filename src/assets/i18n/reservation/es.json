@@ -29,7 +29,7 @@
         "NONE": "El cliente no tiene reservas",
         "DAYS": "La última reserva fue hace {{days}} días",
         "PROFESSIONAL_NAME": "<span class='bold'>Profesional:</span> {{professional}}",
-        "PRODUCT": "<span class='bold'>Servicio:</span> {{product}}"
+        "TREATMENT": "<span class='bold'>Tratamiento:</span> {{treatment}}"
       }
     },
     "ROOM": {
@@ -43,9 +43,9 @@
     "PROFESSIONAL": {
       "SELECT": "Select professional"
     },
-    "PRODUCT": {
+    "TREATMENT": {
       "DETAIL": "Detalle",
-      "NO_CONTENT": "No hay servicios",
+      "NO_CONTENT": "No hay tratamientos",
       "NAME": {
         "FIELD": "Nombre"
       },
@@ -63,8 +63,8 @@
       },
       "COMPLETE": {
         "DESCRIPTION": "<span class='bold'>Descripción:</span> {{description}}",
-        "GROUP": "<span class='bold'>Tipo de servicio:</span> {{name}}",
-        "NAME": "<span class='bold'>Servicio:</span> {{name}}",
+        "GROUP": "<span class='bold'>Tipo de tratamiento:</span> {{name}}",
+        "NAME": "<span class='bold'>Tratamiento:</span> {{name}}",
         "TOTAL": "<span class='bold'>Total:</span>",
         "PRICE": "<span class='bold'>Price:</span>",
         "DURATION": "<span class='bold'>Duración:</span> {{duration}}"
@@ -77,6 +77,16 @@
     "DATE": {
       "FIELD": "Elegí una fecha",
       "REQUIRED": "Fecha es <b>requerida</b>"
+    },
+    "END": {
+      "DATE": {
+        "FIELD": "Elegí una fecha de fin del tratamiento",
+        "REQUIRED": "Fecha de fin del tratamiento es <b>requerido</b>"
+      },
+      "TIME": {
+        "FIELD": "Elegí una hora de fin del tratamiento",
+        "REQUIRED": "Hora de fin del tratamiento es <b>requerido</b>"
+      }
     },
     "START": {
       "FIELD": "Elegí una hora",
@@ -93,7 +103,7 @@
         "CONTENT": "La nueva reserva se superpone con <div>{{data}}</div> ¿Está seguro de agregar la reserva?",
         "ERROR": "La nueva reserva se superpone con <div>{{data}}</div>"
       },
-      "DETAIL": "<div class='detail'><b>{{professionalName}}</b></div><div class='detail'>{{productName}}</div><div class='detail'>{{customerName}}</div>",
+      "DETAIL": "<div class='detail'><b>{{professionalName}}</b></div><div class='detail'>{{treatmentName}}</div><div class='detail'>{{customerName}}</div>",
       "TITLE": "Agregar nueva reserva",
       "CONTENT": "¿Estás segura de añadir la reserva el {{date}}?",
       "CHANGE": {
@@ -184,9 +194,9 @@
   },
   "WHATSAPP": {
     "SEND": {
-      "APPROVE": "♡ \uD83C\uDD43\uD83C\uDD44 \uD83C\uDD3F\uD83C\uDD41\uD83C\uDD3E\uD83C\uDD47\uD83C\uDD38\uD83C\uDD3C\uD83C\uDD3E \uD83C\uDD42\uD83C\uDD34\uD83C\uDD41\uD83C\uDD45\uD83C\uDD38\uD83C\uDD32\uD83C\uDD34:%0A♡ {{date}} Hs.",
+      "APPROVE": "♡ \uD835\uDC77\uD835\uDC79\uD835\uDC76\uD835\uDC7F\uD835\uDC70\uD835\uDC74\uD835\uDC68 \uD835\uDC6A\uD835\uDC70\uD835\uDC7B\uD835\uDC68 ♡\n{{date}}",
       "TODAY": "♕\uD835\uDC79\uD835\uDC86\uD835\uDC84\uD835\uDC90\uD835\uDC93\uD835\uDC85\uD835\uDC82\uD835\uDC95\uD835\uDC90\uD835\uDC93\uD835\uDC8A\uD835\uDC90 \uD835\uDC85\uD835\uDC86 \uD835\uDC95\uD835\uDC96\uD835\uDC93\uD835\uDC8F\uD835\uDC90♕%0Aℍ\uD835\uDD60\uD835\uDD5D\uD835\uDD52!!! ℍ\uD835\uDD60\uD835\uDD6A {{date}} ℍ\uD835\uDD64 \uD835\uDD65\uD835\uDD56\uD835\uDD5Fé\uD835\uDD64 \uD835\uDD65\uD835\uDD66 \uD835\uDD64\uD835\uDD56\uD835\uDD64\uD835\uDD5Aó\uD835\uDD5F \uD835\uDD55\uD835\uDD56 \uD835\uDD66ñ\uD835\uDD52\uD835\uDD64 ♡♡♡  ℂ\uD835\uDD60\uD835\uDD5F\uD835\uDD57í\uD835\uDD63\uD835\uDD5E\uD835\uDD52\uD835\uDD5E\uD835\uDD56 \uD835\uDD62\uD835\uDD66\uD835\uDD56 \uD835\uDD52\uD835\uDD64\uD835\uDD5A\uD835\uDD64\uD835\uDD65\uD835\uDD5A\uD835\uDD63á\uD835\uDD64 \uD835\uDD61\uD835\uDD60\uD835\uDD63 \uD835\uDD57\uD835\uDD52\uD835\uDD67\uD835\uDD60\uD835\uDD63.%0A❀ \uD835\uDD39\uD835\uDD56\uD835\uDD64\uD835\uDD5A\uD835\uDD65\uD835\uDD60 ❀",
-      "TOMORROW": "♕\uD835\uDC79\uD835\uDC86\uD835\uDC84\uD835\uDC90\uD835\uDC93\uD835\uDC85\uD835\uDC82\uD835\uDC95\uD835\uDC90\uD835\uDC93\uD835\uDC8A\uD835\uDC90 \uD835\uDC85\uD835\uDC86 \uD835\uDC95\uD835\uDC96\uD835\uDC93\uD835\uDC8F\uD835\uDC90♕%0Aℍ\uD835\uDD60\uD835\uDD5D\uD835\uDD52!!! \uD835\uDD44\uD835\uDD52ñ\uD835\uDD52\uD835\uDD5F\uD835\uDD52 {{date}} ℍ\uD835\uDD64 \uD835\uDD65\uD835\uDD56\uD835\uDD5Fé\uD835\uDD64 \uD835\uDD65\uD835\uDD66 \uD835\uDD64\uD835\uDD56\uD835\uDD64\uD835\uDD5Aó\uD835\uDD5F \uD835\uDD55\uD835\uDD56 \uD835\uDD66ñ\uD835\uDD52\uD835\uDD64 ♡♡♡  ℂ\uD835\uDD60\uD835\uDD5F\uD835\uDD57í\uD835\uDD63\uD835\uDD5E\uD835\uDD52\uD835\uDD5E\uD835\uDD56 \uD835\uDD62\uD835\uDD66\uD835\uDD56 \uD835\uDD52\uD835\uDD64\uD835\uDD5A\uD835\uDD64\uD835\uDD65\uD835\uDD5A\uD835\uDD63á\uD835\uDD64 \uD835\uDD61\uD835\uDD60\uD835\uDD63 \uD835\uDD57\uD835\uDD52\uD835\uDD67\uD835\uDD60\uD835\uDD63.%0A❀ \uD835\uDD39\uD835\uDD56\uD835\uDD64\uD835\uDD5A\uD835\uDD65\uD835\uDD60 ❀"
+      "TOMORROW": "♡ RECORDATORIO ♡\n\n\uD835\uDC74\uD835\uDC82ñ\uD835\uDC82\uD835\uDC8F\uD835\uDC82 {{date}}, \uD835\uDC6A\uD835\uDC8D\uD835\uDC86\uD835\uDC90\uD835\uDC94 \uD835\uDC95\uD835\uDC86 \uD835\uDC86\uD835\uDC94\uD835\uDC91\uD835\uDC86\uD835\uDC93\uD835\uDC82!\n\n⚠️ ʟᴀ ᴄɪᴛᴀ ᴘᴜᴇᴅᴇ ꜱᴇʀ ᴄᴀɴᴄᴇʟᴀᴅᴀ, ꜱɪɴ ᴄᴀʀɢᴏ, ʜᴀꜱᴛᴀ 24ʜꜱ ᴀɴᴛᴇꜱ. ᴅᴇ ʟᴏ ᴄᴏɴᴛʀᴀʀɪᴏ ᴅᴇʙᴇʀᴀ ᴀʙᴏɴᴀʀ ᴀʟ ᴍᴇɴᴏꜱ ᴇʟ 30% ᴅᴇʟ ᴛʀᴀᴛᴀᴍɪᴇɴᴛᴏ. \nᴍᴜᴄʜᴀꜱ ɢʀᴀᴄɪᴀꜱ ᴘᴏʀ ᴄᴏᴍᴘʀᴇɴᴅᴇʀ!\n\n♡ \uD835\uDC75\uD835\uDC90\uD835\uDC94 \uD835\uDC97\uD835\uDC86\uD835\uDC8E\uD835\uDC90\uD835\uDC94! ♡"
     }
   }
 }

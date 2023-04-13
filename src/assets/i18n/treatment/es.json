@@ -1,0 +1,55 @@
+{
+  "TREATMENT": {
+    "TITLE": "Agregar tratamientos",
+    "CREATED": "Tratamiento {{name}} creado",
+    "DETAIL": "Actualizar tratamientos",
+    "LIST": {
+      "COLUMN": {
+        "DURABILITY": "Durabilidad",
+        "PRICE": "Precio",
+        "DURATION": "Duración",
+        "DATE": "Actualizado"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No hay tratamientos",
+        "REQUIRED": "Se requiere al menos un tratamiento"
+      }
+    },
+    "NAME": {
+      "FIELD": "Nombre",
+      "REQUIRED": "Nombre es <b>requerido</b>"
+    },
+    "DESCRIPTION": {
+      "FIELD": "Descripción"
+    },
+    "PRICE": {
+      "FIELD": "Precio",
+      "REQUIRED": "Precio es <b>requerido</b>",
+      "GREATER": "Precio debe ser mayor a 1"
+    },
+    "DURATION": {
+      "FIELD": "Duración",
+      "REQUIRED": "Duración es <b>requerido</b>"
+    },
+    "DURABILITY": {
+      "FIELD": "Durabilidad",
+      "MIN": {
+        "FIELD": "Durabilidad mínima"
+      },
+      "MAX": {
+        "FIELD": "Durabilidad máxima"
+      }
+    },
+    "PRIMARY": {
+      "CHECK": "Principal"
+    },
+    "DELETED": {
+      "TITLE": "Eliminar tratamiento",
+      "CONTENT": "¿Está seguro de eliminar el tratamiento {{name}}?",
+      "MESSAGE": "Tratamiento {{name}} eliminado"
+    },
+    "UPDATED": {
+      "MESSAGE": "Tratamiento {{name}} actualizado"
+    }
+  }
+}

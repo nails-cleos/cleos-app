@@ -13,7 +13,7 @@ import { getBackIndex, getPrice, getStep } from "../../../../util/helper";
 import { IStep, Step } from "../../../../interfaces/step";
 import { MatStepper } from "@angular/material/stepper";
 import { IPaymentAll } from "../../../../interfaces/payment";
-import { IPrice } from "../../../../interfaces/product";
+import { IPrice } from "../../../../interfaces/treatment";
 
 @Component({
   selector: 'app-option',

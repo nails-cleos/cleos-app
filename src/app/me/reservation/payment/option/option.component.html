@@ -71,16 +71,16 @@
           <div mat-line>{{bank.value.name}}</div>
         </mat-list-item>
         <mat-divider></mat-divider>
-        <div mat-subheader>{{ 'COMMON.PRODUCT.FIELD' | translate}}</div>
+        <div mat-subheader>{{ 'COMMON.TREATMENT.FIELD' | translate}}</div>
         <mat-list-item>
           <mat-icon matListItemIcon>home_repair_service</mat-icon>
-          <div mat-line>{{ 'ME.RESERVATION.PRODUCT.NAME.FIELD' | translate}}</div>
-          <div mat-line>{{payment.reservation?.product?.name}}</div>
+          <div mat-line>{{ 'ME.RESERVATION.TREATMENT.NAME.FIELD' | translate}}</div>
+          <div mat-line>{{payment.reservation?.treatment?.name}}</div>
         </mat-list-item>
         <mat-list-item>
           <mat-icon matListItemIcon>timer</mat-icon>
-          <div mat-line>{{ 'ME.RESERVATION.PRODUCT.DURATION.FIELD' | translate}}</div>
-          <div mat-line>{{payment.reservation?.product?.duration | durationTime}}</div>
+          <div mat-line>{{ 'ME.RESERVATION.TREATMENT.DURATION.FIELD' | translate}}</div>
+          <div mat-line>{{payment.reservation?.treatment?.duration | durationTime}}</div>
         </mat-list-item>
         <mat-list-item>
           <mat-icon matListItemIcon>{{payment.reservation?.room?.currency?.icon}}</mat-icon>

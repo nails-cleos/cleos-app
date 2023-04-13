@@ -8,7 +8,7 @@
           </mat-card-header>
           <mat-card-content>
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-              <div *ngIf="currencies; else skeleton" fxLayout="row" fxLayoutAlign="space-between center">
+              <div *ngIf="currencies; else skeleton" fxLayout="row" fxLayoutAlign="space-between center" id="fields">
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'COMMON.CURRENCY.FIELD' | translate }}</mat-label>
                   <label>
@@ -68,9 +68,9 @@
                   <span>{{ 'ROOM.OFFICE.ADD_BUTTON' | translate }}</span>
                 </button>
               </div>
-              <div *ngIf="allProfessional; else skeleton" fxLayout="row" fxLayoutAlign="space-between center">
+              <div *ngIf="allProfessional; else skeleton" fxLayout="row" fxLayoutAlign="space-between center" id="professionals">
                 <mat-form-field class="chip-list">
-                  <mat-label>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</mat-label>
+                  <mat-label>{{ 'ROOM.PROFESSIONAL.FIELD' | translate }}</mat-label>
                   <mat-chip-grid #chipList aria-label="Professional selection">
                     <mat-chip-row (removed)="remove(professional)" *ngFor="let professional of professionals"
                                   [removable]="true">
@@ -86,15 +86,6 @@
                       {{professional | userName}}
                     </mat-option>
                   </mat-autocomplete>
-                  <mat-error *ngIf="professional.hasError('required')"
-                             [innerHTML]="'COMMON.PROFESSIONAL.REQUIRED' | translate">
-                  </mat-error>
-                  <mat-error *ngIf="professional.hasError('requireMatch')"
-                             [innerHTML]="'COMMON.PROFESSIONAL.INVALID' | translate">
-                  </mat-error>
-                  <mat-error *ngIf="errors['professional']">
-                    {{errors['professional']}}
-                  </mat-error>
                 </mat-form-field>
                 <button fxShow.lt-sm fxHide (click)="addProfessional" color="accent" mat-fab>
                   <mat-icon matPrefix>person_add_alt_1</mat-icon>
@@ -104,6 +95,8 @@
                   <span>{{ 'COMMON.PROFESSIONAL.ADD_BUTTON' | translate }}</span>
                 </button>
               </div>
+              <mat-error *ngIf="errors['professionals']" [innerHTML]="'ROOM.PROFESSIONAL.REQUIRED' | translate"
+                         class="divider"></mat-error>
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'ROOM.TIME_ZONE.FIELD' | translate }}</mat-label>
                 <label>
@@ -265,7 +258,7 @@
             <div fxFlex></div>
             <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
-            <button  color="primary" mat-fab extended class="icon-button"
+            <button color="primary" mat-fab extended class="icon-button"
                     type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
           </mat-card-actions>
         </mat-card>

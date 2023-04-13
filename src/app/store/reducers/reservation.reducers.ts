@@ -8,7 +8,7 @@ import {
   ITracking
 } from '../../interfaces/reservation';
 import { IUser } from '../../interfaces/user';
-import { IProductDiscountDTO } from '../../interfaces/product';
+import { ITreatmentDiscountDTO } from '../../interfaces/treatment';
 import { IRoom } from '../../interfaces/room';
 import { Pagination } from '../../interfaces/pagination';
 import { IPayment } from '../../interfaces/payment';
@@ -24,7 +24,7 @@ export interface State {
   customer: ICustomerLastReservation | null;
   rooms: IRoom[] | null;
   additional: IAdditional[] | null;
-  productDiscount: IProductDiscountDTO[] | null;
+  treatmentDiscount: ITreatmentDiscountDTO[] | null;
   tracking: ITracking[] | ITracking | null;
   payments: IPayment[] | null;
   history: IReservation[] | null;
@@ -46,7 +46,7 @@ export const initialState: State = {
   customer: null,
   rooms: null,
   additional: null,
-  productDiscount: null,
+  treatmentDiscount: null,
   tracking: null,
   payments: null,
   history: null,
@@ -192,7 +192,7 @@ export const reducer = (state = initialState, action: All): State => {
     case ReservationActionTypes.getServices: {
       return {
         ...state,
-        productDiscount: null,
+        treatmentDiscount: null,
         errorMessage: null,
         error: null,
         subErrors: null,
@@ -341,10 +341,10 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false
       };
     }
-    case ReservationActionTypes.reservationProductsSuccess: {
+    case ReservationActionTypes.reservationTreatmentsSuccess: {
       return {
         ...state,
-        productDiscount: action.payload,
+        treatmentDiscount: action.payload,
         errorMessage: null,
         error: null,
         subErrors: null,

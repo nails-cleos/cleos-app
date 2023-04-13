@@ -1,10 +1,10 @@
 import { All, MainActionTypes } from '../main.actions';
 import { ICatalogue } from '../../interfaces/catalogue';
-import { IProductGroup } from '../../interfaces/product';
+import { ITreatmentGroup } from '../../interfaces/treatment';
 
 export interface State {
   catalogue: ICatalogue[] | null;
-  groups: IProductGroup[] | null;
+  groups: ITreatmentGroup[] | null;
   errorMessage: string | null;
   error: any;
   message: string | null;
@@ -32,7 +32,7 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: true
       };
     }
-    case MainActionTypes.getAllProducts: {
+    case MainActionTypes.getAllTreatments: {
       return {
         ...state,
         groups: null,
@@ -58,7 +58,7 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false
       };
     }
-    case MainActionTypes.productSuccess: {
+    case MainActionTypes.treatmentSuccess: {
       return {
         ...state,
         groups: action.payload,

@@ -27,26 +27,26 @@
               </div>
             </div>
           </div>
-          <h2>{{'ROOM.ME.SERVICES.PRODUCT.TITLE' | translate}}</h2>
+          <h2>{{'ROOM.ME.SERVICES.TREATMENT.TITLE' | translate}}</h2>
           <div *ngIf="groups.size; else boxSkeleton">
             <div *ngFor="let group of groups | keyvalue">
               <div fxLayout="row" fxLayoutAlign="space-evenly stretch">
                 <div class="drag-container">
                   <div class="section-heading">{{group.value.name}}</div>
-                  <div #productList="cdkDropList" (cdkDropListDropped)="drop($event, false)"
-                       [cdkDropListConnectedTo]="[selectedProductList]" [cdkDropListData]="group.value.products"
+                  <div #treatmentList="cdkDropList" (cdkDropListDropped)="drop($event, false)"
+                       [cdkDropListConnectedTo]="[selectedTreatmentList]" [cdkDropListData]="group.value.treatments"
                        cdkDropList
                        class="item-list">
-                    <div *ngFor="let item of group.value.products" cdkDrag class="item-box">{{item.name}}</div>
+                    <div *ngFor="let item of group.value.treatments" cdkDrag class="item-box">{{item.name}}</div>
                   </div>
                 </div>
                 <div class="drag-container">
                   <div class="section-heading">{{group.value.name}}</div>
-                  <div #selectedProductList="cdkDropList" (cdkDropListDropped)="drop($event,true)"
-                       [cdkDropListConnectedTo]="[productList]" [cdkDropListData]="group.value.selectedProducts"
+                  <div #selectedTreatmentList="cdkDropList" (cdkDropListDropped)="drop($event,true)"
+                       [cdkDropListConnectedTo]="[treatmentList]" [cdkDropListData]="group.value.selectedTreatments"
                        cdkDropList
                        class="item-list">
-                    <div (click)="changePrice(item)" *ngFor="let item of group.value.selectedProducts" cdkDrag
+                    <div (click)="changePrice(item)" *ngFor="let item of group.value.selectedTreatments" cdkDrag
                          class="item-box">
                       {{item.name}} - {{item.currency}} {{item.price}}
                     </div>

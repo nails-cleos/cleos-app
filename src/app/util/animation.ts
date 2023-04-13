@@ -33,3 +33,13 @@ export const stampAnimation = trigger(
         ], {params: {deg: 0}}
       )]
   );
+
+export const goTo = (elementId: string): boolean => {
+  document.getElementById(elementId)?.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start',
+    inline: 'nearest'
+  });
+
+  return true;
+}

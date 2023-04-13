@@ -1,0 +1,44 @@
+<mat-card appearance="outlined" class="mat-elevation-z8">
+  <mat-card-header (click)="click($event)"
+                   matTooltip="{{'COMMON.BUTTON.EXPAND.' + expand.toString().toUpperCase() | translate}}"
+                   matTooltipPosition="above">
+    <mat-card-title>
+      {{card.name}}
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content class="dashboard-card-content">
+    <div (click)="click($event)">{{card.description}}</div>
+    <div *ngIf="durability" [innerHTML]="durability" mat-line></div>
+    <div [@detailExpand]="expand ? 'expanded' : 'collapsed'" class="divider detail">
+      <div class="treatment-container">
+        <div *ngFor="let treatment of treatments" class="card-wrap">
+          <mat-card appearance="outlined" (click)="setTreatment(treatment)" class="mini-dashboard-card">
+            <mat-card-header>
+              <mat-card-title class="card-text-color">
+                {{treatment.name}}
+              </mat-card-title>
+              <mat-card-subtitle class="card-text-color">
+                {{treatment.price | currency:'$':'symbol':'0.0' }}
+              </mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content class="card-text-color">
+              <div>{{treatment.description}}</div>
+              <div *ngIf="treatment.duration"
+                   [innerHTML]="'CARD.TREATMENT.DURATION' | translate: {duration: treatment.duration | durationTime}"></div>
+              <div *ngIf="treatment.rating">
+                <app-rating [notEmpty]="true" [rate]="'REVIEW.RATE'" [rating]="treatment.rating" class="card-text-color"
+                            color="primary"></app-rating>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+  <mat-card-actions>
+    <button (click)="setGroup" mat-button>
+      <mat-icon matPrefix>done</mat-icon>
+      {{'COMMON.BUTTON.SELECT' | translate}}
+    </button>
+  </mat-card-actions>
+</mat-card>

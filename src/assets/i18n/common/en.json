@@ -176,7 +176,7 @@
         "FIELD": "Date of birth"
       }
     },
-    "PRODUCT": {
+    "TREATMENT": {
       "FIELD": "Service",
       "REQUIRED": "Service is <b>required</b>",
       "INVALID": "Service is invalid",
@@ -226,7 +226,7 @@
           "PROFESSIONAL": "Professional",
           "START": "Start",
           "STATE": "State",
-          "PRODUCT": "Service"
+          "TREATMENT": "Service"
         },
         "ERROR": {
           "NO_CONTENT": "No reservations"

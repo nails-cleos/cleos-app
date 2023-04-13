@@ -75,11 +75,11 @@
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="product">
+    <ng-container matColumnDef="treatment">
       <th *matHeaderCellDef fxHide.lt-sm fxShow
-          mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.PRODUCT' | translate }}</th>
+          mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }}</th>
       <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
-        <div *ngIf="reservation.id; else skeleton">{{reservation.product.name}}</div>
+        <div *ngIf="reservation.id; else skeleton">{{reservation.treatment.name}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>

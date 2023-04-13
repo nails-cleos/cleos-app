@@ -6,6 +6,12 @@ import { environment } from "../../environments/environment";
 
 declare let google: any;
 
+export enum MapStatus {
+  READY,
+  LOADING,
+  NOT_AVAILABLE
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -14,20 +20,20 @@ export class GeocodeService {
   constructor(private httpClient: HttpClient) {
   }
 
-  public createMap(): Observable<boolean> {
+  public createMap(): Observable<MapStatus> {
     const showMap = environment.production;
     if (showMap) {
       return this.httpClient.jsonp(
         `https://maps.googleapis.com/maps/api/js?libraries=geometry,places&key=${ environment.googleMapKey }&sensor=false`,
         'callback')
-        .pipe(map(() => true),
+        .pipe(map(() => MapStatus.READY),
           catchError((e) => {
             console.error(e)
-            return of(false)
+            return of(MapStatus.NOT_AVAILABLE)
           }),
         );
     }
-    return new Observable((observer) => observer.next(false));
+    return new Observable((observer) => observer.next(MapStatus.NOT_AVAILABLE));
   }
 
   geocodeAddress(lat: number, lng: number, showDistance: boolean | undefined): Observable<any> {

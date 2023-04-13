@@ -14,7 +14,7 @@ import {
   selectNotificationState,
   selectOfficeState,
   selectPaymentState,
-  selectProductState,
+  selectTreatmentState,
   selectReservationState,
   selectRoomState,
   selectUnavailableState,
@@ -95,7 +95,7 @@ export class NavComponent implements OnInit, OnDestroy {
     this.language = this.translate.currentLang;
     this.getState = this.store.select(selectAuthState);
     this.getNotificationState = this.store.select(selectNotificationState);
-    this.selectStore([selectRoomState, selectProductState, selectCatalogueState, selectDiscountState,
+    this.selectStore([selectRoomState, selectTreatmentState, selectCatalogueState, selectDiscountState,
       selectUnavailableState, selectUserState, selectReservationState, selectPaymentState, selectAdditionalState,
       selectCurrencyState, selectOfficeState]);
     this.navigation.subscribe();

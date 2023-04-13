@@ -174,10 +174,10 @@
         "FIELD": "Fecha de nacimiento"
       }
     },
-    "PRODUCT": {
-      "FIELD": "Servicio",
-      "REQUIRED": "Servicio es <b>requerido</b>",
-      "INVALID": "Servicio no valido",
+    "TREATMENT": {
+      "FIELD": "Tratamiento",
+      "REQUIRED": "Tratamiento es <b>requerido</b>",
+      "INVALID": "Tratamiento no valido",
       "DURABILITY": {
         "TITLE": {
           "DIFFERENT": "<span class='bold'>Durabilidad:</span> {{min}} a {{max}} días",
@@ -188,9 +188,9 @@
         "NONE": "-"
       },
       "GROUP": {
-        "FIELD": "Tipo de servicio",
-        "REQUIRED": "Tipo de servicio es <b>requerido</b>",
-        "INVALID": "Tipo de servicio no valido"
+        "FIELD": "Tipo de tratamiento",
+        "REQUIRED": "Tipo de tratamiento es <b>requerido</b>",
+        "INVALID": "Tipo de tratamiento no valido"
       }
     },
     "ADDITIONAL": {
@@ -224,7 +224,7 @@
           "PROFESSIONAL": "Profesional",
           "START": "Inicio",
           "STATE": "Estado",
-          "PRODUCT": "Servicio"
+          "TREATMENT": "Tratamiento"
         },
         "ERROR": {
           "NO_CONTENT": "No hay reservas"

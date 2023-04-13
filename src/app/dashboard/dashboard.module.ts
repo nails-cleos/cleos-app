@@ -11,7 +11,7 @@ import { ReservationEffects } from '../store/effects/reservation.effects';
 import { DashboardService } from '../services/dashboard.service';
 import { ReservationService } from '../services/reservation.service';
 import { PaymentService } from '../services/payment.service';
-import { ProductService } from '../services/product.service';
+import { TreatmentService } from '../services/treatment.service';
 import { RoomService } from '../services/room.service';
 import { UserService } from '../services/user.service';
 import { AdditionalService } from '../services/additional.service';
@@ -42,7 +42,7 @@ import { DayViewSchedulerComponent } from './day-view-scheduler.component';
     DashboardService,
     ReservationService,
     PaymentService,
-    ProductService,
+    TreatmentService,
     RoomService,
     UserService,
     AdditionalService,
