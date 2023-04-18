@@ -59,7 +59,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
 
   description: UntypedFormControl = new UntypedFormControl();
   extraPrice: UntypedFormControl = new UntypedFormControl();
-  type: UntypedFormControl = new UntypedFormControl(PaymentType.cash);
+  type: UntypedFormControl = new UntypedFormControl(PaymentType.transfer);
   transfer: UntypedFormControl = new UntypedFormControl();
 
   types: string[] = [PaymentType.cash, PaymentType.transfer];

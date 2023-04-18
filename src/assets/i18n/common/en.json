@@ -210,7 +210,8 @@
     },
     "DASHBOARD": {
       "HOME": "Home",
-      "DARK_MODE": "Dark mode"
+      "DARK_MODE": "Dark mode",
+      "LIGHT_MODE": "Light mode"
     },
     "CURRENCY": {
       "FIELD": "Currency",

@@ -60,7 +60,7 @@ export class NavComponent implements OnInit, OnDestroy {
   canChangePassword = false;
   showInformation = true;
 
-  language: string;
+  dateFormat: string;
 
   isProfessional = false;
   isManager = false;
@@ -92,7 +92,7 @@ export class NavComponent implements OnInit, OnDestroy {
               private cookieService: CookieService, private overlayContainer: OverlayContainer,
               private themeService: ThemeService) {
     this.checked = isDarkMode(cookieService.get(THEME) as Theme);
-    this.language = this.translate.currentLang;
+    this.dateFormat = this.translate.currentLang;
     this.getState = this.store.select(selectAuthState);
     this.getNotificationState = this.store.select(selectNotificationState);
     this.selectStore([selectRoomState, selectTreatmentState, selectCatalogueState, selectDiscountState,
@@ -104,6 +104,19 @@ export class NavComponent implements OnInit, OnDestroy {
   get logout(): void {
     return this.store.dispatch(
       new fromActionsLogin.LogOut()
+    );
+  }
+
+  get changeTheme(): void {
+    this.checked = !this.checked;
+    const theme: Theme = getThemeName(this.checked);
+    this.resetTheme(theme);
+    const user: IUser = new User();
+    user.theme = theme;
+    const redirectUrl = this.router.url;
+    const message = this.translate.instant(`COMMON.PROFILE.UPDATED.DARK_MODE_${ this.checked.toString().toUpperCase() }`);
+    return this.store.dispatch(
+      new fromActionsUser.UpdateUser({ user, redirectUrl, message })
     );
   }
 
@@ -151,18 +164,6 @@ export class NavComponent implements OnInit, OnDestroy {
 
   setStep(index: number): void {
     this.step = index;
-  }
-
-  setTheme(checked: boolean): void {
-    const theme: Theme = getThemeName(checked);
-    this.resetTheme(theme);
-    const user: IUser = new User();
-    user.theme = theme;
-    const redirectUrl = this.router.url;
-    const message = this.translate.instant(`COMMON.PROFILE.UPDATED.DARK_MODE_${ checked.toString().toUpperCase() }`);
-    this.store.dispatch(
-      new fromActionsUser.UpdateUser({ user, redirectUrl, message })
-    );
   }
 
   private selectStore(states: any[]): void {

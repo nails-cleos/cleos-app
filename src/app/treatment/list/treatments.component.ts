@@ -32,7 +32,7 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
   pageSize = PAGE_SIZE;
 
   expanded?: ITreatmentGroup;
-  language: string;
+  dateFormat: string;
 
   private subscription?: Subscription;
   private paginatorSubscription?: Subscription;
@@ -48,7 +48,7 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.pageSize = MOBILE_PAGE_SIZE;
       }
     });
-    this.language = this.translate.currentLang;
+    this.dateFormat = this.translate.currentLang;
     this.getState = this.store.select(selectTreatmentState);
   }
 

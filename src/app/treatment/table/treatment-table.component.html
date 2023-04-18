@@ -3,7 +3,7 @@
     <th *matHeaderCellDef mat-header-cell>{{ 'TREATMENT.LIST.COLUMN.DATE' | translate }}</th>
     <td *matCellDef="let treatment" mat-cell>
       <div *ngIf="treatment.id; else skeleton">
-        {{treatment.createdAt | date:'shortDate':undefined:language}}
+        {{treatment.createdAt | date:'shortDate':undefined:dateFormat}}
       </div>
       <ng-template #skeleton>
         <div class="ssc-line"></div>

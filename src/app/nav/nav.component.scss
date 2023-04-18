@@ -23,7 +23,7 @@ mat-drawer-container {
     }
 
     img {
-      margin-right: 1%;
+      margin-right: 5% !important;
     }
 
     .badge-padding {
@@ -104,8 +104,19 @@ mat-drawer-container {
 
 img {
   border-radius: 50%;
-  width: 60px;
-  height: 60px;
+  margin-right: 5% !important;
+}
+
+@media all and (max-device-width: 812px) and (orientation: portrait) {
+  img {
+    max-width: 52px !important;
+  }
+}
+
+@media not all and (max-device-width: 812px) and (orientation: portrait) {
+  img {
+    max-width: 60px !important;
+  }
 }
 
 ::ng-deep .mat-mdc-list .mat-mdc-list-item .mat-line {

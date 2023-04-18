@@ -7,7 +7,7 @@
          class="stepper-item">
       <div class="step-counter">
         <span *ngIf="tracking.createdTimestamp">
-          {{tracking.createdTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:language}}
+          {{tracking.createdTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat}}
         </span>
       </div>
       <div class="step-name">{{'COMMON.STATUS.RESERVATION.CREATED' | translate}}</div>
@@ -18,7 +18,7 @@
     }" class="stepper-item">
       <div class="step-counter">
         <span *ngIf="tracking.approvedTimestamp">
-          {{tracking.approvedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:language}}
+          {{tracking.approvedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat}}
         </span>
       </div>
       <div class="step-name">{{'COMMON.STATUS.RESERVATION.APPROVED' | translate}}</div>
@@ -27,7 +27,7 @@
          class="stepper-item">
       <div class="step-counter">
         <span *ngIf="tracking.startedTimestamp">
-          {{tracking.startedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:language}}
+          {{tracking.startedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat}}
         </span>
       </div>
       <div class="step-name">{{'COMMON.STATUS.RESERVATION.STARTED' | translate}}</div>
@@ -38,7 +38,7 @@
       }" class="stepper-item">
       <div class="step-counter">
         <span *ngIf="tracking.completedTimestamp">
-          {{tracking.completedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:language}}
+          {{tracking.completedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat}}
         </span>
       </div>
       <div class="step-name">{{'COMMON.STATUS.RESERVATION.COMPLETED' | translate}}</div>

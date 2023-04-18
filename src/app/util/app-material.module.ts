@@ -23,6 +23,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from "@angular/material/radio";
 import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
+import { LayoutModule } from '@angular/cdk/layout';
+import { MatSidenavModule } from '@angular/material/sidenav';
 
 const materialModules = [
   NgxMaterialTimepickerModule,
@@ -47,7 +49,9 @@ const materialModules = [
   MatTooltipModule,
   MatCheckboxModule,
   MatRadioModule,
-  MatSlideToggleModule
+  MatSlideToggleModule,
+  LayoutModule,
+  MatSidenavModule
 ];
 
 @NgModule({

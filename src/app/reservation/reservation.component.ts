@@ -173,7 +173,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   day: IDay;
   refresh: Subject<any> = new Subject();
 
-  locale: string;
+  dateFormat: string;
   smallScreen?: boolean;
   isPreview = false;
   duration: IDuration = new Duration();
@@ -209,7 +209,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.price = new Price();
     this.day = new Day();
     this.getState = this.store.select(selectReservationState);
-    this.locale = this.translate.currentLang;
+    this.dateFormat = this.translate.currentLang;
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -229,7 +229,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.isDashboard = this.extras.isDashboard;
       if (this.extras.date) {
         this.date.setValue(this.extras.date);
-        this.start.setValue(getTime(this.extras.date, this.locale));
+        this.start.setValue(getTime(this.extras.date, this.dateFormat));
       }
     }
     this.store.select(selectAuthState).subscribe((state: any) => {
@@ -504,7 +504,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openDialog(reservationDate?: Date): void {
-    openDialog(this.room.value, this.locale, this.translate, this.dialog, reservationDate);
+    openDialog(this.room.value, this.dateFormat, this.translate, this.dialog, reservationDate);
   }
 
   segmentClick(date: Date, state: string, id?: string): void {
@@ -595,7 +595,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   private createEvent(date: Date, state: string, id?: string): void {
     this.errors.overlapping = false;
     this.date.setValue(date);
-    this.start.setValue(getTime(date, this.locale));
+    this.start.setValue(getTime(date, this.dateFormat));
     const nowTime = getTimeNumber(date)!;
 
     const start = createNewDate(date, nowTime.hour, nowTime.minute);
@@ -1126,7 +1126,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.room.setValue(reservation.room);
     this.professional.setValue(reservation.professional);
     this.date.setValue(date);
-    this.start.setValue(getTime(date, this.locale));
+    this.start.setValue(getTime(date, this.dateFormat));
     this.customer.setValue(reservation.customer);
     this.price = getPrice(this.reservation);
     this.additionalSelected = this.reservation.additional ? this.reservation.additional

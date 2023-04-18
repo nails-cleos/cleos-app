@@ -5,7 +5,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { stampAnimation, transitionAnimation } from '../../../util/animation';
 import { createNewDate, isSameTimeZone, newDateTimestamp, reservationDuration } from '../../../util/dates';
 import { MatDialog } from '@angular/material/dialog';
-import { AngularFireAnalytics } from "@angular/fire/compat/analytics";
 
 @Component({
   selector: 'app-upcoming',
@@ -18,10 +17,10 @@ export class UpcomingComponent implements OnChanges {
   @Input() showHeader: boolean;
 
   paymentTypes?: string[];
-  language: string;
+  dateFormat: string;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog) {
-    this.language = translate.currentLang;
+    this.dateFormat = this.translate.currentLang;
     this.showHeader = false;
   }
 
@@ -35,7 +34,7 @@ export class UpcomingComponent implements OnChanges {
 
   openDialog(reservationDate: Date): void {
     if (this.upcoming) {
-      openDialog(this.upcoming.room, this.language, this.translate, this.dialog, reservationDate);
+      openDialog(this.upcoming.room, this.dateFormat, this.translate, this.dialog, reservationDate);
     }
   }
 

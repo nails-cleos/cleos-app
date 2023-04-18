@@ -151,11 +151,11 @@ export class GoogleMapComponent implements OnInit, AfterViewInit {
     if (!this.addressFormGroup?.get('address')?.value) {
       const value = {
         address_components: [],
-        formatted_address: 'Mock address',
+        formatted_address: `Mock address - ${new Date().getTime()}`,
         geometry: {
           location: {
-            lat: () => this.latitude,
-            lng: () => this.longitude,
+            lat: () => this.getRandomInRange(-90, 90),
+            lng: () => this.getRandomInRange(-180, 180),
             toJSON: () => 'toJSON mock',
             toString: () => 'toString mock'
           },
@@ -171,5 +171,10 @@ export class GoogleMapComponent implements OnInit, AfterViewInit {
       this.addressFormGroup?.get('address')?.setValue(value.formatted_address)
       this.addressEmitter.emit(value);
     }
+  }
+
+  private getRandomInRange(from: number, to: number, fixed: number = 3): number {
+    return Number((Math.random() * (to - from) + from).toFixed(fixed)) * 1;
+    // .toFixed() returns string, so ' * 1' is a trick to convert to number
   }
 }

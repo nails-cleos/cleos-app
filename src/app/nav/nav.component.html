@@ -106,7 +106,7 @@
               <div [matTooltip]="not.message" [ngClass]="{ 'gray-text': not.read}" mat-line>
                 <span *ngIf="!not.read" class="dot"></span>{{not.message}}
               </div>
-              <div [ngClass]="{ 'gray-text': not.read}" mat-line>{{not.date | date:'short':undefined:language}}</div>
+              <div [ngClass]="{ 'gray-text': not.read}" mat-line>{{not.date | date:'short':undefined:dateFormat}}</div>
               <mat-divider class="divider"></mat-divider>
             </mat-list-item>
             <mat-list-item>
@@ -145,7 +145,7 @@
         </ng-template>
 
         <button [matMenuTriggerFor]="menuLogged" [ngClass]="{'badge-padding': incomplete}" mat-icon-button>
-          <mat-icon [matBadgeHidden]="!incomplete" [matBadge]="'*'" matBadgeColor="warn">person_pin
+          <mat-icon [matBadgeHidden]="!incomplete" [matBadge]="'*'" matBadgeColor="warn">settings
           </mat-icon>
         </button>
         <mat-menu #menuLogged="matMenu">
@@ -157,28 +157,28 @@
             <mat-divider></mat-divider>
             <a [routerLink]="'/auth/profile'" mat-list-item>
               <mat-icon *ngIf="incomplete; else complete" matListItemIcon matBadgeColor="warn" [matBadge]="'*'">
-                settings
+                badge
               </mat-icon>
               <ng-template #complete>
-                <mat-icon matListItemIcon>settings</mat-icon>
+                <mat-icon matListItemIcon>badge</mat-icon>
               </ng-template>
               <div mat-line>{{'DASHBOARD.PROFILE' | translate }}</div>
             </a>
             <mat-divider></mat-divider>
             <a *ngIf="canChangePassword" [routerLink]="'/auth/change-password'" mat-list-item>
-              <mat-icon matListItemIcon>mode_edit</mat-icon>
+              <mat-icon matListItemIcon>password</mat-icon>
               <div mat-line>{{'DASHBOARD.CHANGE_PASSWORD' | translate }}</div>
+            </a>
+            <mat-divider></mat-divider>
+            <a (click)="changeTheme" mat-list-item>
+              <mat-icon matListItemIcon>{{checked ? 'light_mode' : 'dark_mode'}}</mat-icon>
+              <div mat-line>{{'COMMON.DASHBOARD.' + (checked ? 'LIGHT_MODE' : 'DARK_MODE') | translate }}</div>
             </a>
             <mat-divider></mat-divider>
             <a (click)="logout" mat-list-item>
               <mat-icon matListItemIcon>exit_to_app</mat-icon>
               <div mat-line>{{'DASHBOARD.SIGN_OUT' | translate }}</div>
             </a>
-            <mat-divider></mat-divider>
-            <mat-list-item>
-              <mat-slide-toggle (change)="setTheme($event.checked)" [checked]="checked" color="accent"
-                                mat-line>{{'COMMON.DASHBOARD.DARK_MODE' | translate }}</mat-slide-toggle>
-            </mat-list-item>
           </mat-nav-list>
         </mat-menu>
       </div>

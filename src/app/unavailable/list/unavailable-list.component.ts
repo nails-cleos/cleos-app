@@ -34,7 +34,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
 
-  language: string;
+  dateFormat: string;
 
   private subscription?: Subscription;
   private paginatorSubscription?: Subscription;
@@ -51,7 +51,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
       }
     });
     this.getState = this.store.select(selectUnavailableState);
-    this.language = this.translate.currentLang;
+    this.dateFormat = this.translate.currentLang;
   }
 
   ngAfterViewInit(): void {
@@ -98,7 +98,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
     const time = newDateTimestamp(unavailable.timestamp);
     const name = getUserName(unavailable.professional);
     const timeZone = unavailable.professional.timeZone;
-    createDialog('PROFESSIONAL_INFO', name, this.language, this.translate, this.dialog, timeZone, time);
+    createDialog('PROFESSIONAL_INFO', name, this.dateFormat, this.translate, this.dialog, timeZone, time);
   }
 
   private subscribe(): void {

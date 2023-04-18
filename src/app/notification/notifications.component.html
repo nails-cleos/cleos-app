@@ -15,7 +15,7 @@
                 <div [matTooltip]="not.message" [ngClass]="{ 'gray-text': not.read}" mat-line>
                   <span *ngIf="!not.read" class="dot"></span>{{not.message}}
                 </div>
-                <div [ngClass]="{ 'gray-text': not.read}" mat-line>{{not.date | date:'short':undefined:language}}</div>
+                <div [ngClass]="{ 'gray-text': not.read}" mat-line>{{not.date | date:'short':undefined:dateFormat}}</div>
                 <mat-divider *ngIf="!last || showMore" class="divider"></mat-divider>
               </mat-list-item>
               <mat-list-item *ngFor="let n of loadingNotifications">

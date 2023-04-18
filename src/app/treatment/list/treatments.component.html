@@ -66,7 +66,7 @@
           <mat-list>
             <div mat-subheader>{{ 'COMMON.COLUMN.LAST_UPDATE' | translate }}</div>
             <mat-list-item role="list">
-              <div matListItemLine>{{treatment.modifiedAt | date:'short':undefined:language}}</div>
+              <div matListItemLine>{{treatment.modifiedAt | date:'short':undefined:dateFormat}}</div>
             </mat-list-item>
             <div fxHide fxShow.lt-sm mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
             <mat-list-item fxHide fxShow.lt-sm role="list">
