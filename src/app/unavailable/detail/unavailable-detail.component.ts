@@ -22,7 +22,7 @@ import {
   getTime,
   getTimeNumber,
   newDate,
-  newDateTimestamp
+  zoneDateToDate
 } from '../../util/dates';
 import { IRoomAll } from '../../interfaces/room';
 import { IUser } from '../../interfaces/user';
@@ -107,7 +107,7 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
     let date: Date;
     if (!this.allDay.value) {
       const time = getTimeNumber(this.startTime.value);
-      date = createNewDate(this.startDate.value, time!.hour, time!.minute);
+      date = createNewDate(this.startDate.value, time?.hour, time?.minute);
     } else {
       date = createNewDate(this.startDate.value);
     }
@@ -128,7 +128,7 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
   get focusin(): void {
     if (this.rooms.length && this.startTime.value) {
       const time = getTimeNumber(this.startTime.value);
-      const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time!.hour, time!.minute);
+      const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time?.hour, time?.minute);
       const day = date.getDay();
       const { minDate, maxDate, roomAvailability } = getMinMaxDate(day, date, this.rooms);
 
@@ -178,7 +178,7 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
 
   setTime($event: any): void {
     const time = getTimeNumber($event);
-    const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time!.hour, time!.minute);
+    const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time?.hour, time?.minute);
 
     let maxHour;
     let diffMin;
@@ -257,11 +257,10 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
         this.rooms = state.room;
       }
       if (state.selected) {
-        const date = newDateTimestamp(state.selected.timestamp);
+        const date = zoneDateToDate(state.selected.timestamp);
         if (!this.rooms.length) {
           this.getRoom(state.selected.professional);
         }
-        console.log("RESERVATION START", state.selected.start)
         this.unavailable = {
           id: state.selected.id,
           description: state.selected.description,
