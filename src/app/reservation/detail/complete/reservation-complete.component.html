@@ -106,10 +106,7 @@
                   </div>
                   <div matListItemTitle>
                     <span [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.PRICE' | translate"></span>
-                    <span [class.strikethrough]="price.discount"
-                          class="vertical-divider">$ {{price.amount | number:'1.2-2'}}</span>
-                    <span *ngIf="price.priceWithDiscount" [@discountAnimation]
-                          class="vertical-divider bold">$ {{price.priceWithDiscount | number:'1.2-2'}}</span>
+                    <span class="vertical-divider bold">$ {{price.amount | number:'1.2-2'}}</span>
                   </div>
                   <div *ngIf="durability" [innerHTML]="durability" matListItemLine></div>
                 </mat-list-item>
@@ -128,7 +125,10 @@
                 <mat-list-item>
                   <div mat-line>
                     <span [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.TOTAL' | translate"></span>
-                    <span class="vertical-divider bold">$ {{price.total | number:'1.2-2'}}</span>
+                    <span [class.strikethrough]="price.discount"
+                          class="vertical-divider">$ {{price.totalWithoutDiscount | number:'1.2-2'}}</span>
+                    <span *ngIf="price.total" [@discountAnimation]
+                          class="vertical-divider bold">$ {{price.total | number:'1.2-2'}}</span>
                   </div>
                 </mat-list-item>
               </mat-list>
