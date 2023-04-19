@@ -297,7 +297,7 @@
     [daysInWeek]="daysInWeek"
     [events]="events"
     [hourSegments]="4"
-    [locale]="locale"
+    [locale]="dateFormat"
     [refresh]="refresh"
     [viewDate]="viewDate"
     [weekendDays]="weekendDays"></mwl-calendar-week-view>
@@ -410,13 +410,13 @@
           <mat-icon matListItemIcon>event</mat-icon>
           <div matListItemLine>
             <div>
-              {{event.value.start | date:'short':room.value.timeZone:locale}}
+              {{event.value.start | date:'short':room.value.timeZone:dateFormat}}
               <button (click)="openDialog(event.value?.start)" *ngIf="showTimeZone" mat-icon-button type="button">
                 <mat-icon>info_outline</mat-icon>
               </button>
             </div>
             <div>
-              {{event.value?.end | date:'short':room.value.timeZone:locale}}
+              {{event.value?.end | date:'short':room.value.timeZone:dateFormat}}
               <button (click)="openDialog(event.value?.end)" *ngIf="showTimeZone" mat-icon-button type="button">
                 <mat-icon>info_outline</mat-icon>
               </button>

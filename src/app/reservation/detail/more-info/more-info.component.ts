@@ -25,7 +25,7 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
   payments?: IPaymentAll[];
   reservation?: IReservationAll;
 
-  language: string;
+  dateFormat: string;
   totalTime?: string;
 
   private paymentGetState: Observable<any>;
@@ -39,7 +39,7 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
               private clipboard: Clipboard, private snackBar: MatSnackBar) {
     this.getState = this.store.select(selectReservationState);
     this.paymentGetState = this.store.select(selectPaymentState);
-    this.language = this.translate.currentLang;
+    this.dateFormat = this.translate.currentLang;
   }
 
   ngOnInit(): void {

@@ -24,9 +24,10 @@ import { MatPaginatorIntl } from '@angular/material/paginator';
 import { PaginatorI18n } from './util/paginator';
 import { TranslationLoaderResolver } from './util/translation.resolver';
 import localeEn from '@angular/common/locales/en';
-import localeEnExtra from '@angular/common/locales/extra/en';
+import localeEnGB from '@angular/common/locales/en-GB';
+import localeEnNL from '@angular/common/locales/en-NL';
 import localeEs from '@angular/common/locales/es';
-import localeEsExtra from '@angular/common/locales/extra/es';
+import localeAr from '@angular/common/locales/es-AR';
 import { CookieService } from 'ngx-cookie-service';
 import { TranslateLoaderFactory } from './shared/translate-loader.factory';
 import {
@@ -76,8 +77,11 @@ export const localStorageSyncReducer =
 
 const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
 
-registerLocaleData(localeEn, 'en', localeEnExtra);
-registerLocaleData(localeEs, 'es', localeEsExtra);
+registerLocaleData(localeEn, 'en');
+registerLocaleData(localeEnGB, 'en-GB');
+registerLocaleData(localeEnNL, 'en-NL');
+registerLocaleData(localeEs, 'es');
+registerLocaleData(localeAr, 'es-AR');
 
 @NgModule({
   declarations: [

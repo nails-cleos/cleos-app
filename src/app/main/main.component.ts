@@ -32,6 +32,22 @@ export class MainComponent {
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(map(result => result.matches), shareReplay());
 
+  get changeTheme(): void {
+    this.checked = !this.checked;
+    const theme: Theme = getThemeName(this.checked);
+    this.resetTheme(theme);
+    if (this.isAuthenticated) {
+      const user: IUser = new User();
+      user.theme = theme;
+      const redirectUrl = this.router.url;
+      const message = this.translate.instant(`COMMON.PROFILE.UPDATED.DARK_MODE_${this.checked.toString().toUpperCase()}`);
+      this.store.dispatch(
+        new fromActionsUser.UpdateUser({user, redirectUrl, message})
+      );
+    }
+    return;
+  }
+
   constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
               private viewportScroller: ViewportScroller, private router: Router, private translate: TranslateService,
               private overlayContainer: OverlayContainer, private cookieService: CookieService,
@@ -54,20 +70,6 @@ export class MainComponent {
     this.router.navigate(['main']).then(() => {
       this.viewportScroller.scrollToAnchor(elementId);
     });
-  }
-
-  setTheme(checked: boolean): void {
-    const theme: Theme = getThemeName(checked);
-    this.resetTheme(theme);
-    if (this.isAuthenticated) {
-      const user: IUser = new User();
-      user.theme = theme;
-      const redirectUrl = this.router.url;
-      const message = this.translate.instant(`COMMON.PROFILE.UPDATED.DARK_MODE_${checked.toString().toUpperCase()}`);
-      this.store.dispatch(
-        new fromActionsUser.UpdateUser({user, redirectUrl, message})
-      );
-    }
   }
 
   private resetTheme(theme?: Theme): void {

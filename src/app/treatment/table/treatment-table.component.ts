@@ -22,10 +22,10 @@ export class TreatmentTableComponent implements AfterViewInit, OnChanges {
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
-  language: string;
+  dateFormat: string;
 
   constructor(protected translate: TranslateService) {
-    this.language = translate.currentLang;
+    this.dateFormat = this.translate.currentLang;
   }
 
   ngAfterViewInit(): void {

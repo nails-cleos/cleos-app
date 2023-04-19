@@ -22,7 +22,7 @@ export class ActivateAccountComponent implements OnInit, OnDestroy {
   constructor(private store: Store<AppState>, private route: ActivatedRoute, private router: Router,
               private translate: TranslateService) {
     this.getState = this.store.select(selectAuthState);
-    this.locale = getLocale(this.route.snapshot.queryParamMap.get('locale') || navigator.language);
+    this.locale = getLocale(this.route.snapshot.queryParamMap.get('locale') || navigator.language).language;
   }
 
   get activate(): void {

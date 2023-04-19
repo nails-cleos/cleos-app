@@ -11,7 +11,7 @@
 <!--Calendar-->
 <mat-card appearance="outlined">
   <mat-card-header>
-    <mat-card-title>{{ viewDate | calendarDate:(view + 'ViewTitle'):locale }}
+    <mat-card-title>{{ viewDate | calendarDate:(view + 'ViewTitle'):dateFormat }}
       <div *ngIf="!isCalendarLoading; else skeleton">
         <div [innerHTML]="'DASHBOARD.RESERVATION.COMPLETED' | translate: {completed: completed}">
         </div>
@@ -61,7 +61,7 @@
   </mat-card-header>
   <mat-card-content *ngIf="!isCalendarLoading; else calendarLoading">
     <mwl-calendar-month-view (dayClicked)="dayClicked($event.day)" (eventClicked)="handleEvent($event.event)"
-                             [activeDayIsOpen]="activeDayIsOpen" [events]="events" [locale]="locale"
+                             [activeDayIsOpen]="activeDayIsOpen" [events]="events" [locale]="dateFormat"
                              [viewDate]="viewDate"></mwl-calendar-month-view>
   </mat-card-content>
   <ng-template #calendarLoading>

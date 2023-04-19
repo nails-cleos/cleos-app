@@ -27,7 +27,7 @@ export class RecoveryPasswordComponent implements OnInit, OnDestroy {
   constructor(private store: Store<AppState>, private route: ActivatedRoute, private translate: TranslateService,
               private router: Router, private snackBar: MatSnackBar, private formBuilder: FormBuilder) {
     this.getState = this.store.select(selectAuthState);
-    this.locale = getLocale(this.route.snapshot.queryParamMap.get('locale') || navigator.language);
+    this.locale = getLocale(this.route.snapshot.queryParamMap.get('locale') || navigator.language).language;
   }
 
   get recoveryPassword(): void {

@@ -12,7 +12,7 @@ import { AppState, selectReservationState } from '../../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import * as fromActionsReservation from '../../../store/reservation.actions';
 import { isSameTimeZone, newDateTimestamp } from '../../../util/dates';
-import { openDialog } from '../../../util/helper';
+import { getLocale, openDialog } from '../../../util/helper';
 import { stampAnimation, transitionAnimation } from '../../../util/animation';
 import { IReview, Review } from '../../../interfaces/review';
 import { ReviewDialogComponent } from '../review/review-dialog.component';
@@ -38,7 +38,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
 
-  language: string;
+  dateFormat: string;
   error: any;
 
   private data?: ICustomerReservation;
@@ -49,7 +49,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef, private analytic: AngularFireAnalytics) {
     this.getState = this.store.select(selectReservationState);
-    this.language = this.translate.currentLang;
+    this.dateFormat = this.translate.currentLang;
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -106,7 +106,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
 
   openDialog(reservation: IReservationAll): void {
     const time = newDateTimestamp(reservation.timestamp);
-    openDialog(reservation.room, this.language, this.translate, this.dialog, time);
+    openDialog(reservation.room, this.dateFormat, this.translate, this.dialog, time);
   }
 
   private clean(): void {

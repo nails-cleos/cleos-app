@@ -37,7 +37,7 @@ export class DashComponent implements OnInit, OnDestroy {
   view: CalendarView = CalendarView.Month;
   viewDate: Date;
   activeDayIsOpen = false;
-  locale: string;
+  dateFormat: string;
   events: CalendarEvent[] = [];
   isCalendarLoading = true;
   isLoading: any;
@@ -103,7 +103,7 @@ export class DashComponent implements OnInit, OnDestroy {
       });
     });
     this.viewDate = getNow();
-    this.locale = this.translate.currentLang;
+    this.dateFormat = this.translate.currentLang;
     this.totalReservation = 0;
   }
 
