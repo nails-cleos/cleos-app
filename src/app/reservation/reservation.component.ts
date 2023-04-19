@@ -1,13 +1,4 @@
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  Inject,
-  Input,
-  OnDestroy,
-  OnInit,
-  ViewChild
-} from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, Inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
@@ -128,6 +119,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   ]);
 
   discounts?: IUserDiscount[];
+  userDiscount?: IUserDiscount;
   discount = new UntypedFormControl();
   showDiscount = false;
   price: IPrice;
@@ -164,7 +156,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   reference: UntypedFormControl = new UntypedFormControl();
 
   eventGroup!: UntypedFormGroup;
-  event: UntypedFormControl = new UntypedFormControl('', [Validators.required])
+  event: UntypedFormControl = new UntypedFormControl('', [Validators.required]);
 
   viewDate: Date = getNow();
   daysInWeek = 7;
@@ -265,7 +257,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.isPreview) {
       this.isPreview = false;
     } else {
-      this.event.setValue(undefined)
+      this.event.setValue(undefined);
     }
     this.myStepper.selectedIndex = getBackIndex(this.steps, this.myStepper.selectedIndex);
     return;
@@ -585,7 +577,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onChange(options: MatListOption[]): void {
     this.additionalSelected = options.map(o => o.value);
-    this.price = newAdditional(this.price, this.additionalSelected);
+    this.price = newAdditional(this.price, this.additionalSelected, this.userDiscount?.discount);
   }
 
   isSelected(it: IAdditionalAll): boolean {
@@ -772,7 +764,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.treatment.valueChanges.subscribe(value => {
       if (value) {
-        this.price = newPrice(this.price, value.price);
+        this.price = newPrice(this.price, value.price, this.userDiscount?.discount);
       }
       if (this.extras && this.extras.discount) {
         this.showDiscount = true;
@@ -781,9 +773,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.discount.valueChanges.subscribe(value => {
       if (value && this.discounts) {
-        const userDiscount = this.discounts.find(d => d.id === value);
-        if (userDiscount) {
-          this.price = newDiscount(this.price, userDiscount.discount);
+        this.userDiscount = this.discounts.find(d => d.id === value);
+        if (this.userDiscount) {
+          this.price = newDiscount(this.price, this.userDiscount.discount);
         }
       }
     });
@@ -1002,7 +994,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           if (this.reservationId && this.reservation && this.date.value && this.myStepper.selectedIndex === bookOrder) {
             let date: Date;
             if (this.start?.value) {
-              const time = getTimeNumber(this.start.value)!
+              const time = getTimeNumber(this.start.value)!;
               date = createNewDate(this.date.value, time.hour, time.minute);
             } else {
               date = createNewDate(this.date.value, this.date.value.getHours(), this.date.value.getMinutes());
@@ -1014,7 +1006,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
               const event = this.createNewEvent(date, end, this.reservation.state, this.reservation.room.timeZone,
                 this.reservation.id);
               if (event) {
-                this.event.setValue(event)
+                this.event.setValue(event);
                 this.events = [...this.events, event];
               }
             } else {
@@ -1122,7 +1114,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.reservation = reservation;
     this.isPreview = false;
-    const date = newDateTimestamp(reservation.timestamp, this.reservation.room.timeZone)
+    const date = newDateTimestamp(reservation.timestamp, this.reservation.room.timeZone);
     this.room.setValue(reservation.room);
     this.professional.setValue(reservation.professional);
     this.date.setValue(date);
