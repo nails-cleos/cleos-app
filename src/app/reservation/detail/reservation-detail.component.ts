@@ -55,7 +55,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   start: Date = getNow();
   end: Date = getNow();
   state: string | undefined;
-  locale: string;
+  dateFormat: string;
   changeState: MatFabMenu[] = [];
 
   displayedColumns: string[] = ['position', 'professional', 'start', 'treatment', 'state'];
@@ -99,12 +99,11 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       }
     });
     this.language = this.translate.currentLang;
-    this.locale = this.translate.currentLang;
+    this.dateFormat = this.translate.currentLang;
     this.price = new Price();
 
     this.store.select(selectAuthState).subscribe((state: any) => {
       const user: IUserAll = state.user;
-      this.locale = user.locale;
       this.professionalId = user.authorities.some(u => u.authority === Role.professional) ? user.id : undefined;
       this.customerId = user.authorities.some(u => u.authority === Role.customer) ? user.id : undefined;
     });

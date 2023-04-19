@@ -4,7 +4,6 @@ import { SharedModule } from '../shared/shared.module';
 import { NavRoutingModule } from './nav-routing.module';
 
 import { NavComponent } from './nav.component';
-import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatRippleModule } from '@angular/material/core';
@@ -29,7 +28,6 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
   imports: [
     NavRoutingModule,
     SharedModule,
-    MatSidenavModule,
     MatToolbarModule,
     MatBadgeModule,
     MatRippleModule,

@@ -18,7 +18,7 @@ export const createChart = (chart: IChart, isDark?: boolean): IChartUtil => {
     default:
       colors = chartColors();
   }
-  let options;
+  let options: ChartOptions<any>;
   switch (chart.options) {
     case 'NO_LABEL':
       options = barChartNoLabelOptions(isDark);
@@ -273,9 +273,6 @@ const pieChatPercentageLabel = (tooltipItem: TooltipItem<'pie'>): string => {
   const total = tooltipItem.dataset.data.reduce((a, b) => a + b);
   return `${ tooltipItem.label }: ${ (Number(tooltipItem.raw) * 100 / total).toFixed(2) }%`;
 };
-
-const formatLabel = (value: string | number): string | number =>
-  String(value).length > 10 ? `${ String(value).substring(0, 15) }...` : value;
 
 const formatSecsAsHourMin = (d: any): string =>
   new Date(d * 1000).toISOString().substr(11, 5);

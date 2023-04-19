@@ -19,4 +19,8 @@ export class TrackingService {
   public findByReservationId(reservationId: string): Observable<ITracking> {
     return this.http.get<ITracking>(`${this.urlV1}/reservations/${reservationId}`);
   }
+
+  public executeByReservationId(reservationId: string): Observable<ITracking> {
+    return this.http.post<ITracking>(`${this.urlV1}/reservations/${reservationId}`, {});
+  }
 }

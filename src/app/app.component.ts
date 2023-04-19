@@ -31,8 +31,9 @@ export class AppComponent implements OnInit {
       } else {
         this.locale = navigator.language;
       }
-      this.dateAdapter.setLocale(this.locale);
-      this.translate.use(getLocale(this.locale));
+      const locale = getLocale(this.locale);
+      this.dateAdapter.setLocale(locale.language);
+      this.translate.use(locale.language);
     });
   }
 

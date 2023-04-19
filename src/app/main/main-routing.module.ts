@@ -9,10 +9,10 @@ import { TermsAndConditionsComponent } from './terms-and-conditions/terms-and-co
 const routes: Routes = [
   {
     path: '', component: MainComponent, children: [
-      {path: '', component: MainContentComponent},
-      {path: 'catalogs', component: CatalogComponent},
-      {path: 'privacy', component: PrivacyComponent},
-      {path: 'term-and-conditions', component: TermsAndConditionsComponent}
+      { path: '', component: MainContentComponent },
+      { path: 'catalogs', component: CatalogComponent },
+      { path: 'privacy', component: PrivacyComponent },
+      { path: 'term-and-conditions', component: TermsAndConditionsComponent }
     ]
   }
 ];

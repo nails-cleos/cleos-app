@@ -36,7 +36,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
   pageSize = PAGE_SIZE;
   error: any;
   isAdmin = false;
-  locale: string;
+  dateFormat: string;
 
   private getState: Observable<any>;
   private subscription?: Subscription;
@@ -45,7 +45,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
     this.getState = this.store.select(selectReservationState);
-    this.locale = this.translate.currentLang;
+    this.dateFormat = this.translate.currentLang;
     this.store.select(selectAuthState).subscribe((state: any) =>
       this.isAdmin = state.user?.authorities.some((u: { authority: Role }) => u.authority === Role.admin));
     breakpointObserver.observe([
@@ -84,7 +84,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
 
   openDialog(reservation: IReservationAll): void {
     const time = newDateTimestamp(reservation.timestamp);
-    openDialog(reservation.room, this.locale, this.translate, this.dialog, time);
+    openDialog(reservation.room, this.dateFormat, this.translate, this.dialog, time);
   }
 
   delete(reservation: IReservation): void {

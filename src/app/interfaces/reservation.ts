@@ -35,11 +35,11 @@ export interface IReservation {
 }
 
 export interface IReservationPayment {
-   type: PaymentType;
-   percentage: PaymentPercentage;
-   bic?: string;
-   name?: string;
-   countryCode?: string;
+  type: PaymentType;
+  percentage: PaymentPercentage;
+  bic?: string;
+  name?: string;
+  countryCode?: string;
 }
 
 export interface IReservationAll {
@@ -134,6 +134,7 @@ export interface ITracking {
   startedTimestamp?: number;
   completedTimestamp?: number;
   cancelledTimestamp?: number;
+  process?: boolean;
 }
 
 export interface ICustomerLastReservation {

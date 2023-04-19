@@ -19,7 +19,7 @@ import { AngularFireAnalytics } from "@angular/fire/compat/analytics";
 export class ReviewDialogComponent {
   reservation?: IReservationAll;
   end?: Date;
-  language: string;
+  dateFormat: string;
 
   price: IPrice;
   rating = -1;
@@ -38,7 +38,7 @@ export class ReviewDialogComponent {
     const duration = reservationDuration(data);
     this.end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
     this.review = data.review;
-    this.language = this.translate.currentLang;
+    this.dateFormat = this.translate.currentLang;
     this.analytic.logEvent('screen_view', {
       firebase_screen: 'Review page',
       firebase_screen_class: 'ReviewDialogComponent'

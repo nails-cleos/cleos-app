@@ -392,13 +392,13 @@
         <mat-list-item>
           <mat-icon matListItemIcon>event</mat-icon>
           <div mat-line>
-            {{date | date:'short':room.value.timeZone:locale}}
+            {{date | date:'short':room.value.timeZone:dateFormat}}
             <button (click)="openDialog(date)" *ngIf="showTimeZone" mat-icon-button type="button">
               <mat-icon>info_outline</mat-icon>
             </button>
           </div>
           <div mat-line>
-            {{endDate | date:'short':room.value.timeZone:locale}}
+            {{endDate | date:'short':room.value.timeZone:dateFormat}}
             <button (click)="openDialog(endDate)" *ngIf="showTimeZone" mat-icon-button type="button">
               <mat-icon>info_outline</mat-icon>
             </button>

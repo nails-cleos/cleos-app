@@ -2,6 +2,10 @@ import { NgModule } from '@angular/core';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../shared/shared.module';
 import { MainRoutingModule } from './main-routing.module';
+import { MatCarouselModule } from "@magloft/material-carousel";
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { EffectsModule } from '@ngrx/effects';
 
 import { MainComponent } from './main.component';
 import { MainContentComponent } from './main-content/main-content.component';
@@ -9,10 +13,7 @@ import { CatalogComponent } from './catalog/catalog.component';
 import { PrivacyComponent } from './privacy/privacy.component';
 import { ImageViewerComponent } from './image-viewer/image-viewer.component';
 import { TermsAndConditionsComponent } from './terms-and-conditions/terms-and-conditions.component';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MiniCardTreatmentComponent } from './mini-card-treatment/mini-card-treatment.component';
-import { EffectsModule } from '@ngrx/effects';
 import { MainEffects } from '../store/effects/main.effects';
 import { MainService } from '../services/main.service';
 import { CatalogueService } from '../services/catalogue.service';
@@ -23,7 +24,6 @@ import { UserService } from '../services/user.service';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { LoginEffects } from '../store/effects/auth.effects';
 import { AuthService } from '../services/auth.service';
-import { MatCarouselModule } from "@magloft/material-carousel";
 
 @NgModule({
   declarations: [

@@ -1,13 +1,13 @@
 <div class="divider">
   <h1>{{ 'RESERVATION.TRACKING.TITLE' | translate}}</h1>
 </div>
-<div *ngIf="tracking; else box">
+<ng-template [ngIf]="tracking" [ngIfElse]="box">
   <div class="stepper-wrapper">
     <div [ngClass]="{'active': tracking.reservation.state === 'CREATED', 'completed': tracking.approvedTimestamp}"
          class="stepper-item">
       <div class="step-counter">
         <span *ngIf="tracking.createdTimestamp">
-          {{tracking.createdTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:language}}
+          {{tracking.createdTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat}}
         </span>
       </div>
       <div class="step-name">{{'COMMON.STATUS.RESERVATION.CREATED' | translate}}</div>
@@ -18,7 +18,7 @@
     }" class="stepper-item">
       <div class="step-counter">
         <span *ngIf="tracking.approvedTimestamp">
-          {{tracking.approvedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:language}}
+          {{tracking.approvedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat}}
         </span>
       </div>
       <div class="step-name">{{'COMMON.STATUS.RESERVATION.APPROVED' | translate}}</div>
@@ -27,7 +27,7 @@
          class="stepper-item">
       <div class="step-counter">
         <span *ngIf="tracking.startedTimestamp">
-          {{tracking.startedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:language}}
+          {{tracking.startedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat}}
         </span>
       </div>
       <div class="step-name">{{'COMMON.STATUS.RESERVATION.STARTED' | translate}}</div>
@@ -38,7 +38,7 @@
       }" class="stepper-item">
       <div class="step-counter">
         <span *ngIf="tracking.completedTimestamp">
-          {{tracking.completedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:language}}
+          {{tracking.completedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat}}
         </span>
       </div>
       <div class="step-name">{{'COMMON.STATUS.RESERVATION.COMPLETED' | translate}}</div>
@@ -47,7 +47,13 @@
   <h4 *ngIf="totalTime">
     <span class="bold">{{'RESERVATION.TRACKING.DURATION' | translate}}:</span> {{totalTime}}
   </h4>
-</div>
+  <ng-template [ngIf]="!tracking.process">
+    <button type="button" (click)="execute" mat-fab extended class="icon-button">
+      <mat-icon>sync_problem</mat-icon>
+      {{'RESERVATION.TRACKING.SYNC' | translate}}
+    </button>
+  </ng-template>
+</ng-template>
 
 <mat-divider></mat-divider>
 

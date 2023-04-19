@@ -19,7 +19,7 @@
       <table>
         <tr *ngIf="upcoming.id; else skeleton">
           <td class="right">{{ 'ME.RESERVATION.UPCOMING.START' | translate }}</td>
-          <td class="left">{{upcoming.start | date:'short':upcoming.room.timeZone:language}}
+          <td class="left">{{upcoming.start | date:'short':upcoming.room.timeZone:dateFormat}}
             <button (click)="openDialog(upcoming.start)" *ngIf="showTimeZone" mat-icon-button type="button">
               <mat-icon>info_outline</mat-icon>
             </button>
@@ -27,7 +27,7 @@
         </tr>
         <tr *ngIf="upcoming.end; else skeleton">
           <td class="right">{{ 'ME.RESERVATION.UPCOMING.END' | translate }}</td>
-          <td class="left">{{upcoming.end | date:'short':upcoming.room.timeZone:language}}
+          <td class="left">{{upcoming.end | date:'short':upcoming.room.timeZone:dateFormat}}
             <button (click)="openDialog(upcoming.end)" *ngIf="showTimeZone" mat-icon-button type="button">
               <mat-icon>info_outline</mat-icon>
             </button>

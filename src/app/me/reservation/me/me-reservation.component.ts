@@ -116,7 +116,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   smallScreen?: boolean;
   isPreview = false;
   isPayment = false;
-  locale: string;
+  dateFormat: string;
 
   isEditing = false;
   canCreate = false;
@@ -155,12 +155,12 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.getState = this.store.select(selectReservationState);
     this.store.select(selectAuthState).subscribe((state: any) => this.customerId = state.user.id);
     this.price = new Price();
-    this.locale = this.translate.currentLang;
+    this.dateFormat = this.translate.currentLang;
     breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small])
       .subscribe(result => this.smallScreen = result.matches);
     this.minDate = getNow();
     this.maxDate = plusMonthDate(this.minDate, this.reservationMonths, this.minDate.getDate() + 1);
-    this.maxDateFormat = formatDateTwoDigit(this.maxDate, this.locale);
+    this.maxDateFormat = formatDateTwoDigit(this.maxDate, this.dateFormat);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
     if (this.extras) {
       this.treatmentId = this.extras.treatment?.key || this.extras.treatment?.id;
@@ -214,8 +214,8 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       this.time = undefined;
     }
     this.duration = totalDuration(this.treatment.value, this.additionalSelected);
-    this.totalDuration = formatTime(this.duration, this.locale);
-    this.additionalDuration = formatTime(totalDuration(undefined, this.additionalSelected), this.locale);
+    this.totalDuration = formatTime(this.duration, this.dateFormat);
+    this.additionalDuration = formatTime(totalDuration(undefined, this.additionalSelected), this.dateFormat);
 
     this.store.dispatch(
       new fromActionsReservation.CustomerSearchReservation({
@@ -372,7 +372,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   openDialog(reservationDate?: Date): void {
-    openDialog(this.room.value, this.locale, this.translate, this.dialog, reservationDate);
+    openDialog(this.room.value, this.dateFormat, this.translate, this.dialog, reservationDate);
   }
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d, this.room.value);
@@ -759,7 +759,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
           const key = createNewDate(date).toString();
 
           let dates: any = group.get(key) || [];
-          dates = [...dates, { time: getTime(date, this.locale), date }];
+          dates = [...dates, { time: getTime(date, this.dateFormat), date }];
           group.set(key, dates);
 
           return group;
@@ -846,7 +846,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.isPreview = false;
     const date = newDateTimestamp(reservation.timestamp, this.reservation.room.timeZone)
     this.event.setValue(date);
-    this.time = getTime(date, this.locale)
+    this.time = getTime(date, this.dateFormat)
     this.room.setValue(reservation.room);
     this.professional.setValue(reservation.professional);
     this.startDate.setValue(date);

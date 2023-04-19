@@ -38,7 +38,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
 
-  language: string;
+  dateFormat: string;
 
   filteredCustomer: Observable<IUser[] | undefined> | undefined;
   customer: UntypedFormControl = new UntypedFormControl();
@@ -65,7 +65,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
       }
     });
     this.getState = this.store.select(selectReservationState);
-    this.language = this.translate.currentLang;
+    this.dateFormat = this.translate.currentLang;
     this.allStates = this.allStates.filter(s => States[s as StatesKey] !== States.created);
     this.filteredStates = this.state.valueChanges.pipe(
       startWith(null),
@@ -100,7 +100,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
 
   openDialog(reservation: IReservationAll): void {
     const time = newDateTimestamp(reservation.timestamp);
-    openDialog(reservation.room, this.language, this.translate, this.dialog, time);
+    openDialog(reservation.room, this.dateFormat, this.translate, this.dialog, time);
   }
 
   showTimeZone(reservation: IReservation): boolean {
@@ -173,9 +173,9 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
       if (state.filter) {
         const now = getNow();
         this.dataSource = state.filter.content?.map((reservation: IReservationAll) => {
-          console.log("RESERVATION START", reservation.start)
-          if (reservation.start && [String(States.created), String(States.approved)].includes(reservation.state)) {
-            const deadLine = newDate(reservation.start) < now;
+          const reservationStart = newDateTimestamp(reservation.timestamp);
+          if (reservationStart && [String(States.created), String(States.approved)].includes(reservation.state)) {
+            const deadLine = reservationStart < now;
             return Object.assign({}, reservation, {deadLine});
           }
           return reservation;

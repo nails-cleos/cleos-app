@@ -8,7 +8,7 @@ import * as fromActionsDashboard from '../store/dashboard.actions';
 import * as fromActionsReservation from '../store/reservation.actions';
 import { IReservationSummary, States } from '../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
-import { getEnd, getNow, newDateTimestamp } from '../util/dates';
+import { createDateTimezone, getEnd, getNow, newDateTimestamp } from '../util/dates';
 import { CalendarEvent, CalendarView } from 'angular-calendar';
 import { findStateColor, isDarkMode } from '../util/theme';
 import { getFrequency, Meta, monthEvent } from '../util/event';
@@ -37,7 +37,7 @@ export class DashComponent implements OnInit, OnDestroy {
   view: CalendarView = CalendarView.Month;
   viewDate: Date;
   activeDayIsOpen = false;
-  locale: string;
+  dateFormat: string;
   events: CalendarEvent[] = [];
   isCalendarLoading = true;
   isLoading: any;
@@ -103,7 +103,7 @@ export class DashComponent implements OnInit, OnDestroy {
       });
     });
     this.viewDate = getNow();
-    this.locale = this.translate.currentLang;
+    this.dateFormat = this.translate.currentLang;
     this.totalReservation = 0;
   }
 
@@ -272,8 +272,7 @@ export class DashComponent implements OnInit, OnDestroy {
             this.events = [...this.events, event];
           }
         } else {
-          recurring = [...recurring, getFrequency(it.repeat, start, it.unavailableId, title, newDateTimestamp(it.end)
-            .toISOString(), it.duration)];
+          recurring = [...recurring, getFrequency(it.repeat, start, it.unavailableId, title, it.end, it.duration)];
         }
       });
 

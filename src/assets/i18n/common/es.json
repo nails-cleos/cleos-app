@@ -208,7 +208,8 @@
     },
     "DASHBOARD": {
       "HOME": "Principal",
-      "DARK_MODE": "Modo oscuro"
+      "DARK_MODE": "Modo oscuro",
+      "LIGHT_MODE": "Modo claro"
     },
     "CURRENCY": {
       "FIELD": "Moneda",

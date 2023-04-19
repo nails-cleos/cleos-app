@@ -14,7 +14,7 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class NotificationsComponent implements OnInit, OnDestroy {
   notifications: INotification[] = [];
-  language: string;
+  dateFormat: string;
   showMore = false;
   loadingNotifications?: [];
 
@@ -23,7 +23,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   private page: number;
 
   constructor(private router: Router, private store: Store<AppState>, private translate: TranslateService) {
-    this.language = this.translate.currentLang;
+    this.dateFormat = this.translate.currentLang;
     this.getState = this.store.select(selectNotificationState);
     this.page = -1;
   }

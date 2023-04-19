@@ -19,6 +19,10 @@ export const flags = (): IFlag[] => [{
   value: 'en_GB',
   text: 'EN'
 }, {
+  icon: 'nl',
+  value: 'en_NL',
+  text: 'EN'
+}, {
   icon: 'us',
   value: 'en',
   text: 'EN'
@@ -27,7 +31,7 @@ export const flags = (): IFlag[] => [{
 export const findFlag = (flagList: IFlag[], lang: string): IFlag => {
   let value = flagList.find(flag => flag.value === lang);
   if (!value) {
-    const locale = getLocale(lang);
+    const locale = getLocale(lang).flag;
     value = flagList.find(flag => flag.value === locale);
     if (!value) {
       value = flagList.find(flag => flag.value.startsWith(navigator.language) || navigator.language.startsWith(flag.value));

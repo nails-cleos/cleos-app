@@ -93,10 +93,38 @@ export const getUserImage = (user: IUser | IUserAll | undefined): string | undef
   return image;
 };
 
-export const getLocale = (userLang: string): string => {
-  const index = userLang.indexOf('_');
-  return index === -1 ? userLang : userLang.substr(0, index);
-};
+export interface ILocale {
+  language: string;
+  flag: string;
+}
+
+export class Locale implements ILocale {
+  language: string;
+  flag: string;
+
+  constructor(language: string = 'en-NL', flag: string = 'en_NL') {
+    this.language = language;
+    this.flag = flag;
+  }
+
+}
+
+export const getLocale = (userLang?: string): ILocale => {
+    let locale = 'en-NL';
+    let flag
+    if (userLang?.startsWith('es')) {
+      locale = userLang === 'es-AR' ? userLang : 'es';
+      flag = locale;
+    } else if (userLang?.startsWith('en')) {
+      locale = userLang === 'en' ? userLang : 'en-GB';
+      flag = userLang === 'en-GB' || 'en' ? userLang : 'en-NL';
+    // } else if (userLang?.startsWith('nl')) {
+    //   locale = 'nl';
+    //   flag = 'nl';
+    }
+
+    return new Locale(locale, flag?.replace('-', '_'));
+}
 
 export const round = (value: number): number => Math.round((value + Number.EPSILON) * 100) / 100;
 

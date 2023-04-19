@@ -1,6 +1,6 @@
 {
   "name": "cleos",
-  "version": "1.0.4",
+  "version": "1.0.8-rc",
   "engines": {
     "node": "16.19.1",
     "npm": "8.19.3"
@@ -75,7 +75,7 @@
     "skeleton-screen-css": "^1.1.0",
     "timezones-list": "^3.0.2",
     "tslib": "^2.5.0",
-    "typescript": "~4.8.4",
+    "typescript": "^4.9.5",
     "zone.js": "~0.13.0"
   },
   "devDependencies": {
