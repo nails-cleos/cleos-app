@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppState, selectAuthState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
@@ -7,7 +7,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { getLocale } from '../../util/helper';
-import { FormBuilder, FormControl, UntypedFormGroup } from "@angular/forms";
+import { FormBuilder, FormControl, UntypedFormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-recovery-password',
@@ -15,13 +15,10 @@ import { FormBuilder, FormControl, UntypedFormGroup } from "@angular/forms";
   styleUrls: ['./recovery-password.component.scss']
 })
 export class RecoveryPasswordComponent implements OnInit, OnDestroy {
-  @ViewChild('passwordComponent') passwordComponent: any;
-
   passwordFormGroup!: UntypedFormGroup;
 
   getState: Observable<any>;
   subscription?: Subscription;
-  showError = false;
   locale: string;
 
   constructor(private store: Store<AppState>, private route: ActivatedRoute, private translate: TranslateService,
@@ -31,14 +28,14 @@ export class RecoveryPasswordComponent implements OnInit, OnDestroy {
   }
 
   get recoveryPassword(): void {
-    if (this.passwordComponent.passwordFormControl.invalid
-      || this.passwordComponent.passwordConfirmationFormControl.invalid) {
+    const password = this.passwordFormGroup.get('password')?.value;
+    if (this.passwordFormGroup.invalid && password) {
       return;
     }
     const token = this.route.snapshot.queryParamMap.get('token');
     this.translate.use(this.locale);
     return this.store.dispatch(
-      new fromActionsLogin.RecoveryPassword({token, password: this.passwordComponent.passwordFormControl.value})
+      new fromActionsLogin.RecoveryPassword({token, password})
     );
   }
 

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -15,11 +15,9 @@ import { IUser } from '../../interfaces/user';
 })
 export class ChangePasswordComponent implements OnInit, OnDestroy {
 
-  @ViewChild('passwordComponent') passwordComponent: any;
-
   hideOld = true;
   form!: UntypedFormGroup;
-  passwordFormGroup!: UntypedFormGroup
+  passwordFormGroup!: UntypedFormGroup;
   subscription?: Subscription;
   getState: Observable<any>;
   currentUser?: IUser;
