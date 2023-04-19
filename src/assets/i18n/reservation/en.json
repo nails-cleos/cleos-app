@@ -152,7 +152,8 @@
     },
     "TRACKING": {
       "TITLE": "Tracking",
-      "DURATION": "Appointment duration"
+      "DURATION": "Appointment duration",
+      "SYNC": "Reservation not processed"
     },
     "REVIEW": {
       "TITLE": "Review"

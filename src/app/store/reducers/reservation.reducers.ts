@@ -405,6 +405,16 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: true
       };
     }
+    case ReservationActionTypes.executeTracking: {
+      return {
+        ...state,
+        tracking: null,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: null
+      };
+    }
     case ReservationActionTypes.findTracking: {
       return {
         ...state,

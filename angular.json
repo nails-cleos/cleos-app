@@ -163,28 +163,7 @@
                   "replace": "src/manifest.json",
                   "with": "src/manifest-dev.json"
                 }
-              ],
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "namedChunks": false,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "2mb",
-                  "maximumError": "5mb"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "4kb",
-                  "maximumError": "6kb"
-                }
-              ],
-              "serviceWorker": true,
-              "ngswConfigPath": "ngsw-config.json"
+              ]
             }
           },
           "defaultConfiguration": "production"

@@ -3,14 +3,13 @@ import { AppState, selectPaymentState, selectReservationState } from '../../../s
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { IPaymentAll, PaymentType } from '../../../interfaces/payment';
+import { IPaymentAll } from '../../../interfaces/payment';
 import { IReservationAll, ITracking } from '../../../interfaces/reservation';
 import * as fromActionsReservation from '../../../store/reservation.actions';
 import * as fromActionsPayment from '../../../store/payment.actions';
 import { TranslateService } from '@ngx-translate/core';
-import { getDiffTime, newDate, newDateTimestamp } from '../../../util/dates';
+import { getDiffTime, newDateTimestamp } from '../../../util/dates';
 import { Clipboard } from '@angular/cdk/clipboard';
-import { environment } from '../../../../environments/environment';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
@@ -42,6 +41,13 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
     this.dateFormat = this.translate.currentLang;
   }
 
+  get execute(): void {
+    this.tracking = undefined;
+    return this.store.dispatch(
+      new fromActionsReservation.ExecuteTracking({ reservationId: this.reservationId })
+    );
+  }
+
   ngOnInit(): void {
     this.subscribe();
     this.route.params.subscribe(routeParams => {
@@ -57,7 +63,7 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
 
   resend(payment: IPaymentAll): void {
     this.store.dispatch(
-      new fromActionsPayment.PaymentRecreate({id: payment.id, paymentType: payment.type})
+      new fromActionsPayment.PaymentRecreate({ id: payment.id, paymentType: payment.type })
     );
   }
 
@@ -91,7 +97,7 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
     if (!this.tracking) {
       this.tracking = undefined;
       this.store.dispatch(
-        new fromActionsReservation.FindTracking({reservationId: this.reservationId})
+        new fromActionsReservation.FindTracking({ reservationId: this.reservationId })
       );
     }
     if (!this.payments) {
@@ -103,7 +109,7 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
     if (!this.reservation) {
       this.reservation = undefined;
       this.store.dispatch(
-        new fromActionsReservation.ReservationFind({id: this.reservationId})
+        new fromActionsReservation.ReservationFind({ id: this.reservationId })
       );
     }
   }

@@ -54,7 +54,7 @@ export interface ICalendarUnavailable {
   unavailableId: string;
   title: string;
   start: number;
-  end: number;
+  end: string;
   duration?: string;
   repeat: string;
   allDay: boolean;
