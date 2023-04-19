@@ -1,7 +1,7 @@
 import { IDiscount, IUserDiscount } from './discount';
 import { IAdditionalAll } from './additional';
 import { IService } from './room';
-import { TreatmentService } from "../services/treatment.service";
+import { TreatmentService } from '../services/treatment.service';
 
 export interface ITreatmentGroup {
   id?: string;
@@ -75,10 +75,12 @@ export interface IPrice {
   additional: number;
   total: number;
   totalPaid: number;
+  totalWithoutDiscount: number;
   priceWithDiscount: number;
   priceWithExtras: number;
   priceWithAdditional: number;
   isPaid: boolean;
+  percentageToPaid: number;
   toPaid: number;
 }
 
@@ -89,25 +91,29 @@ export class Price implements IPrice {
   additional: number;
   total: number;
   totalPaid: number;
+  totalWithoutDiscount: number;
   priceWithDiscount: number;
   priceWithExtras: number;
   priceWithAdditional: number;
   isPaid: boolean;
+  percentageToPaid: number;
   toPaid: number;
 
   constructor(price: number = 0, discount: number = 0, extra: number = 0, additional: number = 0, total: number = 0,
-              totalPaid: number = 0, priceWithDiscount: number = 0, priceWithExtras = 0, priceWithAdditional = 0,
-              toPaid: number = 0) {
+              totalPaid: number = 0, totalWithoutDiscount: number = 0, priceWithDiscount: number = 0, priceWithExtras = 0,
+              priceWithAdditional = 0, percentageToPaid: number = 0) {
     this.amount = price;
     this.discount = discount;
     this.extra = extra;
     this.additional = additional;
     this.total = total;
     this.totalPaid = totalPaid;
+    this.totalWithoutDiscount = totalWithoutDiscount;
     this.priceWithDiscount = priceWithDiscount;
     this.priceWithExtras = priceWithExtras;
     this.priceWithAdditional = priceWithAdditional;
-    this.toPaid = toPaid;
+    this.percentageToPaid = percentageToPaid;
+    this.toPaid = total * percentageToPaid / 100;
     this.isPaid = this.amount > 0 && this.totalPaid >= this.total;
   }
 }

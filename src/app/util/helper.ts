@@ -14,7 +14,6 @@ import { DialogComponent } from '../shared/dialog/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { isSameDay } from 'date-fns';
 import { Role } from '../interfaces/token';
-import { TreatmentService } from "../services/treatment.service";
 
 export const isRoomAdmin = (authorities?: IAuthority[]): boolean => !!authorities && authorities.length === 1 &&
   authorities.some(u => (u.authority === Role.roomAdmin));
@@ -110,21 +109,21 @@ export class Locale implements ILocale {
 }
 
 export const getLocale = (userLang?: string): ILocale => {
-    let locale = 'en-NL';
-    let flag
-    if (userLang?.startsWith('es')) {
-      locale = userLang === 'es-AR' ? userLang : 'es';
-      flag = locale;
-    } else if (userLang?.startsWith('en')) {
-      locale = userLang === 'en' ? userLang : 'en-GB';
-      flag = userLang === 'en-GB' || 'en' ? userLang : 'en-NL';
+  let locale = 'en-NL';
+  let flag;
+  if (userLang?.startsWith('es')) {
+    locale = userLang === 'es-AR' ? userLang : 'es';
+    flag = locale;
+  } else if (userLang?.startsWith('en')) {
+    locale = userLang === 'en' ? userLang : 'en-GB';
+    flag = userLang === 'en-GB' || 'en' ? userLang : 'en-NL';
     // } else if (userLang?.startsWith('nl')) {
     //   locale = 'nl';
     //   flag = 'nl';
-    }
+  }
 
-    return new Locale(locale, flag?.replace('-', '_'));
-}
+  return new Locale(locale, flag?.replace('-', '_'));
+};
 
 export const round = (value: number): number => Math.round((value + Number.EPSILON) * 100) / 100;
 
@@ -149,20 +148,20 @@ export const getPrice = (reservation: IReservationAll, payments?: IPayment[] | u
     priceWithAdditional += additional;
   }
 
+  const totalWithoutDiscount = total;
   if (treatment.discount) {
-    discount = getDiscount(treatment.discount, treatment.price);
+    discount = getDiscount(treatment.discount, total);
     priceWithDiscount = treatment.price - discount;
     total = total - discount;
   }
 
-  return new Price(treatment.price, discount, extras, additional, total, totalPaid(payments), priceWithDiscount,
+  return new Price(treatment.price, discount, extras, additional, total, totalPaid(payments), totalWithoutDiscount, priceWithDiscount,
     priceWithExtras, priceWithAdditional);
 };
 
-export const newPrice = (price: IPrice, amount: number): IPrice => {
+export const newPrice = (price: IPrice, amount: number, discount?: IDiscount): IPrice => {
   let total = amount;
-  let priceWithDiscount;
-  const discount = price.discount;
+  let priceWithDiscount = price.priceWithDiscount;
   const extras = price.extra;
   const additional = price.additional;
   const priceWithExtras = amount + extras;
@@ -175,52 +174,70 @@ export const newPrice = (price: IPrice, amount: number): IPrice => {
     total += additional;
   }
 
-  if (discount) {
-    priceWithDiscount = amount - discount;
-    total = total - discount;
+  const priceDiscount = discount ? getDiscount(discount, total) : price.discount;
+
+  const totalWithoutDiscount = total;
+  if (priceDiscount) {
+    priceWithDiscount = price.amount - priceDiscount;
+    total = total - priceDiscount;
   }
 
-  return new Price(amount, discount, extras, additional, total, price.totalPaid, priceWithDiscount, priceWithExtras,
-    priceWithAdditional);
+  return new Price(amount, priceDiscount, extras, additional, total, price.totalPaid, totalWithoutDiscount, priceWithDiscount,
+    priceWithExtras, priceWithAdditional);
 };
 
-export const newExtra = (price: IPrice, extras: number): IPrice => {
-  const total = price.amount - price.discount + extras + price.additional;
+export const newExtra = (price: IPrice, extras: number, discount?: IDiscount): IPrice => {
+  let total = price.amount + extras + price.additional;
+  let priceWithDiscount = price.priceWithDiscount;
   const priceWithExtras = price.amount + extras;
 
-  return new Price(price.amount, price.discount, extras, price.additional, total, price.totalPaid,
-    price.priceWithDiscount, priceWithExtras, price.priceWithAdditional);
+  const priceDiscount = discount ? getDiscount(discount, total) : price.discount;
+
+  const totalWithoutDiscount = total;
+  if (priceDiscount) {
+    priceWithDiscount = price.amount - priceDiscount;
+    total = total - priceDiscount;
+  }
+
+  return new Price(price.amount, price.discount, extras, price.additional, total, price.totalPaid, totalWithoutDiscount,
+    priceWithDiscount, priceWithExtras, price.priceWithAdditional, price.percentageToPaid);
 };
 
 export const newDiscount = (price: IPrice, treatmentDiscount: IDiscount): IPrice => {
   const discount = getDiscount(treatmentDiscount, price.amount);
-  const total = price.amount - discount + price.extra + price.additional;
+  const totalWithoutDiscount = price.amount + price.extra + price.additional;
   const priceWithDiscount = price.amount - discount;
+  const total = totalWithoutDiscount - discount;
 
-  return new Price(price.amount, discount, price.extra, price.additional, total, price.totalPaid, priceWithDiscount,
-    price.priceWithExtras, price.priceWithAdditional);
+  return new Price(price.amount, discount, price.extra, price.additional, total, price.totalPaid, totalWithoutDiscount, priceWithDiscount,
+    price.priceWithExtras, price.priceWithAdditional, price.percentageToPaid);
 };
 
-export const newAdditional = (price: IPrice, additionalList: IAdditionalAll[]): IPrice => {
-  let total = price.amount - price.discount + price.extra;
-  let priceWithAdditional = price.amount;
+export const newAdditional = (price: IPrice, additionalList: IAdditionalAll[], discount?: IDiscount): IPrice => {
+  let total = price.amount + price.extra;
   let additional;
+  let priceWithDiscount = price.priceWithDiscount;
+  let priceWithAdditional = price.amount; // Added after
   if (additionalList && additionalList.length) {
     additional = additionalList.map(a => a.price).reduce((p, c) => p + c);
     total += additional;
     priceWithAdditional += additional;
   }
 
+  const totalWithoutDiscount = total;
+  const priceDiscount = discount ? getDiscount(discount, total) : price.discount;
+  if (priceDiscount) {
+    priceWithDiscount = price.amount - priceDiscount;
+    total = total - priceDiscount;
+  }
+
   return new Price(price.amount, price.discount, price.extra, additional, total, price.totalPaid,
-    price.priceWithDiscount, price.priceWithExtras, priceWithAdditional);
+    totalWithoutDiscount, priceWithDiscount, price.priceWithExtras, priceWithAdditional, price.percentageToPaid);
 };
 
-export const newPercentage = (price: IPrice, percentage: number): IPrice => {
-  const toPaid = price.total * percentage / 100;
-
-  return new Price(price.amount, price.discount, price.extra, price.additional, price.total, price.totalPaid,
-    price.priceWithDiscount, price.priceWithExtras, price.priceWithAdditional, toPaid)
-}
+export const newPercentage = (price: IPrice, percentage: number): IPrice => new Price(price.amount, price.discount, price.extra,
+  price.additional, price.total, price.totalPaid, price.totalWithoutDiscount, price.priceWithDiscount, price.priceWithExtras,
+  price.priceWithAdditional, percentage);
 
 export const getTreatmentDurability = (min: number, max: number, translate: TranslateService): string | undefined => {
   if (!min && !max) {
@@ -374,8 +391,8 @@ const totalPaid = (payments: IPayment[] | undefined): number => {
 };
 
 export const areEquals = (array1: any[], array2: any[]): boolean => (array1.length === array2.length &&
-  array1.every((element_1) => array2.some((element_2) =>
-      Object.keys(element_1).every((key) => element_1[key] === element_2[key])
+  array1.every((element1) => array2.some((element2) =>
+      Object.keys(element1).every((key) => element1[key] === element2[key])
     )
   )
 );

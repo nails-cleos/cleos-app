@@ -5,13 +5,26 @@ import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } 
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../interfaces/treatment';
 import { IRoom, IService } from '../../../interfaces/room';
+import { IAvailableDTO, IReservation, IReservationAll, MAX_RESERVATION_MONTH, Reservation } from '../../../interfaces/reservation';
 import {
-  IAvailableDTO, IReservation, IReservationAll, MAX_RESERVATION_MONTH, Reservation
-} from '../../../interfaces/reservation';
-import {
-  API_LOCALE, createNewDate, Duration, filterDateRoom, formatDateName, formatDateTwoDigit, formatFullDateTime,
-  formatTime, getCurrentTimeZone, getNow, getTime, IDuration, isSameTimeZone, newDate, newDateTimestamp, plusMonthDate,
-  stringDateUTCToTimeZone, totalDuration
+  API_LOCALE,
+  createNewDate,
+  Duration,
+  filterDateRoom,
+  formatDateName,
+  formatDateTwoDigit,
+  formatFullDateTime,
+  formatTime,
+  getCurrentTimeZone,
+  getNow,
+  getTime,
+  IDuration,
+  isSameTimeZone,
+  newDate,
+  newDateTimestamp,
+  plusMonthDate,
+  stringDateUTCToTimeZone,
+  totalDuration
 } from '../../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -23,8 +36,21 @@ import * as fromActionsReservation from '../../../store/reservation.actions';
 import { map, startWith } from 'rxjs/operators';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import {
-  createTreatmentGroupService, createRoomOffice, getBackIndex, getFullUserName, getPrice, getTreatmentDurability, getStep,
-  getUserName, newAdditional, newDiscount, newPercentage, newPrice, openDialog, roomDetail, round
+  createRoomOffice,
+  createTreatmentGroupService,
+  getBackIndex,
+  getFullUserName,
+  getPrice,
+  getStep,
+  getTreatmentDurability,
+  getUserName,
+  newAdditional,
+  newDiscount,
+  newPercentage,
+  newPrice,
+  openDialog,
+  roomDetail,
+  round
 } from '../../../util/helper';
 import { DiscountType, IUserDiscount } from '../../../interfaces/discount';
 import { transitionAnimation } from '../../../util/animation';
@@ -37,10 +63,10 @@ import { IStep, Step } from '../../../interfaces/step';
 import { TimeZoneSnackBarComponent } from '../../../shared/snak/time-zone/time-zone-snack-bar.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Role } from '../../../interfaces/token';
-import { IUser } from "../../../interfaces/user";
-import { banks, IBank } from "../../../interfaces/bank";
-import { PaymentType } from "../../../interfaces/payment";
-import { AngularFireAnalytics } from "@angular/fire/compat/analytics";
+import { IUser } from '../../../interfaces/user';
+import { banks, IBank } from '../../../interfaces/bank';
+import { PaymentType } from '../../../interfaces/payment';
+import { AngularFireAnalytics } from '@angular/fire/compat/analytics';
 
 @Component({
   selector: 'app-me-reservation',
@@ -70,9 +96,10 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   ]);
 
   eventGroup!: UntypedFormGroup;
-  event: UntypedFormControl = new UntypedFormControl('', [Validators.required])
+  event: UntypedFormControl = new UntypedFormControl('', [Validators.required]);
 
   discounts?: IUserDiscount[];
+  userDiscount?: IUserDiscount;
   showDiscount = false;
   price: IPrice;
   discount = new UntypedFormControl();
@@ -100,7 +127,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   ]);
 
   typeForm!: UntypedFormGroup;
-  types?: string[]
+  types?: string[];
   type: UntypedFormControl = new UntypedFormControl('');
 
   bankList?: IBank[] = banks();
@@ -130,6 +157,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   additionalDuration?: string;
   totalDuration?: string;
   durability?: string;
+  reservationId?: string;
 
   private readonly extras: any;
   private reservation?: IReservationAll;
@@ -140,7 +168,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   private professionalId?: string;
   private customerId?: string;
   private treatmentId?: string;
-  reservationId?: string;
   private reservationMonths = MAX_RESERVATION_MONTH;
   private getState: Observable<any>;
   private subscription?: Subscription;
@@ -201,7 +228,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     if (this.treatmentForm.invalid) {
       return;
     }
-    this.treatmentId = this.treatment.value.id
+    this.treatmentId = this.treatment.value.id;
     return this.completeAndNext();
   }
 
@@ -210,7 +237,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       return;
     }
     if (this.event.value !== this.startDate.value) {
-      this.event.setValue(undefined)
+      this.event.setValue(undefined);
       this.time = undefined;
     }
     this.duration = totalDuration(this.treatment.value, this.additionalSelected);
@@ -293,7 +320,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
           bic: this.bank.value.id,
           countryCode: 'en_NL',
           percentage: this.percentage.value
-        }
+        };
       }
       this.store.dispatch(
         new fromActionsReservation.ReservationSave({ reservation, role })
@@ -324,7 +351,9 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       const reservationId = routeParams.id;
       if (reservationId) {
         this.analytic.logEvent('screen_view', {
-          firebase_screen: `Edit customer reservation ${reservationId}`,
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          firebase_screen: `Edit customer reservation ${ reservationId }`,
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           firebase_screen_class: 'MeReservationComponent'
         });
         this.reservationId = reservationId;
@@ -462,7 +491,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   onChange(options: MatListOption[]): void {
     this.additionalSelected = options.map(o => o.value);
-    this.price = newAdditional(this.price, this.additionalSelected);
+    this.price = newAdditional(this.price, this.additionalSelected, this.userDiscount?.discount);
   }
 
   isSelected(it: IAdditionalAll): boolean {
@@ -589,7 +618,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
     this.treatment.valueChanges.subscribe(value => {
       if (value) {
-        this.price = newPrice(this.price, value.price);
+        this.price = newPrice(this.price, value.price, this.userDiscount?.discount);
       }
       if (this.extras && this.extras.discount) {
         this.showDiscount = true;
@@ -599,9 +628,9 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
     this.discount.valueChanges.subscribe(value => {
       if (value && this.discounts) {
-        const userDiscount = this.discounts.find(d => d.id === value);
-        if (userDiscount) {
-          this.price = newDiscount(this.price, userDiscount.discount);
+        this.userDiscount = this.discounts.find(d => d.id === value);
+        if (this.userDiscount) {
+          this.price = newDiscount(this.price, this.userDiscount.discount);
         }
       }
     });
@@ -708,12 +737,14 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       }
       if (state.customerReservation && state.customerReservation.upcoming && state.customerReservation.upcoming.length) {
         this.analytic.logEvent('screen_view', {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           firebase_screen: 'Customer cannot create a reservation',
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           firebase_screen_class: 'MeReservationComponent'
         });
         this.canCreate = false;
         const date = newDateTimestamp(state.customerReservation.upcoming[0].timestamp,
-          state.customerReservation.upcoming[0].room.timeZone)
+          state.customerReservation.upcoming[0].room.timeZone);
         const message = this.translate.instant('ME.RESERVATION.UPCOMING.CUSTOMER.ERROR',
           {
             date: formatFullDateTime(date, this.translate.currentLang)
@@ -729,7 +760,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
         this.canCreate = true;
         this.firstTime = state.customerReservation && state.customerReservation.firstTime;
         if (this.firstTime) {
-          this.type.setValidators([Validators.required])
+          this.type.setValidators([Validators.required]);
         }
       }
       // Multiple professionals
@@ -844,9 +875,9 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     }
     this.reservation = reservation;
     this.isPreview = false;
-    const date = newDateTimestamp(reservation.timestamp, this.reservation.room.timeZone)
+    const date = newDateTimestamp(reservation.timestamp, this.reservation.room.timeZone);
     this.event.setValue(date);
-    this.time = getTime(date, this.dateFormat)
+    this.time = getTime(date, this.dateFormat);
     this.room.setValue(reservation.room);
     this.professional.setValue(reservation.professional);
     this.startDate.setValue(date);
@@ -868,7 +899,9 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     setTimeout(() => {
       const step = getStep(this.steps, this.myStepper.selectedIndex);
       this.analytic.logEvent('screen_view', {
-        firebase_screen: `Customer reservation. Step: ${step?.name}`,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        firebase_screen: `Customer reservation. Step: ${ step?.name }`,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         firebase_screen_class: 'MeReservationComponent'
       });
       if (step) {

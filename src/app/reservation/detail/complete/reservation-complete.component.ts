@@ -80,11 +80,11 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     this.price = new Price();
     this.treatment.valueChanges.subscribe(value => {
       if (value) {
-        this.price = newPrice(this.price, value.price);
+        this.price = newPrice(this.price, value.price, this.reservation?.treatment?.discount);
       }
     });
     this.extraPrice.valueChanges.subscribe(value => {
-      this.price = newExtra(this.price, value ? value : 0);
+      this.price = newExtra(this.price, value ? value : 0, this.reservation?.treatment?.discount);
     });
     this.isDashboard = this.router.getCurrentNavigation()?.extras?.state?.data?.isDashboard;
   }
@@ -146,7 +146,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
 
   onChange(options: MatListOption[]): void {
     this.additionalSelected = options.map(o => o.value);
-    this.price = newAdditional(this.price, this.additionalSelected);
+    this.price = newAdditional(this.price, this.additionalSelected, this.reservation?.treatment?.discount);
   }
 
   isSelected(it: IAdditionalAll): boolean {
@@ -221,7 +221,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     });
     this.treatment.valueChanges.subscribe(value => {
       if (value) {
-        this.price = newPrice(this.price, value.price);
+        this.price = newPrice(this.price, value.price, this.reservation?.treatment?.discount);
       }
     });
   }
