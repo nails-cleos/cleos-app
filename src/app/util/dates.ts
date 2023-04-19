@@ -55,7 +55,7 @@ export class TimeZone implements ITimeZone {
   }
 }
 
-export const daysOfWeek: string[] = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+export const daysOfWeek: string[] = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
 
 export const findDayOfWeek = (day: string): number => daysOfWeek.findIndex(x => x === day);
 
@@ -390,7 +390,7 @@ export const createDateFromString = (stringDate: string): Date => {
 };
 
 export const createDate = (hour: number = 0, minute: number = 0, second: number = 0,
-                           mili: number = 0): Date => createNewDate(new Date(), hour, minute, second, mili);
+                           milli: number = 0): Date => createNewDate(new Date(), hour, minute, second, milli);
 
 export const createEndDate = (stringDate: string): Date => {
   const d = stringDate.split('-');
@@ -404,17 +404,20 @@ export const createFullDate = (selectDate: Date): Date => {
   return date;
 };
 
-export const newDateTimestamp = (value: number = 0, timeZone: string = getCurrentTimeZone()): Date => {
-  const date = new Date(value * 1000);
-  return utcToZonedTime(date, timeZone);
-};
+export const createDateTimezone = (stringDate: string, timeZone: string = getCurrentTimeZone()): Date =>
+  utcToZonedTime(new Date(stringDate), timeZone);
+
+export const newDateTimestamp = (value: number = 0, timeZone: string = getCurrentTimeZone()): Date =>
+  utcToZonedTime(value * 1000, timeZone);
+
+export const zoneDateToDate = (value: number = 0, timeZone: string = getCurrentTimeZone()): Date => zonedTimeToUtc(value * 1000, timeZone);
 
 export const dateToUTC = (date: Date, timeZone: string = getCurrentTimeZone()): Date => zonedTimeToUtc(date, timeZone);
 
 export const createNewDate = (date: Date, hour: number = 0, minute: number = 0, second: number = 0,
-                              mili: number = 0): Date => {
+                              milli: number = 0): Date => {
   const d = new Date(date);
-  d.setHours(hour, minute, second, mili);
+  d.setHours(hour, minute, second, milli);
 
   return d;
 };
@@ -432,13 +435,13 @@ export const getTimeNumber = (date: any) => {
       if (format.toLowerCase() === 'pm' || format.toLowerCase() === 'p.m.') {
         hour += 12;
       }
-      return { hour: hour, minute: Number(time[1].slice(0, 2)) };
+      return { hour, minute: Number(time[1].slice(0, 2)) };
     }
-    return { hour: hour, minute: Number(time[1]) };
+    return { hour, minute: Number(time[1]) };
   }
 
   return undefined;
-}
+};
 
 export const dateToTimestamp = (date: Date = getNow()): number => parseInt(`${ date.getTime() / 1000 }`, 10);
 
@@ -449,7 +452,7 @@ export const isSameTimeZone = (timeZone: string = getCurrentTimeZone()): boolean
     return true;
   }
   const date = new Date();
-  return getGMT(timeZone, date) === getGMT(getCurrentTimeZone(), date)
+  return getGMT(timeZone, date) === getGMT(getCurrentTimeZone(), date);
 };
 
 export const newDate = (value: number | string | Date): Date => new Date(value);
@@ -549,12 +552,12 @@ const getMinAndMax = (availability: IAvailability, date: Date, timeZone: string)
   let max;
   if (availability) {
     if (availability.start) {
-      const start = getTimeNumber(availability.start)!;
-      min = dateToUTC(createNewDate(date, start.hour, start.minute), timeZone);
+      const start = getTimeNumber(availability.start);
+      min = dateToUTC(createNewDate(date, start?.hour, start?.minute), timeZone);
     }
     if (availability.end) {
-      const end = getTimeNumber(availability.end)!;
-      max = dateToUTC(createNewDate(date, end.hour, end.minute), timeZone);
+      const end = getTimeNumber(availability.end);
+      max = dateToUTC(createNewDate(date, end?.hour, end?.minute), timeZone);
     }
   }
   return { min, max };
@@ -571,10 +574,10 @@ export const getReservationGMT = (reservation?: IReservationAll | IReservation):
     timeZone = getCurrentTimeZone();
   }
 
-  const date = newDateTimestamp(reservation?.timestamp)
+  const date = newDateTimestamp(reservation?.timestamp);
 
   return getUTC(timeZone, date);
-}
+};
 
 const timeConvert = (time: number, hour: number = 0) => {
   const hours = (time / 60);
