@@ -8,7 +8,7 @@ import * as fromActionsDashboard from '../store/dashboard.actions';
 import * as fromActionsReservation from '../store/reservation.actions';
 import { IReservationSummary, States } from '../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
-import { createDateTimezone, getEnd, getNow, newDateTimestamp } from '../util/dates';
+import { newDateTimestamp, getEnd, getNow } from '../util/dates';
 import { CalendarEvent, CalendarView } from 'angular-calendar';
 import { findStateColor, isDarkMode } from '../util/theme';
 import { getFrequency, Meta, monthEvent } from '../util/event';
@@ -19,7 +19,6 @@ import { UnavailableRepeatType } from '../interfaces/unavailable';
 import { UntypedFormControl } from '@angular/forms';
 import { IAuthority } from '../interfaces/user';
 import { Role } from '../interfaces/token';
-import { TreatmentService } from "../services/treatment.service";
 
 @Component({
   selector: 'app-dash',

@@ -199,7 +199,7 @@ export const newExtra = (price: IPrice, extras: number, discount?: IDiscount): I
     total = total - priceDiscount;
   }
 
-  return new Price(price.amount, price.discount, extras, price.additional, total, price.totalPaid, totalWithoutDiscount,
+  return new Price(price.amount, priceDiscount, extras, price.additional, total, price.totalPaid, totalWithoutDiscount,
     priceWithDiscount, priceWithExtras, price.priceWithAdditional, price.percentageToPaid);
 };
 
@@ -231,7 +231,7 @@ export const newAdditional = (price: IPrice, additionalList: IAdditionalAll[], d
     total = total - priceDiscount;
   }
 
-  return new Price(price.amount, price.discount, price.extra, additional, total, price.totalPaid,
+  return new Price(price.amount, priceDiscount, price.extra, additional, total, price.totalPaid,
     totalWithoutDiscount, priceWithDiscount, price.priceWithExtras, priceWithAdditional, price.percentageToPaid);
 };
 

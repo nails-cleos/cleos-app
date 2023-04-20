@@ -52,7 +52,7 @@ import {
   roomDetail,
   round
 } from '../../../util/helper';
-import { DiscountType, IUserDiscount } from '../../../interfaces/discount';
+import { DiscountType, IDiscount, IUserDiscount } from '../../../interfaces/discount';
 import { transitionAnimation } from '../../../util/animation';
 import { isEqual } from 'date-fns';
 import { IAdditionalAll } from '../../../interfaces/additional';
@@ -99,7 +99,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   event: UntypedFormControl = new UntypedFormControl('', [Validators.required]);
 
   discounts?: IUserDiscount[];
-  userDiscount?: IUserDiscount;
   showDiscount = false;
   price: IPrice;
   discount = new UntypedFormControl();
@@ -173,6 +172,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   private subscription?: Subscription;
   private steps: IStep[];
   private dismiss = false;
+  private treatmentDiscount?: IDiscount;
 
   constructor(private readonly translate: TranslateService, private snackBar: MatSnackBar,
               private store: Store<AppState>,
@@ -491,7 +491,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   onChange(options: MatListOption[]): void {
     this.additionalSelected = options.map(o => o.value);
-    this.price = newAdditional(this.price, this.additionalSelected, this.userDiscount?.discount);
+    this.price = newAdditional(this.price, this.additionalSelected, this.treatmentDiscount);
   }
 
   isSelected(it: IAdditionalAll): boolean {
@@ -618,7 +618,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
     this.treatment.valueChanges.subscribe(value => {
       if (value) {
-        this.price = newPrice(this.price, value.price, this.userDiscount?.discount);
+        this.price = newPrice(this.price, value.price, this.treatmentDiscount);
       }
       if (this.extras && this.extras.discount) {
         this.showDiscount = true;
@@ -628,9 +628,10 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
     this.discount.valueChanges.subscribe(value => {
       if (value && this.discounts) {
-        this.userDiscount = this.discounts.find(d => d.id === value);
-        if (this.userDiscount) {
-          this.price = newDiscount(this.price, this.userDiscount.discount);
+        const userDiscount = this.discounts.find(d => d.id === value);
+        if (userDiscount) {
+          this.treatmentDiscount = userDiscount.discount;
+          this.price = newDiscount(this.price, this.treatmentDiscount);
         }
       }
     });

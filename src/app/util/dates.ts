@@ -382,7 +382,7 @@ export const formatTime = (duration: IDuration, locale: string = API_LOCALE): st
 
 export const getNow = (): Date => new Date();
 
-export const getNowTimeZone = (timeZone: string = getCurrentTimeZone()): Date => utcToZonedTime(new Date(), timeZone);
+export const getNowTimeZone = (timeZone: string = getCurrentTimeZone()): Date => newDateTimestamp(new Date(), timeZone);
 
 export const createDateFromString = (stringDate: string): Date => {
   const date = stringDate.split('-');
@@ -404,11 +404,15 @@ export const createFullDate = (selectDate: Date): Date => {
   return date;
 };
 
-export const createDateTimezone = (stringDate: string, timeZone: string = getCurrentTimeZone()): Date =>
-  utcToZonedTime(new Date(stringDate), timeZone);
+export const newDateTimestamp = (date: string | Date | number = new Date(), timeZone: string = getCurrentTimeZone()): Date => {
+  if (typeof date === 'string') {
+    return utcToZonedTime(new Date(date), timeZone);
+  } else if (date instanceof Date) {
+    return utcToZonedTime(date, timeZone);
+  }
 
-export const newDateTimestamp = (value: number = 0, timeZone: string = getCurrentTimeZone()): Date =>
-  utcToZonedTime(value * 1000, timeZone);
+  return utcToZonedTime(date * 1000, timeZone);
+};
 
 export const zoneDateToDate = (value: number = 0, timeZone: string = getCurrentTimeZone()): Date => zonedTimeToUtc(value * 1000, timeZone);
 
