@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { HttpClient } from "@angular/common/http";
-import { environment } from "../../environments/environment";
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 declare let google: any;
 
 export enum MapStatus {
-  READY,
-  LOADING,
-  NOT_AVAILABLE
+  ready,
+  loading,
+  notAvailable
 }
 
 @Injectable({
@@ -26,14 +26,14 @@ export class GeocodeService {
       return this.httpClient.jsonp(
         `https://maps.googleapis.com/maps/api/js?libraries=geometry,places&key=${ environment.googleMapKey }&sensor=false`,
         'callback')
-        .pipe(map(() => MapStatus.READY),
+        .pipe(map(() => MapStatus.ready),
           catchError((e) => {
-            console.error(e)
-            return of(MapStatus.NOT_AVAILABLE)
+            console.error(e);
+            return of(MapStatus.notAvailable);
           }),
         );
     }
-    return new Observable((observer) => observer.next(MapStatus.NOT_AVAILABLE));
+    return new Observable((observer) => observer.next(MapStatus.notAvailable));
   }
 
   geocodeAddress(lat: number, lng: number, showDistance: boolean | undefined): Observable<any> {

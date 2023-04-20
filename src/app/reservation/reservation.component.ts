@@ -54,7 +54,7 @@ import { createRecurringEvent, fillNotAvailable, getOverlapEvent, Meta, newEvent
 import { ActivatedRoute, Router } from '@angular/router';
 import { Role } from '../interfaces/token';
 import { IUnavailableAll } from '../interfaces/unavailable';
-import { DiscountType, IUserDiscount } from '../interfaces/discount';
+import { DiscountType, IDiscount, IUserDiscount } from '../interfaces/discount';
 import {
   createRoomOffice,
   createTreatmentGroupService,
@@ -119,7 +119,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   ]);
 
   discounts?: IUserDiscount[];
-  userDiscount?: IUserDiscount;
   discount = new UntypedFormControl();
   showDiscount = false;
   price: IPrice;
@@ -193,6 +192,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscription?: Subscription;
   private steps: IStep[];
   private dismiss = false;
+  private treatmentDiscount?: IDiscount;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private formBuilder: UntypedFormBuilder, private breakpointObserver: BreakpointObserver,
@@ -528,8 +528,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   timeChange($event: string): void {
-    const time = getTimeNumber($event)!;
-    this.date.value.setHours(time.hour, time.minute);
+    const time = getTimeNumber($event);
+    this.date.value.setHours(time?.hour || 0, time?.minute || 0);
   }
 
   keyDownHandler(event: any, form: UntypedFormControl): void {
@@ -577,7 +577,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onChange(options: MatListOption[]): void {
     this.additionalSelected = options.map(o => o.value);
-    this.price = newAdditional(this.price, this.additionalSelected, this.userDiscount?.discount);
+    this.price = newAdditional(this.price, this.additionalSelected, this.treatmentDiscount);
   }
 
   isSelected(it: IAdditionalAll): boolean {
@@ -588,9 +588,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.errors.overlapping = false;
     this.date.setValue(date);
     this.start.setValue(getTime(date, this.dateFormat));
-    const nowTime = getTimeNumber(date)!;
+    const nowTime = getTimeNumber(date);
 
-    const start = createNewDate(date, nowTime.hour, nowTime.minute);
+    const start = createNewDate(date, nowTime?.hour, nowTime?.minute);
     const end = createNewDate(start, start.getHours() + this.duration.hour,
       start.getMinutes() + this.duration.minute);
     const event = this.createNewEvent(start, end, state, this.room.value.timeZone, id);
@@ -764,7 +764,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.treatment.valueChanges.subscribe(value => {
       if (value) {
-        this.price = newPrice(this.price, value.price, this.userDiscount?.discount);
+        this.price = newPrice(this.price, value.price, this.treatmentDiscount);
       }
       if (this.extras && this.extras.discount) {
         this.showDiscount = true;
@@ -773,9 +773,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.discount.valueChanges.subscribe(value => {
       if (value && this.discounts) {
-        this.userDiscount = this.discounts.find(d => d.id === value);
-        if (this.userDiscount) {
-          this.price = newDiscount(this.price, this.userDiscount.discount);
+        const userDiscount = this.discounts.find(d => d.id === value);
+        if (userDiscount) {
+          this.treatmentDiscount = userDiscount.discount;
+          this.price = newDiscount(this.price, this.treatmentDiscount);
         }
       }
     });
@@ -994,8 +995,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           if (this.reservationId && this.reservation && this.date.value && this.myStepper.selectedIndex === bookOrder) {
             let date: Date;
             if (this.start?.value) {
-              const time = getTimeNumber(this.start.value)!;
-              date = createNewDate(this.date.value, time.hour, time.minute);
+              const time = getTimeNumber(this.start.value);
+              date = createNewDate(this.date.value, time?.hour, time?.minute);
             } else {
               date = createNewDate(this.date.value, this.date.value.getHours(), this.date.value.getMinutes());
             }
@@ -1113,6 +1114,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.completeAndNext();
     }
     this.reservation = reservation;
+    this.treatmentDiscount = this.reservation.treatment.discount;
     this.isPreview = false;
     const date = newDateTimestamp(reservation.timestamp, this.reservation.room.timeZone);
     this.room.setValue(reservation.room);

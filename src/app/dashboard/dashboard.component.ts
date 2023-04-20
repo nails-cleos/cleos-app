@@ -3,8 +3,20 @@ import { CalendarEvent } from 'angular-calendar';
 import { Observable, Subscription } from 'rxjs';
 import { AppState, selectAuthState, selectDashboardState } from '../store/app.states';
 import {
-  addPeriod, API_LOCALE, createDateTimezone, createNewDate, dateToTimestamp, endOfPeriod, getCurrentTimeZone, getEnd,
-  getMinutesBetweenTimes, getNow, getRoomStartEndDay, isBetween, newDate, newDateTimestamp, startOfPeriod, subPeriod
+  addPeriod,
+  API_LOCALE, newDateTimestamp,
+  createNewDate,
+  dateToTimestamp,
+  endOfPeriod,
+  getCurrentTimeZone,
+  getEnd,
+  getMinutesBetweenTimes,
+  getNow,
+  getRoomStartEndDay,
+  isBetween,
+  newDate,
+  startOfPeriod,
+  subPeriod
 } from '../util/dates';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
