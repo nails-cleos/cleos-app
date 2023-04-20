@@ -78,12 +78,12 @@
       "FIELD": "Pick a date",
       "REQUIRED": "Date is <b>required</b>"
     },
-    "END": {
-      "DATE": {
-        "FIELD": "Pick a treatment end date",
-        "REQUIRED": "Treatment end date is <b>required</b>"
+    "TIME": {
+      "START": {
+        "FIELD": "Pick a treatment start time",
+        "REQUIRED": "Treatment start time is <b>required</b>"
       },
-      "TIME": {
+      "END": {
         "FIELD": "Pick a treatment end time",
         "REQUIRED": "Treatment end time is <b>required</b>"
       }

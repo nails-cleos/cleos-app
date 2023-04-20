@@ -42,13 +42,13 @@
       <mat-list-item>
         <mat-icon matListItemIcon>event</mat-icon>
         <div matListItemLine>
-          {{start | date:'short':GMT:dateFormat}}
+          {{start | date:'short':gmt:dateFormat}}
           <button (click)="openDialog(start)" *ngIf="showTimeZone()" mat-icon-button type="button">
             <mat-icon>info_outline</mat-icon>
           </button>
         </div>
         <div matListItemLine>
-          {{end | date:'short':GMT:dateFormat}}
+          {{end | date:'short':gmt:dateFormat}}
           <button (click)="openDialog(end)" *ngIf="showTimeZone()" mat-icon-button type="button">
             <mat-icon>info_outline</mat-icon>
           </button>
@@ -74,9 +74,6 @@
         <mat-icon matListItemIcon>{{reservation.room.currency.icon}}</mat-icon>
         <div matListItemTitle>{{ 'RESERVATION.TREATMENT.PRICE.FIELD' | translate}}</div>
         <div matListItemLine><span class="bold">{{price.amount}}</span></div>
-        <ng-template #noDiscount>
-          <div matListItemLine>{{price.amount | number:'1.2-2'}}</div>
-        </ng-template>
       </mat-list-item>
       <div *ngIf="reservation.treatment.extras">
         <mat-divider></mat-divider>
@@ -112,13 +109,16 @@
       </div>
       <div *ngIf="reservation.treatment.extras || (reservation.additional && reservation.additional.length)">
         <mat-divider></mat-divider>
+        <div mat-subheader><span class="bold">{{ 'COMMON.LABEL.TOTAL' | translate}}</span></div>
         <mat-list-item *ngIf="price.total">
           <mat-icon class="bold" matListItemIcon>{{reservation.room.currency.icon}}</mat-icon>
-          <div matListItemTitle><span class="bold">{{ 'COMMON.LABEL.TOTAL' | translate}}</span></div>
-          <div *ngIf="price.discount; else noDiscount" matListItemLine>
+          <div *ngIf="price.discount; else noDiscount" matListItemTitle>
             <span [class.strikethrough]="price.discount">{{price.totalWithoutDiscount | number:'1.2-2'}}</span>
             <span [@discountAnimation] class="raised-button bold">{{price.total | number:'1.2-2'}}</span>
           </div>
+          <ng-template #noDiscount>
+            <div matListItemTitle>{{price.total | number:'1.2-2'}}</div>
+          </ng-template>
         </mat-list-item>
       </div>
       <mat-divider></mat-divider>
@@ -256,7 +256,7 @@
           <th *matHeaderCellDef mat-header-cell> {{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }} </th>
           <td *matCellDef="let history" mat-cell>
             <div *ngIf="history.id; else skeleton">
-              {{history.timestamp | timeDetail | date:'short':GMT:dateFormat}}
+              {{history.timestamp | timeDetail | date:'short':gmt:dateFormat}}
               <button (click)="openHistoryDialog(history)" *ngIf="showTimeZone(history)" mat-icon-button type="button">
                 <mat-icon>info_outline</mat-icon>
               </button>

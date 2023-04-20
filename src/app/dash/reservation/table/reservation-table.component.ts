@@ -13,7 +13,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { openDialog } from '../../../util/helper';
-import { isSameTimeZone, newDateTimestamp } from '../../../util/dates';
+import { newDateTimestamp, isSameTimeZone } from '../../../util/dates';
 import { Role } from '../../../interfaces/token';
 import { detailExpandAnimation } from '../../../util/animation';
 

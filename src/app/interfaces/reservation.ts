@@ -32,6 +32,7 @@ export interface IReservation {
   reference?: string;
 
   payment?: IReservationPayment;
+  startedTimestamp?: number;
 }
 
 export interface IReservationPayment {
@@ -55,6 +56,7 @@ export interface IReservationAll {
   history?: IReservationAll[];
   additional?: IAdditionalAll[];
   configuration?: IConfigurationReservation;
+  startedTimestamp?: number;
 }
 
 export interface IConfigurationReservation {

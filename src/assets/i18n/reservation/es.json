@@ -78,12 +78,12 @@
       "FIELD": "Elegí una fecha",
       "REQUIRED": "Fecha es <b>requerida</b>"
     },
-    "END": {
-      "DATE": {
-        "FIELD": "Elegí una fecha de fin del tratamiento",
-        "REQUIRED": "Fecha de fin del tratamiento es <b>requerido</b>"
+    "TIME": {
+      "START": {
+        "FIELD": "Elegí una hora de inicio del tratamiento",
+        "REQUIRED": "Hora de inicio del tratamiento es <b>requerido</b>"
       },
-      "TIME": {
+      "END": {
         "FIELD": "Elegí una hora de fin del tratamiento",
         "REQUIRED": "Hora de fin del tratamiento es <b>requerido</b>"
       }

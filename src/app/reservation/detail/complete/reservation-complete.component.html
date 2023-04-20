@@ -65,27 +65,38 @@
                   <input [formControl]="extraPrice" [min]="1" matInput step="1" type="number">
                 </label>
               </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'RESERVATION.END.DATE.FIELD' | translate }}</mat-label>
-                <label>
-                  <input (focus)="picker.open()" [formControl]="date" [matDatepicker]="picker" matInput required>
-                </label>
-                <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
-                <mat-datepicker #picker touchUi></mat-datepicker>
-                <mat-error *ngIf="date.hasError('required')" [innerHTML]="'RESERVATION.END.DATE.REQUIRED' | translate">
-                </mat-error>
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'RESERVATION.END.TIME.FIELD' | translate }}</mat-label>
-                <label>
-                  <input [formControl]="time" [format]="24" [ngxTimepicker]="tStart" matInput name="start" readonly
-                         required/>
-                </label>
-                <span matPrefix><mat-icon (click)="tStart.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
-                <ngx-material-timepicker #tStart (timeSet)="timeChange($event)"></ngx-material-timepicker>
-                <mat-error *ngIf="time.hasError('required')" [innerHTML]="'RESERVATION.END.TIME.REQUIRED' | translate">
-                </mat-error>
-              </mat-form-field>
+              <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-between center">
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'RESERVATION.TIME.START.FIELD' | translate }}</mat-label>
+                  <label>
+                    <input [formControl]="startTime" [format]="24" [ngxTimepicker]="tStart" matInput name="start"
+                           readonly required style="text-align: center;"/>
+                  </label>
+                  <span matPrefix class="bold" style="margin: 0 5px 0 10px;">
+                  {{startDate | timeDetail | date:'shortDate':reservation.room.timeZone:dateFormat}}
+                </span>
+                  <mat-icon (click)="tStart.open()" matSuffix>schedule</mat-icon>
+                  <ngx-material-timepicker #tStart (timeSet)="timeChange($event, startDate)"></ngx-material-timepicker>
+                  <mat-error *ngIf="startTime.hasError('required')"
+                             [innerHTML]="'RESERVATION.TIME.START.REQUIRED' | translate">
+                  </mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'RESERVATION.TIME.END.FIELD' | translate }}</mat-label>
+                  <label>
+                    <input [formControl]="endTime" [format]="24" [ngxTimepicker]="tEnd" matInput name="end" readonly
+                           required style="text-align: center;"/>
+                  </label>
+                  <span matPrefix class="bold" style="margin: 0 5px 0 10px;">
+                  {{endDate | timeDetail | date:'shortDate':reservation.room.timeZone:dateFormat}}
+                </span>
+                  <mat-icon (click)="tEnd.open()" matSuffix>schedule</mat-icon>
+                  <ngx-material-timepicker #tEnd (timeSet)="timeChange($event, endDate)"></ngx-material-timepicker>
+                  <mat-error *ngIf="endTime.hasError('required')"
+                             [innerHTML]="'RESERVATION.TIME.END.REQUIRED' | translate">
+                  </mat-error>
+                </mat-form-field>
+              </div>
               <ng-template #skeleton>
                 <div class="ssc-line"></div>
               </ng-template>

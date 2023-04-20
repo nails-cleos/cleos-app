@@ -357,19 +357,7 @@
         <mat-list-item>
           <mat-icon matListItemIcon>{{room.value.currency.icon}}</mat-icon>
           <div matListItemTitle>{{ 'RESERVATION.TREATMENT.PRICE.FIELD' | translate}}</div>
-          <div *ngIf="!isEditing; else editing" matListItemLine>
-            <span [class.strikethrough]="discount.value">{{treatment.value.price | number:'1.2-2'}}</span>
-            <span *ngIf="price.priceWithDiscount" [@discountAnimation]
-                  class="raised-button bold">{{price.priceWithDiscount | number:'1.2-2'}}</span>
-          </div>
-          <ng-template #editing>
-            <div matListItemLine>
-              <span>{{(price.priceWithDiscount ? price.priceWithDiscount : treatment.value.price) | number:'1.2-2'}}</span>
-              <span *ngIf="price.priceWithDiscount" class="raised-button bold">
-                {{'RESERVATION.TREATMENT.DISCOUNT.ADD' | translate}}
-              </span>
-            </div>
-          </ng-template>
+          <div matListItemLine><span class="bold">{{treatment.value.price | number:'1.2-2'}}</span></div>
         </mat-list-item>
         <div *ngIf="additionalSelected.length">
           <mat-divider></mat-divider>
@@ -391,7 +379,19 @@
           <mat-list-item *ngIf="price.total">
             <mat-icon class="bold" matListItemIcon>{{room.value.currency.icon}}</mat-icon>
             <div matListItemLine><span class="bold">{{ 'COMMON.LABEL.TOTAL' | translate}}</span></div>
-            <div matListItemLine><span class="bold">{{price.total}}</span></div>
+            <div *ngIf="!isEditing; else editing" matListItemLine>
+              <span [class.strikethrough]="discount.value">{{price.totalWithoutDiscount | number:'1.2-2'}}</span>
+              <span *ngIf="price.priceWithDiscount" [@discountAnimation]
+                    class="raised-button bold">{{price.total | number:'1.2-2'}}</span>
+            </div>
+            <ng-template #editing>
+              <div matListItemLine>
+                <span>{{price.total | number:'1.2-2'}}</span>
+                <span *ngIf="price.priceWithDiscount !== price.total" class="raised-button bold">
+                {{'RESERVATION.TREATMENT.DISCOUNT.ADD' | translate}}
+              </span>
+              </div>
+            </ng-template>
           </mat-list-item>
         </div>
         <div *ngIf="customerChange.value">

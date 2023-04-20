@@ -109,8 +109,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  get GMT(): string {
-    return getReservationGMT(this.reservation)
+  get gmt(): string {
+    return getReservationGMT(this.reservation);
   }
 
   get total(): number {

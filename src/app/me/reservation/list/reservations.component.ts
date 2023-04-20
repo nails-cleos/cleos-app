@@ -11,13 +11,13 @@ import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import * as fromActionsReservation from '../../../store/reservation.actions';
-import { isSameTimeZone, newDateTimestamp } from '../../../util/dates';
-import { getLocale, openDialog } from '../../../util/helper';
+import { newDateTimestamp, isSameTimeZone } from '../../../util/dates';
+import { openDialog } from '../../../util/helper';
 import { stampAnimation, transitionAnimation } from '../../../util/animation';
 import { IReview, Review } from '../../../interfaces/review';
 import { ReviewDialogComponent } from '../review/review-dialog.component';
 import { isToday } from 'date-fns';
-import { AngularFireAnalytics } from "@angular/fire/compat/analytics";
+import { AngularFireAnalytics } from '@angular/fire/compat/analytics';
 
 @Component({
   selector: 'app-reservations',

@@ -6,18 +6,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as fromActionsReservation from '../../../store/reservation.actions';
 import { IReservationAll } from '../../../interfaces/reservation';
 import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../interfaces/treatment';
-import { FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IPaymentAll, PaymentType } from '../../../interfaces/payment';
-import {
-  createTreatmentGroupService,
-  getPrice,
-  getTreatmentDurability,
-  newAdditional,
-  newExtra,
-  newPrice
-} from '../../../util/helper';
-import { API_LOCALE, getNowTimeZone, getTime, getTimeNumber } from '../../../util/dates';
+import { createTreatmentGroupService, getPrice, getTreatmentDurability, newAdditional, newExtra, newPrice } from '../../../util/helper';
+import { API_LOCALE, newDateTimestamp, getNowTimeZone, getTime, getTimeNumber } from '../../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
 import { map, startWith } from 'rxjs/operators';
 import { transitionAnimation } from '../../../util/animation';
@@ -49,11 +42,15 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     Validators.required, requireMatch
   ]);
 
-  date: FormControl<Date> = new UntypedFormControl('', [
+  startDate: Date;
+
+  startTime: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
 
-  time: UntypedFormControl = new UntypedFormControl('', [
+  endDate: Date;
+
+  endTime: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
 
@@ -66,6 +63,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   price: IPrice;
 
   durability?: string;
+  dateFormat: string;
 
   private reservationId: any;
   private roomId: any;
@@ -77,6 +75,10 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   constructor(private store: Store<AppState>, private route: ActivatedRoute, private formBuilder: UntypedFormBuilder,
               private readonly translate: TranslateService, private router: Router) {
     this.getState = this.store.select(selectReservationState);
+    this.dateFormat = this.translate.currentLang;
+    this.endDate = getNowTimeZone();
+    this.startDate = getNowTimeZone();
+    this.endTime.setValue(getTime(this.endDate, this.translate.currentLang));
     this.price = new Price();
     this.treatment.valueChanges.subscribe(value => {
       if (value) {
@@ -98,11 +100,13 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       const paymentType = this.type.value;
       const additionalIds = this.additionalSelected.map(additional => additional.id);
       const transfer = this.transfer.value;
-      const dateTime = this.date.value.toLocaleString(API_LOCALE);
+      const startDateTime = this.startDate.toLocaleString(API_LOCALE);
+      const endDateTime = this.endDate.toLocaleString(API_LOCALE);
+
       this.store.dispatch(
         new fromActionsReservation.Complete({
           reservationId,
-          extras: { treatmentId, description, price, paymentType, additionalIds, transfer, dateTime },
+          extras: { treatmentId, description, price, paymentType, additionalIds, transfer, startDateTime, endDateTime },
           isDashboard: this.isDashboard
         })
       );
@@ -117,9 +121,6 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       this.reservationId = routeParams.id;
       this.roomId = routeParams.roomId;
       this.customerId = routeParams.customerId;
-      const dateTime = getNowTimeZone();
-      this.date.setValue(dateTime);
-      this.time.setValue(getTime(dateTime, this.translate.currentLang));
       this.getReservation();
       this.getTreatments();
     });
@@ -153,9 +154,9 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     return this.additionalSelected.filter(el => el.id === it.id).length > 0;
   }
 
-  timeChange($event: string): void {
-    const time = getTimeNumber($event)!;
-    this.date.value.setHours(time.hour, time.minute, 0);
+  timeChange($event: string, date: Date): void {
+    const time = getTimeNumber($event);
+    date.setHours(time?.hour || 0, time?.minute || 0, 0);
   }
 
   private subscribe(): void {
@@ -163,6 +164,10 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       this.payments = state.payments;
       this.reservation = state.selected;
       if (this.reservation) {
+        this.startDate = newDateTimestamp(this.reservation.startedTimestamp, this.reservation.room.timeZone);
+        this.startTime.setValue(getTime(this.startDate, this.translate.currentLang));
+        const endDate = newDateTimestamp(this.reservation.timestamp, this.reservation.room.timeZone);
+        this.endDate.setFullYear(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
         this.price = getPrice(this.reservation, this.payments);
         this.treatment.setValue(this.reservation.treatment);
         this.additionalSelected = this.reservation.additional ? this.reservation.additional
@@ -194,8 +199,8 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       extraPrice: this.extraPrice,
       type: this.type,
       transfer: this.transfer,
-      date: this.date,
-      time: this.time
+      startTime: this.startTime,
+      endTime: this.endTime
     });
     this.valueChange();
   }

@@ -37,7 +37,7 @@ export class GoogleMapComponent implements OnInit, AfterViewInit {
     this.latitude = 51.926517;
     this.longitude = 4.462456;
     this.isDraggable = false;
-    this.mapStatus = MapStatus.LOADING;
+    this.mapStatus = MapStatus.loading;
     this.markerOptions = { draggable: this.isDraggable }
     this.center = { lat: this.latitude, lng: this.longitude }
     this.zoom = 10;
@@ -53,11 +53,11 @@ export class GoogleMapComponent implements OnInit, AfterViewInit {
     this.geocodeService.createMap().subscribe((mapStatus) => {
       this.mapStatus = mapStatus;
       switch (mapStatus) {
-        case MapStatus.READY:
+        case MapStatus.ready:
           this.setCurrentPosition();
           this.setAutocomplete();
           break;
-        case MapStatus.NOT_AVAILABLE:
+        case MapStatus.notAvailable:
           this.mockResponse();
           break;
       }
