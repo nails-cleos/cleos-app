@@ -99,7 +99,7 @@ export const monthEvent = (title: string, start: Date, end: Date | null, id: str
   start,
   title,
   end,
-  color: createEventColor(color, isDarkMode),
+  color: createEventColor(color, isDarkMode, true),
   meta
 } as unknown as CalendarEvent);
 
@@ -169,9 +169,9 @@ const createEvent = (it: IAvailability, date: Date, notWorking: string, unavaila
     const hour = nowTime.hour;
     const minute = nowTime.minute;
     if (it.start) {
-      const start = getTimeNumber(it.start)!;
-      const endHour = start.hour;
-      const endMinute = start.minute;
+      const start = getTimeNumber(it.start);
+      const endHour = start?.hour;
+      const endMinute = start?.minute;
       const eventBefore = newEvent(notWorking, findStateColor('DEFAULT', isDarkMode),
         newDate, dateToUTC(createNewDate(date, endHour, endMinute), timeZone), isDarkMode);
       if (eventBefore) {

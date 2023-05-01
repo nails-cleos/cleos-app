@@ -1,7 +1,7 @@
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { CookieService } from 'ngx-cookie-service';
 import { ChartOptions } from 'chart.js';
-import { ThemeService } from "ng2-charts";
+import { ThemeService } from 'ng2-charts';
 
 export type Theme = 'light-theme' | 'dark-theme';
 
@@ -47,28 +47,28 @@ const getTheme = (theme: string | undefined): Theme => theme === dark ? dark : l
 
 const stateColor = (isDark: boolean): IState[] => [{
   name: 'CREATED',
-  color: isDark ? '#fafafa' : '#ABABAB'// accent-lighter
+  color: isDark ? '#fafafa' : '#ababab'// accent-lighter
 }, {
   name: 'PARTIALLY_COMPLETED',
   color: '#f7e6d8'
 }, {
   name: 'COMPLETED',
-  color: isDark ? '#90EE90' : '#44A244'
+  color: isDark ? '#90ee90' : '#44a244'
 }, {
   name: 'PAID',
-  color: isDark ? 'rgb(0, 158, 227)' : 'rgba(0, 158, 227, 0.4)'
+  color: isDark ? '#009ee3' : '#04589a'
 }, {
   name: 'PARTIALLY_PAID',
-  color: isDark ? 'rgb(0, 158, 227)' : 'rgba(0, 158, 227, 0.4)'
+  color: isDark ? '#009ee3' : '#04589a'
 }, {
   name: 'STARTED',
-  color: isDark ? '#E6B9FF' : '#673ab7'
+  color: isDark ? '#e6b9ff' : '#673ab7'
 }, {
   name: 'APPROVED',
   color: isDark ? '#e3d3c5' : '#a06c3f' // primary-lighter
 }, {
   name: 'DEFAULT',
-  color: isDark ? '#ffb3b3' : '#f08080' // warn-lighter
+  color: isDark ? '#f08080' : '#ffb3b3' // warn-lighter
 }];
 
 const selectedTheme = (value: Theme | undefined, themeService: ThemeService): void => {
