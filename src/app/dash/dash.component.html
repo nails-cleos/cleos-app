@@ -1,11 +1,11 @@
 <mat-form-field appearance="outline" *ngIf="mapDashboard?.size" style="margin-bottom: 8px; width: 100%;">
-<!--  <mat-card-header>-->
-    <mat-select [formControl]="selectedDash">
-      <mat-option *ngFor="let dashboard of mapDashboard | keyvalue" [value]="dashboard.key">
-        {{dashboard.key}}
-      </mat-option>
-    </mat-select>
-<!--  </mat-card-header>-->
+  <!--  <mat-card-header>-->
+  <mat-select [formControl]="selectedDash">
+    <mat-option *ngFor="let dashboard of mapDashboard | keyvalue" [value]="dashboard.key">
+      {{dashboard.key}}
+    </mat-option>
+  </mat-select>
+  <!--  </mat-card-header>-->
 </mat-form-field>
 
 <!--Calendar-->
@@ -24,7 +24,7 @@
       </ng-template>
     </mat-card-title>
     <mat-card-subtitle class="calendar-title">
-      <button  fxShow.lt-sm fxHide (click)="changeDate" (viewDateChange)="closeOpenMonthViewDay" [(viewDate)]="viewDate"
+      <button fxShow.lt-sm fxHide (click)="changeDate" (viewDateChange)="closeOpenMonthViewDay" [(viewDate)]="viewDate"
               [class.spinner]="isLoading || isCalendarLoading" [disabled]="isLoading || isCalendarLoading" [view]="view"
               color="accent" mat-fab mwlCalendarPreviousView>
         <mat-icon>navigate_before</mat-icon>
@@ -35,12 +35,14 @@
         <mat-icon>navigate_before</mat-icon>
         <span>{{'COMMON.BUTTON.PREVIOUS' | translate}}</span>
       </button>
-      <button fxShow.lt-sm fxHide (click)="changeDate" [(viewDate)]="viewDate" [class.spinner]="isLoading || isCalendarLoading"
+      <button fxShow.lt-sm fxHide (click)="changeDate" [(viewDate)]="viewDate"
+              [class.spinner]="isLoading || isCalendarLoading"
               [disabled]="isLoading || isCalendarLoading" class="btn btn-outline-secondary" color="accent"
               mat-fab mwlCalendarToday>
         <mat-icon>today</mat-icon>
       </button>
-      <button fxHide.lt-sm fxShow (click)="changeDate" [(viewDate)]="viewDate" [class.spinner]="isLoading || isCalendarLoading"
+      <button fxHide.lt-sm fxShow (click)="changeDate" [(viewDate)]="viewDate"
+              [class.spinner]="isLoading || isCalendarLoading"
               [disabled]="isLoading || isCalendarLoading" class="btn btn-outline-secondary" color="accent"
               mat-fab extended mwlCalendarToday>
         <mat-icon>today</mat-icon>
@@ -61,6 +63,7 @@
   </mat-card-header>
   <mat-card-content *ngIf="!isCalendarLoading; else calendarLoading">
     <mwl-calendar-month-view (dayClicked)="dayClicked($event.day)" (eventClicked)="handleEvent($event.event)"
+                             (mwlClick)="cellClick(viewDate)"
                              [activeDayIsOpen]="activeDayIsOpen" [events]="events" [locale]="dateFormat"
                              [viewDate]="viewDate"></mwl-calendar-month-view>
   </mat-card-content>

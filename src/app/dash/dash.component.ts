@@ -8,7 +8,7 @@ import * as fromActionsDashboard from '../store/dashboard.actions';
 import * as fromActionsReservation from '../store/reservation.actions';
 import { IReservationSummary, States } from '../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
-import { newDateTimestamp, getEnd, getNow } from '../util/dates';
+import { getEnd, getNow, newDateTimestamp } from '../util/dates';
 import { CalendarEvent, CalendarView } from 'angular-calendar';
 import { findStateColor, isDarkMode } from '../util/theme';
 import { getFrequency, Meta, monthEvent } from '../util/event';
@@ -19,6 +19,9 @@ import { UnavailableRepeatType } from '../interfaces/unavailable';
 import { UntypedFormControl } from '@angular/forms';
 import { IAuthority } from '../interfaces/user';
 import { Role } from '../interfaces/token';
+import { IRoom } from '../interfaces/room';
+import { CalendarDialogComponent } from '../shared/calendar-dialog/calendar-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-dash',
@@ -51,17 +54,17 @@ export class DashComponent implements OnInit, OnDestroy {
 
   cardLayout = {
     columns: 2,
-    miniCard: {cols: 1, rows: 1},
-    calendar: {cols: 2, rows: 4},
-    chart: {cols: 2, rows: 2},
-    table: {cols: 2, rows: 4}
+    miniCard: { cols: 1, rows: 1 },
+    calendar: { cols: 2, rows: 4 },
+    chart: { cols: 2, rows: 2 },
+    table: { cols: 2, rows: 4 }
   };
 
   private destroy$ = new Subject();
   private getState: Observable<any>;
   private subscription?: Subscription;
 
-  constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
+  constructor(public dialog: MatDialog, private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
               private readonly translate: TranslateService, private router: Router) {
     this.getState = this.store.select(selectDashboardState);
     this.store.select(selectAuthState).subscribe((state: any) => {
@@ -77,26 +80,26 @@ export class DashComponent implements OnInit, OnDestroy {
         if (breakpointState.breakpoints[Breakpoints.Medium]) {
           this.cardLayout = {
             columns: 2,
-            miniCard: isManager ? {cols: 1, rows: 1} : {cols: 0, rows: 0},
-            calendar: {cols: 2, rows: 4},
-            chart: {cols: 2, rows: 2},
-            table: {cols: 2, rows: 4}
+            miniCard: isManager ? { cols: 1, rows: 1 } : { cols: 0, rows: 0 },
+            calendar: { cols: 2, rows: 4 },
+            chart: { cols: 2, rows: 2 },
+            table: { cols: 2, rows: 4 }
           };
         } else if (breakpointState.matches) {
           this.cardLayout = {
             columns: 1,
-            miniCard: isManager ? {cols: 1, rows: 1} : {cols: 0, rows: 0},
-            calendar: {cols: 1, rows: 4},
-            chart: {cols: 1, rows: 1.5},
-            table: {cols: 1, rows: 4.5}
+            miniCard: isManager ? { cols: 1, rows: 1 } : { cols: 0, rows: 0 },
+            calendar: { cols: 1, rows: 4 },
+            chart: { cols: 1, rows: 1.5 },
+            table: { cols: 1, rows: 4.5 }
           };
         } else {
           this.cardLayout = {
             columns: 4,
-            miniCard: isManager ? {cols: 1, rows: 1} : {cols: 0, rows: 0},
-            calendar: {cols: 4, rows: 4},
-            chart: {cols: 2, rows: 2},
-            table: {cols: 4, rows: 4}
+            miniCard: isManager ? { cols: 1, rows: 1 } : { cols: 0, rows: 0 },
+            calendar: { cols: 4, rows: 4 },
+            chart: { cols: 2, rows: 2 },
+            table: { cols: 4, rows: 4 }
           };
         }
       });
@@ -127,7 +130,7 @@ export class DashComponent implements OnInit, OnDestroy {
 
   private static createErrorMiniCard(title: string, message: string): IReservationSummary {
     return {
-      title: `DASHBOARD.MINI_CARD.${title}`,
+      title: `DASHBOARD.MINI_CARD.${ title }`,
       error: {
         status: message
       }
@@ -158,10 +161,32 @@ export class DashComponent implements OnInit, OnDestroy {
     this.router.navigate(event.meta.route);
   }
 
-  dayClicked({date, events}: { date: Date; events: CalendarEvent[] }): void {
+  dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {
     if (isSameMonth(date, this.viewDate)) {
       this.activeDayIsOpen = !((isSameDay(this.viewDate, date) && this.activeDayIsOpen) || events.length === 0);
       this.viewDate = date;
+    }
+    if (!this.activeDayIsOpen) {
+      const room = { id: this.roomId };
+      this.segmentClick(date, room);
+    }
+  }
+
+  cellClick(date: any): void {
+    const room = { id: this.roomId };
+    this.segmentClick(date, room);
+  }
+
+  private segmentClick(date: Date, room?: IRoom): void {
+    const data = { date, room };
+    if (date && room) {
+      const dialogRef = this.dialog.open(CalendarDialogComponent);
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.router.navigate(result.split(','), { state: data });
+        }
+      });
     }
   }
 
@@ -261,7 +286,7 @@ export class DashComponent implements OnInit, OnDestroy {
       this.state.calendarSummary.unavailable?.forEach((it: ICalendarUnavailable) => {
         const start = newDateTimestamp(it.start);
         this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNow());
-        const title = it.duration ? it.title : `${this.translate.instant('COMMON.ALL_DAY.CHECK')} - ${it.title}`;
+        const title = it.duration ? it.title : `${ this.translate.instant('COMMON.ALL_DAY.CHECK') } - ${ it.title }`;
 
         if (it.repeat === UnavailableRepeatType.none) {
           const end = getEnd(start, it.duration);
