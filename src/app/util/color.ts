@@ -44,13 +44,14 @@ export const lightenDarkenColor = (col: string, amt: number): string => {
   return (usePound ? '#' : '') + (g | (b << 8) | (r << 16)).toString(16);
 };
 
-export const createColor = ({red, green, blue}: any, isDarkMode: boolean): ColorEvent => {
+export const createColor = ({ red, green, blue }: any, isDarkMode: boolean, isMonth: boolean = false): ColorEvent => {
   const color = convertRGBToHex(red, green, blue);
   const lightenDarken = lightenDarkenColor(color, isDarkMode ? 50 : -50);
   return new ColorEvent(lightenDarken, color);
 };
 
-export const createEventColor = (hex: string, isDarkMode: boolean): ColorEvent => createColor(convertHexToRGB(hex), isDarkMode);
+export const createEventColor = (hex: string, isDarkMode: boolean, isMonth: boolean = false): ColorEvent =>
+  createColor(convertHexToRGB(hex), isDarkMode, isMonth);
 
 export const convertRGBToHex = (red: number, green: number, blue: number): string =>
   '#' + getRGBColor(red) + getRGBColor(green) + getRGBColor(blue);
@@ -74,10 +75,10 @@ const convertHexToRGB = (h: string): { red: number; green: number; blue: number 
     b = '0x' + h[5] + h[6];
   }
 
-  return {red: +r, green: +g, blue: +b};
+  return { red: +r, green: +g, blue: +b };
 };
 
-const getRGBColor = (value: number): string => `0${value.toString(16)}`.slice(-2);
+const getRGBColor = (value: number): string => `0${ value.toString(16) }`.slice(-2);
 
 const randomColor = (dark: boolean): { red: number; green: number; blue: number } => {
   const value = dark ? 1 : 0;
@@ -85,10 +86,10 @@ const randomColor = (dark: boolean): { red: number; green: number; blue: number 
   const green = Math.floor((value + Math.random()) * 256 / 2);
   const blue = Math.floor((value + Math.random()) * 256 / 2);
 
-  return {red, green, blue};
+  return { red, green, blue };
 };
 
 const createColorEvent = (color: string, isDark: boolean): ColorEvent => {
   const rgb = color.split(',');
-  return createColor({red: Number(rgb[0]), green: Number(rgb[1]), blue: Number(rgb[2])}, isDark);
+  return createColor({ red: Number(rgb[0]), green: Number(rgb[1]), blue: Number(rgb[2]) }, isDark);
 };
