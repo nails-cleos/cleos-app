@@ -5,6 +5,7 @@ export enum ReservationIconName {
   started = 'play_arrow',
   completed = 'done_all',
   cancelled = 'clear',
+  freeCancellation = 'free_cancellation',
   edit = 'edit_calendar',
   book = 'book_online',
   paid = 'price_check',
@@ -12,7 +13,9 @@ export enum ReservationIconName {
   payment = 'payment',
   partiallyCompleted = 'rule',
   more = 'read_more',
-  change = 'switch_account'
+  change = 'switch_account',
+  cancelledPaymentRequired = 'credit_card_off',
+  editCancelled = 'edit_calendar'
 }
 
 export enum RoomIconName {

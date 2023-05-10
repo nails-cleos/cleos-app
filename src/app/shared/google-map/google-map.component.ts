@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { ControlContainer, NgForm, UntypedFormGroup } from '@angular/forms';
 import { GeocodeService, MapStatus } from '../../services/geocode.service';
-import { MapInfoWindow, MapMarker } from "@angular/google-maps";
+import { MapInfoWindow, MapMarker } from '@angular/google-maps';
 import PlaceResult = google.maps.places.PlaceResult;
 import MapMouseEvent = google.maps.MapMouseEvent;
 

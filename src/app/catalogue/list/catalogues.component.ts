@@ -9,9 +9,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ICatalogueAll } from '../../interfaces/catalogue';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
-import { DialogComponent } from '../../shared/dialog/dialog.component';
+import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
+import { executeDialogNoWidth } from '../../util/helper';
 
 @Component({
   selector: 'app-catalogue-list',
@@ -76,12 +77,8 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   delete(catalogue: ICatalogueAll): void {
     const title = this.translate.instant('CATALOGUE.DELETED.TITLE');
-    const content = this.translate.instant('CATALOGUE.DELETED.CONTENT', {name: catalogue.name});
-    const dialogRef = this.dialog.open(DialogComponent, {
-      data: {title, content, value: catalogue}
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
+    const content = this.translate.instant('CATALOGUE.DELETED.CONTENT', { name: catalogue.name });
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: catalogue }, result => {
       if (result) {
         this.store.dispatch(
           new fromActionsCatalogue.DeleteCatalogue(result.id)

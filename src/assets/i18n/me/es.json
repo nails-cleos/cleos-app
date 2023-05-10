@@ -8,6 +8,7 @@
         "START": "Inicio",
         "END": "Fin",
         "PAID": "Pagado",
+        "TO_PAY": "Por pagar",
         "APPROVED": "Aprobado",
         "CREATED": "La reserva debe ser aprobada por: ",
         "PAY_NOW": "Pagá ahora y congela el precio",
@@ -17,6 +18,10 @@
         "CUSTOMER": {
           "ERROR": "El cliente ya tiene una reserva el {{date}}",
           "NO_CONTENT": "No hay disponibilidad el <span class='bold'>{{date}}</span>"
+        },
+        "ERROR": {
+          "CUSTOMER": "El cliente ya tiene una reserva el {{date}}",
+          "PAYMENT": "Debes pagar una reserva previa"
         }
       },
       "TREATMENT": {
@@ -75,15 +80,13 @@
             "M": "<span class='bold'>Distancia:</span> {{distance}} Metros"
           }
         }
-      },
-      "PAYMENT_MESSAGE": "Si pagas, la reserva está aprobada. De lo contrario, debe esperar hasta que {{professional}} la apruebe."
+      }
     },
     "PAYMENT": {
       "ERROR_TEXT": "Error",
       "ERROR": "Pago incompleto.\n{{reason}}",
       "DETAIL": "Detalle de pago",
-      "DEPOSIT_30": "Pagar un depósito del 30% de la reserva",
-      "TOTAL": "Pagar total de la reserva",
+      "RESERVATION": "Reserva {{reservationId}}",
       "LIST": {
         "COLUMN": {
           "AMOUNT": "Importe",
@@ -94,14 +97,7 @@
         }
       },
       "TYPE": {
-        "FIELD": "Forma de pago",
-        "REQUIRED": "Forma de pago es <b>requerido</b>",
         "NO_CONTENT": "No hay forma de pago"
-      },
-      "BANK": {
-        "FIELD": "Banco",
-        "REQUIRED": "Banco es <b>requerido</b>",
-        "INVALID": "Banco es invalido"
       }
     },
     "REFERRAL": {

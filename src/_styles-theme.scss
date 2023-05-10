@@ -282,7 +282,7 @@
     color: mat.get-color-from-palette($foreground, base);
   }
 
-  .strikethrough:before, .red-text, .incomplete {
+  .strikethrough:before, .red-text, .incomplete, .minus {
     color: mat.get-color-from-palette($warn-palette);
   }
 

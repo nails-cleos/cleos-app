@@ -11,7 +11,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectOfficeState } from '../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import * as fromActionsOffice from '../../store/office.actions';
-import { DialogComponent } from '../../shared/dialog/dialog.component';
+import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { detailExpandAnimation } from '../../util/animation';
 
 @Component({

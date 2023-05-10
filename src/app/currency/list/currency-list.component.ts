@@ -10,9 +10,10 @@ import { Store } from '@ngrx/store';
 import { AppState, selectCurrencyState } from '../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import * as fromActionsCurrency from '../../store/currency.actions';
-import { DialogComponent } from '../../shared/dialog/dialog.component';
+import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { detailExpandAnimation } from '../../util/animation';
+import { executeDialogNoWidth } from '../../util/helper';
 
 @Component({
   selector: 'app-currency-list',
@@ -70,12 +71,8 @@ export class CurrencyListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   delete(currency: ICurrency): void {
     const title = this.translate.instant('CURRENCY.DELETED.TITLE');
-    const content = this.translate.instant('CURRENCY.DELETED.CONTENT', {code: currency.code});
-    const dialogRef = this.dialog.open(DialogComponent, {
-      data: {title, content, value: currency}
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
+    const content = this.translate.instant('CURRENCY.DELETED.CONTENT', { code: currency.code });
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: currency }, result => {
       if (result) {
         this.store.dispatch(
           new fromActionsCurrency.DeleteCurrency(result.id)

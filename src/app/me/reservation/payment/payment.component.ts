@@ -3,11 +3,10 @@ import { AppState, selectPaymentState } from '../../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { IPayment, IPaymentAll, PaymentType } from '../../../interfaces/payment';
+import { IPayment, IPaymentAll } from '../../../interfaces/payment';
 import * as fromActionsPayment from '../../../store/payment.actions';
 import { MatTableDataSource } from '@angular/material/table';
 import { Pagination } from '../../../interfaces/pagination';
-import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-payment',

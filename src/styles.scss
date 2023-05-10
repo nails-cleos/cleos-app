@@ -88,22 +88,6 @@ table {
   hyphens: auto;
 }
 
-//.mat-column-actions {
-//  flex: 0 0 15%;
-//  width: 15%;
-//  text-align: center;
-//  word-wrap: break-word !important;
-//  white-space: unset !important;
-//  overflow-wrap: break-word;
-//
-//  word-break: break-word;
-//
-//  -ms-hyphens: auto;
-//  -moz-hyphens: auto;
-//  -webkit-hyphens: auto;
-//  hyphens: auto;
-//}
-
 a, u {
   text-decoration: none;
 }
@@ -195,6 +179,14 @@ a, u {
     display: inherit !important;
     margin-right: 5px
   }
+}
+
+.icon-button {
+  margin: 5px 0 5px 10px
+}
+
+.custom-material-icons {
+  vertical-align: middle !important;
 }
 
 .margin-right-eight {
@@ -306,6 +298,110 @@ legend {
 .cal-week-view .cal-time-events .cal-events-container {
   width: 90%;
 }
+
+@keyframes spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner:before {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  margin-left: -10px;
+  border-radius: 50%;
+  animation: spinner .8s linear infinite;
+}
+
+.reservation-example {
+  box-sizing: border-box;
+  display: block;
+  height: 100px;
+  padding: 0 5px;
+  margin-bottom: 1px;
+  border-style: solid;
+  border-width: 3px;
+  border-radius: 5px;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cal-event {
+  border-width: 3px !important;
+  z-index: 1 !important;
+}
+
+span.cal-event-actions {
+  bottom: 0;
+  left: 0;
+  top: 100%;
+  position: absolute;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  text-align: center;
+  width: 100%;
+  padding: 0 5px;
+  opacity: 0;
+  transition: all 0.5s ease;
+  cursor: pointer;
+}
+
+.timing {
+  opacity: 1;
+  transition: all 0.5s ease;
+}
+
+.cal-custom-event {
+  position: relative;
+}
+
+.cal-custom-event:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: scaleY(0);
+  transform-origin: bottom center;
+  transition: transform 0.5s;
+}
+
+.cal-custom-event:hover::after {
+  transform: scaleY(1);
+}
+
+.cal-custom-event:hover span.cal-event-actions {
+  opacity: 1;
+  z-index: 99;
+  top: 30%;
+}
+
+.cal-custom-event:hover .timing {
+  opacity: 0;
+}
+
+.svg-icon {
+  vertical-align: middle;
+}
+
+.description {
+  white-space: pre-wrap !important;
+}
+
+.important {
+  font-weight: bold;
+}
+
+
 
 // fireworks
 $particles: 100;
@@ -424,110 +520,4 @@ $box-shadow2: ();
     margin-top: 30%;
     margin-left: 80%;
   }
-}
-
-@keyframes spinner {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.spinner:before {
-  content: '';
-  box-sizing: border-box;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 20px;
-  height: 20px;
-  margin-top: -10px;
-  margin-left: -10px;
-  border-radius: 50%;
-  animation: spinner .8s linear infinite;
-}
-
-.reservation-example {
-  box-sizing: border-box;
-  display: block;
-  height: 100px;
-  padding: 0 5px;
-  margin-bottom: 1px;
-  border-style: solid;
-  border-width: 3px;
-  border-radius: 5px;
-  font-size: 12px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.material-icons {
-  vertical-align: middle !important;
-}
-
-.cal-event {
-  border-width: 3px !important;
-  z-index: 1 !important;
-}
-
-span.cal-event-actions {
-  bottom: 0;
-  left: 0;
-  top: 100%;
-  position: absolute;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-evenly;
-  text-align: center;
-  width: 100%;
-  padding: 0 5px;
-  opacity: 0;
-  transition: all 0.5s ease;
-  cursor: pointer;
-}
-
-.timing {
-  opacity: 1;
-  transition: all 0.5s ease;
-}
-
-.cal-custom-event {
-  position: relative;
-}
-
-.cal-custom-event:after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  transform: scaleY(0);
-  transform-origin: bottom center;
-  transition: transform 0.5s;
-}
-
-.cal-custom-event:hover::after {
-  transform: scaleY(1);
-}
-
-.cal-custom-event:hover span.cal-event-actions {
-  opacity: 1;
-  z-index: 99;
-  top: 30%;
-}
-
-.cal-custom-event:hover .timing {
-  opacity: 0;
-}
-
-.icon-button {
-  margin: 5px 0 5px 10px
-}
-
-.svg-icon {
-  vertical-align: middle;
-}
-
-.description {
-  white-space: pre-wrap !important;
 }

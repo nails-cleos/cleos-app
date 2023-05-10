@@ -20,8 +20,9 @@ import { UntypedFormControl } from '@angular/forms';
 import { IAuthority } from '../interfaces/user';
 import { Role } from '../interfaces/token';
 import { IRoom } from '../interfaces/room';
-import { CalendarDialogComponent } from '../shared/calendar-dialog/calendar-dialog.component';
+import { CalendarDialogComponent } from '../shared/dialog/calendar/calendar-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { executeDialogNoWidth } from '../util/helper';
 
 @Component({
   selector: 'app-dash',
@@ -166,7 +167,7 @@ export class DashComponent implements OnInit, OnDestroy {
       this.activeDayIsOpen = !((isSameDay(this.viewDate, date) && this.activeDayIsOpen) || events.length === 0);
       this.viewDate = date;
     }
-    if (!this.activeDayIsOpen) {
+    if (events.length === 0) {
       const room = { id: this.roomId };
       this.segmentClick(date, room);
     }
@@ -180,9 +181,7 @@ export class DashComponent implements OnInit, OnDestroy {
   private segmentClick(date: Date, room?: IRoom): void {
     const data = { date, room };
     if (date && room) {
-      const dialogRef = this.dialog.open(CalendarDialogComponent);
-
-      dialogRef.afterClosed().subscribe(result => {
+      executeDialogNoWidth(this.dialog, CalendarDialogComponent, null, result => {
         if (result) {
           this.router.navigate(result.split(','), { state: data });
         }

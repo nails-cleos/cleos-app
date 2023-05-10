@@ -29,7 +29,7 @@
     <ng-container matColumnDef="type">
       <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
       <td *matCellDef="let payment" class="column-large-text" mat-cell>
-        <div *ngIf="payment.id; else skeleton">{{ 'COMMON.PAYMENT.' + payment.type | translate }}</div>
+        <div *ngIf="payment.id; else skeleton">{{ 'COMMON.PAYMENT.TYPE.' + (payment.type || 'NONE') | translate }}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
@@ -64,11 +64,11 @@
       <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
       <td *matCellDef="let payment" mat-cell>
         <div *ngIf="payment.id; else skeleton">
-          <button (click)="pay(payment)" *ngIf="payment.status !== 'APPROVED'" mat-icon-button
+          <button (click)="pay(payment)" *ngIf="payment.status === 'CREATED'" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.' + payment.type | translate }}" matTooltipPosition="above">
             <mat-icon [svgIcon]="payment.type" class="svg-icon"></mat-icon>
           </button>
-          <button (click)="notify(payment)" *ngIf="payment.status !== 'APPROVED'" mat-icon-button
+          <button (click)="notify(payment)" *ngIf="payment.status === 'PENDING'" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.NOTIFY'| translate }}" matTooltipPosition="above">
             <mat-icon color="primary">published_with_changes</mat-icon>
           </button>

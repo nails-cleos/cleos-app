@@ -44,7 +44,7 @@ export class CustomEventTitleFormatter extends CalendarEventTitleFormatter {
   week(event: CalendarEvent): string {
     let result = CustomEventTitleFormatter.eventTitle(event, this.translate.currentLang);
     if (event.meta.state) {
-      result = `<div class="material-icons">
+      result = `<div class="custom-material-icons">
         ${ReservationIconName[snakeToCamel(event.meta.state) as ReservationIconKey]}
       </div>&nbsp; ${result}`;
     }

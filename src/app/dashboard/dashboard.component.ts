@@ -33,7 +33,8 @@ import { addMonths, isSameDay, isToday } from 'date-fns';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { getProfessionalColor } from '../util/color';
-import { CalendarDialogComponent } from '../shared/calendar-dialog/calendar-dialog.component';
+import { CalendarDialogComponent } from '../shared/dialog/calendar/calendar-dialog.component';
+import { executeDialogNoWidth } from '../util/helper';
 
 @Component({
   selector: 'app-dashboard',
@@ -174,9 +175,7 @@ export class DashboardComponent implements OnInit {
   segmentClick(date: Date, professionalId: string): void {
     const data = { date, professionalId, isDashboard: true };
     if (date && professionalId && this.dateIsValid(date)) {
-      const dialogRef = this.dialog.open(CalendarDialogComponent);
-
-      dialogRef.afterClosed().subscribe(result => {
+      executeDialogNoWidth(this.dialog, CalendarDialogComponent, null, result => {
         if (result) {
           this.router.navigate(result.split(','), { state: data });
         }
@@ -244,12 +243,12 @@ export class DashboardComponent implements OnInit {
 
     if (!calendarEvent.actions) {
       calendarEvent.actions = [{
-        label: `<div class="mat-raised-button"><div class="material-icons">visibility</div>&nbsp;${ this.viewText }</div>`,
+        label: `<div class="mat-raised-button"><div class="custom-material-icons">visibility</div>&nbsp;${ this.viewText }</div>`,
         onClick: ({ event }: { event: CalendarEvent }): void => {
           this.eventClick(event, 'VIEW');
         }
       }, {
-        label: `<div class="mat-raised-button"><div class="material-icons">read_more</div>&nbsp;${ this.moreText }</div>`,
+        label: `<div class="mat-raised-button"><div class="custom-material-icons">read_more</div>&nbsp;${ this.moreText }</div>`,
         onClick: ({ event }: { event: CalendarEvent }): void => {
           this.eventClick(event, 'MORE_INFO');
         }
@@ -257,7 +256,7 @@ export class DashboardComponent implements OnInit {
 
       if (showApprove) {
         calendarEvent.actions = [{
-          label: `<div class="mat-raised-button"><div class="material-icons">done</div>&nbsp;${ this.approveText }</div>`,
+          label: `<div class="mat-raised-button"><div class="custom-material-icons">done</div>&nbsp;${ this.approveText }</div>`,
           onClick: ({ event }: { event: CalendarEvent }): void => {
             this.eventClick(event, 'APPROVE');
           }
@@ -266,7 +265,7 @@ export class DashboardComponent implements OnInit {
 
       if (showStart) {
         calendarEvent.actions = [{
-          label: `<div class="mat-raised-button"><div class="material-icons">play_arrow</div>&nbsp;${ this.startText }</div>`,
+          label: `<div class="mat-raised-button"><div class="custom-material-icons">play_arrow</div>&nbsp;${ this.startText }</div>`,
           onClick: ({ event }: { event: CalendarEvent }): void => {
             this.eventClick(event, 'START');
           }
@@ -275,7 +274,7 @@ export class DashboardComponent implements OnInit {
 
       if (showComplete) {
         calendarEvent.actions = [{
-          label: `<div class="mat-raised-button"><div class="material-icons">done_all</div>&nbsp;${ this.completeText }</div>`,
+          label: `<div class="mat-raised-button"><div class="custom-material-icons">done_all</div>&nbsp;${ this.completeText }</div>`,
           onClick: ({ event }: { event: CalendarEvent }): void => {
             this.eventClick(event, 'COMPLETE');
           }

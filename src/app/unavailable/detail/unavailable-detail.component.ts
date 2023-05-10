@@ -26,8 +26,8 @@ import {
 } from '../../util/dates';
 import { IRoomAll } from '../../interfaces/room';
 import { IUser } from '../../interfaces/user';
-import { getUserName } from '../../util/helper';
-import { DialogComponent } from '../../shared/dialog/dialog.component';
+import { executeDialogNoWidth, getUserName } from '../../util/helper';
+import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -83,18 +83,14 @@ export class UnavailableDetailComponent implements OnInit, AfterViewInit, OnDest
     const date = this.unavailable?.startDate ? formatFullDate(this.unavailable.startDate, this.translate.currentLang)
       : this.unavailable?.start;
     const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT', { date });
-    const dialogRef = this.dialog.open(DialogComponent, {
-      data: { title, content, value: this.unavailable }
-    });
 
-    dialogRef.afterClosed().subscribe(result => {
+    return executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: this.unavailable }, result => {
       if (result) {
         this.store.dispatch(
           new fromActionsUnavailable.DeleteUnavailable(result.id)
         );
       }
     });
-    return;
   }
 
   get update(): void {

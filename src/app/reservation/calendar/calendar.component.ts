@@ -31,14 +31,14 @@ import { CalendarEvent } from 'angular-calendar';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { IUnavailableAll } from '../../interfaces/unavailable';
-import { createRoomOffice, getFullUserName, getUserName, roomName } from '../../util/helper';
+import { createRoomOffice, executeDialogNoWidth, getFullUserName, getUserName, roomName } from '../../util/helper';
 import { addMonths } from 'date-fns';
 import { findStateColor, isDarkMode } from '../../util/theme';
 import { map, startWith, takeUntil } from 'rxjs/operators';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { IOffice } from '../../interfaces/office';
 import { requireMatch } from '../../util/validators';
-import { CalendarDialogComponent } from '../../shared/calendar-dialog/calendar-dialog.component';
+import { CalendarDialogComponent } from '../../shared/dialog/calendar/calendar-dialog.component';
 
 @Component({
   selector: 'app-calendar',
@@ -107,9 +107,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
         daysInWeek: 5
       }
     };
-    this.breakpointObserver.observe(Object.values(CALENDAR_RESPONSIVE).map(({breakpoint}) => breakpoint))
+    this.breakpointObserver.observe(Object.values(CALENDAR_RESPONSIVE).map(({ breakpoint }) => breakpoint))
       .pipe(takeUntil(this.destroy$)).subscribe((state: BreakpointState) => {
-      const foundBreakpoint = Object.values(CALENDAR_RESPONSIVE).find(({breakpoint}) => !!state.breakpoints[breakpoint]);
+      const foundBreakpoint = Object.values(CALENDAR_RESPONSIVE).find(({ breakpoint }) => !!state.breakpoints[breakpoint]);
       if (foundBreakpoint) {
         this.daysInWeek = foundBreakpoint.daysInWeek;
       } else {
@@ -158,7 +158,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   displayFnOffice(office: IOffice): string {
-    return office ? `${office.name}` : '';
+    return office ? `${ office.name }` : '';
   }
 
   displayFnRoom(room: IRoom): string {
@@ -199,13 +199,11 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   segmentClick(date: Date, room?: IRoom): void {
-    const data = {date, room, professional: this.professional.value};
+    const data = { date, room, professional: this.professional.value };
     if (date && room && this.dateIsValid(date)) {
-      const dialogRef = this.dialog.open(CalendarDialogComponent);
-
-      dialogRef.afterClosed().subscribe(result => {
+      executeDialogNoWidth(this.dialog, CalendarDialogComponent, null, result => {
         if (result) {
-          this.router.navigate(result.split(','), {state: data});
+          this.router.navigate(result.split(','), { state: data });
         }
       });
     }
@@ -216,7 +214,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.getReservations();
   }
 
-  beforeMonthViewRender({header}: any): void {
+  beforeMonthViewRender({ header }: any): void {
     header.forEach((day: any) => {
       if (!this.dateIsValid(day.date)) {
         day.cssClass = 'cal-disabled';
@@ -339,7 +337,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
         const color = findStateColor(it.state, darkMode);
         const meta = new Meta(true, it.room.timeZone);
-        const event = newEvent(detail, color, start, end, darkMode, `reservation/${it.id}`, meta);
+        const event = newEvent(detail, color, start, end, darkMode, `reservation/${ it.id }`, meta);
         if (event) {
           let events;
           if (this.calendar) {
@@ -396,7 +394,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
                 events = [...events, value];
               }
             }
-            if (events.find(ce => ce.id !== `unavailable/${it.id}`)) {
+            if (events.find(ce => ce.id !== `unavailable/${ it.id }`)) {
               this.createUnavailableEvent(room, events, this.calendar?.day, it, start, end, darkMode);
             }
           }
@@ -416,7 +414,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
     const color = findStateColor('DEFAULT', darkMode);
     const meta = new Meta(!it.allDay, room.timeZone);
-    const event = newEvent(detail, color, start, end, darkMode, `unavailable/${it.id}`, meta);
+    const event = newEvent(detail, color, start, end, darkMode, `unavailable/${ it.id }`, meta);
     if (event) {
       events = [...events, event];
       const calendar = new Calendar(room, events);
@@ -445,8 +443,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
       this.addReservations(this.data, darkMode);
       if (this.calendar) {
         const timeZone = this.calendar.room.timeZone;
-        const {monday, tuesday, wednesday, thursday, friday, saturday, sunday, exclude} = getAvailability(this.calendar.room);
-        const {min, max} = getStartEndDay(monday, tuesday, wednesday, thursday, friday, saturday, sunday, timeZone);
+        const { monday, tuesday, wednesday, thursday, friday, saturday, sunday, exclude } = getAvailability(this.calendar.room);
+        const { min, max } = getStartEndDay(monday, tuesday, wednesday, thursday, friday, saturday, sunday, timeZone);
         this.calendar.day = new Day(min, max, getNow(), exclude, 1);
         const unavailable = this.translate.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
         const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');

@@ -5,7 +5,7 @@ import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } 
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../interfaces/treatment';
 import { IRoom, IService } from '../../../interfaces/room';
-import { IAvailableDTO, IReservation, IReservationAll, MAX_RESERVATION_MONTH, Reservation } from '../../../interfaces/reservation';
+import { IAvailableDTO, IReservation, IUpcomingAll, MAX_RESERVATION_MONTH, Reservation } from '../../../interfaces/reservation';
 import {
   API_LOCALE,
   createNewDate,
@@ -64,7 +64,6 @@ import { TimeZoneSnackBarComponent } from '../../../shared/snak/time-zone/time-z
 import { MatDialog } from '@angular/material/dialog';
 import { Role } from '../../../interfaces/token';
 import { IUser } from '../../../interfaces/user';
-import { banks, IBank } from '../../../interfaces/bank';
 import { PaymentType } from '../../../interfaces/payment';
 import { AngularFireAnalytics } from '@angular/fire/compat/analytics';
 
@@ -101,6 +100,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   discounts?: IUserDiscount[];
   showDiscount = false;
   price: IPrice;
+  oldPrice?: IPrice;
   discount = new UntypedFormControl();
 
   roomForm!: UntypedFormGroup;
@@ -125,14 +125,13 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     Validators.required, requireMatch
   ]);
 
-  typeForm!: UntypedFormGroup;
+  typeForm: UntypedFormGroup;
   types?: string[];
-  type: UntypedFormControl = new UntypedFormControl('');
 
-  bankList?: IBank[] = banks();
-  filteredBank?: Observable<IBank[] | undefined>;
-  bank: UntypedFormControl = new UntypedFormControl('');
-  percentage: UntypedFormControl = new UntypedFormControl('');
+  acceptForm!: UntypedFormGroup;
+  accept: UntypedFormControl = new UntypedFormControl('', [
+    Validators.requiredTrue
+  ]);
 
   additionalList: IAdditionalAll[] = [];
   additionalSelected: IAdditionalAll[] = [];
@@ -146,7 +145,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   isEditing = false;
   canCreate = false;
-  firstTime = true;
+  firstTime = false;
   distance?: string;
   maxDate: Date;
   maxDateFormat: string;
@@ -157,9 +156,10 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   totalDuration?: string;
   durability?: string;
   reservationId?: string;
+  showPenalty?: boolean;
 
   private readonly extras: any;
-  private reservation?: IReservationAll;
+  private reservation?: IUpcomingAll;
   private measure = 'long';
   private duration: IDuration = new Duration();
   private time: any;
@@ -203,6 +203,12 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     const treatment = new Step(1, 'home_repair_service', () => this.callStepThree, additional);
     const room = new Step(0, 'room', () => this.callStepTwo, treatment);
     this.steps = [room, treatment, additional, book, payment, preview];
+
+    this.typeForm = this.formBuilder.group({
+      type: new UntypedFormControl(undefined),
+      bank: new UntypedFormControl(''),
+      percentage: new UntypedFormControl(undefined)
+    });
   }
 
   get professionalName(): string {
@@ -219,7 +225,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     }
     this.professionalId = this.professional.value.id;
     this.roomId = this.room.value.id;
-    this.types = this.room.value.paymentTypes.filter((p: PaymentType) => ![PaymentType.cash, PaymentType.transfer].includes(p));
+    this.setTypes();
     this.getTreatmentList();
     return this.completeAndNext();
   }
@@ -293,6 +299,9 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   get create(): void {
+    if (this.acceptForm.invalid) {
+      return;
+    }
     const reservation: IReservation = new Reservation();
     reservation.customerId = this.customerId;
     reservation.roomId = this.room.value.id;
@@ -304,6 +313,15 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     reservation.additionalIds = this.additionalSelected?.map(value => value.id);
 
     const role = Role.customer;
+    const type = this.typeForm.get('type')?.value;
+    if (this.firstTime || type) {
+      reservation.payment = {
+        type,
+        bic: this.typeForm.get('bank')?.value?.bic,
+        countryCode: 'en_NL',
+        percentage: this.typeForm.get('percentage')?.value
+      };
+    }
     if (this.isEditing && this.reservation) {
       reservation.id = this.reservation.id;
       reservation.treatmentId = valueChange(this.treatment.value.id, this.reservation.treatment.id);
@@ -314,14 +332,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     } else {
       reservation.treatmentId = this.treatment.value.id;
       reservation.discountId = this.discount.value;
-      if (this.firstTime || this.type.value) {
-        reservation.payment = {
-          type: this.type.value,
-          bic: this.bank.value.id,
-          countryCode: 'en_NL',
-          percentage: this.percentage.value
-        };
-      }
       this.store.dispatch(
         new fromActionsReservation.ReservationSave({ reservation, role })
       );
@@ -426,10 +436,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     return professional ? getFullUserName(professional) : '';
   }
 
-  displayFnBank(bank: IBank): string {
-    return bank ? `${ bank.name }` : '';
-  }
-
   dateNoContent(date?: any): string {
     return formatDateName(createNewDate(date ? date : this.startDate.value), this.translate.currentLang, this.measure);
   }
@@ -498,9 +504,13 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     return this.additionalSelected.filter(el => el.id === it.id).length > 0;
   }
 
-  private getReservation(id: string | null): void {
+  getPercentage(percentage: number): void {
+    this.price = newPercentage(this.price, percentage);
+  }
+
+  private getReservation(id: string): void {
     this.store.dispatch(
-      new fromActionsReservation.ReservationFind({ id })
+      new fromActionsReservation.ReservationFind({ id, edit: true })
     );
   }
 
@@ -535,10 +545,8 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.eventGroup = this.formBuilder.group({
       event: this.event
     });
-    this.typeForm = this.formBuilder.group({
-      type: this.type,
-      bank: this.bank,
-      percentage: this.percentage
+    this.acceptForm = this.formBuilder.group({
+      accept: this.accept
     });
     this.valueChange();
   }
@@ -635,28 +643,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
         }
       }
     });
-
-    this.typeForm.valueChanges.subscribe(value => {
-      if (value?.type === 'IDEAL') {
-        this.bank.setValidators([Validators.required, requireMatch]);
-      }
-      this.percentage.setValidators([Validators.required]);
-    });
-
-    this.percentage.valueChanges.subscribe(value => {
-      let percentage;
-      switch (value) {
-        case 'TOTAL':
-          percentage = 100;
-          break;
-        case 'DEPOSIT_30':
-          percentage = 30;
-          break;
-        default:
-          percentage = 0;
-      }
-      this.price = newPercentage(this.price, percentage);
-    });
   }
 
   private createFilter(): void {
@@ -685,10 +671,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       map(addressName => addressName ? this.filterProfessional(addressName) : this.professionalList
         ? this.professionalList.slice() : this.professionalList)
     );
-
-    this.filteredBank = this.bank.valueChanges.pipe(startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterBank(name) : this.bankList ? this.bankList.slice() : this.bankList));
   }
 
   private clean(): void {
@@ -734,34 +716,28 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
         this.office.setValue(this.offices[0]);
       }
       if (state.selected && !this.reservation) {
-        this.setData(state.selected);
+        if (state.selected.paymentRequired) {
+          const message = this.translate.instant('ME.RESERVATION.UPCOMING.ERROR.PAYMENT');
+          this.canNotContinue(message, 'update');
+        } else {
+          this.setData(state.selected);
+        }
       }
       if (state.customerReservation && state.customerReservation.upcoming && state.customerReservation.upcoming.length) {
-        this.analytic.logEvent('screen_view', {
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          firebase_screen: 'Customer cannot create a reservation',
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          firebase_screen_class: 'MeReservationComponent'
-        });
-        this.canCreate = false;
         const date = newDateTimestamp(state.customerReservation.upcoming[0].timestamp,
           state.customerReservation.upcoming[0].room.timeZone);
-        const message = this.translate.instant('ME.RESERVATION.UPCOMING.CUSTOMER.ERROR',
+        const message = this.translate.instant('ME.RESERVATION.UPCOMING.ERROR.CUSTOMER',
           {
             date: formatFullDateTime(date, this.translate.currentLang)
           });
-        const snackBarRef = this.snackBar.open(message, 'OK', {
-          duration: 5000
-        });
-        snackBarRef.afterDismissed().subscribe(() => {
-          this.clean();
-          this.router.navigate(['me', 'reservations']);
-        });
+        this.canNotContinue(message, 'create');
       } else {
         this.canCreate = true;
-        this.firstTime = state.customerReservation && state.customerReservation.firstTime;
-        if (this.firstTime) {
-          this.type.setValidators([Validators.required]);
+        if (state.customerReservation?.firstTime) {
+          this.firstTime = true;
+        }
+        if (state.selected && !state.selected.canEdit) {
+          this.firstTime = true;
         }
       }
       // Multiple professionals
@@ -816,6 +792,23 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     });
   }
 
+  private canNotContinue(message: string, type: string): void {
+    this.analytic.logEvent('screen_view', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      firebase_screen: `Customer cannot ${ type } a reservation`,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      firebase_screen_class: 'MeReservationComponent'
+    });
+    this.canCreate = false;
+    const snackBarRef = this.snackBar.open(message, 'OK', {
+      duration: 5000
+    });
+    snackBarRef.afterDismissed().subscribe(() => {
+      this.clean();
+      this.router.navigate(['me', 'reservations']);
+    });
+  }
+
   private setSelectedIndex(): void {
     let i = 0;
     new Map([...this.availableList.entries()]
@@ -858,19 +851,13 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     return this.professionalList?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
   }
 
-  private filterBank(name: string): IBank[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.bankList?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
-  }
-
   private completeStep(step: IStep): void {
     this.myStepper.next();
     step.completed = true;
     this.steps[step.order] = step;
   }
 
-  private setData(reservation: IReservationAll): void {
+  private setData(reservation: IUpcomingAll): void {
     if (!this.reservation) {
       this.completeAndNext();
     }
@@ -882,18 +869,33 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.room.setValue(reservation.room);
     this.professional.setValue(reservation.professional);
     this.startDate.setValue(date);
-    this.price = getPrice(this.reservation);
+    this.price = getPrice(this.reservation, this.reservation?.payments);
     this.additionalSelected = this.reservation.additional ? this.reservation.additional
       .map(ad => Object.assign({}, ad, { id: ad.key })) : [];
     this.treatmentId = reservation.treatment.key;
     this.roomId = reservation.room.id;
     this.professionalId = reservation.professional.id;
     if (this.isEditing) {
+      if (!this.reservation.canEdit && this.price.totalPaid < this.price.penalty) {
+        this.oldPrice = this.price;
+        this.showPenalty = true;
+        this.typeForm = this.formBuilder.group({
+          type: new UntypedFormControl(undefined),
+          bank: new UntypedFormControl('')
+        });
+        this.firstTime = true;
+        this.setTypes();
+      } else {
+        const sp = this.steps[4];
+        sp.enable = false;
+        this.steps[4] = sp;
+      }
       this.getTreatmentList();
-      const sp = this.steps[4];
-      sp.enable = false;
-      this.steps[4] = sp;
     }
+  }
+
+  private setTypes(): void {
+    this.types = this.room.value.paymentTypes.filter((p: PaymentType) => ![PaymentType.cash, PaymentType.transfer].includes(p));
   }
 
   private completeAndNext(): void {

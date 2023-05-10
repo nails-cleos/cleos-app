@@ -104,6 +104,7 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false
       };
     }
+    case PaymentActionTypes.paymentUpdate:
     case PaymentActionTypes.paymentRecreate:
     case PaymentActionTypes.paymentSave:
     case PaymentActionTypes.paymentSend:

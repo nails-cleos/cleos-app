@@ -10,15 +10,16 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dial
 import { Store } from '@ngrx/store';
 import { AppState, selectDiscountState, selectUserState } from '../../store/app.states';
 import * as fromActionsDiscount from '../../store/discount.actions';
-import { DialogComponent } from '../../shared/dialog/dialog.component';
+import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { UntypedFormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import * as fromActionsUser from '../../store/user.actions';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { map, startWith } from 'rxjs/operators';
-import { getFullUserName } from '../../util/helper';
+import { executeDialog, getFullUserName } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
+import { CustomerEditDialogComponent } from '../../shared/dialog/customer-edit/customer-edit-dialog.component';
 
 @Component({
   selector: 'app-discounts',
@@ -77,9 +78,9 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   delete(discount: IDiscount): void {
     const title = this.translate.instant('DISCOUNT.DELETED.TITLE');
-    const content = this.translate.instant('DISCOUNT.DELETED.CONTENT', {name: discount.name});
+    const content = this.translate.instant('DISCOUNT.DELETED.CONTENT', { name: discount.name });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: {title, content, value: discount}
+      data: { title, content, value: discount }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -92,21 +93,16 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   sentToUsers(discount: IDiscount): void {
-    const dialogRef = this.dialog.open(DiscountDialogComponent, {
-      width: '70vw',
-      disableClose: true,
-      data: {
-        discount
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
+    const data = {
+      discount
+    };
+    executeDialog(this.dialog, DiscountDialogComponent, data, result => {
       if (result) {
         this.store.dispatch(
           new fromActionsDiscount.AddDiscount(result)
         );
       }
-    });
+    }, true);
   }
 
   private subscribe(): void {
@@ -186,8 +182,8 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   get doAction(): void {
-    const customerIds = this.customers.map(({id}) => id);
-    return this.dialogRef.close({discountId: this.discount.id, customerIds});
+    const customerIds = this.customers.map(({ id }) => id);
+    return this.dialogRef.close({ discountId: this.discount.id, customerIds });
   }
 
   ngOnInit(): void {
@@ -238,10 +234,10 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
     this.title = this.discount.name;
     switch (this.discount.type) {
       case DiscountType.money:
-        this.title = `$ ${this.discount.amount} ${this.title}`;
+        this.title = `$ ${ this.discount.amount } ${ this.title }`;
         break;
       case DiscountType.percentage:
-        this.title = `${this.discount.amount} % ${this.title}`;
+        this.title = `${ this.discount.amount } % ${ this.title }`;
         break;
     }
   }
