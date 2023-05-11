@@ -8,7 +8,7 @@ import * as fromActionsUser from '../../store/user.actions';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { fieldChange, valueChange } from '../../util/validators';
 import { findFlag, flags, IFlag } from '../../util/flags';
-import { createDateFromString } from '../../util/dates';
+import { API_LOCALE, backendFormatDate, createDateFromString, formatDateTwoDigit, newDate } from '../../util/dates';
 import { Color } from '@angular-material-components/color-picker';
 import { lightenDarkenColor } from '../../util/color';
 
@@ -62,18 +62,19 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     user.lang = valueChange(this.langValue.value.value, this.user?.locale);
     user.phone = fieldChange(this.phone, this.user?.phone);
     user.dob = fieldChange(this.dob, this.user?.dob);
+    user.dob = user.dob ? backendFormatDate(newDate(user.dob), API_LOCALE) : user.dob;
 
     if (this.lightColor.value) {
       const color = this.lightColor.value;
-      user.lightColor = `${color.r},${color.g},${color.b}`;
+      user.lightColor = `${ color.r },${ color.g },${ color.b }`;
     }
 
     if (this.darkColor.value) {
       const color = this.darkColor.value;
-      user.darkColor = `${color.r},${color.g},${color.b}`;
+      user.darkColor = `${ color.r },${ color.g },${ color.b }`;
     }
 
-    return this.store.dispatch(new fromActionsUser.SaveUser({user}));
+    return this.store.dispatch(new fromActionsUser.SaveUser({ user }));
   }
 
   ngOnInit(): void {
@@ -91,7 +92,7 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   lightenDarkenColor(color: Color, isDark: boolean): string {
-    return lightenDarkenColor(`#${color.hex}`, isDark ? 50 : -50);
+    return lightenDarkenColor(`#${ color.hex }`, isDark ? 50 : -50);
   }
 
   private createForm(): void {

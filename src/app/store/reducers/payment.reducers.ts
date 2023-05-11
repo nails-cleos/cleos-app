@@ -1,7 +1,6 @@
 import { Pagination } from '../../interfaces/pagination';
 import { All, PaymentActionTypes } from '../payment.actions';
 import { IPayment } from '../../interfaces/payment';
-import { IBank } from "../../interfaces/bank";
 
 export interface State {
   data: IPayment | Pagination<IPayment> | null;
@@ -10,6 +9,7 @@ export interface State {
   subErrors: any;
   selected: IPayment | null;
   message: string | null;
+  reload: boolean | null;
   isLoading: boolean;
 }
 
@@ -20,6 +20,7 @@ export const initialState: State = {
   subErrors: null,
   selected: null,
   message: null,
+  reload: false,
   isLoading: false
 };
 
@@ -29,7 +30,7 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         // @ts-ignore
-        data: {content: [{}, {}, {}], totalElements: 3},
+        data: { content: [{}, {}, {}], totalElements: 3 },
         errorMessage: null,
         subErrors: null,
         selected: null,
@@ -70,6 +71,7 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         message: action.payload.message,
+        reload: action.payload.reload,
         errorMessage: null,
         selected: null,
         subErrors: null,

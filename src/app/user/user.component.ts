@@ -9,6 +9,7 @@ import { IUser, User } from '../interfaces/user';
 import { flags, IFlag } from '../util/flags';
 import { Color } from '@angular-material-components/color-picker';
 import { lightenDarkenColor } from '../util/color';
+import { API_LOCALE, backendFormatDate, newDate } from '../util/dates';
 
 @Component({
   selector: 'app-user',
@@ -68,7 +69,7 @@ export class UserComponent implements OnInit, OnDestroy {
     user.lastName = this.lastName.value;
     user.phone = this.phone.value;
     user.password = 'Ch4ng#';
-    user.dob = this.dob.value;
+    user.dob = this.dob.value ? backendFormatDate(newDate(this.dob.value), API_LOCALE) : this.dob.value;
 
     if (this.lightColor.value) {
       const color = this.lightColor.value;

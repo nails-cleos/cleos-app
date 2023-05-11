@@ -11,6 +11,7 @@ export enum ReservationIconName {
   paid = 'price_check',
   partiallyPaid = 'request_quote',
   payment = 'payment',
+  notify = 'published_with_changes',
   partiallyCompleted = 'rule',
   more = 'read_more',
   change = 'switch_account',
