@@ -14,9 +14,9 @@ import {
   selectNotificationState,
   selectOfficeState,
   selectPaymentState,
-  selectTreatmentState,
   selectReservationState,
   selectRoomState,
+  selectTreatmentState,
   selectUnavailableState,
   selectUserState
 } from '../store/app.states';
@@ -172,9 +172,14 @@ export class NavComponent implements OnInit, OnDestroy {
       if (!state.subErrors) {
         this.error = state.error;
         if (state.errorMessage || state.message) {
-          this.snackBar.open(state.errorMessage || state.message, 'OK', {
+          const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
             duration: 5000
           });
+          if (state.reload) {
+            snackBarRef.afterDismissed().subscribe(() => {
+              window.location.reload();
+            });
+          }
         }
       }
     }));

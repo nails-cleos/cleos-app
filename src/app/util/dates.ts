@@ -372,6 +372,10 @@ export const formatDateTwoDigit = (date: Date, locale: string): string => date.t
   day: '2-digit', month: '2-digit', year: '2-digit'
 });
 
+export const backendFormatDate = (date: Date, locale: string): string => date.toLocaleDateString(locale, {
+  day: '2-digit', month: '2-digit', year: 'numeric'
+}).replace(/\//g, '-');
+
 export const formatDuration = (duration: string, locale: string = API_LOCALE): string => {
   const d: IDuration = convertDuration(duration);
   return formatTime(d, locale);

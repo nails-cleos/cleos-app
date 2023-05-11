@@ -83,7 +83,10 @@ export class PaymentEffects {
       switchMap((response: any) => {
         switch (response.status) {
           case 'approved':
-            return of(new fromActionsPayment.PaymentSaveSuccess({ message: this.translate.instant('COMMON.PAYMENT.SUCCESS') }));
+            return of(new fromActionsPayment.PaymentSaveSuccess({
+              message: this.translate.instant('COMMON.PAYMENT.SUCCESS'),
+              reload: true
+            }));
           case 'pending':
             return of(new fromActionsPayment.PaymentSaveSuccess({ message: this.translate.instant('COMMON.PAYMENT.PENDING') }));
           default:

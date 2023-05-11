@@ -10,10 +10,12 @@
     </ng-template>
   </mat-card-header>
   <mat-card-content *ngIf="reservation; else boxSkeleton">
-    <div *ngIf="showFireworks" class="pyro">
-      <div class="before"></div>
-      <div class="after"></div>
-    </div>
+    <ng-template [ngIf]="showFireworks">
+      <div class="pyro">
+        <div class="before"></div>
+        <div class="after"></div>
+      </div>
+    </ng-template>
     <mat-divider></mat-divider>
     <mat-list>
       <div mat-subheader>{{ 'COMMON.ROOM.FIELD' | translate}}</div>
@@ -245,12 +247,23 @@
                   </div>
                 </mat-list-item>
               </mat-list>
-              <ng-template [ngIf]="payment.status !== 'APPROVED'">
+              <ng-template
+                [ngIf]="!['APPROVED', 'APPROVED_REFUND', 'REFUND_PENDING', 'REFUND', 'PENDING'].includes(payment.status)">
                 <mat-list>
                   <div mat-subheader>{{ 'COMMON.BUTTON.PAYMENT' | translate }}</div>
                   <mat-list-item role="list">
                     <button [routerLink]="['/me', 'payment', payment.id]" mat-icon-button>
                       <mat-icon class="payment-button" color="primary">payment</mat-icon>
+                    </button>
+                  </mat-list-item>
+                </mat-list>
+              </ng-template>
+              <ng-template [ngIf]="payment.status === 'PENDING'">
+                <mat-list>
+                  <div mat-subheader>{{ 'COMMON.BUTTON.NOTIFY' | translate }}</div>
+                  <mat-list-item role="list">
+                    <button (click)="notify(payment)" mat-icon-button>
+                      <mat-icon color="primary">published_with_changes</mat-icon>
                     </button>
                   </mat-list-item>
                 </mat-list>

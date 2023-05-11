@@ -186,7 +186,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   }
 
   onChangeState(id: any): void {
-    if (['send', 'book', 'more', 'change', 'cancel', 'cancel_edit'].indexOf(id.toString()) >= 0 && this.reservation) {
+    if (['send', 'book', 'more', 'change', 'cancel', 'cancel_edit', 'notify', 'pay'].indexOf(id.toString()) >= 0 && this.reservation) {
       this.machine.transition(snakeToCamel(this.reservation.state), snakeToCamel(id));
       return;
     }
@@ -564,7 +564,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
     const cancelledPaymentRequired = {
       transitions: {
-        pay: null
+        pay: null,
+        notify: null
       },
       next: [] as any[]
     };
@@ -604,13 +605,24 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     }
 
     if (reservation.paymentRequired) {
-      const pay = this.createAction(translate.instant('RESERVATION.ACTION.PAY'),
-        ReservationIconName.payment, 'pay', 'blue');
-      cancelledPaymentRequired.next = [pay];
+      const paymentPending = self.paymentPaid?.filter((p: IPayment) => p.status === 'PENDING')[0];
+      if (paymentPending) {
+        const notify = this.createAction(translate.instant('RESERVATION.ACTION.NOTIFY'),
+          ReservationIconName.notify, 'notify');
+        cancelledPaymentRequired.next = [notify];
 
-      cancelledPaymentRequired.transitions.pay = ReservationDetailComponent.createTransaction('cancelledPaymentRequired', (): void => {
-        self.router.navigate(['me', 'reservation']);
-      });
+        cancelledPaymentRequired.transitions.notify = ReservationDetailComponent.createTransaction('cancelledPaymentRequired', (): void => {
+          this.notify(paymentPending);
+        });
+      } else {
+        const pay = this.createAction(translate.instant('RESERVATION.ACTION.PAY'),
+          ReservationIconName.payment, 'pay', 'blue');
+        cancelledPaymentRequired.next = [pay];
+
+        cancelledPaymentRequired.transitions.pay = ReservationDetailComponent.createTransaction('cancelledPaymentRequired', (): void => {
+          this.router.navigate(['/me', 'payment', self.paymentPaid?.filter((p: IPayment) => p.status !== 'APPROVED')[0]?.id]);
+        });
+      }
       self.addActions();
     }
 
