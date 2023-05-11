@@ -147,6 +147,7 @@ export interface ICustomerLastReservation {
   treatment: ITreatmentAll;
   days: number;
   professionalName: string;
+  additionalIds: string[];
 }
 
 export class Reservation implements IReservation {

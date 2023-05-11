@@ -951,6 +951,11 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       }
       this.customerInfo = state.customer;
+      if (this.customerInfo) {
+        this.treatmentId = this.customerInfo.treatment.key;
+        this.additionalSelected = this.customerInfo.additionalIds ? this.customerInfo.additionalIds
+          .map(id => Object.assign({}, id, { id } as IAdditionalAll)) : [];
+      }
       this.customers = state.customers;
       this.additionalList = state.treatmentDiscount?.additionalList;
       if (this.additionalList && this.additionalList.length) {
