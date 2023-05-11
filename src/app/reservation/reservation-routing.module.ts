@@ -22,12 +22,12 @@ const routes: Routes = [
   },
   {
     path: '', component: ReservationComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional] // TODO Customer not allowed
+      roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional] // Customer not allowed
     }
   },
   {
     path: ':id/edit', component: ReservationComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional] // TODO Customer not allowed
+      roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional] // Customer not allowed
     }
   },
   {

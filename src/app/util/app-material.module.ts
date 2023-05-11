@@ -20,9 +20,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatRadioModule } from "@angular/material/radio";
-import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
-import { MatSlideToggleModule } from "@angular/material/slide-toggle";
+import { MatRadioModule } from '@angular/material/radio';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { LayoutModule } from '@angular/cdk/layout';
 import { MatSidenavModule } from '@angular/material/sidenav';
 
@@ -60,22 +60,22 @@ const materialModules = [
 })
 export class AppMaterialModule {
   constructor(private matIconRegistry: MatIconRegistry, private domSanitizer: DomSanitizer) {
-    matIconRegistry.addSvgIcon('IDEAL', this.getUrl("assets/banks/IDEAL.svg"))
-    matIconRegistry.addSvgIcon('PAYPAL', this.getUrl("assets/banks/PAYPAL.svg"))
-    matIconRegistry.addSvgIcon('RABONL2U', this.getUrl("assets/banks/RABONL2U.svg"))
-    matIconRegistry.addSvgIcon('ABNANL2A', this.getUrl("assets/banks/ABNANL2A.svg"))
-    matIconRegistry.addSvgIcon('FVLBNL22', this.getUrl("assets/banks/FVLBNL22.svg"))
-    matIconRegistry.addSvgIcon('TRIONL2U', this.getUrl("assets/banks/TRIONL2U.svg"))
-    matIconRegistry.addSvgIcon('INGBNL2A', this.getUrl("assets/banks/INGBNL2A.svg"))
-    matIconRegistry.addSvgIcon('SNSBNL2A', this.getUrl("assets/banks/SNSBNL2A.svg"))
-    matIconRegistry.addSvgIcon('ASNBNL21', this.getUrl("assets/banks/ASNBNL21.svg"))
-    matIconRegistry.addSvgIcon('RBRBNL21', this.getUrl("assets/banks/RBRBNL21.svg"))
-    matIconRegistry.addSvgIcon('KNABNL2H', this.getUrl("assets/banks/KNABNL2H.svg"))
-    matIconRegistry.addSvgIcon('BUNQNL2A', this.getUrl("assets/banks/BUNQNL2A.svg"))
-    matIconRegistry.addSvgIcon('MOYONL21', this.getUrl("assets/banks/MOYONL21.svg"))
+    matIconRegistry.addSvgIcon('IDEAL', this.getUrl('assets/banks/IDEAL.svg'));
+    matIconRegistry.addSvgIcon('PAYPAL', this.getUrl('assets/banks/PAYPAL.svg'));
+    matIconRegistry.addSvgIcon('RABONL2U', this.getUrl('assets/banks/RABONL2U.svg'));
+    matIconRegistry.addSvgIcon('ABNANL2A', this.getUrl('assets/banks/ABNANL2A.svg'));
+    matIconRegistry.addSvgIcon('FVLBNL22', this.getUrl('assets/banks/FVLBNL22.svg'));
+    matIconRegistry.addSvgIcon('TRIONL2U', this.getUrl('assets/banks/TRIONL2U.svg'));
+    matIconRegistry.addSvgIcon('INGBNL2A', this.getUrl('assets/banks/INGBNL2A.svg'));
+    matIconRegistry.addSvgIcon('SNSBNL2A', this.getUrl('assets/banks/SNSBNL2A.svg'));
+    matIconRegistry.addSvgIcon('ASNBNL21', this.getUrl('assets/banks/ASNBNL21.svg'));
+    matIconRegistry.addSvgIcon('RBRBNL21', this.getUrl('assets/banks/RBRBNL21.svg'));
+    matIconRegistry.addSvgIcon('KNABNL2H', this.getUrl('assets/banks/KNABNL2H.svg'));
+    matIconRegistry.addSvgIcon('BUNQNL2A', this.getUrl('assets/banks/BUNQNL2A.svg'));
+    matIconRegistry.addSvgIcon('MOYONL21', this.getUrl('assets/banks/MOYONL21.svg'));
   }
 
   private getUrl(path: string): SafeResourceUrl {
-    return this.domSanitizer.bypassSecurityTrustResourceUrl(path)
+    return this.domSanitizer.bypassSecurityTrustResourceUrl(path);
   }
 }

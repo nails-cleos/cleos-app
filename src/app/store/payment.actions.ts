@@ -4,6 +4,7 @@ export enum PaymentActionTypes {
   getAll = '[Payment] Get all',
   paymentSuccess = '[Payment] Success',
   paymentSave = '[Payment] Save',
+  paymentUpdate = '[Payment] Update',
   paymentSend = '[Payment] Send',
   paymentNotify = '[Payment] Notify',
   paymentRecreate = '[Payment] Recreate',
@@ -40,6 +41,13 @@ export class PaymentNotComplete implements Action {
 
 export class PaymentSave implements Action {
   readonly type = PaymentActionTypes.paymentSave;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class PaymentUpdate implements Action {
+  readonly type = PaymentActionTypes.paymentUpdate;
 
   constructor(public payload: any) {
   }
@@ -115,6 +123,7 @@ export class Clean implements Action {
 export type All =
   | GetAll
   | PaymentSave
+  | PaymentUpdate
   | PaymentSend
   | PaymentRecreate
   | PaymentNotify

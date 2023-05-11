@@ -11,13 +11,15 @@ import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import * as fromActionsReservation from '../../../store/reservation.actions';
-import { newDateTimestamp, isSameTimeZone } from '../../../util/dates';
-import { openDialog } from '../../../util/helper';
+import { isSameTimeZone, newDateTimestamp } from '../../../util/dates';
+import { executeDialog, executeDialogNoWidth, openDialog } from '../../../util/helper';
 import { stampAnimation, transitionAnimation } from '../../../util/animation';
 import { IReview, Review } from '../../../interfaces/review';
 import { ReviewDialogComponent } from '../review/review-dialog.component';
 import { isToday } from 'date-fns';
 import { AngularFireAnalytics } from '@angular/fire/compat/analytics';
+import { Router } from '@angular/router';
+import { IPayment } from '../../../interfaces/payment';
 
 @Component({
   selector: 'app-reservations',
@@ -40,6 +42,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
 
   dateFormat: string;
   error: any;
+  small = false;
 
   private data?: ICustomerReservation;
   private showReview = true;
@@ -47,7 +50,8 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   private subscription?: Subscription;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef, private analytic: AngularFireAnalytics) {
+              private router: Router, private breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef,
+              private analytic: AngularFireAnalytics) {
     this.getState = this.store.select(selectReservationState);
     this.dateFormat = this.translate.currentLang;
     breakpointObserver.observe([
@@ -55,11 +59,14 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
       Breakpoints.Small
     ]).subscribe(result => {
       if (result.matches) {
+        this.small = true;
         this.pageSize = MOBILE_PAGE_SIZE;
       }
     });
     analytic.logEvent('screen_view', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       firebase_screen: 'Main reservation page',
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       firebase_screen_class: 'ReservationsComponent'
     });
   }
@@ -90,9 +97,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   onRatingChanged(reservation: IReservationAll): void {
-    const dialogRef = this.dialog.open(ReviewDialogComponent, { data: reservation });
-
-    dialogRef.afterClosed().subscribe(result => {
+    executeDialogNoWidth(this.dialog, ReviewDialogComponent, reservation, result => {
       if (result && result.rating) {
         const review: IReview = new Review(result.rating);
         review.reservationId = reservation?.id;
@@ -122,6 +127,32 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
       if (this.data) {
         this.noContent = !this.data.upcoming || !this.data.upcoming.length;
         if (this.data.reservations) {
+          this.data.upcoming.forEach(u => {
+            if (u.state === States.cancelledPaymentRequired) {
+              let link = null;
+              let paymentId = null;
+              let pending = false;
+              u.payments.forEach((payment: IPayment) => {
+                if (payment.link && payment.status === 'CREATED') {
+                  link = payment.link;
+                  return;
+                } else if (payment.status === 'CREATED' && !payment.type) {
+                  paymentId = payment.id;
+                  return;
+                } else if (payment.status === 'PENDING') {
+                  pending = true;
+                  return;
+                }
+              });
+              if (link) {
+                window.open(link, '_self');
+              } else if (paymentId) {
+                this.router.navigate(['me', 'payment', paymentId]);
+              } else if (!pending) {
+                this.router.navigate(['/me', 'reservation', u.id, 'payment', 'option']);
+              }
+            }
+          });
           this.dataSource = this.data.reservations.content?.map((reservation: IReservationAll) => {
             if (this.showReview && reservation.state === States.completed
               && isToday(newDateTimestamp(reservation.timestamp, reservation.room.timeZone))

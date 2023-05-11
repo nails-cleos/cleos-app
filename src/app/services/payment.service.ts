@@ -3,8 +3,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
 import { IPayment, IPaymentStatus, PaymentType } from '../interfaces/payment';
-import { IBank } from "../interfaces/bank";
-import { IReservationPayment } from "../interfaces/reservation";
+import { IBank } from '../interfaces/bank';
+import { IReservationPayment } from '../interfaces/reservation';
 
 @Injectable()
 export class PaymentService {
@@ -39,7 +39,11 @@ export class PaymentService {
   }
 
   public create(reservationId: string, payment: IReservationPayment): Observable<IPayment> {
-    return this.http.post<IPayment>(`${ this.urlV1 }/reservations/${ reservationId }`,  payment);
+    return this.http.post<IPayment>(`${ this.urlV1 }/reservations/${ reservationId }`, payment);
+  }
+
+  public update(id: string, payment: IReservationPayment): Observable<IPayment> {
+    return this.http.patch<IPayment>(`${ this.urlV1 }/${ id }`, payment);
   }
 
   public recreate(id: string, paymentType: string): Observable<IPayment> {
@@ -58,6 +62,6 @@ export class PaymentService {
   }
 
   public getBankList(type: PaymentType): Observable<IBank[]> {
-    return this.http.get<IBank[]>(`${ this.urlV1 }/types/${ type }/banks`)
+    return this.http.get<IBank[]>(`${ this.urlV1 }/types/${ type }/banks`);
   }
 }

@@ -6,7 +6,7 @@
         <mat-label>{{ 'RESERVATION.STATE.SEARCH' | translate }}</mat-label>
         <mat-chip-grid #chipList aria-label="Fruit selection">
           <mat-chip-row (removed)="remove(state)" *ngFor="let state of states" [removable]="true"
-                    color="primary">
+                        color="primary">
             {{ 'COMMON.STATUS.RESERVATION.' + state.toUpperCase() | translate}}
             <mat-icon matChipRemove>cancel</mat-icon>
           </mat-chip-row>
@@ -39,7 +39,8 @@
     <mat-spinner></mat-spinner>
   </div>
   <div class="mat-elevation-z8">
-    <table [dataSource]="dataSource" mat-table matSort matSortActive="timestamp" matSortDirection="desc" matSortDisableClear
+    <table [dataSource]="dataSource" mat-table matSort matSortActive="timestamp" matSortDirection="desc"
+           matSortDisableClear
            multiTemplateDataRows>
       <ng-container matColumnDef="position">
         <th *matHeaderCellDef mat-header-cell>#</th>
@@ -126,25 +127,29 @@
           <div [@detailExpand]="reservation === expandedReservation ? 'expanded' : 'collapsed'"
                class="detail" fxHide fxShow.lt-sm>
             <mat-list>
-              <div matListItemTitle>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</div>
+              <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</div>
               <mat-list-item role="list">
                 <div *ngIf="reservation.state" matListItemLine>
-                  <mat-icon matPrefix>{{reservation.state | reservationIcon}}</mat-icon>&nbsp;
+                  <mat-icon matListItemIcon matPrefix>{{reservation.state | reservationIcon}}</mat-icon>&nbsp;
                   {{ 'COMMON.STATUS.RESERVATION.' + reservation.state | translate}}</div>
               </mat-list-item>
-              <div matListItemTitle>{{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }}</div>
+              <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }}</div>
               <mat-list-item role="list">
                 <div matListItemLine>{{reservation.treatment?.name}}</div>
               </mat-list-item>
-              <div matListItemTitle>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+              <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
               <mat-list-item role="list">
-                <button *ngIf="!reservation.deleted" [routerLink]="['/reservation', reservation.id]" color="primary"
-                        mat-icon-button>
-                  <mat-icon>visibility</mat-icon>
-                </button>
-                <button (click)="cancel(reservation)" *ngIf="reservation.deadLine" color="warn" mat-icon-button>
-                  <mat-icon>close</mat-icon>
-                </button>
+                <ng-template [ngIf]="!reservation.deleted">
+                  <button [routerLink]="['/reservation', reservation.id]" color="primary"
+                          mat-icon-button>
+                    <mat-icon matListItemIcon>visibility</mat-icon>
+                  </button>
+                </ng-template>
+                <ng-template [ngIf]="reservation.deadLine">
+                  <button (click)="cancel(reservation)" color="warn" mat-icon-button>
+                    <mat-icon matListItemIcon>close</mat-icon>
+                  </button>
+                </ng-template>
               </mat-list-item>
             </mat-list>
           </div>

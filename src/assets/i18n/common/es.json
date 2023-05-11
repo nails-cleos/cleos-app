@@ -33,6 +33,7 @@
       "NOTIFY": "Notificar",
       "SELECT": "Seleccionar",
       "UNAVAILABLE": "Agregar no disponible",
+      "ACCEPT": "Aceptar",
       "EXPAND": {
         "TRUE": "Presiona para mostrar menos",
         "FALSE": "Presiona para mostrar más"
@@ -67,7 +68,7 @@
     },
     "REPEAT": {
       "NONE": "Nunca",
-      "EVERY_DAY": "Todos los dias",
+      "EVERY_DAY": "Todos los días",
       "ONCE_A_WEEK": "Una vez a la semana"
     },
     "NOTIFICATION": {
@@ -88,25 +89,55 @@
       "PERCENTAGE": "Porcentaje"
     },
     "PAYMENT": {
+      "TYPE": {
+        "FIELD": {
+          "TITLE": "Forma de pago",
+          "REQUIRED": "Forma de pago es <b>requerido</b>"
+        },
+        "CASH": "Efectivo",
+        "ML": "Mercado Libre",
+        "PAYPAL": "PayPal",
+        "IDEAL": "iDeal",
+        "TRANSFER": "Transferencia bancaria",
+        "NONE": "Pago no seleccionado"
+      },
+      "BANK": {
+        "FIELD": "Banco",
+        "REQUIRED": "Banco es <b>requerido</b>",
+        "INVALID": "Banco es invalido"
+      },
+      "OPTIONS": {
+        "TO_PAY": "Total a pagar: {{amount}} {{symbol}}",
+        "PAID": "Total pagado: {{amount}} {{symbol}}",
+        "PENALTY": "Penalización: {{amount}} {{symbol}}",
+        "D_OR_R": "Descuento o reembolso: {{amount}} {{symbol}}"
+      },
+      "DEPOSIT_30": "Pagar un depósito del 30% de la reserva",
+      "TOTAL": "Pagar total de la reserva",
       "PENDING": "Pago pendiente",
       "SUCCESS": "Pago completado",
-      "CASH": "Efectivo",
-      "ML": "Mercado Libre",
-      "PAYPAL": "PayPal",
-      "IDEAL": "iDeal",
-      "TRANSFER": "Transferencia bancaria"
+      "ERROR": "Error en el pago. {{reason}}",
+      "CANCELLATION_POLICY": {
+        "TITLE": "Políticas de cancelación/cambios",
+        "1": "<span class='important'>Aviso menor a 24 horas</span> resultara en un cargo del <span class='important'>30%</span> del precio del tratamiento.",
+        "2": "<span class='important'>“No show”</span> también se cobrará el <span class='important'>30%</span> del precio del tratamiento reservado.",
+        "3": "La cancelación/cambios de una cita realizada <span class='important'>dentro de las 24 horas anteriores</span> dará lugar a <span class='important'>reembolso o un vale de descuento</span> por el importe abonado."
+      }
     },
     "STATUS": {
       "PAYMENT": {
         "NONE": "Pendiente",
         "APPROVED": "Aprobado",
+        "APPROVED_REFUND": "Aprobado",
         "REJECTED": "Rechazado",
         "FAILURE": "Rechazado",
         "CANCELLED": "Cancelado",
         "IN_PROCESS": "Pendiente",
         "PENDING": "Pendiente",
         "CREATED": "Creado",
-        "UNKNOWN": "Desconocido"
+        "UNKNOWN": "Desconocido",
+        "REFUND": "Reembolsado",
+        "REFUND_PENDING": "Reembolso pendiente"
       },
       "RESERVATION": {
         "CREATED": "Creada",
@@ -118,7 +149,9 @@
         "COMPLETED": "Completada",
         "PARTIALLY_COMPLETED": "Parcialmente Completada",
         "PARTIALLYCOMPLETED": "Parcialmente Completada",
-        "CANCELLED": "Cancelada"
+        "CANCELLED": "Cancelada",
+        "CANCELLED_PAYMENT_REQUIRED": "Pago requerido",
+        "EDIT_CANCELLED": "Nueva reserva relacionada"
       }
     },
     "BACK": {
@@ -219,6 +252,7 @@
     },
     "RESERVATION": {
       "CREATED": "Reserva {{date}} creada",
+      "PAYMENT_MESSAGE": "Si pagas, la reserva está aprobada. De lo contrario, debe esperar hasta que {{professional}} la apruebe.",
       "LIST": {
         "COLUMN": {
           "CUSTOMER": "Cliente",
@@ -238,6 +272,10 @@
         "APPROVE": "La reserva fue aprobada",
         "START": "La reserva se inició",
         "COMPLETE": "La reserva se completó"
+      },
+      "EDIT": {
+        "TITLE": "Editar reserva",
+        "TEXT": "Aviso menor a 24 horas resultara en un cargo del 30% del precio del tratamiento."
       }
     },
     "TIME_ZONE": {

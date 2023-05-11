@@ -10,7 +10,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AppState, selectTreatmentState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
 import * as fromActionsTreatment from '../../store/treatment.actions';
-import { DialogComponent } from '../../shared/dialog/dialog.component';
+import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
 import { groupDurability } from '../../util/helper';

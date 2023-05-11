@@ -10,10 +10,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../store/app.states';
 import * as fromActionsRoom from '../../store/room.actions';
-import { DialogComponent } from '../../shared/dialog/dialog.component';
+import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
 import { findDayOfWeek, getTimeZone, ITimeZone } from '../../util/dates';
+import { executeDialogNoWidth } from '../../util/helper';
 
 @Component({
   selector: 'app-rooms',
@@ -112,11 +113,7 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
   delete(room: IRoom): void {
     const title = this.translate.instant('ROOM.DELETED.TITLE');
     const content = this.translate.instant('ROOM.DELETED.CONTENT', { name: room.address?.name });
-    const dialogRef = this.dialog.open(DialogComponent, {
-      data: { title, content, value: room }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: room }, result => {
       if (result) {
         this.store.dispatch(
           new fromActionsRoom.DeleteRoom(result.id)
@@ -153,5 +150,5 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
-  sortFn = (a: IAvailabilityAll, b: IAvailabilityAll): number => findDayOfWeek(a.day) - findDayOfWeek(b.day)
+  sortFn = (a: IAvailabilityAll, b: IAvailabilityAll): number => findDayOfWeek(a.day) - findDayOfWeek(b.day);
 }

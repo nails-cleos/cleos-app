@@ -1,7 +1,8 @@
 import { IDiscount, IUserDiscount } from './discount';
 import { IAdditionalAll } from './additional';
 import { IService } from './room';
-import { TreatmentService } from '../services/treatment.service';
+
+export const PENALTY = 30;
 
 export interface ITreatmentGroup {
   id?: string;
@@ -82,6 +83,9 @@ export interface IPrice {
   isPaid: boolean;
   percentageToPaid: number;
   toPaid: number;
+  penalty: number;
+
+  setPenalty(penaltyToPay: number): void;
 }
 
 export class Price implements IPrice {
@@ -98,6 +102,7 @@ export class Price implements IPrice {
   isPaid: boolean;
   percentageToPaid: number;
   toPaid: number;
+  penalty: number;
 
   constructor(price: number = 0, discount: number = 0, extra: number = 0, additional: number = 0, total: number = 0,
               totalPaid: number = 0, totalWithoutDiscount: number = 0, priceWithDiscount: number = 0, priceWithExtras = 0,
@@ -115,6 +120,11 @@ export class Price implements IPrice {
     this.percentageToPaid = percentageToPaid;
     this.toPaid = total * percentageToPaid / 100;
     this.isPaid = this.amount > 0 && this.totalPaid >= this.total;
+    this.penalty = (total * PENALTY / 100);
+  }
+
+  setPenalty(penalty: number): void {
+    this.penalty = penalty;
   }
 }
 

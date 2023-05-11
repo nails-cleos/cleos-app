@@ -8,12 +8,12 @@ import * as fromActionsReservation from '../../../store/reservation.actions';
 import { IReservation, IReservationAll } from '../../../interfaces/reservation';
 import { MatTableDataSource } from '@angular/material/table';
 import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../../interfaces/pagination';
-import { DialogComponent } from '../../../shared/dialog/dialog.component';
+import { DialogComponent } from '../../../shared/dialog/generic/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { openDialog } from '../../../util/helper';
-import { newDateTimestamp, isSameTimeZone } from '../../../util/dates';
+import { executeDialogNoWidth, openDialog } from '../../../util/helper';
+import { isSameTimeZone, newDateTimestamp } from '../../../util/dates';
 import { Role } from '../../../interfaces/token';
 import { detailExpandAnimation } from '../../../util/animation';
 
@@ -89,12 +89,9 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
 
   delete(reservation: IReservation): void {
     const title = this.translate.instant('RESERVATION.DELETED.TITLE');
-    const content = this.translate.instant('RESERVATION.DELETED.CONTENT', {date: newDateTimestamp(reservation.timestamp)});
-    const dialogRef = this.dialog.open(DialogComponent, {
-      data: {title, content, value: reservation}
-    });
+    const content = this.translate.instant('RESERVATION.DELETED.CONTENT', { date: newDateTimestamp(reservation.timestamp) });
 
-    dialogRef.afterClosed().subscribe(result => {
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: reservation }, result => {
       if (result) {
         this.store.dispatch(
           new fromActionsReservation.DeleteReservation(result.id)

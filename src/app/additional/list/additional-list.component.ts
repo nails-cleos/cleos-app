@@ -11,9 +11,10 @@ import { Store } from '@ngrx/store';
 import { AppState, selectAdditionalState } from '../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import * as fromActionsAdditional from '../../store/additional.actions';
-import { DialogComponent } from '../../shared/dialog/dialog.component';
+import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { convertDuration } from '../../util/dates';
 import { detailExpandAnimation } from '../../util/animation';
+import { executeDialogNoWidth } from '../../util/helper';
 
 @Component({
   selector: 'app-additional-list',
@@ -72,12 +73,9 @@ export class AdditionalListComponent implements OnInit, AfterViewInit, OnDestroy
 
   delete(additional: IAdditional): void {
     const title = this.translate.instant('ADDITIONAL.DELETED.TITLE');
-    const content = this.translate.instant('ADDITIONAL.DELETED.CONTENT', {name: additional.name});
-    const dialogRef = this.dialog.open(DialogComponent, {
-      data: {title, content, value: additional}
-    });
+    const content = this.translate.instant('ADDITIONAL.DELETED.CONTENT', { name: additional.name });
 
-    dialogRef.afterClosed().subscribe(result => {
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: additional }, result => {
       if (result) {
         this.store.dispatch(
           new fromActionsAdditional.DeleteAdditional(result.id)
@@ -96,7 +94,7 @@ export class AdditionalListComponent implements OnInit, AfterViewInit, OnDestroy
         if (additional.duration) {
           const duration = convertDuration(additional.duration);
 
-          return Object.assign({}, additional, {hour: duration.hour, minute: duration.minute});
+          return Object.assign({}, additional, { hour: duration.hour, minute: duration.minute });
         }
         return additional;
       });
