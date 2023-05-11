@@ -8,10 +8,16 @@ import { ReservationDetailComponent } from './detail/reservation-detail.componen
 import { MoreInfoComponent } from './detail/more-info/more-info.component';
 import { CalendarComponent } from './calendar/calendar.component';
 import { ReservationCompleteComponent } from './detail/complete/reservation-complete.component';
+import { InvoiceComponent } from './invoice/invoice.component';
 
 const routes: Routes = [
   {
     path: 'search', component: SearchComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.admin, Role.manager, Role.professional]
+    }
+  },
+  {
+    path: 'invoices', component: InvoiceComponent, canActivate: [AuthGuardService], data: {
       roles: [Role.admin, Role.manager, Role.professional]
     }
   },

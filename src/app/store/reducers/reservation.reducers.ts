@@ -73,6 +73,17 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
+    case ReservationActionTypes.findInvoiceReservation: {
+      return {
+        ...state,
+        data: [{} as IReservation, {} as IReservation, {} as IReservation],
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        selected: null,
+        message: null
+      };
+    }
     case ReservationActionTypes.getAllFilterPage: {
       return {
         ...state,
@@ -229,19 +240,6 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         history: [{}, {}, {}],
-        page: null,
-        filter: null,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case ReservationActionTypes.paymentBankList: {
-      return {
-        ...state,
-        // @ts-ignore
-        banks: [{}, {}, {}],
         page: null,
         filter: null,
         errorMessage: null,
@@ -450,16 +448,6 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         history: action.payload,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case ReservationActionTypes.paymentBankListSuccess: {
-      return {
-        ...state,
-        banks: action.payload,
         errorMessage: null,
         error: null,
         subErrors: null,

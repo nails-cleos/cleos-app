@@ -102,7 +102,6 @@
     </ng-container>
 
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-    <tr *matRowDef="let additional; columns: displayedColumns;" fxHide.lt-sm fxShow mat-row></tr>
     <tr (click)="expandedAdditional = expandedAdditional === additional ? null : additional"
         *matRowDef="let additional; columns: displayedColumns;" class="row"
         fxHide fxShow.lt-sm mat-row></tr>

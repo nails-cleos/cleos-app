@@ -2,7 +2,9 @@
   "RESERVATION": {
     "PREVIEW": "Vista previa",
     "APPOINTMENT": "Cita",
-    "SEARCH": "Búsqueda",
+    "SEARCH": {
+      "TITLE": "Búsqueda"
+    },
     "LIST": {
       "CANCEL": {
         "TITLE": "Cancelar reserva",
@@ -194,6 +196,10 @@
     }
   },
   "PAYMENT": {
+    "TYPE": {
+      "FIELD": "Tipo de pago",
+      "SEARCH": "Buscar por tipo de pago"
+    },
     "RECREATE": "Link de pago regenerado",
     "COPY": "¡Link copiado!",
     "LIST": {

@@ -51,6 +51,16 @@ export class ReservationEffects {
         ))
     ));
 
+  findInvoiceReservation$ = createEffect(() =>
+    this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.findInvoiceReservation)).pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) =>
+        this.reservationService.findInvoiceReservation(payload.start, payload.end, payload.types).pipe(
+          switchMap((response) => of(new fromActionsReservation.ReservationSuccess(response ? response : []))),
+          catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({ error: err.error })))
+        ))
+    ));
+
   getAllGroupingByRoom$ = createEffect(() =>
     this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.getAllGroupingByRoom)).pipe(
       map((action: any) => action.payload),
@@ -309,13 +319,6 @@ export class ReservationEffects {
       catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({ error: err.error })))
     ))
   ));
-  paymentBankList$ = createEffect(() => this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.paymentBankList)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.paymentService.getBankList(payload).pipe(
-      switchMap((response) => of(new fromActionsReservation.PaymentBankListSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({ error: err.error })))
-    ))
-  ));
 
   selectedData$ = createEffect(() => this.actions.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.reservationSelected),
@@ -406,10 +409,6 @@ export class ReservationEffects {
 
   trackingSuccess$ = createEffect(() => this.actions.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.trackingSuccess)
-  ), { dispatch: false });
-
-  paymentBankListSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(fromActionsReservation.ReservationActionTypes.paymentBankListSuccess)
   ), { dispatch: false });
 
   paymentsSuccess$ = createEffect(() => this.actions.pipe(

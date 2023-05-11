@@ -95,6 +95,32 @@
     border-bottom-color: mat.get-color-from-palette($background, hover);
   }
 
+  @if $isDark {
+    .first {
+      background-color: mat.get-color-from-palette($primary-palette, A200);
+    }
+
+    .second {
+      background-color: mat.get-color-from-palette($primary-palette);
+    }
+
+    .third {
+      background-color: mat.get-color-from-palette($accent-palette);
+    }
+  } @else {
+    .first {
+      background-color: mat.get-color-from-palette($primary-palette, A200);
+    }
+
+    .second {
+      background-color: mat.get-color-from-palette($primary-palette);
+    }
+
+    .third {
+      background-color: mat.get-color-from-palette($accent-palette);
+    }
+  }
+
   // Time picker
   .timepicker {
     .timepicker__header {

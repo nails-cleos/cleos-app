@@ -25,6 +25,7 @@ import { AdditionalService } from '../services/additional.service';
 import { PaymentEffects } from '../store/effects/payment.effects';
 import { TrackingService } from '../services/tracking.service';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { InvoiceComponent } from './invoice/invoice.component';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
     ReservationCompleteComponent,
     ChangeCustomerDialogComponent,
     SelectProfessionalDialogComponent,
+    InvoiceComponent,
   ],
   imports: [
     ReservationRoutingModule,

@@ -62,7 +62,7 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     user.lang = valueChange(this.langValue.value.value, this.user?.locale);
     user.phone = fieldChange(this.phone, this.user?.phone);
     user.dob = fieldChange(this.dob, this.user?.dob);
-    user.dob = user.dob ? backendFormatDate(newDate(user.dob), API_LOCALE) : user.dob;
+    user.dob = user.dob ? backendFormatDate(newDate(user.dob)) : user.dob;
 
     if (this.lightColor.value) {
       const color = this.lightColor.value;

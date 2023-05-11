@@ -4,6 +4,7 @@ export enum ReservationActionTypes {
   getAllPage = '[Reservation] Get all page',
   getCustomerReservations = '[Reservation] Get customer reservations',
   getAllFilterPage = '[Reservation] Get all filter page',
+  findInvoiceReservation = '[Reservation] Find invoice reservation',
   getAllGroupingByRoom = '[Reservation] Get all grouping by room',
   getCustomers = '[Reservation] Get customers',
   getCustomerInfo = '[Reservation] Get customer info',
@@ -35,6 +36,7 @@ export enum ReservationActionTypes {
   reservationSuccess = '[Reservation] Success',
   reservationPageSuccess = '[Reservation] Page Success',
   reservationFilterPageSuccess = '[Reservation] Filter Page Success',
+  reservationFindInvoiceSuccess = '[Reservation] Find invoice Success',
   customersSuccess = '[Reservation] Customers success',
   customerSuccess = '[Reservation] Customer success',
   reservationTreatmentsSuccess = '[Reservation] Treatments success',
@@ -47,8 +49,6 @@ export enum ReservationActionTypes {
   trackingSuccess = '[Reservation] Tracking success',
   reservationFailure = '[Reservation] Failure',
   reservationCompleteSuccess = '[Reservation] Complete success',
-  paymentBankList = '[Reservation] Payment bank list',
-  paymentBankListSuccess = '[Reservation] Payment bank list success',
   clean = '[Reservation] Clean'
 }
 
@@ -68,6 +68,13 @@ export class GetCustomerReservations implements Action {
 
 export class GetAllFilterPage implements Action {
   readonly type = ReservationActionTypes.getAllFilterPage;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class FindInvoiceReservation implements Action {
+  readonly type = ReservationActionTypes.findInvoiceReservation;
 
   constructor(public payload: any) {
   }
@@ -363,20 +370,6 @@ export class ChangeCustomer implements Action {
   }
 }
 
-export class PaymentBankList implements Action {
-  readonly type = ReservationActionTypes.paymentBankList;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class PaymentBankListSuccess implements Action {
-  readonly type = ReservationActionTypes.paymentBankListSuccess;
-
-  constructor(public payload: any) {
-  }
-}
-
 export class Clean implements Action {
   readonly type = ReservationActionTypes.clean;
 }
@@ -428,6 +421,5 @@ export type All =
   | ReservationReview
   | ReservationCompleteSuccess
   | ChangeCustomer
-  | PaymentBankList
-  | PaymentBankListSuccess
+  | FindInvoiceReservation
   | Clean;

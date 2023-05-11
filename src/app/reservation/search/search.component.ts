@@ -68,7 +68,6 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     });
     this.getState = this.store.select(selectReservationState);
     this.dateFormat = this.translate.currentLang;
-    this.allStates = this.allStates.filter(s => States[s as StatesKey] !== States.created);
     this.filteredStates = this.state.valueChanges.pipe(
       startWith(null),
       map((state: string | null) => state ? this.filterStates(state) : this.allStates.slice()));

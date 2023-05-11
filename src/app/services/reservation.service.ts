@@ -65,6 +65,17 @@ export class ReservationService {
     return this.http.get<IReservation[]>(`${ this.urlV1 }/filter`, { params });
   }
 
+  public findInvoiceReservation(start: string, end: string, types?: string[]): Observable<IReservation[]> {
+    let params = new HttpParams().set('start', start).set('end', end);
+    if (types && types.length) {
+      types.forEach(type => {
+        params = params.append('types', type);
+      });
+    }
+
+    return this.http.get<IReservation[]>(`${ this.urlV1 }/invoices`, { params });
+  }
+
   public getAllGroupingByRoom(days: number, date: Date, roomId: string,
                               professionalId?: string): Observable<IReservation> {
     let params = new HttpParams().set('date', date.toISOString().slice(0, 10))

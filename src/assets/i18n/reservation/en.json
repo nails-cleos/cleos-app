@@ -2,7 +2,9 @@
   "RESERVATION": {
     "PREVIEW": "Preview",
     "APPOINTMENT": "Appointment",
-    "SEARCH": "Search",
+    "SEARCH": {
+      "TITLE": "Search"
+    },
     "LIST": {
       "CANCEL": {
         "TITLE": "Cancel reservation",
@@ -194,6 +196,10 @@
     }
   },
   "PAYMENT": {
+    "TYPE": {
+      "FIELD": "Payment type",
+      "SEARCH": "Find by payment type"
+    },
     "RECREATE": "Payment link recreated",
     "COPY": "Link copied!",
     "LIST": {
