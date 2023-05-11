@@ -45,7 +45,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
 
   state = new UntypedFormControl();
   filteredStates: Observable<string[]>;
-  states: string[] = [States.created];
+  states: string[] = [];
 
   private allStates: string[] = Object.keys(States);
   private userId: string | undefined;
