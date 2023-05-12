@@ -8,6 +8,7 @@
         "START": "Start",
         "END": "End",
         "PAID": "Paid",
+        "TO_PAY": "To pay",
         "APPROVED": "Approved",
         "CREATED": "Reservation must be approved by: ",
         "PAY_NOW": "Pay now and freeze the price",
@@ -15,8 +16,11 @@
           "TITLE": "No upcoming reservations"
         },
         "CUSTOMER": {
-          "ERROR": "Customer already has a reservation on {{date}}",
           "NO_CONTENT": "No availability on <span class='bold'>{{date}}</span>"
+        },
+        "ERROR": {
+          "CUSTOMER": "Customer already has a reservation on {{date}}",
+          "PAYMENT": "You must to pay a reservation"
         }
       },
       "TREATMENT": {
@@ -75,15 +79,13 @@
             "M": "<span class='bold'>Distance:</span> {{distance}} Meters"
           }
         }
-      },
-      "PAYMENT_MESSAGE": "If you pay, the reservation is approved. Otherwise, you need to wait until {{professional}} approved."
+      }
     },
     "PAYMENT": {
       "ERROR_TEXT": "Payment error",
       "ERROR": "Payment incomplete.\n{{reason}}",
       "DETAIL": "Payment detail",
-      "DEPOSIT_30": "Pay a 30% deposit of the reservation",
-      "TOTAL": "Pay total of the reservation",
+      "RESERVATION": "Reservation {{reservationId}}",
       "LIST": {
         "COLUMN": {
           "AMOUNT": "Amount",
@@ -94,14 +96,7 @@
         }
       },
       "TYPE": {
-        "FIELD": "Payment Type",
-        "REQUIRED": "Payment Type is <b>required</b>",
         "NO_CONTENT": "No Payment type"
-      },
-      "BANK": {
-        "FIELD": "Bank",
-        "REQUIRED": "Bank is <b>required</b>",
-        "INVALID": "Bank is invalid"
       }
     },
     "REFERRAL": {

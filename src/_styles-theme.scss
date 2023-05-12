@@ -13,6 +13,64 @@
   $foreground: map.get($color-config, 'foreground');
   $isDark: map.get($color-config, 'is-dark');
 
+  .text-bg-partially_completed {
+    background-color: #f7e6d8;
+    color: black;
+  }
+
+  @if $isDark {
+    .text-bg-created {
+      background-color: #fafafa;
+      color: black;
+    }
+    .text-bg-completed {
+      background-color: #90ee90;
+      color: black;
+    }
+    .text-bg-paid {
+      background-color: #009ee3;
+      color: black;
+    }
+    .text-bg-partially_paid {
+      background-color: #009ee3;
+      color: black;
+    }
+    .text-bg-started {
+      background-color: #e6b9ff;
+      color: black;
+    }
+    .text-bg-approved {
+      background-color: #e3d3c5;
+      color: black;
+    }
+    .text-bg-undefined {
+      background-color: #f08080;
+      color: black;
+    }
+  } @else {
+    .text-bg-created {
+      background-color: #ababab;
+    }
+    .text-bg-completed {
+      background-color: #44a244;
+    }
+    .text-bg-paid {
+      background-color: #04589a;
+    }
+    .text-bg-partially_paid {
+      background-color: #04589a;
+    }
+    .text-bg-started {
+      background-color: #673ab7;
+    }
+    .text-bg-approved {
+      background-color: #a06c3f;
+    }
+    .text-bg-undefined {
+      background-color: #ffb3b3;
+    }
+  }
+
   .loading {
     &::before {
       background: mat.get-color-from-palette($background, loading)
@@ -282,7 +340,7 @@
     color: mat.get-color-from-palette($foreground, base);
   }
 
-  .strikethrough:before, .red-text, .incomplete {
+  .strikethrough:before, .red-text, .incomplete, .minus {
     color: mat.get-color-from-palette($warn-palette);
   }
 
@@ -475,6 +533,7 @@
   .warning {
     color: mat.get-color-from-palette($warn-palette, darker);
   }
+
 }
 
 @mixin theme($theme) {

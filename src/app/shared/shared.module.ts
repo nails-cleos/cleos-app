@@ -8,7 +8,7 @@ import { SortByPipe } from '../pipes/sort-by.pipe';
 
 import { ErrorComponent } from './error/error.component';
 import { GoogleMapComponent } from './google-map/google-map.component';
-import { DialogComponent } from './dialog/dialog.component';
+import { DialogComponent } from './dialog/generic/dialog.component';
 import { GeocodeService } from '../services/geocode.service';
 import { RatingComponent } from './rating/rating.component';
 import { CalendarDateFormatter, CalendarEventTitleFormatter, CalendarModule, DateAdapter } from 'angular-calendar';
@@ -31,9 +31,13 @@ import { CurrencySymbolPipe } from '../pipes/currency-symbol.pipe';
 import { ReservationIconPipe } from '../pipes/reservation-icon.pipe';
 import { ConvertHMPipe } from '../pipes/convert-hm.pipe';
 import { CounterComponent } from '../util/counter/counter.component';
-import { CalendarDialogComponent } from './calendar-dialog/calendar-dialog.component';
-import { GoogleMapsModule } from "@angular/google-maps";
+import { CalendarDialogComponent } from './dialog/calendar/calendar-dialog.component';
+import { GoogleMapsModule } from '@angular/google-maps';
 import { PasswordComponent } from './password/password.component';
+import { BankComponent } from './bank/bank.component';
+import { PriceComponent } from './price/price.component';
+import { CustomerEditDialogComponent } from './dialog/customer-edit/customer-edit-dialog.component';
+import { CancelDialogComponent } from './dialog/cancel/cancel-dialog.component';
 
 @NgModule({
   imports: [
@@ -85,15 +89,19 @@ import { PasswordComponent } from './password/password.component';
     ConvertHMPipe,
     ErrorComponent,
     GoogleMapComponent,
-    DialogComponent,
     RatingComponent,
     CardChartComponent,
     CardComponent,
     ChartComponent,
     TimeZoneSnackBarComponent,
     CounterComponent,
+    PasswordComponent,
+    BankComponent,
+    PriceComponent,
+    DialogComponent,
     CalendarDialogComponent,
-    PasswordComponent
+    CustomerEditDialogComponent,
+    CancelDialogComponent
   ],
   declarations: [
     BackButtonDirective,
@@ -107,15 +115,19 @@ import { PasswordComponent } from './password/password.component';
     ConvertHMPipe,
     ErrorComponent,
     GoogleMapComponent,
-    DialogComponent,
     RatingComponent,
     CardChartComponent,
     CardComponent,
     ChartComponent,
     TimeZoneSnackBarComponent,
     CounterComponent,
+    PasswordComponent,
+    BankComponent,
+    PriceComponent,
+    DialogComponent,
     CalendarDialogComponent,
-    PasswordComponent
+    CustomerEditDialogComponent,
+    CancelDialogComponent
   ],
   providers: [
     httpInterceptorProviders,

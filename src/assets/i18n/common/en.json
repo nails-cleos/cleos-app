@@ -33,6 +33,7 @@
       "NOTIFY": "Notify",
       "SELECT": "Select",
       "UNAVAILABLE": "Add unavailable",
+      "ACCEPT": "Accept",
       "EXPAND": {
         "TRUE": "Click to show less",
         "FALSE": "Click to show more"
@@ -88,27 +89,55 @@
       "PERCENTAGE": "Percentage"
     },
     "PAYMENT": {
+      "TYPE": {
+        "FIELD": {
+          "TITLE": "Payment Type",
+          "REQUIRED": "Payment Type is <b>required</b>"
+        },
+        "CASH": "Cash",
+        "ML": "Mercado Libre",
+        "PAYPAL": "PayPal",
+        "IDEAL": "iDeal",
+        "TRANSFER": "Wire Transfer",
+        "NONE": "No payment selected"
+      },
+      "BANK": {
+        "FIELD": "Bank",
+        "REQUIRED": "Bank is <b>required</b>",
+        "INVALID": "Bank is invalid"
+      },
+      "OPTIONS": {
+        "TO_PAY": "Total to pay: {{amount}} {{symbol}}",
+        "PAID": "Total paid: {{amount}} {{symbol}}",
+        "PENALTY": "Penalty: {{amount}} {{symbol}}",
+        "D_OR_R": "Discount or refund: {{amount}} {{symbol}}"
+      },
+      "DEPOSIT_30": "Pay a 30% deposit of the reservation",
+      "TOTAL": "Pay total of the reservation",
       "PENDING": "Payment pending",
       "SUCCESS": "Payment complete successfully",
-      "CASH": "Cash",
-      "ML": "Mercado Libre",
-      "PAYPAL": "PayPal",
-      "IDEAL": "iDeal",
-      "TRANSFER": "Wire Transfer",
-      "CANCELLATION_POLICY": "1) Less than 24 hours’ notice will result in a fee of 100% of the reserved service price.\n2) “No show” will likewise be charged 100% of the booked service price.\n3) Between 24 hours and 1 week notice will result in a fee of 30% of the reserved service price.\n4) Cancellation of an appointment made within 1 week prior will  result in a discount voucher for the paid amount.",
-      "EDIT_POLICY": ""
+      "ERROR": "Payment error. {{reason}}",
+      "CANCELLATION_POLICY": {
+        "TITLE": "Cancellation/Rescheduling policy",
+        "1": "<span class='important'>Less than 24 hours’</span> notice will result in a fee of <span class='important'>30%</span> of the reserved treatment price.",
+        "2": "<span class='important'>“No show”</span> will likewise be charged <span class='important'>30%</span> of the booked treatment price.",
+        "3": "Cancellation/Rescheduling of an appointment made <span class='important'>within 24 hours prior</span> will result in a <span class='important'>refund or discount voucher</span> for the paid amount."
+      }
     },
     "STATUS": {
       "PAYMENT": {
         "NONE": "Pending",
         "APPROVED": "Approved",
+        "APPROVED_REFUND": "Approved",
         "REJECTED": "Rejected",
         "FAILURE": "Rejected",
         "CANCELLED": "Cancelled",
         "IN_PROCESS": "In process",
         "PENDING": "Pending",
         "CREATED": "Created",
-        "UNKNOWN": "Unknown"
+        "UNKNOWN": "Unknown",
+        "REFUND": "Refunded",
+        "REFUND_PENDING": "Refund pending"
       },
       "RESERVATION": {
         "CREATED": "Created",
@@ -120,7 +149,9 @@
         "PARTIALLY_COMPLETED": "Partially completed",
         "PARTIALLYCOMPLETED": "Partially completed",
         "COMPLETED": "Completed",
-        "CANCELLED": "Cancelled"
+        "CANCELLED": "Cancelled",
+        "CANCELLED_PAYMENT_REQUIRED": "Payment required",
+        "EDIT_CANCELLED": "New reservation related"
       }
     },
     "BACK": {
@@ -221,6 +252,7 @@
     },
     "RESERVATION": {
       "CREATED": "Reservation {{date}} created",
+      "PAYMENT_MESSAGE": "If you pay, the reservation is approved. Otherwise, you need to wait until {{professional}} approved.",
       "LIST": {
         "COLUMN": {
           "CUSTOMER": "Customer",
@@ -240,6 +272,10 @@
         "APPROVE": "Reservation approved",
         "START": "Reservation started",
         "COMPLETE": "Reservation completed"
+      },
+      "EDIT": {
+        "TITLE": "Reschedule reservation",
+        "TEXT": "Less than 24 hours’ notice will result in a fee of 30% of the reserved treatment price."
       }
     },
     "TIME_ZONE": {
@@ -280,6 +316,18 @@
       "3": "Good",
       "4": "Very good",
       "5": "Excellent"
+    }
+  },
+  "WHATSAPP": {
+    "SEND": {
+      "APPROVE": "♡ \uD835\uDC75\uD835\uDC86\uD835\uDC99\uD835\uDC95 \uD835\uDC82\uD835\uDC91\uD835\uDC91\uD835\uDC90\uD835\uDC8A\uD835\uDC8F\uD835\uDC95\uD835\uDC8E\uD835\uDC86\uD835\uDC8F\uD835\uDC95 ♡%0A{{date}}%0A%0A⚠️ \uD835\uDC68\uD835\uDC91\uD835\uDC91\uD835\uDC90\uD835\uDC8A\uD835\uDC8F\uD835\uDC95\uD835\uDC8E\uD835\uDC86\uD835\uDC8F\uD835\uDC95\uD835\uDC94 \uD835\uDC84\uD835\uDC82\uD835\uDC8F \uD835\uDC83\uD835\uDC86 \uD835\uDC84\uD835\uDC82\uD835\uDC8F\uD835\uDC84\uD835\uDC86\uD835\uDC8D \uD835\uDC98\uD835\uDC8A\uD835\uDC95\uD835\uDC89\uD835\uDC90\uD835\uDC96\uD835\uDC95 \uD835\uDC84\uD835\uDC89\uD835\uDC82\uD835\uDC93\uD835\uDC88\uD835\uDC86 \uD835\uDC96\uD835\uDC8F\uD835\uDC95\uD835\uDC8A\uD835\uDC8D 24 \uD835\uDC89\uD835\uDC90\uD835\uDC96\uD835\uDC93\uD835\uDC94 \uD835\uDC83\uD835\uDC86\uD835\uDC87\uD835\uDC90\uD835\uDC93\uD835\uDC86, \uD835\uDC90\uD835\uDC95\uD835\uDC89\uD835\uDC86\uD835\uDC93\uD835\uDC98\uD835\uDC8A\uD835\uDC94\uD835\uDC86 \uD835\uDC9A\uD835\uDC90\uD835\uDC96 \uD835\uDC94\uD835\uDC89\uD835\uDC90\uD835\uDC96\uD835\uDC8D\uD835\uDC85 \uD835\uDC91\uD835\uDC82\uD835\uDC9A \uD835\uDC82\uD835\uDC95 \uD835\uDC8D\uD835\uDC86\uD835\uDC82\uD835\uDC94\uD835\uDC95 \uD835\uDC95\uD835\uDC89\uD835\uDC86 30% \uD835\uDC90\uD835\uDC87 \uD835\uDC95\uD835\uDC89\uD835\uDC86 \uD835\uDC95\uD835\uDC93\uD835\uDC86\uD835\uDC82\uD835\uDC95\uD835\uDC8E\uD835\uDC86\uD835\uDC8F\uD835\uDC95. \uD835\uDC7B\uD835\uDC89\uD835\uDC82\uD835\uDC8F\uD835\uDC8C\uD835\uDC94 \uD835\uDC87\uD835\uDC90\uD835\uDC93 \uD835\uDC9A\uD835\uDC90\uD835\uDC96\uD835\uDC93 \uD835\uDC84\uD835\uDC90\uD835\uDC8E\uD835\uDC91\uD835\uDC93\uD835\uDC86\uD835\uDC89\uD835\uDC86\uD835\uDC8F\uD835\uDC94\uD835\uDC8A\uD835\uDC90\uD835\uDC8F!%0A%0A ♡ \uD835\uDE1A\uD835\uDE26\uD835\uDE26 \uD835\uDE3A\uD835\uDE30\uD835\uDE36 \uD835\uDE34\uD835\uDE30\uD835\uDE30\uD835\uDE2F ♡",
+      "TODAY": "♕\uD835\uDE3C\uD835\uDE65\uD835\uDE65\uD835\uDE64\uD835\uDE5E\uD835\uDE63\uD835\uDE69\uD835\uDE62\uD835\uDE5A\uD835\uDE63\uD835\uDE69 \uD835\uDE67\uD835\uDE5A\uD835\uDE62\uD835\uDE5E\uD835\uDE63\uD835\uDE59\uD835\uDE5A\uD835\uDE67♕%0Aℍ\uD835\uDD56\uD835\uDD5D\uD835\uDD5D\uD835\uDD60!!! \uD835\uDD4B\uD835\uDD60\uD835\uDD55\uD835\uDD52\uD835\uDD6A {{date}}\uD835\uDD6A\uD835\uDD60\uD835\uDD66 \uD835\uDD59\uD835\uDD52\uD835\uDD67\uD835\uDD56 \uD835\uDD6A\uD835\uDD60\uD835\uDD66\uD835\uDD63 \uD835\uDD5F\uD835\uDD52\uD835\uDD5A\uD835\uDD5D \uD835\uDD64\uD835\uDD56\uD835\uDD64\uD835\uDD64\uD835\uDD5A\uD835\uDD60\uD835\uDD5F ♡♡♡ ℂ\uD835\uDD60\uD835\uDD5F\uD835\uDD57\uD835\uDD5A\uD835\uDD63\uD835\uDD5E \uD835\uDD65\uD835\uDD59\uD835\uDD52\uD835\uDD65 \uD835\uDD6A\uD835\uDD60\uD835\uDD66 \uD835\uDD68\uD835\uDD5A\uD835\uDD5D\uD835\uDD5D \uD835\uDD52\uD835\uDD65\uD835\uDD65\uD835\uDD56\uD835\uDD5F\uD835\uDD55 \uD835\uDD61\uD835\uDD5D\uD835\uDD56\uD835\uDD52\uD835\uDD64\uD835\uDD56.%0A\uD835\uDD42\uD835\uDD5A\uD835\uDD64\uD835\uDD64\uD835\uDD56\uD835\uDD64 ❀",
+      "TOMORROW": "♡ \uD835\uDCE1\uD835\uDCEE\uD835\uDCF6\uD835\uDCF2\uD835\uDCF7\uD835\uDCED\uD835\uDCEE\uD835\uDCFB ♡%0A%0A\uD835\uDE1B\uD835\uDE30\uD835\uDE2E\uD835\uDE30\uD835\uDE33\uD835\uDE33\uD835\uDE30\uD835\uDE38 {{date}}, \uD835\uDE0A\uD835\uDE2D\uD835\uDE26\uD835\uDE30\uD835\uDE34 \uD835\uDE2A\uD835\uDE34 \uD835\uDE38\uD835\uDE22\uD835\uDE2A\uD835\uDE35\uD835\uDE2A\uD835\uDE2F\uD835\uDE28 \uD835\uDE27\uD835\uDE30\uD835\uDE33 \uD835\uDE3A\uD835\uDE30\uD835\uDE36!  %0A%0A⚠️ \uD835\uDC68\uD835\uDC91\uD835\uDC91\uD835\uDC90\uD835\uDC8A\uD835\uDC8F\uD835\uDC95\uD835\uDC8E\uD835\uDC86\uD835\uDC8F\uD835\uDC95\uD835\uDC94 \uD835\uDC84\uD835\uDC82\uD835\uDC8F \uD835\uDC83\uD835\uDC86 \uD835\uDC84\uD835\uDC82\uD835\uDC8F\uD835\uDC84\uD835\uDC86\uD835\uDC8D \uD835\uDC98\uD835\uDC8A\uD835\uDC95\uD835\uDC89\uD835\uDC90\uD835\uDC96\uD835\uDC95 \uD835\uDC84\uD835\uDC89\uD835\uDC82\uD835\uDC93\uD835\uDC88\uD835\uDC86 \uD835\uDC96\uD835\uDC8F\uD835\uDC95\uD835\uDC8A\uD835\uDC8D 24 \uD835\uDC89\uD835\uDC90\uD835\uDC96\uD835\uDC93\uD835\uDC94 \uD835\uDC83\uD835\uDC86\uD835\uDC87\uD835\uDC90\uD835\uDC93\uD835\uDC86, \uD835\uDC90\uD835\uDC95\uD835\uDC89\uD835\uDC86\uD835\uDC93\uD835\uDC98\uD835\uDC8A\uD835\uDC94\uD835\uDC86 \uD835\uDC9A\uD835\uDC90\uD835\uDC96 \uD835\uDC94\uD835\uDC89\uD835\uDC90\uD835\uDC96\uD835\uDC8D\uD835\uDC85 \uD835\uDC91\uD835\uDC82\uD835\uDC9A \uD835\uDC82\uD835\uDC95 \uD835\uDC8D\uD835\uDC86\uD835\uDC82\uD835\uDC94\uD835\uDC95 \uD835\uDC95\uD835\uDC89\uD835\uDC86 30% \uD835\uDC90\uD835\uDC87 \uD835\uDC95\uD835\uDC89\uD835\uDC86 \uD835\uDC95\uD835\uDC93\uD835\uDC86\uD835\uDC82\uD835\uDC95\uD835\uDC8E\uD835\uDC86\uD835\uDC8F\uD835\uDC95. \uD835\uDC7B\uD835\uDC89\uD835\uDC82\uD835\uDC8F\uD835\uDC8C\uD835\uDC94 \uD835\uDC87\uD835\uDC90\uD835\uDC93 \uD835\uDC9A\uD835\uDC90\uD835\uDC96\uD835\uDC93 \uD835\uDC84\uD835\uDC90\uD835\uDC8E\uD835\uDC91\uD835\uDC93\uD835\uDC86\uD835\uDC89\uD835\uDC86\uD835\uDC8F\uD835\uDC94\uD835\uDC8A\uD835\uDC90\uD835\uDC8F!%0A%0A ♡ \uD835\uDE1A\uD835\uDE26\uD835\uDE26 \uD835\uDE3A\uD835\uDE30\uD835\uDE36 \uD835\uDE34\uD835\uDE30\uD835\uDE30\uD835\uDE2F ♡",
+      "FOLLOWINGS": {
+        "TITLE": "\uD835\uDC80\uD835\uDC90\uD835\uDC96\uD835\uDC93 \uD835\uDC82\uD835\uDC91\uD835\uDC91\uD835\uDC90\uD835\uDC8A\uD835\uDC8F\uD835\uDC95\uD835\uDC8E\uD835\uDC86\uD835\uDC8F\uD835\uDC95\uD835\uDC94%0A",
+        "VALUE": "%0A♡ {{date}}"
+      },
+      "ATTENTION": "%0A%0A⚠️ \uD835\uDC68\uD835\uDC91\uD835\uDC91\uD835\uDC90\uD835\uDC8A\uD835\uDC8F\uD835\uDC95\uD835\uDC8E\uD835\uDC86\uD835\uDC8F\uD835\uDC95\uD835\uDC94 \uD835\uDC84\uD835\uDC82\uD835\uDC8F \uD835\uDC83\uD835\uDC86 \uD835\uDC84\uD835\uDC82\uD835\uDC8F\uD835\uDC84\uD835\uDC86\uD835\uDC8D \uD835\uDC98\uD835\uDC8A\uD835\uDC95\uD835\uDC89\uD835\uDC90\uD835\uDC96\uD835\uDC95 \uD835\uDC84\uD835\uDC89\uD835\uDC82\uD835\uDC93\uD835\uDC88\uD835\uDC86 \uD835\uDC96\uD835\uDC8F\uD835\uDC95\uD835\uDC8A\uD835\uDC8D 24 \uD835\uDC89\uD835\uDC90\uD835\uDC96\uD835\uDC93\uD835\uDC94 \uD835\uDC83\uD835\uDC86\uD835\uDC87\uD835\uDC90\uD835\uDC93\uD835\uDC86, \uD835\uDC90\uD835\uDC95\uD835\uDC89\uD835\uDC86\uD835\uDC93\uD835\uDC98\uD835\uDC8A\uD835\uDC94\uD835\uDC86 \uD835\uDC9A\uD835\uDC90\uD835\uDC96 \uD835\uDC94\uD835\uDC89\uD835\uDC90\uD835\uDC96\uD835\uDC8D\uD835\uDC85 \uD835\uDC91\uD835\uDC82\uD835\uDC9A \uD835\uDC82\uD835\uDC95 \uD835\uDC8D\uD835\uDC86\uD835\uDC82\uD835\uDC94\uD835\uDC95 \uD835\uDC95\uD835\uDC89\uD835\uDC86 30% \uD835\uDC90\uD835\uDC87 \uD835\uDC95\uD835\uDC89\uD835\uDC86 \uD835\uDC95\uD835\uDC93\uD835\uDC86\uD835\uDC82\uD835\uDC95\uD835\uDC8E\uD835\uDC86\uD835\uDC8F\uD835\uDC95. \uD835\uDC7B\uD835\uDC89\uD835\uDC82\uD835\uDC8F\uD835\uDC8C\uD835\uDC94 \uD835\uDC87\uD835\uDC90\uD835\uDC93 \uD835\uDC9A\uD835\uDC90\uD835\uDC96\uD835\uDC93 \uD835\uDC84\uD835\uDC90\uD835\uDC8E\uD835\uDC91\uD835\uDC93\uD835\uDC86\uD835\uDC89\uD835\uDC86\uD835\uDC8F\uD835\uDC94\uD835\uDC8A\uD835\uDC90\uD835\uDC8F!%0A%0A ♡ \uD835\uDE1A\uD835\uDE26\uD835\uDE26 \uD835\uDE3A\uD835\uDE30\uD835\uDE36 \uD835\uDE34\uD835\uDE30\uD835\uDE30\uD835\uDE2F ♡"
     }
   },
   "APP": {

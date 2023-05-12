@@ -33,6 +33,7 @@ export interface IReservation {
 
   payment?: IReservationPayment;
   startedTimestamp?: number;
+  paymentLink?: string;
 }
 
 export interface IReservationPayment {
@@ -57,6 +58,10 @@ export interface IReservationAll {
   additional?: IAdditionalAll[];
   configuration?: IConfigurationReservation;
   startedTimestamp?: number;
+  paymentLink?: string;
+  canEdit?: boolean;
+  paymentRequired?: boolean;
+  relatedReservationId: string;
 }
 
 export interface IConfigurationReservation {
@@ -80,7 +85,6 @@ export interface IRoomReservation {
 export interface ICustomerReservation {
   reservations: Pagination<IReservationAll>;
   upcoming: IUpcomingAll[];
-
   firstTime: boolean;
 }
 
@@ -143,6 +147,7 @@ export interface ICustomerLastReservation {
   treatment: ITreatmentAll;
   days: number;
   professionalName: string;
+  additionalIds: string[];
 }
 
 export class Reservation implements IReservation {
@@ -199,7 +204,17 @@ export enum States {
   started = 'STARTED',
   completed = 'COMPLETED',
   partiallyCompleted = 'PARTIALLY_COMPLETED',
-  cancelled = 'CANCELLED'
+  cancelled = 'CANCELLED',
+  cancelledPaymentRequired = 'CANCELLED_PAYMENT_REQUIRED'
+}
+
+export enum CancelOption {
+  refund = 'REFUND',
+  discount = 'DISCOUNT',
+  chargeWithDiscount = 'CHARGE_WITH_DISCOUNT',
+  chargeWithRefund = 'CHARGE_WITH_REFUND',
+  charge = 'CHARGE',
+  none = 'NONE'
 }
 
 export type StatesKey = keyof typeof States;

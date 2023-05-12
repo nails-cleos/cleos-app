@@ -7,13 +7,17 @@ import { IAdditionalAll } from '../interfaces/additional';
 import { TranslateService } from '@ngx-translate/core';
 import { IRoom, IRoomAll, ServiceType } from '../interfaces/room';
 import { IOffice } from '../interfaces/office';
-import { ICurrency } from '../interfaces/currency';
+import { ICurrency, ICurrencyAll } from '../interfaces/currency';
 import { IStep } from '../interfaces/step';
 import { getTime, getTimeZone, localeTimeZoneDate } from './dates';
-import { DialogComponent } from '../shared/dialog/dialog.component';
+import { DialogComponent } from '../shared/dialog/generic/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { isSameDay } from 'date-fns';
 import { Role } from '../interfaces/token';
+import { CancelDialogComponent } from '../shared/dialog/cancel/cancel-dialog.component';
+import { Router } from '@angular/router';
+import { CustomerEditDialogComponent } from '../shared/dialog/customer-edit/customer-edit-dialog.component';
+import { da } from 'date-fns/locale';
 
 export const isRoomAdmin = (authorities?: IAuthority[]): boolean => !!authorities && authorities.length === 1 &&
   authorities.some(u => (u.authority === Role.roomAdmin));
@@ -178,7 +182,7 @@ export const newPrice = (price: IPrice, amount: number, discount?: IDiscount): I
 
   const totalWithoutDiscount = total;
   if (priceDiscount) {
-    priceWithDiscount = price.amount - priceDiscount;
+    priceWithDiscount = amount - priceDiscount;
     total = total - priceDiscount;
   }
 
@@ -379,16 +383,9 @@ export const createDialog = (key: string, value: string, locale: string, transla
 export const isProfessional = (id: string, professionals?: IUser[]): boolean =>
   professionals ? professionals?.some(professional => professional.id === id) : false;
 
-const totalPaid = (payments: IPayment[] | undefined): number => {
-  let total = 0;
-  payments?.forEach(payment => {
-    if (payment.status === 'APPROVED' && payment.amount) {
-      total += payment.amount;
-    }
-  });
-
-  return total;
-};
+export const totalPaid = (payments: IPayment[] | undefined): number => payments?.filter(
+  (p: IPayment) => p.status && ['APPROVED', 'APPROVED_REFUND', 'REFUND'].includes(p.status))?.map((p: IPayment) =>
+  p.transactionAmount).reduce((acc: number, value: number | undefined) => acc + (value ? value : 0), 0) || 0;
 
 export const areEquals = (array1: any[], array2: any[]): boolean => (array1.length === array2.length &&
   array1.every((element1) => array2.some((element2) =>
@@ -396,6 +393,56 @@ export const areEquals = (array1: any[], array2: any[]): boolean => (array1.leng
     )
   )
 );
+
+export const openCancel = (dialog: MatDialog, room: IRoomAll, small: boolean, options: string[], afterClose: (result: any) => void,
+                           showPenalty?: boolean, price?: IPrice): void => {
+  const types = room.paymentTypes.filter((p) => !['CASH', 'TRANSFER'].includes(p));
+  const currency = room.currency;
+  const data = {
+    small,
+    options,
+    price,
+    types,
+    currency,
+    showPenalty
+  };
+
+  executeDialog(dialog, CancelDialogComponent, data, afterClose, true);
+};
+
+export const customerEditDialog = (dialog: MatDialog, router: Router, reservationId: string, currency: ICurrencyAll, small: boolean,
+                                   price?: IPrice): void => {
+  const data = {
+    small,
+    price,
+    currency
+  };
+  executeDialog(dialog, CustomerEditDialogComponent, data, result => {
+    if (result) {
+      router.navigate(['me', 'reservation', reservationId]);
+    }
+  }, true);
+};
+
+export const executeDialogNoWidth = (dialog: MatDialog, dialogComponent: any, data: any, afterClose: (result: any) => void,
+                                     disableClose: boolean = false): void => {
+  const dialogRef = dialog.open(dialogComponent, {
+    disableClose,
+    data
+  });
+
+  dialogRef.afterClosed().subscribe(afterClose);
+};
+export const executeDialog = (dialog: MatDialog, dialogComponent: any, data: any, afterClose: (result: any) => void,
+                              disableClose: boolean = false): void => {
+  const dialogRef = dialog.open(dialogComponent, {
+    width: '70vw',
+    disableClose,
+    data
+  });
+
+  dialogRef.afterClosed().subscribe(afterClose);
+};
 
 const getDiscount = (discount: IDiscount, price: number): number => {
   let value = 0;

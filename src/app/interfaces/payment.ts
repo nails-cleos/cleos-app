@@ -1,4 +1,4 @@
-import { IReservationAll } from "./reservation";
+import { IReservationAll } from './reservation';
 
 export interface IPaymentType {
   name: string;
@@ -49,27 +49,25 @@ export interface IPayment {
   id?: string;
   description?: string;
   amount?: number;
+  transactionAmount?: number;
   status?: string;
   type?: string;
   paymentId?: string;
   preferenceId?: string;
+  link?: string;
 }
 
 export interface IPaymentAll {
   id: string;
   description: string;
   amount: number;
+  transactionAmount?: number;
   status: string;
   type: string;
   paymentId: string;
   preferenceId: string;
   reservation?: IReservationAll;
   link?: string;
-}
-
-export class Payment implements IPayment {
-  constructor() {
-  }
 }
 
 export class PaymentStatus implements IPaymentStatus {
@@ -82,6 +80,6 @@ export class PaymentStatus implements IPaymentStatus {
     this.paymentId = paymentId;
     this.paymentType = type;
     this.preferenceId = referenceId;
-    this.reason = reason
+    this.reason = reason;
   }
 }

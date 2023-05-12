@@ -23,7 +23,7 @@ import {
 import { CalendarEvent, CalendarEventTimesChangedEvent } from 'angular-calendar';
 import { TranslateService } from '@ngx-translate/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { DialogComponent } from '../shared/dialog/dialog.component';
+import { DialogComponent } from '../shared/dialog/generic/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import {
   API_LOCALE,
@@ -58,6 +58,7 @@ import { DiscountType, IDiscount, IUserDiscount } from '../interfaces/discount';
 import {
   createRoomOffice,
   createTreatmentGroupService,
+  executeDialogNoWidth,
   getBackIndex,
   getFullUserName,
   getIndex,
@@ -149,6 +150,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   additionalList: IAdditionalAll[] = [];
   additionalSelected: IAdditionalAll[] = [];
+  customerAdditionalIds: string[] = [];
 
   configurationForm!: UntypedFormGroup;
   customerChange: UntypedFormControl = new UntypedFormControl();
@@ -504,20 +506,17 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
     if (!this.professionalId) {
-      const dialogRef = this.dialog.open(SelectProfessionalDialogComponent, {
-        disableClose: true,
-        data: {
-          professionals: this.professionalList,
-          small: this.smallScreen
-        }
-      });
+      const data = {
+        professionals: this.professionalList,
+        small: this.smallScreen
+      };
 
-      dialogRef.afterClosed().subscribe(result => {
+      executeDialogNoWidth(this.dialog, SelectProfessionalDialogComponent, data, result => {
         if (result) {
           this.professional.setValue(result.professional);
           this.createEvent(date, state, id);
         }
-      });
+      }, true);
     } else {
       this.createEvent(date, state, id);
     }
@@ -953,12 +952,20 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       }
       this.customerInfo = state.customer;
+      if (this.customerInfo) {
+        this.treatmentId = this.customerInfo.treatment.key;
+        this.customerAdditionalIds = this.customerInfo.additionalIds;
+      }
       this.customers = state.customers;
       this.additionalList = state.treatmentDiscount?.additionalList;
       if (this.additionalList && this.additionalList.length) {
         const sp = this.steps[3];
         sp.enable = true;
         this.steps[3] = sp;
+        if (this.customerAdditionalIds?.length && !this.additionalSelected.length) {
+          this.additionalSelected = this.additionalList.filter(ad => this.customerAdditionalIds.includes(ad.id))
+            .map(ad => Object.assign({}, ad, { id: ad.id }));
+        }
       }
       if (state.treatmentDiscount?.treatments) {
         this.groups = Array.from(

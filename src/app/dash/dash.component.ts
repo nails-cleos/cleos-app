@@ -9,9 +9,9 @@ import * as fromActionsReservation from '../store/reservation.actions';
 import { IReservationSummary, States } from '../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
 import { getEnd, getNow, newDateTimestamp } from '../util/dates';
-import { CalendarEvent, CalendarView } from 'angular-calendar';
+import { CalendarEvent, CalendarMonthViewDay, CalendarView } from 'angular-calendar';
 import { findStateColor, isDarkMode } from '../util/theme';
-import { getFrequency, Meta, monthEvent } from '../util/event';
+import { getFrequency, IMeta, Meta, monthEvent } from '../util/event';
 import { Router } from '@angular/router';
 import { isSameDay, isSameMonth } from 'date-fns';
 import { ICalendarReservations, ICalendarUnavailable, IChart, IDashboard } from '../interfaces/dashboard';
@@ -20,8 +20,9 @@ import { UntypedFormControl } from '@angular/forms';
 import { IAuthority } from '../interfaces/user';
 import { Role } from '../interfaces/token';
 import { IRoom } from '../interfaces/room';
-import { CalendarDialogComponent } from '../shared/calendar-dialog/calendar-dialog.component';
+import { CalendarDialogComponent } from '../shared/dialog/calendar/calendar-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { executeDialogNoWidth } from '../util/helper';
 
 @Component({
   selector: 'app-dash',
@@ -166,7 +167,7 @@ export class DashComponent implements OnInit, OnDestroy {
       this.activeDayIsOpen = !((isSameDay(this.viewDate, date) && this.activeDayIsOpen) || events.length === 0);
       this.viewDate = date;
     }
-    if (!this.activeDayIsOpen) {
+    if (events.length === 0) {
       const room = { id: this.roomId };
       this.segmentClick(date, room);
     }
@@ -177,12 +178,25 @@ export class DashComponent implements OnInit, OnDestroy {
     this.segmentClick(date, room);
   }
 
+  beforeMonthViewRender({ body }: { body: CalendarMonthViewDay<IMeta>[] }): void {
+    // month view has a different UX from the week and day view so we only really need to group by the type
+    body.forEach((cell) => {
+      const groups = {};
+      cell.events.forEach((event: CalendarEvent<IMeta>) => {
+        // @ts-ignore
+        groups[event.meta?.state] = groups[event.meta?.state] || [];
+        // @ts-ignore
+        groups[event.meta?.state].push(event);
+      });
+      // @ts-ignore
+      cell.eventGroups = Object.entries(groups);
+    });
+  }
+
   private segmentClick(date: Date, room?: IRoom): void {
     const data = { date, room };
     if (date && room) {
-      const dialogRef = this.dialog.open(CalendarDialogComponent);
-
-      dialogRef.afterClosed().subscribe(result => {
+      executeDialogNoWidth(this.dialog, CalendarDialogComponent, null, result => {
         if (result) {
           this.router.navigate(result.split(','), { state: data });
         }

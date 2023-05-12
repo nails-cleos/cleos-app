@@ -13,10 +13,9 @@ export const requireMatch = (control: AbstractControl): any => {
   return null;
 };
 
-export const confirmedValidator = (controlOne?: AbstractControl | null, controlTwo?: AbstractControl | null): any => {
-  return () => {
-    if (controlOne?.value !== controlTwo?.value)
-      return { notConfirmed: true };
-    return null;
-  };
-}
+export const confirmedValidator = (controlOne?: AbstractControl | null, controlTwo?: AbstractControl | null): any => () => {
+  if (controlOne?.value !== controlTwo?.value) {
+    return { notConfirmed: true };
+  }
+  return null;
+};

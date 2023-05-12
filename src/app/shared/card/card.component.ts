@@ -6,7 +6,7 @@ import { IChart } from '../../interfaces/dashboard';
 @Component({
   selector: 'app-card',
   templateUrl: './card.component.html',
-  styleUrls: ['./card.component.css']
+  styleUrls: ['./card.component.scss']
 })
 export class CardComponent {
   @Input() title: string | undefined;

@@ -13,7 +13,7 @@ import { IRoom } from '../../interfaces/room';
 import { Pagination } from '../../interfaces/pagination';
 import { IPayment } from '../../interfaces/payment';
 import { IAdditional } from '../../interfaces/additional';
-import { IBank } from "../../interfaces/bank";
+import { IBank } from '../../interfaces/bank';
 
 export interface State {
   data: IReservation | IRoomReservation[] | IReservation[] | ICustomerReservation | IAvailableDTO | null;

@@ -23,7 +23,7 @@ export class PaymentEffects {
   findOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentFind)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.paymentService.getById(payload).pipe(
-      switchMap((payment: any) => of(new fromActionsPayment.PaymentSelected({ payment, redirect: true }))),
+      switchMap((payment: any) => of(new fromActionsPayment.PaymentSelected({ payment, redirect: false }))),
       catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
     ))
   ));
@@ -61,6 +61,14 @@ export class PaymentEffects {
     ))
   ));
 
+  updateOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentUpdate)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.paymentService.update(payload.id, payload.payment).pipe(
+      switchMap((payment: any) => of(new fromActionsPayment.PaymentSend(payment.link))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
+    ))
+  ));
+
   recreate$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentRecreate)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.paymentService.recreate(payload.id, payload.paymentType).pipe(
@@ -75,11 +83,14 @@ export class PaymentEffects {
       switchMap((response: any) => {
         switch (response.status) {
           case 'approved':
-            return of(new fromActionsPayment.PaymentSaveSuccess({ message: this.translate.instant('COMMON.PAYMENT.SUCCESS') }));
+            return of(new fromActionsPayment.PaymentSaveSuccess({
+              message: this.translate.instant('COMMON.PAYMENT.SUCCESS'),
+              reload: true
+            }));
           case 'pending':
             return of(new fromActionsPayment.PaymentSaveSuccess({ message: this.translate.instant('COMMON.PAYMENT.PENDING') }));
           default:
-            const message = this.translate.instant('PAYMENT.ERROR', { reason: response.status });
+            const message = this.translate.instant('COMMON.PAYMENT.ERROR', { reason: response.message });
             return of(new fromActionsPayment.PaymentNotComplete({ message }));
         }
       }), catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
@@ -91,7 +102,7 @@ export class PaymentEffects {
     tap((data: any) => {
       const payment = data.payload.payment;
       if (data.payload.redirect) {
-        this.router.navigate(['me', 'reservation', payment[0].reservationId || payment[0].reservation.id, 'payment'])
+        this.router.navigate(['me', 'reservation', payment[0].reservationId || payment[0].reservation.id, 'payment']);
       }
     })
   ), { dispatch: false });
@@ -106,7 +117,7 @@ export class PaymentEffects {
   ), { dispatch: false });
 
   saveSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsPayment.PaymentActionTypes.paymentSaveSuccess)
+    ofType(fromActionsPayment.PaymentActionTypes.paymentSaveSuccess),
   ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private router: Router,

@@ -9,7 +9,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectUnavailableState } from '../../store/app.states';
 import * as fromActionsUnavailable from '../../store/unavailable.actions';
-import { DialogComponent } from '../../shared/dialog/dialog.component';
+import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { isSameTimeZone, newDateTimestamp } from '../../util/dates';
 import { IUnavailable, IUnavailableAll } from '../../interfaces/unavailable';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';

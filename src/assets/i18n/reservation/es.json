@@ -41,7 +41,7 @@
       }
     },
     "PROFESSIONAL": {
-      "SELECT": "Select professional"
+      "SELECT": "Selecionar profesional"
     },
     "TREATMENT": {
       "DETAIL": "Detalle",
@@ -178,6 +178,19 @@
       "CUSTOMER_CHANGE": {
         "FIELD": "Se puede cambiar el cliente"
       }
+    },
+    "CANCEL": {
+      "TITLE": "Cancelar la reserva",
+      "FIELD": "Selecionar una opción de cancelación",
+      "REQUIRED": "Opción de cancelación es <b>requerido</b>",
+      "OPTION": {
+        "DISCOUNT": "<b>Descuento:</b><br>Crear un descuento por el total pagado.",
+        "REFUND": "<b>Reembolso:</b><br>Reembolsar el total pagado.",
+        "CHARGE": "<b>Penalización:</b><br>Se cobrará una penalización del 30%.",
+        "CHARGE_WITH_DISCOUNT": "<b>Penalización + Descuento:</b><br>Se cobrará una penalización del 30%. Si pagó más del 30%, se creará un descuento.",
+        "CHARGE_WITH_REFUND": "<b>Penalización + Reembolso:</b><br>Se cobrará una penalización del 30%. Si pagó más del 30%, obtendrá un reembolso.",
+        "NONE": "<b>None:</b><br>No extra action performed."
+      }
     }
   },
   "PAYMENT": {
@@ -191,13 +204,6 @@
       "ERROR": {
         "NO_CONTENT": "No hay pagos"
       }
-    }
-  },
-  "WHATSAPP": {
-    "SEND": {
-      "APPROVE": "♡ \uD835\uDC77\uD835\uDC79\uD835\uDC76\uD835\uDC7F\uD835\uDC70\uD835\uDC74\uD835\uDC68 \uD835\uDC6A\uD835\uDC70\uD835\uDC7B\uD835\uDC68 ♡\n{{date}}",
-      "TODAY": "♕\uD835\uDC79\uD835\uDC86\uD835\uDC84\uD835\uDC90\uD835\uDC93\uD835\uDC85\uD835\uDC82\uD835\uDC95\uD835\uDC90\uD835\uDC93\uD835\uDC8A\uD835\uDC90 \uD835\uDC85\uD835\uDC86 \uD835\uDC95\uD835\uDC96\uD835\uDC93\uD835\uDC8F\uD835\uDC90♕%0Aℍ\uD835\uDD60\uD835\uDD5D\uD835\uDD52!!! ℍ\uD835\uDD60\uD835\uDD6A {{date}} ℍ\uD835\uDD64 \uD835\uDD65\uD835\uDD56\uD835\uDD5Fé\uD835\uDD64 \uD835\uDD65\uD835\uDD66 \uD835\uDD64\uD835\uDD56\uD835\uDD64\uD835\uDD5Aó\uD835\uDD5F \uD835\uDD55\uD835\uDD56 \uD835\uDD66ñ\uD835\uDD52\uD835\uDD64 ♡♡♡  ℂ\uD835\uDD60\uD835\uDD5F\uD835\uDD57í\uD835\uDD63\uD835\uDD5E\uD835\uDD52\uD835\uDD5E\uD835\uDD56 \uD835\uDD62\uD835\uDD66\uD835\uDD56 \uD835\uDD52\uD835\uDD64\uD835\uDD5A\uD835\uDD64\uD835\uDD65\uD835\uDD5A\uD835\uDD63á\uD835\uDD64 \uD835\uDD61\uD835\uDD60\uD835\uDD63 \uD835\uDD57\uD835\uDD52\uD835\uDD67\uD835\uDD60\uD835\uDD63.%0A❀ \uD835\uDD39\uD835\uDD56\uD835\uDD64\uD835\uDD5A\uD835\uDD65\uD835\uDD60 ❀",
-      "TOMORROW": "♡ RECORDATORIO ♡\n\n\uD835\uDC74\uD835\uDC82ñ\uD835\uDC82\uD835\uDC8F\uD835\uDC82 {{date}}, \uD835\uDC6A\uD835\uDC8D\uD835\uDC86\uD835\uDC90\uD835\uDC94 \uD835\uDC95\uD835\uDC86 \uD835\uDC86\uD835\uDC94\uD835\uDC91\uD835\uDC86\uD835\uDC93\uD835\uDC82!\n\n⚠️ ʟᴀ ᴄɪᴛᴀ ᴘᴜᴇᴅᴇ ꜱᴇʀ ᴄᴀɴᴄᴇʟᴀᴅᴀ, ꜱɪɴ ᴄᴀʀɢᴏ, ʜᴀꜱᴛᴀ 24ʜꜱ ᴀɴᴛᴇꜱ. ᴅᴇ ʟᴏ ᴄᴏɴᴛʀᴀʀɪᴏ ᴅᴇʙᴇʀᴀ ᴀʙᴏɴᴀʀ ᴀʟ ᴍᴇɴᴏꜱ ᴇʟ 30% ᴅᴇʟ ᴛʀᴀᴛᴀᴍɪᴇɴᴛᴏ. \nᴍᴜᴄʜᴀꜱ ɢʀᴀᴄɪᴀꜱ ᴘᴏʀ ᴄᴏᴍᴘʀᴇɴᴅᴇʀ!\n\n♡ \uD835\uDC75\uD835\uDC90\uD835\uDC94 \uD835\uDC97\uD835\uDC86\uD835\uDC8E\uD835\uDC90\uD835\uDC94! ♡"
     }
   }
 }

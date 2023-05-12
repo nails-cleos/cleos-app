@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
-import { IReservation, IReservationAll, States, StatesKey } from '../../interfaces/reservation';
+import { CancelOption, IReservation, IReservationAll, States, StatesKey } from '../../interfaces/reservation';
 import { Observable, Subscription } from 'rxjs';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -10,13 +10,13 @@ import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../store/app.states';
 import * as fromActionsReservation from '../../store/reservation.actions';
-import { getNow, isSameTimeZone, newDate, newDateTimestamp } from '../../util/dates';
-import { DialogComponent } from '../../shared/dialog/dialog.component';
+import { getNow, isSameTimeZone, newDateTimestamp } from '../../util/dates';
+import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { map, startWith } from 'rxjs/operators';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { UntypedFormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { getFullUserName, openDialog } from '../../util/helper';
+import { getFullUserName, openCancel, openDialog } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
 
@@ -45,11 +45,12 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
 
   state = new UntypedFormControl();
   filteredStates: Observable<string[]>;
-  states: string[] = [States.created];
+  states: string[] = [];
 
   private allStates: string[] = Object.keys(States);
   private userId: string | undefined;
   private customers: IUserAll[] | undefined;
+  private small = false;
   private getState: Observable<any>;
   private subscription: Subscription | undefined;
   private paginatorSubscription: Subscription | undefined;
@@ -62,6 +63,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     ]).subscribe(result => {
       if (result.matches) {
         this.pageSize = MOBILE_PAGE_SIZE;
+        this.small = true;
       }
     });
     this.getState = this.store.select(selectReservationState);
@@ -109,17 +111,23 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
 
   cancel(reservation: IReservationAll): void {
     const title = this.translate.instant('RESERVATION.LIST.CANCEL.TITLE');
-    const content = this.translate.instant('RESERVATION.LIST.CANCEL.CONTENT', {date: reservation.start});
+    const date = newDateTimestamp(reservation.timestamp);
+    const content = this.translate.instant('RESERVATION.LIST.CANCEL.CONTENT', { date });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: {title, content, value: reservation.id}
+      data: { title, content, value: reservation.id }
     });
 
     dialogRef.afterClosed().subscribe(event => {
       if (event) {
-        this.dataSource = [{}, {}, {}];
-        this.store.dispatch(
-          new fromActionsReservation.Cancel(event)
-        );
+        const options = Object.values(CancelOption).filter(co => co !== CancelOption.charge);
+        openCancel(this.dialog, reservation.room, this.small, options, result => {
+          if (result) {
+            this.dataSource = [{}, {}, {}];
+            this.store.dispatch(
+              new fromActionsReservation.Cancel({ id: event, paymentCancellation: result })
+            );
+          }
+        });
       }
     });
   }
@@ -162,7 +170,9 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
       this.paginator.pageIndex = 0;
       this.getReservations();
     });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getReservations(this.paginator.pageIndex));
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => {
+      this.getReservations(this.paginator.pageIndex);
+    });
 
     this.cdRef.detectChanges();
   }
@@ -176,13 +186,16 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
           const reservationStart = newDateTimestamp(reservation.timestamp);
           if (reservationStart && [String(States.created), String(States.approved)].includes(reservation.state)) {
             const deadLine = reservationStart < now;
-            return Object.assign({}, reservation, {deadLine});
+            return Object.assign({}, reservation, { deadLine });
           }
           return reservation;
         });
         this.resultsLength = state.filter?.totalElements;
         if (!this.paginatorSubscription && this.resultsLength) {
           this.createPageSubscriptions();
+        } else if (!this.resultsLength) {
+          this.paginatorSubscription?.unsubscribe();
+          this.paginatorSubscription = undefined;
         }
       }
       if (state.message) {

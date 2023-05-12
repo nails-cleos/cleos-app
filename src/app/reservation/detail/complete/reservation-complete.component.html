@@ -148,7 +148,7 @@
                   <mat-label>{{ 'RESERVATION.PAYMENT.TYPE' | translate }}</mat-label>
                   <mat-select [formControl]="type">
                     <mat-option *ngFor="let t of types" [value]="t">
-                      {{ 'COMMON.PAYMENT.' + t | translate }}
+                      {{ 'COMMON.PAYMENT.TYPE.' + (t || 'NONE') | translate }}
                     </mat-option>
                   </mat-select>
                 </mat-form-field>

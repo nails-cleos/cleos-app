@@ -9,7 +9,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dial
 import { IService, IServicePrice, ServicePrice, ServiceType } from '../../../interfaces/room';
 import { IGroupService } from '../../../interfaces/treatment';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { createTreatmentGroupService } from '../../../util/helper';
+import { createTreatmentGroupService, executeDialogNoWidth } from '../../../util/helper';
 
 @Component({
   selector: 'app-add-service',
@@ -44,7 +44,7 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
       });
     }
     return this.store.dispatch(
-      new fromActionsRoom.UpdateMyServices({id: this.roomId, prices})
+      new fromActionsRoom.UpdateMyServices({ id: this.roomId, prices })
     );
   }
 
@@ -65,14 +65,10 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else if (showDialog) {
       const selectedItem = event.previousContainer.data[event.previousIndex];
-      const dialogRef = this.dialog.open(PriceDialogComponent, {
-        data: {name: selectedItem.name, type: selectedItem.type}
-      });
-
-      dialogRef.afterClosed().subscribe(s => {
+      executeDialogNoWidth(this.dialog, PriceDialogComponent, { name: selectedItem.name, type: selectedItem.type }, s => {
         if (s) {
           const price = s.price;
-          event.previousContainer.data[event.previousIndex] = Object.assign({}, selectedItem, {price});
+          event.previousContainer.data[event.previousIndex] = Object.assign({}, selectedItem, { price });
           transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
         }
       });
@@ -83,7 +79,7 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
 
   changePrice(service: IService): void {
     const dialogRef = this.dialog.open(PriceDialogComponent, {
-      data: {name: service.name, type: service.type, currentPrice: service.price}
+      data: { name: service.name, type: service.type, currentPrice: service.price }
     });
     dialogRef.afterClosed().subscribe(s => {
       if (s) {
@@ -91,14 +87,14 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
           const i = this.selectedAdditional.indexOf(service);
           if (i > -1) {
             const price = s.price;
-            this.selectedAdditional[i] = Object.assign({}, service, {price});
+            this.selectedAdditional[i] = Object.assign({}, service, { price });
           }
         } else if (s.type === ServiceType.treatment) {
           for (const [, value] of this.groups) {
             const i = value.selectedTreatments.indexOf(service);
             if (i > -1) {
               const price = s.price;
-              value.selectedTreatments[i] = Object.assign({}, service, {price});
+              value.selectedTreatments[i] = Object.assign({}, service, { price });
               break;
             }
           }
@@ -112,9 +108,9 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
       if (state.services) {
         const currency = state.services.currency.code;
         this.additional = state.services.additionalList.map((value: any) =>
-          Object.assign({}, value, {currency, type: ServiceType.additional}));
+          Object.assign({}, value, { currency, type: ServiceType.additional }));
         this.selectedAdditional = state.services.selectedAdditionalList.map((value: any) =>
-          Object.assign({}, value, {currency, type: ServiceType.additional}));
+          Object.assign({}, value, { currency, type: ServiceType.additional }));
 
         this.groups = new Map<string, IGroupService>();
         this.groups = createTreatmentGroupService(this.groups, state.services.treatments, currency);
@@ -134,7 +130,7 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
     this.route.params.subscribe((routeParams) => {
       this.roomId = routeParams.id;
       this.store.dispatch(
-        new fromActionsRoom.GetMyServices({id: this.roomId})
+        new fromActionsRoom.GetMyServices({ id: this.roomId })
       );
     });
   }

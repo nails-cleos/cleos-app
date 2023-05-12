@@ -7,19 +7,19 @@ export const environment = {
   appServer: 'http://localhost:4200',
   title: 'Cleos DEV',
   version: require('../../package.json').version + '-dev',
-  baseUrl: 'http://localhost:8080/api',
+  baseUrl: 'http://localhost:9999/api',
   googleClientId: 'xxxx.apps.googleusercontent.com',
   facebookClientId: 'xxxx',
   firebase: {
-    apiKey: "xxx",
-    authDomain: "nails-cleos-dev.firebaseapp.com",
-    projectId: "nails-cleos-dev",
-    storageBucket: "nails-cleos-dev.appspot.com",
-    messagingSenderId: "xxxx",
-    appId: "xxxx",
-    measurementId: "G-xxx",
-    vapidKey: "xxxx",
-    databaseURL: "https://nails-cleos-dev-default-rtdb.europe-west1.firebasedatabase.app"
+    apiKey: 'xxx',
+    authDomain: 'nails-cleos-dev.firebaseapp.com',
+    projectId: 'nails-cleos-dev',
+    storageBucket: 'nails-cleos-dev.appspot.com',
+    messagingSenderId: 'xxxx',
+    appId: 'xxxx',
+    measurementId: 'G-xxx',
+    vapidKey: 'xxxx',
+    databaseURL: 'https://nails-cleos-dev-default-rtdb.europe-west1.firebasedatabase.app'
   },
   googleMapKey: 'AIzaSyAkKXZ_Qi3MLge6Jjhi1bw0OXawDAbJgXc'
 };

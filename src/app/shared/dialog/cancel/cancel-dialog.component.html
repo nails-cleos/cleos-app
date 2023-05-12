@@ -1,0 +1,36 @@
+<h1 mat-dialog-title>{{'RESERVATION.CANCEL.TITLE' | translate }}</h1>
+<div mat-dialog-content>
+  <form [formGroup]="cancelForm">
+    <app-price [price]="price" [typeForm]="typeForm" [types]="types" [currency]="currency"
+               [firstTime]="true" [showPenalty]="showPenalty" [showBank]="true"></app-price>
+    <div style="margin-top: 10px;">
+      <mat-label>{{ 'RESERVATION.CANCEL.FIELD' | translate }}</mat-label>
+      <mat-radio-group class="radio-group" [formControl]="paymentCancellation">
+        <mat-radio-button class="radio-button" *ngFor="let option of options" [value]="option">
+          <div [innerHTML]="'RESERVATION.CANCEL.OPTION.' + option | translate"></div>
+        </mat-radio-button>
+      </mat-radio-group>
+      <ng-template *ngIf="paymentCancellation.hasError('required')">
+        <mat-error [innerHTML]="'RESERVATION.CANCEL.REQUIRED' | translate"></mat-error>
+      </ng-template>
+    </div>
+  </form>
+</div>
+<div mat-dialog-actions>
+  <div fxFlex></div>
+  <div *ngIf="data.small; else largeButton">
+    <button (click)="onNoClick" mat-fab>
+      <mat-icon>clear</mat-icon>
+    </button>
+    <button (click)="doAction" cdkFocusInitial color="primary" [disabled]="cancelForm.invalid || typeForm.invalid"
+            mat-fab>
+      <mat-icon>event_busy</mat-icon>
+    </button>
+  </div>
+  <ng-template #largeButton>
+    <button (click)="onNoClick" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+    <button (click)="doAction" cdkFocusInitial color="primary" [disabled]="cancelForm.invalid || typeForm.invalid"
+            mat-fab extended class="icon-button">Ok
+    </button>
+  </ng-template>
+</div>

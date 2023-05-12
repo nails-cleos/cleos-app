@@ -9,7 +9,7 @@ import { fieldChange, valueChange } from '../../util/validators';
 import { Location } from '@angular/common';
 import { findFlag, flags, IFlag } from '../../util/flags';
 import { getUserImage, getUserNameInitials } from '../../util/helper';
-import { createDateFromString } from '../../util/dates';
+import { API_LOCALE, backendFormatDate, createDateFromString, newDate } from '../../util/dates';
 import { Color } from '@angular-material-components/color-picker';
 import { lightenDarkenColor } from '../../util/color';
 
@@ -62,7 +62,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     user.firstName = fieldChange(this.firstName, this.user?.firstName);
     user.lastName = fieldChange(this.lastName, this.user?.lastName);
     user.phone = fieldChange(this.phone, this.user?.phone);
-    user.dob = fieldChange(this.dob, this.user?.dob);
+    user.dob = user.dob ? backendFormatDate(newDate(user.dob), API_LOCALE) : user.dob;
 
     if (this.lightColor.value) {
       const color = this.lightColor.value;
