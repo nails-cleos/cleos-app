@@ -80,6 +80,7 @@ export class UnavailableComponent implements OnInit, OnDestroy {
       this.rooms = [this.extras.room];
       this.professional.setValue(this.extras.room.professional);
       this.setValues(this.extras.date, getTime(this.extras.date));
+      this.showDuration = true;
     }
   }
 
