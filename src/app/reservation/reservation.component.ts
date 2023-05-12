@@ -150,6 +150,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   additionalList: IAdditionalAll[] = [];
   additionalSelected: IAdditionalAll[] = [];
+  customerAdditionalIds: string[] = [];
 
   configurationForm!: UntypedFormGroup;
   customerChange: UntypedFormControl = new UntypedFormControl();
@@ -951,12 +952,20 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       }
       this.customerInfo = state.customer;
+      if (this.customerInfo) {
+        this.treatmentId = this.customerInfo.treatment.key;
+        this.customerAdditionalIds = this.customerInfo.additionalIds;
+      }
       this.customers = state.customers;
       this.additionalList = state.treatmentDiscount?.additionalList;
       if (this.additionalList && this.additionalList.length) {
         const sp = this.steps[3];
         sp.enable = true;
         this.steps[3] = sp;
+        if (this.customerAdditionalIds?.length && !this.additionalSelected.length) {
+          this.additionalSelected = this.additionalList.filter(ad => this.customerAdditionalIds.includes(ad.id))
+            .map(ad => Object.assign({}, ad, { id: ad.id }));
+        }
       }
       if (state.treatmentDiscount?.treatments) {
         this.groups = Array.from(

@@ -73,6 +73,9 @@ export class AppMaterialModule {
     matIconRegistry.addSvgIcon('KNABNL2H', this.getUrl('assets/banks/KNABNL2H.svg'));
     matIconRegistry.addSvgIcon('BUNQNL2A', this.getUrl('assets/banks/BUNQNL2A.svg'));
     matIconRegistry.addSvgIcon('MOYONL21', this.getUrl('assets/banks/MOYONL21.svg'));
+    matIconRegistry.addSvgIcon('WHATSAPP', this.getUrl('assets/whatsapp.svg'));
+    matIconRegistry.addSvgIcon('INSTAGRAM', this.getUrl('assets/instagram.svg'));
+    matIconRegistry.addSvgIcon('FACEBOOK', this.getUrl('assets/facebook.svg'));
   }
 
   private getUrl(path: string): SafeResourceUrl {

@@ -5,3 +5,26 @@
     margin: 10px;
   }
 }
+
+.cell-totals {
+  margin: 5px;
+  text-align: center;
+}
+
+.badge {
+  margin-right: 5px;
+  --bs-badge-padding-x: .65em;
+  --bs-badge-padding-y: .35em;
+  --bs-badge-font-size: .75em;
+  --bs-badge-font-weight: 700;
+  --bs-badge-border-radius: .375rem;
+  display: inline-block;
+  padding: var(--bs-badge-padding-y) var(--bs-badge-padding-x);
+  font-size: var(--bs-badge-font-size);
+  font-weight: var(--bs-badge-font-weight);
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: var(--bs-badge-border-radius);
+}
