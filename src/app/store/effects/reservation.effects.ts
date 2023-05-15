@@ -55,7 +55,7 @@ export class ReservationEffects {
     this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.findInvoiceReservation)).pipe(
       map((action: any) => action.payload),
       switchMap((payload: any) =>
-        this.reservationService.findInvoiceReservation(payload.start, payload.end, payload.types).pipe(
+        this.reservationService.findInvoiceReservation(payload.officeId, payload.start, payload.end, payload.types).pipe(
           switchMap((response) => of(new fromActionsReservation.ReservationSuccess(response ? response : []))),
           catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({ error: err.error })))
         ))

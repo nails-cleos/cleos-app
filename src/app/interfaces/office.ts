@@ -8,12 +8,23 @@ export interface IOffice {
   manager?: IUser;
   managerId?: string;
   rooms?: IRoom[];
+
+  subject?: string;
+  kvk?: string;
+  account?: string;
+  btw?: string;
+  lastInvoiceNumber?: number;
 }
 
 export interface IOfficeAll {
   id: string;
   name: string;
   manager: IUser;
+  subject?: string;
+  kvk?: string;
+  account?: string;
+  btw?: string;
+  lastInvoiceNumber?: number;
 }
 
 export class Office implements IOffice {

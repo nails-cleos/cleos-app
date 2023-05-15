@@ -65,7 +65,7 @@ export class ReservationService {
     return this.http.get<IReservation[]>(`${ this.urlV1 }/filter`, { params });
   }
 
-  public findInvoiceReservation(start: string, end: string, types?: string[]): Observable<IReservation[]> {
+  public findInvoiceReservation(officeId: string, start: string, end: string, types?: string[]): Observable<IReservation[]> {
     let params = new HttpParams().set('start', start).set('end', end);
     if (types && types.length) {
       types.forEach(type => {
@@ -73,7 +73,7 @@ export class ReservationService {
       });
     }
 
-    return this.http.get<IReservation[]>(`${ this.urlV1 }/invoices`, { params });
+    return this.http.get<IReservation[]>(`${ this.urlV1 }/offices/${ officeId }/invoices`, { params });
   }
 
   public getAllGroupingByRoom(days: number, date: Date, roomId: string,

@@ -3,7 +3,11 @@
     "PREVIEW": "Vista previa",
     "APPOINTMENT": "Cita",
     "SEARCH": {
-      "TITLE": "Búsqueda"
+      "TITLE": "Búsqueda",
+      "RANGE": {
+        "FIELD": "Seleccione rango de fecha",
+        "REQUIRED": "Rango de fecha es <b>requerido</b>"
+      }
     },
     "LIST": {
       "CANCEL": {

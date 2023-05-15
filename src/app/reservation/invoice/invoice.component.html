@@ -3,14 +3,29 @@
     <legend>{{'RESERVATION.SEARCH.TITLE' | translate }}</legend>
     <form [formGroup]="form">
       <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
+        <mat-form-field>
+          <mat-label>{{ 'RESERVATION.CUSTOMER.SEARCH' | translate }}</mat-label>
+          <label>
+            <input (keydown)="keyDownHandler($event)" [formControl]="office" [matAutocomplete]="autoOffice"
+                   autocomplete="off" matInput placeholder="{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}"
+                   type="text">
+          </label>
+          <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
+            <mat-option *ngFor="let office of filteredOffice | async" [value]="office">
+              {{office.name}}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
         <mat-form-field appearance="fill">
-          <mat-label>{{'RESERVATION.SEARCH.RANGE' | translate }}</mat-label>
+          <mat-label>{{'RESERVATION.SEARCH.RANGE.FIELD' | translate }}</mat-label>
           <mat-date-range-input [rangePicker]="drp" [formGroup]="dateRange">
             <input matStartDate [formControl]="startDate" placeholder="Start date">
             <input matEndDate [formControl]="endDate" placeholder="End date">
           </mat-date-range-input>
           <mat-datepicker-toggle matSuffix [for]="drp"></mat-datepicker-toggle>
           <mat-date-range-picker #drp touchUi></mat-date-range-picker>
+          <mat-error [innerHTML]="'RESERVATION.SEARCH.RANGE.REQUIRED' | translate">
+          </mat-error>
         </mat-form-field>
         <mat-form-field>
           <mat-label>{{ 'PAYMENT.TYPE.SEARCH' | translate }}</mat-label>
@@ -29,6 +44,16 @@
             </mat-option>
           </mat-autocomplete>
         </mat-form-field>
+        <ng-template [ngIf]="reservations">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'RESERVATION.SEARCH.START.FIELD' | translate }}</mat-label>
+            <label>
+              <input [formControl]="startNumber" matInput matNativeControl required [type]="'number'" [step]="1">
+            </label>
+            <mat-error *ngIf="startNumber.hasError('required')" [innerHTML]="'RESERVATION.SEARCH.START.REQUIRED' | translate">
+            </mat-error>
+          </mat-form-field>
+        </ng-template>
       </div>
     </form>
   </fieldset>
@@ -90,16 +115,16 @@
           </td>
         </ng-container>
 
-        <ng-container matColumnDef="treatment">
-          <th *matHeaderCellDef fxHide.lt-sm fxShow
-              mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }}</th>
-          <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
-            <div *ngIf="reservation.id; else skeleton">{{reservation.treatment.name}}</div>
-            <ng-template #skeleton>
-              <div class="ssc-line"></div>
-            </ng-template>
-          </td>
-        </ng-container>
+        <!--        <ng-container matColumnDef="treatment">-->
+        <!--          <th *matHeaderCellDef fxHide.lt-sm fxShow-->
+        <!--              mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }}</th>-->
+        <!--          <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>-->
+        <!--            <div *ngIf="reservation.id; else skeleton">{{reservation.item.name}}</div>-->
+        <!--            <ng-template #skeleton>-->
+        <!--              <div class="ssc-line"></div>-->
+        <!--            </ng-template>-->
+        <!--          </td>-->
+        <!--        </ng-container>-->
 
         <ng-container matColumnDef="actions">
           <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
@@ -157,6 +182,28 @@
     </div>
 
     <div>
+      <!--      <ng-template [ngIf]="selection.selected.length">-->
+      <!--        <div id="pdfTable" #pdfTable [hidden]="true">-->
+      <!--          <h2>Angular HTML To PDF Generator Example - ItSolutionStuff.com</h2>-->
+
+      <!--          <table class="table table-bordered">-->
+      <!--            <thead>-->
+      <!--            <tr>-->
+      <!--              <th>Firstname</th>-->
+      <!--              <th>Lastname</th>-->
+      <!--              <th>Website</th>-->
+      <!--            </tr>-->
+      <!--            </thead>-->
+      <!--            <tbody>-->
+      <!--            <tr *ngFor="let reservation of selection.selected">-->
+      <!--              <td>{{reservation.id}}</td>-->
+      <!--              <td>{{reservation.state}}</td>-->
+      <!--              <td>{{reservation.timestamp}}</td>-->
+      <!--            </tr>-->
+      <!--            </tbody>-->
+      <!--          </table>-->
+      <!--        </div>-->
+      <!--      </ng-template>-->
       <button mat-icon-button type="button" (click)="print" [disabled]="!selection.selected.length">
         <mat-icon>print</mat-icon>
       </button>

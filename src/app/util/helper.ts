@@ -17,7 +17,6 @@ import { Role } from '../interfaces/token';
 import { CancelDialogComponent } from '../shared/dialog/cancel/cancel-dialog.component';
 import { Router } from '@angular/router';
 import { CustomerEditDialogComponent } from '../shared/dialog/customer-edit/customer-edit-dialog.component';
-import { da } from 'date-fns/locale';
 
 export const isRoomAdmin = (authorities?: IAuthority[]): boolean => !!authorities && authorities.length === 1 &&
   authorities.some(u => (u.authority === Role.roomAdmin));

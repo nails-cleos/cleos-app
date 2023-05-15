@@ -32,6 +32,16 @@
       </td>
     </ng-container>
 
+    <ng-container matColumnDef="subject">
+      <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'OFFICE.SUBJECT.FIELD' | translate }}</th>
+      <td *matCellDef="let office" mat-cell>
+        <div *ngIf="office.id; else skeleton">{{office.subject}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
     <ng-container matColumnDef="actions">
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
       <td *matCellDef="let office" fxHide.lt-sm fxShow mat-cell>
