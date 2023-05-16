@@ -151,7 +151,9 @@
         "PARTIALLYCOMPLETED": "Parcialmente Completada",
         "CANCELLED": "Cancelada",
         "CANCELLED_PAYMENT_REQUIRED": "Pago requerido",
-        "EDIT_CANCELLED": "Nueva reserva relacionada"
+        "CANCELLEDPAYMENTREQUIRED": "Pago requerido",
+        "EDIT_CANCELLED": "Nueva reserva relacionada",
+        "EDITCANCELLED": "Nueva reserva relacionada"
       }
     },
     "BACK": {

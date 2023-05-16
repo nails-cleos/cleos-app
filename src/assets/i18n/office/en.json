@@ -22,6 +22,18 @@
       "INVALID": "Manager is invalid",
       "ADD_BUTTON": "Add manager"
     },
+    "SUBJECT": {
+      "FIELD": "Subject"
+    },
+    "KVK": {
+      "FIELD": "KVK nr"
+    },
+    "ACCOUNT": {
+      "FIELD": "Account nr"
+    },
+    "BTW": {
+      "FIELD": "BTW nr"
+    },
     "DELETED": {
       "TITLE": "Delete office",
       "CONTENT": "Are you sure to delete office {{name}}?",

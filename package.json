@@ -1,6 +1,6 @@
 {
   "name": "cleos",
-  "version": "1.0.14",
+  "version": "1.0.15-rc",
   "engines": {
     "node": "16.19.1",
     "npm": "8.19.3"
@@ -58,6 +58,8 @@
     "express": "^4.18.2",
     "firebase": "^9.18.0",
     "flag-icon-css": "^4.1.7",
+    "html-to-pdfmake": "^2.4.20",
+    "jspdf": "^2.5.1",
     "libphonenumber-js": "^1.10.24",
     "net": "^1.0.2",
     "ng2-charts": "^4.1.1",
@@ -67,6 +69,7 @@
     "ngx-material-timepicker": "^5.5.3",
     "ngx-sharebuttons": "^11.0.0",
     "path": "^0.12.7",
+    "pdfmake": "^0.2.7",
     "replace-in-file": "^6.3.5",
     "reselect": "^4.1.7",
     "rrule": "^2.7.2",
@@ -90,6 +93,7 @@
     "@angular/localize": "^15.2.3",
     "@ngrx/schematics": "^15.4.0",
     "@types/google.maps": "^3.52.5",
+    "@types/html-to-pdfmake": "^2.4.1",
     "@types/jasmine": "~4.3.1",
     "@types/node": "^18.15.3",
     "@typescript-eslint/eslint-plugin": "^5.55.0",

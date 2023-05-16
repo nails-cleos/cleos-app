@@ -25,6 +25,11 @@ export class OfficeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     Validators.required
   ]);
 
+  subject: UntypedFormControl = new UntypedFormControl('');
+  kvk: UntypedFormControl = new UntypedFormControl('');
+  account: UntypedFormControl = new UntypedFormControl('');
+  btw: UntypedFormControl = new UntypedFormControl('');
+
   private getState: Observable<any>;
   private subscription?: Subscription;
 
@@ -41,6 +46,10 @@ export class OfficeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     office.id = this.office?.id;
 
     office.name = fieldChange(this.name, this.office?.name);
+    office.subject = fieldChange(this.subject, this.office?.subject);
+    office.kvk = fieldChange(this.kvk, this.office?.kvk);
+    office.account = fieldChange(this.account, this.office?.account);
+    office.btw = fieldChange(this.btw, this.office?.btw);
 
     return this.store.dispatch(new fromActionsOffice.OfficeUpdate(office));
   }
@@ -60,7 +69,11 @@ export class OfficeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private createForm(): void {
     this.form = this.formBuilder.group({
-      name: this.name
+      name: this.name,
+      subject: this.subject,
+      kvk: this.kvk,
+      account: this.account,
+      btw: this.btw
     });
   }
 
@@ -71,7 +84,11 @@ export class OfficeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         this.office = {
           id: state.selected.office.id,
           name: state.selected.office.name,
-          rooms: state.selected.office.rooms
+          rooms: state.selected.office.rooms,
+          subject: state.selected.office.subject,
+          kvk: state.selected.office.kvk,
+          account: state.selected.office.account,
+          btw: state.selected.office.btw
         } as IOffice;
         this.form.patchValue(this.office);
       }
@@ -94,5 +111,4 @@ export class OfficeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
       );
     }
   }
-
 }

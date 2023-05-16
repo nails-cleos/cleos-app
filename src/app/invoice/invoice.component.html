@@ -1,0 +1,192 @@
+<div>
+  <fieldset>
+    <legend>{{'INVOICE.SEARCH.TITLE' | translate }}</legend>
+    <form [formGroup]="form">
+      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
+        <mat-form-field>
+          <mat-label>{{ 'INVOICE.OFFICE.SEARCH' | translate }}</mat-label>
+          <label>
+            <input (keydown)="keyDownHandler($event)" [formControl]="office" [matAutocomplete]="autoOffice"
+                   autocomplete="off" matInput placeholder="{{ 'INVOICE.OFFICE.FIELD' | translate }}"
+                   type="text" required>
+          </label>
+          <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
+            <mat-option *ngFor="let office of filteredOffice | async" [value]="office">
+              {{office.name}}
+            </mat-option>
+          </mat-autocomplete>
+          <mat-error *ngIf="office.hasError('required')"
+                     [innerHTML]="'INVOICE.OFFICE.REQUIRED' | translate">
+          </mat-error>
+          <mat-error *ngIf="office.hasError('requireMatch')"
+                     [innerHTML]="'INVOICE.OFFICE.INVALID' | translate">
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'INVOICE.SEARCH.START.FIELD' | translate }}</mat-label>
+          <label>
+            <input [formControl]="startNumber" matInput matNativeControl required [type]="'number'" [step]="1"
+                   [min]="1">
+          </label>
+          <mat-error *ngIf="startNumber.hasError('required')" [innerHTML]="'INVOICE.SEARCH.START.REQUIRED' | translate">
+          </mat-error>
+          <mat-error *ngIf="startNumber.hasError('min')"
+                     [innerHTML]="'INVOICE.SEARCH.START.MIN' | translate">
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>{{'INVOICE.SEARCH.RANGE.FIELD' | translate }}</mat-label>
+          <mat-date-range-input [rangePicker]="drp" [formGroup]="dateRange">
+            <input matStartDate [formControl]="startDate" placeholder="Start date">
+            <input matEndDate [formControl]="endDate" placeholder="End date">
+          </mat-date-range-input>
+          <mat-datepicker-toggle matSuffix [for]="drp"></mat-datepicker-toggle>
+          <mat-date-range-picker #drp touchUi></mat-date-range-picker>
+          <mat-error [innerHTML]="'INVOICE.SEARCH.RANGE.REQUIRED' | translate">
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{ 'INVOICE.PAYMENT.SEARCH' | translate }}</mat-label>
+          <mat-chip-grid #chipList aria-label="Payment type selection">
+            <mat-chip-row (removed)="remove(type)" *ngFor="let type of types" [removable]="true"
+                          color="primary">
+              {{ 'COMMON.PAYMENT.TYPE.' + type.toUpperCase() | translate}}
+              <mat-icon matChipRemove>cancel</mat-icon>
+            </mat-chip-row>
+            <input #typeInput [formControl]="type" [matAutocomplete]="auto" [matChipInputFor]="chipList"
+                   placeholder="{{ 'INVOICE.PAYMENT.FIELD' | translate }}">
+          </mat-chip-grid>
+          <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+            <mat-option *ngFor="let type of filteredTypes | async" [value]="type">
+              {{ 'COMMON.PAYMENT.TYPE.' + type.toUpperCase() | translate}}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+        <button color="accent" id="print"  mat-fab type="button" (click)="print"
+                [disabled]="!selection.selected.length">
+          <mat-icon>print</mat-icon>
+        </button>
+      </div>
+    </form>
+  </fieldset>
+
+  <ng-template [ngIf]="invoices">
+    <div class="mat-elevation-z8">
+      <table [dataSource]="dataSource" mat-table multiTemplateDataRows>
+        <ng-container matColumnDef="select">
+          <th mat-header-cell *matHeaderCellDef>
+            <mat-checkbox (change)="$event ? toggleAllRows() : null"
+                          [checked]="selection.hasValue() && isAllSelected()"
+                          [indeterminate]="selection.hasValue() && !isAllSelected()"
+                          [aria-label]="checkboxLabel()" [disabled]="!invoices.length">
+            </mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let row">
+            <mat-checkbox (click)="$event.stopPropagation()"
+                          (change)="$event ? selection.toggle(row) : null"
+                          [checked]="selection.isSelected(row)"
+                          [aria-label]="checkboxLabel(row)">
+            </mat-checkbox>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="position">
+          <th *matHeaderCellDef mat-header-cell fxHide.lt-sm fxShow>#</th>
+          <td *matCellDef="let invoice; let i = dataIndex;" mat-cell fxHide.lt-sm fxShow>
+            <div *ngIf="invoice.id; else skeleton">
+              {{((paginator?.pageIndex || 0) * pageSize) + i + 1}}
+            </div>
+            <ng-template #skeleton>
+              <div class="ssc-line"></div>
+            </ng-template>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="customer">
+          <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.CUSTOMER' | translate }}</th>
+          <td *matCellDef="let invoice" mat-cell>
+            <div *ngIf="invoice.id; else skeleton">{{invoice.customer | userName}}</div>
+            <ng-template #skeleton>
+              <div class="ssc-line"></div>
+            </ng-template>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="timestamp">
+          <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</th>
+          <td *matCellDef="let invoice" mat-cell>
+            <div *ngIf="invoice.id; else skeleton">
+              {{invoice.timestamp | timeDetail | date:'short':invoice.room.timeZone:dateFormat}}
+              <!--          <button (click)="openDialog(invoice)" *ngIf="showTimeZone(invoice)" mat-icon-button type="button">-->
+              <!--            <mat-icon>info_outline</mat-icon>-->
+              <!--          </button>-->
+            </div>
+            <ng-template #skeleton>
+              <div class="ssc-line"></div>
+            </ng-template>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="treatment">
+          <th *matHeaderCellDef fxHide.lt-sm fxShow
+              mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }}</th>
+          <td *matCellDef="let invoice" fxHide.lt-sm fxShow mat-cell>
+            <div *ngIf="invoice.id; else skeleton">{{invoice.items[0].name}}</div>
+            <ng-template #skeleton>
+              <div class="ssc-line"></div>
+            </ng-template>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+          <td *matCellDef="let invoice" fxHide.lt-sm fxShow mat-cell>
+            <div *ngIf="invoice.id; else skeleton">
+              <button [routerLink]="['/reservation', invoice.id]" mat-icon-button
+                      matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
+                <mat-icon color="primary">visibility</mat-icon>
+              </button>
+            </div>
+            <ng-template #skeleton>
+              <div class="ssc-line"></div>
+            </ng-template>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="expandedDetail">
+          <td *matCellDef="let invoice" [attr.colspan]="displayedColumns.length" fxHide fxShow.lt-sm>
+            <div [@detailExpand]="invoice === expandedInvoice ? 'expanded' : 'collapsed'" class="detail" fxHide
+                 fxShow.lt-sm>
+              <mat-list>
+                <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+                <mat-list-item role="list">
+                  <ng-template>
+                    <button [routerLink]="['/reservation', invoice.id]" color="primary" mat-icon-button>
+                      <mat-icon matListItemIcon>visibility</mat-icon>
+                    </button>
+                  </ng-template>
+                </mat-list-item>
+              </mat-list>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="noContent">
+          <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+            {{ 'COMMON.RESERVATION.LIST.ERROR.NO_CONTENT' | translate }}</td>
+        </ng-container>
+
+        <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+        <tr (click)="expandedInvoice = expandedInvoice === invoice ? null : invoice"
+            *matRowDef="let invoice; columns: displayedColumns;" class="row" mat-row
+            [ngClass]="invoice.order"></tr>
+        <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row fxHide fxShow.lt-sm></tr>
+
+        <tr *matFooterRowDef="['noContent']" [hidden]="invoices && invoices.length > 0" mat-footer-row></tr>
+
+      </table>
+      <mat-paginator [pageSize]="pageSize"></mat-paginator>
+    </div>
+
+  </ng-template>
+</div>

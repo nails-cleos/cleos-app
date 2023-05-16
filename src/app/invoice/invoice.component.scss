@@ -1,0 +1,28 @@
+[class*='mat-column-'] {
+  text-align: center;
+}
+
+.mat-column-code {
+  flex: 0 0 55%;
+  width: 55%;
+}
+
+tr.detail-row {
+  height: 0 !important;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+.first {
+  padding: 16px 0;
+}
+
+.second {
+  padding: 16px 0;
+}
+
+.third {
+  padding: 16px 0;
+}

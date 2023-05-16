@@ -22,6 +22,18 @@
       "INVALID": "Manager no valido",
       "ADD_BUTTON": "Agregar manager"
     },
+    "SUBJECT": {
+      "FIELD": "Empresa"
+    },
+    "KVK": {
+      "FIELD": "KVK nr"
+    },
+    "ACCOUNT": {
+      "FIELD": "Cuenta nr"
+    },
+    "BTW": {
+      "FIELD": "BTW nr"
+    },
     "DELETED": {
       "TITLE": "Eliminar oficina",
       "CONTENT": "¿Está seguro de eliminar la oficina {{name}}?",

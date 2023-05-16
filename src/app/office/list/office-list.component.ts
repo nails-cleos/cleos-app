@@ -24,7 +24,7 @@ export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['position', 'name', 'manager', 'actions'];
+  displayedColumns: string[] = ['position', 'name', 'manager', 'subject', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IOffice>>();
   expanded?: IOffice;
 

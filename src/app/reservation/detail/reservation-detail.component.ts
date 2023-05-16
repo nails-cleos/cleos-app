@@ -59,7 +59,7 @@ import * as fromActionsPayment from '../../store/payment.actions';
   styleUrls: ['./reservation-detail.component.scss']
 })
 export class ReservationDetailComponent implements OnInit, OnDestroy {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatPaginator) paginator?: MatPaginator;
 
   reservation: IReservationAll | undefined;
   history: IReservationAll[] | undefined;
@@ -258,7 +258,9 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       }
       this.history = state.history;
       this.dataSource = new MatTableDataSource(state.history);
-      this.dataSource.paginator = this.paginator;
+      if (this.history && this.history[0]?.id) {
+        this.dataSource.paginator = this.paginator;
+      }
       if (state.errorMessage || state.message) {
         if (state.message) {
           const id: string | null = this.route.snapshot.paramMap.get('id');

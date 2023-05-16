@@ -291,7 +291,7 @@
           <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>#</th>
           <td *matCellDef="let history; let i = dataIndex;" fxHide.lt-sm fxShow mat-cell>
             <div *ngIf="history.id; else skeleton">
-              {{((paginator.pageIndex || 0) * pageSize) + i + 1}}
+              {{((paginator?.pageIndex || 0) * pageSize) + i + 1}}
             </div>
             <ng-template #skeleton>
               <div class="ssc-line"></div>

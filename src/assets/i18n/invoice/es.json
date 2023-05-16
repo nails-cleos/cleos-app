@@ -1,0 +1,26 @@
+{
+  "INVOICE": {
+    "SEARCH": {
+      "TITLE": "Búsqueda",
+      "RANGE": {
+        "FIELD": "Seleccione rango de fecha",
+        "REQUIRED": "Rango de fecha es <b>requerido</b>"
+      },
+      "START": {
+        "FIELD": "Número de inicio",
+        "REQUIRED": "Número de inicio es <b>requerido</b>",
+        "MIN": "Número de inicio debe ser mayor que 0"
+      }
+    },
+    "OFFICE": {
+      "SEARCH": "Buscar por oficina",
+      "FIELD": "Oficina",
+      "REQUIRED": "Oficina es <b>requerido</b>",
+      "INVALID": "Oficina no valido"
+    },
+    "PAYMENT": {
+      "SEARCH": "Buscar por tipo de pago",
+      "FIELD": "Tipo de pago"
+    }
+  }
+}
