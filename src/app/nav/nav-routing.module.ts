@@ -41,6 +41,8 @@ const routes: Routes = [
         path: 'me', loadChildren: () => import('../me/me.module').then(m => m.MeModule)
       }, {
         path: 'events', loadChildren: () => import('../dashboard/dashboard.module').then(m => m.DashboardModule)
+      }, {
+        path: 'invoices', loadChildren: () => import('../invoice/invoice.module').then(m => m.InvoiceModule)
       }
     ]
   }

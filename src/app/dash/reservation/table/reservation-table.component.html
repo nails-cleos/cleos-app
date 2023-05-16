@@ -141,8 +141,8 @@
     </ng-container>
 
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-    <tr (click)="expanded = expanded === currency ? null : currency"
-        *matRowDef="let currency; columns: displayedColumns;" class="row" mat-row></tr>
+    <tr (click)="expanded = expanded === reservation ? null : reservation"
+        *matRowDef="let reservation; columns: displayedColumns;" class="row" mat-row></tr>
     <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row></tr>
 
     <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>

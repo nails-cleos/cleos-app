@@ -62,7 +62,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     user.firstName = fieldChange(this.firstName, this.user?.firstName);
     user.lastName = fieldChange(this.lastName, this.user?.lastName);
     user.phone = fieldChange(this.phone, this.user?.phone);
-    user.dob = user.dob ? backendFormatDate(newDate(user.dob), API_LOCALE) : user.dob;
+    user.dob = user.dob ? backendFormatDate(newDate(user.dob)) : user.dob;
 
     if (this.lightColor.value) {
       const color = this.lightColor.value;

@@ -51,6 +51,42 @@
               <ng-template #skeleton>
                 <div class="ssc-line"></div>
               </ng-template>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'OFFICE.SUBJECT.FIELD' | translate }}</mat-label>
+                <label>
+                  <input [formControl]="subject" matInput>
+                </label>
+                <mat-error *ngIf="errors['subject']">
+                  {{errors['subject']}}
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'OFFICE.KVK.FIELD' | translate }}</mat-label>
+                <label>
+                  <input [formControl]="kvk" matInput>
+                </label>
+                <mat-error *ngIf="errors['kvk']">
+                  {{errors['kvk']}}
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'OFFICE.ACCOUNT.FIELD' | translate }}</mat-label>
+                <label>
+                  <input [formControl]="account" matInput>
+                </label>
+                <mat-error *ngIf="errors['account']">
+                  {{errors['account']}}
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'OFFICE.BTW.FIELD' | translate }}</mat-label>
+                <label>
+                  <input [formControl]="btw" matInput>
+                </label>
+                <mat-error *ngIf="errors['btw']">
+                  {{errors['btw']}}
+                </mat-error>
+              </mat-form-field>
             </div>
           </mat-card-content>
           <mat-card-actions>

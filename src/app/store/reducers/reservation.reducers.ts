@@ -14,6 +14,7 @@ import { Pagination } from '../../interfaces/pagination';
 import { IPayment } from '../../interfaces/payment';
 import { IAdditional } from '../../interfaces/additional';
 import { IBank } from '../../interfaces/bank';
+import { IOffice } from '../../interfaces/office';
 
 export interface State {
   data: IReservation | IRoomReservation[] | IReservation[] | ICustomerReservation | IAvailableDTO | null;
@@ -21,6 +22,7 @@ export interface State {
   page: Pagination<IReservation> | null;
   customerReservation: ICustomerReservation | null;
   customers: IUser[] | null;
+  offices: IOffice[] | null;
   customer: ICustomerLastReservation | null;
   rooms: IRoom[] | null;
   additional: IAdditional[] | null;
@@ -43,6 +45,7 @@ export const initialState: State = {
   page: null,
   customerReservation: null,
   customers: null,
+  offices: null,
   customer: null,
   rooms: null,
   additional: null,
@@ -229,19 +232,6 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         history: [{}, {}, {}],
-        page: null,
-        filter: null,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case ReservationActionTypes.paymentBankList: {
-      return {
-        ...state,
-        // @ts-ignore
-        banks: [{}, {}, {}],
         page: null,
         filter: null,
         errorMessage: null,
@@ -450,16 +440,6 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         history: action.payload,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case ReservationActionTypes.paymentBankListSuccess: {
-      return {
-        ...state,
-        banks: action.payload,
         errorMessage: null,
         error: null,
         subErrors: null,

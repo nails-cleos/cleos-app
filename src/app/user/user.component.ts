@@ -69,7 +69,7 @@ export class UserComponent implements OnInit, OnDestroy {
     user.lastName = this.lastName.value;
     user.phone = this.phone.value;
     user.password = 'Ch4ng#';
-    user.dob = this.dob.value ? backendFormatDate(newDate(this.dob.value), API_LOCALE) : this.dob.value;
+    user.dob = this.dob.value ? backendFormatDate(newDate(this.dob.value)) : this.dob.value;
 
     if (this.lightColor.value) {
       const color = this.lightColor.value;

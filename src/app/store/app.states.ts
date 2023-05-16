@@ -13,6 +13,7 @@ import * as dashboard from './reducers/dashboard.reducers';
 import * as additional from './reducers/additional.reducers';
 import * as currency from './reducers/currency.reducers';
 import * as office from './reducers/office.reducers';
+import * as invoice from './reducers/invoice.reducers';
 import { createFeatureSelector } from '@ngrx/store';
 
 export interface AppState {
@@ -31,6 +32,7 @@ export interface AppState {
   additionalState: additional.State;
   currencyState: currency.State;
   officeState: office.State;
+  invoiceState: invoice.State;
 }
 
 export const reducers = {
@@ -48,7 +50,8 @@ export const reducers = {
   dashboard: dashboard.reducer,
   additional: additional.reducer,
   currency: currency.reducer,
-  office: office.reducer
+  office: office.reducer,
+  invoice: invoice.reducer
 };
 
 export const selectAuthState = createFeatureSelector<AppState>('auth');
@@ -66,3 +69,4 @@ export const selectDashboardState = createFeatureSelector<AppState>('dashboard')
 export const selectAdditionalState = createFeatureSelector<AppState>('additional');
 export const selectCurrencyState = createFeatureSelector<AppState>('currency');
 export const selectOfficeState = createFeatureSelector<AppState>('office');
+export const selectInvoiceState = createFeatureSelector<AppState>('invoice');

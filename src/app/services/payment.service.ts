@@ -60,8 +60,4 @@ export class PaymentService {
       paymentType
     });
   }
-
-  public getBankList(type: PaymentType): Observable<IBank[]> {
-    return this.http.get<IBank[]>(`${ this.urlV1 }/types/${ type }/banks`);
-  }
 }

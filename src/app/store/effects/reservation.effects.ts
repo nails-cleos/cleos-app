@@ -15,6 +15,7 @@ import { PaymentService } from '../../services/payment.service';
 import { AdditionalService } from '../../services/additional.service';
 import { newDateTimestamp } from '../../util/dates';
 import { Role } from '../../interfaces/token';
+import { OfficeService } from '../../services/office.service';
 
 @Injectable()
 export class ReservationEffects {
@@ -309,13 +310,6 @@ export class ReservationEffects {
       catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({ error: err.error })))
     ))
   ));
-  paymentBankList$ = createEffect(() => this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.paymentBankList)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.paymentService.getBankList(payload).pipe(
-      switchMap((response) => of(new fromActionsReservation.PaymentBankListSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({ error: err.error })))
-    ))
-  ));
 
   selectedData$ = createEffect(() => this.actions.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.reservationSelected),
@@ -406,10 +400,6 @@ export class ReservationEffects {
 
   trackingSuccess$ = createEffect(() => this.actions.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.trackingSuccess)
-  ), { dispatch: false });
-
-  paymentBankListSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(fromActionsReservation.ReservationActionTypes.paymentBankListSuccess)
   ), { dispatch: false });
 
   paymentsSuccess$ = createEffect(() => this.actions.pipe(

@@ -35,7 +35,7 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
     CalendarComponent,
     ReservationCompleteComponent,
     ChangeCustomerDialogComponent,
-    SelectProfessionalDialogComponent,
+    SelectProfessionalDialogComponent
   ],
   imports: [
     ReservationRoutingModule,

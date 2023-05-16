@@ -1,4 +1,4 @@
-import { IReservationAll } from './reservation';
+import { IReservationAll, States } from './reservation';
 
 export interface IPaymentType {
   name: string;
@@ -14,6 +14,8 @@ export enum PaymentType {
   ideal = 'IDEAL',
   transfer = 'TRANSFER'
 }
+
+export type PaymentTypeKey = keyof typeof PaymentType;
 
 export enum PaymentPercentage {
   deposit_30 = 'DEPOSIT_30',

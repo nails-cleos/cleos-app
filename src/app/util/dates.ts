@@ -356,6 +356,10 @@ export const monthViewTitle = (date: Date, locale: string = 'en'): string => dat
   year: 'numeric', month: 'long'
 }).replace(/^\w/, (c) => c.toUpperCase());
 
+export const invoiceTitle = (date: Date): string => date.toLocaleDateString(API_LOCALE, {
+  year: 'numeric', month: '2-digit'
+});
+
 export const columnHeader = (date: Date, locale: string = 'en'): string => date.toLocaleDateString(locale, {
   weekday: 'long'
 }).replace(/^\w/, (c) => c.toUpperCase());
@@ -372,9 +376,9 @@ export const formatDateTwoDigit = (date: Date, locale: string): string => date.t
   day: '2-digit', month: '2-digit', year: '2-digit'
 });
 
-export const backendFormatDate = (date: Date, locale: string): string => date.toLocaleDateString(locale, {
+export const backendFormatDate = (date?: Date): string | undefined => date?.toLocaleDateString(API_LOCALE, {
   day: '2-digit', month: '2-digit', year: 'numeric'
-}).replace(/\//g, '-');
+})?.replace(/\//g, '-');
 
 export const formatDuration = (duration: string, locale: string = API_LOCALE): string => {
   const d: IDuration = convertDuration(duration);

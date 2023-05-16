@@ -31,6 +31,11 @@ export class OfficeComponent implements OnInit, OnDestroy {
     Validators.required, requireMatch
   ]);
 
+  subject: UntypedFormControl = new UntypedFormControl('');
+  kvk: UntypedFormControl = new UntypedFormControl('');
+  account: UntypedFormControl = new UntypedFormControl('');
+  btw: UntypedFormControl = new UntypedFormControl('');
+
   private getState: Observable<any>;
   private subscription?: Subscription;
 
@@ -47,6 +52,10 @@ export class OfficeComponent implements OnInit, OnDestroy {
     const office: IOffice = new Office();
     office.name = this.name.value;
     office.managerId = this.manager.value.id;
+    office.subject = this.subject.value;
+    office.kvk = this.kvk.value;
+    office.account = this.account.value;
+    office.btw = this.btw.value;
 
     return this.store.dispatch(
       new fromActionsOffice.OfficeSave(office)
@@ -76,7 +85,11 @@ export class OfficeComponent implements OnInit, OnDestroy {
   private createForm(): void {
     this.form = this.formBuilder.group({
       name: this.name,
-      manager: this.manager
+      manager: this.manager,
+      subject: this.subject,
+      kvk: this.kvk,
+      account: this.account,
+      btw: this.btw
     });
     this.filteredOptions = this.manager.valueChanges.pipe(
       startWith(''),

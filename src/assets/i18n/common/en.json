@@ -151,7 +151,9 @@
         "COMPLETED": "Completed",
         "CANCELLED": "Cancelled",
         "CANCELLED_PAYMENT_REQUIRED": "Payment required",
-        "EDIT_CANCELLED": "New reservation related"
+        "CANCELLEDPAYMENTREQUIRED": "Payment required",
+        "EDIT_CANCELLED": "New reservation related",
+        "EDITCANCELLED": "New reservation related"
       }
     },
     "BACK": {
