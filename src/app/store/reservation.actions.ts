@@ -4,7 +4,6 @@ export enum ReservationActionTypes {
   getAllPage = '[Reservation] Get all page',
   getCustomerReservations = '[Reservation] Get customer reservations',
   getAllFilterPage = '[Reservation] Get all filter page',
-  findInvoiceReservation = '[Reservation] Find invoice reservation',
   getAllGroupingByRoom = '[Reservation] Get all grouping by room',
   getCustomers = '[Reservation] Get customers',
   getCustomerInfo = '[Reservation] Get customer info',
@@ -36,7 +35,6 @@ export enum ReservationActionTypes {
   reservationSuccess = '[Reservation] Success',
   reservationPageSuccess = '[Reservation] Page Success',
   reservationFilterPageSuccess = '[Reservation] Filter Page Success',
-  reservationFindInvoiceSuccess = '[Reservation] Find invoice Success',
   customersSuccess = '[Reservation] Customers success',
   customerSuccess = '[Reservation] Customer success',
   reservationTreatmentsSuccess = '[Reservation] Treatments success',
@@ -68,13 +66,6 @@ export class GetCustomerReservations implements Action {
 
 export class GetAllFilterPage implements Action {
   readonly type = ReservationActionTypes.getAllFilterPage;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class FindInvoiceReservation implements Action {
-  readonly type = ReservationActionTypes.findInvoiceReservation;
 
   constructor(public payload: any) {
   }
@@ -348,7 +339,6 @@ export class ExecuteTracking implements Action {
   }
 }
 
-
 export class TrackingSuccess implements Action {
   readonly type = ReservationActionTypes.trackingSuccess;
 
@@ -421,5 +411,4 @@ export type All =
   | ReservationReview
   | ReservationCompleteSuccess
   | ChangeCustomer
-  | FindInvoiceReservation
   | Clean;

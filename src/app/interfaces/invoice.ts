@@ -10,7 +10,7 @@ export interface IItem {
   order: number;
 }
 
-export interface IInvoice {
+export interface ITotals {
   subTotal: number;
   discount: number;
   price: number;
@@ -26,13 +26,13 @@ export interface IDiscount {
   value: number;
 }
 
-export interface IReservationInvoice {
+export interface IInvoice {
   id: string;
   customer: IUserAll;
   room: IRoomAll;
   items: IItem[];
   timestamp: number;
 
-  invoice: IInvoice;
+  totals: ITotals;
   discount: IDiscount;
 }

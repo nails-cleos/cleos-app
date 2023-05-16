@@ -32,6 +32,18 @@ export class MainComponent {
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(map(result => result.matches), shareReplay());
 
+  constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
+              private viewportScroller: ViewportScroller, private router: Router, private translate: TranslateService,
+              private overlayContainer: OverlayContainer, private cookieService: CookieService,
+              private themeService: ThemeService) {
+    this.checked = isDarkMode(cookieService.get(THEME) as Theme);
+    this.store.select(selectAuthState).subscribe((state: any) => {
+      this.isAuthenticated = state.isAuthenticated;
+      this.resetTheme(state.user?.theme);
+      this.checked = isDarkMode(cookieService.get(THEME) as Theme);
+    });
+  }
+
   get changeTheme(): void {
     this.checked = !this.checked;
     const theme: Theme = getThemeName(this.checked);
@@ -46,18 +58,6 @@ export class MainComponent {
       );
     }
     return;
-  }
-
-  constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
-              private viewportScroller: ViewportScroller, private router: Router, private translate: TranslateService,
-              private overlayContainer: OverlayContainer, private cookieService: CookieService,
-              private themeService: ThemeService) {
-    this.checked = isDarkMode(cookieService.get(THEME) as Theme);
-    this.store.select(selectAuthState).subscribe((state: any) => {
-      this.isAuthenticated = state.isAuthenticated;
-      this.resetTheme(state.user?.theme);
-      this.checked = isDarkMode(cookieService.get(THEME) as Theme);
-    });
   }
 
   get redirect(): void {

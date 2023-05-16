@@ -97,27 +97,27 @@
 
   @if $isDark {
     .first {
-      background-color: mat.get-color-from-palette($primary-palette, A200);
+      border-bottom: 3px groove mat.get-color-from-palette($primary-palette, A700);
     }
 
     .second {
-      background-color: mat.get-color-from-palette($primary-palette);
+      border-bottom: 3px groove mat.get-color-from-palette($primary-palette, A700);
     }
 
     .third {
-      background-color: mat.get-color-from-palette($accent-palette);
+      border-bottom: 3px groove mat.get-color-from-palette($primary-palette, A700);
     }
   } @else {
     .first {
-      background-color: mat.get-color-from-palette($primary-palette, A200);
+      border-bottom: 3px groove mat.get-color-from-palette($primary-palette, 700);
     }
 
     .second {
-      background-color: mat.get-color-from-palette($primary-palette);
+      border-bottom: 3px groove mat.get-color-from-palette($primary-palette, 700);
     }
 
     .third {
-      background-color: mat.get-color-from-palette($accent-palette);
+      border-bottom: 3px groove mat.get-color-from-palette($primary-palette, 700);
     }
   }
 

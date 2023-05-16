@@ -10,7 +10,7 @@ import { IOffice } from '../interfaces/office';
 export class OfficeService {
 
   private url = 'offices';
-  private urlV1 = `v1/${this.url}`;
+  private urlV1 = `v1/${ this.url }`;
 
   constructor(private http: HttpClient) {
   }
@@ -24,15 +24,11 @@ export class OfficeService {
       params = params.append('direction', direction);
     }
 
-    return this.http.get<IOffice[]>(`${this.urlV1}/pages`, {params});
-  }
-
-  public getAllOffice(): Observable<IOffice[]> {
-    return this.http.get<IOffice[]>(this.urlV1);
+    return this.http.get<IOffice[]>(`${ this.urlV1 }/pages`, { params });
   }
 
   public getById(id: string | null): Observable<IOffice | undefined> {
-    const url = `${this.urlV1}/${id}`;
+    const url = `${ this.urlV1 }/${ id }`;
     return this.http.get<IOffice>(url);
   }
 
@@ -41,12 +37,12 @@ export class OfficeService {
   }
 
   public delete(id: string | null): Observable<IOffice> {
-    const url = `${this.urlV1}/${id}`;
+    const url = `${ this.urlV1 }/${ id }`;
     return this.http.delete<IOffice>(url);
   }
 
   public update(office: IOffice): Observable<IOffice> {
-    const url = `${this.urlV1}/${office.id}`;
+    const url = `${ this.urlV1 }/${ office.id }`;
     return this.http.patch<IOffice>(url, office);
   }
 }

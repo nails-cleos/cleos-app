@@ -14,6 +14,7 @@ import { Pagination } from '../../interfaces/pagination';
 import { IPayment } from '../../interfaces/payment';
 import { IAdditional } from '../../interfaces/additional';
 import { IBank } from '../../interfaces/bank';
+import { IOffice } from '../../interfaces/office';
 
 export interface State {
   data: IReservation | IRoomReservation[] | IReservation[] | ICustomerReservation | IAvailableDTO | null;
@@ -21,6 +22,7 @@ export interface State {
   page: Pagination<IReservation> | null;
   customerReservation: ICustomerReservation | null;
   customers: IUser[] | null;
+  offices: IOffice[] | null;
   customer: ICustomerLastReservation | null;
   rooms: IRoom[] | null;
   additional: IAdditional[] | null;
@@ -43,6 +45,7 @@ export const initialState: State = {
   page: null,
   customerReservation: null,
   customers: null,
+  offices: null,
   customer: null,
   rooms: null,
   additional: null,
@@ -66,17 +69,6 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         // @ts-ignore
         customerReservation: { reservations: { content: [{}, {}, {}], totalElements: 3 }, upcoming: [{}] },
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case ReservationActionTypes.findInvoiceReservation: {
-      return {
-        ...state,
-        data: [{} as IReservation, {} as IReservation, {} as IReservation],
         errorMessage: null,
         error: null,
         subErrors: null,

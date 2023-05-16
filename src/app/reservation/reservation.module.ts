@@ -25,7 +25,6 @@ import { AdditionalService } from '../services/additional.service';
 import { PaymentEffects } from '../store/effects/payment.effects';
 import { TrackingService } from '../services/tracking.service';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
-import { InvoiceComponent } from './invoice/invoice.component';
 
 @NgModule({
   declarations: [
@@ -36,8 +35,7 @@ import { InvoiceComponent } from './invoice/invoice.component';
     CalendarComponent,
     ReservationCompleteComponent,
     ChangeCustomerDialogComponent,
-    SelectProfessionalDialogComponent,
-    InvoiceComponent,
+    SelectProfessionalDialogComponent
   ],
   imports: [
     ReservationRoutingModule,

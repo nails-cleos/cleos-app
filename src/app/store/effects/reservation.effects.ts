@@ -15,6 +15,7 @@ import { PaymentService } from '../../services/payment.service';
 import { AdditionalService } from '../../services/additional.service';
 import { newDateTimestamp } from '../../util/dates';
 import { Role } from '../../interfaces/token';
+import { OfficeService } from '../../services/office.service';
 
 @Injectable()
 export class ReservationEffects {
@@ -47,16 +48,6 @@ export class ReservationEffects {
         this.reservationService.getAllFilterReservationsPage(payload.active, payload.direction, payload.page,
           payload.size, payload.userId, payload.states).pipe(
           switchMap((response) => of(new fromActionsReservation.ReservationFilterPageSuccess(response ? response : { content: [] }))),
-          catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({ error: err.error })))
-        ))
-    ));
-
-  findInvoiceReservation$ = createEffect(() =>
-    this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.findInvoiceReservation)).pipe(
-      map((action: any) => action.payload),
-      switchMap((payload: any) =>
-        this.reservationService.findInvoiceReservation(payload.officeId, payload.start, payload.end, payload.types).pipe(
-          switchMap((response) => of(new fromActionsReservation.ReservationSuccess(response ? response : []))),
           catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({ error: err.error })))
         ))
     ));

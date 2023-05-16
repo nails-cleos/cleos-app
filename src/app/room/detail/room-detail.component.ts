@@ -35,7 +35,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   professional = new UntypedFormControl('', [
     Validators.required
-  ])
+  ]);
   filteredProfessionals?: Observable<IUser[] | undefined>;
   professionals: IUserAll[] = [];
   allProfessional?: IUserAll[];
@@ -115,7 +115,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
             x: location.lng(),
             y: location.lat()
           }
-        }
+        };
       }
       this.store.dispatch(new fromActionsRoom.RoomUpdate(room));
     }
@@ -129,8 +129,8 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private static createAv(date?: string): Date | undefined {
     if (date) {
-      const startTime = getTimeNumber(date)!;
-      return createDate(startTime.hour, startTime.minute);
+      const startTime = getTimeNumber(date);
+      return createDate(startTime?.hour, startTime?.minute);
     }
     return undefined;
   }
@@ -207,7 +207,7 @@ export class RoomDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  getAddress(placeResult: PlaceResult) {
+  getAddress(placeResult: PlaceResult): void {
     this.geometry = placeResult.geometry;
     this.formattedAddress = placeResult.formatted_address;
   }

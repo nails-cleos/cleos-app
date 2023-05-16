@@ -3,11 +3,7 @@
     "PREVIEW": "Preview",
     "APPOINTMENT": "Appointment",
     "SEARCH": {
-      "TITLE": "Search",
-      "RANGE": {
-        "FIELD": "Select range date",
-        "REQUIRED": "Range date is <b>required</b>"
-      }
+      "TITLE": "Search"
     },
     "LIST": {
       "CANCEL": {
