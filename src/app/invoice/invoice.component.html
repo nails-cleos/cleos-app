@@ -3,7 +3,7 @@
     <legend>{{'INVOICE.SEARCH.TITLE' | translate }}</legend>
     <form [formGroup]="form">
       <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
-        <mat-form-field>
+        <mat-form-field appearance="outline">
           <mat-label>{{ 'INVOICE.OFFICE.SEARCH' | translate }}</mat-label>
           <label>
             <input (keydown)="keyDownHandler($event)" [formControl]="office" [matAutocomplete]="autoOffice"
@@ -34,7 +34,7 @@
                      [innerHTML]="'INVOICE.SEARCH.START.MIN' | translate">
           </mat-error>
         </mat-form-field>
-        <mat-form-field appearance="fill">
+        <mat-form-field appearance="outline">
           <mat-label>{{'INVOICE.SEARCH.RANGE.FIELD' | translate }}</mat-label>
           <mat-date-range-input [rangePicker]="drp" [formGroup]="dateRange">
             <input matStartDate [formControl]="startDate" placeholder="Start date">
@@ -45,7 +45,9 @@
           <mat-error [innerHTML]="'INVOICE.SEARCH.RANGE.REQUIRED' | translate">
           </mat-error>
         </mat-form-field>
-        <mat-form-field>
+      </div>
+      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
+        <mat-form-field appearance="outline">
           <mat-label>{{ 'INVOICE.PAYMENT.SEARCH' | translate }}</mat-label>
           <mat-chip-grid #chipList aria-label="Payment type selection">
             <mat-chip-row (removed)="remove(type)" *ngFor="let type of types" [removable]="true"
@@ -62,7 +64,9 @@
             </mat-option>
           </mat-autocomplete>
         </mat-form-field>
-        <button color="accent" id="print"  mat-fab type="button" (click)="print"
+      </div>
+      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
+        <button color="accent" id="print" mat-fab type="button" (click)="print"
                 [disabled]="!selection.selected.length">
           <mat-icon>print</mat-icon>
         </button>

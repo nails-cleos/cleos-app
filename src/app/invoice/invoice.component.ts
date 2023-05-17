@@ -23,7 +23,6 @@ import { IInvoice } from '../interfaces/invoice';
 import { IOffice, IOfficeAll, Office } from '../interfaces/office';
 import { pdf } from '../util/invoice';
 import { requireMatch } from '../util/validators';
-import { ViewportScroller } from '@angular/common';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -113,8 +112,7 @@ export class InvoiceComponent implements OnInit, OnDestroy {
   private offices?: IOfficeAll[];
 
   constructor(private readonly translate: TranslateService, private store: Store<AppState>, private formBuilder: FormBuilder,
-              private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver,
-              private viewportScroller: ViewportScroller) {
+              private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
