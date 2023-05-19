@@ -33,13 +33,15 @@ export class Meta implements IMeta {
   state?: string;
   route?: string[];
   professionalId?: string;
+  total?: number;
 
-  constructor(time?: boolean, timeZone?: string, state?: string, route?: string[], professionalId?: string) {
+  constructor(time?: boolean, timeZone?: string, state?: string, route?: string[], professionalId?: string, total?: number) {
     this.time = time;
     this.timeZone = timeZone;
     this.state = state;
     this.route = route;
     this.professionalId = professionalId;
+    this.total = total;
   }
 }
 

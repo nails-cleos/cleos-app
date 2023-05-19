@@ -1,5 +1,6 @@
 import { ChartConfiguration, ChartOptions, ChartType, TooltipItem } from 'chart.js';
 import { IChart } from '../interfaces/dashboard';
+import { API_LOCALE } from './dates';
 
 export interface IChartUtil {
   labels: any[];
@@ -24,8 +25,13 @@ export const createChart = (chart: IChart, isDark?: boolean): IChartUtil => {
       options = barChartNoLabelOptions(isDark);
       break;
     case 'BAR_CHART':
+      options = barChartDefaultOptions('', chart.sum, isDark);
+      break;
+    case 'LINE_CHART_CURRENCY':
+      options = lineChartDefaultOptions('€', chart.sum, isDark);
+      break;
     case 'LINE_CHART':
-      options = barChartDefaultOptions(isDark);
+      options = lineChartDefaultOptions('', chart.sum, isDark);
       break;
     case 'RADAR_CHART':
       options = radarChartDefaultOptions(isDark);
@@ -44,11 +50,13 @@ export const createChart = (chart: IChart, isDark?: boolean): IChartUtil => {
   let dataSet: any[] = [];
   if (chart.dataSet && chart.dataSet.length) {
     chart.dataSet.forEach((value, i) => {
-      const color = colors[i % 10]
+      const color = colors[i % 10];
       dataSet = [...dataSet, {
         data: value.data,
         label: value.label,
         type: value.type,
+        pointRadius: value.pointRadius || 3,
+        pointHoverRadius: (value.pointRadius || 3) + 1,
         backgroundColor: color.backgroundColor,
         hoverBackgroundColor: color.hoverBackgroundColor,
         borderColor: color.borderColor,
@@ -56,7 +64,9 @@ export const createChart = (chart: IChart, isDark?: boolean): IChartUtil => {
         pointBackgroundColor: color.pointBackgroundColor,
         pointBorderColor: color.pointBorderColor,
         pointHoverBackgroundColor: color.pointHoverBackgroundColor,
-        pointHoverBorderColor: color.pointHoverBorderColor
+        pointHoverBorderColor: color.pointHoverBorderColor,
+        tension: 0.5,
+        fill: false
       }];
     });
   }
@@ -64,7 +74,7 @@ export const createChart = (chart: IChart, isDark?: boolean): IChartUtil => {
   const charData: ChartConfiguration['data'] = {
     labels: chart.labels || [],
     datasets: dataSet
-  }
+  };
 
   return {
     labels: chart.labels || [],
@@ -79,7 +89,7 @@ const defaultOptions = (): ChartOptions => ({
 });
 
 const radarChartDefaultOptions = (isDark?: boolean): ChartOptions<'radar'> => {
-  let options: ChartOptions<'radar'>
+  let options: ChartOptions<'radar'>;
   if (isDark) {
     options = {
       responsive: true,
@@ -104,7 +114,7 @@ const radarChartDefaultOptions = (isDark?: boolean): ChartOptions<'radar'> => {
           }
         }
       }
-    }
+    };
   } else {
     options = {
       responsive: true,
@@ -121,19 +131,98 @@ const radarChartDefaultOptions = (isDark?: boolean): ChartOptions<'radar'> => {
           }
         }
       }
-    }
+    };
   }
   return options;
 };
 
-const barChartDefaultOptions = (isDark?: boolean): ChartOptions<'bar'> => {
+const barChartDefaultOptions = (currency: string, sum?: boolean, isDark?: boolean): ChartOptions<'bar'> => {
   let options: ChartOptions<'bar'>;
   if (isDark) {
     options = {
       responsive: true,
+      interaction: {
+        intersect: false,
+        mode: 'index',
+      },
       scales: {
         y: {
+          ticks: {
+            color: 'white',
+            callback: (value) => `${ currency } ${ value }`
+          },
+          grid: { color: 'rgba(255,255,255,0.1)' },
+          beginAtZero: true,
+          stacked: true
+        },
+        x: {
           ticks: { color: 'white' },
+          grid: { color: 'rgba(255,255,255,0.1)' },
+          stacked: true
+        }
+      },
+      plugins: {
+        legend: {
+          display: true,
+        },
+        tooltip: {
+          callbacks: {
+            label: (tooltipItem: any) => label(tooltipItem, currency, sum),
+            footer: (tooltipItems: any) => footer(tooltipItems, currency, sum),
+          }
+        }
+      }
+    };
+  } else {
+    options = {
+      responsive: true,
+      interaction: {
+        intersect: false,
+        mode: 'index',
+      },
+      scales: {
+        y: {
+          ticks: {
+            callback: (value) => `${ currency } ${ value }`
+          },
+          beginAtZero: true,
+          stacked: true
+        },
+        x: {
+          stacked: true
+        }
+      },
+      plugins: {
+        legend: {
+          display: true,
+        },
+        tooltip: {
+          callbacks: {
+            label: (tooltipItem: any) => label(tooltipItem, currency, sum),
+            footer: (tooltipItems: any) => footer(tooltipItems, currency, sum),
+          }
+        }
+      }
+    };
+  }
+  return options;
+};
+
+const lineChartDefaultOptions = (currency: string, sum?: boolean, isDark?: boolean): ChartOptions<'bar'> => {
+  let options: ChartOptions<'bar'>;
+  if (isDark) {
+    options = {
+      responsive: true,
+      interaction: {
+        intersect: false,
+        mode: 'index',
+      },
+      scales: {
+        y: {
+          ticks: {
+            color: 'white',
+            callback: (value) => `${ currency } ${ value }`
+          },
           grid: { color: 'rgba(255,255,255,0.1)' },
           beginAtZero: true
         },
@@ -145,26 +234,65 @@ const barChartDefaultOptions = (isDark?: boolean): ChartOptions<'bar'> => {
       plugins: {
         legend: {
           display: true,
+        },
+        tooltip: {
+          callbacks: {
+            label: (tooltipItem: any) => label(tooltipItem, currency, sum),
+            footer: (tooltipItems: any) => footer(tooltipItems, currency, sum),
+          }
         }
       }
-    }
+    };
   } else {
     options = {
       responsive: true,
+      interaction: {
+        intersect: false,
+        mode: 'index',
+      },
       scales: {
         y: {
-          beginAtZero: true
+          ticks: {
+            callback: (value) => `${ currency } ${ value }`
+          },
+          beginAtZero: true,
         }
       },
       plugins: {
         legend: {
           display: true,
+        },
+        tooltip: {
+          callbacks: {
+            label: (tooltipItem: any) => label(tooltipItem, currency, sum),
+            footer: (tooltipItems) => footer(tooltipItems, currency, sum),
+          }
         }
       }
-    }
+    };
   }
   return options;
 };
+
+const footer = (tooltipItems: any, currency: string, sum?: boolean) => tooltipItems.length ?
+  createTooltip('Total', currency, sum ?
+    tooltipItems.reduce((a: number, b: any) => a + b.parsed.y, 0) :
+    tooltipItems[tooltipItems.length - 1].formattedValue)
+  : '';
+
+const label = (tooltipItem: any, currency: string, sum?: boolean) => {
+  if (!sum && tooltipItem.datasetIndex) {
+    const previous = Number(tooltipItem.chart.data.datasets[tooltipItem.datasetIndex - 1].data[tooltipItem.dataIndex]);
+    const newValue = new Intl.NumberFormat(API_LOCALE, { maximumSignificantDigits: 2 })
+      .format(Number(tooltipItem.raw) - previous);
+
+    return createTooltip(tooltipItem.dataset.label, currency, newValue);
+  }
+
+  return createTooltip(tooltipItem.dataset.label, currency, tooltipItem.formattedValue);
+};
+
+const createTooltip = (title: string, currency: string, value: string) => `${ title }: ${ currency }${ value }`;
 
 const barChartNoLabelOptions = (isDark?: boolean): ChartOptions<'bar'> => {
   let options: ChartOptions<'bar'>;
@@ -184,8 +312,15 @@ const barChartNoLabelOptions = (isDark?: boolean): ChartOptions<'bar'> => {
           },
           grid: { color: 'rgba(255,255,255,0.1)' }
         }
+      },
+      plugins: {
+        tooltip: {
+          enabled: false,
+          position: 'nearest',
+          external: externalTooltipHandler
+        }
       }
-    }
+    };
   } else {
     options = {
       responsive: true,
@@ -198,15 +333,128 @@ const barChartNoLabelOptions = (isDark?: boolean): ChartOptions<'bar'> => {
             callback: () => ''
           }
         }
+      },
+      plugins: {
+        tooltip: {
+          enabled: false,
+          position: 'nearest',
+          external: externalTooltipHandler
+        }
       }
-    }
+    };
   }
 
   return options;
 };
 
+const getOrCreateTooltip = (chart: any) => {
+  let tooltipEl = chart.canvas.parentNode.querySelector('div');
+
+  if (!tooltipEl) {
+    tooltipEl = document.createElement('div');
+    tooltipEl.style.background = 'rgba(0, 0, 0, 0.7)';
+    tooltipEl.style.borderRadius = '3px';
+    tooltipEl.style.color = 'white';
+    tooltipEl.style.opacity = 1;
+    tooltipEl.style.pointerEvents = 'none';
+    // tooltipEl.style.position = 'fixed';
+    tooltipEl.style.position = 'absolute';
+    tooltipEl.style.transform = 'translate(-50%, 0)';
+    tooltipEl.style.transition = 'all .1s ease';
+
+    const table = document.createElement('table');
+    table.style.margin = 'auto';
+
+    tooltipEl.appendChild(table);
+    chart.canvas.parentNode.appendChild(tooltipEl);
+  }
+
+  return tooltipEl;
+};
+
+const externalTooltipHandler = (context: any) => {
+  // Tooltip Element
+  const { chart, tooltip } = context;
+  const tooltipEl = getOrCreateTooltip(chart);
+
+  // Hide if no tooltip
+  if (tooltip.opacity === 0) {
+    tooltipEl.style.opacity = 0;
+    return;
+  }
+
+  // Set Text
+  if (tooltip.body) {
+    const titleLines = tooltip.title || [];
+    const bodyLines = tooltip.body.map((b: any) => b.lines);
+
+    const tableHead = document.createElement('thead');
+
+    const ul = document.createElement('ul');
+    ul.style.columns = titleLines.length <= 10 ? '1' : '4';
+    titleLines.forEach((title: any) => {
+      ul.style.borderWidth = '0';
+
+      const li = document.createElement('li');
+      li.style.borderWidth = '0';
+      const text = document.createTextNode(title);
+
+      li.appendChild(text);
+      ul.appendChild(li);
+      tableHead.appendChild(ul);
+    });
+
+    const tableBody = document.createElement('tbody');
+    bodyLines.forEach((body: any, i: any) => {
+      const colors = tooltip.labelColors[i];
+
+      const span = document.createElement('span');
+      span.style.background = colors.backgroundColor;
+      span.style.borderColor = colors.borderColor;
+      span.style.borderWidth = '2px';
+      span.style.marginRight = '10px';
+      span.style.height = '10px';
+      span.style.width = '10px';
+      span.style.display = 'inline-block';
+
+      const tr = document.createElement('tr');
+      tr.style.backgroundColor = 'inherit';
+      tr.style.borderWidth = '0';
+
+      const td = document.createElement('td');
+      td.style.borderWidth = '0';
+
+      const text = document.createTextNode(body);
+
+      td.appendChild(span);
+      td.appendChild(text);
+      tr.appendChild(td);
+      tableBody.appendChild(tr);
+    });
+
+    const tableRoot = tooltipEl.querySelector('table');
+
+    // Remove old children
+    while (tableRoot.firstChild) {
+      tableRoot.firstChild.remove();
+    }
+
+    // Add new children
+    tableRoot.appendChild(tableHead);
+    tableRoot.appendChild(tableBody);
+  }
+
+  const { offsetLeft: positionX, offsetTop: positionY } = chart.canvas;
+  // Display, position, and set styles for font
+  tooltipEl.style.opacity = 1;
+  tooltipEl.style.left = positionX + tooltip.caretX + 'px';
+  tooltipEl.style.top = positionY + tooltip.caretY + 'px';
+  tooltipEl.style.font = tooltip.options.bodyFont.string;
+  tooltipEl.style.padding = tooltip.options.padding + 'px ' + tooltip.options.padding + 'px';
+};
+
 const barChartTimeOptions = (isDark?: boolean): ChartOptions<'bar'> => {
-  let options: ChartOptions<'bar'>
+  let options: ChartOptions<'bar'>;
   if (isDark) {
     options = {
       responsive: true,
@@ -232,7 +480,7 @@ const barChartTimeOptions = (isDark?: boolean): ChartOptions<'bar'> => {
           }
         }
       }
-    }
+    };
   } else {
     options = {
       responsive: true,
@@ -252,7 +500,7 @@ const barChartTimeOptions = (isDark?: boolean): ChartOptions<'bar'> => {
           }
         }
       }
-    }
+    };
   }
 
   return options;
@@ -290,7 +538,19 @@ const chartArrayColors = (): any[] => ([{
   hoverBorderColor: ['rgb(254, 205, 190)', 'rgb(152, 109, 142)', 'rgb(95, 147, 154)',
     'rgb(161, 202, 226)', 'rgb(242, 213, 239)', 'rgb(203, 239, 227)', 'rgb(194, 213, 167)',
     'rgb(176, 171, 202)', 'rgb(226, 169, 190)', 'rgb(163, 214, 212)']
-}]);
+},
+  {
+    hoverBackgroundColor: ['rgba(254, 205, 190, 0.2)', 'rgba(152, 109, 142, 0.2)', 'rgba(95, 147, 154, 0.2)',
+      'rgba(161, 202, 226, 0.2)', 'rgba(242, 213, 239, 0.2)', 'rgba(203, 239, 227, 0.2)', 'rgba(194, 213, 167, 0.2)',
+      'rgba(176, 171, 202, 0.2)', 'rgba(226, 169, 190, 0.2)', 'rgba(163, 214, 212, 0.2)'],
+    borderColor: ['#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff'],
+    backgroundColor: ['rgba(254, 205, 190, 0.4)', 'rgba(152, 109, 142, 0.4)', 'rgba(95, 147, 154, 0.4)',
+      'rgba(161, 202, 226, 0.4)', 'rgba(242, 213, 239, 0.4)', 'rgba(203, 239, 227, 0.4)', 'rgba(194, 213, 167, 0.4)',
+      'rgba(176, 171, 202, 0.4)', 'rgba(226, 169, 190, 0.4)', 'rgba(163, 214, 212, 0.4)'],
+    hoverBorderColor: ['rgba(254, 205, 190, 0.6)', 'rgba(152, 109, 142, 0.6)', 'rgba(95, 147, 154, 0.6)',
+      'rgba(161, 202, 226, 0.6)', 'rgba(242, 213, 239, 0.6)', 'rgba(203, 239, 227, 0.6)', 'rgba(194, 213, 167, 0.6)',
+      'rgba(176, 171, 202, 0.6)', 'rgba(226, 169, 190, 0.6)', 'rgba(163, 214, 212, 0.6)']
+  }]);
 
 const chartColors = (): any[] => ([{
   backgroundColor: 'rgba(254, 205, 190, 0.6)',

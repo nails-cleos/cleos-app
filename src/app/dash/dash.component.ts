@@ -55,6 +55,7 @@ export class DashComponent implements OnInit, OnDestroy {
 
   cardLayout = {
     columns: 2,
+    rowHeight: '250px',
     miniCard: { cols: 1, rows: 1 },
     calendar: { cols: 2, rows: 4 },
     chart: { cols: 2, rows: 2 },
@@ -81,6 +82,7 @@ export class DashComponent implements OnInit, OnDestroy {
         if (breakpointState.breakpoints[Breakpoints.Medium]) {
           this.cardLayout = {
             columns: 2,
+            rowHeight: '250px',
             miniCard: isManager ? { cols: 1, rows: 1 } : { cols: 0, rows: 0 },
             calendar: { cols: 2, rows: 4 },
             chart: { cols: 2, rows: 2 },
@@ -89,6 +91,7 @@ export class DashComponent implements OnInit, OnDestroy {
         } else if (breakpointState.matches) {
           this.cardLayout = {
             columns: 1,
+            rowHeight: '250px',
             miniCard: isManager ? { cols: 1, rows: 1 } : { cols: 0, rows: 0 },
             calendar: { cols: 1, rows: 4 },
             chart: { cols: 1, rows: 1.5 },
@@ -97,6 +100,7 @@ export class DashComponent implements OnInit, OnDestroy {
         } else {
           this.cardLayout = {
             columns: 4,
+            rowHeight: '250px',
             miniCard: isManager ? { cols: 1, rows: 1 } : { cols: 0, rows: 0 },
             calendar: { cols: 4, rows: 4 },
             chart: { cols: 2, rows: 2 },
@@ -115,9 +119,19 @@ export class DashComponent implements OnInit, OnDestroy {
       && isSameMonth(event.start, this.viewDate)).length;
   }
 
+  get completedTotal(): number {
+    return this.events?.filter((event: CalendarEvent) => event.meta.state === States.completed
+      && isSameMonth(event.start, this.viewDate)).reduce((a, b) => a + b.meta.total || 0, 0);
+  }
+
   get upcoming(): number {
     return this.events?.filter((event: CalendarEvent) => event.meta.state && event.meta.state !== States.completed
       && event.meta.state !== States.cancelled && isSameMonth(event.start, this.viewDate)).length;
+  }
+
+  get upcomingTotal(): number {
+    return this.events?.filter((event: CalendarEvent) => event.meta.state && event.meta.state !== States.completed
+      && event.meta.state !== States.cancelled && isSameMonth(event.start, this.viewDate)).reduce((a, b) => a + b.meta.total || 0, 0);
   }
 
   get closeOpenMonthViewDay(): void {
@@ -291,7 +305,8 @@ export class DashComponent implements OnInit, OnDestroy {
         this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNow());
 
         const event = monthEvent(it.title, start, end, it.reservationId, findStateColor(it.state, darkMode),
-          new Meta(true, this.state.timeZone, it.state, ['reservation', it.reservationId]), darkMode);
+          new Meta(true, this.state.timeZone, it.state, ['reservation', it.reservationId], undefined, it.total),
+          darkMode);
         if (event) {
           this.events = [...this.events, event];
         }
@@ -326,6 +341,7 @@ export class DashComponent implements OnInit, OnDestroy {
 
       this.isCalendarLoading = false;
     }
+    this.events = this.events.slice().sort((a, b) => a.start.getTime() - b.start.getTime());
   }
 
   private getSummaries(): void {

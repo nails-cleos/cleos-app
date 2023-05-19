@@ -24,7 +24,7 @@ export class ChartComponent implements OnChanges {
 
   private createChart(): void {
     if (!this.chartSummary || this.error || !this.chartSummary.type) {
-      this.error = {status: 'NO_CONTENT'};
+      this.error = { status: 'NO_CONTENT' };
       return;
     }
     this.error = undefined;

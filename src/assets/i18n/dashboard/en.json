@@ -6,8 +6,8 @@
     "SIGN_OUT": "Sign out",
     "SIGN_IN": "Sign In",
     "RESERVATION": {
-      "COMPLETED": "Completed: {{completed}}",
-      "UPCOMING": "Upcoming: {{upcoming}}",
+      "COMPLETED": "Completed: {{completed}} - {{currency}} {{total}}",
+      "UPCOMING": "Upcoming: {{upcoming}} - {{currency}} {{total}}",
       "DELETED": {
         "TITLE": "Delete reservation",
         "CONTENT": "Are you sure to delete reservation {{date}}?",
@@ -15,7 +15,8 @@
       }
     },
     "MINI_CARD": {
-      "DURATION": "since last month",
+      "DURATION": "since {{period}}",
+      "PROJECTION": "projection",
       "TOTAL_TREATMENT_SALES": "Total Service Sales",
       "AVERAGE_TREATMENT_VALUE": "Average Service Value",
       "TOTAL_TREATMENTS": "Total Services",
