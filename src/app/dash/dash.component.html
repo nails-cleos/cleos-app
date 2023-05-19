@@ -13,9 +13,11 @@
   <mat-card-header>
     <mat-card-title>{{ viewDate | calendarDate:(view + 'ViewTitle'):dateFormat }}
       <div *ngIf="!isCalendarLoading; else skeleton">
-        <div [innerHTML]="'DASHBOARD.RESERVATION.COMPLETED' | translate: {completed: completed}">
+        <div [innerHTML]="'DASHBOARD.RESERVATION.COMPLETED' | translate:
+        {completed: completed, currency: state?.currency | currencySymbol, total: completedTotal}">
         </div>
-        <div [innerHTML]="'DASHBOARD.RESERVATION.UPCOMING' | translate: {upcoming: upcoming}">
+        <div [innerHTML]="'DASHBOARD.RESERVATION.UPCOMING' | translate:
+          {upcoming: upcoming, currency: state?.currency | currencySymbol, total: upcomingTotal}">
         </div>
       </div>
       <ng-template #skeleton>
@@ -74,7 +76,6 @@
         </span>
       </div>
     </ng-template>
-
     <mwl-calendar-month-view (dayClicked)="dayClicked($event.day)" (eventClicked)="handleEvent($event.event)"
                              (mwlClick)="cellClick(viewDate)"
                              [cellTemplate]="customCellTemplate"
@@ -86,14 +87,16 @@
     <div class="ssc-square mb"></div>
   </ng-template>
 </mat-card>
-<mat-grid-list cols="{{cardLayout.columns }}" rowHeight="200px">
+<mat-grid-list [cols]="cardLayout.columns" [rowHeight]="cardLayout.rowHeight">
   <!--Mini Cards-->
   <mat-grid-tile *ngFor="let mc of miniCardData" [colspan]="cardLayout.miniCard.cols"
                  [rowspan]="cardLayout.miniCard.rows">
-    <app-mini-card [color]="mc.color" [duration]="'DASHBOARD.MINI_CARD.DURATION' | translate" [error]="mc.error"
-                   [icon]="mc.icon" [isInfinity]="mc.infinity"
-                   [isCurrency]="mc.currency" [isIncrease]="mc.increase" [isLoading]="isLoading"
-                   [percentValue]="mc.percentValue" [title]="mc.title | translate"
+    <app-mini-card [color]="mc.color"
+                   [duration]="'DASHBOARD.MINI_CARD.DURATION' | translate: {period: mc.previousPeriod}"
+                   [error]="mc.error" [icon]="mc.icon" [isInfinity]="mc.infinity" [isCurrency]="mc.currency"
+                   [isIncrease]="mc.increase" [isLoading]="isLoading" [percentValue]="mc.percentValue"
+                   [title]="mc.title | translate" [period]="mc.period" [previousPeriod]="mc.previousPeriod"
+                   [isProjection]="mc.projection" [projection]="'DASHBOARD.MINI_CARD.PROJECTION' | translate"
                    [value]="mc.value"></app-mini-card>
   </mat-grid-tile>
   <!--Charts-->

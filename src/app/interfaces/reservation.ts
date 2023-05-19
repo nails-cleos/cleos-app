@@ -111,9 +111,12 @@ export interface IReservationSummary {
   value?: number;
   increase?: boolean;
   infinity?: boolean;
+  projection?: boolean;
   color?: ThemePalette;
   percentValue?: number;
   icon?: string;
+  period?: string;
+  previousPeriod?: string;
   currency?: boolean;
   error?: any;
 }

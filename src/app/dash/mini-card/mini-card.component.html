@@ -1,34 +1,52 @@
 <mat-card appearance="outlined" class="dashboard-card">
   <div *ngIf="!isLoading && (value || value === 0 || error); else box">
-    <div *ngIf="value || value === 0; else errorBox">
-      <mat-card-header class="card-header">
-        <mat-card-title>
-          <h1 *ngIf="isCurrency; else noCurrency" class="value-text">{{value | currency:'$':'symbol':'0.0' }}</h1>
-          <ng-template #noCurrency>
-            <h1 *ngIf="!isCurrency" class="value-text">{{value}}</h1>
-          </ng-template>
-        </mat-card-title>
-        <div class="card-icon" mat-card-avatar>
-          <mat-icon [color]="color" class="avatar-icon">{{icon}}</mat-icon>
-        </div>
-      </mat-card-header>
-      <h3 class="title-text">{{title}}</h3>
-      <div class="difference-text">
-        <span *ngIf="isInfinity; else showPercentage" [ngClass]="{ 'green-text': isIncrease, 'red-text': !isIncrease }">
-          {{ isIncrease ? '+' : '-' }}∞
-          <mat-icon *ngIf="isIncrease" class="trending" matSuffix>trending_up</mat-icon>
-          <mat-icon *ngIf="!isIncrease" class="trending" matSuffix>trending_down</mat-icon>
-        </span>
-        <ng-template #showPercentage>
-        <span [ngClass]="{ 'green-text': isIncrease, 'red-text': !isIncrease }">
-          {{ isIncrease ? '+' : '-' }}{{ percentValue | percent:'1.0-2':locale }}
-          <mat-icon *ngIf="isIncrease" class="trending" matSuffix>trending_up</mat-icon>
-          <mat-icon *ngIf="!isIncrease" class="trending" matSuffix>trending_down</mat-icon>
-        </span>
+    <ng-template [ngIf]="value || value === 0" [ngIfElse]="errorBox">
+      <div>
+        <div class="title-text period">{{period}}</div>
+        <mat-card-header class="card-header">
+          <mat-card-title>
+            <ng-template [ngIf]="isCurrency" [ngIfElse]="noCurrency">
+              <h1 class="value-text">{{value | currency:'$':'symbol':'0.0' }}</h1>
+            </ng-template>
+            <ng-template #noCurrency>
+              <h1 class="value-text">{{value}}</h1>
+            </ng-template>
+          </mat-card-title>
+          <div class="card-icon" mat-card-avatar>
+            <mat-icon [color]="color" class="avatar-icon">{{icon}}</mat-icon>
+          </div>
+        </mat-card-header>
+        <ng-template [ngIf]="isProjection">
+          <div class="projection red-text">({{projection}})</div>
         </ng-template>
-        <p class="duration">{{duration}}</p>
+        <h3 class="title-text">{{title}}</h3>
+        <div class="difference-text">
+          <ng-template [ngIf]="isInfinity" [ngIfElse]="showPercentage">
+        <span [ngClass]="{ 'green-text': isIncrease, 'red-text': !isIncrease }">
+          {{ isIncrease ? '+' : '-' }}∞
+          <ng-template [ngIf]="isIncrease" [ngIfElse]="noIncrease">
+            <mat-icon class="trending" matSuffix>trending_up</mat-icon>
+          </ng-template>
+          <ng-template #noIncrease>
+            <mat-icon class="trending" matSuffix>trending_down</mat-icon>
+          </ng-template>
+        </span>
+          </ng-template>
+          <ng-template #showPercentage>
+            <span [ngClass]="{ 'green-text': isIncrease, 'red-text': !isIncrease }">
+              {{ isIncrease ? '+' : '-' }}{{ percentValue | percent:'1.0-2':locale }}
+              <ng-template [ngIf]="isIncrease" [ngIfElse]="noIncrease">
+                <mat-icon class="trending" matSuffix>trending_up</mat-icon>
+              </ng-template>
+              <ng-template #noIncrease>
+                <mat-icon class="trending" matSuffix>trending_down</mat-icon>
+              </ng-template>
+            </span>
+          </ng-template>
+          <p class="duration">{{duration}}</p>
+        </div>
       </div>
-    </div>
+    </ng-template>
     <ng-template #errorBox>
       <app-error [error]="error" [isCard]="true"></app-error>
     </ng-template>

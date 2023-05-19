@@ -15,7 +15,8 @@
       }
     },
     "MINI_CARD": {
-      "DURATION": "desde el mes pasado",
+      "DURATION": "desde {{period}}",
+      "PROJECTION": "proyección",
       "TOTAL_TREATMENT_SALES": "Ganancia total",
       "AVERAGE_TREATMENT_VALUE": "Ganancia promedio",
       "TOTAL_TREATMENTS": "Total de tratamientos",
