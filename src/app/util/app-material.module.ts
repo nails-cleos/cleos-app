@@ -76,6 +76,7 @@ export class AppMaterialModule {
     matIconRegistry.addSvgIcon('WHATSAPP', this.getUrl('assets/whatsapp.svg'));
     matIconRegistry.addSvgIcon('INSTAGRAM', this.getUrl('assets/instagram.svg'));
     matIconRegistry.addSvgIcon('FACEBOOK', this.getUrl('assets/facebook.svg'));
+    matIconRegistry.addSvgIcon('MANICURE', this.getUrl('assets/manicure.svg'));
   }
 
   private getUrl(path: string): SafeResourceUrl {

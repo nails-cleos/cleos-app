@@ -5,7 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 @Component({
   selector: 'app-mini-card',
   templateUrl: './mini-card.component.html',
-  styleUrls: ['./mini-card.component.css']
+  styleUrls: ['./mini-card.component.scss']
 })
 export class MiniCardComponent implements OnInit {
   @Input() icon?: string;
@@ -17,6 +17,10 @@ export class MiniCardComponent implements OnInit {
   @Input() isCurrency?: boolean;
   @Input() duration?: string;
   @Input() percentValue?: number;
+  @Input() period?: string;
+  @Input() previousPeriod?: string;
+  @Input() isProjection?: boolean;
+  @Input() projection?: string;
   @Input() error: any;
   @Input() isLoading: any | boolean;
 
