@@ -226,7 +226,7 @@ const createTotals = (totals: ITotals, currency: string): any => {
 export const pdf = (invoices: IInvoice[], office: IOfficeAll, start: number, startDate: Date, endDate: Date): any => {
   let content: any[] = [];
   invoices.map((invoice, index) => {
-    const next = start + index;
+    const next = start + invoice.position;
     const receiptNro = `${ next }`.padStart(5, '0');
     const date = dayViewTitle(newDateTimestamp(invoice.timestamp, invoice.room.timeZone), API_LOCALE);
     const header = createHeader(index, date, office.subject, office.kvk, office.account, office.btw);

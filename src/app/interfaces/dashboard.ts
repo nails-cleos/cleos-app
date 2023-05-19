@@ -2,6 +2,7 @@ import { ThemePalette } from '@angular/material/core';
 import { ChartType } from 'chart.js';
 import { EventColor } from 'calendar-utils';
 import { IAvailability } from './room';
+import { ICurrency } from './currency';
 
 export interface IDashboard {
   timeZone?: string;
@@ -12,6 +13,7 @@ export interface IDashboard {
   calendarSummary?: ICalendarSummary;
   miniCardSummaries?: IReservationSummary[];
   chartSummaries?: IChart[];
+  currency?: ICurrency;
   error?: any;
 }
 
@@ -48,6 +50,7 @@ export interface ICalendarReservations {
   started: number;
   end: number;
   state: string;
+  total: number;
 }
 
 export interface ICalendarUnavailable {
@@ -68,6 +71,7 @@ export interface IChart {
   label?: string;
   options?: string;
   colors?: string;
+  sum?: boolean;
 }
 
 export interface IRoomEvents {
