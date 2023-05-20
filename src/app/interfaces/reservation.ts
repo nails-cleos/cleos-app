@@ -108,7 +108,7 @@ export interface ICalendar {
 
 export interface IReservationSummary {
   title: string;
-  value?: number;
+  value?: number | string;
   increase?: boolean;
   infinity?: boolean;
   projection?: boolean;

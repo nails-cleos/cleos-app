@@ -10,7 +10,7 @@ import { TranslateService } from '@ngx-translate/core';
 export class MiniCardComponent implements OnInit {
   @Input() icon?: string;
   @Input() title!: string;
-  @Input() value?: number;
+  @Input() value?: number | string;
   @Input() color?: ThemePalette;
   @Input() isIncrease?: boolean;
   @Input() isInfinity?: boolean;

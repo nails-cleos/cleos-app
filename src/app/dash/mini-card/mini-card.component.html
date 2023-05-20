@@ -5,12 +5,7 @@
         <div class="title-text period">{{period}}</div>
         <mat-card-header class="card-header">
           <mat-card-title>
-            <ng-template [ngIf]="isCurrency" [ngIfElse]="noCurrency">
-              <h1 class="value-text">{{value | currency:'$':'symbol':'0.0' }}</h1>
-            </ng-template>
-            <ng-template #noCurrency>
-              <h1 class="value-text">{{value}}</h1>
-            </ng-template>
+            <h1 class="value-text">{{value}}</h1>
           </mat-card-title>
           <div class="card-icon" mat-card-avatar>
             <mat-icon [color]="color" class="avatar-icon">{{icon}}</mat-icon>

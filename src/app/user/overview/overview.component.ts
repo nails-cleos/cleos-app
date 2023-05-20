@@ -12,6 +12,7 @@ import { IReservationOverview } from '../../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
 import { IChart } from '../../interfaces/dashboard';
 import { formatDateTime, newDateTimestamp } from '../../util/dates';
+import { isDarkMode } from '../../util/theme';
 
 @Component({
   selector: 'app-overview',
@@ -29,6 +30,8 @@ export class OverviewComponent implements OnInit, OnDestroy {
   charts: IChart[] = [{} as IChart, {} as IChart];
 
   upcoming: number[] = [];
+  isDark?: boolean;
+  language: string;
 
   layout = this.breakpointObserver.observe([
     Breakpoints.XSmall,
@@ -62,8 +65,6 @@ export class OverviewComponent implements OnInit, OnDestroy {
 
   private subscription: Subscription | undefined;
   private getState: Observable<any>;
-
-  private readonly language: string;
 
   constructor(private breakpointObserver: BreakpointObserver, private route: ActivatedRoute,
               private store: Store<AppState>, private translate: TranslateService, private router: Router) {
@@ -101,6 +102,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
     this.subscription = this.getState.subscribe((state) => {
       if (state && state.data) {
         this.user = state.data.customer;
+        this.isDark = isDarkMode(state.user?.theme);
         this.image = getUserImage(this.user);
         this.initials = getUserNameInitials(this.user);
         this.username = getUserName(this.user);

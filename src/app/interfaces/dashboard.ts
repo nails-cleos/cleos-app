@@ -23,7 +23,7 @@ export interface IEventSummary {
 
 export interface IReservationSummary {
   title: string;
-  value?: number;
+  value?: number | string;
   increase?: boolean;
   color?: ThemePalette;
   percentValue?: number;
@@ -72,6 +72,7 @@ export interface IChart {
   options?: string;
   colors?: string;
   sum?: boolean;
+  currency?: ICurrency;
 }
 
 export interface IRoomEvents {

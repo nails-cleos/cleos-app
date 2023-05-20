@@ -2,6 +2,7 @@ import { Component, Inject, Input } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { createChart, IChartUtil } from '../../util/chart';
 import { IChart } from '../../interfaces/dashboard';
+import { ICurrency } from '../../interfaces/currency';
 
 @Component({
   selector: 'app-card',
@@ -13,13 +14,15 @@ export class CardComponent {
   @Input() expand = true;
   @Input() chart?: IChart;
   @Input() isDark?: boolean;
+  @Input() currency?: ICurrency;
+  @Input() locale?: string;
 
   constructor(public dialog: MatDialog) {
   }
 
   get onClick(): void {
     if (this.chart) {
-      const chart = createChart(this.chart, this.isDark);
+      const chart = createChart(this.chart, this.currency, this.isDark, this.locale);
       this.dialog.open(CardChartComponent, {
         height: '85vh',
         width: '70vw',

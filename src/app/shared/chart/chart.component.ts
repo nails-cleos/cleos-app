@@ -1,6 +1,7 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { createChart, IChartUtil } from '../../util/chart';
 import { IChart } from '../../interfaces/dashboard';
+import { ICurrency } from '../../interfaces/currency';
 
 @Component({
   selector: 'app-chart',
@@ -12,6 +13,8 @@ export class ChartComponent implements OnChanges {
   @Input() chartSummary?: IChart;
   @Input() isDark?: boolean;
   @Input() isLoading: any | boolean;
+  @Input() currency?: ICurrency;
+  @Input() locale?: string;
 
   chart: IChartUtil | undefined;
 
@@ -28,6 +31,6 @@ export class ChartComponent implements OnChanges {
       return;
     }
     this.error = undefined;
-    this.chart = createChart(this.chartSummary, this.isDark);
+    this.chart = createChart(this.chartSummary, this.currency, this.isDark, this.locale);
   }
 }
