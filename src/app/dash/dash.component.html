@@ -13,11 +13,9 @@
   <mat-card-header>
     <mat-card-title>{{ viewDate | calendarDate:(view + 'ViewTitle'):dateFormat }}
       <div *ngIf="!isCalendarLoading; else skeleton">
-        <div [innerHTML]="'DASHBOARD.RESERVATION.COMPLETED' | translate:
-        {completed: completed, currency: state?.currency | currencySymbol, total: completedTotal}">
+        <div [innerHTML]="'DASHBOARD.RESERVATION.COMPLETED' | translate:{completed: completed, total: completedTotal}">
         </div>
-        <div [innerHTML]="'DASHBOARD.RESERVATION.UPCOMING' | translate:
-          {upcoming: upcoming, currency: state?.currency | currencySymbol, total: upcomingTotal}">
+        <div [innerHTML]="'DASHBOARD.RESERVATION.UPCOMING' | translate:{upcoming: upcoming, total: upcomingTotal}">
         </div>
       </div>
       <ng-template #skeleton>
@@ -91,23 +89,25 @@
   <!--Mini Cards-->
   <mat-grid-tile *ngFor="let mc of miniCardData" [colspan]="cardLayout.miniCard.cols"
                  [rowspan]="cardLayout.miniCard.rows">
-    <app-mini-card [color]="mc.color"
-                   [duration]="'DASHBOARD.MINI_CARD.DURATION' | translate: {period: mc.previousPeriod}"
-                   [error]="mc.error" [icon]="mc.icon" [isInfinity]="mc.infinity" [isCurrency]="mc.currency"
-                   [isIncrease]="mc.increase" [isLoading]="isLoading" [percentValue]="mc.percentValue"
-                   [title]="mc.title | translate" [period]="mc.period" [previousPeriod]="mc.previousPeriod"
-                   [isProjection]="mc.projection" [projection]="'DASHBOARD.MINI_CARD.PROJECTION' | translate"
-                   [value]="mc.value"></app-mini-card>
+    <app-mini-card [color]="mc.color" [error]="mc.error" [icon]="mc.icon" [isInfinity]="mc.infinity"
+                   [isCurrency]="mc.currency" [isIncrease]="mc.increase" [isLoading]="isLoading"
+                   [percentValue]="mc.percentValue" [title]="mc.title | translate" [period]="mc.period"
+                   [previousPeriod]="mc.previousPeriod" [isProjection]="mc.projection"
+                   [projection]="'DASHBOARD.MINI_CARD.PROJECTION' | translate" [value]="mc.value"
+                   [duration]="'DASHBOARD.MINI_CARD.DURATION' | translate: {period: mc.previousPeriod}">
+    </app-mini-card>
   </mat-grid-tile>
   <!--Charts-->
   <mat-grid-tile *ngFor="let chart of charts" [colspan]="cardLayout.chart.cols" [rowspan]="cardLayout.chart.rows">
     <app-card [chart]="chart" [isDark]="isDarkMode" [title]="chart.title">
-      <app-chart [chartSummary]="chart" [error]="error" [isDark]="isDarkMode" [isLoading]="isLoading"></app-chart>
+      <app-chart [chartSummary]="chart" [error]="error" [currency]="currency" [isDark]="isDarkMode"
+                 [isLoading]="isLoading" [locale]="dateFormat"></app-chart>
     </app-card>
   </mat-grid-tile>
   <!--Table-->
   <mat-grid-tile *ngIf="roomId || professionalId" [colspan]="cardLayout.table.cols" [rowspan]="cardLayout.table.rows">
-    <app-card [expand]="false" [title]="'DASHBOARD.CARD.RESERVATION' | translate">
+    <app-card [expand]="false" [title]="'DASHBOARD.CARD.RESERVATION' | translate" [currency]="currency"
+              [isDark]="isDarkMode" [locale]="dateFormat">
       <app-reservation-table [roomId]="roomId" [professionalId]="professionalId"></app-reservation-table>
     </app-card>
   </mat-grid-tile>

@@ -23,6 +23,8 @@ import { IRoom } from '../interfaces/room';
 import { CalendarDialogComponent } from '../shared/dialog/calendar/calendar-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { executeDialogNoWidth } from '../util/helper';
+import { numberFormat } from '../util/numbers';
+import { ICurrency } from '../interfaces/currency';
 
 @Component({
   selector: 'app-dash',
@@ -46,6 +48,7 @@ export class DashComponent implements OnInit, OnDestroy {
   isLoading: any;
   totalReservation: number;
   isDarkMode?: boolean;
+  currency?: ICurrency;
 
   miniCardData: IReservationSummary[] = [{} as IReservationSummary, {} as IReservationSummary,
     {} as IReservationSummary, {} as IReservationSummary];
@@ -119,9 +122,10 @@ export class DashComponent implements OnInit, OnDestroy {
       && isSameMonth(event.start, this.viewDate)).length;
   }
 
-  get completedTotal(): number {
-    return this.events?.filter((event: CalendarEvent) => event.meta.state === States.completed
+  get completedTotal(): string {
+    const total = this.events?.filter((event: CalendarEvent) => event.meta.state === States.completed
       && isSameMonth(event.start, this.viewDate)).reduce((a, b) => a + b.meta.total || 0, 0);
+    return numberFormat(total, this.currency, this.dateFormat);
   }
 
   get upcoming(): number {
@@ -129,9 +133,11 @@ export class DashComponent implements OnInit, OnDestroy {
       && event.meta.state !== States.cancelled && isSameMonth(event.start, this.viewDate)).length;
   }
 
-  get upcomingTotal(): number {
-    return this.events?.filter((event: CalendarEvent) => event.meta.state && event.meta.state !== States.completed
+  get upcomingTotal(): string {
+    const total = this.events?.filter((event: CalendarEvent) => event.meta.state && event.meta.state !== States.completed
       && event.meta.state !== States.cancelled && isSameMonth(event.start, this.viewDate)).reduce((a, b) => a + b.meta.total || 0, 0);
+
+    return numberFormat(total, this.currency, this.dateFormat);
   }
 
   get closeOpenMonthViewDay(): void {
@@ -225,6 +231,7 @@ export class DashComponent implements OnInit, OnDestroy {
         this.error = state.error;
         this.roomId = state.roomId;
         this.professionalId = state.professionalId;
+        this.currency = state.currency;
         this.state = state;
         this.createEvents(this.isDarkMode);
         if (!state.chartSummaries && !state.miniCardSummaries) {
@@ -244,7 +251,12 @@ export class DashComponent implements OnInit, OnDestroy {
               {} as IChart, {} as IChart, {} as IChart, {} as IChart, {} as IChart];
           }
           if (state.miniCardSummaries && state.miniCardSummaries.length) {
-            this.miniCardData = state.miniCardSummaries;
+            this.miniCardData = state.miniCardSummaries.map(miniCard => {
+              if (miniCard.currency && miniCard.value) {
+                return Object.assign({}, miniCard, { value: numberFormat(miniCard.value, this.currency, this.dateFormat) });
+              }
+              return miniCard;
+            });
           } else {
             this.miniCardError('NO_CONTENT');
           }

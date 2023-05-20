@@ -1,6 +1,7 @@
 import { ChartConfiguration, ChartOptions, ChartType, TooltipItem } from 'chart.js';
 import { IChart } from '../interfaces/dashboard';
-import { API_LOCALE } from './dates';
+import { ICurrency } from '../interfaces/currency';
+import { numberFormat } from './numbers';
 
 export interface IChartUtil {
   labels: any[];
@@ -9,7 +10,7 @@ export interface IChartUtil {
   options: ChartOptions;
 }
 
-export const createChart = (chart: IChart, isDark?: boolean): IChartUtil => {
+export const createChart = (chart: IChart, currency?: ICurrency, isDark?: boolean, locale?: string): IChartUtil => {
   let colors: any[];
   switch (chart.colors) {
     case 'COLORS_ARRAY':
@@ -25,13 +26,13 @@ export const createChart = (chart: IChart, isDark?: boolean): IChartUtil => {
       options = barChartNoLabelOptions(isDark);
       break;
     case 'BAR_CHART':
-      options = barChartDefaultOptions('', chart.sum, isDark);
+      options = barChartDefaultOptions(undefined, chart.sum, isDark, locale);
       break;
     case 'LINE_CHART_CURRENCY':
-      options = lineChartDefaultOptions('€', chart.sum, isDark);
+      options = lineChartDefaultOptions(currency, chart.sum, isDark, locale);
       break;
     case 'LINE_CHART':
-      options = lineChartDefaultOptions('', chart.sum, isDark);
+      options = lineChartDefaultOptions(undefined, chart.sum, isDark, locale);
       break;
     case 'RADAR_CHART':
       options = radarChartDefaultOptions(isDark);
@@ -136,7 +137,7 @@ const radarChartDefaultOptions = (isDark?: boolean): ChartOptions<'radar'> => {
   return options;
 };
 
-const barChartDefaultOptions = (currency: string, sum?: boolean, isDark?: boolean): ChartOptions<'bar'> => {
+const barChartDefaultOptions = (currency?: ICurrency, sum?: boolean, isDark?: boolean, locale?: string): ChartOptions<'bar'> => {
   let options: ChartOptions<'bar'>;
   if (isDark) {
     options = {
@@ -149,7 +150,7 @@ const barChartDefaultOptions = (currency: string, sum?: boolean, isDark?: boolea
         y: {
           ticks: {
             color: 'white',
-            callback: (value) => `${ currency } ${ value }`
+            callback: (value) => numberFormat(value, currency, locale)
           },
           grid: { color: 'rgba(255,255,255,0.1)' },
           beginAtZero: true,
@@ -167,8 +168,8 @@ const barChartDefaultOptions = (currency: string, sum?: boolean, isDark?: boolea
         },
         tooltip: {
           callbacks: {
-            label: (tooltipItem: any) => label(tooltipItem, currency, sum),
-            footer: (tooltipItems: any) => footer(tooltipItems, currency, sum),
+            label: (tooltipItem: any) => label(tooltipItem, currency, sum, locale),
+            footer: (tooltipItems: any) => footer(tooltipItems, currency, sum, locale),
           }
         }
       }
@@ -183,7 +184,7 @@ const barChartDefaultOptions = (currency: string, sum?: boolean, isDark?: boolea
       scales: {
         y: {
           ticks: {
-            callback: (value) => `${ currency } ${ value }`
+            callback: (value) => numberFormat(value, currency, locale)
           },
           beginAtZero: true,
           stacked: true
@@ -198,8 +199,8 @@ const barChartDefaultOptions = (currency: string, sum?: boolean, isDark?: boolea
         },
         tooltip: {
           callbacks: {
-            label: (tooltipItem: any) => label(tooltipItem, currency, sum),
-            footer: (tooltipItems: any) => footer(tooltipItems, currency, sum),
+            label: (tooltipItem: any) => label(tooltipItem, currency, sum, locale),
+            footer: (tooltipItems: any) => footer(tooltipItems, currency, sum, locale),
           }
         }
       }
@@ -208,7 +209,7 @@ const barChartDefaultOptions = (currency: string, sum?: boolean, isDark?: boolea
   return options;
 };
 
-const lineChartDefaultOptions = (currency: string, sum?: boolean, isDark?: boolean): ChartOptions<'bar'> => {
+const lineChartDefaultOptions = (currency?: ICurrency, sum?: boolean, isDark?: boolean, locale?: string): ChartOptions<'bar'> => {
   let options: ChartOptions<'bar'>;
   if (isDark) {
     options = {
@@ -221,7 +222,7 @@ const lineChartDefaultOptions = (currency: string, sum?: boolean, isDark?: boole
         y: {
           ticks: {
             color: 'white',
-            callback: (value) => `${ currency } ${ value }`
+            callback: (value) => numberFormat(value, currency, locale)
           },
           grid: { color: 'rgba(255,255,255,0.1)' },
           beginAtZero: true
@@ -237,8 +238,8 @@ const lineChartDefaultOptions = (currency: string, sum?: boolean, isDark?: boole
         },
         tooltip: {
           callbacks: {
-            label: (tooltipItem: any) => label(tooltipItem, currency, sum),
-            footer: (tooltipItems: any) => footer(tooltipItems, currency, sum),
+            label: (tooltipItem: any) => label(tooltipItem, currency, sum, locale),
+            footer: (tooltipItems: any) => footer(tooltipItems, currency, sum, locale),
           }
         }
       }
@@ -253,7 +254,7 @@ const lineChartDefaultOptions = (currency: string, sum?: boolean, isDark?: boole
       scales: {
         y: {
           ticks: {
-            callback: (value) => `${ currency } ${ value }`
+            callback: (value) => numberFormat(value, currency, locale)
           },
           beginAtZero: true,
         }
@@ -264,8 +265,8 @@ const lineChartDefaultOptions = (currency: string, sum?: boolean, isDark?: boole
         },
         tooltip: {
           callbacks: {
-            label: (tooltipItem: any) => label(tooltipItem, currency, sum),
-            footer: (tooltipItems) => footer(tooltipItems, currency, sum),
+            label: (tooltipItem: any) => label(tooltipItem, currency, sum, locale),
+            footer: (tooltipItems) => footer(tooltipItems, currency, sum, locale),
           }
         }
       }
@@ -274,25 +275,24 @@ const lineChartDefaultOptions = (currency: string, sum?: boolean, isDark?: boole
   return options;
 };
 
-const footer = (tooltipItems: any, currency: string, sum?: boolean) => tooltipItems.length ?
-  createTooltip('Total', currency, sum ?
-    tooltipItems.reduce((a: number, b: any) => a + b.parsed.y, 0) :
-    tooltipItems[tooltipItems.length - 1].formattedValue)
-  : '';
-
-const label = (tooltipItem: any, currency: string, sum?: boolean) => {
-  if (!sum && tooltipItem.datasetIndex) {
-    const previous = Number(tooltipItem.chart.data.datasets[tooltipItem.datasetIndex - 1].data[tooltipItem.dataIndex]);
-    const newValue = new Intl.NumberFormat(API_LOCALE, { maximumSignificantDigits: 2 })
-      .format(Number(tooltipItem.raw) - previous);
-
-    return createTooltip(tooltipItem.dataset.label, currency, newValue);
-  }
-
-  return createTooltip(tooltipItem.dataset.label, currency, tooltipItem.formattedValue);
+const footer = (tooltipItems: any, currency?: ICurrency, sum?: boolean, locale?: string) => {
+  const total = sum ? tooltipItems.reduce((a: number, b: any) => a + b.parsed.y, 0) :
+    tooltipItems[tooltipItems.length - 1].formattedValue;
+  return tooltipItems.length > 1 ? createTooltip('Total', total, currency, locale) : '';
 };
 
-const createTooltip = (title: string, currency: string, value: string) => `${ title }: ${ currency }${ value }`;
+const label = (tooltipItem: any, currency?: ICurrency, sum?: boolean, locale?: string) => {
+  if (!sum && tooltipItem.datasetIndex) {
+    const previous = Number(tooltipItem.chart.data.datasets[tooltipItem.datasetIndex - 1].data[tooltipItem.dataIndex]);
+
+    return createTooltip(tooltipItem.dataset.label, Number(tooltipItem.raw) - previous, currency, locale);
+  }
+
+  return createTooltip(tooltipItem.dataset.label, tooltipItem.raw, currency, locale);
+};
+
+const createTooltip = (title: string, value: string | number, currency?: ICurrency, locale?: string) =>
+  `${ title } ${ numberFormat(value, currency, locale) }`;
 
 const barChartNoLabelOptions = (isDark?: boolean): ChartOptions<'bar'> => {
   let options: ChartOptions<'bar'>;
@@ -357,7 +357,6 @@ const getOrCreateTooltip = (chart: any) => {
     tooltipEl.style.color = 'white';
     tooltipEl.style.opacity = 1;
     tooltipEl.style.pointerEvents = 'none';
-    // tooltipEl.style.position = 'fixed';
     tooltipEl.style.position = 'absolute';
     tooltipEl.style.transform = 'translate(-50%, 0)';
     tooltipEl.style.transition = 'all .1s ease';
