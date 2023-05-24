@@ -1,0 +1,44 @@
+<h1 mat-dialog-title>{{'USER.MERGE.SELECT' | translate }}</h1>
+<div mat-dialog-content>
+  <form [formGroup]="userForm">
+    <mat-form-field *ngIf="users; else skeleton" appearance="outline">
+      <mat-label>{{ 'USER.MERGE.FIELD' | translate }}</mat-label>
+      <label>
+        <input (keydown)="keyDownHandler($event)" [formControl]="user" [matAutocomplete]="autoUser"
+               autocomplete="off" matInput required
+               type="text">
+      </label>
+      <mat-autocomplete #autoUser="matAutocomplete" [displayWith]="displayFnUser">
+        <mat-option *ngFor="let user of filteredUser | async" [value]="user">
+          {{user | userName}}
+        </mat-option>
+      </mat-autocomplete>
+      <mat-error *ngIf="user.hasError('required')"
+                 [innerHTML]="'USER.MERGE.REQUIRED' | translate">
+      </mat-error>
+      <mat-error *ngIf="user.hasError('requireMatch')"
+                 [innerHTML]="'USER.MERGE.INVALID' | translate">
+      </mat-error>
+    </mat-form-field>
+    <ng-template #skeleton>
+      <div class="ssc-line"></div>
+    </ng-template>
+  </form>
+</div>
+<div mat-dialog-actions>
+  <div fxFlex></div>
+  <ng-template [ngIf]="data.small" [ngIfElse]="largeButton">
+    <button (click)="onNoClick" mat-icon-button>
+      <mat-icon>clear</mat-icon>
+    </button>
+    <button (click)="doAction" [disabled]="userForm.invalid" cdkFocusInitial color="primary"
+            mat-icon-button>
+      <mat-icon>published_with_changes</mat-icon>
+    </button>
+  </ng-template>
+  <ng-template #largeButton>
+    <button (click)="onNoClick" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+    <button (click)="doAction" [disabled]="userForm.invalid" cdkFocusInitial color="primary"
+            mat-fab extended class="icon-button">{{ 'USER.MERGE.MERGE' | translate }}</button>
+  </ng-template>
+</div>
