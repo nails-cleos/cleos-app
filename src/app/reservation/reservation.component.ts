@@ -347,8 +347,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   get create(): void {
     const reservation: IReservation = new Reservation();
     reservation.customerId = this.customer.value.id;
-    reservation.roomId = this.room.value.id;
-    reservation.professionalId = this.professional.value.id;
     if (this.event.value) {
       reservation.start = this.event.value.start.toLocaleString(API_LOCALE);
       reservation.timeZone = getCurrentTimeZone();
@@ -952,7 +950,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       }
       this.customerInfo = state.customer;
-      if (this.customerInfo) {
+      const treatment = getIndex(this.steps, 'home_repair_service');
+      if (this.customerInfo && this.myStepper.selectedIndex === treatment) {
         this.treatmentId = this.customerInfo.treatment.key;
         this.customerAdditionalIds = this.customerInfo.additionalIds;
       }
@@ -962,7 +961,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         const sp = this.steps[3];
         sp.enable = true;
         this.steps[3] = sp;
-        if (this.customerAdditionalIds?.length && !this.additionalSelected.length) {
+        if (this.customerAdditionalIds?.length && !this.additionalSelected.length && this.myStepper.selectedIndex === treatment) {
           this.additionalSelected = this.additionalList.filter(ad => this.customerAdditionalIds.includes(ad.id))
             .map(ad => Object.assign({}, ad, { id: ad.id }));
         }
