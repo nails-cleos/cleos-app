@@ -315,12 +315,14 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     const more = this.createAction(translate.instant('RESERVATION.ACTION.MORE'),
       ReservationIconName.more, 'more');
 
+    const userPhone = reservation.customer.phone || reservation.customer.oldPhone;
+
     let approveActions: MatFabMenu[] = [];
     if (isToday(newDate(self.start))) {
       approveActions = [start];
     }
     approveActions = [...approveActions, edit];
-    if (reservation.customer.phone && greaterOrEqualsThanToday(newDate(self.start))) {
+    if (userPhone && greaterOrEqualsThanToday(newDate(self.start))) {
       approveActions = [...approveActions, sendMessage];
     }
     approveActions = [...approveActions, more, cancel];
@@ -350,7 +352,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
             break;
         }
         const message = translate.instant(`WHATSAPP.SEND.${ key }`, { date });
-        window.open(`https://api.whatsapp.com/send?phone=+${ reservation.customer?.phone }&text=${ message }`, '_blank');
+        window.open(`https://api.whatsapp.com/send?phone=+${ userPhone }&text=${ message }`, '_blank');
       }
     });
 

@@ -85,7 +85,8 @@ export class OverviewComponent implements OnInit, OnDestroy {
       });
       message += this.translate.instant('WHATSAPP.SEND.ATTENTION');
     }
-    window.open(`https://api.whatsapp.com/send?phone=+${ this.user?.phone }&text=${ message }`, '_blank');
+    const userPhone = this.user?.phone || this.user?.oldPhone;
+    window.open(`https://api.whatsapp.com/send?phone=+${ userPhone }&text=${ message }`, '_blank');
     return;
   }
 

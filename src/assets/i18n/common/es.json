@@ -34,6 +34,7 @@
       "SELECT": "Seleccionar",
       "UNAVAILABLE": "Agregar no disponible",
       "ACCEPT": "Aceptar",
+      "MERGE": "Unir",
       "EXPAND": {
         "TRUE": "Presiona para mostrar menos",
         "FALSE": "Presiona para mostrar más"
@@ -104,7 +105,7 @@
       "BANK": {
         "FIELD": "Banco",
         "REQUIRED": "Banco es <b>requerido</b>",
-        "INVALID": "Banco es invalido"
+        "INVALID": "Banco es no valido"
       },
       "OPTIONS": {
         "TO_PAY": "Total a pagar: {{amount}} {{symbol}}",
@@ -199,7 +200,7 @@
       },
       "PHONE": {
         "FIELD": "Teléfono",
-        "INVALID": "Número de teléfono invalido"
+        "INVALID": "Número de teléfono no valido"
       },
       "LANG": {
         "FIELD": "Idioma",

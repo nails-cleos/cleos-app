@@ -4,6 +4,7 @@ import { Pagination } from '../../interfaces/pagination';
 
 export interface State {
   data: IUser | IUserAll[] | Pagination<IUser> | IOverview | null;
+  users: IUserAll[] | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -14,6 +15,7 @@ export interface State {
 
 export const initialState: State = {
   data: null,
+  users: null,
   errorMessage: null,
   error: null,
   subErrors: null,
@@ -96,6 +98,7 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false
       };
     }
+    case UserActionTypes.mergeUsers:
     case UserActionTypes.setRole:
     case UserActionTypes.changePassword:
     case UserActionTypes.saveUser:
@@ -110,6 +113,25 @@ export const reducer = (state = initialState, action: All): State => {
         subErrors: null,
         message: null,
         isLoading: true
+      };
+    }
+    case UserActionTypes.getAllDisableUsers: {
+      return {
+        ...state,
+        users: [] as IUserAll[],
+        errorMessage: null,
+        subErrors: null,
+        selected: null,
+        message: null
+      };
+    }
+    case UserActionTypes.disableUsersSuccess: {
+      return {
+        ...state,
+        users: action.payload,
+        errorMessage: null,
+        subErrors: null,
+        message: null
       };
     }
     case UserActionTypes.clean: {

@@ -146,4 +146,12 @@ export class UserService {
   public getRoomByProfessionalId(id: string): Observable<IRoom> {
     return this.http.get<IRoom>(`${ this.professionalUrlV1 }/${ id }/rooms`);
   }
+
+  public getAllDisableUsers(): Observable<IUser[]> {
+    return this.http.get<IUser[]>(this.userUrlV1);
+  }
+
+  public mergeUsers(mergeUserRequest: any): Observable<IUser> {
+    return this.http.post<IUser>(`${ this.userUrlV1 }/merge`, mergeUserRequest);
+  }
 }
