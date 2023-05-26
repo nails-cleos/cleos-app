@@ -171,6 +171,24 @@ export class UserEffects {
     ))
   ));
 
+  getAllDisableUsers$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.getAllDisableUsers)).pipe(
+    map((action: any) => action.payload),
+    switchMap(() => this.userService.getAllDisableUsers().pipe(
+      switchMap((response: any) => of(new fromActionsUser.DisableUsersSuccess(response ? response : []))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
+    ))
+  ));
+
+  mergeUsers$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.mergeUsers)).pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.userService.mergeUsers(payload).pipe(
+        switchMap(() => {
+          const message = this.translate.instant(`USER.MERGE.SUCCESS`);
+          return of(new fromActionsUser.UserSaveSuccess({message}));
+        }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({error: err.error})))
+      ))
+    ));
+
   dataSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsUser.UserActionTypes.userSuccess)
   ), {dispatch: false});
@@ -189,6 +207,10 @@ export class UserEffects {
 
   changePasswordSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsUser.UserActionTypes.changePasswordSuccess)
+  ), {dispatch: false});
+
+  disableUsersSuccess$ = createEffect(() => this.actions$.pipe(
+    ofType(fromActionsUser.UserActionTypes.disableUsersSuccess)
   ), {dispatch: false});
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private userService: UserService,

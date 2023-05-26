@@ -7,7 +7,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 export class NotificationService {
 
   private url = 'notifications';
-  private urlV1 = `v1/${this.url}`;
+  private urlV1 = `v1/${ this.url }`;
 
   constructor(private http: HttpClient) {
   }
@@ -20,16 +20,18 @@ export class NotificationService {
     if (direction) {
       params = params.append('direction', direction);
     }
-    return this.http.get<INotification[]>(`${this.urlV1}/pages`, {params});
+    // return this.http.get<INotification[]>(`${ this.urlV1 }/pages`, { params });
+    return new Observable();
   }
 
   public readNotification(notificationId: string): Observable<INotification | undefined> {
-    const url = `${this.urlV1}/${notificationId}`;
+    const url = `${ this.urlV1 }/${ notificationId }`;
     return this.http.post<INotification>(url, null);
   }
 
   public subscribe(token: string): Observable<any> {
-    const url = `${this.urlV1}/subscribe`;
-    return this.http.post(url, {token});
+    const url = `${ this.urlV1 }/subscribe`;
+    // return this.http.post(url, { token });
+    return new Observable();
   }
 }

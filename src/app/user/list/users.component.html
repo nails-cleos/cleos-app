@@ -93,26 +93,35 @@
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
       <td *matCellDef="let user" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="user.id; else skeleton">
-          <button (click)="edit(user)" *ngIf="!user.deleted" mat-icon-button>
-            <mat-icon color="primary">edit</mat-icon>
-          </button>
-          <button *ngIf="!user.deleted" [routerLink]="['/users', user.id, 'overview']" mat-icon-button>
-            <mat-icon color="primary">analytics</mat-icon>
-          </button>
-          <button (click)="book(user)" *ngIf="!user.deleted" mat-icon-button>
-            <mat-icon color="accent">today</mat-icon>
-          </button>
-          <button (click)="delete(user)" *ngIf="!user.deleted" mat-icon-button>
-            <mat-icon color="warn">delete</mat-icon>
-          </button>
-          <button (click)="sendInvite(user)" *ngIf="!user.deleted && !user.enabled && user.provider === 'LOCAL'"
-                  mat-icon-button>
-            <mat-icon color="accent">forward_to_inbox</mat-icon>
-          </button>
-          <button (click)="restore(user)" *ngIf="user.deleted"
-                  mat-icon-button>
-            <mat-icon color="primary">restore_from_trash</mat-icon>
-          </button>
+          <ng-template [ngIf]="!user.deleted" [ngIfElse]="deleted">
+            <button (click)="edit(user)" mat-icon-button>
+              <mat-icon color="primary">edit</mat-icon>
+            </button>
+            <button [routerLink]="['/users', user.id, 'overview']" mat-icon-button>
+              <mat-icon color="primary">analytics</mat-icon>
+            </button>
+            <button (click)="book(user)" mat-icon-button>
+              <mat-icon color="accent">today</mat-icon>
+            </button>
+            <ng-template [ngIf]="!user.deleted && !user.enabled && user.provider === 'LOCAL'">
+              <button (click)="sendInvite(user)" mat-icon-button>
+                <mat-icon color="accent">forward_to_inbox</mat-icon>
+              </button>
+            </ng-template>
+            <ng-template [ngIf]="user.enabled">
+              <button (click)="merge(user)" mat-icon-button>
+                <mat-icon color="primary">merge</mat-icon>
+              </button>
+            </ng-template>
+            <button (click)="delete(user)" mat-icon-button>
+              <mat-icon color="warn">delete</mat-icon>
+            </button>
+          </ng-template>
+          <ng-template #deleted>
+            <button (click)="restore(user)" mat-icon-button>
+              <mat-icon color="primary">restore_from_trash</mat-icon>
+            </button>
+          </ng-template>
         </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -139,61 +148,74 @@
             </mat-list-item>
             <div fxHide fxShow.lt-sm matListItemTitle>{{ 'USER.LIST.COLUMN.STATUS' | translate }}</div>
             <mat-list-item fxHide fxShow.lt-sm role="list">
-              <div *ngIf="!user.deleted; else deleteBlock">
-                <mat-icon matListItemIcon *ngIf="user.enabled || user.provider !== 'LOCAL'; else elseBlock">
-                  verified_user
-                </mat-icon>
-                <ng-template #elseBlock>
-                  <mat-icon color="warn">gpp_bad</mat-icon>
+              <ng-template [ngIf]="!user.deleted" [ngIfElse]="deleteBlock">
+                <ng-template [ngIf]="user.enabled || user.provider !== 'LOCAL'" [ngIfElse]="elseBlock">
+                  <mat-icon matListItemIcon>verified_user</mat-icon>
                 </ng-template>
-              </div>
+                <ng-template #elseBlock>
+                  <mat-icon matListItemIcon color="warn">gpp_bad</mat-icon>
+                </ng-template>
+              </ng-template>
               <ng-template #deleteBlock>
-                <mat-icon color="accent">delete_outline</mat-icon>
+                <mat-icon matListItemIcon color="accent">delete_outline</mat-icon>
               </ng-template>
             </mat-list-item>
             <div fxHide.lt-sm fxShow matListItemTitle>{{ 'USER.LIST.COLUMN.DETAIL.TITLE' | translate }}</div>
-            <div class="flex-container" fxHide.lt-sm fxShow>
-              <div class="flex-child">
-                <mat-list-item *ngFor="let it of user.authorities" role="list">
-                  <mat-icon matListItemIcon>{{getIcon(it.authority)}}</mat-icon>
-                  <div matListItemTitle>{{ 'COMMON.ROLES.' + it.authority | translate}}
-                    <button (click)="removeRole(user, it.authority)" *ngIf="!user.deleted" color="warn" mat-icon-button>
-                      <mat-icon>person_remove</mat-icon>
-                    </button>
-                  </div>
-                </mat-list-item>
+            <ng-template [ngIf]="!user.deleted">
+              <div class="flex-container" fxHide.lt-sm fxShow>
+                <div class="flex-child">
+                  <mat-list-item *ngFor="let it of user.authorities" role="list">
+                    <mat-icon matListItemIcon>{{getIcon(it.authority)}}</mat-icon>
+                    <div matListItemTitle>{{ 'COMMON.ROLES.' + it.authority | translate}}
+                      <button (click)="removeRole(user, it.authority)" color="warn" mat-icon-button>
+                        <mat-icon>person_remove</mat-icon>
+                      </button>
+                    </div>
+                  </mat-list-item>
+                </div>
+                <div *ngIf="!user.deleted" class="flex-child">
+                  <mat-list-item *ngFor="let role of user.missing">
+                    <mat-icon matListItemIcon>{{getIcon(role)}}</mat-icon>
+                    <button (click)="addRole(user, role)" color="primary" mat-button>
+                      {{'COMMON.BUTTON.ADD' | translate}} {{ 'COMMON.ROLES.' + role | translate | lowercase}}</button>
+                  </mat-list-item>
+                </div>
               </div>
-              <div *ngIf="!user.deleted" class="flex-child">
-                <mat-list-item *ngFor="let role of user.missing">
-                  <mat-icon matListItemIcon>{{getIcon(role)}}</mat-icon>
-                  <button (click)="addRole(user, role)" color="primary" mat-button>
-                    {{'COMMON.BUTTON.ADD' | translate}} {{ 'COMMON.ROLES.' + role | translate | lowercase}}</button>
-                </mat-list-item>
-              </div>
-            </div>
+            </ng-template>
             <div fxHide fxShow.lt-sm matListItemTitle>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
-            <div *ngIf="!user.deleted" fxHide fxShow.lt-sm>
-              <button (click)="edit(user)" mat-icon-button>
-                <mat-icon color="primary">edit</mat-icon>
-              </button>
-              <button [routerLink]="['/users', user.id, 'overview']" mat-icon-button>
-                <mat-icon color="primary">analytics</mat-icon>
-              </button>
-              <button (click)="book(user)" mat-icon-button>
-                <mat-icon color="accent">today</mat-icon>
-              </button>
-              <button (click)="delete(user)" mat-icon-button>
-                <mat-icon color="warn">delete</mat-icon>
-              </button>
-              <button (click)="sendInvite(user)" *ngIf="!user.enabled && user.provider === 'LOCAL'" mat-icon-button>
-                <mat-icon color="accent">forward_to_inbox</mat-icon>
-              </button>
-            </div>
-            <div *ngIf="user.deleted" fxHide fxShow.lt-sm>
-              <button (click)="restore(user)" *ngIf="user.deleted" mat-icon-button>
-                <mat-icon color="primary">restore_from_trash</mat-icon>
-              </button>
-            </div>
+            <ng-template [ngIf]="!user.deleted" [ngIfElse]="deleted">
+              <div fxHide fxShow.lt-sm>
+                <button (click)="edit(user)" mat-icon-button>
+                  <mat-icon color="primary">edit</mat-icon>
+                </button>
+                <button [routerLink]="['/users', user.id, 'overview']" mat-icon-button>
+                  <mat-icon color="primary">analytics</mat-icon>
+                </button>
+                <button (click)="book(user)" mat-icon-button>
+                  <mat-icon color="accent">today</mat-icon>
+                </button>
+                <ng-template [ngIf]="!user.enabled && user.provider === 'LOCAL'">
+                  <button (click)="sendInvite(user)" mat-icon-button>
+                    <mat-icon color="accent">forward_to_inbox</mat-icon>
+                  </button>
+                </ng-template>
+                <ng-template [ngIf]="user.enabled">
+                  <button (click)="merge(user)" mat-icon-button>
+                    <mat-icon color="primary">merge</mat-icon>
+                  </button>
+                </ng-template>
+                <button (click)="delete(user)" mat-icon-button>
+                  <mat-icon color="warn">delete</mat-icon>
+                </button>
+              </div>
+            </ng-template>
+            <ng-template #deleted>
+              <div fxHide fxShow.lt-sm>
+                <button (click)="restore(user)" *ngIf="user.deleted" mat-icon-button>
+                  <mat-icon color="primary">restore_from_trash</mat-icon>
+                </button>
+              </div>
+            </ng-template>
           </mat-list>
         </div>
       </td>

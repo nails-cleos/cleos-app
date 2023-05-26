@@ -42,6 +42,8 @@ export interface IUserAll {
   locale: string;
   phone?: string;
   dob?: string;
+  oldPhone?: string;
+  oldDob?: string;
   referralMax?: number;
   theme?: Theme;
   changePassword: boolean;
