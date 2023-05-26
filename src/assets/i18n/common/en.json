@@ -34,6 +34,7 @@
       "SELECT": "Select",
       "UNAVAILABLE": "Add unavailable",
       "ACCEPT": "Accept",
+      "MERGE": "Merge",
       "EXPAND": {
         "TRUE": "Click to show less",
         "FALSE": "Click to show more"

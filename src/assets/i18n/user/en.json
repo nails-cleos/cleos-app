@@ -50,6 +50,20 @@
     "ROLES": {
       "REMOVE": "Role {{role}} removed to {{username}}",
       "ADD": "Role {{role}} added to {{username}}"
+    },
+    "MERGE": {
+      "SELECT": "Select user to merge",
+      "NAME": "<b>Name:</b> {{name}}",
+      "EMAIL": "<b>Email:</b> {{email}}",
+      "OLD_USER": {
+        "TITLE": "Old user",
+        "FIELD": "Old user",
+        "REQUIRED": "Old user <b>required</b>",
+        "INVALID": "Old user is invalid"
+      },
+      "NEW_USER": {
+        "TITLE": "New user"
+      }
     }
   }
 }

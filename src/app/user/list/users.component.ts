@@ -1,22 +1,25 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { IUser, IUserAll, User } from '../../interfaces/user';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
 import * as fromActionsUser from '../../store/user.actions';
 import { MatTableDataSource } from '@angular/material/table';
-import { MatDialog } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
 import { TranslateService } from '@ngx-translate/core';
 import { Role } from '../../interfaces/token';
-import { getUserName, snakeToCamel } from '../../util/helper';
+import { executeDialogNoWidth, getFullUserName, getUserName, snakeToCamel } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
 import { RoleIconKey, RoleIconName } from '../../util/icon';
 import { Router } from '@angular/router';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { requireMatch } from '../../util/validators';
+import { map, startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'app-users',
@@ -41,6 +44,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   private paginatorSubscription: Subscription | undefined;
   private getState: Observable<any>;
   private allRole: Role[] = [Role.customer, Role.professional, Role.manager, Role.admin];
+  private smallScreen = false;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private router: Router, private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
@@ -50,6 +54,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     ]).subscribe(result => {
       if (result.matches) {
         this.pageSize = MOBILE_PAGE_SIZE;
+        this.smallScreen = true;
       }
     });
     this.getState = this.store.select(selectUserState);
@@ -77,16 +82,16 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
 
   edit(user: IUser): void {
     this.store.dispatch(
-      new fromActionsUser.UserSelected({user, profile: false})
+      new fromActionsUser.UserSelected({ user, profile: false })
     );
   }
 
   delete(user: IUser): void {
     this.noExpanded(user);
     const title = this.translate.instant('USER.DELETED.TITLE');
-    const content = this.translate.instant('USER.DELETED.CONTENT', {username: getUserName(user)});
+    const content = this.translate.instant('USER.DELETED.CONTENT', { username: getUserName(user) });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: {title, content, value: user}
+      data: { title, content, value: user }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -101,9 +106,9 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   sendInvite(user: IUser): void {
     this.noExpanded(user);
     const title = this.translate.instant('USER.ACTIVATION_RESEND.TITLE');
-    const content = this.translate.instant('USER.ACTIVATION_RESEND.CONTENT', {username: getUserName(user)});
+    const content = this.translate.instant('USER.ACTIVATION_RESEND.CONTENT', { username: getUserName(user) });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: {title, content, value: user}
+      data: { title, content, value: user }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -118,9 +123,9 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   restore(user: IUser): void {
     this.noExpanded(user);
     const title = this.translate.instant('USER.RESTORE.TITLE');
-    const content = this.translate.instant('USER.RESTORE.CONTENT', {username: getUserName(user)});
+    const content = this.translate.instant('USER.RESTORE.CONTENT', { username: getUserName(user) });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: {title, content, value: user}
+      data: { title, content, value: user }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -135,6 +140,22 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  merge(user: IUser): void {
+    this.noExpanded(user);
+    const data = {
+      small: this.smallScreen,
+      newUser: user
+    };
+
+    executeDialogNoWidth(this.dialog, SelectUserDialogComponent, data, result => {
+      if (result) {
+        this.store.dispatch(
+          new fromActionsUser.MergeUsers({ oldUserId: result.id, newUserId: user.id })
+        );
+      }
+    }, true);
+  }
+
   getIcon(name: any): any {
     const iconName: RoleIconKey = snakeToCamel(name) as RoleIconKey;
     return RoleIconName[iconName];
@@ -142,19 +163,19 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
 
   addRole(user: IUserAll, role: Role): void {
     this.store.dispatch(
-      new fromActionsUser.SetRole({user, role, action: 'ADD'})
+      new fromActionsUser.SetRole({ user, role, action: 'ADD' })
     );
   }
 
   removeRole(user: IUserAll, role: string): void {
     this.store.dispatch(
-      new fromActionsUser.SetRole({user, role, action: 'REMOVE'})
+      new fromActionsUser.SetRole({ user, role, action: 'REMOVE' })
     );
   }
 
   book(customer: IUser): void {
-    const data = {customer};
-    this.router.navigate(['reservation'], {state: data});
+    const data = { customer };
+    this.router.navigate(['reservation'], { state: data });
   }
 
   private clean(): void {
@@ -195,7 +216,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
       this.dataSource = stateValue.data?.content?.map((user: IUserAll) => {
         if (user.authorities) {
           const missing = this.allRole.filter(au => !user.authorities.some(u => u.authority === au));
-          return Object.assign({}, user, {missing});
+          return Object.assign({}, user, { missing });
         }
         return user;
       });
@@ -215,6 +236,97 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this.expandedUser = user;
     }
+  }
+}
+
+@Component({
+  selector: 'app-select-user-dialog-component',
+  templateUrl: './select-user-dialog.component.html'
+})
+export class SelectUserDialogComponent implements OnInit, AfterViewInit, OnDestroy {
+  userForm!: UntypedFormGroup;
+  users?: IUser[];
+  filteredUser?: Observable<IUser[] | undefined>;
+  user: UntypedFormControl = new UntypedFormControl('', [
+    Validators.required, requireMatch
+  ]);
+
+  newUser: IUserAll;
+
+  private getState: Observable<any>;
+  private subscription?: Subscription;
+
+  constructor(public dialogRef: MatDialogRef<SelectUserDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
+              private formBuilder: UntypedFormBuilder, private store: Store<AppState>, private cdRef: ChangeDetectorRef) {
+    this.newUser = data.newUser;
+    this.getState = this.store.select(selectUserState);
+  }
+
+  get onNoClick(): void {
+    return this.dialogRef.close();
+  }
+
+  get doAction(): void {
+    return this.dialogRef.close(this.user.value);
+  }
+
+  ngOnInit(): void {
+    this.createFilters();
+    this.createForm();
+    this.subscribe();
+    this.getOldUsers();
+  }
+
+  ngAfterViewInit(): void {
+    this.cdRef.detectChanges();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+  }
+
+  displayFnUser(user: IUser): string {
+    return user ? getUserName(user) : '';
+  }
+
+  keyDownHandler(event: any): void {
+    if (event.code === 'Backspace') {
+      this.user.setValue('');
+    }
+  }
+
+  private getOldUsers(): void {
+    this.store.dispatch(
+      new fromActionsUser.GetAllDisableUsers()
+    );
+  }
+
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe(state => {
+      this.users = state.users;
+      this.user.setValue(null);
+    });
+  }
+
+  private createForm(): void {
+    this.userForm = this.formBuilder.group({
+      user: this.user
+    });
+  }
+
+  private createFilters(): void {
+    this.filteredUser = this.user.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value ? value.name : ''),
+      map(name => name ? this.filterUser(
+        name) : this.users ? this.users.slice() : this.users)
+    );
+  }
+
+  private filterUser(name: string): IUser[] | undefined {
+    const filterValue = name.toLowerCase();
+
+    return this.users?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
   }
 }
 

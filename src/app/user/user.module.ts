@@ -4,7 +4,7 @@ import { SharedModule } from '../shared/shared.module';
 import { UserRoutingModule } from './user-routing.module';
 
 import { UserComponent } from './user.component';
-import { UsersComponent } from './list/users.component';
+import { SelectUserDialogComponent, UsersComponent } from './list/users.component';
 import { UserDetailComponent } from './detail/user-detail.component';
 import { OverviewComponent } from './overview/overview.component';
 import { OverviewChartComponent } from './overview/chart/overview-chart/overview-chart.component';
@@ -21,7 +21,8 @@ import { NgxMatColorPickerModule } from '@angular-material-components/color-pick
     UsersComponent,
     UserDetailComponent,
     OverviewComponent,
-    OverviewChartComponent
+    OverviewChartComponent,
+    SelectUserDialogComponent
   ],
   imports: [
     UserRoutingModule,

@@ -19,6 +19,9 @@ export enum UserActionTypes {
   resendUserToken = '[User] Resend user token',
   changePassword = '[Auth] Change password',
   changePasswordSuccess = '[Auth] Change password Success',
+  getAllDisableUsers = '[User] Get all disable users',
+  disableUsersSuccess = '[User] Disable users success',
+  mergeUsers = '[User] Merge users',
   clean = '[User] Clean'
 }
 
@@ -142,6 +145,24 @@ export class ChangePasswordSuccess implements Action {
   }
 }
 
+export class GetAllDisableUsers implements Action {
+  readonly type = UserActionTypes.getAllDisableUsers;
+}
+
+export class DisableUsersSuccess implements Action {
+  readonly type = UserActionTypes.disableUsersSuccess;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class MergeUsers implements Action {
+  readonly type = UserActionTypes.mergeUsers;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class Clean implements Action {
   readonly type = UserActionTypes.clean;
 }
@@ -165,4 +186,7 @@ export type All =
   | ResendToken
   | ChangePassword
   | ChangePasswordSuccess
+  | GetAllDisableUsers
+  | DisableUsersSuccess
+  | MergeUsers
   | Clean;
