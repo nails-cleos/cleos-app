@@ -69,7 +69,7 @@
         "NAME": "<span class='bold'>Tratamiento:</span> {{name}}",
         "TOTAL": "<span class='bold'>Total:</span>",
         "PRICE": "<span class='bold'>Price:</span>",
-        "DURATION": "<span class='bold'>Duración:</span> {{duration}}"
+        "DURATION": "<span class='bold'>Duración:</span>"
       },
       "DISCOUNT": {
         "FIELD": "Descuento",
@@ -165,11 +165,6 @@
       "SEARCH": "Buscar por estados",
       "CANCEL": "La reserva se canceló",
       "CHANGE_CUSTOMER": "Cliente actualizado"
-    },
-    "ADDITIONAL": {
-      "DURATION": {
-        "FIELD": "Duración"
-      }
     },
     "CONFIGURATION": {
       "TITLE": "Configuración",

@@ -22,7 +22,10 @@
                    [cdkDropListConnectedTo]="[additionalList]" [cdkDropListData]="selectedAdditional" cdkDropList
                    class="item-list">
                 <div (click)="changePrice(item)" *ngFor="let item of selectedAdditional" cdkDrag class="item-box">
-                  {{item.name}} - {{item.currency}} {{item.price}}
+                  <div>
+                    <div>{{item.name}}</div>
+                    <div>{{item.currency | currencySymbol}} {{item.price}}</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -48,7 +51,10 @@
                        class="item-list">
                     <div (click)="changePrice(item)" *ngFor="let item of group.value.selectedTreatments" cdkDrag
                          class="item-box">
-                      {{item.name}} - {{item.currency}} {{item.price}}
+                      <div>
+                        <div>{{item.name}}</div>
+                        <div>{{item.currency | currencySymbol}} {{item.price}}</div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -61,10 +67,12 @@
         </mat-card-content>
         <mat-card-actions>
           <div fxFlex></div>
-          <button appBackButton class="margin-right-eight" color="accent" mat-fab extended class="icon-button"
-                  type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
-          <button (click)="save" class="margin-right-eight" color="primary" mat-fab extended
-                  class="icon-button">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
+          <button appBackButton class="margin-right-eight icon-button" color="accent" mat-fab extended type="button">
+            {{ 'COMMON.BUTTON.BACK' | translate }}
+          </button>
+          <button (click)="save" class="margin-right-eight icon-button" color="primary" mat-fab extended>
+            {{ 'COMMON.BUTTON.UPDATE' | translate }}
+          </button>
         </mat-card-actions>
       </mat-card>
     </div>

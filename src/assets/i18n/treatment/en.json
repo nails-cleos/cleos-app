@@ -1,8 +1,8 @@
 {
   "TREATMENT": {
-    "TITLE": "Add services",
-    "CREATED": "Service {{name}} created",
-    "DETAIL": "Update services",
+    "TITLE": "Add treatments",
+    "CREATED": "Treatment {{name}} created",
+    "DETAIL": "Update treatments",
     "LIST": {
       "COLUMN": {
         "DURABILITY": "Durability",
@@ -11,8 +11,8 @@
         "DATE": "Updated"
       },
       "ERROR": {
-        "NO_CONTENT": "No services",
-        "REQUIRED": "At least one service is required"
+        "NO_CONTENT": "No treatments",
+        "REQUIRED": "At least one treatment is required"
       }
     },
     "NAME": {
@@ -44,12 +44,15 @@
       "CHECK": "Primary"
     },
     "DELETED": {
-      "TITLE": "Delete service",
-      "CONTENT": "Are you sure to delete service {{name}}?",
-      "MESSAGE": "Service {{name}} deleted"
+      "TITLE": "Delete treatment",
+      "CONTENT": "Are you sure to delete treatment {{name}}?",
+      "MESSAGE": "Treatment {{name}} deleted"
     },
     "UPDATED": {
-      "MESSAGE": "Service {{name}} updated"
+      "MESSAGE": "Treatment {{name}} updated"
+    },
+    "SORTED": {
+      "MESSAGE": "Treatments sorted"
     }
   }
 }

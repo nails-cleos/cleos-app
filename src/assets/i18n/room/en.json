@@ -114,7 +114,7 @@
           "TITLE": "Additional"
         },
         "TREATMENT": {
-          "TITLE": "Service"
+          "TITLE": "Treatment"
         },
         "PRICE": {
           "TEXT": "What is the price of {{name}}?",

@@ -106,15 +106,15 @@ a, u {
   padding-bottom: 10px;
 }
 
-@media all and (max-device-width: 812px) and (orientation: portrait) {
-  #add-button {
-    top: 80px;
-    right: 30px;
-    bottom: auto;
-    left: auto;
-    position: fixed;
-  }
+#add-button {
+  top: 83px;
+  right: 30px;
+  bottom: auto;
+  left: auto;
+  position: fixed;
+}
 
+@media all and (max-device-width: 812px) and (orientation: portrait) {
   .spinner-vertical {
     position: fixed;
     top: 50%;
@@ -124,14 +124,6 @@ a, u {
 }
 
 @media not all and (max-device-width: 812px) and (orientation: portrait) {
-  #add-button {
-    top: 83px;
-    right: 30px;
-    bottom: auto;
-    left: auto;
-    position: fixed;
-  }
-
   .spinner-vertical {
     position: fixed;
     top: 50%;
@@ -145,7 +137,6 @@ a, u {
 }
 
 /*Charts*/
-
 .chartContainer canvas {
   max-height: 250px;
   width: auto;

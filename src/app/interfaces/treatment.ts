@@ -12,6 +12,7 @@ export interface ITreatmentGroup {
   durabilityMin?: number;
   durabilityMax?: number;
   treatments?: ITreatment[];
+  order?: number;
 }
 
 export interface ITreatmentGroupAll {
@@ -21,6 +22,7 @@ export interface ITreatmentGroupAll {
   durability?: string;
   durabilityMin?: number;
   durabilityMax?: number;
+  order?: number;
 }
 
 export interface ITreatment {

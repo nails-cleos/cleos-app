@@ -18,6 +18,27 @@
     color: black;
   }
 
+  .sorting-item-list {
+    background: mat.get-color-from-palette($background, card);
+    border: solid 1px mat.get-color-from-palette($background, tooltip);
+  }
+
+  .sorting-item-box {
+    background: mat.get-color-from-palette($background, card);
+    border-bottom: solid 1px mat.get-color-from-palette($background, tooltip);
+  }
+
+  .cdk-drag-preview {
+    box-shadow: 0 5px 5px -3px mat.get-color-from-palette($background, shadow),
+    0 8px 10px 1px mat.get-color-from-palette($background, shadow),
+    0 3px 14px 2px mat.get-color-from-palette($background, shadow);
+  }
+
+  .sorting-item-placeholder {
+    background: mat.get-color-from-palette($background, hover);
+    border: dotted 3px mat.get-color-from-palette($background, hoverable);
+  }
+
   @if $isDark {
     .text-bg-created {
       background-color: #fafafa;

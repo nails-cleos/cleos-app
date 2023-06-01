@@ -45,6 +45,27 @@
                   {{errors['duration']}}
                 </mat-error>
               </mat-form-field>
+              <mat-form-field *ngIf="groups; else skeleton" appearance="outline">
+                <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
+                <label>
+                  <input (keydown)="keyDownGroup($event)" [formControl]="group" [matAutocomplete]="autoGroup"
+                         matInput type="text">
+                </label>
+                <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
+                  <mat-option *ngFor="let group of filteredGroup | async | sortBy: 'asc':'name'" [value]="group">
+                    {{group.name}}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="group.hasError('requireMatch')"
+                           [innerHTML]="'COMMON.TREATMENT.GROUP.INVALID' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['group']">
+                  {{errors['group']}}
+                </mat-error>
+              </mat-form-field>
+              <ng-template #skeleton>
+                <div class="ssc-line"></div>
+              </ng-template>
             </div>
           </mat-card-content>
           <ng-template #boxSkeleton>

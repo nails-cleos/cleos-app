@@ -17,6 +17,8 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { TreatmentSortingComponent } from './sorting/treatment-sorting.component';
+import { DragDropSortingComponent } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +26,8 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
     TreatmentsComponent,
     TreatmentDetailComponent,
     TreatmentViewComponent,
-    TreatmentTableComponent
+    TreatmentTableComponent,
+    TreatmentSortingComponent
   ],
   imports: [
     TreatmentRoutingModule,
@@ -42,7 +45,8 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
     MatExpansionModule,
     MatTableModule,
     MatPaginatorModule,
-    MatSortModule
+    MatSortModule,
+    DragDropSortingComponent
   ],
   providers: [
     TreatmentService

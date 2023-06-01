@@ -25,7 +25,7 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['position', 'name', 'durability', 'actions'];
+  displayedColumns: string[] = ['order', 'name', 'durability', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<ITreatmentGroup>>();
 
   resultsLength = DEFAULT_LENGTH;

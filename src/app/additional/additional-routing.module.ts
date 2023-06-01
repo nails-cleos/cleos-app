@@ -5,10 +5,16 @@ import { Role } from '../interfaces/token';
 import { AdditionalComponent } from './additional.component';
 import { AdditionalListComponent } from './list/additional-list.component';
 import { AdditionalDetailComponent } from './detail/additional-detail.component';
+import { AdditionalSortingComponent } from './sorting/additional-sorting.component';
 
 const routes: Routes = [
   {
     path: '', component: AdditionalListComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.admin]
+    }
+  },
+  {
+    path: 'sorting', component: AdditionalSortingComponent, canActivate: [AuthGuardService], data: {
       roles: [Role.admin]
     }
   },

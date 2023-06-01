@@ -22,22 +22,24 @@
         {{errors['customer']}}
       </mat-error>
     </mat-form-field>
-    <mat-list *ngIf="customerInfo">
-      <mat-list-item>
-        <div mat-line>{{ 'RESERVATION.CUSTOMER.INFO.DAYS' | translate: {days: customerInfo.days} }}</div>
-      </mat-list-item>
-      <mat-list-item>
-        <div [innerHTML]="'RESERVATION.CUSTOMER.INFO.PROFESSIONAL_NAME' |
+    <ng-template [ngIf]="customerInfo">
+      <mat-list>
+        <mat-list-item>
+          <div mat-line>{{ 'RESERVATION.CUSTOMER.INFO.DAYS' | translate: {days: customerInfo.days} }}</div>
+        </mat-list-item>
+        <mat-list-item>
+          <div [innerHTML]="'RESERVATION.CUSTOMER.INFO.PROFESSIONAL_NAME' |
                   translate: {professional: customerInfo.professionalName}" mat-line></div>
-      </mat-list-item>
-      <mat-list-item>
-        <div [innerHTML]="'RESERVATION.CUSTOMER.INFO.TREATMENT' |
+        </mat-list-item>
+        <mat-list-item>
+          <div [innerHTML]="'RESERVATION.CUSTOMER.INFO.TREATMENT' |
                   translate: {treatment: treatmentDetail}" mat-line></div>
-      </mat-list-item>
-    </mat-list>
-    <div *ngIf="!customerInfo && customer.value">
+        </mat-list-item>
+      </mat-list>
+    </ng-template>
+    <ng-template [ngIf]="!customerInfo && customer.value">
       <div mat-subheader>{{ 'RESERVATION.CUSTOMER.INFO.NONE' | translate}}</div>
-    </div>
+    </ng-template>
     <ng-template #skeleton>
       <div class="ssc-line"></div>
     </ng-template>
@@ -46,9 +48,9 @@
 
 <ng-template #stepTwo>
   <form [formGroup]="officeForm">
-    <div *ngIf="!offices?.length; else data" class="no-content bold">
-      {{'RESERVATION.ROOM.NO_CONTENT' | translate}}
-    </div>
+    <ng-template [ngIf]="!offices?.length" [ngIfElse]="data">
+      <div class="no-content bold">{{'RESERVATION.ROOM.NO_CONTENT' | translate}}</div>
+    </ng-template>
     <ng-template #data>
       <div fxLayout="column" fxLayoutAlign="space-evenly start">
         <mat-form-field *ngIf="offices; else skeleton" appearance="outline">
@@ -72,45 +74,49 @@
             {{errors['office']}}
           </mat-error>
         </mat-form-field>
-        <mat-form-field *ngIf="roomList" appearance="outline">
-          <mat-label>{{ 'COMMON.ROOM.FIELD' | translate }}</mat-label>
-          <label>
-            <input (keydown)="keyDownRoom($event)" [formControl]="room" [matAutocomplete]="autoRoom" matInput
-                   required type="text">
-          </label>
-          <mat-autocomplete #autoRoom="matAutocomplete" [displayWith]="displayFnRoom">
-            <mat-option *ngFor="let room of filteredRoom | async" [value]="room">
-              {{room | roomName}}
-            </mat-option>
-          </mat-autocomplete>
-          <mat-error *ngIf="room.hasError('required')"
-                     [innerHTML]="'COMMON.ROOM.REQUIRED' | translate">
-          </mat-error>
-          <mat-error *ngIf="room.hasError('requireMatch')"
-                     [innerHTML]="'COMMON.ROOM.INVALID' | translate">
-          </mat-error>
-          <mat-error *ngIf="errors['room']">
-            {{errors['room']}}
-          </mat-error>
-        </mat-form-field>
-        <mat-form-field *ngIf="professionalList" appearance="outline">
-          <mat-label>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</mat-label>
-          <label>
-            <input (keydown)="keyDownHandler($event, professional)" [formControl]="professional"
-                   [matAutocomplete]="autoProfessional" matInput type="text">
-          </label>
-          <mat-autocomplete #autoProfessional="matAutocomplete" [displayWith]="displayFnProfessional">
-            <mat-option *ngFor="let professional of filteredProfessional | async" [value]="professional">
-              {{professional | userName}}
-            </mat-option>
-          </mat-autocomplete>
-          <mat-error *ngIf="professional.hasError('requireMatch')"
-                     [innerHTML]="'COMMON.PROFESSIONAL.INVALID' | translate">
-          </mat-error>
-          <mat-error *ngIf="errors['professional']">
-            {{errors['professional']}}
-          </mat-error>
-        </mat-form-field>
+        <ng-template [ngIf]="roomList">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'COMMON.ROOM.FIELD' | translate }}</mat-label>
+            <label>
+              <input (keydown)="keyDownRoom($event)" [formControl]="room" [matAutocomplete]="autoRoom" matInput
+                     required type="text">
+            </label>
+            <mat-autocomplete #autoRoom="matAutocomplete" [displayWith]="displayFnRoom">
+              <mat-option *ngFor="let room of filteredRoom | async" [value]="room">
+                {{room | roomName}}
+              </mat-option>
+            </mat-autocomplete>
+            <mat-error *ngIf="room.hasError('required')"
+                       [innerHTML]="'COMMON.ROOM.REQUIRED' | translate">
+            </mat-error>
+            <mat-error *ngIf="room.hasError('requireMatch')"
+                       [innerHTML]="'COMMON.ROOM.INVALID' | translate">
+            </mat-error>
+            <mat-error *ngIf="errors['room']">
+              {{errors['room']}}
+            </mat-error>
+          </mat-form-field>
+        </ng-template>
+        <ng-template [ngIf]="professionalList">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</mat-label>
+            <label>
+              <input (keydown)="keyDownHandler($event, professional)" [formControl]="professional"
+                     [matAutocomplete]="autoProfessional" matInput type="text" required>
+            </label>
+            <mat-autocomplete #autoProfessional="matAutocomplete" [displayWith]="displayFnProfessional">
+              <mat-option *ngFor="let professional of filteredProfessional | async" [value]="professional">
+                {{professional | userName}}
+              </mat-option>
+            </mat-autocomplete>
+            <mat-error *ngIf="professional.hasError('requireMatch')"
+                       [innerHTML]="'COMMON.PROFESSIONAL.INVALID' | translate">
+            </mat-error>
+            <mat-error *ngIf="errors['professional']">
+              {{errors['professional']}}
+            </mat-error>
+          </mat-form-field>
+        </ng-template>
       </div>
     </ng-template>
     <ng-template #skeleton>
@@ -121,9 +127,11 @@
 
 <ng-template #stepThree>
   <form [formGroup]="treatmentForm">
-    <div *ngIf="!groups?.length; else data" class="no-content bold">
-      {{'RESERVATION.TREATMENT.NO_CONTENT' | translate}}
-    </div>
+    <ng-template [ngIf]="!groups?.length" [ngIfElse]="data">
+      <div class="no-content bold">
+        {{'RESERVATION.TREATMENT.NO_CONTENT' | translate}}
+      </div>
+    </ng-template>
     <ng-template #data>
       <div fxLayout="column" fxLayoutAlign="space-evenly start">
         <mat-form-field appearance="outline">
@@ -169,73 +177,94 @@
           </mat-error>
         </mat-form-field>
         <div>
-          <mat-form-field *ngIf="treatmentList" appearance="outline">
-            <mat-label>{{ 'COMMON.TREATMENT.FIELD' | translate }}</mat-label>
-            <label>
-              <input (keydown)="keyDownHandler($event, treatment)" [formControl]="treatment"
-                     [matAutocomplete]="autoTreatment"
-                     matInput required type="text">
-            </label>
-            <mat-autocomplete #autoTreatment="matAutocomplete" [displayWith]="displayFnTreatment">
-              <mat-option *ngFor="let treatment of filteredTreatment | async | sortBy: 'asc':'name'"
-                          [value]="treatment">
-                {{treatment.name}}
-              </mat-option>
-            </mat-autocomplete>
-            <mat-error *ngIf="treatment.hasError('required')"
-                       [innerHTML]="'COMMON.TREATMENT.REQUIRED' | translate">
-            </mat-error>
-            <mat-error *ngIf="treatment.hasError('requireMatch')"
-                       [innerHTML]="'COMMON.TREATMENT.INVALID' | translate">
-            </mat-error>
-            <mat-error *ngIf="errors['treatment']">
-              {{errors['treatment']}}
-            </mat-error>
-          </mat-form-field>
-          <button (click)="showDiscount = !showDiscount" *ngIf="treatment.value && !isEditing && discounts?.length"
-                  class="icon-button" mat-fab extended type="button">
-            {{ 'COMMON.BUTTON.DISCOUNT.' + (showDiscount ? 'HIDE' : 'SHOW') | translate }}
-            <mat-icon>redeem</mat-icon>
-          </button>
+          <ng-template [ngIf]="treatmentList">
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'COMMON.TREATMENT.FIELD' | translate }}</mat-label>
+              <label>
+                <input (keydown)="keyDownHandler($event, treatment)" [formControl]="treatment"
+                       [matAutocomplete]="autoTreatment"
+                       matInput required type="text">
+              </label>
+              <mat-autocomplete #autoTreatment="matAutocomplete" [displayWith]="displayFnTreatment">
+                <mat-option *ngFor="let treatment of filteredTreatment | async | sortBy: 'asc':'name'"
+                            [value]="treatment">
+                  {{treatment.name}}
+                </mat-option>
+              </mat-autocomplete>
+              <mat-error *ngIf="treatment.hasError('required')"
+                         [innerHTML]="'COMMON.TREATMENT.REQUIRED' | translate">
+              </mat-error>
+              <mat-error *ngIf="treatment.hasError('requireMatch')"
+                         [innerHTML]="'COMMON.TREATMENT.INVALID' | translate">
+              </mat-error>
+              <mat-error *ngIf="errors['treatment']">
+                {{errors['treatment']}}
+              </mat-error>
+            </mat-form-field>
+          </ng-template>
+          <ng-template [ngIf]="treatment.value && !isEditing && discounts?.length">
+            <button (click)="showDiscount = !showDiscount" class="icon-button" mat-fab extended type="button">
+              {{ 'COMMON.BUTTON.DISCOUNT.' + (showDiscount ? 'HIDE' : 'SHOW') | translate }}
+              <mat-icon>redeem</mat-icon>
+            </button>
+          </ng-template>
         </div>
-        <mat-form-field *ngIf="treatment.value && showDiscount && !isEditing" appearance="outline">
-          <mat-label>{{ 'RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate }}</mat-label>
-          <mat-select [formControl]="discount">
-            <mat-option>--</mat-option>
-            <mat-option *ngFor="let cd of discounts" [value]="cd.id">{{cd.title}}</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <div *ngIf="treatment.value">
+        <ng-template [ngIf]="treatment.value && showDiscount && !isEditing">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate }}</mat-label>
+            <mat-select [formControl]="discount">
+              <mat-option>--</mat-option>
+              <mat-option *ngFor="let cd of discounts" [value]="cd.id">{{cd.title}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </ng-template>
+        <ng-template [ngIf]="treatment.value">
           <mat-list-item>
             <mat-icon matListItemIcon>home_repair_service</mat-icon>
             <div class="bold" mat-subheader>{{ 'RESERVATION.TREATMENT.DETAIL' | translate}}</div>
             <mat-divider></mat-divider>
           </mat-list-item>
           <mat-list-item>
-            <div *ngIf="treatment.value.description" [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.DESCRIPTION' |
-                  translate: {description: treatment.value.description}"
-                 mat-line>
-            </div>
-            <div *ngIf="!isEditing; else editing" mat-line>
-              <span [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.PRICE' | translate"></span>
-              <span [class.strikethrough]="discount.value"
-                    class="raised-button">{{room.value.currency | currencySymbol}} {{treatment.value.price | number:'1.2-2'}}</span>
-              <span *ngIf="price.priceWithDiscount" [@discountAnimation]
-                    class="raised-button bold">{{room.value.currency | currencySymbol}} {{price.priceWithDiscount | number:'1.2-2'}}</span>
-            </div>
-            <ng-template #editing>
-              <span [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.PRICE' | translate"></span>
-              <span
-                class="raised-button">{{room.value.currency | currencySymbol}} {{(price.priceWithDiscount ? price.priceWithDiscount : treatment.value.price) | number:'1.2-2'}}</span>
-              <span *ngIf="price.priceWithDiscount"
-                    class="raised-button bold">{{'RESERVATION.TREATMENT.DISCOUNT.ADD' | translate}}</span>
+            <ng-template [ngIf]="treatment.value.description">
+              <div [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.DESCRIPTION' |
+                  translate: {description: treatment.value.description}" mat-line>
+              </div>
             </ng-template>
-            <div [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.DURATION' |
-                  translate: {duration: treatment.value.duration | durationTime}" mat-line>
+
+            <div mat-line>
+              <ng-template [ngIf]="price.priceWithDiscount" [ngIfElse]="noDiscount">
+                <ng-template [ngIf]="!isEditing" [ngIfElse]="editing">
+                  <span [class.strikethrough]="discount.value" class="raised-button">
+                    {{room.value.currency | currencySymbol}} {{treatment.value.price | number:'1.2-2'}}
+                  </span>
+                  <span [@discountAnimation] class="raised-button bold">
+                    {{room.value.currency | currencySymbol}} {{price.priceWithDiscount | number:'1.2-2'}}
+                  </span>
+                </ng-template>
+                <ng-template #editing>
+                  <span class="raised-button">
+                    {{room.value.currency | currencySymbol}} {{price.priceWithDiscount | number:'1.2-2'}}
+                  </span>
+                  <span class="raised-button bold">{{'RESERVATION.TREATMENT.DISCOUNT.ADD' | translate}}</span>
+                </ng-template>
+              </ng-template>
+              <ng-template #noDiscount>
+                <span class="raised-button">
+                  {{room.value.currency | currencySymbol}} {{treatment.value.price | number:'1.2-2'}}
+                </span>
+              </ng-template>
             </div>
-            <div *ngIf="durability" [innerHTML]="durability" mat-line></div>
+
+            <div mat-line>
+              <span class="raised-button">
+                &#9202; {{treatment.value.duration | durationTime}}
+              </span>
+            </div>
+            <ng-template [ngIf]="durability">
+              <div [innerHTML]="durability" mat-line></div>
+            </ng-template>
           </mat-list-item>
-        </div>
+        </ng-template>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
@@ -252,9 +281,12 @@
                        checkboxPosition="before">
         <div matListItemTitle>{{it.name}}</div>
         <div matListItemLine>{{room.value.currency | currencySymbol}} {{it.price | number:'1.2-2'}}</div>
-        <div *ngIf="it.description" class="description" matListItemLine>{{it.description}}</div>
-        <div class="additional-line" matListItemLine>{{'RESERVATION.ADDITIONAL.DURATION.FIELD' | translate}}
-          : {{it.duration | durationTime}}</div>
+        <div matListItemLine>
+          <span>&#9202; {{it.duration | durationTime}}</span>
+        </div>
+        <ng-template [ngIf]="it.description">
+          <div class="description" matListItemLine>{{it.description}}</div>
+        </ng-template>
         <mat-divider></mat-divider>
       </mat-list-option>
     </mat-selection-list>
@@ -267,8 +299,9 @@
 <ng-template #stepFive>
   <form [formGroup]="configurationForm">
     <div>
-      <mat-checkbox [formControl]="customerChange"
-                    color="primary">{{ 'RESERVATION.CONFIGURATION.CUSTOMER_CHANGE.FIELD' | translate }}</mat-checkbox>
+      <mat-checkbox [formControl]="customerChange" color="primary">
+        {{ 'RESERVATION.CONFIGURATION.CUSTOMER_CHANGE.FIELD' | translate }}
+      </mat-checkbox>
     </div>
     <mat-form-field appearance="outline">
       <mat-label>{{ 'RESERVATION.CONFIGURATION.REFERENCE.FIELD' | translate }}</mat-label>
@@ -301,131 +334,153 @@
     [refresh]="refresh"
     [viewDate]="viewDate"
     [weekendDays]="weekendDays"></mwl-calendar-week-view>
-  <mat-error *ngIf="this.errors['schedule']" [innerHTML]="'RESERVATION.SCHEDULE.REQUIRED' | translate"
+  <mat-error *ngIf="errors['schedule']" [innerHTML]="'RESERVATION.SCHEDULE.REQUIRED' | translate"
              class="divider"></mat-error>
-  <mat-error *ngIf="this.errors['overlapping']" [innerHTML]="errors['overlapping']" class="divider">
+  <mat-error *ngIf="errors['overlapping']" [innerHTML]="errors['overlapping']" class="divider">
   </mat-error>
-  <mat-error *ngIf="this.errors['professional']" [innerHTML]="errors['professional']" class="divider">
+  <mat-error *ngIf="errors['professional']" [innerHTML]="errors['professional']" class="divider">
   </mat-error>
 </ng-template>
 
 <ng-template #stepSeven>
-  <mat-card appearance="outlined" *ngIf="isPreview">
-    <mat-card-header>
-      <mat-card-title>{{ 'RESERVATION.PREVIEW' | translate }}</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <mat-list>
-        <div mat-subheader>{{ 'RESERVATION.CUSTOMER.FIELD' | translate}}</div>
-        <mat-list-item>
-          <mat-icon matListItemIcon>wash</mat-icon>
-          <div matListItemLine>{{customer.value | userName}}</div>
-        </mat-list-item>
-        <mat-divider></mat-divider>
-        <div mat-subheader>{{ 'COMMON.ROOM.FIELD' | translate}}</div>
-        <mat-list-item>
-          <mat-icon matListItemIcon>store</mat-icon>
-          <div matListItemTitle>{{ 'RESERVATION.ROOM.NAME.FIELD' | translate}}</div>
-          <div matListItemLine>{{room.value | roomName}}</div>
-        </mat-list-item>
-        <mat-list-item>
-          <mat-icon matListItemIcon>person_pin</mat-icon>
-          <div matListItemTitle>{{ 'COMMON.PROFESSIONAL.FIELD' | translate}}</div>
-          <div matListItemLine>{{professional.value | userName}}</div>
-        </mat-list-item>
-        <mat-list-item>
-          <mat-icon matListItemIcon>room</mat-icon>
-          <div matListItemTitle>{{ 'COMMON.ADDRESS.FIELD' | translate}}</div>
-          <div matListItemLine class="description">
-            <a [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + room.value.address.name"
-               rel="noreferrer" target="_blank">{{room.value.address.name}}</a>
-          </div>
-          <div matListItemLine class="description">{{room.value.address.description}}</div>
-        </mat-list-item>
-        <mat-divider></mat-divider>
-        <div mat-subheader>{{ 'COMMON.TREATMENT.FIELD' | translate}}</div>
-        <mat-list-item>
-          <mat-icon matListItemIcon>home_repair_service</mat-icon>
-          <div matListItemTitle>{{ 'RESERVATION.TREATMENT.NAME.FIELD' | translate}}</div>
-          <div matListItemLine>{{treatment.value.name}}</div>
-        </mat-list-item>
-        <mat-list-item>
-          <mat-icon matListItemIcon>timer</mat-icon>
-          <div matListItemTitle>{{ 'RESERVATION.TREATMENT.DURATION.FIELD' | translate}}</div>
-          <div matListItemLine>{{duration.hour | number:'2.0-0'}}:{{duration.minute | number:'2.0-0'}}</div>
-        </mat-list-item>
-        <mat-list-item>
-          <mat-icon matListItemIcon>{{room.value.currency.icon}}</mat-icon>
-          <div matListItemTitle>{{ 'RESERVATION.TREATMENT.PRICE.FIELD' | translate}}</div>
-          <div matListItemLine><span class="bold">{{treatment.value.price | number:'1.2-2'}}</span></div>
-        </mat-list-item>
-        <div *ngIf="additionalSelected.length">
-          <mat-divider></mat-divider>
-          <div mat-subheader>{{ 'COMMON.ADDITIONAL.FIELD' | translate}}</div>
+  <ng-template [ngIf]="isPreview">
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>{{ 'RESERVATION.PREVIEW' | translate }}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-list>
+          <div mat-subheader>{{ 'RESERVATION.CUSTOMER.FIELD' | translate}}</div>
           <mat-list-item>
-            <mat-icon matListItemIcon>add_post</mat-icon>
-            <div matListItemLine>
-              <div *ngFor="let it of additionalSelected">
-                {{it.name}} - {{room.value.currency | currencySymbol}} {{it.price | number:'1.2-2'}}
-              </div>
-            </div>
+            <mat-icon matListItemIcon>wash</mat-icon>
+            <div matListItemLine>{{customer.value | userName}}</div>
           </mat-list-item>
-          <mat-list-item *ngIf="price.additional">
+          <mat-divider></mat-divider>
+          <div mat-subheader>{{ 'COMMON.ROOM.FIELD' | translate}}</div>
+          <mat-list-item>
+            <mat-icon matListItemIcon>store</mat-icon>
+            <div matListItemTitle>{{ 'RESERVATION.ROOM.NAME.FIELD' | translate}}</div>
+            <div matListItemLine>{{room.value | roomName}}</div>
+          </mat-list-item>
+          <mat-list-item>
+            <mat-icon matListItemIcon>person_pin</mat-icon>
+            <div matListItemTitle>{{ 'COMMON.PROFESSIONAL.FIELD' | translate}}</div>
+            <div matListItemLine>{{professional.value | userName}}</div>
+          </mat-list-item>
+          <mat-list-item>
+            <mat-icon matListItemIcon>room</mat-icon>
+            <div matListItemTitle>{{ 'COMMON.ADDRESS.FIELD' | translate}}</div>
+            <div matListItemLine class="description">
+              <a [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + room.value.address.name"
+                 rel="noreferrer" target="_blank">{{room.value.address.name}}</a>
+            </div>
+            <div matListItemLine class="description">{{room.value.address.description}}</div>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+          <div mat-subheader>{{ 'COMMON.TREATMENT.FIELD' | translate}}</div>
+          <mat-list-item>
+            <mat-icon matListItemIcon>home_repair_service</mat-icon>
+            <div matListItemTitle>{{ 'RESERVATION.TREATMENT.NAME.FIELD' | translate}}</div>
+            <div matListItemLine>{{treatment.value.name}}</div>
+          </mat-list-item>
+          <mat-list-item>
+            <mat-icon matListItemIcon>timer</mat-icon>
+            <div matListItemTitle>{{ 'RESERVATION.TREATMENT.DURATION.FIELD' | translate}}</div>
+            <div matListItemLine>{{treatment.value.duration | durationTime}}</div>
+          </mat-list-item>
+          <mat-list-item>
             <mat-icon matListItemIcon>{{room.value.currency.icon}}</mat-icon>
-            <div matListItemTitle>{{ 'COMMON.LABEL.PRICE' | translate}}</div>
-            <div matListItemLine>{{price.additional}}</div>
+            <div matListItemTitle>{{ 'RESERVATION.TREATMENT.PRICE.FIELD' | translate}}</div>
+            <div matListItemLine><span class="bold">{{treatment.value.price | number:'1.2-2'}}</span></div>
           </mat-list-item>
-          <mat-divider></mat-divider>
-          <mat-list-item *ngIf="price.total">
-            <mat-icon class="bold" matListItemIcon>{{room.value.currency.icon}}</mat-icon>
-            <div matListItemLine><span class="bold">{{ 'COMMON.LABEL.TOTAL' | translate}}</span></div>
-            <div *ngIf="!isEditing; else editing" matListItemLine>
-              <span [class.strikethrough]="discount.value">{{price.totalWithoutDiscount | number:'1.2-2'}}</span>
-              <span *ngIf="price.priceWithDiscount" [@discountAnimation]
-                    class="raised-button bold">{{price.total | number:'1.2-2'}}</span>
+          <ng-template [ngIf]="additionalSelected.length">
+            <mat-divider></mat-divider>
+            <div mat-subheader>{{ 'COMMON.ADDITIONAL.FIELD' | translate}}</div>
+            <div *ngFor="let it of additionalSelected">
+              <mat-list-item>
+                <mat-icon matListItemIcon>add_post</mat-icon>
+                <div matListItemTitle>
+                  {{it.name}}
+                </div>
+                <div matListItemLine>
+                  {{room.value.currency | currencySymbol}} {{it.price | number:'1.2-2'}}
+                </div>
+                <div matListItemLine>&#9202; {{it.duration | durationTime}}</div>
+              </mat-list-item>
             </div>
-            <ng-template #editing>
-              <div matListItemLine>
-                <span>{{price.total | number:'1.2-2'}}</span>
-                <span *ngIf="price.priceWithDiscount !== price.total" class="raised-button bold">
-                {{'RESERVATION.TREATMENT.DISCOUNT.ADD' | translate}}
-              </span>
-              </div>
-            </ng-template>
-          </mat-list-item>
-        </div>
-        <div *ngIf="customerChange.value">
+          </ng-template>
+          <ng-template [ngIf]="customerChange.value">
+            <mat-divider></mat-divider>
+            <div mat-subheader>{{ 'RESERVATION.CONFIGURATION.TITLE' | translate}}</div>
+            <mat-list-item>
+              <mat-icon matListItemIcon>settings</mat-icon>
+              <div matListItemTitle>{{ 'RESERVATION.CONFIGURATION.CUSTOMER_CHANGE.FIELD' | translate }}</div>
+              <ng-template [ngIf]="reference.value">
+                <div matListItemLine class="description">{{reference.value}}</div>
+              </ng-template>
+            </mat-list-item>
+          </ng-template>
           <mat-divider></mat-divider>
-          <div mat-subheader>{{ 'RESERVATION.CONFIGURATION.TITLE' | translate}}</div>
+          <div mat-subheader>{{ 'RESERVATION.APPOINTMENT' | translate}}</div>
           <mat-list-item>
-            <mat-icon matListItemIcon>settings</mat-icon>
-            <div matListItemTitle>{{ 'RESERVATION.CONFIGURATION.CUSTOMER_CHANGE.FIELD' | translate }}
-            </div>
-            <div *ngIf="reference.value" matListItemLine class="description">{{reference.value}}</div>
-          </mat-list-item>
-        </div>
-        <mat-divider></mat-divider>
-        <div mat-subheader>{{ 'RESERVATION.APPOINTMENT' | translate}}</div>
-        <mat-list-item>
-          <mat-icon matListItemIcon>event</mat-icon>
-          <div matListItemLine>
-            <div>
+            <mat-icon matListItemIcon>event</mat-icon>
+            <div matListItemTitle>
               {{event.value.start | date:'short':room.value.timeZone:dateFormat}}
-              <button (click)="openDialog(event.value?.start)" *ngIf="showTimeZone" mat-icon-button type="button">
-                <mat-icon>info_outline</mat-icon>
-              </button>
+              <ng-template [ngIf]="showTimeZone">
+                <button (click)="openDialog(event.value?.start)" mat-icon-button type="button">
+                  <mat-icon>info_outline</mat-icon>
+                </button>
+              </ng-template>
             </div>
-            <div>
+            <div matListItemLine>
               {{event.value?.end | date:'short':room.value.timeZone:dateFormat}}
-              <button (click)="openDialog(event.value?.end)" *ngIf="showTimeZone" mat-icon-button type="button">
-                <mat-icon>info_outline</mat-icon>
-              </button>
+              <ng-template [ngIf]="showTimeZone">
+                <button (click)="openDialog(event.value?.end)" mat-icon-button type="button">
+                  <mat-icon>info_outline</mat-icon>
+                </button>
+              </ng-template>
             </div>
-          </div>
-        </mat-list-item>
-      </mat-list>
-    </mat-card-content>
-  </mat-card>
+          </mat-list-item>
+          <ng-template [ngIf]="additionalSelected.length">
+            <mat-list-item>
+              <mat-icon matListItemIcon>timer</mat-icon>
+              <div matListItemTitle>{{ 'RESERVATION.TREATMENT.DURATION.FIELD' | translate}}</div>
+              <div matListItemLine>{{totalDurationFormatted}}</div>
+            </mat-list-item>
+            <ng-template [ngIf]="price.total">
+              <mat-list-item>
+                <mat-icon matListItemIcon>{{room.value.currency.icon}}</mat-icon>
+                <div matListItemTitle>{{ 'COMMON.LABEL.TOTAL' | translate}}</div>
+                <ng-template [ngIf]="price.priceWithDiscount" [ngIfElse]="noDiscount">
+                  <ng-template [ngIf]="!isEditing" [ngIfElse]="editing">
+                    <span mat-line>
+                      <span [class.strikethrough]="discount.value">
+                        {{price.totalWithoutDiscount | number:'1.2-2'}}
+                      </span>
+                      <span [@discountAnimation] class="raised-button bold">
+                        {{price.total | number:'1.2-2'}}
+                      </span>
+                    </span>
+                  </ng-template>
+                  <ng-template #editing>
+                    <span mat-line>
+                      <span>{{price.total | number:'1.2-2'}}</span>
+                      <span class="bold">
+                        {{'RESERVATION.TREATMENT.DISCOUNT.ADD' | translate}}
+                      </span>
+                    </span>
+                  </ng-template>
+                </ng-template>
+                <ng-template #noDiscount>
+                  <span mat-line>{{price.total | number:'1.2-2'}}</span>
+                </ng-template>
+              </mat-list-item>
+            </ng-template>
+          </ng-template>
+        </mat-list>
+      </mat-card-content>
+    </mat-card>
+  </ng-template>
 </ng-template>
 
 <ng-template [ngIfElse]="bigScreen" [ngIf]="smallScreen">
@@ -433,14 +488,16 @@
     <mat-step [completed]="getStepCompleted(0)" [editable]="getStepEnabled(0)" [state]="getStepName(0)"
               [stepControl]="customerForm">
       <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</ng-template>
-      <div *ngIf="!isEditing; else editing">
+      <ng-template [ngIf]="!isEditing" [ngIfElse]="editing">
         <div class="flex-container" fxLayout="column">
           <div fxLayout="column" fxLayoutAlign="space-between start">
             <div fxLayout="row" fxLayoutAlign="space-between start">
               <ng-container *ngTemplateOutlet="stepOne"></ng-container>
-              <button (click)="addCustomer" *ngIf="isAdmin" class="raised-button" color="accent" mat-mini-fab>
-                <mat-icon>person_add</mat-icon>
-              </button>
+              <ng-template [ngIf]="isAdmin">
+                <button (click)="addCustomer" class="raised-button" color="accent" mat-mini-fab>
+                  <mat-icon>person_add</mat-icon>
+                </button>
+              </ng-template>
               <div class="vertical-divider"></div>
             </div>
           </div>
@@ -454,7 +511,7 @@
             <mat-icon>arrow_downward</mat-icon>
           </button>
         </div>
-      </div>
+      </ng-template>
       <ng-template #editing>
         <div class="spinner-parent-center">
           <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
@@ -467,35 +524,41 @@
       <div class="flex-container" fxLayout="column">
         <div fxLayout="column" fxLayoutAlign="space-between start">
           <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
-          <mat-form-field *ngIf="room.value">
-            <mat-label>{{ 'RESERVATION.ROOM.DETAIL' | translate }}</mat-label>
-            <label>
-              <input [value]="roomDetail" disabled matInput type="text">
-            </label>
-          </mat-form-field>
-          <mat-form-field *ngIf="room.value && room.value.address && room.value.address.location">
-            <mat-label>{{ 'COMMON.ADDRESS.FIELD' | translate }}</mat-label>
-            <label>
-              <input [value]="room.value.address.name" disabled matInput type="text">
-            </label>
-          </mat-form-field>
-          <mat-form-field *ngIf="room.value && room.value.address && room.value.address.location">
-            <mat-label>{{ 'COMMON.ADDRESS.DESCRIPTION' | translate }}</mat-label>
-            <label>
-              <input [value]="room.value.address.description" disabled matInput type="text">
-            </label>
-          </mat-form-field>
-          <div class="vertical-divider"></div>
-          <div *ngIf="room.value && room.value.address && room.value.address.location" style="width: 400px">
-            <app-google-map (addressEmitter)="getAddress($event)" [latitudeMarker]="room.value.address.location.y"
-                            [longitudeMarker]="room.value.address.location.x"></app-google-map>
-          </div>
+          <ng-template [ngIf]="room.value">
+            <mat-form-field>
+              <mat-label>{{ 'RESERVATION.ROOM.DETAIL' | translate }}</mat-label>
+              <label>
+                <input [value]="roomDetail" disabled matInput type="text">
+              </label>
+            </mat-form-field>
+            <ng-template [ngIf]="room.value.address && room.value.address.location">
+              <mat-form-field>
+                <mat-label>{{ 'COMMON.ADDRESS.FIELD' | translate }}</mat-label>
+                <label>
+                  <input [value]="room.value.address.name" disabled matInput type="text">
+                </label>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>{{ 'COMMON.ADDRESS.DESCRIPTION' | translate }}</mat-label>
+                <label>
+                  <input [value]="room.value.address.description" disabled matInput type="text">
+                </label>
+              </mat-form-field>
+              <div class="vertical-divider"></div>
+              <div style="width: 400px">
+                <app-google-map (addressEmitter)="getAddress($event)" [latitudeMarker]="room.value.address.location.y"
+                                [longitudeMarker]="room.value.address.location.x"></app-google-map>
+              </div>
+            </ng-template>
+          </ng-template>
         </div>
       </div>
       <div class="divider">
-        <button (click)="back" *ngIf="!isEditing; else editButton" color="accent" class="icon-button" mat-fab>
-          <mat-icon>arrow_upward</mat-icon>
-        </button>
+        <ng-template [ngIf]="!isEditing" [ngIfElse]="editButton">
+          <button (click)="back" color="accent" class="icon-button" mat-fab>
+            <mat-icon>arrow_upward</mat-icon>
+          </button>
+        </ng-template>
         <ng-template #editButton>
           <button [form]="officeForm" appBackButton color="accent" class="icon-button" mat-fab type="button">
             <mat-icon>keyboard_return</mat-icon>
@@ -512,10 +575,12 @@
       <ng-template matStepLabel>{{ 'COMMON.TREATMENT.FIELD' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepThree"></ng-container>
       <div class="divider">
-        <button (click)="back" *ngIf="!isEditing || (isEditing && isAdmin); else editButton" color="accent"
-                class="icon-button" mat-fab>
-          <mat-icon>arrow_upward</mat-icon>
-        </button>
+        <ng-template [ngIf]="!isEditing || (isEditing && isAdmin)" [ngIfElse]="editButton">
+          <button (click)="back" color="accent"
+                  class="icon-button" mat-fab>
+            <mat-icon>arrow_upward</mat-icon>
+          </button>
+        </ng-template>
         <ng-template #editButton>
           <button [form]="treatmentForm" appBackButton color="accent" class="icon-button" mat-fab type="button">
             <mat-icon>keyboard_return</mat-icon>
@@ -590,71 +655,84 @@
     <mat-step [completed]="getStepCompleted(0)" [editable]="getStepEnabled(0)" [state]="getStepName(0)"
               [stepControl]="customerForm">
       <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</ng-template>
-      <div *ngIf="!isEditing; else editing">
-        <div class="flex-container" fxLayout="row" fxLayoutAlign="space-between start">
-          <ng-container *ngTemplateOutlet="stepOne"></ng-container>
-          <div class="vertical-divider"></div>
-          <button (click)="addCustomer" *ngIf="isAdmin" color="accent" class="icon-button" mat-fab extended>
-            <mat-icon>person_add</mat-icon>
-            {{ 'RESERVATION.CUSTOMER.ADD_BUTTON' | translate }}
-          </button>
-        </div>
+      <ng-template [ngIf]="!isEditing" [ngIfElse]="editing">
         <div>
-          <button [form]="customerForm" appBackButton color="accent" class="icon-button" mat-fab extended type="button">
-            <mat-icon>keyboard_return</mat-icon>
-            {{ 'COMMON.BUTTON.BACK' | translate }}
-          </button>
-          <button (click)="callStepTwo" [disabled]="customerForm.invalid" color="primary"
-                  class="icon-button" mat-fab extended type="button">
-            <mat-icon>arrow_forward</mat-icon>
-            {{ 'COMMON.BUTTON.NEXT' | translate }}
-          </button>
+          <div class="flex-container" fxLayout="row" fxLayoutAlign="space-between start">
+            <ng-container *ngTemplateOutlet="stepOne"></ng-container>
+            <div class="vertical-divider"></div>
+            <ng-template [ngIf]="isAdmin">
+              <button (click)="addCustomer" color="accent" class="icon-button" mat-fab extended>
+                <mat-icon>person_add</mat-icon>
+                {{ 'RESERVATION.CUSTOMER.ADD_BUTTON' | translate }}
+              </button>
+            </ng-template>
+          </div>
+          <div>
+            <button [form]="customerForm" appBackButton color="accent" class="icon-button" mat-fab extended
+                    type="button">
+              <mat-icon>keyboard_return</mat-icon>
+              {{ 'COMMON.BUTTON.BACK' | translate }}
+            </button>
+            <button (click)="callStepTwo" [disabled]="customerForm.invalid" color="primary"
+                    class="icon-button" mat-fab extended type="button">
+              <mat-icon>arrow_forward</mat-icon>
+              {{ 'COMMON.BUTTON.NEXT' | translate }}
+            </button>
+          </div>
         </div>
-      </div>
+      </ng-template>
       <ng-template #editing>
         <div class="spinner-parent-center">
           <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
         </div>
       </ng-template>
     </mat-step>
-    <mat-step [completed]="getStepCompleted(1)" [editable]="getStepEnabled(1)" [state]="getStepName(0)"
+    <mat-step [completed]="getStepCompleted(1)" [editable]="getStepEnabled(1)" [state]="getStepName(1)"
               [stepControl]="officeForm">
       <ng-template matStepLabel>{{ 'COMMON.ROOM.FIELD' | translate }}</ng-template>
       <div class="flex-container" fxLayout="row">
         <div fxLayout="row" fxLayoutAlign="space-between start">
           <div fxLayout="column" fxLayoutAlign="space-between start">
             <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
-            <mat-form-field *ngIf="room.value">
-              <mat-label>{{ 'RESERVATION.ROOM.DETAIL' | translate }}</mat-label>
-              <label>
-                <input [value]="roomDetail" disabled matInput type="text">
-              </label>
-            </mat-form-field>
-            <mat-form-field *ngIf="room.value && room.value.address && room.value.address.location">
-              <mat-label>{{ 'COMMON.ADDRESS.FIELD' | translate }}</mat-label>
-              <label>
-                <input [value]="room.value.address.name" disabled matInput type="text">
-              </label>
-            </mat-form-field>
-            <mat-form-field *ngIf="room.value && room.value.address && room.value.address.location">
-              <mat-label>{{ 'COMMON.ADDRESS.DESCRIPTION' | translate }}</mat-label>
-              <label>
-                <input [value]="room.value.address.description" disabled matInput type="text">
-              </label>
-            </mat-form-field>
+            <ng-template [ngIf]="room.value">
+              <mat-form-field>
+                <mat-label>{{ 'RESERVATION.ROOM.DETAIL' | translate }}</mat-label>
+                <label>
+                  <input [value]="roomDetail" disabled matInput type="text">
+                </label>
+              </mat-form-field>
+              <ng-template [ngIf]="room.value.address && room.value.address.location">
+                <mat-form-field>
+                  <mat-label>{{ 'COMMON.ADDRESS.FIELD' | translate }}</mat-label>
+                  <label>
+                    <input [value]="room.value.address.name" disabled matInput type="text">
+                  </label>
+                </mat-form-field>
+                <mat-form-field>
+                  <mat-label>{{ 'COMMON.ADDRESS.DESCRIPTION' | translate }}</mat-label>
+                  <label>
+                    <input [value]="room.value.address.description" disabled matInput type="text">
+                  </label>
+                </mat-form-field>
+              </ng-template>
+            </ng-template>
           </div>
-          <div class="vertical-divider"></div>
-          <div *ngIf="room.value && room.value.address && room.value.address.location" style="width: 400px">
-            <app-google-map (addressEmitter)="getAddress($event)" [latitudeMarker]="room.value.address.location.y"
-                            [longitudeMarker]="room.value.address.location.x"></app-google-map>
-          </div>
+          <ng-template [ngIf]="room.value && room.value.address && room.value.address.location">
+            <div class="vertical-divider"></div>
+            <div style="width: 400px">
+              <app-google-map (addressEmitter)="getAddress($event)" [latitudeMarker]="room.value.address.location.y"
+                              [longitudeMarker]="room.value.address.location.x"></app-google-map>
+            </div>
+          </ng-template>
         </div>
       </div>
       <div class="divider">
-        <button (click)="back" *ngIf="!isEditing; else editButton" color="accent" class="icon-button" mat-fab extended>
-          {{ 'COMMON.BUTTON.BACK' | translate }}
-          <mat-icon>arrow_back</mat-icon>
-        </button>
+        <ng-template [ngIf]="!isEditing" [ngIfElse]="editButton">
+          <button (click)="back" color="accent" class="icon-button" mat-fab extended>
+            {{ 'COMMON.BUTTON.BACK' | translate }}
+            <mat-icon>arrow_back</mat-icon>
+          </button>
+        </ng-template>
         <ng-template #editButton>
           <button [form]="officeForm" appBackButton color="accent" class="icon-button" mat-fab extended type="button">
             {{ 'COMMON.BUTTON.BACK' | translate }}
@@ -673,11 +751,13 @@
       <ng-template matStepLabel>{{ 'COMMON.TREATMENT.FIELD' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepThree"></ng-container>
       <div>
-        <button (click)="back" *ngIf="!isEditing || (isEditing && isAdmin); else editButton" color="accent"
-                mat-fab extended class="icon-button">
-          <mat-icon>arrow_back</mat-icon>
-          {{ 'COMMON.BUTTON.BACK' | translate }}
-        </button>
+        <ng-template [ngIf]="!isEditing || (isEditing && isAdmin)" [ngIfElse]="editButton">
+          <button (click)="back" color="accent"
+                  mat-fab extended class="icon-button">
+            <mat-icon>arrow_back</mat-icon>
+            {{ 'COMMON.BUTTON.BACK' | translate }}
+          </button>
+        </ng-template>
         <ng-template #editButton>
           <button [form]="treatmentForm" appBackButton color="accent" mat-fab extended class="icon-button"
                   type="button">
@@ -707,7 +787,7 @@
         </button>
       </div>
     </mat-step>
-    <mat-step [completed]="getStepCompleted(4)" [editable]="getStepEnabled(4)" [state]="getStepName(2)"
+    <mat-step [completed]="getStepCompleted(4)" [editable]="getStepEnabled(4)" [state]="getStepName(4)"
               [stepControl]="configurationForm">
       <ng-template matStepLabel>{{ 'RESERVATION.CONFIGURATION.TITLE' | translate }}</ng-template>
       <div class="flex-container" fxLayout="row" fxLayoutAlign="space-between start">
