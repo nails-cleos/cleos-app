@@ -211,9 +211,9 @@
       }
     },
     "TREATMENT": {
-      "FIELD": "Service",
-      "REQUIRED": "Service is <b>required</b>",
-      "INVALID": "Service is invalid",
+      "FIELD": "Treatment",
+      "REQUIRED": "Treatment is <b>required</b>",
+      "INVALID": "Treatment is invalid",
       "DURABILITY": {
         "TITLE": {
           "DIFFERENT": "<span class='bold'>Durability:</span> {{min}} to {{max}} days",
@@ -224,9 +224,9 @@
         "NONE": "-"
       },
       "GROUP": {
-        "FIELD": "Service type",
-        "REQUIRED": "Service type is <b>required</b>",
-        "INVALID": "Service type is invalid"
+        "FIELD": "Treatment type",
+        "REQUIRED": "Treatment type is <b>required</b>",
+        "INVALID": "Treatment type is invalid"
       }
     },
     "ADDITIONAL": {
@@ -262,7 +262,7 @@
           "PROFESSIONAL": "Professional",
           "START": "Start",
           "STATE": "State",
-          "TREATMENT": "Service"
+          "TREATMENT": "Tratamiento"
         },
         "ERROR": {
           "NO_CONTENT": "No reservations"

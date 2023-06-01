@@ -75,16 +75,15 @@ export const reservationDuration = (reservation?: IReservationAll): IDuration =>
   return sumDurations(durations);
 };
 
-export const totalDuration = (treatment?: ITreatmentAll, additional?: IAdditionalAll[]): IDuration => {
-  let durations: IDuration[] = [];
+export const totalDuration = (treatment: ITreatmentAll, additional?: IAdditionalAll[]) => {
+  let additionalDuration: IDuration = new Duration();
   if (additional && additional.length) {
-    durations = additional.map(value => convertDuration(value.duration));
+    additionalDuration = sumDurations(additional.map(value => convertDuration(value.duration)));
   }
-  if (treatment) {
-    durations = [...durations, convertDuration(treatment.duration)];
-  }
+  const treatmentDuration = convertDuration(treatment.duration);
+  const duration = sumDurations([treatmentDuration, additionalDuration]);
 
-  return sumDurations(durations);
+  return { additionalDuration, duration };
 };
 
 export const convertDuration = (duration: string): IDuration => {

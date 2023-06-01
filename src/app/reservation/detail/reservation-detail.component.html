@@ -100,12 +100,13 @@
       <div *ngIf="reservation.additional && reservation.additional.length">
         <mat-divider></mat-divider>
         <div mat-subheader>{{ 'COMMON.ADDITIONAL.FIELD' | translate}}</div>
-        <mat-list-item>
+        <mat-list-item *ngFor="let it of reservation.additional">
           <mat-icon matListItemIcon>add_post</mat-icon>
-          <div mat-line>
-            <div *ngFor="let it of reservation.additional">
-              {{it.name}} - {{reservation.room.currency | currencySymbol}} {{it.price | number:'1.2-2'}}
-            </div>
+          <div matListItemTitle>
+            {{it.name}}
+          </div>
+          <div matListItemLine>
+            {{reservation.room.currency | currencySymbol}} {{it.price | number:'1.2-2'}}
           </div>
         </mat-list-item>
         <mat-list-item>

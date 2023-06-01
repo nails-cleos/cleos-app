@@ -3,12 +3,13 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ITreatmentAll, ITreatmentDiscountDTO, ITreatmentGroup } from '../interfaces/treatment';
 import { PAGE_SIZE } from '../interfaces/pagination';
+import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 
 @Injectable()
 export class TreatmentService {
 
   private url = 'treatments';
-  private urlV1 = `v1/${this.url}`;
+  private urlV1 = `v1/${ this.url }`;
 
   constructor(private http: HttpClient) {
   }
@@ -22,7 +23,11 @@ export class TreatmentService {
       params = params.append('direction', direction);
     }
 
-    return this.http.get<ITreatmentGroup[]>(`${this.urlV1}/pages`, {params});
+    return this.http.get<ITreatmentGroup[]>(`${ this.urlV1 }/pages`, { params });
+  }
+
+  public getAllTreatmentGroup(): Observable<ITreatmentGroup[]> {
+    return this.http.get<ITreatmentGroup[]>(`${ this.urlV1 }/groups`);
   }
 
   public getAllTreatments(roomId: string, customerId?: string): Observable<ITreatmentDiscountDTO[]> {
@@ -30,15 +35,15 @@ export class TreatmentService {
     if (customerId) {
       params = params.append('customerId', customerId);
     }
-    return this.http.get<ITreatmentDiscountDTO[]>(this.urlV1, {params});
+    return this.http.get<ITreatmentDiscountDTO[]>(this.urlV1, { params });
   }
 
   public getTreatmentList(): Observable<ITreatmentGroup[]> {
-    return this.http.get<ITreatmentGroup[]>(`${this.urlV1}/list`);
+    return this.http.get<ITreatmentGroup[]>(`${ this.urlV1 }/list`);
   }
 
   public getById(id: string | null): Observable<ITreatmentGroup | undefined> {
-    const url = `${this.urlV1}/${id}`;
+    const url = `${ this.urlV1 }/${ id }`;
     return this.http.get<ITreatmentGroup>(url);
   }
 
@@ -47,17 +52,21 @@ export class TreatmentService {
   }
 
   public delete(id: string | null): Observable<ITreatmentGroup> {
-    const url = `${this.urlV1}/${id}`;
+    const url = `${ this.urlV1 }/${ id }`;
     return this.http.delete<ITreatmentGroup>(url);
   }
 
   public update(treatment: ITreatmentGroup): Observable<ITreatmentGroup> {
-    const url = `${this.urlV1}/${treatment.id}`;
+    const url = `${ this.urlV1 }/${ treatment.id }`;
     return this.http.patch<ITreatmentGroup>(url, treatment);
   }
 
+  public updateSort(treatment: ISorted[]): Observable<ITreatmentGroup[]> {
+    return this.http.patch<ITreatmentGroup[]>(`${ this.urlV1 }/groups`, treatment);
+  }
+
   public getHistory(id: string, treatmentId: string): Observable<ITreatmentAll[] | undefined> {
-    const url = `${this.urlV1}/${id}/treatments/${treatmentId}/histories`;
+    const url = `${ this.urlV1 }/${ id }/treatments/${ treatmentId }/histories`;
     return this.http.get<ITreatmentAll[]>(url);
   }
 }

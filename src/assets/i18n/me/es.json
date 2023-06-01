@@ -34,7 +34,7 @@
         "COMPLETE": {
           "DESCRIPTION": "<span class='bold'>Descripción:</span> {{description}}",
           "PRICE": "<span class='bold'>Price:</span>",
-          "DURATION": "<span class='bold'>Duración:</span> {{duration}}"
+          "DURATION": "<span class='bold'>Duración:</span>"
         },
         "NAME": {
           "FIELD": "Nombre"
@@ -51,11 +51,6 @@
         "REQUIRED": "Fecha es <b>requerida</b>",
         "GREATER": "La fecha debe ser mayor a hoy",
         "LESS": "La fecha debe ser menor a {{maxDate}}"
-      },
-      "ADDITIONAL": {
-        "DURATION": {
-          "FIELD": "Duración"
-        }
       },
       "SCHEDULE": {
         "FIELD": "Reservar una cita",

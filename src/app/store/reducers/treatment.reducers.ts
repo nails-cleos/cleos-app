@@ -37,6 +37,16 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
+    case TreatmentActionTypes.getAllGroup: {
+      return {
+        ...state,
+        data: null,
+        errorMessage: null,
+        subErrors: null,
+        selected: null,
+        message: null
+      };
+    }
     case TreatmentActionTypes.treatmentFind: {
       return {
         ...state,

@@ -10,7 +10,7 @@ import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } 
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IPaymentAll, PaymentType } from '../../../interfaces/payment';
 import { createTreatmentGroupService, getPrice, getTreatmentDurability, newAdditional, newExtra, newPrice } from '../../../util/helper';
-import { API_LOCALE, newDateTimestamp, getNowTimeZone, getTime, getTimeNumber } from '../../../util/dates';
+import { API_LOCALE, getNowTimeZone, getTime, getTimeNumber, newDateTimestamp } from '../../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
 import { map, startWith } from 'rxjs/operators';
 import { transitionAnimation } from '../../../util/animation';
@@ -67,6 +67,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
 
   private reservationId: any;
   private roomId: any;
+  private groupId: any;
   private customerId: any;
   private getState: Observable<any>;
   private subscription?: Subscription;
@@ -162,21 +163,29 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       this.payments = state.payments;
-      this.reservation = state.selected;
-      if (this.reservation) {
-        this.startDate = newDateTimestamp(this.reservation.startedTimestamp, this.reservation.room.timeZone);
+      if (!this.reservation && state.selected) {
+        const reservation: IReservationAll = state.selected;
+        this.startDate = newDateTimestamp(reservation.startedTimestamp, reservation.room.timeZone);
         this.startTime.setValue(getTime(this.startDate, this.translate.currentLang));
-        const endDate = newDateTimestamp(this.reservation.timestamp, this.reservation.room.timeZone);
+        const endDate = newDateTimestamp(reservation.timestamp, reservation.room.timeZone);
         this.endDate.setFullYear(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
-        this.price = getPrice(this.reservation, this.payments);
-        this.treatment.setValue(this.reservation.treatment);
-        this.additionalSelected = this.reservation.additional ? this.reservation.additional
-          .map(ad => Object.assign({}, ad, { id: ad.key })) : [];
-        this.types = [...this.reservation.room.paymentTypes, PaymentType.transfer];
+        this.price = getPrice(reservation, this.payments);
+        this.treatment.setValue(reservation.treatment);
+        this.additionalSelected = reservation.additional?.map(ad => Object.assign({}, ad, { id: ad.key })) || [];
+        this.types = [...reservation.room.paymentTypes, PaymentType.transfer];
+        this.reservation = reservation;
       }
-      if (state.treatmentDiscount) {
-        this.additionalList = state.treatmentDiscount.additionalList;
-        if (state.treatmentDiscount?.treatments && this.reservation) {
+      this.additionalList = state.additional;
+      if (this.additionalSelected?.length && this.additionalList?.length) {
+        const selectIds = this.additionalSelected?.map(value => value.id);
+        const newList = this.additionalList.filter(al => selectIds.includes(al.id));
+        if (newList.length !== this.additionalSelected.length) {
+          this.additionalSelected = newList;
+          this.price = newAdditional(this.price, this.additionalSelected, this.reservation?.treatment?.discount);
+        }
+      }
+      if (state.treatmentDiscount && !this.groupId) {
+        if (state.treatmentDiscount.treatments && this.reservation) {
           const treatmentId = this.reservation.treatment.key;
           this.groups = Array.from(createTreatmentGroupService(new Map<string, IGroupService>(), state.treatmentDiscount.treatments,
             this.reservation.room.currency.code).values());
@@ -223,6 +232,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
         }
       }
       this.durability = getTreatmentDurability(value.durabilityMin, value.durabilityMax, this.translate);
+      this.getAdditionalList(value.id);
     });
     this.treatment.valueChanges.subscribe(value => {
       if (value) {
@@ -245,9 +255,20 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   }
 
   private getTreatments(): void {
-    this.store.dispatch(
-      new fromActionsReservation.GetAllServices({ roomId: this.roomId, customerId: this.customerId })
-    );
+    if (this.roomId) {
+      this.store.dispatch(
+        new fromActionsReservation.GetAllServices({ roomId: this.roomId, customerId: this.customerId })
+      );
+    }
+  }
+
+  private getAdditionalList(groupId: string): void {
+    if (this.groupId !== groupId && this.roomId) {
+      this.groupId = groupId;
+      this.store.dispatch(
+        new fromActionsReservation.GetAllAdditional({ roomId: this.roomId, groupId })
+      );
+    }
   }
 
   private filterGroup(name: string): IGroupService[] | undefined {
