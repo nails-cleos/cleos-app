@@ -152,8 +152,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   minDate: Date;
   date?: Date;
   endDate?: Date;
-  additionalDuration?: string;
-  totalDuration?: string;
+  totalDurationFormatted?: string;
   durability?: string;
   reservationId?: string;
   showPenalty?: boolean;
@@ -235,6 +234,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       return;
     }
     this.treatmentId = this.treatment.value.id;
+    this.getAdditionalList();
     return this.completeAndNext();
   }
 
@@ -246,9 +246,8 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       this.event.setValue(undefined);
       this.time = undefined;
     }
-    this.duration = totalDuration(this.treatment.value, this.additionalSelected);
-    this.totalDuration = formatTime(this.duration, this.dateFormat);
-    this.additionalDuration = formatTime(totalDuration(undefined, this.additionalSelected), this.dateFormat);
+    const duration = totalDuration(this.treatment.value, this.additionalSelected);
+    this.totalDurationFormatted = formatTime(duration.duration, this.dateFormat);
 
     this.store.dispatch(
       new fromActionsReservation.CustomerSearchReservation({
@@ -532,6 +531,12 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     );
   }
 
+  private getAdditionalList(): void {
+    this.store.dispatch(
+      new fromActionsReservation.GetAllAdditional({ roomId: this.room.value.id, groupId: this.group.value.id })
+    );
+  }
+
   private createForm(): void {
     this.treatmentForm = this.formBuilder.group({
       treatment: this.treatment,
@@ -681,11 +686,19 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      this.additionalList = state.treatmentDiscount?.additionalList;
+      this.additionalList = state.additional;
       if (this.additionalList && this.additionalList.length) {
         const sp = this.steps[2];
         sp.enable = true;
         this.steps[2] = sp;
+        if (this.additionalSelected?.length) {
+          const selectIds = this.additionalSelected?.map(value => value.id);
+          const newList = this.additionalList.filter(al => selectIds.includes(al.id));
+          if (newList.length !== this.additionalSelected.length) {
+            this.additionalSelected = newList;
+            this.price = newAdditional(this.price, this.additionalSelected, this.reservation?.treatment?.discount);
+          }
+        }
       }
       if (state.treatmentDiscount?.treatments) {
         this.groups = Array.from(
@@ -859,38 +872,38 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private setData(reservation: IUpcomingAll): void {
     if (!this.reservation) {
-      this.completeAndNext();
-    }
-    this.reservation = reservation;
-    this.isPreview = false;
-    const date = newDateTimestamp(reservation.timestamp, this.reservation.room.timeZone);
-    this.event.setValue(date);
-    this.time = getTime(date, this.dateFormat);
-    this.room.setValue(reservation.room);
-    this.professional.setValue(reservation.professional);
-    this.startDate.setValue(date);
-    this.price = getPrice(this.reservation, this.reservation?.payments);
-    this.additionalSelected = this.reservation.additional ? this.reservation.additional
-      .map(ad => Object.assign({}, ad, { id: ad.key })) : [];
-    this.treatmentId = reservation.treatment.key;
-    this.roomId = reservation.room.id;
-    this.professionalId = reservation.professional.id;
-    if (this.isEditing) {
-      if (!this.reservation.canEdit && this.price.totalPaid < this.price.penalty) {
-        this.oldPrice = this.price;
-        this.showPenalty = true;
-        this.typeForm = this.formBuilder.group({
-          type: new UntypedFormControl(undefined),
-          bank: new UntypedFormControl('')
-        });
-        this.firstTime = true;
-        this.setTypes();
-      } else {
-        const sp = this.steps[4];
-        sp.enable = false;
-        this.steps[4] = sp;
+      this.reservation = reservation;
+      this.isPreview = false;
+      const date = newDateTimestamp(reservation.timestamp, this.reservation.room.timeZone);
+      this.event.setValue(date);
+      this.time = getTime(date, this.dateFormat);
+      this.room.setValue(reservation.room);
+      this.professional.setValue(reservation.professional);
+      this.startDate.setValue(date);
+      this.price = getPrice(this.reservation, this.reservation?.payments);
+      this.additionalSelected = this.reservation.additional ? this.reservation.additional
+        .map(ad => Object.assign({}, ad, { id: ad.key })) : [];
+      this.treatmentId = reservation.treatment.key;
+      this.roomId = reservation.room.id;
+      this.professionalId = reservation.professional.id;
+      if (this.isEditing) {
+        if (!this.reservation.canEdit && this.price.totalPaid < this.price.penalty) {
+          this.oldPrice = this.price;
+          this.showPenalty = true;
+          this.typeForm = this.formBuilder.group({
+            type: new UntypedFormControl(undefined),
+            bank: new UntypedFormControl('')
+          });
+          this.firstTime = true;
+          this.setTypes();
+        } else {
+          const sp = this.steps[4];
+          sp.enable = false;
+          this.steps[4] = sp;
+        }
+        this.getTreatmentList();
       }
-      this.getTreatmentList();
+      this.completeAndNext();
     }
   }
 

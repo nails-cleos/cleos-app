@@ -1,5 +1,4 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { IReservation, IReservationAll } from '../interfaces/reservation';
 import { getUserName } from '../util/helper';
 import { IUser, IUserAll } from '../interfaces/user';
 

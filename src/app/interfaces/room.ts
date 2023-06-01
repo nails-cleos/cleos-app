@@ -45,6 +45,8 @@ export interface IService {
   currency?: string;
   price: number;
   type: ServiceType;
+
+  order?: number;
 }
 
 export enum ServiceType {

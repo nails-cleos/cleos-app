@@ -8,6 +8,7 @@ export interface IAdditional {
   price?: number;
   duration?: string;
   durationDate?: Date;
+  groupId?: string;
 }
 
 export interface IAdditionalAll extends IService {

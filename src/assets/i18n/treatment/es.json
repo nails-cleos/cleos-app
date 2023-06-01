@@ -50,6 +50,9 @@
     },
     "UPDATED": {
       "MESSAGE": "Tratamiento {{name}} actualizado"
+    },
+    "SORTED": {
+      "MESSAGE": "Tratamientos ordenados"
     }
   }
 }

@@ -2,9 +2,30 @@
   text-align: center !important;
 }
 
+.mat-column-actions {
+  width: 20% !important;
+}
+
+.mat-column-duration {
+  width: 10% !important;
+}
+
+.mat-column-order {
+  width: 5% !important;
+}
+
 .mat-column-name {
-  flex: 0 0 55%;
-  width: 55%;
+  width: 30% !important;
+}
+
+.mat-column-description {
+  width: 35% !important;
+}
+
+td, th {
+  white-space: normal;
+  word-wrap: break-word;
+  max-width: 200px;
 }
 
 tr.detail-row {

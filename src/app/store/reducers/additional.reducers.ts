@@ -1,9 +1,11 @@
 import { Pagination } from '../../interfaces/pagination';
 import { All, AdditionalActionTypes } from '../additional.actions';
 import { IAdditional } from '../../interfaces/additional';
+import { ITreatmentGroup } from '../../interfaces/treatment';
 
 export interface State {
   data: IAdditional | Pagination<IAdditional> | null;
+  groups: ITreatmentGroup[] | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -14,6 +16,7 @@ export interface State {
 
 export const initialState: State = {
   data: null,
+  groups: null,
   errorMessage: null,
   error: null,
   subErrors: null,
@@ -32,6 +35,15 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
+        message: null
+      };
+    }
+    case AdditionalActionTypes.getAdditionalList: {
+      return {
+        ...state,
+        data: null,
+        errorMessage: null,
+        subErrors: null,
         message: null
       };
     }
@@ -92,6 +104,24 @@ export const reducer = (state = initialState, action: All): State => {
         subErrors: null,
         message: null,
         isLoading: true
+      };
+    }
+    case AdditionalActionTypes.findGroups: {
+      return {
+        ...state,
+        groups: null,
+        errorMessage: null,
+        subErrors: null,
+        message: null
+      };
+    }
+    case AdditionalActionTypes.findGroupsSuccess: {
+      return {
+        ...state,
+        groups: action.payload,
+        errorMessage: null,
+        subErrors: null,
+        message: null
       };
     }
     case AdditionalActionTypes.clean: {

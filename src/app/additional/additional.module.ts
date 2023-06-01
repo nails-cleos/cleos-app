@@ -10,12 +10,16 @@ import { EffectsModule } from '@ngrx/effects';
 import { AdditionalEffects } from '../store/effects/additional.effects';
 import { AdditionalService } from '../services/additional.service';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { TreatmentService } from '../services/treatment.service';
+import { AdditionalSortingComponent } from './sorting/additional-sorting.component';
+import { DragDropSortingComponent } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 
 @NgModule({
   declarations: [
     AdditionalComponent,
     AdditionalListComponent,
-    AdditionalDetailComponent
+    AdditionalDetailComponent,
+    AdditionalSortingComponent
   ],
   imports: [
     AdditionalRoutingModule,
@@ -28,10 +32,12 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
       isolate: false,
       extend: true
     }),
-    EffectsModule.forFeature([AdditionalEffects])
+    EffectsModule.forFeature([AdditionalEffects]),
+    DragDropSortingComponent
   ],
   providers: [
-    AdditionalService
+    AdditionalService,
+    TreatmentService
   ]
 })
 export class AdditionalModule {

@@ -25,7 +25,7 @@
       },
       "TREATMENT": {
         "DETAIL": "Detail",
-        "NO_CONTENT": "No services",
+        "NO_CONTENT": "No treatments",
         "DISCOUNT": {
           "FIELD": "Discount",
           "ADD": "With discount"
@@ -33,7 +33,7 @@
         "COMPLETE": {
           "DESCRIPTION": "<span class='bold'>Description:</span> {{description}}",
           "PRICE": "<span class='bold'>Price:</span>",
-          "DURATION": "<span class='bold'>Duration:</span> {{duration}}"
+          "DURATION": "<span class='bold'>Duration:</span>"
         },
         "NAME": {
           "FIELD": "Name"
@@ -50,11 +50,6 @@
         "REQUIRED": "Date is <b>required</b>",
         "GREATER": "Date must be greater than today",
         "LESS": "Date must be less than {{maxDate}}"
-      },
-      "ADDITIONAL": {
-        "DURATION": {
-          "FIELD": "Duration"
-        }
       },
       "SCHEDULE": {
         "FIELD": "Book an appointment",

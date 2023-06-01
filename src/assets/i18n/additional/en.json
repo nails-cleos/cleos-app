@@ -35,6 +35,9 @@
     },
     "UPDATED": {
       "MESSAGE": "Additional {{name}} updated"
+    },
+    "SORTED": {
+      "MESSAGE": "Additional list sorted"
     }
   }
 }

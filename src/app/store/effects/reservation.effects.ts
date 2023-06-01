@@ -115,7 +115,7 @@ export class ReservationEffects {
 
   getAllAdditional$ = createEffect(() => this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.getAdditional)).pipe(
     map((action: any) => action.payload),
-    switchMap(() => this.additionalService.getAllAdditional().pipe(
+    switchMap((payload: any) => this.additionalService.getAllAdditional(payload.roomId, payload.groupId).pipe(
       switchMap((response) => of(new fromActionsReservation.ReservationAdditionalSuccess(response))),
       catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({ error: err.error })))
     ))
