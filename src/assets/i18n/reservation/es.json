@@ -125,6 +125,9 @@
       "TYPE": "Forma de pago",
       "TRANSFER": {
         "FIELD": "Referencia de transferencia"
+      },
+      "UPDATE":{
+        "MESSAGE": "Pago(s) actualizado(s)"
       }
     },
     "ACTION": {

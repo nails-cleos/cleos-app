@@ -173,10 +173,27 @@
 
         <ng-container matColumnDef="type">
           <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
-          <td *matCellDef="let payment" fxHide.lt-sm fxShow mat-cell>
-            <div *ngIf="payment.id; else skeleton">
-              {{'COMMON.PAYMENT.TYPE.' + (payment.type || 'NONE') | translate}}
-            </div>
+          <td *matCellDef="let payment; let i = dataIndex;" fxHide.lt-sm fxShow mat-cell>
+            <ng-template [ngIf]="professionalId && ['CASH', 'TRANSFER'].includes(payment.type)" [ngIfElse]="noChange"
+                         [formGroup]="form">
+              <ng-container formArrayName="types">
+                <div [formGroupName]="i">
+                  <mat-form-field appearance="outline" *ngIf="payment.id; else skeleton" style="text-align: center">
+                    <mat-select formControlName="type">
+                      <mat-option *ngFor="let t of allPaymentTypes" [value]="t">
+                        {{ 'COMMON.PAYMENT.TYPE.' + (t || 'NONE') | translate }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </ng-container>
+            </ng-template>
+
+            <ng-template #noChange>
+              <div *ngIf="payment.id; else skeleton">
+                {{'COMMON.PAYMENT.TYPE.' + (payment.type || 'NONE') | translate}}
+              </div>
+            </ng-template>
             <ng-template #skeleton>
               <div class="ssc-line"></div>
             </ng-template>
@@ -231,14 +248,34 @@
         </ng-container>
 
         <ng-container matColumnDef="expandedDetail">
-          <td *matCellDef="let payment" [attr.colspan]="paymentDisplayedColumns.length" fxHide fxShow.lt-sm>
+          <td *matCellDef="let payment; let i = dataIndex;" [attr.colspan]="paymentDisplayedColumns.length" fxHide
+              fxShow.lt-sm>
             <div [@detailExpand]="payment === paymentExpanded ? 'expanded' : 'collapsed'" class="detail" fxHide
                  fxShow.lt-sm>
               <mat-list>
                 <div mat-subheader>{{ 'COMMON.COLUMN.TYPE' | translate }}</div>
-                <mat-list-item role="list">
-                  <div matListItemLine>{{'COMMON.PAYMENT.TYPE.' + (payment.type || 'NONE') | translate}}</div>
-                </mat-list-item>
+                <ng-template [ngIf]="professionalId && ['CASH', 'TRANSFER'].includes(payment.type)"
+                             [ngIfElse]="noChange" [formGroup]="form">
+                  <ng-container formArrayName="types">
+                    <div [formGroupName]="i">
+                      <mat-form-field appearance="outline" *ngIf="payment.id; else skeleton"
+                                      style="text-align: center">
+                        <mat-select formControlName="type">
+                          <mat-option *ngFor="let t of allPaymentTypes" [value]="t">
+                            {{ 'COMMON.PAYMENT.TYPE.' + (t || 'NONE') | translate }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                  </ng-container>
+                </ng-template>
+
+                <ng-template #noChange>
+                  <mat-list-item role="list">
+                    <div matListItemLine>{{'COMMON.PAYMENT.TYPE.' + (payment.type || 'NONE') | translate}}</div>
+                  </mat-list-item>
+                </ng-template>
+
               </mat-list>
               <mat-list>
                 <div mat-subheader>{{ 'PAYMENT.LIST.COLUMN.STATUS' | translate }}</div>
@@ -282,8 +319,15 @@
         <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row></tr>
         <tr *matFooterRowDef="paymentDisplayedColumns" mat-footer-row></tr>
       </table>
+      <div style="margin-top: 5px">
+        <div fxFlex></div>
+        <button [disabled]="disableUpdateButton" (click)="updatePayment" color="accent" mat-fab extended type="button">
+          {{ 'COMMON.BUTTON.UPDATE' | translate }}
+        </button>
+      </div>
     </mat-list>
     <mat-list *ngIf="history">
+      <mat-divider></mat-divider>
       <div class="divider">
         <h1>{{ 'RESERVATION.LIST.HISTORY.TITLE' | translate}}</h1>
       </div>

@@ -47,7 +47,7 @@ export class MePaymentComponent implements OnInit, OnDestroy {
     };
 
     return this.store.dispatch(
-      new fromActionsPayment.PaymentUpdate(payload)
+      new fromActionsPayment.PaymentUpdateLink(payload)
     );
   }
 
