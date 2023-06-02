@@ -239,6 +239,14 @@
       color: mat.get-color-from-palette($foreground, base);
     }
 
+    .cal-open {
+      .cal-day-number {
+        color: mat.get-color-from-palette($primary-palette) !important;
+        font-size: 2.6em !important;
+        opacity: 1 !important;
+      }
+    }
+
     .cal-out-month .cal-day-number {
       color: mat.get-color-from-palette($foreground, base);
       opacity: 1;
