@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState, selectReservationState, selectUserState } from '../../store/app.states';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, pairwise, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
 import { CancelOption, IReservationAll, States } from '../../interfaces/reservation';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -41,12 +41,12 @@ import {
 import { IPrice, PENALTY, Price } from '../../interfaces/treatment';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatFabMenu, MatFabMenuDirection } from '@angular-material-extensions/fab-menu/lib/mat-fab-menu.component';
-import { IPayment, IPaymentAll } from '../../interfaces/payment';
+import { IPayment, IPaymentAll, PaymentType } from '../../interfaces/payment';
 import { detailExpandAnimation, transitionAnimation } from '../../util/animation';
 import { isToday, isTomorrow } from 'date-fns';
 import { ReservationIconName } from '../../util/icon';
 import { DiscountDialogComponent } from '../../discount/list/discounts.component';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
 import * as fromActionsUser from '../../store/user.actions';
 import { requireMatch } from '../../util/validators';
@@ -84,10 +84,18 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   paymentDisplayedColumns: string[] = ['position', 'description', 'status', 'type', 'amount'];
   paymentExpanded?: IPayment;
 
+  allPaymentTypes: string[] = [PaymentType.cash, PaymentType.transfer];
+  professionalId?: string;
+
+  form = this.formBuilder.group({
+    types: this.formBuilder.array([])
+  });
+
+  disableUpdateButton = true;
+
   private tooltipPosition = 'below';
   private machine: any;
   private customerId?: string;
-  private professionalId?: string;
   private isLoading = false;
   private getState: Observable<any>;
   private subscription?: Subscription;
@@ -98,7 +106,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private route: ActivatedRoute,
               private store: Store<AppState>, private cdRef: ChangeDetectorRef, private router: Router,
-              private breakpointObserver: BreakpointObserver) {
+              private breakpointObserver: BreakpointObserver, private formBuilder: UntypedFormBuilder) {
     this.getState = this.store.select(selectReservationState);
     breakpointObserver.observe([
       Breakpoints.XSmall,
@@ -121,12 +129,32 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  get types(): FormArray {
+    return this.form.controls.types as FormArray;
+  }
+
   get gmt(): string {
     return getReservationGMT(this.reservation);
   }
 
   get total(): number {
     return totalPaid(this.paymentPaid);
+  }
+
+  get updatePayment(): void {
+    let payload: any = [];
+    this.paymentPaid.forEach((p: IPayment, i: number) => {
+      const type = this.types.at(i).value.type;
+      if (p.type !== type) {
+        payload = [...payload, {
+          paymentId: p.id,
+          paymentType: type
+        }];
+      }
+    });
+    return this.store.dispatch(
+      new fromActionsPayment.PaymentUpdate(payload)
+    );
   }
 
   private static createMachine(stateMachineDefinition: any, initialState: any): any {
@@ -223,12 +251,31 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       this.isLoading = state.isLoading;
       const isCustomer = this.customerId && this.customerId === state.selected?.customer?.id;
       if (state.payments && state.payments[0].id) {
-        this.paymentPaid = isCustomer ? state.payments?.map((p: IPayment) => {
-          if (p.status && !['APPROVED', 'APPROVED_REFUND', 'REFUND_PENDING', 'REFUND'].includes(p.status)) {
-            this.addActions();
+        if (isCustomer) {
+          this.paymentPaid = state.payments.map((p: IPayment) => {
+            if (p.status && !['APPROVED', 'APPROVED_REFUND', 'REFUND_PENDING', 'REFUND'].includes(p.status)) {
+              this.addActions();
+            }
+            return p;
+          }).sort((a?: IPaymentAll, b?: IPaymentAll) => b?.status && a?.status?.localeCompare(b?.status));
+        } else {
+          if (!this.types.length) {
+            let arr: any[] = [];
+            this.paymentPaid = state.payments.map((p: IPayment) => {
+              if (p.id) {
+                const typeForm = this.formBuilder.group({
+                  type: [p.type]
+                });
+                arr = [...arr, { type: p.type }];
+                this.types.push(typeForm);
+              }
+              return p;
+            });
+            this.valueChanges(arr);
+          } else {
+            this.paymentPaid = state.payments;
           }
-          return p;
-        }).sort((a?: IPaymentAll, b?: IPaymentAll) => b?.status && a?.status?.localeCompare(b?.status)) : state.payments;
+        }
       } else {
         this.paymentPaid = [];
       }
@@ -266,6 +313,14 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
           const id: string | null = this.route.snapshot.paramMap.get('id');
           this.getReservation(id);
         }
+      }
+    });
+  }
+
+  private valueChanges(arr: any[]): void {
+    this.types.valueChanges.pipe(startWith(arr), pairwise()).subscribe(([prev, next]: [any[], any[]]) => {
+      if (prev !== next) {
+        this.disableUpdateButton = false;
       }
     });
   }

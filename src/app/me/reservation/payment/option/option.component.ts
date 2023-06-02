@@ -134,8 +134,8 @@ export class OptionComponent implements OnInit, OnDestroy {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
         const reservation = state.selected[0].reservation;
-        this.types = reservation.room.paymentTypes.filter((p: PaymentType) => ![PaymentType.cash, PaymentType.transfer].includes(p));
         if (reservation) {
+          this.types = reservation.room.paymentTypes.filter((p: PaymentType) => ![PaymentType.cash, PaymentType.transfer].includes(p));
           this.price = getPrice(reservation, state.selected);
           if (this.price.toPaid === 0) {
             this.router.navigate(['/reservation', reservation.id]);

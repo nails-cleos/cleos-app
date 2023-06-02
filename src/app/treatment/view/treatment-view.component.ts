@@ -26,7 +26,7 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
 
   get edit(): void {
     return this.store.dispatch(
-      new fromActionsTreatment.TreatmentSelected({treatment: this.group, path: 'edit'})
+      new fromActionsTreatment.TreatmentSelected({ treatment: this.group, path: 'edit' })
     );
   }
 
@@ -45,7 +45,7 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
   getHistory(treatmentId?: string): void {
     this.treatmentId = treatmentId;
     this.store.dispatch(
-      new fromActionsTreatment.TreatmentHistory({id: this.group?.id, treatmentId})
+      new fromActionsTreatment.TreatmentHistory({ id: this.group?.id, treatmentId })
     );
   }
 
@@ -63,10 +63,15 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
           treatments
         } as ITreatmentGroup;
       }
-      if (state.history) {
-        const treatment = this.group?.treatments?.find(p => p.id === this.treatmentId);
+      if (state.history && this.group) {
+        this.group.treatments = this.group.treatments?.map(p => {
+          if (p.id === this.treatmentId) {
+            return Object.assign({ showHistory: true, history: state.history }, p);
+          }
+          return p;
+        });
+        const treatment = this.group.treatments?.find(p => p.id === this.treatmentId);
         if (treatment) {
-          treatment.showHistory = true;
           treatment.history = state.history;
         }
       }
@@ -77,7 +82,7 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
     if (!this.group) {
       const id = this.route.snapshot.paramMap.get('id');
       this.store.dispatch(
-        new fromActionsTreatment.TreatmentFind({id, path: 'view'})
+        new fromActionsTreatment.TreatmentFind({ id, path: 'view' })
       );
     }
   }
