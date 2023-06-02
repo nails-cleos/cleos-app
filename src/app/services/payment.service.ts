@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
-import { IPayment, IPaymentStatus, PaymentType } from '../interfaces/payment';
-import { IBank } from '../interfaces/bank';
+import { IPayment, IPaymentStatus } from '../interfaces/payment';
 import { IReservationPayment } from '../interfaces/reservation';
 
 @Injectable()
@@ -42,7 +41,11 @@ export class PaymentService {
     return this.http.post<IPayment>(`${ this.urlV1 }/reservations/${ reservationId }`, payment);
   }
 
-  public update(id: string, payment: IReservationPayment): Observable<IPayment> {
+  public update(payment: IReservationPayment[]): Observable<void> {
+    return this.http.patch<void>(this.urlV1, payment);
+  }
+
+  public updateLink(id: string, payment: IReservationPayment): Observable<IPayment> {
     return this.http.patch<IPayment>(`${ this.urlV1 }/${ id }`, payment);
   }
 

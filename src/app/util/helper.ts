@@ -186,7 +186,7 @@ export const newPrice = (price: IPrice, amount: number, discount?: IDiscount): I
   }
 
   return new Price(amount, priceDiscount, extras, additional, total, price.totalPaid, totalWithoutDiscount, priceWithDiscount,
-    priceWithExtras, priceWithAdditional);
+    priceWithExtras, priceWithAdditional, price.percentageToPaid);
 };
 
 export const newExtra = (price: IPrice, extras: number, discount?: IDiscount): IPrice => {

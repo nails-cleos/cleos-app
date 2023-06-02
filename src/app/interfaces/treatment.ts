@@ -108,7 +108,7 @@ export class Price implements IPrice {
 
   constructor(price: number = 0, discount: number = 0, extra: number = 0, additional: number = 0, total: number = 0,
               totalPaid: number = 0, totalWithoutDiscount: number = 0, priceWithDiscount: number = 0, priceWithExtras = 0,
-              priceWithAdditional = 0, percentageToPaid: number = 0) {
+              priceWithAdditional = 0, percentageToPaid: number = 100) {
     this.amount = price;
     this.discount = discount;
     this.extra = extra;
