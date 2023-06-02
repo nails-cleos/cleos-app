@@ -106,7 +106,7 @@ export class AdditionalDetailComponent implements OnInit, AfterViewInit, OnDestr
           name: state.selected.name,
           description: state.selected.description,
           duration: formatDuration(state.selected.duration),
-          groupId: state.selected.group.id
+          groupId: state.selected.group?.id
         } as IAdditional;
         this.form.patchValue(this.additional);
         this.group.setValue(state.selected.group);
