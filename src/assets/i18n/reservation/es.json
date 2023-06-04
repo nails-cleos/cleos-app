@@ -179,6 +179,9 @@
         "FIELD": "Se puede cambiar el cliente"
       }
     },
+    "NOTE": {
+      "FIELD": "Nota"
+    },
     "CANCEL": {
       "TITLE": "Cancelar la reserva",
       "FIELD": "Selecionar una opción de cancelación",
