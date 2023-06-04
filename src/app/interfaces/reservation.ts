@@ -30,6 +30,7 @@ export interface IReservation {
   review?: IReview;
   canCustomerChange?: boolean;
   reference?: string;
+  note?: string;
 
   payment?: IReservationPayment;
   startedTimestamp?: number;
@@ -57,11 +58,12 @@ export interface IReservationAll {
   history?: IReservationAll[];
   additional?: IAdditionalAll[];
   configuration?: IConfigurationReservation;
+  note?: string;
   startedTimestamp?: number;
   paymentLink?: string;
   canEdit?: boolean;
   paymentRequired?: boolean;
-  relatedReservationId: string;
+  relatedReservationId?: string;
 }
 
 export interface IConfigurationReservation {

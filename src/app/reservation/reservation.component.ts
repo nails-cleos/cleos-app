@@ -156,6 +156,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   configurationForm!: UntypedFormGroup;
   customerChange: UntypedFormControl = new UntypedFormControl();
   reference: UntypedFormControl = new UntypedFormControl();
+  note: UntypedFormControl = new UntypedFormControl();
 
   eventGroup!: UntypedFormGroup;
   event: UntypedFormControl = new UntypedFormControl('', [Validators.required]);
@@ -356,6 +357,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       reservation.start = this.event.value.start.toLocaleString(API_LOCALE);
       reservation.timeZone = getCurrentTimeZone();
       reservation.additionalIds = this.additionalSelected?.map(value => value.id);
+      reservation.canCustomerChange = this.customerChange.value;
+      reservation.reference = this.reference.value;
+      reservation.note = this.note.value;
 
       const role = this.isDashboard ? Role.roomAdmin : Role.professional;
       if (this.isEditing && this.reservation) {
@@ -371,8 +375,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         reservation.roomId = this.room.value.id;
         reservation.professionalId = this.professional.value.id;
         reservation.discountId = this.discount.value;
-        reservation.canCustomerChange = this.customerChange.value;
-        reservation.reference = this.reference.value;
         this.store.dispatch(
           new fromActionsReservation.ReservationSave({ reservation, role })
         );
@@ -416,9 +418,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
             case 1:
               const enable = !(this.isEditing && !this.isAdmin);
               value.enable = enable;
-              return value;
-            case 4:
-              value.enable = false;
               return value;
             default:
               return value;
@@ -683,7 +682,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.configurationForm = this.formBuilder.group({
       customerChange: this.customerChange,
-      reference: this.reference
+      reference: this.reference,
+      note: this.note
     });
     this.eventGroup = this.formBuilder.group({
       event: this.event
@@ -1152,6 +1152,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.treatmentId = reservation.treatment.key;
       this.roomId = reservation.room.id;
       this.professionalId = reservation.professional.id;
+      this.note.setValue(reservation.note);
       if (reservation.configuration) {
         this.reference.setValue(reservation.configuration.reference);
         this.customerChange.setValue(reservation.configuration.canCustomerChange);

@@ -1,6 +1,8 @@
 <mat-card appearance="outlined">
   <mat-card-header>
-    <mat-card-title>{{ 'RESERVATION.CUSTOMER.DETAIL' | translate }}</mat-card-title>
+    <mat-card-title>
+      {{ 'RESERVATION.CUSTOMER.DETAIL' | translate }}
+    </mat-card-title>
     <mat-card-subtitle
       *ngIf="reservation; else skeleton">{{reservation.customer | userName}}</mat-card-subtitle>
     <mat-card-subtitle
@@ -9,6 +11,7 @@
       <div class="ssc-line"></div>
     </ng-template>
   </mat-card-header>
+  <mat-divider></mat-divider>
   <mat-card-content *ngIf="reservation; else boxSkeleton">
     <ng-template [ngIf]="showFireworks">
       <div class="pyro">
@@ -16,8 +19,18 @@
         <div class="after"></div>
       </div>
     </ng-template>
-    <mat-divider></mat-divider>
+    <ng-template [ngIf]="reservation.note">
+      <mat-list class="note">
+        <div mat-subheader>{{ 'RESERVATION.NOTE.FIELD' | translate}}</div>
+        <mat-list-item>
+          <div matListItemLine>{{reservation.note}}</div>
+        </mat-list-item>
+      </mat-list>
+    </ng-template>
     <mat-list>
+      <ng-template [ngIf]="reservation.note">
+        <mat-divider></mat-divider>
+      </ng-template>
       <div mat-subheader>{{ 'COMMON.ROOM.FIELD' | translate}}</div>
       <mat-list-item>
         <mat-icon matListItemIcon>store</mat-icon>
@@ -39,6 +52,8 @@
         </div>
         <div matListItemLine class="description">{{reservation.room.address.description}}</div>
       </mat-list-item>
+    </mat-list>
+    <mat-list>
       <mat-divider></mat-divider>
       <div mat-subheader>{{ 'RESERVATION.APPOINTMENT' | translate}}</div>
       <mat-list-item>
@@ -95,7 +110,6 @@
           <div matListItemTitle>{{ 'RESERVATION.TREATMENT.EXTRAS.PRICE' | translate}}</div>
           <div matListItemLine>{{price.extra}}</div>
         </mat-list-item>
-        <mat-divider></mat-divider>
       </div>
       <div *ngIf="reservation.additional && reservation.additional.length">
         <mat-divider></mat-divider>
@@ -129,9 +143,9 @@
           </ng-template>
         </mat-list-item>
       </div>
-      <mat-divider></mat-divider>
     </mat-list>
     <mat-list *ngIf="paymentPaid && paymentPaid.length">
+      <mat-divider></mat-divider>
       <div class="divider">
         <h1>{{ 'RESERVATION.PAYMENT.TITLE' | translate}}</h1>
       </div>
@@ -434,7 +448,6 @@
       </table>
 
       <mat-paginator [pageSize]="pageSize" showFirstLastButtons></mat-paginator>
-      <mat-divider></mat-divider>
     </mat-list>
   </mat-card-content>
   <ng-template #boxSkeleton>
@@ -442,6 +455,7 @@
     <div class="ssc-square mb"></div>
     <div class="ssc-hr"></div>
   </ng-template>
+  <mat-divider></mat-divider>
   <mat-card-actions *ngIf="reservation; else buttonSkeleton">
     <div fxFlex></div>
     <button appBackButton color="accent" mat-fab extended type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>

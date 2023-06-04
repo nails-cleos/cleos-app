@@ -298,23 +298,32 @@
 
 <ng-template #stepFive>
   <form [formGroup]="configurationForm">
-    <div>
+    <div fxLayout="column" fxLayoutAlign="space-evenly start">
       <mat-checkbox [formControl]="customerChange" color="primary">
         {{ 'RESERVATION.CONFIGURATION.CUSTOMER_CHANGE.FIELD' | translate }}
       </mat-checkbox>
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'RESERVATION.CONFIGURATION.REFERENCE.FIELD' | translate }}</mat-label>
+        <label>
+          <input [formControl]="reference" [required]="customerChange.value" matInput>
+        </label>
+        <mat-error *ngIf="reference.hasError('required')"
+                   [innerHTML]="'RESERVATION.CONFIGURATION.REFERENCE.REQUIRED' | translate">
+        </mat-error>
+        <mat-error *ngIf="errors['reference']">
+          {{errors['reference']}}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'RESERVATION.NOTE.FIELD' | translate }}</mat-label>
+        <label>
+          <textarea [formControl]="note" matInput></textarea>
+        </label>
+        <mat-error *ngIf="errors['note']">
+          {{errors['note']}}
+        </mat-error>
+      </mat-form-field>
     </div>
-    <mat-form-field appearance="outline">
-      <mat-label>{{ 'RESERVATION.CONFIGURATION.REFERENCE.FIELD' | translate }}</mat-label>
-      <label>
-        <input [formControl]="reference" [required]="customerChange.value" matInput>
-      </label>
-      <mat-error *ngIf="reference.hasError('required')"
-                 [innerHTML]="'RESERVATION.CONFIGURATION.REFERENCE.REQUIRED' | translate">
-      </mat-error>
-      <mat-error *ngIf="errors['reference']">
-        {{errors['reference']}}
-      </mat-error>
-    </mat-form-field>
   </form>
 </ng-template>
 
@@ -349,6 +358,14 @@
         <mat-card-title>{{ 'RESERVATION.PREVIEW' | translate }}</mat-card-title>
       </mat-card-header>
       <mat-card-content>
+        <ng-template [ngIf]="note.value">
+          <mat-list class="note">
+            <div mat-subheader>{{ 'RESERVATION.NOTE.FIELD' | translate}}</div>
+            <mat-list-item>
+              <div matListItemLine>{{note.value}}</div>
+            </mat-list-item>
+          </mat-list>
+        </ng-template>
         <mat-list>
           <div mat-subheader>{{ 'RESERVATION.CUSTOMER.FIELD' | translate}}</div>
           <mat-list-item>

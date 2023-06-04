@@ -39,6 +39,10 @@
     border: dotted 3px mat.get-color-from-palette($background, hoverable);
   }
 
+  .note {
+    border: solid 1px mat.get-color-from-palette($warn-palette) !important;
+  }
+
   @if $isDark {
     .text-bg-created {
       background-color: #fafafa;
