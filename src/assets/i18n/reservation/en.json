@@ -179,6 +179,9 @@
         "FIELD": "Can customer change"
       }
     },
+    "NOTE": {
+      "FIELD": "Note"
+    },
     "CANCEL": {
       "TITLE": "Cancel reservation",
       "FIELD": "Select a cancellation option",
