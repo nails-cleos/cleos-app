@@ -290,11 +290,6 @@
       color: mat.get-color-from-palette($primary-palette, A100);
     }
 
-    .cal-day-badge {
-      background-color: mat.get-color-from-palette($accent-palette);
-      color: mat.get-color-from-palette($accent-palette, default-contrast);
-    }
-
     .cal-event {
       background-color: mat.get-color-from-palette($primary-palette, 600);
       color: mat.get-color-from-palette($background, background);
