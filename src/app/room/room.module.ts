@@ -8,7 +8,6 @@ import { RoomComponent } from './room.component';
 import { RoomMeComponent } from './me/room-me.component';
 import { RoomDetailComponent } from './detail/room-detail.component';
 import { AvailabilityComponent } from './availability/availability.component';
-import { MatExpansionModule } from '@angular/material/expansion';
 import { EffectsModule } from '@ngrx/effects';
 import { RoomEffects } from '../store/effects/room.effects';
 import { RoomService } from '../services/room.service';
@@ -16,7 +15,6 @@ import { UserService } from '../services/user.service';
 import { AddServiceComponent, PriceDialogComponent } from './me/add-service/add-service.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
-import { MatChipsModule } from '@angular/material/chips';
 
 @NgModule({
   declarations: [
@@ -31,7 +29,6 @@ import { MatChipsModule } from '@angular/material/chips';
   imports: [
     RoomRoutingModule,
     SharedModule,
-    MatExpansionModule,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
@@ -41,8 +38,7 @@ import { MatChipsModule } from '@angular/material/chips';
       extend: true
     }),
     EffectsModule.forFeature([RoomEffects]),
-    DragDropModule,
-    MatChipsModule
+    DragDropModule
   ],
   providers: [
     RoomService,

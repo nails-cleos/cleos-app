@@ -15,6 +15,7 @@ import { IPayment } from '../../interfaces/payment';
 import { IAdditional } from '../../interfaces/additional';
 import { IBank } from '../../interfaces/bank';
 import { IOffice } from '../../interfaces/office';
+import { IColorAll } from '../../interfaces/color';
 
 export interface State {
   data: IReservation | IRoomReservation[] | IReservation[] | ICustomerReservation | IAvailableDTO | null;
@@ -31,6 +32,7 @@ export interface State {
   payments: IPayment[] | null;
   history: IReservation[] | null;
   banks: IBank[] | null;
+  colors: IColorAll[] | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -54,6 +56,7 @@ export const initialState: State = {
   payments: null,
   history: null,
   banks: null,
+  colors: null,
   errorMessage: null,
   error: null,
   subErrors: null,
@@ -453,6 +456,24 @@ export const reducer = (state = initialState, action: All): State => {
         subErrors: null,
         message: null,
         isLoading: false
+      };
+    }
+    case ReservationActionTypes.getAllColorsByTreatmentId: {
+      return {
+        ...state,
+        colors: null,
+        errorMessage: null,
+        subErrors: null,
+        message: null
+      };
+    }
+    case ReservationActionTypes.colorsCompleteSuccess: {
+      return {
+        ...state,
+        colors: action.payload,
+        errorMessage: null,
+        subErrors: null,
+        message: null
       };
     }
     case ReservationActionTypes.clean: {

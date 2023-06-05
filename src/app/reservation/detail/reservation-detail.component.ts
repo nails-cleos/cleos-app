@@ -51,6 +51,7 @@ import { map, startWith } from 'rxjs/operators';
 import * as fromActionsUser from '../../store/user.actions';
 import { requireMatch } from '../../util/validators';
 import * as fromActionsPayment from '../../store/payment.actions';
+import { IColorAll } from '../../interfaces/color';
 
 @Component({
   selector: 'app-reservation-detail',
@@ -92,10 +93,10 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   });
 
   disableUpdateButton = true;
+  customerId?: string;
 
   private tooltipPosition = 'below';
   private machine: any;
-  private customerId?: string;
   private isLoading = false;
   private getState: Observable<any>;
   private subscription?: Subscription;
@@ -214,7 +215,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   }
 
   onChangeState(id: any): void {
-    if (['send', 'book', 'more', 'change', 'cancel', 'cancel_edit', 'notify', 'pay'].indexOf(id.toString()) >= 0 && this.reservation) {
+    const list = ['send', 'book', 'more', 'change', 'cancel', 'cancel_edit', 'notify', 'pay', 'color'];
+    if (list.indexOf(id.toString()) >= 0 && this.reservation) {
       this.machine.transition(snakeToCamel(this.reservation.state), snakeToCamel(id));
       return;
     }
@@ -370,6 +372,9 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     const more = this.createAction(translate.instant('RESERVATION.ACTION.MORE'),
       ReservationIconName.more, 'more');
 
+    const color = this.createAction(translate.instant('RESERVATION.ACTION.COLOR'),
+      ReservationIconName.color, 'color');
+
     const userPhone = reservation.customer.phone || reservation.customer.oldPhone;
 
     let approveActions: MatFabMenu[] = [];
@@ -433,6 +438,9 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     const changeCustomerTransaction = ReservationDetailComponent.createTransaction('change',
       (): void => self.changeUser(reservation));
 
+    const changeColorTransaction = ReservationDetailComponent.createTransaction('color',
+      (): void => self.changeColor(reservation));
+
     const options = Object.values(CancelOption).filter(co => co !== CancelOption.charge);
     const cancelTransaction = ReservationDetailComponent.createTransaction('cancelled', (): void =>
       self.cancel(reservation, options, self.price, result => {
@@ -475,13 +483,14 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     if (reservation.configuration?.canCustomerChange) {
       completeActions = [...completeActions, change];
     }
-    completeActions = [...completeActions, more];
+    completeActions = [...completeActions, more, color];
 
     const completed = {
       transitions: {
         book: bookTransaction,
         more: moreTransaction,
-        change: changeCustomerTransaction
+        change: changeCustomerTransaction,
+        color: changeColorTransaction
       },
       next: completeActions
     };
@@ -746,6 +755,22 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     }, true);
   }
 
+  private changeColor(reservation: IReservationAll): void {
+    const data = {
+      treatmentId: reservation.treatment.key,
+      colorId: reservation.treatment.color?.id,
+      small: this.small
+    };
+    executeDialog(this.dialog, ChangeColorDialogComponent, data, result => {
+      if (result) {
+        this.reservation = undefined;
+        this.store.dispatch(
+          new fromActionsReservation.ChangeColor({ colorId: result.colorId, reservationId: reservation.id })
+        );
+      }
+    }, true);
+  }
+
   private cancel(reservation: IReservationAll, options: string[], price: IPrice, afterClose: (result: any) => void,
                  showPenalty?: boolean): void {
     openCancel(this.dialog, reservation.room, this.small, options, afterClose, showPenalty, price);
@@ -839,5 +864,90 @@ export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsUser.Clean()
     );
+  }
+}
+
+@Component({
+  selector: 'app-change-color-dialog-component',
+  templateUrl: './change-color-dialog.component.html'
+})
+export class ChangeColorDialogComponent implements OnInit, OnDestroy {
+  colorForm!: UntypedFormGroup;
+  colors?: IColorAll[];
+  filteredColor?: Observable<IColorAll[] | undefined>;
+  color: UntypedFormControl = new UntypedFormControl('', [
+    Validators.required, requireMatch
+  ]);
+
+  private getState: Observable<any>;
+  private subscription?: Subscription;
+  private readonly treatmentId: string;
+
+  constructor(public dialogRef: MatDialogRef<DiscountDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
+              private store: Store<AppState>, private formBuilder: UntypedFormBuilder) {
+    this.getState = this.store.select(selectReservationState);
+    this.treatmentId = data.treatmentId;
+  }
+
+  get onNoClick(): void {
+    return this.dialogRef.close();
+  }
+
+  get doAction(): void {
+    return this.dialogRef.close({ colorId: this.color.value.id });
+  }
+
+  ngOnInit(): void {
+    this.createForm();
+    this.createFilters();
+    this.subscribe();
+    this.getColors();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+  }
+
+  displayFnColor(color: IColorAll): string {
+    return color ? color.name : '';
+  }
+
+  keyDownHandler(event: any): void {
+    if (event.code === 'Backspace') {
+      this.color.setValue('');
+    }
+  }
+
+  private createForm(): void {
+    this.colorForm = this.formBuilder.group({
+      color: this.color
+    });
+  }
+
+  private createFilters(): void {
+    this.filteredColor = this.color.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value.name),
+      map(name => name ? this.filterColor(name) : this.colors ? this.colors.slice() : this.colors)
+    );
+  }
+
+  private filterColor(name: string): IColorAll[] | undefined {
+    const filterValue = name.toLowerCase();
+
+    return this.colors?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
+  }
+
+  private getColors(): void {
+    this.store.dispatch(
+      new fromActionsReservation.GetAllColorsByTreatmentId(this.treatmentId)
+    );
+  }
+
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe(state => {
+      this.colors = state.colors;
+      this.color.setValue(this.colors?.find(color => color.id === this.data.colorId));
+    });
   }
 }

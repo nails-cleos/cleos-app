@@ -7,6 +7,7 @@ import { AppState, selectTreatmentState } from '../../store/app.states';
 import * as fromActionsTreatment from '../../store/treatment.actions';
 import { groupDurability } from '../../util/helper';
 import { TranslateService } from '@ngx-translate/core';
+import { IColorAll } from '../../interfaces/color';
 
 @Component({
   selector: 'app-treatment-view',
@@ -15,6 +16,7 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy {
   group?: ITreatmentGroup;
+  colors?: IColorAll[];
 
   private subscription?: Subscription;
   private getState: Observable<any>;
@@ -60,8 +62,10 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
           durability: groupDurability(state.selected, this.translate),
           durabilityMin: state.selected.durabilityMin,
           durabilityMax: state.selected.durabilityMax,
+          colors: state.selected.colors,
           treatments
         } as ITreatmentGroup;
+        this.colors = state.selected.colors;
       }
       if (state.history && this.group) {
         this.group.treatments = this.group.treatments?.map(p => {

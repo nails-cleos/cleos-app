@@ -25,6 +25,21 @@
               </label>
             </mat-form-field>
 
+            <ng-template [ngIf]="colors">
+              <div fxLayout="row" fxLayoutAlign="space-between center" id="colors" class="bottom-divider">
+                <mat-list>
+                  <div mat-subheader>{{ 'TREATMENT.COLORS' | translate }}</div>
+                  <mat-list-item>
+                    <mat-chip-listbox>
+                      <mat-chip *ngFor="let color of colors" color="accent">
+                        {{color.name}}
+                      </mat-chip>
+                    </mat-chip-listbox>
+                  </mat-list-item>
+                </mat-list>
+              </div>
+            </ng-template>
+
             <mat-accordion>
               <mat-expansion-panel *ngFor="let tab of group.treatments; let i = index" [expanded]="i === 0">
                 <mat-expansion-panel-header>

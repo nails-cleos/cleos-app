@@ -13,7 +13,6 @@ import { ChangePasswordComponent } from './change-password/change-password.compo
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ProfileComponent } from './profile/profile.component';
 import { RedirectComponent } from './redirect/redirect.component';
-import { MatTabsModule } from '@angular/material/tabs';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { NgxMatIntlTelInputComponent } from 'ngx-mat-intl-tel-input';
 import { EffectsModule } from '@ngrx/effects';
@@ -24,7 +23,7 @@ import { UserService } from '../services/user.service';
 import { TokenService } from '../services/token.service';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { NgxMatColorPickerModule } from '@angular-material-components/color-picker';
-import { GoogleSigninButtonModule } from "@abacritt/angularx-social-login";
+import { GoogleSigninButtonModule } from '@abacritt/angularx-social-login';
 
 
 @NgModule({
@@ -42,7 +41,6 @@ import { GoogleSigninButtonModule } from "@abacritt/angularx-social-login";
     imports: [
         AuthRoutingModule,
         SharedModule,
-        MatTabsModule,
         MatSlideToggleModule,
         NgxMatIntlTelInputComponent,
         TranslateModule.forChild({

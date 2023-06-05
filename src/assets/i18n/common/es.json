@@ -227,6 +227,11 @@
         "FIELD": "Tipo de tratamiento",
         "REQUIRED": "Tipo de tratamiento es <b>requerido</b>",
         "INVALID": "Tipo de tratamiento no valido"
+      },
+      "COLOR": {
+        "FIELD": "Color",
+        "INVALID": "Color no valido",
+        "ADD_BUTTON": "Agregar color"
       }
     },
     "ADDITIONAL": {

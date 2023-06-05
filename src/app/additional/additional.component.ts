@@ -84,7 +84,6 @@ export class AdditionalComponent implements OnInit, OnDestroy {
       group: this.group
     });
 
-
     this.filteredGroup = this.group.valueChanges.pipe(startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups)

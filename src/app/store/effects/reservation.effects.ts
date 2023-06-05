@@ -15,7 +15,7 @@ import { PaymentService } from '../../services/payment.service';
 import { AdditionalService } from '../../services/additional.service';
 import { newDateTimestamp } from '../../util/dates';
 import { Role } from '../../interfaces/token';
-import { OfficeService } from '../../services/office.service';
+import { ColorService } from '../../services/color.service';
 
 @Injectable()
 export class ReservationEffects {
@@ -283,6 +283,18 @@ export class ReservationEffects {
     ))
   ));
 
+  changeColor$ = createEffect(() => this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.changeColor)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.reservationService.changeColor(payload.reservationId, payload.colorId).pipe(
+      switchMap(() => of(new fromActionsReservation.StateSuccess({
+        id: payload.reservationId,
+        message: this.translate.instant('RESERVATION.STATE.CHANGE_COLOR')
+      }))), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({
+        error: err.error
+      })))
+    ))
+  ));
+
   findTracking$ = createEffect(() => this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.findTracking)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.trackingService.findByReservationId(payload.reservationId).pipe(
@@ -310,6 +322,15 @@ export class ReservationEffects {
       catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({ error: err.error })))
     ))
   ));
+
+  getAllColorsByTreatmentId$ = createEffect(() => this.actions
+    .pipe(ofType(fromActionsReservation.ReservationActionTypes.getAllColorsByTreatmentId)).pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.colorService.getAllByTreatmentId(payload).pipe(
+        switchMap((response: any) => of(new fromActionsReservation.ColorSuccess(response))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({ error: err.error })))
+      ))
+    ));
 
   selectedData$ = createEffect(() => this.actions.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.reservationSelected),
@@ -410,6 +431,6 @@ export class ReservationEffects {
               private reservationService: ReservationService, private userService: UserService,
               private treatmentService: TreatmentService, private roomService: RoomService,
               private additionalService: AdditionalService, private trackingService: TrackingService,
-              private paymentService: PaymentService) {
+              private paymentService: PaymentService, private colorService: ColorService) {
   }
 }
