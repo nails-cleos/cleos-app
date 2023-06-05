@@ -25,6 +25,9 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { LayoutModule } from '@angular/cdk/layout';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatTabsModule } from '@angular/material/tabs';
 
 const materialModules = [
   NgxMaterialTimepickerModule,
@@ -51,7 +54,10 @@ const materialModules = [
   MatRadioModule,
   MatSlideToggleModule,
   LayoutModule,
-  MatSidenavModule
+  MatSidenavModule,
+  MatChipsModule,
+  MatExpansionModule,
+  MatTabsModule
 ];
 
 @NgModule({

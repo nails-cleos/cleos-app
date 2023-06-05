@@ -17,6 +17,7 @@ import { transitionAnimation } from '../../../util/animation';
 import { IAdditionalAll } from '../../../interfaces/additional';
 import { MatListOption } from '@angular/material/list';
 import { IService } from '../../../interfaces/room';
+import { IColorAll } from '../../../interfaces/color';
 
 @Component({
   selector: 'app-reservation-complete',
@@ -62,6 +63,10 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   types: string[] = [PaymentType.cash, PaymentType.transfer];
   price: IPrice;
 
+  filteredColor?: Observable<IColorAll[] | undefined>;
+  color: UntypedFormControl = new UntypedFormControl('', [requireMatch]);
+  colors?: IColorAll[];
+
   durability?: string;
   dateFormat: string;
 
@@ -103,11 +108,12 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       const transfer = this.transfer.value;
       const startDateTime = this.startDate.toLocaleString(API_LOCALE);
       const endDateTime = this.endDate.toLocaleString(API_LOCALE);
+      const color = this.color.value?.id;
 
       this.store.dispatch(
         new fromActionsReservation.Complete({
           reservationId,
-          extras: { treatmentId, description, price, paymentType, additionalIds, transfer, startDateTime, endDateTime },
+          extras: { treatmentId, description, price, paymentType, additionalIds, transfer, startDateTime, endDateTime, color },
           isDashboard: this.isDashboard
         })
       );
@@ -138,6 +144,10 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
 
   displayFnTreatment(treatment: ITreatment): string {
     return treatment ? `${ treatment.name }` : '';
+  }
+
+  displayFnColor(color?: IColorAll): string {
+    return color ? `${ color.name }` : '';
   }
 
   keyDownHandler(event: any, form: UntypedFormControl): void {
@@ -231,6 +241,8 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
           this.treatment.setValue('');
         }
       }
+      this.colors = value.colors;
+      this.color.setValue(null);
       this.durability = getTreatmentDurability(value.durabilityMin, value.durabilityMax, this.translate);
       this.getAdditionalList(value.id);
     });
@@ -251,6 +263,12 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filterTreatment(name) : this.treatments ? this.treatments.slice() : this.treatments)
+    );
+    this.filteredColor = this.color.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value ? value.name : ''),
+      map(
+        name => name ? this.filterColor(name) : (this.colors ? this.colors.slice() : this.colors))
     );
   }
 
@@ -281,6 +299,12 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     const filterValue = name.toLowerCase();
 
     return this.treatments?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
+  }
+
+  private filterColor(name: string): IColorAll[] | undefined {
+    const filterValue = name.toLowerCase();
+
+    return this.colors?.filter(option => option?.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 
   private getReservation(): void {

@@ -53,6 +53,24 @@
                   </mat-error>
                 </mat-form-field>
               </ng-template>
+              <ng-template [ngIf]="colors">
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'COMMON.TREATMENT.COLOR.FIELD' | translate }}</mat-label>
+                  <label>
+                    <input (keydown)="keyDownHandler($event, color)" [formControl]="color"
+                           [matAutocomplete]="autoColor" matInput type="text">
+                  </label>
+                  <mat-autocomplete #autoColor="matAutocomplete" [displayWith]="displayFnColor">
+                    <mat-option *ngFor="let color of filteredColor | async" [value]="color">
+                      {{color.name}}
+                    </mat-option>
+                  </mat-autocomplete>
+                  <mat-icon matSuffix>palette</mat-icon>
+                  <mat-error *ngIf="color.hasError('requireMatch')"
+                             [innerHTML]="'COMMON.TREATMENT.COLOR.INVALID' | translate">
+                  </mat-error>
+                </mat-form-field>
+              </ng-template>
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'RESERVATION.TREATMENT.EXTRAS.DESCRIPTION' | translate }}</mat-label>
                 <label>

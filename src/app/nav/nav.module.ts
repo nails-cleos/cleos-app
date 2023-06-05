@@ -16,7 +16,6 @@ import { AuthService } from '../services/auth.service';
 import { NotificationService } from '../services/notification.service';
 import { UserService } from '../services/user.service';
 import { TokenService } from '../services/token.service';
-import { MatExpansionModule } from '@angular/material/expansion';
 import { MenuItemComponent } from './menu-item/menu-item.component';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
 
@@ -41,7 +40,6 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
       extend: true
     }),
     EffectsModule.forFeature([LoginEffects, NotificationEffects, UserEffects]),
-    MatExpansionModule
   ],
   providers: [
     AuthService,

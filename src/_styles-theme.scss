@@ -43,6 +43,10 @@
     border: solid 1px mat.get-color-from-palette($warn-palette) !important;
   }
 
+  .bottom-divider {
+    border-bottom: 1px solid mat.get-color-from-palette($background, tooltip);
+  }
+
   @if $isDark {
     .text-bg-created {
       background-color: #fafafa;
@@ -245,7 +249,7 @@
 
     .cal-open {
       .cal-day-number {
-        color: mat.get-color-from-palette($primary-palette) !important;
+        color: mat.get-color-from-palette($primary-palette, A700) !important;
         font-size: 2.6em !important;
         opacity: 1 !important;
       }

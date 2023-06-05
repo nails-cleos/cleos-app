@@ -16,7 +16,8 @@ export enum ReservationIconName {
   more = 'read_more',
   change = 'switch_account',
   cancelledPaymentRequired = 'credit_card_off',
-  editCancelled = 'edit_calendar'
+  editCancelled = 'edit_calendar',
+  color = 'palette'
 }
 
 export enum RoomIconName {

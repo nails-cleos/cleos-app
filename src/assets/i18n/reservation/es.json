@@ -74,6 +74,13 @@
       "DISCOUNT": {
         "FIELD": "Descuento",
         "ADD": "Con descuento"
+      },
+      "COLOR": {
+        "FIELD": "Color",
+        "REQUIRED": "Color es <b>requerido</b>",
+        "INVALID": "Color no valido",
+        "CHANGE": "Cambiar color",
+        "UPDATE": "Actualizar color"
       }
     },
     "DATE": {
@@ -140,7 +147,8 @@
       "BOOK": "Reservar nuevamente",
       "SEND": "Enviar Whatsapp",
       "MORE": "Más",
-      "CHANGE": "Cambiar cliente"
+      "CHANGE": "Cambiar cliente",
+      "COLOR": "Cambiar color"
     },
     "CHANGE_STATE": {
       "TITLE": "Cambio de estado",
@@ -167,7 +175,8 @@
       "FIELD": "Estado",
       "SEARCH": "Buscar por estados",
       "CANCEL": "La reserva se canceló",
-      "CHANGE_CUSTOMER": "Cliente actualizado"
+      "CHANGE_CUSTOMER": "Cliente actualizado",
+      "CHANGE_COLOR": "Color actualizado"
     },
     "CONFIGURATION": {
       "TITLE": "Configuración",

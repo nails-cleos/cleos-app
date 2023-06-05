@@ -7,7 +7,6 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { EffectsModule } from '@ngrx/effects';
 import { InvoiceEffects } from '../store/effects/invoice.effects';
 import { InvoiceService } from '../services/invoice.service';
-import { MatChipsModule } from '@angular/material/chips';
 import { OfficeService } from '../services/office.service';
 
 @NgModule({
@@ -17,7 +16,6 @@ import { OfficeService } from '../services/office.service';
   imports: [
     InvoiceRoutingModule,
     SharedModule,
-    MatChipsModule,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,

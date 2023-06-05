@@ -1,0 +1,27 @@
+{
+  "COLOR": {
+    "TITLE": "Add color",
+    "CREATED": "Color {{name}} created",
+    "DETAIL": "Update Color",
+    "LIST": {
+      "ERROR": {
+        "NO_CONTENT": "No Color"
+      }
+    },
+    "NAME": {
+      "FIELD": "Name",
+      "REQUIRED": "Name is <b>required</b>"
+    },
+    "DESCRIPTION": {
+      "FIELD": "Description"
+    },
+    "DELETED": {
+      "TITLE": "Delete Color",
+      "CONTENT": "Are you sure to delete Color {{name}}?",
+      "MESSAGE": "Color {{name}} deleted"
+    },
+    "UPDATED": {
+      "MESSAGE": "Color {{name}} updated"
+    }
+  }
+}

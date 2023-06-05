@@ -3,7 +3,6 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
 import { IAdditional, IAdditionalAll } from '../interfaces/additional';
-import { ITreatmentGroup } from '../interfaces/treatment';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 
 @Injectable()

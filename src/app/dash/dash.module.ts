@@ -19,6 +19,7 @@ import { UserService } from '../services/user.service';
 import { AdditionalService } from '../services/additional.service';
 import { TrackingService } from '../services/tracking.service';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { ColorService } from '../services/color.service';
 
 @NgModule({
   declarations: [
@@ -49,7 +50,8 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
     RoomService,
     UserService,
     AdditionalService,
-    TrackingService
+    TrackingService,
+    ColorService
   ]
 })
 export class DashModule {

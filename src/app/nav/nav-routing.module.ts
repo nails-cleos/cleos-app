@@ -38,6 +38,9 @@ const routes: Routes = [
         path: 'currency',
         loadChildren: () => import('../currency/currency.module').then(m => m.CurrencyModule)
       }, {
+        path: 'colors',
+        loadChildren: () => import('../color/color.module').then(m => m.ColorModule)
+      }, {
         path: 'me', loadChildren: () => import('../me/me.module').then(m => m.MeModule)
       }, {
         path: 'events', loadChildren: () => import('../dashboard/dashboard.module').then(m => m.DashboardModule)

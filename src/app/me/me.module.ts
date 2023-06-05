@@ -10,12 +10,10 @@ import { PaymentCompleteComponent } from './reservation/payment/complete/payment
 import { BottomSheetReferralComponent, BottomSheetShareComponent, ReferralsComponent } from './referrals/referrals.component';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
 import { ReviewDialogComponent } from './reservation/review/review-dialog.component';
-import { MatChipsModule } from '@angular/material/chips';
 import { ShareButtonsModule } from 'ngx-sharebuttons/buttons';
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { ShareIconsModule } from 'ngx-sharebuttons/icons';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatTabsModule } from '@angular/material/tabs';
 import { MatStepperModule } from '@angular/material/stepper';
 import { UpcomingComponent } from './reservation/upcoming/upcoming.component';
 import { EffectsModule } from '@ngrx/effects';
@@ -35,6 +33,7 @@ import { CurrencyService } from '../services/currency.service';
 import { CurrencyEffects } from '../store/effects/currency.effects';
 import { OptionComponent } from './reservation/payment/option/option.component';
 import { MePaymentComponent } from './payment/me-payment.component';
+import { ColorService } from '../services/color.service';
 
 @NgModule({
   declarations: [
@@ -54,12 +53,10 @@ import { MePaymentComponent } from './payment/me-payment.component';
     imports: [
         MeRoutingModule,
         SharedModule,
-        MatChipsModule,
         ShareButtonsModule,
         MatBottomSheetModule,
         ShareIconsModule,
         MatProgressBarModule,
-        MatTabsModule,
         MatStepperModule,
         TranslateModule.forChild({
             loader: {
@@ -80,7 +77,8 @@ import { MePaymentComponent } from './payment/me-payment.component';
     AdditionalService,
     TrackingService,
     DiscountService,
-    CurrencyService
+    CurrencyService,
+    ColorService
   ]
 })
 export class MeModule {

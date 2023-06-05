@@ -270,7 +270,7 @@ export const createTreatmentGroupService = (groups: Map<string, GroupService>, l
   list.forEach((treatment: ITreatmentAll) => {
     const groupId = treatment.group.id;
     const mapGroup = groups.get(groupId);
-    const keyGroup: IGroupService = mapGroup ? mapGroup : new GroupService(groupId, treatment.group.name);
+    const keyGroup: IGroupService = mapGroup ? mapGroup : new GroupService(groupId, treatment.group.name, treatment.group.colors);
 
     treatment = Object.assign({}, treatment, { currency, type: ServiceType.treatment });
 

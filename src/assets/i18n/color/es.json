@@ -1,0 +1,27 @@
+{
+  "COLOR": {
+    "TITLE": "Agregar color",
+    "CREATED": "Color {{name}} creado",
+    "DETAIL": "Actualizar color",
+    "LIST": {
+      "ERROR": {
+        "NO_CONTENT": "No hay colores"
+      }
+    },
+    "NAME": {
+      "FIELD": "Nombre",
+      "REQUIRED": "Nombre es <b>requerido</b>"
+    },
+    "DESCRIPTION": {
+      "FIELD": "Descripción"
+    },
+    "DELETED": {
+      "TITLE": "Eliminar color",
+      "CONTENT": "¿Está seguro de eliminar color {{name}}?",
+      "MESSAGE": "Color {{name}} eliminado"
+    },
+    "UPDATED": {
+      "MESSAGE": "Color {{name}} actualizado"
+    }
+  }
+}

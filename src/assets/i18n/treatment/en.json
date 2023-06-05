@@ -3,6 +3,7 @@
     "TITLE": "Add treatments",
     "CREATED": "Treatment {{name}} created",
     "DETAIL": "Update treatments",
+    "COLORS": "Colors",
     "LIST": {
       "COLUMN": {
         "DURABILITY": "Durability",
@@ -39,6 +40,9 @@
       "MAX": {
         "FIELD": "Durability maximum"
       }
+    },
+    "COLOR": {
+      "FIELD": "Color"
     },
     "PRIMARY": {
       "CHECK": "Primary"

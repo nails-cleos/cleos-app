@@ -31,6 +31,7 @@ export enum ReservationActionTypes {
   cancel = '[Reservation] Cancel',
   customerCancel = '[Reservation] Customer cancel',
   changeCustomer = '[Reservation] Change customer reservation',
+  changeColor = '[Reservation] Change color reservation',
   stateSuccess = '[Reservation] State success',
   reservationSuccess = '[Reservation] Success',
   reservationPageSuccess = '[Reservation] Page Success',
@@ -47,6 +48,8 @@ export enum ReservationActionTypes {
   trackingSuccess = '[Reservation] Tracking success',
   reservationFailure = '[Reservation] Failure',
   reservationCompleteSuccess = '[Reservation] Complete success',
+  getAllColorsByTreatmentId = '[Reservation] Get all colors by treatment id',
+  colorsCompleteSuccess = '[Reservation] Colors complete success',
   clean = '[Reservation] Clean'
 }
 
@@ -363,6 +366,27 @@ export class ChangeCustomer implements Action {
   }
 }
 
+export class ChangeColor implements Action {
+  readonly type = ReservationActionTypes.changeColor;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class GetAllColorsByTreatmentId implements Action {
+  readonly type = ReservationActionTypes.getAllColorsByTreatmentId;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class ColorSuccess implements Action {
+  readonly type = ReservationActionTypes.colorsCompleteSuccess;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class Clean implements Action {
   readonly type = ReservationActionTypes.clean;
 }
@@ -414,4 +438,6 @@ export type All =
   | ReservationReview
   | ReservationCompleteSuccess
   | ChangeCustomer
+  | GetAllColorsByTreatmentId
+  | ColorSuccess
   | Clean;
