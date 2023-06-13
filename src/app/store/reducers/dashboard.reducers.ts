@@ -1,9 +1,10 @@
 import { All, DashboardActionTypes } from '../dashboard.actions';
-import { IDashboard, IRoomEvents } from '../../interfaces/dashboard';
+import { IDashboard, IMonthlyRoom, IMonthlySummary, IMonthlySummaryReservation, IRoomEvents } from '../../interfaces/dashboard';
 
 export interface State {
   data: Map<string, IDashboard>;
   dashboard: IRoomEvents | null;
+  monthlySummaryMap: Map<IMonthlyRoom, IMonthlySummaryReservation[]> | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -14,6 +15,7 @@ export interface State {
 const initialState: State = {
   data: new Map<string, IDashboard>(),
   dashboard: null,
+  monthlySummaryMap: null,
   errorMessage: null,
   error: null,
   subErrors: null,
@@ -23,7 +25,7 @@ const initialState: State = {
 
 const merge = (a: IDashboard, b: IDashboard) => {
   const res = {};
-  Object.keys({...a, ...b}).map(key => {
+  Object.keys({ ...a, ...b }).map(key => {
     // @ts-ignore
     res[key] = b[key] || a[key];
   });
@@ -32,7 +34,7 @@ const merge = (a: IDashboard, b: IDashboard) => {
 
 const getMap = (a: Map<string, IDashboard>, b: IDashboard) => {
   const res = a;
-  Object.keys({...a, ...b}).map(key => {
+  Object.keys({ ...a, ...b }).map(key => {
     // @ts-ignore
     const data = b[key];
     const dashKey = data.roomName || data.professionalName;
@@ -61,6 +63,11 @@ const cleanCardMap = (data: Map<string, IDashboard>): Map<string, IDashboard> =>
   return data;
 };
 
+const monthSummaryMap = (summaries: IMonthlySummary[]) => summaries.reduce((map, summary) => {
+  map.set({ roomName: summary.roomName, currency: summary.currency, timeZone: summary.timeZone }, summary.reservationSummary);
+  return map;
+}, new Map<IMonthlyRoom, IMonthlySummaryReservation[]>());
+
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
     case DashboardActionTypes.dashEvents: {
@@ -77,7 +84,7 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         // @ts-ignore
-        dashboard: {availability: {}},
+        dashboard: { availability: {} },
         errorMessage: null,
         error: null,
         subErrors: null,
@@ -124,6 +131,26 @@ export const reducer = (state = initialState, action: All): State => {
         subErrors: action.payload.error.subErrors,
         message: null,
         isLoading: false
+      };
+    }
+    case DashboardActionTypes.dashSummary: {
+      return {
+        ...state,
+        monthlySummaryMap: null,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: null
+      };
+    }
+    case DashboardActionTypes.dashSummarySuccess: {
+      return {
+        ...state,
+        monthlySummaryMap: monthSummaryMap(action.payload),
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: null
       };
     }
     case DashboardActionTypes.clean: {

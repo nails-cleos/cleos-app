@@ -1,0 +1,131 @@
+<div fxLayout="column" fxLayoutAlign="space-around center">
+  <mat-form-field>
+    <mat-label>{{'SUMMARY.MONTHLY.SELECT.DATE' | translate}}</mat-label>
+    <input matInput [matDatepicker]="dp" [formControl]="date">
+    <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
+    <mat-datepicker #dp startView="year" (monthSelected)="setMonthAndYear($event, dp)">
+    </mat-datepicker>
+  </mat-form-field>
+</div>
+<div fxLayout="column" fxLayoutAlign="space-around stretch">
+  <mat-form-field appearance="outline" *ngIf="monthlySummaryMap?.size" class="full-select">
+    <mat-select [formControl]="selectedRoom">
+      <mat-option *ngFor="let monthlySummary of monthlySummaryMap | keyvalue" [value]="monthlySummary.key">
+        {{monthlySummary.key.roomName}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
+<ng-template #paymentTemplate let-payment='payment' let-currency='currency' let-summaryId='summaryId' let-index='index'>
+  <td>
+    <mat-form-field class="amount" appearance="outline" *ngIf="showInput">
+      <input matInput [value]="(payment.total || 0) | number:'1.2-2'" appTwoDigits #total id="totalInput"
+             (focusin)="total.select()" (focusout)="twoDigit(total, summaryId, index)">
+      <mat-icon matPrefix>{{currency}}</mat-icon>
+    </mat-form-field>
+    <span *ngIf="!showInput">{{payment.total || 0}}</span>
+  </td>
+  <td>
+    <mat-form-field class="amount" appearance="outline" *ngIf="showInput">
+      <input matInput [value]="(payment.excBTW || 0) | number:'1.2-2'" appTwoDigits #excBTW id="excBTWInput"
+             (focusin)="excBTW.select()" (focusout)="twoDigit(excBTW, summaryId, index)">
+      <mat-icon matPrefix>{{currency}}</mat-icon>
+    </mat-form-field>
+    <span *ngIf="!showInput">{{payment.excBTW || 0}}</span>
+  </td>
+  <td>
+    <mat-form-field class="amount" appearance="outline" *ngIf="showInput">
+      <input matInput [value]="(payment.btw || 0) | number:'1.2-2'" appTwoDigits #btw id="btwInput"
+             (focusin)="btw.select()" (focusout)="twoDigit(btw, summaryId, index)">
+      <mat-icon matPrefix>{{currency}}</mat-icon>
+    </mat-form-field>
+    <span *ngIf="!showInput">{{payment.btw || 0}}</span>
+  </td>
+  <td
+    [ngClass]="(payment.type || 'PENDING').toLowerCase()">{{'COMMON.PAYMENT.TYPE.' + (payment.type || 'PENDING') | translate}}</td>
+</ng-template>
+
+
+<div>
+  <table #tableData id="tableData">
+    <colgroup>
+      <col id="id" style="width:4%">
+      <col id="date" style="width:10%">
+      <col id="customer" style="width:10%">
+      <col id="treatment" style="width:9%">
+      <col id="discount" style="width:7%">
+      <col id="total" style="width:15%">
+      <col id="exclBTW" style="width:15%">
+      <col id="btw" style="width:15%">
+      <col id="type" style="width:8%">
+      <col id="color" style="width:7%">
+    </colgroup>
+    <thead>
+    <tr>
+      <th mat-subheader></th>
+      <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.DATE' | translate}}</th>
+      <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.CUSTOMER' | translate}}</th>
+      <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.TREATMENT' | translate}}</th>
+      <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.DISCOUNT' | translate}}</th>
+      <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.TOTAL' | translate}}</th>
+      <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.EXC_BTW' | translate}}</th>
+      <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.BTW' | translate}}</th>
+      <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.PAYMENT_TYPE' | translate}}</th>
+      <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.COLOR' | translate}}</th>
+    </tr>
+    </thead>
+    <tbody *ngFor="let week of weeks; let i = index">
+    <tr>
+      <td mat-subheader class="week text-center" [colSpan]="10"
+          [innerHTML]="'SUMMARY.MONTHLY.TABLE.WEEK' | translate:{number: i+1}"></td>
+    </tr>
+    <ng-template [ngIf]="summaries?.length">
+      <tr *ngFor="let summary of summaries | filterByDay:week.dates" class="summary-row">
+        <td [rowSpan]="summary.total.payments.length || 1">
+          <button mat-icon-button [routerLink]="['/reservation', summary.id]">
+            <mat-icon>visibility</mat-icon>
+          </button>
+        </td>
+        <td [rowSpan]="summary.total.payments.length || 1">
+          {{(summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat)?.replace(',', '')}}
+        </td>
+        <td [rowSpan]="summary.total.payments.length || 1">{{summary.customerName}}</td>
+        <td [rowSpan]="summary.total.payments.length || 1">{{summary.treatmentName}}</td>
+        <td [rowSpan]="summary.total.payments.length || 1">
+          {{summary.total.discountType | discount:summary.total.discountValue:summary.currency}}
+        </td>
+        <ng-template [ngIf]="summary.total.payments.length" [ngIfElse]="noPaid">
+          <ng-container *ngFor="let payment of summary.total.payments; let i = index"
+                        [ngTemplateOutlet]="paymentTemplate"
+                        [ngTemplateOutletContext]="{payment: payment, currency: selectedRoom.value.currency.icon, summaryId: summary.id, index: i}">
+          </ng-container>
+        </ng-template>
+        <ng-template #noPaid>
+          <ng-container [ngTemplateOutlet]="paymentTemplate"
+                        [ngTemplateOutletContext]="{payment: summary.total, currency: selectedRoom.value.currency.icon, summaryId: summary.id}">
+          </ng-container>
+        </ng-template>
+        <td [rowSpan]="summary.total.payments.length || 1">{{summary.color}}</td>
+      </tr>
+    </ng-template>
+    </tbody>
+    <tfoot>
+    <tr *ngIf="selectedRoom.value">
+      <td mat-subheader [colSpan]="5">{{'SUMMARY.MONTHLY.TABLE.TOTALS' | translate}}</td>
+      <td mat-subheader>{{totalMonth | currency:selectedRoom.value.currency.code:'symbol':'1.2-2' }}</td>
+      <td mat-subheader>{{excBTWMonth | currency:selectedRoom.value.currency.code:'symbol':'1.2-2'}}</td>
+      <td mat-subheader>{{btwMonth | currency:selectedRoom.value.currency.code:'symbol':'1.2-2'}}</td>
+      <td mat-subheader [colSpan]="2"></td>
+    </tr>
+    </tfoot>
+  </table>
+</div>
+
+<div class="top-space">
+  <div fxFlex></div>
+  <button fxHide.lt-sm fxShow (click)="exportCVS" color="accent" mat-fab extended>
+    <mat-icon>file_download</mat-icon>
+    <span>{{'COMMON.BUTTON.EXPORT' | translate}}</span>
+  </button>
+</div>

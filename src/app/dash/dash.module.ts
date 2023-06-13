@@ -20,12 +20,14 @@ import { AdditionalService } from '../services/additional.service';
 import { TrackingService } from '../services/tracking.service';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { ColorService } from '../services/color.service';
+import { MonthSummaryComponent } from './month-summary/month-summary.component';
 
 @NgModule({
   declarations: [
     DashComponent,
     MiniCardComponent,
-    ReservationTableComponent
+    ReservationTableComponent,
+    MonthSummaryComponent
   ],
   imports: [
     DashRoutingModule,

@@ -43,6 +43,14 @@ export class DashboardEffects {
     ))
   ));
 
+  getSummary$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.dashSummary)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.dashboardService.getSummary(payload).pipe(
+      switchMap((response: any) => of(new fromActionsDashboard.GetSummarySuccess(response ? response : []))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({error: err.error})))
+    ))
+  ));
+
   dataSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsDashboard.DashboardActionTypes.dashSuccess)
   ), {dispatch: false});

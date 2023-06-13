@@ -1,0 +1,53 @@
+.amount {
+  width: 100% !important;
+
+  input {
+    flex: 0 0 auto;
+    text-align: right;
+    width: 100%;
+  }
+}
+
+#tableData {
+  border-collapse: collapse;
+  border-spacing: 0;
+
+  table-layout: fixed;
+  width: 100%;
+
+  #id {
+    width: 4%;
+  }
+
+  #customer, #date, #treatment {
+    width: 10%;
+  }
+
+  #discount, #color, #type {
+    width: 7%;
+  }
+
+  #total, #exclBTW,#btw {
+    width: 15%;
+  }
+
+  td, th {
+    padding: 0 0.2rem 0 0.2rem;
+    //display: flex;
+    align-items: center;
+    //flex: 0 0 auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    column-width: auto;
+  }
+
+  td:not(.week) {
+    height: 56px;
+  }
+
+  td:not(.amount) {
+    text-align: center;
+  }
+}
+

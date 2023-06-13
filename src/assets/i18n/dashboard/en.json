@@ -40,5 +40,25 @@
       "ELAPSED": "<div>Elapsed {elapsedText}</div>",
       "FINISH_IN": "<div>Finish in {finishText}</div>"
     }
+  },
+  "SUMMARY": {
+    "MONTHLY": {
+      "SELECT": {
+        "DATE": "Month and Year"
+      },
+      "TABLE": {
+        "WEEK": "Week {{number}}",
+        "DATE": "Date",
+        "CUSTOMER": "Customer",
+        "TREATMENT": "Treatment",
+        "DISCOUNT": "Discount",
+        "TOTAL": "Total",
+        "EXC_BTW": "Net",
+        "BTW": "BTW",
+        "PAYMENT_TYPE": "Type",
+        "COLOR": "Color",
+        "TOTALS": "Totals"
+      }
+    }
   }
 }
