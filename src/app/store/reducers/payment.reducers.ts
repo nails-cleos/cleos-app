@@ -52,6 +52,7 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         data: {} as IPayment,
+        isLoading: true,
         errorMessage: null,
         subErrors: null,
         selected: null,
@@ -62,6 +63,7 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         data: action.payload,
+        isLoading: false,
         errorMessage: null,
         subErrors: null,
         message: null
