@@ -55,6 +55,7 @@
       "SELECT": "Seleccionar usuario para unir",
       "NAME": "<b>Nombre:</b> {{name}}",
       "EMAIL": "<b>Email:</b> {{email}}",
+      "SUCCESS": "Usuario fusionado",
       "OLD_USER": {
         "TITLE": "Usuario viejo",
         "FIELD": "Usuario viejo",

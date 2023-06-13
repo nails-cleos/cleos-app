@@ -1,6 +1,7 @@
 <ng-template #stepOne>
   <ng-template [ngIf]="reservation" [ngIfElse]="noReservation">
-    <app-bank [firstTime]="first" [formGroup]="typeForm" [types]="types" [professionalName]="professionalName"></app-bank>
+    <app-bank [firstTime]="first" [formGroup]="typeForm" [types]="types"
+              [professionalName]="professionalName" (percentageEmitter)="getPercentage($event)"></app-bank>
   </ng-template>
 
   <ng-template #noReservation>
@@ -11,7 +12,7 @@
 </ng-template>
 
 <ng-template #stepTwo>
-  <mat-card appearance="outlined" *ngIf="payment && payment.id; else skeleton">
+  <mat-card appearance="outlined" *ngIf="reservation && price; else skeleton">
     <mat-card-header>
       <mat-card-title>{{ 'ME.RESERVATION.PREVIEW' | translate }}</mat-card-title>
     </mat-card-header>
@@ -34,17 +35,17 @@
         <mat-list-item>
           <mat-icon matListItemIcon>home_repair_service</mat-icon>
           <div mat-line>{{ 'ME.RESERVATION.TREATMENT.NAME.FIELD' | translate}}</div>
-          <div mat-line>{{payment.reservation?.treatment?.name}}</div>
+          <div mat-line>{{reservation.treatment.name}}</div>
         </mat-list-item>
         <mat-list-item>
           <mat-icon matListItemIcon>timer</mat-icon>
           <div mat-line>{{ 'ME.RESERVATION.TREATMENT.DURATION.FIELD' | translate}}</div>
-          <div mat-line>{{payment.reservation?.treatment?.duration | durationTime}}</div>
+          <div mat-line>{{reservation.treatment.duration | durationTime}}</div>
         </mat-list-item>
         <mat-list-item>
-          <mat-icon matListItemIcon>{{payment.reservation?.room?.currency?.icon}}</mat-icon>
+          <mat-icon matListItemIcon>{{reservation.room.currency.icon}}</mat-icon>
           <div mat-line><span class="bold">{{ 'COMMON.LABEL.TOTAL' | translate}}</span></div>
-          <div mat-line><span class="bold">{{payment.amount}}</span></div>
+          <div mat-line><span class="bold">{{price.toPaid}}</span></div>
         </mat-list-item>
       </mat-list>
     </mat-card-content>
@@ -82,7 +83,7 @@
         <button (click)="back" class="icon-button" color="accent" mat-mini-fab>
           <mat-icon>arrow_upward</mat-icon>
         </button>
-        <button (click)="pay" class="icon-button" [disabled]="!payment?.id" color="primary" mat-mini-fab
+        <button (click)="pay" class="icon-button" color="primary" mat-mini-fab
                 type="button">
           <mat-icon>credit_score</mat-icon>
         </button>
@@ -121,7 +122,7 @@
         <button (click)="back" color="accent" mat-fab extended>
           <mat-icon>arrow_back</mat-icon>
           {{ 'COMMON.BUTTON.BACK' | translate }}</button>
-        <button (click)="pay" [disabled]="!payment?.id" class="raised-button" color="primary" mat-fab extended
+        <button (click)="pay" class="raised-button" color="primary" mat-fab extended
                 type="button">
           {{ 'COMMON.BUTTON.PAYMENT' | translate }}
           <mat-icon>credit_score</mat-icon>
