@@ -47,6 +47,21 @@
     border-bottom: 1px solid mat.get-color-from-palette($background, tooltip);
   }
 
+  .week {
+    background-color: mat.get-color-from-palette($primary-palette, A700) !important;
+    color: black;
+  }
+
+  #tableData {
+    th, td {
+      border: 1px solid mat.get-color-from-palette($primary-palette) !important;
+    }
+
+    tr:hover {
+      background-color: mat.get-color-from-palette($background, hover);
+    }
+  }
+
   @if $isDark {
     .text-bg-created {
       background-color: #fafafa;
@@ -438,6 +453,10 @@
       color: #44A244;
     }
 
+    tr:has(.cash) {
+      background-color: #44A244 !important;
+    }
+
     .cash {
       background-color: #44A244 !important;
 
@@ -467,6 +486,10 @@
     .stamp-paid {
       box-shadow: 0 0 0 3px #90EE90, 0 0 0 2px #90EE90 inset;
       color: #90EE90;
+    }
+
+    tr:has(.cash) {
+      background-color: #90EE90 !important;
     }
 
     .cash {

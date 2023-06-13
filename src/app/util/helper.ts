@@ -323,12 +323,17 @@ export const roomGMT = (room: IRoom | IRoomAll): string => {
   return tz.gmt ? ` - (${ tz.gmt })` : '';
 };
 
-export const currencySymbol = (currency: ICurrency | string): string => {
+export const currencySymbol = (currency?: ICurrency | string): string => {
+  if (!currency) {
+    return '';
+  }
   if (typeof currency === 'string') {
     switch (currency) {
       case 'EUR':
+      case 'euro':
         return '€';
       case 'GBP':
+      case 'currency_pound':
         return '£';
       default:
         return '$';

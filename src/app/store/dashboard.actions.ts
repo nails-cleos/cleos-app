@@ -8,6 +8,8 @@ export enum DashboardActionTypes {
   dashboardEvents = '[Dashboard] Get events',
   eventSuccess = '[Dashboard] Event success',
   updateEvent = '[Dashboard] Update event',
+  dashSummary = '[Dash] Get summary',
+  dashSummarySuccess = '[Dash] Summary success',
   clean = '[Dash] Clean'
 }
 
@@ -60,6 +62,20 @@ export class UpdateEvent implements Action {
   }
 }
 
+export class GetSummary implements Action {
+  readonly type = DashboardActionTypes.dashSummary;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class GetSummarySuccess implements Action {
+  readonly type = DashboardActionTypes.dashSummarySuccess;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class Clean implements Action {
   readonly type = DashboardActionTypes.clean;
 }
@@ -72,4 +88,6 @@ export type All =
   | GetDashboardEvents
   | EventSuccess
   | UpdateEvent
+  | GetSummary
+  | GetSummarySuccess
   | Clean;
