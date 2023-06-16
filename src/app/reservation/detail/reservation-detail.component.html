@@ -97,6 +97,13 @@
         <div matListItemTitle>{{ 'RESERVATION.TREATMENT.PRICE.FIELD' | translate}}</div>
         <div matListItemLine><span class="bold">{{price.amount}}</span></div>
       </mat-list-item>
+      <ng-template [ngIf]="!customerId && reservation.treatment.color">
+        <mat-list-item>
+          <mat-icon matListItemIcon>palette</mat-icon>
+          <div matListItemTitle>{{ 'COMMON.TREATMENT.COLOR.FIELD' | translate}}</div>
+          <div matListItemLine><span class="bold">{{reservation.treatment.color.name}}</span></div>
+        </mat-list-item>
+      </ng-template>
       <div *ngIf="reservation.treatment.extras">
         <mat-divider></mat-divider>
         <div mat-subheader>{{ 'RESERVATION.TREATMENT.EXTRAS.TITLE' | translate}}</div>

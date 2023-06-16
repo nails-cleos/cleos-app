@@ -270,7 +270,7 @@ export const createTreatmentGroupService = (groups: Map<string, GroupService>, l
   list.forEach((treatment: ITreatmentAll) => {
     const groupId = treatment.group.id;
     const mapGroup = groups.get(groupId);
-    const keyGroup: IGroupService = mapGroup ? mapGroup : new GroupService(groupId, treatment.group.name);
+    const keyGroup: IGroupService = mapGroup ? mapGroup : new GroupService(groupId, treatment.group.name, treatment.group.colors);
 
     treatment = Object.assign({}, treatment, { currency, type: ServiceType.treatment });
 
@@ -323,12 +323,17 @@ export const roomGMT = (room: IRoom | IRoomAll): string => {
   return tz.gmt ? ` - (${ tz.gmt })` : '';
 };
 
-export const currencySymbol = (currency: ICurrency | string): string => {
+export const currencySymbol = (currency?: ICurrency | string): string => {
+  if (!currency) {
+    return '';
+  }
   if (typeof currency === 'string') {
     switch (currency) {
       case 'EUR':
+      case 'euro':
         return '€';
       case 'GBP':
+      case 'currency_pound':
         return '£';
       default:
         return '$';

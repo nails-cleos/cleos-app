@@ -2,7 +2,10 @@ import { ThemePalette } from '@angular/material/core';
 import { ChartType } from 'chart.js';
 import { EventColor } from 'calendar-utils';
 import { IAvailability } from './room';
-import { ICurrency } from './currency';
+import { ICurrency, ICurrencyAll } from './currency';
+import { States } from './reservation';
+import { DiscountType } from './discount';
+import { PaymentType } from './payment';
 
 export interface IDashboard {
   timeZone?: string;
@@ -102,4 +105,41 @@ export class ColorEvent implements EventColor {
     this.primary = primary;
     this.secondary = secondary;
   }
+}
+
+export interface IMonthSummaryPayment {
+  type: PaymentType;
+  total: number;
+  excBTW: number;
+  btw: number;
+}
+
+export interface IMonthlySummaryTotal {
+  excBTW: number;
+  btw: number;
+  total: number;
+  discountType: DiscountType;
+  discountValue: number;
+  payments: IMonthSummaryPayment[];
+}
+
+export interface IMonthlySummaryReservation {
+  id: string;
+  state: States;
+  timestamp: number;
+  date: Date;
+  customerName: string;
+  treatmentName: string;
+  color: string;
+  total: IMonthlySummaryTotal;
+}
+
+export interface IMonthlyRoom {
+  roomName: string;
+  currency: ICurrencyAll;
+  timeZone: string;
+}
+
+export interface IMonthlySummary extends IMonthlyRoom {
+  reservationSummary: IMonthlySummaryReservation[];
 }

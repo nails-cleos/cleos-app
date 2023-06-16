@@ -35,6 +35,7 @@
       "UNAVAILABLE": "Agregar no disponible",
       "ACCEPT": "Aceptar",
       "MERGE": "Unir",
+      "EXPORT": "Exportar",
       "EXPAND": {
         "TRUE": "Presiona para mostrar menos",
         "FALSE": "Presiona para mostrar más"
@@ -100,7 +101,8 @@
         "PAYPAL": "PayPal",
         "IDEAL": "iDeal",
         "TRANSFER": "Transferencia bancaria",
-        "NONE": "Pago no seleccionado"
+        "NONE": "Pago no seleccionado",
+        "PENDING": "Pendiente"
       },
       "BANK": {
         "FIELD": "Banco",
@@ -227,6 +229,11 @@
         "FIELD": "Tipo de tratamiento",
         "REQUIRED": "Tipo de tratamiento es <b>requerido</b>",
         "INVALID": "Tipo de tratamiento no valido"
+      },
+      "COLOR": {
+        "FIELD": "Color",
+        "INVALID": "Color no valido",
+        "ADD_BUTTON": "Agregar color"
       }
     },
     "ADDITIONAL": {

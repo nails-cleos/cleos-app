@@ -1,6 +1,7 @@
 import { IDiscount, IUserDiscount } from './discount';
 import { IAdditionalAll } from './additional';
 import { IService } from './room';
+import { IColorAll } from './color';
 
 export const PENALTY = 30;
 
@@ -11,6 +12,7 @@ export interface ITreatmentGroup {
   durability?: string;
   durabilityMin?: number;
   durabilityMax?: number;
+  colors?: string[];
   treatments?: ITreatment[];
   order?: number;
 }
@@ -23,6 +25,7 @@ export interface ITreatmentGroupAll {
   durabilityMin?: number;
   durabilityMax?: number;
   order?: number;
+  colors?: IColorAll[];
 }
 
 export interface ITreatment {
@@ -45,6 +48,7 @@ export interface ITreatment {
 export interface IGroupService {
   id: string;
   name: string;
+  colors?: IColorAll[];
   treatments: IService[];
   selectedTreatments: IService[];
 }
@@ -58,6 +62,7 @@ export interface ITreatmentAll extends IService {
   createdAt?: string;
   treatmentId?: string;
   group: ITreatmentGroupAll;
+  color?: IColorAll;
 }
 
 export interface ITreatmentDiscountDTO {
@@ -152,12 +157,14 @@ export class TreatmentGroup implements ITreatmentGroup {
 export class GroupService implements IGroupService {
   id: string;
   name: string;
+  colors?: IColorAll[];
   treatments: IService[];
   selectedTreatments: IService[];
 
-  constructor(id: string, name: string) {
+  constructor(id: string, name: string, colors?: IColorAll[]) {
     this.id = id;
     this.name = name;
+    this.colors = colors;
     this.treatments = [];
     this.selectedTreatments = [];
   }

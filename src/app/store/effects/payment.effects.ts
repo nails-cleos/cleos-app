@@ -39,7 +39,7 @@ export class PaymentEffects {
   createOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentCreate)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.paymentService.create(payload.reservationId, payload.payment).pipe(
-      switchMap((payment: any) => of(new fromActionsPayment.PaymentSuccess(payment))),
+      switchMap((payment: any) => of(new fromActionsPayment.PaymentSend(payment.link))),
       catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
     ))
   ));

@@ -1,10 +1,12 @@
 import { Pagination } from '../../interfaces/pagination';
 import { All, TreatmentActionTypes } from '../treatment.actions';
 import { ITreatmentAll, ITreatmentGroup } from '../../interfaces/treatment';
+import { IColor, IColorAll } from '../../interfaces/color';
 
 export interface State {
   data: ITreatmentGroup | Pagination<ITreatmentGroup> | null;
   history: ITreatmentAll[] | null;
+  colors: IColorAll[] | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -16,6 +18,7 @@ export interface State {
 export const initialState: State = {
   data: null,
   history: null,
+  colors: null,
   errorMessage: null,
   error: null,
   subErrors: null,
@@ -30,7 +33,7 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         // @ts-ignore
-        data: {content: [{}, {}, {}], totalElements: 3},
+        data: { content: [{}, {}, {}], totalElements: 3 },
         errorMessage: null,
         subErrors: null,
         selected: null,
@@ -44,6 +47,15 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
+        message: null
+      };
+    }
+    case TreatmentActionTypes.getColors: {
+      return {
+        ...state,
+        colors: null,
+        errorMessage: null,
+        subErrors: null,
         message: null
       };
     }
@@ -61,6 +73,15 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         data: action.payload,
+        errorMessage: null,
+        subErrors: null,
+        message: null
+      };
+    }
+    case TreatmentActionTypes.colorSuccess: {
+      return {
+        ...state,
+        colors: action.payload,
         errorMessage: null,
         subErrors: null,
         message: null

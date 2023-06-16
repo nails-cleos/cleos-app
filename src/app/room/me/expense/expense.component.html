@@ -1,0 +1,152 @@
+<div class="flex-container" fxLayout="column">
+  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
+    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+      <form (ngSubmit)="submit" [formGroup]="form" novalidate>
+        <mat-card appearance="outlined" class="style-card">
+          <ng-template [ngIf]="isAddMode" [ngIfElse]="headerEditMode">
+            <mat-card-header>
+              <mat-card-title>{{ 'EXPENSE.TITLE' | translate }}</mat-card-title>
+              <mat-card-subtitle *ngIf="roomName; else skeleton">{{roomName}}</mat-card-subtitle>
+              <ng-template #skeleton>
+                <div class="ssc-line"></div>
+              </ng-template>
+            </mat-card-header>
+          </ng-template>
+          <ng-template #headerEditMode>
+            <mat-card-header>
+              <mat-card-title>{{ 'EXPENSE.DETAIL' | translate }}</mat-card-title>
+              <mat-card-subtitle *ngIf="expense; else skeleton">{{expense.id}}</mat-card-subtitle>
+              <mat-card-subtitle *ngIf="roomName; else skeleton">{{roomName}}</mat-card-subtitle>
+              <ng-template #skeleton>
+                <div class="ssc-line"></div>
+              </ng-template>
+            </mat-card-header>
+          </ng-template>
+          <mat-card-content>
+            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'EXPENSE.INVOICE.FIELD' | translate }}</mat-label>
+                <label>
+                  <input formControlName="invoice" matInput required>
+                </label>
+                <mat-error *ngIf="getForm.invoice.hasError('required')"
+                           [innerHTML]="'EXPENSE.INVOICE.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['invoice']">
+                  {{errors['invoice']}}
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'EXPENSE.STORE_SUPPLY.FIELD' | translate }}</mat-label>
+                <label>
+                  <input formControlName="storeSupply" matInput required>
+                </label>
+                <mat-error *ngIf="getForm.storeSupply.hasError('required')"
+                           [innerHTML]="'EXPENSE.STORE_SUPPLY.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['storeSupply']">
+                  {{errors['storeSupply']}}
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'EXPENSE.DESCRIPTION.FIELD' | translate }}</mat-label>
+                <label>
+                  <textarea #message formControlName="description" matInput maxlength="256"></textarea>
+                </label>
+                <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
+              </mat-form-field>
+            </div>
+            <div fxLayout.xs="column" fxLayoutAlign.xs="space-evenly stretch"
+                 fxLayout="row" fxLayoutAlign="space-around center">
+              <mat-form-field>
+                <mat-label>{{'EXPENSE.DATE.FIELD' | translate}}</mat-label>
+                <input matInput [matDatepicker]="dp" formControlName="date" required [max]="today">
+                <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
+                <mat-datepicker #dp startView="year">
+                </mat-datepicker>
+                <mat-error *ngIf="getForm.date.hasError('required')"
+                           [innerHTML]="'EXPENSE.DATE.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['date']">
+                  {{errors['date']}}
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>{{ 'EXPENSE.TYPE.FIELD' | translate }}</mat-label>
+                <mat-select formControlName="type" required>
+                  <mat-optgroup *ngFor="let group of types | keyvalue"
+                                [label]="'EXPENSE.TYPE.' + group.key | translate">
+                    <mat-option *ngFor="let type of group.value" [value]="type">
+                      {{'EXPENSE.TYPE.' + type | translate}}
+                    </mat-option>
+                  </mat-optgroup>
+                </mat-select>
+                <mat-error *ngIf="getForm.type.hasError('required')"
+                           [innerHTML]="'EXPENSE.TYPE.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['type']">
+                  {{errors['type']}}
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <div fxLayout.xs="column" fxLayoutAlign.xs="space-evenly stretch"
+                 fxLayout="row" fxLayoutAlign="space-around center">
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'EXPENSE.GROSS.FIELD' | translate }}</mat-label>
+                <label>
+                  <input id="gross" formControlName="gross" matInput required appTwoDigits #gross
+                         (focusout)="validateInputValue(gross, 0.01)">
+                </label>
+                <mat-icon matPrefix>{{currencyIcon}}</mat-icon>
+                <mat-error *ngIf="getForm.gross.hasError('required')"
+                           [innerHTML]="'EXPENSE.GROSS.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['gross']">
+                  {{errors['gross']}}
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'EXPENSE.BTW.FIELD' | translate }}</mat-label>
+                <label>
+                  <input id="btw" formControlName="btw" matInput appTwoDigits #btw
+                         (focusout)="validateInputValue(btw, 0, 100)">
+                </label>
+                <mat-icon matSuffix>percent</mat-icon>
+                <mat-error *ngIf="errors['btw']">
+                  {{errors['btw']}}
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <div fxLayout.xs="column" fxLayoutAlign.xs="space-evenly stretch"
+                 fxLayout="row" fxLayoutAlign="space-around center">
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'EXPENSE.NET.FIELD' | translate }}</mat-label>
+                <label>
+                  <input disabled [value]="net" matInput appTwoDigits>
+                </label>
+                <mat-icon matPrefix>{{currencyIcon}}</mat-icon>
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+          <mat-card-actions>
+            <div fxFlex></div>
+            <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
+                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <ng-template [ngIf]="isAddMode" [ngIfElse]="buttonEditMode">
+              <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button"
+                      type="submit">
+                {{ 'COMMON.BUTTON.CREATE' | translate }}
+              </button>
+            </ng-template>
+            <ng-template #buttonEditMode>
+              <button [disabled]="form.invalid || form.pristine" color="primary" mat-fab extended class="icon-button"
+                      type="submit">
+                {{ 'COMMON.BUTTON.UPDATE' | translate }}
+              </button>
+            </ng-template>
+          </mat-card-actions>
+        </mat-card>
+      </form>
+    </div>
+  </div>
+</div>

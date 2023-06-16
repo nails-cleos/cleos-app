@@ -4,7 +4,9 @@ import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 export enum TreatmentActionTypes {
   getAll = '[Treatment] Get all',
   getAllGroup = '[Treatment] Get all group',
+  getColors = '[Treatment] Get colors',
   treatmentSuccess = '[Treatment] Success',
+  colorSuccess = '[Treatment] color Success',
   treatmentSave = '[Treatment] Save',
   treatmentUpdate = '[Treatment] Update',
   treatmentUpdateSort = '[Treatment] Update sort',
@@ -27,6 +29,10 @@ export class GetAll implements Action {
 
 export class GetAllGroup implements Action {
   readonly type = TreatmentActionTypes.getAllGroup;
+}
+
+export class GetColors implements Action {
+  readonly type = TreatmentActionTypes.getColors;
 }
 
 export class TreatmentSuccess implements Action {
@@ -52,6 +58,13 @@ export class TreatmentUpdate implements Action {
 
 export class TreatmentUpdateSort implements Action {
   readonly type = TreatmentActionTypes.treatmentUpdateSort;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class ColorSuccess implements Action {
+  readonly type = TreatmentActionTypes.colorSuccess;
 
   constructor(public payload: any) {
   }
@@ -113,10 +126,12 @@ export class Clean implements Action {
 export type All =
   | GetAll
   | GetAllGroup
+  | GetColors
   | TreatmentSave
   | TreatmentUpdate
   | TreatmentUpdateSort
   | TreatmentSuccess
+  | ColorSuccess
   | TreatmentSaveSuccess
   | TreatmentFailure
   | TreatmentFind

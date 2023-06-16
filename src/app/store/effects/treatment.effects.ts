@@ -7,8 +7,7 @@ import * as fromActionsTreatment from '../treatment.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { TreatmentService } from '../../services/treatment.service';
 import { Router } from '@angular/router';
-import * as fromActionsAdditional from '../additional.actions';
-import { ISorted } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
+import { ColorService } from '../../services/color.service';
 
 @Injectable()
 export class TreatmentEffects {
@@ -29,6 +28,15 @@ export class TreatmentEffects {
       catchError((err: HttpErrorResponse) => of(new fromActionsTreatment.TreatmentFailure({ error: err.error })))
     ))
   ));
+
+  findColors$ = createEffect(() => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.getColors)).pipe(
+    map((action: any) => action.payload),
+    switchMap(() => this.colorService.getAllColors().pipe(
+      switchMap((response: any) => of(new fromActionsTreatment.ColorSuccess(response ? response : []))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsTreatment.TreatmentFailure({ error: err.error })))
+    ))
+  ));
+
 
   findOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.treatmentFind)).pipe(
     map((action: any) => action.payload),
@@ -94,6 +102,10 @@ export class TreatmentEffects {
     ofType(fromActionsTreatment.TreatmentActionTypes.treatmentSuccess)
   ), { dispatch: false });
 
+  colorsSuccess$ = createEffect(() => this.actions$.pipe(
+    ofType(fromActionsTreatment.TreatmentActionTypes.colorSuccess)
+  ), { dispatch: false });
+
   saveSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsTreatment.TreatmentActionTypes.treatmentSaveSuccess)
   ), { dispatch: false });
@@ -103,6 +115,6 @@ export class TreatmentEffects {
   ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private treatmentService: TreatmentService,
-              private router: Router) {
+              private colorService: ColorService, private router: Router) {
   }
 }

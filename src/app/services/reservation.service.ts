@@ -127,8 +127,12 @@ export class ReservationService {
     return this.http.post<IReservation>(`${ this.urlV1 }/${ reservationId }/${ event }`, extras);
   }
 
-  public changeCustomer(reservationId: string, customerId: string): Observable<IReservation> {
-    return this.http.patch<IReservation>(`${ this.urlV1 }/${ reservationId }/customers/${ customerId }`, null);
+  public changeCustomer(reservationId: string, customerId: string): Observable<void> {
+    return this.http.patch<void>(`${ this.urlV1 }/${ reservationId }/customers/${ customerId }`, null);
+  }
+
+  public changeColor(reservationId: string, colorId: string): Observable<void> {
+    return this.http.patch<void>(`${ this.urlV1 }/${ reservationId }/colors/${ colorId }`, null);
   }
 
   public getUpcomingReservation(): Observable<ICustomerReservation> {

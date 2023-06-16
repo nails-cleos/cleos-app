@@ -1,7 +1,7 @@
 {
   "ADDITIONAL": {
     "TITLE": "Agregar adicional",
-    "CREATED": "adicional {{name}} creado",
+    "CREATED": "Adicional {{name}} creado",
     "DETAIL": "Actualizar adicional",
     "LIST": {
       "COLUMN": {

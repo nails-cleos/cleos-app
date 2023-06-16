@@ -17,6 +17,7 @@ import { UserService } from '../services/user.service';
 import { AdditionalService } from '../services/additional.service';
 import { TrackingService } from '../services/tracking.service';
 import { DayViewSchedulerComponent } from './day-view-scheduler.component';
+import { ColorService } from '../services/color.service';
 
 @NgModule({
   declarations: [
@@ -46,7 +47,8 @@ import { DayViewSchedulerComponent } from './day-view-scheduler.component';
     RoomService,
     UserService,
     AdditionalService,
-    TrackingService
+    TrackingService,
+    ColorService
   ]
 })
 export class DashboardModule {

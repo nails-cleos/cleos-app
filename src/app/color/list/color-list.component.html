@@ -1,0 +1,99 @@
+<div class="mat-elevation-z8">
+  <table [dataSource]="dataSource" mat-table matSort matSortActive="name" matSortDirection="asc" matSortDisableClear
+         multiTemplateDataRows>
+    <ng-container matColumnDef="position">
+      <th *matHeaderCellDef mat-header-cell>#</th>
+      <td *matCellDef="let color; let i = dataIndex;" mat-cell>
+        <div *ngIf="color.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="name">
+      <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
+      <td *matCellDef="let color" mat-cell>
+        <div *ngIf="color.id; else skeleton">{{color.name}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="description">
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+          mat-sort-header>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
+      <td *matCellDef="let color" fxHide.lt-sm fxShow mat-cell>
+        <div *ngIf="color.id; else skeleton">{{color.description}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+      <td *matCellDef="let color" fxHide.lt-sm fxShow mat-cell>
+        <div *ngIf="color.id; else skeleton">
+          <ng-template [ngIf]="!color.deleted">
+            <button (click)="edit(color)" mat-icon-button
+                    matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
+              <mat-icon color="primary">edit</mat-icon>
+            </button>
+            <button (click)="delete(color)" mat-icon-button
+                    matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
+              <mat-icon color="warn">delete</mat-icon>
+            </button>
+          </ng-template>
+        </div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="expandedDetail">
+      <td *matCellDef="let color" [attr.colspan]="displayedColumns.length" fxHide fxShow.lt-sm mat-cell>
+        <div [@detailExpand]="color === expandedColor ? 'expanded' : 'collapsed'"
+             class="detail" fxHide fxShow.lt-sm>
+          <mat-list>
+            <div *ngIf="color.description" matListItemTitle>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</div>
+            <mat-list-item *ngIf="color.description" role="list">
+              <div matListItemLine>{{color.description}}</div>
+            </mat-list-item>
+            <ng-template [ngIf]="!color.deleted">
+              <div matListItemTitle>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+              <mat-list-item role="list">
+                <button (click)="edit(color)" color="primary" mat-icon-button>
+                  <mat-icon matListItemIcon>edit</mat-icon>
+                </button>
+                <button (click)="delete(color)" color="warn" mat-icon-button>
+                  <mat-icon matListItemIcon>delete</mat-icon>
+                </button>
+              </mat-list-item>
+            </ng-template>
+          </mat-list>
+        </div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="noContent">
+      <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+        {{ 'COLOR.LIST.ERROR.NO_CONTENT' | translate }}</td>
+    </ng-container>
+
+    <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+    <tr (click)="expandedColor = expandedColor === color ? null : color"
+        *matRowDef="let color; columns: displayedColumns;" class="row" mat-row></tr>
+    <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row></tr>
+
+    <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
+  </table>
+  <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+
+  <button color="accent" id="add-button" mat-fab matTooltip="{{ 'COLOR.TITLE' | translate }}"
+          routerLink="/colors/add">
+    <mat-icon>add</mat-icon>
+  </button>
+</div>

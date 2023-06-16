@@ -3,7 +3,7 @@
   <form [formGroup]="cancelForm">
     <app-price [price]="price" [typeForm]="typeForm" [types]="types" [currency]="currency"
                [firstTime]="true" [showPenalty]="showPenalty" [showBank]="true"></app-price>
-    <div style="margin-top: 10px;">
+    <div class="top-space">
       <mat-label>{{ 'RESERVATION.CANCEL.FIELD' | translate }}</mat-label>
       <mat-radio-group class="radio-group" [formControl]="paymentCancellation">
         <mat-radio-button class="radio-button" *ngFor="let option of options" [value]="option">

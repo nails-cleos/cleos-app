@@ -1,0 +1,58 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { PAGE_SIZE } from '../interfaces/pagination';
+import { Observable } from 'rxjs';
+import { IExpense, IExpenseInfo } from '../interfaces/expense';
+
+@Injectable()
+export class ExpenseService {
+
+  private urlV1 = `v1/rooms/{roomId}/expenses`;
+
+  constructor(private http: HttpClient) {
+  }
+
+  public getAll(roomId: string, sort: string, direction: string, page: number, size: number = PAGE_SIZE): Observable<IExpense[]> {
+    let params = new HttpParams().set('page', String(page)).set('size', String(size));
+    if (sort) {
+      params = params.append('sort', sort);
+    }
+    if (direction) {
+      params = params.append('direction', direction);
+    }
+
+    return this.http.get<IExpense[]>(this.updatePathVariable(roomId, ['pages']), { params });
+  }
+
+  public getAllExpenses(roomId: string): Observable<IExpense[]> {
+    return this.http.get<IExpense[]>(this.updatePathVariable(roomId));
+  }
+
+  public getExpenseInfo(roomId: string): Observable<IExpenseInfo> {
+    return this.http.get<IExpenseInfo>(this.updatePathVariable(roomId, ['info']));
+  }
+
+  public getById(roomId: string, id: string): Observable<IExpense | undefined> {
+    return this.http.get<IExpense>(this.updatePathVariable(roomId, [id]));
+  }
+
+  public add(roomId: string, expense: IExpense): Observable<IExpense> {
+    return this.http.post<IExpense>(this.updatePathVariable(roomId), expense);
+  }
+
+  public delete(roomId: string, id: string): Observable<IExpense> {
+    return this.http.delete<IExpense>(this.updatePathVariable(roomId, [id]));
+  }
+
+  public update(roomId: string, expense: IExpense): Observable<IExpense> {
+    return this.http.patch<IExpense>(this.updatePathVariable(roomId, [expense.id]), expense);
+  }
+
+  private updatePathVariable(roomId: string, args?: (string | null | undefined)[]): string {
+    let url = this.urlV1;
+    if (args && args.length) {
+      url = `${ this.urlV1 }/${ args.join('/') }`;
+    }
+    return url.replace('{roomId}', roomId);
+  }
+}

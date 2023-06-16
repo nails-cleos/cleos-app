@@ -7,6 +7,11 @@ import { Observable, Subscription } from 'rxjs';
 import { ITreatment, ITreatmentGroup, Treatment, TreatmentGroup } from '../interfaces/treatment';
 import { createNewDate, getNow, getTime, getTimeNumber } from '../util/dates';
 import { Router } from '@angular/router';
+import { IColorAll } from '../interfaces/color';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { map, startWith } from 'rxjs/operators';
+import { IUserAll } from '../interfaces/user';
+import { getFullUserName } from '../util/helper';
 
 @Component({
   selector: 'app-treatment',
@@ -15,6 +20,7 @@ import { Router } from '@angular/router';
 })
 export class TreatmentComponent implements OnInit, OnDestroy {
   @ViewChild('inputName') inputName: ElementRef<HTMLInputElement> | undefined;
+  @ViewChild('colorInput') colorInput!: ElementRef<HTMLInputElement>;
 
   form!: UntypedFormGroup;
   name: UntypedFormControl = new UntypedFormControl('', [
@@ -22,6 +28,11 @@ export class TreatmentComponent implements OnInit, OnDestroy {
   ]);
   selected = new UntypedFormControl(0);
   treatments: ITreatment[] = [];
+
+  color = new UntypedFormControl();
+  filteredColors?: Observable<IColorAll[] | undefined>;
+  colors: IColorAll[] = [];
+  allColors?: IColorAll[];
 
   errors: any = [];
 
@@ -61,6 +72,7 @@ export class TreatmentComponent implements OnInit, OnDestroy {
     group.durabilityMin = this.form.value.durabilityMin;
     group.durabilityMax = this.form.value.durabilityMax;
     group.treatments = this.treatments;
+    group.colors = this.colors.map(c => c.id);
 
     return this.store.dispatch(
       new fromActionsTreatment.TreatmentSave(group)
@@ -81,6 +93,7 @@ export class TreatmentComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.createForm();
     this.clean();
+    this.getColors();
     this.subscribe();
   }
 
@@ -112,13 +125,52 @@ export class TreatmentComponent implements OnInit, OnDestroy {
     tab.primary = true;
   }
 
+  remove(color: IColorAll): void {
+    const index = this.colors.indexOf(color);
+    if (index >= 0) {
+      this.colors.splice(index, 1);
+      this.allColors?.push(color);
+      this.color.setValue(null);
+    }
+  }
+
+  selectedColor(event: MatAutocompleteSelectedEvent): void {
+    const color = event.option.value;
+    this.colors.push(color);
+    this.allColors = this.allColors?.filter(c => c.id !== color.id);
+    this.colorInput.nativeElement.value = '';
+    this.color.setValue(null);
+  }
+
+  sortColors(data: any): IColorAll[] {
+    return data.sort((a: any, b: any) => {
+      const aName = a.name.toUpperCase();
+      const bName = b.name.toUpperCase();
+      return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
+    });
+  }
+
   private createForm(): void {
     this.form = this.formBuilder.group({
       name: this.name,
       description: new UntypedFormControl(),
       durabilityMin: new UntypedFormControl(),
-      durabilityMax: new UntypedFormControl()
+      durabilityMax: new UntypedFormControl(),
+      color: this.color
     });
+
+    this.filteredColors = this.color.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value ? value.name : ''),
+      map(
+        name => name ? this.filter(name) : (this.allColors ? this.allColors.slice() : this.allColors))
+    );
+  }
+
+  private getColors(): void {
+    this.store.dispatch(
+      new fromActionsTreatment.GetColors()
+    );
   }
 
   private clean(): void {
@@ -129,6 +181,7 @@ export class TreatmentComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
+      this.allColors = state.colors;
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
@@ -138,5 +191,11 @@ export class TreatmentComponent implements OnInit, OnDestroy {
         this.router.navigate(['treatments']);
       }
     });
+  }
+
+  private filter(name: string): IColorAll[] | undefined {
+    const filterValue = name.toLowerCase();
+
+    return this.allColors?.filter(option => option?.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 }

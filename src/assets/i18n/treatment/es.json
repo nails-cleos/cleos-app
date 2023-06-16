@@ -3,6 +3,7 @@
     "TITLE": "Agregar tratamientos",
     "CREATED": "Tratamiento {{name}} creado",
     "DETAIL": "Actualizar tratamientos",
+    "COLORS": "Colores",
     "LIST": {
       "COLUMN": {
         "DURABILITY": "Durabilidad",
@@ -39,6 +40,9 @@
       "MAX": {
         "FIELD": "Durabilidad máxima"
       }
+    },
+    "COLOR": {
+      "FIELD": "Color"
     },
     "PRIMARY": {
       "CHECK": "Principal"

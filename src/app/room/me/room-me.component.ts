@@ -16,9 +16,9 @@ import { IUser, IUserAll } from '../../interfaces/user';
 import { Role } from '../../interfaces/token';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { map, startWith } from 'rxjs/operators';
+import { goTo } from '../../util/animation';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
-import { goTo } from "../../util/animation";
 
 @Component({
   selector: 'app-room-me',
@@ -113,7 +113,7 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
             x: location.lng(),
             y: location.lat()
           }
-        }
+        };
       }
 
       this.store.dispatch(new fromActionsRoom.RoomUpdate(room));
@@ -129,8 +129,8 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private static createAv(date?: string): Date | undefined {
     if (date) {
-      const startTime = getTimeNumber(date)!;
-      return createDate(startTime.hour, startTime.minute);
+      const startTime = getTimeNumber(date);
+      return createDate(startTime?.hour, startTime?.minute);
     }
     return undefined;
   }
@@ -246,13 +246,13 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (this.professionals.length === 0) {
       this.errors.professionals = true;
-      return goTo('professionals');;
+      return goTo('professionals');
     }
 
     return false;
   }
 
-  getAddress(placeResult: PlaceResult) {
+  getAddress(placeResult: PlaceResult): void {
     this.geometry = placeResult.geometry;
     this.formattedAddress = placeResult.formatted_address;
   }

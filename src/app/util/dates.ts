@@ -628,3 +628,28 @@ const formatMinMax = (min: Date, max: Date): { min: Date; max: Date } => {
 
   return { min, max };
 };
+
+export const getWeeksInMonth = (currentDate: Date): { start: any; end: any; dates: any }[] => {
+  const weeks: any[] = [];
+  const firstDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+  const lastDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+  const numDays = lastDate.getDate();
+
+  let dayOfWeekCounter = firstDate.getDay();
+
+  for (let date = 1; date <= numDays; date++) {
+    if (dayOfWeekCounter === 0 || weeks.length === 0) {
+      weeks.push([]);
+    }
+    weeks[weeks.length - 1].push(date);
+    dayOfWeekCounter = (dayOfWeekCounter + 1) % 7;
+  }
+
+  return weeks
+    .filter((w) => !!w.length)
+    .map((w) => ({
+      start: w[0],
+      end: w[w.length - 1],
+      dates: w,
+    }));
+};

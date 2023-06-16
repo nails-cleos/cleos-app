@@ -43,6 +43,25 @@
     border: solid 1px mat.get-color-from-palette($warn-palette) !important;
   }
 
+  .bottom-divider {
+    border-bottom: 1px solid mat.get-color-from-palette($background, tooltip);
+  }
+
+  .week {
+    background-color: mat.get-color-from-palette($primary-palette, A700) !important;
+    color: black;
+  }
+
+  #tableData {
+    th, td {
+      border: 1px solid mat.get-color-from-palette($primary-palette) !important;
+    }
+
+    tr:hover {
+      background-color: mat.get-color-from-palette($background, hover);
+    }
+  }
+
   @if $isDark {
     .text-bg-created {
       background-color: #fafafa;
@@ -245,7 +264,7 @@
 
     .cal-open {
       .cal-day-number {
-        color: mat.get-color-from-palette($primary-palette) !important;
+        color: mat.get-color-from-palette($primary-palette, A700) !important;
         font-size: 2.6em !important;
         opacity: 1 !important;
       }
@@ -284,11 +303,6 @@
     .cal-day-cell.cal-today {
       background-color: mat.get-color-from-palette($primary-palette, 200);
       color: mat.get-color-from-palette($primary-palette, A100);
-    }
-
-    .cal-day-badge {
-      background-color: mat.get-color-from-palette($accent-palette);
-      color: mat.get-color-from-palette($accent-palette, default-contrast);
     }
 
     .cal-event {
@@ -439,6 +453,10 @@
       color: #44A244;
     }
 
+    tr:has(.cash) {
+      background-color: #44A244 !important;
+    }
+
     .cash {
       background-color: #44A244 !important;
 
@@ -468,6 +486,10 @@
     .stamp-paid {
       box-shadow: 0 0 0 3px #90EE90, 0 0 0 2px #90EE90 inset;
       color: #90EE90;
+    }
+
+    tr:has(.cash) {
+      background-color: #90EE90 !important;
     }
 
     .cash {
@@ -540,6 +562,11 @@
   }
 
   .deadLine {
+    td {
+      color: mat.get-color-from-palette($background, background) !important;
+    }
+
+    color: mat.get-color-from-palette($background, background) !important;
     background-color: mat.get-color-from-palette($warn-palette, lighter);
   }
 

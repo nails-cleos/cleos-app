@@ -38,6 +38,9 @@ import { BankComponent } from './bank/bank.component';
 import { PriceComponent } from './price/price.component';
 import { CustomerEditDialogComponent } from './dialog/customer-edit/customer-edit-dialog.component';
 import { CancelDialogComponent } from './dialog/cancel/cancel-dialog.component';
+import { FilterByDayPipe } from '../pipes/filterByDay.pipe';
+import { DiscountPipe } from '../pipes/discount.pipe';
+import { TwoDigitsDirective } from '../directives/two-digits.directive';
 
 @NgModule({
   imports: [
@@ -67,42 +70,45 @@ import { CancelDialogComponent } from './dialog/cancel/cancel-dialog.component';
     HttpClientJsonpModule,
     FormsModule
   ],
-  exports: [
-    AppMaterialModule,
-    CommonModule,
-    TranslateModule,
-    ReactiveFormsModule,
-    AppMaterialModule,
-    FlexLayoutModule,
-    HttpClientModule,
-    HttpClientJsonpModule,
-    NgChartsModule,
-    FormsModule,
-    BackButtonDirective,
-    SortByPipe,
-    UserNamePipe,
-    TimeDetailPipe,
-    DurationTimePipe,
-    RoomNamePipe,
-    CurrencySymbolPipe,
-    ReservationIconPipe,
-    ConvertHMPipe,
-    ErrorComponent,
-    GoogleMapComponent,
-    RatingComponent,
-    CardChartComponent,
-    CardComponent,
-    ChartComponent,
-    TimeZoneSnackBarComponent,
-    CounterComponent,
-    PasswordComponent,
-    BankComponent,
-    PriceComponent,
-    DialogComponent,
-    CalendarDialogComponent,
-    CustomerEditDialogComponent,
-    CancelDialogComponent
-  ],
+    exports: [
+        AppMaterialModule,
+        CommonModule,
+        TranslateModule,
+        ReactiveFormsModule,
+        AppMaterialModule,
+        FlexLayoutModule,
+        HttpClientModule,
+        HttpClientJsonpModule,
+        NgChartsModule,
+        FormsModule,
+        BackButtonDirective,
+        SortByPipe,
+        UserNamePipe,
+        TimeDetailPipe,
+        DurationTimePipe,
+        RoomNamePipe,
+        CurrencySymbolPipe,
+        ReservationIconPipe,
+        ConvertHMPipe,
+        ErrorComponent,
+        GoogleMapComponent,
+        RatingComponent,
+        CardChartComponent,
+        CardComponent,
+        ChartComponent,
+        TimeZoneSnackBarComponent,
+        CounterComponent,
+        PasswordComponent,
+        BankComponent,
+        PriceComponent,
+        DialogComponent,
+        CalendarDialogComponent,
+        CustomerEditDialogComponent,
+        CancelDialogComponent,
+        FilterByDayPipe,
+        DiscountPipe,
+        TwoDigitsDirective
+    ],
   declarations: [
     BackButtonDirective,
     SortByPipe,
@@ -127,7 +133,10 @@ import { CancelDialogComponent } from './dialog/cancel/cancel-dialog.component';
     DialogComponent,
     CalendarDialogComponent,
     CustomerEditDialogComponent,
-    CancelDialogComponent
+    CancelDialogComponent,
+    FilterByDayPipe,
+    DiscountPipe,
+    TwoDigitsDirective
   ],
   providers: [
     httpInterceptorProviders,

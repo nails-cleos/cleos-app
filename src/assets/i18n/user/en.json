@@ -55,6 +55,7 @@
       "SELECT": "Select user to merge",
       "NAME": "<b>Name:</b> {{name}}",
       "EMAIL": "<b>Email:</b> {{email}}",
+      "SUCCESS": "Users merged",
       "OLD_USER": {
         "TITLE": "Old user",
         "FIELD": "Old user",

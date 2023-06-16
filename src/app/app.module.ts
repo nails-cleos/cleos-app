@@ -2,12 +2,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import {
-  FacebookLoginProvider,
-  GoogleLoginProvider,
-  SocialAuthServiceConfig,
-  SocialLoginModule
-} from '@abacritt/angularx-social-login';
+import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthServiceConfig, SocialLoginModule } from '@abacritt/angularx-social-login';
 import { ActionReducer, MetaReducer, StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -30,11 +25,7 @@ import localeEs from '@angular/common/locales/es';
 import localeAr from '@angular/common/locales/es-AR';
 import { CookieService } from 'ngx-cookie-service';
 import { TranslateLoaderFactory } from './shared/translate-loader.factory';
-import {
-  MAT_COLOR_FORMATS,
-  NGX_MAT_COLOR_FORMATS,
-  NgxMatColorPickerModule
-} from '@angular-material-components/color-picker';
+import { MAT_COLOR_FORMATS, NGX_MAT_COLOR_FORMATS, NgxMatColorPickerModule } from '@angular-material-components/color-picker';
 
 // Services
 import { AuthGuardService } from './services/auth-guard.service';
@@ -49,11 +40,11 @@ import { reducers } from './store/app.states';
 // Components
 import { AppComponent } from './app.component';
 import { SharedModule } from './shared/shared.module';
-import { AngularFireModule } from "@angular/fire/compat";
-import { AngularFireMessagingModule } from "@angular/fire/compat/messaging";
-import { AngularFireAnalyticsModule } from "@angular/fire/compat/analytics";
-import { AngularFireAuthModule } from "@angular/fire/compat/auth";
-import { AngularFireDatabaseModule } from "@angular/fire/compat/database";
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireMessagingModule } from '@angular/fire/compat/messaging';
+import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
+import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
 
 export const getAuthServiceConfigs = (): SocialAuthServiceConfig => ({
   autoLogin: false,
@@ -139,7 +130,7 @@ registerLocaleData(localeAr, 'es-AR');
     },
     {
       provide: LOCALE_ID,
-      useValue: "en-GB"
+      useValue: 'en-GB'
     },
     TranslateService
   ],

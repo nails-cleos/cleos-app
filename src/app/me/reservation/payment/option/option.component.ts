@@ -6,10 +6,10 @@ import { AppState, selectPaymentState } from '../../../../store/app.states';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { getBackIndex, getPrice, getStep, getUserName } from '../../../../util/helper';
+import { getBackIndex, getPrice, getStep, getUserName, newPercentage } from '../../../../util/helper';
 import { IStep, Step } from '../../../../interfaces/step';
 import { MatStepper } from '@angular/material/stepper';
-import { IPaymentAll, PaymentType } from '../../../../interfaces/payment';
+import { PaymentType } from '../../../../interfaces/payment';
 import { IPrice, Price } from '../../../../interfaces/treatment';
 import { IReservationAll } from '../../../../interfaces/reservation';
 import * as fromActionsReservation from '../../../../store/reservation.actions';
@@ -28,10 +28,9 @@ export class OptionComponent implements OnInit, OnDestroy {
   typeForm: UntypedFormGroup;
   types?: string[];
 
-  payment?: IPaymentAll;
   reservation?: IReservationAll;
 
-  price?: IPrice;
+  price: IPrice;
 
   first = true;
 
@@ -53,15 +52,7 @@ export class OptionComponent implements OnInit, OnDestroy {
       type: new UntypedFormControl(undefined),
       bank: new UntypedFormControl('')
     });
-  }
-
-  get pay(): void {
-    if (this.payment?.link) {
-      this.store.dispatch(
-        new fromActionsPayment.PaymentSend(this.payment.link)
-      );
-    }
-    return;
+    this.price = new Price();
   }
 
   get back(): void {
@@ -74,6 +65,10 @@ export class OptionComponent implements OnInit, OnDestroy {
       return;
     }
 
+    return this.completeAndNext();
+  }
+
+  get pay(): void {
     const type = this.typeForm.get('type')?.value;
     const payload = {
       reservationId: this.reservationId,
@@ -83,10 +78,9 @@ export class OptionComponent implements OnInit, OnDestroy {
         percentage: this.typeForm.get('percentage')?.value || 'TOTAL'
       }
     };
-    this.store.dispatch(
+    return this.store.dispatch(
       new fromActionsPayment.PaymentCreate(payload)
     );
-    return this.completeAndNext();
   }
 
   get professionalName(): string {
@@ -130,6 +124,10 @@ export class OptionComponent implements OnInit, OnDestroy {
     return step ? step.name : '';
   }
 
+  getPercentage(percentage: number): void {
+    this.price = newPercentage(this.price, percentage);
+  }
+
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
@@ -156,7 +154,6 @@ export class OptionComponent implements OnInit, OnDestroy {
           }
         }
       }
-      this.payment = state.data;
     });
   }
 

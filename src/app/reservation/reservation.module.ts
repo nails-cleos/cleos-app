@@ -7,12 +7,14 @@ import { ReservationRoutingModule } from './reservation-routing.module';
 
 import { SearchComponent } from './search/search.component';
 import { ReservationComponent, SelectProfessionalDialogComponent } from './reservation.component';
-import { ChangeCustomerDialogComponent, ReservationDetailComponent } from './detail/reservation-detail.component';
+import {
+  ChangeColorDialogComponent,
+  ChangeCustomerDialogComponent,
+  ReservationDetailComponent
+} from './detail/reservation-detail.component';
 import { MoreInfoComponent } from './detail/more-info/more-info.component';
 import { CalendarComponent } from './calendar/calendar.component';
 import { MatStepperModule } from '@angular/material/stepper';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatExpansionModule } from '@angular/material/expansion';
 import { ReservationCompleteComponent } from './detail/complete/reservation-complete.component';
 import { EffectsModule } from '@ngrx/effects';
 import { PaymentService } from '../services/payment.service';
@@ -25,6 +27,7 @@ import { AdditionalService } from '../services/additional.service';
 import { PaymentEffects } from '../store/effects/payment.effects';
 import { TrackingService } from '../services/tracking.service';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { ColorService } from '../services/color.service';
 
 @NgModule({
   declarations: [
@@ -35,6 +38,7 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
     CalendarComponent,
     ReservationCompleteComponent,
     ChangeCustomerDialogComponent,
+    ChangeColorDialogComponent,
     SelectProfessionalDialogComponent
   ],
   imports: [
@@ -43,8 +47,6 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
     MatFabMenuModule,
     CalendarModule,
     MatStepperModule,
-    MatChipsModule,
-    MatExpansionModule,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
@@ -62,7 +64,8 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
     RoomService,
     UserService,
     AdditionalService,
-    TrackingService
+    TrackingService,
+    ColorService
   ]
 })
 export class ReservationModule {
