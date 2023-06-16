@@ -15,6 +15,10 @@ import { UserService } from '../services/user.service';
 import { AddServiceComponent, PriceDialogComponent } from './me/add-service/add-service.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { ExpenseService } from '../services/expense.service';
+import { ExpensesComponent } from './me/expense/list/expenses.component';
+import { ExpenseComponent } from './me/expense/expense.component';
+import { ExpenseEffects } from '../store/effects/expense.effects';
 
 @NgModule({
   declarations: [
@@ -24,7 +28,9 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
     RoomDetailComponent,
     AvailabilityComponent,
     AddServiceComponent,
-    PriceDialogComponent
+    PriceDialogComponent,
+    ExpensesComponent,
+    ExpenseComponent
   ],
   imports: [
     RoomRoutingModule,
@@ -37,12 +43,13 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
       isolate: false,
       extend: true
     }),
-    EffectsModule.forFeature([RoomEffects]),
+    EffectsModule.forFeature([RoomEffects, ExpenseEffects]),
     DragDropModule
   ],
   providers: [
     RoomService,
-    UserService
+    UserService,
+    ExpenseService
   ]
 })
 export class RoomModule {

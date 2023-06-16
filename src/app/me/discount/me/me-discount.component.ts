@@ -12,7 +12,7 @@ import { AppState, selectDiscountState } from '../../../store/app.states';
 import * as fromActionsDiscount from '../../../store/discount.actions';
 import { Router } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { AngularFireAnalytics } from "@angular/fire/compat/analytics";
+import { AngularFireAnalytics } from '@angular/fire/compat/analytics';
 
 @Component({
   selector: 'app-me-discount',
@@ -66,8 +66,8 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   useDiscount(discount: IUserDiscount): void {
-    const data = {discount};
-    this.router.navigate(['me', 'reservation'], {state: data});
+    const data = { discount };
+    this.router.navigate(['me', 'reservation'], { state: data });
   }
 
   private subscribe(): void {
@@ -81,13 +81,13 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
           let symbol;
           switch (ud.discount.type) {
             case DiscountType.money:
-              symbol = `$ ${ud.discount.amount}`;
+              symbol = `$ ${ ud.discount.amount }`;
               break;
             case DiscountType.percentage:
-              symbol = `${ud.discount.amount} %`;
+              symbol = `${ ud.discount.amount } %`;
               break;
           }
-          return Object.assign({}, ud, {symbol});
+          return Object.assign({}, ud, { symbol });
         }
         return ud;
       });

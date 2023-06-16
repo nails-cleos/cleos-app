@@ -127,5 +127,83 @@
         }
       }
     }
+  },
+  "EXPENSE": {
+    "TITLE": "Add expense",
+    "CREATED": "Expense {{invoice}} created",
+    "DETAIL": "Update expense",
+    "LIST": {
+      "COLUMN": {
+        "INVOICE": "Invoice",
+        "STORE_SUPPLY": "Store supply",
+        "DATE": "Date",
+        "GROSS": "Gross",
+        "BTW": "BTW",
+        "NET": "Net"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No expenses"
+      }
+    },
+    "INVOICE": {
+      "FIELD": "Invoice",
+      "REQUIRED": "Invoice is <b>required</b>"
+    },
+    "STORE_SUPPLY": {
+      "FIELD": "Store supply",
+      "REQUIRED": "Store supply is <b>required</b>"
+    },
+    "DESCRIPTION": {
+      "FIELD": "Description"
+    },
+    "DATE": {
+      "FIELD": "Pick a date",
+      "REQUIRED": "Date is <b>required</b>",
+      "FUTURE": "Date must not be in the future"
+    },
+    "GROSS": {
+      "FIELD": "Gross",
+      "REQUIRED": "Gross is <b>required</b>",
+      "MIN": "Gross must be greater than 0.01"
+    },
+    "BTW": {
+      "FIELD": "BTW",
+      "MIN": "BTW must be greater than 0.01",
+      "MAX": "BTW must be less than 100.00"
+    },
+    "NET": {
+      "FIELD": "Net"
+    },
+    "TYPE": {
+      "FIELD": "Type",
+      "REQUIRED": "Type is <b>required</b>",
+      "OPERATING": "Operating",
+      "COGS": "Cost of Goods Sold",
+      "O_MAP": "Marketing, advertising and promotion",
+      "O_SBW": "Salaries, benefits and wages",
+      "SGA": "Selling, general and administrative",
+      "RI": "Rent and insurance",
+      "DA": "Depreciation and amortization",
+      "OTHER": "Other",
+      "NON_OPERATING": "Non operating",
+      "INTEREST": "Interest",
+      "TAXES": "Taxes",
+      "IC": "Impairment charges",
+      "FIXED": "Fixed",
+      "RENT": "Rent",
+      "F_SBW": "Salaries, benefits and wages",
+      "VARIABLE": "Variable",
+      "TRANSACTION_FEES": "Transaction fees",
+      "COMMISSIONS": "Commissions",
+      "V_MAP": "Marketing, advertising and promotion"
+    },
+    "DELETED": {
+      "TITLE": "Delete expense",
+      "CONTENT": "Are you sure to delete expense {{invoice}}?",
+      "MESSAGE": "Expense {{invoice}} deleted"
+    },
+    "UPDATED": {
+      "MESSAGE": "Expense {{invoice}} updated"
+    }
   }
 }

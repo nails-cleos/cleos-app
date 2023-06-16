@@ -7,6 +7,8 @@ import { RoomComponent } from './room.component';
 import { RoomMeComponent } from './me/room-me.component';
 import { RoomDetailComponent } from './detail/room-detail.component';
 import { AddServiceComponent } from './me/add-service/add-service.component';
+import { ExpensesComponent } from './me/expense/list/expenses.component';
+import { ExpenseComponent } from './me/expense/expense.component';
 
 const routes: Routes = [
   {
@@ -21,7 +23,22 @@ const routes: Routes = [
   },
   {
     path: ':id/services', component: AddServiceComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.manager]
+      roles: [Role.admin, Role.manager]
+    }
+  },
+  {
+    path: ':id/expenses', component: ExpensesComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.admin, Role.manager]
+    }
+  },
+  {
+    path: ':id/expenses/add', component: ExpenseComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.admin, Role.manager]
+    }
+  },
+  {
+    path: ':id/expenses/:expenseId', component: ExpenseComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.admin, Role.manager]
     }
   },
   {
