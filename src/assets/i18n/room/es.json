@@ -127,5 +127,83 @@
         }
       }
     }
+  },
+  "EXPENSE": {
+    "TITLE": "Agregar gasto",
+    "CREATED": "Gasto {{invoice}} creado",
+    "DETAIL": "Actualizar gasto",
+    "LIST": {
+      "COLUMN": {
+        "INVOICE": "Factura",
+        "STORE_SUPPLY": "Suministro de tienda",
+        "DATE": "Fecha",
+        "GROSS": "Bruto",
+        "BTW": "BTW",
+        "NET": "Neto"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No expenses"
+      }
+    },
+    "INVOICE": {
+      "FIELD": "Factura",
+      "REQUIRED": "Factura es <b>requerido</b>"
+    },
+    "STORE_SUPPLY": {
+      "FIELD": "Suministro de tienda",
+      "REQUIRED": "Suministro de tienda es <b>requerido</b>"
+    },
+    "DESCRIPTION": {
+      "FIELD": "Descripción"
+    },
+    "DATE": {
+      "FIELD": "Elegí una fecha",
+      "REQUIRED": "Fecha es <b>requerida</b>",
+      "FUTURE": "Fecha no debe ser en el futuro"
+    },
+    "GROSS": {
+      "FIELD": "Bruto",
+      "REQUIRED": "Bruto es <b>requerido</b>",
+      "MIN": "Bruto debe ser mayor a 0.01"
+    },
+    "BTW": {
+      "FIELD": "BTW",
+      "MIN": "BTW debe ser mayor a 0.01",
+      "MAX": "BTW debe ser menor a 100.00"
+    },
+    "NET": {
+      "FIELD": "Neto"
+    },
+    "TYPE": {
+      "FIELD": "Typo",
+      "REQUIRED": "Typo es <b>requerido</b>",
+      "OPERATING": "Operativo",
+      "COGS": "Costo de los bienes vendidos",
+      "O_MAP": "Marketing, publicidad y promoción",
+      "O_SBW": "Salarios, prestaciones y salarios",
+      "SGA": "Vendedor general y administrativo",
+      "RI": "Alquiler y seguro",
+      "DA": "Depreciación y amortización",
+      "OTHER": "Otros",
+      "NON_OPERATING": "No operativo",
+      "INTEREST": "Interés",
+      "TAXES": "Impuestos",
+      "IC": "Cargos por deterioro",
+      "FIXED": "Fijo",
+      "RENT": "Alquilar",
+      "F_SBW": "Salarios, prestaciones y salarios",
+      "VARIABLE": "Variable",
+      "TRANSACTION_FEES": "Tarifas de transacción",
+      "COMMISSIONS": "Comisiones",
+      "V_MAP": "Marketing, publicidad y promoción"
+    },
+    "DELETED": {
+      "TITLE": "Eliminar gasto",
+      "CONTENT": "¿Está seguro de eliminar el gasto {{invoice}}?",
+      "MESSAGE": "Gasto {{name}} eliminado"
+    },
+    "UPDATED": {
+      "MESSAGE": "Gasto {{invoice}} actualizado"
+    }
   }
 }

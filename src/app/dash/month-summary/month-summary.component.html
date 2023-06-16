@@ -8,39 +8,53 @@
   </mat-form-field>
 </div>
 <div fxLayout="column" fxLayoutAlign="space-around stretch">
-  <mat-form-field appearance="outline" *ngIf="monthlySummaryMap?.size" class="full-select">
-    <mat-select [formControl]="selectedRoom">
-      <mat-option *ngFor="let monthlySummary of monthlySummaryMap | keyvalue" [value]="monthlySummary.key">
-        {{monthlySummary.key.roomName}}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+  <ng-template [ngIf]="monthlySummaryMap?.size">
+    <mat-form-field appearance="outline" class="full-select">
+      <mat-select [formControl]="selectedRoom">
+        <mat-option *ngFor="let monthlySummary of monthlySummaryMap | keyvalue" [value]="monthlySummary.key">
+          {{monthlySummary.key.roomName}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </ng-template>
 </div>
 
 <ng-template #paymentTemplate let-payment='payment' let-currency='currency' let-summaryId='summaryId' let-index='index'>
   <td>
-    <mat-form-field class="amount" appearance="outline" *ngIf="showInput">
-      <input matInput [value]="(payment.total || 0) | number:'1.2-2'" appTwoDigits #total id="totalInput"
-             (focusin)="total.select()" (focusout)="twoDigit(total, summaryId, index)">
-      <mat-icon matPrefix>{{currency}}</mat-icon>
-    </mat-form-field>
-    <span *ngIf="!showInput">{{payment.total || 0}}</span>
+    <ng-template [ngIf]="showInput" [ngIfElse]="noInput">
+      <mat-form-field class="amount" appearance="outline">
+        <input matInput [value]="(payment.total || 0) | number:'1.2-2'" appTwoDigits #total id="totalInput"
+               (focusin)="total.select()" (focusout)="twoDigit(total, summaryId, index)">
+        <mat-icon matPrefix>{{currency}}</mat-icon>
+      </mat-form-field>
+    </ng-template>
+    <ng-template #noInput>
+      <span>{{payment.total || 0}}</span>
+    </ng-template>
   </td>
   <td>
-    <mat-form-field class="amount" appearance="outline" *ngIf="showInput">
-      <input matInput [value]="(payment.excBTW || 0) | number:'1.2-2'" appTwoDigits #excBTW id="excBTWInput"
-             (focusin)="excBTW.select()" (focusout)="twoDigit(excBTW, summaryId, index)">
-      <mat-icon matPrefix>{{currency}}</mat-icon>
-    </mat-form-field>
-    <span *ngIf="!showInput">{{payment.excBTW || 0}}</span>
+    <ng-template [ngIf]="showInput" [ngIfElse]="noInput">
+      <mat-form-field class="amount" appearance="outline">
+        <input matInput [value]="(payment.excBTW || 0) | number:'1.2-2'" appTwoDigits #excBTW id="excBTWInput"
+               (focusin)="excBTW.select()" (focusout)="twoDigit(excBTW, summaryId, index)">
+        <mat-icon matPrefix>{{currency}}</mat-icon>
+      </mat-form-field>
+    </ng-template>
+    <ng-template #noInput>
+      <span>{{payment.excBTW || 0}}</span>
+    </ng-template>
   </td>
   <td>
-    <mat-form-field class="amount" appearance="outline" *ngIf="showInput">
-      <input matInput [value]="(payment.btw || 0) | number:'1.2-2'" appTwoDigits #btw id="btwInput"
-             (focusin)="btw.select()" (focusout)="twoDigit(btw, summaryId, index)">
-      <mat-icon matPrefix>{{currency}}</mat-icon>
-    </mat-form-field>
-    <span *ngIf="!showInput">{{payment.btw || 0}}</span>
+    <ng-template [ngIf]="showInput" [ngIfElse]="noInput">
+      <mat-form-field class="amount" appearance="outline">
+        <input matInput [value]="(payment.btw || 0) | number:'1.2-2'" appTwoDigits #btw id="btwInput"
+               (focusin)="btw.select()" (focusout)="twoDigit(btw, summaryId, index)">
+        <mat-icon matPrefix>{{currency}}</mat-icon>
+      </mat-form-field>
+    </ng-template>
+    <ng-template #noInput>
+      <span>{{payment.btw || 0}}</span>
+    </ng-template>
   </td>
   <td
     [ngClass]="(payment.type || 'PENDING').toLowerCase()">{{'COMMON.PAYMENT.TYPE.' + (payment.type || 'PENDING') | translate}}</td>
@@ -50,16 +64,16 @@
 <div>
   <table #tableData id="tableData">
     <colgroup>
-      <col id="id" style="width:4%">
-      <col id="date" style="width:10%">
-      <col id="customer" style="width:10%">
-      <col id="treatment" style="width:9%">
-      <col id="discount" style="width:7%">
-      <col id="total" style="width:15%">
-      <col id="exclBTW" style="width:15%">
-      <col id="btw" style="width:15%">
-      <col id="type" style="width:8%">
-      <col id="color" style="width:7%">
+      <col id="id">
+      <col id="date">
+      <col id="customer">
+      <col id="treatment">
+      <col id="discount">
+      <col id="total">
+      <col id="exclBTW">
+      <col id="btw">
+      <col id="type">
+      <col id="color">
     </colgroup>
     <thead>
     <tr>
