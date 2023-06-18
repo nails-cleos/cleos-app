@@ -143,8 +143,8 @@ export class MonthSummaryComponent implements OnInit {
   }
 
   twoDigit(input: HTMLInputElement, index: number, paymentId?: string): void {
-    this.summaries = this.summaries?.map((summary, i) => {
-      if (i === index) {
+    this.summaries = this.summaries?.map(summary => {
+      if (summary.position === index) {
         const isInvalidInput = this.isInvalidInput(input.value);
         let gross = isInvalidInput ? paymentId ?
             summary.total.payments.find(payment => payment.paymentId === paymentId)?.gross || summary.total.gross

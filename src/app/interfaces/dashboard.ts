@@ -120,6 +120,7 @@ export interface IMonthlySummaryTotal {
 
 export interface IMonthlySummaryReservation {
   id: string;
+  position: number;
   state: States;
   timestamp: number;
   reservationDate: Date;
