@@ -35,7 +35,8 @@
       "UNAVAILABLE": "Add unavailable",
       "ACCEPT": "Accept",
       "MERGE": "Merge",
-      "EXPORT": "Export",
+      "EXPORT": "Save & Export",
+      "SAVE": "Save",
       "EXPAND": {
         "TRUE": "Click to show less",
         "FALSE": "Click to show more"

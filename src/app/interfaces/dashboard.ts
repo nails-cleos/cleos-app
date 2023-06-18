@@ -107,27 +107,22 @@ export class ColorEvent implements EventColor {
   }
 }
 
-export interface IMonthSummaryPayment {
-  type: PaymentType;
-  total: number;
-  excBTW: number;
-  btw: number;
-}
-
 export interface IMonthlySummaryTotal {
-  excBTW: number;
+  paymentId: string;
+  type: PaymentType;
+  net: number;
   btw: number;
-  total: number;
+  gross: number;
   discountType: DiscountType;
   discountValue: number;
-  payments: IMonthSummaryPayment[];
+  payments: IMonthlySummaryTotal[];
 }
 
 export interface IMonthlySummaryReservation {
   id: string;
   state: States;
   timestamp: number;
-  date: Date;
+  reservationDate: Date;
   customerName: string;
   treatmentName: string;
   color: string;
@@ -138,6 +133,12 @@ export interface IMonthlyRoom {
   roomName: string;
   currency: ICurrencyAll;
   timeZone: string;
+}
+
+export interface IMonthlySummaryPayment {
+  paymentId: string;
+  gross: number;
+  btw: number;
 }
 
 export interface IMonthlySummary extends IMonthlyRoom {
