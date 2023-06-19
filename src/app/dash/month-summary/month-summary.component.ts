@@ -143,35 +143,41 @@ export class MonthSummaryComponent implements OnInit {
   }
 
   twoDigit(input: HTMLInputElement, index: number, paymentId?: string): void {
-    this.summaries = this.summaries?.map(summary => {
-      if (summary.position === index) {
-        const isInvalidInput = this.isInvalidInput(input.value);
-        let gross = isInvalidInput ? paymentId ?
-            summary.total.payments.find(payment => payment.paymentId === paymentId)?.gross || summary.total.gross
-            : summary.total.gross
-          : parseFloat(input.value);
-        let net = gross;
-        let btw = 0;
-        if (input.id === 'grossInput') {
-          net = gross * 100 / 121;
+    if (this.summaries) {
+      const objIndex = this.summaries.findIndex((obj => obj.position === index));
+      const isInvalidInput = this.isInvalidInput(input.value);
+      const summary = this.summaries[objIndex];
+      const total = summary.total;
+      let gross = isInvalidInput ? paymentId ?
+          total.payments.find(payment => payment.paymentId === paymentId)?.gross || total.gross
+          : total.gross
+        : parseFloat(input.value);
+      let net = gross;
+      let btw = 0;
+      if (input.id === 'grossInput') {
+        net = gross * 100 / 121;
+        btw = gross - net;
+      } else if (input.id === 'netInput') {
+        if (!isInvalidInput) {
+          net = parseFloat(input.value);
+          gross = net * 1.21;
           btw = gross - net;
-        } else if (input.id === 'netInput') {
-          if (!isInvalidInput) {
-            net = parseFloat(input.value);
-            gross = net * 1.21;
-            btw = gross - net;
-          }
-        } else if (input.id === 'btwInput') {
-          if (!isInvalidInput) {
-            btw = parseFloat(input.value);
-            net = btw * 100 / 21;
-            gross = btw + net;
-          }
         }
-        return this.newSummary(summary, paymentId, gross, net, btw);
+      } else if (input.id === 'btwInput') {
+        if (!isInvalidInput) {
+          btw = parseFloat(input.value);
+          net = btw * 100 / 21;
+          gross = btw + net;
+        }
       }
-      return summary;
-    });
+      const updatedObj = this.newSummary(summary, paymentId, gross, net, btw);
+
+      this.summaries = [
+        ...this.summaries.slice(0, objIndex),
+        updatedObj,
+        ...this.summaries.slice(objIndex + 1),
+      ];
+    }
 
     this.calculateTotals();
   }
