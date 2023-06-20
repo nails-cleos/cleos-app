@@ -186,12 +186,16 @@ export class MonthSummaryComponent implements OnInit {
                      btw: number = 0): IMonthlySummaryReservation {
     if (paymentId) {
       this.addSummary(paymentId, gross, btw);
-      const payments = summary.total.payments.map(payment => {
-        if (payment.paymentId === paymentId) {
-          return Object.assign({}, payment, { gross, net, btw });
-        }
-        return payment;
-      });
+      const objIndex = summary.total.payments.findIndex((obj => obj.paymentId === paymentId));
+      const payment = summary.total.payments[objIndex];
+
+      const updatedObj = Object.assign({}, payment, { gross, net, btw });
+
+      const payments = [
+        ...summary.total.payments.slice(0, objIndex),
+        updatedObj,
+        ...summary.total.payments.slice(objIndex + 1),
+      ];
       return Object.assign({}, summary, { total: { ...summary.total, payments } });
     }
     return Object.assign({}, summary, { total: { ...summary.total, gross, net, btw } });
