@@ -42,6 +42,7 @@
     }
   },
   "SUMMARY": {
+    "UPDATED": "Resumen mensual actualizado",
     "MONTHLY": {
       "SELECT": {
         "DATE": "Mes y año"
@@ -52,8 +53,8 @@
         "CUSTOMER": "Cliente",
         "TREATMENT": "Tratamiento",
         "DISCOUNT": "Descuento",
-        "TOTAL": "Total",
-        "EXC_BTW": "Neto",
+        "GROSS": "Bruto",
+        "NET": "Neto",
         "BTW": "BTW",
         "PAYMENT_TYPE": "Tipo",
         "COLOR": "Color",

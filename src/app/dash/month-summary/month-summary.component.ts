@@ -9,7 +9,7 @@ import { AppState, selectDashboardState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import * as fromActionsDashboard from '../../store/dashboard.actions';
-import { IMonthlyRoom, IMonthlySummaryReservation, IMonthlySummaryTotal, IMonthSummaryPayment } from '../../interfaces/dashboard';
+import { IMonthlyRoom, IMonthlySummaryReservation, IMonthlySummaryTotal, IMonthlySummaryPayment } from '../../interfaces/dashboard';
 
 export class CustomDateAdapter extends NativeDateAdapter {
 
@@ -54,11 +54,12 @@ export class MonthSummaryComponent implements OnInit {
   monthlySummaryMap?: Map<IMonthlyRoom, IMonthlySummaryReservation[]>;
   selectedRoom = new UntypedFormControl();
   summaries?: IMonthlySummaryReservation[];
+  monthlySummaryPayment: IMonthlySummaryPayment[] = [];
   weeks: any[];
   dateFormat: string;
   showInput = true;
-  totalMonth = 0;
-  excBTWMonth = 0;
+  grossMonth = 0;
+  netMonth = 0;
   btwMonth = 0;
 
   private getState: Observable<any>;
@@ -70,8 +71,22 @@ export class MonthSummaryComponent implements OnInit {
     this.weeks = getWeeksInMonth(getNow());
   }
 
+  get updateMonthlySummary(): void {
+    return this.store.dispatch(
+      new fromActionsDashboard.UpdateMonthlySummary(
+        {
+          date: this.getDateFormat(this.date.value),
+          gross: this.grossMonth,
+          btw: this.btwMonth,
+          payments: this.monthlySummaryPayment
+        }
+      )
+    );
+  }
+
   get exportCVS(): void {
     this.showInput = false;
+
     setTimeout(() => {
       let csv = '';
       const table = this.table.nativeElement;
@@ -97,7 +112,7 @@ export class MonthSummaryComponent implements OnInit {
         }
       }
 
-      csv += `,,,,${ this.totalMonth },${ this.excBTWMonth }, ${ this.btwMonth }\n`;
+      csv += `,,,,${ this.grossMonth },${ this.netMonth }, ${ this.btwMonth }\n`;
 
       csv = `${ csv.substring(0, csv.length - 1) }\n`;
       const hiddenElement = document.createElement('a');
@@ -105,6 +120,8 @@ export class MonthSummaryComponent implements OnInit {
       hiddenElement.target = '_blank';
       hiddenElement.download = 'data.csv';
       hiddenElement.click();
+
+      return this.updateMonthlySummary;
     }, 0);
     return;
   }
@@ -125,53 +142,73 @@ export class MonthSummaryComponent implements OnInit {
     datepicker.close();
   }
 
-  twoDigit(input: HTMLInputElement, summaryId: string, index?: number): void {
-    this.summaries = this.summaries?.map(summary => {
-      if (summary.id === summaryId) {
-        const isInvalidInput = this.isInvalidInput(input.value);
-        let total = isInvalidInput ?
-          index || index === 0 ?
-            summary.total.payments[index].total
-            : summary.total.total
-          : parseFloat(input.value);
-        let excBTW = 0;
-        let btw = 0;
-        if (input.id === 'totalInput') {
-          excBTW = total * 100 / 121;
-          btw = total - excBTW;
-        } else if (input.id === 'excBTWInput') {
-          if (!isInvalidInput) {
-            excBTW = parseFloat(input.value);
-            total = excBTW * 1.21;
-            btw = total - excBTW;
-          }
-        } else if (input.id === 'btwInput') {
-          if (!isInvalidInput) {
-            btw = parseFloat(input.value);
-            excBTW = btw * 100 / 21;
-            total = btw + excBTW;
-          }
+  twoDigit(input: HTMLInputElement, index: number, paymentId?: string): void {
+    if (this.summaries) {
+      const objIndex = this.summaries.findIndex((obj => obj.position === index));
+      const isInvalidInput = this.isInvalidInput(input.value);
+      const summary = this.summaries[objIndex];
+      const total = summary.total;
+      let gross = isInvalidInput ? paymentId ?
+          total.payments.find(payment => payment.paymentId === paymentId)?.gross || total.gross
+          : total.gross
+        : parseFloat(input.value);
+      let net = gross;
+      let btw = 0;
+      if (input.id === 'grossInput') {
+        net = gross * 100 / 121;
+        btw = gross - net;
+      } else if (input.id === 'netInput') {
+        if (!isInvalidInput) {
+          net = parseFloat(input.value);
+          gross = net * 1.21;
+          btw = gross - net;
         }
-        return this.newSummary(summary, index, total, excBTW, btw);
+      } else if (input.id === 'btwInput') {
+        if (!isInvalidInput) {
+          btw = parseFloat(input.value);
+          net = btw * 100 / 21;
+          gross = btw + net;
+        }
       }
-      return summary;
-    });
+      const updatedObj = this.newSummary(summary, paymentId, gross, net, btw);
+
+      this.summaries = [
+        ...this.summaries.slice(0, objIndex),
+        updatedObj,
+        ...this.summaries.slice(objIndex + 1),
+      ];
+    }
 
     this.calculateTotals();
   }
 
-  private newSummary(summary: IMonthlySummaryReservation, paymentIndex?: number, total: number = 0, excBTW: number = 0,
+  private newSummary(summary: IMonthlySummaryReservation, paymentId?: string, gross: number = 0, net: number = 0,
                      btw: number = 0): IMonthlySummaryReservation {
-    if (paymentIndex || paymentIndex === 0) {
-      const payments = summary.total.payments.map((payment, i) => {
-        if (paymentIndex === i) {
-          return Object.assign({}, payment, { total, excBTW, btw });
-        }
-        return payment;
-      });
+    if (paymentId) {
+      this.addSummary(paymentId, gross, btw);
+      const objIndex = summary.total.payments.findIndex((obj => obj.paymentId === paymentId));
+      const payment = summary.total.payments[objIndex];
+
+      const updatedObj = Object.assign({}, payment, { gross, net, btw });
+
+      const payments = [
+        ...summary.total.payments.slice(0, objIndex),
+        updatedObj,
+        ...summary.total.payments.slice(objIndex + 1),
+      ];
       return Object.assign({}, summary, { total: { ...summary.total, payments } });
     }
-    return Object.assign({}, summary, { total: { ...summary.total, total, excBTW, btw } });
+    return Object.assign({}, summary, { total: { ...summary.total, gross, net, btw } });
+  }
+
+  private addSummary(paymentId: string, gross: number, btw: number): void {
+    const newSummary = { paymentId, gross, btw };
+    const exist = this.monthlySummaryPayment.find(ms => ms.paymentId === paymentId);
+    if (exist) {
+      this.monthlySummaryPayment = this.monthlySummaryPayment.map(u => u.paymentId !== newSummary.paymentId ? u : newSummary);
+    } else {
+      this.monthlySummaryPayment.push(newSummary);
+    }
   }
 
   private isInvalidInput(value: string): boolean {
@@ -186,19 +223,26 @@ export class MonthSummaryComponent implements OnInit {
     });
     this.date.valueChanges.subscribe(value => {
       if (value) {
-        const month = `0${ value.getMonth() + 1 }`.slice(0, 2);
-        const year = value.getFullYear();
-
-        this.getSummary(`${ month }-${ year }`);
+        this.getSummary(this.getDateFormat(value));
         this.weeks = getWeeksInMonth(value);
         this.showInput = true;
       }
     });
   }
 
+  private getDateFormat(date: Date | null): string {
+    if (!date) {
+      return '';
+    }
+    const month = `0${ date.getMonth() + 1 }`.slice(0, 2);
+    const year = date.getFullYear();
+
+    return `${ month }-${ year }`;
+  }
+
   private getSummary(date: string): void {
     this.store.dispatch(
-      new fromActionsDashboard.GetSummary(date)
+      new fromActionsDashboard.GetMonthlySummary(date)
     );
   }
 
@@ -214,10 +258,10 @@ export class MonthSummaryComponent implements OnInit {
 
   private createData(): void {
     if (this.selectedRoom.value) {
-      this.summaries = this.monthlySummaryMap?.get(this.selectedRoom.value)?.map((s: IMonthlySummaryReservation) => {
+      this.summaries = this.monthlySummaryMap?.get(this.selectedRoom.value)?.map((s: IMonthlySummaryReservation, i) => {
         if (s.id) {
-          const date = newDateTimestamp(s.timestamp);
-          return Object.assign({}, s, { date, day: date.getDate() });
+          const reservationDate = newDateTimestamp(s.timestamp);
+          return Object.assign({}, s, { reservationDate, day: reservationDate.getDate(), position: i });
         }
         return s;
       });
@@ -226,37 +270,37 @@ export class MonthSummaryComponent implements OnInit {
   }
 
   private cleanCVSText(text: string): string {
-    return `${ text.replace(/,/g, '') },`;
+    return `${ text.replace(/,/g, '') }, `;
   }
 
   private calculateTotals(): void {
     const t = this.summaries?.map(s => s.total).reduce((totals: any, next: IMonthlySummaryTotal) => {
-      let total;
-      let excBTW;
+      let gross;
+      let net;
       let btw;
       if (next.payments?.length) {
-        const paid = next.payments.reduce((payments: any, payment: IMonthSummaryPayment) => {
-          payments.total += payment.total;
-          payments.excBTW += payment.excBTW;
+        const paid = next.payments.reduce((payments: any, payment: IMonthlySummaryTotal) => {
+          payments.gross += payment.gross;
+          payments.net += payment.net;
           payments.btw += payment.btw;
           return payments;
-        }, { total: 0, excBTW: 0, btw: 0 });
-        total = paid.total;
-        excBTW = paid.excBTW;
+        }, { gross: 0, net: 0, btw: 0 });
+        gross = paid.gross;
+        net = paid.net;
         btw = paid.btw;
       } else {
-        total = next.total;
-        excBTW = next.excBTW;
+        gross = next.gross;
+        net = next.net;
         btw = next.btw;
       }
-      totals.total += total;
-      totals.excBTW += excBTW;
+      totals.gross += gross;
+      totals.net += net;
       totals.btw += btw;
       return totals;
-    }, { total: 0, excBTW: 0, btw: 0 });
+    }, { gross: 0, net: 0, btw: 0 });
 
-    this.totalMonth = t?.total || 0;
-    this.excBTWMonth = t?.excBTW || 0;
+    this.grossMonth = t?.gross || 0;
+    this.netMonth = t?.net || 0;
     this.btwMonth = t?.btw || 0;
   }
 }

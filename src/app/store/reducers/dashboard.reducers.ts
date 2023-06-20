@@ -133,7 +133,7 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false
       };
     }
-    case DashboardActionTypes.dashSummary: {
+    case DashboardActionTypes.monthlySummary: {
       return {
         ...state,
         monthlySummaryMap: null,
@@ -143,7 +143,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
-    case DashboardActionTypes.dashSummarySuccess: {
+    case DashboardActionTypes.monthlySummarySuccess: {
       return {
         ...state,
         monthlySummaryMap: monthSummaryMap(action.payload),
@@ -151,6 +151,25 @@ export const reducer = (state = initialState, action: All): State => {
         error: null,
         subErrors: null,
         message: null
+      };
+    }
+    case DashboardActionTypes.saveMonthlySummary: {
+      return {
+        ...state,
+        monthlySummaryMap: null,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: null
+      };
+    }
+    case DashboardActionTypes.saveMonthlySummarySuccess: {
+      return {
+        ...state,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: action.payload.message
       };
     }
     case DashboardActionTypes.clean: {
