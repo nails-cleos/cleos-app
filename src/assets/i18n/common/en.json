@@ -128,6 +128,29 @@
         "3": "Cancellation/Rescheduling of an appointment made <span class='important'>within 24 hours prior</span> will result in a <span class='important'>refund or discount voucher</span> for the paid amount."
       }
     },
+    "EXPENSE": {
+      "TYPE": {
+        "OPERATING": "Operating",
+        "COGS": "Cost of Goods Sold",
+        "O_MAP": "Marketing, advertising and promotion",
+        "O_SBW": "Salaries, benefits and wages",
+        "SGA": "Selling, general and administrative",
+        "RI": "Rent and insurance",
+        "DA": "Depreciation and amortization",
+        "OTHER": "Other",
+        "NON_OPERATING": "Non operating",
+        "INTEREST": "Interest",
+        "TAXES": "Taxes",
+        "IC": "Impairment charges",
+        "FIXED": "Fixed",
+        "RENT": "Rent",
+        "F_SBW": "Salaries, benefits and wages",
+        "VARIABLE": "Variable",
+        "TRANSACTION_FEES": "Transaction fees",
+        "COMMISSIONS": "Commissions",
+        "V_MAP": "Marketing, advertising and promotion"
+      }
+    },
     "STATUS": {
       "PAYMENT": {
         "NONE": "Pending",

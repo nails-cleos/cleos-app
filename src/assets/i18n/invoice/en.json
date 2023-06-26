@@ -4,7 +4,9 @@
       "TITLE": "Search",
       "RANGE": {
         "FIELD": "Select range date",
-        "REQUIRED": "Range date is <b>required</b>"
+        "REQUIRED": "Range date is <b>required</b>",
+        "START": "Start",
+        "END": "End"
       },
       "START": {
         "FIELD": "Start number",

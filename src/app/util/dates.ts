@@ -355,6 +355,10 @@ export const monthViewTitle = (date: Date, locale: string = 'en'): string => dat
   year: 'numeric', month: 'long'
 }).replace(/^\w/, (c) => c.toUpperCase());
 
+export const monthTitle = (date: Date, locale: string, measure: 'long' | 'short'): string => date.toLocaleDateString(locale, {
+  month: measure
+}).replace(/^\w/, (c) => c.toUpperCase());
+
 export const invoiceTitle = (date: Date): string => date.toLocaleDateString(API_LOCALE, {
   year: 'numeric', month: '2-digit'
 });

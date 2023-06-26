@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ICardSummary, IEventSummary, IMonthlySummaryPayment, IRoomEvents } from '../interfaces/dashboard';
+import { ICardSummary, IEventSummary, IMonthlySummaryRequest, IRoomEvents, SummaryType } from '../interfaces/dashboard';
 import { IReservation } from '../interfaces/reservation';
 
 @Injectable()
@@ -36,7 +36,12 @@ export class DashboardService {
     return this.http.get<any>(`${ this.urlV1 }/summaries/${ date }`);
   }
 
-  public saveMonthlySummary(date: string, gross: number, btw: number, payments: IMonthlySummaryPayment[]): Observable<void> {
-    return this.http.post<void>(`${ this.urlV1 }/summaries/${ date }`, { gross, btw, payments });
+  public saveMonthlySummary(date: string, gross: number, btw: number, summaries: IMonthlySummaryRequest[],
+                            type: SummaryType, roomId: string): Observable<void> {
+    return this.http.post<void>(`${ this.urlV1 }/summaries/${ date }`, { gross, btw, summaries, type, roomId });
+  }
+
+  public getYearSummary(year: number): Observable<any> {
+    return this.http.get<any>(`${ this.urlV1 }/quarters/${ year }`);
   }
 }

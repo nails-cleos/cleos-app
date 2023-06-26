@@ -128,6 +128,29 @@
         "3": "La cancelación/cambios de una cita realizada <span class='important'>dentro de las 24 horas anteriores</span> dará lugar a <span class='important'>reembolso o un vale de descuento</span> por el importe abonado."
       }
     },
+    "EXPENSE": {
+      "TYPE": {
+        "OPERATING": "Operativo",
+        "COGS": "Costo de los bienes vendidos",
+        "O_MAP": "Marketing, publicidad y promoción",
+        "O_SBW": "Salarios, prestaciones y salarios",
+        "SGA": "Vendedor general y administrativo",
+        "RI": "Alquiler y seguro",
+        "DA": "Depreciación y amortización",
+        "OTHER": "Otros",
+        "NON_OPERATING": "No operativo",
+        "INTEREST": "Interés",
+        "TAXES": "Impuestos",
+        "IC": "Cargos por deterioro",
+        "FIXED": "Fijo",
+        "RENT": "Alquilar",
+        "F_SBW": "Salarios, prestaciones y salarios",
+        "VARIABLE": "Variable",
+        "TRANSACTION_FEES": "Tarifas de transacción",
+        "COMMISSIONS": "Comisiones",
+        "V_MAP": "Marketing, publicidad y promoción"
+      }
+    },
     "STATUS": {
       "PAYMENT": {
         "NONE": "Pendiente",

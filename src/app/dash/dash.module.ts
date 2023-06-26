@@ -21,13 +21,17 @@ import { TrackingService } from '../services/tracking.service';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { ColorService } from '../services/color.service';
 import { MonthSummaryComponent } from './month-summary/month-summary.component';
+import { QuarterSummaryComponent } from './quarter-summary/quarter-summary.component';
+import { QuarterComponent } from './quarter-summary/quarter/quarter.component';
 
 @NgModule({
   declarations: [
     DashComponent,
     MiniCardComponent,
     ReservationTableComponent,
-    MonthSummaryComponent
+    MonthSummaryComponent,
+    QuarterSummaryComponent,
+    QuarterComponent
   ],
   imports: [
     DashRoutingModule,

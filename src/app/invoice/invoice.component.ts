@@ -1,6 +1,5 @@
-import { ChangeDetectorRef, Component, ElementRef, Injectable, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { DateAdapter } from '@angular/material/core';
-import { DateRange, MAT_DATE_RANGE_SELECTION_STRATEGY, MatDateRangeSelectionStrategy } from '@angular/material/datepicker';
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MAT_DATE_RANGE_SELECTION_STRATEGY } from '@angular/material/datepicker';
 import { FormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { AppState, selectInvoiceState } from '../store/app.states';
 import { Observable, Subscription } from 'rxjs';
@@ -23,43 +22,9 @@ import { IInvoice } from '../interfaces/invoice';
 import { IOffice, IOfficeAll, Office } from '../interfaces/office';
 import { pdf } from '../util/invoice';
 import { requireMatch } from '../util/validators';
+import { QuarterPeriodAdapter } from '../util/adapter/quarter-period.adapter';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
-@Injectable()
-export class PeriodRangeSelectionStrategy<D> implements MatDateRangeSelectionStrategy<D> {
-  constructor(private dateAdapter: DateAdapter<D>) {
-  }
-
-  selectionFinished(date: D | null): DateRange<D> {
-    return this.createPeriodRange(date);
-  }
-
-  createPreview(activeDate: D | null): DateRange<D> {
-    return this.createPeriodRange(activeDate);
-  }
-
-  private createPeriodRange(date: D | null): DateRange<D> {
-    if (date) {
-      const year = this.dateAdapter.getYear(date);
-      const month = this.dateAdapter.getMonth(date);
-      const lastDay = this.dateAdapter.getNumDaysInMonth(date);
-
-      let startMonth = month - 2;
-      let startYear = year;
-      if (startMonth < 0) {
-        startMonth += 12;
-        startYear -= 1;
-      }
-
-      const start = this.dateAdapter.createDate(startYear, startMonth, 1);
-      const end = this.dateAdapter.createDate(year, month, lastDay);
-      return new DateRange<D>(start, end);
-    }
-
-    return new DateRange<D>(null, null);
-  }
-}
 
 @Component({
   selector: 'app-invoice',
@@ -69,7 +34,7 @@ export class PeriodRangeSelectionStrategy<D> implements MatDateRangeSelectionStr
   providers: [
     {
       provide: MAT_DATE_RANGE_SELECTION_STRATEGY,
-      useClass: PeriodRangeSelectionStrategy,
+      useClass: QuarterPeriodAdapter,
     },
   ]
 })
@@ -77,7 +42,6 @@ export class InvoiceComponent implements OnInit, OnDestroy {
   @ViewChild('pdfTable') pdfTable!: ElementRef;
   @ViewChild(MatPaginator) paginator?: MatPaginator;
   @ViewChild('typeInput') typeInput!: ElementRef<HTMLInputElement>;
-  title = 'htmltopdf';
 
   displayedColumns: string[] = ['select', 'position', 'customer', 'timestamp', 'treatment', 'actions'];
   expandedInvoice?: IInvoice;
