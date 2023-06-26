@@ -52,7 +52,7 @@
     color: black;
   }
 
-  #tableData {
+  #reservationTableData, #expenseTableData {
     th, td {
       border: 1px solid mat.get-color-from-palette($primary-palette) !important;
     }
@@ -60,6 +60,14 @@
     tr:hover {
       background-color: mat.get-color-from-palette($background, hover);
     }
+  }
+
+  .result {
+    border-bottom: solid 3px mat.get-color-from-palette($accent-palette);
+  }
+
+  .result:after {
+    border-bottom: solid 3px mat.get-color-from-palette($primary-palette);
   }
 
   @if $isDark {

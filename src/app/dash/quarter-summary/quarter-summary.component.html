@@ -1,0 +1,56 @@
+<div>
+  <fieldset>
+    <div fxLayout="row" fxLayoutAlign="space-around center">
+      <mat-form-field>
+        <mat-label>{{'SUMMARY.YEAR.SELECT.DATE' | translate}}</mat-label>
+        <input matInput [matDatepicker]="dp" [formControl]="date">
+        <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
+        <mat-datepicker #dp startView="multi-year" (yearSelected)="setYear($event, dp)">
+        </mat-datepicker>
+      </mat-form-field>
+      <!--      <div fxFlex></div>-->
+      <button color="accent" mat-fab matTooltip="{{ 'SUMMARY.MONTHLY.FIELD' | translate }}"
+              routerLink="/dashboard/monthly/summary">
+        <mat-icon>calendar_month</mat-icon>
+      </button>
+    </div>
+    <div fxLayout="column" fxLayoutAlign="space-around stretch">
+      <ng-template [ngIf]="yearSummaryMap?.size">
+        <mat-form-field appearance="outline" class="full-select">
+          <mat-select [formControl]="selectedRoom">
+            <mat-option *ngFor="let quarterSummary of yearSummaryMap | keyvalue" [value]="quarterSummary.key">
+              {{quarterSummary.key.roomName}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </ng-template>
+    </div>
+  </fieldset>
+</div>
+
+<ng-template [ngIf]="!isLoading" [ngIfElse]="loading">
+  <ng-template [ngIf]="date.value">
+    <ng-template [ngIf]="yearSummaryMap?.size" [ngIfElse]="noData">
+      <ng-template [ngIf]="isHandset$ | async" [ngIfElse]="bigScreen">
+        <app-quarter [cols]="1" [yearSummaries]="yearSummaries" [year]="date.value.getFullYear()"
+                     [measure]="'short'" [currency]="selectedRoom.value.currency"></app-quarter>
+      </ng-template>
+
+      <ng-template #bigScreen>
+        <app-quarter [cols]="2" [yearSummaries]="yearSummaries" [year]="date.value.getFullYear()"
+                     [measure]="'long'" [currency]="selectedRoom.value.currency"></app-quarter>
+      </ng-template>
+    </ng-template>
+
+    <ng-template #noData>
+      <div style="text-align: center"
+           [innerHTML]="'SUMMARY.YEAR.ERROR.NO_CONTENT' | translate:{year: date.value.getFullYear()}"></div>
+    </ng-template>
+  </ng-template>
+</ng-template>
+
+<ng-template #loading>
+  <div class="spinner-parent-center">
+    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+  </div>
+</ng-template>

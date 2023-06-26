@@ -176,26 +176,7 @@
     },
     "TYPE": {
       "FIELD": "Type",
-      "REQUIRED": "Type is <b>required</b>",
-      "OPERATING": "Operating",
-      "COGS": "Cost of Goods Sold",
-      "O_MAP": "Marketing, advertising and promotion",
-      "O_SBW": "Salaries, benefits and wages",
-      "SGA": "Selling, general and administrative",
-      "RI": "Rent and insurance",
-      "DA": "Depreciation and amortization",
-      "OTHER": "Other",
-      "NON_OPERATING": "Non operating",
-      "INTEREST": "Interest",
-      "TAXES": "Taxes",
-      "IC": "Impairment charges",
-      "FIXED": "Fixed",
-      "RENT": "Rent",
-      "F_SBW": "Salaries, benefits and wages",
-      "VARIABLE": "Variable",
-      "TRANSACTION_FEES": "Transaction fees",
-      "COMMISSIONS": "Commissions",
-      "V_MAP": "Marketing, advertising and promotion"
+      "REQUIRED": "Type is <b>required</b>"
     },
     "DELETED": {
       "TITLE": "Delete expense",

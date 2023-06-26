@@ -46,15 +46,24 @@ export class DashboardEffects {
   getSummary$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.monthlySummary)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.dashboardService.getSummary(payload).pipe(
-      switchMap((response: any) => of(new fromActionsDashboard.GetMonthlySummarySuccess(response ? response : []))),
+      switchMap((response: any) => of(new fromActionsDashboard.MonthlySummarySuccess(response ? response : []))),
       catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
     ))
   ));
 
   saveMonthlySummary$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.saveMonthlySummary)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.dashboardService.saveMonthlySummary(payload.date, payload.gross, payload.btw, payload.payments).pipe(
+    switchMap((payload: any) => this.dashboardService.saveMonthlySummary(payload.date, payload.gross, payload.btw,
+      payload.summaries, payload.type, payload.roomId).pipe(
       switchMap(() => of(new fromActionsDashboard.UpdateMonthlySummarySuccess({ message: this.translate.instant('SUMMARY.UPDATED') }))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
+    ))
+  ));
+
+  getYearSummary$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.yearSummary)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.dashboardService.getYearSummary(payload).pipe(
+      switchMap((response: any) => of(new fromActionsDashboard.YearSummarySuccess(response ? response : []))),
       catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
     ))
   ));

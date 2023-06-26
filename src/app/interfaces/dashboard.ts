@@ -107,41 +107,110 @@ export class ColorEvent implements EventColor {
   }
 }
 
-export interface IMonthlySummaryTotal {
-  paymentId: string;
-  type: PaymentType;
+export enum SummaryType {
+  payment,
+  expense
+}
+
+export interface ISummaryTotal {
+  id: string;
+  paymentType: PaymentType;
+  expenseType: string;
+  type: string;
   net: number;
   btw: number;
   gross: number;
   discountType: DiscountType;
   discountValue: number;
-  payments: IMonthlySummaryTotal[];
+  payments: ISummaryTotal[];
 }
 
-export interface IMonthlySummaryReservation {
+export interface IMonthlySummary {
   id: string;
   position: number;
-  state: States;
   timestamp: number;
+  total: ISummaryTotal;
+}
+
+export interface IMonthlySummaryReservation extends IMonthlySummary {
+  state: States;
   reservationDate: Date;
   customerName: string;
   treatmentName: string;
   color: string;
-  total: IMonthlySummaryTotal;
 }
 
-export interface IMonthlyRoom {
+export interface IMonthlySummaryExpense extends IMonthlySummary {
+  expenseDate: Date;
+  invoice: string;
+  storeSupply: string;
+}
+
+export interface ISummaryRoom {
+  roomId: string;
   roomName: string;
   currency: ICurrencyAll;
   timeZone: string;
 }
 
-export interface IMonthlySummaryPayment {
-  paymentId: string;
+export interface IMonthlySummaryRequest {
+  id: string;
   gross: number;
   btw: number;
 }
 
-export interface IMonthlySummary extends IMonthlyRoom {
+export interface IMonthlyRoomSummary extends ISummaryRoom {
   reservationSummary: IMonthlySummaryReservation[];
+  expenseSummary: IMonthlySummaryExpense[];
+}
+
+export interface IYearRoomSummary extends ISummaryRoom {
+  yearSummaries: IYearSummary[];
+}
+
+export interface IQuarterSummary {
+  month: number;
+  total: ISummaryTotal[];
+  totalGross: number;
+  totalNet: number;
+  totalBTW: number;
+}
+
+export interface IYearSummary {
+  quarter: number;
+  summaries: IQuarterSummary[];
+}
+
+export class YearSummary implements IYearSummary {
+  quarter: number;
+  summaries: IQuarterSummary[];
+
+  constructor(quarter: number, summaries: IQuarterSummary[]) {
+    this.quarter = quarter;
+    this.summaries = summaries;
+  }
+}
+
+export class QuarterSummary implements IQuarterSummary {
+  month: number;
+  total: ISummaryTotal[];
+  totalGross: number;
+  totalNet: number;
+  totalBTW: number;
+
+  constructor(month: number, total: ISummaryTotal[]) {
+    this.month = month;
+    this.total = total;
+    const { totalGross, totalNet, totalBTW } = total.reduce((totals: any, next: ISummaryTotal) => {
+      const by = next.type === 'INCOME' ? 1 : -1;
+      totals.totalGross += next.gross * by;
+      totals.totalNet += next.net * by;
+      totals.totalBTW += next.btw * by;
+
+      return totals;
+    }, { totalGross: 0, totalNet: 0, totalBTW: 0 });
+    this.totalGross = totalGross;
+    this.totalNet = totalNet;
+    this.totalBTW = totalBTW;
+  }
 }

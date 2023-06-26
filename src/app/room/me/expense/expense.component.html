@@ -75,9 +75,9 @@
                 <mat-label>{{ 'EXPENSE.TYPE.FIELD' | translate }}</mat-label>
                 <mat-select formControlName="type" required>
                   <mat-optgroup *ngFor="let group of types | keyvalue"
-                                [label]="'EXPENSE.TYPE.' + group.key | translate">
+                                [label]="'COMMON.EXPENSE.TYPE.' + group.key | translate">
                     <mat-option *ngFor="let type of group.value" [value]="type">
-                      {{'EXPENSE.TYPE.' + type | translate}}
+                      {{'COMMON.EXPENSE.TYPE.' + type | translate}}
                     </mat-option>
                   </mat-optgroup>
                 </mat-select>
