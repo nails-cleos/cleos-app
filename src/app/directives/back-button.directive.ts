@@ -11,6 +11,7 @@ import { executeDialogNoWidth } from '../util/helper';
 })
 export class BackButtonDirective {
   @Input() form?: UntypedFormGroup;
+  @Input() date?: Date;
 
   constructor(private navigation: NavigationService, private translate: TranslateService, public dialog: MatDialog) {
   }
@@ -22,11 +23,11 @@ export class BackButtonDirective {
       const content = this.translate.instant('COMMON.BACK.CONTENT');
       executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: this.form }, result => {
         if (result) {
-          this.navigation.back();
+          this.navigation.back(this.date);
         }
       });
     } else {
-      this.navigation.back();
+      this.navigation.back(this.date);
     }
   }
 }

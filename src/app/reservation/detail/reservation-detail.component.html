@@ -465,7 +465,7 @@
   <mat-divider></mat-divider>
   <mat-card-actions *ngIf="reservation; else buttonSkeleton">
     <div fxFlex></div>
-    <button appBackButton color="accent" mat-fab extended type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+    <button appBackButton [date]="start" color="accent" mat-fab extended type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
   </mat-card-actions>
   <ng-template #buttonSkeleton>
     <div class="ssc-head-line"></div>
