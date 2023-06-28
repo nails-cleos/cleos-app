@@ -14,7 +14,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { IUserAll } from '../../interfaces/user';
 import { getUserName } from '../../util/helper';
 import { filterDateRoom, getNow, plusMonthDate } from '../../util/dates';
-import { MAX_RESERVATION_MONTH } from '../../interfaces/reservation';
+import { MAX_RESERVATION_CUSTOMER_MONTH } from '../../interfaces/reservation';
 import * as fromActionsMain from '../../store/main.actions';
 
 @Component({
@@ -69,7 +69,7 @@ export class MainContentComponent implements OnInit, OnDestroy {
       }
     });
     this.minDate = getNow();
-    this.maxDate = plusMonthDate(this.minDate, MAX_RESERVATION_MONTH, this.minDate.getDate() + 1);
+    this.maxDate = plusMonthDate(this.minDate, MAX_RESERVATION_CUSTOMER_MONTH, this.minDate.getDate() + 1);
   }
 
   get book(): void {

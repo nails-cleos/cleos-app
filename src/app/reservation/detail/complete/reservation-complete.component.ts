@@ -275,7 +275,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   private getTreatments(): void {
     if (this.roomId) {
       this.store.dispatch(
-        new fromActionsReservation.GetAllServices({ roomId: this.roomId, customerId: this.customerId })
+        new fromActionsReservation.GetAllTreatments({ roomId: this.roomId, customerId: this.customerId })
       );
     }
   }

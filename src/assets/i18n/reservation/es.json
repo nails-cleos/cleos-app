@@ -133,7 +133,7 @@
       "TRANSFER": {
         "FIELD": "Referencia de transferencia"
       },
-      "UPDATE":{
+      "UPDATE": {
         "MESSAGE": "Pago(s) actualizado(s)"
       }
     },
@@ -189,7 +189,10 @@
       }
     },
     "NOTE": {
-      "FIELD": "Nota"
+      "FIELD": "Nota",
+      "REQUIRED": "Nota es <b>requerida</b>",
+      "ADD": "Agregar nota",
+      "MESSAGE": "¿Cuál es tu nota?"
     },
     "CANCEL": {
       "TITLE": "Cancelar la reserva",

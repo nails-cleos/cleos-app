@@ -7,7 +7,7 @@ export enum ReservationActionTypes {
   getAllGroupingByRoom = '[Reservation] Get all grouping by room',
   getCustomers = '[Reservation] Get customers',
   getCustomerInfo = '[Reservation] Get customer info',
-  getServices = '[Reservation] Get services',
+  getTreatments = '[Reservation] Get treatments',
   getRooms = '[Reservation] Get rooms',
   findRooms = '[Reservation] Find rooms',
   getAdditional = '[Reservation] Get additional',
@@ -50,6 +50,7 @@ export enum ReservationActionTypes {
   reservationCompleteSuccess = '[Reservation] Complete success',
   getAllColorsByTreatmentId = '[Reservation] Get all colors by treatment id',
   colorsCompleteSuccess = '[Reservation] Colors complete success',
+  updateNote = '[Reservation] Update note',
   clean = '[Reservation] Clean'
 }
 
@@ -106,8 +107,8 @@ export class GetCustomerInfo implements Action {
   }
 }
 
-export class GetAllServices implements Action {
-  readonly type = ReservationActionTypes.getServices;
+export class GetAllTreatments implements Action {
+  readonly type = ReservationActionTypes.getTreatments;
 
   constructor(public payload?: any) {
   }
@@ -387,6 +388,13 @@ export class ColorSuccess implements Action {
   }
 }
 
+export class UpdateNote implements Action {
+  readonly type = ReservationActionTypes.updateNote;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class Clean implements Action {
   readonly type = ReservationActionTypes.clean;
 }
@@ -400,7 +408,7 @@ export type All =
   | CustomerSearchReservation
   | GetAllCustomers
   | GetCustomerInfo
-  | GetAllServices
+  | GetAllTreatments
   | GetAllRooms
   | FindRooms
   | GetAllAdditional
@@ -440,4 +448,5 @@ export type All =
   | ChangeCustomer
   | GetAllColorsByTreatmentId
   | ColorSuccess
+  | UpdateNote
   | Clean;

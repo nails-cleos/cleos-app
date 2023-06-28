@@ -46,7 +46,7 @@ import { detailExpandAnimation, transitionAnimation } from '../../util/animation
 import { isToday, isTomorrow } from 'date-fns';
 import { ReservationIconName } from '../../util/icon';
 import { DiscountDialogComponent } from '../../discount/list/discounts.component';
-import { FormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormArray, FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
 import * as fromActionsUser from '../../store/user.actions';
 import { requireMatch } from '../../util/validators';
@@ -156,6 +156,17 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     return this.store.dispatch(
       new fromActionsPayment.PaymentUpdate(payload)
     );
+  }
+
+  get addNote(): void {
+    executeDialog(this.dialog, AddNoteDialogComponent, { note: this.reservation?.note }, result => {
+      if (result) {
+        this.store.dispatch(
+          new fromActionsReservation.UpdateNote({ note: result.note, reservationId: this.reservation?.id })
+        );
+      }
+    }, true);
+    return;
   }
 
   private static createMachine(stateMachineDefinition: any, initialState: any): any {
@@ -948,6 +959,40 @@ export class ChangeColorDialogComponent implements OnInit, OnDestroy {
     this.subscription = this.getState.subscribe(state => {
       this.colors = state.colors;
       this.color.setValue(this.colors?.find(color => color.id === this.data.colorId));
+    });
+  }
+}
+
+@Component({
+  selector: 'app-add-note-dialog-component',
+  templateUrl: './add-note-dialog.component.html'
+})
+export class AddNoteDialogComponent implements OnInit {
+  noteForm!: UntypedFormGroup;
+  note: FormControl<string | null> = new FormControl('', [
+    Validators.required
+  ]);
+
+  constructor(public dialogRef: MatDialogRef<DiscountDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
+              private formBuilder: UntypedFormBuilder) {
+    this.note.setValue(data.note || '');
+  }
+
+  get onNoClick(): void {
+    return this.dialogRef.close();
+  }
+
+  get doAction(): void {
+    return this.dialogRef.close({ note: this.note.value });
+  }
+
+  ngOnInit(): void {
+    this.createForm();
+  }
+
+  private createForm(): void {
+    this.noteForm = this.formBuilder.group({
+      note: this.note
     });
   }
 }

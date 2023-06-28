@@ -8,6 +8,7 @@ import { ReservationRoutingModule } from './reservation-routing.module';
 import { SearchComponent } from './search/search.component';
 import { ReservationComponent, SelectProfessionalDialogComponent } from './reservation.component';
 import {
+  AddNoteDialogComponent,
   ChangeColorDialogComponent,
   ChangeCustomerDialogComponent,
   ReservationDetailComponent
@@ -39,7 +40,8 @@ import { ColorService } from '../services/color.service';
     ReservationCompleteComponent,
     ChangeCustomerDialogComponent,
     ChangeColorDialogComponent,
-    SelectProfessionalDialogComponent
+    SelectProfessionalDialogComponent,
+    AddNoteDialogComponent
   ],
   imports: [
     ReservationRoutingModule,

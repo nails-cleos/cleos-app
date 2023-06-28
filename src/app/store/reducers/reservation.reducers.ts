@@ -161,17 +161,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
-    case ReservationActionTypes.getRooms: {
-      return {
-        ...state,
-        rooms: null,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
+    case ReservationActionTypes.getRooms:
     case ReservationActionTypes.findRooms: {
       return {
         ...state,
@@ -194,7 +184,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
-    case ReservationActionTypes.getServices: {
+    case ReservationActionTypes.getTreatments: {
       return {
         ...state,
         treatmentDiscount: null,
@@ -204,6 +194,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
+    case ReservationActionTypes.updateNote:
     case ReservationActionTypes.edit: {
       return {
         ...state,

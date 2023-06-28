@@ -189,7 +189,10 @@
       }
     },
     "NOTE": {
-      "FIELD": "Note"
+      "FIELD": "Note",
+      "REQUIRED": "Note is <b>required</b>",
+      "ADD": "Add note",
+      "MESSAGE": "What is your note?"
     },
     "CANCEL": {
       "TITLE": "Cancel reservation",
