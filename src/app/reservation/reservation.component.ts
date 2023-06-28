@@ -651,7 +651,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const roomId = this.room?.value?.id || this.roomId;
     if (roomId) {
       this.store.dispatch(
-        new fromActionsReservation.GetAllServices({ roomId, customerId: this.customer.value?.id })
+        new fromActionsReservation.GetAllTreatments({ roomId, customerId: this.customer.value?.id })
       );
     }
   }

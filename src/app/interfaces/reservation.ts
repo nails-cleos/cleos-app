@@ -224,4 +224,5 @@ export enum CancelOption {
 
 export type StatesKey = keyof typeof States;
 
-export const MAX_RESERVATION_MONTH = 3;
+export const MAX_RESERVATION_MONTH = 6;
+export const MAX_RESERVATION_CUSTOMER_MONTH = 2;
