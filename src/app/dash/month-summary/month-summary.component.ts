@@ -59,7 +59,7 @@ export class MonthSummaryComponent implements OnInit {
     this.weeks = getWeeksInMonth(getNow());
   }
 
-  static calculateTotals(summaries?: IMonthlySummary[]): { gross: number; btw: number; net: number } {
+  private static calculateTotals(summaries?: IMonthlySummary[]): { gross: number; btw: number; net: number } {
     const t = summaries?.map(s => s.total).reduce((totals: any, next: ISummaryTotal) => {
       let gross;
       let net;
@@ -88,9 +88,9 @@ export class MonthSummaryComponent implements OnInit {
     return { gross: t?.gross || 0, net: t?.net || 0, btw: t?.btw || 0 };
   }
 
-  static cleanCVSText = (text: string): string => `${ text.replace(/,/g, '') }, `;
+  private static cleanCVSText = (text: string): string => `${ text.replace(/,/g, '') }, `;
 
-  static getDateFormat(date: Date | null): string {
+  private static getDateFormat(date: Date | null): string {
     if (!date) {
       return '';
     }
@@ -100,13 +100,13 @@ export class MonthSummaryComponent implements OnInit {
     return `${ month }-${ year }`;
   }
 
-  static isInvalidInput(value: string): boolean {
+  private static isInvalidInput(value: string): boolean {
     return !value || new RegExp(/^0\.?0{0,2}$/g).test(value) || new RegExp(/^\.0{0,2}$/g).test(value);
   }
 
-  static getType = (key: string): SummaryType => SummaryType[key.toLowerCase() as keyof typeof SummaryType];
+  private static getType = (key: string): SummaryType => SummaryType[key.toLowerCase() as keyof typeof SummaryType];
 
-  static addSummary(id: string, gross: number, btw: number, summaries: IMonthlySummaryRequest[]): IMonthlySummaryRequest[] {
+  private static addSummary(id: string, gross: number, btw: number, summaries: IMonthlySummaryRequest[]): IMonthlySummaryRequest[] {
     const newSummary = { id, gross, btw };
     const exist = summaries.find(ms => ms.id === id);
     if (exist) {
@@ -115,8 +115,8 @@ export class MonthSummaryComponent implements OnInit {
     return [...summaries, newSummary];
   }
 
-  static newSummary(summary: IMonthlySummary, newSummaries: IMonthlySummaryRequest[], id: string, gross: number = 0,
-                    net: number = 0, btw: number = 0): { monthlySummary: IMonthlySummary; newSummaries: IMonthlySummaryRequest[] } {
+  private static newSummary(summary: IMonthlySummary, newSummaries: IMonthlySummaryRequest[], id: string, gross: number = 0,
+                            net: number = 0, btw: number = 0): { monthlySummary: IMonthlySummary; newSummaries: IMonthlySummaryRequest[] } {
     newSummaries = MonthSummaryComponent.addSummary(id, gross, btw, newSummaries);
     if (summary.total.payments?.length) {
       const objIndex = summary.total.payments?.findIndex((obj => obj.id === id));
@@ -135,8 +135,8 @@ export class MonthSummaryComponent implements OnInit {
     }
   }
 
-  static updateAmounts(summaries: IMonthlySummary[], summaryRequests: IMonthlySummaryRequest[], input: HTMLInputElement, index: number,
-                       id: string): { monthlySummaries: IMonthlySummary[]; newSummaries: IMonthlySummaryRequest[] } {
+  private static updateAmounts(summaries: IMonthlySummary[], summaryRequests: IMonthlySummaryRequest[], input: HTMLInputElement,
+                               index: number, id: string): { monthlySummaries: IMonthlySummary[]; newSummaries: IMonthlySummaryRequest[] } {
     const objIndex = summaries.findIndex((obj => obj.position === index));
     const isInvalidInput = MonthSummaryComponent.isInvalidInput(input.value);
     const summary = summaries[objIndex];
