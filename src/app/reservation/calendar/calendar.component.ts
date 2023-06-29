@@ -25,13 +25,13 @@ import {
   subPeriod
 } from '../../util/dates';
 import { IRoom, IRoomAll } from '../../interfaces/room';
-import { createRecurringEvent, fillNotAvailable, getOverlapEvent, Meta, newEvent } from '../../util/event';
+import { createBullet, createRecurringEvent, fillNotAvailable, getOverlapEvent, Meta, newEvent } from '../../util/event';
 import { Router } from '@angular/router';
 import { CalendarEvent } from 'angular-calendar';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { IUnavailableAll } from '../../interfaces/unavailable';
-import { createRoomOffice, executeDialogNoWidth, getFullUserName, getUserName, roomName } from '../../util/helper';
+import { createRoomOffice, executeDialogNoWidth, getFullUserName, getUserName } from '../../util/helper';
 import { addMonths } from 'date-fns';
 import { findStateColor, isDarkMode } from '../../util/theme';
 import { map, startWith, takeUntil } from 'rxjs/operators';
@@ -222,11 +222,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
     });
   }
 
-  sortData(data: IRoomReservation[]): IRoomReservation[] {
-    return data.slice().sort((a, b) =>
-      roomName(a.room) > roomName(b.room) ? 1 : -1);
-  }
-
   private createForm(): void {
     this.officeForm = this.formBuilder.group({
       office: this.office,
@@ -329,10 +324,13 @@ export class CalendarComponent implements OnInit, OnDestroy {
         const start = newDateTimestamp(it.timestamp);
         const duration = reservationDuration(it);
         const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
+        let treatments = createBullet(it.treatment.name);
+        treatments += it.additional?.map(additional => createBullet(additional.name));
+
         const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
           customerName: getUserName(it.customer),
-          treatmentName: it.treatment.name,
-          professionalName: getUserName(it.professional)
+          professionalName: getUserName(it.professional),
+          treatments
         });
 
         const color = findStateColor(it.state, darkMode);

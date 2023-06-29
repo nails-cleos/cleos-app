@@ -285,3 +285,5 @@ const createRule = (repeat: string, dtstart: Date, until: Date): RRule => {
     until
   });
 };
+
+export const createBullet = (name: string): string => `<div class='detail'>\uD83D\uDC85\uD83C\uDFFB&nbsp;${ name }</div>`;
