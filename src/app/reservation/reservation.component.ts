@@ -51,7 +51,7 @@ import {
   reservationDuration,
   totalDuration
 } from '../util/dates';
-import { createRecurringEvent, fillNotAvailable, getOverlapEvent, Meta, newEvent } from '../util/event';
+import { createBullet, createRecurringEvent, fillNotAvailable, getOverlapEvent, Meta, newEvent } from '../util/event';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Role } from '../interfaces/token';
 import { IUnavailableAll } from '../interfaces/unavailable';
@@ -621,10 +621,13 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private createNewEvent(start: Date, end: Date, state: string, timeZone: string = getCurrentTimeZone(),
                          id?: string): CalendarEvent | undefined {
+    let treatments = createBullet(this.treatment.value.name);
+    treatments += this.additionalSelected.map(additional => createBullet(additional.name));
+
     const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
       customerName: getUserName(this.customer.value),
-      treatmentName: this.treatment.value.name,
-      professionalName: getUserName(this.professional.value)
+      professionalName: getUserName(this.professional.value),
+      treatments
     });
 
     const meta = new Meta(true, timeZone, undefined, undefined, this.professional.value.id);
@@ -651,7 +654,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const roomId = this.room?.value?.id || this.roomId;
     if (roomId) {
       this.store.dispatch(
-        new fromActionsReservation.GetAllServices({ roomId, customerId: this.customer.value?.id })
+        new fromActionsReservation.GetAllTreatments({ roomId, customerId: this.customer.value?.id })
       );
     }
   }
@@ -860,10 +863,13 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         const start = newDateTimestamp(it.timestamp);
         const duration = reservationDuration(it);
         const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
+        let treatments = createBullet(it.treatment.name);
+        treatments += it.additional?.map(additional => createBullet(additional.name));
+
         const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
           customerName: getUserName(it.customer),
-          treatmentName: it.treatment.name,
-          professionalName: getUserName(it.professional)
+          professionalName: getUserName(it.professional),
+          treatments
         });
 
         const color = findStateColor(it.state, this.isDarkMode);

@@ -38,7 +38,7 @@ import { BankComponent } from './bank/bank.component';
 import { PriceComponent } from './price/price.component';
 import { CustomerEditDialogComponent } from './dialog/customer-edit/customer-edit-dialog.component';
 import { CancelDialogComponent } from './dialog/cancel/cancel-dialog.component';
-import { FilterByDayPipe } from '../pipes/filterByDay.pipe';
+import { FilterByPipe } from '../pipes/filterBy.pipe';
 import { DiscountPipe } from '../pipes/discount.pipe';
 import { TwoDigitsDirective } from '../directives/two-digits.directive';
 
@@ -105,7 +105,7 @@ import { TwoDigitsDirective } from '../directives/two-digits.directive';
         CalendarDialogComponent,
         CustomerEditDialogComponent,
         CancelDialogComponent,
-        FilterByDayPipe,
+        FilterByPipe,
         DiscountPipe,
         TwoDigitsDirective
     ],
@@ -134,7 +134,7 @@ import { TwoDigitsDirective } from '../directives/two-digits.directive';
     CalendarDialogComponent,
     CustomerEditDialogComponent,
     CancelDialogComponent,
-    FilterByDayPipe,
+    FilterByPipe,
     DiscountPipe,
     TwoDigitsDirective
   ],

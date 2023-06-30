@@ -22,10 +22,11 @@ export class NavigationService {
     });
   }
 
-  back(): void {
+  back(date?: Date): void {
     this.history.pop();
     if (this.history.length > 0) {
-      this.location.back();
+      const last = this.history[this.history.length - 1];
+      this.router.navigate([last], { state: { date } });
     } else {
       this.router.navigateByUrl('/').then(() => window.location.reload());
     }

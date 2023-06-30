@@ -97,7 +97,7 @@ export class ReservationEffects {
     ))
   ));
 
-  getAllTreatments$ = createEffect(() => this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.getServices)).pipe(
+  getAllTreatments$ = createEffect(() => this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.getTreatments)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.treatmentService.getAllTreatments(payload.roomId, payload?.customerId).pipe(
       switchMap((response) => of(new fromActionsReservation.ReservationTreatmentsSuccess(response))),
@@ -331,6 +331,20 @@ export class ReservationEffects {
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({ error: err.error })))
       ))
     ));
+
+  updateNote$ = createEffect(() => this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.updateNote)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.reservationService.addNote(payload.reservationId, payload.note).pipe(
+      switchMap((response: any) => of(new fromActionsReservation.ReservationSaveSuccess({
+        message: this.translate.instant('COMMON.RESERVATION.UPDATED.MESSAGE', { date: newDateTimestamp(response.timestamp) }),
+        id: response.id,
+        role: payload.role,
+        paymentLink: response.paymentLink
+      }))), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({
+        error: err.error
+      })))
+    ))
+  ));
 
   selectedData$ = createEffect(() => this.actions.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.reservationSelected),

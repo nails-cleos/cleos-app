@@ -8,8 +8,12 @@ export enum DashboardActionTypes {
   dashboardEvents = '[Dashboard] Get events',
   eventSuccess = '[Dashboard] Event success',
   updateEvent = '[Dashboard] Update event',
-  dashSummary = '[Dash] Get summary',
-  dashSummarySuccess = '[Dash] Summary success',
+  monthlySummary = '[Dash] Get monthly summary',
+  monthlySummarySuccess = '[Dash] Monthly summary success',
+  saveMonthlySummary = '[Dash] Save Monthly summary',
+  saveMonthlySummarySuccess = '[Dash] Save monthly summary success',
+  yearSummary = '[Dash] Get year summary',
+  yearSummarySuccess = '[Dash] Year summary success',
   clean = '[Dash] Clean'
 }
 
@@ -62,15 +66,43 @@ export class UpdateEvent implements Action {
   }
 }
 
-export class GetSummary implements Action {
-  readonly type = DashboardActionTypes.dashSummary;
+export class GetMonthlySummary implements Action {
+  readonly type = DashboardActionTypes.monthlySummary;
 
   constructor(public payload: any) {
   }
 }
 
-export class GetSummarySuccess implements Action {
-  readonly type = DashboardActionTypes.dashSummarySuccess;
+export class MonthlySummarySuccess implements Action {
+  readonly type = DashboardActionTypes.monthlySummarySuccess;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class UpdateMonthlySummary implements Action {
+  readonly type = DashboardActionTypes.saveMonthlySummary;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class UpdateMonthlySummarySuccess implements Action {
+  readonly type = DashboardActionTypes.saveMonthlySummarySuccess;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class GetYearSummary implements Action {
+  readonly type = DashboardActionTypes.yearSummary;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class YearSummarySuccess implements Action {
+  readonly type = DashboardActionTypes.yearSummarySuccess;
 
   constructor(public payload: any) {
   }
@@ -88,6 +120,10 @@ export type All =
   | GetDashboardEvents
   | EventSuccess
   | UpdateEvent
-  | GetSummary
-  | GetSummarySuccess
+  | GetMonthlySummary
+  | MonthlySummarySuccess
+  | UpdateMonthlySummary
+  | UpdateMonthlySummarySuccess
+  | GetYearSummary
+  | YearSummarySuccess
   | Clean;

@@ -112,7 +112,7 @@
         "CONTENT": "The new reservation is overlapping with <div>{{data}}</div> Are you sure to add reservation?",
         "ERROR": "The new reservation is overlapping with <div>{{data}}</div>"
       },
-      "DETAIL": "<div class='detail'><b>{{professionalName}}</b></div><div class='detail'>{{treatmentName}}</div><div class='detail'>{{customerName}}</div>",
+      "DETAIL": "<div class='detail'><b>{{professionalName}}</b></div><div class='detail'>{{customerName}}</div>{{treatments}}",
       "TITLE": "Add new reservation",
       "CONTENT": "Are you sure to add reservation on {{date}}?",
       "CHANGE": {
@@ -189,7 +189,10 @@
       }
     },
     "NOTE": {
-      "FIELD": "Note"
+      "FIELD": "Note",
+      "REQUIRED": "Note is <b>required</b>",
+      "ADD": "Add note",
+      "MESSAGE": "What is your note?"
     },
     "CANCEL": {
       "TITLE": "Cancel reservation",

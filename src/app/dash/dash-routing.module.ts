@@ -4,6 +4,7 @@ import { DashComponent } from './dash.component';
 import { AuthGuardService } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
 import { MonthSummaryComponent } from './month-summary/month-summary.component';
+import { QuarterSummaryComponent } from './quarter-summary/quarter-summary.component';
 
 const routes: Routes = [
   {
@@ -13,7 +14,12 @@ const routes: Routes = [
   },
   {
     path: 'monthly/summary', component: MonthSummaryComponent, canActivate: [AuthGuardService], data: {
-      roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional]
+      roles: [Role.admin, Role.manager]
+    }
+  },
+  {
+    path: 'quarter/summary', component: QuarterSummaryComponent, canActivate: [AuthGuardService], data: {
+      roles: [Role.admin, Role.manager]
     }
   }
 ];

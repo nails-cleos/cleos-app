@@ -35,7 +35,8 @@
       "UNAVAILABLE": "Add unavailable",
       "ACCEPT": "Accept",
       "MERGE": "Merge",
-      "EXPORT": "Export",
+      "EXPORT": "Save & Export",
+      "SAVE": "Save",
       "EXPAND": {
         "TRUE": "Click to show less",
         "FALSE": "Click to show more"
@@ -125,6 +126,29 @@
         "1": "<span class='important'>Less than 24 hours’</span> notice will result in a fee of <span class='important'>30%</span> of the reserved treatment price.",
         "2": "<span class='important'>“No show”</span> will likewise be charged <span class='important'>30%</span> of the booked treatment price.",
         "3": "Cancellation/Rescheduling of an appointment made <span class='important'>within 24 hours prior</span> will result in a <span class='important'>refund or discount voucher</span> for the paid amount."
+      }
+    },
+    "EXPENSE": {
+      "TYPE": {
+        "OPERATING": "Operating",
+        "COGS": "Cost of Goods Sold",
+        "O_MAP": "Marketing, advertising and promotion",
+        "O_SBW": "Salaries, benefits and wages",
+        "SGA": "Selling, general and administrative",
+        "RI": "Rent and insurance",
+        "DA": "Depreciation and amortization",
+        "OTHER": "Other",
+        "NON_OPERATING": "Non operating",
+        "INTEREST": "Interest",
+        "TAXES": "Taxes",
+        "IC": "Impairment charges",
+        "FIXED": "Fixed",
+        "RENT": "Rent",
+        "F_SBW": "Salaries, benefits and wages",
+        "VARIABLE": "Variable",
+        "TRANSACTION_FEES": "Transaction fees",
+        "COMMISSIONS": "Commissions",
+        "V_MAP": "Marketing, advertising and promotion"
       }
     },
     "STATUS": {

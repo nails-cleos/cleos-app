@@ -5,7 +5,7 @@ import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } 
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../interfaces/treatment';
 import { IRoom, IService } from '../../../interfaces/room';
-import { IAvailableDTO, IReservation, IUpcomingAll, MAX_RESERVATION_MONTH, Reservation } from '../../../interfaces/reservation';
+import { IAvailableDTO, IReservation, IUpcomingAll, MAX_RESERVATION_CUSTOMER_MONTH, Reservation } from '../../../interfaces/reservation';
 import {
   API_LOCALE,
   createNewDate,
@@ -166,7 +166,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   private professionalId?: string;
   private customerId?: string;
   private treatmentId?: string;
-  private reservationMonths = MAX_RESERVATION_MONTH;
+  private reservationMonths = MAX_RESERVATION_CUSTOMER_MONTH;
   private getState: Observable<any>;
   private subscription?: Subscription;
   private steps: IStep[];
@@ -527,7 +527,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private getTreatmentList(): void {
     this.store.dispatch(
-      new fromActionsReservation.GetAllServices({ roomId: this.room.value.id })
+      new fromActionsReservation.GetAllTreatments({ roomId: this.room.value.id })
     );
   }
 

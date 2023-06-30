@@ -57,7 +57,7 @@
           mat-sort-header>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
       <td *matCellDef="let expense" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="expense.id; else skeleton">
-          {{'EXPENSE.TYPE.' + expense.type | translate}}
+          {{'COMMON.EXPENSE.TYPE.' + expense.type | translate}}
         </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -147,7 +147,7 @@
             </mat-list-item>
             <div mat-subheader>{{ 'COMMON.COLUMN.TYPE' | translate }}</div>
             <mat-list-item role="list">
-              <div matListItemLine>{{'EXPENSE.TYPE.' + expense.type | translate}}</div>
+              <div matListItemLine>{{'COMMON.EXPENSE.TYPE.' + expense.type | translate}}</div>
             </mat-list-item>
             <ng-template [ngIf]="expense.gross">
               <div mat-subheader>{{ 'EXPENSE.LIST.COLUMN.GROSS' | translate }}</div>

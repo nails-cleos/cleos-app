@@ -1,8 +1,8 @@
-import { FilterByDayPipe } from './filterByDay.pipe';
+import { FilterByPipe } from './filterBy.pipe';
 
 describe('FilterPipe', () => {
   it('create an instance', () => {
-    const pipe = new FilterByDayPipe();
+    const pipe = new FilterByPipe();
     expect(pipe).toBeTruthy();
   });
 });

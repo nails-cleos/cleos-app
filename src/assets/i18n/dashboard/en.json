@@ -42,9 +42,23 @@
     }
   },
   "SUMMARY": {
-    "MONTHLY": {
+    "INCOMES": "Incomes",
+    "INCOME": "Income",
+    "EXPENSES": "Expenses",
+    "EXPENSE": "Expense",
+    "UPDATED": "Monthly summary updated",
+    "YEAR": {
       "SELECT": {
-        "DATE": "Month and Year"
+        "DATE": "Year"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No data in {{year}}"
+      }
+    },
+    "MONTHLY": {
+      "FIELD": "Monthly summary",
+      "SELECT": {
+        "DATE": "Month and year"
       },
       "TABLE": {
         "WEEK": "Week {{number}}",
@@ -52,11 +66,13 @@
         "CUSTOMER": "Customer",
         "TREATMENT": "Treatment",
         "DISCOUNT": "Discount",
-        "TOTAL": "Total",
-        "EXC_BTW": "Net",
+        "GROSS": "Gross",
+        "NET": "Net",
         "BTW": "BTW",
-        "PAYMENT_TYPE": "Type",
+        "TYPE": "Type",
         "COLOR": "Color",
+        "INVOICE": "Invoice",
+        "STORE_SUPPLY": "Store supply",
         "TOTALS": "Totals"
       }
     }

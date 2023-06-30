@@ -42,7 +42,21 @@
     }
   },
   "SUMMARY": {
+    "INCOMES": "Ingresos",
+    "INCOME": "Ingresos",
+    "EXPENSES": "Gastos",
+    "EXPENSE": "Gastos",
+    "UPDATED": "Resumen mensual actualizado",
+    "YEAR": {
+      "SELECT": {
+        "DATE": "Año"
+      },
+      "ERROR": {
+        "NO_CONTENT": "No hay datos en {{year}}"
+      }
+    },
     "MONTHLY": {
+      "FIELD": "Resumen mensual",
       "SELECT": {
         "DATE": "Mes y año"
       },
@@ -52,11 +66,13 @@
         "CUSTOMER": "Cliente",
         "TREATMENT": "Tratamiento",
         "DISCOUNT": "Descuento",
-        "TOTAL": "Total",
-        "EXC_BTW": "Neto",
+        "GROSS": "Bruto",
+        "NET": "Neto",
         "BTW": "BTW",
-        "PAYMENT_TYPE": "Tipo",
+        "TYPE": "Tipo",
         "COLOR": "Color",
+        "INVOICE": "Factura",
+        "STORE_SUPPLY": "Suministro de tienda",
         "TOTALS": "Totales"
       }
     }

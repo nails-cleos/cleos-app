@@ -8,37 +8,42 @@
   }
 }
 
-#tableData {
+#reservationTableData, #expenseTableData {
   border-collapse: collapse;
   border-spacing: 0;
 
-  table-layout: fixed;
+  @media not all and (min-width: 640px) {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  @media all and (min-width: 640px) {
+    table-layout: fixed;
+  }
   width: 100%;
 
-  #id {
+  .id {
     width: 4%;
   }
 
-  #customer, #date, #treatment {
+  #customer, .date, #treatment, #discount, #color, .type {
     width: 10%;
   }
 
-  #discount, #color, #type {
-    width: 7%;
+  #invoice, #store-supply {
+    width: 20%;
   }
 
-  #total, #exclBTW,#btw {
-    width: 15%;
+  .gross, .net, .btw {
+    width: 12%;
   }
 
   td, th {
     padding: 0 0.2rem 0 0.2rem;
-    //display: flex;
     align-items: center;
-    //flex: 0 0 auto;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    word-wrap: break-word;
+    white-space: normal;
     column-width: auto;
   }
 
@@ -51,3 +56,11 @@
   }
 }
 
+.headers-align .mat-expansion-panel-header-description {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.headers-align .mat-mdc-form-field + .mat-mdc-form-field {
+  margin-left: 8px;
+}

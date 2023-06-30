@@ -112,7 +112,8 @@ export class DashComponent implements OnInit, OnDestroy {
         }
       });
     });
-    this.viewDate = getNow();
+    const extras = this.router.getCurrentNavigation()?.extras.state;
+    this.viewDate = extras?.date || getNow();
     this.dateFormat = this.translate.currentLang;
     this.totalReservation = 0;
   }

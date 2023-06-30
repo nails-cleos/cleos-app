@@ -9,11 +9,16 @@ import { resetTheme, Theme } from './util/theme';
 import { getLocale } from './util/helper';
 import { ThemeService } from 'ng2-charts';
 import { DateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
+import { YearMonthDateAdapter } from './util/adapter/year-month-date.adapter';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
+  providers: [{
+    provide: DateAdapter,
+    useClass: YearMonthDateAdapter
+  }]
 })
 export class AppComponent implements OnInit {
 
@@ -31,9 +36,9 @@ export class AppComponent implements OnInit {
       } else {
         this.locale = navigator.language;
       }
-      const locale = getLocale(this.locale);
-      this.dateAdapter.setLocale(locale.language);
-      this.translate.use(locale.language);
+      const currentLocale = getLocale(this.locale);
+      this.dateAdapter.setLocale(currentLocale.language);
+      this.translate.use(currentLocale.language);
     });
   }
 

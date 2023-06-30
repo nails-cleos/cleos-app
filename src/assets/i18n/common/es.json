@@ -35,7 +35,8 @@
       "UNAVAILABLE": "Agregar no disponible",
       "ACCEPT": "Aceptar",
       "MERGE": "Unir",
-      "EXPORT": "Exportar",
+      "EXPORT": "Guardar & Exportar",
+      "SAVE": "Guardar",
       "EXPAND": {
         "TRUE": "Presiona para mostrar menos",
         "FALSE": "Presiona para mostrar más"
@@ -125,6 +126,29 @@
         "1": "<span class='important'>Aviso menor a 24 horas</span> resultara en un cargo del <span class='important'>30%</span> del precio del tratamiento.",
         "2": "<span class='important'>“No show”</span> también se cobrará el <span class='important'>30%</span> del precio del tratamiento reservado.",
         "3": "La cancelación/cambios de una cita realizada <span class='important'>dentro de las 24 horas anteriores</span> dará lugar a <span class='important'>reembolso o un vale de descuento</span> por el importe abonado."
+      }
+    },
+    "EXPENSE": {
+      "TYPE": {
+        "OPERATING": "Operativo",
+        "COGS": "Costo de los bienes vendidos",
+        "O_MAP": "Marketing, publicidad y promoción",
+        "O_SBW": "Salarios, prestaciones y salarios",
+        "SGA": "Vendedor general y administrativo",
+        "RI": "Alquiler y seguro",
+        "DA": "Depreciación y amortización",
+        "OTHER": "Otros",
+        "NON_OPERATING": "No operativo",
+        "INTEREST": "Interés",
+        "TAXES": "Impuestos",
+        "IC": "Cargos por deterioro",
+        "FIXED": "Fijo",
+        "RENT": "Alquilar",
+        "F_SBW": "Salarios, prestaciones y salarios",
+        "VARIABLE": "Variable",
+        "TRANSACTION_FEES": "Tarifas de transacción",
+        "COMMISSIONS": "Comisiones",
+        "V_MAP": "Marketing, publicidad y promoción"
       }
     },
     "STATUS": {
