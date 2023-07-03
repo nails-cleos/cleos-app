@@ -1,6 +1,6 @@
 // Modules
 import { BrowserModule } from '@angular/platform-browser';
-import { LOCALE_ID, NgModule } from '@angular/core';
+import { APP_INITIALIZER, LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthServiceConfig, SocialLoginModule } from '@abacritt/angularx-social-login';
 import { ActionReducer, MetaReducer, StoreModule } from '@ngrx/store';
@@ -32,7 +32,6 @@ import { AuthGuardService } from './services/auth-guard.service';
 import { TokenService } from './services/token.service';
 import { NavigationService } from './services/navigation.service';
 import { MessagingService } from './services/messaging.service';
-import { PromptUpdateService } from './services/prompt-update.service';
 
 // Reducers
 import { reducers } from './store/app.states';
@@ -45,6 +44,8 @@ import { AngularFireMessagingModule } from '@angular/fire/compat/messaging';
 import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
+import { PwaService } from './services/pwa.service';
+import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 
 export const getAuthServiceConfigs = (): SocialAuthServiceConfig => ({
   autoLogin: false,
@@ -105,7 +106,8 @@ registerLocaleData(localeAr, 'es-AR');
     AngularFireAuthModule,
     AngularFireMessagingModule,
     AngularFireAnalyticsModule,
-    AngularFireDatabaseModule
+    AngularFireDatabaseModule,
+    MatBottomSheetModule
   ],
   providers: [
     {
@@ -122,7 +124,6 @@ registerLocaleData(localeAr, 'es-AR');
     },
     MessagingService,
     AsyncPipe,
-    PromptUpdateService,
     CookieService,
     {
       provide: MAT_COLOR_FORMATS,
@@ -132,7 +133,8 @@ registerLocaleData(localeAr, 'es-AR');
       provide: LOCALE_ID,
       useValue: 'en-GB'
     },
-    TranslateService
+    TranslateService,
+    { provide: APP_INITIALIZER, useFactory: (pwaService: PwaService) => () => pwaService.initPwaPrompt(), deps: [PwaService], multi: true }
   ],
   bootstrap: [AppComponent],
   exports: [TranslateModule, AngularFireMessagingModule]

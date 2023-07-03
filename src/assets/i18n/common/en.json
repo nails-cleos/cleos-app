@@ -339,6 +339,10 @@
           "RESERVATION": "This is how reservations will look in light mode"
         }
       }
+    },
+    "INSTALL": {
+      "IOS": "To install this web app on your device. Open in safari, tap the Menu button and then 'Add to Home screen' button",
+      "ANDROID": "Add to Home screen"
     }
   },
   "REVIEW": {
