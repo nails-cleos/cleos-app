@@ -11,9 +11,11 @@ export class PwaService {
   private promptEvent: any;
 
   constructor(private bottomSheet: MatBottomSheet, private platform: Platform, private swUpdate: SwUpdate) {
-    swUpdate.versionUpdates
-      .pipe(filter((evt): evt is VersionReadyEvent => evt.type === 'VERSION_READY'))
-      .subscribe(() => document.location.reload());
+    if (swUpdate.isEnabled) {
+      swUpdate.versionUpdates
+        .pipe(filter((evt): evt is VersionReadyEvent => evt.type === 'VERSION_READY'))
+        .subscribe(() => document.location.reload());
+    }
   }
 
   public initPwaPrompt(): void {

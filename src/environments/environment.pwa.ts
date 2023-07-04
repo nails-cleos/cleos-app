@@ -1,9 +1,9 @@
 export const environment = {
   production: false,
-  appServer: 'https://192.168.0.8:5000',
+  appServer: 'http://localhsot:4200',
   title: 'Cleos PWA',
   version: require('../../package.json').version + '-pwa',
-  baseUrl: 'https://nails.com:8443/api',
+  baseUrl: 'http://localhost:9999/api',
   googleClientId: '364998384255-kk09n0fq6p79s7oim94ljevf8bb0etip.apps.googleusercontent.com',
   facebookClientId: '453309609006101',
   firebase: {

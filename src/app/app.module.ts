@@ -5,12 +5,17 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthServiceConfig, SocialLoginModule } from '@abacritt/angularx-social-login';
 import { ActionReducer, MetaReducer, StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
-import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AsyncPipe, registerLocaleData } from '@angular/common';
 import { ServiceWorkerModule, SwPush } from '@angular/service-worker';
 import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
 import { AppRoutingModule } from './app-routing.module';
 import { Router } from '@angular/router';
+import { SharedModule } from './shared/shared.module';
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireMessagingModule } from '@angular/fire/compat/messaging';
+import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
+import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
 
 // Providers
 import { environment } from '../environments/environment';
@@ -28,24 +33,18 @@ import { TranslateLoaderFactory } from './shared/translate-loader.factory';
 import { MAT_COLOR_FORMATS, NGX_MAT_COLOR_FORMATS, NgxMatColorPickerModule } from '@angular-material-components/color-picker';
 
 // Services
+import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthGuardService } from './services/auth-guard.service';
 import { TokenService } from './services/token.service';
 import { NavigationService } from './services/navigation.service';
 import { MessagingService } from './services/messaging.service';
+import { PwaService } from './services/pwa.service';
 
 // Reducers
 import { reducers } from './store/app.states';
 
 // Components
 import { AppComponent } from './app.component';
-import { SharedModule } from './shared/shared.module';
-import { AngularFireModule } from '@angular/fire/compat';
-import { AngularFireMessagingModule } from '@angular/fire/compat/messaging';
-import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
-import { AngularFireAuthModule } from '@angular/fire/compat/auth';
-import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
-import { PwaService } from './services/pwa.service';
-import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 
 export const getAuthServiceConfigs = (): SocialAuthServiceConfig => ({
   autoLogin: false,
@@ -106,8 +105,7 @@ registerLocaleData(localeAr, 'es-AR');
     AngularFireAuthModule,
     AngularFireMessagingModule,
     AngularFireAnalyticsModule,
-    AngularFireDatabaseModule,
-    MatBottomSheetModule
+    AngularFireDatabaseModule
   ],
   providers: [
     {

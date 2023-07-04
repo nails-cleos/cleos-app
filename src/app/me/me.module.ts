@@ -11,7 +11,6 @@ import { BottomSheetReferralComponent, BottomSheetShareComponent, ReferralsCompo
 import { MeDiscountComponent } from './discount/me/me-discount.component';
 import { ReviewDialogComponent } from './reservation/review/review-dialog.component';
 import { ShareButtonsModule } from 'ngx-sharebuttons/buttons';
-import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { ShareIconsModule } from 'ngx-sharebuttons/icons';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatStepperModule } from '@angular/material/stepper';
@@ -54,7 +53,6 @@ import { ColorService } from '../services/color.service';
         MeRoutingModule,
         SharedModule,
         ShareButtonsModule,
-        MatBottomSheetModule,
         ShareIconsModule,
         MatProgressBarModule,
         MatStepperModule,
