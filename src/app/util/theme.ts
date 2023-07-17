@@ -50,7 +50,7 @@ const stateColor = (isDark: boolean): IState[] => [{
   color: isDark ? '#fafafa' : '#ababab'// accent-lighter
 }, {
   name: 'PARTIALLY_COMPLETED',
-  color: '#f7e6d8'
+  color: '#a9a397'
 }, {
   name: 'COMPLETED',
   color: isDark ? '#90ee90' : '#44a244'

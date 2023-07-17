@@ -346,6 +346,20 @@ export class ReservationEffects {
     ))
   ));
 
+  updateDiscount$ = createEffect(() => this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.updateDiscount)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.reservationService.addDiscount(payload.reservationId, payload.discountId).pipe(
+      switchMap((response: any) => of(new fromActionsReservation.ReservationSaveSuccess({
+        message: this.translate.instant('COMMON.RESERVATION.UPDATED.MESSAGE', { date: newDateTimestamp(response.timestamp) }),
+        id: response.id,
+        role: payload.role,
+        paymentLink: response.paymentLink
+      }))), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({
+        error: err.error
+      })))
+    ))
+  ));
+
   selectedData$ = createEffect(() => this.actions.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.reservationSelected),
     tap((data: any) => {

@@ -7,7 +7,6 @@ import { ActionReducer, MetaReducer, StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { AsyncPipe, registerLocaleData } from '@angular/common';
 import { ServiceWorkerModule, SwPush } from '@angular/service-worker';
-import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
 import { AppRoutingModule } from './app-routing.module';
 import { Router } from '@angular/router';
 import { SharedModule } from './shared/shared.module';
@@ -94,7 +93,6 @@ registerLocaleData(localeAr, 'es-AR');
     AppRoutingModule,
     SocialLoginModule,
     BrowserAnimationsModule,
-    MatFabMenuModule,
     SharedModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,
