@@ -1,6 +1,6 @@
-import { ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState, selectReservationState, selectUserState } from '../../store/app.states';
+import { AppState, selectAuthState, selectReservationState } from '../../store/app.states';
 import { Observable, pairwise, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
 import { CancelOption, IReservationAll, States } from '../../interfaces/reservation';
@@ -21,17 +21,15 @@ import {
 } from '../../util/dates';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { IUser, IUserAll } from '../../interfaces/user';
+import { IUserAll } from '../../interfaces/user';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { Role } from '../../interfaces/token';
 import {
   customerEditDialog,
   executeDialog,
-  getFullUserName,
   getPrice,
-  getUserName,
   isProfessional,
   openCancel,
   openDialog,
@@ -45,13 +43,13 @@ import { IPayment, IPaymentAll, PaymentType } from '../../interfaces/payment';
 import { detailExpandAnimation, transitionAnimation } from '../../util/animation';
 import { isToday, isTomorrow } from 'date-fns';
 import { ReservationIconName } from '../../util/icon';
-import { DiscountDialogComponent } from '../../discount/list/discounts.component';
-import { FormArray, FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { map, startWith } from 'rxjs/operators';
-import * as fromActionsUser from '../../store/user.actions';
-import { requireMatch } from '../../util/validators';
+import { FormArray, UntypedFormBuilder } from '@angular/forms';
+import { startWith } from 'rxjs/operators';
 import * as fromActionsPayment from '../../store/payment.actions';
-import { IColorAll } from '../../interfaces/color';
+import { ChangeCustomerDialogComponent } from './change-customer-dialog.component';
+import { ChangeColorDialogComponent } from './change-color-dialog.component';
+import { AddNoteDialogComponent } from './add-note-dialog.component';
+import { AddDiscountDialogComponent } from './add-discount-dialog.component';
 
 @Component({
   selector: 'app-reservation-detail',
@@ -94,6 +92,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
   disableUpdateButton = true;
   customerId?: string;
+  isReservationAdmin?: boolean;
 
   private tooltipPosition = 'below';
   private machine: any;
@@ -102,6 +101,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
   private small = false;
   private reservationId?: string;
+  private user?: IUserAll;
 
   private readonly language: string;
 
@@ -127,6 +127,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       const user: IUserAll = state.user;
       this.professionalId = user.authorities.some(u => u.authority === Role.professional) ? user.id : undefined;
       this.customerId = user.authorities.some(u => u.authority === Role.customer) ? user.id : undefined;
+      this.user = state.user;
     });
   }
 
@@ -159,14 +160,23 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   }
 
   get addNote(): void {
-    executeDialog(this.dialog, AddNoteDialogComponent, { note: this.reservation?.note }, result => {
+    return executeDialog(this.dialog, AddNoteDialogComponent, { note: this.reservation?.note }, result => {
       if (result) {
         this.store.dispatch(
           new fromActionsReservation.UpdateNote({ note: result.note, reservationId: this.reservation?.id })
         );
       }
     }, true);
-    return;
+  }
+
+  get addDiscount(): void {
+    return executeDialog(this.dialog, AddDiscountDialogComponent, { customerId: this.reservation?.customer.id }, result => {
+      if (result) {
+        this.store.dispatch(
+          new fromActionsReservation.UpdateDiscount({ discountId: result.discountId, reservationId: this.reservation?.id })
+        );
+      }
+    }, true);
   }
 
   private static createMachine(stateMachineDefinition: any, initialState: any): any {
@@ -299,7 +309,10 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
           this.start.getMinutes() + this.duration.minute);
         this.state = state.selected.state;
         this.reservation = state.selected;
-        if (this.professionalId && isProfessional(this.professionalId, this.reservation?.room?.professionals)) {
+        const isProfessionalAdmin = this.professionalId && isProfessional(this.professionalId, this.reservation?.room?.professionals);
+        this.isReservationAdmin = (isProfessionalAdmin || this.user?.authorities
+          .some(u => [Role.admin, Role.roomAdmin, Role.manager].includes(u.authority as Role)));
+        if (isProfessionalAdmin) {
           this.professionalMachine(this);
           this.changeState = this.machine.next(snakeToCamel(this.reservation?.state));
         } else if (isCustomer) {
@@ -785,214 +798,5 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   private cancel(reservation: IReservationAll, options: string[], price: IPrice, afterClose: (result: any) => void,
                  showPenalty?: boolean): void {
     openCancel(this.dialog, reservation.room, this.small, options, afterClose, showPenalty, price);
-  }
-}
-
-@Component({
-  selector: 'app-change-customer-dialog-component',
-  templateUrl: './change-customer-dialog.component.html'
-})
-export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
-  customerForm!: UntypedFormGroup;
-  customers?: IUserAll[];
-  filteredCustomer?: Observable<IUser[] | undefined>;
-  customer: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required, requireMatch
-  ]);
-
-  private getState: Observable<any>;
-  private subscription?: Subscription;
-
-  constructor(public dialogRef: MatDialogRef<DiscountDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
-              private store: Store<AppState>, private formBuilder: UntypedFormBuilder) {
-    this.getState = this.store.select(selectUserState);
-  }
-
-  get onNoClick(): void {
-    return this.dialogRef.close();
-  }
-
-  get doAction(): void {
-    return this.dialogRef.close({ customerId: this.customer.value.id });
-  }
-
-  ngOnInit(): void {
-    this.clean();
-    this.createForm();
-    this.createFilters();
-    this.subscribe();
-    this.getCustomers();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  displayFnUser(user: IUser): string {
-    return user ? getUserName(user) : '';
-  }
-
-  keyDownHandler(event: any): void {
-    if (event.code === 'Backspace') {
-      this.customer.setValue('');
-    }
-  }
-
-  private createForm(): void {
-    this.customerForm = this.formBuilder.group({
-      customer: this.customer
-    });
-  }
-
-  private createFilters(): void {
-    this.filteredCustomer = this.customer.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterCustomer(name) : this.customers ? this.customers.slice() : this.customers)
-    );
-  }
-
-  private filterCustomer(name: string): IUser[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.customers?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-  private getCustomers(): void {
-    this.store.dispatch(
-      new fromActionsUser.GetAllCustomers()
-    );
-  }
-
-  private subscribe(): void {
-    this.subscription = this.getState.subscribe(state => {
-      this.customers = state.data;
-      this.customer.setValue(this.customers?.find(customer => customer.id === this.data.customerId));
-    });
-  }
-
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsUser.Clean()
-    );
-  }
-}
-
-@Component({
-  selector: 'app-change-color-dialog-component',
-  templateUrl: './change-color-dialog.component.html'
-})
-export class ChangeColorDialogComponent implements OnInit, OnDestroy {
-  colorForm!: UntypedFormGroup;
-  colors?: IColorAll[];
-  filteredColor?: Observable<IColorAll[] | undefined>;
-  color: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required, requireMatch
-  ]);
-
-  private getState: Observable<any>;
-  private subscription?: Subscription;
-  private readonly treatmentId: string;
-
-  constructor(public dialogRef: MatDialogRef<DiscountDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
-              private store: Store<AppState>, private formBuilder: UntypedFormBuilder) {
-    this.getState = this.store.select(selectReservationState);
-    this.treatmentId = data.treatmentId;
-  }
-
-  get onNoClick(): void {
-    return this.dialogRef.close();
-  }
-
-  get doAction(): void {
-    return this.dialogRef.close({ colorId: this.color.value.id });
-  }
-
-  ngOnInit(): void {
-    this.createForm();
-    this.createFilters();
-    this.subscribe();
-    this.getColors();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  displayFnColor(color: IColorAll): string {
-    return color ? color.name : '';
-  }
-
-  keyDownHandler(event: any): void {
-    if (event.code === 'Backspace') {
-      this.color.setValue('');
-    }
-  }
-
-  private createForm(): void {
-    this.colorForm = this.formBuilder.group({
-      color: this.color
-    });
-  }
-
-  private createFilters(): void {
-    this.filteredColor = this.color.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterColor(name) : this.colors ? this.colors.slice() : this.colors)
-    );
-  }
-
-  private filterColor(name: string): IColorAll[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.colors?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-  private getColors(): void {
-    this.store.dispatch(
-      new fromActionsReservation.GetAllColorsByTreatmentId(this.treatmentId)
-    );
-  }
-
-  private subscribe(): void {
-    this.subscription = this.getState.subscribe(state => {
-      this.colors = state.colors;
-      this.color.setValue(this.colors?.find(color => color.id === this.data.colorId));
-    });
-  }
-}
-
-@Component({
-  selector: 'app-add-note-dialog-component',
-  templateUrl: './add-note-dialog.component.html'
-})
-export class AddNoteDialogComponent implements OnInit {
-  noteForm!: UntypedFormGroup;
-  note: FormControl<string | null> = new FormControl('', [
-    Validators.required
-  ]);
-
-  constructor(public dialogRef: MatDialogRef<DiscountDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
-              private formBuilder: UntypedFormBuilder) {
-    this.note.setValue(data.note || '');
-  }
-
-  get onNoClick(): void {
-    return this.dialogRef.close();
-  }
-
-  get doAction(): void {
-    return this.dialogRef.close({ note: this.note.value });
-  }
-
-  ngOnInit(): void {
-    this.createForm();
-  }
-
-  private createForm(): void {
-    this.noteForm = this.formBuilder.group({
-      note: this.note
-    });
   }
 }

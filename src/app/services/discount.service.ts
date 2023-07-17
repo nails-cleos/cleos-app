@@ -8,7 +8,7 @@ import { PAGE_SIZE } from '../interfaces/pagination';
 export class DiscountService {
 
   private url = 'discounts';
-  private urlV1 = `v1/${this.url}`;
+  private urlV1 = `v1/${ this.url }`;
 
   constructor(private http: HttpClient) {
   }
@@ -22,16 +22,15 @@ export class DiscountService {
       params = params.append('direction', direction);
     }
 
-    return this.http.get<IDiscount[]>(`${this.urlV1}/${path}`, {params});
+    return this.http.get<IDiscount[]>(`${ this.urlV1 }/${ path }`, { params });
   }
 
   public getReferrals(): Observable<IUserDiscount[]> {
-    return this.http.get<IUserDiscount[]>(`${this.urlV1}/me/referrals`);
+    return this.http.get<IUserDiscount[]>(`${ this.urlV1 }/me/referrals`);
   }
 
   public getById(id: string | null): Observable<IDiscount | undefined> {
-    const url = `${this.urlV1}/${id}`;
-    return this.http.get<IDiscount>(url);
+    return this.http.get<IDiscount>(`${ this.urlV1 }/${ id }`);
   }
 
   public add(discount: IDiscount): Observable<IDiscount> {
@@ -39,16 +38,18 @@ export class DiscountService {
   }
 
   public send(id: string, customersDiscount: string[]): Observable<IDiscount> {
-    return this.http.post<IDiscount>(`${this.urlV1}/${id}/customers`, customersDiscount);
+    return this.http.post<IDiscount>(`${ this.urlV1 }/${ id }/customers`, customersDiscount);
   }
 
   public delete(id: string | null): Observable<IDiscount> {
-    const url = `${this.urlV1}/${id}`;
-    return this.http.delete<IDiscount>(url);
+    return this.http.delete<IDiscount>(`${ this.urlV1 }/${ id }`);
   }
 
   public update(discount: IDiscount): Observable<IDiscount> {
-    const url = `${this.urlV1}/${discount.id}`;
-    return this.http.patch<IDiscount>(url, discount);
+    return this.http.patch<IDiscount>(`${ this.urlV1 }/${ discount.id }`, discount);
+  }
+
+  public findByCustomerId(customerId: string): Observable<IUserDiscount[]> {
+    return this.http.get<IUserDiscount[]>(`${ this.urlV1 }/customers/${ customerId }`);
   }
 }

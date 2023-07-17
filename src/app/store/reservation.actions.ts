@@ -51,6 +51,7 @@ export enum ReservationActionTypes {
   getAllColorsByTreatmentId = '[Reservation] Get all colors by treatment id',
   colorsCompleteSuccess = '[Reservation] Colors complete success',
   updateNote = '[Reservation] Update note',
+  updateDiscount = '[Reservation] Update discount',
   clean = '[Reservation] Clean'
 }
 
@@ -395,6 +396,13 @@ export class UpdateNote implements Action {
   }
 }
 
+export class UpdateDiscount implements Action {
+  readonly type = ReservationActionTypes.updateDiscount;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class Clean implements Action {
   readonly type = ReservationActionTypes.clean;
 }
@@ -449,4 +457,5 @@ export type All =
   | GetAllColorsByTreatmentId
   | ColorSuccess
   | UpdateNote
+  | UpdateDiscount
   | Clean;

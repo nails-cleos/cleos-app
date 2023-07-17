@@ -196,7 +196,7 @@
     },
     "CANCEL": {
       "TITLE": "Cancelar la reserva",
-      "FIELD": "Selecionar una opción de cancelación",
+      "FIELD": "Seleccionar una opción de cancelación",
       "REQUIRED": "Opción de cancelación es <b>requerido</b>",
       "OPTION": {
         "DISCOUNT": "<b>Descuento:</b><br>Crear un descuento por el total pagado.",
@@ -206,6 +206,11 @@
         "CHARGE_WITH_REFUND": "<b>Penalización + Reembolso:</b><br>Se cobrará una penalización del 30%. Si pagó más del 30%, obtendrá un reembolso.",
         "NONE": "<b>None:</b><br>No extra action performed."
       }
+    },
+    "DISCOUNT": {
+      "ADD": "Agregar descuento",
+      "FIELD": "Seleccionar descuento",
+      "REQUIRED": "Descuento es <b>requerido</b>"
     }
   },
   "PAYMENT": {

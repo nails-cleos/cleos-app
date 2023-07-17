@@ -4,7 +4,7 @@ import { IDiscount, IReferral, IUserDiscount } from '../../interfaces/discount';
 import { ICurrency } from '../../interfaces/currency';
 
 export interface State {
-  data: IDiscount | Pagination<IDiscount> | Pagination<IUserDiscount> | null;
+  data: IDiscount | Pagination<IDiscount> | Pagination<IUserDiscount> | IUserDiscount[] | null;
   referrals: IReferral[] | null;
   currencies: ICurrency[] | null;
   errorMessage: string | null;
@@ -34,7 +34,7 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         // @ts-ignore
-        data: {content: [{}, {}, {}], totalElements: 3},
+        data: { content: [{}, {}, {}], totalElements: 3 },
         errorMessage: null,
         subErrors: null,
         selected: null,
@@ -75,6 +75,16 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         data: {} as IDiscount,
+        errorMessage: null,
+        subErrors: null,
+        selected: null,
+        message: null
+      };
+    }
+    case DiscountActionTypes.discountFindByCustomer: {
+      return {
+        ...state,
+        data: [],
         errorMessage: null,
         subErrors: null,
         selected: null,

@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, Inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
@@ -22,7 +22,7 @@ import {
 } from '../interfaces/reservation';
 import { CalendarEvent, CalendarEventTimesChangedEvent } from 'angular-calendar';
 import { TranslateService } from '@ngx-translate/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import {
@@ -82,8 +82,8 @@ import { IOffice } from '../interfaces/office';
 import { IStep, Step } from '../interfaces/step';
 import { TimeZoneSnackBarComponent } from '../shared/snak/time-zone/time-zone-snack-bar.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { DiscountDialogComponent } from '../discount/list/discounts.component';
 import PlaceResult = google.maps.places.PlaceResult;
+import { SelectProfessionalDialogComponent } from './select-professional-dialog.component';
 
 @Component({
   selector: 'app-reservation',
@@ -1165,67 +1165,5 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       this.completeAndNext();
     }
-  }
-}
-
-@Component({
-  selector: 'app-select-professional-dialog-component',
-  templateUrl: './select-professional-dialog.component.html'
-})
-export class SelectProfessionalDialogComponent implements OnInit {
-  professionalForm!: UntypedFormGroup;
-  professionals?: IUser[];
-  filteredProfessional?: Observable<IUser[] | undefined>;
-  professional: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required, requireMatch
-  ]);
-
-  constructor(public dialogRef: MatDialogRef<DiscountDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
-              private formBuilder: UntypedFormBuilder) {
-    this.professionals = data.professionals;
-  }
-
-  get onNoClick(): void {
-    return this.dialogRef.close();
-  }
-
-  get doAction(): void {
-    return this.dialogRef.close({ professional: this.professional.value });
-  }
-
-  ngOnInit(): void {
-    this.createForm();
-    this.createFilters();
-  }
-
-  displayFnUser(user: IUser): string {
-    return user ? getUserName(user) : '';
-  }
-
-  keyDownHandler(event: any): void {
-    if (event.code === 'Backspace') {
-      this.professional.setValue('');
-    }
-  }
-
-  private createForm(): void {
-    this.professionalForm = this.formBuilder.group({
-      professional: this.professional
-    });
-  }
-
-  private createFilters(): void {
-    this.filteredProfessional = this.professional.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterProfessional(
-        name) : this.professionals ? this.professionals.slice() : this.professionals)
-    );
-  }
-
-  private filterProfessional(name: string): IUser[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.professionals?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
   }
 }

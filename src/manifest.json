@@ -1,13 +1,28 @@
 {
   "name": "Cleos",
   "short_name": "Cleos",
-  "theme_color": "#f7e6d8",
-  "background_color": "#f7e6d8",
+  "theme_color": "#a9a397",
+  "background_color": "#a9a397",
   "display": "standalone",
   "gcm_sender_id": "174727853234",
   "scope": "./",
-  "start_url": "./",
+  "start_url": "https://nailscleos.nl/main",
   "description": "App to book an appointment to make your nail prettier",
+  "display_override": ["standalone", "window-controls-overlay", "fullscreen"],
+  "categories": ["beauty", "health"],
+  "edge_side_panel": {
+    "preferred_width": 390
+  },
+  "launch_handler": {
+    "client_mode": "auto"
+  },
+  "shortcuts" : [
+    {
+      "name": "Agenda",
+      "url": "/reservation/calendar",
+      "description": "List of events"
+    }
+  ],
   "icons": [
     {
       "src": "assets/icons/icon-16x16.png",

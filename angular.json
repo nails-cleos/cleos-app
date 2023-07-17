@@ -148,6 +148,8 @@
               ],
               "serviceWorker": true,
               "ngswConfigPath": "ngsw-config.json"
+            },
+            "development": {
             }
           },
           "defaultConfiguration": "production"
