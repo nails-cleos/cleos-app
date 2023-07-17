@@ -41,6 +41,8 @@ import { CancelDialogComponent } from './dialog/cancel/cancel-dialog.component';
 import { FilterByPipe } from '../pipes/filterBy.pipe';
 import { DiscountPipe } from '../pipes/discount.pipe';
 import { TwoDigitsDirective } from '../directives/two-digits.directive';
+import { PromptComponent } from './prompt/prompt.component';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 @NgModule({
   imports: [
@@ -68,48 +70,20 @@ import { TwoDigitsDirective } from '../directives/two-digits.directive';
     FlexLayoutModule,
     HttpClientModule,
     HttpClientJsonpModule,
-    FormsModule
+    FormsModule,
+    MatToolbarModule
   ],
-    exports: [
-        AppMaterialModule,
-        CommonModule,
-        TranslateModule,
-        ReactiveFormsModule,
-        AppMaterialModule,
-        FlexLayoutModule,
-        HttpClientModule,
-        HttpClientJsonpModule,
-        NgChartsModule,
-        FormsModule,
-        BackButtonDirective,
-        SortByPipe,
-        UserNamePipe,
-        TimeDetailPipe,
-        DurationTimePipe,
-        RoomNamePipe,
-        CurrencySymbolPipe,
-        ReservationIconPipe,
-        ConvertHMPipe,
-        ErrorComponent,
-        GoogleMapComponent,
-        RatingComponent,
-        CardChartComponent,
-        CardComponent,
-        ChartComponent,
-        TimeZoneSnackBarComponent,
-        CounterComponent,
-        PasswordComponent,
-        BankComponent,
-        PriceComponent,
-        DialogComponent,
-        CalendarDialogComponent,
-        CustomerEditDialogComponent,
-        CancelDialogComponent,
-        FilterByPipe,
-        DiscountPipe,
-        TwoDigitsDirective
-    ],
-  declarations: [
+  exports: [
+    AppMaterialModule,
+    CommonModule,
+    TranslateModule,
+    ReactiveFormsModule,
+    AppMaterialModule,
+    FlexLayoutModule,
+    HttpClientModule,
+    HttpClientJsonpModule,
+    NgChartsModule,
+    FormsModule,
     BackButtonDirective,
     SortByPipe,
     UserNamePipe,
@@ -137,6 +111,36 @@ import { TwoDigitsDirective } from '../directives/two-digits.directive';
     FilterByPipe,
     DiscountPipe,
     TwoDigitsDirective
+  ],
+  declarations: [
+    BackButtonDirective,
+    SortByPipe,
+    UserNamePipe,
+    TimeDetailPipe,
+    DurationTimePipe,
+    RoomNamePipe,
+    CurrencySymbolPipe,
+    ReservationIconPipe,
+    ConvertHMPipe,
+    ErrorComponent,
+    GoogleMapComponent,
+    RatingComponent,
+    CardChartComponent,
+    CardComponent,
+    ChartComponent,
+    TimeZoneSnackBarComponent,
+    CounterComponent,
+    PasswordComponent,
+    BankComponent,
+    PriceComponent,
+    DialogComponent,
+    CalendarDialogComponent,
+    CustomerEditDialogComponent,
+    CancelDialogComponent,
+    FilterByPipe,
+    DiscountPipe,
+    TwoDigitsDirective,
+    PromptComponent
   ],
   providers: [
     httpInterceptorProviders,

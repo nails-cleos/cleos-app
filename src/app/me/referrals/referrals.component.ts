@@ -10,7 +10,7 @@ import { IUserAll } from '../../interfaces/user';
 import { Observable, Subscription } from 'rxjs';
 import * as fromActionsDiscount from '../../store/discount.actions';
 import { IUserDiscount } from '../../interfaces/discount';
-import { AngularFireAnalytics } from "@angular/fire/compat/analytics";
+import { AngularFireAnalytics } from '@angular/fire/compat/analytics';
 
 @Component({
   selector: 'app-referrals',

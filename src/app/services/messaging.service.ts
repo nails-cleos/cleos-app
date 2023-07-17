@@ -3,10 +3,10 @@ import { BehaviorSubject, take } from 'rxjs';
 import { AppState } from '../store/app.states';
 import { Store } from '@ngrx/store';
 import * as fromActionsNotification from '../store/notification.actions';
-import { AngularFireMessaging } from "@angular/fire/compat/messaging";
-import { AngularFireAuth } from "@angular/fire/compat/auth";
-import { AngularFireDatabase } from "@angular/fire/compat/database";
-import firebase from "firebase/compat";
+import { AngularFireMessaging } from '@angular/fire/compat/messaging';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { AngularFireDatabase } from '@angular/fire/compat/database';
+import firebase from 'firebase/compat';
 import MessagePayload = firebase.messaging.MessagePayload;
 
 @Injectable({
@@ -44,9 +44,9 @@ export class MessagingService {
   receiveMessage(): void {
     this.messaging.messages.subscribe(payload => {
       if (this.currentMessage) {
-        this.currentMessage.next(payload)
+        this.currentMessage.next(payload);
       } else {
-        this.currentMessage = new BehaviorSubject<any>(payload)
+        this.currentMessage = new BehaviorSubject<any>(payload);
       }
     });
   }
@@ -56,7 +56,7 @@ export class MessagingService {
    *
    * @param userId userId
    */
-  requestPermission(userId: any) {
+  requestPermission(userId: any): void {
     this.messaging.requestPermission.subscribe(value => {
       if (value === 'granted') {
         this.messaging.requestToken.subscribe(currentToken => {

@@ -92,10 +92,6 @@
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.staging.ts"
-                },
-                {
-                  "replace": "src/manifest.json",
-                  "with": "src/manifest-dev.json"
                 }
               ],
               "optimization": true,
@@ -129,10 +125,6 @@
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.pwa.ts"
-                },
-                {
-                  "replace": "src/manifest.json",
-                  "with": "src/manifest-dev.json"
                 }
               ],
               "optimization": true,
@@ -156,14 +148,6 @@
               ],
               "serviceWorker": true,
               "ngswConfigPath": "ngsw-config.json"
-            },
-            "development": {
-              "fileReplacements": [
-                {
-                  "replace": "src/manifest.json",
-                  "with": "src/manifest-dev.json"
-                }
-              ]
             }
           },
           "defaultConfiguration": "production"

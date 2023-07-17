@@ -6,7 +6,7 @@ import { NavRoutingModule } from './nav-routing.module';
 import { NavComponent } from './nav.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatBadgeModule } from '@angular/material/badge';
-import { DateAdapter, MatRippleModule } from '@angular/material/core';
+import { MatRippleModule } from '@angular/material/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { EffectsModule } from '@ngrx/effects';
 import { LoginEffects } from '../store/effects/auth.effects';
@@ -18,7 +18,6 @@ import { UserService } from '../services/user.service';
 import { TokenService } from '../services/token.service';
 import { MenuItemComponent } from './menu-item/menu-item.component';
 import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
-import { YearMonthDateAdapter } from '../util/adapter/year-month-date.adapter';
 
 @NgModule({
   declarations: [
