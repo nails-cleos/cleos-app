@@ -35,6 +35,7 @@ export class OfficeComponent implements OnInit, OnDestroy {
   kvk: UntypedFormControl = new UntypedFormControl('');
   account: UntypedFormControl = new UntypedFormControl('');
   btw: UntypedFormControl = new UntypedFormControl('');
+  billingAddress: UntypedFormControl = new UntypedFormControl('');
 
   private getState: Observable<any>;
   private subscription?: Subscription;
@@ -56,6 +57,7 @@ export class OfficeComponent implements OnInit, OnDestroy {
     office.kvk = this.kvk.value;
     office.account = this.account.value;
     office.btw = this.btw.value;
+    office.billingAddress = this.billingAddress.value;
 
     return this.store.dispatch(
       new fromActionsOffice.OfficeSave(office)
@@ -89,7 +91,8 @@ export class OfficeComponent implements OnInit, OnDestroy {
       subject: this.subject,
       kvk: this.kvk,
       account: this.account,
-      btw: this.btw
+      btw: this.btw,
+      billingAddress: this.billingAddress
     });
     this.filteredOptions = this.manager.valueChanges.pipe(
       startWith(''),

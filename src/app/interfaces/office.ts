@@ -13,6 +13,7 @@ export interface IOffice {
   kvk?: string;
   account?: string;
   btw?: string;
+  billingAddress?: string;
   lastInvoiceNumber?: number;
 }
 
@@ -24,6 +25,7 @@ export interface IOfficeAll {
   kvk?: string;
   account?: string;
   btw?: string;
+  billingAddress?: string;
   lastInvoiceNumber?: number;
 }
 

@@ -93,14 +93,6 @@ export class InvoiceComponent implements OnInit, OnDestroy {
   }
 
   get print(): void {
-    pdfMake.fonts = {
-      belleza: {
-        normal: `${ window.location.origin }/assets/Belleza/Belleza-Regular.ttf`,
-        bold: `${ window.location.origin }/assets/Belleza/Belleza-Regular.ttf`,
-        italics: `${ window.location.origin }/assets/Belleza/Belleza-Regular.ttf`,
-      },
-    };
-
     const start = Number(this.startNumber.value || 0);
 
     if (this.selection.selected.length === this.invoices?.length) {

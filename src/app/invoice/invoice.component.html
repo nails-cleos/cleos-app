@@ -2,7 +2,7 @@
   <fieldset>
     <legend>{{'INVOICE.SEARCH.TITLE' | translate }}</legend>
     <form [formGroup]="form">
-      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
+      <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutAlign="space-around center">
         <mat-form-field appearance="outline">
           <mat-label>{{ 'INVOICE.OFFICE.SEARCH' | translate }}</mat-label>
           <label>
@@ -23,31 +23,6 @@
           </mat-error>
         </mat-form-field>
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'INVOICE.SEARCH.START.FIELD' | translate }}</mat-label>
-          <label>
-            <input [formControl]="startNumber" matInput matNativeControl required [type]="'number'" [step]="1"
-                   [min]="1">
-          </label>
-          <mat-error *ngIf="startNumber.hasError('required')" [innerHTML]="'INVOICE.SEARCH.START.REQUIRED' | translate">
-          </mat-error>
-          <mat-error *ngIf="startNumber.hasError('min')"
-                     [innerHTML]="'INVOICE.SEARCH.START.MIN' | translate">
-          </mat-error>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>{{'INVOICE.SEARCH.RANGE.FIELD' | translate }}</mat-label>
-          <mat-date-range-input [rangePicker]="drp" [formGroup]="dateRange">
-            <input matStartDate [formControl]="startDate" placeholder="{{'INVOICE.SEARCH.RANGE.START' | translate }}">
-            <input matEndDate [formControl]="endDate" placeholder="{{'INVOICE.SEARCH.RANGE.END' | translate }}">
-          </mat-date-range-input>
-          <mat-datepicker-toggle matSuffix [for]="drp"></mat-datepicker-toggle>
-          <mat-date-range-picker #drp touchUi></mat-date-range-picker>
-          <mat-error [innerHTML]="'INVOICE.SEARCH.RANGE.REQUIRED' | translate">
-          </mat-error>
-        </mat-form-field>
-      </div>
-      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
-        <mat-form-field appearance="outline">
           <mat-label>{{ 'INVOICE.PAYMENT.SEARCH' | translate }}</mat-label>
           <mat-chip-grid #chipList aria-label="Payment type selection">
             <mat-chip-row (removed)="remove(type)" *ngFor="let type of types" [removable]="true"
@@ -64,8 +39,29 @@
             </mat-option>
           </mat-autocomplete>
         </mat-form-field>
-      </div>
-      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
+        <mat-form-field appearance="outline">
+          <mat-label>{{'INVOICE.SEARCH.RANGE.FIELD' | translate }}</mat-label>
+          <mat-date-range-input [rangePicker]="drp" [formGroup]="dateRange">
+            <input matStartDate [formControl]="startDate" placeholder="{{'INVOICE.SEARCH.RANGE.START' | translate }}">
+            <input matEndDate [formControl]="endDate" placeholder="{{'INVOICE.SEARCH.RANGE.END' | translate }}">
+          </mat-date-range-input>
+          <mat-datepicker-toggle matSuffix [for]="drp"></mat-datepicker-toggle>
+          <mat-date-range-picker #drp touchUi></mat-date-range-picker>
+          <mat-error [innerHTML]="'INVOICE.SEARCH.RANGE.REQUIRED' | translate">
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline" style="margin-left: -15px">
+          <mat-label>{{ 'INVOICE.SEARCH.START.FIELD' | translate }}</mat-label>
+          <label>
+            <input [formControl]="startNumber" matInput matNativeControl required [type]="'number'" [step]="1"
+                   [min]="1">
+          </label>
+          <mat-error *ngIf="startNumber.hasError('required')" [innerHTML]="'INVOICE.SEARCH.START.REQUIRED' | translate">
+          </mat-error>
+          <mat-error *ngIf="startNumber.hasError('min')"
+                     [innerHTML]="'INVOICE.SEARCH.START.MIN' | translate">
+          </mat-error>
+        </mat-form-field>
         <button color="accent" id="print" mat-fab type="button" (click)="print"
                 [disabled]="!selection.selected.length">
           <mat-icon>print</mat-icon>

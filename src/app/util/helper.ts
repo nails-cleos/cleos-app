@@ -408,6 +408,7 @@ export const areEquals = (array1: any[], array2: any[]): boolean => (array1.leng
   )
 );
 
+export const titleCase = (text: string) => text.split(' ').map((l: string) => l[0].toUpperCase() + l.substring(1)).join(' ');
 export const openCancel = (dialog: MatDialog, room: IRoomAll, small: boolean, options: string[], afterClose: (result: any) => void,
                            showPenalty?: boolean, price?: IPrice): void => {
   const types = room.paymentTypes.filter((p) => !['CASH', 'TRANSFER'].includes(p));
