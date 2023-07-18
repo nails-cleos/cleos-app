@@ -81,7 +81,6 @@ export class DashboardEffects {
     tap(() => window.location.reload())
   ), { dispatch: false });
 
-
   constructor(private readonly translate: TranslateService, private actions$: Actions, private router: Router,
               private dashboardService: DashboardService) {
   }

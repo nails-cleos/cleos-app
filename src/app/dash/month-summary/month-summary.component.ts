@@ -19,6 +19,7 @@ import {
   SummaryType
 } from '../../interfaces/dashboard';
 import { YearMonthAdapter } from '../../util/adapter/year-month.adapter';
+import { titleCase } from '../../util/helper';
 
 @Component({
   selector: 'app-month-summary',
@@ -260,14 +261,15 @@ export class MonthSummaryComponent implements OnInit {
       csv += `,,,,,${ gross },${ net },${ btw }\n`;
 
       csv = `${ csv.substring(0, csv.length - 1) }\n`;
+
       const hiddenElement = document.createElement('a');
       hiddenElement.href = `data:text/csv;charset=utf-8,${ encodeURI(csv) }`;
       hiddenElement.target = '_blank';
-      hiddenElement.download = `${ name }-${ MonthSummaryComponent.getDateFormat(this.date.value) }.csv`;
+      hiddenElement.download = `${ titleCase(SummaryType[type]) }-${ MonthSummaryComponent.getDateFormat(this.date.value) }.csv`;
       hiddenElement.click();
 
       return this.updateMonthlySummary(type, gross, btw, values);
-    }, 0);
+    }, 100);
     return;
   }
 

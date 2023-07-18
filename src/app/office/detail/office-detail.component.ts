@@ -29,6 +29,7 @@ export class OfficeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
   kvk: UntypedFormControl = new UntypedFormControl('');
   account: UntypedFormControl = new UntypedFormControl('');
   btw: UntypedFormControl = new UntypedFormControl('');
+  billingAddress: UntypedFormControl = new UntypedFormControl('');
 
   private getState: Observable<any>;
   private subscription?: Subscription;
@@ -50,6 +51,7 @@ export class OfficeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     office.kvk = fieldChange(this.kvk, this.office?.kvk);
     office.account = fieldChange(this.account, this.office?.account);
     office.btw = fieldChange(this.btw, this.office?.btw);
+    office.billingAddress = fieldChange(this.billingAddress, this.office?.billingAddress);
 
     return this.store.dispatch(new fromActionsOffice.OfficeUpdate(office));
   }
@@ -73,7 +75,8 @@ export class OfficeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
       subject: this.subject,
       kvk: this.kvk,
       account: this.account,
-      btw: this.btw
+      btw: this.btw,
+      billingAddress: this.billingAddress
     });
   }
 
@@ -88,7 +91,8 @@ export class OfficeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
           subject: state.selected.office.subject,
           kvk: state.selected.office.kvk,
           account: state.selected.office.account,
-          btw: state.selected.office.btw
+          btw: state.selected.office.btw,
+          billingAddress: state.selected.office.billingAddress
         } as IOffice;
         this.form.patchValue(this.office);
       }

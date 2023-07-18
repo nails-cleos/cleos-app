@@ -34,6 +34,9 @@
     "BTW": {
       "FIELD": "BTW nr"
     },
+    "ADDRESS": {
+      "FIELD": "Invoice address"
+    },
     "DELETED": {
       "TITLE": "Delete office",
       "CONTENT": "Are you sure to delete office {{name}}?",
