@@ -89,8 +89,8 @@
       <td *matCellDef="let expense" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="expense.id; else skeleton">
           <mat-list-item>
-            <div matListItemTitle>{{expense.btw | number:'1.2-2'}}</div>
-            <mat-icon matListItemIcon>percent</mat-icon>
+            <mat-icon matListItemIcon>{{expense.room.currency.icon}}</mat-icon>
+            <div matListItemTitle>{{(expense.gross - expense.net) | number:'1.2-2'}}</div>
           </mat-list-item>
         </div>
         <ng-template #skeleton>
@@ -159,8 +159,8 @@
             <ng-template [ngIf]="expense.btw">
               <div mat-subheader>{{ 'EXPENSE.LIST.COLUMN.BTW' | translate }}</div>
               <mat-list-item role="list">
-                <div matListItemTitle>{{expense.btw | number:'1.2-2'}}</div>
-                <mat-icon matListItemIcon>percent</mat-icon>
+                <mat-icon matListItemIcon>{{expense.room.currency.icon}}</mat-icon>
+                <div matListItemTitle>{{(expense.gross - expense.net) | number:'1.2-2'}}</div>
               </mat-list-item>
             </ng-template>
             <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
