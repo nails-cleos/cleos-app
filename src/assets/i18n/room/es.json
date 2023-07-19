@@ -163,8 +163,7 @@
     },
     "GROSS": {
       "FIELD": "Bruto",
-      "REQUIRED": "Bruto es <b>requerido</b>",
-      "MIN": "Bruto debe ser mayor a -10,000.00"
+      "REQUIRED": "Bruto es <b>requerido</b>"
     },
     "BTW": {
       "FIELD": "IVA",
