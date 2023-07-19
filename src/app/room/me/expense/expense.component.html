@@ -106,10 +106,10 @@
                 </mat-error>
               </mat-form-field>
               <mat-form-field appearance="outline">
-                <mat-label>{{ 'EXPENSE.BTW_21.FIELD' | translate }}</mat-label>
+                <mat-label>{{ 'EXPENSE.BTW.FIELD' | translate }}</mat-label>
                 <label>
-                  <input id="btw21" formControlName="btw21" matInput appTwoDigits #btw21
-                         (focusout)="validateInputValue(btw21, 0, 100)">
+                  <input id="btw" formControlName="btw" matInput appTwoDigits #btw
+                         (focusout)="validateInputValue(btw, 0, 100)">
                 </label>
                 <mat-icon matSuffix>percent</mat-icon>
                 <mat-error *ngIf="errors['btw']">
@@ -129,7 +129,7 @@
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'EXPENSE.BTW.FIELD' | translate }}</mat-label>
                 <label>
-                  <input disabled [value]="btw" matInput appTwoDigits>
+                  <input disabled [value]="btwValue" matInput appTwoDigits>
                 </label>
                 <mat-icon matPrefix>{{currencyIcon}}</mat-icon>
               </mat-form-field>

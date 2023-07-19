@@ -166,13 +166,10 @@
       "REQUIRED": "Gross is <b>required</b>",
       "MIN": "Gross must be greater than -10,000.00"
     },
-    "BTW_21": {
-      "FIELD": "BTW (21%)",
+    "BTW": {
+      "FIELD": "BTW",
       "MIN": "BTW must be greater than 0.00",
       "MAX": "BTW must be less than 100.00"
-    },
-    "BTW": {
-      "FIELD": "BTW"
     },
     "NET": {
       "FIELD": "Net"

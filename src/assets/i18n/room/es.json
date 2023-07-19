@@ -138,7 +138,7 @@
         "STORE_SUPPLY": "Suministro de tienda",
         "DATE": "Fecha",
         "GROSS": "Bruto",
-        "BTW": "BTW",
+        "BTW": "IVA",
         "NET": "Neto"
       },
       "ERROR": {
@@ -166,13 +166,10 @@
       "REQUIRED": "Bruto es <b>requerido</b>",
       "MIN": "Bruto debe ser mayor a -10,000.00"
     },
-    "BTW_21": {
-      "FIELD": "BTW (21%)",
-      "MIN": "BTW debe ser mayor a 0.00",
-      "MAX": "BTW debe ser menor a 100.00"
-    },
     "BTW": {
-      "FIELD": "BTW"
+      "FIELD": "IVA",
+      "MIN": "IVA debe ser mayor a 0.00",
+      "MAX": "IVA debe ser menor a 100.00"
     },
     "NET": {
       "FIELD": "Neto"
