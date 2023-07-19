@@ -24,6 +24,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   errors: any = [];
   types: any[] = [];
   net: string;
+  btw: string;
   currencyIcon?: string;
   roomName?: string;
   today: Date;
@@ -35,6 +36,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
               private route: ActivatedRoute, private router: Router) {
     this.isAddMode = true;
     this.net = '';
+    this.btw = '';
     this.today = getNow();
     this.getState = this.store.select(selectExpenseState);
   }
@@ -53,7 +55,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     expense.storeSupply = fieldChange(this.getForm.storeSupply as UntypedFormControl, this.expense?.storeSupply);
     expense.description = fieldChange(this.getForm.description as UntypedFormControl, this.expense?.description);
     expense.gross = fieldChange(this.getForm.gross as UntypedFormControl, this.expense?.gross?.toFixed(2));
-    expense.btw = fieldChange(this.getForm.btw as UntypedFormControl, this.expense?.btw?.toFixed(2));
+    expense.btw = fieldChange(this.getForm.btw21 as UntypedFormControl, this.expense?.btw?.toFixed(2));
     expense.type = fieldChange(this.getForm.type as UntypedFormControl, this.expense?.type);
     expense.date = this.getForm.date.value.toLocaleString(API_LOCALE);
 
@@ -88,10 +90,14 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  validateInputValue(input: HTMLInputElement, min: number, max?: number): void {
+  validateInputValue(input: HTMLInputElement, min?: number, max?: number): void {
     if (input.value) {
       const value = parseFloat(input.value);
-      if (value < min) {
+      if (isNaN(value)) {
+        this.getForm[input.id].setValue(null);
+        return;
+      }
+      if (min && value < min) {
         this.errors[input.id] = this.translate.instant(`EXPENSE.${ input.id.toUpperCase() }.MIN`);
       } else if (max && value > max) {
         this.errors[input.id] = this.translate.instant(`EXPENSE.${ input.id.toUpperCase() }.MAX`);
@@ -104,14 +110,17 @@ export class ExpenseComponent implements OnInit, OnDestroy {
         this.getForm[input.id].setValue(value.toFixed(2));
         if (this.getForm.gross.value) {
           const gross = parseFloat(this.getForm.gross.value);
-          if (this.getForm.btw.value) {
-            const btw = parseFloat(this.getForm.btw.value);
-            this.net = (gross / (btw + 100) * 100).toFixed(2);
+          if (this.getForm.btw21.value) {
+            const btw21 = parseFloat(this.getForm.btw21.value);
+            this.net = (gross / (btw21 + 100) * 100).toFixed(2);
           } else {
             this.net = this.getForm.gross.value;
           }
+          this.btw = (gross - parseFloat(this.net)).toFixed(2);
         }
       }
+    } else {
+      this.getForm[input.id].setValue(null);
     }
   }
 
@@ -127,11 +136,12 @@ export class ExpenseComponent implements OnInit, OnDestroy {
         this.getForm.date.setValue(newDateTimestamp(this.expense.timestamp, this.expense.room?.timeZone));
         this.getForm.gross.setValue(this.expense.gross.toFixed(2));
         if (this.expense.btw) {
-          this.getForm.btw.setValue(this.expense.btw.toFixed(2));
+          this.getForm.btw21.setValue(this.expense.btw.toFixed(2));
           this.net = (this.expense.gross / (this.expense.btw + 100) * 100).toFixed(2);
         } else {
           this.net = this.expense.gross.toFixed(2);
         }
+        this.btw = (this.expense.gross - parseFloat(this.net)).toFixed(2);
       }
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
@@ -150,7 +160,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       storeSupply: ['', Validators.required],
       description: [''],
       gross: ['', Validators.required],
-      btw: [''],
+      btw21: [''],
       date: ['', Validators.required],
       type: ['', Validators.required]
     });
