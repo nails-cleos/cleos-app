@@ -55,7 +55,12 @@
     "MONTHLY": {
       "FIELD": "Resumen mensual",
       "SELECT": {
-        "DATE": "Mes y año"
+        "DATE": "Mes y año",
+        "FORMAT": "Formato de moneda"
+      },
+      "FORMAT": {
+        "EN": "Formato $1,234.56",
+        "ES": "Formato $1.234,56"
       },
       "TABLE": {
         "WEEK": "Semana {{number}}",

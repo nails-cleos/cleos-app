@@ -56,11 +56,11 @@
       "FIELD": "Monthly summary",
       "SELECT": {
         "DATE": "Month and year",
-        "FORMAT": "Amount format in file"
+        "FORMAT": "Amount format"
       },
       "FORMAT": {
-        "EN": "Currency $1,234.56",
-        "ES": "Currency $1.234,56"
+        "EN": "Format $1,234.56",
+        "ES": "Format $1.234,56"
       },
       "TABLE": {
         "WEEK": "Week {{number}}",
