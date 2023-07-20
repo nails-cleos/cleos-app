@@ -162,12 +162,12 @@
               <ng-template #complete>
                 <mat-icon matListItemIcon>badge</mat-icon>
               </ng-template>
-              <div mat-line>{{'DASHBOARD.PROFILE' | translate }}</div>
+              <div mat-line>{{'COMMON.DASHBOARD.PROFILE' | translate }}</div>
             </a>
             <mat-divider></mat-divider>
             <a *ngIf="canChangePassword" [routerLink]="'/auth/change-password'" mat-list-item>
               <mat-icon matListItemIcon>password</mat-icon>
-              <div mat-line>{{'DASHBOARD.CHANGE_PASSWORD' | translate }}</div>
+              <div mat-line>{{'COMMON.DASHBOARD.CHANGE_PASSWORD' | translate }}</div>
             </a>
             <mat-divider></mat-divider>
             <a (click)="changeTheme" mat-list-item>
@@ -177,7 +177,7 @@
             <mat-divider></mat-divider>
             <a (click)="logout" mat-list-item>
               <mat-icon matListItemIcon>exit_to_app</mat-icon>
-              <div mat-line>{{'DASHBOARD.SIGN_OUT' | translate }}</div>
+              <div mat-line>{{'COMMON.DASHBOARD.SIGN_OUT' | translate }}</div>
             </a>
           </mat-nav-list>
         </mat-menu>

@@ -1,10 +1,18 @@
-<div fxLayout="column" fxLayoutAlign="space-around center">
-  <mat-form-field>
+<div fxLayout="row" fxLayoutAlign="space-around center">
+  <mat-form-field appearance="outline">
     <mat-label>{{'SUMMARY.MONTHLY.SELECT.DATE' | translate}}</mat-label>
     <input matInput [matDatepicker]="dp" [formControl]="date">
     <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
     <mat-datepicker #dp startView="year" (monthSelected)="setMonthAndYear($event, dp)">
     </mat-datepicker>
+  </mat-form-field>
+  <mat-form-field appearance="outline">
+    <mat-label>{{'SUMMARY.MONTHLY.SELECT.FORMAT' | translate}}</mat-label>
+    <mat-select [formControl]="amountFormat">
+      <mat-option *ngFor="let enum of amountFormatKeys | keyvalue" [value]="enum.value">
+        {{'SUMMARY.MONTHLY.FORMAT.' + enum.value | translate}}
+      </mat-option>
+    </mat-select>
   </mat-form-field>
 </div>
 <div fxLayout="column" fxLayoutAlign="space-around stretch">
@@ -25,22 +33,22 @@
     <ng-template [ngIf]="showInput" [ngIfElse]="noGrossInput">
       <ng-template [ngIf]="edit" [ngIfElse]="noNetEdit">
         <mat-form-field class="amount" appearance="outline">
-          <input matInput [value]="(payment.gross || 0) | number:'1.2-2'" appTwoDigits #gross id="grossInput"
-                 (focusin)="gross.select()" (focusout)="twoDigit(gross, index, key, payment.id)">
+          <input matInput [value]="(payment.gross || 0) | number:'1.2-2'" appTwoDigits #gross
+                 id="grossInput" (focusin)="gross.select()" (focusout)="twoDigit(gross, index, key, payment.id)">
           <mat-icon matPrefix>{{currency}}</mat-icon>
         </mat-form-field>
       </ng-template>
       <ng-template #noNetEdit>
         <mat-list>
           <mat-list-item>
-            <div matListItemTitle>{{(payment.gross || 0) | number:'1.2-2'}}</div>
+            <div matListItemTitle>{{(payment.gross || 0) | number:'1.2-2':locale}}</div>
             <mat-icon matListItemIcon>{{currency}}</mat-icon>
           </mat-list-item>
         </mat-list>
       </ng-template>
     </ng-template>
     <ng-template #noGrossInput>
-      <span>{{payment.gross || 0}}</span>
+      <span>{{payment.gross || 0 | number:'1.2-2':locale}}</span>
     </ng-template>
   </td>
   <td>
@@ -55,14 +63,14 @@
       <ng-template #noNetEdit>
         <mat-list>
           <mat-list-item>
-            <div matListItemTitle>{{(payment.net || 0) | number:'1.2-2'}}</div>
+            <div matListItemTitle>{{(payment.net || 0) | number:'1.2-2':locale}}</div>
             <mat-icon matListItemIcon>{{currency}}</mat-icon>
           </mat-list-item>
         </mat-list>
       </ng-template>
     </ng-template>
     <ng-template #noNetInput>
-      <span>{{payment.net || 0}}</span>
+      <span>{{payment.net || 0 | number:'1.2-2':locale}}</span>
     </ng-template>
   </td>
   <td>
@@ -77,14 +85,14 @@
       <ng-template #noNetEdit>
         <mat-list>
           <mat-list-item>
-            <div matListItemTitle>{{(payment.btw || 0) | number:'1.2-2'}}</div>
+            <div matListItemTitle>{{(payment.btw || 0) | number:'1.2-2':locale}}</div>
             <mat-icon matListItemIcon>{{currency}}</mat-icon>
           </mat-list-item>
         </mat-list>
       </ng-template>
     </ng-template>
     <ng-template #noBtwInput>
-      <span>{{payment.btw || 0}}</span>
+      <span>{{payment.btw || 0 | number:'1.2-2':locale}}</span>
     </ng-template>
   </td>
   <td [ngClass]="(type || 'PENDING').toLowerCase()">
@@ -145,7 +153,7 @@
             </button>
           </td>
           <td [rowSpan]="summary.total.payments.length || 1">
-            {{(summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat)?.replace(',', '')}}
+            {{summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat}}
           </td>
           <td [rowSpan]="summary.total.payments.length || 1">{{summary.customerName}}</td>
           <td [rowSpan]="summary.total.payments.length || 1">{{summary.treatmentName}}</td>

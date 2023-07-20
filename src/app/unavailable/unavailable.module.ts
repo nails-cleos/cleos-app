@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../shared/shared.module';
 import { UnavailableRoutingModule } from './unavailable-routing.module';
 
@@ -10,7 +10,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { UnavailableEffects } from '../store/effects/unavailable.effects';
 import { UnavailableService } from '../services/unavailable.service';
 import { UserService } from '../services/user.service';
-import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 
 @NgModule({
   declarations: [
@@ -25,6 +25,10 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
       loader: {
         provide: TranslateLoader,
         useClass: TranslateLoaderFactory.forModule('unavailable')
+      },
+      missingTranslationHandler: {
+        provide: MissingTranslationHandler,
+        useClass: MissingTranslateHandler,
       },
       isolate: false,
       extend: true

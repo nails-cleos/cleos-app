@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
-import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
 import { MatStepperModule } from '@angular/material/stepper';
 import { EffectsModule } from '@ngrx/effects';
 import { CalendarModule } from 'angular-calendar';
 
 import { SharedModule } from '../shared/shared.module';
-import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { ReservationRoutingModule } from './reservation-routing.module';
 
 import { SearchComponent } from './search/search.component';
@@ -60,6 +60,10 @@ import { CurrencyService } from '../services/currency.service';
       loader: {
         provide: TranslateLoader,
         useClass: TranslateLoaderFactory.forModule('reservation')
+      },
+      missingTranslationHandler: {
+        provide: MissingTranslationHandler,
+        useClass: MissingTranslateHandler,
       },
       isolate: false,
       extend: true

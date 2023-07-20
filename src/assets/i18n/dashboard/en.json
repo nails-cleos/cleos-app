@@ -1,9 +1,6 @@
 {
   "DASHBOARD": {
     "FIELD": "Tablero",
-    "PROFILE": "Profile",
-    "CHANGE_PASSWORD": "Change password",
-    "SIGN_OUT": "Sign out",
     "SIGN_IN": "Sign In",
     "RESERVATION": {
       "COMPLETED": "Completed: {{completed}} - {{total}}",
@@ -58,7 +55,12 @@
     "MONTHLY": {
       "FIELD": "Monthly summary",
       "SELECT": {
-        "DATE": "Month and year"
+        "DATE": "Month and year",
+        "FORMAT": "Amount format"
+      },
+      "FORMAT": {
+        "EN": "Format $1,234.56",
+        "ES": "Format $1.234,56"
       },
       "TABLE": {
         "WEEK": "Week {{number}}",

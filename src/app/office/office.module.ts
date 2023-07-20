@@ -5,12 +5,12 @@ import { OfficeComponent } from './office.component';
 import { SharedModule } from '../shared/shared.module';
 import { OfficeListComponent } from './list/office-list.component';
 import { OfficeDetailComponent } from './detail/office-detail.component';
-import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EffectsModule } from '@ngrx/effects';
 import { OfficeEffects } from '../store/effects/office.effects';
 import { OfficeService } from '../services/office.service';
 import { UserService } from '../services/user.service';
-import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 
 @NgModule({
   declarations: [
@@ -25,6 +25,10 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
       loader: {
         provide: TranslateLoader,
         useClass: TranslateLoaderFactory.forModule('office')
+      },
+      missingTranslationHandler: {
+        provide: MissingTranslationHandler,
+        useClass: MissingTranslateHandler,
       },
       isolate: false,
       extend: true

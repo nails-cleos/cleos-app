@@ -33,7 +33,7 @@ import { MAT_COLOR_FORMATS, NGX_MAT_COLOR_FORMATS, NgxMatColorPickerModule } fro
 
 // Services
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { AuthGuardService } from './services/auth-guard.service';
+import { PermissionsService } from './services/auth-guard.service';
 import { TokenService } from './services/token.service';
 import { NavigationService } from './services/navigation.service';
 import { MessagingService } from './services/messaging.service';
@@ -110,7 +110,7 @@ registerLocaleData(localeAr, 'es-AR');
       provide: MatPaginatorIntl, deps: [TranslateService],
       useFactory: (translateService: TranslateService) => new PaginatorI18n(translateService).getPaginatorIntl()
     },
-    AuthGuardService,
+    PermissionsService,
     TokenService,
     NavigationService,
     TranslationLoaderResolver,

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AuthGuardService } from '../services/auth-guard.service';
+import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
 import { UnavailableListComponent } from './list/unavailable-list.component';
 import { UnavailableComponent } from './unavailable.component';
@@ -8,17 +8,17 @@ import { UnavailableDetailComponent } from './detail/unavailable-detail.componen
 
 const routes: Routes = [
   {
-    path: '', component: UnavailableListComponent, canActivate: [AuthGuardService], data: {
+    path: '', component: UnavailableListComponent, canActivate: [authGuard], data: {
       roles: [Role.admin, Role.professional]
     }
   },
   {
-    path: 'add', component: UnavailableComponent, canActivate: [AuthGuardService], data: {
+    path: 'add', component: UnavailableComponent, canActivate: [authGuard], data: {
       roles: [Role.admin, Role.professional]
     }
   },
   {
-    path: ':id', component: UnavailableDetailComponent, canActivate: [AuthGuardService], data: {
+    path: ':id', component: UnavailableDetailComponent, canActivate: [authGuard], data: {
       roles: [Role.admin, Role.professional]
     }
   }

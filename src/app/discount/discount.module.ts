@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../shared/shared.module';
 import { DiscountRoutingModule } from './discount-routing.module';
 
@@ -12,7 +12,7 @@ import { DiscountService } from '../services/discount.service';
 import { UserEffects } from '../store/effects/user.effects';
 import { UserService } from '../services/user.service';
 import { CurrencyService } from '../services/currency.service';
-import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 
 @NgModule({
   declarations: [
@@ -28,6 +28,10 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
       loader: {
         provide: TranslateLoader,
         useClass: TranslateLoaderFactory.forModule('discount')
+      },
+      missingTranslationHandler: {
+        provide: MissingTranslationHandler,
+        useClass: MissingTranslateHandler,
       },
       isolate: false,
       extend: true

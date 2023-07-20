@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthService } from '@abacritt/angularx-social-login';
+import { SocialAuthService } from '@abacritt/angularx-social-login';
 import { Store } from '@ngrx/store';
 import * as fromActionsLogin from '../store/auth.actions';
 import { AppState, selectAuthState } from '../store/app.states';
@@ -21,12 +21,10 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   getState: Observable<any>;
   subscription?: Subscription;
   code?: string | null;
-  extras: any;
 
   constructor(private socialService: SocialAuthService, private store: Store<AppState>, private route: ActivatedRoute,
               private snackBar: MatSnackBar, private router: Router, private cookieService: CookieService) {
     this.getState = this.store.select(selectAuthState);
-    this.extras = this.router.getCurrentNavigation()?.extras.state;
   }
 
   ngOnInit(): void {
@@ -50,7 +48,9 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe((state) => {
-      if (state.isAuthenticated && !state.redirect && this.router.url.indexOf('returnUrl') === -1) {
+      const queryState = this.route.snapshot.queryParamMap.get('state');
+      const returnUrl = queryState ? JSON.parse(atob(queryState)).returnUrl : null;
+      if (state.isAuthenticated && !state.redirect && !returnUrl) {
         this.store.dispatch(
           new fromActionsLogin.Redirect()
         );
@@ -72,8 +72,7 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
           socialUser,
           theme: this.cookieService.get(THEME),
           code: this.code,
-          queryParams: this.route.snapshot.queryParams,
-          extras: this.extras
+          queryParams: this.route.snapshot.queryParams
         })
       );
     });

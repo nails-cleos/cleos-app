@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { SharedModule } from '../shared/shared.module';
 import { AuthRoutingModule } from './auth-routing.module';
@@ -21,7 +21,7 @@ import { AuthService } from '../services/auth.service';
 import { UserEffects } from '../store/effects/user.effects';
 import { UserService } from '../services/user.service';
 import { TokenService } from '../services/token.service';
-import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { NgxMatColorPickerModule } from '@angular-material-components/color-picker';
 import { GoogleSigninButtonModule } from '@abacritt/angularx-social-login';
 
@@ -38,23 +38,27 @@ import { GoogleSigninButtonModule } from '@abacritt/angularx-social-login';
     ProfileComponent,
     RedirectComponent
   ],
-    imports: [
-        AuthRoutingModule,
-        SharedModule,
-        MatSlideToggleModule,
-        NgxMatIntlTelInputComponent,
-        TranslateModule.forChild({
-            loader: {
-                provide: TranslateLoader,
-                useClass: TranslateLoaderFactory.forModule('auth')
-            },
-            isolate: false,
-            extend: true
-        }),
-        EffectsModule.forFeature([LoginEffects, UserEffects]),
-        NgxMatColorPickerModule,
-        GoogleSigninButtonModule
-    ],
+  imports: [
+    AuthRoutingModule,
+    SharedModule,
+    MatSlideToggleModule,
+    NgxMatIntlTelInputComponent,
+    TranslateModule.forChild({
+      loader: {
+        provide: TranslateLoader,
+        useClass: TranslateLoaderFactory.forModule('auth')
+      },
+      missingTranslationHandler: {
+        provide: MissingTranslationHandler,
+        useClass: MissingTranslateHandler,
+      },
+      isolate: false,
+      extend: true
+    }),
+    EffectsModule.forFeature([LoginEffects, UserEffects]),
+    NgxMatColorPickerModule,
+    GoogleSigninButtonModule
+  ],
   providers: [
     AuthService,
     UserService,

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AuthGuardService } from '../services/auth-guard.service';
+import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
 import { OfficeComponent } from './office.component';
 import { OfficeListComponent } from './list/office-list.component';
@@ -8,17 +8,17 @@ import { OfficeDetailComponent } from './detail/office-detail.component';
 
 const routes: Routes = [
   {
-    path: '', component: OfficeListComponent, canActivate: [AuthGuardService], data: {
+    path: '', component: OfficeListComponent, canActivate: [authGuard], data: {
       roles: [Role.admin]
     }
   },
   {
-    path: 'add', component: OfficeComponent, canActivate: [AuthGuardService], data: {
+    path: 'add', component: OfficeComponent, canActivate: [authGuard], data: {
       roles: [Role.admin]
     }
   },
   {
-    path: ':id', component: OfficeDetailComponent, canActivate: [AuthGuardService], data: {
+    path: ':id', component: OfficeDetailComponent, canActivate: [authGuard], data: {
       roles: [Role.admin]
     }
   }

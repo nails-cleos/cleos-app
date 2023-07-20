@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Location } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
 
 @Injectable({
@@ -8,7 +7,7 @@ import { NavigationEnd, Router } from '@angular/router';
 export class NavigationService {
   private history: string[] = [];
 
-  constructor(private router: Router, private location: Location) {
+  constructor(private router: Router) {
   }
 
   subscribe(): void {
@@ -28,7 +27,16 @@ export class NavigationService {
       const last = this.history[this.history.length - 1];
       this.router.navigate([last], { state: { date } });
     } else {
-      this.router.navigateByUrl('/').then(() => window.location.reload());
+      this.reloadPage();
     }
+  }
+
+  reload(url: string[], data?: any, queryParams?: any): void {
+    this.router.navigateByUrl('/auth/redirect', { skipLocationChange: true }).then(() =>
+      this.router.navigate(url.filter(path => path), { state: data, queryParams }));
+  }
+
+  reloadPage(url: string = '/'): void {
+    this.router.navigateByUrl(url).then(() => window.location.reload());
   }
 }

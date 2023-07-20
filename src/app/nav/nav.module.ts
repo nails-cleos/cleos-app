@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../shared/shared.module';
 import { NavRoutingModule } from './nav-routing.module';
 
@@ -17,7 +17,7 @@ import { NotificationService } from '../services/notification.service';
 import { UserService } from '../services/user.service';
 import { TokenService } from '../services/token.service';
 import { MenuItemComponent } from './menu-item/menu-item.component';
-import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 
 @NgModule({
   declarations: [
@@ -35,6 +35,10 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
       loader: {
         provide: TranslateLoader,
         useClass: TranslateLoaderFactory.forModule('dashboard')
+      },
+      missingTranslationHandler: {
+        provide: MissingTranslationHandler,
+        useClass: MissingTranslateHandler,
       },
       isolate: false,
       extend: true
