@@ -275,6 +275,9 @@
     },
     "DASHBOARD": {
       "HOME": "Principal",
+      "PROFILE": "Perfil",
+      "CHANGE_PASSWORD": "Cambiar contraseña",
+      "SIGN_OUT": "Cerrar sesión",
       "DARK_MODE": "Modo oscuro",
       "LIGHT_MODE": "Modo claro"
     },

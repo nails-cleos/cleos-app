@@ -1,9 +1,6 @@
 {
   "DASHBOARD": {
     "FIELD": "Tablero",
-    "PROFILE": "Perfil",
-    "CHANGE_PASSWORD": "Cambiar contraseña",
-    "SIGN_OUT": "Cerrar sesión",
     "SIGN_IN": "Ingresar",
     "RESERVATION": {
       "COMPLETED": "Completas: {{completed}}",

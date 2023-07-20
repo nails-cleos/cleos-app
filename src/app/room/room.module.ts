@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../shared/shared.module';
 import { RoomRoutingModule } from './room-routing.module';
 
@@ -14,7 +14,7 @@ import { RoomService } from '../services/room.service';
 import { UserService } from '../services/user.service';
 import { AddServiceComponent, PriceDialogComponent } from './me/add-service/add-service.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { ExpenseService } from '../services/expense.service';
 import { ExpensesComponent } from './me/expense/list/expenses.component';
 import { ExpenseComponent } from './me/expense/expense.component';
@@ -39,6 +39,10 @@ import { ExpenseEffects } from '../store/effects/expense.effects';
       loader: {
         provide: TranslateLoader,
         useClass: TranslateLoaderFactory.forModule('room')
+      },
+      missingTranslationHandler: {
+        provide: MissingTranslationHandler,
+        useClass: MissingTranslateHandler,
       },
       isolate: false,
       extend: true

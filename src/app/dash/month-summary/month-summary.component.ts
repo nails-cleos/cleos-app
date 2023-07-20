@@ -3,13 +3,14 @@ import { FormControl, UntypedFormControl } from '@angular/forms';
 import { DateAdapter } from '@angular/material/core';
 import { MatDatepicker } from '@angular/material/datepicker';
 
-import { getNow, getWeeksInMonth, newDateTimestamp } from '../../util/dates';
+import { dateMonthYear, getNow, getWeeksInMonth, newDateTimestamp } from '../../util/dates';
 import { Observable, Subscription } from 'rxjs';
 import { AppState, selectDashboardState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import * as fromActionsDashboard from '../../store/dashboard.actions';
 import {
+  AmountFormat,
   IMonthlySummary,
   IMonthlySummaryExpense,
   IMonthlySummaryRequest,
@@ -20,6 +21,8 @@ import {
 } from '../../interfaces/dashboard';
 import { YearMonthAdapter } from '../../util/adapter/year-month.adapter';
 import { titleCase } from '../../util/helper';
+import { Router } from '@angular/router';
+import { twoDigitNumber } from '../../util/numbers';
 
 @Component({
   selector: 'app-month-summary',
@@ -33,6 +36,8 @@ export class MonthSummaryComponent implements OnInit {
   date = new FormControl<Date | null>(null);
   monthlySummaryMap?: Map<ISummaryRoom, { summaryReservation: IMonthlySummaryReservation[]; summaryExpenses: IMonthlySummaryExpense[] }>;
   selectedRoom = new UntypedFormControl();
+  amountFormat = new UntypedFormControl('ES');
+  amountFormatKeys = Object.values(AmountFormat);
   summaryReservations?: IMonthlySummary[];
   summaryExpenses?: IMonthlySummary[];
   weeks: any[];
@@ -50,14 +55,17 @@ export class MonthSummaryComponent implements OnInit {
   type: typeof SummaryType = SummaryType;
   step = 0;
   roomId?: string;
+  locale = 'es';
 
   private getState: Observable<any>;
   private subscription?: Subscription;
+  private readonly extras: any;
 
-  constructor(private readonly translate: TranslateService, private store: Store<AppState>) {
+  constructor(private readonly translate: TranslateService, private store: Store<AppState>, private router: Router) {
     this.getState = this.store.select(selectDashboardState);
     this.dateFormat = this.translate.currentLang;
     this.weeks = getWeeksInMonth(getNow());
+    this.extras = this.router.getCurrentNavigation()?.extras.state;
   }
 
   private static calculateTotals(summaries?: IMonthlySummary[]): { gross: number; btw: number; net: number } {
@@ -89,7 +97,7 @@ export class MonthSummaryComponent implements OnInit {
     return { gross: t?.gross || 0, net: t?.net || 0, btw: t?.btw || 0 };
   }
 
-  private static cleanCVSText = (text: string): string => `${ text.replace(/,/g, '') }, `;
+  private static cleanCVSText = (text: string): string => `${ text.replace(/,/g, '') }; `;
 
   private static getDateFormat(date: Date | null): string {
     if (!date) {
@@ -178,7 +186,14 @@ export class MonthSummaryComponent implements OnInit {
   ngOnInit(): void {
     this.subscribe();
     this.valueChange();
-    this.date.setValue(getNow());
+    if (this.extras) {
+      const date = this.extras.date.split('-');
+      const month = Number(date[0]) - 1;
+      const year = date[1];
+      this.date.setValue(dateMonthYear(month, year));
+    } else {
+      this.date.setValue(getNow());
+    }
   }
 
   setStep(index: number): void {
@@ -226,17 +241,20 @@ export class MonthSummaryComponent implements OnInit {
         csv += MonthSummaryComponent.cleanCVSText(thChildren.innerText);
       }
 
-      csv = `${ csv.substring(0, csv.length - 1) }\n`;
+      csv = `${ csv.substring(0, csv.length - 2) }\n`;
 
       for (const tbody of Array.from(table.children).slice(2, table.children.length - 1)) {
         // @ts-ignore
         for (const trBody of tbody.children) {
+          let remove = false;
           for (const tdBody of Array.from(trBody.children).slice(1, trBody.children.length)) {
             // @ts-ignore
-            const value = tdBody.innerText;
-            csv += `${ value },`;
+            csv += `${ tdBody.innerText }; `;
+            remove = true;
           }
-          csv = `${ csv.substring(0, csv.length - 1) }\n`;
+          if (remove) {
+            csv = `${ csv.substring(0, csv.length - 2) }\n`;
+          }
         }
       }
 
@@ -258,9 +276,8 @@ export class MonthSummaryComponent implements OnInit {
           values = this.monthlySummaryExpense;
           break;
       }
-      csv += `,,,,,${ gross },${ net },${ btw }\n`;
-
-      csv = `${ csv.substring(0, csv.length - 1) }\n`;
+      csv += ';;;;;';
+      csv += `${ twoDigitNumber(gross, this.locale) };${ twoDigitNumber(net, this.locale) };${ twoDigitNumber(btw, this.locale) }\n`;
 
       const hiddenElement = document.createElement('a');
       hiddenElement.href = `data:text/csv;charset=utf-8,${ encodeURI(csv) }`;
@@ -321,6 +338,11 @@ export class MonthSummaryComponent implements OnInit {
         this.getSummary(MonthSummaryComponent.getDateFormat(value));
         this.weeks = getWeeksInMonth(value);
         this.showInput = true;
+      }
+    });
+    this.amountFormat.valueChanges.subscribe(format => {
+      if (format) {
+        this.locale = format.toLowerCase();
       }
     });
   }

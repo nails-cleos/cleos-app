@@ -112,6 +112,11 @@ export enum SummaryType {
   expense
 }
 
+export enum AmountFormat {
+  en = 'EN',
+  es = 'ES'
+}
+
 export interface ISummaryTotal {
   id: string;
   paymentType: PaymentType;

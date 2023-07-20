@@ -6,8 +6,13 @@ export const numberFormat = (value: number | string, currency?: ICurrency, local
   const options = currency ? { maximumFractionDigits: 2, currency: currency.code, style: 'currency' } : { maximumFractionDigits: 2 };
 
   if (typeof value === 'string') {
-    return currency ? `${currencySymbol(currency)}${value}` : value;
+    return currency ? `${ currencySymbol(currency) }${ value }` : value;
   }
 
   return new Intl.NumberFormat(locale, options).format(Number(value));
 };
+
+export const twoDigitNumber = (value: number, locale: string = API_LOCALE) => value.toLocaleString(locale, {
+  maximumFractionDigits: 2,
+  minimumFractionDigits: 2
+});

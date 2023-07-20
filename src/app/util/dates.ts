@@ -437,6 +437,8 @@ export const createNewDate = (date: Date, hour: number = 0, minute: number = 0, 
   return d;
 };
 
+export const dateMonthYear = (month: number | string, year: number | string): Date => new Date(Number(year), Number(month), 1);
+
 export const getTimeNumber = (date: any) => {
   if (date instanceof Date) {
     const time = getTime(date).split(':');

@@ -5,11 +5,11 @@ import { CurrencyComponent } from './currency.component';
 import { SharedModule } from '../shared/shared.module';
 import { CurrencyListComponent } from './list/currency-list.component';
 import { CurrencyDetailComponent } from './detail/currency-detail.component';
-import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EffectsModule } from '@ngrx/effects';
 import { CurrencyEffects } from '../store/effects/currency.effects';
 import { CurrencyService } from '../services/currency.service';
-import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 
 @NgModule({
   declarations: [
@@ -24,6 +24,10 @@ import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
       loader: {
         provide: TranslateLoader,
         useClass: TranslateLoaderFactory.forModule('currency')
+      },
+      missingTranslationHandler: {
+        provide: MissingTranslationHandler,
+        useClass: MissingTranslateHandler,
       },
       isolate: false,
       extend: true

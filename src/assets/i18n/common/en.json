@@ -275,6 +275,9 @@
     },
     "DASHBOARD": {
       "HOME": "Home",
+      "PROFILE": "Profile",
+      "CHANGE_PASSWORD": "Change password",
+      "SIGN_OUT": "Sign out",
       "DARK_MODE": "Dark mode",
       "LIGHT_MODE": "Light mode"
     },

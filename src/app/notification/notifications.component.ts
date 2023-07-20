@@ -6,6 +6,7 @@ import * as fromActionsNotification from '../store/notification.actions';
 import { INotification } from '../interfaces/notification';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { NavigationService } from '../services/navigation.service';
 
 @Component({
   selector: 'app-notifications',
@@ -22,7 +23,8 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
   private page: number;
 
-  constructor(private router: Router, private store: Store<AppState>, private translate: TranslateService) {
+  constructor(private router: Router, private store: Store<AppState>, private translate: TranslateService,
+              private navigationService: NavigationService) {
     this.dateFormat = this.translate.currentLang;
     this.getState = this.store.select(selectNotificationState);
     this.page = -1;
@@ -42,7 +44,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     if (notification.read) {
       this.router.navigate([notification.navigation]);
     } else {
-      window.location.reload();
+      this.navigationService.reload(this.router.url.split('/'));
       this.store.dispatch(
         new fromActionsNotification.NotificationRead(notification)
       );

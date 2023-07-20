@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AuthGuardService } from '../services/auth-guard.service';
+import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
 import { RoomsComponent } from './list/rooms.component';
 import { RoomComponent } from './room.component';
@@ -12,42 +12,42 @@ import { ExpenseComponent } from './me/expense/expense.component';
 
 const routes: Routes = [
   {
-    path: '', component: RoomsComponent, canActivate: [AuthGuardService], data: {
+    path: '', component: RoomsComponent, canActivate: [authGuard], data: {
       roles: [Role.admin, Role.manager]
     }
   },
   {
-    path: 'add', component: RoomComponent, canActivate: [AuthGuardService], data: {
+    path: 'add', component: RoomComponent, canActivate: [authGuard], data: {
       roles: [Role.admin, Role.manager]
     }
   },
   {
-    path: ':id/services', component: AddServiceComponent, canActivate: [AuthGuardService], data: {
+    path: ':id/services', component: AddServiceComponent, canActivate: [authGuard], data: {
       roles: [Role.admin, Role.manager]
     }
   },
   {
-    path: ':id/expenses', component: ExpensesComponent, canActivate: [AuthGuardService], data: {
+    path: ':id/expenses', component: ExpensesComponent, canActivate: [authGuard], data: {
       roles: [Role.admin, Role.manager]
     }
   },
   {
-    path: ':id/expenses/add', component: ExpenseComponent, canActivate: [AuthGuardService], data: {
+    path: ':id/expenses/add', component: ExpenseComponent, canActivate: [authGuard], data: {
       roles: [Role.admin, Role.manager]
     }
   },
   {
-    path: ':id/expenses/:expenseId', component: ExpenseComponent, canActivate: [AuthGuardService], data: {
+    path: ':id/expenses/:expenseId', component: ExpenseComponent, canActivate: [authGuard], data: {
       roles: [Role.admin, Role.manager]
     }
   },
   {
-    path: 'me/:id', component: RoomMeComponent, canActivate: [AuthGuardService], data: {
+    path: 'me/:id', component: RoomMeComponent, canActivate: [authGuard], data: {
       roles: [Role.professional, Role.manager]
     }
   },
   {
-    path: ':id', component: RoomDetailComponent, canActivate: [AuthGuardService], data: {
+    path: ':id', component: RoomDetailComponent, canActivate: [authGuard], data: {
       roles: [Role.admin, Role.manager]
     }
   }

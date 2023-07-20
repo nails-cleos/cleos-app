@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
-import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EffectsModule } from '@ngrx/effects';
 import { CalendarModule, CalendarMonthModule } from 'angular-calendar';
 import { DashboardComponent } from './dashboard.component';
 import { SharedModule } from '../shared/shared.module';
-import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { DashboardEffects } from '../store/effects/dashboard.effects';
 import { DashboardRoutingModule } from './dashboard-routing.module';
 import { ReservationEffects } from '../store/effects/reservation.effects';
@@ -33,6 +33,10 @@ import { ColorService } from '../services/color.service';
       loader: {
         provide: TranslateLoader,
         useClass: TranslateLoaderFactory.forModule('dashboard')
+      },
+      missingTranslationHandler: {
+        provide: MissingTranslationHandler,
+        useClass: MissingTranslateHandler,
       },
       isolate: false,
       extend: true

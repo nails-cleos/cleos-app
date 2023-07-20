@@ -7,6 +7,7 @@ import * as fromActionsDashboard from '../dashboard.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { DashboardService } from '../../services/dashboard.service';
 import { Router } from '@angular/router';
+import { NavigationService } from '../../services/navigation.service';
 
 @Injectable()
 export class DashboardEffects {
@@ -55,7 +56,10 @@ export class DashboardEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.dashboardService.saveMonthlySummary(payload.date, payload.gross, payload.btw,
       payload.summaries, payload.type, payload.roomId).pipe(
-      switchMap(() => of(new fromActionsDashboard.UpdateMonthlySummarySuccess({ message: this.translate.instant('SUMMARY.UPDATED') }))),
+      switchMap(() => of(new fromActionsDashboard.UpdateMonthlySummarySuccess({
+        date: payload.date,
+        message: this.translate.instant('SUMMARY.UPDATED')
+      }))),
       catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
     ))
   ));
@@ -78,10 +82,10 @@ export class DashboardEffects {
 
   saveMonthlySummarySuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsDashboard.DashboardActionTypes.saveMonthlySummarySuccess),
-    tap(() => window.location.reload())
+    tap((data: any) => this.navigationService.reload(this.router.url.split('/'), { date: data.payload.date }))
   ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private router: Router,
-              private dashboardService: DashboardService) {
+              private dashboardService: DashboardService, private navigationService: NavigationService) {
   }
 }
