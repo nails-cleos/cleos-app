@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
+import { inject, Injectable } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
 import { IUser } from '../interfaces/user';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState } from '../store/app.states';
@@ -11,17 +11,20 @@ import * as fromActionsLogin from '../store/auth.actions';
 @Injectable({
   providedIn: 'root'
 })
-export class AuthGuardService implements CanActivate {
+export class PermissionsService {
 
   getState: Observable<any>;
   currentUser!: IUser;
   token!: string;
+
+  private readonly data: any;
 
   constructor(private snackBar: MatSnackBar, private router: Router, private store: Store<AppState>, private translate: TranslateService) {
     this.getState = this.store.select(selectAuthState);
     this.getState.subscribe((state) => {
       this.currentUser = state.user;
     });
+    this.data = this.router.getCurrentNavigation()?.extras.state;
   }
 
   private static hasRole(route: ActivatedRouteSnapshot, user: IUser): boolean {
@@ -34,7 +37,7 @@ export class AuthGuardService implements CanActivate {
 
   public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
     if (this.currentUser) {
-      if (AuthGuardService.hasRole(route, this.currentUser)) {
+      if (PermissionsService.hasRole(route, this.currentUser)) {
         return true;
       } else {
         let message;
@@ -53,15 +56,12 @@ export class AuthGuardService implements CanActivate {
       }
     }
     // not logged in so redirect to auth page with the return url and extra data
-    const currentNavigation = this.router.getCurrentNavigation();
-    if (currentNavigation && currentNavigation.extras) {
-      this.router.navigate(['auth'], {
-        queryParams: {returnUrl: state.url}, state: currentNavigation.extras.state
-      });
-    } else {
-      this.router.navigate(['auth'], {queryParams: {returnUrl: state.url}});
-    }
+    const queryParams = btoa(JSON.stringify({ returnUrl: state.url, data: this.data }));
+    this.router.navigate(['auth'], { queryParams: { state: queryParams } });
 
     return false;
   }
 }
+
+export const authGuard: CanActivateFn = (next: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean =>
+  inject(PermissionsService).canActivate(next, state);

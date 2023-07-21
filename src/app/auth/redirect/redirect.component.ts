@@ -6,6 +6,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectAuthState } from '../../store/app.states';
 import { TokenService } from '../../services/token.service';
 import { isRoomAdmin } from '../../util/helper';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-redirect',
@@ -14,7 +15,8 @@ import { isRoomAdmin } from '../../util/helper';
 })
 export class RedirectComponent {
 
-  constructor(private router: Router, private store: Store<AppState>, private tokenService: TokenService) {
+  constructor(private router: Router, private store: Store<AppState>, private tokenService: TokenService,
+              private navigateService: NavigationService) {
     this.store.select(selectAuthState).subscribe((state: any) => {
       if (state.redirect) {
         let redirectUrl = ['main'];
@@ -32,7 +34,7 @@ export class RedirectComponent {
             redirectUrl = ['me', 'reservations'];
           }
         }
-        this.router.navigate(redirectUrl).then(() => window.location.reload());
+        this.navigateService.reload(redirectUrl);
       }
     });
   }

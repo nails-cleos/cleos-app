@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../shared/shared.module';
 import { MeRoutingModule } from './me-routing.module';
 
@@ -11,7 +11,6 @@ import { BottomSheetReferralComponent, BottomSheetShareComponent, ReferralsCompo
 import { MeDiscountComponent } from './discount/me/me-discount.component';
 import { ReviewDialogComponent } from './reservation/review/review-dialog.component';
 import { ShareButtonsModule } from 'ngx-sharebuttons/buttons';
-import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { ShareIconsModule } from 'ngx-sharebuttons/icons';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatStepperModule } from '@angular/material/stepper';
@@ -28,7 +27,7 @@ import { TrackingService } from '../services/tracking.service';
 import { ReservationEffects } from '../store/effects/reservation.effects';
 import { DiscountEffects } from '../store/effects/discount.effects';
 import { DiscountService } from '../services/discount.service';
-import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { CurrencyService } from '../services/currency.service';
 import { CurrencyEffects } from '../store/effects/currency.effects';
 import { OptionComponent } from './reservation/payment/option/option.component';
@@ -50,24 +49,27 @@ import { ColorService } from '../services/color.service';
     OptionComponent,
     MePaymentComponent,
   ],
-    imports: [
-        MeRoutingModule,
-        SharedModule,
-        ShareButtonsModule,
-        MatBottomSheetModule,
-        ShareIconsModule,
-        MatProgressBarModule,
-        MatStepperModule,
-        TranslateModule.forChild({
-            loader: {
-                provide: TranslateLoader,
-                useClass: TranslateLoaderFactory.forModule('me')
-            },
-            isolate: false,
-            extend: true
-        }),
-        EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects, CurrencyEffects])
-    ],
+  imports: [
+    MeRoutingModule,
+    SharedModule,
+    ShareButtonsModule,
+    ShareIconsModule,
+    MatProgressBarModule,
+    MatStepperModule,
+    TranslateModule.forChild({
+      loader: {
+        provide: TranslateLoader,
+        useClass: TranslateLoaderFactory.forModule('me')
+      },
+      missingTranslationHandler: {
+        provide: MissingTranslationHandler,
+        useClass: MissingTranslateHandler,
+      },
+      isolate: false,
+      extend: true
+    }),
+    EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects, CurrencyEffects])
+  ],
   providers: [
     ReservationService,
     PaymentService,

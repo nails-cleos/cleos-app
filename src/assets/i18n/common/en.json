@@ -151,6 +151,11 @@
         "V_MAP": "Marketing, advertising and promotion"
       }
     },
+    "CASH": {
+      "TYPE": {
+        "CASH": "Cash"
+      }
+    },
     "STATUS": {
       "PAYMENT": {
         "NONE": "Pending",
@@ -275,6 +280,9 @@
     },
     "DASHBOARD": {
       "HOME": "Home",
+      "PROFILE": "Profile",
+      "CHANGE_PASSWORD": "Change password",
+      "SIGN_OUT": "Sign out",
       "DARK_MODE": "Dark mode",
       "LIGHT_MODE": "Light mode"
     },
@@ -339,6 +347,10 @@
           "RESERVATION": "This is how reservations will look in light mode"
         }
       }
+    },
+    "INSTALL": {
+      "IOS": "To install this web app on your device. Open in safari, tap the Menu button and then 'Add to Home screen' button",
+      "ANDROID": "Add to Home screen"
     }
   },
   "REVIEW": {

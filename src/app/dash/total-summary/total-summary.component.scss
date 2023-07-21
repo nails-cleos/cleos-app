@@ -1,0 +1,26 @@
+.header {
+  justify-content: center;
+  text-align: center;
+}
+
+.result {
+  padding: 5px 0;
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.result:after {
+  content: '';
+  width: 100%;
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+}
+
+.bottom {
+  margin-bottom: 5%
+}
+
+.currency {
+  font-size: 18px;
+}

@@ -15,8 +15,9 @@ const createField = (text: string, width: string | number, alignment: string, co
   return { text, width, alignment, fontSize, margin, border, fillColor };
 };
 
-const createHeader = (index: number, date: string, subject: string = '', kvKNr: string = '', accountNr: string = '',
-                      btwNr: string = ''): any => {
+const createHeader = (index: number, titleDate: string, date: string, titleSubject: string = '', subject: string = '',
+                      titleKVK: string = '', kvkNr: string = '', titleAccount: string = '', accountNr: string = '',
+                      titleBTW: string = '', btwNr: string = ''): any => {
   const image = {
     image: 'logo',
     width: '*',
@@ -30,27 +31,27 @@ const createHeader = (index: number, date: string, subject: string = '', kvKNr: 
     stack: [
       {
         columns: [
-          createField('Date', 80, 'left', '#aaaaab'), // TODO
+          createField(titleDate, 80, 'left', '#aaaaab'),
           createField(date, '*', 'left', '#333333')
         ]
       }, {
         columns: [
-          createField('Subject', 80, 'left', '#aaaaab'), // TODO
+          createField(titleSubject, 80, 'left', '#aaaaab'),
           createField(subject, '*', 'left', '#333333')
         ]
       }, {
         columns: [
-          createField('KvK nr', 80, 'left', '#aaaaab'), // TODO
-          createField(kvKNr, '*', 'left', '#333333')
+          createField(titleKVK, 80, 'left', '#aaaaab'),
+          createField(kvkNr, '*', 'left', '#333333')
         ]
       }, {
         columns: [
-          createField('Account nr', 80, 'left', '#aaaaab'), // TODO
+          createField(titleAccount, 80, 'left', '#aaaaab'),
           createField(accountNr, '*', 'left', '#333333')
         ]
       }, {
         columns: [
-          createField('BTW nr', 80, 'left', '#aaaaab'), // TODO
+          createField(titleBTW, 80, 'left', '#aaaaab'),
           createField(btwNr, '*', 'left', '#333333')
         ]
       }
@@ -74,57 +75,56 @@ const fromTo = (): any => ({
   ]
 });
 
-const companyName = (room: IRoomAll): any => {
+const companyName = (room: IRoomAll, titleAddress: string, titlePhone: string, titleEmail: string, billAddress?: string): any => {
   const phone = room.office.manager?.phone || '';
   const email = room.office.manager?.email || '';
+  const address = billAddress || room.address.name;
   return [{
     columns: [
-      createField('Address', 80, 'left', '#333333', [0, 0, 0, 5]), // TODO
-      createField(room.address.name, 'auto', 'right', '#333333', [0, 0, 0, 0])
+      createField(titleAddress, 80, 'left', '#333333', [0, 0, 0, 5]),
+      createField(address, 'auto', 'right', '#333333', [0, 0, 0, 0])
     ]
   }, {
     columns: [
-      createField('Phone', 80, 'left', '#333333', [0, 0, 0, 5]), // TODO
+      createField(titlePhone, 80, 'left', '#333333', [0, 0, 0, 5]),
       createField(phone, 'auto', 'right', '#333333', [0, 0, 0, 0])
     ]
   }, {
     columns: [
-      createField('Email', 80, 'left', '#333333', [0, 0, 0, 5]), // TODO
+      createField(titleEmail, 80, 'left', '#333333', [0, 0, 0, 5]),
       createField(email, 'auto', 'right', '#333333', [0, 0, 0, 0])
     ]
   }];
 };
 
-const clientName = (customer: IUserAll): any => {
+const clientName = (customer: IUserAll, titleClient: string, titleContact: string): any => {
   const client = getUserName(customer);
   const contact = customer.phone || customer.email;
   return [{
     columns: [
-      createField('Client', 80, 'left', '#333333'), // TODO
+      createField(titleClient, 80, 'left', '#333333'),
       createField(client, '*', 'left', '#333333')
     ]
   }, {
     columns: [
-      createField('Contact', 80, 'left', '#333333'), // TODO
+      createField(titleContact, 80, 'left', '#333333'),
       createField(contact, '*', 'left', '#333333')
     ]
   }];
 };
 
-const createInvoiceNro = (receiptNro: string): any => {
-  const text = `Invoice No. ${ receiptNro }`; // TODO
-  return createField(text, 'auto', 'center', undefined, [0, 10, 0, 10], undefined, 15);
-};
+const createInvoiceNro = (receiptNro: string): any => createField(receiptNro, 'auto', 'center', undefined,
+  [0, 10, 0, 10], undefined, 15);
 
-const createItemTitle = (): any => [
-  createField('ITEM DESCRIPTION', '*', 'center', undefined, // TODO
-    [0, 12, 0, 5], [false, true, false, true], undefined, '#a9a397'),
-  createField('ITEM \n (excl. btw)', '*', 'center', undefined, // TODO
-    [0, 5, 0, 5], [false, true, false, true], undefined, '#a9a397'),
-  createField('BTW', '*', 'center', undefined, // TODO
-    [0, 12, 0, 5], [false, true, false, true], undefined, '#a9a397'),
-  createField('ITEM TOTAL (incl. btw)', '*', 'center', undefined, // TODO
-    [0, 5, 0, 5], [false, true, false, true], undefined, '#a9a397')
+const createItemTitle = (titleDescription: string, titleItem: string, titleBTW: string, titleTotal: string): any => [
+  createField(titleDescription, '*', 'center', undefined, [0, 12, 0, 5], [false, true, false, true],
+    undefined, '#a9a397'),
+  createField(titleItem, '*', 'center', undefined, [0, 5, 0, 5], [false, true, false, true],
+    undefined, '#a9a397'),
+  createField(titleBTW, '*', 'center', undefined, [0, 12, 0, 5], [false, true, false, true],
+    undefined, '#a9a397'),
+  createField(titleTotal, '*', 'center', undefined, [0, 5, 0, 5], [false, true, false, true],
+    undefined, '#a9a397')
 ];
 
 const itemBody = (name: string, neto: number, bruto: number, symbol: string): any => [
@@ -166,27 +166,28 @@ const createItems = (itemTitle: any, itemList: IItem[], currency: string): any =
   };
 };
 
-const createTotals = (totals: ITotals, currency: string): any => {
+const createTotals = (totals: ITotals, currency: string, titleSubTotal: string, titleExclBTW: string, titleBTW21: string,
+                      titleTotal: string, titleDiscount: string): any => {
   const subTotal = [
-    createField('Subtotal:', '*', 'right', undefined, [0, 5, 0, 5], [false, true, false, true]), // TODO
+    createField(titleSubTotal, '*', 'right', undefined, [0, 5, 0, 5], [false, true, false, true]),
     createField(`${ currency } ${ totals.subTotal.toFixed(2) }`, '*', 'right', undefined,
       [0, 5, 0, 5], [false, true, false, true], undefined, '#eee4e1')
   ];
 
   const excBTW = [
-    createField('Excl. BTW:', '*', 'right', undefined, [0, 5, 0, 5], [false, false, false, true]), // TODO
+    createField(titleExclBTW, '*', 'right', undefined, [0, 5, 0, 5], [false, false, false, true]),
     createField(`${ currency } ${ totals.excBTW.toFixed(2) }`, '*', 'right', undefined,
       [0, 5, 0, 5], [false, false, false, true], undefined, '#eee4e1')
   ];
 
   const btw = [
-    createField('BTW (21%):', '*', 'right', undefined, [0, 5, 0, 5], [false, false, false, true]), // TODO
+    createField(titleBTW21, '*', 'right', undefined, [0, 5, 0, 5], [false, false, false, true]),
     createField(`${ currency } ${ totals.btw.toFixed(2) }`, '*', 'right', undefined,
       [0, 5, 0, 5], [false, false, false, true], undefined, '#eee4e1')
   ];
 
   const total = [
-    createField('Total:', '*', 'right', undefined, [0, 5, 0, 5], [false, false, false, true], 20), // TODO
+    createField(titleTotal, '*', 'right', undefined, [0, 5, 0, 5], [false, false, false, true], 20),
     createField(`${ currency } ${ totals.totalPaid.toFixed(2) }`, '*', 'right', undefined,
       [0, 5, 0, 5], [false, false, false, true], 20, '#eee4e1')
   ];
@@ -195,7 +196,7 @@ const createTotals = (totals: ITotals, currency: string): any => {
 
   if (totals.discount) {
     const discount = [
-      createField('Discount:', '*', 'right', undefined, [0, 5, 0, 5], [false, false, false, true]), // TODO
+      createField(titleDiscount, '*', 'right', undefined, [0, 5, 0, 5], [false, false, false, true]),
       createField(`(${ currency } ${ totals.discount.toFixed(2) })`, '*', 'right', '#ff8080',
         [0, 5, 0, 5], [false, false, false, true], undefined, '#eee4e1')];
     body = [subTotal, discount, total, btw, excBTW];
@@ -229,16 +230,43 @@ export const pdf = (invoices: IInvoice[], office: IOfficeAll, start: number, sta
     const next = start + invoice.position;
     const receiptNro = `${ next }`.padStart(5, '0');
     const date = dayViewTitle(newDateTimestamp(invoice.timestamp, invoice.room.timeZone), API_LOCALE);
-    const header = createHeader(index, date, office.subject, office.kvk, office.account, office.btw);
+    const titleDate = 'Date';
+    const titleSubject = 'Subject';
+    const titleKVK = 'KvK nr';
+    const titleAccount = 'Account nr';
+    const titleBTWNr = 'BTW nr';
+    const header = createHeader(index, titleDate, date, titleSubject, office.subject, titleKVK, office.kvk, titleAccount, office.account,
+      titleBTWNr, office.btw);
     const currency = currencySymbol(invoice.room.currency);
-    const itemTitle = createItemTitle();
 
-    const invoiceNro = createInvoiceNro(receiptNro);
+    const titleDescription = 'ITEM DESCRIPTION';
+    const titleItem = 'ITEM \n (excl. btw)';
+    const titleBTW = 'BTW';
+    const titleItemTotal = 'ITEM TOTAL \n (incl. btw)';
+
+    const itemTitle = createItemTitle(titleDescription, titleItem, titleBTW, titleItemTotal);
+
+    const text = `Invoice No. ${ receiptNro }`;
+    const invoiceNro = createInvoiceNro(text);
     const items = createItems(itemTitle, invoice.items.slice().sort((a, b) => a.order - b.order), currency);
-    const totals = createTotals(invoice.totals, currency);
+
+    const titleSubTotal = 'Subtotal:';
+    const titleExclBTW = 'Excl. BTW:';
+    const titleBTW21 = 'BTW (21%):';
+    const titleTotal = 'Total:';
+    const titleDiscount = 'Discount:';
+
+    const totals = createTotals(invoice.totals, currency, titleSubTotal, titleExclBTW, titleBTW21, titleTotal, titleDiscount);
+
+    const titleAddress = 'Address';
+    const titlePhone = 'Phone';
+    const titleEmail = 'Email';
+    const titleClient = 'Client';
+    const titleContact = 'Contact';
 
     content = [...content, header, fromTo(), {
-      columns: [clientName(invoice.customer), companyName(invoice.room)]
+      columns: [clientName(invoice.customer, titleClient, titleContact),
+        companyName(invoice.room, titleAddress, titlePhone, titleEmail, office.billingAddress)]
     }, '\n\n', invoiceNro, items, totals];
   });
 
@@ -250,9 +278,6 @@ export const pdf = (invoices: IInvoice[], office: IOfficeAll, start: number, sta
       subject: office.subject
     },
     content,
-    defaultStyle: {
-      font: 'belleza'
-    },
     images: {
       logo: `${ environment.appServer }/assets/icons/icon-192x192.png`
     },

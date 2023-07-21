@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AuthGuardService } from '../services/auth-guard.service';
+import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
 import { ReservationsComponent } from './reservation/list/reservations.component';
 import { MeReservationComponent } from './reservation/me/me-reservation.component';
@@ -14,7 +14,7 @@ import { OptionComponent } from './reservation/payment/option/option.component';
 import { MePaymentComponent } from './payment/me-payment.component';
 
 const routes: Routes = [{
-  path: '', canActivate: [AuthGuardService], data: { roles: [Role.customer] }, children: [
+  path: '', canActivate: [authGuard], data: { roles: [Role.customer] }, children: [
     { path: 'reservations', component: ReservationsComponent },
     { path: 'reservation', component: MeReservationComponent },
     { path: 'reservation/:id', component: MeReservationComponent },

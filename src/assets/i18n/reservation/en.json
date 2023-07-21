@@ -206,6 +206,11 @@
         "CHARGE_WITH_REFUND": "<b>Penalty + Refund:</b><br>A 30% penalty will be charged. If you paid more than 30%, you will get a refund.",
         "NONE": "<b>None:</b><br>No extra action performed."
       }
+    },
+    "DISCOUNT": {
+      "ADD": "Add discount",
+      "FIELD": "Select discount",
+      "REQUIRED": "Discount is <b>required</b>"
     }
   },
   "PAYMENT": {

@@ -8,7 +8,7 @@
   }
 }
 
-#reservationTableData, #expenseTableData {
+#reservationTableData, #expenseTableData, #cashTableData {
   border-collapse: collapse;
   border-spacing: 0;
 
@@ -27,7 +27,7 @@
     width: 4%;
   }
 
-  #customer, .date, #treatment, #discount, #color, .type {
+  .customer, .date, .treatment, .discount, .color, .type {
     width: 10%;
   }
 

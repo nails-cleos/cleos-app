@@ -1,9 +1,8 @@
 import { NgModule } from '@angular/core';
-import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../shared/shared.module';
 import { MainRoutingModule } from './main-routing.module';
-import { MatCarouselModule } from "@magloft/material-carousel";
-import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatCarouselModule } from '@magloft/material-carousel';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { EffectsModule } from '@ngrx/effects';
 
@@ -21,7 +20,7 @@ import { TreatmentService } from '../services/treatment.service';
 import { CatalogueEffects } from '../store/effects/catalogue.effects';
 import { UserEffects } from '../store/effects/user.effects';
 import { UserService } from '../services/user.service';
-import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { LoginEffects } from '../store/effects/auth.effects';
 import { AuthService } from '../services/auth.service';
 
@@ -38,12 +37,15 @@ import { AuthService } from '../services/auth.service';
   imports: [
     MainRoutingModule,
     SharedModule,
-    MatToolbarModule,
     MatSlideToggleModule,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
         useClass: TranslateLoaderFactory.forModule('main')
+      },
+      missingTranslationHandler: {
+        provide: MissingTranslationHandler,
+        useClass: MissingTranslateHandler,
       },
       isolate: false,
       extend: true

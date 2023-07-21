@@ -2,7 +2,6 @@ import { LayoutModule } from '@angular/cdk/layout';
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatToolbarModule } from '@angular/material/toolbar';
 
 import { NavComponent } from './nav.component';
 
@@ -16,8 +15,7 @@ describe('NavComponent', () => {
       imports: [
         NoopAnimationsModule,
         LayoutModule,
-        MatSidenavModule,
-        MatToolbarModule,
+        MatSidenavModule
       ]
     }).compileComponents();
   }));

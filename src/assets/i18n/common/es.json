@@ -151,6 +151,11 @@
         "V_MAP": "Marketing, publicidad y promoción"
       }
     },
+    "CASH": {
+      "TYPE": {
+        "CASH": "Efectivo"
+      }
+    },
     "STATUS": {
       "PAYMENT": {
         "NONE": "Pendiente",
@@ -275,6 +280,9 @@
     },
     "DASHBOARD": {
       "HOME": "Principal",
+      "PROFILE": "Perfil",
+      "CHANGE_PASSWORD": "Cambiar contraseña",
+      "SIGN_OUT": "Cerrar sesión",
       "DARK_MODE": "Modo oscuro",
       "LIGHT_MODE": "Modo claro"
     },
@@ -339,6 +347,10 @@
           "RESERVATION": "Así se van a ver las reservas en modo claro"
         }
       }
+    },
+    "INSTALL": {
+      "IOS": "Para instalar esta aplicación web en su dispositivo. Abra en Safari, toque el botón Menú y luego el botón 'Agregar a la pantalla de inicio'",
+      "ANDROID": "Añadir a la pantalla principal"
     }
   },
   "REVIEW": {

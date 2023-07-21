@@ -87,6 +87,15 @@
                   {{errors['btw']}}
                 </mat-error>
               </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'OFFICE.ADDRESS.FIELD' | translate }}</mat-label>
+                <label>
+                  <input [formControl]="billingAddress" matInput>
+                </label>
+                <mat-error *ngIf="errors['billingAddress']">
+                  {{errors['billingAddress']}}
+                </mat-error>
+              </mat-form-field>
             </div>
           </mat-card-content>
           <mat-card-actions>

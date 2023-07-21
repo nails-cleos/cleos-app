@@ -1,9 +1,6 @@
 {
   "DASHBOARD": {
     "FIELD": "Tablero",
-    "PROFILE": "Profile",
-    "CHANGE_PASSWORD": "Change password",
-    "SIGN_OUT": "Sign out",
     "SIGN_IN": "Sign In",
     "RESERVATION": {
       "COMPLETED": "Completed: {{completed}} - {{total}}",
@@ -47,7 +44,10 @@
     "EXPENSES": "Expenses",
     "EXPENSE": "Expense",
     "UPDATED": "Monthly summary updated",
+    "CASH_INCOMES": "Cash incomes",
+    "CASH": "Cash income",
     "YEAR": {
+      "RESULT": "Year Summary",
       "SELECT": {
         "DATE": "Year"
       },
@@ -55,10 +55,22 @@
         "NO_CONTENT": "No data in {{year}}"
       }
     },
+    "QUARTER": {
+      "RESULT": "Quarter Summary",
+      "SELECT": "Quarter",
+      "ERROR": {
+        "NO_CONTENT": "No data in Q{{quarter}} of {{year}}"
+      }
+    },
     "MONTHLY": {
-      "FIELD": "Monthly summary",
+      "RESULT": "Monthly summary",
       "SELECT": {
-        "DATE": "Month and year"
+        "DATE": "Month and year",
+        "FORMAT": "Amount format"
+      },
+      "FORMAT": {
+        "EN": "Format $1,234.56",
+        "ES": "Format $1.234,56"
       },
       "TABLE": {
         "WEEK": "Week {{number}}",
@@ -74,6 +86,11 @@
         "INVOICE": "Invoice",
         "STORE_SUPPLY": "Store supply",
         "TOTALS": "Totals"
+      },
+      "ERROR": {
+        "INCOMES": "No incomes on {{date}}",
+        "EXPENSES": "No expenses on {{date}}",
+        "CASH_INCOMES": "No cash income on {{date}}"
       }
     }
   }

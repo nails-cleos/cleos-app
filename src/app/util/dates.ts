@@ -5,7 +5,7 @@ import {
   addWeeks,
   endOfDay,
   endOfMonth,
-  endOfWeek,
+  endOfWeek, getQuarter,
   isSameDay,
   startOfDay,
   startOfMonth,
@@ -371,7 +371,7 @@ export const dayViewTitle = (date: Date, locale: string = 'en'): string => date.
   day: 'numeric', month: 'long', weekday: 'long', year: 'numeric'
 }).replace(/^\w/, (c) => c.toUpperCase());
 
-export const formatDateMonth = (date: Date, locale: string = 'en'): string => date.toLocaleTimeString(locale, {
+export const formatDateHourMinute = (date: Date, locale: string = 'en'): string => date.toLocaleTimeString(locale, {
   hour: '2-digit', minute: '2-digit'
 }).replace(/^\w/, (c) => c.toUpperCase());
 
@@ -436,6 +436,10 @@ export const createNewDate = (date: Date, hour: number = 0, minute: number = 0, 
 
   return d;
 };
+
+export const dateMonthYear = (month: number | string, year: number | string): Date => new Date(Number(year), Number(month), 1);
+
+export const getDateQuarter = (date: Date): number => getQuarter(date);
 
 export const getTimeNumber = (date: any) => {
   if (date instanceof Date) {

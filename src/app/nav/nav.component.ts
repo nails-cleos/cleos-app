@@ -8,9 +8,11 @@ import {
   AppState,
   selectAdditionalState,
   selectAuthState,
-  selectCatalogueState, selectColorState,
+  selectCatalogueState,
+  selectColorState,
   selectCurrencyState,
-  selectDiscountState, selectExpenseState,
+  selectDiscountState,
+  selectExpenseState,
   selectNotificationState,
   selectOfficeState,
   selectPaymentState,
@@ -90,7 +92,7 @@ export class NavComponent implements OnInit, OnDestroy {
               private router: Router, private store: Store<AppState>, private messagingService: MessagingService,
               private snackBar: MatSnackBar, private navigation: NavigationService, private tokenService: TokenService,
               private cookieService: CookieService, private overlayContainer: OverlayContainer,
-              private themeService: ThemeService) {
+              private themeService: ThemeService, private navigationService: NavigationService) {
     this.checked = isDarkMode(cookieService.get(THEME) as Theme);
     this.dateFormat = this.translate.currentLang;
     this.getState = this.store.select(selectAuthState);
@@ -176,9 +178,7 @@ export class NavComponent implements OnInit, OnDestroy {
             duration: 5000
           });
           if (state.reload) {
-            snackBarRef.afterDismissed().subscribe(() => {
-              window.location.reload();
-            });
+            snackBarRef.afterDismissed().subscribe(() => this.navigationService.reload(this.router.url.split('/')));
           }
         }
       }

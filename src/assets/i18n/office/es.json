@@ -32,7 +32,10 @@
       "FIELD": "Cuenta nr"
     },
     "BTW": {
-      "FIELD": "BTW nr"
+      "FIELD": "IVA nr"
+    },
+    "ADDRESS": {
+      "FIELD": "Dirección de facturación"
     },
     "DELETED": {
       "TITLE": "Eliminar oficina",

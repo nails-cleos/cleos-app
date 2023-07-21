@@ -1,9 +1,6 @@
 {
   "DASHBOARD": {
     "FIELD": "Tablero",
-    "PROFILE": "Perfil",
-    "CHANGE_PASSWORD": "Cambiar contraseña",
-    "SIGN_OUT": "Cerrar sesión",
     "SIGN_IN": "Ingresar",
     "RESERVATION": {
       "COMPLETED": "Completas: {{completed}}",
@@ -46,8 +43,11 @@
     "INCOME": "Ingresos",
     "EXPENSES": "Gastos",
     "EXPENSE": "Gastos",
+    "CASH_INCOMES": "Ingresos en efectivo",
+    "CASH": "Ingresos en efectivo",
     "UPDATED": "Resumen mensual actualizado",
     "YEAR": {
+      "RESULT": "Resumen anual",
       "SELECT": {
         "DATE": "Año"
       },
@@ -55,10 +55,22 @@
         "NO_CONTENT": "No hay datos en {{year}}"
       }
     },
+    "QUARTER": {
+      "RESULT": "Resumen trimestral",
+      "SELECT": "Trimestre",
+      "ERROR": {
+        "NO_CONTENT": "No hay datos en Q{{quarter}} del {{year}}"
+      }
+    },
     "MONTHLY": {
       "FIELD": "Resumen mensual",
       "SELECT": {
-        "DATE": "Mes y año"
+        "DATE": "Mes y año",
+        "FORMAT": "Formato de moneda"
+      },
+      "FORMAT": {
+        "EN": "Formato $1,234.56",
+        "ES": "Formato $1.234,56"
       },
       "TABLE": {
         "WEEK": "Semana {{number}}",
@@ -68,7 +80,7 @@
         "DISCOUNT": "Descuento",
         "GROSS": "Bruto",
         "NET": "Neto",
-        "BTW": "BTW",
+        "BTW": "IVA",
         "TYPE": "Tipo",
         "COLOR": "Color",
         "INVOICE": "Factura",

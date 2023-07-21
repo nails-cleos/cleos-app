@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../shared/shared.module';
 import { DashRoutingModule } from './dash-routing.module';
 
@@ -18,11 +18,15 @@ import { RoomService } from '../services/room.service';
 import { UserService } from '../services/user.service';
 import { AdditionalService } from '../services/additional.service';
 import { TrackingService } from '../services/tracking.service';
-import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { ColorService } from '../services/color.service';
 import { MonthSummaryComponent } from './month-summary/month-summary.component';
+import { YearSummaryComponent } from './year-summary/year-summary.component';
+import { YearComponent } from './year-summary/year/year.component';
 import { QuarterSummaryComponent } from './quarter-summary/quarter-summary.component';
+import { MonthComponent } from './month-summary/month/month.component';
 import { QuarterComponent } from './quarter-summary/quarter/quarter.component';
+import { TotalSummaryComponent } from './total-summary/total-summary.component';
 
 @NgModule({
   declarations: [
@@ -30,8 +34,12 @@ import { QuarterComponent } from './quarter-summary/quarter/quarter.component';
     MiniCardComponent,
     ReservationTableComponent,
     MonthSummaryComponent,
+    YearSummaryComponent,
+    YearComponent,
     QuarterSummaryComponent,
-    QuarterComponent
+    MonthComponent,
+    QuarterComponent,
+    TotalSummaryComponent
   ],
   imports: [
     DashRoutingModule,
@@ -42,6 +50,10 @@ import { QuarterComponent } from './quarter-summary/quarter/quarter.component';
       loader: {
         provide: TranslateLoader,
         useClass: TranslateLoaderFactory.forModule('dashboard')
+      },
+      missingTranslationHandler: {
+        provide: MissingTranslationHandler,
+        useClass: MissingTranslateHandler,
       },
       isolate: false,
       extend: true

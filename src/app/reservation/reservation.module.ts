@@ -1,34 +1,40 @@
 import { NgModule } from '@angular/core';
-import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
+import { MatStepperModule } from '@angular/material/stepper';
+import { EffectsModule } from '@ngrx/effects';
 import { CalendarModule } from 'angular-calendar';
+
 import { SharedModule } from '../shared/shared.module';
+import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { ReservationRoutingModule } from './reservation-routing.module';
 
 import { SearchComponent } from './search/search.component';
-import { ReservationComponent, SelectProfessionalDialogComponent } from './reservation.component';
-import {
-  AddNoteDialogComponent,
-  ChangeColorDialogComponent,
-  ChangeCustomerDialogComponent,
-  ReservationDetailComponent
-} from './detail/reservation-detail.component';
+import { ReservationComponent } from './reservation.component';
+import { SelectProfessionalDialogComponent } from './select-professional-dialog.component';
+import { ReservationDetailComponent } from './detail/reservation-detail.component';
+import { ChangeColorDialogComponent } from './detail/change-color-dialog.component';
+import { ChangeCustomerDialogComponent } from './detail/change-customer-dialog.component';
+import { AddNoteDialogComponent } from './detail/add-note-dialog.component';
+import { AddDiscountDialogComponent } from './detail/add-discount-dialog.component';
 import { MoreInfoComponent } from './detail/more-info/more-info.component';
-import { CalendarComponent } from './calendar/calendar.component';
-import { MatStepperModule } from '@angular/material/stepper';
 import { ReservationCompleteComponent } from './detail/complete/reservation-complete.component';
-import { EffectsModule } from '@ngrx/effects';
+import { CalendarComponent } from './calendar/calendar.component';
+
 import { PaymentService } from '../services/payment.service';
-import { ReservationEffects } from '../store/effects/reservation.effects';
 import { ReservationService } from '../services/reservation.service';
 import { TreatmentService } from '../services/treatment.service';
 import { RoomService } from '../services/room.service';
 import { UserService } from '../services/user.service';
 import { AdditionalService } from '../services/additional.service';
-import { PaymentEffects } from '../store/effects/payment.effects';
 import { TrackingService } from '../services/tracking.service';
-import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { ColorService } from '../services/color.service';
+import { DiscountService } from '../services/discount.service';
+
+import { ReservationEffects } from '../store/effects/reservation.effects';
+import { PaymentEffects } from '../store/effects/payment.effects';
+import { DiscountEffects } from '../store/effects/discount.effects';
+import { CurrencyService } from '../services/currency.service';
 
 @NgModule({
   declarations: [
@@ -41,7 +47,8 @@ import { ColorService } from '../services/color.service';
     ChangeCustomerDialogComponent,
     ChangeColorDialogComponent,
     SelectProfessionalDialogComponent,
-    AddNoteDialogComponent
+    AddNoteDialogComponent,
+    AddDiscountDialogComponent
   ],
   imports: [
     ReservationRoutingModule,
@@ -54,10 +61,14 @@ import { ColorService } from '../services/color.service';
         provide: TranslateLoader,
         useClass: TranslateLoaderFactory.forModule('reservation')
       },
+      missingTranslationHandler: {
+        provide: MissingTranslationHandler,
+        useClass: MissingTranslateHandler,
+      },
       isolate: false,
       extend: true
     }),
-    EffectsModule.forFeature([ReservationEffects, PaymentEffects]),
+    EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects]),
   ],
   providers: [
     ReservationService,
@@ -67,7 +78,9 @@ import { ColorService } from '../services/color.service';
     UserService,
     AdditionalService,
     TrackingService,
-    ColorService
+    ColorService,
+    DiscountService,
+    CurrencyService
   ]
 })
 export class ReservationModule {

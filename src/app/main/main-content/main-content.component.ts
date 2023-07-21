@@ -73,8 +73,8 @@ export class MainContentComponent implements OnInit, OnDestroy {
   }
 
   get book(): void {
-    const data = {date: this.date.value, treatment: this.treatment.value};
-    this.router.navigate(['me', 'reservation'], {state: data});
+    const data = { date: this.date.value, treatment: { id: this.treatment.value.id } };
+    this.router.navigate(['me', 'reservation'], { state: data });
     return;
   }
 
@@ -117,11 +117,11 @@ export class MainContentComponent implements OnInit, OnDestroy {
   myFilter = (d: Date | null): boolean => filterDateRoom(d);
 
   displayFnGroup(group: ITreatmentGroup): string {
-    return group ? `${group.name}` : '';
+    return group ? `${ group.name }` : '';
   }
 
   displayFnTreatment(treatment: ITreatment): string {
-    return treatment ? `${treatment.name}` : '';
+    return treatment ? `${ treatment.name }` : '';
   }
 
   keyDownHandler(event: any, form: UntypedFormControl): void {
@@ -162,7 +162,7 @@ export class MainContentComponent implements OnInit, OnDestroy {
       if (state.catalogue && Array.from(state.catalogue)) {
         state.catalogue.forEach((value: ICatalogue) => {
           if (value && value.blob) {
-            const slide = new Slide(`data:image/jpg;base64,${value.blob}`);
+            const slide = new Slide(`data:image/jpg;base64,${ value.blob }`);
             this.slides = [...this.slides, slide];
           }
         });

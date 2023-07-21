@@ -15,6 +15,7 @@ export enum DiscountActionTypes {
   discountFailure = '[Discount] Failure',
   discountSelected = '[Discount] Selected',
   discountFind = '[Discount] Find',
+  discountFindByCustomer = '[Discount] Find by customer',
   discountDelete = '[Discount] Delete',
   clean = '[Discount] Clean'
 }
@@ -111,6 +112,13 @@ export class DiscountFind implements Action {
   }
 }
 
+export class DiscountFindByCustomer implements Action {
+  readonly type = DiscountActionTypes.discountFindByCustomer;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class DeleteDiscount implements Action {
   readonly type = DiscountActionTypes.discountDelete;
 
@@ -136,6 +144,7 @@ export type All =
   | DiscountSaveSuccess
   | DiscountFailure
   | DiscountFind
+  | DiscountFindByCustomer
   | DiscountSelected
   | DeleteDiscount
   | Clean;

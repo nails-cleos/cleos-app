@@ -94,8 +94,8 @@
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'EXPENSE.GROSS.FIELD' | translate }}</mat-label>
                 <label>
-                  <input id="gross" formControlName="gross" matInput required appTwoDigits #gross
-                         (focusout)="validateInputValue(gross, 0.01)">
+                  <input id="gross" formControlName="gross" matInput required appTwoDigits [allowNegatives]="true" #gross
+                         (focusout)="validateInputValue(gross)">
                 </label>
                 <mat-icon matPrefix>{{currencyIcon}}</mat-icon>
                 <mat-error *ngIf="getForm.gross.hasError('required')"
@@ -123,6 +123,13 @@
                 <mat-label>{{ 'EXPENSE.NET.FIELD' | translate }}</mat-label>
                 <label>
                   <input disabled [value]="net" matInput appTwoDigits>
+                </label>
+                <mat-icon matPrefix>{{currencyIcon}}</mat-icon>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'EXPENSE.BTW.FIELD' | translate }}</mat-label>
+                <label>
+                  <input disabled [value]="btwValue" matInput appTwoDigits>
                 </label>
                 <mat-icon matPrefix>{{currencyIcon}}</mat-icon>
               </mat-form-field>

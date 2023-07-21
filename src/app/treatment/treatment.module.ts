@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../shared/shared.module';
 import { TreatmentRoutingModule } from './treatment-routing.module';
 
@@ -11,7 +11,7 @@ import { TreatmentEffects } from '../store/effects/treatment.effects';
 import { TreatmentService } from '../services/treatment.service';
 import { TreatmentViewComponent } from './view/treatment-view.component';
 import { TreatmentTableComponent } from './table/treatment-table.component';
-import { TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { TreatmentSortingComponent } from './sorting/treatment-sorting.component';
 import { DragDropSortingComponent } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 import { ColorService } from '../services/color.service';
@@ -32,6 +32,10 @@ import { ColorService } from '../services/color.service';
       loader: {
         provide: TranslateLoader,
         useClass: TranslateLoaderFactory.forModule('treatment')
+      },
+      missingTranslationHandler: {
+        provide: MissingTranslationHandler,
+        useClass: MissingTranslateHandler,
       },
       isolate: false,
       extend: true

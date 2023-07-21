@@ -163,12 +163,11 @@
     },
     "GROSS": {
       "FIELD": "Gross",
-      "REQUIRED": "Gross is <b>required</b>",
-      "MIN": "Gross must be greater than 0.01"
+      "REQUIRED": "Gross is <b>required</b>"
     },
     "BTW": {
       "FIELD": "BTW",
-      "MIN": "BTW must be greater than 0.01",
+      "MIN": "BTW must be greater than 0.00",
       "MAX": "BTW must be less than 100.00"
     },
     "NET": {

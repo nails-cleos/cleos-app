@@ -1,4 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { NavigationService } from '../../services/navigation.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-error',
@@ -12,11 +14,11 @@ export class ErrorComponent implements OnInit {
   imageSrc: string | undefined;
   retry = false;
 
-  constructor() {
+  constructor(private router: Router, private navigationService: NavigationService) {
   }
 
   get reload(): void {
-    return window.location.reload();
+    return this.navigationService.reload(this.router.url.split('/'));
   }
 
   ngOnInit(): void {
