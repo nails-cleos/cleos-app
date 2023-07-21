@@ -1,16 +1,17 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Observable, Subscription } from 'rxjs';
-import { map, shareReplay } from 'rxjs/operators';
-import { MatDatepicker } from '@angular/material/datepicker';
+import * as fromActionsDashboard from '../../store/dashboard.actions';
 import { FormControl, UntypedFormControl } from '@angular/forms';
+import { IMonthSummary, ISummaryRoom, ITotal, Total } from '../../interfaces/dashboard';
+import { Observable, Subscription } from 'rxjs';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { map, shareReplay } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
+import { AppState, selectDashboardState } from '../../store/app.states';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DateAdapter } from '@angular/material/core';
 import { YearAdapter } from '../../util/adapter/year.adapter';
-import { getNow } from '../../util/dates';
-import { AppState, selectDashboardState } from '../../store/app.states';
-import { Store } from '@ngrx/store';
-import { ISummaryRoom, IYearSummary } from '../../interfaces/dashboard';
-import * as fromActionsDashboard from '../../store/dashboard.actions';
+import { MatDatepicker } from '@angular/material/datepicker';
+import { dateMonthYear, getNow, getDateQuarter } from '../../util/dates';
 
 @Component({
   selector: 'app-quarter-summary',
@@ -21,30 +22,59 @@ import * as fromActionsDashboard from '../../store/dashboard.actions';
   ]
 })
 export class QuarterSummaryComponent implements OnInit, OnDestroy {
-  date = new FormControl<Date | null>(null);
+
   selectedRoom = new UntypedFormControl();
-  yearSummaryMap?: Map<ISummaryRoom, { yearSummaries: IYearSummary[] }>;
-  yearSummaries?: IYearSummary[];
+  selectedQuarter = new FormControl<number | null>(null);
+  date = new FormControl<Date | null>(null);
+  quarterSummaryMap?: Map<ISummaryRoom, { monthSummaries: IMonthSummary[] }>;
+  monthSummaries?: IMonthSummary[];
 
   isLoading = false;
+  quarter?: number;
+  year?: number;
+
+  income: ITotal = new Total();
+  expense: ITotal = new Total();
+  cash: ITotal = new Total();
+  totals: ITotal = new Total();
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe([
     Breakpoints.XSmall,
-    Breakpoints.Small
+    Breakpoints.Small,
+    Breakpoints.Medium
   ]).pipe(map(result => result.matches), shareReplay());
 
   private getState: Observable<any>;
   private subscription?: Subscription;
+  private readonly extras: any;
 
-  constructor(private store: Store<AppState>, private breakpointObserver: BreakpointObserver) {
+  constructor(private store: Store<AppState>, private breakpointObserver: BreakpointObserver, private route: ActivatedRoute,
+              private router: Router) {
     this.getState = this.store.select(selectDashboardState);
+    this.extras = this.router.getCurrentNavigation()?.extras.state;
+  }
+
+  get goBack(): void {
+    this.router.navigate(['dashboard', 'year', 'summary'], { state: { year: this.year } });
+    return;
   }
 
   ngOnInit(): void {
     this.subscribe();
     this.clean();
     this.valueChange();
-    this.date.setValue(getNow());
+    const now = getNow();
+    if (this.extras) {
+      const year = this.extras.year || now.getFullYear();
+      this.year = year;
+      const quarter = this.extras.quarter || getDateQuarter(now);
+      this.quarter = quarter;
+      this.date.setValue(dateMonthYear(0, year));
+      this.selectedQuarter.setValue(quarter);
+    } else {
+      this.date.setValue(now);
+      this.selectedQuarter.setValue(getDateQuarter(now));
+    }
   }
 
   ngOnDestroy(): void {
@@ -66,20 +96,25 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
         this.createData();
       }
     });
+    this.selectedQuarter.valueChanges.subscribe(value => {
+      if (value && this.date.value) {
+        this.getSummary(this.date.value.getFullYear(), value);
+      }
+    });
     this.date.valueChanges.subscribe(value => {
-      if (value) {
-        this.getSummary(value.getFullYear());
+      if (value && this.selectedQuarter.value) {
+        this.getSummary(value.getFullYear(), this.selectedQuarter.value);
       }
     });
   }
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      this.yearSummaryMap = state.yearSummaryMap;
-      if (this.yearSummaryMap) {
+      this.quarterSummaryMap = state.quarterSummaryMap;
+      if (this.quarterSummaryMap) {
         this.isLoading = false;
-        if (this.yearSummaryMap?.size === 1) {
-          const [room] = this.yearSummaryMap.keys();
+        if (this.quarterSummaryMap?.size === 1) {
+          const [room] = this.quarterSummaryMap.keys();
           this.selectedRoom.setValue(room);
         }
       }
@@ -88,16 +123,43 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
 
   private createData(): void {
     if (this.selectedRoom.value) {
-      this.yearSummaries = this.yearSummaryMap?.get(this.selectedRoom.value)?.yearSummaries;
+      this.monthSummaries = this.quarterSummaryMap?.get(this.selectedRoom.value)?.monthSummaries;
+      this.monthSummaries?.forEach(value => {
+        value.total.forEach(t => {
+          switch (t.type) {
+            case 'INCOME':
+              this.income = new Total(this.income.gross + t.gross, this.income.btw + t.btw, this.income.net + t.net);
+              break;
+            case 'EXPENSE':
+              this.expense = new Total(this.expense.gross + t.gross, this.expense.btw + t.btw, this.expense.net + t.net);
+              break;
+            case 'CASH':
+              this.cash = new Total(this.cash.gross + t.gross, this.cash.btw + t.btw, this.cash.net + t.net);
+              break;
+          }
+        });
+        this.totals = new Total(this.totals.gross + value.totalGross, this.totals.btw + value.totalBTW,
+          this.totals.net + value.totalNet);
+      });
     }
   }
 
-  private getSummary(year: number): void {
-    this.yearSummaries = undefined;
+  private getSummary(year: number, quarter: number): void {
+    this.reset();
+    this.year = year;
+    this.quarter = quarter;
     this.isLoading = true;
     this.store.dispatch(
-      new fromActionsDashboard.GetYearSummary(year)
+      new fromActionsDashboard.GetQuarterSummary({ year, quarter })
     );
+  }
+
+  private reset(): void {
+    this.monthSummaries = undefined;
+    this.income = new Total();
+    this.expense = new Total();
+    this.cash = new Total();
+    this.totals = new Total();
   }
 
   private clean(): void {

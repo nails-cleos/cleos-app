@@ -52,7 +52,7 @@
     color: black;
   }
 
-  #reservationTableData, #expenseTableData {
+  #reservationTableData, #expenseTableData, #cashTableData {
     th, td {
       border: 1px solid mat.get-color-from-palette($primary-palette) !important;
     }
@@ -68,6 +68,10 @@
 
   .result:after {
     border-bottom: solid 3px mat.get-color-from-palette($primary-palette);
+  }
+
+  .summary-header {
+    border: 1px solid mat.get-color-from-palette($background, hover) !important;
   }
 
   @if $isDark {
@@ -453,20 +457,20 @@
   @if ($isDark) {
     .success,
     .green-text {
-      color: #44A244;
+      color: #008b00;
     }
 
     .stamp-paid {
-      box-shadow: 0 0 0 3px #44A244, 0 0 0 2px #44A244 inset;
-      color: #44A244;
+      box-shadow: 0 0 0 3px #008b00, 0 0 0 2px #008b00 inset;
+      color: #008b00;
     }
 
     tr:has(.cash) {
-      background-color: #44A244 !important;
+      background-color: #008b00 !important;
     }
 
     .cash {
-      background-color: #44A244 !important;
+      background-color: #008b00 !important;
 
       td {
         color: mat.get-color-from-palette($foreground, contrast) !important;
@@ -475,7 +479,7 @@
 
     ::ng-deep .mat-green {
       color: mat.get-color-from-palette($background, background);
-      background-color: #44A244 !important;
+      background-color: #008b00 !important;
     }
 
     .in_process {
@@ -483,25 +487,25 @@
     }
 
     .ml, .paypal, .approved {
-      background-color: rgba(0, 158, 227, 0.4) !important;
+      background-color: rgb(0, 158, 227, 0.4) !important;
     }
   } @else {
     .success,
     .green-text {
-      color: #90EE90;
+      color: #c3f69d;
     }
 
     .stamp-paid {
-      box-shadow: 0 0 0 3px #90EE90, 0 0 0 2px #90EE90 inset;
-      color: #90EE90;
+      box-shadow: 0 0 0 3px #c3f69d, 0 0 0 2px #c3f69d inset;
+      color: #c3f69d;
     }
 
     tr:has(.cash) {
-      background-color: #90EE90 !important;
+      background-color: #c3f69d !important;
     }
 
     .cash {
-      background-color: #90EE90 !important;
+      background-color: #c3f69d !important;
 
       td {
         color: mat.get-color-from-palette($foreground, contrast) !important;
@@ -510,7 +514,7 @@
 
     ::ng-deep .mat-green {
       color: mat.get-color-from-palette($background, background);
-      background-color: #90EE90 !important;
+      background-color: #c3f69d !important;
     }
 
     .in_process {

@@ -21,8 +21,12 @@ import { TrackingService } from '../services/tracking.service';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { ColorService } from '../services/color.service';
 import { MonthSummaryComponent } from './month-summary/month-summary.component';
+import { YearSummaryComponent } from './year-summary/year-summary.component';
+import { YearComponent } from './year-summary/year/year.component';
 import { QuarterSummaryComponent } from './quarter-summary/quarter-summary.component';
+import { MonthComponent } from './month-summary/month/month.component';
 import { QuarterComponent } from './quarter-summary/quarter/quarter.component';
+import { TotalSummaryComponent } from './total-summary/total-summary.component';
 
 @NgModule({
   declarations: [
@@ -30,8 +34,12 @@ import { QuarterComponent } from './quarter-summary/quarter/quarter.component';
     MiniCardComponent,
     ReservationTableComponent,
     MonthSummaryComponent,
+    YearSummaryComponent,
+    YearComponent,
     QuarterSummaryComponent,
-    QuarterComponent
+    MonthComponent,
+    QuarterComponent,
+    TotalSummaryComponent
   ],
   imports: [
     DashRoutingModule,

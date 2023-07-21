@@ -4,7 +4,6 @@ import { SharedModule } from '../shared/shared.module';
 import { NavRoutingModule } from './nav-routing.module';
 
 import { NavComponent } from './nav.component';
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatRippleModule } from '@angular/material/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
@@ -27,7 +26,6 @@ import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/trans
   imports: [
     NavRoutingModule,
     SharedModule,
-    MatToolbarModule,
     MatBadgeModule,
     MatRippleModule,
     MatSlideToggleModule,

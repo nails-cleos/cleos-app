@@ -42,6 +42,10 @@ export class DashboardService {
   }
 
   public getYearSummary(year: number): Observable<any> {
-    return this.http.get<any>(`${ this.urlV1 }/quarters/${ year }`);
+    return this.http.get<any>(`${ this.urlV1 }/years/${ year }`);
+  }
+
+  public getQuarterSummary(year: number, quarter: number): Observable<any> {
+    return this.http.get<any>(`${ this.urlV1 }/years/${ year }/quarters/${ quarter }`);
   }
 }

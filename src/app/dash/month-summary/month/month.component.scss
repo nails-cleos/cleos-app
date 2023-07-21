@@ -1,0 +1,26 @@
+.result {
+  padding: 5px 0;
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.result:after {
+  content: '';
+  width: 100%;
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+}
+
+.bottom {
+  margin-bottom: 5%
+}
+
+.header {
+  text-align: center;
+}
+
+.header:hover {
+  transform: scale(1.2);
+  font-weight: bold;
+}

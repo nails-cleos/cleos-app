@@ -109,7 +109,8 @@ export class ColorEvent implements EventColor {
 
 export enum SummaryType {
   payment,
-  expense
+  expense,
+  cash
 }
 
 export enum AmountFormat {
@@ -117,14 +118,17 @@ export enum AmountFormat {
   es = 'ES'
 }
 
-export interface ISummaryTotal {
+export interface ITotal {
+  net: number;
+  btw: number;
+  gross: number;
+}
+
+export interface ISummaryTotal extends ITotal {
   id: string;
   paymentType: PaymentType;
   expenseType: string;
   type: string;
-  net: number;
-  btw: number;
-  gross: number;
   discountType: DiscountType;
   discountValue: number;
   payments: ISummaryTotal[];
@@ -167,13 +171,17 @@ export interface IMonthlySummaryRequest {
 export interface IMonthlyRoomSummary extends ISummaryRoom {
   reservationSummary: IMonthlySummaryReservation[];
   expenseSummary: IMonthlySummaryExpense[];
+  cashSummary: IMonthlySummaryReservation[];
 }
 
 export interface IYearRoomSummary extends ISummaryRoom {
-  yearSummaries: IYearSummary[];
+  quarterSummaries: IQuarterSummary[];
 }
 
-export interface IQuarterSummary {
+export interface IQuarterRoomSummary extends ISummaryRoom, IQuarterSummary {
+}
+
+export interface IMonthSummary {
   month: number;
   total: ISummaryTotal[];
   totalGross: number;
@@ -181,22 +189,22 @@ export interface IQuarterSummary {
   totalBTW: number;
 }
 
-export interface IYearSummary {
+export interface IQuarterSummary {
   quarter: number;
-  summaries: IQuarterSummary[];
-}
-
-export class YearSummary implements IYearSummary {
-  quarter: number;
-  summaries: IQuarterSummary[];
-
-  constructor(quarter: number, summaries: IQuarterSummary[]) {
-    this.quarter = quarter;
-    this.summaries = summaries;
-  }
+  monthSummaries: IMonthSummary[];
 }
 
 export class QuarterSummary implements IQuarterSummary {
+  quarter: number;
+  monthSummaries: IMonthSummary[];
+
+  constructor(quarter: number, monthSummaries: IMonthSummary[]) {
+    this.quarter = quarter;
+    this.monthSummaries = monthSummaries;
+  }
+}
+
+export class MonthSummary implements IMonthSummary {
   month: number;
   total: ISummaryTotal[];
   totalGross: number;
@@ -207,7 +215,7 @@ export class QuarterSummary implements IQuarterSummary {
     this.month = month;
     this.total = total;
     const { totalGross, totalNet, totalBTW } = total.reduce((totals: any, next: ISummaryTotal) => {
-      const by = next.type === 'INCOME' ? 1 : -1;
+      const by = next.type === 'EXPENSE' ? -1 : 1;
       totals.totalGross += next.gross * by;
       totals.totalNet += next.net * by;
       totals.totalBTW += next.btw * by;
@@ -217,5 +225,17 @@ export class QuarterSummary implements IQuarterSummary {
     this.totalGross = totalGross;
     this.totalNet = totalNet;
     this.totalBTW = totalBTW;
+  }
+}
+
+export class Total implements ITotal {
+  btw: number;
+  gross: number;
+  net: number;
+
+  constructor(gross: number = 0, btw: number = 0, net: number = 0) {
+    this.btw = btw;
+    this.gross = gross;
+    this.net = net;
   }
 }

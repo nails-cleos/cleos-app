@@ -1,5 +1,5 @@
 import { CalendarNativeDateFormatter, DateFormatterParams } from 'angular-calendar';
-import { columnHeader, dayViewTitle, formatDateMonth, monthViewTitle } from '../util/dates';
+import { columnHeader, dayViewTitle, formatDateHourMinute, monthViewTitle } from '../util/dates';
 import { Injectable } from '@angular/core';
 
 @Injectable()
@@ -18,7 +18,7 @@ export class CustomDateFormatter extends CalendarNativeDateFormatter {
   }
 
   public weekViewHour({date, locale}: DateFormatterParams): string {
-    return formatDateMonth(date, locale);
+    return formatDateHourMinute(date, locale);
   }
 
   public dayViewTitle({date, locale}: DateFormatterParams): string {

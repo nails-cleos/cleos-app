@@ -3,7 +3,6 @@ import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateS
 import { SharedModule } from '../shared/shared.module';
 import { MainRoutingModule } from './main-routing.module';
 import { MatCarouselModule } from '@magloft/material-carousel';
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { EffectsModule } from '@ngrx/effects';
 
@@ -38,7 +37,6 @@ import { AuthService } from '../services/auth.service';
   imports: [
     MainRoutingModule,
     SharedModule,
-    MatToolbarModule,
     MatSlideToggleModule,
     TranslateModule.forChild({
       loader: {

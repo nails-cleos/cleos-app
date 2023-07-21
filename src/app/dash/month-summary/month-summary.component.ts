@@ -3,7 +3,7 @@ import { FormControl, UntypedFormControl } from '@angular/forms';
 import { DateAdapter } from '@angular/material/core';
 import { MatDatepicker } from '@angular/material/datepicker';
 
-import { dateMonthYear, getNow, getWeeksInMonth, newDateTimestamp } from '../../util/dates';
+import { dateMonthYear, getDateQuarter, getNow, getWeeksInMonth, monthViewTitle, newDateTimestamp } from '../../util/dates';
 import { Observable, Subscription } from 'rxjs';
 import { AppState, selectDashboardState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
@@ -34,12 +34,17 @@ import { twoDigitNumber } from '../../util/numbers';
 })
 export class MonthSummaryComponent implements OnInit {
   date = new FormControl<Date | null>(null);
-  monthlySummaryMap?: Map<ISummaryRoom, { summaryReservation: IMonthlySummaryReservation[]; summaryExpenses: IMonthlySummaryExpense[] }>;
+  monthlySummaryMap?: Map<ISummaryRoom, {
+    summaryReservation: IMonthlySummaryReservation[];
+    summaryExpenses: IMonthlySummaryExpense[];
+    summaryCash: IMonthlySummaryReservation[];
+  }>;
   selectedRoom = new UntypedFormControl();
   amountFormat = new UntypedFormControl('ES');
   amountFormatKeys = Object.values(AmountFormat);
   summaryReservations?: IMonthlySummary[];
   summaryExpenses?: IMonthlySummary[];
+  summaryCash?: IMonthlySummary[];
   weeks: any[];
   dateFormat: string;
   showInput = true;
@@ -49,13 +54,18 @@ export class MonthSummaryComponent implements OnInit {
   expenseGrossMonth = 0;
   expenseNetMonth = 0;
   expenseBtwMonth = 0;
+  cashGrossMonth = 0;
+  cashNetMonth = 0;
+  cashBtwMonth = 0;
 
   monthlySummaryPayment: IMonthlySummaryRequest[] = [];
   monthlySummaryExpense: IMonthlySummaryRequest[] = [];
+  monthlySummaryCash: IMonthlySummaryRequest[] = [];
   type: typeof SummaryType = SummaryType;
   step = 0;
   roomId?: string;
   locale = 'es';
+  isLoading = false;
 
   private getState: Observable<any>;
   private subscription?: Subscription;
@@ -66,6 +76,21 @@ export class MonthSummaryComponent implements OnInit {
     this.dateFormat = this.translate.currentLang;
     this.weeks = getWeeksInMonth(getNow());
     this.extras = this.router.getCurrentNavigation()?.extras.state;
+  }
+
+  get dateFormatted(): string {
+    return this.date.value ? monthViewTitle(this.date.value, this.translate.currentLang) : '';
+  }
+
+  get goBack(): void {
+    if (this.date.value) {
+      const year = this.date.value.getFullYear();
+      const quarter = getDateQuarter(this.date.value);
+      this.router.navigate(['dashboard', 'quarter', 'summary'], { state: { year, quarter } });
+    } else {
+      this.router.navigate(['dashboard', 'quarter', 'summary']);
+    }
+    return;
   }
 
   private static calculateTotals(summaries?: IMonthlySummary[]): { gross: number; btw: number; net: number } {
@@ -187,6 +212,7 @@ export class MonthSummaryComponent implements OnInit {
     this.subscribe();
     this.valueChange();
     if (this.extras) {
+      this.step = this.extras.step || 0;
       const date = this.extras.date.split('-');
       const month = Number(date[0]) - 1;
       const year = date[1];
@@ -224,6 +250,12 @@ export class MonthSummaryComponent implements OnInit {
           this.setSummaryExpense(input, index, id);
         }
         this.calculateExpenseSummary();
+        break;
+      case SummaryType.cash:
+        if (this.summaryCash) {
+          this.setSummaryCash(input, index, id);
+        }
+        this.calculateCashSummary();
         break;
     }
   }
@@ -275,6 +307,12 @@ export class MonthSummaryComponent implements OnInit {
           btw = this.expenseBtwMonth;
           values = this.monthlySummaryExpense;
           break;
+        case SummaryType.cash:
+          gross = this.cashGrossMonth;
+          net = this.cashNetMonth;
+          btw = this.cashBtwMonth;
+          values = this.monthlySummaryCash;
+          break;
       }
       csv += ';;;;;';
       csv += `${ twoDigitNumber(gross, this.locale) };${ twoDigitNumber(net, this.locale) };${ twoDigitNumber(btw, this.locale) }\n`;
@@ -291,6 +329,7 @@ export class MonthSummaryComponent implements OnInit {
   }
 
   updateMonthlySummary(type: SummaryType, gross: number, btw: number, summaries: IMonthlySummaryRequest[]): void {
+    this.isLoading = true;
     return this.store.dispatch(
       new fromActionsDashboard.UpdateMonthlySummary(
         {
@@ -300,6 +339,7 @@ export class MonthSummaryComponent implements OnInit {
           gross,
           btw,
           summaries,
+          step: this.step
         }
       )
     );
@@ -327,6 +367,17 @@ export class MonthSummaryComponent implements OnInit {
     }
   }
 
+  private setSummaryCash(input: HTMLInputElement, index: number, id: string): void {
+    if (this.summaryCash) {
+      const {
+        monthlySummaries,
+        newSummaries
+      } = MonthSummaryComponent.updateAmounts(this.summaryCash, this.monthlySummaryCash, input, index, id);
+      this.summaryCash = monthlySummaries;
+      this.monthlySummaryCash = newSummaries;
+    }
+  }
+
   private valueChange(): void {
     this.selectedRoom.valueChanges.subscribe(value => {
       if (value) {
@@ -348,6 +399,10 @@ export class MonthSummaryComponent implements OnInit {
   }
 
   private getSummary(date: string): void {
+    this.isLoading = true;
+    this.summaryReservations = undefined;
+    this.summaryExpenses = undefined;
+    this.summaryCash = undefined;
     this.store.dispatch(
       new fromActionsDashboard.GetMonthlySummary(date)
     );
@@ -356,9 +411,12 @@ export class MonthSummaryComponent implements OnInit {
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       this.monthlySummaryMap = state.monthlySummaryMap;
-      if (this.monthlySummaryMap?.size === 1) {
-        const [room] = this.monthlySummaryMap.keys();
-        this.selectedRoom.setValue(room);
+      if (this.monthlySummaryMap) {
+        this.isLoading = false;
+        if (this.monthlySummaryMap.size === 1) {
+          const [room] = this.monthlySummaryMap.keys();
+          this.selectedRoom.setValue(room);
+        }
       }
     });
   }
@@ -383,6 +441,15 @@ export class MonthSummaryComponent implements OnInit {
         return s;
       });
       this.calculateExpenseSummary();
+
+      this.summaryCash = this.monthlySummaryMap?.get(this.selectedRoom.value)?.summaryCash.map((s, i) => {
+        if (s.id) {
+          const reservationDate = newDateTimestamp(s.timestamp);
+          return Object.assign({}, s, { reservationDate, day: reservationDate.getDate(), position: i });
+        }
+        return s;
+      });
+      this.calculateCashSummary();
     }
   }
 
@@ -398,5 +465,12 @@ export class MonthSummaryComponent implements OnInit {
     this.expenseGrossMonth = gross;
     this.expenseNetMonth = net;
     this.expenseBtwMonth = btw;
+  }
+
+  private calculateCashSummary(): void {
+    const { gross, net, btw } = MonthSummaryComponent.calculateTotals(this.summaryCash);
+    this.cashGrossMonth = gross;
+    this.cashNetMonth = net;
+    this.cashBtwMonth = btw;
   }
 }

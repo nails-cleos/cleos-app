@@ -151,6 +151,11 @@
         "V_MAP": "Marketing, publicidad y promoción"
       }
     },
+    "CASH": {
+      "TYPE": {
+        "CASH": "Efectivo"
+      }
+    },
     "STATUS": {
       "PAYMENT": {
         "NONE": "Pendiente",
