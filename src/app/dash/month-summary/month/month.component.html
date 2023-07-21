@@ -1,0 +1,54 @@
+<mat-card appearance="outlined">
+  <mat-card-content *ngFor="let total of month.total let last = last">
+    <mat-list>
+      <mat-list-item (click)="goToMonth(month.month, total.type)">
+        <div matListItemTitle class="header pointer">
+          {{'SUMMARY.' + total.type | translate}}
+        </div>
+      </mat-list-item>
+      <mat-list-item [ngClass]="{'bottom':last}">
+        <div fxLayout="row" fxLayoutAlign="space-between center">
+          <div>{{'SUMMARY.MONTHLY.TABLE.GROSS' | translate}}</div>
+          <div matListItemLine class="currency">
+            {{total.gross | currency: currency.code: 'symbol': '1.2-2'}}
+          </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="space-between center" class="result">
+          <div>{{'SUMMARY.MONTHLY.TABLE.BTW' | translate}}</div>
+          <div matListItemLine class="currency">
+            {{total.btw | currency: currency.code: 'symbol': '1.2-2'}}
+          </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="space-between center">
+          <div>{{'SUMMARY.MONTHLY.TABLE.NET' | translate}}</div>
+          <div matListItemLine class="currency">
+            {{total.net | currency: currency.code: 'symbol': '1.2-2'}}
+          </div>
+        </div>
+      </mat-list-item>
+    </mat-list>
+  </mat-card-content>
+  <mat-divider></mat-divider>
+  <mat-card-footer>
+    <mat-list-item class="bottom">
+      <div fxLayout="row" fxLayoutAlign="space-between center">
+        <div>{{'SUMMARY.MONTHLY.TABLE.GROSS' | translate}}</div>
+        <div matListItemLine class="currency">
+          {{month.totalGross | currency: currency.code: 'symbol': '1.2-2'}}
+        </div>
+      </div>
+      <div fxLayout="row" fxLayoutAlign="space-between center" class="result">
+        <div>{{'SUMMARY.MONTHLY.TABLE.BTW' | translate}}</div>
+        <div matListItemLine class="currency">
+          {{month.totalBTW | currency: currency.code: 'symbol': '1.2-2'}}
+        </div>
+      </div>
+      <div fxLayout="row" fxLayoutAlign="space-between center">
+        <div>{{'SUMMARY.MONTHLY.TABLE.NET' | translate}}</div>
+        <div matListItemLine class="currency">
+          {{month.totalNet | currency: currency.code: 'symbol': '1.2-2'}}
+        </div>
+      </div>
+    </mat-list-item>
+  </mat-card-footer>
+</mat-card>

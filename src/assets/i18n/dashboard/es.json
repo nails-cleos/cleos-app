@@ -43,13 +43,23 @@
     "INCOME": "Ingresos",
     "EXPENSES": "Gastos",
     "EXPENSE": "Gastos",
+    "CASH_INCOMES": "Ingresos en efectivo",
+    "CASH": "Ingresos en efectivo",
     "UPDATED": "Resumen mensual actualizado",
     "YEAR": {
+      "RESULT": "Resumen anual",
       "SELECT": {
         "DATE": "Año"
       },
       "ERROR": {
         "NO_CONTENT": "No hay datos en {{year}}"
+      }
+    },
+    "QUARTER": {
+      "RESULT": "Resumen trimestral",
+      "SELECT": "Trimestre",
+      "ERROR": {
+        "NO_CONTENT": "No hay datos en Q{{quarter}} del {{year}}"
       }
     },
     "MONTHLY": {

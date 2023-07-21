@@ -42,7 +42,6 @@ import { FilterByPipe } from '../pipes/filterBy.pipe';
 import { DiscountPipe } from '../pipes/discount.pipe';
 import { TwoDigitsDirective } from '../directives/two-digits.directive';
 import { PromptComponent } from './prompt/prompt.component';
-import { MatToolbarModule } from '@angular/material/toolbar';
 
 @NgModule({
   imports: [
@@ -70,8 +69,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     FlexLayoutModule,
     HttpClientModule,
     HttpClientJsonpModule,
-    FormsModule,
-    MatToolbarModule
+    FormsModule
   ],
   exports: [
     AppMaterialModule,

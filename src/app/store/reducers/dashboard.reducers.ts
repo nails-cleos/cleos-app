@@ -4,10 +4,15 @@ import {
   IMonthlyRoomSummary,
   IMonthlySummaryExpense,
   IMonthlySummaryReservation,
+  IMonthSummary,
+  IQuarterRoomSummary,
+  IQuarterSummary,
   IRoomEvents,
-  ISummaryRoom, ISummaryTotal,
+  ISummaryRoom,
+  ISummaryTotal,
   IYearRoomSummary,
-  IYearSummary, QuarterSummary, YearSummary
+  MonthSummary,
+  QuarterSummary
 } from '../../interfaces/dashboard';
 
 export interface State {
@@ -15,7 +20,8 @@ export interface State {
   dashboard: IRoomEvents | null;
   monthlySummaryMap: Map<ISummaryRoom,
     { summaryReservation: IMonthlySummaryReservation[]; summaryExpenses: IMonthlySummaryExpense[] }> | null;
-  yearSummaryMap: Map<ISummaryRoom, { yearSummaries: IYearSummary[] }> | null;
+  yearSummaryMap: Map<ISummaryRoom, { quarterSummaries: IQuarterSummary[] }> | null;
+  quarterSummaryMap: Map<ISummaryRoom, { monthSummaries: IMonthSummary[] }> | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -28,6 +34,7 @@ const initialState: State = {
   dashboard: null,
   monthlySummaryMap: null,
   yearSummaryMap: null,
+  quarterSummaryMap: null,
   errorMessage: null,
   error: null,
   subErrors: null,
@@ -83,40 +90,55 @@ const monthSummaryMap = (summaries: IMonthlyRoomSummary[]) => summaries.reduce((
     timeZone: summary.timeZone
   }, {
     summaryReservation: summary.reservationSummary,
-    summaryExpenses: summary.expenseSummary
+    summaryExpenses: summary.expenseSummary,
+    summaryCash: summary.cashSummary
   });
   return map;
-}, new Map<ISummaryRoom, { summaryReservation: IMonthlySummaryReservation[]; summaryExpenses: IMonthlySummaryExpense[] }>());
+}, new Map<ISummaryRoom, {
+  summaryReservation: IMonthlySummaryReservation[];
+  summaryExpenses: IMonthlySummaryExpense[];
+  summaryCash: IMonthlySummaryReservation[];
+}>());
 
 const emptySummaryTotal = (type: string): ISummaryTotal => ({ type, net: 0, btw: 0, gross: 0 } as ISummaryTotal);
 
-const emptySummariesTotal = (): ISummaryTotal[] => [emptySummaryTotal('INCOME'), emptySummaryTotal('EXPENSE')];
+const emptySummariesTotal = (): ISummaryTotal[] => [emptySummaryTotal('INCOME'), emptySummaryTotal('EXPENSE'),
+  emptySummaryTotal('CASH')];
 
 const getMonth = (quarter: number, key: number): number => ((quarter - 1) * 3) + key;
 
-const emptyQuarterMonth = (month: number) => new QuarterSummary(month, emptySummariesTotal());
+const emptyQuarterMonth = (month: number) => new MonthSummary(month, emptySummariesTotal());
 
-const fullYear = (yearSummaries: IYearSummary[]): IYearSummary[] => [1, 2, 3, 4].map(quarter => {
-  const yearSummary = yearSummaries.find(year => year.quarter === quarter);
-  if (yearSummary) {
-    const quarterSummaries = [1, 2, 3].map(key => {
-      const quarterSummary = yearSummary.summaries.find(quarterS => quarterS.month === getMonth(quarter, key));
-      if (quarterSummary) {
-        const totalTypes = ['INCOME', 'EXPENSE'].map(type => {
-          const totalType = quarterSummary.total.find(total => total.type === type);
-          if (totalType) {
-            return totalType;
-          }
-          return emptySummaryTotal(type);
-        });
-        return new QuarterSummary(quarterSummary.month, totalTypes);
+const totalTypes = (quarterSummary: IMonthSummary) => ['INCOME', 'EXPENSE', 'CASH'].map(type => {
+  const totalType = quarterSummary.total.find(total => total.type === type);
+  if (totalType) {
+    return totalType;
+  }
+  return emptySummaryTotal(type);
+});
+
+const fullYear = (quarterSummaries: IQuarterSummary[]): IQuarterSummary[] => [1, 2, 3, 4].map(quarter => {
+  const quarterSummary = quarterSummaries.find(year => year.quarter === quarter);
+  if (quarterSummary) {
+    const monthSummaries = [1, 2, 3].map(key => {
+      const monthSummary = quarterSummary.monthSummaries.find(quarterS => quarterS.month === getMonth(quarter, key));
+      if (monthSummary) {
+        return new MonthSummary(monthSummary.month, totalTypes(monthSummary));
       }
       return emptyQuarterMonth(getMonth(quarter, key));
     });
-    return new YearSummary(yearSummary.quarter, quarterSummaries);
+    return new QuarterSummary(quarterSummary.quarter, monthSummaries);
   }
   const summaries = [1, 2, 3].map(key => emptyQuarterMonth(getMonth(quarter, key)));
-  return new YearSummary(quarter, summaries);
+  return new QuarterSummary(quarter, summaries);
+});
+
+const fullQuarter = (monthSummaries: IMonthSummary[], quarter: number): IMonthSummary[] => [1, 2, 3].map(key => {
+  const monthSummary = monthSummaries.find(quarterS => quarterS.month === getMonth(quarter, key));
+  if (monthSummary) {
+    return new MonthSummary(monthSummary.month, totalTypes(monthSummary));
+  }
+  return emptyQuarterMonth(getMonth(quarter, key));
 });
 
 const yearSummaryMap = (summaries: IYearRoomSummary[]) => summaries.reduce((map, summary) => {
@@ -126,10 +148,22 @@ const yearSummaryMap = (summaries: IYearRoomSummary[]) => summaries.reduce((map,
     currency: summary.currency,
     timeZone: summary.timeZone
   }, {
-    yearSummaries: fullYear(summary.yearSummaries)
+    quarterSummaries: fullYear(summary.quarterSummaries)
   });
   return map;
-}, new Map<ISummaryRoom, { yearSummaries: IYearSummary[] }>());
+}, new Map<ISummaryRoom, { quarterSummaries: IQuarterSummary[] }>());
+
+const quarterSummaryMap = (summaries: IQuarterRoomSummary[]) => summaries.reduce((map, summary) => {
+  map.set({
+    roomId: summary.roomId,
+    roomName: summary.roomName,
+    currency: summary.currency,
+    timeZone: summary.timeZone
+  }, {
+    monthSummaries: fullQuarter(summary.monthSummaries, summary.quarter)
+  });
+  return map;
+}, new Map<ISummaryRoom, { monthSummaries: IMonthSummary[] }>());
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
@@ -249,6 +283,26 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         yearSummaryMap: yearSummaryMap(action.payload),
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: null
+      };
+    }
+    case DashboardActionTypes.quarterSummary: {
+      return {
+        ...state,
+        quarterSummaryMap: null,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: null
+      };
+    }
+    case DashboardActionTypes.quarterSummarySuccess: {
+      return {
+        ...state,
+        quarterSummaryMap: quarterSummaryMap(action.payload),
         errorMessage: null,
         error: null,
         subErrors: null,

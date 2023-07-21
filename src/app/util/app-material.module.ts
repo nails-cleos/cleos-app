@@ -29,6 +29,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 const materialModules = [
   NgxMaterialTimepickerModule,
@@ -59,7 +60,8 @@ const materialModules = [
   MatChipsModule,
   MatExpansionModule,
   MatTabsModule,
-  MatBottomSheetModule
+  MatBottomSheetModule,
+  MatToolbarModule
 ];
 
 @NgModule({

@@ -1,71 +1,13 @@
-<mat-grid-list [cols]="1" [rowHeight]="'fit'" style="height: 200%">
-  <mat-grid-tile>
-    <mat-grid-tile-header>{{year}}</mat-grid-tile-header>
-    <div class='internalMatGrid'>
-      <mat-grid-list [cols]="cols" [rowHeight]="'fit'" class="grid-list-top">
-        <mat-grid-tile *ngFor="let year of yearSummaries">
-          <mat-grid-tile-header>Q{{year.quarter}}</mat-grid-tile-header>
-          <div class='internalMatGrid'>
-            <mat-grid-list [cols]="3" [rowHeight]="'fit'" class="grid-list-top">
-              <mat-grid-tile *ngFor="let quarter of year.summaries">
-                <mat-grid-tile-header>{{getMonth(quarter.month)}}</mat-grid-tile-header>
-                <mat-card appearance="outlined" style="width: 100%; height: 600px">
-                  <mat-card-content *ngFor="let total of quarter.total let last = last">
-                    <mat-list>
-                      <mat-list-item>
-                        <div matListItemTitle class="header">{{'SUMMARY.' + total.type | translate}}</div>
-                      </mat-list-item>
-                      <mat-list-item>
-                        <div fxLayout="row" fxLayoutAlign="space-between center">
-                          <div>{{'SUMMARY.MONTHLY.TABLE.GROSS' | translate}}</div>
-                          <div matListItemLine class="currency">
-                            {{total.gross | currency: currency.code: 'symbol': '1.2-2'}}
-                          </div>
-                        </div>
-                        <div fxLayout="row" fxLayoutAlign="space-between center" class="result">
-                          <div>{{'SUMMARY.MONTHLY.TABLE.BTW' | translate}}</div>
-                          <div matListItemLine class="currency">
-                            {{total.btw | currency: currency.code: 'symbol': '1.2-2'}}
-                          </div>
-                        </div>
-                        <div fxLayout="row" fxLayoutAlign="space-between center">
-                          <div>{{'SUMMARY.MONTHLY.TABLE.NET' | translate}}</div>
-                          <div matListItemLine class="currency">
-                            {{total.net | currency: currency.code: 'symbol': '1.2-2'}}
-                          </div>
-                        </div>
-                      </mat-list-item>
-                    </mat-list>
-                  </mat-card-content>
-                  <mat-divider></mat-divider>
-                  <mat-card-footer>
-                    <mat-list-item>
-                      <div fxLayout="row" fxLayoutAlign="space-between center">
-                        <div>{{'SUMMARY.MONTHLY.TABLE.GROSS' | translate}}</div>
-                        <div matListItemLine class="currency">
-                          {{quarter.totalGross | currency: currency.code: 'symbol': '1.2-2'}}
-                        </div>
-                      </div>
-                      <div fxLayout="row" fxLayoutAlign="space-between center" class="result">
-                        <div>{{'SUMMARY.MONTHLY.TABLE.BTW' | translate}}</div>
-                        <div matListItemLine class="currency">
-                          {{quarter.totalBTW | currency: currency.code: 'symbol': '1.2-2'}}
-                        </div>
-                      </div>
-                      <div fxLayout="row" fxLayoutAlign="space-between center">
-                        <div>{{'SUMMARY.MONTHLY.TABLE.NET' | translate}}</div>
-                        <div matListItemLine class="currency">
-                          {{quarter.totalNet | currency: currency.code: 'symbol': '1.2-2'}}
-                        </div>
-                      </div>
-                    </mat-list-item>
-                  </mat-card-footer>
-                </mat-card>
-              </mat-grid-tile>
-            </mat-grid-list>
-          </div>
-        </mat-grid-tile>
-      </mat-grid-list>
+<mat-toolbar (click)="goToQuarter(quarter)" class="pointer summary-header" [ngClass]="{'margin-top': margin}">
+  Q{{quarter}}
+</mat-toolbar>
+<div fxLayout="row wrap">
+  <div *ngFor="let month of monthSummaries" fxFlex.gt-md="33.33%" fxFlex="100%">
+    <mat-toolbar (click)="goToMonth(month.month)" class="pointer summary-header">
+      {{getMonth(month.month)}}
+    </mat-toolbar>
+    <div class="margin-top">
+      <app-month [month]="month" [year]="year" [currency]="currency"></app-month>
     </div>
-  </mat-grid-tile>
-</mat-grid-list>
+  </div>
+</div>

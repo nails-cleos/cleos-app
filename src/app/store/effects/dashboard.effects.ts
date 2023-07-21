@@ -58,6 +58,7 @@ export class DashboardEffects {
       payload.summaries, payload.type, payload.roomId).pipe(
       switchMap(() => of(new fromActionsDashboard.UpdateMonthlySummarySuccess({
         date: payload.date,
+        step: payload.step,
         message: this.translate.instant('SUMMARY.UPDATED')
       }))),
       catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
@@ -72,6 +73,14 @@ export class DashboardEffects {
     ))
   ));
 
+  getQuarterSummary$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.quarterSummary)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.dashboardService.getQuarterSummary(payload.year, payload.quarter).pipe(
+      switchMap((response: any) => of(new fromActionsDashboard.QuarterSummarySuccess(response ? response : []))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
+    ))
+  ));
+
   dataSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsDashboard.DashboardActionTypes.dashSuccess)
   ), { dispatch: false });
@@ -82,7 +91,8 @@ export class DashboardEffects {
 
   saveMonthlySummarySuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsDashboard.DashboardActionTypes.saveMonthlySummarySuccess),
-    tap((data: any) => this.navigationService.reload(this.router.url.split('/'), { date: data.payload.date }))
+    tap((data: any) => this.navigationService.reload(this.router.url.split('/'),
+      { date: data.payload.date, step: data.payload.step }))
   ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private router: Router,
