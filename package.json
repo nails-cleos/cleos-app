@@ -2,7 +2,7 @@
   "name": "cleos",
   "version": "1.0.49-rc",
   "engines": {
-    "node": "16.19.1",
+    "node": "16.19.0",
     "npm": "8.19.3"
   },
   "scripts": {
