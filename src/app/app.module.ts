@@ -99,11 +99,11 @@ registerLocaleData(localeAr, 'es-AR');
       registrationStrategy: 'registerWhenStable:30000'
     }),
     NgxMatColorPickerModule,
-    AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
     AngularFireMessagingModule,
     AngularFireAnalyticsModule,
-    AngularFireDatabaseModule
+    AngularFireDatabaseModule,
+    AngularFireModule.initializeApp(environment.firebase)
   ],
   providers: [
     {
