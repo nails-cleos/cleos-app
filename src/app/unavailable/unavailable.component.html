@@ -14,8 +14,7 @@
                   <input (keydown)="keyDownHandler($event)" [formControl]="professional" [matAutocomplete]="auto"
                          matInput required type="text">
                 </label>
-                <mat-autocomplete #auto="matAutocomplete" (optionSelected)="getRoom($event.option.value)"
-                                  [displayWith]="displayFn">
+                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
                   <mat-option *ngFor="let professional of filteredOptions | async" [value]="professional">
                     {{professional | userName}}
                   </mat-option>
@@ -48,8 +47,8 @@
                     <mat-icon>today</mat-icon>
                   </button>
                   <label>
-                    <input (dateChange)="setDate($event)" (focus)="picker.open()" [formControl]="startDate"
-                           [matDatepickerFilter]="myFilter" [matDatepicker]="picker" matInput required>
+                    <input (focus)="picker.open()" [formControl]="startDate" [matDatepickerFilter]="myFilter"
+                           [matDatepicker]="picker" matInput required>
                   </label>
                   <mat-datepicker #picker touchUi></mat-datepicker>
                   <mat-error *ngIf="startDate.hasError('required')"
@@ -68,8 +67,7 @@
                            [ngxTimepicker]="time" matInput name="start_time" readonly/>
                   </label>
                   <span matPrefix><mat-icon (click)="time.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
-                  <ngx-material-timepicker #time (timeSet)="setTime($event)"
-                                           [minutesGap]="15"></ngx-material-timepicker>
+                  <ngx-material-timepicker #time [minutesGap]="15"></ngx-material-timepicker>
                   <mat-error *ngIf="startTime.hasError('required')"
                              [innerHTML]="'UNAVAILABLE.TIME.REQUIRED' | translate">
                   </mat-error>

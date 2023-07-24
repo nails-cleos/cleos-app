@@ -4,6 +4,7 @@
     "TITLE": "Add unavailable",
     "CREATED": "Unavailable {{date}} created",
     "DETAIL": "Update unavailable",
+    "BLOCK_AGENDA": "Block agenda",
     "LIST": {
       "COLUMN": {
         "PROFESSIONAL": "Professional",

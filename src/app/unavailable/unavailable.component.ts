@@ -77,19 +77,6 @@ export class UnavailableComponent implements OnInit, OnDestroy {
   constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router) {
     this.getState = this.store.select(selectUnavailableState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
-    if (this.extras) {
-      let startTime;
-      if (this.extras.room) {
-        this.rooms = [this.extras.room];
-        this.professional.setValue(this.extras.room.professional);
-        this.showDuration = true;
-        const time = getTimeNumber(this.extras.date);
-        const hour = time ? `${ time.hour }`.padStart(2, '0') : '12';
-        const minute = time ? `${ closest(time.minute) }`.padStart(2, '0') : '00';
-        startTime = `${ hour }:${ minute }`;
-      }
-      this.setValues(this.extras.date, startTime);
-    }
   }
 
   get create(): void {
@@ -140,6 +127,19 @@ export class UnavailableComponent implements OnInit, OnDestroy {
     this.clean();
     this.subscribe();
     this.getProfessionals();
+    if (this.extras) {
+      let startTime;
+      if (this.extras.room) {
+        this.rooms = [this.extras.room];
+        this.professional.setValue(this.extras.room.professional);
+        this.showDuration = true;
+        const time = getTimeNumber(this.extras.date);
+        const hour = time ? `${ time.hour }`.padStart(2, '0') : '12';
+        const minute = time ? `${ closest(time.minute) }`.padStart(2, '0') : '00';
+        startTime = `${ hour }:${ minute }`;
+      }
+      this.setValues(this.extras.date, startTime);
+    }
   }
 
   ngOnDestroy(): void {
@@ -151,48 +151,6 @@ export class UnavailableComponent implements OnInit, OnDestroy {
   }
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d, this.roomAvailability);
-
-  setDate($event: any): void {
-    const date = newDate($event.value);
-
-    let max;
-    let maxTime;
-    let minTime;
-    let availability;
-    if (this.rooms.length) {
-      const day = date.getDay();
-      const { minDate, maxDate, roomAvailability } = getMinMaxDate(day, $event.value, this.rooms);
-      max = maxDate;
-      minTime = getTime(minDate);
-      maxTime = getTime(maxDate);
-      availability = roomAvailability;
-    }
-
-    const maxHour = max?.getHours();
-    const diffMin = max?.getMinutes();
-
-    const d = diffTime(date, maxHour, diffMin);
-
-    this.setValues($event.value, undefined, minTime, maxTime, false, formatTime(d), availability);
-  }
-
-  setTime($event: any): void {
-    const time = getTimeNumber($event)!;
-    const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time.hour, time.minute);
-
-    let maxHour;
-    let diffMin;
-    const max = getTimeNumber(this.maxTime);
-    if (max) {
-      maxHour = max.hour;
-      diffMin = max.minute;
-    }
-
-    const d = diffTime(date, Number(maxHour), Number(diffMin));
-
-    this.setValues(this.startDate.value, $event, this.minTime, this.maxTime, true, formatTime(d),
-      this.roomAvailability);
-  }
 
   getRoom(user: IUser): void {
     this.store.dispatch(
@@ -234,6 +192,10 @@ export class UnavailableComponent implements OnInit, OnDestroy {
       allDay: this.allDay,
       endDate: this.endDate
     });
+    this.valueChange();
+  }
+
+  private valueChange(): void {
     this.allDay.valueChanges.subscribe(value => {
       if (value) {
         this.duration.clearValidators();
@@ -263,6 +225,64 @@ export class UnavailableComponent implements OnInit, OnDestroy {
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filter(name) : this.professionals ? this.professionals.slice() : this.professionals)
     );
+
+    this.startDate.valueChanges.subscribe(value => {
+      if (value) {
+        if (this.rooms.length) {
+          this.setMaxMin(value, this.rooms);
+        }
+        this.startTime.setValue(undefined);
+        this.duration.setValue(undefined);
+      }
+    });
+
+    this.startTime.valueChanges.subscribe(value => {
+      if (value) {
+        const time = getTimeNumber(value)!;
+        const date = createNewDate(this.startDate.value ? newDate(this.startDate.value) : getNow(), time.hour, time.minute);
+
+        let maxHour;
+        let diffMin;
+        const max = getTimeNumber(this.maxTime);
+        if (max) {
+          maxHour = max.hour;
+          diffMin = max.minute;
+        }
+
+        const d = diffTime(date, Number(maxHour), Number(diffMin));
+
+        this.showDuration = true;
+        this.durationMax = formatTime(d);
+        this.duration.setValue(undefined);
+      }
+    });
+
+    this.professional.valueChanges.subscribe(value => {
+      if (!this.rooms?.length && value) {
+        this.getRoom(value);
+      }
+    });
+  }
+
+  private setMaxMin(startDate: Date, rooms: IRoomAll[]): void {
+    const day = startDate.getDay();
+    const { minDate, maxDate, roomAvailability } = getMinMaxDate(day, startDate, rooms);
+    const max = maxDate;
+    const minTime = getTime(minDate);
+    const maxTime = getTime(maxDate);
+    const availability = roomAvailability;
+
+    const maxHour = max?.getHours();
+    const diffMin = max?.getMinutes();
+
+    const d = diffTime(startDate, maxHour, diffMin);
+
+    this.minTime = minTime;
+    this.maxTime = maxTime;
+    this.showDuration = false;
+    this.durationMax = formatTime(d);
+    this.roomAvailability = availability;
+    this.showEnd = false;
   }
 
   private clean(): void {
@@ -281,8 +301,14 @@ export class UnavailableComponent implements OnInit, OnDestroy {
     this.subscription = this.getState.subscribe(state => {
       if (state.professionals) {
         this.professionals = state.professionals;
+        if (this.professionals?.length === 1 && !this.professional.value) {
+          this.professional.setValue(this.professionals[0]);
+        }
       }
       if (state.room) {
+        if (!this.rooms?.length && this.startDate.value) {
+          this.setMaxMin(this.startDate.value, state.room);
+        }
         this.rooms = state.room;
       }
       if (state.subErrors) {
