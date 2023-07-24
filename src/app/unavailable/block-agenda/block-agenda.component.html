@@ -1,0 +1,96 @@
+<div class="flex-container" fxLayout="column">
+  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
+    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+      <form (ngSubmit)="create" [formGroup]="form" novalidate>
+        <mat-card appearance="outlined" class="style-card">
+          <mat-card-header>
+            <mat-card-title>{{ 'UNAVAILABLE.TITLE' | translate }}</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+              <mat-form-field *ngIf="professionals; else skeleton" appearance="outline">
+                <mat-label>{{ 'UNAVAILABLE.PROFESSIONAL.FIELD' | translate }}</mat-label>
+                <label>
+                  <input (keydown)="keyDownHandler($event)" [formControl]="professional" [matAutocomplete]="auto"
+                         matInput required type="text">
+                </label>
+                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+                  <mat-option *ngFor="let professional of filteredOptions | async" [value]="professional">
+                    {{professional | userName}}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="professional.hasError('required')"
+                           [innerHTML]="'UNAVAILABLE.PROFESSIONAL.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="professional.hasError('requireMatch')"
+                           [innerHTML]="'UNAVAILABLE.PROFESSIONAL.INVALID' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['professional']">
+                  {{errors['professional']}}
+                </mat-error>
+              </mat-form-field>
+              <ng-template #skeleton>
+                <div class="ssc-line"></div>
+              </ng-template>
+
+              <div *ngIf="professional.valid" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
+                <mat-form-field appearance="outline" color="primary" style="margin-right: 12px;">
+                  <mat-label>{{ 'UNAVAILABLE.DATE.FIELD' | translate }}</mat-label>
+                  <button (click)="picker.open()" mat-icon-button matPrefix>
+                    <mat-icon>today</mat-icon>
+                  </button>
+                  <label>
+                    <input (focus)="picker.open()" [formControl]="startDate"
+                           [matDatepickerFilter]="myFilter" [matDatepicker]="picker" matInput required>
+                  </label>
+                  <mat-datepicker #picker touchUi></mat-datepicker>
+                  <mat-error *ngIf="startDate.hasError('required')"
+                             [innerHTML]="'UNAVAILABLE.DATE.REQUIRED' | translate">
+                  </mat-error>
+                  <mat-error *ngIf="errors['startDate']">
+                    {{errors['startDate']}}
+                  </mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="outline" style="margin-right: 12px;">
+                  <mat-label>{{ 'UNAVAILABLE.TIME.FIELD' | translate }}</mat-label>
+                  <label>
+                    <input (focusin)="focusin" [formControl]="startTime" [format]="24" [max]="maxTime" [min]="minTime"
+                           [ngxTimepicker]="time" matInput name="start_time" readonly/>
+                  </label>
+                  <span matPrefix><mat-icon (click)="time.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
+                  <ngx-material-timepicker #time [minutesGap]="15"></ngx-material-timepicker>
+                  <mat-error *ngIf="startTime.hasError('required')"
+                             [innerHTML]="'UNAVAILABLE.TIME.REQUIRED' | translate">
+                  </mat-error>
+                </mat-form-field>
+              </div>
+
+              <mat-form-field *ngIf="showDuration" appearance="outline">
+                <mat-label>{{ 'UNAVAILABLE.DURATION.FIELD' | translate }}</mat-label>
+                <label>
+                  <input [formControl]="duration" [format]="24" [max]="durationMax" [ngxTimepicker]="t" matInput
+                         name="duration" readonly/>
+                </label>
+                <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
+                <ngx-material-timepicker #t [minutesGap]="15"></ngx-material-timepicker>
+                <mat-error *ngIf="duration.hasError('required')"
+                           [innerHTML]="'UNAVAILABLE.DURATION.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['duration']">
+                  {{errors['duration']}}
+                </mat-error>
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+          <mat-card-actions>
+            <div fxFlex></div>
+            <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
+                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button"
+                    type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
+          </mat-card-actions>
+        </mat-card>
+      </form>
+    </div>
+  </div>
+</div>

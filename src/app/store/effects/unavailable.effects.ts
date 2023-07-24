@@ -57,6 +57,16 @@ export class UnavailableEffects {
     ))
   ));
 
+  blockAgenda$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableBlockAgenda)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.unavailableService.blockAgenda(payload).pipe(
+      switchMap((response: any) => {
+        const message = this.translate.instant('UNAVAILABLE.CREATED', {date: newDateTimestamp(response.timestamp)});
+        return of(new fromActionsUnavailable.UnavailableSaveSuccess({message}));
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({error: err.error})))
+    ))
+  ));
+
   update = createEffect(() => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableUpdate)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.unavailableService.update(payload).pipe(
