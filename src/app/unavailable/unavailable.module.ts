@@ -11,12 +11,14 @@ import { UnavailableEffects } from '../store/effects/unavailable.effects';
 import { UnavailableService } from '../services/unavailable.service';
 import { UserService } from '../services/user.service';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { BlockAgendaComponent } from './block-agenda/block-agenda.component';
 
 @NgModule({
   declarations: [
     UnavailableComponent,
     UnavailableListComponent,
-    UnavailableDetailComponent
+    UnavailableDetailComponent,
+    BlockAgendaComponent
   ],
   imports: [
     UnavailableRoutingModule,

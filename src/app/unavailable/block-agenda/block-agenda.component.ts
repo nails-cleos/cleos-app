@@ -1,13 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { IUser, IUserAll } from '../../interfaces/user';
+import { IRoomAll } from '../../interfaces/room';
+import { Observable, Subscription } from 'rxjs';
+import { requireMatch } from '../../util/validators';
+import { IUnavailable, Unavailable } from '../../interfaces/unavailable';
 import { Store } from '@ngrx/store';
-import { AppState, selectUnavailableState } from '../store/app.states';
-import { IUnavailable, Unavailable, UnavailableRepeatType } from '../interfaces/unavailable';
-import * as fromActionsUnavailable from '../store/unavailable.actions';
-import { IUser, IUserAll } from '../interfaces/user';
-import { requireMatch } from '../util/validators';
-import { map, startWith } from 'rxjs/operators';
+import { AppState, selectUnavailableState } from '../../store/app.states';
+import { Router } from '@angular/router';
 import {
   API_LOCALE,
   createNewDate,
@@ -20,18 +20,18 @@ import {
   getTime,
   getTimeNumber,
   newDate
-} from '../util/dates';
-import { IRoomAll } from '../interfaces/room';
-import { getUserName } from '../util/helper';
-import { Router } from '@angular/router';
-import { closest } from '../util/numbers';
+} from '../../util/dates';
+import * as fromActionsUnavailable from '../../store/unavailable.actions';
+import { getUserName } from '../../util/helper';
+import { map, startWith } from 'rxjs/operators';
+import { closest } from '../../util/numbers';
 
 @Component({
-  selector: 'app-unavailable',
-  templateUrl: './unavailable.component.html',
-  styleUrls: ['./unavailable.component.scss']
+  selector: 'app-block-agenda',
+  templateUrl: './block-agenda.component.html',
+  styleUrls: ['./block-agenda.component.scss']
 })
-export class UnavailableComponent implements OnInit, OnDestroy {
+export class BlockAgendaComponent implements OnInit, OnDestroy {
   form!: UntypedFormGroup;
 
   professionals?: IUserAll[];
@@ -45,21 +45,12 @@ export class UnavailableComponent implements OnInit, OnDestroy {
   startDate: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  endDate: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required
-  ]);
   startTime: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
   duration: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
-  repeat: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required
-  ]);
-  allDay: UntypedFormControl = new UntypedFormControl();
-
-  repeats = UnavailableRepeatType;
 
   errors: any = [];
 
@@ -68,7 +59,6 @@ export class UnavailableComponent implements OnInit, OnDestroy {
   maxTime: any;
 
   showDuration = false;
-  showEnd = false;
 
   private getState: Observable<any>;
   private subscription?: Subscription;
@@ -84,28 +74,17 @@ export class UnavailableComponent implements OnInit, OnDestroy {
       return;
     }
 
-    let date: Date;
-    if (!this.allDay.value) {
-      const time = getTimeNumber(this.startTime.value)!;
-      date = createNewDate(this.startDate.value, time.hour, time.minute);
-    } else {
-      date = createNewDate(this.startDate.value);
-    }
+    const time = getTimeNumber(this.startTime.value)!;
+    const date = createNewDate(this.startDate.value, time.hour, time.minute);
 
     const unavailable: IUnavailable = new Unavailable();
     unavailable.professionalId = this.professional.value.id;
-    unavailable.description = this.form.value.description;
     unavailable.start = date.toLocaleString(API_LOCALE);
     unavailable.timeZone = getCurrentTimeZone();
-    unavailable.repeat = this.repeat.value;
     unavailable.duration = this.duration.value;
-    unavailable.allDay = this.allDay.value;
-    if (this.endDate.value) {
-      unavailable.end = createNewDate(this.endDate.value).toLocaleString(API_LOCALE);
-    }
 
     return this.store.dispatch(
-      new fromActionsUnavailable.UnavailableSave(unavailable)
+      new fromActionsUnavailable.BlockAgenda(unavailable)
     );
   }
 
@@ -175,10 +154,6 @@ export class UnavailableComponent implements OnInit, OnDestroy {
     this.durationMax = durationMax;
     this.roomAvailability = roomAvailability;
     this.duration.setValue(undefined);
-    this.endDate.setValue(undefined);
-    this.repeat.setValue(undefined);
-    this.allDay.setValue(startDate ? this.allDay.value : false);
-    this.showEnd = false;
   }
 
   private createForm(): void {
@@ -188,44 +163,16 @@ export class UnavailableComponent implements OnInit, OnDestroy {
       startDate: this.startDate,
       startTime: this.startTime,
       duration: this.duration,
-      repeat: this.repeat,
-      allDay: this.allDay,
-      endDate: this.endDate
-    });
-    this.valueChange();
-  }
-
-  private valueChange(): void {
-    this.allDay.valueChanges.subscribe(value => {
-      if (value) {
-        this.duration.clearValidators();
-        this.duration.updateValueAndValidity();
-        this.startTime.clearValidators();
-        this.startTime.updateValueAndValidity();
-      } else {
-        this.duration.setValidators(Validators.required);
-        this.duration.updateValueAndValidity();
-        this.startTime.setValidators(Validators.required);
-        this.startTime.updateValueAndValidity();
-      }
-    });
-    this.repeat.valueChanges.subscribe(value => {
-      if (value && (value === UnavailableRepeatType.onceAWeek || value === UnavailableRepeatType.everyDay)) {
-        this.endDate.setValidators(Validators.required);
-        this.endDate.updateValueAndValidity();
-        this.showEnd = true;
-      } else {
-        this.endDate.clearValidators();
-        this.endDate.updateValueAndValidity();
-        this.showEnd = false;
-      }
     });
     this.filteredOptions = this.professional.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filter(name) : this.professionals ? this.professionals.slice() : this.professionals)
     );
+    this.valueChange();
+  }
 
+  private valueChange(): void {
     this.startDate.valueChanges.subscribe(value => {
       if (value) {
         if (this.rooms.length) {
@@ -282,7 +229,6 @@ export class UnavailableComponent implements OnInit, OnDestroy {
     this.showDuration = false;
     this.durationMax = formatTime(d);
     this.roomAvailability = availability;
-    this.showEnd = false;
   }
 
   private clean(): void {

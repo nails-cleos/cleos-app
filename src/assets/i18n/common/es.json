@@ -37,6 +37,7 @@
       "MERGE": "Unir",
       "EXPORT": "Guardar & Exportar",
       "SAVE": "Guardar",
+      "BLOCK_AGENDA": "Bloquear agenda",
       "EXPAND": {
         "TRUE": "Presiona para mostrar menos",
         "FALSE": "Presiona para mostrar más"

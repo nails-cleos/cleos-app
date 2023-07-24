@@ -112,6 +112,7 @@ export const reducer = (state = initialState, action: All): State => {
     }
     case UnavailableActionTypes.unavailableUpdate:
     case UnavailableActionTypes.unavailableSave:
+    case UnavailableActionTypes.unavailableBlockAgenda:
     case UnavailableActionTypes.unavailableDelete: {
       return {
         ...state,

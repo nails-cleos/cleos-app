@@ -37,6 +37,7 @@
       "MERGE": "Merge",
       "EXPORT": "Save & Export",
       "SAVE": "Save",
+      "BLOCK_AGENDA": "Block agenda",
       "EXPAND": {
         "TRUE": "Click to show less",
         "FALSE": "Click to show more"

@@ -7,6 +7,7 @@ export enum UnavailableActionTypes {
   getRoom = '[Unavailable] Get room',
   roomSuccess = '[Unavailable] Get room success',
   unavailableSave = '[Unavailable] Save',
+  unavailableBlockAgenda = '[Unavailable] Block agenda',
   unavailableUpdate = '[Unavailable] Update',
   unavailableSaveSuccess = '[Unavailable] Save Success',
   unavailableFailure = '[Unavailable] Failure',
@@ -50,6 +51,13 @@ export class RoomSuccess implements Action {
 
 export class UnavailableSave implements Action {
   readonly type = UnavailableActionTypes.unavailableSave;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class BlockAgenda implements Action {
+  readonly type = UnavailableActionTypes.unavailableBlockAgenda;
 
   constructor(public payload: any) {
   }
@@ -106,6 +114,7 @@ export type All =
   | GetAllProfessional
   | GetRoom
   | UnavailableSave
+  | BlockAgenda
   | UnavailableUpdate
   | UnavailableSuccess
   | RoomSuccess
