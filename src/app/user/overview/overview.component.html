@@ -90,7 +90,7 @@
   <div fxFlex></div>
   <button appBackButton color="accent" mat-fab extended type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
 </div>
-<ng-template [ngIf]="upcoming.length && (user?.phone || user?.oldPhone)">
+<ng-template [ngIf]="upcoming.length && user?.phone">
   <button color="accent" id="add-button" mat-fab (click)="notification">
     <mat-icon>campaign</mat-icon>
   </button>
