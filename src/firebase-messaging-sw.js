@@ -1,10 +1,10 @@
-import {initializeApp} from "firebase/app";
-import {getMessaging} from "firebase/messaging/sw";
+importScripts('https://www.gstatic.com/firebasejs/9.18.0/firebase-app.js');
+importScripts('https://www.gstatic.com/firebasejs/9.18.0/firebase-messaging.js');
 
 // Initialize the Firebase app in the service worker by passing in
 // your app's Firebase config object.
 // https://firebase.google.com/docs/web/setup#config-object
-const firebaseApp = initializeApp({
+firebase.initializeApp({
   apiKey: 'AIzaSyCQw4--OYnNQTpsLe9yoaqVnT4z_csjnrk',
   authDomain: 'nails-cleos.firebaseapp.com',
   databaseURL: 'https://nails-cleos-default-rtdb.europe-west1.firebasedatabase.app/',
@@ -18,4 +18,4 @@ const firebaseApp = initializeApp({
 
 // Retrieve an instance of Firebase Messaging so that it can handle background
 // messages.
-const messaging = getMessaging(firebaseApp);
+const messaging = firebase.messaging();
