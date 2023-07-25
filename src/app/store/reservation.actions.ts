@@ -52,6 +52,7 @@ export enum ReservationActionTypes {
   colorsCompleteSuccess = '[Reservation] Colors complete success',
   updateNote = '[Reservation] Update note',
   updateDiscount = '[Reservation] Update discount',
+  updateTimestamp = '[Reservation] Update timestamp',
   clean = '[Reservation] Clean'
 }
 
@@ -403,6 +404,13 @@ export class UpdateDiscount implements Action {
   }
 }
 
+export class UpdateTimestamp implements Action {
+  readonly type = ReservationActionTypes.updateTimestamp;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class Clean implements Action {
   readonly type = ReservationActionTypes.clean;
 }
@@ -458,4 +466,5 @@ export type All =
   | ColorSuccess
   | UpdateNote
   | UpdateDiscount
+  | UpdateTimestamp
   | Clean;

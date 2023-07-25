@@ -8,7 +8,7 @@
       <button (click)="addNote" mat-icon-button type="button" color="accent">
         <mat-icon>note_add</mat-icon>
       </button>
-      <ng-template [ngIf]="isReservationAdmin">
+      <ng-template [ngIf]="isReservationAdmin && reservation.state === 'APPROVED'">
         <button (click)="addDiscount" mat-icon-button type="button" color="accent">
           <mat-icon>switch_access_shortcut_add</mat-icon>
         </button>
@@ -113,8 +113,9 @@
         </mat-list-item>
       </ng-template>
 
-      <ng-template [ngIf]="reservation.treatment.extras || (reservation.additional && reservation.additional.length)"
-                   [ngIfElse]="singleTreatment">
+      <ng-template
+        [ngIf]="reservation.treatment.extras?.description || price.extra || (reservation.additional && reservation.additional.length)"
+        [ngIfElse]="singleTreatment">
         <ng-template [ngIf]="reservation.treatment.extras">
           <div>
             <mat-divider></mat-divider>

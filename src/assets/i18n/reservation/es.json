@@ -211,6 +211,10 @@
       "ADD": "Agregar descuento",
       "FIELD": "Seleccionar descuento",
       "REQUIRED": "Descuento es <b>requerido</b>"
+    },
+    "MOVE": {
+      "TITLE": "¿Estás segura de mover la reserva de {{customer}}?",
+      "CONTENT": "Del: {{from}} <br> Al: {{to}}"
     }
   },
   "PAYMENT": {

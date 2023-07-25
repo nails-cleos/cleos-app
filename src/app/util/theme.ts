@@ -47,7 +47,10 @@ const getTheme = (theme: string | undefined): Theme => theme === dark ? dark : l
 
 const stateColor = (isDark: boolean): IState[] => [{
   name: 'CREATED',
-  color: isDark ? '#fafafa' : '#ababab'// accent-lighter
+  color: isDark ? '#dcc8c2' : '#ceb4ac'// accent-dark
+}, {
+  name: 'EDITING',
+  color: isDark ? '#ffd991' : '#ffd078'// primary-A-dark
 }, {
   name: 'PARTIALLY_COMPLETED',
   color: '#a9a397'
@@ -65,10 +68,10 @@ const stateColor = (isDark: boolean): IState[] => [{
   color: isDark ? '#e6b9ff' : '#673ab7'
 }, {
   name: 'APPROVED',
-  color: isDark ? '#e3d3c5' : '#a06c3f' // primary-lighter
+  color: isDark ? '#a9a397' : '#8f887a' // primary-dark
 }, {
   name: 'DEFAULT',
-  color: isDark ? '#f08080' : '#ffb3b3' // warn-lighter
+  color: isDark ? '#f08080' : '#ffb3b3' // warn-dark-lighter
 }];
 
 const selectedTheme = (value: Theme | undefined, themeService: ThemeService): void => {

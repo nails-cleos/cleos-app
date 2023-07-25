@@ -34,14 +34,17 @@ export class Meta implements IMeta {
   route?: string[];
   professionalId?: string;
   total?: number;
+  id?: string;
+  customer?: string;
 
-  constructor(time?: boolean, timeZone?: string, state?: string, route?: string[], professionalId?: string, total?: number) {
+  constructor(time?: boolean, timeZone?: string, state?: string, route?: string[], professionalId?: string, total?: number, id?: string) {
     this.time = time;
     this.timeZone = timeZone;
     this.state = state;
     this.route = route;
     this.professionalId = professionalId;
     this.total = total;
+    this.id = id;
   }
 }
 
@@ -95,14 +98,15 @@ export const newEvent = (title: string, color: string, start: Date, end: Date, i
   return undefined;
 };
 
-export const monthEvent = (title: string, start: Date, end: Date | null, id: string, color: string,
-                           meta: Meta = new Meta(true), isDarkMode: boolean): CalendarEvent | undefined => ({
+export const monthEvent = (title: string, start: Date, end: Date | null, id: string, color: string, meta: Meta, isDarkMode: boolean,
+                           draggable: boolean = false): CalendarEvent | undefined => ({
   id,
   start,
   title,
   end,
   color: createEventColor(color, isDarkMode, true),
-  meta
+  meta,
+  draggable
 } as unknown as CalendarEvent);
 
 export const getOverlapEvent = (events: any[], eventStartDay: Date, eventEndDay: Date,
