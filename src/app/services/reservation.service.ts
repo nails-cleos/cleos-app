@@ -154,4 +154,8 @@ export class ReservationService {
   public addDiscount(id: string, discountId: string): Observable<IReservation> {
     return this.http.patch<IReservation>(`${ this.urlV1 }/${ id }/discounts/${ discountId }`, null);
   }
+
+  public addTimestamp(id: string, start: string): Observable<IReservation> {
+    return this.http.patch<IReservation>(`${ this.urlV1 }/${ id }/timestamp`, start);
+  }
 }

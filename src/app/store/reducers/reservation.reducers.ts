@@ -196,6 +196,7 @@ export const reducer = (state = initialState, action: All): State => {
     }
     case ReservationActionTypes.updateNote:
     case ReservationActionTypes.updateDiscount:
+    case ReservationActionTypes.updateTimestamp:
     case ReservationActionTypes.edit: {
       return {
         ...state,

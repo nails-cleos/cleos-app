@@ -8,9 +8,10 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import {
   addPeriod,
+  API_LOCALE,
   CalendarPeriod,
   createNewDate,
-  endOfPeriod,
+  endOfPeriod, formatDateTime,
   getAvailability,
   getDuration,
   getNow,
@@ -27,18 +28,19 @@ import {
 import { IRoom, IRoomAll } from '../../interfaces/room';
 import { createBullet, createRecurringEvent, fillNotAvailable, getOverlapEvent, Meta, newEvent } from '../../util/event';
 import { Router } from '@angular/router';
-import { CalendarEvent } from 'angular-calendar';
+import { CalendarEvent, CalendarEventTimesChangedEvent } from 'angular-calendar';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { IUnavailableAll } from '../../interfaces/unavailable';
 import { createRoomOffice, executeDialogNoWidth, getFullUserName, getUserName } from '../../util/helper';
-import { addMonths } from 'date-fns';
+import { addMonths, isEqual } from 'date-fns';
 import { findStateColor, isDarkMode } from '../../util/theme';
 import { map, startWith, takeUntil } from 'rxjs/operators';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { IOffice } from '../../interfaces/office';
 import { requireMatch } from '../../util/validators';
 import { CalendarDialogComponent } from '../../shared/dialog/calendar/calendar-dialog.component';
+import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 
 @Component({
   selector: 'app-calendar',
@@ -76,6 +78,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
   professional: UntypedFormControl = new UntypedFormControl('', [
     requireMatch
   ]);
+
+  refresh: Subject<any> = new Subject();
 
   private isDarkMode?: boolean;
   private selectView: CalendarPeriod = 'day';
@@ -222,6 +226,33 @@ export class CalendarComponent implements OnInit, OnDestroy {
     });
   }
 
+  eventTimesChanged({ event, newStart, newEnd }: CalendarEventTimesChangedEvent): void {
+    // todo move?
+    if (isEqual(event.start, newStart)) {
+      return;
+    }
+    const oldStart = event.start;
+    const oldEnd = event.end;
+    event.start = newStart;
+    event.end = newEnd;
+    this.refresh.next(event);
+    const title = this.translate.instant('RESERVATION.MOVE.TITLE', { customer: event.meta.customer?.trim() });
+    const from = formatDateTime(oldStart, this.locale);
+    const to = formatDateTime(newStart, this.locale);
+    const content = this.translate.instant('RESERVATION.MOVE.CONTENT', { from, to });
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: event }, result => {
+      if (result) {
+        this.store.dispatch(
+          new fromActionsReservation.UpdateTimestamp({ reservationId: event.meta.id, start: event.start.toLocaleString(API_LOCALE) })
+        );
+      } else {
+        event.start = oldStart;
+        event.end = oldEnd;
+        this.refresh.next(event);
+      }
+    });
+  }
+
   private createForm(): void {
     this.officeForm = this.formBuilder.group({
       office: this.office,
@@ -335,7 +366,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
         const color = findStateColor(it.state, darkMode);
         const meta = new Meta(true, it.room.timeZone);
-        const event = newEvent(detail, color, start, end, darkMode, `reservation/${ it.id }`, meta);
+        meta.id = it.id;
+        meta.customer = getUserName(it.customer);
+        const event = newEvent(detail, color, start, end, darkMode, `reservation/${ it.id }`, meta, true);
         if (event) {
           let events;
           if (this.calendar) {
@@ -381,7 +414,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
       const overlapEvent = getOverlapEvent(events, start, end);
       if (overlapEvent.length > 0) {
         overlapEvent.forEach(value => {
-          if (value.id !== 'NOT_WORKING_ALL_DAY') {
+          if (!value.id) {
             events = events.filter(ev => ev !== value);
             if (value.end) {
               if (start < value.start && end < value.end) {
@@ -392,14 +425,10 @@ export class CalendarComponent implements OnInit, OnDestroy {
                 events = [...events, value];
               }
             }
-            if (events.find(ce => ce.id !== `unavailable/${ it.id }`)) {
-              this.createUnavailableEvent(room, events, this.calendar?.day, it, start, end, darkMode);
-            }
           }
         });
-      } else {
-        this.createUnavailableEvent(room, events, this.calendar.day, it, start, end, darkMode);
       }
+      this.createUnavailableEvent(room, events, this.calendar.day, it, start, end, darkMode);
     }
   }
 
