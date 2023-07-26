@@ -109,12 +109,12 @@
           </ng-template>
           <mat-card-actions *ngIf="unavailable; else buttonSkeleton">
             <div fxFlex></div>
-            <button (click)="delete" color="warn" mat-fab extended class="icon-button"
-                    type="button">{{ 'COMMON.BUTTON.DELETE' | translate }}</button>
             <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
             <button [disabled]="form.invalid || form.pristine" color="primary" mat-fab extended class="icon-button"
                     type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
+            <button (click)="delete" color="warn" mat-fab extended class="icon-button"
+                    type="button">{{ 'COMMON.BUTTON.DELETE' | translate }}</button>
           </mat-card-actions>
           <ng-template #buttonSkeleton>
             <div class="ssc-head-line"></div>
