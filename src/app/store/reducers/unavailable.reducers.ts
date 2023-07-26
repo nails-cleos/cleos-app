@@ -47,7 +47,6 @@ export const reducer = (state = initialState, action: All): State => {
         professionals: null,
         errorMessage: null,
         subErrors: null,
-        selected: null,
         message: null
       };
     }
@@ -57,7 +56,6 @@ export const reducer = (state = initialState, action: All): State => {
         room: null,
         errorMessage: null,
         subErrors: null,
-        selected: null,
         message: null
       };
     }

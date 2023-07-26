@@ -27,6 +27,11 @@ const routes: Routes = [
     path: 'block-agenda/add', component: BlockAgendaComponent, canActivate: [authGuard], data: {
       roles: [Role.admin, Role.professional]
     }
+  },
+  {
+    path: 'block-agenda/:id', component: BlockAgendaComponent, canActivate: [authGuard], data: {
+      roles: [Role.admin, Role.professional]
+    }
   }
 ];
 

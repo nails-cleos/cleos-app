@@ -227,7 +227,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   eventTimesChanged({ event, newStart, newEnd }: CalendarEventTimesChangedEvent): void {
-    // todo move?
     if (isEqual(event.start, newStart)) {
       return;
     }
@@ -441,7 +440,12 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
     const color = findStateColor('DEFAULT', darkMode);
     const meta = new Meta(!it.allDay, room.timeZone);
-    const event = newEvent(detail, color, start, end, darkMode, `unavailable/${ it.id }`, meta);
+    let path = 'unavailable/';
+    if (it.type === 'BLOCK_AGENDA') {
+      path += 'block-agenda/';
+    }
+    path += it.id;
+    const event = newEvent(detail, color, start, end, darkMode, path, meta);
     if (event) {
       events = [...events, event];
       const calendar = new Calendar(room, events);
