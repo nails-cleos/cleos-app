@@ -116,6 +116,8 @@
       (beforeViewRender)="beforeMonthViewRender($event)"
       (eventClicked)="view($event.event)"
       (hourSegmentClicked)="segmentClick($event.date, calendar.room)"
+      (eventTimesChanged)="eventTimesChanged($event)"
+      [refresh]="refresh"
       [dayEndHour]="calendar.day!.dayEndHour"
       [dayEndMinute]="calendar.day!.dayEndMinute"
       [dayStartHour]="calendar.day!.dayStartHour"

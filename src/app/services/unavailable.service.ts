@@ -8,7 +8,7 @@ import { PAGE_SIZE } from '../interfaces/pagination';
 export class UnavailableService {
 
   private url = 'unavailable';
-  private urlV1 = `v1/${this.url}`;
+  private urlV1 = `v1/${ this.url }`;
 
   constructor(private http: HttpClient) {
   }
@@ -22,11 +22,11 @@ export class UnavailableService {
       params = params.append('direction', direction);
     }
 
-    return this.http.get<IUnavailable[]>(`${this.urlV1}/pages`, {params});
+    return this.http.get<IUnavailable[]>(`${ this.urlV1 }/pages`, { params });
   }
 
   public getById(id: string | null): Observable<IUnavailable | undefined> {
-    const url = `${this.urlV1}/${id}`;
+    const url = `${ this.urlV1 }/${ id }`;
     return this.http.get<IUnavailable>(url);
   }
 
@@ -34,13 +34,17 @@ export class UnavailableService {
     return this.http.post<IUnavailable>(this.urlV1, unavailable);
   }
 
+  public blockAgenda(unavailable: IUnavailable): Observable<IUnavailable> {
+    return this.http.post<IUnavailable>(`${ this.urlV1 }/block/agenda`, unavailable);
+  }
+
   public delete(id: string | null): Observable<IUnavailable> {
-    const url = `${this.urlV1}/${id}`;
+    const url = `${ this.urlV1 }/${ id }`;
     return this.http.delete<IUnavailable>(url);
   }
 
   public update(unavailable: IUnavailable): Observable<IUnavailable> {
-    const url = `${this.urlV1}/${unavailable.id}`;
+    const url = `${ this.urlV1 }/${ unavailable.id }`;
     return this.http.patch<IUnavailable>(url, unavailable);
   }
 }

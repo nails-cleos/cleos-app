@@ -4,6 +4,10 @@
     "TITLE": "Agregar no disponible",
     "CREATED": "No disponible {{date}} creado",
     "DETAIL": "Actualizar no disponible",
+    "BLOCK_AGENDA": {
+      "TITLE": "Agregar bloquear agenda",
+      "DETAIL": "Actualizar bloquear agenda"
+    },
     "LIST": {
       "COLUMN": {
         "PROFESSIONAL": "Profesional",

@@ -16,3 +16,6 @@ export const twoDigitNumber = (value: number, locale: string = API_LOCALE) => va
   maximumFractionDigits: 2,
   minimumFractionDigits: 2
 });
+
+export const closest = (goal: number, counts: number[] = [0, 15, 30, 45]): number => counts
+  .reduce((prev, curr) => (Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev));

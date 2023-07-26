@@ -215,7 +215,7 @@ export class DashComponent implements OnInit, OnDestroy {
   }
 
   private segmentClick(date: Date, room?: IRoom): void {
-    const data = { date, room };
+    const data = { date };
     if (date && room) {
       executeDialogNoWidth(this.dialog, CalendarDialogComponent, null, result => {
         if (result) {
@@ -326,6 +326,9 @@ export class DashComponent implements OnInit, OnDestroy {
       });
       let recurring: any[] = [];
       this.state.calendarSummary.unavailable?.forEach((it: ICalendarUnavailable) => {
+        if (it.type === 'BLOCK_AGENDA') {
+          return;
+        }
         const start = newDateTimestamp(it.start);
         this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNow());
         const title = it.duration ? it.title : `${ this.translate.instant('COMMON.ALL_DAY.CHECK') } - ${ it.title }`;

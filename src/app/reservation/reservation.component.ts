@@ -1024,30 +1024,32 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           this.addReservations();
           this.addUnavailableList();
           const bookOrder = getIndex(this.steps, 'book_online');
-          if (this.reservationId && this.reservation && this.date.value && this.myStepper.selectedIndex === bookOrder) {
-            let date: Date;
-            if (this.start?.value) {
-              const time = getTimeNumber(this.start.value);
-              date = createNewDate(this.date.value, time?.hour, time?.minute);
-            } else {
-              date = createNewDate(this.date.value, this.date.value.getHours(), this.date.value.getMinutes());
-            }
-            if (isEqual(newDateTimestamp(this.reservation.timestamp), date)) {
-              const duration = reservationDuration(this.reservation);
-              const end = createNewDate(date, date.getHours() + duration.hour,
-                date.getMinutes() + duration.minute);
-              const event = this.createNewEvent(date, end, this.reservation.state, this.reservation.room.timeZone,
-                this.reservation.id);
-              if (event) {
-                this.event.setValue(event);
-                this.events = [...this.events, event];
+          setTimeout(() => {
+            if (this.reservationId && this.reservation && this.date.value && this.myStepper.selectedIndex === bookOrder) {
+              let date: Date;
+              if (this.start?.value) {
+                const time = getTimeNumber(this.start.value);
+                date = createNewDate(this.date.value, time?.hour, time?.minute);
+              } else {
+                date = createNewDate(this.date.value, this.date.value.getHours(), this.date.value.getMinutes());
               }
-            } else {
-              this.segmentClick(date, this.reservation.state, this.reservation.id);
+              if (isEqual(newDateTimestamp(this.reservation.timestamp), date)) {
+                const duration = reservationDuration(this.reservation);
+                const end = createNewDate(date, date.getHours() + duration.hour,
+                  date.getMinutes() + duration.minute);
+                const event = this.createNewEvent(date, end, 'EDITING', this.reservation.room.timeZone,
+                  this.reservation.id);
+                if (event) {
+                  this.event.setValue(event);
+                  this.events = [...this.events, event];
+                }
+              } else {
+                this.segmentClick(date, 'EDITING', this.reservation.id);
+              }
+            } else if ((this.extras?.date || this.start.value && this.myStepper.selectedIndex === bookOrder) && !this.event.value) {
+              this.segmentClick(this.date.value, 'CREATED');
             }
-          } else if ((this.extras?.date || this.start.value && this.myStepper.selectedIndex === bookOrder) && !this.event.value) {
-            this.segmentClick(this.date.value, 'CREATED');
-          }
+          }, 50);
         }
       }
       if (state.subErrors) {

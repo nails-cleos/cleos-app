@@ -33,6 +33,7 @@ export interface IUnavailableAll {
   professional: IUser;
   repeat: string;
   allDay: boolean;
+  type?: string;
 }
 
 export class Unavailable implements IUnavailable {

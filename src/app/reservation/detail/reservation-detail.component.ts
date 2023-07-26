@@ -399,7 +399,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     const color = this.createAction(translate.instant('RESERVATION.ACTION.COLOR'),
       ReservationIconName.color, 'color');
 
-    const userPhone = reservation.customer.phone || reservation.customer.oldPhone;
+    const userPhone = reservation.customer.phone;
 
     let approveActions: MatFabMenu[] = [];
     if (isToday(newDate(self.start))) {
