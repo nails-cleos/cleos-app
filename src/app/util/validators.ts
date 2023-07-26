@@ -14,13 +14,7 @@ export const requireMatch = (control: AbstractControl): any => {
   return null;
 };
 
-export const requireMatchAsync = (control: AbstractControl): Observable<ValidationErrors | null> => {
-  const selection: any = control.value;
-  if (selection && typeof selection === 'string') {
-    return of({ requireMatch: true });
-  }
-  return of(null);
-};
+export const requireMatchAsync = (control: AbstractControl): Observable<ValidationErrors | null> => of(requireMatch(control));
 
 export const confirmedValidator = (controlOne?: AbstractControl | null, controlTwo?: AbstractControl | null): any => () => {
   if (controlOne?.value !== controlTwo?.value) {
