@@ -2,15 +2,15 @@
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <mat-card appearance="outlined">
+        <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+          <firebase-ui></firebase-ui>
+          <div class="divider">
+            <mat-divider></mat-divider>
+          </div>
+        </div>
         <mat-tab-group #authGroup>
           <mat-tab label="{{ 'AUTH.SIGN_IN.TITLE' | translate }}">
             <mat-card-content>
-              <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-                <asl-google-signin-button type='standard' size='large' shape="circle"></asl-google-signin-button>
-              </div>
-              <div class="divider">
-                <mat-divider></mat-divider>
-              </div>
               <div class="divider-padding" fxLayout="column" fxLayoutAlign="space-evenly center">
                 <b>{{ 'AUTH.SIGN_IN.OR' | translate }}</b>
               </div>
@@ -25,13 +25,6 @@
           </mat-tab>
           <mat-tab label="{{ 'AUTH.SIGN_UP.TITLE' | translate }}">
             <mat-card-content>
-              <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-                <asl-google-signin-button type='standard' size='large' shape="circle"
-                                          text="signup_with"></asl-google-signin-button>
-              </div>
-              <div class="divider">
-                <mat-divider></mat-divider>
-              </div>
               <div class="divider-padding" fxLayout="column" fxLayoutAlign="space-evenly center">
                 <b>{{ 'AUTH.SIGN_UP.OR' | translate }}</b>
               </div>

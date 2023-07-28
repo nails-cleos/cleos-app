@@ -20,8 +20,7 @@ export class NotificationService {
     if (direction) {
       params = params.append('direction', direction);
     }
-    // return this.http.get<INotification[]>(`${ this.urlV1 }/pages`, { params });
-    return new Observable();
+    return this.http.get<INotification[]>(`${ this.urlV1 }/pages`, { params });
   }
 
   public readNotification(notificationId: string): Observable<INotification | undefined> {
@@ -31,7 +30,6 @@ export class NotificationService {
 
   public subscribe(token: string): Observable<any> {
     const url = `${ this.urlV1 }/subscribe`;
-    // return this.http.post(url, { token });
-    return new Observable();
+    return this.http.post(url, { token });
   }
 }
