@@ -206,7 +206,7 @@ export class NavComponent implements OnInit, OnDestroy {
         this.canChangePassword = user?.provider === 'LOCAL';
         this.initials = getUserNameInitials(user);
         this.image = getUserImage(user);
-        this.messagingService.requestPermission(user.id);
+        this.messagingService.requestPermission(user);
         this.messagingService.receiveMessage();
         this.messagingService.currentMessage?.subscribe((value: any) => {
           if (value) {

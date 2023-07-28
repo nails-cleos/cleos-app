@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, take } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { AppState } from '../store/app.states';
 import { Store } from '@ngrx/store';
 import * as fromActionsNotification from '../store/notification.actions';
 import { AngularFireMessaging } from '@angular/fire/compat/messaging';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { AngularFireDatabase } from '@angular/fire/compat/database';
+import { AngularFireDatabase, AngularFireList } from '@angular/fire/compat/database';
 import firebase from 'firebase/compat';
 import MessagePayload = firebase.messaging.MessagePayload;
 
@@ -15,27 +15,52 @@ import MessagePayload = firebase.messaging.MessagePayload;
 export class MessagingService {
   currentMessage?: BehaviorSubject<MessagePayload>;
 
+  tokenList: AngularFireList<any>;
+
   constructor(private store: Store<AppState>, private messaging: AngularFireMessaging, private auth: AngularFireAuth,
               private database: AngularFireDatabase) {
+    this.tokenList = database.list('/fcmTokens');
   }
 
   /**
    * update token in firebase database
    *
-   * @param userId userId as a key
+   * @param user user as a key
    * @param token the new token generated
    */
-  updateToken(userId: any, token: string): void {
+  updateToken(user: any, token: string): void {
     this.store.dispatch(
       new fromActionsNotification.NotificationSubscribe(token)
     );
-    this.auth.authState.pipe(take(1)).subscribe(
-      () => {
-        const data = {};
-        // @ts-ignore
-        data[userId] = token;
-        this.database.object('fcmTokens/').update(data);
-      });
+    const data = {};
+    // @ts-ignore
+    data[userId] = token;
+    this.tokenList.push(data);
+    // this.auth.authState.pipe(take(1)).subscribe(
+    //   () => {
+    //     const data = {};
+    //     // @ts-ignore
+    //     data[userId] = token;
+    //     this.database.object('fcmTokens/').update(data);
+    //   });
+
+    // if (user.provider === 'GOOGLE') {
+    //   const provider = new firebase.auth.GoogleAuthProvider();
+    //   provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+    //   this.auth.signInWithPopup(provider).then(() => {
+    //     const data = {};
+    //     // @ts-ignore
+    //     data[user.id] = token;
+    //     this.database.object('fcmTokens/').update(data);
+    //   });
+    // } else {
+    //   this.auth.createUserWithEmailAndPassword(user.email, user.username).then(() => {
+    //     const data = {};
+    //     // @ts-ignore
+    //     data[user.id] = token;
+    //     this.database.object('fcmTokens/').update(data);
+    //   });
+    // }
   }
 
   /**
@@ -54,14 +79,16 @@ export class MessagingService {
   /**
    * request permission for notification from firebase cloud messaging
    *
-   * @param userId userId
+   * @param user user
    */
-  requestPermission(userId: any): void {
+  requestPermission(user: any): void {
     this.messaging.requestPermission.subscribe(value => {
+      console.log('value', value);
       if (value === 'granted') {
         this.messaging.requestToken.subscribe(currentToken => {
+          console.log('currentToken', currentToken);
           if (currentToken) {
-            this.updateToken(userId, currentToken);
+            this.updateToken(user, currentToken);
           } else {
             console.warn('No registration token available. Request permission to generate one.');
           }

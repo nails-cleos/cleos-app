@@ -4,6 +4,9 @@
 
 export const environment = {
   production: false,
+  recaptcha: {
+    siteKey: '6LfEiF0nAAAAANfmwbXgOiMZg9TAzJjf4qNvr8uH'
+  },
   appServer: 'http://localhost:4200',
   title: 'Cleos DEV',
   version: require('../../package.json').version + '-dev',

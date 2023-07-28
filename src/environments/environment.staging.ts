@@ -1,5 +1,8 @@
 export const environment = {
   production: true,
+  recaptcha: {
+    siteKey: ''
+  },
   appServer: 'https://cleos-staging.herokuapp.com',
   title: 'CLEOS STAGING',
   version: require('../../package.json').version + '-staging',

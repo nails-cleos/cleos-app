@@ -1,5 +1,8 @@
 export const environment = {
-  production: false,
+  production: true,
+  recaptcha: {
+    siteKey: '6LfEiF0nAAAAANfmwbXgOiMZg9TAzJjf4qNvr8uH'
+  },
   appServer: 'http://localhsot:4200',
   title: 'Cleos PWA',
   version: require('../../package.json').version + '-pwa',

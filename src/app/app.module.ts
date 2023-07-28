@@ -44,6 +44,7 @@ import { reducers } from './store/app.states';
 
 // Components
 import { AppComponent } from './app.component';
+import { RECAPTCHA_V3_SITE_KEY, RecaptchaV3Module } from 'ng-recaptcha';
 
 export const getAuthServiceConfigs = (): SocialAuthServiceConfig => ({
   autoLogin: false,
@@ -103,7 +104,8 @@ registerLocaleData(localeAr, 'es-AR');
     AngularFireMessagingModule,
     AngularFireAnalyticsModule,
     AngularFireDatabaseModule,
-    AngularFireModule.initializeApp(environment.firebase)
+    AngularFireModule.initializeApp(environment.firebase),
+    RecaptchaV3Module
   ],
   providers: [
     {
@@ -128,6 +130,10 @@ registerLocaleData(localeAr, 'es-AR');
     {
       provide: LOCALE_ID,
       useValue: 'en-GB'
+    },
+    {
+      provide: RECAPTCHA_V3_SITE_KEY,
+      useValue: environment.recaptcha.siteKey,
     },
     TranslateService,
     { provide: APP_INITIALIZER, useFactory: (pwaService: PwaService) => () => pwaService.initPwaPrompt(), deps: [PwaService], multi: true }
