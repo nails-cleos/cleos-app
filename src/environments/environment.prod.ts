@@ -1,10 +1,14 @@
 export const environment = {
   production: true,
+  useEmulators: false,
+  recaptcha: {
+    siteKey: '6LcJf10nAAAAAFDvt_OLXZQ5J9tOwwxjhtW3McoY'
+  },
   appServer: 'https://www.nailscleos.nl',
   title: 'Cleos',
   version: require('../../package.json').version,
   baseUrl: 'https://api.nailscleos.nl/api',
-  googleClientId: '174727853234-hoc8nq88jjpn8fj3sjkaj7ook2egbmq4.apps.googleusercontent.com',
+  googleClientId: '174727853234-3pdb4doq776uuklfr7jsfp5ll33ork6c.apps.googleusercontent.com',
   facebookClientId: '523962545388946',
   firebase: {
     apiKey: 'AIzaSyCQw4--OYnNQTpsLe9yoaqVnT4z_csjnrk',

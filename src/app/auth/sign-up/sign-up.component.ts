@@ -20,7 +20,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
   @Output() codeEvent = new EventEmitter<string>();
 
   form!: UntypedFormGroup;
-  passwordFormGroup!: UntypedFormGroup
+  passwordFormGroup!: UntypedFormGroup;
   subscription: Subscription | undefined;
   getState: Observable<any>;
   errors: any = [];
@@ -58,7 +58,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
     }
     const user: IUser = new User();
     user.username = this.username.value;
-    user.email = this.email.value;
+    user.email = this.email.value.trim();
     user.password = this.passwordFormGroup.get('password')?.value;
     user.lang = this.lang.value.value;
     user.firstName = this.firstName.value;
@@ -101,7 +101,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
-          this.form.controls[value.field]?.setErrors({incorrect: true});
+          this.form.controls[value.field]?.setErrors({ incorrect: true });
         });
       } else if (state.errorMessage || state.message) {
         const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {

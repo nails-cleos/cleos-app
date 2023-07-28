@@ -5,6 +5,7 @@ import { IUser } from '../../interfaces/user';
 import { AppState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute } from '@angular/router';
+import { ReCaptchaV3Service } from 'ng-recaptcha';
 
 @Component({
   selector: 'app-sign-in',
@@ -17,7 +18,8 @@ export class SignInComponent implements OnInit {
   form!: UntypedFormGroup;
   user?: IUser;
 
-  constructor(private formBuilder: UntypedFormBuilder, private store: Store<AppState>, private route: ActivatedRoute) {
+  constructor(private formBuilder: UntypedFormBuilder, private store: Store<AppState>, private route: ActivatedRoute,
+              private recaptchaV3Service: ReCaptchaV3Service) {
   }
 
   get signIn(): void {
@@ -27,12 +29,19 @@ export class SignInComponent implements OnInit {
     const username: string = this.form.get('username')?.value.trim();
     const password: string = this.form.get('password')?.value.trim();
 
-    return this.store.dispatch(
-      new fromActionsLogin.Login({
-        username, password,
-        queryParams: this.route.snapshot.queryParams
-      })
-    );
+    this.recaptchaV3Service.execute('importantAction')
+      .subscribe((token) => {
+        if (token) {
+          this.store.dispatch(
+            new fromActionsLogin.Login({
+              username, password,
+              queryParams: this.route.snapshot.queryParams
+            })
+          );
+        }
+      });
+
+    return;
   }
 
   ngOnInit(): void {
