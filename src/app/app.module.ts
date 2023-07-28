@@ -2,7 +2,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { APP_INITIALIZER, LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthServiceConfig, SocialLoginModule } from '@abacritt/angularx-social-login';
 import { ActionReducer, MetaReducer, StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { AsyncPipe, registerLocaleData } from '@angular/common';
@@ -10,11 +9,11 @@ import { ServiceWorkerModule, SwPush } from '@angular/service-worker';
 import { AppRoutingModule } from './app-routing.module';
 import { Router } from '@angular/router';
 import { SharedModule } from './shared/shared.module';
-import { AngularFireModule } from '@angular/fire/compat';
-import { AngularFireMessagingModule } from '@angular/fire/compat/messaging';
-import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
-import { AngularFireAuthModule } from '@angular/fire/compat/auth';
-import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
+import { AngularFireModule, FIREBASE_OPTIONS } from '@angular/fire/compat';
+import { AngularFireAuthModule, USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/compat/auth';
+import { RECAPTCHA_V3_SITE_KEY, RecaptchaV3Module } from 'ng-recaptcha';
+import { AppCheckModule } from '@angular/fire/app-check';
+import { firebase, firebaseui, FirebaseUIModule } from 'firebaseui-angular';
 
 // Providers
 import { environment } from '../environments/environment';
@@ -44,24 +43,10 @@ import { reducers } from './store/app.states';
 
 // Components
 import { AppComponent } from './app.component';
-import { RECAPTCHA_V3_SITE_KEY, RecaptchaV3Module } from 'ng-recaptcha';
-
-export const getAuthServiceConfigs = (): SocialAuthServiceConfig => ({
-  autoLogin: false,
-  providers: [
-    {
-      id: GoogleLoginProvider.PROVIDER_ID,
-      provider: new GoogleLoginProvider(environment.googleClientId)
-    },
-    {
-      id: FacebookLoginProvider.PROVIDER_ID,
-      provider: new FacebookLoginProvider(environment.facebookClientId)
-    }
-  ],
-  onError: (err) => {
-    console.error(err);
-  }
-});
+import { isMobile } from './util/helper';
+import { AngularFireMessagingModule } from '@angular/fire/compat/messaging';
+import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
+import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
 
 export const localStorageSyncReducer =
   (reducer: ActionReducer<any>): ActionReducer<any> => localStorageSync({ keys: ['auth'], rehydrate: true })(reducer);
@@ -73,6 +58,14 @@ registerLocaleData(localeEnGB, 'en-GB');
 registerLocaleData(localeEnNL, 'en-NL');
 registerLocaleData(localeEs, 'es');
 registerLocaleData(localeAr, 'es-AR');
+
+const firebaseUiAuthConfig: firebaseui.auth.Config = {
+  signInFlow: isMobile() ? 'redirect' : 'popup',
+  signInOptions: [
+    firebase.auth.GoogleAuthProvider.PROVIDER_ID
+  ],
+  credentialHelper: firebaseui.auth.CredentialHelper.GOOGLE_YOLO
+};
 
 @NgModule({
   declarations: [
@@ -92,7 +85,6 @@ registerLocaleData(localeAr, 'es-AR');
       extend: true
     }),
     AppRoutingModule,
-    SocialLoginModule,
     BrowserAnimationsModule,
     SharedModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
@@ -100,11 +92,39 @@ registerLocaleData(localeAr, 'es-AR');
       registrationStrategy: 'registerWhenStable:30000'
     }),
     NgxMatColorPickerModule,
+    AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
     AngularFireMessagingModule,
     AngularFireAnalyticsModule,
     AngularFireDatabaseModule,
-    AngularFireModule.initializeApp(environment.firebase),
+    AppCheckModule,
+
+    // provideFirebaseApp(() => initializeApp(environment.firebase)),
+    // provideAppCheck(() => {
+    //   const providerV3 = new ReCaptchaV3Provider(environment.recaptcha.siteKey);
+    //   return initializeAppCheck(getApp(), {
+    //     provider: providerV3,
+    //     isTokenAutoRefreshEnabled: true
+    //   });
+    // }),
+    // provideAuth(() => {
+    //   if (environment.useEmulators) {
+    //     const fireauth = getAuth();
+    //     connectAuthEmulator(fireauth, 'http://localhost:9099'); // <---FireAuth Port
+    //     return fireauth;
+    //   }
+    //   return getAuth();
+    // }),
+    // provideStorage(() => {
+    //   if (environment.useEmulators) {
+    //     const firestorage = getStorage();
+    //     connectStorageEmulator(firestorage, 'localhost', 9199); // <---- Firestorage Port
+    //     return firestorage;
+    //   }
+    //   return getStorage();
+    // }),
+    // provideAnalytics(() => getAnalytics()),
+    FirebaseUIModule.forRoot(firebaseUiAuthConfig),
     RecaptchaV3Module
   ],
   providers: [
@@ -116,13 +136,10 @@ registerLocaleData(localeAr, 'es-AR');
     TokenService,
     NavigationService,
     TranslationLoaderResolver,
-    {
-      provide: 'SocialAuthServiceConfig',
-      useValue: getAuthServiceConfigs()
-    },
     MessagingService,
     AsyncPipe,
     CookieService,
+    TranslateService,
     {
       provide: MAT_COLOR_FORMATS,
       useValue: NGX_MAT_COLOR_FORMATS
@@ -135,17 +152,49 @@ registerLocaleData(localeAr, 'es-AR');
       provide: RECAPTCHA_V3_SITE_KEY,
       useValue: environment.recaptcha.siteKey,
     },
-    TranslateService,
-    { provide: APP_INITIALIZER, useFactory: (pwaService: PwaService) => () => pwaService.initPwaPrompt(), deps: [PwaService], multi: true }
+    {
+      provide: FIREBASE_OPTIONS,
+      useValue: environment.firebase
+    },
+    { provide: APP_INITIALIZER, useFactory: (pwaService: PwaService) => () => pwaService.initPwaPrompt(), deps: [PwaService], multi: true },
+    { provide: USE_AUTH_EMULATOR, useValue: !environment.production ? ['http://', 'localhost', 9099] : undefined },
+    {
+      provide: 'appConfig',
+      useValue: { googleAuthEnabled: true, emailAuthEnabled: false }
+    },
+    {
+      provide: 'firebaseUIAuthConfig',
+      useFactory: (config: any) => {
+
+        const fbUiConfig: firebaseui.auth.Config = {
+          signInFlow: isMobile() ? 'redirect' : 'popup',
+          signInOptions: [],
+          credentialHelper: firebaseui.auth.CredentialHelper.GOOGLE_YOLO
+        };
+
+        if (config.googleAuthEnabled) {
+          fbUiConfig?.signInOptions?.push(firebase.auth.GoogleAuthProvider.PROVIDER_ID);
+        }
+
+        // if (config.emailAuthEnabled) {
+        //   fbUiConfig.signInOptions.push({
+        //     provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
+        //     requireDisplayName: true,
+        //     signInMethod: firebase.auth.EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD
+        //   });
+        // }
+
+        return fbUiConfig;
+      },
+      deps: ['appConfig']
+    }
   ],
   bootstrap: [AppComponent],
-  exports: [TranslateModule, AngularFireMessagingModule]
+  exports: [TranslateModule]
 })
 export class AppModule {
   constructor(swPush: SwPush, private router: Router) {
     if (swPush.isEnabled) {
-      // navigator.serviceWorker
-      //   .ready.then((registration) => messaging.useServiceWorker(registration));
       swPush.notificationClicks.subscribe(({ action, notification }) =>
         router.navigate(notification.data.onActionClick[action].url));
     }

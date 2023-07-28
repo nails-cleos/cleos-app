@@ -5,8 +5,9 @@ import { Store } from '@ngrx/store';
 import * as fromActionsNotification from '../store/notification.actions';
 import { AngularFireMessaging } from '@angular/fire/compat/messaging';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { AngularFireDatabase, AngularFireList } from '@angular/fire/compat/database';
+import { AngularFireDatabase } from '@angular/fire/compat/database';
 import firebase from 'firebase/compat';
+import { ReCaptchaV3Service } from 'ng-recaptcha';
 import MessagePayload = firebase.messaging.MessagePayload;
 
 @Injectable({
@@ -15,11 +16,8 @@ import MessagePayload = firebase.messaging.MessagePayload;
 export class MessagingService {
   currentMessage?: BehaviorSubject<MessagePayload>;
 
-  tokenList: AngularFireList<any>;
-
   constructor(private store: Store<AppState>, private messaging: AngularFireMessaging, private auth: AngularFireAuth,
-              private database: AngularFireDatabase) {
-    this.tokenList = database.list('/fcmTokens');
+              private database: AngularFireDatabase, private recaptchaV3Service: ReCaptchaV3Service) {
   }
 
   /**
@@ -29,38 +27,19 @@ export class MessagingService {
    * @param token the new token generated
    */
   updateToken(user: any, token: string): void {
-    this.store.dispatch(
-      new fromActionsNotification.NotificationSubscribe(token)
-    );
-    const data = {};
-    // @ts-ignore
-    data[userId] = token;
-    this.tokenList.push(data);
-    // this.auth.authState.pipe(take(1)).subscribe(
-    //   () => {
-    //     const data = {};
-    //     // @ts-ignore
-    //     data[userId] = token;
-    //     this.database.object('fcmTokens/').update(data);
-    //   });
-
-    // if (user.provider === 'GOOGLE') {
-    //   const provider = new firebase.auth.GoogleAuthProvider();
-    //   provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
-    //   this.auth.signInWithPopup(provider).then(() => {
-    //     const data = {};
-    //     // @ts-ignore
-    //     data[user.id] = token;
-    //     this.database.object('fcmTokens/').update(data);
-    //   });
-    // } else {
-    //   this.auth.createUserWithEmailAndPassword(user.email, user.username).then(() => {
-    //     const data = {};
-    //     // @ts-ignore
-    //     data[user.id] = token;
-    //     this.database.object('fcmTokens/').update(data);
-    //   });
-    // }
+    this.recaptchaV3Service.execute('importantAction').subscribe((tokenV3) => {
+      if (tokenV3) {
+        this.auth.onAuthStateChanged(authUser => {
+          this.store.dispatch(
+            new fromActionsNotification.NotificationSubscribe(token)
+          );
+          const data = {};
+          // @ts-ignore
+          data[user.id] = token;
+          this.database.object('fcmTokens/').update(data);
+        });
+      }
+    });
   }
 
   /**
@@ -82,15 +61,17 @@ export class MessagingService {
    * @param user user
    */
   requestPermission(user: any): void {
-    this.messaging.requestPermission.subscribe(value => {
-      console.log('value', value);
-      if (value === 'granted') {
-        this.messaging.requestToken.subscribe(currentToken => {
-          console.log('currentToken', currentToken);
-          if (currentToken) {
-            this.updateToken(user, currentToken);
-          } else {
-            console.warn('No registration token available. Request permission to generate one.');
+    this.recaptchaV3Service.execute('importantAction').subscribe((tokenV3) => {
+      if (tokenV3) {
+        this.messaging.requestPermission.subscribe(value => {
+          if (value === 'granted') {
+            this.messaging.requestToken.subscribe(currentToken => {
+              if (currentToken) {
+                this.updateToken(user, currentToken);
+              } else {
+                console.warn('No registration token available. Request permission to generate one.');
+              }
+            });
           }
         });
       }

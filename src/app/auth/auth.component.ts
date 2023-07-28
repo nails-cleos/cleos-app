@@ -1,5 +1,4 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { SocialAuthService } from '@abacritt/angularx-social-login';
 import { Store } from '@ngrx/store';
 import * as fromActionsLogin from '../store/auth.actions';
 import { AppState, selectAuthState } from '../store/app.states';
@@ -8,6 +7,7 @@ import { Observable, Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { THEME } from '../util/theme';
 import { CookieService } from 'ngx-cookie-service';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 @Component({
   selector: 'app-auth',
@@ -22,7 +22,7 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   subscription?: Subscription;
   code?: string | null;
 
-  constructor(private socialService: SocialAuthService, private store: Store<AppState>, private route: ActivatedRoute,
+  constructor(private auth: AngularFireAuth, private store: Store<AppState>, private route: ActivatedRoute,
               private snackBar: MatSnackBar, private router: Router, private cookieService: CookieService) {
     this.getState = this.store.select(selectAuthState);
   }
@@ -66,15 +66,22 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     });
-    this.socialService.authState.subscribe((socialUser) => {
-      this.store.dispatch(
-        new fromActionsLogin.SocialLogin({
-          socialUser,
-          theme: this.cookieService.get(THEME),
-          code: this.code,
-          queryParams: this.route.snapshot.queryParams
-        })
-      );
+    this.auth.onAuthStateChanged(response => {
+      if (response) {
+        response.getIdToken().then(idToken => {
+          this.store.dispatch(
+            new fromActionsLogin.SocialLogin({
+              socialUser: {
+                idToken,
+                provider: response.providerId.toUpperCase()
+              },
+              theme: this.cookieService.get(THEME),
+              code: this.code,
+              queryParams: this.route.snapshot.queryParams
+            })
+          );
+        });
+      }
     });
   }
 

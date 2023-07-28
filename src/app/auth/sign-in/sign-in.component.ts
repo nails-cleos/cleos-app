@@ -31,12 +31,14 @@ export class SignInComponent implements OnInit {
 
     this.recaptchaV3Service.execute('importantAction')
       .subscribe((token) => {
-        this.store.dispatch(
-          new fromActionsLogin.Login({
-            username, password,
-            queryParams: this.route.snapshot.queryParams
-          })
-        );
+        if (token) {
+          this.store.dispatch(
+            new fromActionsLogin.Login({
+              username, password,
+              queryParams: this.route.snapshot.queryParams
+            })
+          );
+        }
       });
 
     return;

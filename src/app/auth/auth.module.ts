@@ -23,7 +23,8 @@ import { UserService } from '../services/user.service';
 import { TokenService } from '../services/token.service';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { NgxMatColorPickerModule } from '@angular-material-components/color-picker';
-import { GoogleSigninButtonModule } from '@abacritt/angularx-social-login';
+// import { GoogleSigninButtonModule } from '@abacritt/angularx-social-login';
+import { FirebaseUIModule } from 'firebaseui-angular';
 
 
 @NgModule({
@@ -57,7 +58,7 @@ import { GoogleSigninButtonModule } from '@abacritt/angularx-social-login';
     }),
     EffectsModule.forFeature([LoginEffects, UserEffects]),
     NgxMatColorPickerModule,
-    GoogleSigninButtonModule
+    FirebaseUIModule
   ],
   providers: [
     AuthService,
