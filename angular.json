@@ -23,6 +23,7 @@
             "allowedCommonJsDependencies": [
               "chart.js"
             ],
+            "crossOrigin": "anonymous",
             "outputPath": "dist/cleos",
             "index": "src/index.html",
             "main": "src/main.ts",
