@@ -4,7 +4,6 @@ import { SharedModule } from '../shared/shared.module';
 import { UnavailableRoutingModule } from './unavailable-routing.module';
 
 import { UnavailableComponent } from './unavailable.component';
-import { UnavailableDetailComponent } from './detail/unavailable-detail.component';
 import { UnavailableListComponent } from './list/unavailable-list.component';
 import { EffectsModule } from '@ngrx/effects';
 import { UnavailableEffects } from '../store/effects/unavailable.effects';
@@ -17,7 +16,6 @@ import { BlockAgendaComponent } from './block-agenda/block-agenda.component';
   declarations: [
     UnavailableComponent,
     UnavailableListComponent,
-    UnavailableDetailComponent,
     BlockAgendaComponent
   ],
   imports: [

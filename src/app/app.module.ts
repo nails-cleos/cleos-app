@@ -14,6 +14,9 @@ import { AngularFireAuthModule, USE_EMULATOR as USE_AUTH_EMULATOR } from '@angul
 import { RECAPTCHA_V3_SITE_KEY, RecaptchaV3Module } from 'ng-recaptcha';
 import { AppCheckModule } from '@angular/fire/app-check';
 import { firebase, firebaseui, FirebaseUIModule } from 'firebaseui-angular';
+import { AngularFireMessagingModule } from '@angular/fire/compat/messaging';
+import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
+import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
 
 // Providers
 import { environment } from '../environments/environment';
@@ -43,10 +46,7 @@ import { reducers } from './store/app.states';
 
 // Components
 import { AppComponent } from './app.component';
-import { isMobile } from './util/helper';
-import { AngularFireMessagingModule } from '@angular/fire/compat/messaging';
-import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
-import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
+import { isIPhone, isMobile } from './util/helper';
 
 export const localStorageSyncReducer =
   (reducer: ActionReducer<any>): ActionReducer<any> => localStorageSync({ keys: ['auth'], rehydrate: true })(reducer);
@@ -60,7 +60,7 @@ registerLocaleData(localeEs, 'es');
 registerLocaleData(localeAr, 'es-AR');
 
 const firebaseUiAuthConfig: firebaseui.auth.Config = {
-  signInFlow: isMobile() ? 'redirect' : 'popup',
+  signInFlow: isMobile() && !isIPhone() ? 'redirect' : 'popup',
   signInOptions: [
     firebase.auth.GoogleAuthProvider.PROVIDER_ID
   ],
@@ -141,9 +141,12 @@ const firebaseUiAuthConfig: firebaseui.auth.Config = {
       useFactory: (config: any) => {
 
         const fbUiConfig: firebaseui.auth.Config = {
-          signInFlow: isMobile() ? 'redirect' : 'popup',
+          callbacks: {
+            signInSuccessWithAuthResult: () => true,
+          },
+          signInFlow: isMobile() && !isIPhone() ? 'redirect' : 'popup',
           signInOptions: [],
-          credentialHelper: firebaseui.auth.CredentialHelper.GOOGLE_YOLO
+          signInSuccessUrl: location.href,
         };
 
         if (config.googleAuthEnabled) {
