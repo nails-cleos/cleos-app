@@ -4,7 +4,6 @@ import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
 import { UnavailableListComponent } from './list/unavailable-list.component';
 import { UnavailableComponent } from './unavailable.component';
-import { UnavailableDetailComponent } from './detail/unavailable-detail.component';
 import { BlockAgendaComponent } from './block-agenda/block-agenda.component';
 
 const routes: Routes = [
@@ -19,7 +18,7 @@ const routes: Routes = [
     }
   },
   {
-    path: ':id', component: UnavailableDetailComponent, canActivate: [authGuard], data: {
+    path: ':id', component: UnavailableComponent, canActivate: [authGuard], data: {
       roles: [Role.admin, Role.professional]
     }
   },

@@ -98,32 +98,6 @@ const firebaseUiAuthConfig: firebaseui.auth.Config = {
     AngularFireAnalyticsModule,
     AngularFireDatabaseModule,
     AppCheckModule,
-
-    // provideFirebaseApp(() => initializeApp(environment.firebase)),
-    // provideAppCheck(() => {
-    //   const providerV3 = new ReCaptchaV3Provider(environment.recaptcha.siteKey);
-    //   return initializeAppCheck(getApp(), {
-    //     provider: providerV3,
-    //     isTokenAutoRefreshEnabled: true
-    //   });
-    // }),
-    // provideAuth(() => {
-    //   if (environment.useEmulators) {
-    //     const fireauth = getAuth();
-    //     connectAuthEmulator(fireauth, 'http://localhost:9099'); // <---FireAuth Port
-    //     return fireauth;
-    //   }
-    //   return getAuth();
-    // }),
-    // provideStorage(() => {
-    //   if (environment.useEmulators) {
-    //     const firestorage = getStorage();
-    //     connectStorageEmulator(firestorage, 'localhost', 9199); // <---- Firestorage Port
-    //     return firestorage;
-    //   }
-    //   return getStorage();
-    // }),
-    // provideAnalytics(() => getAnalytics()),
     FirebaseUIModule.forRoot(firebaseUiAuthConfig),
     RecaptchaV3Module
   ],
@@ -176,13 +150,13 @@ const firebaseUiAuthConfig: firebaseui.auth.Config = {
           fbUiConfig?.signInOptions?.push(firebase.auth.GoogleAuthProvider.PROVIDER_ID);
         }
 
-        // if (config.emailAuthEnabled) {
-        //   fbUiConfig.signInOptions.push({
-        //     provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
-        //     requireDisplayName: true,
-        //     signInMethod: firebase.auth.EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD
-        //   });
-        // }
+        if (config.emailAuthEnabled) {
+          fbUiConfig?.signInOptions?.push({
+            provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
+            requireDisplayName: true,
+            signInMethod: firebase.auth.EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD
+          });
+        }
 
         return fbUiConfig;
       },
