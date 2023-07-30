@@ -8,6 +8,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { THEME } from '../util/theme';
 import { CookieService } from 'ngx-cookie-service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { FirebaseUISignInFailure, FirebaseUISignInSuccessWithAuthResult } from 'firebaseui-angular';
 
 @Component({
   selector: 'app-auth',
@@ -18,9 +19,11 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('authGroup') authGroup: any;
 
-  getState: Observable<any>;
-  subscription?: Subscription;
   code?: string | null;
+
+  private subscription?: Subscription;
+  private getState: Observable<any>;
+  private authSubscription?: Subscription;
 
   constructor(private auth: AngularFireAuth, private store: Store<AppState>, private route: ActivatedRoute,
               private snackBar: MatSnackBar, private router: Router, private cookieService: CookieService) {
@@ -44,6 +47,28 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.authSubscription?.unsubscribe();
+  }
+
+  successCallback(authResult: FirebaseUISignInSuccessWithAuthResult): void {
+    const response = authResult.authResult.user;
+    response?.getIdToken().then(idToken => {
+      this.store.dispatch(
+        new fromActionsLogin.SocialLogin({
+          socialUser: {
+            idToken,
+            provider: response.providerId.toUpperCase()
+          },
+          theme: this.cookieService.get(THEME),
+          code: this.code,
+          queryParams: this.route.snapshot.queryParams
+        })
+      );
+    });
+  }
+
+  errorCallback($event: FirebaseUISignInFailure): void {
+    console.error($event);
   }
 
   private subscribe(): void {
@@ -66,7 +91,7 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     });
-    this.auth.onAuthStateChanged(response => {
+    this.authSubscription = this.auth.authState.subscribe(response => {
       if (response) {
         response.getIdToken().then(idToken => {
           this.store.dispatch(
