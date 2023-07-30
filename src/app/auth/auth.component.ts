@@ -8,7 +8,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { THEME } from '../util/theme';
 import { CookieService } from 'ngx-cookie-service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { FirebaseUISignInFailure, FirebaseUISignInSuccessWithAuthResult } from 'firebaseui-angular';
+import { FirebaseUISignInFailure } from 'firebaseui-angular';
 
 @Component({
   selector: 'app-auth',
@@ -50,25 +50,8 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
     this.authSubscription?.unsubscribe();
   }
 
-  successCallback(authResult: FirebaseUISignInSuccessWithAuthResult): void {
-    const response = authResult.authResult.user;
-    response?.getIdToken().then(idToken => {
-      this.store.dispatch(
-        new fromActionsLogin.SocialLogin({
-          socialUser: {
-            idToken,
-            provider: response.providerId.toUpperCase()
-          },
-          theme: this.cookieService.get(THEME),
-          code: this.code,
-          queryParams: this.route.snapshot.queryParams
-        })
-      );
-    });
-  }
-
   errorCallback($event: FirebaseUISignInFailure): void {
-    console.error($event);
+    console.error('Error in logIn: ', $event);
   }
 
   private subscribe(): void {

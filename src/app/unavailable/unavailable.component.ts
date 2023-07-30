@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AppState, selectUnavailableState } from '../store/app.states';
 import { IUnavailable, Unavailable, UnavailableRepeatType } from '../interfaces/unavailable';
@@ -13,7 +13,8 @@ import {
   createNewDate,
   diffTime,
   filterDateRoom,
-  formatDuration, formatFullDate,
+  formatDuration,
+  formatFullDate,
   formatTime,
   getCurrentTimeZone,
   getMinMaxDate,
@@ -27,7 +28,7 @@ import { IRoomAll } from '../interfaces/room';
 import { executeDialogNoWidth, getUserName } from '../util/helper';
 import { ActivatedRoute, Router } from '@angular/router';
 import { closest } from '../util/numbers';
-import { requireMatchAsync } from '../util/validators';
+import { fieldChange, requireMatchAsync, valueChange } from '../util/validators';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -74,7 +75,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.form.controls;
   }
 
-  get create(): void {
+  get submit(): void {
     if (this.form.invalid) {
       return;
     }
@@ -88,12 +89,13 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const unavailable: IUnavailable = new Unavailable();
-    unavailable.professionalId = this.getForm.professional.value.id;
-    unavailable.description = this.getForm.form.value.description;
+    unavailable.professionalId = valueChange(this.getForm.professional.value, this.unavailable?.professional)?.id;
+    unavailable.description = valueChange(this.getForm.description.value, this.unavailable?.description);
+    unavailable.duration = fieldChange(this.getForm.duration as UntypedFormControl, this.unavailable?.duration);
+    unavailable.repeat = fieldChange(this.getForm.repeat as UntypedFormControl, this.unavailable?.repeat);
+
     unavailable.start = date.toLocaleString(API_LOCALE);
     unavailable.timeZone = getCurrentTimeZone();
-    unavailable.repeat = this.getForm.repeat.value;
-    unavailable.duration = this.getForm.duration.value;
     unavailable.allDay = this.getForm.allDay.value;
     if (this.getForm.endDate.value) {
       unavailable.end = createNewDate(this.getForm.endDate.value).toLocaleString(API_LOCALE);
@@ -227,10 +229,10 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filter(name) : this.professionals ? this.professionals.slice() : this.professionals)
     );
-    this.valueChange();
+    this.formValueChange();
   }
 
-  private valueChange(): void {
+  private formValueChange(): void {
     this.getForm.allDay.valueChanges.subscribe(value => {
       if (value) {
         this.getForm.duration.clearValidators();
