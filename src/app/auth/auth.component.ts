@@ -7,8 +7,7 @@ import { Observable, Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { THEME } from '../util/theme';
 import { CookieService } from 'ngx-cookie-service';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { FirebaseUISignInFailure } from 'firebaseui-angular';
+import { SocialAuthService } from '@abacritt/angularx-social-login';
 
 @Component({
   selector: 'app-auth',
@@ -23,9 +22,8 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private subscription?: Subscription;
   private getState: Observable<any>;
-  private authSubscription?: Subscription;
 
-  constructor(private auth: AngularFireAuth, private store: Store<AppState>, private route: ActivatedRoute,
+  constructor(private socialService: SocialAuthService, private store: Store<AppState>, private route: ActivatedRoute,
               private snackBar: MatSnackBar, private router: Router, private cookieService: CookieService) {
     this.getState = this.store.select(selectAuthState);
   }
@@ -47,11 +45,6 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
-    this.authSubscription?.unsubscribe();
-  }
-
-  errorCallback($event: FirebaseUISignInFailure): void {
-    console.error('Error in logIn: ', $event);
   }
 
   private subscribe(): void {
@@ -74,22 +67,15 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     });
-    this.authSubscription = this.auth.authState.subscribe(response => {
-      if (response) {
-        response.getIdToken().then(idToken => {
-          this.store.dispatch(
-            new fromActionsLogin.SocialLogin({
-              socialUser: {
-                idToken,
-                provider: response.providerId.toUpperCase()
-              },
-              theme: this.cookieService.get(THEME),
-              code: this.code,
-              queryParams: this.route.snapshot.queryParams
-            })
-          );
-        });
-      }
+    this.socialService.authState.subscribe((socialUser) => {
+      this.store.dispatch(
+        new fromActionsLogin.SocialLogin({
+          socialUser,
+          theme: this.cookieService.get(THEME),
+          code: this.code,
+          queryParams: this.route.snapshot.queryParams
+        })
+      );
     });
   }
 

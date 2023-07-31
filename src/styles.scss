@@ -12,8 +12,6 @@
 $flag-icon-css-path: '~flag-icon-css/flags' !default;
 @import 'node_modules/flag-icon-css/sass/flag-icons';
 
-@import '~firebaseui/dist/firebaseui.css';
-
 html, body {
   height: 100%;
 }

@@ -10,6 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CookieService } from 'ngx-cookie-service';
 import { Theme, THEME } from '../../util/theme';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 @Component({
   selector: 'app-sign-up',
@@ -45,7 +46,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
 
   constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private route: ActivatedRoute,
               private cdRef: ChangeDetectorRef, private snackBar: MatSnackBar, private router: Router,
-              private cookieService: CookieService) {
+              private cookieService: CookieService, private auth: AngularFireAuth) {
     this.getState = this.store.select(selectAuthState);
     this.codeForm.valueChanges.subscribe(value => {
       this.codeEvent.emit(value);
@@ -66,7 +67,10 @@ export class SignUpComponent implements OnInit, OnDestroy {
     user.phone = this.phone.value;
     user.code = this.codeForm.value;
     user.theme = this.cookieService.get(THEME) as Theme;
-    return this.store.dispatch(new fromActionsLogin.SignUp(user));
+    this.store.dispatch(new fromActionsLogin.SignUp(user));
+
+    this.auth.createUserWithEmailAndPassword(this.email.value.trim(), this.passwordFormGroup.get('password')?.value);
+    return;
   }
 
   ngOnInit(): void {

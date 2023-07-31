@@ -2,6 +2,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { APP_INITIALIZER, LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthServiceConfig, SocialLoginModule } from '@abacritt/angularx-social-login';
 import { ActionReducer, MetaReducer, StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { AsyncPipe, registerLocaleData } from '@angular/common';
@@ -13,7 +14,6 @@ import { AngularFireModule, FIREBASE_OPTIONS } from '@angular/fire/compat';
 import { AngularFireAuthModule, USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/compat/auth';
 import { RECAPTCHA_V3_SITE_KEY, RecaptchaV3Module } from 'ng-recaptcha';
 import { AppCheckModule } from '@angular/fire/app-check';
-import { firebase, firebaseui, FirebaseUIModule } from 'firebaseui-angular';
 import { AngularFireMessagingModule } from '@angular/fire/compat/messaging';
 import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
 import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
@@ -46,8 +46,24 @@ import { reducers } from './store/app.states';
 
 // Components
 import { AppComponent } from './app.component';
-import { isIPhone, isMobile } from './util/helper';
 import { AuthUserService } from './services/auth-user.service';
+
+export const getAuthServiceConfigs = (): SocialAuthServiceConfig => ({
+  autoLogin: false,
+  providers: [
+    {
+      id: GoogleLoginProvider.PROVIDER_ID,
+      provider: new GoogleLoginProvider(environment.googleClientId)
+    },
+    {
+      id: FacebookLoginProvider.PROVIDER_ID,
+      provider: new FacebookLoginProvider(environment.facebookClientId)
+    }
+  ],
+  onError: (err) => {
+    console.error(err);
+  }
+});
 
 export const localStorageSyncReducer =
   (reducer: ActionReducer<any>): ActionReducer<any> => localStorageSync({ keys: ['auth'], rehydrate: true })(reducer);
@@ -59,14 +75,6 @@ registerLocaleData(localeEnGB, 'en-GB');
 registerLocaleData(localeEnNL, 'en-NL');
 registerLocaleData(localeEs, 'es');
 registerLocaleData(localeAr, 'es-AR');
-
-const firebaseUiAuthConfig: firebaseui.auth.Config = {
-  signInFlow: isMobile() && !isIPhone() ? 'redirect' : 'popup',
-  signInOptions: [
-    firebase.auth.GoogleAuthProvider.PROVIDER_ID
-  ],
-  credentialHelper: firebaseui.auth.CredentialHelper.GOOGLE_YOLO
-};
 
 @NgModule({
   declarations: [
@@ -86,6 +94,7 @@ const firebaseUiAuthConfig: firebaseui.auth.Config = {
       extend: true
     }),
     AppRoutingModule,
+    SocialLoginModule,
     BrowserAnimationsModule,
     SharedModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
@@ -99,7 +108,6 @@ const firebaseUiAuthConfig: firebaseui.auth.Config = {
     AngularFireAnalyticsModule,
     AngularFireDatabaseModule,
     AppCheckModule,
-    FirebaseUIModule.forRoot(firebaseUiAuthConfig),
     RecaptchaV3Module
   ],
   providers: [
@@ -117,6 +125,10 @@ const firebaseUiAuthConfig: firebaseui.auth.Config = {
     TranslateService,
     AuthUserService,
     {
+      provide: 'SocialAuthServiceConfig',
+      useValue: getAuthServiceConfigs()
+    },
+    {
       provide: MAT_COLOR_FORMATS,
       useValue: NGX_MAT_COLOR_FORMATS
     },
@@ -132,40 +144,15 @@ const firebaseUiAuthConfig: firebaseui.auth.Config = {
       provide: FIREBASE_OPTIONS,
       useValue: environment.firebase
     },
-    { provide: APP_INITIALIZER, useFactory: (pwaService: PwaService) => () => pwaService.initPwaPrompt(), deps: [PwaService], multi: true },
-    { provide: USE_AUTH_EMULATOR, useValue: environment.useEmulators ? ['http://', 'localhost', 9099] : undefined },
     {
-      provide: 'appConfig',
-      useValue: { googleAuthEnabled: true, emailAuthEnabled: false }
+      provide: APP_INITIALIZER,
+      useFactory: (pwaService: PwaService) => () => pwaService.initPwaPrompt(),
+      deps: [PwaService],
+      multi: true
     },
     {
-      provide: 'firebaseUIAuthConfig',
-      useFactory: (config: any) => {
-
-        const fbUiConfig: firebaseui.auth.Config = {
-          callbacks: {
-            signInSuccessWithAuthResult: () => true,
-          },
-          signInFlow: isMobile() && !isIPhone() ? 'redirect' : 'popup',
-          signInOptions: [],
-          signInSuccessUrl: location.href,
-        };
-
-        if (config.googleAuthEnabled) {
-          fbUiConfig?.signInOptions?.push(firebase.auth.GoogleAuthProvider.PROVIDER_ID);
-        }
-
-        if (config.emailAuthEnabled) {
-          fbUiConfig?.signInOptions?.push({
-            provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
-            requireDisplayName: true,
-            signInMethod: firebase.auth.EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD
-          });
-        }
-
-        return fbUiConfig;
-      },
-      deps: ['appConfig']
+      provide: USE_AUTH_EMULATOR,
+      useValue: !environment.production ? ['http://', 'localhost', 9099] : undefined
     }
   ],
   bootstrap: [AppComponent],
