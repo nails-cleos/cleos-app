@@ -82,6 +82,7 @@ export interface IRoomReservation {
   room: IRoomAll;
   reservations: IReservationAll[];
   unavailableList: IUnavailableAll[];
+  birthdays: IUserAll[];
 }
 
 export interface ICustomerReservation {

@@ -44,14 +44,14 @@ export const lightenDarkenColor = (col: string, amt: number): string => {
   return (usePound ? '#' : '') + (g | (b << 8) | (r << 16)).toString(16);
 };
 
-export const createColor = ({ red, green, blue }: any, isDarkMode: boolean, isMonth: boolean = false): ColorEvent => {
+export const createColor = ({ red, green, blue }: any, isDarkMode: boolean): ColorEvent => {
   const color = convertRGBToHex(red, green, blue);
   const lightenDarken = lightenDarkenColor(color, isDarkMode ? 50 : -50);
   return new ColorEvent(lightenDarken, color);
 };
 
-export const createEventColor = (hex: string, isDarkMode: boolean, isMonth: boolean = false): ColorEvent =>
-  createColor(convertHexToRGB(hex), isDarkMode, isMonth);
+export const createEventColor = (hex: string, isDarkMode: boolean): ColorEvent =>
+  createColor(convertHexToRGB(hex), isDarkMode);
 
 export const convertRGBToHex = (red: number, green: number, blue: number): string =>
   '#' + getRGBColor(red) + getRGBColor(green) + getRGBColor(blue);
