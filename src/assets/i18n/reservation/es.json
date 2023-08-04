@@ -124,7 +124,8 @@
         "LUNCH": "<b>Hora de almuerzo</b>",
         "OUT_OF_WORK": "<b>Fuera del trabajo</b>"
       },
-      "UNAVAILABLE": "<div class='detail'><b>{{professionalName}} no disponible</b></div><div class='detail'>{{description}}</div>"
+      "UNAVAILABLE": "<div class='detail'><b>{{professionalName}} no disponible</b></div><div class='detail'>{{description}}</div>",
+      "BIRTHDAY": "<div class='detail'><b>Cumpleaños de {{customerName}}</b></div>"
     },
     "PAYMENT": {
       "TITLE": "Pagos",

@@ -11,7 +11,8 @@ import {
   API_LOCALE,
   CalendarPeriod,
   createNewDate,
-  endOfPeriod, formatDateTime,
+  endOfPeriod,
+  formatDateTime,
   getAvailability,
   getDuration,
   getNow,
@@ -26,7 +27,7 @@ import {
   subPeriod
 } from '../../util/dates';
 import { IRoom, IRoomAll } from '../../interfaces/room';
-import { createBullet, createRecurringEvent, fillNotAvailable, getOverlapEvent, Meta, newEvent } from '../../util/event';
+import { allDayEvent, createBullet, createRecurringEvent, fillNotAvailable, getOverlapEvent, Meta, newEvent } from '../../util/event';
 import { Router } from '@angular/router';
 import { CalendarEvent, CalendarEventTimesChangedEvent } from 'angular-calendar';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
@@ -367,7 +368,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
         const meta = new Meta(true, it.room.timeZone);
         meta.id = it.id;
         meta.customer = getUserName(it.customer);
-        const event = newEvent(detail, color, start, end, darkMode, `reservation/${ it.id }`, meta, true);
+        const event = newEvent(detail, color, start, darkMode, end, `reservation/${ it.id }`, meta, true);
         if (event) {
           let events;
           if (this.calendar) {
@@ -402,6 +403,24 @@ export class CalendarComponent implements OnInit, OnDestroy {
     recurringEvents.forEach(recurring => {
       recurring.rrule.all().forEach((date: Date) =>
         this.validateUnavailableEvent(rr.room, date, recurring.duration, recurring.it, darkMode));
+    });
+  }
+
+  private addBirthdays(rr: IRoomReservation, darkMode: boolean): void {
+    const birthdays: IUserAll[] = rr.birthdays;
+    birthdays.forEach(it => {
+      if (it.dob) {
+        const detail = this.translate.instant('RESERVATION.EVENT.BIRTHDAY', {
+          customerName: getUserName(it)
+        });
+        const startDate = newDateTimestamp(it.dob);
+        startDate.setFullYear(getNow().getFullYear());
+        const color = findStateColor('BIRTHDAY', darkMode);
+        const event = allDayEvent(detail, color, startDate, darkMode, `users/${ it.id }`);
+        if (this.calendar && event) {
+          this.calendar.events = [...this.calendar.events, event];
+        }
+      }
     });
   }
 
@@ -445,7 +464,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
       path += 'block-agenda/';
     }
     path += it.id;
-    const event = newEvent(detail, color, start, end, darkMode, path, meta);
+    const event = newEvent(detail, color, start, darkMode, end, path, meta);
     if (event) {
       events = [...events, event];
       const calendar = new Calendar(room, events);
@@ -483,6 +502,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
         this.calendar.events = this.calendar.events.concat(fillNotAvailable(unavailable, lunch, notWorking, this.viewDate,
           sunday, saturday, friday, thursday, wednesday, tuesday, monday, darkMode, this.maxDate, timeZone));
         this.addUnavailableList(this.data, darkMode);
+        this.addBirthdays(this.data, darkMode);
       }
     }
   }

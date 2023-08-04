@@ -333,6 +333,9 @@
   }
 
   .cal-week-view {
+    .cal-day-columns {
+      background-color: mat.get-color-from-palette($background, background);
+    }
     .cal-day-headers {
       .cal-header:hover {
         background-color: mat.get-color-from-palette($background, hover);
@@ -357,7 +360,7 @@
 
     .cal-event {
       background-color: mat.get-color-from-palette($primary-palette, 600);
-      color: mat.get-color-from-palette($background, background);
+      color: mat.get-color-from-palette($foreground, text);
       border: 1px solid #000000;
     }
 

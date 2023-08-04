@@ -631,7 +631,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     const meta = new Meta(true, timeZone, undefined, undefined, this.professional.value.id);
-    return newEvent(detail, findStateColor(state, this.isDarkMode), start, end, this.isDarkMode, id, meta, true);
+    return newEvent(detail, findStateColor(state, this.isDarkMode), start, this.isDarkMode, end, id, meta, true);
   }
 
   private dateIsValid(date: Date): boolean {
@@ -874,7 +874,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
         const color = findStateColor(it.state, this.isDarkMode);
         const meta = new Meta(true, timeZone, undefined, undefined, it.professional.id);
-        const event = newEvent(detail, color, start, end, this.isDarkMode, it.id, meta);
+        const event = newEvent(detail, color, start, this.isDarkMode, end, it.id, meta);
         if (event) {
           this.events = [...this.events, event];
         }
@@ -939,7 +939,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const color = findStateColor('DEFAULT', this.isDarkMode);
     const meta = new Meta(!it.allDay, this.room.value.timeZone, undefined, undefined, it.professional.id);
-    const event = newEvent(detail, color, start, end, this.isDarkMode, `unavailable/${ it.id }`, meta);
+    const event = newEvent(detail, color, start, this.isDarkMode, end, `unavailable/${ it.id }`, meta);
     if (event) {
       this.events = [...this.events, event];
     }
