@@ -4,7 +4,6 @@ import { EventColor } from 'calendar-utils';
 import { IAvailability } from './room';
 import { ICurrency, ICurrencyAll } from './currency';
 import { States } from './reservation';
-import { DiscountType } from './discount';
 import { PaymentType } from './payment';
 
 export interface IDashboard {
@@ -130,7 +129,7 @@ export interface ISummaryTotal extends ITotal {
   paymentType: PaymentType;
   expenseType: string;
   type: string;
-  discountType: DiscountType;
+  discountDescription: string;
   discountValue: number;
   payments: ISummaryTotal[];
 }

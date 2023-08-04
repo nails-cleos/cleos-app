@@ -159,7 +159,7 @@
               <td [rowSpan]="summary.total.payments.length || 1">{{summary.customerName}}</td>
               <td [rowSpan]="summary.total.payments.length || 1">{{summary.treatmentName}}</td>
               <td [rowSpan]="summary.total.payments.length || 1">
-                {{summary.total.discountType | discount:summary.total.discountValue:summary.currency}}
+                {{summary.total.discountDescription}}
               </td>
               <td [rowSpan]="summary.total.payments.length || 1">{{summary.color}}</td>
               <ng-template [ngIf]="summary.total.payments.length" [ngIfElse]="noPaid">
@@ -380,7 +380,7 @@
               <td [rowSpan]="summary.total.payments.length || 1">{{summary.customerName}}</td>
               <td [rowSpan]="summary.total.payments.length || 1">{{summary.treatmentName}}</td>
               <td [rowSpan]="summary.total.payments.length || 1">
-                {{summary.total.discountType | discount:summary.total.discountValue:summary.currency}}
+                {{summary.total.discountDescription}}
               </td>
               <td [rowSpan]="summary.total.payments.length || 1">{{summary.color}}</td>
               <ng-template [ngIf]="summary.total.payments.length" [ngIfElse]="noPaid">
