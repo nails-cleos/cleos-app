@@ -4,7 +4,7 @@ export const environment = {
   recaptcha: {
     siteKey: '6Lc7KGEnAAAAAERpXU8AdaBpHtqGz9cuD6C8DTmZ'
   },
-  appServer: 'http://localhsot:4200',
+  appServer: 'http://localhost:4200',
   title: 'Cleos PWA',
   version: require('../../package.json').version + '-pwa',
   baseUrl: 'http://localhost:9999/api',
