@@ -47,31 +47,37 @@ const getTheme = (theme: string | undefined): Theme => theme === dark ? dark : l
 
 const stateColor = (isDark: boolean): IState[] => [{
   name: 'CREATED',
-  color: isDark ? '#dcc8c2' : '#ceb4ac'// accent-dark
+  color: isDark ? '#ceb4ac' : '#dcc8c2'// accent-dark
 }, {
   name: 'EDITING',
-  color: isDark ? '#ffd991' : '#ffd078'// primary-A-dark
+  color: isDark ? '#ffd078' : '#ffd991'// primary-A-dark
 }, {
   name: 'PARTIALLY_COMPLETED',
   color: '#a9a397'
 }, {
   name: 'COMPLETED',
-  color: isDark ? '#90ee90' : '#44a244'
+  color: isDark ? '#44a244' : '#90ee90'
 }, {
   name: 'PAID',
-  color: isDark ? '#009ee3' : '#04589a'
+  color: isDark ? '#04589a' : '#009ee3'
 }, {
   name: 'PARTIALLY_PAID',
-  color: isDark ? '#009ee3' : '#04589a'
+  color: isDark ? '#04589a' : '#009ee3'
 }, {
   name: 'STARTED',
-  color: isDark ? '#e6b9ff' : '#673ab7'
+  color: isDark ? '#673ab7' : '#e6b9ff'
 }, {
   name: 'APPROVED',
-  color: isDark ? '#a9a397' : '#8f887a' // primary-dark
+  color: isDark ? '#8f887a' : '#a9a397' // primary-dark
 }, {
   name: 'DEFAULT',
   color: isDark ? '#f08080' : '#ffb3b3' // warn-dark-lighter
+}, {
+  name: 'BIRTHDAY',
+  color: isDark ? '#eb70a5' : '#f18dbc'
+}, {
+  name: 'NOTE',
+  color: isDark ? '#e7d255' : '#eedf72'
 }];
 
 const selectedTheme = (value: Theme | undefined, themeService: ThemeService): void => {

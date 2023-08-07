@@ -1,11 +1,5 @@
 import { IUser } from './user';
 
-export enum UnavailableRepeatType {
-  none = 'NONE',
-  onceAWeek = 'ONCE_A_WEEK',
-  everyDay = 'EVERY_DAY'
-}
-
 export interface IUnavailable {
   id?: string;
   description?: string;

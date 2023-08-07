@@ -46,6 +46,8 @@ const routes: Routes = [
         path: 'events', loadChildren: () => import('../dashboard/dashboard.module').then(m => m.DashboardModule)
       }, {
         path: 'invoices', loadChildren: () => import('../invoice/invoice.module').then(m => m.InvoiceModule)
+      }, {
+        path: 'notes', loadChildren: () => import('../note/note.module').then(m => m.NoteModule)
       }
     ]
   }

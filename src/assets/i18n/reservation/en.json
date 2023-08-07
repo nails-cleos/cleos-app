@@ -124,7 +124,9 @@
         "LUNCH": "<b>Lunch time</b>",
         "OUT_OF_WORK": "<b>Out of work</b>"
       },
-      "UNAVAILABLE": "<div class='detail'><b>{{professionalName}} unavailable</b></div><div class='detail'>{{description}}</div>"
+      "UNAVAILABLE": "<div class='detail'><b>{{professionalName}} unavailable</b></div><div class='detail'>{{description}}</div>",
+      "BIRTHDAY": "<div class='detail'><b>&#127874; {{customerName}}</b></div>",
+      "NOTE": "<div class='detail'><b>&#128211; {{note}}</b></div>"
     },
     "PAYMENT": {
       "TITLE": "Payments",

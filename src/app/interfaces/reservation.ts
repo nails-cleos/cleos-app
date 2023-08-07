@@ -10,6 +10,7 @@ import { IReview } from './review';
 import { IAdditionalAll } from './additional';
 import { addHours, isSameDay } from 'date-fns';
 import { createNewDate, getNow } from '../util/dates';
+import { INoteAll } from './note';
 
 export interface IReservation {
   id?: string;
@@ -82,6 +83,8 @@ export interface IRoomReservation {
   room: IRoomAll;
   reservations: IReservationAll[];
   unavailableList: IUnavailableAll[];
+  birthdays: IUserAll[];
+  notes: INoteAll[];
 }
 
 export interface ICustomerReservation {
