@@ -482,3 +482,10 @@ export const isMobile = (): boolean => {
 
 export const isIPhone = (): boolean => (/iPad|iPhone|iPod/.test(navigator.userAgent))
   || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+export enum FrequencyEnum {
+  none = 'NONE',
+  everyDay = 'EVERY_DAY',
+  onceAWeek = 'ONCE_A_WEEK',
+  onceAMonth = 'ONCE_A_MONTH'
+}

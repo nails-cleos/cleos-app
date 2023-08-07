@@ -15,14 +15,13 @@ import { getFrequency, IMeta, Meta, monthEvent } from '../util/event';
 import { Router } from '@angular/router';
 import { isSameDay, isSameMonth } from 'date-fns';
 import { ICalendarReservations, ICalendarUnavailable, IChart, IDashboard } from '../interfaces/dashboard';
-import { UnavailableRepeatType } from '../interfaces/unavailable';
 import { UntypedFormControl } from '@angular/forms';
 import { IAuthority } from '../interfaces/user';
 import { Role } from '../interfaces/token';
 import { IRoom } from '../interfaces/room';
 import { CalendarDialogComponent } from '../shared/dialog/calendar/calendar-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
-import { executeDialogNoWidth } from '../util/helper';
+import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
 import { numberFormat } from '../util/numbers';
 import { ICurrency } from '../interfaces/currency';
 
@@ -333,7 +332,7 @@ export class DashComponent implements OnInit, OnDestroy {
         this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNow());
         const title = it.duration ? it.title : `${ this.translate.instant('COMMON.ALL_DAY.CHECK') } - ${ it.title }`;
 
-        if (it.repeat === UnavailableRepeatType.none) {
+        if (it.repeat === FrequencyEnum.none) {
           const end = getEnd(start, it.duration);
           const event = monthEvent(title, start, end, it.unavailableId, findStateColor('DEFAULT', darkMode),
             new Meta(!!it.duration, this.state.timeZone, undefined, ['unavailable', it.unavailableId]), darkMode);

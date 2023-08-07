@@ -4,7 +4,7 @@ import { Observable, Subscription } from 'rxjs';
 import { AppState, selectAuthState, selectDashboardState } from '../store/app.states';
 import {
   addPeriod,
-  API_LOCALE, newDateTimestamp,
+  API_LOCALE,
   createNewDate,
   dateToTimestamp,
   endOfPeriod,
@@ -15,6 +15,7 @@ import {
   getRoomStartEndDay,
   isBetween,
   newDate,
+  newDateTimestamp,
   startOfPeriod,
   subPeriod
 } from '../util/dates';
@@ -26,7 +27,6 @@ import * as fromActionsDashboard from '../store/dashboard.actions';
 import * as fromActionsReservation from '../store/reservation.actions';
 import { IProfessional, Professional } from './day-view-scheduler.component';
 import { EventColor } from 'calendar-utils';
-import { UnavailableRepeatType } from '../interfaces/unavailable';
 import { getFrequency } from '../util/event';
 import { Day, IReservation, MAX_RESERVATION_MONTH, States } from '../interfaces/reservation';
 import { addMonths, isSameDay, isToday } from 'date-fns';
@@ -34,7 +34,7 @@ import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { getProfessionalColor } from '../util/color';
 import { CalendarDialogComponent } from '../shared/dialog/calendar/calendar-dialog.component';
-import { executeDialogNoWidth } from '../util/helper';
+import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
 
 @Component({
   selector: 'app-dashboard',
@@ -383,7 +383,7 @@ export class DashboardComponent implements OnInit {
           const start = newDateTimestamp(it.start);
           const title = it.duration ? it.title : `${ this.translate.instant('COMMON.ALL_DAY.CHECK') } - ${ it.title }`;
 
-          if (it.repeat === UnavailableRepeatType.none) {
+          if (it.repeat === FrequencyEnum.none) {
             const end = getEnd(start, it.duration);
             const event = {
               start, end, title: it.title, id: it.unavailableId, color: professional.color, draggable: true,

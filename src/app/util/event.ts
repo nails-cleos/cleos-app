@@ -12,13 +12,14 @@ import {
   getWeekDay,
   greaterOrEqualsThan,
   greaterOrEqualsThanToday,
-  IDuration
+  IDuration,
+  plusDays
 } from './dates';
 import { findStateColor } from './theme';
 import { ByWeekday, Frequency, RRule } from 'rrule';
 import { isToday } from 'date-fns';
-import { UnavailableRepeatType } from '../interfaces/unavailable';
 import { createEventColor } from './color';
+import { FrequencyEnum } from './helper';
 
 export interface IMeta {
   time?: boolean;
@@ -48,12 +49,18 @@ export class Meta implements IMeta {
   }
 }
 
-export const createRecurringEvent = (start: Date, date: Date, it: any, duration: IDuration): any => {
+export const createRecurringEvent = (start: Date, date: Date, it: any, daysInWeek: number, duration?: IDuration): any => {
   const finalDate = greaterOrEqualsThan(date, start) ? date : start;
   const startDate = createNewDate(finalDate, start.getHours(), start.getMinutes());
-  const end = createEndDate(it.end);
+  let calendarEnd = plusDays(date, daysInWeek);
+  if (it.end) {
+    const end = createEndDate(it.end);
+    if (greaterOrEqualsThan(calendarEnd, end)) {
+      calendarEnd = end;
+    }
+  }
 
-  return { duration, it, rrule: createRule(it.repeat, startDate, end) };
+  return { duration, it, rrule: createRule(it.repeat, startDate, calendarEnd, start.getDate(), getWeekDay(start.getDay())) };
 };
 
 export const getFrequency = (repeat: string, start: Date, unavailableId: string, title: string, end: string,
@@ -61,7 +68,7 @@ export const getFrequency = (repeat: string, start: Date, unavailableId: string,
   unavailableId,
   title,
   duration,
-  rule: createRule(repeat, start, createEndDate(end))
+  rule: createRule(repeat, start, createEndDate(end), start.getDate(), getWeekDay(start.getDay()))
 });
 
 export const fillNotAvailable = (unavailable: string, lunch: string, notWorking: string,
@@ -284,21 +291,27 @@ const lunchEvent = (hour: number, lunchStartHour: number, minute: number, lunchS
   return undefined;
 };
 
-const createRule = (repeat: string, dtstart: Date, until: Date): RRule => {
+const createRule = (repeat: string, dtstart: Date, until: Date, monthDay: number, weekDay: ByWeekday): RRule => {
   let freq: Frequency | undefined;
   let byweekday: ByWeekday | undefined;
+  let bymonthday: number | undefined;
   switch (repeat) {
-    case UnavailableRepeatType.onceAWeek:
-      freq = RRule.WEEKLY;
-      byweekday = getWeekDay(dtstart.getDay());
+    case FrequencyEnum.onceAMonth:
+      freq = RRule.MONTHLY;
+      bymonthday = monthDay;
       break;
-    case UnavailableRepeatType.everyDay:
+    case FrequencyEnum.onceAWeek:
+      freq = RRule.WEEKLY;
+      byweekday = weekDay;
+      break;
+    case FrequencyEnum.everyDay:
       freq = RRule.DAILY;
       break;
   }
 
   return new RRule({
     freq,
+    bymonthday,
     byweekday,
     dtstart,
     until

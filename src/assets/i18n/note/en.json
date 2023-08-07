@@ -1,0 +1,37 @@
+{
+  "NOTE": {
+    "TITLE": "Add note",
+    "DETAIL": "Update note",
+    "DESCRIPTION": {
+      "FIELD": "Description",
+      "REQUIRED": "Description is <b>required</b>"
+    },
+    "PROFESSIONAL": {
+      "FIELD": "Professional",
+      "REQUIRED": "Professional is <b>required</b>",
+      "INVALID": "Professional is invalid"
+    },
+    "DATE": {
+      "FIELD": "Pick date",
+      "REQUIRED": "Date is <b>required</b>"
+    },
+    "REPEAT": {
+      "FIELD": "Repeat",
+      "REQUIRED": "Repeat is <b>required</b>"
+    },
+    "CREATED": {
+      "MESSAGE": "Note &lsquo;{{description}}&rsquo; created"
+    },
+    "DELETED": {
+      "TITLE": "Delete note",
+      "CONTENT": "Are you sure to delete note &lsquo;{{description}}&rsquo;?",
+      "MESSAGE": "Note &lsquo;{{description}}&rsquo; deleted"
+    },
+    "UPDATED": {
+      "MESSAGE": "Note &lsquo;{{description}}&rsquo; updated"
+    },
+    "COMPLETED": {
+      "MESSAGE": "Note &lsquo;{{description}}&rsquo; completed"
+    }
+  }
+}

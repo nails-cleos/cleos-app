@@ -48,6 +48,7 @@ import {
   isSameTimeZone,
   newDate,
   newDateTimestamp,
+  plusDays,
   reservationDuration,
   totalDuration
 } from '../util/dates';
@@ -82,8 +83,8 @@ import { IOffice } from '../interfaces/office';
 import { IStep, Step } from '../interfaces/step';
 import { TimeZoneSnackBarComponent } from '../shared/snak/time-zone/time-zone-snack-bar.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import PlaceResult = google.maps.places.PlaceResult;
 import { SelectProfessionalDialogComponent } from './select-professional-dialog.component';
+import PlaceResult = google.maps.places.PlaceResult;
 
 @Component({
   selector: 'app-reservation',
@@ -325,7 +326,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
     this.events = this.events.concat(fillNotAvailable(unavailable, lunch, notWorking,
       date, sunday, saturday, friday, thursday, wednesday, tuesday, monday, this.isDarkMode,
-      addMonths(getNow(), MAX_RESERVATION_MONTH), timeZone));
+      plusDays(date, this.daysInWeek), timeZone));
     this.unavailableEventLength = this.events.length;
     this.viewDate = date;
     this.store.dispatch(
@@ -894,7 +895,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
             this.validateUnavailableEvent(start, duration, it);
           }
         } else {
-          recurringEvents = [...recurringEvents, createRecurringEvent(start, this.viewDate, it, duration)];
+          recurringEvents = [...recurringEvents, createRecurringEvent(start, this.viewDate, it, this.daysInWeek, duration)];
         }
       }
     });
