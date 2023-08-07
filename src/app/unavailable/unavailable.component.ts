@@ -3,7 +3,7 @@ import { Observable, Subscription } from 'rxjs';
 import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AppState, selectUnavailableState } from '../store/app.states';
-import { IUnavailable, Unavailable, UnavailableRepeatType } from '../interfaces/unavailable';
+import { IUnavailable, Unavailable } from '../interfaces/unavailable';
 import * as fromActionsUnavailable from '../store/unavailable.actions';
 import { IUser, IUserAll } from '../interfaces/user';
 import { map, startWith } from 'rxjs/operators';
@@ -25,7 +25,7 @@ import {
   zoneDateToDate
 } from '../util/dates';
 import { IRoomAll } from '../interfaces/room';
-import { executeDialogNoWidth, getUserName } from '../util/helper';
+import { executeDialogNoWidth, FrequencyEnum, getUserName } from '../util/helper';
 import { ActivatedRoute, Router } from '@angular/router';
 import { closest } from '../util/numbers';
 import { fieldChange, requireMatchAsync, valueChange } from '../util/validators';
@@ -49,7 +49,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
   filteredOptions?: Observable<IUser[] | undefined>;
   roomAvailability?: IRoomAll;
 
-  repeats = UnavailableRepeatType;
+  repeats = FrequencyEnum;
 
   errors: any = [];
 
@@ -247,7 +247,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
     this.getForm.repeat.valueChanges.subscribe(value => {
-      if (value && (value === UnavailableRepeatType.onceAWeek || value === UnavailableRepeatType.everyDay)) {
+      if (value && (value === FrequencyEnum.onceAWeek || value === FrequencyEnum.everyDay)) {
         this.getForm.endDate.setValidators(Validators.required);
         this.getForm.endDate.updateValueAndValidity();
         this.showEnd = true;

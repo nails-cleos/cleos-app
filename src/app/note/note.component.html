@@ -1,0 +1,107 @@
+<div class="flex-container" fxLayout="column">
+  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
+    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+      <form (ngSubmit)="submit" [formGroup]="form" novalidate>
+        <mat-card appearance="outlined" class="style-card">
+          <ng-template [ngIf]="isAddMode" [ngIfElse]="headerEditMode">
+            <mat-card-header>
+              <mat-card-title>{{ 'NOTE.TITLE' | translate }}</mat-card-title>
+            </mat-card-header>
+          </ng-template>
+          <ng-template #headerEditMode>
+            <mat-card-header>
+              <mat-card-title>{{ 'NOTE.DETAIL' | translate }}</mat-card-title>
+              <mat-card-subtitle *ngIf="note; else skeleton">{{note.id}}</mat-card-subtitle>
+              <ng-template #skeleton>
+                <div class="ssc-line"></div>
+              </ng-template>
+            </mat-card-header>
+          </ng-template>
+          <mat-card-content>
+            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+              <mat-form-field *ngIf="professionals; else skeleton" appearance="outline">
+                <mat-label>{{ 'NOTE.PROFESSIONAL.FIELD' | translate }}</mat-label>
+                <label>
+                  <input (keydown)="keyDownHandler($event)" formControlName="professional" [matAutocomplete]="auto"
+                         matInput required type="text">
+                </label>
+                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+                  <mat-option *ngFor="let professional of filteredOptions | async" [value]="professional">
+                    {{professional | userName}}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="getForm.professional.hasError('required')"
+                           [innerHTML]="'NOTE.PROFESSIONAL.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="getForm.professional.hasError('requireMatch')"
+                           [innerHTML]="'NOTE.PROFESSIONAL.INVALID' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['professional']">{{errors['professional']}}</mat-error>
+              </mat-form-field>
+              <ng-template #skeleton>
+                <div class="ssc-line"></div>
+              </ng-template>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'NOTE.DESCRIPTION.FIELD' | translate }}</mat-label>
+                <label>
+                  <textarea #message formControlName="description" matInput maxlength="256" required></textarea>
+                </label>
+                <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
+                <mat-error *ngIf="getForm.description.hasError('required')"
+                           [innerHTML]="'NOTE.DESCRIPTION.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['description']">{{errors['description']}}</mat-error>
+              </mat-form-field>
+
+              <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
+                <mat-form-field appearance="outline" color="primary" style="margin-right: 12px;">
+                  <mat-label>{{ 'NOTE.DATE.FIELD' | translate }}</mat-label>
+                  <button (click)="picker.open()" mat-icon-button matPrefix>
+                    <mat-icon>today</mat-icon>
+                  </button>
+                  <label>
+                    <input (focus)="picker.open()" formControlName="date" [matDatepicker]="picker" matInput required>
+                  </label>
+                  <mat-datepicker #picker touchUi></mat-datepicker>
+                  <mat-error *ngIf="getForm.date.hasError('required')" [innerHTML]="'NOTE.DATE.REQUIRED' | translate">
+                  </mat-error>
+                  <mat-error *ngIf="errors['date']">{{errors['date']}}</mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'NOTE.REPEAT.FIELD' | translate }}</mat-label>
+                  <mat-select formControlName="repeat" required>
+                    <mat-option *ngFor="let t of repeats | keyvalue" [value]="t.value">
+                      {{ 'COMMON.REPEAT.' + t.value | translate }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="getForm.repeat.hasError('required')"
+                             [innerHTML]="'NOTE.REPEAT.REQUIRED' | translate">
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+          </mat-card-content>
+          <mat-card-actions>
+            <div fxFlex></div>
+            <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
+                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <ng-template [ngIf]="isAddMode" [ngIfElse]="buttonEditMode">
+              <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button"
+                      type="submit">
+                {{ 'COMMON.BUTTON.CREATE' | translate }}
+              </button>
+            </ng-template>
+            <ng-template #buttonEditMode>
+              <button [disabled]="form.invalid || form.pristine" color="primary" mat-fab extended class="icon-button"
+                      type="submit">
+                {{ 'COMMON.BUTTON.UPDATE' | translate }}
+              </button>
+              <button (click)="delete" color="warn" mat-fab extended class="icon-button"
+                      type="button">{{ 'COMMON.BUTTON.DELETE' | translate }}</button>
+            </ng-template>
+          </mat-card-actions>
+        </mat-card>
+      </form>
+    </div>
+  </div>
+</div>

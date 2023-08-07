@@ -13,6 +13,7 @@ import {
   selectCurrencyState,
   selectDiscountState,
   selectExpenseState,
+  selectNoteState,
   selectNotificationState,
   selectOfficeState,
   selectPaymentState,
@@ -99,7 +100,7 @@ export class NavComponent implements OnInit, OnDestroy {
     this.getNotificationState = this.store.select(selectNotificationState);
     this.selectStore([selectRoomState, selectTreatmentState, selectCatalogueState, selectDiscountState, selectUnavailableState,
       selectUserState, selectReservationState, selectPaymentState, selectAdditionalState, selectCurrencyState, selectOfficeState,
-      selectColorState, selectExpenseState]);
+      selectColorState, selectExpenseState, selectNoteState]);
     this.navigation.subscribe();
   }
 

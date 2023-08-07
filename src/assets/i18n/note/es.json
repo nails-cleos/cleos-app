@@ -1,0 +1,37 @@
+{
+  "COLOR": {
+    "TITLE": "Agregar nota",
+    "DETAIL": "Actualizar nota",
+    "DESCRIPTION": {
+      "FIELD": "Descripción",
+      "REQUIRED": "Descripción es <b>requerido</b>"
+    },
+    "PROFESSIONAL": {
+      "FIELD": "Profesional",
+      "REQUIRED": "Profesional es <b>requerido</b>",
+      "INVALID": "Profesional no valido"
+    },
+    "DATE": {
+      "FIELD": "Elegí fecha",
+      "REQUIRED": "Fecha es <b>requerido</b>"
+    },
+    "REPEAT": {
+      "FIELD": "Repetir",
+      "REQUIRED": "Repetir es <b>requerido</b>"
+    },
+    "CREATED": {
+      "MESSAGE": "Nota &lsquo;{{description}}&rsquo; creado"
+    },
+    "DELETED": {
+      "TITLE": "Eliminar nota",
+      "CONTENT": "¿Está seguro de eliminar nota &lsquo;{{description}}&rsquo;?",
+      "MESSAGE": "Nota &lsquo;{{description}}&rsquo; eliminada"
+    },
+    "UPDATED": {
+      "MESSAGE": "Nota &lsquo;{{description}}&rsquo; actualizada"
+    },
+    "COMPLETED": {
+      "MESSAGE": "Nota &lsquo;{{description}}&rsquo; completada"
+    }
+  }
+}

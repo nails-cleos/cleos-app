@@ -75,6 +75,9 @@ const stateColor = (isDark: boolean): IState[] => [{
 }, {
   name: 'BIRTHDAY',
   color: isDark ? '#eb70a5' : '#f18dbc'
+}, {
+  name: 'NOTE',
+  color: isDark ? '#e7d255' : '#eedf72'
 }];
 
 const selectedTheme = (value: Theme | undefined, themeService: ThemeService): void => {
