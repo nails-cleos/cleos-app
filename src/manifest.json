@@ -5,7 +5,7 @@
   "background_color": "#a9a397",
   "display": "standalone",
   "gcm_sender_id": "174727853234",
-  "scope": "./",
+  "scope": "/",
   "start_url": "https://nailscleos.nl/main",
   "description": "App to book an appointment to make your nail prettier",
   "display_override": ["standalone", "window-controls-overlay", "fullscreen"],
