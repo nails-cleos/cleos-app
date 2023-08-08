@@ -166,11 +166,9 @@
             </a>
             <mat-divider></mat-divider>
             <a [routerLink]="'/auth/profile'" mat-list-item>
-              <ng-template [ngIf]="incomplete" [ngIfElse]="complete">
-                <mat-icon matListItemIcon matBadgeColor="warn" [matBadge]="'*'">
-                  badge
-                </mat-icon>
-              </ng-template>
+              <mat-icon *ngIf="incomplete; else complete" matListItemIcon matBadgeColor="warn" [matBadge]="'*'">
+                badge
+              </mat-icon>
               <ng-template #complete>
                 <mat-icon matListItemIcon>badge</mat-icon>
               </ng-template>
