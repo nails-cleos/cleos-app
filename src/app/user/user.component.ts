@@ -1,16 +1,17 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../store/app.states';
 import * as fromActionsUser from '../store/user.actions';
 import { IUser, User } from '../interfaces/user';
-import { flags, IFlag } from '../util/flags';
+import { findFlag, flags, IFlag } from '../util/flags';
 import { Color } from '@angular-material-components/color-picker';
 import { lightenDarkenColor } from '../util/color';
-import { backendFormatDate, newDate } from '../util/dates';
+import { backendFormatDate, createDateFromString, newDate } from '../util/dates';
 import { IAddress, ILocation } from '../interfaces/room';
+import { fieldChange, valueChange } from '../util/validators';
 import PlaceGeometry = google.maps.places.PlaceGeometry;
 import PlaceResult = google.maps.places.PlaceResult;
 
@@ -20,70 +21,57 @@ import PlaceResult = google.maps.places.PlaceResult;
   styleUrls: ['./user.component.scss']
 })
 export class UserComponent implements OnInit, OnDestroy {
-
-  hide = false;
+  @Input() user?: IUser;
   form!: UntypedFormGroup;
+  id?: string;
+  isAddMode: boolean;
+  hide = false;
   errors: any = [];
-
-  role: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required
-  ]);
-  username: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required
-  ]);
-  email: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required, Validators.email
-  ]);
-  lang: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required
-  ]);
-
-  firstName: UntypedFormControl = new UntypedFormControl();
-  lastName: UntypedFormControl = new UntypedFormControl();
-  phone: UntypedFormControl = new UntypedFormControl();
-  dob: UntypedFormControl = new UntypedFormControl();
-  darkColor: UntypedFormControl = new UntypedFormControl();
-  lightColor: UntypedFormControl = new UntypedFormControl();
-  address: UntypedFormControl = new UntypedFormControl();
-
   flagList: IFlag[] = flags();
   geometry?: PlaceGeometry;
+  addressUpdated = false;
+  formattedAddress?: string;
 
   private getState: Observable<any>;
   private subscription?: Subscription;
-  private formattedAddress?: string;
   private readonly extras: any;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
               private router: Router, private cdRef: ChangeDetectorRef) {
+    this.isAddMode = true;
     this.getState = this.store.select(selectUserState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
     if (this.extras) {
-      this.role.setValue(this.extras.role);
+      this.getForm.role.setValue(this.extras.role);
     }
   }
 
-  get create(): void {
+  get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
+    return this.form.controls;
+  }
+
+  get submit(): void {
     if (this.form.invalid) {
       return;
     }
     const user: IUser = new User();
-    user.username = this.username.value;
-    user.email = this.email.value;
-    user.firstName = this.firstName.value;
-    user.lang = this.lang.value.value;
-    user.lastName = this.lastName.value;
-    user.phone = this.phone.value;
+    user.username = fieldChange(this.getForm.username as UntypedFormControl, this.user?.username);
+    user.email = fieldChange(this.getForm.email as UntypedFormControl, this.user?.email);
+    user.firstName = fieldChange(this.getForm.firstName as UntypedFormControl, this.user?.firstName);
+    user.lang = valueChange(this.getForm.lang.value.value, this.user?.locale);
+    user.lastName = fieldChange(this.getForm.lastName as UntypedFormControl, this.user?.lastName);
+    user.phone = fieldChange(this.getForm.phone as UntypedFormControl, this.user?.phone);
     user.password = 'Ch4ng#';
-    user.dob = this.dob.value ? backendFormatDate(newDate(this.dob.value)) : this.dob.value;
+    user.dob = fieldChange(this.getForm.dob as UntypedFormControl, this.user?.dob);
+    user.dob = user.dob ? backendFormatDate(newDate(user.dob)) : user.dob;
 
-    if (this.lightColor.value) {
-      const color = this.lightColor.value;
+    if (this.getForm.lightColor.value) {
+      const color = this.getForm.lightColor.value;
       user.lightColor = `${ color.r },${ color.g },${ color.b }`;
     }
 
-    if (this.darkColor.value) {
-      const color = this.darkColor.value;
+    if (this.getForm.darkColor.value) {
+      const color = this.getForm.darkColor.value;
       user.darkColor = `${ color.r },${ color.g },${ color.b }`;
     }
 
@@ -98,9 +86,14 @@ export class UserComponent implements OnInit, OnDestroy {
       } as IAddress;
     }
 
-    return this.store.dispatch(
-      new fromActionsUser.SaveUser({ user, role: this.role.value })
-    );
+    if (this.isAddMode) {
+      return this.store.dispatch(
+        new fromActionsUser.SaveUser({ user, role: this.getForm.role.value })
+      );
+    } else {
+      user.id = this.id;
+      return this.store.dispatch(new fromActionsUser.SaveUser({ user }));
+    }
   }
 
   ngOnDestroy(): void {
@@ -108,9 +101,17 @@ export class UserComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.createForm();
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.id = id;
+    }
     this.clean();
+    this.createForm();
     this.subscribe();
+    this.isAddMode = !this.id;
+    if (!this.isAddMode) {
+      this.getUser();
+    }
     this.cdRef.detectChanges();
   }
 
@@ -121,21 +122,22 @@ export class UserComponent implements OnInit, OnDestroy {
   getAddress(placeResult: PlaceResult): void {
     this.geometry = placeResult.geometry;
     this.formattedAddress = placeResult.formatted_address;
+    this.addressUpdated = true;
   }
 
   private createForm(): void {
     this.form = this.formBuilder.group({
-      role: this.role,
-      username: this.username,
-      email: this.email,
-      lang: this.lang,
-      firstName: this.firstName,
-      lastName: this.lastName,
-      phone: this.phone,
-      dob: this.dob,
-      darkColor: this.darkColor,
-      lightColor: this.lightColor,
-      address: this.address
+      role: ['', Validators.required],
+      username: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      lang: ['', Validators.required],
+      firstName: [''],
+      lastName: [''],
+      phone: [''],
+      dob: [''],
+      darkColor: [''],
+      lightColor: [''],
+      address: ['']
     });
   }
 
@@ -147,6 +149,36 @@ export class UserComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
+      if (state.selected) {
+        this.user = state.selected;
+        const user: IUser = {
+          username: this.user?.username,
+          email: this.user?.email,
+          firstName: this.user?.firstName,
+          lastName: this.user?.lastName,
+          phone: this.user?.phone,
+        };
+        console.log((this.user))
+        this.form.patchValue(user);
+        this.getForm.address.setValue(this.user?.address?.name);
+
+        if (state.selected.lightColor) {
+          const rgb = state.selected.lightColor.split(',');
+          this.getForm.lightColor.setValue(new Color(Number(rgb[0]), Number(rgb[1]), Number(rgb[2])));
+        }
+        if (state.selected.darkColor) {
+          const rgb = state.selected.darkColor.split(',');
+          this.getForm.darkColor.setValue(new Color(Number(rgb[0]), Number(rgb[1]), Number(rgb[2])));
+        }
+        if (state.selected.dob) {
+          this.getForm.dob.setValue(createDateFromString(state.selected.dob));
+        }
+
+        this.getForm.lang.setValue(findFlag(this.flagList, state.selected.locale));
+        this.getForm.role.setValidators([]);
+        this.getForm.role.updateValueAndValidity();
+        this.cdRef.detectChanges();
+      }
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
@@ -156,5 +188,13 @@ export class UserComponent implements OnInit, OnDestroy {
         this.router.navigate(['users']);
       }
     });
+  }
+
+  private getUser(): void {
+    if (!this.user) {
+      this.store.dispatch(
+        new fromActionsUser.FindUser(this.id)
+      );
+    }
   }
 }

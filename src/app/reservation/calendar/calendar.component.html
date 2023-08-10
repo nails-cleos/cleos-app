@@ -78,14 +78,14 @@
 
 <div *ngIf="data && calendar" class="scroll-container">
   <div class="divider">
-    <button fxShow.lt-sm fxHide (click)="decrement" [disabled]="prevBtnDisabled" color="accent" mat-fab>
+    <button fxShow.lt-sm fxHide (click)="decrement" color="accent" mat-fab>
       <mat-icon>navigate_before</mat-icon>
     </button>
-    <button fxHide.lt-sm fxShow (click)="decrement" [disabled]="prevBtnDisabled" color="accent" mat-fab extended>
+    <button fxHide.lt-sm fxShow (click)="decrement" color="accent" mat-fab extended>
       <mat-icon>navigate_before</mat-icon>
       <span>{{'COMMON.BUTTON.PREVIOUS' | translate}}</span>
     </button>
-    <input (dateChange)="selectDate($event)" [matDatepicker]="picker" [max]="maxDate" [min]="today" [value]="viewDate"
+    <input (dateChange)="selectDate($event)" [matDatepicker]="picker" [value]="viewDate"
            hidden matInput>
     <mat-datepicker #picker touchUi></mat-datepicker>
     <button fxShow.lt-sm fxHide (click)="picker.open()" color="primary" mat-fab>
@@ -95,10 +95,10 @@
       <mat-icon>today</mat-icon>
       <span>{{'COMMON.BUTTON.GOTO' | translate}}</span>
     </button>
-    <button fxShow.lt-sm fxHide (click)="increment" [disabled]="nextBtnDisabled" color="accent" mat-fab>
+    <button fxShow.lt-sm fxHide (click)="increment" color="accent" mat-fab>
       <mat-icon>navigate_next</mat-icon>
     </button>
-    <button fxHide.lt-sm fxShow (click)="increment" [disabled]="nextBtnDisabled" color="accent" mat-fab extended>
+    <button fxHide.lt-sm fxShow (click)="increment" color="accent" mat-fab extended>
       <mat-icon>navigate_next</mat-icon>
       <span>{{'COMMON.BUTTON.NEXT' | translate}}</span>
     </button>
@@ -122,9 +122,8 @@
       [dayEndMinute]="calendar.day!.dayEndMinute"
       [dayStartHour]="calendar.day!.dayStartHour"
       [dayStartMinute]="calendar.day!.dayStartMinute"
-      [daysInWeek]="daysInWeek"
+      [daysInWeek]="totalDays"
       [events]="calendar.events"
-      [excludeDays]="calendar.day!.excludeDays"
       [hourSegments]="hourSegments"
       [locale]="locale"
       [viewDate]="viewDate"

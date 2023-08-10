@@ -5,7 +5,6 @@ import { UserRoutingModule } from './user-routing.module';
 
 import { UserComponent } from './user.component';
 import { SelectUserDialogComponent, UsersComponent } from './list/users.component';
-import { UserDetailComponent } from './detail/user-detail.component';
 import { OverviewComponent } from './overview/overview.component';
 import { OverviewChartComponent } from './overview/chart/overview-chart/overview-chart.component';
 import { NgxMatIntlTelInputComponent } from 'ngx-mat-intl-tel-input';
@@ -19,7 +18,6 @@ import { NgxMatColorPickerModule } from '@angular-material-components/color-pick
   declarations: [
     UserComponent,
     UsersComponent,
-    UserDetailComponent,
     OverviewComponent,
     OverviewChartComponent,
     SelectUserDialogComponent
