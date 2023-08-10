@@ -1,9 +1,9 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState, selectReservationState } from '../../store/app.states';
-import { Observable, Subject } from 'rxjs';
+import { AppState, selectReservationState } from '../../store/app.states';
+import { Observable, Subject, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
-import { Calendar, Day, ICalendar, IReservationAll, IRoomReservation, MAX_RESERVATION_MONTH } from '../../interfaces/reservation';
+import { Calendar, Day, ICalendar, IReservationAll, IRoomReservation, MAX_RESERVATION_MONTH, States } from '../../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import {
@@ -11,7 +11,6 @@ import {
   API_LOCALE,
   CalendarPeriod,
   createNewDate,
-  endOfPeriod,
   formatDateTime,
   getAvailability,
   getDuration,
@@ -21,21 +20,21 @@ import {
   IDuration,
   isBetween,
   newDate,
-  newDateTimestamp, plusDays,
+  newDateTimestamp,
+  plusDays,
   reservationDuration,
-  startOfPeriod,
   subPeriod
 } from '../../util/dates';
 import { IRoom, IRoomAll } from '../../interfaces/room';
-import { allDayEvent, createBullet, createRecurringEvent, fillNotAvailable, getOverlapEvent, Meta, newEvent } from '../../util/event';
+import { allDayEvent, calendarEvent, createBullet, createRecurringEvent, fillNotAvailable, getOverlapEvent, Meta } from '../../util/event';
 import { Router } from '@angular/router';
 import { CalendarEvent, CalendarEventTimesChangedEvent } from 'angular-calendar';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { IUnavailableAll } from '../../interfaces/unavailable';
 import { createRoomOffice, executeDialogNoWidth, FrequencyEnum, getFullUserName, getUserName } from '../../util/helper';
-import { addMonths, isEqual } from 'date-fns';
-import { findStateColor, isDarkMode } from '../../util/theme';
+import { addMonths, isEqual, startOfWeek } from 'date-fns';
+import { findStateColor } from '../../util/theme';
 import { map, startWith, takeUntil } from 'rxjs/operators';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { IOffice } from '../../interfaces/office';
@@ -43,6 +42,7 @@ import { requireMatch } from '../../util/validators';
 import { CalendarDialogComponent } from '../../shared/dialog/calendar/calendar-dialog.component';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { INoteAll } from '../../interfaces/note';
+import { AuthUserService } from '../../services/auth-user.service';
 
 @Component({
   selector: 'app-calendar',
@@ -54,15 +54,10 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   data?: IRoomReservation;
   calendar?: ICalendar;
-  daysInWeek = 7;
   hourSegments = 4;
   viewDate: Date = getNow();
-  today: Date = createNewDate(getNow());
-  maxDate: Date;
   locale: string;
   professionalId?: string;
-  prevBtnDisabled = false;
-  nextBtnDisabled = false;
 
   officeForm!: UntypedFormGroup;
   offices?: IOffice[];
@@ -88,12 +83,16 @@ export class CalendarComponent implements OnInit, OnDestroy {
   private getState: Observable<any>;
   private destroy$ = new Subject();
   private subscription = new Subject();
+  private authUserServiceSubscription: Subscription;
   private roomId?: string;
   private professionalSelectedId?: string;
+  private readonly maxDate: Date;
+  private today: Date = createNewDate(getNow());
+  private daysInWeek = 7;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private router: Router, private breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef,
-              private formBuilder: UntypedFormBuilder) {
+              private formBuilder: UntypedFormBuilder, private authUserService: AuthUserService) {
     this.getState = this.store.select(selectReservationState);
     const CALENDAR_RESPONSIVE = {
       xsmall: {
@@ -125,21 +124,24 @@ export class CalendarComponent implements OnInit, OnDestroy {
     });
     this.locale = this.translate.currentLang;
 
-    this.store.select(selectAuthState).subscribe((state: any) => {
-      const user: IUserAll = state.user;
-      this.professionalId = user.id;
-      const darkMode: boolean = isDarkMode(user.theme);
+    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
+      this.professionalId = value.professionalId;
+      const darkMode: boolean = value.isDarkMode;
       if (this.isDarkMode !== undefined && darkMode !== this.isDarkMode) {
         this.fillData(darkMode);
       }
       this.isDarkMode = darkMode;
     });
     this.maxDate = addMonths(getNow(), MAX_RESERVATION_MONTH);
-    this.dateOrViewChanged();
   }
 
   get search(): void {
     return this.getReservations();
+  }
+
+  get totalDays(): number {
+    // set 0 for full week
+    return this.daysInWeek === 7 ? 0 : this.daysInWeek;
   }
 
   get increment(): void {
@@ -148,6 +150,13 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   get decrement(): void {
     return this.picker.select(subPeriod(this.selectView, this.viewDate, this.daysInWeek));
+  }
+
+  private get searchDate(): Date {
+    if (this.totalDays) {
+      return this.viewDate;
+    }
+    return startOfWeek(this.viewDate);
   }
 
   ngOnInit(): void {
@@ -161,6 +170,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
     this.destroy$.unsubscribe();
+    this.authUserServiceSubscription.unsubscribe();
   }
 
   displayFnOffice(office: IOffice): string {
@@ -327,21 +337,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   private changeDate(date: Date): void {
     this.viewDate = createNewDate(date, this.viewDate.getHours(), this.viewDate.getMinutes());
-    this.dateOrViewChanged();
-  }
-
-  private dateOrViewChanged(): void {
-    this.prevBtnDisabled = !this.dateIsValid(
-      endOfPeriod(this.selectView, subPeriod(this.selectView, this.viewDate, 1))
-    );
-    this.nextBtnDisabled = !this.dateIsValid(
-      startOfPeriod(this.selectView, addPeriod(this.selectView, this.viewDate, 1))
-    );
-    if (this.viewDate < this.today) {
-      this.changeDate(this.today);
-    } else if (this.viewDate > this.maxDate) {
-      this.changeDate(this.maxDate);
-    }
   }
 
   private dateIsValid(date: Date): boolean {
@@ -369,16 +364,15 @@ export class CalendarComponent implements OnInit, OnDestroy {
         const meta = new Meta(true, it.room.timeZone);
         meta.id = it.id;
         meta.customer = getUserName(it.customer);
-        const event = newEvent(detail, color, start, darkMode, end, `reservation/${ it.id }`, meta, true);
-        if (event) {
-          let events;
-          if (this.calendar) {
-            events = [...this.calendar.events, event];
-          } else {
-            events = [event];
-          }
-          this.calendar = new Calendar(rr.room, events);
+        const draggable = [States.approved, States.created, States.partiallyPaid, States.paid].includes(it.state as States);
+        const event = calendarEvent(detail, color, start, darkMode, end, `reservation/${ it.id }`, meta, draggable);
+        let events;
+        if (this.calendar) {
+          events = [...this.calendar.events, event];
+        } else {
+          events = [event];
         }
+        this.calendar = new Calendar(rr.room, events);
       }
     });
   }
@@ -491,13 +485,10 @@ export class CalendarComponent implements OnInit, OnDestroy {
       path += 'block-agenda/';
     }
     path += it.id;
-    const event = newEvent(detail, color, start, darkMode, end, path, meta);
-    if (event) {
-      events = [...events, event];
-      const calendar = new Calendar(room, events);
-      calendar.day = day;
-      this.calendar = calendar;
-    }
+    events = [...events, calendarEvent(detail, color, start, darkMode, end, path, meta)];
+    const calendar = new Calendar(room, events);
+    calendar.day = day;
+    this.calendar = calendar;
   }
 
   private subscribe(): void {
@@ -545,7 +536,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   private getReservations(): void {
     const payload = {
       days: this.daysInWeek,
-      date: this.viewDate,
+      date: this.searchDate,
       roomId: this.roomId,
       professionalId: this.professionalSelectedId
     };

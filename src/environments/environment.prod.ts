@@ -21,5 +21,6 @@ export const environment = {
     vapidKey: 'BKiso9gE3_8fIrVVtY1pKS2vC6a93hAYOGMPlqVUBBUCVmuAtEtDw98El0Z-YQFIpEL_VsCbwYGiz05xzJnaWJY',
     databaseURL: 'https://nails-cleos-default-rtdb.europe-west1.firebasedatabase.app/'
   },
-  googleMapKey: 'AIzaSyDI-kCD_XD9jNJ3tNcDVmkMuwCqljzudJg'
+  googleMapKey: 'AIzaSyDI-kCD_XD9jNJ3tNcDVmkMuwCqljzudJg',
+  showMap: true
 };

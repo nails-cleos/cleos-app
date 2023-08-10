@@ -6,16 +6,15 @@ import { ICatalogue, ISlide, Slide } from '../../interfaces/catalogue';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { requireMatch } from '../../util/validators';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState, selectMainState } from '../../store/app.states';
+import { AppState, selectMainState } from '../../store/app.states';
 import { ViewportScroller } from '@angular/common';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { IUserAll } from '../../interfaces/user';
-import { getUserName } from '../../util/helper';
 import { filterDateRoom, getNow, plusMonthDate } from '../../util/dates';
 import { MAX_RESERVATION_CUSTOMER_MONTH } from '../../interfaces/reservation';
 import * as fromActionsMain from '../../store/main.actions';
+import { AuthUserService } from '../../services/auth-user.service';
 
 @Component({
   selector: 'app-main-content',
@@ -53,19 +52,19 @@ export class MainContentComponent implements OnInit, OnDestroy {
   ]);
 
   private isAuthenticated = false;
-  private subscription: Subscription | undefined;
+  private subscription?: Subscription;
+  private authUserServiceSubscription: Subscription;
   private getState: Observable<any>;
 
-  constructor(private store: Store<AppState>, private cdRef: ChangeDetectorRef,
-              private viewportScroller: ViewportScroller, private translate: TranslateService, private router: Router,
-              private formBuilder: UntypedFormBuilder, private snackBar: MatSnackBar) {
+  constructor(private store: Store<AppState>, private cdRef: ChangeDetectorRef, private viewportScroller: ViewportScroller,
+              private translate: TranslateService, private router: Router, private formBuilder: UntypedFormBuilder,
+              private snackBar: MatSnackBar, private authUserService: AuthUserService) {
     this.getState = this.store.select(selectMainState);
-    this.store.select(selectAuthState).subscribe((state: any) => {
-      this.isAuthenticated = state.isAuthenticated;
-      if (state.isAuthenticated) {
-        const user: IUserAll = state.user;
-        this.email.setValue(user.email);
-        this.name.setValue(getUserName(user));
+    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
+      this.isAuthenticated = value.isAuthenticated;
+      if (this.isAuthenticated) {
+        this.email.setValue(value.email);
+        this.name.setValue(value.username);
       }
     });
     this.minDate = getNow();
@@ -112,6 +111,7 @@ export class MainContentComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.authUserServiceSubscription.unsubscribe();
   }
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d);

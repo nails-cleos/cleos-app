@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CalendarEvent } from 'angular-calendar';
 import { Observable, Subscription } from 'rxjs';
-import { AppState, selectAuthState, selectDashboardState } from '../store/app.states';
+import { AppState, selectDashboardState } from '../store/app.states';
 import {
   addPeriod,
   API_LOCALE,
@@ -21,7 +21,6 @@ import {
 } from '../util/dates';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
-import { isDarkMode } from '../util/theme';
 import { IProfessionalEvent, IRoomEvents } from '../interfaces/dashboard';
 import * as fromActionsDashboard from '../store/dashboard.actions';
 import * as fromActionsReservation from '../store/reservation.actions';
@@ -35,13 +34,14 @@ import { MatDialog } from '@angular/material/dialog';
 import { getProfessionalColor } from '../util/color';
 import { CalendarDialogComponent } from '../shared/dialog/calendar/calendar-dialog.component';
 import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
+import { AuthUserService } from '../services/auth-user.service';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   @ViewChild('picker') picker: any;
 
   viewDate: Date = getNow();
@@ -72,12 +72,13 @@ export class DashboardComponent implements OnInit {
 
   private getState: Observable<any>;
   private subscription?: Subscription;
+  private authUserServiceSubscription: Subscription;
 
   constructor(private store: Store<AppState>, private readonly translate: TranslateService, private router: Router,
-              public dialog: MatDialog) {
+              public dialog: MatDialog, private authUserService: AuthUserService) {
     this.getState = this.store.select(selectDashboardState);
-    this.store.select(selectAuthState).subscribe((state: any) => {
-      const darkMode: boolean = isDarkMode(state.user?.theme);
+    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
+      const darkMode: boolean = value.isDarkMode;
       if (this.isDarkMode !== undefined && darkMode !== this.isDarkMode) {
         this.createEvents(darkMode);
       }
@@ -126,6 +127,11 @@ export class DashboardComponent implements OnInit {
     this.clean();
     this.subscribe();
     this.getEvents();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+    this.authUserServiceSubscription.unsubscribe();
   }
 
   selectDate(event: any): void {

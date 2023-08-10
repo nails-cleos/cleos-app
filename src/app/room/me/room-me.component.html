@@ -194,9 +194,12 @@
               </mat-accordion>
               <mat-error *ngIf="errors['availability']" [innerHTML]="'ROOM.AVAILABILITY.REQUIRED' | translate"
                          class="divider"></mat-error>
-              <app-google-map [addressFormGroup]="addressFormGroup" [latitudeMarker]="room.address.location.y"
-                              [longitudeMarker]="room.address.location.x" (addressEmitter)="getAddress($event)">
-              </app-google-map>
+              <div>
+                <app-google-map [addressFormGroup]="addressFormGroup" [latitudeMarker]="room.address.location.y"
+                                [longitudeMarker]="room.address.location.x" (addressEmitter)="getAddress($event)"
+                                [types]="['establishment']">
+                </app-google-map>
+              </div>
             </div>
           </mat-card-content>
           <ng-template #boxSkeleton>

@@ -9,9 +9,12 @@ import { fieldChange, valueChange } from '../../util/validators';
 import { Location } from '@angular/common';
 import { findFlag, flags, IFlag } from '../../util/flags';
 import { getUserImage, getUserNameInitials } from '../../util/helper';
-import { API_LOCALE, backendFormatDate, createDateFromString, newDate } from '../../util/dates';
+import { backendFormatDate, createDateFromString, newDate } from '../../util/dates';
 import { Color } from '@angular-material-components/color-picker';
 import { lightenDarkenColor } from '../../util/color';
+import { IAddress, ILocation } from '../../interfaces/room';
+import PlaceResult = google.maps.places.PlaceResult;
+import PlaceGeometry = google.maps.places.PlaceGeometry;
 
 @Component({
   selector: 'app-profile',
@@ -19,9 +22,6 @@ import { lightenDarkenColor } from '../../util/color';
   styleUrls: ['./profile.component.scss']
 })
 export class ProfileComponent implements OnInit, OnDestroy {
-
-  getState: Observable<any>;
-  subscription?: Subscription;
   form!: UntypedFormGroup;
   errors: any = [];
   user?: IUser;
@@ -43,9 +43,17 @@ export class ProfileComponent implements OnInit, OnDestroy {
   darkColor: UntypedFormControl = new UntypedFormControl();
   lightColor: UntypedFormControl = new UntypedFormControl();
 
+  address: UntypedFormControl = new UntypedFormControl();
+
   showColors = false;
 
   flagList: IFlag[] = flags();
+  isDarkMode = false;
+
+  private getState: Observable<any>;
+  private subscription?: Subscription;
+  private geometry?: PlaceGeometry;
+  private formattedAddress?: string;
 
   constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private location: Location,
               private cdRef: ChangeDetectorRef) {
@@ -66,16 +74,27 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
     if (this.lightColor.value) {
       const color = this.lightColor.value;
-      user.lightColor = `${color.r},${color.g},${color.b}`;
+      user.lightColor = `${ color.r },${ color.g },${ color.b }`;
     }
 
     if (this.darkColor.value) {
       const color = this.darkColor.value;
-      user.darkColor = `${color.r},${color.g},${color.b}`;
+      user.darkColor = `${ color.r },${ color.g },${ color.b }`;
+    }
+
+    if (this.geometry?.location) {
+      const location = this.geometry.location;
+      user.address = {
+        name: this.formattedAddress,
+        location: {
+          x: location?.lng(),
+          y: location?.lat()
+        } as ILocation
+      } as IAddress;
     }
 
     return this.store.dispatch(
-      new fromActionsUser.UpdateUser({user, redirectUrl: 'auth/profile'})
+      new fromActionsUser.UpdateUser({ user, redirectUrl: 'auth/profile' })
     );
   }
 
@@ -105,7 +124,12 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   lightenDarkenColor(color: Color, isDark: boolean): string {
-    return lightenDarkenColor(`#${color.hex}`, isDark ? 50 : -50);
+    return lightenDarkenColor(`#${ color.hex }`, isDark ? 50 : -50);
+  }
+
+  getAddress(placeResult: PlaceResult): void {
+    this.geometry = placeResult.geometry;
+    this.formattedAddress = placeResult.formatted_address;
   }
 
   private findMe(): void {
@@ -123,7 +147,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
       phone: this.phone,
       dob: this.dob,
       darkColor: this.darkColor,
-      lightColor: this.lightColor
+      lightColor: this.lightColor,
+      address: this.address
     });
   }
 
@@ -142,6 +167,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.initials = getUserNameInitials(user);
         this.image = getUserImage(user);
         this.form.patchValue(state.selected);
+        this.address.setValue(this.user?.address?.name);
 
         const roles = ['ROLE_PROFESSIONAL', 'ROLE_MANAGER'];
         this.showColors = state.selected.authorities?.some((au: any) => roles.includes(au.authority));
@@ -164,7 +190,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({incorrect: true});
+          this.form.controls[value.field].setErrors({ incorrect: true });
         });
       }
       if (state.message) {

@@ -68,7 +68,8 @@
                   <span>{{ 'ROOM.OFFICE.ADD_BUTTON' | translate }}</span>
                 </button>
               </div>
-              <div *ngIf="allProfessional; else skeleton" fxLayout="row" fxLayoutAlign="space-between center" id="professionals">
+              <div *ngIf="allProfessional; else skeleton" fxLayout="row" fxLayoutAlign="space-between center"
+                   id="professionals">
                 <mat-form-field class="chip-list">
                   <mat-label>{{ 'ROOM.PROFESSIONAL.FIELD' | translate }}</mat-label>
                   <mat-chip-grid #chipList aria-label="Professional selection">
@@ -250,7 +251,8 @@
               </mat-accordion>
               <mat-error *ngIf="errors['availability']" [innerHTML]="'ROOM.AVAILABILITY.REQUIRED' | translate"
                          class="divider"></mat-error>
-              <app-google-map [addressFormGroup]="form" (addressEmitter)="getAddress($event)"></app-google-map>
+              <app-google-map [addressFormGroup]="form" (addressEmitter)="getAddress($event)"
+                              [types]="['establishment']"></app-google-map>
               <mat-error *ngIf="errors['location']" class="divider">{{errors['location']}}</mat-error>
             </div>
           </mat-card-content>

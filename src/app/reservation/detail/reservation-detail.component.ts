@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState, selectReservationState } from '../../store/app.states';
+import { AppState, selectReservationState } from '../../store/app.states';
 import { Observable, pairwise, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
 import { CancelOption, IReservationAll, States } from '../../interfaces/reservation';
@@ -21,11 +21,9 @@ import {
 } from '../../util/dates';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { IUserAll } from '../../interfaces/user';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Role } from '../../interfaces/token';
 import {
   customerEditDialog,
   executeDialog,
@@ -50,6 +48,7 @@ import { ChangeCustomerDialogComponent } from './change-customer-dialog.componen
 import { ChangeColorDialogComponent } from './change-color-dialog.component';
 import { AddNoteDialogComponent } from './add-note-dialog.component';
 import { AddDiscountDialogComponent } from './add-discount-dialog.component';
+import { AuthUserService } from '../../services/auth-user.service';
 
 @Component({
   selector: 'app-reservation-detail',
@@ -99,15 +98,17 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   private isLoading = false;
   private getState: Observable<any>;
   private subscription?: Subscription;
+  private authUserServiceSubscription: Subscription;
   private small = false;
   private reservationId?: string;
-  private user?: IUserAll;
+  private hasRoomAdmin?: boolean;
 
   private readonly language: string;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private route: ActivatedRoute,
               private store: Store<AppState>, private cdRef: ChangeDetectorRef, private router: Router,
-              private breakpointObserver: BreakpointObserver, private formBuilder: UntypedFormBuilder) {
+              private breakpointObserver: BreakpointObserver, private formBuilder: UntypedFormBuilder,
+              private authUserService: AuthUserService) {
     this.getState = this.store.select(selectReservationState);
     breakpointObserver.observe([
       Breakpoints.XSmall,
@@ -123,11 +124,10 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     this.dateFormat = this.translate.currentLang;
     this.price = new Price();
 
-    this.store.select(selectAuthState).subscribe((state: any) => {
-      const user: IUserAll = state.user;
-      this.professionalId = user.authorities.some(u => u.authority === Role.professional) ? user.id : undefined;
-      this.customerId = user.authorities.some(u => u.authority === Role.customer) ? user.id : undefined;
-      this.user = state.user;
+    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
+      this.professionalId = value.professionalId;
+      this.customerId = value.customerId;
+      this.hasRoomAdmin = value.isAdmin || value.isManager || value.isRoomAdmin;
     });
   }
 
@@ -233,6 +233,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.authUserServiceSubscription.unsubscribe();
   }
 
   onChangeState(id: any): void {
@@ -310,8 +311,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         this.state = state.selected.state;
         this.reservation = state.selected;
         const isProfessionalAdmin = this.professionalId && isProfessional(this.professionalId, this.reservation?.room?.professionals);
-        this.isReservationAdmin = (isProfessionalAdmin || this.user?.authorities
-          .some(u => [Role.admin, Role.roomAdmin, Role.manager].includes(u.authority as Role)));
+        this.isReservationAdmin = isProfessionalAdmin || this.hasRoomAdmin;
         if (isProfessionalAdmin) {
           this.professionalMachine(this);
           this.changeState = this.machine.next(snakeToCamel(this.reservation?.state));

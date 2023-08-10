@@ -105,6 +105,17 @@ export const newEvent = (title: string, color: string, start: Date, isDarkMode: 
   return undefined;
 };
 
+export const calendarEvent = (title: string, color: string, start: Date, isDarkMode: boolean, end?: Date,
+                              id?: string, meta: IMeta = new Meta(), draggable: boolean = false): CalendarEvent => ({
+    id,
+    start,
+    end,
+    title,
+    draggable,
+    color: createEventColor(color, isDarkMode),
+    meta
+  } as unknown as CalendarEvent);
+
 export const allDayEvent = (title: string, color: string, start: Date, isDarkMode: boolean, id?: string,
                             meta: IMeta = new Meta()): CalendarEvent | undefined => {
   if (greaterOrEqualsThanToday(start)) {
