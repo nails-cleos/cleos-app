@@ -8,9 +8,12 @@ import * as fromActionsUser from '../../store/user.actions';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { fieldChange, valueChange } from '../../util/validators';
 import { findFlag, flags, IFlag } from '../../util/flags';
-import { API_LOCALE, backendFormatDate, createDateFromString, formatDateTwoDigit, newDate } from '../../util/dates';
+import { backendFormatDate, createDateFromString, newDate } from '../../util/dates';
 import { Color } from '@angular-material-components/color-picker';
 import { lightenDarkenColor } from '../../util/color';
+import { IAddress, ILocation } from '../../interfaces/room';
+import PlaceGeometry = google.maps.places.PlaceGeometry;
+import PlaceResult = google.maps.places.PlaceResult;
 
 @Component({
   selector: 'app-user-detail',
@@ -21,8 +24,6 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Input() user: IUser | undefined;
   form!: UntypedFormGroup;
-  getState: Observable<any>;
-  subscription: Subscription | undefined;
   username: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
@@ -39,9 +40,15 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   dob: UntypedFormControl = new UntypedFormControl();
   darkColor: UntypedFormControl = new UntypedFormControl();
   lightColor: UntypedFormControl = new UntypedFormControl();
+  address: UntypedFormControl = new UntypedFormControl();
 
   showColors = false;
   flagList: IFlag[] = flags();
+
+  private getState: Observable<any>;
+  private subscription?: Subscription;
+  private geometry?: PlaceGeometry;
+  private formattedAddress?: string;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
               private cdRef: ChangeDetectorRef, private router: Router) {
@@ -74,6 +81,17 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       user.darkColor = `${ color.r },${ color.g },${ color.b }`;
     }
 
+    if (this.geometry?.location) {
+      const location = this.geometry.location;
+      user.address = {
+        name: this.formattedAddress,
+        location: {
+          x: location?.lng(),
+          y: location?.lat()
+        } as ILocation
+      } as IAddress;
+    }
+
     return this.store.dispatch(new fromActionsUser.SaveUser({ user }));
   }
 
@@ -95,6 +113,11 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     return lightenDarkenColor(`#${ color.hex }`, isDark ? 50 : -50);
   }
 
+  getAddress(placeResult: PlaceResult): void {
+    this.geometry = placeResult.geometry;
+    this.formattedAddress = placeResult.formatted_address;
+  }
+
   private createForm(): void {
     this.form = this.formBuilder.group({
       username: this.username,
@@ -105,7 +128,8 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       phone: this.phone,
       dob: this.dob,
       darkColor: this.darkColor,
-      lightColor: this.lightColor
+      lightColor: this.lightColor,
+      address: this.address
     });
   }
 
@@ -120,6 +144,7 @@ export class UserDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       if (state.selected) {
         this.user = state.selected;
         this.form.patchValue(state.selected);
+        this.address.setValue(this.user?.address?.name);
 
         const roles = ['ROLE_PROFESSIONAL', 'ROLE_MANAGER'];
         this.showColors = state.selected.authorities?.some((au: any) => roles.includes(au.authority));

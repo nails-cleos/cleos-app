@@ -93,13 +93,18 @@
                   {{errors['dob']}}
                 </mat-error>
               </mat-form-field>
-              <mat-form-field *ngIf="['ROLE_PROFESSIONAL', 'ROLE_MANAGER'].indexOf(role.value) === 0" appearance="outline">
+              <app-google-map [addressFormGroup]="form" [latitudeMarker]="geometry?.location?.lat()"
+                              [longitudeMarker]="geometry?.location?.lng()" (addressEmitter)="getAddress($event)">
+              </app-google-map>
+              <mat-form-field *ngIf="['ROLE_PROFESSIONAL', 'ROLE_MANAGER'].indexOf(role.value) === 0"
+                              appearance="outline">
                 <mat-label>{{ 'COMMON.PROFESSIONAL.COLOR.DARK.FIELD' | translate }}</mat-label>
                 <input [formControl]="darkColor" [ngxMatColorPicker]="pickerDark" matInput>
                 <ngx-mat-color-toggle [for]="pickerDark" matSuffix></ngx-mat-color-toggle>
                 <ngx-mat-color-picker #pickerDark [touchUi]="true"></ngx-mat-color-picker>
               </mat-form-field>
-              <mat-form-field *ngIf="['ROLE_PROFESSIONAL', 'ROLE_MANAGER'].indexOf(role.value) === 0" appearance="outline">
+              <mat-form-field *ngIf="['ROLE_PROFESSIONAL', 'ROLE_MANAGER'].indexOf(role.value) === 0"
+                              appearance="outline">
                 <mat-label>{{ 'COMMON.PROFESSIONAL.COLOR.LIGHT.FIELD' | translate }}</mat-label>
                 <input [formControl]="lightColor" [ngxMatColorPicker]="picker" matInput>
                 <ngx-mat-color-toggle [for]="picker" matSuffix></ngx-mat-color-toggle>

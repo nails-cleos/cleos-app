@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState, selectReservationState } from '../../store/app.states';
-import { Observable, Subject } from 'rxjs';
+import { AppState, selectReservationState } from '../../store/app.states';
+import { Observable, Subject, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
 import { Calendar, Day, ICalendar, IReservationAll, IRoomReservation, MAX_RESERVATION_MONTH } from '../../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
@@ -35,7 +35,7 @@ import { IUser, IUserAll } from '../../interfaces/user';
 import { IUnavailableAll } from '../../interfaces/unavailable';
 import { createRoomOffice, executeDialogNoWidth, FrequencyEnum, getFullUserName, getUserName } from '../../util/helper';
 import { addMonths, isEqual } from 'date-fns';
-import { findStateColor, isDarkMode } from '../../util/theme';
+import { findStateColor } from '../../util/theme';
 import { map, startWith, takeUntil } from 'rxjs/operators';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { IOffice } from '../../interfaces/office';
@@ -43,6 +43,7 @@ import { requireMatch } from '../../util/validators';
 import { CalendarDialogComponent } from '../../shared/dialog/calendar/calendar-dialog.component';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { INoteAll } from '../../interfaces/note';
+import { AuthUserService } from '../../services/auth-user.service';
 
 @Component({
   selector: 'app-calendar',
@@ -88,12 +89,13 @@ export class CalendarComponent implements OnInit, OnDestroy {
   private getState: Observable<any>;
   private destroy$ = new Subject();
   private subscription = new Subject();
+  private authUserServiceSubscription: Subscription;
   private roomId?: string;
   private professionalSelectedId?: string;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private router: Router, private breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef,
-              private formBuilder: UntypedFormBuilder) {
+              private formBuilder: UntypedFormBuilder, private authUserService: AuthUserService) {
     this.getState = this.store.select(selectReservationState);
     const CALENDAR_RESPONSIVE = {
       xsmall: {
@@ -125,10 +127,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
     });
     this.locale = this.translate.currentLang;
 
-    this.store.select(selectAuthState).subscribe((state: any) => {
-      const user: IUserAll = state.user;
-      this.professionalId = user.id;
-      const darkMode: boolean = isDarkMode(user.theme);
+    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
+      this.professionalId = value.professionalId;
+      const darkMode: boolean = value.isDarkMode;
       if (this.isDarkMode !== undefined && darkMode !== this.isDarkMode) {
         this.fillData(darkMode);
       }
@@ -161,6 +162,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
     this.destroy$.unsubscribe();
+    this.authUserServiceSubscription.unsubscribe();
   }
 
   displayFnOffice(office: IOffice): string {

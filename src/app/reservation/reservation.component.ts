@@ -5,7 +5,7 @@ import { map, startWith } from 'rxjs/operators';
 import { IUser, IUserAll } from '../interfaces/user';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState, selectReservationState } from '../store/app.states';
+import { AppState, selectReservationState } from '../store/app.states';
 import * as fromActionsReservation from '../store/reservation.actions';
 import { requireMatch, valueChange } from '../util/validators';
 import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../interfaces/treatment';
@@ -76,7 +76,7 @@ import {
 } from '../util/helper';
 import { transitionAnimation } from '../util/animation';
 import { addDays, addMonths, isEqual, isSameDay } from 'date-fns';
-import { findStateColor, isDarkMode } from '../util/theme';
+import { findStateColor } from '../util/theme';
 import { IAdditionalAll } from '../interfaces/additional';
 import { MatListOption } from '@angular/material/list';
 import { IOffice } from '../interfaces/office';
@@ -84,6 +84,7 @@ import { IStep, Step } from '../interfaces/step';
 import { TimeZoneSnackBarComponent } from '../shared/snak/time-zone/time-zone-snack-bar.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SelectProfessionalDialogComponent } from './select-professional-dialog.component';
+import { AuthUserService } from '../services/auth-user.service';
 import PlaceResult = google.maps.places.PlaceResult;
 
 @Component({
@@ -195,15 +196,16 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   private unavailableList?: IUnavailableAll[];
   private getState: Observable<any>;
   private subscription?: Subscription;
+  private authUserServiceSubscription: Subscription;
   private steps: IStep[];
   private dismiss = false;
   private treatmentDiscount?: IDiscount;
   private totalDuration: IDuration = new Duration();
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private formBuilder: UntypedFormBuilder, private breakpointObserver: BreakpointObserver,
-              private router: Router, private route: ActivatedRoute,
-              private cdRef: ChangeDetectorRef, private snackBar: MatSnackBar) {
+              private formBuilder: UntypedFormBuilder, private breakpointObserver: BreakpointObserver, private router: Router,
+              private route: ActivatedRoute, private cdRef: ChangeDetectorRef, private snackBar: MatSnackBar,
+              private authUserService: AuthUserService) {
     this.price = new Price();
     this.day = new Day();
     this.getState = this.store.select(selectReservationState);
@@ -230,12 +232,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         this.start.setValue(getTime(this.extras.date, this.dateFormat));
       }
     }
-    this.store.select(selectAuthState).subscribe((state: any) => {
-      if (state.user) {
-        const user: IUserAll = state.user;
-        this.isAdmin = user.authorities.some(u => u.authority === Role.admin);
-        this.isDarkMode = isDarkMode(user.theme);
-      }
+    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
+      this.isAdmin = value.isAdmin;
+      this.isDarkMode = value.isDarkMode;
     });
     this.maxCalendarDate = addMonths(getNow(), MAX_RESERVATION_MONTH);
     const preview = new Step(6, 'preview', () => this.create);
@@ -457,6 +456,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.authUserServiceSubscription.unsubscribe();
   }
 
   getStepName(index: number): string {

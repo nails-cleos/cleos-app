@@ -84,6 +84,9 @@
                 </label>
                 <mat-datepicker #picker startView="multi-year" touchUi></mat-datepicker>
               </mat-form-field>
+              <app-google-map [addressFormGroup]="form" [latitudeMarker]="user.address?.location?.y"
+                              [longitudeMarker]="user.address?.location?.x" (addressEmitter)="getAddress($event)">
+              </app-google-map>
               <mat-form-field *ngIf="showColors" appearance="outline">
                 <mat-label>{{ 'COMMON.PROFESSIONAL.COLOR.DARK.FIELD' | translate }}</mat-label>
                 <input [formControl]="darkColor" [ngxMatColorPicker]="pickerDark" matInput>

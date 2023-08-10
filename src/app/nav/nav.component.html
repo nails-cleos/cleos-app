@@ -183,8 +183,8 @@
             </ng-template>
             <mat-divider></mat-divider>
             <a (click)="changeTheme" mat-list-item>
-              <mat-icon matListItemIcon>{{checked ? 'light_mode' : 'dark_mode'}}</mat-icon>
-              <div mat-line>{{'COMMON.DASHBOARD.' + (checked ? 'LIGHT_MODE' : 'DARK_MODE') | translate }}</div>
+              <mat-icon matListItemIcon>{{isDarkMode ? 'light_mode' : 'dark_mode'}}</mat-icon>
+              <div mat-line>{{'COMMON.DASHBOARD.' + (isDarkMode ? 'LIGHT_MODE' : 'DARK_MODE') | translate }}</div>
             </a>
             <mat-divider></mat-divider>
             <a (click)="logout" mat-list-item>
