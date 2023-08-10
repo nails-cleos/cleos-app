@@ -158,7 +158,6 @@ export class UserComponent implements OnInit, OnDestroy {
           lastName: this.user?.lastName,
           phone: this.user?.phone,
         };
-        console.log((this.user))
         this.form.patchValue(user);
         this.getForm.address.setValue(this.user?.address?.name);
 
