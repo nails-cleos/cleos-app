@@ -4,7 +4,6 @@ import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
 import { TreatmentsComponent } from './list/treatments.component';
 import { TreatmentComponent } from './treatment.component';
-import { TreatmentDetailComponent } from './detail/treatment-detail.component';
 import { TreatmentViewComponent } from './view/treatment-view.component';
 import { TreatmentSortingComponent } from './sorting/treatment-sorting.component';
 
@@ -25,7 +24,7 @@ const routes: Routes = [
     }
   },
   {
-    path: ':id/edit', component: TreatmentDetailComponent, canActivate: [authGuard], data: {
+    path: ':id/edit', component: TreatmentComponent, canActivate: [authGuard], data: {
       roles: [Role.admin]
     }
   },

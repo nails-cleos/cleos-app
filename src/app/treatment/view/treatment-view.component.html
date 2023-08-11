@@ -26,61 +26,61 @@
             </mat-form-field>
 
             <ng-template [ngIf]="colors">
-              <div fxLayout="row" fxLayoutAlign="space-between center" id="colors" class="bottom-divider">
+              <div>
                 <mat-list>
                   <div mat-subheader>{{ 'TREATMENT.COLORS' | translate }}</div>
-                  <mat-list-item>
-                    <mat-chip-listbox>
-                      <mat-chip *ngFor="let color of colors" color="accent">
-                        {{color.name}}
-                      </mat-chip>
-                    </mat-chip-listbox>
-                  </mat-list-item>
                 </mat-list>
+                <mat-chip-listbox>
+                  <mat-chip *ngFor="let color of colors" color="accent">
+                    {{color.name}}
+                  </mat-chip>
+                </mat-chip-listbox>
               </div>
             </ng-template>
 
-            <mat-accordion>
-              <mat-expansion-panel *ngFor="let tab of group.treatments; let i = index" [expanded]="i === 0">
-                <mat-expansion-panel-header>
-                  <mat-panel-title>
-                    {{tab.name}}
-                  </mat-panel-title>
-                  <mat-panel-description fxHide.lt-sm fxShow>
-                    {{tab.id}}
-                  </mat-panel-description>
-                </mat-expansion-panel-header>
-                <mat-form-field appearance="outline" class="tab-field">
-                  <mat-label>{{ 'COMMON.TREATMENT.FIELD' | translate }}</mat-label>
-                  <label>
-                    <input [value]="tab.name" matInput readonly>
-                  </label>
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="tab-field">
-                  <mat-label>{{ 'TREATMENT.DESCRIPTION.FIELD' | translate }}</mat-label>
-                  <label>
-                    <input [value]="tab.description" matInput readonly>
-                  </label>
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="tab-field">
-                  <mat-label>{{ 'TREATMENT.DURATION.FIELD' | translate }}</mat-label>
-                  <label>
-                    <input [value]="tab.duration | durationTime" matInput readonly/>
-                  </label>
-                </mat-form-field>
-                <div>
-                  <mat-checkbox [checked]="tab.primary" [disabled]="true"
-                                color="primary">{{ 'TREATMENT.PRIMARY.CHECK' | translate }}</mat-checkbox>
-                  <div fxFlex></div>
-                  <button (click)="getHistory(tab.id)" mat-icon-button>
-                    <mat-icon>timeline</mat-icon>
-                  </button>
-                </div>
-                <div *ngIf="tab.history && tab.showHistory">
-                  <app-treatment-table [treatment]="tab.history"></app-treatment-table>
-                </div>
-              </mat-expansion-panel>
-            </mat-accordion>
+            <div class="top">
+              <mat-accordion>
+                <mat-expansion-panel *ngFor="let tab of group.treatments; let i = index" [expanded]="i === 0">
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      {{tab.name}}
+                    </mat-panel-title>
+                    <mat-panel-description fxHide.lt-sm fxShow>
+                      {{tab.id}}
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <mat-form-field appearance="outline" class="tab-field">
+                    <mat-label>{{ 'COMMON.TREATMENT.FIELD' | translate }}</mat-label>
+                    <label>
+                      <input [value]="tab.name" matInput readonly>
+                    </label>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="tab-field">
+                    <mat-label>{{ 'TREATMENT.DESCRIPTION.FIELD' | translate }}</mat-label>
+                    <label>
+                      <input [value]="tab.description" matInput readonly>
+                    </label>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="tab-field">
+                    <mat-label>{{ 'TREATMENT.DURATION.FIELD' | translate }}</mat-label>
+                    <label>
+                      <input [value]="tab.duration | durationTime" matInput readonly/>
+                    </label>
+                  </mat-form-field>
+                  <div>
+                    <mat-checkbox [checked]="tab.primary" [disabled]="true"
+                                  color="primary">{{ 'TREATMENT.PRIMARY.CHECK' | translate }}</mat-checkbox>
+                    <div fxFlex></div>
+                    <button (click)="getHistory(tab.id)" mat-icon-button>
+                      <mat-icon>timeline</mat-icon>
+                    </button>
+                  </div>
+                  <div *ngIf="tab.history && tab.showHistory">
+                    <app-treatment-table [treatment]="tab.history"></app-treatment-table>
+                  </div>
+                </mat-expansion-panel>
+              </mat-accordion>
+            </div>
           </div>
         </mat-card-content>
         <ng-template #boxSkeleton>

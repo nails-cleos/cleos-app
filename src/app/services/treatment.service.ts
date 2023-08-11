@@ -57,8 +57,7 @@ export class TreatmentService {
   }
 
   public update(treatment: ITreatmentGroup): Observable<ITreatmentGroup> {
-    const url = `${ this.urlV1 }/${ treatment.id }`;
-    return this.http.patch<ITreatmentGroup>(url, treatment);
+    return this.http.patch<ITreatmentGroup>(`${ this.urlV1 }/${ treatment.id }`, treatment);
   }
 
   public updateSort(treatment: ISorted[]): Observable<ITreatmentGroup[]> {
