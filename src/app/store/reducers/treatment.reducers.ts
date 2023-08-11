@@ -124,6 +124,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         message: null,
+        selected: null,
         isLoading: true
       };
     }

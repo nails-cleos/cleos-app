@@ -1,19 +1,31 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
-      <form (ngSubmit)="create" [formGroup]="form" novalidate>
+      <form (ngSubmit)="submit" [formGroup]="form" novalidate>
         <mat-card appearance="outlined" class="style-card">
-          <mat-card-header>
-            <mat-card-title>{{ 'TREATMENT.TITLE' | translate }}</mat-card-title>
-          </mat-card-header>
+          <ng-template [ngIf]="isAddMode" [ngIfElse]="headerEditMode">
+            <mat-card-header>
+              <mat-card-title>{{ 'TREATMENT.TITLE' | translate }}</mat-card-title>
+            </mat-card-header>
+          </ng-template>
+          <ng-template #headerEditMode>
+            <mat-card-header>
+              <mat-card-title>{{ 'TREATMENT.DETAIL' | translate }}</mat-card-title>
+              <mat-card-subtitle *ngIf="group; else skeleton">{{group.name}}</mat-card-subtitle>
+              <ng-template #skeleton>
+                <div class="ssc-line"></div>
+              </ng-template>
+            </mat-card-header>
+          </ng-template>
+
           <mat-card-content>
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
                 <label>
-                  <input [formControl]="name" autocomplete="name" matInput required>
+                  <input formControlName="name" autocomplete="name" matInput required>
                 </label>
-                <mat-error *ngIf="name.hasError('required')"
+                <mat-error *ngIf="getForm.name.hasError('required')"
                            [innerHTML]="'COMMON.TREATMENT.GROUP.REQUIRED' | translate">
                 </mat-error>
                 <mat-error *ngIf="errors['name']">
@@ -52,12 +64,11 @@
                   <mat-form-field class="chip-list">
                     <mat-label>{{ 'TREATMENT.COLOR.FIELD' | translate }}</mat-label>
                     <mat-chip-grid #chipList aria-label="Color selection">
-                      <mat-chip-row (removed)="remove(color)" *ngFor="let color of colors"
-                                    [removable]="true">
+                      <mat-chip-row (removed)="remove(color)" *ngFor="let color of colors" [removable]="true">
                         {{color.name}}
                         <mat-icon matChipRemove>cancel</mat-icon>
                       </mat-chip-row>
-                      <input #colorInput [formControl]="color" [matAutocomplete]="auto"
+                      <input #colorInput formControlName="color" [matAutocomplete]="auto"
                              [matChipInputFor]="chipList">
                     </mat-chip-grid>
                     <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedColor($event)">
@@ -66,10 +77,10 @@
                       </mat-option>
                     </mat-autocomplete>
                   </mat-form-field>
-                  <button fxShow.lt-sm fxHide routerLink="/colors/add" color="accent" mat-fab>
+                  <button fxShow.lt-sm fxHide routerLink="/colors/add" color="accent" mat-fab type="button">
                     <mat-icon matPrefix>palette</mat-icon>
                   </button>
-                  <button fxHide.lt-sm fxShow routerLink="/colors/add" color="accent" mat-fab extended>
+                  <button fxHide.lt-sm fxShow routerLink="/colors/add" color="accent" mat-fab extended type="button">
                     <mat-icon matPrefix>palette</mat-icon>
                     <span>{{ 'COMMON.TREATMENT.COLOR.ADD_BUTTON' | translate }}</span>
                   </button>
@@ -83,8 +94,8 @@
                 <label>
                   <input #inputName matInput>
                 </label>
-                <button (click)="addTab" [attr.aria-label]="'Add treatment'"
-                        [disabled]="!inputName.value" color="primary" mat-icon-button matSuffix type="button">
+                <button (click)="addTab" [attr.aria-label]="'Add treatment'" [disabled]="!inputName.value"
+                        color="primary" mat-icon-button matSuffix type="button">
                   <mat-icon>inventory</mat-icon>
                 </button>
                 <mat-hint *ngIf="errors['treatments']"
@@ -138,12 +149,20 @@
           </mat-card-content>
           <mat-card-actions>
             <div fxFlex></div>
-            <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
-              {{ 'COMMON.BUTTON.BACK' | translate }}
-            </button>
-            <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
-              {{ 'COMMON.BUTTON.CREATE' | translate }}
-            </button>
+            <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
+                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <ng-template [ngIf]="isAddMode" [ngIfElse]="buttonEditMode">
+              <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button"
+                      type="submit">
+                {{ 'COMMON.BUTTON.CREATE' | translate }}
+              </button>
+            </ng-template>
+            <ng-template #buttonEditMode>
+              <button [disabled]="form.invalid" color="primary" mat-fab extended
+                      class="icon-button" type="submit">
+                {{ 'COMMON.BUTTON.UPDATE' | translate }}
+              </button>
+            </ng-template>
           </mat-card-actions>
         </mat-card>
       </form>

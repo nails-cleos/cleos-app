@@ -92,6 +92,7 @@ export class UserComponent implements OnInit, OnDestroy {
       );
     } else {
       user.id = this.id;
+      this.user = undefined;
       return this.store.dispatch(new fromActionsUser.SaveUser({ user }));
     }
   }
