@@ -33,7 +33,7 @@ import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { IUnavailableAll } from '../../interfaces/unavailable';
 import { createRoomOffice, executeDialogNoWidth, FrequencyEnum, getFullUserName, getUserName } from '../../util/helper';
-import { addMonths, isEqual, startOfWeek } from 'date-fns';
+import { addDays, addMonths, isEqual, startOfWeek } from 'date-fns';
 import { findStateColor } from '../../util/theme';
 import { map, startWith, takeUntil } from 'rxjs/operators';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
@@ -77,6 +77,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
   ]);
 
   refresh: Subject<any> = new Subject();
+  maxDate: Date;
+  minDate: Date;
 
   private isDarkMode?: boolean;
   private selectView: CalendarPeriod = 'day';
@@ -86,7 +88,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
   private authUserServiceSubscription: Subscription;
   private roomId?: string;
   private professionalSelectedId?: string;
-  private readonly maxDate: Date;
   private today: Date = createNewDate(getNow());
   private daysInWeek = 7;
 
@@ -133,6 +134,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
       this.isDarkMode = darkMode;
     });
     this.maxDate = addMonths(getNow(), MAX_RESERVATION_MONTH);
+    this.minDate = new Date(2023, 0, 1);
   }
 
   get search(): void {
@@ -153,10 +155,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   private get searchDate(): Date {
-    if (this.totalDays) {
-      return this.viewDate;
-    }
-    return startOfWeek(this.viewDate);
+    const date = this.totalDays ? this.viewDate : startOfWeek(this.viewDate);
+    return addDays(date, -1);
   }
 
   ngOnInit(): void {
@@ -390,7 +390,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
             this.validateUnavailableEvent(rr.room, start, duration, it, darkMode);
           }
         } else {
-          recurringEvents = [...recurringEvents, createRecurringEvent(start, this.viewDate, it, this.daysInWeek, duration)];
+          recurringEvents = [...recurringEvents, createRecurringEvent(start, this.searchDate, it, this.daysInWeek, duration)];
         }
       }
     });
@@ -412,7 +412,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
         startDate.setFullYear(getNow().getFullYear());
         const color = findStateColor('BIRTHDAY', darkMode);
         const event = allDayEvent(detail, color, startDate, darkMode, `users/${ it.id }`);
-        if (this.calendar && event) {
+        if (this.calendar) {
           this.calendar.events = [...this.calendar.events, event];
         }
       }
@@ -427,7 +427,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
       if (it.repeat === FrequencyEnum.none) {
         this.createNoteEvent(it, startDate, darkMode);
       } else {
-        recurringEvents = [...recurringEvents, createRecurringEvent(startDate, this.viewDate, it, this.daysInWeek)];
+        recurringEvents = [...recurringEvents, createRecurringEvent(startDate, this.searchDate, it, this.daysInWeek)];
       }
     });
 
@@ -517,8 +517,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
         const unavailable = this.translate.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
         const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
         const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
-        this.calendar.events = this.calendar.events.concat(fillNotAvailable(unavailable, lunch, notWorking, this.viewDate,
-          sunday, saturday, friday, thursday, wednesday, tuesday, monday, darkMode, plusDays(this.viewDate, this.daysInWeek), timeZone));
+        const date = this.dateIsValid(this.searchDate) ? this.searchDate : this.viewDate;
+        this.calendar.events = this.calendar.events.concat(fillNotAvailable(unavailable, lunch, notWorking, date,
+          sunday, saturday, friday, thursday, wednesday, tuesday, monday, darkMode, plusDays(date, this.daysInWeek), timeZone));
         this.addUnavailableList(this.data, darkMode);
         this.addBirthdays(this.data, darkMode);
         this.addNotes(this.data, darkMode);

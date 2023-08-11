@@ -86,7 +86,7 @@
       <span>{{'COMMON.BUTTON.PREVIOUS' | translate}}</span>
     </button>
     <input (dateChange)="selectDate($event)" [matDatepicker]="picker" [value]="viewDate"
-           hidden matInput>
+           hidden matInput [max]="maxDate" [min]="minDate">
     <mat-datepicker #picker touchUi></mat-datepicker>
     <button fxShow.lt-sm fxHide (click)="picker.open()" color="primary" mat-fab>
       <mat-icon>today</mat-icon>

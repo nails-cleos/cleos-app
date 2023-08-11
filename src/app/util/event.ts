@@ -107,29 +107,24 @@ export const newEvent = (title: string, color: string, start: Date, isDarkMode: 
 
 export const calendarEvent = (title: string, color: string, start: Date, isDarkMode: boolean, end?: Date,
                               id?: string, meta: IMeta = new Meta(), draggable: boolean = false): CalendarEvent => ({
-    id,
-    start,
-    end,
-    title,
-    draggable,
-    color: createEventColor(color, isDarkMode),
-    meta
-  } as unknown as CalendarEvent);
+  id,
+  start,
+  end,
+  title,
+  draggable,
+  color: createEventColor(color, isDarkMode),
+  meta
+} as unknown as CalendarEvent);
 
 export const allDayEvent = (title: string, color: string, start: Date, isDarkMode: boolean, id?: string,
-                            meta: IMeta = new Meta()): CalendarEvent | undefined => {
-  if (greaterOrEqualsThanToday(start)) {
-    return {
-      id,
-      start,
-      title,
-      color: createEventColor(color, isDarkMode),
-      meta,
-      allDay: true
-    } as unknown as CalendarEvent;
-  }
-  return undefined;
-};
+                            meta: IMeta = new Meta()): CalendarEvent => ({
+  id,
+  start,
+  title,
+  color: createEventColor(color, isDarkMode),
+  meta,
+  allDay: true
+} as unknown as CalendarEvent);
 
 export const monthEvent = (title: string, start: Date, end: Date | null, id: string, color: string, meta: Meta, isDarkMode: boolean,
                            draggable: boolean = false): CalendarEvent | undefined => ({
