@@ -29,10 +29,9 @@ import * as fromActionsNotification from '../store/notification.actions';
 import * as fromActionsUser from '../store/user.actions';
 import { INotification } from '../interfaces/notification';
 import { TranslateService } from '@ngx-translate/core';
-import { Role } from '../interfaces/token';
 import { MessagingService } from '../services/messaging.service';
 import { environment } from '../../environments/environment';
-import { getUserImage, getUserNameInitials, isRoomAdmin } from '../util/helper';
+import { getUserImage, getUserNameInitials } from '../util/helper';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NavigationService } from '../services/navigation.service';
 import { TokenService } from '../services/token.service';
@@ -40,6 +39,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { getThemeName, isDarkMode, resetTheme, Theme, THEME } from '../util/theme';
 import { ThemeService } from 'ng2-charts';
+import { AuthUserService } from '../services/auth-user.service';
 
 @Component({
   selector: 'app-nav',
@@ -78,7 +78,7 @@ export class NavComponent implements OnInit, OnDestroy {
   error: any;
   incomplete = false;
 
-  checked = false;
+  isDarkMode = false;
   step = 0;
 
   private getState: Observable<any>;
@@ -93,8 +93,8 @@ export class NavComponent implements OnInit, OnDestroy {
               private router: Router, private store: Store<AppState>, private messagingService: MessagingService,
               private snackBar: MatSnackBar, private navigation: NavigationService, private tokenService: TokenService,
               private cookieService: CookieService, private overlayContainer: OverlayContainer,
-              private themeService: ThemeService, private navigationService: NavigationService) {
-    this.checked = isDarkMode(cookieService.get(THEME) as Theme);
+              private themeService: ThemeService, private navigationService: NavigationService, private authUserService: AuthUserService) {
+    this.isDarkMode = isDarkMode(cookieService.get(THEME) as Theme);
     this.dateFormat = this.translate.currentLang;
     this.getState = this.store.select(selectAuthState);
     this.getNotificationState = this.store.select(selectNotificationState);
@@ -111,13 +111,13 @@ export class NavComponent implements OnInit, OnDestroy {
   }
 
   get changeTheme(): void {
-    this.checked = !this.checked;
-    const theme: Theme = getThemeName(this.checked);
+    this.isDarkMode = !this.isDarkMode;
+    const theme: Theme = getThemeName(this.isDarkMode);
     this.resetTheme(theme);
     const user: IUser = new User();
     user.theme = theme;
     const redirectUrl = this.router.url;
-    const message = this.translate.instant(`COMMON.PROFILE.UPDATED.DARK_MODE_${ this.checked.toString().toUpperCase() }`);
+    const message = this.translate.instant(`COMMON.PROFILE.UPDATED.DARK_MODE_${ this.isDarkMode.toString().toUpperCase() }`);
     return this.store.dispatch(
       new fromActionsUser.UpdateUser({ user, redirectUrl, message })
     );
@@ -192,17 +192,18 @@ export class NavComponent implements OnInit, OnDestroy {
       this.isLoading = state.isLoading;
       this.authSubject.next(this.isAuthorized);
       if (state.isAuthenticated) {
+        const authUser = this.authUserService.reloadUser(state.user);
+        this.showInformation = !authUser.isRoomAdmin;
+        this.isDarkMode = authUser.isDarkMode;
+        this.isProfessional = authUser.isProfessional;
+        this.isManager = authUser.isManager;
+        this.isAdmin = authUser.isAdmin;
         this.tokenService.token = state.token;
         this.tokenService.user = state.user;
         this.incomplete = !state.user.completed;
         const user: IUserAll = state.user;
         this.currentUser = user;
-        this.showInformation = !isRoomAdmin(user.authorities);
-        this.checked = isDarkMode(this.currentUser.theme);
         this.resetTheme(this.currentUser.theme);
-        this.isProfessional = user.authorities.some(u => u.authority === Role.professional);
-        this.isManager = user.authorities.some(u => u.authority === Role.manager);
-        this.isAdmin = user.authorities.some(u => u.authority === Role.admin);
         this.menuItems = state.menus;
         this.canChangePassword = user?.provider === 'LOCAL';
         this.initials = getUserNameInitials(user);

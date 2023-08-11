@@ -13,18 +13,21 @@
           <div class="divider" fxLayout="row" fxLayoutAlign="center">
             {{'ME.REFERRAL.DETAIL' | translate}}
           </div>
-          <div *ngIf="user" class="divider" fxLayout="row" fxLayoutAlign="center">
-            <div class="box">
-              <div class="vertical-center">
-                <div class="box-text bold">
-                  {{user.id}}
+          <ng-template [ngIf]="userId">
+            <div class="divider" fxLayout="row" fxLayoutAlign="center">
+              <div class="box">
+                <div class="vertical-center">
+                  <div class="box-text bold">
+                    {{userId}}
+                  </div>
+                  <mat-chip-listbox class="box-button">
+                    <mat-chip-option (click)="copy"
+                                     [disabled]="!showShare">{{'COMMON.BUTTON.COPY' | translate }}</mat-chip-option>
+                  </mat-chip-listbox>
                 </div>
-                <mat-chip-listbox class="box-button">
-                  <mat-chip-option (click)="copy" [disabled]="!showShare">{{'COMMON.BUTTON.COPY' | translate }}</mat-chip-option>
-                </mat-chip-listbox>
               </div>
             </div>
-          </div>
+          </ng-template>
         </mat-card-content>
         <mat-card-actions>
           <div fxFlex></div>

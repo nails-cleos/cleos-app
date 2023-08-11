@@ -98,15 +98,15 @@
   </mat-grid-tile>
   <!--Charts-->
   <mat-grid-tile *ngFor="let chart of charts" [colspan]="cardLayout.chart.cols" [rowspan]="cardLayout.chart.rows">
-    <app-card [chart]="chart" [isDark]="isDarkMode" [title]="chart.title">
-      <app-chart [chartSummary]="chart" [error]="error" [currency]="currency" [isDark]="isDarkMode"
-                 [isLoading]="isLoading" [locale]="dateFormat"></app-chart>
+    <app-card [chart]="chart" [title]="chart.title">
+      <app-chart [chartSummary]="chart" [error]="error" [currency]="currency" [isLoading]="isLoading"
+                 [locale]="dateFormat"></app-chart>
     </app-card>
   </mat-grid-tile>
   <!--Table-->
   <mat-grid-tile *ngIf="roomId || professionalId" [colspan]="cardLayout.table.cols" [rowspan]="cardLayout.table.rows">
     <app-card [expand]="false" [title]="'DASHBOARD.CARD.RESERVATION' | translate" [currency]="currency"
-              [isDark]="isDarkMode" [locale]="dateFormat">
+              [locale]="dateFormat">
       <app-reservation-table [roomId]="roomId" [professionalId]="professionalId"></app-reservation-table>
     </app-card>
   </mat-grid-tile>

@@ -3,27 +3,26 @@ import { takeUntil } from 'rxjs/operators';
 import { BreakpointObserver, Breakpoints, BreakpointState } from '@angular/cdk/layout';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState, selectDashboardState } from '../store/app.states';
+import { AppState, selectDashboardState } from '../store/app.states';
 import * as fromActionsDashboard from '../store/dashboard.actions';
 import * as fromActionsReservation from '../store/reservation.actions';
 import { IReservationSummary, States } from '../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
 import { getEnd, getNow, newDateTimestamp } from '../util/dates';
 import { CalendarEvent, CalendarMonthViewDay, CalendarView } from 'angular-calendar';
-import { findStateColor, isDarkMode } from '../util/theme';
+import { findStateColor } from '../util/theme';
 import { getFrequency, IMeta, Meta, monthEvent } from '../util/event';
 import { Router } from '@angular/router';
 import { isSameDay, isSameMonth } from 'date-fns';
 import { ICalendarReservations, ICalendarUnavailable, IChart, IDashboard } from '../interfaces/dashboard';
 import { UntypedFormControl } from '@angular/forms';
-import { IAuthority } from '../interfaces/user';
-import { Role } from '../interfaces/token';
 import { IRoom } from '../interfaces/room';
 import { CalendarDialogComponent } from '../shared/dialog/calendar/calendar-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
 import { numberFormat } from '../util/numbers';
 import { ICurrency } from '../interfaces/currency';
+import { AuthUserService } from '../services/auth-user.service';
 
 @Component({
   selector: 'app-dash',
@@ -46,7 +45,7 @@ export class DashComponent implements OnInit, OnDestroy {
   isCalendarLoading = true;
   isLoading: any;
   totalReservation: number;
-  isDarkMode?: boolean;
+
   currency?: ICurrency;
 
   miniCardData: IReservationSummary[] = [{} as IReservationSummary, {} as IReservationSummary,
@@ -67,25 +66,27 @@ export class DashComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject();
   private getState: Observable<any>;
   private subscription?: Subscription;
+  private authUserServiceSubscription: Subscription;
+  private isDarkMode?: boolean;
 
   constructor(public dialog: MatDialog, private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
-              private readonly translate: TranslateService, private router: Router) {
+              private readonly translate: TranslateService, private router: Router, private authUserService: AuthUserService) {
     this.getState = this.store.select(selectDashboardState);
-    this.store.select(selectAuthState).subscribe((state: any) => {
-      const darkMode: boolean = isDarkMode(state.user?.theme);
+    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
+      const darkMode: boolean = value.isDarkMode;
       if (this.isDarkMode !== undefined && darkMode !== this.isDarkMode) {
         this.createEvents(darkMode);
       }
       this.isDarkMode = darkMode;
-      const isManager = state.user?.authorities?.some((au: IAuthority) => [Role.admin as string, Role.manager as string]
-        .includes(au.authority));
+      const isAdminOrManager = value.isAdmin || value.isManager;
+      const miniCard = isAdminOrManager ? { cols: 1, rows: 1 } : { cols: 0, rows: 0 };
       this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium])
         .pipe(takeUntil(this.destroy$)).subscribe((breakpointState: BreakpointState) => {
         if (breakpointState.breakpoints[Breakpoints.Medium]) {
           this.cardLayout = {
             columns: 2,
             rowHeight: '250px',
-            miniCard: isManager ? { cols: 1, rows: 1 } : { cols: 0, rows: 0 },
+            miniCard,
             calendar: { cols: 2, rows: 4 },
             chart: { cols: 2, rows: 2 },
             table: { cols: 2, rows: 4 }
@@ -94,7 +95,7 @@ export class DashComponent implements OnInit, OnDestroy {
           this.cardLayout = {
             columns: 1,
             rowHeight: '250px',
-            miniCard: isManager ? { cols: 1, rows: 1 } : { cols: 0, rows: 0 },
+            miniCard,
             calendar: { cols: 1, rows: 4 },
             chart: { cols: 1, rows: 1.5 },
             table: { cols: 1, rows: 4.5 }
@@ -103,7 +104,7 @@ export class DashComponent implements OnInit, OnDestroy {
           this.cardLayout = {
             columns: 4,
             rowHeight: '250px',
-            miniCard: isManager ? { cols: 1, rows: 1 } : { cols: 0, rows: 0 },
+            miniCard,
             calendar: { cols: 4, rows: 4 },
             chart: { cols: 2, rows: 2 },
             table: { cols: 4, rows: 4 }
@@ -176,6 +177,7 @@ export class DashComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
     this.destroy$.unsubscribe();
+    this.authUserServiceSubscription.unsubscribe();
   }
 
   handleEvent(event: CalendarEvent): void {

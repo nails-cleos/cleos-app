@@ -1,6 +1,7 @@
 import { IReservationOverview } from './reservation';
 import { Theme } from '../util/theme';
 import { IChart } from './dashboard';
+import { IAddress } from './room';
 
 export interface IUser {
   id?: string;
@@ -26,6 +27,7 @@ export interface IUser {
   timeZone?: string;
   lightColor?: string;
   darkColor?: string;
+  address?: IAddress;
 }
 
 export interface IUserAll {
@@ -48,6 +50,7 @@ export interface IUserAll {
   timeZone: string;
   lightColor?: string;
   darkColor?: string;
+  address?: IAddress;
 }
 
 export interface IAuthority {

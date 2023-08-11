@@ -2,7 +2,7 @@ import { AfterViewInit, ChangeDetectorRef, Component, Input, OnChanges, OnDestro
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState, selectReservationState } from '../../../store/app.states';
+import { AppState, selectReservationState } from '../../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../../store/reservation.actions';
 import { IReservation, IReservationAll } from '../../../interfaces/reservation';
@@ -14,8 +14,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { executeDialogNoWidth, openDialog } from '../../../util/helper';
 import { isSameTimeZone, newDateTimestamp } from '../../../util/dates';
-import { Role } from '../../../interfaces/token';
 import { detailExpandAnimation } from '../../../util/animation';
+import { AuthUserService } from '../../../services/auth-user.service';
 
 @Component({
   selector: 'app-reservation-table',
@@ -41,13 +41,13 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
   private getState: Observable<any>;
   private subscription?: Subscription;
   private paginatorSubscription?: Subscription;
+  private authUserServiceSubscription: Subscription;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+              private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver, private authUserService: AuthUserService) {
     this.getState = this.store.select(selectReservationState);
     this.dateFormat = this.translate.currentLang;
-    this.store.select(selectAuthState).subscribe((state: any) =>
-      this.isAdmin = state.user?.authorities.some((u: { authority: Role }) => u.authority === Role.admin));
+    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => this.isAdmin = value.isAdmin);
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -76,6 +76,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
     this.paginatorSubscription?.unsubscribe();
+    this.authUserServiceSubscription.unsubscribe();
   }
 
   showTimeZone(reservation: IReservationAll): boolean {

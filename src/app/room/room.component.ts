@@ -20,9 +20,9 @@ import { IPaymentType, paymentOptions } from '../interfaces/payment';
 import timezones from 'timezones-list';
 import { getCurrentTimeZone } from '../util/dates';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { goTo } from '../util/animation';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
-import { goTo } from "../util/animation";
 
 export interface IIcon {
   monday: RoomIconName;
@@ -108,7 +108,7 @@ export class RoomComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.room.professionalIds = this.professionals.map(({id}) => id);
+    this.room.professionalIds = this.professionals.map(({ id }) => id);
     this.room.officeId = this.office.value.id;
     this.room.currencyId = this.currency.value.id;
     this.room.timeZone = this.timeZone.value.tzCode;
@@ -129,7 +129,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   get addProfessional(): void {
-    this.router.navigate(['users', 'add'], {state: {role: Role.professional}});
+    this.router.navigate(['users', 'add'], { state: { role: Role.professional } });
     return;
   }
 
@@ -236,7 +236,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     });
   }
 
-  getAddress(placeResult: PlaceResult) {
+  getAddress(placeResult: PlaceResult): void {
     this.geometry = placeResult.geometry;
     this.formattedAddress = placeResult.formatted_address;
   }
@@ -288,7 +288,7 @@ export class RoomComponent implements OnInit, OnDestroy {
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({incorrect: true});
+          this.form.controls[value.field].setErrors({ incorrect: true });
         });
       } else if (state.message) {
         this.router.navigate(['rooms']);
@@ -363,7 +363,7 @@ export class RoomComponent implements OnInit, OnDestroy {
         break;
     }
     if (step > -1) {
-      this.errors[`day${step}`] = true;
+      this.errors[`day${ step }`] = true;
       this.setStep(step);
       return true;
     }

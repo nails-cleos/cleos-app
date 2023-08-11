@@ -3,78 +3,80 @@
               [mode]="(isHandset$ | async) ? 'over' : 'side'"
               [opened]="(isHandset$ | async) === false"
               class="sidenav">
-    <mat-card appearance="outlined" *ngIf="showInformation" class="mat-elevation-z0">
-      <mat-card-header *ngIf="currentUser; else headerNoLogged">
-        <div class="circle" mat-card-avatar>
-          <img *ngIf="image; else showInitialsBlock" alt="profile" src="{{image}}">
-          <ng-template #showInitialsBlock>
-            <div class="initials">{{ initials | uppercase }}</div>
-          </ng-template>
-        </div>
-        <mat-card-title>{{currentUser | userName | uppercase}}</mat-card-title>
-        <mat-card-subtitle>{{currentUser.email}}</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content *ngIf="currentUser; else contentNoLogged">
-        <mat-nav-list>
-          <div *ngFor="let menu of menuItems; let i = index">
-            <div *ngIf="menu.subMenus && menu.subMenus.length; else items">
-              <mat-expansion-panel #rla="routerLinkActive" (opened)="setStep(i)" [class.mat-elevation-z0]="true"
-                                   [expanded]="step === i" [ngClass]="{ 'active': rla.isActive}"
-                                   [routerLinkActiveOptions]="{ exact: true }" [routerLinkActive]="menu.name">
-                <mat-expansion-panel-header>
-                  <mat-panel-title class="active-header-title">
-                    <mat-icon>{{menu.icon}}</mat-icon>&nbsp;{{menu.name}}
-                  </mat-panel-title>
-                </mat-expansion-panel-header>
-                <app-menu-item [drawer]="drawer" [items]="menu.subMenus"></app-menu-item>
-              </mat-expansion-panel>
-            </div>
-            <ng-template #items>
-              <a (click)="navigate(menu, drawer)" *ngIf="isHandset$ | async; else showMenu"
-                 [routerLinkActive]="['active']" [routerLink]="'/'+menu.path" mat-list-item>
-                <mat-icon matListItemIcon>{{menu.icon}}</mat-icon>
-                <div mat-line>{{menu.name}}</div>
-              </a>
-              <ng-template #showMenu>
-                <a (click)="navigate(menu)" [routerLinkActive]="['active']"
-                   [routerLink]="'/'+menu.path" mat-list-item>
-                  <mat-icon matListItemIcon>{{menu.icon}}</mat-icon>
-                  <div mat-line>{{menu.name}}</div>
-                </a>
+    <ng-template [ngIf]="showInformation">
+      <mat-card appearance="outlined" class="mat-elevation-z0">
+        <ng-template [ngIf]="currentUser" [ngIfElse]="noLogged">
+          <mat-card-header>
+            <div class="circle" mat-card-avatar>
+              <img *ngIf="image; else showInitialsBlock" alt="profile" src="{{image}}">
+              <ng-template #showInitialsBlock>
+                <div class="initials">{{ initials | uppercase }}</div>
               </ng-template>
-            </ng-template>
-          </div>
-        </mat-nav-list>
-      </mat-card-content>
-      <ng-template #headerNoLogged>
-        <mat-card-header>
-          <div class="circle" mat-card-avatar>
-            <img alt="profile" src="../../assets/icons/icon-512x512.png">
-          </div>
-          <mat-card-title>Nails Cleos</mat-card-title>
-          <mat-card-subtitle>@nails.cleos</mat-card-subtitle>
-        </mat-card-header>
-      </ng-template>
-      <ng-template #contentNoLogged>
-        <mat-card-content>
-          <mat-nav-list>
-            <mat-divider></mat-divider>
-            <a (click)="drawer.toggle()" *ngIf="isHandset$ | async; else showMenu" [routerLink]="'/main'"
-               mat-list-item>
-              <mat-icon matListItemIcon>main</mat-icon>
-              <div mat-line>{{'COMMON.DASHBOARD.HOME' | translate }}</div>
-            </a>
-            <ng-template #showMenu>
-              <a [routerLinkActive]="['active']" [routerLink]="'/main'" mat-list-item>
-                <mat-icon matListItemIcon>home</mat-icon>
+            </div>
+            <mat-card-title>{{currentUser | userName | uppercase}}</mat-card-title>
+            <mat-card-subtitle>{{currentUser.email}}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <mat-nav-list>
+              <div *ngFor="let menu of menuItems; let i = index">
+                <div *ngIf="menu.subMenus && menu.subMenus.length; else items">
+                  <mat-expansion-panel #rla="routerLinkActive" (opened)="setStep(i)" [class.mat-elevation-z0]="true"
+                                       [expanded]="step === i" [ngClass]="{ 'active': rla.isActive}"
+                                       [routerLinkActiveOptions]="{ exact: true }" [routerLinkActive]="menu.name">
+                    <mat-expansion-panel-header>
+                      <mat-panel-title class="active-header-title">
+                        <mat-icon>{{menu.icon}}</mat-icon>&nbsp;{{menu.name}}
+                      </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <app-menu-item [drawer]="drawer" [items]="menu.subMenus"></app-menu-item>
+                  </mat-expansion-panel>
+                </div>
+                <ng-template #items>
+                  <a (click)="navigate(menu, drawer)" *ngIf="isHandset$ | async; else showMenu"
+                     [routerLinkActive]="['active']" [routerLink]="'/'+menu.path" mat-list-item>
+                    <mat-icon matListItemIcon>{{menu.icon}}</mat-icon>
+                    <div mat-line>{{menu.name}}</div>
+                  </a>
+                  <ng-template #showMenu>
+                    <a (click)="navigate(menu)" [routerLinkActive]="['active']"
+                       [routerLink]="'/'+menu.path" mat-list-item>
+                      <mat-icon matListItemIcon>{{menu.icon}}</mat-icon>
+                      <div mat-line>{{menu.name}}</div>
+                    </a>
+                  </ng-template>
+                </ng-template>
+              </div>
+            </mat-nav-list>
+          </mat-card-content>
+        </ng-template>
+        <ng-template #noLogged>
+          <mat-card-header>
+            <div class="circle" mat-card-avatar>
+              <img alt="profile" src="../../assets/icons/icon-512x512.png">
+            </div>
+            <mat-card-title>Nails Cleos</mat-card-title>
+            <mat-card-subtitle>@nails.cleos</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <mat-nav-list>
+              <mat-divider></mat-divider>
+              <a (click)="drawer.toggle()" *ngIf="isHandset$ | async; else showMenu" [routerLink]="'/main'"
+                 mat-list-item>
+                <mat-icon matListItemIcon>main</mat-icon>
                 <div mat-line>{{'COMMON.DASHBOARD.HOME' | translate }}</div>
               </a>
-            </ng-template>
-            <mat-divider></mat-divider>
-          </mat-nav-list>
-        </mat-card-content>
-      </ng-template>
-    </mat-card>
+              <ng-template #showMenu>
+                <a [routerLinkActive]="['active']" [routerLink]="'/main'" mat-list-item>
+                  <mat-icon matListItemIcon>home</mat-icon>
+                  <div mat-line>{{'COMMON.DASHBOARD.HOME' | translate }}</div>
+                </a>
+              </ng-template>
+              <mat-divider></mat-divider>
+            </mat-nav-list>
+          </mat-card-content>
+        </ng-template>
+      </mat-card>
+    </ng-template>
   </mat-drawer>
   <mat-drawer-content class="page-wrap">
     <mat-toolbar class="header" color="primary">
@@ -86,27 +88,30 @@
       <span>{{title}}</span>
       <span class="align-right"></span>
       <div *ngIf="currentUser?.username; else login">
-        <button *ngIf="isProfessional && workDay.length; else workDayIcon" [matMenuTriggerFor]="menuWorkDay"
-                class="badge-padding" mat-icon-button>
-          <mat-icon [matBadgeHidden]="!workDay.length" [matBadge]="workDay.length" matBadgeColor="warn">
-            work
-          </mat-icon>
-        </button>
-        <button *ngIf="notifications.length && showInformation; else notificationIcon"
-                [matMenuTriggerFor]="menuNotification" class="badge-padding" mat-icon-button>
-          <mat-icon [matBadgeHidden]="!countNotifications"
-                    [matBadge]="plusNotification ? plusNotification : countNotifications"
-                    matBadgeColor="warn">
-            notifications
-          </mat-icon>
-        </button>
+        <ng-template [ngIf]="isProfessional && workDay.length" [ngIfElse]="workDayIcon">
+          <button [matMenuTriggerFor]="menuWorkDay" class="badge-padding" mat-icon-button>
+            <mat-icon [matBadgeHidden]="!workDay.length" [matBadge]="workDay.length" matBadgeColor="warn">
+              work
+            </mat-icon>
+          </button>
+        </ng-template>
+        <ng-template [ngIf]="notifications.length && showInformation" [ngIfElse]="notificationIcon">
+          <button [matMenuTriggerFor]="menuNotification" class="badge-padding" mat-icon-button>
+            <mat-icon [matBadgeHidden]="!countNotifications"
+                      [matBadge]="plusNotification ? plusNotification : countNotifications"
+                      matBadgeColor="warn">
+              notifications
+            </mat-icon>
+          </button>
+        </ng-template>
         <mat-menu #menuNotification="matMenu" xPosition="before">
           <mat-list>
             <mat-list-item (click)="notification(not)" *ngFor="let not of notifications" class="pointer" matRipple>
-              <div [matTooltip]="not.message" [ngClass]="{ 'gray-text': not.read}" mat-line>
+              <div [matTooltip]="not.message" [ngClass]="{ 'gray-text': not.read}" matListItemLine>
                 <span *ngIf="!not.read" class="dot"></span>{{not.message}}
               </div>
-              <div [ngClass]="{ 'gray-text': not.read}" mat-line>{{not.date | date:'short':undefined:dateFormat}}</div>
+              <div [ngClass]="{ 'gray-text': not.read}"
+                   matListItemLine>{{not.date | date:'short':undefined:dateFormat}}</div>
               <mat-divider class="divider"></mat-divider>
             </mat-list-item>
             <mat-list-item>
@@ -117,10 +122,11 @@
           </mat-list>
         </mat-menu>
         <ng-template #notificationIcon>
-          <button *ngIf="showInformation" [matMenuTriggerFor]="menuNoNotification" class="badge-padding"
-                  mat-icon-button>
-            <mat-icon>notifications</mat-icon>
-          </button>
+          <ng-template [ngIf]="showInformation">
+            <button [matMenuTriggerFor]="menuNoNotification" class="badge-padding" mat-icon-button>
+              <mat-icon>notifications</mat-icon>
+            </button>
+          </ng-template>
           <mat-menu #menuNoNotification="matMenu" xPosition="before">
             <mat-list>
               <mat-list-item class="pointer" matRipple>
@@ -133,15 +139,19 @@
           <mat-list>
             <mat-list-item (click)="notification(not)" *ngFor="let not of workDay; last as isLast" class="pointer"
                            matRipple>
-              <div [matTooltip]="not.message" mat-line>{{not.message}}</div>
-              <mat-divider *ngIf="!isLast" class="divider"></mat-divider>
+              <div [matTooltip]="not.message" matListItemLine>{{not.message}}</div>
+              <ng-template [ngIf]="!isLast">
+                <mat-divider class="divider"></mat-divider>
+              </ng-template>
             </mat-list-item>
           </mat-list>
         </mat-menu>
         <ng-template #workDayIcon>
-          <button *ngIf="isProfessional" class="badge-padding" mat-icon-button>
-            <mat-icon>work_off</mat-icon>
-          </button>
+          <ng-template [ngIf]="isProfessional">
+            <button class="badge-padding" mat-icon-button>
+              <mat-icon>work_off</mat-icon>
+            </button>
+          </ng-template>
         </ng-template>
 
         <button [matMenuTriggerFor]="menuLogged" [ngClass]="{'badge-padding': incomplete}" mat-icon-button>
@@ -165,14 +175,16 @@
               <div mat-line>{{'COMMON.DASHBOARD.PROFILE' | translate }}</div>
             </a>
             <mat-divider></mat-divider>
-            <a *ngIf="canChangePassword" [routerLink]="'/auth/change-password'" mat-list-item>
-              <mat-icon matListItemIcon>password</mat-icon>
-              <div mat-line>{{'COMMON.DASHBOARD.CHANGE_PASSWORD' | translate }}</div>
-            </a>
+            <ng-template [ngIf]="canChangePassword">
+              <a [routerLink]="'/auth/change-password'" mat-list-item>
+                <mat-icon matListItemIcon>password</mat-icon>
+                <div mat-line>{{'COMMON.DASHBOARD.CHANGE_PASSWORD' | translate }}</div>
+              </a>
+            </ng-template>
             <mat-divider></mat-divider>
             <a (click)="changeTheme" mat-list-item>
-              <mat-icon matListItemIcon>{{checked ? 'light_mode' : 'dark_mode'}}</mat-icon>
-              <div mat-line>{{'COMMON.DASHBOARD.' + (checked ? 'LIGHT_MODE' : 'DARK_MODE') | translate }}</div>
+              <mat-icon matListItemIcon>{{isDarkMode ? 'light_mode' : 'dark_mode'}}</mat-icon>
+              <div mat-line>{{'COMMON.DASHBOARD.' + (isDarkMode ? 'LIGHT_MODE' : 'DARK_MODE') | translate }}</div>
             </a>
             <mat-divider></mat-divider>
             <a (click)="logout" mat-list-item>
@@ -183,10 +195,12 @@
         </mat-menu>
       </div>
       <ng-template #login>
-        <button *ngIf="(isHandset$ | async) === false; else mini" color="accent" mat-fab extended routerLink="/main">
-          <mat-icon>home</mat-icon>
-          <span>{{'COMMON.DASHBOARD.HOME' | translate }}</span>
-        </button>
+        <ng-template [ngIf]="(isHandset$ | async) === false" [ngIfElse]="mini">
+          <button color="accent" mat-fab extended routerLink="/main">
+            <mat-icon>home</mat-icon>
+            <span>{{'COMMON.DASHBOARD.HOME' | translate }}</span>
+          </button>
+        </ng-template>
         <ng-template #mini>
           <button color="accent" mat-fab routerLink="/main">
             <mat-icon>home</mat-icon>

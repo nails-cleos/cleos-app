@@ -21,7 +21,7 @@ export class GeocodeService {
   }
 
   public createMap(): Observable<MapStatus> {
-    const showMap = environment.production;
+    const showMap = environment.showMap;
     if (showMap) {
       return this.httpClient.jsonp(
         `https://maps.googleapis.com/maps/api/js?libraries=geometry,places&key=${ environment.googleMapKey }&sensor=false`,

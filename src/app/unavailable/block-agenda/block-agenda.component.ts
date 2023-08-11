@@ -90,6 +90,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
       );
     } else {
       unavailable.id = this.id;
+      this.unavailable = undefined;
       return this.store.dispatch(
         new fromActionsUnavailable.UnavailableUpdate(unavailable)
       );

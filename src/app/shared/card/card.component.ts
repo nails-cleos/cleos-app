@@ -1,28 +1,34 @@
-import { Component, Inject, Input } from '@angular/core';
+import { Component, Inject, Input, OnDestroy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { createChart, IChartUtil } from '../../util/chart';
 import { IChart } from '../../interfaces/dashboard';
 import { ICurrency } from '../../interfaces/currency';
+import { Subscription } from 'rxjs';
+import { AuthUserService } from '../../services/auth-user.service';
 
 @Component({
   selector: 'app-card',
   templateUrl: './card.component.html',
   styleUrls: ['./card.component.scss']
 })
-export class CardComponent {
+export class CardComponent implements OnDestroy {
   @Input() title: string | undefined;
   @Input() expand = true;
   @Input() chart?: IChart;
-  @Input() isDark?: boolean;
   @Input() currency?: ICurrency;
   @Input() locale?: string;
 
-  constructor(public dialog: MatDialog) {
+  private authUserServiceSubscription: Subscription;
+  private isDarkMode: boolean;
+
+  constructor(public dialog: MatDialog, private authUserService: AuthUserService) {
+    this.isDarkMode = false;
+    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => this.isDarkMode = value.isDarkMode);
   }
 
   get onClick(): void {
     if (this.chart) {
-      const chart = createChart(this.chart, this.currency, this.isDark, this.locale);
+      const chart = createChart(this.chart, this.currency, this.isDarkMode, this.locale);
       this.dialog.open(CardChartComponent, {
         height: '85vh',
         width: '70vw',
@@ -33,6 +39,10 @@ export class CardComponent {
       });
     }
     return;
+  }
+
+  ngOnDestroy(): void {
+    this.authUserServiceSubscription.unsubscribe();
   }
 }
 

@@ -29,7 +29,7 @@ import {
 import { TranslateService } from '@ngx-translate/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState, selectReservationState } from '../../../store/app.states';
+import { AppState, selectReservationState } from '../../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as fromActionsReservation from '../../../store/reservation.actions';
@@ -66,6 +66,7 @@ import { Role } from '../../../interfaces/token';
 import { IUser } from '../../../interfaces/user';
 import { PaymentType } from '../../../interfaces/payment';
 import { AngularFireAnalytics } from '@angular/fire/compat/analytics';
+import { AuthUserService } from '../../../services/auth-user.service';
 
 @Component({
   selector: 'app-me-reservation',
@@ -169,17 +170,17 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   private reservationMonths = MAX_RESERVATION_CUSTOMER_MONTH;
   private getState: Observable<any>;
   private subscription?: Subscription;
+  private authUserServiceSubscription: Subscription;
   private steps: IStep[];
   private dismiss = false;
   private treatmentDiscount?: IDiscount;
 
-  constructor(private readonly translate: TranslateService, private snackBar: MatSnackBar,
-              private store: Store<AppState>,
-              private formBuilder: UntypedFormBuilder, private breakpointObserver: BreakpointObserver,
-              private router: Router, private route: ActivatedRoute, public dialog: MatDialog,
-              private analytic: AngularFireAnalytics) {
+  constructor(private readonly translate: TranslateService, private snackBar: MatSnackBar, private store: Store<AppState>,
+              private formBuilder: UntypedFormBuilder, private breakpointObserver: BreakpointObserver, private router: Router,
+              private route: ActivatedRoute, public dialog: MatDialog, private analytic: AngularFireAnalytics,
+              private authUserService: AuthUserService) {
     this.getState = this.store.select(selectReservationState);
-    this.store.select(selectAuthState).subscribe((state: any) => this.customerId = state.user.id);
+    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => this.customerId = value.customerId);
     this.price = new Price();
     this.dateFormat = this.translate.currentLang;
     breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small])
@@ -392,6 +393,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.authUserServiceSubscription.unsubscribe();
   }
 
   getStepName(index: number): string {

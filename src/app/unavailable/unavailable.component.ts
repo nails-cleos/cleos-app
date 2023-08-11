@@ -107,6 +107,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
       );
     } else {
       unavailable.id = this.id;
+      this.unavailable = undefined;
       return this.store.dispatch(
         new fromActionsUnavailable.UnavailableUpdate(unavailable)
       );

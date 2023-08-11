@@ -3,18 +3,19 @@ import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/c
 import { Observable, throwError } from 'rxjs';
 import { catchError, retryWhen } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState } from '../store/app.states';
+import { AppState } from '../store/app.states';
 import * as fromActionsLogin from '../store/auth.actions';
 
 import { genericRetryStrategy } from '../util/rxjs';
+import { AuthUserService } from '../services/auth-user.service';
 
 @Injectable({ providedIn: 'root' })
 export class ErrorInterceptor implements HttpInterceptor {
 
   isAuthenticated = false;
 
-  constructor(private store: Store<AppState>) {
-    this.store.select(selectAuthState).subscribe((state: any) => this.isAuthenticated = state.isAuthenticated);
+  constructor(private store: Store<AppState>, private authUserService: AuthUserService) {
+    this.authUserService.authUser.subscribe(value => this.isAuthenticated = value.isAuthenticated);
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {

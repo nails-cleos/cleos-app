@@ -47,6 +47,7 @@ import { reducers } from './store/app.states';
 // Components
 import { AppComponent } from './app.component';
 import { isIPhone, isMobile } from './util/helper';
+import { AuthUserService } from './services/auth-user.service';
 
 export const localStorageSyncReducer =
   (reducer: ActionReducer<any>): ActionReducer<any> => localStorageSync({ keys: ['auth'], rehydrate: true })(reducer);
@@ -114,6 +115,7 @@ const firebaseUiAuthConfig: firebaseui.auth.Config = {
     AsyncPipe,
     CookieService,
     TranslateService,
+    AuthUserService,
     {
       provide: MAT_COLOR_FORMATS,
       useValue: NGX_MAT_COLOR_FORMATS
@@ -131,7 +133,7 @@ const firebaseUiAuthConfig: firebaseui.auth.Config = {
       useValue: environment.firebase
     },
     { provide: APP_INITIALIZER, useFactory: (pwaService: PwaService) => () => pwaService.initPwaPrompt(), deps: [PwaService], multi: true },
-    { provide: USE_AUTH_EMULATOR, useValue: !environment.production ? ['http://', 'localhost', 9099] : undefined },
+    { provide: USE_AUTH_EMULATOR, useValue: environment.useEmulators ? ['http://', 'localhost', 9099] : undefined },
     {
       provide: 'appConfig',
       useValue: { googleAuthEnabled: true, emailAuthEnabled: false }

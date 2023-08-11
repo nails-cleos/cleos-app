@@ -30,12 +30,12 @@
       </button>
     </ng-template>
     <button mat-icon-button (click)="changeTheme">
-      <mat-icon>{{checked ? 'light_mode' : 'dark_mode'}}</mat-icon>
+      <mat-icon>{{isDarkMode ? 'light_mode' : 'dark_mode'}}</mat-icon>
     </button>
   </span>
       <ng-template #menuButton>
         <button mat-icon-button (click)="changeTheme">
-          <mat-icon>{{checked ? 'light_mode' : 'dark_mode'}}</mat-icon>
+          <mat-icon>{{isDarkMode ? 'light_mode' : 'dark_mode'}}</mat-icon>
         </button>
         <button [matMenuTriggerFor]="menuLogged" mat-icon-button>
           <mat-icon>menu</mat-icon>

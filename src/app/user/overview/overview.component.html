@@ -81,10 +81,19 @@
     <mat-grid-tile *ngFor="let chart of charts" [colspan]="( layout | async )?.chart?.cols"
                    [rowspan]="( layout | async )?.chart?.rows">
       <app-card [chart]="chart" [title]="chart.title">
-        <app-chart [chartSummary]="chart" [error]="error" [isDark]="isDark" [locale]="language"></app-chart>
+        <app-chart [chartSummary]="chart" [error]="error" [locale]="language"></app-chart>
       </app-card>
     </mat-grid-tile>
   </mat-grid-list>
+  <div *ngIf="user; else box">
+    <ng-template [ngIf]="user.address">
+      <app-google-map [latitudeMarker]="user.address.location.y" [longitudeMarker]="user.address.location.x"
+                      [markInfo]="'<b>' + user.address.name + '</b>'"></app-google-map>
+    </ng-template>
+  </div>
+  <ng-template #box>
+    <div class="ssc-square mb"></div>
+  </ng-template>
 </div>
 <div class="grid-container">
   <div fxFlex></div>

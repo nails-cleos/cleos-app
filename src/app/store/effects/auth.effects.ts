@@ -9,6 +9,7 @@ import { AuthActionTypes, LoginFailure, LoginSuccess, SignUpFailure, SignUpSucce
 import { TranslateService } from '@ngx-translate/core';
 import { NavigationService } from '../../services/navigation.service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { AuthUserService } from '../../services/auth-user.service';
 
 @Injectable()
 export class LoginEffects {
@@ -114,6 +115,7 @@ export class LoginEffects {
   logOut$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.logout),
     tap(() => {
       this.auth.signOut();
+      this.authUserService.reloadUser();
       localStorage.removeItem('auth');
       window.location.href = '/main';
     })
@@ -131,6 +133,7 @@ export class LoginEffects {
   ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private authService: AuthService,
-              private router: Router, private navigationService: NavigationService, private auth: AngularFireAuth) {
+              private router: Router, private navigationService: NavigationService, private auth: AngularFireAuth,
+              private authUserService: AuthUserService) {
   }
 }
