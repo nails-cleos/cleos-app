@@ -17,7 +17,6 @@ import {
   getNow,
   getStartEndDay,
   greaterOrEqualsThan,
-  IDuration,
   isBetween,
   newDate,
   newDateTimestamp,
@@ -26,7 +25,15 @@ import {
   subPeriod
 } from '../../util/dates';
 import { IRoom, IRoomAll } from '../../interfaces/room';
-import { allDayEvent, calendarEvent, createBullet, createRecurringEvent, fillNotAvailable, getOverlapEvent, Meta } from '../../util/event';
+import {
+  allDayEvent,
+  calendarEvent,
+  createBullet,
+  fillNotAvailable,
+  getFrequency,
+  getOverlapEvent,
+  Meta
+} from '../../util/event';
 import { Router } from '@angular/router';
 import { CalendarEvent, CalendarEventTimesChangedEvent } from 'angular-calendar';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
@@ -156,7 +163,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   private get searchDate(): Date {
     const date = this.totalDays ? this.viewDate : startOfWeek(this.viewDate);
-    return addDays(date, -1);
+    return addDays(date, -2);
   }
 
   ngOnInit(): void {
@@ -385,19 +392,32 @@ export class CalendarComponent implements OnInit, OnDestroy {
         const startDate = newDateTimestamp(it.timestamp);
         const start = it.allDay ? createNewDate(startDate) : startDate;
         const duration = getDuration(it.allDay, it.duration);
+        const id = it.id;
+        const allDay = it.allDay;
+        const title = this.translate.instant('RESERVATION.EVENT.UNAVAILABLE', {
+          description: it.description ? it.description : '',
+          professionalName: getUserName(it.professional)
+        });
+        let path = 'unavailable/';
+        if (it.type === 'BLOCK_AGENDA') {
+          path += 'block-agenda/';
+        }
         if (it.repeat === 'NONE') {
           if (!greaterOrEqualsThan(start, this.maxDate)) {
-            this.validateUnavailableEvent(rr.room, start, duration, it, darkMode);
+            const data = { id, allDay, title, path, duration };
+            this.validateUnavailableEvent(rr.room, start, data, darkMode);
           }
         } else {
-          recurringEvents = [...recurringEvents, createRecurringEvent(start, this.searchDate, it, this.daysInWeek, duration)];
+          recurringEvents = [...recurringEvents,
+            getFrequency(it.repeat, startDate, id, title, this.daysInWeek, it.type || 'UNAVAILABLE', path, it.end, duration, allDay)
+          ];
         }
       }
     });
 
     recurringEvents.forEach(recurring => {
       recurring.rrule.all().forEach((date: Date) =>
-        this.validateUnavailableEvent(rr.room, date, recurring.duration, recurring.it, darkMode));
+        this.validateUnavailableEvent(rr.room, date, recurring, darkMode));
     });
   }
 
@@ -423,30 +443,33 @@ export class CalendarComponent implements OnInit, OnDestroy {
     const notes: INoteAll[] = rr.notes;
     let recurringEvents: any[] = [];
     notes.forEach(it => {
+      const title = this.translate.instant('RESERVATION.EVENT.NOTE', {
+        note: it.description
+      });
       const startDate = newDateTimestamp(it.date);
+      const state = 'NOTE';
+      const path = `notes/${ it.id }`;
       if (it.repeat === FrequencyEnum.none) {
-        this.createNoteEvent(it, startDate, darkMode);
+        this.createNoteEvent(title, state, path, startDate, darkMode);
       } else {
-        recurringEvents = [...recurringEvents, createRecurringEvent(startDate, this.searchDate, it, this.daysInWeek)];
+        recurringEvents = [...recurringEvents, getFrequency(it.repeat, startDate, it.id, title, this.daysInWeek, state, path)];
       }
     });
 
-    recurringEvents.forEach(recurring => recurring.rrule.all().forEach((date: Date) => this.createNoteEvent(recurring.it, date, darkMode)));
+    recurringEvents.forEach(recurring => recurring.rrule.all().forEach((date: Date) => this.createNoteEvent(recurring.title,
+      recurring.state, recurring.path, date, darkMode)));
   }
 
-  private createNoteEvent(note: INoteAll, date: Date, darkMode: boolean): void {
-    const detail = this.translate.instant('RESERVATION.EVENT.NOTE', {
-      note: note.description
-    });
-    const color = findStateColor('NOTE', darkMode);
-    const event = allDayEvent(detail, color, date, darkMode, `notes/${ note.id }`);
+  private createNoteEvent(title: string, state: string, path: string, date: Date, darkMode: boolean): void {
+    const color = findStateColor(state, darkMode);
+    const event = allDayEvent(title, color, date, darkMode, path);
     if (this.calendar && event) {
       this.calendar.events = [...this.calendar.events, event];
     }
   }
 
-  private validateUnavailableEvent(room: IRoomAll, start: Date, duration: IDuration, it: IUnavailableAll,
-                                   darkMode: boolean): void {
+  private validateUnavailableEvent(room: IRoomAll, start: Date, recurring: any, darkMode: boolean): void {
+    const duration = recurring.duration;
     const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
     if (this.calendar) {
       let events = this.calendar.events;
@@ -467,25 +490,15 @@ export class CalendarComponent implements OnInit, OnDestroy {
           }
         });
       }
-      this.createUnavailableEvent(room, events, this.calendar.day, it, start, end, darkMode);
+      this.createUnavailableEvent(room, events, this.calendar.day, recurring, start, end, darkMode);
     }
   }
 
-  private createUnavailableEvent(room: IRoomAll, events: CalendarEvent[], day: any, it: IUnavailableAll, start: Date,
+  private createUnavailableEvent(room: IRoomAll, events: CalendarEvent[], day: any, recurring: any, start: Date,
                                  end: Date, darkMode: boolean): void {
-    const detail = this.translate.instant('RESERVATION.EVENT.UNAVAILABLE', {
-      description: it.description ? it.description : '',
-      professionalName: getUserName(it.professional)
-    });
-
     const color = findStateColor('DEFAULT', darkMode);
-    const meta = new Meta(!it.allDay, room.timeZone);
-    let path = 'unavailable/';
-    if (it.type === 'BLOCK_AGENDA') {
-      path += 'block-agenda/';
-    }
-    path += it.id;
-    events = [...events, calendarEvent(detail, color, start, darkMode, end, path, meta)];
+    const meta = new Meta(!recurring.allDay, room.timeZone);
+    events = [...events, calendarEvent(recurring.title, color, start, darkMode, end, recurring.path + recurring.id, meta)];
     const calendar = new Calendar(room, events);
     calendar.day = day;
     this.calendar = calendar;

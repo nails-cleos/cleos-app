@@ -11,10 +11,11 @@ const light = 'light-theme';
 interface IState {
   name: string;
   color: string;
+  order: number;
 }
 
 export const findStateColor = (state: string, isDark: boolean = false): string => {
-  const value = stateColor(isDark).find(color => color.name === state);
+  const value = eventState(isDark).find(color => color.name === state);
   return value ? value.color : findStateColor('DEFAULT', isDark);
 };
 
@@ -45,39 +46,52 @@ export const resetTheme = (theme: Theme | undefined, cssClass: string | undefine
 
 const getTheme = (theme: string | undefined): Theme => theme === dark ? dark : light;
 
-const stateColor = (isDark: boolean): IState[] => [{
-  name: 'CREATED',
-  color: isDark ? '#ceb4ac' : '#dcc8c2'// accent-dark
-}, {
-  name: 'EDITING',
-  color: isDark ? '#ffd078' : '#ffd991'// primary-A-dark
-}, {
-  name: 'PARTIALLY_COMPLETED',
-  color: '#a9a397'
-}, {
-  name: 'COMPLETED',
-  color: isDark ? '#44a244' : '#90ee90'
-}, {
-  name: 'PAID',
-  color: isDark ? '#04589a' : '#009ee3'
-}, {
-  name: 'PARTIALLY_PAID',
-  color: isDark ? '#04589a' : '#009ee3'
-}, {
-  name: 'STARTED',
-  color: isDark ? '#673ab7' : '#e6b9ff'
-}, {
-  name: 'APPROVED',
-  color: isDark ? '#8f887a' : '#a9a397' // primary-dark
-}, {
-  name: 'DEFAULT',
-  color: isDark ? '#f08080' : '#ffb3b3' // warn-dark-lighter
-}, {
+export const getStateOrder = (state?: string): number => eventState().find(color => color.name === state)?.order || 100;
+
+export const eventState = (isDark: boolean = false): IState[] => [{
   name: 'BIRTHDAY',
-  color: isDark ? '#eb70a5' : '#f18dbc'
+  color: isDark ? '#eb70a5' : '#f18dbc',
+  order: 1
 }, {
   name: 'NOTE',
-  color: isDark ? '#e7d255' : '#eedf72'
+  color: isDark ? '#e7d255' : '#eedf72',
+  order: 2
+}, {
+  name: 'CREATED',
+  color: isDark ? '#ceb4ac' : '#dcc8c2', // accent-dark
+  order: 3
+}, {
+  name: 'EDITING',
+  color: isDark ? '#ffd078' : '#ffd991', // primary-A-dark
+  order: 4
+}, {
+  name: 'APPROVED',
+  color: isDark ? '#8f887a' : '#a9a397', // primary-dark
+  order: 5
+}, {
+  name: 'PARTIALLY_PAID',
+  color: isDark ? '#04589a' : '#009ee3',
+  order: 6
+}, {
+  name: 'PAID',
+  color: isDark ? '#04589a' : '#009ee3',
+  order: 7
+}, {
+  name: 'STARTED',
+  color: isDark ? '#673ab7' : '#e6b9ff',
+  order: 8
+}, {
+  name: 'PARTIALLY_COMPLETED',
+  color: '#a9a397',
+  order: 9
+}, {
+  name: 'COMPLETED',
+  color: isDark ? '#44a244' : '#90ee90',
+  order: 10
+}, {
+  name: 'DEFAULT',
+  color: isDark ? '#f08080' : '#ffb3b3', // warn-dark-lighter
+  order: 100
 }];
 
 const selectedTheme = (value: Theme | undefined, themeService: ThemeService): void => {

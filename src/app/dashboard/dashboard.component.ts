@@ -8,7 +8,7 @@ import {
   createNewDate,
   dateToTimestamp,
   endOfPeriod,
-  getCurrentTimeZone,
+  getCurrentTimeZone, getDurationOrUndefined,
   getEnd,
   getMinutesBetweenTimes,
   getNow,
@@ -398,7 +398,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
             this.events = [...this.events, event];
           } else {
-            recurring = [...recurring, getFrequency(it.repeat, start, it.unavailableId, title, it.end, it.duration)];
+            recurring = [...recurring, getFrequency(it.repeat, start, it.unavailableId, title, 45, 'UNAVAILABLE',
+              'unavailable', it.end, getDurationOrUndefined(it.duration))];
           }
         });
         recurring.forEach(r =>
@@ -407,7 +408,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             const event = {
               start, end,
               title: r.title,
-              id: r.unavailableId,
+              id: r.id,
               color: professional.color,
               draggable: true,
               meta: { professional, time: true },

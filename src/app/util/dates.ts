@@ -5,7 +5,8 @@ import {
   addWeeks,
   endOfDay,
   endOfMonth,
-  endOfWeek, getQuarter,
+  endOfWeek,
+  getQuarter,
   isSameDay,
   startOfDay,
   startOfMonth,
@@ -86,6 +87,8 @@ export const totalDuration = (treatment: ITreatmentAll, additional?: IAdditional
   return { additionalDuration, duration };
 };
 
+export const getDurationOrUndefined = (duration?: string): IDuration | undefined => duration ? convertDuration(duration) : undefined;
+
 export const convertDuration = (duration: string): IDuration => {
   const hIndex = duration.indexOf('H');
   const mIndex = duration.indexOf('M');
@@ -106,12 +109,13 @@ export const sumDurations = (durations: IDuration[]): IDuration => {
   return timeConvert(minutes, hours);
 };
 
-export const getEnd = (start: Date, strDuration?: string): Date => {
-  if (strDuration) {
-    const duration = convertDuration(strDuration);
+export const getEnd = (start: Date, strDuration?: string): Date => getEndWithDuration(start,
+  strDuration ? convertDuration(strDuration) : undefined);
+
+export const getEndWithDuration = (start: Date, duration?: IDuration): Date => {
+  if (duration) {
     return createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
   }
-
   return createNewDate(start, 23, 59, 59, 99);
 };
 

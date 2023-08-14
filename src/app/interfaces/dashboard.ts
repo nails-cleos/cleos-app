@@ -5,6 +5,7 @@ import { IAvailability } from './room';
 import { ICurrency, ICurrencyAll } from './currency';
 import { States } from './reservation';
 import { PaymentType } from './payment';
+import { FrequencyEnum } from '../util/helper';
 
 export interface IDashboard {
   timeZone?: string;
@@ -42,6 +43,8 @@ export interface ICardSummary {
 export interface ICalendarSummary {
   reservations: ICalendarReservations[];
   unavailable: ICalendarUnavailable[];
+  birthdays: ICalendarBirthday[];
+  notes: ICalendarNote[];
 }
 
 export interface ICalendarReservations {
@@ -64,6 +67,19 @@ export interface ICalendarUnavailable {
   repeat: string;
   allDay: boolean;
   type: string;
+}
+
+export interface ICalendarBirthday {
+  userId: string;
+  title: string;
+  date: string;
+}
+
+export interface ICalendarNote {
+  noteId: string;
+  title: string;
+  date: number;
+  repeat: FrequencyEnum;
 }
 
 export interface IChart {

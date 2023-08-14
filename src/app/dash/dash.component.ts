@@ -8,13 +8,13 @@ import * as fromActionsDashboard from '../store/dashboard.actions';
 import * as fromActionsReservation from '../store/reservation.actions';
 import { IReservationSummary, States } from '../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
-import { getEnd, getNow, newDateTimestamp } from '../util/dates';
+import { convertDuration, getDurationOrUndefined, getEnd, getEndWithDuration, getNow, newDateTimestamp } from '../util/dates';
 import { CalendarEvent, CalendarMonthViewDay, CalendarView } from 'angular-calendar';
-import { findStateColor } from '../util/theme';
-import { getFrequency, IMeta, Meta, monthEvent } from '../util/event';
+import { findStateColor, getStateOrder } from '../util/theme';
+import { allDayEvent, getFrequency, IMeta, Meta, monthEvent } from '../util/event';
 import { Router } from '@angular/router';
 import { isSameDay, isSameMonth } from 'date-fns';
-import { ICalendarReservations, ICalendarUnavailable, IChart, IDashboard } from '../interfaces/dashboard';
+import { ICalendarNote, ICalendarSummary, IChart, IDashboard } from '../interfaces/dashboard';
 import { UntypedFormControl } from '@angular/forms';
 import { IRoom } from '../interfaces/room';
 import { CalendarDialogComponent } from '../shared/dialog/calendar/calendar-dialog.component';
@@ -215,6 +215,10 @@ export class DashComponent implements OnInit, OnDestroy {
     });
   }
 
+  sortBy(eventGroups: CalendarEvent<IMeta>[]): any {
+    return eventGroups.sort((a: any, b: any) => getStateOrder(a[0]) - getStateOrder(b[0]));
+  }
+
   private segmentClick(date: Date, room?: IRoom): void {
     const data = { date };
     if (date && room) {
@@ -313,7 +317,8 @@ export class DashComponent implements OnInit, OnDestroy {
   private createEvents(darkMode: boolean = false): void {
     this.events = [];
     if (this.state.calendarSummary) {
-      this.state.calendarSummary.reservations?.forEach((it: ICalendarReservations) => {
+      const calendarSummary: ICalendarSummary = this.state.calendarSummary;
+      calendarSummary.reservations?.forEach(it => {
         const start = newDateTimestamp(it.start);
         const end = it.end ? newDateTimestamp(it.end) : null;
         this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNow());
@@ -326,7 +331,7 @@ export class DashComponent implements OnInit, OnDestroy {
         }
       });
       let recurring: any[] = [];
-      this.state.calendarSummary.unavailable?.forEach((it: ICalendarUnavailable) => {
+      calendarSummary.unavailable?.forEach(it => {
         if (it.type === 'BLOCK_AGENDA') {
           return;
         }
@@ -337,28 +342,56 @@ export class DashComponent implements OnInit, OnDestroy {
         if (it.repeat === FrequencyEnum.none) {
           const end = getEnd(start, it.duration);
           const event = monthEvent(title, start, end, it.unavailableId, findStateColor('DEFAULT', darkMode),
-            new Meta(!!it.duration, this.state.timeZone, undefined, ['unavailable', it.unavailableId]), darkMode);
+            new Meta(!!it.duration, this.state.timeZone, 'UNAVAILABLE', ['unavailable', it.unavailableId]), darkMode);
           if (event) {
             this.events = [...this.events, event];
           }
         } else {
-          recurring = [...recurring, getFrequency(it.repeat, start, it.unavailableId, title, it.end, it.duration)];
+          recurring = [...recurring, getFrequency(it.repeat, start, it.unavailableId, title, 45, 'UNAVAILABLE',
+            'unavailable', it.end, getDurationOrUndefined(it.duration))];
+        }
+      });
+
+      calendarSummary.birthdays?.forEach(it => {
+        const startDate = newDateTimestamp(it.date);
+        startDate.setFullYear(getNow().getFullYear());
+        const color = findStateColor('BIRTHDAY', darkMode);
+        const event = allDayEvent(it.title, color, startDate, darkMode, `users/${ it.userId }`,
+          new Meta(false, this.state.timeZone, 'BIRTHDAY', ['users', it.userId]));
+        this.events = [...this.events, event];
+      });
+
+      calendarSummary.notes.forEach(it => {
+        const startDate = newDateTimestamp(it.date);
+        if (it.repeat === FrequencyEnum.none) {
+          this.createNoteEvent(it, startDate, darkMode);
+        } else {
+          recurring = [...recurring, getFrequency(it.repeat, startDate, it.noteId, it.title, 45, 'NOTE', 'notes',
+            undefined, undefined, true)];
         }
       });
 
       recurring.forEach(r =>
         r.rule.all().forEach((date: Date) => {
-          const end = getEnd(date, r.duration);
-          const event = monthEvent(r.title, date, end, r.unavailableId, findStateColor('DEFAULT', darkMode),
-            new Meta(!!r.duration, this.state.timeZone, undefined, ['unavailable', r.unavailableId]), darkMode);
+          const end = getEndWithDuration(date, r.duration);
+          const event = monthEvent(r.title, date, end, r.id, findStateColor(r.state, darkMode),
+            new Meta(!!r.duration, this.state.timeZone, r.state, [r.path, r.id]), darkMode);
           if (event) {
             this.events = [...this.events, event];
           }
         }));
 
+
       this.isCalendarLoading = false;
     }
     this.events = this.events.slice().sort((a, b) => a.start.getTime() - b.start.getTime());
+  }
+
+  private createNoteEvent(note: ICalendarNote, date: Date, darkMode: boolean): void {
+    const color = findStateColor('NOTE', darkMode);
+    const event = allDayEvent(note.title, color, date, darkMode, `notes/${ note.noteId }`,
+      new Meta(false, this.state.timeZone, 'NOTE', ['notes', note.noteId]));
+    this.events = [...this.events, event];
   }
 
   private getSummaries(): void {
