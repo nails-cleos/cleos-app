@@ -37,7 +37,7 @@ import {
   formatTime,
   getAvailability,
   getCurrentTimeZone,
-  getDuration,
+  getDuration, getDurationOrUndefined,
   getNow,
   getStartEndDay,
   getTime,
@@ -52,7 +52,7 @@ import {
   reservationDuration,
   totalDuration
 } from '../util/dates';
-import { createBullet, createRecurringEvent, fillNotAvailable, getOverlapEvent, Meta, newEvent } from '../util/event';
+import { createBullet, fillNotAvailable, getFrequency, getOverlapEvent, Meta, newEvent } from '../util/event';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Role } from '../interfaces/token';
 import { IUnavailableAll } from '../interfaces/unavailable';
@@ -890,23 +890,37 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         const startDate = newDateTimestamp(it.timestamp, this.room.value.timeZone);
         const start = it.allDay ? createNewDate(startDate) : startDate;
         const duration = getDuration(it.allDay, it.duration);
+        const id = it.id;
+        const allDay = it.allDay;
+        const professionalId = it.professional.id;
+        const title = this.translate.instant('RESERVATION.EVENT.UNAVAILABLE', {
+          description: it.description ? it.description : '',
+          professionalName: getUserName(it.professional)
+        });
+        let path = 'unavailable/';
+        if (it.type === 'BLOCK_AGENDA') {
+          path += 'block-agenda/';
+        }
         if (it.repeat === 'NONE') {
           if (!greaterOrEqualsThan(start, this.maxDate)) {
-            this.validateUnavailableEvent(start, duration, it);
+            const data = { id, allDay, title, path, duration, professionalId };
+            this.validateUnavailableEvent(start, data);
           }
         } else {
-          recurringEvents = [...recurringEvents, createRecurringEvent(start, this.viewDate, it, this.daysInWeek, duration)];
+          recurringEvents = [...recurringEvents, getFrequency(it.repeat, start, it.id, title, this.daysInWeek, 'UNAVAILABLE',
+            'unavailable', it.end, getDurationOrUndefined(it.duration), it.allDay, professionalId)];
         }
       }
     });
 
     recurringEvents.forEach(recurring => {
       recurring.rrule.all().forEach((date: Date) =>
-        this.validateUnavailableEvent(date, recurring.duration, recurring.it));
+        this.validateUnavailableEvent(date, recurring));
     });
   }
 
-  private validateUnavailableEvent(start: Date, duration: IDuration, it: IUnavailableAll): void {
+  private validateUnavailableEvent(start: Date, recurring: any): void {
+    const duration = recurring.duration;
     const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
     const overlapEvent = getOverlapEvent(this.events, start, end);
     if (overlapEvent.length > 0) {
@@ -922,25 +936,20 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
               this.events = [...this.events, value];
             }
           }
-          if (!this.events.find(ce => ce.id === `unavailable/${ it.id }` && isSameDay(value.start, ce.start))) {
-            this.createUnavailableEvent(it, start, end);
+          if (!this.events.find(ce => ce.id === recurring.path && isSameDay(value.start, ce.start))) {
+            this.createUnavailableEvent(recurring, start, end);
           }
         }
       });
     } else {
-      this.createUnavailableEvent(it, start, end);
+      this.createUnavailableEvent(recurring, start, end);
     }
   }
 
-  private createUnavailableEvent(it: IUnavailableAll, start: Date, end: Date): void {
-    const detail = this.translate.instant('RESERVATION.EVENT.UNAVAILABLE', {
-      description: it.description ? it.description : '',
-      professionalName: getUserName(it.professional)
-    });
-
+  private createUnavailableEvent(recurring: any, start: Date, end: Date): void {
     const color = findStateColor('DEFAULT', this.isDarkMode);
-    const meta = new Meta(!it.allDay, this.room.value.timeZone, undefined, undefined, it.professional.id);
-    const event = newEvent(detail, color, start, this.isDarkMode, end, `unavailable/${ it.id }`, meta);
+    const meta = new Meta(!recurring.allDay, this.room.value.timeZone, undefined, undefined, recurring.professionalId);
+    const event = newEvent(recurring.title, color, start, this.isDarkMode, end, recurring.path, meta);
     if (event) {
       this.events = [...this.events, event];
     }

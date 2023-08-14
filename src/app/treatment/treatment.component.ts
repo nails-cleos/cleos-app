@@ -10,7 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { IColorAll } from '../interfaces/color';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { map, startWith } from 'rxjs/operators';
-import { fieldChange, valueChange } from '../util/validators';
+import { fieldChange } from '../util/validators';
 import { areEquals } from '../util/helper';
 
 @Component({
@@ -190,7 +190,6 @@ export class TreatmentComponent implements OnInit, OnDestroy {
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       this.allColors = state.colors;
-      console.log(state)
       if (state.selected) {
         this.group = {
           id: state.selected.id,

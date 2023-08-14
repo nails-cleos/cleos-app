@@ -68,7 +68,7 @@
         <span class="cal-day-number">{{ day.date | calendarDate:'monthViewDayNumber':locale }}</span>
       </div>
       <div class="cell-totals">
-        <span *ngFor="let group of day.eventGroups" class="badge text-bg-{{ group[0].toLowerCase() }}">
+        <span *ngFor="let group of sortBy(day.eventGroups)" class="badge text-bg-{{ group[0].toLowerCase() }}">
           {{ group[1].length }}
         </span>
       </div>
