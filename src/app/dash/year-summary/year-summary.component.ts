@@ -47,9 +47,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     this.getState = this.store.select(selectDashboardState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
     this.showCash = false;
-    this.authUserService.authUser.subscribe(value => {
-      this.showCash = value.showCash;
-    });
+    this.authUserService.authUser.subscribe(value => this.showCash = value.showCash);
   }
 
   ngOnInit(): void {

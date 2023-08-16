@@ -80,9 +80,7 @@ export class MonthSummaryComponent implements OnInit {
     this.dateFormat = this.translate.currentLang;
     this.weeks = getWeeksInMonth(getNow());
     this.extras = this.router.getCurrentNavigation()?.extras.state;
-    this.authUserService.authUser.subscribe(value => {
-      this.showCash = value.showCash;
-    });
+    this.authUserService.authUser.subscribe(value => this.showCash = value.showCash);
   }
 
   get dateFormatted(): string {

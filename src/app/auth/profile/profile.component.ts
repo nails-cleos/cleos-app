@@ -175,7 +175,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.form.patchValue(state.selected);
         this.address.setValue(this.user?.address?.name);
 
-        const roles = ['ROLE_PROFESSIONAL', 'ROLE_MANAGER'];
+        const roles = [Role.professional, Role.manager];
         this.showColors = state.selected.authorities?.some((au: any) => roles.includes(au.authority));
         this.isAdmin = state.selected.authorities?.some((u: any) => u.authority === Role.admin);
 
