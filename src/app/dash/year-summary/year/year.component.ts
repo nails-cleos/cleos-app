@@ -14,4 +14,9 @@ export class YearComponent {
   @Input() year!: number;
   @Input() currency!: ICurrencyAll;
   @Input() start!: number;
+  @Input() showCash: boolean;
+
+  constructor() {
+    this.showCash = false;
+  }
 }

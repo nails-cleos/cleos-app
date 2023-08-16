@@ -13,6 +13,7 @@ import { backendFormatDate, createDateFromString, newDate } from '../../util/dat
 import { Color } from '@angular-material-components/color-picker';
 import { lightenDarkenColor } from '../../util/color';
 import { IAddress, ILocation } from '../../interfaces/room';
+import { Role } from '../../interfaces/token';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
 
@@ -49,6 +50,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   flagList: IFlag[] = flags();
   isDarkMode = false;
+  isAdmin: boolean;
+  showCash: boolean;
 
   private getState: Observable<any>;
   private subscription?: Subscription;
@@ -57,6 +60,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private location: Location,
               private cdRef: ChangeDetectorRef) {
+    this.showCash = false;
+    this.isAdmin = false;
     this.getState = this.store.select(selectUserState);
   }
 
@@ -71,6 +76,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     user.lastName = fieldChange(this.lastName, this.user?.lastName);
     user.phone = fieldChange(this.phone, this.user?.phone);
     user.dob = user.dob ? backendFormatDate(newDate(user.dob)) : user.dob;
+    user.showCash = this.showCash;
 
     if (this.lightColor.value) {
       const color = this.lightColor.value;
@@ -169,8 +175,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.form.patchValue(state.selected);
         this.address.setValue(this.user?.address?.name);
 
-        const roles = ['ROLE_PROFESSIONAL', 'ROLE_MANAGER'];
+        const roles = [Role.professional, Role.manager];
         this.showColors = state.selected.authorities?.some((au: any) => roles.includes(au.authority));
+        this.isAdmin = state.selected.authorities?.some((u: any) => u.authority === Role.admin);
 
         if (state.selected.lightColor) {
           const rgb = state.selected.lightColor.split(',');
@@ -185,6 +192,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
         }
         const langValue = findFlag(this.flagList, state.selected.locale);
         this.langValue.setValue(langValue);
+        this.showCash = user.showCash || false;
         this.cdRef.detectChanges();
       }
       if (state.subErrors) {

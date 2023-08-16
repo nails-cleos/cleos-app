@@ -104,8 +104,16 @@
       background-color: #e3d3c5;
       color: black;
     }
-    .text-bg-undefined {
+    .text-bg-unavailable {
       background-color: #f08080;
+      color: black;
+    }
+    .text-bg-birthday {
+      background-color: #eb70a5;
+      color: black;
+    }
+    .text-bg-note {
+      background-color: #e7d255;
       color: black;
     }
   } @else {
@@ -127,8 +135,14 @@
     .text-bg-approved {
       background-color: #a06c3f;
     }
-    .text-bg-undefined {
+    .text-bg-unavailable {
       background-color: #ffb3b3;
+    }
+    .text-bg-birthday {
+      background-color: #f18dbc;
+    }
+    .text-bg-note {
+      background-color: #eedf72;
     }
   }
 

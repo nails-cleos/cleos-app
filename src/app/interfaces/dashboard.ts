@@ -5,6 +5,7 @@ import { IAvailability } from './room';
 import { ICurrency, ICurrencyAll } from './currency';
 import { States } from './reservation';
 import { PaymentType } from './payment';
+import { FrequencyEnum } from '../util/helper';
 
 export interface IDashboard {
   timeZone?: string;
@@ -42,6 +43,8 @@ export interface ICardSummary {
 export interface ICalendarSummary {
   reservations: ICalendarReservations[];
   unavailable: ICalendarUnavailable[];
+  birthdays: ICalendarBirthday[];
+  notes: ICalendarNote[];
 }
 
 export interface ICalendarReservations {
@@ -64,6 +67,19 @@ export interface ICalendarUnavailable {
   repeat: string;
   allDay: boolean;
   type: string;
+}
+
+export interface ICalendarBirthday {
+  userId: string;
+  title: string;
+  date: string;
+}
+
+export interface ICalendarNote {
+  noteId: string;
+  title: string;
+  date: number;
+  repeat: FrequencyEnum;
 }
 
 export interface IChart {
@@ -187,6 +203,9 @@ export interface IMonthSummary {
   totalGross: number;
   totalNet: number;
   totalBTW: number;
+  totalWithoutGross: number;
+  totalWithoutNet: number;
+  totalWithoutBTW: number;
 }
 
 export interface IQuarterSummary {
@@ -210,21 +229,40 @@ export class MonthSummary implements IMonthSummary {
   totalGross: number;
   totalNet: number;
   totalBTW: number;
+  totalWithoutGross: number;
+  totalWithoutNet: number;
+  totalWithoutBTW: number;
 
   constructor(month: number, total: ISummaryTotal[]) {
     this.month = month;
     this.total = total;
-    const { totalGross, totalNet, totalBTW } = total.reduce((totals: any, next: ISummaryTotal) => {
+    const {
+      totalGross,
+      totalNet,
+      totalBTW,
+      totalWithoutGross,
+      totalWithoutNet,
+      totalWithoutBTW
+    } = total.reduce((totals: any, next: ISummaryTotal) => {
       const by = next.type === 'EXPENSE' ? -1 : 1;
       totals.totalGross += next.gross * by;
       totals.totalNet += next.net * by;
       totals.totalBTW += next.btw * by;
 
+      if (next.type !== 'CASH') {
+        totals.totalWithoutGross += next.gross * by;
+        totals.totalWithoutNet += next.net * by;
+        totals.totalWithoutBTW += next.btw * by;
+      }
+
       return totals;
-    }, { totalGross: 0, totalNet: 0, totalBTW: 0 });
+    }, { totalGross: 0, totalNet: 0, totalBTW: 0, totalWithoutGross: 0, totalWithoutNet: 0, totalWithoutBTW: 0 });
     this.totalGross = totalGross;
     this.totalNet = totalNet;
     this.totalBTW = totalBTW;
+    this.totalWithoutGross = totalWithoutGross;
+    this.totalWithoutNet = totalWithoutNet;
+    this.totalWithoutBTW = totalWithoutBTW;
   }
 }
 
@@ -237,5 +275,31 @@ export class Total implements ITotal {
     this.btw = btw;
     this.gross = gross;
     this.net = net;
+  }
+}
+
+export interface ISummaryTotals {
+  income: ITotal;
+  expense: ITotal;
+  cash: ITotal;
+  totalsWithoutCash: ITotal;
+  totals: ITotal;
+}
+
+export class SummaryTotals implements ISummaryTotals {
+  income: ITotal;
+  expense: ITotal;
+  cash: ITotal;
+  totalsWithoutCash: ITotal;
+  totals: ITotal;
+
+
+  constructor(income: ITotal = new Total(), expense: ITotal = new Total(), cash: ITotal = new Total(),
+              totalsWithoutCash: ITotal = new Total(), totals: ITotal = new Total()) {
+    this.income = income;
+    this.expense = expense;
+    this.cash = cash;
+    this.totalsWithoutCash = totalsWithoutCash;
+    this.totals = totals;
   }
 }

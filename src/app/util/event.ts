@@ -63,13 +63,26 @@ export const createRecurringEvent = (start: Date, date: Date, it: any, daysInWee
   return { duration, it, rrule: createRule(it.repeat, startDate, calendarEnd, start.getDate(), getWeekDay(start.getDay())) };
 };
 
-export const getFrequency = (repeat: string, start: Date, unavailableId: string, title: string, end: string,
-                             duration?: string): any => ({
-  unavailableId,
-  title,
-  duration,
-  rule: createRule(repeat, start, createEndDate(end), start.getDate(), getWeekDay(start.getDay()))
-});
+export const getFrequency = (repeat: string, start: Date, id: any, title: string, daysInWeek: number, state: string, path: string,
+                             endDate?: string, duration?: IDuration, allDay: boolean = false, professionalId?: string): any => {
+  let calendarEnd = plusDays(start, daysInWeek);
+  if (endDate) {
+    const end = createEndDate(endDate);
+    if (greaterOrEqualsThan(calendarEnd, end)) {
+      calendarEnd = end;
+    }
+  }
+  return {
+    id,
+    title,
+    duration,
+    state,
+    path,
+    allDay,
+    professionalId,
+    rule: createRule(repeat, start, calendarEnd, start.getDate(), getWeekDay(start.getDay()))
+  };
+};
 
 export const fillNotAvailable = (unavailable: string, lunch: string, notWorking: string,
                                  selectDate: Date, sunday: IAvailability, saturday: IAvailability,
@@ -127,14 +140,15 @@ export const allDayEvent = (title: string, color: string, start: Date, isDarkMod
 } as unknown as CalendarEvent);
 
 export const monthEvent = (title: string, start: Date, end: Date | null, id: string, color: string, meta: Meta, isDarkMode: boolean,
-                           draggable: boolean = false): CalendarEvent | undefined => ({
+                           allDay: boolean = false, draggable: boolean = false): CalendarEvent | undefined => ({
   id,
   start,
   title,
   end,
   color: createEventColor(color, isDarkMode),
   meta,
-  draggable
+  draggable,
+  allDay
 } as unknown as CalendarEvent);
 
 export const getOverlapEvent = (events: any[], eventStartDay: Date, eventEndDay: Date,

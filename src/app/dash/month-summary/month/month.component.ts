@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { IMonthSummary } from '../../../interfaces/dashboard';
+import { AfterViewInit, Component, Input } from '@angular/core';
+import { IMonthSummary, ISummaryTotal, ITotal, Total } from '../../../interfaces/dashboard';
 import { ICurrencyAll } from '../../../interfaces/currency';
 import { Router } from '@angular/router';
 
@@ -8,12 +8,41 @@ import { Router } from '@angular/router';
   templateUrl: './month.component.html',
   styleUrls: ['./month.component.scss']
 })
-export class MonthComponent {
+export class MonthComponent implements AfterViewInit {
   @Input() month!: IMonthSummary;
   @Input() currency!: ICurrencyAll;
   @Input() year!: number;
+  @Input() showCash: boolean;
+
+  income?: ISummaryTotal;
+  expense?: ISummaryTotal;
+  cash?: ISummaryTotal;
 
   constructor(private router: Router) {
+    this.showCash = false;
+  }
+
+  ngAfterViewInit(): void {
+    const { income, expense, cash } = this.month.total.reduce((types: any, next: ISummaryTotal) => {
+      const total = new Total(next.gross, next.btw, next.net);
+      switch (next.type) {
+        case 'CASH':
+          if (this.showCash) {
+            types.cash = total;
+          }
+          break;
+        case 'INCOME':
+          types.income = total;
+          break;
+        case 'EXPENSE':
+          types.expense = total;
+          break;
+      }
+      return types;
+    }, { income: {} as ITotal, expense: {} as ITotal, cash: {} as ITotal });
+    this.income = income;
+    this.expense = expense;
+    this.cash = cash;
   }
 
   goToMonth(month: number, type?: string): void {

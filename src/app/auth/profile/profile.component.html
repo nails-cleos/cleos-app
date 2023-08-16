@@ -151,6 +151,10 @@
                   </div>
                 </div>
               </div>
+              <ng-template [ngIf]="isAdmin">
+                <mat-checkbox (change)="showCash = !showCash" color="primary"
+                              [checked]="showCash">{{ 'COMMON.PROFILE.SHOW_CASH' | translate }}</mat-checkbox>
+              </ng-template>
             </div>
           </mat-card-content>
           <ng-template #boxSkeleton>
