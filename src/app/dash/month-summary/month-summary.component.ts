@@ -23,6 +23,7 @@ import { YearMonthAdapter } from '../../util/adapter/year-month.adapter';
 import { titleCase } from '../../util/helper';
 import { Router } from '@angular/router';
 import { twoDigitNumber } from '../../util/numbers';
+import { AuthUserService } from '../../services/auth-user.service';
 
 @Component({
   selector: 'app-month-summary',
@@ -66,16 +67,22 @@ export class MonthSummaryComponent implements OnInit {
   roomId?: string;
   locale = 'es';
   isLoading = false;
+  showCash: boolean;
 
   private getState: Observable<any>;
   private subscription?: Subscription;
   private readonly extras: any;
 
-  constructor(private readonly translate: TranslateService, private store: Store<AppState>, private router: Router) {
+  constructor(private readonly translate: TranslateService, private store: Store<AppState>, private router: Router,
+              private authUserService: AuthUserService) {
+    this.showCash = false;
     this.getState = this.store.select(selectDashboardState);
     this.dateFormat = this.translate.currentLang;
     this.weeks = getWeeksInMonth(getNow());
     this.extras = this.router.getCurrentNavigation()?.extras.state;
+    this.authUserService.authUser.subscribe(value => {
+      this.showCash = value.showCash;
+    });
   }
 
   get dateFormatted(): string {

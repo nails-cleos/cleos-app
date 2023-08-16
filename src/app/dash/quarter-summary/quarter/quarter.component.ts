@@ -16,12 +16,15 @@ export class QuarterComponent {
   @Input() year!: number;
   @Input() quarter!: number;
   @Input() currency!: ICurrencyAll;
-  @Input() margin = false;
+  @Input() margin: boolean;
+  @Input() showCash: boolean;
 
   dateFormat: string;
 
   constructor(private readonly translate: TranslateService, private router: Router) {
     this.dateFormat = this.translate.currentLang;
+    this.margin = false;
+    this.showCash = false;
   }
 
   getMonth(month: number): string {

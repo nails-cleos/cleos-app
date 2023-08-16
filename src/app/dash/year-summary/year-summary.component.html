@@ -33,19 +33,19 @@
     <ng-template [ngIf]="yearSummaryMap?.size" [ngIfElse]="noData">
       <ng-template [ngIf]="isHandset$ | async" [ngIfElse]="bigScreen">
         <app-year [quarterSummaries]="quarterSummaries" [year]="date.value.getFullYear()"
-                  [measure]="'short'" [currency]="selectedRoom.value.currency" [start]="1"></app-year>
+                  [measure]="'short'" [currency]="selectedRoom.value.currency" [start]="1" [showCash]="showCash"></app-year>
       </ng-template>
 
       <ng-template #bigScreen>
         <app-year [quarterSummaries]="quarterSummaries" [year]="date.value.getFullYear()"
-                  [measure]="'long'" [currency]="selectedRoom.value.currency" [start]="2"></app-year>
+                  [measure]="'long'" [currency]="selectedRoom.value.currency" [start]="2" [showCash]="showCash"></app-year>
       </ng-template>
       <div style="margin-top: 2%">
         <mat-toolbar color="primary">
           {{'SUMMARY.YEAR.RESULT' | translate}}
         </mat-toolbar>
-        <app-total-summary [income]="income" [expense]="expense" [cash]="cash" [totals]="totals"
-                           [currency]="selectedRoom.value.currency"></app-total-summary>
+        <app-total-summary [summaryTotals]="yearSummaryTotals" [currency]="selectedRoom.value.currency"
+                           [showCash]="showCash"></app-total-summary>
       </div>
     </ng-template>
     <ng-template #noData>

@@ -209,6 +209,7 @@
     "PROFILE": {
       "FIELD": "Perfil",
       "INCOMPLETE": "Completá todos los datos de tu perfil",
+      "SHOW_CASH": "Mostar efectivo",
       "UPDATED": {
         "MESSAGE": "Usuario {{username}} actualizado",
         "PHOTO": "Foto de perfil actualizada",

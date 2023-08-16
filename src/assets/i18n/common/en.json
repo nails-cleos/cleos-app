@@ -208,6 +208,7 @@
     },
     "PROFILE": {
       "FIELD": "Profile",
+      "SHOW_CASH": "Show cash",
       "INCOMPLETE": "Complete your profile",
       "UPDATED": {
         "MESSAGE": "User {{username}} updated",

@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { ITotal } from '../../interfaces/dashboard';
+import { AfterViewInit, Component, Input } from '@angular/core';
+import { ISummaryTotals } from '../../interfaces/dashboard';
 import { ICurrencyAll } from '../../interfaces/currency';
 
 @Component({
@@ -7,10 +7,21 @@ import { ICurrencyAll } from '../../interfaces/currency';
   templateUrl: './total-summary.component.html',
   styleUrls: ['./total-summary.component.scss']
 })
-export class TotalSummaryComponent {
-  @Input() income!: ITotal;
-  @Input() expense!: ITotal;
-  @Input() cash!: ITotal;
-  @Input() totals!: ITotal;
+export class TotalSummaryComponent implements AfterViewInit {
+  @Input() summaryTotals!: ISummaryTotals;
   @Input() currency!: ICurrencyAll;
+  @Input() showCash: boolean;
+
+  fxFlex: string;
+
+  constructor() {
+    this.showCash = false;
+    this.fxFlex = '100%';
+  }
+
+  ngAfterViewInit(): void {
+    if (this.showCash) {
+      this.fxFlex = '50%';
+    }
+  }
 }

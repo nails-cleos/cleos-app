@@ -42,17 +42,17 @@
     <ng-template [ngIf]="quarterSummaryMap?.size" [ngIfElse]="noData">
       <ng-template [ngIf]="isHandset$ | async" [ngIfElse]="bigScreen">
         <app-quarter style="width: 100%" [measure]="'short'" [monthSummaries]="monthSummaries" [year]="year"
-                     [quarter]="quarter" [currency]="selectedRoom.value.currency"></app-quarter>
+                     [quarter]="quarter" [currency]="selectedRoom.value.currency" [showCash]="showCash"></app-quarter>
       </ng-template>
       <ng-template #bigScreen>
         <app-quarter style="width: 100%" [measure]="'long'" [monthSummaries]="monthSummaries" [year]="year"
-                     [quarter]="quarter" [currency]="selectedRoom.value.currency"></app-quarter>
+                     [quarter]="quarter" [currency]="selectedRoom.value.currency" [showCash]="showCash"></app-quarter>
       </ng-template>
       <div style="margin-top: 2%">
         <mat-toolbar color="primary">
           {{'SUMMARY.QUARTER.RESULT' | translate}}
         </mat-toolbar>
-        <app-total-summary [income]="income" [expense]="expense" [cash]="cash" [totals]="totals"
+        <app-total-summary [summaryTotals]="quarterSummaryTotals" [showCash]="showCash"
                            [currency]="selectedRoom.value.currency"></app-total-summary>
       </div>
     </ng-template>
