@@ -5,6 +5,6 @@
 <div fxLayout="row wrap">
   <div *ngFor="let quarter of quarterSummaries; let index = index" fxFlex.gt-md="50%" fxFlex="100%">
     <app-quarter [monthSummaries]="quarter.monthSummaries" [quarter]="quarter.quarter" [measure]="measure"
-                 [year]="year" [currency]="currency" [margin]="index >= start"></app-quarter>
+                 [year]="year" [currency]="currency" [margin]="index >= start" [showCash]="showCash"></app-quarter>
   </div>
 </div>

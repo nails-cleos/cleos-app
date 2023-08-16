@@ -28,6 +28,7 @@ export interface IUser {
   lightColor?: string;
   darkColor?: string;
   address?: IAddress;
+  showCash?: boolean;
 }
 
 export interface IUserAll {
@@ -51,6 +52,7 @@ export interface IUserAll {
   lightColor?: string;
   darkColor?: string;
   address?: IAddress;
+  showCash?: boolean;
 }
 
 export interface IAuthority {

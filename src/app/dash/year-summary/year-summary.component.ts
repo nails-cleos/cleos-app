@@ -9,9 +9,10 @@ import { YearAdapter } from '../../util/adapter/year.adapter';
 import { dateMonthYear, getNow } from '../../util/dates';
 import { AppState, selectDashboardState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
-import { IQuarterSummary, ISummaryRoom, ITotal, Total } from '../../interfaces/dashboard';
+import { IQuarterSummary, ISummaryRoom, ISummaryTotals, SummaryTotals, Total } from '../../interfaces/dashboard';
 import * as fromActionsDashboard from '../../store/dashboard.actions';
 import { Router } from '@angular/router';
+import { AuthUserService } from '../../services/auth-user.service';
 
 @Component({
   selector: 'app-year-summary',
@@ -28,11 +29,8 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
   quarterSummaries?: IQuarterSummary[];
 
   isLoading = false;
-
-  income: ITotal = new Total();
-  expense: ITotal = new Total();
-  cash: ITotal = new Total();
-  totals: ITotal = new Total();
+  yearSummaryTotals: ISummaryTotals = new SummaryTotals();
+  showCash: boolean;
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe([
     Breakpoints.XSmall,
@@ -44,9 +42,12 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
   private readonly extras: any;
 
-  constructor(private store: Store<AppState>, private breakpointObserver: BreakpointObserver, private router: Router) {
+  constructor(private store: Store<AppState>, private breakpointObserver: BreakpointObserver, private router: Router,
+              private authUserService: AuthUserService) {
     this.getState = this.store.select(selectDashboardState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
+    this.showCash = false;
+    this.authUserService.authUser.subscribe(value => this.showCash = value.showCash);
   }
 
   ngOnInit(): void {
@@ -108,18 +109,24 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
           value.total.forEach(t => {
             switch (t.type) {
               case 'INCOME':
-                this.income = new Total(this.income.gross + t.gross, this.income.btw + t.btw, this.income.net + t.net);
+                this.yearSummaryTotals.income = new Total(this.yearSummaryTotals.income.gross + t.gross,
+                  this.yearSummaryTotals.income.btw + t.btw, this.yearSummaryTotals.income.net + t.net);
                 break;
               case 'EXPENSE':
-                this.expense = new Total(this.expense.gross + t.gross, this.expense.btw + t.btw, this.expense.net + t.net);
+                this.yearSummaryTotals.expense = new Total(this.yearSummaryTotals.expense.gross + t.gross,
+                  this.yearSummaryTotals.expense.btw + t.btw, this.yearSummaryTotals.expense.net + t.net);
                 break;
               case 'CASH':
-                this.cash = new Total(this.cash.gross + t.gross, this.cash.btw + t.btw, this.cash.net + t.net);
+                this.yearSummaryTotals.cash = new Total(this.yearSummaryTotals.cash.gross + t.gross,
+                  this.yearSummaryTotals.cash.btw + t.btw, this.yearSummaryTotals.cash.net + t.net);
                 break;
             }
           });
-          this.totals = new Total(this.totals.gross + value.totalGross, this.totals.btw + value.totalBTW,
-            this.totals.net + value.totalNet);
+          this.yearSummaryTotals.totals = new Total(this.yearSummaryTotals.totals.gross + value.totalGross,
+            this.yearSummaryTotals.totals.btw + value.totalBTW, this.yearSummaryTotals.totals.net + value.totalNet);
+          this.yearSummaryTotals.totalsWithoutCash = new Total(this.yearSummaryTotals.totalsWithoutCash.gross + value.totalWithoutGross,
+            this.yearSummaryTotals.totalsWithoutCash.btw + value.totalWithoutBTW,
+            this.yearSummaryTotals.totalsWithoutCash.net + value.totalWithoutNet);
         });
       });
     }
@@ -127,10 +134,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
 
   private reset(): void {
     this.quarterSummaries = undefined;
-    this.income = new Total();
-    this.expense = new Total();
-    this.cash = new Total();
-    this.totals = new Total();
+    this.yearSummaryTotals = new SummaryTotals();
   }
 
   private getSummary(year: number): void {

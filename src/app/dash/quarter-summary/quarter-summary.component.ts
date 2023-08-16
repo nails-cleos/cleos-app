@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import * as fromActionsDashboard from '../../store/dashboard.actions';
 import { FormControl, UntypedFormControl } from '@angular/forms';
-import { IMonthSummary, ISummaryRoom, ITotal, Total } from '../../interfaces/dashboard';
+import { IMonthSummary, ISummaryRoom, ISummaryTotals, SummaryTotals, Total } from '../../interfaces/dashboard';
 import { Observable, Subscription } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
@@ -11,7 +11,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DateAdapter } from '@angular/material/core';
 import { YearAdapter } from '../../util/adapter/year.adapter';
 import { MatDatepicker } from '@angular/material/datepicker';
-import { dateMonthYear, getNow, getDateQuarter } from '../../util/dates';
+import { dateMonthYear, getDateQuarter, getNow } from '../../util/dates';
+import { AuthUserService } from '../../services/auth-user.service';
 
 @Component({
   selector: 'app-quarter-summary',
@@ -32,11 +33,8 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
   isLoading = false;
   quarter?: number;
   year?: number;
-
-  income: ITotal = new Total();
-  expense: ITotal = new Total();
-  cash: ITotal = new Total();
-  totals: ITotal = new Total();
+  quarterSummaryTotals: ISummaryTotals = new SummaryTotals();
+  showCash: boolean;
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe([
     Breakpoints.XSmall,
@@ -49,9 +47,13 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
   private readonly extras: any;
 
   constructor(private store: Store<AppState>, private breakpointObserver: BreakpointObserver, private route: ActivatedRoute,
-              private router: Router) {
+              private router: Router, private authUserService: AuthUserService) {
+    this.showCash = false;
     this.getState = this.store.select(selectDashboardState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
+    this.authUserService.authUser.subscribe(value => {
+      this.showCash = value.showCash;
+    });
   }
 
   get goBack(): void {
@@ -124,22 +126,32 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
   private createData(): void {
     if (this.selectedRoom.value) {
       this.monthSummaries = this.quarterSummaryMap?.get(this.selectedRoom.value)?.monthSummaries;
+      let totals = new Total();
+      let totalsWithoutCash = new Total();
       this.monthSummaries?.forEach(value => {
         value.total.forEach(t => {
           switch (t.type) {
             case 'INCOME':
-              this.income = new Total(this.income.gross + t.gross, this.income.btw + t.btw, this.income.net + t.net);
+              this.quarterSummaryTotals.income = new Total(this.quarterSummaryTotals.income.gross + t.gross,
+                this.quarterSummaryTotals.income.btw + t.btw, this.quarterSummaryTotals.income.net + t.net);
               break;
             case 'EXPENSE':
-              this.expense = new Total(this.expense.gross + t.gross, this.expense.btw + t.btw, this.expense.net + t.net);
+              this.quarterSummaryTotals.expense = new Total(this.quarterSummaryTotals.expense.gross + t.gross,
+                this.quarterSummaryTotals.expense.btw + t.btw, this.quarterSummaryTotals.expense.net + t.net);
               break;
             case 'CASH':
-              this.cash = new Total(this.cash.gross + t.gross, this.cash.btw + t.btw, this.cash.net + t.net);
+              this.quarterSummaryTotals.cash = new Total(this.quarterSummaryTotals.cash.gross + t.gross,
+                this.quarterSummaryTotals.cash.btw + t.btw, this.quarterSummaryTotals.cash.net + t.net);
               break;
           }
         });
-        this.totals = new Total(this.totals.gross + value.totalGross, this.totals.btw + value.totalBTW,
-          this.totals.net + value.totalNet);
+        totals = new Total(totals.gross + value.totalGross, totals.btw + value.totalBTW,
+          totals.net + value.totalNet);
+        totalsWithoutCash = new Total(totalsWithoutCash.gross + value.totalWithoutGross, totalsWithoutCash.btw + value.totalWithoutBTW,
+          totalsWithoutCash.net + value.totalWithoutNet);
+
+        this.quarterSummaryTotals = new SummaryTotals(this.quarterSummaryTotals.income, this.quarterSummaryTotals.expense,
+          this.quarterSummaryTotals.cash, totalsWithoutCash, totals);
       });
     }
   }
@@ -156,10 +168,7 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
 
   private reset(): void {
     this.monthSummaries = undefined;
-    this.income = new Total();
-    this.expense = new Total();
-    this.cash = new Total();
-    this.totals = new Total();
+    this.quarterSummaryTotals = new SummaryTotals();
   }
 
   private clean(): void {

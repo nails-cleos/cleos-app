@@ -13,6 +13,7 @@ export interface IAuthUser {
   isProfessional: boolean;
   isCustomer: boolean;
   isAuthenticated: boolean;
+  showCash: boolean;
   locale: string;
   referralMax: number;
   email?: string;
@@ -31,6 +32,7 @@ const initialAuthUser: IAuthUser = {
   isProfessional: false,
   isCustomer: false,
   isAuthenticated: false,
+  showCash: false,
   locale: navigator.language,
   referralMax: 5,
   email: undefined,
@@ -63,6 +65,7 @@ export class AuthUserService {
         isProfessional,
         isCustomer,
         isAuthenticated: true,
+        showCash: user.showCash || false,
         locale: user.locale || initialAuthUser.locale,
         referralMax: user.referralMax || initialAuthUser.referralMax,
         email: user.email,
