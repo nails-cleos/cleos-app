@@ -8,7 +8,7 @@ import * as fromActionsDashboard from '../store/dashboard.actions';
 import * as fromActionsReservation from '../store/reservation.actions';
 import { IReservationSummary, States } from '../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
-import { convertDuration, getDurationOrUndefined, getEnd, getEndWithDuration, getNow, newDateTimestamp } from '../util/dates';
+import { getDurationOrUndefined, getEnd, getEndWithDuration, getNow, newDateTimestamp } from '../util/dates';
 import { CalendarEvent, CalendarMonthViewDay, CalendarView } from 'angular-calendar';
 import { findStateColor, getStateOrder } from '../util/theme';
 import { allDayEvent, getFrequency, IMeta, Meta, monthEvent } from '../util/event';
@@ -119,24 +119,23 @@ export class DashComponent implements OnInit, OnDestroy {
   }
 
   get completed(): number {
-    return this.events?.filter((event: CalendarEvent) => event.meta.state === States.completed
-      && isSameMonth(event.start, this.viewDate)).length;
+    return this.events?.filter((event: CalendarEvent) => DashComponent.completedByMonth(event, this.viewDate)).length;
   }
 
   get completedTotal(): string {
-    const total = this.events?.filter((event: CalendarEvent) => event.meta.state === States.completed
-      && isSameMonth(event.start, this.viewDate)).reduce((a, b) => a + b.meta.total || 0, 0);
+    const total = this.events?.filter((event: CalendarEvent) =>  DashComponent.completedByMonth(event, this.viewDate))
+      .reduce((a, b) => a + b.meta.total || 0, 0);
+
     return numberFormat(total, this.currency, this.dateFormat);
   }
 
   get upcoming(): number {
-    return this.events?.filter((event: CalendarEvent) => event.meta.state && event.meta.state !== States.completed
-      && event.meta.state !== States.cancelled && isSameMonth(event.start, this.viewDate)).length;
+    return this.events?.filter((event: CalendarEvent) => DashComponent.upcomingByMonth(event, this.viewDate)).length;
   }
 
   get upcomingTotal(): string {
-    const total = this.events?.filter((event: CalendarEvent) => event.meta.state && event.meta.state !== States.completed
-      && event.meta.state !== States.cancelled && isSameMonth(event.start, this.viewDate)).reduce((a, b) => a + b.meta.total || 0, 0);
+    const total = this.events?.filter((event: CalendarEvent) => DashComponent.upcomingByMonth(event, this.viewDate))
+      .reduce((a, b) => a + b.meta.total || 0, 0);
 
     return numberFormat(total, this.currency, this.dateFormat);
   }
@@ -157,6 +156,15 @@ export class DashComponent implements OnInit, OnDestroy {
         status: message
       }
     };
+  }
+
+  private static completedByMonth(event: CalendarEvent, viewDate: Date): boolean {
+    return event.meta.state === States.completed && isSameMonth(event.start, viewDate);
+  }
+
+  private static upcomingByMonth(event: CalendarEvent, viewDate: Date): boolean {
+    return isSameMonth(event.start, viewDate) && event.meta.state
+      && [States.created, States.approved, States.partiallyPaid, States.paid].includes(event.meta.state);
   }
 
   ngOnInit(): void {
