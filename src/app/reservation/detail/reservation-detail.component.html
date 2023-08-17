@@ -230,7 +230,7 @@
           <td *matCellDef="let payment; let i = dataIndex;" fxHide.lt-sm fxShow mat-cell>
             <ng-template [ngIf]="professionalId && ['CASH', 'TRANSFER'].includes(payment.type)" [ngIfElse]="noChange"
                          [formGroup]="form">
-              <ng-container formArrayName="types">
+              <ng-container formArrayName="payments">
                 <div [formGroupName]="i">
                   <mat-form-field appearance="outline" *ngIf="payment.id; else skeleton" style="text-align: center">
                     <mat-select formControlName="type">
@@ -282,13 +282,27 @@
 
         <ng-container matColumnDef="amount">
           <th *matHeaderCellDef mat-header-cell>{{ 'PAYMENT.LIST.COLUMN.AMOUNT' | translate }}</th>
-          <td *matCellDef="let payment" mat-cell>
+          <td *matCellDef="let payment; let i = dataIndex;" mat-cell>
             <div *ngIf="payment.id; else skeleton">
-              <mat-icon matPrefix>attach_money</mat-icon>&nbsp;
-              <ng-template [ngIf]="payment.transactionAmount" [ngIfElse]="noTransactionAmount">
-                {{payment.transactionAmount | number:'1.2-2'}}
+              <ng-template [ngIf]="payment.transactionAmount >= 0" [ngIfElse]="noTransactionAmount">
+                <ng-template [ngIf]="professionalId && ['CASH', 'TRANSFER'].includes(payment.type)"
+                             [ngIfElse]="noChange" [formGroup]="form">
+                  <ng-container formArrayName="payments">
+                    <div [formGroupName]="i">
+                      <mat-icon matPrefix>{{reservation.room.currency.icon}}</mat-icon>&nbsp;
+                      <mat-form-field appearance="outline" style="width: 100px;">
+                        <input matInput appTwoDigits formControlName="amount" (focusout)="twoDigit($event, i)">
+                      </mat-form-field>
+                    </div>
+                  </ng-container>
+                </ng-template>
+                <ng-template #noChange>
+                  <mat-icon matPrefix>{{reservation.room.currency.icon}}</mat-icon>&nbsp;
+                  {{payment.transactionAmount | number:'1.2-2'}}
+                </ng-template>
               </ng-template>
               <ng-template #noTransactionAmount>
+                <mat-icon matPrefix>{{reservation.room.currency.icon}}</mat-icon>&nbsp;
                 {{payment.amount || 0 | number:'1.2-2'}}
               </ng-template>
             </div>
@@ -297,7 +311,7 @@
             </ng-template>
           </td>
           <td *matFooterCellDef class="bold" mat-footer-cell>
-            <mat-icon matPrefix>attach_money</mat-icon>&nbsp;{{total | number:'1.2-2'}}
+            <mat-icon matPrefix>{{reservation.room.currency.icon}}</mat-icon>&nbsp;{{total | number:'1.2-2'}}
           </td>
         </ng-container>
 
@@ -310,7 +324,7 @@
                 <div mat-subheader>{{ 'COMMON.COLUMN.TYPE' | translate }}</div>
                 <ng-template [ngIf]="professionalId && ['CASH', 'TRANSFER'].includes(payment.type)"
                              [ngIfElse]="noChange" [formGroup]="form">
-                  <ng-container formArrayName="types">
+                  <ng-container formArrayName="payments">
                     <div [formGroupName]="i">
                       <mat-form-field appearance="outline" *ngIf="payment.id; else skeleton"
                                       style="text-align: center">

@@ -25,6 +25,7 @@ import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import {
+  areEquals,
   customerEditDialog,
   executeDialog,
   getPrice,
@@ -86,7 +87,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   professionalId?: string;
 
   form = this.formBuilder.group({
-    types: this.formBuilder.array([])
+    payments: this.formBuilder.array([])
   });
 
   disableUpdateButton = true;
@@ -131,8 +132,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  get types(): FormArray {
-    return this.form.controls.types as FormArray;
+  get payments(): FormArray {
+    return this.form.controls.payments as FormArray;
   }
 
   get gmt(): string {
@@ -146,11 +147,12 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   get updatePayment(): void {
     let payload: any = [];
     this.paymentPaid.forEach((p: IPayment, i: number) => {
-      const type = this.types.at(i).value.type;
-      if (p.type !== type) {
+      const payment = this.payments.at(i).value;
+      if (p.transactionAmount?.toFixed(2) !== payment.amount || p.type !== payment.type) {
         payload = [...payload, {
           paymentId: p.id,
-          paymentType: type
+          amount: parseFloat(payment.amount) - parseFloat(p.transactionAmount?.toFixed(2) || '0'),
+          paymentType: payment.type
         }];
       }
     });
@@ -225,6 +227,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscribe();
+    this.clean();
     this.route.params.subscribe(routeParams => {
       this.reservationId = routeParams.id;
       this.getReservation(this.reservationId);
@@ -266,6 +269,14 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     );
   }
 
+  twoDigit($event: FocusEvent, i: number): void {
+    const payment = this.payments.at(i).value;
+    if (!isNaN(payment.amount)) {
+      payment.amount = parseFloat(payment.amount).toFixed(2);
+      this.payments.at(i).setValue(payment);
+    }
+  }
+
   private createAction(tooltip: string, icon: string, id: string, color?: string): MatFabMenu {
     return { tooltip, tooltipPosition: this.tooltipPosition, icon, id, color } as MatFabMenu;
   }
@@ -283,15 +294,16 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
             return p;
           }).sort((a?: IPaymentAll, b?: IPaymentAll) => b?.status && a?.status?.localeCompare(b?.status));
         } else {
-          if (!this.types.length) {
+          if (!this.payments.length) {
             let arr: any[] = [];
             this.paymentPaid = state.payments.map((p: IPayment) => {
               if (p.id) {
-                const typeForm = this.formBuilder.group({
+                const paymentForm = this.formBuilder.group({
+                  amount: [p.transactionAmount?.toFixed(2)],
                   type: [p.type]
                 });
-                arr = [...arr, { type: p.type }];
-                this.types.push(typeForm);
+                arr = [...arr, { amount: p.transactionAmount?.toFixed(2), type: p.type }];
+                this.payments.push(paymentForm);
               }
               return p;
             });
@@ -344,11 +356,18 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   }
 
   private valueChanges(arr: any[]): void {
-    this.types.valueChanges.pipe(startWith(arr), pairwise()).subscribe(([prev, next]: [any[], any[]]) => {
-      if (prev !== next) {
+    this.payments.valueChanges.pipe(startWith(arr), pairwise()).subscribe(([prev, next]: [any[], any[]]) => {
+      if (!areEquals(prev, next)) {
         this.disableUpdateButton = false;
       }
     });
+  }
+
+  private clean(): void {
+    this.payments.clear();
+    this.store.dispatch(
+      new fromActionsReservation.Clean()
+    );
   }
 
   private getReservation(id?: string | null): void {

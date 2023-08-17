@@ -44,6 +44,7 @@ export interface IReservationPayment {
   bic?: string;
   name?: string;
   countryCode?: string;
+  amount?: number;
 }
 
 export interface IReservationAll {
