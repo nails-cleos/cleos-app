@@ -240,7 +240,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   }
 
   onChangeState(id: any): void {
-    const list = ['send', 'book', 'more', 'change', 'cancel', 'cancel_edit', 'notify', 'pay', 'color'];
+    const list = ['send', 'coffee', 'book', 'more', 'change', 'cancel', 'cancel_edit', 'notify', 'pay', 'color'];
     if (list.indexOf(id.toString()) >= 0 && this.reservation) {
       this.machine.transition(snakeToCamel(this.reservation.state), snakeToCamel(id));
       return;
@@ -409,6 +409,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       ReservationIconName.book, 'book', 'primary');
     const sendMessage = this.createAction(translate.instant('RESERVATION.ACTION.SEND'),
       ReservationIconName.send, 'send', 'green');
+    const coffeeMessage = this.createAction(translate.instant('RESERVATION.ACTION.COFFEE'),
+      ReservationIconName.coffee, 'coffee', 'accent');
     const change = this.createAction(translate.instant('RESERVATION.ACTION.CHANGE'),
       ReservationIconName.change, 'change', 'accent');
 
@@ -425,8 +427,14 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       approveActions = [start];
     }
     approveActions = [...approveActions, edit];
-    if (userPhone && greaterOrEqualsThanToday(newDate(self.start))) {
-      approveActions = [...approveActions, sendMessage];
+    if (userPhone) {
+      const date = newDate(self.start);
+      if (greaterOrEqualsThanToday(date)) {
+        approveActions = [...approveActions, sendMessage];
+      }
+      if (isTomorrow(date)) {
+        approveActions = [...approveActions, coffeeMessage];
+      }
     }
     approveActions = [...approveActions, more, cancel];
 
@@ -457,6 +465,11 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         const message = translate.instant(`WHATSAPP.SEND.${ key }`, { date });
         window.open(`https://api.whatsapp.com/send?phone=+${ userPhone }&text=${ message }`, '_blank');
       }
+    });
+
+    const coffeeMessageTransaction = ReservationDetailComponent.createTransaction('send', (): void => {
+      const message = translate.instant('WHATSAPP.SEND.COFFEE');
+      window.open(`https://api.whatsapp.com/send?phone=+${ userPhone }&text=${ message }`, '_blank');
     });
 
     const startTransaction = ReservationDetailComponent.createTransaction('started', (): void => {
@@ -517,6 +530,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         cancel: cancelTransaction,
         edit: editTransaction,
         send: sendMessageTransaction,
+        coffee: coffeeMessageTransaction,
         more: moreTransaction
       },
       next: approveActions

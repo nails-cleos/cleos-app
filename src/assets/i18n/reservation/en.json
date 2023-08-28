@@ -150,7 +150,8 @@
       "SEND": "Send Whatsapp",
       "MORE": "More",
       "CHANGE": "Change customer",
-      "COLOR": "Change color"
+      "COLOR": "Change color",
+      "COFFEE": "Send coffee"
     },
     "CHANGE_STATE": {
       "TITLE": "Change state",

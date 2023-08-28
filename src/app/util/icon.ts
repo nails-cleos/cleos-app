@@ -2,6 +2,7 @@ export enum ReservationIconName {
   created = 'assignment',
   approved = 'done',
   send = 'sms',
+  coffee = 'coffee',
   started = 'play_arrow',
   completed = 'done_all',
   cancelled = 'clear',

@@ -43,7 +43,7 @@
       }
     },
     "PROFESSIONAL": {
-      "SELECT": "Selecionar profesional"
+      "SELECT": "Seleccionar profesional"
     },
     "TREATMENT": {
       "DETAIL": "Detalle",
@@ -150,7 +150,8 @@
       "SEND": "Enviar Whatsapp",
       "MORE": "Más",
       "CHANGE": "Cambiar cliente",
-      "COLOR": "Cambiar color"
+      "COLOR": "Cambiar color",
+      "COFFEE": "Enviar café"
     },
     "CHANGE_STATE": {
       "TITLE": "Cambio de estado",
