@@ -20,18 +20,18 @@
       "REQUIRED": "Repeat is <b>required</b>"
     },
     "CREATED": {
-      "MESSAGE": "Note &lsquo;{{description}}&rsquo; created"
+      "MESSAGE": "Note '{{description}}' created"
     },
     "DELETED": {
       "TITLE": "Delete note",
       "CONTENT": "Are you sure to delete note &lsquo;{{description}}&rsquo;?",
-      "MESSAGE": "Note &lsquo;{{description}}&rsquo; deleted"
+      "MESSAGE": "Note '{{description}}' deleted"
     },
     "UPDATED": {
-      "MESSAGE": "Note &lsquo;{{description}}&rsquo; updated"
+      "MESSAGE": "Note '{{description}}' updated"
     },
     "COMPLETED": {
-      "MESSAGE": "Note &lsquo;{{description}}&rsquo; completed"
+      "MESSAGE": "Note '{{description}}' completed"
     }
   }
 }

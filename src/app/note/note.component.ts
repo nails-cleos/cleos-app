@@ -5,7 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { AppState, selectNoteState } from '../store/app.states';
 import { ActivatedRoute, Router } from '@angular/router';
-import { backendFormatDate } from '../util/dates';
+import { backendFormatDate, createDateFromString } from '../util/dates';
 import { fieldChange, requireMatchAsync, valueChange } from '../util/validators';
 import * as fromActionsNote from '../store/note.actions';
 import { INote, INoteAll, Note } from '../interfaces/note';
@@ -126,6 +126,7 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
       this.note = state.selected;
       if (this.note?.id) {
         this.form.patchValue(this.note);
+        this.getForm.date.setValue(createDateFromString(this.note.date));
       }
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {

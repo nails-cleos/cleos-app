@@ -500,9 +500,10 @@
       }
     }
 
-    ::ng-deep .mat-green {
-      color: mat.get-color-from-palette($background, background);
-      background-color: #008b00 !important;
+    .mat-mdc-fab.mat-green {
+      --mdc-fab-container-color: #c3f69d !important;
+      --mdc-fab-icon-color: #000;
+      --mat-mdc-fab-color: #000;
     }
 
     .in_process {
@@ -535,9 +536,10 @@
       }
     }
 
-    ::ng-deep .mat-green {
-      color: mat.get-color-from-palette($background, background);
-      background-color: #c3f69d !important;
+    .mat-mdc-fab.mat-green {
+      --mdc-fab-container-color: #008b00 !important;
+      --mdc-fab-icon-color: #fff;
+      --mat-mdc-fab-color: #fff;
     }
 
     .in_process {
