@@ -20,18 +20,18 @@
       "REQUIRED": "Repetir es <b>requerido</b>"
     },
     "CREATED": {
-      "MESSAGE": "Nota &lsquo;{{description}}&rsquo; creado"
+      "MESSAGE": "Nota '{{description}}' creado"
     },
     "DELETED": {
       "TITLE": "Eliminar nota",
       "CONTENT": "¿Está seguro de eliminar nota &lsquo;{{description}}&rsquo;?",
-      "MESSAGE": "Nota &lsquo;{{description}}&rsquo; eliminada"
+      "MESSAGE": "Nota '{{description}}' eliminada"
     },
     "UPDATED": {
-      "MESSAGE": "Nota &lsquo;{{description}}&rsquo; actualizada"
+      "MESSAGE": "Nota '{{description}}' actualizada"
     },
     "COMPLETED": {
-      "MESSAGE": "Nota &lsquo;{{description}}&rsquo; completada"
+      "MESSAGE": "Nota '{{description}}' completada"
     }
   }
 }
