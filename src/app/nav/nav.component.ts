@@ -228,6 +228,7 @@ export class NavComponent implements OnInit, OnDestroy {
             if (this.countNotifications > 9) {
               this.plusNotification = '+9';
             }
+            this.setBadge();
           }
         });
       }
@@ -252,9 +253,20 @@ export class NavComponent implements OnInit, OnDestroy {
         if (this.countNotifications > 9) {
           this.plusNotification = '+9';
         }
+        this.setBadge();
       }
       this.isLoading = state.isLoading;
     });
+  }
+
+  private setBadge(): void {
+    if ('setAppBadge' in navigator && 'clearAppBadge' in navigator) {
+      if (this.countNotifications) {
+        (navigator as any).setAppBadge(this.countNotifications);
+      } else {
+        (navigator as any).clearAppBadge();
+      }
+    }
   }
 
   private getNotifications(): void {

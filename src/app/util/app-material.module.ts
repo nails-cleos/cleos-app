@@ -70,6 +70,7 @@ const materialModules = [
 })
 export class AppMaterialModule {
   constructor(private matIconRegistry: MatIconRegistry, private domSanitizer: DomSanitizer) {
+    matIconRegistry.addSvgIcon('CLEOS', this.getUrl('assets/icons/safari-pinned-tab.svg'));
     matIconRegistry.addSvgIcon('IDEAL', this.getUrl('assets/banks/IDEAL.svg'));
     matIconRegistry.addSvgIcon('PAYPAL', this.getUrl('assets/banks/PAYPAL.svg'));
     matIconRegistry.addSvgIcon('RABONL2U', this.getUrl('assets/banks/RABONL2U.svg'));

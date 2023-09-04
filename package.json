@@ -14,7 +14,7 @@
     "build-pwa": "ng build --configuration=pwa",
     "build-development": "ng build --configuration=development",
     "build:pwa": "docker build -t nails-app --build-arg BUILD_CONFIG=build-pwa --build-arg NGINX=nginx-staging.conf .",
-    "postbuild-pwa": "cp ./src/manifest-dev.json ./dist/cleos/manifest-dev.json",
+    "postbuild-pwa": "cp -r ./src/manifest-dev.json ./dist/cleos/manifest.json",
     "build:source": "ng build --source-map",
     "test": "ng test",
     "lint": "ng lint --fix",
