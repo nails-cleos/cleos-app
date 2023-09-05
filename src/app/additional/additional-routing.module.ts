@@ -4,7 +4,6 @@ import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
 import { AdditionalComponent } from './additional.component';
 import { AdditionalListComponent } from './list/additional-list.component';
-import { AdditionalDetailComponent } from './detail/additional-detail.component';
 import { AdditionalSortingComponent } from './sorting/additional-sorting.component';
 
 const routes: Routes = [
@@ -24,7 +23,7 @@ const routes: Routes = [
     }
   },
   {
-    path: ':id', component: AdditionalDetailComponent, canActivate: [authGuard], data: {
+    path: ':id', component: AdditionalComponent, canActivate: [authGuard], data: {
       roles: [Role.admin]
     }
   }

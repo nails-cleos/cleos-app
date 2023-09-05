@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 import { AdditionalRoutingModule } from './additional-routing.module';
 import { AdditionalComponent } from './additional.component';
 import { AdditionalListComponent } from './list/additional-list.component';
-import { AdditionalDetailComponent } from './detail/additional-detail.component';
 import { SharedModule } from '../shared/shared.module';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EffectsModule } from '@ngrx/effects';
@@ -18,7 +17,6 @@ import { DragDropSortingComponent } from '../util/drag-drop-sorting/drag-drop-so
   declarations: [
     AdditionalComponent,
     AdditionalListComponent,
-    AdditionalDetailComponent,
     AdditionalSortingComponent
   ],
   imports: [

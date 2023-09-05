@@ -5,22 +5,303 @@
   "background_color": "#a9a397",
   "display": "standalone",
   "gcm_sender_id": "174727853234",
-  "scope": "/",
-  "start_url": "https://nailscleos.nl/main",
+  "scope": "./",
+  "start_url": "/main",
   "description": "App to book an appointment to make your nail prettier",
-  "display_override": ["standalone", "window-controls-overlay", "fullscreen"],
-  "categories": ["beauty", "health"],
+  "display_override": [
+    "standalone",
+    "window-controls-overlay",
+    "fullscreen"
+  ],
+  "categories": [
+    "beauty",
+    "health"
+  ],
   "edge_side_panel": {
     "preferred_width": 390
   },
   "launch_handler": {
     "client_mode": "auto"
   },
-  "shortcuts" : [
+  "shortcuts": [
     {
-      "name": "Agenda",
+      "name": "Dashboard",
+      "url": "/dashboard",
+      "description": "List of events",
+      "icons": [
+        {
+          "src": "/assets/icons/shortcuts/dashboard-36x36.png",
+          "sizes": "36x36"
+        },
+        {
+          "src": "/assets/icons/shortcuts/dashboard-48x48.png",
+          "sizes": "48x48"
+        },
+        {
+          "src": "/assets/icons/shortcuts/dashboard-72x72.png",
+          "sizes": "72x72"
+        },
+        {
+          "src": "/assets/icons/shortcuts/dashboard-96x96.png",
+          "sizes": "96x96"
+        },
+        {
+          "src": "/assets/icons/shortcuts/dashboard-144x144.png",
+          "sizes": "144x144"
+        },
+        {
+          "src": "/assets/icons/shortcuts/dashboard-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Calendar",
       "url": "/reservation/calendar",
-      "description": "List of events"
+      "description": "List of events",
+      "icons": [
+        {
+          "src": "/assets/icons/shortcuts/calendar-36x36.png",
+          "sizes": "36x36"
+        },
+        {
+          "src": "/assets/icons/shortcuts/calendar-48x48.png",
+          "sizes": "48x48"
+        },
+        {
+          "src": "/assets/icons/shortcuts/calendar-72x72.png",
+          "sizes": "72x72"
+        },
+        {
+          "src": "/assets/icons/shortcuts/calendar-96x96.png",
+          "sizes": "96x96"
+        },
+        {
+          "src": "/assets/icons/shortcuts/calendar-144x144.png",
+          "sizes": "144x144"
+        },
+        {
+          "src": "/assets/icons/shortcuts/calendar-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Reservation",
+      "url": "/reservation",
+      "description": "Add reservation",
+      "icons": [
+        {
+          "src": "/assets/icons/shortcuts/reservation-36x36.png",
+          "sizes": "36x36"
+        },
+        {
+          "src": "/assets/icons/shortcuts/reservation-48x48.png",
+          "sizes": "48x48"
+        },
+        {
+          "src": "/assets/icons/shortcuts/reservation-72x72.png",
+          "sizes": "72x72"
+        },
+        {
+          "src": "/assets/icons/shortcuts/reservation-96x96.png",
+          "sizes": "96x96"
+        },
+        {
+          "src": "/assets/icons/shortcuts/reservation-144x144.png",
+          "sizes": "144x144"
+        },
+        {
+          "src": "/assets/icons/shortcuts/reservation-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Note",
+      "url": "/notes/add",
+      "description": "Add note",
+      "icons": [
+        {
+          "src": "/assets/icons/shortcuts/note-36x36.png",
+          "sizes": "36x36"
+        },
+        {
+          "src": "/assets/icons/shortcuts/note-48x48.png",
+          "sizes": "48x48"
+        },
+        {
+          "src": "/assets/icons/shortcuts/note-72x72.png",
+          "sizes": "72x72"
+        },
+        {
+          "src": "/assets/icons/shortcuts/note-96x96.png",
+          "sizes": "96x96"
+        },
+        {
+          "src": "/assets/icons/shortcuts/note-144x144.png",
+          "sizes": "144x144"
+        },
+        {
+          "src": "/assets/icons/shortcuts/note-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Block agenda",
+      "url": "/unavailable/block-agenda/add",
+      "description": "Add block agenda",
+      "icons": [
+        {
+          "src": "/assets/icons/shortcuts/block-36x36.png",
+          "sizes": "36x36"
+        },
+        {
+          "src": "/assets/icons/shortcuts/block-48x48.png",
+          "sizes": "48x48"
+        },
+        {
+          "src": "/assets/icons/shortcuts/block-72x72.png",
+          "sizes": "72x72"
+        },
+        {
+          "src": "/assets/icons/shortcuts/block-96x96.png",
+          "sizes": "96x96"
+        },
+        {
+          "src": "/assets/icons/shortcuts/block-144x144.png",
+          "sizes": "144x144"
+        },
+        {
+          "src": "/assets/icons/shortcuts/block-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Unavailable",
+      "url": "/unavailable/add",
+      "description": "Add unavailable",
+      "icons": [
+        {
+          "src": "/assets/icons/shortcuts/unavailable-36x36.png",
+          "sizes": "36x36"
+        },
+        {
+          "src": "/assets/icons/shortcuts/unavailable-48x48.png",
+          "sizes": "48x48"
+        },
+        {
+          "src": "/assets/icons/shortcuts/unavailable-72x72.png",
+          "sizes": "72x72"
+        },
+        {
+          "src": "/assets/icons/shortcuts/unavailable-96x96.png",
+          "sizes": "96x96"
+        },
+        {
+          "src": "/assets/icons/shortcuts/unavailable-144x144.png",
+          "sizes": "144x144"
+        },
+        {
+          "src": "/assets/icons/shortcuts/unavailable-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "url": "/users/add",
+      "description": "Add user",
+      "icons": [
+        {
+          "src": "/assets/icons/shortcuts/user-36x36.png",
+          "sizes": "36x36"
+        },
+        {
+          "src": "/assets/icons/shortcuts/user-48x48.png",
+          "sizes": "48x48"
+        },
+        {
+          "src": "/assets/icons/shortcuts/user-72x72.png",
+          "sizes": "72x72"
+        },
+        {
+          "src": "/assets/icons/shortcuts/user-96x96.png",
+          "sizes": "96x96"
+        },
+        {
+          "src": "/assets/icons/shortcuts/user-144x144.png",
+          "sizes": "144x144"
+        },
+        {
+          "src": "/assets/icons/shortcuts/user-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Summary month",
+      "url": "/dashboard/monthly/summary",
+      "description": "View summary month",
+      "icons": [
+        {
+          "src": "/assets/icons/shortcuts/month-36x36.png",
+          "sizes": "36x36"
+        },
+        {
+          "src": "/assets/icons/shortcuts/month-48x48.png",
+          "sizes": "48x48"
+        },
+        {
+          "src": "/assets/icons/shortcuts/month-72x72.png",
+          "sizes": "72x72"
+        },
+        {
+          "src": "/assets/icons/shortcuts/month-96x96.png",
+          "sizes": "96x96"
+        },
+        {
+          "src": "/assets/icons/shortcuts/month-144x144.png",
+          "sizes": "144x144"
+        },
+        {
+          "src": "/assets/icons/shortcuts/month-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Invoices",
+      "url": "/invoices",
+      "description": "View invoices",
+      "icons": [
+        {
+          "src": "/assets/icons/shortcuts/invoice-36x36.png",
+          "sizes": "36x36"
+        },
+        {
+          "src": "/assets/icons/shortcuts/invoice-48x48.png",
+          "sizes": "48x48"
+        },
+        {
+          "src": "/assets/icons/shortcuts/invoice-72x72.png",
+          "sizes": "72x72"
+        },
+        {
+          "src": "/assets/icons/shortcuts/invoice-96x96.png",
+          "sizes": "96x96"
+        },
+        {
+          "src": "/assets/icons/shortcuts/invoice-144x144.png",
+          "sizes": "144x144"
+        },
+        {
+          "src": "/assets/icons/shortcuts/invoice-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ],
   "icons": [
