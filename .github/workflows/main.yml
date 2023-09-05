@@ -7,7 +7,34 @@ on:
     tags-ignore:
       - "**"
 
+### Increments the part of the string
+## $1: version itself
+## $2: number of part: 0 – major, 1 – minor, 2 – patch
+env:
+  VERSION_PART: '2'
+
 jobs:
+  snapshot:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Update rc version
+        run: |
+          git config --global user.email "nails.cloes@gmail.com"
+          git config --global user.name "Espacio Cleos"
+          git fetch
+          git checkout develop
+          # make file runnable, might not be necessary
+          chmod +x "${GITHUB_WORKSPACE}/version-update.sh"
+
+          # run script
+          "${GITHUB_WORKSPACE}/version-update.sh" true $VERSION_PART
+          git commit -am "Update rc version"
+          git push
+
   version:
     if: github.event_name == 'push'
 
@@ -22,6 +49,7 @@ jobs:
           git config --global user.email "nails.cleos@gmail.com"
           git config --global user.name "Espacio Cleos"
           git fetch
+          git checkout main
           # make file runnable, might not be necessary
           chmod +x "${GITHUB_WORKSPACE}/version-update.sh"
 
