@@ -1,7 +1,7 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
-      <form (ngSubmit)="create" [formGroup]="form" novalidate>
+      <form (ngSubmit)="submit" [formGroup]="form" novalidate>
         <mat-card appearance="outlined" class="style-card">
           <mat-card-header>
             <mat-card-title>{{ 'ADDITIONAL.TITLE' | translate }}</mat-card-title>
@@ -11,9 +11,10 @@
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'ADDITIONAL.NAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input [formControl]="name" autocomplete="name" matInput required>
+                  <input formControlName="name" autocomplete="name" matInput required>
                 </label>
-                <mat-error *ngIf="name.hasError('required')" [innerHTML]="'ADDITIONAL.NAME.REQUIRED' | translate">
+                <mat-error *ngIf="getForm.name.hasError('required')"
+                           [innerHTML]="'ADDITIONAL.NAME.REQUIRED' | translate">
                 </mat-error>
                 <mat-error *ngIf="errors['name']">
                   {{errors['name']}}
@@ -29,12 +30,12 @@
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'ADDITIONAL.DURATION.FIELD' | translate }}</mat-label>
                 <label>
-                  <input [formControl]="duration" [format]="24" [ngxTimepicker]="t" matInput
+                  <input formControlName="duration" [format]="24" [ngxTimepicker]="t" matInput
                          name="duration" required readonly/>
                 </label>
                 <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
                 <ngx-material-timepicker #t [minutesGap]="15"></ngx-material-timepicker>
-                <mat-error *ngIf="duration.hasError('required')"
+                <mat-error *ngIf="getForm.duration.hasError('required')"
                            [innerHTML]="'ADDITIONAL.DURATION.REQUIRED' | translate">
                 </mat-error>
                 <mat-error *ngIf="errors['duration']">
@@ -44,7 +45,7 @@
               <mat-form-field *ngIf="groups; else skeleton" appearance="outline">
                 <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
                 <label>
-                  <input (keydown)="keyDownGroup($event)" [formControl]="group" [matAutocomplete]="autoGroup"
+                  <input (keydown)="keyDownGroup($event)" formControlName="group" [matAutocomplete]="autoGroup"
                          matInput type="text">
                 </label>
                 <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
@@ -52,7 +53,7 @@
                     {{group.name}}
                   </mat-option>
                 </mat-autocomplete>
-                <mat-error *ngIf="group.hasError('requireMatch')"
+                <mat-error *ngIf="getForm.group.hasError('requireMatch')"
                            [innerHTML]="'COMMON.TREATMENT.GROUP.INVALID' | translate">
                 </mat-error>
                 <mat-error *ngIf="errors['group']">
@@ -68,8 +69,18 @@
             <div fxFlex></div>
             <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
-            <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button"
-                    type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
+            <ng-template [ngIf]="isAddMode" [ngIfElse]="buttonEditMode">
+              <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button"
+                      type="submit">
+                {{ 'COMMON.BUTTON.CREATE' | translate }}
+              </button>
+            </ng-template>
+            <ng-template #buttonEditMode>
+              <button [disabled]="form.invalid || (form.pristine && additional?.groupId === getForm.group.value?.id)"
+                      color="primary" mat-fab extended class="icon-button" type="submit">
+                {{ 'COMMON.BUTTON.UPDATE' | translate }}
+              </button>
+            </ng-template>
           </mat-card-actions>
         </mat-card>
       </form>

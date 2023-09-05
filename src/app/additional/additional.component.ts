@@ -1,14 +1,15 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectAdditionalState } from '../store/app.states';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
 import { Additional, IAdditional } from '../interfaces/additional';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import * as fromActionsAdditional from '../store/additional.actions';
 import { IGroupService, ITreatmentGroup } from '../interfaces/treatment';
-import { requireMatch } from '../util/validators';
+import { fieldChange, requireMatch, valueChange } from '../util/validators';
 import { map, startWith } from 'rxjs/operators';
+import { formatDuration } from '../util/dates';
 
 @Component({
   selector: 'app-additional',
@@ -16,50 +17,63 @@ import { map, startWith } from 'rxjs/operators';
   styleUrls: ['./additional.component.scss']
 })
 export class AdditionalComponent implements OnInit, OnDestroy {
+  @Input() additional?: IAdditional;
   form!: UntypedFormGroup;
+  id?: string;
+  isAddMode: boolean;
 
-  name: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required
-  ]);
-  duration: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required
-  ]);
   groups?: IGroupService[];
   filteredGroup?: Observable<IGroupService[] | undefined>;
-  group: UntypedFormControl = new UntypedFormControl('', [requireMatch]);
 
   errors: any = [];
 
   private getState: Observable<any>;
   private subscription: Subscription | undefined;
 
-  constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router) {
+  constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router,
+              private route: ActivatedRoute, private cdRef: ChangeDetectorRef) {
+    this.isAddMode = true;
     this.getState = this.store.select(selectAdditionalState);
   }
 
-  get create(): void {
+  get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
+    return this.form.controls;
+  }
+
+  get submit(): void {
     if (this.form.invalid) {
       return;
     }
 
     const additional: IAdditional = new Additional();
-    additional.name = this.name.value;
-    additional.description = this.form.value.description;
-    additional.duration = this.duration.value;
-    additional.groupId = this.group.value.id;
+    additional.name = fieldChange(this.getForm.name as UntypedFormControl, this.additional?.name);
+    additional.description = valueChange(this.getForm.description.value, this.additional?.description);
+    additional.duration = fieldChange(this.getForm.duration as UntypedFormControl, this.additional?.duration);
+    additional.groupId = this.getForm.group.value?.id;
 
-    this.store.dispatch(
-      new fromActionsAdditional.AdditionalSave(additional)
-    );
-
-    return;
+    if (this.isAddMode) {
+      return this.store.dispatch(new fromActionsAdditional.AdditionalSave(additional));
+    } else {
+      additional.id = this.id;
+      this.additional = undefined;
+      return this.store.dispatch(new fromActionsAdditional.AdditionalUpdate(additional));
+    }
   }
 
   ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.id = id;
+    }
     this.clean();
     this.findGroups();
     this.createForm();
     this.subscribe();
+    this.isAddMode = !this.id;
+    if (!this.isAddMode) {
+      this.getAdditional();
+    }
+    this.cdRef.detectChanges();
   }
 
   ngOnDestroy(): void {
@@ -72,19 +86,19 @@ export class AdditionalComponent implements OnInit, OnDestroy {
 
   keyDownGroup(event: any): void {
     if (event.code === 'Backspace') {
-      this.group.setValue('');
+      this.getForm.group.setValue('');
     }
   }
 
   private createForm(): void {
     this.form = this.formBuilder.group({
-      description: new UntypedFormControl(),
-      name: this.name,
-      duration: this.duration,
-      group: this.group
+      description: [''],
+      name: ['', Validators.required],
+      duration: ['', Validators.required],
+      group: ['', requireMatch]
     });
 
-    this.filteredGroup = this.group.valueChanges.pipe(startWith(''),
+    this.filteredGroup = this.getForm.group.valueChanges.pipe(startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups)
     );
@@ -105,6 +119,17 @@ export class AdditionalComponent implements OnInit, OnDestroy {
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       this.groups = state.groups;
+      if (state.selected) {
+        this.additional = {
+          id: state.selected.id,
+          name: state.selected.name,
+          description: state.selected.description,
+          duration: formatDuration(state.selected.duration),
+          groupId: state.selected.group?.id
+        } as IAdditional;
+        this.form.patchValue(this.additional);
+        this.getForm.group.setValue(state.selected.group);
+      }
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
@@ -120,5 +145,13 @@ export class AdditionalComponent implements OnInit, OnDestroy {
     const filterValue = name.toLowerCase();
 
     return this.groups?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
+  }
+
+  private getAdditional(): void {
+    if (!this.additional) {
+      this.store.dispatch(
+        new fromActionsAdditional.AdditionalFind(this.id)
+      );
+    }
   }
 }
