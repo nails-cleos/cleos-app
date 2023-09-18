@@ -93,6 +93,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   disableUpdateButton = true;
   customerId?: string;
   isReservationAdmin?: boolean;
+  isCustomer?: boolean;
 
   private tooltipPosition = 'below';
   private machine: any;
@@ -284,9 +285,9 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       this.isLoading = state.isLoading;
-      const isCustomer = this.customerId && this.customerId === state.selected?.customer?.id;
+      this.isCustomer = this.customerId === state.selected?.customer?.id;
       if (state.payments && state.payments[0].id) {
-        if (isCustomer) {
+        if (this.isCustomer) {
           this.paymentPaid = state.payments.map((p: IPayment) => {
             if (p.status && !['APPROVED', 'APPROVED_REFUND', 'REFUND_PENDING', 'REFUND'].includes(p.status)) {
               this.addActions();
@@ -327,7 +328,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         if (isProfessionalAdmin) {
           this.professionalMachine(this);
           this.changeState = this.machine.next(snakeToCamel(this.reservation?.state));
-        } else if (isCustomer) {
+        } else if (this.isCustomer) {
           this.customerMachine(this);
           this.changeState = this.machine.next(snakeToCamel(state.selected.state));
           if (state.selected.state === States.completed) {
