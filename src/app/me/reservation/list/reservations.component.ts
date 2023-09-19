@@ -12,14 +12,14 @@ import { AppState, selectReservationState } from '../../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import * as fromActionsReservation from '../../../store/reservation.actions';
 import { isSameTimeZone, newDateTimestamp } from '../../../util/dates';
-import { executeDialog, executeDialogNoWidth, openDialog } from '../../../util/helper';
+import { executeDialogNoWidth, openDialog } from '../../../util/helper';
 import { stampAnimation, transitionAnimation } from '../../../util/animation';
 import { IReview, Review } from '../../../interfaces/review';
 import { ReviewDialogComponent } from '../review/review-dialog.component';
 import { isToday } from 'date-fns';
-import { AngularFireAnalytics } from '@angular/fire/compat/analytics';
 import { Router } from '@angular/router';
 import { IPayment } from '../../../interfaces/payment';
+import { Analytics, logEvent } from '@angular/fire/analytics';
 
 @Component({
   selector: 'app-reservations',
@@ -51,7 +51,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private router: Router, private breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef,
-              private analytic: AngularFireAnalytics) {
+              private analytic: Analytics) {
     this.getState = this.store.select(selectReservationState);
     this.dateFormat = this.translate.currentLang;
     breakpointObserver.observe([
@@ -63,7 +63,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
         this.pageSize = MOBILE_PAGE_SIZE;
       }
     });
-    analytic.logEvent('screen_view', {
+    logEvent(this.analytic, 'screen_view', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       firebase_screen: 'Main reservation page',
       // eslint-disable-next-line @typescript-eslint/naming-convention

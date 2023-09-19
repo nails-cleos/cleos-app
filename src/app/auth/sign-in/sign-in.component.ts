@@ -5,7 +5,7 @@ import { IUser } from '../../interfaces/user';
 import { AppState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute } from '@angular/router';
-import { ReCaptchaV3Service } from 'ng-recaptcha';
+import { AppCheck, getToken } from '@angular/fire/app-check';
 
 @Component({
   selector: 'app-sign-in',
@@ -19,7 +19,7 @@ export class SignInComponent implements OnInit {
   user?: IUser;
 
   constructor(private formBuilder: UntypedFormBuilder, private store: Store<AppState>, private route: ActivatedRoute,
-              private recaptchaV3Service: ReCaptchaV3Service) {
+              private appCheck: AppCheck) {
   }
 
   get signIn(): void {
@@ -29,17 +29,16 @@ export class SignInComponent implements OnInit {
     const username: string = this.form.get('username')?.value.trim();
     const password: string = this.form.get('password')?.value.trim();
 
-    this.recaptchaV3Service.execute('importantAction')
-      .subscribe((token) => {
-        if (token) {
-          this.store.dispatch(
-            new fromActionsLogin.Login({
-              username, password,
-              queryParams: this.route.snapshot.queryParams
-            })
-          );
-        }
-      });
+    getToken(this.appCheck).then(appCheckToken => {
+      if (appCheckToken.token) {
+        this.store.dispatch(
+          new fromActionsLogin.Login({
+            username, password,
+            queryParams: this.route.snapshot.queryParams
+          })
+        );
+      }
+    });
 
     return;
   }

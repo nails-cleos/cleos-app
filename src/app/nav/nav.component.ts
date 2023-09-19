@@ -210,11 +210,11 @@ export class NavComponent implements OnInit, OnDestroy {
         this.image = getUserImage(user);
         this.messagingService.requestPermission(user);
         this.messagingService.receiveMessage();
-        this.messagingService.currentMessage?.subscribe((value: any) => {
+        this.messagingService.message$?.subscribe((value: any) => {
           if (value) {
             const notification = {
               id: value.data.id,
-              message: value.title,
+              message: value.notification.title,
               date: value.data.date,
               navigation: value.data.navigation,
               read: false

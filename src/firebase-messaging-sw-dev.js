@@ -1,19 +1,19 @@
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
 import {
   getMessaging,
-  isSupported,
-  onBackgroundMessage
+  onBackgroundMessage,
+  isSupported
 } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-sw.js';
 
 const app = initializeApp({
-  apiKey: 'AIzaSyCQw4--OYnNQTpsLe9yoaqVnT4z_csjnrk',
-  authDomain: 'nails-cleos.firebaseapp.com',
-  projectId: 'nails-cleos',
-  storageBucket: 'nails-cleos.appspot.com',
-  messagingSenderId: '174727853234',
-  appId: '1:174727853234:web:6cf02667f8d913be34c5ab',
-  measurementId: 'G-X9XEEDVFN4',
-  databaseURL: 'https://nails-cleos-default-rtdb.europe-west1.firebasedatabase.app/'
+  apiKey: 'AIzaSyBHkZS6OP4IOLe6EI6jkGBYZTiHP2CIn7M',
+  authDomain: 'nails-cleos-dev.firebaseapp.com',
+  projectId: 'nails-cleos-dev',
+  storageBucket: 'nails-cleos-dev.appspot.com',
+  messagingSenderId: '364998384255',
+  appId: '1:364998384255:web:a39b48b0b30392aefcbd4a',
+  measurementId: 'G-Q2NR1R8MWQ',
+  databaseURL: 'https://nails-cleos-dev-default-rtdb.europe-west1.firebasedatabase.app'
 });
 
 isSupported().then(isSupported => {

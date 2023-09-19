@@ -9,14 +9,12 @@ import { ServiceWorkerModule, SwPush } from '@angular/service-worker';
 import { AppRoutingModule } from './app-routing.module';
 import { Router } from '@angular/router';
 import { SharedModule } from './shared/shared.module';
-import { AngularFireModule, FIREBASE_OPTIONS } from '@angular/fire/compat';
-import { AngularFireAuthModule, USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/compat/auth';
-import { RECAPTCHA_V3_SITE_KEY, RecaptchaV3Module } from 'ng-recaptcha';
-import { AppCheckModule } from '@angular/fire/app-check';
-import { firebase, firebaseui, FirebaseUIModule } from 'firebaseui-angular';
-import { AngularFireMessagingModule } from '@angular/fire/compat/messaging';
-import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
-import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
+import { getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { initializeAppCheck, provideAppCheck, ReCaptchaV3Provider } from '@angular/fire/app-check';
+import { connectAuthEmulator, getAuth, provideAuth } from '@angular/fire/auth';
+import { getAnalytics, provideAnalytics } from '@angular/fire/analytics';
+import { getMessaging, provideMessaging } from '@angular/fire/messaging';
+import { connectDatabaseEmulator, getDatabase, provideDatabase } from '@angular/fire/database';
 
 // Providers
 import { environment } from '../environments/environment';
@@ -29,12 +27,12 @@ import localeEnGB from '@angular/common/locales/en-GB';
 import localeEnNL from '@angular/common/locales/en-NL';
 import localeEs from '@angular/common/locales/es';
 import localeAr from '@angular/common/locales/es-AR';
-import { CookieService } from 'ngx-cookie-service';
 import { TranslateLoaderFactory } from './shared/translate-loader.factory';
 import { MAT_COLOR_FORMATS, NGX_MAT_COLOR_FORMATS, NgxMatColorPickerModule } from '@angular-material-components/color-picker';
 
 // Services
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { CookieService } from 'ngx-cookie-service';
 import { PermissionsService } from './services/auth-guard.service';
 import { TokenService } from './services/token.service';
 import { NavigationService } from './services/navigation.service';
@@ -46,7 +44,6 @@ import { reducers } from './store/app.states';
 
 // Components
 import { AppComponent } from './app.component';
-import { isIPhone, isMobile } from './util/helper';
 import { AuthUserService } from './services/auth-user.service';
 
 export const localStorageSyncReducer =
@@ -59,14 +56,6 @@ registerLocaleData(localeEnGB, 'en-GB');
 registerLocaleData(localeEnNL, 'en-NL');
 registerLocaleData(localeEs, 'es');
 registerLocaleData(localeAr, 'es-AR');
-
-const firebaseUiAuthConfig: firebaseui.auth.Config = {
-  signInFlow: isMobile() && !isIPhone() ? 'redirect' : 'popup',
-  signInOptions: [
-    firebase.auth.GoogleAuthProvider.PROVIDER_ID
-  ],
-  credentialHelper: firebaseui.auth.CredentialHelper.GOOGLE_YOLO
-};
 
 @NgModule({
   declarations: [
@@ -93,14 +82,29 @@ const firebaseUiAuthConfig: firebaseui.auth.Config = {
       registrationStrategy: 'registerWhenStable:30000'
     }),
     NgxMatColorPickerModule,
-    AngularFireModule.initializeApp(environment.firebase),
-    AngularFireAuthModule,
-    AngularFireMessagingModule,
-    AngularFireAnalyticsModule,
-    AngularFireDatabaseModule,
-    AppCheckModule,
-    FirebaseUIModule.forRoot(firebaseUiAuthConfig),
-    RecaptchaV3Module
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideAuth(() => {
+      const auth = getAuth();
+      if (environment.useEmulators) {
+        connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: false });
+      }
+      return auth;
+    }),
+
+    provideAnalytics(() => getAnalytics()),
+    provideMessaging(() => getMessaging()),
+    provideDatabase(() => {
+      const database = getDatabase();
+      if (environment.useEmulators) {
+        connectDatabaseEmulator(database, 'localhost', 9000);
+      }
+      return database;
+    }),
+    provideAppCheck(() => initializeAppCheck(getApp(), {
+        provider: new ReCaptchaV3Provider(environment.recaptcha.siteKey),
+        isTokenAutoRefreshEnabled: true
+      })
+    )
   ],
   providers: [
     {
@@ -124,49 +128,7 @@ const firebaseUiAuthConfig: firebaseui.auth.Config = {
       provide: LOCALE_ID,
       useValue: 'en-GB'
     },
-    {
-      provide: RECAPTCHA_V3_SITE_KEY,
-      useValue: environment.recaptcha.siteKey,
-    },
-    {
-      provide: FIREBASE_OPTIONS,
-      useValue: environment.firebase
-    },
-    { provide: APP_INITIALIZER, useFactory: (pwaService: PwaService) => () => pwaService.initPwaPrompt(), deps: [PwaService], multi: true },
-    { provide: USE_AUTH_EMULATOR, useValue: environment.useEmulators ? ['http://', 'localhost', 9099] : undefined },
-    {
-      provide: 'appConfig',
-      useValue: { googleAuthEnabled: true, emailAuthEnabled: false }
-    },
-    {
-      provide: 'firebaseUIAuthConfig',
-      useFactory: (config: any) => {
-
-        const fbUiConfig: firebaseui.auth.Config = {
-          callbacks: {
-            signInSuccessWithAuthResult: () => true,
-          },
-          signInFlow: isMobile() && !isIPhone() ? 'redirect' : 'popup',
-          signInOptions: [],
-          signInSuccessUrl: location.href,
-        };
-
-        if (config.googleAuthEnabled) {
-          fbUiConfig?.signInOptions?.push(firebase.auth.GoogleAuthProvider.PROVIDER_ID);
-        }
-
-        if (config.emailAuthEnabled) {
-          fbUiConfig?.signInOptions?.push({
-            provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
-            requireDisplayName: true,
-            signInMethod: firebase.auth.EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD
-          });
-        }
-
-        return fbUiConfig;
-      },
-      deps: ['appConfig']
-    }
+    { provide: APP_INITIALIZER, useFactory: (pwaService: PwaService) => () => pwaService.initPwaPrompt(), deps: [PwaService], multi: true }
   ],
   bootstrap: [AppComponent],
   exports: [TranslateModule]

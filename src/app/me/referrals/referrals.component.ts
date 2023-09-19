@@ -9,8 +9,8 @@ import { environment } from '../../../environments/environment';
 import { Observable, Subscription } from 'rxjs';
 import * as fromActionsDiscount from '../../store/discount.actions';
 import { IUserDiscount } from '../../interfaces/discount';
-import { AngularFireAnalytics } from '@angular/fire/compat/analytics';
 import { AuthUserService } from '../../services/auth-user.service';
+import { Analytics, logEvent } from '@angular/fire/analytics';
 
 @Component({
   selector: 'app-referrals',
@@ -31,13 +31,13 @@ export class ReferralsComponent implements OnInit, OnDestroy {
 
   constructor(private store: Store<AppState>, private clipboard: Clipboard, private snackBar: MatSnackBar,
               private translate: TranslateService, private bottomSheet: MatBottomSheet,
-              private analytic: AngularFireAnalytics, private authUserService: AuthUserService) {
+              private analytic: Analytics, private authUserService: AuthUserService) {
     this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
       this.userId = value.userId;
       this.referralMax = value.referralMax;
     });
     this.getState = this.store.select(selectDiscountState);
-    this.analytic.logEvent('screen_view', {
+    logEvent(this.analytic, 'screen_view', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       firebase_screen: 'Referral page',
       // eslint-disable-next-line @typescript-eslint/naming-convention

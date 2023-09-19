@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, Optional, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import * as fromActionsLogin from '../store/auth.actions';
 import { AppState, selectAuthState } from '../store/app.states';
@@ -7,8 +7,9 @@ import { Observable, Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { THEME } from '../util/theme';
 import { CookieService } from 'ngx-cookie-service';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { FirebaseUISignInFailure } from 'firebaseui-angular';
+import { Auth, authState } from '@angular/fire/auth';
+import { firebase, firebaseui } from 'firebaseui-angular';
+import { isIPhone, isMobile } from '../util/helper';
 
 @Component({
   selector: 'app-auth',
@@ -24,15 +25,41 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscription?: Subscription;
   private getState: Observable<any>;
   private authSubscription?: Subscription;
+  private ui: firebaseui.auth.AuthUI;
 
-  constructor(private auth: AngularFireAuth, private store: Store<AppState>, private route: ActivatedRoute,
+  constructor(@Optional() private auth: Auth, private store: Store<AppState>, private route: ActivatedRoute,
               private snackBar: MatSnackBar, private router: Router, private cookieService: CookieService) {
     this.getState = this.store.select(selectAuthState);
+    this.ui = new firebaseui.auth.AuthUI(this.auth);
   }
 
   ngOnInit(): void {
     this.clean();
     this.subscribe();
+    console.log(isMobile() && !isIPhone() ? 'redirect' : 'popup')
+    const uiConfig = {
+      callbacks: {
+        signInSuccessWithAuthResult: () => true,
+        uiShown: () => {
+          const loader = document.getElementById('loader');
+          if (loader) {
+            loader.style.display = 'none';
+          }
+        }
+      },
+      signInFlow: isMobile() && !isIPhone() ? 'redirect' : 'popup',
+      signInSuccessUrl: location.href,
+      signInOptions: [
+        firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+        // firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+        // firebase.auth.EmailAuthProvider.PROVIDER_ID
+      ]
+      // Terms of service url.
+      // tosUrl: '<your-tos-url>',
+      // Privacy policy url.
+      // privacyPolicyUrl: '<your-privacy-policy-url>'
+    };
+    this.ui.start('#firebaseui-auth-container', uiConfig);
   }
 
   ngAfterViewInit(): void {
@@ -48,10 +75,6 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
     this.authSubscription?.unsubscribe();
-  }
-
-  errorCallback($event: FirebaseUISignInFailure): void {
-    console.error('Error in logIn: ', $event);
   }
 
   private subscribe(): void {
@@ -74,9 +97,9 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     });
-    this.authSubscription = this.auth.authState.subscribe(response => {
-      if (response) {
-        response.getIdToken().then(idToken => {
+    this.authSubscription = authState(this.auth).subscribe(response => {
+      if (response && response.providerData[0].providerId === 'google.com') {
+        this.auth.currentUser?.getIdToken().then(idToken => {
           this.store.dispatch(
             new fromActionsLogin.SocialLogin({
               socialUser: {
