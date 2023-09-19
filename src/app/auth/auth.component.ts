@@ -36,7 +36,6 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.clean();
     this.subscribe();
-    console.log(isMobile() && !isIPhone() ? 'redirect' : 'popup')
     const uiConfig = {
       callbacks: {
         signInSuccessWithAuthResult: () => true,
