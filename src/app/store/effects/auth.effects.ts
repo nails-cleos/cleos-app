@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, Optional } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
@@ -8,8 +8,9 @@ import { Router } from '@angular/router';
 import { AuthActionTypes, LoginFailure, LoginSuccess, SignUpFailure, SignUpSuccess } from '../auth.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { NavigationService } from '../../services/navigation.service';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AuthUserService } from '../../services/auth-user.service';
+import { Auth, signInWithEmailAndPassword, signOut } from '@angular/fire/auth';
+import { createUserWithEmailAndPassword } from '@firebase/auth';
 
 @Injectable()
 export class LoginEffects {
@@ -17,10 +18,16 @@ export class LoginEffects {
   login$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.login)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.authService.login(payload.username, payload.password).pipe(
-      switchMap((response: any) => of(new LoginSuccess({
-        response,
-        queryParams: payload.queryParams
-      }))),
+      switchMap((response: any) => {
+        signInWithEmailAndPassword(this.auth, response.user.email, payload.password).catch(error => {
+          console.error(error, 'Error trying to login in firebase');
+          createUserWithEmailAndPassword(this.auth, response.user.email, payload.password);
+        });
+        return of(new LoginSuccess({
+          response,
+          queryParams: payload.queryParams
+        }));
+      }),
       catchError((err: HttpErrorResponse) => of(new LoginFailure({ error: err.error })))
     ))
   ));
@@ -47,6 +54,7 @@ export class LoginEffects {
           username: response.username,
           email: response.email
         });
+        createUserWithEmailAndPassword(this.auth, response.email, payload.password);
         return of(new SignUpSuccess({ message }));
       }), catchError((err: HttpErrorResponse) => of(new SignUpFailure({ error: err.error })))
     ))
@@ -114,10 +122,13 @@ export class LoginEffects {
 
   logOut$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.logout),
     tap(() => {
-      this.auth.signOut();
-      this.authUserService.reloadUser();
-      localStorage.removeItem('auth');
-      window.location.href = '/main';
+      signOut(this.auth).then(() => {
+        this.authUserService.reloadUser();
+        localStorage.removeItem('auth');
+        window.location.href = '/main';
+      }).catch((error) => {
+        console.error('sign out error: ' + error);
+      });
     })
   ), { dispatch: false });
 
@@ -133,7 +144,7 @@ export class LoginEffects {
   ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private authService: AuthService,
-              private router: Router, private navigationService: NavigationService, private auth: AngularFireAuth,
+              private router: Router, private navigationService: NavigationService, @Optional() private auth: Auth,
               private authUserService: AuthUserService) {
   }
 }

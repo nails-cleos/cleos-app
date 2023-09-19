@@ -4,9 +4,9 @@ import { AppState, selectPaymentState } from '../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute } from '@angular/router';
-import { AngularFireAnalytics } from '@angular/fire/compat/analytics';
 import * as fromActionsPayment from '../../store/payment.actions';
 import { IPaymentAll } from '../../interfaces/payment';
+import { Analytics, logEvent } from '@angular/fire/analytics';
 
 @Component({
   selector: 'app-me-payment',
@@ -24,7 +24,7 @@ export class MePaymentComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
 
   constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private route: ActivatedRoute,
-              private analytic: AngularFireAnalytics) {
+              private analytic: Analytics) {
     this.getState = this.store.select(selectPaymentState);
     this.typeForm = this.formBuilder.group({
       type: new UntypedFormControl(undefined),
@@ -57,7 +57,7 @@ export class MePaymentComponent implements OnInit, OnDestroy {
     this.route.params.subscribe(routeParams => {
       const paymentId = routeParams.id;
       if (paymentId) {
-        this.analytic.logEvent('screen_view', {
+        logEvent(this.analytic, 'screen_view', {
           // eslint-disable-next-line @typescript-eslint/naming-convention
           firebase_screen: `Customer missing payment ${ paymentId }`,
           // eslint-disable-next-line @typescript-eslint/naming-convention

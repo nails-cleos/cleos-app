@@ -12,7 +12,7 @@ import { AppState, selectDiscountState } from '../../../store/app.states';
 import * as fromActionsDiscount from '../../../store/discount.actions';
 import { Router } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { AngularFireAnalytics } from '@angular/fire/compat/analytics';
+import { Analytics, logEvent } from '@angular/fire/analytics';
 
 @Component({
   selector: 'app-me-discount',
@@ -34,7 +34,7 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
   private getState: Observable<any>;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private router: Router, private cdRef: ChangeDetectorRef, private analytic: AngularFireAnalytics,
+              private router: Router, private cdRef: ChangeDetectorRef, private analytic: Analytics,
               private breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
@@ -45,8 +45,10 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
     this.getState = this.store.select(selectDiscountState);
-    this.analytic.logEvent('screen_view', {
+    logEvent(this.analytic, 'screen_view', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       firebase_screen: 'Referral page',
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       firebase_screen_class: 'ReferralsComponent'
     });
   }

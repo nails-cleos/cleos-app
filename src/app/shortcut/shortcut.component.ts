@@ -49,8 +49,6 @@ export class ShortcutComponent implements OnDestroy {
           redirect = [...redirect, 'reservation'];
           break;
       }
-      console.log(key);
-      console.log(redirect);
       this.router.navigate(redirect);
     });
   }
