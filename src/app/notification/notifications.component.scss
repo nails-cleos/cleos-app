@@ -9,3 +9,22 @@
   justify-content: center;
   align-items: center;
 }
+
+.pointer:hover {
+  transform: scale(1);
+  font-weight: bold;
+}
+
+.notification-list:hover {
+  background-color: rgba(#fafafa, 0.12);
+}
+
+.list-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.list-container {
+  flex-direction: column;
+}

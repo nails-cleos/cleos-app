@@ -9,29 +9,31 @@ import { EffectsModule } from '@ngrx/effects';
 import { NotificationEffects } from '../store/effects/notification.effects';
 import { NotificationService } from '../services/notification.service';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { MatBadgeModule } from '@angular/material/badge';
 
 @NgModule({
   declarations: [
     NotificationsComponent
   ],
-  imports: [
-    NotificationRoutingModule,
-    SharedModule,
-    MatRippleModule,
-    TranslateModule.forChild({
-      loader: {
-        provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('notification')
-      },
-      missingTranslationHandler: {
-        provide: MissingTranslationHandler,
-        useClass: MissingTranslateHandler,
-      },
-      isolate: false,
-      extend: true
-    }),
-    EffectsModule.forFeature([NotificationEffects])
-  ],
+    imports: [
+        NotificationRoutingModule,
+        SharedModule,
+        MatRippleModule,
+        TranslateModule.forChild({
+            loader: {
+                provide: TranslateLoader,
+                useClass: TranslateLoaderFactory.forModule('notification')
+            },
+            missingTranslationHandler: {
+                provide: MissingTranslationHandler,
+                useClass: MissingTranslateHandler,
+            },
+            isolate: false,
+            extend: true
+        }),
+        EffectsModule.forFeature([NotificationEffects]),
+        MatBadgeModule
+    ],
   providers: [
     NotificationService
   ]

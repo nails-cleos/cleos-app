@@ -3,6 +3,7 @@ import { INotificationDTO } from '../../interfaces/notification';
 
 export interface State {
   data: INotificationDTO | null;
+  dataDeleted: INotificationDTO | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -12,6 +13,7 @@ export interface State {
 
 export const initialState: State = {
   data: null,
+  dataDeleted: null,
   errorMessage: null,
   error: null,
   subErrors: null,
@@ -26,6 +28,7 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         // @ts-ignore
         data: {page: {content: [{}, {}, {}]}},
+        dataDeleted: null,
         errorMessage: null,
         subErrors: null,
         message: null
@@ -66,6 +69,26 @@ export const reducer = (state = initialState, action: All): State => {
         subErrors: null,
         message: null,
         isLoading: true
+      };
+    }
+    case NotificationActionTypes.notificationDelete: {
+      return {
+        ...state,
+        dataDeleted: null,
+        data: null,
+        errorMessage: null,
+        subErrors: null,
+        message: null,
+        isLoading: false
+      };
+    }
+    case NotificationActionTypes.notificationDeleteSuccess: {
+      return {
+        ...state,
+        dataDeleted: action.payload,
+        errorMessage: null,
+        subErrors: null,
+        message: null
       };
     }
     case NotificationActionTypes.clean: {

@@ -3,21 +3,32 @@
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <mat-card appearance="outlined">
         <mat-card-header>
-          <mat-card-title>{{ 'NOTIFICATION.TITLE' | translate }}</mat-card-title>
+          <mat-card-titlem [matBadgeHidden]="badge <= 0" [matBadge]="badge" matBadgeColor="warn"
+                           [matBadgeOverlap]="false" [matBadgeSize]="'medium'">
+            {{ 'NOTIFICATION.TITLE' | translate }}
+          </mat-card-titlem>
           <mat-card-subtitle
             *ngIf="!notifications.length">{{ 'COMMON.NOTIFICATION.NO' | translate }}</mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
-          <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-            <mat-list>
-              <mat-list-item (click)="notification(not)" *ngFor="let not of notifications; last as last"
-                             class="pointer" matRipple>
-                <div [matTooltip]="not.message" [ngClass]="{ 'gray-text': not.read}" mat-line>
-                  <span *ngIf="!not.read" class="dot"></span>{{not.message}}
+          <div fxLayout="column" fxLayoutAlign="space-evenly stretch" @list class="list-container"
+               *ngIf="notifications.length">
+            <mat-list *ngFor="let not of notifications; last as last; let i = index" @items
+                      matRipple style="padding: 0">
+              <mat-list-item class="notification-list">
+                <div (click)="notification(not)" [matTooltip]="not.message" [ngClass]="{ 'gray-text': not.read}"
+                     matListItemTitle class="pointer">
+                  <span *ngIf="!not.read" class="pointer dot"></span>
+                  {{not.message}}
                 </div>
-                <div [ngClass]="{ 'gray-text': not.read}" mat-line>{{not.date | date:'short':undefined:dateFormat}}</div>
-                <mat-divider *ngIf="!last || showMore" class="divider"></mat-divider>
+                <div matListItemLine>{{not.date | date:'short':undefined:dateFormat}}</div>
+                <button matListItemMeta mat-icon-button (click)="remove(i)">
+                  <mat-icon>delete</mat-icon>
+                </button>
               </mat-list-item>
+              <mat-divider *ngIf="!last || showMore"></mat-divider>
+            </mat-list>
+            <mat-list>
               <mat-list-item *ngFor="let n of loadingNotifications">
                 <div class="ssc-line" mat-line></div>
                 <div class="ssc-line top" mat-line></div>
@@ -35,3 +46,14 @@
     </div>
   </div>
 </div>
+
+<!--<div class="buttons-container">-->
+<!--  <button mat-fab (click)="add()"><i class="material-icons">&#xE147;</i></button>-->
+<!--  <button mat-fab (click)="remove(0)" [disabled]="list.length===0"><i class="material-icons">&#xE872;</i></button>-->
+<!--</div>-->
+<!--<div @list class="list-container">-->
+<!--  <div @items class="box"-->
+<!--       (click)="remove(i)"-->
+<!--       *ngFor="let item of list; let i=index;">-->
+<!--  </div>-->
+<!--</div>-->

@@ -19,10 +19,18 @@ export class NotificationEffects {
     ))
   ));
 
-  readNotification$ = createEffect(() => this.actions$.pipe(ofType(fromActionsNotification.NotificationActionTypes.notificationRead)).pipe(
+  read$ = createEffect(() => this.actions$.pipe(ofType(fromActionsNotification.NotificationActionTypes.notificationRead)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.notificationService.readNotification(payload.id).pipe(
       switchMap(() => of(new fromActionsNotification.NotificationReadSuccess(payload))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsNotification.NotificationFailure({ error: err.error })))
+    ))
+  ));
+
+  delete$ = createEffect(() => this.actions$.pipe(ofType(fromActionsNotification.NotificationActionTypes.notificationDelete)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.notificationService.deleteNotification(payload.id).pipe(
+      switchMap(() => of(new fromActionsNotification.NotificationDeleteSuccess(payload))),
       catchError((err: HttpErrorResponse) => of(new fromActionsNotification.NotificationFailure({ error: err.error })))
     ))
   ));
@@ -37,6 +45,10 @@ export class NotificationEffects {
 
   notificationSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsNotification.NotificationActionTypes.notificationSuccess)
+  ), { dispatch: false });
+
+  notificationDelete$ = createEffect(() => this.actions$.pipe(
+    ofType(fromActionsNotification.NotificationActionTypes.notificationDeleteSuccess)
   ), { dispatch: false });
 
   notificationReadSuccess$ = createEffect(() => this.actions$.pipe(

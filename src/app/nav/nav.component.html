@@ -107,7 +107,7 @@
         <mat-menu #menuNotification="matMenu" xPosition="before">
           <mat-list>
             <mat-list-item (click)="notification(not)" *ngFor="let not of notifications" class="pointer" matRipple>
-              <div [matTooltip]="not.message" [ngClass]="{ 'gray-text': not.read}" matListItemLine>
+              <div [matTooltip]="not.message" [ngClass]="{ 'gray-text': not.read}" matListItemTitle>
                 <span *ngIf="!not.read" class="dot"></span>{{not.message}}
               </div>
               <div [ngClass]="{ 'gray-text': not.read}"
