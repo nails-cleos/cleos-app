@@ -90,14 +90,15 @@
       <div *ngIf="currentUser?.username; else login">
         <ng-template [ngIf]="isProfessional && workDay.length" [ngIfElse]="workDayIcon">
           <button [matMenuTriggerFor]="menuWorkDay" class="badge-padding" mat-icon-button>
-            <mat-icon [matBadgeHidden]="!workDay.length" [matBadge]="workDay.length" matBadgeColor="warn">
+            <mat-icon [matBadgeHidden]="!workDay.length" [matBadgeOverlap]="true" [matBadge]="workDay.length"
+                      matBadgeColor="warn">
               work
             </mat-icon>
           </button>
         </ng-template>
         <ng-template [ngIf]="notifications.length && showInformation" [ngIfElse]="notificationIcon">
           <button [matMenuTriggerFor]="menuNotification" class="badge-padding" mat-icon-button>
-            <mat-icon [matBadgeHidden]="!countNotifications"
+            <mat-icon [matBadgeHidden]="!countNotifications" [matBadgeOverlap]="true"
                       [matBadge]="plusNotification ? plusNotification : countNotifications"
                       matBadgeColor="warn">
               notifications
@@ -155,7 +156,8 @@
         </ng-template>
 
         <button [matMenuTriggerFor]="menuLogged" [ngClass]="{'badge-padding': incomplete}" mat-icon-button>
-          <mat-icon [matBadgeHidden]="!incomplete" [matBadge]="'*'" matBadgeColor="warn">settings
+          <mat-icon [matBadgeHidden]="!incomplete" [matBadgeOverlap]="true" [matBadge]="'*'" matBadgeColor="warn">
+            settings
           </mat-icon>
         </button>
         <mat-menu #menuLogged="matMenu">
@@ -166,7 +168,8 @@
             </a>
             <mat-divider></mat-divider>
             <a [routerLink]="'/auth/profile'" mat-list-item>
-              <mat-icon *ngIf="incomplete; else complete" matListItemIcon matBadgeColor="warn" [matBadge]="'*'">
+              <mat-icon *ngIf="incomplete; else complete" matListItemIcon matBadgeColor="warn" [matBadge]="'*'"
+                        [matBadgeOverlap]="true">
                 badge
               </mat-icon>
               <ng-template #complete>
