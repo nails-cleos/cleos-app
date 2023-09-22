@@ -3,10 +3,10 @@
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
       <mat-card appearance="outlined">
         <mat-card-header>
-          <mat-card-titlem [matBadgeHidden]="badge <= 0" [matBadge]="badge" matBadgeColor="warn"
+          <mat-card-title [matBadgeHidden]="badge <= 0" [matBadge]="badge" matBadgeColor="warn"
                            [matBadgeOverlap]="false" [matBadgeSize]="'medium'">
             {{ 'NOTIFICATION.TITLE' | translate }}
-          </mat-card-titlem>
+          </mat-card-title>
           <mat-card-subtitle
             *ngIf="!notifications.length">{{ 'COMMON.NOTIFICATION.NO' | translate }}</mat-card-subtitle>
         </mat-card-header>
