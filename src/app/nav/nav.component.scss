@@ -85,6 +85,11 @@ mat-drawer-container {
   margin-right: 5%;
 }
 
+.pointer:hover {
+  transform: scale(1.1);
+  font-weight: bold;
+}
+
 .circle {
   border-radius: 50%;
   width: 60px;

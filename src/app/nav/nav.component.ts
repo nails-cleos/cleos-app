@@ -248,15 +248,26 @@ export class NavComponent implements OnInit, OnDestroy {
     this.notificationSubscription = this.getNotificationState.subscribe((state) => {
       if (state.data && state.data.page && state.data.page.content[0]?.id) {
         this.workDay = state.data.workDay;
-        this.notifications = state.data.page.content;
+        this.notifications = state.data.page.number === 0 ? state.data.page.content : this.notifications;
         this.countNotifications = state.data.unread;
-        if (this.countNotifications > 9) {
-          this.plusNotification = '+9';
-        }
-        this.setBadge();
+        this.updateCount();
+      }
+      if (state.dataDeleted?.deleted && !state.dataDeleted.read) {
+        this.notifications = this.notifications.filter((it: INotification) => it.id !== state.dataDeleted.id);
+        this.countNotifications = this.countNotifications - 1;
+        this.updateCount();
       }
       this.isLoading = state.isLoading;
     });
+  }
+
+  private updateCount(): void {
+    if (this.countNotifications > 9) {
+      this.plusNotification = '+9';
+    } else {
+      this.plusNotification = undefined;
+    }
+    this.setBadge();
   }
 
   private setBadge(): void {

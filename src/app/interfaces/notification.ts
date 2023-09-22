@@ -6,6 +6,7 @@ export interface INotification {
   navigation: string;
   date: Date;
   read: boolean;
+  deleted: boolean;
 }
 
 export interface INotificationDTO {
