@@ -15,25 +15,25 @@ import { MatBadgeModule } from '@angular/material/badge';
   declarations: [
     NotificationsComponent
   ],
-    imports: [
-        NotificationRoutingModule,
-        SharedModule,
-        MatRippleModule,
-        TranslateModule.forChild({
-            loader: {
-                provide: TranslateLoader,
-                useClass: TranslateLoaderFactory.forModule('notification')
-            },
-            missingTranslationHandler: {
-                provide: MissingTranslationHandler,
-                useClass: MissingTranslateHandler,
-            },
-            isolate: false,
-            extend: true
-        }),
-        EffectsModule.forFeature([NotificationEffects]),
-        MatBadgeModule
-    ],
+  imports: [
+    NotificationRoutingModule,
+    SharedModule,
+    MatRippleModule,
+    MatBadgeModule,
+    TranslateModule.forChild({
+      loader: {
+        provide: TranslateLoader,
+        useClass: TranslateLoaderFactory.forModule('notification')
+      },
+      missingTranslationHandler: {
+        provide: MissingTranslationHandler,
+        useClass: MissingTranslateHandler,
+      },
+      isolate: false,
+      extend: true
+    }),
+    EffectsModule.forFeature([NotificationEffects])
+  ],
   providers: [
     NotificationService
   ]

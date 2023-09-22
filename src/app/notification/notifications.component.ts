@@ -7,37 +7,14 @@ import { INotification } from '../interfaces/notification';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { NavigationService } from '../services/navigation.service';
-import { animate, animateChild, query, stagger, style, transition, trigger } from '@angular/animations';
 import { zoneDateToDate } from '../util/dates';
+import { addRemoveItemList, insertItemList } from '../util/animation';
 
 @Component({
   selector: 'app-notifications',
   templateUrl: './notifications.component.html',
   styleUrls: ['./notifications.component.scss'],
-  animations: [
-    // nice stagger effect when showing existing elements
-    trigger('list', [
-      transition(':enter', [
-        // child animation selector + stagger
-        query('@items',
-          stagger(300, animateChild())
-        )
-      ]),
-    ]),
-    trigger('items', [
-      // cubic-bezier for a tiny bouncing feel
-      transition(':enter', [
-        style({ transform: 'scale(0.5)', opacity: 0 }),
-        animate('1s cubic-bezier(.8,-0.6,0.2,1.5)',
-          style({ transform: 'scale(1)', opacity: 1 }))
-      ]),
-      transition(':leave', [
-        style({ transform: 'scale(1)', opacity: 1, height: '*' }),
-        animate('1s cubic-bezier(.8,-0.6,0.2,1.5)',
-          style({ transform: 'scale(0.5)', opacity: 0, height: '0px', margin: '0px' }))
-      ]),
-    ])
-  ]
+  animations: [insertItemList, addRemoveItemList]
 })
 export class NotificationsComponent implements OnInit, OnDestroy {
   notifications: INotification[] = [];
