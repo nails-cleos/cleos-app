@@ -1,6 +1,7 @@
 export const environment = {
   production: true,
   useEmulators: false,
+  firebaseMessaging: 'firebase-messaging-sw.js',
   recaptcha: {
     siteKey: '6LcJf10nAAAAAFDvt_OLXZQ5J9tOwwxjhtW3McoY'
   },

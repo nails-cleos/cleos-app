@@ -28,6 +28,11 @@ export class NotificationService {
     return this.http.post<INotification>(url, null);
   }
 
+  public deleteNotification(notificationId: string): Observable<INotification | undefined> {
+    const url = `${ this.urlV1 }/${ notificationId }`;
+    return this.http.delete<INotification>(url);
+  }
+
   public subscribe(token: string): Observable<any> {
     const url = `${ this.urlV1 }/subscribe`;
     return this.http.post(url, { token });

@@ -65,8 +65,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { Role } from '../../../interfaces/token';
 import { IUser } from '../../../interfaces/user';
 import { PaymentType } from '../../../interfaces/payment';
-import { AngularFireAnalytics } from '@angular/fire/compat/analytics';
 import { AuthUserService } from '../../../services/auth-user.service';
+import { Analytics, logEvent } from '@angular/fire/analytics';
 
 @Component({
   selector: 'app-me-reservation',
@@ -177,7 +177,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   constructor(private readonly translate: TranslateService, private snackBar: MatSnackBar, private store: Store<AppState>,
               private formBuilder: UntypedFormBuilder, private breakpointObserver: BreakpointObserver, private router: Router,
-              private route: ActivatedRoute, public dialog: MatDialog, private analytic: AngularFireAnalytics,
+              private route: ActivatedRoute, public dialog: MatDialog, private analytic: Analytics,
               private authUserService: AuthUserService) {
     this.getState = this.store.select(selectReservationState);
     this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => this.customerId = value.customerId);
@@ -360,7 +360,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.route.params.subscribe(routeParams => {
       const reservationId = routeParams.id;
       if (reservationId) {
-        this.analytic.logEvent('screen_view', {
+        logEvent(this.analytic, 'screen_view', {
           // eslint-disable-next-line @typescript-eslint/naming-convention
           firebase_screen: `Edit customer reservation ${ reservationId }`,
           // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -808,7 +808,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   private canNotContinue(message: string, type: string): void {
-    this.analytic.logEvent('screen_view', {
+    logEvent(this.analytic, 'screen_view', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       firebase_screen: `Customer cannot ${ type } a reservation`,
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -916,7 +916,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   private completeAndNext(): void {
     setTimeout(() => {
       const step = getStep(this.steps, this.myStepper.selectedIndex);
-      this.analytic.logEvent('screen_view', {
+      logEvent(this.analytic, 'screen_view', {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         firebase_screen: `Customer reservation. Step: ${ step?.name }`,
         // eslint-disable-next-line @typescript-eslint/naming-convention

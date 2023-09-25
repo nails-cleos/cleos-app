@@ -1,12 +1,13 @@
 export const environment = {
   production: false,
-  useEmulators: true,
+  useEmulators: false,
+  firebaseMessaging: 'firebase-messaging-sw-dev.js',
   recaptcha: {
-    siteKey: '6Lc7KGEnAAAAAERpXU8AdaBpHtqGz9cuD6C8DTmZ'
+    siteKey: '6Ldp5DgoAAAAAO9KDBFMNoyuTaJpIoGx8a8D04so'
   },
   appServer: 'http://localhost:4200',
   title: 'Cleos DEV',
-  version: require('../../package.json').version + '-pwa',
+  version: require('../../package.json').version + '-dev',
   baseUrl: 'http://localhost:9999/api',
   googleClientId: '364998384255-kk09n0fq6p79s7oim94ljevf8bb0etip.apps.googleusercontent.com',
   facebookClientId: '453309609006101',

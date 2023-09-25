@@ -8,7 +8,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { UntypedFormControl } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { transitionAnimation } from '../../../util/animation';
-import { AngularFireAnalytics } from '@angular/fire/compat/analytics';
+import { Analytics, logEvent } from '@angular/fire/analytics';
 
 @Component({
   selector: 'app-review-dialog',
@@ -31,7 +31,7 @@ export class ReviewDialogComponent {
   detail = new UntypedFormControl();
 
   constructor(public dialogRef: MatDialogRef<ReviewDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: IReservationAll,
-              private translate: TranslateService, private analytic: AngularFireAnalytics) {
+              private translate: TranslateService, private analytic: Analytics) {
     const start = newDateTimestamp(data.timestamp, data.room.timeZone);
     this.reservation = Object.assign({}, data, { start });
     this.price = getPrice(data);
@@ -39,8 +39,10 @@ export class ReviewDialogComponent {
     this.end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
     this.review = data.review;
     this.dateFormat = this.translate.currentLang;
-    this.analytic.logEvent('screen_view', {
+    logEvent(this.analytic, 'screen_view', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       firebase_screen: 'Review page',
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       firebase_screen_class: 'ReviewDialogComponent'
     });
   }

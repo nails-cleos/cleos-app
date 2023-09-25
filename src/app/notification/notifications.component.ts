@@ -7,17 +7,21 @@ import { INotification } from '../interfaces/notification';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { NavigationService } from '../services/navigation.service';
+import { zoneDateToDate } from '../util/dates';
+import { addRemoveItemList, insertItemList } from '../util/animation';
 
 @Component({
   selector: 'app-notifications',
   templateUrl: './notifications.component.html',
-  styleUrls: ['./notifications.component.scss']
+  styleUrls: ['./notifications.component.scss'],
+  animations: [insertItemList, addRemoveItemList]
 })
 export class NotificationsComponent implements OnInit, OnDestroy {
   notifications: INotification[] = [];
   dateFormat: string;
   showMore = false;
   loadingNotifications?: [];
+  badge = 0;
 
   private getState: Observable<any>;
   private subscription?: Subscription;
@@ -63,6 +67,23 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     );
   }
 
+  remove(index: number): void {
+    if (!this.notifications.length) {
+      return;
+    }
+    const notification = this.notifications.splice(index, 1)[0];
+    this.store.dispatch(
+      new fromActionsNotification.NotificationDelete(Object.assign({}, notification, { deleted: true }))
+    );
+    if (!notification.read) {
+      --this.badge;
+    }
+    if (this.notifications.length === 0 && this.showMore) {
+      this.page = -1;
+      this.getNotifications();
+    }
+  }
+
   private clean(): void {
     this.store.dispatch(
       new fromActionsNotification.Clean()
@@ -75,8 +96,12 @@ export class NotificationsComponent implements OnInit, OnDestroy {
         if (state.data.page?.content?.length) {
           if (state.data.page?.content[0]?.id) {
             this.loadingNotifications = undefined;
-            this.notifications = this.notifications.concat(state.data.page.content);
-            this.showMore = !state.data.page.last;
+            if (!state.dataDeleted) {
+              this.notifications = this.notifications.concat(state.data.page.content
+                .map((not: any) => Object.assign({}, not, { date: zoneDateToDate(not.date) })));
+              this.showMore = !state.data.page.last;
+              this.badge = state.data.unread;
+            }
           } else {
             this.loadingNotifications = state.data.page.content;
           }

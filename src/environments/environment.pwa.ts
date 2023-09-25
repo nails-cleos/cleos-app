@@ -1,8 +1,9 @@
 export const environment = {
   production: true,
   useEmulators: false,
+  firebaseMessaging: 'firebase-messaging-sw-dev.js',
   recaptcha: {
-    siteKey: '6Lc7KGEnAAAAAERpXU8AdaBpHtqGz9cuD6C8DTmZ'
+    siteKey: '6Ldp5DgoAAAAAO9KDBFMNoyuTaJpIoGx8a8D04so'
   },
   appServer: 'http://localhost:4200',
   title: 'Cleos PWA',
