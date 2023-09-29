@@ -33,6 +33,10 @@ export class PaymentService {
     return this.http.get<IPayment>(url);
   }
 
+  public paymentOptions(): Observable<IPayment | undefined> {
+    return this.http.get<IPayment>(this.urlV1);
+  }
+
   public add(reservationId: string, status: string, paymentStatus: IPaymentStatus): Observable<IPayment> {
     return this.http.post<IPayment>(`${ this.reservationUrlV1 }/${ reservationId }/${ this.url }/${ status }`, paymentStatus);
   }

@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { IPrice } from '../../../interfaces/treatment';
+import { IPrice, PENALTY } from '../../../interfaces/treatment';
 import { ICurrency } from '../../../interfaces/currency';
 
 @Component({
@@ -22,6 +22,7 @@ export class CancelDialogComponent implements OnInit {
   price?: IPrice;
   currency: ICurrency;
   showPenalty: boolean;
+  penalty = PENALTY;
 
   constructor(public dialogRef: MatDialogRef<CancelDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
               private formBuilder: FormBuilder) {

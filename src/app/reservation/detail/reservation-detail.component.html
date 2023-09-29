@@ -233,7 +233,7 @@
         <ng-container matColumnDef="type">
           <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
           <td *matCellDef="let payment; let i = dataIndex;" fxHide.lt-sm fxShow mat-cell>
-            <ng-template [ngIf]="professionalId && ['CASH', 'TRANSFER'].includes(payment.type)" [ngIfElse]="noChange"
+            <ng-template [ngIf]="!professionalId && ['CASH', 'TRANSFER'].includes(payment.type)" [ngIfElse]="noChange"
                          [formGroup]="form">
               <ng-container formArrayName="payments">
                 <div [formGroupName]="i">
@@ -265,7 +265,7 @@
           <td *matCellDef="let payment" fxHide.lt-sm fxShow mat-cell>
             <div *ngIf="payment.id; else skeleton">
               <ng-template
-                [ngIf]="!['APPROVED', 'APPROVED_REFUND', 'REFUND_PENDING', 'REFUND', 'PENDING'].includes(payment.status)">
+                [ngIf]="!['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND_PENDING', 'REFUND', 'PENDING'].includes(payment.status)">
                 <button [routerLink]="['/me', 'payment', payment.id]" mat-icon-button
                         matTooltip="{{ 'COMMON.BUTTON.PAYMENT' | translate }}" matTooltipPosition="right">
                   <mat-icon class="payment-button" color="primary">payment</mat-icon>
@@ -359,7 +359,7 @@
                 </mat-list-item>
               </mat-list>
               <ng-template
-                [ngIf]="!['APPROVED', 'APPROVED_REFUND', 'REFUND_PENDING', 'REFUND', 'PENDING'].includes(payment.status)">
+                [ngIf]="!['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND_PENDING', 'REFUND', 'PENDING'].includes(payment.status)">
                 <mat-list>
                   <div mat-subheader>{{ 'COMMON.BUTTON.PAYMENT' | translate }}</div>
                   <mat-list-item role="list">

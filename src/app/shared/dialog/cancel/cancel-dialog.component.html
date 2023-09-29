@@ -7,7 +7,7 @@
       <mat-label>{{ 'RESERVATION.CANCEL.FIELD' | translate }}</mat-label>
       <mat-radio-group class="radio-group" [formControl]="paymentCancellation">
         <mat-radio-button class="radio-button" *ngFor="let option of options" [value]="option">
-          <div [innerHTML]="'RESERVATION.CANCEL.OPTION.' + option | translate"></div>
+          <div [innerHTML]="'RESERVATION.CANCEL.OPTION.' + option | translate:{penalty: penalty}"></div>
         </mat-radio-button>
       </mat-radio-group>
       <ng-template *ngIf="paymentCancellation.hasError('required')">

@@ -6,24 +6,23 @@
       </div>
     </ng-template>
     <mat-form-field appearance="outline">
-      <mat-icon *ngIf="formGroup.get('type')?.value" matPrefix [svgIcon]="formGroup.get('type')?.value"
-                class="svg-icon"></mat-icon>
-      <mat-icon *ngIf="!formGroup.get('type')?.value" matPrefix>account_balance</mat-icon>
+      <mat-icon *ngIf="type" matPrefix [svgIcon]="type.svgIcon" class="svg-icon"></mat-icon>
+      <mat-icon *ngIf="!type?.svgIcon" matPrefix>account_balance</mat-icon>
       <mat-label>{{ 'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate }}</mat-label>
       <mat-select [formControlName]="'type'" [required]="firstTime">
         <mat-option *ngIf="!firstTime">--</mat-option>
-        <mat-option *ngFor="let t of types" [value]="t">
-          <mat-icon [svgIcon]="t" class="svg-icon"></mat-icon>
-          {{ 'COMMON.PAYMENT.TYPE.' + (t || 'NONE') | translate }}
+        <mat-option *ngFor="let t of options" [value]="t">
+          <mat-icon [svgIcon]="t.svgIcon" class="svg-icon"></mat-icon>
+          {{ t.name }}
         </mat-option>
       </mat-select>
       <mat-error [innerHTML]="'COMMON.PAYMENT.TYPE.FIELD.REQUIRED' | translate">
       </mat-error>
     </mat-form-field>
-    <mat-form-field appearance="outline" *ngIf="bankList?.length && formGroup.get('type')?.value === 'IDEAL'">
-      <mat-icon *ngIf="formGroup.get('bank')?.value" matPrefix [svgIcon]="formGroup.get('bank')?.value.bic"
+    <mat-form-field appearance="outline" *ngIf="bankList?.length">
+      <mat-icon *ngIf="formGroup.get('bank')?.value?.svgIcon" matPrefix [svgIcon]="formGroup.get('bank')?.value?.svgIcon"
                 class="svg-icon"></mat-icon>
-      <mat-icon *ngIf="!formGroup.get('bank')?.value" matPrefix>account_balance</mat-icon>
+      <mat-icon *ngIf="!formGroup.get('bank')?.value?.svgIcon" matPrefix>account_balance</mat-icon>
       <mat-label>{{ 'COMMON.PAYMENT.BANK.FIELD' | translate }}</mat-label>
       <label>
         <input (keydown)="keyDownHandler($event)" [formControlName]="'bank'" [matAutocomplete]="autoBank" matInput
@@ -31,7 +30,7 @@
       </label>
       <mat-autocomplete #autoBank="matAutocomplete" [displayWith]="displayFnBank">
         <mat-option *ngFor="let bank of filteredBank | async" [value]="bank">
-          <mat-icon [svgIcon]="bank.bic" class="svg-icon"></mat-icon>
+          <mat-icon [svgIcon]="bank.svgIcon" class="svg-icon"></mat-icon>
           {{bank.name}}
         </mat-option>
       </mat-autocomplete>
@@ -44,7 +43,7 @@
     </mat-form-field>
     <ng-template [ngIf]="formGroup.get('percentage') && formGroup.get('type')?.value">
       <mat-radio-group [formControlName]="'percentage'" aria-label="Select an option" required>
-        <mat-radio-button value="DEPOSIT_30">{{'COMMON.PAYMENT.DEPOSIT_30' | translate}}</mat-radio-button>
+        <mat-radio-button value="DEPOSIT_50">{{'COMMON.PAYMENT.DEPOSIT_50' | translate}}</mat-radio-button>
         <mat-radio-button value="TOTAL">{{'COMMON.PAYMENT.TOTAL' | translate}}</mat-radio-button>
       </mat-radio-group>
     </ng-template>

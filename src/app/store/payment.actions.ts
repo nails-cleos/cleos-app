@@ -15,6 +15,7 @@ export enum PaymentActionTypes {
   paymentSelected = '[Payment] Selected',
   paymentByReservation = '[Payment] Find by reservation',
   paymentFind = '[Payment] Find',
+  paymentOptions = '[Payment] Options',
   paymentCreate = '[Payment] Create',
   clean = '[Payment] Clean'
 }
@@ -117,6 +118,10 @@ export class PaymentFind implements Action {
   }
 }
 
+export class PaymentOptions implements Action {
+  readonly type = PaymentActionTypes.paymentOptions;
+}
+
 export class PaymentCreate implements Action {
   readonly type = PaymentActionTypes.paymentCreate;
 
@@ -144,4 +149,5 @@ export type All =
   | PaymentFind
   | PaymentSelected
   | PaymentCreate
+  | PaymentOptions
   | Clean;

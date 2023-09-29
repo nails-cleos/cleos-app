@@ -255,11 +255,11 @@
 
 <ng-template #stepFive>
   <form [formGroup]="typeForm">
-    <div *ngIf="!types?.length; else data" class="no-content bold">
+    <div *ngIf="!options?.length; else data" class="no-content bold">
       {{'ME.PAYMENT.TYPE.NO_CONTENT' | translate}}
     </div>
     <ng-template #data>
-      <app-price [price]="oldPrice" [typeForm]="typeForm" [types]="types" [currency]="room.value.currency"
+      <app-price [price]="oldPrice" [typeForm]="typeForm" [options]="options" [currency]="room.value.currency"
                  [firstTime]="firstTime" [professionalName]="professionalName" [showBank]="true"
                  (percentageEmitter)="getPercentage($event)" [showPenalty]="showPenalty"></app-price>
     </ng-template>
@@ -402,34 +402,15 @@
               </ng-template>
             </mat-list-item>
           </ng-template>
-          <ng-template [ngIf]="typeForm.get('type')?.value">
-            <mat-divider></mat-divider>
-            <div mat-subheader>{{ 'ME.PAYMENT.DETAIL' | translate}}</div>
-            <mat-list-item>
-              <mat-icon matListItemIcon [svgIcon]="typeForm.get('type')?.value"></mat-icon>
-              <div matListItemTitle>{{ 'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate}}</div>
-              <div matListItemLine>
-                {{ 'COMMON.PAYMENT.TYPE.' + (typeForm.get('type')?.value || 'NONE') | translate }}
-              </div>
-            </mat-list-item>
-            <ng-template [ngIf]="typeForm.get('bank')?.value">
-              <mat-list-item>
-                <mat-icon matListItemIcon [svgIcon]="typeForm.get('bank')?.value?.bic"></mat-icon>
-                <div matListItemTitle>{{ 'COMMON.PAYMENT.BANK.FIELD' | translate}}</div>
-                <div matListItemLine>{{typeForm.get('bank')?.value?.name}}</div>
-              </mat-list-item>
-            </ng-template>
-            <mat-list-item>
-              <mat-icon matListItemIcon>{{room.value.currency.icon}}</mat-icon>
-              <div matListItemTitle><span class="bold">{{ 'COMMON.LABEL.TOTAL' | translate}}</span></div>
-              <div matListItemLine><span class="bold">{{price.toPaid || oldPrice?.penalty}}</span></div>
-            </mat-list-item>
-          </ng-template>
+          <app-payment-preview [type]="typeForm.get('type')?.value" [bank]="typeForm.get('bank')?.value"
+                               [currencyIcon]="room.value.currency.icon" [toPaid]="price.toPaid"
+                               [penalty]="oldPrice?.penalty"></app-payment-preview>
         </mat-list>
         <mat-divider style="margin-bottom: 2%;"></mat-divider>
         <mat-label>{{ 'COMMON.PAYMENT.CANCELLATION_POLICY.TITLE' | translate }}</mat-label>
         <div *ngFor="let item of [1, 2, 3]">
-          {{item}})&nbsp;<span [innerHTML]="'COMMON.PAYMENT.CANCELLATION_POLICY.' + item | translate"></span>
+          {{item}})&nbsp;<span
+          [innerHTML]="'COMMON.PAYMENT.CANCELLATION_POLICY.' + item | translate:{penalty: penalty}"></span>
         </div>
         <mat-checkbox [formControl]="accept" required>
           {{ 'COMMON.BUTTON.ACCEPT' | translate}}

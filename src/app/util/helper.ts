@@ -398,7 +398,7 @@ export const isProfessional = (id: string, professionals?: IUser[]): boolean =>
   professionals ? professionals?.some(professional => professional.id === id) : false;
 
 export const totalPaid = (payments: IPayment[] | undefined): number => payments?.filter(
-  (p: IPayment) => p.status && ['APPROVED', 'APPROVED_REFUND', 'REFUND'].includes(p.status))?.map((p: IPayment) =>
+  (p: IPayment) => p.status && ['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND'].includes(p.status))?.map((p: IPayment) =>
   p.transactionAmount).reduce((acc: number, value: number | undefined) => acc + (value ? value : 0), 0) || 0;
 
 export const areEquals = (array1: any[], array2: any[]): boolean => (array1.length === array2.length &&

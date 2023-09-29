@@ -30,6 +30,7 @@
       "ML": "Pagar con ML",
       "PAYPAL": "Pagar con PayPal",
       "IDEAL": "Pagar con iDeal",
+      "PAY_NL": "Pagar con PAY.",
       "NOTIFY": "Notificar",
       "SELECT": "Seleccionar",
       "UNAVAILABLE": "Agregar no disponible",
@@ -104,6 +105,7 @@
         "ML": "Mercado Libre",
         "PAYPAL": "PayPal",
         "IDEAL": "iDeal",
+        "PAY_NL": "PAY.",
         "TRANSFER": "Transferencia bancaria",
         "NONE": "Pago no seleccionado",
         "PENDING": "Pendiente"
@@ -119,15 +121,15 @@
         "PENALTY": "Penalización: {{amount}} {{symbol}}",
         "D_OR_R": "Descuento o reembolso: {{amount}} {{symbol}}"
       },
-      "DEPOSIT_30": "Pagar un depósito del 30% de la reserva",
+      "DEPOSIT_50": "Pagar un depósito del 50% de la reserva",
       "TOTAL": "Pagar total de la reserva",
       "PENDING": "Pago pendiente",
       "SUCCESS": "Pago completado",
       "ERROR": "Error en el pago. {{reason}}",
       "CANCELLATION_POLICY": {
         "TITLE": "Políticas de cancelación/cambios",
-        "1": "<span class='important'>Aviso menor a 24 horas</span> resultara en un cargo del <span class='important'>30%</span> del precio del tratamiento.",
-        "2": "<span class='important'>“No show”</span> también se cobrará el <span class='important'>30%</span> del precio del tratamiento reservado.",
+        "1": "<span class='important'>Aviso menor a 24 horas</span> resultara en un cargo del <span class='important'>{{penalty}}%</span> del precio del tratamiento.",
+        "2": "<span class='important'>“No show”</span> también se cobrará el <span class='important'>{{penalty}}%</span> del precio del tratamiento reservado.",
         "3": "La cancelación/cambios de una cita realizada <span class='important'>dentro de las 24 horas anteriores</span> dará lugar a <span class='important'>reembolso o un vale de descuento</span> por el importe abonado."
       }
     },
@@ -172,7 +174,8 @@
         "CREATED": "Creado",
         "UNKNOWN": "Desconocido",
         "REFUND": "Reembolsado",
-        "REFUND_PENDING": "Reembolso pendiente"
+        "REFUND_PENDING": "Reembolso pendiente",
+        "REFUND_FAILURE": "Reembolso rechazado"
       },
       "RESERVATION": {
         "CREATED": "Creada",
@@ -321,7 +324,7 @@
       },
       "EDIT": {
         "TITLE": "Editar reserva",
-        "TEXT": "Aviso menor a 24 horas resultara en un cargo del 30% del precio del tratamiento."
+        "TEXT": "Aviso menor a 24 horas resultara en un cargo del {{penalty}}% del precio del tratamiento."
       }
     },
     "TIME_ZONE": {
@@ -370,15 +373,15 @@
   },
   "WHATSAPP": {
     "SEND": {
-      "APPROVE": "♡ \uD835\uDC77\uD835\uDC79\uD835\uDC76\uD835\uDC7F\uD835\uDC70\uD835\uDC74\uD835\uDC68 \uD835\uDC6A\uD835\uDC70\uD835\uDC7B\uD835\uDC68 ♡%0A{{date}}%0A%0A⚠️ ʟᴀ ᴄɪᴛᴀ ᴘᴜᴇᴅᴇ ꜱᴇʀ ᴄᴀɴᴄᴇʟᴀᴅᴀ, ꜱɪɴ ᴄᴀʀɢᴏ, ʜᴀꜱᴛᴀ 24ʜꜱ ᴀɴᴛᴇꜱ. ᴅᴇ ʟᴏ ᴄᴏɴᴛʀᴀʀɪᴏ ᴅᴇʙᴇʀᴀ ᴀʙᴏɴᴀʀ ᴀʟ ᴍᴇɴᴏꜱ ᴇʟ 30% ᴅᴇʟ ᴛʀᴀᴛᴀᴍɪᴇɴᴛᴏ. %0Aᴍᴜᴄʜᴀꜱ ɢʀᴀᴄɪᴀꜱ ᴘᴏʀ ᴄᴏᴍᴘʀᴇɴᴅᴇʀ!%0A%0A♡ \uD835\uDC75\uD835\uDC90\uD835\uDC94 \uD835\uDC97\uD835\uDC86\uD835\uDC8E\uD835\uDC90\uD835\uDC94! ♡",
+      "APPROVE": "♡ \uD835\uDC77\uD835\uDC79\uD835\uDC76\uD835\uDC7F\uD835\uDC70\uD835\uDC74\uD835\uDC68 \uD835\uDC6A\uD835\uDC70\uD835\uDC7B\uD835\uDC68 ♡%0A{{date}}%0A%0A⚠️ ʟᴀ ᴄɪᴛᴀ ᴘᴜᴇᴅᴇ ꜱᴇʀ ᴄᴀɴᴄᴇʟᴀᴅᴀ, ꜱɪɴ ᴄᴀʀɢᴏ, ʜᴀꜱᴛᴀ 24ʜꜱ ᴀɴᴛᴇꜱ. ᴅᴇ ʟᴏ ᴄᴏɴᴛʀᴀʀɪᴏ ᴅᴇʙᴇʀᴀ ᴀʙᴏɴᴀʀ ᴀʟ ᴍᴇɴᴏꜱ ᴇʟ 50% ᴅᴇʟ ᴛʀᴀᴛᴀᴍɪᴇɴᴛᴏ. %0Aᴍᴜᴄʜᴀꜱ ɢʀᴀᴄɪᴀꜱ ᴘᴏʀ ᴄᴏᴍᴘʀᴇɴᴅᴇʀ!%0A%0A♡ \uD835\uDC75\uD835\uDC90\uD835\uDC94 \uD835\uDC97\uD835\uDC86\uD835\uDC8E\uD835\uDC90\uD835\uDC94! ♡",
       "TODAY": "♕\uD835\uDC79\uD835\uDC86\uD835\uDC84\uD835\uDC90\uD835\uDC93\uD835\uDC85\uD835\uDC82\uD835\uDC95\uD835\uDC90\uD835\uDC93\uD835\uDC8A\uD835\uDC90 \uD835\uDC85\uD835\uDC86 \uD835\uDC95\uD835\uDC96\uD835\uDC93\uD835\uDC8F\uD835\uDC90♕%0Aℍ\uD835\uDD60\uD835\uDD5D\uD835\uDD52!!! ℍ\uD835\uDD60\uD835\uDD6A {{date}} ℍ\uD835\uDD64 \uD835\uDD65\uD835\uDD56\uD835\uDD5Fé\uD835\uDD64 \uD835\uDD65\uD835\uDD66 \uD835\uDD64\uD835\uDD56\uD835\uDD64\uD835\uDD5Aó\uD835\uDD5F \uD835\uDD55\uD835\uDD56 \uD835\uDD66ñ\uD835\uDD52\uD835\uDD64 ♡♡♡  ℂ\uD835\uDD60\uD835\uDD5F\uD835\uDD57í\uD835\uDD63\uD835\uDD5E\uD835\uDD52\uD835\uDD5E\uD835\uDD56 \uD835\uDD62\uD835\uDD66\uD835\uDD56 \uD835\uDD52\uD835\uDD64\uD835\uDD5A\uD835\uDD64\uD835\uDD65\uD835\uDD5A\uD835\uDD63á\uD835\uDD64 \uD835\uDD61\uD835\uDD60\uD835\uDD63 \uD835\uDD57\uD835\uDD52\uD835\uDD67\uD835\uDD60\uD835\uDD63.%0A❀ \uD835\uDD39\uD835\uDD56\uD835\uDD64\uD835\uDD5A\uD835\uDD65\uD835\uDD60 ❀",
-      "COFFEE": "♡ RECORDATORIO ♡%0A%0A\uD835\uDC74\uD835\uDC82ñ\uD835\uDC82\uD835\uDC8F\uD835\uDC82 {{date}}, \uD835\uDC6A\uD835\uDC8D\uD835\uDC86\uD835\uDC90\uD835\uDC94 \uD835\uDC95\uD835\uDC86 \uD835\uDC86\uD835\uDC94\uD835\uDC91\uD835\uDC86\uD835\uDC93\uD835\uDC82!%0A%0A⚠️ ʟᴀ ᴄɪᴛᴀ ᴘᴜᴇᴅᴇ ꜱᴇʀ ᴄᴀɴᴄᴇʟᴀᴅᴀ, ꜱɪɴ ᴄᴀʀɢᴏ, ʜᴀꜱᴛᴀ 24ʜꜱ ᴀɴᴛᴇꜱ. ᴅᴇ ʟᴏ ᴄᴏɴᴛʀᴀʀɪᴏ ᴅᴇʙᴇʀᴀ ᴀʙᴏɴᴀʀ ᴀʟ ᴍᴇɴᴏꜱ ᴇʟ 30% ᴅᴇʟ ᴛʀᴀᴛᴀᴍɪᴇɴᴛᴏ. %0Aᴍᴜᴄʜᴀꜱ ɢʀᴀᴄɪᴀꜱ ᴘᴏʀ ᴄᴏᴍᴘʀᴇɴᴅᴇʀ!%0A%0A♡ \uD835\uDC75\uD835\uDC90\uD835\uDC94 \uD835\uDC97\uD835\uDC86\uD835\uDC8E\uD835\uDC90\uD835\uDC94! ♡",
-      "TOMORROW": "♡ RECORDATORIO ♡%0A%0A\uD835\uDC74\uD835\uDC82ñ\uD835\uDC82\uD835\uDC8F\uD835\uDC82 {{date}}, \uD835\uDC6A\uD835\uDC8D\uD835\uDC86\uD835\uDC90\uD835\uDC94 \uD835\uDC95\uD835\uDC86 \uD835\uDC86\uD835\uDC94\uD835\uDC91\uD835\uDC86\uD835\uDC93\uD835\uDC82!%0A%0A⚠️ ʟᴀ ᴄɪᴛᴀ ᴘᴜᴇᴅᴇ ꜱᴇʀ ᴄᴀɴᴄᴇʟᴀᴅᴀ, ꜱɪɴ ᴄᴀʀɢᴏ, ʜᴀꜱᴛᴀ 24ʜꜱ ᴀɴᴛᴇꜱ. ᴅᴇ ʟᴏ ᴄᴏɴᴛʀᴀʀɪᴏ ᴅᴇʙᴇʀᴀ ᴀʙᴏɴᴀʀ ᴀʟ ᴍᴇɴᴏꜱ ᴇʟ 30% ᴅᴇʟ ᴛʀᴀᴛᴀᴍɪᴇɴᴛᴏ. %0Aᴍᴜᴄʜᴀꜱ ɢʀᴀᴄɪᴀꜱ ᴘᴏʀ ᴄᴏᴍᴘʀᴇɴᴅᴇʀ!%0A%0A♡ \uD835\uDC75\uD835\uDC90\uD835\uDC94 \uD835\uDC97\uD835\uDC86\uD835\uDC8E\uD835\uDC90\uD835\uDC94! ♡",
+      "COFFEE": "♡ RECORDATORIO ♡%0A%0A\uD835\uDC74\uD835\uDC82ñ\uD835\uDC82\uD835\uDC8F\uD835\uDC82 {{date}}, \uD835\uDC6A\uD835\uDC8D\uD835\uDC86\uD835\uDC90\uD835\uDC94 \uD835\uDC95\uD835\uDC86 \uD835\uDC86\uD835\uDC94\uD835\uDC91\uD835\uDC86\uD835\uDC93\uD835\uDC82!%0A%0A⚠️ ʟᴀ ᴄɪᴛᴀ ᴘᴜᴇᴅᴇ ꜱᴇʀ ᴄᴀɴᴄᴇʟᴀᴅᴀ, ꜱɪɴ ᴄᴀʀɢᴏ, ʜᴀꜱᴛᴀ 24ʜꜱ ᴀɴᴛᴇꜱ. ᴅᴇ ʟᴏ ᴄᴏɴᴛʀᴀʀɪᴏ ᴅᴇʙᴇʀᴀ ᴀʙᴏɴᴀʀ ᴀʟ ᴍᴇɴᴏꜱ ᴇʟ 50% ᴅᴇʟ ᴛʀᴀᴛᴀᴍɪᴇɴᴛᴏ. %0Aᴍᴜᴄʜᴀꜱ ɢʀᴀᴄɪᴀꜱ ᴘᴏʀ ᴄᴏᴍᴘʀᴇɴᴅᴇʀ!%0A%0A♡ \uD835\uDC75\uD835\uDC90\uD835\uDC94 \uD835\uDC97\uD835\uDC86\uD835\uDC8E\uD835\uDC90\uD835\uDC94! ♡",
+      "TOMORROW": "♡ RECORDATORIO ♡%0A%0A\uD835\uDC74\uD835\uDC82ñ\uD835\uDC82\uD835\uDC8F\uD835\uDC82 {{date}}, \uD835\uDC6A\uD835\uDC8D\uD835\uDC86\uD835\uDC90\uD835\uDC94 \uD835\uDC95\uD835\uDC86 \uD835\uDC86\uD835\uDC94\uD835\uDC91\uD835\uDC86\uD835\uDC93\uD835\uDC82!%0A%0A⚠️ ʟᴀ ᴄɪᴛᴀ ᴘᴜᴇᴅᴇ ꜱᴇʀ ᴄᴀɴᴄᴇʟᴀᴅᴀ, ꜱɪɴ ᴄᴀʀɢᴏ, ʜᴀꜱᴛᴀ 24ʜꜱ ᴀɴᴛᴇꜱ. ᴅᴇ ʟᴏ ᴄᴏɴᴛʀᴀʀɪᴏ ᴅᴇʙᴇʀᴀ ᴀʙᴏɴᴀʀ ᴀʟ ᴍᴇɴᴏꜱ ᴇʟ 50% ᴅᴇʟ ᴛʀᴀᴛᴀᴍɪᴇɴᴛᴏ. %0Aᴍᴜᴄʜᴀꜱ ɢʀᴀᴄɪᴀꜱ ᴘᴏʀ ᴄᴏᴍᴘʀᴇɴᴅᴇʀ!%0A%0A♡ \uD835\uDC75\uD835\uDC90\uD835\uDC94 \uD835\uDC97\uD835\uDC86\uD835\uDC8E\uD835\uDC90\uD835\uDC94! ♡",
       "FOLLOWINGS": {
         "TITLE": "\uD835\uDC7B\uD835\uDC96\uD835\uDC94 \uD835\uDC93\uD835\uDC86\uD835\uDC94\uD835\uDC86\uD835\uDC93\uD835\uDC97\uD835\uDC82\uD835\uDC94%0A",
         "VALUE": "%0A♡ {{date}}"
       },
-      "ATTENTION": "%0A%0A⚠️ ʟᴀ ᴄɪᴛᴀ ᴘᴜᴇᴅᴇ ꜱᴇʀ ᴄᴀɴᴄᴇʟᴀᴅᴀ, ꜱɪɴ ᴄᴀʀɢᴏ, ʜᴀꜱᴛᴀ 24ʜꜱ ᴀɴᴛᴇꜱ. ᴅᴇ ʟᴏ ᴄᴏɴᴛʀᴀʀɪᴏ ᴅᴇʙᴇʀᴀ ᴀʙᴏɴᴀʀ ᴀʟ ᴍᴇɴᴏꜱ ᴇʟ 30% ᴅᴇʟ ᴛʀᴀᴛᴀᴍɪᴇɴᴛᴏ. %0Aᴍᴜᴄʜᴀꜱ ɢʀᴀᴄɪᴀꜱ ᴘᴏʀ ᴄᴏᴍᴘʀᴇɴᴅᴇʀ!%0A%0A♡ \uD835\uDC75\uD835\uDC90\uD835\uDC94 \uD835\uDC97\uD835\uDC86\uD835\uDC8E\uD835\uDC90\uD835\uDC94! ♡"
+      "ATTENTION": "%0A%0A⚠️ ʟᴀ ᴄɪᴛᴀ ᴘᴜᴇᴅᴇ ꜱᴇʀ ᴄᴀɴᴄᴇʟᴀᴅᴀ, ꜱɪɴ ᴄᴀʀɢᴏ, ʜᴀꜱᴛᴀ 24ʜꜱ ᴀɴᴛᴇꜱ. ᴅᴇ ʟᴏ ᴄᴏɴᴛʀᴀʀɪᴏ ᴅᴇʙᴇʀᴀ ᴀʙᴏɴᴀʀ ᴀʟ ᴍᴇɴᴏꜱ ᴇʟ 50% ᴅᴇʟ ᴛʀᴀᴛᴀᴍɪᴇɴᴛᴏ. %0Aᴍᴜᴄʜᴀꜱ ɢʀᴀᴄɪᴀꜱ ᴘᴏʀ ᴄᴏᴍᴘʀᴇɴᴅᴇʀ!%0A%0A♡ \uD835\uDC75\uD835\uDC90\uD835\uDC94 \uD835\uDC97\uD835\uDC86\uD835\uDC8E\uD835\uDC90\uD835\uDC94! ♡"
     }
   },
   "APP": {

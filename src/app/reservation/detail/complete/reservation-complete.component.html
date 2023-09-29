@@ -80,7 +80,7 @@
               </mat-form-field>
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'RESERVATION.TREATMENT.EXTRAS.PRICE' | translate }}</mat-label>
-                <span matPrefix><mat-icon matPrefix>attach_money</mat-icon> &nbsp;</span>
+                <span matPrefix><mat-icon matPrefix>{{reservation.room.currency.icon}}</mat-icon> &nbsp;</span>
                 <label>
                   <input [formControl]="extraPrice" matInput type="number">
                 </label>
@@ -141,7 +141,8 @@
                     </ng-template>
                     <div matListItemTitle>
                       <span [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.PRICE' | translate"></span>
-                      <span class="vertical-divider bold">$ {{price.amount | number:'1.2-2'}}</span>
+                      <span
+                        class="vertical-divider bold"> {{reservation.room.currency | currencySymbol}} {{price.amount | number:'1.2-2'}}</span>
                     </div>
                     <ng-template [ngIf]="durability">
                       <div [innerHTML]="durability" matListItemLine></div>

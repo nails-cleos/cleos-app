@@ -22,6 +22,9 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
   payerId: any;
   token: any;
   reason: any;
+  private orderId: any;
+  private orderStatusId: any;
+  private paymentSessionId: any;
 
   constructor(private route: ActivatedRoute, private router: Router, private store: Store<AppState>,
               private translate: TranslateService) {
@@ -32,6 +35,9 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
       this.payerId = params.PayerID;
       this.token = params.token;
       this.reason = params.reason || params.errorcode;
+      this.orderId = params.orderId;
+      this.orderStatusId = params.orderStatusId;
+      this.paymentSessionId = params.paymentSessionId;
     });
   }
 
@@ -46,7 +52,7 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
   ngAfterViewInit(): void {
     setTimeout(() => {
       this.reservationId = this.route.snapshot.paramMap.get('id');
-      const status = this.route.snapshot.paramMap.get('status');
+      let status = this.route.snapshot.paramMap.get('status');
       // TODO analytic payment option
       let type;
       let referenceId;
@@ -61,18 +67,28 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
       } else if (this.token) {
         type = PaymentType.ideal;
         referenceId = this.token;
+      } else if (status === 'status') {
+        if (this.orderStatusId === '100') {
+          status = 'approved';
+        } else if (this.orderStatusId > 0) {
+          status = 'pending';
+        } else {
+          status = 'cancelled';
+        }
+        type = PaymentType.paynl;
+        referenceId = this.orderId;
       }
       if (!type || !referenceId) {
-        const message = this.translate.instant('ME.PAYMENT.ERROR', {reason: 'incomplete'});
+        const message = this.translate.instant('ME.PAYMENT.ERROR', { reason: 'incomplete' });
         this.store.dispatch(
-          new fromActionsPayment.PaymentNotComplete({message})
+          new fromActionsPayment.PaymentNotComplete({ message })
         );
         this.router.navigate(['me', 'reservation', this.reservationId, 'payment']);
         return;
       }
       const paymentStatus = new PaymentStatus(this.paymentId, type, referenceId, this.reason);
       this.store.dispatch(
-        new fromActionsPayment.PaymentSave({reservationId: this.reservationId, status, paymentStatus})
+        new fromActionsPayment.PaymentSave({ reservationId: this.reservationId, status, paymentStatus })
       );
     }, 500);
   }

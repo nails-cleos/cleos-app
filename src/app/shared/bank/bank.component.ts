@@ -1,9 +1,9 @@
 import { AfterViewInit, Component, EventEmitter, Input, Output } from '@angular/core';
-import { banks, IBank } from '../../interfaces/bank';
 import { Observable } from 'rxjs';
 import { UntypedFormGroup, Validators } from '@angular/forms';
 import { requireMatch } from '../../util/validators';
 import { map, startWith } from 'rxjs/operators';
+import { IPaymentOption } from '../../interfaces/payment';
 
 @Component({
   selector: 'app-bank',
@@ -12,20 +12,22 @@ import { map, startWith } from 'rxjs/operators';
 })
 export class BankComponent implements AfterViewInit {
   @Input() formGroup!: UntypedFormGroup;
-  @Input() types?: string[];
+  @Input() options?: IPaymentOption[];
   @Input() firstTime!: boolean;
   @Input() professionalName?: string;
   @Output() percentageEmitter = new EventEmitter<number>();
 
-  bankList?: IBank[] = banks();
-  filteredBank?: Observable<IBank[] | undefined>;
+  bankList?: IPaymentOption[] = [];
+  filteredBank?: Observable<IPaymentOption[] | undefined>;
+
+  type?: IPaymentOption;
 
   ngAfterViewInit(): void {
     this.formChanges();
     this.createFilter();
   }
 
-  displayFnBank(bank: IBank): string {
+  displayFnBank(bank: IPaymentOption): string {
     return bank ? `${ bank.name }` : '';
   }
 
@@ -42,8 +44,12 @@ export class BankComponent implements AfterViewInit {
     }
 
     this.formGroup.get('type')?.valueChanges.subscribe(value => {
-      if (value === 'IDEAL') {
+      this.type = value;
+      if (value.subTypes?.length) {
+        this.bankList = value.subTypes;
         this.formGroup.get('bank')?.setValidators([Validators.required, requireMatch]);
+      } else {
+        this.bankList = [];
       }
       this.formGroup.get('percentage')?.setValidators([Validators.required]);
     });
@@ -54,8 +60,8 @@ export class BankComponent implements AfterViewInit {
         case 'TOTAL':
           percentage = 100;
           break;
-        case 'DEPOSIT_30':
-          percentage = 30;
+        case 'DEPOSIT_50':
+          percentage = 50;
           break;
         default:
           percentage = 0;
@@ -69,12 +75,12 @@ export class BankComponent implements AfterViewInit {
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filterBank(name) : this.bankList ? this.bankList.slice() : this.bankList));
 
-    if (this.firstTime && this.types?.length === 1) {
-      this.formGroup.get('type')?.setValue(this.types[0]);
+    if (this.firstTime && this.options?.length === 1) {
+      this.formGroup.get('type')?.setValue(this.options[0]);
     }
   }
 
-  private filterBank(name: string): IBank[] | undefined {
+  private filterBank(name: string): IPaymentOption[] | undefined {
     const filterValue = name.toLowerCase();
 
     return this.bankList?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);

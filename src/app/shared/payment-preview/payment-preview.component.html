@@ -1,0 +1,19 @@
+<mat-divider></mat-divider>
+<div mat-subheader>{{ 'ME.PAYMENT.DETAIL' | translate}}</div>
+<ng-template [ngIf]="type">
+  <mat-list-item>
+    <mat-icon matListItemIcon [svgIcon]="type.svgIcon"></mat-icon>
+    <div matListItemTitle>{{ 'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate}}</div>
+    <div matListItemLine>{{type.name}}</div>
+  </mat-list-item>
+  <mat-list-item *ngIf="type.subTypes.length && bank">
+    <mat-icon matListItemIcon [svgIcon]="bank.svgIcon"></mat-icon>
+    <div matListItemTitle>{{ 'COMMON.PAYMENT.BANK.FIELD' | translate}}</div>
+    <div matListItemLine>{{bank.name}}</div>
+  </mat-list-item>
+  <mat-list-item *ngIf="toPaid || penalty">
+    <mat-icon matListItemIcon>{{currencyIcon}}</mat-icon>
+    <div matListItemTitle><span class="bold">{{ 'COMMON.LABEL.TOTAL' | translate}}</span></div>
+    <div matListItemLine><span class="bold">{{toPaid || penalty}}</span></div>
+  </mat-list-item>
+</ng-template>

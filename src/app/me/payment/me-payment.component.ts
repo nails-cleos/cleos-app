@@ -5,8 +5,9 @@ import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute } from '@angular/router';
 import * as fromActionsPayment from '../../store/payment.actions';
-import { IPaymentAll } from '../../interfaces/payment';
+import { getPaymentOptions, getPayNlOptions, IPaymentAll, IPaymentOption, PaymentType } from '../../interfaces/payment';
 import { Analytics, logEvent } from '@angular/fire/analytics';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-me-payment',
@@ -16,7 +17,7 @@ import { Analytics, logEvent } from '@angular/fire/analytics';
 export class MePaymentComponent implements OnInit, OnDestroy {
 
   typeForm: UntypedFormGroup;
-  types?: string[];
+  options?: IPaymentOption[];
 
   payment?: IPaymentAll;
 
@@ -24,7 +25,7 @@ export class MePaymentComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
 
   constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private route: ActivatedRoute,
-              private analytic: Analytics) {
+              private analytic: Analytics, private translate: TranslateService) {
     this.getState = this.store.select(selectPaymentState);
     this.typeForm = this.formBuilder.group({
       type: new UntypedFormControl(undefined),
@@ -37,14 +38,16 @@ export class MePaymentComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const type = this.typeForm.get('type')?.value;
+    const option: IPaymentOption = this.typeForm.get('type')?.value;
+    const type = option.type;
+    const paymentOptionId = option.paymentId;
     const payload = {
       id: this.payment?.id,
-      payment: {
-        type,
-        bic: this.typeForm.get('bank')?.value?.id
-      }
+      payment: { type, paymentOptionId, bic: undefined }
     };
+    if (option.subTypes.length) {
+      payload.payment.bic = this.typeForm.get('bank')?.value?.paymentId;
+    }
 
     return this.store.dispatch(
       new fromActionsPayment.PaymentUpdateLink(payload)
@@ -74,15 +77,31 @@ export class MePaymentComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      this.payment = state.selected;
-      const reservation = this.payment?.reservation;
-      this.types = reservation?.room?.paymentTypes?.filter((p) => !['CASH', 'TRANSFER'].includes(p));
+      if (state.selected) {
+        this.payment = state.selected;
+        const reservation = this.payment?.reservation;
+        const types = reservation?.room?.paymentTypes.filter(p => ![PaymentType.cash, PaymentType.transfer].includes(p));
+        if (types?.includes(PaymentType.paynl)) {
+          this.getOptions();
+        } else {
+          this.options = getPaymentOptions(this.translate, types);
+        }
+      }
+      if (state.data) {
+        this.options = getPayNlOptions(state.data);
+      }
     });
   }
 
   private getPayment(paymentId: string): void {
     this.store.dispatch(
       new fromActionsPayment.PaymentFind(paymentId)
+    );
+  }
+
+  private getOptions(): void {
+    this.store.dispatch(
+      new fromActionsPayment.PaymentOptions()
     );
   }
 

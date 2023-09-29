@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { IPrice } from '../../../interfaces/treatment';
+import { IPrice, PENALTY } from '../../../interfaces/treatment';
 import { ICurrencyAll } from '../../../interfaces/currency';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
@@ -11,6 +11,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 export class CustomerEditDialogComponent {
   price: IPrice;
   currency: ICurrencyAll;
+  penalty = PENALTY;
 
   constructor(public dialogRef: MatDialogRef<CustomerEditDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
     this.price = data.price;

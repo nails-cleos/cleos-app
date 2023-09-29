@@ -289,7 +289,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       if (state.payments && state.payments[0].id) {
         if (this.isCustomer) {
           this.paymentPaid = state.payments.map((p: IPayment) => {
-            if (p.status && !['APPROVED', 'APPROVED_REFUND', 'REFUND_PENDING', 'REFUND'].includes(p.status)) {
+            if (p.status && !['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND_PENDING', 'REFUND'].includes(p.status)) {
               this.addActions();
             }
             return p;

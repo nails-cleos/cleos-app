@@ -3,7 +3,7 @@ import { IAdditionalAll } from './additional';
 import { IService } from './room';
 import { IColorAll } from './color';
 
-export const PENALTY = 30;
+export const PENALTY = 50;
 
 export interface ITreatmentGroup {
   id?: string;
