@@ -220,8 +220,8 @@
         </ng-template>
         <ng-template [ngIf]="treatment.value">
           <mat-list-item>
-            <mat-icon matListItemIcon>home_repair_service</mat-icon>
-            <div class="bold" mat-subheader>{{ 'RESERVATION.TREATMENT.DETAIL' | translate}}</div>
+            <mat-icon matListItemIcon>spa</mat-icon>
+            <div class="bold" matListItemTitle>{{ 'RESERVATION.TREATMENT.DETAIL' | translate}}</div>
             <mat-divider></mat-divider>
           </mat-list-item>
           <mat-list-item>
@@ -231,7 +231,8 @@
               </div>
             </ng-template>
 
-            <div mat-line>
+            <div matListItemLine>
+              <span [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.PRICE' | translate"></span>
               <ng-template [ngIf]="price.priceWithDiscount" [ngIfElse]="noDiscount">
                 <ng-template [ngIf]="!isEditing" [ngIfElse]="editing">
                   <span [class.strikethrough]="discount.value" class="raised-button">
@@ -255,14 +256,13 @@
               </ng-template>
             </div>
 
-            <div mat-line>
+            <div matListItemLine>
+              <span [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.DURATION' | translate"></span>
               <span class="raised-button">
                 &#9202; {{treatment.value.duration | durationTime}}
               </span>
             </div>
-            <ng-template [ngIf]="durability">
-              <div [innerHTML]="durability" mat-line></div>
-            </ng-template>
+            <div *ngIf="durability" [innerHTML]="durability" mat-line></div>
           </mat-list-item>
         </ng-template>
         <ng-template #skeleton>
@@ -396,7 +396,7 @@
           <mat-divider></mat-divider>
           <div mat-subheader>{{ 'COMMON.TREATMENT.FIELD' | translate}}</div>
           <mat-list-item>
-            <mat-icon matListItemIcon>home_repair_service</mat-icon>
+            <mat-icon matListItemIcon>spa</mat-icon>
             <div matListItemTitle>{{ 'RESERVATION.TREATMENT.NAME.FIELD' | translate}}</div>
             <div matListItemLine>{{treatment.value.name}}</div>
           </mat-list-item>
@@ -405,11 +405,18 @@
             <div matListItemTitle>{{ 'RESERVATION.TREATMENT.DURATION.FIELD' | translate}}</div>
             <div matListItemLine>{{treatment.value.duration | durationTime}}</div>
           </mat-list-item>
-          <mat-list-item>
-            <mat-icon matListItemIcon>{{room.value.currency.icon}}</mat-icon>
-            <div matListItemTitle>{{ 'RESERVATION.TREATMENT.PRICE.FIELD' | translate}}</div>
-            <div matListItemLine><span class="bold">{{treatment.value.price | number:'1.2-2'}}</span></div>
-          </mat-list-item>
+
+          <ng-template [ngIf]="additionalSelected.length" [ngIfElse]="noAdditional">
+            <mat-list-item>
+              <mat-icon matListItemIcon>{{room.value.currency.icon}}</mat-icon>
+              <div matListItemTitle>{{ 'RESERVATION.TREATMENT.PRICE.FIELD' | translate}}</div>
+              <div matListItemLine><span class="bold">{{treatment.value.price | number:'1.2-2'}}</span></div>
+            </mat-list-item>
+          </ng-template>
+          <ng-template #noAdditional>
+            <app-price-preview [price]="price" [currencyIcon]="room.value.currency.icon" [isEditing]="isEditing"
+                               [discountKey]="'RESERVATION.TREATMENT.DISCOUNT.ADD'"></app-price-preview>
+          </ng-template>
           <ng-template [ngIf]="additionalSelected.length">
             <mat-divider></mat-divider>
             <div mat-subheader>{{ 'COMMON.ADDITIONAL.FIELD' | translate}}</div>
@@ -464,35 +471,8 @@
               <div matListItemTitle>{{ 'RESERVATION.TREATMENT.DURATION.FIELD' | translate}}</div>
               <div matListItemLine>{{totalDurationFormatted}}</div>
             </mat-list-item>
-            <ng-template [ngIf]="price.total">
-              <mat-list-item>
-                <mat-icon matListItemIcon>{{room.value.currency.icon}}</mat-icon>
-                <div matListItemTitle>{{ 'COMMON.LABEL.TOTAL' | translate}}</div>
-                <ng-template [ngIf]="price.priceWithDiscount" [ngIfElse]="noDiscount">
-                  <ng-template [ngIf]="!isEditing" [ngIfElse]="editing">
-                    <span mat-line>
-                      <span [class.strikethrough]="discount.value">
-                        {{price.totalWithoutDiscount | number:'1.2-2'}}
-                      </span>
-                      <span [@discountAnimation] class="raised-button bold">
-                        {{price.total | number:'1.2-2'}}
-                      </span>
-                    </span>
-                  </ng-template>
-                  <ng-template #editing>
-                    <span mat-line>
-                      <span>{{price.total | number:'1.2-2'}}</span>
-                      <span class="bold">
-                        {{'RESERVATION.TREATMENT.DISCOUNT.ADD' | translate}}
-                      </span>
-                    </span>
-                  </ng-template>
-                </ng-template>
-                <ng-template #noDiscount>
-                  <span mat-line>{{price.total | number:'1.2-2'}}</span>
-                </ng-template>
-              </mat-list-item>
-            </ng-template>
+            <app-price-preview [price]="price" [currencyIcon]="room.value.currency.icon" [isEditing]="isEditing"
+                               [discountKey]="'RESERVATION.TREATMENT.DISCOUNT.ADD'"></app-price-preview>
           </ng-template>
         </mat-list>
       </mat-card-content>

@@ -17,7 +17,7 @@ export class BankComponent implements AfterViewInit {
   @Input() professionalName?: string;
   @Output() percentageEmitter = new EventEmitter<number>();
 
-  bankList?: IPaymentOption[] = [];
+  bankList: IPaymentOption[] = [];
   filteredBank?: Observable<IPaymentOption[] | undefined>;
 
   type?: IPaymentOption;
@@ -40,18 +40,29 @@ export class BankComponent implements AfterViewInit {
   private formChanges(): void {
     if (this.firstTime) {
       this.formGroup.get('type')?.setValidators([Validators.required]);
+      this.formGroup.get('type')?.updateValueAndValidity();
       this.formGroup.get('percentage')?.setValidators([Validators.required]);
+      this.formGroup.get('percentage')?.updateValueAndValidity();
     }
 
     this.formGroup.get('type')?.valueChanges.subscribe(value => {
       this.type = value;
-      if (value.subTypes?.length) {
-        this.bankList = value.subTypes;
-        this.formGroup.get('bank')?.setValidators([Validators.required, requireMatch]);
+      if (this.type) {
+        if (this.type.subTypes?.length) {
+          this.bankList = this.type.subTypes;
+          this.formGroup.get('bank')?.setValidators([Validators.required, requireMatch]);
+        } else {
+          this.formGroup.get('bank')?.setValidators([]);
+          this.bankList = [];
+        }
+        this.formGroup.get('percentage')?.setValidators([Validators.required]);
       } else {
+        this.formGroup.get('bank')?.setValidators([]);
+        this.formGroup.get('percentage')?.setValidators([]);
         this.bankList = [];
       }
-      this.formGroup.get('percentage')?.setValidators([Validators.required]);
+      this.formGroup.get('percentage')?.updateValueAndValidity();
+      this.formGroup.get('bank')?.updateValueAndValidity();
     });
 
     this.formGroup.get('percentage')?.valueChanges.subscribe(value => {

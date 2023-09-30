@@ -1,6 +1,6 @@
-<mat-divider></mat-divider>
-<div mat-subheader>{{ 'ME.PAYMENT.DETAIL' | translate}}</div>
 <ng-template [ngIf]="type">
+  <mat-divider></mat-divider>
+  <div mat-subheader>{{ 'ME.PAYMENT.DETAIL' | translate}}</div>
   <mat-list-item>
     <mat-icon matListItemIcon [svgIcon]="type.svgIcon"></mat-icon>
     <div matListItemTitle>{{ 'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate}}</div>

@@ -72,14 +72,14 @@ export class OptionComponent implements OnInit, OnDestroy {
   get pay(): void {
     const option: IPaymentOption = this.typeForm.get('type')?.value;
     const type = option.type;
-    const paymentOptionId = option.paymentId;
+    const paymentOptionId = option.bic;
     const percentage = this.typeForm.get('percentage')?.value || 'TOTAL';
     const payload = {
       reservationId: this.reservationId,
       payment: { type, paymentOptionId, percentage, bic: undefined }
     };
     if (option.subTypes.length) {
-      payload.payment.bic = this.typeForm.get('bank')?.value?.paymentId;
+      payload.payment.bic = this.typeForm.get('bank')?.value?.bic;
     }
     return this.store.dispatch(
       new fromActionsPayment.PaymentCreate(payload)

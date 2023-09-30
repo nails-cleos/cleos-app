@@ -3,7 +3,7 @@ import { MatStepper } from '@angular/material/stepper';
 import { Observable, Subscription } from 'rxjs';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
-import { IGroupService, IPrice, ITreatment, ITreatmentGroup, PENALTY, Price } from '../../../interfaces/treatment';
+import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../interfaces/treatment';
 import { IRoom, IService } from '../../../interfaces/room';
 import { IAvailableDTO, IReservation, IUpcomingAll, MAX_RESERVATION_CUSTOMER_MONTH, Reservation } from '../../../interfaces/reservation';
 import {
@@ -48,7 +48,7 @@ import {
   newDiscount,
   newPercentage,
   newPrice,
-  openDialog,
+  openDialog, removeDiscount,
   roomDetail,
   round
 } from '../../../util/helper';
@@ -64,7 +64,7 @@ import { TimeZoneSnackBarComponent } from '../../../shared/snak/time-zone/time-z
 import { MatDialog } from '@angular/material/dialog';
 import { Role } from '../../../interfaces/token';
 import { IUser } from '../../../interfaces/user';
-import { getPaymentOptions, getPayNlOptions, IPaymentOption, PaymentType } from '../../../interfaces/payment';
+import { getPaymentOptions, getPayNlOptions, IPaymentOption, PaymentType, PENALTY } from '../../../interfaces/payment';
 import { AuthUserService } from '../../../services/auth-user.service';
 import { Analytics, logEvent } from '@angular/fire/analytics';
 
@@ -201,7 +201,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     const payment = new Step(4, 'payment', () => this.callStepSix, preview);
     const book = new Step(3, 'book_online', () => this.callStepFive, payment);
     const additional = new Step(2, 'post_add', () => this.callStepFour, book, false);
-    const treatment = new Step(1, 'home_repair_service', () => this.callStepThree, additional);
+    const treatment = new Step(1, 'spa', () => this.callStepThree, additional);
     const room = new Step(0, 'room', () => this.callStepTwo, treatment);
     this.steps = [room, treatment, additional, book, payment, preview];
 
@@ -317,12 +317,12 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     const option: IPaymentOption = this.typeForm.get('type')?.value;
     if (this.firstTime || option) {
       const type = option.type;
-      const paymentOptionId = option.paymentId;
+      const paymentOptionId = option.bic;
       const percentage = this.typeForm.get('percentage')?.value || 'TOTAL';
 
       reservation.payment = { type, paymentOptionId, percentage, bic: undefined };
       if (option.subTypes.length) {
-        reservation.payment.bic = this.typeForm.get('bank')?.value?.paymentId;
+        reservation.payment.bic = this.typeForm.get('bank')?.value?.bic;
       }
     }
     if (this.isEditing && this.reservation) {
@@ -651,6 +651,9 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
           this.treatmentDiscount = userDiscount.discount;
           this.price = newDiscount(this.price, this.treatmentDiscount);
         }
+      } else {
+        this.treatmentDiscount = undefined;
+        this.price = removeDiscount(this.price);
       }
     });
   }

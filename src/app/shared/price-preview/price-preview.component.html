@@ -1,0 +1,27 @@
+<mat-list-item *ngIf="price && price.total">
+  <mat-icon matListItemIcon>{{currencyIcon}}</mat-icon>
+  <div matListItemTitle>{{ label | translate}}</div>
+  <ng-template [ngIf]="price.priceWithDiscount" [ngIfElse]="noDiscount">
+    <ng-template [ngIf]="!isEditing" [ngIfElse]="editing">
+      <div matListItemLine>
+        <span [class.strikethrough]="price.discount">
+          {{price.totalWithoutDiscount | number:'1.2-2'}}
+        </span>
+        <span [@discountAnimation] class="raised-button bold">
+          {{price.total | number:'1.2-2'}}
+        </span>
+      </div>
+    </ng-template>
+    <ng-template #editing>
+      <div matListItemLine>
+        <span>{{price.total | number:'1.2-2'}}</span>
+        <span class="raised-button bold" *ngIf="discountKey">
+          {{discountKey | translate}}
+        </span>
+      </div>
+    </ng-template>
+  </ng-template>
+  <ng-template #noDiscount>
+    <div matListItemLine>{{price.total | number:'1.2-2'}}</div>
+  </ng-template>
+</mat-list-item>

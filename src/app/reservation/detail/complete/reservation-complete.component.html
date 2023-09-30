@@ -44,7 +44,7 @@
                       {{treatment.name}}
                     </mat-option>
                   </mat-autocomplete>
-                  <mat-icon matSuffix>home_repair_service</mat-icon>
+                  <mat-icon matSuffix>spa</mat-icon>
                   <mat-error *ngIf="treatment.hasError('required')"
                              [innerHTML]="'COMMON.TREATMENT.REQUIRED' | translate">
                   </mat-error>
@@ -123,7 +123,7 @@
               <mat-list>
                 <ng-template [ngIf]="group.value && treatment.value">
                   <mat-list-item>
-                    <mat-icon matListItemIcon>home_repair_service</mat-icon>
+                    <mat-icon matListItemIcon>spa</mat-icon>
                     <div class="bold" matListItemTitle>{{ 'COMMON.TREATMENT.FIELD' | translate}}</div>
                   </mat-list-item>
                   <mat-list-item style="text-align: center">

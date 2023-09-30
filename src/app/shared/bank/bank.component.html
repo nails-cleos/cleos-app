@@ -19,7 +19,7 @@
       <mat-error [innerHTML]="'COMMON.PAYMENT.TYPE.FIELD.REQUIRED' | translate">
       </mat-error>
     </mat-form-field>
-    <mat-form-field appearance="outline" *ngIf="bankList?.length">
+    <mat-form-field appearance="outline" *ngIf="bankList.length">
       <mat-icon *ngIf="formGroup.get('bank')?.value?.svgIcon" matPrefix [svgIcon]="formGroup.get('bank')?.value?.svgIcon"
                 class="svg-icon"></mat-icon>
       <mat-icon *ngIf="!formGroup.get('bank')?.value?.svgIcon" matPrefix>account_balance</mat-icon>

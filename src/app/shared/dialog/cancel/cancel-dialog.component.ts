@@ -1,8 +1,9 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { IPrice, PENALTY } from '../../../interfaces/treatment';
+import { IPrice } from '../../../interfaces/treatment';
 import { ICurrency } from '../../../interfaces/currency';
+import { IPaymentOption, PENALTY } from '../../../interfaces/payment';
 
 @Component({
   selector: 'app-cancel-dialog',
@@ -12,7 +13,7 @@ import { ICurrency } from '../../../interfaces/currency';
 export class CancelDialogComponent implements OnInit {
   cancelForm!: UntypedFormGroup;
   typeForm!: UntypedFormGroup;
-  types: string[];
+  paymentOptions: IPaymentOption[];
 
   paymentCancellation: FormControl = new UntypedFormControl('', [
     Validators.required
@@ -28,7 +29,7 @@ export class CancelDialogComponent implements OnInit {
               private formBuilder: FormBuilder) {
     this.options = data.options;
     this.price = data.price;
-    this.types = data.types;
+    this.paymentOptions = data.paymentOptions;
     this.currency = data.currency;
     this.showPenalty = data.showPenalty || false;
 
@@ -52,9 +53,14 @@ export class CancelDialogComponent implements OnInit {
     }
     // if we want to only charge, it is the same use CHARGE_WITH_DISCOUNT or CHARGE_WITH_REFUND
     const cancelOption = this.paymentCancellation.value === 'CHARGE' ? 'CHARGE_WITH_DISCOUNT' : this.paymentCancellation.value;
-    const type = this.typeForm.get('type')?.value;
-    const bic = this.typeForm.get('bank')?.value?.bic;
-    return this.dialogRef.close({ cancelOption, type, bic });
+    const option: IPaymentOption = this.typeForm.get('type')?.value;
+    const type = option?.type;
+    const paymentOptionId = option?.bic;
+    const payload = { cancelOption, type, paymentOptionId, bic: undefined };
+    if (option?.subTypes?.length) {
+      payload.bic = this.typeForm.get('bank')?.value?.bic;
+    }
+    return this.dialogRef.close(payload);
   }
 
   ngOnInit(): void {

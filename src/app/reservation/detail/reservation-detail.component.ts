@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { AppState, selectReservationState } from '../../store/app.states';
+import { AppState, selectPaymentState, selectReservationState } from '../../store/app.states';
 import { Observable, pairwise, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
 import { CancelOption, IReservationAll, States } from '../../interfaces/reservation';
@@ -35,10 +35,10 @@ import {
   snakeToCamel,
   totalPaid
 } from '../../util/helper';
-import { IPrice, PENALTY, Price } from '../../interfaces/treatment';
+import { IPrice, Price } from '../../interfaces/treatment';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatFabMenu, MatFabMenuDirection } from '@angular-material-extensions/fab-menu/lib/mat-fab-menu.component';
-import { IPayment, IPaymentAll, PaymentType } from '../../interfaces/payment';
+import { getPaymentOptions, getPayNlOptions, IPayment, IPaymentAll, IPaymentOption, PaymentType, PENALTY } from '../../interfaces/payment';
 import { detailExpandAnimation, transitionAnimation } from '../../util/animation';
 import { isToday, isTomorrow } from 'date-fns';
 import { ReservationIconName } from '../../util/icon';
@@ -75,6 +75,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   pageSize = 5;
 
   price: IPrice;
+  options?: IPaymentOption[];
 
   direction: MatFabMenuDirection = 'left';
   showFireworks = false;
@@ -99,8 +100,10 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   private machine: any;
   private isLoading = false;
   private getState: Observable<any>;
+  private getPaymentState: Observable<any>;
   private subscription?: Subscription;
   private authUserServiceSubscription: Subscription;
+  private paymentSubscription?: Subscription;
   private small = false;
   private reservationId?: string;
   private hasRoomAdmin?: boolean;
@@ -131,6 +134,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       this.customerId = value.customerId;
       this.hasRoomAdmin = value.isAdmin || value.isManager || value.isRoomAdmin;
     });
+    this.getPaymentState = this.store.select(selectPaymentState);
   }
 
   get payments(): FormArray {
@@ -237,6 +241,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.paymentSubscription?.unsubscribe();
     this.authUserServiceSubscription.unsubscribe();
   }
 
@@ -329,6 +334,13 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
           this.professionalMachine(this);
           this.changeState = this.machine.next(snakeToCamel(this.reservation?.state));
         } else if (this.isCustomer) {
+          const types = state.selected.room.paymentTypes.filter((p: PaymentType) => ![PaymentType.cash, PaymentType.transfer]
+            .includes(p));
+          if (types?.includes(PaymentType.paynl)) {
+            this.getOptions();
+          } else {
+            this.options = getPaymentOptions(this.translate, types);
+          }
           this.customerMachine(this);
           this.changeState = this.machine.next(snakeToCamel(state.selected.state));
           if (state.selected.state === States.completed) {
@@ -354,6 +366,13 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         }
       }
     });
+    this.paymentSubscription = this.getPaymentState.subscribe(state => {
+      this.options = getPayNlOptions(state.data);
+      // if (this.options) {
+      //   this.customerMachine(this);
+      //   this.changeState = this.machine.next(snakeToCamel(state.selected.state));
+      // }
+    });
   }
 
   private valueChanges(arr: any[]): void {
@@ -368,6 +387,12 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     this.payments.clear();
     this.store.dispatch(
       new fromActionsReservation.Clean()
+    );
+  }
+
+  private getOptions(): void {
+    this.store.dispatch(
+      new fromActionsPayment.PaymentOptions()
     );
   }
 
@@ -643,7 +668,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
             new fromActionsReservation.CustomerCancel({ id: reservation.id, paymentCancellation: result })
           );
         }
-      }, showPenalty));
+      }, showPenalty, self.options));
 
     const bookTransaction = ReservationDetailComponent.createTransaction('booked', (): void => {
       const room = reservation.room;
@@ -830,7 +855,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   }
 
   private cancel(reservation: IReservationAll, options: string[], price: IPrice, afterClose: (result: any) => void,
-                 showPenalty?: boolean): void {
-    openCancel(this.dialog, reservation.room, this.small, options, afterClose, showPenalty, price);
+                 showPenalty?: boolean, paymentOptions?: IPaymentOption[]): void {
+    openCancel(this.dialog, reservation.room, this.small, options, afterClose, showPenalty, price, paymentOptions);
   }
 }

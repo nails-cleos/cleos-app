@@ -16,7 +16,6 @@ export class PriceComponent {
   @Input() firstTime!: boolean;
   @Input() showPenalty?: boolean;
   @Input() showBank!: boolean;
-  @Input() types?: string[]; // TODO remove
   @Input() options?: IPaymentOption[];
   @Input() professionalName?: string;
   @Output() percentageEmitter = new EventEmitter<number>();

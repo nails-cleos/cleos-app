@@ -2,8 +2,7 @@ import { IDiscount, IUserDiscount } from './discount';
 import { IAdditionalAll } from './additional';
 import { IService } from './room';
 import { IColorAll } from './color';
-
-export const PENALTY = 50;
+import { PENALTY } from './payment';
 
 export interface ITreatmentGroup {
   id?: string;

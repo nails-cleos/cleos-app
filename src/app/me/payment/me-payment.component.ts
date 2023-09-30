@@ -40,13 +40,13 @@ export class MePaymentComponent implements OnInit, OnDestroy {
 
     const option: IPaymentOption = this.typeForm.get('type')?.value;
     const type = option.type;
-    const paymentOptionId = option.paymentId;
+    const paymentOptionId = option.bic;
     const payload = {
       id: this.payment?.id,
       payment: { type, paymentOptionId, bic: undefined }
     };
     if (option.subTypes.length) {
-      payload.payment.bic = this.typeForm.get('bank')?.value?.paymentId;
+      payload.payment.bic = this.typeForm.get('bank')?.value?.bic;
     }
 
     return this.store.dispatch(

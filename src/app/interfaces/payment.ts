@@ -1,6 +1,8 @@
 import { IReservationAll } from './reservation';
 import { TranslateService } from '@ngx-translate/core';
 
+export const PENALTY = 50;
+
 export interface IPaymentType {
   name: string;
   disabled: boolean;
@@ -19,28 +21,19 @@ export enum PaymentType {
 export type PaymentTypeKey = keyof typeof PaymentType;
 
 export interface IPaymentOption {
-  // common
   name: string;
   subTypes: IPaymentOption[];
   svgIcon: string;
   type: PaymentType;
-  // no payNl
   bic?: string;
-  // payNl
-  paymentId?: number;
 }
 
 export class PaymentOption implements IPaymentOption {
   name: string;
   subTypes: IPaymentOption[];
   type: PaymentType;
-  // no payNl
   bic?: string;
   svgIcon: string;
-  // payNl
-  paymentId?: number;
-  image?: string;
-  state?: number;
 
   constructor(name: string, type: PaymentType, svgIcon: string, bic?: string, subTypes?: IPaymentOption[]) {
     this.name = name;
@@ -66,7 +59,6 @@ export const getPaymentOptions = (translate: TranslateService, types?: PaymentTy
       svgIcon = '/payment_methods/21.svg';
       break;
   }
-
 
   return new PaymentOption(name, it, svgIcon, undefined, subTypes);
 }) || [];
