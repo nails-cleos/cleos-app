@@ -3,6 +3,7 @@ import { ICurrency, ICurrencyAll } from './currency';
 import { ITreatment } from './treatment';
 import { IAdditional } from './additional';
 import { IOffice } from './office';
+import { PaymentType } from './payment';
 
 export interface IRoom {
   id?: string;
@@ -63,7 +64,7 @@ export interface IRoomAll {
   currency: ICurrencyAll;
   office: IOffice;
   timeZone: string;
-  paymentTypes: string[];
+  paymentTypes: PaymentType[];
 }
 
 export interface IAvailability {

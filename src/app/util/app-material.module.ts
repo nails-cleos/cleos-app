@@ -71,23 +71,30 @@ const materialModules = [
 export class AppMaterialModule {
   constructor(private matIconRegistry: MatIconRegistry, private domSanitizer: DomSanitizer) {
     matIconRegistry.addSvgIcon('CLEOS', this.getUrl('assets/icons/safari-pinned-tab.svg'));
-    matIconRegistry.addSvgIcon('IDEAL', this.getUrl('assets/banks/IDEAL.svg'));
-    matIconRegistry.addSvgIcon('PAYPAL', this.getUrl('assets/banks/PAYPAL.svg'));
-    matIconRegistry.addSvgIcon('RABONL2U', this.getUrl('assets/banks/RABONL2U.svg'));
-    matIconRegistry.addSvgIcon('ABNANL2A', this.getUrl('assets/banks/ABNANL2A.svg'));
-    matIconRegistry.addSvgIcon('FVLBNL22', this.getUrl('assets/banks/FVLBNL22.svg'));
-    matIconRegistry.addSvgIcon('TRIONL2U', this.getUrl('assets/banks/TRIONL2U.svg'));
-    matIconRegistry.addSvgIcon('INGBNL2A', this.getUrl('assets/banks/INGBNL2A.svg'));
-    matIconRegistry.addSvgIcon('SNSBNL2A', this.getUrl('assets/banks/SNSBNL2A.svg'));
-    matIconRegistry.addSvgIcon('ASNBNL21', this.getUrl('assets/banks/ASNBNL21.svg'));
-    matIconRegistry.addSvgIcon('RBRBNL21', this.getUrl('assets/banks/RBRBNL21.svg'));
-    matIconRegistry.addSvgIcon('KNABNL2H', this.getUrl('assets/banks/KNABNL2H.svg'));
-    matIconRegistry.addSvgIcon('BUNQNL2A', this.getUrl('assets/banks/BUNQNL2A.svg'));
-    matIconRegistry.addSvgIcon('MOYONL21', this.getUrl('assets/banks/MOYONL21.svg'));
     matIconRegistry.addSvgIcon('WHATSAPP', this.getUrl('assets/whatsapp.svg'));
     matIconRegistry.addSvgIcon('INSTAGRAM', this.getUrl('assets/instagram.svg'));
     matIconRegistry.addSvgIcon('FACEBOOK', this.getUrl('assets/facebook.svg'));
-    matIconRegistry.addSvgIcon('MANICURE', this.getUrl('assets/manicure.svg'));
+    matIconRegistry.addSvgIcon('/payment_methods/1.svg', this.getUrl('assets/payment_methods/1.svg'));
+    matIconRegistry.addSvgIcon('IDEAL', this.getUrl('assets/payment_methods/1.svg'));
+    matIconRegistry.addSvgIcon('/payment_methods/2.svg', this.getUrl('assets/payment_methods/2.svg'));
+    matIconRegistry.addSvgIcon('/payment_methods/21.svg', this.getUrl('assets/payment_methods/21.svg'));
+    matIconRegistry.addSvgIcon('PAYPAL', this.getUrl('assets/payment_methods/21.svg'));
+    matIconRegistry.addSvgIcon('PAY_NL', this.getUrl('assets/payment_methods/paynl.svg'));
+    matIconRegistry.addSvgIcon('/issuers/1.svg', this.getUrl('assets/issuers/1.svg'));
+    matIconRegistry.addSvgIcon('/issuers/2.svg', this.getUrl('assets/issuers/2.svg'));
+    matIconRegistry.addSvgIcon('/issuers/4.svg', this.getUrl('assets/issuers/4.svg'));
+    matIconRegistry.addSvgIcon('/issuers/5.svg', this.getUrl('assets/issuers/5.svg'));
+    matIconRegistry.addSvgIcon('/issuers/8.svg', this.getUrl('assets/issuers/8.svg'));
+    matIconRegistry.addSvgIcon('/issuers/9.svg', this.getUrl('assets/issuers/9.svg'));
+    matIconRegistry.addSvgIcon('/issuers/10.svg', this.getUrl('assets/issuers/10.svg'));
+    matIconRegistry.addSvgIcon('/issuers/11.svg', this.getUrl('assets/issuers/11.svg'));
+    matIconRegistry.addSvgIcon('/issuers/12.svg', this.getUrl('assets/issuers/12.svg'));
+    matIconRegistry.addSvgIcon('/issuers/5080.svg', this.getUrl('assets/issuers/5080.svg'));
+    matIconRegistry.addSvgIcon('/issuers/5084.svg', this.getUrl('assets/issuers/5084.svg'));
+    matIconRegistry.addSvgIcon('/issuers/23355.svg', this.getUrl('assets/issuers/23355.svg'));
+    matIconRegistry.addSvgIcon('/issuers/23358.svg', this.getUrl('assets/issuers/23358.svg'));
+    matIconRegistry.addSvgIcon('/issuers/23361.svg', this.getUrl('assets/issuers/23361.svg'));
+    matIconRegistry.addSvgIcon('MOYONL21', this.getUrl('assets/issuers/MOYONL21.svg'));
   }
 
   private getUrl(path: string): SafeResourceUrl {

@@ -51,7 +51,17 @@ export const reducer = (state = initialState, action: All): State => {
     case PaymentActionTypes.paymentFind: {
       return {
         ...state,
-        data: {} as IPayment,
+        isLoading: true,
+        errorMessage: null,
+        subErrors: null,
+        selected: null,
+        message: null
+      };
+    }
+    case PaymentActionTypes.paymentOptions: {
+      return {
+        ...state,
+        data: null,
         isLoading: true,
         errorMessage: null,
         subErrors: null,

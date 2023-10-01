@@ -113,7 +113,8 @@
       <th *matHeaderCellDef mat-header-cell>{{ 'PAYMENT.LIST.COLUMN.AMOUNT' | translate }}</th>
       <td *matCellDef="let payment" mat-cell>
         <div *ngIf="payment.id; else skeleton">
-          <mat-icon matPrefix>attach_money</mat-icon>&nbsp;{{payment.transactionAmount | number:'1.2-2'}}
+          <mat-icon matPrefix>
+            {{payment.reservation.room.currency.icon}}</mat-icon>&nbsp;{{payment.transactionAmount | number:'1.2-2'}}
         </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>

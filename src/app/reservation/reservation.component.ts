@@ -71,7 +71,7 @@ import {
   newAdditional,
   newDiscount,
   newPrice,
-  openDialog,
+  openDialog, removeDiscount,
   roomDetail
 } from '../util/helper';
 import { transitionAnimation } from '../util/animation';
@@ -241,7 +241,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const book = new Step(5, 'book_online', () => this.callStepSeven, preview);
     const settings = new Step(4, 'settings', () => this.callStepSix, book);
     const additional = new Step(3, 'post_add', () => this.callStepFive, settings);
-    const treatment = new Step(2, 'home_repair_service', () => this.callStepFour, additional);
+    const treatment = new Step(2, 'spa', () => this.callStepFour, additional);
     const room = new Step(1, 'room', () => this.callStepThree, treatment);
     const customer = new Step(0, 'person_search', () => this.callStepTwo, room);
     this.steps = [customer, room, treatment, additional, settings, book, preview];
@@ -791,6 +791,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           this.treatmentDiscount = userDiscount.discount;
           this.price = newDiscount(this.price, this.treatmentDiscount);
         }
+      } else {
+        this.treatmentDiscount = undefined;
+        this.price = removeDiscount(this.price);
       }
     });
     this.customerChange.valueChanges.subscribe((value) => {
@@ -978,7 +981,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       }
       this.customerInfo = state.customer;
-      const treatment = getIndex(this.steps, 'home_repair_service');
+      const treatment = getIndex(this.steps, 'spa');
       if (this.customerInfo && this.myStepper.selectedIndex === treatment) {
         this.treatmentId = this.customerInfo.treatment.key;
         this.customerAdditionalIds = this.customerInfo.additionalIds;

@@ -42,6 +42,9 @@ import { FilterByPipe } from '../pipes/filterBy.pipe';
 import { DiscountPipe } from '../pipes/discount.pipe';
 import { TwoDigitsDirective } from '../directives/two-digits.directive';
 import { PromptComponent } from './prompt/prompt.component';
+import { HideMissingDirective } from '../directives/hide-missing.directive';
+import { PaymentPreviewComponent } from './payment-preview/payment-preview.component';
+import { PricePreviewComponent } from './price-preview/price-preview.component';
 
 @NgModule({
   imports: [
@@ -83,35 +86,7 @@ import { PromptComponent } from './prompt/prompt.component';
     NgChartsModule,
     FormsModule,
     BackButtonDirective,
-    SortByPipe,
-    UserNamePipe,
-    TimeDetailPipe,
-    DurationTimePipe,
-    RoomNamePipe,
-    CurrencySymbolPipe,
-    ReservationIconPipe,
-    ConvertHMPipe,
-    ErrorComponent,
-    GoogleMapComponent,
-    RatingComponent,
-    CardChartComponent,
-    CardComponent,
-    ChartComponent,
-    TimeZoneSnackBarComponent,
-    CounterComponent,
-    PasswordComponent,
-    BankComponent,
-    PriceComponent,
-    DialogComponent,
-    CalendarDialogComponent,
-    CustomerEditDialogComponent,
-    CancelDialogComponent,
-    FilterByPipe,
-    DiscountPipe,
-    TwoDigitsDirective
-  ],
-  declarations: [
-    BackButtonDirective,
+    HideMissingDirective,
     SortByPipe,
     UserNamePipe,
     TimeDetailPipe,
@@ -138,7 +113,41 @@ import { PromptComponent } from './prompt/prompt.component';
     FilterByPipe,
     DiscountPipe,
     TwoDigitsDirective,
-    PromptComponent
+    PaymentPreviewComponent,
+    PricePreviewComponent
+  ],
+  declarations: [
+    BackButtonDirective,
+    HideMissingDirective,
+    SortByPipe,
+    UserNamePipe,
+    TimeDetailPipe,
+    DurationTimePipe,
+    RoomNamePipe,
+    CurrencySymbolPipe,
+    ReservationIconPipe,
+    ConvertHMPipe,
+    ErrorComponent,
+    GoogleMapComponent,
+    RatingComponent,
+    CardChartComponent,
+    CardComponent,
+    ChartComponent,
+    TimeZoneSnackBarComponent,
+    CounterComponent,
+    PasswordComponent,
+    BankComponent,
+    PriceComponent,
+    DialogComponent,
+    CalendarDialogComponent,
+    CustomerEditDialogComponent,
+    CancelDialogComponent,
+    FilterByPipe,
+    DiscountPipe,
+    TwoDigitsDirective,
+    PromptComponent,
+    PaymentPreviewComponent,
+    PricePreviewComponent
   ],
   providers: [
     httpInterceptorProviders,

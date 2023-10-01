@@ -28,6 +28,14 @@ export class PaymentEffects {
     ))
   ));
 
+  options$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentOptions)).pipe(
+    map((action: any) => action.payload),
+    switchMap(() => this.paymentService.paymentOptions().pipe(
+      switchMap((payment: any) => of(new fromActionsPayment.PaymentSuccess(payment))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
+    ))
+  ));
+
   findByReservation$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentByReservation)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.paymentService.findByReservationId(payload.reservationId).pipe(

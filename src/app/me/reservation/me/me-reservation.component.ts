@@ -48,7 +48,7 @@ import {
   newDiscount,
   newPercentage,
   newPrice,
-  openDialog,
+  openDialog, removeDiscount,
   roomDetail,
   round
 } from '../../../util/helper';
@@ -64,7 +64,7 @@ import { TimeZoneSnackBarComponent } from '../../../shared/snak/time-zone/time-z
 import { MatDialog } from '@angular/material/dialog';
 import { Role } from '../../../interfaces/token';
 import { IUser } from '../../../interfaces/user';
-import { PaymentType } from '../../../interfaces/payment';
+import { getPaymentOptions, getPayNlOptions, IPaymentOption, PaymentType, PENALTY } from '../../../interfaces/payment';
 import { AuthUserService } from '../../../services/auth-user.service';
 import { Analytics, logEvent } from '@angular/fire/analytics';
 
@@ -127,8 +127,8 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   ]);
 
   typeForm: UntypedFormGroup;
-  types?: string[];
 
+  options?: IPaymentOption[];
   acceptForm!: UntypedFormGroup;
   accept: UntypedFormControl = new UntypedFormControl('', [
     Validators.requiredTrue
@@ -157,6 +157,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   durability?: string;
   reservationId?: string;
   showPenalty?: boolean;
+  penalty = PENALTY;
 
   private readonly extras: any;
   private reservation?: IUpcomingAll;
@@ -200,7 +201,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     const payment = new Step(4, 'payment', () => this.callStepSix, preview);
     const book = new Step(3, 'book_online', () => this.callStepFive, payment);
     const additional = new Step(2, 'post_add', () => this.callStepFour, book, false);
-    const treatment = new Step(1, 'home_repair_service', () => this.callStepThree, additional);
+    const treatment = new Step(1, 'spa', () => this.callStepThree, additional);
     const room = new Step(0, 'room', () => this.callStepTwo, treatment);
     this.steps = [room, treatment, additional, book, payment, preview];
 
@@ -313,14 +314,16 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     reservation.additionalIds = this.additionalSelected?.map(value => value.id);
 
     const role = Role.customer;
-    const type = this.typeForm.get('type')?.value;
-    if (this.firstTime || type) {
-      reservation.payment = {
-        type,
-        bic: this.typeForm.get('bank')?.value?.bic,
-        countryCode: 'en_NL',
-        percentage: this.typeForm.get('percentage')?.value
-      };
+    const option: IPaymentOption = this.typeForm.get('type')?.value;
+    if (this.firstTime || option) {
+      const type = option.type;
+      const paymentOptionId = option.bic;
+      const percentage = this.typeForm.get('percentage')?.value || 'TOTAL';
+
+      reservation.payment = { type, paymentOptionId, percentage, bic: undefined };
+      if (option.subTypes.length) {
+        reservation.payment.bic = this.typeForm.get('bank')?.value?.bic;
+      }
     }
     if (this.isEditing && this.reservation) {
       reservation.id = this.reservation.id;
@@ -604,9 +607,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
             this.professional.setValue('');
           }
         }
-        // if (!this.groups) {
-        // this.getTreatmentList();
-        // }
       }
       this.group.setValue('');
       this.cleanTreatment();
@@ -648,6 +648,9 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
           this.treatmentDiscount = userDiscount.discount;
           this.price = newDiscount(this.price, this.treatmentDiscount);
         }
+      } else {
+        this.treatmentDiscount = undefined;
+        this.price = removeDiscount(this.price);
       }
     });
   }
@@ -804,6 +807,9 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
           this.treatmentForm.controls[value.field]?.setErrors({ incorrect: true });
         });
       }
+      if (state.paymentOptions) {
+        this.options = getPayNlOptions(state.paymentOptions);
+      }
     });
   }
 
@@ -910,7 +916,12 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   private setTypes(): void {
-    this.types = this.room.value.paymentTypes.filter((p: PaymentType) => ![PaymentType.cash, PaymentType.transfer].includes(p));
+    const types = this.room.value.paymentTypes.filter((p: PaymentType) => ![PaymentType.cash, PaymentType.transfer].includes(p));
+    if (types?.includes(PaymentType.paynl)) {
+      this.getOptions();
+    } else {
+      this.options = getPaymentOptions(this.translate, types);
+    }
   }
 
   private completeAndNext(): void {
@@ -935,5 +946,11 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.treatment.setValue('');
     this.showDiscount = false;
     this.treatmentList = undefined;
+  }
+
+  private getOptions(): void {
+    this.store.dispatch(
+      new fromActionsReservation.PaymentOptions()
+    );
   }
 }

@@ -11,9 +11,8 @@ import { IUser } from '../../interfaces/user';
 import { ITreatmentDiscountDTO } from '../../interfaces/treatment';
 import { IRoom } from '../../interfaces/room';
 import { Pagination } from '../../interfaces/pagination';
-import { IPayment } from '../../interfaces/payment';
+import { IPayment, IPaymentOption } from '../../interfaces/payment';
 import { IAdditional } from '../../interfaces/additional';
-import { IBank } from '../../interfaces/bank';
 import { IOffice } from '../../interfaces/office';
 import { IColorAll } from '../../interfaces/color';
 
@@ -31,8 +30,8 @@ export interface State {
   tracking: ITracking[] | ITracking | null;
   payments: IPayment[] | null;
   history: IReservation[] | null;
-  banks: IBank[] | null;
   colors: IColorAll[] | null;
+  paymentOptions: IPaymentOption[] | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -55,8 +54,8 @@ export const initialState: State = {
   tracking: null,
   payments: null,
   history: null,
-  banks: null,
   colors: null,
+  paymentOptions: null,
   errorMessage: null,
   error: null,
   subErrors: null,
@@ -464,6 +463,24 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         colors: action.payload,
+        errorMessage: null,
+        subErrors: null,
+        message: null
+      };
+    }
+    case ReservationActionTypes.paymentOptions: {
+      return {
+        ...state,
+        paymentOptions: null,
+        errorMessage: null,
+        subErrors: null,
+        message: null
+      };
+    }
+    case ReservationActionTypes.paymentOptionsSuccess: {
+      return {
+        ...state,
+        paymentOptions: action.payload,
         errorMessage: null,
         subErrors: null,
         message: null

@@ -17,7 +17,7 @@
     </ng-template>
 
     <ng-template [ngIf]="showBank && price.penalty > price.totalPaid">
-      <app-bank [firstTime]="firstTime" [formGroup]="typeForm" [types]="types" [professionalName]="professionalName"
+      <app-bank [firstTime]="firstTime" [formGroup]="typeForm" [options]="options" [professionalName]="professionalName"
                 (percentageEmitter)="emitter($event)"></app-bank>
     </ng-template>
   </ng-template>
@@ -29,7 +29,7 @@
 
 <ng-template #noPrice>
   <ng-template [ngIf]="showBank">
-    <app-bank [firstTime]="firstTime" [formGroup]="typeForm" [types]="types" [professionalName]="professionalName"
+    <app-bank [firstTime]="firstTime" [formGroup]="typeForm" [options]="options" [professionalName]="professionalName"
               (percentageEmitter)="emitter($event)"></app-bank>
   </ng-template>
 </ng-template>

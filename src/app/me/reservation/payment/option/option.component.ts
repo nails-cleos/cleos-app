@@ -9,10 +9,11 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { getBackIndex, getPrice, getStep, getUserName, newPercentage } from '../../../../util/helper';
 import { IStep, Step } from '../../../../interfaces/step';
 import { MatStepper } from '@angular/material/stepper';
-import { PaymentType } from '../../../../interfaces/payment';
+import { getPaymentOptions, getPayNlOptions, IPaymentOption, PaymentType } from '../../../../interfaces/payment';
 import { IPrice, Price } from '../../../../interfaces/treatment';
 import { IReservationAll } from '../../../../interfaces/reservation';
 import * as fromActionsReservation from '../../../../store/reservation.actions';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-option',
@@ -26,7 +27,7 @@ export class OptionComponent implements OnInit, OnDestroy {
   smallScreen?: boolean;
 
   typeForm: UntypedFormGroup;
-  types?: string[];
+  options?: IPaymentOption[];
 
   reservation?: IReservationAll;
 
@@ -41,7 +42,7 @@ export class OptionComponent implements OnInit, OnDestroy {
   private reservationId: any;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
-              private breakpointObserver: BreakpointObserver, private router: Router) {
+              private breakpointObserver: BreakpointObserver, private router: Router, private translate: TranslateService) {
     this.getState = this.store.select(selectPaymentState);
     breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small])
       .subscribe(result => this.smallScreen = result.matches);
@@ -69,15 +70,17 @@ export class OptionComponent implements OnInit, OnDestroy {
   }
 
   get pay(): void {
-    const type = this.typeForm.get('type')?.value;
+    const option: IPaymentOption = this.typeForm.get('type')?.value;
+    const type = option.type;
+    const paymentOptionId = option.bic;
+    const percentage = this.typeForm.get('percentage')?.value || 'TOTAL';
     const payload = {
       reservationId: this.reservationId,
-      payment: {
-        type,
-        bic: this.typeForm.get('bank')?.value?.id,
-        percentage: this.typeForm.get('percentage')?.value || 'TOTAL'
-      }
+      payment: { type, paymentOptionId, percentage, bic: undefined }
     };
+    if (option.subTypes.length) {
+      payload.payment.bic = this.typeForm.get('bank')?.value?.bic;
+    }
     return this.store.dispatch(
       new fromActionsPayment.PaymentCreate(payload)
     );
@@ -130,10 +133,15 @@ export class OptionComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      if (state.selected) {
+      if (state.selected && (!this.options || this.options.length === 0)) {
         const reservation = state.selected[0].reservation;
         if (reservation) {
-          this.types = reservation.room.paymentTypes.filter((p: PaymentType) => ![PaymentType.cash, PaymentType.transfer].includes(p));
+          const types = reservation.room.paymentTypes.filter((p: PaymentType) => ![PaymentType.cash, PaymentType.transfer].includes(p));
+          if (types?.includes(PaymentType.paynl)) {
+            this.getOptions();
+          } else {
+            this.options = getPaymentOptions(this.translate, types);
+          }
           this.price = getPrice(reservation, state.selected);
           if (this.price.toPaid === 0) {
             this.router.navigate(['/reservation', reservation.id]);
@@ -153,6 +161,9 @@ export class OptionComponent implements OnInit, OnDestroy {
             this.reservation = reservation;
           }
         }
+      }
+      if (state.data) {
+        this.options = getPayNlOptions(state.data);
       }
     });
   }
@@ -179,6 +190,12 @@ export class OptionComponent implements OnInit, OnDestroy {
     );
     this.store.dispatch(
       new fromActionsReservation.ReservationFind({ id: this.reservationId })
+    );
+  }
+
+  private getOptions(): void {
+    this.store.dispatch(
+      new fromActionsPayment.PaymentOptions()
     );
   }
 

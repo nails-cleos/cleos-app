@@ -1,7 +1,7 @@
 import { DiscountType, IDiscount } from '../interfaces/discount';
 import { IAuthority, IUser, IUserAll } from '../interfaces/user';
 import { GroupService, IGroupService, IPrice, ITreatmentAll, ITreatmentGroup, Price } from '../interfaces/treatment';
-import { IPayment } from '../interfaces/payment';
+import { IPayment, IPaymentOption } from '../interfaces/payment';
 import { IReservationAll } from '../interfaces/reservation';
 import { IAdditionalAll } from '../interfaces/additional';
 import { TranslateService } from '@ngx-translate/core';
@@ -206,6 +206,12 @@ export const newExtra = (price: IPrice, extras: number, discount?: IDiscount): I
     priceWithDiscount, priceWithExtras, price.priceWithAdditional, price.percentageToPaid);
 };
 
+export const removeDiscount = (price: IPrice): IPrice => {
+  const total = price.amount + price.extra + price.additional;
+  return new Price(price.amount, 0, price.extra, price.additional, total, price.totalPaid, total, 0, price.priceWithExtras,
+    price.priceWithAdditional, price.percentageToPaid);
+};
+
 export const newDiscount = (price: IPrice, treatmentDiscount: IDiscount): IPrice => {
   const discount = getDiscount(treatmentDiscount, price.amount);
   const totalWithoutDiscount = price.amount + price.extra + price.additional;
@@ -398,7 +404,7 @@ export const isProfessional = (id: string, professionals?: IUser[]): boolean =>
   professionals ? professionals?.some(professional => professional.id === id) : false;
 
 export const totalPaid = (payments: IPayment[] | undefined): number => payments?.filter(
-  (p: IPayment) => p.status && ['APPROVED', 'APPROVED_REFUND', 'REFUND'].includes(p.status))?.map((p: IPayment) =>
+  (p: IPayment) => p.status && ['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND'].includes(p.status))?.map((p: IPayment) =>
   p.transactionAmount).reduce((acc: number, value: number | undefined) => acc + (value ? value : 0), 0) || 0;
 
 export const areEquals = (array1: any[], array2: any[]): boolean => (array1.length === array2.length &&
@@ -410,14 +416,13 @@ export const areEquals = (array1: any[], array2: any[]): boolean => (array1.leng
 
 export const titleCase = (text: string) => text.split(' ').map((l: string) => l[0].toUpperCase() + l.substring(1)).join(' ');
 export const openCancel = (dialog: MatDialog, room: IRoomAll, small: boolean, options: string[], afterClose: (result: any) => void,
-                           showPenalty?: boolean, price?: IPrice): void => {
-  const types = room.paymentTypes.filter((p) => !['CASH', 'TRANSFER'].includes(p));
+                           showPenalty?: boolean, price?: IPrice, paymentOptions?: IPaymentOption[]): void => {
   const currency = room.currency;
   const data = {
     small,
     options,
     price,
-    types,
+    paymentOptions,
     currency,
     showPenalty
   };
@@ -461,7 +466,7 @@ export const executeDialog = (dialog: MatDialog, dialogComponent: any, data: any
 
 const getDiscount = (discount: IDiscount, price: number): number => {
   let value = 0;
-  if (discount.amount) {
+  if (discount?.amount) {
     switch (discount.type) {
       case DiscountType.money: {
         value = discount.amount;

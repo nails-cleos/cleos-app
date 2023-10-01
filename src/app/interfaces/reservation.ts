@@ -42,6 +42,7 @@ export interface IReservationPayment {
   type: PaymentType;
   percentage: PaymentPercentage;
   bic?: string;
+  paymentOptionId?: string;
   name?: string;
   countryCode?: string;
   amount?: number;
