@@ -366,13 +366,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         }
       }
     });
-    this.paymentSubscription = this.getPaymentState.subscribe(state => {
-      this.options = getPayNlOptions(state.data);
-      // if (this.options) {
-      //   this.customerMachine(this);
-      //   this.changeState = this.machine.next(snakeToCamel(state.selected.state));
-      // }
-    });
+    this.paymentSubscription = this.getPaymentState.subscribe(state => this.options = getPayNlOptions(state.data));
   }
 
   private valueChanges(arr: any[]): void {

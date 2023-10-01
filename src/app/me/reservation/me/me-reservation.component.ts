@@ -607,9 +607,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
             this.professional.setValue('');
           }
         }
-        // if (!this.groups) {
-        // this.getTreatmentList();
-        // }
       }
       this.group.setValue('');
       this.cleanTreatment();
