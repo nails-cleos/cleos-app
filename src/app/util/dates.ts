@@ -667,3 +667,13 @@ export const getWeeksInMonth = (currentDate: Date): { start: any; end: any; date
       dates: w,
     }));
 };
+
+export const getDateFormat = (date?: Date | null): string => {
+  if (!date) {
+    return '';
+  }
+  const month = `0${ date.getMonth() + 1 }`.slice(0, 2);
+  const year = date.getFullYear();
+
+  return `${ month }-${ year }`;
+};

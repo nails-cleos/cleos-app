@@ -36,7 +36,7 @@
               <div *ngIf="allProfessional; else skeleton" fxLayout="row" fxLayoutAlign="space-between center"
                    id="professionals">
                 <div class="chip-list" fxLayout="column" fxLayoutAlign="space-around stretch">
-                  <mat-form-field>
+                  <mat-form-field appearance="outline">
                     <mat-label>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</mat-label>
                     <mat-chip-grid #chipList aria-label="Professional selection" required>
                       <mat-chip-row (removed)="remove(professional)" *ngFor="let professional of professionals"

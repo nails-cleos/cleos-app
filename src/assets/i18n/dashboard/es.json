@@ -85,7 +85,7 @@
         "TYPE": "Tipo",
         "COLOR": "Color",
         "INVOICE": "Factura",
-        "STORE_SUPPLY": "Suministro de tienda",
+        "SUPPLY_STORE": "Tienda de suministro",
         "TOTALS": "Totales"
       }
     }

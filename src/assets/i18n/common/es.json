@@ -206,6 +206,9 @@
       "PRICE": "Precio",
       "TOTAL": "Total"
     },
+    "SEARCH": {
+      "TITLE": "Búsqueda"
+    },
     "ALL_DAY": {
       "CHECK": "Todo el día"
     },

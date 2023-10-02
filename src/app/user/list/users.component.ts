@@ -38,7 +38,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
-  filter: string | undefined;
+  filter?: string;
 
   private subscription: Subscription | undefined;
   private paginatorSubscription: Subscription | undefined;

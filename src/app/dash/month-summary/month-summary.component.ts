@@ -3,7 +3,7 @@ import { FormControl, UntypedFormControl } from '@angular/forms';
 import { DateAdapter } from '@angular/material/core';
 import { MatDatepicker } from '@angular/material/datepicker';
 
-import { dateMonthYear, getDateQuarter, getNow, getWeeksInMonth, monthViewTitle, newDateTimestamp } from '../../util/dates';
+import { dateMonthYear, getDateFormat, getDateQuarter, getNow, getWeeksInMonth, monthViewTitle, newDateTimestamp } from '../../util/dates';
 import { Observable, Subscription } from 'rxjs';
 import { AppState, selectDashboardState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
@@ -128,16 +128,6 @@ export class MonthSummaryComponent implements OnInit {
   }
 
   private static cleanCVSText = (text: string): string => `${ text.replace(/,/g, '') }; `;
-
-  private static getDateFormat(date: Date | null): string {
-    if (!date) {
-      return '';
-    }
-    const month = `0${ date.getMonth() + 1 }`.slice(0, 2);
-    const year = date.getFullYear();
-
-    return `${ month }-${ year }`;
-  }
 
   private static isInvalidInput(value: string): boolean {
     return !value || new RegExp(/^0\.?0{0,2}$/g).test(value) || new RegExp(/^\.0{0,2}$/g).test(value);
@@ -325,7 +315,7 @@ export class MonthSummaryComponent implements OnInit {
       const hiddenElement = document.createElement('a');
       hiddenElement.href = `data:text/csv;charset=utf-8,${ encodeURI(csv) }`;
       hiddenElement.target = '_blank';
-      hiddenElement.download = `${ titleCase(SummaryType[type]) }-${ MonthSummaryComponent.getDateFormat(this.date.value) }.csv`;
+      hiddenElement.download = `${ titleCase(SummaryType[type]) }-${ getDateFormat(this.date.value) }.csv`;
       hiddenElement.click();
 
       return this.updateMonthlySummary(type, gross, btw, values);
@@ -338,7 +328,7 @@ export class MonthSummaryComponent implements OnInit {
     return this.store.dispatch(
       new fromActionsDashboard.UpdateMonthlySummary(
         {
-          date: MonthSummaryComponent.getDateFormat(this.date.value),
+          date: getDateFormat(this.date.value),
           roomId: this.roomId,
           type,
           gross,
@@ -391,7 +381,7 @@ export class MonthSummaryComponent implements OnInit {
     });
     this.date.valueChanges.subscribe(value => {
       if (value) {
-        this.getSummary(MonthSummaryComponent.getDateFormat(value));
+        this.getSummary(getDateFormat(value));
         this.weeks = getWeeksInMonth(value);
         this.showInput = true;
       }

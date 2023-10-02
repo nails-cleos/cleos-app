@@ -168,7 +168,7 @@ export interface IMonthlySummaryReservation extends IMonthlySummary {
 export interface IMonthlySummaryExpense extends IMonthlySummary {
   expenseDate: Date;
   invoice: string;
-  storeSupply: string;
+  supplyStore: string;
 }
 
 export interface ISummaryRoom {

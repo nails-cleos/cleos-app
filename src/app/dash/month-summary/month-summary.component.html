@@ -250,7 +250,7 @@
             <th mat-subheader></th>
             <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.DATE' | translate}}</th>
             <th mat-subheader [colSpan]="2">{{'SUMMARY.MONTHLY.TABLE.INVOICE' | translate}}</th>
-            <th mat-subheader [colSpan]="2">{{'SUMMARY.MONTHLY.TABLE.STORE_SUPPLY' | translate}}</th>
+            <th mat-subheader [colSpan]="2">{{'SUMMARY.MONTHLY.TABLE.SUPPLY_STORE' | translate}}</th>
             <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.GROSS' | translate}}</th>
             <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.NET' | translate}}</th>
             <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.BTW' | translate}}</th>
@@ -273,7 +273,7 @@
                 {{(summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat)?.replace(',', '')}}
               </td>
               <td [colSpan]="2">{{summary.invoice}}</td>
-              <td [colSpan]="2">{{summary.storeSupply}}</td>
+              <td [colSpan]="2">{{summary.supplyStore}}</td>
               <ng-container [ngTemplateOutlet]="paymentTemplate"
                             [ngTemplateOutletContext]="{payment: summary.total, currency: selectedRoom.value.currency.icon,
                         index: summary.position, key: 'EXPENSE', type: summary.total.expenseType, edit: true}">

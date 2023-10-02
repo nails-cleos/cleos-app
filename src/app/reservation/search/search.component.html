@@ -1,8 +1,8 @@
 <div>
   <fieldset>
-    <legend>{{'RESERVATION.SEARCH.TITLE' | translate }}</legend>
+    <legend>{{'COMMON.SEARCH.TITLE' | translate }}</legend>
     <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
-      <mat-form-field>
+      <mat-form-field appearance="outline">
         <mat-label>{{ 'RESERVATION.STATE.SEARCH' | translate }}</mat-label>
         <mat-chip-grid #chipList aria-label="Fruit selection">
           <mat-chip-row (removed)="remove(state)" *ngFor="let state of states" [removable]="true"
@@ -19,7 +19,7 @@
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
-      <mat-form-field>
+      <mat-form-field appearance="outline">
         <mat-label>{{ 'RESERVATION.CUSTOMER.SEARCH' | translate }}</mat-label>
         <label>
           <input (keydown)="keyDownHandler($event)" [formControl]="customer" [matAutocomplete]="autoCustomer"
@@ -35,7 +35,7 @@
     </div>
   </fieldset>
 
-  <div *ngIf="dataSource.loading$ | async" class="spinner-container">
+  <div *ngIf="dataSource.loading$ | async">
     <mat-spinner></mat-spinner>
   </div>
   <div class="mat-elevation-z8">

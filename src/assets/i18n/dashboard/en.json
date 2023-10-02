@@ -85,7 +85,7 @@
         "TYPE": "Type",
         "COLOR": "Color",
         "INVOICE": "Invoice",
-        "STORE_SUPPLY": "Store supply",
+        "SUPPLY_STORE": "Supply store",
         "TOTALS": "Totals"
       },
       "ERROR": {

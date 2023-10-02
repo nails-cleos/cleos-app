@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { IUser } from '../interfaces/user';
 import { Observable } from 'rxjs';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Role } from '../interfaces/token';
 import { IRoom } from '../interfaces/room';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { ICustomerLastReservation } from '../interfaces/reservation';
+import { createFilter } from '../util/service-helper';
 
 @Injectable()
 export class UserService {
@@ -26,16 +27,7 @@ export class UserService {
 
   public getAll(sort: string, direction: string, page: number, size: number = PAGE_SIZE,
                 filter: string): Observable<IUser[]> {
-    let params = new HttpParams().set('page', String(page)).set('size', String(size));
-    if (sort) {
-      params = params.append('sort', sort);
-    }
-    if (direction) {
-      params = params.append('direction', direction);
-    }
-    if (filter) {
-      params = params.append('filter', filter);
-    }
+    const params = createFilter(page, size, sort, direction, filter);
 
     return this.http.get<IUser[]>(`${ this.userUrlV1 }/pages`, { params });
   }
