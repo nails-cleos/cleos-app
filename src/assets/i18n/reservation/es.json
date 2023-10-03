@@ -2,9 +2,6 @@
   "RESERVATION": {
     "PREVIEW": "Vista previa",
     "APPOINTMENT": "Cita",
-    "SEARCH": {
-      "TITLE": "Búsqueda"
-    },
     "LIST": {
       "CANCEL": {
         "TITLE": "Cancelar reserva",

@@ -135,7 +135,7 @@
     "LIST": {
       "COLUMN": {
         "INVOICE": "Invoice",
-        "STORE_SUPPLY": "Store supply",
+        "SUPPLY_STORE": "Supply store",
         "DATE": "Date",
         "GROSS": "Gross",
         "BTW": "BTW",
@@ -149,9 +149,9 @@
       "FIELD": "Invoice",
       "REQUIRED": "Invoice is <b>required</b>"
     },
-    "STORE_SUPPLY": {
-      "FIELD": "Store supply",
-      "REQUIRED": "Store supply is <b>required</b>"
+    "SUPPLY_STORE": {
+      "FIELD": "Supply store",
+      "REQUIRED": "Supply store is <b>required</b>"
     },
     "DESCRIPTION": {
       "FIELD": "Description"

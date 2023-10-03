@@ -36,18 +36,33 @@
                   {{errors['invoice']}}
                 </mat-error>
               </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'EXPENSE.STORE_SUPPLY.FIELD' | translate }}</mat-label>
+
+              <mat-form-field *ngIf="supplyStores; else skeleton" appearance="outline">
+                <mat-label>{{ 'EXPENSE.SUPPLY_STORE.FIELD' | translate }}</mat-label>
                 <label>
-                  <input formControlName="storeSupply" matInput required>
+                  <input formControlName="supplyStore" [matAutocomplete]="autoSupplyStore" matInput required
+                         type="text">
                 </label>
-                <mat-error *ngIf="getForm.storeSupply.hasError('required')"
-                           [innerHTML]="'EXPENSE.STORE_SUPPLY.REQUIRED' | translate">
+                <button matSuffix mat-icon-button *ngIf="getForm.supplyStore.value" (click)="removeSupplyStore"
+                        type="button">
+                  <mat-icon>close</mat-icon>
+                </button>
+                <mat-autocomplete #autoSupplyStore="matAutocomplete" [displayWith]="displayFnSupplyStore">
+                  <mat-option *ngFor="let supplyStore of filteredSupplyStore | async " [value]="supplyStore">
+                    {{supplyStore.name}}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="getForm.supplyStore.hasError('required')"
+                           [innerHTML]="'COMMON.ROOM.OFFICE.REQUIRED' | translate">
                 </mat-error>
-                <mat-error *ngIf="errors['storeSupply']">
-                  {{errors['storeSupply']}}
+                <mat-error *ngIf="errors['supplyStore']">
+                  {{errors['supplyStore']}}
                 </mat-error>
               </mat-form-field>
+              <ng-template #skeleton>
+                <div class="ssc-line"></div>
+              </ng-template>
+
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'EXPENSE.DESCRIPTION.FIELD' | translate }}</mat-label>
                 <label>
@@ -58,7 +73,7 @@
             </div>
             <div fxLayout.xs="column" fxLayoutAlign.xs="space-evenly stretch"
                  fxLayout="row" fxLayoutAlign="space-around center">
-              <mat-form-field>
+              <mat-form-field appearance="outline">
                 <mat-label>{{'EXPENSE.DATE.FIELD' | translate}}</mat-label>
                 <input matInput [matDatepicker]="dp" formControlName="date" required [max]="today">
                 <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
@@ -71,7 +86,7 @@
                   {{errors['date']}}
                 </mat-error>
               </mat-form-field>
-              <mat-form-field>
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'EXPENSE.TYPE.FIELD' | translate }}</mat-label>
                 <mat-select formControlName="type" required>
                   <mat-optgroup *ngFor="let group of types | keyvalue"
@@ -94,7 +109,8 @@
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'EXPENSE.GROSS.FIELD' | translate }}</mat-label>
                 <label>
-                  <input id="gross" formControlName="gross" matInput required appTwoDigits [allowNegatives]="true" #gross
+                  <input id="gross" formControlName="gross" matInput required appTwoDigits [allowNegatives]="true"
+                         #gross
                          (focusout)="validateInputValue(gross)">
                 </label>
                 <mat-icon matPrefix>{{currencyIcon}}</mat-icon>

@@ -14,20 +14,27 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import * as fromActionsExpense from '../../../../store/expense.actions';
 import { DialogComponent } from '../../../../shared/dialog/generic/dialog.component';
 import { ActivatedRoute } from '@angular/router';
-import { isSameTimeZone, newDateTimestamp } from '../../../../util/dates';
+import { getDateFormat, getNow, isSameTimeZone, newDateTimestamp } from '../../../../util/dates';
 import { openDialog } from '../../../../util/helper';
+import { DateAdapter } from '@angular/material/core';
+import { YearMonthAdapter } from '../../../../util/adapter/year-month.adapter';
+import { FormControl } from '@angular/forms';
+import { MatDatepicker } from '@angular/material/datepicker';
 
 @Component({
   selector: 'app-expenses',
   templateUrl: './expenses.component.html',
   styleUrls: ['./expenses.component.scss'],
-  animations: [detailExpandAnimation]
+  animations: [detailExpandAnimation],
+  providers: [
+    { provide: DateAdapter, useClass: YearMonthAdapter }
+  ]
 })
 export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['position', 'invoice', 'storeSupply', 'timestamp', 'type', 'gross', 'btw', 'net', 'actions'];
+  displayedColumns: string[] = ['position', 'invoice', 'supplyStore.name', 'timestamp', 'type', 'gross', 'btw', 'net', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IExpense>>();
   expanded?: IExpense;
 
@@ -35,10 +42,13 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
   pageSize = PAGE_SIZE;
   roomId: string | null = null;
   dateFormat: string;
-
+  date = new FormControl<Date | null>(null);
   private subscription: Subscription | undefined;
+
   private paginatorSubscription: Subscription | undefined;
   private getState: Observable<any>;
+  private filter?: string;
+  private dateFilter: string | null = null;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver, private route: ActivatedRoute) {
@@ -62,6 +72,7 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.roomId = this.route.snapshot.paramMap.get('id');
     this.clean();
     this.subscribe();
+    this.valueChange();
   }
 
   ngOnDestroy(): void {
@@ -69,8 +80,31 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription?.unsubscribe();
   }
 
+  applyFilter(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.filter = filterValue.trim().toLowerCase();
+    this.getExpenses(0);
+  }
+
   showTimeZone(expense: IExpenseAll): boolean {
     return !isSameTimeZone(expense.room.timeZone);
+  }
+
+  setMonthAndYear(normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>): void {
+    const ctrlValue = this.date.value || getNow();
+
+    ctrlValue.setMonth(normalizedMonthAndYear.getMonth());
+    ctrlValue.setFullYear(normalizedMonthAndYear.getFullYear());
+
+    this.date.setValue(ctrlValue);
+
+    datepicker.close();
+  }
+
+  keyDownHandler(event: any): void {
+    if (event.code === 'Backspace') {
+      this.date.setValue(null);
+    }
   }
 
   openDialog(expense: IExpenseAll): void {
@@ -97,6 +131,13 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
           new fromActionsExpense.DeleteExpense({ roomId: this.roomId, id: result.id })
         );
       }
+    });
+  }
+
+  private valueChange(): void {
+    this.date.valueChanges.subscribe(value => {
+      this.dateFilter = value ? getDateFormat(value) : value;
+      this.getExpenses(0);
     });
   }
 
@@ -144,6 +185,8 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
       active: this.sort.active,
       direction: this.sort.direction,
       size: this.pageSize,
+      filter: this.filter,
+      dateFilter: this.dateFilter,
       page
     };
     this.store.dispatch(

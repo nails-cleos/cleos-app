@@ -135,7 +135,7 @@
     "LIST": {
       "COLUMN": {
         "INVOICE": "Factura",
-        "STORE_SUPPLY": "Suministro de tienda",
+        "SUPPLY_STORE": "Tienda de suministro",
         "DATE": "Fecha",
         "GROSS": "Bruto",
         "BTW": "IVA",
@@ -149,9 +149,9 @@
       "FIELD": "Factura",
       "REQUIRED": "Factura es <b>requerido</b>"
     },
-    "STORE_SUPPLY": {
-      "FIELD": "Suministro de tienda",
-      "REQUIRED": "Suministro de tienda es <b>requerido</b>"
+    "SUPPLY_STORE": {
+      "FIELD": "Tienda de suministro",
+      "REQUIRED": "Tienda de suministro es <b>requerido</b>"
     },
     "DESCRIPTION": {
       "FIELD": "Descripción"

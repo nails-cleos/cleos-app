@@ -522,20 +522,20 @@
         <div fxLayout="column" fxLayoutAlign="space-between start">
           <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
           <ng-template [ngIf]="room.value">
-            <mat-form-field>
+            <mat-form-field appearance="outline">
               <mat-label>{{ 'RESERVATION.ROOM.DETAIL' | translate }}</mat-label>
               <label>
                 <input [value]="roomDetail" disabled matInput type="text">
               </label>
             </mat-form-field>
             <ng-template [ngIf]="room.value.address && room.value.address.location">
-              <mat-form-field>
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.ADDRESS.FIELD' | translate }}</mat-label>
                 <label>
                   <input [value]="room.value.address.name" disabled matInput type="text">
                 </label>
               </mat-form-field>
-              <mat-form-field>
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.ADDRESS.DESCRIPTION' | translate }}</mat-label>
                 <label>
                   <input [value]="room.value.address.description" disabled matInput type="text">
@@ -692,20 +692,20 @@
           <div fxLayout="column" fxLayoutAlign="space-between start">
             <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
             <ng-template [ngIf]="room.value">
-              <mat-form-field>
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'RESERVATION.ROOM.DETAIL' | translate }}</mat-label>
                 <label>
                   <input [value]="roomDetail" disabled matInput type="text">
                 </label>
               </mat-form-field>
               <ng-template [ngIf]="room.value.address && room.value.address.location">
-                <mat-form-field>
+                <mat-form-field appearance="outline">
                   <mat-label>{{ 'COMMON.ADDRESS.FIELD' | translate }}</mat-label>
                   <label>
                     <input [value]="room.value.address.name" disabled matInput type="text">
                   </label>
                 </mat-form-field>
-                <mat-form-field>
+                <mat-form-field appearance="outline">
                   <mat-label>{{ 'COMMON.ADDRESS.DESCRIPTION' | translate }}</mat-label>
                   <label>
                     <input [value]="room.value.address.description" disabled matInput type="text">

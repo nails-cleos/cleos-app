@@ -3,7 +3,7 @@ import { IRoomAll } from './room';
 
 export interface IExpense {
   id?: string | null;
-  storeSupply?: string;
+  supplyStore?: string;
   invoice?: string;
   description?: string;
   type?: string;
@@ -18,7 +18,7 @@ export interface IExpense {
 
 export interface IExpenseAll {
   id?: string;
-  storeSupply: string;
+  supplyStore: string;
   invoice: string;
   type: string;
   timestamp: number;
@@ -34,6 +34,11 @@ export interface IExpenseInfo {
   roomName: string;
   currency: ICurrencyAll;
   types: any[];
+}
+
+export interface ISupplyStore {
+  id: string;
+  name: string;
 }
 
 export class Expense implements IExpense {
