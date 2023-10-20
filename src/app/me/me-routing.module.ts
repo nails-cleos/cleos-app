@@ -4,25 +4,25 @@ import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
 import { ReservationsComponent } from './reservation/list/reservations.component';
 import { MeReservationComponent } from './reservation/me/me-reservation.component';
-import { PaymentComponent } from './reservation/payment/payment.component';
-import { PaymentCompleteComponent } from './reservation/payment/complete/payment-complete.component';
+import { PaymentComponent } from './payment/payment.component';
+import { PaymentCompleteComponent } from './payment/complete/payment-complete.component';
 import { ReferralsComponent } from './referrals/referrals.component';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
 import { ReviewDialogComponent } from './reservation/review/review-dialog.component';
 import { OverviewComponent } from '../user/overview/overview.component';
-import { OptionComponent } from './reservation/payment/option/option.component';
-import { MePaymentComponent } from './payment/me-payment.component';
+import { OptionComponent } from './payment/option/option.component';
+import { MePaymentComponent } from './payment/me/me-payment.component';
 
 const routes: Routes = [{
   path: '', canActivate: [authGuard], data: { roles: [Role.customer] }, children: [
     { path: 'reservations', component: ReservationsComponent },
     { path: 'reservation', component: MeReservationComponent },
     { path: 'reservation/:id', component: MeReservationComponent },
-    { path: 'reservation/:id/payment', component: PaymentComponent },
     { path: 'reservation/:id/payment/option', component: OptionComponent },
-    { path: 'reservation/:id/payment/:status', component: PaymentCompleteComponent },
     { path: 'reservation/:id/payment/:id/:status', component: PaymentCompleteComponent },
     { path: 'reservation/:id/review', component: ReviewDialogComponent },
+    { path: ':path/:id/payment', component: PaymentComponent },
+    { path: ':path/:id/payment/:status', component: PaymentCompleteComponent },
     { path: 'payment/:id', component: MePaymentComponent },
     { path: 'referrals', component: ReferralsComponent },
     { path: 'discounts', component: MeDiscountComponent },

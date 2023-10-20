@@ -464,6 +464,12 @@
     background-color: mat.get-color-from-palette($accent-palette);
   }
 
+  #account-spinner {
+    mat-progress-spinner {
+      box-shadow: 0 0 0 1.4em mat.get-color-from-palette($primary-palette, default, 0.2) inset;
+    }
+  }
+
   .card-text-color {
     color: mat.get-color-from-palette($accent-palette, darker-contrast);
   }

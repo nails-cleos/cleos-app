@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { ITreatmentAll, ITreatmentDiscountDTO, ITreatmentGroup } from '../interfaces/treatment';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
+import { createFilter } from '../util/service-helper';
 
 @Injectable()
 export class TreatmentService {
@@ -15,13 +16,7 @@ export class TreatmentService {
   }
 
   public getAll(sort: string, direction: string, page: number, size: number = PAGE_SIZE): Observable<ITreatmentGroup[]> {
-    let params = new HttpParams().set('page', String(page)).set('size', String(size));
-    if (sort) {
-      params = params.append('sort', sort);
-    }
-    if (direction) {
-      params = params.append('direction', direction);
-    }
+    const params = createFilter(page, size, sort, direction);
 
     return this.http.get<ITreatmentGroup[]>(`${ this.urlV1 }/pages`, { params });
   }

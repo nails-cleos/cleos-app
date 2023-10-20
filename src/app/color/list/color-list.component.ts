@@ -28,13 +28,13 @@ export class ColorListComponent implements OnInit, AfterViewInit, OnDestroy {
   displayedColumns: string[] = ['position', 'name', 'description', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IColor>>();
 
-  expandedColor: IColor | undefined;
+  expandedColor?: IColor;
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
 
-  private subscription: Subscription | undefined;
-  private paginatorSubscription: Subscription | undefined;
+  private subscription?: Subscription;
+  private paginatorSubscription?: Subscription;
   private getState: Observable<any>;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,

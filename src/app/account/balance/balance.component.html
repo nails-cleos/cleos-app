@@ -1,0 +1,35 @@
+<mat-card appearance="outlined" class="style-card">
+  <mat-card-header *ngIf="account; else skeletonTitle">
+    <mat-card-title style="font-size: 2em">{{'ACCOUNT.BALANCE' | translate}}</mat-card-title>
+    <mat-card-subtitle>{{'ACCOUNT.TITLE' | translate}} {{account.id}}</mat-card-subtitle>
+    <div fxFlex></div>
+    <ng-template [ngIf]="showAdd">
+      <button mat-icon-button [color]="'primary'" [routerLink]="['/', 'accounts', account.id, 'transactions', 'add']">
+        <mat-icon>add</mat-icon>
+      </button>
+    </ng-template>
+    <ng-template [ngIf]="showView">
+      <button mat-icon-button [color]="'primary'" [routerLink]="['/', 'accounts', account.id, 'transactions', 'view']">
+        <mat-icon>receipt</mat-icon>
+      </button>
+    </ng-template>
+  </mat-card-header>
+  <ng-template #skeletonTitle>
+    <div class="card-margin ssc-head-line"></div>
+  </ng-template>
+  <mat-card-content>
+    <div *ngIf="account; else box">
+      <div id="account-spinner" class="spinner-parent-center">
+        <mat-progress-spinner [color]="'primary'" [mode]="'determinate'" [value]="balancePercentage"
+                              [diameter]="200">
+        </mat-progress-spinner>
+      </div>
+      <div class="spinner-text-inside">
+        <h1>{{account.balance | currency: account.currency.code: 'symbol': '1.2-2'}}</h1>
+      </div>
+    </div>
+    <ng-template #box>
+      <div style="height: 80px" class="ssc-square mb"></div>
+    </ng-template>
+  </mat-card-content>
+</mat-card>

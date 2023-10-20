@@ -30,6 +30,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatBadgeModule } from '@angular/material/badge';
 
 const materialModules = [
   NgxMaterialTimepickerModule,
@@ -61,7 +62,8 @@ const materialModules = [
   MatExpansionModule,
   MatTabsModule,
   MatBottomSheetModule,
-  MatToolbarModule
+  MatToolbarModule,
+  MatBadgeModule
 ];
 
 @NgModule({

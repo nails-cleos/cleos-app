@@ -20,7 +20,7 @@ export class ErrorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.error.status !== 'NO_CONTENT') {
+    if (!['NO_CONTENT', 'no_content_error'].includes(this.error.status)) {
       if (this.error.status === 'NOT_FOUND') {
         this.imageSrc = './assets/not_found.png';
         this.retry = false;

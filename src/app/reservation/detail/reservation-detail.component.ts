@@ -268,7 +268,9 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   notify(payment: IPaymentAll): void {
     this.store.dispatch(
       new fromActionsPayment.PaymentNotify({
-        id: payment.id, reservationId: payment?.reservation?.id,
+        id: payment.id,
+        resourceId: payment?.reservation?.id,
+        path: 'reservation',
         preferenceId: payment.preferenceId,
         type: payment.type
       })

@@ -1,18 +1,18 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import * as fromActionsPayment from '../../../../store/payment.actions';
+import * as fromActionsPayment from '../../../store/payment.actions';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { AppState, selectPaymentState } from '../../../../store/app.states';
+import { AppState, selectPaymentState } from '../../../store/app.states';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { getBackIndex, getPrice, getStep, getUserName, newPercentage } from '../../../../util/helper';
-import { IStep, Step } from '../../../../interfaces/step';
+import { getBackIndex, getPrice, getStep, getUserName, newPercentage } from '../../../util/helper';
+import { IStep, Step } from '../../../interfaces/step';
 import { MatStepper } from '@angular/material/stepper';
-import { getPaymentOptions, getPayNlOptions, IPaymentOption, PaymentType } from '../../../../interfaces/payment';
-import { IPrice, Price } from '../../../../interfaces/treatment';
-import { IReservationAll } from '../../../../interfaces/reservation';
-import * as fromActionsReservation from '../../../../store/reservation.actions';
+import { getPaymentOptions, getPayNlOptions, IPaymentOption, PaymentType } from '../../../interfaces/payment';
+import { IPrice, Price } from '../../../interfaces/treatment';
+import { IReservationAll } from '../../../interfaces/reservation';
+import * as fromActionsReservation from '../../../store/reservation.actions';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
@@ -186,7 +186,7 @@ export class OptionComponent implements OnInit, OnDestroy {
 
   private getPaymentFindByReservationId(): void {
     this.store.dispatch(
-      new fromActionsPayment.PaymentFindByReservationId({ reservationId: this.reservationId })
+      new fromActionsPayment.PaymentFindByResourceId({ id: this.reservationId, path: 'reservation' })
     );
     this.store.dispatch(
       new fromActionsReservation.ReservationFind({ id: this.reservationId })

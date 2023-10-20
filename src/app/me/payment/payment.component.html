@@ -37,11 +37,11 @@
     </ng-container>
 
     <ng-container matColumnDef="amount">
-      <th *matHeaderCellDef mat-header-cell>{{ 'ME.PAYMENT.LIST.COLUMN.AMOUNT' | translate }}</th>
+      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
       <td *matCellDef="let payment" mat-cell>
         <div *ngIf="payment.id; else skeleton">
           <mat-icon matPrefix>
-            {{payment.reservation.room.currency.icon}}
+            {{getCurrency(payment)}}
           </mat-icon>&nbsp;{{payment.amount | number:'1.2-2'}}
         </div>
         <ng-template #skeleton>
@@ -51,7 +51,7 @@
     </ng-container>
 
     <ng-container matColumnDef="status">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'ME.PAYMENT.LIST.COLUMN.STATUS' | translate }}</th>
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
       <td *matCellDef="let payment" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="payment.id; else skeleton">
           {{'COMMON.STATUS.PAYMENT.' + (payment.status || 'NONE') | translate}}

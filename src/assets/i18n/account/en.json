@@ -1,0 +1,42 @@
+{
+  "ACCOUNT": {
+    "TITLE": "Account",
+    "BALANCE": "Balance",
+    "MONEY_ADDED": "Money added to account {{id}}",
+    "UPDATED": "Account {{id}} updated",
+    "GIFT": {
+      "FIELD": "Gift",
+      "REQUIRED": "Gift is <b>required</b>",
+      "GREATER": "Gift must be greater than 0",
+      "LESS": "Gift must be less than 100"
+    },
+    "TRANSACTION": {
+      "TITLE": "Transaction",
+      "DETAIL": "Transaction detail",
+      "TRANSFER": "Transfer reference",
+      "ID": "Transaction id",
+      "PREFERENCE_ID": "Reference",
+      "PAYMENT_ID": "Payment",
+      "AMOUNT_GIFTED": "Amount gifted",
+      "DATE": "Date",
+      "STATUS": "Status",
+      "LIST": {
+        "COLUMN": {
+          "AMOUNT_GIFTED": "Amount gifted",
+          "DATE": "Date"
+        },
+        "ERROR": {
+          "NO_CONTENT": "No transactions"
+        }
+      },
+      "TYPE": {
+        "FIELD": "Type",
+        "REQUIRED": "Type is <b>required</b>"
+      },
+      "AMOUNT": {
+        "FIELD": "Amount",
+        "REQUIRED": "Amount is <b>required</b>"
+      }
+    }
+  }
+}

@@ -1,12 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AppState, selectPaymentState } from '../../../store/app.states';
+import { AppState, selectPaymentState } from '../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { IPayment, IPaymentAll } from '../../../interfaces/payment';
-import * as fromActionsPayment from '../../../store/payment.actions';
+import { IPayment, IPaymentAll } from '../../interfaces/payment';
+import * as fromActionsPayment from '../../store/payment.actions';
 import { MatTableDataSource } from '@angular/material/table';
-import { Pagination } from '../../../interfaces/pagination';
+import { Pagination } from '../../interfaces/pagination';
 
 @Component({
   selector: 'app-payment',
@@ -22,7 +22,8 @@ export class PaymentComponent implements OnInit, OnDestroy {
 
   private getState: Observable<any>;
   private subscription?: Subscription;
-  private reservationId: any;
+  private id: any;
+  private path: any;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private router: Router) {
     this.getState = this.store.select(selectPaymentState);
@@ -36,7 +37,8 @@ export class PaymentComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscribe();
     this.route.params.subscribe(routeParams => {
-      this.reservationId = routeParams.id;
+      this.id = routeParams.id;
+      this.path = routeParams.path;
       this.getPayments();
     });
   }
@@ -56,19 +58,31 @@ export class PaymentComponent implements OnInit, OnDestroy {
   notify(payment: IPayment): void {
     this.store.dispatch(
       new fromActionsPayment.PaymentNotify({
-        id: payment.id, reservationId: this.reservationId,
+        id: payment.id, resourceId: this.id,
+        path: this.path,
         preferenceId: payment.preferenceId,
         type: payment.type
       })
     );
   }
 
+  getCurrency(payment: IPaymentAll): string {
+    let icon = 'euro';
+    if (payment.reservation) {
+      icon = payment.reservation.room.currency.icon;
+    } else if (payment.transaction && payment.transaction.account) {
+      icon = payment.transaction.account.currency.icon;
+    }
+    return icon;
+  }
+
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       this.dataSource = state.selected;
-      if (state.message) {
+      const paths = state.paths;
+      if (state.message && paths) {
         this.clean();
-        this.router.navigate(['reservation', this.reservationId]);
+        this.router.navigate(paths);
       } else if (state.subErrors) {
         this.showError = true;
         this.errorMessage = state.subErrors;
@@ -79,7 +93,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
   private getPayments(): void {
     if (!this.dataSource) {
       this.store.dispatch(
-        new fromActionsPayment.PaymentFindByReservationId({ reservationId: this.reservationId, redirect: true })
+        new fromActionsPayment.PaymentFindByResourceId({ id: this.id, path: this.path, redirect: true })
       );
     }
   }

@@ -1,0 +1,74 @@
+<div class="flex-container" fxLayout="column">
+  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
+    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+      <app-balance [account]="account" [showView]="true"></app-balance>
+      <form (ngSubmit)="submit" [formGroup]="form" novalidate>
+        <mat-card appearance="outlined" class="style-card" *ngIf="account">
+          <mat-card-header>
+            <mat-card-title>{{'ACCOUNT.TRANSACTION.TITLE' | translate}}</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'ACCOUNT.TRANSACTION.AMOUNT.FIELD' | translate }}</mat-label>
+                <mat-select formControlName="amount">
+                  <mat-select-trigger>
+                    <mat-icon>{{account.currency.icon}}</mat-icon>
+                    {{getForm.amount.value}}
+                  </mat-select-trigger>
+                  <mat-option *ngFor="let item of [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]" [value]="item">
+                    <mat-icon>{{account.currency.icon}}</mat-icon>
+                    {{item}}
+                  </mat-option>
+                </mat-select>
+                <mat-error *ngIf="getForm.amount.hasError('required')"
+                           [innerHTML]="'ACCOUNT.TRANSACTION.AMOUNT.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['amount']">
+                  {{errors['amount']}}
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <ng-template [ngIf]="!hasAdminRole" [ngIfElse]="noAdmin">
+              <app-bank [firstTime]="true" [formGroup]="form" [options]="options"></app-bank>
+            </ng-template>
+            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+              <ng-template #noAdmin>
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'ACCOUNT.TRANSACTION.TYPE.FIELD' | translate }}</mat-label>
+                  <mat-select formControlName="type" required>
+                    <mat-option *ngFor="let t of types" [value]="t">
+                      {{ 'COMMON.PAYMENT.TYPE.' + (t || 'NONE') | translate }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="getForm.type.hasError('required')"
+                             [innerHTML]="'ACCOUNT.TRANSACTION.TYPE.REQUIRED' | translate">
+                  </mat-error>
+                  <mat-error *ngIf="errors['type']">
+                    {{errors['type']}}
+                  </mat-error>
+                </mat-form-field>
+                <ng-template [ngIf]="getForm.type.value === 'TRANSFER'">
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ 'ACCOUNT.TRANSACTION.TRANSFER' | translate }}</mat-label>
+                    <label>
+                      <input formControlName="transfer" matInput>
+                    </label>
+                  </mat-form-field>
+                </ng-template>
+              </ng-template>
+            </div>
+          </mat-card-content>
+          <mat-card-actions>
+            <div fxFlex></div>
+            <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
+                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
+              {{ 'COMMON.BUTTON.ADD' | translate }}
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </form>
+    </div>
+  </div>
+</div>

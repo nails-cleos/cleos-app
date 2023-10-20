@@ -23,7 +23,7 @@
 
     <ng-container matColumnDef="discount.amount">
       <th *matHeaderCellDef mat-header-cell
-          mat-sort-header>{{ 'ME.DISCOUNT.LIST.COLUMN.AMOUNT' | translate }}</th>
+          mat-sort-header>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
       <td *matCellDef="let userDiscount">
         <div *ngIf="userDiscount.id; else skeleton" class="bold">{{userDiscount.symbol}}</div>
         <ng-template #skeleton>

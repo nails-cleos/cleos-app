@@ -140,7 +140,7 @@ export class ReservationEffects {
 
   findPayments$ = createEffect(() => this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.reservationFindPayments)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.paymentService.findByReservationId(payload).pipe(
+    switchMap((payload: any) => this.paymentService.findByResourceId(payload, 'reservation').pipe(
       switchMap((response) => of(new fromActionsReservation.ReservationPaymentsSuccess(response ? response : []))),
       catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({ error: err.error })))
     ))

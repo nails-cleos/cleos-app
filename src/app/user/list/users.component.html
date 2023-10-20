@@ -65,7 +65,7 @@
       </ng-container>
 
       <ng-container matColumnDef="status">
-        <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'USER.LIST.COLUMN.STATUS' | translate }}</th>
+        <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
         <td *matCellDef="let user" fxHide.lt-sm fxShow mat-cell>
           <div *ngIf="user.id; else skeleton">
             <div *ngIf="!user.deleted; else deleteBlock">
@@ -106,6 +106,9 @@
               </button>
               <button (click)="book(user)" mat-icon-button>
                 <mat-icon color="accent">today</mat-icon>
+              </button>
+              <button [routerLink]="['/', 'accounts', 'customers', user.id]" mat-icon-button>
+                <mat-icon color="primary">account_balance</mat-icon>
               </button>
               <ng-template [ngIf]="!user.deleted && !user.enabled && user.provider === 'LOCAL'">
                 <button (click)="sendInvite(user)" mat-icon-button>
@@ -150,7 +153,7 @@
               <mat-list-item fxHide fxShow.lt-sm role="list">
                 <div matListItemLine>{{user.provider}}</div>
               </mat-list-item>
-              <div fxHide fxShow.lt-sm matListItemTitle>{{ 'USER.LIST.COLUMN.STATUS' | translate }}</div>
+              <div fxHide fxShow.lt-sm matListItemTitle>{{ 'COMMON.COLUMN.STATUS' | translate }}</div>
               <mat-list-item fxHide fxShow.lt-sm role="list">
                 <ng-template [ngIf]="!user.deleted" [ngIfElse]="deleteBlock">
                   <ng-template [ngIf]="user.enabled || user.provider !== 'LOCAL'" [ngIfElse]="elseBlock">

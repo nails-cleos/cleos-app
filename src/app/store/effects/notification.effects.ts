@@ -13,7 +13,7 @@ export class NotificationEffects {
 
   getAll$ = createEffect(() => this.actions$.pipe(ofType(fromActionsNotification.NotificationActionTypes.notificationPage)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.notificationService.getAll(payload.active, payload.direction, payload.page).pipe(
+    switchMap((payload: any) => this.notificationService.getAll(payload.active, payload.direction, payload.page, payload.size).pipe(
       switchMap((response: any) => of(new fromActionsNotification.NotificationSuccess(response ? response : { page: { content: [] } }))),
       catchError((err: HttpErrorResponse) => of(new fromActionsNotification.NotificationFailure({ error: err.error })))
     ))

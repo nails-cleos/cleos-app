@@ -225,10 +225,6 @@
     "RECREATE": "Link de pago regenerado",
     "COPY": "¡Link copiado!",
     "LIST": {
-      "COLUMN": {
-        "AMOUNT": "Importe",
-        "STATUS": "Estado"
-      },
       "ERROR": {
         "NO_CONTENT": "No hay pagos"
       }

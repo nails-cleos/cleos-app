@@ -51,7 +51,7 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
       signInOptions: [
         firebase.auth.GoogleAuthProvider.PROVIDER_ID,
         // firebase.auth.FacebookAuthProvider.PROVIDER_ID,
-        // firebase.auth.EmailAuthProvider.PROVIDER_ID
+        firebase.auth.EmailAuthProvider.PROVIDER_ID
       ]
       // Terms of service url.
       // tosUrl: '<your-tos-url>',

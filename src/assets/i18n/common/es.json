@@ -55,7 +55,9 @@
       "LAST_UPDATE": "Última actualización",
       "NAME": "Nombre",
       "DESCRIPTION": "Descripción",
-      "TYPE": "Tipo"
+      "TYPE": "Tipo",
+      "STATUS": "Estado",
+      "AMOUNT": "Importe"
     },
     "PAGINATOR": {
       "ITEMS_PER_PAGE_LABEL": "Items por página:",
@@ -160,6 +162,9 @@
       "TYPE": {
         "CASH": "Efectivo"
       }
+    },
+    "ACCOUNT": {
+      "BALANCE": "Saldo"
     },
     "STATUS": {
       "PAYMENT": {
