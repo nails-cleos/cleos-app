@@ -9,6 +9,7 @@ export interface State {
   subErrors: any;
   selected: IPayment | null;
   message: string | null;
+  paths: string[] | null;
   reload: boolean | null;
   isLoading: boolean;
 }
@@ -20,6 +21,7 @@ export const initialState: State = {
   subErrors: null,
   selected: null,
   message: null,
+  paths: null,
   reload: false,
   isLoading: false
 };
@@ -37,7 +39,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
-    case PaymentActionTypes.paymentByReservation: {
+    case PaymentActionTypes.paymentByResource: {
       return {
         ...state,
         errorMessage: null,
@@ -84,6 +86,7 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         message: action.payload.message,
         reload: action.payload.reload,
+        paths: action.payload.paths,
         errorMessage: null,
         selected: null,
         subErrors: null,
@@ -96,6 +99,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
         errorMessage: null,
         subErrors: action.payload.message,
+        paths: action.payload.paths,
         isLoading: false
       };
     }

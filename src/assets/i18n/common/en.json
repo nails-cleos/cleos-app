@@ -55,7 +55,9 @@
       "LAST_UPDATE": "Last update",
       "NAME": "Name",
       "DESCRIPTION": "Description",
-      "TYPE": "Type"
+      "TYPE": "Type",
+      "STATUS": "Status",
+      "AMOUNT": "Amount"
     },
     "PAGINATOR": {
       "ITEMS_PER_PAGE_LABEL": "Items per page:",
@@ -160,6 +162,9 @@
       "TYPE": {
         "CASH": "Cash"
       }
+    },
+    "ACCOUNT": {
+      "BALANCE": "Balance"
     },
     "STATUS": {
       "PAYMENT": {

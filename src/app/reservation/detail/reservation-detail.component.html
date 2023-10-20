@@ -199,7 +199,7 @@
         </ng-container>
 
         <ng-container matColumnDef="status">
-          <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'PAYMENT.LIST.COLUMN.STATUS' | translate }}</th>
+          <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
           <td *matCellDef="let payment" fxHide.lt-sm fxShow mat-cell>
             <div *ngIf="payment.id; else skeleton">
               {{'COMMON.STATUS.PAYMENT.' + (payment.status ? payment.status.toUpperCase() : 'NONE') | translate}}
@@ -267,7 +267,7 @@
         </ng-container>
 
         <ng-container matColumnDef="amount">
-          <th *matHeaderCellDef mat-header-cell>{{ 'PAYMENT.LIST.COLUMN.AMOUNT' | translate }}</th>
+          <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
           <td *matCellDef="let payment; let i = dataIndex;" mat-cell>
             <div *ngIf="payment.id; else skeleton">
               <ng-template [ngIf]="payment.transactionAmount >= 0" [ngIfElse]="noTransactionAmount">
@@ -332,7 +332,7 @@
 
               </mat-list>
               <mat-list>
-                <div mat-subheader>{{ 'PAYMENT.LIST.COLUMN.STATUS' | translate }}</div>
+                <div mat-subheader>{{ 'COMMON.COLUMN.STATUS' | translate }}</div>
                 <mat-list-item role="list">
                   <div matListItemLine>
                     {{'COMMON.STATUS.PAYMENT.' + (payment.status || 'NONE') | translate}}

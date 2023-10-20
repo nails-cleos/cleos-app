@@ -225,10 +225,6 @@
     "RECREATE": "Payment link recreated",
     "COPY": "Link copied!",
     "LIST": {
-      "COLUMN": {
-        "AMOUNT": "Amount",
-        "STATUS": "Status"
-      },
       "ERROR": {
         "NO_CONTENT": "No payment"
       }

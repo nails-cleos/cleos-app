@@ -5,8 +5,8 @@ import { MeRoutingModule } from './me-routing.module';
 
 import { ReservationsComponent } from './reservation/list/reservations.component';
 import { MeReservationComponent } from './reservation/me/me-reservation.component';
-import { PaymentComponent } from './reservation/payment/payment.component';
-import { PaymentCompleteComponent } from './reservation/payment/complete/payment-complete.component';
+import { PaymentComponent } from './payment/payment.component';
+import { PaymentCompleteComponent } from './payment/complete/payment-complete.component';
 import { BottomSheetReferralComponent, BottomSheetShareComponent, ReferralsComponent } from './referrals/referrals.component';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
 import { ReviewDialogComponent } from './reservation/review/review-dialog.component';
@@ -30,8 +30,8 @@ import { DiscountService } from '../services/discount.service';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { CurrencyService } from '../services/currency.service';
 import { CurrencyEffects } from '../store/effects/currency.effects';
-import { OptionComponent } from './reservation/payment/option/option.component';
-import { MePaymentComponent } from './payment/me-payment.component';
+import { OptionComponent } from './payment/option/option.component';
+import { MePaymentComponent } from './payment/me/me-payment.component';
 import { ColorService } from '../services/color.service';
 
 @NgModule({

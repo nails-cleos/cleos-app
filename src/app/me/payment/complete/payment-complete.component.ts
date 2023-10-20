@@ -1,11 +1,11 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
-import { AppState, selectPaymentState } from '../../../../store/app.states';
+import { AppState, selectPaymentState } from '../../../store/app.states';
 import { Store } from '@ngrx/store';
-import * as fromActionsPayment from '../../../../store/payment.actions';
+import * as fromActionsPayment from '../../../store/payment.actions';
 import { TranslateService } from '@ngx-translate/core';
-import { PaymentStatus, PaymentType } from '../../../../interfaces/payment';
+import { PaymentStatus, PaymentType } from '../../../interfaces/payment';
 
 @Component({
   selector: 'app-payment-complete',
@@ -13,18 +13,19 @@ import { PaymentStatus, PaymentType } from '../../../../interfaces/payment';
   styleUrls: ['./payment-complete.component.scss']
 })
 export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewInit {
-  subscription: Subscription | undefined;
-  getState: Observable<any>;
+  private subscription?: Subscription;
+  private getState: Observable<any>;
 
-  paymentId: any;
-  preferenceId: any;
-  reservationId: any;
-  payerId: any;
-  token: any;
-  reason: any;
+  private paymentId: any;
+  private preferenceId: any;
+  private id: any;
+  private payerId: any;
+  private token: any;
+  private reason: any;
   private orderId: any;
   private orderStatusId: any;
   private paymentSessionId: any;
+  private path: string | null = 'reservation';
 
   constructor(private route: ActivatedRoute, private router: Router, private store: Store<AppState>,
               private translate: TranslateService) {
@@ -51,8 +52,9 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      this.reservationId = this.route.snapshot.paramMap.get('id');
+      this.id = this.route.snapshot.paramMap.get('id');
       let status = this.route.snapshot.paramMap.get('status');
+      this.path = this.route.snapshot.paramMap.get('path');
       // TODO analytic payment option
       let type;
       let referenceId;
@@ -83,22 +85,22 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
         this.store.dispatch(
           new fromActionsPayment.PaymentNotComplete({ message })
         );
-        this.router.navigate(['me', 'reservation', this.reservationId, 'payment']);
+        // this.router.navigate(['me', this.path, this.id, 'payment']);
         return;
       }
       const paymentStatus = new PaymentStatus(this.paymentId, type, referenceId, this.reason);
       this.store.dispatch(
-        new fromActionsPayment.PaymentSave({ reservationId: this.reservationId, status, paymentStatus })
+        new fromActionsPayment.PaymentSave({ id: this.id, path: this.path, status, paymentStatus })
       );
     }, 500);
   }
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      if (state.message) {
-        this.router.navigate(['reservation', this.reservationId]);
+      if (state.paths) {
+        this.router.navigate(state.paths);
       } else if (state.subErrors) {
-        this.router.navigate(['me', 'reservation', this.reservationId, 'payment']);
+        this.router.navigate(['me', this.path, this.id, 'payment']);
       }
     });
   }

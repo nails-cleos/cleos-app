@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { IUserAll } from '../interfaces/user';
 import { isDarkMode, Theme } from '../util/theme';
-import { getUserName, isRoomAdmin } from '../util/helper';
+import { getUserName, hasRoomAdmin } from '../util/helper';
 import { Role } from '../interfaces/token';
 import { BehaviorSubject } from 'rxjs';
 
@@ -12,6 +12,7 @@ export interface IAuthUser {
   isRoomAdmin: boolean;
   isProfessional: boolean;
   isCustomer: boolean;
+  hasAdminRole: boolean;
   isAuthenticated: boolean;
   showCash: boolean;
   locale: string;
@@ -30,6 +31,7 @@ const initialAuthUser: IAuthUser = {
   isManager: false,
   isRoomAdmin: false,
   isProfessional: false,
+  hasAdminRole: false,
   isCustomer: false,
   isAuthenticated: false,
   showCash: false,
@@ -56,14 +58,18 @@ export class AuthUserService {
     if (user) {
       const isProfessional = user.authorities.some(u => u.authority === Role.professional);
       const isCustomer = user.authorities.some(u => u.authority === Role.customer);
+      const isAdmin = user.authorities.some(u => u.authority === Role.admin);
+      const isManager = user.authorities.some(u => u.authority === Role.manager);
+      const isRoomAdmin = hasRoomAdmin(user.authorities);
       authUser = {
         ...initialAuthUser,
         isDarkMode: isDarkMode(user.theme),
-        isAdmin: user.authorities.some(u => u.authority === Role.admin),
-        isManager: user.authorities.some(u => u.authority === Role.manager),
-        isRoomAdmin: isRoomAdmin(user.authorities),
+        isAdmin,
+        isManager,
+        isRoomAdmin,
         isProfessional,
         isCustomer,
+        hasAdminRole: isProfessional || isAdmin || isManager || isRoomAdmin,
         isAuthenticated: true,
         showCash: user.showCash || false,
         locale: user.locale || initialAuthUser.locale,

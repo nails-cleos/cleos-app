@@ -1,5 +1,6 @@
 import { IReservationAll } from './reservation';
 import { TranslateService } from '@ngx-translate/core';
+import { IAccountTransaction, ITransaction } from './account';
 
 export const PENALTY = 50;
 
@@ -126,6 +127,7 @@ export interface IPayment {
   paymentId?: string;
   preferenceId?: string;
   link?: string;
+  paymentURL?: string;
 }
 
 export interface IPaymentAll {
@@ -138,6 +140,7 @@ export interface IPaymentAll {
   paymentId: string;
   preferenceId: string;
   reservation?: IReservationAll;
+  transaction?: ITransaction;
   link?: string;
 }
 

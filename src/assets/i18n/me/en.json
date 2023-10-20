@@ -82,10 +82,6 @@
       "DETAIL": "Payment detail",
       "RESERVATION": "Reservation {{reservationId}}",
       "LIST": {
-        "COLUMN": {
-          "AMOUNT": "Amount",
-          "STATUS": "Status"
-        },
         "ERROR": {
           "NO_CONTENT": "No payment"
         }
@@ -123,7 +119,6 @@
     "DISCOUNT": {
       "LIST": {
         "COLUMN": {
-          "AMOUNT": "Amount",
           "USED": "Used"
         },
         "ERROR": {

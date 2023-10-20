@@ -50,6 +50,7 @@ const routes: Routes = [
         path: 'notes', loadChildren: () => import('../note/note.module').then(m => m.NoteModule)
       },
       { path: 'shortcut', loadChildren: () => import('../shortcut/shortcut.module').then(m => m.ShortcutModule) },
+      { path: 'accounts', loadChildren: () => import('../account/account.module').then(m => m.AccountModule) }
     ]
   }
 ];

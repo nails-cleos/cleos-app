@@ -1,11 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import { AppState, selectPaymentState } from '../../store/app.states';
+import { AppState, selectPaymentState } from '../../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute } from '@angular/router';
-import * as fromActionsPayment from '../../store/payment.actions';
-import { getPaymentOptions, getPayNlOptions, IPaymentAll, IPaymentOption, PaymentType } from '../../interfaces/payment';
+import * as fromActionsPayment from '../../../store/payment.actions';
+import { getPaymentOptions, getPayNlOptions, IPaymentAll, IPaymentOption, PaymentType } from '../../../interfaces/payment';
 import { Analytics, logEvent } from '@angular/fire/analytics';
 import { TranslateService } from '@ngx-translate/core';
 

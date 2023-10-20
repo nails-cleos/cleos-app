@@ -83,10 +83,6 @@
       "DETAIL": "Detalle de pago",
       "RESERVATION": "Reserva {{reservationId}}",
       "LIST": {
-        "COLUMN": {
-          "AMOUNT": "Importe",
-          "STATUS": "Estado"
-        },
         "ERROR": {
           "NO_CONTENT": "No hay pagos"
         }
@@ -124,7 +120,6 @@
     "DISCOUNT": {
       "LIST": {
         "COLUMN": {
-          "AMOUNT": "Monto",
           "USED": "Utilizado"
         },
         "ERROR": {

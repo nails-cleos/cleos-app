@@ -18,7 +18,7 @@ import { CancelDialogComponent } from '../shared/dialog/cancel/cancel-dialog.com
 import { Router } from '@angular/router';
 import { CustomerEditDialogComponent } from '../shared/dialog/customer-edit/customer-edit-dialog.component';
 
-export const isRoomAdmin = (authorities?: IAuthority[]): boolean => !!authorities && authorities.length === 1 &&
+export const hasRoomAdmin = (authorities?: IAuthority[]): boolean => !!authorities && authorities.length === 1 &&
   authorities.some(u => (u.authority === Role.roomAdmin));
 
 export const snakeToCamel = (value: string = ''): string =>

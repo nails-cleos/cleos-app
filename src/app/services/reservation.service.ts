@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { ICustomerReservation, IReservation, IRoomReservation } from '../interfaces/reservation';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { IReview } from '../interfaces/review';
+import { createFilter } from '../util/service-helper';
 
 @Injectable()
 export class ReservationService {
@@ -16,13 +17,7 @@ export class ReservationService {
 
   public getAllPage(page: number, roomId?: string, professionalId?: string, sort?: string, direction?: string,
                     size: number = PAGE_SIZE): Observable<IReservation[]> {
-    let params = new HttpParams().set('page', String(page)).set('size', String(size));
-    if (sort) {
-      params = params.append('sort', sort);
-    }
-    if (direction) {
-      params = params.append('direction', direction);
-    }
+    const params = createFilter(page, size, sort, direction);
 
     if (roomId) {
       return this.http.get<IReservation[]>(`${ this.urlV1 }/rooms/${ roomId }/pages`, { params });

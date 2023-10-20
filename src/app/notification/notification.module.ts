@@ -9,7 +9,6 @@ import { EffectsModule } from '@ngrx/effects';
 import { NotificationEffects } from '../store/effects/notification.effects';
 import { NotificationService } from '../services/notification.service';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
-import { MatBadgeModule } from '@angular/material/badge';
 
 @NgModule({
   declarations: [
@@ -19,7 +18,6 @@ import { MatBadgeModule } from '@angular/material/badge';
     NotificationRoutingModule,
     SharedModule,
     MatRippleModule,
-    MatBadgeModule,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,

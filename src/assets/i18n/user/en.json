@@ -11,7 +11,6 @@
         "USERNAME": "Username",
         "EMAIL": "Email",
         "PROVIDER": "Provider",
-        "STATUS": "Status",
         "DETAIL": {
           "TITLE": "Roles"
         }

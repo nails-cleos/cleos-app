@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { IUnavailable } from '../interfaces/unavailable';
 import { PAGE_SIZE } from '../interfaces/pagination';
+import { createFilter } from '../util/service-helper';
 
 @Injectable()
 export class UnavailableService {
@@ -14,13 +15,7 @@ export class UnavailableService {
   }
 
   public getAll(sort: string, direction: string, page: number, size: number = PAGE_SIZE): Observable<IUnavailable[]> {
-    let params = new HttpParams().set('page', String(page)).set('size', String(size));
-    if (sort) {
-      params = params.append('sort', sort);
-    }
-    if (direction) {
-      params = params.append('direction', direction);
-    }
+    const params = createFilter(page, size, sort, direction);
 
     return this.http.get<IUnavailable[]>(`${ this.urlV1 }/pages`, { params });
   }

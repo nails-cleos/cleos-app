@@ -4,6 +4,7 @@ import { PAGE_SIZE } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
 import { IAdditional, IAdditionalAll } from '../interfaces/additional';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
+import { createFilter } from '../util/service-helper';
 
 @Injectable()
 export class AdditionalService {
@@ -15,13 +16,7 @@ export class AdditionalService {
   }
 
   public getAll(sort: string, direction: string, page: number, size: number = PAGE_SIZE): Observable<IAdditional[]> {
-    let params = new HttpParams().set('page', String(page)).set('size', String(size));
-    if (sort) {
-      params = params.append('sort', sort);
-    }
-    if (direction) {
-      params = params.append('direction', direction);
-    }
+    const params = createFilter(page, size, sort, direction);
 
     return this.http.get<IAdditional[]>(`${ this.urlV1 }/pages`, { params });
   }
