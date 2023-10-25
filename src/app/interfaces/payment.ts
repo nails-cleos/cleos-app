@@ -1,6 +1,6 @@
 import { IReservationAll } from './reservation';
 import { TranslateService } from '@ngx-translate/core';
-import { IAccountTransaction, ITransaction } from './account';
+import { ITransaction } from './account';
 
 export const PENALTY = 50;
 
@@ -16,7 +16,8 @@ export enum PaymentType {
   paypal = 'PAYPAL',
   ideal = 'IDEAL',
   transfer = 'TRANSFER',
-  paynl = 'PAY_NL'
+  paynl = 'PAY_NL',
+  account = 'ACCOUNT'
 }
 
 export type PaymentTypeKey = keyof typeof PaymentType;

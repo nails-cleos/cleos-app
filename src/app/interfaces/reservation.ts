@@ -67,6 +67,7 @@ export interface IReservationAll {
   canEdit?: boolean;
   paymentRequired?: boolean;
   relatedReservationId?: string;
+  balance?: number;
 }
 
 export interface IConfigurationReservation {

@@ -174,7 +174,6 @@
                 <mat-list-item>
                   <div mat-line>
                     <span [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.TOTAL' | translate"></span>
-
                     <ng-template [ngIf]="price.priceWithDiscount" [ngIfElse]="noDiscount">
                       <span [class.strikethrough]="price.discount" class="vertical-divider">
                         {{reservation.room.currency | currencySymbol}} {{price.totalWithoutDiscount | number:'1.2-2'}}
@@ -190,6 +189,33 @@
                     </ng-template>
                   </div>
                 </mat-list-item>
+                <ng-template [ngIf]="!price.isPaid && (price.balance || price.totalPaid)">
+                  <ng-template [ngIf]="price.totalPaid">
+                    <mat-list-item>
+                      <div matListItemLine [innerHTML]="'COMMON.PAYMENT.OPTIONS.PAID' | translate: {
+                         amount: price.totalPaid | number:'1.2-2',
+                         symbol: reservation.room.currency | currencySymbol
+                         }">
+                      </div>
+                    </mat-list-item>
+                  </ng-template>
+                  <ng-template [ngIf]="price.balance">
+                    <mat-list-item>
+                      <div matListItemLine [innerHTML]="'COMMON.PAYMENT.OPTIONS.ACCOUNT' | translate: {
+                         amount: price.balance | number:'1.2-2',
+                         symbol: reservation.room.currency | currencySymbol
+                         }">
+                      </div>
+                    </mat-list-item>
+                  </ng-template>
+                  <mat-list-item>
+                    <div matListItemLine [innerHTML]="'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate: {
+                         amount: price.toPaid - price.totalPaid - price.balance | number:'1.2-2',
+                         symbol: reservation.room.currency | currencySymbol
+                         }">
+                    </div>
+                  </mat-list-item>
+                </ng-template>
               </mat-list>
               <ng-template [ngIf]="!price.isPaid">
                 <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
