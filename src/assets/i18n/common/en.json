@@ -109,6 +109,7 @@
         "IDEAL": "iDeal",
         "PAY_NL": "PAY.",
         "TRANSFER": "Wire Transfer",
+        "ACCOUNT": "Account credit",
         "NONE": "No payment selected",
         "PENDING": "Pending"
       },
@@ -120,6 +121,7 @@
       "OPTIONS": {
         "TO_PAY": "Total to pay: {{amount}} {{symbol}}",
         "PAID": "Total paid: {{amount}} {{symbol}}",
+        "ACCOUNT": "Account credit: {{amount}} {{symbol}}",
         "PENALTY": "Penalty: {{amount}} {{symbol}}",
         "D_OR_R": "Discount or refund: {{amount}} {{symbol}}"
       },

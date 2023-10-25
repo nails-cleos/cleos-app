@@ -90,6 +90,7 @@ export interface IPrice {
   percentageToPaid: number;
   toPaid: number;
   penalty: number;
+  balance: number;
 
   setPenalty(penaltyToPay: number): void;
 }
@@ -109,10 +110,11 @@ export class Price implements IPrice {
   percentageToPaid: number;
   toPaid: number;
   penalty: number;
+  balance: number;
 
   constructor(price: number = 0, discount: number = 0, extra: number = 0, additional: number = 0, total: number = 0,
               totalPaid: number = 0, totalWithoutDiscount: number = 0, priceWithDiscount: number = 0, priceWithExtras = 0,
-              priceWithAdditional = 0, percentageToPaid: number = 100) {
+              priceWithAdditional = 0, percentageToPaid: number = 100, balance: number = 0) {
     this.amount = price;
     this.discount = discount;
     this.extra = extra;
@@ -124,9 +126,10 @@ export class Price implements IPrice {
     this.priceWithExtras = priceWithExtras;
     this.priceWithAdditional = priceWithAdditional;
     this.percentageToPaid = percentageToPaid;
+    this.balance = balance;
     this.toPaid = total * percentageToPaid / 100;
-    this.isPaid = this.amount > 0 && this.totalPaid >= this.total;
     this.penalty = (total * PENALTY / 100);
+    this.isPaid = this.amount > 0 && this.totalPaid + this.balance >= this.total;
   }
 
   setPenalty(penalty: number): void {

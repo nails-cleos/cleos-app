@@ -109,6 +109,7 @@
         "IDEAL": "iDeal",
         "PAY_NL": "PAY.",
         "TRANSFER": "Transferencia bancaria",
+        "ACCOUNT": "Crédito de la cuenta",
         "NONE": "Pago no seleccionado",
         "PENDING": "Pendiente"
       },
@@ -120,6 +121,7 @@
       "OPTIONS": {
         "TO_PAY": "Total a pagar: {{amount}} {{symbol}}",
         "PAID": "Total pagado: {{amount}} {{symbol}}",
+        "ACCOUNT": "Crédito: {{amount}} {{symbol}}",
         "PENALTY": "Penalización: {{amount}} {{symbol}}",
         "D_OR_R": "Descuento o reembolso: {{amount}} {{symbol}}"
       },

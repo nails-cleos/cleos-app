@@ -130,7 +130,7 @@ export const getLocale = (userLang?: string): ILocale => {
 
 export const round = (value: number): number => Math.round((value + Number.EPSILON) * 100) / 100;
 
-export const getPrice = (reservation: IReservationAll, payments?: IPayment[] | undefined): IPrice => {
+export const getPrice = (reservation: IReservationAll, payments?: IPayment[]): IPrice => {
   const treatment = reservation.treatment;
   let total = treatment.price;
   let priceWithDiscount;
@@ -159,8 +159,12 @@ export const getPrice = (reservation: IReservationAll, payments?: IPayment[] | u
   }
 
   return new Price(treatment.price, discount, extras, additional, total, totalPaid(payments), totalWithoutDiscount, priceWithDiscount,
-    priceWithExtras, priceWithAdditional);
+    priceWithExtras, priceWithAdditional, 100, reservation.balance);
 };
+
+export const addPayment = (price: IPrice, payments?: IPayment[]) => new Price(price.amount, price.discount, price.extra, price.additional,
+  price.total, totalPaid(payments), price.totalWithoutDiscount, price.priceWithDiscount, price.priceWithExtras, price.priceWithAdditional,
+  price.percentageToPaid, price.balance);
 
 export const newPrice = (price: IPrice, amount: number, discount?: IDiscount): IPrice => {
   let total = amount;
@@ -186,7 +190,7 @@ export const newPrice = (price: IPrice, amount: number, discount?: IDiscount): I
   }
 
   return new Price(amount, priceDiscount, extras, additional, total, price.totalPaid, totalWithoutDiscount, priceWithDiscount,
-    priceWithExtras, priceWithAdditional, price.percentageToPaid);
+    priceWithExtras, priceWithAdditional, price.percentageToPaid, price.balance);
 };
 
 export const newExtra = (price: IPrice, extras: number, discount?: IDiscount): IPrice => {
@@ -203,13 +207,13 @@ export const newExtra = (price: IPrice, extras: number, discount?: IDiscount): I
   }
 
   return new Price(price.amount, priceDiscount, extras, price.additional, total, price.totalPaid, totalWithoutDiscount,
-    priceWithDiscount, priceWithExtras, price.priceWithAdditional, price.percentageToPaid);
+    priceWithDiscount, priceWithExtras, price.priceWithAdditional, price.percentageToPaid, price.balance);
 };
 
 export const removeDiscount = (price: IPrice): IPrice => {
   const total = price.amount + price.extra + price.additional;
   return new Price(price.amount, 0, price.extra, price.additional, total, price.totalPaid, total, 0, price.priceWithExtras,
-    price.priceWithAdditional, price.percentageToPaid);
+    price.priceWithAdditional, price.percentageToPaid, price.balance);
 };
 
 export const newDiscount = (price: IPrice, treatmentDiscount: IDiscount): IPrice => {
@@ -219,7 +223,7 @@ export const newDiscount = (price: IPrice, treatmentDiscount: IDiscount): IPrice
   const total = totalWithoutDiscount - discount;
 
   return new Price(price.amount, discount, price.extra, price.additional, total, price.totalPaid, totalWithoutDiscount, priceWithDiscount,
-    price.priceWithExtras, price.priceWithAdditional, price.percentageToPaid);
+    price.priceWithExtras, price.priceWithAdditional, price.percentageToPaid, price.balance);
 };
 
 export const newAdditional = (price: IPrice, additionalList: IAdditionalAll[], discount?: IDiscount): IPrice => {
@@ -240,13 +244,13 @@ export const newAdditional = (price: IPrice, additionalList: IAdditionalAll[], d
     total = total - priceDiscount;
   }
 
-  return new Price(price.amount, priceDiscount, price.extra, additional, total, price.totalPaid,
-    totalWithoutDiscount, priceWithDiscount, price.priceWithExtras, priceWithAdditional, price.percentageToPaid);
+  return new Price(price.amount, priceDiscount, price.extra, additional, total, price.totalPaid, totalWithoutDiscount, priceWithDiscount,
+    price.priceWithExtras, priceWithAdditional, price.percentageToPaid, price.balance);
 };
 
 export const newPercentage = (price: IPrice, percentage: number): IPrice => new Price(price.amount, price.discount, price.extra,
   price.additional, price.total, price.totalPaid, price.totalWithoutDiscount, price.priceWithDiscount, price.priceWithExtras,
-  price.priceWithAdditional, percentage);
+  price.priceWithAdditional, percentage, price.balance);
 
 export const getTreatmentDurability = (min: number, max: number, translate: TranslateService): string | undefined => {
   if (!min && !max) {
