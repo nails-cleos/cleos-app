@@ -4,6 +4,11 @@
       <mat-card appearance="outlined">
         <mat-card-header *ngIf="transaction; else headSkeleton">
           <mat-card-title>{{ 'ACCOUNT.TRANSACTION.DETAIL' | translate }}</mat-card-title>
+          <div fxFlex></div>
+          <mat-icon *ngIf="transaction" class="pointer-only header-icon"
+                    [routerLink]="['/', 'accounts', transaction.account?.id, 'transactions', 'view']">
+            account_balance
+          </mat-icon>
         </mat-card-header>
         <ng-template #headSkeleton>
           <div class="divider-padding-bottom">

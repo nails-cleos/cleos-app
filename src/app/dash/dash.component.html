@@ -17,6 +17,8 @@
         </div>
         <div [innerHTML]="'DASHBOARD.RESERVATION.UPCOMING' | translate:{upcoming: upcoming, total: upcomingTotal}">
         </div>
+        <div [innerHTML]="'DASHBOARD.RESERVATION.TRANSACTION' | translate:{transaction: transaction, total: transactionTotal}">
+        </div>
       </div>
       <ng-template #skeleton>
         <div class="ssc-line"></div>

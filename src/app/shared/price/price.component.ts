@@ -13,12 +13,18 @@ export class PriceComponent {
   @Input() typeForm!: UntypedFormGroup;
   @Input() price?: IPrice;
   @Input() currency!: ICurrency;
-  @Input() firstTime!: boolean;
-  @Input() showPenalty?: boolean;
-  @Input() showBank!: boolean;
+  @Input() firstTime: boolean;
+  @Input() showPenalty: boolean;
+  @Input() showBank: boolean;
   @Input() options?: IPaymentOption[];
   @Input() professionalName?: string;
   @Output() percentageEmitter = new EventEmitter<number>();
+
+  constructor() {
+    this.firstTime = false;
+    this.showBank = false;
+    this.showPenalty = false;
+  }
 
   emitter(percentage: number): void {
     this.percentageEmitter.emit(percentage);

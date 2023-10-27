@@ -28,11 +28,9 @@
                   {{errors['amount']}}
                 </mat-error>
               </mat-form-field>
-            </div>
-            <ng-template [ngIf]="!hasAdminRole" [ngIfElse]="noAdmin">
-              <app-bank [firstTime]="true" [formGroup]="form" [options]="options"></app-bank>
-            </ng-template>
-            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+              <ng-template [ngIf]="!hasAdminRole" [ngIfElse]="noAdmin">
+                <app-bank [firstTime]="true" [formGroup]="form" [options]="options"></app-bank>
+              </ng-template>
               <ng-template #noAdmin>
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'ACCOUNT.TRANSACTION.TYPE.FIELD' | translate }}</mat-label>

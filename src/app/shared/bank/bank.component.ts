@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Input, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { Observable } from 'rxjs';
 import { UntypedFormGroup, Validators } from '@angular/forms';
 import { requireMatch } from '../../util/validators';
@@ -13,14 +13,19 @@ import { IPaymentOption } from '../../interfaces/payment';
 export class BankComponent implements AfterViewInit {
   @Input() formGroup!: UntypedFormGroup;
   @Input() options?: IPaymentOption[];
-  @Input() firstTime!: boolean;
+  @Input() firstTime: boolean;
   @Input() professionalName?: string;
   @Output() percentageEmitter = new EventEmitter<number>();
 
-  bankList: IPaymentOption[] = [];
+  bankList: IPaymentOption[];
   filteredBank?: Observable<IPaymentOption[] | undefined>;
 
   type?: IPaymentOption;
+
+  constructor() {
+    this.firstTime = false;
+    this.bankList = [];
+  }
 
   ngAfterViewInit(): void {
     this.formChanges();
@@ -38,6 +43,7 @@ export class BankComponent implements AfterViewInit {
   }
 
   private formChanges(): void {
+    this.formGroup.get('percentage')?.setValue('TOTAL');
     if (this.firstTime) {
       this.formGroup.get('type')?.setValidators([Validators.required]);
       this.formGroup.get('type')?.updateValueAndValidity();
@@ -55,7 +61,11 @@ export class BankComponent implements AfterViewInit {
           this.formGroup.get('bank')?.setValidators([]);
           this.bankList = [];
         }
-        this.formGroup.get('percentage')?.setValidators([Validators.required]);
+        if (this.type.hidePercentage) {
+          this.formGroup.get('percentage')?.setValidators([]);
+        } else {
+          this.formGroup.get('percentage')?.setValidators([Validators.required]);
+        }
       } else {
         this.formGroup.get('bank')?.setValidators([]);
         this.formGroup.get('percentage')?.setValidators([]);

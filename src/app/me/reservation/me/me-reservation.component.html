@@ -254,13 +254,20 @@
 
 <ng-template #stepFive>
   <form [formGroup]="typeForm">
-    <div *ngIf="!options?.length; else data" class="no-content bold">
-      {{'ME.PAYMENT.TYPE.NO_CONTENT' | translate}}
-    </div>
-    <ng-template #data>
-      <app-price [price]="oldPrice" [typeForm]="typeForm" [options]="options" [currency]="room.value.currency"
-                 [firstTime]="firstTime" [professionalName]="professionalName" [showBank]="true"
-                 (percentageEmitter)="getPercentage($event)" [showPenalty]="showPenalty"></app-price>
+    <ng-template [ngIf]="price.isPaid" [ngIfElse]="noPaid">
+      <app-price [price]="oldPrice" [typeForm]="typeForm" [options]="accountCreditOptions"
+                 [currency]="room.value.currency" [firstTime]="firstTime" [professionalName]="professionalName"
+                 [showBank]="true" (percentageEmitter)="getPercentage($event)" [showPenalty]="showPenalty"></app-price>
+    </ng-template>
+    <ng-template #noPaid>
+      <div *ngIf="!options?.length; else data" class="no-content bold">
+        {{'ME.PAYMENT.TYPE.NO_CONTENT' | translate}}
+      </div>
+      <ng-template #data>
+        <app-price [price]="oldPrice" [typeForm]="typeForm" [options]="options" [currency]="room.value.currency"
+                   [firstTime]="firstTime" [professionalName]="professionalName" [showBank]="true"
+                   (percentageEmitter)="getPercentage($event)" [showPenalty]="showPenalty"></app-price>
+      </ng-template>
     </ng-template>
   </form>
 </ng-template>
