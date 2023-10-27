@@ -93,6 +93,10 @@ export interface IPrice {
   balance: number;
 
   setPenalty(penaltyToPay: number): void;
+
+  withTotalPaid(totalPaid: number): IPrice;
+
+  withBalance(balance?: number): IPrice;
 }
 
 export class Price implements IPrice {
@@ -129,11 +133,27 @@ export class Price implements IPrice {
     this.balance = balance;
     this.toPaid = total * percentageToPaid / 100;
     this.penalty = (total * PENALTY / 100);
-    this.isPaid = this.amount > 0 && this.totalPaid + this.balance >= this.total;
+    this.isPaid = this.calculateIsPaid();
+  }
+
+  withTotalPaid(totalPaid: number = 0): IPrice {
+    this.totalPaid = totalPaid;
+    this.isPaid = this.calculateIsPaid();
+    return this;
+  }
+
+  withBalance(balance: number = 0): IPrice {
+    this.balance = balance;
+    this.isPaid = this.calculateIsPaid();
+    return this;
   }
 
   setPenalty(penalty: number): void {
     this.penalty = penalty;
+  }
+
+  private calculateIsPaid(): boolean {
+    return this.amount > 0 && this.totalPaid + this.balance >= this.total;
   }
 }
 

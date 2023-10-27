@@ -28,6 +28,8 @@ export interface IPaymentOption {
   svgIcon: string;
   type: PaymentType;
   bic?: string;
+  hidePercentage?: boolean;
+  icon?: string;
 }
 
 export class PaymentOption implements IPaymentOption {
@@ -36,13 +38,17 @@ export class PaymentOption implements IPaymentOption {
   type: PaymentType;
   bic?: string;
   svgIcon: string;
+  hidePercentage?: boolean;
+  icon?: string;
 
-  constructor(name: string, type: PaymentType, svgIcon: string, bic?: string, subTypes?: IPaymentOption[]) {
+  constructor(name: string, type: PaymentType, svgIcon: string, bic?: string, subTypes?: IPaymentOption[],
+              hidePercentage: boolean = false) {
     this.name = name;
     this.type = type;
     this.svgIcon = svgIcon;
     this.bic = bic;
     this.subTypes = subTypes || [];
+    this.hidePercentage = hidePercentage;
   }
 }
 
@@ -82,6 +88,10 @@ export const iDealBanks = (): IPaymentOption[] => [
   { subTypes: [], type: PaymentType.ideal, name: 'Knab', bic: 'KNABNL2H', svgIcon: '/issuers/12.svg' },
   { subTypes: [], type: PaymentType.ideal, name: 'Bunq', bic: 'BUNQNL2A', svgIcon: '/issuers/5080.svg' },
   { subTypes: [], type: PaymentType.ideal, name: 'Moneyou', bic: 'MOYONL21', svgIcon: 'MOYONL21' }
+];
+
+export const accountCredit = (name: string): IPaymentOption[] => [
+  { subTypes: [], type: PaymentType.account, name, icon: 'account_balance', hidePercentage: true, svgIcon: 'account_balance' }
 ];
 
 export enum PaymentPercentage {

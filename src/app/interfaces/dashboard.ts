@@ -45,6 +45,7 @@ export interface ICalendarSummary {
   unavailable: ICalendarUnavailable[];
   birthdays: ICalendarBirthday[];
   notes: ICalendarNote[];
+  transactions: ICalendarTransaction[];
 }
 
 export interface ICalendarReservations {
@@ -80,6 +81,14 @@ export interface ICalendarNote {
   title: string;
   date: number;
   repeat: FrequencyEnum;
+}
+
+export interface ICalendarTransaction {
+  accountId: string;
+  transactionId: string;
+  title: string;
+  createdAt: string;
+  total: number;
 }
 
 export interface IChart {

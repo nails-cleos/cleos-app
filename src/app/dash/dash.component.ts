@@ -123,7 +123,7 @@ export class DashComponent implements OnInit, OnDestroy {
   }
 
   get completedTotal(): string {
-    const total = this.events?.filter((event: CalendarEvent) =>  DashComponent.completedByMonth(event, this.viewDate))
+    const total = this.events?.filter((event: CalendarEvent) => DashComponent.completedByMonth(event, this.viewDate))
       .reduce((a, b) => a + b.meta.total || 0, 0);
 
     return numberFormat(total, this.currency, this.dateFormat);
@@ -135,6 +135,17 @@ export class DashComponent implements OnInit, OnDestroy {
 
   get upcomingTotal(): string {
     const total = this.events?.filter((event: CalendarEvent) => DashComponent.upcomingByMonth(event, this.viewDate))
+      .reduce((a, b) => a + b.meta.total || 0, 0);
+
+    return numberFormat(total, this.currency, this.dateFormat);
+  }
+
+  get transaction(): number {
+    return this.events?.filter((event: CalendarEvent) => DashComponent.transactionByMonth(event, this.viewDate)).length;
+  }
+
+  get transactionTotal(): string {
+    const total = this.events?.filter((event: CalendarEvent) => DashComponent.transactionByMonth(event, this.viewDate))
       .reduce((a, b) => a + b.meta.total || 0, 0);
 
     return numberFormat(total, this.currency, this.dateFormat);
@@ -165,6 +176,10 @@ export class DashComponent implements OnInit, OnDestroy {
   private static upcomingByMonth(event: CalendarEvent, viewDate: Date): boolean {
     return isSameMonth(event.start, viewDate) && event.meta.state
       && [States.created, States.approved, States.partiallyPaid, States.paid].includes(event.meta.state);
+  }
+
+  private static transactionByMonth(event: CalendarEvent, viewDate: Date): boolean {
+    return event.meta.state === 'TRANSACTION' && isSameMonth(event.start, viewDate);
   }
 
   ngOnInit(): void {
@@ -366,6 +381,16 @@ export class DashComponent implements OnInit, OnDestroy {
         const color = findStateColor('BIRTHDAY', darkMode);
         const event = allDayEvent(it.title, color, startDate, darkMode, `users/${ it.userId }`,
           new Meta(false, this.state.timeZone, 'BIRTHDAY', ['users', it.userId]));
+        this.events = [...this.events, event];
+      });
+
+      calendarSummary.transactions?.forEach(it => {
+        const startDate = newDateTimestamp(it.createdAt);
+        startDate.setFullYear(getNow().getFullYear());
+        const color = findStateColor('TRANSACTION', darkMode);
+        const event = allDayEvent(it.title, color, startDate, darkMode, `accounts/${ it.accountId }/transactions/ ${ it.transactionId }`,
+          new Meta(false, this.state.timeZone, 'TRANSACTION', ['accounts', it.accountId, 'transactions', it.transactionId],
+            undefined, it.total));
         this.events = [...this.events, event];
       });
 

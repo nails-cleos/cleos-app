@@ -48,7 +48,8 @@ import {
   newDiscount,
   newPercentage,
   newPrice,
-  openDialog, removeDiscount,
+  openDialog,
+  removeDiscount,
   roomDetail,
   round
 } from '../../../util/helper';
@@ -64,7 +65,7 @@ import { TimeZoneSnackBarComponent } from '../../../shared/snak/time-zone/time-z
 import { MatDialog } from '@angular/material/dialog';
 import { Role } from '../../../interfaces/token';
 import { IUser } from '../../../interfaces/user';
-import { getPaymentOptions, getPayNlOptions, IPaymentOption, PaymentType, PENALTY } from '../../../interfaces/payment';
+import { accountCredit, getPaymentOptions, getPayNlOptions, IPaymentOption, PaymentType, PENALTY } from '../../../interfaces/payment';
 import { AuthUserService } from '../../../services/auth-user.service';
 import { Analytics, logEvent } from '@angular/fire/analytics';
 
@@ -129,6 +130,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   typeForm: UntypedFormGroup;
 
   options?: IPaymentOption[];
+  accountCreditOptions: IPaymentOption[];
   acceptForm!: UntypedFormGroup;
   accept: UntypedFormControl = new UntypedFormControl('', [
     Validators.requiredTrue
@@ -147,6 +149,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   isEditing = false;
   canCreate = false;
   firstTime = false;
+  balance = 0;
   distance?: string;
   maxDate: Date;
   maxDateFormat: string;
@@ -156,7 +159,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   totalDurationFormatted?: string;
   durability?: string;
   reservationId?: string;
-  showPenalty?: boolean;
+  showPenalty: boolean;
   penalty = PENALTY;
 
   private readonly extras: any;
@@ -183,6 +186,8 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.getState = this.store.select(selectReservationState);
     this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => this.customerId = value.customerId);
     this.price = new Price();
+    this.showPenalty = false;
+    this.accountCreditOptions = accountCredit(this.translate.instant('COMMON.PAYMENT.TYPE.ACCOUNT'));
     this.dateFormat = this.translate.currentLang;
     breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small])
       .subscribe(result => this.smallScreen = result.matches);
@@ -315,7 +320,8 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
     const role = Role.customer;
     const option: IPaymentOption = this.typeForm.get('type')?.value;
-    if (this.firstTime || option) {
+    // TODO validate if not first time and option empty
+    if ((this.firstTime || option) && option.type !== PaymentType.account) {
       const type = option.type;
       const paymentOptionId = option.bic;
       const percentage = this.typeForm.get('percentage')?.value || 'TOTAL';
@@ -751,6 +757,8 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
         this.canNotContinue(message, 'create');
       } else {
         this.canCreate = true;
+        this.balance = state.customerReservation?.balance || 0;
+        this.price = this.price.withBalance(state.customerReservation?.balance);
         if (state.customerReservation?.firstTime) {
           this.firstTime = true;
         }
@@ -791,6 +799,9 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
           return group;
         }, this.availableList);
         this.setSelectedIndex();
+        if (this.price.isPaid) {
+          this.firstTime = false;
+        }
       }
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {

@@ -6,13 +6,15 @@
       </div>
     </ng-template>
     <mat-form-field appearance="outline">
-      <mat-icon *ngIf="type" matPrefix [svgIcon]="type.svgIcon" class="svg-icon"></mat-icon>
+      <mat-icon *ngIf="type && type.icon" matPrefix>{{type.icon}}</mat-icon>
+      <mat-icon *ngIf="type && !type.icon" matPrefix [svgIcon]="type.svgIcon" class="svg-icon"></mat-icon>
       <mat-icon *ngIf="!type?.svgIcon" matPrefix>account_balance</mat-icon>
       <mat-label>{{ 'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate }}</mat-label>
       <mat-select [formControlName]="'type'" [required]="firstTime">
         <mat-option *ngIf="!firstTime">--</mat-option>
         <mat-option *ngFor="let t of options" [value]="t">
-          <mat-icon [svgIcon]="t.svgIcon" class="svg-icon"></mat-icon>
+          <mat-icon *ngIf="t.icon">{{t.icon}}</mat-icon>
+          <mat-icon *ngIf="!t.icon" [svgIcon]="t.svgIcon" class="svg-icon"></mat-icon>
           {{ t.name }}
         </mat-option>
       </mat-select>
@@ -20,7 +22,8 @@
       </mat-error>
     </mat-form-field>
     <mat-form-field appearance="outline" *ngIf="bankList.length">
-      <mat-icon *ngIf="formGroup.get('bank')?.value?.svgIcon" matPrefix [svgIcon]="formGroup.get('bank')?.value?.svgIcon"
+      <mat-icon *ngIf="formGroup.get('bank')?.value?.svgIcon" matPrefix
+                [svgIcon]="formGroup.get('bank')?.value?.svgIcon"
                 class="svg-icon"></mat-icon>
       <mat-icon *ngIf="!formGroup.get('bank')?.value?.svgIcon" matPrefix>account_balance</mat-icon>
       <mat-label>{{ 'COMMON.PAYMENT.BANK.FIELD' | translate }}</mat-label>
@@ -41,7 +44,8 @@
                  [innerHTML]="'COMMON.PAYMENT.BANK.INVALID' | translate">
       </mat-error>
     </mat-form-field>
-    <ng-template [ngIf]="formGroup.get('percentage') && formGroup.get('type')?.value">
+    <ng-template
+      [ngIf]="formGroup.get('percentage') && formGroup.get('type')?.value && !formGroup.get('type')?.value.hidePercentage">
       <mat-radio-group [formControlName]="'percentage'" aria-label="Select an option" required>
         <mat-radio-button value="DEPOSIT_50">{{'COMMON.PAYMENT.DEPOSIT_50' | translate}}</mat-radio-button>
         <mat-radio-button value="TOTAL">{{'COMMON.PAYMENT.TOTAL' | translate}}</mat-radio-button>

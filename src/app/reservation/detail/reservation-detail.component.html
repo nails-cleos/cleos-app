@@ -5,10 +5,10 @@
     </mat-card-title>
     <mat-card-subtitle *ngIf="reservation; else skeleton">
       <ng-template [ngIf]="isCustomer" [ngIfElse]="noCustomer">
-        <a [routerLink]="['/', 'auth', 'profile']">{{reservation.customer | userName}}</a>
+        <a [routerLink]="['/', 'me', 'overview']">{{reservation.customer | userName}}</a>
       </ng-template>
       <ng-template #noCustomer>
-        <a [routerLink]="['/', 'users', reservation.customer.id]">{{reservation.customer | userName}}</a>
+        <a [routerLink]="['/', 'users', reservation.customer.id, 'overview']">{{reservation.customer | userName}}</a>
       </ng-template>
       <button (click)="addNote" mat-icon-button type="button" color="accent">
         <mat-icon>note_add</mat-icon>

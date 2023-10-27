@@ -2,7 +2,8 @@
   <mat-divider></mat-divider>
   <div mat-subheader>{{ 'ME.PAYMENT.DETAIL' | translate}}</div>
   <mat-list-item>
-    <mat-icon matListItemIcon [svgIcon]="type.svgIcon"></mat-icon>
+    <mat-icon *ngIf="!type.icon" matListItemIcon [svgIcon]="type.svgIcon"></mat-icon>
+    <mat-icon *ngIf="type.icon" matListItemIcon>{{type.icon}}</mat-icon>
     <div matListItemTitle>{{ 'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate}}</div>
     <div matListItemLine>{{type.name}}</div>
   </mat-list-item>
