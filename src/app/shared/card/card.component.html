@@ -1,5 +1,5 @@
 <mat-card appearance="outlined" class="dashboard-card">
-  <mat-card-header>
+  <mat-card-header *ngIf="title; else skeletonTitle">
     <mat-card-title>
       {{title}}
       <div *ngIf="title && expand">
@@ -12,7 +12,13 @@
       </div>
     </mat-card-title>
   </mat-card-header>
-  <mat-card-content class="dashboard-card-content">
+  <ng-template #skeletonTitle>
+    <div class="card-margin ssc-head-line"></div>
+  </ng-template>
+  <mat-card-content class="dashboard-card-content" *ngIf="title; else box">
     <ng-content></ng-content>
   </mat-card-content>
+  <ng-template #box>
+    <div style="margin: auto; width: 90%" class="ssc-square mb"></div>
+  </ng-template>
 </mat-card>

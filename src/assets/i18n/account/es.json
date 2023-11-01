@@ -1,0 +1,42 @@
+{
+  "ACCOUNT": {
+    "TITLE": "Cuenta",
+    "BALANCE": "Saldo",
+    "MONEY_ADDED": "Dinero agregado a la cuenta {{id}}",
+    "UPDATED": "Cuenta {{id}} actualizada",
+    "GIFT": {
+      "FIELD": "Regalo",
+      "REQUIRED": "Regalo es <b>requerido</b>",
+      "GREATER": "Regalo debe ser mayor a 0.00",
+      "LESS": "Regalo debe ser menor a 100.00"
+    },
+    "TRANSACTION": {
+      "TITLE": "Transacción",
+      "DETAIL": "Detalle de la transacción",
+      "TRANSFER": "Referencia de transferencia",
+      "ID": "Id de la transacción",
+      "PREFERENCE_ID": "Referencia",
+      "PAYMENT_ID": "Pago",
+      "AMOUNT_GIFTED": "Importe regalado",
+      "DATE": "Fecha",
+      "STATUS": "Estado",
+      "LIST": {
+        "COLUMN": {
+          "AMOUNT_GIFTED": "Importe regalado",
+          "DATE": "Fecha"
+        },
+        "ERROR": {
+          "NO_CONTENT": "No hay transacciones"
+        }
+      },
+      "TYPE": {
+        "FIELD": "Tipo",
+        "REQUIRED": "Tipo es <b>requerido</b>"
+      },
+      "AMOUNT": {
+        "FIELD": "Monto",
+        "REQUIRED": "Monto es <b>requerido</b>"
+      }
+    }
+  }
+}

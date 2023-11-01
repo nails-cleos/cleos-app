@@ -9,7 +9,15 @@ import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../..
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IPaymentAll, PaymentType } from '../../../interfaces/payment';
-import { createTreatmentGroupService, getPrice, getTreatmentDurability, newAdditional, newExtra, newPrice } from '../../../util/helper';
+import {
+  addPayment,
+  createTreatmentGroupService,
+  getPrice,
+  getTreatmentDurability,
+  newAdditional,
+  newExtra,
+  newPrice
+} from '../../../util/helper';
 import { API_LOCALE, getNowTimeZone, getTime, getTimeNumber, newDateTimestamp } from '../../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
 import { map, startWith } from 'rxjs/operators';
@@ -57,7 +65,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
 
   description: UntypedFormControl = new UntypedFormControl();
   extraPrice: UntypedFormControl = new UntypedFormControl();
-  type: UntypedFormControl = new UntypedFormControl(PaymentType.transfer);
+  type: UntypedFormControl = new UntypedFormControl();
   transfer: UntypedFormControl = new UntypedFormControl();
 
   types: string[] = [PaymentType.cash, PaymentType.transfer];
@@ -103,7 +111,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       const treatmentId = valueChange(this.treatment.value.id, this.reservation?.treatment.key);
       const description = this.description.value;
       const price = this.extraPrice.value;
-      const paymentType = this.type.value;
+      const paymentType = this.type.value || PaymentType.account;
       const additionalIds = this.additionalSelected.map(additional => additional.id);
       const transfer = this.transfer.value;
       const startDateTime = this.startDate.toLocaleString(API_LOCALE);
@@ -159,6 +167,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   onChange(options: MatListOption[]): void {
     this.additionalSelected = options.map(o => o.value);
     this.price = newAdditional(this.price, this.additionalSelected, this.reservation?.treatment?.discount);
+    this.setPaymentType();
   }
 
   isSelected(it: IAdditionalAll): boolean {
@@ -185,6 +194,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
         this.types = [...reservation.room.paymentTypes, PaymentType.transfer];
         this.reservation = reservation;
       }
+      this.price = addPayment(this.price, this.payments);
       this.additionalList = state.additional;
       if (this.additionalSelected?.length && this.additionalList?.length) {
         const selectIds = this.additionalSelected?.map(value => value.id);
@@ -207,6 +217,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
           }));
         }
       }
+      this.setPaymentType();
     });
   }
 
@@ -249,6 +260,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     this.treatment.valueChanges.subscribe(value => {
       if (value) {
         this.price = newPrice(this.price, value.price, this.reservation?.treatment?.discount);
+        this.setPaymentType();
       }
     });
   }
@@ -319,6 +331,14 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       this.store.dispatch(
         new fromActionsReservation.ReservationFind({ id: this.reservationId })
       );
+    }
+  }
+
+  private setPaymentType(): void {
+    if (this.price.isPaid) {
+      this.type.setValue(undefined);
+    } else {
+      this.type.setValue(PaymentType.transfer);
     }
   }
 }

@@ -89,11 +89,11 @@
       color: black;
     }
     .text-bg-paid {
-      background-color: #009ee3;
+      background-color: #87ceeb;
       color: black;
     }
     .text-bg-partially_paid {
-      background-color: #009ee3;
+      background-color: #87ceeb;
       color: black;
     }
     .text-bg-started {
@@ -114,6 +114,10 @@
     }
     .text-bg-note {
       background-color: #e7d255;
+      color: black;
+    }
+    .text-bg-transaction {
+      background-color: #fe8d02;
       color: black;
     }
   } @else {
@@ -143,6 +147,10 @@
     }
     .text-bg-note {
       background-color: #eedf72;
+    }
+    .text-bg-transaction {
+      background-color: #ffa53e;
+      color: black;
     }
   }
 
@@ -464,6 +472,12 @@
     background-color: mat.get-color-from-palette($accent-palette);
   }
 
+  #account-spinner {
+    mat-progress-spinner {
+      box-shadow: 0 0 0 1.4em mat.get-color-from-palette($primary-palette, default, 0.2) inset;
+    }
+  }
+
   .card-text-color {
     color: mat.get-color-from-palette($accent-palette, darker-contrast);
   }
@@ -616,11 +630,11 @@
   }
 
   .payment-button {
-    color: #009ee3 !important;
+    color: #87ceeb !important;
   }
 
   .mat-blue {
-    background-color: #009ee3 !important;
+    background-color: #87ceeb !important;
   }
 
   #close {

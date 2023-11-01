@@ -1,6 +1,6 @@
 <h1 mat-dialog-title>{{'COMMON.RESERVATION.EDIT.TITLE' | translate }}</h1>
 <div mat-dialog-content>
-  <p>{{'COMMON.RESERVATION.EDIT.TEXT' | translate }}</p>
+  <p>{{'COMMON.RESERVATION.EDIT.TEXT' | translate: {penalty: penalty} }}</p>
   <app-price [price]="price" [currency]="currency" [showPenalty]="true" [showBank]="false"></app-price>
 </div>
 <div mat-dialog-actions>

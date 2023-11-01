@@ -5,7 +5,7 @@ import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import {
-  AppState,
+  AppState, selectAccountState,
   selectAdditionalState,
   selectAuthState,
   selectCatalogueState,
@@ -100,7 +100,7 @@ export class NavComponent implements OnInit, OnDestroy {
     this.getNotificationState = this.store.select(selectNotificationState);
     this.selectStore([selectRoomState, selectTreatmentState, selectCatalogueState, selectDiscountState, selectUnavailableState,
       selectUserState, selectReservationState, selectPaymentState, selectAdditionalState, selectCurrencyState, selectOfficeState,
-      selectColorState, selectExpenseState, selectNoteState]);
+      selectColorState, selectExpenseState, selectNoteState, selectAccountState]);
     this.navigation.subscribe();
   }
 

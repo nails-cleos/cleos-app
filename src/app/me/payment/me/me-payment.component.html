@@ -1,0 +1,36 @@
+<div class="flex-container" fxLayout="column">
+  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
+    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+      <form (ngSubmit)="update" [formGroup]="typeForm" novalidate>
+        <mat-card appearance="outlined" class="style-card">
+          <mat-card-header>
+            <mat-card-title [innerHTML]="'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate: {amount: payment?.amount | number:'1.2-2',
+                   symbol: payment?.reservation?.room?.currency | currencySymbol}">
+            </mat-card-title>
+            <mat-card-subtitle>
+              <ng-template [ngIf]="payment?.reservation">
+                <button mat-icon-button [routerLink]="['/reservation', payment?.reservation?.id]">
+                  <mat-icon>visibility</mat-icon>
+                </button>&nbsp;
+                <span [innerHTML]="'ME.PAYMENT.RESERVATION' | translate: {reservationId: payment?.reservation?.id}">
+                </span>
+              </ng-template>
+            </mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+              <app-bank [firstTime]="true" [formGroup]="typeForm" [options]="options"></app-bank>
+            </div>
+          </mat-card-content>
+          <mat-card-actions>
+            <div fxFlex></div>
+            <button [form]="typeForm" appBackButton color="accent" mat-fab extended class="icon-button"
+                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <button [disabled]="typeForm.invalid" color="primary" mat-fab extended class="icon-button"
+                    type="submit">{{ 'COMMON.BUTTON.PAYMENT' | translate }}</button>
+          </mat-card-actions>
+        </mat-card>
+      </form>
+    </div>
+  </div>
+</div>

@@ -5,9 +5,6 @@
     "CREATED": "Descuento {{name}} creado",
     "DETAIL": "Actualizar descuento",
     "LIST": {
-      "COLUMN": {
-        "AMOUNT": "Monto"
-      },
       "DIALOG": {
         "CUSTOMER": "Clientes"
       },

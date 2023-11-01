@@ -3,7 +3,6 @@ import { map } from 'rxjs/operators';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
-import { IUserAll } from '../../interfaces/user';
 import { getUserImage, getUserName, getUserNameInitials } from '../../util/helper';
 import { Observable, Subscription } from 'rxjs';
 import * as fromActionsUser from '../../store/user.actions';
@@ -12,6 +11,9 @@ import { IReservationOverview } from '../../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
 import { IChart } from '../../interfaces/dashboard';
 import { formatDateTime, newDateTimestamp } from '../../util/dates';
+import { IAccountAll } from '../../interfaces/account';
+import { IUserAll } from '../../interfaces/user';
+import { AuthUserService } from '../../services/auth-user.service';
 
 @Component({
   selector: 'app-overview',
@@ -21,9 +23,10 @@ import { formatDateTime, newDateTimestamp } from '../../util/dates';
 export class OverviewComponent implements OnInit, OnDestroy {
   error: any;
   image: any;
-  user: IUserAll | undefined;
-  initials: string | undefined;
-  username: string | undefined;
+  account?: IAccountAll;
+  customer?: IUserAll;
+  initials?: string;
+  username?: string;
 
   miniCardData: IReservationOverview[] = [{} as IReservationOverview, {} as IReservationOverview];
   charts: IChart[] = [{} as IChart, {} as IChart];
@@ -33,21 +36,14 @@ export class OverviewComponent implements OnInit, OnDestroy {
 
   layout = this.breakpointObserver.observe([
     Breakpoints.XSmall,
-    Breakpoints.Small,
-    Breakpoints.Medium
+    Breakpoints.Small
   ]).pipe(
     map((r) => {
-      if (r.breakpoints[Breakpoints.Medium]) {
-        return {
-          columns: 2,
-          miniCard: { cols: 1, rows: 1 },
-          chart: { cols: 2, rows: 2 }
-        };
-      }
-
       if (r.matches) {
         return {
           columns: 1,
+          miniCardInfo: { cols: 1, rows: 2 },
+          miniCardAccount: { cols: 1, rows: 1 },
           miniCard: { cols: 1, rows: 1 },
           chart: { cols: 1, rows: 2 }
         };
@@ -55,6 +51,8 @@ export class OverviewComponent implements OnInit, OnDestroy {
 
       return {
         columns: 4,
+        miniCardInfo: { cols: 2, rows: 2 },
+        miniCardAccount: { cols: 1, rows: 1 },
         miniCard: { cols: 1, rows: 1 },
         chart: { cols: 2, rows: 2 }
       };
@@ -62,12 +60,25 @@ export class OverviewComponent implements OnInit, OnDestroy {
   );
 
   private subscription?: Subscription;
+  private authUserServiceSubscription: Subscription;
   private getState: Observable<any>;
+  private hasAdminRole: boolean;
 
   constructor(private breakpointObserver: BreakpointObserver, private route: ActivatedRoute, private store: Store<AppState>,
-              private translate: TranslateService, private router: Router) {
+              private translate: TranslateService, private router: Router, private authUserService: AuthUserService) {
     this.getState = this.store.select(selectUserState);
     this.language = this.translate.currentLang;
+    this.hasAdminRole = false;
+    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => this.hasAdminRole = value.hasAdminRole);
+  }
+
+  get goTo(): void {
+    if (this.hasAdminRole) {
+      this.router.navigate(['/', 'accounts', 'customers', this.customer?.id]);
+    } else {
+      this.router.navigate(['/', 'accounts', this.account?.id, 'transactions', 'add']);
+    }
+    return;
   }
 
   get notification(): void {
@@ -83,7 +94,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
       });
       message += this.translate.instant('WHATSAPP.SEND.ATTENTION');
     }
-    const userPhone = this.user?.phone;
+    const userPhone = this.customer?.phone;
     window.open(`https://api.whatsapp.com/send?phone=+${ userPhone }&text=${ message }`, '_blank');
     return;
   }
@@ -95,15 +106,17 @@ export class OverviewComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.authUserServiceSubscription.unsubscribe();
   }
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe((state) => {
-      if (state && state.data) {
-        this.user = state.data.customer;
-        this.image = getUserImage(this.user);
-        this.initials = getUserNameInitials(this.user);
-        this.username = getUserName(this.user);
+      if (state?.data) {
+        this.account = state.data.account;
+        this.customer = this.account?.customer;
+        this.image = getUserImage(this.customer);
+        this.initials = getUserNameInitials(this.customer);
+        this.username = getUserName(this.customer);
         if (state.data.upcomingList) {
           this.upcoming = state.data.upcomingList;
         }
@@ -124,7 +137,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   }
 
   private getUserOverview(): void {
-    if (!this.user) {
+    if (!this.account) {
       const id = this.route.snapshot.paramMap.get('id');
       this.store.dispatch(
         new fromActionsUser.UserOverview(id)

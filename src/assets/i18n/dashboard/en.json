@@ -5,6 +5,7 @@
     "RESERVATION": {
       "COMPLETED": "Completed: {{completed}} - {{total}}",
       "UPCOMING": "Upcoming: {{upcoming}} - {{total}}",
+      "TRANSACTION": "Account credit: {{transaction}} - {{total}}",
       "DELETED": {
         "TITLE": "Delete reservation",
         "CONTENT": "Are you sure to delete reservation {{date}}?",
@@ -77,7 +78,7 @@
         "WEEK": "Week {{number}}",
         "DATE": "Date",
         "CUSTOMER": "Customer",
-        "TREATMENT": "Treatment",
+        "DESCRIPTION": "Description",
         "DISCOUNT": "Discount",
         "GROSS": "Gross",
         "NET": "Net",
@@ -85,7 +86,7 @@
         "TYPE": "Type",
         "COLOR": "Color",
         "INVOICE": "Invoice",
-        "STORE_SUPPLY": "Store supply",
+        "SUPPLY_STORE": "Supply store",
         "TOTALS": "Totals"
       },
       "ERROR": {

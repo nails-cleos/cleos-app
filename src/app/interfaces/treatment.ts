@@ -2,8 +2,7 @@ import { IDiscount, IUserDiscount } from './discount';
 import { IAdditionalAll } from './additional';
 import { IService } from './room';
 import { IColorAll } from './color';
-
-export const PENALTY = 30;
+import { PENALTY } from './payment';
 
 export interface ITreatmentGroup {
   id?: string;
@@ -91,8 +90,13 @@ export interface IPrice {
   percentageToPaid: number;
   toPaid: number;
   penalty: number;
+  balance: number;
 
   setPenalty(penaltyToPay: number): void;
+
+  withTotalPaid(totalPaid: number): IPrice;
+
+  withBalance(balance?: number): IPrice;
 }
 
 export class Price implements IPrice {
@@ -110,10 +114,11 @@ export class Price implements IPrice {
   percentageToPaid: number;
   toPaid: number;
   penalty: number;
+  balance: number;
 
   constructor(price: number = 0, discount: number = 0, extra: number = 0, additional: number = 0, total: number = 0,
               totalPaid: number = 0, totalWithoutDiscount: number = 0, priceWithDiscount: number = 0, priceWithExtras = 0,
-              priceWithAdditional = 0, percentageToPaid: number = 100) {
+              priceWithAdditional = 0, percentageToPaid: number = 100, balance: number = 0) {
     this.amount = price;
     this.discount = discount;
     this.extra = extra;
@@ -125,13 +130,30 @@ export class Price implements IPrice {
     this.priceWithExtras = priceWithExtras;
     this.priceWithAdditional = priceWithAdditional;
     this.percentageToPaid = percentageToPaid;
+    this.balance = balance;
     this.toPaid = total * percentageToPaid / 100;
-    this.isPaid = this.amount > 0 && this.totalPaid >= this.total;
     this.penalty = (total * PENALTY / 100);
+    this.isPaid = this.calculateIsPaid();
+  }
+
+  withTotalPaid(totalPaid: number = 0): IPrice {
+    this.totalPaid = totalPaid;
+    this.isPaid = this.calculateIsPaid();
+    return this;
+  }
+
+  withBalance(balance: number = 0): IPrice {
+    this.balance = balance;
+    this.isPaid = this.calculateIsPaid();
+    return this;
   }
 
   setPenalty(penalty: number): void {
     this.penalty = penalty;
+  }
+
+  private calculateIsPaid(): boolean {
+    return this.amount > 0 && this.totalPaid + this.balance >= this.total;
   }
 }
 

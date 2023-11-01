@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { INotification, PAGE_SIZE } from '../interfaces/notification';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
+import { createFilter } from '../util/service-helper';
 
 @Injectable()
 export class NotificationService {
@@ -12,14 +13,9 @@ export class NotificationService {
   constructor(private http: HttpClient) {
   }
 
-  public getAll(sort: string, direction: string, page: number): Observable<INotification[]> {
-    let params = new HttpParams().set('page', String(page)).set('size', String(PAGE_SIZE));
-    if (sort) {
-      params = params.append('sort', sort);
-    }
-    if (direction) {
-      params = params.append('direction', direction);
-    }
+  public getAll(sort: string, direction: string, page: number, size: number = PAGE_SIZE): Observable<INotification[]> {
+    const params = createFilter(page, size, sort, direction);
+
     return this.http.get<INotification[]>(`${ this.urlV1 }/pages`, { params });
   }
 

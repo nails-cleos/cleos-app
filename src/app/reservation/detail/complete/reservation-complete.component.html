@@ -44,7 +44,7 @@
                       {{treatment.name}}
                     </mat-option>
                   </mat-autocomplete>
-                  <mat-icon matSuffix>home_repair_service</mat-icon>
+                  <mat-icon matSuffix>spa</mat-icon>
                   <mat-error *ngIf="treatment.hasError('required')"
                              [innerHTML]="'COMMON.TREATMENT.REQUIRED' | translate">
                   </mat-error>
@@ -80,7 +80,7 @@
               </mat-form-field>
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'RESERVATION.TREATMENT.EXTRAS.PRICE' | translate }}</mat-label>
-                <span matPrefix><mat-icon matPrefix>attach_money</mat-icon> &nbsp;</span>
+                <span matPrefix><mat-icon matPrefix>{{reservation.room.currency.icon}}</mat-icon> &nbsp;</span>
                 <label>
                   <input [formControl]="extraPrice" matInput type="number">
                 </label>
@@ -123,7 +123,7 @@
               <mat-list>
                 <ng-template [ngIf]="group.value && treatment.value">
                   <mat-list-item>
-                    <mat-icon matListItemIcon>home_repair_service</mat-icon>
+                    <mat-icon matListItemIcon>spa</mat-icon>
                     <div class="bold" matListItemTitle>{{ 'COMMON.TREATMENT.FIELD' | translate}}</div>
                   </mat-list-item>
                   <mat-list-item style="text-align: center">
@@ -141,7 +141,8 @@
                     </ng-template>
                     <div matListItemTitle>
                       <span [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.PRICE' | translate"></span>
-                      <span class="vertical-divider bold">$ {{price.amount | number:'1.2-2'}}</span>
+                      <span
+                        class="vertical-divider bold"> {{reservation.room.currency | currencySymbol}} {{price.amount | number:'1.2-2'}}</span>
                     </div>
                     <ng-template [ngIf]="durability">
                       <div [innerHTML]="durability" matListItemLine></div>
@@ -173,7 +174,6 @@
                 <mat-list-item>
                   <div mat-line>
                     <span [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.TOTAL' | translate"></span>
-
                     <ng-template [ngIf]="price.priceWithDiscount" [ngIfElse]="noDiscount">
                       <span [class.strikethrough]="price.discount" class="vertical-divider">
                         {{reservation.room.currency | currencySymbol}} {{price.totalWithoutDiscount | number:'1.2-2'}}
@@ -189,6 +189,33 @@
                     </ng-template>
                   </div>
                 </mat-list-item>
+                <ng-template [ngIf]="!price.isPaid && (price.balance || price.totalPaid)">
+                  <ng-template [ngIf]="price.totalPaid">
+                    <mat-list-item>
+                      <div matListItemLine [innerHTML]="'COMMON.PAYMENT.OPTIONS.PAID' | translate: {
+                         amount: price.totalPaid | number:'1.2-2',
+                         symbol: reservation.room.currency | currencySymbol
+                         }">
+                      </div>
+                    </mat-list-item>
+                  </ng-template>
+                  <ng-template [ngIf]="price.balance">
+                    <mat-list-item>
+                      <div matListItemLine [innerHTML]="'COMMON.PAYMENT.OPTIONS.ACCOUNT' | translate: {
+                         amount: price.balance | number:'1.2-2',
+                         symbol: reservation.room.currency | currencySymbol
+                         }">
+                      </div>
+                    </mat-list-item>
+                  </ng-template>
+                  <mat-list-item>
+                    <div matListItemLine [innerHTML]="'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate: {
+                         amount: price.toPaid - price.totalPaid - price.balance | number:'1.2-2',
+                         symbol: reservation.room.currency | currencySymbol
+                         }">
+                    </div>
+                  </mat-list-item>
+                </ng-template>
               </mat-list>
               <ng-template [ngIf]="!price.isPaid">
                 <div fxLayout="column" fxLayoutAlign="space-evenly stretch">

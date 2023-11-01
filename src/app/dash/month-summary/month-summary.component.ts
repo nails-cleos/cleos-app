@@ -3,7 +3,7 @@ import { FormControl, UntypedFormControl } from '@angular/forms';
 import { DateAdapter } from '@angular/material/core';
 import { MatDatepicker } from '@angular/material/datepicker';
 
-import { dateMonthYear, getDateQuarter, getNow, getWeeksInMonth, monthViewTitle, newDateTimestamp } from '../../util/dates';
+import { dateMonthYear, getDateFormat, getDateQuarter, getNow, getWeeksInMonth, monthViewTitle, newDateTimestamp } from '../../util/dates';
 import { Observable, Subscription } from 'rxjs';
 import { AppState, selectDashboardState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
@@ -14,7 +14,7 @@ import {
   IMonthlySummary,
   IMonthlySummaryExpense,
   IMonthlySummaryRequest,
-  IMonthlySummaryReservation,
+  IMonthlySummarySale,
   ISummaryRoom,
   ISummaryTotal,
   SummaryType
@@ -36,9 +36,9 @@ import { AuthUserService } from '../../services/auth-user.service';
 export class MonthSummaryComponent implements OnInit {
   date = new FormControl<Date | null>(null);
   monthlySummaryMap?: Map<ISummaryRoom, {
-    summaryReservation: IMonthlySummaryReservation[];
+    summarySale: IMonthlySummarySale[];
     summaryExpenses: IMonthlySummaryExpense[];
-    summaryCash: IMonthlySummaryReservation[];
+    summaryCashSale: IMonthlySummarySale[];
   }>;
   selectedRoom = new UntypedFormControl();
   amountFormat = new UntypedFormControl('ES');
@@ -129,16 +129,6 @@ export class MonthSummaryComponent implements OnInit {
 
   private static cleanCVSText = (text: string): string => `${ text.replace(/,/g, '') }; `;
 
-  private static getDateFormat(date: Date | null): string {
-    if (!date) {
-      return '';
-    }
-    const month = `0${ date.getMonth() + 1 }`.slice(0, 2);
-    const year = date.getFullYear();
-
-    return `${ month }-${ year }`;
-  }
-
   private static isInvalidInput(value: string): boolean {
     return !value || new RegExp(/^0\.?0{0,2}$/g).test(value) || new RegExp(/^\.0{0,2}$/g).test(value);
   }
@@ -218,9 +208,17 @@ export class MonthSummaryComponent implements OnInit {
     this.valueChange();
     if (this.extras) {
       this.step = this.extras.step || 0;
-      const date = this.extras.date.split('-');
-      const month = Number(date[0]) - 1;
-      const year = date[1];
+      const dateTime = this.extras.date;
+      let month;
+      let year;
+      if (dateTime instanceof Date) {
+        month = dateTime.getMonth();
+        year = dateTime.getFullYear();
+      } else {
+        const date = dateTime.split('-');
+        month = Number(date[0]) - 1;
+        year = date[1];
+      }
       this.date.setValue(dateMonthYear(month, year));
     } else {
       this.date.setValue(getNow());
@@ -325,7 +323,7 @@ export class MonthSummaryComponent implements OnInit {
       const hiddenElement = document.createElement('a');
       hiddenElement.href = `data:text/csv;charset=utf-8,${ encodeURI(csv) }`;
       hiddenElement.target = '_blank';
-      hiddenElement.download = `${ titleCase(SummaryType[type]) }-${ MonthSummaryComponent.getDateFormat(this.date.value) }.csv`;
+      hiddenElement.download = `${ titleCase(SummaryType[type]) }-${ getDateFormat(this.date.value) }.csv`;
       hiddenElement.click();
 
       return this.updateMonthlySummary(type, gross, btw, values);
@@ -338,7 +336,7 @@ export class MonthSummaryComponent implements OnInit {
     return this.store.dispatch(
       new fromActionsDashboard.UpdateMonthlySummary(
         {
-          date: MonthSummaryComponent.getDateFormat(this.date.value),
+          date: getDateFormat(this.date.value),
           roomId: this.roomId,
           type,
           gross,
@@ -391,7 +389,7 @@ export class MonthSummaryComponent implements OnInit {
     });
     this.date.valueChanges.subscribe(value => {
       if (value) {
-        this.getSummary(MonthSummaryComponent.getDateFormat(value));
+        this.getSummary(getDateFormat(value));
         this.weeks = getWeeksInMonth(value);
         this.showInput = true;
       }
@@ -429,7 +427,7 @@ export class MonthSummaryComponent implements OnInit {
   private createData(): void {
     if (this.selectedRoom.value) {
       this.roomId = this.selectedRoom.value.roomId;
-      this.summaryReservations = this.monthlySummaryMap?.get(this.selectedRoom.value)?.summaryReservation.map((s, i) => {
+      this.summaryReservations = this.monthlySummaryMap?.get(this.selectedRoom.value)?.summarySale.map((s, i) => {
         if (s.id) {
           const reservationDate = newDateTimestamp(s.timestamp);
           return Object.assign({}, s, { reservationDate, day: reservationDate.getDate(), position: i });
@@ -447,7 +445,7 @@ export class MonthSummaryComponent implements OnInit {
       });
       this.calculateExpenseSummary();
 
-      this.summaryCash = this.monthlySummaryMap?.get(this.selectedRoom.value)?.summaryCash.map((s, i) => {
+      this.summaryCash = this.monthlySummaryMap?.get(this.selectedRoom.value)?.summaryCashSale.map((s, i) => {
         if (s.id) {
           const reservationDate = newDateTimestamp(s.timestamp);
           return Object.assign({}, s, { reservationDate, day: reservationDate.getDate(), position: i });

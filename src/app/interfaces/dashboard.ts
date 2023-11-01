@@ -45,6 +45,7 @@ export interface ICalendarSummary {
   unavailable: ICalendarUnavailable[];
   birthdays: ICalendarBirthday[];
   notes: ICalendarNote[];
+  transactions: ICalendarTransaction[];
 }
 
 export interface ICalendarReservations {
@@ -80,6 +81,14 @@ export interface ICalendarNote {
   title: string;
   date: number;
   repeat: FrequencyEnum;
+}
+
+export interface ICalendarTransaction {
+  accountId: string;
+  transactionId: string;
+  title: string;
+  createdAt: string;
+  total: number;
 }
 
 export interface IChart {
@@ -152,23 +161,24 @@ export interface ISummaryTotal extends ITotal {
 
 export interface IMonthlySummary {
   id: string;
+  paths: string[];
   position: number;
   timestamp: number;
   total: ISummaryTotal;
 }
 
-export interface IMonthlySummaryReservation extends IMonthlySummary {
+export interface IMonthlySummarySale extends IMonthlySummary {
   state: States;
   reservationDate: Date;
   customerName: string;
-  treatmentName: string;
+  description: string;
   color: string;
 }
 
 export interface IMonthlySummaryExpense extends IMonthlySummary {
   expenseDate: Date;
   invoice: string;
-  storeSupply: string;
+  supplyStore: string;
 }
 
 export interface ISummaryRoom {
@@ -185,9 +195,9 @@ export interface IMonthlySummaryRequest {
 }
 
 export interface IMonthlyRoomSummary extends ISummaryRoom {
-  reservationSummary: IMonthlySummaryReservation[];
+  saleSummary: IMonthlySummarySale[];
   expenseSummary: IMonthlySummaryExpense[];
-  cashSummary: IMonthlySummaryReservation[];
+  cashSaleSummary: IMonthlySummarySale[];
 }
 
 export interface IYearRoomSummary extends ISummaryRoom {

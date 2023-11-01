@@ -2,9 +2,6 @@
   "RESERVATION": {
     "PREVIEW": "Preview",
     "APPOINTMENT": "Appointment",
-    "SEARCH": {
-      "TITLE": "Search"
-    },
     "LIST": {
       "CANCEL": {
         "TITLE": "Cancel reservation",
@@ -204,9 +201,9 @@
       "OPTION": {
         "DISCOUNT": "<b>Discount:</b><br>Create a discount for the amount paid.",
         "REFUND": "<b>Refund:</b><br>Refund the amount paid.",
-        "CHARGE": "<b>Penalty:</b><br>A penalty of 30% will be charge.",
-        "CHARGE_WITH_DISCOUNT": "<b>Penalty + Discount:</b><br>A penalty of 30% will be charge. If you paid more than the 30%, a discount will be created.",
-        "CHARGE_WITH_REFUND": "<b>Penalty + Refund:</b><br>A 30% penalty will be charged. If you paid more than 30%, you will get a refund.",
+        "CHARGE": "<b>Penalty:</b><br>A penalty of {{penalty}}% will be charge.",
+        "CHARGE_WITH_DISCOUNT": "<b>Penalty + Discount:</b><br>A penalty of {{penalty}}% will be charge. If you paid more than the {{penalty}}%, a discount will be created.",
+        "CHARGE_WITH_REFUND": "<b>Penalty + Refund:</b><br>A {{penalty}}% penalty will be charged. If you paid more than {{penalty}}%, you will get a refund.",
         "NONE": "<b>None:</b><br>No extra action performed."
       }
     },
@@ -228,10 +225,6 @@
     "RECREATE": "Payment link recreated",
     "COPY": "Link copied!",
     "LIST": {
-      "COLUMN": {
-        "AMOUNT": "Amount",
-        "STATUS": "Status"
-      },
       "ERROR": {
         "NO_CONTENT": "No payment"
       }

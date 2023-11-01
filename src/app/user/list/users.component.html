@@ -1,244 +1,252 @@
-<mat-form-field appearance="outline">
-  <mat-label>{{ 'COMMON.LABEL.FILTER' | translate }}</mat-label>
-  <label>
-    <input (keyup)="applyFilter($event)" [formNoValidate]="true" autocomplete="off" matInput type="text">
-  </label>
-</mat-form-field>
-<div class="mat-elevation-z8">
-  <table [dataSource]="dataSource" mat-table matSort matSortActive="username" matSortDirection="asc"
-         matSortDisableClear multiTemplateDataRows>
-    <ng-container matColumnDef="position">
-      <th *matHeaderCellDef mat-header-cell>#</th>
-      <td *matCellDef="let user; let i = dataIndex;" mat-cell>
-        <div *ngIf="user.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
-      </td>
-    </ng-container>
+<div>
+  <fieldset>
+    <legend>{{'COMMON.SEARCH.TITLE' | translate }}</legend>
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'COMMON.LABEL.FILTER' | translate }}</mat-label>
+      <label>
+        <input (keyup)="applyFilter($event)" [formNoValidate]="true" autocomplete="off" matInput type="text">
+      </label>
+    </mat-form-field>
+  </fieldset>
+  <div class="mat-elevation-z8">
+    <table [dataSource]="dataSource" mat-table matSort matSortActive="username" matSortDirection="asc"
+           matSortDisableClear multiTemplateDataRows>
+      <ng-container matColumnDef="position">
+        <th *matHeaderCellDef mat-header-cell>#</th>
+        <td *matCellDef="let user; let i = dataIndex;" mat-cell>
+          <div *ngIf="user.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
+          <ng-template #skeleton>
+            <div class="ssc-line"></div>
+          </ng-template>
+        </td>
+      </ng-container>
 
-    <ng-container matColumnDef="firstName">
-      <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
-      <td *matCellDef="let user" mat-cell>
-        <div *ngIf="user.id; else skeleton">{{user | userName}}</div>
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
-      </td>
-    </ng-container>
+      <ng-container matColumnDef="firstName">
+        <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
+        <td *matCellDef="let user" mat-cell>
+          <div *ngIf="user.id; else skeleton">{{user | userName}}</div>
+          <ng-template #skeleton>
+            <div class="ssc-line"></div>
+          </ng-template>
+        </td>
+      </ng-container>
 
-    <ng-container matColumnDef="username">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
-          mat-sort-header>{{ 'USER.LIST.COLUMN.USERNAME' | translate }}</th>
-      <td *matCellDef="let user" class="column-large-text" fxHide.lt-sm fxShow mat-cell>
-        <div *ngIf="user.id; else skeleton">{{user.username}}</div>
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
-      </td>
-    </ng-container>
+      <ng-container matColumnDef="username">
+        <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+            mat-sort-header>{{ 'USER.LIST.COLUMN.USERNAME' | translate }}</th>
+        <td *matCellDef="let user" class="column-large-text" fxHide.lt-sm fxShow mat-cell>
+          <div *ngIf="user.id; else skeleton">{{user.username}}</div>
+          <ng-template #skeleton>
+            <div class="ssc-line"></div>
+          </ng-template>
+        </td>
+      </ng-container>
 
-    <ng-container matColumnDef="email">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
-          mat-sort-header>{{ 'USER.LIST.COLUMN.EMAIL' | translate }}</th>
-      <td *matCellDef="let user" class="column-large-text" fxHide.lt-sm fxShow mat-cell>
-        <div *ngIf="user.id; else skeleton">{{user.email}}</div>
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
-      </td>
-    </ng-container>
+      <ng-container matColumnDef="email">
+        <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+            mat-sort-header>{{ 'USER.LIST.COLUMN.EMAIL' | translate }}</th>
+        <td *matCellDef="let user" class="column-large-text" fxHide.lt-sm fxShow mat-cell>
+          <div *ngIf="user.id; else skeleton">{{user.email}}</div>
+          <ng-template #skeleton>
+            <div class="ssc-line"></div>
+          </ng-template>
+        </td>
+      </ng-container>
 
-    <ng-container matColumnDef="provider">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
-          mat-sort-header>{{ 'USER.LIST.COLUMN.PROVIDER' | translate }}</th>
-      <td *matCellDef="let user" fxHide.lt-sm fxShow mat-cell>
-        <div *ngIf="user.id; else skeleton">{{user.provider}}</div>
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
-      </td>
-    </ng-container>
+      <ng-container matColumnDef="provider">
+        <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+            mat-sort-header>{{ 'USER.LIST.COLUMN.PROVIDER' | translate }}</th>
+        <td *matCellDef="let user" fxHide.lt-sm fxShow mat-cell>
+          <div *ngIf="user.id; else skeleton">{{user.provider}}</div>
+          <ng-template #skeleton>
+            <div class="ssc-line"></div>
+          </ng-template>
+        </td>
+      </ng-container>
 
-    <ng-container matColumnDef="status">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'USER.LIST.COLUMN.STATUS' | translate }}</th>
-      <td *matCellDef="let user" fxHide.lt-sm fxShow mat-cell>
-        <div *ngIf="user.id; else skeleton">
-          <div *ngIf="!user.deleted; else deleteBlock">
-            <mat-icon *ngIf="user.enabled || user.provider !== 'LOCAL'; else elseBlock"
-                      matTooltip="{{ 'USER.LIST.STATUS.ENABLED' | translate }}"
-                      matTooltipPosition="left">
-              verified_user
-            </mat-icon>
-            <ng-template #elseBlock>
-              <mat-icon color="warn" matTooltip="{{ 'USER.LIST.STATUS.DISABLED' | translate }}"
+      <ng-container matColumnDef="status">
+        <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
+        <td *matCellDef="let user" fxHide.lt-sm fxShow mat-cell>
+          <div *ngIf="user.id; else skeleton">
+            <div *ngIf="!user.deleted; else deleteBlock">
+              <mat-icon *ngIf="user.enabled || user.provider !== 'LOCAL'; else elseBlock"
+                        matTooltip="{{ 'USER.LIST.STATUS.ENABLED' | translate }}"
                         matTooltipPosition="left">
-                gpp_bad
+                verified_user
+              </mat-icon>
+              <ng-template #elseBlock>
+                <mat-icon color="warn" matTooltip="{{ 'USER.LIST.STATUS.DISABLED' | translate }}"
+                          matTooltipPosition="left">
+                  gpp_bad
+                </mat-icon>
+              </ng-template>
+            </div>
+            <ng-template #deleteBlock>
+              <mat-icon color="primary" matTooltip="{{ 'USER.LIST.STATUS.DELETED' | translate }}"
+                        matTooltipPosition="left">delete_outline
               </mat-icon>
             </ng-template>
           </div>
-          <ng-template #deleteBlock>
-            <mat-icon color="primary" matTooltip="{{ 'USER.LIST.STATUS.DELETED' | translate }}"
-                      matTooltipPosition="left">delete_outline
-            </mat-icon>
+          <ng-template #skeleton>
+            <div class="ssc-line"></div>
           </ng-template>
-        </div>
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
-      </td>
-    </ng-container>
+        </td>
+      </ng-container>
 
-    <ng-container matColumnDef="actions">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-      <td *matCellDef="let user" fxHide.lt-sm fxShow mat-cell>
-        <div *ngIf="user.id; else skeleton">
-          <ng-template [ngIf]="!user.deleted" [ngIfElse]="deleted">
-            <button (click)="edit(user)" mat-icon-button>
-              <mat-icon color="primary">edit</mat-icon>
-            </button>
-            <button [routerLink]="['/users', user.id, 'overview']" mat-icon-button>
-              <mat-icon color="primary">analytics</mat-icon>
-            </button>
-            <button (click)="book(user)" mat-icon-button>
-              <mat-icon color="accent">today</mat-icon>
-            </button>
-            <ng-template [ngIf]="!user.deleted && !user.enabled && user.provider === 'LOCAL'">
-              <button (click)="sendInvite(user)" mat-icon-button>
-                <mat-icon color="accent">forward_to_inbox</mat-icon>
-              </button>
-            </ng-template>
-            <ng-template [ngIf]="user.enabled">
-              <button (click)="merge(user)" mat-icon-button>
-                <mat-icon color="primary">merge</mat-icon>
-              </button>
-            </ng-template>
-            <button (click)="delete(user)" mat-icon-button>
-              <mat-icon color="warn">delete</mat-icon>
-            </button>
-          </ng-template>
-          <ng-template #deleted>
-            <button (click)="restore(user)" mat-icon-button>
-              <mat-icon color="primary">restore_from_trash</mat-icon>
-            </button>
-          </ng-template>
-        </div>
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="expandedDetail">
-      <td *matCellDef="let user" [attr.colspan]="displayedColumns.length" mat-cell>
-        <div [@detailExpand]="user === expandedUser ? 'expanded' : 'collapsed'"
-             class="user-detail">
-          <mat-list>
-            <div fxHide fxShow.lt-sm matListItemTitle>{{ 'USER.LIST.COLUMN.USERNAME' | translate }}</div>
-            <mat-list-item fxHide fxShow.lt-sm role="list">
-              <div matListItemLine>{{user.username}}</div>
-            </mat-list-item>
-            <div fxHide fxShow.lt-sm matListItemTitle>{{ 'USER.LIST.COLUMN.EMAIL' | translate }}</div>
-            <mat-list-item fxHide fxShow.lt-sm role="list">
-              <div mat-line>{{user.email}}</div>
-            </mat-list-item>
-            <div fxHide fxShow.lt-sm matListItemTitle>{{ 'USER.LIST.COLUMN.PROVIDER' | translate }}</div>
-            <mat-list-item fxHide fxShow.lt-sm role="list">
-              <div matListItemLine>{{user.provider}}</div>
-            </mat-list-item>
-            <div fxHide fxShow.lt-sm matListItemTitle>{{ 'USER.LIST.COLUMN.STATUS' | translate }}</div>
-            <mat-list-item fxHide fxShow.lt-sm role="list">
-              <ng-template [ngIf]="!user.deleted" [ngIfElse]="deleteBlock">
-                <ng-template [ngIf]="user.enabled || user.provider !== 'LOCAL'" [ngIfElse]="elseBlock">
-                  <mat-icon matListItemIcon>verified_user</mat-icon>
-                </ng-template>
-                <ng-template #elseBlock>
-                  <mat-icon matListItemIcon color="warn">gpp_bad</mat-icon>
-                </ng-template>
-              </ng-template>
-              <ng-template #deleteBlock>
-                <mat-icon matListItemIcon color="accent">delete_outline</mat-icon>
-              </ng-template>
-            </mat-list-item>
-            <div fxHide.lt-sm fxShow matListItemTitle>{{ 'USER.LIST.COLUMN.DETAIL.TITLE' | translate }}</div>
-            <ng-template [ngIf]="!user.deleted">
-              <div class="flex-container" fxHide.lt-sm fxShow>
-                <div class="flex-child">
-                  <mat-list-item *ngFor="let it of user.authorities" role="list">
-                    <mat-icon matListItemIcon>{{getIcon(it.authority)}}</mat-icon>
-                    <div matListItemTitle>{{ 'COMMON.ROLES.' + it.authority | translate}}
-                      <button (click)="removeRole(user, it.authority)" color="warn" mat-icon-button>
-                        <mat-icon>person_remove</mat-icon>
-                      </button>
-                    </div>
-                  </mat-list-item>
-                </div>
-                <div *ngIf="!user.deleted" class="flex-child">
-                  <mat-list-item *ngFor="let role of user.missing">
-                    <mat-icon matListItemIcon>{{getIcon(role)}}</mat-icon>
-                    <button (click)="addRole(user, role)" color="primary" mat-button>
-                      {{'COMMON.BUTTON.ADD' | translate}} {{ 'COMMON.ROLES.' + role | translate | lowercase}}</button>
-                  </mat-list-item>
-                </div>
-              </div>
-            </ng-template>
-            <div fxHide fxShow.lt-sm matListItemTitle>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+      <ng-container matColumnDef="actions">
+        <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+        <td *matCellDef="let user" fxHide.lt-sm fxShow mat-cell>
+          <div *ngIf="user.id; else skeleton">
             <ng-template [ngIf]="!user.deleted" [ngIfElse]="deleted">
-              <div fxHide fxShow.lt-sm>
-                <button (click)="edit(user)" mat-icon-button>
-                  <mat-icon color="primary">edit</mat-icon>
+              <button (click)="edit(user)" mat-icon-button>
+                <mat-icon color="primary">edit</mat-icon>
+              </button>
+              <button [routerLink]="['/users', user.id, 'overview']" mat-icon-button>
+                <mat-icon color="primary">analytics</mat-icon>
+              </button>
+              <button (click)="book(user)" mat-icon-button>
+                <mat-icon color="accent">today</mat-icon>
+              </button>
+              <button [routerLink]="['/', 'accounts', 'customers', user.id]" mat-icon-button>
+                <mat-icon color="primary">account_balance</mat-icon>
+              </button>
+              <ng-template [ngIf]="!user.deleted && !user.enabled && user.provider === 'LOCAL'">
+                <button (click)="sendInvite(user)" mat-icon-button>
+                  <mat-icon color="accent">forward_to_inbox</mat-icon>
                 </button>
-                <button [routerLink]="['/users', user.id, 'overview']" mat-icon-button>
-                  <mat-icon color="primary">analytics</mat-icon>
+              </ng-template>
+              <ng-template [ngIf]="user.enabled">
+                <button (click)="merge(user)" mat-icon-button>
+                  <mat-icon color="primary">merge</mat-icon>
                 </button>
-                <button (click)="book(user)" mat-icon-button>
-                  <mat-icon color="accent">today</mat-icon>
-                </button>
-                <ng-template [ngIf]="!user.enabled && user.provider === 'LOCAL'">
-                  <button (click)="sendInvite(user)" mat-icon-button>
-                    <mat-icon color="accent">forward_to_inbox</mat-icon>
-                  </button>
-                </ng-template>
-                <ng-template [ngIf]="user.enabled">
-                  <button (click)="merge(user)" mat-icon-button>
-                    <mat-icon color="primary">merge</mat-icon>
-                  </button>
-                </ng-template>
-                <button (click)="delete(user)" mat-icon-button>
-                  <mat-icon color="warn">delete</mat-icon>
-                </button>
-              </div>
+              </ng-template>
+              <button (click)="delete(user)" mat-icon-button>
+                <mat-icon color="warn">delete</mat-icon>
+              </button>
             </ng-template>
             <ng-template #deleted>
-              <div fxHide fxShow.lt-sm>
-                <button (click)="restore(user)" *ngIf="user.deleted" mat-icon-button>
-                  <mat-icon color="primary">restore_from_trash</mat-icon>
-                </button>
-              </div>
+              <button (click)="restore(user)" mat-icon-button>
+                <mat-icon color="primary">restore_from_trash</mat-icon>
+              </button>
             </ng-template>
-          </mat-list>
-        </div>
-      </td>
-    </ng-container>
+          </div>
+          <ng-template #skeleton>
+            <div class="ssc-line"></div>
+          </ng-template>
+        </td>
+      </ng-container>
 
-    <ng-container matColumnDef="noContent">
-      <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-        {{ 'USER.LIST.ERROR.NO_CONTENT' | translate }} '{{filter}}'
-      </td>
-    </ng-container>
+      <ng-container matColumnDef="expandedDetail">
+        <td *matCellDef="let user" [attr.colspan]="displayedColumns.length" mat-cell>
+          <div [@detailExpand]="user === expandedUser ? 'expanded' : 'collapsed'"
+               class="user-detail">
+            <mat-list>
+              <div fxHide fxShow.lt-sm matListItemTitle>{{ 'USER.LIST.COLUMN.USERNAME' | translate }}</div>
+              <mat-list-item fxHide fxShow.lt-sm role="list">
+                <div matListItemLine>{{user.username}}</div>
+              </mat-list-item>
+              <div fxHide fxShow.lt-sm matListItemTitle>{{ 'USER.LIST.COLUMN.EMAIL' | translate }}</div>
+              <mat-list-item fxHide fxShow.lt-sm role="list">
+                <div mat-line>{{user.email}}</div>
+              </mat-list-item>
+              <div fxHide fxShow.lt-sm matListItemTitle>{{ 'USER.LIST.COLUMN.PROVIDER' | translate }}</div>
+              <mat-list-item fxHide fxShow.lt-sm role="list">
+                <div matListItemLine>{{user.provider}}</div>
+              </mat-list-item>
+              <div fxHide fxShow.lt-sm matListItemTitle>{{ 'COMMON.COLUMN.STATUS' | translate }}</div>
+              <mat-list-item fxHide fxShow.lt-sm role="list">
+                <ng-template [ngIf]="!user.deleted" [ngIfElse]="deleteBlock">
+                  <ng-template [ngIf]="user.enabled || user.provider !== 'LOCAL'" [ngIfElse]="elseBlock">
+                    <mat-icon matListItemIcon>verified_user</mat-icon>
+                  </ng-template>
+                  <ng-template #elseBlock>
+                    <mat-icon matListItemIcon color="warn">gpp_bad</mat-icon>
+                  </ng-template>
+                </ng-template>
+                <ng-template #deleteBlock>
+                  <mat-icon matListItemIcon color="accent">delete_outline</mat-icon>
+                </ng-template>
+              </mat-list-item>
+              <div fxHide.lt-sm fxShow matListItemTitle>{{ 'USER.LIST.COLUMN.DETAIL.TITLE' | translate }}</div>
+              <ng-template [ngIf]="!user.deleted">
+                <div class="flex-container" fxHide.lt-sm fxShow>
+                  <div class="flex-child">
+                    <mat-list-item *ngFor="let it of user.authorities" role="list">
+                      <mat-icon matListItemIcon>{{getIcon(it.authority)}}</mat-icon>
+                      <div matListItemTitle>{{ 'COMMON.ROLES.' + it.authority | translate}}
+                        <button (click)="removeRole(user, it.authority)" color="warn" mat-icon-button>
+                          <mat-icon>person_remove</mat-icon>
+                        </button>
+                      </div>
+                    </mat-list-item>
+                  </div>
+                  <div *ngIf="!user.deleted" class="flex-child">
+                    <mat-list-item *ngFor="let role of user.missing">
+                      <mat-icon matListItemIcon>{{getIcon(role)}}</mat-icon>
+                      <button (click)="addRole(user, role)" color="primary" mat-button>
+                        {{'COMMON.BUTTON.ADD' | translate}} {{ 'COMMON.ROLES.' + role | translate | lowercase}}</button>
+                    </mat-list-item>
+                  </div>
+                </div>
+              </ng-template>
+              <div fxHide fxShow.lt-sm matListItemTitle>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+              <ng-template [ngIf]="!user.deleted" [ngIfElse]="deleted">
+                <div fxHide fxShow.lt-sm>
+                  <button (click)="edit(user)" mat-icon-button>
+                    <mat-icon color="primary">edit</mat-icon>
+                  </button>
+                  <button [routerLink]="['/users', user.id, 'overview']" mat-icon-button>
+                    <mat-icon color="primary">analytics</mat-icon>
+                  </button>
+                  <button (click)="book(user)" mat-icon-button>
+                    <mat-icon color="accent">today</mat-icon>
+                  </button>
+                  <ng-template [ngIf]="!user.enabled && user.provider === 'LOCAL'">
+                    <button (click)="sendInvite(user)" mat-icon-button>
+                      <mat-icon color="accent">forward_to_inbox</mat-icon>
+                    </button>
+                  </ng-template>
+                  <ng-template [ngIf]="user.enabled">
+                    <button (click)="merge(user)" mat-icon-button>
+                      <mat-icon color="primary">merge</mat-icon>
+                    </button>
+                  </ng-template>
+                  <button (click)="delete(user)" mat-icon-button>
+                    <mat-icon color="warn">delete</mat-icon>
+                  </button>
+                </div>
+              </ng-template>
+              <ng-template #deleted>
+                <div fxHide fxShow.lt-sm>
+                  <button (click)="restore(user)" *ngIf="user.deleted" mat-icon-button>
+                    <mat-icon color="primary">restore_from_trash</mat-icon>
+                  </button>
+                </div>
+              </ng-template>
+            </mat-list>
+          </div>
+        </td>
+      </ng-container>
 
-    <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-    <tr (click)="expandedUser = expandedUser === user ? null : user" *matRowDef="let user; columns: displayedColumns;"
-        [ngClass]="{'deadLine': user.deleted}" class="user-row" mat-row></tr>
-    <tr *matRowDef="let row; columns: ['expandedDetail']" class="user-detail-row"
-        [class.user-expanded-row]="expandedUser === row" mat-row></tr>
+      <ng-container matColumnDef="noContent">
+        <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+          {{ 'USER.LIST.ERROR.NO_CONTENT' | translate }} '{{filter}}'
+        </td>
+      </ng-container>
 
-    <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
-  </table>
-  <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+      <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+      <tr (click)="expandedUser = expandedUser === user ? null : user" *matRowDef="let user; columns: displayedColumns;"
+          [ngClass]="{'deadLine': user.deleted}" class="user-row" mat-row></tr>
+      <tr *matRowDef="let row; columns: ['expandedDetail']" class="user-detail-row"
+          [class.user-expanded-row]="expandedUser === row" mat-row></tr>
 
-  <button color="accent" id="add-button" mat-fab matTooltip="{{ 'USER.TITLE' | translate }}"
-          routerLink="/users/add">
-    <mat-icon>person_add</mat-icon>
-  </button>
+      <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
+    </table>
+    <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+
+    <button color="accent" id="add-button" mat-fab matTooltip="{{ 'USER.TITLE' | translate }}"
+            routerLink="/users/add">
+      <mat-icon>person_add</mat-icon>
+    </button>
+  </div>
 </div>

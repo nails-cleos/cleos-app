@@ -1,0 +1,118 @@
+<div class="flex-container" fxLayout="column">
+  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
+    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+      <mat-card appearance="outlined">
+        <mat-card-header *ngIf="transaction; else headSkeleton">
+          <mat-card-title>{{ 'ACCOUNT.TRANSACTION.DETAIL' | translate }}</mat-card-title>
+          <div fxFlex></div>
+          <mat-icon *ngIf="transaction" class="pointer-only header-icon"
+                    [routerLink]="['/', 'accounts', transaction.account?.id, 'transactions', 'view']">
+            account_balance
+          </mat-icon>
+        </mat-card-header>
+        <ng-template #headSkeleton>
+          <div class="divider-padding-bottom">
+            <div class="ssc-head-line"></div>
+          </div>
+          <mat-divider></mat-divider>
+        </ng-template>
+        <mat-divider *ngIf="transaction"></mat-divider>
+        <mat-card-content class="mat-card-table">
+          <div class="container">
+            <table>
+              <tbody>
+              <tr *ngIf="transaction; else skeleton">
+                <td class="right">{{ 'ACCOUNT.TRANSACTION.ID' | translate }}</td>
+                <td class="left">{{transaction.id}}
+                </td>
+              </tr>
+              <tr *ngIf="transaction; else skeleton">
+                <td class="right">{{ 'ACCOUNT.TRANSACTION.DATE' | translate }}</td>
+                <td class="left">{{transaction.date | date:'short':undefined:dateFormat}}
+                </td>
+              </tr>
+              <tr *ngIf="transaction; else skeleton">
+                <td class="right">{{ 'ACCOUNT.TRANSACTION.AMOUNT.FIELD' | translate }}</td>
+                <td class="left">{{transaction.amount | number:'1.2-2'}}</td>
+              </tr>
+              <tr *ngIf="transaction; else skeleton">
+                <td class="right">{{ 'ACCOUNT.TRANSACTION.AMOUNT_GIFTED' | translate }}</td>
+                <td class="left">{{transaction.amountGifted | number:'1.2-2'}}</td>
+              </tr>
+              <tr>
+                <td>
+                  <mat-divider *ngIf="transaction"></mat-divider>
+                </td>
+                <td>
+                  <mat-divider *ngIf="transaction"></mat-divider>
+                </td>
+              </tr>
+              <tr *ngIf="transaction; else skeleton">
+                <td class="right">{{ 'ACCOUNT.TRANSACTION.PAYMENT_ID' | translate }}</td>
+                <td class="left">{{transaction.payment?.paymentId}}</td>
+              </tr>
+              <tr *ngIf="transaction; else skeleton">
+                <td class="right">{{ 'ACCOUNT.TRANSACTION.PREFERENCE_ID' | translate }}</td>
+                <td class="left">{{transaction.payment?.preferenceId}}
+                </td>
+              </tr>
+              <tr *ngIf="transaction; else skeleton">
+                <td class="right">{{ 'ACCOUNT.TRANSACTION.STATUS' | translate }}</td>
+                <td class="left">{{'COMMON.STATUS.PAYMENT.' + (transaction.payment?.status || 'NONE') | translate}}</td>
+              </tr>
+              <tr *ngIf="transaction; else skeleton">
+                <td class="right">{{ 'ACCOUNT.TRANSACTION.TYPE.FIELD' | translate }}</td>
+                <td class="left">{{ 'COMMON.PAYMENT.TYPE.' + (transaction.payment?.type || 'NONE') | translate }}</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+          <ng-template #skeleton>
+            <div class="ssc-line"></div>
+          </ng-template>
+        </mat-card-content>
+        <mat-divider></mat-divider>
+        <mat-card-actions *ngIf="transaction; else buttonSkeleton">
+          <div fxFlex></div>
+          <button fxShow.lt-sm fxHide appBackButton [date]="transaction.date" [step]="step" color="accent" mat-fab
+                  class="icon-button">
+            <mat-icon matIconPrefix>arrow_back</mat-icon>
+          </button>
+          <button fxHide.lt-sm fxShow appBackButton [date]="transaction.date" [step]="step" color="accent" mat-fab
+                  extended class="icon-button">
+            {{ 'COMMON.BUTTON.BACK' | translate }}
+            <mat-icon matIconPrefix>arrow_back</mat-icon>
+          </button>
+          <ng-template [ngIf]="transaction.payment">
+            <button fxShow.lt-sm fxHide class="icon-button" (click)="pay" mat-fab color="primary"
+                    *ngIf="transaction.payment.status === 'CREATED' && transaction.payment.type">
+              <mat-icon [svgIcon]="transaction.payment.type" class="svg-icon"></mat-icon>
+            </button>
+
+            <button fxHide.lt-sm fxShow (click)="pay" mat-fab extended color="primary" class="icon-button"
+                    *ngIf="transaction.payment.status === 'CREATED' && transaction.payment.type">
+              <mat-icon matIconPrefix>payment</mat-icon>
+              {{ 'COMMON.BUTTON.PAYMENT' | translate }}
+            </button>
+
+            <button fxShow.lt-sm fxHide class="icon-button" (click)="notify" mat-fab
+                    *ngIf="transaction.payment.status === 'PENDING'">
+              <mat-icon color="primary">published_with_changes</mat-icon>
+            </button>
+
+            <button fxHide.lt-sm fxShow (click)="notify" color="primary" mat-fab extended class="icon-button"
+                    *ngIf="transaction.payment.status === 'PENDING'">
+              <mat-icon matIconPrefix>published_with_changes</mat-icon>
+              {{ 'COMMON.BUTTON.NOTIFY' | translate }}
+            </button>
+          </ng-template>
+        </mat-card-actions>
+        <ng-template #buttonSkeleton>
+          <div class="divider-padding">
+            <div class="ssc-head-line"></div>
+          </div>
+        </ng-template>
+      </mat-card>
+    </div>
+  </div>
+</div>

@@ -53,6 +53,8 @@ export enum ReservationActionTypes {
   updateNote = '[Reservation] Update note',
   updateDiscount = '[Reservation] Update discount',
   updateTimestamp = '[Reservation] Update timestamp',
+  paymentOptions = '[Reservation] Payment options',
+  paymentOptionsSuccess = '[Reservation] Payment options success',
   clean = '[Reservation] Clean'
 }
 
@@ -411,6 +413,17 @@ export class UpdateTimestamp implements Action {
   }
 }
 
+export class PaymentOptions implements Action {
+  readonly type = ReservationActionTypes.paymentOptions;
+}
+
+export class PaymentOptionsSuccess implements Action {
+  readonly type = ReservationActionTypes.paymentOptionsSuccess;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class Clean implements Action {
   readonly type = ReservationActionTypes.clean;
 }
@@ -467,4 +480,6 @@ export type All =
   | UpdateNote
   | UpdateDiscount
   | UpdateTimestamp
+  | PaymentOptions
+  | PaymentOptionsSuccess
   | Clean;

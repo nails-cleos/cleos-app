@@ -14,7 +14,7 @@ export class ExpenseEffects {
   getAll$ = createEffect(() => this.actions.pipe(ofType(fromActionsExpense.ExpenseActionTypes.getAll)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.expenseService.getAll(payload.roomId, payload.active, payload.direction, payload.page,
-      payload.size).pipe(
+      payload.size, payload.filter, payload.dateFilter).pipe(
       switchMap((response: any) => of(new fromActionsExpense.ExpenseSuccess(response))),
       catchError((err: HttpErrorResponse) => of(new fromActionsExpense.ExpenseFailure({ error: err.error })))
     ))

@@ -1,6 +1,6 @@
 <div>
   <fieldset>
-    <legend>{{'RESERVATION.SEARCH.TITLE' | translate }}</legend>
+    <legend>{{'COMMON.SEARCH.TITLE' | translate }}</legend>
     <form [formGroup]="officeForm">
       <div *ngIf="!offices?.length; else dataOffice">
         <button class="only-button" color="accent" mat-fab extended routerLink="/rooms/add">
@@ -71,7 +71,7 @@
     </button>
     <button fxHide.lt-sm fxShow (click)="search" [disabled]="officeForm.invalid" class="only-button" color="accent" mat-fab extended>
       <mat-icon matPrefix>search</mat-icon>
-      <span>{{ 'RESERVATION.SEARCH.TITLE' | translate }}</span>
+      <span>{{ 'COMMON.SEARCH.TITLE' | translate }}</span>
     </button>
   </fieldset>
 </div>

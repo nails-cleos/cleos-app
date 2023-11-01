@@ -5,10 +5,10 @@
     </mat-card-title>
     <mat-card-subtitle *ngIf="reservation; else skeleton">
       <ng-template [ngIf]="isCustomer" [ngIfElse]="noCustomer">
-        <a [routerLink]="['/', 'auth', 'profile']">{{reservation.customer | userName}}</a>
+        <a [routerLink]="['/', 'me', 'overview']">{{reservation.customer | userName}}</a>
       </ng-template>
       <ng-template #noCustomer>
-        <a [routerLink]="['/', 'users', reservation.customer.id]">{{reservation.customer | userName}}</a>
+        <a [routerLink]="['/', 'users', reservation.customer.id, 'overview']">{{reservation.customer | userName}}</a>
       </ng-template>
       <button (click)="addNote" mat-icon-button type="button" color="accent">
         <mat-icon>note_add</mat-icon>
@@ -101,7 +101,7 @@
       <mat-divider></mat-divider>
       <div mat-subheader>{{ 'COMMON.TREATMENT.FIELD' | translate}}</div>
       <mat-list-item>
-        <mat-icon matListItemIcon>home_repair_service</mat-icon>
+        <mat-icon matListItemIcon>spa</mat-icon>
         <div matListItemTitle>{{ 'RESERVATION.TREATMENT.NAME.FIELD' | translate}}</div>
         <div matListItemLine>{{reservation.treatment.name}}</div>
       </mat-list-item>
@@ -160,33 +160,14 @@
         <div>
           <mat-divider></mat-divider>
           <div mat-subheader><span class="bold">{{ 'COMMON.LABEL.TOTAL' | translate}}</span></div>
-          <mat-list-item *ngIf="price.total">
-            <mat-icon class="bold" matListItemIcon>{{reservation.room.currency.icon}}</mat-icon>
-            <div *ngIf="price.discount; else noDiscount" matListItemTitle>
-              <span [class.strikethrough]="price.discount">{{price.totalWithoutDiscount | number:'1.2-2'}}</span>
-              <span [@discountAnimation] class="raised-button bold">{{price.total | number:'1.2-2'}}</span>
-            </div>
-            <ng-template #noDiscount>
-              <div matListItemTitle>{{price.total | number:'1.2-2'}}</div>
-            </ng-template>
-          </mat-list-item>
+          <app-price-preview [price]="price" [currencyIcon]="reservation.room.currency.icon"
+                             [isEditing]="false"></app-price-preview>
         </div>
       </ng-template>
 
       <ng-template #singleTreatment>
-        <mat-list-item>
-          <mat-icon matListItemIcon>{{reservation.room.currency.icon}}</mat-icon>
-          <div matListItemTitle>{{ 'RESERVATION.TREATMENT.PRICE.FIELD' | translate}}</div>
-          <mat-list-item *ngIf="price.total">
-            <div *ngIf="price.discount; else noDiscount" matListItemLine>
-              <span [class.strikethrough]="price.discount">{{price.totalWithoutDiscount | number:'1.2-2'}}</span>
-              <span [@discountAnimation] style="margin: 0 0 0 10px" class="bold">{{price.total | number:'1.2-2'}}</span>
-            </div>
-            <ng-template #noDiscount>
-              <div matListItemLine>{{price.total | number:'1.2-2'}}</div>
-            </ng-template>
-          </mat-list-item>
-        </mat-list-item>
+        <app-price-preview [label]="'RESERVATION.TREATMENT.PRICE.FIELD'" [price]="price"
+                           [currencyIcon]="reservation.room.currency.icon" [isEditing]="false"></app-price-preview>
       </ng-template>
     </mat-list>
     <mat-list *ngIf="paymentPaid && paymentPaid.length">
@@ -218,7 +199,7 @@
         </ng-container>
 
         <ng-container matColumnDef="status">
-          <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'PAYMENT.LIST.COLUMN.STATUS' | translate }}</th>
+          <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
           <td *matCellDef="let payment" fxHide.lt-sm fxShow mat-cell>
             <div *ngIf="payment.id; else skeleton">
               {{'COMMON.STATUS.PAYMENT.' + (payment.status ? payment.status.toUpperCase() : 'NONE') | translate}}
@@ -265,7 +246,7 @@
           <td *matCellDef="let payment" fxHide.lt-sm fxShow mat-cell>
             <div *ngIf="payment.id; else skeleton">
               <ng-template
-                [ngIf]="!['APPROVED', 'APPROVED_REFUND', 'REFUND_PENDING', 'REFUND', 'PENDING'].includes(payment.status)">
+                [ngIf]="!['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND_PENDING', 'REFUND', 'PENDING', 'CREATED'].includes(payment.status)">
                 <button [routerLink]="['/me', 'payment', payment.id]" mat-icon-button
                         matTooltip="{{ 'COMMON.BUTTON.PAYMENT' | translate }}" matTooltipPosition="right">
                   <mat-icon class="payment-button" color="primary">payment</mat-icon>
@@ -277,6 +258,12 @@
                   <mat-icon color="primary">published_with_changes</mat-icon>
                 </button>
               </ng-template>
+              <ng-template [ngIf]="payment.status === 'CREATED'">
+                <button (click)="pay(payment)" mat-icon-button
+                        matTooltip="{{ 'COMMON.BUTTON.PAYMENT' | translate }}" matTooltipPosition="right">
+                  <mat-icon class="payment-button" color="primary">payment</mat-icon>
+                </button>
+              </ng-template>
             </div>
             <ng-template #skeleton>
               <div class="ssc-line"></div>
@@ -286,7 +273,7 @@
         </ng-container>
 
         <ng-container matColumnDef="amount">
-          <th *matHeaderCellDef mat-header-cell>{{ 'PAYMENT.LIST.COLUMN.AMOUNT' | translate }}</th>
+          <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
           <td *matCellDef="let payment; let i = dataIndex;" mat-cell>
             <div *ngIf="payment.id; else skeleton">
               <ng-template [ngIf]="payment.transactionAmount >= 0" [ngIfElse]="noTransactionAmount">
@@ -351,7 +338,7 @@
 
               </mat-list>
               <mat-list>
-                <div mat-subheader>{{ 'PAYMENT.LIST.COLUMN.STATUS' | translate }}</div>
+                <div mat-subheader>{{ 'COMMON.COLUMN.STATUS' | translate }}</div>
                 <mat-list-item role="list">
                   <div matListItemLine>
                     {{'COMMON.STATUS.PAYMENT.' + (payment.status || 'NONE') | translate}}
@@ -359,7 +346,7 @@
                 </mat-list-item>
               </mat-list>
               <ng-template
-                [ngIf]="!['APPROVED', 'APPROVED_REFUND', 'REFUND_PENDING', 'REFUND', 'PENDING'].includes(payment.status)">
+                [ngIf]="!['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND_PENDING', 'REFUND', 'PENDING'].includes(payment.status)">
                 <mat-list>
                   <div mat-subheader>{{ 'COMMON.BUTTON.PAYMENT' | translate }}</div>
                   <mat-list-item role="list">
@@ -517,7 +504,7 @@
   <mat-divider></mat-divider>
   <mat-card-actions *ngIf="reservation; else buttonSkeleton">
     <div fxFlex></div>
-    <button appBackButton [date]="start" color="accent" mat-fab extended
+    <button appBackButton [date]="start" [step]="step" color="accent" mat-fab extended
             type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
   </mat-card-actions>
   <ng-template #buttonSkeleton>

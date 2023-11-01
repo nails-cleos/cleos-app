@@ -34,14 +34,14 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   displayedColumns: string[] = ['position', 'firstName', 'username', 'email', 'provider', 'status', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IUser>>();
 
-  expandedUser: IUser | undefined;
+  expandedUser?: IUser;
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
-  filter: string | undefined;
+  filter?: string;
 
-  private subscription: Subscription | undefined;
-  private paginatorSubscription: Subscription | undefined;
+  private subscription?: Subscription;
+  private paginatorSubscription?: Subscription;
   private getState: Observable<any>;
   private allRole: Role[] = [Role.customer, Role.professional, Role.manager, Role.admin];
   private smallScreen = false;

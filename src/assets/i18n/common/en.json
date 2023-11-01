@@ -30,6 +30,7 @@
       "ML": "ML payment",
       "PAYPAL": "PayPal payment",
       "IDEAL": "iDeal payment",
+      "PAY_NL": "PAY. payment",
       "NOTIFY": "Notify",
       "SELECT": "Select",
       "UNAVAILABLE": "Add unavailable",
@@ -54,7 +55,9 @@
       "LAST_UPDATE": "Last update",
       "NAME": "Name",
       "DESCRIPTION": "Description",
-      "TYPE": "Type"
+      "TYPE": "Type",
+      "STATUS": "Status",
+      "AMOUNT": "Amount"
     },
     "PAGINATOR": {
       "ITEMS_PER_PAGE_LABEL": "Items per page:",
@@ -104,7 +107,9 @@
         "ML": "Mercado Libre",
         "PAYPAL": "PayPal",
         "IDEAL": "iDeal",
+        "PAY_NL": "PAY.",
         "TRANSFER": "Wire Transfer",
+        "ACCOUNT": "Account credit",
         "NONE": "No payment selected",
         "PENDING": "Pending"
       },
@@ -116,18 +121,19 @@
       "OPTIONS": {
         "TO_PAY": "Total to pay: {{amount}} {{symbol}}",
         "PAID": "Total paid: {{amount}} {{symbol}}",
+        "ACCOUNT": "Account credit: {{amount}} {{symbol}}",
         "PENALTY": "Penalty: {{amount}} {{symbol}}",
         "D_OR_R": "Discount or refund: {{amount}} {{symbol}}"
       },
-      "DEPOSIT_30": "Pay a 30% deposit of the reservation",
+      "DEPOSIT_50": "Pay a 50% deposit of the reservation",
       "TOTAL": "Pay total of the reservation",
       "PENDING": "Payment pending",
       "SUCCESS": "Payment complete successfully",
       "ERROR": "Payment error. {{reason}}",
       "CANCELLATION_POLICY": {
         "TITLE": "Cancellation/Rescheduling policy",
-        "1": "<span class='important'>Less than 24 hours’</span> notice will result in a fee of <span class='important'>30%</span> of the reserved treatment price.",
-        "2": "<span class='important'>“No show”</span> will likewise be charged <span class='important'>30%</span> of the booked treatment price.",
+        "1": "<span class='important'>Less than 24 hours’</span> notice will result in a fee of <span class='important'>{{penalty}}%</span> of the reserved treatment price.",
+        "2": "<span class='important'>“No show”</span> will likewise be charged <span class='important'>{{penalty}}%</span> of the booked treatment price.",
         "3": "Cancellation/Rescheduling of an appointment made <span class='important'>within 24 hours prior</span> will result in a <span class='important'>refund or discount voucher</span> for the paid amount."
       }
     },
@@ -159,6 +165,9 @@
         "CASH": "Cash"
       }
     },
+    "ACCOUNT": {
+      "BALANCE": "Balance"
+    },
     "STATUS": {
       "PAYMENT": {
         "NONE": "Pending",
@@ -172,7 +181,8 @@
         "CREATED": "Created",
         "UNKNOWN": "Unknown",
         "REFUND": "Refunded",
-        "REFUND_PENDING": "Refund pending"
+        "REFUND_PENDING": "Refund pending",
+        "REFUND_FAILURE": "Refund failed"
       },
       "RESERVATION": {
         "CREATED": "Created",
@@ -202,6 +212,9 @@
       "FILTER": "Filter",
       "PRICE": "Price",
       "TOTAL": "Total"
+    },
+    "SEARCH": {
+      "TITLE": "Search"
     },
     "ALL_DAY": {
       "CHECK": "All day"
@@ -321,7 +334,7 @@
       },
       "EDIT": {
         "TITLE": "Reschedule reservation",
-        "TEXT": "Less than 24 hours’ notice will result in a fee of 30% of the reserved treatment price."
+        "TEXT": "Less than 24 hours’ notice will result in a fee of {{penalty}}% of the reserved treatment price."
       }
     },
     "TIME_ZONE": {

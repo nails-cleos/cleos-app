@@ -5,6 +5,7 @@
     "RESERVATION": {
       "COMPLETED": "Completas: {{completed}}",
       "UPCOMING": "Próximas: {{upcoming}}",
+      "TRANSACTION": "Crédito en cuenta: {{transaction}} - {{total}}",
       "DELETED": {
         "TITLE": "Eliminar reserva",
         "CONTENT": "¿Está seguro de eliminar la reserva {{date}}?",
@@ -77,7 +78,7 @@
         "WEEK": "Semana {{number}}",
         "DATE": "Fecha",
         "CUSTOMER": "Cliente",
-        "TREATMENT": "Tratamiento",
+        "DESCRIPTION": "Descripción",
         "DISCOUNT": "Descuento",
         "GROSS": "Bruto",
         "NET": "Neto",
@@ -85,7 +86,7 @@
         "TYPE": "Tipo",
         "COLOR": "Color",
         "INVOICE": "Factura",
-        "STORE_SUPPLY": "Suministro de tienda",
+        "SUPPLY_STORE": "Tienda de suministro",
         "TOTALS": "Totales"
       }
     }

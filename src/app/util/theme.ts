@@ -57,37 +57,41 @@ export const eventState = (isDark: boolean = false): IState[] => [{
   color: isDark ? '#e7d255' : '#eedf72',
   order: 2
 }, {
+  name: 'TRANSACTION',
+  color: isDark ? '#fe8d02' : '#ffa53e',
+  order: 3
+}, {
   name: 'CREATED',
   color: isDark ? '#ceb4ac' : '#dcc8c2', // accent-dark
-  order: 3
+  order: 4
 }, {
   name: 'EDITING',
   color: isDark ? '#ffd078' : '#ffd991', // primary-A-dark
-  order: 4
+  order: 5
 }, {
   name: 'APPROVED',
   color: isDark ? '#8f887a' : '#a9a397', // primary-dark
-  order: 5
-}, {
-  name: 'PARTIALLY_PAID',
-  color: isDark ? '#04589a' : '#009ee3',
   order: 6
 }, {
-  name: 'PAID',
-  color: isDark ? '#04589a' : '#009ee3',
+  name: 'PARTIALLY_PAID',
+  color: isDark ? '#04589a' : '#87ceeb',
   order: 7
+}, {
+  name: 'PAID',
+  color: isDark ? '#04589a' : '#87ceeb',
+  order: 8
 }, {
   name: 'STARTED',
   color: isDark ? '#673ab7' : '#e6b9ff',
-  order: 8
+  order: 9
 }, {
   name: 'PARTIALLY_COMPLETED',
   color: '#a9a397',
-  order: 9
+  order: 10
 }, {
   name: 'COMPLETED',
   color: isDark ? '#44a244' : '#90ee90',
-  order: 10
+  order: 11
 }, {
   name: 'DEFAULT',
   color: isDark ? '#f08080' : '#ffb3b3', // warn-dark-lighter

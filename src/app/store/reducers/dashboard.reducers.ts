@@ -3,7 +3,7 @@ import {
   IDashboard,
   IMonthlyRoomSummary,
   IMonthlySummaryExpense,
-  IMonthlySummaryReservation,
+  IMonthlySummarySale,
   IMonthSummary,
   IQuarterRoomSummary,
   IQuarterSummary,
@@ -19,7 +19,7 @@ export interface State {
   data: Map<string, IDashboard>;
   dashboard: IRoomEvents | null;
   monthlySummaryMap: Map<ISummaryRoom,
-    { summaryReservation: IMonthlySummaryReservation[]; summaryExpenses: IMonthlySummaryExpense[] }> | null;
+    { summarySale: IMonthlySummarySale[]; summaryCashSale: IMonthlySummarySale[]; summaryExpenses: IMonthlySummaryExpense[] }> | null;
   yearSummaryMap: Map<ISummaryRoom, { quarterSummaries: IQuarterSummary[] }> | null;
   quarterSummaryMap: Map<ISummaryRoom, { monthSummaries: IMonthSummary[] }> | null;
   errorMessage: string | null;
@@ -89,15 +89,15 @@ const monthSummaryMap = (summaries: IMonthlyRoomSummary[]) => summaries.reduce((
     currency: summary.currency,
     timeZone: summary.timeZone
   }, {
-    summaryReservation: summary.reservationSummary,
+    summarySale: summary.saleSummary,
     summaryExpenses: summary.expenseSummary,
-    summaryCash: summary.cashSummary
+    summaryCashSale: summary.cashSaleSummary
   });
   return map;
 }, new Map<ISummaryRoom, {
-  summaryReservation: IMonthlySummaryReservation[];
+  summarySale: IMonthlySummarySale[];
   summaryExpenses: IMonthlySummaryExpense[];
-  summaryCash: IMonthlySummaryReservation[];
+  summaryCashSale: IMonthlySummarySale[];
 }>());
 
 const emptySummaryTotal = (type: string): ISummaryTotal => ({ type, net: 0, btw: 0, gross: 0 } as ISummaryTotal);

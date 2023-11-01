@@ -2,9 +2,6 @@
   "RESERVATION": {
     "PREVIEW": "Vista previa",
     "APPOINTMENT": "Cita",
-    "SEARCH": {
-      "TITLE": "Búsqueda"
-    },
     "LIST": {
       "CANCEL": {
         "TITLE": "Cancelar reserva",
@@ -204,9 +201,9 @@
       "OPTION": {
         "DISCOUNT": "<b>Descuento:</b><br>Crear un descuento por el total pagado.",
         "REFUND": "<b>Reembolso:</b><br>Reembolsar el total pagado.",
-        "CHARGE": "<b>Penalización:</b><br>Se cobrará una penalización del 30%.",
-        "CHARGE_WITH_DISCOUNT": "<b>Penalización + Descuento:</b><br>Se cobrará una penalización del 30%. Si pagó más del 30%, se creará un descuento.",
-        "CHARGE_WITH_REFUND": "<b>Penalización + Reembolso:</b><br>Se cobrará una penalización del 30%. Si pagó más del 30%, obtendrá un reembolso.",
+        "CHARGE": "<b>Penalización:</b><br>Se cobrará una penalización del 50%.",
+        "CHARGE_WITH_DISCOUNT": "<b>Penalización + Descuento:</b><br>Se cobrará una penalización del 50%. Si pagó más del 50%, se creará un descuento.",
+        "CHARGE_WITH_REFUND": "<b>Penalización + Reembolso:</b><br>Se cobrará una penalización del 50%. Si pagó más del 50%, obtendrá un reembolso.",
         "NONE": "<b>None:</b><br>No extra action performed."
       }
     },
@@ -228,10 +225,6 @@
     "RECREATE": "Link de pago regenerado",
     "COPY": "¡Link copiado!",
     "LIST": {
-      "COLUMN": {
-        "AMOUNT": "Importe",
-        "STATUS": "Estado"
-      },
       "ERROR": {
         "NO_CONTENT": "No hay pagos"
       }

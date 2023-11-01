@@ -13,8 +13,9 @@ export enum PaymentActionTypes {
   paymentNotComplete = '[Payment] Not complete',
   paymentFailure = '[Payment] Failure',
   paymentSelected = '[Payment] Selected',
-  paymentByReservation = '[Payment] Find by reservation',
+  paymentByResource = '[Payment] Find by resource',
   paymentFind = '[Payment] Find',
+  paymentOptions = '[Payment] Options',
   paymentCreate = '[Payment] Create',
   clean = '[Payment] Clean'
 }
@@ -103,8 +104,8 @@ export class PaymentSelected implements Action {
   }
 }
 
-export class PaymentFindByReservationId implements Action {
-  readonly type = PaymentActionTypes.paymentByReservation;
+export class PaymentFindByResourceId implements Action {
+  readonly type = PaymentActionTypes.paymentByResource;
 
   constructor(public payload: any) {
   }
@@ -115,6 +116,10 @@ export class PaymentFind implements Action {
 
   constructor(public payload: any) {
   }
+}
+
+export class PaymentOptions implements Action {
+  readonly type = PaymentActionTypes.paymentOptions;
 }
 
 export class PaymentCreate implements Action {
@@ -140,8 +145,9 @@ export type All =
   | PaymentSaveSuccess
   | PaymentNotComplete
   | PaymentFailure
-  | PaymentFindByReservationId
+  | PaymentFindByResourceId
   | PaymentFind
   | PaymentSelected
   | PaymentCreate
+  | PaymentOptions
   | Clean;

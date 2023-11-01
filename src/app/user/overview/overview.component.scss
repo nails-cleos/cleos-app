@@ -21,13 +21,6 @@
   justify-content: center;
 }
 
-/* TODO(mdc-migration): The following rule targets internal classes of card that may no longer apply for the MDC version. */
-/* TODO(mdc-migration): The following rule targets internal classes of card that may no longer apply for the MDC version. */
-mat-card {
-  display: flex;
-  flex-direction: column;
-}
-
 img {
   align-items: center;
   justify-content: center;
@@ -36,12 +29,17 @@ img {
 .center-circle {
   width: 100px !important;
   height: 100px;
-  position: absolute;
   top: 50%;
-  left: 50%;
   margin: auto;
-  -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
+}
+
+.ssc-circle {
+  position: unset;
+}
+
+.super {
+  margin-left: 5px;
+  vertical-align: super;
 }
 
 .circle {
@@ -64,21 +62,14 @@ img {
   }
 }
 
-.text-center {
-  text-align: center;
-}
-
-.value-text {
-  margin: 15px auto auto 15px;
-  text-align: center;
-}
-
 .avatar-icon {
   margin: 0 15px;
   transform: scale(2);
+  padding-right: 10px;
 }
 
 .card-icon {
+  height: auto;
   align-items: center;
   justify-content: center;
   margin: 0 auto;

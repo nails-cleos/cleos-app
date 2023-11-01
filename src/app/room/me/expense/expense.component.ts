@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, UntypedFormControl, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Expense, IExpense, IExpenseAll } from '../../../interfaces/expense';
+import { Expense, IExpense, IExpenseAll, ISupplyStore } from '../../../interfaces/expense';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
 import { AppState, selectExpenseState } from '../../../store/app.states';
@@ -9,6 +9,7 @@ import { Store } from '@ngrx/store';
 import * as fromActionsExpense from '../../../store/expense.actions';
 import { API_LOCALE, getNow, getNowTimeZone, newDateTimestamp } from '../../../util/dates';
 import { fieldChange } from '../../../util/validators';
+import { map, startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'app-expense',
@@ -28,6 +29,8 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   currencyIcon?: string;
   roomName?: string;
   today: Date;
+  supplyStores?: ISupplyStore[];
+  filteredSupplyStore?: Observable<ISupplyStore[] | undefined>;
 
   private getState: Observable<any>;
   private subscription?: Subscription;
@@ -51,8 +54,9 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     }
 
     const expense: IExpense = new Expense();
+    const supplyStore = fieldChange(this.getForm.supplyStore as UntypedFormControl, this.expense?.supplyStore);
     expense.invoice = fieldChange(this.getForm.invoice as UntypedFormControl, this.expense?.invoice);
-    expense.storeSupply = fieldChange(this.getForm.storeSupply as UntypedFormControl, this.expense?.storeSupply);
+    expense.supplyStore = supplyStore?.id ? supplyStore.id : supplyStore;
     expense.description = fieldChange(this.getForm.description as UntypedFormControl, this.expense?.description);
     expense.gross = fieldChange(this.getForm.gross as UntypedFormControl, this.expense?.gross?.toFixed(2));
     expense.btw = fieldChange(this.getForm.btw as UntypedFormControl, this.expense?.btw?.toFixed(2));
@@ -69,6 +73,10 @@ export class ExpenseComponent implements OnInit, OnDestroy {
         new fromActionsExpense.ExpenseUpdate({ roomId: this.roomId, expense })
       );
     }
+  }
+
+  get removeSupplyStore(): void {
+    return this.getForm.supplyStore.setValue('');
   }
 
   ngOnInit(): void {
@@ -88,6 +96,10 @@ export class ExpenseComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+  }
+
+  displayFnSupplyStore(supplyStore: ISupplyStore): string {
+    return supplyStore ? `${ supplyStore.name }` : '';
   }
 
   validateInputValue(input: HTMLInputElement, min?: number, max?: number): void {
@@ -127,6 +139,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
+      this.supplyStores = state.info?.supplyStores;
       this.types = state.info?.types;
       this.roomName = state.info?.roomName;
       this.currencyIcon = state.info?.currency?.icon;
@@ -158,13 +171,24 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   private createForm(): void {
     this.form = this.formBuilder.group({
       invoice: ['', Validators.required],
-      storeSupply: ['', Validators.required],
+      supplyStore: ['', Validators.required],
       description: [''],
       gross: ['', Validators.required],
       btw: [''],
       date: ['', Validators.required],
       type: ['', Validators.required]
     });
+
+    this.filteredSupplyStore = this.getForm.supplyStore.valueChanges.pipe(startWith(''),
+      map(value => typeof value === 'string' ? value : value.name),
+      map(name => name ? this.filterSupplyStore(name) : this.supplyStores ? this.supplyStores.slice() : this.supplyStores)
+    );
+  }
+
+  private filterSupplyStore(name: string): ISupplyStore[] | undefined {
+    const filterValue = name.toLowerCase();
+
+    return this.supplyStores?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 
   private getExpenseInfo(): void {

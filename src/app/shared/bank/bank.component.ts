@@ -1,9 +1,9 @@
 import { AfterViewInit, Component, EventEmitter, Input, Output } from '@angular/core';
-import { banks, IBank } from '../../interfaces/bank';
 import { Observable } from 'rxjs';
 import { UntypedFormGroup, Validators } from '@angular/forms';
 import { requireMatch } from '../../util/validators';
 import { map, startWith } from 'rxjs/operators';
+import { IPaymentOption } from '../../interfaces/payment';
 
 @Component({
   selector: 'app-bank',
@@ -12,20 +12,27 @@ import { map, startWith } from 'rxjs/operators';
 })
 export class BankComponent implements AfterViewInit {
   @Input() formGroup!: UntypedFormGroup;
-  @Input() types?: string[];
-  @Input() firstTime!: boolean;
+  @Input() options?: IPaymentOption[];
+  @Input() firstTime: boolean;
   @Input() professionalName?: string;
   @Output() percentageEmitter = new EventEmitter<number>();
 
-  bankList?: IBank[] = banks();
-  filteredBank?: Observable<IBank[] | undefined>;
+  bankList: IPaymentOption[];
+  filteredBank?: Observable<IPaymentOption[] | undefined>;
+
+  type?: IPaymentOption;
+
+  constructor() {
+    this.firstTime = false;
+    this.bankList = [];
+  }
 
   ngAfterViewInit(): void {
     this.formChanges();
     this.createFilter();
   }
 
-  displayFnBank(bank: IBank): string {
+  displayFnBank(bank: IPaymentOption): string {
     return bank ? `${ bank.name }` : '';
   }
 
@@ -36,16 +43,36 @@ export class BankComponent implements AfterViewInit {
   }
 
   private formChanges(): void {
+    this.formGroup.get('percentage')?.setValue('TOTAL');
     if (this.firstTime) {
       this.formGroup.get('type')?.setValidators([Validators.required]);
+      this.formGroup.get('type')?.updateValueAndValidity();
       this.formGroup.get('percentage')?.setValidators([Validators.required]);
+      this.formGroup.get('percentage')?.updateValueAndValidity();
     }
 
     this.formGroup.get('type')?.valueChanges.subscribe(value => {
-      if (value === 'IDEAL') {
-        this.formGroup.get('bank')?.setValidators([Validators.required, requireMatch]);
+      this.type = value;
+      if (this.type) {
+        if (this.type.subTypes?.length) {
+          this.bankList = this.type.subTypes;
+          this.formGroup.get('bank')?.setValidators([Validators.required, requireMatch]);
+        } else {
+          this.formGroup.get('bank')?.setValidators([]);
+          this.bankList = [];
+        }
+        if (this.type.hidePercentage) {
+          this.formGroup.get('percentage')?.setValidators([]);
+        } else {
+          this.formGroup.get('percentage')?.setValidators([Validators.required]);
+        }
+      } else {
+        this.formGroup.get('bank')?.setValidators([]);
+        this.formGroup.get('percentage')?.setValidators([]);
+        this.bankList = [];
       }
-      this.formGroup.get('percentage')?.setValidators([Validators.required]);
+      this.formGroup.get('percentage')?.updateValueAndValidity();
+      this.formGroup.get('bank')?.updateValueAndValidity();
     });
 
     this.formGroup.get('percentage')?.valueChanges.subscribe(value => {
@@ -54,8 +81,8 @@ export class BankComponent implements AfterViewInit {
         case 'TOTAL':
           percentage = 100;
           break;
-        case 'DEPOSIT_30':
-          percentage = 30;
+        case 'DEPOSIT_50':
+          percentage = 50;
           break;
         default:
           percentage = 0;
@@ -69,12 +96,12 @@ export class BankComponent implements AfterViewInit {
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filterBank(name) : this.bankList ? this.bankList.slice() : this.bankList));
 
-    if (this.firstTime && this.types?.length === 1) {
-      this.formGroup.get('type')?.setValue(this.types[0]);
+    if (this.firstTime && this.options?.length === 1) {
+      this.formGroup.get('type')?.setValue(this.options[0]);
     }
   }
 
-  private filterBank(name: string): IBank[] | undefined {
+  private filterBank(name: string): IPaymentOption[] | undefined {
     const filterValue = name.toLowerCase();
 
     return this.bankList?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);

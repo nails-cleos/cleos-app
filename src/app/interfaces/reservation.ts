@@ -42,6 +42,7 @@ export interface IReservationPayment {
   type: PaymentType;
   percentage: PaymentPercentage;
   bic?: string;
+  paymentOptionId?: string;
   name?: string;
   countryCode?: string;
   amount?: number;
@@ -66,6 +67,7 @@ export interface IReservationAll {
   canEdit?: boolean;
   paymentRequired?: boolean;
   relatedReservationId?: string;
+  balance?: number;
 }
 
 export interface IConfigurationReservation {

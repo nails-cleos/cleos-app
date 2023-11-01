@@ -1,0 +1,48 @@
+.mat-card-table {
+  .container {
+    margin: auto;
+    text-align: center;
+
+    table {
+      border-spacing: 0 1px;
+      border-collapse: separate;
+      margin: auto;
+
+      td {
+        width: 50%;
+      }
+
+      .left {
+        text-align: left;
+      }
+
+      .right {
+        padding: 0 5% 0;
+        font-weight: bold;
+        text-align: right;
+      }
+
+      tfoot {
+        tr:nth-last-child(2) {
+          th, td {
+            border-bottom: 1px double #000;
+            padding-bottom: 5px;
+          }
+        }
+        tr:last-child {
+          th, td {
+            border-top: 1px double #000;
+          }
+        }
+      }
+    }
+  }
+}
+
+.header-icon {
+  margin: auto;
+}
+
+mat-divider {
+  margin: 1em 0;
+}

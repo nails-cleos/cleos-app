@@ -1,7 +1,7 @@
 <div>
   <fieldset>
     <div fxLayout="row" fxLayoutAlign="space-around center">
-      <mat-form-field>
+      <mat-form-field appearance="outline">
         <mat-label>{{'SUMMARY.YEAR.SELECT.DATE' | translate}}</mat-label>
         <input matInput [matDatepicker]="dp" [formControl]="date">
         <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>

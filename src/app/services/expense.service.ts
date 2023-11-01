@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
 import { IExpense, IExpenseInfo } from '../interfaces/expense';
+import { createFilter } from '../util/service-helper';
 
 @Injectable()
 export class ExpenseService {
@@ -12,20 +13,14 @@ export class ExpenseService {
   constructor(private http: HttpClient) {
   }
 
-  public getAll(roomId: string, sort: string, direction: string, page: number, size: number = PAGE_SIZE): Observable<IExpense[]> {
-    let params = new HttpParams().set('page', String(page)).set('size', String(size));
-    if (sort) {
-      params = params.append('sort', sort);
-    }
-    if (direction) {
-      params = params.append('direction', direction);
+  public getAll(roomId: string, sort: string, direction: string, page: number, size: number = PAGE_SIZE,
+                filter?: string, dateFilter?: string): Observable<IExpense[]> {
+    let params = createFilter(page, size, sort, direction, filter);
+    if (dateFilter) {
+      params = params.append('date', dateFilter);
     }
 
     return this.http.get<IExpense[]>(this.updatePathVariable(roomId, ['pages']), { params });
-  }
-
-  public getAllExpenses(roomId: string): Observable<IExpense[]> {
-    return this.http.get<IExpense[]>(this.updatePathVariable(roomId));
   }
 
   public getExpenseInfo(roomId: string): Observable<IExpenseInfo> {

@@ -1,0 +1,100 @@
+<fieldset *ngIf="showError" id="error-box">
+  <mat-icon (click)="close" id="close">close</mat-icon>
+  <legend>{{'ME.PAYMENT.ERROR_TEXT' | translate }}</legend>
+  <div id="error-text">{{errorMessage}}</div>
+</fieldset>
+
+<div class="mat-elevation-z8">
+  <table [dataSource]="dataSource" mat-table>
+    <ng-container matColumnDef="position">
+      <th *matHeaderCellDef mat-header-cell>#</th>
+      <td *matCellDef="let payment; let i = index;" mat-cell>
+        <div *ngIf="payment.id; else skeleton">{{i + 1}} </div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="description">
+      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
+      <td *matCellDef="let payment" class="column-large-text" mat-cell>
+        <div *ngIf="payment.id; else skeleton">{{payment.description}}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="type">
+      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
+      <td *matCellDef="let payment" class="column-large-text" mat-cell>
+        <div *ngIf="payment.id; else skeleton">{{ 'COMMON.PAYMENT.TYPE.' + (payment.type || 'NONE') | translate }}</div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="amount">
+      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
+      <td *matCellDef="let payment" mat-cell>
+        <div *ngIf="payment.id; else skeleton">
+          <mat-icon matPrefix>
+            {{getCurrency(payment)}}
+          </mat-icon>&nbsp;{{payment.amount | number:'1.2-2'}}
+        </div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
+      <td *matCellDef="let payment" fxHide.lt-sm fxShow mat-cell>
+        <div *ngIf="payment.id; else skeleton">
+          {{'COMMON.STATUS.PAYMENT.' + (payment.status || 'NONE') | translate}}
+        </div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+      <td *matCellDef="let payment" mat-cell>
+        <div *ngIf="payment.id; else skeleton">
+          <button (click)="pay(payment)" *ngIf="payment.status === 'CREATED'" mat-icon-button
+                  matTooltip="{{ 'COMMON.BUTTON.' + payment.type | translate }}" matTooltipPosition="above">
+            <mat-icon [svgIcon]="payment.type" class="svg-icon"></mat-icon>
+          </button>
+          <button (click)="notify(payment)" *ngIf="payment.status === 'PENDING'" mat-icon-button
+                  matTooltip="{{ 'COMMON.BUTTON.NOTIFY'| translate }}" matTooltipPosition="above">
+            <mat-icon color="primary">published_with_changes</mat-icon>
+          </button>
+        </div>
+        <ng-template #skeleton>
+          <div class="ssc-line"></div>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="noContent">
+      <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+        {{ 'ME.PAYMENT.LIST.ERROR.NO_CONTENT' | translate }}</td>
+    </ng-container>
+
+    <tr *matFooterRowDef="['noContent']" [hidden]="dataSource?.length > 0" mat-footer-row></tr>
+
+    <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+    <tr *matRowDef="let row; columns: displayedColumns;" class="{{row.status}}" mat-row></tr>
+  </table>
+</div>
+<div class="top">
+  <div fxFlex></div>
+  <button appBackButton color="accent" mat-fab extended class="icon-button"
+          type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+</div>
+

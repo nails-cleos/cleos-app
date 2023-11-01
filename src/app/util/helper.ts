@@ -1,7 +1,7 @@
 import { DiscountType, IDiscount } from '../interfaces/discount';
 import { IAuthority, IUser, IUserAll } from '../interfaces/user';
 import { GroupService, IGroupService, IPrice, ITreatmentAll, ITreatmentGroup, Price } from '../interfaces/treatment';
-import { IPayment } from '../interfaces/payment';
+import { IPayment, IPaymentOption } from '../interfaces/payment';
 import { IReservationAll } from '../interfaces/reservation';
 import { IAdditionalAll } from '../interfaces/additional';
 import { TranslateService } from '@ngx-translate/core';
@@ -18,7 +18,7 @@ import { CancelDialogComponent } from '../shared/dialog/cancel/cancel-dialog.com
 import { Router } from '@angular/router';
 import { CustomerEditDialogComponent } from '../shared/dialog/customer-edit/customer-edit-dialog.component';
 
-export const isRoomAdmin = (authorities?: IAuthority[]): boolean => !!authorities && authorities.length === 1 &&
+export const hasRoomAdmin = (authorities?: IAuthority[]): boolean => !!authorities && authorities.length === 1 &&
   authorities.some(u => (u.authority === Role.roomAdmin));
 
 export const snakeToCamel = (value: string = ''): string =>
@@ -130,7 +130,7 @@ export const getLocale = (userLang?: string): ILocale => {
 
 export const round = (value: number): number => Math.round((value + Number.EPSILON) * 100) / 100;
 
-export const getPrice = (reservation: IReservationAll, payments?: IPayment[] | undefined): IPrice => {
+export const getPrice = (reservation: IReservationAll, payments?: IPayment[]): IPrice => {
   const treatment = reservation.treatment;
   let total = treatment.price;
   let priceWithDiscount;
@@ -159,8 +159,10 @@ export const getPrice = (reservation: IReservationAll, payments?: IPayment[] | u
   }
 
   return new Price(treatment.price, discount, extras, additional, total, totalPaid(payments), totalWithoutDiscount, priceWithDiscount,
-    priceWithExtras, priceWithAdditional);
+    priceWithExtras, priceWithAdditional, 100, reservation.balance);
 };
+
+export const addPayment = (price: IPrice, payments?: IPayment[]): IPrice => price.withTotalPaid(totalPaid(payments));
 
 export const newPrice = (price: IPrice, amount: number, discount?: IDiscount): IPrice => {
   let total = amount;
@@ -186,7 +188,7 @@ export const newPrice = (price: IPrice, amount: number, discount?: IDiscount): I
   }
 
   return new Price(amount, priceDiscount, extras, additional, total, price.totalPaid, totalWithoutDiscount, priceWithDiscount,
-    priceWithExtras, priceWithAdditional, price.percentageToPaid);
+    priceWithExtras, priceWithAdditional, price.percentageToPaid, price.balance);
 };
 
 export const newExtra = (price: IPrice, extras: number, discount?: IDiscount): IPrice => {
@@ -203,7 +205,13 @@ export const newExtra = (price: IPrice, extras: number, discount?: IDiscount): I
   }
 
   return new Price(price.amount, priceDiscount, extras, price.additional, total, price.totalPaid, totalWithoutDiscount,
-    priceWithDiscount, priceWithExtras, price.priceWithAdditional, price.percentageToPaid);
+    priceWithDiscount, priceWithExtras, price.priceWithAdditional, price.percentageToPaid, price.balance);
+};
+
+export const removeDiscount = (price: IPrice): IPrice => {
+  const total = price.amount + price.extra + price.additional;
+  return new Price(price.amount, 0, price.extra, price.additional, total, price.totalPaid, total, 0, price.priceWithExtras,
+    price.priceWithAdditional, price.percentageToPaid, price.balance);
 };
 
 export const newDiscount = (price: IPrice, treatmentDiscount: IDiscount): IPrice => {
@@ -213,7 +221,7 @@ export const newDiscount = (price: IPrice, treatmentDiscount: IDiscount): IPrice
   const total = totalWithoutDiscount - discount;
 
   return new Price(price.amount, discount, price.extra, price.additional, total, price.totalPaid, totalWithoutDiscount, priceWithDiscount,
-    price.priceWithExtras, price.priceWithAdditional, price.percentageToPaid);
+    price.priceWithExtras, price.priceWithAdditional, price.percentageToPaid, price.balance);
 };
 
 export const newAdditional = (price: IPrice, additionalList: IAdditionalAll[], discount?: IDiscount): IPrice => {
@@ -234,13 +242,13 @@ export const newAdditional = (price: IPrice, additionalList: IAdditionalAll[], d
     total = total - priceDiscount;
   }
 
-  return new Price(price.amount, priceDiscount, price.extra, additional, total, price.totalPaid,
-    totalWithoutDiscount, priceWithDiscount, price.priceWithExtras, priceWithAdditional, price.percentageToPaid);
+  return new Price(price.amount, priceDiscount, price.extra, additional, total, price.totalPaid, totalWithoutDiscount, priceWithDiscount,
+    price.priceWithExtras, priceWithAdditional, price.percentageToPaid, price.balance);
 };
 
 export const newPercentage = (price: IPrice, percentage: number): IPrice => new Price(price.amount, price.discount, price.extra,
   price.additional, price.total, price.totalPaid, price.totalWithoutDiscount, price.priceWithDiscount, price.priceWithExtras,
-  price.priceWithAdditional, percentage);
+  price.priceWithAdditional, percentage, price.balance);
 
 export const getTreatmentDurability = (min: number, max: number, translate: TranslateService): string | undefined => {
   if (!min && !max) {
@@ -398,7 +406,7 @@ export const isProfessional = (id: string, professionals?: IUser[]): boolean =>
   professionals ? professionals?.some(professional => professional.id === id) : false;
 
 export const totalPaid = (payments: IPayment[] | undefined): number => payments?.filter(
-  (p: IPayment) => p.status && ['APPROVED', 'APPROVED_REFUND', 'REFUND'].includes(p.status))?.map((p: IPayment) =>
+  (p: IPayment) => p.status && ['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND'].includes(p.status))?.map((p: IPayment) =>
   p.transactionAmount).reduce((acc: number, value: number | undefined) => acc + (value ? value : 0), 0) || 0;
 
 export const areEquals = (array1: any[], array2: any[]): boolean => (array1.length === array2.length &&
@@ -410,14 +418,13 @@ export const areEquals = (array1: any[], array2: any[]): boolean => (array1.leng
 
 export const titleCase = (text: string) => text.split(' ').map((l: string) => l[0].toUpperCase() + l.substring(1)).join(' ');
 export const openCancel = (dialog: MatDialog, room: IRoomAll, small: boolean, options: string[], afterClose: (result: any) => void,
-                           showPenalty?: boolean, price?: IPrice): void => {
-  const types = room.paymentTypes.filter((p) => !['CASH', 'TRANSFER'].includes(p));
+                           showPenalty?: boolean, price?: IPrice, paymentOptions?: IPaymentOption[]): void => {
   const currency = room.currency;
   const data = {
     small,
     options,
     price,
-    types,
+    paymentOptions,
     currency,
     showPenalty
   };
@@ -461,7 +468,7 @@ export const executeDialog = (dialog: MatDialog, dialogComponent: any, data: any
 
 const getDiscount = (discount: IDiscount, price: number): number => {
   let value = 0;
-  if (discount.amount) {
+  if (discount?.amount) {
     switch (discount.type) {
       case DiscountType.money: {
         value = discount.amount;

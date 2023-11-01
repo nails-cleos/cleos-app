@@ -1,0 +1,80 @@
+<div class="flex-container" fxLayout="column">
+  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
+    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+      <app-balance [account]="account" [showAdd]="showAdd" [showView]="true"></app-balance>
+      <form (ngSubmit)="submit" [formGroup]="form" novalidate>
+        <mat-card appearance="outlined" class="style-card">
+          <mat-card-header>
+            <mat-card-title>{{'ACCOUNT.TITLE' | translate}}</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+              <div *ngIf="account?.currencies; else skeleton" fxLayout="row" fxLayoutAlign="space-between center"
+                   id="fields">
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'COMMON.CURRENCY.FIELD' | translate }}</mat-label>
+                  <label>
+                    <input (keydown)="keyDownHandler($event)" formControlName="currency"
+                           [matAutocomplete]="auto" matInput required type="text">
+                  </label>
+                  <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayCurrencyFn">
+                    <mat-option *ngFor="let currency of filteredCurrencyOptions | async" [value]="currency">
+                      {{currency.code}}
+                    </mat-option>
+                  </mat-autocomplete>
+                  <mat-error *ngIf="getForm.currency.hasError('required')"
+                             [innerHTML]="'COMMON.CURRENCY.REQUIRED' | translate">
+                  </mat-error>
+                  <mat-error *ngIf="getForm.currency.hasError('requireMatch')"
+                             [innerHTML]="'COMMON.CURRENCY.INVALID' | translate">
+                  </mat-error>
+                  <mat-error *ngIf="errors['currency']">
+                    {{errors['currency']}}
+                  </mat-error>
+                </mat-form-field>
+                <button fxShow.lt-sm fxHide [routerLink]="['/', 'currency', 'add']" color="accent" mat-fab>
+                  <mat-icon matPrefix>add_card</mat-icon>
+                </button>
+                <button fxHide.lt-sm fxShow [routerLink]="['/', 'currency', 'add']" color="accent" mat-fab extended>
+                  <mat-icon matPrefix>add_card</mat-icon>
+                  <span>{{ 'COMMON.CURRENCY.ADD_BUTTON' | translate }}</span>
+                </button>
+              </div>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'ACCOUNT.GIFT.FIELD' | translate }}</mat-label>
+                <mat-icon matIconPrefix>percent</mat-icon>
+                <label>
+                  <input formControlName="gift" matInput required [step]="1" [min]="0" [max]="100"
+                         type="number" (keydown)="keyDownNumberHandler($event)">
+                </label>
+                <mat-error *ngIf="getForm.gift.hasError('required')"
+                           [innerHTML]="'ACCOUNT.GIFT.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="getForm.gift.hasError('min')">
+                  {{ 'ACCOUNT.GIFT.GREATER' | translate }}
+                </mat-error>
+                <mat-error *ngIf="getForm.gift.hasError('max')">
+                  {{ 'ACCOUNT.GIFT.LESS' | translate }}
+                </mat-error>
+                <mat-error *ngIf="errors['gift']">
+                  {{errors['gift']}}
+                </mat-error>
+              </mat-form-field>
+              <ng-template #skeleton>
+                <div class="ssc-line"></div>
+              </ng-template>
+            </div>
+          </mat-card-content>
+        </mat-card>
+        <mat-card-actions>
+          <div fxFlex></div>
+          <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
+                  type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+          <button [disabled]="form.invalid || form.pristine" color="primary" mat-fab extended class="icon-button" type="submit">
+            {{ 'COMMON.BUTTON.UPDATE' | translate }}
+          </button>
+        </mat-card-actions>
+      </form>
+    </div>
+  </div>
+</div>
