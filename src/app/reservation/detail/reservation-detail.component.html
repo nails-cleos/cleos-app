@@ -246,7 +246,7 @@
           <td *matCellDef="let payment" fxHide.lt-sm fxShow mat-cell>
             <div *ngIf="payment.id; else skeleton">
               <ng-template
-                [ngIf]="!['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND_PENDING', 'REFUND', 'PENDING'].includes(payment.status)">
+                [ngIf]="!['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND_PENDING', 'REFUND', 'PENDING', 'CREATED'].includes(payment.status)">
                 <button [routerLink]="['/me', 'payment', payment.id]" mat-icon-button
                         matTooltip="{{ 'COMMON.BUTTON.PAYMENT' | translate }}" matTooltipPosition="right">
                   <mat-icon class="payment-button" color="primary">payment</mat-icon>
@@ -256,6 +256,12 @@
                 <button (click)="notify(payment)" mat-icon-button
                         matTooltip="{{ 'COMMON.BUTTON.NOTIFY'| translate }}" matTooltipPosition="above">
                   <mat-icon color="primary">published_with_changes</mat-icon>
+                </button>
+              </ng-template>
+              <ng-template [ngIf]="payment.status === 'CREATED'">
+                <button (click)="pay(payment)" mat-icon-button
+                        matTooltip="{{ 'COMMON.BUTTON.PAYMENT' | translate }}" matTooltipPosition="right">
+                  <mat-icon class="payment-button" color="primary">payment</mat-icon>
                 </button>
               </ng-template>
             </div>
@@ -498,7 +504,7 @@
   <mat-divider></mat-divider>
   <mat-card-actions *ngIf="reservation; else buttonSkeleton">
     <div fxFlex></div>
-    <button appBackButton [date]="start" color="accent" mat-fab extended
+    <button appBackButton [date]="start" [step]="step" color="accent" mat-fab extended
             type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
   </mat-card-actions>
   <ng-template #buttonSkeleton>

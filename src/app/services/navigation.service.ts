@@ -21,11 +21,11 @@ export class NavigationService {
     });
   }
 
-  back(date?: Date): void {
+  back(date?: Date, step: number = 0): void {
     this.history.pop();
     if (this.history.length > 0) {
       const last = this.history[this.history.length - 1];
-      this.router.navigate([last], { state: { date } });
+      this.router.navigate([last], { state: { date, step } });
     } else {
       this.reloadPage();
     }

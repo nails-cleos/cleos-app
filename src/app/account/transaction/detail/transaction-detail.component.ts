@@ -7,6 +7,7 @@ import { ITransaction } from '../../../interfaces/account';
 import * as fromActionsAccount from '../../../store/account.actions';
 import { TranslateService } from '@ngx-translate/core';
 import * as fromActionsPayment from '../../../store/payment.actions';
+import { newDateTimestamp } from '../../../util/dates';
 
 @Component({
   selector: 'app-transaction-detail',
@@ -17,6 +18,7 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
 
   transaction?: ITransaction;
   dateFormat: string;
+  step?: number;
 
   private getState: Observable<any>;
   private getPaymentState: Observable<any>;
@@ -28,6 +30,7 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
     this.getState = this.store.select(selectAccountState);
     this.getPaymentState = this.store.select(selectPaymentState);
     this.dateFormat = this.translate.currentLang;
+    this.step = this.router.getCurrentNavigation()?.extras.state?.step;
   }
 
   get pay(): void {
@@ -68,7 +71,7 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
-        this.transaction = state.selected;
+        this.transaction = Object.assign({}, state.selected, { date: newDateTimestamp(state.selected.payment.timestamp) });
       }
       if (state.paths) {
         this.router.navigate(state.paths);
