@@ -14,6 +14,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
 import * as fromActionsAccount from '../../../store/account.actions';
 import { detailExpandAnimation } from '../../../util/animation';
+import { newDateTimestamp } from '../../../util/dates';
 
 @Component({
   selector: 'app-transaction-view',
@@ -25,7 +26,7 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['position', 'createdAt', 'amount', 'amountGifted', 'payment.status', 'payment.type', 'actions'];
+  displayedColumns: string[] = ['position', 'timestamp', 'amount', 'amountGifted', 'payment.status', 'payment.type', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<ITransaction>>();
 
   expandedTransaction?: ITransaction;
@@ -107,7 +108,9 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
       if (state.data?.account) {
         this.account = state.data.account;
       }
-      this.dataSource = state.data?.transactions?.content;
+      this.dataSource = state.data?.transactions?.content?.map((it: ITransaction) =>
+        Object.assign({}, it, { date: newDateTimestamp(it.payment?.timestamp) })
+      );
       this.resultsLength = state.data?.transactions?.totalElements;
       if (!this.paginatorSubscription && this.resultsLength) {
         this.createPageSubscriptions();

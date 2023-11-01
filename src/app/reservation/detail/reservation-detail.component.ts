@@ -95,6 +95,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   customerId?: string;
   isReservationAdmin?: boolean;
   isCustomer?: boolean;
+  step?: number;
 
   private tooltipPosition = 'below';
   private machine: any;
@@ -128,7 +129,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     this.language = this.translate.currentLang;
     this.dateFormat = this.translate.currentLang;
     this.price = new Price();
-
+    this.step = this.router.getCurrentNavigation()?.extras.state?.step;
     this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
       this.professionalId = value.professionalId;
       this.customerId = value.customerId;
@@ -274,6 +275,12 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         preferenceId: payment.preferenceId,
         type: payment.type
       })
+    );
+  }
+
+  pay(payment: IPaymentAll): void {
+    this.store.dispatch(
+      new fromActionsPayment.PaymentSend(payment.paymentURL || payment.link)
     );
   }
 

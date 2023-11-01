@@ -47,6 +47,7 @@ export interface ITransaction {
   payment?: IPayment;
   paymentRequest?: IPaymentRequest;
   createdAt?: string;
+  date?: Date;
   // Account add mode
   customerId?: string;
   currencyId?: string;

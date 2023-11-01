@@ -162,7 +162,6 @@ export const getPrice = (reservation: IReservationAll, payments?: IPayment[]): I
     priceWithExtras, priceWithAdditional, 100, reservation.balance);
 };
 
-
 export const addPayment = (price: IPrice, payments?: IPayment[]): IPrice => price.withTotalPaid(totalPaid(payments));
 
 export const newPrice = (price: IPrice, amount: number, discount?: IDiscount): IPrice => {

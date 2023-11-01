@@ -161,16 +161,17 @@ export interface ISummaryTotal extends ITotal {
 
 export interface IMonthlySummary {
   id: string;
+  paths: string[];
   position: number;
   timestamp: number;
   total: ISummaryTotal;
 }
 
-export interface IMonthlySummaryReservation extends IMonthlySummary {
+export interface IMonthlySummarySale extends IMonthlySummary {
   state: States;
   reservationDate: Date;
   customerName: string;
-  treatmentName: string;
+  description: string;
   color: string;
 }
 
@@ -194,9 +195,9 @@ export interface IMonthlySummaryRequest {
 }
 
 export interface IMonthlyRoomSummary extends ISummaryRoom {
-  reservationSummary: IMonthlySummaryReservation[];
+  saleSummary: IMonthlySummarySale[];
   expenseSummary: IMonthlySummaryExpense[];
-  cashSummary: IMonthlySummaryReservation[];
+  cashSaleSummary: IMonthlySummarySale[];
 }
 
 export interface IYearRoomSummary extends ISummaryRoom {

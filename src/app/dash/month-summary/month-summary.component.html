@@ -119,7 +119,7 @@
             <col class="id">
             <col class="date">
             <col class="customer">
-            <col class="treatment">
+            <col class="description">
             <col class="discount">
             <col class="color">
             <col class="gross">
@@ -132,7 +132,7 @@
             <th mat-subheader></th>
             <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.DATE' | translate}}</th>
             <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.CUSTOMER' | translate}}</th>
-            <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.TREATMENT' | translate}}</th>
+            <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.DESCRIPTION' | translate}}</th>
             <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.DISCOUNT' | translate}}</th>
             <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.COLOR' | translate}}</th>
             <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.GROSS' | translate}}</th>
@@ -149,7 +149,7 @@
           <ng-template [ngIf]="summaryReservations?.length">
             <tr *ngFor="let summary of summaryReservations | filterBy:week.dates:'day'">
               <td [rowSpan]="summary.total.payments.length || 1">
-                <button mat-icon-button [routerLink]="['/reservation', summary.id]">
+                <button mat-icon-button [routerLink]="summary.paths" [state]="{step: 0}">
                   <mat-icon>visibility</mat-icon>
                 </button>
               </td>
@@ -157,7 +157,7 @@
                 {{summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat}}
               </td>
               <td [rowSpan]="summary.total.payments.length || 1">{{summary.customerName}}</td>
-              <td [rowSpan]="summary.total.payments.length || 1">{{summary.treatmentName}}</td>
+              <td [rowSpan]="summary.total.payments.length || 1">{{summary.description}}</td>
               <td [rowSpan]="summary.total.payments.length || 1">
                 {{summary.total.discountDescription}}
               </td>
@@ -265,7 +265,7 @@
           <ng-template [ngIf]="summaryExpenses?.length">
             <tr *ngFor="let summary of summaryExpenses | filterBy:week.dates:'day'">
               <td>
-                <button mat-icon-button [routerLink]="['/rooms', roomId, 'expenses', summary.id]">
+                <button mat-icon-button [routerLink]="summary.paths">
                   <mat-icon>visibility</mat-icon>
                 </button>
               </td>
@@ -341,7 +341,7 @@
               <col class="id">
               <col class="date">
               <col class="customer">
-              <col class="treatment">
+              <col class="description">
               <col class="discount">
               <col class="color">
               <col class="gross">
@@ -354,7 +354,7 @@
               <th mat-subheader></th>
               <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.DATE' | translate}}</th>
               <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.CUSTOMER' | translate}}</th>
-              <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.TREATMENT' | translate}}</th>
+              <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.DESCRIPTION' | translate}}</th>
               <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.DISCOUNT' | translate}}</th>
               <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.COLOR' | translate}}</th>
               <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.GROSS' | translate}}</th>
@@ -371,7 +371,7 @@
             <ng-template [ngIf]="summaryCash?.length">
               <tr *ngFor="let summary of summaryCash | filterBy:week.dates:'day'">
                 <td [rowSpan]="summary.total.payments.length || 1">
-                  <button mat-icon-button [routerLink]="['/reservation', summary.id]">
+                  <button mat-icon-button [routerLink]="summary.paths" [state]="{step: 2}">
                     <mat-icon>visibility</mat-icon>
                   </button>
                 </td>
@@ -379,7 +379,7 @@
                   {{summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat}}
                 </td>
                 <td [rowSpan]="summary.total.payments.length || 1">{{summary.customerName}}</td>
-                <td [rowSpan]="summary.total.payments.length || 1">{{summary.treatmentName}}</td>
+                <td [rowSpan]="summary.total.payments.length || 1">{{summary.description}}</td>
                 <td [rowSpan]="summary.total.payments.length || 1">
                   {{summary.total.discountDescription}}
                 </td>

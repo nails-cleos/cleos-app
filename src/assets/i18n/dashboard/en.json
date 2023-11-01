@@ -78,7 +78,7 @@
         "WEEK": "Week {{number}}",
         "DATE": "Date",
         "CUSTOMER": "Customer",
-        "TREATMENT": "Treatment",
+        "DESCRIPTION": "Description",
         "DISCOUNT": "Discount",
         "GROSS": "Gross",
         "NET": "Net",

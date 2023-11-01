@@ -78,7 +78,7 @@
         "WEEK": "Semana {{number}}",
         "DATE": "Fecha",
         "CUSTOMER": "Cliente",
-        "TREATMENT": "Tratamiento",
+        "DESCRIPTION": "Descripción",
         "DISCOUNT": "Descuento",
         "GROSS": "Bruto",
         "NET": "Neto",

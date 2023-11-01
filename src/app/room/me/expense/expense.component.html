@@ -153,8 +153,8 @@
           </mat-card-content>
           <mat-card-actions>
             <div fxFlex></div>
-            <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
-                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+            <button [form]="form" appBackButton [date]="getForm.date.value" [step]="1" color="accent" mat-fab extended
+                    class="icon-button" type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
             <ng-template [ngIf]="isAddMode" [ngIfElse]="buttonEditMode">
               <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button"
                       type="submit">

@@ -139,6 +139,7 @@ export interface IPayment {
   preferenceId?: string;
   link?: string;
   paymentURL?: string;
+  timestamp?: number;
 }
 
 export interface IPaymentAll {
@@ -153,6 +154,7 @@ export interface IPaymentAll {
   reservation?: IReservationAll;
   transaction?: ITransaction;
   link?: string;
+  paymentURL?: string;
 }
 
 export class PaymentStatus implements IPaymentStatus {

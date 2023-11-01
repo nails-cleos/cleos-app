@@ -14,7 +14,7 @@ import {
   IMonthlySummary,
   IMonthlySummaryExpense,
   IMonthlySummaryRequest,
-  IMonthlySummaryReservation,
+  IMonthlySummarySale,
   ISummaryRoom,
   ISummaryTotal,
   SummaryType
@@ -36,9 +36,9 @@ import { AuthUserService } from '../../services/auth-user.service';
 export class MonthSummaryComponent implements OnInit {
   date = new FormControl<Date | null>(null);
   monthlySummaryMap?: Map<ISummaryRoom, {
-    summaryReservation: IMonthlySummaryReservation[];
+    summarySale: IMonthlySummarySale[];
     summaryExpenses: IMonthlySummaryExpense[];
-    summaryCash: IMonthlySummaryReservation[];
+    summaryCashSale: IMonthlySummarySale[];
   }>;
   selectedRoom = new UntypedFormControl();
   amountFormat = new UntypedFormControl('ES');
@@ -208,9 +208,17 @@ export class MonthSummaryComponent implements OnInit {
     this.valueChange();
     if (this.extras) {
       this.step = this.extras.step || 0;
-      const date = this.extras.date.split('-');
-      const month = Number(date[0]) - 1;
-      const year = date[1];
+      const dateTime = this.extras.date;
+      let month;
+      let year;
+      if (dateTime instanceof Date) {
+        month = dateTime.getMonth();
+        year = dateTime.getFullYear();
+      } else {
+        const date = dateTime.split('-');
+        month = Number(date[0]) - 1;
+        year = date[1];
+      }
       this.date.setValue(dateMonthYear(month, year));
     } else {
       this.date.setValue(getNow());
@@ -419,7 +427,7 @@ export class MonthSummaryComponent implements OnInit {
   private createData(): void {
     if (this.selectedRoom.value) {
       this.roomId = this.selectedRoom.value.roomId;
-      this.summaryReservations = this.monthlySummaryMap?.get(this.selectedRoom.value)?.summaryReservation.map((s, i) => {
+      this.summaryReservations = this.monthlySummaryMap?.get(this.selectedRoom.value)?.summarySale.map((s, i) => {
         if (s.id) {
           const reservationDate = newDateTimestamp(s.timestamp);
           return Object.assign({}, s, { reservationDate, day: reservationDate.getDate(), position: i });
@@ -437,7 +445,7 @@ export class MonthSummaryComponent implements OnInit {
       });
       this.calculateExpenseSummary();
 
-      this.summaryCash = this.monthlySummaryMap?.get(this.selectedRoom.value)?.summaryCash.map((s, i) => {
+      this.summaryCash = this.monthlySummaryMap?.get(this.selectedRoom.value)?.summaryCashSale.map((s, i) => {
         if (s.id) {
           const reservationDate = newDateTimestamp(s.timestamp);
           return Object.assign({}, s, { reservationDate, day: reservationDate.getDate(), position: i });

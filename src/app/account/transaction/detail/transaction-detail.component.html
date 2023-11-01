@@ -28,7 +28,7 @@
               </tr>
               <tr *ngIf="transaction; else skeleton">
                 <td class="right">{{ 'ACCOUNT.TRANSACTION.DATE' | translate }}</td>
-                <td class="left">{{transaction.createdAt| date:'short':undefined:dateFormat}}
+                <td class="left">{{transaction.date | date:'short':undefined:dateFormat}}
                 </td>
               </tr>
               <tr *ngIf="transaction; else skeleton">
@@ -74,10 +74,12 @@
         <mat-divider></mat-divider>
         <mat-card-actions *ngIf="transaction; else buttonSkeleton">
           <div fxFlex></div>
-          <button fxShow.lt-sm fxHide appBackButton color="accent" mat-fab class="icon-button">
+          <button fxShow.lt-sm fxHide appBackButton [date]="transaction.date" [step]="step" color="accent" mat-fab
+                  class="icon-button">
             <mat-icon matIconPrefix>arrow_back</mat-icon>
           </button>
-          <button fxHide.lt-sm fxShow appBackButton color="accent" mat-fab extended class="icon-button">
+          <button fxHide.lt-sm fxShow appBackButton [date]="transaction.date" [step]="step" color="accent" mat-fab
+                  extended class="icon-button">
             {{ 'COMMON.BUTTON.BACK' | translate }}
             <mat-icon matIconPrefix>arrow_back</mat-icon>
           </button>

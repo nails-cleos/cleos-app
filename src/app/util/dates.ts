@@ -672,7 +672,7 @@ export const getDateFormat = (date?: Date | null): string => {
   if (!date) {
     return '';
   }
-  const month = `0${ date.getMonth() + 1 }`.slice(0, 2);
+  const month = (`0${ (date.getMonth()) + 1 }`).slice(-2);
   const year = date.getFullYear();
 
   return `${ month }-${ year }`;

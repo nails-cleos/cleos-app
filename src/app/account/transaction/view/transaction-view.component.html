@@ -6,7 +6,7 @@
   </div>
 </div>
 <div class="mat-elevation-z8">
-  <table [dataSource]="dataSource" mat-table matSort matSortActive="createdAt" matSortDirection="desc"
+  <table [dataSource]="dataSource" mat-table matSort matSortActive="timestamp" matSortDirection="desc"
          matSortDisableClear multiTemplateDataRows>
     <ng-container matColumnDef="position">
       <th *matHeaderCellDef mat-header-cell>#</th>
@@ -18,11 +18,11 @@
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="createdAt">
+    <ng-container matColumnDef="timestamp">
       <th *matHeaderCellDef mat-header-cell
           mat-sort-header>{{ 'ACCOUNT.TRANSACTION.LIST.COLUMN.DATE' | translate }}</th>
       <td *matCellDef="let transaction" mat-cell>
-        <div *ngIf="transaction.id; else skeleton">{{transaction.createdAt| date:'short':undefined:dateFormat}}</div>
+        <div *ngIf="transaction.id; else skeleton">{{transaction.date | date:'short':undefined:dateFormat}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
