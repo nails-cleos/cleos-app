@@ -14,7 +14,7 @@ jobs:
           owner: nails-cleos
           number: 1
           token: ${{ secrets.TOKEN_READ }}
-          iteration-field: Iteration
+          iteration-field: Sprint
           iteration: last
           new-iteration: current
           statuses: Todo,In Progress,Blocked
