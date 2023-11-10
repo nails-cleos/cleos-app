@@ -5,18 +5,16 @@ import { IAddress } from './room';
 
 export interface IUser {
   id?: string;
-  firstName?: string;
-  lastName?: string;
+  uuid?: string;
+  displayName?: string;
   phone?: string;
   dob?: string;
   enabled?: boolean;
+  verified?: boolean;
   deleted?: boolean;
-  provider?: string;
   lang?: string;
   locale?: string;
-  username?: string;
   email?: string;
-  password?: string;
   authorities?: IAuthority[];
   imageUrl?: string;
   image?: any;
@@ -33,10 +31,8 @@ export interface IUser {
 
 export interface IUserAll {
   id: string;
-  firstName?: string;
-  lastName?: string;
-  provider: string;
-  username: string;
+  uid?: string;
+  displayName: string;
   email: string;
   authorities: IAuthority[];
   imageUrl?: string;
@@ -47,7 +43,6 @@ export interface IUserAll {
   dob?: string;
   referralMax?: number;
   theme?: Theme;
-  changePassword: boolean;
   timeZone: string;
   lightColor?: string;
   darkColor?: string;

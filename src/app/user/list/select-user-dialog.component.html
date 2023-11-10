@@ -7,7 +7,7 @@
     <mat-card-content>
       <mat-list>
         <mat-list-item>
-          <div matListItemLine [innerHTML]="'USER.MERGE.NAME' | translate: {name: newUser | userName}"></div>
+          <div matListItemLine [innerHTML]="'USER.MERGE.NAME' | translate: {name: newUser.displayName}"></div>
         </mat-list-item>
         <mat-list-item>
           <div matListItemLine [innerHTML]="'USER.MERGE.EMAIL' | translate: {email: newUser.email}"></div>
@@ -31,7 +31,7 @@
           </label>
           <mat-autocomplete #autoUser="matAutocomplete" [displayWith]="displayFnUser">
             <mat-option *ngFor="let user of filteredUser | async" [value]="user">
-              {{user | userName}}
+              {{user.displayName}}
             </mat-option>
           </mat-autocomplete>
           <mat-error *ngIf="user.hasError('required')"
@@ -47,7 +47,7 @@
       </form>
       <mat-list *ngIf="!userForm.invalid">
         <mat-list-item>
-          <div matListItemLine [innerHTML]="'USER.MERGE.NAME' | translate: {name: user.value | userName}"></div>
+          <div matListItemLine [innerHTML]="'USER.MERGE.NAME' | translate: {name: user.value.displayName}"></div>
         </mat-list-item>
         <mat-list-item>
           <div matListItemLine [innerHTML]="'USER.MERGE.EMAIL' | translate: {email: user.value.email}"></div>

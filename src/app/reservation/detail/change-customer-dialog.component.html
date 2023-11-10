@@ -10,7 +10,7 @@
       </label>
       <mat-autocomplete #autoCustomer="matAutocomplete" [displayWith]="displayFnUser">
         <mat-option *ngFor="let customer of filteredCustomer | async" [value]="customer">
-          {{customer | userName}}
+          {{customer.displayName}}
         </mat-option>
       </mat-autocomplete>
       <mat-error *ngIf="customer.hasError('required')"

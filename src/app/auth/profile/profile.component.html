@@ -12,15 +12,15 @@
         </mat-card-header>
         <div class="center">
           <div *ngIf="user; else circle" [ngClass]="{'profile-background': !image}" class="hoverable" mat-card-avatar>
-            <label [ngClass]="{'pointer': canChange}" for="fileInput">
+            <label class="pointer-only" for="fileInput">
               <img *ngIf="image; else showInitialsBlock" alt="profile" class="image"
                    src="{{image}}">
               <ng-template #showInitialsBlock>
                 <div class="initials">{{ initials | uppercase }}</div>
               </ng-template>
-              <div *ngIf="canChange" class="hover-text">Choose file</div>
-              <div *ngIf="canChange" class="profile-background"></div>
-              <input (change)="onSelectFile($event.target)" *ngIf="canChange" accept="image/*" autocomplete="photo"
+              <div class="hover-text">Choose file</div>
+              <div class="profile-background"></div>
+              <input (change)="onSelectFile($event.target)" accept="image/*" autocomplete="photo"
                      id="fileInput" type='file'>
             </label>
           </div>
@@ -34,30 +34,11 @@
           <mat-card-content *ngIf="user; else boxSkeleton">
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <mat-form-field appearance="outline">
-                <mat-label>{{ 'COMMON.USER.USERNAME.FIELD' | translate }}</mat-label>
+                <mat-label>{{ 'COMMON.USER.DISPLAY_NAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input [formControl]="username" [readonly]="!canChange" autocomplete="username" matInput required>
+                  <input [formControl]="displayName" autocomplete="given-name" matInput>
                 </label>
-                <mat-error *ngIf="username.hasError('required')"
-                           [innerHTML]="'COMMON.USER.USERNAME.REQUIRED' | translate">
-                </mat-error>
-                <mat-error *ngIf="errors['username']">
-                  {{errors['username']}}
-                </mat-error>
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'COMMON.USER.FIRST_NAME.FIELD' | translate }}</mat-label>
-                <label>
-                  <input [formControl]="firstName" [readonly]="!canChange" autocomplete="given-name" matInput>
-                </label>
-                <mat-error *ngIf="errors['firstName']">{{errors['firstName']}}</mat-error>
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'COMMON.USER.LAST_NAME.FIELD' | translate }}</mat-label>
-                <label>
-                  <input [formControl]="lastName" [readonly]="!canChange" autocomplete="family-name" matInput>
-                </label>
-                <mat-error *ngIf="errors['lastName']">{{errors['lastName']}}</mat-error>
+                <mat-error *ngIf="errors['displayName']">{{errors['displayName']}}</mat-error>
               </mat-form-field>
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.USER.LANG.FIELD' | translate }}</mat-label>

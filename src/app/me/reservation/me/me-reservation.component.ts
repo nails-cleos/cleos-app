@@ -39,11 +39,9 @@ import {
   createRoomOffice,
   createTreatmentGroupService,
   getBackIndex,
-  getFullUserName,
   getPrice,
   getStep,
   getTreatmentDurability,
-  getUserName,
   newAdditional,
   newDiscount,
   newPercentage,
@@ -218,7 +216,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   get professionalName(): string {
-    return getUserName(this.professional.value);
+    return this.professional.value.displayName;
   }
 
   get roomDetail(): string {
@@ -443,7 +441,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   displayFnProfessional(professional: IUser): string {
-    return professional ? getFullUserName(professional) : '';
+    return professional?.displayName ? professional.displayName : '';
   }
 
   dateNoContent(date?: any): string {
@@ -880,7 +878,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   private filterProfessional(name: string): IUser[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.professionalList?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
+    return this.professionalList?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
   }
 
   private completeStep(step: IStep): void {

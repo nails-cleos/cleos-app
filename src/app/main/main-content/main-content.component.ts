@@ -64,7 +64,7 @@ export class MainContentComponent implements OnInit, OnDestroy {
       this.isAuthenticated = value.isAuthenticated;
       if (this.isAuthenticated) {
         this.email.setValue(value.email);
-        this.name.setValue(value.username);
+        this.name.setValue(value.displayName);
       }
     });
     this.minDate = getNow();

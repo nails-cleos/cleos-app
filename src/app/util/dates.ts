@@ -1,6 +1,6 @@
 import { IAvailability, IAvailabilityAll, IRoom, IRoomAll } from '../interfaces/room';
 import {
-  addDays,
+  addDays, addMinutes,
   addMonths,
   addWeeks,
   endOfDay,
@@ -488,6 +488,7 @@ export const plusMonthDate = (date: Date, plus: number, day: number): Date => {
 };
 
 export const plusDays = (date: Date, plus: number): Date => addDays(new Date(date), plus);
+export const plusMinutes = (date: Date, plus: number): Date => addMinutes(date, plus);
 
 export const greaterOrEqualsThan = (date1: Date, date2: Date): boolean => date1 >= date2;
 

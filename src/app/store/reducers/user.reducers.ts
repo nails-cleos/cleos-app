@@ -77,7 +77,6 @@ export const reducer = (state = initialState, action: All): State => {
         message: null
       };
     }
-    case UserActionTypes.changePasswordSuccess:
     case UserActionTypes.userSaveSuccess: {
       return {
         ...state,
@@ -100,7 +99,6 @@ export const reducer = (state = initialState, action: All): State => {
     }
     case UserActionTypes.mergeUsers:
     case UserActionTypes.setRole:
-    case UserActionTypes.changePassword:
     case UserActionTypes.saveUser:
     case UserActionTypes.updateUser:
     case UserActionTypes.updatePhoto:

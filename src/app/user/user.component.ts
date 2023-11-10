@@ -55,13 +55,10 @@ export class UserComponent implements OnInit, OnDestroy {
       return;
     }
     const user: IUser = new User();
-    user.username = fieldChange(this.getForm.username as UntypedFormControl, this.user?.username);
     user.email = fieldChange(this.getForm.email as UntypedFormControl, this.user?.email);
-    user.firstName = fieldChange(this.getForm.firstName as UntypedFormControl, this.user?.firstName);
+    user.displayName = fieldChange(this.getForm.displayName as UntypedFormControl, this.user?.displayName);
     user.lang = valueChange(this.getForm.lang.value.value, this.user?.locale);
-    user.lastName = fieldChange(this.getForm.lastName as UntypedFormControl, this.user?.lastName);
     user.phone = fieldChange(this.getForm.phone as UntypedFormControl, this.user?.phone);
-    user.password = 'Ch4ng#';
     user.dob = fieldChange(this.getForm.dob as UntypedFormControl, this.user?.dob);
     user.dob = user.dob ? backendFormatDate(newDate(user.dob)) : user.dob;
 
@@ -129,11 +126,9 @@ export class UserComponent implements OnInit, OnDestroy {
   private createForm(): void {
     this.form = this.formBuilder.group({
       role: ['', Validators.required],
-      username: ['', Validators.required],
+      displayName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       lang: ['', Validators.required],
-      firstName: [''],
-      lastName: [''],
       phone: [''],
       dob: [''],
       darkColor: [''],
@@ -153,10 +148,8 @@ export class UserComponent implements OnInit, OnDestroy {
       if (state.selected) {
         this.user = state.selected;
         const user: IUser = {
-          username: this.user?.username,
           email: this.user?.email,
-          firstName: this.user?.firstName,
-          lastName: this.user?.lastName,
+          displayName: this.user?.displayName,
           phone: this.user?.phone,
         };
         this.form.patchValue(user);

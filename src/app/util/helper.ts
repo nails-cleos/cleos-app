@@ -18,68 +18,20 @@ import { CancelDialogComponent } from '../shared/dialog/cancel/cancel-dialog.com
 import { Router } from '@angular/router';
 import { CustomerEditDialogComponent } from '../shared/dialog/customer-edit/customer-edit-dialog.component';
 
+export const VERIFICATION_EMAIL = 'verification_email';
 export const hasRoomAdmin = (authorities?: IAuthority[]): boolean => !!authorities && authorities.length === 1 &&
   authorities.some(u => (u.authority === Role.roomAdmin));
 
 export const snakeToCamel = (value: string = ''): string =>
   value.toLowerCase().replace(/([-_]\w)/g, (g: string) => g[1].toUpperCase());
 
-export const getUserName = (user?: IUserAll | IUser): string => {
-  if (!user) {
-    return '';
-  }
-  let names: string[] = [];
-  if (user.firstName) {
-    names = [...names, user.firstName];
-  }
-  if (user.lastName) {
-    names = [...names, user.lastName];
-  }
-
-  if (!names || !names.length) {
-    return user.username ? user.username : '';
-  }
-
-  return names.join(' ');
-};
-
-export const getFullUserName = (user: IUserAll | IUser): string => {
-  let names: string[] = [];
-  if (user.firstName) {
-    names = [...names, user.firstName];
-  }
-  if (user.lastName) {
-    names = [...names, user.lastName];
-  }
-
-  if (user.username && (!names || !names.length)) {
-    names = [user.username];
-  }
-
-  names = [...names, `(${ user.email })`];
-  return names.join(' ');
-};
-
-export const getUserNameInitials = (user: IUserAll | undefined): string | undefined => {
+export const getDisplayNameInitials = (user: IUserAll | undefined): string | undefined => {
   if (!user) {
     return undefined;
   }
-  let names: string[] = [];
-  if (user.firstName) {
-    names = [...names, user.firstName];
-  }
-  if (user.lastName) {
-    names = [...names, user.lastName];
-  }
+  const names = user.displayName?.split(' ');
 
-  if (!names || !names.length) {
-    names = [...names, user.username];
-  }
-
-  let name = '';
-  names.forEach(n => name = name + n.charAt(0));
-
-  return name;
+  return names?.length ? names.reduce((p, c) => p + c.charAt(0), '') : undefined;
 };
 
 export const getUserImage = (user: IUser | IUserAll | undefined): string | undefined => {

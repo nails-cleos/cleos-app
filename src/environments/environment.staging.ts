@@ -12,7 +12,7 @@ export const environment = {
   googleClientId: '364998384255-kk09n0fq6p79s7oim94ljevf8bb0etip.apps.googleusercontent.com',
   facebookClientId: '453309609006101',
   firebase: {
-    apiKey: 'AIzaSyBHkZS6OP4IOLe6EI6jkGBYZTiHP2CIn7M',
+    apiKey: 'AIzaSyCIx8KV4QW1hJuOQWT3bKO4UkiQpCqU0dg',
     authDomain: 'nails-cleos-dev.firebaseapp.com',
     projectId: 'nails-cleos-dev',
     storageBucket: 'nails-cleos-dev.appspot.com',

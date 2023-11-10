@@ -25,7 +25,7 @@ import {
   zoneDateToDate
 } from '../../util/dates';
 import * as fromActionsUnavailable from '../../store/unavailable.actions';
-import { executeDialogNoWidth, getUserName } from '../../util/helper';
+import { executeDialogNoWidth } from '../../util/helper';
 import { map, startWith } from 'rxjs/operators';
 import { closest } from '../../util/numbers';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
@@ -162,7 +162,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   displayFn(user: IUser): string {
-    return user ? getUserName(user) : '';
+    return user?.displayName ? user.displayName : '';
   }
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d, this.roomAvailability);
@@ -314,7 +314,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
   private filter(name: string): IUser[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.professionals?.filter(option => getUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
+    return this.professionals?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
   }
 
   private getBlockAgenda(): void {

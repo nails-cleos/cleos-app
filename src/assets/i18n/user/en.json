@@ -2,15 +2,14 @@
   "USER": {
     "FIELD": "Users",
     "TITLE": "Add user",
-    "CUSTOMER": "Customer {{username}} created",
-    "PROFESSIONAL": "Professional {{username}} created",
-    "MANAGER": "Manager {{username}} created",
+    "CUSTOMER": "Customer {{displayName}} created",
+    "PROFESSIONAL": "Professional {{displayName}} created",
+    "MANAGER": "Manager {{displayName}} created",
     "DETAIL": "Update user",
     "LIST": {
       "COLUMN": {
-        "USERNAME": "Username",
+        "DISPLAY_NAME": "Display name",
         "EMAIL": "Email",
-        "PROVIDER": "Provider",
         "DETAIL": {
           "TITLE": "Roles"
         }
@@ -20,7 +19,8 @@
       },
       "STATUS": {
         "ENABLED": "Verified",
-        "DISABLED": "Not verified",
+        "DISABLED": "Unverified",
+        "NOT_CREATED": "Unregistered",
         "DELETED": "Deleted"
       }
     },
@@ -30,25 +30,25 @@
     },
     "DELETED": {
       "TITLE": "Delete user",
-      "CONTENT": "Are you sure to delete user {{username}}?",
-      "MESSAGE": "User {{username}} deleted"
+      "CONTENT": "Are you sure to delete user {{displayName}}?",
+      "MESSAGE": "User {{displayName}} deleted"
     },
     "RESTORE": {
       "TITLE": "Restore user",
-      "CONTENT": "Are you sure to restore user {{username}}?",
-      "MESSAGE": "User {{username}} restored"
+      "CONTENT": "Are you sure to restore user {{displayName}}?",
+      "MESSAGE": "User {{displayName}} restored"
     },
     "UPDATED": {
-      "MESSAGE": "User {{username}} updated"
+      "MESSAGE": "User {{displayName}} updated"
     },
     "ACTIVATION_RESEND": {
       "TITLE": "Resend activation code",
-      "CONTENT": "Are you sure to resend activation code to user {{username}}?",
+      "CONTENT": "Are you sure to resend activation code to user {{displayName}}?",
       "MESSAGE": "Activation code sent"
     },
     "ROLES": {
-      "REMOVE": "Role {{role}} removed to {{username}}",
-      "ADD": "Role {{role}} added to {{username}}"
+      "REMOVE": "Role {{role}} removed to {{displayName}}",
+      "ADD": "Role {{role}} added to {{displayName}}"
     },
     "MERGE": {
       "SELECT": "Select user to merge",

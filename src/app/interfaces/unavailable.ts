@@ -1,4 +1,4 @@
-import { IUser } from './user';
+import { IUser, IUserAll } from './user';
 
 export interface IUnavailable {
   id?: string;
@@ -24,7 +24,7 @@ export interface IUnavailableAll {
   timestamp: number;
   end: string;
   duration: string;
-  professional: IUser;
+  professional: IUserAll;
   repeat: string;
   allDay: boolean;
   type?: string;

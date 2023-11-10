@@ -10,7 +10,7 @@ import { fieldChange, requireMatchAsync, valueChange } from '../util/validators'
 import * as fromActionsNote from '../store/note.actions';
 import { INote, INoteAll, Note } from '../interfaces/note';
 import { IUser, IUserAll } from '../interfaces/user';
-import { executeDialogNoWidth, FrequencyEnum, getUserName } from '../util/helper';
+import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { map, startWith } from 'rxjs/operators';
@@ -111,7 +111,7 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   displayFn(user: IUser): string {
-    return user ? getUserName(user) : '';
+    return user?.displayName ? user.displayName : '';
   }
 
   keyDownHandler(event: any): void {
@@ -156,7 +156,7 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
   private filter(name: string): IUser[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.professionals?.filter(option => getUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
+    return this.professionals?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
   }
 
   private clean(): void {

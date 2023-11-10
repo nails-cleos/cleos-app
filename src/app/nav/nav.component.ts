@@ -31,7 +31,7 @@ import { INotification } from '../interfaces/notification';
 import { TranslateService } from '@ngx-translate/core';
 import { MessagingService } from '../services/messaging.service';
 import { environment } from '../../environments/environment';
-import { getUserImage, getUserNameInitials } from '../util/helper';
+import { getUserImage, getDisplayNameInitials } from '../util/helper';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NavigationService } from '../services/navigation.service';
 import { TokenService } from '../services/token.service';
@@ -60,7 +60,6 @@ export class NavComponent implements OnInit, OnDestroy {
   workDay: INotification[] = [];
   currentUser!: IUser | null;
 
-  canChangePassword = false;
   showInformation = true;
 
   dateFormat: string;
@@ -205,8 +204,7 @@ export class NavComponent implements OnInit, OnDestroy {
         this.currentUser = user;
         this.resetTheme(this.currentUser.theme);
         this.menuItems = state.menus;
-        this.canChangePassword = user?.provider === 'LOCAL';
-        this.initials = getUserNameInitials(user);
+        this.initials = getDisplayNameInitials(user);
         this.image = getUserImage(user);
         this.messagingService.requestPermission(user);
         this.messagingService.receiveMessage();

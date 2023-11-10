@@ -16,10 +16,9 @@ import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material
 import * as fromActionsUser from '../../store/user.actions';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { map, startWith } from 'rxjs/operators';
-import { executeDialog, getFullUserName } from '../../util/helper';
+import { executeDialog } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
-import { CustomerEditDialogComponent } from '../../shared/dialog/customer-edit/customer-edit-dialog.component';
 
 @Component({
   selector: 'app-discounts',
@@ -224,8 +223,8 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
 
   sortCustomers(data: any): IUser[] {
     return data.sort((a: any, b: any) => {
-      const aName = getFullUserName(a).toUpperCase();
-      const bName = getFullUserName(b).toUpperCase();
+      const aName = a.displayName.toUpperCase();
+      const bName = b.displayName.toUpperCase();
       return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
     });
   }
@@ -264,6 +263,6 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
   private filter(name: string): IUserAll[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.allCustomers?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
+    return this.allCustomers?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
   }
 }

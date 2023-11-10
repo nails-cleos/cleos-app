@@ -25,7 +25,7 @@ import {
   zoneDateToDate
 } from '../util/dates';
 import { IRoomAll } from '../interfaces/room';
-import { executeDialogNoWidth, FrequencyEnum, getUserName } from '../util/helper';
+import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
 import { ActivatedRoute, Router } from '@angular/router';
 import { closest } from '../util/numbers';
 import { fieldChange, requireMatchAsync, valueChange } from '../util/validators';
@@ -180,7 +180,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   displayFn(user: IUser): string {
-    return user ? getUserName(user) : '';
+    return user?.displayName ? user.displayName : '';
   }
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d, this.roomAvailability);
@@ -370,7 +370,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
   private filter(name: string): IUser[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.professionals?.filter(option => getUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
+    return this.professionals?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
   }
 
   private getUnavailable(): void {

@@ -14,7 +14,7 @@
     <ng-container matColumnDef="customer">
       <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.CUSTOMER' | translate }}</th>
       <td *matCellDef="let reservation" mat-cell>
-        <div *ngIf="reservation.id; else skeleton">{{reservation?.customer | userName}}</div>
+        <div *ngIf="reservation.id; else skeleton">{{reservation?.customer.displayName}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
@@ -25,7 +25,7 @@
       <th *matHeaderCellDef fxHide.lt-sm fxShow
           mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</th>
       <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
-        <div *ngIf="reservation.id; else skeleton">{{reservation?.professional | userName}}</div>
+        <div *ngIf="reservation.id; else skeleton">{{reservation?.professional.displayName}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
@@ -98,7 +98,7 @@
           <mat-list *ngIf="reservation.id">
             <div matListItemTitle>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
             <mat-list-item role="list">
-              <div matListItemLine>{{reservation?.professional | userName}}</div>
+              <div matListItemLine>{{reservation?.professional.displayName}}</div>
             </mat-list-item>
             <div matListItemTitle>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</div>
             <mat-list-item role="list">
