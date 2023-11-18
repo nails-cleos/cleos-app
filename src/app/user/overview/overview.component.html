@@ -15,7 +15,7 @@
           </ng-template>
           <div class="dashboard-card-content">
             <div *ngIf="customer; else skeletonTitle" class="top-space">
-              <h2 class="bold">{{username}}</h2>
+              <h2 class="bold">{{customer.displayName}}</h2>
             </div>
             <div class="text-center" *ngIf="customer; else skeleton">
               <mat-icon color="primary">cake</mat-icon>

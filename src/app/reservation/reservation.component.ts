@@ -62,12 +62,10 @@ import {
   createTreatmentGroupService,
   executeDialogNoWidth,
   getBackIndex,
-  getFullUserName,
   getIndex,
   getPrice,
   getStep,
   getTreatmentDurability,
-  getUserName,
   newAdditional,
   newDiscount,
   newPrice,
@@ -477,7 +475,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   myFilter = (d: Date | null): boolean => filterDateRoom(d, this.room.value);
 
   displayFnUser(user: IUser): string {
-    return user ? getUserName(user) : '';
+    return user?.displayName ? user.displayName : '';
   }
 
   displayFnGroup(group: ITreatmentGroup): string {
@@ -497,7 +495,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   displayFnProfessional(professional: IUser): string {
-    return professional ? getFullUserName(professional) : '';
+    return professional?.displayName ? professional.displayName : '';
   }
 
   openDialog(reservationDate?: Date): void {
@@ -626,8 +624,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     treatments += this.additionalSelected.map(additional => createBullet(additional.name));
 
     const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
-      customerName: getUserName(this.customer.value),
-      professionalName: getUserName(this.professional.value),
+      customerName: this.customer.value.displayName,
+      professionalName: this.professional.value.displayName,
       treatments
     });
 
@@ -871,8 +869,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         treatments += it.additional?.map(additional => createBullet(additional.name));
 
         const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
-          customerName: getUserName(it.customer),
-          professionalName: getUserName(it.professional),
+          customerName: it.customer.displayName,
+          professionalName: it.professional.displayName,
           treatments
         });
 
@@ -898,7 +896,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         const professionalId = it.professional.id;
         const title = this.translate.instant('RESERVATION.EVENT.UNAVAILABLE', {
           description: it.description ? it.description : '',
-          professionalName: getUserName(it.professional)
+          professionalName: it.professional.displayName
         });
         let path = 'unavailable/';
         if (it.type === 'BLOCK_AGENDA') {
@@ -1107,7 +1105,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   private filterCustomer(name: string): IUser[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.customers?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
+    return this.customers?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
   }
 
   private filterGroup(name: string): IGroupService[] | undefined {
@@ -1137,7 +1135,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   private filterProfessional(name: string): IUser[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.professionalList?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
+    return this.professionalList?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
   }
 
   private completeAndNext(): void {

@@ -6,7 +6,6 @@ import { requireMatch } from '../../util/validators';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
-import { getFullUserName, getUserName } from '../../util/helper';
 import { map, startWith } from 'rxjs/operators';
 import * as fromActionsUser from '../../store/user.actions';
 
@@ -52,7 +51,7 @@ export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
   }
 
   displayFnUser(user: IUser): string {
-    return user ? getUserName(user) : '';
+    return user?.displayName ? user.displayName : '';
   }
 
   keyDownHandler(event: any): void {
@@ -78,7 +77,7 @@ export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
   private filterCustomer(name: string): IUser[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.customers?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
+    return this.customers?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
   }
 
   private getCustomers(): void {

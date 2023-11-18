@@ -27,7 +27,7 @@
                   </label>
                   <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
                     <mat-option *ngFor="let manager of filteredOptions | async" [value]="manager">
-                      {{manager | userName}}
+                      {{manager.displayName}}
                     </mat-option>
                   </mat-autocomplete>
                   <mat-error *ngIf="manager.hasError('required')"

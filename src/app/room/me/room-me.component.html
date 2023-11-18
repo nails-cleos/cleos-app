@@ -41,7 +41,7 @@
                     <mat-chip-grid #chipList aria-label="Professional selection" required>
                       <mat-chip-row (removed)="remove(professional)" *ngFor="let professional of professionals"
                                     [removable]="true">
-                        {{professional | userName}}
+                        {{professional.displayName}}
                         <mat-icon matChipRemove>cancel</mat-icon>
                       </mat-chip-row>
                       <input #professionalInput [formControl]="professional" [matAutocomplete]="auto"
@@ -50,7 +50,7 @@
                     <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
                       <mat-option *ngFor="let professional of sortProfessionals(filteredProfessionals | async)"
                                   [value]="professional">
-                        {{professional | userName}}
+                        {{professional.displayName}}
                       </mat-option>
                     </mat-autocomplete>
                   </mat-form-field>

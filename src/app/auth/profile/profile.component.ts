@@ -8,7 +8,7 @@ import * as fromActionsUser from '../../store/user.actions';
 import { fieldChange, valueChange } from '../../util/validators';
 import { Location } from '@angular/common';
 import { findFlag, flags, IFlag } from '../../util/flags';
-import { getUserImage, getUserNameInitials } from '../../util/helper';
+import { getUserImage, getDisplayNameInitials } from '../../util/helper';
 import { backendFormatDate, createDateFromString, newDate } from '../../util/dates';
 import { Color } from '@angular-material-components/color-picker';
 import { lightenDarkenColor } from '../../util/color';
@@ -26,19 +26,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
   form!: UntypedFormGroup;
   errors: any = [];
   user?: IUser;
-  canChange = false;
   image: any;
   initials?: string;
 
-  username: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required
-  ]);
   langValue: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
   ]);
 
-  firstName: UntypedFormControl = new UntypedFormControl();
-  lastName: UntypedFormControl = new UntypedFormControl();
+  displayName: UntypedFormControl = new UntypedFormControl();
   phone: UntypedFormControl = new UntypedFormControl();
   dob: UntypedFormControl = new UntypedFormControl();
   darkColor: UntypedFormControl = new UntypedFormControl();
@@ -71,10 +66,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
     const user: IUser = new User();
     user.lang = valueChange(this.langValue.value.value, this.user?.locale);
-    user.username = fieldChange(this.username, this.user?.username);
-    user.firstName = fieldChange(this.firstName, this.user?.firstName);
-    user.lastName = fieldChange(this.lastName, this.user?.lastName);
+    user.displayName = fieldChange(this.displayName, this.user?.displayName);
     user.phone = fieldChange(this.phone, this.user?.phone);
+    user.dob = fieldChange(this.dob, this.user?.dob);
     user.dob = user.dob ? backendFormatDate(newDate(user.dob)) : user.dob;
     user.showCash = this.showCash;
 
@@ -146,10 +140,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   private createForm(): void {
     this.form = this.formBuilder.group({
-      username: this.username,
       langValue: this.langValue,
-      firstName: this.firstName,
-      lastName: this.lastName,
+      displayName: this.displayName,
       phone: this.phone,
       dob: this.dob,
       darkColor: this.darkColor,
@@ -169,8 +161,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       if (state.selected) {
         const user = state.selected;
         this.user = user;
-        this.canChange = user?.provider === 'LOCAL';
-        this.initials = getUserNameInitials(user);
+        this.initials = getDisplayNameInitials(user);
         this.image = getUserImage(user);
         this.form.patchValue(state.selected);
         this.address.setValue(this.user?.address?.name);

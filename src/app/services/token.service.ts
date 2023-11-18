@@ -1,32 +1,34 @@
 import { Injectable } from '@angular/core';
-import { HttpHeaders, HttpClient } from '@angular/common/http';
-import { Observable, timer, Subscription, Subject } from 'rxjs';
-import { shareReplay, switchMap, map, takeUntil } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { Observable, Subject, Subscription, timer } from 'rxjs';
+import { shareReplay, switchMap, takeUntil } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { IUserAll } from '../interfaces/user';
 import { Store } from '@ngrx/store';
 import { AppState } from '../store/app.states';
-import * as fromActionsLogin from '../store/auth.actions';
-
-export interface RefreshTokenResponse {
-  refreshToken: string;
-}
+import { Auth, user } from '@angular/fire/auth';
+import { User } from '@firebase/auth';
+import { getNow, newDate, plusMinutes } from '../util/dates';
 
 @Injectable()
 export class TokenService {
-  private myTokenCache?: Observable<RefreshTokenResponse>;
+  private myTokenCache?: Observable<User | null>;
   private readonly cacheSize = 1;
-  private readonly refreshInterval = 45000; // 45 sec
+  private readonly refreshInterval = 5 * 60 * 1000; // 5 min
   private myToken?: string;
   private myUser: any;
   private myTokenSubscription?: Subscription;
   private stopTimer?: Subject<boolean>;
 
-  constructor(private http: HttpClient, private router: Router, private store: Store<AppState>) {
+  constructor(private http: HttpClient, private router: Router, private store: Store<AppState>, private auth: Auth) {
   }
 
-  get tokenStream(): Observable<string> | undefined {
-    return this.myTokenCache?.pipe(map(response => response.refreshToken));
+  get user(): IUserAll {
+    return this.myUser;
+  }
+
+  set user(myUser: IUserAll) {
+    this.myUser = myUser;
   }
 
   get token(): string {
@@ -41,27 +43,23 @@ export class TokenService {
       const myTimer = timer(0, this.refreshInterval);
       this.myTokenCache = myTimer.pipe(
         takeUntil(myStopTimer),
-        switchMap(() => this.refreshToken()),
+        switchMap(() => user(this.auth)),
         shareReplay(this.cacheSize));
-      this.myTokenSubscription = this.myTokenCache.subscribe(newToken => {
-        this.store.dispatch(
-          new fromActionsLogin.RefreshToken(newToken)
-        );
-        this.myToken = newToken.refreshToken;
-      }, () => this.clear());
+      this.myTokenSubscription = this.myTokenCache.subscribe({
+        next: (firebaseUser) => firebaseUser?.getIdTokenResult().then(tokenResult => {
+          const expirationTime = plusMinutes(newDate(tokenResult.expirationTime), -10);
+          if (getNow() >= expirationTime) {
+              firebaseUser.getIdToken(true).then(newToken => this.myToken = newToken);
+          }
+        }),
+        error: () => this.clear(),
+        complete: () => this.clear()
+      });
     }
   }
 
-  get user(): IUserAll {
-    return this.myUser;
-  }
-
-  set user(user: IUserAll) {
-    this.myUser = user;
-  }
-
   public createTokenHeader(): string {
-    return this.token ? `Bearer ${this.token}` : '';
+    return this.token ? this.token : '';
   }
 
   public clear(): void {
@@ -76,22 +74,6 @@ export class TokenService {
     this.myToken = undefined;
     this.myUser = undefined;
     this.router.navigate(['/login']);
-  }
-
-  private createHeader(): HttpHeaders {
-    let reqOptions = new HttpHeaders().set('Content-Type', 'application/json');
-    if (this.token) {
-      reqOptions = new HttpHeaders().set('Content-Type', 'application/json')
-        .set('Authorization', `Bearer ${this.token}`);
-    }
-
-    return reqOptions;
-  }
-
-  private refreshToken(): Observable<RefreshTokenResponse> {
-    return this.http.get<RefreshTokenResponse>('v1/auth/refresh', {
-      headers: this.createHeader()
-    });
   }
 }
 

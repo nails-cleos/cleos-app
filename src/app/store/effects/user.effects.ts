@@ -63,28 +63,28 @@ export class UserEffects {
         case Role.customer:
           return this.userService.addCustomer(payload.user).pipe(
             switchMap((response: any) => {
-              const message = this.translate.instant('USER.CUSTOMER', { username: response.username });
+              const message = this.translate.instant('USER.CUSTOMER', { displayName: response.displayName });
               return of(new fromActionsUser.UserSaveSuccess({ message }));
             }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
           );
         case Role.manager:
           return this.userService.addManager(payload.user).pipe(
             switchMap((response: any) => {
-              const message = this.translate.instant('USER.MANAGER', { username: response.username });
+              const message = this.translate.instant('USER.MANAGER', { displayName: response.displayName });
               return of(new fromActionsUser.UserSaveSuccess({ message }));
             }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
           );
         case Role.professional:
           return this.userService.addProfessional(payload.user).pipe(
             switchMap((response: any) => {
-              const message = this.translate.instant('USER.PROFESSIONAL', { username: response.username });
+              const message = this.translate.instant('USER.PROFESSIONAL', { displayName: response.displayName });
               return of(new fromActionsUser.UserSaveSuccess({ message }));
             }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
           );
         default:
           return this.userService.update(payload.user).pipe(
             switchMap((response: any) => {
-              const message = this.translate.instant('USER.UPDATED.MESSAGE', { username: response.username });
+              const message = this.translate.instant('USER.UPDATED.MESSAGE', { displayName: response.displayName });
               return of(new fromActionsUser.UserSaveSuccess({ message }));
             }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
           );
@@ -97,7 +97,7 @@ export class UserEffects {
     switchMap((payload: any) => this.userService.setRole(payload.user.id, payload.role).pipe(
       switchMap(() => {
         const role = this.translate.instant(`COMMON.ROLES.${ payload.role }`);
-        const message = this.translate.instant(`USER.ROLES.${ payload.action }`, { role, username: payload.user.username });
+        const message = this.translate.instant(`USER.ROLES.${ payload.action }`, { role, displayName: payload.user.displayName });
         return of(new fromActionsUser.UserSaveSuccess({ message }));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
     ))
@@ -107,7 +107,7 @@ export class UserEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.userService.updateMe(payload.user).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('COMMON.PROFILE.UPDATED.MESSAGE', { username: response.user.username });
+        const message = this.translate.instant('COMMON.PROFILE.UPDATED.MESSAGE', { displayName: response.user.displayName });
         return of(new LoginSuccess({
           response, queryParams: {
             state: btoa(JSON.stringify({ returnUrl: payload.redirectUrl }))
@@ -135,7 +135,7 @@ export class UserEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.userService.delete(payload).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('USER.DELETED.MESSAGE', { username: response.username });
+        const message = this.translate.instant('USER.DELETED.MESSAGE', { displayName: response.displayName });
         return of(new fromActionsUser.UserSaveSuccess({ message }));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
     ))
@@ -145,7 +145,7 @@ export class UserEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.userService.restore(payload).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('USER.RESTORE.MESSAGE', { username: response.username });
+        const message = this.translate.instant('USER.RESTORE.MESSAGE', { displayName: response.displayName });
         return of(new fromActionsUser.UserSaveSuccess({ message }));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
     ))
@@ -157,16 +157,6 @@ export class UserEffects {
       switchMap(() => {
         const message = this.translate.instant('USER.ACTIVATION_RESEND.MESSAGE');
         return of(new fromActionsUser.UserSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
-    ))
-  ));
-
-  changePassword$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.changePassword)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.userService.changePassword(payload.username, payload.oldPassword, payload.password).pipe(
-      switchMap(() => {
-        const message = this.translate.instant('USER.CHANGE_PASSWORD.MESSAGE');
-        return of(new fromActionsUser.ChangePasswordSuccess({ message }));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
     ))
   ));
@@ -204,10 +194,6 @@ export class UserEffects {
 
   saveSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsUser.UserActionTypes.userSaveSuccess)), { dispatch: false });
-
-  changePasswordSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsUser.UserActionTypes.changePasswordSuccess)
-  ), { dispatch: false });
 
   disableUsersSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsUser.UserActionTypes.disableUsersSuccess)

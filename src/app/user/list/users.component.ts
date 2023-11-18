@@ -12,7 +12,7 @@ import { MatSort } from '@angular/material/sort';
 import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
 import { TranslateService } from '@ngx-translate/core';
 import { Role } from '../../interfaces/token';
-import { executeDialogNoWidth, getFullUserName, getUserName, snakeToCamel } from '../../util/helper';
+import { executeDialogNoWidth, snakeToCamel } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
 import { RoleIconKey, RoleIconName } from '../../util/icon';
@@ -20,6 +20,7 @@ import { Router } from '@angular/router';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { requireMatch } from '../../util/validators';
 import { map, startWith } from 'rxjs/operators';
+import { getAuth, signOut } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-users',
@@ -31,7 +32,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['position', 'firstName', 'username', 'email', 'provider', 'status', 'actions'];
+  displayedColumns: string[] = ['position', 'displayName', 'email', 'status', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IUser>>();
 
   expandedUser?: IUser;
@@ -89,7 +90,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   delete(user: IUser): void {
     this.noExpanded(user);
     const title = this.translate.instant('USER.DELETED.TITLE');
-    const content = this.translate.instant('USER.DELETED.CONTENT', { username: getUserName(user) });
+    const content = this.translate.instant('USER.DELETED.CONTENT', { displayName: user.displayName });
     const dialogRef = this.dialog.open(DialogComponent, {
       data: { title, content, value: user }
     });
@@ -106,7 +107,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   sendInvite(user: IUser): void {
     this.noExpanded(user);
     const title = this.translate.instant('USER.ACTIVATION_RESEND.TITLE');
-    const content = this.translate.instant('USER.ACTIVATION_RESEND.CONTENT', { username: getUserName(user) });
+    const content = this.translate.instant('USER.ACTIVATION_RESEND.CONTENT', { displayName: user.displayName });
     const dialogRef = this.dialog.open(DialogComponent, {
       data: { title, content, value: user }
     });
@@ -123,7 +124,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   restore(user: IUser): void {
     this.noExpanded(user);
     const title = this.translate.instant('USER.RESTORE.TITLE');
-    const content = this.translate.instant('USER.RESTORE.CONTENT', { username: getUserName(user) });
+    const content = this.translate.instant('USER.RESTORE.CONTENT', { displayName: user.displayName });
     const dialogRef = this.dialog.open(DialogComponent, {
       data: { title, content, value: user }
     });
@@ -286,7 +287,7 @@ export class SelectUserDialogComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   displayFnUser(user: IUser): string {
-    return user ? getUserName(user) : '';
+    return user?.displayName ? user.displayName : '';
   }
 
   keyDownHandler(event: any): void {
@@ -326,7 +327,7 @@ export class SelectUserDialogComponent implements OnInit, AfterViewInit, OnDestr
   private filterUser(name: string): IUser[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.users?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
+    return this.users?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
   }
 }
 

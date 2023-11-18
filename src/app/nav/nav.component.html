@@ -13,7 +13,7 @@
                 <div class="initials">{{ initials | uppercase }}</div>
               </ng-template>
             </div>
-            <mat-card-title>{{currentUser | userName | uppercase}}</mat-card-title>
+            <mat-card-title>{{currentUser.displayName | uppercase}}</mat-card-title>
             <mat-card-subtitle>{{currentUser.email}}</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
@@ -87,7 +87,7 @@
       <img alt="logo" src="../../assets/icons/icon-512x512.png">
       <span>{{title}}</span>
       <span class="align-right"></span>
-      <div *ngIf="currentUser?.username; else login">
+      <div *ngIf="currentUser?.email; else login">
         <ng-template [ngIf]="isProfessional && workDay.length" [ngIfElse]="workDayIcon">
           <button [matMenuTriggerFor]="menuWorkDay" class="badge-padding" mat-icon-button>
             <mat-icon [matBadgeHidden]="!workDay.length" [matBadgeOverlap]="true" [matBadge]="workDay.length"
@@ -177,13 +177,6 @@
               </ng-template>
               <div mat-line>{{'COMMON.DASHBOARD.PROFILE' | translate }}</div>
             </a>
-            <mat-divider></mat-divider>
-            <ng-template [ngIf]="canChangePassword">
-              <a [routerLink]="'/auth/change-password'" mat-list-item>
-                <mat-icon matListItemIcon>password</mat-icon>
-                <div mat-line>{{'COMMON.DASHBOARD.CHANGE_PASSWORD' | translate }}</div>
-              </a>
-            </ng-template>
             <mat-divider></mat-divider>
             <a (click)="changeTheme" mat-list-item>
               <mat-icon matListItemIcon>{{isDarkMode ? 'light_mode' : 'dark_mode'}}</mat-icon>

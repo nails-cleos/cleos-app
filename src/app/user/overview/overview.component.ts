@@ -3,7 +3,7 @@ import { map } from 'rxjs/operators';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
-import { getUserImage, getUserName, getUserNameInitials } from '../../util/helper';
+import { getUserImage, getDisplayNameInitials } from '../../util/helper';
 import { Observable, Subscription } from 'rxjs';
 import * as fromActionsUser from '../../store/user.actions';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -26,7 +26,6 @@ export class OverviewComponent implements OnInit, OnDestroy {
   account?: IAccountAll;
   customer?: IUserAll;
   initials?: string;
-  username?: string;
 
   miniCardData: IReservationOverview[] = [{} as IReservationOverview, {} as IReservationOverview];
   charts: IChart[] = [{} as IChart, {} as IChart];
@@ -115,8 +114,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
         this.account = state.data.account;
         this.customer = this.account?.customer;
         this.image = getUserImage(this.customer);
-        this.initials = getUserNameInitials(this.customer);
-        this.username = getUserName(this.customer);
+        this.initials = getDisplayNameInitials(this.customer);
         if (state.data.upcomingList) {
           this.upcoming = state.data.upcomingList;
         }

@@ -25,21 +25,13 @@ import {
   subPeriod
 } from '../../util/dates';
 import { IRoom, IRoomAll } from '../../interfaces/room';
-import {
-  allDayEvent,
-  calendarEvent,
-  createBullet,
-  fillNotAvailable,
-  getFrequency,
-  getOverlapEvent,
-  Meta
-} from '../../util/event';
+import { allDayEvent, calendarEvent, createBullet, fillNotAvailable, getFrequency, getOverlapEvent, Meta } from '../../util/event';
 import { Router } from '@angular/router';
 import { CalendarEvent, CalendarEventTimesChangedEvent } from 'angular-calendar';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { IUnavailableAll } from '../../interfaces/unavailable';
-import { createRoomOffice, executeDialogNoWidth, FrequencyEnum, getFullUserName, getUserName } from '../../util/helper';
+import { createRoomOffice, executeDialogNoWidth, FrequencyEnum } from '../../util/helper';
 import { addDays, addMonths, isEqual, startOfWeek } from 'date-fns';
 import { findStateColor } from '../../util/theme';
 import { map, startWith, takeUntil } from 'rxjs/operators';
@@ -189,7 +181,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   displayFnProfessional(professional: IUser): string {
-    return professional ? getFullUserName(professional) : '';
+    return professional?.displayName ? professional.displayName : '';
   }
 
   keyDownHandler(event: any, form: UntypedFormControl): void {
@@ -362,15 +354,15 @@ export class CalendarComponent implements OnInit, OnDestroy {
         treatments += it.additional?.map(additional => createBullet(additional.name));
 
         const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
-          customerName: getUserName(it.customer),
-          professionalName: getUserName(it.professional),
+          customerName: it.customer.displayName,
+          professionalName: it.professional.displayName,
           treatments
         });
 
         const color = findStateColor(it.state, darkMode);
         const meta = new Meta(true, it.room.timeZone);
         meta.id = it.id;
-        meta.customer = getUserName(it.customer);
+        meta.customer = it.customer.displayName;
         const draggable = [States.approved, States.created, States.partiallyPaid, States.paid].includes(it.state as States);
         const event = calendarEvent(detail, color, start, darkMode, end, `reservation/${ it.id }`, meta, draggable);
         let events;
@@ -396,7 +388,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
         const allDay = it.allDay;
         const title = this.translate.instant('RESERVATION.EVENT.UNAVAILABLE', {
           description: it.description ? it.description : '',
-          professionalName: getUserName(it.professional)
+          professionalName: it.professional.displayName
         });
         let path = 'unavailable/';
         if (it.type === 'BLOCK_AGENDA') {
@@ -426,7 +418,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     birthdays.forEach(it => {
       if (it.dob) {
         const detail = this.translate.instant('RESERVATION.EVENT.BIRTHDAY', {
-          customerName: getUserName(it)
+          customerName: it.displayName
         });
         const startDate = newDateTimestamp(it.dob);
         startDate.setFullYear(getNow().getFullYear());
@@ -580,6 +572,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
   private filterProfessional(name: string): IUser[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.professionalList?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
+    return this.professionalList?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
   }
 }

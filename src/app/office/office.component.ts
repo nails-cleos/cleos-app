@@ -7,7 +7,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { AppState, selectOfficeState } from '../store/app.states';
 import { Router } from '@angular/router';
-import { getUserName } from '../util/helper';
 import * as fromActionsOffice from '../store/office.actions';
 import { Role } from '../interfaces/token';
 import { map, startWith } from 'rxjs/operators';
@@ -81,7 +80,7 @@ export class OfficeComponent implements OnInit, OnDestroy {
   }
 
   displayFn(user: IUser): string {
-    return user ? getUserName(user) : '';
+    return user?.displayName ? user.displayName : '';
   }
 
   private createForm(): void {
@@ -132,7 +131,7 @@ export class OfficeComponent implements OnInit, OnDestroy {
   private filter(name: string): IUser[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.managers?.filter(option => getUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
+    return this.managers?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
   }
 }
 
