@@ -27,6 +27,7 @@ export class LoginEffects {
 
   loginSuccess$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.loginSuccess),
     tap((response: any) => {
+      let redirectUrl = ['auth', 'redirect'];
       if (Object.keys(response.payload.queryParams).length) {
         const state = JSON.parse(atob(response.payload.queryParams.state));
         const decodedURI = state.returnUrl;
@@ -36,11 +37,14 @@ export class LoginEffects {
             ?.replace(/&/g, '","')?.replace(/=/g, '":"')) + '"}');
           this.navigationService.reload(decodedURI?.slice(0, paramsIndex)?.split('/'), state.data, queryParams);
         } else {
-          const redirectUrl = decodedURI?.split('/') || ['auth', 'redirect'];
+          if (decodedURI) {
+            const [, ...rest] = decodedURI.split('/');
+            redirectUrl = ['/', ...rest];
+          }
           this.navigationService.reload(redirectUrl, state.data);
         }
       } else {
-        this.navigationService.reload(['auth', 'redirect']);
+        this.navigationService.reload(redirectUrl);
       }
     })
   ), { dispatch: false });
