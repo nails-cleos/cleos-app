@@ -6,7 +6,7 @@ import { AppState, selectPaymentState } from '../../../store/app.states';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { getBackIndex, getPrice, getStep, getUserName, newPercentage } from '../../../util/helper';
+import { getBackIndex, getPrice, getStep, newPercentage } from '../../../util/helper';
 import { IStep, Step } from '../../../interfaces/step';
 import { MatStepper } from '@angular/material/stepper';
 import { getPaymentOptions, getPayNlOptions, IPaymentOption, PaymentType } from '../../../interfaces/payment';
@@ -87,7 +87,8 @@ export class OptionComponent implements OnInit, OnDestroy {
   }
 
   get professionalName(): string {
-    return getUserName(this.reservation?.professional);
+    const displayName = this.reservation?.professional?.displayName;
+    return displayName ? displayName : '';
   }
 
   private static goNext(step: IStep): void {

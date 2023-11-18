@@ -1,15 +1,17 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, Optional, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, Optional } from '@angular/core';
 import { Store } from '@ngrx/store';
 import * as fromActionsLogin from '../store/auth.actions';
 import { AppState, selectAuthState } from '../store/app.states';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { THEME } from '../util/theme';
 import { CookieService } from 'ngx-cookie-service';
-import { Auth, authState } from '@angular/fire/auth';
+import { Auth, authState, sendEmailVerification } from '@angular/fire/auth';
 import { firebase, firebaseui } from 'firebaseui-angular';
-import { isIPhone, isMobile } from '../util/helper';
+import { isIPhone, isMobile, VERIFICATION_EMAIL } from '../util/helper';
+import { THEME } from '../util/theme';
+import { UntypedFormControl } from '@angular/forms';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-auth',
@@ -18,17 +20,16 @@ import { isIPhone, isMobile } from '../util/helper';
 })
 export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  @ViewChild('authGroup') authGroup: any;
-
-  code?: string | null;
+  code: string | null = null;
+  codeForm: UntypedFormControl = new UntypedFormControl();
 
   private subscription?: Subscription;
   private getState: Observable<any>;
   private authSubscription?: Subscription;
   private ui: firebaseui.auth.AuthUI;
 
-  constructor(@Optional() private auth: Auth, private store: Store<AppState>, private route: ActivatedRoute,
-              private snackBar: MatSnackBar, private router: Router, private cookieService: CookieService) {
+  constructor(@Optional() private auth: Auth, private store: Store<AppState>, private route: ActivatedRoute, private snackBar: MatSnackBar,
+              private router: Router, private cookieService: CookieService, private translate: TranslateService) {
     this.getState = this.store.select(selectAuthState);
     this.ui = new firebaseui.auth.AuthUI(this.auth);
   }
@@ -36,6 +37,14 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.clean();
     this.subscribe();
+  }
+
+  ngAfterViewInit(): void {
+    if (this.code) {
+      this.codeForm.setValue(this.code);
+    }
+    const queryState = this.route.snapshot.queryParamMap.get('state');
+    const signInSuccessUrl = queryState ? `${ location.origin }${ JSON.parse(atob(queryState)).returnUrl }` : location.href;
     const uiConfig = {
       callbacks: {
         signInSuccessWithAuthResult: () => true,
@@ -47,28 +56,26 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       },
       signInFlow: isMobile() && !isIPhone() ? 'redirect' : 'popup',
-      signInSuccessUrl: location.href,
+      signInSuccessUrl,
       signInOptions: [
-        firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-        // firebase.auth.FacebookAuthProvider.PROVIDER_ID,
-        // firebase.auth.EmailAuthProvider.PROVIDER_ID
-      ]
+        {
+          provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+          scopes: [
+            'https://www.googleapis.com/auth/admin.directory.user.readonly'
+          ]
+        },
+        {
+          requireDisplayName: true,
+          provider: firebase.auth.EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD
+        }
+      ],
+      credentialHelper: firebaseui.auth.CredentialHelper.GOOGLE_YOLO
       // Terms of service url.
       // tosUrl: '<your-tos-url>',
       // Privacy policy url.
       // privacyPolicyUrl: '<your-privacy-policy-url>'
     };
     this.ui.start('#firebaseui-auth-container', uiConfig);
-  }
-
-  ngAfterViewInit(): void {
-    if (this.code) {
-      this.authGroup.selectedIndex = 1;
-    }
-  }
-
-  getCode($event: string): void {
-    this.code = $event;
   }
 
   ngOnDestroy(): void {
@@ -78,13 +85,6 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe((state) => {
-      const queryState = this.route.snapshot.queryParamMap.get('state');
-      const returnUrl = queryState ? JSON.parse(atob(queryState)).returnUrl : null;
-      if (state.isAuthenticated && !state.redirect && !returnUrl) {
-        this.store.dispatch(
-          new fromActionsLogin.Redirect()
-        );
-      }
       if (!state.subErrors && (state.errorMessage || state.message)) {
         const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
           duration: 5000
@@ -96,21 +96,35 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     });
+    this.codeForm.valueChanges.subscribe(value => {
+      if (value) {
+        localStorage.setItem('CODE', value);
+      }
+    });
     this.authSubscription = authState(this.auth).subscribe(response => {
-      if (response && response.providerData[0].providerId === 'google.com') {
-        this.auth.currentUser?.getIdToken().then(idToken => {
-          this.store.dispatch(
-            new fromActionsLogin.SocialLogin({
-              socialUser: {
-                idToken,
-                provider: response.providerId.toUpperCase()
-              },
+      if (response) {
+        if (!response.emailVerified && !this.cookieService.get(VERIFICATION_EMAIL)) {
+          sendEmailVerification(response).then(() => {
+            const message = this.translate.instant('AUTH.ACTIVATE_ACCOUNT.MESSAGE');
+            this.store.dispatch(
+              new fromActionsLogin.SignUpSuccess({ message })
+            );
+            this.cookieService.set(VERIFICATION_EMAIL, 'sent');
+          }).catch(e => console.error(`Error sending email verification. ${ e }`));
+        } else {
+          response.getIdToken().then(idToken => {
+            const payload = {
+              idToken,
               theme: this.cookieService.get(THEME),
-              code: this.code,
+              code: localStorage.getItem('CODE'),
               queryParams: this.route.snapshot.queryParams
-            })
-          );
-        });
+            };
+            localStorage.removeItem('CODE');
+            this.store.dispatch(
+              new fromActionsLogin.Login(payload)
+            );
+          });
+        }
       }
     });
   }

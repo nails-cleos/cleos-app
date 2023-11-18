@@ -52,7 +52,7 @@
           mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</th>
       <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
         <div
-          *ngIf="reservation.id; else skeleton">{{reservation?.professional | userName}}</div>
+          *ngIf="reservation.id; else skeleton">{{reservation?.professional?.displayName}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>

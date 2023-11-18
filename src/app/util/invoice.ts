@@ -1,6 +1,6 @@
 import { IRoomAll } from '../interfaces/room';
 import { IUserAll } from '../interfaces/user';
-import { currencySymbol, getUserName } from './helper';
+import { currencySymbol } from './helper';
 import { IInvoice, IItem, ITotals } from '../interfaces/invoice';
 import { API_LOCALE, dayViewTitle, invoiceTitle, newDateTimestamp } from './dates';
 import { environment } from '../../environments/environment';
@@ -98,7 +98,7 @@ const companyName = (room: IRoomAll, titleAddress: string, titlePhone: string, t
 };
 
 const clientName = (customer: IUserAll, titleClient: string, titleContact: string): any => {
-  const client = getUserName(customer);
+  const client = customer.displayName;
   const contact = customer.phone || customer.email;
   return [{
     columns: [
@@ -274,7 +274,7 @@ export const pdf = (invoices: IInvoice[], office: IOfficeAll, start: number, sta
     info: {
       fileName: `${ invoiceTitle(startDate) } - ${ invoiceTitle(endDate) }`,
       title: `${ invoiceTitle(startDate) } - ${ invoiceTitle(endDate) }`,
-      author: getUserName(office.manager),
+      author: office.manager.displayName,
       subject: office.subject
     },
     content,

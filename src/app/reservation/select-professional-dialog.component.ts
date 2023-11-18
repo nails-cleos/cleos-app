@@ -4,7 +4,6 @@ import { IUser } from '../interfaces/user';
 import { Observable } from 'rxjs';
 import { requireMatch } from '../util/validators';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { getFullUserName, getUserName } from '../util/helper';
 import { map, startWith } from 'rxjs/operators';
 
 @Component({
@@ -38,7 +37,7 @@ export class SelectProfessionalDialogComponent implements OnInit {
   }
 
   displayFnUser(user: IUser): string {
-    return user ? getUserName(user) : '';
+    return user?.displayName ? user.displayName : '';
   }
 
   keyDownHandler(event: any): void {
@@ -65,6 +64,6 @@ export class SelectProfessionalDialogComponent implements OnInit {
   private filterProfessional(name: string): IUser[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.professionals?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
+    return this.professionals?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
   }
 }

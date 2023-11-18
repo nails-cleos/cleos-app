@@ -31,9 +31,7 @@ export const initialState: State = {
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case AuthActionTypes.login:
-    case AuthActionTypes.signup:
-    case AuthActionTypes.socialLogin: {
+    case AuthActionTypes.login: {
       return {
         ...state,
         errorMessage: null,
@@ -92,19 +90,6 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         message: action.payload.message,
         subErrors: null,
-        redirect: false
-      };
-    }
-    case AuthActionTypes.forgotPassword:
-    case AuthActionTypes.recoveryPassword:
-    case AuthActionTypes.activateAccount: {
-      return {
-        ...state,
-        isAuthenticated: false,
-        errorMessage: null,
-        message: action.payload.message,
-        subErrors: null,
-        isLoading: false,
         redirect: false
       };
     }

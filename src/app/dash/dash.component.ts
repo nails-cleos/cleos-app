@@ -8,7 +8,15 @@ import * as fromActionsDashboard from '../store/dashboard.actions';
 import * as fromActionsReservation from '../store/reservation.actions';
 import { IReservationSummary, States } from '../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
-import { getDurationOrUndefined, getEnd, getEndWithDuration, getNow, newDateTimestamp } from '../util/dates';
+import {
+  getDurationOrUndefined,
+  getEnd,
+  getEndWithDuration,
+  getNow,
+  getNowTimeZone,
+  greaterOrEqualsThan,
+  newDateTimestamp
+} from '../util/dates';
 import { CalendarEvent, CalendarMonthViewDay, CalendarView } from 'angular-calendar';
 import { findStateColor, getStateOrder } from '../util/theme';
 import { allDayEvent, getFrequency, IMeta, Meta, monthEvent } from '../util/event';
@@ -68,6 +76,7 @@ export class DashComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
   private authUserServiceSubscription: Subscription;
   private isDarkMode?: boolean;
+  private periodStart?: Date;
 
   constructor(public dialog: MatDialog, private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
               private readonly translate: TranslateService, private router: Router, private authUserService: AuthUserService) {
@@ -223,8 +232,9 @@ export class DashComponent implements OnInit, OnDestroy {
     this.segmentClick(date, room);
   }
 
-  beforeMonthViewRender({ body }: { body: CalendarMonthViewDay<IMeta>[] }): void {
+  beforeMonthViewRender({ body, period }: { body: CalendarMonthViewDay<IMeta>[], period: any }): void {
     // month view has a different UX from the week and day view so we only really need to group by the type
+    this.periodStart = period.start;
     body.forEach((cell) => {
       const groups = {};
       cell.events.forEach((event: CalendarEvent<IMeta>) => {
@@ -395,11 +405,18 @@ export class DashComponent implements OnInit, OnDestroy {
       });
 
       calendarSummary.notes.forEach(it => {
-        const startDate = newDateTimestamp(it.date);
+        const startDate = newDateTimestamp(it.date, this.state.timeZone);
         if (it.repeat === FrequencyEnum.none) {
           this.createNoteEvent(it, startDate, darkMode);
         } else {
-          recurring = [...recurring, getFrequency(it.repeat, startDate, it.noteId, it.title, 45, 'NOTE', 'notes',
+          let repeatDate: Date;
+          if (this.periodStart && greaterOrEqualsThan(this.periodStart, startDate)) {
+            repeatDate = this.periodStart;
+            repeatDate.setDate(startDate.getDate());
+          } else {
+            repeatDate = startDate;
+          }
+          recurring = [...recurring, getFrequency(it.repeat, repeatDate, it.noteId, it.title, 45, 'NOTE', 'notes',
             undefined, undefined, true)];
         }
       });

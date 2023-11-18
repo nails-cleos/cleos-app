@@ -14,7 +14,7 @@ import { isSameTimeZone, newDateTimestamp } from '../../util/dates';
 import { IUnavailable, IUnavailableAll } from '../../interfaces/unavailable';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
-import { createDialog, getUserName } from '../../util/helper';
+import { createDialog } from '../../util/helper';
 
 @Component({
   selector: 'app-unavailable-list',
@@ -96,7 +96,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
 
   openDialog(unavailable: IUnavailableAll): void {
     const time = newDateTimestamp(unavailable.timestamp);
-    const name = getUserName(unavailable.professional);
+    const name = unavailable.professional.displayName;
     const timeZone = unavailable.professional.timeZone;
     createDialog('PROFESSIONAL_INFO', name, this.dateFormat, this.translate, this.dialog, timeZone, time);
   }

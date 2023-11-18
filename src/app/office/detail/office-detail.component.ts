@@ -7,7 +7,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { IOffice, Office } from '../../interfaces/office';
 import { fieldChange } from '../../util/validators';
 import * as fromActionsOffice from '../../store/office.actions';
-import { getUserName } from '../../util/helper';
 
 @Component({
   selector: 'app-office-detail',
@@ -83,7 +82,7 @@ export class OfficeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
-        this.managerName = getUserName(state.selected.office.manager);
+        this.managerName = state.selected.office.manager.displayName;
         this.office = {
           id: state.selected.office.id,
           name: state.selected.office.name,

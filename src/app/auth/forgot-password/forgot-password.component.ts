@@ -6,6 +6,9 @@ import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms
 import { Observable, Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import { Auth } from '@angular/fire/auth';
+import { sendPasswordResetEmail } from '@firebase/auth';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-forgot-password',
@@ -20,8 +23,18 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
   form!: UntypedFormGroup;
 
   constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private snackBar: MatSnackBar,
-              private router: Router) {
+              private router: Router, private auth: Auth, private translate: TranslateService) {
     this.getState = this.store.select(selectAuthState);
+  }
+
+  get forgotPassword(): void {
+    sendPasswordResetEmail(this.auth, this.form.get('email')?.value.trim()).then(() => {
+      const message = this.translate.instant('AUTH.FORGOT_PASSWORD.MESSAGE');
+      this.store.dispatch(
+        new fromActionsLogin.SignUpSuccess({ message })
+      );
+    }).catch(e => console.error(`Error sending reset password. ${ e }`));
+    return;
   }
 
   ngOnInit(): void {
@@ -34,12 +47,6 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  get forgotPassword(): void {
-    return this.store.dispatch(
-      new fromActionsLogin.ForgotPassword(this.form.get('username')?.value.trim())
-    );
-  }
-
   private clean(): void {
     this.store.dispatch(
       new fromActionsLogin.Clean()
@@ -48,7 +55,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
 
   private createForm(): void {
     this.form = this.formBuilder.group({
-      username: ['', Validators.required]
+      email: ['', Validators.required]
     });
   }
 

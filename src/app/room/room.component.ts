@@ -9,7 +9,6 @@ import { IUser, IUserAll } from '../interfaces/user';
 import { map, startWith } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { requireMatch } from '../util/validators';
-import { getFullUserName } from '../util/helper';
 import { Router } from '@angular/router';
 import { Role } from '../interfaces/token';
 import { RoomIconName } from '../util/icon';
@@ -230,8 +229,8 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   sortProfessionals(data: any): IUser[] {
     return data.sort((a: any, b: any) => {
-      const aName = getFullUserName(a).toUpperCase();
-      const bName = getFullUserName(b).toUpperCase();
+      const aName = a.displayName.toUpperCase();
+      const bName = b.displayName.toUpperCase();
       return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
     });
   }
@@ -380,7 +379,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   private filter(name: string): IUserAll[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.allProfessional?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
+    return this.allProfessional?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
   }
 
   private filterCurrency(name: string): ICurrency[] | undefined {

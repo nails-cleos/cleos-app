@@ -1,6 +1,6 @@
 {
   "name": "cleos",
-  "version": "1.0.95",
+  "version": "1.0.96-rc",
   "engines": {
     "node": "16.19.0",
     "npm": "8.19.3"
@@ -20,7 +20,8 @@
     "lint": "ng lint --fix",
     "eslint": "eslint src --fix",
     "e2e": "ng e2e",
-    "heroku-postbuild": "ng build --configuration=staging"
+    "heroku-postbuild": "ng build --configuration=staging",
+    "emulator": "firebase emulators:start"
   },
   "private": true,
   "dependencies": {

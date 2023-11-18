@@ -9,7 +9,7 @@
       </label>
       <mat-autocomplete #autoCustomer="matAutocomplete" [displayWith]="displayFnUser">
         <mat-option *ngFor="let customer of filteredCustomer | async" [value]="customer">
-          {{customer | userName}}
+          {{customer.displayName}}
         </mat-option>
       </mat-autocomplete>
       <mat-error *ngIf="customer.hasError('required')"
@@ -106,7 +106,7 @@
             </label>
             <mat-autocomplete #autoProfessional="matAutocomplete" [displayWith]="displayFnProfessional">
               <mat-option *ngFor="let professional of filteredProfessional | async" [value]="professional">
-                {{professional | userName}}
+                {{professional.displayName}}
               </mat-option>
             </mat-autocomplete>
             <mat-error *ngIf="professional.hasError('requireMatch')"
@@ -370,7 +370,7 @@
           <div mat-subheader>{{ 'RESERVATION.CUSTOMER.FIELD' | translate}}</div>
           <mat-list-item>
             <mat-icon matListItemIcon>wash</mat-icon>
-            <div matListItemLine>{{customer.value | userName}}</div>
+            <div matListItemLine>{{customer.value.displayName}}</div>
           </mat-list-item>
           <mat-divider></mat-divider>
           <div mat-subheader>{{ 'COMMON.ROOM.FIELD' | translate}}</div>
@@ -382,7 +382,7 @@
           <mat-list-item>
             <mat-icon matListItemIcon>person_pin</mat-icon>
             <div matListItemTitle>{{ 'COMMON.PROFESSIONAL.FIELD' | translate}}</div>
-            <div matListItemLine>{{professional.value | userName}}</div>
+            <div matListItemLine>{{professional.value.displayName}}</div>
           </mat-list-item>
           <mat-list-item>
             <mat-icon matListItemIcon>room</mat-icon>

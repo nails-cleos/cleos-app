@@ -2,15 +2,14 @@
   "USER": {
     "FIELD": "Usuarios",
     "TITLE": "Agregar usuario",
-    "CUSTOMER": "Cliente {{username}} creado",
-    "PROFESSIONAL": "Profesional {{username}} creado",
-    "MANAGER": "Manager {{username}} creado",
+    "CUSTOMER": "Cliente {{displayName}} creado",
+    "PROFESSIONAL": "Profesional {{displayName}} creado",
+    "MANAGER": "Manager {{displayName}} creado",
     "DETAIL": "Actualizar usuario",
     "LIST": {
       "COLUMN": {
-        "USERNAME": "Nombre de usuario",
+        "DISPLAY_NAME": "Nombre",
         "EMAIL": "Email",
-        "PROVIDER": "Proveedor",
         "DETAIL": {
           "TITLE": "Roles"
         }
@@ -21,6 +20,7 @@
       "STATUS": {
         "ENABLED": "Verificado",
         "DISABLED": "No verificado",
+        "NOT_CREATED": "No registrado",
         "DELETED": "Eliminado"
       }
     },
@@ -30,25 +30,25 @@
     },
     "DELETED": {
       "TITLE": "Eliminar usuario",
-      "CONTENT": "¿Está seguro de eliminar el usuario {{username}}?",
-      "MESSAGE": "Usuario {{username}} eliminado"
+      "CONTENT": "¿Está seguro de eliminar el usuario {{displayName}}?",
+      "MESSAGE": "Usuario {{displayName}} eliminado"
     },
     "RESTORE": {
       "TITLE": "Recuperar usuario",
-      "CONTENT": "¿Está seguro de recuperar el usuario {{username}}?",
-      "MESSAGE": "Usuario {{username}} recuperado"
+      "CONTENT": "¿Está seguro de recuperar el usuario {{displayName}}?",
+      "MESSAGE": "Usuario {{displayName}} recuperado"
     },
     "UPDATED": {
-      "MESSAGE": "Usuario {{username}} actualizado"
+      "MESSAGE": "Usuario {{displayName}} actualizado"
     },
     "ACTIVATION_RESEND": {
       "TITLE": "Reenviar código de activación",
-      "CONTENT": "¿Está seguro de reenviar el código de activación al usuario {{username}}?",
+      "CONTENT": "¿Está seguro de reenviar el código de activación al usuario {{displayName}}?",
       "MESSAGE": "Código de activación enviado"
     },
     "ROLES": {
-      "REMOVE": "Rol {{role}} eliminado de {{username}}",
-      "ADD": "Role {{role}} agregado a {{username}}"
+      "REMOVE": "Rol {{role}} eliminado de {{displayName}}",
+      "ADD": "Role {{role}} agregado a {{displayName}}"
     },
     "MERGE": {
       "SELECT": "Seleccionar usuario para unir",

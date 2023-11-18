@@ -224,27 +224,21 @@
       "SHOW_CASH": "Show cash",
       "INCOMPLETE": "Complete your profile",
       "UPDATED": {
-        "MESSAGE": "User {{username}} updated",
+        "MESSAGE": "User {{displayName}} updated",
         "PHOTO": "Profile picture updated",
         "DARK_MODE_TRUE": "Dark mode on",
         "DARK_MODE_FALSE": "Dark mode off"
       }
     },
     "USER": {
-      "USERNAME": {
-        "FIELD": "Username",
-        "REQUIRED": "Username is <b>required</b>"
+      "DISPLAY_NAME": {
+        "FIELD": "Display name",
+        "REQUIRED": "Display name is <b>required</b>"
       },
       "EMAIL": {
         "FIELD": "Email",
         "REQUIRED": "Email is <b>required</b>",
         "VALID": "Provide a valid email"
-      },
-      "FIRST_NAME": {
-        "FIELD": "First name"
-      },
-      "LAST_NAME": {
-        "FIELD": "Last name"
       },
       "PHONE": {
         "FIELD": "Phone",
@@ -298,7 +292,6 @@
     "DASHBOARD": {
       "HOME": "Home",
       "PROFILE": "Profile",
-      "CHANGE_PASSWORD": "Change password",
       "SIGN_OUT": "Sign out",
       "DARK_MODE": "Dark mode",
       "LIGHT_MODE": "Light mode"

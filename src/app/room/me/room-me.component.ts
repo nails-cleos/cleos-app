@@ -8,7 +8,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../store/app.states';
 import * as fromActionsRoom from '../../store/room.actions';
 import { createDate, getTimeNumber, getTimeZone } from '../../util/dates';
-import { areEquals, getFullUserName } from '../../util/helper';
+import { areEquals } from '../../util/helper';
 import { RoomIconName } from '../../util/icon';
 import { IPaymentType, paymentOptions } from '../../interfaces/payment';
 import { MatListOption } from '@angular/material/list';
@@ -200,8 +200,8 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   sortProfessionals(data: any): IUser[] {
     return data.sort((a: any, b: any) => {
-      const aName = getFullUserName(a).toUpperCase();
-      const bName = getFullUserName(b).toUpperCase();
+      const aName = a.displayName.toUpperCase();
+      const bName = b.displayName.toUpperCase();
       return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
     });
   }
@@ -383,6 +383,6 @@ export class RoomMeComponent implements OnInit, AfterViewInit, OnDestroy {
   private filter(name: string): IUserAll[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.allProfessional?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
+    return this.allProfessional?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
   }
 }

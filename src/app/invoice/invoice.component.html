@@ -105,7 +105,7 @@
         <ng-container matColumnDef="customer">
           <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.CUSTOMER' | translate }}</th>
           <td *matCellDef="let invoice" mat-cell>
-            <div *ngIf="invoice.id; else skeleton">{{invoice.customer | userName}}</div>
+            <div *ngIf="invoice.id; else skeleton">{{invoice.customer.displayName}}</div>
             <ng-template #skeleton>
               <div class="ssc-line"></div>
             </ng-template>

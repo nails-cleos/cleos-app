@@ -22,7 +22,6 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { ChartComponent } from './chart/chart.component';
 import { httpInterceptorProviders } from '../http-interceptors';
 import { HttpClientJsonpModule, HttpClientModule } from '@angular/common/http';
-import { UserNamePipe } from '../pipes/user-name.pipe';
 import { TimeDetailPipe } from '../pipes/time-detail.pipe';
 import { TimeZoneSnackBarComponent } from './snak/time-zone/time-zone-snack-bar.component';
 import { DurationTimePipe } from '../pipes/durationTime.pipe';
@@ -33,7 +32,6 @@ import { ConvertHMPipe } from '../pipes/convert-hm.pipe';
 import { CounterComponent } from '../util/counter/counter.component';
 import { CalendarDialogComponent } from './dialog/calendar/calendar-dialog.component';
 import { GoogleMapsModule } from '@angular/google-maps';
-import { PasswordComponent } from './password/password.component';
 import { BankComponent } from './bank/bank.component';
 import { PriceComponent } from './price/price.component';
 import { CustomerEditDialogComponent } from './dialog/customer-edit/customer-edit-dialog.component';
@@ -88,7 +86,6 @@ import { PricePreviewComponent } from './price-preview/price-preview.component';
     BackButtonDirective,
     HideMissingDirective,
     SortByPipe,
-    UserNamePipe,
     TimeDetailPipe,
     DurationTimePipe,
     RoomNamePipe,
@@ -103,7 +100,6 @@ import { PricePreviewComponent } from './price-preview/price-preview.component';
     ChartComponent,
     TimeZoneSnackBarComponent,
     CounterComponent,
-    PasswordComponent,
     BankComponent,
     PriceComponent,
     DialogComponent,
@@ -120,7 +116,6 @@ import { PricePreviewComponent } from './price-preview/price-preview.component';
     BackButtonDirective,
     HideMissingDirective,
     SortByPipe,
-    UserNamePipe,
     TimeDetailPipe,
     DurationTimePipe,
     RoomNamePipe,
@@ -135,7 +130,6 @@ import { PricePreviewComponent } from './price-preview/price-preview.component';
     ChartComponent,
     TimeZoneSnackBarComponent,
     CounterComponent,
-    PasswordComponent,
     BankComponent,
     PriceComponent,
     DialogComponent,

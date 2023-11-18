@@ -25,7 +25,7 @@
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
           mat-sort-header>{{ 'OFFICE.LIST.COLUMN.MANAGER' | translate }}</th>
       <td *matCellDef="let office" fxHide.lt-sm fxShow mat-cell>
-        <div *ngIf="office.id; else skeleton">{{office?.manager | userName}}</div>
+        <div *ngIf="office.id; else skeleton">{{office?.manager.displayName}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
@@ -67,7 +67,7 @@
           <mat-list>
             <div mat-subheader>{{ 'OFFICE.LIST.COLUMN.MANAGER' | translate }}</div>
             <mat-list-item role="list">
-              <div matListItemLine>{{office.manager | userName}}</div>
+              <div matListItemLine>{{office.manager.displayName}}</div>
             </mat-list-item>
             <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
             <mat-list-item role="list">

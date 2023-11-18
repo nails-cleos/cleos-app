@@ -12,8 +12,6 @@
 $flag-icon-css-path: '~flag-icon-css/flags' !default;
 @import 'node_modules/flag-icon-css/sass/flag-icons';
 
-@import '~firebaseui/dist/firebaseui.css';
-
 html, body {
   height: 100%;
 }
@@ -29,6 +27,17 @@ body {
   font-style: normal;
   font-weight: 400;
   font-display: swap;
+}
+
+[class*='firebaseui-'] {
+  font-family: 'Belleza', 'Helvetica Neue', sans-serif !important;
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+.mat-mdc-header-cell, .mat-column-actions {
+  text-align: center !important;
 }
 
 .style-card {

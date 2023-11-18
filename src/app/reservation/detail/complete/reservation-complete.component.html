@@ -6,7 +6,7 @@
           <mat-card-header>
             <mat-card-title>{{ 'RESERVATION.CUSTOMER.DETAIL' | translate }}</mat-card-title>
             <mat-card-subtitle
-              *ngIf="reservation; else skeleton">{{reservation.customer | userName}}</mat-card-subtitle>
+              *ngIf="reservation; else skeleton">{{reservation.customer.displayName}}</mat-card-subtitle>
             <ng-template #skeleton>
               <div class="ssc-line"></div>
             </ng-template>

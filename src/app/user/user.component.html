@@ -10,7 +10,7 @@
         <ng-template #headerEditMode>
           <mat-card-header>
             <mat-card-title>{{ 'USER.DETAIL' | translate }}</mat-card-title>
-            <mat-card-subtitle *ngIf="user; else skeleton">{{user | userName}}</mat-card-subtitle>
+            <mat-card-subtitle *ngIf="user; else skeleton">{{user.displayName}}</mat-card-subtitle>
             <ng-template #skeleton>
               <div class="ssc-line"></div>
             </ng-template>
@@ -33,18 +33,6 @@
                   </mat-error>
                 </mat-form-field>
               </ng-template>
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'COMMON.USER.USERNAME.FIELD' | translate }}</mat-label>
-                <label>
-                  <input formControlName="username" autocomplete="username" matInput required>
-                </label>
-                <mat-error *ngIf="getForm.username.hasError('required')"
-                           [innerHTML]="'COMMON.USER.USERNAME.REQUIRED' | translate">
-                </mat-error>
-                <mat-error *ngIf="errors['username']">
-                  {{errors['username']}}
-                </mat-error>
-              </mat-form-field>
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.USER.EMAIL.FIELD' | translate }}</mat-label>
                 <label>
@@ -74,18 +62,14 @@
                 </mat-error>
               </mat-form-field>
               <mat-form-field appearance="outline">
-                <mat-label>{{ 'COMMON.USER.FIRST_NAME.FIELD' | translate }}</mat-label>
+                <mat-label>{{ 'COMMON.USER.DISPLAY_NAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input formControlName="firstName" autocomplete="given-name" matInput>
+                  <input formControlName="displayName" autocomplete="given-name" matInput required>
                 </label>
-                <mat-error *ngIf="errors['firstName']">{{errors['firstName']}}</mat-error>
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'COMMON.USER.LAST_NAME.FIELD' | translate }}</mat-label>
-                <label>
-                  <input formControlName="lastName" autocomplete="family-name" matInput>
-                </label>
-                <mat-error *ngIf="errors['lastName']">{{errors['lastName']}}</mat-error>
+                <mat-error *ngIf="getForm.displayName.hasError('required')"
+                           [innerHTML]="'COMMON.USER.DISPLAY_NAME.REQUIRED' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['displayName']">{{errors['displayName']}}</mat-error>
               </mat-form-field>
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.USER.PHONE.FIELD' | translate }}</mat-label>

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { IUserAll } from '../interfaces/user';
 import { isDarkMode, Theme } from '../util/theme';
-import { getUserName, hasRoomAdmin } from '../util/helper';
+import { hasRoomAdmin } from '../util/helper';
 import { Role } from '../interfaces/token';
 import { BehaviorSubject } from 'rxjs';
 
@@ -18,7 +18,7 @@ export interface IAuthUser {
   locale: string;
   referralMax: number;
   email?: string;
-  username?: string;
+  displayName?: string;
   professionalId?: string;
   customerId?: string;
   userId?: string;
@@ -38,7 +38,7 @@ const initialAuthUser: IAuthUser = {
   locale: navigator.language,
   referralMax: 5,
   email: undefined,
-  username: undefined,
+  displayName: undefined,
   professionalId: undefined,
   customerId: undefined,
   userId: undefined,
@@ -75,7 +75,7 @@ export class AuthUserService {
         locale: user.locale || initialAuthUser.locale,
         referralMax: user.referralMax || initialAuthUser.referralMax,
         email: user.email,
-        username: getUserName(user),
+        displayName: user.displayName,
         professionalId: isProfessional ? user.id : undefined,
         customerId: isCustomer ? user.id : undefined,
         userId: user.id,

@@ -1,6 +1,7 @@
 @use 'sass:map';
 @use '@angular/material' as mat;
 @import "angular-calendar/scss/angular-calendar.scss";
+@import '~firebaseui/dist/firebaseui.css';
 
 @mixin color($theme) {
   // Get the color config from the theme.
@@ -12,6 +13,55 @@
   $background: map.get($color-config, 'background');
   $foreground: map.get($color-config, 'foreground');
   $isDark: map.get($color-config, 'is-dark');
+
+  // firebase-ui
+  .mdl-card {
+    background: mat.get-color-from-palette($background, card);
+
+    .firebaseui-title {
+      color: mat.get-color-from-palette($foreground, text);
+    }
+
+    .firebaseui-textfield.mdl-textfield .firebaseui-label::after {
+      background-color: mat.get-color-from-palette($primary-palette);
+    }
+
+    .progressbar {
+      background-color: mat.get-color-from-palette($primary-palette) !important;
+    }
+
+    .mdl-button--raised.mdl-button--colored {
+      background-color: mat.get-color-from-palette($accent-palette) !important;
+      color: black
+    }
+
+    .mdl-button.mdl-js-button.mdl-button--primary {
+      color: mat.get-color-from-palette($accent-palette) !important;
+    }
+
+    .firebaseui-textfield.mdl-textfield.firebaseui-label::after {
+      background-color: mat.get-color-from-palette($primary-palette) !important;
+    }
+
+    a.firebaseui-link {
+      color: mat.get-color-from-palette($primary-palette) !important;
+    }
+
+    .progressbar {
+      background-color: mat.get-color-from-palette($primary-palette) !important;
+    }
+
+    .bufferbar {
+      background-image: none !important;
+      background-color: mat.get-color-from-palette($accent-palette)
+    }
+
+    .auxbar {
+      background-image: none !important;
+      background-color: mat.get-color-from-palette($primary-palette) !important;
+    }
+  }
+  // firebase-ui
 
   .text-bg-partially_completed {
     background-color: #a9a397;
@@ -454,6 +504,10 @@
 
   .hoverable:hover .hover-text {
     color: mat.get-color-from-palette($foreground, base);
+  }
+
+  .hoverable {
+    border: 5px solid mat.get-color-from-palette($primary-palette);
   }
 
   .strikethrough:before, .red-text, .incomplete, .minus {

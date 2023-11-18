@@ -24,9 +24,7 @@ export class RedirectComponent {
           const user: IUserAll = state.user;
           this.tokenService.token = state.token;
           this.tokenService.user = state.user;
-          if (user.changePassword) {
-            redirectUrl = ['auth', 'change-password'];
-          } else if (RedirectComponent.hasRoomOrAdmin(user.authorities)) {
+          if (RedirectComponent.hasRoomOrAdmin(user.authorities)) {
             redirectUrl = ['dashboard'];
           } else if (hasRoomAdmin(user.authorities)) {
             redirectUrl = ['events'];

@@ -93,11 +93,6 @@ export class UserService {
     return this.http.post(url, null);
   }
 
-  public changePassword(username: string, oldPassword: string, password: string): Observable<any> {
-    const url = `${ this.userUrlV1 }/me/change-password`;
-    return this.http.post(url, { username, oldPassword, password });
-  }
-
   public getAllProfessionals(): Observable<IUser[]> {
     return this.http.get<IUser[]>(this.professionalUrlV1);
   }

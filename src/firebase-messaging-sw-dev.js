@@ -6,7 +6,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-sw.js';
 
 const app = initializeApp({
-  apiKey: 'AIzaSyBHkZS6OP4IOLe6EI6jkGBYZTiHP2CIn7M',
+  apiKey: 'AIzaSyCIx8KV4QW1hJuOQWT3bKO4UkiQpCqU0dg',
   authDomain: 'nails-cleos-dev.firebaseapp.com',
   projectId: 'nails-cleos-dev',
   storageBucket: 'nails-cleos-dev.appspot.com',

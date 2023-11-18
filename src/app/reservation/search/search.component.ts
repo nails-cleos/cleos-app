@@ -16,7 +16,7 @@ import { map, startWith } from 'rxjs/operators';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { UntypedFormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { getFullUserName, openCancel, openDialog } from '../../util/helper';
+import { openCancel, openDialog } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
 
@@ -132,7 +132,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   displayFnUser(user: IUser): string {
-    return user ? getFullUserName(user) : '';
+    return user?.displayName ? user.displayName : '';
   }
 
   keyDownHandler(event: any): void {
@@ -233,7 +233,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   private filterCustomer(name: string): IUser[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.customers?.filter(option => getFullUserName(option)?.toLowerCase().indexOf(filterValue) === 0);
+    return this.customers?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
   }
 
   private filterStates(value: string): string[] {
