@@ -14,6 +14,52 @@
   $foreground: map.get($color-config, 'foreground');
   $isDark: map.get($color-config, 'is-dark');
 
+  // Home page
+  #back-top {
+    color: mat.get-color-from-palette($primary-palette) !important;
+  }
+
+  .home-divider:before,
+  .home-divider:after {
+    content: "______________________";
+    color: mat.get-color-from-palette($foreground, text);
+    position: relative;
+    bottom: 1.3vh;
+  }
+
+  .section-sub-title p {
+    color: mat.get-color-from-palette($foreground, secondary-text);
+  }
+
+  .treatments {
+    background-color: mat.get-color-from-palette($background, hover);
+  }
+
+  .footer {
+    border-top: 5px solid mat.get-color-from-palette($primary-palette, A700);
+    color: mat.get-color-from-palette($foreground, text);
+
+    #subs {
+      color: mat.get-color-from-palette($foreground, text);
+    }
+  }
+
+  .subscribe #subscribe {
+    border: 2px solid mat.get-color-from-palette($foreground, text);
+  }
+
+  .credit a {
+    color: mat.get-color-from-palette($foreground, text);
+  }
+
+  .credit a:hover {
+    color: mat.get-color-from-palette($foreground, disabled-button);
+  }
+
+  .copyright {
+    color: mat.get-color-from-palette($foreground, text);
+  }
+
   // firebase-ui
   .mdl-card {
     background: mat.get-color-from-palette($background, card);
@@ -130,6 +176,36 @@
   }
 
   @if $isDark {
+    #facts {
+      background-color: #e1d0cb;
+
+      .parallax-overlay {
+        background-color: #e1d0cb;
+      }
+    }
+    .facts .home-divider:before,
+    .facts .home-divider:after {
+      color: black;
+    }
+
+    .facts .home-divider mat-icon {
+      color: black;
+    }
+
+    .counters-item {
+      color: black;
+    }
+
+    .counters-item mat-icon {
+      // TODO change
+      border: 1px solid #737C85;
+      color: black;
+    }
+
+    .footer {
+      background-color: mat.get-color-from-palette($primary-palette, 900);
+    }
+
     .text-bg-created {
       background-color: #fafafa;
       color: black;
@@ -171,6 +247,38 @@
       color: black;
     }
   } @else {
+    #facts {
+      // TODO change
+      background-color: #7e7769;
+
+      // TODO change
+      .parallax-overlay {
+        background-color: #7e7769;
+      }
+    }
+    .facts .home-divider:before,
+    .facts .home-divider:after {
+      color: white;
+    }
+
+    .facts .home-divider mat-icon {
+      color: white;
+    }
+
+    .counters-item {
+      color: white;
+    }
+
+    .counters-item mat-icon {
+      // TODO change
+      border: 1px solid #a9a9a9;
+      color: white;
+    }
+
+    .footer {
+      background-color: mat.get-color-from-palette($primary-palette, 500);
+    }
+
     .text-bg-created {
       background-color: #ababab;
     }

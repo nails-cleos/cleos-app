@@ -1,8 +1,8 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ITreatment, ITreatmentGroup } from '../../interfaces/treatment';
 import { map, startWith } from 'rxjs/operators';
-import { Observable, Subscription } from 'rxjs';
-import { ICatalogue, ISlide, Slide } from '../../interfaces/catalogue';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { ICatalogue, ISlide } from '../../interfaces/catalogue';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { requireMatch } from '../../util/validators';
 import { Store } from '@ngrx/store';
@@ -15,14 +15,66 @@ import { filterDateRoom, getNow, plusMonthDate } from '../../util/dates';
 import { MAX_RESERVATION_CUSTOMER_MONTH } from '../../interfaces/reservation';
 import * as fromActionsMain from '../../store/main.actions';
 import { AuthUserService } from '../../services/auth-user.service';
+import {
+  bottomTop,
+  bounceInDownAnimation,
+  fadeInUpDown,
+  gelatine,
+  leftRight,
+  observeElement,
+  rubberBand,
+  scaleIn,
+  slideInX,
+  slideInY
+} from '../../util/animation';
+import { AnimationAnimateMetadata, AnimationSequenceMetadata } from '@angular/animations';
+import { isMobile } from '../../util/helper';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+
+interface ISocialLink {
+  name: 'WHATSAPP' | 'INSTAGRAM' | 'FACEBOOK';
+  delay: string;
+  href: string;
+  svgIcon: 'WHATSAPP-NO-COLOR' | 'WHATSAPP' | 'INSTAGRAM-NO-COLOR' | 'INSTAGRAM' | 'FACEBOOK-NO-COLOR' | 'FACEBOOK';
+}
 
 @Component({
   selector: 'app-main-content',
   templateUrl: './main-content.component.html',
-  styleUrls: ['./main-content.component.scss']
+  styleUrls: ['./main-content.component.scss'],
+  animations: [bottomTop, leftRight, slideInX, slideInY]
 })
-export class MainContentComponent implements OnInit, OnDestroy {
+export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
 
+  @ViewChild('treatmentItem', { static: false }) private serviceItem?: ElementRef<HTMLDivElement>;
+  @ViewChild('teamItem', { static: false }) private teamItem?: ElementRef<HTMLDivElement>;
+  @ViewChild('factItem1', { static: false }) private factItem1?: ElementRef<HTMLDivElement>;
+  @ViewChild('factItem2', { static: false }) private factItem2?: ElementRef<HTMLDivElement>;
+  @ViewChild('factItem3', { static: false }) private factItem3?: ElementRef<HTMLDivElement>;
+  @ViewChild('factItem4', { static: false }) private factItem4?: ElementRef<HTMLDivElement>;
+  @ViewChild('contactItem1', { static: false }) private contactItem1?: ElementRef<HTMLDivElement>;
+  @ViewChild('contactItem2', { static: false }) private contactItem2?: ElementRef<HTMLDivElement>;
+  @ViewChild('contactItem3', { static: false }) private contactItem3?: ElementRef<HTMLDivElement>;
+
+  treatmentItemState: BehaviorSubject<'open' | 'close'>;
+  teamItemState: BehaviorSubject<'open' | 'close'>;
+  factItem1State: BehaviorSubject<'open' | 'close'>;
+  factItem2State: BehaviorSubject<'open' | 'close'>;
+  factItem3State: BehaviorSubject<'open' | 'close'>;
+  factItem4State: BehaviorSubject<'open' | 'close'>;
+  contactItem1State: BehaviorSubject<'open' | 'close'>;
+  contactItem2State: BehaviorSubject<'open' | 'close'>;
+  contactItem3State: BehaviorSubject<'open' | 'close'>;
+
+  treatmentTitle: AnimationAnimateMetadata;
+  teamTitle: AnimationSequenceMetadata;
+  storyText: AnimationSequenceMetadata;
+  factTitle: AnimationSequenceMetadata;
+  contactTitle: AnimationSequenceMetadata;
+  contactText: AnimationSequenceMetadata;
+  contactMap: AnimationAnimateMetadata;
+  isSmall: boolean;
+  isDark: boolean;
   isHandset: any;
   slides: ISlide[] = [];
 
@@ -51,6 +103,34 @@ export class MainContentComponent implements OnInit, OnDestroy {
     Validators.required
   ]);
 
+  imageObject: Array<object> = [];
+  noImages: Array<object> = [
+    {
+      image: 'assets/home_page/img/banner.jpg',
+      thumbImage: 'assets/home_page/img/banner.jpg'
+    }, {
+      image: 'assets/home_page/img/parallax/city.jpg',
+      thumbImage: 'assets/home_page/img/parallax/city.jpg'
+    }
+  ];
+  socialLinks: ISocialLink[] = [{
+    name: 'WHATSAPP',
+    delay: '1000ms',
+    href: `https://api.whatsapp.com/send?phone=${ this.translate.instant('MAIN.CONTACT.PHONE') }
+    &text=${ this.translate.instant('MAIN.CONTACT.SEND.HELLO') }`,
+    svgIcon: 'WHATSAPP-NO-COLOR'
+  }, {
+    name: 'INSTAGRAM',
+    delay: '1100ms',
+    href: 'https://www.instagram.com/carlanailscleos.nl/',
+    svgIcon: 'INSTAGRAM-NO-COLOR'
+  }, {
+    name: 'FACEBOOK',
+    delay: '1200ms',
+    href: 'https://www.facebook.com/carlanailscleos.nl/',
+    svgIcon: 'FACEBOOK-NO-COLOR'
+  }];
+
   private isAuthenticated = false;
   private subscription?: Subscription;
   private authUserServiceSubscription: Subscription;
@@ -58,7 +138,28 @@ export class MainContentComponent implements OnInit, OnDestroy {
 
   constructor(private store: Store<AppState>, private cdRef: ChangeDetectorRef, private viewportScroller: ViewportScroller,
               private translate: TranslateService, private router: Router, private formBuilder: UntypedFormBuilder,
-              private snackBar: MatSnackBar, private authUserService: AuthUserService) {
+              private snackBar: MatSnackBar, private authUserService: AuthUserService, private breakpointObserver: BreakpointObserver) {
+    this.isSmall = isMobile();
+    this.isDark = false;
+
+    this.treatmentTitle = bounceInDownAnimation('500ms');
+    this.teamTitle = fadeInUpDown('20px', '700ms');
+    this.storyText = gelatine;
+    this.factTitle = rubberBand;
+    this.treatmentItemState = new BehaviorSubject<'open' | 'close'>('open');
+    this.teamItemState = new BehaviorSubject<'open' | 'close'>('open');
+    this.factItem1State = new BehaviorSubject<'open' | 'close'>('open');
+    this.factItem2State = new BehaviorSubject<'open' | 'close'>('open');
+    this.factItem3State = new BehaviorSubject<'open' | 'close'>('open');
+    this.factItem4State = new BehaviorSubject<'open' | 'close'>('open');
+    this.contactItem1State = new BehaviorSubject<'open' | 'close'>('open');
+    this.contactItem2State = new BehaviorSubject<'open' | 'close'>('open');
+    this.contactItem3State = new BehaviorSubject<'open' | 'close'>('open');
+    this.contactText = rubberBand;
+    this.contactTitle = fadeInUpDown('20px', '500ms');
+    this.contactMap = bounceInDownAnimation('500ms');
+
+
     this.getState = this.store.select(selectMainState);
     this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
       this.isAuthenticated = value.isAuthenticated;
@@ -66,9 +167,15 @@ export class MainContentComponent implements OnInit, OnDestroy {
         this.email.setValue(value.email);
         this.name.setValue(value.displayName);
       }
+      this.isDark = value.isDarkMode;
     });
     this.minDate = getNow();
     this.maxDate = plusMonthDate(this.minDate, MAX_RESERVATION_CUSTOMER_MONTH, this.minDate.getDate() + 1);
+
+    breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small
+    ]).subscribe(result => this.isSmall = result.matches);
   }
 
   get book(): void {
@@ -109,9 +216,30 @@ export class MainContentComponent implements OnInit, OnDestroy {
     this.cdRef.detectChanges();
   }
 
+  ngAfterViewInit(): void {
+    observeElement(this.treatmentItemState, this.serviceItem?.nativeElement, !this.isSmall);
+    observeElement(this.teamItemState, this.teamItem?.nativeElement, !this.isSmall, 0.1);
+    observeElement(this.factItem1State, this.factItem1?.nativeElement, !this.isSmall);
+    observeElement(this.factItem2State, this.factItem2?.nativeElement, !this.isSmall);
+    observeElement(this.factItem3State, this.factItem3?.nativeElement, !this.isSmall);
+    observeElement(this.factItem4State, this.factItem4?.nativeElement, !this.isSmall);
+    observeElement(this.contactItem1State, this.contactItem1?.nativeElement, !this.isSmall);
+    observeElement(this.contactItem2State, this.contactItem2?.nativeElement, !this.isSmall);
+    observeElement(this.contactItem3State, this.contactItem3?.nativeElement, !this.isSmall);
+  }
+
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
     this.authUserServiceSubscription.unsubscribe();
+  }
+
+  setTreatmentAnimation(i: number): AnimationSequenceMetadata {
+    return scaleIn(`${ i * (this.isSmall ? 0 : 300) }ms`);
+  }
+
+  onHover(social: ISocialLink, enter: boolean): void {
+    const suffix = enter ? '' : '-NO-COLOR';
+    social.svgIcon = `${ social.name }${ suffix }`;
   }
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d);
@@ -162,8 +290,9 @@ export class MainContentComponent implements OnInit, OnDestroy {
       if (state.catalogue && Array.from(state.catalogue)) {
         state.catalogue.forEach((value: ICatalogue) => {
           if (value && value.blob) {
-            const slide = new Slide(`data:image/jpg;base64,${ value.blob }`);
-            this.slides = [...this.slides, slide];
+            // const slide = new Slide(`data:image/jpg;base64,${ value.blob }`);
+            const img = `data:image/jpg;base64,${ value.blob }`;
+            this.imageObject?.push({ image: img, thumbImage: img });
           }
         });
       }

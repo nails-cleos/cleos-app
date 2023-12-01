@@ -1,81 +1,383 @@
-.carousel {
-  height: 50%;
-  position: relative;
-
-  .spinner-parent-vertical {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
+.mb-50 {
+  margin-bottom: 50px;
 }
 
-.content {
-  .last {
-    padding-bottom: 5%;
-    overflow: auto;
-  }
-
-  .title {
-    text-align: center;
-  }
-
-  .large-text {
-    column-count: 2;
-    text-align: justify;
-    text-justify: inter-word;
-  }
-
-  #contact {
-    mat-icon {
-      margin-right: 0 !important;
-    }
-
-    .i-size-24 {
-      font-size: 24px;
-    }
-  }
-
-  @media all and (max-device-width: 812px) and (orientation: portrait) {
-    .div-left {
-      margin: 0 auto 10px auto;
-    }
-
-    .div-right {
-      margin: 0 auto 10px auto;
-    }
-  }
-
-  @media not all and (max-device-width: 812px) and (orientation: portrait) {
-    .div-left {
-      width: 50%;
-    }
-
-    .div-right {
-      padding-left: 16px;
-      width: 50%;
-    }
-  }
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-* {
+section {
+  padding: 70px 0 0;
+}
+
+.banner {
+  width: 100% !important;
+  height: 100vh !important;
+}
+
+#slider {
+  padding: 0;
+}
+
+.carousel-caption {
+  top: 50%;
+  z-index: 99999;
+  box-sizing: border-box;
+  position: absolute;
+  bottom: 20px;
+  padding-top: 20px;
+  color: #fff;
+  text-align: center;
+  right: 20%;
+  left: 20%;
+  padding-bottom: 30px;
+}
+
+.carousel-caption h1 {
+  font-size: 62px;
+  text-align: center;
+}
+
+.carousel-caption h1 span {
+  font-weight: 800;
+}
+
+.carousel-caption h2 {
+  text-align: center;
+  box-sizing: border-box;
+  font-size: 45px;
+}
+
+.carousel-caption p {
+  color: #fff;
+  font-size: 18px;
+  text-align: center;
   box-sizing: border-box;
 }
 
-.treatment-container {
-  width: 100%; /*whatever size you want your container*/
-  flex-flow: row wrap;
-  display: flex; /*Make sure to call this on your container*/
-  align-items: stretch; /*stretches all cards same height*/
-  justify-content: center; /*some space between cards*/
+.carousel-caption p:before,
+.carousel-caption p:after {
+  color: #0feb9e;
+  content: "___";
+  position: relative;
+  top: -8px;
 }
 
-.card-wrap {
-  display: flex;
-  padding: 10px;
+span.color {
+  color: #0feb9e;
 }
 
-app-mini-card-treatment-group {
-  cursor: pointer;
-  flex: 0 0 100%;
+.carousel-caption p:before {
+  right: 20px;
 }
+
+.carousel-caption p:after {
+  left: 20px;
+}
+
+.social-links {
+  margin-top: 5%;
+}
+
+.social-links li {
+  display: inline-block;
+}
+
+.social-links li a {
+  display: block;
+  margin: 0 6px;
+}
+
+.section-title h1 {
+  color: #0eb493;
+  font-size: 28px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.section-sub-title {
+  margin: 35px 10px 45px 10px;
+}
+
+.section-sub-title p {
+  font-weight: 600;
+  line-height: 24px;
+  font-size: 18px;
+}
+
+.home-divider {
+  margin-top: 30px;
+}
+
+.home-divider:before {
+  right: 10px;
+}
+
+.home-divider:after {
+  left: 10px;
+}
+
+.treatment-icon {
+  border: 1px solid #0eb493;
+  border-radius: 50%;
+  color: #0eb493;
+  padding: 12px 13px 8px 13px;
+  float: none;
+  margin: 0 auto 15px;
+  text-align: center;
+  width: 50px;
+  box-sizing: border-box;
+
+  mat-icon {
+    transform: scale(1.5);
+  }
+}
+
+.treatment-item {
+  margin: 0 auto 30px;
+  text-align: center;
+  opacity: 0;
+}
+
+.treatment-desc {
+  margin-left: 0;
+  position: relative;
+  top: 0;
+
+  p {
+    margin: 0 15px;
+  }
+}
+
+.team-member h3 {
+  color: #062033;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+  margin: 15px 0 8px;
+}
+
+.member-thumb {
+  width: 273px;
+  position: relative;
+}
+
+#facts {
+  //background-image: url("../img/parallax/city.jpg");
+  background-attachment: fixed !important;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  padding: 0;
+
+  .parallax-overlay {
+    padding: 70px 0;
+  }
+}
+
+.counters-item mat-icon {
+  border-radius: 50%;
+  display: inline-block;
+  height: 40px;
+  margin: 0 0 50px;
+  padding: 6px 0 0;
+  width: 40px;
+  transform: scale(3);
+  box-sizing: border-box;
+}
+
+.counters-item strong {
+  display: block;
+  font-size: 60px;
+  font-weight: 600;
+  line-height: 60px;
+}
+
+.counters-item p {
+  font-size: 18px;
+  line-height: 24px;
+  margin-top: 15px;
+  text-transform: uppercase;
+}
+
+.map {
+  border: 0;
+  margin-bottom: -5px;
+}
+
+.dark-map {
+  filter: invert(90%) hue-rotate(180deg);
+}
+
+/*============================================================
+	For Small Desktop
+==============================================================*/
+
+@media (min-width: 980px) and (max-width: 1150px) {
+  /* slider */
+  .carousel-caption h2 {
+    font-size: 45px;
+  }
+  //
+  //  .member-thumb {
+  //    width: auto;
+  //  }
+}
+
+/*============================================================
+	Tablet (Portrait) Design for a width of 768px
+==============================================================*/
+
+@media (min-width: 768px) and (max-width: 979px) {
+  .carousel-caption h1 {
+    font-size: 55px;
+  }
+
+  .carousel-caption h2 {
+    font-size: 36px;
+  }
+  //
+  //  /* works */
+  //  .work-item {
+  //    width: 33%;
+  //  }
+  //
+  //  /* team */
+  //  .member-thumb .overlay h4 {
+  //    margin: 25px 0;
+  //  }
+  //
+  //  .member-thumb {
+  //    margin: 0 auto;
+  //  }
+  //
+  //  /* fatcs */
+  //  #facts {
+  //    background-position: center top !important;
+  //  }
+    .counters-item {
+      margin-bottom: 50px;
+    }
+  //
+  //  .counters-item i {
+  //    margin: 0 0 15px;
+  //  }
+  //
+  //  .counters-item strong {
+  //    font-size: 45px;
+  //  }
+  //
+  //  /* contact */
+  //
+  //  .contact-form .name-email input {
+  //    margin-right: 0;
+  //    width: 100%;
+  //  }
+  //
+  //  .footer-social {
+  //    margin-top: 45px;
+  //  }
+  //
+  //  /* footer */
+  //  .footer-subscribe {
+  //    margin-bottom: 30px;
+  //  }
+  //
+  //  /* Team mamber */
+  //  .team-member{
+  //    margin-bottom: 20px;
+  //  }
+}
+
+/*============================================================
+	Mobile (Portrait) Design for a width of 320px
+==============================================================*/
+
+@media only screen and (max-width: 767px) {
+  //  .section-sub-title p {
+  //    font-size: 14px;
+  //  }
+  //
+  /* slider */
+  .carousel-caption h1 {
+    font-size: 35px;
+  }
+
+  .carousel-caption h2 {
+    font-size: 22px;
+  }
+
+  .carousel-caption p {
+    font-size: 14px;
+  }
+
+  //  .social-links {
+  //    margin-top: 20%;
+  //  }
+  //
+  //  /* works */
+  //  .work-item {
+  //    left: 5% !important;
+  //    width: 90%;
+  //  }
+  //
+  //  /* team */
+  //  .team-member {
+  //    margin-bottom: 30px;
+  //  }
+  //
+  //  .team-member:last-child {
+  //    margin-bottom: 0;
+  //  }
+  //
+  //  .member-thumb {
+  //    margin: 0 auto;
+  //  }
+  //
+  //  /* facts */
+  //  #facts {
+  //    background-position: center top !important;
+  //  }
+  //
+    .counters-item {
+      margin-bottom: 50px;
+    }
+  //
+  //  /* contact */
+  //  .contact-address {
+  //    margin-bottom: 30px;
+  //  }
+  //
+  //  .footer-social {
+  //    margin-top: 20px;
+  //    text-align: center;
+  //  }
+  //
+  //  .footer-social li {
+  //    display: inline-block;
+  //  }
+  //
+  //  .footer-social li a {
+  //    margin: 0 10px;
+  //  }
+  //
+  //  /* footer */
+  //  .footer-subscribe {
+  //    margin-bottom: 30px;
+  //  }
+}
+
+///*============================================================
+//	Mobile (Landscape) Design for a width of 480px
+//==============================================================*/
+//
+//@media only screen and (min-width: 480px) and (max-width: 767px) {
+//  /* works */
+//  .work-item {
+//    left: inherit !important;
+//    width: 50%;
+//  }
+//}
+//

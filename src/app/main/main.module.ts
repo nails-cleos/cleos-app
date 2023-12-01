@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../shared/shared.module';
 import { MainRoutingModule } from './main-routing.module';
-import { MatCarouselModule } from '@magloft/material-carousel';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { EffectsModule } from '@ngrx/effects';
 
@@ -23,6 +22,7 @@ import { UserService } from '../services/user.service';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { LoginEffects } from '../store/effects/auth.effects';
 import { AuthService } from '../services/auth.service';
+import { NgImageSliderModule } from 'ng-image-slider';
 
 @NgModule({
   declarations: [
@@ -51,7 +51,7 @@ import { AuthService } from '../services/auth.service';
       extend: true
     }),
     EffectsModule.forFeature([MainEffects, CatalogueEffects, UserEffects, LoginEffects]),
-    MatCarouselModule.forRoot()
+    NgImageSliderModule
   ],
   providers: [
     MainService,

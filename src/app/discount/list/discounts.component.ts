@@ -223,8 +223,8 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
 
   sortCustomers(data: any): IUser[] {
     return data.sort((a: any, b: any) => {
-      const aName = a.displayName.toUpperCase();
-      const bName = b.displayName.toUpperCase();
+      const aName = a.displayName?.toUpperCase();
+      const bName = b.displayName?.toUpperCase();
       return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
     });
   }
