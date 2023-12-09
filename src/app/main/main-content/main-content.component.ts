@@ -234,9 +234,11 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     return [{
       name: 'WHATSAPP',
       delay: '1000ms',
-      href: `https://api.whatsapp.com/send?phone=${ this.translate.instant('MAIN.CONTACT.PHONE') }
-    &text=${ this.translate.instant('MAIN.CONTACT.SEND.HELLO') }`,
-      svgIcon: 'WHATSAPP-NO-COLOR'
+      href: 'https://api.whatsapp.com/send?phone=',
+      svgIcon: 'WHATSAPP-NO-COLOR',
+      phone: 'MAIN.CONTACT.SEND.PHONE',
+      phoneKey: '&text=',
+      phoneText: 'MAIN.CONTACT.SEND.HELLO'
     }, {
       name: 'INSTAGRAM',
       delay: '1100ms',

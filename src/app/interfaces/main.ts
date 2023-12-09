@@ -10,6 +10,9 @@ export interface ISocialLink {
   name: 'WHATSAPP' | 'INSTAGRAM' | 'FACEBOOK';
   delay: string;
   href: string;
+  phone?: string;
+  phoneKey?: string;
+  phoneText?: string;
   svgIcon: 'WHATSAPP-NO-COLOR' | 'WHATSAPP' | 'INSTAGRAM-NO-COLOR' | 'INSTAGRAM' | 'FACEBOOK-NO-COLOR' | 'FACEBOOK';
 }
 

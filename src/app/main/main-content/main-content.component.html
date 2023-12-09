@@ -19,10 +19,19 @@
     <ul class="social-links text-center">
       <li *ngFor="let social of socialLinks"
           [@slideInY]="{value: ':enter', params: {translate: '100px', duration: '500ms', delay: social.delay}}">
-        <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
-           (mouseleave)="onHover(social, false)" [href]="social.href">
-          <mat-icon [svgIcon]="social.svgIcon"></mat-icon>
-        </a>
+        <ng-template [ngIf]="social.phone && social.phoneKey && social.phoneText" [ngIfElse]="noPhone">
+          <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
+             (mouseleave)="onHover(social, false)"
+             [href]="social.href + (social.phone | translate) + social.phoneKey + (social.phoneText | translate)">
+            <mat-icon [svgIcon]="social.svgIcon"></mat-icon>
+          </a>
+        </ng-template>
+        <ng-template #noPhone>
+          <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
+             (mouseleave)="onHover(social, false)" [href]="social.href">
+            <mat-icon [svgIcon]="social.svgIcon"></mat-icon>
+          </a>
+        </ng-template>
       </li>
     </ul>
   </div>
@@ -273,10 +282,19 @@
         <ul fxLayout.lt-sm="row" fxLayout="column" fxLayoutAlign="space-around center">
           <li *ngFor="let social of socialLinks"
               [@leftRight]="{value: contactItem3State.value, params: {translate: '100%', delay: isSmall ? '0ms' : social.delay}}">
-            <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
-               (mouseleave)="onHover(social, false)" [href]="social.href">
-              <mat-icon [svgIcon]="social.svgIcon"></mat-icon>
-            </a>
+            <ng-template [ngIf]="social.phone && social.phoneKey && social.phoneText" [ngIfElse]="noPhone">
+              <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
+                 (mouseleave)="onHover(social, false)"
+                 [href]="social.href + (social.phone | translate) + social.phoneKey + (social.phoneText | translate)">
+                <mat-icon [svgIcon]="social.svgIcon"></mat-icon>
+              </a>
+            </ng-template>
+            <ng-template #noPhone>
+              <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
+                 (mouseleave)="onHover(social, false)" [href]="social.href">
+                <mat-icon [svgIcon]="social.svgIcon"></mat-icon>
+              </a>
+            </ng-template>
           </li>
         </ul>
       </div>
