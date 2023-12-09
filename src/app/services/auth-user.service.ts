@@ -85,4 +85,12 @@ export class AuthUserService {
     this.authUser.next(authUser);
     return authUser;
   }
+
+  updateMode(isDark: boolean): IAuthUser {
+    const authUser = this.authUser.getValue();
+    authUser.isDarkMode = isDark;
+
+    this.authUser.next(authUser);
+    return authUser;
+  }
 }

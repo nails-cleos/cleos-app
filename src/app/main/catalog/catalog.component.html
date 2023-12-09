@@ -1,20 +1,30 @@
 <div class="content">
   <section class="section-style">
-    <div style="margin-top: 20px; margin-bottom: 20px">
-      <app-image-viewer (eventEmitter)="viewerOpen = false" [imageURL]="imageURL"
-                        [open]="viewerOpen"></app-image-viewer>
-      <mat-grid-list [cols]="(isHandset$ | async) ? 1 : 3" fxLayoutAlign="center center" rowHeight="2:1">
-        <mat-grid-tile *ngFor="let catalogue of catalogues; let i = index;">
-          <mat-icon (click)="openImage(catalogue)" class="expand" color="primary">open_in_full</mat-icon>
-          <mat-card appearance="outlined" class="catalogue-card mat-elevation-z8">
-            <img *ngIf="catalogue.id; else box" [alt]="catalogue.name"
-                 [src]="'data:image/jpg;base64,'+ catalogue.blob" mat-card-sm-image/>
-            <ng-template #box>
-              <div class="ssc-square mbs"></div>
-            </ng-template>
-          </mat-card>
-        </mat-grid-tile>
-      </mat-grid-list>
+    <div class="frame" fxLayout="row grap" fxLayout.xs="column" fxLayoutAlign="center center">
+      <mat-card fxFlex="1 1 calc(33.33% - 32px)" fxFlex.md="1 1 calc(50% - 32px)" fxFlex.sm="100%" fxFlex.xs="100%"
+                *ngFor="let catalogue of catalogues;" appearance="outlined" class="catalogue-card">
+        <ng-template [ngIf]="catalogue.treatmentGroup" [ngIfElse]="noDetail">
+          <mat-card-header>
+            <mat-card-title>{{catalogue.name}}</mat-card-title>
+            <mat-card-subtitle>{{catalogue.treatmentGroup.name}}</mat-card-subtitle>
+          </mat-card-header>
+        </ng-template>
+        <ng-template #noDetail>
+          <mat-card-header>
+            <mat-card-title>{{catalogue.name}}</mat-card-title>
+            <mat-card-subtitle>{{'MAIN.CATALOGUE.NO_DETAIL' | translate}}</mat-card-subtitle>
+          </mat-card-header>
+        </ng-template>
+          <mat-card-content class="text-center">
+            <img mat-card-md-image [alt]="catalogue.name" [src]="catalogue.image"/>
+          </mat-card-content>
+          <mat-card-actions>
+            <div fxFlex></div>
+            <a [href]="catalogue.image" rel="noreferrer" target="_blank">
+              <mat-icon>zoom_out_map</mat-icon>
+            </a>
+          </mat-card-actions>
+      </mat-card>
     </div>
   </section>
 </div>

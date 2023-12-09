@@ -1,19 +1,31 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
-      <form (ngSubmit)="create" [formGroup]="form" novalidate>
-        <mat-card appearance="outlined" class="style-card">
+      <mat-card appearance="outlined" class="style-card">
+        <ng-template [ngIf]="isAddMode" [ngIfElse]="headerEditMode">
           <mat-card-header>
             <mat-card-title>{{ 'CATALOGUE.TITLE' | translate }}</mat-card-title>
           </mat-card-header>
+        </ng-template>
+        <ng-template #headerEditMode>
+          <mat-card-header>
+            <mat-card-title>{{ 'CATALOGUE.DETAIL' | translate }}</mat-card-title>
+            <mat-card-subtitle *ngIf="catalogue; else skeleton">{{catalogue.name}}</mat-card-subtitle>
+            <ng-template #skeleton>
+              <div class="ssc-line"></div>
+            </ng-template>
+          </mat-card-header>
+        </ng-template>
+        <form (ngSubmit)="submit" [formGroup]="form" novalidate>
           <mat-card-content>
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'CATALOGUE.NAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input [formControl]="name" autocomplete="name" matInput required>
+                  <input formControlName="name" autocomplete="name" matInput required>
                 </label>
-                <mat-error *ngIf="name.hasError('required')" [innerHTML]="'CATALOGUE.NAME.REQUIRED' | translate">
+                <mat-error *ngIf="getForm.name.hasError('required')"
+                           [innerHTML]="'CATALOGUE.NAME.REQUIRED' | translate">
                 </mat-error>
                 <mat-error *ngIf="errors['name']">
                   {{errors['name']}}
@@ -26,14 +38,35 @@
                 </label>
                 <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
               </mat-form-field>
+              <mat-form-field *ngIf="groups; else skeleton" appearance="outline">
+                <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
+                <label>
+                  <input (keydown)="keyDownGroup($event)" formControlName="group" [matAutocomplete]="autoGroup"
+                         matInput type="text">
+                </label>
+                <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
+                  <mat-option *ngFor="let group of filteredGroup | async | sortBy: 'asc':'name'" [value]="group">
+                    {{group.name}}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="getForm.group.hasError('requireMatch')"
+                           [innerHTML]="'COMMON.TREATMENT.GROUP.INVALID' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['group']">
+                  {{errors['group']}}
+                </mat-error>
+              </mat-form-field>
+              <ng-template #skeleton>
+                <div class="ssc-line"></div>
+              </ng-template>
               <div>
-                <mat-checkbox [formControl]="home"
+                <mat-checkbox formControlName="home"
                               color="primary">{{ 'CATALOGUE.SHOW.HOME' | translate }}</mat-checkbox>
-                <mat-checkbox [formControl]="catalog"
+                <mat-checkbox formControlName="catalog"
                               color="primary">{{ 'CATALOGUE.SHOW.CATALOG' | translate }}</mat-checkbox>
               </div>
-              <div (fileDropped)="onFileDropped($event)" *ngIf="!file" appDragDrop class="container" fxHide.lt-sm
-                   fxShow>
+              <div (fileDropped)="onFileDropped($event)" *ngIf="!file && !showImg" appDragDrop class="container"
+                   fxHide.lt-sm fxShow>
                 <input #fileDropRef (change)="fileBrowseHandler($event)" [multiple]="false" id="fileDropRef"
                        type="file"/>
                 <svg height="64" viewBox="0 0 63 64" width="63" xmlns="http://www.w3.org/2000/svg">
@@ -58,11 +91,11 @@
                 <input #fileInput (change)="fileBrowseHandler($event)" [multiple]="false" hidden id="file" type="file">
               </div>
 
-              <mat-card appearance="outlined" *ngIf="file" class="divider">
+              <mat-card appearance="outlined" *ngIf="file && !showImg" class="divider">
                 <mat-card-header>
                   <mat-icon class="icon-display" mat-card-avatar>image</mat-icon>
                   <mat-card-title-group>
-                    <mat-card-title>{{ file.name }}</mat-card-title>
+                    <mat-card-title style="margin-left: 20px;">{{ file.name }}</mat-card-title>
                     <mat-card-subtitle> {{ formatBytes(file.size, 0) }}</mat-card-subtitle>
                   </mat-card-title-group>
                   <div fxFlex></div>
@@ -79,16 +112,35 @@
                 </mat-card-content>
               </mat-card>
             </div>
+            <div *ngIf="showImg" class="divider">
+              <div class="container">
+                <mat-icon (click)="deleteImg" class="delete-img" color="warn">delete
+                </mat-icon>
+                <img [alt]="catalogue?.name" [src]="img" mat-card-image>
+              </div>
+            </div>
           </mat-card-content>
           <mat-card-actions>
             <div fxFlex></div>
             <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
-            <button [disabled]="form.invalid || file?.progress !== 100" color="primary" mat-fab extended
-                    class="icon-button" type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
+
+            <ng-template [ngIf]="isAddMode" [ngIfElse]="buttonEditMode">
+              <button [disabled]="form.invalid || file?.progress !== 100" color="primary" mat-fab extended
+                      class="icon-button"
+                      type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}
+              </button>
+            </ng-template>
+            <ng-template #buttonEditMode>
+              <button [disabled]="form.invalid || (!showImg && file?.progress !== 100)" color="primary" mat-fab extended
+                      class="icon-button" type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
+            </ng-template>
           </mat-card-actions>
-        </mat-card>
-      </form>
+          <ng-template #buttonSkeleton>
+            <div class="ssc-head-line"></div>
+          </ng-template>
+        </form>
+      </mat-card>
     </div>
   </div>
 </div>

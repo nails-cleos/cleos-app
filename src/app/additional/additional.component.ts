@@ -104,6 +104,12 @@ export class AdditionalComponent implements OnInit, OnDestroy {
     );
   }
 
+  private filterGroup(name: string): IGroupService[] | undefined {
+    const filterValue = name.toLowerCase();
+
+    return this.groups?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
+  }
+
   private findGroups(): void {
     this.store.dispatch(
       new fromActionsAdditional.FindGroups()
@@ -114,6 +120,14 @@ export class AdditionalComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsAdditional.Clean()
     );
+  }
+
+  private getAdditional(): void {
+    if (!this.additional) {
+      this.store.dispatch(
+        new fromActionsAdditional.AdditionalFind(this.id)
+      );
+    }
   }
 
   private subscribe(): void {
@@ -139,19 +153,5 @@ export class AdditionalComponent implements OnInit, OnDestroy {
         this.router.navigate(['additional']);
       }
     });
-  }
-
-  private filterGroup(name: string): IGroupService[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.groups?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-  private getAdditional(): void {
-    if (!this.additional) {
-      this.store.dispatch(
-        new fromActionsAdditional.AdditionalFind(this.id)
-      );
-    }
   }
 }

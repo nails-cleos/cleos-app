@@ -81,6 +81,7 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
     this.authSubscription?.unsubscribe();
+    this.ui.delete();
   }
 
   private subscribe(): void {

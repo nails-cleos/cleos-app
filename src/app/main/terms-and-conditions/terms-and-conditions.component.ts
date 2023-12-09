@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { environment } from '../../../environments/environment';
+import { MainContentService } from '../main-content.service';
 
 @Component({
   selector: 'app-terms-and-conditions',
@@ -9,6 +10,7 @@ import { environment } from '../../../environments/environment';
 export class TermsAndConditionsComponent {
   url = `${environment.appServer}/main`;
 
-  constructor() {
+  constructor(private mainContent: MainContentService) {
+    this.mainContent.showPreload(false);
   }
 }

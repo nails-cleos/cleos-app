@@ -1,208 +1,297 @@
-<!--<div class="carousel">-->
-<!--  <mat-carousel *ngIf="slides && slides.length; else loading" [autoplay]="true" [hideArrows]="true"-->
-<!--                [hideIndicators]="false" [interval]="3000" [loop]="true"-->
-<!--                [maintainAspectRatio]="false" [slides]="slides.length" [useKeyboard]="true" [useMouseWheel]="false"-->
-<!--                color="primary" orientation="ltr" timings="250ms ease-in">-->
-<!--    <mat-carousel-slide #matCarouselSlide *ngFor="let slide of slides; let i = index"-->
-<!--                        [image]="slide.image"></mat-carousel-slide>-->
-<!--  </mat-carousel>-->
-<!--  <ng-template #loading>-->
-<!--    <div class="spinner-parent-vertical">-->
-<!--      <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>-->
-<!--    </div>-->
-<!--  </ng-template>-->
-<!--</div>-->
-<div [style.height]="'auto'">
-  <mat-carousel *ngIf="slides && slides.length"
-                timings="250ms ease-in"
-                [autoplay]="true"
-                [interval]="5000"
-                color="accent"
-                maxWidth="auto"
-                [proportion]="100"
-                [slides]="5"
-                [loop]="true"
-                [hideArrows]="true"
-                [hideIndicators]="false"
-                [useKeyboard]="false"
-                [useMouseWheel]="false"
-                orientation="ltr"
-  >
-    <mat-carousel-slide
-      #matCarouselSlide
-      *ngFor="let slide of slides; let i = index"
-      [image]="slide.image"
-      overlayColor="#00000040"
-      [hideOverlay]="false"
-    ></mat-carousel-slide>
-  </mat-carousel>
-</div>
-<div class="content">
-  <section class="section-style" id="story">
-    <h1 class="title">{{ 'MAIN.SECTION.STORY' | translate }}</h1>
-    <div [innerHTML]="'MAIN.STORY_DETAIL' | translate" class="large-text">
+<!-- Home Slider -->
+<section id="slider">
+  <div class="container slider">
+    <div [@slideAnimation]="currentIndex">
+      <ng-template ngFor [ngForOf]="slides" let-slide let-i="index">
+        <div *ngIf="isCurrentSlideIndex(i)" class="slider-img"
+             [ngStyle]="{'background-image': 'url(' + slide.image + ')'}"></div>
+      </ng-template>
     </div>
-  </section>
-  <section class="section-style" id="treatment">
-    <h1 class="title">{{ 'MAIN.SECTION.TREATMENT' | translate }}</h1>
-    <div class="treatment-container">
-      <div *ngFor="let group of groups" class="card-wrap">
-        <app-mini-card-treatment-group (groupEvent)="setGroup($event)" (treatmentEvent)="setTreatment($event)"
-                                     [card]="group"></app-mini-card-treatment-group>
+  </div>
+
+  <div class="carousel-caption">
+    <h1 [@slideInY]="{value: ':enter', params: {translate: '-2000px'}}">
+      {{'MAIN.SLIDER.TITLE' | translate}}</h1>
+    <h2 [@slideInX]="{value: ':enter', params: {translate: '-2000px'}}">{{'MAIN.SLIDER.SUB_1' | translate}}</h2>
+    <p [@slideInX]="{value: ':enter', params: {translate: '2000px'}}">{{'MAIN.SLIDER.SUB_2' | translate}}
+    </p>
+
+    <ul class="social-links text-center">
+      <li *ngFor="let social of socialLinks"
+          [@slideInY]="{value: ':enter', params: {translate: '100px', duration: '500ms', delay: social.delay}}">
+        <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
+           (mouseleave)="onHover(social, false)" [href]="social.href">
+          <mat-icon [svgIcon]="social.svgIcon"></mat-icon>
+        </a>
+      </li>
+    </ul>
+  </div>
+</section>
+<!-- End Home Slider -->
+
+<!-- Story -->
+<section id="story" class="story">
+  <div fxLayout="column" fxLayoutAlign="space-around center">
+    <div class="section-title text-center" appAnimate [animateInAnimation]="storyTitle">
+      <h1>{{'MAIN.SECTION.STORY' | translate}}</h1>
+      <div class="home-divider">
+        <mat-icon>favorite</mat-icon>
       </div>
     </div>
-  </section>
-  <section class="section-style" id="book">
-    <h1 class="title">{{ 'MAIN.SECTION.BOOK' | translate }}</h1>
-    <fieldset>
-      <legend>{{'MAIN.SECTION.BOOK' | translate }}</legend>
-      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
-        <mat-form-field appearance="outline">
-          <mat-label>{{ 'MAIN.BOOK.DATE.FIELD' | translate }}</mat-label>
-          <label>
-            <input (focus)="picker.open()" [formControl]="date" [matDatepickerFilter]="myFilter"
-                   [matDatepicker]="picker" [max]="maxDate" [min]="minDate"
-                   matInput>
-          </label>
-          <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
-          <mat-datepicker #picker touchUi></mat-datepicker>
-        </mat-form-field>
-        <mat-form-field *ngIf="groups; else skeleton" appearance="outline">
-          <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
-          <label>
-            <input (keydown)="keyDownGroup($event)" [formControl]="group" [matAutocomplete]="autoGroup"
-                   matInput type="text">
-          </label>
-          <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
-            <mat-option *ngFor="let group of filteredGroup | async" [value]="group">
-              {{group.name}}
-            </mat-option>
-          </mat-autocomplete>
-          <mat-icon matSuffix>format_list_bulleted</mat-icon>
-          <mat-error *ngIf="group.hasError('requireMatch')"
-                     [innerHTML]="'COMMON.TREATMENT.GROUP.INVALID' | translate">
-          </mat-error>
-        </mat-form-field>
-        <mat-form-field *ngIf="treatments" appearance="outline">
-          <mat-label>{{ 'COMMON.TREATMENT.FIELD' | translate }}</mat-label>
-          <label>
-            <input (keydown)="keyDownHandler($event, treatment)" [formControl]="treatment"
-                   [matAutocomplete]="autoTreatment" matInput type="text">
-          </label>
-          <mat-autocomplete #autoTreatment="matAutocomplete" [displayWith]="displayFnTreatment">
-            <mat-option *ngFor="let treatment of filteredTreatment | async" [value]="treatment">
-              {{treatment.name}}
-            </mat-option>
-          </mat-autocomplete>
-          <mat-icon matSuffix>spa</mat-icon>
-          <mat-error *ngIf="treatment.hasError('requireMatch')"
-                     [innerHTML]="'COMMON.TREATMENT.INVALID' | translate">
-          </mat-error>
-        </mat-form-field>
-        <div [ngClass]="{'last': isHandset}">
-          <button (click)="book" [disabled]="!treatment.value && !date.value" color="primary" mat-fab extended
-                  type="button">
-            <mat-icon>book_online</mat-icon>
-            {{'COMMON.BUTTON.BOOK' | translate}}
-          </button>
-        </div>
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
+
+    <div fxLayout="row wrap" fxLayout.xs="column" fxLayoutAlign="space-between center" style="width: 100%">
+      <div class="section-sub-title" fxFlex="1 1 calc(75% - 32px)" fxFlex.md="1 1 calc(50% - 32px)"
+           fxFlex.sm="1 1 calc(50% - 32px)" fxFlex.xs="100%">
+        <h2 class="text-center" #storyDescription
+            [@leftRight]="{value: storyDescriptionState.value, params: {translate: '-20px'}}">
+          {{ 'MAIN.STORY.DESCRIPTION' | translate}}
+        </h2>
+
+        <h3 class="text-justify" *ngFor="let story of stories" [id]="story.id"
+            [@leftRight]="{value: story.state.value, params: {translate: '-20px', delay: story.delay}}"
+            [innerHTML]="story.text | translate">
+        </h3>
       </div>
-    </fieldset>
-  </section>
-  <section class="section-style last" id="contact">
-    <h1 class="title">{{ 'MAIN.SECTION.CONTACT' | translate }}</h1>
-    <mat-card appearance="outlined">
-      <mat-card-content fxLayout="row" fxLayout.lt-sm="column" fxLayoutAlign="space-evenly stretch">
-        <div class="div-left">
-          <h2 class="bold no-content">{{'MAIN.CONTACT.TITLE' | translate}}</h2>
-          <p>
-            <mat-icon matPrefix>room</mat-icon>&nbsp;
-            <a
-              [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + ('MAIN.CONTACT.ADDRESS' | translate)"
-              rel="noreferrer"
-              target="_blank">
-              {{'MAIN.CONTACT.ADDRESS' | translate}}
+
+      <div fxFlex="1 1 calc(25% - 32px)" fxFlex.md="1 1 calc(50% - 32px)" fxFlex.sm="1 1 calc(50% - 32px)"
+           fxFlex.xs="100%" #storyMember>
+        <figure class="team-member text-center">
+          <div class="member-thumb"
+               [@bottomTop]="{value: storyMemberState.value, params: {translate: '40vh', delayIn: '0ms', delayOut: '600ms'}}">
+            <img src="../../../assets/home_page/img/team/member-1.png" alt="Team Member" class="img-responsive">
+          </div>
+          <h3
+            [@bottomTop]="{value: storyMemberState.value, params: {translate: '20px', delayIn: '300ms', delayOut: '300ms'}}">
+            Carla Lujan</h3>
+          <span
+            [@bottomTop]="{value: storyMemberState.value, params: {translate: '20px', delayIn: '600ms', delayOut: '0ms'}}">{{'MAIN.STORY.MEMBER' | translate}}</span>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End Story -->
+
+<!-- Works -->
+<section id="work" class="works">
+  <div fxLayout="column" fxLayoutAlign="space-between center">
+    <div class="section-title text-center">
+      <h1>{{'MAIN.SECTION.WORK' | translate}}</h1>
+      <div class="home-divider">
+        <mat-icon>favorite</mat-icon>
+      </div>
+    </div>
+
+    <div class="work-sub-title text-center" appAnimate [animateInAnimation]="workText" [stopAnimation]="isSmall">
+      <h3>{{'MAIN.WORK.TEXT_1' | translate}}</h3>
+    </div>
+
+    <div class="work-filter fadeInRight animated" data-wow-duration="500ms">
+      <ul class="text-center">
+        <li><a (click)="filter = undefined" class="work-filter pointer"
+               [ngClass]="{'active': filter === undefined}">{{'MAIN.WORK.FILTER.ALL' | translate}}</a>
+        </li>
+        <li *ngFor="let group of groups">
+          <a (click)="filter = group" class="work-filter pointer"
+             [ngClass]="{'active': filter === group}">{{group.name}}</a>
+        </li>
+      </ul>
+    </div>
+
+    <div fxLayout="row grap" fxLayout.xs="column" fxLayoutAlign="center center">
+
+      <div fxFlex="1 1 calc(33.33% - 32px)" fxFlex.md="1 1 calc(50% - 32px)" fxFlex.sm="100%" fxFlex.xs="100%"
+           class="text-center" *ngFor="let work of filterGroups(works)" @fadeInOut>
+        <figure class="work-item" [ngClass]="{'work-item-active': !filter}">
+          <img [src]="work.image" alt="">
+          <figcaption class="overlay">
+            <a class="fancybox" [title]="work.title" [href]="work.image" target="_blank">
+              <mat-icon class="text-top">visibility</mat-icon>
             </a>
-          </p>
-          <p>
-            <mat-icon matPrefix>phone</mat-icon>&nbsp;
-            <a [href]="'tel:' + ('MAIN.CONTACT.PHONE' | translate)">{{'MAIN.CONTACT.PHONE' | translate}}</a>
-          </p>
-          <p>
-            <mat-icon matPrefix>mail</mat-icon>&nbsp;
-            <a [href]="'mailto:' + ('MAIN.CONTACT.MAIL' | translate)">{{'MAIN.CONTACT.MAIL' | translate}}</a>
-          </p>
-          <div fxLayout="row" fxLayoutAlign="center center">
-            <a
-              [href]="'https://api.whatsapp.com/send?phone=' + ('MAIN.CONTACT.PHONE' | translate) + '&text=' + ('MAIN.CONTACT.SEND.HELLO' | translate)"
-              mat-icon-button rel="noreferrer" target="_blank">
-              <mat-icon [svgIcon]="'WHATSAPP'"></mat-icon>
-            </a>
-            <a [href]="'https://www.instagram.com/carlanailscleos.nl/'" mat-icon-button rel="noreferrer" target="_blank">
-              <mat-icon [svgIcon]="'INSTAGRAM'"></mat-icon>
-            </a>
-            <a [href]="'https://www.facebook.com/carlanailscleos.nl/'" mat-icon-button rel="noreferrer" target="_blank">
-              <mat-icon [svgIcon]="'FACEBOOK'"></mat-icon>
-            </a>
+            <h3>{{work.title}}</h3>
+            <p>{{work.detail}}</p>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End Works -->
+
+<!-- Features -->
+<section id="treatments" class="treatments" *ngIf="groups?.length">
+  <div fxLayout="column" fxLayoutAlign="space-around center">
+
+    <div class="section-title text-center mb-50" appAnimate [animateInAnimation]="treatmentTitle">
+      <h1>{{'MAIN.SECTION.TREATMENT' | translate }}</h1>
+      <div class="home-divider">
+        <mat-icon>favorite</mat-icon>
+      </div>
+    </div>
+    <div #treatmentItem></div>
+
+    <div fxLayout="row grap" fxLayout.xs="column" fxLayoutAlign="space-around center">
+      <div fxFlex="1 1 calc(33.33% - 32px)" fxFlex.sm="1 1 calc(50% - 32px)" fxFlex.xs="100"
+           *ngFor="let group of groups; let i = index">
+        <div class="treatment-item pointer-only" appAnimate [animateInAnimation]="setTreatmentAnimation(i)"
+             [stopAnimation]="isSmall">
+          <div class="treatment-icon">
+            <mat-icon>favorite</mat-icon>
+          </div>
+          <div class="treatment-desc">
+            <h2>{{group.name}}</h2>
+            <p>{{group.description}}</p>
           </div>
         </div>
-        <mat-divider [vertical]="true"></mat-divider>
-        <div class="div-right">
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End Features -->
+
+<!-- Experiences -->
+<section id="experiences" class="experiences">
+  <div class="parallax-overlay">
+    <div fxLayout="column" fxLayoutAlign="space-around center">
+      <div class="section-title text-center mb-50" appAnimate [animateInAnimation]="experienceTitle">
+        <h1 class="experience-title">{{'MAIN.SECTION.EXPERIENCE' | translate }}</h1>
+        <div class="home-divider">
+          <mat-icon>favorite</mat-icon>
+        </div>
+      </div>
+
+      <div fxLayout="row wrap" fxLayout.xs="column" fxLayoutAlign="space-between center" style="width: 100%">
+        <div *ngFor="let experience of experiences" class="text-center" fxFlex="1 1 calc(25% - 32px)"
+             fxFlex.sm="1 1 calc(50% - 32px)" fxFlex.xs="100%" [id]="experience.id"
+             [@bottomTop]="{value: experience.state.value, params: {translate: '20px', delayIn: experience.delay, delayOut: experience.delayOut}}">
+          <div class="counters-item">
+            <mat-icon>{{experience.icon}}</mat-icon>
+            <strong>{{experience.position}}</strong>
+            <p>{{experience.text | translate}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End Some fun facts -->
+
+<!-- Contact Us -->
+<section id="contact" class="contact">
+  <div fxLayout="column" fxLayoutAlign="space-around center" class="mb-50">
+
+    <div class="section-title text-center mb-50" appAnimate [animateInAnimation]="contactTitle">
+      <h1>{{'MAIN.SECTION.CONTACTS' | translate }}</h1>
+      <div class="home-divider">
+        <mat-icon>favorite</mat-icon>
+      </div>
+    </div>
+
+    <div class="section-sub-title text-center" appAnimate [animateInAnimation]="contactText"
+         [stopAnimation]="isSmall">
+      <p [innerHTML]="'MAIN.CONTACT.DETAIL' | translate"></p>
+    </div>
+
+    <div fxLayout="row wrap" fxLayoutGap="32px" fxLayout.xs="column" fxLayoutAlign="space-between center"
+         style="width: 80%">
+
+      <!-- contact address -->
+      <div fxFlex.lg="1 1 calc(20% - 32px)" fxFlex.md="1 1 calc(20% - 32px)" fxFlex.sm="1 1 calc(20% - 32px)"
+           fxFlex.xs="100" #contactItem1>
+        <div class="contact-address" [@leftRight]="contactItem1State.value">
+          <h2>{{'MAIN.CONTACT.TITLE' | translate }}</h2>
+          <p>{{'MAIN.CONTACT.ADDRESS' | translate}}</p>
+          <p>{{'MAIN.CONTACT.PHONE' | translate}}</p>
+        </div>
+      </div>
+      <!-- end contact address -->
+
+      <!-- contact form -->
+      <div fxFlex.lg="1 1 calc(60% - 32px)" fxFlex.md="1 1 calc(60% - 32px)" fxFlex.sm="1 1 calc(60% - 32px)"
+           fxFlex.xs="100" #contactItem2>
+        <div class="contact-form"
+             [@bottomTop]="{value:contactItem2State.value, params: {delayIn: isSmall ? '0ms' : '500ms', delayOut: '0ms'}}">
           <h2 class="bold no-content">{{'MAIN.CONTACT.SEND.TITLE' | translate}}</h2>
+
           <form (ngSubmit)="sendEmail" [formGroup]="form" novalidate>
-            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'MAIN.CONTACT.NAME.FIELD' | translate }}</mat-label>
-                <label>
-                  <input [formControl]="name" [tabIndex]="1" autocomplete="name" matInput required>
-                </label>
-                <mat-error *ngIf="name.hasError('required')"
-                           [innerHTML]="'MAIN.CONTACT.NAME.REQUIRED' | translate">
-                </mat-error>
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'MAIN.CONTACT.EMAIL.FIELD' | translate }}</mat-label>
-                <label>
-                  <input [formControl]="email" [tabIndex]="2" autocomplete="email" matInput required>
-                </label>
-                <mat-error *ngIf="email.hasError('email')">
-                  {{ 'MAIN.CONTACT.EMAIL.INVALID' | translate }}
-                </mat-error>
-                <mat-error *ngIf="email.hasError('required')"
-                           [innerHTML]="'MAIN.CONTACT.EMAIL.REQUIRED' | translate">
-                </mat-error>
-              </mat-form-field>
-              <mat-form-field appearance="outline">
+            <div fxLayout="column" fxLayoutAlign="space-evenly stretch" class="home-page-form">
+              <div fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="space-between stretch">
+                <mat-form-field class="full full-margin">
+                  <mat-label>{{ 'MAIN.CONTACT.NAME.FIELD' | translate }}</mat-label>
+                  <label>
+                    <input [formControl]="name" [tabIndex]="1" autocomplete="name" matInput required>
+                  </label>
+                  <mat-error *ngIf="name.hasError('required')"
+                             [innerHTML]="'MAIN.CONTACT.NAME.REQUIRED' | translate"></mat-error>
+                </mat-form-field>
+                <mat-form-field class="full">
+                  <mat-label>{{ 'MAIN.CONTACT.EMAIL.FIELD' | translate }}</mat-label>
+                  <label>
+                    <input [formControl]="email" [tabIndex]="2" autocomplete="email" matInput required>
+                  </label>
+                  <mat-error *ngIf="email.hasError('email')">
+                    {{ 'MAIN.CONTACT.EMAIL.INVALID' | translate }}
+                  </mat-error>
+                  <mat-error *ngIf="email.hasError('required')"
+                             [innerHTML]="'MAIN.CONTACT.EMAIL.REQUIRED' | translate"></mat-error>
+                </mat-form-field>
+              </div>
+
+              <mat-form-field>
                 <mat-label>{{ 'MAIN.CONTACT.SUBJECT.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="subject" [tabIndex]="3" autocomplete="subject" matInput required>
                 </label>
                 <mat-error *ngIf="subject.hasError('required')"
-                           [innerHTML]="'MAIN.CONTACT.SUBJECT.REQUIRED' | translate">
-                </mat-error>
+                           [innerHTML]="'MAIN.CONTACT.SUBJECT.REQUIRED' | translate"></mat-error>
               </mat-form-field>
-              <mat-form-field appearance="outline">
+              <mat-form-field>
                 <mat-label>{{ 'MAIN.CONTACT.BODY.FIELD' | translate }}</mat-label>
                 <label>
                   <textarea #message [formControl]="body" [tabIndex]="4" matInput maxlength="256" required></textarea>
                 </label>
                 <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
                 <mat-error *ngIf="body.hasError('required')"
-                           [innerHTML]="'MAIN.CONTACT.BODY.REQUIRED' | translate">
-                </mat-error>
+                           [innerHTML]="'MAIN.CONTACT.BODY.REQUIRED' | translate"></mat-error>
               </mat-form-field>
-              <div fxFlex></div>
-              <button [disabled]="form.invalid" [tabIndex]="5" color="primary" mat-fab extended type="submit">
-                <mat-icon>send</mat-icon>
-                {{'COMMON.BUTTON.SEND' | translate}}
-              </button>
+              <div>
+                <div fxFlex></div>
+                <button [disabled]="form.invalid" [tabIndex]="5" color="primary" mat-fab extended type="submit">
+                  <mat-icon>mail</mat-icon>
+                  {{'COMMON.BUTTON.SEND' | translate}}
+                </button>
+              </div>
             </div>
           </form>
         </div>
-      </mat-card-content>
-    </mat-card>
-  </section>
-</div>
+      </div>
+      <!-- end contact form -->
+
+      <!-- footer social links -->
+      <div fxFlex.lg="1 1 calc(20% - 32px)" fxFlex.md="1 1 calc(20% - 32px)" fxFlex.sm="1 1 calc(20% - 32px)"
+           fxFlex.xs="100" #contactItem3>
+        <ul fxLayout.lt-sm="row" fxLayout="column" fxLayoutAlign="space-around center">
+          <li *ngFor="let social of socialLinks"
+              [@leftRight]="{value: contactItem3State.value, params: {translate: '100%', delay: isSmall ? '0ms' : social.delay}}">
+            <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
+               (mouseleave)="onHover(social, false)" [href]="social.href">
+              <mat-icon [svgIcon]="social.svgIcon"></mat-icon>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <!-- end footer social links -->
+    </div>
+  </div>
+
+  <!-- Google map -->
+  <div appAnimate [animateInAnimation]="contactMap" [stopAnimation]="true">
+    <iframe
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2459.8286698251877!2d4.476945576894232!3d51.937078579223154!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47c5cbae073735b3%3A0xc150afbfa3aeaf88!2sNails%20Cleos!5e0!3m2!1sen!2snl!4v1701072269943!5m2!1sen!2snl"
+      width="100%" height="300" class="map" allowfullscreen="" loading="lazy" [ngClass]="{'dark-map': isDark}"
+      referrerpolicy="no-referrer-when-downgrade"></iframe>
+  </div>
+  <!-- End Google map -->
+
+</section>
+<!-- End Contact Us-->

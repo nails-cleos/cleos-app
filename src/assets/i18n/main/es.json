@@ -1,30 +1,52 @@
 {
   "MAIN": {
-    "LEGALS": "© 2021 - CLEOS - Todos los derechos reservados.",
-    "STORY_DETAIL": "dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna\n      aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl\n      ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie\n      consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui\n      blandit\n      praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis\n      eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum.",
+    "LEGALS": "Copyright © 2021 - Nails Cleos - Todos los derechos reservados.",
     "SECTION": {
-      "STORY": "Historia",
+      "STORY": "Mi Historia",
       "TREATMENT": "Tratamientos",
-      "BOOK": "Reservar",
+      "WORK": "Trabajos de Cleos",
+      "EXPERIENCE": "Experiencia",
       "CONTACT": "Contacto",
+      "CONTACTS": "Vamos a hablar!",
       "CATALOG": "Catálogo",
       "ACCOUNT": "Mi cuenta",
       "AUTH": "Ingresar",
       "PRIVACY": "Privacidad",
       "TERM_AND_CONDITIONS": "Términos y condiciones"
     },
-    "BOOK": {
-      "DATE": {
-        "FIELD": "Elegí una fecha"
+    "SLIDER": {
+      "TITLE": "NAILS CLEOS",
+      "SUB_1": "La máxima calidad en tus tratamientos.",
+      "SUB_2": "SALUDABLE · ELEGANTE · PERFECTAS · UÑAS"
+    },
+    "STORY": {
+      "DESCRIPTION": "¿Algo más mágico que convertir tu hobby en el trabajo de cada día?",
+      "TEXT_1": "Mi historia como nail artist comenzó en el verano del año 2014. Cursando la carrera de Contadora en la Universidad de Ciencias Económicas de la ciudad de Córdoba de mi amado país, Argentina, y libre de exámenes que dar, me apunté a mi primer curso de manicure.",
+      "TEXT_2": "En busca de perfeccionar mis técnicas básicas en el arte, solo por atender a esa \"chispa interior\" que me inspiraba en los momentos dedicados a mis propias manos – y por supuesto a las de las mujeres valientes de mi círculo íntimo que se sometían a mis tratamientos de principiante",
+      "TEXT_3": "Al finalizar mis estudios de contadora en marzo del 2018, aboqué los primeros 3 años de profesión al rubro, mientras cursaba la Licenciatura en Administración de Empresas en la misma Universidad. Hasta que un día tomé coraje y, con el apoyo incondicional de quien sería meses después mi querido esposo, decidí darle un giro a mi carrera. Así es como comencé a capacitarme aún más en el arte de las uñas, convenciendome dia a dia, clienta a clienta, uña a uña, que el mundo del cuidado y belleza de manos era lo que realmente me apasionaba y un negocio que querría emprender con fuerte motivación......",
+      "TEXT_4": "......Así es que creé mi propio negocio al que bauticé con el nombre de <span class='bold'>\"Cleos\"</span>. El nombre fue inspirado en la historia de este arte.",
+      "MEMBER": "Artista experta en uñas"
+    },
+    "WORK": {
+      "TEXT_1": "Y es que nada más y nada menos que la mismísima Cleopatra del antiguo Egipto, donde se utilizaba henna como colorante, cubría sus uñas con este tinte natural para darles color. Se cree que los tonos rojizos estaban reservados para las reinas, como muestra de rango y poder. Esto es una reafirmación de que la manicura ha sido una de las formas de expresión del yo y de reafirmación de la mujer desde tiempos inmemoriales.",
+      "FILTER": {
+        "ALL": "Todos"
       }
+    },
+    "EXPERIENCE": {
+      "TEXT_1": "Una calida bienvenida",
+      "TEXT_2": "Un Café",
+      "TEXT_3": "Hagamos arte",
+      "TEXT_4": "Felicidad"
     },
     "CONTACT": {
       "TITLE": "Contactanos",
+      "DETAIL": "El compromiso con el cliente es una de mis premisas básicas. Mi desafío cada día es satisfacer sus necesidades, superar sus expectativas y hacer que \"volver\" por su nuevo set de uñas siga siendo un momento muy esperado.",
       "ADDRESS": "Nails Cleos, Benthuizerstraat 33A, 3036 CB Rotterdam",
       "PHONE": "+31 (06) 2525-1524",
       "MAIL": "nails.cleos@gmail.com",
       "SEND": {
-        "TITLE": "¿Tiene alguna pregunta? Nos encantaría saber de ti",
+        "TITLE": "¿Tiene alguna duda? Me encantaría saber de ti",
         "MESSAGE": "Tu mensaje se envió con éxito",
         "HELLO": "ʜᴏʟᴀ ᴄʟᴇᴏꜱ! %0Aɴᴇᴄᴇꜱɪᴛᴏ ʜᴀᴄᴇʀ ᴜɴᴀ ᴄᴏɴꜱᴜʟᴛᴀ ♡"
       },
@@ -45,6 +67,9 @@
         "FIELD": "Mensaje",
         "REQUIRED": "El mensaje es requerido"
       }
+    },
+    "CATALOGUE": {
+      "NO_DETAIL": "Sin detalle"
     }
   },
   "CARD": {

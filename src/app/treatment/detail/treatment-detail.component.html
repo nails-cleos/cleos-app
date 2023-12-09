@@ -32,7 +32,7 @@
                 <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
               </mat-form-field>
               <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
-                <mat-form-field appearance="outline" style="margin-right: 12px;">
+                <mat-form-field appearance="outline" class="full-margin">
                   <mat-label>{{ 'TREATMENT.DURABILITY.MIN.FIELD' | translate }}</mat-label>
                   <label>
                     <input formControlName="durabilityMin" matInput>
@@ -41,7 +41,7 @@
                     {{errors['durabilityMin']}}
                   </mat-error>
                 </mat-form-field>
-                <mat-form-field appearance="outline" style="margin-right: 12px;">
+                <mat-form-field appearance="outline" class="full-margin">
                   <mat-label>{{ 'TREATMENT.DURABILITY.MAX.FIELD' | translate }}</mat-label>
                   <label>
                     <input formControlName="durabilityMax" matInput>

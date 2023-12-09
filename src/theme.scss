@@ -171,7 +171,7 @@ $mat-dark-theme-background: (
 body {
   --primary-color: #a9a397;
   --primary-lighter-color: #e5e3e0;
-  --primary-darker-color: #8f887a;
+  --primary-darker-color: #7e7769;
   --text-primary-color: #{$dark-primary-text};
   --text-primary-lighter-color: #{$dark-primary-text};
   --text-primary-darker-color: #{$dark-primary-text};
@@ -208,7 +208,7 @@ $mat-primary: (
     A700 : $dark-primary-text,
   )
 );
-$theme-primary: mat.define-palette($mat-primary);
+$theme-primary: mat.define-palette($mat-primary, 500);
 
 body {
   --accent-color: #dcc8c2;
@@ -368,6 +368,15 @@ $altTheme: mat.define-dark-theme((
   @include mat.all-component-themes($altTheme);
   @include style.theme($altTheme);
   @include mat.strong-focus-indicators-theme($altTheme);
+}
+
+.home-page-form {
+  @include mat.private-form-field-density(-5);
+  @include mat.button-density(-3);
+  .mat-mdc-text-field-wrapper:not(.mdc-text-field--outlined),
+  .mat-mdc-floating-label {
+    display: inline !important;
+  }
 }
 
 // Specific component overrides, pieces that are not in line with the general theming
