@@ -6,6 +6,8 @@ import { AppState, selectCatalogueState } from '../../store/app.states';
 import * as fromActionsCatalogue from '../../store/catalogue.actions';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
+import { MainContentService } from '../main-content.service';
+import { b64toBlob } from '../../util/file';
 
 @Component({
   selector: 'app-catalog',
@@ -26,7 +28,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
 
   catalogues: ICatalogueAll[] = [];
 
-  constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>) {
+  constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>, private mainContent: MainContentService) {
     this.getState = this.store.select(selectCatalogueState);
   }
 
@@ -41,14 +43,23 @@ export class CatalogComponent implements OnInit, OnDestroy {
   }
 
   openImage(catalogue: ICatalogueAll): void {
-    this.imageURL = `data:image/jpg;base64,${catalogue.blob}`;
+    this.imageURL = `data:${ catalogue.contentType };base64,${ catalogue.blob }`;
     this.viewerOpen = true;
   }
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe((state) => {
       if (state.data) {
-        this.catalogues = state.data;
+        state.data.forEach((it?: ICatalogueAll) => {
+          if (it && it.blob) {
+            const blob = b64toBlob(it.blob, it.contentType);
+            const image = URL.createObjectURL(blob);
+            this.catalogues.push(Object.assign({}, it, { image }));
+          }
+        });
+        if (this.catalogues?.length) {
+          this.mainContent.showPreload(false);
+        }
       }
     });
   }

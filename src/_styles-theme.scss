@@ -16,7 +16,7 @@
 
   // Home page
   #back-top {
-    color: mat.get-color-from-palette($primary-palette) !important;
+    color: mat.get-color-from-palette($accent-palette) !important;
   }
 
   .home-divider:before,
@@ -31,29 +31,55 @@
     color: mat.get-color-from-palette($foreground, secondary-text);
   }
 
-  .treatments {
+  .section-title h1 {
+    color: mat.get-color-from-palette($primary-palette);
+  }
+
+  .treatment-icon {
+    border: 1px solid mat.get-color-from-palette($primary-palette);
+    color: mat.get-color-from-palette($primary-palette);
+  }
+
+  .works {
     background-color: mat.get-color-from-palette($background, hover);
   }
 
+  .work-filter ul li a {
+    color: mat.get-color-from-palette($foreground, text);
+  }
+
+  .work-filter ul li a:hover,
+  .work-filter ul li a.active {
+    background-color: mat.get-color-from-palette($primary-palette);
+    border-radius: 6px;
+    color: mat.get-color-from-palette($foreground, text);
+    padding: 5px 17px;
+  }
+
+  .overlay {
+    background-color: rgba(mat.get-color-from-palette($primary-palette), .9);
+    color: mat.get-color-from-palette($foreground, text);
+  }
+
+  .work-item .overlay a {
+    border: 1px solid mat.get-color-from-palette($foreground, text);
+    color: mat.get-color-from-palette($foreground, text);
+  }
+
+  .work-item .overlay a:hover {
+    color: mat.get-color-from-palette($accent-palette) !important;
+  }
+
+  .team-member h3 {
+    color: mat.get-color-from-palette($accent-palette);
+  }
+
   .footer {
-    border-top: 5px solid mat.get-color-from-palette($primary-palette, A700);
     color: mat.get-color-from-palette($foreground, text);
 
     #subs {
       color: mat.get-color-from-palette($foreground, text);
     }
-  }
-
-  .subscribe #subscribe {
-    border: 2px solid mat.get-color-from-palette($foreground, text);
-  }
-
-  .credit a {
-    color: mat.get-color-from-palette($foreground, text);
-  }
-
-  .credit a:hover {
-    color: mat.get-color-from-palette($foreground, disabled-button);
   }
 
   .copyright {
@@ -176,19 +202,23 @@
   }
 
   @if $isDark {
-    #facts {
+    #experiences {
       background-color: #e1d0cb;
 
       .parallax-overlay {
         background-color: #e1d0cb;
       }
+
+      h1 {
+        color: black;
+      }
     }
-    .facts .home-divider:before,
-    .facts .home-divider:after {
+    .experiences .home-divider:before,
+    .experiences .home-divider:after {
       color: black;
     }
 
-    .facts .home-divider mat-icon {
+    .experiences .home-divider mat-icon {
       color: black;
     }
 
@@ -197,13 +227,13 @@
     }
 
     .counters-item mat-icon {
-      // TODO change
       border: 1px solid #737C85;
       color: black;
     }
 
     .footer {
-      background-color: mat.get-color-from-palette($primary-palette, 900);
+      border-top: 5px solid mat.get-color-from-palette($primary-palette, 900);
+      background-color: mat.get-color-from-palette($accent-palette, 900);
     }
 
     .text-bg-created {
@@ -247,21 +277,23 @@
       color: black;
     }
   } @else {
-    #facts {
-      // TODO change
+    #experiences {
       background-color: #7e7769;
 
-      // TODO change
       .parallax-overlay {
         background-color: #7e7769;
       }
+
+      h1 {
+        color: white;
+      }
     }
-    .facts .home-divider:before,
-    .facts .home-divider:after {
+    .experiences .home-divider:before,
+    .experiences .home-divider:after {
       color: white;
     }
 
-    .facts .home-divider mat-icon {
+    .experiences .home-divider mat-icon {
       color: white;
     }
 
@@ -270,13 +302,13 @@
     }
 
     .counters-item mat-icon {
-      // TODO change
       border: 1px solid #a9a9a9;
       color: white;
     }
 
     .footer {
-      background-color: mat.get-color-from-palette($primary-palette, 500);
+      border-top: 5px solid mat.get-color-from-palette($primary-palette, 500);
+      background-color: mat.get-color-from-palette($accent-palette, 500);
     }
 
     .text-bg-created {

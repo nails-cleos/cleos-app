@@ -6,17 +6,17 @@
     <mat-toolbar class="nav-fixed-top"
                  [@colorChange]="{value: navigationState.value, params: {backgroundColor: backgroundColor}}">
       <img [@colorChangeChild]="navigationState.value" alt="logo" src="../../assets/icons/icon-512x512.png">
-      <span>{{title}}</span>
+      <span>{{title | uppercase}}</span>
       <span class="mat-spacer"></span>
       <span *ngIf="(isHandset$ | async) === false; else menuButton">
         <button (click)="scrollToElement('story')" mat-button type="button">
           <span>{{'MAIN.SECTION.STORY' | translate }}</span>
         </button>
+        <button (click)="scrollToElement('work')" mat-button type="button">
+          <span>{{'MAIN.SECTION.WORK' | translate }}</span>
+        </button>
         <button (click)="scrollToElement('treatments')" mat-button type="button">
           <span>{{'MAIN.SECTION.TREATMENT' | translate }}</span>
-        </button>
-        <button (click)="scrollToElement('book')" mat-button type="button">
-          <span>{{'MAIN.SECTION.BOOK' | translate }}</span>
         </button>
         <button (click)="scrollToElement('contact')" mat-button type="button">
           <span>{{'MAIN.SECTION.CONTACT' | translate }}</span>
@@ -51,14 +51,14 @@
               <div mat-line>{{'MAIN.SECTION.STORY' | translate }}</div>
             </a>
             <mat-divider></mat-divider>
+            <a (click)="scrollToElement('work')" mat-list-item>
+              <mat-icon matListItemIcon>work</mat-icon>
+              <div mat-line>{{'MAIN.SECTION.WORK' | translate }}</div>
+            </a>
+            <mat-divider></mat-divider>
             <a (click)="scrollToElement('treatments')" mat-list-item>
               <mat-icon matListItemIcon>spa</mat-icon>
               <div mat-line>{{'MAIN.SECTION.TREATMENT' | translate }}</div>
-            </a>
-            <mat-divider></mat-divider>
-            <a (click)="scrollToElement('book')" mat-list-item>
-              <mat-icon matListItemIcon>book_online</mat-icon>
-              <div mat-line>{{'MAIN.SECTION.BOOK' | translate }}</div>
             </a>
             <mat-divider></mat-divider>
             <a (click)="scrollToElement('contact')" mat-list-item>
@@ -90,68 +90,41 @@
     <router-outlet #bodySection></router-outlet>
     <footer id="footer" class="footer">
       <div fxLayout="column" fxLayoutAlign="space-around center">
-        <div #footerItem fxLayout="row wrap" fxLayoutGap="32px" fxLayout.xs="column"
-             fxLayoutAlign="space-around center">
-
-          <div fxFlex="1 1 calc(25% - 32px)"
-               fxFlex.lt-md="1 1 calc(50% - 32px)"
-               fxFlex.lt-sm="100%"
-               [@bottomTop]="{value:footerItemState.value, params: {delayIn: '0ms', delayOut: '900ms'}}">
-            <div>
-              <img src="../../assets/icons/icon-512x512.png" alt="">
-              <p>eusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-                nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-            </div>
-          </div>
-
-          <div fxFlex="1 1 calc(25% - 32px)"
-               fxFlex.lt-md="1 1 calc(50% - 32px)"
-               fxFlex.lt-sm="100%"
-               [@bottomTop]="{value:footerItemState.value, params: {delayIn: '300ms', delayOut: '600ms'}}">
-            <div class="footer-subscribe">
-              <h6>Subscribe </h6>
-              <form action="#" class="subscribe">
-                <input type="text" name="subscribe" id="subscribe">
-                <input type="submit" value="&#8594;" id="subs">
-              </form>
-              <p>eusmod tempor incididunt ut labore et dolore magna aliqua. </p>
-            </div>
-          </div>
-
-          <div fxFlex="1 1 calc(25% - 32px)" fxFlex.lt-md="1 1 calc(50% - 32px)" fxFlex.lt-sm="100%" class="credit"
-               [@bottomTop]="{value:footerItemState.value, params: {delayIn: '600ms', delayOut: '300ms'}}">
-            <div>
-              <h6>Explore</h6>
-              <ul>
-                <li><a href="#">Inside Us</a></li>
-                <li><a href="#">Flickr</a></li>
-                <li><a href="https://maps.app.goo.gl/VXx7cmh6kTSueLbx8" rel="noreferrer" target="_blank">Google</a></li>
-                <li><a href="#">Forum</a></li>
-              </ul>
-            </div>
-          </div>
-
-          <div fxFlex="1 1 calc(25% - 32px)" fxFlex.lt-md="1 1 calc(50% - 32px)" fxFlex.lt-sm="100%" class="credit"
-               [@bottomTop]="{value:footerItemState.value, params: {delayIn: '900ms', delayOut: '0ms'}}">
-            <div>
-              <h6>Support</h6>
-              <ul>
-                <li><a class="pointer-only" (click)="scrollToElement('contact')">Contact Us</a></li>
-                <li><a [routerLink]="'/main/privacy'">{{'MAIN.SECTION.PRIVACY' | translate }}</a></li>
-                <li><a href="#">Help Center</a></li>
-                <li><a
-                  [routerLink]="'/main/term-and-conditions'">{{'MAIN.SECTION.TERM_AND_CONDITIONS' | translate }}</a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div fxLayout="row" fxLayoutAlign="center">
-          <p class="copyright text-center">
+        <mat-toolbar [ngClass]="{ 'footer-toolbar-dark': isDarkMode, 'footer-toolbar-light': !isDarkMode }">
+          <mat-toolbar-row>
+              <span style="margin: auto;">
+                <button [routerLinkActive]="['active']" [routerLink]="'/main/privacy'" mat-button>
+                  <span>{{'MAIN.SECTION.PRIVACY' | translate }}</span>
+                </button>
+                <button [routerLinkActive]="['active']" [routerLink]="'/main/term-and-conditions'" mat-button>
+                  <span>{{'MAIN.SECTION.TERM_AND_CONDITIONS' | translate }}</span>
+                </button>
+                <button (click)="scrollToElement('contact')" mat-button>
+                  <span>{{'MAIN.SECTION.CONTACT' | translate }}</span>
+                </button>
+              </span>
+          </mat-toolbar-row>
+          <mat-toolbar-row>
+            <span style="margin: auto;">
+              <a
+                [href]="'https://api.whatsapp.com/send?phone=' + ('MAIN.CONTACT.PHONE' | translate) + '&text=' + ('MAIN.CONTACT.SEND.HELLO' | translate)"
+                mat-icon-button rel="noreferrer" target="_blank">
+                <mat-icon [svgIcon]="'WHATSAPP-NO-COLOR'"></mat-icon>
+              </a>
+              <a [href]="'https://www.instagram.com/carlanailscleos.nl/'" mat-icon-button rel="noreferrer"
+                 target="_blank">
+                <mat-icon [svgIcon]="'INSTAGRAM-NO-COLOR'"></mat-icon>
+              </a>
+              <a [href]="'https://www.facebook.com/carlanailscleos.nl/'" mat-icon-button rel="noreferrer"
+                 target="_blank">
+                <mat-icon [svgIcon]="'FACEBOOK-NO-COLOR'"></mat-icon>
+              </a>
+            </span>
+          </mat-toolbar-row>
+          <mat-toolbar-row>
             <span style="margin: auto; font-size: small">{{'MAIN.LEGALS' | translate}} - v{{appVersion}}</span>
-          </p>
-        </div>
+          </mat-toolbar-row>
+        </mat-toolbar>
       </div>
     </footer>
     <a class="pointer-only" (click)="scrollToElement(home)" id="back-top" type="button"

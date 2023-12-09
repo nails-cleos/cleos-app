@@ -1,6 +1,6 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
 
-import { CdkDragEnter, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, CdkDragEnter, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Observable, Subscription } from 'rxjs';
 import { AppState, selectCatalogueState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
@@ -13,6 +13,7 @@ import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { executeDialogNoWidth } from '../../util/helper';
+import { b64toBlob } from '../../util/file';
 
 @Component({
   selector: 'app-catalogue-list',
@@ -65,8 +66,8 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  entered($event: CdkDragEnter): void {
-    moveItemInArray(this.catalogues, $event.item.data, $event.container.data);
+  drop(event: CdkDragDrop<{ title: string; poster: string }[]>): void {
+    moveItemInArray(this.catalogues, event.previousIndex, event.currentIndex);
   }
 
   edit(catalogue: ICatalogueAll): void {
@@ -90,7 +91,8 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscribe(): void {
     this.subscription = this.getState.subscribe((state) => {
       if (state.data) {
-        this.catalogues = [...state.data];
+        this.catalogues = state.data
+          .map((it: ICatalogueAll) => Object.assign({}, it, { image: `data:${it.contentType};base64,${it.blob}` }));
         this.cdRef.detectChanges();
       }
       if (state.message) {

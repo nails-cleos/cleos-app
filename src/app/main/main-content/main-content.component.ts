@@ -1,94 +1,70 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ITreatment, ITreatmentGroup } from '../../interfaces/treatment';
-import { map, startWith } from 'rxjs/operators';
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
-import { ICatalogue, ISlide } from '../../interfaces/catalogue';
+import { ITreatmentGroup } from '../../interfaces/treatment';
+import { BehaviorSubject, interval, Observable, Subscription } from 'rxjs';
+import { ICatalogueAll } from '../../interfaces/catalogue';
+import { IExperience, ISlide, ISocialLink, IStory, IWork } from '../../interfaces/main';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { requireMatch } from '../../util/validators';
 import { Store } from '@ngrx/store';
 import { AppState, selectMainState } from '../../store/app.states';
 import { ViewportScroller } from '@angular/common';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { filterDateRoom, getNow, plusMonthDate } from '../../util/dates';
-import { MAX_RESERVATION_CUSTOMER_MONTH } from '../../interfaces/reservation';
 import * as fromActionsMain from '../../store/main.actions';
 import { AuthUserService } from '../../services/auth-user.service';
 import {
   bottomTop,
   bounceInDownAnimation,
+  fadeInOut,
   fadeInUpDown,
   gelatine,
   leftRight,
   observeElement,
   rubberBand,
   scaleIn,
+  slideAnimation,
   slideInX,
   slideInY
 } from '../../util/animation';
 import { AnimationAnimateMetadata, AnimationSequenceMetadata } from '@angular/animations';
 import { isMobile } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-
-interface ISocialLink {
-  name: 'WHATSAPP' | 'INSTAGRAM' | 'FACEBOOK';
-  delay: string;
-  href: string;
-  svgIcon: 'WHATSAPP-NO-COLOR' | 'WHATSAPP' | 'INSTAGRAM-NO-COLOR' | 'INSTAGRAM' | 'FACEBOOK-NO-COLOR' | 'FACEBOOK';
-}
+import { MainContentService } from '../main-content.service';
+import { b64toBlob } from '../../util/file';
 
 @Component({
   selector: 'app-main-content',
   templateUrl: './main-content.component.html',
   styleUrls: ['./main-content.component.scss'],
-  animations: [bottomTop, leftRight, slideInX, slideInY]
+  animations: [bottomTop, leftRight, slideInX, slideInY, fadeInOut, slideAnimation]
 })
 export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('treatmentItem', { static: false }) private serviceItem?: ElementRef<HTMLDivElement>;
-  @ViewChild('teamItem', { static: false }) private teamItem?: ElementRef<HTMLDivElement>;
-  @ViewChild('factItem1', { static: false }) private factItem1?: ElementRef<HTMLDivElement>;
-  @ViewChild('factItem2', { static: false }) private factItem2?: ElementRef<HTMLDivElement>;
-  @ViewChild('factItem3', { static: false }) private factItem3?: ElementRef<HTMLDivElement>;
-  @ViewChild('factItem4', { static: false }) private factItem4?: ElementRef<HTMLDivElement>;
+  @ViewChild('storyDescription', { static: false }) private storyDescription?: ElementRef<HTMLDivElement>;
+  @ViewChild('storyMember', { static: false }) private storyItem6?: ElementRef<HTMLDivElement>;
   @ViewChild('contactItem1', { static: false }) private contactItem1?: ElementRef<HTMLDivElement>;
   @ViewChild('contactItem2', { static: false }) private contactItem2?: ElementRef<HTMLDivElement>;
   @ViewChild('contactItem3', { static: false }) private contactItem3?: ElementRef<HTMLDivElement>;
 
   treatmentItemState: BehaviorSubject<'open' | 'close'>;
-  teamItemState: BehaviorSubject<'open' | 'close'>;
-  factItem1State: BehaviorSubject<'open' | 'close'>;
-  factItem2State: BehaviorSubject<'open' | 'close'>;
-  factItem3State: BehaviorSubject<'open' | 'close'>;
-  factItem4State: BehaviorSubject<'open' | 'close'>;
+  storyDescriptionState: BehaviorSubject<'open' | 'close'>;
+  storyMemberState: BehaviorSubject<'open' | 'close'>;
   contactItem1State: BehaviorSubject<'open' | 'close'>;
   contactItem2State: BehaviorSubject<'open' | 'close'>;
   contactItem3State: BehaviorSubject<'open' | 'close'>;
 
   treatmentTitle: AnimationAnimateMetadata;
-  teamTitle: AnimationSequenceMetadata;
-  storyText: AnimationSequenceMetadata;
-  factTitle: AnimationSequenceMetadata;
+  storyTitle: AnimationSequenceMetadata;
+  workText: AnimationSequenceMetadata;
+  experienceTitle: AnimationSequenceMetadata;
   contactTitle: AnimationSequenceMetadata;
   contactText: AnimationSequenceMetadata;
   contactMap: AnimationAnimateMetadata;
   isSmall: boolean;
   isDark: boolean;
-  isHandset: any;
-  slides: ISlide[] = [];
-
   form!: UntypedFormGroup;
   groups: ITreatmentGroup[] | undefined;
-  filteredGroup: Observable<ITreatmentGroup[] | undefined> | undefined;
-  group: UntypedFormControl = new UntypedFormControl('', [requireMatch]);
-  treatments: ITreatment[] | undefined;
-  filteredTreatment: Observable<ITreatment[] | undefined> | undefined;
-  treatment: UntypedFormControl = new UntypedFormControl('', [requireMatch]);
-
-  maxDate: Date;
-  minDate: Date;
-  date: UntypedFormControl = new UntypedFormControl();
 
   name: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
@@ -103,55 +79,40 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     Validators.required
   ]);
 
-  imageObject: Array<object> = [];
-  noImages: Array<object> = [
-    {
-      image: 'assets/home_page/img/banner.jpg',
-      thumbImage: 'assets/home_page/img/banner.jpg'
-    }, {
-      image: 'assets/home_page/img/parallax/city.jpg',
-      thumbImage: 'assets/home_page/img/parallax/city.jpg'
-    }
-  ];
-  socialLinks: ISocialLink[] = [{
-    name: 'WHATSAPP',
-    delay: '1000ms',
-    href: `https://api.whatsapp.com/send?phone=${ this.translate.instant('MAIN.CONTACT.PHONE') }
-    &text=${ this.translate.instant('MAIN.CONTACT.SEND.HELLO') }`,
-    svgIcon: 'WHATSAPP-NO-COLOR'
-  }, {
-    name: 'INSTAGRAM',
-    delay: '1100ms',
-    href: 'https://www.instagram.com/carlanailscleos.nl/',
-    svgIcon: 'INSTAGRAM-NO-COLOR'
-  }, {
-    name: 'FACEBOOK',
-    delay: '1200ms',
-    href: 'https://www.facebook.com/carlanailscleos.nl/',
-    svgIcon: 'FACEBOOK-NO-COLOR'
-  }];
+  // Images 768x1024
+  slides: ISlide[] = [];
+  socialLinks: ISocialLink[];
+  works: IWork[] = [];
+  filter?: ITreatmentGroup;
+  experiences: IExperience[];
+  stories: IStory[];
+
+  currentIndex: number;
 
   private isAuthenticated = false;
   private subscription?: Subscription;
   private authUserServiceSubscription: Subscription;
+  private sliderSubscription?: Subscription;
   private getState: Observable<any>;
 
   constructor(private store: Store<AppState>, private cdRef: ChangeDetectorRef, private viewportScroller: ViewportScroller,
               private translate: TranslateService, private router: Router, private formBuilder: UntypedFormBuilder,
-              private snackBar: MatSnackBar, private authUserService: AuthUserService, private breakpointObserver: BreakpointObserver) {
+              private snackBar: MatSnackBar, private authUserService: AuthUserService, private breakpointObserver: BreakpointObserver,
+              private mainContent: MainContentService) {
+    this.currentIndex = 0;
     this.isSmall = isMobile();
     this.isDark = false;
+    this.socialLinks = this.allSocialLinks();
+    this.stories = this.allStories();
+    this.experiences = this.allExperience();
 
     this.treatmentTitle = bounceInDownAnimation('500ms');
-    this.teamTitle = fadeInUpDown('20px', '700ms');
-    this.storyText = gelatine;
-    this.factTitle = rubberBand;
+    this.storyTitle = fadeInUpDown('20px', '700ms');
+    this.workText = gelatine;
+    this.experienceTitle = rubberBand;
     this.treatmentItemState = new BehaviorSubject<'open' | 'close'>('open');
-    this.teamItemState = new BehaviorSubject<'open' | 'close'>('open');
-    this.factItem1State = new BehaviorSubject<'open' | 'close'>('open');
-    this.factItem2State = new BehaviorSubject<'open' | 'close'>('open');
-    this.factItem3State = new BehaviorSubject<'open' | 'close'>('open');
-    this.factItem4State = new BehaviorSubject<'open' | 'close'>('open');
+    this.storyDescriptionState = new BehaviorSubject<'open' | 'close'>('open');
+    this.storyMemberState = new BehaviorSubject<'open' | 'close'>('open');
     this.contactItem1State = new BehaviorSubject<'open' | 'close'>('open');
     this.contactItem2State = new BehaviorSubject<'open' | 'close'>('open');
     this.contactItem3State = new BehaviorSubject<'open' | 'close'>('open');
@@ -169,19 +130,11 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       this.isDark = value.isDarkMode;
     });
-    this.minDate = getNow();
-    this.maxDate = plusMonthDate(this.minDate, MAX_RESERVATION_CUSTOMER_MONTH, this.minDate.getDate() + 1);
 
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
     ]).subscribe(result => this.isSmall = result.matches);
-  }
-
-  get book(): void {
-    const data = { date: this.date.value, treatment: { id: this.treatment.value.id } };
-    this.router.navigate(['me', 'reservation'], { state: data });
-    return;
   }
 
   get sendEmail(): void {
@@ -199,38 +152,31 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscribe();
     this.getCatalogues();
     this.getTreatments();
-
-    this.filteredGroup = this.group.valueChanges.pipe(startWith(''), map(value => {
-      if (typeof value === 'string') {
-        return value;
-      }
-      this.treatments = value.treatments;
-      this.treatment.setValue('');
-      return value.name;
-    }), map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups));
-    this.filteredTreatment = this.treatment.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterTreatment(name) : this.treatments ? this.treatments.slice() : this.treatments)
-    );
     this.cdRef.detectChanges();
   }
 
   ngAfterViewInit(): void {
     observeElement(this.treatmentItemState, this.serviceItem?.nativeElement, !this.isSmall);
-    observeElement(this.teamItemState, this.teamItem?.nativeElement, !this.isSmall, 0.1);
-    observeElement(this.factItem1State, this.factItem1?.nativeElement, !this.isSmall);
-    observeElement(this.factItem2State, this.factItem2?.nativeElement, !this.isSmall);
-    observeElement(this.factItem3State, this.factItem3?.nativeElement, !this.isSmall);
-    observeElement(this.factItem4State, this.factItem4?.nativeElement, !this.isSmall);
+    observeElement(this.storyDescriptionState, this.storyDescription?.nativeElement, !this.isSmall, 0.1);
+    observeElement(this.storyMemberState, this.storyItem6?.nativeElement, !this.isSmall, 0.1);
     observeElement(this.contactItem1State, this.contactItem1?.nativeElement, !this.isSmall);
     observeElement(this.contactItem2State, this.contactItem2?.nativeElement, !this.isSmall);
     observeElement(this.contactItem3State, this.contactItem3?.nativeElement, !this.isSmall);
+
+    this.experiences.forEach(it => observeElement(it.state, document.getElementById(it.id), !this.isSmall));
+    this.stories.forEach(it => observeElement(it.state, document.getElementById(it.id), !this.isSmall));
+
+    this.automateSlider();
   }
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.sliderSubscription?.unsubscribe();
     this.authUserServiceSubscription.unsubscribe();
+  }
+
+  isCurrentSlideIndex(index: number): boolean {
+    return this.currentIndex === index;
   }
 
   setTreatmentAnimation(i: number): AnimationSequenceMetadata {
@@ -242,35 +188,16 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     social.svgIcon = `${ social.name }${ suffix }`;
   }
 
-  myFilter = (d: Date | null): boolean => filterDateRoom(d);
-
-  displayFnGroup(group: ITreatmentGroup): string {
-    return group ? `${ group.name }` : '';
-  }
-
-  displayFnTreatment(treatment: ITreatment): string {
-    return treatment ? `${ treatment.name }` : '';
-  }
-
-  keyDownHandler(event: any, form: UntypedFormControl): void {
-    if (event.code === 'Backspace') {
-      form.setValue('');
+  filterGroups(works: IWork[]): IWork[] {
+    if (this.filter) {
+      return works.filter(p => p.group.id === this.filter?.id);
     }
+    return this.works;
   }
 
-  keyDownGroup(event: any): void {
-    this.treatments = undefined;
-    this.keyDownHandler(event, this.treatment);
-    this.keyDownHandler(event, this.group);
-  }
-
-  setGroup(group: ITreatmentGroup): void {
-    this.group.setValue(group);
-  }
-
-  setTreatment(treatment: ITreatment): void {
-    this.treatment.setValue(treatment);
-    this.viewportScroller.scrollToAnchor('book');
+  book(group: ITreatmentGroup): void {
+    // const data = { date: this.date.value, treatment: { id: this.treatment.value.id } };
+    // this.router.navigate(['me', 'reservation'], { state: data });
   }
 
   private createForm(): void {
@@ -282,26 +209,105 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  private subscribe(): void {
-    this.subscription = this.getState.subscribe(state => {
-      if (state.groups) {
-        this.groups = state.groups;
-      }
-      if (state.catalogue && Array.from(state.catalogue)) {
-        state.catalogue.forEach((value: ICatalogue) => {
-          if (value && value.blob) {
-            // const slide = new Slide(`data:image/jpg;base64,${ value.blob }`);
-            const img = `data:image/jpg;base64,${ value.blob }`;
-            this.imageObject?.push({ image: img, thumbImage: img });
+  private automateSlider(): void {
+    this.sliderSubscription = interval(3000).subscribe(() => this.moveForwardSlide());
+  }
+
+  private moveForwardSlide(): void {
+    if (this.slides?.length) {
+      if (this.currentIndex === this.slides.length - 1) {
+        this.sliderSubscription?.unsubscribe();
+        const back = interval(100).subscribe(() => {
+          this.currentIndex--;
+          if (this.currentIndex === 0) {
+            back.unsubscribe();
+            this.automateSlider();
           }
         });
+      } else {
+        this.currentIndex++;
       }
-      if (state.errorMessage || state.message) {
-        this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
-        });
-      }
-    });
+    }
+  }
+
+  private allSocialLinks(): ISocialLink[] {
+    return [{
+      name: 'WHATSAPP',
+      delay: '1000ms',
+      href: `https://api.whatsapp.com/send?phone=${ this.translate.instant('MAIN.CONTACT.PHONE') }
+    &text=${ this.translate.instant('MAIN.CONTACT.SEND.HELLO') }`,
+      svgIcon: 'WHATSAPP-NO-COLOR'
+    }, {
+      name: 'INSTAGRAM',
+      delay: '1100ms',
+      href: 'https://www.instagram.com/carlanailscleos.nl/',
+      svgIcon: 'INSTAGRAM-NO-COLOR'
+    }, {
+      name: 'FACEBOOK',
+      delay: '1200ms',
+      href: 'https://www.facebook.com/carlanailscleos.nl/',
+      svgIcon: 'FACEBOOK-NO-COLOR'
+    }];
+  }
+
+  private allStories(): IStory[] {
+    return [{
+      id: 'storyItem1',
+      state: new BehaviorSubject<'open' | 'close'>('open'),
+      delay: '100ms',
+      text: 'MAIN.STORY.TEXT_1'
+    }, {
+      id: 'storyItem2',
+      state: new BehaviorSubject<'open' | 'close'>('open'),
+      delay: '200ms',
+      text: 'MAIN.STORY.TEXT_2'
+    }, {
+      id: 'storyItem3',
+      state: new BehaviorSubject<'open' | 'close'>('open'),
+      delay: '300ms',
+      text: 'MAIN.STORY.TEXT_3'
+    }, {
+      id: 'storyItem4',
+      state: new BehaviorSubject<'open' | 'close'>('open'),
+      delay: '400ms',
+      text: 'MAIN.STORY.TEXT_4'
+    }];
+  }
+
+  private allExperience(): IExperience[] {
+    return [{
+      id: 'experienceItem1',
+      state: new BehaviorSubject<'open' | 'close'>('open'),
+      delay: '0ms',
+      delayOut: '900ms',
+      icon: 'waving_hand',
+      position: '1°',
+      text: 'MAIN.EXPERIENCE.TEXT_1'
+    }, {
+      id: 'experienceItem2',
+      state: new BehaviorSubject<'open' | 'close'>('open'),
+      delay: this.isSmall ? '0ms' : '300ms',
+      delayOut: '600ms',
+      icon: 'coffee',
+      position: '2°',
+      text: 'MAIN.EXPERIENCE.TEXT_2'
+    }, {
+      id: 'experienceItem3',
+      state: new BehaviorSubject<'open' | 'close'>('open'),
+      delay: this.isSmall ? '0ms' : '600ms',
+      delayOut: '300ms',
+      icon: 'palette',
+      position: '3°',
+      text: 'MAIN.EXPERIENCE.TEXT_3'
+    }, {
+      id: 'experienceItem4',
+      state: new BehaviorSubject<'open' | 'close'>('open'),
+      delay: this.isSmall ? '0ms' : '900ms',
+      delayOut: '0ms',
+      icon: 'mood',
+      position: '4°',
+      text: 'MAIN.EXPERIENCE.TEXT_4'
+    }];
   }
 
   private clean(): void {
@@ -322,15 +328,38 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
-  private filterGroup(name: string): ITreatmentGroup[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.groups?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-  private filterTreatment(name: string): ITreatment[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.treatments?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe(state => {
+      if (state.groups) {
+        this.groups = state.groups;
+      }
+      if (state.catalogue && Array.from(state.catalogue) && !this.slides?.length) {
+        state.catalogue.forEach((catalogue: ICatalogueAll) => {
+          if (catalogue && catalogue.blob) {
+            const blob = b64toBlob(catalogue.blob, catalogue.contentType);
+            const image = URL.createObjectURL(blob);
+            if (catalogue.home) {
+              this.slides?.push({ image, description: catalogue.name });
+            }
+            if (catalogue.treatmentGroup) {
+              this.works.push({
+                title: catalogue.name,
+                detail: catalogue.description,
+                image,
+                group: catalogue.treatmentGroup
+              });
+            }
+          }
+        });
+      }
+      if (this.groups?.length && this.slides?.length && this.works?.length) {
+        this.mainContent.showPreload(false);
+      }
+      if (state.errorMessage || state.message) {
+        this.snackBar.open(state.errorMessage || state.message, 'OK', {
+          duration: 5000
+        });
+      }
+    });
   }
 }

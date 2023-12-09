@@ -64,7 +64,6 @@
     "jspdf": "^2.5.1",
     "libphonenumber-js": "^1.10.24",
     "net": "^1.0.2",
-    "ng-image-slider": "^7.0.1",
     "ng2-charts": "^4.1.1",
     "ngrx-store-localstorage": "^15.0.0",
     "ngx-cookie-service": "^15.0.0",

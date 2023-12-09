@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, Optional, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, Optional, ViewChild } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { AppState } from '../store/app.states';
@@ -18,6 +18,7 @@ import { ThemeService } from 'ng2-charts';
 import { bottomTop, colorChange, colorChangeChild, fade, goTo, observeElement } from '../util/animation';
 import { Auth, user } from '@angular/fire/auth';
 import { AuthUserService } from '../services/auth-user.service';
+import { MainContentService } from './main-content.service';
 
 @Component({
   selector: 'app-main',
@@ -25,12 +26,10 @@ import { AuthUserService } from '../services/auth-user.service';
   styleUrls: ['./main.component.scss'],
   animations: [fade, bottomTop, colorChange, colorChangeChild]
 })
-export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
+export class MainComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('bodySection', { static: true }) bodySection?: ElementRef<HTMLElement>;
-  @ViewChild('footerItem', { static: true }) footerItem?: ElementRef<HTMLElement>;
   navigationState: BehaviorSubject<'open' | 'close'>;
-  footerItemState: BehaviorSubject<'open' | 'close'>;
 
   title = environment.title;
   firstSection?: Element | null;
@@ -45,20 +44,23 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     .pipe(map(result => result.matches), shareReplay());
 
   private authUserServiceSubscription: Subscription;
+  private mainContentSubscription: Subscription;
 
   private navigationObserve?: IntersectionObserver;
 
   constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
               private viewportScroller: ViewportScroller, private router: Router, private translate: TranslateService,
               private overlayContainer: OverlayContainer, private cookieService: CookieService,
-              private themeService: ThemeService, @Optional() private auth: Auth, private authUserService: AuthUserService) {
+              private themeService: ThemeService, @Optional() private auth: Auth, private authUserService: AuthUserService,
+              private mainContent: MainContentService) {
     this.navigationState = new BehaviorSubject<'open' | 'close'>('open');
-    this.footerItemState = new BehaviorSubject<'open' | 'close'>('open');
     this.isAuthenticated = false;
     this.showLoader = true;
     this.isDarkMode = isDarkMode(cookieService.get(THEME) as Theme);
+    this.authUserService.updateMode(this.isDarkMode);
     this.backgroundColor = this.isDarkMode ? '126, 119, 105' : '169, 163, 151';
     this.authUserServiceSubscription = user(this.auth).subscribe(response => this.isAuthenticated = response !== null);
+    this.mainContentSubscription = mainContent.data$.subscribe(it => this.showLoader = it);
   }
 
   get changeTheme(): void {
@@ -66,12 +68,12 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     const theme: Theme = getThemeName(this.isDarkMode);
     this.resetTheme(theme);
     if (this.isAuthenticated) {
-      const user1: IUser = new User();
-      user1.theme = theme;
+      const authenticatedUser: IUser = new User();
+      authenticatedUser.theme = theme;
       const redirectUrl = this.router.url;
       const message = this.translate.instant(`COMMON.PROFILE.UPDATED.DARK_MODE_${ this.isDarkMode.toString().toUpperCase() }`);
       this.store.dispatch(
-        new fromActionsUser.UpdateUser({ user: user1, redirectUrl, message })
+        new fromActionsUser.UpdateUser({ user: authenticatedUser, redirectUrl, message })
       );
     }
     return;
@@ -83,17 +85,13 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
-  ngOnInit(): void {
-    this.setTimer();
-  }
-
   ngAfterViewInit(): void {
     this.navigationAnimation();
-    observeElement(this.footerItemState, this.footerItem?.nativeElement);
   }
 
   ngOnDestroy(): void {
     this.authUserServiceSubscription.unsubscribe();
+    this.mainContentSubscription.unsubscribe();
   }
 
   scrollToElement(element: HTMLElement | string): void {
@@ -101,12 +99,6 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
       this.navigationAnimation();
       goTo(element);
     }, 100));
-  }
-
-  setTimer(): void {
-    setTimeout(() => {
-      this.showLoader = false;
-    }, 1000);
   }
 
   private resetTheme(theme?: Theme): void {

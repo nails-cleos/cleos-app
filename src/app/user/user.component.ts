@@ -25,7 +25,6 @@ export class UserComponent implements OnInit, OnDestroy {
   form!: UntypedFormGroup;
   id?: string;
   isAddMode: boolean;
-  hide = false;
   errors: any = [];
   flagList: IFlag[] = flags();
   geometry?: PlaceGeometry;

@@ -6,19 +6,18 @@ import { DragDropDirective } from '../directives/drag-drop.directive';
 
 import { CatalogueComponent } from './catalogue.component';
 import { CataloguesComponent } from './list/catalogues.component';
-import { CatalogueDetailComponent } from './detail/catalogue-detail.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { EffectsModule } from '@ngrx/effects';
 import { CatalogueEffects } from '../store/effects/catalogue.effects';
 import { CatalogueService } from '../services/catalogue.service';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { TreatmentService } from '../services/treatment.service';
 
 @NgModule({
   declarations: [
     CatalogueComponent,
     CataloguesComponent,
-    CatalogueDetailComponent,
     DragDropDirective
   ],
   imports: [
@@ -41,7 +40,8 @@ import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/trans
     EffectsModule.forFeature([CatalogueEffects])
   ],
   providers: [
-    CatalogueService
+    CatalogueService,
+    TreatmentService
   ]
 })
 export class CatalogueModule {

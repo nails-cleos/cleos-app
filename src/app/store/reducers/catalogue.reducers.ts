@@ -1,9 +1,11 @@
 import { Pagination } from '../../interfaces/pagination';
 import { All, CatalogueActionTypes } from '../catalogue.actions';
 import { ICatalogue } from '../../interfaces/catalogue';
+import { ITreatmentGroup } from '../../interfaces/treatment';
 
 export interface State {
   data: ICatalogue | Pagination<ICatalogue> | null;
+  groups: ITreatmentGroup[] | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -14,6 +16,7 @@ export interface State {
 
 export const initialState: State = {
   data: null,
+  groups: null,
   errorMessage: null,
   error: null,
   subErrors: null,
@@ -103,6 +106,24 @@ export const reducer = (state = initialState, action: All): State => {
         subErrors: null,
         message: null,
         isLoading: true
+      };
+    }
+    case CatalogueActionTypes.findGroups: {
+      return {
+        ...state,
+        groups: null,
+        errorMessage: null,
+        subErrors: null,
+        message: null
+      };
+    }
+    case CatalogueActionTypes.findGroupsSuccess: {
+      return {
+        ...state,
+        groups: action.payload,
+        errorMessage: null,
+        subErrors: null,
+        message: null
       };
     }
     case CatalogueActionTypes.clean: {

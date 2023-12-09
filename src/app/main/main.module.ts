@@ -9,7 +9,6 @@ import { MainComponent } from './main.component';
 import { MainContentComponent } from './main-content/main-content.component';
 import { CatalogComponent } from './catalog/catalog.component';
 import { PrivacyComponent } from './privacy/privacy.component';
-import { ImageViewerComponent } from './image-viewer/image-viewer.component';
 import { TermsAndConditionsComponent } from './terms-and-conditions/terms-and-conditions.component';
 import { MiniCardTreatmentComponent } from './mini-card-treatment/mini-card-treatment.component';
 import { MainEffects } from '../store/effects/main.effects';
@@ -22,11 +21,10 @@ import { UserService } from '../services/user.service';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { LoginEffects } from '../store/effects/auth.effects';
 import { AuthService } from '../services/auth.service';
-import { NgImageSliderModule } from 'ng-image-slider';
+import { NgOptimizedImage } from '@angular/common';
 
 @NgModule({
   declarations: [
-    ImageViewerComponent,
     MainComponent,
     MainContentComponent,
     CatalogComponent,
@@ -34,25 +32,25 @@ import { NgImageSliderModule } from 'ng-image-slider';
     TermsAndConditionsComponent,
     MiniCardTreatmentComponent
   ],
-  imports: [
-    MainRoutingModule,
-    SharedModule,
-    MatSlideToggleModule,
-    TranslateModule.forChild({
-      loader: {
-        provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('main')
-      },
-      missingTranslationHandler: {
-        provide: MissingTranslationHandler,
-        useClass: MissingTranslateHandler,
-      },
-      isolate: false,
-      extend: true
-    }),
-    EffectsModule.forFeature([MainEffects, CatalogueEffects, UserEffects, LoginEffects]),
-    NgImageSliderModule
-  ],
+    imports: [
+        MainRoutingModule,
+        SharedModule,
+        MatSlideToggleModule,
+        TranslateModule.forChild({
+            loader: {
+                provide: TranslateLoader,
+                useClass: TranslateLoaderFactory.forModule('main')
+            },
+            missingTranslationHandler: {
+                provide: MissingTranslationHandler,
+                useClass: MissingTranslateHandler,
+            },
+            isolate: false,
+            extend: true
+        }),
+        EffectsModule.forFeature([MainEffects, CatalogueEffects, UserEffects, LoginEffects]),
+        NgOptimizedImage
+    ],
   providers: [
     MainService,
     CatalogueService,

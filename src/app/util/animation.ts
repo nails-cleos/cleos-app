@@ -1,6 +1,51 @@
 import { animate, animateChild, group, keyframes, query, sequence, stagger, state, style, transition, trigger } from '@angular/animations';
 import { BehaviorSubject } from 'rxjs';
 
+const right = [
+  query(':enter, :leave',
+    style({ position: 'absolute', width: '100%' }), { optional: true }
+  ),
+  group([
+    query(':enter', [
+      style({ transform: 'translateX(100%)' }),
+      animate('300ms ease-out',
+        style({ transform: 'translateX(0%)' })
+      )
+    ], { optional: true }),
+    query(':leave', [
+      style({ transform: 'translateX(0%)' }),
+      animate('300ms ease-out',
+        style({ transform: 'translateX(-100%)' })
+      )
+    ], { optional: true })
+  ])
+];
+
+const left = [
+  query(':enter, :leave',
+    style({ position: 'absolute', width: '100%' }), { optional: true }
+  ),
+  group([
+    query(':enter', [
+      style({ transform: 'translateX(-100%)' }),
+      animate('300ms ease-out',
+        style({ transform: 'translateX(0%)' })
+      )
+    ], { optional: true }),
+    query(':leave', [
+      style({ transform: 'translateX(0%)' }),
+      animate('300ms ease-out',
+        style({ transform: 'translateX(100%)' })
+      )
+    ], { optional: true })
+  ])
+];
+
+export const slideAnimation = trigger('slideAnimation', [
+  transition(':increment', right),
+  transition(':decrement', left)
+]);
+
 export const fadeInUpDown = (translate: string = '20px', duration: string = '2000ms') => sequence([
   animate(`${ duration } ease-in-out`, keyframes([
     style({ opacity: 0, transform: `translateY(${ translate })`, offset: 0 }),
@@ -44,23 +89,6 @@ export const scaleIn = (delay: string = '0ms') => sequence([
   ]))
 ]);
 
-// export const scaleIn = trigger('scaleIn', [
-//   state('open', style({ opacity: 0, transform: 'scale(2)' })),
-//   state('close', style({ opacity: 1, transform: 'scale(1)' })),
-//   transition('open => close', animate('{{duration}} {{delay}} ease-in-out'), {
-//     params: {
-//       duration: '500ms',
-//       delayIn: '0ms'
-//     }
-//   }),
-//   transition('close => open', animate('{{duration}} {{delayOut}} ease-in-out'), {
-//     params: {
-//       duration: '500ms',
-//       delayOut: '0ms'
-//     }
-//   })
-// ]);
-
 export const slideInX = trigger('slideInX', [
   transition(':enter', [
       style({ transform: 'translateX({{translate}})', opacity: 0 }),
@@ -85,6 +113,16 @@ export const fade = trigger('fade', [
       duration: '1000ms'
     }
   })
+]);
+
+export const fadeInOut = trigger('fadeInOut', [
+  transition(':enter', [
+    style({ transform: 'scale(0)', opacity: 0 }),
+    animate('500ms 500ms ease-in-out', style({ transform: 'scale(1)', opacity: 1 })),
+  ]),
+  transition(':leave', [
+    animate('500ms ease-in-out', style({ transform: 'scale(0)' })),
+  ])
 ]);
 
 export const colorChange = trigger('colorChange', [

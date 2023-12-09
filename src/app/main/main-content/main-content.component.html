@@ -1,21 +1,19 @@
 <!-- Home Slider -->
 <section id="slider">
-  <div *ngIf="imageObject?.length; else noSlides">
-    <ng-image-slider [images]="imageObject" [infinite]="true" [showArrow]="false" [imagePopup]="false"
-                     [imageSize]="{width: '100%', height: '100%', space: 0}" [autoSlide]="5">
-    </ng-image-slider>
+  <div class="container slider">
+    <div [@slideAnimation]="currentIndex">
+      <ng-template ngFor [ngForOf]="slides" let-slide let-i="index">
+        <div *ngIf="isCurrentSlideIndex(i)" class="slider-img"
+             [ngStyle]="{'background-image': 'url(' + slide.image + ')'}"></div>
+      </ng-template>
+    </div>
   </div>
-  <ng-template #noSlides>
-    <ng-image-slider [images]="noImages" [infinite]="true" [showArrow]="false" [imagePopup]="false"
-                     [imageSize]="{width: '100%', height: '100%', space: 0}" [autoSlide]="5">
-    </ng-image-slider>
-  </ng-template>
+
   <div class="carousel-caption">
     <h1 [@slideInY]="{value: ':enter', params: {translate: '-2000px'}}">
-      Meet Nails Cleos!</h1>
-    <h2 [@slideInX]="{value: ':enter', params: {translate: '-2000px'}}"><span
-      class="color">/creative</span> one page template.</h2>
-    <p [@slideInX]="{value: ':enter', params: {translate: '2000px'}}">We are a team of professionals
+      {{'MAIN.SLIDER.TITLE' | translate}}</h1>
+    <h2 [@slideInX]="{value: ':enter', params: {translate: '-2000px'}}">{{'MAIN.SLIDER.SUB_1' | translate}}</h2>
+    <p [@slideInX]="{value: ':enter', params: {translate: '2000px'}}">{{'MAIN.SLIDER.SUB_2' | translate}}
     </p>
 
     <ul class="social-links text-center">
@@ -32,127 +30,96 @@
 <!-- End Home Slider -->
 
 <!-- Story -->
-<!--TODO: Remove main.css -->
 <section id="story" class="story">
   <div fxLayout="column" fxLayoutAlign="space-around center">
-    <div class="section-title text-center">
-      <h1>Works</h1>
+    <div class="section-title text-center" appAnimate [animateInAnimation]="storyTitle">
+      <h1>{{'MAIN.SECTION.STORY' | translate}}</h1>
       <div class="home-divider">
         <mat-icon>favorite</mat-icon>
       </div>
     </div>
 
-    <div class="section-sub-title text-center" appAnimate [animateInAnimation]="storyText" [stopAnimation]="isSmall">
-      <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium,
-        totam rem aperiam, eaque ipsa quae ab illo inventore</p>
-    </div>
+    <div fxLayout="row wrap" fxLayout.xs="column" fxLayoutAlign="space-between center" style="width: 100%">
+      <div class="section-sub-title" fxFlex="1 1 calc(75% - 32px)" fxFlex.md="1 1 calc(50% - 32px)"
+           fxFlex.sm="1 1 calc(50% - 32px)" fxFlex.xs="100%">
+        <h2 class="text-center" #storyDescription
+            [@leftRight]="{value: storyDescriptionState.value, params: {translate: '-20px'}}">
+          {{ 'MAIN.STORY.DESCRIPTION' | translate}}
+        </h2>
 
-    <div class="work-filter fadeInRight animated" data-wow-duration="500ms">
-      <ul class="text-center">
-        <li><a href="javascript:" data-filter="all" class="active filter">All</a></li>
-        <li><a href="javascript:" data-filter=".branding" class="filter">Branding</a></li>
-        <li><a href="javascript:" data-filter=".web" class="filter">web</a></li>
-        <li><a href="javascript:" data-filter=".logo-design" class="filter">logo design</a></li>
-        <li><a href="javascript:" data-filter=".photography" class="filter">photography</a></li>
-      </ul>
-    </div>
+        <h3 class="text-justify" *ngFor="let story of stories" [id]="story.id"
+            [@leftRight]="{value: story.state.value, params: {translate: '-20px', delay: story.delay}}"
+            [innerHTML]="story.text | translate">
+        </h3>
+      </div>
 
-    <div class="project-wrapper">
-
-      <figure class="mix work-item branding">
-        <img src="../../../assets/home_page/img/works/item-1.jpg" alt="">
-        <figcaption class="overlay">
-          <a class="fancybox" rel="works" title="Write Your Image Caption Here"
-             href="../../../assets/home_page/img/works/item-1.jpg"><i
-            class="fa fa-eye fa-lg"></i></a>
-          <h3>Labore et dolore magnam</h3>
-          <p>Photography</p>
-        </figcaption>
-      </figure>
-
-      <figure class="mix work-item web">
-        <img src="../../../assets/home_page/img/works/item-2.jpg" alt="">
-        <figcaption class="overlay">
-          <a class="fancybox" rel="works" title="Write Your Image Caption Here"
-             href="../../../assets/home_page/img/works/item-2.jpg"><i
-            class="fa fa-eye fa-lg"></i></a>
-          <h3>Labore et dolore magnam</h3>
-          <p>Photography</p>
-        </figcaption>
-      </figure>
-
-      <figure class="mix work-item logo-design">
-        <img src="../../../assets/home_page/img/works/item-3.jpg" alt="">
-        <figcaption class="overlay">
-          <a class="fancybox" rel="works" title="Write Your Image Caption Here"
-             href="../../../assets/home_page/img/works/item-3.jpg"><i
-            class="fa fa-eye fa-lg"></i></a>
-          <h3>Labore et dolore magnam</h3>
-          <p>Photography</p>
-        </figcaption>
-      </figure>
-
-      <figure class="mix work-item photography">
-        <img src="../../../assets/home_page/img/works/item-4.jpg" alt="">
-        <figcaption class="overlay">
-          <a class="fancybox" rel="works" title="Write Your Image Caption Here"
-             href="../../../assets/home_page/img/works/item-4.jpg"><i
-            class="fa fa-eye fa-lg"></i></a>
-          <h3>Labore et dolore magnam</h3>
-          <p>Photography</p>
-        </figcaption>
-      </figure>
-
-      <figure class="mix work-item branding">
-        <img src="../../../assets/home_page/img/works/item-5.jpg" alt="">
-        <figcaption class="overlay">
-          <a class="fancybox" rel="works" title="Write Your Image Caption Here"
-             href="../../../assets/home_page/img/works/item-5.jpg"><i
-            class="fa fa-eye fa-lg"></i></a>
-          <h3>Labore et dolore magnam</h3>
-          <p>Photography</p>
-        </figcaption>
-      </figure>
-
-      <figure class="mix work-item web">
-        <img src="../../../assets/home_page/img/works/item-6.jpg" alt="">
-        <figcaption class="overlay">
-          <a class="fancybox" rel="works" title="Write Your Image Caption Here"
-             href="../../../assets/home_page/img/works/item-6.jpg"><i
-            class="fa fa-eye fa-lg"></i></a>
-          <h3>Labore et dolore magnam</h3>
-          <p>Photography</p>
-        </figcaption>
-      </figure>
-
-      <figure class="mix work-item logo-design">
-        <img src="../../../assets/home_page/img/works/item-7.jpg" alt="">
-        <figcaption class="overlay">
-          <a class="fancybox" rel="works" title="Write Your Image Caption Here"
-             href="../../../assets/home_page/img/works/item-7.jpg"><i
-            class="fa fa-eye fa-lg"></i></a>
-          <h3>Labore et dolore magnam</h3>
-          <p>Photography</p>
-        </figcaption>
-      </figure>
-
-      <figure class="mix work-item photography">
-        <img src="../../../assets/home_page/img/works/item-8.jpg" alt="">
-        <figcaption class="overlay">
-          <a class="fancybox" rel="works" title="Write Your Image Caption Here"
-             href="../../../assets/home_page/img/works/item-8.jpg"><i
-            class="fa fa-eye fa-lg"></i></a>
-          <h3>Labore et dolore magnam</h3>
-          <p>Photography</p>
-        </figcaption>
-      </figure>
+      <div fxFlex="1 1 calc(25% - 32px)" fxFlex.md="1 1 calc(50% - 32px)" fxFlex.sm="1 1 calc(50% - 32px)"
+           fxFlex.xs="100%" #storyMember>
+        <figure class="team-member text-center">
+          <div class="member-thumb"
+               [@bottomTop]="{value: storyMemberState.value, params: {translate: '40vh', delayIn: '0ms', delayOut: '600ms'}}">
+            <img src="../../../assets/home_page/img/team/member-1.png" alt="Team Member" class="img-responsive">
+          </div>
+          <h3
+            [@bottomTop]="{value: storyMemberState.value, params: {translate: '20px', delayIn: '300ms', delayOut: '300ms'}}">
+            Carla Lujan</h3>
+          <span
+            [@bottomTop]="{value: storyMemberState.value, params: {translate: '20px', delayIn: '600ms', delayOut: '0ms'}}">{{'MAIN.STORY.MEMBER' | translate}}</span>
+        </figure>
+      </div>
     </div>
   </div>
 </section>
 <!-- End Story -->
 
+<!-- Works -->
+<section id="work" class="works">
+  <div fxLayout="column" fxLayoutAlign="space-between center">
+    <div class="section-title text-center">
+      <h1>{{'MAIN.SECTION.WORK' | translate}}</h1>
+      <div class="home-divider">
+        <mat-icon>favorite</mat-icon>
+      </div>
+    </div>
+
+    <div class="work-sub-title text-center" appAnimate [animateInAnimation]="workText" [stopAnimation]="isSmall">
+      <h3>{{'MAIN.WORK.TEXT_1' | translate}}</h3>
+    </div>
+
+    <div class="work-filter fadeInRight animated" data-wow-duration="500ms">
+      <ul class="text-center">
+        <li><a (click)="filter = undefined" class="work-filter pointer"
+               [ngClass]="{'active': filter === undefined}">{{'MAIN.WORK.FILTER.ALL' | translate}}</a>
+        </li>
+        <li *ngFor="let group of groups">
+          <a (click)="filter = group" class="work-filter pointer"
+             [ngClass]="{'active': filter === group}">{{group.name}}</a>
+        </li>
+      </ul>
+    </div>
+
+    <div fxLayout="row grap" fxLayout.xs="column" fxLayoutAlign="center center">
+
+      <div fxFlex="1 1 calc(33.33% - 32px)" fxFlex.md="1 1 calc(50% - 32px)" fxFlex.sm="100%" fxFlex.xs="100%"
+           class="text-center" *ngFor="let work of filterGroups(works)" @fadeInOut>
+        <figure class="work-item" [ngClass]="{'work-item-active': !filter}">
+          <img [src]="work.image" alt="">
+          <figcaption class="overlay">
+            <a class="fancybox" [title]="work.title" [href]="work.image" target="_blank">
+              <mat-icon class="text-top">visibility</mat-icon>
+            </a>
+            <h3>{{work.title}}</h3>
+            <p>{{work.detail}}</p>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End Works -->
+
 <!-- Features -->
-<section id="treatments" class="treatments">
+<section id="treatments" class="treatments" *ngIf="groups?.length">
   <div fxLayout="column" fxLayoutAlign="space-around center">
 
     <div class="section-title text-center mb-50" appAnimate [animateInAnimation]="treatmentTitle">
@@ -166,153 +133,41 @@
     <div fxLayout="row grap" fxLayout.xs="column" fxLayoutAlign="space-around center">
       <div fxFlex="1 1 calc(33.33% - 32px)" fxFlex.sm="1 1 calc(50% - 32px)" fxFlex.xs="100"
            *ngFor="let group of groups; let i = index">
-        <div class="treatment-item" appAnimate [animateInAnimation]="setTreatmentAnimation(i)"
+        <div class="treatment-item pointer-only" appAnimate [animateInAnimation]="setTreatmentAnimation(i)"
              [stopAnimation]="isSmall">
           <div class="treatment-icon">
-            <mat-icon [svgIcon]="'MANICURE'"></mat-icon>
+            <mat-icon>favorite</mat-icon>
           </div>
-
           <div class="treatment-desc">
             <h2>{{group.name}}</h2>
             <p>{{group.description}}</p>
           </div>
         </div>
       </div>
-
-      <!-- service item -->
-      <!--      <div [@leftRight]="{value: treatmentItemState.value, params: {translate: '-20px'}}">-->
-      <!--        <div class="treatment-item">-->
-      <!--          <div class="treatment-icon">-->
-      <!--            <mat-icon>add_circle</mat-icon>-->
-      <!--          </div>-->
-
-      <!--          <div class="treatment-desc">-->
-      <!--            <h2>Branding</h2>-->
-      <!--            <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque-->
-      <!--              laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore</p>-->
-      <!--          </div>-->
-      <!--        </div>-->
-      <!--      </div>-->
-      <!--      &lt;!&ndash; end service item &ndash;&gt;-->
-
-      <!--      &lt;!&ndash; service item &ndash;&gt;-->
-      <!--      <div [@bottomTop]="{value:treatmentItemState.value, params: {delayIn: '500ms', delayOut: '0ms'}}">-->
-      <!--        <div class="treatment-item">-->
-      <!--          <div class="treatment-icon">-->
-      <!--            <mat-icon>edit</mat-icon>-->
-      <!--          </div>-->
-
-      <!--          <div class="treatment-desc">-->
-      <!--            <h2>Development</h2>-->
-      <!--            <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque-->
-      <!--              laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore</p>-->
-      <!--          </div>-->
-      <!--        </div>-->
-      <!--      </div>-->
-      <!--      &lt;!&ndash; end service item &ndash;&gt;-->
-
-      <!--      &lt;!&ndash; service item &ndash;&gt;-->
-      <!--      <div-->
-      <!--        [@leftRight]="{value: treatmentItemState.value, params: {translate: '20px', delay: '0.9s'}}">-->
-      <!--        <div class="treatment-item">-->
-      <!--          <div class="treatment-icon">-->
-      <!--            <mat-icon>campaign</mat-icon>-->
-      <!--          </div>-->
-
-      <!--          <div class="treatment-desc">-->
-      <!--            <h2>Consulting</h2>-->
-      <!--            <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque-->
-      <!--              laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore</p>-->
-      <!--          </div>-->
-      <!--        </div>-->
-      <!--      </div>-->
-      <!-- end service item -->
-
     </div>
   </div>
 </section>
 <!-- End Features -->
 
-<!-- Meet Our Team -->
-<section id="team" class="team">
-  <div fxLayout="column" fxLayoutAlign="space-around center">
-    <div class="section-title text-center" appAnimate [animateInAnimation]="teamTitle">
-      <h1>Meet Our Team</h1>
-      <div class="home-divider">
-        <mat-icon>favorite</mat-icon>
-      </div>
-    </div>
-
-    <div class="section-sub-title text-center" #teamItem
-         [@leftRight]="{value: teamItemState.value, params: {translate: '20px'}}">
-      <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium,
-        totam rem aperiam, eaque ipsa quae ab illo inventore</p>
-    </div>
-
-    <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-around center">
-
-      <figure class="team-member text-center">
-        <div class="member-thumb"
-             [@bottomTop]="{value: teamItemState.value, params: {translate: '20px', delayIn: '0ms', delayOut: '600ms'}}">
-          <img src="../../../assets/home_page/img/team/member-1.png" alt="Team Member" class="img-responsive">
-        </div>
-        <h3
-          [@bottomTop]="{value: teamItemState.value, params: {translate: '20px', delayIn: '300ms', delayOut: '300ms'}}">
-          John Filmr Doe</h3>
-        <span
-          [@bottomTop]="{value: teamItemState.value, params: {translate: '20px', delayIn: '600ms', delayOut: '0ms'}}">Managing Director</span>
-      </figure>
-    </div>
-  </div>
-</section>
-<!-- End Meet Our Team -->
-
-<!-- Some fun facts -->
-<section id="facts" class="facts">
+<!-- Experiences -->
+<section id="experiences" class="experiences">
   <div class="parallax-overlay">
     <div fxLayout="column" fxLayoutAlign="space-around center">
-      <div class="section-title text-center mb-50" appAnimate [animateInAnimation]="factTitle">
-        <h1>Some Fun Facts</h1>
+      <div class="section-title text-center mb-50" appAnimate [animateInAnimation]="experienceTitle">
+        <h1 class="experience-title">{{'MAIN.SECTION.EXPERIENCE' | translate }}</h1>
         <div class="home-divider">
           <mat-icon>favorite</mat-icon>
         </div>
       </div>
 
       <div fxLayout="row wrap" fxLayout.xs="column" fxLayoutAlign="space-between center" style="width: 100%">
-        <div class="text-center" fxFlex="1 1 calc(25% - 32px)" fxFlex.sm="1 1 calc(50% - 32px)" fxFlex.xs="100%"
-             #factItem1
-             [@bottomTop]="{value: factItem1State.value, params: {translate: '20px', delayOut: '900ms'}}">
+        <div *ngFor="let experience of experiences" class="text-center" fxFlex="1 1 calc(25% - 32px)"
+             fxFlex.sm="1 1 calc(50% - 32px)" fxFlex.xs="100%" [id]="experience.id"
+             [@bottomTop]="{value: experience.state.value, params: {translate: '20px', delayIn: experience.delay, delayOut: experience.delayOut}}">
           <div class="counters-item">
-            <mat-icon>schedule</mat-icon>
-            <strong>0</strong>
-            <p>Hours of Work</p>
-          </div>
-        </div>
-        <div class="text-center" fxFlex="1 1 calc(25% - 32px)" fxFlex.sm="1 1 calc(50% - 32px)" fxFlex.xs="100%"
-             #factItem2
-             [@bottomTop]="{value: factItem2State.value, params: {translate: '20px', delayIn: isSmall ? '0ms' : '300ms', delayOut: '600ms'}}">
-          <div class="counters-item">
-            <mat-icon>groups</mat-icon>
-            <strong>0</strong>
-            <p>Satisfied Clients</p>
-          </div>
-        </div>
-        <div class="text-center" fxFlex="1 1 calc(25% - 32px)" fxFlex.sm="1 1 calc(50% - 32px)" fxFlex.xs="100%"
-             #factItem3
-             [@bottomTop]="{value: factItem3State.value, params: {translate: '20px', delayIn:  isSmall ? '0ms' : '600ms', delayOut: '300ms'}}">
-          <div class="counters-item">
-            <mat-icon>rocket_launch</mat-icon>
-            <strong>0</strong>
-            <p> Projects Delivered </p>
-          </div>
-        </div>
-        <div class="text-center" fxFlex="1 1 calc(25% - 32px)" fxFlex.sm="1 1 calc(50% - 32px)" fxFlex.xs="100%"
-             #factItem4
-             [@bottomTop]="{value: factItem4State.value, params: {translate: '20px', delayIn:  isSmall ? '0ms' : '900ms'}}">
-          <div class="counters-item">
-            <mat-icon>rewarded_ads</mat-icon>
-            <strong>0</strong>
-            <p>Awards Won</p>
+            <mat-icon>{{experience.icon}}</mat-icon>
+            <strong>{{experience.position}}</strong>
+            <p>{{experience.text | translate}}</p>
           </div>
         </div>
       </div>
@@ -326,7 +181,7 @@
   <div fxLayout="column" fxLayoutAlign="space-around center" class="mb-50">
 
     <div class="section-title text-center mb-50" appAnimate [animateInAnimation]="contactTitle">
-      <h1>Let’s Discuss</h1>
+      <h1>{{'MAIN.SECTION.CONTACTS' | translate }}</h1>
       <div class="home-divider">
         <mat-icon>favorite</mat-icon>
       </div>
@@ -334,18 +189,17 @@
 
     <div class="section-sub-title text-center" appAnimate [animateInAnimation]="contactText"
          [stopAnimation]="isSmall">
-      <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium,
-        totam rem aperiam, eaque ipsa quae ab illo inventore</p>
+      <p [innerHTML]="'MAIN.CONTACT.DETAIL' | translate"></p>
     </div>
 
     <div fxLayout="row wrap" fxLayoutGap="32px" fxLayout.xs="column" fxLayoutAlign="space-between center"
          style="width: 80%">
-      <!-- contact address -->
 
+      <!-- contact address -->
       <div fxFlex.lg="1 1 calc(20% - 32px)" fxFlex.md="1 1 calc(20% - 32px)" fxFlex.sm="1 1 calc(20% - 32px)"
            fxFlex.xs="100" #contactItem1>
         <div class="contact-address" [@leftRight]="contactItem1State.value">
-          <h2>Cras at ultrices erat, sed vulputate!</h2>
+          <h2>{{'MAIN.CONTACT.TITLE' | translate }}</h2>
           <p>{{'MAIN.CONTACT.ADDRESS' | translate}}</p>
           <p>{{'MAIN.CONTACT.PHONE' | translate}}</p>
         </div>
@@ -368,8 +222,7 @@
                     <input [formControl]="name" [tabIndex]="1" autocomplete="name" matInput required>
                   </label>
                   <mat-error *ngIf="name.hasError('required')"
-                             [innerHTML]="'MAIN.CONTACT.NAME.REQUIRED' | translate">
-                  </mat-error>
+                             [innerHTML]="'MAIN.CONTACT.NAME.REQUIRED' | translate"></mat-error>
                 </mat-form-field>
                 <mat-form-field class="full">
                   <mat-label>{{ 'MAIN.CONTACT.EMAIL.FIELD' | translate }}</mat-label>
@@ -380,8 +233,7 @@
                     {{ 'MAIN.CONTACT.EMAIL.INVALID' | translate }}
                   </mat-error>
                   <mat-error *ngIf="email.hasError('required')"
-                             [innerHTML]="'MAIN.CONTACT.EMAIL.REQUIRED' | translate">
-                  </mat-error>
+                             [innerHTML]="'MAIN.CONTACT.EMAIL.REQUIRED' | translate"></mat-error>
                 </mat-form-field>
               </div>
 
@@ -391,19 +243,16 @@
                   <input [formControl]="subject" [tabIndex]="3" autocomplete="subject" matInput required>
                 </label>
                 <mat-error *ngIf="subject.hasError('required')"
-                           [innerHTML]="'MAIN.CONTACT.SUBJECT.REQUIRED' | translate">
-                </mat-error>
+                           [innerHTML]="'MAIN.CONTACT.SUBJECT.REQUIRED' | translate"></mat-error>
               </mat-form-field>
               <mat-form-field>
                 <mat-label>{{ 'MAIN.CONTACT.BODY.FIELD' | translate }}</mat-label>
                 <label>
-                      <textarea #message [formControl]="body" [tabIndex]="4" matInput maxlength="256"
-                                required></textarea>
+                  <textarea #message [formControl]="body" [tabIndex]="4" matInput maxlength="256" required></textarea>
                 </label>
                 <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
                 <mat-error *ngIf="body.hasError('required')"
-                           [innerHTML]="'MAIN.CONTACT.BODY.REQUIRED' | translate">
-                </mat-error>
+                           [innerHTML]="'MAIN.CONTACT.BODY.REQUIRED' | translate"></mat-error>
               </mat-form-field>
               <div>
                 <div fxFlex></div>

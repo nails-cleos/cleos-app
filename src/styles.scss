@@ -302,7 +302,7 @@ legend {
 
 .content {
   .section-style {
-    margin: 0 15% 0 15%;
+    margin: 70px 35px;
     padding-top: 58px;
   }
 }
@@ -459,6 +459,16 @@ span.cal-event-actions {
 
 .text-center {
   text-align: center;
+}
+
+.text-justify {
+  text-align: justify;
+  margin-left: 10% !important;
+  margin-right: 10% !important;
+}
+
+.text-top {
+  vertical-align: text-top;
 }
 
 // fireworks

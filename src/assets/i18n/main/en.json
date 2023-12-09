@@ -1,30 +1,52 @@
 {
   "MAIN": {
     "LEGALS": "Copyright © 2021 - Nails Cleos - All rights reserved.",
-    "STORY_DETAIL": "dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna\n      aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl\n      ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie\n      consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui\n      blandit\n      praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis\n      eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum.",
     "SECTION": {
-      "STORY": "Story",
-      "TREATMENT": "Tratamientos",
-      "BOOK": "Book",
+      "STORY": "My Story",
+      "TREATMENT": "Treatments",
+      "WORK": "Cleos Works",
+      "EXPERIENCE": "Experience",
       "CONTACT": "Contact",
+      "CONTACTS": "Lets talk!",
       "CATALOG": "Catalogs",
       "ACCOUNT": "My account",
       "AUTH": "Login",
       "PRIVACY": "Privacy",
       "TERM_AND_CONDITIONS": "Term and conditions"
     },
-    "BOOK": {
-      "DATE": {
-        "FIELD": "Pick a date"
+    "SLIDER": {
+      "TITLE": "NAILS CLEOS",
+      "SUB_1": "The highest quality in your treatments",
+      "SUB_2": "HEALTHY · ELEGANT · PERFECT · NAILS"
+    },
+    "STORY": {
+      "DESCRIPTION": "Is there anything more magical than turning your hobby into your daily job?",
+      "TEXT_1": "My story as a Nail Artist began in the summer of 2014. Studying the Accounting Degree at the University of Economic Sciences in Cordoba city from my beloved country, Argentina, and free of exams to get pass, I signed up for my first Manicure course.",
+      "TEXT_2": "My challenge was improving my basic techniques in this Art, just to attend to the \"Inner Spark\", that creativeness within me, and don't ignore it, letting it suffocate inside me. I got inspired in the moments dedicated to my own hands – and, of course, to brave women's hands from my intimate circle who trusted me and went through my treatment as a beginner.",
+      "TEXT_3": "After completing my accounting studies in March 2018, I dedicated the first 3 years to my profession, while I was studying a Bachelor's Degree in Business Administration at the same University. But one day I took courage and, with the unconditional support of who would become my Dear husband months later, I decided to turn my career around. This is how I began to train myself even more as a nail stylist, convincing myself day by day, customer by customer, nail by nail, that the nail care and beauty world was what I was really passionate about and a business that I would want to start with a strong motivation......",
+      "TEXT_4": "......So I created my own business to which I gave the name <span class='bold'>\"Cleos\"</span>. The name was inspired by the history of this Art.",
+      "MEMBER": "Expert Nail Artist"
+    },
+    "WORK": {
+      "TEXT_1": "No less than Cleopatra herself from ancient Egypt, where henna was used as a dye, covered her own nails with this natural dye to give them colour. It is believed that reddish tones were reserved for queens, as a sign of rank and power. This is a reassertion that Manicure has been one of the forms of self-expression and reaffirmation of women since time immemorial.",
+      "FILTER": {
+        "ALL": "All"
       }
+    },
+    "EXPERIENCE": {
+      "TEXT_1": "A warm welcome",
+      "TEXT_2": "A coffee",
+      "TEXT_3": "Let's Art",
+      "TEXT_4": "Happiness"
     },
     "CONTACT": {
       "TITLE": "Contact us",
+      "DETAIL": "Commitment to the customer is one of my basic premises. My challenge every day is to meet their needs,<br>to exceed their expectations, and make \"returning\" for a new nails set, will remain a long-awaited moment.",
       "ADDRESS": "Nails Cleos, Benthuizerstraat 33A, 3036 CB Rotterdam",
       "PHONE": "+31 (06) 2525-1524",
       "MAIL": "nails.cleos@gmail.com",
       "SEND": {
-        "TITLE": "Have any questions? We would love to hear about you",
+        "TITLE": "Have any doubt? I would love to hear about you",
         "MESSAGE": "Your message was sending successfully",
         "HELLO": "ʜᴇʟʟᴏ ᴄʟᴇᴏꜱ! %0Aɪ ʜᴀᴠᴇ ᴀ ᴅᴏᴜʙᴛ ♡"
       },
@@ -45,6 +67,9 @@
         "FIELD": "Message",
         "REQUIRED": "Message is required"
       }
+    },
+    "CATALOGUE": {
+      "NO_DETAIL": "No detail"
     }
   },
   "CARD": {

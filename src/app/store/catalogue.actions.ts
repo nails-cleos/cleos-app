@@ -12,6 +12,8 @@ export enum CatalogueActionTypes {
   catalogueSelected = '[Catalogue] Selected',
   catalogueFind = '[Catalogue] Find',
   catalogueDelete = '[Catalogue] Delete',
+  findGroups = '[Catalogue] Find treatment groups',
+  findGroupsSuccess = '[Catalogue] Find treatment groups success',
   clean = '[Catalogue] Clean'
 }
 
@@ -86,6 +88,17 @@ export class DeleteCatalogue implements Action {
   }
 }
 
+export class FindGroups implements Action {
+  readonly type = CatalogueActionTypes.findGroups;
+}
+
+export class FindGroupsSuccess implements Action {
+  readonly type = CatalogueActionTypes.findGroupsSuccess;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class Clean implements Action {
   readonly type = CatalogueActionTypes.clean;
 }
@@ -102,4 +115,6 @@ export type All =
   | CatalogueFind
   | CatalogueSelected
   | DeleteCatalogue
+  | FindGroups
+  | FindGroupsSuccess
   | Clean;
