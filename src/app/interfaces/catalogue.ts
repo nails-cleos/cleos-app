@@ -1,3 +1,5 @@
+import { ITreatmentGroup } from './treatment';
+
 export interface ICatalogue {
   id?: string;
   name?: string;
@@ -6,16 +8,21 @@ export interface ICatalogue {
   catalog?: boolean;
   file?: any;
   blob?: any;
+  groupId?: string;
+  treatmentGroup?: ITreatmentGroup;
 }
 
 export interface ICatalogueAll {
   order: number;
   id: string;
   name: string;
+  contentType: string;
   description?: string;
   home?: boolean;
   catalog?: boolean;
   blob: any;
+  image: any;
+  treatmentGroup?: ITreatmentGroup;
 }
 
 export interface ISlide {

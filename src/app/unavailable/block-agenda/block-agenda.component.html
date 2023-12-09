@@ -45,7 +45,7 @@
               </ng-template>
 
               <div *ngIf="getForm.professional.valid" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
-                <mat-form-field appearance="outline" color="primary" style="margin-right: 12px;">
+                <mat-form-field appearance="outline" color="primary" class="full-margin">
                   <mat-label>{{ 'UNAVAILABLE.DATE.FIELD' | translate }}</mat-label>
                   <button (click)="picker.open()" mat-icon-button matPrefix>
                     <mat-icon>today</mat-icon>
@@ -62,7 +62,7 @@
                     {{errors['startDate']}}
                   </mat-error>
                 </mat-form-field>
-                <mat-form-field appearance="outline" style="margin-right: 12px;">
+                <mat-form-field appearance="outline" class="full-margin">
                   <mat-label>{{ 'UNAVAILABLE.TIME.FIELD' | translate }}</mat-label>
                   <label>
                     <input (focusin)="focusin" formControlName="startTime" [format]="24" [max]="maxTime" [min]="minTime"

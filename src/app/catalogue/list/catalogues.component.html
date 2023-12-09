@@ -1,38 +1,42 @@
 <div *ngIf="catalogues.length; else emptyCatalogue" style="margin: 0 30px 0 30px">
-  <mat-grid-list [cols]="(isHandset$ | async) ? 1 : 3" rowHeight="2:1">
-    <mat-grid-tile *ngFor="let catalogue of catalogues; let i = index;">
-      <cdk-drop-list [cdkDropListConnectedTo]="drops" [cdkDropListData]="i">
-        <mat-card appearance="outlined" (cdkDragEntered)="entered($event)" [cdkDragData]="i" cdkDrag
-                  class="catalogue-card mat-elevation-z8">
-          <mat-icon *ngIf="catalogue.home" color="primary">home</mat-icon>
-          <mat-icon *ngIf="catalogue.catalog" color="primary">collections</mat-icon>
-          <img *ngIf="catalogue.id; else box" [alt]="catalogue.name" [matTooltip]="catalogue.name"
-               [src]="'data:image/jpg;base64,'+catalogue.blob"
-               mat-card-sm-image matTooltipPosition="above"/>
-          <ng-template #box>
-            <div class="ssc-square"></div>
-          </ng-template>
-          <div *ngIf="catalogue.id" class="wrapper" fxFlex>
-            <mat-icon (click)="edit(catalogue)" class="edit" matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}"
-                      matTooltipPosition="left">edit
-            </mat-icon>
-            <mat-icon (click)="delete(catalogue)" class="delete" color="warn"
-                      matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}"
-                      matTooltipPosition="left">delete
-            </mat-icon>
-          </div>
-        </mat-card>
-      </cdk-drop-list>
-    </mat-grid-tile>
-  </mat-grid-list>
+  <div class="drop-list" cdkDropList (cdkDropListDropped)="drop($event)">
+    <mat-card *ngFor="let catalogue of catalogues;" appearance="outlined" cdkDrag class="catalogue-card">
+      <mat-card-header>
+        <div mat-card-avatar>
+          <mat-icon [ngClass]="{'home-cross icon-cross': !catalogue.home}" color="primary">home</mat-icon>
+          <mat-icon [ngClass]="{'catalog-cross icon-cross': !catalogue.catalog}" color="primary">collections</mat-icon>
+        </div>
+        <mat-card-title-group>
+          <mat-card-title>{{catalogue.name}}</mat-card-title>
+          <mat-card-subtitle>{{catalogue.treatmentGroup?.name}}</mat-card-subtitle>
+          <img mat-card-sm-image [alt]="catalogue.name" [src]="catalogue.image"/>
+          <img class="preview" *cdkDragPreview [src]="catalogue.image" [alt]="catalogue.name">
+        </mat-card-title-group>
+      </mat-card-header>
+      <mat-card-content>
+        {{catalogue.description}}
+      </mat-card-content>
+      <mat-card-actions>
+        <div *ngIf="catalogue.id" class="pointer-only" fxFlex>
+          <mat-icon (click)="edit(catalogue)" class="edit" matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}"
+                    matTooltipPosition="left">edit
+          </mat-icon>
+          <mat-icon (click)="delete(catalogue)" class="pointer-only" color="warn"
+                    matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}"
+                    matTooltipPosition="right">delete
+          </mat-icon>
+        </div>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
   <div class="divider">
     <button (click)="finish" color="primary" mat-fab extended class="icon-button">
       {{ 'COMMON.BUTTON.UPDATE' | translate }}
     </button>
   </div>
 
-  <button color="accent" id="add-button" mat-fab extended class="icon-button"
-          matTooltip="{{ 'CATALOGUE.TITLE' | translate }}"
+  <button color="accent" id="add-button" mat-fab matTooltip="{{ 'CATALOGUE.TITLE' | translate }}"
           routerLink="/catalogues/add">
     <mat-icon>add_a_photo</mat-icon>
   </button>

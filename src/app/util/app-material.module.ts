@@ -73,9 +73,13 @@ const materialModules = [
 export class AppMaterialModule {
   constructor(private matIconRegistry: MatIconRegistry, private domSanitizer: DomSanitizer) {
     matIconRegistry.addSvgIcon('CLEOS', this.getUrl('assets/icons/safari-pinned-tab.svg'));
+    matIconRegistry.addSvgIcon('MANICURE', this.getUrl('assets/treatment.svg'));
     matIconRegistry.addSvgIcon('WHATSAPP', this.getUrl('assets/whatsapp.svg'));
+    matIconRegistry.addSvgIcon('WHATSAPP-NO-COLOR', this.getUrl('assets/whatsapp-no-color.svg'));
     matIconRegistry.addSvgIcon('INSTAGRAM', this.getUrl('assets/instagram.svg'));
+    matIconRegistry.addSvgIcon('INSTAGRAM-NO-COLOR', this.getUrl('assets/instagram-no-color.svg'));
     matIconRegistry.addSvgIcon('FACEBOOK', this.getUrl('assets/facebook.svg'));
+    matIconRegistry.addSvgIcon('FACEBOOK-NO-COLOR', this.getUrl('assets/facebook-no-color.svg'));
     matIconRegistry.addSvgIcon('/payment_methods/1.svg', this.getUrl('assets/payment_methods/1.svg'));
     matIconRegistry.addSvgIcon('IDEAL', this.getUrl('assets/payment_methods/1.svg'));
     matIconRegistry.addSvgIcon('/payment_methods/2.svg', this.getUrl('assets/payment_methods/2.svg'));

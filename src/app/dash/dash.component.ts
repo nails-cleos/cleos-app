@@ -13,7 +13,6 @@ import {
   getEnd,
   getEndWithDuration,
   getNow,
-  getNowTimeZone,
   greaterOrEqualsThan,
   newDateTimestamp
 } from '../util/dates';

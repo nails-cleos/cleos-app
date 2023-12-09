@@ -22,6 +22,9 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() public longitudeMarker?: number;
   @Input() public types: string[];
   @Input() public markInfo?: string;
+  @Input() height: number | string;
+  @Input() width: number | string;
+  @Input() scrollwheel?: boolean;
   @ViewChild('addressText') addressText: any;
   @Output() addressEmitter = new EventEmitter<PlaceResult>();
   @Output() distanceEmitter = new EventEmitter<number>();
@@ -42,6 +45,8 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
   private isDarkMode: boolean;
 
   constructor(private geocodeService: GeocodeService, private authUserService: AuthUserService) {
+    this.height = 400;
+    this.width = 400;
     this.latitude = 51.926517;
     this.longitude = 4.462456;
     this.isDraggable = false;
@@ -61,6 +66,7 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
+    this.options.scrollwheel = this.scrollwheel;
     if (this.isDarkMode) {
       this.options.styles = [
         { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },

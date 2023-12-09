@@ -43,6 +43,7 @@ import { PromptComponent } from './prompt/prompt.component';
 import { HideMissingDirective } from '../directives/hide-missing.directive';
 import { PaymentPreviewComponent } from './payment-preview/payment-preview.component';
 import { PricePreviewComponent } from './price-preview/price-preview.component';
+import { AnimateDirective } from '../directives/animate.directive';
 
 @NgModule({
   imports: [
@@ -110,7 +111,8 @@ import { PricePreviewComponent } from './price-preview/price-preview.component';
     DiscountPipe,
     TwoDigitsDirective,
     PaymentPreviewComponent,
-    PricePreviewComponent
+    PricePreviewComponent,
+    AnimateDirective
   ],
   declarations: [
     BackButtonDirective,
@@ -141,7 +143,8 @@ import { PricePreviewComponent } from './price-preview/price-preview.component';
     TwoDigitsDirective,
     PromptComponent,
     PaymentPreviewComponent,
-    PricePreviewComponent
+    PricePreviewComponent,
+    AnimateDirective
   ],
   providers: [
     httpInterceptorProviders,

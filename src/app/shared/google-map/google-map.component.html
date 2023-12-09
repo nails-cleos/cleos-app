@@ -21,7 +21,7 @@
 </div>
 <div [ngSwitch]="mapStatus">
   <div *ngSwitchCase="0">
-    <google-map [zoom]="zoom" class="divider" [center]="center" height="400" width="400"
+    <google-map [zoom]="zoom" class="divider" [center]="center" [height]="height" [width]="width"
                 style="display: flex; justify-content: center;" [options]="options">
       <map-marker *ngIf="markerPosition" #marker="mapMarker" [position]="markerPosition"
                   [options]="markerOptions" (mapDragend)="markerDragEnd($event)"

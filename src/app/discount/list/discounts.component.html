@@ -42,7 +42,7 @@
     </ng-container>
 
     <ng-container matColumnDef="amount">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'DISCOUNT.LIST.COLUMN.AMOUNT' | translate }}</th>
+      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
       <td *matCellDef="let discount" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="discount.id; else skeleton">
           <mat-icon *ngIf="discount.currency" matPrefix>{{discount.currency.icon}}</mat-icon>&nbsp;

@@ -14,6 +14,78 @@
   $foreground: map.get($color-config, 'foreground');
   $isDark: map.get($color-config, 'is-dark');
 
+  // Home page
+  #back-top {
+    color: mat.get-color-from-palette($accent-palette) !important;
+  }
+
+  .home-divider:before,
+  .home-divider:after {
+    content: "______________________";
+    color: mat.get-color-from-palette($foreground, text);
+    position: relative;
+    bottom: 1.3vh;
+  }
+
+  .section-sub-title p {
+    color: mat.get-color-from-palette($foreground, secondary-text);
+  }
+
+  .section-title h1 {
+    color: mat.get-color-from-palette($primary-palette);
+  }
+
+  .treatment-icon {
+    border: 1px solid mat.get-color-from-palette($primary-palette);
+    color: mat.get-color-from-palette($primary-palette);
+  }
+
+  .works {
+    background-color: mat.get-color-from-palette($background, hover);
+  }
+
+  .work-filter ul li a {
+    color: mat.get-color-from-palette($foreground, text);
+  }
+
+  .work-filter ul li a:hover,
+  .work-filter ul li a.active {
+    background-color: mat.get-color-from-palette($primary-palette);
+    border-radius: 6px;
+    color: mat.get-color-from-palette($foreground, text);
+    padding: 5px 17px;
+  }
+
+  .overlay {
+    background-color: rgba(mat.get-color-from-palette($primary-palette), .9);
+    color: mat.get-color-from-palette($foreground, text);
+  }
+
+  .work-item .overlay a {
+    border: 1px solid mat.get-color-from-palette($foreground, text);
+    color: mat.get-color-from-palette($foreground, text);
+  }
+
+  .work-item .overlay a:hover {
+    color: mat.get-color-from-palette($accent-palette) !important;
+  }
+
+  .team-member h3 {
+    color: mat.get-color-from-palette($accent-palette);
+  }
+
+  .footer {
+    color: mat.get-color-from-palette($foreground, text);
+
+    #subs {
+      color: mat.get-color-from-palette($foreground, text);
+    }
+  }
+
+  .copyright {
+    color: mat.get-color-from-palette($foreground, text);
+  }
+
   // firebase-ui
   .mdl-card {
     background: mat.get-color-from-palette($background, card);
@@ -130,6 +202,40 @@
   }
 
   @if $isDark {
+    #experiences {
+      background-color: #e1d0cb;
+
+      .parallax-overlay {
+        background-color: #e1d0cb;
+      }
+
+      h1 {
+        color: black;
+      }
+    }
+    .experiences .home-divider:before,
+    .experiences .home-divider:after {
+      color: black;
+    }
+
+    .experiences .home-divider mat-icon {
+      color: black;
+    }
+
+    .counters-item {
+      color: black;
+    }
+
+    .counters-item mat-icon {
+      border: 1px solid #737C85;
+      color: black;
+    }
+
+    .footer {
+      border-top: 5px solid mat.get-color-from-palette($primary-palette, 900);
+      background-color: mat.get-color-from-palette($accent-palette, 900);
+    }
+
     .text-bg-created {
       background-color: #fafafa;
       color: black;
@@ -171,6 +277,40 @@
       color: black;
     }
   } @else {
+    #experiences {
+      background-color: #7e7769;
+
+      .parallax-overlay {
+        background-color: #7e7769;
+      }
+
+      h1 {
+        color: white;
+      }
+    }
+    .experiences .home-divider:before,
+    .experiences .home-divider:after {
+      color: white;
+    }
+
+    .experiences .home-divider mat-icon {
+      color: white;
+    }
+
+    .counters-item {
+      color: white;
+    }
+
+    .counters-item mat-icon {
+      border: 1px solid #a9a9a9;
+      color: white;
+    }
+
+    .footer {
+      border-top: 5px solid mat.get-color-from-palette($primary-palette, 500);
+      background-color: mat.get-color-from-palette($accent-palette, 500);
+    }
+
     .text-bg-created {
       background-color: #ababab;
     }
