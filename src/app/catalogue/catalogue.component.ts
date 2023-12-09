@@ -202,7 +202,6 @@ export class CatalogueComponent implements OnInit, OnDestroy {
     this.subscription = this.getState.subscribe(state => {
       this.groups = state.groups;
       if (state.selected) {
-        console.log(state.selected)
         this.catalogue = {
           id: state.selected.id,
           name: state.selected.name,
