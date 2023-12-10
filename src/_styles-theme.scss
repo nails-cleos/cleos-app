@@ -74,6 +74,10 @@
     color: mat.get-color-from-palette($accent-palette);
   }
 
+  .link {
+    color: mat.get-color-from-palette($foreground, text);
+  }
+
   .footer {
     color: mat.get-color-from-palette($foreground, text);
 
