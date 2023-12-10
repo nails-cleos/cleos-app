@@ -1,4 +1,17 @@
-import { animate, animateChild, group, keyframes, query, sequence, stagger, state, style, transition, trigger } from '@angular/animations';
+import {
+  animate,
+  animateChild,
+  AUTO_STYLE,
+  group,
+  keyframes,
+  query,
+  sequence,
+  stagger,
+  state,
+  style,
+  transition,
+  trigger
+} from '@angular/animations';
 import { BehaviorSubject } from 'rxjs';
 
 const right = [
@@ -116,12 +129,17 @@ export const fade = trigger('fade', [
 ]);
 
 export const fadeInOut = trigger('fadeInOut', [
-  transition(':enter', [
-    style({ transform: 'scale(0)', opacity: 0 }),
-    animate('500ms 500ms ease-in-out', style({ transform: 'scale(1)', opacity: 1 })),
+  state('in',
+    style({ opacity: 1 })
+  ),
+  transition('void => *', [
+    style({ opacity: 0 }),
+    animate('500ms ease-in-out')
   ]),
-  transition(':leave', [
-    animate('500ms ease-in-out', style({ transform: 'scale(0)' })),
+  transition('* => void', [
+    animate('500ms ease-in-out',
+      style({ opacity: 0 })
+    )
   ])
 ]);
 

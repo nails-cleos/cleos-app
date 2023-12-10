@@ -71,7 +71,7 @@
           </div>
           <h3
             [@bottomTop]="{value: storyMemberState.value, params: {translate: '20px', delayIn: '300ms', delayOut: '300ms'}}">
-            Carla Lujan</h3>
+            Carla Luján Bonadero</h3>
           <span
             [@bottomTop]="{value: storyMemberState.value, params: {translate: '20px', delayIn: '600ms', delayOut: '0ms'}}">{{'MAIN.STORY.MEMBER' | translate}}</span>
         </figure>
@@ -97,24 +97,24 @@
 
     <div class="work-filter fadeInRight animated" data-wow-duration="500ms">
       <ul class="text-center">
-        <li><a (click)="filter = undefined" class="work-filter pointer"
+        <li><a (click)="filterBy()" class="work-filter pointer" type="button"
                [ngClass]="{'active': filter === undefined}">{{'MAIN.WORK.FILTER.ALL' | translate}}</a>
         </li>
         <li *ngFor="let group of groups">
-          <a (click)="filter = group" class="work-filter pointer"
+          <a (click)="filterBy(group)" class="work-filter pointer"
              [ngClass]="{'active': filter === group}">{{group.name}}</a>
         </li>
       </ul>
     </div>
 
-    <div fxLayout="row grap" fxLayout.xs="column" fxLayoutAlign="center center">
+    <div fxLayout="row grap" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
 
       <div fxFlex="1 1 calc(33.33% - 32px)" fxFlex.md="1 1 calc(50% - 32px)" fxFlex.sm="100%" fxFlex.xs="100%"
-           class="text-center" *ngFor="let work of filterGroups(works)" @fadeInOut>
-        <figure class="work-item" [ngClass]="{'work-item-active': !filter}">
-          <img [src]="work.image" alt="">
+           class="text-center" *ngFor="let work of works; let i = index" [@fadeInOut]="i">
+        <figure class="work-item">
+          <div class="work-img" [ngStyle]="{'background-image': 'url(' + work.image + ')'}"></div>
           <figcaption class="overlay">
-            <a class="fancybox" [title]="work.title" [href]="work.image" target="_blank">
+            <a [title]="work.title" [href]="work.image" target="_blank">
               <mat-icon class="text-top">visibility</mat-icon>
             </a>
             <h3>{{work.title}}</h3>
@@ -209,8 +209,24 @@
            fxFlex.xs="100" #contactItem1>
         <div class="contact-address" [@leftRight]="contactItem1State.value">
           <h2>{{'MAIN.CONTACT.TITLE' | translate }}</h2>
-          <p>{{'MAIN.CONTACT.ADDRESS' | translate}}</p>
-          <p>{{'MAIN.CONTACT.PHONE' | translate}}</p>
+          <p>
+            <mat-icon matPrefix>room</mat-icon>&nbsp;
+            <a
+              class="link" rel="noreferrer" target="_blank"
+              [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + ('MAIN.CONTACT.ADDRESS' | translate)">
+              {{'MAIN.CONTACT.ADDRESS' | translate}}
+            </a>
+          </p>
+          <p>
+            <mat-icon matPrefix>phone</mat-icon>&nbsp;
+            <a class="link"
+               [href]="'tel:' + ('MAIN.CONTACT.PHONE' | translate)">{{'MAIN.CONTACT.PHONE' | translate}}</a>
+          </p>
+          <p>
+            <mat-icon matPrefix>mail</mat-icon>&nbsp;
+            <a class="link"
+               [href]="'mailto:' + ('MAIN.CONTACT.MAIL' | translate)">{{'MAIN.CONTACT.MAIL' | translate}}</a>
+          </p>
         </div>
       </div>
       <!-- end contact address -->
