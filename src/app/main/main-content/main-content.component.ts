@@ -83,6 +83,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   slides: ISlide[] = [];
   socialLinks: ISocialLink[];
   works: IWork[] = [];
+  allWorks: IWork[] = [];
   filter?: ITreatmentGroup;
   experiences: IExperience[];
   stories: IStory[];
@@ -188,11 +189,16 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     social.svgIcon = `${ social.name }${ suffix }`;
   }
 
-  filterGroups(works: IWork[]): IWork[] {
-    if (this.filter) {
-      return works.filter(p => p.group.id === this.filter?.id);
-    }
-    return this.works;
+  filterBy(group?: ITreatmentGroup): void {
+    this.works = [];
+    this.filter = group;
+    setTimeout(() => {
+      if (group) {
+        this.works = this.allWorks.filter(p => p.group.id === group.id);
+      } else {
+        this.works = this.allWorks;
+      }
+    }, 500);
   }
 
   book(group: ITreatmentGroup): void {
@@ -350,11 +356,12 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
                 image,
                 group: catalogue.treatmentGroup
               });
+              this.allWorks = [...this.works];
             }
           }
         });
       }
-      if (this.groups?.length && this.slides?.length && this.works?.length) {
+      if (this.groups?.length && this.slides?.length && this.allWorks?.length) {
         this.mainContent.showPreload(false);
       }
       if (state.errorMessage || state.message) {

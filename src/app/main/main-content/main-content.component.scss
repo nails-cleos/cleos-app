@@ -14,6 +14,10 @@ section {
 
 .contact {
   padding-bottom: 0;
+
+  .link {
+    vertical-align: super;
+  }
 }
 
 .banner {
@@ -72,8 +76,8 @@ section {
 .carousel-caption h2 {
   text-align: center;
   box-sizing: border-box;
-  font-size: 45px;
-  margin: 5% 0;
+  font-size: 35px;
+  margin: 5% 0 2%;
 }
 
 .carousel-caption p {
@@ -200,15 +204,18 @@ section {
 
 .work-item {
   position: relative;
-  //margin: 0 auto 5% auto;
-  text-align: center;
-  text-align: -webkit-center;
-  text-align: -moz-center;
+  justify-content: center;
+  justify-items: center;
+  margin-top: 20px;
+  display: flex;
 }
 
-.work-item-active {
-  margin: auto 10px 5% auto;
-  display: block;
+.work-img {
+  float: left;
+  width: 400px;
+  height: 300px;
+  background-size: cover;
+  background-position: center center;
 }
 
 .work-item > img {
@@ -347,11 +354,11 @@ section {
   }
 
   .carousel-caption h2 {
-    font-size: 38px;
+    font-size: 30px;
   }
 
   .carousel-caption p {
-    font-size: 26px;
+    font-size: 16px;
   }
 }
 
@@ -369,7 +376,7 @@ section {
   }
 
   .carousel-caption p {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   /* fatcs */
@@ -384,13 +391,21 @@ section {
 
 @media only screen and (max-width: 767px) {
   /* slider */
+  .carousel-caption {
+    left: 0;
+    right: 0;
+    text-align: center;
+  }
+
   .carousel-caption h1 {
-    font-size: 40px;
+    font-size: 50px;
+    text-align: center !important;
   }
 
   .carousel-caption h2 {
     font-size: 20px;
     white-space: break-spaces;
+    margin: 5% 0 0;
   }
 
   .carousel-caption p {
@@ -400,12 +415,15 @@ section {
   .counters-item {
     margin-bottom: 50px;
   }
-  .work-item > img {
+
+  .work-img {
+    margin: 20px 0;
+    width: 300px;
     height: 250px;
-    width: 300px !important;
   }
 
   .overlay {
+    margin: 20px 0;
     height: 250px;
     width: 300px !important;
   }
