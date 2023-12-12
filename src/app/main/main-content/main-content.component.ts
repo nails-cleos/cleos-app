@@ -93,6 +93,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscription?: Subscription;
   private authUserServiceSubscription: Subscription;
   private sliderSubscription?: Subscription;
+  private filterSubscription?: Subscription;
   private getState: Observable<any>;
 
   constructor(private store: Store<AppState>, private cdRef: ChangeDetectorRef, private viewportScroller: ViewportScroller,
@@ -154,7 +155,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.getCatalogues();
     this.getTreatments();
     this.cdRef.detectChanges();
-    this.filter?.subscribe(group => {
+    this.filterSubscription = this.filter.subscribe(group => {
       setTimeout(() => {
         if (group) {
           this.works = this.allWorks.filter(p => p.group.id === group.id);
@@ -182,6 +183,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
     this.sliderSubscription?.unsubscribe();
+    this.filterSubscription?.unsubscribe();
     this.authUserServiceSubscription.unsubscribe();
   }
 
@@ -395,6 +397,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
           duration: 5000
         });
         if (!this.slides?.length) {
+          this.slides.push({ image: '../../assets/icons/icon-512x512.png' });
           this.slides.push({ image: '../../assets/home_page/img/b1.jpeg' });
           this.slides.push({ image: '../../assets/home_page/img/b2.jpeg' });
           this.slides.push({ image: '../../assets/home_page/img/b3.jpeg' });
