@@ -5,7 +5,7 @@ import { TranslationLoaderResolver } from '../util/translation.resolver';
 
 const routes: Routes = [
   {
-    path: '', component: NavComponent, resolve: {model: TranslationLoaderResolver}, children: [
+    path: '', component: NavComponent, resolve: { model: TranslationLoaderResolver }, children: [
       {
         path: 'dashboard', loadChildren: () => import('../dash/dash.module').then(m => m.DashModule)
       }, {

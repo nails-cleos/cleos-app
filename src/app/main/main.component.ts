@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, Optional, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, Optional, ViewChild } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { AppState } from '../store/app.states';
@@ -19,6 +19,8 @@ import { bottomTop, colorChange, colorChangeChild, fade, goTo, observeElement } 
 import { Auth, user } from '@angular/fire/auth';
 import { AuthUserService } from '../services/auth-user.service';
 import { MainContentService } from './main-content.service';
+import { NgcContentOptions } from 'ngx-cookieconsent/lib/model/content-options';
+import { NgcCookieConsentService } from 'ngx-cookieconsent';
 
 @Component({
   selector: 'app-main',
@@ -26,7 +28,7 @@ import { MainContentService } from './main-content.service';
   styleUrls: ['./main.component.scss'],
   animations: [fade, bottomTop, colorChange, colorChangeChild]
 })
-export class MainComponent implements AfterViewInit, OnDestroy {
+export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('bodySection', { static: true }) bodySection?: ElementRef<HTMLElement>;
   navigationState: BehaviorSubject<'open' | 'close'>;
@@ -52,7 +54,7 @@ export class MainComponent implements AfterViewInit, OnDestroy {
               private viewportScroller: ViewportScroller, private router: Router, private translate: TranslateService,
               private overlayContainer: OverlayContainer, private cookieService: CookieService,
               private themeService: ThemeService, @Optional() private auth: Auth, private authUserService: AuthUserService,
-              private mainContent: MainContentService) {
+              private mainContent: MainContentService, private cookieConsentService: NgcCookieConsentService) {
     this.navigationState = new BehaviorSubject<'open' | 'close'>('open');
     this.isAuthenticated = false;
     this.showLoader = true;
@@ -83,6 +85,10 @@ export class MainComponent implements AfterViewInit, OnDestroy {
     return this.store.dispatch(
       new fromActionsLogin.Redirect()
     );
+  }
+
+  ngOnInit(): void {
+    this.authUserService.cookieConsent(this.translate);
   }
 
   ngAfterViewInit(): void {

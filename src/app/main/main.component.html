@@ -5,7 +5,7 @@
   <mat-sidenav-content>
     <mat-toolbar class="nav-fixed-top"
                  [@colorChange]="{value: navigationState.value, params: {backgroundColor: backgroundColor}}">
-      <img [@colorChangeChild]="navigationState.value" alt="logo" src="../../assets/icons/icon-512x512.png">
+      <img [@colorChangeChild]="navigationState.value" alt="logo" src="../../assets/icons/safari-pinned-tab.svg" style="transform: scale(1.5)">
       <span>{{title | uppercase}}</span>
       <span class="mat-spacer"></span>
       <span *ngIf="(isHandset$ | async) === false; else menuButton">
@@ -92,6 +92,11 @@
       <div fxLayout="column" fxLayoutAlign="space-around center">
         <mat-toolbar [ngClass]="{ 'footer-toolbar-dark': isDarkMode, 'footer-toolbar-light': !isDarkMode }">
           <mat-toolbar-row>
+            <span style="margin: auto;">
+              <img src="../../assets/icons/icon-512x512.png" style="transform: scale(2);">
+            </span>
+          </mat-toolbar-row>
+          <mat-toolbar-row style="margin-top: 20px">
               <span style="margin: auto;">
                 <button [routerLinkActive]="['active']" [routerLink]="'/main/privacy'" mat-button>
                   <span>{{'MAIN.SECTION.PRIVACY' | translate }}</span>
@@ -122,7 +127,8 @@
             </span>
           </mat-toolbar-row>
           <mat-toolbar-row>
-            <span style="margin: auto; font-size: small">{{'MAIN.LEGALS' | translate}} - v{{appVersion}}</span>
+            <span class="text-center" style="margin: auto; font-size: small; white-space: break-spaces">
+              {{'MAIN.LEGALS' | translate}} - v{{appVersion}}</span>
           </mat-toolbar-row>
         </mat-toolbar>
       </div>

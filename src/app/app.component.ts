@@ -1,4 +1,4 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { CookieService } from 'ngx-cookie-service';
@@ -19,32 +19,29 @@ import { Subscription } from 'rxjs';
     useClass: YearMonthDateAdapter
   }]
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements OnDestroy {
 
   private cssClass?: string;
   private authUserServiceSubscription: Subscription;
 
   constructor(private translate: TranslateService, private overlayContainer: OverlayContainer, private cookieService: CookieService,
-              private themeService: ThemeService, private dateAdapter: DateAdapter<Date>,
-              @Inject(MAT_DATE_LOCALE) private locale: string, private authUserService: AuthUserService) {
-    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
-      this.resetTheme(value.theme);
-      this.locale = value.locale;
-      const currentLocale = getLocale(this.locale);
-      this.dateAdapter.setLocale(currentLocale.language);
-      this.translate.use(currentLocale.language);
-    });
-  }
-
-  ngOnInit(): void {
-    this.resetTheme();
+              private themeService: ThemeService, private dateAdapter: DateAdapter<Date>, private authUserService: AuthUserService,
+              @Inject(MAT_DATE_LOCALE) private locale: string) {
+    this.authUserServiceSubscription = this.authUserService.authUser
+      .subscribe(value => this.resetConfig(value.locale, value.theme));
   }
 
   ngOnDestroy(): void {
     this.authUserServiceSubscription.unsubscribe();
   }
 
-  private resetTheme(theme?: Theme): void {
+  private resetConfig(locale: string, theme?: Theme): void {
     this.cssClass = resetTheme(theme, this.cssClass, this.overlayContainer, this.cookieService, this.themeService);
+    this.locale = locale;
+    const currentLocale = getLocale(this.locale);
+    this.dateAdapter.setLocale(currentLocale.language);
+    if (currentLocale.i18n !== getLocale(this.translate.currentLang).i18n) {
+      this.translate.use(currentLocale.language);
+    }
   }
 }

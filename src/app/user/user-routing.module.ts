@@ -10,7 +10,7 @@ import { OverviewComponent } from './overview/overview.component';
 const routes: Routes = [
   {
     path: '', component: UsersComponent, canActivate: [authGuard],
-    resolve: {model: TranslationLoaderResolver},
+    resolve: { model: TranslationLoaderResolver },
     data: {
       roles: [Role.admin]
     }

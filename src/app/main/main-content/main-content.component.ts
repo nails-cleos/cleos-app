@@ -84,10 +84,9 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   socialLinks: ISocialLink[];
   works: IWork[] = [];
   allWorks: IWork[] = [];
-  filter?: ITreatmentGroup;
+  filter: BehaviorSubject<ITreatmentGroup | undefined>;
   experiences: IExperience[];
   stories: IStory[];
-
   currentIndex: number;
 
   private isAuthenticated = false;
@@ -106,6 +105,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.socialLinks = this.allSocialLinks();
     this.stories = this.allStories();
     this.experiences = this.allExperience();
+    this.filter = new BehaviorSubject<ITreatmentGroup | undefined>(undefined);
 
     this.treatmentTitle = bounceInDownAnimation('500ms');
     this.storyTitle = fadeInUpDown('20px', '700ms');
@@ -154,6 +154,15 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.getCatalogues();
     this.getTreatments();
     this.cdRef.detectChanges();
+    this.filter?.subscribe(group => {
+      setTimeout(() => {
+        if (group) {
+          this.works = this.allWorks.filter(p => p.group.id === group.id);
+        } else {
+          this.works = this.allWorks;
+        }
+      }, 500);
+    });
   }
 
   ngAfterViewInit(): void {
@@ -191,14 +200,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
 
   filterBy(group?: ITreatmentGroup): void {
     this.works = [];
-    this.filter = group;
-    setTimeout(() => {
-      if (group) {
-        this.works = this.allWorks.filter(p => p.group.id === group.id);
-      } else {
-        this.works = this.allWorks;
-      }
-    }, 500);
+    this.filter?.next(group);
   }
 
   book(group: ITreatmentGroup): void {
@@ -216,23 +218,41 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private automateSlider(): void {
+    // let forward = true;
     this.sliderSubscription = interval(3000).subscribe(() => this.moveForwardSlide());
   }
 
   private moveForwardSlide(): void {
     if (this.slides?.length) {
+      // Fade in
       if (this.currentIndex === this.slides.length - 1) {
-        this.sliderSubscription?.unsubscribe();
-        const back = interval(100).subscribe(() => {
-          this.currentIndex--;
-          if (this.currentIndex === 0) {
-            back.unsubscribe();
-            this.automateSlider();
-          }
-        });
+        this.currentIndex = 0;
       } else {
         this.currentIndex++;
       }
+
+      // Forward and backward
+      // if (this.currentIndex === this.slides.length - 1) {
+      //   forward = false;
+      // }
+      // if (this.currentIndex === 0 && !forward) {
+      //   forward = true;
+      // }
+      // this.currentIndex = this.currentIndex + (forward ? +1 : -1);
+
+      // Forward
+      // if (this.currentIndex === this.slides.length - 1) {
+      //   this.sliderSubscription?.unsubscribe();
+      //   const back = interval(100).subscribe(() => {
+      //     this.currentIndex--;
+      //     if (this.currentIndex === 0) {
+      //       back.unsubscribe();
+      //       this.automateSlider();
+      //     }
+      //   });
+      // } else {
+      //   this.currentIndex++;
+      // }
     }
   }
 
@@ -279,6 +299,11 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
       state: new BehaviorSubject<'open' | 'close'>('open'),
       delay: '400ms',
       text: 'MAIN.STORY.TEXT_4'
+    }, {
+      id: 'storyItem5',
+      state: new BehaviorSubject<'open' | 'close'>('open'),
+      delay: '500ms',
+      text: 'MAIN.STORY.TEXT_5'
     }];
   }
 
@@ -340,6 +365,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscription = this.getState.subscribe(state => {
       if (state.groups) {
         this.groups = state.groups;
+        this.filter?.next(state.groups[0]);
       }
       if (state.catalogue && Array.from(state.catalogue) && !this.slides?.length) {
         state.catalogue.forEach((catalogue: ICatalogueAll) => {
@@ -368,6 +394,12 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
         this.snackBar.open(state.errorMessage || state.message, 'OK', {
           duration: 5000
         });
+        if (!this.slides?.length) {
+          this.slides.push({ image: '../../assets/home_page/img/b1.jpeg' });
+          this.slides.push({ image: '../../assets/home_page/img/b2.jpeg' });
+          this.slides.push({ image: '../../assets/home_page/img/b3.jpeg' });
+          this.mainContent.showPreload(false);
+        }
       }
     });
   }

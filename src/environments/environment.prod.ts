@@ -5,6 +5,7 @@ export const environment = {
   recaptcha: {
     siteKey: '6LcJf10nAAAAAFDvt_OLXZQ5J9tOwwxjhtW3McoY'
   },
+  appDomain: 'nailscleos.nl',
   appServer: 'https://www.nailscleos.nl',
   title: 'Cleos',
   version: require('../../package.json').version,
