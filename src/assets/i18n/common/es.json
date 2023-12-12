@@ -389,5 +389,14 @@
   },
   "APP": {
     "TITLE": "Cleos"
+  },
+  "COOKIE": {
+    "HEADER": "¡Cookies utilizadas en el sitio web!",
+    "MESSAGE": "Este sitio web utiliza cookies para garantizar que usted obtenga la mejor experiencia en nuestro sitio web.",
+    "DISMISS": "¡Entendido!",
+    "ALLOW": "Permitir cookies",
+    "DENY": "Rechazar",
+    "LINK": "Más información",
+    "POLICY": "Política de cookies"
   }
 }

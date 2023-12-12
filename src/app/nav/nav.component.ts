@@ -129,6 +129,7 @@ export class NavComponent implements OnInit, OnDestroy {
         this.getNotifications();
       }
     });
+    this.authUserService.cookieConsent(this.translate);
   }
 
   ngOnDestroy(): void {

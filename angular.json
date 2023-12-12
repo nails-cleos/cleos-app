@@ -41,9 +41,12 @@
             ],
             "styles": [
               "node_modules/angular-calendar/css/angular-calendar.css",
+              "node_modules/cookieconsent/build/cookieconsent.min.css",
               "src/styles.scss"
             ],
-            "scripts": [],
+            "scripts": [
+              "node_modules/cookieconsent/build/cookieconsent.min.js"
+            ],
             "vendorChunk": true,
             "extractLicenses": false,
             "buildOptimizer": false,
@@ -203,9 +206,12 @@
             ],
             "styles": [
               "node_modules/angular-calendar/css/angular-calendar.css",
+              "node_modules/cookieconsent/build/cookieconsent.min.css",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/cookieconsent/build/cookieconsent.min.js"
+            ]
           }
         },
         "lint": {

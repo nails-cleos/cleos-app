@@ -50,17 +50,19 @@ export const getUserImage = (user: IUser | IUserAll | undefined): string | undef
 export interface ILocale {
   language: string;
   flag: string;
+  i18n: string;
 }
 
 export class Locale implements ILocale {
   language: string;
   flag: string;
+  i18n: string;
 
-  constructor(language: string = 'en-NL', flag: string = 'en_NL') {
+  constructor(language: string = 'en-NL', flag: string = 'en_NL', i18n: string = 'en') {
     this.language = language;
     this.flag = flag;
+    this.i18n = i18n;
   }
-
 }
 
 export const getLocale = (userLang?: string): ILocale => {
@@ -77,7 +79,10 @@ export const getLocale = (userLang?: string): ILocale => {
     //   flag = 'nl';
   }
 
-  return new Locale(locale, flag?.replace('-', '_'));
+  const match = locale?.match(/([-_])/);
+  const i18n = !match ? locale : locale.substring(0, match.index);
+
+  return new Locale(locale, flag?.replace('-', '_'), i18n);
 };
 
 export const round = (value: number): number => Math.round((value + Number.EPSILON) * 100) / 100;

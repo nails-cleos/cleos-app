@@ -784,7 +784,7 @@
   }
 
   .active-link {
-    color: mat.get-color-from-palette($primary-palette) !important;
+    color: mat.get-color-from-palette($primary-palette, 900) !important;
   }
 
   mat-drawer-container {

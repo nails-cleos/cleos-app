@@ -5,6 +5,7 @@ export const environment = {
   recaptcha: {
     siteKey: '6Ldp5DgoAAAAAO9KDBFMNoyuTaJpIoGx8a8D04so'
   },
+  appDomain: 'cleos-staging.herokuapp.com',
   appServer: 'https://cleos-staging.herokuapp.com',
   title: 'CLEOS STAGING',
   version: require('../../package.json').version + '-staging',
