@@ -1,6 +1,6 @@
 {
   "name": "cleos",
-  "version": "1.1.1",
+  "version": "1.1.2-rc",
   "engines": {
     "node": "16.19.0",
     "npm": "8.19.3"
@@ -53,6 +53,7 @@
     "@paypal/paypal-js": "^5.1.4",
     "angular-calendar": "^0.31.0",
     "chart.js": "^4.2.1",
+    "cookieconsent": "^3.1.1",
     "date-fns": "^2.29.3",
     "date-fns-tz": "^2.0.0",
     "express": "^4.18.2",
@@ -67,6 +68,7 @@
     "ng2-charts": "^4.1.1",
     "ngrx-store-localstorage": "^15.0.0",
     "ngx-cookie-service": "^15.0.0",
+    "ngx-cookieconsent": "^4.0.2",
     "ngx-mat-intl-tel-input": "^5.0.0",
     "ngx-material-timepicker": "^5.5.3",
     "ngx-sharebuttons": "^11.0.0",

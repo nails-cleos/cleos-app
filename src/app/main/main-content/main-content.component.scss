@@ -52,14 +52,47 @@ section {
   background-position: center center;
 }
 
+.fade-in-background {
+  animation: fadeIn 4000ms;
+  -webkit-animation: fadeIn 4000ms;
+  -moz-animation: fadeIn 4000ms;
+  -o-animation: fadeIn 4000ms;
+  -ms-animation: fadeIn 4000ms;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@-webkit-keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@-moz-keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@-o-keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@-ms-keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
 .carousel-caption {
-  top: 40%;
+  background: rgba(169, 163, 151, 0.3);
+  top: 25%;
   z-index: 99999;
   box-sizing: border-box;
   position: absolute;
-  bottom: 20px;
   padding-top: 20px;
-  color: #fff;
+  color: #000;
   text-align: center;
   right: 20%;
   left: 20%;
@@ -68,6 +101,7 @@ section {
 }
 
 .carousel-caption h1 {
+  margin-top: 5%;
   font-weight: 1000;
   font-size: 90px;
   text-align: center;
@@ -81,7 +115,7 @@ section {
 }
 
 .carousel-caption p {
-  color: #fff;
+  color: #000;
   font-size: 18px;
   text-align: center;
   box-sizing: border-box;
@@ -89,7 +123,7 @@ section {
 
 .carousel-caption p:before,
 .carousel-caption p:after {
-  color: #fff;
+  color: #000;
   content: "___";
   position: relative;
   top: -8px;

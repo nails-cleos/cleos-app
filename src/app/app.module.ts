@@ -45,6 +45,7 @@ import { reducers } from './store/app.states';
 // Components
 import { AppComponent } from './app.component';
 import { AuthUserService } from './services/auth-user.service';
+import { NgcCookieConsentConfig, NgcCookieConsentModule } from 'ngx-cookieconsent';
 
 export const localStorageSyncReducer =
   (reducer: ActionReducer<any>): ActionReducer<any> => localStorageSync({ keys: ['auth'], rehydrate: true })(reducer);
@@ -56,6 +57,30 @@ registerLocaleData(localeEnGB, 'en-GB');
 registerLocaleData(localeEnNL, 'en-NL');
 registerLocaleData(localeEs, 'es');
 registerLocaleData(localeAr, 'es-AR');
+
+const cookieConfig: NgcCookieConsentConfig = {
+  cookie: {
+    domain: environment.appDomain
+  },
+  position: 'bottom-right',
+  theme: 'classic',
+  palette: {
+    popup: {
+      background: '#a9a397',
+      text: '#000',
+      link: '#000'
+    },
+    button: {
+      background: '#dcc8c2',
+      text: '#000',
+      border: 'transparent'
+    }
+  },
+  type: 'info',
+  content: {
+    href: `${ environment.appServer }/main/privacy`,
+  }
+};
 
 @NgModule({
   declarations: [
@@ -74,6 +99,7 @@ registerLocaleData(localeAr, 'es-AR');
       isolate: false,
       extend: true
     }),
+    NgcCookieConsentModule.forRoot(cookieConfig),
     AppRoutingModule,
     BrowserAnimationsModule,
     SharedModule,
@@ -128,7 +154,12 @@ registerLocaleData(localeAr, 'es-AR');
       provide: LOCALE_ID,
       useValue: 'en-GB'
     },
-    { provide: APP_INITIALIZER, useFactory: (pwaService: PwaService) => () => pwaService.initPwaPrompt(), deps: [PwaService], multi: true }
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (pwaService: PwaService) => () => pwaService.initPwaPrompt(),
+      deps: [PwaService],
+      multi: true
+    }
   ],
   bootstrap: [AppComponent],
   exports: [TranslateModule]

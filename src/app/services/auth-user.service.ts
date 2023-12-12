@@ -4,6 +4,9 @@ import { isDarkMode, Theme } from '../util/theme';
 import { hasRoomAdmin } from '../util/helper';
 import { Role } from '../interfaces/token';
 import { BehaviorSubject } from 'rxjs';
+import { NgcContentOptions } from 'ngx-cookieconsent/lib/model/content-options';
+import { TranslateService } from '@ngx-translate/core';
+import { NgcCookieConsentService } from 'ngx-cookieconsent';
 
 export interface IAuthUser {
   isDarkMode: boolean;
@@ -50,7 +53,7 @@ export class AuthUserService {
 
   public authUser: BehaviorSubject<IAuthUser> = new BehaviorSubject<IAuthUser>(initialAuthUser);
 
-  constructor() {
+  constructor(private cookieConsentService: NgcCookieConsentService) {
   }
 
   reloadUser(user?: IUserAll): IAuthUser {
@@ -92,5 +95,21 @@ export class AuthUserService {
 
     this.authUser.next(authUser);
     return authUser;
+  }
+
+  cookieConsent(translate: TranslateService): void {
+    const data = translate.instant('COOKIE');
+    const content = this.cookieConsentService.getConfig().content || {} as NgcContentOptions;
+    content.header = data.HEADER;
+    content.message = data.MESSAGE;
+    content.dismiss = data.DISMISS;
+    content.allow = data.ALLOW;
+    content.deny = data.DENY;
+    content.link = data.LINK;
+    content.policy = data.POLICY;
+
+    this.cookieConsentService.getConfig().content = content;
+    this.cookieConsentService.destroy();
+    this.cookieConsentService.init(this.cookieConsentService.getConfig());
   }
 }

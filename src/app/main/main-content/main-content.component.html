@@ -9,7 +9,7 @@
     </div>
   </div>
 
-  <div class="carousel-caption">
+  <div class="carousel-caption fade-in-background">
     <h1 [@slideInY]="{value: ':enter', params: {translate: '-2000px'}}">
       {{'MAIN.SLIDER.TITLE' | translate}}</h1>
     <h2 [@slideInX]="{value: ':enter', params: {translate: '-2000px'}}">{{'MAIN.SLIDER.SUB_1' | translate}}</h2>
@@ -82,7 +82,7 @@
 <!-- End Story -->
 
 <!-- Works -->
-<section id="work" class="works">
+<section id="work" class="works" *ngIf="allWorks.length">
   <div fxLayout="column" fxLayoutAlign="space-between center">
     <div class="section-title text-center">
       <h1>{{'MAIN.SECTION.WORK' | translate}}</h1>
@@ -98,11 +98,11 @@
     <div class="work-filter fadeInRight animated" data-wow-duration="500ms">
       <ul class="text-center">
         <li><a (click)="filterBy()" class="work-filter pointer" type="button"
-               [ngClass]="{'active': filter === undefined}">{{'MAIN.WORK.FILTER.ALL' | translate}}</a>
+               [ngClass]="{'active': filter.value === undefined}">{{'MAIN.WORK.FILTER.ALL' | translate}}</a>
         </li>
         <li *ngFor="let group of groups">
           <a (click)="filterBy(group)" class="work-filter pointer"
-             [ngClass]="{'active': filter === group}">{{group.name}}</a>
+             [ngClass]="{'active': filter.value === group}">{{group.name}}</a>
         </li>
       </ul>
     </div>
