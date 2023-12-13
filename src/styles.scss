@@ -134,6 +134,11 @@ a, u {
   position: fixed;
 }
 
+// cookie consents
+.cc-floating {
+  top: 9% !important;
+}
+
 @media all and (max-device-width: 812px) and (orientation: portrait) {
   .spinner-vertical {
     position: fixed;

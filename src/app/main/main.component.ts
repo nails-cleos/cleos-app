@@ -19,7 +19,6 @@ import { bottomTop, colorChange, colorChangeChild, fade, goTo, observeElement } 
 import { Auth, user } from '@angular/fire/auth';
 import { AuthUserService } from '../services/auth-user.service';
 import { MainContentService } from './main-content.service';
-import { NgcContentOptions } from 'ngx-cookieconsent/lib/model/content-options';
 import { NgcCookieConsentService } from 'ngx-cookieconsent';
 
 @Component({
@@ -55,7 +54,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
               private overlayContainer: OverlayContainer, private cookieService: CookieService,
               private themeService: ThemeService, @Optional() private auth: Auth, private authUserService: AuthUserService,
               private mainContent: MainContentService, private cookieConsentService: NgcCookieConsentService) {
-    this.navigationState = new BehaviorSubject<'open' | 'close'>('open');
+    this.navigationState = new BehaviorSubject<'open' | 'close'>('close');
     this.isAuthenticated = false;
     this.showLoader = true;
     this.isDarkMode = isDarkMode(cookieService.get(THEME) as Theme);

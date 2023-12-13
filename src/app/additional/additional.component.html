@@ -53,24 +53,33 @@
                   {{errors['duration']}}
                 </mat-error>
               </mat-form-field>
-              <mat-form-field *ngIf="groups; else skeleton" appearance="outline">
-                <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
-                <label>
-                  <input (keydown)="keyDownGroup($event)" formControlName="group" [matAutocomplete]="autoGroup"
-                         matInput type="text">
-                </label>
-                <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
-                  <mat-option *ngFor="let group of filteredGroup | async | sortBy: 'asc':'name'" [value]="group">
-                    {{group.name}}
-                  </mat-option>
-                </mat-autocomplete>
-                <mat-error *ngIf="getForm.group.hasError('requireMatch')"
-                           [innerHTML]="'COMMON.TREATMENT.GROUP.INVALID' | translate">
-                </mat-error>
-                <mat-error *ngIf="errors['group']">
-                  {{errors['group']}}
-                </mat-error>
-              </mat-form-field>
+              <div *ngIf="allGroups; else skeleton" fxLayout="row" fxLayoutAlign="space-between center" id="groups">
+                <ng-template [ngIf]="allGroups.length || groups.length">
+                  <mat-form-field class="chip-list">
+                    <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
+                    <mat-chip-grid #chipList aria-label="Group selection">
+                      <mat-chip-row (removed)="remove(group)" *ngFor="let group of groups" [removable]="true">
+                        {{group.name}}
+                        <mat-icon matChipRemove>cancel</mat-icon>
+                      </mat-chip-row>
+                      <input #groupInput formControlName="group" [matAutocomplete]="auto"
+                             [matChipInputFor]="chipList">
+                    </mat-chip-grid>
+                    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedGroup($event)">
+                      <mat-option *ngFor="let group of sortGroups(filteredGroup | async)" [value]="group">
+                        {{group.name}}
+                      </mat-option>
+                    </mat-autocomplete>
+                  </mat-form-field>
+                  <button fxShow.lt-sm fxHide routerLink="/treatments/add" color="accent" mat-fab type="button">
+                    <mat-icon matPrefix>add</mat-icon>
+                  </button>
+                  <button fxHide.lt-sm fxShow routerLink="/treatments/add" color="accent" mat-fab extended type="button">
+                    <mat-icon matPrefix>add</mat-icon>
+                    <span>{{ 'COMMON.TREATMENT.COLOR.ADD_BUTTON' | translate }}</span>
+                  </button>
+                </ng-template>
+              </div>
               <ng-template #skeleton>
                 <div class="ssc-line"></div>
               </ng-template>
@@ -87,7 +96,7 @@
               </button>
             </ng-template>
             <ng-template #buttonEditMode>
-              <button [disabled]="form.invalid || (form.pristine && additional?.groupId === getForm.group.value?.id)"
+              <button [disabled]="form.invalid"
                       color="primary" mat-fab extended class="icon-button" type="submit">
                 {{ 'COMMON.BUTTON.UPDATE' | translate }}
               </button>

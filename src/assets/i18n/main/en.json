@@ -72,6 +72,16 @@
     },
     "CATALOGUE": {
       "NO_DETAIL": "No detail"
+    },
+    "BOOK": {
+      "APPOINTMENT": "Book your appointment",
+      "VIA": {
+        "WHATSAPP": "Via Whatsapp",
+        "INSTAGRAM": "Via Instagram",
+        "FACEBOOK": "Via Facebook",
+        "PHONE": "Via Phone call",
+        "EMAIL": "Via Email"
+      }
     }
   },
   "CARD": {
