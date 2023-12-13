@@ -16,7 +16,7 @@
 
   // Home page
   #back-top {
-    color: mat.get-color-from-palette($accent-palette) !important;
+    color: mat.get-color-from-palette($foreground, text) !important;
   }
 
   .home-divider:before,

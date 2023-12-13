@@ -126,8 +126,8 @@ export const slideInY = trigger('slideInY', [
 ]);
 
 export const fade = trigger('fade', [
-  state('open', style({ opacity: 0, zIndex: -1 })),
-  state('close', style({ opacity: 1 })),
+  state('open', style({ opacity: '{{opacityOpen}}', zIndex: '{{index}}' }), { params: { opacityOpen: 0, index: -1 } }),
+  state('close', style({ opacity: '{{opacityClose}}' }), { params: { opacityClose: 1 } }),
   transition('open <=> close', animate('{{duration}} ease-in-out'), {
     params: {
       duration: '1000ms'
@@ -151,27 +151,24 @@ export const fadeInOut = trigger('fadeInOut', [
 ]);
 
 export const colorChange = trigger('colorChange', [
-  state('open', style({ backgroundColor: 'rgb({{backgroundColor}})', color: '#000' }), {
+  state('open', style({ backgroundColor: 'rgb({{backgroundColor}})', color: '#000', fill: '#000' }), {
     params: {
       backgroundColor: '101, 247, 204'
     }
   }),
-  state('close', style({ backgroundColor: 'rgba({{backgroundColor}}, 0.2)', color: '#fff' }), {
+  state('close', style({ backgroundColor: 'rgba({{backgroundColor}}, 0.2)', color: '#fff', fill: '#fff' }), {
     params: {
       backgroundColor: '101, 247, 204'
     }
   }),
   transition('* <=> *', [
-    group([
-      query('@colorChangeChild', animateChild()),
-      animate('1000ms ease-in-out'),
-    ]),
+    animate('1000ms ease-in-out'),
   ])
 ]);
 
 export const colorChangeChild = trigger('colorChangeChild', [
   state('open', style({ opacity: 1 })),
-  state('close', style({ opacity: 0.2 })),
+  state('close', style({ opacity: 1 })),
   transition('* => *', animate('1000ms ease-in-out'))
 ]);
 

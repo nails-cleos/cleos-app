@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectAdditionalState } from '../store/app.states';
@@ -6,10 +6,12 @@ import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGro
 import { Additional, IAdditional } from '../interfaces/additional';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as fromActionsAdditional from '../store/additional.actions';
-import { IGroupService, ITreatmentGroup } from '../interfaces/treatment';
-import { fieldChange, requireMatch, valueChange } from '../util/validators';
+import { IGroupService } from '../interfaces/treatment';
+import { fieldChange, valueChange } from '../util/validators';
 import { map, startWith } from 'rxjs/operators';
 import { formatDuration } from '../util/dates';
+import { areEquals } from '../util/helper';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 
 @Component({
   selector: 'app-additional',
@@ -18,17 +20,20 @@ import { formatDuration } from '../util/dates';
 })
 export class AdditionalComponent implements OnInit, OnDestroy {
   @Input() additional?: IAdditional;
+  @ViewChild('groupInput') groupInput!: ElementRef<HTMLInputElement>;
   form!: UntypedFormGroup;
   id?: string;
   isAddMode: boolean;
 
-  groups?: IGroupService[];
+  groups: IGroupService[] = [];
   filteredGroup?: Observable<IGroupService[] | undefined>;
+  allGroups?: IGroupService[];
 
   errors: any = [];
 
   private getState: Observable<any>;
   private subscription: Subscription | undefined;
+  private currentGroupIds: string[] = [];
 
   constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router,
               private route: ActivatedRoute, private cdRef: ChangeDetectorRef) {
@@ -49,7 +54,11 @@ export class AdditionalComponent implements OnInit, OnDestroy {
     additional.name = fieldChange(this.getForm.name as UntypedFormControl, this.additional?.name);
     additional.description = valueChange(this.getForm.description.value, this.additional?.description);
     additional.duration = fieldChange(this.getForm.duration as UntypedFormControl, this.additional?.duration);
-    additional.groupId = this.getForm.group.value?.id;
+
+    const newGroupIds = this.groups.map(({ id }) => id);
+    if (!areEquals(newGroupIds, this.currentGroupIds)) {
+      additional.groupIds = newGroupIds;
+    }
 
     if (this.isAddMode) {
       return this.store.dispatch(new fromActionsAdditional.AdditionalSave(additional));
@@ -80,14 +89,29 @@ export class AdditionalComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  displayFnGroup(group: ITreatmentGroup): string {
-    return group ? `${ group.name }` : '';
+  remove(group: IGroupService): void {
+    const index = this.groups.indexOf(group);
+    if (index >= 0) {
+      this.groups.splice(index, 1);
+      this.allGroups?.push(group);
+      this.getForm.group.setValue(null);
+    }
   }
 
-  keyDownGroup(event: any): void {
-    if (event.code === 'Backspace') {
-      this.getForm.group.setValue('');
-    }
+  selectedGroup(event: MatAutocompleteSelectedEvent): void {
+    const group = event.option.value;
+    this.groups.push(group);
+    this.allGroups = this.allGroups?.filter(c => c.id !== group.id);
+    this.groupInput.nativeElement.value = '';
+    this.getForm.group.setValue(null);
+  }
+
+  sortGroups(data: any): IGroupService[] {
+    return data.sort((a: any, b: any) => {
+      const aName = a.name.toUpperCase();
+      const bName = b.name.toUpperCase();
+      return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
+    });
   }
 
   private createForm(): void {
@@ -95,19 +119,21 @@ export class AdditionalComponent implements OnInit, OnDestroy {
       description: [''],
       name: ['', Validators.required],
       duration: ['', Validators.required],
-      group: ['', requireMatch]
+      group: ['']
     });
 
-    this.filteredGroup = this.getForm.group.valueChanges.pipe(startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups)
+    this.filteredGroup = this.getForm.group.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value ? value.name : ''),
+      map(
+        name => name ? this.filterGroup(name) : (this.allGroups ? this.allGroups.slice() : this.allGroups))
     );
   }
 
   private filterGroup(name: string): IGroupService[] | undefined {
     const filterValue = name.toLowerCase();
 
-    return this.groups?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
+    return this.allGroups?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 
   private findGroups(): void {
@@ -132,7 +158,7 @@ export class AdditionalComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      this.groups = state.groups;
+      this.allGroups = state.groups;
       if (state.selected) {
         this.additional = {
           id: state.selected.id,
@@ -141,8 +167,13 @@ export class AdditionalComponent implements OnInit, OnDestroy {
           duration: formatDuration(state.selected.duration),
           groupId: state.selected.group?.id
         } as IAdditional;
+        this.groups = [];
+        state.selected.groups?.forEach((group: IGroupService) => {
+          this.groups.push(group);
+          this.allGroups = this.allGroups?.filter(c => c.id !== group.id);
+        });
+        this.currentGroupIds = this.groups.map(({ id }) => id);
         this.form.patchValue(this.additional);
-        this.getForm.group.setValue(state.selected.group);
       }
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {

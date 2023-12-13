@@ -329,3 +329,15 @@
 
 </section>
 <!-- End Contact Us-->
+
+<button fxHide.lt-sm fxShow  color="primary" class="book-button fab-book-button" (click)="openBottomSheet" mat-fab
+        extended type="button">
+  <mat-icon matPrefix>book_online</mat-icon>
+  <span>{{ 'MAIN.BOOK.APPOINTMENT' | translate }}</span>
+</button>
+
+<button fxShow.lt-sm fxHide color="primary" class="book-button raised-book-button" (click)="openBottomSheet"
+        mat-raised-button type="button">
+  <mat-icon matPrefix>book_online</mat-icon>
+  <span>{{ 'MAIN.BOOK.APPOINTMENT' | translate }}</span>
+</button>

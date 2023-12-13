@@ -31,6 +31,7 @@ import { isMobile } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MainContentService } from '../main-content.service';
 import { b64toBlob } from '../../util/file';
+import { MatBottomSheet, MatBottomSheetRef } from '@angular/material/bottom-sheet';
 
 @Component({
   selector: 'app-main-content',
@@ -99,7 +100,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(private store: Store<AppState>, private cdRef: ChangeDetectorRef, private viewportScroller: ViewportScroller,
               private translate: TranslateService, private router: Router, private formBuilder: UntypedFormBuilder,
               private snackBar: MatSnackBar, private authUserService: AuthUserService, private breakpointObserver: BreakpointObserver,
-              private mainContent: MainContentService) {
+              private mainContent: MainContentService, private bottomSheet: MatBottomSheet) {
     this.currentIndex = 0;
     this.isSmall = isMobile();
     this.isDark = false;
@@ -137,6 +138,11 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
       Breakpoints.XSmall,
       Breakpoints.Small
     ]).subscribe(result => this.isSmall = result.matches);
+  }
+
+  get openBottomSheet(): void {
+    this.bottomSheet.open(BottomSheetBookAppointmentComponent);
+    return;
   }
 
   get sendEmail(): void {
@@ -405,5 +411,45 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     });
+  }
+}
+
+@Component({
+  selector: 'app-bottom-sheet-book-appointment',
+  templateUrl: 'bottom-sheet-book-appointment.html',
+})
+export class BottomSheetBookAppointmentComponent {
+  constructor(private bottomSheetRef: MatBottomSheetRef<BottomSheetBookAppointmentComponent>, private translate: TranslateService) {
+  }
+
+  openLink(event: MouseEvent, key: 'whatsapp' | 'instagram' | 'facebook' | 'phone' | 'email'): void {
+    this.bottomSheetRef.dismiss();
+    event.preventDefault();
+    setTimeout(() => {
+      let url;
+      switch (key) {
+        case 'whatsapp':
+          const phone = this.translate.instant('MAIN.CONTACT.SEND.PHONE');
+          const message = this.translate.instant('MAIN.CONTACT.SEND.HELLO');
+          url = `https://api.whatsapp.com/send?phone=${ phone }&text=${ message }`;
+          break;
+        case 'phone':
+          const tel = this.translate.instant('MAIN.CONTACT.SEND.PHONE');
+          url = `tel:${ tel }`;
+          break;
+        case 'instagram':
+          url = 'https://ig.me/m/carlanailscleos.nl';
+          break;
+        case 'facebook':
+          const message2 = this.translate.instant('MAIN.CONTACT.SEND.HELLO');
+          url = `https://m.me/carlanailscleos.nl?text=${ message2 }`;
+          break;
+        case 'email':
+          const mail = this.translate.instant('MAIN.CONTACT.MAIL');
+          url = `mailto:${ mail }`;
+          break;
+      }
+      window.open(url, '_blank');
+    }, 500);
   }
 }

@@ -103,19 +103,19 @@
   flex: 1 1 auto;
 }
 
-img {
+img, svg {
   border-radius: 50%;
   margin-right: 5% !important;
 }
 
 @media all and (max-device-width: 812px) and (orientation: portrait) {
-  img {
+  img, svg {
     max-width: 52px !important;
   }
 }
 
 @media not all and (max-device-width: 812px) and (orientation: portrait) {
-  img {
+  img, svg {
     max-width: 60px !important;
   }
 }
@@ -130,18 +130,14 @@ img {
 }
 
 #back-top {
-  bottom: 20px;
+  bottom: 40px;
   position: fixed;
   right: 25px;
-  z-index: 9;
+  z-index: 9999;
 
   mat-icon {
     transform: scale(2.5);
   }
-}
-
-.arrow-none {
-  display: none;
 }
 
 a {

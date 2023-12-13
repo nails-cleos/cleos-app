@@ -1,0 +1,23 @@
+<mat-nav-list>
+  <div mat-subheader>{{'MAIN.BOOK.APPOINTMENT' | translate}}</div>
+  <a mat-list-item (click)="openLink($event, 'whatsapp')">
+    <span matListItemTitle>{{'MAIN.BOOK.VIA.WHATSAPP' | translate}}</span>
+    <mat-icon matListItemIcon [svgIcon]="'WHATSAPP'"></mat-icon>
+  </a>
+  <a mat-list-item (click)="openLink($event, 'instagram')">
+    <span matListItemTitle>{{'MAIN.BOOK.VIA.INSTAGRAM' | translate}}</span>
+    <mat-icon matListItemIcon [svgIcon]="'INSTAGRAM'"></mat-icon>
+  </a>
+  <a mat-list-item (click)="openLink($event, 'facebook')">
+    <span matListItemTitle>{{'MAIN.BOOK.VIA.FACEBOOK' | translate}}</span>
+    <mat-icon matListItemIcon [svgIcon]="'FACEBOOK'"></mat-icon>
+  </a>
+  <a mat-list-item (click)="openLink($event, 'phone')">
+    <span matListItemTitle>{{'MAIN.BOOK.VIA.PHONE' | translate}}</span>
+    <mat-icon matListItemIcon>phone</mat-icon>
+  </a>
+  <a mat-list-item (click)="openLink($event, 'email')">
+    <span matListItemTitle>{{'MAIN.BOOK.VIA.EMAIL' | translate}}</span>
+    <mat-icon matListItemIcon>email</mat-icon>
+  </a>
+</mat-nav-list>

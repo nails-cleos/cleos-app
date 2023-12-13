@@ -62,7 +62,7 @@ const cookieConfig: NgcCookieConsentConfig = {
   cookie: {
     domain: environment.appDomain
   },
-  position: 'bottom-right',
+  position: 'top-right',
   theme: 'classic',
   palette: {
     popup: {
