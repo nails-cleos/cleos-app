@@ -72,6 +72,16 @@
     },
     "CATALOGUE": {
       "NO_DETAIL": "Sin detalle"
+    },
+    "BOOK": {
+      "APPOINTMENT": "Reserva tu cita",
+      "VIA": {
+        "WHATSAPP": "Mediante Whatsapp",
+        "INSTAGRAM": "Mediante Instagram",
+        "FACEBOOK": "Mediante Facebook",
+        "PHONE": "Mediante Llamada telefónica",
+        "EMAIL": "Mediante Email"
+      }
     }
   },
   "CARD": {

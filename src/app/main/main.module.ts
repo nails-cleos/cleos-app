@@ -6,7 +6,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { EffectsModule } from '@ngrx/effects';
 
 import { MainComponent } from './main.component';
-import { MainContentComponent } from './main-content/main-content.component';
+import { BottomSheetBookAppointmentComponent, MainContentComponent } from './main-content/main-content.component';
 import { CatalogComponent } from './catalog/catalog.component';
 import { PrivacyComponent } from './privacy/privacy.component';
 import { TermsAndConditionsComponent } from './terms-and-conditions/terms-and-conditions.component';
@@ -27,7 +27,8 @@ import { AuthService } from '../services/auth.service';
     MainContentComponent,
     CatalogComponent,
     PrivacyComponent,
-    TermsAndConditionsComponent
+    TermsAndConditionsComponent,
+    BottomSheetBookAppointmentComponent
   ],
   imports: [
     MainRoutingModule,

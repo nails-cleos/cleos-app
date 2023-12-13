@@ -268,7 +268,8 @@
       "GROUP": {
         "FIELD": "Tipo de tratamiento",
         "REQUIRED": "Tipo de tratamiento es <b>requerido</b>",
-        "INVALID": "Tipo de tratamiento no valido"
+        "INVALID": "Tipo de tratamiento no valido",
+        "ADD_BUTTON": "Agregar tratamientos"
       },
       "COLOR": {
         "FIELD": "Color",

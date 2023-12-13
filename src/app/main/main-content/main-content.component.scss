@@ -61,28 +61,48 @@ section {
 }
 
 @keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 @-webkit-keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 @-moz-keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 @-o-keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 @-ms-keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .carousel-caption {
@@ -375,6 +395,24 @@ section {
 
 .dark-map {
   filter: invert(90%) hue-rotate(180deg);
+}
+
+.book-button {
+  z-index: 99;
+  position: fixed;
+}
+
+.fab-book-button {
+  top: auto;
+  right: auto;
+  bottom: 40px;
+  left: 25px;
+}
+
+.raised-book-button {
+  width: 100%;
+  bottom: 0;
+  margin: 0;
 }
 
 /*============================================================
