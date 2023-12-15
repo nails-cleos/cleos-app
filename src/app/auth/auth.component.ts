@@ -12,6 +12,7 @@ import { isIPhone, isMobile, VERIFICATION_EMAIL } from '../util/helper';
 import { THEME } from '../util/theme';
 import { UntypedFormControl } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-auth',
@@ -69,11 +70,11 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
           provider: firebase.auth.EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD
         }
       ],
-      credentialHelper: firebaseui.auth.CredentialHelper.GOOGLE_YOLO
+      credentialHelper: firebaseui.auth.CredentialHelper.GOOGLE_YOLO,
       // Terms of service url.
-      // tosUrl: '<your-tos-url>',
+      tosUrl: `${environment.appServer}/main/term-and-conditions`,
       // Privacy policy url.
-      // privacyPolicyUrl: '<your-privacy-policy-url>'
+      privacyPolicyUrl: `${environment.appServer}/main/privacy`
     };
     this.ui.start('#firebaseui-auth-container', uiConfig);
   }

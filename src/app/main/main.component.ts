@@ -20,6 +20,7 @@ import { AuthUserService } from '../services/auth-user.service';
 import { MainContentService } from './main-content.service';
 import { NgcCookieConsentService } from 'ngx-cookieconsent';
 import * as fromActionsMain from '../store/main.actions';
+import { TokenService } from '../services/token.service';
 
 @Component({
   selector: 'app-main',
@@ -53,15 +54,22 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
               private viewportScroller: ViewportScroller, private router: Router, private translate: TranslateService,
               private overlayContainer: OverlayContainer, private cookieService: CookieService,
               private themeService: ThemeService, @Optional() private auth: Auth, private authUserService: AuthUserService,
-              private mainContent: MainContentService, private cookieConsentService: NgcCookieConsentService) {
+              private mainContent: MainContentService, private cookieConsentService: NgcCookieConsentService,
+              private tokenService: TokenService) {
     this.navigationState = new BehaviorSubject<'open' | 'close'>('close');
     this.isAuthenticated = false;
     this.showLoader = true;
     this.isDarkMode = isDarkMode(cookieService.get(THEME) as Theme);
     this.authUserService.updateMode(this.isDarkMode);
     this.backgroundColor = this.isDarkMode ? '126, 119, 105' : '169, 163, 151';
-    this.authUserServiceSubscription = user(this.auth).subscribe(response => this.isAuthenticated = response !== null);
-    this.mainContentSubscription = mainContent.data$.subscribe(it => this.showLoader = it);
+    this.authUserServiceSubscription = user(this.auth).subscribe(response => {
+      response?.getIdToken().then(idToken => this.tokenService.token = idToken);
+      this.isAuthenticated = response !== null;
+    });
+    this.mainContentSubscription = mainContent.data$.subscribe(it => {
+      this.showLoader = it.showPreload;
+      this.navigationState.next(it.navigationHeader);
+    });
   }
 
   get changeTheme(): void {

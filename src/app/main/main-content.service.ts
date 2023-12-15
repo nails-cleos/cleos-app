@@ -5,10 +5,13 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root'
 })
 export class MainContentService {
-  data = new BehaviorSubject(true);
+  data = new BehaviorSubject<{ showPreload: boolean; navigationHeader: 'open' | 'close' }>({
+    showPreload: true,
+    navigationHeader: 'close'
+  });
   data$ = this.data.asObservable();
 
-  showPreload(data: boolean): void {
-    this.data.next(data);
+  configure(showPreload: boolean, navigationHeader: 'open' | 'close'): void {
+    this.data.next({ showPreload, navigationHeader });
   }
 }

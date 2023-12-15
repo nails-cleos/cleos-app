@@ -35,6 +35,9 @@ import { ReservationEffects } from '../store/effects/reservation.effects';
 import { PaymentEffects } from '../store/effects/payment.effects';
 import { DiscountEffects } from '../store/effects/discount.effects';
 import { CurrencyService } from '../services/currency.service';
+import { Store } from '@ngrx/store';
+import { AppState, selectI18nState } from '../store/app.states';
+import { Observable } from 'rxjs';
 
 @NgModule({
   declarations: [
@@ -84,9 +87,11 @@ import { CurrencyService } from '../services/currency.service';
   ]
 })
 export class ReservationModule {
-  constructor(protected translateService: TranslateService) {
-    const currentLang = translateService.currentLang;
-    translateService.currentLang = '';
-    translateService.use(currentLang);
+  constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {
+    const getI18nState: Observable<any> = this.store.select(selectI18nState);
+    getI18nState.subscribe(state => {
+      translateService.currentLang = '';
+      this.translateService.use(state.data);
+    });
   }
 }
