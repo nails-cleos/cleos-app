@@ -6,7 +6,7 @@
     "COLORS": "Colores",
     "LIST": {
       "COLUMN": {
-        "DURABILITY": "Durabilidad",
+        "PRICE_FROM": "Precio desde",
         "PRICE": "Precio",
         "DURATION": "Duración",
         "DATE": "Actualizado"
@@ -32,14 +32,9 @@
       "FIELD": "Duración",
       "REQUIRED": "Duración es <b>requerido</b>"
     },
-    "DURABILITY": {
-      "FIELD": "Durabilidad",
-      "MIN": {
-        "FIELD": "Durabilidad mínima"
-      },
-      "MAX": {
-        "FIELD": "Durabilidad máxima"
-      }
+    "PRICE_FROM": {
+      "FIELD": "Precio desde",
+      "MIN": "Precio desde debe ser mayor a 0"
     },
     "COLOR": {
       "FIELD": "Color"

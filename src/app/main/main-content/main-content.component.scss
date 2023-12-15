@@ -1,3 +1,5 @@
+@import "animation";
+
 .mb-50 {
   margin-bottom: 50px;
 }
@@ -43,66 +45,11 @@ section {
   left: 0;
 }
 
-// slider
-
 .slider-img {
   width: 100%;
   height: 100vh;
   background-size: cover;
   background-position: center center;
-}
-
-.fade-in-background {
-  animation: fadeIn 4000ms;
-  -webkit-animation: fadeIn 4000ms;
-  -moz-animation: fadeIn 4000ms;
-  -o-animation: fadeIn 4000ms;
-  -ms-animation: fadeIn 4000ms;
-}
-
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@-webkit-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@-moz-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@-o-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@-ms-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
 }
 
 .carousel-caption {
@@ -278,43 +225,6 @@ section {
   width: 400px !important;
 }
 
-.overlay {
-  text-align: center;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  margin: auto;
-  height: 300px;
-  width: 400px !important;
-
-  opacity: 0;
-  filter: alpha(opacity=0);
-
-  -webkit-transition: all 450ms ease-out 0s;
-  -moz-transition: all 450ms ease-out 0s;
-  -o-transition: all 450ms ease-out 0s;
-  transition: all 450ms ease-out 0s;
-
-  -webkit-transform: rotateY(180deg) scale(0.5, 0.5);
-  -moz-transform: rotateY(180deg) scale(0.5, 0.5);
-  -ms-transform: rotateY(180deg) scale(0.5, 0.5);
-  -o-transform: rotateY(180deg) scale(0.5, 0.5);
-  transform: rotateY(180deg) scale(0.5, 0.5);
-}
-
-.work-item:hover .overlay {
-  opacity: 1;
-  filter: alpha(opacity=100);
-
-  -webkit-transform: rotateY(0deg) scale(1, 1);
-  -moz-transform: rotateY(0deg) scale(1, 1);
-  -ms-transform: rotateY(0deg) scale(1, 1);
-  -o-transform: rotateY(0deg) scale(1, 1);
-  transform: rotateY(0deg) scale(1, 1);
-}
-
 .work-item .overlay a {
   border-radius: 50%;
   display: inline-block;
@@ -404,9 +314,9 @@ section {
 
 .fab-book-button {
   top: auto;
-  right: auto;
+  right: 60px;
+  left: auto;
   bottom: 40px;
-  left: 25px;
 }
 
 .raised-book-button {
@@ -418,9 +328,7 @@ section {
 /*============================================================
 	For Small Desktop
 ==============================================================*/
-
 @media (min-width: 980px) and (max-width: 1150px) {
-  /* slider */
   .carousel-caption h1 {
     font-size: 72px;
   }
@@ -437,7 +345,6 @@ section {
 /*============================================================
 	Tablet (Portrait) Design for a width of 768px
 ==============================================================*/
-
 @media (min-width: 768px) and (max-width: 979px) {
   .carousel-caption h1 {
     font-size: 72px;
@@ -451,7 +358,6 @@ section {
     font-size: 16px;
   }
 
-  /* fatcs */
   .counters-item {
     margin-bottom: 50px;
   }
@@ -460,9 +366,7 @@ section {
 /*============================================================
 	Mobile (Portrait) Design for a width of 320px
 ==============================================================*/
-
 @media only screen and (max-width: 767px) {
-  /* slider */
   .carousel-caption {
     left: 0;
     right: 0;
@@ -500,10 +404,3 @@ section {
     width: 300px !important;
   }
 }
-
-///*============================================================
-//	Mobile (Landscape) Design for a width of 480px
-//==============================================================*/
-//
-//@media only screen and (min-width: 480px) and (max-width: 767px) {
-//}

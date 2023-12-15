@@ -8,9 +8,7 @@ export interface ITreatmentGroup {
   id?: string;
   name?: string;
   description?: string;
-  durability?: string;
-  durabilityMin?: number;
-  durabilityMax?: number;
+  priceFrom?: string;
   colors?: string[];
   treatments?: ITreatment[];
   order?: number;
@@ -20,9 +18,7 @@ export interface ITreatmentGroupAll {
   id: string;
   name: string;
   description?: string;
-  durability?: string;
-  durabilityMin?: number;
-  durabilityMax?: number;
+  priceFrom?: string;
   order?: number;
   colors?: IColorAll[];
 }

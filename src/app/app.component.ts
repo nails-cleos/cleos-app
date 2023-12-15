@@ -9,6 +9,7 @@ import { DateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
 import { YearMonthDateAdapter } from './util/adapter/year-month-date.adapter';
 import { AuthUserService } from './services/auth-user.service';
 import { Subscription } from 'rxjs';
+import { SeoService } from './services/seo.service';
 
 @Component({
   selector: 'app-root',
@@ -26,7 +27,7 @@ export class AppComponent implements OnDestroy {
 
   constructor(private translate: TranslateService, private overlayContainer: OverlayContainer, private cookieService: CookieService,
               private themeService: ThemeService, private dateAdapter: DateAdapter<Date>, private authUserService: AuthUserService,
-              @Inject(MAT_DATE_LOCALE) private locale: string) {
+              @Inject(MAT_DATE_LOCALE) private locale: string, private seoService: SeoService) {
     this.authUserServiceSubscription = this.authUserService.authUser
       .subscribe(value => this.resetConfig(value.locale, value.theme));
   }
@@ -36,6 +37,10 @@ export class AppComponent implements OnDestroy {
   }
 
   private resetConfig(locale: string, theme?: Theme): void {
+    const meta = this.translate.instant('META');
+
+    this.seoService.setMetaDescription(meta.CONTENT);
+    this.seoService.setMetaTitle(meta.TITLE);
     this.cssClass = resetTheme(theme, this.cssClass, this.overlayContainer, this.cookieService, this.themeService);
     this.locale = locale;
     const currentLocale = getLocale(this.locale);

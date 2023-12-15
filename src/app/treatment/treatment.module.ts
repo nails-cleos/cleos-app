@@ -5,7 +5,6 @@ import { TreatmentRoutingModule } from './treatment-routing.module';
 
 import { TreatmentComponent } from './treatment.component';
 import { TreatmentsComponent } from './list/treatments.component';
-import { TreatmentDetailComponent } from './detail/treatment-detail.component';
 import { EffectsModule } from '@ngrx/effects';
 import { TreatmentEffects } from '../store/effects/treatment.effects';
 import { TreatmentService } from '../services/treatment.service';
@@ -20,7 +19,6 @@ import { ColorService } from '../services/color.service';
   declarations: [
     TreatmentComponent,
     TreatmentsComponent,
-    TreatmentDetailComponent,
     TreatmentViewComponent,
     TreatmentTableComponent,
     TreatmentSortingComponent

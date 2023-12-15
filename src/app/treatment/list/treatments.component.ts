@@ -13,7 +13,6 @@ import * as fromActionsTreatment from '../../store/treatment.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
-import { groupDurability } from '../../util/helper';
 
 @Component({
   selector: 'app-treatments',
@@ -25,7 +24,7 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['order', 'name', 'durability', 'actions'];
+  displayedColumns: string[] = ['order', 'name', 'priceFrom', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<ITreatmentGroup>>();
 
   resultsLength = DEFAULT_LENGTH;
@@ -88,10 +87,7 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.clean();
         this.getTreatments();
       }
-      this.dataSource = stateValue.data?.content?.map((group: ITreatmentGroup) => {
-        const durability: string = groupDurability(group, this.translate);
-        return Object.assign({}, group, {durability});
-      });
+      this.dataSource = stateValue.data?.content;
       this.resultsLength = stateValue.data?.totalElements;
       if (!this.paginatorSubscription && this.resultsLength) {
         this.createPageSubscriptions();

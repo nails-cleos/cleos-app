@@ -256,15 +256,6 @@
       "FIELD": "Tratamiento",
       "REQUIRED": "Tratamiento es <b>requerido</b>",
       "INVALID": "Tratamiento no valido",
-      "DURABILITY": {
-        "TITLE": {
-          "DIFFERENT": "<span class='bold'>Durabilidad:</span> {{min}} a {{max}} días",
-          "EQUAL": "<span class='bold'>Durabilidad:</span> {{value}} días"
-        },
-        "DIFFERENT": "{{min}} a {{max}} días",
-        "EQUAL": "{{min}} días",
-        "NONE": "-"
-      },
       "GROUP": {
         "FIELD": "Tipo de tratamiento",
         "REQUIRED": "Tipo de tratamiento es <b>requerido</b>",
@@ -399,5 +390,9 @@
     "DENY": "Rechazar",
     "LINK": "Más información",
     "POLICY": "Política de cookies"
+  },
+  "META": {
+    "TITLE": "El mejor salón de uñas en Rotterdam | uñas cleos",
+    "CONTENT": "Bienvenido a Nails Cleos, tu paraíso para unas uñas impecables y una belleza duradera. Como propietaria única y artista de uñas experta, me dedico a ofrecer una gama de servicios de primer nivel, que incluyen extensiones de uñas BIAB (Builder In A Bottle) e impresionantes aplicaciones de esmalte en gel. Ubicado en Rotterdam, mi salón es un santuario para quienes buscan mejoras de uñas elegantes y duraderas y diseños de esmaltes en gel vibrantes y duraderos. Desde extensiones BIAB fortalecedoras que combinan durabilidad con elegancia hasta colores vibrantes de esmalte en gel que hacen una declaración, cada sesión está meticulosamente diseñada para reflejar su estilo único. Ingrese a mi salón para vivir una experiencia personalizada que combina experiencia, creatividad y compromiso con la perfección. Reserve su cita hoy y descubra la belleza y la resistencia de las extensiones BIAB y el atractivo vibrante del esmalte en gel, diseñados solo para usted."
   }
 }

@@ -40,6 +40,9 @@
       "TEXT_3": "Hagamos arte",
       "TEXT_4": "Felicidad"
     },
+    "TREATMENT": {
+      "PRICE_FROM": "Desde {{priceFrom}}"
+    },
     "CONTACT": {
       "TITLE": "Contactame",
       "DETAIL": "El compromiso con el cliente es una de mis premisas básicas. Mi desafío cada día es satisfacer sus necesidades, superar sus expectativas y hacer que \"volver\" por su nuevo set de uñas siga siendo un momento muy esperado.",

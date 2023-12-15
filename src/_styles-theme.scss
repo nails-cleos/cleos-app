@@ -48,12 +48,10 @@
     color: mat.get-color-from-palette($foreground, text);
   }
 
-  .work-filter ul li a:hover,
-  .work-filter ul li a.active {
+  .work-filter ul li button:hover,
+  .work-filter ul li button.active {
     background-color: mat.get-color-from-palette($primary-palette);
-    border-radius: 6px;
-    color: mat.get-color-from-palette($foreground, text);
-    padding: 5px 17px;
+    color: black;
   }
 
   .overlay {

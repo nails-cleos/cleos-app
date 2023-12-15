@@ -9,15 +9,7 @@ import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../..
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IPaymentAll, PaymentType } from '../../../interfaces/payment';
-import {
-  addPayment,
-  createTreatmentGroupService,
-  getPrice,
-  getTreatmentDurability,
-  newAdditional,
-  newExtra,
-  newPrice
-} from '../../../util/helper';
+import { addPayment, createTreatmentGroupService, getPrice, newAdditional, newExtra, newPrice } from '../../../util/helper';
 import { API_LOCALE, getNowTimeZone, getTime, getTimeNumber, newDateTimestamp } from '../../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
 import { map, startWith } from 'rxjs/operators';
@@ -75,7 +67,6 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   color: UntypedFormControl = new UntypedFormControl('', [requireMatch]);
   colors?: IColorAll[];
 
-  durability?: string;
   dateFormat: string;
 
   private reservationId: any;
@@ -254,7 +245,6 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       }
       this.colors = value.colors;
       this.color.setValue(null);
-      this.durability = getTreatmentDurability(value.durabilityMin, value.durabilityMax, this.translate);
       this.getAdditionalList(value.id);
     });
     this.treatment.valueChanges.subscribe(value => {
