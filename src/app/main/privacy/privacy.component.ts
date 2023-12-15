@@ -11,6 +11,6 @@ export class PrivacyComponent {
   url = `${environment.appServer}/main`;
 
   constructor(private mainContent: MainContentService) {
-    this.mainContent.showPreload(false);
+    this.mainContent.configure(false, 'open');
   }
 }

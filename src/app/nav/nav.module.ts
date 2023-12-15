@@ -16,6 +16,9 @@ import { UserService } from '../services/user.service';
 import { TokenService } from '../services/token.service';
 import { MenuItemComponent } from './menu-item/menu-item.component';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
+import { Store } from '@ngrx/store';
+import { AppState, selectI18nState } from '../store/app.states';
+import { Observable } from 'rxjs';
 
 @NgModule({
   declarations: [
@@ -49,9 +52,11 @@ import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/trans
   ]
 })
 export class NavModule {
-  constructor(protected translateService: TranslateService) {
-    const currentLang = translateService.currentLang;
-    translateService.currentLang = '';
-    translateService.use(currentLang);
+  constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {
+    const getI18nState: Observable<any> = this.store.select(selectI18nState);
+    getI18nState.subscribe(state => {
+      translateService.currentLang = '';
+      this.translateService.use(state.data);
+    });
   }
 }

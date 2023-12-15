@@ -58,7 +58,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
           }
         });
         if (this.catalogues?.length) {
-          this.mainContent.showPreload(false);
+          this.mainContent.configure(false, 'open');
         }
       }
     });

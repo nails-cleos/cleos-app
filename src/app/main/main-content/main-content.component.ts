@@ -396,7 +396,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       }
       if (this.groups?.length && this.slides?.length && this.allWorks?.length) {
-        this.mainContent.showPreload(false);
+        this.mainContent.configure(false, 'close');
       }
       if (state.errorMessage || state.message) {
         this.snackBar.open(state.errorMessage || state.message, 'OK', {
@@ -407,7 +407,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
           this.slides.push({ image: '../../assets/home_page/img/b1.webp' });
           this.slides.push({ image: '../../assets/home_page/img/b2.webp' });
           this.slides.push({ image: '../../assets/home_page/img/b3.webp' });
-          this.mainContent.showPreload(false);
+          this.mainContent.configure(false, 'close');
         }
       }
     });
