@@ -41,6 +41,7 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: true
       };
     }
+    case MainActionTypes.updateUser:
     case MainActionTypes.sendMessage: {
       return {
         ...state,

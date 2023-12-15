@@ -41,7 +41,6 @@ import {
   getBackIndex,
   getPrice,
   getStep,
-  getTreatmentDurability,
   newAdditional,
   newDiscount,
   newPercentage,
@@ -155,7 +154,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   date?: Date;
   endDate?: Date;
   totalDurationFormatted?: string;
-  durability?: string;
   reservationId?: string;
   showPenalty: boolean;
   penalty = PENALTY;
@@ -632,7 +630,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
           this.treatment.setValue('');
         }
       }
-      this.durability = getTreatmentDurability(value.durabilityMin, value.durabilityMax, this.translate);
     });
 
     this.treatment.valueChanges.subscribe(value => {

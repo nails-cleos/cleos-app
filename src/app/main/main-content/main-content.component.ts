@@ -403,10 +403,10 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
           duration: 5000
         });
         if (!this.slides?.length) {
-          this.slides.push({ image: '../../assets/icons/icon-512x512.png' });
-          this.slides.push({ image: '../../assets/home_page/img/b1.jpeg' });
-          this.slides.push({ image: '../../assets/home_page/img/b2.jpeg' });
-          this.slides.push({ image: '../../assets/home_page/img/b3.jpeg' });
+          this.slides.push({ image: '../../assets/icons/b0.webp' });
+          this.slides.push({ image: '../../assets/home_page/img/b1.webp' });
+          this.slides.push({ image: '../../assets/home_page/img/b2.webp' });
+          this.slides.push({ image: '../../assets/home_page/img/b3.webp' });
           this.mainContent.showPreload(false);
         }
       }

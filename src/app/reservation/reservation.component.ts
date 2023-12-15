@@ -37,7 +37,8 @@ import {
   formatTime,
   getAvailability,
   getCurrentTimeZone,
-  getDuration, getDurationOrUndefined,
+  getDuration,
+  getDurationOrUndefined,
   getNow,
   getStartEndDay,
   getTime,
@@ -65,11 +66,11 @@ import {
   getIndex,
   getPrice,
   getStep,
-  getTreatmentDurability,
   newAdditional,
   newDiscount,
   newPrice,
-  openDialog, removeDiscount,
+  openDialog,
+  removeDiscount,
   roomDetail
 } from '../util/helper';
 import { transitionAnimation } from '../util/animation';
@@ -180,7 +181,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   minDate: any;
   maxDate: any;
   maxCalendarDate: Date;
-  durability?: string;
 
   private treatmentId?: string;
   private roomId?: string;
@@ -771,7 +771,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           this.treatment.setValue('');
         }
       }
-      this.durability = getTreatmentDurability(value.durabilityMin, value.durabilityMax, this.translate);
     });
     this.treatment.valueChanges.subscribe(value => {
       if (value) {

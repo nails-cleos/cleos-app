@@ -9,7 +9,6 @@ import { ViewportScroller } from '@angular/common';
 import { Router } from '@angular/router';
 import * as fromActionsLogin from '../store/auth.actions';
 import { IUser, User } from '../interfaces/user';
-import * as fromActionsUser from '../store/user.actions';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { CookieService } from 'ngx-cookie-service';
 import { TranslateService } from '@ngx-translate/core';
@@ -20,6 +19,7 @@ import { Auth, user } from '@angular/fire/auth';
 import { AuthUserService } from '../services/auth-user.service';
 import { MainContentService } from './main-content.service';
 import { NgcCookieConsentService } from 'ngx-cookieconsent';
+import * as fromActionsMain from '../store/main.actions';
 
 @Component({
   selector: 'app-main',
@@ -74,7 +74,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
       const redirectUrl = this.router.url;
       const message = this.translate.instant(`COMMON.PROFILE.UPDATED.DARK_MODE_${ this.isDarkMode.toString().toUpperCase() }`);
       this.store.dispatch(
-        new fromActionsUser.UpdateUser({ user: authenticatedUser, redirectUrl, message })
+        new fromActionsMain.UpdateUser({ user: authenticatedUser, redirectUrl, message })
       );
     }
     return;

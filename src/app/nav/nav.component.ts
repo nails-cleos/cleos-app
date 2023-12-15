@@ -232,12 +232,10 @@ export class NavComponent implements OnInit, OnDestroy {
         });
       }
       if (this.router.url === '/') {
-        if (this.isAuthorized) {
-          if (!state.redirect) {
-            this.store.dispatch(
-              new fromActionsLogin.Redirect()
-            );
-          }
+        if (this.isAuthorized && !state.redirect) {
+          this.store.dispatch(
+            new fromActionsLogin.Redirect()
+          );
         } else {
           this.router.navigate(['main']);
         }

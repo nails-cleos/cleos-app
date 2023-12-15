@@ -21,13 +21,13 @@
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="durability">
+    <ng-container matColumnDef="priceFrom">
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
-          mat-sort-header>{{ 'TREATMENT.LIST.COLUMN.DURABILITY' | translate }}</th>
+          mat-sort-header>{{ 'TREATMENT.LIST.COLUMN.PRICE_FROM' | translate }}</th>
       <td *matCellDef="let treatment" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="treatment.id; else skeleton">
-          <div *ngIf="treatment.durability; else noDurability">{{treatment.durability}}</div>
-          <ng-template #noDurability>
+          <div *ngIf="treatment.priceFrom; else noPriceFrom">{{('EUR' | currencySymbol) + ' ' + treatment.priceFrom}}</div>
+          <ng-template #noPriceFrom>
             <div>-</div>
           </ng-template>
         </div>

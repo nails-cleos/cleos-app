@@ -20,6 +20,7 @@ import { UserService } from '../services/user.service';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { LoginEffects } from '../store/effects/auth.effects';
 import { AuthService } from '../services/auth.service';
+import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -53,7 +54,11 @@ import { AuthService } from '../services/auth.service';
     CatalogueService,
     TreatmentService,
     UserService,
-    AuthService
+    AuthService,
+    {
+      provide: LocationStrategy,
+      useClass: HashLocationStrategy
+    }
   ]
 })
 export class MainModule {

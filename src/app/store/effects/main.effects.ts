@@ -8,6 +8,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { CatalogueService } from '../../services/catalogue.service';
 import { TreatmentService } from '../../services/treatment.service';
 import { MainService } from '../../services/main.service';
+import * as fromActionsUser from '../user.actions';
+import { LoginSuccess } from '../auth.actions';
+import { UserService } from '../../services/user.service';
 
 @Injectable()
 export class MainEffects {
@@ -39,6 +42,20 @@ export class MainEffects {
     ))
   ));
 
+  update$ = createEffect(() => this.actions$.pipe(ofType(fromActionsMain.MainActionTypes.updateUser)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.userService.updateMe(payload.user).pipe(
+      switchMap((response: any) => {
+        const message = this.translate.instant('COMMON.PROFILE.UPDATED.MESSAGE', { displayName: response.user.displayName });
+        return of(new LoginSuccess({
+          response, queryParams: {
+            state: btoa(JSON.stringify({ returnUrl: payload.redirectUrl }))
+          }
+        }), new fromActionsMain.RequestSuccess({ message: payload.message ? payload.message : message }));
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsMain.RequestFailure({ error: err.error })))
+    ))
+  ));
+
   catalogueSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsMain.MainActionTypes.catalogueSuccess)
   ), {dispatch: false});
@@ -52,6 +69,6 @@ export class MainEffects {
   ), {dispatch: false});
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private mainService: MainService,
-              private catalogueService: CatalogueService, private treatmentService: TreatmentService) {
+              private catalogueService: CatalogueService, private treatmentService: TreatmentService, private userService: UserService) {
   }
 }

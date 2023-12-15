@@ -39,26 +39,19 @@
                 </label>
                 <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
               </mat-form-field>
-              <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
-                <mat-form-field appearance="outline" class="full-margin">
-                  <mat-label>{{ 'TREATMENT.DURABILITY.MIN.FIELD' | translate }}</mat-label>
-                  <label>
-                    <input formControlName="durabilityMin" matInput>
-                  </label>
-                  <mat-error *ngIf="errors['durabilityMin']">
-                    {{errors['durabilityMin']}}
-                  </mat-error>
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="full-margin">
-                  <mat-label>{{ 'TREATMENT.DURABILITY.MAX.FIELD' | translate }}</mat-label>
-                  <label>
-                    <input formControlName="durabilityMax" matInput>
-                  </label>
-                  <mat-error *ngIf="errors['durabilityMax']">
-                    {{errors['durabilityMax']}}
-                  </mat-error>
-                </mat-form-field>
-              </div>
+              <mat-form-field appearance="outline" class="full-margin">
+                <mat-icon matIconPrefix>euro</mat-icon>
+                <mat-label>{{ 'TREATMENT.PRICE_FROM.FIELD' | translate }}</mat-label>
+                <label>
+                  <input formControlName="priceFrom" matInput type="number" [min]="0">
+                </label>
+                <mat-error *ngIf="getForm.priceFrom.hasError('min')"
+                           [innerHTML]="'TREATMENT.PRICE_FROM.MIN' | translate">
+                </mat-error>
+                <mat-error *ngIf="errors['priceFrom']">
+                  {{errors['priceFrom']}}
+                </mat-error>
+              </mat-form-field>
               <div *ngIf="allColors; else skeleton" fxLayout="row" fxLayoutAlign="space-between center" id="colors">
                 <ng-template [ngIf]="allColors.length || colors.length">
                   <mat-form-field class="chip-list">
