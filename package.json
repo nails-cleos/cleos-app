@@ -1,6 +1,6 @@
 {
   "name": "cleos",
-  "version": "1.1.4-rc",
+  "version": "1.1.5-rc",
   "engines": {
     "node": "16.19.0",
     "npm": "8.19.3"
