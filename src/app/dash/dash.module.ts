@@ -27,6 +27,9 @@ import { QuarterSummaryComponent } from './quarter-summary/quarter-summary.compo
 import { MonthComponent } from './month-summary/month/month.component';
 import { QuarterComponent } from './quarter-summary/quarter/quarter.component';
 import { TotalSummaryComponent } from './total-summary/total-summary.component';
+import { AppState, selectI18nState } from '../store/app.states';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
 
 @NgModule({
   declarations: [
@@ -73,9 +76,12 @@ import { TotalSummaryComponent } from './total-summary/total-summary.component';
   ]
 })
 export class DashModule {
-  constructor(protected translateService: TranslateService) {
-    const currentLang = translateService.currentLang;
-    translateService.currentLang = '';
-    translateService.use(currentLang);
+
+  constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {
+    const getI18nState: Observable<any> = this.store.select(selectI18nState);
+    getI18nState.subscribe(state => {
+      translateService.currentLang = '';
+      this.translateService.use(state.data);
+    });
   }
 }

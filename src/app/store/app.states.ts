@@ -18,6 +18,7 @@ import * as color from './reducers/color.reducers';
 import * as expense from './reducers/expense.reducers';
 import * as note from './reducers/note.reducers';
 import * as account from './reducers/account.reducers';
+import * as i18n from './reducers/i18n.reducers';
 import { createFeatureSelector } from '@ngrx/store';
 
 export interface AppState {
@@ -41,6 +42,7 @@ export interface AppState {
   expenseState: expense.State;
   noteState: note.State;
   accountState: account.State;
+  i18nState: i18n.State;
 }
 
 export const reducers = {
@@ -63,7 +65,8 @@ export const reducers = {
   color: color.reducer,
   expense: expense.reducer,
   note: note.reducer,
-  account: account.reducer
+  account: account.reducer,
+  i18n: i18n.reducer
 };
 
 export const selectAuthState = createFeatureSelector<AppState>('auth');
@@ -86,3 +89,4 @@ export const selectColorState = createFeatureSelector<AppState>('color');
 export const selectExpenseState = createFeatureSelector<AppState>('expense');
 export const selectNoteState = createFeatureSelector<AppState>('note');
 export const selectAccountState = createFeatureSelector<AppState>('account');
+export const selectI18nState = createFeatureSelector<AppState>('i18n');

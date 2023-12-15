@@ -21,14 +21,14 @@
           [@slideInY]="{value: ':enter', params: {translate: '100px', duration: '500ms', delay: social.delay}}">
         <ng-template [ngIf]="social.phone && social.phoneKey && social.phoneText" [ngIfElse]="noPhone">
           <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
-             (mouseleave)="onHover(social, false)"
+             (mouseleave)="onHover(social, false)" aria-label="social icon"
              [href]="social.href + (social.phone | translate) + social.phoneKey + (social.phoneText | translate)">
             <mat-icon [svgIcon]="social.svgIcon"></mat-icon>
           </a>
         </ng-template>
         <ng-template #noPhone>
           <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
-             (mouseleave)="onHover(social, false)" [href]="social.href">
+             (mouseleave)="onHover(social, false)" [href]="social.href" aria-label="social icon">
             <mat-icon [svgIcon]="social.svgIcon"></mat-icon>
           </a>
         </ng-template>
@@ -67,7 +67,7 @@
         <figure class="team-member text-center">
           <div class="member-thumb"
                [@bottomTop]="{value: storyMemberState.value, params: {translate: '40vh', delayIn: '0ms', delayOut: '600ms'}}">
-            <img src="../../../assets/home_page/img/team/member-1.png" alt="Team Member" class="img-responsive">
+            <img src="../../../assets/home_page/img/team/member-1.webp" alt="Team Member" class="img-responsive">
           </div>
           <h3
             [@bottomTop]="{value: storyMemberState.value, params: {translate: '20px', delayIn: '300ms', delayOut: '300ms'}}">
@@ -97,12 +97,13 @@
 
     <div class="work-filter fadeInRight animated" data-wow-duration="500ms">
       <ul class="text-center">
-        <li><a (click)="filterBy()" class="work-filter pointer" type="button"
-               [ngClass]="{'active': filter.value === undefined}">{{'MAIN.WORK.FILTER.ALL' | translate}}</a>
+        <li>
+          <button mat-raised-button (click)="filterBy()" class="work-filter" type="button" aria-label="Filter All"
+                  [ngClass]="{'active': filter.value === undefined}">{{'MAIN.WORK.FILTER.ALL' | translate}}</button>
         </li>
         <li *ngFor="let group of groups">
-          <a (click)="filterBy(group)" class="work-filter pointer"
-             [ngClass]="{'active': filter.value === group}">{{group.name}}</a>
+          <button (click)="filterBy(group)" class="work-filter" mat-raised-button aria-label="Filter by"
+                  [ngClass]="{'active': filter.value === group}">{{group.name}}</button>
         </li>
       </ul>
     </div>
@@ -114,7 +115,7 @@
         <figure class="work-item">
           <div class="work-img" [ngStyle]="{'background-image': 'url(' + work.image + ')'}"></div>
           <figcaption class="overlay">
-            <a [title]="work.title" [href]="work.image" target="_blank">
+            <a [title]="work.title" [href]="work.image" target="_blank" aria-label="Open work image">
               <mat-icon class="text-top">visibility</mat-icon>
             </a>
             <h3>{{work.title}}</h3>
@@ -149,6 +150,8 @@
           </div>
           <div class="treatment-desc">
             <h2>{{group.name}}</h2>
+            <h4 *ngIf="group.priceFrom"
+                [innerHTML]="'MAIN.TREATMENT.PRICE_FROM' | translate: {priceFrom: ('EUR'| currencySymbol) + ' ' + group.priceFrom}"></h4>
             <p>{{group.description}}</p>
           </div>
         </div>
@@ -211,20 +214,19 @@
           <h2>{{'MAIN.CONTACT.TITLE' | translate }}</h2>
           <p>
             <mat-icon matPrefix>room</mat-icon>&nbsp;
-            <a
-              class="link" rel="noreferrer" target="_blank"
-              [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + ('MAIN.CONTACT.ADDRESS' | translate)">
+            <a class="link" rel="noreferrer" target="_blank" aria-label="Address"
+               [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + ('MAIN.CONTACT.ADDRESS' | translate)">
               {{'MAIN.CONTACT.ADDRESS' | translate}}
             </a>
           </p>
           <p>
             <mat-icon matPrefix>phone</mat-icon>&nbsp;
-            <a class="link"
+            <a class="link" aria-label="Phone"
                [href]="'tel:' + ('MAIN.CONTACT.PHONE' | translate)">{{'MAIN.CONTACT.PHONE' | translate}}</a>
           </p>
           <p>
             <mat-icon matPrefix>mail</mat-icon>&nbsp;
-            <a class="link"
+            <a class="link" aria-label="Mail"
                [href]="'mailto:' + ('MAIN.CONTACT.MAIL' | translate)">{{'MAIN.CONTACT.MAIL' | translate}}</a>
           </p>
         </div>
@@ -244,7 +246,7 @@
                 <mat-form-field class="full full-margin">
                   <mat-label>{{ 'MAIN.CONTACT.NAME.FIELD' | translate }}</mat-label>
                   <label>
-                    <input [formControl]="name" [tabIndex]="1" autocomplete="name" matInput required>
+                    <input [formControl]="name" autocomplete="name" matInput required>
                   </label>
                   <mat-error *ngIf="name.hasError('required')"
                              [innerHTML]="'MAIN.CONTACT.NAME.REQUIRED' | translate"></mat-error>
@@ -252,7 +254,7 @@
                 <mat-form-field class="full">
                   <mat-label>{{ 'MAIN.CONTACT.EMAIL.FIELD' | translate }}</mat-label>
                   <label>
-                    <input [formControl]="email" [tabIndex]="2" autocomplete="email" matInput required>
+                    <input [formControl]="email" autocomplete="email" matInput required>
                   </label>
                   <mat-error *ngIf="email.hasError('email')">
                     {{ 'MAIN.CONTACT.EMAIL.INVALID' | translate }}
@@ -265,7 +267,7 @@
               <mat-form-field>
                 <mat-label>{{ 'MAIN.CONTACT.SUBJECT.FIELD' | translate }}</mat-label>
                 <label>
-                  <input [formControl]="subject" [tabIndex]="3" autocomplete="subject" matInput required>
+                  <input [formControl]="subject" autocomplete="subject" matInput required>
                 </label>
                 <mat-error *ngIf="subject.hasError('required')"
                            [innerHTML]="'MAIN.CONTACT.SUBJECT.REQUIRED' | translate"></mat-error>
@@ -273,7 +275,7 @@
               <mat-form-field>
                 <mat-label>{{ 'MAIN.CONTACT.BODY.FIELD' | translate }}</mat-label>
                 <label>
-                  <textarea #message [formControl]="body" [tabIndex]="4" matInput maxlength="256" required></textarea>
+                  <textarea #message [formControl]="body" matInput maxlength="256" required></textarea>
                 </label>
                 <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
                 <mat-error *ngIf="body.hasError('required')"
@@ -281,7 +283,8 @@
               </mat-form-field>
               <div>
                 <div fxFlex></div>
-                <button [disabled]="form.invalid" [tabIndex]="5" color="primary" mat-fab extended type="submit">
+                <button [disabled]="form.invalid" color="primary" mat-fab extended type="submit"
+                        aria-label="Submit contact form">
                   <mat-icon>mail</mat-icon>
                   {{'COMMON.BUTTON.SEND' | translate}}
                 </button>
@@ -300,14 +303,14 @@
               [@leftRight]="{value: contactItem3State.value, params: {translate: '100%', delay: isSmall ? '0ms' : social.delay}}">
             <ng-template [ngIf]="social.phone && social.phoneKey && social.phoneText" [ngIfElse]="noPhone">
               <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
-                 (mouseleave)="onHover(social, false)"
+                 (mouseleave)="onHover(social, false)" aria-label="Social icon"
                  [href]="social.href + (social.phone | translate) + social.phoneKey + (social.phoneText | translate)">
                 <mat-icon [svgIcon]="social.svgIcon"></mat-icon>
               </a>
             </ng-template>
             <ng-template #noPhone>
               <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
-                 (mouseleave)="onHover(social, false)" [href]="social.href">
+                 (mouseleave)="onHover(social, false)" [href]="social.href" aria-label="Social icon">
                 <mat-icon [svgIcon]="social.svgIcon"></mat-icon>
               </a>
             </ng-template>
@@ -320,24 +323,24 @@
 
   <!-- Google map -->
   <div appAnimate [animateInAnimation]="contactMap" [stopAnimation]="true">
-    <iframe
-      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2459.8286698251877!2d4.476945576894232!3d51.937078579223154!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47c5cbae073735b3%3A0xc150afbfa3aeaf88!2sNails%20Cleos!5e0!3m2!1sen!2snl!4v1701072269943!5m2!1sen!2snl"
-      width="100%" height="300" class="map" allowfullscreen="" loading="lazy" [ngClass]="{'dark-map': isDark}"
-      referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <iframe title="Nails Cleos map" width="100%" height="300" class="map" allowfullscreen="" loading="lazy"
+            [ngClass]="{'dark-map': isDark}" referrerpolicy="no-referrer-when-downgrade"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2459.8286698251877!2d4.476945576894232!3d51.937078579223154!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47c5cbae073735b3%3A0xc150afbfa3aeaf88!2sNails%20Cleos!5e0!3m2!1sen!2snl!4v1701072269943!5m2!1sen!2snl">
+    </iframe>
   </div>
   <!-- End Google map -->
 
 </section>
 <!-- End Contact Us-->
 
-<button fxHide.lt-sm fxShow  color="primary" class="book-button fab-book-button" (click)="openBottomSheet" mat-fab
-        extended type="button">
+<button fxHide.lt-sm fxShow color="primary" class="book-button fab-book-button" (click)="openBottomSheet" mat-fab
+        extended type="button" aria-label="Book your appointment">
   <mat-icon matPrefix>book_online</mat-icon>
   <span>{{ 'MAIN.BOOK.APPOINTMENT' | translate }}</span>
 </button>
 
 <button fxShow.lt-sm fxHide color="primary" class="book-button raised-book-button" (click)="openBottomSheet"
-        mat-raised-button type="button">
+        mat-raised-button type="button" aria-label="Book your appointment">
   <mat-icon matPrefix>book_online</mat-icon>
   <span>{{ 'MAIN.BOOK.APPOINTMENT' | translate }}</span>
 </button>

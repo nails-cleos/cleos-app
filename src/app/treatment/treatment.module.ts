@@ -5,7 +5,6 @@ import { TreatmentRoutingModule } from './treatment-routing.module';
 
 import { TreatmentComponent } from './treatment.component';
 import { TreatmentsComponent } from './list/treatments.component';
-import { TreatmentDetailComponent } from './detail/treatment-detail.component';
 import { EffectsModule } from '@ngrx/effects';
 import { TreatmentEffects } from '../store/effects/treatment.effects';
 import { TreatmentService } from '../services/treatment.service';
@@ -15,12 +14,14 @@ import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/trans
 import { TreatmentSortingComponent } from './sorting/treatment-sorting.component';
 import { DragDropSortingComponent } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 import { ColorService } from '../services/color.service';
+import { Store } from '@ngrx/store';
+import { AppState, selectI18nState } from '../store/app.states';
+import { Observable } from 'rxjs';
 
 @NgModule({
   declarations: [
     TreatmentComponent,
     TreatmentsComponent,
-    TreatmentDetailComponent,
     TreatmentViewComponent,
     TreatmentTableComponent,
     TreatmentSortingComponent
@@ -49,9 +50,11 @@ import { ColorService } from '../services/color.service';
   ]
 })
 export class TreatmentModule {
-  constructor(protected translateService: TranslateService) {
-    const currentLang = translateService.currentLang;
-    translateService.currentLang = '';
-    translateService.use(currentLang);
+  constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {
+    const getI18nState: Observable<any> = this.store.select(selectI18nState);
+    getI18nState.subscribe(state => {
+      translateService.currentLang = '';
+      this.translateService.use(state.data);
+    });
   }
 }

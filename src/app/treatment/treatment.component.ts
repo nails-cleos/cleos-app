@@ -74,8 +74,7 @@ export class TreatmentComponent implements OnInit, OnDestroy {
     const group: ITreatmentGroup = new TreatmentGroup();
     group.name = fieldChange(this.getForm.name as UntypedFormControl, this.group?.name);
     group.description = fieldChange(this.getForm.description as UntypedFormControl, this.group?.description);
-    group.durabilityMin = fieldChange(this.getForm.durabilityMin as UntypedFormControl, this.group?.durabilityMin);
-    group.durabilityMax = fieldChange(this.getForm.durabilityMax as UntypedFormControl, this.group?.durabilityMax);
+    group.priceFrom = fieldChange(this.getForm.priceFrom as UntypedFormControl, this.group?.priceFrom);
     group.treatments = this.treatments;
 
     const newColorIds = this.colors.map(({ id }) => id);
@@ -174,8 +173,7 @@ export class TreatmentComponent implements OnInit, OnDestroy {
     this.form = this.formBuilder.group({
       name: ['', Validators.required],
       description: [''],
-      durabilityMin: [''],
-      durabilityMax: [''],
+      priceFrom: [''],
       color: ['']
     });
 
@@ -195,8 +193,7 @@ export class TreatmentComponent implements OnInit, OnDestroy {
           id: state.selected.id,
           name: state.selected.name,
           description: state.selected.description,
-          durabilityMin: state.selected.durabilityMin,
-          durabilityMax: state.selected.durabilityMax
+          priceFrom: state.selected.priceFrom
         } as ITreatmentGroup;
         this.colors = [];
         state.selected.colors?.forEach((color: IColorAll) => {

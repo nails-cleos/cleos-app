@@ -192,7 +192,6 @@
             <span [innerHTML]="'ME.RESERVATION.TREATMENT.COMPLETE.DURATION' | translate"></span>
             <span class="raised-button">&#9202; {{treatment.value.duration | durationTime}}</span>
           </div>
-          <div *ngIf="durability" [innerHTML]="durability" matListItemLine></div>
         </mat-list-item>
         <ng-template #skeleton>
           <div class="ssc-line"></div>

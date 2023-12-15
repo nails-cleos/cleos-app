@@ -5,7 +5,6 @@ import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectTreatmentState } from '../../store/app.states';
 import * as fromActionsTreatment from '../../store/treatment.actions';
-import { groupDurability } from '../../util/helper';
 import { TranslateService } from '@ngx-translate/core';
 import { IColorAll } from '../../interfaces/color';
 
@@ -59,9 +58,7 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
           id: state.selected.id,
           name: state.selected.name,
           description: state.selected.description,
-          durability: groupDurability(state.selected, this.translate),
-          durabilityMin: state.selected.durabilityMin,
-          durabilityMax: state.selected.durabilityMax,
+          priceFrom: state.priceFrom,
           colors: state.selected.colors,
           treatments
         } as ITreatmentGroup;

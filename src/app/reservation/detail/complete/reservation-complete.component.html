@@ -144,9 +144,6 @@
                       <span
                         class="vertical-divider bold"> {{reservation.room.currency | currencySymbol}} {{price.amount | number:'1.2-2'}}</span>
                     </div>
-                    <ng-template [ngIf]="durability">
-                      <div [innerHTML]="durability" matListItemLine></div>
-                    </ng-template>
                   </mat-list-item>
                 </ng-template>
                 <ng-template [ngIf]="additionalList && additionalList.length">

@@ -50,75 +50,77 @@
       <span>{{title | uppercase}}</span>
       <span class="mat-spacer"></span>
       <span *ngIf="(isHandset$ | async) === false; else menuButton">
-        <button (click)="scrollToElement('story')" mat-button type="button">
+        <button (click)="scrollToElement('story')" mat-button type="button" aria-label="My story">
           <span>{{'MAIN.SECTION.STORY' | translate }}</span>
         </button>
-        <button (click)="scrollToElement('work')" mat-button type="button">
+        <button (click)="scrollToElement('work')" mat-button type="button" aria-label="Cleos works">
           <span>{{'MAIN.SECTION.WORK' | translate }}</span>
         </button>
-        <button (click)="scrollToElement('treatments')" mat-button type="button">
+        <button (click)="scrollToElement('treatments')" mat-button type="button" aria-label="Go to treatments">
           <span>{{'MAIN.SECTION.TREATMENT' | translate }}</span>
         </button>
-        <button (click)="scrollToElement('contact')" mat-button type="button">
+        <button (click)="scrollToElement('contact')" mat-button type="button" aria-label="Go to contact">
           <span>{{'MAIN.SECTION.CONTACT' | translate }}</span>
         </button>
-        <button [routerLinkActive]="['active']" [routerLink]="'/main/catalogs'" mat-button type="button">
+        <button [routerLinkActive]="['active']" [routerLink]="'/main/catalogs'" mat-button type="button"
+                aria-label="Catalogs">
           <span>{{'MAIN.SECTION.CATALOG' | translate }}</span>
         </button>
         <button (click)="redirect" *ngIf="isAuthenticated; else login" [routerLinkActive]="['active']"
-                mat-button type="button">
+                mat-button type="button" aria-label="Go to my account">
           <span>{{'MAIN.SECTION.ACCOUNT' | translate }}</span>
         </button>
         <ng-template #login>
-          <button [routerLinkActive]="['active']" [routerLink]="'/auth'" mat-button type="button">
+          <button [routerLinkActive]="['active']" [routerLink]="'/auth'" mat-button type="button"
+                  aria-label="Go to login">
             <span>{{'MAIN.SECTION.AUTH' | translate }}</span>
           </button>
         </ng-template>
-        <button mat-icon-button (click)="changeTheme">
+        <button mat-icon-button (click)="changeTheme" aria-label="Change theme">
           <mat-icon>{{isDarkMode ? 'light_mode' : 'dark_mode'}}</mat-icon>
         </button>
       </span>
       <ng-template #menuButton>
-        <button mat-icon-button (click)="changeTheme">
+        <button mat-icon-button (click)="changeTheme" aria-label="Change theme">
           <mat-icon>{{isDarkMode ? 'light_mode' : 'dark_mode'}}</mat-icon>
         </button>
-        <button [matMenuTriggerFor]="menuLogged" mat-icon-button>
+        <button [matMenuTriggerFor]="menuLogged" mat-icon-button aria-label="Open menu">
           <mat-icon>menu</mat-icon>
         </button>
         <mat-menu #menuLogged="matMenu">
           <mat-nav-list>
-            <a (click)="scrollToElement('story')" mat-list-item>
+            <a (click)="scrollToElement('story')" mat-list-item aria-label="My story">
               <mat-icon matListItemIcon>auto_stories</mat-icon>
               <div mat-line>{{'MAIN.SECTION.STORY' | translate }}</div>
             </a>
             <mat-divider></mat-divider>
-            <a (click)="scrollToElement('work')" mat-list-item>
+            <a (click)="scrollToElement('work')" mat-list-item aria-label="Cleos works">
               <mat-icon matListItemIcon>work</mat-icon>
               <div mat-line>{{'MAIN.SECTION.WORK' | translate }}</div>
             </a>
             <mat-divider></mat-divider>
-            <a (click)="scrollToElement('treatments')" mat-list-item>
+            <a (click)="scrollToElement('treatments')" mat-list-item aria-label="Go to treatments">
               <mat-icon matListItemIcon>spa</mat-icon>
               <div mat-line>{{'MAIN.SECTION.TREATMENT' | translate }}</div>
             </a>
             <mat-divider></mat-divider>
-            <a (click)="scrollToElement('contact')" mat-list-item>
+            <a (click)="scrollToElement('contact')" mat-list-item aria-label="Go to contact">
               <mat-icon matListItemIcon>contact_page</mat-icon>
               <div mat-line>{{'MAIN.SECTION.CONTACT' | translate }}</div>
             </a>
             <mat-divider></mat-divider>
-            <a [routerLink]="'/main/catalogs'" mat-list-item>
+            <a [routerLink]="'/main/catalogs'" mat-list-item aria-label="Catalogs">
               <mat-icon matListItemIcon>collections</mat-icon>
               <div mat-line>{{'MAIN.SECTION.CATALOG' | translate }}</div>
             </a>
             <mat-divider></mat-divider>
             <a (click)="redirect" *ngIf="isAuthenticated; else login" [routerLinkActive]="['active']"
-               mat-list-item>
+               mat-list-item aria-label="Go to my account">
               <mat-icon matListItemIcon>person_pin</mat-icon>
               <div mat-line>{{'MAIN.SECTION.ACCOUNT' | translate }}</div>
             </a>
             <ng-template #login>
-              <a [routerLink]="'/auth'" mat-list-item>
+              <a [routerLink]="'/auth'" mat-list-item aria-label="Go to login">
                 <mat-icon matListItemIcon>login</mat-icon>
                 <div mat-line>{{'MAIN.SECTION.AUTH' | translate }}</div>
               </a>
@@ -134,35 +136,36 @@
         <mat-toolbar [ngClass]="{ 'footer-toolbar-dark': isDarkMode, 'footer-toolbar-light': !isDarkMode }">
           <mat-toolbar-row>
             <span style="margin: auto;">
-              <img src="../../assets/icons/icon-512x512.png" style="transform: scale(2);">
+              <img src="../../assets/icons/icon-512x512.png" style="transform: scale(2);" alt="Logo footer">
             </span>
           </mat-toolbar-row>
           <mat-toolbar-row style="margin-top: 20px">
               <span style="margin: auto;">
-                <button [routerLinkActive]="['active']" [routerLink]="'/main/privacy'" mat-button>
+                <button [routerLinkActive]="['active']" [routerLink]="'/main/privacy'" mat-button
+                        aria-label="Go to privacy">
                   <span>{{'MAIN.SECTION.PRIVACY' | translate }}</span>
                 </button>
-                <button [routerLinkActive]="['active']" [routerLink]="'/main/term-and-conditions'" mat-button>
+                <button [routerLinkActive]="['active']" [routerLink]="'/main/term-and-conditions'" mat-button
+                        aria-label="Go to term-and-conditions">
                   <span>{{'MAIN.SECTION.TERM_AND_CONDITIONS' | translate }}</span>
                 </button>
-                <button (click)="scrollToElement('contact')" mat-button>
+                <button (click)="scrollToElement('contact')" mat-button aria-label="Go to contact">
                   <span>{{'MAIN.SECTION.CONTACT' | translate }}</span>
                 </button>
               </span>
           </mat-toolbar-row>
           <mat-toolbar-row>
             <span style="margin: auto;">
-              <a
-                [href]="'https://api.whatsapp.com/send?phone=' + ('MAIN.CONTACT.SEND.PHONE' | translate) + '&text=' + ('MAIN.CONTACT.SEND.HELLO' | translate)"
-                mat-icon-button rel="noreferrer" target="_blank">
+              <a mat-icon-button rel="noreferrer" target="_blank" aria-label="Whatsapp"
+                 [href]="'https://api.whatsapp.com/send?phone=' + ('MAIN.CONTACT.SEND.PHONE' | translate) + '&text=' + ('MAIN.CONTACT.SEND.HELLO' | translate)">
                 <mat-icon [svgIcon]="'WHATSAPP-NO-COLOR'"></mat-icon>
               </a>
               <a [href]="'https://www.instagram.com/carlanailscleos.nl/'" mat-icon-button rel="noreferrer"
-                 target="_blank">
+                 target="_blank" aria-label="Instagram">
                 <mat-icon [svgIcon]="'INSTAGRAM-NO-COLOR'"></mat-icon>
               </a>
               <a [href]="'https://www.facebook.com/carlanailscleos.nl/'" mat-icon-button rel="noreferrer"
-                 target="_blank">
+                 target="_blank" aria-label="Facebook">
                 <mat-icon [svgIcon]="'FACEBOOK-NO-COLOR'"></mat-icon>
               </a>
             </span>
@@ -174,7 +177,8 @@
         </mat-toolbar>
       </div>
     </footer>
-    <a [@fade]="{value: navigationState.value, params: {opacityOpen: 1, opacityClose: 0, index: 99}}" class="pointer-only"
+    <a [@fade]="{value: navigationState.value, params: {opacityOpen: 1, opacityClose: 0, index: 99}}"
+       class="pointer-only"
        (click)="scrollToElement(home)" id="back-top" type="button">
       <mat-icon>keyboard_double_arrow_up</mat-icon>
     </a>

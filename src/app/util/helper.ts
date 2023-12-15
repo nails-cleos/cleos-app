@@ -1,6 +1,6 @@
 import { DiscountType, IDiscount } from '../interfaces/discount';
 import { IAuthority, IUser, IUserAll } from '../interfaces/user';
-import { GroupService, IGroupService, IPrice, ITreatmentAll, ITreatmentGroup, Price } from '../interfaces/treatment';
+import { GroupService, IGroupService, IPrice, ITreatmentAll, Price } from '../interfaces/treatment';
 import { IPayment, IPaymentOption } from '../interfaces/payment';
 import { IReservationAll } from '../interfaces/reservation';
 import { IAdditionalAll } from '../interfaces/additional';
@@ -206,29 +206,6 @@ export const newAdditional = (price: IPrice, additionalList: IAdditionalAll[], d
 export const newPercentage = (price: IPrice, percentage: number): IPrice => new Price(price.amount, price.discount, price.extra,
   price.additional, price.total, price.totalPaid, price.totalWithoutDiscount, price.priceWithDiscount, price.priceWithExtras,
   price.priceWithAdditional, percentage, price.balance);
-
-export const getTreatmentDurability = (min: number, max: number, translate: TranslateService): string | undefined => {
-  if (!min && !max) {
-    return undefined;
-  }
-  if (min !== max) {
-    return translate.instant('COMMON.TREATMENT.DURABILITY.TITLE.DIFFERENT', { min, max });
-  }
-  return translate.instant('COMMON.TREATMENT.DURABILITY.TITLE.EQUAL', { value: min });
-};
-
-export const groupDurability = (group: ITreatmentGroup, translate: TranslateService): string => {
-  const min = group.durabilityMin;
-  const max = group.durabilityMax;
-  let key = 'COMMON.TREATMENT.DURABILITY.EQUAL';
-  if (!min && !max) {
-    key = 'COMMON.TREATMENT.DURABILITY.NONE';
-  } else if (min !== max) {
-    key = 'COMMON.TREATMENT.DURABILITY.DIFFERENT';
-  }
-
-  return translate.instant(key, { min, max });
-};
 
 export const createTreatmentGroupService = (groups: Map<string, GroupService>, list: ITreatmentAll[], currency: string,
                                             isSelected: boolean = false): Map<string, GroupService> => {

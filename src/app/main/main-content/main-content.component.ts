@@ -396,18 +396,18 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       }
       if (this.groups?.length && this.slides?.length && this.allWorks?.length) {
-        this.mainContent.showPreload(false);
+        this.mainContent.configure(false, 'close');
       }
       if (state.errorMessage || state.message) {
         this.snackBar.open(state.errorMessage || state.message, 'OK', {
           duration: 5000
         });
         if (!this.slides?.length) {
-          this.slides.push({ image: '../../assets/icons/icon-512x512.png' });
-          this.slides.push({ image: '../../assets/home_page/img/b1.jpeg' });
-          this.slides.push({ image: '../../assets/home_page/img/b2.jpeg' });
-          this.slides.push({ image: '../../assets/home_page/img/b3.jpeg' });
-          this.mainContent.showPreload(false);
+          this.slides.push({ image: '../../assets/icons/b0.webp' });
+          this.slides.push({ image: '../../assets/home_page/img/b1.webp' });
+          this.slides.push({ image: '../../assets/home_page/img/b2.webp' });
+          this.slides.push({ image: '../../assets/home_page/img/b3.webp' });
+          this.mainContent.configure(false, 'close');
         }
       }
     });
