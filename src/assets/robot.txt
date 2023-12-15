@@ -1,0 +1,2 @@
+User-agent: *
+Sitemap: https://nailscleos.nl/assets/sitemap.xml
