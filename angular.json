@@ -37,7 +37,8 @@
               "src/manifest.json",
               "src/firebase-messaging-sw.js",
               "src/styles.scss",
-              "src/sitemap.xml"
+              "src/assets/sitemap.xml",
+              "src/assets/robot.txt"
             ],
             "styles": [
               "node_modules/angular-calendar/css/angular-calendar.css",
@@ -202,7 +203,8 @@
               "src/manifest.json",
               "src/firebase-messaging-sw.js",
               "src/styles.scss",
-              "src/sitemap.xml"
+              "src/assets/sitemap.xml",
+              "src/assets/robot.txt"
             ],
             "styles": [
               "node_modules/angular-calendar/css/angular-calendar.css",
