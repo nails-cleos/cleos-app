@@ -1,2 +1,3 @@
 User-agent: *
-Sitemap: https://nailscleos.nl/assets/sitemap.xml
+Disallow:
+Sitemap: https://www.nailscleos.nl/sitemap.xml
