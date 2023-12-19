@@ -35,11 +35,6 @@
     color: mat.get-color-from-palette($primary-palette);
   }
 
-  .treatment-icon {
-    border: 1px solid mat.get-color-from-palette($primary-palette);
-    color: mat.get-color-from-palette($primary-palette);
-  }
-
   .works {
     background-color: mat.get-color-from-palette($background, hover);
   }

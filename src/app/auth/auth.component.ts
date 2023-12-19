@@ -86,7 +86,6 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private subscribe(): void {
     this.codeForm.valueChanges.subscribe(value => {
-      console.log(value)
       if (value) {
         localStorage.setItem('CODE', value);
       }
@@ -115,7 +114,6 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
     this.authSubscription = authState(this.auth).subscribe(response => {
       if (response) {
         if (!response.emailVerified && !this.cookieService.get(VERIFICATION_EMAIL)) {
-          console.log(localStorage.getItem('CODE'))
           sendEmailVerification(response).then(() => {
             const message = this.translate.instant('AUTH.ACTIVATE_ACCOUNT.MESSAGE');
             this.store.dispatch(
@@ -124,7 +122,6 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
             this.cookieService.set(VERIFICATION_EMAIL, 'sent');
           }).catch(e => console.error(`Error sending email verification. ${ e }`));
         } else {
-          console.log(localStorage.getItem('CODE'))
           response.getIdToken().then(idToken => {
             const payload = {
               idToken,
