@@ -73,6 +73,7 @@ const materialModules = [
 export class AppMaterialModule {
   constructor(private matIconRegistry: MatIconRegistry, private domSanitizer: DomSanitizer) {
     matIconRegistry.addSvgIcon('CLEOS', this.getUrl('assets/icons/safari-pinned-tab.svg'));
+    matIconRegistry.addSvgIcon('CLEOS-COLOR', this.getUrl('assets/icons/icon.svg'));
     matIconRegistry.addSvgIcon('MANICURE', this.getUrl('assets/treatment.svg'));
     matIconRegistry.addSvgIcon('WHATSAPP', this.getUrl('assets/whatsapp.svg'));
     matIconRegistry.addSvgIcon('WHATSAPP-NO-COLOR', this.getUrl('assets/whatsapp-no-color.svg'));

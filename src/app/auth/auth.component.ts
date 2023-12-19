@@ -38,12 +38,11 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.clean();
     this.subscribe();
+    this.code = this.route.snapshot.queryParamMap.get('code');
+    this.codeForm.setValue(this.code);
   }
 
   ngAfterViewInit(): void {
-    if (this.code) {
-      this.codeForm.setValue(this.code);
-    }
     const queryState = this.route.snapshot.queryParamMap.get('state');
     const signInSuccessUrl = queryState ? `${ location.origin }${ JSON.parse(atob(queryState)).returnUrl }` : location.href;
     const uiConfig = {
@@ -86,6 +85,11 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private subscribe(): void {
+    this.codeForm.valueChanges.subscribe(value => {
+      if (value) {
+        localStorage.setItem('CODE', value);
+      }
+    });
     this.subscription = this.getState.subscribe((state) => {
       let returnUrl;
       if (state.queryParams?.state) {
@@ -105,11 +109,6 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
             this.clean();
           });
         }
-      }
-    });
-    this.codeForm.valueChanges.subscribe(value => {
-      if (value) {
-        localStorage.setItem('CODE', value);
       }
     });
     this.authSubscription = authState(this.auth).subscribe(response => {
