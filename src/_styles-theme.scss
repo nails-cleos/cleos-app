@@ -96,8 +96,12 @@
       color: mat.get-color-from-palette($foreground, text);
     }
 
-    .firebaseui-textfield.mdl-textfield .firebaseui-label::after {
-      background-color: mat.get-color-from-palette($primary-palette);
+    .firebaseui-textfield.mdl-textfield .firebaseui-label {
+      color: mat.get-color-from-palette($foreground, text);
+    }
+
+    .firebaseui-textfield.mdl-textfield .firebaseui-input {
+      color: mat.get-color-from-palette($foreground, text);
     }
 
     .progressbar {
@@ -113,12 +117,16 @@
       color: mat.get-color-from-palette($accent-palette) !important;
     }
 
-    .firebaseui-textfield.mdl-textfield.firebaseui-label::after {
+    .firebaseui-textfield.mdl-textfield .firebaseui-label::after {
       background-color: mat.get-color-from-palette($primary-palette) !important;
     }
 
     a.firebaseui-link {
       color: mat.get-color-from-palette($primary-palette) !important;
+    }
+
+    a.firebaseui-input-floating-button {
+      color: mat.get-color-from-palette($accent-palette) !important;
     }
 
     .progressbar {

@@ -38,12 +38,11 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.clean();
     this.subscribe();
+    this.code = this.route.snapshot.queryParamMap.get('code');
+    this.codeForm.setValue(this.code);
   }
 
   ngAfterViewInit(): void {
-    if (this.code) {
-      this.codeForm.setValue(this.code);
-    }
     const queryState = this.route.snapshot.queryParamMap.get('state');
     const signInSuccessUrl = queryState ? `${ location.origin }${ JSON.parse(atob(queryState)).returnUrl }` : location.href;
     const uiConfig = {
@@ -86,6 +85,12 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private subscribe(): void {
+    this.codeForm.valueChanges.subscribe(value => {
+      console.log(value)
+      if (value) {
+        localStorage.setItem('CODE', value);
+      }
+    });
     this.subscription = this.getState.subscribe((state) => {
       let returnUrl;
       if (state.queryParams?.state) {
@@ -107,14 +112,10 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     });
-    this.codeForm.valueChanges.subscribe(value => {
-      if (value) {
-        localStorage.setItem('CODE', value);
-      }
-    });
     this.authSubscription = authState(this.auth).subscribe(response => {
       if (response) {
         if (!response.emailVerified && !this.cookieService.get(VERIFICATION_EMAIL)) {
+          console.log(localStorage.getItem('CODE'))
           sendEmailVerification(response).then(() => {
             const message = this.translate.instant('AUTH.ACTIVATE_ACCOUNT.MESSAGE');
             this.store.dispatch(
@@ -123,6 +124,7 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
             this.cookieService.set(VERIFICATION_EMAIL, 'sent');
           }).catch(e => console.error(`Error sending email verification. ${ e }`));
         } else {
+          console.log(localStorage.getItem('CODE'))
           response.getIdToken().then(idToken => {
             const payload = {
               idToken,

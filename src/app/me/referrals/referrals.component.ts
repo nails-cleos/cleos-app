@@ -11,6 +11,7 @@ import * as fromActionsDiscount from '../../store/discount.actions';
 import { IUserDiscount } from '../../interfaces/discount';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Analytics, logEvent } from '@angular/fire/analytics';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-referrals',
@@ -113,8 +114,19 @@ export class BottomSheetShareComponent {
   message: any;
   url = environment.appServer;
   image = `${ this.url }/assets/icons/icon-512x512.png`;
+  show: number;
 
-  constructor(@Inject(MAT_BOTTOM_SHEET_DATA) public data: { code: string }, private translate: TranslateService) {
+  constructor(@Inject(MAT_BOTTOM_SHEET_DATA) public data: { code: string }, private translate: TranslateService,
+              private breakpointObserver: BreakpointObserver) {
+    this.show = 7;
+    breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small
+    ]).subscribe(result => {
+      if (result.matches) {
+        this.show = 5;
+      }
+    });
     this.message = this.translate.instant('ME.REFERRAL.LINK', {
       code: data.code,
       url: `${ this.url }/auth?code=${ data.code }`
@@ -133,10 +145,19 @@ export class BottomSheetReferralComponent {
   referralsUsed = 0;
 
   constructor(@Inject(MAT_BOTTOM_SHEET_DATA) public data: any) {
+    this.referralMax = data.referralMax;
+    const max = data.referrals > data.referralsUsed ? data.referrals : data.referralsUsed;
+    this.delay(data, 0, max);
+  }
+
+  private delay(data: any, count: number, max: number): void {
     setTimeout(() => {
-      this.referralMax = data.referralMax;
-      this.referrals = data.referrals;
-      this.referralsUsed = data.referralsUsed;
+      count++;
+      this.referrals = count > data.referrals ? data.referrals : count;
+      this.referralsUsed = count > data.referralsUsed ? data.referralsUsed : count;
+      if (count < max) {
+        this.delay(data, count, max);
+      }
     }, 500);
   }
 }
