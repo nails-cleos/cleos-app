@@ -40,6 +40,7 @@ import { OverlayContainer } from '@angular/cdk/overlay';
 import { getThemeName, isDarkMode, resetTheme, Theme, THEME } from '../util/theme';
 import { ThemeService } from 'ng2-charts';
 import { AuthUserService } from '../services/auth-user.service';
+import { SeoService } from '../services/seo.service';
 
 @Component({
   selector: 'app-nav',
@@ -92,7 +93,8 @@ export class NavComponent implements OnInit, OnDestroy {
               private router: Router, private store: Store<AppState>, private messagingService: MessagingService,
               private snackBar: MatSnackBar, private navigation: NavigationService, private tokenService: TokenService,
               private cookieService: CookieService, private overlayContainer: OverlayContainer,
-              private themeService: ThemeService, private navigationService: NavigationService, private authUserService: AuthUserService) {
+              private themeService: ThemeService, private navigationService: NavigationService, private authUserService: AuthUserService,
+              private seoService: SeoService) {
     this.isDarkMode = isDarkMode(cookieService.get(THEME) as Theme);
     this.dateFormat = this.translate.currentLang;
     this.getState = this.store.select(selectAuthState);
@@ -130,6 +132,11 @@ export class NavComponent implements OnInit, OnDestroy {
       }
     });
     this.authUserService.cookieConsent(this.translate);
+
+    const meta = this.translate.instant('DASHBOARD.META');
+
+    this.seoService.setMetaDescription(meta.CONTENT);
+    this.seoService.setMetaTitle(meta.TITLE);
   }
 
   ngOnDestroy(): void {

@@ -7,7 +7,7 @@ import * as fromActionsCatalogue from '../../store/catalogue.actions';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
 import { MainContentService } from '../main-content.service';
-import { b64toBlob } from '../../util/file';
+import { getImage } from '../../util/file';
 
 @Component({
   selector: 'app-catalog',
@@ -52,8 +52,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
       if (state.data) {
         state.data.forEach((it?: ICatalogueAll) => {
           if (it && it.blob) {
-            const blob = b64toBlob(it.blob, it.contentType);
-            const image = URL.createObjectURL(blob);
+            const image = getImage(it.blob, it.contentType);
             this.catalogues.push(Object.assign({}, it, { image }));
           }
         });
