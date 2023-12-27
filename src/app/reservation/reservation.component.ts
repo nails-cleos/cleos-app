@@ -540,22 +540,29 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   keyDownGroup(event: any): void {
     this.treatmentList = undefined;
+    this.groups = undefined;
     this.keyDownHandler(event, this.treatment);
     this.keyDownHandler(event, this.group);
+    this.errors = this.errors.filter((it: any) => it !== 'treatment');
+    this.errors = this.errors.filter((it: any) => it !== 'group');
+    this.errors = this.errors.filter((it: any) => it !== 'start');
   }
 
   keyDownOffice(event: any): void {
-    this.keyDownHandler(event, this.office);
     this.keyDownRoom(event);
+    this.keyDownHandler(event, this.office);
+    this.errors = this.errors.filter((it: any) => it !== 'office');
   }
 
   keyDownRoom(event: any): void {
     if (event.code === 'Backspace') {
+      this.keyDownHandler(event, this.professional);
+      this.keyDownHandler(event, this.room);
       this.professionalList = undefined;
       this.roomId = undefined;
       this.professionalId = undefined;
-      this.keyDownHandler(event, this.professional);
-      this.keyDownHandler(event, this.room);
+      this.errors = this.errors.filter((it: any) => it !== 'room');
+      this.errors = this.errors.filter((it: any) => it !== 'professional');
     }
   }
 
@@ -672,6 +679,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       customer: this.customer
     });
     this.treatmentForm = this.formBuilder.group({
+      group: this.group,
       treatment: this.treatment,
       discount: this.discount,
       date: this.date,
@@ -749,6 +757,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
             this.professional.setValue('');
           }
         }
+        if (this.roomId !== value.id) {
+          this.getTreatmentList();
+        }
       }
       this.group.setValue('');
       this.cleanTreatment();
@@ -808,8 +819,11 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.price = new Price();
     this.discount.setValue(undefined);
     this.treatment.setValue('');
+    this.treatmentId = undefined;
     this.showDiscount = false;
     this.treatmentList = undefined;
+    this.groups = undefined;
+    this.additionalSelected = [];
   }
 
   private createFilters(): void {
@@ -961,129 +975,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
-  private subscribe(): void {
-    this.subscription = this.getState.subscribe(state => {
-      this.offices = Array.from(createRoomOffice(state.rooms)?.values() || []);
-      if (this.offices && this.roomId && !this.office.value) {
-        this.office.setValue(
-          this.offices?.find(office => office.rooms?.find(o => o.id === this.roomId) ? office : undefined));
-      } else if (this.offices && this.offices.length === 1 && !this.office.value) {
-        this.office.setValue(this.offices[0]);
-      } else if (this.offices && this.professionalId && !this.office.value) {
-        this.offices.find(office => {
-          const room = office.rooms?.find(
-            r => r.professionals?.find(o => o.id === this.professionalId) ? r : undefined);
-          this.roomId = room?.id;
-          return room ? office : undefined;
-        });
-      }
-      this.customerInfo = state.customer;
-      const treatment = getIndex(this.steps, 'spa');
-      if (this.customerInfo && this.myStepper.selectedIndex === treatment) {
-        this.treatmentId = this.customerInfo.treatment.key;
-        this.customerAdditionalIds = this.customerInfo.additionalIds;
-      }
-      this.customers = state.customers;
-      this.additionalList = state.additional;
-      if (this.additionalList && this.additionalList.length) {
-        const sp = this.steps[3];
-        sp.enable = true;
-        this.steps[3] = sp;
-        if (this.customerAdditionalIds?.length && !this.additionalSelected.length && this.myStepper.selectedIndex === treatment) {
-          this.additionalSelected = this.additionalList.filter(ad => this.customerAdditionalIds.includes(ad.id))
-            .map(ad => Object.assign({}, ad, { id: ad.id }));
-        }
-        if (this.additionalSelected?.length) {
-          const selectIds = this.additionalSelected?.map(value => value.id);
-          const newList = this.additionalList.filter(al => selectIds.includes(al.id));
-          if (newList.length !== this.additionalSelected.length) {
-            this.additionalSelected = newList;
-            this.price = newAdditional(this.price, this.additionalSelected, this.reservation?.treatment?.discount);
-          }
-        }
-      }
-      if (state.treatmentDiscount?.treatments) {
-        this.groups = Array.from(
-          createTreatmentGroupService(new Map<string, IGroupService>(), state.treatmentDiscount.treatments,
-            this.room.value.currency).values());
-      }
-      if (this.groups && this.treatmentId && !this.group.value) {
-        this.group.setValue(
-          this.groups?.find(group => group.treatments?.find(p => p.id === this.treatmentId) ? group : undefined));
-      }
-      this.discounts = state.treatmentDiscount?.discounts.map((ud: IUserDiscount) => {
-        let title = ud.discount.name;
-        switch (ud.discount.type) {
-          case DiscountType.money:
-            title = `$ ${ ud.discount.amount } ${ title }`;
-            break;
-          case DiscountType.percentage:
-            title = `${ ud.discount.amount } % ${ title }`;
-            break;
-        }
-        return Object.assign({}, ud, { title });
-      });
-      if (state.selected) {
-        this.setData(state.selected);
-      }
-      if (state.data && (Array.isArray(state.data.reservations) || Array.isArray(
-        state.data.unavailableList)) && !state.isLoading) {
-        if (this.events.length === this.unavailableEventLength) {
-          this.reservations = state.data.reservations;
-          this.unavailableList = state.data.unavailableList;
-          this.addReservations();
-          this.addUnavailableList();
-          const bookOrder = getIndex(this.steps, 'book_online');
-          setTimeout(() => {
-            if (this.reservationId && this.reservation && this.date.value && this.myStepper.selectedIndex === bookOrder) {
-              let date: Date;
-              if (this.start?.value) {
-                const time = getTimeNumber(this.start.value);
-                date = createNewDate(this.date.value, time?.hour, time?.minute);
-              } else {
-                date = createNewDate(this.date.value, this.date.value.getHours(), this.date.value.getMinutes());
-              }
-              if (isEqual(newDateTimestamp(this.reservation.timestamp), date)) {
-                const duration = reservationDuration(this.reservation);
-                const end = createNewDate(date, date.getHours() + duration.hour,
-                  date.getMinutes() + duration.minute);
-                const event = this.createNewEvent(date, end, 'EDITING', this.reservation.room.timeZone,
-                  this.reservation.id);
-                if (event) {
-                  this.event.setValue(event);
-                  this.events = [...this.events, event];
-                }
-              } else {
-                this.segmentClick(date, 'EDITING', this.reservation.id);
-              }
-            } else if ((this.extras?.date || this.start.value && this.myStepper.selectedIndex === bookOrder) && !this.event.value) {
-              this.segmentClick(this.date.value, 'CREATED');
-            }
-          }, 50);
-        }
-      }
-      if (state.subErrors) {
-        state.subErrors.forEach((value: any) => {
-          switch (value.field) {
-            case 'room':
-              this.myStepper.selectedIndex = 1;
-              break;
-            case 'professional':
-              this.myStepper.selectedIndex = 3;
-              break;
-            default:
-              this.myStepper.selectedIndex = 0;
-              break;
-          }
-          this.event.setValue(undefined);
-          this.errors[value.field] = value.message;
-          this.customerForm.controls[value.field]?.setErrors({ incorrect: true });
-          this.officeForm.controls[value.field]?.setErrors({ incorrect: true });
-        });
-      }
-    });
-  }
-
   private createSelectEvent(title: string, content: string, event: CalendarEvent): void {
     const dialogRef = this.dialog.open(DialogComponent, {
       data: { title, content, value: event }
@@ -1177,5 +1068,135 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       this.completeAndNext();
     }
+  }
+
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe(state => {
+      this.offices = Array.from(createRoomOffice(state.rooms)?.values() || []);
+      if (this.offices && this.roomId && !this.office.value) {
+        this.office.setValue(
+          this.offices?.find(office => office.rooms?.find(o => o.id === this.roomId) ? office : undefined));
+      } else if (this.offices && this.offices.length === 1 && !this.office.value) {
+        this.office.setValue(this.offices[0]);
+      } else if (this.offices && this.professionalId && !this.office.value) {
+        this.offices.find(office => {
+          const room = office.rooms?.find(
+            r => r.professionals?.find(o => o.id === this.professionalId) ? r : undefined);
+          this.roomId = room?.id;
+          return room ? office : undefined;
+        });
+      }
+      this.customerInfo = state.customer;
+      const treatment = getIndex(this.steps, 'spa');
+      if (this.customerInfo && this.myStepper.selectedIndex === treatment) {
+        this.treatmentId = this.customerInfo.treatment.key;
+        this.customerAdditionalIds = this.customerInfo.additionalIds;
+      }
+      this.customers = state.customers;
+      this.additionalList = state.treatmentDiscount?.additionalList;
+      if (this.additionalList && this.additionalList.length) {
+        const sp = this.steps[3];
+        sp.enable = true;
+        this.steps[3] = sp;
+        if (this.customerAdditionalIds?.length && !this.additionalSelected.length && this.myStepper.selectedIndex === treatment) {
+          this.additionalSelected = this.additionalList.filter(ad => this.customerAdditionalIds.includes(ad.id))
+            .map(ad => Object.assign({}, ad, { id: ad.id }));
+        }
+        if (this.additionalSelected?.length) {
+          const selectIds = this.additionalSelected?.map(value => value.id);
+          const newList = this.additionalList.filter(al => selectIds.includes(al.id));
+          if (newList.length !== this.additionalSelected.length) {
+            this.additionalSelected = newList;
+            this.price = newAdditional(this.price, this.additionalSelected, this.reservation?.treatment?.discount);
+          }
+        }
+      }
+      if (!this.groups && state.treatmentDiscount?.treatments) {
+        this.groups = Array.from(
+          createTreatmentGroupService(new Map<string, IGroupService>(), state.treatmentDiscount.treatments,
+            this.room.value.currency).values());
+      }
+      if (this.groups && this.treatmentId && !this.group.value) {
+        this.group.setValue(
+          this.groups?.find(group => group.treatments?.find(p => p.id === this.treatmentId) ? group : undefined));
+      }
+      this.discounts = state.treatmentDiscount?.discounts.map((ud: IUserDiscount) => {
+        let title = ud.discount.name;
+        switch (ud.discount.type) {
+          case DiscountType.money:
+            title = `$ ${ ud.discount.amount } ${ title }`;
+            break;
+          case DiscountType.percentage:
+            title = `${ ud.discount.amount } % ${ title }`;
+            break;
+        }
+        return Object.assign({}, ud, { title });
+      });
+      if (state.selected) {
+        this.setData(state.selected);
+      }
+      if (state.data && (Array.isArray(state.data.reservations) || Array.isArray(
+        state.data.unavailableList)) && !state.isLoading) {
+        if (this.events.length === this.unavailableEventLength) {
+          this.reservations = state.data.reservations;
+          this.unavailableList = state.data.unavailableList;
+          this.addReservations();
+          this.addUnavailableList();
+          const bookOrder = getIndex(this.steps, 'book_online');
+          setTimeout(() => {
+            if (this.reservationId && this.reservation && this.date.value && this.myStepper.selectedIndex === bookOrder) {
+              let date: Date;
+              if (this.start?.value) {
+                const time = getTimeNumber(this.start.value);
+                date = createNewDate(this.date.value, time?.hour, time?.minute);
+              } else {
+                date = createNewDate(this.date.value, this.date.value.getHours(), this.date.value.getMinutes());
+              }
+              if (isEqual(newDateTimestamp(this.reservation.timestamp), date)) {
+                const duration = reservationDuration(this.reservation);
+                const end = createNewDate(date, date.getHours() + duration.hour,
+                  date.getMinutes() + duration.minute);
+                const event = this.createNewEvent(date, end, 'EDITING', this.reservation.room.timeZone,
+                  this.reservation.id);
+                if (event) {
+                  this.event.setValue(event);
+                  this.events = [...this.events, event];
+                }
+              } else {
+                this.segmentClick(date, 'EDITING', this.reservation.id);
+              }
+            } else if ((this.extras?.date || this.start.value && this.myStepper.selectedIndex === bookOrder) && !this.event.value) {
+              this.segmentClick(this.date.value, 'CREATED');
+            }
+          }, 50);
+        }
+      }
+      if (state.subErrors) {
+        this.isPreview = false;
+        state.subErrors.forEach((value: any) => {
+          let step = this.isEditing ? this.isAdmin ? 1 : 2 : 0;
+          switch (value.field) {
+            case 'room':
+              step = 1;
+              break;
+            case 'professional':
+              step = 3;
+              break;
+          }
+          this.errors[value.field] = value.message;
+          this.myStepper.selectedIndex = step;
+          this.customerForm.controls[value.field]?.setErrors({ incorrect: true });
+          this.officeForm.controls[value.field]?.setErrors({ incorrect: true });
+          this.event.setValue(null);
+          setTimeout(() => {
+            const nameInputField = document.querySelector(`input[formControlName="${ value.field }"]`) as HTMLInputElement;
+            if (nameInputField) {
+              nameInputField.focus();
+              nameInputField.blur();
+            }
+          }, 100);
+        });
+      }
+    });
   }
 }

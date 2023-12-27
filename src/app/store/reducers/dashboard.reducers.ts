@@ -87,7 +87,8 @@ const monthSummaryMap = (summaries: IMonthlyRoomSummary[]) => summaries.reduce((
     roomId: summary.roomId,
     roomName: summary.roomName,
     currency: summary.currency,
-    timeZone: summary.timeZone
+    timeZone: summary.timeZone,
+    primary: summary.primary
   }, {
     summarySale: summary.saleSummary,
     summaryExpenses: summary.expenseSummary,
@@ -146,7 +147,8 @@ const yearSummaryMap = (summaries: IYearRoomSummary[]) => summaries.reduce((map,
     roomId: summary.roomId,
     roomName: summary.roomName,
     currency: summary.currency,
-    timeZone: summary.timeZone
+    timeZone: summary.timeZone,
+    primary: summary.primary
   }, {
     quarterSummaries: fullYear(summary.quarterSummaries)
   });
@@ -158,7 +160,8 @@ const quarterSummaryMap = (summaries: IQuarterRoomSummary[]) => summaries.reduce
     roomId: summary.roomId,
     roomName: summary.roomName,
     currency: summary.currency,
-    timeZone: summary.timeZone
+    timeZone: summary.timeZone,
+    primary: summary.primary
   }, {
     monthSummaries: fullQuarter(summary.monthSummaries, summary.quarter)
   });

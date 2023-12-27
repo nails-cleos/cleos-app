@@ -20,10 +20,11 @@ import {
   SummaryType
 } from '../../interfaces/dashboard';
 import { YearMonthAdapter } from '../../util/adapter/year-month.adapter';
-import { titleCase } from '../../util/helper';
+import { allElementsHaveSameKeyFilterValue, titleCase } from '../../util/helper';
 import { Router } from '@angular/router';
 import { twoDigitNumber } from '../../util/numbers';
 import { AuthUserService } from '../../services/auth-user.service';
+import { ICurrencyAll } from '../../interfaces/currency';
 
 @Component({
   selector: 'app-month-summary',
@@ -67,6 +68,8 @@ export class MonthSummaryComponent implements OnInit {
   roomId?: string;
   locale = 'es';
   isLoading = false;
+  primaryRoom?: ISummaryRoom;
+  currency: ICurrencyAll = { id: '', name: 'euro', code: 'EUR', icon: 'euro' };
   showCash: boolean;
 
   private getState: Observable<any>;
@@ -411,23 +414,30 @@ export class MonthSummaryComponent implements OnInit {
     );
   }
 
-  private subscribe(): void {
-    this.subscription = this.getState.subscribe(state => {
-      this.monthlySummaryMap = state.monthlySummaryMap;
-      if (this.monthlySummaryMap) {
-        this.isLoading = false;
-        if (this.monthlySummaryMap.size === 1) {
-          const [room] = this.monthlySummaryMap.keys();
-          this.selectedRoom.setValue(room);
-        }
-      }
-    });
-  }
-
   private createData(): void {
-    if (this.selectedRoom.value) {
-      this.roomId = this.selectedRoom.value.roomId;
-      this.summaryReservations = this.monthlySummaryMap?.get(this.selectedRoom.value)?.summarySale.map((s, i) => {
+    const room = this.selectedRoom.value;
+    if (room) {
+      let summary: {
+        summarySale: IMonthlySummarySale[];
+        summaryExpenses: IMonthlySummaryExpense[];
+        summaryCashSale: IMonthlySummarySale[];
+      } | undefined;
+      if (room === 'All' && this.monthlySummaryMap && this.primaryRoom) {
+        this.roomId = this.primaryRoom.roomId;
+        this.currency = this.primaryRoom.currency;
+        summary = [...this.monthlySummaryMap.values()].reduce((prev, curr) => {
+          prev.summarySale = prev.summarySale.concat(curr.summarySale);
+          prev.summaryExpenses = prev.summaryExpenses.concat(curr.summaryExpenses);
+          prev.summaryCashSale = prev.summaryCashSale.concat(curr.summaryCashSale);
+          return prev;
+        }, { summarySale: [], summaryExpenses: [], summaryCashSale: [] });
+        summary.summarySale = summary.summarySale.sort((a, b) => a.timestamp - b.timestamp);
+      } else {
+        this.roomId = room.roomId;
+        this.currency = room.currency;
+        summary = this.monthlySummaryMap?.get(this.selectedRoom.value);
+      }
+      this.summaryReservations = summary?.summarySale.map((s, i) => {
         if (s.id) {
           const reservationDate = newDateTimestamp(s.timestamp);
           return Object.assign({}, s, { reservationDate, day: reservationDate.getDate(), position: i });
@@ -436,7 +446,7 @@ export class MonthSummaryComponent implements OnInit {
       });
       this.calculateReservationSummary();
 
-      this.summaryExpenses = this.monthlySummaryMap?.get(this.selectedRoom.value)?.summaryExpenses.map((s, i) => {
+      this.summaryExpenses = summary?.summaryExpenses.map((s, i) => {
         if (s.id) {
           const expenseDate = newDateTimestamp(s.timestamp);
           return Object.assign({}, s, { expenseDate, day: expenseDate.getDate(), position: i });
@@ -445,7 +455,7 @@ export class MonthSummaryComponent implements OnInit {
       });
       this.calculateExpenseSummary();
 
-      this.summaryCash = this.monthlySummaryMap?.get(this.selectedRoom.value)?.summaryCashSale.map((s, i) => {
+      this.summaryCash = summary?.summaryCashSale.map((s, i) => {
         if (s.id) {
           const reservationDate = newDateTimestamp(s.timestamp);
           return Object.assign({}, s, { reservationDate, day: reservationDate.getDate(), position: i });
@@ -475,5 +485,22 @@ export class MonthSummaryComponent implements OnInit {
     this.cashGrossMonth = gross;
     this.cashNetMonth = net;
     this.cashBtwMonth = btw;
+  }
+
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe(state => {
+      this.monthlySummaryMap = state.monthlySummaryMap;
+      if (this.monthlySummaryMap) {
+        this.isLoading = false;
+        this.monthlySummaryMap.forEach((value, key) => {
+          if (key.primary) {
+            this.selectedRoom.setValue(key);
+          }
+        });
+        if (this.monthlySummaryMap.size > 1 && allElementsHaveSameKeyFilterValue(this.monthlySummaryMap, ['currency', 'id'])) {
+          this.primaryRoom = this.selectedRoom.value;
+        }
+      }
+    });
   }
 }

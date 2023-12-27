@@ -26,6 +26,7 @@ import { AuthUserService } from '../../../services/auth-user.service';
 export class ReservationTableComponent implements AfterViewInit, OnInit, OnChanges, OnDestroy {
   @Input() roomId: any;
   @Input() professionalId: any;
+  @Input() all?: boolean;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -116,6 +117,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
 
   private getReservations(page: number = 0): void {
     const payload = {
+      all: this.all,
       roomId: this.roomId,
       professionalId: this.professionalId,
       active: this.sort.active,

@@ -10,8 +10,8 @@ import { findFlag, flags, IFlag } from '../util/flags';
 import { Color } from '@angular-material-components/color-picker';
 import { lightenDarkenColor } from '../util/color';
 import { backendFormatDate, createDateFromString, newDate } from '../util/dates';
-import { IAddress, ILocation } from '../interfaces/room';
 import { fieldChange, valueChange } from '../util/validators';
+import { createAddress } from '../util/helper';
 import PlaceGeometry = google.maps.places.PlaceGeometry;
 import PlaceResult = google.maps.places.PlaceResult;
 
@@ -71,16 +71,7 @@ export class UserComponent implements OnInit, OnDestroy {
       user.darkColor = `${ color.r },${ color.g },${ color.b }`;
     }
 
-    if (this.geometry?.location) {
-      const location = this.geometry.location;
-      user.address = {
-        name: this.formattedAddress,
-        location: {
-          x: location?.lng(),
-          y: location?.lat()
-        } as ILocation
-      } as IAddress;
-    }
+    user.address = createAddress(this.formattedAddress, this.geometry?.location, this.user?.address);
 
     if (this.isAddMode) {
       return this.store.dispatch(

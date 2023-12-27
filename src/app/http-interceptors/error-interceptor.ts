@@ -20,7 +20,7 @@ export class ErrorInterceptor implements HttpInterceptor {
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(request).pipe(retryWhen(genericRetryStrategy({
-      excludedStatusCodes: [0, 400, 401, 403, 500]
+      excludedStatusCodes: [0, 400, 401, 403, 409]
     })), catchError(err => {
       if ([0].indexOf(err.status) !== -1) {
         const message = err?.error?.message || err.statusText;

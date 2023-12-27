@@ -8,14 +8,7 @@ import * as fromActionsDashboard from '../store/dashboard.actions';
 import * as fromActionsReservation from '../store/reservation.actions';
 import { IReservationSummary, States } from '../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
-import {
-  getDurationOrUndefined,
-  getEnd,
-  getEndWithDuration,
-  getNow,
-  greaterOrEqualsThan,
-  newDateTimestamp
-} from '../util/dates';
+import { getDurationOrUndefined, getEnd, getEndWithDuration, getNow, greaterOrEqualsThan, newDateTimestamp } from '../util/dates';
 import { CalendarEvent, CalendarMonthViewDay, CalendarView } from 'angular-calendar';
 import { findStateColor, getStateOrder } from '../util/theme';
 import { allDayEvent, getFrequency, IMeta, Meta, monthEvent } from '../util/event';
@@ -26,7 +19,7 @@ import { UntypedFormControl } from '@angular/forms';
 import { IRoom } from '../interfaces/room';
 import { CalendarDialogComponent } from '../shared/dialog/calendar/calendar-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
-import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
+import { allElementsHaveSameKeyFilterValue, executeDialogNoWidth, FrequencyEnum } from '../util/helper';
 import { numberFormat } from '../util/numbers';
 import { ICurrency } from '../interfaces/currency';
 import { AuthUserService } from '../services/auth-user.service';
@@ -54,6 +47,7 @@ export class DashComponent implements OnInit, OnDestroy {
   totalReservation: number;
 
   currency?: ICurrency;
+  all?: boolean;
 
   miniCardData: IReservationSummary[] = [{} as IReservationSummary, {} as IReservationSummary,
     {} as IReservationSummary, {} as IReservationSummary];
@@ -271,6 +265,7 @@ export class DashComponent implements OnInit, OnDestroy {
         this.professionalId = state.professionalId;
         this.currency = state.currency;
         this.state = state;
+        this.all = state.all;
         this.createEvents(this.isDarkMode);
         if (!state.chartSummaries && !state.miniCardSummaries) {
           this.isLoading = false;
@@ -321,29 +316,6 @@ export class DashComponent implements OnInit, OnDestroy {
 
     const customer = DashComponent.createErrorMiniCard('NEW_CUSTOMERS_RESERVATION', error);
     this.miniCardData = [revenue, treatments, totalTreatments, customer];
-  }
-
-  private subscribe(): void {
-    this.subscription = this.getState.subscribe(state => {
-      if (state.errorMessage) {
-        this.state = state;
-        this.error = state.errorMessage;
-        this.miniCardError(state.errorMessage);
-      }
-      this.mapDashboard = state.data;
-      if (state.data) {
-        this.isCalendarLoading = false;
-      }
-      if (this.selectedDash.value) {
-        this.createDashboards();
-      } else {
-        // @ts-ignore
-        const [firstKey] = this.mapDashboard?.keys();
-        if (firstKey) {
-          this.selectedDash.setValue(firstKey);
-        }
-      }
-    });
   }
 
   private createEvents(darkMode: boolean = false): void {
@@ -457,5 +429,30 @@ export class DashComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsDashboard.GetEvents(this.viewDate)
     );
+  }
+
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe(state => {
+      if (state.errorMessage) {
+        this.state = state;
+        this.error = state.errorMessage;
+        this.miniCardError(state.errorMessage);
+      }
+      this.mapDashboard = state.data;
+      if (state.data) {
+        this.isCalendarLoading = false;
+      }
+      if (this.selectedDash.value) {
+        this.createDashboards();
+      } else if (this.mapDashboard) {
+        let room: IDashboard | undefined;
+        this.mapDashboard.forEach((value, key) => {
+          if (value?.primary) {
+            room = value;
+            this.selectedDash.setValue(key);
+          }
+        });
+      }
+    });
   }
 }

@@ -9,10 +9,21 @@ import { YearAdapter } from '../../util/adapter/year.adapter';
 import { dateMonthYear, getNow } from '../../util/dates';
 import { AppState, selectDashboardState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
-import { IQuarterSummary, ISummaryRoom, ISummaryTotals, SummaryTotals, Total } from '../../interfaces/dashboard';
+import {
+  IQuarterSummary,
+  ISummaryRoom,
+  ISummaryTotal,
+  ISummaryTotals,
+  MonthSummary,
+  QuarterSummary,
+  SummaryTotals,
+  Total
+} from '../../interfaces/dashboard';
 import * as fromActionsDashboard from '../../store/dashboard.actions';
 import { Router } from '@angular/router';
 import { AuthUserService } from '../../services/auth-user.service';
+import { allElementsHaveSameKeyFilterValue } from '../../util/helper';
+import { ICurrencyAll } from '../../interfaces/currency';
 
 @Component({
   selector: 'app-year-summary',
@@ -29,6 +40,8 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
   quarterSummaries?: IQuarterSummary[];
 
   isLoading = false;
+  primaryRoom?: ISummaryRoom;
+  currency?: ICurrencyAll;
   yearSummaryTotals: ISummaryTotals = new SummaryTotals();
   showCash: boolean;
 
@@ -88,22 +101,25 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     });
   }
 
-  private subscribe(): void {
-    this.subscription = this.getState.subscribe(state => {
-      this.yearSummaryMap = state.yearSummaryMap;
-      if (this.yearSummaryMap) {
-        this.isLoading = false;
-        if (this.yearSummaryMap?.size === 1) {
-          const [room] = this.yearSummaryMap.keys();
-          this.selectedRoom.setValue(room);
-        }
-      }
-    });
-  }
-
   private createData(): void {
-    if (this.selectedRoom.value) {
-      this.quarterSummaries = this.yearSummaryMap?.get(this.selectedRoom.value)?.quarterSummaries;
+    const room = this.selectedRoom.value;
+    if (room) {
+      if (room === 'All' && this.yearSummaryMap) {
+        this.currency = this.primaryRoom?.currency;
+        let result: IQuarterSummary[] | undefined;
+        this.yearSummaryMap.forEach((value) => {
+          const quarterSummaries: IQuarterSummary[] = value.quarterSummaries;
+          if (!result?.length) {
+            result = quarterSummaries;
+          } else {
+            this.quarterSummaries = this.getAllQuarterSummaries(quarterSummaries, result);
+          }
+        });
+      } else {
+        this.quarterSummaries = this.yearSummaryMap?.get(room)?.quarterSummaries;
+        this.currency = room.currency;
+      }
+      this.yearSummaryTotals = new SummaryTotals();
       this.quarterSummaries?.forEach(q => {
         q.monthSummaries.forEach(value => {
           value.total.forEach(t => {
@@ -132,6 +148,23 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     }
   }
 
+  private getAllQuarterSummaries(quarterSummaries: IQuarterSummary[], result: IQuarterSummary[]): IQuarterSummary[] {
+    return result.map(q => {
+      const quarter = quarterSummaries.find(it => it.quarter === q.quarter);
+      return new QuarterSummary(q.quarter, q.monthSummaries.map(m => {
+        const month = quarter?.monthSummaries?.find(it => it.month === m.month);
+        return new MonthSummary(m.month, m.total.map(t => {
+          const total = month?.total?.find(it => it.type === t.type);
+          const type = t.type;
+          const net = t.net + (total?.net || 0);
+          const btw = t.btw + (total?.btw || 0);
+          const gross = t.gross + (total?.gross || 0);
+          return { type, net, btw, gross } as ISummaryTotal;
+        }));
+      }));
+    });
+  }
+
   private reset(): void {
     this.quarterSummaries = undefined;
     this.yearSummaryTotals = new SummaryTotals();
@@ -149,5 +182,22 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsDashboard.Clean()
     );
+  }
+
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe(state => {
+      this.yearSummaryMap = state.yearSummaryMap;
+      if (this.yearSummaryMap) {
+        this.isLoading = false;
+        this.yearSummaryMap?.forEach((value, key) => {
+          if (key.primary) {
+            this.selectedRoom.setValue(key);
+          }
+        });
+        if (this.yearSummaryMap.size > 1 && allElementsHaveSameKeyFilterValue(this.yearSummaryMap, ['currency', 'id'])) {
+          this.primaryRoom = this.selectedRoom.value;
+        }
+      }
+    });
   }
 }

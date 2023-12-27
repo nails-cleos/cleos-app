@@ -7,14 +7,10 @@ interface RetryParams {
   excludedStatusCodes: [];
 }
 
-export const genericRetryStrategy = ({
-    maxRetryAttempts = 3,
-    scalingDuration = 1000,
-    excludedStatusCodes = []
-  }: {
-  maxRetryAttempts?: number,
-  scalingDuration?: number,
-  excludedStatusCodes?: number[]
+export const genericRetryStrategy = ({ maxRetryAttempts = 3, scalingDuration = 1000, excludedStatusCodes = [] }: {
+  maxRetryAttempts?: number;
+  scalingDuration?: number;
+  excludedStatusCodes?: number[];
 } = {}) => (attempts: Observable<any>) => attempts.pipe(
   mergeMap((error, i) => {
     const retryAttempt = i + 1;

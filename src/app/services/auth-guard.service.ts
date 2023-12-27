@@ -36,6 +36,8 @@ export class PermissionsService {
   }
 
   public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+    console.log(this.currentUser)
+    console.log(route.data.roles)
     if (this.currentUser) {
       if (PermissionsService.hasRole(route, this.currentUser)) {
         return true;

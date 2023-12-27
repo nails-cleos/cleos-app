@@ -15,10 +15,3 @@ export const requireMatch = (control: AbstractControl): any => {
 };
 
 export const requireMatchAsync = (control: AbstractControl): Observable<ValidationErrors | null> => of(requireMatch(control));
-
-export const confirmedValidator = (controlOne?: AbstractControl | null, controlTwo?: AbstractControl | null): any => () => {
-  if (controlOne?.value !== controlTwo?.value) {
-    return { notConfirmed: true };
-  }
-  return null;
-};

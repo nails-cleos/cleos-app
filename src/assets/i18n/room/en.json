@@ -40,6 +40,12 @@
       "REQUIRED": "Time zone is <b>required</b>",
       "INVALID": "Time zone is invalid"
     },
+    "CLOSE_DATE": {
+      "FIELD": "Close date"
+    },
+    "PRIMARY": {
+      "FIELD": "Is primary?"
+    },
     "AVAILABILITY": {
       "FIELD": "Availability",
       "REQUIRED": "At least one availability is <b>required</b>"
@@ -49,37 +55,37 @@
       "REQUIRED": "At least one professional is <b>required</b>"
     },
     "MONDAY_TIME": {
-      "FIELD": "Monday availability",
+      "FIELD": "Monday",
       "DESCRIPTION": "Monday working time availability",
       "REQUIRED": "Add or ignore Monday working time"
     },
     "TUESDAY_TIME": {
-      "FIELD": "Tuesday availability",
+      "FIELD": "Tuesday",
       "DESCRIPTION": "Tuesday working time availability",
       "REQUIRED": "Add or ignore Tuesday working time"
     },
     "WEDNESDAY_TIME": {
-      "FIELD": "Wednesday availability",
+      "FIELD": "Wednesday",
       "DESCRIPTION": "Wednesday working time availability",
       "REQUIRED": "Add or ignore Wednesday working time"
     },
     "THURSDAY_TIME": {
-      "FIELD": "Thursday availability",
+      "FIELD": "Thursday",
       "DESCRIPTION": "Thursday working time availability",
       "REQUIRED": "Add or ignore Thursday working time"
     },
     "FRIDAY_TIME": {
-      "FIELD": "Friday availability",
+      "FIELD": "Friday",
       "DESCRIPTION": "Friday working time availability",
       "REQUIRED": "Add or ignore Friday working time"
     },
     "SATURDAY_TIME": {
-      "FIELD": "Saturday availability",
+      "FIELD": "Saturday",
       "DESCRIPTION": "Saturday working time availability",
       "REQUIRED": "Add or ignore saturday working time"
     },
     "SUNDAY_TIME": {
-      "FIELD": "Sunday availability",
+      "FIELD": "Sunday",
       "DESCRIPTION": "Sunday working time availability",
       "REQUIRED": "Add or ignore sunday working time"
     },
