@@ -2,8 +2,10 @@ import { BehaviorSubject } from 'rxjs';
 import { ITreatmentGroup } from './treatment';
 
 export interface ISlide {
-  image: string;
+  id: string;
+  image: any;
   description?: string;
+  order: number;
 }
 
 export interface ISocialLink {

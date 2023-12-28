@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import * as fromActionsDashboard from '../../store/dashboard.actions';
 import { FormControl, UntypedFormControl } from '@angular/forms';
-import { IMonthSummary, ISummaryRoom, ISummaryTotals, SummaryTotals, Total } from '../../interfaces/dashboard';
+import { IMonthSummary, ISummaryRoom, ISummaryTotal, ISummaryTotals, MonthSummary, SummaryTotals, Total } from '../../interfaces/dashboard';
 import { Observable, Subscription } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
@@ -13,6 +13,8 @@ import { YearAdapter } from '../../util/adapter/year.adapter';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { dateMonthYear, getDateQuarter, getNow } from '../../util/dates';
 import { AuthUserService } from '../../services/auth-user.service';
+import { allElementsHaveSameKeyFilterValue } from '../../util/helper';
+import { ICurrencyAll } from '../../interfaces/currency';
 
 @Component({
   selector: 'app-quarter-summary',
@@ -31,6 +33,8 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
   monthSummaries?: IMonthSummary[];
 
   isLoading = false;
+  primaryRoom?: ISummaryRoom;
+  currency?: ICurrencyAll;
   quarter?: number;
   year?: number;
   quarterSummaryTotals: ISummaryTotals = new SummaryTotals();
@@ -110,24 +114,27 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
     });
   }
 
-  private subscribe(): void {
-    this.subscription = this.getState.subscribe(state => {
-      this.quarterSummaryMap = state.quarterSummaryMap;
-      if (this.quarterSummaryMap) {
-        this.isLoading = false;
-        if (this.quarterSummaryMap?.size === 1) {
-          const [room] = this.quarterSummaryMap.keys();
-          this.selectedRoom.setValue(room);
-        }
-      }
-    });
-  }
-
   private createData(): void {
-    if (this.selectedRoom.value) {
-      this.monthSummaries = this.quarterSummaryMap?.get(this.selectedRoom.value)?.monthSummaries;
+    const room = this.selectedRoom.value;
+    if (room) {
+      if (room === 'All' && this.quarterSummaryMap) {
+        this.currency = this.primaryRoom?.currency;
+        let result: IMonthSummary[] | undefined;
+        this.quarterSummaryMap.forEach((value) => {
+          const monthSummaries: IMonthSummary[] = value.monthSummaries;
+          if (!result?.length) {
+            result = monthSummaries;
+          } else {
+            this.monthSummaries = this.getAllMonthSummaries(monthSummaries, result);
+          }
+        });
+      } else {
+        this.monthSummaries = this.quarterSummaryMap?.get(this.selectedRoom.value)?.monthSummaries;
+        this.currency = room.currency;
+      }
       let totals = new Total();
       let totalsWithoutCash = new Total();
+      this.quarterSummaryTotals = new SummaryTotals();
       this.monthSummaries?.forEach(value => {
         value.total.forEach(t => {
           switch (t.type) {
@@ -156,6 +163,20 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
     }
   }
 
+  private getAllMonthSummaries(quarterSummaries: IMonthSummary[], result: IMonthSummary[]): IMonthSummary[] {
+    return result.map(m => {
+      const month = quarterSummaries?.find(it => it.month === m.month);
+      return new MonthSummary(m.month, m.total.map(t => {
+        const total = month?.total?.find(it => it.type === t.type);
+        const type = t.type;
+        const net = t.net + (total?.net || 0);
+        const btw = t.btw + (total?.btw || 0);
+        const gross = t.gross + (total?.gross || 0);
+        return { type, net, btw, gross } as ISummaryTotal;
+      }));
+    });
+  }
+
   private getSummary(year: number, quarter: number): void {
     this.reset();
     this.year = year;
@@ -175,5 +196,22 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsDashboard.Clean()
     );
+  }
+
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe(state => {
+      this.quarterSummaryMap = state.quarterSummaryMap;
+      if (this.quarterSummaryMap) {
+        this.isLoading = false;
+        this.quarterSummaryMap.forEach((value, key) => {
+          if (key.primary) {
+            this.selectedRoom.setValue(key);
+          }
+        });
+        if (this.quarterSummaryMap.size > 1 && allElementsHaveSameKeyFilterValue(this.quarterSummaryMap, ['currency', 'id'])) {
+          this.primaryRoom = this.selectedRoom.value;
+        }
+      }
+    });
   }
 }

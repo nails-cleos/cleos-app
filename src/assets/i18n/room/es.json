@@ -40,6 +40,12 @@
       "REQUIRED": "Zona horaria es <b>requerida</b>",
       "INVALID": "Zona horaria no valida"
     },
+    "CLOSE_DATE": {
+      "FIELD": "Fecha de cierre"
+    },
+    "PRIMARY": {
+      "FIELD": "¿Es la principal?"
+    },
     "AVAILABILITY": {
       "FIELD": "Disponibilidad",
       "REQUIRED": "Al menos una disponibilidad es <b>requerida</b>"
@@ -49,37 +55,37 @@
       "REQUIRED": "Al menos un profesional es <b>requerida</b>"
     },
     "MONDAY_TIME": {
-      "FIELD": "Disponibilidad los lunes",
+      "FIELD": "Lunes",
       "DESCRIPTION": "Disponibilidad de trabajo los lunes",
       "REQUIRED": "Agregue o ignore la disponibilidad del lunes"
     },
     "TUESDAY_TIME": {
-      "FIELD": "Disponibilidad los martes",
+      "FIELD": "Martes",
       "DESCRIPTION": "Disponibilidad de trabajo los martes",
       "REQUIRED": "Agregue o ignore la disponibilidad del martes"
     },
     "WEDNESDAY_TIME": {
-      "FIELD": "Disponibilidad los miércoles",
+      "FIELD": "Miércoles",
       "DESCRIPTION": "Disponibilidad de trabajo los miércoles",
       "REQUIRED": "Agregue o ignore la disponibilidad del miércoles"
     },
     "THURSDAY_TIME": {
-      "FIELD": "Disponibilidad los jueves",
+      "FIELD": "Jueves",
       "DESCRIPTION": "Disponibilidad de trabajo los jueves",
       "REQUIRED": "Agregue o ignore la disponibilidad del jueves"
     },
     "FRIDAY_TIME": {
-      "FIELD": "Disponibilidad los viernes",
+      "FIELD": "Viernes",
       "DESCRIPTION": "Disponibilidad de trabajo los viernes",
       "REQUIRED": "Agregue o ignore la disponibilidad del viernes"
     },
     "SATURDAY_TIME": {
-      "FIELD": "Disponibilidad los sábados",
+      "FIELD": "Sábados",
       "DESCRIPTION": "Disponibilidad de trabajo los sábados",
       "REQUIRED": "Agregue o ignore la disponibilidad del sábado"
     },
     "SUNDAY_TIME": {
-      "FIELD": "Disponibilidad los domingos",
+      "FIELD": "Domingos",
       "DESCRIPTION": "Disponibilidad de trabajo los domingos",
       "REQUIRED": "Agregue o ignore la disponibilidad del domingo"
     },

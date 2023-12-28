@@ -9,7 +9,7 @@ import { ICurrencyAll } from '../../interfaces/currency';
 })
 export class TotalSummaryComponent implements AfterViewInit {
   @Input() summaryTotals!: ISummaryTotals;
-  @Input() currency!: ICurrencyAll;
+  @Input() currency?: ICurrencyAll;
   @Input() showCash: boolean;
 
   fxFlex: string;

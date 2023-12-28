@@ -19,6 +19,7 @@
   <ng-template [ngIf]="monthlySummaryMap?.size">
     <mat-form-field appearance="outline" class="full-select">
       <mat-select [formControl]="selectedRoom">
+        <mat-option *ngIf="primaryRoom" [value]="'All'">All</mat-option>
         <mat-option *ngFor="let monthlySummary of monthlySummaryMap | keyvalue" [value]="monthlySummary.key">
           {{monthlySummary.key.roomName}}
         </mat-option>
@@ -165,13 +166,13 @@
               <ng-template [ngIf]="summary.total.payments.length" [ngIfElse]="noPaid">
                 <ng-container *ngFor="let payment of summary.total.payments"
                               [ngTemplateOutlet]="paymentTemplate"
-                              [ngTemplateOutletContext]="{payment: payment, currency: selectedRoom.value.currency.icon,
+                              [ngTemplateOutletContext]="{payment: payment, currency: currency.icon,
                         index: summary.position, edit: true, key: 'PAYMENT', type: payment.paymentType}">
                 </ng-container>
               </ng-template>
               <ng-template #noPaid>
                 <ng-container [ngTemplateOutlet]="paymentTemplate"
-                              [ngTemplateOutletContext]="{payment: summary.total, currency: selectedRoom.value.currency.icon,
+                              [ngTemplateOutletContext]="{payment: summary.total, currency: currency.icon,
                         index: summary.position, key: 'PAYMENT'}">
                 </ng-container>
               </ng-template>
@@ -182,9 +183,9 @@
           <tr *ngIf="selectedRoom.value">
             <td mat-subheader [colSpan]="6">{{'SUMMARY.MONTHLY.TABLE.TOTALS' | translate}}</td>
             <td
-              mat-subheader>{{reservationGrossMonth | currency:selectedRoom.value.currency.code:'symbol':'1.2-2' }}</td>
-            <td mat-subheader>{{reservationNetMonth | currency:selectedRoom.value.currency.code:'symbol':'1.2-2'}}</td>
-            <td mat-subheader>{{reservationBtwMonth | currency:selectedRoom.value.currency.code:'symbol':'1.2-2'}}</td>
+              mat-subheader>{{reservationGrossMonth | currency:currency.code:'symbol':'1.2-2' }}</td>
+            <td mat-subheader>{{reservationNetMonth | currency:currency.code:'symbol':'1.2-2'}}</td>
+            <td mat-subheader>{{reservationBtwMonth | currency:currency.code:'symbol':'1.2-2'}}</td>
             <td mat-subheader></td>
           </tr>
           </tfoot>
@@ -275,7 +276,7 @@
               <td [colSpan]="2">{{summary.invoice}}</td>
               <td [colSpan]="2">{{summary.supplyStore}}</td>
               <ng-container [ngTemplateOutlet]="paymentTemplate"
-                            [ngTemplateOutletContext]="{payment: summary.total, currency: selectedRoom.value.currency.icon,
+                            [ngTemplateOutletContext]="{payment: summary.total, currency: currency.icon,
                         index: summary.position, key: 'EXPENSE', type: summary.total.expenseType, edit: true}">
               </ng-container>
             </tr>
@@ -284,9 +285,9 @@
           <tfoot>
           <tr *ngIf="selectedRoom.value">
             <td mat-subheader [colSpan]="6">{{'SUMMARY.MONTHLY.TABLE.TOTALS' | translate}}</td>
-            <td mat-subheader>{{expenseGrossMonth | currency:selectedRoom.value.currency.code:'symbol':'1.2-2' }}</td>
-            <td mat-subheader>{{expenseNetMonth | currency:selectedRoom.value.currency.code:'symbol':'1.2-2'}}</td>
-            <td mat-subheader>{{expenseBtwMonth | currency:selectedRoom.value.currency.code:'symbol':'1.2-2'}}</td>
+            <td mat-subheader>{{expenseGrossMonth | currency:currency.code:'symbol':'1.2-2' }}</td>
+            <td mat-subheader>{{expenseNetMonth | currency:currency.code:'symbol':'1.2-2'}}</td>
+            <td mat-subheader>{{expenseBtwMonth | currency:currency.code:'symbol':'1.2-2'}}</td>
             <td mat-subheader></td>
           </tr>
           </tfoot>
@@ -387,13 +388,13 @@
                 <ng-template [ngIf]="summary.total.payments.length" [ngIfElse]="noPaid">
                   <ng-container *ngFor="let payment of summary.total.payments"
                                 [ngTemplateOutlet]="paymentTemplate"
-                                [ngTemplateOutletContext]="{payment: payment, currency: selectedRoom.value.currency.icon,
+                                [ngTemplateOutletContext]="{payment: payment, currency: currency.icon,
                         index: summary.position, edit: true, key: 'CASH', type: payment.paymentType}">
                   </ng-container>
                 </ng-template>
                 <ng-template #noPaid>
                   <ng-container [ngTemplateOutlet]="paymentTemplate"
-                                [ngTemplateOutletContext]="{payment: summary.total, currency: selectedRoom.value.currency.icon,
+                                [ngTemplateOutletContext]="{payment: summary.total, currency: currency.icon,
                         index: summary.position, key: 'CASH'}">
                   </ng-container>
                 </ng-template>
@@ -403,9 +404,9 @@
             <tfoot>
             <tr *ngIf="selectedRoom.value">
               <td mat-subheader [colSpan]="6">{{'SUMMARY.MONTHLY.TABLE.TOTALS' | translate}}</td>
-              <td mat-subheader>{{cashGrossMonth | currency:selectedRoom.value.currency.code:'symbol':'1.2-2' }}</td>
-              <td mat-subheader>{{cashNetMonth | currency:selectedRoom.value.currency.code:'symbol':'1.2-2'}}</td>
-              <td mat-subheader>{{cashBtwMonth | currency:selectedRoom.value.currency.code:'symbol':'1.2-2'}}</td>
+              <td mat-subheader>{{cashGrossMonth | currency:currency.code:'symbol':'1.2-2' }}</td>
+              <td mat-subheader>{{cashNetMonth | currency:currency.code:'symbol':'1.2-2'}}</td>
+              <td mat-subheader>{{cashBtwMonth | currency:currency.code:'symbol':'1.2-2'}}</td>
               <td mat-subheader></td>
             </tr>
             </tfoot>

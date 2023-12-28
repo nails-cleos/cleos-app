@@ -1,4 +1,4 @@
-<mat-nav-list>
+<mat-nav-list style="width: 300px">
   <div *ngFor="let menu of items; let i = index">
     <div *ngIf="menu.subMenus && menu.subMenus.length; else showItems">
       <mat-expansion-panel #rla="routerLinkActive" (opened)="setStep(i)" [class.mat-elevation-z0]="true"
@@ -6,9 +6,12 @@
                            [routerLinkActiveOptions]="{ exact: true }" routerLinkActive>
         <mat-expansion-panel-header matTooltip="{{menu.tooltip ? menu.tooltip : menu.name}}">
           <mat-panel-title class="active-header-title">
-            <mat-icon>{{menu.icon}}</mat-icon>&nbsp;{{menu.name}}
+            <mat-icon>{{menu.icon}}</mat-icon>&nbsp;{{menu.subName ? menu.subName : menu.name}}
           </mat-panel-title>
         </mat-expansion-panel-header>
+        <ng-template [ngIf]="menu.tooltip">
+          <div class="top">{{menu.name}}</div>
+        </ng-template>
         <app-menu-item [drawer]="drawer" [items]="menu.subMenus"></app-menu-item>
       </mat-expansion-panel>
     </div>

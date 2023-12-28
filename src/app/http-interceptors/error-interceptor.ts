@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError, retryWhen } from 'rxjs/operators';
+import { Observable, retry, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { AppState } from '../store/app.states';
 import * as fromActionsLogin from '../store/auth.actions';
@@ -19,12 +19,13 @@ export class ErrorInterceptor implements HttpInterceptor {
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    return next.handle(request).pipe(retryWhen(genericRetryStrategy({
-      excludedStatusCodes: [0, 400, 401, 403, 500]
-    })), catchError(err => {
+    return next.handle(request).pipe(retry({
+      count: 3,
+      delay: genericRetryStrategy({})
+    }), catchError(err => {
       if ([0].indexOf(err.status) !== -1) {
         const message = err?.error?.message || err.statusText;
-        return throwError({ error: { message } });
+        return throwError(() => ({ error: { message } }));
       }
       if ([401].indexOf(err.status) >= 0 && this.isAuthenticated) {
         this.store.dispatch(

@@ -60,6 +60,7 @@ export interface IMenu {
   icon: string;
   subMenus: IMenu[];
   tooltip?: string;
+  subName?: string;
 }
 
 export interface IOverview {

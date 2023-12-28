@@ -1,6 +1,6 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
 
-import { CdkDragDrop, CdkDragEnter, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Observable, Subscription } from 'rxjs';
 import { AppState, selectCatalogueState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
@@ -13,7 +13,6 @@ import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { executeDialogNoWidth } from '../../util/helper';
-import { b64toBlob } from '../../util/file';
 
 @Component({
   selector: 'app-catalogue-list',

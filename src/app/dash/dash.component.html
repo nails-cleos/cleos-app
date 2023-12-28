@@ -109,7 +109,7 @@
   <mat-grid-tile *ngIf="roomId || professionalId" [colspan]="cardLayout.table.cols" [rowspan]="cardLayout.table.rows">
     <app-card [expand]="false" [title]="'DASHBOARD.CARD.RESERVATION' | translate" [currency]="currency"
               [locale]="dateFormat">
-      <app-reservation-table [roomId]="roomId" [professionalId]="professionalId"></app-reservation-table>
+      <app-reservation-table [roomId]="roomId" [professionalId]="professionalId" [all]="all"></app-reservation-table>
     </app-card>
   </mat-grid-tile>
 </mat-grid-list>
