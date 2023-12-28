@@ -63,7 +63,6 @@ export class UserEffects {
         case Role.customer:
           return this.userService.addCustomer(payload.user).pipe(
             switchMap((response: any) => {
-              console.log(response)
               const message = this.translate.instant('USER.CUSTOMER', { displayName: response.displayName });
               return of(new fromActionsUser.UserSaveSuccess({ message }));
             }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
@@ -71,7 +70,6 @@ export class UserEffects {
         case Role.manager:
           return this.userService.addManager(payload.user).pipe(
             switchMap((response: any) => {
-              console.log(response)
               const message = this.translate.instant('USER.MANAGER', { displayName: response.displayName });
               return of(new fromActionsUser.UserSaveSuccess({ message }));
             }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
@@ -79,7 +77,6 @@ export class UserEffects {
         case Role.professional:
           return this.userService.addProfessional(payload.user).pipe(
             switchMap((response: any) => {
-              console.log(response)
               const message = this.translate.instant('USER.PROFESSIONAL', { displayName: response.displayName });
               return of(new fromActionsUser.UserSaveSuccess({ message }));
             }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
@@ -87,7 +84,6 @@ export class UserEffects {
         default:
           return this.userService.update(payload.user).pipe(
             switchMap((response: any) => {
-              console.log(response)
               const message = this.translate.instant('USER.UPDATED.MESSAGE', { displayName: response.displayName });
               return of(new fromActionsUser.UserSaveSuccess({ message }));
             }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
@@ -99,8 +95,7 @@ export class UserEffects {
   setRole$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.setRole)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.userService.setRole(payload.user.id, payload.role).pipe(
-      switchMap((response) => {
-        console.log(payload)
+      switchMap(() => {
         const role = this.translate.instant(`COMMON.ROLES.${ payload.role }`);
         const message = this.translate.instant(`USER.ROLES.${ payload.action }`, { role, displayName: payload.user.displayName });
         return of(new fromActionsUser.UserSaveSuccess({ message }));
