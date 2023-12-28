@@ -9,7 +9,11 @@ export const formatBytes = (bytes: any, decimals: number): string => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 };
 
-export const b64toBlob = (b64Data: string, contentType = '', sliceSize = 512): Blob => {
+export const getImage = (b64Data: string, contentType = '', sliceSize = 512): string => URL
+  .createObjectURL(b64toBlob(b64Data, contentType, sliceSize));
+
+
+const b64toBlob = (b64Data: string, contentType = '', sliceSize = 512): Blob => {
   const byteCharacters = atob(b64Data);
   const byteArrays = [];
 

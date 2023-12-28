@@ -5,7 +5,7 @@ import { IPayment, IPaymentOption } from '../interfaces/payment';
 import { IReservationAll } from '../interfaces/reservation';
 import { IAdditionalAll } from '../interfaces/additional';
 import { TranslateService } from '@ngx-translate/core';
-import { IRoom, IRoomAll, ServiceType } from '../interfaces/room';
+import { IAddress, ILocation, IRoom, IRoomAll, ServiceType } from '../interfaces/room';
 import { IOffice } from '../interfaces/office';
 import { ICurrency, ICurrencyAll } from '../interfaces/currency';
 import { IStep } from '../interfaces/step';
@@ -350,6 +350,28 @@ export const areEquals = (array1: any[], array2: any[]): boolean => (array1.leng
   )
 );
 
+export const allElementsHaveSameKeyFilterValue = (map: Map<any, any>, filter: string[]): boolean => {
+  let firstValue: string | undefined;
+
+  for (const [key] of map.entries()) {
+    let keyFilter;
+    for (const field of filter) {
+      if (!keyFilter) {
+        keyFilter = key[field];
+      } else {
+        keyFilter = keyFilter[field];
+      }
+    }
+    if (!firstValue) {
+      firstValue = keyFilter;
+    } else if (keyFilter !== firstValue) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
 export const titleCase = (text: string) => text.split(' ').map((l: string) => l[0].toUpperCase() + l.substring(1)).join(' ');
 export const openCancel = (dialog: MatDialog, room: IRoomAll, small: boolean, options: string[], afterClose: (result: any) => void,
                            showPenalty?: boolean, price?: IPrice, paymentOptions?: IPaymentOption[]): void => {
@@ -430,3 +452,19 @@ export enum FrequencyEnum {
   onceAWeek = 'ONCE_A_WEEK',
   onceAMonth = 'ONCE_A_MONTH'
 }
+
+export const createAddress = (formattedAddress?: string, location?: google.maps.LatLng,
+                              address?: IAddress, description?: string): IAddress | undefined => {
+  if (location || address) {
+    return {
+      id: address?.id,
+      name: formattedAddress || address?.name,
+      description: description || address?.description,
+      location: {
+        x: location?.lng() || address?.location?.x,
+        y: location?.lat() || address?.location?.y
+      } as ILocation
+    } as IAddress;
+  }
+  return undefined;
+};

@@ -12,19 +12,19 @@
             <div fxLayout="row" fxLayoutAlign="space-between center">
               <div>{{'SUMMARY.MONTHLY.TABLE.GROSS' | translate}}</div>
               <div matListItemLine class="currency">
-                {{income?.gross | currency: currency.code: 'symbol': '1.2-2'}}
+                {{income?.gross | currency: (currency?.code || 'EUR'): 'symbol': '1.2-2'}}
               </div>
             </div>
             <div fxLayout="row" fxLayoutAlign="space-between center" class="result">
               <div>{{'SUMMARY.MONTHLY.TABLE.BTW' | translate}}</div>
               <div matListItemLine class="currency">
-                {{income?.btw | currency: currency.code: 'symbol': '1.2-2'}}
+                {{income?.btw | currency: (currency?.code || 'EUR'): 'symbol': '1.2-2'}}
               </div>
             </div>
             <div fxLayout="row" fxLayoutAlign="space-between center">
               <div>{{'SUMMARY.MONTHLY.TABLE.NET' | translate}}</div>
               <div matListItemLine class="currency">
-                {{income?.net | currency: currency.code: 'symbol': '1.2-2'}}
+                {{income?.net | currency: (currency?.code || 'EUR'): 'symbol': '1.2-2'}}
               </div>
             </div>
           </mat-list-item>
@@ -37,19 +37,19 @@
             <div fxLayout="row" fxLayoutAlign="space-between center">
               <div>{{'SUMMARY.MONTHLY.TABLE.GROSS' | translate}}</div>
               <div matListItemLine class="currency">
-                {{expense?.gross | currency: currency.code: 'symbol': '1.2-2'}}
+                {{expense?.gross | currency: (currency?.code || 'EUR'): 'symbol': '1.2-2'}}
               </div>
             </div>
             <div fxLayout="row" fxLayoutAlign="space-between center" class="result">
               <div>{{'SUMMARY.MONTHLY.TABLE.BTW' | translate}}</div>
               <div matListItemLine class="currency">
-                {{expense?.btw | currency: currency.code: 'symbol': '1.2-2'}}
+                {{expense?.btw | currency: (currency?.code || 'EUR'): 'symbol': '1.2-2'}}
               </div>
             </div>
             <div fxLayout="row" fxLayoutAlign="space-between center">
               <div>{{'SUMMARY.MONTHLY.TABLE.NET' | translate}}</div>
               <div matListItemLine class="currency">
-                {{expense?.net | currency: currency.code: 'symbol': '1.2-2'}}
+                {{expense?.net | currency: (currency?.code || 'EUR'): 'symbol': '1.2-2'}}
               </div>
             </div>
           </mat-list-item>
@@ -62,19 +62,19 @@
             <div fxLayout="row" fxLayoutAlign="space-between center">
               <div>{{'SUMMARY.MONTHLY.TABLE.GROSS' | translate}}</div>
               <div matListItemLine class="currency">
-                {{month.totalWithoutGross | currency: currency.code: 'symbol': '1.2-2'}}
+                {{month.totalWithoutGross | currency: (currency?.code || 'EUR'): 'symbol': '1.2-2'}}
               </div>
             </div>
             <div fxLayout="row" fxLayoutAlign="space-between center" class="result">
               <div>{{'SUMMARY.MONTHLY.TABLE.BTW' | translate}}</div>
               <div matListItemLine class="currency">
-                {{month.totalWithoutBTW | currency: currency.code: 'symbol': '1.2-2'}}
+                {{month.totalWithoutBTW | currency: (currency?.code || 'EUR'): 'symbol': '1.2-2'}}
               </div>
             </div>
             <div fxLayout="row" fxLayoutAlign="space-between center">
               <div>{{'SUMMARY.MONTHLY.TABLE.NET' | translate}}</div>
               <div matListItemLine class="currency">
-                {{month.totalWithoutNet | currency: currency.code: 'symbol': '1.2-2'}}
+                {{month.totalWithoutNet | currency: (currency?.code || 'EUR'): 'symbol': '1.2-2'}}
               </div>
             </div>
           </mat-list-item>
@@ -95,19 +95,19 @@
               <div fxLayout="row" fxLayoutAlign="space-between center">
                 <div>{{'SUMMARY.MONTHLY.TABLE.GROSS' | translate}}</div>
                 <div matListItemLine class="currency">
-                  {{cash?.gross | currency: currency.code: 'symbol': '1.2-2'}}
+                  {{cash?.gross | currency: (currency?.code || 'EUR'): 'symbol': '1.2-2'}}
                 </div>
               </div>
               <div fxLayout="row" fxLayoutAlign="space-between center" class="result">
                 <div>{{'SUMMARY.MONTHLY.TABLE.BTW' | translate}}</div>
                 <div matListItemLine class="currency">
-                  {{cash?.btw | currency: currency.code: 'symbol': '1.2-2'}}
+                  {{cash?.btw | currency: (currency?.code || 'EUR'): 'symbol': '1.2-2'}}
                 </div>
               </div>
               <div fxLayout="row" fxLayoutAlign="space-between center">
                 <div>{{'SUMMARY.MONTHLY.TABLE.NET' | translate}}</div>
                 <div matListItemLine class="currency">
-                  {{cash?.net | currency: currency.code: 'symbol': '1.2-2'}}
+                  {{cash?.net | currency: (currency?.code || 'EUR'): 'symbol': '1.2-2'}}
                 </div>
               </div>
             </mat-list-item>
@@ -125,19 +125,19 @@
               <div fxLayout="row" fxLayoutAlign="space-between center">
                 <div>{{'SUMMARY.MONTHLY.TABLE.GROSS' | translate}}</div>
                 <div matListItemLine class="currency">
-                  {{month.totalGross | currency: currency.code: 'symbol': '1.2-2'}}
+                  {{month.totalGross | currency: (currency?.code || 'EUR'): 'symbol': '1.2-2'}}
                 </div>
               </div>
               <div fxLayout="row" fxLayoutAlign="space-between center" class="result">
                 <div>{{'SUMMARY.MONTHLY.TABLE.BTW' | translate}}</div>
                 <div matListItemLine class="currency">
-                  {{month.totalBTW | currency: currency.code: 'symbol': '1.2-2'}}
+                  {{month.totalBTW | currency: (currency?.code || 'EUR'): 'symbol': '1.2-2'}}
                 </div>
               </div>
               <div fxLayout="row" fxLayoutAlign="space-between center">
                 <div>{{'SUMMARY.MONTHLY.TABLE.NET' | translate}}</div>
                 <div matListItemLine class="currency">
-                  {{month.totalNet | currency: currency.code: 'symbol': '1.2-2'}}
+                  {{month.totalNet | currency: (currency?.code || 'EUR'): 'symbol': '1.2-2'}}
                 </div>
               </div>
             </mat-list-item>

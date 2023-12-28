@@ -30,7 +30,7 @@ import { AnimationAnimateMetadata, AnimationSequenceMetadata } from '@angular/an
 import { isMobile } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MainContentService } from '../main-content.service';
-import { b64toBlob } from '../../util/file';
+import { getImage } from '../../util/file';
 import { MatBottomSheet, MatBottomSheetRef } from '@angular/material/bottom-sheet';
 
 @Component({
@@ -81,7 +81,11 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   ]);
 
   // Images 768x1024
-  slides: ISlide[] = [];
+  slides: ISlide[] = [
+    { id: 'c7ae73b1-c6be-4848-9f84-cbf451e8ee59', image: '../../assets/home_page/img/b1.webp', order: 0 },
+    { id: '3e989461-81b2-4723-9fa3-746c05fd69a2', image: '../../assets/home_page/img/b2.webp', order: 1 },
+    { id: '25e33d58-34c3-4e55-b4e4-885f177fb570', image: '../../assets/home_page/img/b3.webp', order: 2 },
+  ];
   socialLinks: ISocialLink[];
   works: IWork[] = [];
   allWorks: IWork[] = [];
@@ -184,6 +188,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.stories.forEach(it => observeElement(it.state, document.getElementById(it.id), !this.isSmall));
 
     this.automateSlider();
+    this.mainContent.configure(false, 'close');
   }
 
   ngOnDestroy(): void {
@@ -209,11 +214,6 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   filterBy(group?: ITreatmentGroup): void {
     this.works = [];
     this.filter?.next(group);
-  }
-
-  book(group: ITreatmentGroup): void {
-    // const data = { date: this.date.value, treatment: { id: this.treatment.value.id } };
-    // this.router.navigate(['me', 'reservation'], { state: data });
   }
 
   private createForm(): void {
@@ -375,40 +375,40 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
         this.groups = state.groups;
         this.filter?.next(state.groups[0]);
       }
-      if (state.catalogue && Array.from(state.catalogue) && !this.slides?.length) {
+      if (state.catalogue && Array.from(state.catalogue)) {
         state.catalogue.forEach((catalogue: ICatalogueAll) => {
           if (catalogue && catalogue.blob) {
-            const blob = b64toBlob(catalogue.blob, catalogue.contentType);
-            const image = URL.createObjectURL(blob);
             if (catalogue.home) {
-              this.slides?.push({ image, description: catalogue.name });
+              const currentOrder = this.slides.filter(it => it.order === catalogue.order);
+              currentOrder.forEach((v, i) => {
+                v.order = v.order + 1 + i;
+              });
+              const current = this.slides.find(it => it.id === catalogue.id);
+              if (!current) {
+                const homeImage = getImage(catalogue.blob, catalogue.contentType);
+                this.slides.push({ id: catalogue.id, image: homeImage, description: catalogue.name, order: catalogue.order });
+              } else {
+                current.order = catalogue.order;
+              }
             }
-            if (catalogue.treatmentGroup) {
+            if (!this.works.length && catalogue.treatmentGroup) {
+              const workImage = getImage(catalogue.blob, catalogue.contentType);
               this.works.push({
                 title: catalogue.name,
                 detail: catalogue.description,
-                image,
+                image: workImage,
                 group: catalogue.treatmentGroup
               });
               this.allWorks = [...this.works];
             }
           }
         });
-      }
-      if (this.groups?.length && this.slides?.length && this.allWorks?.length) {
-        this.mainContent.configure(false, 'close');
+        this.slides = this.slides.sort((a, b) => a.order - b.order);
       }
       if (state.errorMessage || state.message) {
         this.snackBar.open(state.errorMessage || state.message, 'OK', {
           duration: 5000
         });
-        if (!this.slides?.length) {
-          this.slides.push({ image: '../../assets/icons/b0.webp' });
-          this.slides.push({ image: '../../assets/home_page/img/b1.webp' });
-          this.slides.push({ image: '../../assets/home_page/img/b2.webp' });
-          this.slides.push({ image: '../../assets/home_page/img/b3.webp' });
-          this.mainContent.configure(false, 'close');
-        }
       }
     });
   }

@@ -5,8 +5,6 @@ import { RoomRoutingModule } from './room-routing.module';
 
 import { RoomsComponent } from './list/rooms.component';
 import { RoomComponent } from './room.component';
-import { RoomMeComponent } from './me/room-me.component';
-import { RoomDetailComponent } from './detail/room-detail.component';
 import { AvailabilityComponent } from './availability/availability.component';
 import { EffectsModule } from '@ngrx/effects';
 import { RoomEffects } from '../store/effects/room.effects';
@@ -27,8 +25,6 @@ import { Observable } from 'rxjs';
   declarations: [
     RoomsComponent,
     RoomComponent,
-    RoomMeComponent,
-    RoomDetailComponent,
     AvailabilityComponent,
     AddServiceComponent,
     PriceDialogComponent,

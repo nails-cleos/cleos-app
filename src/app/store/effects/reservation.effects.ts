@@ -22,7 +22,7 @@ export class ReservationEffects {
 
   getAllPage$ = createEffect(() => this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.getAllPage)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.reservationService.getAllPage(payload.page, payload.roomId, payload.professionalId,
+    switchMap((payload: any) => this.reservationService.getAllPage(payload.page, payload.all, payload.roomId, payload.professionalId,
         payload.active, payload.direction, payload.size).pipe(
         switchMap((response) => of(
           new fromActionsReservation.ReservationPageSuccess(response ? response : { content: [] }))

@@ -12,7 +12,7 @@ export class YearComponent {
   @Input() cols!: number;
   @Input() measure!: 'long' | 'short';
   @Input() year!: number;
-  @Input() currency!: ICurrencyAll;
+  @Input() currency?: ICurrencyAll;
   @Input() start!: number;
   @Input() showCash: boolean;
 

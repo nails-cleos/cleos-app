@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 })
 export class MonthComponent implements AfterViewInit {
   @Input() month!: IMonthSummary;
-  @Input() currency!: ICurrencyAll;
+  @Input() currency?: ICurrencyAll;
   @Input() year!: number;
   @Input() showCash: boolean;
 

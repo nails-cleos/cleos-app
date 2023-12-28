@@ -3,7 +3,7 @@
     <mat-form-field *ngIf="customers; else skeleton" appearance="outline">
       <mat-label>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</mat-label>
       <label>
-        <input (keydown)="keyDownHandler($event, customer)" [formControl]="customer" [matAutocomplete]="autoCustomer"
+        <input (keydown)="keyDownHandler($event, customer)" formControlName="customer" [matAutocomplete]="autoCustomer"
                autocomplete="off" matInput required
                type="text">
       </label>
@@ -56,7 +56,7 @@
         <mat-form-field *ngIf="offices; else skeleton" appearance="outline">
           <mat-label>{{ 'COMMON.ROOM.OFFICE.FIELD' | translate }}</mat-label>
           <label>
-            <input (keydown)="keyDownOffice($event)" [formControl]="office" [matAutocomplete]="autoOffice"
+            <input (keydown)="keyDownOffice($event)" formControlName="office" [matAutocomplete]="autoOffice"
                    matInput required type="text">
           </label>
           <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
@@ -78,7 +78,7 @@
           <mat-form-field appearance="outline">
             <mat-label>{{ 'COMMON.ROOM.FIELD' | translate }}</mat-label>
             <label>
-              <input (keydown)="keyDownRoom($event)" [formControl]="room" [matAutocomplete]="autoRoom" matInput
+              <input (keydown)="keyDownRoom($event)" formControlName="room" [matAutocomplete]="autoRoom" matInput
                      required type="text">
             </label>
             <mat-autocomplete #autoRoom="matAutocomplete" [displayWith]="displayFnRoom">
@@ -101,7 +101,7 @@
           <mat-form-field appearance="outline">
             <mat-label>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</mat-label>
             <label>
-              <input (keydown)="keyDownHandler($event, professional)" [formControl]="professional"
+              <input (keydown)="keyDownHandler($event, professional)" formControlName="professional"
                      [matAutocomplete]="autoProfessional" matInput type="text" required>
             </label>
             <mat-autocomplete #autoProfessional="matAutocomplete" [displayWith]="displayFnProfessional">
@@ -137,7 +137,7 @@
         <mat-form-field appearance="outline">
           <mat-label>{{ 'RESERVATION.DATE.FIELD' | translate }}</mat-label>
           <label>
-            <input (focus)="picker.open()" [formControl]="date" [matDatepickerFilter]="myFilter"
+            <input (focus)="picker.open()" formControlName="date" [matDatepickerFilter]="myFilter"
                    [matDatepicker]="picker" [max]="maxCalendarDate" matInput required>
           </label>
           <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
@@ -149,7 +149,7 @@
         <mat-form-field appearance="outline">
           <mat-label>{{ 'RESERVATION.START.FIELD' | translate }}</mat-label>
           <label>
-            <input [formControl]="start" [format]="24" [max]="maxDate" [min]="minDate" [ngxTimepicker]="tStart"
+            <input formControlName="start" [format]="24" [max]="maxDate" [min]="minDate" [ngxTimepicker]="tStart"
                    matInput name="start" readonly/>
           </label>
           <span matPrefix><mat-icon (click)="tStart.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
@@ -158,7 +158,7 @@
         <mat-form-field *ngIf="groups; else skeleton" appearance="outline">
           <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
           <label>
-            <input (keydown)="keyDownGroup($event)" [formControl]="group" [matAutocomplete]="autoGroup"
+            <input (keydown)="keyDownGroup($event)" formControlName="group" [matAutocomplete]="autoGroup"
                    matInput required type="text">
           </label>
           <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
@@ -181,7 +181,7 @@
             <mat-form-field appearance="outline">
               <mat-label>{{ 'COMMON.TREATMENT.FIELD' | translate }}</mat-label>
               <label>
-                <input (keydown)="keyDownHandler($event, treatment)" [formControl]="treatment"
+                <input (keydown)="keyDownHandler($event, treatment)" formControlName="treatment"
                        [matAutocomplete]="autoTreatment"
                        matInput required type="text">
               </label>
@@ -212,7 +212,7 @@
         <ng-template [ngIf]="treatment.value && showDiscount && !isEditing">
           <mat-form-field appearance="outline">
             <mat-label>{{ 'RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate }}</mat-label>
-            <mat-select [formControl]="discount">
+            <mat-select formControlName="discount">
               <mat-option>--</mat-option>
               <mat-option *ngFor="let cd of discounts" [value]="cd.id">{{cd.title}}</mat-option>
             </mat-select>
@@ -298,13 +298,13 @@
 <ng-template #stepFive>
   <form [formGroup]="configurationForm">
     <div fxLayout="column" fxLayoutAlign="space-evenly start">
-      <mat-checkbox [formControl]="customerChange" color="primary">
+      <mat-checkbox formControlName="customerChange" color="primary">
         {{ 'RESERVATION.CONFIGURATION.CUSTOMER_CHANGE.FIELD' | translate }}
       </mat-checkbox>
       <mat-form-field appearance="outline">
         <mat-label>{{ 'RESERVATION.CONFIGURATION.REFERENCE.FIELD' | translate }}</mat-label>
         <label>
-          <input [formControl]="reference" [required]="customerChange.value" matInput>
+          <input formControlName="reference" [required]="customerChange.value" matInput>
         </label>
         <mat-error *ngIf="reference.hasError('required')"
                    [innerHTML]="'RESERVATION.CONFIGURATION.REFERENCE.REQUIRED' | translate">
@@ -316,7 +316,7 @@
       <mat-form-field appearance="outline">
         <mat-label>{{ 'RESERVATION.NOTE.FIELD' | translate }}</mat-label>
         <label>
-          <textarea [formControl]="note" matInput></textarea>
+          <textarea formControlName="note" matInput></textarea>
         </label>
         <mat-error *ngIf="errors['note']">
           {{errors['note']}}

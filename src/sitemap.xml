@@ -2,18 +2,27 @@
 
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://www.nailscleos.nl</loc>
+    <lastmod>2023-12-28</lastmod>
+  </url>
+  <url>
     <loc>https://www.nailscleos.nl/main</loc>
+    <lastmod>2023-12-28</lastmod>
   </url>
   <url>
     <loc>https://www.nailscleos.nl/main/catalogs</loc>
+    <lastmod>2023-12-19</lastmod>
   </url>
   <url>
     <loc>https://www.nailscleos.nl/main/privacy</loc>
+    <lastmod>2023-12-19</lastmod>
   </url>
   <url>
     <loc>https://www.nailscleos.nl/main/term-and-conditions</loc>
+    <lastmod>2023-12-19</lastmod>
   </url>
   <url>
     <loc>https://www.nailscleos.nl/auth</loc>
+    <lastmod>2023-12-19</lastmod>
   </url>
 </urlset>

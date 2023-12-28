@@ -1,26 +1,13 @@
-import { Observable, throwError, timer } from 'rxjs';
-import { mergeMap } from 'rxjs/operators';
+import { throwError, timer } from 'rxjs';
 
-interface RetryParams {
-  maxAttempts: number;
-  scalingDuration: number;
-  excludedStatusCodes: [];
-}
-
-export const genericRetryStrategy = ({
-    maxRetryAttempts = 3,
-    scalingDuration = 1000,
-    excludedStatusCodes = []
-  }: {
-  maxRetryAttempts?: number,
-  scalingDuration?: number,
-  excludedStatusCodes?: number[]
-} = {}) => (attempts: Observable<any>) => attempts.pipe(
-  mergeMap((error, i) => {
-    const retryAttempt = i + 1;
-    if (retryAttempt > maxRetryAttempts || excludedStatusCodes.find(e => e === error.status)) {
-      return throwError(error);
-    }
-    return timer(retryAttempt * scalingDuration);
-  })
-);
+export const genericRetryStrategy = ({ scalingDuration = 1000, excludedStatusCodes = [0, 400, 401, 403, 404, 409, 412] }: {
+  maxRetryAttempts?: number;
+  scalingDuration?: number;
+  excludedStatusCodes?: number[];
+}) => (error: any, attempts: number) => {
+  const retryAttempt = attempts + 1;
+  if (excludedStatusCodes.find(e => e === error.status)) {
+    return throwError(error);
+  }
+  return timer(retryAttempt * scalingDuration);
+};

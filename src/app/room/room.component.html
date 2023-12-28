@@ -1,76 +1,113 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
-      <form (ngSubmit)="create" [formGroup]="form" novalidate>
+      <form (ngSubmit)="submit" [formGroup]="form" novalidate>
         <mat-card appearance="outlined" class="style-card">
-          <mat-card-header>
-            <mat-card-title>{{ 'ROOM.TITLE' | translate }}</mat-card-title>
-          </mat-card-header>
+          <ng-template [ngIf]="isAddMode" [ngIfElse]="headerEditMode">
+            <mat-card-header>
+              <mat-card-title>{{ 'ROOM.TITLE' | translate }}</mat-card-title>
+            </mat-card-header>
+          </ng-template>
+          <ng-template #headerEditMode>
+            <mat-card-header>
+              <mat-card-title>{{ 'ROOM.DETAIL' | translate }}</mat-card-title>
+              <mat-card-subtitle *ngIf="room; else skeleton">{{room.id}}</mat-card-subtitle>
+              <ng-template #skeleton>
+                <div class="ssc-line"></div>
+              </ng-template>
+            </mat-card-header>
+          </ng-template>
           <mat-card-content>
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-              <div *ngIf="currencies; else skeleton" fxLayout="row" fxLayoutAlign="space-between center" id="fields">
+              <ng-template [ngIf]="isAddMode" [ngIfElse]="editMode">
+                <div *ngIf="currencies; else skeleton" fxLayout="row" fxLayoutAlign="space-between center" id="fields">
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ 'COMMON.CURRENCY.FIELD' | translate }}</mat-label>
+                    <label>
+                      <input (keydown)="keyDownHandler($event, getForm.currency)" formControlName="currency"
+                             [matAutocomplete]="auto" matInput required type="text">
+                    </label>
+                    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayCurrencyFn">
+                      <mat-option *ngFor="let currency of filteredCurrencyOptions | async" [value]="currency">
+                        {{currency.code}}
+                      </mat-option>
+                    </mat-autocomplete>
+                    <mat-error *ngIf="getForm.currency.hasError('required')"
+                               [innerHTML]="'COMMON.CURRENCY.REQUIRED' | translate">
+                    </mat-error>
+                    <mat-error *ngIf="getForm.currency.hasError('requireMatch')"
+                               [innerHTML]="'COMMON.CURRENCY.INVALID' | translate">
+                    </mat-error>
+                    <mat-error *ngIf="errors['currency']">
+                      {{errors['currency']}}
+                    </mat-error>
+                  </mat-form-field>
+                  <button fxShow.lt-sm fxHide (click)="addCurrency" color="accent" mat-fab>
+                    <mat-icon matPrefix>add_card</mat-icon>
+                  </button>
+                  <button fxHide.lt-sm fxShow (click)="addCurrency" color="accent" mat-fab extended>
+                    <mat-icon matPrefix>add_card</mat-icon>
+                    <span>{{ 'COMMON.CURRENCY.ADD_BUTTON' | translate }}</span>
+                  </button>
+                </div>
+                <div *ngIf="offices; else skeleton" fxLayout="row" fxLayoutAlign="space-between center">
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ 'ROOM.OFFICE.FIELD' | translate }}</mat-label>
+                    <label>
+                      <input (keydown)="keyDownHandler($event, getForm.office)" formControlName="office"
+                             [matAutocomplete]="auto"
+                             matInput required type="text">
+                    </label>
+                    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayOfficeFn">
+                      <mat-option *ngFor="let office of filteredOfficeOptions | async" [value]="office">
+                        {{office.name}}
+                      </mat-option>
+                    </mat-autocomplete>
+                    <mat-error *ngIf="getForm.office.hasError('required')"
+                               [innerHTML]="'ROOM.OFFICE.REQUIRED' | translate">
+                    </mat-error>
+                    <mat-error *ngIf="getForm.office.hasError('requireMatch')"
+                               [innerHTML]="'ROOM.OFFICE.INVALID' | translate">
+                    </mat-error>
+                    <mat-error *ngIf="errors['office']">
+                      {{errors['office']}}
+                    </mat-error>
+                  </mat-form-field>
+                  <button fxShow.lt-sm fxHide (click)="addOffice" color="accent" mat-fab>
+                    <mat-icon matPrefix>add_business</mat-icon>
+                  </button>
+                  <button fxHide.lt-sm fxShow (click)="addOffice" color="accent" mat-fab extended>
+                    <mat-icon matPrefix>add_business</mat-icon>
+                    <span>{{ 'ROOM.OFFICE.ADD_BUTTON' | translate }}</span>
+                  </button>
+                </div>
+              </ng-template>
+              <ng-template #editMode>
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'COMMON.CURRENCY.FIELD' | translate }}</mat-label>
+                  <mat-icon matPrefix>{{room?.currency?.icon}}</mat-icon>
                   <label>
-                    <input (keydown)="keyDownHandler($event, currency)" [formControl]="currency"
-                           [matAutocomplete]="auto" matInput required type="text">
+                    <input [value]="room?.currency?.code" disabled matInput>
                   </label>
-                  <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayCurrencyFn">
-                    <mat-option *ngFor="let currency of filteredCurrencyOptions | async" [value]="currency">
-                      {{currency.code}}
-                    </mat-option>
-                  </mat-autocomplete>
-                  <mat-error *ngIf="currency.hasError('required')"
-                             [innerHTML]="'COMMON.CURRENCY.REQUIRED' | translate">
-                  </mat-error>
-                  <mat-error *ngIf="currency.hasError('requireMatch')"
-                             [innerHTML]="'COMMON.CURRENCY.INVALID' | translate">
-                  </mat-error>
-                  <mat-error *ngIf="errors['currency']">
-                    {{errors['currency']}}
-                  </mat-error>
                 </mat-form-field>
-                <button fxShow.lt-sm fxHide (click)="addCurrency" color="accent" mat-fab>
-                  <mat-icon matPrefix>add_card</mat-icon>
-                </button>
-                <button fxHide.lt-sm fxShow (click)="addCurrency" color="accent" mat-fab extended>
-                  <mat-icon matPrefix>add_card</mat-icon>
-                  <span>{{ 'COMMON.CURRENCY.ADD_BUTTON' | translate }}</span>
-                </button>
-              </div>
-              <div *ngIf="offices; else skeleton" fxLayout="row" fxLayoutAlign="space-between center">
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'ROOM.OFFICE.FIELD' | translate }}</mat-label>
+                  <mat-icon matPrefix>store</mat-icon>
                   <label>
-                    <input (keydown)="keyDownHandler($event, office)" [formControl]="office" [matAutocomplete]="auto"
-                           matInput required type="text">
+                    <input [value]="room?.office?.name" disabled matInput type="text">
                   </label>
-                  <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayOfficeFn">
-                    <mat-option *ngFor="let office of filteredOfficeOptions | async" [value]="office">
-                      {{office.name}}
-                    </mat-option>
-                  </mat-autocomplete>
-                  <mat-error *ngIf="office.hasError('required')"
-                             [innerHTML]="'ROOM.OFFICE.REQUIRED' | translate">
-                  </mat-error>
-                  <mat-error *ngIf="office.hasError('requireMatch')"
-                             [innerHTML]="'ROOM.OFFICE.INVALID' | translate">
-                  </mat-error>
-                  <mat-error *ngIf="errors['office']">
-                    {{errors['office']}}
-                  </mat-error>
                 </mat-form-field>
-                <button fxShow.lt-sm fxHide (click)="addOffice" color="accent" mat-fab>
-                  <mat-icon matPrefix>add_business</mat-icon>
-                </button>
-                <button fxHide.lt-sm fxShow (click)="addOffice" color="accent" mat-fab extended>
-                  <mat-icon matPrefix>add_business</mat-icon>
-                  <span>{{ 'ROOM.OFFICE.ADD_BUTTON' | translate }}</span>
-                </button>
-              </div>
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'ROOM.TIME_ZONE.FIELD' | translate }}</mat-label>
+                  <mat-icon matPrefix>public</mat-icon>
+                  <label>
+                    <input [value]="room?.timeZone" disabled matInput type="text">
+                  </label>
+                </mat-form-field>
+              </ng-template>
               <div *ngIf="allProfessional; else skeleton" fxLayout="row" fxLayoutAlign="space-between center"
                    id="professionals">
-                <mat-form-field class="chip-list">
+                <mat-form-field class="chip-list full-margin">
                   <mat-label>{{ 'ROOM.PROFESSIONAL.FIELD' | translate }}</mat-label>
                   <mat-chip-grid #chipList aria-label="Professional selection">
                     <mat-chip-row (removed)="remove(professional)" *ngFor="let professional of professionals"
@@ -78,7 +115,7 @@
                       {{professional.displayName}}
                       <mat-icon matChipRemove>cancel</mat-icon>
                     </mat-chip-row>
-                    <input #professionalInput [formControl]="professional" [matAutocomplete]="auto"
+                    <input #professionalInput formControlName="professional" [matAutocomplete]="auto"
                            [matChipInputFor]="chipList">
                   </mat-chip-grid>
                   <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
@@ -101,7 +138,7 @@
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'ROOM.TIME_ZONE.FIELD' | translate }}</mat-label>
                 <label>
-                  <input (keydown)="keyDownHandler($event, timeZone)" [formControl]="timeZone"
+                  <input (keydown)="keyDownHandler($event, getForm.timeZone)" formControlName="timeZone"
                          [matAutocomplete]="auto" matInput required type="text">
                 </label>
                 <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayTimeZoneFn">
@@ -109,150 +146,172 @@
                     {{timeZone.label}}
                   </mat-option>
                 </mat-autocomplete>
-                <mat-error *ngIf="timeZone.hasError('required')"
+                <mat-error *ngIf="getForm.timeZone.hasError('required')"
                            [innerHTML]="'ROOM.TIME_ZONE.REQUIRED' | translate">
                 </mat-error>
-                <mat-error *ngIf="timeZone.hasError('requireMatch')"
+                <mat-error *ngIf="getForm.timeZone.hasError('requireMatch')"
                            [innerHTML]="'ROOM.TIME_ZONE.INVALID' | translate">
                 </mat-error>
                 <mat-error *ngIf="errors['timeZone']">
                   {{errors['timeZone']}}
                 </mat-error>
               </mat-form-field>
+              <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
+                <mat-checkbox (change)="primary = !primary" color="primary"
+                              [checked]="primary">{{ 'ROOM.PRIMARY.FIELD' | translate }}</mat-checkbox>
+                <mat-form-field appearance="outline" color="primary" class="full-margin">
+                  <mat-label>{{ 'ROOM.CLOSE_DATE.FIELD' | translate }}</mat-label>
+                  <button (click)="picker.open()" mat-icon-button matPrefix>
+                    <mat-icon>today</mat-icon>
+                  </button>
+                  <label>
+                    <input (focus)="picker.open()" formControlName="closeDate" [matDatepicker]="picker" [min]="today"
+                           matInput>
+                  </label>
+                  <mat-datepicker #picker touchUi></mat-datepicker>
+                  <mat-error *ngIf="errors['closeDate']">
+                    {{errors['closeDate']}}
+                  </mat-error>
+                </mat-form-field>
+              </div>
               <ng-template #skeleton>
                 <div class="ssc-line"></div>
               </ng-template>
-              <mat-list>
-                <mat-list-item>
-                  <div matListItemTitle>{{ 'ROOM.PAYMENT_OPTION' | translate }}</div>
-                  <mat-divider></mat-divider>
-                  <mat-selection-list #paymentType (selectionChange)="onChange(paymentType.selectedOptions.selected)">
-                    <mat-list-option *ngFor="let option of paymentOptions" [disabled]="option.disabled"
-                                     [selected]="isSelected(option)" [value]="option.name" color="primary">
-                      <div matListItemLine>{{option.name}}</div>
-                    </mat-list-option>
-                  </mat-selection-list>
-                </mat-list-item>
+              <mat-list class="top">
+                <div matListItemTitle>{{ 'ROOM.PAYMENT_OPTION' | translate }}</div>
+                <mat-divider class="top"></mat-divider>
+                <mat-selection-list #paymentType (selectionChange)="onChange(paymentType.selectedOptions.selected)">
+                  <mat-list-option *ngFor="let option of paymentOptions" [disabled]="option.disabled"
+                                   [selected]="isSelected(option)" [value]="option.name" color="primary">
+                    <div matListItemLine>{{option.name}}</div>
+                  </mat-list-option>
+                </mat-selection-list>
                 <mat-divider></mat-divider>
               </mat-list>
-              <mat-accordion class="divider headers-align" multi>
-                <mat-expansion-panel (opened)="setStep(0)" [expanded]="step === 0" hideToggle>
-                  <mat-expansion-panel-header>
-                    <mat-panel-title>
-                      {{ 'ROOM.MONDAY_TIME.FIELD' | translate }}
-                    </mat-panel-title>
-                    <mat-panel-description fxHide.lt-sm fxShow>
-                      {{ 'ROOM.MONDAY_TIME.DESCRIPTION' | translate }}
-                      <mat-icon>{{icons.monday}}</mat-icon>
-                    </mat-panel-description>
-                  </mat-expansion-panel-header>
-                  <app-availability (availability)="addAvailability($event, 1)" (ignore)="ignore('MONDAY', 1)"
-                                    [day]="'MONDAY'"></app-availability>
-                  <mat-error *ngIf="errors['day0']">
-                    {{ 'ROOM.MONDAY_TIME.REQUIRED' | translate }}
-                  </mat-error>
-                </mat-expansion-panel>
-                <mat-expansion-panel (opened)="setStep(1)" [expanded]="step === 1" hideToggle>
-                  <mat-expansion-panel-header>
-                    <mat-panel-title>
-                      {{ 'ROOM.TUESDAY_TIME.FIELD' | translate }}
-                    </mat-panel-title>
-                    <mat-panel-description fxHide.lt-sm fxShow>
-                      {{ 'ROOM.TUESDAY_TIME.DESCRIPTION' | translate }}
-                      <mat-icon>{{icons.tuesday}}</mat-icon>
-                    </mat-panel-description>
-                  </mat-expansion-panel-header>
-                  <app-availability (availability)="addAvailability($event, 2)" (ignore)="ignore('TUESDAY', 2)"
-                                    [day]="'TUESDAY'"></app-availability>
-                  <mat-error *ngIf="errors['day1']">
-                    {{ 'ROOM.TUESDAY_TIME.REQUIRED' | translate }}
-                  </mat-error>
-                </mat-expansion-panel>
-                <mat-expansion-panel (opened)="setStep(2)" [expanded]="step === 2" hideToggle>
-                  <mat-expansion-panel-header>
-                    <mat-panel-title>
-                      {{ 'ROOM.WEDNESDAY_TIME.FIELD' | translate }}
-                    </mat-panel-title>
-                    <mat-panel-description fxHide.lt-sm fxShow>
-                      {{ 'ROOM.WEDNESDAY_TIME.DESCRIPTION' | translate }}
-                      <mat-icon>{{icons.wednesday}}</mat-icon>
-                    </mat-panel-description>
-                  </mat-expansion-panel-header>
-                  <app-availability (availability)="addAvailability($event, 3)" (ignore)="ignore('WEDNESDAY', 3)"
-                                    [day]="'WEDNESDAY'"></app-availability>
-                  <mat-error *ngIf="errors['day2']">
-                    {{ 'ROOM.WEDNESDAY_TIME.REQUIRED' | translate }}
-                  </mat-error>
-                </mat-expansion-panel>
-                <mat-expansion-panel (opened)="setStep(3)" [expanded]="step === 3" hideToggle>
-                  <mat-expansion-panel-header>
-                    <mat-panel-title>
-                      {{ 'ROOM.THURSDAY_TIME.FIELD' | translate }}
-                    </mat-panel-title>
-                    <mat-panel-description fxHide.lt-sm fxShow>
-                      {{ 'ROOM.THURSDAY_TIME.DESCRIPTION' | translate }}
-                      <mat-icon>{{icons.thursday}}</mat-icon>
-                    </mat-panel-description>
-                  </mat-expansion-panel-header>
-                  <app-availability (availability)="addAvailability($event, 4)" (ignore)="ignore('THURSDAY', 4)"
-                                    [day]="'THURSDAY'"></app-availability>
-                  <mat-error *ngIf="errors['day3']">
-                    {{ 'ROOM.THURSDAY_TIME.REQUIRED' | translate }}
-                  </mat-error>
-                </mat-expansion-panel>
-                <mat-expansion-panel (opened)="setStep(4)" [expanded]="step === 4" hideToggle>
-                  <mat-expansion-panel-header>
-                    <mat-panel-title>
-                      {{ 'ROOM.FRIDAY_TIME.FIELD' | translate }}
-                    </mat-panel-title>
-                    <mat-panel-description fxHide.lt-sm fxShow>
-                      {{ 'ROOM.FRIDAY_TIME.DESCRIPTION' | translate }}
-                      <mat-icon>{{icons.friday}}</mat-icon>
-                    </mat-panel-description>
-                  </mat-expansion-panel-header>
-                  <app-availability (availability)="addAvailability($event, 5)" (ignore)="ignore('FRIDAY', 5)"
-                                    [day]="'FRIDAY'"></app-availability>
-                  <mat-error *ngIf="errors['day4']">
-                    {{ 'ROOM.FRIDAY_TIME.REQUIRED' | translate }}
-                  </mat-error>
-                </mat-expansion-panel>
-                <mat-expansion-panel (opened)="setStep(5)" [expanded]="step === 5" hideToggle>
-                  <mat-expansion-panel-header>
-                    <mat-panel-title>
-                      {{ 'ROOM.SATURDAY_TIME.FIELD' | translate }}
-                    </mat-panel-title>
-                    <mat-panel-description fxHide.lt-sm fxShow>
-                      {{ 'ROOM.SATURDAY_TIME.DESCRIPTION' | translate }}
-                      <mat-icon>{{icons.saturday}}</mat-icon>
-                    </mat-panel-description>
-                  </mat-expansion-panel-header>
-                  <app-availability (availability)="addAvailability($event, 6)" (ignore)="ignore('SATURDAY', 6)"
-                                    [day]="'SATURDAY'"></app-availability>
-                  <mat-error *ngIf="errors['day5']">
-                    {{ 'ROOM.SATURDAY_TIME.REQUIRED' | translate }}
-                  </mat-error>
-                </mat-expansion-panel>
-                <mat-expansion-panel (opened)="setStep(6)" [expanded]="step === 6" hideToggle>
-                  <mat-expansion-panel-header>
-                    <mat-panel-title>
-                      {{ 'ROOM.SUNDAY_TIME.FIELD' | translate }}
-                    </mat-panel-title>
-                    <mat-panel-description fxHide.lt-sm fxShow>
-                      {{ 'ROOM.SUNDAY_TIME.DESCRIPTION' | translate }}
-                      <mat-icon>{{icons.sunday}}</mat-icon>
-                    </mat-panel-description>
-                  </mat-expansion-panel-header>
-                  <app-availability (availability)="addAvailability($event, 7)" (ignore)="ignore('SUNDAY', 7)"
-                                    [day]="'SUNDAY'"></app-availability>
-                  <mat-error *ngIf="errors['day6']">
-                    {{ 'ROOM.SUNDAY_TIME.REQUIRED' | translate }}
-                  </mat-error>
-                </mat-expansion-panel>
-              </mat-accordion>
-              <mat-error *ngIf="errors['availability']" [innerHTML]="'ROOM.AVAILABILITY.REQUIRED' | translate"
-                         class="divider"></mat-error>
-              <app-google-map [addressFormGroup]="form" (addressEmitter)="getAddress($event)"
-                              [types]="['establishment']"></app-google-map>
+              <mat-list class="top">
+                <div matListItemTitle>{{ 'ROOM.AVAILABILITY.FIELD' | translate }}</div>
+                <mat-divider class="top"></mat-divider>
+                <mat-accordion class="headers-align" multi id="availabilities">
+                  <mat-expansion-panel (opened)="setStep(0)" [expanded]="step === 0" hideToggle>
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>
+                        {{ 'ROOM.MONDAY_TIME.FIELD' | translate }}
+                      </mat-panel-title>
+                      <mat-panel-description fxHide.lt-sm fxShow>
+                        {{ 'ROOM.MONDAY_TIME.DESCRIPTION' | translate }}
+                        <mat-icon>{{icons.monday}}</mat-icon>
+                      </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <app-availability (availability)="addAvailability($event, 1)" (ignore)="ignore('MONDAY', 1)"
+                                      [dates]="monDate" [day]="'MONDAY'"></app-availability>
+                    <mat-error *ngIf="errors['day0']">
+                      {{ 'ROOM.MONDAY_TIME.REQUIRED' | translate }}
+                    </mat-error>
+                  </mat-expansion-panel>
+                  <mat-expansion-panel (opened)="setStep(1)" [expanded]="step === 1" hideToggle>
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>
+                        {{ 'ROOM.TUESDAY_TIME.FIELD' | translate }}
+                      </mat-panel-title>
+                      <mat-panel-description fxHide.lt-sm fxShow>
+                        {{ 'ROOM.TUESDAY_TIME.DESCRIPTION' | translate }}
+                        <mat-icon>{{icons.tuesday}}</mat-icon>
+                      </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <app-availability (availability)="addAvailability($event, 2)" (ignore)="ignore('TUESDAY', 2)"
+                                      [dates]="tueDate" [day]="'TUESDAY'"></app-availability>
+                    <mat-error *ngIf="errors['day1']">
+                      {{ 'ROOM.TUESDAY_TIME.REQUIRED' | translate }}
+                    </mat-error>
+                  </mat-expansion-panel>
+                  <mat-expansion-panel (opened)="setStep(2)" [expanded]="step === 2" hideToggle>
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>
+                        {{ 'ROOM.WEDNESDAY_TIME.FIELD' | translate }}
+                      </mat-panel-title>
+                      <mat-panel-description fxHide.lt-sm fxShow>
+                        {{ 'ROOM.WEDNESDAY_TIME.DESCRIPTION' | translate }}
+                        <mat-icon>{{icons.wednesday}}</mat-icon>
+                      </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <app-availability (availability)="addAvailability($event, 3)" (ignore)="ignore('WEDNESDAY', 3)"
+                                      [dates]="wedDate" [day]="'WEDNESDAY'"></app-availability>
+                    <mat-error *ngIf="errors['day2']">
+                      {{ 'ROOM.WEDNESDAY_TIME.REQUIRED' | translate }}
+                    </mat-error>
+                  </mat-expansion-panel>
+                  <mat-expansion-panel (opened)="setStep(3)" [expanded]="step === 3" hideToggle>
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>
+                        {{ 'ROOM.THURSDAY_TIME.FIELD' | translate }}
+                      </mat-panel-title>
+                      <mat-panel-description fxHide.lt-sm fxShow>
+                        {{ 'ROOM.THURSDAY_TIME.DESCRIPTION' | translate }}
+                        <mat-icon>{{icons.thursday}}</mat-icon>
+                      </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <app-availability (availability)="addAvailability($event, 4)" (ignore)="ignore('THURSDAY', 4)"
+                                      [dates]="thuDate" [day]="'THURSDAY'"></app-availability>
+                    <mat-error *ngIf="errors['day3']">
+                      {{ 'ROOM.THURSDAY_TIME.REQUIRED' | translate }}
+                    </mat-error>
+                  </mat-expansion-panel>
+                  <mat-expansion-panel (opened)="setStep(4)" [expanded]="step === 4" hideToggle>
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>
+                        {{ 'ROOM.FRIDAY_TIME.FIELD' | translate }}
+                      </mat-panel-title>
+                      <mat-panel-description fxHide.lt-sm fxShow>
+                        {{ 'ROOM.FRIDAY_TIME.DESCRIPTION' | translate }}
+                        <mat-icon>{{icons.friday}}</mat-icon>
+                      </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <app-availability (availability)="addAvailability($event, 5)" (ignore)="ignore('FRIDAY', 5)"
+                                      [dates]="friDate" [day]="'FRIDAY'"></app-availability>
+                    <mat-error *ngIf="errors['day4']">
+                      {{ 'ROOM.FRIDAY_TIME.REQUIRED' | translate }}
+                    </mat-error>
+                  </mat-expansion-panel>
+                  <mat-expansion-panel (opened)="setStep(5)" [expanded]="step === 5" hideToggle>
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>
+                        {{ 'ROOM.SATURDAY_TIME.FIELD' | translate }}
+                      </mat-panel-title>
+                      <mat-panel-description fxHide.lt-sm fxShow>
+                        {{ 'ROOM.SATURDAY_TIME.DESCRIPTION' | translate }}
+                        <mat-icon>{{icons.saturday}}</mat-icon>
+                      </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <app-availability (availability)="addAvailability($event, 6)" (ignore)="ignore('SATURDAY', 6)"
+                                      [dates]="satDate" [day]="'SATURDAY'"></app-availability>
+                    <mat-error *ngIf="errors['day5']">
+                      {{ 'ROOM.SATURDAY_TIME.REQUIRED' | translate }}
+                    </mat-error>
+                  </mat-expansion-panel>
+                  <mat-expansion-panel (opened)="setStep(6)" [expanded]="step === 6" hideToggle>
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>
+                        {{ 'ROOM.SUNDAY_TIME.FIELD' | translate }}
+                      </mat-panel-title>
+                      <mat-panel-description fxHide.lt-sm fxShow>
+                        {{ 'ROOM.SUNDAY_TIME.DESCRIPTION' | translate }}
+                        <mat-icon>{{icons.sunday}}</mat-icon>
+                      </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <app-availability (availability)="addAvailability($event, 7)" (ignore)="ignore('SUNDAY', 7)"
+                                      [dates]="sunDate" [day]="'SUNDAY'"></app-availability>
+                    <mat-error *ngIf="errors['day6']">
+                      {{ 'ROOM.SUNDAY_TIME.REQUIRED' | translate }}
+                    </mat-error>
+                  </mat-expansion-panel>
+                </mat-accordion>
+                <mat-error *ngIf="errors['availability']" [innerHTML]="'ROOM.AVAILABILITY.REQUIRED' | translate"
+                           class="divider"></mat-error>
+              </mat-list>
+              <app-google-map [addressFormGroup]="form" [latitudeMarker]="room?.address?.location?.y"
+                              [longitudeMarker]="room?.address?.location?.x"
+                              (addressEmitter)="getAddress($event)"
+                              [markInfo]="'<b>' + room?.address?.name + '</b>'"></app-google-map>
               <mat-error *ngIf="errors['location']" class="divider">{{errors['location']}}</mat-error>
             </div>
           </mat-card-content>
@@ -260,8 +319,19 @@
             <div fxFlex></div>
             <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
-            <button color="primary" mat-fab extended class="icon-button"
-                    type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
+
+            <ng-template [ngIf]="isAddMode" [ngIfElse]="buttonEditMode">
+              <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button"
+                      type="submit">
+                {{ 'COMMON.BUTTON.CREATE' | translate }}
+              </button>
+            </ng-template>
+            <ng-template #buttonEditMode>
+              <button [disabled]="form.invalid" color="primary" mat-fab extended
+                      class="icon-button" type="submit">
+                {{ 'COMMON.BUTTON.UPDATE' | translate }}
+              </button>
+            </ng-template>
           </mat-card-actions>
         </mat-card>
       </form>

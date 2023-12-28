@@ -261,7 +261,7 @@ export const addRemoveItemList = trigger('items', [
   ]),
 ]);
 
-export const goTo = (elementId: string | HTMLElement): boolean => {
+export const goTo = (elementId: string | HTMLElement): void => {
   let element;
   if (typeof elementId === 'string') {
     element = document.getElementById(elementId);
@@ -270,8 +270,6 @@ export const goTo = (elementId: string | HTMLElement): boolean => {
   }
 
   element?.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
-
-  return true;
 };
 
 export const observeElement = (animationState: BehaviorSubject<'open' | 'close'>, el?: HTMLElement | Element | null,

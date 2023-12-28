@@ -17,6 +17,8 @@ export interface IRoom {
   availabilities?: IAvailability[];
   address?: IAddress;
   paymentTypes?: string[];
+  primary?: boolean;
+  closeDate?: string | Date;
 }
 
 export interface IRoomService {
@@ -65,6 +67,8 @@ export interface IRoomAll {
   office: IOffice;
   timeZone: string;
   paymentTypes: PaymentType[];
+  primary: boolean;
+  closeDate?: string | Date;
 }
 
 export interface IAvailability {
@@ -91,6 +95,7 @@ export interface IAvailabilityDate {
 }
 
 export interface IAddress {
+  id: number;
   name: string;
   description?: string;
   location: ILocation;
@@ -114,10 +119,7 @@ export class AvailabilityDate implements IAvailabilityDate {
 }
 
 export class Room implements IRoom {
-  availabilities: IAvailability[];
-
   constructor() {
-    this.availabilities = [];
   }
 }
 

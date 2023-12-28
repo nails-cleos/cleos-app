@@ -15,15 +15,20 @@ export class ReservationService {
   constructor(private http: HttpClient) {
   }
 
-  public getAllPage(page: number, roomId?: string, professionalId?: string, sort?: string, direction?: string,
+  public getAllPage(page: number, all?: boolean, roomId?: string, professionalId?: string, sort?: string, direction?: string,
                     size: number = PAGE_SIZE): Observable<IReservation[]> {
     const params = createFilter(page, size, sort, direction);
 
-    if (roomId) {
-      return this.http.get<IReservation[]>(`${ this.urlV1 }/rooms/${ roomId }/pages`, { params });
+    let baseUrl = this.urlV1;
+    if (!all) {
+      if (roomId) {
+        baseUrl += `/rooms/${ roomId }`;
+      } else {
+        baseUrl += `/professionals/${ professionalId }`;
+      }
     }
 
-    return this.http.get<IReservation[]>(`${ this.urlV1 }/professionals/${ professionalId }/pages`, { params });
+    return this.http.get<IReservation[]>(`${ baseUrl }/pages`, { params });
   }
 
   public getCustomerReservations(sort: string, direction: string, page: number,

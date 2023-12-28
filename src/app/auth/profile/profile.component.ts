@@ -8,11 +8,10 @@ import * as fromActionsUser from '../../store/user.actions';
 import { fieldChange, valueChange } from '../../util/validators';
 import { Location } from '@angular/common';
 import { findFlag, flags, IFlag } from '../../util/flags';
-import { getUserImage, getDisplayNameInitials } from '../../util/helper';
+import { createAddress, getDisplayNameInitials, getUserImage } from '../../util/helper';
 import { backendFormatDate, createDateFromString, newDate } from '../../util/dates';
 import { Color } from '@angular-material-components/color-picker';
 import { lightenDarkenColor } from '../../util/color';
-import { IAddress, ILocation } from '../../interfaces/room';
 import { Role } from '../../interfaces/token';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
@@ -82,16 +81,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       user.darkColor = `${ color.r },${ color.g },${ color.b }`;
     }
 
-    if (this.geometry?.location) {
-      const location = this.geometry.location;
-      user.address = {
-        name: this.formattedAddress,
-        location: {
-          x: location?.lng(),
-          y: location?.lat()
-        } as ILocation
-      } as IAddress;
-    }
+    user.address = createAddress(this.formattedAddress, this.geometry?.location, this.user?.address);
 
     return this.store.dispatch(
       new fromActionsUser.UpdateUser({ user, redirectUrl: 'auth/profile' })

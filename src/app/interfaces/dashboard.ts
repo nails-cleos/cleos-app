@@ -11,6 +11,8 @@ export interface IDashboard {
   timeZone?: string;
   roomName?: string;
   roomId?: string;
+  primary?: boolean;
+  all?: boolean;
   professionalName?: string;
   professionalId?: string;
   calendarSummary?: ICalendarSummary;
@@ -186,6 +188,7 @@ export interface ISummaryRoom {
   roomName: string;
   currency: ICurrencyAll;
   timeZone: string;
+  primary: boolean;
 }
 
 export interface IMonthlySummaryRequest {

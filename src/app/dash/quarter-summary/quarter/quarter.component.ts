@@ -15,7 +15,7 @@ export class QuarterComponent {
   @Input() measure!: 'long' | 'short';
   @Input() year!: number;
   @Input() quarter!: number;
-  @Input() currency!: ICurrencyAll;
+  @Input() currency?: ICurrencyAll;
   @Input() margin: boolean;
   @Input() showCash: boolean;
 
