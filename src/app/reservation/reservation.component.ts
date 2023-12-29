@@ -644,36 +644,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     return isBetween(getNow(), this.maxCalendarDate, date);
   }
 
-  private getReservation(id: string | null): void {
-    this.store.dispatch(
-      new fromActionsReservation.ReservationFind({ id })
-    );
-  }
-
-  private getRoomList(): void {
-    this.store.dispatch(
-      new fromActionsReservation.GetAllRooms({ customerId: this.customer?.value?.id })
-    );
-  }
-
-  private getTreatmentList(): void {
-    const roomId = this.room?.value?.id || this.roomId;
-    if (roomId) {
-      this.store.dispatch(
-        new fromActionsReservation.GetAllTreatments({ roomId, customerId: this.customer.value?.id })
-      );
-    }
-  }
-
-  private getAdditionalList(): void {
-    const roomId = this.room?.value?.id || this.roomId;
-    if (roomId) {
-      this.store.dispatch(
-        new fromActionsReservation.GetAllAdditional({ roomId, groupId: this.group.value.id })
-      );
-    }
-  }
-
   private createForm(): void {
     this.customerForm = this.formBuilder.group({
       customer: this.customer
@@ -859,12 +829,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsReservation.Clean()
-    );
-  }
-
   private addReservations(): void {
     this.reservations?.forEach(it => {
       if (it.id === this.reservationId) {
@@ -969,12 +933,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private getCustomers(): void {
-    this.store.dispatch(
-      new fromActionsReservation.GetAllCustomers()
-    );
-  }
-
   private createSelectEvent(title: string, content: string, event: CalendarEvent): void {
     const dialogRef = this.dialog.open(DialogComponent, {
       data: { title, content, value: event }
@@ -1070,6 +1028,48 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  private getReservation(id: string | null): void {
+    this.store.dispatch(
+      new fromActionsReservation.ReservationFind({ id })
+    );
+  }
+
+  private getRoomList(): void {
+    this.store.dispatch(
+      new fromActionsReservation.GetAllRooms({ customerId: this.customer?.value?.id })
+    );
+  }
+
+  private getTreatmentList(): void {
+    const roomId = this.room?.value?.id || this.roomId;
+    if (roomId) {
+      this.store.dispatch(
+        new fromActionsReservation.GetAllTreatments({ roomId, customerId: this.customer.value?.id })
+      );
+    }
+  }
+
+  private getAdditionalList(): void {
+    const roomId = this.room?.value?.id || this.roomId;
+    if (roomId) {
+      this.store.dispatch(
+        new fromActionsReservation.GetAllAdditional({ roomId, groupId: this.group.value.id })
+      );
+    }
+  }
+
+  private clean(): void {
+    this.store.dispatch(
+      new fromActionsReservation.Clean()
+    );
+  }
+
+  private getCustomers(): void {
+    this.store.dispatch(
+      new fromActionsReservation.GetAllCustomers()
+    );
+  }
+
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       this.offices = Array.from(createRoomOffice(state.rooms)?.values() || []);
@@ -1093,7 +1093,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         this.customerAdditionalIds = this.customerInfo.additionalIds;
       }
       this.customers = state.customers;
-      this.additionalList = state.treatmentDiscount?.additionalList;
+      this.additionalList = state.additional;
       if (this.additionalList && this.additionalList.length) {
         const sp = this.steps[3];
         sp.enable = true;
