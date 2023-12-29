@@ -1,5 +1,4 @@
 import { IDiscount, IUserDiscount } from './discount';
-import { IAdditionalAll } from './additional';
 import { IService } from './room';
 import { IColorAll } from './color';
 import { PENALTY } from './payment';
@@ -63,7 +62,6 @@ export interface ITreatmentAll extends IService {
 export interface ITreatmentDiscountDTO {
   treatments: ITreatmentAll[];
   discounts: IUserDiscount[];
-  additionalList: IAdditionalAll[];
 }
 
 export interface IExtras {
