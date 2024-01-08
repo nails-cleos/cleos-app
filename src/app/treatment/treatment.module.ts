@@ -11,12 +11,13 @@ import { TreatmentService } from '../services/treatment.service';
 import { TreatmentViewComponent } from './view/treatment-view.component';
 import { TreatmentTableComponent } from './table/treatment-table.component';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
-import { TreatmentSortingComponent } from './sorting/treatment-sorting.component';
+import { TreatmentGroupSortingComponent } from './sorting/treatment-group-sorting.component';
 import { DragDropSortingComponent } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 import { ColorService } from '../services/color.service';
 import { Store } from '@ngrx/store';
 import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
+import { TreatmentSortingComponent } from './sorting/treatment-sorting.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { Observable } from 'rxjs';
     TreatmentsComponent,
     TreatmentViewComponent,
     TreatmentTableComponent,
+    TreatmentGroupSortingComponent,
     TreatmentSortingComponent
   ],
   imports: [

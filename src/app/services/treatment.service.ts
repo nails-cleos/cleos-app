@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ITreatmentAll, ITreatmentDiscountDTO, ITreatmentGroup } from '../interfaces/treatment';
+import { ITreatment, ITreatmentAll, ITreatmentDiscountDTO, ITreatmentGroup } from '../interfaces/treatment';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 import { createFilter } from '../util/service-helper';
@@ -55,8 +55,12 @@ export class TreatmentService {
     return this.http.patch<ITreatmentGroup>(`${ this.urlV1 }/${ treatment.id }`, treatment);
   }
 
-  public updateSort(treatment: ISorted[]): Observable<ITreatmentGroup[]> {
-    return this.http.patch<ITreatmentGroup[]>(`${ this.urlV1 }/groups`, treatment);
+  public updateSort(treatments: ISorted[]): Observable<ITreatment[]> {
+    return this.http.patch<ITreatment[]>(`${ this.urlV1 }/sort`, treatments);
+  }
+
+  public updateGroupSort(groups: ISorted[]): Observable<ITreatmentGroup[]> {
+    return this.http.patch<ITreatmentGroup[]>(`${ this.urlV1 }/groups/sort`, groups);
   }
 
   public getHistory(id: string, treatmentId: string): Observable<ITreatmentAll[] | undefined> {

@@ -39,9 +39,6 @@
     "COLOR": {
       "FIELD": "Color"
     },
-    "PRIMARY": {
-      "CHECK": "Primary"
-    },
     "DELETED": {
       "TITLE": "Delete treatment",
       "CONTENT": "Are you sure to delete treatment {{name}}?",

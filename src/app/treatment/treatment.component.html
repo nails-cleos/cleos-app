@@ -1,6 +1,6 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+    <div fxFlex="60%" fxFlex.lt-sm="80%">
       <form (ngSubmit)="submit" [formGroup]="form" novalidate>
         <mat-card appearance="outlined" class="style-card">
           <ng-template [ngIf]="isAddMode" [ngIfElse]="headerEditMode">
@@ -127,11 +127,9 @@
                               class="mat-mdc-form-field-error">
                     </mat-hint>
                   </mat-form-field>
-                  <mat-checkbox (change)="setPrimary(tab)" [checked]="tab.primary" [disabled]="tab.primary"
-                                color="primary">{{ 'TREATMENT.PRIMARY.CHECK' | translate }}</mat-checkbox>
                   <div class="divider">
-                    <button (click)="removeTab(index)" [disabled]="treatments.length === 1 || tab.primary"
-                            class="tab-field" color="warn" mat-fab extended type="button">
+                    <button (click)="removeTab(index)" [disabled]="treatments.length === 1" class="tab-field"
+                            color="warn" mat-fab extended type="button">
                       <mat-icon>delete</mat-icon>
                       {{'COMMON.BUTTON.DELETE' | translate}}
                     </button>
