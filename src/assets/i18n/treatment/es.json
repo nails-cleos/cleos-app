@@ -39,9 +39,6 @@
     "COLOR": {
       "FIELD": "Color"
     },
-    "PRIMARY": {
-      "CHECK": "Principal"
-    },
     "DELETED": {
       "TITLE": "Eliminar tratamiento",
       "CONTENT": "¿Está seguro de eliminar el tratamiento {{name}}?",

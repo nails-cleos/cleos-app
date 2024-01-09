@@ -1,6 +1,6 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div fxFlex="50%" fxFlex.gt-lg="40%" fxFlex.lt-sm="80%">
+    <div fxFlex="60%" fxFlex.lt-sm="80%">
       <mat-card appearance="outlined">
         <mat-card-header>
           <mat-card-title *ngIf="group; else skeleton">{{group.name}}</mat-card-title>
@@ -68,8 +68,6 @@
                     </label>
                   </mat-form-field>
                   <div>
-                    <mat-checkbox [checked]="tab.primary" [disabled]="true"
-                                  color="primary">{{ 'TREATMENT.PRIMARY.CHECK' | translate }}</mat-checkbox>
                     <div fxFlex></div>
                     <button (click)="getHistory(tab.id)" mat-icon-button>
                       <mat-icon>timeline</mat-icon>

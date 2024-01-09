@@ -81,6 +81,16 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  private createPageSubscriptions(): void {
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.getTreatments();
+    });
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getTreatments(this.paginator.pageIndex));
+
+    this.cdRef.detectChanges();
+  }
+
   private subscribe(): void {
     this.subscription = this.getState.subscribe((stateValue) => {
       if (stateValue.message) {
@@ -99,16 +109,6 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.store.dispatch(
       new fromActionsTreatment.Clean()
     );
-  }
-
-  private createPageSubscriptions(): void {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getTreatments();
-    });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getTreatments(this.paginator.pageIndex));
-
-    this.cdRef.detectChanges();
   }
 
   private getTreatments(page: number = 0): void {

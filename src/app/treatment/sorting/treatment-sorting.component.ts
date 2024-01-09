@@ -1,25 +1,26 @@
-import { Component, OnInit } from '@angular/core';
-import { ISorted, ISorting, ItemSorting } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-import { TranslateService } from '@ngx-translate/core';
+import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectTreatmentState } from '../../store/app.states';
+import { TranslateService } from '@ngx-translate/core';
+import { ITreatmentAll } from '../../interfaces/treatment';
 import * as fromActionsTreatment from '../../store/treatment.actions';
-import { ITreatmentGroupAll } from '../../interfaces/treatment';
+import { ISorted, ItemSorting } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
 
 @Component({
-  selector: 'app-sorting',
+  selector: 'app-treatment-sorting',
   templateUrl: './treatment-sorting.component.html',
   styleUrls: ['./treatment-sorting.component.scss']
 })
-export class TreatmentSortingComponent implements OnInit {
+export class TreatmentSortingComponent implements OnInit, OnDestroy {
 
-  items?: ISorting[];
+  items?: ITreatmentAll[];
 
   private subscription?: Subscription;
   private getState: Observable<any>;
 
-  constructor(private readonly translate: TranslateService, private store: Store<AppState>) {
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private translate: TranslateService) {
     this.getState = this.store.select(selectTreatmentState);
   }
 
@@ -29,20 +30,14 @@ export class TreatmentSortingComponent implements OnInit {
     this.getTreatments();
   }
 
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+  }
+
   sorted(sorted: ISorted[]): void {
     this.store.dispatch(
       new fromActionsTreatment.TreatmentUpdateSort(sorted)
     );
-  }
-
-  private subscribe(): void {
-    this.subscription = this.getState.subscribe((stateValue) => {
-      if (stateValue.message) {
-        this.clean();
-        this.getTreatments();
-      }
-      this.items = stateValue.data?.map((group: ITreatmentGroupAll) => new ItemSorting(group.id, group.name, group.order));
-    });
   }
 
   private clean(): void {
@@ -52,8 +47,21 @@ export class TreatmentSortingComponent implements OnInit {
   }
 
   private getTreatments(): void {
-    this.store.dispatch(
-      new fromActionsTreatment.GetAllGroup()
-    );
+    if (!this.items) {
+      const id = this.route.snapshot.paramMap.get('id');
+      this.store.dispatch(
+        new fromActionsTreatment.TreatmentFind({ id, path: 'sorting' })
+      );
+    }
+  }
+
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe(state => {
+      if (state.message) {
+        this.clean();
+        this.getTreatments();
+      }
+      this.items = state.selected?.treatments?.map((group: ITreatmentAll) => new ItemSorting(group.id, group.name, group.order));
+    });
   }
 }

@@ -40,6 +40,7 @@
       "SAVE": "Guardar",
       "BLOCK_AGENDA": "Bloquear agenda",
       "NOTE": "Agregar nota",
+      "SORT": "Ordenar",
       "EXPAND": {
         "TRUE": "Presiona para mostrar menos",
         "FALSE": "Presiona para mostrar más"

@@ -40,6 +40,7 @@
       "SAVE": "Save",
       "BLOCK_AGENDA": "Block agenda",
       "NOTE": "Add Note",
+      "SORT": "Sort",
       "EXPAND": {
         "TRUE": "Click to show less",
         "FALSE": "Click to show more"

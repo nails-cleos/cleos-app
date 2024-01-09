@@ -87,6 +87,18 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  private clean(): void {
+    this.store.dispatch(
+      new fromActionsCatalogue.Clean()
+    );
+  }
+
+  private getCatalogues(): void {
+    this.store.dispatch(
+      new fromActionsCatalogue.GetAll()
+    );
+  }
+
   private subscribe(): void {
     this.subscription = this.getState.subscribe((state) => {
       if (state.data) {
@@ -99,17 +111,5 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.getCatalogues();
       }
     });
-  }
-
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsCatalogue.Clean()
-    );
-  }
-
-  private getCatalogues(): void {
-    this.store.dispatch(
-      new fromActionsCatalogue.GetAll()
-    );
   }
 }

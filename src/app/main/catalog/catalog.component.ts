@@ -23,8 +23,6 @@ export class CatalogComponent implements OnInit, OnDestroy {
 
   subscription?: Subscription;
   getState: Observable<any>;
-  imageURL: any;
-  viewerOpen = false;
 
   catalogues: ICatalogueAll[] = [];
 
@@ -42,9 +40,16 @@ export class CatalogComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  openImage(catalogue: ICatalogueAll): void {
-    this.imageURL = `data:${ catalogue.contentType };base64,${ catalogue.blob }`;
-    this.viewerOpen = true;
+  private clean(): void {
+    this.store.dispatch(
+      new fromActionsCatalogue.Clean()
+    );
+  }
+
+  private getCatalogs(): void {
+    this.store.dispatch(
+      new fromActionsCatalogue.GetAllCatalogs()
+    );
   }
 
   private subscribe(): void {
@@ -61,18 +66,6 @@ export class CatalogComponent implements OnInit, OnDestroy {
         }
       }
     });
-  }
-
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsCatalogue.Clean()
-    );
-  }
-
-  private getCatalogs(): void {
-    this.store.dispatch(
-      new fromActionsCatalogue.GetAllCatalogs()
-    );
   }
 }
 
