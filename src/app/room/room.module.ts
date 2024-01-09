@@ -11,7 +11,6 @@ import { RoomEffects } from '../store/effects/room.effects';
 import { RoomService } from '../services/room.service';
 import { UserService } from '../services/user.service';
 import { AddServiceComponent, PriceDialogComponent } from './me/add-service/add-service.component';
-import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { ExpenseService } from '../services/expense.service';
 import { ExpensesComponent } from './me/expense/list/expenses.component';
@@ -46,8 +45,7 @@ import { Observable } from 'rxjs';
       isolate: false,
       extend: true
     }),
-    EffectsModule.forFeature([RoomEffects, ExpenseEffects]),
-    DragDropModule
+    EffectsModule.forFeature([RoomEffects, ExpenseEffects])
   ],
   providers: [
     RoomService,

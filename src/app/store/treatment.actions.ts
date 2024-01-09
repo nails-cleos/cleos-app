@@ -1,5 +1,4 @@
 import { Action } from '@ngrx/store';
-import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 
 export enum TreatmentActionTypes {
   getAll = '[Treatment] Get all',
@@ -10,6 +9,7 @@ export enum TreatmentActionTypes {
   treatmentSave = '[Treatment] Save',
   treatmentUpdate = '[Treatment] Update',
   treatmentUpdateSort = '[Treatment] Update sort',
+  treatmentGroupUpdateSort = '[Treatment] Update group sort',
   treatmentSaveSuccess = '[Treatment] Save Success',
   treatmentFailure = '[Treatment] Failure',
   treatmentSelected = '[Treatment] Selected',
@@ -51,6 +51,13 @@ export class TreatmentSave implements Action {
 
 export class TreatmentUpdate implements Action {
   readonly type = TreatmentActionTypes.treatmentUpdate;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class TreatmentGroupUpdateSort implements Action {
+  readonly type = TreatmentActionTypes.treatmentGroupUpdateSort;
 
   constructor(public payload: any) {
   }
@@ -130,6 +137,7 @@ export type All =
   | TreatmentSave
   | TreatmentUpdate
   | TreatmentUpdateSort
+  | TreatmentGroupUpdateSort
   | TreatmentSuccess
   | ColorSuccess
   | TreatmentSaveSuccess

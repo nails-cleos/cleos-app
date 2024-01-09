@@ -42,15 +42,19 @@
       <td *matCellDef="let treatment" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="treatment.id; else skeleton">
           <button *ngIf="!treatment.deleted" [routerLink]="'/treatments/'+ treatment.id + '/edit'" mat-icon-button
-                  matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
+                  matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="below">
             <mat-icon color="primary">edit</mat-icon>
           </button>
           <button *ngIf="!treatment.deleted" [routerLink]="'/treatments/'+ treatment.id + '/view'" mat-icon-button
-                  matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
+                  matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="below">
             <mat-icon color="accent">visibility</mat-icon>
           </button>
+          <button *ngIf="!treatment.deleted" [routerLink]="'/treatments/'+ treatment.id + '/sorting'" mat-icon-button
+                  matTooltip="{{ 'COMMON.BUTTON.SORT' | translate }}" matTooltipPosition="below">
+            <mat-icon color="accent">sort</mat-icon>
+          </button>
           <button (click)="delete(treatment)" *ngIf="!treatment.deleted" mat-icon-button
-                  matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
+                  matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="below">
             <mat-icon color="warn">delete</mat-icon>
           </button>
         </div>
@@ -76,6 +80,9 @@
               </button>
               <button [routerLink]="'/treatments/'+ treatment.id + '/view'" color="accent" mat-icon-button>
                 <mat-icon matListItemIcon>visibility</mat-icon>
+              </button>
+              <button [routerLink]="'/treatments/'+ treatment.id + '/sorting'" color="accent" mat-icon-button>
+                <mat-icon matListItemIcon>sort</mat-icon>
               </button>
               <button (click)="delete(treatment)" *ngIf="!treatment.deleted" color="warn" mat-icon-button>
                 <mat-icon matListItemIcon>delete</mat-icon>

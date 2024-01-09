@@ -37,6 +37,7 @@ export interface ITreatment {
   errors?: any;
   history?: ITreatmentAll[];
   showHistory?: boolean;
+  order?: number;
 }
 
 export interface IGroupService {

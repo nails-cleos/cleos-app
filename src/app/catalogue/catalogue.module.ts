@@ -7,7 +7,6 @@ import { DragDropDirective } from '../directives/drag-drop.directive';
 import { CatalogueComponent } from './catalogue.component';
 import { CataloguesComponent } from './list/catalogues.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { DragDropModule } from '@angular/cdk/drag-drop';
 import { EffectsModule } from '@ngrx/effects';
 import { CatalogueEffects } from '../store/effects/catalogue.effects';
 import { CatalogueService } from '../services/catalogue.service';
@@ -27,7 +26,6 @@ import { Observable } from 'rxjs';
     CatalogueRoutingModule,
     SharedModule,
     MatProgressBarModule,
-    DragDropModule,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,

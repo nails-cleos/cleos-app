@@ -75,6 +75,15 @@ export class TreatmentEffects {
     ))
   ));
 
+  updateGroupSort$ = createEffect(() => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.treatmentGroupUpdateSort)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.treatmentService.updateGroupSort(payload).pipe(
+      switchMap(() =>
+        of(new fromActionsTreatment.TreatmentSaveSuccess({ message: this.translate.instant('TREATMENT.SORTED.MESSAGE') }))
+      ), catchError((err: HttpErrorResponse) => of(new fromActionsTreatment.TreatmentFailure({ error: err.error })))
+    ))
+  ));
+
   delete$ = createEffect(() => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.treatmentDelete)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.treatmentService.delete(payload).pipe(

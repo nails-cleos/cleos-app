@@ -5,6 +5,7 @@ import { Role } from '../interfaces/token';
 import { TreatmentsComponent } from './list/treatments.component';
 import { TreatmentComponent } from './treatment.component';
 import { TreatmentViewComponent } from './view/treatment-view.component';
+import { TreatmentGroupSortingComponent } from './sorting/treatment-group-sorting.component';
 import { TreatmentSortingComponent } from './sorting/treatment-sorting.component';
 
 const routes: Routes = [
@@ -14,7 +15,7 @@ const routes: Routes = [
     }
   },
   {
-    path: 'sorting', component: TreatmentSortingComponent, canActivate: [authGuard], data: {
+    path: 'sorting', component: TreatmentGroupSortingComponent, canActivate: [authGuard], data: {
       roles: [Role.admin]
     }
   },
@@ -30,6 +31,11 @@ const routes: Routes = [
   },
   {
     path: ':id/view', component: TreatmentViewComponent, canActivate: [authGuard], data: {
+      roles: [Role.admin]
+    }
+  },
+  {
+    path: ':id/sorting', component: TreatmentSortingComponent, canActivate: [authGuard], data: {
       roles: [Role.admin]
     }
   }];
