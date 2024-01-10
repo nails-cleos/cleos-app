@@ -139,7 +139,7 @@ export class RoomComponent implements OnInit, OnDestroy {
 
     if (this.isAddMode) {
       return this.store.dispatch(
-        new fromActionsRoom.RoomSave(this.room)
+        new fromActionsRoom.RoomSave(room)
       );
     } else {
       room.id = this.id;
