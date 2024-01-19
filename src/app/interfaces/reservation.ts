@@ -97,7 +97,7 @@ export interface ICustomerReservation {
 }
 
 export interface IAvailableDTO {
-  start: string;
+  dateTime: number;
 }
 
 export interface IDay {
