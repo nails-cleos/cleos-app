@@ -23,7 +23,6 @@ import {
   newDate,
   newDateTimestamp,
   plusMonthDate,
-  stringDateUTCToTimeZone,
   totalDuration
 } from '../../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
@@ -690,135 +689,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     );
   }
 
-  private subscribe(): void {
-    this.subscription = this.getState.subscribe(state => {
-      this.additionalList = state.additional;
-      if (this.additionalList && this.additionalList.length) {
-        const sp = this.steps[2];
-        sp.enable = true;
-        this.steps[2] = sp;
-        if (this.additionalSelected?.length) {
-          const selectIds = this.additionalSelected?.map(value => value.id);
-          const newList = this.additionalList.filter(al => selectIds.includes(al.id));
-          if (newList.length !== this.additionalSelected.length) {
-            this.additionalSelected = newList;
-            this.price = newAdditional(this.price, this.additionalSelected, this.reservation?.treatment?.discount);
-          }
-        }
-      }
-      if (state.treatmentDiscount?.treatments) {
-        this.groups = Array.from(
-          createTreatmentGroupService(new Map<string, IGroupService>(), state.treatmentDiscount.treatments,
-            this.room.value.currency).values());
-      }
-      if (this.groups && this.treatmentId && !this.group.value) {
-        this.group.setValue(
-          this.groups?.find(group => group.treatments?.find(p => p.id === this.treatmentId) ? group : undefined));
-        if (this.reservation) {
-          this.datePicker?.open();
-        }
-      }
-      this.discounts = state.treatmentDiscount?.discounts.map((ud: IUserDiscount) => {
-        let title = ud.discount.name;
-        switch (ud.discount.type) {
-          case DiscountType.money:
-            title = `$ ${ ud.discount.amount } ${ title }`;
-            break;
-          case DiscountType.percentage:
-            title = `${ ud.discount.amount } % ${ title }`;
-            break;
-        }
-        return Object.assign({}, ud, { title });
-      });
-      this.offices = Array.from(createRoomOffice(state.rooms)?.values() || []);
-      if (this.offices && this.offices.length === 1) {
-        this.office.setValue(this.offices[0]);
-      }
-      if (state.selected && !this.reservation) {
-        if (state.selected.paymentRequired) {
-          const message = this.translate.instant('ME.RESERVATION.UPCOMING.ERROR.PAYMENT');
-          this.canNotContinue(message, 'update');
-        } else {
-          this.setData(state.selected);
-        }
-      }
-      if (state.customerReservation && state.customerReservation.upcoming && state.customerReservation.upcoming.length) {
-        const date = newDateTimestamp(state.customerReservation.upcoming[0].timestamp,
-          state.customerReservation.upcoming[0].room.timeZone);
-        const message = this.translate.instant('ME.RESERVATION.UPCOMING.ERROR.CUSTOMER',
-          {
-            date: formatFullDateTime(date, this.translate.currentLang)
-          });
-        this.canNotContinue(message, 'create');
-      } else {
-        this.canCreate = true;
-        this.balance = state.customerReservation?.balance || 0;
-        this.price = this.price.withBalance(state.customerReservation?.balance);
-        if (state.customerReservation?.firstTime) {
-          this.firstTime = true;
-        }
-        if (state.selected && !state.selected.canEdit) {
-          this.firstTime = true;
-        }
-      }
-      // Multiple professionals
-      // if (state.data) {
-      //   this.professionalAvailableList = new Map<string, Map<string, any[]>>();
-      //   Object.keys(state.data).map((key) => {
-      //     const date = newDate(key);
-      //     const id = createNewDate(date).toString();
-      //     state.data[key].reduce((group: Map<string, Map<string, any[]>>, pId: string) => {
-      //       let professionals = group.get(pId) || new Map<string, any[]>();
-      //
-      //       let dates: any = professionals.get(id) || [];
-      //       dates = [...dates, { time: getTime(date, this.locale), date }];
-      //       professionals.set(id, dates);
-      //       group.set(pId, professionals);
-      //
-      //       return group;
-      //     }, this.professionalAvailableList);
-      //   });
-      //   this.setSelectedIndex();
-      // }
-      if (state.data && Array.isArray(state.data)) {
-        this.availableList = new Map<string, any[]>();
-        this.availableList.set(createNewDate(this.startDate.value).toString(), []);
-        state.data.reduce((group: Map<string, string[]>, item: IAvailableDTO) => {
-          const date = stringDateUTCToTimeZone(item.start);
-          const key = createNewDate(date).toString();
-
-          let dates: any = group.get(key) || [];
-          dates = [...dates, { time: getTime(date, this.dateFormat), date }];
-          group.set(key, dates);
-
-          return group;
-        }, this.availableList);
-        this.setSelectedIndex();
-        if (this.price.isPaid) {
-          this.firstTime = false;
-        }
-      }
-      if (state.subErrors) {
-        state.subErrors.forEach((value: any) => {
-          switch (value.field) {
-            case 'startDate':
-              this.myStepper.selectedIndex = 1;
-              break;
-            default:
-              this.myStepper.selectedIndex = 0;
-              break;
-          }
-          this.event.setValue(undefined);
-          this.errors[value.field] = value.message;
-          this.treatmentForm.controls[value.field]?.setErrors({ incorrect: true });
-        });
-      }
-      if (state.paymentOptions) {
-        this.options = getPayNlOptions(state.paymentOptions);
-      }
-    });
-  }
-
   private canNotContinue(message: string, type: string): void {
     logEvent(this.analytic, 'screen_view', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -958,5 +828,134 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.store.dispatch(
       new fromActionsReservation.PaymentOptions()
     );
+  }
+
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe(state => {
+      this.additionalList = state.additional;
+      if (this.additionalList && this.additionalList.length) {
+        const sp = this.steps[2];
+        sp.enable = true;
+        this.steps[2] = sp;
+        if (this.additionalSelected?.length) {
+          const selectIds = this.additionalSelected?.map(value => value.id);
+          const newList = this.additionalList.filter(al => selectIds.includes(al.id));
+          if (newList.length !== this.additionalSelected.length) {
+            this.additionalSelected = newList;
+            this.price = newAdditional(this.price, this.additionalSelected, this.reservation?.treatment?.discount);
+          }
+        }
+      }
+      if (state.treatmentDiscount?.treatments) {
+        this.groups = Array.from(
+          createTreatmentGroupService(new Map<string, IGroupService>(), state.treatmentDiscount.treatments,
+            this.room.value.currency).values());
+      }
+      if (this.groups && this.treatmentId && !this.group.value) {
+        this.group.setValue(
+          this.groups?.find(group => group.treatments?.find(p => p.id === this.treatmentId) ? group : undefined));
+        if (this.reservation) {
+          this.datePicker?.open();
+        }
+      }
+      this.discounts = state.treatmentDiscount?.discounts.map((ud: IUserDiscount) => {
+        let title = ud.discount.name;
+        switch (ud.discount.type) {
+          case DiscountType.money:
+            title = `$ ${ ud.discount.amount } ${ title }`;
+            break;
+          case DiscountType.percentage:
+            title = `${ ud.discount.amount } % ${ title }`;
+            break;
+        }
+        return Object.assign({}, ud, { title });
+      });
+      this.offices = Array.from(createRoomOffice(state.rooms)?.values() || []);
+      if (this.offices && this.offices.length === 1) {
+        this.office.setValue(this.offices[0]);
+      }
+      if (state.selected && !this.reservation) {
+        if (state.selected.paymentRequired) {
+          const message = this.translate.instant('ME.RESERVATION.UPCOMING.ERROR.PAYMENT');
+          this.canNotContinue(message, 'update');
+        } else {
+          this.setData(state.selected);
+        }
+      }
+      if (state.customerReservation && state.customerReservation.upcoming && state.customerReservation.upcoming.length) {
+        const date = newDateTimestamp(state.customerReservation.upcoming[0].timestamp,
+          state.customerReservation.upcoming[0].room.timeZone);
+        const message = this.translate.instant('ME.RESERVATION.UPCOMING.ERROR.CUSTOMER',
+          {
+            date: formatFullDateTime(date, this.translate.currentLang)
+          });
+        this.canNotContinue(message, 'create');
+      } else {
+        this.canCreate = true;
+        this.balance = state.customerReservation?.balance || 0;
+        this.price = this.price.withBalance(state.customerReservation?.balance);
+        if (state.customerReservation?.firstTime) {
+          this.firstTime = true;
+        }
+        if (state.selected && !state.selected.canEdit) {
+          this.firstTime = true;
+        }
+      }
+      // Multiple professionals
+      // if (state.data) {
+      //   this.professionalAvailableList = new Map<string, Map<string, any[]>>();
+      //   Object.keys(state.data).map((key) => {
+      //     const date = newDate(key);
+      //     const id = createNewDate(date).toString();
+      //     state.data[key].reduce((group: Map<string, Map<string, any[]>>, pId: string) => {
+      //       let professionals = group.get(pId) || new Map<string, any[]>();
+      //
+      //       let dates: any = professionals.get(id) || [];
+      //       dates = [...dates, { time: getTime(date, this.locale), date }];
+      //       professionals.set(id, dates);
+      //       group.set(pId, professionals);
+      //
+      //       return group;
+      //     }, this.professionalAvailableList);
+      //   });
+      //   this.setSelectedIndex();
+      // }
+      if (state.data && Array.isArray(state.data)) {
+        this.availableList = new Map<string, any[]>();
+        this.availableList.set(createNewDate(this.startDate.value).toString(), []);
+        state.data.reduce((group: Map<string, string[]>, item: IAvailableDTO) => {
+          const date = newDateTimestamp(item.dateTime);
+          const key = createNewDate(date).toString();
+
+          let dates: any = group.get(key) || [];
+          dates = [...dates, { time: getTime(date, this.dateFormat), date }];
+          group.set(key, dates);
+
+          return group;
+        }, this.availableList);
+        this.setSelectedIndex();
+        if (this.price.isPaid) {
+          this.firstTime = false;
+        }
+      }
+      if (state.subErrors) {
+        state.subErrors.forEach((value: any) => {
+          switch (value.field) {
+            case 'startDate':
+              this.myStepper.selectedIndex = 1;
+              break;
+            default:
+              this.myStepper.selectedIndex = 0;
+              break;
+          }
+          this.event.setValue(undefined);
+          this.errors[value.field] = value.message;
+          this.treatmentForm.controls[value.field]?.setErrors({ incorrect: true });
+        });
+      }
+      if (state.paymentOptions) {
+        this.options = getPayNlOptions(state.paymentOptions);
+      }
+    });
   }
 }
