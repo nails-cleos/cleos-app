@@ -468,8 +468,6 @@ export const getTimeNumber = (date: any) => {
 
 export const dateToTimestamp = (date: Date = getNow()): number => parseInt(`${ date.getTime() / 1000 }`, 10);
 
-export const stringDateUTCToTimeZone = (date: string): Date => new Date(`${ date }.000z`);
-
 export const isSameTimeZone = (timeZone: string = getCurrentTimeZone()): boolean => {
   if (getCurrentTimeZone() === timeZone) {
     return true;
