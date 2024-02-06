@@ -48,7 +48,7 @@
 
 
 <ng-template [ngIfElse]="bigScreen" [ngIf]="smallScreen">
-  <mat-vertical-stepper #stepper [linear]="true">
+  <mat-vertical-stepper #stepper [linear]="true" (selectionChange)="triggerClick($event)">
     <mat-step [completed]="getStepCompleted(0)" [editable]="true" [state]="getStepName(0)"
               [stepControl]="typeForm">
       <ng-template matStepLabel>{{ 'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate }}</ng-template>
@@ -61,7 +61,7 @@
         <button [form]="typeForm" appBackButton class="icon-button" color="accent" mat-mini-fab type="button">
           <mat-icon>keyboard_return</mat-icon>
         </button>
-        <button (click)="callStepTwo" [disabled]="typeForm.invalid" class="icon-button" color="primary" mat-mini-fab
+        <button (click)="callStepTwo(true)" [disabled]="typeForm.invalid" class="icon-button" color="primary" mat-mini-fab
                 type="button">
           <mat-icon>arrow_downward</mat-icon>
         </button>
@@ -84,7 +84,7 @@
 </ng-template>
 
 <ng-template #bigScreen>
-  <mat-horizontal-stepper #stepper [linear]="true">
+  <mat-horizontal-stepper #stepper [linear]="true" (selectionChange)="triggerClick($event)">
     <mat-step [completed]="getStepCompleted(0)" [editable]="true" [state]="getStepName(0)"
               [stepControl]="typeForm">
       <ng-template matStepLabel>{{ 'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate }}</ng-template>
@@ -99,7 +99,7 @@
         <button [form]="typeForm" appBackButton color="accent" mat-fab extended type="button">
           <mat-icon>keyboard_return</mat-icon>
           {{ 'COMMON.BUTTON.BACK' | translate }}</button>
-        <button (click)="callStepTwo" [disabled]="typeForm.invalid" class="raised-button" color="primary" mat-fab
+        <button (click)="callStepTwo(true)" [disabled]="typeForm.invalid" class="raised-button" color="primary" mat-fab
                 extended type="button">
           {{ 'COMMON.BUTTON.NEXT' | translate }}
           <mat-icon>arrow_forward</mat-icon>
