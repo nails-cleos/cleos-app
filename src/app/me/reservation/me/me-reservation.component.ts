@@ -33,13 +33,11 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as fromActionsReservation from '../../../store/reservation.actions';
 import { map, startWith } from 'rxjs/operators';
-import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
+import { STEPPER_GLOBAL_OPTIONS, StepperSelectionEvent } from '@angular/cdk/stepper';
 import {
   createRoomOffice,
   createTreatmentGroupService,
-  getBackIndex,
   getPrice,
-  getStep,
   newAdditional,
   newDiscount,
   newPercentage,
@@ -64,6 +62,7 @@ import { IUser } from '../../../interfaces/user';
 import { accountCredit, getPaymentOptions, getPayNlOptions, IPaymentOption, PaymentType, PENALTY } from '../../../interfaces/payment';
 import { AuthUserService } from '../../../services/auth-user.service';
 import { Analytics, logEvent } from '@angular/fire/analytics';
+import { completeAndNext, enableStep, getBackIndex, getStepCall, getStepCompleted, getStepEnabled, getStepName } from '../../../util/step';
 
 @Component({
   selector: 'app-me-reservation',
@@ -200,7 +199,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     const preview = new Step(5, 'preview', () => this.create);
     const payment = new Step(4, 'payment', () => this.callStepSix, preview);
     const book = new Step(3, 'book_online', () => this.callStepFive, payment);
-    const additional = new Step(2, 'post_add', () => this.callStepFour, book, false);
+    const additional = new Step(2, 'post_add', () => this.callStepFour, book, true, false);
     const treatment = new Step(1, 'spa', () => this.callStepThree, additional);
     const room = new Step(0, 'room', () => this.callStepTwo, treatment);
     this.steps = [room, treatment, additional, book, payment, preview];
@@ -218,72 +217,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   get roomDetail(): string {
     return roomDetail(this.room.value);
-  }
-
-  get callStepTwo(): void {
-    if (this.roomForm.invalid) {
-      return;
-    }
-    this.professionalId = this.professional.value.id;
-    this.roomId = this.room.value.id;
-    this.setTypes();
-    this.getTreatmentList();
-    return this.completeAndNext();
-  }
-
-  get callStepThree(): void {
-    if (this.treatmentForm.invalid) {
-      return;
-    }
-    this.treatmentId = this.treatment.value.id;
-    this.getAdditionalList();
-    return this.completeAndNext();
-  }
-
-  get callStepFour(): void {
-    if (this.treatmentForm.invalid) {
-      return;
-    }
-    if (this.event.value !== this.startDate.value) {
-      this.event.setValue(undefined);
-      this.time = undefined;
-    }
-    const duration = totalDuration(this.treatment.value, this.additionalSelected);
-    this.totalDurationFormatted = formatTime(duration.duration, this.dateFormat);
-
-    this.store.dispatch(
-      new fromActionsReservation.CustomerSearchReservation({
-        date: this.startDate.value,
-        roomId: this.room.value.id,
-        treatmentId: this.treatment.value.id,
-        professionalId: this.professional.value.id,
-        additionalIds: this.additionalSelected?.map(additional => additional.id)
-      })
-    );
-    return this.completeAndNext();
-  }
-
-  get callStepFive(): void {
-    if (this.eventGroup.invalid) {
-      this.errors.schedule = true;
-      return;
-    }
-
-    this.date = newDate(this.event.value);
-    this.endDate = createNewDate(this.date, this.date.getHours() + this.duration.hour,
-      this.date.getMinutes() + this.duration.minute);
-
-    this.isPayment = true;
-    return this.completeAndNext();
-  }
-
-  get callStepSix(): void {
-    if (this.typeForm.invalid) {
-      return;
-    }
-
-    this.isPreview = true;
-    return this.completeAndNext();
   }
 
   get back(): void {
@@ -348,14 +281,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     return !isSameTimeZone(this.room.value.timeZone);
   }
 
-  private static goNext(step: IStep): void {
-    const nextStep = step.next;
-    if (nextStep && !nextStep.enable) {
-      nextStep.call();
-    }
-    return;
-  }
-
   ngOnInit(): void {
     this.createForm();
     this.createFilter();
@@ -400,19 +325,89 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.authUserServiceSubscription.unsubscribe();
   }
 
+  triggerClick(event: StepperSelectionEvent): void {
+    return getStepCall(this.steps, event.selectedIndex - 1);
+  }
+
+  callStepTwo(goNext: boolean): void {
+    if (this.roomForm.invalid) {
+      return;
+    }
+    this.isPreview = false;
+    this.professionalId = this.professional.value.id;
+    this.roomId = this.room.value.id;
+    this.setTypes();
+    this.getTreatmentList();
+    completeAndNext(this.steps, this.myStepper, goNext, this.analytic);
+  }
+
+  callStepThree(goNext: boolean): void {
+    if (this.treatmentForm.invalid) {
+      return;
+    }
+    this.isPreview = false;
+    this.treatmentId = this.treatment.value.id;
+    this.getAdditionalList();
+    completeAndNext(this.steps, this.myStepper, goNext, this.analytic);
+  }
+
+  callStepFour(goNext: boolean): void {
+    if (this.treatmentForm.invalid) {
+      return;
+    }
+    this.isPreview = false;
+    if (this.event.value !== this.startDate.value) {
+      this.event.setValue(undefined);
+      this.time = undefined;
+    }
+    const duration = totalDuration(this.treatment.value, this.additionalSelected);
+    this.totalDurationFormatted = formatTime(duration.duration, this.dateFormat);
+
+    this.store.dispatch(
+      new fromActionsReservation.CustomerSearchReservation({
+        date: this.startDate.value,
+        roomId: this.room.value.id,
+        treatmentId: this.treatment.value.id,
+        professionalId: this.professional.value.id,
+        additionalIds: this.additionalSelected?.map(additional => additional.id)
+      })
+    );
+    completeAndNext(this.steps, this.myStepper, goNext, this.analytic);
+  }
+
+  callStepFive(goNext: boolean): void {
+    if (this.eventGroup.invalid) {
+      this.errors.schedule = true;
+      return;
+    }
+
+    this.date = newDate(this.event.value);
+    this.endDate = createNewDate(this.date, this.date.getHours() + this.duration.hour,
+      this.date.getMinutes() + this.duration.minute);
+
+    this.isPayment = true;
+    completeAndNext(this.steps, this.myStepper, goNext, this.analytic);
+  }
+
+  callStepSix(goNext: boolean): void {
+    if (this.typeForm.invalid) {
+      return;
+    }
+
+    this.isPreview = true;
+    completeAndNext(this.steps, this.myStepper, goNext, this.analytic);
+  }
+
   getStepName(index: number): string {
-    const step = getStep(this.steps, index);
-    return step ? step.name : '';
+    return getStepName(this.steps, index);
   }
 
   getStepEnabled(index: number): boolean {
-    const step = getStep(this.steps, index);
-    return !!step?.enable;
+    return getStepEnabled(this.steps, index);
   }
 
   getStepCompleted(index: number): boolean {
-    const step = getStep(this.steps, index);
-    return !!step?.completed;
+    return getStepCompleted(this.steps, index);
   }
 
   openDialog(reservationDate?: Date): void {
@@ -748,12 +743,6 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     return this.professionalList?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
   }
 
-  private completeStep(step: IStep): void {
-    this.myStepper.next();
-    step.completed = true;
-    this.steps[step.order] = step;
-  }
-
   private setData(reservation: IUpcomingAll): void {
     if (!this.reservation) {
       this.reservation = reservation;
@@ -781,13 +770,11 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
           this.firstTime = true;
           this.setTypes();
         } else {
-          const sp = this.steps[4];
-          sp.enable = false;
-          this.steps[4] = sp;
+          enableStep(this.steps, 'payment', false);
         }
         this.getTreatmentList();
       }
-      this.completeAndNext();
+      completeAndNext(this.steps, this.myStepper, true, this.analytic);
     }
   }
 
@@ -800,28 +787,13 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     }
   }
 
-  private completeAndNext(): void {
-    setTimeout(() => {
-      const step = getStep(this.steps, this.myStepper.selectedIndex);
-      logEvent(this.analytic, 'screen_view', {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        firebase_screen: `Customer reservation. Step: ${ step?.name }`,
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        firebase_screen_class: 'MeReservationComponent'
-      });
-      if (step) {
-        this.completeStep(step);
-        MeReservationComponent.goNext(step);
-      }
-    }, 100);
-  }
-
   private cleanTreatment(): void {
     this.price = new Price();
     this.discount.setValue(undefined);
     this.treatment.setValue('');
     this.showDiscount = false;
     this.treatmentList = undefined;
+    this.event.setValue(undefined);
   }
 
   private getOptions(): void {
@@ -834,9 +806,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.subscription = this.getState.subscribe(state => {
       this.additionalList = state.additional;
       if (this.additionalList && this.additionalList.length) {
-        const sp = this.steps[2];
-        sp.enable = true;
-        this.steps[2] = sp;
+        enableStep(this.steps, 'post_add');
         if (this.additionalSelected?.length) {
           const selectIds = this.additionalSelected?.map(value => value.id);
           const newList = this.additionalList.filter(al => selectIds.includes(al.id));

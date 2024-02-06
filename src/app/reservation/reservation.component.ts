@@ -1,5 +1,5 @@
 import { AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
+import { STEPPER_GLOBAL_OPTIONS, StepperSelectionEvent } from '@angular/cdk/stepper';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
 import { IUser, IUserAll } from '../interfaces/user';
@@ -62,10 +62,7 @@ import {
   createRoomOffice,
   createTreatmentGroupService,
   executeDialogNoWidth,
-  getBackIndex,
-  getIndex,
   getPrice,
-  getStep,
   newAdditional,
   newDiscount,
   newPrice,
@@ -84,6 +81,16 @@ import { TimeZoneSnackBarComponent } from '../shared/snak/time-zone/time-zone-sn
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SelectProfessionalDialogComponent } from './select-professional-dialog.component';
 import { AuthUserService } from '../services/auth-user.service';
+import {
+  completeAndNext, enableStep,
+  getBackIndex,
+  getIndex,
+  getStepCall,
+  getStepCompleted,
+  getStepEnabled,
+  getStepName,
+  getStepOptional
+} from '../util/step';
 import PlaceResult = google.maps.places.PlaceResult;
 
 @Component({
@@ -236,12 +243,12 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.maxCalendarDate = addMonths(getNow(), MAX_RESERVATION_MONTH);
     const preview = new Step(6, 'preview', () => this.create);
-    const book = new Step(5, 'book_online', () => this.callStepSeven, preview);
-    const settings = new Step(4, 'settings', () => this.callStepSix, book);
-    const additional = new Step(3, 'post_add', () => this.callStepFive, settings);
-    const treatment = new Step(2, 'spa', () => this.callStepFour, additional);
-    const room = new Step(1, 'room', () => this.callStepThree, treatment);
-    const customer = new Step(0, 'person_search', () => this.callStepTwo, room);
+    const book = new Step(5, 'book_online', (goNext: boolean) => this.callStepSeven(goNext), preview);
+    const settings = new Step(4, 'settings', (goNext: boolean) => this.callStepSix(goNext), book);
+    const additional = new Step(3, 'post_add', (goNext: boolean) => this.callStepFive(goNext), settings, true);
+    const treatment = new Step(2, 'spa', (goNext: boolean) => this.callStepFour(goNext), additional);
+    const room = new Step(1, 'room', (goNext: boolean) => this.callStepThree(goNext), treatment);
+    const customer = new Step(0, 'person_search', (goNext: boolean) => this.callStepTwo(goNext), room);
     this.steps = [customer, room, treatment, additional, settings, book, preview];
   }
 
@@ -260,92 +267,11 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.isPreview) {
       this.isPreview = false;
     } else {
-      this.event.setValue(undefined);
+      this.cleanEvent();
     }
+
     this.myStepper.selectedIndex = getBackIndex(this.steps, this.myStepper.selectedIndex);
     return;
-  }
-
-  get callStepTwo(): void {
-    if (this.customerForm.invalid) {
-      return;
-    }
-    this.getRoomList();
-    return this.completeAndNext();
-  }
-
-  get callStepThree(): void {
-    if (this.officeForm.invalid) {
-      return;
-    }
-    this.getTreatmentList();
-    return this.completeAndNext();
-  }
-
-  get callStepFour(): void {
-    if (this.treatmentForm.invalid) {
-      return;
-    }
-    this.getAdditionalList();
-    return this.completeAndNext();
-  }
-
-  get callStepFive(): void {
-    return this.completeAndNext();
-  }
-
-  get callStepSix(): void {
-    if (this.configurationForm.invalid) {
-      return;
-    }
-    const duration = totalDuration(this.treatment.value, this.additionalSelected);
-    this.totalDuration = duration.duration;
-    this.totalDurationFormatted = formatTime(duration.duration, this.dateFormat);
-    this.events = [];
-
-    const timeZone = this.room.value.timeZone;
-
-    let date = dateToUTC(newDate(this.date.value), timeZone);
-    const now = dateToUTC(createDate(), timeZone);
-    date = addDays(date, -this.lessDays);
-    if (date < createFullDate(now)) {
-      date = now;
-    }
-
-    const { monday, tuesday, wednesday, thursday, friday, saturday, sunday, exclude } = getAvailability(
-      this.room.value);
-    this.weekendDays = exclude;
-
-    const { min, max } = getStartEndDay(monday, tuesday, wednesday, thursday, friday, saturday, sunday, timeZone);
-    this.day = new Day(min, max, getNow(), exclude, 1);
-    const unavailable = this.translate.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
-    const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
-    const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
-    this.events = this.events.concat(fillNotAvailable(unavailable, lunch, notWorking,
-      date, sunday, saturday, friday, thursday, wednesday, tuesday, monday, this.isDarkMode,
-      plusDays(date, this.daysInWeek), timeZone));
-    this.unavailableEventLength = this.events.length;
-    this.viewDate = date;
-    this.store.dispatch(
-      new fromActionsReservation.SearchReservation({
-        date: this.date.value,
-        roomId: this.room.value.id,
-        professionalId: this.professional.value.id,
-        days: this.daysInWeek
-      })
-    );
-    return this.completeAndNext();
-  }
-
-  get callStepSeven(): void {
-    this.errors.schedule = false;
-    this.errors.overlapping = false;
-    if (!this.event.value) {
-      this.errors.schedule = true;
-      return;
-    }
-    this.isPreview = true;
-    return this.completeAndNext();
   }
 
   get create(): void {
@@ -388,14 +314,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get showTimeZone(): boolean {
     return !isSameTimeZone(this.room.value.timeZone);
-  }
-
-  private static goNext(step: IStep): void {
-    const nextStep = step.next;
-    if (nextStep && !nextStep.enable) {
-      nextStep.call();
-    }
-    return;
   }
 
   ngOnInit(): void {
@@ -457,19 +375,111 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.authUserServiceSubscription.unsubscribe();
   }
 
+  triggerClick(event: StepperSelectionEvent): void {
+    return getStepCall(this.steps, event.selectedIndex - 1);
+  }
+
+  callStepTwo(goNext: boolean): void {
+    if (this.customerForm.invalid) {
+      return;
+    }
+    this.isPreview = false;
+    this.getRoomList();
+    completeAndNext(this.steps, this.myStepper, goNext);
+  }
+
+  callStepThree(goNext: boolean): void {
+    if (this.officeForm.invalid) {
+      return;
+    }
+    this.isPreview = false;
+    this.getTreatmentList();
+    completeAndNext(this.steps, this.myStepper, goNext);
+  }
+
+  callStepFour(goNext: boolean): void {
+    if (this.treatmentForm.invalid) {
+      return;
+    }
+    this.isPreview = false;
+    this.getAdditionalList();
+    completeAndNext(this.steps, this.myStepper, goNext);
+  }
+
+  callStepFive(goNext: boolean): void {
+    this.isPreview = false;
+    completeAndNext(this.steps, this.myStepper, goNext);
+  }
+
+  callStepSix(goNext: boolean): void {
+    if (this.configurationForm.invalid) {
+      return;
+    }
+    this.isPreview = false;
+    const duration = totalDuration(this.treatment.value, this.additionalSelected);
+    this.totalDuration = duration.duration;
+    this.totalDurationFormatted = formatTime(duration.duration, this.dateFormat);
+    this.events = [];
+
+    const timeZone = this.room.value.timeZone;
+
+    let date = dateToUTC(newDate(this.date.value), timeZone);
+    const now = dateToUTC(createDate(), timeZone);
+    date = addDays(date, -this.lessDays);
+    if (date < createFullDate(now)) {
+      date = now;
+    }
+
+    const { monday, tuesday, wednesday, thursday, friday, saturday, sunday, exclude } = getAvailability(
+      this.room.value);
+    this.weekendDays = exclude;
+
+    const { min, max } = getStartEndDay(monday, tuesday, wednesday, thursday, friday, saturday, sunday, timeZone);
+    this.day = new Day(min, max, getNow(), exclude, 1);
+    const unavailable = this.translate.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
+    const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
+    const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
+    this.events = this.events.concat(fillNotAvailable(unavailable, lunch, notWorking,
+      date, sunday, saturday, friday, thursday, wednesday, tuesday, monday, this.isDarkMode,
+      plusDays(date, this.daysInWeek), timeZone));
+    this.unavailableEventLength = this.events.length;
+    this.viewDate = date;
+    this.store.dispatch(
+      new fromActionsReservation.SearchReservation({
+        date: this.date.value,
+        roomId: this.room.value.id,
+        professionalId: this.professional.value.id,
+        days: this.daysInWeek
+      })
+    );
+    completeAndNext(this.steps, this.myStepper, goNext);
+  }
+
+  callStepSeven(goNext: boolean): void {
+    this.errors.schedule = false;
+    this.errors.overlapping = false;
+    if (!this.event.value) {
+      this.errors.schedule = true;
+      return;
+    }
+    this.isPreview = true;
+    completeAndNext(this.steps, this.myStepper, goNext);
+  }
+
   getStepName(index: number): string {
-    const step = getStep(this.steps, index);
-    return step ? step.name : '';
+    return getStepName(this.steps, index);
   }
 
   getStepEnabled(index: number): boolean {
-    const step = getStep(this.steps, index);
-    return !!step?.enable;
+    return getStepEnabled(this.steps, index);
+  }
+
+  getStepOptional(index: number): boolean {
+    return getStepOptional(this.steps, index);
   }
 
   getStepCompleted(index: number): boolean {
-    const step = getStep(this.steps, index);
-    return !!step?.completed;
+    return getStepCompleted(this.steps, index);
   }
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d, this.room.value);
@@ -540,7 +550,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   keyDownGroup(event: any): void {
     this.treatmentList = undefined;
-    this.groups = undefined;
     this.keyDownHandler(event, this.treatment);
     this.keyDownHandler(event, this.group);
     this.errors = this.errors.filter((it: any) => it !== 'treatment');
@@ -583,6 +592,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   onChange(options: MatListOption[]): void {
     this.additionalSelected = options.map(o => o.value);
     this.price = newAdditional(this.price, this.additionalSelected, this.treatmentDiscount);
+    this.cleanEvent();
   }
 
   isSelected(it: IAdditionalAll): boolean {
@@ -756,6 +766,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.treatment.valueChanges.subscribe(value => {
       if (value) {
         this.price = newPrice(this.price, value.price, this.treatmentDiscount);
+        this.cleanEvent();
       }
       if (this.extras && this.extras.discount) {
         this.showDiscount = true;
@@ -768,10 +779,12 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         if (userDiscount) {
           this.treatmentDiscount = userDiscount.discount;
           this.price = newDiscount(this.price, this.treatmentDiscount);
+          this.cleanEvent();
         }
       } else {
         this.treatmentDiscount = undefined;
         this.price = removeDiscount(this.price);
+        this.cleanEvent();
       }
     });
     this.customerChange.valueChanges.subscribe((value) => {
@@ -794,6 +807,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.treatmentList = undefined;
     this.groups = undefined;
     this.additionalSelected = [];
+    this.cleanEvent();
   }
 
   private createFilters(): void {
@@ -803,7 +817,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       map(name => name ? this.filterCustomer(name) : this.customers ? this.customers.slice() : this.customers)
     );
     this.filteredGroup = this.group.valueChanges.pipe(startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
+      map(value => typeof value === 'string' ? value : value?.name),
       map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups)
     );
     this.filteredTreatment = this.treatment?.valueChanges.pipe(
@@ -986,22 +1000,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.professionalList?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
   }
 
-  private completeAndNext(): void {
-    setTimeout(() => {
-      const step = getStep(this.steps, this.myStepper.selectedIndex);
-      if (step) {
-        this.completeStep(step);
-        ReservationComponent.goNext(step);
-      }
-    }, 100);
-  }
-
-  private completeStep(step: IStep): void {
-    this.myStepper.selectedIndex = step.order + 1;
-    step.completed = true;
-    this.steps[step.order] = step;
-  }
-
   private setData(reservation: IReservationAll): void {
     if (!this.reservation) {
       this.reservation = reservation;
@@ -1024,7 +1022,14 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         this.reference.setValue(reservation.configuration.reference);
         this.customerChange.setValue(reservation.configuration.canCustomerChange);
       }
-      this.completeAndNext();
+      completeAndNext(this.steps, this.myStepper, true);
+    }
+  }
+
+  private cleanEvent(): void {
+    if (this.event.value) {
+      this.events = this.events.filter(it => it === this.event.value);
+      this.event.setValue(undefined);
     }
   }
 
@@ -1095,9 +1100,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.customers = state.customers;
       this.additionalList = state.additional;
       if (this.additionalList && this.additionalList.length) {
-        const sp = this.steps[3];
-        sp.enable = true;
-        this.steps[3] = sp;
+        enableStep(this.steps, 'post_add');
         if (this.customerAdditionalIds?.length && !this.additionalSelected.length && this.myStepper.selectedIndex === treatment) {
           this.additionalSelected = this.additionalList.filter(ad => this.customerAdditionalIds.includes(ad.id))
             .map(ad => Object.assign({}, ad, { id: ad.id }));
@@ -1187,7 +1190,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           this.myStepper.selectedIndex = step;
           this.customerForm.controls[value.field]?.setErrors({ incorrect: true });
           this.officeForm.controls[value.field]?.setErrors({ incorrect: true });
-          this.event.setValue(null);
+          this.cleanEvent();
           setTimeout(() => {
             const nameInputField = document.querySelector(`input[formControlName="${ value.field }"]`) as HTMLInputElement;
             if (nameInputField) {

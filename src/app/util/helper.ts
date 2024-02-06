@@ -8,7 +8,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { IAddress, ILocation, IRoom, IRoomAll, ServiceType } from '../interfaces/room';
 import { IOffice } from '../interfaces/office';
 import { ICurrency, ICurrencyAll } from '../interfaces/currency';
-import { IStep } from '../interfaces/step';
 import { getTime, getTimeZone, localeTimeZoneDate } from './dates';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -289,21 +288,6 @@ export const currencySymbol = (currency?: ICurrency | string): string => {
     default:
       return '$';
   }
-};
-
-export const getIndex = (steps: IStep[], name: string): number | undefined => steps.find(s => s.name === name)?.order;
-
-export const getStep = (steps: IStep[], index: number): IStep | undefined => steps.find(s => s.order === index);
-
-export const getBackIndex = (steps: IStep[], current: number): number => {
-  let index = -1;
-  for (const step of steps.slice(0, current).reverse()) {
-    if (step.enable) {
-      index = step.order;
-      break;
-    }
-  }
-  return index;
 };
 
 export const openDialog = (myRoom: IRoomAll, locale: string, translate: TranslateService,
