@@ -398,7 +398,7 @@
           {{item}})&nbsp;<span
           [innerHTML]="'COMMON.PAYMENT.CANCELLATION_POLICY.' + item | translate:{penalty: penalty}"></span>
         </div>
-        <mat-checkbox [formControl]="accept" required>
+        <mat-checkbox [formControl]="accept" [required]="true">
           {{ 'COMMON.BUTTON.ACCEPT' | translate}}
         </mat-checkbox>
       </mat-card-content>
@@ -408,7 +408,7 @@
 
 <ng-template [ngIfElse]="bigScreen" [ngIf]="smallScreen">
   <div *ngIf="canCreate; else cannotCreate">
-    <mat-vertical-stepper #stepper [linear]="true">
+    <mat-vertical-stepper #stepper [linear]="true" (selectionChange)="triggerClick">
       <mat-step [completed]="getStepCompleted(0)" [editable]="getStepEnabled(0)" [state]="getStepName(0)"
                 [stepControl]="roomForm">
         <ng-template matStepLabel>{{ 'COMMON.ROOM.FIELD' | translate }}</ng-template>
@@ -448,7 +448,7 @@
                     mat-mini-fab type="button">
               <mat-icon>keyboard_return</mat-icon>
             </button>
-            <button (click)="callStepTwo" [disabled]="roomForm.invalid" class="icon-button"
+            <button (click)="callStepTwo(true)" [disabled]="roomForm.invalid" class="icon-button"
                     color="primary" mat-mini-fab type="button">
               <mat-icon>arrow_downward</mat-icon>
             </button>
@@ -475,7 +475,7 @@
               <mat-icon>arrow_upward</mat-icon>
             </button>
           </ng-template>
-          <button (click)="callStepThree" [disabled]="treatmentForm.invalid" class="icon-button" color="primary"
+          <button (click)="callStepThree(true)" [disabled]="treatmentForm.invalid" class="icon-button" color="primary"
                   mat-mini-fab type="button">
             <mat-icon>arrow_downward</mat-icon>
           </button>
@@ -489,7 +489,7 @@
           <button (click)="back" color="accent" class="icon-button" mat-mini-fab>
             <mat-icon>arrow_upward</mat-icon>
           </button>
-          <button (click)="callStepFour" class="icon-button" color="primary" mat-mini-fab type="button">
+          <button (click)="callStepFour(true)" class="icon-button" color="primary" mat-mini-fab type="button">
             <mat-icon>arrow_downward</mat-icon>
           </button>
         </div>
@@ -502,7 +502,7 @@
           <button (click)="back" class="icon-button" color="accent" mat-mini-fab>
             <mat-icon>arrow_upward</mat-icon>
           </button>
-          <button (click)="callStepFive" [disabled]="eventGroup.invalid" class="icon-button" color="primary"
+          <button (click)="callStepFive(true)" [disabled]="eventGroup.invalid" class="icon-button" color="primary"
                   mat-mini-fab
                   type="button">
             <mat-icon>arrow_downward</mat-icon>
@@ -517,7 +517,7 @@
           <button (click)="back" class="icon-button" color="accent" mat-mini-fab>
             <mat-icon>arrow_upward</mat-icon>
           </button>
-          <button (click)="callStepSix" [disabled]="typeForm.invalid" class="icon-button" color="primary" mat-mini-fab
+          <button (click)="callStepSix(true)" [disabled]="typeForm.invalid" class="icon-button" color="primary" mat-mini-fab
                   type="button">
             <mat-icon>arrow_downward</mat-icon>
           </button>
@@ -546,7 +546,7 @@
 
 <ng-template #bigScreen>
   <div *ngIf="canCreate; else cannotCreate">
-    <mat-horizontal-stepper #stepper [linear]="true">
+    <mat-horizontal-stepper #stepper [linear]="true" (selectionChange)="triggerClick">
       <mat-step [completed]="getStepCompleted(0)" [editable]="getStepEnabled(0)" [state]="getStepName(0)"
                 [stepControl]="roomForm">
         <ng-template matStepLabel>{{ 'COMMON.ROOM.FIELD' | translate }}</ng-template>
@@ -588,7 +588,7 @@
                     type="button">
               <mat-icon>keyboard_return</mat-icon>
               {{ 'COMMON.BUTTON.BACK' | translate }}</button>
-            <button (click)="callStepTwo" [disabled]="roomForm.invalid" class="raised-button"
+            <button (click)="callStepTwo(true)" [disabled]="roomForm.invalid" class="raised-button"
                     color="primary" mat-fab extended type="button">
               {{ 'COMMON.BUTTON.NEXT' | translate }}
               <mat-icon>arrow_forward</mat-icon>
@@ -615,7 +615,7 @@
               <mat-icon>arrow_back</mat-icon>
               {{ 'COMMON.BUTTON.BACK' | translate }}</button>
           </ng-template>
-          <button (click)="callStepThree" [disabled]="treatmentForm.invalid" class="raised-button" color="primary"
+          <button (click)="callStepThree(true)" [disabled]="treatmentForm.invalid" class="raised-button" color="primary"
                   mat-fab extended type="button">
             {{ 'COMMON.BUTTON.NEXT' | translate }}
             <mat-icon>arrow_forward</mat-icon>
@@ -631,7 +631,7 @@
             <mat-icon>arrow_back</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
-          <button (click)="callStepFour" class="raised-button" color="primary" mat-fab extended type="button">
+          <button (click)="callStepFour(true)" class="raised-button" color="primary" mat-fab extended type="button">
             <mat-icon>arrow_forward</mat-icon>
             {{ 'COMMON.BUTTON.NEXT' | translate }}
           </button>
@@ -645,7 +645,7 @@
           <button (click)="back" color="accent" mat-fab extended type="button">
             <mat-icon>arrow_back</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}</button>
-          <button (click)="callStepFive" [disabled]="eventGroup.invalid" class="raised-button" color="primary"
+          <button (click)="callStepFive(true)" [disabled]="eventGroup.invalid" class="raised-button" color="primary"
                   mat-fab extended type="button">
             {{ 'COMMON.BUTTON.NEXT' | translate }}
             <mat-icon>arrow_forward</mat-icon>
@@ -660,7 +660,7 @@
           <button (click)="back" color="accent" mat-fab extended>
             <mat-icon>arrow_back</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}</button>
-          <button (click)="callStepSix" [disabled]="typeForm.invalid" class="raised-button" color="primary" mat-fab
+          <button (click)="callStepSix(true)" [disabled]="typeForm.invalid" class="raised-button" color="primary" mat-fab
                   extended type="button">
             {{ 'COMMON.BUTTON.NEXT' | translate }}
             <mat-icon>arrow_forward</mat-icon>

@@ -17,4 +17,4 @@ jobs:
           iteration-field: Sprint
           iteration: last
           new-iteration: current
-          statuses: Todo,In Progress,Blocked
+          excluded-statuses: 'Done'

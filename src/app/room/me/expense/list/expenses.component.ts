@@ -189,6 +189,8 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
       dateFilter: this.dateFilter,
       page
     };
+    this.paginatorSubscription?.unsubscribe();
+    this.paginatorSubscription = undefined;
     this.store.dispatch(
       new fromActionsExpense.GetAll(payload)
     );

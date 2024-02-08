@@ -6,7 +6,8 @@ import { AppState, selectPaymentState } from '../../../store/app.states';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { getBackIndex, getPrice, getStep, newPercentage } from '../../../util/helper';
+import { getPrice, newPercentage } from '../../../util/helper';
+import { completeAndNext, getBackIndex, getStepCall, getStepCompleted, getStepName } from '../../../util/step';
 import { IStep, Step } from '../../../interfaces/step';
 import { MatStepper } from '@angular/material/stepper';
 import { getPaymentOptions, getPayNlOptions, IPaymentOption, PaymentType } from '../../../interfaces/payment';
@@ -14,6 +15,7 @@ import { IPrice, Price } from '../../../interfaces/treatment';
 import { IReservationAll } from '../../../interfaces/reservation';
 import * as fromActionsReservation from '../../../store/reservation.actions';
 import { TranslateService } from '@ngx-translate/core';
+import { StepperSelectionEvent } from '@angular/cdk/stepper';
 
 @Component({
   selector: 'app-option',
@@ -47,7 +49,7 @@ export class OptionComponent implements OnInit, OnDestroy {
     breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small])
       .subscribe(result => this.smallScreen = result.matches);
     const preview = new Step(1, 'preview', () => this.pay);
-    const type = new Step(0, 'type', () => this.callStepTwo, preview);
+    const type = new Step(0, 'type', (goNext: boolean) => this.callStepTwo(goNext), preview);
     this.steps = [type, preview];
     this.typeForm = this.formBuilder.group({
       type: new UntypedFormControl(undefined),
@@ -59,14 +61,6 @@ export class OptionComponent implements OnInit, OnDestroy {
   get back(): void {
     this.myStepper.selectedIndex = getBackIndex(this.steps, this.myStepper.selectedIndex);
     return;
-  }
-
-  get callStepTwo(): void {
-    if (this.typeForm.invalid) {
-      return;
-    }
-
-    return this.completeAndNext();
   }
 
   get pay(): void {
@@ -91,14 +85,6 @@ export class OptionComponent implements OnInit, OnDestroy {
     return displayName ? displayName : '';
   }
 
-  private static goNext(step: IStep): void {
-    const nextStep = step.next;
-    if (nextStep && !nextStep.enable) {
-      nextStep.call();
-    }
-    return;
-  }
-
   ngOnInit(): void {
     this.route.params.subscribe(routeParams => {
       this.reservationId = routeParams.id;
@@ -112,24 +98,49 @@ export class OptionComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  keyDownHandler(event: any, form: UntypedFormControl): void {
-    if (event.code === 'Backspace') {
-      form.setValue('');
-    }
+  triggerClick(event: StepperSelectionEvent): void {
+    return getStepCall(this.steps, event.selectedIndex - 1);
   }
 
-  getStepCompleted(index: number): boolean {
-    const step = getStep(this.steps, index);
-    return !!step?.completed;
+  callStepTwo(goNext: boolean): void {
+    if (this.typeForm.invalid) {
+      return;
+    }
+
+    completeAndNext(this.steps, this.myStepper, goNext);
   }
 
   getStepName(index: number): string {
-    const step = getStep(this.steps, index);
-    return step ? step.name : '';
+    return getStepName(this.steps, index);
+  }
+
+  getStepCompleted(index: number): boolean {
+    return getStepCompleted(this.steps, index);
   }
 
   getPercentage(percentage: number): void {
     this.price = newPercentage(this.price, percentage);
+  }
+
+  private getPaymentFindByReservationId(): void {
+    this.store.dispatch(
+      new fromActionsPayment.PaymentFindByResourceId({ id: this.reservationId, path: 'reservation' })
+    );
+    this.store.dispatch(
+      new fromActionsReservation.ReservationFind({ id: this.reservationId })
+    );
+  }
+
+  private getOptions(): void {
+    this.store.dispatch(
+      new fromActionsPayment.PaymentOptions()
+    );
+  }
+
+  private clean(): void {
+    this.store.dispatch(
+      new fromActionsPayment.Clean()
+    );
   }
 
   private subscribe(): void {
@@ -167,42 +178,5 @@ export class OptionComponent implements OnInit, OnDestroy {
         this.options = getPayNlOptions(state.data);
       }
     });
-  }
-
-  private completeStep(step: IStep): void {
-    this.myStepper.next();
-    step.completed = true;
-    this.steps[step.order] = step;
-  }
-
-  private completeAndNext(): void {
-    setTimeout(() => {
-      const step = getStep(this.steps, this.myStepper.selectedIndex);
-      if (step) {
-        this.completeStep(step);
-        OptionComponent.goNext(step);
-      }
-    }, 100);
-  }
-
-  private getPaymentFindByReservationId(): void {
-    this.store.dispatch(
-      new fromActionsPayment.PaymentFindByResourceId({ id: this.reservationId, path: 'reservation' })
-    );
-    this.store.dispatch(
-      new fromActionsReservation.ReservationFind({ id: this.reservationId })
-    );
-  }
-
-  private getOptions(): void {
-    this.store.dispatch(
-      new fromActionsPayment.PaymentOptions()
-    );
-  }
-
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsPayment.Clean()
-    );
   }
 }
