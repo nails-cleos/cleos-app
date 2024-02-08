@@ -20,7 +20,6 @@ import { Router } from '@angular/router';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { requireMatch } from '../../util/validators';
 import { map, startWith } from 'rxjs/operators';
-import { getAuth, signOut } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-users',
@@ -304,7 +303,7 @@ export class SelectUserDialogComponent implements OnInit, AfterViewInit, OnDestr
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      this.users = state.users;
+      this.users = state.users?.filter((it: IUser) => it.id !== this.newUser.id);
       this.user.setValue(null);
     });
   }
