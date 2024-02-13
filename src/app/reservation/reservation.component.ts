@@ -234,7 +234,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.isDashboard = this.extras.isDashboard;
       if (this.extras.date) {
         this.date.setValue(this.extras.date);
-        this.start.setValue(getTime(this.extras.date, this.dateFormat));
+        if (this.extras.date.getMinutes() % 15 === 0 && this.extras.date.getSeconds() === 0) {
+          this.start.setValue(getTime(this.extras.date, this.dateFormat));
+        }
       }
     }
     this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
