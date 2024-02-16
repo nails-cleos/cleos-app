@@ -10,6 +10,7 @@ export interface State {
   subErrors: any;
   message: string | null;
   isLoading: boolean;
+  changes: boolean;
 }
 
 export const initialState: State = {
@@ -19,7 +20,8 @@ export const initialState: State = {
   subErrors: null,
   offices: null,
   message: null,
-  isLoading: false
+  isLoading: false,
+  changes: true
 };
 
 export const reducer = (state = initialState, action: All): State => {
@@ -27,11 +29,12 @@ export const reducer = (state = initialState, action: All): State => {
     case InvoiceActionTypes.invoiceFind: {
       return {
         ...state,
-        data: null,
+        data: [{} as IInvoice, {} as IInvoice, {} as IInvoice],
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null
+        message: null,
+        changes: true
       };
     }
     case InvoiceActionTypes.invoiceSuccess: {
@@ -41,7 +44,8 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null
+        message: null,
+        changes: true
       };
     }
     case InvoiceActionTypes.invoiceFindMyOffices: {
@@ -51,7 +55,8 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null
+        message: null,
+        changes: false
       };
     }
     case InvoiceActionTypes.invoiceOfficesSuccess: {
@@ -61,7 +66,8 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null
+        message: null,
+        changes: false
       };
     }
     case InvoiceActionTypes.invoiceFailure: {
@@ -71,7 +77,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: action.payload.error,
         subErrors: action.payload.error.subErrors,
         message: null,
-        isLoading: false
+        changes: false
       };
     }
     case InvoiceActionTypes.invoiceUpdateOffice: {
@@ -80,7 +86,8 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null
+        message: null,
+        changes: false
       };
     }
     case InvoiceActionTypes.clean: {

@@ -94,7 +94,7 @@
           <th *matHeaderCellDef mat-header-cell fxHide.lt-sm fxShow>#</th>
           <td *matCellDef="let invoice; let i = dataIndex;" mat-cell fxHide.lt-sm fxShow>
             <div *ngIf="invoice.id; else skeleton">
-              {{((paginator?.pageIndex || 0) * pageSize) + i + 1}}
+              {{i + 1}}
             </div>
             <ng-template #skeleton>
               <div class="ssc-line"></div>
@@ -185,7 +185,6 @@
         <tr *matFooterRowDef="['noContent']" [hidden]="invoices && invoices.length > 0" mat-footer-row></tr>
 
       </table>
-      <mat-paginator [pageSize]="pageSize"></mat-paginator>
     </div>
 
   </ng-template>
