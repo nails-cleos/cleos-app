@@ -104,26 +104,6 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
     }, true);
   }
 
-  private subscribe(): void {
-    this.subscription = this.getState.subscribe((stateValue) => {
-      if (stateValue.message) {
-        this.clean();
-        this.getDiscounts();
-      }
-      this.dataSource = stateValue.data?.content;
-      this.resultsLength = stateValue.data?.totalElements;
-      if (!this.paginatorSubscription && this.resultsLength) {
-        this.createPageSubscriptions();
-      }
-    });
-  }
-
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsDiscount.Clean()
-    );
-  }
-
   private createPageSubscriptions(): void {
     this.sort.sortChange.subscribe((a) => {
       if (a !== this.lastSort) {
@@ -137,6 +117,12 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cdRef.detectChanges();
   }
 
+  private clean(): void {
+    this.store.dispatch(
+      new fromActionsDiscount.Clean()
+    );
+  }
+
   private getDiscounts(page: number = 0): void {
     const payload = {
       active: this.sort.active,
@@ -147,6 +133,30 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.store.dispatch(
       new fromActionsDiscount.GetAll(payload)
     );
+  }
+
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe((stateValue) => {
+      if (stateValue.message) {
+        this.clean();
+        this.getDiscounts();
+      }
+      this.dataSource = stateValue.data?.content?.map((it: IDiscount) => {
+        let icon = '';
+        switch (it.type) {
+          case DiscountType.money:
+            icon = it.currency?.icon ?? 'euro';
+            break;
+          case DiscountType.percentage:
+            icon = 'percent';
+        }
+        return Object.assign({}, it, { icon });
+      });
+      this.resultsLength = stateValue.data?.totalElements;
+      if (!this.paginatorSubscription && this.resultsLength) {
+        this.createPageSubscriptions();
+      }
+    });
   }
 }
 

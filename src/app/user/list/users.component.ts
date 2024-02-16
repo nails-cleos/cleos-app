@@ -194,6 +194,14 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cdRef.detectChanges();
   }
 
+  private noExpanded(user: IUser): void {
+    if (this.expandedUser) {
+      this.expandedUser = undefined;
+    } else {
+      this.expandedUser = user;
+    }
+  }
+
   private getUsers(page: number = 0): void {
     const payload = {
       active: this.sort.active,
@@ -228,14 +236,6 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
         this.paginatorSubscription = undefined;
       }
     });
-  }
-
-  private noExpanded(user: IUser): void {
-    if (this.expandedUser) {
-      this.expandedUser = undefined;
-    } else {
-      this.expandedUser = user;
-    }
   }
 }
 
@@ -295,6 +295,24 @@ export class SelectUserDialogComponent implements OnInit, AfterViewInit, OnDestr
     }
   }
 
+  private createForm(): void {
+    this.userForm = this.formBuilder.group({ user: this.user });
+  }
+
+  private createFilters(): void {
+    this.filteredUser = this.user.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value ? value.name : ''),
+      map(name => name ? this.filterUser(name) : this.users ? this.users.slice() : this.users)
+    );
+  }
+
+  private filterUser(name: string): IUser[] | undefined {
+    const filterValue = name.toLowerCase();
+
+    return this.users?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
+  }
+
   private getOldUsers(): void {
     this.store.dispatch(
       new fromActionsUser.GetAllDisableUsers()
@@ -306,27 +324,6 @@ export class SelectUserDialogComponent implements OnInit, AfterViewInit, OnDestr
       this.users = state.users?.filter((it: IUser) => it.id !== this.newUser.id);
       this.user.setValue(null);
     });
-  }
-
-  private createForm(): void {
-    this.userForm = this.formBuilder.group({
-      user: this.user
-    });
-  }
-
-  private createFilters(): void {
-    this.filteredUser = this.user.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value ? value.name : ''),
-      map(name => name ? this.filterUser(
-        name) : this.users ? this.users.slice() : this.users)
-    );
-  }
-
-  private filterUser(name: string): IUser[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.users?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
   }
 }
 

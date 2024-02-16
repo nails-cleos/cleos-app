@@ -92,7 +92,7 @@ export class DashboardEffects {
   saveMonthlySummarySuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsDashboard.DashboardActionTypes.saveMonthlySummarySuccess),
     tap((data: any) => this.navigationService.reload(this.router.url.split('/'),
-      { date: data.payload.date, step: data.payload.step }))
+      { date: data.payload.date, step: data.payload.step }, null, '/main'))
   ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private router: Router,

@@ -207,6 +207,10 @@
   }
 
   @if $isDark {
+    .newWeek {
+      border-bottom: 3px groove mat.get-color-from-palette($primary-palette, A700);
+    }
+
     #experiences {
       background-color: #e1d0cb;
 
@@ -282,6 +286,9 @@
       color: black;
     }
   } @else {
+    .newWeek {
+      border-bottom: 3px groove mat.get-color-from-palette($primary-palette, 700);
+    }
     #experiences {
       background-color: #7e7769;
 
@@ -371,32 +378,6 @@
 
   mat-header-cell, mat-cell {
     border-bottom-color: mat.get-color-from-palette($background, hover);
-  }
-
-  @if $isDark {
-    .first {
-      border-bottom: 3px groove mat.get-color-from-palette($primary-palette, A700);
-    }
-
-    .second {
-      border-bottom: 3px groove mat.get-color-from-palette($primary-palette, A700);
-    }
-
-    .third {
-      border-bottom: 3px groove mat.get-color-from-palette($primary-palette, A700);
-    }
-  } @else {
-    .first {
-      border-bottom: 3px groove mat.get-color-from-palette($primary-palette, 700);
-    }
-
-    .second {
-      border-bottom: 3px groove mat.get-color-from-palette($primary-palette, 700);
-    }
-
-    .third {
-      border-bottom: 3px groove mat.get-color-from-palette($primary-palette, 700);
-    }
   }
 
   // Time picker

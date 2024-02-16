@@ -364,7 +364,7 @@ export const monthTitle = (date: Date, locale: string, measure: 'long' | 'short'
 }).replace(/^\w/, (c) => c.toUpperCase());
 
 export const invoiceTitle = (date: Date): string => date.toLocaleDateString(API_LOCALE, {
-  year: 'numeric', month: '2-digit'
+  year: 'numeric', month: '2-digit', day: '2-digit'
 });
 
 export const columnHeader = (date: Date, locale: string = 'en'): string => date.toLocaleDateString(locale, {
@@ -675,4 +675,22 @@ export const getDateFormat = (date?: Date | null): string => {
   const year = date.getFullYear();
 
   return `${ month }-${ year }`;
+};
+
+export const datesInSameWeek = (date1: Date, date2: Date): boolean => {
+  // Copy dates so don't modify originals
+  const copyDate1 = new Date(date1.getTime());
+  const copyDate2 = new Date(date2.getTime());
+
+  // Set to nearest Thursday: current date + 4 - current day number
+  // Make Sunday's day number 7
+  copyDate1.setDate(copyDate1.getDate() + 4 - (copyDate1.getDay() || 7));
+  copyDate2.setDate(copyDate2.getDate() + 4 - (copyDate2.getDay() || 7));
+
+  const dayDiff1 = Math.ceil((copyDate1.getTime() - new Date(copyDate1.getFullYear(), 0, 1).getTime()) / (86400000));
+  const dayDiff2 = Math.ceil((copyDate2.getTime() - new Date(copyDate2.getFullYear(), 0, 1).getTime()) / (86400000));
+
+  // Check if the dates are in the same week by comparing year and week number
+  return copyDate1.getFullYear() === copyDate2.getFullYear() &&
+    Math.ceil(dayDiff1 / 7) === Math.ceil(dayDiff2 / 7);
 };

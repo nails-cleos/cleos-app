@@ -31,8 +31,8 @@ export class NavigationService {
     }
   }
 
-  reload(url: string[], data?: any, queryParams?: any): void {
-    this.router.navigateByUrl('/auth/redirect', { skipLocationChange: true }).then(() =>
+  reload(url: string[], data?: any, queryParams?: any, reloadURL = '/auth/redirect'): void {
+    this.router.navigateByUrl(reloadURL, { skipLocationChange: true }).then(() =>
       this.router.navigate(url.filter(path => path), { state: data, queryParams }));
   }
 

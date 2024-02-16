@@ -5,10 +5,9 @@ import { AppState, selectInvoiceState } from '../store/app.states';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import * as fromActionsInvoice from '../store/invoice.actions';
-import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../interfaces/pagination';
-import { backendFormatDate, newDateTimestamp } from '../util/dates';
+import { backendFormatDate, datesInSameWeek, newDateTimestamp } from '../util/dates';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { PaymentType, PaymentTypeKey } from '../interfaces/payment';
 import { map, startWith } from 'rxjs/operators';
@@ -22,7 +21,7 @@ import { IInvoice } from '../interfaces/invoice';
 import { IOffice, IOfficeAll, Office } from '../interfaces/office';
 import { pdf } from '../util/invoice';
 import { requireMatch } from '../util/validators';
-import { QuarterPeriodAdapter } from '../util/adapter/quarter-period.adapter';
+import { MonthPeriodAdapter } from '../util/adapter/month-period-adapter.service';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -34,13 +33,12 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
   providers: [
     {
       provide: MAT_DATE_RANGE_SELECTION_STRATEGY,
-      useClass: QuarterPeriodAdapter,
+      useClass: MonthPeriodAdapter,
     },
   ]
 })
 export class InvoiceComponent implements OnInit, OnDestroy {
   @ViewChild('pdfTable') pdfTable!: ElementRef;
-  @ViewChild(MatPaginator) paginator?: MatPaginator;
   @ViewChild('typeInput') typeInput!: ElementRef<HTMLInputElement>;
 
   displayedColumns: string[] = ['select', 'position', 'customer', 'timestamp', 'treatment', 'actions'];
@@ -209,44 +207,21 @@ export class InvoiceComponent implements OnInit, OnDestroy {
     });
   }
 
-  private subscribe(): void {
-    this.subscription = this.getState.subscribe(state => {
-      this.offices = state.offices;
-      if (this.offices?.length === 1) {
-        this.office.setValue(this.offices[0]);
-      }
-      if (state.data) {
-        this.invoices = state.data.map((invoice: IInvoice, position: number) => {
-          if (invoice.id) {
-            const month = newDateTimestamp(invoice.timestamp, invoice.room.timeZone).getMonth();
-            let order;
-            if (position + 1 < state.data.length) {
-              const nextRow = state.data[position + 1];
-              const nextMonth = newDateTimestamp(nextRow.timestamp, nextRow.room.timeZone).getMonth();
-              if (nextMonth !== month) {
-                if (month - this.startDate.value.getMonth() === 0) {
-                  order = 'first';
-                } else {
-                  order = 'second';
-                }
-              }
-            } else {
-              order = 'third';
-            }
-            return Object.assign({}, invoice, { position, order });
-          }
-          return invoice;
-        });
-        this.dataSource = new MatTableDataSource(this.invoices);
-        if (this.invoices && this.invoices[0]?.id) {
-          this.dataSource.paginator = this.paginator;
-        }
-      }
-    });
+  private filterTypes(value: string): string[] {
+    const filterValue = value.toLowerCase();
+
+    return this.allPaymentTypes.filter(state => state.toLowerCase().indexOf(filterValue) === 0);
+  }
+
+  private filterOffice(name: string): IOfficeAll[] | undefined {
+    const filterValue = name.toLowerCase();
+
+    return this.offices?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 
   private findInvoices(): void {
     if (this.startDate.value && this.endDate.value) {
+      this.selection.clear();
       const payload = {
         officeId: this.office.value.id,
         types: this.types,
@@ -271,15 +246,30 @@ export class InvoiceComponent implements OnInit, OnDestroy {
     );
   }
 
-  private filterTypes(value: string): string[] {
-    const filterValue = value.toLowerCase();
-
-    return this.allPaymentTypes.filter(state => state.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-  private filterOffice(name: string): IOfficeAll[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.offices?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
+  private subscribe(): void {
+    this.subscription = this.getState.subscribe(state => {
+      this.offices = state.offices;
+      if (this.offices?.length === 1) {
+        this.office.setValue(this.offices[0]);
+      }
+      if (state.changes) {
+        this.invoices = state.data?.map((invoice: IInvoice, position: number) => {
+          if (invoice.id) {
+            const date1 = newDateTimestamp(invoice.timestamp, invoice.room.timeZone);
+            let order;
+            if (position + 1 < state.data.length) {
+              const nextRow = state.data[position + 1];
+              const date2 = newDateTimestamp(nextRow.timestamp, nextRow.room.timeZone);
+              if (!datesInSameWeek(date1, date2)) {
+                order = 'newWeek';
+              }
+            }
+            return Object.assign({}, invoice, { position, order });
+          }
+          return invoice;
+        });
+        this.dataSource = new MatTableDataSource(this.invoices);
+      }
+    });
   }
 }

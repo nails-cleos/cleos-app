@@ -1,5 +1,4 @@
 import { IUserAll } from './user';
-import { IRoomAll } from './room';
 
 export interface IItem {
   key?: string;
@@ -29,10 +28,18 @@ export interface IDiscount {
 export interface IInvoice {
   id: string;
   customer: IUserAll;
-  room: IRoomAll;
+  room: IRoomInvoice;
   items: IItem[];
   timestamp: number;
   totals: ITotals;
   discount: IDiscount;
   position: number;
+}
+
+export interface IRoomInvoice {
+  timeZone: string;
+  currencyCode: string;
+  addressName: string;
+  phone: string;
+  email: string;
 }
