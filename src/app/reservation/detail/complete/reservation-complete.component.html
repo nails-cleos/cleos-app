@@ -6,7 +6,8 @@
           <mat-card-header>
             <mat-card-title>{{ 'RESERVATION.CUSTOMER.DETAIL' | translate }}</mat-card-title>
             <mat-card-subtitle
-              *ngIf="reservation; else skeleton">{{reservation.customer.displayName}}</mat-card-subtitle>
+              *ngIf="reservation; else skeleton">{{ reservation.customer.displayName }}
+            </mat-card-subtitle>
             <ng-template #skeleton>
               <div class="ssc-line"></div>
             </ng-template>
@@ -21,7 +22,7 @@
                 </label>
                 <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
                   <mat-option *ngFor="let group of filteredGroup | async" [value]="group">
-                    {{group.name}}
+                    {{ group.name }}
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="group.hasError('required')"
@@ -41,7 +42,7 @@
                   </label>
                   <mat-autocomplete #autoTreatment="matAutocomplete" [displayWith]="displayFnTreatment">
                     <mat-option *ngFor="let treatment of filteredTreatment | async" [value]="treatment">
-                      {{treatment.name}}
+                      {{ treatment.name }}
                     </mat-option>
                   </mat-autocomplete>
                   <mat-icon matSuffix>spa</mat-icon>
@@ -62,7 +63,7 @@
                   </label>
                   <mat-autocomplete #autoColor="matAutocomplete" [displayWith]="displayFnColor">
                     <mat-option *ngFor="let color of filteredColor | async" [value]="color">
-                      {{color.name}}
+                      {{ color.name }}
                     </mat-option>
                   </mat-autocomplete>
                   <mat-icon matSuffix>palette</mat-icon>
@@ -76,11 +77,11 @@
                 <label>
                   <textarea #message [formControl]="description" matInput maxlength="256"></textarea>
                 </label>
-                <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
+                <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
               </mat-form-field>
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'RESERVATION.TREATMENT.EXTRAS.PRICE' | translate }}</mat-label>
-                <span matPrefix><mat-icon matPrefix>{{reservation.room.currency.icon}}</mat-icon> &nbsp;</span>
+                <span matPrefix><mat-icon matPrefix>{{ reservation.room.currency.icon }}</mat-icon> &nbsp;</span>
                 <label>
                   <input [formControl]="extraPrice" matInput type="number">
                 </label>
@@ -93,7 +94,7 @@
                            readonly required style="text-align: center;"/>
                   </label>
                   <span matPrefix class="bold" style="margin: 0 5px 0 10px;">
-                  {{startDate | timeDetail | date:'shortDate':reservation.room.timeZone:dateFormat}}
+                  {{ startDate | timeDetail | date:'shortDate':reservation.room.timeZone:dateFormat }}
                 </span>
                   <mat-icon (click)="tStart.open()" matSuffix>schedule</mat-icon>
                   <ngx-material-timepicker #tStart (timeSet)="timeChange($event, startDate)"></ngx-material-timepicker>
@@ -108,7 +109,7 @@
                            required style="text-align: center;"/>
                   </label>
                   <span matPrefix class="bold" style="margin: 0 5px 0 10px;">
-                  {{endDate | timeDetail | date:'shortDate':reservation.room.timeZone:dateFormat}}
+                  {{ endDate | timeDetail | date:'shortDate':reservation.room.timeZone:dateFormat }}
                 </span>
                   <mat-icon (click)="tEnd.open()" matSuffix>schedule</mat-icon>
                   <ngx-material-timepicker #tEnd (timeSet)="timeChange($event, endDate)"></ngx-material-timepicker>
@@ -124,7 +125,7 @@
                 <ng-template [ngIf]="group.value && treatment.value">
                   <mat-list-item>
                     <mat-icon matListItemIcon>spa</mat-icon>
-                    <div class="bold" matListItemTitle>{{ 'COMMON.TREATMENT.FIELD' | translate}}</div>
+                    <div class="bold" matListItemTitle>{{ 'COMMON.TREATMENT.FIELD' | translate }}</div>
                   </mat-list-item>
                   <mat-list-item style="text-align: center">
                     <div [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.GROUP' | translate: {name: group.value.name}"
@@ -142,77 +143,33 @@
                     <div matListItemTitle>
                       <span [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.PRICE' | translate"></span>
                       <span
-                        class="vertical-divider bold"> {{reservation.room.currency | currencySymbol}} {{price.amount | number:'1.2-2'}}</span>
+                        class="vertical-divider bold"> {{ reservation.room.currency | currencySymbol }} {{ price.amount | number:'1.2-2' }}</span>
                     </div>
                   </mat-list-item>
                 </ng-template>
                 <ng-template [ngIf]="additionalList && additionalList.length">
                   <mat-list-item>
                     <mat-icon matListItemIcon>add_post</mat-icon>
-                    <div class="bold" matListItemTitle>{{ 'COMMON.ADDITIONAL.FIELD' | translate}}</div>
+                    <div class="bold" matListItemTitle>{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</div>
                   </mat-list-item>
-                  <mat-list-item>
                     <mat-selection-list #additional (selectionChange)="onChange(additional.selectedOptions.selected)">
                       <mat-list-option *ngFor="let it of additionalList" [selected]="isSelected(it)" [value]="it"
-                                       checkboxPosition="before">
-                        <div matListItemLine>{{it.name}}</div>
+                                       togglePosition="before">
+                        <div matListItemLine>{{ it.name }}</div>
                         <div matListItemLine>
                           <span>
-                            {{reservation.room.currency | currencySymbol}} {{it.price | number:'1.2-2'}}
+                            {{ reservation.room.currency | currencySymbol }} {{ it.price | number:'1.2-2' }}
                           </span>
                           &nbsp;&#9202;
-                          <span>{{it.duration | durationTime}}</span>
+                          <span>{{ it.duration | durationTime }}</span>
                         </div>
                       </mat-list-option>
                     </mat-selection-list>
-                  </mat-list-item>
                 </ng-template>
                 <mat-divider></mat-divider>
-                <mat-list-item>
-                  <div mat-line>
-                    <span [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.TOTAL' | translate"></span>
-                    <ng-template [ngIf]="price.priceWithDiscount" [ngIfElse]="noDiscount">
-                      <span [class.strikethrough]="price.discount" class="vertical-divider">
-                        {{reservation.room.currency | currencySymbol}} {{price.totalWithoutDiscount | number:'1.2-2'}}
-                      </span>
-                      <span [@discountAnimation] class="vertical-divider bold">
-                        {{reservation.room.currency | currencySymbol}} {{price.total | number:'1.2-2'}}
-                      </span>
-                    </ng-template>
-                    <ng-template #noDiscount>
-                      <span class="raised-button">
-                        {{reservation.room.currency | currencySymbol}} {{price.total | number:'1.2-2'}}
-                      </span>
-                    </ng-template>
-                  </div>
-                </mat-list-item>
-                <ng-template [ngIf]="!price.isPaid && (price.balance || price.totalPaid)">
-                  <ng-template [ngIf]="price.totalPaid">
-                    <mat-list-item>
-                      <div matListItemLine [innerHTML]="'COMMON.PAYMENT.OPTIONS.PAID' | translate: {
-                         amount: price.totalPaid | number:'1.2-2',
-                         symbol: reservation.room.currency | currencySymbol
-                         }">
-                      </div>
-                    </mat-list-item>
-                  </ng-template>
-                  <ng-template [ngIf]="price.balance">
-                    <mat-list-item>
-                      <div matListItemLine [innerHTML]="'COMMON.PAYMENT.OPTIONS.ACCOUNT' | translate: {
-                         amount: price.balance | number:'1.2-2',
-                         symbol: reservation.room.currency | currencySymbol
-                         }">
-                      </div>
-                    </mat-list-item>
-                  </ng-template>
-                  <mat-list-item>
-                    <div matListItemLine [innerHTML]="'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate: {
-                         amount: price.toPaid - price.totalPaid - price.balance | number:'1.2-2',
-                         symbol: reservation.room.currency | currencySymbol
-                         }">
-                    </div>
-                  </mat-list-item>
-                </ng-template>
+                <app-price-preview [price]="price" [currencyIcon]="reservation.room.currency.icon" [isEditing]="false"
+                                   [label]="'RESERVATION.TREATMENT.COMPLETE.TOTAL'">
+                </app-price-preview>
               </mat-list>
               <ng-template [ngIf]="!price.isPaid">
                 <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
@@ -247,9 +204,11 @@
           <mat-card-actions *ngIf="reservation; else buttonSkeleton">
             <div fxFlex></div>
             <button appBackButton color="accent" mat-fab extended class="icon-button"
-                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
+            </button>
             <button [disabled]="group.invalid || treatment.invalid" cdkFocusInitial color="primary"
-                    mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.COMPLETE' | translate }}</button>
+                    mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.COMPLETE' | translate }}
+            </button>
           </mat-card-actions>
           <ng-template #buttonSkeleton>
             <div class="ssc-head-line"></div>

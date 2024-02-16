@@ -1,18 +1,16 @@
 <ng-template [ngIf]="price">
-  <mat-list-item *ngIf="price.total">
-    <mat-icon matListItemIcon>{{currencyIcon}}</mat-icon>
-    <div matListItemTitle>{{ label | translate}}</div>
-    <ng-template [ngIf]="price.priceWithDiscount" [ngIfElse]="noDiscount">
-      <ng-template [ngIf]="!isEditing" [ngIfElse]="editing">
+  <mat-list-item *ngIf="price.total || price.total === 0">
+    <mat-icon style="margin-top: 32px" matListItemIcon>{{currencyIcon}}</mat-icon>
+    <div matListItemTitle [innerHTML]="label | translate"></div>
+    <ng-container *ngIf="price.total !== price.totalWithoutDiscount; else noDiscount">
+      <ng-container *ngIf="!isEditing; else editing">
         <div matListItemLine>
-        <span [class.strikethrough]="price.discount">
-          {{price.totalWithoutDiscount | number:'1.2-2'}}
-        </span>
-          <span [@discountAnimation] class="raised-button bold">
-          {{price.total | number:'1.2-2'}}
-        </span>
+          <span [class.strikethrough]="price.discount">
+            {{price.totalWithoutDiscount | number:'1.2-2'}}
+          </span>
+          <span @discountAnimation class="raised-button bold">{{price.total | number:'1.2-2'}}</span>
         </div>
-      </ng-template>
+      </ng-container>
       <ng-template #editing>
         <div matListItemLine>
           <span>{{price.total | number:'1.2-2'}}</span>
@@ -21,7 +19,7 @@
         </span>
         </div>
       </ng-template>
-    </ng-template>
+    </ng-container>
     <ng-template #noDiscount>
       <div matListItemLine>{{price.total | number:'1.2-2'}}</div>
     </ng-template>

@@ -4,7 +4,7 @@
     <ng-container matColumnDef="position">
       <th *matHeaderCellDef mat-header-cell>#</th>
       <td *matCellDef="let discount; let i = dataIndex;" mat-cell>
-        <div *ngIf="discount.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
+        <div *ngIf="discount.id; else skeleton">{{ (paginator.pageIndex * pageSize) + i + 1 }}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
@@ -14,7 +14,7 @@
     <ng-container matColumnDef="name">
       <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
       <td *matCellDef="let discount" mat-cell>
-        <div *ngIf="discount.id; else skeleton">{{discount.name}}</div>
+        <div *ngIf="discount.id; else skeleton">{{ discount.name }}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
@@ -24,7 +24,7 @@
     <ng-container matColumnDef="description">
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
       <td *matCellDef="let discount" fxHide.lt-sm fxShow mat-cell>
-        <div *ngIf="discount.id; else skeleton">{{discount.description}}</div>
+        <div *ngIf="discount.id; else skeleton">{{ discount.description }}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
@@ -34,7 +34,7 @@
     <ng-container matColumnDef="type">
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
       <td *matCellDef="let discount" fxHide.lt-sm fxShow mat-cell>
-        <div *ngIf="discount.id; else skeleton">{{ 'COMMON.DISCOUNT.' + discount.type | translate}}</div>
+        <div *ngIf="discount.id; else skeleton">{{ 'COMMON.DISCOUNT.' + discount.type | translate }}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
@@ -45,8 +45,14 @@
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
       <td *matCellDef="let discount" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="discount.id; else skeleton">
-          <mat-icon *ngIf="discount.currency" matPrefix>{{discount.currency.icon}}</mat-icon>&nbsp;
-          {{discount.amount}}
+          <ng-template [ngIf]="discount.type === 'PERCENTAGE'" [ngIfElse]="money">
+            <span class="icon-text">{{ discount.amount | number:'1.2-2' }}</span>
+            <mat-icon class="icon-text" matSuffix>percent</mat-icon>&nbsp;
+          </ng-template>
+          <ng-template #money>
+            <mat-icon class="icon-text" *ngIf="discount.currency" matPrefix>{{ discount.currency.icon }}</mat-icon>&nbsp;
+            <span class="icon-text">{{ discount.amount| number:'1.2-2' }}</span>
+          </ng-template>
         </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -83,12 +89,12 @@
           <mat-list>
             <div mat-subheader>{{ 'COMMON.COLUMN.TYPE' | translate }}</div>
             <mat-list-item role="list">
-              <div mat-line>{{ 'COMMON.DISCOUNT.' + discount.type | translate}}</div>
+              <div mat-line>{{ 'COMMON.DISCOUNT.' + discount.type | translate }}</div>
             </mat-list-item>
             <div mat-subheader>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</div>
             <mat-list-item role="list">
-              <mat-icon *ngIf="discount.currency" matListItemIcon>{{discount.currency.icon}}</mat-icon>
-              <div mat-line>{{discount.amount}}</div>
+              <mat-icon *ngIf="discount.currency" matListItemIcon>{{ discount.currency.icon }}</mat-icon>
+              <div mat-line>{{ discount.amount }}</div>
             </mat-list-item>
             <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
             <mat-list-item role="list">
@@ -109,7 +115,8 @@
 
     <ng-container matColumnDef="noContent">
       <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-        {{ 'DISCOUNT.LIST.ERROR.NO_CONTENT' | translate }}</td>
+        {{ 'DISCOUNT.LIST.ERROR.NO_CONTENT' | translate }}
+      </td>
     </ng-container>
 
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
