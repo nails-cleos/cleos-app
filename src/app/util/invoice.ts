@@ -1,7 +1,6 @@
-import { IRoomAll } from '../interfaces/room';
 import { IUserAll } from '../interfaces/user';
 import { currencySymbol } from './helper';
-import { IInvoice, IItem, ITotals } from '../interfaces/invoice';
+import { IInvoice, IItem, IRoomInvoice, ITotals } from '../interfaces/invoice';
 import { API_LOCALE, dayViewTitle, invoiceTitle, newDateTimestamp } from './dates';
 import { environment } from '../../environments/environment';
 import { IOfficeAll } from '../interfaces/office';
@@ -75,10 +74,11 @@ const fromTo = (): any => ({
   ]
 });
 
-const companyName = (room: IRoomAll, titleAddress: string, titlePhone: string, titleEmail: string, billAddress?: string): any => {
-  const phone = room.office.manager?.phone || '';
-  const email = room.office.manager?.email || '';
-  const address = billAddress || room.address.name;
+const companyName = (room: IRoomInvoice, titleAddress: string, titlePhone: string, titleEmail: string,
+                     billAddress?: string): any => {
+  const phone = room.phone || '';
+  const email = room.email || '';
+  const address = billAddress || room.addressName;
   return [{
     columns: [
       createField(titleAddress, 80, 'left', '#333333', [0, 0, 0, 5]),
@@ -237,7 +237,7 @@ export const pdf = (invoices: IInvoice[], office: IOfficeAll, start: number, sta
     const titleBTWNr = 'BTW nr';
     const header = createHeader(index, titleDate, date, titleSubject, office.subject, titleKVK, office.kvk, titleAccount, office.account,
       titleBTWNr, office.btw);
-    const currency = currencySymbol(invoice.room.currency);
+    const currency = currencySymbol(invoice.room.currencyCode);
 
     const titleDescription = 'ITEM DESCRIPTION';
     const titleItem = 'ITEM \n (excl. btw)';
