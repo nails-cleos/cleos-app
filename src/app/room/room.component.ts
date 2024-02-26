@@ -7,7 +7,6 @@ import * as fromActionsRoom from '../store/room.actions';
 import { AvailabilityDate, IAvailability, IAvailabilityDate, IRoom, IRoomAll, Room } from '../interfaces/room';
 import { IUser, IUserAll } from '../interfaces/user';
 import { map, startWith } from 'rxjs/operators';
-import { TranslateService } from '@ngx-translate/core';
 import { requireMatch, valueChange } from '../util/validators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Role } from '../interfaces/token';
@@ -96,8 +95,8 @@ export class RoomComponent implements OnInit, OnDestroy {
   private currentPaymentTypes: string[] = [];
   private currentProfessionalIds: string[] = [];
 
-  constructor(private readonly translate: TranslateService, private store: Store<AppState>, private route: ActivatedRoute,
-              private formBuilder: UntypedFormBuilder, private router: Router) {
+  constructor(private store: Store<AppState>, private route: ActivatedRoute, private formBuilder: UntypedFormBuilder,
+              private router: Router) {
     this.isAddMode = true;
     this.primary = false;
     this.today = createDate();
@@ -171,18 +170,20 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.id = id;
-    }
+    this.route.paramMap.subscribe(param => {
+      const id = param.get('id');
+      if (id) {
+        this.id = id;
+      }
+      this.isAddMode = !this.id;
+      if (!this.isAddMode) {
+        this.getRoom();
+      }
+      this.getRoomInfo(); // TODO needs manager role
+    });
     this.createForm();
     this.clean();
     this.subscribe();
-    this.isAddMode = !this.id;
-    if (!this.isAddMode) {
-      this.getRoom();
-    }
-    this.getRoomInfo(); // TODO needs manager role
   }
 
   ngOnDestroy(): void {
