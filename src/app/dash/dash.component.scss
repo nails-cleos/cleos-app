@@ -28,3 +28,19 @@
   vertical-align: baseline;
   border-radius: var(--bs-badge-border-radius);
 }
+
+.spinner:before {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  margin-left: -10px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  border-top-color: #000;
+  animation: spinner .8s linear infinite;
+}

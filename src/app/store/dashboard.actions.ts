@@ -14,6 +14,8 @@ export enum DashboardActionTypes {
   saveMonthlySummarySuccess = '[Dash] Save monthly summary success',
   yearSummary = '[Dash] Get year summary',
   yearSummarySuccess = '[Dash] Year summary success',
+  yearExport = '[Dash] Get year export',
+  yearExportSuccess = '[Dash] Year export success',
   quarterSummary = '[Dash] Get quarter summary',
   quarterSummarySuccess = '[Dash] Quarter summary success',
   clean = '[Dash] Clean'
@@ -110,6 +112,20 @@ export class YearSummarySuccess implements Action {
   }
 }
 
+export class GetYearExport implements Action {
+  readonly type = DashboardActionTypes.yearExport;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class YearExportSuccess implements Action {
+  readonly type = DashboardActionTypes.yearExportSuccess;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class GetQuarterSummary implements Action {
   readonly type = DashboardActionTypes.quarterSummary;
 
@@ -144,4 +160,6 @@ export type All =
   | YearSummarySuccess
   | GetQuarterSummary
   | QuarterSummarySuccess
+  | GetYearExport
+  | YearExportSuccess
   | Clean;
