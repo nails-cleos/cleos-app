@@ -1,6 +1,6 @@
 import { All, DashboardActionTypes } from '../dashboard.actions';
 import {
-  IDashboard,
+  IDashboard, IMonthlyExport,
   IMonthlyRoomSummary,
   IMonthlySummaryExpense,
   IMonthlySummarySale,
@@ -9,7 +9,7 @@ import {
   IQuarterSummary,
   IRoomEvents,
   ISummaryRoom,
-  ISummaryTotal,
+  ISummaryTotal, IYearRoomExport,
   IYearRoomSummary,
   MonthSummary,
   QuarterSummary
@@ -22,6 +22,7 @@ export interface State {
     { summarySale: IMonthlySummarySale[]; summaryCashSale: IMonthlySummarySale[]; summaryExpenses: IMonthlySummaryExpense[] }> | null;
   yearSummaryMap: Map<ISummaryRoom, { quarterSummaries: IQuarterSummary[] }> | null;
   quarterSummaryMap: Map<ISummaryRoom, { monthSummaries: IMonthSummary[] }> | null;
+  yearExport: any | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -35,6 +36,7 @@ const initialState: State = {
   monthlySummaryMap: null,
   yearSummaryMap: null,
   quarterSummaryMap: null,
+  yearExport: null,
   errorMessage: null,
   error: null,
   subErrors: null,
@@ -99,6 +101,21 @@ const monthSummaryMap = (summaries: IMonthlyRoomSummary[]) => summaries.reduce((
   summarySale: IMonthlySummarySale[];
   summaryExpenses: IMonthlySummaryExpense[];
   summaryCashSale: IMonthlySummarySale[];
+}>());
+
+const yearExportMap = (summaries: IYearRoomExport[]) => summaries.reduce((map, summary) => {
+  map.set({
+    roomId: summary.roomId,
+    roomName: summary.roomName,
+    currency: summary.currency,
+    timeZone: summary.timeZone,
+    primary: summary.primary
+  }, {
+    monthlyExport: summary.monthExportResponse
+  });
+  return map;
+}, new Map<ISummaryRoom, {
+  monthlyExport: IMonthlyExport[];
 }>());
 
 const emptySummaryTotal = (type: string): ISummaryTotal => ({ type, net: 0, btw: 0, gross: 0 } as ISummaryTotal);
@@ -276,6 +293,7 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         yearSummaryMap: null,
+        yearExport: null,
         errorMessage: null,
         error: null,
         subErrors: null,
@@ -286,6 +304,26 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         yearSummaryMap: yearSummaryMap(action.payload),
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: null
+      };
+    }
+    case DashboardActionTypes.yearExport: {
+      return {
+        ...state,
+        yearExport: null,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: null
+      };
+    }
+    case DashboardActionTypes.yearExportSuccess: {
+      return {
+        ...state,
+        yearExport: yearExportMap(action.payload),
         errorMessage: null,
         error: null,
         subErrors: null,

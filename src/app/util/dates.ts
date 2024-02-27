@@ -1,6 +1,7 @@
 import { IAvailability, IAvailabilityAll, IRoom, IRoomAll } from '../interfaces/room';
 import {
-  addDays, addMinutes,
+  addDays,
+  addMinutes,
   addMonths,
   addWeeks,
   endOfDay,
@@ -379,13 +380,17 @@ export const formatDateHourMinute = (date: Date, locale: string = 'en'): string 
   hour: '2-digit', minute: '2-digit'
 }).replace(/^\w/, (c) => c.toUpperCase());
 
-export const formatDateTwoDigit = (date: Date, locale: string): string => date.toLocaleDateString(locale, {
-  day: '2-digit', month: '2-digit', year: '2-digit'
-});
+export const formatDateTwoDigit = (date: Date, locale: string, timeZone: string = getCurrentTimeZone()): string =>
+  date.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: '2-digit', timeZone });
 
 export const backendFormatDate = (date?: Date): string | undefined => date?.toLocaleDateString(API_LOCALE, {
   day: '2-digit', month: '2-digit', year: 'numeric'
 })?.replace(/\//g, '-');
+
+export const exportFormatDate = (date: Date, locale: string = API_LOCALE, timeZone: string = getCurrentTimeZone()):
+  string => date.toLocaleDateString(locale, {
+  day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone
+}).replace(/\//g, '-').replace(',', '');
 
 export const formatDuration = (duration: string, locale: string = API_LOCALE): string => {
   const d: IDuration = convertDuration(duration);
@@ -433,6 +438,9 @@ export const zoneDateToDate = (value: number = 0, timeZone: string = getCurrentT
 
 export const dateToUTC = (date: Date, timeZone: string = getCurrentTimeZone()): Date => zonedTimeToUtc(date, timeZone);
 
+export const createNewDateZonedTime = (date: string | Date | number, timeZone: string = getCurrentTimeZone(), hour: number = 0,
+                                       minute: number = 0, second: number = 0, milli: number = 0): Date =>
+  utcToZonedTime(createNewDate(newDateTimestamp(date), hour, minute, second, milli), timeZone);
 export const createNewDate = (date: Date, hour: number = 0, minute: number = 0, second: number = 0,
                               milli: number = 0): Date => {
   const d = new Date(date);

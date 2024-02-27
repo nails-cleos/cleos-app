@@ -209,7 +209,7 @@
           <button fxHide.lt-sm fxShow (click)="exportCVS(reservationTableData, type.payment)" color="accent" mat-fab
                   extended [disabled]="!summaryReservations?.length" class="icon-button">
             <mat-icon>file_download</mat-icon>
-            <span>{{'COMMON.BUTTON.EXPORT' | translate}}</span>
+            <span>{{'COMMON.BUTTON.SAVE_EXPORT' | translate}}</span>
           </button>
         </mat-action-row>
       </ng-template>
@@ -312,7 +312,7 @@
                   extended
                   class="icon-button" [disabled]="!summaryExpenses?.length">
             <mat-icon>file_download</mat-icon>
-            <span>{{'COMMON.BUTTON.EXPORT' | translate}}</span>
+            <span>{{'COMMON.BUTTON.SAVE_EXPORT' | translate}}</span>
           </button>
         </mat-action-row>
       </ng-template>
@@ -430,7 +430,7 @@
             <button fxHide.lt-sm fxShow (click)="exportCVS(cashTableData, type.cash)" color="accent" mat-fab
                     extended [disabled]="!summaryCash?.length" class="icon-button">
               <mat-icon>file_download</mat-icon>
-              <span>{{'COMMON.BUTTON.EXPORT' | translate}}</span>
+              <span>{{'COMMON.BUTTON.SAVE_EXPORT' | translate}}</span>
             </button>
           </mat-action-row>
         </ng-template>

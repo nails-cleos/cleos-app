@@ -10,6 +10,7 @@ import { dateMonthYear, getNow } from '../../util/dates';
 import { AppState, selectDashboardState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
 import {
+  IMonthlyExport,
   IQuarterSummary,
   ISummaryRoom,
   ISummaryTotal,
@@ -22,8 +23,10 @@ import {
 import * as fromActionsDashboard from '../../store/dashboard.actions';
 import { Router } from '@angular/router';
 import { AuthUserService } from '../../services/auth-user.service';
-import { allElementsHaveSameKeyFilterValue } from '../../util/helper';
+import { allElementsHaveSameKeyFilterValue, currencySymbol } from '../../util/helper';
 import { ICurrencyAll } from '../../interfaces/currency';
+import { createWorkbook } from '../../util/report';
+import fs from 'file-saver';
 
 @Component({
   selector: 'app-year-summary',
@@ -36,14 +39,20 @@ import { ICurrencyAll } from '../../interfaces/currency';
 export class YearSummaryComponent implements OnInit, OnDestroy {
   date = new FormControl<Date | null>(null);
   selectedRoom = new UntypedFormControl();
+  yearExport?: Map<ISummaryRoom, { monthlyExport: IMonthlyExport[] }>;
   yearSummaryMap?: Map<ISummaryRoom, { quarterSummaries: IQuarterSummary[] }>;
   quarterSummaries?: IQuarterSummary[];
+  sheetData: IMonthlyExport[] = [];
 
+  export = false;
+  isExportLoading = false;
   isLoading = false;
   primaryRoom?: ISummaryRoom;
   currency?: ICurrencyAll;
+  timeZone?: string;
   yearSummaryTotals: ISummaryTotals = new SummaryTotals();
   showCash: boolean;
+  userName?: string;
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe([
     Breakpoints.XSmall,
@@ -60,7 +69,21 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     this.getState = this.store.select(selectDashboardState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
     this.showCash = false;
-    this.authUserService.authUser.subscribe(value => this.showCash = value.showCash);
+    this.authUserService.authUser.subscribe(value => {
+      this.userName = value.displayName;
+      this.showCash = value.showCash;
+    });
+  }
+
+  get exportAction(): void {
+    if (this.date.value) {
+      if (this.export) {
+        this.exportToExcel();
+      } else {
+        this.getExportData(this.date.value.getFullYear());
+      }
+    }
+    return;
   }
 
   ngOnInit(): void {
@@ -92,6 +115,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     this.selectedRoom.valueChanges.subscribe(value => {
       if (value) {
         this.createData();
+        this.createExportData();
       }
     });
     this.date.valueChanges.subscribe(value => {
@@ -106,6 +130,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     if (room) {
       if (room === 'All' && this.yearSummaryMap) {
         this.currency = this.primaryRoom?.currency;
+        this.timeZone = this.primaryRoom?.timeZone;
         let result: IQuarterSummary[] | undefined;
         this.yearSummaryMap.forEach((value) => {
           const quarterSummaries: IQuarterSummary[] = value.quarterSummaries;
@@ -118,6 +143,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
       } else {
         this.quarterSummaries = this.yearSummaryMap?.get(room)?.quarterSummaries;
         this.currency = room.currency;
+        this.timeZone = room.timeZone;
       }
       this.yearSummaryTotals = new SummaryTotals();
       this.quarterSummaries?.forEach(q => {
@@ -165,9 +191,63 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     });
   }
 
+  private createExportData(): void {
+    this.sheetData = [];
+    const room = this.selectedRoom.value;
+    if (room) {
+      if (room === 'All' && this.yearExport) {
+        this.yearExport.forEach(({ monthlyExport }) => {
+          monthlyExport.forEach(({ month, saleSummary, expenseSummary, cashSaleSummary }) => {
+            const existingIndex = this.sheetData.findIndex(item => item.month === month);
+            if (existingIndex !== -1) {
+              this.sheetData[existingIndex].saleSummary.push(...saleSummary);
+              this.sheetData[existingIndex].expenseSummary.push(...expenseSummary);
+              this.sheetData[existingIndex].cashSaleSummary.push(...cashSaleSummary);
+            } else {
+              this.sheetData.push({
+                month,
+                saleSummary: [...saleSummary],
+                expenseSummary: [...expenseSummary],
+                cashSaleSummary: [...cashSaleSummary]
+              });
+            }
+          });
+        });
+        this.sheetData = this.sheetData.sort((a, b) => a.month - b.month);
+      } else {
+        this.yearExport?.forEach(({ monthlyExport }, key) => {
+          if (key.roomId === room.roomId) {
+            this.sheetData = monthlyExport;
+            return;
+          }
+        });
+      }
+    }
+  }
+
+  private exportToExcel(): void {
+    if (this.sheetData.length) {
+      const workbook = createWorkbook(this.sheetData, this.date.value || getNow(), currencySymbol(this.currency), this.timeZone);
+
+      workbook.creator = this.userName || '';
+      workbook.created = getNow();
+
+      // Generate & Save Excel File
+      workbook.xlsx.writeBuffer().then((content) => {
+        const blob = new Blob([content], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        });
+        fs.saveAs(blob, `Report_${ this.date.value?.getFullYear() }.xlsx`);
+      });
+    }
+  }
+
   private reset(): void {
     this.quarterSummaries = undefined;
     this.yearSummaryTotals = new SummaryTotals();
+    this.selectedRoom.setValue(null);
+    this.primaryRoom = undefined;
+    this.export = false;
   }
 
   private getSummary(year: number): void {
@@ -175,6 +255,13 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.store.dispatch(
       new fromActionsDashboard.GetYearSummary(year)
+    );
+  }
+
+  private getExportData(year: number): void {
+    this.isExportLoading = true;
+    this.store.dispatch(
+      new fromActionsDashboard.GetYearExport(year)
     );
   }
 
@@ -188,15 +275,26 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     this.subscription = this.getState.subscribe(state => {
       this.yearSummaryMap = state.yearSummaryMap;
       if (this.yearSummaryMap) {
-        this.isLoading = false;
-        this.yearSummaryMap?.forEach((value, key) => {
-          if (key.primary) {
-            this.selectedRoom.setValue(key);
+        if (this.yearSummaryMap.size === 1) {
+          this.selectedRoom.setValue(this.yearSummaryMap.keys().next().value);
+        } else {
+          this.yearSummaryMap?.forEach((_, key) => {
+            if (key.primary) {
+              this.selectedRoom.setValue(key);
+            }
+          });
+          if (this.yearSummaryMap.size > 1 && allElementsHaveSameKeyFilterValue(this.yearSummaryMap, ['currency', 'id'])) {
+            this.primaryRoom = this.selectedRoom.value;
           }
-        });
-        if (this.yearSummaryMap.size > 1 && allElementsHaveSameKeyFilterValue(this.yearSummaryMap, ['currency', 'id'])) {
-          this.primaryRoom = this.selectedRoom.value;
         }
+        this.isLoading = false;
+      }
+      this.yearExport = state.yearExport;
+      if (this.yearExport) {
+        this.sheetData = [];
+        this.createExportData();
+        this.isExportLoading = false;
+        this.export = true;
       }
     });
   }

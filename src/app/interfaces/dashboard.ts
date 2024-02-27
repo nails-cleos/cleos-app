@@ -203,6 +203,17 @@ export interface IMonthlyRoomSummary extends ISummaryRoom {
   cashSaleSummary: IMonthlySummarySale[];
 }
 
+export interface IYearRoomExport extends ISummaryRoom {
+  monthExportResponse: IMonthlyExport[];
+}
+
+export interface IMonthlyExport {
+  month: number;
+  saleSummary: IMonthlySummarySale[];
+  expenseSummary: IMonthlySummaryExpense[];
+  cashSaleSummary: IMonthlySummarySale[];
+}
+
 export interface IYearRoomSummary extends ISummaryRoom {
   quarterSummaries: IQuarterSummary[];
 }
