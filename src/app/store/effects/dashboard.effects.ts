@@ -73,6 +73,14 @@ export class DashboardEffects {
     ))
   ));
 
+  getYearExport$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.yearExport)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.dashboardService.getYearExport(payload).pipe(
+      switchMap((response: any) => of(new fromActionsDashboard.YearExportSuccess(response ? response : []))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
+    ))
+  ));
+
   getQuarterSummary$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.quarterSummary)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.dashboardService.getQuarterSummary(payload.year, payload.quarter).pipe(

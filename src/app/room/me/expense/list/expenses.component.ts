@@ -65,11 +65,13 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.getExpenses();
+    this.route.paramMap.subscribe(param => {
+      this.roomId = param.get('id');
+      this.getExpenses();
+    });
   }
 
   ngOnInit(): void {
-    this.roomId = this.route.snapshot.paramMap.get('id');
     this.clean();
     this.subscribe();
     this.valueChange();
