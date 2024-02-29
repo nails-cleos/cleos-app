@@ -339,6 +339,9 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         this.reservation = state.selected;
         const isProfessionalAdmin = this.professionalId && isProfessional(this.professionalId, this.reservation?.room?.professionals);
         this.isReservationAdmin = isProfessionalAdmin || this.hasRoomAdmin;
+        if (this.reservation && this.reservation.treatment) {
+          this.price = getPrice(this.reservation, this.paymentPaid);
+        }
         if (isProfessionalAdmin) {
           this.professionalMachine(this);
           this.changeState = this.machine.next(snakeToCamel(this.reservation?.state));
@@ -358,9 +361,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
               this.showFireworks = false;
             }, 5000);
           }
-        }
-        if (this.reservation && this.reservation.treatment) {
-          this.price = getPrice(this.reservation, this.paymentPaid);
         }
       }
       this.history = state.history;
@@ -780,7 +780,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       self.addActions();
     }
 
-    if (self.price.total > self.price.totalPaid) {
+    if (price.total > price.totalPaid) {
       const next = this.createAction(translate.instant('RESERVATION.ACTION.PAY'),
         ReservationIconName.payment, 'pay', 'blue');
       approved.next = [...approved.next, next];

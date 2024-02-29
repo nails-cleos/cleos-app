@@ -62,7 +62,16 @@ import { IUser } from '../../../interfaces/user';
 import { accountCredit, getPaymentOptions, getPayNlOptions, IPaymentOption, PaymentType, PENALTY } from '../../../interfaces/payment';
 import { AuthUserService } from '../../../services/auth-user.service';
 import { Analytics, logEvent } from '@angular/fire/analytics';
-import { completeAndNext, enableStep, getBackIndex, getStepCall, getStepCompleted, getStepEnabled, getStepName } from '../../../util/step';
+import {
+  completeAndNext,
+  enableStep,
+  getBackIndex,
+  getStepCall,
+  getStepCompleted,
+  getStepEnabled,
+  getStepName,
+  getStepOptional
+} from '../../../util/step';
 
 @Component({
   selector: 'app-me-reservation',
@@ -408,6 +417,10 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
   getStepCompleted(index: number): boolean {
     return getStepCompleted(this.steps, index);
+  }
+
+  getStepOptional(index: number): boolean {
+    return getStepOptional(this.steps, index);
   }
 
   openDialog(reservationDate?: Date): void {

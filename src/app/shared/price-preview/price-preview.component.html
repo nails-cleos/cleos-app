@@ -45,7 +45,7 @@
     </ng-template>
     <mat-list-item>
       <div matListItemLine [innerHTML]="'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate: {
-                         amount: price.toPaid - price.totalPaid - price.balance | number:'1.2-2',
+                         amount: price.toPaid | number:'1.2-2',
                          symbol: currencyIcon | currencySymbol
                          }">
       </div>

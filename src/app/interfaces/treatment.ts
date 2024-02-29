@@ -126,7 +126,7 @@ export class Price implements IPrice {
     this.priceWithAdditional = priceWithAdditional;
     this.percentageToPaid = percentageToPaid;
     this.balance = balance;
-    this.toPaid = total * percentageToPaid / 100;
+    this.toPaid = (total * percentageToPaid / 100) - totalPaid - balance; // Total to pay
     this.penalty = (total * PENALTY / 100);
     this.isPaid = this.calculateIsPaid();
   }
