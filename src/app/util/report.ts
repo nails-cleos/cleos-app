@@ -1,13 +1,22 @@
 import { CellFormulaValue, CellHyperlinkValue, Workbook, Worksheet } from 'exceljs';
 import { API_LOCALE, createNewDateZonedTime, exportFormatDate, getCurrentTimeZone, monthViewTitle, newDateTimestamp } from './dates';
-import { IMonthlyExport, IMonthlySummaryExpense, IMonthlySummarySale } from '../interfaces/dashboard';
+import { IMonthlyExport, IMonthlySummaryExpense, IMonthlySummarySale, ISummaryTotal } from '../interfaces/dashboard';
+
+interface IMonthResult {
+  name: string;
+  month: number;
+  totalGross: number;
+  totalNet: number;
+  totalBtw: number;
+  cellNumber: number;
+}
 
 export const createWorkbook = (data: IMonthlyExport[], date: Date, currency: string, timeZone: string = getCurrentTimeZone()): Workbook => {
   const workbook = new Workbook();
-
-  data.forEach(it => {
+  let monthResults: IMonthResult[] = [];
+  completeData(workbook, date, data).forEach(it => {
     const name = monthViewTitle(new Date(date.getFullYear(), it.month - 1));
-    const worksheet = workbook.addWorksheet(name);
+    const worksheet = workbook.getWorksheet(name);
 
     const { saleRowData, saleGross, saleNet, saleBtw } = getSaleRowData(it.saleSummary, timeZone);
     let cellNumber = addData(worksheet, 'Sales', 1, 'Customer', 'Description', saleRowData, saleGross, saleNet, saleBtw);
@@ -31,87 +40,66 @@ export const createWorkbook = (data: IMonthlyExport[], date: Date, currency: str
     cellNumber++;
 
     worksheet.mergeCells(`A${ cellNumber }`, `D${ cellNumber }`);
-    const resultCellTitle = worksheet.getCell(`A${ cellNumber }`);
-    resultCellTitle.value = 'Result';
-    resultCellTitle.alignment = { vertical: 'middle', horizontal: 'right' };
-    resultCellTitle.border = {
-      bottom: { style: 'medium' },
-      left: { style: 'medium' },
-      right: { style: 'medium' },
-      top: { style: 'medium' }
-    };
-    resultCellTitle.fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: 'dcc8c2' }
-    };
+    setTotalTitle(worksheet, cellNumber);
 
-    setTotal(worksheet, cellNumber, 'E', `E${ saleCellNumber } - E${ expenseCellNumber }`, saleGross - expenseGross);
-    setTotal(worksheet, cellNumber, 'F', `F${ saleCellNumber } - F${ expenseCellNumber }`, saleNet - expenseNet);
-    setTotal(worksheet, cellNumber, 'G', `G${ saleCellNumber } - G${ expenseCellNumber }`, saleBtw - expenseBtw);
+    const totalGross = saleGross - expenseGross;
+    const totalNet = saleNet - expenseNet;
+    const totalBtw = saleBtw - expenseBtw;
 
-    worksheet.getColumn('E').numFmt = `"${ currency }"#,##0.00;[Red]\-"${ currency }"#,##0.00`;
-    worksheet.getColumn('F').numFmt = `"${ currency }"#,##0.00;[Red]\-"${ currency }"#,##0.00`;
-    worksheet.getColumn('G').numFmt = `"${ currency }"#,##0.00;[Red]\-"${ currency }"#,##0.00`;
+    setTotal(worksheet, cellNumber, 'E', `E${ saleCellNumber } - E${ expenseCellNumber }`, totalGross);
+    setTotal(worksheet, cellNumber, 'F', `F${ saleCellNumber } - F${ expenseCellNumber }`, totalNet);
+    setTotal(worksheet, cellNumber, 'G', `G${ saleCellNumber } - G${ expenseCellNumber }`, totalBtw);
 
-    worksheet.getCell(`E${cellNumber}`).numFmt = `[Green]"${ currency }"#,##0.00;[Red]\-"${ currency }"#,##0.00`;
-    worksheet.getCell(`F${cellNumber}`).numFmt = `[Green]"${ currency }"#,##0.00;[Red]\-"${ currency }"#,##0.00`;
-    worksheet.getCell(`G${cellNumber}`).numFmt = `[Green]"${ currency }"#,##0.00;[Red]\-"${ currency }"#,##0.00`;
+    const priceFormat = currencyFormat(currency);
+    worksheet.getColumn('E').numFmt = priceFormat;
+    worksheet.getColumn('F').numFmt = priceFormat;
+    worksheet.getColumn('G').numFmt = priceFormat;
 
-    worksheet.columns.forEach(column => {
-      if (column.values) {
-        const lengths = column.values.map(v => v?.toString()?.length || 0);
-        column.width = Math.max(...lengths.filter(v => typeof v === 'number'));
-      }
-    });
+    const positivePriceFormat = currencyFormat(currency, true);
+    worksheet.getCell(`E${ cellNumber }`).numFmt = positivePriceFormat;
+    worksheet.getCell(`F${ cellNumber }`).numFmt = positivePriceFormat;
+    worksheet.getCell(`G${ cellNumber }`).numFmt = positivePriceFormat;
+
+    monthResults = [...monthResults, { month: it.month, name, totalGross, totalNet, totalBtw, cellNumber }];
+
+    resizeColumn(worksheet);
   });
+
+  createQData(workbook, monthResults, currency);
 
   return workbook;
 };
 
-const cells = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+const qCells = ['A', 'B', 'C', 'D'];
+const monthCells = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
 
+const completeData = (workbook: Workbook, date: Date, data: IMonthlyExport[]): IMonthlyExport[] => {
+  for (let i = 12; i >= 1; i--) {
+    if (i % 3 === 0) {
+      workbook.addWorksheet(`Q${ (i / 3) }`);
+    }
+    const name = monthViewTitle(new Date(date.getFullYear(), i - 1));
+    workbook.addWorksheet(name);
+    if (!data.find(it => it.month === i)) {
+      data = [...data, { month: i, expenseSummary: [], saleSummary: [], cashSaleSummary: [] }];
+    }
+  }
+  return data.sort((a, b) => a.month - b.month);
+};
 const addData = (worksheet: Worksheet, key: string, cellNumber: number, column3Name: string, column4Name: string,
                  rowData: (CellHyperlinkValue | string | number)[][], gross: number, net: number, btw: number): number => {
-  worksheet.mergeCells(`A${ cellNumber }`, `G${ cellNumber }`);
-  const titleCell = worksheet.getCell(`A${ cellNumber }`);
-  titleCell.value = key;
-  titleCell.alignment = { vertical: 'middle', horizontal: 'center' };
-  titleCell.border = {
-    top: { style: 'medium' },
-    left: { style: 'medium' },
-    right: { style: 'medium' }
-  };
-  titleCell.fill = {
-    type: 'pattern',
-    pattern: 'solid',
-    fgColor: { argb: 'a9a397' }
-  };
+  setTitle(worksheet, cellNumber, 'G', key);
 
   // Add Header Rows
   worksheet.addRow(['N°', 'Date', column3Name, column4Name, 'Gross', 'Net', 'BTW']);
   cellNumber++;
-  cells.forEach((cell, index) => {
-    const currentCell = worksheet.getCell(`${ cell }${ cellNumber }`);
-    currentCell.alignment = { vertical: 'middle', horizontal: 'center' };
-    currentCell.fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: 'dcc8c2' }
-    };
-    currentCell.border = {
-      left: { style: index === 0 ? 'medium' : 'thin' },
-      right: { style: index === cells.length - 1 ? 'medium' : 'thin' },
-      top: { style: 'thin' },
-      bottom: { style: 'thin' }
-    };
-  });
+  setSubtitle(worksheet, monthCells, cellNumber);
 
   const init = ++cellNumber;
   if (rowData.length) {
     worksheet.addRows(rowData);
     cellNumber += rowData.length;
-    setBorder(worksheet, init, cellNumber - 1);
+    setBorder(worksheet, init, cellNumber - 1, monthCells);
 
     worksheet.mergeCells(`A${ cellNumber }`, `D${ cellNumber }`);
     const totalCell = worksheet.getCell(`A${ cellNumber }`);
@@ -153,6 +141,41 @@ const addData = (worksheet: Worksheet, key: string, cellNumber: number, column3N
   return cellNumber;
 };
 
+const setTitle = (worksheet: Worksheet, cellNumber: number, endLetter: string, key: string) => {
+  worksheet.mergeCells(`A${ cellNumber }`, `${ endLetter }${ cellNumber }`);
+  const titleCell = worksheet.getCell(`A${ cellNumber }`);
+  titleCell.value = key;
+  titleCell.alignment = { vertical: 'middle', horizontal: 'center' };
+  titleCell.border = {
+    top: { style: 'medium' },
+    left: { style: 'medium' },
+    right: { style: 'medium' }
+  };
+  titleCell.fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: 'a9a397' }
+  };
+};
+
+const setSubtitle = (worksheet: Worksheet, cellList: string[], cellNumber: number) => {
+  cellList.forEach((cell, index) => {
+    const currentCell = worksheet.getCell(`${ cell }${ cellNumber }`);
+    currentCell.alignment = { vertical: 'middle', horizontal: 'center' };
+    currentCell.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'dcc8c2' }
+    };
+    currentCell.border = {
+      left: { style: index === 0 ? 'medium' : 'thin' },
+      right: { style: index === cellList.length - 1 ? 'medium' : 'thin' },
+      top: { style: 'thin' },
+      bottom: { style: 'thin' }
+    };
+  });
+};
+
 const getSaleRowData = (saleSummary: IMonthlySummarySale[], timeZone: string): {
   saleRowData: (string | number)[][];
   saleGross: number;
@@ -168,12 +191,19 @@ const getSaleRowData = (saleSummary: IMonthlySummarySale[], timeZone: string): {
     //   hyperlink: `${ environment.appServer }/${ sale.paths.join('/') }`
     // } as CellHyperlinkValue;
 
-    gross += sale.total.gross;
-    net += sale.total.net;
-    btw += sale.total.btw;
+    const paid = sale.total.payments.reduce((payments: any, payment: ISummaryTotal) => {
+      payments.gross += payment.gross;
+      payments.net += payment.net;
+      payments.btw += payment.btw;
+      return payments;
+    }, { gross: 0, net: 0, btw: 0 });
+
+    gross += paid.gross;
+    net += paid.net;
+    btw += paid.btw;
 
     return [index + 1, exportFormatDate(newDateTimestamp(sale.timestamp, timeZone), API_LOCALE, timeZone),
-      sale.customerName, sale.description, sale.total.gross, sale.total.net, sale.total.btw];
+      sale.customerName, sale.description, paid.gross, paid.net, paid.btw];
   });
 
   return { saleRowData: rowData, saleGross: gross, saleNet: net, saleBtw: btw };
@@ -205,7 +235,60 @@ const getExpenseRowData = (expenseSummary: IMonthlySummaryExpense[], timeZone: s
   return { expenseRowData: rowData, expenseGross: gross, expenseNet: net, expenseBtw: btw };
 };
 
-const setTotal = (worksheet: Worksheet, cellNumber: number, letter: 'E' | 'F' | 'G', formula: string, result: number): void => {
+const createQData = (workbook: Workbook, monthResults: IMonthResult[], currency: string) => {
+  [...Array(4)].map((_, i) => {
+    const name = `Q${ ++i }`;
+    const worksheet = workbook.getWorksheet(name);
+    setTitle(worksheet, 1, 'D', name);
+    worksheet.addRow(['', 'Gross', 'Net', 'BTW']);
+    setSubtitle(worksheet, qCells, 2);
+
+    let totalGross = 0;
+    let totalNet = 0;
+    let totalBtw = 0;
+    monthResults.filter(it => it.month <= i * 3 && it.month > (i - 1) * 3).forEach((it, index) => {
+      worksheet.addRow([it.name]);
+      setQTotal(worksheet, it, 'B', 3 + index, 'E');
+      setQTotal(worksheet, it, 'C', 3 + index, 'F');
+      setQTotal(worksheet, it, 'D', 3 + index, 'G');
+      totalGross += it.totalGross;
+      totalNet += it.totalNet;
+      totalBtw += it.totalBtw;
+    });
+
+    setBorder(worksheet, 3, 5, qCells);
+
+    setTotalTitle(worksheet, 6);
+    setTotal(worksheet, 6, 'B', 'SUM(B3:B5)', totalGross);
+    setTotal(worksheet, 6, 'C', 'SUM(C3:C5)', totalNet);
+    setTotal(worksheet, 6, 'D', 'SUM(D3:D5)', totalBtw);
+
+    const positivePriceFormat = currencyFormat(currency, true);
+    worksheet.getColumn('B').numFmt = positivePriceFormat;
+    worksheet.getColumn('C').numFmt = positivePriceFormat;
+    worksheet.getColumn('D').numFmt = positivePriceFormat;
+
+    resizeColumn(worksheet);
+  });
+};
+
+const setTotalTitle = (worksheet: Worksheet, cellNumber: number) => {
+  const resultCellTitle = worksheet.getCell(`A${ cellNumber }`);
+  resultCellTitle.value = 'Result';
+  resultCellTitle.alignment = { vertical: 'middle', horizontal: 'right' };
+  resultCellTitle.border = {
+    bottom: { style: 'medium' },
+    left: { style: 'medium' },
+    right: { style: 'medium' },
+    top: { style: 'medium' }
+  };
+  resultCellTitle.fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: 'dcc8c2' }
+  };
+};
+const setTotal = (worksheet: Worksheet, cellNumber: number, letter: string, formula: string, result: number): void => {
   const totalCell = worksheet.getCell(`${ letter }${ cellNumber }`);
   totalCell.value = {
     formula,
@@ -226,16 +309,34 @@ const setTotal = (worksheet: Worksheet, cellNumber: number, letter: 'E' | 'F' | 
   };
 };
 
-const setBorder = (worksheet: Worksheet, start: number, end: number) => {
-  cells.forEach((cell, index) => {
+const setQTotal = (worksheet: Worksheet, monthResult: IMonthResult, cellLetter: string, cellNumber: number, formulaLetter: string) => {
+  worksheet.getCell(`${ cellLetter }${ cellNumber }`).value = {
+    formula: `'${ monthResult.name }'!${ formulaLetter }${ monthResult.cellNumber }`,
+    result: monthResult.totalGross
+  } as CellFormulaValue;
+};
+
+const setBorder = (worksheet: Worksheet, start: number, end: number, cellList: string[]) => {
+  cellList.forEach((cell, index) => {
     const length = Math.abs(end - start) + 1;
     Array.from({ length }, (_, i) => start + i).forEach(cellNumber => {
       const currentCell = worksheet.getCell(`${ cell }${ cellNumber }`);
       currentCell.border = {
         left: { style: index === 0 ? 'medium' : 'thin' },
-        right: { style: index === cells.length - 1 ? 'medium' : 'thin' },
+        right: { style: index === cellList.length - 1 ? 'medium' : 'thin' },
       };
     });
   });
 };
 
+const resizeColumn = (worksheet: Worksheet) => {
+  worksheet.columns.forEach(column => {
+    if (column.values) {
+      const lengths = column.values.map(v => v?.toString()?.length || 0);
+      column.width = Math.max(...lengths.filter(v => typeof v === 'number'));
+    }
+  });
+};
+
+const currencyFormat = (currency: string, positiveColor: boolean = false) =>
+  `${ positiveColor ? '[Green]' : '' }"${ currency }"#,##0.00;[Red]\-"${ currency }"#,##0.00`;
