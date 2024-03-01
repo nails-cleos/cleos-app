@@ -86,12 +86,12 @@ export class OptionComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.route.params.subscribe(routeParams => {
-      this.reservationId = routeParams.id;
-    });
     this.subscribe();
     this.clean();
-    this.getPaymentFindByReservationId();
+    this.route.params.subscribe(routeParams => {
+      this.reservationId = routeParams.id;
+      this.getPaymentFindByReservationId();
+    });
   }
 
   ngOnDestroy(): void {
@@ -145,17 +145,19 @@ export class OptionComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      if (state.selected && (!this.options || this.options.length === 0)) {
+      if (state.selected) {
         const reservation = state.selected[0].reservation;
         if (reservation) {
-          const types = reservation.room.paymentTypes.filter((p: PaymentType) => ![PaymentType.cash, PaymentType.transfer].includes(p));
-          if (types?.includes(PaymentType.paynl)) {
-            this.getOptions();
-          } else {
-            this.options = getPaymentOptions(this.translate, types);
+          if ((!this.options || this.options.length === 0)) {
+            const types = reservation.room.paymentTypes.filter((p: PaymentType) => ![PaymentType.cash, PaymentType.transfer].includes(p));
+            if (types?.includes(PaymentType.paynl)) {
+              this.getOptions();
+            } else {
+              this.options = getPaymentOptions(this.translate, types);
+            }
           }
           this.price = getPrice(reservation, state.selected);
-          if (this.price.toPaid === 0) {
+          if (this.price.isPaid) {
             this.router.navigate(['/reservation', reservation.id]);
           } else {
             if (reservation.state !== 'CANCELLED_PAYMENT_REQUIRED') {
