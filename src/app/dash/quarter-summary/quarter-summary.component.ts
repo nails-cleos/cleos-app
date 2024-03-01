@@ -202,15 +202,19 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
     this.subscription = this.getState.subscribe(state => {
       this.quarterSummaryMap = state.quarterSummaryMap;
       if (this.quarterSummaryMap) {
-        this.isLoading = false;
-        this.quarterSummaryMap.forEach((value, key) => {
-          if (key.primary) {
-            this.selectedRoom.setValue(key);
+        if (this.quarterSummaryMap.size === 1) {
+          this.selectedRoom.setValue(this.quarterSummaryMap.keys().next().value);
+        } else {
+          this.quarterSummaryMap.forEach((_, key) => {
+            if (key.primary) {
+              this.selectedRoom.setValue(key);
+            }
+          });
+          if (this.quarterSummaryMap.size > 1 && allElementsHaveSameKeyFilterValue(this.quarterSummaryMap, ['currency', 'id'])) {
+            this.primaryRoom = this.selectedRoom.value;
           }
-        });
-        if (this.quarterSummaryMap.size > 1 && allElementsHaveSameKeyFilterValue(this.quarterSummaryMap, ['currency', 'id'])) {
-          this.primaryRoom = this.selectedRoom.value;
         }
+        this.isLoading = false;
       }
     });
   }

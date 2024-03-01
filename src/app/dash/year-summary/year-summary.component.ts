@@ -278,7 +278,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
         if (this.yearSummaryMap.size === 1) {
           this.selectedRoom.setValue(this.yearSummaryMap.keys().next().value);
         } else {
-          this.yearSummaryMap?.forEach((_, key) => {
+          this.yearSummaryMap.forEach((_, key) => {
             if (key.primary) {
               this.selectedRoom.setValue(key);
             }
