@@ -320,7 +320,7 @@ export class MonthSummaryComponent implements OnInit {
           values = this.monthlySummaryCash;
           break;
       }
-      csv += ';;;;;';
+      csv += ';;;;;;';
       csv += `${ twoDigitNumber(gross, this.locale) };${ twoDigitNumber(net, this.locale) };${ twoDigitNumber(btw, this.locale) }\n`;
 
       const hiddenElement = document.createElement('a');
@@ -491,15 +491,19 @@ export class MonthSummaryComponent implements OnInit {
     this.subscription = this.getState.subscribe(state => {
       this.monthlySummaryMap = state.monthlySummaryMap;
       if (this.monthlySummaryMap) {
-        this.isLoading = false;
-        this.monthlySummaryMap.forEach((value, key) => {
-          if (key.primary) {
-            this.selectedRoom.setValue(key);
+        if (this.monthlySummaryMap.size === 1) {
+          this.selectedRoom.setValue(this.monthlySummaryMap.keys().next().value);
+        } else {
+          this.monthlySummaryMap.forEach((_, key) => {
+            if (key.primary) {
+              this.selectedRoom.setValue(key);
+            }
+          });
+          if (this.monthlySummaryMap.size > 1 && allElementsHaveSameKeyFilterValue(this.monthlySummaryMap, ['currency', 'id'])) {
+            this.primaryRoom = this.selectedRoom.value;
           }
-        });
-        if (this.monthlySummaryMap.size > 1 && allElementsHaveSameKeyFilterValue(this.monthlySummaryMap, ['currency', 'id'])) {
-          this.primaryRoom = this.selectedRoom.value;
         }
+        this.isLoading = false;
       }
     });
   }

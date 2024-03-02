@@ -3,7 +3,7 @@
     <mat-label>{{'SUMMARY.MONTHLY.SELECT.DATE' | translate}}</mat-label>
     <input matInput [matDatepicker]="dp" [formControl]="date">
     <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
-    <mat-datepicker #dp startView="year" (monthSelected)="setMonthAndYear($event, dp)">
+    <mat-datepicker #dp startView="multi-year"  (monthSelected)="setMonthAndYear($event, dp)">
     </mat-datepicker>
   </mat-form-field>
   <mat-form-field appearance="outline">
@@ -118,6 +118,7 @@
         <table #reservationTableData id="reservationTableData">
           <colgroup>
             <col class="id">
+            <col class="nmb">
             <col class="date">
             <col class="customer">
             <col class="description">
@@ -131,6 +132,7 @@
           <thead>
           <tr>
             <th mat-subheader></th>
+            <th mat-subheader>N°</th>
             <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.DATE' | translate}}</th>
             <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.CUSTOMER' | translate}}</th>
             <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.DESCRIPTION' | translate}}</th>
@@ -144,15 +146,18 @@
           </thead>
           <tbody *ngFor="let week of weeks; let i = index">
           <tr>
-            <td mat-subheader class="week text-center" [colSpan]="10"
+            <td mat-subheader class="week text-center" [colSpan]="11"
                 [innerHTML]="'SUMMARY.MONTHLY.TABLE.WEEK' | translate:{number: i + 1}"></td>
           </tr>
           <ng-template [ngIf]="summaryReservations?.length">
-            <tr *ngFor="let summary of summaryReservations | filterBy:week.dates:'day'">
+            <tr *ngFor="let summary of summaryReservations | filterBy:week.dates:'day';">
               <td [rowSpan]="summary.total.payments.length || 1">
                 <button mat-icon-button [routerLink]="summary.paths" [state]="{step: 0}">
                   <mat-icon>visibility</mat-icon>
                 </button>
+              </td>
+              <td [rowSpan]="summary.total.payments.length || 1">
+                {{summary.position + 1}}
               </td>
               <td [rowSpan]="summary.total.payments.length || 1">
                 {{summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat}}
@@ -181,7 +186,7 @@
           </tbody>
           <tfoot>
           <tr *ngIf="selectedRoom.value">
-            <td mat-subheader [colSpan]="6">{{'SUMMARY.MONTHLY.TABLE.TOTALS' | translate}}</td>
+            <td mat-subheader [colSpan]="7">{{'SUMMARY.MONTHLY.TABLE.TOTALS' | translate}}</td>
             <td
               mat-subheader>{{reservationGrossMonth | currency:currency.code:'symbol':'1.2-2' }}</td>
             <td mat-subheader>{{reservationNetMonth | currency:currency.code:'symbol':'1.2-2'}}</td>
@@ -236,6 +241,7 @@
         <table #expenseTableData id="expenseTableData">
           <colgroup>
             <col class="id">
+            <col class="nmb">
             <col class="date">
             <col id="invoice">
             <col>
@@ -249,6 +255,7 @@
           <thead>
           <tr>
             <th mat-subheader></th>
+            <th mat-subheader>N°</th>
             <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.DATE' | translate}}</th>
             <th mat-subheader [colSpan]="2">{{'SUMMARY.MONTHLY.TABLE.INVOICE' | translate}}</th>
             <th mat-subheader [colSpan]="2">{{'SUMMARY.MONTHLY.TABLE.SUPPLY_STORE' | translate}}</th>
@@ -260,7 +267,7 @@
           </thead>
           <tbody *ngFor="let week of weeks; let i = index">
           <tr>
-            <td mat-subheader class="week text-center" [colSpan]="10"
+            <td mat-subheader class="week text-center" [colSpan]="11"
                 [innerHTML]="'SUMMARY.MONTHLY.TABLE.WEEK' | translate:{number: i + 1}"></td>
           </tr>
           <ng-template [ngIf]="summaryExpenses?.length">
@@ -269,6 +276,9 @@
                 <button mat-icon-button [routerLink]="summary.paths">
                   <mat-icon>visibility</mat-icon>
                 </button>
+              </td>
+              <td>
+                {{summary.position + 1}}
               </td>
               <td>
                 {{(summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat)?.replace(',', '')}}
@@ -284,7 +294,7 @@
           </tbody>
           <tfoot>
           <tr *ngIf="selectedRoom.value">
-            <td mat-subheader [colSpan]="6">{{'SUMMARY.MONTHLY.TABLE.TOTALS' | translate}}</td>
+            <td mat-subheader [colSpan]="7">{{'SUMMARY.MONTHLY.TABLE.TOTALS' | translate}}</td>
             <td mat-subheader>{{expenseGrossMonth | currency:currency.code:'symbol':'1.2-2' }}</td>
             <td mat-subheader>{{expenseNetMonth | currency:currency.code:'symbol':'1.2-2'}}</td>
             <td mat-subheader>{{expenseBtwMonth | currency:currency.code:'symbol':'1.2-2'}}</td>
@@ -340,6 +350,7 @@
           <table #cashTableData id="cashTableData">
             <colgroup>
               <col class="id">
+              <col class="nmb">
               <col class="date">
               <col class="customer">
               <col class="description">
@@ -353,6 +364,7 @@
             <thead>
             <tr>
               <th mat-subheader></th>
+              <th mat-subheader>N°</th>
               <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.DATE' | translate}}</th>
               <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.CUSTOMER' | translate}}</th>
               <th mat-subheader>{{'SUMMARY.MONTHLY.TABLE.DESCRIPTION' | translate}}</th>
@@ -366,7 +378,7 @@
             </thead>
             <tbody *ngFor="let week of weeks; let i = index">
             <tr>
-              <td mat-subheader class="week text-center" [colSpan]="10"
+              <td mat-subheader class="week text-center" [colSpan]="11"
                   [innerHTML]="'SUMMARY.MONTHLY.TABLE.WEEK' | translate:{number: i + 1}"></td>
             </tr>
             <ng-template [ngIf]="summaryCash?.length">
@@ -375,6 +387,9 @@
                   <button mat-icon-button [routerLink]="summary.paths" [state]="{step: 2}">
                     <mat-icon>visibility</mat-icon>
                   </button>
+                </td>
+                <td [rowSpan]="summary.total.payments.length || 1">
+                  {{summary.position + 1}}
                 </td>
                 <td [rowSpan]="summary.total.payments.length || 1">
                   {{summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat}}
@@ -403,7 +418,7 @@
             </tbody>
             <tfoot>
             <tr *ngIf="selectedRoom.value">
-              <td mat-subheader [colSpan]="6">{{'SUMMARY.MONTHLY.TABLE.TOTALS' | translate}}</td>
+              <td mat-subheader [colSpan]="7">{{'SUMMARY.MONTHLY.TABLE.TOTALS' | translate}}</td>
               <td mat-subheader>{{cashGrossMonth | currency:currency.code:'symbol':'1.2-2' }}</td>
               <td mat-subheader>{{cashNetMonth | currency:currency.code:'symbol':'1.2-2'}}</td>
               <td mat-subheader>{{cashBtwMonth | currency:currency.code:'symbol':'1.2-2'}}</td>
