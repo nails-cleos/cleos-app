@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { IAuthority, IUserAll } from '../../interfaces/user';
 import { Role } from '../../interfaces/token';
-import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState } from '../../store/app.states';
 import { TokenService } from '../../services/token.service';
@@ -15,7 +14,7 @@ import { NavigationService } from '../../services/navigation.service';
 })
 export class RedirectComponent {
 
-  constructor(private router: Router, private store: Store<AppState>, private tokenService: TokenService,
+  constructor(private store: Store<AppState>, private tokenService: TokenService,
               private navigateService: NavigationService) {
     this.store.select(selectAuthState).subscribe((state: any) => {
       if (state.redirect) {

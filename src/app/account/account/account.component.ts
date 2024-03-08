@@ -24,13 +24,13 @@ export class AccountComponent implements OnInit, OnDestroy {
 
   errors: any = [];
   showAdd: boolean;
+  userId?: string;
 
   private getState: Observable<any>;
   private subscription?: Subscription;
   private authUserServiceSubscription: Subscription;
   private customerId?: string;
   private hasAdminRole: boolean;
-  private userId?: string;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
               private authUserService: AuthUserService, private router: Router) {

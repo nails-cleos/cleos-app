@@ -7,7 +7,7 @@
           <div fxFlex></div>
           <mat-icon *ngIf="transaction" class="pointer-only header-icon"
                     [routerLink]="['/', 'accounts', transaction.account?.id, 'transactions', 'view']">
-            account_balance
+            receipt
           </mat-icon>
         </mat-card-header>
         <ng-template #headSkeleton>

@@ -1,11 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable, Subject, Subscription, timer } from 'rxjs';
 import { shareReplay, switchMap, takeUntil } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { IUserAll } from '../interfaces/user';
-import { Store } from '@ngrx/store';
-import { AppState } from '../store/app.states';
 import { Auth, user } from '@angular/fire/auth';
 import { User } from '@firebase/auth';
 import { getNow, newDate, plusMinutes } from '../util/dates';
@@ -13,14 +10,16 @@ import { getNow, newDate, plusMinutes } from '../util/dates';
 @Injectable()
 export class TokenService {
   private myTokenCache?: Observable<User | null>;
-  private readonly cacheSize = 1;
-  private readonly refreshInterval = 5 * 60 * 1000; // 5 min
+  private readonly cacheSize: number;
+  private readonly refreshInterval: number;
   private myToken?: string;
   private myUser: any;
   private myTokenSubscription?: Subscription;
   private stopTimer?: Subject<boolean>;
 
-  constructor(private http: HttpClient, private router: Router, private store: Store<AppState>, private auth: Auth) {
+  constructor(private router: Router, private auth: Auth) {
+    this.cacheSize = 1;
+    this.refreshInterval = 5 * 60 * 1000; // 5 min
   }
 
   get user(): IUserAll {
@@ -56,10 +55,6 @@ export class TokenService {
         complete: () => this.clear()
       });
     }
-  }
-
-  public createTokenHeader(): string {
-    return this.token ? this.token : '';
   }
 
   public clear(): void {
