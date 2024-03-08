@@ -5,7 +5,18 @@
       <form (ngSubmit)="submit" [formGroup]="form" novalidate>
         <mat-card appearance="outlined" class="style-card">
           <mat-card-header>
-            <mat-card-title>{{'ACCOUNT.TITLE' | translate}}</mat-card-title>
+            <mat-card-title>{{ 'ACCOUNT.TITLE' | translate }}</mat-card-title>
+            <mat-card-subtitle *ngIf="account?.customer; else skeleton">
+              <ng-template [ngIf]="userId === account?.customer?.id" [ngIfElse]="noCustomer">
+                <a [routerLink]="['/', 'me', 'overview']">{{account?.customer?.displayName}}</a>
+              </ng-template>
+              <ng-template #noCustomer>
+                <a [routerLink]="['/', 'users', account?.customer?.id, 'overview']">{{account?.customer?.displayName}}</a>
+              </ng-template>
+            </mat-card-subtitle>
+            <ng-template #skeleton>
+              <div class="ssc-line"></div>
+            </ng-template>
           </mat-card-header>
           <mat-card-content>
             <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
@@ -19,7 +30,7 @@
                   </label>
                   <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayCurrencyFn">
                     <mat-option *ngFor="let currency of filteredCurrencyOptions | async" [value]="currency">
-                      {{currency.code}}
+                      {{ currency.code }}
                     </mat-option>
                   </mat-autocomplete>
                   <mat-error *ngIf="getForm.currency.hasError('required')"
@@ -29,7 +40,7 @@
                              [innerHTML]="'COMMON.CURRENCY.INVALID' | translate">
                   </mat-error>
                   <mat-error *ngIf="errors['currency']">
-                    {{errors['currency']}}
+                    {{ errors['currency'] }}
                   </mat-error>
                 </mat-form-field>
                 <button fxShow.lt-sm fxHide [routerLink]="['/', 'currency', 'add']" color="accent" mat-fab>
@@ -40,6 +51,9 @@
                   <span>{{ 'COMMON.CURRENCY.ADD_BUTTON' | translate }}</span>
                 </button>
               </div>
+              <ng-template #skeleton>
+                <div class="ssc-line"></div>
+              </ng-template>
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'ACCOUNT.GIFT.FIELD' | translate }}</mat-label>
                 <mat-icon matIconPrefix>percent</mat-icon>
@@ -57,7 +71,7 @@
                   {{ 'ACCOUNT.GIFT.LESS' | translate }}
                 </mat-error>
                 <mat-error *ngIf="errors['gift']">
-                  {{errors['gift']}}
+                  {{ errors['gift'] }}
                 </mat-error>
               </mat-form-field>
               <ng-template #skeleton>
@@ -69,8 +83,10 @@
         <mat-card-actions>
           <div fxFlex></div>
           <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
-                  type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
-          <button [disabled]="form.invalid || form.pristine" color="primary" mat-fab extended class="icon-button" type="submit">
+                  type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
+          </button>
+          <button [disabled]="form.invalid || form.pristine" color="primary" mat-fab extended class="icon-button"
+                  type="submit">
             {{ 'COMMON.BUTTON.UPDATE' | translate }}
           </button>
         </mat-card-actions>

@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-import { AppState, selectAccountState, selectPaymentState } from '../../../store/app.states';
+import { AppState, selectAccountState } from '../../../store/app.states';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ITransaction } from '../../../interfaces/account';
@@ -21,14 +21,12 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
   step?: number;
 
   private getState: Observable<any>;
-  private getPaymentState: Observable<any>;
   private subscription?: Subscription;
   private id: string | null = null;
   private transactionId: string | null = null;
 
   constructor(private store: Store<AppState>, private route: ActivatedRoute, private translate: TranslateService, private router: Router) {
     this.getState = this.store.select(selectAccountState);
-    this.getPaymentState = this.store.select(selectPaymentState);
     this.dateFormat = this.translate.currentLang;
     this.step = this.router.getCurrentNavigation()?.extras.state?.step;
   }

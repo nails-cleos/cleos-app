@@ -15,7 +15,7 @@ export class AuthInterceptor implements HttpInterceptor {
       req = req.clone({
         setHeaders: {
           // eslint-disable-next-line @typescript-eslint/naming-convention
-          'X-Authorization-Firebase': this.tokenService.createTokenHeader()
+          'X-Authorization-Firebase': this.tokenService.token
         }
       });
     }

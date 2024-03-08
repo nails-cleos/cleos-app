@@ -26,7 +26,7 @@ export class ErrorComponent implements OnInit {
         this.retry = false;
       } else {
         this.imageSrc = './assets/error.png';
-        this.retry = true;
+        this.retry = this.error.status !== 'BAD_REQUEST';
       }
     }
   }

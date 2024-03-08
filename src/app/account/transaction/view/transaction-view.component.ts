@@ -4,11 +4,9 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../../interfaces/pagination';
 import { IAccountAll, ITransaction } from '../../../interfaces/account';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectAccountState } from '../../../store/app.states';
-import { FormBuilder } from '@angular/forms';
-import { AuthUserService } from '../../../services/auth-user.service';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
@@ -41,9 +39,8 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
   private paginatorSubscription?: Subscription;
   private getState: Observable<any>;
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
-              private authUserService: AuthUserService, private router: Router, private cdRef: ChangeDetectorRef,
-              private breakpointObserver: BreakpointObserver, private translate: TranslateService) {
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private cdRef: ChangeDetectorRef,
+              breakpointObserver: BreakpointObserver, private translate: TranslateService) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small

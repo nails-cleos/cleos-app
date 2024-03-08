@@ -517,7 +517,7 @@ const pieChartPercentageOptions = (): ChartOptions<'pie'> => ({
 });
 
 const pieChatPercentageLabel = (tooltipItem: TooltipItem<'pie'>): string => {
-  const total = tooltipItem.dataset.data.reduce((a, b) => a + b);
+  const total = tooltipItem.dataset.data.reduce((a, b) => Number(a) + Number(b));
   return `${ tooltipItem.label }: ${ (Number(tooltipItem.raw) * 100 / total).toFixed(2) }%`;
 };
 
