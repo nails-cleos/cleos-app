@@ -10,6 +10,7 @@ export class BalanceComponent {
   @Input() account?: IAccountAll;
   @Input() showAdd?: boolean;
   @Input() showView?: boolean;
+  @Input() showUser?: boolean;
 
   get balancePercentage(): number {
     if (this.account) {

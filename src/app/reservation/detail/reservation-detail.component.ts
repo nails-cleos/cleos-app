@@ -99,7 +99,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
   private tooltipPosition = 'below';
   private machine: any;
-  private isLoading = false;
   private getState: Observable<any>;
   private getPaymentState: Observable<any>;
   private subscription?: Subscription;
@@ -112,9 +111,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   private readonly language: string;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private route: ActivatedRoute,
-              private store: Store<AppState>, private cdRef: ChangeDetectorRef, private router: Router,
-              private breakpointObserver: BreakpointObserver, private formBuilder: UntypedFormBuilder,
-              private authUserService: AuthUserService) {
+              private store: Store<AppState>, private router: Router, breakpointObserver: BreakpointObserver,
+              private formBuilder: UntypedFormBuilder, private authUserService: AuthUserService) {
     this.getState = this.store.select(selectReservationState);
     breakpointObserver.observe([
       Breakpoints.XSmall,
@@ -298,7 +296,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      this.isLoading = state.isLoading;
       this.isCustomer = this.customerId === state.selected?.customer?.id;
       if (state.payments && state.payments[0].id) {
         if (this.isCustomer) {
