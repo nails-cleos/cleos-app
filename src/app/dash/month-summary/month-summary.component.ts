@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, UntypedFormControl } from '@angular/forms';
 import { DateAdapter } from '@angular/material/core';
 import { MatDatepicker } from '@angular/material/datepicker';
@@ -20,11 +20,12 @@ import {
   SummaryType
 } from '../../interfaces/dashboard';
 import { YearMonthAdapter } from '../../util/adapter/year-month.adapter';
-import { allElementsHaveSameKeyFilterValue, titleCase } from '../../util/helper';
+import { allElementsHaveSameKeyFilterValue, currencySymbol, titleCase } from '../../util/helper';
 import { Router } from '@angular/router';
-import { twoDigitNumber } from '../../util/numbers';
 import { AuthUserService } from '../../services/auth-user.service';
 import { ICurrencyAll } from '../../interfaces/currency';
+import fs from 'file-saver';
+import { createMonthlyExpenseWorkbook, createMonthlyIncomeWorkbook, createMonthlySummary } from '../../util/report';
 
 @Component({
   selector: 'app-month-summary',
@@ -34,7 +35,7 @@ import { ICurrencyAll } from '../../interfaces/currency';
     { provide: DateAdapter, useClass: YearMonthAdapter }
   ]
 })
-export class MonthSummaryComponent implements OnInit {
+export class MonthSummaryComponent implements OnInit, OnDestroy {
   date = new FormControl<Date | null>(null);
   monthlySummaryMap?: Map<ISummaryRoom, {
     summarySale: IMonthlySummarySale[];
@@ -49,7 +50,6 @@ export class MonthSummaryComponent implements OnInit {
   summaryCash?: IMonthlySummary[];
   weeks: any[];
   dateFormat: string;
-  showInput = true;
   reservationGrossMonth = 0;
   reservationNetMonth = 0;
   reservationBtwMonth = 0;
@@ -70,11 +70,13 @@ export class MonthSummaryComponent implements OnInit {
   isLoading = false;
   primaryRoom?: ISummaryRoom;
   currency: ICurrencyAll = { id: '', name: 'euro', code: 'EUR', icon: 'euro' };
+  timeZone?: string;
   showCash: boolean;
 
   private getState: Observable<any>;
-  private subscription?: Subscription;
+  private subscription: Subscription;
   private readonly extras: any;
+  private userName?: string;
 
   constructor(private readonly translate: TranslateService, private store: Store<AppState>, private router: Router,
               private authUserService: AuthUserService) {
@@ -83,7 +85,10 @@ export class MonthSummaryComponent implements OnInit {
     this.dateFormat = this.translate.currentLang;
     this.weeks = getWeeksInMonth(getNow());
     this.extras = this.router.getCurrentNavigation()?.extras.state;
-    this.authUserService.authUser.subscribe(value => this.showCash = value.showCash);
+    this.subscription = this.authUserService.authUser.subscribe(value => {
+      this.userName = value.displayName;
+      this.showCash = value.showCash;
+    });
   }
 
   get dateFormatted(): string {
@@ -129,8 +134,6 @@ export class MonthSummaryComponent implements OnInit {
 
     return { gross: t?.gross || 0, net: t?.net || 0, btw: t?.btw || 0 };
   }
-
-  private static cleanCVSText = (text: string): string => `${ text.replace(/,/g, '') }; `;
 
   private static isInvalidInput(value: string): boolean {
     return !value || new RegExp(/^0\.?0{0,2}$/g).test(value) || new RegExp(/^\.0{0,2}$/g).test(value);
@@ -228,6 +231,10 @@ export class MonthSummaryComponent implements OnInit {
     }
   }
 
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
+
   setStep(index: number): void {
     this.step = index;
   }
@@ -266,72 +273,71 @@ export class MonthSummaryComponent implements OnInit {
     }
   }
 
-  exportCVS(table: HTMLTableElement, type: SummaryType): void {
-    this.showInput = false;
+  exportMonthlySummary(): void {
+    const workbook = createMonthlySummary(this.weeks, currencySymbol(this.currency), this.translate, this.timeZone,
+      this.summaryReservations as IMonthlySummarySale[], this.summaryExpenses as IMonthlySummaryExpense[]);
 
-    setTimeout(() => {
-      let csv = '';
+    workbook.creator = this.userName || '';
+    workbook.created = getNow();
 
-      const th = table.children[1].children[0]; // start in 1 to exclude col
+    // Generate & Save Excel File
+    workbook.xlsx.writeBuffer().then((content) => {
+      const blob = new Blob([content], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      fs.saveAs(blob, `Report_${ monthViewTitle(this.date.value || getNow()).replace(' ', '_') }.xlsx`);
+    });
+  }
 
-      for (const thChildren of Array.from(th.children).slice(1, th.children.length)) {
-        // @ts-ignore
-        csv += MonthSummaryComponent.cleanCVSText(thChildren.innerText);
-      }
+  exportToExcel(type: SummaryType, title: string, data?: IMonthlySummary[]): void {
+    if (data?.length) {
+      const name = `${ titleCase(SummaryType[type]) }-${ getDateFormat(this.date.value) }`;
 
-      csv = `${ csv.substring(0, csv.length - 2) }\n`;
-
-      for (const tbody of Array.from(table.children).slice(2, table.children.length - 1)) {
-        // @ts-ignore
-        for (const trBody of tbody.children) {
-          let remove = false;
-          for (const tdBody of Array.from(trBody.children).slice(1, trBody.children.length)) {
-            // @ts-ignore
-            csv += `${ tdBody.innerText }; `;
-            remove = true;
-          }
-          if (remove) {
-            csv = `${ csv.substring(0, csv.length - 2) }\n`;
-          }
-        }
-      }
+      let workbook;
 
       let gross;
-      let net;
       let btw;
       let values;
       switch (type) {
         case SummaryType.payment:
           gross = this.reservationGrossMonth;
-          net = this.reservationNetMonth;
           btw = this.reservationBtwMonth;
           values = this.monthlySummaryPayment;
+          workbook = createMonthlyIncomeWorkbook(data as IMonthlySummarySale[], this.weeks,
+            this.translate.instant(`SUMMARY.${ title }`), SummaryType[type], name, this.translate,
+            currencySymbol(this.currency), this.timeZone);
           break;
         case SummaryType.expense:
           gross = this.expenseGrossMonth;
-          net = this.expenseNetMonth;
           btw = this.expenseBtwMonth;
           values = this.monthlySummaryExpense;
+          workbook = createMonthlyExpenseWorkbook(data as IMonthlySummaryExpense[], this.weeks,
+            this.translate.instant(`SUMMARY.${ title }`), name, this.translate,
+            currencySymbol(this.currency), this.timeZone);
           break;
         case SummaryType.cash:
           gross = this.cashGrossMonth;
-          net = this.cashNetMonth;
           btw = this.cashBtwMonth;
           values = this.monthlySummaryCash;
+          workbook = createMonthlyIncomeWorkbook(data as IMonthlySummarySale[], this.weeks,
+            this.translate.instant(`SUMMARY.${ title }`), SummaryType[type], name, this.translate,
+            currencySymbol(this.currency), this.timeZone);
           break;
       }
-      csv += ';;;;;;';
-      csv += `${ twoDigitNumber(gross, this.locale) };${ twoDigitNumber(net, this.locale) };${ twoDigitNumber(btw, this.locale) }\n`;
 
-      const hiddenElement = document.createElement('a');
-      hiddenElement.href = `data:text/csv;charset=utf-8,${ encodeURI(csv) }`;
-      hiddenElement.target = '_blank';
-      hiddenElement.download = `${ titleCase(SummaryType[type]) }-${ getDateFormat(this.date.value) }.csv`;
-      hiddenElement.click();
+      workbook.creator = this.userName || '';
+      workbook.created = getNow();
 
-      return this.updateMonthlySummary(type, gross, btw, values);
-    }, 100);
-    return;
+      // Generate & Save Excel File
+      workbook.xlsx.writeBuffer().then((content) => {
+        const blob = new Blob([content], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        });
+        fs.saveAs(blob, `${ name }.xlsx`);
+      });
+
+      this.updateMonthlySummary(type, gross, btw, values);
+    }
   }
 
   updateMonthlySummary(type: SummaryType, gross: number, btw: number, summaries: IMonthlySummaryRequest[]): void {
@@ -394,7 +400,6 @@ export class MonthSummaryComponent implements OnInit {
       if (value) {
         this.getSummary(getDateFormat(value));
         this.weeks = getWeeksInMonth(value);
-        this.showInput = true;
       }
     });
     this.amountFormat.valueChanges.subscribe(format => {
@@ -425,6 +430,7 @@ export class MonthSummaryComponent implements OnInit {
       if (room === 'All' && this.monthlySummaryMap && this.primaryRoom) {
         this.roomId = this.primaryRoom.roomId;
         this.currency = this.primaryRoom.currency;
+        this.timeZone = this.primaryRoom.timeZone;
         summary = [...this.monthlySummaryMap.values()].reduce((prev, curr) => {
           prev.summarySale = prev.summarySale.concat(curr.summarySale);
           prev.summaryExpenses = prev.summaryExpenses.concat(curr.summaryExpenses);
@@ -435,6 +441,7 @@ export class MonthSummaryComponent implements OnInit {
       } else {
         this.roomId = room.roomId;
         this.currency = room.currency;
+        this.timeZone = room.timeZone;
         summary = this.monthlySummaryMap?.get(this.selectedRoom.value);
       }
       this.summaryReservations = summary?.summarySale.map((s, i) => {

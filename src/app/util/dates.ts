@@ -453,6 +453,8 @@ export const dateMonthYear = (month: number | string, year: number | string): Da
 
 export const getDateQuarter = (date: Date): number => getQuarter(date);
 
+export const getMonth = (quarter: number, key: number): number => ((quarter - 1) * 3) + key;
+
 export const getTimeNumber = (date: any) => {
   if (date instanceof Date) {
     const time = getTime(date).split(':');
