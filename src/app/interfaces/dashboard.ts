@@ -168,6 +168,7 @@ export interface IMonthlySummary {
   position: number;
   timestamp: number;
   total: ISummaryTotal;
+  day: any;
 }
 
 export interface IMonthlySummarySale extends IMonthlySummary {

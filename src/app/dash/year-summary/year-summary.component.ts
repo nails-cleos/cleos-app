@@ -25,7 +25,7 @@ import { Router } from '@angular/router';
 import { AuthUserService } from '../../services/auth-user.service';
 import { allElementsHaveSameKeyFilterValue, currencySymbol } from '../../util/helper';
 import { ICurrencyAll } from '../../interfaces/currency';
-import { createWorkbook } from '../../util/report';
+import { createYearlyWorkbook } from '../../util/report';
 import fs from 'file-saver';
 
 @Component({
@@ -52,7 +52,6 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
   timeZone?: string;
   yearSummaryTotals: ISummaryTotals = new SummaryTotals();
   showCash: boolean;
-  userName?: string;
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe([
     Breakpoints.XSmall,
@@ -63,6 +62,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
   private getState: Observable<any>;
   private subscription?: Subscription;
   private readonly extras: any;
+  private userName?: string;
 
   constructor(private store: Store<AppState>, private breakpointObserver: BreakpointObserver, private router: Router,
               private authUserService: AuthUserService) {
@@ -227,7 +227,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
 
   private exportToExcel(): void {
     if (this.sheetData.length) {
-      const workbook = createWorkbook(this.sheetData, this.date.value || getNow(), currencySymbol(this.currency), this.timeZone);
+      const workbook = createYearlyWorkbook(this.sheetData, this.date.value || getNow(), currencySymbol(this.currency), this.timeZone);
 
       workbook.creator = this.userName || '';
       workbook.created = getNow();

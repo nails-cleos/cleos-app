@@ -14,6 +14,7 @@ import {
   MonthSummary,
   QuarterSummary
 } from '../../interfaces/dashboard';
+import { getMonth } from '../../util/dates';
 
 export interface State {
   data: Map<string, IDashboard>;
@@ -122,8 +123,6 @@ const emptySummaryTotal = (type: string): ISummaryTotal => ({ type, net: 0, btw:
 
 const emptySummariesTotal = (): ISummaryTotal[] => [emptySummaryTotal('INCOME'), emptySummaryTotal('EXPENSE'),
   emptySummaryTotal('CASH')];
-
-const getMonth = (quarter: number, key: number): number => ((quarter - 1) * 3) + key;
 
 const emptyQuarterMonth = (month: number) => new MonthSummary(month, emptySummariesTotal());
 
