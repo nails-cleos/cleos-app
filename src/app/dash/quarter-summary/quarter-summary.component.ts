@@ -7,14 +7,16 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { AppState, selectDashboardState } from '../../store/app.states';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { DateAdapter } from '@angular/material/core';
 import { YearAdapter } from '../../util/adapter/year.adapter';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { dateMonthYear, getDateQuarter, getNow } from '../../util/dates';
 import { AuthUserService } from '../../services/auth-user.service';
-import { allElementsHaveSameKeyFilterValue } from '../../util/helper';
+import { allElementsHaveSameKeyFilterValue, currencySymbol } from '../../util/helper';
 import { ICurrencyAll } from '../../interfaces/currency';
+import { createQuarterSummary } from '../../util/report';
+import fs from 'file-saver';
 
 @Component({
   selector: 'app-quarter-summary',
@@ -49,13 +51,15 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
   private getState: Observable<any>;
   private subscription?: Subscription;
   private readonly extras: any;
+  private userName?: string;
 
-  constructor(private store: Store<AppState>, private breakpointObserver: BreakpointObserver, private route: ActivatedRoute,
-              private router: Router, private authUserService: AuthUserService) {
+  constructor(private store: Store<AppState>, private breakpointObserver: BreakpointObserver, private router: Router,
+              private authUserService: AuthUserService) {
     this.showCash = false;
     this.getState = this.store.select(selectDashboardState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
     this.authUserService.authUser.subscribe(value => {
+      this.userName = value.displayName;
       this.showCash = value.showCash;
     });
   }
@@ -94,6 +98,27 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
     this.date.setValue(ctrlValue);
 
     datepicker.close();
+  }
+
+  exportQuarterSummary(): void {
+    if (this.monthSummaries?.length) {
+      const now = getNow();
+      const quarter = this.selectedQuarter.value || getDateQuarter(getNow());
+      const year = this.year || now.getFullYear();
+      const workbook = createQuarterSummary(quarter, year, this.monthSummaries, this.quarterSummaryTotals,
+        currencySymbol(this.currency));
+
+      workbook.creator = this.userName || '';
+      workbook.created = getNow();
+
+      // Generate & Save Excel File
+      workbook.xlsx.writeBuffer().then((content) => {
+        const blob = new Blob([content], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        });
+        fs.saveAs(blob, `Report_Q${ this.selectedQuarter.value }_${ year }.xlsx`);
+      });
+    }
   }
 
   private valueChange(): void {
