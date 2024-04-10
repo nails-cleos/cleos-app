@@ -55,18 +55,18 @@ export const createMonthlySummary = (weeks: any[], currency: string, translate: 
 };
 
 export const createQuarterSummary = (quarter: number, year: number, monthSummaries: IMonthSummary[],
-                                     quarterSummaryTotals: ISummaryTotals, currency: string): Workbook => {
+                                     quarterSummaryTotals: ISummaryTotals, currency: string, translate: TranslateService): Workbook => {
   const workbook = new Workbook();
   const name = `Q${ quarter }`;
   const worksheet = workbook.addWorksheet(name);
 
-  setTitle(worksheet, 1, 'D', 'Income');
+  setTitle(worksheet, 1, 'D', translate.instant('SUMMARY.INCOMES'));
   worksheet.addRow(['Month', 'Gross', 'Net', 'BTW']);
   setSubtitle(worksheet, qCells, 2);
-  setTitle(worksheet, 8, 'D', 'Expense');
+  setTitle(worksheet, 8, 'D', translate.instant('SUMMARY.EXPENSES'));
   worksheet.addRow(['Month', 'Gross', 'Net', 'BTW']);
   setSubtitle(worksheet, qCells, 9);
-  setTitle(worksheet, 15, 'D', 'Totals');
+  setTitle(worksheet, 15, 'D', translate.instant('SUMMARY.MONTHLY.TABLE.TOTALS'));
 
   monthSummaries.forEach((it, index) => {
     const totalIncome = it.total.find(total => total.type === 'INCOME');
@@ -111,6 +111,7 @@ export const createQuarterSummary = (quarter: number, year: number, monthSummari
   return workbook;
 };
 
+// TODO translate
 export const createYearlyWorkbook = (data: IMonthlyExport[], date: Date, currency: string,
                                      timeZone: string = getCurrentTimeZone()): Workbook => {
   const workbook = new Workbook();

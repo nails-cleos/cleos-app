@@ -82,17 +82,17 @@ const companyName = (room: IRoomInvoice, titleAddress: string, titlePhone: strin
   return [{
     columns: [
       createField(titleAddress, 80, 'left', '#333333', [0, 0, 0, 5]),
-      createField(address, 'auto', 'right', '#333333', [0, 0, 0, 0])
+      createField(address, 'auto', 'left', '#333333', [0, 0, 0, 0])
     ]
   }, {
     columns: [
       createField(titlePhone, 80, 'left', '#333333', [0, 0, 0, 5]),
-      createField(phone, 'auto', 'right', '#333333', [0, 0, 0, 0])
+      createField(phone, 'auto', 'left', '#333333', [0, 0, 0, 0])
     ]
   }, {
     columns: [
       createField(titleEmail, 80, 'left', '#333333', [0, 0, 0, 5]),
-      createField(email, 'auto', 'right', '#333333', [0, 0, 0, 0])
+      createField(email, 'auto', 'left', '#333333', [0, 0, 0, 0])
     ]
   }];
 };
@@ -224,6 +224,7 @@ const createTotals = (totals: ITotals, currency: string, titleSubTotal: string, 
   };
 };
 
+// TODO translate
 export const pdf = (invoices: IInvoice[], office: IOfficeAll, start: number, startDate: Date, endDate: Date): any => {
   let content: any[] = [];
   invoices.map((invoice, index) => {
