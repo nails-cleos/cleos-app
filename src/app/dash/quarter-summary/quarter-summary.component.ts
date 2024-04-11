@@ -17,6 +17,7 @@ import { allElementsHaveSameKeyFilterValue, currencySymbol } from '../../util/he
 import { ICurrencyAll } from '../../interfaces/currency';
 import { createQuarterSummary } from '../../util/report';
 import fs from 'file-saver';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-quarter-summary',
@@ -54,7 +55,7 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
   private userName?: string;
 
   constructor(private store: Store<AppState>, private breakpointObserver: BreakpointObserver, private router: Router,
-              private authUserService: AuthUserService) {
+              private authUserService: AuthUserService, private translate: TranslateService) {
     this.showCash = false;
     this.getState = this.store.select(selectDashboardState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
@@ -106,7 +107,7 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
       const quarter = this.selectedQuarter.value || getDateQuarter(getNow());
       const year = this.year || now.getFullYear();
       const workbook = createQuarterSummary(quarter, year, this.monthSummaries, this.quarterSummaryTotals,
-        currencySymbol(this.currency));
+        currencySymbol(this.currency), this.translate);
 
       workbook.creator = this.userName || '';
       workbook.created = getNow();
