@@ -8,6 +8,7 @@ import { AuthUserService } from '../../services/auth-user.service';
 import { Observable, Subscription } from 'rxjs';
 import { IAccountAll } from '../../interfaces/account';
 import { getPayNlOptions, IPaymentOption, PaymentOption, PaymentType } from '../../interfaces/payment';
+import { currencySymbol } from '../../util/helper';
 
 @Component({
   selector: 'app-transaction',
@@ -21,6 +22,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
 
   types: string[] = [PaymentType.cash, PaymentType.transfer];
   options?: IPaymentOption[];
+  amountMin: number;
 
   errors: any = [];
 
@@ -33,6 +35,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
               private authUserService: AuthUserService, private router: Router) {
     this.getState = this.store.select(selectAccountState);
     this.hasAdminRole = false;
+    this.amountMin = 100;
     this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
       this.hasAdminRole = value.hasAdminRole;
       if (!value.hasAdminRole) {
@@ -44,6 +47,10 @@ export class TransactionComponent implements OnInit, OnDestroy {
 
   get getForm(): ɵTypedOrUntyped<any, any, any> {
     return this.form.controls;
+  }
+
+  get currencyIcon(): string {
+    return currencySymbol(this.account?.currency);
   }
 
   get submit(): void {
@@ -94,7 +101,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
 
   private createForm(): void {
     this.form = this.formBuilder.group({
-      amount: ['', Validators.required],
+      amount: ['', [Validators.required, Validators.min(this.amountMin)]],
       type: ['', Validators.required],
       transfer: [''],
       bank: ['']

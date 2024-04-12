@@ -268,21 +268,26 @@ export const currencySymbol = (currency?: ICurrency | string): string => {
   if (!currency) {
     return '';
   }
-  if (typeof currency === 'string') {
-    switch (currency) {
-      case 'EUR':
-      case 'euro':
-        return '€';
-      case 'GBP':
-      case 'currency_pound':
-        return '£';
-      default:
-        return '$';
+  if (typeof currency !== 'string') {
+    if (currency.icon) {
+      switch (currency.icon) {
+        case 'euro':
+          return '€';
+        case 'currency_pound':
+          return '£';
+        default:
+          return '$';
+      }
+    } else {
+      currency = currency.code;
     }
   }
-  switch (currency.icon) {
+
+  switch (currency) {
+    case 'EUR':
     case 'euro':
       return '€';
+    case 'GBP':
     case 'currency_pound':
       return '£';
     default:
