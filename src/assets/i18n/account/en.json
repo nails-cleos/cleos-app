@@ -35,7 +35,8 @@
       },
       "AMOUNT": {
         "FIELD": "Amount",
-        "REQUIRED": "Amount is <b>required</b>"
+        "REQUIRED": "Amount is <b>required</b>",
+        "MIN": "Amount should be greater than {{currency}}{{min}}"
       }
     }
   }

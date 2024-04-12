@@ -13,22 +13,19 @@ import { OverviewComponent } from '../user/overview/overview.component';
 import { OptionComponent } from './payment/option/option.component';
 import { MePaymentComponent } from './payment/me/me-payment.component';
 
-const routes: Routes = [{
-  path: '', canActivate: [authGuard], data: { roles: [Role.customer] }, children: [
-    { path: 'reservations', component: ReservationsComponent },
-    { path: 'reservation', component: MeReservationComponent },
-    { path: 'reservation/:id', component: MeReservationComponent },
-    { path: 'reservation/:id/payment/option', component: OptionComponent },
-    { path: 'reservation/:id/payment/:id/:status', component: PaymentCompleteComponent },
-    { path: 'reservation/:id/review', component: ReviewDialogComponent },
-    { path: ':path/:id/payment', component: PaymentComponent },
-    { path: ':path/:id/payment/:status', component: PaymentCompleteComponent },
-    { path: 'payment/:id', component: MePaymentComponent },
-    { path: 'referrals', component: ReferralsComponent },
-    { path: 'discounts', component: MeDiscountComponent },
-    { path: 'overview', component: OverviewComponent },
-  ]
-}];
+const routes: Routes = [
+  { path: 'reservations', component: ReservationsComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
+  { path: 'reservation', component: MeReservationComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
+  { path: 'reservation/:id', component: MeReservationComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
+  { path: 'reservation/:id/payment/option', component: OptionComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
+  { path: 'reservation/:id/review', component: ReviewDialogComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
+  { path: ':path/:id/payment', component: PaymentComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
+  { path: ':path/:id/payment/:status', component: PaymentCompleteComponent },
+  { path: 'payment/:id', component: MePaymentComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
+  { path: 'referrals', component: ReferralsComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
+  { path: 'discounts', component: MeDiscountComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
+  { path: 'overview', component: OverviewComponent, canActivate: [authGuard], data: { roles: [Role.customer] } }
+];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],

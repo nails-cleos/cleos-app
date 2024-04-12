@@ -8,8 +8,8 @@ import { ProfileComponent } from './profile/profile.component';
 import { RedirectComponent } from './redirect/redirect.component';
 
 const routes: Routes = [
-  {path: '', component: AuthComponent, data: {error: 'error'}},
-  {path: 'forgot-password', component: ForgotPasswordComponent},
+  { path: '', component: AuthComponent, data: { error: 'error' } },
+  { path: 'forgot-password', component: ForgotPasswordComponent },
   {
     path: 'profile', component: ProfileComponent, canActivate: [authGuard], data: {
       roles: [Role.admin, Role.manager, Role.professional, Role.customer, Role.roomAdmin]
