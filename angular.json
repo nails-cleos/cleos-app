@@ -38,7 +38,8 @@
               "src/firebase-messaging-sw.js",
               "src/styles.scss",
               "src/sitemap.xml",
-              "src/robot.txt"
+              "src/robot.txt",
+              "src/.well-known/pki-validation/C6F5D5C40BA3516C769DCB03AE23BA37.txt"
             ],
             "styles": [
               "node_modules/angular-calendar/css/angular-calendar.css",
@@ -204,7 +205,8 @@
               "src/firebase-messaging-sw.js",
               "src/styles.scss",
               "src/sitemap.xml",
-              "src/robot.txt"
+              "src/robot.txt",
+              "src/.well-known/pki-validation/C6F5D5C40BA3516C769DCB03AE23BA37.txt"
             ],
             "styles": [
               "node_modules/angular-calendar/css/angular-calendar.css",
