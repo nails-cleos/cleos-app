@@ -226,6 +226,11 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
   }
 
   private exportToExcel(): void {
+    this.sheetData.forEach(monthly => {
+      monthly.saleSummary = monthly.saleSummary.sort((a, b) => a.timestamp - b.timestamp);
+      monthly.expenseSummary = monthly.expenseSummary.sort((a, b) => a.timestamp - b.timestamp);
+      monthly.cashSaleSummary = monthly.cashSaleSummary.sort((a, b) => a.timestamp - b.timestamp);
+    });
     if (this.sheetData.length) {
       const workbook = createYearlyWorkbook(this.sheetData, this.date.value || getNow(), currencySymbol(this.currency), this.timeZone);
 
@@ -273,21 +278,23 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      this.yearSummaryMap = state.yearSummaryMap;
-      if (this.yearSummaryMap) {
-        if (this.yearSummaryMap.size === 1) {
-          this.selectedRoom.setValue(this.yearSummaryMap.keys().next().value);
-        } else {
-          this.yearSummaryMap.forEach((_, key) => {
-            if (key.primary) {
-              this.selectedRoom.setValue(key);
+      if (!this.yearSummaryMap) {
+        this.yearSummaryMap = state.yearSummaryMap;
+        if (this.yearSummaryMap) {
+          if (this.yearSummaryMap.size === 1) {
+            this.selectedRoom.setValue(this.yearSummaryMap.keys().next().value);
+          } else {
+            this.yearSummaryMap.forEach((_, key) => {
+              if (key.primary) {
+                this.selectedRoom.setValue(key);
+              }
+            });
+            if (this.yearSummaryMap.size > 1 && allElementsHaveSameKeyFilterValue(this.yearSummaryMap, ['currency', 'id'])) {
+              this.primaryRoom = this.selectedRoom.value;
             }
-          });
-          if (this.yearSummaryMap.size > 1 && allElementsHaveSameKeyFilterValue(this.yearSummaryMap, ['currency', 'id'])) {
-            this.primaryRoom = this.selectedRoom.value;
           }
+          this.isLoading = false;
         }
-        this.isLoading = false;
       }
       this.yearExport = state.yearExport;
       if (this.yearExport) {
