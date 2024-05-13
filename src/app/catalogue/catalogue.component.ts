@@ -34,6 +34,7 @@ export class CatalogueComponent implements OnInit, OnDestroy {
   errors: any = [];
   private getState: Observable<any>;
   private subscription?: Subscription;
+  private language: string;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
               private router: Router, private translate: TranslateService, private snackBar: MatSnackBar,
@@ -41,6 +42,7 @@ export class CatalogueComponent implements OnInit, OnDestroy {
     this.isAddMode = true;
     this.showImg = false;
     this.getState = this.store.select(selectCatalogueState);
+    this.language = this.translate.currentLang;
   }
 
   get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
@@ -223,7 +225,7 @@ export class CatalogueComponent implements OnInit, OnDestroy {
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
       } else if (state.message) {
-        this.router.navigate(['catalogues']);
+        this.router.navigate([this.language, 'catalogues']);
       }
     });
   }

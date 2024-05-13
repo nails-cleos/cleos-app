@@ -23,6 +23,7 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
 
   code: string | null = null;
   codeForm: UntypedFormControl = new UntypedFormControl();
+  language: string;
 
   private subscription?: Subscription;
   private getState: Observable<any>;
@@ -30,9 +31,10 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   private ui: firebaseui.auth.AuthUI;
 
   constructor(@Optional() private auth: Auth, private store: Store<AppState>, private route: ActivatedRoute, private snackBar: MatSnackBar,
-              private router: Router, private cookieService: CookieService, private translate: TranslateService) {
+              private cookieService: CookieService, private translate: TranslateService) {
     this.getState = this.store.select(selectAuthState);
     this.ui = new firebaseui.auth.AuthUI(this.auth);
+    this.language = this.translate.currentLang;
   }
 
   ngOnInit(): void {
@@ -71,9 +73,9 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
       ],
       credentialHelper: firebaseui.auth.CredentialHelper.GOOGLE_YOLO,
       // Terms of service url.
-      tosUrl: `${environment.appServer}/main/term-and-conditions`,
+      tosUrl: `${ environment.appServer }/${ this.language }/term-and-conditions`,
       // Privacy policy url.
-      privacyPolicyUrl: `${environment.appServer}/main/privacy`
+      privacyPolicyUrl: `${ environment.appServer }/${ this.language }/privacy`
     };
     this.ui.start('#firebaseui-auth-container', uiConfig);
   }

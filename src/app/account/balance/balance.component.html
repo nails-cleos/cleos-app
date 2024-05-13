@@ -4,17 +4,17 @@
     <mat-card-subtitle>{{'ACCOUNT.TITLE' | translate}} {{account.id}}</mat-card-subtitle>
     <div fxFlex></div>
     <ng-template [ngIf]="showAdd">
-      <button mat-icon-button [color]="'primary'" [routerLink]="['/', 'accounts', account.id, 'transactions', 'add']">
+      <button mat-icon-button [color]="'primary'" [routerLink]="['/', language, 'accounts', account.id, 'transactions', 'add']">
         <mat-icon>add</mat-icon>
       </button>
     </ng-template>
     <ng-template [ngIf]="showView">
-      <button mat-icon-button [color]="'primary'" [routerLink]="['/', 'accounts', account.id, 'transactions', 'view']">
+      <button mat-icon-button [color]="'primary'" [routerLink]="['/', language, 'accounts', account.id, 'transactions', 'view']">
         <mat-icon>receipt</mat-icon>
       </button>
     </ng-template>
     <ng-template [ngIf]="showUser">
-      <button mat-icon-button [color]="'primary'" [routerLink]="['/', 'accounts', 'customers', account.customer.id]">
+      <button mat-icon-button [color]="'primary'" [routerLink]="['/', language, 'accounts', 'customers', account.customer.id]">
         <mat-icon>account_balance</mat-icon>
       </button>
     </ng-template>

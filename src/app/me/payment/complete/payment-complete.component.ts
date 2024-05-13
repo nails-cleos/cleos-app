@@ -24,8 +24,8 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
   private reason: any;
   private orderId: any;
   private orderStatusId: any;
-  private paymentSessionId: any;
   private path: string | null = 'reservation';
+  private readonly language: string;
 
   constructor(private route: ActivatedRoute, private router: Router, private store: Store<AppState>,
               private translate: TranslateService) {
@@ -38,8 +38,8 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
       this.reason = params.reason || params.errorcode;
       this.orderId = params.orderId;
       this.orderStatusId = params.orderStatusId;
-      this.paymentSessionId = params.paymentSessionId;
     });
+    this.language = this.translate.currentLang;
   }
 
   ngOnInit(): void {
@@ -85,7 +85,7 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
         this.store.dispatch(
           new fromActionsPayment.PaymentNotComplete({ message })
         );
-        // this.router.navigate(['me', this.path, this.id, 'payment']);
+        // this.router.navigate([this.language, 'me', this.path, this.id, 'payment']);
         return;
       }
       const paymentStatus = new PaymentStatus(this.paymentId, type, referenceId, this.reason);
@@ -100,7 +100,7 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
       if (state.paths) {
         this.router.navigate(state.paths);
       } else if (state.subErrors) {
-        this.router.navigate(['me', this.path, this.id, 'payment']);
+        this.router.navigate([this.language, 'me', this.path, this.id, 'payment']);
       }
     });
   }

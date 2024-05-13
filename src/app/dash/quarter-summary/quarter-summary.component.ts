@@ -42,6 +42,7 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
   year?: number;
   quarterSummaryTotals: ISummaryTotals = new SummaryTotals();
   showCash: boolean;
+  language: string;
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe([
     Breakpoints.XSmall,
@@ -63,10 +64,11 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
       this.userName = value.displayName;
       this.showCash = value.showCash;
     });
+    this.language = this.translate.currentLang;
   }
 
   get goBack(): void {
-    this.router.navigate(['dashboard', 'year', 'summary'], { state: { year: this.year } });
+    this.router.navigate([this.language, 'dashboard', 'year', 'summary'], { state: { year: this.year } });
     return;
   }
 

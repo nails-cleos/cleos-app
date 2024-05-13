@@ -5,10 +5,10 @@
     </mat-card-title>
     <mat-card-subtitle *ngIf="reservation; else skeleton">
       <ng-template [ngIf]="isCustomer" [ngIfElse]="noCustomer">
-        <a [routerLink]="['/', 'me', 'overview']">{{reservation.customer.displayName}}</a>
+        <a [routerLink]="['/', language, 'me', 'overview']">{{reservation.customer.displayName}}</a>
       </ng-template>
       <ng-template #noCustomer>
-        <a [routerLink]="['/', 'users', reservation.customer.id, 'overview']">{{reservation.customer.displayName}}</a>
+        <a [routerLink]="['/', language, 'users', reservation.customer.id, 'overview']">{{reservation.customer.displayName}}</a>
       </ng-template>
       <button (click)="addNote" mat-icon-button type="button" color="accent">
         <mat-icon>note_add</mat-icon>
@@ -93,7 +93,7 @@
         <mat-icon matListItemIcon>{{state | reservationIcon}}</mat-icon>
         <div matListItemTitle>{{ 'COMMON.STATUS.RESERVATION.' + reservation.state | translate}}</div>
         <ng-template [ngIf]="state === 'EDIT_CANCELLED'">
-          <a matListItemLine [routerLink]="['/reservation', reservation.relatedReservationId]">
+          <a matListItemLine [routerLink]="['/', language, 'reservation', reservation.relatedReservationId]">
             {{reservation.relatedReservationId}}
           </a>
         </ng-template>
@@ -247,7 +247,7 @@
             <div *ngIf="payment.id; else skeleton">
               <ng-template
                 [ngIf]="!['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND_PENDING', 'REFUND', 'PENDING', 'CREATED'].includes(payment.status)">
-                <button [routerLink]="['/me', 'payment', payment.id]" mat-icon-button
+                <button [routerLink]="['/', language, 'me', 'payment', payment.id]" mat-icon-button
                         matTooltip="{{ 'COMMON.BUTTON.PAYMENT' | translate }}" matTooltipPosition="right">
                   <mat-icon class="payment-button" color="primary">payment</mat-icon>
                 </button>

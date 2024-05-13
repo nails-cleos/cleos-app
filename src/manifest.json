@@ -6,7 +6,7 @@
   "display": "standalone",
   "gcm_sender_id": "174727853234",
   "scope": "./",
-  "start_url": "/main",
+  "start_url": "/",
   "description": "App to book an appointment to make your nail prettier",
   "display_override": [
     "standalone",

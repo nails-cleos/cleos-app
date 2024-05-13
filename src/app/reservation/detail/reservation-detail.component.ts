@@ -96,6 +96,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   isReservationAdmin?: boolean;
   isCustomer?: boolean;
   step?: number;
+  language: string;
 
   private tooltipPosition = 'below';
   private machine: any;
@@ -107,8 +108,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   private small = false;
   private reservationId?: string;
   private hasRoomAdmin?: boolean;
-
-  private readonly language: string;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private route: ActivatedRoute,
               private store: Store<AppState>, private router: Router, breakpointObserver: BreakpointObserver,
@@ -547,7 +546,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       const treatment = reservation.treatment;
       const professional = reservation.professional;
       const data = { customer, room, treatment, professional };
-      this.router.navigate(['reservation'], { state: data });
+      this.router.navigate([this.language, 'reservation'], { state: data });
     });
 
     const approved = {
@@ -675,7 +674,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       const treatment = reservation.treatment;
       const professional = reservation.professional;
       const data = { room, treatment, professional };
-      this.router.navigate(['me', 'reservation'], { state: data });
+      this.router.navigate([this.language, 'me', 'reservation'], { state: data });
     });
 
     const created = {
@@ -771,7 +770,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         cancelledPaymentRequired.next = [pay];
 
         cancelledPaymentRequired.transitions.pay = ReservationDetailComponent.createTransaction('cancelledPaymentRequired', (): void => {
-          this.router.navigate(['/me', 'payment', self.paymentPaid?.filter((p: IPayment) => p.status !== 'APPROVED')[0]?.id]);
+          this.router.navigate(['/', this.language, 'me', 'payment', self.paymentPaid?.filter((p: IPayment) => p.status !== 'APPROVED')[0]?.id]);
         });
       }
       self.addActions();
@@ -785,7 +784,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
       const transaction = ReservationDetailComponent.createTransaction('paid',
         (): void => {
-          this.router.navigate(['/me', 'reservation', reservation.id, 'payment', 'option']);
+          this.router.navigate(['/', this.language, 'me', 'reservation', reservation.id, 'payment', 'option']);
         });
       approved.transitions.pay = transaction;
       partiallyCompleted.transitions.pay = transaction;

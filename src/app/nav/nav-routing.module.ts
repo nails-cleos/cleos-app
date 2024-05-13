@@ -4,6 +4,7 @@ import { NavComponent } from './nav.component';
 import { TranslationLoaderResolver } from '../util/translation.resolver';
 
 const routes: Routes = [
+  { path: '', loadChildren: () => import('../main/main.module').then(m => m.MainModule) },
   {
     path: '', component: NavComponent, resolve: { model: TranslationLoaderResolver }, children: [
       {

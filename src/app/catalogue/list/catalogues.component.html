@@ -37,13 +37,13 @@
   </div>
 
   <button color="accent" id="add-button" mat-fab matTooltip="{{ 'CATALOGUE.TITLE' | translate }}"
-          routerLink="/catalogues/add">
+          [routerLink]="['/', language, 'catalogues', 'add']">
     <mat-icon>add_a_photo</mat-icon>
   </button>
 </div>
 
 <ng-template #emptyCatalogue>
-  <button class="only-button icon-button" color="accent" mat-fab extended routerLink="/catalogues/add">
+  <button class="only-button icon-button" color="accent" mat-fab extended [routerLink]="['/', language, 'catalogues', 'add']">
     <mat-icon>add_a_photo</mat-icon> &nbsp;{{ 'CATALOGUE.TITLE' | translate }}
   </button>
 </ng-template>

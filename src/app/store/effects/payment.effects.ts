@@ -129,9 +129,11 @@ export class PaymentEffects {
       const payment = data.payload.payment;
       if (data.payload.redirect) {
         if (payment[0].transactionId || payment[0].transaction?.id) {
-          this.router.navigate(['me', 'transaction', payment[0].transactionId || payment[0].transaction.id, 'payment']);
+          this.router.navigate([this.translate.currentLang, 'me', 'transaction',
+            payment[0].transactionId || payment[0].transaction.id, 'payment']);
         } else {
-          this.router.navigate(['me', 'reservation', payment[0].reservationId || payment[0].reservation.id, 'payment']);
+          this.router.navigate([this.translate.currentLang, 'me', 'reservation',
+            payment[0].reservationId || payment[0].reservation.id, 'payment']);
         }
       }
     })

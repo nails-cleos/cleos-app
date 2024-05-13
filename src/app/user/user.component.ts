@@ -12,6 +12,7 @@ import { lightenDarkenColor } from '../util/color';
 import { backendFormatDate, createDateFromString, newDate } from '../util/dates';
 import { fieldChange, valueChange } from '../util/validators';
 import { createAddress } from '../util/helper';
+import { TranslateService } from '@ngx-translate/core';
 import PlaceGeometry = google.maps.places.PlaceGeometry;
 import PlaceResult = google.maps.places.PlaceResult;
 
@@ -34,15 +35,17 @@ export class UserComponent implements OnInit, OnDestroy {
   private getState: Observable<any>;
   private subscription?: Subscription;
   private readonly extras: any;
+  private readonly language: string;
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
-              private router: Router, private cdRef: ChangeDetectorRef) {
+  constructor(private readonly translate: TranslateService, private route: ActivatedRoute, private store: Store<AppState>,
+              private formBuilder: UntypedFormBuilder, private router: Router, private cdRef: ChangeDetectorRef) {
     this.isAddMode = true;
     this.getState = this.store.select(selectUserState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
     if (this.extras) {
       this.getForm.role.setValue(this.extras.role);
     }
+    this.language = this.translate.currentLang;
   }
 
   get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
@@ -168,7 +171,7 @@ export class UserComponent implements OnInit, OnDestroy {
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
       } else if (state.message) {
-        this.router.navigate(['users']);
+        this.router.navigate([this.translate.currentLang, 'users']);
       }
     });
   }

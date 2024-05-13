@@ -12,6 +12,7 @@ import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { map, startWith } from 'rxjs/operators';
 import { fieldChange } from '../util/validators';
 import { areEquals } from '../util/helper';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-treatment',
@@ -33,15 +34,17 @@ export class TreatmentComponent implements OnInit, OnDestroy {
   allColors?: IColorAll[];
 
   errors: any = [];
+  language: string;
 
   private getState: Observable<any>;
   private subscription: Subscription | undefined;
   private currentColorIds: string[] = [];
 
   constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router,
-              private route: ActivatedRoute, private cdRef: ChangeDetectorRef) {
+              private route: ActivatedRoute, private cdRef: ChangeDetectorRef, private translate: TranslateService) {
     this.isAddMode = true;
     this.getState = this.store.select(selectTreatmentState);
+    this.language = this.translate.currentLang;
   }
 
   get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
@@ -214,7 +217,7 @@ export class TreatmentComponent implements OnInit, OnDestroy {
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
       } else if (state.message) {
-        this.router.navigate(['treatments']);
+        this.router.navigate([this.translate.currentLang, 'treatments']);
       }
     });
   }

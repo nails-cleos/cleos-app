@@ -1,7 +1,7 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="60%" fxFlex.lt-sm="80%">
-      <app-balance [account]="account" [showAdd]="true" [showUser]="true"></app-balance>
+      <app-balance [account]="account" [showAdd]="true" [showUser]="true" [language]="language"></app-balance>
     </div>
   </div>
 </div>
@@ -85,7 +85,8 @@
       <td *matCellDef="let transaction" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="transaction.id; else skeleton">
           <ng-template [ngIf]="!transaction.deleted">
-            <button mat-icon-button [routerLink]="['/', 'accounts', account?.id, 'transactions', transaction.id]"
+            <button mat-icon-button
+                    [routerLink]="['/', language, 'accounts', account?.id, 'transactions', transaction.id]"
                     matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
               <mat-icon color="primary">visibility</mat-icon>
             </button>
@@ -127,7 +128,8 @@
             <ng-template [ngIf]="!transaction.deleted">
               <div matListItemTitle>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
               <mat-list-item role="list">
-                <button [routerLink]="['/', 'accounts', account?.id, 'transactions', transaction.id]" color="primary"
+                <button [routerLink]="['/', language, 'accounts', account?.id, 'transactions', transaction.id]"
+                        color="primary"
                         mat-icon-button>
                   <mat-icon matListItemIcon>visibility</mat-icon>
                 </button>

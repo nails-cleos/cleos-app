@@ -8,13 +8,14 @@ import * as fromActionsUser from '../../store/user.actions';
 import { fieldChange, valueChange } from '../../util/validators';
 import { Location } from '@angular/common';
 import { findFlag, flags, IFlag } from '../../util/flags';
-import { createAddress, getDisplayNameInitials, getUserImage } from '../../util/helper';
+import { createAddress, getDisplayNameInitials, getLocale, getUserImage } from '../../util/helper';
 import { backendFormatDate, createDateFromString, newDate } from '../../util/dates';
 import { Color } from '@angular-material-components/color-picker';
 import { lightenDarkenColor } from '../../util/color';
 import { Role } from '../../interfaces/token';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-profile',
@@ -52,8 +53,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private geometry?: PlaceGeometry;
   private formattedAddress?: string;
 
-  constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private location: Location,
-              private cdRef: ChangeDetectorRef) {
+  constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private cdRef: ChangeDetectorRef,
+              private translate: TranslateService) {
     this.showCash = false;
     this.isAdmin = false;
     this.getState = this.store.select(selectUserState);
@@ -84,7 +85,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     user.address = createAddress(this.formattedAddress, this.geometry?.location, this.user?.address);
 
     return this.store.dispatch(
-      new fromActionsUser.UpdateUser({ user, redirectUrl: 'auth/profile' })
+      new fromActionsUser.UpdateUser({ user, redirectUrl: `${ getLocale(this.translate.currentLang).language }/auth/profile` })
     );
   }
 

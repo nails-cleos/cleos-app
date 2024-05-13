@@ -41,6 +41,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   pageSize = PAGE_SIZE;
 
   dateFormat: string;
+  language: string;
   error: any;
   small = false;
 
@@ -54,6 +55,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
               private analytic: Analytics) {
     this.getState = this.store.select(selectReservationState);
     this.dateFormat = this.translate.currentLang;
+    this.language = this.translate.currentLang;
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -147,9 +149,9 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
               if (link) {
                 window.open(link, '_self');
               } else if (paymentId) {
-                this.router.navigate(['me', 'payment', paymentId]);
+                this.router.navigate([this.language, 'me', 'payment', paymentId]);
               } else if (!pending) {
-                this.router.navigate(['/me', 'reservation', u.id, 'payment', 'option']);
+                this.router.navigate(['/', this.language, 'me', 'reservation', u.id, 'payment', 'option']);
               }
             }
           });

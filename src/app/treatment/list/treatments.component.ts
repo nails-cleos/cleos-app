@@ -32,6 +32,7 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   expanded?: ITreatmentGroup;
   dateFormat: string;
+  language: string;
 
   private subscription?: Subscription;
   private paginatorSubscription?: Subscription;
@@ -48,6 +49,7 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
     this.dateFormat = this.translate.currentLang;
+    this.language = this.translate.currentLang;
     this.getState = this.store.select(selectTreatmentState);
   }
 

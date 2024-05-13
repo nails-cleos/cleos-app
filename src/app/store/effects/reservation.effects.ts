@@ -333,12 +333,12 @@ export class ReservationEffects {
     ));
 
   paymentOptions$ = createEffect(() => this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.paymentOptions)).pipe(
-      map((action: any) => action.payload),
-      switchMap(() => this.paymentService.paymentOptions().pipe(
-        switchMap((response: any) => of(new fromActionsReservation.PaymentOptionsSuccess(response))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({ error: err.error })))
-      ))
-    ));
+    map((action: any) => action.payload),
+    switchMap(() => this.paymentService.paymentOptions().pipe(
+      switchMap((response: any) => of(new fromActionsReservation.PaymentOptionsSuccess(response))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({ error: err.error })))
+    ))
+  ));
 
   updateNote$ = createEffect(() => this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.updateNote)).pipe(
     map((action: any) => action.payload),
@@ -457,7 +457,8 @@ export class ReservationEffects {
   reservationComplete$ = createEffect(() => this.actions.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.reservationCompleteSuccess),
     tap((data: any) => {
-      this.router.navigate(data.payload.isDashboard ? ['events'] : ['reservation', data.payload.id]);
+      this.router.navigate(data.payload.isDashboard ?
+        [this.translate.currentLang, 'events'] : [this.translate.currentLang, 'reservation', data.payload.id]);
     })
   ), { dispatch: false });
 

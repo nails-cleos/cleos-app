@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Role } from '../../interfaces/token';
 import { LoginSuccess } from '../auth.actions';
+import { getLocale } from '../../util/helper';
 
 @Injectable()
 export class UserEffects {
@@ -124,7 +125,7 @@ export class UserEffects {
         const message = this.translate.instant('COMMON.PROFILE.UPDATED.PHOTO');
         return of(new LoginSuccess({
           response, queryParams: {
-            state: btoa(JSON.stringify({ returnUrl: '/auth/profile' }))
+            state: btoa(JSON.stringify({ returnUrl: `/${getLocale(this.translate.currentLang).language}/auth/profile` }))
           }
         }), new fromActionsUser.UserSaveSuccess({ message }));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
@@ -187,7 +188,7 @@ export class UserEffects {
     ofType(fromActionsUser.UserActionTypes.userSelected),
     tap((data: any) => {
       if (!data.payload.profile) {
-        this.router.navigate(['users', data.payload.user.id]);
+        this.router.navigate([this.translate.currentLang, 'users', data.payload.user.id]);
       }
     })
   ), { dispatch: false });

@@ -20,6 +20,7 @@ export class MePaymentComponent implements OnInit, OnDestroy {
   options?: IPaymentOption[];
 
   payment?: IPaymentAll;
+  language: string;
 
   private getState: Observable<any>;
   private subscription?: Subscription;
@@ -31,6 +32,7 @@ export class MePaymentComponent implements OnInit, OnDestroy {
       type: new UntypedFormControl(undefined),
       bank: new UntypedFormControl(''),
     });
+    this.language = this.translate.currentLang;
   }
 
   get update(): void {

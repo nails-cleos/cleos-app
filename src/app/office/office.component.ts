@@ -38,10 +38,12 @@ export class OfficeComponent implements OnInit, OnDestroy {
 
   private getState: Observable<any>;
   private subscription?: Subscription;
+  private readonly language: string;
 
-  constructor(private readonly translate: TranslateService, private store: Store<AppState>,
+  constructor(private translate: TranslateService, private store: Store<AppState>,
               private formBuilder: UntypedFormBuilder, private router: Router) {
     this.getState = this.store.select(selectOfficeState);
+    this.language = this.translate.currentLang;
   }
 
   get create(): void {
@@ -64,7 +66,7 @@ export class OfficeComponent implements OnInit, OnDestroy {
   }
 
   get addManager(): void {
-    this.router.navigate(['users', 'add'], {state: {role: Role.manager}});
+    this.router.navigate([this.language, 'users', 'add'], {state: {role: Role.manager}});
     return;
   }
 
@@ -117,7 +119,7 @@ export class OfficeComponent implements OnInit, OnDestroy {
           this.form.controls[value.field].setErrors({incorrect: true});
         });
       } else if (state.message) {
-        this.router.navigate(['offices']);
+        this.router.navigate([this.language, 'offices']);
       }
     });
   }

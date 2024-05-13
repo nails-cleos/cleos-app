@@ -19,9 +19,11 @@ export class UpcomingComponent implements OnChanges {
   @Input() small!: boolean;
 
   dateFormat: string;
+  language: string;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private router: Router) {
     this.dateFormat = this.translate.currentLang;
+    this.language = this.translate.currentLang;
     this.showHeader = false;
   }
 
@@ -33,7 +35,7 @@ export class UpcomingComponent implements OnChanges {
     if (this.upcoming && !this.upcoming.canEdit && this.upcoming.price.totalPaid < this.upcoming.price.penalty) {
       return customerEditDialog(this.dialog, this.router, this.upcoming.id, this.upcoming.room.currency, this.small, this.upcoming.price);
     }
-    this.router.navigate(['me', 'reservation', this.upcoming?.id]);
+    this.router.navigate([this.language, 'me', 'reservation', this.upcoming?.id]);
     return;
   }
 

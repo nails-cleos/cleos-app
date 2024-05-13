@@ -86,7 +86,7 @@ export class AdditionalEffects {
 
   selectedData$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsAdditional.AdditionalActionTypes.additionalSelected),
-    tap((data: any) => this.router.navigate(['additional', data.payload.id]))
+    tap((data: any) => this.router.navigate([this.translate.currentLang, 'additional', data.payload.id]))
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions$.pipe(

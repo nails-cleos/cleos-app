@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { ICurrency, ICurrencyAll } from '../interfaces/currency';
 import { requireMatch } from '../util/validators';
 import { map, startWith } from 'rxjs/operators';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-discount',
@@ -38,9 +39,12 @@ export class DiscountComponent implements OnInit, OnDestroy {
   ]);
 
   types = DiscountType;
+  private readonly language: string;
 
-  constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router) {
+  constructor(private readonly translate: TranslateService, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
+              private router: Router) {
     this.getState = this.store.select(selectDiscountState);
+    this.language = this.translate.currentLang;
   }
 
   get create(): void {
@@ -61,7 +65,7 @@ export class DiscountComponent implements OnInit, OnDestroy {
   }
 
   get addCurrency(): void {
-    this.router.navigate(['currency', 'add']);
+    this.router.navigate([this.language, 'currency', 'add']);
     return;
   }
 
@@ -113,10 +117,10 @@ export class DiscountComponent implements OnInit, OnDestroy {
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({incorrect: true});
+          this.form.controls[value.field].setErrors({ incorrect: true });
         });
       } else if (state.message) {
-        this.router.navigate(['discounts']);
+        this.router.navigate([this.language, 'discounts']);
       }
     });
   }

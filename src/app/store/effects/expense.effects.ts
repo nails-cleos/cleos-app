@@ -68,7 +68,7 @@ export class ExpenseEffects {
 
   selectedData$ = createEffect(() => this.actions.pipe(
     ofType(fromActionsExpense.ExpenseActionTypes.expenseSelected),
-    tap((data: any) => this.router.navigate(['rooms', data.payload.expense.room.id, 'expenses',
+    tap((data: any) => this.router.navigate([this.translate.currentLang, 'rooms', data.payload.expense.room.id, 'expenses',
       data.payload.expense.id]))
   ), { dispatch: false });
 

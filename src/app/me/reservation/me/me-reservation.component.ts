@@ -181,6 +181,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   private steps: IStep[];
   private dismiss = false;
   private treatmentDiscount?: IDiscount;
+  private readonly language: string;
 
   constructor(private readonly translate: TranslateService, private snackBar: MatSnackBar, private store: Store<AppState>,
               private formBuilder: UntypedFormBuilder, private breakpointObserver: BreakpointObserver, private router: Router,
@@ -218,6 +219,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       bank: new UntypedFormControl(''),
       percentage: new UntypedFormControl(undefined)
     });
+    this.language = this.translate.currentLang;
   }
 
   get professionalName(): string {
@@ -710,7 +712,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     });
     snackBarRef.afterDismissed().subscribe(() => {
       this.clean();
-      this.router.navigate(['me', 'reservations']);
+      this.router.navigate([this.language, 'me', 'reservations']);
     });
   }
 

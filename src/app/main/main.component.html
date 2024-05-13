@@ -62,7 +62,7 @@
         <button (click)="scrollToElement('contact')" mat-button type="button" aria-label="Go to contact">
           <span>{{'MAIN.SECTION.CONTACT' | translate }}</span>
         </button>
-        <button [routerLinkActive]="['active']" [routerLink]="'/main/catalogs'" mat-button type="button"
+        <button [routerLinkActive]="['active']" [routerLink]="['/', language, 'catalogs']" mat-button type="button"
                 aria-label="Catalogs">
           <span>{{'MAIN.SECTION.CATALOG' | translate }}</span>
         </button>
@@ -71,7 +71,7 @@
           <span>{{'MAIN.SECTION.ACCOUNT' | translate }}</span>
         </button>
         <ng-template #login>
-          <button [routerLinkActive]="['active']" [routerLink]="'/auth'" mat-button type="button"
+          <button [routerLinkActive]="['active']" [routerLink]="['/', language, 'auth']" mat-button type="button"
                   aria-label="Go to login">
             <span>{{'MAIN.SECTION.AUTH' | translate }}</span>
           </button>
@@ -109,7 +109,7 @@
               <div mat-line>{{'MAIN.SECTION.CONTACT' | translate }}</div>
             </a>
             <mat-divider></mat-divider>
-            <a [routerLink]="'/main/catalogs'" mat-list-item aria-label="Catalogs">
+            <a [routerLink]="['/', language, 'catalogs']" mat-list-item aria-label="Catalogs">
               <mat-icon matListItemIcon>collections</mat-icon>
               <div mat-line>{{'MAIN.SECTION.CATALOG' | translate }}</div>
             </a>
@@ -120,7 +120,7 @@
               <div mat-line>{{'MAIN.SECTION.ACCOUNT' | translate }}</div>
             </a>
             <ng-template #login>
-              <a [routerLink]="'/auth'" mat-list-item aria-label="Go to login">
+              <a [routerLink]="['/', language, 'auth']" mat-list-item aria-label="Go to login">
                 <mat-icon matListItemIcon>login</mat-icon>
                 <div mat-line>{{'MAIN.SECTION.AUTH' | translate }}</div>
               </a>
@@ -141,11 +141,11 @@
           </mat-toolbar-row>
           <mat-toolbar-row style="margin-top: 20px">
               <span style="margin: auto;">
-                <button [routerLinkActive]="['active']" [routerLink]="'/main/privacy'" mat-button
+                <button [routerLinkActive]="['active']" [routerLink]="['/', language, 'privacy']" mat-button
                         aria-label="Go to privacy">
                   <span>{{'MAIN.SECTION.PRIVACY' | translate }}</span>
                 </button>
-                <button [routerLinkActive]="['active']" [routerLink]="'/main/term-and-conditions'" mat-button
+                <button [routerLinkActive]="['active']" [routerLink]="['/', language, 'term-and-conditions']" mat-button
                         aria-label="Go to term-and-conditions">
                   <span>{{'MAIN.SECTION.TERM_AND_CONDITIONS' | translate }}</span>
                 </button>

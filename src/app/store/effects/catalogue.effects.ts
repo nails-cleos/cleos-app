@@ -86,7 +86,7 @@ export class CatalogueEffects {
 
   selectedData$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsCatalogue.CatalogueActionTypes.catalogueSelected),
-    tap((data: any) => this.router.navigate(['catalogues', data.payload.id]))
+    tap((data: any) => this.router.navigate([this.translate.currentLang, 'catalogues', data.payload.id]))
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions$.pipe(

@@ -9,6 +9,7 @@ import { Observable, Subscription } from 'rxjs';
 import { IAccountAll } from '../../interfaces/account';
 import { getPayNlOptions, IPaymentOption, PaymentOption, PaymentType } from '../../interfaces/payment';
 import { currencySymbol } from '../../util/helper';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-transaction',
@@ -23,6 +24,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
   types: string[] = [PaymentType.cash, PaymentType.transfer];
   options?: IPaymentOption[];
   amountMin: number;
+  language: string;
 
   errors: any = [];
 
@@ -32,10 +34,11 @@ export class TransactionComponent implements OnInit, OnDestroy {
   private accountId?: string;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
-              private authUserService: AuthUserService, private router: Router) {
+              private authUserService: AuthUserService, private router: Router, private translate: TranslateService) {
     this.getState = this.store.select(selectAccountState);
     this.hasAdminRole = false;
     this.amountMin = 100;
+    this.language = this.translate.currentLang;
     this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
       this.hasAdminRole = value.hasAdminRole;
       if (!value.hasAdminRole) {
@@ -137,9 +140,9 @@ export class TransactionComponent implements OnInit, OnDestroy {
         });
       } else if (state.message) {
         if (this.hasAdminRole) {
-          this.router.navigate(['users', this.account?.customer?.id, 'overview']);
+          this.router.navigate([this.language, 'users', this.account?.customer?.id, 'overview']);
         } else {
-          this.router.navigate(['me', 'overview']);
+          this.router.navigate([this.language, 'me', 'overview']);
         }
       }
     });

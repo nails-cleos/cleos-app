@@ -21,10 +21,12 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
   subscription?: Subscription;
 
   form!: UntypedFormGroup;
+  language: string;
 
   constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private snackBar: MatSnackBar,
               private router: Router, private auth: Auth, private translate: TranslateService) {
     this.getState = this.store.select(selectAuthState);
+    this.language = this.translate.currentLang;
   }
 
   get forgotPassword(): void {
@@ -67,7 +69,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
         });
         if (state.message) {
           snackBarRef.afterDismissed().subscribe(() => {
-            this.router.navigate(['auth']);
+            this.router.navigate([this.language, 'auth']);
           });
         }
       }

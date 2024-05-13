@@ -24,7 +24,7 @@
             <mat-divider></mat-divider>
             <mat-card-actions>
               <div fxFlex></div>
-              <button [routerLink]="['/me', 'reservation']" color="primary" mat-fab extended>
+              <button [routerLink]="['/', language, 'me', 'reservation']" color="primary" mat-fab extended>
                 <mat-icon>book_online</mat-icon>
                 {{ 'COMMON.BUTTON.CREATE' | translate }}
               </button>
@@ -104,7 +104,7 @@
       <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
       <td *matCellDef="let reservation" mat-cell>
         <div *ngIf="reservation.id; else skeleton">
-          <button [routerLink]="['/reservation', reservation.id]" mat-icon-button
+          <button [routerLink]="['/', language, 'reservation', reservation.id]" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
             <mat-icon color="primary">visibility</mat-icon>
           </button>

@@ -30,6 +30,7 @@ export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
+  language: string;
 
   private subscription: Subscription | undefined;
   private paginatorSubscription: Subscription | undefined;
@@ -46,6 +47,7 @@ export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
     this.getState = this.store.select(selectOfficeState);
+    this.language = this.translate.currentLang;
   }
 
   ngAfterViewInit(): void {
@@ -78,15 +80,15 @@ export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   edit(office: IOffice): void {
     this.store.dispatch(
-      new fromActionsOffice.OfficeSelected({office, redirect: true})
+      new fromActionsOffice.OfficeSelected({ office, redirect: true })
     );
   }
 
   delete(office: IOffice): void {
     const title = this.translate.instant('OFFICE.DELETED.TITLE');
-    const content = this.translate.instant('OFFICE.DELETED.CONTENT', {name: office.name});
+    const content = this.translate.instant('OFFICE.DELETED.CONTENT', { name: office.name });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: {title, content, value: office}
+      data: { title, content, value: office }
     });
 
     dialogRef.afterClosed().subscribe(result => {

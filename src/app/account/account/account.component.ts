@@ -10,6 +10,8 @@ import { map, startWith } from 'rxjs/operators';
 import { FormBuilder, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
 import { requireMatch, valueChange } from '../../util/validators';
 import { AuthUserService } from '../../services/auth-user.service';
+import { getLocale } from '../../util/helper';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-account',
@@ -25,6 +27,7 @@ export class AccountComponent implements OnInit, OnDestroy {
   errors: any = [];
   showAdd: boolean;
   userId?: string;
+  language: string;
 
   private getState: Observable<any>;
   private subscription?: Subscription;
@@ -33,7 +36,7 @@ export class AccountComponent implements OnInit, OnDestroy {
   private hasAdminRole: boolean;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
-              private authUserService: AuthUserService, private router: Router) {
+              private authUserService: AuthUserService, private router: Router, private translate: TranslateService) {
     this.showAdd = false;
     this.hasAdminRole = false;
     this.getState = this.store.select(selectAccountState);
@@ -41,6 +44,7 @@ export class AccountComponent implements OnInit, OnDestroy {
       this.hasAdminRole = value.hasAdminRole;
       this.userId = value.customerId;
     });
+    this.language = getLocale(this.translate.currentLang).language;
   }
 
   get getForm(): ɵTypedOrUntyped<any, any, any> {
@@ -132,9 +136,9 @@ export class AccountComponent implements OnInit, OnDestroy {
         });
       } else if (state.message) {
         if (this.hasAdminRole) {
-          this.router.navigate(['users', this.customerId, 'overview']);
+          this.router.navigate([this.language, 'users', this.customerId, 'overview']);
         } else {
-          this.router.navigate(['me', 'overview']);
+          this.router.navigate([this.language, 'me', 'overview']);
         }
       }
     });

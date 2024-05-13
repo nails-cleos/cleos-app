@@ -5,8 +5,7 @@ import { AppState } from '../store/app.states';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
-import { ViewportScroller } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import * as fromActionsLogin from '../store/auth.actions';
 import { IUser, User } from '../interfaces/user';
 import { OverlayContainer } from '@angular/cdk/overlay';
@@ -18,9 +17,10 @@ import { bottomTop, colorChange, colorChangeChild, fade, goTo, observeElement } 
 import { Auth, user } from '@angular/fire/auth';
 import { AuthUserService } from '../services/auth-user.service';
 import { MainContentService } from './main-content.service';
-import { NgcCookieConsentService } from 'ngx-cookieconsent';
 import * as fromActionsMain from '../store/main.actions';
 import { TokenService } from '../services/token.service';
+import { NavigationService } from '../services/navigation.service';
+import { getLocale } from '../util/helper';
 
 @Component({
   selector: 'app-main',
@@ -42,6 +42,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   cssClass?: string;
   isDarkMode: boolean;
   backgroundColor: string;
+  language: string;
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(map(result => result.matches), shareReplay());
 
@@ -50,12 +51,11 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private navigationObserve?: IntersectionObserver;
 
-  constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
-              private viewportScroller: ViewportScroller, private router: Router, private translate: TranslateService,
-              private overlayContainer: OverlayContainer, private cookieService: CookieService,
+  constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>, private router: Router,
+              private translate: TranslateService, private overlayContainer: OverlayContainer, private cookieService: CookieService,
               private themeService: ThemeService, @Optional() private auth: Auth, private authUserService: AuthUserService,
-              private mainContent: MainContentService, private cookieConsentService: NgcCookieConsentService,
-              private tokenService: TokenService) {
+              mainContent: MainContentService, private tokenService: TokenService, private navigationService: NavigationService,
+              private route: ActivatedRoute) {
     this.navigationState = new BehaviorSubject<'open' | 'close'>('close');
     this.isAuthenticated = false;
     this.showLoader = true;
@@ -70,6 +70,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
       this.showLoader = it.showPreload;
       this.navigationState.next(it.navigationHeader);
     });
+    this.language = this.translate.currentLang;
   }
 
   get changeTheme(): void {
@@ -96,6 +97,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.authUserService.cookieConsent(this.translate);
+    this.language = this.navigationService.attachLang(this.route.snapshot.paramMap.get('lang'));
   }
 
   ngAfterViewInit(): void {
@@ -108,7 +110,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   scrollToElement(element: HTMLElement | string): void {
-    this.router.navigate(['/', 'main']).then(() => setTimeout(() => {
+    this.router.navigate(['/', this.language]).then(() => setTimeout(() => {
       this.navigationAnimation();
       goTo(element);
     }, 100));

@@ -38,6 +38,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
   error: any;
   isAdmin = false;
   dateFormat: string;
+  language: string;
 
   private getState: Observable<any>;
   private subscription?: Subscription;
@@ -45,9 +46,10 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
   private authUserServiceSubscription: Subscription;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver, private authUserService: AuthUserService) {
+              private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver, private authUserService: AuthUserService) {
     this.getState = this.store.select(selectReservationState);
     this.dateFormat = this.translate.currentLang;
+    this.language = this.translate.currentLang;
     this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => this.isAdmin = value.isAdmin);
     breakpointObserver.observe([
       Breakpoints.XSmall,

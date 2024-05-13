@@ -83,13 +83,13 @@
               <button (click)="edit(user)" mat-icon-button>
                 <mat-icon color="primary">edit</mat-icon>
               </button>
-              <button [routerLink]="['/users', user.id, 'overview']" mat-icon-button>
+              <button [routerLink]="['/', language, 'users', user.id, 'overview']" mat-icon-button>
                 <mat-icon color="primary">analytics</mat-icon>
               </button>
               <button (click)="book(user)" mat-icon-button>
                 <mat-icon color="accent">today</mat-icon>
               </button>
-              <button [routerLink]="['/', 'accounts', 'customers', user.id]" mat-icon-button>
+              <button [routerLink]="['/', language, 'accounts', 'customers', user.id]" mat-icon-button>
                 <mat-icon color="primary">account_balance</mat-icon>
               </button>
               <ng-template [ngIf]="!user.deleted && !user.verified && user.uid">
@@ -159,7 +159,7 @@
                   <button (click)="edit(user)" mat-icon-button>
                     <mat-icon color="primary">edit</mat-icon>
                   </button>
-                  <button [routerLink]="['/users', user.id, 'overview']" mat-icon-button>
+                  <button [routerLink]="['/', language, 'users', user.id, 'overview']" mat-icon-button>
                     <mat-icon color="primary">analytics</mat-icon>
                   </button>
                   <button (click)="book(user)" mat-icon-button>
@@ -209,7 +209,7 @@
     <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
 
     <button color="accent" id="add-button" mat-fab matTooltip="{{ 'USER.TITLE' | translate }}"
-            routerLink="/users/add">
+            [routerLink]="['/', language, 'users', 'add']">
       <mat-icon>person_add</mat-icon>
     </button>
   </div>

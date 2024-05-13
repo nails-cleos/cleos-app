@@ -2,10 +2,11 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import {
-  AppState, selectAccountState,
+  AppState,
+  selectAccountState,
   selectAdditionalState,
   selectAuthState,
   selectCatalogueState,
@@ -31,7 +32,7 @@ import { INotification } from '../interfaces/notification';
 import { TranslateService } from '@ngx-translate/core';
 import { MessagingService } from '../services/messaging.service';
 import { environment } from '../../environments/environment';
-import { getUserImage, getDisplayNameInitials } from '../util/helper';
+import { getDisplayNameInitials, getLocale, getUserImage } from '../util/helper';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NavigationService } from '../services/navigation.service';
 import { TokenService } from '../services/token.service';
@@ -80,6 +81,7 @@ export class NavComponent implements OnInit, OnDestroy {
 
   isDarkMode = false;
   step = 0;
+  language: string;
 
   private getState: Observable<any>;
   private getNotificationState: Observable<any>;
@@ -94,9 +96,10 @@ export class NavComponent implements OnInit, OnDestroy {
               private snackBar: MatSnackBar, private navigation: NavigationService, private tokenService: TokenService,
               private cookieService: CookieService, private overlayContainer: OverlayContainer,
               private themeService: ThemeService, private navigationService: NavigationService, private authUserService: AuthUserService,
-              private seoService: SeoService) {
+              private seoService: SeoService, private route: ActivatedRoute) {
     this.isDarkMode = isDarkMode(cookieService.get(THEME) as Theme);
     this.dateFormat = this.translate.currentLang;
+    this.language = this.translate.currentLang;
     this.getState = this.store.select(selectAuthState);
     this.getNotificationState = this.store.select(selectNotificationState);
     this.selectStore([selectRoomState, selectTreatmentState, selectCatalogueState, selectDiscountState, selectUnavailableState,
@@ -137,6 +140,8 @@ export class NavComponent implements OnInit, OnDestroy {
 
     this.seoService.setMetaDescription(meta.CONTENT);
     this.seoService.setMetaTitle(meta.TITLE);
+
+    this.language = this.navigationService.attachLang(this.route.snapshot.paramMap.get('lang'));
   }
 
   ngOnDestroy(): void {
@@ -169,7 +174,7 @@ export class NavComponent implements OnInit, OnDestroy {
   navigate(menu: IMenu, drawer?: any): void {
     drawer?.toggle();
     this.error = undefined;
-    this.router.navigate([menu.path]);
+    this.router.navigate([this.language].concat(menu.path.split('/')));
   }
 
   setStep(index: number): void {
@@ -212,6 +217,7 @@ export class NavComponent implements OnInit, OnDestroy {
         this.currentUser = user;
         this.resetTheme(this.currentUser.theme);
         this.menuItems = state.menus;
+        console.log(this.menuItems);
         this.initials = getDisplayNameInitials(user);
         this.image = getUserImage(user);
         this.messagingService.requestPermission(user);
@@ -238,13 +244,14 @@ export class NavComponent implements OnInit, OnDestroy {
           }
         });
       }
-      if (this.router.url === '/') {
+      const language = getLocale(this.translate.currentLang).language;
+      if (this.router.url === `/${ language }`) {
         if (this.isAuthorized && !state.redirect) {
           this.store.dispatch(
             new fromActionsLogin.Redirect()
           );
         } else {
-          this.router.navigate(['main']);
+          this.router.navigate(['/', language]);
         }
       }
     });

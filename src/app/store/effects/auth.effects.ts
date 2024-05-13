@@ -10,6 +10,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { NavigationService } from '../../services/navigation.service';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Auth, signOut } from '@angular/fire/auth';
+import { getLocale } from '../../util/helper';
 
 @Injectable()
 export class LoginEffects {
@@ -27,7 +28,7 @@ export class LoginEffects {
 
   loginSuccess$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.loginSuccess),
     tap((response: any) => {
-      let redirectUrl = ['auth', 'redirect'];
+      let redirectUrl = [getLocale(this.translate.currentLang).language, 'auth', 'redirect'];
       if (Object.keys(response.payload.queryParams).length) {
         const state = JSON.parse(atob(response.payload.queryParams.state));
         const decodedURI = state.returnUrl;
@@ -57,7 +58,7 @@ export class LoginEffects {
       signOut(this.auth).then(() => {
         this.authUserService.reloadUser();
         localStorage.removeItem('auth');
-        window.location.href = '/main';
+        window.location.href = `/${ getLocale(this.translate.currentLang).language }`;
       }).catch((error) => {
         console.error('sign out error: ' + error);
       });
@@ -67,12 +68,12 @@ export class LoginEffects {
   reLogin$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.reLogin),
     tap(() => {
       localStorage.removeItem('auth');
-      window.location.href = '/auth';
+      window.location.href = `/${ this.translate.currentLang }/auth`;
     })
   ), { dispatch: false });
 
   redirect$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.redirect),
-    tap(() => this.router.navigate(['auth', 'redirect']))
+    tap(() => this.router.navigate([this.translate.currentLang, 'auth', 'redirect']))
   ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private authService: AuthService,

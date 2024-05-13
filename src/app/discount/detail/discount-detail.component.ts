@@ -7,6 +7,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectDiscountState } from '../../store/app.states';
 import { fieldChange, valueChange } from '../../util/validators';
 import * as fromActionsDiscount from '../../store/discount.actions';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-discount-detail',
@@ -33,10 +34,12 @@ export class DiscountDetailComponent implements OnInit, AfterViewInit, OnDestroy
 
   private subscription?: Subscription;
   private getState: Observable<any>;
+  private readonly language: string;
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
-              private router: Router) {
+  constructor(private readonly translate: TranslateService, private route: ActivatedRoute, private store: Store<AppState>,
+              private formBuilder: UntypedFormBuilder, private router: Router) {
     this.getState = this.store.select(selectDiscountState);
+    this.language = this.translate.currentLang;
   }
 
   get update(): void {
@@ -95,7 +98,7 @@ export class DiscountDetailComponent implements OnInit, AfterViewInit, OnDestroy
           this.form.controls[value.field].setErrors({incorrect: true});
         });
       } else if (state.message) {
-        this.router.navigate(['discounts']);
+        this.router.navigate([this.language, 'discounts']);
       }
     });
   }

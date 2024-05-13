@@ -117,7 +117,7 @@ export class BottomSheetShareComponent {
   show: number;
 
   constructor(@Inject(MAT_BOTTOM_SHEET_DATA) public data: { code: string }, private translate: TranslateService,
-              private breakpointObserver: BreakpointObserver) {
+              breakpointObserver: BreakpointObserver) {
     this.show = 7;
     breakpointObserver.observe([
       Breakpoints.XSmall,
