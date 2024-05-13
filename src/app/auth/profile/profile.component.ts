@@ -6,16 +6,15 @@ import { IUser, User } from '../../interfaces/user';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import * as fromActionsUser from '../../store/user.actions';
 import { fieldChange, valueChange } from '../../util/validators';
-import { Location } from '@angular/common';
 import { findFlag, flags, IFlag } from '../../util/flags';
-import { createAddress, getDisplayNameInitials, getLocale, getUserImage } from '../../util/helper';
+import { createAddress, getDisplayNameInitials, getUserImage } from '../../util/helper';
 import { backendFormatDate, createDateFromString, newDate } from '../../util/dates';
 import { Color } from '@angular-material-components/color-picker';
 import { lightenDarkenColor } from '../../util/color';
 import { Role } from '../../interfaces/token';
+import { TranslateService } from '@ngx-translate/core';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
-import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-profile',
@@ -64,8 +63,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
     if (this.form.invalid) {
       return;
     }
+
+    const lang = valueChange(this.langValue.value.value, this.user?.locale) || this.translate.currentLang;
     const user: IUser = new User();
-    user.lang = valueChange(this.langValue.value.value, this.user?.locale);
+    user.lang = lang;
     user.displayName = fieldChange(this.displayName, this.user?.displayName);
     user.phone = fieldChange(this.phone, this.user?.phone);
     user.dob = fieldChange(this.dob, this.user?.dob);
@@ -85,7 +86,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     user.address = createAddress(this.formattedAddress, this.geometry?.location, this.user?.address);
 
     return this.store.dispatch(
-      new fromActionsUser.UpdateUser({ user, redirectUrl: `${ getLocale(this.translate.currentLang).language }/auth/profile` })
+      new fromActionsUser.UpdateUser({ user, redirectUrl: `/${ lang }/auth/profile` })
     );
   }
 

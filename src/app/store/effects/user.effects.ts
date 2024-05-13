@@ -109,6 +109,7 @@ export class UserEffects {
     switchMap((payload: any) => this.userService.updateMe(payload.user).pipe(
       switchMap((response: any) => {
         const message = this.translate.instant('COMMON.PROFILE.UPDATED.MESSAGE', { displayName: response.user.displayName });
+        console.log(payload.redirectUrl)
         return of(new LoginSuccess({
           response, queryParams: {
             state: btoa(JSON.stringify({ returnUrl: payload.redirectUrl }))

@@ -19,7 +19,7 @@ import { UntypedFormControl } from '@angular/forms';
 import { IRoom } from '../interfaces/room';
 import { CalendarDialogComponent } from '../shared/dialog/calendar/calendar-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
-import { allElementsHaveSameKeyFilterValue, executeDialogNoWidth, FrequencyEnum } from '../util/helper';
+import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
 import { numberFormat } from '../util/numbers';
 import { ICurrency } from '../interfaces/currency';
 import { AuthUserService } from '../services/auth-user.service';
@@ -70,6 +70,7 @@ export class DashComponent implements OnInit, OnDestroy {
   private authUserServiceSubscription: Subscription;
   private isDarkMode?: boolean;
   private periodStart?: Date;
+  private language: string;
 
   constructor(public dialog: MatDialog, private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
               private readonly translate: TranslateService, private router: Router, private authUserService: AuthUserService) {
@@ -117,6 +118,7 @@ export class DashComponent implements OnInit, OnDestroy {
     const extras = this.router.getCurrentNavigation()?.extras.state;
     this.viewDate = extras?.date || getNow();
     this.dateFormat = this.translate.currentLang;
+    this.language = this.translate.currentLang;
     this.totalReservation = 0;
   }
 
@@ -328,7 +330,7 @@ export class DashComponent implements OnInit, OnDestroy {
         this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNow());
 
         const event = monthEvent(it.title, start, end, it.reservationId, findStateColor(it.state, darkMode),
-          new Meta(true, this.state.timeZone, it.state, ['reservation', it.reservationId], undefined, it.total),
+          new Meta(true, this.state.timeZone, it.state, [this.language, 'reservation', it.reservationId], undefined, it.total),
           darkMode);
         if (event) {
           this.events = [...this.events, event];
@@ -346,13 +348,13 @@ export class DashComponent implements OnInit, OnDestroy {
         if (it.repeat === FrequencyEnum.none) {
           const end = getEnd(start, it.duration);
           const event = monthEvent(title, start, end, it.unavailableId, findStateColor('DEFAULT', darkMode),
-            new Meta(!!it.duration, this.state.timeZone, 'UNAVAILABLE', ['unavailable', it.unavailableId]), darkMode);
+            new Meta(!!it.duration, this.state.timeZone, 'UNAVAILABLE', [this.language, 'unavailable', it.unavailableId]), darkMode);
           if (event) {
             this.events = [...this.events, event];
           }
         } else {
           recurring = [...recurring, getFrequency(it.repeat, start, it.unavailableId, title, 45, 'UNAVAILABLE',
-            'unavailable', it.end, getDurationOrUndefined(it.duration))];
+            `${ this.language }/unavailable`, it.end, getDurationOrUndefined(it.duration))];
         }
       });
 
@@ -360,8 +362,8 @@ export class DashComponent implements OnInit, OnDestroy {
         const startDate = newDateTimestamp(it.date);
         startDate.setFullYear(getNow().getFullYear());
         const color = findStateColor('BIRTHDAY', darkMode);
-        const event = allDayEvent(it.title, color, startDate, darkMode, `users/${ it.userId }`,
-          new Meta(false, this.state.timeZone, 'BIRTHDAY', ['users', it.userId]));
+        const event = allDayEvent(it.title, color, startDate, darkMode, `${ this.language }/users/${ it.userId }`,
+          new Meta(false, this.state.timeZone, 'BIRTHDAY', [this.language, 'users', it.userId]));
         this.events = [...this.events, event];
       });
 
@@ -369,8 +371,9 @@ export class DashComponent implements OnInit, OnDestroy {
         const startDate = newDateTimestamp(it.createdAt);
         startDate.setFullYear(getNow().getFullYear());
         const color = findStateColor('TRANSACTION', darkMode);
-        const event = allDayEvent(it.title, color, startDate, darkMode, `accounts/${ it.accountId }/transactions/ ${ it.transactionId }`,
-          new Meta(false, this.state.timeZone, 'TRANSACTION', ['accounts', it.accountId, 'transactions', it.transactionId],
+        const event = allDayEvent(it.title, color, startDate, darkMode,
+          `${ this.language }/accounts/${ it.accountId }/transactions/ ${ it.transactionId }`,
+          new Meta(false, this.state.timeZone, 'TRANSACTION', [this.language, 'accounts', it.accountId, 'transactions', it.transactionId],
             undefined, it.total));
         this.events = [...this.events, event];
       });
@@ -387,7 +390,7 @@ export class DashComponent implements OnInit, OnDestroy {
           } else {
             repeatDate = startDate;
           }
-          recurring = [...recurring, getFrequency(it.repeat, repeatDate, it.noteId, it.title, 45, 'NOTE', 'notes',
+          recurring = [...recurring, getFrequency(it.repeat, repeatDate, it.noteId, it.title, 45, 'NOTE', `${ this.language }/notes`,
             undefined, undefined, true)];
         }
       });
@@ -410,8 +413,8 @@ export class DashComponent implements OnInit, OnDestroy {
 
   private createNoteEvent(note: ICalendarNote, date: Date, darkMode: boolean): void {
     const color = findStateColor('NOTE', darkMode);
-    const event = allDayEvent(note.title, color, date, darkMode, `notes/${ note.noteId }`,
-      new Meta(false, this.state.timeZone, 'NOTE', ['notes', note.noteId]));
+    const event = allDayEvent(note.title, color, date, darkMode, `${this.language}/notes/${ note.noteId }`,
+      new Meta(false, this.state.timeZone, 'NOTE', [this.language, 'notes', note.noteId]));
     this.events = [...this.events, event];
   }
 

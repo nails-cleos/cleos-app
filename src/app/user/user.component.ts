@@ -35,17 +35,12 @@ export class UserComponent implements OnInit, OnDestroy {
   private getState: Observable<any>;
   private subscription?: Subscription;
   private readonly extras: any;
-  private readonly language: string;
 
   constructor(private readonly translate: TranslateService, private route: ActivatedRoute, private store: Store<AppState>,
               private formBuilder: UntypedFormBuilder, private router: Router, private cdRef: ChangeDetectorRef) {
     this.isAddMode = true;
     this.getState = this.store.select(selectUserState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
-    if (this.extras) {
-      this.getForm.role.setValue(this.extras.role);
-    }
-    this.language = this.translate.currentLang;
   }
 
   get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
@@ -102,6 +97,9 @@ export class UserComponent implements OnInit, OnDestroy {
     this.isAddMode = !this.id;
     if (!this.isAddMode) {
       this.getUser();
+    }
+    if (this.extras) {
+      this.getForm.role.setValue(this.extras.role);
     }
     this.cdRef.detectChanges();
   }

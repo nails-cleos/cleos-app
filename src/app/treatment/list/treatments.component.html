@@ -41,15 +41,15 @@
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
       <td *matCellDef="let treatment" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="treatment.id; else skeleton">
-          <button *ngIf="!treatment.deleted" [routerLink]="['/', language, 'treatments/'+ treatment.id + '/edit']" mat-icon-button
+          <button *ngIf="!treatment.deleted" [routerLink]="['/', language, 'treatments', treatment.id, 'edit']" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="below">
             <mat-icon color="primary">edit</mat-icon>
           </button>
-          <button *ngIf="!treatment.deleted" [routerLink]="['/', language, 'treatments/'+ treatment.id + '/view']" mat-icon-button
+          <button *ngIf="!treatment.deleted" [routerLink]="['/', language, 'treatments', treatment.id, 'view']" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="below">
             <mat-icon color="accent">visibility</mat-icon>
           </button>
-          <button *ngIf="!treatment.deleted" [routerLink]="['/', language, 'treatments/'+ treatment.id + '/sorting']" mat-icon-button
+          <button *ngIf="!treatment.deleted" [routerLink]="['/', language, 'treatments', treatment.id, 'sorting']" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.SORT' | translate }}" matTooltipPosition="below">
             <mat-icon color="accent">sort</mat-icon>
           </button>
@@ -74,14 +74,14 @@
             </mat-list-item>
             <div fxHide fxShow.lt-sm mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
             <mat-list-item fxHide fxShow.lt-sm role="list">
-              <button *ngIf="!treatment.deleted" [routerLink]="['/', language, 'treatments/'+ treatment.id + '/edit']" color="primary"
+              <button *ngIf="!treatment.deleted" [routerLink]="['/', language, 'treatments', treatment.id, 'edit']" color="primary"
                       mat-icon-button>
                 <mat-icon matListItemIcon>edit</mat-icon>
               </button>
-              <button [routerLink]="['/', language, 'treatments/'+ treatment.id + '/view']" color="accent" mat-icon-button>
+              <button [routerLink]="['/', language, 'treatments', treatment.id, 'view']" color="accent" mat-icon-button>
                 <mat-icon matListItemIcon>visibility</mat-icon>
               </button>
-              <button [routerLink]="['/', language, 'treatments/'+ treatment.id + '/sorting']" color="accent" mat-icon-button>
+              <button [routerLink]="['/', language, 'treatments', treatment.id, 'sorting']" color="accent" mat-icon-button>
                 <mat-icon matListItemIcon>sort</mat-icon>
               </button>
               <button (click)="delete(treatment)" *ngIf="!treatment.deleted" color="warn" mat-icon-button>

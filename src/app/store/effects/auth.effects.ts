@@ -28,7 +28,7 @@ export class LoginEffects {
 
   loginSuccess$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.loginSuccess),
     tap((response: any) => {
-      let redirectUrl = [getLocale(this.translate.currentLang).language, 'auth', 'redirect'];
+      let redirectUrl = [this.translate.currentLang, 'auth', 'redirect'];
       if (Object.keys(response.payload.queryParams).length) {
         const state = JSON.parse(atob(response.payload.queryParams.state));
         const decodedURI = state.returnUrl;
