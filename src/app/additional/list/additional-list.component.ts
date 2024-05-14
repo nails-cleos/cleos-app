@@ -33,13 +33,14 @@ export class AdditionalListComponent implements OnInit, AfterViewInit, OnDestroy
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
+  language: string;
 
   private subscription: Subscription | undefined;
   private paginatorSubscription: Subscription | undefined;
   private getState: Observable<any>;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+              private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -49,6 +50,7 @@ export class AdditionalListComponent implements OnInit, AfterViewInit, OnDestroy
       }
     });
     this.getState = this.store.select(selectAdditionalState);
+    this.language = this.translate.currentLang;
   }
 
   ngAfterViewInit(): void {

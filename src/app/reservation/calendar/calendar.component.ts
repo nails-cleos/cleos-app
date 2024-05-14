@@ -56,6 +56,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   hourSegments = 4;
   viewDate: Date = getNow();
   locale: string;
+  language: string;
   professionalId?: string;
 
   officeForm!: UntypedFormGroup;
@@ -123,6 +124,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
       this.cdRef.markForCheck();
     });
     this.locale = this.translate.currentLang;
+    this.language = this.translate.currentLang;
 
     this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
       this.professionalId = value.professionalId;

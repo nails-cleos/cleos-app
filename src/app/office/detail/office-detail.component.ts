@@ -7,6 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { IOffice, Office } from '../../interfaces/office';
 import { fieldChange } from '../../util/validators';
 import * as fromActionsOffice from '../../store/office.actions';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-office-detail',
@@ -32,10 +33,12 @@ export class OfficeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private getState: Observable<any>;
   private subscription?: Subscription;
+  private language: string;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
-              private router: Router) {
+              private router: Router, private translate: TranslateService) {
     this.getState = this.store.select(selectOfficeState);
+    this.language = this.translate.currentLang;
   }
 
   get update(): void {
@@ -101,7 +104,7 @@ export class OfficeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
           this.form.controls[value.field].setErrors({incorrect: true});
         });
       } else if (state.message) {
-        this.router.navigate(['offices']);
+        this.router.navigate([this.language, 'offices']);
       }
     });
   }

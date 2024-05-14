@@ -90,7 +90,7 @@ export class RoomEffects {
     ofType(fromActionsRoom.RoomActionTypes.roomSelected),
     tap((data: any) => {
       if (data.payload.redirect) {
-        this.router.navigate(['rooms', data.payload.roomInfo.room.id]);
+        this.router.navigate([this.translate.currentLang, 'rooms', data.payload.roomInfo.room.id]);
       }
     })
   ), { dispatch: false });

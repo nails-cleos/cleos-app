@@ -1,7 +1,7 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="60%" fxFlex.lt-sm="80%">
-      <app-balance [account]="account" [showView]="true" [showUser]="true"></app-balance>
+      <app-balance [account]="account" [showView]="true" [showUser]="true" [language]="language"></app-balance>
       <form (ngSubmit)="submit" [formGroup]="form" novalidate>
         <mat-card appearance="outlined" class="style-card" *ngIf="account">
           <mat-card-header>

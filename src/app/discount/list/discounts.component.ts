@@ -36,6 +36,7 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
+  language: string;
 
   private subscription?: Subscription;
   private paginatorSubscription?: Subscription;
@@ -43,7 +44,7 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
   private lastSort?: Sort;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+              private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -53,6 +54,7 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
     this.getState = this.store.select(selectDiscountState);
+    this.language = this.translate.currentLang;
   }
 
   ngAfterViewInit(): void {

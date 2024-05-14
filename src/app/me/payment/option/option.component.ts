@@ -42,9 +42,10 @@ export class OptionComponent implements OnInit, OnDestroy {
   private getState: Observable<any>;
   private subscription?: Subscription;
   private reservationId: any;
+  private readonly language: string;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
-              private breakpointObserver: BreakpointObserver, private router: Router, private translate: TranslateService) {
+              breakpointObserver: BreakpointObserver, private router: Router, private translate: TranslateService) {
     this.getState = this.store.select(selectPaymentState);
     breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small])
       .subscribe(result => this.smallScreen = result.matches);
@@ -56,6 +57,7 @@ export class OptionComponent implements OnInit, OnDestroy {
       bank: new UntypedFormControl('')
     });
     this.price = new Price();
+    this.language = this.translate.currentLang;
   }
 
   get back(): void {
@@ -158,7 +160,7 @@ export class OptionComponent implements OnInit, OnDestroy {
           }
           this.price = getPrice(reservation, state.selected);
           if (this.price.isPaid) {
-            this.router.navigate(['/reservation', reservation.id]);
+            this.router.navigate(['/', this.language, 'reservation', reservation.id]);
           } else {
             if (reservation.state !== 'CANCELLED_PAYMENT_REQUIRED') {
               if (this.price?.totalPaid === 0) {

@@ -90,7 +90,7 @@ export class UnavailableEffects {
   selectedData$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableSelected),
     tap((data: any) => {
-      let path = ['unavailable'];
+      let path = [this.translate.currentLang, 'unavailable'];
       if (data.payload.type === 'BLOCK_AGENDA') {
         path = [...path, 'block-agenda'];
       }

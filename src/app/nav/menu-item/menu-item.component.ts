@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-menu-item',
@@ -23,8 +24,10 @@ export class MenuItemComponent implements OnInit {
     Breakpoints.Medium
   ]).pipe(map(result => result.matches), shareReplay());
 
+  language: string;
 
-  constructor(private breakpointObserver: BreakpointObserver, public router: Router) {
+  constructor(private breakpointObserver: BreakpointObserver, public router: Router, private translate: TranslateService) {
+    this.language = this.translate.currentLang;
   }
 
   ngOnInit(): void {
@@ -32,7 +35,7 @@ export class MenuItemComponent implements OnInit {
 
   navigate(menu: IMenu, drawer?: any): void {
     drawer?.toggle();
-    this.router.navigate([menu.path]);
+    this.router.navigate([this.language].concat(menu.path.split('/')));
   }
 
   setStep(index: number): void {

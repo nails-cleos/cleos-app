@@ -36,11 +36,11 @@
         </mat-card-content>
         <mat-card-actions class="top-space" style="margin: auto">
           <button *ngIf="customer; else skeleton" fxShow.lt-sm fxHide class="only-button" color="accent" mat-fab
-                  [routerLink]="['/', 'users', customer.id]">
+                  [routerLink]="['/', language, 'users', customer.id]">
             <mat-icon matPrefix>edit</mat-icon>
           </button>
           <button *ngIf="customer; else skeleton" fxHide.lt-sm fxShow class="only-button" color="accent" mat-fab
-                  extended [routerLink]="['/', 'users', customer.id]">
+                  extended [routerLink]="['/', language, 'users', customer.id]">
             <mat-icon matPrefix>edit</mat-icon>
             <span>{{ 'COMMON.BUTTON.EDIT' | translate }}</span>
           </button>

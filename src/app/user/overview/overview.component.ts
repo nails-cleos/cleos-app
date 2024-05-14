@@ -3,7 +3,7 @@ import { map } from 'rxjs/operators';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
-import { getUserImage, getDisplayNameInitials } from '../../util/helper';
+import { getDisplayNameInitials, getUserImage } from '../../util/helper';
 import { Observable, Subscription } from 'rxjs';
 import * as fromActionsUser from '../../store/user.actions';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -73,9 +73,9 @@ export class OverviewComponent implements OnInit, OnDestroy {
 
   get goTo(): void {
     if (this.hasAdminRole) {
-      this.router.navigate(['/', 'accounts', 'customers', this.customer?.id]);
+      this.router.navigate(['/', this.language, 'accounts', 'customers', this.customer?.id]);
     } else {
-      this.router.navigate(['/', 'accounts', this.account?.id, 'transactions', 'add']);
+      this.router.navigate(['/', this.language, 'accounts', this.account?.id, 'transactions', 'add']);
     }
     return;
   }
@@ -121,7 +121,10 @@ export class OverviewComponent implements OnInit, OnDestroy {
         if (state.data.miniCardOverview) {
           this.miniCardData = state.data.miniCardOverview?.map((ro: IReservationOverview) => {
             if (ro.primaryId || ro.secondaryId) {
-              return Object.assign({}, ro, { link: (id: string | undefined) => !id || this.router.navigate(['reservation', id]) });
+              return Object.assign({}, ro, {
+                link: (id: string | undefined) => !id ||
+                  this.router.navigate([this.translate.currentLang, 'reservation', id])
+              });
             }
             return ro;
           });

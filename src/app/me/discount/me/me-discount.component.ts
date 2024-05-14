@@ -32,10 +32,11 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscription?: Subscription;
   private paginatorSubscription?: Subscription;
   private getState: Observable<any>;
+  private readonly language: string;
 
-  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
+  constructor(private translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private router: Router, private cdRef: ChangeDetectorRef, private analytic: Analytics,
-              private breakpointObserver: BreakpointObserver) {
+              breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -51,6 +52,7 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       firebase_screen_class: 'ReferralsComponent'
     });
+    this.language = this.translate.currentLang;
   }
 
   ngAfterViewInit(): void {
@@ -69,7 +71,7 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
 
   useDiscount(discount: IUserDiscount): void {
     const data = { discount };
-    this.router.navigate(['me', 'reservation'], { state: data });
+    this.router.navigate([this.language, 'me', 'reservation'], { state: data });
   }
 
   private subscribe(): void {

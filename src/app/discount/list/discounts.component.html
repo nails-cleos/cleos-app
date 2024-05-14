@@ -129,7 +129,7 @@
   <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
 
   <button color="accent" id="add-button" mat-fab matTooltip="{{ 'DISCOUNT.TITLE' | translate }}"
-          routerLink="/discounts/add">
+          [routerLink]="['/', language, 'discounts','add']">
     <mat-icon>add</mat-icon>
   </button>
 </div>

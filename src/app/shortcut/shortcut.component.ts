@@ -2,6 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { AuthUserService } from '../services/auth-user.service';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 
 enum ShortcutEnum {
   dashboard,
@@ -18,7 +19,8 @@ export class ShortcutComponent implements OnDestroy {
 
   private authUserServiceSubscription: Subscription;
 
-  constructor(private authUserService: AuthUserService, private route: ActivatedRoute, private router: Router) {
+  constructor(private readonly translate: TranslateService, private authUserService: AuthUserService, private route: ActivatedRoute,
+              private router: Router) {
     const key = this.route.snapshot.paramMap.get('key') as keyof typeof ShortcutEnum;
     const shortcut = ShortcutEnum[key];
     this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
@@ -49,7 +51,7 @@ export class ShortcutComponent implements OnDestroy {
           redirect = [...redirect, 'reservation'];
           break;
       }
-      this.router.navigate(redirect);
+      this.router.navigate([this.translate.currentLang].concat(redirect));
     });
   }
 

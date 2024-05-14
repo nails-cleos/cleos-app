@@ -8,7 +8,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { CatalogueService } from '../../services/catalogue.service';
 import { TreatmentService } from '../../services/treatment.service';
 import { MainService } from '../../services/main.service';
-import * as fromActionsUser from '../user.actions';
 import { LoginSuccess } from '../auth.actions';
 import { UserService } from '../../services/user.service';
 

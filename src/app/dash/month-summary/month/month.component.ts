@@ -2,6 +2,7 @@ import { AfterViewInit, Component, Input } from '@angular/core';
 import { IMonthSummary, ISummaryTotal, ITotal, Total } from '../../../interfaces/dashboard';
 import { ICurrencyAll } from '../../../interfaces/currency';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-month',
@@ -17,9 +18,11 @@ export class MonthComponent implements AfterViewInit {
   income?: ISummaryTotal;
   expense?: ISummaryTotal;
   cash?: ISummaryTotal;
+  private readonly language: string;
 
-  constructor(private router: Router) {
+  constructor(private readonly translate: TranslateService, private router: Router) {
     this.showCash = false;
+    this.language = this.translate.currentLang;
   }
 
   ngAfterViewInit(): void {
@@ -58,6 +61,6 @@ export class MonthComponent implements AfterViewInit {
         step = 2;
         break;
     }
-    this.router.navigate(['dashboard', 'monthly', 'summary'], { state: { date: `${ month }-${ this.year }`, step } });
+    this.router.navigate([this.language, 'dashboard', 'monthly', 'summary'], { state: { date: `${ month }-${ this.year }`, step } });
   }
 }

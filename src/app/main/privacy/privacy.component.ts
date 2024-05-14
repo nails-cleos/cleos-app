@@ -8,7 +8,7 @@ import { MainContentService } from '../main-content.service';
   styleUrls: ['./privacy.component.scss']
 })
 export class PrivacyComponent {
-  url = `${environment.appServer}/main`;
+  url = environment.appServer;
 
   constructor(private mainContent: MainContentService) {
     this.mainContent.configure(false, 'open');

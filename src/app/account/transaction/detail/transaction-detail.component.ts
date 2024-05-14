@@ -19,6 +19,7 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
   transaction?: ITransaction;
   dateFormat: string;
   step?: number;
+  language: string;
 
   private getState: Observable<any>;
   private subscription?: Subscription;
@@ -29,6 +30,7 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
     this.getState = this.store.select(selectAccountState);
     this.dateFormat = this.translate.currentLang;
     this.step = this.router.getCurrentNavigation()?.extras.state?.step;
+    this.language = this.translate.currentLang;
   }
 
   get pay(): void {
@@ -74,7 +76,7 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
       if (state.paths) {
         this.router.navigate(state.paths);
       } else if (state.subErrors) {
-        this.router.navigate(['me', 'transaction', this.id, 'payment']);
+        this.router.navigate([this.language, 'me', 'transaction', this.id, 'payment']);
       }
     });
   }

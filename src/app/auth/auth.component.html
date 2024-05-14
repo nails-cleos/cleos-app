@@ -17,7 +17,7 @@
             </mat-form-field>
           </div>
           <div fxLayout="column" fxLayoutAlign="space-evenly start">
-            <a type="button" routerLink="/auth/forgot-password">{{ 'AUTH.SIGN_IN.FORGOT_PASSWORD' | translate }}</a>
+            <a type="button" [routerLink]="['/', language, 'auth', 'forgot-password']">{{ 'AUTH.SIGN_IN.FORGOT_PASSWORD' | translate }}</a>
           </div>
         </mat-card-content>
       </mat-card>

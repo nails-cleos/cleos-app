@@ -8,6 +8,7 @@ import { AppState, selectCurrencyState } from '../../store/app.states';
 import { MatDialog } from '@angular/material/dialog';
 import { fieldChange } from '../../util/validators';
 import * as fromActionsCurrency from '../../store/currency.actions';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-currency-detail',
@@ -30,10 +31,12 @@ export class CurrencyDetailComponent implements OnInit, AfterViewInit, OnDestroy
 
   private subscription?: Subscription;
   private getState: Observable<any>;
+  private readonly language: string;
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
-              private router: Router, public dialog: MatDialog) {
+  constructor(private readonly translate: TranslateService, private route: ActivatedRoute, private store: Store<AppState>,
+              private formBuilder: UntypedFormBuilder, private router: Router, public dialog: MatDialog) {
     this.getState = this.store.select(selectCurrencyState);
+    this.language = this.translate.currentLang;
   }
 
   get update(): void {
@@ -85,10 +88,10 @@ export class CurrencyDetailComponent implements OnInit, AfterViewInit, OnDestroy
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({incorrect: true});
+          this.form.controls[value.field].setErrors({ incorrect: true });
         });
       } else if (state.message) {
-        this.router.navigate(['currency']);
+        this.router.navigate([this.language, 'currency']);
       }
     });
   }

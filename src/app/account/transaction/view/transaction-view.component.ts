@@ -34,6 +34,7 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
   dateFormat: string;
   accountId?: string;
   account?: IAccountAll;
+  language: string;
 
   private subscription?: Subscription;
   private paginatorSubscription?: Subscription;
@@ -51,6 +52,7 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
     });
     this.getState = this.store.select(selectAccountState);
     this.dateFormat = this.translate.currentLang;
+    this.language = this.translate.currentLang;
   }
 
   ngOnInit(): void {

@@ -8,6 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { DashboardService } from '../../services/dashboard.service';
 import { Router } from '@angular/router';
 import { NavigationService } from '../../services/navigation.service';
+import { getLocale } from '../../util/helper';
 
 @Injectable()
 export class DashboardEffects {
@@ -100,7 +101,7 @@ export class DashboardEffects {
   saveMonthlySummarySuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsDashboard.DashboardActionTypes.saveMonthlySummarySuccess),
     tap((data: any) => this.navigationService.reload(this.router.url.split('/'),
-      { date: data.payload.date, step: data.payload.step }, null, '/main'))
+      { date: data.payload.date, step: data.payload.step }, null, `/${ getLocale(this.translate.currentLang).language }`))
   ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private router: Router,

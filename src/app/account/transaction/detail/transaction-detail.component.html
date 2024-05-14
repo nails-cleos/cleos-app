@@ -6,7 +6,7 @@
           <mat-card-title>{{ 'ACCOUNT.TRANSACTION.DETAIL' | translate }}</mat-card-title>
           <div fxFlex></div>
           <mat-icon *ngIf="transaction" class="pointer-only header-icon"
-                    [routerLink]="['/', 'accounts', transaction.account?.id, 'transactions', 'view']">
+                    [routerLink]="['/', language, 'accounts', transaction.account?.id, 'transactions', 'view']">
             receipt
           </mat-icon>
         </mat-card-header>

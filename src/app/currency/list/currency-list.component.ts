@@ -31,13 +31,14 @@ export class CurrencyListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
+  language: string;
 
   private subscription?: Subscription;
   private paginatorSubscription?: Subscription;
   private getState: Observable<any>;
 
   constructor(private readonly translate: TranslateService, private store: Store<AppState>, public dialog: MatDialog,
-              private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+              private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -47,6 +48,7 @@ export class CurrencyListComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
     this.getState = this.store.select(selectCurrencyState);
+    this.language = this.translate.currentLang;
   }
 
   ngAfterViewInit(): void {

@@ -64,7 +64,7 @@ export class Locale implements ILocale {
   }
 }
 
-export const getLocale = (userLang?: string): ILocale => {
+export const getLocale = (userLang?: string | null): ILocale => {
   let locale = 'en-NL';
   let flag;
   if (userLang?.startsWith('es')) {

@@ -1,6 +1,6 @@
 <div>
   <fieldset>
-    <legend>{{'INVOICE.SEARCH.TITLE' | translate }}</legend>
+    <legend>{{'COMMON.SEARCH.TITLE' | translate }}</legend>
     <form [formGroup]="form">
       <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutAlign="space-around center">
         <mat-form-field appearance="outline">
@@ -142,7 +142,7 @@
           <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
           <td *matCellDef="let invoice" fxHide.lt-sm fxShow mat-cell>
             <div *ngIf="invoice.id; else skeleton">
-              <button [routerLink]="['/reservation', invoice.id]" mat-icon-button
+              <button [routerLink]="['/', language, 'reservation', invoice.id]" mat-icon-button
                       matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
                 <mat-icon color="primary">visibility</mat-icon>
               </button>
@@ -161,7 +161,7 @@
                 <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
                 <mat-list-item role="list">
                   <ng-template>
-                    <button [routerLink]="['/reservation', invoice.id]" color="primary" mat-icon-button>
+                    <button [routerLink]="['/', language, 'reservation', invoice.id]" color="primary" mat-icon-button>
                       <mat-icon matListItemIcon>visibility</mat-icon>
                     </button>
                   </ng-template>
