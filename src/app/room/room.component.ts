@@ -22,6 +22,7 @@ import { goTo } from '../util/animation';
 import { areEquals, createAddress } from '../util/helper';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
+import { TranslateService } from '@ngx-translate/core';
 
 export interface IIcon {
   monday: RoomIconName;
@@ -94,13 +95,15 @@ export class RoomComponent implements OnInit, OnDestroy {
   private currentAvailabilities: IAvailability[] = [];
   private currentPaymentTypes: string[] = [];
   private currentProfessionalIds: string[] = [];
+  private readonly language: string;
 
-  constructor(private store: Store<AppState>, private route: ActivatedRoute, private formBuilder: UntypedFormBuilder,
-              private router: Router) {
+  constructor(private readonly translate: TranslateService, private store: Store<AppState>, private route: ActivatedRoute,
+              private formBuilder: UntypedFormBuilder, private router: Router) {
     this.isAddMode = true;
     this.primary = false;
     this.today = createDate();
     this.getState = this.store.select(selectRoomState);
+    this.language = this.translate.currentLang;
   }
 
   get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
@@ -147,17 +150,17 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   get addProfessional(): void {
-    this.router.navigate(['users', 'add'], { state: { role: Role.professional } });
+    this.router.navigate([this.language, 'users', 'add'], { state: { role: Role.professional } });
     return;
   }
 
   get addCurrency(): void {
-    this.router.navigate(['currency', 'add']);
+    this.router.navigate([this.language, 'currency', 'add']);
     return;
   }
 
   get addOffice(): void {
-    this.router.navigate(['offices', 'add']);
+    this.router.navigate([this.language, 'offices', 'add']);
     return;
   }
 
@@ -502,7 +505,7 @@ export class RoomComponent implements OnInit, OnDestroy {
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
       } else if (state.message) {
-        this.router.navigate(['rooms']);
+        this.router.navigate([this.language, 'rooms']);
       }
     });
   }

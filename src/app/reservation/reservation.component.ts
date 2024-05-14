@@ -206,9 +206,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   private dismiss = false;
   private treatmentDiscount?: IDiscount;
   private totalDuration: IDuration = new Duration();
+  private readonly language: string;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private formBuilder: UntypedFormBuilder, private breakpointObserver: BreakpointObserver, private router: Router,
+              private formBuilder: UntypedFormBuilder, breakpointObserver: BreakpointObserver, private router: Router,
               private route: ActivatedRoute, private cdRef: ChangeDetectorRef, private snackBar: MatSnackBar,
               private authUserService: AuthUserService) {
     this.price = new Price();
@@ -252,6 +253,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const room = new Step(1, 'room', (goNext: boolean) => this.callStepThree(goNext), treatment);
     const customer = new Step(0, 'person_search', (goNext: boolean) => this.callStepTwo(goNext), room);
     this.steps = [customer, room, treatment, additional, settings, book, preview];
+    this.language = this.translate.currentLang;
   }
 
   get treatmentDetail(): string {
@@ -310,7 +312,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   get addCustomer(): void {
-    this.router.navigate(['users', 'add'], { state: { role: Role.customer } });
+    this.router.navigate([this.language, 'users', 'add'], { state: { role: Role.customer } });
     return;
   }
 

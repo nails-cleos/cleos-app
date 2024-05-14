@@ -32,6 +32,7 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
+  language: string;
 
   private subscription: Subscription | undefined;
   private paginatorSubscription: Subscription | undefined;
@@ -48,6 +49,7 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
     this.getState = this.store.select(selectRoomState);
+    this.language = this.translate.currentLang;
   }
 
   ngAfterViewInit(): void {

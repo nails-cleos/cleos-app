@@ -57,7 +57,7 @@ export class PermissionsService {
     }
     // not logged in so redirect to auth page with the return url and extra data
     const queryParams = btoa(JSON.stringify({ returnUrl: state.url, data: this.data }));
-    this.router.navigate(['auth'], { queryParams: { state: queryParams } });
+    this.router.navigate([this.translate.currentLang, 'auth'], { queryParams: { state: queryParams } });
 
     return false;
   }

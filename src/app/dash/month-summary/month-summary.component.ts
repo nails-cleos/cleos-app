@@ -77,12 +77,14 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
   private subscription: Subscription;
   private readonly extras: any;
   private userName?: string;
+  private readonly language: string;
 
   constructor(private readonly translate: TranslateService, private store: Store<AppState>, private router: Router,
               private authUserService: AuthUserService) {
     this.showCash = false;
     this.getState = this.store.select(selectDashboardState);
     this.dateFormat = this.translate.currentLang;
+    this.language = this.translate.currentLang;
     this.weeks = getWeeksInMonth(getNow());
     this.extras = this.router.getCurrentNavigation()?.extras.state;
     this.subscription = this.authUserService.authUser.subscribe(value => {
@@ -99,9 +101,9 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
     if (this.date.value) {
       const year = this.date.value.getFullYear();
       const quarter = getDateQuarter(this.date.value);
-      this.router.navigate(['dashboard', 'quarter', 'summary'], { state: { year, quarter } });
+      this.router.navigate([this.language, 'dashboard', 'quarter', 'summary'], { state: { year, quarter } });
     } else {
-      this.router.navigate(['dashboard', 'quarter', 'summary']);
+      this.router.navigate([this.language, 'dashboard', 'quarter', 'summary']);
     }
     return;
   }

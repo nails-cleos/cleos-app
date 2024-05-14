@@ -71,10 +71,10 @@
                       </mat-option>
                     </mat-autocomplete>
                   </mat-form-field>
-                  <button fxShow.lt-sm fxHide routerLink="/treatments/add" color="accent" mat-fab type="button">
+                  <button fxShow.lt-sm fxHide [routerLink]="['/', language, 'treatments', 'add']" color="accent" mat-fab type="button">
                     <mat-icon matPrefix>add</mat-icon>
                   </button>
-                  <button fxHide.lt-sm fxShow routerLink="/treatments/add" color="accent" mat-fab extended type="button">
+                  <button fxHide.lt-sm fxShow [routerLink]="['/', language, 'treatments', 'add']" color="accent" mat-fab extended type="button">
                     <mat-icon matPrefix>add</mat-icon>
                     <span>{{ 'COMMON.TREATMENT.GROUP.ADD_BUTTON' | translate }}</span>
                   </button>

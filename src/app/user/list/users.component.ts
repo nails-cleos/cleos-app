@@ -39,6 +39,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
   filter?: string;
+  language: string;
 
   private subscription?: Subscription;
   private paginatorSubscription?: Subscription;
@@ -47,7 +48,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   private smallScreen = false;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private router: Router, private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+              private router: Router, private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -58,6 +59,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
     this.getState = this.store.select(selectUserState);
+    this.language = this.translate.currentLang;
   }
 
   ngOnInit(): void {
@@ -175,7 +177,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
 
   book(customer: IUser): void {
     const data = { customer };
-    this.router.navigate(['reservation'], { state: data });
+    this.router.navigate([this.translate.currentLang, 'reservation'], { state: data });
   }
 
   private clean(): void {

@@ -20,9 +20,11 @@ export class QuarterComponent {
   @Input() showCash: boolean;
 
   dateFormat: string;
+  private readonly language: string;
 
   constructor(private readonly translate: TranslateService, private router: Router) {
     this.dateFormat = this.translate.currentLang;
+    this.language = this.translate.currentLang;
     this.margin = false;
     this.showCash = false;
   }
@@ -32,7 +34,7 @@ export class QuarterComponent {
   }
 
   goToQuarter(quarter: number): void {
-    this.router.navigate(['dashboard', 'quarter', 'summary'], { state: { year: this.year, quarter } });
+    this.router.navigate([this.language, 'dashboard', 'quarter', 'summary'], { state: { year: this.year, quarter } });
   }
 
   goToMonth(month: number, type?: string): void {
@@ -48,6 +50,6 @@ export class QuarterComponent {
         step = 2;
         break;
     }
-    this.router.navigate(['dashboard', 'monthly', 'summary'], { state: { date: `${ month }-${ this.year }`, step } });
+    this.router.navigate([this.language, 'dashboard', 'monthly', 'summary'], { state: { date: `${ month }-${ this.year }`, step } });
   }
 }

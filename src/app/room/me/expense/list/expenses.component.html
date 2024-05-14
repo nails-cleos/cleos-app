@@ -212,7 +212,7 @@
     <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
 
     <button color="accent" id="add-button" mat-fab matTooltip="{{ 'EXPENSE.TITLE' | translate }}"
-            [routerLink]="['/rooms', roomId, 'expenses', 'add']">
+            [routerLink]="['/', language, 'rooms', roomId, 'expenses', 'add']">
       <mat-icon>add_shopping_cart</mat-icon>
     </button>
   </div>

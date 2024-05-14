@@ -6,6 +6,7 @@ import { AppState, selectColorState } from '../store/app.states';
 import { Router } from '@angular/router';
 import { Color, IColor } from '../interfaces/color';
 import * as fromActionsColor from '../store/color.actions';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-colors',
@@ -23,9 +24,12 @@ export class ColorComponent implements OnInit, OnDestroy {
 
   private getState: Observable<any>;
   private subscription: Subscription | undefined;
+  private language: string;
 
-  constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router) {
+  constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router,
+              private translate: TranslateService) {
     this.getState = this.store.select(selectColorState);
+    this.language = this.translate.currentLang;
   }
 
   get create(): void {
@@ -73,7 +77,7 @@ export class ColorComponent implements OnInit, OnDestroy {
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
       } else if (state.message) {
-        this.router.navigate(['colors']);
+        this.router.navigate([this.language, 'colors']);
       }
     });
   }

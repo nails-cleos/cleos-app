@@ -12,6 +12,7 @@ import { map, startWith } from 'rxjs/operators';
 import { formatDuration } from '../util/dates';
 import { areEquals } from '../util/helper';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-additional',
@@ -30,15 +31,18 @@ export class AdditionalComponent implements OnInit, OnDestroy {
   allGroups?: IGroupService[];
 
   errors: any = [];
+  language: string;
 
   private getState: Observable<any>;
   private subscription: Subscription | undefined;
   private currentGroupIds: string[] = [];
 
   constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router,
-              private route: ActivatedRoute, private cdRef: ChangeDetectorRef) {
+              private route: ActivatedRoute, private cdRef: ChangeDetectorRef, private translate: TranslateService) {
     this.isAddMode = true;
     this.getState = this.store.select(selectAdditionalState);
+
+    this.language = this.translate.currentLang;
   }
 
   get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
@@ -181,7 +185,7 @@ export class AdditionalComponent implements OnInit, OnDestroy {
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
       } else if (state.message) {
-        this.router.navigate(['additional']);
+        this.router.navigate([this.language, 'additional']);
       }
     });
   }

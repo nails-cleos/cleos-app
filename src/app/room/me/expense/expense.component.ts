@@ -34,6 +34,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
 
   private getState: Observable<any>;
   private subscription?: Subscription;
+  private readonly language: string;
 
   constructor(private readonly translate: TranslateService, private store: Store<AppState>, private formBuilder: FormBuilder,
               private route: ActivatedRoute, private router: Router) {
@@ -42,6 +43,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     this.btwValue = '';
     this.today = getNow();
     this.getState = this.store.select(selectExpenseState);
+    this.language = this.translate.currentLang;
   }
 
   get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
@@ -163,7 +165,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
       } else if (state.message) {
-        this.router.navigate(['rooms', this.roomId, 'expenses']);
+        this.router.navigate([this.language, 'rooms', this.roomId, 'expenses']);
       }
     });
   }

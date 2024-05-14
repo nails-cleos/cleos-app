@@ -7,7 +7,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { AsyncPipe, registerLocaleData } from '@angular/common';
 import { ServiceWorkerModule, SwPush } from '@angular/service-worker';
 import { AppRoutingModule } from './app-routing.module';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SharedModule } from './shared/shared.module';
 import { getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { initializeAppCheck, provideAppCheck, ReCaptchaV3Provider } from '@angular/fire/app-check';
@@ -78,7 +78,7 @@ const cookieConfig: NgcCookieConsentConfig = {
   },
   type: 'info',
   content: {
-    href: `${ environment.appServer }/main/privacy`,
+    href: `${ environment.appServer }/privacy`,
   }
 };
 
@@ -165,7 +165,7 @@ const cookieConfig: NgcCookieConsentConfig = {
   exports: [TranslateModule]
 })
 export class AppModule {
-  constructor(swPush: SwPush, private router: Router) {
+  constructor(swPush: SwPush, router: Router) {
     if (swPush.isEnabled) {
       swPush.notificationClicks.subscribe(({ action, notification }) =>
         router.navigate(notification.data.onActionClick[action].url));

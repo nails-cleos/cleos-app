@@ -1,10 +1,11 @@
 <div *ngIf="!error; else errorBox">
-  <table [dataSource]="dataSource" mat-table matSort matSortActive="timestamp" matSortDirection="desc" matSortDisableClear
+  <table [dataSource]="dataSource" mat-table matSort matSortActive="timestamp" matSortDirection="desc"
+         matSortDisableClear
          multiTemplateDataRows>
     <ng-container matColumnDef="position">
       <th *matHeaderCellDef mat-header-cell>#</th>
       <td *matCellDef="let reservation; let i = dataIndex;">
-        <div *ngIf="reservation.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
+        <div *ngIf="reservation.id; else skeleton">{{ (paginator.pageIndex * pageSize) + i + 1 }}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
@@ -14,7 +15,7 @@
     <ng-container matColumnDef="customer">
       <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.CUSTOMER' | translate }}</th>
       <td *matCellDef="let reservation" mat-cell>
-        <div *ngIf="reservation.id; else skeleton">{{reservation?.customer.displayName}}</div>
+        <div *ngIf="reservation.id; else skeleton">{{ reservation?.customer.displayName }}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
@@ -23,9 +24,10 @@
 
     <ng-container matColumnDef="professional">
       <th *matHeaderCellDef fxHide.lt-sm fxShow
-          mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</th>
+          mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}
+      </th>
       <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
-        <div *ngIf="reservation.id; else skeleton">{{reservation?.professional.displayName}}</div>
+        <div *ngIf="reservation.id; else skeleton">{{ reservation?.professional.displayName }}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
@@ -34,10 +36,11 @@
 
     <ng-container matColumnDef="timestamp">
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
-          mat-sort-header>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</th>
+          mat-sort-header>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}
+      </th>
       <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="reservation.id; else skeleton">
-          {{reservation.timestamp | timeDetail | date:'short':reservation.room.timeZone:dateFormat}}
+          {{ reservation.timestamp | timeDetail | date:'short':reservation.room.timeZone:dateFormat }}
           <button (click)="openDialog(reservation)" *ngIf="showTimeZone(reservation)" mat-icon-button type="button">
             <mat-icon>info_outline</mat-icon>
           </button>
@@ -50,9 +53,10 @@
 
     <ng-container matColumnDef="treatment">
       <th *matHeaderCellDef fxHide.lt-sm fxShow
-          mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }}</th>
+          mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }}
+      </th>
       <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
-        <div *ngIf="reservation.id; else skeleton">{{reservation.treatment.name}}</div>
+        <div *ngIf="reservation.id; else skeleton">{{ reservation.treatment.name }}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
@@ -61,11 +65,12 @@
 
     <ng-container matColumnDef="state">
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
-          mat-sort-header>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</th>
+          mat-sort-header>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}
+      </th>
       <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="reservation.id; else skeleton">
-          <mat-icon matPrefix>{{reservation.state | reservationIcon}}</mat-icon>&nbsp;
-          {{ 'COMMON.STATUS.RESERVATION.' + reservation.state | translate}}
+          <mat-icon matPrefix>{{ reservation.state | reservationIcon }}</mat-icon>&nbsp;
+          {{ 'COMMON.STATUS.RESERVATION.' + reservation.state | translate }}
         </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -77,7 +82,8 @@
       <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
       <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
         <div *ngIf="reservation.id; else skeleton">
-          <button *ngIf="!reservation.deleted" [routerLink]="['/reservation', reservation.id]" mat-icon-button
+          <button *ngIf="!reservation.deleted" [routerLink]="['/', language, 'reservation', reservation.id]"
+                  mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
             <mat-icon color="primary">visibility</mat-icon>
           </button>
@@ -98,12 +104,12 @@
           <mat-list *ngIf="reservation.id">
             <div matListItemTitle>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
             <mat-list-item role="list">
-              <div matListItemLine>{{reservation?.professional.displayName}}</div>
+              <div matListItemLine>{{ reservation?.professional.displayName }}</div>
             </mat-list-item>
             <div matListItemTitle>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</div>
             <mat-list-item role="list">
               <div matListItemLine>
-                {{reservation.timestamp | timeDetail | date:'short':reservation.room.timeZone:dateFormat}}
+                {{ reservation.timestamp | timeDetail | date:'short':reservation.room.timeZone:dateFormat }}
                 <button (click)="openDialog(reservation)" *ngIf="showTimeZone(reservation)" mat-icon-button
                         type="button">
                   <mat-icon matListItemIcon>info_outline</mat-icon>
@@ -112,18 +118,18 @@
             </mat-list-item>
             <div matListItemTitle>{{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }}</div>
             <mat-list-item role="list">
-              <div matListItemLine>{{reservation.treatment.name}}</div>
+              <div matListItemLine>{{ reservation.treatment.name }}</div>
             </mat-list-item>
             <div matListItemTitle>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</div>
             <mat-list-item role="list">
               <div matListItemLine>
-                <mat-icon matPrefix>{{reservation.state | reservationIcon}}</mat-icon>&nbsp;
-                {{ 'COMMON.STATUS.RESERVATION.' + reservation.state | translate}}
+                <mat-icon matPrefix>{{ reservation.state | reservationIcon }}</mat-icon>&nbsp;
+                {{ 'COMMON.STATUS.RESERVATION.' + reservation.state | translate }}
               </div>
             </mat-list-item>
             <div matListItemTitle>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
             <mat-list-item role="list">
-              <button [routerLink]="['/reservation', reservation.id]" color="primary" mat-icon-button>
+              <button [routerLink]="['/', language, 'reservation', reservation.id]" color="primary" mat-icon-button>
                 <mat-icon matListItemIcon>visibility</mat-icon>
               </button>
               <button (click)="delete(reservation)" *ngIf="!reservation.deleted" color="warn" mat-icon-button>
@@ -137,7 +143,8 @@
 
     <ng-container matColumnDef="noContent">
       <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-        {{ 'COMMON.RESERVATION.LIST.ERROR.NO_CONTENT' | translate }}</td>
+        {{ 'COMMON.RESERVATION.LIST.ERROR.NO_CONTENT' | translate }}
+      </td>
     </ng-container>
 
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>

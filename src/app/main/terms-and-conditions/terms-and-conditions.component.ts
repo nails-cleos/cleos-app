@@ -8,7 +8,7 @@ import { MainContentService } from '../main-content.service';
   styleUrls: ['./terms-and-conditions.component.scss']
 })
 export class TermsAndConditionsComponent {
-  url = `${environment.appServer}/main`;
+  url = environment.appServer;
 
   constructor(private mainContent: MainContentService) {
     this.mainContent.configure(false, 'open');

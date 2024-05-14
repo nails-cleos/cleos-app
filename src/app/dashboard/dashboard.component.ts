@@ -73,6 +73,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private getState: Observable<any>;
   private subscription?: Subscription;
   private authUserServiceSubscription: Subscription;
+  private readonly language: string;
 
   constructor(private store: Store<AppState>, private readonly translate: TranslateService, private router: Router,
               public dialog: MatDialog, private authUserService: AuthUserService) {
@@ -85,6 +86,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.isDarkMode = darkMode;
     });
     this.locale = translate.currentLang;
+    this.language = this.translate.currentLang;
     this.day = new Day();
     this.maxDate = addMonths(getNow(), MAX_RESERVATION_MONTH);
     this.approveText = translate.instant('DASHBOARD.ROOM.APPROVE') ?? 'APPROVE';
@@ -438,7 +440,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const reservationId = event.id;
     switch (type) {
       case 'VIEW':
-        this.router.navigate(['reservation', reservationId]);
+        this.router.navigate([this.language, 'reservation', reservationId]);
         break;
       case 'APPROVE':
         this.events = this.events.filter(ev => ev.id !== event.id);
@@ -460,11 +462,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
         setTimeout(() => this.events = [...this.events, this.createTitle(event)], 1);
         break;
       case 'COMPLETE':
-        this.router.navigate(['reservation', reservationId, 'rooms', this.dashboard?.roomId,
+        this.router.navigate([this.language, 'reservation', reservationId, 'rooms', this.dashboard?.roomId,
           'customer', event.meta.customerId, 'complete'], { state: { data: { isDashboard: true } } });
         break;
       case 'MORE_INFO':
-        this.router.navigate(['reservation', reservationId, 'more-info']);
+        this.router.navigate([this.language, 'reservation', reservationId, 'more-info']);
     }
   }
 }

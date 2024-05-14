@@ -11,6 +11,7 @@ export class BalanceComponent {
   @Input() showAdd?: boolean;
   @Input() showView?: boolean;
   @Input() showUser?: boolean;
+  @Input() language!: string;
 
   get balancePercentage(): number {
     if (this.account) {

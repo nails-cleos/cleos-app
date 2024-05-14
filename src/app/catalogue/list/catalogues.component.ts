@@ -33,11 +33,13 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
   drops: CdkDropList[] = [];
 
   catalogues: ICatalogueAll[] = [];
+  language: string;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog,
               private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
-              private snackBar: MatSnackBar, private cdRef: ChangeDetectorRef) {
+              private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectCatalogueState);
+    this.language = this.translate.currentLang;
   }
 
   get finish(): void {
@@ -103,7 +105,7 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscription = this.getState.subscribe((state) => {
       if (state.data) {
         this.catalogues = state.data
-          .map((it: ICatalogueAll) => Object.assign({}, it, { image: `data:${it.contentType};base64,${it.blob}` }));
+          .map((it: ICatalogueAll) => Object.assign({}, it, { image: `data:${ it.contentType };base64,${ it.blob }` }));
         this.cdRef.detectChanges();
       }
       if (state.message) {

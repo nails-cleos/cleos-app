@@ -9,7 +9,7 @@
             </mat-card-title>
             <mat-card-subtitle>
               <ng-template [ngIf]="payment?.reservation">
-                <button mat-icon-button [routerLink]="['/reservation', payment?.reservation?.id]">
+                <button mat-icon-button [routerLink]="['/', language, 'reservation', payment?.reservation?.id]">
                   <mat-icon>visibility</mat-icon>
                 </button>&nbsp;
                 <span [innerHTML]="'ME.PAYMENT.RESERVATION' | translate: {reservationId: payment?.reservation?.id}">

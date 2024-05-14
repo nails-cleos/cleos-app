@@ -6,6 +6,7 @@ import { AppState, selectCurrencyState } from '../store/app.states';
 import { Router } from '@angular/router';
 import { Currency, ICurrency } from '../interfaces/currency';
 import * as fromActionsCurrency from '../store/currency.actions';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-currency',
@@ -26,9 +27,12 @@ export class CurrencyComponent implements OnInit, OnDestroy {
 
   private getState: Observable<any>;
   private subscription: Subscription | undefined;
+  private readonly language: string;
 
-  constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router) {
+  constructor(private readonly translate: TranslateService, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
+              private router: Router) {
     this.getState = this.store.select(selectCurrencyState);
+    this.language = this.translate.currentLang;
   }
 
   get create(): void {
@@ -75,10 +79,10 @@ export class CurrencyComponent implements OnInit, OnDestroy {
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({incorrect: true});
+          this.form.controls[value.field].setErrors({ incorrect: true });
         });
       } else if (state.message) {
-        this.router.navigate(['currency']);
+        this.router.navigate([this.language, 'currency']);
       }
     });
   }

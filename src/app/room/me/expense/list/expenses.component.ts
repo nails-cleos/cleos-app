@@ -42,6 +42,7 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
   pageSize = PAGE_SIZE;
   roomId: string | null = null;
   dateFormat: string;
+  language: string;
   date = new FormControl<Date | null>(null);
   private subscription: Subscription | undefined;
 
@@ -51,7 +52,7 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
   private dateFilter: string | null = null;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver, private route: ActivatedRoute) {
+              private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver, private route: ActivatedRoute) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -62,6 +63,7 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.getState = this.store.select(selectExpenseState);
     this.dateFormat = this.translate.currentLang;
+    this.language = this.translate.currentLang;
   }
 
   ngAfterViewInit(): void {

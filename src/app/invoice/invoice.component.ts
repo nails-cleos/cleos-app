@@ -65,6 +65,7 @@ export class InvoiceComponent implements OnInit, OnDestroy {
   pageSize = PAGE_SIZE;
 
   dateFormat: string;
+  language: string;
   startNumber: UntypedFormControl = new UntypedFormControl('', [Validators.required, Validators.min(1)]);
 
   private getState: Observable<any>;
@@ -85,6 +86,7 @@ export class InvoiceComponent implements OnInit, OnDestroy {
     });
     this.getState = this.store.select(selectInvoiceState);
     this.dateFormat = this.translate.currentLang;
+    this.language = this.translate.currentLang;
     this.filteredTypes = this.type.valueChanges.pipe(
       startWith(null),
       map((type: string | null) => type ? this.filterTypes(type) : this.allPaymentTypes.slice()));

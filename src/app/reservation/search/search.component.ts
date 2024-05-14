@@ -39,6 +39,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   pageSize = PAGE_SIZE;
 
   dateFormat: string;
+  language: string;
 
   filteredCustomer: Observable<IUser[] | undefined> | undefined;
   customer: UntypedFormControl = new UntypedFormControl();
@@ -68,6 +69,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     });
     this.getState = this.store.select(selectReservationState);
     this.dateFormat = this.translate.currentLang;
+    this.language = this.translate.currentLang;
     this.filteredStates = this.state.valueChanges.pipe(
       startWith(null),
       map((state: string | null) => state ? this.filterStates(state) : this.allStates.slice()));

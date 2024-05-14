@@ -63,7 +63,7 @@ export class NoteEffects {
 
   selectedData$ = createEffect(() => this.actions.pipe(
     ofType(fromActionsNote.NoteActionTypes.noteSelected),
-    tap((data: any) => this.router.navigate(['notes', data.payload.id]))
+    tap((data: any) => this.router.navigate([this.translate.currentLang, 'notes', data.payload.id]))
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions.pipe(

@@ -17,13 +17,13 @@
     </div>
     <ng-template #showItems>
       <a (click)="navigate(menu, drawer)" *ngIf="isHandset$ | async; else showMenu"
-         [routerLinkActive]="['active']" [routerLink]="'/'+menu.path" mat-list-item>
+         [routerLinkActive]="['active']" [routerLink]="'/'+language+'/'+menu.path" mat-list-item>
         <mat-icon matListItemIcon>{{menu.icon}}</mat-icon>
         <div mat-line>{{menu.name}}</div>
       </a>
       <ng-template #showMenu>
         <a (click)="navigate(menu)" [routerLinkActive]="['active']"
-           [routerLink]="'/'+menu.path" mat-list-item>
+           [routerLink]="'/'+language+'/'+menu.path" mat-list-item>
           <mat-icon matListItemIcon>{{menu.icon}}</mat-icon>
           <div mat-line>{{menu.name}}</div>
         </a>

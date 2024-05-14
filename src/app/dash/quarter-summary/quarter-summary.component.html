@@ -18,7 +18,7 @@
         </mat-select>
       </mat-form-field>
       <button color="accent" mat-fab matTooltip="{{ 'SUMMARY.MONTHLY.RESULT' | translate }}"
-              routerLink="/dashboard/monthly/summary">
+              [routerLink]="['/', language, 'dashboard','monthly','summary']">
         <mat-icon>calendar_month</mat-icon>
       </button>
     </div>

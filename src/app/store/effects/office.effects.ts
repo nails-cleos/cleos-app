@@ -69,7 +69,7 @@ export class OfficeEffects {
 
   selectedData$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsOffice.OfficeActionTypes.officeSelected),
-    tap((data: any) => this.router.navigate(['offices', data.payload.office.id]))
+    tap((data: any) => this.router.navigate([this.translate.currentLang, 'offices', data.payload.office.id]))
   ), {dispatch: false});
 
   dataSuccess$ = createEffect(() => this.actions$.pipe(

@@ -8,6 +8,7 @@ import { AppState, selectColorState } from '../../store/app.states';
 import { MatDialog } from '@angular/material/dialog';
 import { fieldChange, valueChange } from '../../util/validators';
 import * as fromActionsColor from '../../store/color.actions';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-color-detail',
@@ -27,10 +28,12 @@ export class ColorDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private subscription?: Subscription;
   private getState: Observable<any>;
+  private language: string;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
-              private router: Router, public dialog: MatDialog) {
+              private router: Router, public dialog: MatDialog, private translate: TranslateService) {
     this.getState = this.store.select(selectColorState);
+    this.language = this.translate.currentLang;
   }
 
   get update(): void {
@@ -82,7 +85,7 @@ export class ColorDetailComponent implements OnInit, AfterViewInit, OnDestroy {
           this.form.controls[value.field].setErrors({incorrect: true});
         });
       } else if (state.message) {
-        this.router.navigate(['colors']);
+        this.router.navigate([this.language, 'colors']);
       }
     });
   }

@@ -6,6 +6,7 @@ import { IUserAll } from '../interfaces/user';
 import { Auth, user } from '@angular/fire/auth';
 import { User } from '@firebase/auth';
 import { getNow, newDate, plusMinutes } from '../util/dates';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable()
 export class TokenService {
@@ -17,7 +18,7 @@ export class TokenService {
   private myTokenSubscription?: Subscription;
   private stopTimer?: Subject<boolean>;
 
-  constructor(private router: Router, private auth: Auth) {
+  constructor(private readonly translate: TranslateService, private router: Router, private auth: Auth) {
     this.cacheSize = 1;
     this.refreshInterval = 5 * 60 * 1000; // 5 min
   }
@@ -48,7 +49,7 @@ export class TokenService {
         next: (firebaseUser) => firebaseUser?.getIdTokenResult().then(tokenResult => {
           const expirationTime = plusMinutes(newDate(tokenResult.expirationTime), -10);
           if (getNow() >= expirationTime) {
-              firebaseUser.getIdToken(true).then(newToken => this.myToken = newToken);
+            firebaseUser.getIdToken(true).then(newToken => this.myToken = newToken);
           }
         }),
         error: () => this.clear(),
@@ -68,7 +69,7 @@ export class TokenService {
     this.myTokenCache = undefined;
     this.myToken = undefined;
     this.myUser = undefined;
-    this.router.navigate(['/login']);
+    this.router.navigate(['/', this.translate.currentLang, 'login']);
   }
 }
 

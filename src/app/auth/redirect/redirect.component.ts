@@ -4,8 +4,9 @@ import { Role } from '../../interfaces/token';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState } from '../../store/app.states';
 import { TokenService } from '../../services/token.service';
-import { hasRoomAdmin } from '../../util/helper';
+import { getLocale, hasRoomAdmin } from '../../util/helper';
 import { NavigationService } from '../../services/navigation.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-redirect',
@@ -15,20 +16,21 @@ import { NavigationService } from '../../services/navigation.service';
 export class RedirectComponent {
 
   constructor(private store: Store<AppState>, private tokenService: TokenService,
-              private navigateService: NavigationService) {
+              private navigateService: NavigationService, private translate: TranslateService) {
     this.store.select(selectAuthState).subscribe((state: any) => {
+      const lang = getLocale(translate.currentLang).language;
       if (state.redirect) {
-        let redirectUrl = ['main'];
+        let redirectUrl = ['/', lang];
         if (state.isAuthenticated) {
           const user: IUserAll = state.user;
           this.tokenService.token = state.token;
           this.tokenService.user = state.user;
           if (RedirectComponent.hasRoomOrAdmin(user.authorities)) {
-            redirectUrl = ['dashboard'];
+            redirectUrl = [lang, 'dashboard'];
           } else if (hasRoomAdmin(user.authorities)) {
-            redirectUrl = ['events'];
+            redirectUrl = [lang, 'events'];
           } else {
-            redirectUrl = ['me', 'reservations'];
+            redirectUrl = [lang, 'me', 'reservations'];
           }
         }
         this.navigateService.reload(redirectUrl);

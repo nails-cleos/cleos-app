@@ -1,17 +1,17 @@
 <div class="flex-container" fxLayout="column">
   <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
     <div fxFlex="60%" fxFlex.lt-sm="80%">
-      <app-balance [account]="account" [showAdd]="showAdd" [showView]="true"></app-balance>
+      <app-balance [account]="account" [showAdd]="showAdd" [showView]="true" [language]="language"></app-balance>
       <form (ngSubmit)="submit" [formGroup]="form" novalidate>
         <mat-card appearance="outlined" class="style-card">
           <mat-card-header>
             <mat-card-title>{{ 'ACCOUNT.TITLE' | translate }}</mat-card-title>
             <mat-card-subtitle *ngIf="account?.customer; else skeleton">
               <ng-template [ngIf]="userId === account?.customer?.id" [ngIfElse]="noCustomer">
-                <a [routerLink]="['/', 'me', 'overview']">{{account?.customer?.displayName}}</a>
+                <a [routerLink]="['/', language, 'me', 'overview']">{{account?.customer?.displayName}}</a>
               </ng-template>
               <ng-template #noCustomer>
-                <a [routerLink]="['/', 'users', account?.customer?.id, 'overview']">{{account?.customer?.displayName}}</a>
+                <a [routerLink]="['/', language, 'users', account?.customer?.id, 'overview']">{{account?.customer?.displayName}}</a>
               </ng-template>
             </mat-card-subtitle>
             <ng-template #skeleton>
@@ -43,10 +43,10 @@
                     {{ errors['currency'] }}
                   </mat-error>
                 </mat-form-field>
-                <button fxShow.lt-sm fxHide [routerLink]="['/', 'currency', 'add']" color="accent" mat-fab>
+                <button fxShow.lt-sm fxHide [routerLink]="['/', language, 'currency', 'add']" color="accent" mat-fab>
                   <mat-icon matPrefix>add_card</mat-icon>
                 </button>
-                <button fxHide.lt-sm fxShow [routerLink]="['/', 'currency', 'add']" color="accent" mat-fab extended>
+                <button fxHide.lt-sm fxShow [routerLink]="['/', language, 'currency', 'add']" color="accent" mat-fab extended>
                   <mat-icon matPrefix>add_card</mat-icon>
                   <span>{{ 'COMMON.CURRENCY.ADD_BUTTON' | translate }}</span>
                 </button>
