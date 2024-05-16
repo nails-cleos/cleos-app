@@ -91,10 +91,10 @@
   <!--Mini Cards-->
   <mat-grid-tile *ngFor="let mc of miniCardData" [colspan]="cardLayout.miniCard.cols"
                  [rowspan]="cardLayout.miniCard.rows">
-    <app-mini-card [color]="mc.color" [error]="mc.error" [icon]="mc.icon" [isInfinity]="mc.infinity"
-                   [isCurrency]="mc.currency" [isIncrease]="mc.increase" [isLoading]="isLoading"
+    <app-mini-card [color]="mc.color" [error]="mc.error" [icon]="mc.icon" [isInfinity]="mc.isInfinity"
+                   [isCurrency]="mc.isCurrency" [isIncrease]="mc.isIncrease" [isLoading]="isLoading"
                    [percentValue]="mc.percentValue" [title]="mc.title | translate" [period]="mc.period"
-                   [previousPeriod]="mc.previousPeriod" [isProjection]="mc.projection"
+                   [previousPeriod]="mc.previousPeriod" [isProjection]="mc.isProjection"
                    [projection]="'DASHBOARD.MINI_CARD.PROJECTION' | translate" [value]="mc.value"
                    [duration]="'DASHBOARD.MINI_CARD.DURATION' | translate: {period: mc.previousPeriod}">
     </app-mini-card>

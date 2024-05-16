@@ -30,11 +30,11 @@ export interface IEventSummary {
 export interface IReservationSummary {
   title: string;
   value?: number | string;
-  increase?: boolean;
+  isIncrease?: boolean;
   color?: ThemePalette;
   percentValue?: number;
   icon?: string;
-  currency?: boolean;
+  isCurrency?: boolean;
   error?: any;
 }
 
