@@ -287,7 +287,7 @@ export class DashComponent implements OnInit, OnDestroy {
           }
           if (state.miniCardSummaries && state.miniCardSummaries.length) {
             this.miniCardData = state.miniCardSummaries.map(miniCard => {
-              if (miniCard.currency && miniCard.value) {
+              if (miniCard.isCurrency && miniCard.value) {
                 return Object.assign({}, miniCard, { value: numberFormat(miniCard.value, this.currency, this.dateFormat) });
               }
               return miniCard;
