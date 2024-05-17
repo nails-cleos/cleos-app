@@ -378,7 +378,7 @@ export const openCancel = (dialog: MatDialog, room: IRoomAll, small: boolean, op
 };
 
 export const customerEditDialog = (dialog: MatDialog, router: Router, reservationId: string, currency: ICurrencyAll, small: boolean,
-                                   price?: IPrice): void => {
+                                   language: string, price?: IPrice): void => {
   const data = {
     small,
     price,
@@ -386,7 +386,7 @@ export const customerEditDialog = (dialog: MatDialog, router: Router, reservatio
   };
   executeDialog(dialog, CustomerEditDialogComponent, data, result => {
     if (result) {
-      router.navigate(['me', 'reservation', reservationId]);
+      router.navigate([language, 'me', 'reservation', reservationId]);
     }
   }, true);
 };
