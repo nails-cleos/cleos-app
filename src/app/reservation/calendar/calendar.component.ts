@@ -366,7 +366,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
         meta.id = it.id;
         meta.customer = it.customer.displayName;
         const draggable = [States.approved, States.created, States.partiallyPaid, States.paid].includes(it.state as States);
-        const event = calendarEvent(detail, color, start, darkMode, end, `reservation/${ it.id }`, meta, draggable);
+        const event = calendarEvent(detail, color, start, darkMode, end, `${ this.language }/reservation/${ it.id }`, meta, draggable);
         let events;
         if (this.calendar) {
           events = [...this.calendar.events, event];
@@ -392,7 +392,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
           description: it.description ? it.description : '',
           professionalName: it.professional.displayName
         });
-        let path = 'unavailable/';
+        let path = `${ this.language }/unavailable/`;
         if (it.type === 'BLOCK_AGENDA') {
           path += 'block-agenda/';
         }
@@ -409,10 +409,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
       }
     });
 
-    recurringEvents.forEach(recurring => {
-      recurring.rrule.all().forEach((date: Date) =>
-        this.validateUnavailableEvent(rr.room, date, recurring, darkMode));
-    });
+    recurringEvents.forEach(recurring => recurring.rule.all().forEach((date: Date) =>
+      this.validateUnavailableEvent(rr.room, date, recurring, darkMode)));
   }
 
   private addBirthdays(rr: IRoomReservation, darkMode: boolean): void {
@@ -425,7 +423,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
         const startDate = newDateTimestamp(it.dob);
         startDate.setFullYear(getNow().getFullYear());
         const color = findStateColor('BIRTHDAY', darkMode);
-        const event = allDayEvent(detail, color, startDate, darkMode, `users/${ it.id }`);
+        const event = allDayEvent(detail, color, startDate, darkMode, `${ this.language }/users/${ it.id }`);
         if (this.calendar) {
           this.calendar.events = [...this.calendar.events, event];
         }
@@ -442,7 +440,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
       });
       const startDate = newDateTimestamp(it.date);
       const state = 'NOTE';
-      const path = `notes/${ it.id }`;
+      const path = `${ this.language }/notes/${ it.id }`;
       if (it.repeat === FrequencyEnum.none) {
         this.createNoteEvent(title, state, path, startDate, darkMode);
       } else {
@@ -450,7 +448,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
       }
     });
 
-    recurringEvents.forEach(recurring => recurring.rrule.all().forEach((date: Date) => this.createNoteEvent(recurring.title,
+    recurringEvents.forEach(recurring => recurring.rule.all().forEach((date: Date) => this.createNoteEvent(recurring.title,
       recurring.state, recurring.path, date, darkMode)));
   }
 
