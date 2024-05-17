@@ -33,7 +33,8 @@ export class UpcomingComponent implements OnChanges {
 
   get edit(): void {
     if (this.upcoming && !this.upcoming.canEdit && this.upcoming.price.totalPaid < this.upcoming.price.penalty) {
-      return customerEditDialog(this.dialog, this.router, this.upcoming.id, this.upcoming.room.currency, this.small, this.upcoming.price);
+      return customerEditDialog(this.dialog, this.router, this.upcoming.id, this.upcoming.room.currency, this.small, this.language,
+        this.upcoming.price);
     }
     this.router.navigate([this.language, 'me', 'reservation', this.upcoming?.id]);
     return;

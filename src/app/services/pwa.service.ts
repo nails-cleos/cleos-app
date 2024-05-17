@@ -13,8 +13,7 @@ export const NOT_INSTALL_PWA = 'not_install_pwa';
 export class PwaService {
   private promptEvent: any;
 
-  constructor(private bottomSheet: MatBottomSheet, private platform: Platform, private swUpdate: SwUpdate,
-              private cookieService: CookieService) {
+  constructor(private bottomSheet: MatBottomSheet, private platform: Platform, swUpdate: SwUpdate, private cookieService: CookieService) {
     if (swUpdate.isEnabled) {
       swUpdate.versionUpdates
         .pipe(filter((evt): evt is VersionReadyEvent => evt.type === 'VERSION_READY'))

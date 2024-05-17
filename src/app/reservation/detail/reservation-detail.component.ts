@@ -505,15 +505,15 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     });
 
     const editTransaction = ReservationDetailComponent.createTransaction('edited', (): void => {
-      self.router.navigate(['reservation', reservationId, 'edit'], { state: { roomId } });
+      self.router.navigate([this.language, 'reservation', reservationId, 'edit'], { state: { roomId } });
     });
 
     const completeTransaction = ReservationDetailComponent.createTransaction('completed', (): void => {
-      self.router.navigate(['reservation', reservationId, 'rooms', roomId, 'customer', customerId, 'complete']);
+      self.router.navigate([this.language, 'reservation', reservationId, 'rooms', roomId, 'customer', customerId, 'complete']);
     });
 
     const moreTransaction = ReservationDetailComponent.createTransaction('more', (): void => {
-      self.router.navigate(['reservation', reservationId, 'more-info']);
+      self.router.navigate([this.language, 'reservation', reservationId, 'more-info']);
     });
 
     const changeCustomerTransaction = ReservationDetailComponent.createTransaction('change',
@@ -726,7 +726,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         ReservationIconName.edit, 'edit', 'accent');
 
       const editTransaction = ReservationDetailComponent.createTransaction('edited', (): void => {
-        self.router.navigate(['me', 'reservation', reservationId]);
+        self.router.navigate([this.language, 'me', 'reservation', reservationId]);
       });
 
       created.transitions.edit = editTransaction;
@@ -742,7 +742,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         ReservationIconName.edit, 'cancel_edit', 'accent');
 
       const editTransaction = ReservationDetailComponent.createTransaction('edited', (): void =>
-        customerEditDialog(self.dialog, self.router, reservationId, reservation.room.currency, self.small, price));
+        customerEditDialog(self.dialog, self.router, reservationId, reservation.room.currency, self.small, self.language, price));
 
       created.transitions.cancelEdit = editTransaction;
       created.next.unshift(edit);
@@ -770,7 +770,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         cancelledPaymentRequired.next = [pay];
 
         cancelledPaymentRequired.transitions.pay = ReservationDetailComponent.createTransaction('cancelledPaymentRequired', (): void => {
-          this.router.navigate(['/', this.language, 'me', 'payment', self.paymentPaid?.filter((p: IPayment) => p.status !== 'APPROVED')[0]?.id]);
+          this.router.navigate(['/', this.language, 'me', 'payment',
+            self.paymentPaid?.filter((p: IPayment) => p.status !== 'APPROVED')[0]?.id]);
         });
       }
       self.addActions();
