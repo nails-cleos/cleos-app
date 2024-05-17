@@ -252,7 +252,7 @@ export class DashComponent implements OnInit, OnDestroy {
     if (date && room) {
       executeDialogNoWidth(this.dialog, CalendarDialogComponent, null, result => {
         if (result) {
-          this.router.navigate(result.split(','), { state: data });
+          this.router.navigate([this.language].concat(result.split(',')), { state: data });
         }
       });
     }
@@ -287,7 +287,7 @@ export class DashComponent implements OnInit, OnDestroy {
           }
           if (state.miniCardSummaries && state.miniCardSummaries.length) {
             this.miniCardData = state.miniCardSummaries.map(miniCard => {
-              if (miniCard.currency && miniCard.value) {
+              if (miniCard.isCurrency && miniCard.value) {
                 return Object.assign({}, miniCard, { value: numberFormat(miniCard.value, this.currency, this.dateFormat) });
               }
               return miniCard;
@@ -413,7 +413,7 @@ export class DashComponent implements OnInit, OnDestroy {
 
   private createNoteEvent(note: ICalendarNote, date: Date, darkMode: boolean): void {
     const color = findStateColor('NOTE', darkMode);
-    const event = allDayEvent(note.title, color, date, darkMode, `${this.language}/notes/${ note.noteId }`,
+    const event = allDayEvent(note.title, color, date, darkMode, `${ this.language }/notes/${ note.noteId }`,
       new Meta(false, this.state.timeZone, 'NOTE', [this.language, 'notes', note.noteId]));
     this.events = [...this.events, event];
   }

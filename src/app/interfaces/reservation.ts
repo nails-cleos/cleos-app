@@ -117,15 +117,15 @@ export interface ICalendar {
 export interface IReservationSummary {
   title: string;
   value?: number | string;
-  increase?: boolean;
-  infinity?: boolean;
-  projection?: boolean;
+  isIncrease?: boolean;
+  isInfinity?: boolean;
+  isProjection?: boolean;
   color?: ThemePalette;
   percentValue?: number;
   icon?: string;
   period?: string;
   previousPeriod?: string;
-  currency?: boolean;
+  isCurrency?: boolean;
   error?: any;
 }
 
