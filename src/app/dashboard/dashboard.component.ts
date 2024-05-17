@@ -185,7 +185,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (date && professionalId && this.dateIsValid(date)) {
       executeDialogNoWidth(this.dialog, CalendarDialogComponent, null, result => {
         if (result) {
-          this.router.navigate(result.split(','), { state: data });
+          this.router.navigate([this.language].concat(result.split(',')), { state: data });
         }
       });
     }

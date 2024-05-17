@@ -217,7 +217,6 @@ export class NavComponent implements OnInit, OnDestroy {
         this.currentUser = user;
         this.resetTheme(this.currentUser.theme);
         this.menuItems = state.menus;
-        console.log(this.menuItems);
         this.initials = getDisplayNameInitials(user);
         this.image = getUserImage(user);
         this.messagingService.requestPermission(user);

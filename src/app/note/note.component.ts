@@ -35,12 +35,14 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
   private getState: Observable<any>;
   private subscription?: Subscription;
   private readonly extras: any;
+  private readonly language: string;
 
   constructor(private readonly translate: TranslateService, private store: Store<AppState>, private formBuilder: FormBuilder,
               private route: ActivatedRoute, private router: Router, public dialog: MatDialog) {
     this.isAddMode = true;
     this.getState = this.store.select(selectNoteState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
+    this.language = translate.currentLang;
   }
 
   get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
@@ -134,7 +136,7 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
       } else if (state.message) {
-        this.router.navigate(['reservation', 'calendar']);
+        this.router.navigate([this.language, 'reservation', 'calendar']);
       }
     });
   }

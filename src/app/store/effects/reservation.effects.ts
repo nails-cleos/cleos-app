@@ -424,20 +424,20 @@ export class ReservationEffects {
   saveSuccess$ = createEffect(() => this.actions.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.reservationSaveSuccess),
     tap((data: any) => {
-      let navigation: string[] = [];
+      let navigation = [this.translate.currentLang];
       switch (data.payload.role) {
         case Role.customer:
           if (data.payload.paymentLink) {
             window.open(data.payload.paymentLink, '_self');
             return;
           }
-          navigation = ['me', 'reservations'];
+          navigation = [...navigation, 'me', 'reservations'];
           break;
         case Role.professional:
-          navigation = data.payload.deleted ? ['dashboard'] : ['reservation', data.payload.id];
+          navigation = data.payload.deleted ? [...navigation, 'dashboard'] : [...navigation, 'reservation', data.payload.id];
           break;
         case Role.roomAdmin:
-          navigation = ['events'];
+          navigation = [...navigation, 'events'];
           break;
       }
       this.router.navigate(navigation);

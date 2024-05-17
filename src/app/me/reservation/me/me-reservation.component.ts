@@ -184,7 +184,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   private readonly language: string;
 
   constructor(private readonly translate: TranslateService, private snackBar: MatSnackBar, private store: Store<AppState>,
-              private formBuilder: UntypedFormBuilder, private breakpointObserver: BreakpointObserver, private router: Router,
+              private formBuilder: UntypedFormBuilder, breakpointObserver: BreakpointObserver, private router: Router,
               private route: ActivatedRoute, public dialog: MatDialog, private analytic: Analytics,
               private authUserService: AuthUserService) {
     this.getState = this.store.select(selectReservationState);
