@@ -6,9 +6,7 @@ import { IExperience, ISlide, ISocialLink, IStory, IWork } from '../../interface
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AppState, selectMainState } from '../../store/app.states';
-import { ViewportScroller } from '@angular/common';
 import { TranslateService } from '@ngx-translate/core';
-import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import * as fromActionsMain from '../../store/main.actions';
 import { AuthUserService } from '../../services/auth-user.service';
@@ -101,9 +99,8 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   private filterSubscription?: Subscription;
   private getState: Observable<any>;
 
-  constructor(private store: Store<AppState>, private cdRef: ChangeDetectorRef, private viewportScroller: ViewportScroller,
-              private translate: TranslateService, private router: Router, private formBuilder: UntypedFormBuilder,
-              private snackBar: MatSnackBar, private authUserService: AuthUserService, private breakpointObserver: BreakpointObserver,
+  constructor(private store: Store<AppState>, private cdRef: ChangeDetectorRef, private formBuilder: UntypedFormBuilder,
+              private snackBar: MatSnackBar, private authUserService: AuthUserService, breakpointObserver: BreakpointObserver,
               private mainContent: MainContentService, private bottomSheet: MatBottomSheet) {
     this.currentIndex = 0;
     this.isSmall = isMobile();
@@ -358,9 +355,9 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private getCatalogues(): void {
-    this.store.dispatch(
-      new fromActionsMain.GetAllCatalogue()
-    );
+    // this.store.dispatch(
+    //   new fromActionsMain.GetAllCatalogue()
+    // );
   }
 
   private getTreatments(): void {

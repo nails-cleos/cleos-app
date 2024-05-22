@@ -42,6 +42,7 @@ import { CalendarDialogComponent } from '../../shared/dialog/calendar/calendar-d
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { INoteAll } from '../../interfaces/note';
 import { AuthUserService } from '../../services/auth-user.service';
+import { Role } from '../../interfaces/token';
 
 @Component({
   selector: 'app-calendar',
@@ -90,6 +91,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   private professionalSelectedId?: string;
   private today: Date = createNewDate(getNow());
   private daysInWeek = 7;
+  private isRoomAdmin = false;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private router: Router, private breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef,
@@ -133,6 +135,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
         this.fillData(darkMode);
       }
       this.isDarkMode = darkMode;
+      this.isRoomAdmin = value.isRoomAdmin;
     });
     this.maxDate = addMonths(getNow(), MAX_RESERVATION_MONTH);
     this.minDate = new Date(2023, 0, 1);
@@ -255,7 +258,11 @@ export class CalendarComponent implements OnInit, OnDestroy {
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: event }, result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsReservation.UpdateTimestamp({ reservationId: event.meta.id, start: event.start.toLocaleString(API_LOCALE) })
+          new fromActionsReservation.UpdateTimestamp({
+            reservationId: event.meta.id,
+            start: event.start.toLocaleString(API_LOCALE),
+            role: this.isRoomAdmin ? Role.roomAdmin : Role.professional
+          })
         );
       } else {
         event.start = oldStart;
