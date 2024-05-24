@@ -52,7 +52,8 @@ export interface ITreatmentAll extends IService {
   duration: string;
   description?: string;
   discount?: IDiscount;
-  extras?: IExtras;
+  extraDescription?: string;
+  extraPrice?: number;
   primary?: boolean;
   createdAt?: string;
   treatmentId?: string;
@@ -63,11 +64,6 @@ export interface ITreatmentAll extends IService {
 export interface ITreatmentDiscountDTO {
   treatments: ITreatmentAll[];
   discounts: IUserDiscount[];
-}
-
-export interface IExtras {
-  description?: string;
-  price?: number;
 }
 
 export interface IPrice {

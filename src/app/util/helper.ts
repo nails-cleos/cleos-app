@@ -95,8 +95,8 @@ export const getPrice = (reservation: IReservationAll, payments?: IPayment[]): I
   let discount;
   let extras;
   let additional;
-  if (treatment.extras && treatment.extras.price) {
-    extras = treatment.extras.price;
+  if (treatment.extraPrice) {
+    extras = treatment.extraPrice;
     total += extras;
     priceWithExtras += extras;
   }
