@@ -82,7 +82,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { SelectProfessionalDialogComponent } from './select-professional-dialog.component';
 import { AuthUserService } from '../services/auth-user.service';
 import {
-  completeAndNext, enableStep,
+  completeAndNext,
+  enableStep,
   getBackIndex,
   getIndex,
   getStepCall,
@@ -1022,9 +1023,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.roomId = reservation.room.id;
       this.professionalId = reservation.professional.id;
       this.note.setValue(reservation.note);
-      if (reservation.configuration) {
-        this.reference.setValue(reservation.configuration.reference);
-        this.customerChange.setValue(reservation.configuration.canCustomerChange);
+      if (reservation.configurationCanCustomerChange !== null || reservation.configurationReference) {
+        this.reference.setValue(reservation.configurationReference);
+        this.customerChange.setValue(reservation.configurationCanCustomerChange);
       }
       completeAndNext(this.steps, this.myStepper, true);
     }

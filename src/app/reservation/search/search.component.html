@@ -140,7 +140,7 @@
               <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
               <mat-list-item role="list">
                 <ng-template [ngIf]="!reservation.deleted">
-                  <button [routerLink]="['/reservation', reservation.id]" color="primary"
+                  <button [routerLink]="['/',language, 'reservation', reservation.id]" color="primary"
                           mat-icon-button>
                     <mat-icon matListItemIcon>visibility</mat-icon>
                   </button>

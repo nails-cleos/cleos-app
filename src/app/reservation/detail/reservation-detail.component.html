@@ -20,7 +20,7 @@
       </ng-template>
     </mat-card-subtitle>
     <mat-card-subtitle
-      *ngIf="reservation?.configuration?.canCustomerChange">{{reservation?.configuration?.reference}}</mat-card-subtitle>
+      *ngIf="reservation?.configurationCanCustomerChange">{{reservation?.configurationReference}}</mat-card-subtitle>
     <ng-template #skeleton>
       <div class="ssc-line"></div>
     </ng-template>
@@ -119,16 +119,16 @@
       </ng-template>
 
       <ng-template
-        [ngIf]="reservation.treatment.extras?.description || price.extra || (reservation.additional && reservation.additional.length)"
+        [ngIf]="reservation.treatment.extraDescription || price.extra || (reservation.additional && reservation.additional.length)"
         [ngIfElse]="singleTreatment">
-        <ng-template [ngIf]="reservation.treatment.extras">
+        <ng-template [ngIf]="reservation.treatment.extraPrice">
           <div>
             <mat-divider></mat-divider>
             <div mat-subheader>{{ 'RESERVATION.TREATMENT.EXTRAS.TITLE' | translate}}</div>
-            <mat-list-item *ngIf="reservation.treatment.extras.description">
+            <mat-list-item *ngIf="reservation.treatment.extraDescription">
               <mat-icon matListItemIcon>description</mat-icon>
               <div matListItemTitle>{{ 'RESERVATION.TREATMENT.EXTRAS.DESCRIPTION' | translate}}</div>
-              <div matListItemLine>{{reservation.treatment.extras.description}}</div>
+              <div matListItemLine>{{reservation.treatment.extraDescription}}</div>
             </mat-list-item>
             <mat-list-item *ngIf="price.extra">
               <mat-icon matListItemIcon>{{reservation.room.currency.icon}}</mat-icon>
