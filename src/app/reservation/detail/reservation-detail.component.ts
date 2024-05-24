@@ -562,7 +562,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     };
 
     let completeActions: MatFabMenu[] = [book];
-    if (reservation.configuration?.canCustomerChange) {
+    if (reservation.configurationCanCustomerChange) {
       completeActions = [...completeActions, change];
     }
     completeActions = [...completeActions, more, color];

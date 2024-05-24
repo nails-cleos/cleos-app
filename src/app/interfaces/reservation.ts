@@ -60,7 +60,8 @@ export interface IReservationAll {
   review?: IReview;
   history?: IReservationAll[];
   additional?: IAdditionalAll[];
-  configuration?: IConfigurationReservation;
+  configurationCanCustomerChange?: boolean;
+  configurationReference?: string;
   note?: string;
   startedTimestamp?: number;
   paymentLink?: string;
@@ -68,11 +69,6 @@ export interface IReservationAll {
   paymentRequired?: boolean;
   relatedReservationId?: string;
   balance?: number;
-}
-
-export interface IConfigurationReservation {
-  canCustomerChange: boolean;
-  reference: string;
 }
 
 export interface IUpcomingAll extends IReservationAll {
