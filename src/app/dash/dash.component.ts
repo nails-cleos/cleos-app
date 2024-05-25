@@ -70,7 +70,7 @@ export class DashComponent implements OnInit, OnDestroy {
   private authUserServiceSubscription: Subscription;
   private isDarkMode?: boolean;
   private periodStart?: Date;
-  private language: string;
+  private readonly language: string;
 
   constructor(public dialog: MatDialog, private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
               private readonly translate: TranslateService, private router: Router, private authUserService: AuthUserService) {
@@ -227,8 +227,8 @@ export class DashComponent implements OnInit, OnDestroy {
     this.segmentClick(date, room);
   }
 
-  beforeMonthViewRender({ body, period }: { body: CalendarMonthViewDay<IMeta>[], period: any }): void {
-    // month view has a different UX from the week and day view so we only really need to group by the type
+  beforeMonthViewRender({ body, period }: { body: CalendarMonthViewDay<IMeta>[]; period: any }): void {
+    // month view has a different UX from the week and day view, so we only really need to group by the type
     this.periodStart = period.start;
     body.forEach((cell) => {
       const groups = {};

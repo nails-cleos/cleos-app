@@ -27,6 +27,7 @@ import { allElementsHaveSameKeyFilterValue, currencySymbol } from '../../util/he
 import { ICurrencyAll } from '../../interfaces/currency';
 import { createYearlyWorkbook } from '../../util/report';
 import fs from 'file-saver';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-year-summary',
@@ -52,6 +53,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
   timeZone?: string;
   yearSummaryTotals: ISummaryTotals = new SummaryTotals();
   showCash: boolean;
+  language: string;
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe([
     Breakpoints.XSmall,
@@ -65,7 +67,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
   private userName?: string;
 
   constructor(private store: Store<AppState>, private breakpointObserver: BreakpointObserver, private router: Router,
-              private authUserService: AuthUserService) {
+              private authUserService: AuthUserService, private translate: TranslateService) {
     this.getState = this.store.select(selectDashboardState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
     this.showCash = false;
@@ -73,6 +75,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
       this.userName = value.displayName;
       this.showCash = value.showCash;
     });
+    this.language = this.translate.currentLang;
   }
 
   get exportAction(): void {

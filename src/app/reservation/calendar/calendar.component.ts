@@ -223,7 +223,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     if (date && room && this.dateIsValid(date)) {
       executeDialogNoWidth(this.dialog, CalendarDialogComponent, null, result => {
         if (result) {
-          this.router.navigate(result.split(','), { state: data });
+          this.router.navigate([this.language].concat(result.split(',')), { state: data });
         }
       });
     }

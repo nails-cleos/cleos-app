@@ -90,13 +90,19 @@ export const totalDuration = (treatment: ITreatmentAll, additional?: IAdditional
 
 export const getDurationOrUndefined = (duration?: string): IDuration | undefined => duration ? convertDuration(duration) : undefined;
 
-export const convertDuration = (duration: string): IDuration => {
-  const hIndex = duration.indexOf('H');
-  const mIndex = duration.indexOf('M');
-  const hour = hIndex > -1 ? Number(duration.slice(2, hIndex)) : 0;
-  const minute = mIndex > -1 ? Number(duration.slice(hIndex > -1 ? hIndex + 1 : 2, mIndex)) : 0;
+export const convertDuration = (duration: string | number): IDuration => {
+  if (typeof duration === 'string') {
+    const hIndex = duration.indexOf('H');
+    const mIndex = duration.indexOf('M');
+    const hour = hIndex > -1 ? Number(duration.slice(2, hIndex)) : 0;
+    const minute = mIndex > -1 ? Number(duration.slice(hIndex > -1 ? hIndex + 1 : 2, mIndex)) : 0;
 
-  return new Duration(hour, minute);
+    return new Duration(hour, minute);
+  } else {
+    const numberDuration = Number(duration);
+
+    return new Duration(Math.floor(numberDuration / 3600), (numberDuration % 3600) / 60);
+  }
 };
 
 export const sumDurations = (durations: IDuration[]): IDuration => {
@@ -383,9 +389,7 @@ export const formatDateHourMinute = (date: Date, locale: string = 'en'): string 
 export const formatDateTwoDigit = (date: Date, locale: string, timeZone: string = getCurrentTimeZone()): string =>
   date.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: '2-digit', timeZone });
 
-export const backendFormatDate = (date?: Date): string | undefined => date?.toLocaleDateString(API_LOCALE, {
-  day: '2-digit', month: '2-digit', year: 'numeric'
-})?.replace(/\//g, '-');
+export const backendFormatDate = (date?: Date): string | undefined => date?.toISOString().split('T')[0];
 
 export const exportFormatDate = (date: Date, locale: string = API_LOCALE, timeZone: string = getCurrentTimeZone()):
   string => date.toLocaleDateString(locale, {
