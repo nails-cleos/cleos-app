@@ -6,7 +6,6 @@ import { ICurrency, ICurrencyAll } from './currency';
 import { States } from './reservation';
 import { PaymentType } from './payment';
 import { FrequencyEnum } from '../util/helper';
-import { Worksheet } from 'exceljs';
 
 export interface IDashboard {
   timeZone?: string;

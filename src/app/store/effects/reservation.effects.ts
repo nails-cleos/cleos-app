@@ -161,7 +161,8 @@ export class ReservationEffects {
         message: this.translate.instant('COMMON.RESERVATION.CREATED', { date: newDateTimestamp(response.timestamp) }),
         id: response.id,
         role: payload.role,
-        paymentLink: response.paymentLink
+        paymentLink: response.paymentLink,
+        navigate: true
       }))), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({
         error: err.error
       })))
@@ -174,7 +175,8 @@ export class ReservationEffects {
       switchMap((response) => of(new fromActionsReservation.ReservationSaveSuccess({
         message: this.translate.instant('RESERVATION.DELETED.MESSAGE', { date: newDateTimestamp(response.timestamp) }),
         deleted: true,
-        role: Role.professional
+        role: Role.professional,
+        navigate: true
       }))), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({
         error: err.error
       })))
@@ -200,7 +202,8 @@ export class ReservationEffects {
         message: this.translate.instant('COMMON.RESERVATION.UPDATED.MESSAGE', { date: newDateTimestamp(response.timestamp) }),
         id: response.id,
         role: payload.role,
-        paymentLink: response.paymentLink
+        paymentLink: response.paymentLink,
+        navigate: true
       }))), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({
         error: err.error
       })))
@@ -317,7 +320,8 @@ export class ReservationEffects {
       switchMap((response) => of(new fromActionsReservation.ReservationSaveSuccess({
         message: this.translate.instant('ME.REVIEW.CREATED'),
         id: response.id,
-        role: Role.customer
+        role: Role.customer,
+        navigate: true
       }))),
       catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({ error: err.error })))
     ))
@@ -347,7 +351,8 @@ export class ReservationEffects {
         message: this.translate.instant('COMMON.RESERVATION.UPDATED.MESSAGE', { date: newDateTimestamp(response.timestamp) }),
         id: response.id,
         role: payload.role,
-        paymentLink: response.paymentLink
+        paymentLink: response.paymentLink,
+        navigate: true
       }))), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({
         error: err.error
       })))
@@ -361,7 +366,8 @@ export class ReservationEffects {
         message: this.translate.instant('COMMON.RESERVATION.UPDATED.MESSAGE', { date: newDateTimestamp(response.timestamp) }),
         id: response.id,
         role: payload.role,
-        paymentLink: response.paymentLink
+        paymentLink: response.paymentLink,
+        navigate: true
       }))), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({
         error: err.error
       })))
@@ -375,7 +381,8 @@ export class ReservationEffects {
         message: this.translate.instant('COMMON.RESERVATION.UPDATED.MESSAGE', { date: newDateTimestamp(response.timestamp) }),
         id: response.id,
         role: payload.role,
-        paymentLink: response.paymentLink
+        paymentLink: response.paymentLink,
+        navigate: false
       }))), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({
         error: err.error
       })))
@@ -424,23 +431,25 @@ export class ReservationEffects {
   saveSuccess$ = createEffect(() => this.actions.pipe(
     ofType(fromActionsReservation.ReservationActionTypes.reservationSaveSuccess),
     tap((data: any) => {
-      let navigation = [this.translate.currentLang];
-      switch (data.payload.role) {
-        case Role.customer:
-          if (data.payload.paymentLink) {
-            window.open(data.payload.paymentLink, '_self');
-            return;
-          }
-          navigation = [...navigation, 'me', 'reservations'];
-          break;
-        case Role.professional:
-          navigation = data.payload.deleted ? [...navigation, 'dashboard'] : [...navigation, 'reservation', data.payload.id];
-          break;
-        case Role.roomAdmin:
-          navigation = [...navigation, 'events'];
-          break;
+      if (data.payload.navigate) {
+        let navigation = [this.translate.currentLang];
+        switch (data.payload.role) {
+          case Role.customer:
+            if (data.payload.paymentLink) {
+              window.open(data.payload.paymentLink, '_self');
+              return;
+            }
+            navigation = [...navigation, 'me', 'reservations'];
+            break;
+          case Role.professional:
+            navigation = data.payload.deleted ? [...navigation, 'dashboard'] : [...navigation, 'reservation', data.payload.id];
+            break;
+          case Role.roomAdmin:
+            navigation = [...navigation, 'events'];
+            break;
+        }
+        this.router.navigate(navigation);
       }
-      this.router.navigate(navigation);
     })
   ), { dispatch: false });
 

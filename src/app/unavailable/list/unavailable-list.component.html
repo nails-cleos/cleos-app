@@ -164,7 +164,7 @@
   <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
 
   <button color="accent" id="add-button" mat-fab matTooltip="{{ 'UNAVAILABLE.TITLE' | translate }}"
-          routerLink="/unavailable/add">
+          [routerLink]="['/', language, 'unavailable', 'add']">
     <mat-icon>add</mat-icon>
   </button>
 </div>
