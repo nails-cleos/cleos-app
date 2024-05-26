@@ -35,13 +35,14 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
   pageSize = PAGE_SIZE;
 
   dateFormat: string;
+  language: string;
 
   private subscription?: Subscription;
   private paginatorSubscription?: Subscription;
   private getState: Observable<any>;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+              private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -52,6 +53,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
     });
     this.getState = this.store.select(selectUnavailableState);
     this.dateFormat = this.translate.currentLang;
+    this.language = this.translate.currentLang;
   }
 
   ngAfterViewInit(): void {

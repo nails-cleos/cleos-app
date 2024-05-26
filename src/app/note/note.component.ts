@@ -29,7 +29,7 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
   professionals?: IUserAll[];
   filteredOptions?: Observable<IUser[] | undefined>;
 
-  repeats = [FrequencyEnum.none, FrequencyEnum.onceAWeek, FrequencyEnum.onceAMonth];
+  repeats = [FrequencyEnum.none, FrequencyEnum.onceAWeek, FrequencyEnum.onceAMonth, FrequencyEnum.onceAYear];
   errors: any = [];
 
   private getState: Observable<any>;

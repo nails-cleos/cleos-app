@@ -9,7 +9,8 @@
         </mat-datepicker>
       </mat-form-field>
       <button color="accent" mat-fab matTooltip="{{ 'SUMMARY.QUARTER.RESULT' | translate }}"
-              routerLink="/dashboard/quarter/summary" [state]="{year: date.value?.getFullYear()}">
+              [routerLink]="['/', language, 'dashboard', 'quarter', 'summary']"
+              [state]="{year: date.value?.getFullYear()}">
         <mat-icon>calendar_view_week</mat-icon>
       </button>
     </div>
