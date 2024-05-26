@@ -316,6 +316,9 @@ const createRule = (repeat: string, dtstart: Date, until: Date, monthDay: number
   let byweekday: ByWeekday | undefined;
   let bymonthday: number | undefined;
   switch (repeat) {
+    case FrequencyEnum.onceAYear:
+      freq = RRule.YEARLY;
+      break;
     case FrequencyEnum.onceAMonth:
       freq = RRule.MONTHLY;
       bymonthday = monthDay;

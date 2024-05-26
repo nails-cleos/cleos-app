@@ -439,7 +439,8 @@ export enum FrequencyEnum {
   none = 'NONE',
   everyDay = 'EVERY_DAY',
   onceAWeek = 'ONCE_A_WEEK',
-  onceAMonth = 'ONCE_A_MONTH'
+  onceAMonth = 'ONCE_A_MONTH',
+  onceAYear = 'ONCE_A_YEAR',
 }
 
 export const createAddress = (formattedAddress?: string, location?: google.maps.LatLng,

@@ -82,7 +82,8 @@
       "NONE": "None",
       "EVERY_DAY": "Every day",
       "ONCE_A_WEEK": "Once a week",
-      "ONCE_A_MONTH": "Once a month"
+      "ONCE_A_MONTH": "Once a month",
+      "ONCE_A_YEAR": "Once a year"
     },
     "NOTIFICATION": {
       "NO": "No notifications",
