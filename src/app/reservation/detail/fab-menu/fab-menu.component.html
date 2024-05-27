@@ -1,0 +1,11 @@
+<div class="fab-menu" [class.open]="menuOpen">
+  <button mat-fab color="primary" (click)="toggleMenu()" [@iconChange]="menuOpen ? 'open' : 'closed'">
+    <mat-icon>all_out</mat-icon>
+  </button>
+  <div class="menu-items" [@listAnimation]="fabButtons.length" *ngIf="menuOpen">
+    <button *ngFor="let item of fabButtons" mat-fab (click)="handleMenuItemClick(item)" matTooltip="{{ item.tooltip }}"
+            [color]="item.color">
+      <mat-icon>{{ item.icon }}</mat-icon>
+    </button>
+  </div>
+</div>
