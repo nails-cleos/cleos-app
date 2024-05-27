@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { MatFabMenuModule } from '@angular-material-extensions/fab-menu';
 import { MatStepperModule } from '@angular/material/stepper';
 import { EffectsModule } from '@ngrx/effects';
 import { CalendarModule } from 'angular-calendar';
@@ -38,6 +37,7 @@ import { CurrencyService } from '../services/currency.service';
 import { Store } from '@ngrx/store';
 import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
+import { FabMenuComponent } from './detail/fab-menu/fab-menu.component';
 
 @NgModule({
   declarations: [
@@ -51,12 +51,12 @@ import { Observable } from 'rxjs';
     ChangeColorDialogComponent,
     SelectProfessionalDialogComponent,
     AddNoteDialogComponent,
-    AddDiscountDialogComponent
+    AddDiscountDialogComponent,
+    FabMenuComponent
   ],
   imports: [
     ReservationRoutingModule,
     SharedModule,
-    MatFabMenuModule,
     CalendarModule,
     MatStepperModule,
     TranslateModule.forChild({
@@ -71,7 +71,7 @@ import { Observable } from 'rxjs';
       isolate: false,
       extend: true
     }),
-    EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects]),
+    EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects])
   ],
   providers: [
     ReservationService,

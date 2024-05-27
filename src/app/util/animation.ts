@@ -247,6 +247,34 @@ export const insertItemList = trigger('list', [
   ]),
 ]);
 
+export const listAnimation = trigger('listAnimation', [
+  transition('* <=> *', [
+    query(':enter', [
+      style({ opacity: 0, transform: 'translateY(-15px)' }),
+      stagger(100, [
+        animate('0.5s ease-in', style({ opacity: 1, transform: 'translateY(0)' }))
+      ])
+    ], { optional: true }),
+    query(':leave', [
+      stagger(100, [
+        animate('0.5s ease-out', style({ opacity: 0, transform: 'translateY(-15px)' }))
+      ])
+    ], { optional: true })
+  ])
+]);
+
+export const iconChange = trigger('iconChange', [
+  state('open', style({
+    transform: 'rotate(225deg)'
+  })),
+  state('closed', style({
+    transform: 'rotate(0)'
+  })),
+  transition('open <=> closed', [
+    animate('200ms ease-in-out')
+  ])
+]);
+
 export const addRemoveItemList = trigger('items', [
   // cubic-bezier for a tiny bouncing feel
   transition(':enter', [

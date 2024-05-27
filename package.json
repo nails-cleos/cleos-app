@@ -26,7 +26,6 @@
   "private": true,
   "dependencies": {
     "@angular-material-components/color-picker": "^9.0.0",
-    "@angular-material-extensions/fab-menu": "~6.1.0",
     "@angular/animations": "^15.2.3",
     "@angular/cdk": "^15.2.3",
     "@angular/common": "^15.2.3",
