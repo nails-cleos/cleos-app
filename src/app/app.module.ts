@@ -7,7 +7,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { AsyncPipe, registerLocaleData } from '@angular/common';
 import { ServiceWorkerModule, SwPush } from '@angular/service-worker';
 import { AppRoutingModule } from './app-routing.module';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { SharedModule } from './shared/shared.module';
 import { getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { initializeAppCheck, provideAppCheck, ReCaptchaV3Provider } from '@angular/fire/app-check';
@@ -46,6 +46,7 @@ import { reducers } from './store/app.states';
 import { AppComponent } from './app.component';
 import { AuthUserService } from './services/auth-user.service';
 import { NgcCookieConsentConfig, NgcCookieConsentModule } from 'ngx-cookieconsent';
+import { AngularFireModule } from '@angular/fire/compat';
 
 export const localStorageSyncReducer =
   (reducer: ActionReducer<any>): ActionReducer<any> => localStorageSync({ keys: ['auth'], rehydrate: true })(reducer);
@@ -108,6 +109,7 @@ const cookieConfig: NgcCookieConsentConfig = {
       registrationStrategy: 'registerWhenStable:30000'
     }),
     NgxMatColorPickerModule,
+    AngularFireModule.initializeApp(environment.firebase),
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAuth(() => {
       const auth = getAuth();
