@@ -12,6 +12,13 @@ import { addHours, isSameDay } from 'date-fns';
 import { createNewDate, getNow } from '../util/dates';
 import { INoteAll } from './note';
 
+export interface IFabMenu {
+  tooltip: string;
+  icon: string;
+  id: string;
+  color?: 'primary' | 'accent' | 'warn';
+}
+
 export interface IReservation {
   id?: string;
   customerId?: string;

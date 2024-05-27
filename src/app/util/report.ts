@@ -119,52 +119,53 @@ export const createYearlyWorkbook = (data: IMonthlyExport[], date: Date, currenc
   completeData(workbook, date, data).forEach(it => {
     const name = monthViewTitle(new Date(date.getFullYear(), it.month - 1));
     const worksheet = workbook.getWorksheet(name);
+    if (worksheet) {
+      const { saleRowData, saleGross, saleNet, saleBtw } = getSaleRowData(it.saleSummary, timeZone);
+      let cellNumber = addData(worksheet, 'Sales', 1, 'Customer', 'Description', saleRowData, saleGross, saleNet, saleBtw);
 
-    const { saleRowData, saleGross, saleNet, saleBtw } = getSaleRowData(it.saleSummary, timeZone);
-    let cellNumber = addData(worksheet, 'Sales', 1, 'Customer', 'Description', saleRowData, saleGross, saleNet, saleBtw);
+      const saleCellNumber = cellNumber;
 
-    const saleCellNumber = cellNumber;
+      // Add 2 extra cells
+      cellNumber++;
+      cellNumber++;
+      cellNumber++;
 
-    // Add 2 extra cells
-    cellNumber++;
-    cellNumber++;
-    cellNumber++;
+      const { expenseRowData, expenseGross, expenseNet, expenseBtw } = getExpenseRowData(it.expenseSummary, timeZone);
+      cellNumber = addData(worksheet, 'Expenses', cellNumber, 'Invoice', 'Supply store',
+        expenseRowData, expenseGross, expenseNet, expenseBtw);
 
-    const { expenseRowData, expenseGross, expenseNet, expenseBtw } = getExpenseRowData(it.expenseSummary, timeZone);
-    cellNumber = addData(worksheet, 'Expenses', cellNumber, 'Invoice', 'Supply store',
-      expenseRowData, expenseGross, expenseNet, expenseBtw);
+      const expenseCellNumber = cellNumber;
 
-    const expenseCellNumber = cellNumber;
+      // Add 2 extra cells
+      cellNumber++;
+      cellNumber++;
+      cellNumber++;
 
-    // Add 2 extra cells
-    cellNumber++;
-    cellNumber++;
-    cellNumber++;
+      worksheet.mergeCells(`A${ cellNumber }`, `D${ cellNumber }`);
+      setTotalTitle(worksheet, cellNumber);
 
-    worksheet.mergeCells(`A${ cellNumber }`, `D${ cellNumber }`);
-    setTotalTitle(worksheet, cellNumber);
+      const totalGross = saleGross - expenseGross;
+      const totalNet = saleNet - expenseNet;
+      const totalBtw = saleBtw - expenseBtw;
 
-    const totalGross = saleGross - expenseGross;
-    const totalNet = saleNet - expenseNet;
-    const totalBtw = saleBtw - expenseBtw;
+      setTotal(worksheet, cellNumber, 'E', `E${ saleCellNumber } - E${ expenseCellNumber }`, totalGross);
+      setTotal(worksheet, cellNumber, 'F', `F${ saleCellNumber } - F${ expenseCellNumber }`, totalNet);
+      setTotal(worksheet, cellNumber, 'G', `G${ saleCellNumber } - G${ expenseCellNumber }`, totalBtw);
 
-    setTotal(worksheet, cellNumber, 'E', `E${ saleCellNumber } - E${ expenseCellNumber }`, totalGross);
-    setTotal(worksheet, cellNumber, 'F', `F${ saleCellNumber } - F${ expenseCellNumber }`, totalNet);
-    setTotal(worksheet, cellNumber, 'G', `G${ saleCellNumber } - G${ expenseCellNumber }`, totalBtw);
+      const priceFormat = currencyFormat(currency);
+      worksheet.getColumn('E').numFmt = priceFormat;
+      worksheet.getColumn('F').numFmt = priceFormat;
+      worksheet.getColumn('G').numFmt = priceFormat;
 
-    const priceFormat = currencyFormat(currency);
-    worksheet.getColumn('E').numFmt = priceFormat;
-    worksheet.getColumn('F').numFmt = priceFormat;
-    worksheet.getColumn('G').numFmt = priceFormat;
+      const positivePriceFormat = currencyFormat(currency, true);
+      worksheet.getCell(`E${ cellNumber }`).numFmt = positivePriceFormat;
+      worksheet.getCell(`F${ cellNumber }`).numFmt = positivePriceFormat;
+      worksheet.getCell(`G${ cellNumber }`).numFmt = positivePriceFormat;
 
-    const positivePriceFormat = currencyFormat(currency, true);
-    worksheet.getCell(`E${ cellNumber }`).numFmt = positivePriceFormat;
-    worksheet.getCell(`F${ cellNumber }`).numFmt = positivePriceFormat;
-    worksheet.getCell(`G${ cellNumber }`).numFmt = positivePriceFormat;
+      monthResults = [...monthResults, { month: it.month, name, totalGross, totalNet, totalBtw, cellNumber }];
 
-    monthResults = [...monthResults, { month: it.month, name, totalGross, totalNet, totalBtw, cellNumber }];
-
-    resizeColumn(worksheet);
+      resizeColumn(worksheet);
+    }
   });
 
   createQData(workbook, monthResults, currency);
@@ -509,36 +510,38 @@ const createQData = (workbook: Workbook, monthResults: IMonthResult[], currency:
   [...Array(4)].map((_, i) => {
     const name = `Q${ ++i }`;
     const worksheet = workbook.getWorksheet(name);
-    setTitle(worksheet, 1, 'D', name);
-    worksheet.addRow(['', 'Gross', 'Net', 'BTW']);
-    setSubtitle(worksheet, qCells, 2);
+    if (worksheet) {
+      setTitle(worksheet, 1, 'D', name);
+      worksheet.addRow(['', 'Gross', 'Net', 'BTW']);
+      setSubtitle(worksheet, qCells, 2);
 
-    let totalGross = 0;
-    let totalNet = 0;
-    let totalBtw = 0;
-    monthResults.filter(it => it.month <= i * 3 && it.month > (i - 1) * 3).forEach((it, index) => {
-      worksheet.addRow([it.name]);
-      setQTotal(worksheet, it, 'B', 3 + index, 'E');
-      setQTotal(worksheet, it, 'C', 3 + index, 'F');
-      setQTotal(worksheet, it, 'D', 3 + index, 'G');
-      totalGross += it.totalGross;
-      totalNet += it.totalNet;
-      totalBtw += it.totalBtw;
-    });
+      let totalGross = 0;
+      let totalNet = 0;
+      let totalBtw = 0;
+      monthResults.filter(it => it.month <= i * 3 && it.month > (i - 1) * 3).forEach((it, index) => {
+        worksheet.addRow([it.name]);
+        setQTotal(worksheet, it, 'B', 3 + index, 'E');
+        setQTotal(worksheet, it, 'C', 3 + index, 'F');
+        setQTotal(worksheet, it, 'D', 3 + index, 'G');
+        totalGross += it.totalGross;
+        totalNet += it.totalNet;
+        totalBtw += it.totalBtw;
+      });
 
-    setBorder(worksheet, 3, 5, qCells);
+      setBorder(worksheet, 3, 5, qCells);
 
-    setTotalTitle(worksheet, 6);
-    setTotal(worksheet, 6, 'B', 'SUM(B3:B5)', totalGross);
-    setTotal(worksheet, 6, 'C', 'SUM(C3:C5)', totalNet);
-    setTotal(worksheet, 6, 'D', 'SUM(D3:D5)', totalBtw);
+      setTotalTitle(worksheet, 6);
+      setTotal(worksheet, 6, 'B', 'SUM(B3:B5)', totalGross);
+      setTotal(worksheet, 6, 'C', 'SUM(C3:C5)', totalNet);
+      setTotal(worksheet, 6, 'D', 'SUM(D3:D5)', totalBtw);
 
-    const positivePriceFormat = currencyFormat(currency, true);
-    worksheet.getColumn('B').numFmt = positivePriceFormat;
-    worksheet.getColumn('C').numFmt = positivePriceFormat;
-    worksheet.getColumn('D').numFmt = positivePriceFormat;
+      const positivePriceFormat = currencyFormat(currency, true);
+      worksheet.getColumn('B').numFmt = positivePriceFormat;
+      worksheet.getColumn('C').numFmt = positivePriceFormat;
+      worksheet.getColumn('D').numFmt = positivePriceFormat;
 
-    resizeColumn(worksheet);
+      resizeColumn(worksheet);
+    }
   });
 };
 

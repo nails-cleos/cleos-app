@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectPaymentState, selectReservationState } from '../../store/app.states';
 import { Observable, pairwise, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
-import { CancelOption, IReservationAll, States } from '../../interfaces/reservation';
+import { CancelOption, IFabMenu, IReservationAll, States } from '../../interfaces/reservation';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   createNewDate,
@@ -37,7 +37,6 @@ import {
 } from '../../util/helper';
 import { IPrice, Price } from '../../interfaces/treatment';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { MatFabMenu, MatFabMenuDirection } from '@angular-material-extensions/fab-menu/lib/mat-fab-menu.component';
 import { getPaymentOptions, getPayNlOptions, IPayment, IPaymentAll, IPaymentOption, PaymentType, PENALTY } from '../../interfaces/payment';
 import { detailExpandAnimation, transitionAnimation } from '../../util/animation';
 import { isToday, isTomorrow } from 'date-fns';
@@ -67,7 +66,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   end: Date = getNow();
   state: string | undefined;
   dateFormat: string;
-  changeState: MatFabMenu[] = [];
+  changeState: IFabMenu[] = [];
 
   displayedColumns: string[] = ['position', 'professional', 'start', 'treatment', 'state'];
   dataSource: any;
@@ -77,7 +76,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   price: IPrice;
   options?: IPaymentOption[];
 
-  direction: MatFabMenuDirection = 'left';
   showFireworks = false;
 
   paymentPaid: any;
@@ -98,7 +96,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   step?: number;
   language: string;
 
-  private tooltipPosition = 'below';
   private machine: any;
   private getState: Observable<any>;
   private getPaymentState: Observable<any>;
@@ -116,13 +113,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
-    ]).subscribe(result => {
-      if (result.matches) {
-        this.small = true;
-        this.direction = 'bottom';
-        this.tooltipPosition = 'left';
-      }
-    });
+    ]).subscribe(result => this.small = result.matches);
     this.language = this.translate.currentLang;
     this.dateFormat = this.translate.currentLang;
     this.price = new Price();
@@ -243,14 +234,14 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     this.authUserServiceSubscription.unsubscribe();
   }
 
-  onChangeState(id: any): void {
+  onChangeState(id: string): void {
     const list = ['send', 'coffee', 'book', 'more', 'change', 'cancel', 'cancel_edit', 'notify', 'pay', 'color'];
-    if (list.indexOf(id.toString()) >= 0 && this.reservation) {
+    if (list.indexOf(id) >= 0 && this.reservation) {
       this.machine.transition(snakeToCamel(this.reservation.state), snakeToCamel(id));
       return;
     }
     const title = this.translate.instant('RESERVATION.CHANGE_STATE.TITLE');
-    const action = this.translate.instant(`RESERVATION.CHANGE_STATE.ACTION.${ String(id).toUpperCase() }`);
+    const action = this.translate.instant(`RESERVATION.CHANGE_STATE.ACTION.${ id.toUpperCase() }`);
     const content = this.translate.instant('RESERVATION.CHANGE_STATE.CONTENT', { action });
     const dialogRef = this.dialog.open(DialogComponent, {
       data: { title, content, value: id }
@@ -289,8 +280,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     }
   }
 
-  private createAction(tooltip: string, icon: string, id: string, color?: string): MatFabMenu {
-    return { tooltip, tooltipPosition: this.tooltipPosition, icon, id, color } as MatFabMenu;
+  private createAction(tooltip: string, icon: string, id: string, color?: string): IFabMenu {
+    return { tooltip, icon, id, color } as IFabMenu;
   }
 
   private subscribe(): void {
@@ -447,7 +438,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
     const userPhone = reservation.customer.phone;
 
-    let approveActions: MatFabMenu[] = [];
+    let approveActions: IFabMenu[] = [];
     if (isToday(newDate(self.start))) {
       approveActions = [start];
     }
@@ -561,7 +552,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       next: approveActions
     };
 
-    let completeActions: MatFabMenu[] = [book];
+    let completeActions: IFabMenu[] = [book];
     if (reservation.configurationCanCustomerChange) {
       completeActions = [...completeActions, change];
     }
