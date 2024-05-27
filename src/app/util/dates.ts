@@ -389,7 +389,14 @@ export const formatDateHourMinute = (date: Date, locale: string = 'en'): string 
 export const formatDateTwoDigit = (date: Date, locale: string, timeZone: string = getCurrentTimeZone()): string =>
   date.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: '2-digit', timeZone });
 
-export const backendFormatDate = (date?: Date): string | undefined => date?.toISOString().split('T')[0];
+export const backendFormatDate = (date?: Date): string | undefined => {
+  if (date) {
+    const month = String(date.getMonth() + 1).padStart(2, '0');  // Months are zero-indexed in JS
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${ date?.getFullYear() }-${ month }-${ day }`;
+  }
+  return date;
+};
 
 export const exportFormatDate = (date: Date, locale: string = API_LOCALE, timeZone: string = getCurrentTimeZone()):
   string => date.toLocaleDateString(locale, {

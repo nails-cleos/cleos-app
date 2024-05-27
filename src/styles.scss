@@ -6,7 +6,7 @@
 @import 'styles-theme';
 
 $flag-icon-css-path: '~flag-icon-css/flags' !default;
-@import 'node_modules/flag-icon-css/sass/flag-icons';
+@import 'node_modules/flag-icons/sass/flag-icons';
 
 html, body {
   height: 100%;
