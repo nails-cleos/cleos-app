@@ -1,0 +1,22 @@
+<div class="share-buttons">
+  <button mat-button (click)="shareOnWhatsApp">
+    <mat-icon [svgIcon]="'WHATSAPP'"></mat-icon>
+    WhatsApp
+  </button>
+  <button mat-button (click)="shareOnMessenger">
+    <mat-icon [svgIcon]="'FACEBOOK'"></mat-icon>
+    Facebook
+  </button>
+  <button mat-button (click)="shareViaSMS">
+    <mat-icon>sms</mat-icon>
+    SMS
+  </button>
+  <button mat-button (click)="shareViaEmail">
+    <mat-icon>email</mat-icon>
+    Email
+  </button>
+  <button mat-button (click)="copyLink">
+    <mat-icon>content_copy</mat-icon>
+    Copy Link
+  </button>
+</div>

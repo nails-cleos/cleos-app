@@ -112,6 +112,7 @@ export class ReferralsComponent implements OnInit, OnDestroy {
 })
 export class BottomSheetShareComponent {
   message: any;
+  code: any;
   url = environment.appServer;
   image = `${ this.url }/assets/icons/icon-512x512.png`;
   show: number;
@@ -127,9 +128,10 @@ export class BottomSheetShareComponent {
         this.show = 5;
       }
     });
+    this.code = `${ this.url }/auth?code=${ data.code }`;
     this.message = this.translate.instant('ME.REFERRAL.LINK', {
       code: data.code,
-      url: `${ this.url }/auth?code=${ data.code }`
+      url: this.code
     });
   }
 }
