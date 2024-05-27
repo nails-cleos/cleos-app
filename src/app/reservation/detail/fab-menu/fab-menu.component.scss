@@ -1,0 +1,25 @@
+.fab-menu {
+  position: relative;
+}
+
+.menu-items {
+  position: absolute;
+  top: calc(100% + 8px); /* Position the menu items below the button */
+  right: 0;
+  display: none; /* Initially hide the menu items */
+  flex-direction: column;
+  align-items: flex-end;
+  z-index: 1000; /* Ensure the menu appears above other content */
+}
+
+.menu-items button {
+  margin-bottom: 8px; /* Adjust as needed */
+}
+
+.menu-items button:last-child {
+  margin-bottom: 0;
+}
+
+.fab-menu.open .menu-items {
+  display: flex; /* Show the menu items when the menu is open */
+}

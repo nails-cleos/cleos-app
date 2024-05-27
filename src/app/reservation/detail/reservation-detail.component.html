@@ -512,7 +512,6 @@
   </ng-template>
 </mat-card>
 <div *ngIf="changeState && changeState.length" id="action-button">
-  <mat-fab-menu (onFabMenuItemSelected)="onChangeState($event)" [direction]="direction" [fabButtons]="changeState"
-                color="primary" icon="all_out">
-  </mat-fab-menu>
+  <app-fab-menu (fabMenuItemSelected)="onChangeState($event)" [fabMenus]="changeState">
+  </app-fab-menu>
 </div>

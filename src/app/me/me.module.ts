@@ -10,8 +10,6 @@ import { PaymentCompleteComponent } from './payment/complete/payment-complete.co
 import { BottomSheetReferralComponent, BottomSheetShareComponent, ReferralsComponent } from './referrals/referrals.component';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
 import { ReviewDialogComponent } from './reservation/review/review-dialog.component';
-import { ShareButtonsModule } from 'ngx-sharebuttons/buttons';
-import { ShareIconsModule } from 'ngx-sharebuttons/icons';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatStepperModule } from '@angular/material/stepper';
 import { UpcomingComponent } from './reservation/upcoming/upcoming.component';
@@ -36,6 +34,7 @@ import { ColorService } from '../services/color.service';
 import { Store } from '@ngrx/store';
 import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
+import { ShareButtonsComponent } from './referrals/share-buttons/share-buttons.component';
 
 @NgModule({
   declarations: [
@@ -51,12 +50,11 @@ import { Observable } from 'rxjs';
     UpcomingComponent,
     OptionComponent,
     MePaymentComponent,
+    ShareButtonsComponent
   ],
   imports: [
     MeRoutingModule,
     SharedModule,
-    ShareButtonsModule,
-    ShareIconsModule,
     MatProgressBarModule,
     MatStepperModule,
     TranslateModule.forChild({
