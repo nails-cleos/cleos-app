@@ -1,6 +1,6 @@
-<div class="flex-container" fxLayout="column">
-  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div fxFlex="60%" fxFlex.lt-sm="80%">
+<div class="flex-container">
+  <div class="card-container">
+    <div class="card-content">
       <mat-card appearance="outlined" class="style-card">
         <mat-card-header>
           <mat-card-title>{{title}}</mat-card-title>
@@ -13,8 +13,8 @@
             </div>
           </div>
         </mat-card-content>
-        <mat-card-actions>
-          <div fxFlex></div>
+        <mat-card-actions class="card-actions">
+          <div class="spacer"></div>
           <button appBackButton color="accent" mat-fab extended class="icon-button"
                   type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
           <button color="primary" mat-fab extended class="icon-button"

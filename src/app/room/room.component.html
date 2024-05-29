@@ -1,6 +1,6 @@
-<div class="flex-container" fxLayout="column">
-  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div fxFlex="60%" fxFlex.lt-sm="80%">
+<div class="flex-container">
+  <div class="card-container">
+    <div class="card-content">
       <form (ngSubmit)="submit" [formGroup]="form" novalidate>
         <mat-card appearance="outlined" class="style-card">
           <ng-template [ngIf]="isAddMode" [ngIfElse]="headerEditMode">
@@ -18,9 +18,9 @@
             </mat-card-header>
           </ng-template>
           <mat-card-content>
-            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+            <div class="inner-container">
               <ng-template [ngIf]="isAddMode" [ngIfElse]="editMode">
-                <div *ngIf="currencies; else skeleton" fxLayout="row" fxLayoutAlign="space-between center" id="fields">
+                <div *ngIf="currencies; else skeleton" class="fields-container" id="fields">
                   <mat-form-field appearance="outline">
                     <mat-label>{{ 'COMMON.CURRENCY.FIELD' | translate }}</mat-label>
                     <label>
@@ -42,15 +42,15 @@
                       {{errors['currency']}}
                     </mat-error>
                   </mat-form-field>
-                  <button fxShow.lt-sm fxHide (click)="addCurrency" color="accent" mat-fab>
+                  <button class="hide-gt-xs" (click)="addCurrency" color="accent" mat-fab>
                     <mat-icon matPrefix>add_card</mat-icon>
                   </button>
-                  <button fxHide.lt-sm fxShow (click)="addCurrency" color="accent" mat-fab extended>
+                  <button class="hide-xs" (click)="addCurrency" color="accent" mat-fab extended>
                     <mat-icon matPrefix>add_card</mat-icon>
                     <span>{{ 'COMMON.CURRENCY.ADD_BUTTON' | translate }}</span>
                   </button>
                 </div>
-                <div *ngIf="offices; else skeleton" fxLayout="row" fxLayoutAlign="space-between center">
+                <div *ngIf="offices; else skeleton" class="fields-container">
                   <mat-form-field appearance="outline">
                     <mat-label>{{ 'ROOM.OFFICE.FIELD' | translate }}</mat-label>
                     <label>
@@ -73,10 +73,10 @@
                       {{errors['office']}}
                     </mat-error>
                   </mat-form-field>
-                  <button fxShow.lt-sm fxHide (click)="addOffice" color="accent" mat-fab>
+                  <button class="hide-gt-xs" (click)="addOffice" color="accent" mat-fab>
                     <mat-icon matPrefix>add_business</mat-icon>
                   </button>
-                  <button fxHide.lt-sm fxShow (click)="addOffice" color="accent" mat-fab extended>
+                  <button class="hide-xs" (click)="addOffice" color="accent" mat-fab extended>
                     <mat-icon matPrefix>add_business</mat-icon>
                     <span>{{ 'ROOM.OFFICE.ADD_BUTTON' | translate }}</span>
                   </button>
@@ -105,7 +105,7 @@
                   </label>
                 </mat-form-field>
               </ng-template>
-              <div *ngIf="allProfessional; else skeleton" fxLayout="row" fxLayoutAlign="space-between center"
+              <div *ngIf="allProfessional; else skeleton" class="fields-container"
                    id="professionals">
                 <mat-form-field class="chip-list full-margin">
                   <mat-label>{{ 'ROOM.PROFESSIONAL.FIELD' | translate }}</mat-label>
@@ -125,10 +125,10 @@
                     </mat-option>
                   </mat-autocomplete>
                 </mat-form-field>
-                <button fxShow.lt-sm fxHide (click)="addProfessional" color="accent" mat-fab>
+                <button class="hide-gt-xs" (click)="addProfessional" color="accent" mat-fab>
                   <mat-icon matPrefix>person_add_alt_1</mat-icon>
                 </button>
-                <button fxHide.lt-sm fxShow (click)="addProfessional" color="accent" mat-fab extended>
+                <button class="hide-xs" (click)="addProfessional" color="accent" mat-fab extended>
                   <mat-icon matPrefix>person_add_alt_1</mat-icon>
                   <span>{{ 'COMMON.PROFESSIONAL.ADD_BUTTON' | translate }}</span>
                 </button>
@@ -156,7 +156,7 @@
                   {{errors['timeZone']}}
                 </mat-error>
               </mat-form-field>
-              <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
+              <div class="row-column-space-evenly-center">
                 <mat-checkbox (change)="primary = !primary" color="primary"
                               [checked]="primary">{{ 'ROOM.PRIMARY.FIELD' | translate }}</mat-checkbox>
                 <mat-form-field appearance="outline" color="primary" class="full-margin">
@@ -197,7 +197,7 @@
                       <mat-panel-title>
                         {{ 'ROOM.MONDAY_TIME.FIELD' | translate }}
                       </mat-panel-title>
-                      <mat-panel-description fxHide.lt-sm fxShow>
+                      <mat-panel-description class="hide-xs">
                         {{ 'ROOM.MONDAY_TIME.DESCRIPTION' | translate }}
                         <mat-icon>{{icons.monday}}</mat-icon>
                       </mat-panel-description>
@@ -213,7 +213,7 @@
                       <mat-panel-title>
                         {{ 'ROOM.TUESDAY_TIME.FIELD' | translate }}
                       </mat-panel-title>
-                      <mat-panel-description fxHide.lt-sm fxShow>
+                      <mat-panel-description class="hide-xs">
                         {{ 'ROOM.TUESDAY_TIME.DESCRIPTION' | translate }}
                         <mat-icon>{{icons.tuesday}}</mat-icon>
                       </mat-panel-description>
@@ -229,7 +229,7 @@
                       <mat-panel-title>
                         {{ 'ROOM.WEDNESDAY_TIME.FIELD' | translate }}
                       </mat-panel-title>
-                      <mat-panel-description fxHide.lt-sm fxShow>
+                      <mat-panel-description class="hide-xs">
                         {{ 'ROOM.WEDNESDAY_TIME.DESCRIPTION' | translate }}
                         <mat-icon>{{icons.wednesday}}</mat-icon>
                       </mat-panel-description>
@@ -245,7 +245,7 @@
                       <mat-panel-title>
                         {{ 'ROOM.THURSDAY_TIME.FIELD' | translate }}
                       </mat-panel-title>
-                      <mat-panel-description fxHide.lt-sm fxShow>
+                      <mat-panel-description class="hide-xs">
                         {{ 'ROOM.THURSDAY_TIME.DESCRIPTION' | translate }}
                         <mat-icon>{{icons.thursday}}</mat-icon>
                       </mat-panel-description>
@@ -261,7 +261,7 @@
                       <mat-panel-title>
                         {{ 'ROOM.FRIDAY_TIME.FIELD' | translate }}
                       </mat-panel-title>
-                      <mat-panel-description fxHide.lt-sm fxShow>
+                      <mat-panel-description class="hide-xs">
                         {{ 'ROOM.FRIDAY_TIME.DESCRIPTION' | translate }}
                         <mat-icon>{{icons.friday}}</mat-icon>
                       </mat-panel-description>
@@ -277,7 +277,7 @@
                       <mat-panel-title>
                         {{ 'ROOM.SATURDAY_TIME.FIELD' | translate }}
                       </mat-panel-title>
-                      <mat-panel-description fxHide.lt-sm fxShow>
+                      <mat-panel-description class="hide-xs">
                         {{ 'ROOM.SATURDAY_TIME.DESCRIPTION' | translate }}
                         <mat-icon>{{icons.saturday}}</mat-icon>
                       </mat-panel-description>
@@ -293,7 +293,7 @@
                       <mat-panel-title>
                         {{ 'ROOM.SUNDAY_TIME.FIELD' | translate }}
                       </mat-panel-title>
-                      <mat-panel-description fxHide.lt-sm fxShow>
+                      <mat-panel-description class="hide-xs">
                         {{ 'ROOM.SUNDAY_TIME.DESCRIPTION' | translate }}
                         <mat-icon>{{icons.sunday}}</mat-icon>
                       </mat-panel-description>
@@ -315,8 +315,8 @@
               <mat-error *ngIf="errors['location']" class="divider">{{errors['location']}}</mat-error>
             </div>
           </mat-card-content>
-          <mat-card-actions>
-            <div fxFlex></div>
+          <mat-card-actions class="card-actions">
+            <div class="spacer"></div>
             <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
 

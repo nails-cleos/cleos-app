@@ -346,6 +346,7 @@
       "ADD_BUTTON": "Agregar profesional",
       "COLOR": {
         "RESERVATION": "10:00 - 12:00 Cliente",
+        "INVALID": "Color no valido",
         "DARK": {
           "FIELD": "Color oscuro",
           "RESERVATION": "Así se van a ver las reservas en modo oscuro"

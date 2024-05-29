@@ -2,7 +2,7 @@
   <mat-card-header *ngIf="account; else skeletonTitle">
     <mat-card-title style="font-size: 2em">{{'ACCOUNT.BALANCE' | translate}}</mat-card-title>
     <mat-card-subtitle>{{'ACCOUNT.TITLE' | translate}} {{account.id}}</mat-card-subtitle>
-    <div fxFlex></div>
+    <div class="spacer"></div>
     <ng-template [ngIf]="showAdd">
       <button mat-icon-button [color]="'primary'" [routerLink]="['/', language, 'accounts', account.id, 'transactions', 'add']">
         <mat-icon>add</mat-icon>

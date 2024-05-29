@@ -54,8 +54,8 @@
   </ng-template>
 </div>
 <mat-divider class="divider-padding"></mat-divider>
-<div mat-dialog-actions>
-  <div fxFlex></div>
+<div mat-dialog-actions class="card-actions">
+  <div class="spacer"></div>
   <button (click)="onNoClick" color="accent" mat-fab extended>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
   <button (click)="doAction" *ngIf="!review" [disabled]="rating < 1" cdkFocusInitial color="primary"
           mat-fab extended>{{ 'COMMON.BUTTON.ADD' | translate }}</button>

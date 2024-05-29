@@ -13,9 +13,9 @@
     </ng-container>
 
     <ng-container matColumnDef="professional">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell
           mat-sort-header>{{ 'UNAVAILABLE.LIST.COLUMN.PROFESSIONAL' | translate }}</th>
-      <td *matCellDef="let unavailable" fxHide.lt-sm fxShow mat-cell>
+      <td *matCellDef="let unavailable" class="hide-xs" mat-cell>
         <div *ngIf="unavailable.id; else skeleton">{{unavailable?.professional?.displayName}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -24,9 +24,9 @@
     </ng-container>
 
     <ng-container matColumnDef="description">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell
           mat-sort-header>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
-      <td *matCellDef="let unavailable" fxHide.lt-sm fxShow mat-cell>
+      <td *matCellDef="let unavailable" class="hide-xs" mat-cell>
         <div *ngIf="unavailable.id; else skeleton">{{unavailable.description}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -51,9 +51,9 @@
     </ng-container>
 
     <ng-container matColumnDef="duration">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell
           mat-sort-header>{{ 'UNAVAILABLE.LIST.COLUMN.DURATION' | translate }}</th>
-      <td *matCellDef="let unavailable" class="column-large-text" fxHide.lt-sm fxShow mat-cell>
+      <td *matCellDef="let unavailable" class="column-large-text hide-xs" mat-cell>
         <div *ngIf="unavailable.id; else skeleton">
           <div *ngIf="!unavailable.allDay; else allDay">
             <mat-icon matPrefix>timer</mat-icon>&nbsp;
@@ -71,9 +71,9 @@
     </ng-container>
 
     <ng-container matColumnDef="repeat">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell
           mat-sort-header>{{ 'UNAVAILABLE.LIST.COLUMN.REPEAT' | translate }}</th>
-      <td *matCellDef="let unavailable" class="column-large-text" fxHide.lt-sm fxShow mat-cell>
+      <td *matCellDef="let unavailable" class="column-large-text hide-xs" mat-cell>
         <div *ngIf="unavailable.id; else skeleton">
           {{ 'COMMON.REPEAT.' + unavailable.repeat | translate}}
         </div>
@@ -84,8 +84,8 @@
     </ng-container>
 
     <ng-container matColumnDef="actions">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-      <td *matCellDef="let unavailable" fxHide.lt-sm fxShow mat-cell>
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+      <td *matCellDef="let unavailable" class="hide-xs" mat-cell>
         <div *ngIf="unavailable.id; else skeleton">
           <button (click)="edit(unavailable)" *ngIf="!unavailable.deleted" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
@@ -107,17 +107,17 @@
         <div [@detailExpand]="unavailable === expandedUnavailable ? 'expanded' : 'collapsed'"
              class="unavailable-detail">
           <mat-list>
-            <div fxHide fxShow.lt-sm matListItemTitle>{{ 'UNAVAILABLE.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
-            <mat-list-item fxHide fxShow.lt-sm role="list">
+            <div class="hide-gt-xs" matListItemTitle>{{ 'UNAVAILABLE.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
+            <mat-list-item class="hide-gt-xs" role="list">
               <div matListItemLine>{{unavailable?.professional?.displayName}}</div>
             </mat-list-item>
-            <div *ngIf="unavailable.description" fxHide fxShow.lt-sm
+            <div *ngIf="unavailable.description" class="hide-gt-xs"
                  matListItemTitle>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</div>
-            <mat-list-item *ngIf="unavailable.description" fxHide fxShow.lt-sm role="list">
+            <mat-list-item *ngIf="unavailable.description" class="hide-gt-xs" role="list">
               <div matListItemLine>{{unavailable.description}}</div>
             </mat-list-item>
-            <div fxHide fxShow.lt-sm matListItemTitle>{{ 'UNAVAILABLE.LIST.COLUMN.DURATION' | translate }}</div>
-            <mat-list-item fxHide fxShow.lt-sm role="list">
+            <div class="hide-gt-xs" matListItemTitle>{{ 'UNAVAILABLE.LIST.COLUMN.DURATION' | translate }}</div>
+            <mat-list-item class="hide-gt-xs" role="list">
               <div *ngIf="!unavailable.allDay; else allDay" matListItemLine>
                 <mat-icon matPrefix>timer</mat-icon>&nbsp;
                 {{unavailable.hour | number:'2.0-0'}}:{{unavailable.minute | number:'2.0-0'}}
@@ -129,12 +129,12 @@
                 </div>
               </ng-template>
             </mat-list-item>
-            <div fxHide fxShow.lt-sm matListItemTitle>{{ 'UNAVAILABLE.LIST.COLUMN.REPEAT' | translate }}</div>
-            <mat-list-item fxHide fxShow.lt-sm role="list">
+            <div class="hide-gt-xs" matListItemTitle>{{ 'UNAVAILABLE.LIST.COLUMN.REPEAT' | translate }}</div>
+            <mat-list-item class="hide-gt-xs" role="list">
               <div matListItemLine>{{ 'COMMON.REPEAT.' + unavailable.repeat | translate}}              </div>
             </mat-list-item>
-            <div fxHide fxShow.lt-sm matListItemTitle>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
-            <div fxHide fxShow.lt-sm>
+            <div class="hide-gt-xs" matListItemTitle>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+            <div class="hide-gt-xs">
               <button (click)="edit(unavailable)" *ngIf="!unavailable.deleted" mat-icon-button>
                 <mat-icon matListItemIcon color="primary">edit</mat-icon>
               </button>
@@ -153,10 +153,9 @@
     </ng-container>
 
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-    <tr *matRowDef="let additional; columns: displayedColumns;" fxHide.lt-sm fxShow mat-row></tr>
+    <tr *matRowDef="let additional; columns: displayedColumns;" class="hide-xs" mat-row></tr>
     <tr (click)="expandedUnavailable = expandedUnavailable === unavailable ? null : unavailable"
-        *matRowDef="let unavailable; columns: displayedColumns;" class="unavailable-row"
-        fxHide fxShow.lt-sm mat-row></tr>
+        *matRowDef="let unavailable; columns: displayedColumns;" class="unavailable-row hide-gt-xs" mat-row></tr>
     <tr *matRowDef="let row; columns: ['expandedDetail']" class="unavailable-detail-row" mat-row></tr>
 
     <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>

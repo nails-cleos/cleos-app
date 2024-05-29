@@ -196,3 +196,10 @@ a {
 .footer-toolbar-light {
   background-color: #dcc8c2;
 }
+
+.footer-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}

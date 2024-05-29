@@ -1,6 +1,6 @@
 <div>
   <fieldset>
-    <legend>{{'COMMON.SEARCH.TITLE' | translate }}</legend>
+    <legend>{{ 'COMMON.SEARCH.TITLE' | translate }}</legend>
     <form [formGroup]="officeForm">
       <div *ngIf="!offices?.length; else dataOffice">
         <button class="only-button" color="accent" mat-fab extended [routerLink]="['/', language, 'rooms', 'add']">
@@ -8,7 +8,7 @@
         </button>
       </div>
       <ng-template #dataOffice>
-        <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
+        <div class="row-column-space-evenly-center">
           <mat-form-field *ngIf="offices; else skeleton" appearance="outline">
             <mat-label>{{ 'COMMON.ROOM.OFFICE.FIELD' | translate }}</mat-label>
             <label>
@@ -17,7 +17,7 @@
             </label>
             <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
               <mat-option *ngFor="let office of filteredOffice | async " [value]="office">
-                {{office.name}}
+                {{ office.name }}
               </mat-option>
             </mat-autocomplete>
             <mat-error *ngIf="office.hasError('required')"
@@ -35,7 +35,7 @@
             </label>
             <mat-autocomplete #autoRoom="matAutocomplete" [displayWith]="displayFnRoom">
               <mat-option *ngFor="let room of filteredRoom | async" [value]="room">
-                {{room | roomName}}
+                {{ room | roomName }}
               </mat-option>
             </mat-autocomplete>
             <mat-error *ngIf="room.hasError('required')"
@@ -53,7 +53,7 @@
             </label>
             <mat-autocomplete #autoProfessional="matAutocomplete" [displayWith]="displayFnProfessional">
               <mat-option *ngFor="let professional of filteredProfessional | async" [value]="professional">
-                {{professional.displayName}}
+                {{ professional.displayName }}
               </mat-option>
             </mat-autocomplete>
             <mat-error *ngIf="professional.hasError('requireMatch')"
@@ -66,10 +66,11 @@
         <div class="ssc-line"></div>
       </ng-template>
     </form>
-    <button fxShow.lt-sm fxHide (click)="search" [disabled]="officeForm.invalid" class="only-button" color="accent" mat-fab>
+    <button (click)="search" [disabled]="officeForm.invalid" class="hide-gt-xs only-button" color="accent" mat-fab>
       <mat-icon matPrefix>search</mat-icon>
     </button>
-    <button fxHide.lt-sm fxShow (click)="search" [disabled]="officeForm.invalid" class="only-button" color="accent" mat-fab extended>
+    <button (click)="search" [disabled]="officeForm.invalid" class="hide-xs only-button" color="accent" mat-fab
+            extended>
       <mat-icon matPrefix>search</mat-icon>
       <span>{{ 'COMMON.SEARCH.TITLE' | translate }}</span>
     </button>
@@ -77,36 +78,36 @@
 </div>
 
 <div *ngIf="data && calendar" class="scroll-container">
-  <div class="divider">
-    <button fxShow.lt-sm fxHide (click)="decrement" color="accent" mat-fab>
+  <div class="divider card-actions">
+    <button class="hide-gt-xs" (click)="decrement" color="accent" mat-fab>
       <mat-icon>navigate_before</mat-icon>
     </button>
-    <button fxHide.lt-sm fxShow (click)="decrement" color="accent" mat-fab extended>
+    <button class="hide-xs" (click)="decrement" color="accent" mat-fab extended>
       <mat-icon>navigate_before</mat-icon>
-      <span>{{'COMMON.BUTTON.PREVIOUS' | translate}}</span>
+      <span>{{ 'COMMON.BUTTON.PREVIOUS' | translate }}</span>
     </button>
     <input (dateChange)="selectDate($event)" [matDatepicker]="picker" [value]="viewDate"
            hidden matInput [max]="maxDate" [min]="minDate">
     <mat-datepicker #picker touchUi></mat-datepicker>
-    <button fxShow.lt-sm fxHide (click)="picker.open()" color="primary" mat-fab>
+    <button class="hide-gt-xs" (click)="picker.open()" color="primary" mat-fab>
       <mat-icon>today</mat-icon>
     </button>
-    <button fxHide.lt-sm fxShow (click)="picker.open()" color="primary" mat-fab extended>
+    <button class="hide-xs" (click)="picker.open()" color="primary" mat-fab extended>
       <mat-icon>today</mat-icon>
-      <span>{{'COMMON.BUTTON.GOTO' | translate}}</span>
+      <span>{{ 'COMMON.BUTTON.GOTO' | translate }}</span>
     </button>
-    <button fxShow.lt-sm fxHide (click)="increment" color="accent" mat-fab>
+    <button class="hide-gt-xs" (click)="increment" color="accent" mat-fab>
       <mat-icon>navigate_next</mat-icon>
     </button>
-    <button fxHide.lt-sm fxShow (click)="increment" color="accent" mat-fab extended>
+    <button class="hide-xs" (click)="increment" color="accent" mat-fab extended>
       <mat-icon>navigate_next</mat-icon>
-      <span>{{'COMMON.BUTTON.NEXT' | translate}}</span>
+      <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
     </button>
-    <div fxFlex></div>
-    <button fxShow.lt-sm fxHide color="accent" mat-fab [routerLink]="['/', language, 'reservation']">
+    <div class="spacer"></div>
+    <button class="hide-gt-xs" color="accent" mat-fab [routerLink]="['/', language, 'reservation']">
       <mat-icon>book_online</mat-icon>
     </button>
-    <button fxHide.lt-sm fxShow color="accent" mat-fab extended [routerLink]="['/', language, 'reservation']">
+    <button class="hide-xs" color="accent" mat-fab extended [routerLink]="['/', language, 'reservation']">
       <mat-icon>book_online</mat-icon>
       <span>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
     </button>

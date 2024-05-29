@@ -1,6 +1,6 @@
-<div class="flex-container" fxLayout="column">
-  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div fxFlex="60%" fxFlex.lt-sm="80%">
+<div class="flex-container">
+  <div class="card-container">
+    <div class="card-content">
       <form (ngSubmit)="submit" [formGroup]="form" novalidate>
         <mat-card appearance="outlined" class="style-card">
           <ng-template [ngIf]="isAddMode" [ngIfElse]="headerEditMode">
@@ -23,7 +23,7 @@
             </mat-card-header>
           </ng-template>
           <mat-card-content>
-            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+            <div class="inner-container">
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'EXPENSE.INVOICE.FIELD' | translate }}</mat-label>
                 <label>
@@ -71,8 +71,7 @@
                 <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
               </mat-form-field>
             </div>
-            <div fxLayout.xs="column" fxLayoutAlign.xs="space-evenly stretch"
-                 fxLayout="row" fxLayoutAlign="space-around center">
+            <div class="expense-space-around-container">
               <mat-form-field appearance="outline">
                 <mat-label>{{'EXPENSE.DATE.FIELD' | translate}}</mat-label>
                 <input matInput [matDatepicker]="dp" formControlName="date" required [max]="today">
@@ -104,8 +103,7 @@
                 </mat-error>
               </mat-form-field>
             </div>
-            <div fxLayout.xs="column" fxLayoutAlign.xs="space-evenly stretch"
-                 fxLayout="row" fxLayoutAlign="space-around center">
+            <div class="expense-space-around-container">
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'EXPENSE.GROSS.FIELD' | translate }}</mat-label>
                 <label>
@@ -133,8 +131,7 @@
                 </mat-error>
               </mat-form-field>
             </div>
-            <div fxLayout.xs="column" fxLayoutAlign.xs="space-evenly stretch"
-                 fxLayout="row" fxLayoutAlign="space-around center">
+            <div class="expense-space-around-container">
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'EXPENSE.NET.FIELD' | translate }}</mat-label>
                 <label>
@@ -151,8 +148,8 @@
               </mat-form-field>
             </div>
           </mat-card-content>
-          <mat-card-actions>
-            <div fxFlex></div>
+          <mat-card-actions class="card-actions">
+            <div class="spacer"></div>
             <button [form]="form" appBackButton [date]="getForm.date.value" [step]="1" color="accent" mat-fab extended
                     class="icon-button" type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
             <ng-template [ngIf]="isAddMode" [ngIfElse]="buttonEditMode">

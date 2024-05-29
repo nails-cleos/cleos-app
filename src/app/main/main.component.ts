@@ -20,7 +20,6 @@ import { MainContentService } from './main-content.service';
 import * as fromActionsMain from '../store/main.actions';
 import { TokenService } from '../services/token.service';
 import { NavigationService } from '../services/navigation.service';
-import { getLocale } from '../util/helper';
 
 @Component({
   selector: 'app-main',

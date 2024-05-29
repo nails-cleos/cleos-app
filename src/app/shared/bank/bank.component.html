@@ -1,5 +1,5 @@
 <form [formGroup]="formGroup" novalidate>
-  <div fxLayout="column" fxLayoutAlign="space-evenly start">
+  <div class="link-container">
     <ng-template [ngIf]="!firstTime">
       <div class="no-content bold"
            [innerHTML]="'COMMON.RESERVATION.PAYMENT_MESSAGE' | translate: {professional: professionalName}">

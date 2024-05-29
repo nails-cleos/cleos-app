@@ -2,8 +2,8 @@
   {{year}}
 </mat-toolbar>
 <mat-divider></mat-divider>
-<div fxLayout="row wrap">
-  <div *ngFor="let quarter of quarterSummaries; let index = index" fxFlex.gt-md="50%" fxFlex="100%">
+<div class="flex-row-wrap">
+  <div *ngFor="let quarter of quarterSummaries; let index = index" class="year-cash-content">
     <app-quarter [monthSummaries]="quarter.monthSummaries" [quarter]="quarter.quarter" [measure]="measure"
                  [year]="year" [currency]="currency" [margin]="index >= start" [showCash]="showCash"></app-quarter>
   </div>

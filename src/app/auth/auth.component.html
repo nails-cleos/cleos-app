@@ -1,13 +1,13 @@
-<div class="flex-container" fxLayout="column">
-  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div fxFlex="60%" fxFlex.lt-sm="80%">
+<div class="flex-container">
+  <div class="card-container">
+    <div class="card-content">
       <mat-card appearance="outlined">
         <mat-card-header>
           <mat-card-title>{{ 'AUTH.SIGN_IN.TITLE' | translate }}</mat-card-title>
         </mat-card-header>
         <mat-divider></mat-divider>
         <mat-card-content>
-          <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+          <div class="inner-container">
             <div id="firebaseui-auth-container"></div>
             <mat-form-field appearance="outline">
               <mat-label>{{ 'AUTH.SIGN_IN.CODE.FIELD' | translate }}</mat-label>
@@ -16,7 +16,7 @@
               </label>
             </mat-form-field>
           </div>
-          <div fxLayout="column" fxLayoutAlign="space-evenly start">
+          <div class="link-container">
             <a type="button" [routerLink]="['/', language, 'auth', 'forgot-password']">{{ 'AUTH.SIGN_IN.FORGOT_PASSWORD' | translate }}</a>
           </div>
         </mat-card-content>

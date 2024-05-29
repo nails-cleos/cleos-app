@@ -1,20 +1,20 @@
-<div class="flex-container" fxLayout="column">
-  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div fxFlex="60%" fxFlex.lt-sm="80%">
+<div class="flex-container">
+  <div class="card-container">
+    <div class="card-content">
       <mat-card appearance="outlined">
-        <mat-card-header fxLayout="row" fxLayoutAlign="center">
+        <mat-card-header class="card-container">
           <mat-card-title>{{ 'ME.REFERRAL.TITLE' | translate }}</mat-card-title>
         </mat-card-header>
         <mat-divider></mat-divider>
         <mat-card-content>
-          <div class="message divider" fxLayout="row" fxLayoutAlign="center">
+          <div class="message divider card-container">
             {{'ME.REFERRAL.MESSAGE' | translate}}
           </div>
-          <div class="divider" fxLayout="row" fxLayoutAlign="center">
+          <div class="divider card-container">
             {{'ME.REFERRAL.DETAIL' | translate}}
           </div>
           <ng-template [ngIf]="userId">
-            <div class="divider" fxLayout="row" fxLayoutAlign="center">
+            <div class="divider card-container">
               <div class="box">
                 <div class="vertical-center">
                   <div class="box-text bold">
@@ -29,8 +29,8 @@
             </div>
           </ng-template>
         </mat-card-content>
-        <mat-card-actions>
-          <div fxFlex></div>
+        <mat-card-actions class="card-actions">
+          <div class="spacer"></div>
           <button (click)="openBottomSheetShare" [disabled]="!showShare" color="primary"
                   mat-fab extended class="icon-button">{{'COMMON.BUTTON.SHARE' | translate }}</button>
           <button (click)="openBottomSheetReferral" [disabled]="!showInvites" mat-fab extended class="icon-button">

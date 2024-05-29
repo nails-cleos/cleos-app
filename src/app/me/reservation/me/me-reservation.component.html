@@ -4,7 +4,7 @@
       {{ 'ME.RESERVATION.ROOM.NO_CONTENT' | translate }}
     </div>
     <ng-template #data>
-      <div fxLayout="column" fxLayoutAlign="space-evenly start">
+      <div class="link-container">
         <mat-form-field *ngIf="offices; else skeleton" appearance="outline">
           <mat-label>{{ 'COMMON.ROOM.OFFICE.FIELD' | translate }}</mat-label>
           <label>
@@ -82,7 +82,7 @@
       {{ 'ME.RESERVATION.TREATMENT.NO_CONTENT' | translate }}
     </div>
     <ng-template #data>
-      <div fxLayout="column" fxLayoutAlign="space-evenly start">
+      <div class="link-container">
         <mat-form-field appearance="outline">
           <mat-label>{{ 'ME.RESERVATION.DATE.FIELD' | translate }}</mat-label>
           <label>
@@ -413,8 +413,8 @@
                 [optional]="getStepOptional(0)" [stepControl]="roomForm">
         <ng-template matStepLabel>{{ 'COMMON.ROOM.FIELD' | translate }}</ng-template>
         <div *ngIf="!isEditing; else editing">
-          <div class="flex-container full" fxLayout="column">
-            <div class="full" fxLayout="column" fxLayoutAlign="space-between start">
+          <div class="flex-container full">
+            <div class="full column-space-between-start">
               <ng-container *ngTemplateOutlet="stepOne"></ng-container>
               <mat-list-item *ngIf="room.value && room.value.address && professional.value">
                 <mat-icon matListItemIcon>room</mat-icon>
@@ -552,9 +552,9 @@
                 [optional]="getStepOptional(0)" [stepControl]="roomForm">
         <ng-template matStepLabel>{{ 'COMMON.ROOM.FIELD' | translate }}</ng-template>
         <div *ngIf="!isEditing; else editing">
-          <div class="flex-container" fxLayout="row">
-            <div class="full" fxLayout="row" fxLayoutAlign="space-between start">
-              <div class="middle" fxLayout="column">
+          <div class="flex-row-container">
+            <div class="full row-space-between-start">
+              <div class="middle flex-container">
                 <ng-container *ngTemplateOutlet="stepOne"></ng-container>
                 <mat-list-item *ngIf="room.value && room.value.address && professional.value">
                   <mat-icon matListItemIcon>room</mat-icon>

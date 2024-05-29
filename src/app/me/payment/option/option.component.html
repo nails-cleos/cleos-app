@@ -52,8 +52,8 @@
     <mat-step [completed]="getStepCompleted(0)" [editable]="true" [state]="getStepName(0)"
               [stepControl]="typeForm">
       <ng-template matStepLabel>{{ 'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate }}</ng-template>
-      <div class="flex-container full" fxLayout="column">
-        <div class="full" fxLayout="column" fxLayoutAlign="space-between start">
+      <div class="flex-container full">
+        <div class="full column-space-between-start">
           <ng-container *ngTemplateOutlet="stepOne"></ng-container>
         </div>
       </div>
@@ -88,9 +88,9 @@
     <mat-step [completed]="getStepCompleted(0)" [editable]="true" [state]="getStepName(0)"
               [stepControl]="typeForm">
       <ng-template matStepLabel>{{ 'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate }}</ng-template>
-      <div class="flex-container" fxLayout="row">
-        <div class="full" fxLayout="row" fxLayoutAlign="space-between start">
-          <div class="middle" fxLayout="column">
+      <div class="flex-row-container">
+        <div class="full row-space-between-start">
+          <div class="middle flex-container">
             <ng-container *ngTemplateOutlet="stepOne"></ng-container>
           </div>
         </div>

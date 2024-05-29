@@ -18,7 +18,6 @@ import { CardChartComponent, CardComponent } from './card/card.component';
 import { NgChartsModule } from 'ng2-charts';
 import { CustomDateFormatter } from './CustomDateFormatter';
 import { CustomEventTitleFormatter } from './CustomEventTitleFormatter';
-import { FlexLayoutModule } from '@angular/flex-layout';
 import { ChartComponent } from './chart/chart.component';
 import { httpInterceptorProviders } from '../http-interceptors';
 import { HttpClientJsonpModule, HttpClientModule } from '@angular/common/http';
@@ -106,7 +105,6 @@ const importExport = [
     GoogleMapsModule,
     ReactiveFormsModule,
     NgChartsModule,
-    FlexLayoutModule,
     HttpClientModule,
     HttpClientJsonpModule,
     FormsModule
@@ -116,7 +114,6 @@ const importExport = [
     CommonModule,
     TranslateModule,
     ReactiveFormsModule,
-    FlexLayoutModule,
     HttpClientModule,
     HttpClientJsonpModule,
     NgChartsModule,

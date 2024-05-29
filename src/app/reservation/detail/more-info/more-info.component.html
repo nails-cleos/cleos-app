@@ -100,8 +100,8 @@
     </ng-container>
 
     <ng-container matColumnDef="type">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
-      <td *matCellDef="let payment" fxHide.lt-sm fxShow mat-cell>
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
+      <td *matCellDef="let payment" class="hide-xs" mat-cell>
         <div *ngIf="payment.id; else skeleton">{{payment.type}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -123,8 +123,8 @@
     </ng-container>
 
     <ng-container matColumnDef="status">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
-      <td *matCellDef="let payment" fxHide.lt-sm fxShow mat-cell>
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
+      <td *matCellDef="let payment" class="hide-xs" mat-cell>
         <div *ngIf="payment.id; else skeleton">
           {{'COMMON.STATUS.PAYMENT.' + (payment.status ? payment.status.toUpperCase() : 'NONE') | translate}}
         </div>
@@ -164,7 +164,7 @@
     <tr *matRowDef="let row; columns: displayedColumns;" class="{{row.type?.toLowerCase()}}" mat-row></tr>
   </table>
 </div>
-<div class="top">
-  <div fxFlex></div>
+<div class="top card-actions">
+  <div class="spacer"></div>
   <button appBackButton color="accent" mat-fab extended type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
 </div>

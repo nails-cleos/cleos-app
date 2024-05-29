@@ -1,7 +1,7 @@
 <div>
   <fieldset>
     <legend>{{'COMMON.SEARCH.TITLE' | translate }}</legend>
-    <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
+    <div class="row-column-space-evenly-center">
       <mat-form-field appearance="outline">
         <mat-label>{{ 'RESERVATION.STATE.SEARCH' | translate }}</mat-label>
         <mat-chip-grid #chipList aria-label="Fruit selection">
@@ -79,9 +79,9 @@
       </ng-container>
 
       <ng-container matColumnDef="state">
-        <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+        <th *matHeaderCellDef class="hide-xs" mat-header-cell
             mat-sort-header>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</th>
-        <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
+        <td *matCellDef="let reservation" class="hide-xs" mat-cell>
           <div *ngIf="reservation.id; else skeleton">
             <mat-icon matPrefix>{{reservation.state | reservationIcon}}</mat-icon>&nbsp;
             {{ 'COMMON.STATUS.RESERVATION.' + reservation.state | translate}}
@@ -93,9 +93,9 @@
       </ng-container>
 
       <ng-container matColumnDef="treatment">
-        <th *matHeaderCellDef fxHide.lt-sm fxShow
+        <th *matHeaderCellDef class="hide-xs"
             mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }}</th>
-        <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
+        <td *matCellDef="let reservation" class="hide-xs" mat-cell>
           <div *ngIf="reservation.id; else skeleton">{{reservation.treatment.name}}</div>
           <ng-template #skeleton>
             <div class="ssc-line"></div>
@@ -104,14 +104,14 @@
       </ng-container>
 
       <ng-container matColumnDef="actions">
-        <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-        <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
+        <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+        <td *matCellDef="let reservation" class="hide-xs" mat-cell>
           <div *ngIf="reservation.id; else skeleton">
             <button *ngIf="!reservation.deleted" [routerLink]="['/', language, 'reservation', reservation.id]" mat-icon-button
                     matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
               <mat-icon color="primary">visibility</mat-icon>
             </button>
-            <button (click)="cancel(reservation)" *ngIf="reservation.deadLine" fxHide.lt-sm fxShow mat-icon-button
+            <button (click)="cancel(reservation)" *ngIf="reservation.deadLine" class="hide-xs" mat-icon-button
                     matTooltip="{{ 'COMMON.BUTTON.CANCEL' | translate }}" matTooltipPosition="right">
               <mat-icon color="warn">close</mat-icon>
             </button>
@@ -123,9 +123,9 @@
       </ng-container>
 
       <ng-container matColumnDef="expandedDetail">
-        <td *matCellDef="let reservation" [attr.colspan]="displayedColumns.length" fxHide fxShow.lt-sm>
+        <td *matCellDef="let reservation" [attr.colspan]="displayedColumns.length" class="hide-gt-xs">
           <div [@detailExpand]="reservation === expandedReservation ? 'expanded' : 'collapsed'"
-               class="detail" fxHide fxShow.lt-sm>
+               class="detail hide-gt-xs">
             <mat-list>
               <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</div>
               <mat-list-item role="list">

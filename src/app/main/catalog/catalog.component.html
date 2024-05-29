@@ -1,8 +1,7 @@
 <div class="content">
   <section class="section-style">
-    <div class="frame" fxLayout="row grap" fxLayout.xs="column" fxLayoutAlign="center center">
-      <mat-card fxFlex="1 1 calc(33.33% - 32px)" fxFlex.md="1 1 calc(50% - 32px)" fxFlex.sm="100%" fxFlex.xs="100%"
-                *ngFor="let catalogue of catalogues;" appearance="outlined" class="catalogue-card">
+    <div class="frame flex-wrap">
+      <mat-card *ngFor="let catalogue of catalogues;" appearance="outlined" class="catalogue-card flex-item">
         <ng-template [ngIf]="catalogue.treatmentGroup" [ngIfElse]="noDetail">
           <mat-card-header>
             <mat-card-title>{{catalogue.name}}</mat-card-title>
@@ -18,8 +17,8 @@
           <mat-card-content class="text-center">
             <img mat-card-md-image [alt]="catalogue.name" [src]="catalogue.image"/>
           </mat-card-content>
-          <mat-card-actions>
-            <div fxFlex></div>
+          <mat-card-actions class="card-actions">
+            <div class="spacer"></div>
             <a [href]="catalogue.image" rel="noreferrer" target="_blank">
               <mat-icon>zoom_out_map</mat-icon>
             </a>

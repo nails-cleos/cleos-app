@@ -22,9 +22,9 @@
     </ng-container>
 
     <ng-container matColumnDef="name">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell
           mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
-      <td *matCellDef="let currency" fxHide.lt-sm fxShow mat-cell>
+      <td *matCellDef="let currency" class="hide-xs" mat-cell>
         <div *ngIf="currency.id; else skeleton">{{currency.name}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -33,8 +33,8 @@
     </ng-container>
 
     <ng-container matColumnDef="actions">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-      <td *matCellDef="let currency" fxHide.lt-sm fxShow mat-cell>
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+      <td *matCellDef="let currency" class="hide-xs" mat-cell>
         <div *ngIf="currency.id; else skeleton">
           <button (click)="edit(currency)" *ngIf="!currency.deleted" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
@@ -52,8 +52,8 @@
     </ng-container>
 
     <ng-container matColumnDef="expandedDetail">
-      <td *matCellDef="let currency" [attr.colspan]="displayedColumns.length" fxHide fxShow.lt-sm>
-        <div [@detailExpand]="currency === expanded ? 'expanded' : 'collapsed'" class="detail" fxHide fxShow.lt-sm>
+      <td *matCellDef="let currency" [attr.colspan]="displayedColumns.length" class="hide-gt-xs">
+        <div [@detailExpand]="currency === expanded ? 'expanded' : 'collapsed'" class="detail hide-gt-xs">
           <mat-list>
             <div mat-subheader>{{ 'COMMON.COLUMN.NAME' | translate }}</div>
             <mat-list-item role="list">

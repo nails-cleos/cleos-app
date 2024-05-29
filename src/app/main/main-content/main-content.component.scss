@@ -403,3 +403,143 @@ section {
     width: 300px !important;
   }
 }
+
+.treatment-container,
+.section-container {
+  justify-content: space-around;
+}
+
+.work-container,
+.contact-container,
+.story-container {
+  justify-content: space-between;
+}
+
+.contact-container {
+  gap: 32px; // fxLayoutGap="32px"
+}
+
+.work-container,
+.section-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.contact-container,
+.story-container,
+.treatment-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 100%;
+
+  @media (max-width: 600px) { // Adjust this breakpoint as needed
+    flex-direction: column;
+  }
+}
+
+.story-item {
+  flex: 1 1 calc(75% - 32px);
+
+  @media (max-width: 960px) { // md breakpoint (adjust as needed)
+    flex: 1 1 calc(50% - 32px);
+  }
+
+  @media (max-width: 600px) { // sm breakpoint (adjust as needed)
+    flex: 1 1 calc(50% - 32px);
+  }
+
+  @media (max-width: 600px) { // xs breakpoint (adjust as needed)
+    flex: 1 1 100%;
+  }
+}
+
+.story-member-item {
+  flex: 1 1 calc(25% - 32px); // Default flex behavior
+
+  @media (max-width: 960px) { // md breakpoint (adjust as needed)
+    flex: 1 1 calc(50% - 32px);
+  }
+
+  @media (max-width: 600px) { // sm and xs breakpoints (adjust as needed)
+    flex: 1 1 calc(50% - 32px);
+  }
+
+  @media (max-width: 600px) { // xs breakpoint (adjust as needed)
+    flex: 1 1 100%;
+  }
+}
+
+.treatment-item {
+  flex: 1 1 calc(25% - 32px);
+
+  @media (max-width: 600px) { // Breakpoint for xs (adjust as needed)
+    flex: 1 1 100%;
+  }
+
+  @media (min-width: 600px) and (max-width: 960px) { // Breakpoint for sm (adjust as needed)
+    flex: 1 1 calc(50% - 32px);
+  }
+}
+
+.contact--item {
+  flex: 1 1 calc(60% - 32px);
+
+  @media (max-width: 600px) { // xs breakpoint (adjust as needed)
+    flex: 1 1 100%;
+  }
+}
+
+.flex-item {
+  flex: 1 1 calc(20% - 32px);
+
+  @media (max-width: 600px) { // xs breakpoint (adjust as needed)
+    flex: 1 1 100%;
+  }
+}
+
+.work-flex-item {
+  flex: 1 1 calc(33.33% - 32px); // Default flex behavior
+
+  @media (max-width: 960px) { // md breakpoint (adjust as needed)
+    flex: 1 1 calc(50% - 32px);
+  }
+
+  @media (max-width: 600px) { // sm and xs breakpoints (adjust as needed)
+    flex: 1 1 100%;
+  }
+}
+
+.contact-inner-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+.social-inner-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.work-inner-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+@media (max-width: 599px) {
+  .work-inner-container,
+  .contact-inner-container {
+    flex-direction: column;
+  }
+
+  .social-inner-container {
+    flex-direction: row;
+  }
+}

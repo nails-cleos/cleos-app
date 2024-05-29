@@ -10,6 +10,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { Router } from '@angular/router';
 import { SharedModule } from './shared/shared.module';
 import { getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { AngularFireModule } from '@angular/fire/compat';
 import { initializeAppCheck, provideAppCheck, ReCaptchaV3Provider } from '@angular/fire/app-check';
 import { connectAuthEmulator, getAuth, provideAuth } from '@angular/fire/auth';
 import { getAnalytics, provideAnalytics } from '@angular/fire/analytics';
@@ -28,7 +29,8 @@ import localeEnNL from '@angular/common/locales/en-NL';
 import localeEs from '@angular/common/locales/es';
 import localeAr from '@angular/common/locales/es-AR';
 import { TranslateLoaderFactory } from './shared/translate-loader.factory';
-import { MAT_COLOR_FORMATS, NGX_MAT_COLOR_FORMATS, NgxMatColorPickerModule } from '@angular-material-components/color-picker';
+import { NgxColorsModule } from 'ngx-colors';
+import { NgcCookieConsentConfig, NgcCookieConsentModule } from 'ngx-cookieconsent';
 
 // Services
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -38,15 +40,13 @@ import { TokenService } from './services/token.service';
 import { NavigationService } from './services/navigation.service';
 import { MessagingService } from './services/messaging.service';
 import { PwaService } from './services/pwa.service';
+import { AuthUserService } from './services/auth-user.service';
 
 // Reducers
 import { reducers } from './store/app.states';
 
 // Components
 import { AppComponent } from './app.component';
-import { AuthUserService } from './services/auth-user.service';
-import { NgcCookieConsentConfig, NgcCookieConsentModule } from 'ngx-cookieconsent';
-import { AngularFireModule } from '@angular/fire/compat';
 
 export const localStorageSyncReducer =
   (reducer: ActionReducer<any>): ActionReducer<any> => localStorageSync({ keys: ['auth'], rehydrate: true })(reducer);
@@ -108,7 +108,7 @@ const cookieConfig: NgcCookieConsentConfig = {
       enabled: environment.production,
       registrationStrategy: 'registerWhenStable:30000'
     }),
-    NgxMatColorPickerModule,
+    NgxColorsModule,
     AngularFireModule.initializeApp(environment.firebase),
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAuth(() => {
@@ -148,10 +148,6 @@ const cookieConfig: NgcCookieConsentConfig = {
     CookieService,
     TranslateService,
     AuthUserService,
-    {
-      provide: MAT_COLOR_FORMATS,
-      useValue: NGX_MAT_COLOR_FORMATS
-    },
     {
       provide: LOCALE_ID,
       useValue: 'en-GB'

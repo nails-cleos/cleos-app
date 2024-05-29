@@ -52,7 +52,7 @@
       <div class="no-content bold">{{ 'RESERVATION.ROOM.NO_CONTENT' | translate }}</div>
     </ng-template>
     <ng-template #data>
-      <div fxLayout="column" fxLayoutAlign="space-evenly start">
+      <div class="link-container">
         <mat-form-field *ngIf="offices; else skeleton" appearance="outline">
           <mat-label>{{ 'COMMON.ROOM.OFFICE.FIELD' | translate }}</mat-label>
           <label>
@@ -133,7 +133,7 @@
       </div>
     </ng-template>
     <ng-template #data>
-      <div fxLayout="column" fxLayoutAlign="space-evenly start">
+      <div class="link-container">
         <mat-form-field appearance="outline">
           <mat-label>{{ 'RESERVATION.DATE.FIELD' | translate }}</mat-label>
           <label>
@@ -297,7 +297,7 @@
 
 <ng-template #stepFive>
   <form [formGroup]="configurationForm">
-    <div fxLayout="column" fxLayoutAlign="space-evenly start">
+    <div class="link-container">
       <mat-checkbox formControlName="customerChange" color="primary">
         {{ 'RESERVATION.CONFIGURATION.CUSTOMER_CHANGE.FIELD' | translate }}
       </mat-checkbox>
@@ -485,9 +485,9 @@
               [optional]="getStepOptional(0)" [stepControl]="customerForm">
       <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</ng-template>
       <ng-template [ngIf]="!isEditing" [ngIfElse]="editing">
-        <div class="flex-container" fxLayout="column">
-          <div fxLayout="column" fxLayoutAlign="space-between start">
-            <div fxLayout="row" fxLayoutAlign="space-between start">
+        <div class="flex-container">
+          <div class="column-space-between-start">
+            <div class="row-space-between-start">
               <ng-container *ngTemplateOutlet="stepOne"></ng-container>
               <ng-template [ngIf]="isAdmin">
                 <button type="button" (click)="addCustomer" class="raised-button" color="accent" mat-mini-fab>
@@ -498,7 +498,7 @@
             </div>
           </div>
         </div>
-        <div class="flex-container">
+        <div class="divider">
           <button type="button" [form]="customerForm" appBackButton color="accent" class="icon-button" mat-fab>
             <mat-icon>keyboard_return</mat-icon>
           </button>
@@ -517,8 +517,8 @@
     <mat-step [completed]="getStepCompleted(1)" [editable]="getStepEnabled(1)" [state]="getStepName(1)"
               [optional]="getStepOptional(1)" [stepControl]="officeForm">
       <ng-template matStepLabel>{{ 'COMMON.ROOM.FIELD' | translate }}</ng-template>
-      <div class="flex-container" fxLayout="column">
-        <div fxLayout="column" fxLayoutAlign="space-between start">
+      <div class="flex-container">
+        <div class="column-space-between-start">
           <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
           <ng-template [ngIf]="room.value">
             <mat-form-field appearance="outline">
@@ -603,7 +603,7 @@
     <mat-step [completed]="getStepCompleted(4)" [editable]="getStepEnabled(4)" [state]="getStepName(4)"
               [optional]="getStepOptional(4)" [stepControl]="configurationForm">
       <ng-template matStepLabel>{{ 'RESERVATION.CONFIGURATION.TITLE' | translate }}</ng-template>
-      <div class="flex-container" fxLayout="row" fxLayoutAlign="space-between start">
+      <div class="flex-container row-space-between-start">
         <ng-container *ngTemplateOutlet="stepFive"></ng-container>
       </div>
       <div>
@@ -653,7 +653,7 @@
       <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</ng-template>
       <ng-template [ngIf]="!isEditing" [ngIfElse]="editing">
         <div>
-          <div class="flex-container" fxLayout="row" fxLayoutAlign="space-between start">
+          <div class="flex-container row-space-between-start">
             <ng-container *ngTemplateOutlet="stepOne"></ng-container>
             <div class="vertical-divider"></div>
             <ng-template [ngIf]="isAdmin">
@@ -686,9 +686,9 @@
     <mat-step [completed]="getStepCompleted(1)" [editable]="getStepEnabled(1)" [state]="getStepName(1)"
               [optional]="getStepOptional(1)" [stepControl]="officeForm">
       <ng-template matStepLabel>{{ 'COMMON.ROOM.FIELD' | translate }}</ng-template>
-      <div class="flex-container" fxLayout="row">
-        <div fxLayout="row" fxLayoutAlign="space-between start">
-          <div fxLayout="column" fxLayoutAlign="space-between start">
+      <div class="flex-row-container">
+        <div class="row-space-between-start">
+          <div class="column-space-between-start">
             <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
             <ng-template [ngIf]="room.value">
               <mat-form-field appearance="outline">
@@ -785,7 +785,7 @@
     <mat-step [completed]="getStepCompleted(4)" [editable]="getStepEnabled(4)" [state]="getStepName(4)"
               [stepControl]="configurationForm" [optional]="getStepOptional(4)">
       <ng-template matStepLabel>{{ 'RESERVATION.CONFIGURATION.TITLE' | translate }}</ng-template>
-      <div class="flex-container" fxLayout="row" fxLayoutAlign="space-between start">
+      <div class="flex-container row-space-between-start">
         <ng-container *ngTemplateOutlet="stepFive"></ng-container>
       </div>
       <div>
