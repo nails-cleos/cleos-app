@@ -42,6 +42,7 @@ import { getThemeName, isDarkMode, resetTheme, Theme, THEME } from '../util/them
 import { ThemeService } from 'ng2-charts';
 import { AuthUserService } from '../services/auth-user.service';
 import { SeoService } from '../services/seo.service';
+import { newDateTimestamp } from '../util/dates';
 
 @Component({
   selector: 'app-nav',
@@ -93,9 +94,9 @@ export class NavComponent implements OnInit, OnDestroy {
 
   constructor(public translate: TranslateService, private breakpointObserver: BreakpointObserver,
               private router: Router, private store: Store<AppState>, private messagingService: MessagingService,
-              private snackBar: MatSnackBar, private navigation: NavigationService, private tokenService: TokenService,
+              private snackBar: MatSnackBar, private navigationService: NavigationService, private tokenService: TokenService,
               private cookieService: CookieService, private overlayContainer: OverlayContainer,
-              private themeService: ThemeService, private navigationService: NavigationService, private authUserService: AuthUserService,
+              private themeService: ThemeService, private authUserService: AuthUserService,
               private seoService: SeoService, private route: ActivatedRoute) {
     this.isDarkMode = isDarkMode(cookieService.get(THEME) as Theme);
     this.dateFormat = this.translate.currentLang;
@@ -105,7 +106,7 @@ export class NavComponent implements OnInit, OnDestroy {
     this.selectStore([selectRoomState, selectTreatmentState, selectCatalogueState, selectDiscountState, selectUnavailableState,
       selectUserState, selectReservationState, selectPaymentState, selectAdditionalState, selectCurrencyState, selectOfficeState,
       selectColorState, selectExpenseState, selectNoteState, selectAccountState]);
-    this.navigation.subscribe();
+    this.navigationService.subscribe();
   }
 
   get logout(): void {
@@ -128,12 +129,10 @@ export class NavComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    console.log("INIT")
+    console.log(this.notifications)
     this.subscribe();
-    this.authSubject.pipe(distinctUntilChanged()).subscribe(v => {
-      if (v) {
-        this.getNotifications();
-      }
-    });
+    this.getNotifications();
     this.authUserService.cookieConsent(this.translate);
 
     const meta = this.translate.instant('DASHBOARD.META');
@@ -214,6 +213,7 @@ export class NavComponent implements OnInit, OnDestroy {
         this.tokenService.user = state.user;
         this.incomplete = !state.user.completed;
         const user: IUserAll = state.user;
+        this.language = this.navigationService.attachLang(getLocale(user.locale).language);
         this.currentUser = user;
         this.resetTheme(this.currentUser.theme);
         this.menuItems = state.menus;
@@ -243,22 +243,23 @@ export class NavComponent implements OnInit, OnDestroy {
           }
         });
       }
-      const language = getLocale(this.translate.currentLang).language;
-      if (this.router.url === `/${ language }`) {
+      if (this.router.url === `/${ this.language }`) {
         if (this.isAuthorized && !state.redirect) {
           this.store.dispatch(
             new fromActionsLogin.Redirect()
           );
         } else {
-          this.router.navigate(['/', language]);
+          this.router.navigate(['/', this.language]);
         }
       }
     });
 
     this.notificationSubscription = this.getNotificationState.subscribe((state) => {
       if (state.data && state.data.page && state.data.page.content[0]?.id) {
+        console.log(state);
         this.workDay = state.data.workDay;
-        this.notifications = state.data.page.number === 0 ? state.data.page.content : this.notifications;
+        this.notifications = state.data.page.number === 0 ? state.data.page.content.map((it: INotification) =>
+          Object.assign({}, it, { notDate: newDateTimestamp(it.date) })) : this.notifications;
         this.countNotifications = state.data.unread;
         this.updateCount();
       }

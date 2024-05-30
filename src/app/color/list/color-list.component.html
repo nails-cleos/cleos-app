@@ -22,9 +22,9 @@
     </ng-container>
 
     <ng-container matColumnDef="description">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell
           mat-sort-header>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
-      <td *matCellDef="let color" fxHide.lt-sm fxShow mat-cell>
+      <td *matCellDef="let color" class="hide-xs" mat-cell>
         <div *ngIf="color.id; else skeleton">{{color.description}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -33,8 +33,8 @@
     </ng-container>
 
     <ng-container matColumnDef="actions">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-      <td *matCellDef="let color" fxHide.lt-sm fxShow mat-cell>
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+      <td *matCellDef="let color" class="hide-xs" mat-cell>
         <div *ngIf="color.id; else skeleton">
           <ng-template [ngIf]="!color.deleted">
             <button (click)="edit(color)" mat-icon-button
@@ -54,9 +54,9 @@
     </ng-container>
 
     <ng-container matColumnDef="expandedDetail">
-      <td *matCellDef="let color" [attr.colspan]="displayedColumns.length" fxHide fxShow.lt-sm mat-cell>
+      <td *matCellDef="let color" [attr.colspan]="displayedColumns.length" class="hide-gt-xs" mat-cell>
         <div [@detailExpand]="color === expandedColor ? 'expanded' : 'collapsed'"
-             class="detail" fxHide fxShow.lt-sm>
+             class="detail hide-gt-xs">
           <mat-list>
             <div *ngIf="color.description" matListItemTitle>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</div>
             <mat-list-item *ngIf="color.description" role="list">

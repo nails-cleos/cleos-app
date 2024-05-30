@@ -1,4 +1,4 @@
-<div fxLayout="row" fxLayoutAlign="space-around center">
+<div class="row-space-around-container">
   <mat-form-field appearance="outline">
     <mat-label>{{ 'SUMMARY.MONTHLY.SELECT.DATE' | translate }}</mat-label>
     <input matInput [matDatepicker]="dp" [formControl]="date">
@@ -9,13 +9,13 @@
   <mat-form-field appearance="outline">
     <mat-label>{{ 'SUMMARY.MONTHLY.SELECT.FORMAT' | translate }}</mat-label>
     <mat-select [formControl]="amountFormat">
-      <mat-option *ngFor="let enum of amountFormatKeys | keyvalue" [value]="enum.value">
-        {{ 'SUMMARY.MONTHLY.FORMAT.' + enum.value | translate }}
+      <mat-option *ngFor="let keys of amountFormatKeys | keyvalue" [value]="keys.value">
+        {{ 'SUMMARY.MONTHLY.FORMAT.' + keys.value | translate }}
       </mat-option>
     </mat-select>
   </mat-form-field>
 </div>
-<div fxLayout="column" fxLayoutAlign="space-around stretch">
+<div class="space-around-container">
   <ng-template [ngIf]="monthlySummaryMap?.size">
     <mat-form-field appearance="outline" class="full-select">
       <mat-select [formControl]="selectedRoom">
@@ -191,24 +191,24 @@
           </tfoot>
         </table>
         <mat-action-row>
-          <div fxFlex></div>
-          <button fxShow.lt-sm fxHide color="accent" mat-fab [disabled]="!summaryReservations?.length"
+          <div class="spacer"></div>
+          <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryReservations?.length"
                   (click)="updateMonthlySummary(type.payment, reservationGrossMonth, reservationBtwMonth, monthlySummaryPayment)">
             <mat-icon>save</mat-icon>
           </button>
-          <button fxHide.lt-sm fxShow color="primary" mat-fab extended class="icon-button"
+          <button color="primary" mat-fab extended class="icon-button hide-xs"
                   [disabled]="!summaryReservations?.length"
                   (click)="updateMonthlySummary(type.payment, reservationGrossMonth, reservationBtwMonth, monthlySummaryPayment)">
             <mat-icon>save</mat-icon>
             <span>{{ 'COMMON.BUTTON.SAVE' | translate }}</span>
           </button>
-          <button fxShow.lt-sm fxHide color="accent" mat-fab
+          <button class="hide-gt-xs" color="accent" mat-fab
                   (click)="exportToExcel(type.payment, 'INCOMES', summaryReservations)"
                   [disabled]="!summaryReservations?.length">
             <mat-icon>file_download</mat-icon>
           </button>
-          <button fxHide.lt-sm fxShow (click)="exportToExcel(type.payment,'INCOMES', summaryReservations)"
-                  color="accent" mat-fab extended [disabled]="!summaryReservations?.length" class="icon-button">
+          <button (click)="exportToExcel(type.payment,'INCOMES', summaryReservations)"
+                  color="accent" mat-fab extended [disabled]="!summaryReservations?.length" class="icon-button hide-xs">
             <mat-icon>file_download</mat-icon>
             <span>{{ 'COMMON.BUTTON.SAVE_EXPORT' | translate }}</span>
           </button>
@@ -299,24 +299,23 @@
           </tfoot>
         </table>
         <mat-action-row>
-          <div fxFlex></div>
-          <button fxShow.lt-sm fxHide color="accent" mat-fab [disabled]="!summaryExpenses?.length"
+          <div class="spacer"></div>
+          <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryExpenses?.length"
                   (click)="updateMonthlySummary(type.expense, expenseGrossMonth, expenseBtwMonth, monthlySummaryExpense)">
             <mat-icon>save</mat-icon>
           </button>
-          <button fxHide.lt-sm fxShow
-                  (click)="updateMonthlySummary(type.expense, expenseGrossMonth, expenseBtwMonth, monthlySummaryExpense)"
-                  color="primary" mat-fab extended class="icon-button" [disabled]="!summaryExpenses?.length">
+          <button (click)="updateMonthlySummary(type.expense, expenseGrossMonth, expenseBtwMonth, monthlySummaryExpense)"
+                  color="primary" mat-fab extended class="icon-button hide-xs" [disabled]="!summaryExpenses?.length">
             <mat-icon>save</mat-icon>
             <span>{{ 'COMMON.BUTTON.SAVE' | translate }}</span>
           </button>
-          <button fxShow.lt-sm fxHide color="accent" mat-fab
+          <button class="hide-gt-xs" color="accent" mat-fab
                   (click)="exportToExcel(type.expense, 'EXPENSES', summaryExpenses)"
                   [disabled]="!summaryExpenses?.length">
             <mat-icon>file_download</mat-icon>
           </button>
-          <button fxHide.lt-sm fxShow (click)="exportToExcel(type.expense, 'EXPENSES', summaryExpenses)" color="accent"
-                  mat-fab extended class="icon-button" [disabled]="!summaryExpenses?.length">
+          <button (click)="exportToExcel(type.expense, 'EXPENSES', summaryExpenses)" color="accent"
+                  mat-fab extended class="icon-button hide-xs" [disabled]="!summaryExpenses?.length">
             <mat-icon>file_download</mat-icon>
             <span>{{ 'COMMON.BUTTON.SAVE_EXPORT' | translate }}</span>
           </button>
@@ -422,25 +421,25 @@
             </tr>
             </tfoot>
           </table>
-          <mat-action-row>
-            <div fxFlex></div>
-            <button fxShow.lt-sm fxHide color="accent" mat-fab [disabled]="!summaryCash?.length"
+          <mat-action-row class="card-actions">
+            <div class="spacer"></div>
+            <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryCash?.length"
                     (click)="updateMonthlySummary(type.cash, cashGrossMonth, cashBtwMonth, monthlySummaryCash)">
               <mat-icon>save</mat-icon>
             </button>
-            <button fxHide.lt-sm fxShow color="primary" mat-fab extended class="icon-button"
+            <button color="primary" mat-fab extended class="icon-button hide-xs"
                     [disabled]="!summaryCash?.length"
                     (click)="updateMonthlySummary(type.cash, cashGrossMonth, cashBtwMonth, monthlySummaryCash)">
               <mat-icon>save</mat-icon>
               <span>{{ 'COMMON.BUTTON.SAVE' | translate }}</span>
             </button>
-            <button fxShow.lt-sm fxHide color="accent" mat-fab
+            <button class="hide-gt-xs" color="accent" mat-fab
                     (click)="exportToExcel(type.cash, 'CASH_INCOMES', summaryCash)"
                     [disabled]="!summaryCash?.length">
               <mat-icon>file_download</mat-icon>
             </button>
-            <button fxHide.lt-sm fxShow (click)="exportToExcel(type.cash, 'CASH_INCOMES', summaryCash)" color="accent"
-                    mat-fab extended [disabled]="!summaryCash?.length" class="icon-button">
+            <button (click)="exportToExcel(type.cash, 'CASH_INCOMES', summaryCash)" color="accent"
+                    mat-fab extended [disabled]="!summaryCash?.length" class="icon-button hide-xs">
               <mat-icon>file_download</mat-icon>
               <span>{{ 'COMMON.BUTTON.SAVE_EXPORT' | translate }}</span>
             </button>
@@ -461,8 +460,8 @@
     <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
   </div>
 </ng-template>
-<div class="top-space">
-  <div fxFlex></div>
+<div class="top-space card-actions">
+  <div class="spacer"></div>
   <button (click)="goBack" color="accent" mat-fab extended class="icon-button" type="button">
     {{ 'COMMON.BUTTON.BACK' | translate }}
   </button>

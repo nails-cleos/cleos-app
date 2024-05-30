@@ -7,14 +7,15 @@ import { AppState, selectUserState } from '../store/app.states';
 import * as fromActionsUser from '../store/user.actions';
 import { IUser, User } from '../interfaces/user';
 import { findFlag, flags, IFlag } from '../util/flags';
-import { Color } from '@angular-material-components/color-picker';
-import { lightenDarkenColor } from '../util/color';
+import { lightenDarkenColor, randomColor } from '../util/color';
 import { backendFormatDate, createDateFromString, newDate } from '../util/dates';
 import { fieldChange, valueChange } from '../util/validators';
 import { createAddress } from '../util/helper';
 import { TranslateService } from '@ngx-translate/core';
+import { validColorValidator } from 'ngx-colors';
 import PlaceGeometry = google.maps.places.PlaceGeometry;
 import PlaceResult = google.maps.places.PlaceResult;
+import { Role } from '../interfaces/token';
 
 @Component({
   selector: 'app-user',
@@ -31,6 +32,7 @@ export class UserComponent implements OnInit, OnDestroy {
   geometry?: PlaceGeometry;
   addressUpdated = false;
   formattedAddress?: string;
+  isProfessionalOrManager: boolean;
 
   private getState: Observable<any>;
   private subscription?: Subscription;
@@ -39,6 +41,7 @@ export class UserComponent implements OnInit, OnDestroy {
   constructor(private readonly translate: TranslateService, private route: ActivatedRoute, private store: Store<AppState>,
               private formBuilder: UntypedFormBuilder, private router: Router, private cdRef: ChangeDetectorRef) {
     this.isAddMode = true;
+    this.isProfessionalOrManager = false;
     this.getState = this.store.select(selectUserState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
   }
@@ -59,14 +62,12 @@ export class UserComponent implements OnInit, OnDestroy {
     user.dob = fieldChange(this.getForm.dob as UntypedFormControl, this.user?.dob);
     user.dob = user.dob ? backendFormatDate(newDate(user.dob)) : user.dob;
 
-    if (this.getForm.lightColor.value) {
-      const color = this.getForm.lightColor.value;
-      user.lightColor = `${ color.r },${ color.g },${ color.b }`;
+    if (this.isProfessionalOrManager && this.getForm.lightColor.value) {
+      user.lightColor = this.getForm.lightColor.value;
     }
 
-    if (this.getForm.darkColor.value) {
-      const color = this.getForm.darkColor.value;
-      user.darkColor = `${ color.r },${ color.g },${ color.b }`;
+    if (this.isProfessionalOrManager && this.getForm.darkColor.value) {
+      user.darkColor = this.getForm.darkColor.value;
     }
 
     user.address = createAddress(this.formattedAddress, this.geometry?.location, this.user?.address);
@@ -104,8 +105,8 @@ export class UserComponent implements OnInit, OnDestroy {
     this.cdRef.detectChanges();
   }
 
-  lightenDarkenColor(color: Color, isDark: boolean): string {
-    return lightenDarkenColor(`#${ color.hex }`, isDark ? 50 : -50);
+  lightenDarkenColor(color: string, isDark: boolean): string {
+    return lightenDarkenColor(color, isDark ? 50 : -50);
   }
 
   getAddress(placeResult: PlaceResult): void {
@@ -122,9 +123,41 @@ export class UserComponent implements OnInit, OnDestroy {
       lang: ['', Validators.required],
       phone: [''],
       dob: [''],
-      darkColor: [''],
-      lightColor: [''],
+      darkColor: ['', [validColorValidator()]],
+      darkColorPicker: [''],
+      lightColor: ['', [validColorValidator()]],
+      lightColorPicker: [''],
       address: ['']
+    });
+
+    this.getForm.darkColor.valueChanges.subscribe(color => {
+      if (this.getForm.darkColorPicker.valid) {
+        this.getForm.darkColorPicker.setValue(color, { emitEvent: false });
+      }
+    });
+    this.getForm.darkColorPicker.valueChanges.subscribe(color =>
+      this.getForm.darkColor.setValue(color, { emitEvent: false })
+    );
+
+    this.getForm.lightColor.valueChanges.subscribe(color => {
+      if (this.getForm.lightColorPicker.valid) {
+        this.getForm.lightColorPicker.setValue(color, { emitEvent: false });
+      }
+    });
+    this.getForm.lightColorPicker.valueChanges.subscribe(color =>
+      this.getForm.lightColor.setValue(color, { emitEvent: false })
+    );
+
+    this.getForm.role.valueChanges.subscribe(role => {
+      this.isProfessionalOrManager = [Role.manager, Role.professional].indexOf(role) > -1;
+      if (this.isProfessionalOrManager) {
+        if (!this.getForm.lightColor.value) {
+          this.getForm.lightColor.setValue(randomColor(false));
+        }
+        if (!this.getForm.darkColor.value) {
+          this.getForm.darkColor.setValue(randomColor(true));
+        }
+      }
     });
   }
 
@@ -147,12 +180,10 @@ export class UserComponent implements OnInit, OnDestroy {
         this.getForm.address.setValue(this.user?.address?.name);
 
         if (state.selected.lightColor) {
-          const rgb = state.selected.lightColor.split(',');
-          this.getForm.lightColor.setValue(new Color(Number(rgb[0]), Number(rgb[1]), Number(rgb[2])));
+          this.getForm.lightColor.setValue(state.selected.lightColor);
         }
         if (state.selected.darkColor) {
-          const rgb = state.selected.darkColor.split(',');
-          this.getForm.darkColor.setValue(new Color(Number(rgb[0]), Number(rgb[1]), Number(rgb[2])));
+          this.getForm.darkColor.setValue(state.selected.darkColor);
         }
         if (state.selected.dob) {
           this.getForm.dob.setValue(createDateFromString(state.selected.dob));

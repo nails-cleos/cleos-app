@@ -1,6 +1,6 @@
-<div class="flex-container" fxLayout="column">
-  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div fxFlex="60%" fxFlex.lt-sm="80%">
+<div class="flex-container">
+  <div class="card-container">
+    <div class="card-content">
       <form (ngSubmit)="submit" [formGroup]="form" novalidate>
         <mat-card appearance="outlined" class="style-card">
           <ng-template [ngIf]="isAddMode" [ngIfElse]="headerEditMode">
@@ -18,7 +18,7 @@
             </mat-card-header>
           </ng-template>
           <mat-card-content>
-            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+            <div class="inner-container">
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'ADDITIONAL.NAME.FIELD' | translate }}</mat-label>
                 <label>
@@ -53,7 +53,7 @@
                   {{errors['duration']}}
                 </mat-error>
               </mat-form-field>
-              <div *ngIf="allGroups; else skeleton" fxLayout="row" fxLayoutAlign="space-between center" id="groups">
+              <div *ngIf="allGroups; else skeleton" class="fields-container" id="groups">
                 <ng-template [ngIf]="allGroups.length || groups.length">
                   <mat-form-field class="chip-list">
                     <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
@@ -71,10 +71,10 @@
                       </mat-option>
                     </mat-autocomplete>
                   </mat-form-field>
-                  <button fxShow.lt-sm fxHide [routerLink]="['/', language, 'treatments', 'add']" color="accent" mat-fab type="button">
+                  <button class="hide-gt-xs" [routerLink]="['/', language, 'treatments', 'add']" color="accent" mat-fab type="button">
                     <mat-icon matPrefix>add</mat-icon>
                   </button>
-                  <button fxHide.lt-sm fxShow [routerLink]="['/', language, 'treatments', 'add']" color="accent" mat-fab extended type="button">
+                  <button class="hide-xs" [routerLink]="['/', language, 'treatments', 'add']" color="accent" mat-fab extended type="button">
                     <mat-icon matPrefix>add</mat-icon>
                     <span>{{ 'COMMON.TREATMENT.GROUP.ADD_BUTTON' | translate }}</span>
                   </button>
@@ -85,8 +85,8 @@
               </ng-template>
             </div>
           </mat-card-content>
-          <mat-card-actions>
-            <div fxFlex></div>
+          <mat-card-actions class="card-actions">
+            <div class="spacer"></div>
             <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
             <ng-template [ngIf]="isAddMode" [ngIfElse]="buttonEditMode">

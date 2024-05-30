@@ -1,7 +1,7 @@
 <div *ngIf="!error; else errorBox">
-  <div class="flex-container" fxLayout="column">
-    <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-      <div fxFlex="60%" fxFlex.lt-sm="80%">
+  <div class="flex-container">
+    <div class="card-container">
+      <div class="card-content">
         <div *ngIf="!noContent; else noUpcoming">
           <div *ngIf="upcoming && upcoming.length > 1; else onlyOne">
             <mat-card-title>{{ 'ME.RESERVATION.UPCOMING.TITLE' | translate }}</mat-card-title>
@@ -22,8 +22,8 @@
               <mat-card-title>{{ 'ME.RESERVATION.UPCOMING.NO_UPCOMING.TITLE' | translate }}</mat-card-title>
             </mat-card-header>
             <mat-divider></mat-divider>
-            <mat-card-actions>
-              <div fxFlex></div>
+            <mat-card-actions class="card-actions">
+              <div class="spacer"></div>
               <button [routerLink]="['/', language, 'me', 'reservation']" color="primary" mat-fab extended>
                 <mat-icon>book_online</mat-icon>
                 {{ 'COMMON.BUTTON.CREATE' | translate }}
@@ -38,8 +38,8 @@
   <table [dataSource]="dataSource" mat-table matSort matSortActive="timestamp"
          matSortDirection="desc" matSortDisableClear>
     <ng-container matColumnDef="position">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>#</th>
-      <td *matCellDef="let reservation; let i = index;" fxHide.lt-sm fxShow mat-cell>
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell>#</th>
+      <td *matCellDef="let reservation; let i = index;" class="hide-xs" mat-cell>
         <div *ngIf="reservation.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -48,9 +48,9 @@
     </ng-container>
 
     <ng-container matColumnDef="professional">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow
+      <th *matHeaderCellDef class="hide-xs"
           mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</th>
-      <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
+      <td *matCellDef="let reservation" class="hide-xs" mat-cell>
         <div
           *ngIf="reservation.id; else skeleton">{{reservation?.professional?.displayName}}</div>
         <ng-template #skeleton>
@@ -76,9 +76,9 @@
     </ng-container>
 
     <ng-container matColumnDef="treatment">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow
+      <th *matHeaderCellDef class="hide-xs"
           mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }}</th>
-      <td *matCellDef="let reservation" fxHide.lt-sm fxShow mat-cell>
+      <td *matCellDef="let reservation" class="hide-xs" mat-cell>
         <div *ngIf="reservation.id; else skeleton">{{reservation.treatment.name}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>

@@ -1,4 +1,4 @@
-<h1 mat-dialog-title>{{'RESERVATION.TREATMENT.COLOR.CHANGE' | translate }}</h1>
+<h1 mat-dialog-title>{{ 'RESERVATION.TREATMENT.COLOR.CHANGE' | translate }}</h1>
 <div mat-dialog-content>
   <form [formGroup]="colorForm">
     <mat-form-field *ngIf="colors; else skeleton" appearance="outline">
@@ -9,7 +9,7 @@
       </label>
       <mat-autocomplete #autoColor="matAutocomplete" [displayWith]="displayFnColor">
         <mat-option *ngFor="let color of filteredColor | async" [value]="color">
-          {{color.name}}
+          {{ color.name }}
         </mat-option>
       </mat-autocomplete>
       <mat-error *ngIf="color.hasError('required')"
@@ -24,8 +24,8 @@
     </ng-template>
   </form>
 </div>
-<div mat-dialog-actions>
-  <div fxFlex></div>
+<div mat-dialog-actions class="card-actions">
+  <div class="spacer"></div>
   <div *ngIf="data.small; else largeButton">
     <button (click)="onNoClick" mat-icon-button>
       <mat-icon>clear</mat-icon>
@@ -38,6 +38,7 @@
   <ng-template #largeButton>
     <button (click)="onNoClick" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
     <button (click)="doAction" cdkFocusInitial color="primary" [disabled]="colorForm.invalid" mat-fab extended
-            class="icon-button">{{ 'RESERVATION.TREATMENT.COLOR.UPDATE' | translate }}</button>
+            class="icon-button">{{ 'RESERVATION.TREATMENT.COLOR.UPDATE' | translate }}
+    </button>
   </ng-template>
 </div>

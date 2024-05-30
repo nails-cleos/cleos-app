@@ -1,6 +1,6 @@
-<div class="flex-container" fxLayout="column">
-  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div fxFlex="60%" fxFlex.lt-sm="80%">
+<div class="flex-container">
+  <div class="card-container">
+    <div class="card-content">
       <app-balance [account]="account" [showAdd]="showAdd" [showView]="true" [language]="language"></app-balance>
       <form (ngSubmit)="submit" [formGroup]="form" novalidate>
         <mat-card appearance="outlined" class="style-card">
@@ -8,10 +8,11 @@
             <mat-card-title>{{ 'ACCOUNT.TITLE' | translate }}</mat-card-title>
             <mat-card-subtitle *ngIf="account?.customer; else skeleton">
               <ng-template [ngIf]="userId === account?.customer?.id" [ngIfElse]="noCustomer">
-                <a [routerLink]="['/', language, 'me', 'overview']">{{account?.customer?.displayName}}</a>
+                <a [routerLink]="['/', language, 'me', 'overview']">{{ account?.customer?.displayName }}</a>
               </ng-template>
               <ng-template #noCustomer>
-                <a [routerLink]="['/', language, 'users', account?.customer?.id, 'overview']">{{account?.customer?.displayName}}</a>
+                <a
+                  [routerLink]="['/', language, 'users', account?.customer?.id, 'overview']">{{ account?.customer?.displayName }}</a>
               </ng-template>
             </mat-card-subtitle>
             <ng-template #skeleton>
@@ -19,14 +20,13 @@
             </ng-template>
           </mat-card-header>
           <mat-card-content>
-            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
-              <div *ngIf="account?.currencies; else skeleton" fxLayout="row" fxLayoutAlign="space-between center"
-                   id="fields">
+            <div class="inner-container">
+              <div *ngIf="account?.currencies; else skeleton" class="fields-container">
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'COMMON.CURRENCY.FIELD' | translate }}</mat-label>
                   <label>
-                    <input (keydown)="keyDownHandler($event)" formControlName="currency"
-                           [matAutocomplete]="auto" matInput required type="text">
+                    <input (keydown)="keyDownHandler($event)" formControlName="currency" [matAutocomplete]="auto"
+                           matInput required type="text">
                   </label>
                   <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayCurrencyFn">
                     <mat-option *ngFor="let currency of filteredCurrencyOptions | async" [value]="currency">
@@ -34,19 +34,16 @@
                     </mat-option>
                   </mat-autocomplete>
                   <mat-error *ngIf="getForm.currency.hasError('required')"
-                             [innerHTML]="'COMMON.CURRENCY.REQUIRED' | translate">
-                  </mat-error>
+                             [innerHTML]="'COMMON.CURRENCY.REQUIRED' | translate"></mat-error>
                   <mat-error *ngIf="getForm.currency.hasError('requireMatch')"
-                             [innerHTML]="'COMMON.CURRENCY.INVALID' | translate">
-                  </mat-error>
-                  <mat-error *ngIf="errors['currency']">
-                    {{ errors['currency'] }}
-                  </mat-error>
+                             [innerHTML]="'COMMON.CURRENCY.INVALID' | translate"></mat-error>
+                  <mat-error *ngIf="errors['currency']">{{ errors['currency'] }}</mat-error>
                 </mat-form-field>
-                <button fxShow.lt-sm fxHide [routerLink]="['/', language, 'currency', 'add']" color="accent" mat-fab>
+                <button class="hide-on-mobile" [routerLink]="['/', language, 'currency', 'add']" color="accent" mat-fab>
                   <mat-icon matPrefix>add_card</mat-icon>
                 </button>
-                <button fxHide.lt-sm fxShow [routerLink]="['/', language, 'currency', 'add']" color="accent" mat-fab extended>
+                <button class="show-on-mobile" [routerLink]="['/', language, 'currency', 'add']" color="accent"
+                        mat-fab extended>
                   <mat-icon matPrefix>add_card</mat-icon>
                   <span>{{ 'COMMON.CURRENCY.ADD_BUTTON' | translate }}</span>
                 </button>
@@ -62,17 +59,10 @@
                          type="number" (keydown)="keyDownNumberHandler($event)">
                 </label>
                 <mat-error *ngIf="getForm.gift.hasError('required')"
-                           [innerHTML]="'ACCOUNT.GIFT.REQUIRED' | translate">
-                </mat-error>
-                <mat-error *ngIf="getForm.gift.hasError('min')">
-                  {{ 'ACCOUNT.GIFT.GREATER' | translate }}
-                </mat-error>
-                <mat-error *ngIf="getForm.gift.hasError('max')">
-                  {{ 'ACCOUNT.GIFT.LESS' | translate }}
-                </mat-error>
-                <mat-error *ngIf="errors['gift']">
-                  {{ errors['gift'] }}
-                </mat-error>
+                           [innerHTML]="'ACCOUNT.GIFT.REQUIRED' | translate"></mat-error>
+                <mat-error *ngIf="getForm.gift.hasError('min')">{{ 'ACCOUNT.GIFT.GREATER' | translate }}</mat-error>
+                <mat-error *ngIf="getForm.gift.hasError('max')">{{ 'ACCOUNT.GIFT.LESS' | translate }}</mat-error>
+                <mat-error *ngIf="errors['gift']">{{ errors['gift'] }}</mat-error>
               </mat-form-field>
               <ng-template #skeleton>
                 <div class="ssc-line"></div>
@@ -80,14 +70,13 @@
             </div>
           </mat-card-content>
         </mat-card>
-        <mat-card-actions>
-          <div fxFlex></div>
+        <mat-card-actions class="card-actions">
+          <div class="spacer"></div>
           <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
                   type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
           <button [disabled]="form.invalid || form.pristine" color="primary" mat-fab extended class="icon-button"
-                  type="submit">
-            {{ 'COMMON.BUTTON.UPDATE' | translate }}
+                  type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}
           </button>
         </mat-card-actions>
       </form>

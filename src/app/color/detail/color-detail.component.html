@@ -1,7 +1,6 @@
-<p>color-detail works!</p>
-<div class="flex-container" fxLayout="column">
-  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div fxFlex="60%" fxFlex.lt-sm="80%">
+<div class="flex-container">
+  <div class="card-container">
+    <div class="card-content">
       <mat-card appearance="outlined">
         <mat-card-header>
           <mat-card-title>{{ 'COLOR.DETAIL' | translate }}</mat-card-title>
@@ -12,7 +11,7 @@
         </mat-card-header>
         <form (ngSubmit)="update" [formGroup]="form" novalidate>
           <mat-card-content *ngIf="color; else boxSkeleton">
-            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+            <div class="inner-container">
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'COLOR.NAME.FIELD' | translate }}</mat-label>
                 <label>
@@ -38,8 +37,8 @@
             <div class="ssc-square mb"></div>
             <div class="ssc-hr"></div>
           </ng-template>
-          <mat-card-actions *ngIf="color; else buttonSkeleton">
-            <div fxFlex></div>
+          <mat-card-actions *ngIf="color; else buttonSkeleton" class="card-actions">
+            <div class="spacer"></div>
             <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
             <button [disabled]="form.invalid || form.pristine" color="primary" mat-fab extended class="icon-button"

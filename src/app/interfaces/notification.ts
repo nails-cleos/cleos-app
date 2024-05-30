@@ -4,7 +4,8 @@ export interface INotification {
   id: string;
   message: string;
   navigation: string;
-  date: Date;
+  date: number;
+  notDate: Date;
   read: boolean;
   deleted: boolean;
 }

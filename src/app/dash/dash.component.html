@@ -27,36 +27,36 @@
       </ng-template>
     </mat-card-title>
     <mat-card-subtitle class="calendar-title">
-      <button fxShow.lt-sm fxHide (click)="changeDate" (viewDateChange)="closeOpenMonthViewDay" [(viewDate)]="viewDate"
+      <button class="hide-gt-xs" (click)="changeDate" (viewDateChange)="closeOpenMonthViewDay" [(viewDate)]="viewDate"
               [class.spinner]="isLoading || isCalendarLoading" [disabled]="isLoading || isCalendarLoading" [view]="view"
               color="accent" mat-fab mwlCalendarPreviousView>
         <mat-icon>navigate_before</mat-icon>
       </button>
-      <button fxHide.lt-sm fxShow (click)="changeDate" (viewDateChange)="closeOpenMonthViewDay" [(viewDate)]="viewDate"
+      <button class="hide-xs" (click)="changeDate" (viewDateChange)="closeOpenMonthViewDay" [(viewDate)]="viewDate"
               [class.spinner]="isLoading || isCalendarLoading" [disabled]="isLoading || isCalendarLoading" [view]="view"
               color="accent" mat-fab extended mwlCalendarPreviousView>
         <mat-icon>navigate_before</mat-icon>
         <span>{{'COMMON.BUTTON.PREVIOUS' | translate}}</span>
       </button>
-      <button fxShow.lt-sm fxHide (click)="changeDate" [(viewDate)]="viewDate"
+      <button class="hide-gt-xs" (click)="changeDate" [(viewDate)]="viewDate"
               [class.spinner]="isLoading || isCalendarLoading"
               [disabled]="isLoading || isCalendarLoading" class="btn btn-outline-secondary" color="accent"
               mat-fab mwlCalendarToday>
         <mat-icon>today</mat-icon>
       </button>
-      <button fxHide.lt-sm fxShow (click)="changeDate" [(viewDate)]="viewDate"
+      <button class="hide-xs" (click)="changeDate" [(viewDate)]="viewDate"
               [class.spinner]="isLoading || isCalendarLoading"
               [disabled]="isLoading || isCalendarLoading" class="btn btn-outline-secondary" color="accent"
               mat-fab extended mwlCalendarToday>
         <mat-icon>today</mat-icon>
         <span>{{'COMMON.BUTTON.TODAY' | translate}}</span>
       </button>
-      <button fxShow.lt-sm fxHide (click)="changeDate" (viewDateChange)="closeOpenMonthViewDay" [(viewDate)]="viewDate"
+      <button class="hide-gt-xs" (click)="changeDate" (viewDateChange)="closeOpenMonthViewDay" [(viewDate)]="viewDate"
               [class.spinner]="isLoading || isCalendarLoading" [disabled]="isLoading || isCalendarLoading" [view]="view"
               color="accent" mat-fab mwlCalendarNextView>
         <mat-icon>navigate_next</mat-icon>
       </button>
-      <button fxHide.lt-sm fxShow (click)="changeDate" (viewDateChange)="closeOpenMonthViewDay" [(viewDate)]="viewDate"
+      <button class="hide-xs" (click)="changeDate" (viewDateChange)="closeOpenMonthViewDay" [(viewDate)]="viewDate"
               [class.spinner]="isLoading || isCalendarLoading" [disabled]="isLoading || isCalendarLoading" [view]="view"
               color="accent" mat-fab extended mwlCalendarNextView>
         <span>{{'COMMON.BUTTON.NEXT' | translate}}</span>

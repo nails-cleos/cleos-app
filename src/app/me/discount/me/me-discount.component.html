@@ -33,9 +33,9 @@
     </ng-container>
 
     <ng-container matColumnDef="used">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell
           mat-sort-header>{{ 'ME.DISCOUNT.LIST.COLUMN.USED' | translate }}</th>
-      <td *matCellDef="let userDiscount" fxHide.lt-sm fxShow>
+      <td *matCellDef="let userDiscount" class="hide-xs">
         <div *ngIf="userDiscount.id; else skeleton">
           <div *ngIf="userDiscount.used; else notUsed">
             <mat-icon>done</mat-icon>

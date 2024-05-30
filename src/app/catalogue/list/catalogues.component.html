@@ -17,7 +17,7 @@
         {{catalogue.description}}
       </mat-card-content>
       <mat-card-actions>
-        <div *ngIf="catalogue.id" class="pointer-only" fxFlex>
+        <div *ngIf="catalogue.id" class="pointer-only spacer">
           <mat-icon (click)="edit(catalogue)" class="edit" matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}"
                     matTooltipPosition="left">edit
           </mat-icon>

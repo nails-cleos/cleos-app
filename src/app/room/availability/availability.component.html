@@ -7,8 +7,7 @@
     </label>
     <span matPrefix><mat-icon (click)="tStart.open()" matPrefix>timer</mat-icon> &nbsp;</span>
     <ngx-material-timepicker [minutesGap]="15" #tStart></ngx-material-timepicker>
-    <mat-error *ngIf="start.hasError('required')"
-               [innerHTML]="'ROOM.START.REQUIRED' | translate">
+    <mat-error *ngIf="start.hasError('required')" [innerHTML]="'ROOM.START.REQUIRED' | translate">
     </mat-error>
   </mat-form-field>
   <mat-form-field class="margin-right-eight" appearance="outline">
@@ -22,8 +21,8 @@
     <mat-error *ngIf="end.hasError('required')" [innerHTML]="'ROOM.END.REQUIRED' | translate">
     </mat-error>
   </mat-form-field>
-  <mat-checkbox (change)="checked = !checked" color="primary"
-                [checked]="checked">{{ 'ROOM.LUNCH.CHECK' | translate }}</mat-checkbox>
+  <mat-checkbox (change)="checked = !checked" color="primary" [checked]="checked">{{ 'ROOM.LUNCH.CHECK' | translate }}
+  </mat-checkbox>
   <div *ngIf="checked">
     <div class="divider">
       <mat-label>{{ 'ROOM.LUNCH.FIELD' | translate }}</mat-label>
@@ -47,8 +46,8 @@
       <ngx-material-timepicker [minutesGap]="15" #tLunchEnd></ngx-material-timepicker>
     </mat-form-field>
   </div>
-  <div fxLayout="row" fxLayoutAlign="space-evenly end">
-    <div fxFlex></div>
+  <div class="card-actions">
+    <div class="spacer"></div>
     <button (click)="ignore.emit()" color="accent" mat-button type="button">
       {{ 'COMMON.BUTTON.IGNORE' | translate }}
     </button>

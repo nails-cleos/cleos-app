@@ -1,8 +1,8 @@
 <div>
   <fieldset>
-    <legend>{{'COMMON.SEARCH.TITLE' | translate }}</legend>
+    <legend>{{ 'COMMON.SEARCH.TITLE' | translate }}</legend>
     <form [formGroup]="form">
-      <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutAlign="space-around center">
+      <div class="row-column-space-around-center">
         <mat-form-field appearance="outline">
           <mat-label>{{ 'INVOICE.OFFICE.SEARCH' | translate }}</mat-label>
           <label>
@@ -12,7 +12,7 @@
           </label>
           <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
             <mat-option *ngFor="let office of filteredOffice | async" [value]="office">
-              {{office.name}}
+              {{ office.name }}
             </mat-option>
           </mat-autocomplete>
           <mat-error *ngIf="office.hasError('required')"
@@ -27,7 +27,7 @@
           <mat-chip-grid #chipList aria-label="Payment type selection">
             <mat-chip-row (removed)="remove(type)" *ngFor="let type of types" [removable]="true"
                           color="primary">
-              {{ 'COMMON.PAYMENT.TYPE.' + type.toUpperCase() | translate}}
+              {{ 'COMMON.PAYMENT.TYPE.' + type.toUpperCase() | translate }}
               <mat-icon matChipRemove>cancel</mat-icon>
             </mat-chip-row>
             <input #typeInput [formControl]="type" [matAutocomplete]="auto" [matChipInputFor]="chipList"
@@ -35,12 +35,12 @@
           </mat-chip-grid>
           <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
             <mat-option *ngFor="let type of filteredTypes | async" [value]="type">
-              {{ 'COMMON.PAYMENT.TYPE.' + type.toUpperCase() | translate}}
+              {{ 'COMMON.PAYMENT.TYPE.' + type.toUpperCase() | translate }}
             </mat-option>
           </mat-autocomplete>
         </mat-form-field>
         <mat-form-field appearance="outline">
-          <mat-label>{{'INVOICE.SEARCH.RANGE.FIELD' | translate }}</mat-label>
+          <mat-label>{{ 'INVOICE.SEARCH.RANGE.FIELD' | translate }}</mat-label>
           <mat-date-range-input [rangePicker]="drp" [formGroup]="dateRange">
             <input matStartDate [formControl]="startDate" placeholder="{{'INVOICE.SEARCH.RANGE.START' | translate }}">
             <input matEndDate [formControl]="endDate" placeholder="{{'INVOICE.SEARCH.RANGE.END' | translate }}">
@@ -50,7 +50,7 @@
           <mat-error [innerHTML]="'INVOICE.SEARCH.RANGE.REQUIRED' | translate">
           </mat-error>
         </mat-form-field>
-        <mat-form-field appearance="outline" style="margin-left: -15px">
+        <mat-form-field appearance="outline" ngStyle.gt-sm="margin-left: -15px">
           <mat-label>{{ 'INVOICE.SEARCH.START.FIELD' | translate }}</mat-label>
           <label>
             <input [formControl]="startNumber" matInput matNativeControl required [type]="'number'" [step]="1"
@@ -91,10 +91,10 @@
         </ng-container>
 
         <ng-container matColumnDef="position">
-          <th *matHeaderCellDef mat-header-cell fxHide.lt-sm fxShow>#</th>
-          <td *matCellDef="let invoice; let i = dataIndex;" mat-cell fxHide.lt-sm fxShow>
+          <th *matHeaderCellDef mat-header-cell class="hide-xs">#</th>
+          <td *matCellDef="let invoice; let i = dataIndex;" mat-cell class="hide-xs">
             <div *ngIf="invoice.id; else skeleton">
-              {{i + 1}}
+              {{ i + 1 }}
             </div>
             <ng-template #skeleton>
               <div class="ssc-line"></div>
@@ -105,7 +105,7 @@
         <ng-container matColumnDef="customer">
           <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.CUSTOMER' | translate }}</th>
           <td *matCellDef="let invoice" mat-cell>
-            <div *ngIf="invoice.id; else skeleton">{{invoice.customer.displayName}}</div>
+            <div *ngIf="invoice.id; else skeleton">{{ invoice.customer.displayName }}</div>
             <ng-template #skeleton>
               <div class="ssc-line"></div>
             </ng-template>
@@ -116,7 +116,7 @@
           <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</th>
           <td *matCellDef="let invoice" mat-cell>
             <div *ngIf="invoice.id; else skeleton">
-              {{invoice.timestamp | timeDetail | date:'short':invoice.room.timeZone:dateFormat}}
+              {{ invoice.timestamp | timeDetail | date:'short':invoice.room.timeZone:dateFormat }}
               <!--          <button (click)="openDialog(invoice)" *ngIf="showTimeZone(invoice)" mat-icon-button type="button">-->
               <!--            <mat-icon>info_outline</mat-icon>-->
               <!--          </button>-->
@@ -128,10 +128,11 @@
         </ng-container>
 
         <ng-container matColumnDef="treatment">
-          <th *matHeaderCellDef fxHide.lt-sm fxShow
-              mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }}</th>
-          <td *matCellDef="let invoice" fxHide.lt-sm fxShow mat-cell>
-            <div *ngIf="invoice.id; else skeleton">{{invoice.items[0].name}}</div>
+          <th *matHeaderCellDef class="hide-xs"
+              mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }}
+          </th>
+          <td *matCellDef="let invoice" class="hide-xs" mat-cell>
+            <div *ngIf="invoice.id; else skeleton">{{ invoice.items[0].name }}</div>
             <ng-template #skeleton>
               <div class="ssc-line"></div>
             </ng-template>
@@ -139,8 +140,8 @@
         </ng-container>
 
         <ng-container matColumnDef="actions">
-          <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-          <td *matCellDef="let invoice" fxHide.lt-sm fxShow mat-cell>
+          <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+          <td *matCellDef="let invoice" class="hide-xs" mat-cell>
             <div *ngIf="invoice.id; else skeleton">
               <button [routerLink]="['/', language, 'reservation', invoice.id]" mat-icon-button
                       matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
@@ -154,17 +155,14 @@
         </ng-container>
 
         <ng-container matColumnDef="expandedDetail">
-          <td *matCellDef="let invoice" [attr.colspan]="displayedColumns.length" fxHide fxShow.lt-sm>
-            <div [@detailExpand]="invoice === expandedInvoice ? 'expanded' : 'collapsed'" class="detail" fxHide
-                 fxShow.lt-sm>
+          <td *matCellDef="let invoice" [attr.colspan]="displayedColumns.length" class="hide-gt-xs">
+            <div [@detailExpand]="invoice === expandedInvoice ? 'expanded' : 'collapsed'" class="detail hide-gt-xs">
               <mat-list>
                 <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
                 <mat-list-item role="list">
-                  <ng-template>
-                    <button [routerLink]="['/', language, 'reservation', invoice.id]" color="primary" mat-icon-button>
-                      <mat-icon matListItemIcon>visibility</mat-icon>
-                    </button>
-                  </ng-template>
+                  <button [routerLink]="['/', language, 'reservation', invoice.id]" color="primary" mat-icon-button>
+                    <mat-icon matListItemIcon>visibility</mat-icon>
+                  </button>
                 </mat-list-item>
               </mat-list>
             </div>
@@ -173,17 +171,16 @@
 
         <ng-container matColumnDef="noContent">
           <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-            {{ 'COMMON.RESERVATION.LIST.ERROR.NO_CONTENT' | translate }}</td>
+            {{ 'COMMON.RESERVATION.LIST.ERROR.NO_CONTENT' | translate }}
+          </td>
         </ng-container>
 
         <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
         <tr (click)="expandedInvoice = expandedInvoice === invoice ? null : invoice"
-            *matRowDef="let invoice; columns: displayedColumns;" class="row" mat-row
-            [ngClass]="invoice.order"></tr>
-        <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row fxHide fxShow.lt-sm></tr>
+            *matRowDef="let invoice; columns: displayedColumns;" class="row" mat-row [ngClass]="invoice.order"></tr>
+        <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row hide-gt-xs" mat-row></tr>
 
         <tr *matFooterRowDef="['noContent']" [hidden]="invoices && invoices.length > 0" mat-footer-row></tr>
-
       </table>
     </div>
 
