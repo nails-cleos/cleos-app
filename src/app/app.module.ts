@@ -13,7 +13,7 @@ import { getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { AngularFireModule } from '@angular/fire/compat';
 import { initializeAppCheck, provideAppCheck, ReCaptchaV3Provider } from '@angular/fire/app-check';
 import { connectAuthEmulator, getAuth, provideAuth } from '@angular/fire/auth';
-import { getAnalytics, provideAnalytics } from '@angular/fire/analytics';
+import { getAnalytics, provideAnalytics, ScreenTrackingService, UserTrackingService } from '@angular/fire/analytics';
 import { getMessaging, provideMessaging } from '@angular/fire/messaging';
 import { connectDatabaseEmulator, getDatabase, provideDatabase } from '@angular/fire/database';
 
@@ -47,6 +47,7 @@ import { reducers } from './store/app.states';
 
 // Components
 import { AppComponent } from './app.component';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 export const localStorageSyncReducer =
   (reducer: ActionReducer<any>): ActionReducer<any> => localStorageSync({ keys: ['auth'], rehydrate: true })(reducer);
@@ -109,30 +110,7 @@ const cookieConfig: NgcCookieConsentConfig = {
       registrationStrategy: 'registerWhenStable:30000'
     }),
     NgxColorsModule,
-    AngularFireModule.initializeApp(environment.firebase),
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideAuth(() => {
-      const auth = getAuth();
-      if (environment.useEmulators) {
-        connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: false });
-      }
-      return auth;
-    }),
-
-    provideAnalytics(() => getAnalytics()),
-    provideMessaging(() => getMessaging()),
-    provideDatabase(() => {
-      const database = getDatabase();
-      if (environment.useEmulators) {
-        connectDatabaseEmulator(database, 'localhost', 9000);
-      }
-      return database;
-    }),
-    provideAppCheck(() => initializeAppCheck(getApp(), {
-        provider: new ReCaptchaV3Provider(environment.recaptcha.siteKey),
-        isTokenAutoRefreshEnabled: true
-      })
-    )
+    AngularFireModule.initializeApp(environment.firebase)
   ],
   providers: [
     {
@@ -157,7 +135,32 @@ const cookieConfig: NgcCookieConsentConfig = {
       useFactory: (pwaService: PwaService) => () => pwaService.initPwaPrompt(),
       deps: [PwaService],
       multi: true
-    }
+    },
+    provideCharts(withDefaultRegisterables()),
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideAuth(() => {
+      const auth = getAuth();
+      if (environment.useEmulators) {
+        connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: false });
+      }
+      return auth;
+    }),
+    provideAppCheck(() => initializeAppCheck(getApp(), {
+        provider: new ReCaptchaV3Provider(environment.recaptcha.siteKey),
+        isTokenAutoRefreshEnabled: true
+      })
+    ),
+    provideDatabase(() => {
+      const database = getDatabase();
+      if (environment.useEmulators) {
+        connectDatabaseEmulator(database, 'localhost', 9000);
+      }
+      return database;
+    }),
+    provideMessaging(() => getMessaging()),
+    provideAnalytics(() => getAnalytics()),
+    ScreenTrackingService,
+    UserTrackingService
   ],
   bootstrap: [AppComponent],
   exports: [TranslateModule]

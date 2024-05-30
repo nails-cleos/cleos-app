@@ -35,11 +35,11 @@
           </ng-template>
         </mat-card-content>
         <mat-card-actions class="top-space" style="margin: auto">
-          <button *ngIf="customer; else skeleton" class="hide-gt-xs" class="only-button" color="accent" mat-fab
+          <button *ngIf="customer; else skeleton" class="hide-gt-xs only-button" color="accent" mat-fab
                   [routerLink]="['/', language, 'users', customer.id]">
             <mat-icon matPrefix>edit</mat-icon>
           </button>
-          <button *ngIf="customer; else skeleton" class="hide-xs" class="only-button" color="accent" mat-fab
+          <button *ngIf="customer; else skeleton" class="hide-xs only-button" color="accent" mat-fab
                   extended [routerLink]="['/', language, 'users', customer.id]">
             <mat-icon matPrefix>edit</mat-icon>
             <span>{{ 'COMMON.BUTTON.EDIT' | translate }}</span>

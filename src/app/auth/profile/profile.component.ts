@@ -7,7 +7,7 @@ import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } 
 import * as fromActionsUser from '../../store/user.actions';
 import { fieldChange, valueChange } from '../../util/validators';
 import { findFlag, flags, IFlag } from '../../util/flags';
-import { createAddress, getDisplayNameInitials, getUserImage } from '../../util/helper';
+import { createAddress, getDisplayNameInitials, getLocale, getUserImage } from '../../util/helper';
 import { backendFormatDate, createDateFromString, newDate } from '../../util/dates';
 import { lightenDarkenColor } from '../../util/color';
 import { Role } from '../../interfaces/token';
@@ -86,7 +86,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     user.address = createAddress(this.formattedAddress, this.geometry?.location, this.user?.address);
 
     return this.store.dispatch(
-      new fromActionsUser.UpdateUser({ user, redirectUrl: `/${ lang }/auth/profile` })
+      new fromActionsUser.UpdateUser({ user, redirectUrl: `/${ getLocale(lang).language }/auth/profile` })
     );
   }
 

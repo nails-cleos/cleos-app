@@ -84,7 +84,7 @@
             <mat-icon matIconPrefix>arrow_back</mat-icon>
           </button>
           <ng-template [ngIf]="transaction.payment">
-            <button class="hide-gt-xs" class="icon-button" (click)="pay" mat-fab color="primary"
+            <button class="hide-gt-xs icon-button" (click)="pay" mat-fab color="primary"
                     *ngIf="transaction.payment.status === 'CREATED' && transaction.payment.type">
               <mat-icon [svgIcon]="transaction.payment.type" class="svg-icon"></mat-icon>
             </button>
@@ -95,7 +95,7 @@
               {{ 'COMMON.BUTTON.PAYMENT' | translate }}
             </button>
 
-            <button class="hide-gt-xs" class="icon-button" (click)="notify" mat-fab
+            <button class="hide-gt-xs icon-button" (click)="notify" mat-fab
                     *ngIf="transaction.payment.status === 'PENDING'">
               <mat-icon color="primary">published_with_changes</mat-icon>
             </button>

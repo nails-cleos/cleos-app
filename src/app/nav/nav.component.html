@@ -112,7 +112,7 @@
                 <span *ngIf="!not.read" class="dot"></span>{{ not.message }}
               </div>
               <div [ngClass]="{ 'gray-text': not.read}"
-                   matListItemLine>{{ not.date | date:'short':undefined:dateFormat }}
+                   matListItemLine>{{ not.notDate | date:'short':undefined:dateFormat }}
               </div>
               <mat-divider class="divider"></mat-divider>
             </mat-list-item>
@@ -157,7 +157,8 @@
         </ng-template>
 
         <button [matMenuTriggerFor]="menuLogged" [ngClass]="{'badge-padding': incomplete}" mat-icon-button>
-          <mat-icon [matBadgeHidden]="!incomplete" [matBadgeOverlap]="true" [matBadge]="'*'" matBadgeColor="warn">
+          <mat-icon [matBadgeHidden]="!incomplete" [matBadgeOverlap]="true" [matBadge]="'*'" matBadgeColor="warn"
+                    aria-hidden="false">
             settings
           </mat-icon>
         </button>
@@ -170,7 +171,7 @@
             <mat-divider></mat-divider>
             <a [routerLink]="['/', language, 'auth', 'profile']" mat-list-item>
               <mat-icon *ngIf="incomplete; else complete" matListItemIcon matBadgeColor="warn" [matBadge]="'*'"
-                        [matBadgeOverlap]="true">
+                        [matBadgeOverlap]="true" aria-hidden="false">
                 badge
               </mat-icon>
               <ng-template #complete>

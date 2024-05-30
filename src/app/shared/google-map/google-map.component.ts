@@ -2,10 +2,10 @@ import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Outpu
 import { ControlContainer, NgForm, UntypedFormGroup } from '@angular/forms';
 import { GeocodeService, MapStatus } from '../../services/geocode.service';
 import { MapInfoWindow, MapMarker } from '@angular/google-maps';
-import PlaceResult = google.maps.places.PlaceResult;
-import MapMouseEvent = google.maps.MapMouseEvent;
 import { AuthUserService } from '../../services/auth-user.service';
 import { Subscription } from 'rxjs';
+import PlaceResult = google.maps.places.PlaceResult;
+import MapMouseEvent = google.maps.MapMouseEvent;
 
 @Component({
   selector: 'app-google-map',

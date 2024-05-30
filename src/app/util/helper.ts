@@ -67,12 +67,13 @@ export class Locale implements ILocale {
 export const getLocale = (userLang?: string | null): ILocale => {
   let locale = 'en-NL';
   let flag;
-  if (userLang?.startsWith('es')) {
-    locale = userLang === 'es-AR' ? userLang : 'es';
+  const lang = userLang?.replace('_', '-');
+  if (lang?.startsWith('es')) {
+    locale = 'es';
     flag = locale;
-  } else if (userLang?.startsWith('en')) {
-    locale = userLang === 'en' ? userLang : 'en-GB';
-    flag = userLang === 'en-GB' || 'en' ? userLang : 'en-NL';
+  } else if (lang?.startsWith('en')) {
+    locale = 'en-GB';
+    flag = 'en-GB';
     // } else if (userLang?.startsWith('nl')) {
     //   locale = 'nl';
     //   flag = 'nl';
