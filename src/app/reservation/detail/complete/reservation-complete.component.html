@@ -120,24 +120,21 @@
         </ng-template>
         <mat-list>
           <ng-template [ngIf]="group.value && treatment.value">
-            <mat-list-item>
+            <mat-list-item >
               <mat-icon matListItemIcon>spa</mat-icon>
               <div class="bold" matListItemTitle>{{ 'COMMON.TREATMENT.FIELD' | translate }}</div>
-            </mat-list-item>
-            <mat-list-item style="text-align: center">
-              <div [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.GROUP' | translate: {name: group.value.name}"
-                   matListItemLine>
-              </div>
-              <div [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.NAME' | translate: {name: treatment.value.name}"
-                   matListItemLine>
-              </div>
               <ng-template [ngIf]="treatment.value.description">
                 <div
                   [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.DESCRIPTION' | translate: {description: treatment.value.description}"
                   matListItemLine>
                 </div>
               </ng-template>
-              <div matListItemTitle>
+            </mat-list-item>
+            <mat-list-item lines="3">
+              <div [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.NAME' | translate: {name: treatment.value.name, group: group.value.name}"
+                   matListItemTitle>
+              </div>
+              <div matListItemLine>
                 <span [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.PRICE' | translate"></span>
                 <span
                   class="vertical-divider bold"> {{ reservation.room.currency | currencySymbol }} {{ price.amount | number:'1.2-2' }}</span>
@@ -150,17 +147,18 @@
               <div class="bold" matListItemTitle>{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</div>
             </mat-list-item>
             <mat-selection-list #additional (selectionChange)="onChange(additional.selectedOptions.selected)">
-              <mat-list-option *ngFor="let it of additionalList" [selected]="isSelected(it)" [value]="it"
-                               togglePosition="before">
-                <div matListItemLine>{{ it.name }}</div>
-                <div matListItemLine>
+              @for (it of additionalList; track it) {
+                <mat-list-option [selected]="isSelected(it)" [value]="it" togglePosition="before">
+                  <div matListItemTitle>{{ it.name }}</div>
+                  <div matListItemLine>
                           <span>
                             {{ reservation.room.currency | currencySymbol }} {{ it.price | number:'1.2-2' }}
                           </span>
-                  &nbsp;&#9202;
-                  <span>{{ it.duration | durationTime }}</span>
-                </div>
-              </mat-list-option>
+                    &nbsp;&#9202;
+                    <span>{{ it.duration | durationTime }}</span>
+                  </div>
+                </mat-list-option>
+              }
             </mat-selection-list>
           </ng-template>
           <mat-divider></mat-divider>

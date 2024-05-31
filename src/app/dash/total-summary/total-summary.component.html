@@ -2,54 +2,54 @@
   <mat-card-content>
     <div class="flex-row-wrap">
       <div class="bottom" [ngClass]="{ 'year-cash-content': showCash, 'year-content': !showCash }">
+        <div mat-subheader class="header">{{ 'SUMMARY.INCOME' | translate }}</div>
         <mat-list-item>
-          <div matListItemTitle class="header">
-            {{'SUMMARY.INCOME' | translate}}
-          </div>
-        </mat-list-item>
-        <mat-list-item>
-          <div class="fields-container">
+          <div class="fields-container" matListItemTitle>
             <div>{{'SUMMARY.MONTHLY.TABLE.GROSS' | translate}}</div>
-            <div matListItemLine class="currency">
+            <div class="currency">
               {{summaryTotals.income.gross | currency: currency?.code: 'symbol': '1.2-2'}}
             </div>
           </div>
-          <div class="fields-container result">
+        </mat-list-item>
+        <mat-list-item>
+          <div class="fields-container result" matListItemTitle>
             <div>{{'SUMMARY.MONTHLY.TABLE.BTW' | translate}}</div>
-            <div matListItemLine class="currency">
+            <div class="currency">
               {{summaryTotals.income.btw | currency: currency?.code: 'symbol': '1.2-2'}}
             </div>
           </div>
-          <div class="fields-container">
+        </mat-list-item>
+        <mat-list-item>
+          <div class="fields-container" matListItemTitle>
             <div>{{'SUMMARY.MONTHLY.TABLE.NET' | translate}}</div>
-            <div matListItemLine class="currency">
+            <div class="currency">
               {{summaryTotals.income.net | currency: currency?.code: 'symbol': '1.2-2'}}
             </div>
           </div>
         </mat-list-item>
       </div>
       <div class="bottom" [ngClass]="{ 'year-cash-content': showCash, 'year-content': !showCash }">
+        <div mat-subheader class="header">{{ 'SUMMARY.EXPENSE' | translate }}</div>
         <mat-list-item>
-          <div matListItemTitle class="header">
-            {{'SUMMARY.EXPENSE' | translate}}
-          </div>
-        </mat-list-item>
-        <mat-list-item>
-          <div class="fields-container">
+          <div class="fields-container" matListItemTitle>
             <div>{{'SUMMARY.MONTHLY.TABLE.GROSS' | translate}}</div>
-            <div matListItemLine class="currency">
+            <div class="currency">
               {{summaryTotals.expense.gross | currency: currency?.code: 'symbol': '1.2-2'}}
             </div>
           </div>
-          <div class="fields-container result">
+        </mat-list-item>
+        <mat-list-item>
+          <div class="fields-container result" matListItemTitle>
             <div>{{'SUMMARY.MONTHLY.TABLE.BTW' | translate}}</div>
-            <div matListItemLine class="currency">
+            <div class="currency">
               {{summaryTotals.expense.btw | currency: currency?.code: 'symbol': '1.2-2'}}
             </div>
           </div>
-          <div class="fields-container">
+        </mat-list-item>
+        <mat-list-item>
+          <div class="fields-container" matListItemTitle>
             <div>{{'SUMMARY.MONTHLY.TABLE.NET' | translate}}</div>
-            <div matListItemLine class="currency">
+            <div class="currency">
               {{summaryTotals.expense.net | currency: currency?.code: 'symbol': '1.2-2'}}
             </div>
           </div>
@@ -57,27 +57,27 @@
       </div>
       <ng-template [ngIf]="showCash">
         <div class="bottom" [ngClass]="{ 'year-cash-content': showCash, 'year-content': !showCash }" style="margin: auto;">
+          <div mat-subheader class="header">{{ 'SUMMARY.CASH' | translate }}</div>
           <mat-list-item>
-            <div matListItemTitle class="header">
-              {{'SUMMARY.CASH' | translate}}
-            </div>
-          </mat-list-item>
-          <mat-list-item>
-            <div class="fields-container">
+            <div class="fields-container" matListItemTitle>
               <div>{{'SUMMARY.MONTHLY.TABLE.GROSS' | translate}}</div>
-              <div matListItemLine class="currency">
+              <div class="currency">
                 {{summaryTotals.cash.gross | currency: currency?.code: 'symbol': '1.2-2'}}
               </div>
             </div>
-            <div class="fields-container result">
+          </mat-list-item>
+          <mat-list-item>
+            <div class="fields-container result" matListItemTitle>
               <div>{{'SUMMARY.MONTHLY.TABLE.BTW' | translate}}</div>
-              <div matListItemLine class="currency">
+              <div class="currency">
                 {{summaryTotals.cash.btw | currency: currency?.code: 'symbol': '1.2-2'}}
               </div>
             </div>
-            <div class="fields-container">
+          </mat-list-item>
+          <mat-list-item>
+            <div class="fields-container" matListItemTitle>
               <div>{{'SUMMARY.MONTHLY.TABLE.NET' | translate}}</div>
-              <div matListItemLine class="currency">
+              <div class="currency">
                 {{summaryTotals.cash.net | currency: currency?.code: 'symbol': '1.2-2'}}
               </div>
             </div>
@@ -89,21 +89,25 @@
       <mat-divider style="margin-top: 2%"></mat-divider>
       <mat-card-footer>
         <mat-list-item>
-          <div class="fields-container">
+          <div class="fields-container" matListItemTitle>
             <div>{{'SUMMARY.MONTHLY.TABLE.GROSS' | translate}}</div>
-            <div matListItemLine class="currency">
+            <div class="currency">
               {{summaryTotals.totals.gross | currency: currency?.code: 'symbol': '1.2-2'}}
             </div>
           </div>
-          <div class="fields-container result">
+        </mat-list-item>
+        <mat-list-item>
+          <div class="fields-container result" matListItemTitle>
             <div>{{'SUMMARY.MONTHLY.TABLE.BTW' | translate}}</div>
-            <div matListItemLine class="currency">
+            <div class="currency">
               {{summaryTotals.totals.btw | currency: currency?.code: 'symbol': '1.2-2'}}
             </div>
           </div>
-          <div class="fields-container">
+        </mat-list-item>
+        <mat-list-item>
+          <div class="fields-container" matListItemTitle>
             <div>{{'SUMMARY.MONTHLY.TABLE.NET' | translate}}</div>
-            <div matListItemLine class="currency">
+            <div class="currency">
               {{summaryTotals.totals.net | currency: currency?.code: 'symbol': '1.2-2'}}
             </div>
           </div>

@@ -37,8 +37,8 @@
     </ng-template>
     <ng-template [ngIf]="reservation.note">
       <mat-list class="note">
-        <div mat-subheader>{{ 'RESERVATION.NOTE.FIELD' | translate }}</div>
         <mat-list-item>
+          <div matListItemTitle>{{ 'RESERVATION.NOTE.FIELD' | translate }}</div>
           <div matListItemLine>{{ reservation.note }}</div>
         </mat-list-item>
       </mat-list>
@@ -74,7 +74,7 @@
       <div mat-subheader>{{ 'RESERVATION.APPOINTMENT' | translate }}</div>
       <mat-list-item>
         <mat-icon matListItemIcon>event</mat-icon>
-        <div matListItemLine>
+        <div matListItemTitle>
           {{ start | date:'short':gmt:dateFormat }}
           <ng-template [ngIf]="showTimeZone()">
             <button (click)="openDialog(start)" mat-icon-button type="button">
@@ -333,14 +333,14 @@
 
                 <ng-template #noChange>
                   <mat-list-item role="list">
-                    <div matListItemLine>{{ 'COMMON.PAYMENT.TYPE.' + (payment.type || 'NONE') | translate }}</div>
+                    <div matListItemTitle>{{ 'COMMON.PAYMENT.TYPE.' + (payment.type || 'NONE') | translate }}</div>
                   </mat-list-item>
                 </ng-template>
 
               </mat-list>
               <mat-list>
-                <div mat-subheader>{{ 'COMMON.COLUMN.STATUS' | translate }}</div>
                 <mat-list-item role="list">
+                  <div matListItemTitle>{{ 'COMMON.COLUMN.STATUS' | translate }}</div>
                   <div matListItemLine>
                     {{ 'COMMON.STATUS.PAYMENT.' + (payment.status || 'NONE') | translate }}
                   </div>
@@ -349,8 +349,8 @@
               <ng-template
                 [ngIf]="!['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND_PENDING', 'REFUND', 'PENDING'].includes(payment.status)">
                 <mat-list>
-                  <div mat-subheader>{{ 'COMMON.BUTTON.PAYMENT' | translate }}</div>
                   <mat-list-item role="list">
+                    <div matListItemTitle>{{ 'COMMON.BUTTON.PAYMENT' | translate }}</div>
                     <button [routerLink]="['/me', 'payment', payment.id]" mat-icon-button>
                       <mat-icon class="payment-button" color="primary">payment</mat-icon>
                     </button>
@@ -359,8 +359,8 @@
               </ng-template>
               <ng-template [ngIf]="payment.status === 'PENDING'">
                 <mat-list>
-                  <div mat-subheader>{{ 'COMMON.BUTTON.NOTIFY' | translate }}</div>
                   <mat-list-item role="list">
+                    <div matListItemTitle>{{ 'COMMON.BUTTON.NOTIFY' | translate }}</div>
                     <button (click)="notify(payment)" mat-icon-button>
                       <mat-icon color="primary">published_with_changes</mat-icon>
                     </button>
@@ -464,14 +464,14 @@
           <td *matCellDef="let history" [attr.colspan]="displayedColumns.length" class="hide-gt-xs">
             <div [@detailExpand]="history === expanded ? 'expanded' : 'collapsed'" class="detail hide-gt-xs">
               <mat-list *ngIf="history.id">
-                <div matListItemTitle>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
                 <mat-list-item role="list">
+                  <div matListItemTitle>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
                   <div matListItemLine>{{ history?.professional.displayName }}</div>
                 </mat-list-item>
               </mat-list>
               <mat-list *ngIf="history.id">
-                <div matListItemTitle>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</div>
                 <mat-list-item role="list">
+                  <div matListItemTitle>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</div>
                   <div matListItemLine>
                     <mat-icon matPrefix>{{ history.state | reservationIcon }}</mat-icon>&nbsp;
                     {{ 'COMMON.STATUS.RESERVATION.' + history.state | translate }}

@@ -65,8 +65,8 @@
       <td *matCellDef="let office" [attr.colspan]="displayedColumns.length" class="hide-gt-xs">
         <div [@detailExpand]="office === expanded ? 'expanded' : 'collapsed'" class="detail hide-gt-xs">
           <mat-list>
-            <div mat-subheader>{{ 'OFFICE.LIST.COLUMN.MANAGER' | translate }}</div>
             <mat-list-item role="list">
+              <div matListItemTitle>{{ 'OFFICE.LIST.COLUMN.MANAGER' | translate }}</div>
               <div matListItemLine>{{office?.manager?.displayName}}</div>
             </mat-list-item>
             <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>

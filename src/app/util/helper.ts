@@ -109,8 +109,8 @@ export const getPrice = (reservation: IReservationAll, payments?: IPayment[]): I
   }
 
   const totalWithoutDiscount = total;
-  if (treatment.discount) {
-    discount = getDiscount(treatment.discount, total);
+  if (treatment.discountCustomer) {
+    discount = getDiscount(treatment.discountCustomer, total);
     priceWithDiscount = treatment.price - discount;
     total = total - discount;
   }

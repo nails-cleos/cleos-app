@@ -38,15 +38,15 @@
         <mat-icon>navigate_before</mat-icon>
         <span>{{'COMMON.BUTTON.PREVIOUS' | translate}}</span>
       </button>
-      <button class="hide-gt-xs" (click)="changeDate" [(viewDate)]="viewDate"
+      <button (click)="changeDate" [(viewDate)]="viewDate"
               [class.spinner]="isLoading || isCalendarLoading"
-              [disabled]="isLoading || isCalendarLoading" class="btn btn-outline-secondary" color="accent"
+              [disabled]="isLoading || isCalendarLoading" class="btn btn-outline-secondary hide-gt-xs" color="accent"
               mat-fab mwlCalendarToday>
         <mat-icon>today</mat-icon>
       </button>
-      <button class="hide-xs" (click)="changeDate" [(viewDate)]="viewDate"
+      <button (click)="changeDate" [(viewDate)]="viewDate"
               [class.spinner]="isLoading || isCalendarLoading"
-              [disabled]="isLoading || isCalendarLoading" class="btn btn-outline-secondary" color="accent"
+              [disabled]="isLoading || isCalendarLoading" class="btn btn-outline-secondary hide-xs" color="accent"
               mat-fab extended mwlCalendarToday>
         <mat-icon>today</mat-icon>
         <span>{{'COMMON.BUTTON.TODAY' | translate}}</span>

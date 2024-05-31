@@ -47,7 +47,9 @@ export class PaymentEffects {
   createOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentCreate)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.paymentService.create(payload.reservationId, payload.payment).pipe(
-      switchMap((payment: any) => of(new fromActionsPayment.PaymentSend(payment.link))),
+      switchMap((payment: any) => {
+        return of(new fromActionsPayment.PaymentSend(payment.link || payment.paymentURL));
+      }),
       catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
     ))
   ));
@@ -90,7 +92,7 @@ export class PaymentEffects {
   updateLink$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentUpdateLink)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.paymentService.updateLink(payload.id, payload.payment).pipe(
-      switchMap((payment: any) => of(new fromActionsPayment.PaymentSend(payment.link))),
+      switchMap((payment: any) => of(new fromActionsPayment.PaymentSend(payment.link || payment.paymentURL))),
       catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
     ))
   ));

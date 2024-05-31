@@ -156,16 +156,16 @@
         <td *matCellDef="let expense" [attr.colspan]="displayedColumns.length" class="hide-gt-xs">
           <div [@detailExpand]="expense === expanded ? 'expanded' : 'collapsed'" class="detail hide-gt-xs">
             <mat-list>
-              <div mat-subheader>{{ 'EXPENSE.LIST.COLUMN.INVOICE' | translate }}</div>
               <mat-list-item role="list">
+                <div matListItemTitle>{{ 'EXPENSE.LIST.COLUMN.INVOICE' | translate }}</div>
                 <div matListItemLine>{{expense.invoice}}</div>
               </mat-list-item>
-              <div mat-subheader>{{ 'EXPENSE.LIST.COLUMN.SUPPLY_STORE' | translate }}</div>
               <mat-list-item role="list">
-                <div matListItemLine>{{expense.supplyStore}}</div>
+                <div matListItemTitle>{{ 'EXPENSE.LIST.COLUMN.SUPPLY_STORE' | translate }}</div>
+                <div matListItemLine>{{expense.supplyStore?.name}}</div>
               </mat-list-item>
-              <div mat-subheader>{{ 'COMMON.COLUMN.TYPE' | translate }}</div>
               <mat-list-item role="list">
+                <div matListItemTitle>{{ 'COMMON.COLUMN.TYPE' | translate }}</div>
                 <div matListItemLine>{{'COMMON.EXPENSE.TYPE.' + expense.type | translate}}</div>
               </mat-list-item>
               <ng-template [ngIf]="expense.gross">

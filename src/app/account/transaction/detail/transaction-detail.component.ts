@@ -74,7 +74,7 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
         this.transaction = Object.assign({}, state.selected, { date: newDateTimestamp(state.selected.payment.timestamp) });
       }
       if (state.paths) {
-        this.router.navigate(state.paths);
+        this.router.navigate([this.language].concat(state.paths));
       } else if (state.subErrors) {
         this.router.navigate([this.language, 'me', 'transaction', this.id, 'payment']);
       }

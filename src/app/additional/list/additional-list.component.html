@@ -76,15 +76,15 @@
               <span matListItemTitle>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</span>
               {{additional.description}}
             </mat-list-item>
-            <div matListItemTitle>{{ 'ADDITIONAL.LIST.COLUMN.DURATION' | translate }}</div>
             <mat-list-item role="list">
+              <div matListItemTitle>{{ 'ADDITIONAL.LIST.COLUMN.DURATION' | translate }}</div>
               <div matListItemLine>
                 <mat-icon matPrefix>timer</mat-icon>&nbsp;
                 {{additional.hour | number:'2.0-0'}}:{{additional.minute | number:'2.0-0'}}
               </div>
             </mat-list-item>
             <ng-template [ngIf]="!additional.deleted">
-              <div matListItemTitle>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+              <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
               <mat-list-item role="list">
                 <button (click)="edit(additional)" color="primary" mat-icon-button>
                   <mat-icon matListItemIcon>edit</mat-icon>

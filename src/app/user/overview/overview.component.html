@@ -15,19 +15,19 @@
           </ng-template>
           <div class="dashboard-card-content">
             <div *ngIf="customer; else skeletonTitle" class="top-space">
-              <h2 class="bold">{{customer.displayName}}</h2>
+              <h2 class="bold">{{ customer.displayName }}</h2>
             </div>
             <div class="text-center" *ngIf="customer; else skeleton">
               <mat-icon color="primary">cake</mat-icon>
-              <span class="super">{{customer.dob ? customer.dob : 'N/A'}}</span>
+              <span class="super">{{ customer.dob ? customer.dob : 'N/A' }}</span>
             </div>
             <div class="text-center" *ngIf="customer; else skeleton">
               <mat-icon color="primary">phone</mat-icon>
-              <span class="super">{{customer.phone ? customer.phone : 'N/A'}}</span>
+              <span class="super">{{ customer.phone ? customer.phone : 'N/A' }}</span>
             </div>
             <div class="text-center" *ngIf="customer; else skeleton">
               <mat-icon color="primary">mail_outline</mat-icon>
-              <span class="super">{{customer.email ? customer.email : 'N/A'}}</span>
+              <span class="super">{{ customer.email ? customer.email : 'N/A' }}</span>
             </div>
           </div>
           <ng-template #skeletonTitle>
@@ -36,11 +36,11 @@
         </mat-card-content>
         <mat-card-actions class="top-space" style="margin: auto">
           <button *ngIf="customer; else skeleton" class="hide-gt-xs only-button" color="accent" mat-fab
-                  [routerLink]="['/', language, 'users', customer.id]">
+                  (click)="goToProfile">
             <mat-icon matPrefix>edit</mat-icon>
           </button>
-          <button *ngIf="customer; else skeleton" class="hide-xs only-button" color="accent" mat-fab
-                  extended [routerLink]="['/', language, 'users', customer.id]">
+          <button *ngIf="customer; else skeleton" class="hide-xs only-button" color="accent" mat-fab extended
+                  (click)="goToProfile">
             <mat-icon matPrefix>edit</mat-icon>
             <span>{{ 'COMMON.BUTTON.EDIT' | translate }}</span>
           </button>
@@ -54,7 +54,7 @@
                    [rowspan]="(layout | async)?.miniCardAccount?.rows">
       <mat-card appearance="outlined" class="dashboard-card">
         <mat-card-header *ngIf="account; else skeletonTitle" class="card-header">
-          <mat-card-title>{{'COMMON.ACCOUNT.BALANCE' | translate}}</mat-card-title>
+          <mat-card-title>{{ 'COMMON.ACCOUNT.BALANCE' | translate }}</mat-card-title>
         </mat-card-header>
         <ng-template #skeletonTitle>
           <div class="card-margin ssc-head-line"></div>
@@ -63,12 +63,12 @@
           <div *ngIf="account && customer; else box">
             <div class="card-icon top-space bottom-space" mat-card-avatar>
               <mat-icon class="avatar-icon pointer-only" color="primary" [matBadgeOverlap]="true" [matBadge]="'+'"
-                        [matBadgeColor]="'primary'" (click)="goTo">
+                        [matBadgeColor]="'primary'" (click)="goTo" aria-hidden="false">
                 account_balance
               </mat-icon>
             </div>
             <div class="text-center">
-              <h2 class="no-bottom">{{account.balance | currency: account.currency.code}}</h2>
+              <h2 class="no-bottom">{{ account.balance | currency: account.currency.code }}</h2>
             </div>
           </div>
           <ng-template #box>
@@ -81,7 +81,7 @@
                    [rowspan]="( layout | async )?.miniCard?.rows">
       <mat-card appearance="outlined" class="dashboard-card">
         <mat-card-header *ngIf="mc.title; else skeletonTitle" class="card-header">
-          <mat-card-title>{{mc.title | translate}}</mat-card-title>
+          <mat-card-title>{{ mc.title | translate }}</mat-card-title>
         </mat-card-header>
         <ng-template #skeletonTitle>
           <div class="card-margin ssc-head-line"></div>
@@ -89,22 +89,22 @@
         <mat-card-content *ngIf="!mc.error; else error">
           <div *ngIf="mc.title; else box">
             <div class="card-icon top-space bottom-space" mat-card-avatar>
-              <mat-icon class="avatar-icon" color="primary">{{mc.icon}}</mat-icon>
+              <mat-icon class="avatar-icon" color="primary">{{ mc.icon }}</mat-icon>
             </div>
             <div *ngIf="mc.split; else noSplit" class="text-center">
               <div *ngIf="mc.link; else noLink">
                 <h3 (click)="mc.link(mc.primaryId)" [ngClass]="{'pointer': mc.primaryId}"
-                    class="no-bottom">{{mc.primaryValue}}</h3>
+                    class="no-bottom">{{ mc.primaryValue }}</h3>
                 <h3 (click)="mc.link(mc.secondaryId)" *ngIf="mc.secondaryValue"
-                    [ngClass]=" {'pointer': mc.secondaryId}">{{mc.secondaryValue}}</h3>
+                    [ngClass]=" {'pointer': mc.secondaryId}">{{ mc.secondaryValue }}</h3>
               </div>
               <ng-template #noLink>
-                <h3 class="no-bottom">{{mc.primaryValue}}</h3>
-                <h3 *ngIf="mc.secondaryValue">{{mc.secondaryValue}}</h3>
+                <h3 class="no-bottom">{{ mc.primaryValue }}</h3>
+                <h3 *ngIf="mc.secondaryValue">{{ mc.secondaryValue }}</h3>
               </ng-template>
             </div>
             <ng-template #noSplit>
-              <h1 class="text-center">{{mc.primaryValue}}/{{mc.secondaryValue}}</h1>
+              <h1 class="text-center">{{ mc.primaryValue }}/{{ mc.secondaryValue }}</h1>
             </ng-template>
           </div>
           <ng-template #box>

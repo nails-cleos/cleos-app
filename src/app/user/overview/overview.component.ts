@@ -80,6 +80,15 @@ export class OverviewComponent implements OnInit, OnDestroy {
     return;
   }
 
+  get goToProfile(): void {
+    if (this.hasAdminRole) {
+      this.router.navigate(['/', this.language, 'users', this.customer?.id]);
+    } else {
+      this.router.navigate(['/', this.language, 'auth', 'profile']);
+    }
+    return;
+  }
+
   get notification(): void {
     let message: string;
     if (this.upcoming.length === 1) {

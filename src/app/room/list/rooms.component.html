@@ -16,10 +16,12 @@
           mat-sort-header>{{ 'ROOM.LIST.COLUMN.CURRENCY' | translate }}</th>
       <td *matCellDef="let room" class="hide-xs" mat-cell>
         <div *ngIf="room.id; else skeleton">
-          <mat-list-item>
-            <mat-icon matListItemIcon>{{room.currency.icon}}</mat-icon>
-            <div matListItemLine>{{room.currency.code}}</div>
-          </mat-list-item>
+          <mat-list>
+            <mat-list-item>
+              <mat-icon matListItemIcon>{{room.currency.icon}}</mat-icon>
+              <div matListItemTitle>{{room.currency.code}}</div>
+            </mat-list-item>
+          </mat-list>
         </div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -114,8 +116,8 @@
                 <div matListItemLine>{{gmt}}</div>
               </mat-list-item>
             </div>
+            <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
             <mat-list-item role="list">
-              <div matListItemTitle>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
               <button (click)="edit(room)" *ngIf="!room.deleted" color="primary" mat-icon-button>
                 <mat-icon>edit</mat-icon>
               </button>

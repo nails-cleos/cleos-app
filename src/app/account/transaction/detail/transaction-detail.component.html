@@ -74,12 +74,12 @@
         <mat-divider></mat-divider>
         <mat-card-actions *ngIf="transaction; else buttonSkeleton">
           <div class="spacer"></div>
-          <button class="hide-gt-xs" appBackButton [date]="transaction.date" [step]="step" color="accent" mat-fab
-                  class="icon-button">
+          <button appBackButton [date]="transaction.date" [step]="step" color="accent" mat-fab
+                  class="icon-button hide-gt-xs">
             <mat-icon matIconPrefix>arrow_back</mat-icon>
           </button>
-          <button class="hide-xs" appBackButton [date]="transaction.date" [step]="step" color="accent" mat-fab
-                  extended class="icon-button">
+          <button appBackButton [date]="transaction.date" [step]="step" color="accent" mat-fab
+                  extended class="icon-button hide-xs">
             {{ 'COMMON.BUTTON.BACK' | translate }}
             <mat-icon matIconPrefix>arrow_back</mat-icon>
           </button>
@@ -89,7 +89,7 @@
               <mat-icon [svgIcon]="transaction.payment.type" class="svg-icon"></mat-icon>
             </button>
 
-            <button class="hide-xs" (click)="pay" mat-fab extended color="primary" class="icon-button"
+            <button (click)="pay" mat-fab extended color="primary" class="icon-button hide-xs"
                     *ngIf="transaction.payment.status === 'CREATED' && transaction.payment.type">
               <mat-icon matIconPrefix>payment</mat-icon>
               {{ 'COMMON.BUTTON.PAYMENT' | translate }}
@@ -100,7 +100,7 @@
               <mat-icon color="primary">published_with_changes</mat-icon>
             </button>
 
-            <button class="hide-xs" (click)="notify" color="primary" mat-fab extended class="icon-button"
+            <button (click)="notify" color="primary" mat-fab extended class="icon-button hide-xs"
                     *ngIf="transaction.payment.status === 'PENDING'">
               <mat-icon matIconPrefix>published_with_changes</mat-icon>
               {{ 'COMMON.BUTTON.NOTIFY' | translate }}

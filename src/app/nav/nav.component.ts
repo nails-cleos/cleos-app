@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subject, Subscription } from 'rxjs';
-import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators';
+import { map, shareReplay } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import {
@@ -129,8 +129,6 @@ export class NavComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    console.log("INIT")
-    console.log(this.notifications)
     this.subscribe();
     this.getNotifications();
     this.authUserService.cookieConsent(this.translate);
@@ -174,10 +172,6 @@ export class NavComponent implements OnInit, OnDestroy {
     drawer?.toggle();
     this.error = undefined;
     this.router.navigate([this.language].concat(menu.path.split('/')));
-  }
-
-  setStep(index: number): void {
-    this.step = index;
   }
 
   private selectStore(states: any[]): void {
@@ -256,7 +250,6 @@ export class NavComponent implements OnInit, OnDestroy {
 
     this.notificationSubscription = this.getNotificationState.subscribe((state) => {
       if (state.data && state.data.page && state.data.page.content[0]?.id) {
-        console.log(state);
         this.workDay = state.data.workDay;
         this.notifications = state.data.page.number === 0 ? state.data.page.content.map((it: INotification) =>
           Object.assign({}, it, { notDate: newDateTimestamp(it.date) })) : this.notifications;

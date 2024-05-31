@@ -51,7 +51,7 @@ export interface IGroupService {
 export interface ITreatmentAll extends IService {
   duration: string;
   description?: string;
-  discount?: IDiscount;
+  discountCustomer?: IDiscount;
   extraDescription?: string;
   extraPrice?: number;
   primary?: boolean;
@@ -122,8 +122,8 @@ export class Price implements IPrice {
     this.priceWithAdditional = priceWithAdditional;
     this.percentageToPaid = percentageToPaid;
     this.balance = balance;
-    this.toPaid = (total * percentageToPaid / 100) - totalPaid - balance; // Total to pay
-    this.penalty = (total * PENALTY / 100);
+    this.toPaid = this.calculateToPaid(); // Total to pay
+    this.penalty = this.calculatePenalty();
     this.isPaid = this.calculateIsPaid();
   }
 
@@ -145,6 +145,14 @@ export class Price implements IPrice {
 
   private calculateIsPaid(): boolean {
     return this.amount > 0 && this.totalPaid + this.balance >= this.total;
+  }
+
+  private calculateToPaid(): number {
+    return (this.total * this.percentageToPaid / 100) - this.totalPaid - this.balance;
+  }
+
+  private calculatePenalty(): number {
+    return (this.total * PENALTY / 100);
   }
 }
 

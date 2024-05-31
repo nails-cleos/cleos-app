@@ -168,26 +168,28 @@
         <mat-list-item *ngIf="treatment.value">
           <div class="bold" matListItemTitle>{{ 'ME.RESERVATION.TREATMENT.DETAIL' | translate }}</div>
           <mat-icon matListItemIcon>spa</mat-icon>
-          <mat-divider></mat-divider>
         </mat-list-item>
-        <mat-list-item *ngIf="treatment.value">
+        <mat-divider></mat-divider>
+        <mat-list-item *ngIf="treatment.value" lines="3">
           <div *ngIf="treatment.value.description" [innerHTML]="'ME.RESERVATION.TREATMENT.COMPLETE.DESCRIPTION' |
                   translate: {description: treatment.value.description}"
-               matListItemLine>
+               matListItemTitle>
           </div>
-          <div *ngIf="!isEditing; else editing" matListItemLine>
-            <span [class.strikethrough]="discount.value"
-                  class="raised-button">{{ room.value.currency | currencySymbol }} {{ treatment.value.price | number:'1.2-2' }}</span>
-            <span *ngIf="price.priceWithDiscount" [@discountAnimation]
-                  class="raised-button bold">{{ room.value.currency | currencySymbol }} {{ price.priceWithDiscount | number:'1.2-2' }}</span>
-          </div>
-          <ng-template #editing>
+          <div matListItemLine>
             <span [innerHTML]="'ME.RESERVATION.TREATMENT.COMPLETE.PRICE' | translate"></span>
-            <span
-              class="raised-button">{{ room.value.currency | currencySymbol }} {{ (price.priceWithDiscount ? price.priceWithDiscount : treatment.value.price) | number:'1.2-2' }}</span>
-            <span *ngIf="price.priceWithDiscount"
-                  class="raised-button bold">{{ 'ME.RESERVATION.TREATMENT.DISCOUNT.ADD' | translate }}</span>
-          </ng-template>
+            <ng-template [ngIf]="isEditing" [ngIfElse]="isAdding">
+              <span
+                class="raised-button">{{ room.value.currency | currencySymbol }} {{ (price.priceWithDiscount ? price.priceWithDiscount : treatment.value.price) | number:'1.2-2' }}</span>
+              <span *ngIf="price.priceWithDiscount"
+                    class="raised-button bold">{{ 'ME.RESERVATION.TREATMENT.DISCOUNT.ADD' | translate }}</span>
+            </ng-template>
+            <ng-template #isAdding>
+              <span [class.strikethrough]="discount.value"
+                    class="raised-button">{{ room.value.currency | currencySymbol }} {{ treatment.value.price | number:'1.2-2' }}</span>
+                <span *ngIf="price.priceWithDiscount" [@discountAnimation]
+                      class="raised-button bold">{{ room.value.currency | currencySymbol }} {{ price.priceWithDiscount | number:'1.2-2' }}</span>
+            </ng-template>
+          </div>
           <div matListItemLine>
             <span [innerHTML]="'ME.RESERVATION.TREATMENT.COMPLETE.DURATION' | translate"></span>
             <span class="raised-button">&#9202; {{ treatment.value.duration | durationTime }}</span>
@@ -205,17 +207,17 @@
   <div *ngIf="additionalList; else skeleton">
     <mat-selection-list #additional (selectionChange)="onChange(additional.selectedOptions.selected)" class="app-class">
       <mat-divider></mat-divider>
-      <ng-container *ngFor="let it of additionalList">
-        <mat-list-option [selected]="isSelected(it)" [value]="it" checkboxPosition="before" style="padding-bottom: 8px">
-          <div matListItemTitle>{{ it.name }}</div>
-          <div matListItemLine>{{ room.value.currency | currencySymbol }} {{ it.price | number:'1.2-2' }}</div>
-          <div matListItemLine>
-            <span>&#9202; {{ it.duration | durationTime }}</span>
+      @for (it of additionalList; track it) {
+        <mat-list-option [selected]="isSelected(it)" [value]="it" togglePosition="before" lines="3"
+                         style="padding-bottom: 8px">
+          <div matListItemTitle>{{ it.name }} {{ room.value.currency | currencySymbol }}
+            ({{ it.price | number:'1.2-2' }} -
+            &#9202; {{ it.duration | durationTime }})
           </div>
           <div *ngIf="it.description" class="description" matListItemLine>{{ it.description }}</div>
         </mat-list-option>
-        <mat-divider></mat-divider>
-      </ng-container>
+        <mat-divider class="top-space"></mat-divider>
+      }
     </mat-selection-list>
   </div>
   <ng-template #skeleton>
@@ -418,22 +420,25 @@
               <ng-container *ngTemplateOutlet="stepOne"></ng-container>
               <mat-list-item *ngIf="room.value && room.value.address && professional.value">
                 <mat-icon matListItemIcon>room</mat-icon>
-                <div class="bold" mat-subheader>{{ 'ME.RESERVATION.ROOM.DETAIL' | translate }}</div>
+                <div class="bold" matListItemTitle>{{ 'ME.RESERVATION.ROOM.DETAIL' | translate }}</div>
                 <mat-divider></mat-divider>
               </mat-list-item>
+              <div [innerHTML]="'ME.RESERVATION.ROOM.PROFESSIONAL.NAME' |
+                  translate: {name: professionalName}" mat-subheader>
+              </div>
               <mat-list-item *ngIf="room.value && room.value.address && professional.value">
-                <div [innerHTML]="'ME.RESERVATION.ROOM.PROFESSIONAL.NAME' |
-                  translate: {name: professionalName}" mat-line>
-                </div>
-                <div [innerHTML]="'ME.RESERVATION.ROOM.NAME.NAME' | translate: {name: roomDetail}" mat-line></div>
+                <div [innerHTML]="'ME.RESERVATION.ROOM.NAME.NAME' | translate: {name: roomDetail}"
+                     matListItemTitle></div>
                 <div [innerHTML]="'ME.RESERVATION.ROOM.ADDRESS.NAME' |
-                  translate: {name: room.value.address.name}" mat-line>
+                  translate: {name: room.value.address.name}" matListItemLine>
                 </div>
-                <div *ngIf="room.value.address.description" [innerHTML]="'ME.RESERVATION.ROOM.ADDRESS.DESCRIPTION' |
+              </mat-list-item>
+              <mat-list-item *ngIf="room.value.address?.description">
+                <div [innerHTML]="'ME.RESERVATION.ROOM.ADDRESS.DESCRIPTION' |
                   translate: {description: room.value.address.description}"
-                     mat-line>
+                     matListItemLine>
                 </div>
-                <div *ngIf="distance" [innerHTML]="distance" mat-line></div>
+                <div *ngIf="distance" [innerHTML]="distance" matListItemLine></div>
               </mat-list-item>
             </div>
             <div class="vertical-divider"></div>
@@ -558,22 +563,25 @@
                 <ng-container *ngTemplateOutlet="stepOne"></ng-container>
                 <mat-list-item *ngIf="room.value && room.value.address && professional.value">
                   <mat-icon matListItemIcon>room</mat-icon>
-                  <div class="bold" mat-subheader>{{ 'ME.RESERVATION.ROOM.DETAIL' | translate }}</div>
+                  <div class="bold" matListItemTitle>{{ 'ME.RESERVATION.ROOM.DETAIL' | translate }}</div>
                   <mat-divider></mat-divider>
                 </mat-list-item>
+                <div [innerHTML]="'ME.RESERVATION.ROOM.PROFESSIONAL.NAME' |
+                  translate: {name: professionalName}" mat-subheader>
+                </div>
                 <mat-list-item *ngIf="room.value && room.value.address && professional.value">
-                  <div [innerHTML]="'ME.RESERVATION.ROOM.PROFESSIONAL.NAME' |
-                  translate: {name: professionalName}" mat-line>
+                  <div [innerHTML]="'ME.RESERVATION.ROOM.NAME.NAME' | translate: {name: roomDetail}"
+                       matListItemTitle></div>
+                  <div [innerHTML]="'ME.RESERVATION.ROOM.ADDRESS.NAME' | translate: {name: room.value.address.name}"
+                       matListItemLine>
                   </div>
-                  <div [innerHTML]="'ME.RESERVATION.ROOM.NAME.NAME' | translate: {name: roomDetail}" mat-line></div>
-                  <div [innerHTML]="'ME.RESERVATION.ROOM.ADDRESS.NAME' |
-                  translate: {name: room.value.address.name}" mat-line>
+                </mat-list-item>
+                <mat-list-item *ngIf="room.value.address?.description">
+                  <div
+                    [innerHTML]="'ME.RESERVATION.ROOM.ADDRESS.DESCRIPTION' | translate: {description: room.value.address.description}"
+                    matListItemTitle>
                   </div>
-                  <div *ngIf="room.value.address.description" [innerHTML]="'ME.RESERVATION.ROOM.ADDRESS.DESCRIPTION' |
-                  translate: {description: room.value.address.description}"
-                       mat-line>
-                  </div>
-                  <div *ngIf="distance" [innerHTML]="distance" mat-line></div>
+                  <div *ngIf="distance" [innerHTML]="distance" matListItemLine></div>
                 </mat-list-item>
               </div>
               <div class="vertical-divider"></div>

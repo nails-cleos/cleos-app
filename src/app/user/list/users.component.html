@@ -1,6 +1,6 @@
 <div>
   <fieldset>
-    <legend>{{'COMMON.SEARCH.TITLE' | translate }}</legend>
+    <legend>{{ 'COMMON.SEARCH.TITLE' | translate }}</legend>
     <mat-form-field appearance="outline">
       <mat-label>{{ 'COMMON.LABEL.FILTER' | translate }}</mat-label>
       <label>
@@ -14,7 +14,7 @@
       <ng-container matColumnDef="position">
         <th *matHeaderCellDef mat-header-cell>#</th>
         <td *matCellDef="let user; let i = dataIndex;" mat-cell>
-          <div *ngIf="user.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
+          <div *ngIf="user.id; else skeleton">{{ (paginator.pageIndex * pageSize) + i + 1 }}</div>
           <ng-template #skeleton>
             <div class="ssc-line"></div>
           </ng-template>
@@ -24,7 +24,7 @@
       <ng-container matColumnDef="displayName">
         <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
         <td *matCellDef="let user" mat-cell>
-          <div *ngIf="user.id; else skeleton">{{user.displayName}}</div>
+          <div *ngIf="user.id; else skeleton">{{ user.displayName }}</div>
           <ng-template #skeleton>
             <div class="ssc-line"></div>
           </ng-template>
@@ -33,9 +33,10 @@
 
       <ng-container matColumnDef="email">
         <th *matHeaderCellDef class="hide-xs" mat-header-cell
-            mat-sort-header>{{ 'USER.LIST.COLUMN.EMAIL' | translate }}</th>
+            mat-sort-header>{{ 'USER.LIST.COLUMN.EMAIL' | translate }}
+        </th>
         <td *matCellDef="let user" class="column-large-text" class="hide-xs" mat-cell>
-          <div *ngIf="user.id; else skeleton">{{user.email}}</div>
+          <div *ngIf="user.id; else skeleton">{{ user.email }}</div>
           <ng-template #skeleton>
             <div class="ssc-line"></div>
           </ng-template>
@@ -53,7 +54,8 @@
                 </mat-icon>
               </ng-template>
               <ng-template [ngIf]="!user.uid">
-                <mat-icon color="warn" matTooltip="{{ 'USER.LIST.STATUS.NOT_CREATED' | translate }}" matTooltipPosition="left">
+                <mat-icon color="warn" matTooltip="{{ 'USER.LIST.STATUS.NOT_CREATED' | translate }}"
+                          matTooltipPosition="left">
                   gpp_bad
                 </mat-icon>
               </ng-template>
@@ -123,33 +125,39 @@
           <div [@detailExpand]="user === expandedUser ? 'expanded' : 'collapsed'"
                class="user-detail">
             <mat-list>
-              <div class="hide-gt-xs" matListItemTitle>{{ 'USER.LIST.COLUMN.DISPLAY_NAME' | translate }}</div>
               <mat-list-item class="hide-gt-xs" role="list">
-                <div matListItemLine>{{user.displayName}}</div>
+                <span class="hide-gt-xs" matListItemTitle>{{ 'USER.LIST.COLUMN.DISPLAY_NAME' | translate }}</span>
+                <span matListItemLine>{{ user.displayName }}</span>
               </mat-list-item>
-              <div class="hide-gt-xs" matListItemTitle>{{ 'USER.LIST.COLUMN.EMAIL' | translate }}</div>
               <mat-list-item class="hide-gt-xs" role="list">
-                <div mat-line>{{user.email}}</div>
+                <span class="hide-gt-xs" matListItemTitle>{{ 'USER.LIST.COLUMN.EMAIL' | translate }}</span>
+                <span matListItemLine>{{ user.email }}</span>
               </mat-list-item>
-              <div class="hide-xs" matListItemTitle>{{ 'USER.LIST.COLUMN.DETAIL.TITLE' | translate }}</div>
+              <span class="hide-xs" mat-subheader>{{ 'USER.LIST.COLUMN.DETAIL.TITLE' | translate }}</span>
               <ng-template [ngIf]="!user.deleted">
                 <div class="flex-container hide-xs">
                   <div class="flex-child">
-                    <mat-list-item *ngFor="let it of user.authorities" role="list">
-                      <mat-icon matListItemIcon>{{getIcon(it.authority)}}</mat-icon>
-                      <div matListItemTitle>{{ 'COMMON.ROLES.' + it.authority | translate}}
-                        <button (click)="removeRole(user, it.authority)" color="warn" mat-icon-button>
-                          <mat-icon>person_remove</mat-icon>
-                        </button>
-                      </div>
-                    </mat-list-item>
+                    @for (it of user.authorities; track it) {
+                      <mat-list-item>
+                        <mat-icon matListItemIcon>{{ getIcon(it.authority) }}</mat-icon>
+                        <div matListItemTitle>{{ 'COMMON.ROLES.' + it.authority | translate }}
+                          <button (click)="removeRole(user, it.authority)" color="warn" mat-icon-button>
+                            <mat-icon>person_remove</mat-icon>
+                          </button>
+                        </div>
+                      </mat-list-item>
+                    }
                   </div>
-                  <div *ngIf="!user.deleted" class="flex-child">
-                    <mat-list-item *ngFor="let role of user.missing">
-                      <mat-icon matListItemIcon>{{getIcon(role)}}</mat-icon>
-                      <button (click)="addRole(user, role)" color="primary" mat-button>
-                        {{'COMMON.BUTTON.ADD' | translate}} {{ 'COMMON.ROLES.' + role | translate | lowercase}}</button>
-                    </mat-list-item>
+                  <mat-divider></mat-divider>
+                  <div class="flex-child">
+                    @for (role of user.missing; track role) {
+                      <mat-list-item>
+                        <mat-icon matListItemIcon>{{ getIcon(role) }}</mat-icon>
+                        <button (click)="addRole(user, role)" color="primary" mat-button>
+                          {{ 'COMMON.BUTTON.ADD' | translate }} {{ 'COMMON.ROLES.' + role | translate | lowercase }}
+                        </button>
+                      </mat-list-item>
+                    }
                   </div>
                 </div>
               </ng-template>
@@ -194,7 +202,7 @@
 
       <ng-container matColumnDef="noContent">
         <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-          {{ 'USER.LIST.ERROR.NO_CONTENT' | translate }} '{{filter}}'
+          {{ 'USER.LIST.ERROR.NO_CONTENT' | translate }} '{{ filter }}'
         </td>
       </ng-container>
 
