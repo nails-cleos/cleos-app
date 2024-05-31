@@ -63,7 +63,7 @@
       "COMPLETE": {
         "DESCRIPTION": "<span class='bold'>Description:</span> {{description}}",
         "GROUP": "<span class='bold'>Service type:</span> {{name}}",
-        "NAME": "<span class='bold'>Service:</span> {{name}}",
+        "NAME": "<span class='bold'>Service:</span> {{group}} - {{name}}",
         "TOTAL": "<span class='bold'>Total:</span>",
         "PRICE": "<span class='bold'>Price:</span>",
         "DURATION": "<span class='bold'>Duration:</span>"

@@ -55,10 +55,10 @@
       <td *matCellDef="let currency" [attr.colspan]="displayedColumns.length" class="hide-gt-xs">
         <div [@detailExpand]="currency === expanded ? 'expanded' : 'collapsed'" class="detail hide-gt-xs">
           <mat-list>
-            <div mat-subheader>{{ 'COMMON.COLUMN.NAME' | translate }}</div>
             <mat-list-item role="list">
+              <div matListItemTitle>{{ 'COMMON.COLUMN.NAME' | translate }}</div>
               <mat-icon matListItemIcon>{{currency.icon}}</mat-icon>
-              <div mat-line>{{currency.name}}</div>
+              <div matListItemLine>{{currency.name}}</div>
             </mat-list-item>
             <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
             <mat-list-item role="list">

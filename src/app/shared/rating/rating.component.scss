@@ -2,15 +2,30 @@
   visibility: hidden;
 }
 
+//.none {
+//  display: none;
+//}
+//
+//div, p {
+//  text-align: center;
+//}
+//
+//.mat-icon {
+//  -webkit-background-clip: text !important;
+//  -webkit-text-fill-color: transparent !important;
+//}
+
 .none {
   display: none;
 }
 
-div, p {
-  text-align: center;
+.star-container {
+  position: relative;
 }
 
-mat-icon {
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
+.star-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
 }

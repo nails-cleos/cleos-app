@@ -183,7 +183,7 @@
                 <mat-selection-list #paymentType (selectionChange)="onChange(paymentType.selectedOptions.selected)">
                   <mat-list-option *ngFor="let option of paymentOptions" [disabled]="option.disabled"
                                    [selected]="isSelected(option)" [value]="option.name" color="primary">
-                    <div matListItemLine>{{option.name}}</div>
+                    <div>{{option.name}}</div>
                   </mat-list-option>
                 </mat-selection-list>
                 <mat-divider></mat-divider>

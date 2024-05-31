@@ -17,36 +17,7 @@
             <mat-card-subtitle>{{ currentUser.email }}</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
-            <mat-nav-list>
-              <div *ngFor="let menu of menuItems; let i = index">
-                <div *ngIf="menu.subMenus && menu.subMenus.length; else items">
-                  <mat-expansion-panel #rla="routerLinkActive" (opened)="setStep(i)" [class.mat-elevation-z0]="true"
-                                       [expanded]="step === i" [ngClass]="{ 'active': rla.isActive}"
-                                       [routerLinkActiveOptions]="{ exact: true }" [routerLinkActive]="menu.name">
-                    <mat-expansion-panel-header>
-                      <mat-panel-title class="active-header-title">
-                        <mat-icon>{{ menu.icon }}</mat-icon>&nbsp;{{ menu.name }}
-                      </mat-panel-title>
-                    </mat-expansion-panel-header>
-                    <app-menu-item [drawer]="drawer" [items]="menu.subMenus"></app-menu-item>
-                  </mat-expansion-panel>
-                </div>
-                <ng-template #items>
-                  <a (click)="navigate(menu, drawer)" *ngIf="isHandset$ | async; else showMenu"
-                     [routerLinkActive]="['active']" [routerLink]="'/'+language+'/'+menu.path" mat-list-item>
-                    <mat-icon matListItemIcon>{{ menu.icon }}</mat-icon>
-                    <div mat-line>{{ menu.name }}</div>
-                  </a>
-                  <ng-template #showMenu>
-                    <a (click)="navigate(menu)" [routerLinkActive]="['active']"
-                       [routerLink]="'/'+language+'/'+menu.path" mat-list-item>
-                      <mat-icon matListItemIcon>{{ menu.icon }}</mat-icon>
-                      <div mat-line>{{ menu.name }}</div>
-                    </a>
-                  </ng-template>
-                </ng-template>
-              </div>
-            </mat-nav-list>
+            <app-menu-item [drawer]="drawer" [items]="menuItems"></app-menu-item>
           </mat-card-content>
         </ng-template>
         <ng-template #noLogged>
@@ -57,21 +28,19 @@
             <mat-card-title>Nails Cleos</mat-card-title>
             <mat-card-subtitle>&#64;nails.cleos</mat-card-subtitle>
           </mat-card-header>
+          <mat-divider></mat-divider>
           <mat-card-content>
             <mat-nav-list>
-              <mat-divider></mat-divider>
-              <a (click)="drawer.toggle()" *ngIf="isHandset$ | async; else showMenu" [routerLink]="['/', language]"
-                 mat-list-item>
+              <mat-list-item (click)="drawer.toggle()" *ngIf="isHandset$ | async; else showMenu" [routerLink]="['/', language]">
                 <mat-icon matListItemIcon>main</mat-icon>
-                <div mat-line>{{ 'COMMON.DASHBOARD.HOME' | translate }}</div>
-              </a>
+                <div matListItemTitle>{{ 'COMMON.DASHBOARD.HOME' | translate }}</div>
+              </mat-list-item>
               <ng-template #showMenu>
-                <a [routerLinkActive]="['active']" [routerLink]="['/', language]" mat-list-item>
+                <mat-list-item [routerLinkActive]="['active-link']" [routerLink]="['/', language]">
                   <mat-icon matListItemIcon>home</mat-icon>
-                  <div mat-line>{{ 'COMMON.DASHBOARD.HOME' | translate }}</div>
-                </a>
+                  <div matListItemTitle>{{ 'COMMON.DASHBOARD.HOME' | translate }}</div>
+                </mat-list-item>
               </ng-template>
-              <mat-divider></mat-divider>
             </mat-nav-list>
           </mat-card-content>
         </ng-template>
@@ -91,7 +60,7 @@
         <ng-template [ngIf]="isProfessional && workDay.length" [ngIfElse]="workDayIcon">
           <button [matMenuTriggerFor]="menuWorkDay" class="badge-padding" mat-icon-button>
             <mat-icon [matBadgeHidden]="!workDay.length" [matBadgeOverlap]="true" [matBadge]="workDay.length"
-                      matBadgeColor="warn">
+                      matBadgeColor="warn" aria-hidden="false">
               work
             </mat-icon>
           </button>
@@ -100,7 +69,7 @@
           <button [matMenuTriggerFor]="menuNotification" class="badge-padding" mat-icon-button>
             <mat-icon [matBadgeHidden]="!countNotifications" [matBadgeOverlap]="true"
                       [matBadge]="plusNotification ? plusNotification : countNotifications"
-                      matBadgeColor="warn">
+                      matBadgeColor="warn" aria-hidden="false">
               notifications
             </mat-icon>
           </button>
@@ -132,7 +101,7 @@
           <mat-menu #menuNoNotification="matMenu" xPosition="before">
             <mat-list>
               <mat-list-item class="pointer" matRipple>
-                <div mat-line>{{ 'COMMON.NOTIFICATION.NO' | translate }}</div>
+                <div matListItemTitle>{{ 'COMMON.NOTIFICATION.NO' | translate }}</div>
               </mat-list-item>
             </mat-list>
           </mat-menu>
@@ -141,7 +110,7 @@
           <mat-list>
             <mat-list-item (click)="notification(not)" *ngFor="let not of workDay; last as isLast" class="pointer"
                            matRipple>
-              <div [matTooltip]="not.message" matListItemLine>{{ not.message }}</div>
+              <div [matTooltip]="not.message" matListItemTitle>{{ not.message }}</div>
               <ng-template [ngIf]="!isLast">
                 <mat-divider class="divider"></mat-divider>
               </ng-template>
@@ -164,31 +133,29 @@
         </button>
         <mat-menu #menuLogged="matMenu">
           <mat-nav-list>
-            <a [routerLinkActive]="['active']" [routerLink]="['/', language]" mat-list-item>
+            <mat-list-item [routerLinkActive]="['active']" [routerLink]="['/', language]">
               <mat-icon matListItemIcon>home</mat-icon>
-              <div mat-line>{{ 'COMMON.DASHBOARD.HOME' | translate }}</div>
-            </a>
+              <div matListItemTitle>{{ 'COMMON.DASHBOARD.HOME' | translate }}</div>
+            </mat-list-item>
             <mat-divider></mat-divider>
-            <a [routerLink]="['/', language, 'auth', 'profile']" mat-list-item>
+            <mat-list-item [routerLink]="['/', language, 'auth', 'profile']">
               <mat-icon *ngIf="incomplete; else complete" matListItemIcon matBadgeColor="warn" [matBadge]="'*'"
-                        [matBadgeOverlap]="true" aria-hidden="false">
-                badge
-              </mat-icon>
+                        [matBadgeOverlap]="true" aria-hidden="false">badge</mat-icon>
               <ng-template #complete>
                 <mat-icon matListItemIcon>badge</mat-icon>
               </ng-template>
-              <div mat-line>{{ 'COMMON.DASHBOARD.PROFILE' | translate }}</div>
-            </a>
+              <div matListItemTitle>{{ 'COMMON.DASHBOARD.PROFILE' | translate }}</div>
+            </mat-list-item>
             <mat-divider></mat-divider>
-            <a (click)="changeTheme" mat-list-item>
+            <mat-list-item (click)="changeTheme">
               <mat-icon matListItemIcon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
-              <div mat-line>{{ 'COMMON.DASHBOARD.' + (isDarkMode ? 'LIGHT_MODE' : 'DARK_MODE') | translate }}</div>
-            </a>
+              <div matListItemTitle>{{ 'COMMON.DASHBOARD.' + (isDarkMode ? 'LIGHT_MODE' : 'DARK_MODE') | translate }}</div>
+            </mat-list-item>
             <mat-divider></mat-divider>
-            <a (click)="logout" mat-list-item>
+            <mat-list-item (click)="logout">
               <mat-icon matListItemIcon>exit_to_app</mat-icon>
-              <div mat-line>{{ 'COMMON.DASHBOARD.SIGN_OUT' | translate }}</div>
-            </a>
+              <div matListItemTitle>{{ 'COMMON.DASHBOARD.SIGN_OUT' | translate }}</div>
+            </mat-list-item>
           </mat-nav-list>
         </mat-menu>
       </div>

@@ -782,7 +782,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       if (value && this.discounts) {
         const userDiscount = this.discounts.find(d => d.id === value);
         if (userDiscount) {
-          this.treatmentDiscount = userDiscount.discount;
+          this.treatmentDiscount = userDiscount.discountCustomer;
           this.price = newDiscount(this.price, this.treatmentDiscount);
           this.cleanEvent();
         }
@@ -1008,7 +1008,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   private setData(reservation: IReservationAll): void {
     if (!this.reservation) {
       this.reservation = reservation;
-      this.treatmentDiscount = this.reservation.treatment.discount;
+      this.treatmentDiscount = this.reservation.treatment.discountCustomer;
       this.isPreview = false;
       const date = newDateTimestamp(reservation.timestamp, this.reservation.room.timeZone);
       this.room.setValue(reservation.room);
@@ -1115,7 +1115,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           const newList = this.additionalList.filter(al => selectIds.includes(al.id));
           if (newList.length !== this.additionalSelected.length) {
             this.additionalSelected = newList;
-            this.price = newAdditional(this.price, this.additionalSelected, this.reservation?.treatment?.discount);
+            this.price = newAdditional(this.price, this.additionalSelected, this.reservation?.treatment?.discountCustomer);
           }
         }
       }
@@ -1129,13 +1129,13 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           this.groups?.find(group => group.treatments?.find(p => p.id === this.treatmentId) ? group : undefined));
       }
       this.discounts = state.treatmentDiscount?.discounts.map((ud: IUserDiscount) => {
-        let title = ud.discount.name;
-        switch (ud.discount.type) {
+        let title = ud.discountCustomer.name;
+        switch (ud.discountCustomer.type) {
           case DiscountType.money:
-            title = `$ ${ ud.discount.amount } ${ title }`;
+            title = `$ ${ ud.discountCustomer.amount } ${ title }`;
             break;
           case DiscountType.percentage:
-            title = `${ ud.discount.amount } % ${ title }`;
+            title = `${ ud.discountCustomer.amount } % ${ title }`;
             break;
         }
         return Object.assign({}, ud, { title });

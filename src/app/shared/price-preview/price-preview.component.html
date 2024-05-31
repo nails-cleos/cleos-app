@@ -27,7 +27,7 @@
   <ng-template [ngIf]="!price.isPaid && (price.balance || price.totalPaid)">
     <ng-template [ngIf]="price.totalPaid">
       <mat-list-item>
-        <div matListItemLine [innerHTML]="'COMMON.PAYMENT.OPTIONS.PAID' | translate: {
+        <div matListItemTitle [innerHTML]="'COMMON.PAYMENT.OPTIONS.PAID' | translate: {
                          amount: price.totalPaid | number:'1.2-2',
                          symbol: currencyIcon | currencySymbol
                          }">
@@ -36,7 +36,7 @@
     </ng-template>
     <ng-template [ngIf]="price.balance">
       <mat-list-item>
-        <div matListItemLine [innerHTML]="'COMMON.PAYMENT.OPTIONS.ACCOUNT' | translate: {
+        <div matListItemTitle [innerHTML]="'COMMON.PAYMENT.OPTIONS.ACCOUNT' | translate: {
                          amount: price.balance | number:'1.2-2',
                          symbol: currencyIcon | currencySymbol
                          }">
@@ -44,7 +44,7 @@
       </mat-list-item>
     </ng-template>
     <mat-list-item>
-      <div matListItemLine [innerHTML]="'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate: {
+      <div matListItemTitle [innerHTML]="'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate: {
                          amount: price.toPaid | number:'1.2-2',
                          symbol: currencyIcon | currencySymbol
                          }">

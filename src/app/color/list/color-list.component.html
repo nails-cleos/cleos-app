@@ -58,12 +58,12 @@
         <div [@detailExpand]="color === expandedColor ? 'expanded' : 'collapsed'"
              class="detail hide-gt-xs">
           <mat-list>
-            <div *ngIf="color.description" matListItemTitle>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</div>
             <mat-list-item *ngIf="color.description" role="list">
-              <div matListItemLine>{{color.description}}</div>
+              <div *ngIf="color.description" matListItemTitle>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</div>
+              <div *ngIf="color.description" matListItemLine>{{color.description}}</div>
             </mat-list-item>
             <ng-template [ngIf]="!color.deleted">
-              <div matListItemTitle>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+              <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
               <mat-list-item role="list">
                 <button (click)="edit(color)" color="primary" mat-icon-button>
                   <mat-icon matListItemIcon>edit</mat-icon>

@@ -68,8 +68,8 @@
       <td *matCellDef="let treatment" [attr.colspan]="displayedColumns.length">
         <div [@detailExpand]="treatment === expanded ? 'expanded' : 'collapsed'" class="detail">
           <mat-list>
-            <div mat-subheader>{{ 'COMMON.COLUMN.LAST_UPDATE' | translate }}</div>
             <mat-list-item role="list">
+              <div matListItemTitle>{{ 'COMMON.COLUMN.LAST_UPDATE' | translate }}</div>
               <div matListItemLine>{{treatment.modifiedAt | date:'short':undefined:dateFormat}}</div>
             </mat-list-item>
             <div class="hide-gt-xs" mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>

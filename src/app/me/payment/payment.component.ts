@@ -7,6 +7,7 @@ import { IPayment, IPaymentAll } from '../../interfaces/payment';
 import * as fromActionsPayment from '../../store/payment.actions';
 import { MatTableDataSource } from '@angular/material/table';
 import { Pagination } from '../../interfaces/pagination';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-payment',
@@ -19,14 +20,16 @@ export class PaymentComponent implements OnInit, OnDestroy {
 
   errorMessage?: string;
   showError = false;
+  language: string;
 
   private getState: Observable<any>;
   private subscription?: Subscription;
   private id: any;
   private path: any;
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private router: Router) {
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private router: Router, private translate: TranslateService) {
     this.getState = this.store.select(selectPaymentState);
+    this.language = translate.currentLang;
   }
 
   get close(): void {
@@ -48,9 +51,9 @@ export class PaymentComponent implements OnInit, OnDestroy {
   }
 
   pay(payment: IPaymentAll): void {
-    if (payment.link) {
+    if (payment.link || payment.paymentURL) {
       this.store.dispatch(
-        new fromActionsPayment.PaymentSend(payment.link)
+        new fromActionsPayment.PaymentSend(payment.link || payment.paymentURL)
       );
     }
   }
@@ -82,7 +85,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
       const paths = state.paths;
       if (state.message && paths) {
         this.clean();
-        this.router.navigate(paths);
+        this.router.navigate([this.language].concat(paths));
       } else if (state.subErrors) {
         this.showError = true;
         this.errorMessage = state.subErrors;

@@ -63,7 +63,7 @@
       "COMPLETE": {
         "DESCRIPTION": "<span class='bold'>Descripción:</span> {{description}}",
         "GROUP": "<span class='bold'>Tipo de tratamiento:</span> {{name}}",
-        "NAME": "<span class='bold'>Tratamiento:</span> {{name}}",
+        "NAME": "<span class='bold'>Tratamiento:</span> {{group}} - {{name}}",
         "TOTAL": "<span class='bold'>Total:</span>",
         "PRICE": "<span class='bold'>Price:</span>",
         "DURATION": "<span class='bold'>Duración:</span>"

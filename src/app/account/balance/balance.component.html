@@ -23,7 +23,7 @@
     <div class="card-margin ssc-head-line"></div>
   </ng-template>
   <mat-card-content>
-    <div *ngIf="account; else box">
+    <div *ngIf="account && account.currency; else box">
       <div id="account-spinner" class="spinner-parent-center">
         <mat-progress-spinner [color]="'primary'" [mode]="'determinate'" [value]="balancePercentage"
                               [diameter]="200">

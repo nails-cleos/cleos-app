@@ -24,16 +24,12 @@
     </mat-form-field>
     <ng-template [ngIf]="customerInfo">
       <mat-list>
-        <mat-list-item>
-          <div mat-line>{{ 'RESERVATION.CUSTOMER.INFO.DAYS' | translate: { days: customerInfo.days } }}</div>
-        </mat-list-item>
-        <mat-list-item>
+        <mat-list-item lines="3">
+          <div matListItemTitle>{{ 'RESERVATION.CUSTOMER.INFO.DAYS' | translate: { days: customerInfo.days } }}</div>
           <div [innerHTML]="'RESERVATION.CUSTOMER.INFO.PROFESSIONAL_NAME' |
-                  translate: {professional: customerInfo.professionalName}" mat-line></div>
-        </mat-list-item>
-        <mat-list-item>
+                  translate: {professional: customerInfo.professionalName}" matListItemLine></div>
           <div [innerHTML]="'RESERVATION.CUSTOMER.INFO.TREATMENT' |
-                  translate: {treatment: treatmentDetail}" mat-line></div>
+                  translate: {treatment: treatmentDetail}" matListItemLine></div>
         </mat-list-item>
       </mat-list>
     </ng-template>
@@ -222,16 +218,14 @@
           <mat-list-item>
             <mat-icon matListItemIcon>spa</mat-icon>
             <div class="bold" matListItemTitle>{{ 'RESERVATION.TREATMENT.DETAIL' | translate }}</div>
-            <mat-divider></mat-divider>
-          </mat-list-item>
-          <mat-list-item>
             <ng-template [ngIf]="treatment.value.description">
               <div [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.DESCRIPTION' |
-                  translate: {description: treatment.value.description}" mat-line>
+                  translate: {description: treatment.value.description}" matListItemLine>
               </div>
             </ng-template>
-
-            <div matListItemLine>
+          </mat-list-item>
+          <mat-list-item>
+            <div matListItemTitle>
               <span [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.PRICE' | translate"></span>
               <ng-template [ngIf]="price.priceWithDiscount" [ngIfElse]="noDiscount">
                 <ng-template [ngIf]="!isEditing" [ngIfElse]="editing">
@@ -255,8 +249,9 @@
                 </span>
               </ng-template>
             </div>
-
-            <div matListItemLine>
+          </mat-list-item>
+          <mat-list-item>
+            <div matListItemTitle>
               <span [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.DURATION' | translate"></span>
               <span class="raised-button">
                 &#9202; {{ treatment.value.duration | durationTime }}
@@ -276,18 +271,16 @@
   <div *ngIf="additionalList; else skeleton">
     <mat-selection-list #additional (selectionChange)="onChange(additional.selectedOptions.selected)" class="app-class">
       <mat-divider></mat-divider>
-      <mat-list-option *ngFor="let it of additionalList" [selected]="isSelected(it)" [value]="it"
-                       checkboxPosition="before">
-        <div matListItemTitle>{{ it.name }}</div>
-        <div matListItemLine>{{ room.value.currency | currencySymbol }} {{ it.price | number:'1.2-2' }}</div>
-        <div matListItemLine>
-          <span>&#9202; {{ it.duration | durationTime }}</span>
-        </div>
-        <ng-template [ngIf]="it.description">
-          <div class="description" matListItemLine>{{ it.description }}</div>
-        </ng-template>
-        <mat-divider></mat-divider>
-      </mat-list-option>
+      @for (it of additionalList; track it) {
+        <mat-list-option [selected]="isSelected(it)" [value]="it" togglePosition="before" lines="3">
+          <div matListItemTitle>{{ it.name }} {{ room.value.currency | currencySymbol }} ({{ it.price | number:'1.2-2' }} -
+            &#9202; {{ it.duration | durationTime }})</div>
+          <ng-template [ngIf]="it.description">
+            <span class="description" matListItemLine>{{ it.description }}</span>
+          </ng-template>
+        </mat-list-option>
+        <mat-divider class="top-space"></mat-divider>
+      }
     </mat-selection-list>
   </div>
   <ng-template #skeleton>
@@ -359,15 +352,15 @@
       <mat-card-content>
         <ng-template [ngIf]="note.value">
           <mat-list class="note">
-            <div mat-subheader>{{ 'RESERVATION.NOTE.FIELD' | translate }}</div>
             <mat-list-item>
+              <div matListItemTitle>{{ 'RESERVATION.NOTE.FIELD' | translate }}</div>
               <div matListItemLine>{{ note.value }}</div>
             </mat-list-item>
           </mat-list>
         </ng-template>
         <mat-list>
-          <div mat-subheader>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</div>
           <mat-list-item>
+            <div matListItemTitle>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</div>
             <mat-icon matListItemIcon>wash</mat-icon>
             <div matListItemLine>{{ customer.value.displayName }}</div>
           </mat-list-item>
@@ -383,7 +376,7 @@
             <div matListItemTitle>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</div>
             <div matListItemLine>{{ professional.value.displayName }}</div>
           </mat-list-item>
-          <mat-list-item>
+          <mat-list-item lines="3">
             <mat-icon matListItemIcon>room</mat-icon>
             <div matListItemTitle>{{ 'COMMON.ADDRESS.FIELD' | translate }}</div>
             <div matListItemLine class="description">
@@ -419,8 +412,8 @@
           <ng-template [ngIf]="additionalSelected.length">
             <mat-divider></mat-divider>
             <div mat-subheader>{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</div>
-            <div *ngFor="let it of additionalSelected">
-              <mat-list-item>
+            @for (it of additionalSelected; track it) {
+              <mat-list-item lines="3">
                 <mat-icon matListItemIcon>add_post</mat-icon>
                 <div matListItemTitle>
                   {{ it.name }}
@@ -430,7 +423,7 @@
                 </div>
                 <div matListItemLine>&#9202; {{ it.duration | durationTime }}</div>
               </mat-list-item>
-            </div>
+            }
           </ng-template>
           <ng-template [ngIf]="customerChange.value">
             <mat-divider></mat-divider>

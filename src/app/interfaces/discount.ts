@@ -28,7 +28,7 @@ export interface IDiscountAll {
 
 export interface IUserDiscount {
   id: string;
-  discount: IDiscountAll;
+  discountCustomer: IDiscountAll;
   used: boolean;
   title?: string;
   symbol?: string;
