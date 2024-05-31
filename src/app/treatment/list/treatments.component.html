@@ -22,9 +22,9 @@
     </ng-container>
 
     <ng-container matColumnDef="priceFrom">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell
           mat-sort-header>{{ 'TREATMENT.LIST.COLUMN.PRICE_FROM' | translate }}</th>
-      <td *matCellDef="let treatment" fxHide.lt-sm fxShow mat-cell>
+      <td *matCellDef="let treatment" class="hide-xs" mat-cell>
         <div *ngIf="treatment.id; else skeleton">
           <div *ngIf="treatment.priceFrom; else noPriceFrom">{{('EUR' | currencySymbol) + ' ' + treatment.priceFrom}}</div>
           <ng-template #noPriceFrom>
@@ -38,8 +38,8 @@
     </ng-container>
 
     <ng-container matColumnDef="actions">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-      <td *matCellDef="let treatment" fxHide.lt-sm fxShow mat-cell>
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+      <td *matCellDef="let treatment" class="hide-xs" mat-cell>
         <div *ngIf="treatment.id; else skeleton">
           <button *ngIf="!treatment.deleted" [routerLink]="['/', language, 'treatments', treatment.id, 'edit']" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="below">
@@ -68,12 +68,12 @@
       <td *matCellDef="let treatment" [attr.colspan]="displayedColumns.length">
         <div [@detailExpand]="treatment === expanded ? 'expanded' : 'collapsed'" class="detail">
           <mat-list>
-            <div mat-subheader>{{ 'COMMON.COLUMN.LAST_UPDATE' | translate }}</div>
             <mat-list-item role="list">
+              <div matListItemTitle>{{ 'COMMON.COLUMN.LAST_UPDATE' | translate }}</div>
               <div matListItemLine>{{treatment.modifiedAt | date:'short':undefined:dateFormat}}</div>
             </mat-list-item>
-            <div fxHide fxShow.lt-sm mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
-            <mat-list-item fxHide fxShow.lt-sm role="list">
+            <div class="hide-gt-xs" mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+            <mat-list-item class="hide-gt-xs" role="list">
               <button *ngIf="!treatment.deleted" [routerLink]="['/', language, 'treatments', treatment.id, 'edit']" color="primary"
                       mat-icon-button>
                 <mat-icon matListItemIcon>edit</mat-icon>

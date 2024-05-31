@@ -31,11 +31,26 @@
   }
 }
 
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .close-button {
-  float: right;
-  z-index: 9999;
+  margin-left: auto; /* Ensures the button is pushed to the right */
 }
 
 .mat-mdc-dialog-content {
   text-align: center;
+}
+
+
+
+.dialog-title {
+  width: calc(100% - 48px); /* Adjust width to account for the button's width */
+  word-wrap: break-word; /* Ensures words will wrap onto the next line */
+  white-space: normal; /* Allows wrapping */
+  max-width: 250px; /* Adjust this value based on your layout requirements */
+  margin: 0; /* Remove any default margin */
 }

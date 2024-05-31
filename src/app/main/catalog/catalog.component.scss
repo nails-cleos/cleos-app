@@ -11,3 +11,15 @@ img {
   display: inline-block;
   vertical-align: middle;
 }
+
+.flex-item {
+  flex: 1 1 calc(33.33% - 32px);
+
+  @media (max-width: 960px) {  // Breakpoint for md (assuming typical md breakpoint is 960px)
+    flex: 1 1 calc(50% - 32px);
+  }
+
+  @media (max-width: 600px) {  // Breakpoint for sm and xs (assuming typical sm/xs breakpoint is 600px)
+    flex: 1 1 100%;
+  }
+}

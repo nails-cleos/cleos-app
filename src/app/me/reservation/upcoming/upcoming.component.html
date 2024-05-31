@@ -20,7 +20,7 @@
         <tbody>
         <tr *ngIf="upcoming.id; else skeleton">
           <td class="right">{{ 'ME.RESERVATION.UPCOMING.START' | translate }}</td>
-          <td class="left">{{upcoming.start | date:'short':upcoming.room.timeZone:dateFormat}}
+          <td class="left">{{ upcoming.start | date:'short':upcoming.room.timeZone:dateFormat }}
             <ng-template [ngIf]="showTimeZone">
               <button (click)="openDialog(upcoming.start)" mat-icon-button type="button">
                 <mat-icon>info_outline</mat-icon>
@@ -30,7 +30,7 @@
         </tr>
         <tr *ngIf="upcoming.end; else skeleton">
           <td class="right">{{ 'ME.RESERVATION.UPCOMING.END' | translate }}</td>
-          <td class="left">{{upcoming.end | date:'short':upcoming.room.timeZone:dateFormat}}
+          <td class="left">{{ upcoming.end | date:'short':upcoming.room.timeZone:dateFormat }}
             <ng-template [ngIf]="showTimeZone">
               <button (click)="openDialog(upcoming.end)" mat-icon-button type="button">
                 <mat-icon>info_outline</mat-icon>
@@ -40,31 +40,33 @@
         </tr>
         <tr *ngIf="upcoming.id; else skeleton">
           <td class="right">{{ 'COMMON.ROOM.FIELD' | translate }}</td>
-          <td class="left">{{upcoming.room | roomName}}</td>
+          <td class="left">{{ upcoming.room | roomName }}</td>
         </tr>
         <tr *ngIf="upcoming.id; else skeleton">
           <td class="right">{{ 'COMMON.ADDRESS.FIELD' | translate }}</td>
           <td class="left">
             <a [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + upcoming.room.address.name"
                rel="noreferrer" target="_blank">
-              {{upcoming.room.address.name}}
+              {{ upcoming.room.address.name }}
             </a>
           </td>
         </tr>
         <tr *ngIf="upcoming.id; else skeleton">
           <td class="right">{{ 'COMMON.TREATMENT.FIELD' | translate }}</td>
-          <td class="left">{{upcoming.treatment.name}}</td>
+          <td class="left">{{ upcoming.treatment.name }}</td>
         </tr>
         <tr *ngIf="upcoming.price; else skeleton">
           <td class="right">{{ 'ME.RESERVATION.TREATMENT.PRICE.FIELD' | translate }}</td>
           <td
-            class="left">{{upcoming.room.currency | currencySymbol}} {{upcoming.price.amount | number:'1.2-2'}}</td>
+            class="left">{{ upcoming.room.currency | currencySymbol }} {{ upcoming.price.amount | number:'1.2-2' }}
+          </td>
         </tr>
         <tr *ngIf="upcoming.rowSpan">
           <td [rowSpan]="upcoming.rowSpan" class="right">{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</td>
           <td class="left">
             <div *ngFor="let additional of upcoming.additional">
-              {{additional.name}} - {{upcoming.room.currency | currencySymbol}} {{additional.price | number:'1.2-2'}}
+              {{ additional.name }}
+              - {{ upcoming.room.currency | currencySymbol }} {{ additional.price | number:'1.2-2' }}
             </div>
           </td>
         </tr>
@@ -75,37 +77,39 @@
           <ng-template [ngIf]="upcoming.price.discount" [ngIfElse]="noDiscount">
             <td class="left">
                 <span [class.strikethrough]="upcoming.price.total !== upcoming.price.totalWithoutDiscount">
-                  {{upcoming.room.currency | currencySymbol}} {{upcoming.price.totalWithoutDiscount | number:'1.2-2'}}
+                  {{ upcoming.room.currency | currencySymbol }} {{ upcoming.price.totalWithoutDiscount | number:'1.2-2' }}
                 </span>
               <span [@discountAnimation] class="raised-button bold">
-                  {{upcoming.room.currency | currencySymbol}} {{upcoming.price.total | number:'1.2-2'}}
+                  {{ upcoming.room.currency | currencySymbol }} {{ upcoming.price.total | number:'1.2-2' }}
                 </span>
             </td>
           </ng-template>
           <ng-template #noDiscount>
             <td
-              class="left">{{upcoming.room.currency | currencySymbol}} {{upcoming.price.total | number:'1.2-2'}}</td>
+              class="left">{{ upcoming.room.currency | currencySymbol }} {{ upcoming.price.total | number:'1.2-2' }}
+            </td>
           </ng-template>
         </tr>
         <ng-template [ngIf]="upcoming.price && upcoming.price.totalPaid">
           <tr>
             <th class="right">{{ 'ME.RESERVATION.UPCOMING.PAID' | translate }}</th>
             <td
-              class="left minus">{{upcoming.room.currency | currencySymbol}}
-              ({{upcoming.price.totalPaid | number:'1.2-2'}})
+              class="left minus">{{ upcoming.room.currency | currencySymbol }}
+              ({{ upcoming.price.totalPaid | number:'1.2-2' }})
             </td>
           </tr>
           <tr>
             <th class="right">{{ 'ME.RESERVATION.UPCOMING.TO_PAY' | translate }}</th>
             <td
-              class="left bold">{{upcoming.room.currency | currencySymbol}} {{(upcoming.price.total - upcoming.price.totalPaid) | number:'1.2-2'}}</td>
+              class="left bold">{{ upcoming.room.currency | currencySymbol }} {{ (upcoming.price.total - upcoming.price.totalPaid) | number:'1.2-2' }}
+            </td>
           </tr>
         </ng-template>
         </tfoot>
       </table>
       <div *ngIf="upcoming.state === 'CREATED'" class="red-text">{{ 'ME.RESERVATION.UPCOMING.CREATED' | translate }}
         <span class="bold">
-          {{upcoming.professional.displayName}}
+          {{ upcoming.professional.displayName }}
         </span>
       </div>
       <!--      <div *ngIf="upcoming.state === 'APPROVED'" class="red-text">-->
@@ -117,16 +121,16 @@
     </ng-template>
   </mat-card-content>
   <mat-divider></mat-divider>
-  <mat-card-actions *ngIf="upcoming.id; else buttonSkeleton">
-    <div fxFlex></div>
+  <mat-card-actions *ngIf="upcoming.id; else buttonSkeleton" class="card-actions">
+    <div class="spacer"></div>
     <ng-template
       [ngIf]="!['CANCELLED_PAYMENT_REQUIRED', 'PAID'].includes(upcoming.state) && upcoming.room.paymentTypes.length > 1">
-      <button fxShow.lt-sm fxHide class="icon-button"
+      <button class="hide-gt-xs icon-button"
               [routerLink]="['/', language, 'me', 'reservation', upcoming.id, 'payment', 'option']"
               mat-fab>
         <mat-icon class="payment-button" color="primary">payment</mat-icon>
       </button>
-      <button fxHide.lt-sm fxShow class="icon-button"
+      <button class="hide-xs icon-button"
               [routerLink]="['/', language, 'me', 'reservation', upcoming.id, 'payment', 'option']"
               mat-fab extended>
         <mat-icon class="payment-button" color="primary">payment</mat-icon>
@@ -135,31 +139,32 @@
     </ng-template>
     <ng-template
       [ngIf]="upcoming.state === 'CANCELLED_PAYMENT_REQUIRED' && upcoming.room.paymentTypes.length > 1">
-      <button fxShow.lt-sm fxHide class="icon-button"
+      <button class="hide-gt-xs icon-button"
               [routerLink]="['/', language, 'me', 'reservation', upcoming.id, 'payment']" mat-fab>
         <mat-icon class="payment-button" color="primary">payment</mat-icon>
       </button>
-      <button fxHide.lt-sm fxShow class="icon-button"
+      <button class="hide-xs icon-button"
               [routerLink]="['/', language, 'me', 'reservation', upcoming.id, 'payment']"
               mat-fab extended>
         <mat-icon class="payment-button" color="primary">payment</mat-icon>
         <span>{{ 'COMMON.BUTTON.PAYMENT' | translate }}</span>
       </button>
     </ng-template>
-    <button fxShow.lt-sm fxHide class="icon-button" (click)="edit" color="primary"
+    <button class="hide-gt-xs icon-button" (click)="edit" color="primary"
             mat-fab>
       <mat-icon>edit_calendar</mat-icon>
     </button>
-    <button fxHide.lt-sm fxShow class="icon-button" (click)="edit" color="primary"
+    <button class="hide-xs icon-button" (click)="edit" color="primary"
             mat-fab extended>
       <mat-icon>edit_calendar</mat-icon>
       <span>{{ 'COMMON.BUTTON.EDIT' | translate }}</span>
     </button>
-    <button fxShow.lt-sm fxHide class="icon-button" [routerLink]="['/', language, 'reservation', upcoming.id]" color="primary"
+    <button class="hide-gt-xs icon-button" [routerLink]="['/', language, 'reservation', upcoming.id]" color="primary"
             mat-fab>
       <mat-icon>visibility</mat-icon>
     </button>
-    <button fxHide.lt-sm fxShow class="icon-button" [routerLink]="['/', language, 'reservation', upcoming.id]" color="primary" mat-fab
+    <button class="hide-xs icon-button" [routerLink]="['/', language, 'reservation', upcoming.id]" color="primary"
+            mat-fab
             extended>
       <mat-icon>visibility</mat-icon>
       <span>{{ 'COMMON.BUTTON.VIEW' | translate }}</span>

@@ -1,7 +1,7 @@
-<div class="flex-container" fxLayout="column">
-  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div fxFlex="60%" fxFlex.lt-sm="80%">
-      <app-balance [account]="account" [showAdd]="true" [showUser]="true" [language]="language"></app-balance>
+<div class="flex-container">
+  <div class="card-container">
+    <div class="card-content">
+      <app-balance [account]="account" [showAdd]="true" [showUser]="hasAdminRole" [language]="language"></app-balance>
     </div>
   </div>
 </div>
@@ -31,10 +31,10 @@
     </ng-container>
 
     <ng-container matColumnDef="amount">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell
           mat-sort-header>{{ 'COMMON.COLUMN.AMOUNT' | translate }}
       </th>
-      <td *matCellDef="let transaction" fxHide.lt-sm fxShow mat-cell>
+      <td *matCellDef="let transaction" class="hide-xs" mat-cell>
         <div *ngIf="transaction.id; else skeleton">
           {{ transaction.amount | number:'1.2-2'| currency: account?.currency?.code }}
         </div>
@@ -45,10 +45,10 @@
     </ng-container>
 
     <ng-container matColumnDef="amountGifted">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell
           mat-sort-header>{{ 'ACCOUNT.TRANSACTION.LIST.COLUMN.AMOUNT_GIFTED' | translate }}
       </th>
-      <td *matCellDef="let transaction" fxHide.lt-sm fxShow mat-cell>
+      <td *matCellDef="let transaction" class="hide-xs" mat-cell>
         <div *ngIf="transaction.id; else skeleton">
           {{ transaction.amountGifted | number:'1.2-2'| currency: account?.currency?.code }}
         </div>
@@ -59,8 +59,8 @@
     </ng-container>
 
     <ng-container matColumnDef="payment.status">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
-      <td *matCellDef="let transaction" fxHide.lt-sm fxShow mat-cell>
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
+      <td *matCellDef="let transaction" class="hide-xs" mat-cell>
         <div *ngIf="transaction.id; else skeleton">
           {{ 'COMMON.STATUS.PAYMENT.' + (transaction.payment?.status || 'NONE') | translate }}
         </div>
@@ -71,8 +71,8 @@
     </ng-container>
 
     <ng-container matColumnDef="payment.type">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
-      <td *matCellDef="let transaction" fxHide.lt-sm fxShow mat-cell>
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
+      <td *matCellDef="let transaction" class="hide-xs" mat-cell>
         <div *ngIf="transaction.id; else skeleton">{{ transaction.payment.type }}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -81,8 +81,8 @@
     </ng-container>
 
     <ng-container matColumnDef="actions">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-      <td *matCellDef="let transaction" fxHide.lt-sm fxShow mat-cell>
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+      <td *matCellDef="let transaction" class="hide-xs" mat-cell>
         <div *ngIf="transaction.id; else skeleton">
           <ng-template [ngIf]="!transaction.deleted">
             <button mat-icon-button
@@ -99,9 +99,9 @@
     </ng-container>
 
     <ng-container matColumnDef="expandedDetail">
-      <td *matCellDef="let transaction" [attr.colspan]="displayedColumns.length" fxHide fxShow.lt-sm mat-cell>
+      <td *matCellDef="let transaction" [attr.colspan]="displayedColumns.length" class="hide-gt-xs" mat-cell>
         <div [@detailExpand]="transaction === expandedTransaction ? 'expanded' : 'collapsed'"
-             class="detail" fxHide fxShow.lt-sm>
+             class="detail hide-gt-xs">
           <mat-list>
             <div *ngIf="transaction?.description" matListItemTitle>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</div>
             <mat-list-item *ngIf="transaction?.description" role="list">

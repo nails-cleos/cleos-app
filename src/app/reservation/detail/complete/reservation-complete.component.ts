@@ -87,11 +87,11 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     this.price = new Price();
     this.treatment.valueChanges.subscribe(value => {
       if (value) {
-        this.price = newPrice(this.price, value.price, this.reservation?.treatment?.discount);
+        this.price = newPrice(this.price, value.price, this.reservation?.treatment?.discountCustomer);
       }
     });
     this.extraPrice.valueChanges.subscribe(value => {
-      this.price = newExtra(this.price, value ? value : 0, this.reservation?.treatment?.discount);
+      this.price = newExtra(this.price, value ? value : 0, this.reservation?.treatment?.discountCustomer);
     });
     this.isDashboard = this.router.getCurrentNavigation()?.extras?.state?.data?.isDashboard;
   }
@@ -157,7 +157,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
 
   onChange(options: MatListOption[]): void {
     this.additionalSelected = options.map(o => o.value);
-    this.price = newAdditional(this.price, this.additionalSelected, this.reservation?.treatment?.discount);
+    this.price = newAdditional(this.price, this.additionalSelected, this.reservation?.treatment?.discountCustomer);
     this.setPaymentType();
   }
 
@@ -192,7 +192,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
         const newList = this.additionalList.filter(al => selectIds.includes(al.id));
         if (newList.length !== this.additionalSelected.length) {
           this.additionalSelected = newList;
-          this.price = newAdditional(this.price, this.additionalSelected, this.reservation?.treatment?.discount);
+          this.price = newAdditional(this.price, this.additionalSelected, this.reservation?.treatment?.discountCustomer);
         }
       }
       if (state.treatmentDiscount && !this.groupId) {
@@ -249,7 +249,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     });
     this.treatment.valueChanges.subscribe(value => {
       if (value) {
-        this.price = newPrice(this.price, value.price, this.reservation?.treatment?.discount);
+        this.price = newPrice(this.price, value.price, this.reservation?.treatment?.discountCustomer);
         this.setPaymentType();
       }
     });

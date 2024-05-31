@@ -15,7 +15,7 @@
     <th *matHeaderCellDef mat-header-cell>{{ 'TREATMENT.LIST.COLUMN.PRICE' | translate }}</th>
     <td *matCellDef="let treatment" mat-cell>
       <div *ngIf="treatment.id; else skeleton">
-        <mat-icon matPrefix fxHide.lt-sm fxShow>attach_money</mat-icon>&nbsp;{{treatment.price | number:'1.2-2'}}
+        <mat-icon matPrefix class="hide-xs">attach_money</mat-icon>&nbsp;{{treatment.price | number:'1.2-2'}}
       </div>
       <ng-template #skeleton>
         <div class="ssc-line"></div>
@@ -24,11 +24,11 @@
   </ng-container>
 
   <ng-container matColumnDef="duration">
-    <th *matHeaderCellDef fxHide.lt-sm fxShow
+    <th *matHeaderCellDef class="hide-xs"
         mat-header-cell>{{ 'TREATMENT.LIST.COLUMN.DURATION' | translate }}</th>
     <td *matCellDef="let treatment" mat-cell>
       <div *ngIf="treatment.id; else skeleton">
-        <mat-icon matPrefix fxHide.lt-sm fxShow>timer</mat-icon>&nbsp;
+        <mat-icon matPrefix class="hide-xs">timer</mat-icon>&nbsp;
         {{treatment.hour | number:'2.0-0'}}:{{treatment.minute | number:'2.0-0'}}
       </div>
       <ng-template #skeleton>

@@ -13,6 +13,7 @@ import { Observable, Subscription } from 'rxjs';
 import * as fromActionsAccount from '../../../store/account.actions';
 import { detailExpandAnimation } from '../../../util/animation';
 import { newDateTimestamp } from '../../../util/dates';
+import { AuthUserService } from '../../../services/auth-user.service';
 
 @Component({
   selector: 'app-transaction-view',
@@ -23,6 +24,7 @@ import { newDateTimestamp } from '../../../util/dates';
 export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+  hasAdminRole: boolean;
 
   displayedColumns: string[] = ['position', 'timestamp', 'amount', 'amountGifted', 'payment.status', 'payment.type', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<ITransaction>>();
@@ -38,10 +40,11 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
 
   private subscription?: Subscription;
   private paginatorSubscription?: Subscription;
+  private authUserServiceSubscription: Subscription;
   private getState: Observable<any>;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private cdRef: ChangeDetectorRef,
-              breakpointObserver: BreakpointObserver, private translate: TranslateService) {
+              breakpointObserver: BreakpointObserver, private translate: TranslateService, private authUserService: AuthUserService) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -50,9 +53,11 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
         this.pageSize = MOBILE_PAGE_SIZE;
       }
     });
+    this.hasAdminRole = false;
     this.getState = this.store.select(selectAccountState);
     this.dateFormat = this.translate.currentLang;
     this.language = this.translate.currentLang;
+    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => this.hasAdminRole = value.hasAdminRole)
   }
 
   ngOnInit(): void {
@@ -71,6 +76,7 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
     this.paginatorSubscription?.unsubscribe();
+    this.authUserServiceSubscription.unsubscribe();
   }
 
   private createPageSubscriptions(): void {
@@ -110,7 +116,7 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
       this.dataSource = state.data?.transactions?.content?.map((it: ITransaction) =>
         Object.assign({}, it, { date: newDateTimestamp(it.payment?.timestamp) })
       );
-      this.resultsLength = state.data?.transactions?.totalElements;
+      this.resultsLength = state.data?.transactions?.totalElements || 0;
       if (!this.paginatorSubscription && this.resultsLength) {
         this.createPageSubscriptions();
       }

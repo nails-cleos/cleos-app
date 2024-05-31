@@ -20,7 +20,7 @@ import { RRule, Weekday } from 'rrule';
 import { IReservation, IReservationAll } from '../interfaces/reservation';
 import { ITreatmentAll } from '../interfaces/treatment';
 import { IAdditionalAll } from '../interfaces/additional';
-import { utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz';
+import { toZonedTime, fromZonedTime } from 'date-fns-tz';
 
 export const API_LOCALE = 'en-GB';
 
@@ -437,21 +437,21 @@ export const createFullDate = (selectDate: Date): Date => {
 
 export const newDateTimestamp = (date: string | Date | number = new Date(), timeZone: string = getCurrentTimeZone()): Date => {
   if (typeof date === 'string') {
-    return utcToZonedTime(new Date(date), timeZone);
+    return toZonedTime(new Date(date), timeZone);
   } else if (date instanceof Date) {
-    return utcToZonedTime(date, timeZone);
+    return toZonedTime(date, timeZone);
   }
 
-  return utcToZonedTime(date * 1000, timeZone);
+  return toZonedTime(date * 1000, timeZone);
 };
 
-export const zoneDateToDate = (value: number = 0, timeZone: string = getCurrentTimeZone()): Date => zonedTimeToUtc(value * 1000, timeZone);
+export const zoneDateToDate = (value: number = 0, timeZone: string = getCurrentTimeZone()): Date => fromZonedTime(value * 1000, timeZone);
 
-export const dateToUTC = (date: Date, timeZone: string = getCurrentTimeZone()): Date => zonedTimeToUtc(date, timeZone);
+export const dateToUTC = (date: Date, timeZone: string = getCurrentTimeZone()): Date => fromZonedTime(date, timeZone);
 
 export const createNewDateZonedTime = (date: string | Date | number, timeZone: string = getCurrentTimeZone(), hour: number = 0,
                                        minute: number = 0, second: number = 0, milli: number = 0): Date =>
-  utcToZonedTime(createNewDate(newDateTimestamp(date), hour, minute, second, milli), timeZone);
+  toZonedTime(createNewDate(newDateTimestamp(date), hour, minute, second, milli), timeZone);
 export const createNewDate = (date: Date, hour: number = 0, minute: number = 0, second: number = 0,
                               milli: number = 0): Date => {
   const d = new Date(date);

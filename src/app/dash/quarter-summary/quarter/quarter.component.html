@@ -1,8 +1,8 @@
 <mat-toolbar (click)="goToQuarter(quarter)" class="pointer summary-header" [ngClass]="{'margin-top': margin}">
   Q{{quarter}}
 </mat-toolbar>
-<div fxLayout="row wrap">
-  <div *ngFor="let month of monthSummaries" fxFlex.gt-md="33.33%" fxFlex="100%">
+<div class="flex-row-wrap">
+  <div *ngFor="let month of monthSummaries" class="quarter-content">
     <mat-toolbar (click)="goToMonth(month.month)" class="pointer summary-header">
       {{getMonth(month.month)}}
     </mat-toolbar>

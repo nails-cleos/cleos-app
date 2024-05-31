@@ -767,6 +767,7 @@
 
   .active-link {
     color: mat.get-color-from-palette($primary-palette, 900) !important;
+    font-weight: bold;
   }
 
   mat-drawer-container {

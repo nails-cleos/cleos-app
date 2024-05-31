@@ -1,13 +1,13 @@
-<div class="flex-container" fxLayout="column">
-  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div fxFlex="60%" fxFlex.lt-sm="80%">
+<div class="flex-container">
+  <div class="card-container">
+    <div class="card-content">
       <form (ngSubmit)="create" [formGroup]="form" novalidate>
         <mat-card appearance="outlined" class="style-card">
           <mat-card-header>
             <mat-card-title>{{ 'DISCOUNT.TITLE' | translate }}</mat-card-title>
           </mat-card-header>
           <mat-card-content>
-            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+            <div class="inner-container">
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'DISCOUNT.NAME.FIELD' | translate }}</mat-label>
                 <label>
@@ -19,7 +19,7 @@
                   {{errors['name']}}
                 </mat-error>
               </mat-form-field>
-              <div *ngIf="currencies; else skeleton" fxLayout="row" fxLayoutAlign="space-between center">
+              <div *ngIf="currencies; else skeleton" class="fields-container">
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'COMMON.CURRENCY.FIELD' | translate }}</mat-label>
                   <label>
@@ -41,10 +41,10 @@
                     {{errors['currency']}}
                   </mat-error>
                 </mat-form-field>
-                <button fxShow.lt-sm fxHide (click)="addCurrency" color="accent" mat-fab>
+                <button class="hide-gt-xs" (click)="addCurrency" color="accent" mat-fab>
                   <mat-icon matPrefix>add_card</mat-icon>
                 </button>
-                <button fxHide.lt-sm fxShow (click)="addCurrency" color="accent" mat-fab extended>
+                <button class="hide-xs" (click)="addCurrency" color="accent" mat-fab extended>
                   <mat-icon matPrefix>add_card</mat-icon>
                   <span>{{ 'COMMON.CURRENCY.ADD_BUTTON' | translate }}</span>
                 </button>
@@ -89,8 +89,8 @@
               </mat-form-field>
             </div>
           </mat-card-content>
-          <mat-card-actions>
-            <div fxFlex></div>
+          <mat-card-actions class="card-actions">
+            <div class="spacer"></div>
             <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
             <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button"

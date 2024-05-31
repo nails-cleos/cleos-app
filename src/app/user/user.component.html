@@ -1,6 +1,6 @@
-<div class="flex-container" fxLayout="column">
-  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div fxFlex="60%" fxFlex.lt-sm="80%">
+<div class="flex-container">
+  <div class="card-container">
+    <div class="card-content">
       <mat-card appearance="outlined">
         <ng-template [ngIf]="isAddMode" [ngIfElse]="headerEditMode">
           <mat-card-header>
@@ -19,7 +19,7 @@
 
         <form (ngSubmit)="submit" [formGroup]="form" novalidate>
           <mat-card-content>
-            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+            <div class="inner-container">
               <ng-template [ngIf]="isAddMode">
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'USER.ROLE.FIELD' | translate }}</mat-label>
@@ -50,11 +50,11 @@
               </mat-form-field>
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.USER.LANG.FIELD' | translate }}</mat-label>
-                <span *ngIf="select.value" [class]="'flag-icon  flag-icon-squared flag-icon-' + select.value.icon"
+                <span *ngIf="select.value" [class]="'fi  fis fi-' + select.value.icon"
                       class="margin-right-eight" matPrefix></span>
                 <mat-select #select formControlName="lang" required>
                   <mat-option *ngFor="let lang of flagList" [value]="lang">
-                    <span [class]="'flag-icon  flag-icon-squared flag-icon-' + lang.icon"></span>
+                    <span [class]="'fi  fis fi-' + lang.icon"></span>
                     {{ 'COMMON.LANG.' + lang.text | translate }}
                   </mat-option>
                 </mat-select>
@@ -99,24 +99,32 @@
                               (addressEmitter)="getAddress($event)"
                               [markInfo]="'<b>' + (formattedAddress || user?.address?.name) + '</b>'">
               </app-google-map>
-              <mat-form-field *ngIf="['ROLE_PROFESSIONAL', 'ROLE_MANAGER'].indexOf(getForm.role.value) === 0"
-                              appearance="outline">
+              <mat-form-field *ngIf="isProfessionalOrManager" appearance="outline">
                 <mat-label>{{ 'COMMON.PROFESSIONAL.COLOR.DARK.FIELD' | translate }}</mat-label>
-                <input formControlName="darkColor" [ngxMatColorPicker]="pickerDark" matInput>
-                <ngx-mat-color-toggle [for]="pickerDark" matSuffix></ngx-mat-color-toggle>
-                <ngx-mat-color-picker #pickerDark [touchUi]="true"></ngx-mat-color-picker>
+                <input matInput formControlName="darkColor"/>
+                <div matSuffix ngx-colors-trigger formControlName="darkColorPicker" [style.color]="getForm.darkColor.value"
+                     [format]="'hex'" [colorsAnimation]="'popup'" style="margin: 5px">
+                  <mat-icon aria-hidden="false" aria-label="Example palette icon" fontIcon="palette"></mat-icon>
+                </div>
+                <mat-error *ngIf="getForm.darkColor.hasError('invalidColor')">
+                  {{ 'COMMON.PROFESSIONAL.COLOR.INVALID' | translate }}
+                </mat-error>
               </mat-form-field>
-              <mat-form-field *ngIf="['ROLE_PROFESSIONAL', 'ROLE_MANAGER'].indexOf(getForm.role.value) === 0"
-                              appearance="outline">
+              <mat-form-field *ngIf="isProfessionalOrManager" appearance="outline">
                 <mat-label>{{ 'COMMON.PROFESSIONAL.COLOR.LIGHT.FIELD' | translate }}</mat-label>
-                <input formControlName="lightColor" [ngxMatColorPicker]="picker" matInput>
-                <ngx-mat-color-toggle [for]="picker" matSuffix></ngx-mat-color-toggle>
-                <ngx-mat-color-picker #picker [touchUi]="true"></ngx-mat-color-picker>
+                <input matInput formControlName="lightColor"/>
+                <div matSuffix ngx-colors-trigger formControlName="lightColorPicker" [style.color]="getForm.lightColor.value"
+                     [format]="'hex'" [colorsAnimation]="'popup'" style="margin: 5px">
+                  <mat-icon aria-hidden="false" aria-label="Example palette icon" fontIcon="palette"></mat-icon>
+                </div>
+                <mat-error *ngIf="getForm.lightColor.hasError('invalidColor')">
+                  {{ 'COMMON.PROFESSIONAL.COLOR.INVALID' | translate }}
+                </mat-error>
               </mat-form-field>
               <div style="width: 100%; display: table;">
                 <div style="display: table-row">
                   <div style="display: table-cell;">
-                    <mat-card appearance="outlined" *ngIf="getForm.darkColor.value"
+                    <mat-card appearance="outlined" *ngIf="isProfessionalOrManager && getForm.darkColor.value"
                               [style.background-color]="'#363636'">
                       <mat-card-header>
                         <mat-card-subtitle [style.color]="'#fafafa'">
@@ -125,7 +133,7 @@
                       </mat-card-header>
                       <mat-card-content>
                         <div
-                          [style.background-color]="'rgb(' + getForm.darkColor.value.r + ',' + getForm.darkColor.value.g + ',' + getForm.darkColor.value.b + ')'"
+                          [style.background-color]="getForm.darkColor.value"
                           [style.border-color]="lightenDarkenColor(getForm.darkColor.value, true)"
                           [style.color]="'#000'"
                           class="reservation-example">
@@ -135,7 +143,7 @@
                     </mat-card>
                   </div>
                   <div style="display: table-cell;">
-                    <mat-card appearance="outlined" *ngIf="getForm.lightColor.value"
+                    <mat-card appearance="outlined" *ngIf="isProfessionalOrManager && getForm.lightColor.value"
                               [style.background-color]="'#fafafa'">
                       <mat-card-header>
                         <mat-card-subtitle [style.color]="'#363636'">
@@ -144,7 +152,7 @@
                       </mat-card-header>
                       <mat-card-content>
                         <div
-                          [style.background-color]="'rgb(' + getForm.lightColor.value.r + ',' + getForm.lightColor.value.g + ',' + getForm.lightColor.value.b + ')'"
+                          [style.background-color]="getForm.lightColor.value"
                           [style.border-color]="lightenDarkenColor(getForm.lightColor.value, false)"
                           [style.color]="'#fff'" class="reservation-example">
                           {{ 'COMMON.PROFESSIONAL.COLOR.RESERVATION' | translate }}
@@ -156,8 +164,8 @@
               </div>
             </div>
           </mat-card-content>
-          <mat-card-actions>
-            <div fxFlex></div>
+          <mat-card-actions class="card-actions">
+            <div class="spacer"></div>
             <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
             <ng-template [ngIf]="isAddMode" [ngIfElse]="buttonEditMode">

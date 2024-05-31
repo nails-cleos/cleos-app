@@ -1,6 +1,6 @@
 <div>
   <fieldset>
-    <div fxLayout="row" fxLayoutAlign="space-around center">
+    <div class="row-space-around-container">
       <mat-form-field appearance="outline">
         <mat-label>{{ 'SUMMARY.YEAR.SELECT.DATE' | translate }}</mat-label>
         <input matInput [matDatepicker]="dp" [formControl]="date">
@@ -14,7 +14,7 @@
         <mat-icon>calendar_view_week</mat-icon>
       </button>
     </div>
-    <div fxLayout="column" fxLayoutAlign="space-around stretch">
+    <div class="space-around-container">
       <ng-template [ngIf]="yearSummaryMap?.size">
         <mat-form-field appearance="outline" class="full-select">
           <mat-label>{{ 'COMMON.ROOM.FIELD' | translate }}</mat-label>

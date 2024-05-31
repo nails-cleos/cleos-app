@@ -6,27 +6,33 @@ export interface IFlag {
   text: string;
 }
 
-export const flags = (): IFlag[] => [{
-  icon: 'ar',
-  value: 'es_AR',
-  text: 'ES'
-}, {
-  icon: 'es',
-  value: 'es',
-  text: 'ES'
-}, {
-  icon: 'gb',
-  value: 'en_GB',
-  text: 'EN'
-}, {
-  icon: 'nl',
-  value: 'en_NL',
-  text: 'EN'
-}, {
-  icon: 'us',
-  value: 'en',
-  text: 'EN'
-}];
+export const flags = (): IFlag[] => [
+  // {
+  //   icon: 'ar',
+  //   value: 'es_AR',
+  //   text: 'ES'
+  // },
+  {
+    icon: 'es',
+    value: 'es',
+    text: 'ES'
+  },
+  {
+    icon: 'gb',
+    value: 'en_GB',
+    text: 'EN'
+  },
+  // {
+  //   icon: 'nl',
+  //   value: 'nl',
+  //   text: 'NL'
+  // },
+  // {
+  //   icon: 'us',
+  //   value: 'en',
+  //   text: 'EN'
+  // }
+];
 
 export const findFlag = (flagList: IFlag[], lang: string): IFlag => {
   let value = flagList.find(flag => flag.value === lang);

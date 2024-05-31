@@ -23,7 +23,7 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['position', 'discount.name', 'discount.amount', 'used', 'actions'];
+  displayedColumns: string[] = ['position', 'discountCustomer.name', 'discountCustomer.amount', 'used', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IUserDiscount>>();
 
   resultsLength = DEFAULT_LENGTH;
@@ -81,14 +81,14 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
         this.getDiscounts();
       }
       this.dataSource = state.data?.content?.map((ud: IUserDiscount) => {
-        if (ud && ud.discount) {
+        if (ud && ud.discountCustomer) {
           let symbol;
-          switch (ud.discount.type) {
+          switch (ud.discountCustomer.type) {
             case DiscountType.money:
-              symbol = `$ ${ ud.discount.amount }`;
+              symbol = `$ ${ ud.discountCustomer.amount }`;
               break;
             case DiscountType.percentage:
-              symbol = `${ ud.discount.amount } %`;
+              symbol = `${ ud.discountCustomer.amount } %`;
               break;
           }
           return Object.assign({}, ud, { symbol });

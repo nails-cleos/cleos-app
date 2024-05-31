@@ -15,10 +15,9 @@ import { CalendarDateFormatter, CalendarEventTitleFormatter, CalendarModule, Dat
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 
 import { CardChartComponent, CardComponent } from './card/card.component';
-import { NgChartsModule } from 'ng2-charts';
+import { BaseChartDirective } from 'ng2-charts';
 import { CustomDateFormatter } from './CustomDateFormatter';
 import { CustomEventTitleFormatter } from './CustomEventTitleFormatter';
-import { FlexLayoutModule } from '@angular/flex-layout';
 import { ChartComponent } from './chart/chart.component';
 import { httpInterceptorProviders } from '../http-interceptors';
 import { HttpClientJsonpModule, HttpClientModule } from '@angular/common/http';
@@ -105,8 +104,7 @@ const importExport = [
     }),
     GoogleMapsModule,
     ReactiveFormsModule,
-    NgChartsModule,
-    FlexLayoutModule,
+    BaseChartDirective,
     HttpClientModule,
     HttpClientJsonpModule,
     FormsModule
@@ -116,10 +114,9 @@ const importExport = [
     CommonModule,
     TranslateModule,
     ReactiveFormsModule,
-    FlexLayoutModule,
     HttpClientModule,
     HttpClientJsonpModule,
-    NgChartsModule,
+    BaseChartDirective,
     FormsModule,
     ...importExport
   ],

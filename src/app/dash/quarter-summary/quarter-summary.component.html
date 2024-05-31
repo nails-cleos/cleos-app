@@ -1,6 +1,6 @@
 <div>
   <fieldset>
-    <div fxLayout="row" fxLayoutAlign="space-around center">
+    <div class="row-space-around-container">
       <mat-form-field appearance="outline">
         <mat-label>{{'SUMMARY.YEAR.SELECT.DATE' | translate}}</mat-label>
         <input matInput [matDatepicker]="dp" [formControl]="date">
@@ -8,7 +8,6 @@
         <mat-datepicker #dp startView="multi-year" (yearSelected)="setYear($event, dp)">
         </mat-datepicker>
       </mat-form-field>
-      <!--      <div fxFlex></div>-->
       <mat-form-field appearance="outline">
         <mat-label>{{'SUMMARY.QUARTER.SELECT' | translate}}</mat-label>
         <mat-select [formControl]="selectedQuarter">
@@ -22,7 +21,7 @@
         <mat-icon>calendar_month</mat-icon>
       </button>
     </div>
-    <div fxLayout="column" fxLayoutAlign="space-around stretch">
+    <div class="space-around-container">
       <ng-template [ngIf]="quarterSummaryMap?.size">
         <mat-form-field appearance="outline" class="full-select">
           <mat-label>{{'COMMON.ROOM.FIELD' | translate}}</mat-label>
@@ -71,8 +70,8 @@
   </div>
 </ng-template>
 
-<div class="top-space">
-  <div fxFlex></div>
+<div class="top-space card-actions">
+  <div class="spacer"></div>
   <button [disabled]="!this.monthSummaries" (click)="exportQuarterSummary()" color="primary" mat-fab extended class="icon-button">
     <mat-icon>file_download</mat-icon>
     <span>{{ 'COMMON.BUTTON.EXPORT' | translate }}</span>

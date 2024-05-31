@@ -1,6 +1,6 @@
-<div class="flex-container" fxLayout="column">
-  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div fxFlex="60%" fxFlex.lt-sm="80%">
+<div class="flex-container">
+  <div class="card-container">
+    <div class="card-content">
       <mat-card appearance="outlined">
         <mat-card-header>
           <mat-card-title [matBadgeHidden]="badge <= 0" [matBadge]="badge" matBadgeColor="warn"
@@ -11,7 +11,7 @@
             *ngIf="!notifications.length">{{ 'COMMON.NOTIFICATION.NO' | translate }}</mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
-          <div fxLayout="column" fxLayoutAlign="space-evenly stretch" @list *ngIf="notifications.length">
+          <div class="inner-container" @list *ngIf="notifications.length">
             <mat-list *ngFor="let not of notifications; last as last; first as first; let i = index" @items
                       matRipple style="padding: 0">
               <mat-divider *ngIf="first"></mat-divider>
@@ -29,11 +29,13 @@
               <mat-divider *ngIf="!last || showMore"></mat-divider>
             </mat-list>
             <mat-list>
-              <mat-list-item *ngFor="let n of loadingNotifications">
-                <div class="ssc-line" mat-line></div>
-                <div class="ssc-line top" mat-line></div>
+              @for (n of loadingNotifications; track n) {
+                <mat-list-item>
+                  <div class="ssc-line" matListItemTitle></div>
+                  <div class="ssc-line top" matListItemLine></div>
+                </mat-list-item>
                 <mat-divider class="divider"></mat-divider>
-              </mat-list-item>
+              }
               <mat-list-item *ngIf="showMore">
                 <button (click)="getNotifications()" color="primary" mat-button>
                   {{'COMMON.NOTIFICATION.LOAD_MORE' | translate}}

@@ -8,7 +8,8 @@ import {
   createNewDate,
   dateToTimestamp,
   endOfPeriod,
-  getCurrentTimeZone, getDurationOrUndefined,
+  getCurrentTimeZone,
+  getDurationOrUndefined,
   getEnd,
   getMinutesBetweenTimes,
   getNow,
@@ -251,12 +252,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     if (!calendarEvent.actions) {
       calendarEvent.actions = [{
-        label: `<div class="mat-raised-button"><div class="custom-material-icons">visibility</div>&nbsp;${ this.viewText }</div>`,
+        label: `<div class="mat-raised-button"><div class="custom-material-icons material-icons">visibility</div>&nbsp;${ this.viewText }</div>`,
         onClick: ({ event }: { event: CalendarEvent }): void => {
           this.eventClick(event, 'VIEW');
         }
       }, {
-        label: `<div class="mat-raised-button"><div class="custom-material-icons">read_more</div>&nbsp;${ this.moreText }</div>`,
+        label: `<div class="mat-raised-button"><div class="custom-material-icons material-icons">read_more</div>&nbsp;${ this.moreText }</div>`,
         onClick: ({ event }: { event: CalendarEvent }): void => {
           this.eventClick(event, 'MORE_INFO');
         }
@@ -264,7 +265,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
       if (showApprove) {
         calendarEvent.actions = [{
-          label: `<div class="mat-raised-button"><div class="custom-material-icons">done</div>&nbsp;${ this.approveText }</div>`,
+          label: `<div class="mat-raised-button"><div class="custom-material-icons material-icons">done</div>&nbsp;${ this.approveText }</div>`,
           onClick: ({ event }: { event: CalendarEvent }): void => {
             this.eventClick(event, 'APPROVE');
           }
@@ -273,7 +274,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
       if (showStart) {
         calendarEvent.actions = [{
-          label: `<div class="mat-raised-button"><div class="custom-material-icons">play_arrow</div>&nbsp;${ this.startText }</div>`,
+          label: `<div class="mat-raised-button"><div class="custom-material-icons material-icons">play_arrow</div>&nbsp;${ this.startText }</div>`,
           onClick: ({ event }: { event: CalendarEvent }): void => {
             this.eventClick(event, 'START');
           }
@@ -282,7 +283,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
       if (showComplete) {
         calendarEvent.actions = [{
-          label: `<div class="mat-raised-button"><div class="custom-material-icons">done_all</div>&nbsp;${ this.completeText }</div>`,
+          label: `<div class="mat-raised-button"><div class="custom-material-icons material-icons">done_all</div>&nbsp;${ this.completeText }</div>`,
           onClick: ({ event }: { event: CalendarEvent }): void => {
             this.eventClick(event, 'COMPLETE');
           }

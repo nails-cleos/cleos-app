@@ -1,18 +1,17 @@
-<div class="flex-container" fxLayout="column">
-  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div fxFlex="60%" fxFlex.lt-sm="80%">
+<div class="flex-container">
+  <div class="card-container">
+    <div class="card-content">
       <mat-card appearance="outlined" class="style-card">
         <mat-card-content>
-          <h2>{{'ROOM.ME.SERVICES.ADDITIONAL.TITLE' | translate}}</h2>
+          <h2>{{ 'ROOM.ME.SERVICES.ADDITIONAL.TITLE' | translate }}</h2>
           <div *ngIf="(selectedAdditional.length && !additional.length) || (!selectedAdditional.length && additional.length)
-      || (selectedAdditional.length && additional.length); else boxSkeleton" fxLayout="row"
-               fxLayoutAlign="space-evenly stretch">
+      || (selectedAdditional.length && additional.length); else boxSkeleton" class="inner-row-container">
             <div class="drag-container">
               <div class="section-heading">{{ 'ROOM.ME.SERVICES.ALL' | translate }}</div>
               <div #additionalList="cdkDropList" (cdkDropListDropped)="drop($event, false)"
                    [cdkDropListConnectedTo]="[selectedAdditionalList]" [cdkDropListData]="additional" cdkDropList
                    class="item-list">
-                <div *ngFor="let item of additional" cdkDrag class="item-box">{{item.name}}</div>
+                <div *ngFor="let item of additional" cdkDrag class="item-box">{{ item.name }}</div>
               </div>
             </div>
 
@@ -23,28 +22,28 @@
                    class="item-list">
                 <div (click)="changePrice(item)" *ngFor="let item of selectedAdditional" cdkDrag class="item-box">
                   <div>
-                    <div>{{item.name}}</div>
-                    <div>{{item.currency | currencySymbol}} {{item.price}}</div>
+                    <div>{{ item.name }}</div>
+                    <div>{{ item.currency | currencySymbol }} {{ item.price }}</div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <h2>{{'ROOM.ME.SERVICES.TREATMENT.TITLE' | translate}}</h2>
+          <h2>{{ 'ROOM.ME.SERVICES.TREATMENT.TITLE' | translate }}</h2>
           <div *ngIf="groups.size; else boxSkeleton">
             <div *ngFor="let group of groups | keyvalue">
-              <div fxLayout="row" fxLayoutAlign="space-evenly stretch">
+              <div class="inner-row-container">
                 <div class="drag-container">
-                  <div class="section-heading">{{group.value.name}}</div>
+                  <div class="section-heading">{{ group.value.name }}</div>
                   <div #treatmentList="cdkDropList" (cdkDropListDropped)="drop($event, false)"
                        [cdkDropListConnectedTo]="[selectedTreatmentList]" [cdkDropListData]="group.value.treatments"
                        cdkDropList
                        class="item-list">
-                    <div *ngFor="let item of group.value.treatments" cdkDrag class="item-box">{{item.name}}</div>
+                    <div *ngFor="let item of group.value.treatments" cdkDrag class="item-box">{{ item.name }}</div>
                   </div>
                 </div>
                 <div class="drag-container">
-                  <div class="section-heading">{{group.value.name}}</div>
+                  <div class="section-heading">{{ group.value.name }}</div>
                   <div #selectedTreatmentList="cdkDropList" (cdkDropListDropped)="drop($event,true)"
                        [cdkDropListConnectedTo]="[treatmentList]" [cdkDropListData]="group.value.selectedTreatments"
                        cdkDropList
@@ -52,8 +51,8 @@
                     <div (click)="changePrice(item)" *ngFor="let item of group.value.selectedTreatments" cdkDrag
                          class="item-box">
                       <div>
-                        <div>{{item.name}}</div>
-                        <div>{{item.currency | currencySymbol}} {{item.price}}</div>
+                        <div>{{ item.name }}</div>
+                        <div>{{ item.currency | currencySymbol }} {{ item.price }}</div>
                       </div>
                     </div>
                   </div>
@@ -65,8 +64,8 @@
             <div class="ssc-square mb"></div>
           </ng-template>
         </mat-card-content>
-        <mat-card-actions>
-          <div fxFlex></div>
+        <mat-card-actions class="card-actions">
+          <div class="spacer"></div>
           <button appBackButton class="margin-right-eight icon-button" color="accent" mat-fab extended type="button">
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>

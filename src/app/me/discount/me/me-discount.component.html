@@ -1,5 +1,5 @@
 <div class="mat-elevation-z8">
-  <table [dataSource]="dataSource" mat-table matSort matSortActive="discount.name"
+  <table [dataSource]="dataSource" mat-table matSort matSortActive="discountCustomer.name"
          matSortDirection="asc" matSortDisableClear>
     <ng-container matColumnDef="position">
       <th *matHeaderCellDef mat-header-cell>#</th>
@@ -11,20 +11,20 @@
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="discount.name">
+    <ng-container matColumnDef="discountCustomer.name">
       <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
       <td *matCellDef="let userDiscount" mat-cell>
-        <div *ngIf="userDiscount.id; else skeleton">{{userDiscount.discount.name}}</div>
+        <div *ngIf="userDiscount.id; else skeleton">{{userDiscount.discountCustomer.name}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="discount.amount">
+    <ng-container matColumnDef="discountCustomer.amount">
       <th *matHeaderCellDef mat-header-cell
           mat-sort-header>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
-      <td *matCellDef="let userDiscount">
+      <td *matCellDef="let userDiscount" mat-cell>
         <div *ngIf="userDiscount.id; else skeleton" class="bold">{{userDiscount.symbol}}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -33,9 +33,9 @@
     </ng-container>
 
     <ng-container matColumnDef="used">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell
           mat-sort-header>{{ 'ME.DISCOUNT.LIST.COLUMN.USED' | translate }}</th>
-      <td *matCellDef="let userDiscount" fxHide.lt-sm fxShow>
+      <td *matCellDef="let userDiscount" class="hide-xs" mat-cell>
         <div *ngIf="userDiscount.id; else skeleton">
           <div *ngIf="userDiscount.used; else notUsed">
             <mat-icon>done</mat-icon>

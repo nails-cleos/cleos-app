@@ -3,8 +3,8 @@
   <p>{{'COMMON.RESERVATION.EDIT.TEXT' | translate: {penalty: penalty} }}</p>
   <app-price [price]="price" [currency]="currency" [showPenalty]="true" [showBank]="false"></app-price>
 </div>
-<div mat-dialog-actions>
-  <div fxFlex></div>
+<div mat-dialog-actions class="card-actions">
+  <div class="spacer"></div>
   <ng-template [ngIf]="data.small" [ngIfElse]="largeButton">
     <button (click)="onNoClick" mat-fab>
       <mat-icon>clear</mat-icon>

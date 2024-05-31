@@ -2,10 +2,10 @@ import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Outpu
 import { ControlContainer, NgForm, UntypedFormGroup } from '@angular/forms';
 import { GeocodeService, MapStatus } from '../../services/geocode.service';
 import { MapInfoWindow, MapMarker } from '@angular/google-maps';
-import PlaceResult = google.maps.places.PlaceResult;
-import MapMouseEvent = google.maps.MapMouseEvent;
 import { AuthUserService } from '../../services/auth-user.service';
 import { Subscription } from 'rxjs';
+import PlaceResult = google.maps.places.PlaceResult;
+import MapMouseEvent = google.maps.MapMouseEvent;
 
 @Component({
   selector: 'app-google-map',
@@ -29,7 +29,7 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
   @Output() addressEmitter = new EventEmitter<PlaceResult>();
   @Output() distanceEmitter = new EventEmitter<number>();
 
-  public markerOptions: google.maps.MarkerOptions;
+  public markerOptions: google.maps.marker.AdvancedMarkerElementOptions;
   public markerPosition?: google.maps.LatLngLiteral;
   public latitude: number;
   public longitude: number;
@@ -51,7 +51,7 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.longitude = 4.462456;
     this.isDraggable = false;
     this.mapStatus = MapStatus.loading;
-    this.markerOptions = { draggable: this.isDraggable };
+    this.markerOptions = { gmpDraggable: this.isDraggable };
     this.center = { lat: this.latitude, lng: this.longitude };
     this.zoom = 10;
     this.types = [];
@@ -204,7 +204,7 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.markerPosition = { lat: this.latitudeMarker, lng: this.longitudeMarker };
 
       this.zoom = 15;
-      this.markerOptions = { draggable: this.isDraggable };
+      this.markerOptions = { gmpDraggable: this.isDraggable };
 
       if (this.showDistance) {
         this.geocodeService.geocodeAddress(this.latitudeMarker, this.longitudeMarker, this.showDistance).subscribe(value => {
@@ -246,7 +246,7 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
         <div>${ this.addressFormGroup?.get('addressDescription')?.value || '' }</div>`;
 
       this.zoom = 15;
-      this.markerOptions = { draggable: this.isDraggable };
+      this.markerOptions = { gmpDraggable: this.isDraggable };
       this.addressEmitter.emit(place);
     }
   }

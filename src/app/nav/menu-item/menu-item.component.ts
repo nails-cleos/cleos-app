@@ -17,6 +17,8 @@ export class MenuItemComponent implements OnInit {
   @ViewChild('childMenu') public childMenu!: IMenu;
   @Input() drawer: any;
   step = 0;
+  openSubMenus: { [key: number]: boolean } = {};
+  openSubSubMenus: { [key: number]: { [key: number]: boolean } } = {};
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe([
     Breakpoints.XSmall,
@@ -36,6 +38,37 @@ export class MenuItemComponent implements OnInit {
   navigate(menu: IMenu, drawer?: any): void {
     drawer?.toggle();
     this.router.navigate([this.language].concat(menu.path.split('/')));
+  }
+
+  toggleSubMenu(index: number) {
+    // Close all other submenus
+    for (let key in this.openSubMenus) {
+      if (Number(key) !== index) {
+        this.openSubMenus[key] = false;
+      }
+    }
+    this.openSubMenus[index] = !this.openSubMenus[index];
+  }
+
+  isSubMenuOpen(index: number): boolean {
+    return this.openSubMenus[index] || false;
+  }
+
+  toggleSubSubMenu(index: number, subIndex: number) {
+    if (!this.openSubSubMenus[index]) {
+      this.openSubSubMenus[index] = {};
+    }
+    // Close all other sub-submenus within the same sub-menu
+    for (let key in this.openSubSubMenus[index]) {
+      if (Number(key) !== subIndex) {
+        this.openSubSubMenus[index][key] = false;
+      }
+    }
+    this.openSubSubMenus[index][subIndex] = !this.openSubSubMenus[index][subIndex];
+  }
+
+  isSubSubMenuOpen(index: number, subIndex: number): boolean {
+    return (this.openSubSubMenus[index] && this.openSubSubMenus[index][subIndex]) || false;
   }
 
   setStep(index: number): void {

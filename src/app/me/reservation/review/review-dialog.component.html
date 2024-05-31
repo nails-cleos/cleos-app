@@ -1,7 +1,9 @@
-<button (click)="onNoClick" class="close-button" mat-icon-button>
-  <mat-icon>close</mat-icon>
-</button>
-<h1 mat-dialog-title>{{ 'ME.REVIEW.TITLE' | translate }}</h1>
+<div class="dialog-header">
+  <h1 mat-dialog-title>{{ 'ME.REVIEW.TITLE' | translate }}</h1>
+  <button (click)="onNoClick" class="close-button" mat-icon-button>
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
 <mat-divider class="divider-padding"></mat-divider>
 <div mat-dialog-content>
   <div class="upcoming">
@@ -20,7 +22,7 @@
       </tr>
       <tr *ngIf="reservation">
         <td class="right">{{ 'COMMON.ADDRESS.FIELD' | translate }}</td>
-        <td class="left">
+        <td class="left dialog-title">
           <a
             [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + reservation.room.address.name"
             rel="noreferrer" target="_blank">
@@ -40,10 +42,10 @@
   </div>
   <mat-divider class="divider-padding"></mat-divider>
   <app-rating *ngIf="review; else noReview" [detail]="review.detail" [rating]="review.rating" [starCount]="starCount"
-              color="primary"></app-rating>
+              color="primary" [canEdit]="false"></app-rating>
   <ng-template #noReview>
     <app-rating (ratingHover)="onRatingHover($event)" (ratingUpdated)="onRatingChanged($event)" [hover]="hover"
-                [rating]="rating" [starCount]="starCount" color="accent"></app-rating>
+                [rating]="rating" [starCount]="starCount" color="accent" [canEdit]="true"></app-rating>
     <mat-form-field appearance="outline">
       <mat-label>{{ 'ME.REVIEW.DETAIL' | translate }}</mat-label>
       <label>
@@ -54,9 +56,9 @@
   </ng-template>
 </div>
 <mat-divider class="divider-padding"></mat-divider>
-<div mat-dialog-actions>
-  <div fxFlex></div>
+<div mat-dialog-actions class="card-actions">
+  <div class="spacer"></div>
   <button (click)="onNoClick" color="accent" mat-fab extended>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
-  <button (click)="doAction" *ngIf="!review" [disabled]="rating < 1" cdkFocusInitial color="primary"
+  <button (click)="doAction" *ngIf="!review" [disabled]="rating < 1" color="primary"
           mat-fab extended>{{ 'COMMON.BUTTON.ADD' | translate }}</button>
 </div>

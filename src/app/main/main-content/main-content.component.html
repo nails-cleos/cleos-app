@@ -42,7 +42,7 @@
 
 <!-- Story -->
 <section id="story" class="story">
-  <div fxLayout="column" fxLayoutAlign="space-around center">
+  <div class="section-container">
     <div class="section-title text-center" appAnimate [animateInAnimation]="storyTitle">
       <h1>{{ 'MAIN.SECTION.STORY' | translate }}</h1>
       <div class="home-divider">
@@ -50,9 +50,8 @@
       </div>
     </div>
 
-    <div fxLayout="row wrap" fxLayout.xs="column" fxLayoutAlign="space-between center" style="width: 100%">
-      <div class="section-sub-title" fxFlex="1 1 calc(75% - 32px)" fxFlex.md="1 1 calc(50% - 32px)"
-           fxFlex.sm="1 1 calc(50% - 32px)" fxFlex.xs="100%">
+    <div class="story-container">
+      <div class="section-sub-title story-item">
         <h2 class="text-center" #storyDescription
             [@leftRight]="{value: storyDescriptionState.value, params: {translate: '-20px'}}">
           {{ 'MAIN.STORY.DESCRIPTION' | translate }}
@@ -64,8 +63,7 @@
         </h3>
       </div>
 
-      <div fxFlex="1 1 calc(25% - 32px)" fxFlex.md="1 1 calc(50% - 32px)" fxFlex.sm="1 1 calc(50% - 32px)"
-           fxFlex.xs="100%" #storyMember>
+      <div class="story-member-item" #storyMember>
         <figure class="team-member text-center">
           <div class="member-thumb"
                [@bottomTop]="{value: storyMemberState.value, params: {translate: '40vh', delayIn: '0ms', delayOut: '600ms'}}">
@@ -85,7 +83,7 @@
 
 <!-- Works -->
 <section id="work" class="works" *ngIf="allWorks.length">
-  <div fxLayout="column" fxLayoutAlign="space-between center">
+  <div class="work-container">
     <div class="section-title text-center">
       <h1>{{ 'MAIN.SECTION.WORK' | translate }}</h1>
       <div class="home-divider">
@@ -112,10 +110,8 @@
       </ul>
     </div>
 
-    <div fxLayout="row grap" fxLayout.xs="column" fxLayoutAlign="space-evenly center">
-
-      <div fxFlex="1 1 calc(33.33% - 32px)" fxFlex.md="1 1 calc(50% - 32px)" fxFlex.sm="100%" fxFlex.xs="100%"
-           class="text-center" *ngFor="let work of works; let i = index" [@fadeInOut]="i">
+    <div class="work-inner-container">
+      <div class="text-center work-flex-item" *ngFor="let work of works; let i = index" [@fadeInOut]="i">
         <figure class="work-item">
           <div class="work-img" [ngStyle]="{'background-image': 'url(' + work.image + ')'}"></div>
           <figcaption class="overlay">
@@ -134,7 +130,7 @@
 
 <!-- Features -->
 <section id="treatments" class="treatments" *ngIf="groups?.length">
-  <div fxLayout="column" fxLayoutAlign="space-around center">
+  <div class="section-container">
 
     <div class="section-title text-center mb-50" appAnimate [animateInAnimation]="treatmentTitle">
       <h1>{{ 'MAIN.SECTION.TREATMENT' | translate }}</h1>
@@ -144,9 +140,8 @@
     </div>
     <div #treatmentItem></div>
 
-    <div fxLayout="row grap" fxLayout.xs="column" fxLayoutAlign="space-around center">
-      <div fxFlex="1 1 calc(33.33% - 32px)" fxFlex.sm="1 1 calc(50% - 32px)" fxFlex.xs="100"
-           *ngFor="let group of groups; let i = index">
+    <div class="treatment-container">
+      <div class="work-flex-item" *ngFor="let group of groups; let i = index">
         <div class="treatment-item pointer-only" appAnimate [animateInAnimation]="setTreatmentAnimation(i)"
              [stopAnimation]="isSmall">
           <div class="treatment-icon">
@@ -168,7 +163,7 @@
 <!-- Experiences -->
 <section id="experiences" class="experiences">
   <div class="parallax-overlay">
-    <div fxLayout="column" fxLayoutAlign="space-around center">
+    <div class="section-container">
       <div class="section-title text-center mb-50" appAnimate [animateInAnimation]="experienceTitle">
         <h1 class="experience-title">{{ 'MAIN.SECTION.EXPERIENCE' | translate }}</h1>
         <div class="home-divider">
@@ -176,9 +171,8 @@
         </div>
       </div>
 
-      <div fxLayout="row wrap" fxLayout.xs="column" fxLayoutAlign="space-between center" style="width: 100%">
-        <div *ngFor="let experience of experiences" class="text-center" fxFlex="1 1 calc(25% - 32px)"
-             fxFlex.sm="1 1 calc(50% - 32px)" fxFlex.xs="100%" [id]="experience.id"
+      <div class="treatment-container">
+        <div *ngFor="let experience of experiences" class="text-center treatment-item" [id]="experience.id"
              [@bottomTop]="{value: experience.state.value, params: {translate: '20px', delayIn: experience.delay, delayOut: experience.delayOut}}">
           <div class="counters-item">
             <mat-icon>{{ experience.icon }}</mat-icon>
@@ -194,7 +188,7 @@
 
 <!-- Contact Us -->
 <section id="contact" class="contact">
-  <div fxLayout="column" fxLayoutAlign="space-around center" class="mb-50">
+  <div class="section-container mb-50">
 
     <div class="section-title text-center mb-50" appAnimate [animateInAnimation]="contactTitle">
       <h1>{{ 'MAIN.SECTION.CONTACTS' | translate }}</h1>
@@ -208,12 +202,10 @@
       <p [innerHTML]="'MAIN.CONTACT.DETAIL' | translate"></p>
     </div>
 
-    <div fxLayout="row wrap" fxLayoutGap="32px" fxLayout.xs="column" fxLayoutAlign="space-between center"
-         style="width: 80%">
+    <div class="contact-container" style="width: 80%">
 
       <!-- contact address -->
-      <div fxFlex.lg="1 1 calc(20% - 32px)" fxFlex.md="1 1 calc(20% - 32px)" fxFlex.sm="1 1 calc(20% - 32px)"
-           fxFlex.xs="100" #contactItem1>
+      <div class="flex-item" #contactItem1>
         <div class="contact-address" [@leftRight]="contactItem1State.value">
           <h2>{{ 'MAIN.CONTACT.TITLE' | translate }}</h2>
           <p>
@@ -238,15 +230,14 @@
       <!-- end contact address -->
 
       <!-- contact form -->
-      <div fxFlex.lg="1 1 calc(60% - 32px)" fxFlex.md="1 1 calc(60% - 32px)" fxFlex.sm="1 1 calc(60% - 32px)"
-           fxFlex.xs="100" #contactItem2>
+      <div class="contact--item" #contactItem2>
         <div class="contact-form"
              [@bottomTop]="{value:contactItem2State.value, params: {delayIn: isSmall ? '0ms' : '500ms', delayOut: '0ms'}}">
           <h2 class="bold no-content">{{ 'MAIN.CONTACT.SEND.TITLE' | translate }}</h2>
 
           <form (ngSubmit)="sendEmail" [formGroup]="form" novalidate>
-            <div fxLayout="column" fxLayoutAlign="space-evenly stretch" class="home-page-form">
-              <div fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="space-between stretch">
+            <div class="home-page-form inner-container">
+              <div class="contact-inner-container">
                 <mat-form-field class="full full-margin">
                   <mat-label>{{ 'MAIN.CONTACT.NAME.FIELD' | translate }}</mat-label>
                   <label>
@@ -285,8 +276,8 @@
                 <mat-error *ngIf="body.hasError('required')"
                            [innerHTML]="'MAIN.CONTACT.BODY.REQUIRED' | translate"></mat-error>
               </mat-form-field>
-              <div>
-                <div fxFlex></div>
+              <div class="card-actions">
+                <div class="spacer"></div>
                 <button [disabled]="form.invalid" color="primary" mat-fab extended type="submit"
                         aria-label="Submit contact form">
                   <mat-icon>mail</mat-icon>
@@ -300,9 +291,8 @@
       <!-- end contact form -->
 
       <!-- footer social links -->
-      <div fxFlex.lg="1 1 calc(20% - 32px)" fxFlex.md="1 1 calc(20% - 32px)" fxFlex.sm="1 1 calc(20% - 32px)"
-           fxFlex.xs="100" #contactItem3>
-        <ul fxLayout.lt-sm="row" fxLayout="column" fxLayoutAlign="space-around center">
+      <div class="flex-item" #contactItem3>
+        <ul class="social-inner-container">
           <li *ngFor="let social of socialLinks"
               [@leftRight]="{value: contactItem3State.value, params: {translate: '100%', delay: isSmall ? '0ms' : social.delay}}">
             <ng-template [ngIf]="social.phone && social.phoneKey && social.phoneText" [ngIfElse]="noPhone">
@@ -337,13 +327,13 @@
 </section>
 <!-- End Contact Us-->
 
-<button fxHide.lt-sm fxShow color="primary" class="book-button fab-book-button" (click)="openBottomSheet" mat-fab
+<button color="primary" class="hide-xs book-button fab-book-button" (click)="openBottomSheet" mat-fab
         extended type="button" aria-label="Book your appointment">
   <mat-icon matPrefix>book_online</mat-icon>
   <span>{{ 'MAIN.BOOK.APPOINTMENT' | translate }}</span>
 </button>
 
-<button fxShow.lt-sm fxHide color="primary" class="book-button raised-book-button" (click)="openBottomSheet"
+<button color="primary" class="hide-gt-xs book-button raised-book-button" (click)="openBottomSheet"
         mat-raised-button type="button" aria-label="Book your appointment">
   <mat-icon matPrefix>book_online</mat-icon>
   <span>{{ 'MAIN.BOOK.APPOINTMENT' | translate }}</span>

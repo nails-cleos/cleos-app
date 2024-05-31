@@ -47,83 +47,86 @@
             d="M2437 1358 c29 -14 33 -34 33 -169 0 -116 -6 -140 -40 -152 -8 -3 44 -6 116 -6 128 -1 132 0 138 22 9 33 7 57 -4 57 -5 0 -10 -8 -10 -19 0 -32 -24 -42 -92 -39 l-63 3 -3 68 -3 67 61 0 c53 0 60 -2 60 -20 0 -11 5 -20 10 -20 6 0 10 22 10 49 0 28 -4 53 -10 56 -5 3 -10 -2 -10 -13 0 -22 -46 -34 -93 -25 -25 5 -27 9 -27 53 0 74 5 80 65 80 67 0 85 -7 85 -32 0 -10 5 -16 10 -13 6 3 10 19 10 36 l0 29 -132 -1 c-100 0 -128 -3 -111 -11z"/>
         </g>
       </svg>
-      <span>{{title | uppercase}}</span>
+      <span>{{ title | uppercase }}</span>
       <span class="mat-spacer"></span>
       <span *ngIf="(isHandset$ | async) === false; else menuButton">
         <button (click)="scrollToElement('story')" mat-button type="button" aria-label="My story">
-          <span>{{'MAIN.SECTION.STORY' | translate }}</span>
+          <span>{{ 'MAIN.SECTION.STORY' | translate }}</span>
         </button>
-<!--        <button (click)="scrollToElement('work')" mat-button type="button" aria-label="Cleos works">-->
-<!--          <span>{{'MAIN.SECTION.WORK' | translate }}</span>-->
-<!--        </button>-->
+        <!--        <button (click)="scrollToElement('work')" mat-button type="button" aria-label="Cleos works">-->
+        <!--          <span>{{'MAIN.SECTION.WORK' | translate }}</span>-->
+        <!--        </button>-->
         <button (click)="scrollToElement('treatments')" mat-button type="button" aria-label="Go to treatments">
-          <span>{{'MAIN.SECTION.TREATMENT' | translate }}</span>
+          <span>{{ 'MAIN.SECTION.TREATMENT' | translate }}</span>
         </button>
         <button (click)="scrollToElement('contact')" mat-button type="button" aria-label="Go to contact">
-          <span>{{'MAIN.SECTION.CONTACT' | translate }}</span>
+          <span>{{ 'MAIN.SECTION.CONTACT' | translate }}</span>
         </button>
-        <button [routerLinkActive]="['active']" [routerLink]="['/', language, 'catalogs']" mat-button type="button"
-                aria-label="Catalogs">
-          <span>{{'MAIN.SECTION.CATALOG' | translate }}</span>
-        </button>
+<!--        <button [routerLinkActive]="['active']" [routerLink]="['/', language, 'catalogs']" mat-button type="button"-->
+<!--                aria-label="Catalogs">-->
+<!--          <span>{{ 'MAIN.SECTION.CATALOG' | translate }}</span>-->
+<!--        </button>-->
         <button (click)="redirect" *ngIf="isAuthenticated; else login" [routerLinkActive]="['active']"
                 mat-button type="button" aria-label="Go to my account">
-          <span>{{'MAIN.SECTION.ACCOUNT' | translate }}</span>
+          <span>{{ 'MAIN.SECTION.ACCOUNT' | translate }}</span>
         </button>
         <ng-template #login>
           <button [routerLinkActive]="['active']" [routerLink]="['/', language, 'auth']" mat-button type="button"
                   aria-label="Go to login">
-            <span>{{'MAIN.SECTION.AUTH' | translate }}</span>
+            <span>{{ 'MAIN.SECTION.AUTH' | translate }}</span>
           </button>
         </ng-template>
         <button mat-icon-button (click)="changeTheme" aria-label="Change theme">
-          <mat-icon>{{isDarkMode ? 'light_mode' : 'dark_mode'}}</mat-icon>
+          <mat-icon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
         </button>
       </span>
       <ng-template #menuButton>
         <button mat-icon-button (click)="changeTheme" aria-label="Change theme">
-          <mat-icon>{{isDarkMode ? 'light_mode' : 'dark_mode'}}</mat-icon>
+          <mat-icon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
         </button>
         <button [matMenuTriggerFor]="menuLogged" mat-icon-button aria-label="Open menu">
           <mat-icon>menu</mat-icon>
         </button>
         <mat-menu #menuLogged="matMenu">
           <mat-nav-list>
-            <a (click)="scrollToElement('story')" mat-list-item aria-label="My story">
+            <mat-list-item (click)="scrollToElement('story')" aria-label="My story">
               <mat-icon matListItemIcon>auto_stories</mat-icon>
-              <div mat-line>{{'MAIN.SECTION.STORY' | translate }}</div>
-            </a>
+              <div matListItemTitle>{{ 'MAIN.SECTION.STORY' | translate }}</div>
+            </mat-list-item>
+            <!--            <mat-divider></mat-divider>-->
+            <!--            <a (click)="scrollToElement('work')" mat-list-item aria-label="Cleos works">-->
+            <!--              <mat-icon matListItemIcon>work</mat-icon>-->
+            <!--              <div mat-line>{{'MAIN.SECTION.WORK' | translate }}</div>-->
+            <!--            </a>-->
+            <mat-divider></mat-divider>
+            <mat-list-item (click)="scrollToElement('treatments')" aria-label="Treatments">
+              <mat-icon matListItemIcon>spa</mat-icon>
+              <div matListItemTitle>{{ 'MAIN.SECTION.TREATMENT' | translate }}</div>
+            </mat-list-item>
+            <mat-divider></mat-divider>
+            <mat-list-item (click)="scrollToElement('contact')" aria-label="Contact">
+              <mat-icon matListItemIcon>contact_page</mat-icon>
+              <div matListItemTitle>{{ 'MAIN.SECTION.CONTACT' | translate }}</div>
+            </mat-list-item>
 <!--            <mat-divider></mat-divider>-->
-<!--            <a (click)="scrollToElement('work')" mat-list-item aria-label="Cleos works">-->
-<!--              <mat-icon matListItemIcon>work</mat-icon>-->
-<!--              <div mat-line>{{'MAIN.SECTION.WORK' | translate }}</div>-->
+<!--            <a [routerLink]="['/', language, 'catalogs']" mat-list-item aria-label="Catalogs">-->
+<!--              <mat-icon matListItemIcon>collections</mat-icon>-->
+<!--              <div mat-line>{{ 'MAIN.SECTION.CATALOG' | translate }}</div>-->
 <!--            </a>-->
             <mat-divider></mat-divider>
-            <a (click)="scrollToElement('treatments')" mat-list-item aria-label="Go to treatments">
-              <mat-icon matListItemIcon>spa</mat-icon>
-              <div mat-line>{{'MAIN.SECTION.TREATMENT' | translate }}</div>
-            </a>
-            <mat-divider></mat-divider>
-            <a (click)="scrollToElement('contact')" mat-list-item aria-label="Go to contact">
-              <mat-icon matListItemIcon>contact_page</mat-icon>
-              <div mat-line>{{'MAIN.SECTION.CONTACT' | translate }}</div>
-            </a>
-            <mat-divider></mat-divider>
-            <a [routerLink]="['/', language, 'catalogs']" mat-list-item aria-label="Catalogs">
-              <mat-icon matListItemIcon>collections</mat-icon>
-              <div mat-line>{{'MAIN.SECTION.CATALOG' | translate }}</div>
-            </a>
-            <mat-divider></mat-divider>
-            <a (click)="redirect" *ngIf="isAuthenticated; else login" [routerLinkActive]="['active']"
-               mat-list-item aria-label="Go to my account">
+            <mat-list-item (click)="redirect" *ngIf="isAuthenticated; else login" aria-label="My account">
               <mat-icon matListItemIcon>person_pin</mat-icon>
-              <div mat-line>{{'MAIN.SECTION.ACCOUNT' | translate }}</div>
-            </a>
+              <div matListItemTitle>{{ 'MAIN.SECTION.ACCOUNT' | translate }}</div>
+            </mat-list-item>
             <ng-template #login>
-              <a [routerLink]="['/', language, 'auth']" mat-list-item aria-label="Go to login">
+              <mat-list-item [routerLink]="['/', language, 'auth']" aria-label="Login">
                 <mat-icon matListItemIcon>login</mat-icon>
-                <div mat-line>{{'MAIN.SECTION.AUTH' | translate }}</div>
-              </a>
+                <div matListItemTitle>{{ 'MAIN.SECTION.AUTH' | translate }}</div>
+              </mat-list-item>
+<!--              <a [routerLink]="['/', language, 'auth']" mat-list-item aria-label="Go to login">-->
+<!--                <mat-icon matListItemIcon>login</mat-icon>-->
+<!--                <div mat-line>{{ 'MAIN.SECTION.AUTH' | translate }}</div>-->
+<!--              </a>-->
             </ng-template>
           </mat-nav-list>
         </mat-menu>
@@ -132,7 +135,7 @@
     <div #home></div>
     <router-outlet #bodySection></router-outlet>
     <footer id="footer" class="footer">
-      <div fxLayout="column" fxLayoutAlign="space-around center">
+      <div class="footer-container">
         <mat-toolbar [ngClass]="{ 'footer-toolbar-dark': isDarkMode, 'footer-toolbar-light': !isDarkMode }">
           <mat-toolbar-row>
             <span style="margin: auto;">
@@ -143,14 +146,14 @@
               <span style="margin: auto;">
                 <button [routerLinkActive]="['active']" [routerLink]="['/', language, 'privacy']" mat-button
                         aria-label="Go to privacy">
-                  <span>{{'MAIN.SECTION.PRIVACY' | translate }}</span>
+                  <span>{{ 'MAIN.SECTION.PRIVACY' | translate }}</span>
                 </button>
                 <button [routerLinkActive]="['active']" [routerLink]="['/', language, 'term-and-conditions']" mat-button
                         aria-label="Go to term-and-conditions">
-                  <span>{{'MAIN.SECTION.TERM_AND_CONDITIONS' | translate }}</span>
+                  <span>{{ 'MAIN.SECTION.TERM_AND_CONDITIONS' | translate }}</span>
                 </button>
                 <button (click)="scrollToElement('contact')" mat-button aria-label="Go to contact">
-                  <span>{{'MAIN.SECTION.CONTACT' | translate }}</span>
+                  <span>{{ 'MAIN.SECTION.CONTACT' | translate }}</span>
                 </button>
               </span>
           </mat-toolbar-row>
@@ -172,7 +175,7 @@
           </mat-toolbar-row>
           <mat-toolbar-row>
             <span class="text-center" style="margin: auto; font-size: small; white-space: break-spaces">
-              {{'MAIN.LEGALS' | translate}} - v{{appVersion}}</span>
+              {{ 'MAIN.LEGALS' | translate }} - v{{ appVersion }}</span>
           </mat-toolbar-row>
         </mat-toolbar>
       </div>

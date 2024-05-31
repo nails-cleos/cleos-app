@@ -22,8 +22,8 @@
     </ng-container>
 
     <ng-container matColumnDef="description">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
-      <td *matCellDef="let discount" fxHide.lt-sm fxShow mat-cell>
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
+      <td *matCellDef="let discount" class="hide-xs" mat-cell>
         <div *ngIf="discount.id; else skeleton">{{ discount.description }}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -32,8 +32,8 @@
     </ng-container>
 
     <ng-container matColumnDef="type">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
-      <td *matCellDef="let discount" fxHide.lt-sm fxShow mat-cell>
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
+      <td *matCellDef="let discount" class="hide-xs" mat-cell>
         <div *ngIf="discount.id; else skeleton">{{ 'COMMON.DISCOUNT.' + discount.type | translate }}</div>
         <ng-template #skeleton>
           <div class="ssc-line"></div>
@@ -42,8 +42,8 @@
     </ng-container>
 
     <ng-container matColumnDef="amount">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
-      <td *matCellDef="let discount" fxHide.lt-sm fxShow mat-cell>
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
+      <td *matCellDef="let discount" class="hide-xs" mat-cell>
         <div *ngIf="discount.id; else skeleton">
           <ng-template [ngIf]="discount.type === 'PERCENTAGE'" [ngIfElse]="money">
             <span class="icon-text">{{ discount.amount | number:'1.2-2' }}</span>
@@ -61,8 +61,8 @@
     </ng-container>
 
     <ng-container matColumnDef="actions">
-      <th *matHeaderCellDef fxHide.lt-sm fxShow mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-      <td *matCellDef="let discount" fxHide.lt-sm fxShow mat-cell>
+      <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+      <td *matCellDef="let discount" class="hide-xs" mat-cell>
         <div *ngIf="discount.id; else skeleton">
           <button (click)="edit(discount)" *ngIf="!discount.deleted" mat-icon-button
                   matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
@@ -84,17 +84,17 @@
     </ng-container>
 
     <ng-container matColumnDef="expandedDetail">
-      <td *matCellDef="let discount" [attr.colspan]="displayedColumns.length" fxHide fxShow.lt-sm>
-        <div [@detailExpand]="discount === expanded ? 'expanded' : 'collapsed'" class="detail" fxHide fxShow.lt-sm>
+      <td *matCellDef="let discount" [attr.colspan]="displayedColumns.length" class="hide-gt-xs">
+        <div [@detailExpand]="discount === expanded ? 'expanded' : 'collapsed'" class="detail hide-gt-xs">
           <mat-list>
-            <div mat-subheader>{{ 'COMMON.COLUMN.TYPE' | translate }}</div>
             <mat-list-item role="list">
-              <div mat-line>{{ 'COMMON.DISCOUNT.' + discount.type | translate }}</div>
+              <div matListItemTitle>{{ 'COMMON.COLUMN.TYPE' | translate }}</div>
+              <div matListItemLine>{{ 'COMMON.DISCOUNT.' + discount.type | translate }}</div>
             </mat-list-item>
-            <div mat-subheader>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</div>
             <mat-list-item role="list">
+              <div matListItemTitle>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</div>
               <mat-icon *ngIf="discount.currency" matListItemIcon>{{ discount.currency.icon }}</mat-icon>
-              <div mat-line>{{ discount.amount }}</div>
+              <div matListItemLine>{{ discount.amount }}</div>
             </mat-list-item>
             <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
             <mat-list-item role="list">

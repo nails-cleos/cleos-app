@@ -655,7 +655,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       if (value && this.discounts) {
         const userDiscount = this.discounts.find(d => d.id === value);
         if (userDiscount) {
-          this.treatmentDiscount = userDiscount.discount;
+          this.treatmentDiscount = userDiscount.discountCustomer;
           this.price = newDiscount(this.price, this.treatmentDiscount);
         }
       } else {
@@ -827,7 +827,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
           const newList = this.additionalList.filter(al => selectIds.includes(al.id));
           if (newList.length !== this.additionalSelected.length) {
             this.additionalSelected = newList;
-            this.price = newAdditional(this.price, this.additionalSelected, this.reservation?.treatment?.discount);
+            this.price = newAdditional(this.price, this.additionalSelected, this.reservation?.treatment?.discountCustomer);
           }
         }
       }
@@ -844,13 +844,13 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
         }
       }
       this.discounts = state.treatmentDiscount?.discounts.map((ud: IUserDiscount) => {
-        let title = ud.discount.name;
-        switch (ud.discount.type) {
+        let title = ud.discountCustomer.name;
+        switch (ud.discountCustomer.type) {
           case DiscountType.money:
-            title = `$ ${ ud.discount.amount } ${ title }`;
+            title = `$ ${ ud.discountCustomer.amount } ${ title }`;
             break;
           case DiscountType.percentage:
-            title = `${ ud.discount.amount } % ${ title }`;
+            title = `${ ud.discountCustomer.amount } % ${ title }`;
             break;
         }
         return Object.assign({}, ud, { title });

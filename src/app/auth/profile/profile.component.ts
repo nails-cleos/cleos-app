@@ -7,12 +7,12 @@ import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } 
 import * as fromActionsUser from '../../store/user.actions';
 import { fieldChange, valueChange } from '../../util/validators';
 import { findFlag, flags, IFlag } from '../../util/flags';
-import { createAddress, getDisplayNameInitials, getUserImage } from '../../util/helper';
+import { createAddress, getDisplayNameInitials, getLocale, getUserImage } from '../../util/helper';
 import { backendFormatDate, createDateFromString, newDate } from '../../util/dates';
-import { Color } from '@angular-material-components/color-picker';
 import { lightenDarkenColor } from '../../util/color';
 import { Role } from '../../interfaces/token';
 import { TranslateService } from '@ngx-translate/core';
+import { validColorValidator } from 'ngx-colors';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
 
@@ -35,8 +35,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
   displayName: UntypedFormControl = new UntypedFormControl();
   phone: UntypedFormControl = new UntypedFormControl();
   dob: UntypedFormControl = new UntypedFormControl();
-  darkColor: UntypedFormControl = new UntypedFormControl();
-  lightColor: UntypedFormControl = new UntypedFormControl();
+  darkColor: UntypedFormControl = new UntypedFormControl(undefined, [validColorValidator()]);
+  darkColorPicker: UntypedFormControl = new UntypedFormControl();
+  lightColor: UntypedFormControl = new UntypedFormControl(undefined, [validColorValidator()]);
+  lightColorPicker: UntypedFormControl = new UntypedFormControl();
 
   address: UntypedFormControl = new UntypedFormControl();
 
@@ -74,19 +76,17 @@ export class ProfileComponent implements OnInit, OnDestroy {
     user.showCash = this.showCash;
 
     if (this.lightColor.value) {
-      const color = this.lightColor.value;
-      user.lightColor = `${ color.r },${ color.g },${ color.b }`;
+      user.lightColor = this.lightColor.value;
     }
 
     if (this.darkColor.value) {
-      const color = this.darkColor.value;
-      user.darkColor = `${ color.r },${ color.g },${ color.b }`;
+      user.darkColor = this.darkColor.value;
     }
 
     user.address = createAddress(this.formattedAddress, this.geometry?.location, this.user?.address);
 
     return this.store.dispatch(
-      new fromActionsUser.UpdateUser({ user, redirectUrl: `/${ lang }/auth/profile` })
+      new fromActionsUser.UpdateUser({ user, redirectUrl: `/${ getLocale(lang).language }/auth/profile` })
     );
   }
 
@@ -115,8 +115,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
   }
 
-  lightenDarkenColor(color: Color, isDark: boolean): string {
-    return lightenDarkenColor(`#${ color.hex }`, isDark ? 50 : -50);
+  lightenDarkenColor(color: string, isDark: boolean): string {
+    return lightenDarkenColor(color, isDark ? 50 : -50);
   }
 
   getAddress(placeResult: PlaceResult): void {
@@ -132,14 +132,35 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   private createForm(): void {
     this.form = this.formBuilder.group({
-      langValue: this.langValue,
-      displayName: this.displayName,
-      phone: this.phone,
-      dob: this.dob,
-      darkColor: this.darkColor,
-      lightColor: this.lightColor,
-      address: this.address
+        langValue: this.langValue,
+        displayName: this.displayName,
+        phone: this.phone,
+        dob: this.dob,
+        darkColor: this.darkColor,
+        darkColorPicker: this.darkColorPicker,
+        lightColor: this.lightColor,
+        lightColorPicker: this.lightColorPicker,
+        address: this.address
+      }
+    );
+
+    this.darkColor.valueChanges.subscribe((color) => {
+      if (this.darkColorPicker.valid) {
+        this.darkColorPicker.setValue(color, { emitEvent: false });
+      }
     });
+    this.darkColorPicker.valueChanges.subscribe((color) =>
+      this.darkColor.setValue(color, { emitEvent: false })
+    );
+
+    this.lightColor.valueChanges.subscribe((color) => {
+      if (this.lightColorPicker.valid) {
+        this.lightColorPicker.setValue(color, { emitEvent: false });
+      }
+    });
+    this.lightColorPicker.valueChanges.subscribe((color) =>
+      this.lightColor.setValue(color, { emitEvent: false })
+    );
   }
 
   private clean(): void {
@@ -163,12 +184,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.isAdmin = state.selected.authorities?.some((u: any) => u.authority === Role.admin);
 
         if (state.selected.lightColor) {
-          const rgb = state.selected.lightColor.split(',');
-          this.lightColor.setValue(new Color(Number(rgb[0]), Number(rgb[1]), Number(rgb[2])));
+          this.lightColorPicker.setValue(state.selected.lightColor);
         }
         if (state.selected.darkColor) {
-          const rgb = state.selected.darkColor.split(',');
-          this.darkColor.setValue(new Color(Number(rgb[0]), Number(rgb[1]), Number(rgb[2])));
+          this.darkColorPicker.setValue(state.selected.darkColor);
         }
         if (state.selected.dob) {
           this.dob.setValue(createDateFromString(state.selected.dob));

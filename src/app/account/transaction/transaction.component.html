@@ -1,14 +1,14 @@
-<div class="flex-container" fxLayout="column">
-  <div class="card-container" fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center">
-    <div fxFlex="60%" fxFlex.lt-sm="80%">
-      <app-balance [account]="account" [showView]="true" [showUser]="true" [language]="language"></app-balance>
+<div class="flex-container">
+  <div class="card-container">
+    <div class="card-content">
+      <app-balance [account]="account" [showView]="true" [showUser]="hasAdminRole" [language]="language"></app-balance>
       <form (ngSubmit)="submit" [formGroup]="form" novalidate>
         <mat-card appearance="outlined" class="style-card" *ngIf="account">
           <mat-card-header>
             <mat-card-title>{{ 'ACCOUNT.TRANSACTION.TITLE' | translate }}</mat-card-title>
           </mat-card-header>
           <mat-card-content>
-            <div fxLayout="column" fxLayoutAlign="space-evenly stretch">
+            <div class="inner-container">
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'ACCOUNT.TRANSACTION.AMOUNT.FIELD' | translate }}</mat-label>
                 <mat-icon matPrefix>{{ currencyIcon }}</mat-icon>
@@ -55,8 +55,8 @@
               </ng-template>
             </div>
           </mat-card-content>
-          <mat-card-actions>
-            <div fxFlex></div>
+          <mat-card-actions class="card-actions">
+            <div class="spacer"></div>
             <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
             </button>

@@ -163,21 +163,21 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "cleos:build",
-            "proxyConfig": "proxy.conf.json"
+            "proxyConfig": "proxy.conf.json",
+            "buildTarget": "cleos:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "cleos:build:production"
+              "buildTarget": "cleos:build:production"
             },
             "staging": {
-              "browserTarget": "appEnv:build:staging"
+              "buildTarget": "appEnv:build:staging"
             },
             "pwa": {
-              "browserTarget": "appEnv:build:pwa"
+              "buildTarget": "appEnv:build:pwa"
             },
             "development": {
-              "browserTarget": "cleos:build:development"
+              "buildTarget": "cleos:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -185,7 +185,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "cleos:build"
+            "buildTarget": "cleos:build"
           }
         },
         "test": {

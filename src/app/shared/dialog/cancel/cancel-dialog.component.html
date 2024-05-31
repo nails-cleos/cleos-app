@@ -16,8 +16,8 @@
     </div>
   </form>
 </div>
-<div mat-dialog-actions>
-  <div fxFlex></div>
+<div mat-dialog-actions class="card-actions">
+  <div class="spacer"></div>
   <div *ngIf="data.small; else largeButton">
     <button (click)="onNoClick" mat-fab>
       <mat-icon>clear</mat-icon>
