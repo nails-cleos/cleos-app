@@ -1,7 +1,7 @@
 @use 'sass:map';
 @use '@angular/material' as mat;
 @import "angular-calendar/scss/angular-calendar.scss";
-@import '~firebaseui/dist/firebaseui.css';
+@import 'firebaseui/dist/firebaseui.css';
 
 @mixin color($theme) {
   // Get the color config from the theme.
@@ -31,12 +31,31 @@
     color: mat.get-color-from-palette($foreground, secondary-text);
   }
 
-  .section-title h1 {
+  .section-title h2 {
     color: mat.get-color-from-palette($primary-palette);
   }
 
   .works {
     background-color: mat.get-color-from-palette($background, hover);
+  }
+
+  .treatment-table {
+    background-color: mat.get-color-from-palette($primary-palette, 400);
+  }
+
+  table {
+    .inner-border {
+      border: 1px solid mat.get-color-from-palette($foreground, contrast);
+    }
+
+    .table-header {
+      background-color: lighten(#2c2c2c, 60%) !important;
+      color: black;
+    }
+
+    .table-column-header {
+      background-color: mat.get-color-from-palette($background, hover) !important;
+    }
   }
 
   .work-filter ul li a {
@@ -63,7 +82,7 @@
     color: mat.get-color-from-palette($accent-palette) !important;
   }
 
-  .team-member h3 {
+  .team-member h4 {
     color: mat.get-color-from-palette($accent-palette);
   }
 
@@ -141,7 +160,7 @@
   // firebase-ui
 
   .text-bg-partially_completed {
-    background-color: #a9a397;
+    background-color: #b5ac9e;
     color: black;
   }
 
@@ -290,10 +309,10 @@
       border-bottom: 3px groove mat.get-color-from-palette($primary-palette, 700);
     }
     #experiences {
-      background-color: #7e7769;
+      background-color: #8d8270;
 
       .parallax-overlay {
-        background-color: #7e7769;
+        background-color: #8d8270;
       }
 
       h1 {
@@ -342,7 +361,7 @@
       background-color: #a06c3f;
     }
     .text-bg-unavailable {
-      background-color: #ffb3b3;
+      background-color: #d28d8c;
     }
     .text-bg-birthday {
       background-color: #f18dbc;

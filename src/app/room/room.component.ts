@@ -20,9 +20,9 @@ import { API_LOCALE, createDate, createDateFromString, createNewDate, getCurrent
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { goTo } from '../util/animation';
 import { areEquals, createAddress } from '../util/helper';
+import { TranslateService } from '@ngx-translate/core';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
-import { TranslateService } from '@ngx-translate/core';
 
 export interface IIcon {
   monday: RoomIconName;

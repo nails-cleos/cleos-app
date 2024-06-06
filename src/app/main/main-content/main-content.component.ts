@@ -15,7 +15,7 @@ import {
   bounceInDownAnimation,
   fadeInOut,
   fadeInUpDown,
-  gelatine,
+  gelatine, goTo,
   leftRight,
   observeElement,
   rubberBand,
@@ -30,6 +30,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MainContentService } from '../main-content.service';
 import { getImage } from '../../util/file';
 import { MatBottomSheet, MatBottomSheetRef } from '@angular/material/bottom-sheet';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-main-content',
@@ -63,7 +64,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   isSmall: boolean;
   isDark: boolean;
   form!: UntypedFormGroup;
-  groups: ITreatmentGroup[] | undefined;
+  groups: ITreatmentGroup[] = [];
 
   name: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
@@ -101,7 +102,8 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(private store: Store<AppState>, private cdRef: ChangeDetectorRef, private formBuilder: UntypedFormBuilder,
               private snackBar: MatSnackBar, private authUserService: AuthUserService, breakpointObserver: BreakpointObserver,
-              private mainContent: MainContentService, private bottomSheet: MatBottomSheet) {
+              private mainContent: MainContentService, private bottomSheet: MatBottomSheet, private translate: TranslateService,
+              private router: Router) {
     this.currentIndex = 0;
     this.isSmall = isMobile();
     this.isDark = false;
@@ -123,7 +125,6 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.contactText = rubberBand;
     this.contactTitle = fadeInUpDown('20px', '500ms');
     this.contactMap = bounceInDownAnimation('500ms');
-
 
     this.getState = this.store.select(selectMainState);
     this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
@@ -156,11 +157,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.clean();
     this.createForm();
-    this.subscribe();
-    this.getCatalogues();
-    this.getTreatments();
     this.cdRef.detectChanges();
     this.filterSubscription = this.filter.subscribe(group => {
       setTimeout(() => {
@@ -171,6 +168,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }, 500);
     });
+    this.groups = this.translate.instant('TREATMENTS')
   }
 
   ngAfterViewInit(): void {
@@ -185,7 +183,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.stories.forEach(it => observeElement(it.state, document.getElementById(it.id), !this.isSmall));
 
     this.automateSlider();
-    this.mainContent.configure(false, 'close');
+    this.mainContent.configure(false, 'close', true);
   }
 
   ngOnDestroy(): void {
@@ -201,6 +199,13 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
 
   setTreatmentAnimation(i: number): AnimationSequenceMetadata {
     return scaleIn(`${ i * (this.isSmall ? 0 : 300) }ms`);
+  }
+
+  goToTreatment(name?: string): void {
+    if (name === 'biab') {
+      goTo('home')
+      this.router.navigate([this.translate.currentLang, name, 'treatment'])
+    }
   }
 
   onHover(social: ISocialLink, enter: boolean): void {
@@ -355,9 +360,9 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private getCatalogues(): void {
-    // this.store.dispatch(
-    //   new fromActionsMain.GetAllCatalogue()
-    // );
+    this.store.dispatch(
+      new fromActionsMain.GetAllCatalogue()
+    );
   }
 
   private getTreatments(): void {

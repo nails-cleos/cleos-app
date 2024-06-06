@@ -5,8 +5,8 @@ export const environment = {
   recaptcha: {
     siteKey: '6Ldp5DgoAAAAAO9KDBFMNoyuTaJpIoGx8a8D04so'
   },
-  appDomain: 'localhost',
-  appServer: 'http://localhost:4200',
+  appDomain: 'typically-optimum-tetra.ngrok-free.app',
+  appServer: 'https://typically-optimum-tetra.ngrok-free.app',
   title: 'Cleos PWA',
   version: require('../../package.json').version + '-pwa',
   baseUrl: 'http://localhost:9999/api',

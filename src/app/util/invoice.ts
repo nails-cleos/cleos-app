@@ -118,13 +118,13 @@ const createInvoiceNro = (receiptNro: string): any => createField(receiptNro, 'a
 
 const createItemTitle = (titleDescription: string, titleItem: string, titleBTW: string, titleTotal: string): any => [
   createField(titleDescription, '*', 'center', undefined, [0, 12, 0, 5], [false, true, false, true],
-    undefined, '#a9a397'),
+    undefined, '#b5ac9e'),
   createField(titleItem, '*', 'center', undefined, [0, 5, 0, 5], [false, true, false, true],
-    undefined, '#a9a397'),
+    undefined, '#b5ac9e'),
   createField(titleBTW, '*', 'center', undefined, [0, 12, 0, 5], [false, true, false, true],
-    undefined, '#a9a397'),
+    undefined, '#b5ac9e'),
   createField(titleTotal, '*', 'center', undefined, [0, 5, 0, 5], [false, true, false, true],
-    undefined, '#a9a397')
+    undefined, '#b5ac9e')
 ];
 
 const itemBody = (name: string, neto: number, bruto: number, symbol: string): any => [
@@ -148,8 +148,8 @@ const createItems = (itemTitle: any, itemList: IItem[], currency: string): any =
       defaultBorder: false,
       hLineWidth: (i: number) => i === 1 || i === 0 ? 2 : 1,
       vLineWidth: () => 0,
-      hLineColor: (i: number) => i === 1 || i === 0 ? '#8f887a' : '#dcc8c2',
-      vLineColor: () => '#8f887a',
+      hLineColor: (i: number) => i === 1 || i === 0 ? '#9d9282' : '#dcc8c2',
+      vLineColor: () => '#9d9282',
       hLineStyle: () => null,
       // vLineStyle: function (i, node) { return {dash: { length: 10, space: 4 }}; },
       paddingLeft: () => 10,
@@ -197,7 +197,7 @@ const createTotals = (totals: ITotals, currency: string, titleSubTotal: string, 
   if (totals.discount) {
     const discount = [
       createField(titleDiscount, '*', 'right', undefined, [0, 5, 0, 5], [false, false, false, true]),
-      createField(`(${ currency } ${ totals.discount.toFixed(2) })`, '*', 'right', '#ff8080',
+      createField(`(${ currency } ${ totals.discount.toFixed(2) })`, '*', 'right', '#d28d8c',
         [0, 5, 0, 5], [false, false, false, true], undefined, '#eee4e1')];
     body = [subTotal, discount, total, btw, excBTW];
   }

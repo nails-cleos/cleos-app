@@ -20,7 +20,7 @@ import { UserService } from '../services/user.service';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { LoginEffects } from '../store/effects/auth.effects';
 import { AuthService } from '../services/auth.service';
-import { HashLocationStrategy, LocationStrategy } from '@angular/common';
+import { HashLocationStrategy, LocationStrategy, NgOptimizedImage } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
@@ -51,6 +51,7 @@ import { Observable } from 'rxjs';
       extend: true
     }),
     EffectsModule.forFeature([MainEffects, CatalogueEffects, UserEffects, LoginEffects]),
+    NgOptimizedImage,
   ],
   providers: [
     MainService,
