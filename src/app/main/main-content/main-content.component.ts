@@ -81,9 +81,9 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Images 768x1024
   slides: ISlide[] = [
-    { id: 'c7ae73b1-c6be-4848-9f84-cbf451e8ee59', image: '../../assets/home_page/img/b1.webp', order: 0 },
-    { id: '3e989461-81b2-4723-9fa3-746c05fd69a2', image: '../../assets/home_page/img/b2.webp', order: 1 },
-    { id: '25e33d58-34c3-4e55-b4e4-885f177fb570', image: '../../assets/home_page/img/b3.webp', order: 2 },
+    { id: 'c7ae73b1-c6be-4848-9f84-cbf451e8ee59', image: 'assets/home_page/img/b1.webp', order: 0 },
+    { id: '3e989461-81b2-4723-9fa3-746c05fd69a2', image: 'assets/home_page/img/b2.webp', order: 1 },
+    { id: '25e33d58-34c3-4e55-b4e4-885f177fb570', image: 'assets/home_page/img/b3.webp', order: 2 },
   ];
   socialLinks: ISocialLink[];
   works: IWork[] = [];

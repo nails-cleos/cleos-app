@@ -25,7 +25,7 @@ export const sections = (translations: any): ISection[] => {
     },
     {
       type: 'image-detail',
-      value: '../../assets/home_page/img/treatment/biab-1.webp',
+      value: 'assets/home_page/img/treatment/biab-1.webp',
       height: 400,
       width: 300,
       details: [
@@ -118,7 +118,7 @@ export const sections = (translations: any): ISection[] => {
     },
     {
       type: 'image',
-      value: '../../assets/home_page/img/treatment/biab-2.webp',
+      value: 'assets/home_page/img/treatment/biab-2.webp',
       height: 250,
       width: 500
     },
@@ -140,7 +140,7 @@ export const sections = (translations: any): ISection[] => {
       details: [
         {
           type: 'image-text',
-          value: '../../assets/home_page/img/treatment/biab-3.webp',
+          value: 'assets/home_page/img/treatment/biab-3.webp',
           width: 300,
           height: 400,
           description: translations.value_21,
@@ -148,7 +148,7 @@ export const sections = (translations: any): ISection[] => {
         },
         {
           type: 'detail',
-          value: '../../assets/home_page/img/treatment/biab-4.webp',
+          value: 'assets/home_page/img/treatment/biab-4.webp',
           width: 300,
           height: 533,
           description: translations.value_22,
@@ -213,7 +213,7 @@ export const sections = (translations: any): ISection[] => {
     },
     {
       type: 'image-detail',
-      value: '../../assets/home_page/img/treatment/biab-5.webp',
+      value: 'assets/home_page/img/treatment/biab-5.webp',
       class: 'left',
       width: 150,
       height: 210,
@@ -226,7 +226,7 @@ export const sections = (translations: any): ISection[] => {
     },
     {
       type: 'image-detail',
-      value: '../../assets/home_page/img/treatment/biab-6.webp',
+      value: 'assets/home_page/img/treatment/biab-6.webp',
       width: 300,
       height: 451,
       details: [
@@ -242,7 +242,7 @@ export const sections = (translations: any): ISection[] => {
     },
     {
       type: 'image',
-      value: '../../assets/home_page/img/treatment/biab-2.webp', // TODO update
+      value: 'assets/home_page/img/treatment/biab-2.webp', // TODO update
       height: 250,
       width: 500
     },
