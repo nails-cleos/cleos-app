@@ -66,11 +66,11 @@ export const eventState = (isDark: boolean = false): IState[] => [{
   order: 4
 }, {
   name: 'EDITING',
-  color: isDark ? '#ffd078' : '#ffd991', // primary-A-dark
+  color: isDark ? '#ffd38c' : '#ffdca6', // primary-A-dark
   order: 5
 }, {
   name: 'APPROVED',
-  color: isDark ? '#8f887a' : '#a9a397', // primary-dark
+  color: isDark ? '#9d9282' : '#b5ac9e', // primary-dark
   order: 6
 }, {
   name: 'PARTIALLY_PAID',
@@ -86,7 +86,7 @@ export const eventState = (isDark: boolean = false): IState[] => [{
   order: 9
 }, {
   name: 'PARTIALLY_COMPLETED',
-  color: '#a9a397',
+  color: '#b5ac9e',
   order: 10
 }, {
   name: 'COMPLETED',
@@ -94,7 +94,7 @@ export const eventState = (isDark: boolean = false): IState[] => [{
   order: 11
 }, {
   name: 'DEFAULT',
-  color: isDark ? '#f08080' : '#ffb3b3', // warn-dark-lighter
+  color: isDark ? '#f08080' : '#d28d8c', // warn-dark-lighter
   order: 100
 }];
 

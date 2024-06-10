@@ -1,7 +1,6 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ITreatmentGroup } from '../../interfaces/treatment';
 import { BehaviorSubject, interval, Observable, Subscription } from 'rxjs';
-import { ICatalogueAll } from '../../interfaces/catalogue';
 import { IExperience, ISlide, ISocialLink, IStory, IWork } from '../../interfaces/main';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
@@ -16,6 +15,7 @@ import {
   fadeInOut,
   fadeInUpDown,
   gelatine,
+  goTo,
   leftRight,
   observeElement,
   rubberBand,
@@ -28,8 +28,8 @@ import { AnimationAnimateMetadata, AnimationSequenceMetadata } from '@angular/an
 import { isMobile } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MainContentService } from '../main-content.service';
-import { getImage } from '../../util/file';
 import { MatBottomSheet, MatBottomSheetRef } from '@angular/material/bottom-sheet';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-main-content',
@@ -63,7 +63,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   isSmall: boolean;
   isDark: boolean;
   form!: UntypedFormGroup;
-  groups: ITreatmentGroup[] | undefined;
+  groups: ITreatmentGroup[] = [];
 
   name: UntypedFormControl = new UntypedFormControl('', [
     Validators.required
@@ -80,9 +80,9 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Images 768x1024
   slides: ISlide[] = [
-    { id: 'c7ae73b1-c6be-4848-9f84-cbf451e8ee59', image: '../../assets/home_page/img/b1.webp', order: 0 },
-    { id: '3e989461-81b2-4723-9fa3-746c05fd69a2', image: '../../assets/home_page/img/b2.webp', order: 1 },
-    { id: '25e33d58-34c3-4e55-b4e4-885f177fb570', image: '../../assets/home_page/img/b3.webp', order: 2 },
+    { id: 'c7ae73b1-c6be-4848-9f84-cbf451e8ee59', image: 'assets/home_page/img/b1.webp', order: 0 },
+    { id: '3e989461-81b2-4723-9fa3-746c05fd69a2', image: 'assets/home_page/img/b2.webp', order: 1 },
+    { id: '25e33d58-34c3-4e55-b4e4-885f177fb570', image: 'assets/home_page/img/b3.webp', order: 2 },
   ];
   socialLinks: ISocialLink[];
   works: IWork[] = [];
@@ -101,7 +101,8 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(private store: Store<AppState>, private cdRef: ChangeDetectorRef, private formBuilder: UntypedFormBuilder,
               private snackBar: MatSnackBar, private authUserService: AuthUserService, breakpointObserver: BreakpointObserver,
-              private mainContent: MainContentService, private bottomSheet: MatBottomSheet) {
+              private mainContent: MainContentService, private bottomSheet: MatBottomSheet, private translate: TranslateService,
+              private router: Router) {
     this.currentIndex = 0;
     this.isSmall = isMobile();
     this.isDark = false;
@@ -123,7 +124,6 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.contactText = rubberBand;
     this.contactTitle = fadeInUpDown('20px', '500ms');
     this.contactMap = bounceInDownAnimation('500ms');
-
 
     this.getState = this.store.select(selectMainState);
     this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
@@ -159,8 +159,6 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.clean();
     this.createForm();
     this.subscribe();
-    this.getCatalogues();
-    this.getTreatments();
     this.cdRef.detectChanges();
     this.filterSubscription = this.filter.subscribe(group => {
       setTimeout(() => {
@@ -171,6 +169,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }, 500);
     });
+    this.groups = this.translate.instant('TREATMENTS');
   }
 
   ngAfterViewInit(): void {
@@ -185,7 +184,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.stories.forEach(it => observeElement(it.state, document.getElementById(it.id), !this.isSmall));
 
     this.automateSlider();
-    this.mainContent.configure(false, 'close');
+    this.mainContent.configure(false, 'close', true);
   }
 
   ngOnDestroy(): void {
@@ -201,6 +200,13 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
 
   setTreatmentAnimation(i: number): AnimationSequenceMetadata {
     return scaleIn(`${ i * (this.isSmall ? 0 : 300) }ms`);
+  }
+
+  goToTreatment(name?: string): void {
+    if (name === 'biab') {
+      goTo('home');
+      this.router.navigate([this.translate.currentLang, name, 'treatment']);
+    }
   }
 
   onHover(social: ISocialLink, enter: boolean): void {
@@ -354,54 +360,8 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
-  private getCatalogues(): void {
-    // this.store.dispatch(
-    //   new fromActionsMain.GetAllCatalogue()
-    // );
-  }
-
-  private getTreatments(): void {
-    this.store.dispatch(
-      new fromActionsMain.GetAllTreatments()
-    );
-  }
-
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      if (state.groups) {
-        this.groups = state.groups;
-        this.filter?.next(state.groups[0]);
-      }
-      if (state.catalogue && Array.from(state.catalogue)) {
-        state.catalogue.forEach((catalogue: ICatalogueAll) => {
-          if (catalogue && catalogue.blob) {
-            if (catalogue.home) {
-              const currentOrder = this.slides.filter(it => it.order === catalogue.order);
-              currentOrder.forEach((v, i) => {
-                v.order = v.order + 1 + i;
-              });
-              const current = this.slides.find(it => it.id === catalogue.id);
-              if (!current) {
-                const homeImage = getImage(catalogue.blob, catalogue.contentType);
-                this.slides.push({ id: catalogue.id, image: homeImage, description: catalogue.name, order: catalogue.order });
-              } else {
-                current.order = catalogue.order;
-              }
-            }
-            if (!this.works.length && catalogue.treatmentGroup) {
-              const workImage = getImage(catalogue.blob, catalogue.contentType);
-              this.works.push({
-                title: catalogue.name,
-                detail: catalogue.description,
-                image: workImage,
-                group: catalogue.treatmentGroup
-              });
-              this.allWorks = [...this.works];
-            }
-          }
-        });
-        this.slides = this.slides.sort((a, b) => a.order - b.order);
-      }
       if (state.errorMessage || state.message) {
         this.snackBar.open(state.errorMessage || state.message, 'OK', {
           duration: 5000

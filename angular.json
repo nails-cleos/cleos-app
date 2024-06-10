@@ -38,7 +38,8 @@
               "src/firebase-messaging-sw.js",
               "src/styles.scss",
               "src/sitemap.xml",
-              "src/robot.txt"
+              "src/browserconfig.xml",
+              "src/robots.txt"
             ],
             "styles": [
               "node_modules/angular-calendar/css/angular-calendar.css",
@@ -204,7 +205,8 @@
               "src/firebase-messaging-sw.js",
               "src/styles.scss",
               "src/sitemap.xml",
-              "src/robot.txt"
+              "src/browserconfig.xml",
+              "src/robots.txt"
             ],
             "styles": [
               "node_modules/angular-calendar/css/angular-calendar.css",

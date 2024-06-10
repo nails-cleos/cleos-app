@@ -2,10 +2,11 @@
 <section id="slider">
   <div class="container slider">
     <div [@slideAnimation]="currentIndex">
-      <ng-template ngFor [ngForOf]="slides" let-slide let-i="index">
-        <div *ngIf="isCurrentSlideIndex(i)" class="slider-img"
-             [ngStyle]="{'background-image': 'url(' + slide.image + ')'}"></div>
-      </ng-template>
+      @for (slide of slides; track slide; let i = $index) {
+        @if (isCurrentSlideIndex(i)) {
+          <div class="slider-img" [ngStyle]="{'background-image': 'url(' + slide.image + ')'}"></div>
+        }
+      }
     </div>
   </div>
 
@@ -19,22 +20,22 @@
     </p>
 
     <ul class="social-links text-center">
-      <li *ngFor="let social of socialLinks"
-          [@slideInY]="{value: ':enter', params: {translate: '100px', duration: '500ms', delay: social.delay}}">
-        <ng-template [ngIf]="social.phone && social.phoneKey && social.phoneText" [ngIfElse]="noPhone">
-          <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
-             (mouseleave)="onHover(social, false)" aria-label="social icon"
-             [href]="social.href + (social.phone | translate) + social.phoneKey + (social.phoneText | translate)">
-            <mat-icon [svgIcon]="social.svgIcon"></mat-icon>
-          </a>
-        </ng-template>
-        <ng-template #noPhone>
-          <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
-             (mouseleave)="onHover(social, false)" [href]="social.href" aria-label="social icon">
-            <mat-icon [svgIcon]="social.svgIcon"></mat-icon>
-          </a>
-        </ng-template>
-      </li>
+      @for (social of socialLinks; track social) {
+        <li [@slideInY]="{value: ':enter', params: {translate: '100px', duration: '500ms', delay: social.delay}}">
+          @if (social.phone && social.phoneKey && social.phoneText) {
+            <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
+               (mouseleave)="onHover(social, false)" aria-label="social icon"
+               [href]="social.href + (social.phone | translate) + social.phoneKey + (social.phoneText | translate)">
+              <mat-icon [svgIcon]="social.svgIcon"></mat-icon>
+            </a>
+          } @else {
+            <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
+               (mouseleave)="onHover(social, false)" [href]="social.href" aria-label="social icon">
+              <mat-icon [svgIcon]="social.svgIcon"></mat-icon>
+            </a>
+          }
+        </li>
+      }
     </ul>
   </div>
 </section>
@@ -44,7 +45,7 @@
 <section id="story" class="story">
   <div class="section-container">
     <div class="section-title text-center" appAnimate [animateInAnimation]="storyTitle">
-      <h1>{{ 'MAIN.SECTION.STORY' | translate }}</h1>
+      <h2>{{ 'MAIN.SECTION.STORY' | translate }}</h2>
       <div class="home-divider">
         <mat-icon>favorite</mat-icon>
       </div>
@@ -52,26 +53,27 @@
 
     <div class="story-container">
       <div class="section-sub-title story-item">
-        <h2 class="text-center" #storyDescription
+        <h3 class="text-center" #storyDescription
             [@leftRight]="{value: storyDescriptionState.value, params: {translate: '-20px'}}">
           {{ 'MAIN.STORY.DESCRIPTION' | translate }}
-        </h2>
-
-        <h3 class="text-justify" *ngFor="let story of stories" [id]="story.id"
-            [@leftRight]="{value: story.state.value, params: {translate: '-20px', delay: story.delay}}"
-            [innerHTML]="story.text | translate">
         </h3>
+
+        @for (story of stories; track story) {
+          <h4 class="text-justify" [id]="story.id" [innerHTML]="story.text | translate"
+              [@leftRight]="{value: story.state.value, params: {translate: '-20px', delay: story.delay}}">
+          </h4>
+        }
       </div>
 
       <div class="story-member-item" #storyMember>
         <figure class="team-member text-center">
           <div class="member-thumb"
                [@bottomTop]="{value: storyMemberState.value, params: {translate: '40vh', delayIn: '0ms', delayOut: '600ms'}}">
-            <img src="../../../assets/home_page/img/team/member-1.webp" alt="Team Member" class="img-responsive">
+            <img src="assets/home_page/img/team/member-1.webp" alt="Team Member" class="img-responsive">
           </div>
-          <h3
+          <h4
             [@bottomTop]="{value: storyMemberState.value, params: {translate: '20px', delayIn: '300ms', delayOut: '300ms'}}">
-            Carla Luján Bonadero</h3>
+            Carla Luján Bonadero</h4>
           <span
             [@bottomTop]="{value: storyMemberState.value, params: {translate: '20px', delayIn: '600ms', delayOut: '0ms'}}">{{ 'MAIN.STORY.MEMBER' | translate }}</span>
         </figure>
@@ -82,82 +84,96 @@
 <!-- End Story -->
 
 <!-- Works -->
-<section id="work" class="works" *ngIf="allWorks.length">
-  <div class="work-container">
-    <div class="section-title text-center">
-      <h1>{{ 'MAIN.SECTION.WORK' | translate }}</h1>
-      <div class="home-divider">
-        <mat-icon>favorite</mat-icon>
-      </div>
-    </div>
-
-    <div class="work-sub-title text-center" appAnimate [animateInAnimation]="workText" [stopAnimation]="isSmall">
-      <h3>{{ 'MAIN.WORK.TEXT_1' | translate }}</h3>
-    </div>
-
-    <div class="work-filter fadeInRight animated" data-wow-duration="500ms">
-      <ul class="text-center">
-        <li>
-          <button mat-raised-button (click)="filterBy()" class="work-filter" type="button" aria-label="Filter All"
-                  [ngClass]="{'active': filter.value === undefined}">{{ 'MAIN.WORK.FILTER.ALL' | translate }}
-          </button>
-        </li>
-        <li *ngFor="let group of groups">
-          <button (click)="filterBy(group)" class="work-filter" mat-raised-button aria-label="Filter by"
-                  [ngClass]="{'active': filter.value === group}">{{ group.name }}
-          </button>
-        </li>
-      </ul>
-    </div>
-
-    <div class="work-inner-container">
-      <div class="text-center work-flex-item" *ngFor="let work of works; let i = index" [@fadeInOut]="i">
-        <figure class="work-item">
-          <div class="work-img" [ngStyle]="{'background-image': 'url(' + work.image + ')'}"></div>
-          <figcaption class="overlay">
-            <a [title]="work.title" [href]="work.image" target="_blank" aria-label="Open work image">
-              <mat-icon class="text-top">visibility</mat-icon>
-            </a>
-            <h3>{{ work.title }}</h3>
-            <p>{{ work.detail }}</p>
-          </figcaption>
-        </figure>
-      </div>
-    </div>
-  </div>
-</section>
-<!-- End Works -->
-
-<!-- Features -->
-<section id="treatments" class="treatments" *ngIf="groups?.length">
-  <div class="section-container">
-
-    <div class="section-title text-center mb-50" appAnimate [animateInAnimation]="treatmentTitle">
-      <h1>{{ 'MAIN.SECTION.TREATMENT' | translate }}</h1>
-      <div class="home-divider">
-        <mat-icon>favorite</mat-icon>
-      </div>
-    </div>
-    <div #treatmentItem></div>
-
-    <div class="treatment-container">
-      <div class="work-flex-item" *ngFor="let group of groups; let i = index">
-        <div class="treatment-item pointer-only" appAnimate [animateInAnimation]="setTreatmentAnimation(i)"
-             [stopAnimation]="isSmall">
-          <div class="treatment-icon">
-            <mat-icon [svgIcon]="'CLEOS-COLOR'"></mat-icon>
-          </div>
-          <div class="treatment-desc">
-            <h2>{{ group.name }}</h2>
-            <h4 *ngIf="group.priceFrom"
-                [innerHTML]="'MAIN.TREATMENT.PRICE_FROM' | translate: {priceFrom: ('EUR'| currencySymbol) + ' ' + group.priceFrom}"></h4>
-            <p>{{ group.description }}</p>
-          </div>
+@if (allWorks.length) {
+  <section id="work" class="works">
+    <div class="work-container">
+      <div class="section-title text-center">
+        <h2>{{ 'MAIN.SECTION.WORK' | translate }}</h2>
+        <div class="home-divider">
+          <mat-icon>favorite</mat-icon>
         </div>
       </div>
+
+      <div class="work-sub-title text-center" appAnimate [animateInAnimation]="workText" [stopAnimation]="isSmall">
+        <h4>{{ 'MAIN.WORK.TEXT_1' | translate }}</h4>
+      </div>
+
+      <div class="work-filter fadeInRight animated" data-wow-duration="500ms">
+        <ul class="text-center">
+          <li>
+            <button mat-raised-button (click)="filterBy()" class="work-filter" type="button" aria-label="Filter All"
+                    [ngClass]="{'active': filter.value === undefined}">{{ 'MAIN.WORK.FILTER.ALL' | translate }}
+            </button>
+          </li>
+          @for (group of groups; track group) {
+            <li>
+              <button (click)="filterBy(group)" class="work-filter" mat-raised-button aria-label="Filter by"
+                      [ngClass]="{'active': filter.value === group}">{{ group.name }}
+              </button>
+            </li>
+          }
+        </ul>
+      </div>
+
+      <div class="work-inner-container">
+        @for (work of works; track work; let i = $index) {
+          <div class="text-center work-flex-item" [@fadeInOut]="i">
+            <figure class="work-item">
+              <div class="work-img" [ngStyle]="{'background-image': 'url(' + work.image + ')'}"></div>
+              <figcaption class="overlay">
+                <a [title]="work.title" [href]="work.image" target="_blank" aria-label="Open work image">
+                  <mat-icon class="text-top">visibility</mat-icon>
+                </a>
+                <h4>{{ work.title }}</h4>
+                <p>{{ work.detail }}</p>
+              </figcaption>
+            </figure>
+          </div>
+        }
+      </div>
     </div>
-  </div>
-</section>
+  </section>
+}
+<!-- End Works -->
+
+
+<!-- Features -->
+@if (groups.length) {
+  <section id="treatments" class="treatments">
+    <div class="section-container">
+
+      <div class="section-title text-center mb-50" appAnimate [animateInAnimation]="treatmentTitle">
+        <h2 style="margin-top: 6%;">{{ 'MAIN.SECTION.TREATMENT' | translate }}</h2>
+        <div class="home-divider">
+          <mat-icon>favorite</mat-icon>
+        </div>
+      </div>
+      <div #treatmentItem></div>
+
+      <div class="treatment-container">
+        @for (group of groups; track group; let i = $index) {
+          <div class="work-flex-item">
+            <div class="treatment-item pointer-only" appAnimate [animateInAnimation]="setTreatmentAnimation(i)"
+                 [stopAnimation]="isSmall" (click)="goToTreatment(group.id)">
+              <div class="treatment-icon">
+                <mat-icon [svgIcon]="'CLEOS-COLOR'"></mat-icon>
+              </div>
+              <div class="treatment-desc">
+                <h3>{{ group.name }}</h3>
+                @if (group.priceFrom) {
+                  <p
+                    [innerHTML]="'MAIN.TREATMENT.PRICE_FROM' | translate: {priceFrom: ('EUR'| currencySymbol) + ' ' + group.priceFrom}">
+                  </p>
+                }
+                <h5>{{ group.description }}</h5>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+}
 <!-- End Features -->
 
 <!-- Experiences -->
@@ -165,21 +181,24 @@
   <div class="parallax-overlay">
     <div class="section-container">
       <div class="section-title text-center mb-50" appAnimate [animateInAnimation]="experienceTitle">
-        <h1 class="experience-title">{{ 'MAIN.SECTION.EXPERIENCE' | translate }}</h1>
+        <h2 class="experience-title">{{ 'MAIN.SECTION.EXPERIENCE' | translate }}</h2>
         <div class="home-divider">
           <mat-icon>favorite</mat-icon>
         </div>
       </div>
 
       <div class="treatment-container">
-        <div *ngFor="let experience of experiences" class="text-center treatment-item" [id]="experience.id"
-             [@bottomTop]="{value: experience.state.value, params: {translate: '20px', delayIn: experience.delay, delayOut: experience.delayOut}}">
-          <div class="counters-item">
-            <mat-icon>{{ experience.icon }}</mat-icon>
-            <strong>{{ experience.position }}</strong>
-            <p>{{ experience.text | translate }}</p>
+        @for (experience of experiences; track experience) {
+          <!--          <div class="text-center treatment-item" [id]="experience.id"-->
+            <!--               [@bottomTop]="{value: experience.state.value, params: {translate: '20px', delayIn: experience.delay, delayOut: experience.delayOut}}">-->
+          <div class="text-center" [id]="experience.id">
+            <div class="counters-item">
+              <mat-icon>{{ experience.icon }}</mat-icon>
+              <strong>{{ experience.position }}</strong>
+              <p>{{ experience.text | translate }}</p>
+            </div>
           </div>
-        </div>
+        }
       </div>
     </div>
   </div>
@@ -191,7 +210,7 @@
   <div class="section-container mb-50">
 
     <div class="section-title text-center mb-50" appAnimate [animateInAnimation]="contactTitle">
-      <h1>{{ 'MAIN.SECTION.CONTACTS' | translate }}</h1>
+      <h2>{{ 'MAIN.SECTION.CONTACTS' | translate }}</h2>
       <div class="home-divider">
         <mat-icon>favorite</mat-icon>
       </div>
@@ -207,7 +226,7 @@
       <!-- contact address -->
       <div class="flex-item" #contactItem1>
         <div class="contact-address" [@leftRight]="contactItem1State.value">
-          <h2>{{ 'MAIN.CONTACT.TITLE' | translate }}</h2>
+          <h3>{{ 'MAIN.CONTACT.TITLE' | translate }}</h3>
           <p>
             <mat-icon matPrefix>room</mat-icon>&nbsp;
             <a class="link" rel="noreferrer" target="_blank" aria-label="Address"
@@ -233,7 +252,7 @@
       <div class="contact--item" #contactItem2>
         <div class="contact-form"
              [@bottomTop]="{value:contactItem2State.value, params: {delayIn: isSmall ? '0ms' : '500ms', delayOut: '0ms'}}">
-          <h2 class="bold no-content">{{ 'MAIN.CONTACT.SEND.TITLE' | translate }}</h2>
+          <h3 class="bold no-content">{{ 'MAIN.CONTACT.SEND.TITLE' | translate }}</h3>
 
           <form (ngSubmit)="sendEmail" [formGroup]="form" novalidate>
             <div class="home-page-form inner-container">
@@ -243,19 +262,21 @@
                   <label>
                     <input [formControl]="name" autocomplete="name" matInput required>
                   </label>
-                  <mat-error *ngIf="name.hasError('required')"
-                             [innerHTML]="'MAIN.CONTACT.NAME.REQUIRED' | translate"></mat-error>
+                  @if (name.hasError('required')) {
+                    <mat-error [innerHTML]="'MAIN.CONTACT.NAME.REQUIRED' | translate"></mat-error>
+                  }
                 </mat-form-field>
                 <mat-form-field class="full">
                   <mat-label>{{ 'MAIN.CONTACT.EMAIL.FIELD' | translate }}</mat-label>
                   <label>
                     <input [formControl]="email" autocomplete="email" matInput required>
                   </label>
-                  <mat-error *ngIf="email.hasError('email')">
-                    {{ 'MAIN.CONTACT.EMAIL.INVALID' | translate }}
-                  </mat-error>
-                  <mat-error *ngIf="email.hasError('required')"
-                             [innerHTML]="'MAIN.CONTACT.EMAIL.REQUIRED' | translate"></mat-error>
+                  @if (email.hasError('email')) {
+                    <mat-error>{{ 'MAIN.CONTACT.EMAIL.INVALID' | translate }}</mat-error>
+                  }
+                  @if (email.hasError('required')) {
+                    <mat-error [innerHTML]="'MAIN.CONTACT.EMAIL.REQUIRED' | translate"></mat-error>
+                  }
                 </mat-form-field>
               </div>
 
@@ -273,8 +294,9 @@
                   <textarea #message [formControl]="body" matInput maxlength="256" required></textarea>
                 </label>
                 <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
-                <mat-error *ngIf="body.hasError('required')"
-                           [innerHTML]="'MAIN.CONTACT.BODY.REQUIRED' | translate"></mat-error>
+                @if (body.hasError('required')) {
+                  <mat-error [innerHTML]="'MAIN.CONTACT.BODY.REQUIRED' | translate"></mat-error>
+                }
               </mat-form-field>
               <div class="card-actions">
                 <div class="spacer"></div>
@@ -293,22 +315,23 @@
       <!-- footer social links -->
       <div class="flex-item" #contactItem3>
         <ul class="social-inner-container">
-          <li *ngFor="let social of socialLinks"
+          @for (social of socialLinks; track social) {
+            <li
               [@leftRight]="{value: contactItem3State.value, params: {translate: '100%', delay: isSmall ? '0ms' : social.delay}}">
-            <ng-template [ngIf]="social.phone && social.phoneKey && social.phoneText" [ngIfElse]="noPhone">
-              <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
-                 (mouseleave)="onHover(social, false)" aria-label="Social icon"
-                 [href]="social.href + (social.phone | translate) + social.phoneKey + (social.phoneText | translate)">
-                <mat-icon [svgIcon]="social.svgIcon"></mat-icon>
-              </a>
-            </ng-template>
-            <ng-template #noPhone>
-              <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
-                 (mouseleave)="onHover(social, false)" [href]="social.href" aria-label="Social icon">
-                <mat-icon [svgIcon]="social.svgIcon"></mat-icon>
-              </a>
-            </ng-template>
-          </li>
+              @if (social.phone && social.phoneKey && social.phoneText) {
+                <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
+                   (mouseleave)="onHover(social, false)" aria-label="Social icon"
+                   [href]="social.href + (social.phone | translate) + social.phoneKey + (social.phoneText | translate)">
+                  <mat-icon [svgIcon]="social.svgIcon"></mat-icon>
+                </a>
+              } @else {
+                <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
+                   (mouseleave)="onHover(social, false)" [href]="social.href" aria-label="Social icon">
+                  <mat-icon [svgIcon]="social.svgIcon"></mat-icon>
+                </a>
+              }
+            </li>
+          }
         </ul>
       </div>
       <!-- end footer social links -->
