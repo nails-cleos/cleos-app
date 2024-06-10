@@ -62,6 +62,12 @@
   margin-bottom: 10%;
 }
 
+.center-50 {
+  width: 50%;
+  margin: 0 auto;
+  text-align: center;
+}
+
 .top-text {
   align-self: flex-start;
   font-size: 1.2em;
@@ -83,6 +89,10 @@
 
   .image-container {
     flex-direction: column;
+  }
+
+  .center-50 {
+    width: 80%;
   }
 }
 

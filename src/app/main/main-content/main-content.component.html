@@ -60,7 +60,7 @@
 
         @for (story of stories; track story) {
           <h4 class="text-justify" [id]="story.id" [innerHTML]="story.text | translate"
-             [@leftRight]="{value: story.state.value, params: {translate: '-20px', delay: story.delay}}">
+              [@leftRight]="{value: story.state.value, params: {translate: '-20px', delay: story.delay}}">
           </h4>
         }
       </div>
@@ -189,8 +189,9 @@
 
       <div class="treatment-container">
         @for (experience of experiences; track experience) {
-          <div class="text-center treatment-item" [id]="experience.id"
-               [@bottomTop]="{value: experience.state.value, params: {translate: '20px', delayIn: experience.delay, delayOut: experience.delayOut}}">
+          <!--          <div class="text-center treatment-item" [id]="experience.id"-->
+            <!--               [@bottomTop]="{value: experience.state.value, params: {translate: '20px', delayIn: experience.delay, delayOut: experience.delayOut}}">-->
+          <div class="text-center" [id]="experience.id">
             <div class="counters-item">
               <mat-icon>{{ experience.icon }}</mat-icon>
               <strong>{{ experience.position }}</strong>

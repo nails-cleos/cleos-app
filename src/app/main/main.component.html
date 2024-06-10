@@ -60,7 +60,7 @@
           <span (click)="scrollToElement('treatments')" aria-label="Go to treatments" class="pointer-only">
             {{ 'MAIN.SECTION.TREATMENT' | translate }}
           </span>
-          <span [routerLink]="['/', language, 'biab', 'treatment']" aria-label="biab"
+          <span (click)="treatment" aria-label="biab"
                 class="pointer-only">
             {{ 'MAIN.SECTION.BIAB' | translate }}
           </span>

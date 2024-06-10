@@ -70,7 +70,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     this.mainContentSubscription = mainContent.data$.subscribe(it => {
       this.showLoader = it.showPreload;
       this.navigationState.next(it.navigationHeader);
-      this.showArrow = it.showArrow
+      this.showArrow = it.showArrow;
     });
     this.language = this.translate.currentLang;
   }
@@ -95,6 +95,12 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.store.dispatch(
       new fromActionsLogin.Redirect()
     );
+  }
+
+  get treatment(): void {
+    goTo('home');
+    this.router.navigate([this.translate.currentLang, 'biab', 'treatment']);
+    return;
   }
 
   ngOnInit(): void {

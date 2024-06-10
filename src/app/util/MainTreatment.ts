@@ -286,12 +286,13 @@ export const sections = (translations: any): ISection[] => {
     },
     {
       type: 'detail',
-      value: translations.value_31
+      value: translations.value_31,
+      class: 'bottom'
     },
     {
       type: 'detail',
       value: translations.value_32,
-      class: 'bold'
+      class: 'bold center-50'
     }
   ];
 };
