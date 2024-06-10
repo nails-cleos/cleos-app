@@ -411,7 +411,7 @@
       "title": "Biab Nailstudio in Capelle aan den iJssel",
       "translations": {
         "value_1": "Why is BIAB TREATMENT the best?",
-        "value_2": "In most cases, when the client doesn't <span class='bold'>know which treatment to choose</span>, either because it's their <span class='bold'>first time in a nailstudio</span> or because they want to try a new technique, my recommendation usually ends up being: let's go for the <span class='bold'>BIAB TREATMENT</span>. Why? I'll tell you right now...",
+        "value_2": "In most cases, when the client doesn't know <span class='bold'>which treatment to choose</span>, either because it's their <span class='bold'>first time in a nailstudio</span> or because they want to try a new technique, my recommendation usually ends up being: let's go for the <span class='bold'>BIAB TREATMENT</span>. Why? I'll explain more below.…",
         "value_3": "In each case presented to me, I carefully examine the nail and touch it to recommend the most suitable treatment. I consider not only the texture and shape of each hand but also my client's <span class='bold'>lifestyle, tastes</span>, and <span class='bold'>preferences.</span>",
         "value_4": "With this type of <span class='bold'>Gelnails</span>, I can guarantee <span class='bold'>healthy and personalized nails</span>, with a <span class='bold'>uniform color</span> and <span class='bold'>unique style</span>, strengthened by a flexible and resistant gel that allows reaching the desired length without breaking or chipping, thus avoiding the use of <span class='bold'>extensions</span> or <span class='bold'>acrylic nails</span>, which are more invasive to the health of the nail.",
         "value_5": "In summary...",
@@ -428,10 +428,10 @@
         "value_16": "do not bite your nails or put them in your mouth to avoid constant moisture;",
         "value_17": "avoid using your nails as tools;",
         "value_18": "keep cuticles hydrated with special oil (Recommended: CND Solar Oil).",
-        "value_19": "But remember my words, after 4 weeks, you'll probably be wanting to cut your nails due to the discomfort caused by their excessive length.",
-        "value_20": "Example of nail growth protected by BIAB TREATMENT",
-        "value_21": "1° BIAB TREATMENT<br> NEW SET BIAB TREATMENT",
-        "value_22": "2° BIAB TREATMENT<br> AFTER 26 DAYS",
+        "value_19": "Remember my words",
+        "value_20": "Example of <span class='bigger bold'>26 days</span> nail growth protected by BIAB TREATMENT",
+        "value_21": "After 4 weeks, you'll probably be wanting to cut your nails due to the discomfort caused by their excessive length.",
+
         "value_23": "Do nails need to rest during the Biab treatment?",
         "value_24": "It's a frequent question, but the answer is simple:",
         "value_25": "&#11088; Find the center that treats your nails<br>with the care they deserve...",
@@ -447,13 +447,13 @@
         "value_35": "I have full confidence in the quality of The GelBottle Inc.'s BIAB, as I know its <span class='bold'>consistency, flexibility, and adhesion</span> will ensure my clients the long-lasting treatment and <span class='bold'>strong nails</span> they seek when entrusting me with their hands. Nails protected against bumps, pressures, and bends.",
         "value_36": "BIAB encapsulates its essence in this equation:",
         "value_37": "One of the main advantages I highlight when promoting the BIAB TREATMENT, comparing it to other conventional gels and acrylics, is that it is a VEGAN and CRUELTY-FREE product, in addition to being 10-free, which means fewer unwanted chemicals. It offers a range of mostly natural and light colors to reflect the concern for minimizing damage and maintaining the product's naturalness.",
-        "value_38": "BIAB offers an elegant color palette that, when applied, provides a uniform and natural",
-        "value_39": "finish without waste. As I always say, once you try it,",
+        "value_38": "BIAB offers an elegant color palette that, when applied, provides a uniform and natural finish without waste. As I always say, once you try it,",
+
         "value_40": "There's no turning back!",
         "value_41": "In contrast to other products, The GelBottle Inc. offers a range of HEMA-FREE Biab gels, with even fewer chemical components. This is ideal for clients with sensitivity, allergies, or simply for those who want to take additional precautions when caring for their nails.",
         "value_42": "And once again, I bring up Biab with another strength regarding the <span class='bold'>frequency with which you have to return for your new Biab Set Treatment</span>, as I mentioned earlier.",
-        "value_43": "Do you still have doubts about the differences between BIAB TREATMENT, OTHER GELS, AND ACRYLIC?",
-        "value_44": "Don't miss this summary table that clarifies the ideas a bit:",
+        "value_43": "Is BIAB TREATMENT better than other gels and acrylic?",
+        "value_44": "Don't miss this summary table that shows the main differences between them:",
         "value_45": "BIAB",
         "value_46": "REGULAR GELS",
         "value_47": "ACRYLIC",
@@ -496,7 +496,8 @@
         "value_84": "DRYING",
         "value_85": "UV-Led Lamp",
         "value_86": "UV-Led Lamp",
-        "value_87": "With exposure to air"
+        "value_87": "With exposure to air",
+        "value_88": "But first..."
       }
     },
     {

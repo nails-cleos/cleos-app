@@ -20,19 +20,39 @@ export const sections = (translations: any): ISection[] => {
   return [
     {
       type: 'title',
+      value: translations.value_43,
+      class: 'center'
+    },
+    {
+      type: 'detail',
+      value: translations.value_2,
+    },
+    {
+      type: 'detail',
+      value: translations.value_88,
+    },
+    {
+      type: 'detail',
+      value: translations.value_44,
+    },
+    {
+      type: 'table',
+      value: '',
+      class: 'margin-bottom',
+      details: comparativeTable(translations)
+    },
+    {
+      type: 'subtitle',
       value: translations.value_1,
       class: 'center'
     },
     {
       type: 'image-detail',
       value: 'assets/home_page/img/treatment/biab-1.webp',
-      height: 400,
-      width: 300,
+      height: 250,
+      width: 228,
+      class: 'margin-5',
       details: [
-        {
-          type: 'detail',
-          value: translations.value_2
-        },
         {
           type: 'detail',
           value: translations.value_3
@@ -72,6 +92,86 @@ export const sections = (translations: any): ISection[] => {
     {
       type: 'subsubtitle',
       value: translations.value_10
+    },
+    {
+      type: 'divider',
+      value: ''
+    },
+    {
+      type: 'subtitle',
+      value: translations.value_33
+    },
+    {
+      type: 'image-detail',
+      value: 'assets/home_page/img/treatment/biab-4.webp',
+      class: 'margin-5',
+      width: 150,
+      height: 210,
+      details: [
+        {
+          type: 'detail',
+          value: translations.value_34
+        }
+      ]
+    },
+    {
+      type: 'image-detail',
+      value: 'assets/home_page/img/treatment/biab-5.webp',
+      width: 300,
+      height: 327,
+      class: 'left',
+      details: [
+        {
+          type: 'detail',
+          value: translations.value_35,
+          class: 'margin-bottom-10'
+        },
+        {
+          type: 'detail',
+          value: translations.value_37
+        }
+      ]
+    },
+    {
+      type: 'subsubtitle',
+      value: translations.value_36
+    },
+    {
+      type: 'image',
+      value: 'assets/home_page/img/treatment/biab-7.webp',
+      height: 250,
+      width: 500
+    },
+    {
+      type: 'image-detail',
+      value: 'assets/home_page/img/treatment/biab-6.webp',
+      width: 235,
+      height: 210,
+      class: 'margin-5 center',
+      details: [
+        {
+          type: 'detail',
+          value: translations.value_38,
+          class: 'bold'
+        },
+        {
+          type: 'detail',
+          value: translations.value_39,
+          class: 'bold'
+        },
+        {
+          type: 'subtitle',
+          value: translations.value_40
+        }
+      ]
+    },
+    {
+      type: 'detail',
+      value: translations.value_41
+    },
+    {
+      type: 'detail',
+      value: translations.value_42,
     },
     {
       type: 'divider',
@@ -123,36 +223,26 @@ export const sections = (translations: any): ISection[] => {
       width: 500
     },
     {
-      type: 'detail',
-      value: translations.value_19
-    },
-    {
-      type: 'divider',
-      value: ''
-    },
-    {
-      type: 'subsubtitle',
-      value: translations.value_20
-    },
-    {
-      type: 'image-text',
-      value: '',
+      type: 'image-detail',
+      value: 'assets/home_page/img/treatment/biab-3.webp',
+      height: 250,
+      width: 209,
+      class: 'left text-center center',
       details: [
         {
-          type: 'image-text',
-          value: 'assets/home_page/img/treatment/biab-3.webp',
-          width: 300,
-          height: 400,
-          description: translations.value_21,
-          class: 'center'
+          type: 'detail',
+          value: translations.value_20,
+          class: 'top-text bold'
         },
         {
           type: 'detail',
-          value: 'assets/home_page/img/treatment/biab-4.webp',
-          width: 300,
-          height: 533,
-          description: translations.value_22,
-          class: 'center'
+          value: translations.value_19,
+          class: 'bottom-tex'
+        },
+        {
+          type: 'detail',
+          value: translations.value_21,
+          class: 'bottom-tex'
         }
       ]
     },
@@ -202,94 +292,6 @@ export const sections = (translations: any): ISection[] => {
       type: 'detail',
       value: translations.value_32,
       class: 'bold'
-    },
-    {
-      type: 'divider',
-      value: ''
-    },
-    {
-      type: 'subtitle',
-      value: translations.value_33
-    },
-    {
-      type: 'image-detail',
-      value: 'assets/home_page/img/treatment/biab-5.webp',
-      class: 'left',
-      width: 150,
-      height: 210,
-      details: [
-        {
-          type: 'detail',
-          value: translations.value_34
-        }
-      ]
-    },
-    {
-      type: 'image-detail',
-      value: 'assets/home_page/img/treatment/biab-6.webp',
-      width: 300,
-      height: 451,
-      details: [
-        {
-          type: 'detail',
-          value: translations.value_35
-        }
-      ]
-    },
-    {
-      type: 'subsubtitle',
-      value: translations.value_36
-    },
-    {
-      type: 'image',
-      value: 'assets/home_page/img/treatment/biab-2.webp', // TODO update
-      height: 250,
-      width: 500
-    },
-    {
-      type: 'detail',
-      value: translations.value_37
-    },
-    {
-      type: 'detail',
-      value: translations.value_38,
-      class: 'bold center'
-    },
-    {
-      type: 'detail',
-      value: translations.value_39,
-      class: 'bold center'
-    },
-    {
-      type: 'subsubtitle',
-      value: translations.value_40
-    },
-    {
-      type: 'detail',
-      value: translations.value_41
-    },
-    {
-      type: 'detail',
-      value: translations.value_42
-    },
-    {
-      type: 'divider',
-      value: ''
-    },
-    {
-      type: 'subtitle',
-      value: translations.value_43,
-      class: 'center'
-    },
-    {
-      type: 'detail',
-      value: translations.value_44,
-    },
-    {
-      type: 'table',
-      value: '',
-      class: 'margin-bottom',
-      details: comparativeTable(translations)
     }
   ];
 };

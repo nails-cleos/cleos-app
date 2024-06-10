@@ -31,13 +31,13 @@
           </div>
         }
         @case ('image-detail') {
-          <div class="image-detail-container">
-            @if (section.class === 'left') {
+          <div class="image-detail-container" [class]="section.class">
+            @if (section.class && section.class.indexOf('left') >= 0) {
               <div class="image-detail">
                 <img [ngSrc]="section.value" [width]="section.width" [height]="section.height" alt="{{section.alt}}"
                      priority>
               </div>
-              <div class="text">
+              <div class="text" [class]="section.class">
                 @if (section.details) {
                   @for (detail of section.details; track detail) {
                     @switch (detail.type) {
@@ -45,7 +45,7 @@
                         <h3 class="title" [innerHTML]="detail.value"></h3>
                       }
                       @case ('detail') {
-                        <div>
+                        <div [class]="detail.class">
                           <p [innerHTML]="detail.value"></p>
                         </div>
                       }
@@ -54,7 +54,7 @@
                 }
               </div>
             } @else {
-              <div class="text">
+              <div class="text" [class]="section.class">
                 @if (section.details) {
                   @for (detail of section.details; track detail) {
                     @switch (detail.type) {
@@ -62,7 +62,7 @@
                         <h3 class="title" [innerHTML]="detail.value"></h3>
                       }
                       @case ('detail') {
-                        <div>
+                        <div [class]="detail.class">
                           <p [innerHTML]="detail.value"></p>
                         </div>
                       }
