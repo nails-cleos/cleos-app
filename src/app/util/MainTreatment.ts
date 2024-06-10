@@ -51,7 +51,6 @@ export const sections = (translations: any): ISection[] => {
       value: 'assets/home_page/img/treatment/biab-1.webp',
       height: 250,
       width: 228,
-      class: 'margin-5',
       details: [
         {
           type: 'detail',
@@ -139,8 +138,8 @@ export const sections = (translations: any): ISection[] => {
     {
       type: 'image',
       value: 'assets/home_page/img/treatment/biab-7.webp',
-      height: 250,
-      width: 500
+      width: 300,
+      height: 150
     },
     {
       type: 'image-detail',
@@ -219,8 +218,8 @@ export const sections = (translations: any): ISection[] => {
     {
       type: 'image',
       value: 'assets/home_page/img/treatment/biab-2.webp',
-      height: 250,
-      width: 500
+      width: 500,
+      height: 250
     },
     {
       type: 'image-detail',
