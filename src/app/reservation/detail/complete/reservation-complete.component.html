@@ -69,22 +69,8 @@
             </mat-error>
           </mat-form-field>
         </ng-template>
-        <mat-form-field appearance="outline">
-          <mat-label>{{ 'RESERVATION.TREATMENT.EXTRAS.DESCRIPTION' | translate }}</mat-label>
-          <label>
-            <textarea #message [formControl]="description" matInput maxlength="256"></textarea>
-          </label>
-          <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>{{ 'RESERVATION.TREATMENT.EXTRAS.PRICE' | translate }}</mat-label>
-          <span matPrefix><mat-icon matPrefix>{{ reservation.room.currency.icon }}</mat-icon> &nbsp;</span>
-          <label>
-            <input [formControl]="extraPrice" matInput type="number">
-          </label>
-        </mat-form-field>
         <div class="fields-container">
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" style="width: 100%;">
             <mat-label>{{ 'RESERVATION.TIME.START.FIELD' | translate }}</mat-label>
             <label>
               <input [formControl]="startTime" [format]="24" [ngxTimepicker]="tStart" matInput name="start"
@@ -99,7 +85,7 @@
                        [innerHTML]="'RESERVATION.TIME.START.REQUIRED' | translate">
             </mat-error>
           </mat-form-field>
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" style="width: 100%;">
             <mat-label>{{ 'RESERVATION.TIME.END.FIELD' | translate }}</mat-label>
             <label>
               <input [formControl]="endTime" [format]="24" [ngxTimepicker]="tEnd" matInput name="end" readonly
@@ -120,7 +106,7 @@
         </ng-template>
         <mat-list>
           <ng-template [ngIf]="group.value && treatment.value">
-            <mat-list-item >
+            <mat-list-item>
               <mat-icon matListItemIcon>spa</mat-icon>
               <div class="bold" matListItemTitle>{{ 'COMMON.TREATMENT.FIELD' | translate }}</div>
               <ng-template [ngIf]="treatment.value.description">
@@ -131,8 +117,9 @@
               </ng-template>
             </mat-list-item>
             <mat-list-item lines="3">
-              <div [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.NAME' | translate: {name: treatment.value.name, group: group.value.name}"
-                   matListItemTitle>
+              <div
+                [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.NAME' | translate: {name: treatment.value.name, group: group.value.name}"
+                matListItemTitle>
               </div>
               <div matListItemLine>
                 <span [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.PRICE' | translate"></span>
@@ -162,30 +149,43 @@
             </mat-selection-list>
           </ng-template>
           <mat-divider></mat-divider>
+          <app-form-field-adder [currency]="reservation.room.currency" [key]="'RESERVATION.TREATMENT.EXTRAS.TITLE'"
+                                (onChange)="onExtrasChanges($event)"></app-form-field-adder>
+          <mat-divider></mat-divider>
           <app-price-preview [price]="price" [currencyIcon]="reservation.room.currency.icon" [isEditing]="false"
                              [label]="'RESERVATION.TREATMENT.COMPLETE.TOTAL'">
           </app-price-preview>
         </mat-list>
-        <ng-template [ngIf]="!price.isPaid">
+        @if (!price.isPaid) {
           <div class="inner-container">
             <mat-form-field appearance="outline">
               <mat-label>{{ 'RESERVATION.PAYMENT.TYPE' | translate }}</mat-label>
               <mat-select [formControl]="type">
-                <mat-option *ngFor="let t of types" [value]="t">
-                  {{ 'COMMON.PAYMENT.TYPE.' + (t || 'NONE') | translate }}
-                </mat-option>
+                @for (t of types; track t) {
+                  <mat-option [value]="t">
+                    {{ 'COMMON.PAYMENT.TYPE.' + (t || 'NONE') | translate }}
+                  </mat-option>
+                }
               </mat-select>
             </mat-form-field>
-            <ng-template [ngIf]="type.value === 'TRANSFER'">
+            @if (type.value === 'TRANSFER') {
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'RESERVATION.PAYMENT.TRANSFER.FIELD' | translate }}</mat-label>
                 <label>
                   <input [formControl]="transfer" matInput>
                 </label>
               </mat-form-field>
-            </ng-template>
+            }
           </div>
-        </ng-template>
+          <mat-checkbox (change)="split = !split" color="primary"
+                        [checked]="split">{{ 'RESERVATION.PAYMENT.SPLIT.TITLE' | translate }}
+          </mat-checkbox>
+          @if (split) {
+            <app-form-field-adder [currency]="reservation.room.currency" [split]="true"
+                                  [key]="'RESERVATION.PAYMENT.SPLIT.TITLE'" [toPaid]="price.toPaid"
+                                  (onChange)="onSplitChanges($event)"></app-form-field-adder>
+          }
+        }
         <ng-template #skeleton>
           <div class="ssc-line"></div>
         </ng-template>

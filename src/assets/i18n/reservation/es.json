@@ -58,6 +58,7 @@
         "TITLE": "Extras",
         "DESCRIPTION": "Descripción",
         "PRICE": "Precio",
+        "REQUIRED": "Precio es <b>requerido</b>",
         "TOTAL": "Total"
       },
       "COMPLETE": {

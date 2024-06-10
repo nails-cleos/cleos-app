@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../../store/app.states';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as fromActionsReservation from '../../../store/reservation.actions';
-import { IReservationAll } from '../../../interfaces/reservation';
+import { IExtras, IReservationAll } from '../../../interfaces/reservation';
 import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../interfaces/treatment';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
@@ -55,8 +55,6 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     Validators.required
   ]);
 
-  description: UntypedFormControl = new UntypedFormControl();
-  extraPrice: UntypedFormControl = new UntypedFormControl();
   type: UntypedFormControl = new UntypedFormControl();
   transfer: UntypedFormControl = new UntypedFormControl();
 
@@ -68,6 +66,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   colors?: IColorAll[];
 
   dateFormat: string;
+  split: boolean = false;
 
   private reservationId: any;
   private roomId: any;
@@ -76,6 +75,8 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   private getState: Observable<any>;
   private subscription?: Subscription;
   private readonly isDashboard = false;
+  private currentExtraData?: IExtras[];
+  private currentSplitData?: IExtras[];
 
   constructor(private store: Store<AppState>, private route: ActivatedRoute, private formBuilder: UntypedFormBuilder,
               private readonly translate: TranslateService, private router: Router) {
@@ -90,29 +91,29 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
         this.price = newPrice(this.price, value.price, this.reservation?.treatment?.discountCustomer);
       }
     });
-    this.extraPrice.valueChanges.subscribe(value => {
-      this.price = newExtra(this.price, value ? value : 0, this.reservation?.treatment?.discountCustomer);
-    });
     this.isDashboard = this.router.getCurrentNavigation()?.extras?.state?.data?.isDashboard;
   }
 
   get complete(): void {
+    if (this.currentExtraData) {
+      console.log(this.currentExtraData);
+      return;
+    }
     if (this.reservation) {
-      const reservationId = this.reservation.id;
-      const treatmentId = valueChange(this.treatment.value.id, this.reservation?.treatment.key);
-      const description = this.description.value;
-      const price = this.extraPrice.value;
-      const paymentType = this.type.value || PaymentType.account;
-      const additionalIds = this.additionalSelected.map(additional => additional.id);
-      const transfer = this.transfer.value;
-      const startDateTime = this.startDate.toLocaleString(API_LOCALE);
-      const endDateTime = this.endDate.toLocaleString(API_LOCALE);
-      const color = this.color.value?.id;
-
       this.store.dispatch(
         new fromActionsReservation.Complete({
-          reservationId,
-          extras: { treatmentId, description, price, paymentType, additionalIds, transfer, startDateTime, endDateTime, color },
+          reservationId: this.reservation.id,
+          complete: {
+            treatmentId: valueChange(this.treatment.value.id, this.reservation?.treatment.key),
+            paymentType: this.type.value || PaymentType.account,
+            additionalIds: this.additionalSelected.map(additional => additional.id),
+            transfer: this.transfer.value,
+            color: this.color.value?.id,
+            startDateTime: this.startDate.toLocaleString(API_LOCALE),
+            endDateTime: this.endDate.toLocaleString(API_LOCALE),
+            extras: this.currentExtraData,
+            split: this.currentSplitData
+          },
           isDashboard: this.isDashboard
         })
       );
@@ -170,6 +171,16 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     date.setHours(time?.hour || 0, time?.minute || 0, 0);
   }
 
+  onExtrasChanges(extras: IExtras[]): void {
+    this.currentExtraData = extras;
+    const extrasTotal = extras.map(a => a.price).reduce((p, c) => p + c);
+    this.price = newExtra(this.price, extrasTotal, this.reservation?.treatment?.discountCustomer);
+  }
+
+  onSplitChanges(split: IExtras[]): void {
+    this.currentSplitData = split;
+  }
+
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       this.payments = state.payments;
@@ -216,12 +227,11 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     this.form = this.formBuilder.group({
       group: this.group,
       treatment: this.treatment,
-      description: this.description,
-      extraPrice: this.extraPrice,
       type: this.type,
       transfer: this.transfer,
       startTime: this.startTime,
-      endTime: this.endTime
+      endTime: this.endTime,
+      formFields: this.formBuilder.array([])
     });
     this.valueChange();
   }
