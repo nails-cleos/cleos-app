@@ -4,6 +4,7 @@
     "SECTION": {
       "STORY": "My Story",
       "TREATMENT": "Treatments",
+      "BIAB": "Biab",
       "WORK": "Cleos Works",
       "EXPERIENCE": "Experience",
       "CONTACT": "Contact",
@@ -52,7 +53,7 @@
       "MAIL": "nails.cleos@gmail.com",
       "SEND": {
         "PHONE": "+310625251524",
-        "TITLE": "Have any doubt? I would love to hear about you",
+        "TITLE": "Have any question? I would love to hear about you",
         "MESSAGE": "Your message was sending successfully",
         "HELLO": "ʜᴇʟʟᴏ ᴄʟᴇᴏꜱ! %0Aɪ ʜᴀᴠᴇ ᴀ ᴅᴏᴜʙᴛ ♡"
       },

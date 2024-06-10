@@ -424,7 +424,7 @@ const setTitle = (worksheet: Worksheet, cellNumber: number, endLetter: string, k
   titleCell.fill = {
     type: 'pattern',
     pattern: 'solid',
-    fgColor: { argb: 'a9a397' }
+    fgColor: { argb: 'b5ac9e' }
   };
 };
 
@@ -604,7 +604,7 @@ const setWeek = (worksheet: Worksheet, cellNumber: number, index: number, endLet
   weekCell.fill = {
     type: 'pattern',
     pattern: 'solid',
-    fgColor: { argb: 'ffd078' }
+    fgColor: { argb: 'ffd38c' }
   };
 };
 

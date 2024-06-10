@@ -76,10 +76,12 @@
     box-shadow: 0 2.5em 0 0;
   }
 }
+
 // Loading
 
 .sidenav-container {
   height: 100%;
+
   mat-sidenav-content {
     overflow-x: hidden !important;
   }
@@ -101,6 +103,21 @@
 
 .mat-spacer {
   flex: 1 1 auto;
+}
+
+.header-container {
+  span:not(:first-of-type):not(:last-of-type) {
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+
+  span:first-of-type {
+    margin-right: 5px;
+  }
+
+  span:last-of-type {
+    margin-left: 5px;
+  }
 }
 
 img, svg {
@@ -148,41 +165,93 @@ a {
   transition: all .3s ease-in 0s;
 }
 
-.footer {
-  padding: 70px 10%;
+$footer-padding: 70px 10%;
+$footer-bottom-padding: 10px;
+
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.footer h6 {
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 24px;
-  margin-bottom: 30px;
+.page-container {
+
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  .main-content {
+    flex: 1;
+    display: flex;
+    justify-content: flex-start; // Align content to the top
+    align-items: center; // Center content horizontally
+  }
+}
+
+.footer {
+  padding: $footer-padding;
+  text-align: center;
+
+  .footer-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+
+    .footer-image-container {
+      margin: auto;
+    }
+
+    @media (min-width: 768px) {
+      flex-direction: row;
+      justify-content: space-between;
+    }
+
+    .footer-logo {
+      margin-bottom: $footer-padding;
+
+      img {
+        max-width: 150px;
+      }
+    }
+
+    .footer-links {
+      ul {
+        list-style: none;
+        padding: 0;
+
+        li {
+          margin-bottom: $footer-bottom-padding;
+
+          a {
+            text-decoration: none;
+          }
+        }
+      }
+    }
+
+    .footer-social {
+      a {
+        font-size: 20px;
+        margin: 0 10px;
+        transition: color 0.3s;
+      }
+    }
+  }
+
+  .footer-bottom {
+    margin-top: $footer-padding;
+    padding-top: $footer-bottom-padding;
+
+    p {
+      margin: 0;
+      font-size: 14px;
+    }
+  }
 }
 
 .about-us p {
   line-height: 24px;
-}
-
-.footer-subscribe .subscribe {
-  margin-bottom: 15px;
-  position: relative;
-}
-
-.subscribe #subscribe {
-  background-color: transparent;
-  border-radius: 2px;
-  height: 40px;
-  text-indent: 10px;
-  width: 80%;
-}
-
-.subscribe #subs {
-  background-color: transparent;
-  border: 0 none;
-  font-size: 24px;
-  position: absolute;
-  right: 20%;
-  top: 6px;
 }
 
 .copyright {

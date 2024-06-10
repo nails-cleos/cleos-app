@@ -167,8 +167,8 @@ export const colorChange = trigger('colorChange', [
 ]);
 
 export const colorChangeChild = trigger('colorChangeChild', [
-  state('open', style({ opacity: 1 })),
-  state('close', style({ opacity: 1 })),
+  state('open', style({ opacity: 1, color: '#000' })),
+  state('close', style({ opacity: 1, color: '#fff' })),
   transition('* => *', animate('1000ms ease-in-out'))
 ]);
 

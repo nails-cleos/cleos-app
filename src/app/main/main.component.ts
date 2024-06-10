@@ -42,6 +42,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   isDarkMode: boolean;
   backgroundColor: string;
   language: string;
+  showArrow: boolean;
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(map(result => result.matches), shareReplay());
 
@@ -58,6 +59,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     this.navigationState = new BehaviorSubject<'open' | 'close'>('close');
     this.isAuthenticated = false;
     this.showLoader = true;
+    this.showArrow = false;
     this.isDarkMode = isDarkMode(cookieService.get(THEME) as Theme);
     this.authUserService.updateMode(this.isDarkMode);
     this.backgroundColor = this.isDarkMode ? '126, 119, 105' : '169, 163, 151';
@@ -68,6 +70,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     this.mainContentSubscription = mainContent.data$.subscribe(it => {
       this.showLoader = it.showPreload;
       this.navigationState.next(it.navigationHeader);
+      this.showArrow = it.showArrow;
     });
     this.language = this.translate.currentLang;
   }
@@ -92,6 +95,12 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.store.dispatch(
       new fromActionsLogin.Redirect()
     );
+  }
+
+  get treatment(): void {
+    goTo('home');
+    this.router.navigate([this.translate.currentLang, 'biab', 'treatment']);
+    return;
   }
 
   ngOnInit(): void {

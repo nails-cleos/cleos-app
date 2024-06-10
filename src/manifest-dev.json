@@ -1,8 +1,8 @@
 {
-  "name": "Cleos Dev",
-  "short_name": "Cleos Dev",
-  "theme_color": "#a9a397",
-  "background_color": "#a9a397",
+  "name": "Cleos Manicure DEV",
+  "short_name": "Cleos DEV",
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
   "display": "standalone",
   "gcm_sender_id": "364998384255",
   "scope": "./",

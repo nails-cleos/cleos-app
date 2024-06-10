@@ -11,6 +11,7 @@ export interface ITreatmentGroup {
   colors?: string[];
   treatments?: ITreatment[];
   order?: number;
+  image?: any
 }
 
 export interface ITreatmentGroupAll {
