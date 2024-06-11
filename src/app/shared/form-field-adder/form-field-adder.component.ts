@@ -1,62 +1,132 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { SharedModule } from '../shared.module';
-import { FormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { IExtras } from '../../interfaces/reservation';
 import { ICurrencyAll } from '../../interfaces/currency';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { detailExpandAnimation } from '../../util/animation';
+import { PaymentType } from '../../interfaces/payment';
 
 @Component({
   selector: 'app-form-field-adder',
   standalone: true,
   imports: [SharedModule],
   templateUrl: './form-field-adder.component.html',
-  styleUrl: './form-field-adder.component.scss'
+  styleUrl: './form-field-adder.component.scss',
+  animations: [detailExpandAnimation]
 })
 export class FormFieldAdderComponent implements OnInit {
   @Input() key!: string;
   @Input() currency!: ICurrencyAll;
   @Input() split: boolean = false;
-  @Output() onChange = new EventEmitter<IExtras[]>();
   @Input() toPaid?: number = 0;
+  @Output() onChange = new EventEmitter<IExtras[]>();
+  @Output() isValid = new EventEmitter<boolean>();
 
-  extraDataForm!: UntypedFormGroup;
   displayedColumns: string[] = ['description', 'price'];
-  extraDataSource = new MatTableDataSource<IExtras>([]);
-  currentExtraData: IExtras[] = [];
+  dataSource = new MatTableDataSource<IExtras>([]);
+  formGroup!: FormGroup;
+  expanded?: IExtras;
+  allPaymentTypes: string[] = Object.keys(PaymentType);
 
-  constructor(private formBuilder: FormBuilder) {
+  get addRow(): void {
+    const element: IExtras = { description: undefined, price: 0 };
     if (this.split) {
-      this.displayedColumns = [...this.displayedColumns, 'type'];
+      element.paymentType = undefined;
     }
+    const newData = [...this.dataSource.data, element];
+    this.dataSource = new MatTableDataSource<IExtras>(newData);
+
+    this.formArray.push(this.createItemFormGroup());
+    return this.subscribeToFormChanges();
   }
 
   get total() {
-    return this.currentExtraData.map(t => t.price).reduce((acc, value) => acc + value, 0);
+    return this.dataSource.data.map(t => t.price).reduce((acc, value) => acc + value, 0);
+  }
+
+  get remainsToBeSplit(): number | null {
+    if (this.split) {
+      return (this.toPaid || 0) - this.total;
+    }
+    return null;
+  }
+
+  constructor(private formBuilder: FormBuilder) {
   }
 
   ngOnInit(): void {
-    this.extraDataForm = this.formBuilder.group({
-      description: [undefined],
-      price: [undefined, [Validators.required]],
-      type: [undefined]
+    this.formGroup = this.formBuilder.group({
+      items: this.formBuilder.array([])
     });
     if (this.split) {
-      this.extraDataForm.controls['type'].setValidators([Validators.required]);
+      this.displayedColumns = [...this.displayedColumns, 'paymentType'];
+    }
+    this.displayedColumns = [...this.displayedColumns, 'actions'];
+  }
+
+  deleteRow(index: number): void {
+    this.dataSource.data.splice(index, 1);
+    this.formArray.removeAt(index);
+    this.emitRowChange();
+  }
+
+  getFormGroup(index: number): FormGroup {
+    return this.formArray.at(index) as FormGroup;
+  }
+
+  private createItemFormGroup(): FormGroup {
+    if (this.split) {
+      return this.formBuilder.group({
+        description: ['', Validators.required],
+        price: ['', Validators.required],
+        paymentType: ['', Validators.required]
+      });
+    }
+    return this.formBuilder.group({
+      description: ['', Validators.required],
+      price: ['', Validators.required]
+    });
+  }
+
+  private emitRowChange(): void {
+    if (!this.formGroup.invalid) {
+      this.onChange.emit(this.dataSource.data);
+    }
+    if (!this.split) {
+      this.isValid.emit(!this.formGroup.invalid);
+    } else {
+      this.isValid.emit(this.total === this.toPaid && !this.formGroup.invalid);
     }
   }
 
-  addExtra() {
-    if (this.extraDataForm.invalid) {
-      return;
-    }
-    const extra = {
-      description: this.extraDataForm.controls['description'].value,
-      price: this.extraDataForm.controls['price'].value,
-      type: this.extraDataForm.controls['type'].value
-    };
-    this.currentExtraData.push(extra);
-    this.onChange.emit(this.currentExtraData);
-    this.extraDataSource.data = [...this.currentExtraData];
-    this.extraDataForm.reset();
+  private subscribeToFormChanges(): void {
+    this.formArray.controls.forEach((control, index) => {
+      control.get('description')?.valueChanges.pipe(debounceTime(300), distinctUntilChanged()).subscribe((newValue) => {
+        const newData = [...this.dataSource.data];
+        newData[index].description = newValue;
+        this.dataSource = new MatTableDataSource<IExtras>(newData);
+        this.emitRowChange();
+      });
+
+      control.get('price')?.valueChanges.pipe(debounceTime(300), distinctUntilChanged()).subscribe((newValue) => {
+        const newData = [...this.dataSource.data];
+        newData[index].price = newValue;
+        this.dataSource = new MatTableDataSource<IExtras>(newData);
+        this.emitRowChange();
+      });
+
+      control.get('paymentType')?.valueChanges?.pipe(debounceTime(300), distinctUntilChanged())?.subscribe((newValue) => {
+        const newData = [...this.dataSource.data];
+        newData[index].paymentType = newValue;
+        this.dataSource = new MatTableDataSource<IExtras>(newData);
+        this.emitRowChange();
+      });
+    });
+  }
+
+  private get formArray(): FormArray {
+    return this.formGroup.get('items') as FormArray;
   }
 }

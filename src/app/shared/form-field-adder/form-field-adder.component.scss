@@ -1,48 +1,19 @@
-.form-container {
-  margin-bottom: 20px;
-
-  .form-layout {
-    display: grid;
-    grid-template-columns: 1fr 56px; // Two columns: the first column takes up remaining space, the second column is 56px wide for the button
-    grid-gap: 16px; // Adjust spacing between elements
-
-    .form-row {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .button-container {
-      align-self: center; // Center button vertically
-    }
-  }
+.table-responsive {
+  overflow: auto;
 }
 
-.table-container {
-  margin-top: 20px;
-  margin-bottom: 20px;
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px;
 }
 
-mat-form-field {
-  margin-bottom: 8px; // Add some space between form fields
+.center-text {
+  flex-grow: 1;
+  text-align: center;
 }
 
-.footer-row {
-  font-weight: bold;
-}
-
-// Responsive layout adjustments
-@media (max-width: 768px) {
-  .form-layout {
-    grid-template-columns: 1fr; // Change to single column layout on smaller screens
-    grid-gap: 0;
-  }
-  .button-container {
-    grid-column: 1; // Place button in first column
-    grid-row: 3; // Place button in new row
-    justify-self: center; // Center button horizontally
-  }
-
-  .description-field, .price-field {
-    width: 80%;
-  }
+.align-start {
+  margin-right: auto;
 }

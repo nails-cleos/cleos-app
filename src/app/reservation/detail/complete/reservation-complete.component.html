@@ -150,40 +150,42 @@
           </ng-template>
           <mat-divider></mat-divider>
           <app-form-field-adder [currency]="reservation.room.currency" [key]="'RESERVATION.TREATMENT.EXTRAS.TITLE'"
-                                (onChange)="onExtrasChanges($event)"></app-form-field-adder>
+                                (onChange)="onExtrasChanges($event)"
+                                (isValid)="isValid = $event"></app-form-field-adder>
           <mat-divider></mat-divider>
           <app-price-preview [price]="price" [currencyIcon]="reservation.room.currency.icon" [isEditing]="false"
                              [label]="'RESERVATION.TREATMENT.COMPLETE.TOTAL'">
           </app-price-preview>
         </mat-list>
         @if (!price.isPaid) {
-          <div class="inner-container">
-            <mat-form-field appearance="outline">
-              <mat-label>{{ 'RESERVATION.PAYMENT.TYPE' | translate }}</mat-label>
-              <mat-select [formControl]="type">
-                @for (t of types; track t) {
-                  <mat-option [value]="t">
-                    {{ 'COMMON.PAYMENT.TYPE.' + (t || 'NONE') | translate }}
-                  </mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
-            @if (type.value === 'TRANSFER') {
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'RESERVATION.PAYMENT.TRANSFER.FIELD' | translate }}</mat-label>
-                <label>
-                  <input [formControl]="transfer" matInput>
-                </label>
-              </mat-form-field>
-            }
-          </div>
-          <mat-checkbox (change)="split = !split" color="primary"
-                        [checked]="split">{{ 'RESERVATION.PAYMENT.SPLIT.TITLE' | translate }}
+          <mat-checkbox (change)="splitChange()" color="primary"
+                        [checked]="split">{{ 'RESERVATION.PAYMENT.SPLIT.CHECKBOX' | translate }}
           </mat-checkbox>
           @if (split) {
             <app-form-field-adder [currency]="reservation.room.currency" [split]="true"
                                   [key]="'RESERVATION.PAYMENT.SPLIT.TITLE'" [toPaid]="price.toPaid"
-                                  (onChange)="onSplitChanges($event)"></app-form-field-adder>
+                                  (onChange)="onSplitChanges($event)" (isValid)="isValidSplit = $event"></app-form-field-adder>
+          } @else {
+            <div class="inner-container">
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'RESERVATION.PAYMENT.TYPE' | translate }}</mat-label>
+                <mat-select [formControl]="type">
+                  @for (t of types; track t) {
+                    <mat-option [value]="t">
+                      {{ 'COMMON.PAYMENT.TYPE.' + (t || 'NONE') | translate }}
+                    </mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              @if (type.value === 'TRANSFER') {
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'RESERVATION.PAYMENT.TRANSFER.FIELD' | translate }}</mat-label>
+                  <label>
+                    <input [formControl]="transfer" matInput>
+                  </label>
+                </mat-form-field>
+              }
+            </div>
           }
         }
         <ng-template #skeleton>
@@ -201,7 +203,7 @@
       <button appBackButton color="accent" mat-fab extended class="icon-button"
               type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
       </button>
-      <button [disabled]="group.invalid || treatment.invalid" cdkFocusInitial color="primary"
+      <button [disabled]="group.invalid || treatment.invalid || !isValidSplit" cdkFocusInitial color="primary"
               mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.COMPLETE' | translate }}
       </button>
     </mat-card-actions>

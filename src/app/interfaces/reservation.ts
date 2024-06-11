@@ -5,7 +5,7 @@ import { CalendarEvent } from 'angular-calendar';
 import { ThemePalette } from '@angular/material/core';
 import { IUnavailableAll } from './unavailable';
 import { Pagination } from './pagination';
-import { IPayment, IPaymentType, PaymentPercentage, PaymentType } from './payment';
+import { IPayment, PaymentPercentage, PaymentType } from './payment';
 import { IReview } from './review';
 import { IAdditionalAll } from './additional';
 import { addHours, isSameDay } from 'date-fns';
@@ -22,7 +22,7 @@ export interface IFabMenu {
 export interface IExtras {
   price: number;
   description?: string;
-  type?: PaymentType
+  paymentType?: PaymentType
   name?: string // To make compatible with additional in price-extra
 }
 

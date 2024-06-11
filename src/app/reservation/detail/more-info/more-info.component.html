@@ -1,169 +1,185 @@
 <div class="divider">
-  <h1>{{ 'RESERVATION.TRACKING.TITLE' | translate}}</h1>
+  <h2>{{ 'RESERVATION.TRACKING.TITLE' | translate }}</h2>
 </div>
-<ng-template [ngIf]="tracking" [ngIfElse]="box">
+@if (tracking) {
   <div class="stepper-wrapper">
     <div [ngClass]="{'active': tracking.reservation.state === 'CREATED', 'completed': tracking.approvedTimestamp}"
          class="stepper-item">
       <div class="step-counter">
-        <span *ngIf="tracking.createdTimestamp">
-          {{tracking.createdTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat}}
-        </span>
+        @if (tracking.createdTimestamp) {
+          <span>
+            {{ tracking.createdTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat }}
+          </span>
+        }
       </div>
-      <div class="step-name">{{'COMMON.STATUS.RESERVATION.CREATED' | translate}}</div>
+      <div class="step-name">{{ 'COMMON.STATUS.RESERVATION.CREATED' | translate }}</div>
     </div>
-    <div [ngClass]="{
+    <div class="stepper-item" [ngClass]="{
      'active': ['APPROVED', 'PAID', 'PARTIALLY_PAID'].indexOf(tracking.reservation.state) >= 0,
      'completed': tracking.startedTimestamp
-    }" class="stepper-item">
+    }">
       <div class="step-counter">
-        <span *ngIf="tracking.approvedTimestamp">
-          {{tracking.approvedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat}}
-        </span>
+        @if (tracking.approvedTimestamp) {
+          <span>
+            {{ tracking.approvedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat }}
+          </span>
+        }
       </div>
-      <div class="step-name">{{'COMMON.STATUS.RESERVATION.APPROVED' | translate}}</div>
+      <div class="step-name">{{ 'COMMON.STATUS.RESERVATION.APPROVED' | translate }}</div>
     </div>
     <div [ngClass]="{'active': tracking.reservation.state === 'STARTED', 'completed': tracking.completedTimestamp}"
          class="stepper-item">
       <div class="step-counter">
-        <span *ngIf="tracking.startedTimestamp">
-          {{tracking.startedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat}}
-        </span>
+        @if (tracking.startedTimestamp) {
+          <span>
+            {{ tracking.startedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat }}
+          </span>
+        }
       </div>
-      <div class="step-name">{{'COMMON.STATUS.RESERVATION.STARTED' | translate}}</div>
+      <div class="step-name">{{ 'COMMON.STATUS.RESERVATION.STARTED' | translate }}</div>
     </div>
     <div [ngClass]="{
       'finish': ['COMPLETED', 'PARTIALLY_COMPLETED'].indexOf(tracking.reservation.state) >= 0,
       'completed': tracking.completedTimestamp
       }" class="stepper-item">
       <div class="step-counter">
-        <span *ngIf="tracking.completedTimestamp">
-          {{tracking.completedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat}}
-        </span>
+        @if (tracking.completedTimestamp) {
+          <span>
+            {{ tracking.completedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat }}
+          </span>
+        }
       </div>
-      <div class="step-name">{{'COMMON.STATUS.RESERVATION.COMPLETED' | translate}}</div>
+      <div class="step-name">{{ 'COMMON.STATUS.RESERVATION.COMPLETED' | translate }}</div>
     </div>
   </div>
-  <h4 *ngIf="totalTime">
-    <span class="bold">{{'RESERVATION.TRACKING.DURATION' | translate}}:</span> {{totalTime}}
-  </h4>
-  <ng-template [ngIf]="!tracking.process && tracking.completedTimestamp">
+  @if (totalTime) {
+    <h4 class="bold" [innerHTML]="'RESERVATION.TRACKING.DURATION' | translate: {totalTime: totalTime}"></h4>
+  }
+  @if (!tracking.process && tracking.completedTimestamp) {
     <button type="button" (click)="execute" mat-fab extended class="icon-button">
       <mat-icon>sync_problem</mat-icon>
-      {{'RESERVATION.TRACKING.SYNC' | translate}}
+      {{ 'RESERVATION.TRACKING.SYNC' | translate }}
     </button>
-  </ng-template>
-</ng-template>
+  }
 
-<mat-divider></mat-divider>
-
-<div class="divider">
-  <h1>{{ 'RESERVATION.REVIEW.TITLE' | translate}}</h1>
-</div>
-<div *ngIf="reservation; else box">
-  <app-rating *ngIf="reservation.review; else noRating" [detail]="reservation.review.detail"
-              [rating]="reservation.review.rating" color="primary"></app-rating>
-  <ng-template #noRating>
-    <app-rating [rating]="0" color="primary"></app-rating>
-  </ng-template>
-</div>
-
-<ng-template #box>
+  <mat-divider></mat-divider>
+} @else {
   <div class="ssc-square mb"></div>
-</ng-template>
+}
 
-<mat-divider></mat-divider>
+@if (reservation) {
+  <div class="divider">
+    <h2>{{ 'RESERVATION.REVIEW.TITLE' | translate }}</h2>
+  </div>
+  @if (reservation.review) {
+    <app-rating [detail]="reservation.review.detail" [rating]="reservation.review.rating" color="primary"></app-rating>
+  } @else {
+    <app-rating [rating]="0" color="primary"></app-rating>
+  }
+} @else {
+  <div class="ssc-square mb"></div>
+}
 
-<div class="divider">
-  <h1>{{ 'RESERVATION.PAYMENT.TITLE' | translate}}</h1>
-</div>
-<div *ngIf="payments" class="mat-elevation-z8">
-  <table [dataSource]="payments" mat-table>
-    <ng-container matColumnDef="position">
-      <th *matHeaderCellDef mat-header-cell>#</th>
-      <td *matCellDef="let payment; let i = index;" mat-cell>
-        <div *ngIf="payment.id; else skeleton">{{i + 1}} </div>
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
-      </td>
-    </ng-container>
+@if (payments && payments[0].id) {
+  <mat-divider></mat-divider>
 
-    <ng-container matColumnDef="description">
-      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
-      <td *matCellDef="let payment" mat-cell>
-        <div *ngIf="payment.id; else skeleton">{{payment.description}}</div>
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
-      </td>
-    </ng-container>
+  <div class="divider">
+    <h2>{{ 'RESERVATION.PAYMENT.TITLE' | translate }}</h2>
+  </div>
+  <div class="mat-elevation-z8">
+    <table [dataSource]="payments" mat-table>
+      <ng-container matColumnDef="position">
+        <th *matHeaderCellDef mat-header-cell>#</th>
+        <td *matCellDef="let payment; let i = index;" mat-cell>
+          @if (payment.id) {
+            {{ i + 1 }}
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        </td>
+      </ng-container>
 
-    <ng-container matColumnDef="type">
-      <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
-      <td *matCellDef="let payment" class="hide-xs" mat-cell>
-        <div *ngIf="payment.id; else skeleton">{{payment.type}}</div>
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
-      </td>
-    </ng-container>
+      <ng-container matColumnDef="description">
+        <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
+        <td *matCellDef="let payment" mat-cell>
+          @if (payment.id) {
+            {{ payment.description }}
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        </td>
+      </ng-container>
 
-    <ng-container matColumnDef="amount">
-      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
-      <td *matCellDef="let payment" mat-cell>
-        <div *ngIf="payment.id; else skeleton">
-          <mat-icon matPrefix>
-            {{payment.reservation.room.currency.icon}}</mat-icon>&nbsp;{{payment.transactionAmount | number:'1.2-2'}}
-        </div>
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
-      </td>
-    </ng-container>
+      <ng-container matColumnDef="type">
+        <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
+        <td *matCellDef="let payment" class="hide-xs" mat-cell>
+          @if (payment.id) {
+            {{ payment.type }}
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        </td>
+      </ng-container>
 
-    <ng-container matColumnDef="status">
-      <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
-      <td *matCellDef="let payment" class="hide-xs" mat-cell>
-        <div *ngIf="payment.id; else skeleton">
-          {{'COMMON.STATUS.PAYMENT.' + (payment.status ? payment.status.toUpperCase() : 'NONE') | translate}}
-        </div>
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
-      </td>
-    </ng-container>
+      <ng-container matColumnDef="amount">
+        <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
+        <td *matCellDef="let payment" mat-cell>
+          @if (payment.id) {
+            <mat-icon matPrefix>
+              {{ payment.reservation.room.currency.icon }}
+            </mat-icon>&nbsp;{{ payment.transactionAmount | number:'1.2-2' }}
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        </td>
+      </ng-container>
 
-    <ng-container matColumnDef="actions">
-      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-      <td *matCellDef="let payment" mat-cell>
-        <div *ngIf="payment.id; else skeleton">
-          <button (click)="resend(payment)" *ngIf="payment.status !== 'APPROVED'" mat-icon-button
-                  matTooltip="{{ 'COMMON.BUTTON.RESEND' | translate }}" matTooltipPosition="above">
-            <mat-icon color="primary">autorenew</mat-icon>
-          </button>
-          <button (click)="copy(payment)" *ngIf="payment.status !== 'APPROVED'" mat-icon-button
-                  matTooltip="{{ 'COMMON.BUTTON.COPY' | translate }}" matTooltipPosition="above">
-            <mat-icon color="primary">content_copy</mat-icon>
-          </button>
-        </div>
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
-      </td>
-    </ng-container>
+      <ng-container matColumnDef="status">
+        <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
+        <td *matCellDef="let payment" class="hide-xs" mat-cell>
+          @if (payment.id) {
+            {{ 'COMMON.STATUS.PAYMENT.' + (payment.status ? payment.status.toUpperCase() : 'NONE') | translate }}
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        </td>
+      </ng-container>
 
-    <ng-container matColumnDef="noContent">
-      <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-        {{ 'PAYMENT.LIST.ERROR.NO_CONTENT' | translate }}</td>
-    </ng-container>
+      <ng-container matColumnDef="actions">
+        <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+        <td *matCellDef="let payment" mat-cell>
+          @if (payment.id) {
+            @if (payment.status !== 'APPROVED') {
+              <div>
+                <button (click)="resend(payment)" mat-icon-button matTooltip="{{ 'COMMON.BUTTON.RESEND' | translate }}"
+                        matTooltipPosition="above">
+                  <mat-icon color="primary">autorenew</mat-icon>
+                </button>
+                <button (click)="copy(payment)" mat-icon-button
+                        matTooltip="{{ 'COMMON.BUTTON.COPY' | translate }}" matTooltipPosition="above">
+                  <mat-icon color="primary">content_copy</mat-icon>
+                </button>
+              </div>
+            }
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        </td>
+      </ng-container>
 
-    <tr *matFooterRowDef="['noContent']" [hidden]="payments.length > 0" mat-footer-row></tr>
+      <ng-container matColumnDef="noContent">
+        <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+          {{ 'PAYMENT.LIST.ERROR.NO_CONTENT' | translate }}
+        </td>
+      </ng-container>
 
-    <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-    <tr *matRowDef="let row; columns: displayedColumns;" class="{{row.type?.toLowerCase()}}" mat-row></tr>
-  </table>
-</div>
+      <tr *matFooterRowDef="['noContent']" [hidden]="payments.length > 0" mat-footer-row></tr>
+
+      <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+      <tr *matRowDef="let row; columns: displayedColumns;" class="{{row.type?.toLowerCase()}}" mat-row></tr>
+    </table>
+  </div>
+}
 <div class="top card-actions">
   <div class="spacer"></div>
   <button appBackButton color="accent" mat-fab extended type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>

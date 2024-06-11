@@ -56,9 +56,20 @@
       },
       "EXTRAS": {
         "TITLE": "Extras",
-        "DESCRIPTION": "Description",
-        "PRICE": "Price",
-        "REQUIRED": "Price is <b>required</b>",
+        "NO_CONTENT": "No data",
+        "DESCRIPTION": {
+          "LABEL": "Description",
+          "REQUIRED": "Description is <b>required</b>"
+        },
+        "PRICE": {
+          "LABEL": "Price",
+          "REQUIRED": "Price is <b>required</b>"
+        },
+        "TYPE": {
+          "LABEL": "Payment type",
+          "REQUIRED": "Payment type is <b>required</b>"
+        },
+        "REMAINS": "<div class='red-text'>Remains to be split: <span class='bold'>{{toPaid}}</span></div>",
         "TOTAL": "Total"
       },
       "COMPLETE": {
@@ -135,6 +146,10 @@
       },
       "UPDATE":{
         "MESSAGE": "Payment(s) updated"
+      },
+      "SPLIT": {
+        "TITLE": "Split the payment",
+        "CHECKBOX": "Split"
       }
     },
     "ACTION": {
@@ -166,7 +181,7 @@
     },
     "TRACKING": {
       "TITLE": "Tracking",
-      "DURATION": "Appointment duration",
+      "DURATION": "Appointment duration: {{totalTime}}",
       "SYNC": "Reservation not processed"
     },
     "REVIEW": {

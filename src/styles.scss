@@ -39,7 +39,7 @@ body {
 
 .style-card {
   margin: 20px auto;
-  width: 60%;
+  width: 70%;
 }
 
 .full {
@@ -930,5 +930,9 @@ $box-shadow2: ();
 
   .social-inner-container {
     flex-direction: row;
+  }
+  .style-card {
+    margin: 20px auto;
+    width: 100%;
   }
 }

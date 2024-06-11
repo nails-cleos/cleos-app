@@ -32,7 +32,7 @@ export interface IInvoice {
   items: IItem[];
   timestamp: number;
   totals: ITotals;
-  discount: IDiscount;
+  discounts: IDiscount[];
   position: number;
 }
 

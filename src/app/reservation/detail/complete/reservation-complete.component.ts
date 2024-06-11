@@ -18,6 +18,8 @@ import { IAdditionalAll } from '../../../interfaces/additional';
 import { MatListOption } from '@angular/material/list';
 import { IService } from '../../../interfaces/room';
 import { IColorAll } from '../../../interfaces/color';
+import { DialogComponent } from '../../../shared/dialog/generic/dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-reservation-complete',
@@ -67,6 +69,8 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
 
   dateFormat: string;
   split: boolean = false;
+  isValid: boolean = true;
+  isValidSplit: boolean = true;
 
   private reservationId: any;
   private roomId: any;
@@ -76,10 +80,11 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
   private readonly isDashboard = false;
   private currentExtraData?: IExtras[];
+  // TODO
   private currentSplitData?: IExtras[];
 
-  constructor(private store: Store<AppState>, private route: ActivatedRoute, private formBuilder: UntypedFormBuilder,
-              private readonly translate: TranslateService, private router: Router) {
+  constructor(public dialog: MatDialog, private store: Store<AppState>, private route: ActivatedRoute,
+              private formBuilder: UntypedFormBuilder, private readonly translate: TranslateService, private router: Router) {
     this.getState = this.store.select(selectReservationState);
     this.dateFormat = this.translate.currentLang;
     this.endDate = getNowTimeZone();
@@ -95,30 +100,22 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   }
 
   get complete(): void {
-    if (this.currentExtraData) {
-      console.log(this.currentExtraData);
+    if (!this.isValid) {
+      const title = this.translate.instant('COMMON.COMPLETE.TITLE');
+      const content = this.translate.instant('COMMON.COMPLETE.CONTENT');
+      const dialogRef = this.dialog.open(DialogComponent, {
+        data: { title, content, value: this.reservation }
+      });
+
+      dialogRef.afterClosed().subscribe(event => {
+        if (event) {
+          this.completeReservation();
+        }
+      });
       return;
+    } else {
+      return this.completeReservation();
     }
-    if (this.reservation) {
-      this.store.dispatch(
-        new fromActionsReservation.Complete({
-          reservationId: this.reservation.id,
-          complete: {
-            treatmentId: valueChange(this.treatment.value.id, this.reservation?.treatment.key),
-            paymentType: this.type.value || PaymentType.account,
-            additionalIds: this.additionalSelected.map(additional => additional.id),
-            transfer: this.transfer.value,
-            color: this.color.value?.id,
-            startDateTime: this.startDate.toLocaleString(API_LOCALE),
-            endDateTime: this.endDate.toLocaleString(API_LOCALE),
-            extras: this.currentExtraData,
-            split: this.currentSplitData
-          },
-          isDashboard: this.isDashboard
-        })
-      );
-    }
-    return;
   }
 
   ngOnInit(): void {
@@ -173,7 +170,10 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
 
   onExtrasChanges(extras: IExtras[]): void {
     this.currentExtraData = extras;
-    const extrasTotal = extras.map(a => a.price).reduce((p, c) => p + c);
+    let extrasTotal = 0;
+    if (extras.length) {
+      extrasTotal = extras.map(a => a.price).reduce((p, c) => p + c);
+    }
     this.price = newExtra(this.price, extrasTotal, this.reservation?.treatment?.discountCustomer);
   }
 
@@ -319,6 +319,28 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     return this.colors?.filter(option => option?.name?.toLowerCase().indexOf(filterValue) === 0);
   }
 
+  private completeReservation(): void {
+    if (this.reservation) {
+      this.store.dispatch(
+        new fromActionsReservation.Complete({
+          reservationId: this.reservation.id,
+          complete: {
+            treatmentId: valueChange(this.treatment.value.id, this.reservation?.treatment.key),
+            paymentType: this.type.value || PaymentType.account,
+            additionalIds: this.additionalSelected.map(additional => additional.id),
+            transfer: this.transfer.value,
+            color: this.color.value?.id,
+            startDateTime: this.startDate.toLocaleString(API_LOCALE),
+            endDateTime: this.endDate.toLocaleString(API_LOCALE),
+            extras: this.currentExtraData,
+            split: this.currentSplitData
+          },
+          isDashboard: this.isDashboard
+        })
+      );
+    }
+  }
+
   private getReservation(): void {
     if (!this.payments) {
       this.payments = undefined;
@@ -339,6 +361,16 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       this.type.setValue(undefined);
     } else {
       this.type.setValue(PaymentType.transfer);
+    }
+  }
+
+  splitChange() {
+    this.split = !this.split;
+    if (this.split) {
+      const totalSplit = this.currentSplitData?.map(t => t.price).reduce((acc, value) => acc + value, 0) || 0;
+      if (totalSplit !== this.price.toPaid) {
+        this.isValidSplit = false;
+      }
     }
   }
 }

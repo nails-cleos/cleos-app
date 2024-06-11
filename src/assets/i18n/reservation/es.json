@@ -56,9 +56,20 @@
       },
       "EXTRAS": {
         "TITLE": "Extras",
-        "DESCRIPTION": "Descripción",
-        "PRICE": "Precio",
-        "REQUIRED": "Precio es <b>requerido</b>",
+        "NO_CONTENT": "No data",
+        "DESCRIPTION": {
+          "LABEL": "Descripción",
+          "REQUIRED": "Descripción es <b>requerido</b>"
+        },
+        "PRICE": {
+          "LABEL": "Precio",
+          "REQUIRED": "Precio es <b>requerido</b>"
+        },
+        "TYPE": {
+          "LABEL": "Tipo de pago",
+          "REQUIRED": "Tipo de pago es <b>requerido</b>"
+        },
+        "REMAINS": "<div class='red-text'>Queda por dividir: <span class='bold'>{{toPaid}}</span></div>",
         "TOTAL": "Total"
       },
       "COMPLETE": {
@@ -135,6 +146,10 @@
       },
       "UPDATE": {
         "MESSAGE": "Pago(s) actualizado(s)"
+      },
+      "SPLIT": {
+        "TITLE": "Dividir el pago",
+        "CHECKBOX": "Dividir pago"
       }
     },
     "ACTION": {
@@ -166,7 +181,7 @@
     },
     "TRACKING": {
       "TITLE": "Seguimiento",
-      "DURATION": "Duración de la cita",
+      "DURATION": "Duración de la cita: {{totalTime}}",
       "SYNC": "Reserva no procesada"
     },
     "REVIEW": {
