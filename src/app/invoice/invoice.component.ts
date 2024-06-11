@@ -56,7 +56,7 @@ export class InvoiceComponent implements OnInit, OnDestroy {
   endDate: UntypedFormControl = new UntypedFormControl('', [Validators.required]);
   type: UntypedFormControl = new UntypedFormControl();
   filteredTypes: Observable<string[]>;
-  types: string[] = [];
+  types: string[] = [PaymentType.transfer, PaymentType.paynl];
 
   dataSource: any;
   selection = new SelectionModel<IInvoice>(true, []);

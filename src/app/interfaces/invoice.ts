@@ -27,6 +27,7 @@ export interface IDiscount {
 
 export interface IInvoice {
   id: string;
+  paths: string[];
   customer: IUserAll;
   room: IRoomInvoice;
   items: IItem[];
