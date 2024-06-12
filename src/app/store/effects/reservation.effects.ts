@@ -225,7 +225,7 @@ export class ReservationEffects {
   complete$ = createEffect(() => this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.complete)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) =>
-      this.reservationService.changeState(payload.reservationId, 'complete', payload.extras).pipe(
+      this.reservationService.changeState(payload.reservationId, 'complete', payload.complete).pipe(
         switchMap(() => of(new fromActionsReservation.ReservationCompleteSuccess({
           id: payload.reservationId,
           isDashboard: payload.isDashboard,

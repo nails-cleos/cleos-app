@@ -2,7 +2,7 @@ import { DiscountType, IDiscount } from '../interfaces/discount';
 import { IAuthority, IUser, IUserAll } from '../interfaces/user';
 import { GroupService, IGroupService, IPrice, ITreatmentAll, Price } from '../interfaces/treatment';
 import { IPayment, IPaymentOption } from '../interfaces/payment';
-import { IReservationAll } from '../interfaces/reservation';
+import { IExtras, IReservationAll } from '../interfaces/reservation';
 import { IAdditionalAll } from '../interfaces/additional';
 import { TranslateService } from '@ngx-translate/core';
 import { IAddress, ILocation, IRoom, IRoomAll, ServiceType } from '../interfaces/room';
@@ -96,8 +96,8 @@ export const getPrice = (reservation: IReservationAll, payments?: IPayment[]): I
   let discount;
   let extras;
   let additional;
-  if (treatment.extraPrice) {
-    extras = treatment.extraPrice;
+  if (reservation.extras && reservation.extras.length) {
+    extras = reservation.extras.map(a => a.price).reduce((p, c) => p + c);
     total += extras;
     priceWithExtras += extras;
   }

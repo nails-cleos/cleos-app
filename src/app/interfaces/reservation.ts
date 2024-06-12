@@ -19,6 +19,13 @@ export interface IFabMenu {
   color?: 'primary' | 'accent' | 'warn';
 }
 
+export interface IExtras {
+  price: number;
+  description?: string;
+  paymentType?: PaymentType
+  name?: string // To make compatible with additional in price-extra
+}
+
 export interface IReservation {
   id?: string;
   customerId?: string;
@@ -67,6 +74,7 @@ export interface IReservationAll {
   review?: IReview;
   history?: IReservationAll[];
   additional?: IAdditionalAll[];
+  extras?: IExtras[];
   configurationCanCustomerChange?: boolean;
   configurationReference?: string;
   note?: string;

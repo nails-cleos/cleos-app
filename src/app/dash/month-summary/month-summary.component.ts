@@ -72,12 +72,12 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
   currency: ICurrencyAll = { id: '', name: 'euro', code: 'EUR', icon: 'euro' };
   timeZone?: string;
   showCash: boolean;
+  readonly language: string;
 
   private getState: Observable<any>;
   private subscription: Subscription;
   private readonly extras: any;
   private userName?: string;
-  private readonly language: string;
 
   constructor(private readonly translate: TranslateService, private store: Store<AppState>, private router: Router,
               private authUserService: AuthUserService) {
@@ -499,6 +499,28 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       this.monthlySummaryMap = state.monthlySummaryMap;
+      this.monthlySummaryMap?.forEach((value, key) => {
+        this.monthlySummaryMap?.set(key, {
+          summarySale: value.summarySale.map(s => {
+            if (s?.paths) {
+              return Object.assign({}, s, { paths: `/${ this.language }/${ s.paths.join('/') }` });
+            }
+            return s;
+          }),
+          summaryExpenses: value.summaryExpenses.map(s => {
+            if (s?.paths) {
+              return Object.assign({}, s, { paths: `/${ this.language }/${ s.paths.join('/') }` });
+            }
+            return s;
+          }),
+          summaryCashSale: value.summaryCashSale.map(s => {
+            if (s?.paths) {
+              return Object.assign({}, s, { paths: `/${ this.language }/${ s.paths.join('/') }` });
+            }
+            return s;
+          })
+        });
+      });
       if (this.monthlySummaryMap) {
         if (this.monthlySummaryMap.size === 1) {
           this.selectedRoom.setValue(this.monthlySummaryMap.keys().next().value);
