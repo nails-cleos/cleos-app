@@ -127,9 +127,9 @@
           </td>
         </ng-container>
 
-        <ng-container matColumnDef="treatment">
+        <ng-container matColumnDef="description">
           <th *matHeaderCellDef class="hide-xs"
-              mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }}
+              mat-header-cell>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}
           </th>
           <td *matCellDef="let invoice" class="hide-xs" mat-cell>
             <div *ngIf="invoice.id; else skeleton">{{ invoice.items[0].name }}</div>
@@ -143,7 +143,7 @@
           <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
           <td *matCellDef="let invoice" class="hide-xs" mat-cell>
             <div *ngIf="invoice.id; else skeleton">
-              <button [routerLink]="invoice.paths" mat-icon-button
+              <button (click)="goToPath(invoice)" type="button" mat-icon-button
                       matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
                 <mat-icon color="primary">visibility</mat-icon>
               </button>

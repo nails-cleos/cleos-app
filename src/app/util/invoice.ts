@@ -5,23 +5,15 @@ import { API_LOCALE, dayViewTitle, invoiceTitle, newDateTimestamp } from './date
 import { environment } from '../../environments/environment';
 import { IOfficeAll } from '../interfaces/office';
 
-const createField = (text: string, width: string | number, alignment: string, color?: string, margin: number[] = [0, 0, 0, 0],
-                     border: boolean[] = [false, false, false, false], fontSize: number = 12, fillColor: string = '#fff'): any => {
-  if (color) {
-    return { text, color, width, alignment, fontSize, margin, border, fillColor };
-  }
-
-  return { text, width, alignment, fontSize, margin, border, fillColor };
-};
-
 const createHeader = (index: number, titleDate: string, date: string, titleSubject: string = '', subject: string = '',
                       titleKVK: string = '', kvkNr: string = '', titleAccount: string = '', accountNr: string = '',
                       titleBTW: string = '', btwNr: string = ''): any => {
   const image = {
     image: 'logo',
     width: '*',
-    fit: [100, 100],
-    alignment: 'center',
+    fit: [180, 180],
+    margin: [0, -40, 0, 0],
+    alignment: 'right',
     pageBreak: 'none'
   };
 
@@ -30,28 +22,28 @@ const createHeader = (index: number, titleDate: string, date: string, titleSubje
     stack: [
       {
         columns: [
-          createField(titleDate, 80, 'left', '#aaaaab'),
-          createField(date, '*', 'left', '#333333')
+          { text: titleDate, style: 'header' },
+          { text: date, style: 'field' }
         ]
       }, {
         columns: [
-          createField(titleSubject, 80, 'left', '#aaaaab'),
-          createField(subject, '*', 'left', '#333333')
+          { text: titleSubject, style: 'header' },
+          { text: subject, style: 'field' }
         ]
       }, {
         columns: [
-          createField(titleKVK, 80, 'left', '#aaaaab'),
-          createField(kvkNr, '*', 'left', '#333333')
+          { text: titleKVK, style: 'header' },
+          { text: kvkNr, style: 'field' }
         ]
       }, {
         columns: [
-          createField(titleAccount, 80, 'left', '#aaaaab'),
-          createField(accountNr, '*', 'left', '#333333')
+          { text: titleAccount, style: 'header' },
+          { text: accountNr, style: 'field' }
         ]
       }, {
         columns: [
-          createField(titleBTW, 80, 'left', '#aaaaab'),
-          createField(btwNr, '*', 'left', '#333333')
+          { text: titleBTW, style: 'header' },
+          { text: btwNr, style: 'field' }
         ]
       }
     ]
@@ -67,13 +59,6 @@ const createHeader = (index: number, titleDate: string, date: string, titleSubje
   };
 };
 
-const fromTo = (): any => ({
-  columns: [
-    createField('', '*', 'left', undefined, [0, 20, 0, 5]),
-    createField('', '*', 'right', undefined, [0, 20, 0, 5])
-  ]
-});
-
 const companyName = (room: IRoomInvoice, titleAddress: string, titlePhone: string, titleEmail: string,
                      billAddress?: string): any => {
   const phone = room.phone || '';
@@ -81,18 +66,18 @@ const companyName = (room: IRoomInvoice, titleAddress: string, titlePhone: strin
   const address = billAddress || room.addressName;
   return [{
     columns: [
-      createField(titleAddress, 80, 'left', '#333333', [0, 0, 0, 5]),
-      createField(address, 'auto', 'left', '#333333', [0, 0, 0, 0])
+      { text: titleAddress, style: 'header' },
+      { text: address, style: ['field', 'fieldMargin'] }
     ]
   }, {
     columns: [
-      createField(titlePhone, 80, 'left', '#333333', [0, 0, 0, 5]),
-      createField(phone, 'auto', 'left', '#333333', [0, 0, 0, 0])
+      { text: titlePhone, style: 'header' },
+      { text: phone, style: ['field', 'fieldMargin'] }
     ]
   }, {
     columns: [
-      createField(titleEmail, 80, 'left', '#333333', [0, 0, 0, 5]),
-      createField(email, 'auto', 'left', '#333333', [0, 0, 0, 0])
+      { text: titleEmail, style: 'header' },
+      { text: email, style: ['field', 'fieldMargin'] }
     ]
   }];
 };
@@ -102,39 +87,43 @@ const clientName = (customer: IUserAll, titleClient: string, titleContact: strin
   const contact = customer.phone || customer.email;
   return [{
     columns: [
-      createField(titleClient, 80, 'left', '#333333'),
-      createField(client, '*', 'left', '#333333')
+      { text: titleClient, style: 'header' },
+      { text: client, style: 'field' }
     ]
   }, {
     columns: [
-      createField(titleContact, 80, 'left', '#333333'),
-      createField(contact, '*', 'left', '#333333')
+      { text: titleContact, style: 'header' },
+      { text: contact, style: 'field' }
     ]
   }];
 };
 
-const createInvoiceNro = (receiptNro: string): any => createField(receiptNro, 'auto', 'center', undefined,
-  [0, 10, 0, 10], undefined, 15);
+const createInvoiceNro = (receiptNro: string): any => ({ text: receiptNro, style: 'invoiceNro' });
 
 const createItemTitle = (titleDescription: string, titleItem: string, titleBTW: string, titleTotal: string): any => [
-  createField(titleDescription, '*', 'center', undefined, [0, 12, 0, 5], [false, true, false, true],
-    undefined, '#b5ac9e'),
-  createField(titleItem, '*', 'center', undefined, [0, 5, 0, 5], [false, true, false, true],
-    undefined, '#b5ac9e'),
-  createField(titleBTW, '*', 'center', undefined, [0, 12, 0, 5], [false, true, false, true],
-    undefined, '#b5ac9e'),
-  createField(titleTotal, '*', 'center', undefined, [0, 5, 0, 5], [false, true, false, true],
-    undefined, '#b5ac9e')
+  { text: titleDescription, style: ['itemTitle', 'itemMargin'], border: [false, true, false, true] },
+  { text: titleItem, style: ['itemTitle', 'item'], border: [false, true, false, true] },
+  { text: titleBTW, style: ['itemTitle', 'itemMargin'], border: [false, true, false, true] },
+  { text: titleTotal, style: ['itemTitle', 'item'], border: [false, true, false, true] }
 ];
 
 const itemBody = (name: string, neto: number, bruto: number, symbol: string): any => [
-  createField(name, '*', 'left', undefined, [0, 5, 0, 5], [false, false, false, true]),
-  createField(`${ symbol } ${ neto.toFixed(2) }`, '*', 'right', undefined,
-    [0, 5, 0, 5], [false, false, false, true], undefined, '#eee4e1'),
-  createField(`${ symbol } ${ (bruto - neto).toFixed(2) }`, '*', 'right', undefined,
-    [0, 5, 0, 5], [false, false, false, true], undefined, '#eee4e1'),
-  createField(`${ symbol } ${ bruto.toFixed(2) }`, '*', 'right', undefined,
-    [0, 5, 0, 5], [false, false, false, true], undefined, '#eee4e1')
+  { text: name, style: 'item', border: [false, false, false, true] },
+  {
+    text: `${ symbol } ${ neto.toFixed(2) }`,
+    style: ['item', 'amountKey', 'amount'],
+    border: [false, false, false, true]
+  },
+  {
+    text: `${ symbol } ${ (bruto - neto).toFixed(2) }`,
+    style: ['item', 'amountKey', 'amount'],
+    border: [false, false, false, true]
+  },
+  {
+    text: `${ symbol } ${ bruto.toFixed(2) }`,
+    style: ['item', 'amountKey', 'amount'],
+    border: [false, false, false, true]
+  }
 ];
 
 const createItems = (itemTitle: any, itemList: IItem[], currency: string): any => {
@@ -169,36 +158,53 @@ const createItems = (itemTitle: any, itemList: IItem[], currency: string): any =
 const createTotals = (totals: ITotals, currency: string, titleSubTotal: string, titleExclBTW: string, titleBTW21: string,
                       titleTotal: string, titleDiscount: string): any => {
   const subTotal = [
-    createField(titleSubTotal, '*', 'right', undefined, [0, 5, 0, 5], [false, true, false, true]),
-    createField(`${ currency } ${ totals.subTotal.toFixed(2) }`, '*', 'right', undefined,
-      [0, 5, 0, 5], [false, true, false, true], undefined, '#eee4e1')
+    { text: titleSubTotal, style: ['item', 'amountKey'], border: [false, false, false, true] },
+    {
+      text: `${ currency } ${ totals.subTotal.toFixed(2) }`,
+      style: ['item', 'amountKey', 'amount'],
+      border: [false, false, false, true]
+    }
   ];
 
   const excBTW = [
-    createField(titleExclBTW, '*', 'right', undefined, [0, 5, 0, 5], [false, false, false, true]),
-    createField(`${ currency } ${ totals.excBTW.toFixed(2) }`, '*', 'right', undefined,
-      [0, 5, 0, 5], [false, false, false, true], undefined, '#eee4e1')
+    { text: titleExclBTW, style: ['item', 'amountKey'], border: [false, false, false, true] },
+    {
+      text: `${ currency } ${ totals.excBTW.toFixed(2) }`,
+      style: ['item', 'amountKey', 'amount'],
+      border: [false, false, false, true]
+    }
   ];
 
   const btw = [
-    createField(titleBTW21, '*', 'right', undefined, [0, 5, 0, 5], [false, false, false, true]),
-    createField(`${ currency } ${ totals.btw.toFixed(2) }`, '*', 'right', undefined,
-      [0, 5, 0, 5], [false, false, false, true], undefined, '#eee4e1')
+    { text: titleBTW21, style: ['item', 'amountKey'], border: [false, false, false, true] },
+    {
+      text: `${ currency } ${ totals.btw.toFixed(2) }`,
+      style: ['item', 'amountKey', 'amount'],
+      border: [false, false, false, true]
+    }
   ];
 
   const total = [
-    createField(titleTotal, '*', 'right', undefined, [0, 5, 0, 5], [false, false, false, true], 20),
-    createField(`${ currency } ${ totals.totalPaid.toFixed(2) }`, '*', 'right', undefined,
-      [0, 5, 0, 5], [false, false, false, true], 20, '#eee4e1')
+    { text: titleTotal, style: ['item', 'amountKey'], border: [false, true, false, true], fontSize: 20 },
+    {
+      text: `${ currency } ${ totals.totalPaid.toFixed(2) }`,
+      style: ['item', 'amountKey', 'amount'],
+      border: [false, true, false, true],
+      fontSize: 20
+    }
   ];
 
   let body = [total, btw, excBTW];
 
   if (totals.discount) {
     const discount = [
-      createField(titleDiscount, '*', 'right', undefined, [0, 5, 0, 5], [false, false, false, true]),
-      createField(`(${ currency } ${ totals.discount.toFixed(2) })`, '*', 'right', '#d28d8c',
-        [0, 5, 0, 5], [false, false, false, true], undefined, '#eee4e1')];
+      { text: titleDiscount, style: ['item', 'amountKey'], border: [false, false, false, true] },
+      {
+        text: `(${ currency } ${ totals.discount.toFixed(2) })`,
+        style: ['item', 'amountKey', 'amount', 'discount'],
+        border: [false, false, false, true]
+      }
+    ];
     body = [subTotal, discount, total, btw, excBTW];
   }
 
@@ -265,7 +271,7 @@ export const pdf = (invoices: IInvoice[], office: IOfficeAll, start: number, sta
     const titleClient = 'Client';
     const titleContact = 'Contact';
 
-    content = [...content, header, fromTo(), {
+    content = [...content, header, {
       columns: [clientName(invoice.customer, titleClient, titleContact),
         companyName(invoice.room, titleAddress, titlePhone, titleEmail, office.billingAddress)]
     }, '\n\n', invoiceNro, items, totals];
@@ -279,8 +285,53 @@ export const pdf = (invoices: IInvoice[], office: IOfficeAll, start: number, sta
       subject: office.subject
     },
     content,
+    styles: {
+      header: {
+        color: '#aaaaab',
+        width: 80,
+        bold: true
+      },
+      field: {
+        color: '#333333',
+        width: 'auto'
+      },
+      fieldMargin: {
+        margin: [-40, 0, 0, 0]
+      },
+      invoiceNro: {
+        width: 'auto',
+        alignment: 'center',
+        fontSize: 15,
+        margin: [0, 10, 0, 10]
+      },
+      itemTitle: {
+        alignment: 'center',
+        fillColor: '#b5ac9e'
+      },
+      itemMargin: {
+        width: '*',
+        margin: [0, 12, 0, 5]
+      },
+      item: {
+        width: '*',
+        margin: [0, 5, 0, 5]
+      },
+      amount: {
+        fillColor: '#eee4e1'
+      },
+      discount: {
+        color: '#d28d8c'
+      },
+      amountKey: {
+        alignment: 'right'
+      }
+    },
+    watermark: { text: 'Nails Cleos', color: '#000000', opacity: 0.1 },
     images: {
-      logo: `${ environment.appServer }/assets/icons/icon-192x192.png`
+      logo: `${ environment.appServer }/assets/icons/icon-512x512.png`
+    },
+    defaultStyle: {
+      font: 'EBGaramond'
     },
     pageSize: 'A4'
   };

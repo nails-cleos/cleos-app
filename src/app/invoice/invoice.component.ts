@@ -15,15 +15,23 @@ import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { TranslateService } from '@ngx-translate/core';
 import { detailExpandAnimation } from '../util/animation';
 import { SelectionModel } from '@angular/cdk/collections';
-import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts';
+import pdfMake, { fonts } from 'pdfmake/build/pdfmake';
 import { IInvoice } from '../interfaces/invoice';
 import { IOffice, IOfficeAll, Office } from '../interfaces/office';
 import { pdf } from '../util/invoice';
 import { requireMatch } from '../util/validators';
 import { MonthPeriodAdapter } from '../util/adapter/month-period-adapter.service';
+import { environment } from '../../environments/environment';
+import { Router } from '@angular/router';
 
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+pdfMake.fonts = {
+  EBGaramond: {
+    normal: `${ environment.appServer }/assets/fonts/EBGaramond-Regular.ttf`,
+    bold: `${ environment.appServer }/assets/fonts/EBGaramond-Bold.ttf`,
+    italics: `${ environment.appServer }/assets/fonts/EBGaramond-Italic.ttf`,
+    bolditalics: `${ environment.appServer }/assets/fonts/EBGaramond-BoldItalic.ttf`
+  }
+};
 
 @Component({
   selector: 'app-invoice',
@@ -41,7 +49,7 @@ export class InvoiceComponent implements OnInit, OnDestroy {
   @ViewChild('pdfTable') pdfTable!: ElementRef;
   @ViewChild('typeInput') typeInput!: ElementRef<HTMLInputElement>;
 
-  displayedColumns: string[] = ['select', 'position', 'customer', 'timestamp', 'treatment', 'actions'];
+  displayedColumns: string[] = ['select', 'position', 'customer', 'timestamp', 'description', 'actions'];
   expandedInvoice?: IInvoice;
   invoices?: IInvoice[];
 
@@ -75,7 +83,7 @@ export class InvoiceComponent implements OnInit, OnDestroy {
   private offices?: IOfficeAll[];
 
   constructor(private readonly translate: TranslateService, private store: Store<AppState>, private formBuilder: FormBuilder,
-              breakpointObserver: BreakpointObserver) {
+              private router: Router, breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -105,7 +113,7 @@ export class InvoiceComponent implements OnInit, OnDestroy {
       );
     }
     const printPdf = pdf(this.selection.selected, this.office.value, start, this.startDate.value, this.endDate.value);
-    pdfMake.createPdf(printPdf).open();
+    pdfMake.createPdf(printPdf, undefined, fonts).open();
     return;
   }
 
@@ -273,5 +281,9 @@ export class InvoiceComponent implements OnInit, OnDestroy {
         this.dataSource = new MatTableDataSource(this.invoices);
       }
     });
+  }
+
+  goToPath(invoice: IInvoice): void {
+    this.router.navigate(invoice.paths)
   }
 }
