@@ -11,7 +11,7 @@ export interface ITreatmentGroup {
   colors?: string[];
   treatments?: ITreatment[];
   order?: number;
-  image?: any
+  image?: any;
 }
 
 export interface ITreatmentGroupAll {
@@ -53,8 +53,6 @@ export interface ITreatmentAll extends IService {
   duration: string;
   description?: string;
   discountCustomer?: IDiscount;
-  extraDescription?: string;
-  extraPrice?: number;
   primary?: boolean;
   createdAt?: string;
   treatmentId?: string;

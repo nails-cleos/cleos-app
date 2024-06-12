@@ -211,6 +211,10 @@
       "TITLE": "You are about to go back",
       "CONTENT": "You have changes on this page, if you go back, you will lose your changes. Are you sure to back off?"
     },
+    "COMPLETE": {
+      "TITLE": "You are about to complete the reservation",
+      "CONTENT": "You have changes on extras, if you complete the reservation, you will lose your changes. Are you sure to complete the reservation?"
+    },
     "ERROR": {
       "NO_CONTENT": "No content"
     },

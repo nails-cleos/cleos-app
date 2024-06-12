@@ -27,12 +27,13 @@ export interface IDiscount {
 
 export interface IInvoice {
   id: string;
+  paths: string[];
   customer: IUserAll;
   room: IRoomInvoice;
   items: IItem[];
   timestamp: number;
   totals: ITotals;
-  discount: IDiscount;
+  discounts: IDiscount[];
   position: number;
 }
 

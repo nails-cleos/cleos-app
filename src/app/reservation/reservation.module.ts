@@ -38,6 +38,8 @@ import { Store } from '@ngrx/store';
 import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
 import { FabMenuComponent } from './detail/fab-menu/fab-menu.component';
+import { PriceExtrasComponent } from '../shared/price-extras/price-extras.component';
+import { FormFieldAdderComponent } from '../shared/form-field-adder/form-field-adder.component';
 
 @NgModule({
   declarations: [
@@ -57,6 +59,7 @@ import { FabMenuComponent } from './detail/fab-menu/fab-menu.component';
   imports: [
     ReservationRoutingModule,
     SharedModule,
+    PriceExtrasComponent,
     CalendarModule,
     MatStepperModule,
     TranslateModule.forChild({
@@ -71,7 +74,8 @@ import { FabMenuComponent } from './detail/fab-menu/fab-menu.component';
       isolate: false,
       extend: true
     }),
-    EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects])
+    EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects]),
+    FormFieldAdderComponent
   ],
   providers: [
     ReservationService,
