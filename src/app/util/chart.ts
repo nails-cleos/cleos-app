@@ -234,12 +234,12 @@ const lineChartDefaultOptions = (currency?: ICurrency, sum?: boolean, isDark?: b
       },
       plugins: {
         legend: {
-          display: true,
+          display: true
         },
         tooltip: {
           callbacks: {
             label: (tooltipItem: any) => label(tooltipItem, currency, sum, locale),
-            footer: (tooltipItems: any) => footer(tooltipItems, currency, sum, locale),
+            footer: (tooltipItems: any) => footer(tooltipItems, currency, sum, locale)
           }
         }
       }
@@ -249,7 +249,7 @@ const lineChartDefaultOptions = (currency?: ICurrency, sum?: boolean, isDark?: b
       responsive: true,
       interaction: {
         intersect: false,
-        mode: 'index',
+        mode: 'index'
       },
       scales: {
         y: {
@@ -261,12 +261,12 @@ const lineChartDefaultOptions = (currency?: ICurrency, sum?: boolean, isDark?: b
       },
       plugins: {
         legend: {
-          display: true,
+          display: true
         },
         tooltip: {
           callbacks: {
             label: (tooltipItem: any) => label(tooltipItem, currency, sum, locale),
-            footer: (tooltipItems) => footer(tooltipItems, currency, sum, locale),
+            footer: (tooltipItems) => footer(tooltipItems, currency, sum, locale)
           }
         }
       }
@@ -474,6 +474,8 @@ const barChartTimeOptions = (isDark?: boolean): ChartOptions<'bar'> => {
       },
       plugins: {
         tooltip: {
+          mode: 'index',
+          intersect: false,
           callbacks: {
             label: (tooltipItem: any) => barChatTimeLabel(tooltipItem)
           }
@@ -494,6 +496,8 @@ const barChartTimeOptions = (isDark?: boolean): ChartOptions<'bar'> => {
       },
       plugins: {
         tooltip: {
+          mode: 'index',
+          intersect: false,
           callbacks: {
             label: (tooltipItem: any) => barChatTimeLabel(tooltipItem)
           }
@@ -521,10 +525,18 @@ const pieChatPercentageLabel = (tooltipItem: TooltipItem<'pie'>): string => {
   return `${ tooltipItem.label }: ${ (Number(tooltipItem.raw) * 100 / total).toFixed(2) }%`;
 };
 
-const formatSecsAsHourMin = (d: any): string =>
-  new Date(d * 1000).toISOString().substr(11, 5);
+const formatSecsAsHourMin = (d: any): string => new Date(d * 1000).toISOString().substring(11, 16);
 
-const barChatTimeLabel = (tooltipItem: any): string => tooltipItem.label + ': ' + formatSecsAsHourMin(tooltipItem.raw);
+const barChatTimeLabel = (tooltipItem: any): string => {
+  let label = tooltipItem.dataset.label || '';
+  if (label) {
+    label += ': ';
+  }
+  if (tooltipItem.parsed.y !== null) {
+    label += formatSecsAsHourMin(tooltipItem.parsed.y);
+  }
+  return label;;
+};
 
 const chartArrayColors = (): any[] => ([{
   hoverBackgroundColor: ['rgba(254, 205, 190, 0.6)', 'rgba(152, 109, 142, 0.6)', 'rgba(95, 147, 154, 0.6)',

@@ -1,24 +1,20 @@
 <mat-card appearance="outlined" class="dashboard-card">
-  <mat-card-header *ngIf="title; else skeletonTitle">
-    <mat-card-title>
-      {{title}}
-      <div *ngIf="title && expand">
-        <button mat-icon-button class="more-button" [matMenuTriggerFor]="menu" aria-label="Toggle menu">
-          <mat-icon>more_vert</mat-icon>
-        </button>
-        <mat-menu #menu="matMenu" xPosition="before">
-          <button mat-menu-item (click)="onClick">{{'DASHBOARD.CARD.EXPAND' | translate}}</button>
-        </mat-menu>
-      </div>
-    </mat-card-title>
-  </mat-card-header>
-  <ng-template #skeletonTitle>
+  @if (title) {
+    <mat-card-header>
+      <mat-card-title>
+        {{ title }}
+        @if (title && expand) {
+          <button mat-icon-button class="more-button" (click)="onClick">
+            <mat-icon>zoom_out_map</mat-icon>
+          </button>
+        }
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="dashboard-card-content">
+      <ng-content></ng-content>
+    </mat-card-content>
+  } @else {
     <div class="card-margin ssc-head-line"></div>
-  </ng-template>
-  <mat-card-content class="dashboard-card-content" *ngIf="title; else box">
-    <ng-content></ng-content>
-  </mat-card-content>
-  <ng-template #box>
     <div style="margin: auto; width: 90%" class="ssc-square mb"></div>
-  </ng-template>
+  }
 </mat-card>
