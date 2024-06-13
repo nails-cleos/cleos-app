@@ -18,6 +18,7 @@ export class BackButtonDirective {
   }
 
   @HostListener('click')
+  @HostListener('window:popstate')
   onClick(): void {
     if (this.form && !this.form.pristine) {
       const title = this.translate.instant('COMMON.BACK.TITLE');

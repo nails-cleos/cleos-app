@@ -49,6 +49,7 @@ import { ChangeColorDialogComponent } from './change-color-dialog.component';
 import { AddNoteDialogComponent } from './add-note-dialog.component';
 import { AddDiscountDialogComponent } from './add-discount-dialog.component';
 import { AuthUserService } from '../../services/auth-user.service';
+import { Role } from '../../interfaces/token';
 
 @Component({
   selector: 'app-reservation-detail',
@@ -159,7 +160,11 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     return executeDialog(this.dialog, AddNoteDialogComponent, { note: this.reservation?.note }, result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsReservation.UpdateNote({ note: result.note, reservationId: this.reservation?.id })
+          new fromActionsReservation.UpdateNote({
+            note: result.note,
+            reservationId: this.reservation?.id,
+            role: this.professionalId ? Role.professional : Role.customer
+          })
         );
       }
     }, true);
