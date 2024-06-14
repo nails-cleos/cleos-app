@@ -48,6 +48,7 @@ export class DashComponent implements OnInit, OnDestroy {
 
   currency?: ICurrency;
   all?: boolean;
+  thisMonthTotal: string;
 
   miniCardData: IReservationSummary[] = [{} as IReservationSummary, {} as IReservationSummary,
     {} as IReservationSummary, {} as IReservationSummary];
@@ -126,6 +127,7 @@ export class DashComponent implements OnInit, OnDestroy {
     this.dateFormat = this.translate.currentLang;
     this.language = this.translate.currentLang;
     this.totalReservation = 0;
+    this.thisMonthTotal = numberFormat(0, this.currency, this.dateFormat);
   }
 
   get completed(): number {
@@ -277,6 +279,7 @@ export class DashComponent implements OnInit, OnDestroy {
         this.currency = state.currency;
         this.state = state;
         this.all = state.all;
+        this.thisMonthTotal = numberFormat(state.thisMonthTotal || 0, this.currency, this.dateFormat);
         this.createEvents(this.isDarkMode);
         if (!state.chartSummaries && !state.miniCardSummaries) {
           this.isLoading = false;

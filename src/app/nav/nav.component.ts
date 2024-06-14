@@ -109,6 +109,11 @@ export class NavComponent implements OnInit, OnDestroy {
     this.navigationService.subscribe();
   }
 
+  get goToHome(): void {
+    this.router.navigate([this.language]);
+    return;
+  }
+
   get logout(): void {
     return this.store.dispatch(
       new fromActionsLogin.LogOut()

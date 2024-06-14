@@ -911,7 +911,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     recurringEvents.forEach(recurring => {
-      recurring.rrule.all().forEach((date: Date) =>
+      recurring.rule.all()?.forEach((date: Date) =>
         this.validateUnavailableEvent(date, recurring));
     });
   }
