@@ -1,9 +1,11 @@
 <mat-form-field appearance="outline" *ngIf="mapDashboard?.size" class="full-select">
   <!--  <mat-card-header>-->
   <mat-select [formControl]="selectedDash">
-    <mat-option *ngFor="let dashboard of mapDashboard | keyvalue" [value]="dashboard.key">
-      {{dashboard.key}}
-    </mat-option>
+    @for (dashboard of mapDashboard | keyvalue; track dashboard) {
+      <mat-option [value]="dashboard.key">
+        {{ dashboard.key }}
+      </mat-option>
+    }
   </mat-select>
   <!--  </mat-card-header>-->
 </mat-form-field>
@@ -12,19 +14,20 @@
 <mat-card appearance="outlined">
   <mat-card-header>
     <mat-card-title>{{ viewDate | calendarDate:(view + 'ViewTitle'):dateFormat }}
-      <div *ngIf="!isCalendarLoading; else skeleton">
+      @if (!isCalendarLoading) {
+        <div [innerHTML]="'DASHBOARD.RESERVATION.PAYMENT' | translate:{total: thisMonthTotal}"></div>
         <div [innerHTML]="'DASHBOARD.RESERVATION.COMPLETED' | translate:{completed: completed, total: completedTotal}">
         </div>
         <div [innerHTML]="'DASHBOARD.RESERVATION.UPCOMING' | translate:{upcoming: upcoming, total: upcomingTotal}">
         </div>
-        <div [innerHTML]="'DASHBOARD.RESERVATION.TRANSACTION' | translate:{transaction: transaction, total: transactionTotal}">
+        <div
+          [innerHTML]="'DASHBOARD.RESERVATION.TRANSACTION' | translate:{transaction: transaction, total: transactionTotal}">
         </div>
-      </div>
-      <ng-template #skeleton>
+      } @else {
         <div style="margin-top: 10px" class="ssc-head-line"></div>
         <div style="margin-top: 10px" class="ssc-head-line"></div>
         <div style="margin-top: 10px" class="ssc-head-line"></div>
-      </ng-template>
+      }
     </mat-card-title>
     <mat-card-subtitle class="calendar-title">
       <button class="hide-gt-xs" (click)="changeDate" (viewDateChange)="closeOpenMonthViewDay" [(viewDate)]="viewDate"
@@ -36,7 +39,7 @@
               [class.spinner]="isLoading || isCalendarLoading" [disabled]="isLoading || isCalendarLoading" [view]="view"
               color="accent" mat-fab extended mwlCalendarPreviousView>
         <mat-icon>navigate_before</mat-icon>
-        <span>{{'COMMON.BUTTON.PREVIOUS' | translate}}</span>
+        <span>{{ 'COMMON.BUTTON.PREVIOUS' | translate }}</span>
       </button>
       <button (click)="changeDate" [(viewDate)]="viewDate"
               [class.spinner]="isLoading || isCalendarLoading"
@@ -49,7 +52,7 @@
               [disabled]="isLoading || isCalendarLoading" class="btn btn-outline-secondary hide-xs" color="accent"
               mat-fab extended mwlCalendarToday>
         <mat-icon>today</mat-icon>
-        <span>{{'COMMON.BUTTON.TODAY' | translate}}</span>
+        <span>{{ 'COMMON.BUTTON.TODAY' | translate }}</span>
       </button>
       <button class="hide-gt-xs" (click)="changeDate" (viewDateChange)="closeOpenMonthViewDay" [(viewDate)]="viewDate"
               [class.spinner]="isLoading || isCalendarLoading" [disabled]="isLoading || isCalendarLoading" [view]="view"
@@ -59,58 +62,66 @@
       <button class="hide-xs" (click)="changeDate" (viewDateChange)="closeOpenMonthViewDay" [(viewDate)]="viewDate"
               [class.spinner]="isLoading || isCalendarLoading" [disabled]="isLoading || isCalendarLoading" [view]="view"
               color="accent" mat-fab extended mwlCalendarNextView>
-        <span>{{'COMMON.BUTTON.NEXT' | translate}}</span>
+        <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
         <mat-icon>navigate_next</mat-icon>
       </button>
     </mat-card-subtitle>
   </mat-card-header>
-  <mat-card-content *ngIf="!isCalendarLoading; else calendarLoading">
-
-    <ng-template #customCellTemplate let-day="day" let-locale="locale">
-      <div class="cal-cell-top">
-        <span class="cal-day-number">{{ day.date | calendarDate:'monthViewDayNumber':locale }}</span>
-      </div>
-      <div class="cell-totals">
-        <span *ngFor="let group of sortBy(day.eventGroups)" class="badge text-bg-{{ group[0].toLowerCase() }}">
-          {{ group[1].length }}
-        </span>
-      </div>
-    </ng-template>
-    <mwl-calendar-month-view (dayClicked)="dayClicked($event.day)" (eventClicked)="handleEvent($event.event)"
-                             (mwlClick)="cellClick(viewDate)"
-                             [cellTemplate]="customCellTemplate"
-                             (beforeViewRender)="beforeMonthViewRender($event)"
-                             [activeDayIsOpen]="activeDayIsOpen" [events]="events" [locale]="dateFormat"
-                             [viewDate]="viewDate"></mwl-calendar-month-view>
-  </mat-card-content>
-  <ng-template #calendarLoading>
+  @if (!isCalendarLoading) {
+    <mat-card-content>
+      <ng-template #customCellTemplate let-day="day" let-locale="locale">
+        <div class="cal-cell-top">
+          <span class="cal-day-number">{{ day.date | calendarDate:'monthViewDayNumber':locale }}</span>
+        </div>
+        <div class="cell-totals">
+          @for (group of sortBy(day.eventGroups); track group) {
+            <span class="badge text-bg-{{ group[0].toLowerCase() }}">
+              {{ group[1].length }}
+            </span>
+          }
+        </div>
+      </ng-template>
+      <mwl-calendar-month-view (dayClicked)="dayClicked($event.day)" (eventClicked)="handleEvent($event.event)"
+                               (mwlClick)="cellClick(viewDate)"
+                               [cellTemplate]="customCellTemplate"
+                               (beforeViewRender)="beforeMonthViewRender($event)"
+                               [activeDayIsOpen]="activeDayIsOpen" [events]="events" [locale]="dateFormat"
+                               [viewDate]="viewDate"></mwl-calendar-month-view>
+    </mat-card-content>
+  } @else {
     <div class="ssc-square mb"></div>
-  </ng-template>
+  }
 </mat-card>
 <mat-grid-list [cols]="cardLayout.columns" [rowHeight]="cardLayout.rowHeight">
   <!--Mini Cards-->
-  <mat-grid-tile *ngFor="let mc of miniCardData" [colspan]="cardLayout.miniCard.cols"
-                 [rowspan]="cardLayout.miniCard.rows">
-    <app-mini-card [color]="mc.color" [error]="mc.error" [icon]="mc.icon" [isInfinity]="mc.isInfinity"
-                   [isCurrency]="mc.isCurrency" [isIncrease]="mc.isIncrease" [isLoading]="isLoading"
-                   [percentValue]="mc.percentValue" [title]="mc.title | translate" [period]="mc.period"
-                   [previousPeriod]="mc.previousPeriod" [isProjection]="mc.isProjection"
-                   [projection]="'DASHBOARD.MINI_CARD.PROJECTION' | translate" [value]="mc.value"
-                   [duration]="'DASHBOARD.MINI_CARD.DURATION' | translate: {period: mc.previousPeriod}">
-    </app-mini-card>
-  </mat-grid-tile>
+  @for (mc of miniCardData; track mc) {
+    <mat-grid-tile [colspan]="cardLayout.miniCard.cols" [rowspan]="cardLayout.miniCard.rows">
+      <app-mini-card [color]="mc.color" [error]="mc.error" [icon]="mc.icon" [isInfinity]="mc.isInfinity"
+                     [isCurrency]="mc.isCurrency" [isIncrease]="mc.isIncrease" [isLoading]="isLoading"
+                     [percentValue]="mc.percentValue" [title]="mc.title | translate" [period]="mc.period"
+                     [previousPeriod]="mc.previousPeriod" [isProjection]="mc.isProjection"
+                     [projection]="'DASHBOARD.MINI_CARD.PROJECTION' | translate" [value]="mc.value"
+                     [duration]="'DASHBOARD.MINI_CARD.DURATION' | translate: {period: mc.previousPeriod}"
+                     [previousPeriodValue]="mc.previousPeriodValue">
+      </app-mini-card>
+    </mat-grid-tile>
+  }
   <!--Charts-->
-  <mat-grid-tile *ngFor="let chart of charts" [colspan]="cardLayout.chart.cols" [rowspan]="cardLayout.chart.rows">
-    <app-card [chart]="chart" [title]="chart.title">
-      <app-chart [chartSummary]="chart" [error]="error" [currency]="currency" [isLoading]="isLoading"
-                 [locale]="dateFormat"></app-chart>
-    </app-card>
-  </mat-grid-tile>
+  @for (chart of charts; track chart) {
+    <mat-grid-tile [colspan]="cardLayout.chart.cols" [rowspan]="cardLayout.chart.rows">
+      <app-card [chart]="chart" [title]="chart.title">
+        <app-chart [chartSummary]="chart" [error]="error" [currency]="currency" [isLoading]="isLoading"
+                   [locale]="dateFormat"></app-chart>
+      </app-card>
+    </mat-grid-tile>
+  }
   <!--Table-->
-  <mat-grid-tile *ngIf="roomId || professionalId" [colspan]="cardLayout.table.cols" [rowspan]="cardLayout.table.rows">
-    <app-card [expand]="false" [title]="'DASHBOARD.CARD.RESERVATION' | translate" [currency]="currency"
-              [locale]="dateFormat">
-      <app-reservation-table [roomId]="roomId" [professionalId]="professionalId" [all]="all"></app-reservation-table>
-    </app-card>
-  </mat-grid-tile>
+  @if (roomId || professionalId) {
+    <mat-grid-tile [colspan]="cardLayout.table.cols" [rowspan]="cardLayout.table.rows">
+      <app-card [expand]="false" [title]="'DASHBOARD.CARD.RESERVATION' | translate" [currency]="currency"
+                [locale]="dateFormat">
+        <app-reservation-table [roomId]="roomId" [professionalId]="professionalId" [all]="all"></app-reservation-table>
+      </app-card>
+    </mat-grid-tile>
+  }
 </mat-grid-list>

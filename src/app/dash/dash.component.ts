@@ -39,7 +39,7 @@ export class DashComponent implements OnInit, OnDestroy {
 
   view: CalendarView = CalendarView.Month;
   viewDate: Date;
-  activeDayIsOpen = false;
+  activeDayIsOpen: boolean;
   dateFormat: string;
   events: CalendarEvent[] = [];
   isCalendarLoading = true;
@@ -48,6 +48,7 @@ export class DashComponent implements OnInit, OnDestroy {
 
   currency?: ICurrency;
   all?: boolean;
+  thisMonthTotal: string;
 
   miniCardData: IReservationSummary[] = [{} as IReservationSummary, {} as IReservationSummary,
     {} as IReservationSummary, {} as IReservationSummary];
@@ -116,10 +117,17 @@ export class DashComponent implements OnInit, OnDestroy {
       });
     });
     const extras = this.router.getCurrentNavigation()?.extras.state;
-    this.viewDate = extras?.date || getNow();
+    if (extras?.date) {
+      this.viewDate = extras.date;
+      this.activeDayIsOpen = true;
+    } else {
+      this.viewDate = getNow();
+      this.activeDayIsOpen = false;
+    }
     this.dateFormat = this.translate.currentLang;
     this.language = this.translate.currentLang;
     this.totalReservation = 0;
+    this.thisMonthTotal = numberFormat(0, this.currency, this.dateFormat);
   }
 
   get completed(): number {
@@ -233,12 +241,15 @@ export class DashComponent implements OnInit, OnDestroy {
     body.forEach((cell) => {
       const groups = {};
       cell.events.forEach((event: CalendarEvent<IMeta>) => {
-        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         groups[event.meta?.state] = groups[event.meta?.state] || [];
-        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         groups[event.meta?.state].push(event);
       });
-      // @ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
       cell.eventGroups = Object.entries(groups);
     });
   }
@@ -268,6 +279,7 @@ export class DashComponent implements OnInit, OnDestroy {
         this.currency = state.currency;
         this.state = state;
         this.all = state.all;
+        this.thisMonthTotal = numberFormat(state.thisMonthTotal || 0, this.currency, this.dateFormat);
         this.createEvents(this.isDarkMode);
         if (!state.chartSummaries && !state.miniCardSummaries) {
           this.isLoading = false;
@@ -288,7 +300,15 @@ export class DashComponent implements OnInit, OnDestroy {
           if (state.miniCardSummaries && state.miniCardSummaries.length) {
             this.miniCardData = state.miniCardSummaries.map(miniCard => {
               if (miniCard.isCurrency && miniCard.value) {
-                return Object.assign({}, miniCard, { value: numberFormat(miniCard.value, this.currency, this.dateFormat) });
+                let value;
+                let previousPeriodValue;
+                if (miniCard.value) {
+                  value = numberFormat(miniCard.value, this.currency, this.dateFormat);
+                }
+                if (miniCard.previousPeriodValue) {
+                  previousPeriodValue = numberFormat(miniCard.previousPeriodValue, this.currency, this.dateFormat);
+                }
+                return Object.assign({}, miniCard, { value, previousPeriodValue });
               }
               return miniCard;
             });
@@ -448,10 +468,8 @@ export class DashComponent implements OnInit, OnDestroy {
       if (this.selectedDash.value) {
         this.createDashboards();
       } else if (this.mapDashboard) {
-        let room: IDashboard | undefined;
         this.mapDashboard.forEach((value, key) => {
           if (value?.primary) {
-            room = value;
             this.selectedDash.setValue(key);
           }
         });

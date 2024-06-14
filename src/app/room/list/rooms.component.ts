@@ -39,7 +39,7 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
   private getState: Observable<any>;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+              private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small

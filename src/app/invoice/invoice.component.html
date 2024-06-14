@@ -11,32 +11,36 @@
                    type="text" required>
           </label>
           <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
-            <mat-option *ngFor="let office of filteredOffice | async" [value]="office">
-              {{ office.name }}
-            </mat-option>
+            @for (office of filteredOffice | async; track office) {
+              <mat-option [value]="office">
+                {{ office.name }}
+              </mat-option>
+            }
           </mat-autocomplete>
-          <mat-error *ngIf="office.hasError('required')"
-                     [innerHTML]="'INVOICE.OFFICE.REQUIRED' | translate">
-          </mat-error>
-          <mat-error *ngIf="office.hasError('requireMatch')"
-                     [innerHTML]="'INVOICE.OFFICE.INVALID' | translate">
-          </mat-error>
+          @if (office.hasError('required')) {
+            <mat-error [innerHTML]="'INVOICE.OFFICE.REQUIRED' | translate"></mat-error>
+          } @else if (office.hasError('requireMatch')) {
+            <mat-error [innerHTML]="'INVOICE.OFFICE.INVALID' | translate"></mat-error>
+          }
         </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-label>{{ 'INVOICE.PAYMENT.SEARCH' | translate }}</mat-label>
           <mat-chip-grid #chipList aria-label="Payment type selection">
-            <mat-chip-row (removed)="remove(type)" *ngFor="let type of types" [removable]="true"
-                          color="primary">
-              {{ 'COMMON.PAYMENT.TYPE.' + type.toUpperCase() | translate }}
-              <mat-icon matChipRemove>cancel</mat-icon>
-            </mat-chip-row>
+            @for (type of types; track type) {
+              <mat-chip-row (removed)="remove(type)" [removable]="true" color="primary">
+                {{ 'COMMON.PAYMENT.TYPE.' + type.toUpperCase() | translate }}
+                <mat-icon matChipRemove>cancel</mat-icon>
+              </mat-chip-row>
+            }
             <input #typeInput [formControl]="type" [matAutocomplete]="auto" [matChipInputFor]="chipList"
                    placeholder="{{ 'INVOICE.PAYMENT.FIELD' | translate }}">
           </mat-chip-grid>
           <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-            <mat-option *ngFor="let type of filteredTypes | async" [value]="type">
-              {{ 'COMMON.PAYMENT.TYPE.' + type.toUpperCase() | translate }}
-            </mat-option>
+            @for (type of filteredTypes | async; track type) {
+              <mat-option [value]="type">
+                {{ 'COMMON.PAYMENT.TYPE.' + type.toUpperCase() | translate }}
+              </mat-option>
+            }
           </mat-autocomplete>
         </mat-form-field>
         <mat-form-field appearance="outline">
@@ -56,11 +60,11 @@
             <input [formControl]="startNumber" matInput matNativeControl required [type]="'number'" [step]="1"
                    [min]="1">
           </label>
-          <mat-error *ngIf="startNumber.hasError('required')" [innerHTML]="'INVOICE.SEARCH.START.REQUIRED' | translate">
-          </mat-error>
-          <mat-error *ngIf="startNumber.hasError('min')"
-                     [innerHTML]="'INVOICE.SEARCH.START.MIN' | translate">
-          </mat-error>
+          @if (startNumber.hasError('required')) {
+            <mat-error [innerHTML]="'INVOICE.SEARCH.START.REQUIRED' | translate"></mat-error>
+          } @else if (startNumber.hasError('min')) {
+            <mat-error [innerHTML]="'INVOICE.SEARCH.START.MIN' | translate"></mat-error>
+          }
         </mat-form-field>
         <button color="accent" id="print" mat-fab type="button" (click)="print"
                 [disabled]="!selection.selected.length">
@@ -70,7 +74,7 @@
     </form>
   </fieldset>
 
-  <ng-template [ngIf]="invoices">
+  @if (invoices) {
     <div class="mat-elevation-z8">
       <table [dataSource]="dataSource" mat-table multiTemplateDataRows>
         <ng-container matColumnDef="select">
@@ -93,37 +97,36 @@
         <ng-container matColumnDef="position">
           <th *matHeaderCellDef mat-header-cell class="hide-xs">#</th>
           <td *matCellDef="let invoice; let i = dataIndex;" mat-cell class="hide-xs">
-            <div *ngIf="invoice.id; else skeleton">
+            @if (invoice.id) {
               {{ i + 1 }}
-            </div>
-            <ng-template #skeleton>
+            } @else {
               <div class="ssc-line"></div>
-            </ng-template>
+            }
           </td>
         </ng-container>
 
         <ng-container matColumnDef="customer">
           <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.CUSTOMER' | translate }}</th>
           <td *matCellDef="let invoice" mat-cell>
-            <div *ngIf="invoice.id; else skeleton">{{ invoice.customer.displayName }}</div>
-            <ng-template #skeleton>
+            @if (invoice.id) {
+              {{ invoice.customer.displayName }}
+            } @else {
               <div class="ssc-line"></div>
-            </ng-template>
+            }
           </td>
         </ng-container>
 
         <ng-container matColumnDef="timestamp">
           <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</th>
           <td *matCellDef="let invoice" mat-cell>
-            <div *ngIf="invoice.id; else skeleton">
+            @if (invoice.id) {
               {{ invoice.timestamp | timeDetail | date:'short':invoice.room.timeZone:dateFormat }}
               <!--          <button (click)="openDialog(invoice)" *ngIf="showTimeZone(invoice)" mat-icon-button type="button">-->
-              <!--            <mat-icon>info_outline</mat-icon>-->
-              <!--          </button>-->
-            </div>
-            <ng-template #skeleton>
+                <!--            <mat-icon>info_outline</mat-icon>-->
+                <!--          </button>-->
+            } @else {
               <div class="ssc-line"></div>
-            </ng-template>
+            }
           </td>
         </ng-container>
 
@@ -132,25 +135,25 @@
               mat-header-cell>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}
           </th>
           <td *matCellDef="let invoice" class="hide-xs" mat-cell>
-            <div *ngIf="invoice.id; else skeleton">{{ invoice.items[0].name }}</div>
-            <ng-template #skeleton>
+            @if (invoice.id) {
+              {{ invoice.items[0].name }}
+            } @else {
               <div class="ssc-line"></div>
-            </ng-template>
+            }
           </td>
         </ng-container>
 
         <ng-container matColumnDef="actions">
           <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
           <td *matCellDef="let invoice" class="hide-xs" mat-cell>
-            <div *ngIf="invoice.id; else skeleton">
+            @if (invoice.id) {
               <button (click)="goToPath(invoice)" type="button" mat-icon-button
                       matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
                 <mat-icon color="primary">visibility</mat-icon>
               </button>
-            </div>
-            <ng-template #skeleton>
+            } @else {
               <div class="ssc-line"></div>
-            </ng-template>
+            }
           </td>
         </ng-container>
 
@@ -160,7 +163,7 @@
               <mat-list>
                 <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
                 <mat-list-item role="list">
-                  <button [routerLink]="['/', language, 'reservation', invoice.id]" color="primary" mat-icon-button>
+                  <button (click)="goToPath(invoice)" color="primary" mat-icon-button>
                     <mat-icon matListItemIcon>visibility</mat-icon>
                   </button>
                 </mat-list-item>
@@ -183,6 +186,5 @@
         <tr *matFooterRowDef="['noContent']" [hidden]="invoices && invoices.length > 0" mat-footer-row></tr>
       </table>
     </div>
-
-  </ng-template>
+  }
 </div>

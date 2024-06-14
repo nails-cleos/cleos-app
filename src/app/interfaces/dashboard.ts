@@ -20,6 +20,7 @@ export interface IDashboard {
   chartSummaries?: IChart[];
   currency?: ICurrency;
   error?: any;
+  thisMonthTotal?: number;
 }
 
 export interface IEventSummary {
@@ -29,6 +30,7 @@ export interface IEventSummary {
 export interface IReservationSummary {
   title: string;
   value?: number | string;
+  previousPeriodValue?: number | string;
   isIncrease?: boolean;
   color?: ThemePalette;
   percentValue?: number;

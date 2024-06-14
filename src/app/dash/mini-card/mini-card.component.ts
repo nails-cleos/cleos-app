@@ -19,6 +19,7 @@ export class MiniCardComponent implements OnInit {
   @Input() percentValue?: number;
   @Input() period?: string;
   @Input() previousPeriod?: string;
+  @Input() previousPeriodValue?: number | string;
   @Input() isProjection?: boolean;
   @Input() projection?: string;
   @Input() error: any;
