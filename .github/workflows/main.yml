@@ -47,13 +47,14 @@ jobs:
         id: version
         run: |
           git config --global user.email "nails.cleos@gmail.com"
-          git config --global user.name "Espacio Cleos"
+          git config --global user.name "Nails Cleos"
           git fetch
           git checkout main
           # make file runnable, might not be necessary
           chmod +x "${GITHUB_WORKSPACE}/version-update.sh"
 
           # run script
+          "${GITHUB_WORKSPACE}/version-update.sh" true $VERSION_PART
           VERSION=$("${GITHUB_WORKSPACE}/version-update.sh")
           git commit -am "Release version $VERSION"
           git checkout -b test_release_$VERSION
