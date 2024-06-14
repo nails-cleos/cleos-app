@@ -6,6 +6,7 @@
       "COMPLETED": "Completas: {{completed}}",
       "UPCOMING": "Próximas: {{upcoming}}",
       "TRANSACTION": "Crédito en cuenta: {{transaction}} - {{total}}",
+      "PAYMENT": "Pagos totales: {{total}}",
       "DELETED": {
         "TITLE": "Eliminar reserva",
         "CONTENT": "¿Está seguro de eliminar la reserva {{date}}?",

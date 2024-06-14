@@ -15,6 +15,7 @@
   <mat-card-header>
     <mat-card-title>{{ viewDate | calendarDate:(view + 'ViewTitle'):dateFormat }}
       @if (!isCalendarLoading) {
+        <div [innerHTML]="'DASHBOARD.RESERVATION.PAYMENT' | translate:{total: thisMonthTotal}"></div>
         <div [innerHTML]="'DASHBOARD.RESERVATION.COMPLETED' | translate:{completed: completed, total: completedTotal}">
         </div>
         <div [innerHTML]="'DASHBOARD.RESERVATION.UPCOMING' | translate:{upcoming: upcoming, total: upcomingTotal}">

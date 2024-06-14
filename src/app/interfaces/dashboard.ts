@@ -20,6 +20,7 @@ export interface IDashboard {
   chartSummaries?: IChart[];
   currency?: ICurrency;
   error?: any;
+  thisMonthTotal?: number;
 }
 
 export interface IEventSummary {
