@@ -13,15 +13,16 @@
         <div class="center">
           <div *ngIf="user; else circle" [ngClass]="{'profile-background': !image}" class="hoverable" mat-card-avatar>
             <label class="pointer-only" for="fileInput">
-              <img *ngIf="image; else showInitialsBlock" alt="profile" class="image"
-                   src="{{image}}">
-              <ng-template #showInitialsBlock>
+              @if (image) {
+                <img alt="profile" class="image" src="{{image}}">
+              } @else {
                 <div class="initials">{{ initials | uppercase }}</div>
-              </ng-template>
+              }
               <div class="hover-text">Choose file</div>
               <div class="profile-background"></div>
               <input (change)="onSelectFile($event.target)" accept="image/*" autocomplete="photo"
                      id="fileInput" type='file'>
+              <canvas #canvas></canvas>
             </label>
           </div>
         </div>

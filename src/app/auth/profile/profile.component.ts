@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
@@ -13,6 +13,7 @@ import { lightenDarkenColor } from '../../util/color';
 import { Role } from '../../interfaces/token';
 import { TranslateService } from '@ngx-translate/core';
 import { validColorValidator } from 'ngx-colors';
+import { resizeImage } from '../../util/file';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
 
@@ -22,6 +23,9 @@ import PlaceGeometry = google.maps.places.PlaceGeometry;
   styleUrls: ['./profile.component.scss']
 })
 export class ProfileComponent implements OnInit, OnDestroy {
+  @ViewChild('canvas', { static: false }) canvas?: ElementRef<HTMLCanvasElement>;
+  @ViewChild('resizedImage', { static: false }) resizedImage?: ElementRef<HTMLImageElement>;
+
   form!: UntypedFormGroup;
   errors: any = [];
   user?: IUser;
@@ -106,12 +110,23 @@ export class ProfileComponent implements OnInit, OnDestroy {
     if (target.files && target.files[0]) {
       const file = target.files[0];
       const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => this.image = reader.result;
+      reader.onload = (e: any) => {
+        const img = new Image();
+        img.onload = () => {
+          if (this.canvas?.nativeElement) {
+            const dataUrl = resizeImage(img, this.canvas.nativeElement);
+            if (this.resizedImage) {
+              this.resizedImage.nativeElement.src = dataUrl;
+            }
+            this.store.dispatch(
+              new fromActionsUser.UpdatePhoto(dataUrl)
+            );
+          }
+        };
+        img.src = e.target.result;
+      };
 
-      this.store.dispatch(
-        new fromActionsUser.UpdatePhoto(file)
-      );
+      reader.readAsDataURL(file);
     }
   }
 
