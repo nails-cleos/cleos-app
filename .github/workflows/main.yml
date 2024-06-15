@@ -55,6 +55,6 @@ jobs:
 
           # run script
           VERSION=$("${GITHUB_WORKSPACE}/version-update.sh")
-          git commit -am "Release version $VERSION"
-          git checkout -b release-$VERSION
-          git push -u origin release-$VERSION
+          git commit -am "Release version v$VERSION"
+          git checkout -b release-v$VERSION
+          git push -u origin release-v$VERSION
