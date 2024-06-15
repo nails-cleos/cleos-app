@@ -1,10 +1,11 @@
 name: Pull request flow
 
 on:
+  push:
+    branches: [ 'main' ]
   pull_request:
     branches:
       - 'develop'
-      - 'main'
 
 jobs:
   build:
