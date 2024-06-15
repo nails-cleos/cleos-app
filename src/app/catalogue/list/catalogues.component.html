@@ -1,49 +1,49 @@
-<div *ngIf="catalogues.length; else emptyCatalogue" style="margin: 0 30px 0 30px">
+@if (catalogues.length) {
   <div class="drop-list" cdkDropList (cdkDropListDropped)="drop($event)">
-    <mat-card *ngFor="let catalogue of catalogues;" appearance="outlined" cdkDrag class="catalogue-card">
-      <mat-card-header>
-        <div mat-card-avatar>
-          <mat-icon [ngClass]="{'home-cross icon-cross': !catalogue.home}" color="primary">home</mat-icon>
-          <mat-icon [ngClass]="{'catalog-cross icon-cross': !catalogue.catalog}" color="primary">collections</mat-icon>
-        </div>
-        <mat-card-title-group>
-          <mat-card-title>{{catalogue.name}}</mat-card-title>
-          <mat-card-subtitle>{{catalogue.treatmentGroup?.name}}</mat-card-subtitle>
-          <img mat-card-sm-image [alt]="catalogue.name" [src]="catalogue.image" class="responsive-image"/>
-          <img *cdkDragPreview [src]="catalogue.image" [alt]="catalogue.name" class="responsive-image preview">
-        </mat-card-title-group>
-      </mat-card-header>
-      <mat-card-content>
-        {{catalogue.description}}
-      </mat-card-content>
-      <mat-card-actions>
-        <div *ngIf="catalogue.id" class="pointer-only spacer">
-          <mat-icon (click)="edit(catalogue)" class="edit" matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}"
-                    matTooltipPosition="left">edit
-          </mat-icon>
-          <mat-icon (click)="delete(catalogue)" class="pointer-only" color="warn"
-                    matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}"
-                    matTooltipPosition="right">delete
-          </mat-icon>
-        </div>
-      </mat-card-actions>
-    </mat-card>
+    @for (catalogue of catalogues; track catalogue) {
+      <mat-card appearance="outlined" cdkDrag class="catalogue-card">
+        <mat-card-header>
+          <div mat-card-avatar>
+            <mat-icon [ngClass]="{'home-cross icon-cross': !catalogue.home}" color="primary">home</mat-icon>
+            <mat-icon [ngClass]="{'catalog-cross icon-cross': !catalogue.catalog}" color="primary">
+              collections
+            </mat-icon>
+          </div>
+          <mat-card-title-group>
+            <mat-card-title>{{ catalogue.name }}</mat-card-title>
+            <mat-card-subtitle>{{ catalogue.treatmentGroup?.name }}</mat-card-subtitle>
+            <img mat-card-sm-image [alt]="catalogue.name" [src]="catalogue.image" class="responsive-image"/>
+            <img *cdkDragPreview [src]="catalogue.image" [alt]="catalogue.name" class="responsive-image preview">
+          </mat-card-title-group>
+        </mat-card-header>
+        <mat-card-content>
+          {{ catalogue.description }}
+        </mat-card-content>
+        <mat-card-actions>
+          @if (catalogue.id) {
+            <mat-icon (click)="edit(catalogue)" class="edit" matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}"
+                      matTooltipPosition="left">edit
+            </mat-icon>
+            <mat-icon (click)="delete(catalogue)" class="pointer-only" color="warn"
+                      matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">delete
+            </mat-icon>
+          }
+        </mat-card-actions>
+      </mat-card>
+    }
   </div>
-
   <div class="divider">
     <button (click)="finish" color="primary" mat-fab extended class="icon-button">
       {{ 'COMMON.BUTTON.UPDATE' | translate }}
     </button>
   </div>
-
   <button color="accent" id="add-button" mat-fab matTooltip="{{ 'CATALOGUE.TITLE' | translate }}"
           [routerLink]="['/', language, 'catalogues', 'add']">
     <mat-icon>add_a_photo</mat-icon>
   </button>
-</div>
-
-<ng-template #emptyCatalogue>
-  <button class="only-button icon-button" color="accent" mat-fab extended [routerLink]="['/', language, 'catalogues', 'add']">
+} @else {
+  <button class="only-button icon-button" color="accent" mat-fab extended
+          [routerLink]="['/', language, 'catalogues', 'add']">
     <mat-icon>add_a_photo</mat-icon> &nbsp;{{ 'CATALOGUE.TITLE' | translate }}
   </button>
-</ng-template>
+}
