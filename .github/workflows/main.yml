@@ -49,12 +49,12 @@ jobs:
           git config --global user.email "nails.cleos@gmail.com"
           git config --global user.name "Nails Cleos"
           git fetch
-          git checkout main
+          git checkout release
+          git merge main --commit --no-edit
           # make file runnable, might not be necessary
           chmod +x "${GITHUB_WORKSPACE}/version-update.sh"
 
           # run script
           VERSION=$("${GITHUB_WORKSPACE}/version-update.sh")
           git commit -am "Release version v$VERSION"
-          git checkout -b release-v$VERSION
-          git push -u origin release-v$VERSION
+          git push

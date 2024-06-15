@@ -27,11 +27,6 @@ jobs:
           role-session-name: GitHub-Action-Role
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Determine branch from tag
-        id: branch_from_tag
-        run: echo "::set-output name=branch::$(git branch --contains ${{ github.sha }} --sort=-committerdate | head -n 1 | cut -c 3-)"
-
-      - name: Deploy from branch
-        run: |
-          git checkout ${{ steps.branch_from_tag.outputs.branch }}
-          ./scripts/amplify-deploy.sh ${{ env.IMAGE_NAME }} ${{ steps.branch_from_tag.outputs.branch }}
+      - uses: actions/checkout@v3
+      - name: Deploy
+        run: ./scripts/amplify-deploy.sh ${{env.IMAGE_NAME}} release
