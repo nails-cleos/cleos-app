@@ -48,7 +48,8 @@ const initialState: State = {
 const merge = (a: IDashboard, b: IDashboard) => {
   const res = {};
   Object.keys({ ...a, ...b }).map(key => {
-    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     res[key] = b[key] || a[key];
   });
   return res;
@@ -57,7 +58,8 @@ const merge = (a: IDashboard, b: IDashboard) => {
 const getMap = (a: Map<string, IDashboard>, b: IDashboard) => {
   const res = a;
   Object.keys({ ...a, ...b }).map(key => {
-    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     const data = b[key];
     const dashKey = data.roomName || data.professionalName;
     const values = a.get(dashKey);
@@ -79,6 +81,7 @@ const cleanCardMap = (data: Map<string, IDashboard>): Map<string, IDashboard> =>
   data.forEach((value, key) => {
     value.chartSummaries = undefined;
     value.miniCardSummaries = undefined;
+    value.thisMonthTotal = undefined;
     data.set(key, value);
   });
 
@@ -199,7 +202,8 @@ export const reducer = (state = initialState, action: All): State => {
     case DashboardActionTypes.dashboardEvents: {
       return {
         ...state,
-        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         dashboard: { availability: {} },
         errorMessage: null,
         error: null,

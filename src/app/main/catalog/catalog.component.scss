@@ -1,25 +1,59 @@
-img {
-  width: 100%;
-  object-fit: contain;
-  vertical-align: middle;
+//img {
+//  width: 100%;
+//  object-fit: contain;
+//  vertical-align: middle;
+//}
+//
+//.catalogue-card {
+//  width: 200px;
+//  height: 250px;
+//  margin: 10px;
+//  display: inline-block;
+//  vertical-align: middle;
+//}
+//
+//.flex-item {
+//  flex: 1 1 calc(33.33% - 32px);
+//
+//  @media (max-width: 960px) {  // Breakpoint for md (assuming typical md breakpoint is 960px)
+//    flex: 1 1 calc(50% - 32px);
+//  }
+//
+//  @media (max-width: 600px) {  // Breakpoint for sm and xs (assuming typical sm/xs breakpoint is 600px)
+//    flex: 1 1 100%;
+//  }
+//}
+
+.frame {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* Adjust as needed */
 }
 
 .catalogue-card {
-  width: 200px;
-  height: 250px;
-  margin: 10px;
-  display: inline-block;
-  vertical-align: middle;
+  flex-grow: 1;
+  flex-basis: calc(33.33% - 20px); /* Adjust basis for three cards per row */
+  margin: 10px; /* Adjust margin as needed */
+  max-width: 300px; /* Limit maximum width of each card */
+  width: 100%; /* Ensure each card takes full width initially */
 }
 
-.flex-item {
-  flex: 1 1 calc(33.33% - 32px);
+.catalogue-card img {
+  width: 100%; /* Ensure image fills its container */
+  height: auto; /* Maintain aspect ratio */
+  max-height: 250px; /* Limit maximum height of the image */
+  object-fit: cover; /* Ensure image covers the entire container */
+}
 
-  @media (max-width: 960px) {  // Breakpoint for md (assuming typical md breakpoint is 960px)
-    flex: 1 1 calc(50% - 32px);
-  }
-
-  @media (max-width: 600px) {  // Breakpoint for sm and xs (assuming typical sm/xs breakpoint is 600px)
-    flex: 1 1 100%;
+@media (max-width: 1200px) {
+  .catalogue-card {
+    flex-basis: calc(50% - 20px); /* Two cards per row on medium screens */
   }
 }
+
+@media (max-width: 768px) {
+  .catalogue-card {
+    flex-basis: calc(100% - 20px); /* One card per row on smaller screens */
+  }
+}
+

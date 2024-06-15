@@ -5,7 +5,6 @@ import { Observable, Subscription } from 'rxjs';
 import { AppState, selectCatalogueState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
 import * as fromActionsCatalogue from '../../store/catalogue.actions';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { ICatalogueAll } from '../../interfaces/catalogue';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
@@ -104,8 +103,12 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscribe(): void {
     this.subscription = this.getState.subscribe((state) => {
       if (state.data) {
-        this.catalogues = state.data
-          .map((it: ICatalogueAll) => Object.assign({}, it, { image: `data:${ it.contentType };base64,${ it.blob }` }));
+        this.catalogues = state.data.map((it: ICatalogueAll) => {
+          if (it.blob) {
+            return Object.assign({}, it, { image: `data:image/jpeg;base64,${ it.blob }` });
+          }
+          return it;
+        });
         this.cdRef.detectChanges();
       }
       if (state.message) {

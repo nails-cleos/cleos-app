@@ -2,7 +2,7 @@ import { DiscountType, IDiscount } from '../interfaces/discount';
 import { IAuthority, IUser, IUserAll } from '../interfaces/user';
 import { GroupService, IGroupService, IPrice, ITreatmentAll, Price } from '../interfaces/treatment';
 import { IPayment, IPaymentOption } from '../interfaces/payment';
-import { IExtras, IReservationAll } from '../interfaces/reservation';
+import { IReservationAll } from '../interfaces/reservation';
 import { IAdditionalAll } from '../interfaces/additional';
 import { TranslateService } from '@ngx-translate/core';
 import { IAddress, ILocation, IRoom, IRoomAll, ServiceType } from '../interfaces/room';
@@ -39,7 +39,7 @@ export const getUserImage = (user: IUser | IUserAll | undefined): string | undef
     if (user.imageUrl.indexOf('http') >= 0) {
       image = user.imageUrl;
     } else if (user.image) {
-      image = `data:image/jpg;base64,${ user.image }`;
+      image = `data:image/jpeg;base64,${ user.image }`;
     }
   }
 

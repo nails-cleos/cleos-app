@@ -9,8 +9,8 @@
         <mat-card-title-group>
           <mat-card-title>{{catalogue.name}}</mat-card-title>
           <mat-card-subtitle>{{catalogue.treatmentGroup?.name}}</mat-card-subtitle>
-          <img mat-card-sm-image [alt]="catalogue.name" [src]="catalogue.image"/>
-          <img class="preview" *cdkDragPreview [src]="catalogue.image" [alt]="catalogue.name">
+          <img mat-card-sm-image [alt]="catalogue.name" [src]="catalogue.image" class="responsive-image"/>
+          <img *cdkDragPreview [src]="catalogue.image" [alt]="catalogue.name" class="responsive-image preview">
         </mat-card-title-group>
       </mat-card-header>
       <mat-card-content>

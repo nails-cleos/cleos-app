@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ICatalogue, ICatalogueAll } from '../interfaces/catalogue';
+import { dataURLToBlob } from '../util/file';
 
 @Injectable()
 export class CatalogueService {
@@ -31,9 +32,10 @@ export class CatalogueService {
     return this.http.get<ICatalogue>(url);
   }
 
-  public add(catalogue: any, file: any): Observable<ICatalogue> {
+  public add(catalogue: any, resizedImageDataUrl: string): Observable<ICatalogue> {
+    const fileBlob = dataURLToBlob(resizedImageDataUrl);
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', fileBlob, 'resized-image.jpg');
     const blob = new Blob([JSON.stringify(catalogue)], {type: 'application/json'});
     formData.append('catalogue', blob);
 
@@ -46,10 +48,12 @@ export class CatalogueService {
     return this.http.delete<ICatalogue>(url);
   }
 
-  public update(catalogue: ICatalogue, file: any): Observable<ICatalogue> {
+  public update(catalogue: ICatalogue, resizedImageDataUrl: string): Observable<ICatalogue> {
     const url = `${this.urlV1}/${catalogue.id}`;
+    const fileBlob = dataURLToBlob(resizedImageDataUrl);
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', fileBlob, 'resized-image.jpg');
+
     const blob = new Blob([JSON.stringify(catalogue)], {type: 'application/json'});
     formData.append('catalogue', blob);
     const headers = new HttpHeaders().set('Upload', 'true');
