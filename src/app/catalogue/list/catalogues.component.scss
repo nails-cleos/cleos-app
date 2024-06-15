@@ -1,13 +1,19 @@
 .catalogue-card {
-  max-width: 400px;
-  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+}
 
-  /* Make images responsive within catalogue cards */
-  .responsive-image {
-    max-width: 100%; /* Ensures the image doesn't exceed its container */
-    height: auto; /* Allows the image to scale proportionally */
-    display: block; /* Ensures the image doesn't have any extra space below it */
-  }
+.image-container {
+  display: flex;
+  gap: 10px; /* Space between images */
+  justify-content: center; /* Center the images */
+  align-items: center; /* Center align images vertically */
+}
+
+.responsive-image {
+  max-width: 200px; /* Set a larger max width */
+  height: auto;
+  flex: 1;
 }
 
 .preview {
