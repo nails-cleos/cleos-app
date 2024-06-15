@@ -7,6 +7,7 @@ import { IRoom } from '../interfaces/room';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { ICustomerLastReservation } from '../interfaces/reservation';
 import { createFilter } from '../util/service-helper';
+import { dataURLToBlob } from '../util/file';
 
 @Injectable()
 export class UserService {
@@ -52,9 +53,10 @@ export class UserService {
     return this.http.patch<IUser>(url, user);
   }
 
-  public updateMePhoto(file: File): Observable<IUser> {
+  public updateMePhoto(resizedImageDataUrl: string): Observable<IUser> {
+    const blob = dataURLToBlob(resizedImageDataUrl);
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', blob, 'resized-image.jpg');
 
     const headers = new HttpHeaders().set('Upload', 'true');
 

@@ -4,25 +4,25 @@
       <mat-card *ngFor="let catalogue of catalogues;" appearance="outlined" class="catalogue-card flex-item">
         <ng-template [ngIf]="catalogue.treatmentGroup" [ngIfElse]="noDetail">
           <mat-card-header>
-            <mat-card-title>{{catalogue.name}}</mat-card-title>
-            <mat-card-subtitle>{{catalogue.treatmentGroup.name}}</mat-card-subtitle>
+            <mat-card-title>{{ catalogue.name }}</mat-card-title>
+            <mat-card-subtitle>{{ catalogue.treatmentGroup.name }}</mat-card-subtitle>
           </mat-card-header>
         </ng-template>
         <ng-template #noDetail>
           <mat-card-header>
-            <mat-card-title>{{catalogue.name}}</mat-card-title>
-            <mat-card-subtitle>{{'MAIN.CATALOGUE.NO_DETAIL' | translate}}</mat-card-subtitle>
+            <mat-card-title>{{ catalogue.name }}</mat-card-title>
+            <mat-card-subtitle>{{ 'MAIN.CATALOGUE.NO_DETAIL' | translate }}</mat-card-subtitle>
           </mat-card-header>
         </ng-template>
-          <mat-card-content class="text-center">
-            <img mat-card-md-image [alt]="catalogue.name" [src]="catalogue.image"/>
-          </mat-card-content>
-          <mat-card-actions class="card-actions">
-            <div class="spacer"></div>
-            <a [href]="catalogue.image" rel="noreferrer" target="_blank">
-              <mat-icon>zoom_out_map</mat-icon>
-            </a>
-          </mat-card-actions>
+        <mat-card-content class="text-center">
+          <img mat-card-md-image [alt]="catalogue.name" [src]="catalogue.image"/>
+        </mat-card-content>
+        <mat-card-actions class="card-actions">
+          <div class="spacer"></div>
+          <a [href]="catalogue.image" rel="noreferrer" target="_blank">
+            <mat-icon>zoom_out_map</mat-icon>
+          </a>
+        </mat-card-actions>
       </mat-card>
     </div>
   </section>

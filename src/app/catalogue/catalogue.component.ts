@@ -1,16 +1,15 @@
-import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AppState, selectCatalogueState } from '../store/app.states';
 import * as fromActionsCatalogue from '../store/catalogue.actions';
 import { Catalogue, ICatalogue } from '../interfaces/catalogue';
-import { formatBytes } from '../util/file';
+import { formatBytes, resizeImage } from '../util/file';
 import { ActivatedRoute, Router } from '@angular/router';
 import { fieldChange, requireMatch, valueChange } from '../util/validators';
 import { TranslateService } from '@ngx-translate/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { DomSanitizer } from '@angular/platform-browser';
 import { IGroupService, ITreatmentGroup } from '../interfaces/treatment';
 import { map, startWith } from 'rxjs/operators';
 
@@ -20,27 +19,28 @@ import { map, startWith } from 'rxjs/operators';
   styleUrls: ['./catalogue.component.scss']
 })
 export class CatalogueComponent implements OnInit, OnDestroy {
-
+  @ViewChild('canvas', { static: false }) canvas?: ElementRef<HTMLCanvasElement>;
+  @ViewChild('canvasXs', { static: false }) canvasXs?: ElementRef<HTMLCanvasElement>;
+  @ViewChild('resizedImage', { static: false }) resizedImage?: ElementRef<HTMLImageElement>;
   @Input() catalogue?: ICatalogue;
+
   form!: UntypedFormGroup;
   id?: string;
   isAddMode: boolean;
   file: any;
-  img: any;
-  showImg: boolean;
+  resizedImageDataUrl?: string;
 
   groups?: IGroupService[];
   filteredGroup?: Observable<IGroupService[] | undefined>;
   errors: any = [];
   private getState: Observable<any>;
   private subscription?: Subscription;
-  private language: string;
+  private readonly language: string;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
               private router: Router, private translate: TranslateService, private snackBar: MatSnackBar,
-              private cdRef: ChangeDetectorRef, private sanitizer: DomSanitizer) {
+              private cdRef: ChangeDetectorRef) {
     this.isAddMode = true;
-    this.showImg = false;
     this.getState = this.store.select(selectCatalogueState);
     this.language = this.translate.currentLang;
   }
@@ -63,12 +63,12 @@ export class CatalogueComponent implements OnInit, OnDestroy {
 
     if (this.isAddMode) {
       return this.store.dispatch(
-        new fromActionsCatalogue.CatalogueSave({ catalogue, file: this.file })
+        new fromActionsCatalogue.CatalogueSave({ catalogue, file: this.resizedImageDataUrl })
       );
     } else {
       catalogue.id = this.id;
       this.catalogue = undefined;
-      return this.store.dispatch(new fromActionsCatalogue.CatalogueUpdate({ catalogue, file: this.file }));
+      return this.store.dispatch(new fromActionsCatalogue.CatalogueUpdate({ catalogue, file: this.resizedImageDataUrl }));
     }
   }
 
@@ -80,18 +80,17 @@ export class CatalogueComponent implements OnInit, OnDestroy {
   get deleteImg(): void {
     if (this.isAddMode) {
       this.file = undefined;
-      this.showImg = false;
+      this.resizedImageDataUrl = undefined;
     } else {
       const content = this.translate.instant('CATALOGUE.DELETE.MESSAGE', { name: this.catalogue?.name });
       const undo = this.translate.instant('CATALOGUE.DELETE.UNDO');
-      const snackBarRef = this.snackBar.open(content, undo, {
-        duration: 5000
-      });
+      const snackBarRef = this.snackBar.open(content, undo, { duration: 5000 });
+      const image = this.resizedImageDataUrl;
       snackBarRef.onAction().subscribe(() => {
-        this.showImg = true;
+        this.resizedImageDataUrl = image;
       });
 
-      this.showImg = false;
+      this.resizedImageDataUrl = undefined;
     }
     return;
   }
@@ -164,19 +163,36 @@ export class CatalogueComponent implements OnInit, OnDestroy {
   }
 
   private uploadFilesSimulator(): void {
+    const fileSizeInMB = this.file.size / (1024 * 1024); // Convert file size to MB
+    const baseInterval = 200; // Base interval in milliseconds
+
+    const interval = Math.ceil(baseInterval * (fileSizeInMB / 10)); // Calculate interval based on file size
+
     setTimeout(() => {
       const progressInterval = setInterval(() => {
         if (this.file.progress === 100) {
-          this.img = this.sanitizer.bypassSecurityTrustUrl(
-            window.URL.createObjectURL(this.file)
-          );
-          this.showImg = true;
+          const reader = new FileReader();
+          reader.onload = (e: any) => {
+            const img = new Image();
+            img.onload = () => {
+              this.processImage(img);
+            };
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(this.file);
           clearInterval(progressInterval);
         } else {
           this.file.progress += 5;
         }
-      }, 200);
+      }, interval); // Use calculated interval
     }, 1000);
+  }
+
+  private processImage(img: HTMLImageElement): void {
+    this.resizedImageDataUrl = resizeImage(img, this.canvas?.nativeElement || this.canvasXs?.nativeElement);
+    if (this.resizedImage) {
+      this.resizedImage.nativeElement.src = this.resizedImageDataUrl;
+    }
   }
 
   private clean(): void {
@@ -212,8 +228,7 @@ export class CatalogueComponent implements OnInit, OnDestroy {
           catalog: state.selected.catalog,
           groupId: state.selected.treatmentGroup?.id
         } as ICatalogue;
-        this.img = `data:${state.selected.contentType};base64,${ state.selected.blob }`;
-        this.showImg = !!this.img;
+        this.resizedImageDataUrl = `data:${ state.selected.contentType };base64,${ state.selected.blob }`;
         this.form.patchValue(this.catalogue);
         if (state.selected.treatmentGroup) {
           this.getForm.group.setValue(state.selected.treatmentGroup);
