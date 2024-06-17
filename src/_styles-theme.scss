@@ -264,19 +264,31 @@
       background-color: mat.get-color-from-palette($accent-palette, 900);
     }
 
+    .text-bg-birthday {
+      background-color: #ffb6c1;
+      color: black;
+    }
+    .text-bg-note {
+      background-color: #eedf72;
+      color: black;
+    }
+    .text-bg-transaction {
+      background-color: #ffa53e;
+      color: black;
+    }
     .text-bg-created {
-      background-color: #fafafa;
+      background-color: #c0c0c0;
       color: black;
     }
-    .text-bg-completed {
-      background-color: #90ee90;
-      color: black;
-    }
-    .text-bg-paid {
-      background-color: #87ceeb;
+    .text-bg-approved {
+      background-color: #b5ac9e;
       color: black;
     }
     .text-bg-partially_paid {
+      background-color: #87ceeb;
+      color: black;
+    }
+    .text-bg-paid {
       background-color: #87ceeb;
       color: black;
     }
@@ -284,24 +296,12 @@
       background-color: #e6b9ff;
       color: black;
     }
-    .text-bg-approved {
-      background-color: #e3d3c5;
+    .text-bg-completed {
+      background-color: #90ee90;
       color: black;
     }
     .text-bg-unavailable {
-      background-color: #f08080;
-      color: black;
-    }
-    .text-bg-birthday {
-      background-color: #eb70a5;
-      color: black;
-    }
-    .text-bg-note {
-      background-color: #e7d255;
-      color: black;
-    }
-    .text-bg-transaction {
-      background-color: #fe8d02;
+      background-color: #d28d8c;
       color: black;
     }
   } @else {
@@ -342,36 +342,35 @@
       background-color: mat.get-color-from-palette($accent-palette, 500);
     }
 
+    .text-bg-birthday {
+      background-color: #eb70a5;
+    }
+    .text-bg-note {
+      background-color: #e7d255;
+    }
+    .text-bg-transaction {
+      background-color: #fe8d02;
+    }
     .text-bg-created {
-      background-color: #ababab;
+      background-color: #708090;
     }
-    .text-bg-completed {
-      background-color: #44a244;
-    }
-    .text-bg-paid {
-      background-color: #04589a;
+    .text-bg-approved {
+      background-color: #8d8270;
     }
     .text-bg-partially_paid {
+      background-color: #04589a;
+    }
+    .text-bg-paid {
       background-color: #04589a;
     }
     .text-bg-started {
       background-color: #673ab7;
     }
-    .text-bg-approved {
-      background-color: #a06c3f;
+    .text-bg-completed {
+      background-color: #44a244;
     }
     .text-bg-unavailable {
-      background-color: #d28d8c;
-    }
-    .text-bg-birthday {
-      background-color: #f18dbc;
-    }
-    .text-bg-note {
-      background-color: #eedf72;
-    }
-    .text-bg-transaction {
-      background-color: #ffa53e;
-      color: black;
+      background-color: #f08080;
     }
   }
 
@@ -542,7 +541,7 @@
     .cal-event {
       background-color: mat.get-color-from-palette($primary-palette, 600);
       color: mat.get-color-from-palette($background, background);
-      border: 1px solid mat.get-color-from-palette($foreground, divider);
+      border: 1px solid rgba(0, 0, 0, 0.2);
     }
 
     .cal-days {
