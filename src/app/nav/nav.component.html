@@ -7,15 +7,19 @@
       <mat-card appearance="outlined" class="mat-elevation-z0">
         @if (currentUser) {
           <mat-card-header>
-            <div class="circle" mat-card-avatar>
+            <div class="circle pointer-only" mat-card-avatar [routerLink]="['/', language, 'auth', 'profile']">
               @if (image) {
                 <img alt="profile" src="{{image}}">
               } @else {
                 <div class="initials">{{ initials | uppercase }}</div>
               }
             </div>
-            <mat-card-title>{{ currentUser.displayName | uppercase }}</mat-card-title>
-            <mat-card-subtitle>{{ currentUser.email }}</mat-card-subtitle>
+            <mat-card-title class="pointer-only" [routerLink]="['/', language, 'auth', 'profile']">
+              {{ currentUser.displayName | uppercase }}
+            </mat-card-title>
+            <mat-card-subtitle class="pointer-only" [routerLink]="['/', language, 'auth', 'profile']">
+              {{ currentUser.email }}
+            </mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
             <app-menu-item [drawer]="drawer" [items]="menuItems"></app-menu-item>

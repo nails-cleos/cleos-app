@@ -50,7 +50,8 @@ export const getStateOrder = (state?: string): number => eventState().find(color
 
 export const eventState = (isDark: boolean = false): IState[] => [{
   name: 'BIRTHDAY',
-  color: isDark ? '#eb70a5' : '#f18dbc',
+  // color: isDark ? '#eb70a5' : '#ffb6c1',
+  color: isDark ? '#eb70a5' : '#ffb6c1',
   order: 1
 }, {
   name: 'NOTE',
@@ -62,7 +63,7 @@ export const eventState = (isDark: boolean = false): IState[] => [{
   order: 3
 }, {
   name: 'CREATED',
-  color: isDark ? '#ceb4ac' : '#dcc8c2', // accent-dark
+  color: isDark ? '#708090' : '#c0c0c0',
   order: 4
 }, {
   name: 'EDITING',
@@ -70,7 +71,7 @@ export const eventState = (isDark: boolean = false): IState[] => [{
   order: 5
 }, {
   name: 'APPROVED',
-  color: isDark ? '#9d9282' : '#b5ac9e', // primary-dark
+  color: isDark ? '#8d8270' : '#b5ac9e', // primary
   order: 6
 }, {
   name: 'PARTIALLY_PAID',
