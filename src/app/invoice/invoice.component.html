@@ -1,7 +1,7 @@
 <div>
   <fieldset>
     <legend>{{ 'COMMON.SEARCH.TITLE' | translate }}</legend>
-    <form [formGroup]="form">
+    <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
       <div class="row-column-space-around-center">
         <mat-form-field appearance="outline">
           <mat-label>{{ 'INVOICE.OFFICE.SEARCH' | translate }}</mat-label>

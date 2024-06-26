@@ -254,7 +254,7 @@
              [@bottomTop]="{value:contactItem2State.value, params: {delayIn: isSmall ? '0ms' : '500ms', delayOut: '0ms'}}">
           <h3 class="bold no-content">{{ 'MAIN.CONTACT.SEND.TITLE' | translate }}</h3>
 
-          <form (ngSubmit)="sendEmail" [formGroup]="form" novalidate>
+          <form (ngSubmit)="sendEmail" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
             <div class="home-page-form inner-container">
               <div class="contact-inner-container">
                 <mat-form-field class="full full-margin">

@@ -9,7 +9,7 @@
             <div class="ssc-line"></div>
           </ng-template>
         </mat-card-header>
-        <form (ngSubmit)="update" [formGroup]="form" novalidate>
+        <form (ngSubmit)="update" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
           <mat-card-content *ngIf="color; else boxSkeleton">
             <div class="inner-container">
               <mat-form-field appearance="outline">

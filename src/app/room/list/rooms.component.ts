@@ -118,7 +118,7 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: room }, result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsRoom.DeleteRoom(result.id)
+          new fromActionsRoom.DeleteRoom(result)
         );
       }
     });

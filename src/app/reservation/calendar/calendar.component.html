@@ -1,7 +1,7 @@
 <div>
   <fieldset>
     <legend>{{ 'COMMON.SEARCH.TITLE' | translate }}</legend>
-    <form [formGroup]="officeForm">
+    <form [formGroup]="officeForm" (keydown.enter)="$event.preventDefault()">
       <div *ngIf="!offices?.length; else dataOffice">
         <button class="only-button" color="accent" mat-fab extended [routerLink]="['/', language, 'rooms', 'add']">
           <mat-icon>add_business</mat-icon> &nbsp;{{ 'RESERVATION.ROOM.TITLE' | translate }}

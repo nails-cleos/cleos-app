@@ -1,4 +1,4 @@
-<form (ngSubmit)="complete" [formGroup]="form" novalidate>
+<form (ngSubmit)="complete" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
   <mat-card appearance="outlined" class="style-card">
     <mat-card-header>
       <mat-card-title>{{ 'RESERVATION.CUSTOMER.DETAIL' | translate }}</mat-card-title>

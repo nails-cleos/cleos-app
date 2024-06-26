@@ -162,7 +162,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         this.store.dispatch(
           new fromActionsReservation.UpdateNote({
             note: result.note,
-            reservationId: this.reservation?.id,
+            reservation: this.reservation,
             role: this.professionalId ? Role.professional : Role.customer
           })
         );

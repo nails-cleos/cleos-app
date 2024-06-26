@@ -87,7 +87,7 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsDiscount.DeleteDiscount(result.id)
+          new fromActionsDiscount.DeleteDiscount(result)
         );
       }
     });

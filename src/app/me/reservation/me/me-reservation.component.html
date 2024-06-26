@@ -1,5 +1,5 @@
 <ng-template #stepOne>
-  <form [formGroup]="roomForm">
+  <form [formGroup]="roomForm" (keydown.enter)="$event.preventDefault()">
     <div *ngIf="!offices?.length; else data" class="no-content bold">
       {{ 'ME.RESERVATION.ROOM.NO_CONTENT' | translate }}
     </div>
@@ -77,7 +77,7 @@
 </ng-template>
 
 <ng-template #stepTwo>
-  <form [formGroup]="treatmentForm">
+  <form [formGroup]="treatmentForm" (keydown.enter)="$event.preventDefault()">
     <div *ngIf="!groups?.length; else data" class="no-content bold">
       {{ 'ME.RESERVATION.TREATMENT.NO_CONTENT' | translate }}
     </div>
@@ -210,8 +210,8 @@
       @for (it of additionalList; track it) {
         <mat-list-option [selected]="isSelected(it)" [value]="it" togglePosition="before" lines="3"
                          style="padding-bottom: 8px">
-          <div matListItemTitle>{{ it.name }} {{ room.value.currency | currencySymbol }}
-            ({{ it.price | number:'1.2-2' }} -
+          <div matListItemTitle>{{ it.name }} ({{ room.value.currency | currencySymbol }}
+            {{ it.price | number:'1.2-2' }} -
             &#9202; {{ it.duration | durationTime }})
           </div>
           <div *ngIf="it.description" class="description" matListItemLine>{{ it.description }}</div>
@@ -254,7 +254,7 @@
 </ng-template>
 
 <ng-template #stepFive>
-  <form [formGroup]="typeForm">
+  <form [formGroup]="typeForm" (keydown.enter)="$event.preventDefault()">
     <ng-template [ngIf]="price.isPaid" [ngIfElse]="noPaid">
       <app-price [price]="oldPrice" [typeForm]="typeForm" [options]="accountCreditOptions"
                  [currency]="room.value.currency" [firstTime]="firstTime" [professionalName]="professionalName"
@@ -274,7 +274,7 @@
 </ng-template>
 
 <ng-template #stepSix>
-  <form [formGroup]="acceptForm">
+  <form [formGroup]="acceptForm" (keydown.enter)="$event.preventDefault()">
     <mat-card appearance="outlined" *ngIf="isPreview">
       <mat-card-header>
         <mat-card-title>{{ 'ME.RESERVATION.PREVIEW' | translate }}</mat-card-title>

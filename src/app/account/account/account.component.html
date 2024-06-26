@@ -2,7 +2,7 @@
   <div class="card-container">
     <div class="card-content">
       <app-balance [account]="account" [showAdd]="showAdd" [showView]="true" [language]="language"></app-balance>
-      <form (ngSubmit)="submit" [formGroup]="form" novalidate>
+      <form (ngSubmit)="submit" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
         <mat-card appearance="outlined" class="style-card">
           <mat-card-header>
             <mat-card-title>{{ 'ACCOUNT.TITLE' | translate }}</mat-card-title>
@@ -39,11 +39,12 @@
                              [innerHTML]="'COMMON.CURRENCY.INVALID' | translate"></mat-error>
                   <mat-error *ngIf="errors['currency']">{{ errors['currency'] }}</mat-error>
                 </mat-form-field>
-                <button class="hide-on-mobile" [routerLink]="['/', language, 'currency', 'add']" color="accent" mat-fab>
+                <button class="hide-on-mobile" type="button" [routerLink]="['/', language, 'currency', 'add']"
+                        color="accent" mat-fab>
                   <mat-icon matPrefix>add_card</mat-icon>
                 </button>
-                <button class="show-on-mobile" [routerLink]="['/', language, 'currency', 'add']" color="accent"
-                        mat-fab extended>
+                <button class="show-on-mobile" type="button" [routerLink]="['/', language, 'currency', 'add']"
+                        color="accent" mat-fab extended>
                   <mat-icon matPrefix>add_card</mat-icon>
                   <span>{{ 'COMMON.CURRENCY.ADD_BUTTON' | translate }}</span>
                 </button>

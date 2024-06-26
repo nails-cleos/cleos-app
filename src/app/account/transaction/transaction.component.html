@@ -2,7 +2,7 @@
   <div class="card-container">
     <div class="card-content">
       <app-balance [account]="account" [showView]="true" [showUser]="hasAdminRole" [language]="language"></app-balance>
-      <form (ngSubmit)="submit" [formGroup]="form" novalidate>
+      <form (ngSubmit)="submit" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
         <mat-card appearance="outlined" class="style-card" *ngIf="account">
           <mat-card-header>
             <mat-card-title>{{ 'ACCOUNT.TRANSACTION.TITLE' | translate }}</mat-card-title>

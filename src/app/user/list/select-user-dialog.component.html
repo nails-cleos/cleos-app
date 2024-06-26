@@ -21,7 +21,7 @@
       <mat-card-title>{{ 'USER.MERGE.OLD_USER.TITLE' | translate}}</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <form [formGroup]="userForm">
+      <form [formGroup]="userForm" (keydown.enter)="$event.preventDefault()">
         <mat-form-field *ngIf="users; else skeleton" appearance="outline">
           <mat-label>{{ 'USER.MERGE.OLD_USER.FIELD' | translate }}</mat-label>
           <label>

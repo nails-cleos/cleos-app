@@ -59,8 +59,8 @@ export class ExpenseEffects {
   delete$ = createEffect(() => this.actions.pipe(ofType(fromActionsExpense.ExpenseActionTypes.expenseDelete)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.expenseService.delete(payload.roomId, payload.id).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('EXPENSE.DELETED.MESSAGE', { invoice: response.invoice });
+      switchMap(() => {
+        const message = this.translate.instant('EXPENSE.DELETED.MESSAGE', { invoice: payload.invoice });
         return of(new fromActionsExpense.ExpenseSaveSuccess({ message }));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsExpense.ExpenseFailure({ error: err.error })))
     ))

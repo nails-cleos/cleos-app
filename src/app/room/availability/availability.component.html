@@ -1,4 +1,4 @@
-<form [formGroup]="availabilityForm" novalidate>
+<form [formGroup]="availabilityForm" novalidate (keydown.enter)="$event.preventDefault()">
   <mat-form-field class="margin-right-eight" appearance="outline">
     <mat-label>{{ 'ROOM.START.FIELD' | translate }}</mat-label>
     <label>

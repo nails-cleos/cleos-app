@@ -1,6 +1,6 @@
 <h1 mat-dialog-title>{{'RESERVATION.PROFESSIONAL.SELECT' | translate }}</h1>
 <div mat-dialog-content>
-  <form [formGroup]="professionalForm">
+  <form [formGroup]="professionalForm" (keydown.enter)="$event.preventDefault()">
     <mat-form-field *ngIf="professionals; else skeleton" appearance="outline">
       <mat-label>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</mat-label>
       <label>

@@ -135,15 +135,12 @@ export class NavComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscribe();
-    this.getNotifications();
     this.authUserService.cookieConsent(this.translate);
 
     const meta = this.translate.instant('DASHBOARD.META');
 
     this.seoService.setMetaDescription(meta.CONTENT);
     this.seoService.setMetaTitle(meta.TITLE);
-
-    this.language = this.navigationService.attachLang(this.route.snapshot.paramMap.get('lang'));
   }
 
   ngOnDestroy(): void {
@@ -197,11 +194,16 @@ export class NavComponent implements OnInit, OnDestroy {
   }
 
   private subscribe(): void {
+    this.authSubject.subscribe(isAuthorized => {
+      if (isAuthorized && this.tokenService.token) {
+        this.getNotifications()
+      }
+    })
     this.authSubscription = this.getState.subscribe(state => {
       this.isAuthorized = state.isAuthenticated;
       this.isLoading = state.isLoading;
-      this.authSubject.next(this.isAuthorized);
       if (state.isAuthenticated) {
+        this.language = this.navigationService.attachLang(state.user?.locale || this.route.snapshot.paramMap.get('lang'), state.user);
         const authUser = this.authUserService.reloadUser(state.user);
         this.showInformation = !authUser.isRoomAdmin;
         this.isDarkMode = authUser.isDarkMode;
@@ -212,7 +214,7 @@ export class NavComponent implements OnInit, OnDestroy {
         this.tokenService.user = state.user;
         this.incomplete = !state.user.completed;
         const user: IUserAll = state.user;
-        this.language = this.navigationService.attachLang(getLocale(user.locale).language);
+        // this.language = this.navigationService.attachLang(getLocale(user.locale).language);
         this.currentUser = user;
         this.resetTheme(this.currentUser.theme);
         this.menuItems = state.menus;
@@ -242,6 +244,7 @@ export class NavComponent implements OnInit, OnDestroy {
           }
         });
       }
+      this.authSubject.next(this.isAuthorized);
       if (this.router.url === `/${ this.language }`) {
         if (this.isAuthorized && !state.redirect) {
           this.store.dispatch(

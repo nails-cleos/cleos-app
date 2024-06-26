@@ -1,7 +1,7 @@
 <div class="flex-container">
   <div class="card-container">
     <div class="card-content">
-      <form (ngSubmit)="submit" [formGroup]="form" novalidate>
+      <form (ngSubmit)="submit" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
         <mat-card appearance="outlined" class="style-card">
           <ng-template [ngIf]="isAddMode" [ngIfElse]="headerEditMode">
             <mat-card-header>

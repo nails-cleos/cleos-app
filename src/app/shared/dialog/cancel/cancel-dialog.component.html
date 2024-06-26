@@ -1,6 +1,6 @@
 <h1 mat-dialog-title>{{'RESERVATION.CANCEL.TITLE' | translate }}</h1>
 <div mat-dialog-content>
-  <form [formGroup]="cancelForm">
+  <form [formGroup]="cancelForm" (keydown.enter)="$event.preventDefault()">
     <app-price [price]="price" [typeForm]="typeForm" [options]="paymentOptions" [currency]="currency"
                [firstTime]="true" [showPenalty]="showPenalty" [showBank]="true"></app-price>
     <div class="top-space">

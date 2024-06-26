@@ -1,5 +1,5 @@
 <ng-template #stepOne>
-  <form [formGroup]="customerForm">
+  <form [formGroup]="customerForm" (keydown.enter)="$event.preventDefault()">
     <mat-form-field *ngIf="customers; else skeleton" appearance="outline">
       <mat-label>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</mat-label>
       <label>
@@ -43,7 +43,7 @@
 </ng-template>
 
 <ng-template #stepTwo>
-  <form [formGroup]="officeForm">
+  <form [formGroup]="officeForm" (keydown.enter)="$event.preventDefault()">
     <ng-template [ngIf]="!offices?.length" [ngIfElse]="data">
       <div class="no-content bold">{{ 'RESERVATION.ROOM.NO_CONTENT' | translate }}</div>
     </ng-template>
@@ -122,7 +122,7 @@
 </ng-template>
 
 <ng-template #stepThree>
-  <form [formGroup]="treatmentForm">
+  <form [formGroup]="treatmentForm" (keydown.enter)="$event.preventDefault()">
     <ng-template [ngIf]="!groups?.length" [ngIfElse]="data">
       <div class="no-content bold">
         {{ 'RESERVATION.TREATMENT.NO_CONTENT' | translate }}
@@ -273,7 +273,7 @@
       <mat-divider></mat-divider>
       @for (it of additionalList; track it) {
         <mat-list-option [selected]="isSelected(it)" [value]="it" togglePosition="before" lines="3">
-          <div matListItemTitle>{{ it.name }} {{ room.value.currency | currencySymbol }} ({{ it.price | number:'1.2-2' }} -
+          <div matListItemTitle>{{ it.name }} ({{ room.value.currency | currencySymbol }} {{ it.price | number:'1.2-2' }} -
             &#9202; {{ it.duration | durationTime }})</div>
           <ng-template [ngIf]="it.description">
             <span class="description" matListItemLine>{{ it.description }}</span>
@@ -289,7 +289,7 @@
 </ng-template>
 
 <ng-template #stepFive>
-  <form [formGroup]="configurationForm">
+  <form [formGroup]="configurationForm" (keydown.enter)="$event.preventDefault()">
     <div class="link-container">
       <mat-checkbox formControlName="customerChange" color="primary">
         {{ 'RESERVATION.CONFIGURATION.CUSTOMER_CHANGE.FIELD' | translate }}

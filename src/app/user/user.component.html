@@ -17,7 +17,7 @@
           </mat-card-header>
         </ng-template>
 
-        <form (ngSubmit)="submit" [formGroup]="form" novalidate>
+        <form (ngSubmit)="submit" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
           <mat-card-content>
             <div class="inner-container">
               <ng-template [ngIf]="isAddMode">
