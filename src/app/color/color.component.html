@@ -10,30 +10,28 @@
             <div class="inner-container">
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'COLOR.NAME.FIELD' | translate }}</mat-label>
-                <label>
-                  <input [formControl]="name" matInput required>
-                </label>
-                <mat-error *ngIf="name.hasError('required')" [innerHTML]="'COLOR.NAME.REQUIRED' | translate">
-                </mat-error>
-                <mat-error *ngIf="errors['code']">
-                  {{errors['code']}}
-                </mat-error>
+                <input [formControl]="name" matInput required>
+                @if (name.hasError('required')) {
+                  <mat-error [innerHTML]="'COLOR.NAME.REQUIRED' | translate"></mat-error>
+                } @else if (errors['code']) {
+                  <mat-error>{{ errors['code'] }}</mat-error>
+                }
               </mat-form-field>
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'COLOR.DESCRIPTION.FIELD' | translate }}</mat-label>
-                <label>
-                  <textarea #message formControlName="description" matInput maxlength="256"></textarea>
-                </label>
-                <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
+                <textarea #message formControlName="description" matInput maxlength="256"></textarea>
+                <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
               </mat-form-field>
             </div>
           </mat-card-content>
           <mat-card-actions class="card-actions">
             <div class="spacer"></div>
             <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
-                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
+            </button>
             <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button"
-                    type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}</button>
+                    type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}
+            </button>
           </mat-card-actions>
         </mat-card>
       </form>

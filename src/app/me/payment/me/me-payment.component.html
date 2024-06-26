@@ -8,13 +8,14 @@
                    symbol: payment?.reservation?.room?.currency | currencySymbol}">
             </mat-card-title>
             <mat-card-subtitle>
-              <ng-template [ngIf]="payment?.reservation">
-                <button mat-icon-button [routerLink]="['/', language, 'reservation', payment?.reservation?.id]">
+              @if (payment?.reservation) {
+                <button mat-icon-button [routerLink]="['/', language, 'reservation', payment?.reservation?.id]"
+                        type="button">
                   <mat-icon>visibility</mat-icon>
                 </button>&nbsp;
                 <span [innerHTML]="'ME.PAYMENT.RESERVATION' | translate: {reservationId: payment?.reservation?.id}">
                 </span>
-              </ng-template>
+              }
             </mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
@@ -25,9 +26,11 @@
           <mat-card-actions class="card-actions">
             <div class="spacer"></div>
             <button [form]="typeForm" appBackButton color="accent" mat-fab extended class="icon-button"
-                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
+            </button>
             <button [disabled]="typeForm.invalid" color="primary" mat-fab extended class="icon-button"
-                    type="submit">{{ 'COMMON.BUTTON.PAYMENT' | translate }}</button>
+                    type="submit">{{ 'COMMON.BUTTON.PAYMENT' | translate }}
+            </button>
           </mat-card-actions>
         </mat-card>
       </form>

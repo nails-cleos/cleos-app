@@ -2,20 +2,20 @@
   <div class="card-container">
     <div class="card-content">
       <mat-card appearance="outlined" class="style-card">
-        <ng-template [ngIf]="isAddMode" [ngIfElse]="headerEditMode">
+        @if (isAddMode) {
           <mat-card-header>
             <mat-card-title>{{ 'CATALOGUE.TITLE' | translate }}</mat-card-title>
           </mat-card-header>
-        </ng-template>
-        <ng-template #headerEditMode>
+        } @else {
           <mat-card-header>
             <mat-card-title>{{ 'CATALOGUE.DETAIL' | translate }}</mat-card-title>
-            <mat-card-subtitle *ngIf="catalogue; else skeleton">{{ catalogue.name }}</mat-card-subtitle>
-            <ng-template #skeleton>
+            @if (catalogue) {
+              <mat-card-subtitle>{{ catalogue.name }}</mat-card-subtitle>
+            } @else {
               <div class="ssc-line"></div>
-            </ng-template>
+            }
           </mat-card-header>
-        </ng-template>
+        }
         <form (ngSubmit)="submit" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
           <mat-card-content>
             <div class="inner-container">
@@ -24,12 +24,11 @@
                 <label>
                   <input formControlName="name" autocomplete="name" matInput required>
                 </label>
-                <mat-error *ngIf="getForm.name.hasError('required')"
-                           [innerHTML]="'CATALOGUE.NAME.REQUIRED' | translate">
-                </mat-error>
-                <mat-error *ngIf="errors['name']">
-                  {{ errors['name'] }}
-                </mat-error>
+                @if (getForm.name.hasError('required')) {
+                  <mat-error [innerHTML]="'CATALOGUE.NAME.REQUIRED' | translate"></mat-error>
+                } @else if (errors['name']) {
+                  <mat-error>{{ errors['name'] }}</mat-error>
+                }
               </mat-form-field>
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'CATALOGUE.DESCRIPTION.FIELD' | translate }}</mat-label>
@@ -38,57 +37,58 @@
                 </label>
                 <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
               </mat-form-field>
-              <mat-form-field *ngIf="groups; else skeleton" appearance="outline">
-                <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
-                <label>
+              @if (groups) {
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
                   <input (keydown)="keyDownGroup($event)" formControlName="group" [matAutocomplete]="autoGroup"
                          matInput type="text">
-                </label>
-                <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
-                  <mat-option *ngFor="let group of filteredGroup | async | sortBy: 'asc':'name'" [value]="group">
-                    {{ group.name }}
-                  </mat-option>
-                </mat-autocomplete>
-                <mat-error *ngIf="getForm.group.hasError('requireMatch')"
-                           [innerHTML]="'COMMON.TREATMENT.GROUP.INVALID' | translate">
-                </mat-error>
-                <mat-error *ngIf="errors['group']">
-                  {{ errors['group'] }}
-                </mat-error>
-              </mat-form-field>
-              <ng-template #skeleton>
+                  <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
+                    @for (group of filteredGroup | async | sortBy: 'asc':'name'; track group) {
+                      <mat-option [value]="group">{{ group.name }}</mat-option>
+                    }
+                  </mat-autocomplete>
+                  @if (getForm.group.hasError('requireMatch')) {
+                    <mat-error [innerHTML]="'COMMON.TREATMENT.GROUP.INVALID' | translate"></mat-error>
+                  } @else if (errors['group']) {
+                    <mat-error>{{ errors['group'] }}</mat-error>
+                  }
+                </mat-form-field>
+              } @else {
                 <div class="ssc-line"></div>
-              </ng-template>
-              <div>
-                <mat-checkbox formControlName="home"
-                              color="primary">{{ 'CATALOGUE.SHOW.HOME' | translate }}
-                </mat-checkbox>
-                <mat-checkbox formControlName="catalog"
-                              color="primary">{{ 'CATALOGUE.SHOW.CATALOG' | translate }}
-                </mat-checkbox>
-              </div>
-              <div (fileDropped)="onFileDropped($event)" *ngIf="!file && !resizedImageDataUrl" appDragDrop
-                   class="container hide-xs">
-                <input #fileDropRef (change)="fileBrowseHandler($event)" [multiple]="false"
-                       id="fileDropRef" type="file" accept="image/*"/>
-                <canvas #canvas></canvas>
-                <svg height="64" viewBox="0 0 63 64" width="63" xmlns="http://www.w3.org/2000/svg">
-                  <g fill="#000" fill-rule="nonzero">
-                    <path
-                      d="M42.656 15.135a1.953 1.953 0 0 1-1.391-.578L31.5 4.795l-9.765 9.762a1.97 1.97 0 1 1-2.785-2.785L30.106.616a1.97 1.97 0 0 1 2.785 0l11.157 11.156a1.97 1.97 0 0 1-1.392 3.363z"/>
-                    <path
-                      d="M31.5 36.791a1.97 1.97 0 0 1-1.969-1.969V2.01a1.97 1.97 0 0 1 3.938 0v32.812a1.97 1.97 0 0 1-1.969 1.969z"/>
-                    <path
-                      d="M55.781 63.041H7.22A7.225 7.225 0 0 1 0 55.822V41.385a4.599 4.599 0 0 1 4.594-4.594h7.234a4.567 4.567 0 0 1 4.402 3.276l2.814 9.382a.658.658 0 0 0 .628.467h23.656a.658.658 0 0 0 .628-.467l2.814-9.385a4.572 4.572 0 0 1 4.402-3.273h7.234A4.599 4.599 0 0 1 63 41.385v14.437a7.225 7.225 0 0 1-7.219 7.219zM4.594 40.729a.656.656 0 0 0-.657.656v14.437a3.286 3.286 0 0 0 3.282 3.282H55.78a3.286 3.286 0 0 0 3.282-3.282V41.385a.656.656 0 0 0-.657-.656h-7.234a.65.65 0 0 0-.628.467L47.73 50.58a4.628 4.628 0 0 1-4.402 3.274H19.672a4.567 4.567 0 0 1-4.402-3.276l-2.814-9.382a.65.65 0 0 0-.628-.467H4.594z"/>
-                  </g>
-                </svg>
+              }
 
-                <h3 class="catalogue-text">{{ 'CATALOGUE.FILE.DRAG_DROP' | translate }}</h3>
-                <h3 class="catalogue-text">{{ 'CATALOGUE.FILE.OR' | translate }}</h3>
-                <button (click)="fileDropRef.click()" color="accent" mat-fab extended class="icon-button"
-                        type="button">{{ 'CATALOGUE.FILE.CHOOSE' | translate }}
-                </button>
+              <div>
+                <mat-checkbox formControlName="home" color="primary">
+                  {{ 'CATALOGUE.SHOW.HOME' | translate }}
+                </mat-checkbox>
+                <mat-checkbox formControlName="catalog" color="primary">
+                  {{ 'CATALOGUE.SHOW.CATALOG' | translate }}
+                </mat-checkbox>
               </div>
+              @if (!file && !resizedImageDataUrl) {
+                <div (fileDropped)="onFileDropped($event)" appDragDrop
+                     class="container hide-xs">
+                  <input #fileDropRef (change)="fileBrowseHandler($event)" [multiple]="false" id="fileDropRef"
+                         type="file" accept="image/*"/>
+                  <canvas #canvas></canvas>
+                  <svg height="64" viewBox="0 0 63 64" width="63" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#000" fill-rule="nonzero">
+                      <path
+                        d="M42.656 15.135a1.953 1.953 0 0 1-1.391-.578L31.5 4.795l-9.765 9.762a1.97 1.97 0 1 1-2.785-2.785L30.106.616a1.97 1.97 0 0 1 2.785 0l11.157 11.156a1.97 1.97 0 0 1-1.392 3.363z"/>
+                      <path
+                        d="M31.5 36.791a1.97 1.97 0 0 1-1.969-1.969V2.01a1.97 1.97 0 0 1 3.938 0v32.812a1.97 1.97 0 0 1-1.969 1.969z"/>
+                      <path
+                        d="M55.781 63.041H7.22A7.225 7.225 0 0 1 0 55.822V41.385a4.599 4.599 0 0 1 4.594-4.594h7.234a4.567 4.567 0 0 1 4.402 3.276l2.814 9.382a.658.658 0 0 0 .628.467h23.656a.658.658 0 0 0 .628-.467l2.814-9.385a4.572 4.572 0 0 1 4.402-3.273h7.234A4.599 4.599 0 0 1 63 41.385v14.437a7.225 7.225 0 0 1-7.219 7.219zM4.594 40.729a.656.656 0 0 0-.657.656v14.437a3.286 3.286 0 0 0 3.282 3.282H55.78a3.286 3.286 0 0 0 3.282-3.282V41.385a.656.656 0 0 0-.657-.656h-7.234a.65.65 0 0 0-.628.467L47.73 50.58a4.628 4.628 0 0 1-4.402 3.274H19.672a4.567 4.567 0 0 1-4.402-3.276l-2.814-9.382a.65.65 0 0 0-.628-.467H4.594z"/>
+                    </g>
+                  </svg>
+
+                  <h3 class="catalogue-text">{{ 'CATALOGUE.FILE.DRAG_DROP' | translate }}</h3>
+                  <h3 class="catalogue-text">{{ 'CATALOGUE.FILE.OR' | translate }}</h3>
+                  <button (click)="fileDropRef.click()" color="accent" mat-fab extended class="icon-button"
+                          type="button">{{ 'CATALOGUE.FILE.CHOOSE' | translate }}
+                  </button>
+                </div>
+              }
               <div class="hide-gt-xs">
                 <button (click)="fileInput.click()" color="accent" mat-fab extended class="icon-button"
                         type="button">{{ 'CATALOGUE.FILE.CHOOSE' | translate }}
@@ -98,51 +98,52 @@
                 <canvas #canvasXs></canvas>
               </div>
 
-              <mat-card appearance="outlined" *ngIf="file && !resizedImageDataUrl" class="divider">
-                <mat-card-header>
-                  <mat-icon class="icon-display" mat-card-avatar>image</mat-icon>
-                  <mat-card-title-group>
-                    <mat-card-title style="margin-left: 20px;">{{ file.name }}</mat-card-title>
-                    <mat-card-subtitle> {{ formatBytes(file.size, 0) }}</mat-card-subtitle>
-                  </mat-card-title-group>
-                  <div class="spacer"></div>
-                  <button (click)="deleteFile" color="warn" mat-icon-button>
-                    <mat-icon>delete</mat-icon>
-                  </button>
-                </mat-card-header>
-                <mat-card-content>
-                  <mat-progress-bar [value]="file.progress"></mat-progress-bar>
-                  <div>
+              @if (file && !resizedImageDataUrl) {
+                <mat-card appearance="outlined" class="divider">
+                  <mat-card-header>
+                    <mat-icon class="icon-display" mat-card-avatar>image</mat-icon>
+                    <mat-card-title-group>
+                      <mat-card-title style="margin-left: 20px;">{{ file.name }}</mat-card-title>
+                      <mat-card-subtitle> {{ formatBytes(file.size, 0) }}</mat-card-subtitle>
+                    </mat-card-title-group>
                     <div class="spacer"></div>
-                    {{ file.progress / 100 | percent }}
-                  </div>
-                </mat-card-content>
-              </mat-card>
+                    <button (click)="deleteFile" color="warn" mat-icon-button type="button">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </mat-card-header>
+                  <mat-card-content>
+                    <mat-progress-bar [value]="file.progress"></mat-progress-bar>
+                    <div>
+                      <div class="spacer"></div>
+                      {{ file.progress / 100 | percent }}
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              }
             </div>
-            <div *ngIf="resizedImageDataUrl" class="divider">
-              <div class="container">
-                <mat-icon (click)="deleteImg" class="delete-img" color="warn">delete
-                </mat-icon>
-                <img [alt]="catalogue?.name" [src]="resizedImageDataUrl" mat-card-image>
+            @if (resizedImageDataUrl) {
+              <div class="divider">
+                <div class="container">
+                  <mat-icon (click)="deleteImg" class="delete-img" color="warn" type="button">delete</mat-icon>
+                  <img [alt]="catalogue?.name" [src]="resizedImageDataUrl" mat-card-image>
+                </div>
               </div>
-            </div>
+            }
           </mat-card-content>
           <mat-card-actions class="card-actions">
             <div class="spacer"></div>
             <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
             </button>
-
-            <ng-template [ngIf]="isAddMode" [ngIfElse]="buttonEditMode">
+            @if (isAddMode) {
               <button [disabled]="form.invalid || file?.progress !== 100" color="primary" mat-fab extended
                       class="icon-button" type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}
               </button>
-            </ng-template>
-            <ng-template #buttonEditMode>
-              <button [disabled]="form.invalid || (!resizedImageDataUrl && file?.progress !== 100)" color="primary" mat-fab extended
-                      class="icon-button" type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}
+            } @else {
+              <button [disabled]="form.invalid || (!resizedImageDataUrl && file?.progress !== 100)" color="primary"
+                      mat-fab extended class="icon-button" type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}
               </button>
-            </ng-template>
+            }
           </mat-card-actions>
         </form>
       </mat-card>
