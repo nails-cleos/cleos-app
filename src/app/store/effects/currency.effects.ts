@@ -50,9 +50,9 @@ export class CurrencyEffects {
 
   delete$ = createEffect(() => this.actions$.pipe(ofType(fromActionsCurrency.CurrencyActionTypes.currencyDelete)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.currencyService.delete(payload).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('CURRENCY.DELETED.MESSAGE', {code: response.code});
+    switchMap((payload: any) => this.currencyService.delete(payload.id).pipe(
+      switchMap(() => {
+        const message = this.translate.instant('CURRENCY.DELETED.MESSAGE', {code: payload.code});
         return of(new fromActionsCurrency.CurrencySaveSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsCurrency.CurrencyFailure({error: err.error})))
     ))

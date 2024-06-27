@@ -31,8 +31,8 @@ export class ColorEffects {
   save$ = createEffect(() => this.actions.pipe(ofType(fromActionsColor.ColorActionTypes.colorSave)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.colorService.add(payload).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('COLOR.CREATED', { name: response.name });
+      switchMap(() => {
+        const message = this.translate.instant('COLOR.CREATED', { name: payload.name });
         return of(new fromActionsColor.ColorSaveSuccess({ message }));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsColor.ColorFailure({ error: err.error })))
     ))
@@ -41,8 +41,9 @@ export class ColorEffects {
   update = createEffect(() => this.actions.pipe(ofType(fromActionsColor.ColorActionTypes.colorUpdate)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.colorService.update(payload).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('COLOR.UPDATED.MESSAGE', { name: response.name });
+      switchMap(() => {
+        const message = this.translate.instant('COLOR.UPDATED.MESSAGE', { name: payload.name });
+        console.log(message)
         return of(new fromActionsColor.ColorSaveSuccess({ message }));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsColor.ColorFailure({ error: err.error })))
     ))
@@ -50,9 +51,9 @@ export class ColorEffects {
 
   delete$ = createEffect(() => this.actions.pipe(ofType(fromActionsColor.ColorActionTypes.colorDelete)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.colorService.delete(payload).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('COLOR.DELETED.MESSAGE', { name: response.name });
+    switchMap((payload: any) => this.colorService.delete(payload.id).pipe(
+      switchMap(() => {
+        const message = this.translate.instant('COLOR.DELETED.MESSAGE', { name: payload.name });
         return of(new fromActionsColor.ColorSaveSuccess({ message }));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsColor.ColorFailure({ error: err.error })))
     ))

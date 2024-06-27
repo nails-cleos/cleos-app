@@ -1,220 +1,201 @@
 <ng-template #stepOne>
-  <form [formGroup]="customerForm">
-    <mat-form-field *ngIf="customers; else skeleton" appearance="outline">
-      <mat-label>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</mat-label>
-      <label>
+  <form [formGroup]="customerForm" (keydown.enter)="$event.preventDefault()">
+    @if (customers) {
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</mat-label>
         <input (keydown)="keyDownHandler($event, customer)" formControlName="customer" [matAutocomplete]="autoCustomer"
-               autocomplete="off" matInput required
-               type="text">
-      </label>
-      <mat-autocomplete #autoCustomer="matAutocomplete" [displayWith]="displayFnUser">
-        <mat-option *ngFor="let customer of filteredCustomer | async" [value]="customer">
-          {{ customer.displayName }}
-        </mat-option>
-      </mat-autocomplete>
-      <mat-error *ngIf="customer.hasError('required')"
-                 [innerHTML]="'RESERVATION.CUSTOMER.REQUIRED' | translate">
-      </mat-error>
-      <mat-error *ngIf="customer.hasError('requireMatch')"
-                 [innerHTML]="'RESERVATION.CUSTOMER.INVALID' | translate">
-      </mat-error>
-      <mat-error *ngIf="errors['customer']">
-        {{ errors['customer'] }}
-      </mat-error>
-    </mat-form-field>
-    <ng-template [ngIf]="customerInfo">
-      <mat-list>
-        <mat-list-item lines="3">
-          <div matListItemTitle>{{ 'RESERVATION.CUSTOMER.INFO.DAYS' | translate: { days: customerInfo.days } }}</div>
-          <div [innerHTML]="'RESERVATION.CUSTOMER.INFO.PROFESSIONAL_NAME' |
+               autocomplete="off" matInput required type="text">
+        <mat-autocomplete #autoCustomer="matAutocomplete" [displayWith]="displayFnUser">
+          @for (customer of filteredCustomer | async; track customer) {
+            <mat-option [value]="customer">{{ customer.displayName }}</mat-option>
+          }
+        </mat-autocomplete>
+        @if (customer.hasError('required')) {
+          <mat-error [innerHTML]="'RESERVATION.CUSTOMER.REQUIRED' | translate"></mat-error>
+        } @else if (customer.hasError('requireMatch')) {
+          <mat-error [innerHTML]="'RESERVATION.CUSTOMER.INVALID' | translate"></mat-error>
+        } @else if (errors['customer']) {
+          <mat-error>{{ errors['customer'] }}</mat-error>
+        }
+      </mat-form-field>
+      @if (customerInfo) {
+        <mat-list>
+          <mat-list-item lines="3">
+            <div matListItemTitle>{{ 'RESERVATION.CUSTOMER.INFO.DAYS' | translate: { days: customerInfo.days } }}</div>
+            <div [innerHTML]="'RESERVATION.CUSTOMER.INFO.PROFESSIONAL_NAME' |
                   translate: {professional: customerInfo.professionalName}" matListItemLine></div>
-          <div [innerHTML]="'RESERVATION.CUSTOMER.INFO.TREATMENT' |
+            <div [innerHTML]="'RESERVATION.CUSTOMER.INFO.TREATMENT' |
                   translate: {treatment: treatmentDetail}" matListItemLine></div>
-        </mat-list-item>
-      </mat-list>
-    </ng-template>
-    <ng-template [ngIf]="!customerInfo && customer.value">
-      <div mat-subheader>{{ 'RESERVATION.CUSTOMER.INFO.NONE' | translate }}</div>
-    </ng-template>
-    <ng-template #skeleton>
+          </mat-list-item>
+        </mat-list>
+      } @else if (customer.value) {
+        <div mat-subheader>{{ 'RESERVATION.CUSTOMER.INFO.NONE' | translate }}</div>
+      }
+    } @else {
       <div class="ssc-line"></div>
-    </ng-template>
+    }
   </form>
 </ng-template>
 
 <ng-template #stepTwo>
-  <form [formGroup]="officeForm">
-    <ng-template [ngIf]="!offices?.length" [ngIfElse]="data">
+  <form [formGroup]="officeForm" (keydown.enter)="$event.preventDefault()">
+    @if (!offices?.length) {
       <div class="no-content bold">{{ 'RESERVATION.ROOM.NO_CONTENT' | translate }}</div>
-    </ng-template>
-    <ng-template #data>
+    } @else {
       <div class="link-container">
-        <mat-form-field *ngIf="offices; else skeleton" appearance="outline">
-          <mat-label>{{ 'COMMON.ROOM.OFFICE.FIELD' | translate }}</mat-label>
-          <label>
+        @if (offices) {
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'COMMON.ROOM.OFFICE.FIELD' | translate }}</mat-label>
             <input (keydown)="keyDownOffice($event)" formControlName="office" [matAutocomplete]="autoOffice"
                    matInput required type="text">
-          </label>
-          <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
-            <mat-option *ngFor="let office of filteredOffice | async " [value]="office">
-              {{ office.name }}
-            </mat-option>
-          </mat-autocomplete>
-          <mat-error *ngIf="office.hasError('required')"
-                     [innerHTML]="'COMMON.ROOM.OFFICE.REQUIRED' | translate">
-          </mat-error>
-          <mat-error *ngIf="office.hasError('requireMatch')"
-                     [innerHTML]="'COMMON.ROOM.OFFICE.INVALID' | translate">
-          </mat-error>
-          <mat-error *ngIf="errors['office']">
-            {{ errors['office'] }}
-          </mat-error>
-        </mat-form-field>
-        <ng-template [ngIf]="roomList">
+            <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
+              @for (office of filteredOffice | async; track office) {
+                <mat-option [value]="office">{{ office.name }}</mat-option>
+              }
+            </mat-autocomplete>
+            @if (office.hasError('required')) {
+              <mat-error [innerHTML]="'COMMON.ROOM.OFFICE.REQUIRED' | translate"></mat-error>
+            } @else if (office.hasError('requireMatch')) {
+              <mat-error [innerHTML]="'COMMON.ROOM.OFFICE.INVALID' | translate"></mat-error>
+            } @else if (errors['office']) {
+              <mat-error>{{ errors['office'] }}</mat-error>
+            }
+          </mat-form-field>
+        } @else {
+          <div class="ssc-line"></div>
+        }
+        @if (roomList) {
           <mat-form-field appearance="outline">
             <mat-label>{{ 'COMMON.ROOM.FIELD' | translate }}</mat-label>
-            <label>
-              <input (keydown)="keyDownRoom($event)" formControlName="room" [matAutocomplete]="autoRoom" matInput
-                     required type="text">
-            </label>
+            <input (keydown)="keyDownRoom($event)" formControlName="room" [matAutocomplete]="autoRoom" matInput
+                   required type="text">
             <mat-autocomplete #autoRoom="matAutocomplete" [displayWith]="displayFnRoom">
-              <mat-option *ngFor="let room of filteredRoom | async" [value]="room">
-                {{ room | roomName }}
-              </mat-option>
+              @for (room of filteredRoom | async; track room) {
+                <mat-option [value]="room">{{ room | roomName }}</mat-option>
+              }
             </mat-autocomplete>
-            <mat-error *ngIf="room.hasError('required')"
-                       [innerHTML]="'COMMON.ROOM.REQUIRED' | translate">
-            </mat-error>
-            <mat-error *ngIf="room.hasError('requireMatch')"
-                       [innerHTML]="'COMMON.ROOM.INVALID' | translate">
-            </mat-error>
-            <mat-error *ngIf="errors['room']">
-              {{ errors['room'] }}
-            </mat-error>
+            @if (room.hasError('required')) {
+              <mat-error [innerHTML]="'COMMON.ROOM.REQUIRED' | translate"></mat-error>
+            } @else if (room.hasError('requireMatch')) {
+              <mat-error [innerHTML]="'COMMON.ROOM.INVALID' | translate"></mat-error>
+            } @else if (errors['room']) {
+              <mat-error>{{ errors['room'] }}</mat-error>
+            }
           </mat-form-field>
-        </ng-template>
-        <ng-template [ngIf]="professionalList">
+        } @else {
+          <div class="ssc-line"></div>
+        }
+        @if (professionalList) {
           <mat-form-field appearance="outline">
             <mat-label>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</mat-label>
-            <label>
-              <input (keydown)="keyDownHandler($event, professional)" formControlName="professional"
-                     [matAutocomplete]="autoProfessional" matInput type="text" required>
-            </label>
+            <input (keydown)="keyDownHandler($event, professional)" formControlName="professional"
+                   [matAutocomplete]="autoProfessional" matInput type="text" required>
             <mat-autocomplete #autoProfessional="matAutocomplete" [displayWith]="displayFnProfessional">
-              <mat-option *ngFor="let professional of filteredProfessional | async" [value]="professional">
-                {{ professional.displayName }}
-              </mat-option>
+              @for (professional of filteredProfessional | async; track professional) {
+                <mat-option [value]="professional">{{ professional.displayName }}</mat-option>
+              }
             </mat-autocomplete>
-            <mat-error *ngIf="professional.hasError('requireMatch')"
-                       [innerHTML]="'COMMON.PROFESSIONAL.INVALID' | translate">
-            </mat-error>
-            <mat-error *ngIf="errors['professional']">
-              {{ errors['professional'] }}
-            </mat-error>
+            @if (professional.hasError('required')) {
+              <mat-error [innerHTML]="'COMMON.PROFESSIONAL.REQUIRED' | translate"></mat-error>
+            } @else if (professional.hasError('requireMatch')) {
+              <mat-error [innerHTML]="'COMMON.PROFESSIONAL.INVALID' | translate"></mat-error>
+            } @else if (errors['professional']) {
+              <mat-error>{{ errors['professional'] }}</mat-error>
+            }
           </mat-form-field>
-        </ng-template>
+        } @else {
+          <div class="ssc-line"></div>
+        }
       </div>
-    </ng-template>
-    <ng-template #skeleton>
-      <div class="ssc-line"></div>
-    </ng-template>
+    }
   </form>
 </ng-template>
 
 <ng-template #stepThree>
-  <form [formGroup]="treatmentForm">
-    <ng-template [ngIf]="!groups?.length" [ngIfElse]="data">
-      <div class="no-content bold">
-        {{ 'RESERVATION.TREATMENT.NO_CONTENT' | translate }}
-      </div>
-    </ng-template>
-    <ng-template #data>
+  <form [formGroup]="treatmentForm" (keydown.enter)="$event.preventDefault()">
+    @if (!groups?.length) {
+      <div class="no-content bold">{{ 'RESERVATION.TREATMENT.NO_CONTENT' | translate }}</div>
+    } @else {
       <div class="link-container">
         <mat-form-field appearance="outline">
           <mat-label>{{ 'RESERVATION.DATE.FIELD' | translate }}</mat-label>
-          <label>
-            <input (focus)="picker.open()" formControlName="date" [matDatepickerFilter]="myFilter"
-                   [matDatepicker]="picker" [max]="maxCalendarDate" matInput required>
-          </label>
+          <input (focus)="picker.open()" formControlName="date" [matDatepickerFilter]="myFilter"
+                 [matDatepicker]="picker" [max]="maxCalendarDate" matInput required>
           <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
           <mat-datepicker #picker touchUi></mat-datepicker>
-          <mat-error *ngIf="date.hasError('required')"
-                     [innerHTML]="'RESERVATION.DATE.REQUIRED' | translate">
-          </mat-error>
+          @if (date.hasError('required')) {
+            <mat-error [innerHTML]="'RESERVATION.DATE.REQUIRED' | translate"></mat-error>
+          }
         </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-label>{{ 'RESERVATION.START.FIELD' | translate }}</mat-label>
-          <label>
-            <input formControlName="start" [format]="24" [max]="maxDate" [min]="minDate" [ngxTimepicker]="tStart"
-                   matInput name="start" readonly/>
-          </label>
+          <input formControlName="start" [format]="24" [max]="maxDate" [min]="minDate" [ngxTimepicker]="tStart"
+                 matInput name="start" readonly/>
           <span matPrefix><mat-icon (click)="tStart.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
           <ngx-material-timepicker #tStart (timeSet)="timeChange($event)" [minutesGap]="15"></ngx-material-timepicker>
         </mat-form-field>
-        <mat-form-field *ngIf="groups; else skeleton" appearance="outline">
-          <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
-          <label>
+        @if (groups) {
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
             <input (keydown)="keyDownGroup($event)" formControlName="group" [matAutocomplete]="autoGroup"
                    matInput required type="text">
-          </label>
-          <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
-            <mat-option *ngFor="let group of filteredGroup | async | sortBy: 'asc':'name'" [value]="group">
-              {{ group.name }}
-            </mat-option>
-          </mat-autocomplete>
-          <mat-error *ngIf="group.hasError('required')"
-                     [innerHTML]="'COMMON.TREATMENT.GROUP.REQUIRED' | translate">
-          </mat-error>
-          <mat-error *ngIf="group.hasError('requireMatch')"
-                     [innerHTML]="'COMMON.TREATMENT.GROUP.INVALID' | translate">
-          </mat-error>
-          <mat-error *ngIf="errors['group']">
-            {{ errors['group'] }}
-          </mat-error>
-        </mat-form-field>
+            <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
+              @for (group of filteredGroup | async | sortBy: 'asc':'name'; track group) {
+                <mat-option [value]="group">{{ group.name }}</mat-option>
+              }
+            </mat-autocomplete>
+            @if (group.hasError('required')) {
+              <mat-error [innerHTML]="'COMMON.TREATMENT.GROUP.REQUIRED' | translate"></mat-error>
+            } @else if (group.hasError('requireMatch')) {
+              <mat-error [innerHTML]="'COMMON.TREATMENT.GROUP.INVALID' | translate"></mat-error>
+            } @else if (errors['group']) {
+              <mat-error>{{ errors['group'] }}</mat-error>
+            }
+          </mat-form-field>
+        } @else {
+          <div class="ssc-line"></div>
+        }
         <div>
-          <ng-template [ngIf]="treatmentList">
+          @if (treatmentList) {
             <mat-form-field appearance="outline">
               <mat-label>{{ 'COMMON.TREATMENT.FIELD' | translate }}</mat-label>
-              <label>
-                <input (keydown)="keyDownHandler($event, treatment)" formControlName="treatment"
-                       [matAutocomplete]="autoTreatment"
-                       matInput required type="text">
-              </label>
+              <input (keydown)="keyDownHandler($event, treatment)" formControlName="treatment"
+                     [matAutocomplete]="autoTreatment" matInput required type="text">
               <mat-autocomplete #autoTreatment="matAutocomplete" [displayWith]="displayFnTreatment">
-                <mat-option *ngFor="let treatment of filteredTreatment | async | sortBy: 'asc':'name'"
-                            [value]="treatment">
-                  {{ treatment.name }}
-                </mat-option>
+                @for (treatment of filteredTreatment | async | sortBy: 'asc':'name'; track treatment) {
+                  <mat-option [value]="treatment">{{ treatment.name }}</mat-option>
+                }
               </mat-autocomplete>
-              <mat-error *ngIf="treatment.hasError('required')"
-                         [innerHTML]="'COMMON.TREATMENT.REQUIRED' | translate">
-              </mat-error>
-              <mat-error *ngIf="treatment.hasError('requireMatch')"
-                         [innerHTML]="'COMMON.TREATMENT.INVALID' | translate">
-              </mat-error>
-              <mat-error *ngIf="errors['treatment']">
-                {{ errors['treatment'] }}
-              </mat-error>
+              @if (treatment.hasError('required')) {
+                <mat-error [innerHTML]="'COMMON.TREATMENT.REQUIRED' | translate"></mat-error>
+              } @else if (treatment.hasError('requireMatch')) {
+                <mat-error [innerHTML]="'COMMON.TREATMENT.INVALID' | translate"></mat-error>
+              } @else if (errors['treatment']) {
+                <mat-error>{{ errors['treatment'] }}</mat-error>
+              }
             </mat-form-field>
-          </ng-template>
-          <ng-template [ngIf]="treatment.value && !isEditing && discounts?.length">
+          } @else {
+            <div class="ssc-line"></div>
+          }
+          @if (treatment.value && !isEditing && discounts?.length) {
             <button (click)="showDiscount = !showDiscount" class="icon-button" mat-fab extended type="button">
               {{ 'COMMON.BUTTON.DISCOUNT.' + (showDiscount ? 'HIDE' : 'SHOW') | translate }}
               <mat-icon>redeem</mat-icon>
             </button>
-          </ng-template>
+          }
         </div>
-        <ng-template [ngIf]="treatment.value && showDiscount && !isEditing">
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate }}</mat-label>
-            <mat-select formControlName="discount">
-              <mat-option>--</mat-option>
-              <mat-option *ngFor="let cd of discounts" [value]="cd.id">{{ cd.title }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </ng-template>
-        <ng-template [ngIf]="treatment.value">
+        @if (treatment.value) {
+          @if (showDiscount && !isEditing) {
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate }}</mat-label>
+              <mat-select formControlName="discount">
+                <mat-option>--</mat-option>
+                @for (d of discounts; track d) {
+                  <mat-option [value]="d.id">{{ d.title }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          }
           <mat-list-item>
             <mat-icon matListItemIcon>spa</mat-icon>
             <div class="bold" matListItemTitle>{{ 'RESERVATION.TREATMENT.DETAIL' | translate }}</div>
@@ -227,93 +208,85 @@
           <mat-list-item>
             <div matListItemTitle>
               <span [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.PRICE' | translate"></span>
-              <ng-template [ngIf]="price.priceWithDiscount" [ngIfElse]="noDiscount">
-                <ng-template [ngIf]="!isEditing" [ngIfElse]="editing">
+              @if (price.priceWithDiscount) {
+                @if (!isEditing) {
                   <span [class.strikethrough]="discount.value" class="raised-button">
                     {{ room.value.currency | currencySymbol }} {{ treatment.value.price | number:'1.2-2' }}
                   </span>
                   <span [@discountAnimation] class="raised-button bold">
                     {{ room.value.currency | currencySymbol }} {{ price.priceWithDiscount | number:'1.2-2' }}
                   </span>
-                </ng-template>
-                <ng-template #editing>
+                } @else {
                   <span class="raised-button">
                     {{ room.value.currency | currencySymbol }} {{ price.priceWithDiscount | number:'1.2-2' }}
                   </span>
                   <span class="raised-button bold">{{ 'RESERVATION.TREATMENT.DISCOUNT.ADD' | translate }}</span>
-                </ng-template>
-              </ng-template>
-              <ng-template #noDiscount>
+                }
+              } @else {
                 <span class="raised-button">
                   {{ room.value.currency | currencySymbol }} {{ treatment.value.price | number:'1.2-2' }}
                 </span>
-              </ng-template>
+              }
             </div>
           </mat-list-item>
           <mat-list-item>
             <div matListItemTitle>
               <span [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.DURATION' | translate"></span>
-              <span class="raised-button">
-                &#9202; {{ treatment.value.duration | durationTime }}
-              </span>
+              <span class="raised-button">&#9202; {{ treatment.value.duration | durationTime }}</span>
             </div>
           </mat-list-item>
-        </ng-template>
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
+        }
       </div>
-    </ng-template>
+    }
   </form>
 </ng-template>
 
 <ng-template #stepFour>
-  <div *ngIf="additionalList; else skeleton">
-    <mat-selection-list #additional (selectionChange)="onChange(additional.selectedOptions.selected)" class="app-class">
-      <mat-divider></mat-divider>
-      @for (it of additionalList; track it) {
-        <mat-list-option [selected]="isSelected(it)" [value]="it" togglePosition="before" lines="3">
-          <div matListItemTitle>{{ it.name }} {{ room.value.currency | currencySymbol }} ({{ it.price | number:'1.2-2' }} -
-            &#9202; {{ it.duration | durationTime }})</div>
-          <ng-template [ngIf]="it.description">
-            <span class="description" matListItemLine>{{ it.description }}</span>
-          </ng-template>
-        </mat-list-option>
-        <mat-divider class="top-space"></mat-divider>
-      }
-    </mat-selection-list>
-  </div>
-  <ng-template #skeleton>
+  @if (additionalList) {
+    <div>
+      <mat-selection-list #additional (selectionChange)="onChange(additional.selectedOptions.selected)"
+                          class="app-class">
+        <mat-divider></mat-divider>
+        @for (it of additionalList; track it) {
+          <mat-list-option [selected]="isSelected(it)" [value]="it" togglePosition="before" lines="3">
+            <div matListItemTitle>{{ it.name }}
+              ({{ room.value.currency | currencySymbol }} {{ it.price | number:'1.2-2' }} -
+              &#9202; {{ it.duration | durationTime }})
+            </div>
+            @if (it.description) {
+              <span class="description" matListItemLine>{{ it.description }}</span>
+            }
+          </mat-list-option>
+          <mat-divider class="top-space"></mat-divider>
+        }
+      </mat-selection-list>
+    </div>
+  } @else {
     <div class="ssc-line"></div>
-  </ng-template>
+  }
 </ng-template>
 
 <ng-template #stepFive>
-  <form [formGroup]="configurationForm">
+  <form [formGroup]="configurationForm" (keydown.enter)="$event.preventDefault()">
     <div class="link-container">
       <mat-checkbox formControlName="customerChange" color="primary">
         {{ 'RESERVATION.CONFIGURATION.CUSTOMER_CHANGE.FIELD' | translate }}
       </mat-checkbox>
       <mat-form-field appearance="outline">
         <mat-label>{{ 'RESERVATION.CONFIGURATION.REFERENCE.FIELD' | translate }}</mat-label>
-        <label>
-          <input formControlName="reference" [required]="customerChange.value" matInput>
-        </label>
-        <mat-error *ngIf="reference.hasError('required')"
-                   [innerHTML]="'RESERVATION.CONFIGURATION.REFERENCE.REQUIRED' | translate">
-        </mat-error>
-        <mat-error *ngIf="errors['reference']">
-          {{ errors['reference'] }}
-        </mat-error>
+        <input formControlName="reference" [required]="customerChange.value" matInput>
+        @if (reference.hasError('required')) {
+          <mat-error [innerHTML]="'RESERVATION.CONFIGURATION.REFERENCE.REQUIRED' | translate"></mat-error>
+        } @else if (errors['reference']) {
+          <mat-error>{{ errors['reference'] }}</mat-error>
+        }
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>{{ 'RESERVATION.NOTE.FIELD' | translate }}</mat-label>
-        <label>
-          <textarea formControlName="note" matInput></textarea>
-        </label>
-        <mat-error *ngIf="errors['note']">
-          {{ errors['note'] }}
-        </mat-error>
+        <textarea formControlName="note" matInput></textarea>
+        @if (errors['note']) {
+          <mat-error>{{ errors['note'] }}</mat-error>
+        }
       </mat-form-field>
     </div>
   </form>
@@ -335,29 +308,32 @@
     [refresh]="refresh"
     [viewDate]="viewDate"
     [weekendDays]="weekendDays"></mwl-calendar-week-view>
-  <mat-error *ngIf="errors['schedule']" [innerHTML]="'RESERVATION.SCHEDULE.REQUIRED' | translate"
-             class="divider"></mat-error>
-  <mat-error *ngIf="errors['overlapping']" [innerHTML]="errors['overlapping']" class="divider">
-  </mat-error>
-  <mat-error *ngIf="errors['professional']" [innerHTML]="errors['professional']" class="divider">
-  </mat-error>
+  @if (errors['schedule']) {
+    <mat-error [innerHTML]="'RESERVATION.SCHEDULE.REQUIRED' | translate" class="divider"></mat-error>
+  }
+  @if (errors['overlapping']) {
+    <mat-error [innerHTML]="errors['overlapping']" class="divider"></mat-error>
+  }
+  @if (errors['professional']) {
+    <mat-error [innerHTML]="errors['professional']" class="divider"></mat-error>
+  }
 </ng-template>
 
 <ng-template #stepSeven>
-  <ng-template [ngIf]="isPreview">
+  @if (isPreview) {
     <mat-card appearance="outlined">
       <mat-card-header>
         <mat-card-title>{{ 'RESERVATION.PREVIEW' | translate }}</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <ng-template [ngIf]="note.value">
+        @if (note.value) {
           <mat-list class="note">
             <mat-list-item>
               <div matListItemTitle>{{ 'RESERVATION.NOTE.FIELD' | translate }}</div>
               <div matListItemLine>{{ note.value }}</div>
             </mat-list-item>
           </mat-list>
-        </ng-template>
+        }
         <mat-list>
           <mat-list-item>
             <div matListItemTitle>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</div>
@@ -397,19 +373,12 @@
             <div matListItemTitle>{{ 'RESERVATION.TREATMENT.DURATION.FIELD' | translate }}</div>
             <div matListItemLine>{{ treatment.value.duration | durationTime }}</div>
           </mat-list-item>
-
-          <ng-template [ngIf]="additionalSelected.length" [ngIfElse]="noAdditional">
+          @if (additionalSelected.length) {
             <mat-list-item>
               <mat-icon matListItemIcon>{{ room.value.currency.icon }}</mat-icon>
               <div matListItemTitle>{{ 'RESERVATION.TREATMENT.PRICE.FIELD' | translate }}</div>
               <div matListItemLine><span class="bold">{{ treatment.value.price | number:'1.2-2' }}</span></div>
             </mat-list-item>
-          </ng-template>
-          <ng-template #noAdditional>
-            <app-price-preview [price]="price" [currencyIcon]="room.value.currency.icon" [isEditing]="isEditing"
-                               [discountKey]="'RESERVATION.TREATMENT.DISCOUNT.ADD'"></app-price-preview>
-          </ng-template>
-          <ng-template [ngIf]="additionalSelected.length">
             <mat-divider></mat-divider>
             <div mat-subheader>{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</div>
             @for (it of additionalSelected; track it) {
@@ -424,8 +393,11 @@
                 <div matListItemLine>&#9202; {{ it.duration | durationTime }}</div>
               </mat-list-item>
             }
-          </ng-template>
-          <ng-template [ngIf]="customerChange.value">
+          } @else {
+            <app-price-preview [price]="price" [currencyIcon]="room.value.currency.icon" [isEditing]="isEditing"
+                               [discountKey]="'RESERVATION.TREATMENT.DISCOUNT.ADD'"></app-price-preview>
+          }
+          @if (customerChange.value) {
             <mat-divider></mat-divider>
             <div mat-subheader>{{ 'RESERVATION.CONFIGURATION.TITLE' | translate }}</div>
             <mat-list-item>
@@ -435,29 +407,29 @@
                 <div matListItemLine class="description">{{ reference.value }}</div>
               </ng-template>
             </mat-list-item>
-          </ng-template>
+          }
           <mat-divider></mat-divider>
           <div mat-subheader>{{ 'RESERVATION.APPOINTMENT' | translate }}</div>
           <mat-list-item>
             <mat-icon matListItemIcon>event</mat-icon>
             <div matListItemTitle>
               {{ event.value.start | date:'short':room.value.timeZone:dateFormat }}
-              <ng-template [ngIf]="showTimeZone">
+              @if (showTimeZone) {
                 <button (click)="openDialog(event.value?.start)" mat-icon-button type="button">
                   <mat-icon>info_outline</mat-icon>
                 </button>
-              </ng-template>
+              }
             </div>
             <div matListItemLine>
               {{ event.value?.end | date:'short':room.value.timeZone:dateFormat }}
-              <ng-template [ngIf]="showTimeZone">
+              @if (showTimeZone) {
                 <button (click)="openDialog(event.value?.end)" mat-icon-button type="button">
                   <mat-icon>info_outline</mat-icon>
                 </button>
-              </ng-template>
+              }
             </div>
           </mat-list-item>
-          <ng-template [ngIf]="additionalSelected.length">
+          @if (additionalSelected.length) {
             <mat-list-item>
               <mat-icon matListItemIcon>timer</mat-icon>
               <div matListItemTitle>{{ 'RESERVATION.TREATMENT.DURATION.FIELD' | translate }}</div>
@@ -465,19 +437,19 @@
             </mat-list-item>
             <app-price-preview [price]="price" [currencyIcon]="room.value.currency.icon" [isEditing]="isEditing"
                                [discountKey]="'RESERVATION.TREATMENT.DISCOUNT.ADD'"></app-price-preview>
-          </ng-template>
+          }
         </mat-list>
       </mat-card-content>
     </mat-card>
-  </ng-template>
+  }
 </ng-template>
 
-<ng-template [ngIfElse]="bigScreen" [ngIf]="smallScreen">
+@if (smallScreen) {
   <mat-vertical-stepper #stepper [linear]="true" (selectionChange)="triggerClick($event)">
     <mat-step [completed]="getStepCompleted(0)" [editable]="getStepEnabled(0)" [state]="getStepName(0)"
               [optional]="getStepOptional(0)" [stepControl]="customerForm">
       <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</ng-template>
-      <ng-template [ngIf]="!isEditing" [ngIfElse]="editing">
+      @if (!isEditing) {
         <div class="flex-container">
           <div class="column-space-between-start">
             <div class="row-space-between-start">
@@ -500,12 +472,11 @@
             <mat-icon>arrow_downward</mat-icon>
           </button>
         </div>
-      </ng-template>
-      <ng-template #editing>
+      } @else {
         <div class="spinner-parent-center">
           <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
         </div>
-      </ng-template>
+      }
     </mat-step>
     <mat-step [completed]="getStepCompleted(1)" [editable]="getStepEnabled(1)" [state]="getStepName(1)"
               [optional]="getStepOptional(1)" [stepControl]="officeForm">
@@ -513,46 +484,39 @@
       <div class="flex-container">
         <div class="column-space-between-start">
           <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
-          <ng-template [ngIf]="room.value">
+          @if (room.value) {
             <mat-form-field appearance="outline">
               <mat-label>{{ 'RESERVATION.ROOM.DETAIL' | translate }}</mat-label>
-              <label>
-                <input [value]="roomDetail" disabled matInput type="text">
-              </label>
+              <input [value]="roomDetail" disabled matInput type="text">
             </mat-form-field>
-            <ng-template [ngIf]="room.value.address && room.value.address.location">
+            @if (room.value.address && room.value.address.location) {
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.ADDRESS.FIELD' | translate }}</mat-label>
-                <label>
-                  <input [value]="room.value.address.name" disabled matInput type="text">
-                </label>
+                <input [value]="room.value.address.name" disabled matInput type="text">
               </mat-form-field>
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.ADDRESS.DESCRIPTION' | translate }}</mat-label>
-                <label>
-                  <input [value]="room.value.address.description" disabled matInput type="text">
-                </label>
+                <input [value]="room.value.address.description" disabled matInput type="text">
               </mat-form-field>
               <div class="vertical-divider"></div>
               <div style="width: 400px">
                 <app-google-map (addressEmitter)="getAddress($event)" [latitudeMarker]="room.value.address.location.y"
                                 [longitudeMarker]="room.value.address.location.x"></app-google-map>
               </div>
-            </ng-template>
-          </ng-template>
+            }
+          }
         </div>
       </div>
       <div class="divider">
-        <ng-template [ngIf]="!isEditing" [ngIfElse]="editButton">
+        @if (!isEditing) {
           <button type="button" (click)="back" color="accent" class="icon-button" mat-fab>
             <mat-icon>arrow_upward</mat-icon>
           </button>
-        </ng-template>
-        <ng-template #editButton>
+        } @else {
           <button type="button" [form]="officeForm" appBackButton color="accent" class="icon-button" mat-fab>
             <mat-icon>keyboard_return</mat-icon>
           </button>
-        </ng-template>
+        }
         <button type="button" (click)="callStepThree(true)" [disabled]="officeForm.invalid" color="primary"
                 class="icon-button" mat-fab>
           <mat-icon>arrow_downward</mat-icon>
@@ -564,16 +528,15 @@
       <ng-template matStepLabel>{{ 'COMMON.TREATMENT.FIELD' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepThree"></ng-container>
       <div class="divider">
-        <ng-template [ngIf]="!isEditing || (isEditing && isAdmin)" [ngIfElse]="editButton">
+        @if (!isEditing || (isEditing && isAdmin)) {
           <button type="button" (click)="back" color="accent" class="icon-button" mat-fab>
             <mat-icon>arrow_upward</mat-icon>
           </button>
-        </ng-template>
-        <ng-template #editButton>
+        } @else {
           <button type="button" [form]="treatmentForm" appBackButton color="accent" class="icon-button" mat-fab>
             <mat-icon>keyboard_return</mat-icon>
           </button>
-        </ng-template>
+        }
         <button type="button" (click)="callStepFour(true)" [disabled]="treatmentForm.invalid" color="primary"
                 class="icon-button" mat-fab>
           <mat-icon>arrow_downward</mat-icon>
@@ -637,24 +600,22 @@
       </div>
     </mat-step>
   </mat-vertical-stepper>
-</ng-template>
-
-<ng-template #bigScreen>
+} @else {
   <mat-horizontal-stepper #stepper [linear]="true" (selectionChange)="triggerClick($event)">
     <mat-step [completed]="getStepCompleted(0)" [editable]="getStepEnabled(0)" [state]="getStepName(0)"
               [optional]="getStepOptional(0)" [stepControl]="customerForm">
       <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</ng-template>
-      <ng-template [ngIf]="!isEditing" [ngIfElse]="editing">
+      @if (!isEditing) {
         <div>
           <div class="flex-container row-space-between-start">
             <ng-container *ngTemplateOutlet="stepOne"></ng-container>
             <div class="vertical-divider"></div>
-            <ng-template [ngIf]="isAdmin">
+            @if (isAdmin) {
               <button type="button" (click)="addCustomer" color="accent" class="icon-button" mat-fab extended>
                 <mat-icon>person_add</mat-icon>
                 {{ 'RESERVATION.CUSTOMER.ADD_BUTTON' | translate }}
               </button>
-            </ng-template>
+            }
           </div>
           <div>
             <button type="button" [form]="customerForm" appBackButton color="accent" class="icon-button" mat-fab
@@ -669,12 +630,11 @@
             </button>
           </div>
         </div>
-      </ng-template>
-      <ng-template #editing>
+      } @else {
         <div class="spinner-parent-center">
           <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
         </div>
-      </ng-template>
+      }
     </mat-step>
     <mat-step [completed]="getStepCompleted(1)" [editable]="getStepEnabled(1)" [state]="getStepName(1)"
               [optional]="getStepOptional(1)" [stepControl]="officeForm">
@@ -683,51 +643,44 @@
         <div class="row-space-between-start">
           <div class="column-space-between-start">
             <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
-            <ng-template [ngIf]="room.value">
+            @if (room.value) {
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'RESERVATION.ROOM.DETAIL' | translate }}</mat-label>
-                <label>
-                  <input [value]="roomDetail" disabled matInput type="text">
-                </label>
+                <input [value]="roomDetail" disabled matInput type="text">
               </mat-form-field>
-              <ng-template [ngIf]="room.value.address && room.value.address.location">
+              @if (room.value.address && room.value.address.location) {
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'COMMON.ADDRESS.FIELD' | translate }}</mat-label>
-                  <label>
-                    <input [value]="room.value.address.name" disabled matInput type="text">
-                  </label>
+                  <input [value]="room.value.address.name" disabled matInput type="text">
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'COMMON.ADDRESS.DESCRIPTION' | translate }}</mat-label>
-                  <label>
-                    <input [value]="room.value.address.description" disabled matInput type="text">
-                  </label>
+                  <input [value]="room.value.address.description" disabled matInput type="text">
                 </mat-form-field>
-              </ng-template>
-            </ng-template>
+              }
+            }
           </div>
-          <ng-template [ngIf]="room.value && room.value.address && room.value.address.location">
+          @if (room.value && room.value.address && room.value.address.location) {
             <div class="vertical-divider"></div>
             <div style="width: 400px">
               <app-google-map (addressEmitter)="getAddress($event)" [latitudeMarker]="room.value.address.location.y"
                               [longitudeMarker]="room.value.address.location.x"></app-google-map>
             </div>
-          </ng-template>
+          }
         </div>
       </div>
       <div class="divider">
-        <ng-template [ngIf]="!isEditing" [ngIfElse]="editButton">
+        @if (!isEditing) {
           <button type="button" (click)="back" color="accent" class="icon-button" mat-fab extended>
             {{ 'COMMON.BUTTON.BACK' | translate }}
             <mat-icon>arrow_back</mat-icon>
           </button>
-        </ng-template>
-        <ng-template #editButton>
+        } @else {
           <button type="button" [form]="officeForm" appBackButton color="accent" class="icon-button" mat-fab extended>
             {{ 'COMMON.BUTTON.BACK' | translate }}
             <mat-icon>keyboard_return</mat-icon>
           </button>
-        </ng-template>
+        }
         <button type="button" (click)="callStepThree(true)" [disabled]="officeForm.invalid" color="primary"
                 class="icon-button" mat-fab extended>
           <mat-icon>arrow_forward</mat-icon>
@@ -740,19 +693,18 @@
       <ng-template matStepLabel>{{ 'COMMON.TREATMENT.FIELD' | translate }}</ng-template>
       <ng-container *ngTemplateOutlet="stepThree"></ng-container>
       <div>
-        <ng-template [ngIf]="!isEditing || (isEditing && isAdmin)" [ngIfElse]="editButton">
+        @if (!isEditing || (isEditing && isAdmin)) {
           <button type="button" (click)="back" color="accent" mat-fab extended class="icon-button">
             <mat-icon>arrow_back</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
-        </ng-template>
-        <ng-template #editButton>
+        } @else {
           <button type="button" [form]="treatmentForm" appBackButton color="accent" mat-fab extended
                   class="icon-button">
             <mat-icon>keyboard_return</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
-        </ng-template>
+        }
         <button type="button" (click)="callStepFour(true)" [disabled]="treatmentForm.invalid" color="primary"
                 mat-fab extended class="icon-button">
           <mat-icon>arrow_forward</mat-icon>
@@ -825,4 +777,4 @@
       </div>
     </mat-step>
   </mat-horizontal-stepper>
-</ng-template>
+}

@@ -80,7 +80,7 @@ export class AdditionalListComponent implements OnInit, AfterViewInit, OnDestroy
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: additional }, result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsAdditional.DeleteAdditional(result.id)
+          new fromActionsAdditional.DeleteAdditional(result)
         );
       }
     });

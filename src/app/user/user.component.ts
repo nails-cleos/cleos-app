@@ -13,9 +13,9 @@ import { fieldChange, valueChange } from '../util/validators';
 import { createAddress } from '../util/helper';
 import { TranslateService } from '@ngx-translate/core';
 import { validColorValidator } from 'ngx-colors';
+import { Role } from '../interfaces/token';
 import PlaceGeometry = google.maps.places.PlaceGeometry;
 import PlaceResult = google.maps.places.PlaceResult;
-import { Role } from '../interfaces/token';
 
 @Component({
   selector: 'app-user',

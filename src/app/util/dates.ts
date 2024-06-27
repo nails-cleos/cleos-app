@@ -20,7 +20,7 @@ import { RRule, Weekday } from 'rrule';
 import { IReservation, IReservationAll } from '../interfaces/reservation';
 import { ITreatmentAll } from '../interfaces/treatment';
 import { IAdditionalAll } from '../interfaces/additional';
-import { toZonedTime, fromZonedTime } from 'date-fns-tz';
+import { fromZonedTime, toZonedTime } from 'date-fns-tz';
 
 export const API_LOCALE = 'en-GB';
 
@@ -714,4 +714,34 @@ export const datesInSameWeek = (date1: Date, date2: Date): boolean => {
   // Check if the dates are in the same week by comparing year and week number
   return copyDate1.getFullYear() === copyDate2.getFullYear() &&
     Math.ceil(dayDiff1 / 7) === Math.ceil(dayDiff2 / 7);
+};
+
+export const getPreviousSunday = (date: Date): Date => {
+  // Create a new Date object based on the input date to avoid modifying the original date
+  const previousSunday = new Date(date);
+
+  // Get the current day of the week (0-6, where 0 is Sunday)
+  const dayOfWeek = previousSunday.getDay();
+
+  // Calculate the difference in days to the previous Sunday
+  const diff = dayOfWeek === 0 ? 0 : dayOfWeek;
+
+  // Subtract the difference in days from the current date
+  previousSunday.setDate(previousSunday.getDate() - diff);
+
+  return previousSunday;
+};
+
+export const searchDates = (allDay: boolean, start: Date, duration: IDuration): [Date, Date] => {
+  let startSearch;
+  let endSearch;
+  if (allDay) {
+    startSearch = createNewDate(start);
+    endSearch = createNewDate(start, 23, 59);
+  } else {
+    startSearch = start;
+    endSearch = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
+  }
+
+  return [startSearch, endSearch];
 };

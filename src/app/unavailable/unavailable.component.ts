@@ -123,7 +123,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
     return executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: this.unavailable }, result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsUnavailable.DeleteUnavailable(result.id)
+          new fromActionsUnavailable.DeleteUnavailable(result)
         );
       }
     });

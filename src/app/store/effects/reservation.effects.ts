@@ -171,9 +171,9 @@ export class ReservationEffects {
 
   delete$ = createEffect(() => this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.reservationDelete)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.reservationService.delete(payload).pipe(
-      switchMap((response) => of(new fromActionsReservation.ReservationSaveSuccess({
-        message: this.translate.instant('RESERVATION.DELETED.MESSAGE', { date: newDateTimestamp(response.timestamp) }),
+    switchMap((payload: any) => this.reservationService.delete(payload.id).pipe(
+      switchMap(() => of(new fromActionsReservation.ReservationSaveSuccess({
+        message: this.translate.instant('RESERVATION.DELETED.MESSAGE', { date: newDateTimestamp(payload.timestamp) }),
         deleted: true,
         role: Role.professional,
         navigate: true
@@ -346,12 +346,12 @@ export class ReservationEffects {
 
   updateNote$ = createEffect(() => this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.updateNote)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.reservationService.addNote(payload.reservationId, payload.note).pipe(
-      switchMap((response: any) => of(new fromActionsReservation.ReservationSaveSuccess({
-        message: this.translate.instant('COMMON.RESERVATION.UPDATED.MESSAGE', { date: newDateTimestamp(response.timestamp) }),
-        id: response.id,
+    switchMap((payload: any) => this.reservationService.addNote(payload.reservation.id, payload.note).pipe(
+      switchMap(() => of(new fromActionsReservation.ReservationSaveSuccess({
+        message: this.translate.instant('COMMON.RESERVATION.UPDATED.MESSAGE', { date: newDateTimestamp(payload.reservation.timestamp) }),
+        id: payload.reservation.id,
         role: payload.role,
-        paymentLink: response.paymentLink,
+        paymentLink: payload.reservation.paymentLink,
         navigate: true
       }))), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({
         error: err.error
@@ -376,12 +376,12 @@ export class ReservationEffects {
 
   updateTimestamp$ = createEffect(() => this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.updateTimestamp)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.reservationService.addTimestamp(payload.reservationId, payload.start).pipe(
-      switchMap((response: any) => of(new fromActionsReservation.ReservationSaveSuccess({
-        message: this.translate.instant('COMMON.RESERVATION.UPDATED.MESSAGE', { date: newDateTimestamp(response.timestamp) }),
-        id: response.id,
+    switchMap((payload: any) => this.reservationService.addTimestamp(payload.reservation.id, payload.start).pipe(
+      switchMap(() => of(new fromActionsReservation.ReservationSaveSuccess({
+        message: this.translate.instant('COMMON.RESERVATION.UPDATED.MESSAGE', { date: newDateTimestamp(payload.reservation.timestamp) }),
+        id: payload.reservation.id,
         role: payload.role,
-        paymentLink: response.paymentLink,
+        paymentLink: payload.reservation.paymentLink,
         navigate: false
       }))), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({
         error: err.error

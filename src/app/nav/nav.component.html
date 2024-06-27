@@ -103,8 +103,9 @@
                 <mat-list-item (click)="notification(not)" class="pointer" matRipple>
                   <div [matTooltip]="not.message" [ngClass]="{ 'gray-text': not.read}" matListItemTitle>
                     @if (!not.read) {
-                      <span class="dot"></span>{{ not.message }}
+                      <span class="dot"></span>
                     }
+                    {{ not.message }}
                   </div>
                   <div [ngClass]="{ 'gray-text': not.read}" matListItemLine>
                     {{ not.notDate | date:'short':undefined:dateFormat }}

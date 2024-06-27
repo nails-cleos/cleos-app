@@ -1,24 +1,26 @@
-<h1 mat-dialog-title>{{'RESERVATION.CANCEL.TITLE' | translate }}</h1>
+<h1 mat-dialog-title>{{ 'RESERVATION.CANCEL.TITLE' | translate }}</h1>
 <div mat-dialog-content>
-  <form [formGroup]="cancelForm">
+  <form [formGroup]="cancelForm" (keydown.enter)="$event.preventDefault()">
     <app-price [price]="price" [typeForm]="typeForm" [options]="paymentOptions" [currency]="currency"
                [firstTime]="true" [showPenalty]="showPenalty" [showBank]="true"></app-price>
     <div class="top-space">
       <mat-label>{{ 'RESERVATION.CANCEL.FIELD' | translate }}</mat-label>
       <mat-radio-group class="radio-group" [formControl]="paymentCancellation">
-        <mat-radio-button class="radio-button" *ngFor="let option of options" [value]="option">
-          <div [innerHTML]="'RESERVATION.CANCEL.OPTION.' + option | translate:{penalty: penalty}"></div>
-        </mat-radio-button>
+        @for (option of options; track option) {
+          <mat-radio-button class="radio-button" [value]="option">
+            <div [innerHTML]="'RESERVATION.CANCEL.OPTION.' + option | translate:{penalty: penalty}"></div>
+          </mat-radio-button>
+        }
       </mat-radio-group>
-      <ng-template *ngIf="paymentCancellation.hasError('required')">
+      @if (paymentCancellation.hasError('required')) {
         <mat-error [innerHTML]="'RESERVATION.CANCEL.REQUIRED' | translate"></mat-error>
-      </ng-template>
+      }
     </div>
   </form>
 </div>
 <div mat-dialog-actions class="card-actions">
   <div class="spacer"></div>
-  <div *ngIf="data.small; else largeButton">
+  @if (data.small) {
     <button (click)="onNoClick" mat-fab>
       <mat-icon>clear</mat-icon>
     </button>
@@ -26,11 +28,10 @@
             mat-fab>
       <mat-icon>event_busy</mat-icon>
     </button>
-  </div>
-  <ng-template #largeButton>
+  } @else {
     <button (click)="onNoClick" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
     <button (click)="doAction" cdkFocusInitial color="primary" [disabled]="cancelForm.invalid || typeForm.invalid"
             mat-fab extended class="icon-button">Ok
     </button>
-  </ng-template>
+  }
 </div>

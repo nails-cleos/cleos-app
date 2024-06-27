@@ -68,9 +68,9 @@ export class CatalogueEffects {
 
   delete$ = createEffect(() => this.actions$.pipe(ofType(fromActionsCatalogue.CatalogueActionTypes.catalogueDelete)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.catalogueService.delete(payload).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('CATALOGUE.DELETED.MESSAGE', { name: response.name });
+    switchMap((payload: any) => this.catalogueService.delete(payload.id).pipe(
+      switchMap(() => {
+        const message = this.translate.instant('CATALOGUE.DELETED.MESSAGE', { name: payload.name });
         return of(new fromActionsCatalogue.CatalogueSaveSuccess({ message }));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({ error: err.error })))
     ))

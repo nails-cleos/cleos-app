@@ -209,7 +209,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     return timeZone ? timeZone.label : '';
   }
 
-  keyDownHandler(event: any, form: AbstractControl<any>): void {
+  keyDownHandler(event: any, form: AbstractControl): void {
     if (event.code === 'Backspace') {
       form.setValue('');
     }

@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { ColorComponent } from './color.component';
-import { ColorDetailComponent } from './detail/color-detail.component';
 import { ColorListComponent } from './list/color-list.component';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ColorRoutingModule } from './color-routing.module';
@@ -17,8 +16,7 @@ import { Observable } from 'rxjs';
 @NgModule({
   declarations: [
     ColorComponent,
-    ColorListComponent,
-    ColorDetailComponent
+    ColorListComponent
   ],
   imports: [
     ColorRoutingModule,

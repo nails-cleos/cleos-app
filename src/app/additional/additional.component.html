@@ -1,107 +1,125 @@
 <div class="flex-container">
   <div class="card-container">
     <div class="card-content">
-      <form (ngSubmit)="submit" [formGroup]="form" novalidate>
+      <form (ngSubmit)="submit" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
         <mat-card appearance="outlined" class="style-card">
-          <ng-template [ngIf]="isAddMode" [ngIfElse]="headerEditMode">
+          @if (isAddMode) {
             <mat-card-header>
               <mat-card-title>{{ 'ADDITIONAL.TITLE' | translate }}</mat-card-title>
             </mat-card-header>
-          </ng-template>
-          <ng-template #headerEditMode>
+          } @else {
             <mat-card-header>
               <mat-card-title>{{ 'ADDITIONAL.DETAIL' | translate }}</mat-card-title>
-              <mat-card-subtitle *ngIf="additional; else skeleton">{{additional.name}}</mat-card-subtitle>
-              <ng-template #skeleton>
+              @if (additional) {
+                <mat-card-subtitle>{{ additional.name }}</mat-card-subtitle>
+              } @else {
                 <div class="ssc-line"></div>
-              </ng-template>
+              }
             </mat-card-header>
-          </ng-template>
-          <mat-card-content>
-            <div class="inner-container">
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'ADDITIONAL.NAME.FIELD' | translate }}</mat-label>
-                <label>
-                  <input formControlName="name" autocomplete="name" matInput required>
-                </label>
-                <mat-error *ngIf="getForm.name.hasError('required')"
-                           [innerHTML]="'ADDITIONAL.NAME.REQUIRED' | translate">
-                </mat-error>
-                <mat-error *ngIf="errors['name']">
-                  {{errors['name']}}
-                </mat-error>
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'ADDITIONAL.DESCRIPTION.FIELD' | translate }}</mat-label>
-                <label>
-                  <textarea #message formControlName="description" matInput maxlength="256"></textarea>
-                </label>
-                <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'ADDITIONAL.DURATION.FIELD' | translate }}</mat-label>
-                <label>
-                  <input formControlName="duration" [format]="24" [ngxTimepicker]="t" matInput
-                         name="duration" required readonly/>
-                </label>
-                <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
-                <ngx-material-timepicker #t [minutesGap]="15"></ngx-material-timepicker>
-                <mat-error *ngIf="getForm.duration.hasError('required')"
-                           [innerHTML]="'ADDITIONAL.DURATION.REQUIRED' | translate">
-                </mat-error>
-                <mat-error *ngIf="errors['duration']">
-                  {{errors['duration']}}
-                </mat-error>
-              </mat-form-field>
-              <div *ngIf="allGroups; else skeleton" class="fields-container" id="groups">
-                <ng-template [ngIf]="allGroups.length || groups.length">
-                  <mat-form-field class="chip-list">
-                    <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
-                    <mat-chip-grid #chipList aria-label="Group selection">
-                      <mat-chip-row (removed)="remove(group)" *ngFor="let group of groups" [removable]="true">
-                        {{group.name}}
-                        <mat-icon matChipRemove>cancel</mat-icon>
-                      </mat-chip-row>
-                      <input #groupInput formControlName="group" [matAutocomplete]="auto"
-                             [matChipInputFor]="chipList">
-                    </mat-chip-grid>
-                    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedGroup($event)">
-                      <mat-option *ngFor="let group of sortGroups(filteredGroup | async)" [value]="group">
-                        {{group.name}}
-                      </mat-option>
-                    </mat-autocomplete>
-                  </mat-form-field>
-                  <button class="hide-gt-xs" [routerLink]="['/', language, 'treatments', 'add']" color="accent" mat-fab type="button">
-                    <mat-icon matPrefix>add</mat-icon>
-                  </button>
-                  <button class="hide-xs" [routerLink]="['/', language, 'treatments', 'add']" color="accent" mat-fab extended type="button">
-                    <mat-icon matPrefix>add</mat-icon>
-                    <span>{{ 'COMMON.TREATMENT.GROUP.ADD_BUTTON' | translate }}</span>
-                  </button>
-                </ng-template>
+          }
+          @if (isAddMode || additional) {
+            <mat-card-content>
+              <div class="inner-container">
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'ADDITIONAL.NAME.FIELD' | translate }}</mat-label>
+                  <label>
+                    <input formControlName="name" autocomplete="name" matInput required>
+                  </label>
+                  @if (getForm.name.hasError('required')) {
+                    <mat-error [innerHTML]="'ADDITIONAL.NAME.REQUIRED' | translate"></mat-error>
+                  } @else if (errors['name']) {
+                    <mat-error>
+                      {{ errors['name'] }}
+                    </mat-error>
+                  }
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'ADDITIONAL.DESCRIPTION.FIELD' | translate }}</mat-label>
+                  <label>
+                    <textarea #message formControlName="description" matInput maxlength="256"></textarea>
+                  </label>
+                  <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'ADDITIONAL.DURATION.FIELD' | translate }}</mat-label>
+                  <label>
+                    <input formControlName="duration" [format]="24" [ngxTimepicker]="t" matInput
+                           name="duration" required readonly/>
+                  </label>
+                  <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
+                  <ngx-material-timepicker #t [minutesGap]="15"></ngx-material-timepicker>
+                  @if (getForm.duration.hasError('required')) {
+                    <mat-error [innerHTML]="'ADDITIONAL.DURATION.REQUIRED' | translate"></mat-error>
+                  } @else if (errors['duration']) {
+                    <mat-error>
+                      {{ errors['duration'] }}
+                    </mat-error>
+                  }
+                </mat-form-field>
+                @if (allGroups) {
+                  <div class="fields-container" id="groups">
+                    @if (allGroups.length || groups.length) {
+                      <mat-form-field class="chip-list">
+                        <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
+                        <mat-chip-grid #chipList aria-label="Group selection">
+                          @for (group of groups; track group) {
+                            <mat-chip-row (removed)="remove(group)" [removable]="true">
+                              {{ group.name }}
+                              <mat-icon matChipRemove>cancel</mat-icon>
+                            </mat-chip-row>
+                          }
+                          <input #groupInput formControlName="group" [matAutocomplete]="auto"
+                                 [matChipInputFor]="chipList">
+                        </mat-chip-grid>
+                        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedGroup($event)">
+                          @for (group of sortGroups(filteredGroup | async); track group) {
+                            <mat-option [value]="group">
+                              {{ group.name }}
+                            </mat-option>
+                          }
+                        </mat-autocomplete>
+                      </mat-form-field>
+                      <button class="hide-gt-xs" [routerLink]="['/', language, 'treatments', 'add']" color="accent"
+                              mat-fab type="button">
+                        <mat-icon matPrefix>add</mat-icon>
+                      </button>
+                      <button class="hide-xs" [routerLink]="['/', language, 'treatments', 'add']" color="accent" mat-fab
+                              extended type="button">
+                        <mat-icon matPrefix>add</mat-icon>
+                        <span>{{ 'COMMON.TREATMENT.GROUP.ADD_BUTTON' | translate }}</span>
+                      </button>
+                    }
+                  </div>
+                } @else {
+                  <div class="ssc-line"></div>
+                }
               </div>
-              <ng-template #skeleton>
-                <div class="ssc-line"></div>
-              </ng-template>
-            </div>
-          </mat-card-content>
-          <mat-card-actions class="card-actions">
-            <div class="spacer"></div>
-            <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
-                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
-            <ng-template [ngIf]="isAddMode" [ngIfElse]="buttonEditMode">
-              <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button"
-                      type="submit">
-                {{ 'COMMON.BUTTON.CREATE' | translate }}
+            </mat-card-content>
+            <mat-card-actions class="card-actions">
+              <div class="spacer"></div>
+              <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
+                {{ 'COMMON.BUTTON.BACK' | translate }}
               </button>
-            </ng-template>
-            <ng-template #buttonEditMode>
-              <button [disabled]="form.invalid"
-                      color="primary" mat-fab extended class="icon-button" type="submit">
-                {{ 'COMMON.BUTTON.UPDATE' | translate }}
-              </button>
-            </ng-template>
-          </mat-card-actions>
+              @if (isAddMode) {
+                <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
+                  {{ 'COMMON.BUTTON.CREATE' | translate }}
+                </button>
+              } @else {
+                <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
+                  {{ 'COMMON.BUTTON.UPDATE' | translate }}
+                </button>
+              }
+            </mat-card-actions>
+          } @else {
+            <mat-card-content>
+              <div class="ssc-hr"></div>
+              <div class="ssc-square mb"></div>
+              <div class="ssc-hr"></div>
+            </mat-card-content>
+            <mat-card-actions class="card-actions">
+              <div class="ssc-head-line"></div>
+            </mat-card-actions>
+          }
         </mat-card>
       </form>
     </div>

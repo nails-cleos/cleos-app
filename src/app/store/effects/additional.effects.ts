@@ -68,9 +68,9 @@ export class AdditionalEffects {
 
   delete$ = createEffect(() => this.actions$.pipe(ofType(fromActionsAdditional.AdditionalActionTypes.additionalDelete)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.additionalService.delete(payload).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('ADDITIONAL.DELETED.MESSAGE', { name: response.name });
+    switchMap((payload: any) => this.additionalService.delete(payload.id).pipe(
+      switchMap(() => {
+        const message = this.translate.instant('ADDITIONAL.DELETED.MESSAGE', { name: payload.name });
         return of(new fromActionsAdditional.AdditionalSaveSuccess({ message }));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsAdditional.AdditionalFailure({ error: err.error })))
     ))

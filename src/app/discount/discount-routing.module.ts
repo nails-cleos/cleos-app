@@ -4,7 +4,6 @@ import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
 import { DiscountsComponent } from './list/discounts.component';
 import { DiscountComponent } from './discount.component';
-import { DiscountDetailComponent } from './detail/discount-detail.component';
 
 const routes: Routes = [
   {
@@ -18,7 +17,7 @@ const routes: Routes = [
     }
   },
   {
-    path: ':id', component: DiscountDetailComponent, canActivate: [authGuard], data: {
+    path: ':id', component: DiscountComponent, canActivate: [authGuard], data: {
       roles: [Role.admin]
     }
   }

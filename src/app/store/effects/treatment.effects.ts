@@ -86,9 +86,9 @@ export class TreatmentEffects {
 
   delete$ = createEffect(() => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.treatmentDelete)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.treatmentService.delete(payload).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('TREATMENT.DELETED.MESSAGE', { name: response.name });
+    switchMap((payload: any) => this.treatmentService.delete(payload.id).pipe(
+      switchMap(() => {
+        const message = this.translate.instant('TREATMENT.DELETED.MESSAGE', { name: payload.name });
         return of(new fromActionsTreatment.TreatmentSaveSuccess({ message }));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsTreatment.TreatmentFailure({ error: err.error })))
     ))

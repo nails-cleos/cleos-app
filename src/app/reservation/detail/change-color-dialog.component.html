@@ -1,6 +1,6 @@
 <h1 mat-dialog-title>{{ 'RESERVATION.TREATMENT.COLOR.CHANGE' | translate }}</h1>
 <div mat-dialog-content>
-  <form [formGroup]="colorForm">
+  <form [formGroup]="colorForm" (keydown.enter)="$event.preventDefault()">
     <mat-form-field *ngIf="colors; else skeleton" appearance="outline">
       <mat-label>{{ 'RESERVATION.TREATMENT.COLOR.FIELD' | translate }}</mat-label>
       <label>

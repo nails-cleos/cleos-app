@@ -1,189 +1,199 @@
 <div class="flex-container">
   <div class="card-container">
     <div class="card-content">
-      <mat-card appearance="outlined">
-        <ng-template [ngIf]="isAddMode" [ngIfElse]="headerEditMode">
-          <mat-card-header>
-            <mat-card-title>{{ 'USER.TITLE' | translate }}</mat-card-title>
-          </mat-card-header>
-        </ng-template>
-        <ng-template #headerEditMode>
-          <mat-card-header>
-            <mat-card-title>{{ 'USER.DETAIL' | translate }}</mat-card-title>
-            <mat-card-subtitle *ngIf="user; else skeleton">{{user.displayName}}</mat-card-subtitle>
-            <ng-template #skeleton>
-              <div class="ssc-line"></div>
-            </ng-template>
-          </mat-card-header>
-        </ng-template>
-
-        <form (ngSubmit)="submit" [formGroup]="form" novalidate>
-          <mat-card-content>
-            <div class="inner-container">
-              <ng-template [ngIf]="isAddMode">
+      <form (ngSubmit)="submit" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+        <mat-card appearance="outlined">
+          @if (isAddMode) {
+            <mat-card-header>
+              <mat-card-title>{{ 'USER.TITLE' | translate }}</mat-card-title>
+            </mat-card-header>
+          } @else {
+            <mat-card-header>
+              <mat-card-title>{{ 'USER.DETAIL' | translate }}</mat-card-title>
+              @if (user) {
+                <mat-card-subtitle>{{ user.displayName }}</mat-card-subtitle>
+              } @else {
+                <div class="ssc-line"></div>
+              }
+            </mat-card-header>
+          }
+          @if (isAddMode || user) {
+            <mat-card-content>
+              <div class="inner-container">
+                @if (isAddMode) {
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ 'USER.ROLE.FIELD' | translate }}</mat-label>
+                    <mat-select formControlName="role" required>
+                      <mat-option value="ROLE_CUSTOMER">{{ 'COMMON.ROLES.ROLE_CUSTOMER' | translate }}</mat-option>
+                      <mat-option
+                        value="ROLE_PROFESSIONAL">{{ 'COMMON.ROLES.ROLE_PROFESSIONAL' | translate }}
+                      </mat-option>
+                      <mat-option value="ROLE_MANAGER">{{ 'COMMON.ROLES.ROLE_MANAGER' | translate }}</mat-option>
+                    </mat-select>
+                    <mat-error [innerHTML]="'USER.ROLE.REQUIRED' | translate">
+                    </mat-error>
+                  </mat-form-field>
+                }
                 <mat-form-field appearance="outline">
-                  <mat-label>{{ 'USER.ROLE.FIELD' | translate }}</mat-label>
-                  <mat-select formControlName="role" required>
-                    <mat-option value="ROLE_CUSTOMER">{{ 'COMMON.ROLES.ROLE_CUSTOMER' | translate }}</mat-option>
-                    <mat-option
-                      value="ROLE_PROFESSIONAL">{{ 'COMMON.ROLES.ROLE_PROFESSIONAL' | translate }}</mat-option>
-                    <mat-option value="ROLE_MANAGER">{{ 'COMMON.ROLES.ROLE_MANAGER' | translate }}</mat-option>
-                  </mat-select>
-                  <mat-error [innerHTML]="'USER.ROLE.REQUIRED' | translate">
-                  </mat-error>
-                </mat-form-field>
-              </ng-template>
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'COMMON.USER.EMAIL.FIELD' | translate }}</mat-label>
-                <label>
+                  <mat-label>{{ 'COMMON.USER.EMAIL.FIELD' | translate }}</mat-label>
                   <input formControlName="email" autocomplete="email" matInput required>
-                </label>
-                <mat-error *ngIf="getForm.email.hasError('email')">
-                  {{ 'COMMON.USER.EMAIL.VALID' | translate }}
-                </mat-error>
-                <mat-error *ngIf="getForm.email.hasError('required')"
-                           [innerHTML]="'COMMON.USER.EMAIL.REQUIRED' | translate">
-                </mat-error>
-                <mat-error *ngIf="errors['email']">
-                  {{errors['email']}}
-                </mat-error>
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'COMMON.USER.LANG.FIELD' | translate }}</mat-label>
-                <span *ngIf="select.value" [class]="'fi  fis fi-' + select.value.icon"
-                      class="margin-right-eight" matPrefix></span>
-                <mat-select #select formControlName="lang" required>
-                  <mat-option *ngFor="let lang of flagList" [value]="lang">
-                    <span [class]="'fi  fis fi-' + lang.icon"></span>
-                    {{ 'COMMON.LANG.' + lang.text | translate }}
-                  </mat-option>
-                </mat-select>
-                <mat-error [innerHTML]="'COMMON.USER.LANG.REQUIRED' | translate">
-                </mat-error>
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'COMMON.USER.DISPLAY_NAME.FIELD' | translate }}</mat-label>
-                <label>
+                  @if (getForm.email.hasError('email')) {
+                    <mat-error [innerHTML]="'COMMON.USER.EMAIL.VALID' | translate"></mat-error>
+                  } @else if (getForm.email.hasError('required')) {
+                    <mat-error [innerHTML]="'COMMON.USER.EMAIL.REQUIRED' | translate"></mat-error>
+                  } @else if (errors['email']) {
+                    <mat-error>{{ errors['email'] }}</mat-error>
+                  }
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'COMMON.USER.LANG.FIELD' | translate }}</mat-label>
+                  @if (select.value) {
+                    <span [class]="'fi  fis fi-' + select.value.icon" class="margin-right-eight" matPrefix></span>
+                  }
+                  <mat-select #select formControlName="lang" required>
+                    @for (lang of flagList; track lang) {
+                      <mat-option [value]="lang">
+                        <span [class]="'fi  fis fi-' + lang.icon"></span>{{ 'COMMON.LANG.' + lang.text | translate }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                  <mat-error [innerHTML]="'COMMON.USER.LANG.REQUIRED' | translate"></mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'COMMON.USER.DISPLAY_NAME.FIELD' | translate }}</mat-label>
                   <input formControlName="displayName" autocomplete="given-name" matInput required>
-                </label>
-                <mat-error *ngIf="getForm.displayName.hasError('required')"
-                           [innerHTML]="'COMMON.USER.DISPLAY_NAME.REQUIRED' | translate">
-                </mat-error>
-                <mat-error *ngIf="errors['displayName']">{{errors['displayName']}}</mat-error>
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'COMMON.USER.PHONE.FIELD' | translate }}</mat-label>
-                <ngx-mat-intl-tel-input [enablePlaceholder]="true" [enableSearch]="true" formControlName="phone"
-                                        [preferredCountries]="['nl']" name="phone"></ngx-mat-intl-tel-input>
-                <mat-error *ngIf="getForm.phone.hasError('validatePhoneNumber')">
-                  {{ 'COMMON.USER.PHONE.INVALID' | translate }}
-                </mat-error>
-                <mat-error *ngIf="errors['phone']">{{errors['phone']}}</mat-error>
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'COMMON.USER.DOB.FIELD' | translate }}</mat-label>
-                <button (click)="picker.open()" mat-icon-button matPrefix>
-                  <mat-icon>today</mat-icon>
-                </button>
-                <label>
+                  @if (getForm.displayName.hasError('required')) {
+                    <mat-error [innerHTML]="'COMMON.USER.DISPLAY_NAME.REQUIRED' | translate"></mat-error>
+                  } @else if (errors['displayName']) {
+                    <mat-error>{{ errors['displayName'] }}</mat-error>
+                  }
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'COMMON.USER.PHONE.FIELD' | translate }}</mat-label>
+                  <ngx-mat-intl-tel-input [enablePlaceholder]="true" [enableSearch]="true" formControlName="phone"
+                                          [preferredCountries]="['nl']" name="phone"></ngx-mat-intl-tel-input>
+                  @if (getForm.phone.hasError('validatePhoneNumber')) {
+                    <mat-error [innerHTML]="'COMMON.USER.PHONE.REQUIRED' | translate"></mat-error>
+                  } @else if (errors['phone']) {
+                    <mat-error>{{ errors['phone'] }}</mat-error>
+                  }
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'COMMON.USER.DOB.FIELD' | translate }}</mat-label>
+                  <button (click)="picker.open()" mat-icon-button matPrefix type="button">
+                    <mat-icon>today</mat-icon>
+                  </button>
                   <input (focus)="picker.open()" formControlName="dob" [matDatepicker]="picker" matInput>
-                </label>
-                <mat-datepicker #picker startView="multi-year" touchUi></mat-datepicker>
-                <mat-error *ngIf="errors['dob']">
-                  {{errors['dob']}}
-                </mat-error>
-              </mat-form-field>
-              <app-google-map [addressFormGroup]="form"
-                              [latitudeMarker]="geometry?.location?.lat() || user?.address?.location?.y"
-                              [longitudeMarker]="geometry?.location?.lng() || user?.address?.location?.x"
-                              (addressEmitter)="getAddress($event)"
-                              [markInfo]="'<b>' + (formattedAddress || user?.address?.name) + '</b>'">
-              </app-google-map>
-              <mat-form-field *ngIf="isProfessionalOrManager" appearance="outline">
-                <mat-label>{{ 'COMMON.PROFESSIONAL.COLOR.DARK.FIELD' | translate }}</mat-label>
-                <input matInput formControlName="darkColor"/>
-                <div matSuffix ngx-colors-trigger formControlName="darkColorPicker" [style.color]="getForm.darkColor.value"
-                     [format]="'hex'" [colorsAnimation]="'popup'" style="margin: 5px">
-                  <mat-icon aria-hidden="false" aria-label="Example palette icon" fontIcon="palette"></mat-icon>
-                </div>
-                <mat-error *ngIf="getForm.darkColor.hasError('invalidColor')">
-                  {{ 'COMMON.PROFESSIONAL.COLOR.INVALID' | translate }}
-                </mat-error>
-              </mat-form-field>
-              <mat-form-field *ngIf="isProfessionalOrManager" appearance="outline">
-                <mat-label>{{ 'COMMON.PROFESSIONAL.COLOR.LIGHT.FIELD' | translate }}</mat-label>
-                <input matInput formControlName="lightColor"/>
-                <div matSuffix ngx-colors-trigger formControlName="lightColorPicker" [style.color]="getForm.lightColor.value"
-                     [format]="'hex'" [colorsAnimation]="'popup'" style="margin: 5px">
-                  <mat-icon aria-hidden="false" aria-label="Example palette icon" fontIcon="palette"></mat-icon>
-                </div>
-                <mat-error *ngIf="getForm.lightColor.hasError('invalidColor')">
-                  {{ 'COMMON.PROFESSIONAL.COLOR.INVALID' | translate }}
-                </mat-error>
-              </mat-form-field>
-              <div style="width: 100%; display: table;">
-                <div style="display: table-row">
-                  <div style="display: table-cell;">
-                    <mat-card appearance="outlined" *ngIf="isProfessionalOrManager && getForm.darkColor.value"
-                              [style.background-color]="'#363636'">
-                      <mat-card-header>
-                        <mat-card-subtitle [style.color]="'#fafafa'">
-                          {{ 'COMMON.PROFESSIONAL.COLOR.DARK.RESERVATION' | translate }}
-                        </mat-card-subtitle>
-                      </mat-card-header>
-                      <mat-card-content>
-                        <div
-                          [style.background-color]="getForm.darkColor.value"
-                          [style.border-color]="lightenDarkenColor(getForm.darkColor.value, true)"
-                          [style.color]="'#000'"
-                          class="reservation-example">
-                          {{ 'COMMON.PROFESSIONAL.COLOR.RESERVATION' | translate }}
-                        </div>
-                      </mat-card-content>
-                    </mat-card>
+                  <mat-datepicker #picker startView="multi-year" touchUi></mat-datepicker>
+                  @if (errors['dob']) {
+                    <mat-error>{{ errors['dob'] }}</mat-error>
+                  }
+                </mat-form-field>
+                <app-google-map [addressFormGroup]="form" (addressEmitter)="getAddress($event)"
+                                [latitudeMarker]="geometry?.location?.lat() || user?.address?.location?.y"
+                                [longitudeMarker]="geometry?.location?.lng() || user?.address?.location?.x"
+                                [markInfo]="'<b>' + (formattedAddress || user?.address?.name) + '</b>'">
+                </app-google-map>
+                @if (isProfessionalOrManager) {
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ 'COMMON.PROFESSIONAL.COLOR.DARK.FIELD' | translate }}</mat-label>
+                    <input matInput formControlName="darkColor"/>
+                    <div matSuffix ngx-colors-trigger formControlName="darkColorPicker" style="margin: 5px"
+                         [style.color]="getForm.darkColor.value" [format]="'hex'" [colorsAnimation]="'popup'">
+                      <mat-icon aria-hidden="false" aria-label="Example palette icon" fontIcon="palette"></mat-icon>
+                    </div>
+                    @if (getForm.darkColor.hasError('invalidColor')) {
+                      <mat-error>
+                        {{ 'COMMON.PROFESSIONAL.COLOR.INVALID' | translate }}
+                      </mat-error>
+                    }
+                  </mat-form-field>
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ 'COMMON.PROFESSIONAL.COLOR.LIGHT.FIELD' | translate }}</mat-label>
+                    <input matInput formControlName="lightColor"/>
+                    <div matSuffix ngx-colors-trigger formControlName="lightColorPicker"
+                         [style.color]="getForm.lightColor.value"
+                         [format]="'hex'" [colorsAnimation]="'popup'" style="margin: 5px">
+                      <mat-icon aria-hidden="false" aria-label="Example palette icon" fontIcon="palette"></mat-icon>
+                    </div>
+                    @if (getForm.lightColor.hasError('invalidColor')) {
+                      <mat-error>
+                        {{ 'COMMON.PROFESSIONAL.COLOR.INVALID' | translate }}
+                      </mat-error>
+                    }
+                  </mat-form-field>
+                  <div style="width: 100%; display: table;">
+                    <div style="display: table-row">
+                      <div style="display: table-cell;">
+                        @if (getForm.darkColor.value) {
+                          <mat-card appearance="outlined" [style.background-color]="'#363636'">
+                            <mat-card-header>
+                              <mat-card-subtitle [style.color]="'#fafafa'">
+                                {{ 'COMMON.PROFESSIONAL.COLOR.DARK.RESERVATION' | translate }}
+                              </mat-card-subtitle>
+                            </mat-card-header>
+                            <mat-card-content>
+                              <div [style.background-color]="getForm.darkColor.value"
+                                   [style.border-color]="lightenDarkenColor(getForm.darkColor.value, true)"
+                                   [style.color]="'#000'" class="reservation-example">
+                                {{ 'COMMON.PROFESSIONAL.COLOR.RESERVATION' | translate }}
+                              </div>
+                            </mat-card-content>
+                          </mat-card>
+                        }
+                      </div>
+                      <div style="display: table-cell;">
+                        @if (getForm.lightColor.value) {
+                          <mat-card appearance="outlined" [style.background-color]="'#fafafa'">
+                            <mat-card-header>
+                              <mat-card-subtitle [style.color]="'#363636'">
+                                {{ 'COMMON.PROFESSIONAL.COLOR.LIGHT.RESERVATION' | translate }}
+                              </mat-card-subtitle>
+                            </mat-card-header>
+                            <mat-card-content>
+                              <div [style.background-color]="getForm.lightColor.value"
+                                   [style.border-color]="lightenDarkenColor(getForm.lightColor.value, false)"
+                                   [style.color]="'#fff'" class="reservation-example">
+                                {{ 'COMMON.PROFESSIONAL.COLOR.RESERVATION' | translate }}
+                              </div>
+                            </mat-card-content>
+                          </mat-card>
+                        }
+                      </div>
+                    </div>
                   </div>
-                  <div style="display: table-cell;">
-                    <mat-card appearance="outlined" *ngIf="isProfessionalOrManager && getForm.lightColor.value"
-                              [style.background-color]="'#fafafa'">
-                      <mat-card-header>
-                        <mat-card-subtitle [style.color]="'#363636'">
-                          {{ 'COMMON.PROFESSIONAL.COLOR.LIGHT.RESERVATION' | translate }}
-                        </mat-card-subtitle>
-                      </mat-card-header>
-                      <mat-card-content>
-                        <div
-                          [style.background-color]="getForm.lightColor.value"
-                          [style.border-color]="lightenDarkenColor(getForm.lightColor.value, false)"
-                          [style.color]="'#fff'" class="reservation-example">
-                          {{ 'COMMON.PROFESSIONAL.COLOR.RESERVATION' | translate }}
-                        </div>
-                      </mat-card-content>
-                    </mat-card>
-                  </div>
-                </div>
+                }
               </div>
-            </div>
-          </mat-card-content>
-          <mat-card-actions class="card-actions">
-            <div class="spacer"></div>
-            <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
-                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
-            <ng-template [ngIf]="isAddMode" [ngIfElse]="buttonEditMode">
-              <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button"
-                      type="submit">
-                {{ 'COMMON.BUTTON.CREATE' | translate }}
+            </mat-card-content>
+            <mat-card-actions class="card-actions">
+              <div class="spacer"></div>
+              <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
+                {{ 'COMMON.BUTTON.BACK' | translate }}
               </button>
-            </ng-template>
-            <ng-template #buttonEditMode>
-              <button [disabled]="form.invalid || !(!form.pristine || addressUpdated)" color="primary" mat-fab extended
-                      class="icon-button"
-                      type="submit">
-                {{ 'COMMON.BUTTON.UPDATE' | translate }}
-              </button>
-            </ng-template>
-          </mat-card-actions>
-        </form>
-      </mat-card>
+              @if (isAddMode) {
+                <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
+                  {{ 'COMMON.BUTTON.CREATE' | translate }}
+                </button>
+              } @else {
+                <button [disabled]="form.invalid || !(!form.pristine || addressUpdated)" color="primary" mat-fab
+                        extended
+                        class="icon-button" type="submit">
+                  {{ 'COMMON.BUTTON.UPDATE' | translate }}
+                </button>
+              }
+            </mat-card-actions>
+          } @else {
+            <mat-card-content>
+              <div class="ssc-hr"></div>
+              <div class="ssc-square mb"></div>
+              <div class="ssc-hr"></div>
+            </mat-card-content>
+            <mat-card-actions class="card-actions">
+              <div class="ssc-head-line"></div>
+            </mat-card-actions>
+          }
+        </mat-card>
+      </form>
     </div>
   </div>
 </div>

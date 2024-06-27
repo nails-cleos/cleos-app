@@ -51,6 +51,7 @@ import {
   newDateTimestamp,
   plusDays,
   reservationDuration,
+  searchDates,
   totalDuration
 } from '../util/dates';
 import { createBullet, fillNotAvailable, getFrequency, getOverlapEvent, Meta, newEvent } from '../util/event';
@@ -904,7 +905,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
             this.validateUnavailableEvent(start, data);
           }
         } else {
-          recurringEvents = [...recurringEvents, getFrequency(it.repeat, start, it.id, title, this.daysInWeek, 'UNAVAILABLE',
+          const calendarStart = greaterOrEqualsThan(this.viewDate, start) ? this.viewDate : start;
+          recurringEvents = [...recurringEvents, getFrequency(it.repeat, calendarStart, it.id, title, this.daysInWeek, 'UNAVAILABLE',
             'unavailable', it.end, getDurationOrUndefined(it.duration), it.allDay, professionalId)];
         }
       }
@@ -917,29 +919,28 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private validateUnavailableEvent(start: Date, recurring: any): void {
-    const duration = recurring.duration;
-    const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
-    const overlapEvent = getOverlapEvent(this.events, start, end);
+    const [startSearch, endSearch] = searchDates(recurring.allDay, start, recurring.duration);
+    const overlapEvent = getOverlapEvent(this.events, startSearch, endSearch);
     if (overlapEvent.length > 0) {
       overlapEvent.forEach(value => {
         if (value.id !== 'NOT_WORKING_ALL_DAY') {
           this.events = this.events.filter(ev => ev !== value);
           if (value.end) {
-            if (start < value.start && end < value.end) {
-              value.start = end;
+            if (startSearch < value.start && endSearch < value.end) {
+              value.start = endSearch;
               this.events = [...this.events, value];
-            } else if (start > value.start && end > value.end) {
-              value.end = start;
+            } else if (startSearch > value.start && endSearch > value.end) {
+              value.end = startSearch;
               this.events = [...this.events, value];
             }
           }
           if (!this.events.find(ce => ce.id === recurring.path && isSameDay(value.start, ce.start))) {
-            this.createUnavailableEvent(recurring, start, end);
+            this.createUnavailableEvent(recurring, startSearch, endSearch);
           }
         }
       });
     } else {
-      this.createUnavailableEvent(recurring, start, end);
+      this.createUnavailableEvent(recurring, startSearch, endSearch);
     }
   }
 

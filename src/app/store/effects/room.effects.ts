@@ -49,8 +49,8 @@ export class RoomEffects {
   save$ = createEffect(() => this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.roomSave)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.roomService.add(payload).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('ROOM.CREATED', { name: roomName(response) });
+      switchMap(() => {
+        const message = this.translate.instant('ROOM.CREATED', { name: roomName(payload) });
         return of(new fromActionsRoom.RoomSaveSuccess({ message }));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({ error: err.error })))
     ))
@@ -59,8 +59,8 @@ export class RoomEffects {
   update$ = createEffect(() => this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.roomUpdate)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.roomService.update(payload).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('ROOM.UPDATED.MESSAGE', { name: roomName(response) });
+      switchMap(() => {
+        const message = this.translate.instant('ROOM.UPDATED.MESSAGE', { name: roomName(payload) });
         return of(new fromActionsRoom.RoomSaveSuccess({ message }));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({ error: err.error })))
     ))
@@ -78,9 +78,9 @@ export class RoomEffects {
 
   delete$ = createEffect(() => this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.roomDelete)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.roomService.delete(payload).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('ROOM.DELETED.MESSAGE', { name: roomName(response) });
+    switchMap((payload: any) => this.roomService.delete(payload.id).pipe(
+      switchMap(() => {
+        const message = this.translate.instant('ROOM.DELETED.MESSAGE', { name: roomName(payload) });
         return of(new fromActionsRoom.RoomSaveSuccess({ message }));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({ error: err.error })))
     ))

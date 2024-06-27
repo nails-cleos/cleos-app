@@ -184,6 +184,23 @@ export class ProfileComponent implements OnInit, OnDestroy {
     );
   }
 
+  private resizeImageFromUrl(url?: string): void {
+    if (url) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        if (this.canvas?.nativeElement) {
+          const dataUrl = resizeImage(img, this.canvas.nativeElement);
+          if (this.resizedImage) {
+            this.resizedImage.nativeElement.src = dataUrl;
+            this.cdRef.detectChanges()
+          }
+        }
+      };
+      img.src = url;
+    }
+  }
+
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
@@ -191,6 +208,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.user = user;
         this.initials = getDisplayNameInitials(user);
         this.image = getUserImage(user);
+        this.resizeImageFromUrl(this.image);
         this.form.patchValue(state.selected);
         this.address.setValue(this.user?.address?.name);
 
