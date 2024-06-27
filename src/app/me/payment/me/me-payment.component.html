@@ -4,8 +4,8 @@
       <form (ngSubmit)="update" [formGroup]="typeForm" novalidate (keydown.enter)="$event.preventDefault()">
         <mat-card appearance="outlined" class="style-card">
           <mat-card-header>
-            <mat-card-title [innerHTML]="'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate: {amount: payment?.amount | number:'1.2-2',
-                   symbol: payment?.reservation?.room?.currency | currencySymbol}">
+            <mat-card-title
+              [innerHTML]="'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate: {amount: payment?.amount | number:'1.2-2', symbol: payment?.reservation?.room?.currency | currencySymbol}">
             </mat-card-title>
             <mat-card-subtitle>
               @if (payment?.reservation) {
@@ -25,11 +25,11 @@
           </mat-card-content>
           <mat-card-actions class="card-actions">
             <div class="spacer"></div>
-            <button [form]="typeForm" appBackButton color="accent" mat-fab extended class="icon-button"
-                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
+            <button [form]="typeForm" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
+              {{ 'COMMON.BUTTON.BACK' | translate }}
             </button>
-            <button [disabled]="typeForm.invalid" color="primary" mat-fab extended class="icon-button"
-                    type="submit">{{ 'COMMON.BUTTON.PAYMENT' | translate }}
+            <button [disabled]="typeForm.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
+              {{ 'COMMON.BUTTON.PAYMENT' | translate }}
             </button>
           </mat-card-actions>
         </mat-card>

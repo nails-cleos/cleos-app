@@ -1,15 +1,13 @@
 <div>
   <fieldset>
     <legend>{{ 'COMMON.SEARCH.TITLE' | translate }}</legend>
-    <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
+    <form [formGroup]="form" (keydown.enter)="$event.preventDefault()" (ngSubmit)="print">
       <div class="row-column-space-around-center">
         <mat-form-field appearance="outline">
           <mat-label>{{ 'INVOICE.OFFICE.SEARCH' | translate }}</mat-label>
-          <label>
-            <input (keydown)="keyDownHandler($event)" [formControl]="office" [matAutocomplete]="autoOffice"
-                   autocomplete="off" matInput placeholder="{{ 'INVOICE.OFFICE.FIELD' | translate }}"
-                   type="text" required>
-          </label>
+          <input (keydown)="keyDownHandler($event)" [formControl]="office" [matAutocomplete]="autoOffice"
+                 autocomplete="off" matInput placeholder="{{ 'INVOICE.OFFICE.FIELD' | translate }}"
+                 type="text" required>
           <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
             @for (office of filteredOffice | async; track office) {
               <mat-option [value]="office">
@@ -56,18 +54,14 @@
         </mat-form-field>
         <mat-form-field appearance="outline" ngStyle.gt-sm="margin-left: -15px">
           <mat-label>{{ 'INVOICE.SEARCH.START.FIELD' | translate }}</mat-label>
-          <label>
-            <input [formControl]="startNumber" matInput matNativeControl required [type]="'number'" [step]="1"
-                   [min]="1">
-          </label>
+          <input [formControl]="startNumber" matInput matNativeControl required [type]="'number'" [step]="1" [min]="1">
           @if (startNumber.hasError('required')) {
             <mat-error [innerHTML]="'INVOICE.SEARCH.START.REQUIRED' | translate"></mat-error>
           } @else if (startNumber.hasError('min')) {
             <mat-error [innerHTML]="'INVOICE.SEARCH.START.MIN' | translate"></mat-error>
           }
         </mat-form-field>
-        <button color="accent" id="print" mat-fab type="button" (click)="print"
-                [disabled]="!selection.selected.length">
+        <button color="accent" id="print" mat-fab type="submit" [disabled]="!selection.selected.length">
           <mat-icon>print</mat-icon>
         </button>
       </div>

@@ -1,12 +1,13 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectCurrencyState } from '../store/app.states';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Currency, ICurrency } from '../interfaces/currency';
 import * as fromActionsCurrency from '../store/currency.actions';
 import { TranslateService } from '@ngx-translate/core';
+import { fieldChange } from '../util/validators';
 
 @Component({
   selector: 'app-currency',
@@ -14,13 +15,11 @@ import { TranslateService } from '@ngx-translate/core';
   styleUrls: ['./currency.component.scss']
 })
 export class CurrencyComponent implements OnInit, OnDestroy {
-  form!: UntypedFormGroup;
+  @Input() currency?: ICurrency;
 
-  code: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required
-  ]);
-  name: UntypedFormControl = new UntypedFormControl('');
-  icon: UntypedFormControl = new UntypedFormControl('');
+  id?: string;
+  isAddMode: boolean;
+  form!: UntypedFormGroup;
 
   errors: any = [];
   icons = ['attach_money', 'euro', 'currency_pound'];
@@ -30,30 +29,50 @@ export class CurrencyComponent implements OnInit, OnDestroy {
   private readonly language: string;
 
   constructor(private readonly translate: TranslateService, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
-              private router: Router) {
+              private router: Router, private route: ActivatedRoute, private cdRef: ChangeDetectorRef) {
+    this.isAddMode = true;
     this.getState = this.store.select(selectCurrencyState);
     this.language = this.translate.currentLang;
   }
 
-  get create(): void {
+  get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
+    return this.form.controls;
+  }
+
+  get submit(): void {
     if (this.form.invalid) {
       return;
     }
 
     const currency: ICurrency = new Currency();
-    currency.name = this.name.value;
-    currency.code = this.code.value;
-    currency.icon = this.icon.value;
+    currency.code = fieldChange(this.getForm.code as UntypedFormControl, this.currency?.code);
+    currency.name = fieldChange(this.getForm.name as UntypedFormControl, this.currency?.name);
+    currency.icon = fieldChange(this.getForm.icon as UntypedFormControl, this.currency?.icon);
 
-    return this.store.dispatch(
-      new fromActionsCurrency.CurrencySave(currency)
-    );
+    if (this.isAddMode) {
+      return this.store.dispatch(
+        new fromActionsCurrency.CurrencySave(currency)
+      );
+    } else {
+      currency.id = this.id;
+      this.currency = undefined;
+      return this.store.dispatch(new fromActionsCurrency.CurrencyUpdate(currency));
+    }
   }
 
   ngOnInit(): void {
-    this.createForm();
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.id = id;
+    }
     this.clean();
+    this.createForm();
     this.subscribe();
+    this.isAddMode = !this.id;
+    if (!this.isAddMode) {
+      this.getCurrency();
+    }
+    this.cdRef.detectChanges();
   }
 
   ngOnDestroy(): void {
@@ -62,9 +81,9 @@ export class CurrencyComponent implements OnInit, OnDestroy {
 
   private createForm(): void {
     this.form = this.formBuilder.group({
-      name: this.name,
-      code: this.code,
-      icon: this.icon
+      name: [''],
+      code: ['', [Validators.required]],
+      icon: ['']
     });
   }
 
@@ -74,8 +93,25 @@ export class CurrencyComponent implements OnInit, OnDestroy {
     );
   }
 
+  private getCurrency(): void {
+    if (!this.currency) {
+      this.store.dispatch(
+        new fromActionsCurrency.CurrencyFind(this.id)
+      );
+    }
+  }
+
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
+      if (state.selected) {
+        this.currency = {
+          id: state.selected.id,
+          name: state.selected.name,
+          icon: state.selected.icon,
+          code: state.selected.code
+        } as ICurrency;
+        this.form.patchValue(this.currency);
+      }
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;

@@ -1,8 +1,8 @@
-<h1 mat-dialog-title>{{'USER.MERGE.SELECT' | translate }}</h1>
+<h1 mat-dialog-title>{{ 'USER.MERGE.SELECT' | translate }}</h1>
 <div mat-dialog-content>
   <mat-card appearance="outlined" class="style-card">
     <mat-card-header>
-      <mat-card-title>{{ 'USER.MERGE.NEW_USER.TITLE' | translate}}</mat-card-title>
+      <mat-card-title>{{ 'USER.MERGE.NEW_USER.TITLE' | translate }}</mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <mat-list>
@@ -18,57 +18,56 @@
   <div></div>
   <mat-card appearance="outlined" class="style-card">
     <mat-card-header>
-      <mat-card-title>{{ 'USER.MERGE.OLD_USER.TITLE' | translate}}</mat-card-title>
+      <mat-card-title>{{ 'USER.MERGE.OLD_USER.TITLE' | translate }}</mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <form [formGroup]="userForm" (keydown.enter)="$event.preventDefault()">
-        <mat-form-field *ngIf="users; else skeleton" appearance="outline">
-          <mat-label>{{ 'USER.MERGE.OLD_USER.FIELD' | translate }}</mat-label>
-          <label>
+        @if (users) {
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'USER.MERGE.OLD_USER.FIELD' | translate }}</mat-label>
             <input (keydown)="keyDownHandler($event)" [formControl]="user" [matAutocomplete]="autoUser"
-                   autocomplete="off" matInput required
-                   type="text">
-          </label>
-          <mat-autocomplete #autoUser="matAutocomplete" [displayWith]="displayFnUser">
-            <mat-option *ngFor="let user of filteredUser | async" [value]="user">
-              {{user.displayName}}
-            </mat-option>
-          </mat-autocomplete>
-          <mat-error *ngIf="user.hasError('required')"
-                     [innerHTML]="'USER.MERGE.OLD_USER.REQUIRED' | translate">
-          </mat-error>
-          <mat-error *ngIf="user.hasError('requireMatch')"
-                     [innerHTML]="'USER.MERGE.OLD_USER.INVALID' | translate">
-          </mat-error>
-        </mat-form-field>
-        <ng-template #skeleton>
+                   autocomplete="off" matInput required type="text">
+            <mat-autocomplete #autoUser="matAutocomplete" [displayWith]="displayFnUser">
+              @for (user of filteredUser | async; track user) {
+                <mat-option [value]="user">{{ user.displayName }}</mat-option>
+              }
+            </mat-autocomplete>
+            @if (user.hasError('required')) {
+              <mat-error [innerHTML]="'USER.MERGE.OLD_USER.REQUIRED' | translate"></mat-error>
+            } @else if (user.hasError('requireMatch')) {
+              <mat-error [innerHTML]="'USER.MERGE.OLD_USER.INVALID' | translate"></mat-error>
+            }
+          </mat-form-field>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </form>
-      <mat-list *ngIf="!userForm.invalid">
-        <mat-list-item>
-          <div matListItemLine [innerHTML]="'USER.MERGE.NAME' | translate: {name: user.value.displayName}"></div>
-        </mat-list-item>
-        <mat-list-item>
-          <div matListItemLine [innerHTML]="'USER.MERGE.EMAIL' | translate: {email: user.value.email}"></div>
-        </mat-list-item>
-      </mat-list>
+      @if (!userForm.invalid) {
+        <mat-list>
+          <mat-list-item>
+            <div matListItemLine [innerHTML]="'USER.MERGE.NAME' | translate: {name: user.value.displayName}"></div>
+          </mat-list-item>
+          <mat-list-item>
+            <div matListItemLine [innerHTML]="'USER.MERGE.EMAIL' | translate: {email: user.value.email}"></div>
+          </mat-list-item>
+        </mat-list>
+      }
     </mat-card-content>
   </mat-card>
 </div>
 <div mat-dialog-actions class="card-actions">
   <div class="spacer"></div>
-  <div *ngIf="data.small; else largeButton">
+  @if (data.small) {
     <button (click)="onNoClick" mat-icon-button>
       <mat-icon>clear</mat-icon>
     </button>
     <button (click)="doAction" [disabled]="userForm.invalid" cdkFocusInitial color="primary" mat-icon-button>
       <mat-icon>published_with_changes</mat-icon>
     </button>
-  </div>
-  <ng-template #largeButton>
+  } @else {
     <button (click)="onNoClick" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
     <button (click)="doAction" [disabled]="userForm.invalid" cdkFocusInitial color="primary"
-            mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.MERGE' | translate }}</button>
-  </ng-template>
+            mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.MERGE' | translate }}
+    </button>
+  }
 </div>

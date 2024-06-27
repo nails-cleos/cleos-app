@@ -28,10 +28,8 @@
                 <div class="fields-container">
                   <mat-form-field appearance="outline">
                     <mat-label>{{ 'COMMON.CURRENCY.FIELD' | translate }}</mat-label>
-                    <label>
-                      <input (keydown)="keyDownHandler($event)" formControlName="currency" [matAutocomplete]="auto"
-                             matInput required type="text">
-                    </label>
+                    <input (keydown)="keyDownHandler($event)" formControlName="currency" [matAutocomplete]="auto"
+                           matInput required type="text">
                     <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayCurrencyFn">
                       @for (currency of filteredCurrencyOptions | async; track currency) {
                         <mat-option [value]="currency">
@@ -63,10 +61,8 @@
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'ACCOUNT.GIFT.FIELD' | translate }}</mat-label>
                 <mat-icon matIconPrefix>percent</mat-icon>
-                <label>
-                  <input formControlName="gift" matInput required [step]="1" [min]="0" [max]="100"
-                         type="number" (keydown)="keyDownNumberHandler($event)">
-                </label>
+                <input formControlName="gift" matInput required [step]="1" [min]="0" [max]="100"
+                       type="number" (keydown)="keyDownNumberHandler($event)">
                 @if (getForm.gift.hasError('required')) {
                   <mat-error [innerHTML]="'ACCOUNT.GIFT.REQUIRED' | translate"></mat-error>
                 } @else if (getForm.gift.hasError('min')) {
@@ -82,11 +78,12 @@
         </mat-card>
         <mat-card-actions class="card-actions">
           <div class="spacer"></div>
-          <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
-                  type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
+          <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
+            {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
           <button [disabled]="form.invalid || form.pristine" color="primary" mat-fab extended class="icon-button"
-                  type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}
+                  type="submit">
+            {{ 'COMMON.BUTTON.UPDATE' | translate }}
           </button>
         </mat-card-actions>
       </form>

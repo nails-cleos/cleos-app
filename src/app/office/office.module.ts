@@ -4,7 +4,6 @@ import { OfficeRoutingModule } from './office-routing.module';
 import { OfficeComponent } from './office.component';
 import { SharedModule } from '../shared/shared.module';
 import { OfficeListComponent } from './list/office-list.component';
-import { OfficeDetailComponent } from './detail/office-detail.component';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EffectsModule } from '@ngrx/effects';
 import { OfficeEffects } from '../store/effects/office.effects';
@@ -18,8 +17,7 @@ import { Observable } from 'rxjs';
 @NgModule({
   declarations: [
     OfficeComponent,
-    OfficeListComponent,
-    OfficeDetailComponent
+    OfficeListComponent
   ],
   imports: [
     OfficeRoutingModule,

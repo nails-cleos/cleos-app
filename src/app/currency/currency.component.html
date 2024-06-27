@@ -1,54 +1,82 @@
 <div class="flex-container">
   <div class="card-container">
     <div class="card-content">
-      <form (ngSubmit)="create" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+      <form (ngSubmit)="submit" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
         <mat-card appearance="outlined" class="style-card">
-          <mat-card-header>
-            <mat-card-title>{{ 'CURRENCY.TITLE' | translate }}</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="inner-container">
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'CURRENCY.CODE.FIELD' | translate }}</mat-label>
-                <input [formControl]="code" matInput required>
-                @if (code.hasError('required')) {
-                  <mat-error [innerHTML]="'CURRENCY.CODE.REQUIRED' | translate"></mat-error>
-                } @else if (errors['code']) {
-                  <mat-error>{{ errors['code'] }}</mat-error>
-                }
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'CURRENCY.NAME.FIELD' | translate }}</mat-label>
-                <input [formControl]="name" matInput>
-                @if (errors['name']) {
-                  <mat-error>{{ errors['name'] }}</mat-error>
-                }
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'CURRENCY.ICON.FIELD' | translate }}</mat-label>
-                <mat-select [formControl]="icon">
-                  <mat-select-trigger>
-                    <mat-icon>{{ icon.value }}</mat-icon>
-                  </mat-select-trigger>
-                  <mat-option>--</mat-option>
-                  @for (ic of icons; track ic) {
-                    <mat-option [value]="ic">
-                      <mat-icon>{{ ic }}</mat-icon>
-                    </mat-option>
+          @if (isAddMode) {
+            <mat-card-header>
+              <mat-card-title>{{ 'CURRENCY.TITLE' | translate }}</mat-card-title>
+            </mat-card-header>
+          } @else {
+            <mat-card-header>
+              <mat-card-title>{{ 'CURRENCY.DETAIL' | translate }}</mat-card-title>
+              @if (currency) {
+                <mat-card-subtitle>{{ currency.code }}</mat-card-subtitle>
+              } @else {
+                <div class="ssc-line"></div>
+              }
+            </mat-card-header>
+          }
+          @if (isAddMode || currency) {
+            <mat-card-content>
+              <div class="inner-container">
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'CURRENCY.CODE.FIELD' | translate }}</mat-label>
+                  <input formControlName="code" matInput required>
+                  @if (getForm.code.hasError('required')) {
+                    <mat-error [innerHTML]="'CURRENCY.CODE.REQUIRED' | translate"></mat-error>
+                  } @else if (errors['code']) {
+                    <mat-error>{{ errors['code'] }}</mat-error>
                   }
-                </mat-select>
-              </mat-form-field>
-            </div>
-          </mat-card-content>
-          <mat-card-actions class="card-actions">
-            <div class="spacer"></div>
-            <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
-                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
-            </button>
-            <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button"
-                    type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}
-            </button>
-          </mat-card-actions>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'CURRENCY.NAME.FIELD' | translate }}</mat-label>
+                  <input formControlName="name" matInput>
+                  @if (errors['name']) {
+                    <mat-error>{{ errors['name'] }}</mat-error>
+                  }
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'CURRENCY.ICON.FIELD' | translate }}</mat-label>
+                  <mat-select formControlName="icon">
+                    <mat-select-trigger>
+                      <mat-icon>{{ getForm.icon.value }}</mat-icon>
+                    </mat-select-trigger>
+                    <mat-option>--</mat-option>
+                    @for (ic of icons; track ic) {
+                      <mat-option [value]="ic">
+                        <mat-icon>{{ ic }}</mat-icon>
+                      </mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </mat-card-content>
+            <mat-card-actions class="card-actions">
+              <div class="spacer"></div>
+              <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
+                {{ 'COMMON.BUTTON.BACK' | translate }}
+              </button>
+              @if (isAddMode) {
+                <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
+                  {{ 'COMMON.BUTTON.CREATE' | translate }}
+                </button>
+              } @else {
+                <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
+                  {{ 'COMMON.BUTTON.UPDATE' | translate }}
+                </button>
+              }
+            </mat-card-actions>
+          } @else {
+            <mat-card-content>
+              <div class="ssc-hr"></div>
+              <div class="ssc-square mb"></div>
+              <div class="ssc-hr"></div>
+            </mat-card-content>
+            <mat-card-actions class="card-actions">
+              <div class="ssc-head-line"></div>
+            </mat-card-actions>
+          }
         </mat-card>
       </form>
     </div>

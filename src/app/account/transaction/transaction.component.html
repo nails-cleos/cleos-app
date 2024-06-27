@@ -13,10 +13,8 @@
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'ACCOUNT.TRANSACTION.AMOUNT.FIELD' | translate }}</mat-label>
                   <mat-icon matPrefix>{{ currencyIcon }}</mat-icon>
-                  <label>
-                    <input formControlName="amount" matInput matNativeControl required [type]="'number'" [step]="1"
-                           [min]="amountMin">
-                  </label>
+                  <input formControlName="amount" matInput matNativeControl required [type]="'number'" [step]="1"
+                         [min]="amountMin">
                   @if (getForm.amount.hasError('required')) {
                     <mat-error [innerHTML]="'ACCOUNT.TRANSACTION.AMOUNT.REQUIRED' | translate"></mat-error>
                   } @else if (getForm.amount.hasError('min')) {
@@ -34,9 +32,7 @@
                     <mat-label>{{ 'ACCOUNT.TRANSACTION.TYPE.FIELD' | translate }}</mat-label>
                     <mat-select formControlName="type" [required]="true">
                       @for (t of types; track t) {
-                        <mat-option [value]="t">
-                          {{ 'COMMON.PAYMENT.TYPE.' + (t || 'NONE') | translate }}
-                        </mat-option>
+                        <mat-option [value]="t">{{ 'COMMON.PAYMENT.TYPE.' + (t || 'NONE') | translate }}</mat-option>
                       }
                     </mat-select>
                     @if (getForm.type.hasError('required')) {
@@ -48,9 +44,7 @@
                   @if (getForm.type.value === 'TRANSFER') {
                     <mat-form-field appearance="outline">
                       <mat-label>{{ 'ACCOUNT.TRANSACTION.TRANSFER' | translate }}</mat-label>
-                      <label>
-                        <input formControlName="transfer" matInput>
-                      </label>
+                      <input formControlName="transfer" matInput>
                     </mat-form-field>
                   }
                 }
@@ -58,8 +52,8 @@
             </mat-card-content>
             <mat-card-actions class="card-actions">
               <div class="spacer"></div>
-              <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
-                      type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
+              <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
+                {{ 'COMMON.BUTTON.BACK' | translate }}
               </button>
               <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
                 {{ 'COMMON.BUTTON.ADD' | translate }}

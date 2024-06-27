@@ -1,38 +1,66 @@
 <div class="flex-container">
   <div class="card-container">
     <div class="card-content">
-      <form (ngSubmit)="create" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+      <form (ngSubmit)="submit" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
         <mat-card appearance="outlined" class="style-card">
-          <mat-card-header>
-            <mat-card-title>{{ 'COLOR.TITLE' | translate }}</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="inner-container">
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'COLOR.NAME.FIELD' | translate }}</mat-label>
-                <input [formControl]="name" matInput required>
-                @if (name.hasError('required')) {
-                  <mat-error [innerHTML]="'COLOR.NAME.REQUIRED' | translate"></mat-error>
-                } @else if (errors['code']) {
-                  <mat-error>{{ errors['code'] }}</mat-error>
-                }
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'COLOR.DESCRIPTION.FIELD' | translate }}</mat-label>
-                <textarea #message formControlName="description" matInput maxlength="256"></textarea>
-                <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
-              </mat-form-field>
-            </div>
-          </mat-card-content>
-          <mat-card-actions class="card-actions">
-            <div class="spacer"></div>
-            <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
-                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
-            </button>
-            <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button"
-                    type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}
-            </button>
-          </mat-card-actions>
+          @if (isAddMode) {
+            <mat-card-header>
+              <mat-card-title>{{ 'COLOR.TITLE' | translate }}</mat-card-title>
+            </mat-card-header>
+          } @else {
+            <mat-card-header>
+              <mat-card-title>{{ 'COLOR.DETAIL' | translate }}</mat-card-title>
+              @if (color) {
+                <mat-card-subtitle>{{ color.name }}</mat-card-subtitle>
+              } @else {
+                <div class="ssc-line"></div>
+              }
+            </mat-card-header>
+          }
+          @if (isAddMode || color) {
+            <mat-card-content>
+              <div class="inner-container">
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'COLOR.NAME.FIELD' | translate }}</mat-label>
+                  <input formControlName="name" matInput required>
+                  @if (getForm.name.hasError('required')) {
+                    <mat-error [innerHTML]="'COLOR.NAME.REQUIRED' | translate"></mat-error>
+                  } @else if (errors['code']) {
+                    <mat-error>{{ errors['code'] }}</mat-error>
+                  }
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'COLOR.DESCRIPTION.FIELD' | translate }}</mat-label>
+                  <textarea #message formControlName="description" matInput maxlength="256"></textarea>
+                  <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
+                </mat-form-field>
+              </div>
+            </mat-card-content>
+            <mat-card-actions class="card-actions">
+              <div class="spacer"></div>
+              <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
+                {{ 'COMMON.BUTTON.BACK' | translate }}
+              </button>
+              @if (isAddMode) {
+                <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
+                  {{ 'COMMON.BUTTON.CREATE' | translate }}
+                </button>
+              } @else {
+                <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
+                  {{ 'COMMON.BUTTON.UPDATE' | translate }}
+                </button>
+              }
+            </mat-card-actions>
+          } @else {
+            <mat-card-content>
+              <div class="ssc-hr"></div>
+              <div class="ssc-square mb"></div>
+              <div class="ssc-hr"></div>
+            </mat-card-content>
+            <mat-card-actions class="card-actions">
+              <div class="ssc-head-line"></div>
+            </mat-card-actions>
+          }
         </mat-card>
       </form>
     </div>

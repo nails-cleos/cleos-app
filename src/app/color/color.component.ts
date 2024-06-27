@@ -1,12 +1,14 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectColorState } from '../store/app.states';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Color, IColor } from '../interfaces/color';
 import * as fromActionsColor from '../store/color.actions';
 import { TranslateService } from '@ngx-translate/core';
+import { fieldChange, valueChange } from '../util/validators';
+import * as fromActionsOffice from '../store/office.actions';
 
 @Component({
   selector: 'app-colors',
@@ -14,42 +16,62 @@ import { TranslateService } from '@ngx-translate/core';
   styleUrls: ['./color.component.scss']
 })
 export class ColorComponent implements OnInit, OnDestroy {
-  form!: UntypedFormGroup;
+  @Input() color?: IColor;
 
-  name: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required
-  ]);
+  id?: string;
+  isAddMode: boolean;
+  form!: UntypedFormGroup;
 
   errors: any = [];
 
   private getState: Observable<any>;
   private subscription: Subscription | undefined;
-  private language: string;
+  private readonly language: string;
 
   constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router,
-              private translate: TranslateService) {
+              private translate: TranslateService, private route: ActivatedRoute, private cdRef: ChangeDetectorRef) {
+    this.isAddMode = true;
     this.getState = this.store.select(selectColorState);
     this.language = this.translate.currentLang;
   }
 
-  get create(): void {
+  get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
+    return this.form.controls;
+  }
+
+  get submit(): void {
     if (this.form.invalid) {
       return;
     }
 
     const color: IColor = new Color();
-    color.name = this.name.value;
-    color.description = this.form.value.description;
+    color.name = fieldChange(this.getForm.name as UntypedFormControl, this.color?.name);
+    color.description = valueChange(this.getForm.description.value, this.color?.description);
 
-    return this.store.dispatch(
-      new fromActionsColor.ColorSave(color)
-    );
+    if (this.isAddMode) {
+      return this.store.dispatch(
+        new fromActionsColor.ColorSave(color)
+      );
+    } else {
+      color.id = this.id;
+      this.color = undefined;
+      return this.store.dispatch(new fromActionsColor.ColorUpdate(color));
+    }
   }
 
   ngOnInit(): void {
-    this.createForm();
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.id = id;
+    }
     this.clean();
+    this.createForm();
     this.subscribe();
+    this.isAddMode = !this.id;
+    if (!this.isAddMode) {
+      this.getColor();
+    }
+    this.cdRef.detectChanges();
   }
 
   ngOnDestroy(): void {
@@ -58,8 +80,8 @@ export class ColorComponent implements OnInit, OnDestroy {
 
   private createForm(): void {
     this.form = this.formBuilder.group({
-      name: this.name,
-      description: new UntypedFormControl()
+      name: ['', [Validators.required]],
+      description: ['']
     });
   }
 
@@ -69,8 +91,25 @@ export class ColorComponent implements OnInit, OnDestroy {
     );
   }
 
+  private getColor(): void {
+    if (!this.color) {
+      this.store.dispatch(
+        new fromActionsColor.ColorFind(this.id)
+      );
+    }
+  }
+
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
+      console.log(state)
+      if (state.selected) {
+        this.color = {
+          id: state.selected.id,
+          name: state.selected.name,
+          description: state.selected.description
+        } as IColor;
+        this.form.patchValue(this.color);
+      }
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;

@@ -4,7 +4,6 @@ import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
 import { CurrencyComponent } from './currency.component';
 import { CurrencyListComponent } from './list/currency-list.component';
-import { CurrencyDetailComponent } from './detail/currency-detail.component';
 
 const routes: Routes = [
   {
@@ -18,7 +17,7 @@ const routes: Routes = [
     }
   },
   {
-    path: ':id', component: CurrencyDetailComponent, canActivate: [authGuard], data: {
+    path: ':id', component: CurrencyComponent, canActivate: [authGuard], data: {
       roles: [Role.admin]
     }
   }

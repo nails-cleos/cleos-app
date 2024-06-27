@@ -1,133 +1,136 @@
 <div>
   <fieldset>
     <legend>{{ 'COMMON.SEARCH.TITLE' | translate }}</legend>
-    <form [formGroup]="officeForm" (keydown.enter)="$event.preventDefault()">
-      <div *ngIf="!offices?.length; else dataOffice">
-        <button class="only-button" color="accent" mat-fab extended [routerLink]="['/', language, 'rooms', 'add']">
+    <form [formGroup]="officeForm" (keydown.enter)="$event.preventDefault()" (ngSubmit)="search">
+      @if (!offices?.length) {
+        <button class="only-button" color="accent" mat-fab extended [routerLink]="['/', language, 'rooms', 'add']"
+                type="button">
           <mat-icon>add_business</mat-icon> &nbsp;{{ 'RESERVATION.ROOM.TITLE' | translate }}
         </button>
-      </div>
-      <ng-template #dataOffice>
+      } @else {
         <div class="row-column-space-evenly-center">
-          <mat-form-field *ngIf="offices; else skeleton" appearance="outline">
-            <mat-label>{{ 'COMMON.ROOM.OFFICE.FIELD' | translate }}</mat-label>
-            <label>
-              <input (keydown)="keyDownOffice($event)" [formControl]="office" [matAutocomplete]="autoOffice"
-                     matInput required type="text">
-            </label>
-            <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
-              <mat-option *ngFor="let office of filteredOffice | async " [value]="office">
-                {{ office.name }}
-              </mat-option>
-            </mat-autocomplete>
-            <mat-error *ngIf="office.hasError('required')"
-                       [innerHTML]="'COMMON.ROOM.OFFICE.REQUIRED' | translate">
-            </mat-error>
-            <mat-error *ngIf="office.hasError('requireMatch')"
-                       [innerHTML]="'COMMON.ROOM.OFFICE.INVALID' | translate">
-            </mat-error>
-          </mat-form-field>
-          <mat-form-field *ngIf="roomList" appearance="outline">
-            <mat-label>{{ 'COMMON.ROOM.FIELD' | translate }}</mat-label>
-            <label>
-              <input (keydown)="keyDownRoom($event)" [formControl]="room" [matAutocomplete]="autoRoom" matInput
+          @if (offices) {
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'COMMON.ROOM.OFFICE.FIELD' | translate }}</mat-label>
+              <input (keydown)="keyDownOffice($event)" [formControl]="office" [matAutocomplete]="autoOffice" matInput
                      required type="text">
-            </label>
-            <mat-autocomplete #autoRoom="matAutocomplete" [displayWith]="displayFnRoom">
-              <mat-option *ngFor="let room of filteredRoom | async" [value]="room">
-                {{ room | roomName }}
-              </mat-option>
-            </mat-autocomplete>
-            <mat-error *ngIf="room.hasError('required')"
-                       [innerHTML]="'COMMON.ROOM.REQUIRED' | translate">
-            </mat-error>
-            <mat-error *ngIf="room.hasError('requireMatch')"
-                       [innerHTML]="'COMMON.ROOM.INVALID' | translate">
-            </mat-error>
-          </mat-form-field>
-          <mat-form-field *ngIf="professionalList" appearance="outline">
-            <mat-label>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</mat-label>
-            <label>
+              <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
+                @for (office of filteredOffice | async; track office) {
+                  <mat-option [value]="office">{{ office.name }}</mat-option>
+                }
+              </mat-autocomplete>
+              @if (office.hasError('required')) {
+                <mat-error [innerHTML]="'COMMON.ROOM.OFFICE.REQUIRED' | translate"></mat-error>
+              } @else if (office.hasError('requireMatch')) {
+                <mat-error [innerHTML]="'COMMON.ROOM.OFFICE.INVALID' | translate"></mat-error>
+              }
+            </mat-form-field>
+          } @else {
+            <div class="ssc-line"></div>
+          }
+
+          @if (roomList) {
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'COMMON.ROOM.FIELD' | translate }}</mat-label>
+              <input (keydown)="keyDownRoom($event)" [formControl]="room" [matAutocomplete]="autoRoom" matInput required
+                     type="text">
+              <mat-autocomplete #autoRoom="matAutocomplete" [displayWith]="displayFnRoom">
+                @for (room of filteredRoom | async; track room) {
+                  <mat-option [value]="room">{{ room | roomName }}</mat-option>
+                }
+              </mat-autocomplete>
+              @if (room.hasError('required')) {
+                <mat-error [innerHTML]="'COMMON.ROOM.REQUIRED' | translate"></mat-error>
+              } @else if (room.hasError('requireMatch')) {
+                <mat-error [innerHTML]="'COMMON.ROOM.INVALID' | translate"></mat-error>
+              }
+            </mat-form-field>
+          } @else {
+            <div class="ssc-line"></div>
+          }
+          @if (professionalList) {
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</mat-label>
               <input (keydown)="keyDownHandler($event, professional)" [formControl]="professional"
                      [matAutocomplete]="autoProfessional" matInput type="text">
-            </label>
-            <mat-autocomplete #autoProfessional="matAutocomplete" [displayWith]="displayFnProfessional">
-              <mat-option *ngFor="let professional of filteredProfessional | async" [value]="professional">
-                {{ professional.displayName }}
-              </mat-option>
-            </mat-autocomplete>
-            <mat-error *ngIf="professional.hasError('requireMatch')"
-                       [innerHTML]="'COMMON.ROOM.INVALID' | translate">
-            </mat-error>
-          </mat-form-field>
+              <mat-autocomplete #autoProfessional="matAutocomplete" [displayWith]="displayFnProfessional">
+                @for (professional of filteredProfessional | async; track professional) {
+                  <mat-option [value]="professional">{{ professional.displayName }}</mat-option>
+                }
+              </mat-autocomplete>
+              @if (professional.hasError('requireMatch')) {
+                <mat-error [innerHTML]="'COMMON.PROFESSIONAL.INVALID' | translate"></mat-error>
+              }
+            </mat-form-field>
+          } @else {
+            <div class="ssc-line"></div>
+          }
         </div>
-      </ng-template>
-      <ng-template #skeleton>
-        <div class="ssc-line"></div>
-      </ng-template>
+      }
+      <button type="submit" [disabled]="officeForm.invalid" class="hide-gt-xs only-button" color="accent" mat-fab>
+        <mat-icon matPrefix>search</mat-icon>
+      </button>
+      <button type="submit" [disabled]="officeForm.invalid" class="hide-xs only-button" color="accent" mat-fab extended>
+        <mat-icon matPrefix>search</mat-icon>
+        <span>{{ 'COMMON.SEARCH.TITLE' | translate }}</span>
+      </button>
     </form>
-    <button (click)="search" [disabled]="officeForm.invalid" class="hide-gt-xs only-button" color="accent" mat-fab>
-      <mat-icon matPrefix>search</mat-icon>
-    </button>
-    <button (click)="search" [disabled]="officeForm.invalid" class="hide-xs only-button" color="accent" mat-fab
-            extended>
-      <mat-icon matPrefix>search</mat-icon>
-      <span>{{ 'COMMON.SEARCH.TITLE' | translate }}</span>
-    </button>
   </fieldset>
 </div>
 
-<div *ngIf="data && calendar" class="scroll-container">
-  <div class="divider card-actions">
-    <button class="hide-gt-xs" (click)="decrement" color="accent" mat-fab>
-      <mat-icon>navigate_before</mat-icon>
-    </button>
-    <button class="hide-xs" (click)="decrement" color="accent" mat-fab extended>
-      <mat-icon>navigate_before</mat-icon>
-      <span>{{ 'COMMON.BUTTON.PREVIOUS' | translate }}</span>
-    </button>
-    <input (dateChange)="selectDate($event)" [matDatepicker]="picker" [value]="viewDate"
-           hidden matInput [max]="maxDate" [min]="minDate">
-    <mat-datepicker #picker touchUi></mat-datepicker>
-    <button class="hide-gt-xs" (click)="picker.open()" color="primary" mat-fab>
-      <mat-icon>today</mat-icon>
-    </button>
-    <button class="hide-xs" (click)="picker.open()" color="primary" mat-fab extended>
-      <mat-icon>today</mat-icon>
-      <span>{{ 'COMMON.BUTTON.GOTO' | translate }}</span>
-    </button>
-    <button class="hide-gt-xs" (click)="increment" color="accent" mat-fab>
-      <mat-icon>navigate_next</mat-icon>
-    </button>
-    <button class="hide-xs" (click)="increment" color="accent" mat-fab extended>
-      <mat-icon>navigate_next</mat-icon>
-      <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
-    </button>
-    <div class="spacer"></div>
-    <button class="hide-gt-xs" color="accent" mat-fab [routerLink]="['/', language, 'reservation']">
-      <mat-icon>book_online</mat-icon>
-    </button>
-    <button class="hide-xs" color="accent" mat-fab extended [routerLink]="['/', language, 'reservation']">
-      <mat-icon>book_online</mat-icon>
-      <span>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
-    </button>
+@if (data && calendar) {
+  <div class="scroll-container">
+    <div class="divider card-actions">
+      <button class="hide-gt-xs" (click)="decrement" color="accent" mat-fab>
+        <mat-icon>navigate_before</mat-icon>
+      </button>
+      <button class="hide-xs" (click)="decrement" color="accent" mat-fab extended>
+        <mat-icon>navigate_before</mat-icon>
+        <span>{{ 'COMMON.BUTTON.PREVIOUS' | translate }}</span>
+      </button>
+      <input (dateChange)="selectDate($event)" [matDatepicker]="picker" [value]="viewDate"
+             hidden matInput [max]="maxDate" [min]="minDate">
+      <mat-datepicker #picker touchUi></mat-datepicker>
+      <button class="hide-gt-xs" (click)="picker.open()" color="primary" mat-fab>
+        <mat-icon>today</mat-icon>
+      </button>
+      <button class="hide-xs" (click)="picker.open()" color="primary" mat-fab extended>
+        <mat-icon>today</mat-icon>
+        <span>{{ 'COMMON.BUTTON.GOTO' | translate }}</span>
+      </button>
+      <button class="hide-gt-xs" (click)="increment" color="accent" mat-fab>
+        <mat-icon>navigate_next</mat-icon>
+      </button>
+      <button class="hide-xs" (click)="increment" color="accent" mat-fab extended>
+        <mat-icon>navigate_next</mat-icon>
+        <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+      </button>
+      <div class="spacer"></div>
+      <button class="hide-gt-xs" color="accent" mat-fab [routerLink]="['/', language, 'reservation']">
+        <mat-icon>book_online</mat-icon>
+      </button>
+      <button class="hide-xs" color="accent" mat-fab extended [routerLink]="['/', language, 'reservation']">
+        <mat-icon>book_online</mat-icon>
+        <span>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
+      </button>
+    </div>
+    <div class="divider">
+      <mwl-calendar-week-view
+        (beforeViewRender)="beforeMonthViewRender($event)"
+        (eventClicked)="view($event.event)"
+        (hourSegmentClicked)="segmentClick($event.date, calendar.room)"
+        (eventTimesChanged)="eventTimesChanged($event)"
+        [refresh]="refresh"
+        [dayEndHour]="calendar.day!.dayEndHour"
+        [dayEndMinute]="calendar.day!.dayEndMinute"
+        [dayStartHour]="calendar.day!.dayStartHour"
+        [dayStartMinute]="calendar.day!.dayStartMinute"
+        [daysInWeek]="totalDays"
+        [events]="calendar.events"
+        [hourSegments]="hourSegments"
+        [locale]="locale"
+        [viewDate]="viewDate"
+        [weekendDays]="[]"></mwl-calendar-week-view>
+    </div>
   </div>
-  <div class="divider">
-    <mwl-calendar-week-view
-      (beforeViewRender)="beforeMonthViewRender($event)"
-      (eventClicked)="view($event.event)"
-      (hourSegmentClicked)="segmentClick($event.date, calendar.room)"
-      (eventTimesChanged)="eventTimesChanged($event)"
-      [refresh]="refresh"
-      [dayEndHour]="calendar.day!.dayEndHour"
-      [dayEndMinute]="calendar.day!.dayEndMinute"
-      [dayStartHour]="calendar.day!.dayStartHour"
-      [dayStartMinute]="calendar.day!.dayStartMinute"
-      [daysInWeek]="totalDays"
-      [events]="calendar.events"
-      [hourSegments]="hourSegments"
-      [locale]="locale"
-      [viewDate]="viewDate"
-      [weekendDays]="[]"></mwl-calendar-week-view>
-  </div>
-</div>
+}

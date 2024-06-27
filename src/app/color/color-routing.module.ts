@@ -4,7 +4,6 @@ import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
 import { ColorComponent } from './color.component';
 import { ColorListComponent } from './list/color-list.component';
-import { ColorDetailComponent } from './detail/color-detail.component';
 
 const routes: Routes = [
   {
@@ -18,7 +17,7 @@ const routes: Routes = [
     }
   },
   {
-    path: ':id', component: ColorDetailComponent, canActivate: [authGuard], data: {
+    path: ':id', component: ColorComponent, canActivate: [authGuard], data: {
       roles: [Role.admin]
     }
   }

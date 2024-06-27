@@ -2,213 +2,201 @@
   <mat-card appearance="outlined" class="style-card">
     <mat-card-header>
       <mat-card-title>{{ 'RESERVATION.CUSTOMER.DETAIL' | translate }}</mat-card-title>
-      <mat-card-subtitle
-        *ngIf="reservation; else skeleton">{{ reservation.customer.displayName }}
-      </mat-card-subtitle>
-      <ng-template #skeleton>
+      @if (reservation) {
+        <mat-card-subtitle>{{ reservation.customer.displayName }}</mat-card-subtitle>
+      } @else {
         <div class="ssc-line"></div>
-      </ng-template>
+      }
     </mat-card-header>
-    <mat-card-content *ngIf="reservation; else boxSkeleton">
-      <div class="inner-container">
-        <mat-form-field *ngIf="groups; else skeleton" appearance="outline">
-          <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
-          <label>
-            <input (keydown)="keyDownHandler($event, group)" [formControl]="group" [matAutocomplete]="autoGroup"
-                   matInput required type="text">
-          </label>
-          <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
-            <mat-option *ngFor="let group of filteredGroup | async" [value]="group">
-              {{ group.name }}
-            </mat-option>
-          </mat-autocomplete>
-          <mat-error *ngIf="group.hasError('required')"
-                     [innerHTML]="'COMMON.TREATMENT.GROUP.REQUIRED' | translate">
-          </mat-error>
-          <mat-error *ngIf="group.hasError('requireMatch')"
-                     [innerHTML]="'COMMON.TREATMENT.GROUP.INVALID' | translate">
-          </mat-error>
-        </mat-form-field>
-        <ng-template [ngIf]="treatments">
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'COMMON.TREATMENT.FIELD' | translate }}</mat-label>
-            <label>
-              <input (keydown)="keyDownHandler($event, treatment)" [formControl]="treatment"
-                     [matAutocomplete]="autoTreatment"
+    @if (reservation) {
+      <mat-card-content>
+        <div class="inner-container">
+          @if (groups) {
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
+              <input (keydown)="keyDownHandler($event, group)" [formControl]="group" [matAutocomplete]="autoGroup"
                      matInput required type="text">
-            </label>
-            <mat-autocomplete #autoTreatment="matAutocomplete" [displayWith]="displayFnTreatment">
-              <mat-option *ngFor="let treatment of filteredTreatment | async" [value]="treatment">
-                {{ treatment.name }}
-              </mat-option>
-            </mat-autocomplete>
-            <mat-icon matSuffix>spa</mat-icon>
-            <mat-error *ngIf="treatment.hasError('required')"
-                       [innerHTML]="'COMMON.TREATMENT.REQUIRED' | translate">
-            </mat-error>
-            <mat-error *ngIf="treatment.hasError('requireMatch')"
-                       [innerHTML]="'COMMON.TREATMENT.INVALID' | translate">
-            </mat-error>
-          </mat-form-field>
-        </ng-template>
-        <ng-template [ngIf]="colors">
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'COMMON.TREATMENT.COLOR.FIELD' | translate }}</mat-label>
-            <label>
-              <input (keydown)="keyDownHandler($event, color)" [formControl]="color"
-                     [matAutocomplete]="autoColor" matInput type="text">
-            </label>
-            <mat-autocomplete #autoColor="matAutocomplete" [displayWith]="displayFnColor">
-              <mat-option *ngFor="let color of filteredColor | async" [value]="color">
-                {{ color.name }}
-              </mat-option>
-            </mat-autocomplete>
-            <mat-icon matSuffix>palette</mat-icon>
-            <mat-error *ngIf="color.hasError('requireMatch')"
-                       [innerHTML]="'COMMON.TREATMENT.COLOR.INVALID' | translate">
-            </mat-error>
-          </mat-form-field>
-        </ng-template>
-        <div class="fields-container">
-          <mat-form-field appearance="outline" style="width: 100%;">
-            <mat-label>{{ 'RESERVATION.TIME.START.FIELD' | translate }}</mat-label>
-            <label>
-              <input [formControl]="startTime" [format]="24" [ngxTimepicker]="tStart" matInput name="start"
-                     readonly required style="text-align: center;"/>
-            </label>
-            <span matPrefix class="bold" style="margin: 0 5px 0 10px;">
-                  {{ startDate | timeDetail | date:'shortDate':reservation.room.timeZone:dateFormat }}
-                </span>
-            <mat-icon (click)="tStart.open()" matSuffix>schedule</mat-icon>
-            <ngx-material-timepicker #tStart (timeSet)="timeChange($event, startDate)"></ngx-material-timepicker>
-            <mat-error *ngIf="startTime.hasError('required')"
-                       [innerHTML]="'RESERVATION.TIME.START.REQUIRED' | translate">
-            </mat-error>
-          </mat-form-field>
-          <mat-form-field appearance="outline" style="width: 100%;">
-            <mat-label>{{ 'RESERVATION.TIME.END.FIELD' | translate }}</mat-label>
-            <label>
-              <input [formControl]="endTime" [format]="24" [ngxTimepicker]="tEnd" matInput name="end" readonly
-                     required style="text-align: center;"/>
-            </label>
-            <span matPrefix class="bold" style="margin: 0 5px 0 10px;">
-                  {{ endDate | timeDetail | date:'shortDate':reservation.room.timeZone:dateFormat }}
-                </span>
-            <mat-icon (click)="tEnd.open()" matSuffix>schedule</mat-icon>
-            <ngx-material-timepicker #tEnd (timeSet)="timeChange($event, endDate)"></ngx-material-timepicker>
-            <mat-error *ngIf="endTime.hasError('required')"
-                       [innerHTML]="'RESERVATION.TIME.END.REQUIRED' | translate">
-            </mat-error>
-          </mat-form-field>
-        </div>
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
-        <mat-list>
-          <ng-template [ngIf]="group.value && treatment.value">
-            <mat-list-item>
-              <mat-icon matListItemIcon>spa</mat-icon>
-              <div class="bold" matListItemTitle>{{ 'COMMON.TREATMENT.FIELD' | translate }}</div>
-              <ng-template [ngIf]="treatment.value.description">
-                <div
-                  [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.DESCRIPTION' | translate: {description: treatment.value.description}"
-                  matListItemLine>
-                </div>
-              </ng-template>
-            </mat-list-item>
-            <mat-list-item lines="3">
-              <div
-                [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.NAME' | translate: {name: treatment.value.name, group: group.value.name}"
-                matListItemTitle>
-              </div>
-              <div matListItemLine>
-                <span [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.PRICE' | translate"></span>
-                <span
-                  class="vertical-divider bold"> {{ reservation.room.currency | currencySymbol }} {{ price.amount | number:'1.2-2' }}</span>
-              </div>
-            </mat-list-item>
-          </ng-template>
-          <ng-template [ngIf]="additionalList && additionalList.length">
-            <mat-list-item>
-              <mat-icon matListItemIcon>add_post</mat-icon>
-              <div class="bold" matListItemTitle>{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</div>
-            </mat-list-item>
-            <mat-selection-list #additional (selectionChange)="onChange(additional.selectedOptions.selected)">
-              @for (it of additionalList; track it) {
-                <mat-list-option [selected]="isSelected(it)" [value]="it" togglePosition="before">
-                  <div matListItemTitle>{{ it.name }}</div>
-                  <div matListItemLine>
-                          <span>
-                            {{ reservation.room.currency | currencySymbol }} {{ it.price | number:'1.2-2' }}
-                          </span>
-                    &nbsp;&#9202;
-                    <span>{{ it.duration | durationTime }}</span>
-                  </div>
-                </mat-list-option>
+              <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
+                @for (group of filteredGroup | async; track group) {
+                  <mat-option [value]="group">{{ group.name }}</mat-option>
+                }
+              </mat-autocomplete>
+              @if (group.hasError('required')) {
+                <mat-error [innerHTML]="'COMMON.TREATMENT.GROUP.REQUIRED' | translate"></mat-error>
+              } @else if (group.hasError('requireMatch')) {
+                <mat-error [innerHTML]="'COMMON.TREATMENT.GROUP.INVALID' | translate"></mat-error>
               }
-            </mat-selection-list>
-          </ng-template>
-          <mat-divider></mat-divider>
-          <app-form-field-adder [currency]="reservation.room.currency" [key]="'RESERVATION.TREATMENT.EXTRAS.TITLE'"
-                                (onChange)="onExtrasChanges($event)"
-                                (isValid)="isValid = $event"></app-form-field-adder>
-          <mat-divider></mat-divider>
-          <app-price-preview [price]="price" [currencyIcon]="reservation.room.currency.icon" [isEditing]="false"
-                             [label]="'RESERVATION.TREATMENT.COMPLETE.TOTAL'">
-          </app-price-preview>
-        </mat-list>
-        @if (!price.isPaid) {
-          <mat-checkbox (change)="splitChange()" color="primary"
-                        [checked]="split">{{ 'RESERVATION.PAYMENT.SPLIT.CHECKBOX' | translate }}
-          </mat-checkbox>
-          @if (split) {
-            <app-form-field-adder [currency]="reservation.room.currency" [split]="true"
-                                  [key]="'RESERVATION.PAYMENT.SPLIT.TITLE'" [toPaid]="price.toPaid"
-                                  (onChange)="onSplitChanges($event)" (isValid)="isValidSplit = $event"></app-form-field-adder>
+            </mat-form-field>
           } @else {
-            <div class="inner-container">
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'RESERVATION.PAYMENT.TYPE' | translate }}</mat-label>
-                <mat-select [formControl]="type">
-                  @for (t of types; track t) {
-                    <mat-option [value]="t">
-                      {{ 'COMMON.PAYMENT.TYPE.' + (t || 'NONE') | translate }}
-                    </mat-option>
-                  }
-                </mat-select>
-              </mat-form-field>
-              @if (type.value === 'TRANSFER') {
-                <mat-form-field appearance="outline">
-                  <mat-label>{{ 'RESERVATION.PAYMENT.TRANSFER.FIELD' | translate }}</mat-label>
-                  <label>
-                    <input [formControl]="transfer" matInput>
-                  </label>
-                </mat-form-field>
-              }
-            </div>
+            <div class="ssc-line"></div>
           }
-        }
-        <ng-template #skeleton>
-          <div class="ssc-line"></div>
-        </ng-template>
-      </div>
-    </mat-card-content>
-    <ng-template #boxSkeleton>
-      <div class="ssc-hr"></div>
-      <div class="ssc-square mb"></div>
-      <div class="ssc-hr"></div>
-    </ng-template>
-    <mat-card-actions *ngIf="reservation; else buttonSkeleton" class="card-actions">
-      <div class="spacer"></div>
-      <button appBackButton color="accent" mat-fab extended class="icon-button"
-              type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
-      </button>
-      <button [disabled]="group.invalid || treatment.invalid || !isValidSplit" cdkFocusInitial color="primary"
-              mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.COMPLETE' | translate }}
-      </button>
-    </mat-card-actions>
-    <ng-template #buttonSkeleton>
-      <div class="ssc-head-line"></div>
-    </ng-template>
+          @if (treatments) {
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'COMMON.TREATMENT.FIELD' | translate }}</mat-label>
+              <input (keydown)="keyDownHandler($event, treatment)" [formControl]="treatment"
+                     [matAutocomplete]="autoTreatment" matInput required type="text">
+              <mat-autocomplete #autoTreatment="matAutocomplete" [displayWith]="displayFnTreatment">
+                @for (treatment of filteredTreatment | async; track treatment) {
+                  <mat-option [value]="treatment">{{ treatment.name }}</mat-option>
+                }
+              </mat-autocomplete>
+              <mat-icon matSuffix>spa</mat-icon>
+              @if (treatment.hasError('required')) {
+                <mat-error [innerHTML]="'COMMON.TREATMENT.REQUIRED' | translate"></mat-error>
+              } @else if (treatment.hasError('requireMatch')) {
+                <mat-error [innerHTML]="'COMMON.TREATMENT.INVALID' | translate"></mat-error>
+              }
+            </mat-form-field>
+          } @else {
+            <div class="ssc-line"></div>
+          }
+          @if (colors) {
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'COMMON.TREATMENT.COLOR.FIELD' | translate }}</mat-label>
+              <input (keydown)="keyDownHandler($event, color)" [formControl]="color" [matAutocomplete]="autoColor"
+                     matInput type="text">
+              <mat-autocomplete #autoColor="matAutocomplete" [displayWith]="displayFnColor">
+                @for (color of filteredColor | async; track color) {
+                  <mat-option [value]="color">{{ color.name }}</mat-option>
+                }
+              </mat-autocomplete>
+              <mat-icon matSuffix>palette</mat-icon>
+              @if (color.hasError('requireMatch')) {
+                <mat-error [innerHTML]="'COMMON.TREATMENT.COLOR.INVALID' | translate"></mat-error>
+              }
+            </mat-form-field>
+          } @else {
+            <div class="ssc-line"></div>
+          }
+          <div class="fields-container">
+            <mat-form-field appearance="outline" style="width: 100%;">
+              <mat-label>{{ 'RESERVATION.TIME.START.FIELD' | translate }}</mat-label>
+              <input [formControl]="startTime" [format]="24" [ngxTimepicker]="tStart" matInput name="start" readonly
+                     required style="text-align: center;"/>
+              <span matPrefix class="bold" style="margin: 0 5px 0 10px;">
+                {{ startDate | timeDetail | date:'shortDate':reservation.room.timeZone:dateFormat }}
+              </span>
+              <mat-icon (click)="tStart.open()" matSuffix>schedule</mat-icon>
+              <ngx-material-timepicker #tStart (timeSet)="timeChange($event, startDate)"></ngx-material-timepicker>
+              @if (startTime.hasError('required')) {
+                <mat-error [innerHTML]="'RESERVATION.TIME.START.REQUIRED' | translate"></mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field appearance="outline" style="width: 100%;">
+              <mat-label>{{ 'RESERVATION.TIME.END.FIELD' | translate }}</mat-label>
+              <input [formControl]="endTime" [format]="24" [ngxTimepicker]="tEnd" matInput name="end" readonly required
+                     style="text-align: center;"/>
+              <span matPrefix class="bold" style="margin: 0 5px 0 10px;">
+                {{ endDate | timeDetail | date:'shortDate':reservation.room.timeZone:dateFormat }}
+              </span>
+              <mat-icon (click)="tEnd.open()" matSuffix>schedule</mat-icon>
+              <ngx-material-timepicker #tEnd (timeSet)="timeChange($event, endDate)"></ngx-material-timepicker>
+              @if (endTime.hasError('required')) {
+                <mat-error [innerHTML]="'RESERVATION.TIME.END.REQUIRED' | translate"></mat-error>
+              }
+            </mat-form-field>
+          </div>
+          <mat-list>
+            @if (group.value && treatment.value) {
+              <mat-list-item>
+                <mat-icon matListItemIcon>spa</mat-icon>
+                <div class="bold" matListItemTitle>{{ 'COMMON.TREATMENT.FIELD' | translate }}</div>
+                @if (treatment.value.description) {
+                  <div matListItemLine
+                       [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.DESCRIPTION' | translate: {description: treatment.value.description}">
+                  </div>
+                }
+              </mat-list-item>
+              <mat-list-item lines="3">
+                <div matListItemTitle
+                     [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.NAME' | translate: {name: treatment.value.name, group: group.value.name}">
+                </div>
+                <div matListItemLine>
+                  <span [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.PRICE' | translate"></span>
+                  <span class="vertical-divider bold">
+                    {{ reservation.room.currency | currencySymbol }} {{ price.amount | number:'1.2-2' }}
+                  </span>
+                </div>
+              </mat-list-item>
+            }
+            @if (additionalList && additionalList.length) {
+              <mat-list-item>
+                <mat-icon matListItemIcon>add_post</mat-icon>
+                <div class="bold" matListItemTitle>{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</div>
+              </mat-list-item>
+              <mat-selection-list #additional (selectionChange)="onChange(additional.selectedOptions.selected)">
+                @for (it of additionalList; track it) {
+                  <mat-list-option [selected]="isSelected(it)" [value]="it" togglePosition="before">
+                    <div matListItemTitle>{{ it.name }}</div>
+                    <div matListItemLine>
+                      <span>
+                        {{ reservation.room.currency | currencySymbol }} {{ it.price | number:'1.2-2' }}
+                      </span>
+                      &nbsp;&#9202;
+                      <span>{{ it.duration | durationTime }}</span>
+                    </div>
+                  </mat-list-option>
+                }
+              </mat-selection-list>
+            }
+            <mat-divider></mat-divider>
+            <app-form-field-adder [currency]="reservation.room.currency" [key]="'RESERVATION.TREATMENT.EXTRAS.TITLE'"
+                                  (onChange)="onExtrasChanges($event)" (isValid)="isValid = $event">
+            </app-form-field-adder>
+            <mat-divider></mat-divider>
+            <app-price-preview [price]="price" [currencyIcon]="reservation.room.currency.icon" [isEditing]="false"
+                               [label]="'RESERVATION.TREATMENT.COMPLETE.TOTAL'"></app-price-preview>
+          </mat-list>
+          @if (!price.isPaid) {
+            <mat-checkbox (change)="splitChange()" color="primary" [checked]="split">
+              {{ 'RESERVATION.PAYMENT.SPLIT.CHECKBOX' | translate }}
+            </mat-checkbox>
+            @if (split) {
+              <app-form-field-adder [currency]="reservation.room.currency" [split]="true"
+                                    (isValid)="isValidSplit = $event" [key]="'RESERVATION.PAYMENT.SPLIT.TITLE'"
+                                    [toPaid]="price.toPaid" (onChange)="onSplitChanges($event)"></app-form-field-adder>
+            } @else {
+              <div class="inner-container">
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'RESERVATION.PAYMENT.TYPE' | translate }}</mat-label>
+                  <mat-select [formControl]="type">
+                    @for (t of types; track t) {
+                      <mat-option [value]="t">{{ 'COMMON.PAYMENT.TYPE.' + (t || 'NONE') | translate }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+                @if (type.value === 'TRANSFER') {
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ 'RESERVATION.PAYMENT.TRANSFER.FIELD' | translate }}</mat-label>
+                    <label>
+                      <input [formControl]="transfer" matInput>
+                    </label>
+                  </mat-form-field>
+                }
+              </div>
+            }
+          }
+        </div>
+      </mat-card-content>
+      <mat-card-actions class="card-actions">
+        <div class="spacer"></div>
+        <button appBackButton color="accent" mat-fab extended class="icon-button" type="button">
+          {{ 'COMMON.BUTTON.BACK' | translate }}
+        </button>
+        <button [disabled]="group.invalid || treatment.invalid || !isValidSplit" cdkFocusInitial color="primary" mat-fab
+                extended class="icon-button">
+          {{ 'COMMON.BUTTON.COMPLETE' | translate }}
+        </button>
+      </mat-card-actions>
+    } @else {
+      <mat-card-content>
+        <div class="ssc-hr"></div>
+        <div class="ssc-square mb"></div>
+        <div class="ssc-hr"></div>
+      </mat-card-content>
+      <mat-card-actions class="card-actions">
+        <div class="ssc-head-line"></div>
+      </mat-card-actions>
+    }
   </mat-card>
 </form>

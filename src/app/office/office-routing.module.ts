@@ -4,7 +4,6 @@ import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
 import { OfficeComponent } from './office.component';
 import { OfficeListComponent } from './list/office-list.component';
-import { OfficeDetailComponent } from './detail/office-detail.component';
 
 const routes: Routes = [
   {
@@ -18,7 +17,7 @@ const routes: Routes = [
     }
   },
   {
-    path: ':id', component: OfficeDetailComponent, canActivate: [authGuard], data: {
+    path: ':id', component: OfficeComponent, canActivate: [authGuard], data: {
       roles: [Role.admin]
     }
   }
