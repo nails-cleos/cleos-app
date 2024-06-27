@@ -132,7 +132,7 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsExpense.DeleteExpense({ roomId: this.roomId, id: result.id })
+          new fromActionsExpense.DeleteExpense({ roomId: this.roomId, id: result.id, invoice: result.invoice })
         );
       }
     });

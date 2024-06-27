@@ -254,23 +254,19 @@
              [@bottomTop]="{value:contactItem2State.value, params: {delayIn: isSmall ? '0ms' : '500ms', delayOut: '0ms'}}">
           <h3 class="bold no-content">{{ 'MAIN.CONTACT.SEND.TITLE' | translate }}</h3>
 
-          <form (ngSubmit)="sendEmail" [formGroup]="form" novalidate>
+          <form (ngSubmit)="sendEmail" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
             <div class="home-page-form inner-container">
               <div class="contact-inner-container">
                 <mat-form-field class="full full-margin">
                   <mat-label>{{ 'MAIN.CONTACT.NAME.FIELD' | translate }}</mat-label>
-                  <label>
-                    <input [formControl]="name" autocomplete="name" matInput required>
-                  </label>
+                  <input [formControl]="name" autocomplete="name" matInput required>
                   @if (name.hasError('required')) {
                     <mat-error [innerHTML]="'MAIN.CONTACT.NAME.REQUIRED' | translate"></mat-error>
                   }
                 </mat-form-field>
                 <mat-form-field class="full">
                   <mat-label>{{ 'MAIN.CONTACT.EMAIL.FIELD' | translate }}</mat-label>
-                  <label>
-                    <input [formControl]="email" autocomplete="email" matInput required>
-                  </label>
+                  <input [formControl]="email" autocomplete="email" matInput required>
                   @if (email.hasError('email')) {
                     <mat-error>{{ 'MAIN.CONTACT.EMAIL.INVALID' | translate }}</mat-error>
                   }
@@ -282,17 +278,13 @@
 
               <mat-form-field>
                 <mat-label>{{ 'MAIN.CONTACT.SUBJECT.FIELD' | translate }}</mat-label>
-                <label>
-                  <input [formControl]="subject" autocomplete="subject" matInput required>
-                </label>
+                <input [formControl]="subject" autocomplete="subject" matInput required>
                 <mat-error *ngIf="subject.hasError('required')"
                            [innerHTML]="'MAIN.CONTACT.SUBJECT.REQUIRED' | translate"></mat-error>
               </mat-form-field>
               <mat-form-field>
                 <mat-label>{{ 'MAIN.CONTACT.BODY.FIELD' | translate }}</mat-label>
-                <label>
-                  <textarea #message [formControl]="body" matInput maxlength="256" required></textarea>
-                </label>
+                <textarea #message [formControl]="body" matInput maxlength="256" required></textarea>
                 <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
                 @if (body.hasError('required')) {
                   <mat-error [innerHTML]="'MAIN.CONTACT.BODY.REQUIRED' | translate"></mat-error>

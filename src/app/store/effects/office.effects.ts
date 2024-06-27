@@ -59,9 +59,9 @@ export class OfficeEffects {
 
   delete$ = createEffect(() => this.actions$.pipe(ofType(fromActionsOffice.OfficeActionTypes.officeDelete)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.officeService.delete(payload).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('OFFICE.DELETED.MESSAGE', {name: response.name});
+    switchMap((payload: any) => this.officeService.delete(payload.id).pipe(
+      switchMap(() => {
+        const message = this.translate.instant('OFFICE.DELETED.MESSAGE', {name: payload.name});
         return of(new fromActionsOffice.OfficeSaveSuccess({message}));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsOffice.OfficeFailure({error: err.error})))
     ))

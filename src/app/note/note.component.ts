@@ -80,7 +80,7 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
     return executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: this.note }, result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsNote.DeleteNote(result.id)
+          new fromActionsNote.DeleteNote(result)
         );
       }
     });

@@ -74,3 +74,18 @@
 canvas {
   display: none;
 }
+
+.table {
+  width: 100%;
+  display: table;
+  margin-top: 5%;
+
+  .row {
+    display: table-row;
+  }
+
+  .cell {
+    display: table-cell;
+    padding: 10px;
+  }
+}

@@ -109,9 +109,10 @@ export class UserEffects {
     switchMap((payload: any) => this.userService.updateMe(payload.user).pipe(
       switchMap((response: any) => {
         const message = this.translate.instant('COMMON.PROFILE.UPDATED.MESSAGE', { displayName: response.user.displayName });
+        const lang = payload.user.lang;
         return of(new LoginSuccess({
           response, queryParams: {
-            state: btoa(JSON.stringify({ returnUrl: payload.redirectUrl }))
+            state: btoa(JSON.stringify({ returnUrl: payload.redirectUrl, lang }))
           }
         }), new fromActionsUser.UserSaveSuccess({ message: payload.message ? payload.message : message }));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
@@ -123,9 +124,10 @@ export class UserEffects {
     switchMap((payload: any) => this.userService.updateMePhoto(payload).pipe(
       switchMap((response: any) => {
         const message = this.translate.instant('COMMON.PROFILE.UPDATED.PHOTO');
+        const lang = getLocale(this.translate.currentLang).language;
         return of(new LoginSuccess({
           response, queryParams: {
-            state: btoa(JSON.stringify({ returnUrl: `/${getLocale(this.translate.currentLang).language}/auth/profile` }))
+            state: btoa(JSON.stringify({ returnUrl: `/${ lang }/auth/profile`, lang }))
           }
         }), new fromActionsUser.UserSaveSuccess({ message }));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
@@ -134,9 +136,9 @@ export class UserEffects {
 
   delete$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.userDelete)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.userService.delete(payload).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('USER.DELETED.MESSAGE', { displayName: response.displayName });
+    switchMap((payload: any) => this.userService.delete(payload.id).pipe(
+      switchMap(() => {
+        const message = this.translate.instant('USER.DELETED.MESSAGE', { displayName: payload.displayName });
         return of(new fromActionsUser.UserSaveSuccess({ message }));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
     ))

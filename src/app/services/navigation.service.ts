@@ -39,8 +39,8 @@ export class NavigationService {
     }
   }
 
-  reload(url: string[], data?: any, queryParams?: any, reloadURL = '/auth/redirect'): void {
-    const navigateUrl = `/${ getLocale(this.translate.currentLang).language }${ reloadURL }`;
+  reload(url: string[], data?: any, queryParams?: any, reloadURL = '/auth/redirect', lang?: string): void {
+    const navigateUrl = `/${ lang || getLocale(this.translate.currentLang).language }${ reloadURL }`;
     this.router.navigateByUrl(navigateUrl, { skipLocationChange: true }).then(() =>
       this.router.navigate(url.filter(path => path), { state: data, queryParams }));
   }
@@ -49,16 +49,22 @@ export class NavigationService {
     this.router.navigateByUrl(url).then(() => window.location.reload());
   }
 
-  attachLang(lang: string | null): string {
+  attachLang(lang: string | null, currentUser?: IUser): string {
     const language = getLocale(lang).language;
     if (language !== getLocale(this.translate.currentLang).language) {
       const user: IUser = new User();
       user.lang = language;
       const redirectUrl = this.router.url;
+      let userLanguage;
+      if (currentUser?.locale) {
+        userLanguage = getLocale(currentUser.locale);
+      }
       this.store.dispatch(new fromActionsI18n.SetLanguage(language));
-      this.store.dispatch(
-        new fromActionsUser.UpdateUser({ user, redirectUrl })
-      );
+      if (userLanguage?.language !== language) {
+        this.store.dispatch(
+          new fromActionsUser.UpdateUser({ user, redirectUrl })
+        );
+      }
     }
     return language;
   }

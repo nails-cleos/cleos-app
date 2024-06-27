@@ -32,8 +32,8 @@ export const resizeImage = (img: HTMLImageElement, canvas?: HTMLCanvasElement): 
     return '';
   }
   const ctx = canvas.getContext('2d');
-  const maxWidth = 300; // Desired width
-  const maxHeight = 300; // Desired height
+  const maxWidth = 200; // Desired width
+  const maxHeight = 200; // Desired height
 
   let width = img.width;
   let height = img.height;

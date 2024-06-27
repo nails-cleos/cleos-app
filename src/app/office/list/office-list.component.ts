@@ -94,7 +94,7 @@ export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsOffice.DeleteOffice(result.id)
+          new fromActionsOffice.DeleteOffice(result)
         );
       }
     });

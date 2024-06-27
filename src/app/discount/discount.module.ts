@@ -5,7 +5,6 @@ import { DiscountRoutingModule } from './discount-routing.module';
 
 import { DiscountComponent } from './discount.component';
 import { DiscountDialogComponent, DiscountsComponent } from './list/discounts.component';
-import { DiscountDetailComponent } from './detail/discount-detail.component';
 import { EffectsModule } from '@ngrx/effects';
 import { DiscountEffects } from '../store/effects/discount.effects';
 import { DiscountService } from '../services/discount.service';
@@ -21,7 +20,6 @@ import { Observable } from 'rxjs';
   declarations: [
     DiscountComponent,
     DiscountsComponent,
-    DiscountDetailComponent,
     DiscountDialogComponent
   ],
   imports: [

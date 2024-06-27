@@ -77,7 +77,7 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsTreatment.DeleteTreatment(result.id)
+          new fromActionsTreatment.DeleteTreatment(result)
         );
       }
     });

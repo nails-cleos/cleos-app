@@ -98,7 +98,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: reservation }, result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsReservation.DeleteReservation(result.id)
+          new fromActionsReservation.DeleteReservation(result)
         );
       }
     });

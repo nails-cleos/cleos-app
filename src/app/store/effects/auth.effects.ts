@@ -20,7 +20,8 @@ export class LoginEffects {
     switchMap((payload: any) => this.authService.login(payload.idToken, payload.code, payload.theme)
       .pipe(switchMap((response: any) => of(new LoginSuccess({
           response,
-          queryParams: payload.queryParams
+          queryParams: payload.queryParams,
+          redirect: true
         }))),
         catchError((err: HttpErrorResponse) => of(new LoginFailure({ error: err.error })))
       ))
@@ -42,7 +43,7 @@ export class LoginEffects {
             const [, ...rest] = decodedURI.split('/');
             redirectUrl = ['/', ...rest];
           }
-          this.navigationService.reload(redirectUrl, state.data);
+          this.navigationService.reload(redirectUrl, state.data, undefined, undefined, state.lang);
         }
       } else {
         this.navigationService.reload(redirectUrl);

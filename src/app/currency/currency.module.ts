@@ -4,7 +4,6 @@ import { CurrencyRoutingModule } from './currency-routing.module';
 import { CurrencyComponent } from './currency.component';
 import { SharedModule } from '../shared/shared.module';
 import { CurrencyListComponent } from './list/currency-list.component';
-import { CurrencyDetailComponent } from './detail/currency-detail.component';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EffectsModule } from '@ngrx/effects';
 import { CurrencyEffects } from '../store/effects/currency.effects';
@@ -17,8 +16,7 @@ import { Observable } from 'rxjs';
 @NgModule({
   declarations: [
     CurrencyComponent,
-    CurrencyListComponent,
-    CurrencyDetailComponent
+    CurrencyListComponent
   ],
   imports: [
     CurrencyRoutingModule,

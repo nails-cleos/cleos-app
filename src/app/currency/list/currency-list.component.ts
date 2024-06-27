@@ -77,7 +77,7 @@ export class CurrencyListComponent implements OnInit, AfterViewInit, OnDestroy {
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: currency }, result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsCurrency.DeleteCurrency(result.id)
+          new fromActionsCurrency.DeleteCurrency(result)
         );
       }
     });

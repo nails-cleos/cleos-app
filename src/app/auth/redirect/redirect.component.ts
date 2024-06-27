@@ -16,11 +16,11 @@ import { TranslateService } from '@ngx-translate/core';
 export class RedirectComponent {
 
   constructor(private store: Store<AppState>, private tokenService: TokenService,
-              private navigateService: NavigationService, private translate: TranslateService) {
+              private navigateService: NavigationService, translate: TranslateService) {
     this.store.select(selectAuthState).subscribe((state: any) => {
       const lang = getLocale(translate.currentLang).language;
+      let redirectUrl = ['/', lang];
       if (state.redirect) {
-        let redirectUrl = ['/', lang];
         if (state.isAuthenticated) {
           const user: IUserAll = state.user;
           this.tokenService.token = state.token;

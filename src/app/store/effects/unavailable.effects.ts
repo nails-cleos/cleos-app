@@ -79,9 +79,9 @@ export class UnavailableEffects {
 
   delete$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableDelete)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.unavailableService.delete(payload).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('UNAVAILABLE.DELETED.MESSAGE', { date: newDateTimestamp(response.timestamp) });
+    switchMap((payload: any) => this.unavailableService.delete(payload.id).pipe(
+      switchMap(() => {
+        const message = this.translate.instant('UNAVAILABLE.DELETED.MESSAGE', { date: newDateTimestamp(payload.timestamp) });
         return of(new fromActionsUnavailable.UnavailableSaveSuccess({ message }));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error })))
     ))

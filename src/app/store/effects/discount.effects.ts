@@ -94,9 +94,9 @@ export class DiscountEffects {
 
   delete$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDiscount.DiscountActionTypes.discountDelete)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.discountService.delete(payload).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('DISCOUNT.DELETED.MESSAGE', { name: response.name });
+    switchMap((payload: any) => this.discountService.delete(payload.id).pipe(
+      switchMap(() => {
+        const message = this.translate.instant('DISCOUNT.DELETED.MESSAGE', { name: payload.name });
         return of(new fromActionsDiscount.DiscountSaveSuccess({ message }));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({ error: err.error })))
     ))

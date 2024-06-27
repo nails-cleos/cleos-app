@@ -86,7 +86,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsUnavailable.DeleteUnavailable(result.id)
+          new fromActionsUnavailable.DeleteUnavailable(result)
         );
       }
     });

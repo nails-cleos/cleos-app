@@ -1,20 +1,21 @@
 <div class="flex-container">
   <div class="card-container">
     <div class="card-content">
-      <form (ngSubmit)="update" [formGroup]="typeForm" novalidate>
+      <form (ngSubmit)="update" [formGroup]="typeForm" novalidate (keydown.enter)="$event.preventDefault()">
         <mat-card appearance="outlined" class="style-card">
           <mat-card-header>
-            <mat-card-title [innerHTML]="'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate: {amount: payment?.amount | number:'1.2-2',
-                   symbol: payment?.reservation?.room?.currency | currencySymbol}">
+            <mat-card-title
+              [innerHTML]="'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate: {amount: payment?.amount | number:'1.2-2', symbol: payment?.reservation?.room?.currency | currencySymbol}">
             </mat-card-title>
             <mat-card-subtitle>
-              <ng-template [ngIf]="payment?.reservation">
-                <button mat-icon-button [routerLink]="['/', language, 'reservation', payment?.reservation?.id]">
+              @if (payment?.reservation) {
+                <button mat-icon-button [routerLink]="['/', language, 'reservation', payment?.reservation?.id]"
+                        type="button">
                   <mat-icon>visibility</mat-icon>
                 </button>&nbsp;
                 <span [innerHTML]="'ME.PAYMENT.RESERVATION' | translate: {reservationId: payment?.reservation?.id}">
                 </span>
-              </ng-template>
+              }
             </mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
@@ -24,10 +25,12 @@
           </mat-card-content>
           <mat-card-actions class="card-actions">
             <div class="spacer"></div>
-            <button [form]="typeForm" appBackButton color="accent" mat-fab extended class="icon-button"
-                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
-            <button [disabled]="typeForm.invalid" color="primary" mat-fab extended class="icon-button"
-                    type="submit">{{ 'COMMON.BUTTON.PAYMENT' | translate }}</button>
+            <button [form]="typeForm" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
+              {{ 'COMMON.BUTTON.BACK' | translate }}
+            </button>
+            <button [disabled]="typeForm.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
+              {{ 'COMMON.BUTTON.PAYMENT' | translate }}
+            </button>
           </mat-card-actions>
         </mat-card>
       </form>

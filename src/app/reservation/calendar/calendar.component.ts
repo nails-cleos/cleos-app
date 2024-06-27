@@ -13,15 +13,15 @@ import {
   createNewDate,
   formatDateTime,
   getAvailability,
-  getDuration,
-  getNow,
+  getDuration, getDurationOrUndefined,
+  getNow, getPreviousSunday,
   getStartEndDay,
   greaterOrEqualsThan,
   isBetween,
   newDate,
   newDateTimestamp,
   plusDays,
-  reservationDuration,
+  reservationDuration, searchDates,
   subPeriod
 } from '../../util/dates';
 import { IRoom, IRoomAll } from '../../interfaces/room';
@@ -32,7 +32,7 @@ import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { IUnavailableAll } from '../../interfaces/unavailable';
 import { createRoomOffice, executeDialogNoWidth, FrequencyEnum } from '../../util/helper';
-import { addDays, addMonths, isEqual, startOfWeek } from 'date-fns';
+import { addDays, addMonths, isEqual, isSameDay, startOfWeek } from 'date-fns';
 import { findStateColor } from '../../util/theme';
 import { map, startWith, takeUntil } from 'rxjs/operators';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
@@ -259,7 +259,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
       if (result) {
         this.store.dispatch(
           new fromActionsReservation.UpdateTimestamp({
-            reservationId: event.meta.id,
+            reservation: event.meta,
             start: event.start.toLocaleString(API_LOCALE),
             role: this.isRoomAdmin ? Role.roomAdmin : Role.professional
           })
@@ -390,28 +390,30 @@ export class CalendarComponent implements OnInit, OnDestroy {
     let recurringEvents: any[] = [];
     unavailableList.forEach(it => {
       if (it.duration || it.allDay) {
-        const startDate = newDateTimestamp(it.timestamp);
+        const startDate = newDateTimestamp(it.timestamp, rr.room.timeZone);
         const start = it.allDay ? createNewDate(startDate) : startDate;
         const duration = getDuration(it.allDay, it.duration);
         const id = it.id;
         const allDay = it.allDay;
+        const professionalId = it.professional.id;
         const title = this.translate.instant('RESERVATION.EVENT.UNAVAILABLE', {
           description: it.description ? it.description : '',
           professionalName: it.professional.displayName
         });
-        let path = `${ this.language }/unavailable/`;
+        let path = 'unavailable/';
         if (it.type === 'BLOCK_AGENDA') {
           path += 'block-agenda/';
         }
         if (it.repeat === 'NONE') {
           if (!greaterOrEqualsThan(start, this.maxDate)) {
-            const data = { id, allDay, title, path, duration };
+            const data = { id, allDay, title, path, duration, professionalId };
             this.validateUnavailableEvent(rr.room, start, data, darkMode);
           }
         } else {
-          recurringEvents = [...recurringEvents,
-            getFrequency(it.repeat, startDate, id, title, this.daysInWeek, it.type || 'UNAVAILABLE', path, it.end, duration, allDay)
-          ];
+          const sundayViewDate = getPreviousSunday(this.viewDate);
+          const calendarStart = greaterOrEqualsThan(sundayViewDate, start) ? sundayViewDate : start;
+          recurringEvents = [...recurringEvents, getFrequency(it.repeat, calendarStart, it.id, title, this.daysInWeek, 'UNAVAILABLE',
+            'unavailable', it.end, getDurationOrUndefined(it.duration), it.allDay, professionalId)];
         }
       }
     });
@@ -468,28 +470,32 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   private validateUnavailableEvent(room: IRoomAll, start: Date, recurring: any, darkMode: boolean): void {
-    const duration = recurring.duration;
-    const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
+    const [startSearch, endSearch] = searchDates(recurring.allDay, start, recurring.duration);
     if (this.calendar) {
-      let events = this.calendar.events;
-      const overlapEvent = getOverlapEvent(events, start, end);
+      const calendar = this.calendar;
+      let events = calendar.events;
+      const overlapEvent = getOverlapEvent(events, startSearch, endSearch);
       if (overlapEvent.length > 0) {
         overlapEvent.forEach(value => {
-          if (!value.id) {
+          if (value.id !== 'NOT_WORKING_ALL_DAY') {
             events = events.filter(ev => ev !== value);
             if (value.end) {
-              if (start < value.start && end < value.end) {
-                value.start = end;
+              if (startSearch < value.start && endSearch < value.end) {
+                value.start = endSearch;
                 events = [...events, value];
-              } else if (start > value.start && end > value.end) {
-                value.end = start;
+              } else if (startSearch > value.start && endSearch > value.end) {
+                value.end = startSearch;
                 events = [...events, value];
               }
             }
+            if (!events.find(ce => ce.id === recurring.path && isSameDay(value.start, ce.start))) {
+              this.createUnavailableEvent(room, events, calendar.day, recurring, startSearch, endSearch, darkMode);
+            }
           }
         });
+      } else {
+        this.createUnavailableEvent(room, events, calendar.day, recurring, startSearch, endSearch, darkMode);
       }
-      this.createUnavailableEvent(room, events, this.calendar.day, recurring, start, end, darkMode);
     }
   }
 

@@ -39,8 +39,8 @@ export class NoteEffects {
 
   delete$ = createEffect(() => this.actions.pipe(ofType(fromActionsNote.NoteActionTypes.noteDelete)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.noteService.delete(payload).pipe(
-      switchMap((response: any) => this.success('DELETED', response.description)),
+    switchMap((payload: any) => this.noteService.delete(payload.id).pipe(
+      switchMap(() => this.success('DELETED', payload.description)),
       catchError((err: HttpErrorResponse) => of(new fromActionsNote.NoteFailure({ error: err.error })))
     ))
   ));

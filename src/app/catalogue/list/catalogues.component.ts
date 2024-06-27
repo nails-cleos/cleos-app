@@ -82,7 +82,7 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: catalogue }, result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsCatalogue.DeleteCatalogue(result.id)
+          new fromActionsCatalogue.DeleteCatalogue(result)
         );
       }
     });
