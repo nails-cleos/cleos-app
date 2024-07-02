@@ -140,7 +140,6 @@
     "PAYMENT": {
       "TITLE": "Pagos",
       "PAID": "Pagado",
-      "TYPE": "Forma de pago",
       "TRANSFER": {
         "FIELD": "Referencia de transferencia"
       },
@@ -209,6 +208,10 @@
       "REQUIRED": "Nota es <b>requerida</b>",
       "ADD": "Agregar nota",
       "MESSAGE": "¿Cuál es tu nota?"
+    },
+    "AMOUNT": {
+      "FIELD": "Monto pagado",
+      "MIN": "Monto pagado debe ser mayor a 0"
     },
     "CANCEL": {
       "TITLE": "Cancelar la reserva",

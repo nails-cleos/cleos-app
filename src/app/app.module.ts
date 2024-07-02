@@ -31,6 +31,8 @@ import localeAr from '@angular/common/locales/es-AR';
 import { TranslateLoaderFactory } from './shared/translate-loader.factory';
 import { NgxColorsModule } from 'ngx-colors';
 import { NgcCookieConsentConfig, NgcCookieConsentModule } from 'ngx-cookieconsent';
+import { MAT_ICON_DEFAULT_OPTIONS } from '@angular/material/icon';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 // Services
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -47,7 +49,6 @@ import { reducers } from './store/app.states';
 
 // Components
 import { AppComponent } from './app.component';
-import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 export const localStorageSyncReducer =
   (reducer: ActionReducer<any>): ActionReducer<any> => localStorageSync({ keys: ['auth'], rehydrate: true })(reducer);
@@ -129,6 +130,10 @@ const cookieConfig: NgcCookieConsentConfig = {
     {
       provide: LOCALE_ID,
       useValue: 'en-GB'
+    },
+    {
+      provide: MAT_ICON_DEFAULT_OPTIONS,
+      useValue: { fontSet: 'material-symbols-outlined' }
     },
     {
       provide: APP_INITIALIZER,

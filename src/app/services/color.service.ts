@@ -43,7 +43,6 @@ export class ColorService {
   }
 
   public update(color: IColor): Observable<IColor> {
-    console.log(color)
     const url = `${ this.urlV1 }/${ color.id }`;
     return this.http.patch<IColor>(url, color);
   }

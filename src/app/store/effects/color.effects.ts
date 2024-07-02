@@ -43,7 +43,6 @@ export class ColorEffects {
     switchMap((payload: any) => this.colorService.update(payload).pipe(
       switchMap(() => {
         const message = this.translate.instant('COLOR.UPDATED.MESSAGE', { name: payload.name });
-        console.log(message)
         return of(new fromActionsColor.ColorSaveSuccess({ message }));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsColor.ColorFailure({ error: err.error })))
     ))

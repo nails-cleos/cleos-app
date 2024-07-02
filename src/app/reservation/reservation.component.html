@@ -288,6 +288,39 @@
           <mat-error>{{ errors['note'] }}</mat-error>
         }
       </mat-form-field>
+      @if (room.value) {
+        <app-price-preview [label]="'RESERVATION.TREATMENT.PRICE.FIELD'" [price]="price"
+                           [currencyIcon]="room.value.currency.icon" [isEditing]="false"></app-price-preview>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'RESERVATION.AMOUNT.FIELD' | translate }}</mat-label>
+          <mat-icon matPrefix>{{ room.value.currency.icon }}</mat-icon>
+          <input formControlName="amount" matInput matNativeControl [type]="'number'" [step]="1" [min]="1">
+          @if (amount.hasError('min')) {
+            <mat-error
+              [innerHTML]="'RESERVATION.AMOUNT.MIN' | translate:{min: 1, currency: room.value.currency.icon}">
+            </mat-error>
+          }
+        </mat-form-field>
+        @if (amount.value) {
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate }}</mat-label>
+            <mat-select formControlName="type" [required]="true">
+              @for (t of types; track t) {
+                <mat-option [value]="t">{{ 'COMMON.PAYMENT.TYPE.' + (t || 'NONE') | translate }}</mat-option>
+              }
+            </mat-select>
+            @if (type.hasError('required')) {
+              <mat-error [innerHTML]="'COMMON.PAYMENT.TYPE.FIELD.REQUIRED' | translate"></mat-error>
+            }
+          </mat-form-field>
+          @if (type.value === 'TRANSFER') {
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'RESERVATION.PAYMENT.TRANSFER.FIELD' | translate }}</mat-label>
+              <input formControlName="transfer" matInput>
+            </mat-form-field>
+          }
+        }
+      }
     </div>
   </form>
 </ng-template>

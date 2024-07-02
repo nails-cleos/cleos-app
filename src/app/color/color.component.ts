@@ -101,7 +101,6 @@ export class ColorComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      console.log(state)
       if (state.selected) {
         this.color = {
           id: state.selected.id,

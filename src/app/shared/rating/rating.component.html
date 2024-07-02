@@ -1,29 +1,26 @@
 <div>
   @for (id of ratingArr; track id; let i = $index) {
-    <ng-template [ngIf]="canEdit" [ngIfElse]="noEdit">
-      <button (click)="onClick(i + 1)" [id]="'star_' + i" mat-icon-button (mouseleave)="onHover(-1)"
-              (mouseover)="onHover(i + 1)">
-        <mat-icon [color]="hover >= i + 1 || rating >= i + 1 ? color : undefined"
-                  [style.font-weight]="hover >= i + 1 || rating >= i + 1 ? 'bold' : 'normal'">
-          star
-        </mat-icon>
+    @if (canEdit) {
+      <button [id]="'star_' + i" mat-icon-button (click)="onClick(i + 1)"
+              (mouseleave)="onHover(-1)" (mouseover)="onHover(i + 1)">
+        <mat-icon [fontSet]="fontSet(i)" [color]="setColor(i)">star</mat-icon>
       </button>
-    </ng-template>
-    <ng-template #noEdit>
+    } @else {
       <button [id]="'star_' + i" mat-icon-button>
-        <mat-icon [color]="hover >= i + 1 || rating >= i + 1 ? color : undefined"
-                  [style.font-weight]="hover >= i + 1 || rating >= i + 1 ? 'bold' : 'normal'">
-          star
-        </mat-icon>
+        <mat-icon [fontSet]="fontSet(i)" [color]="setColor(i)">star</mat-icon>
       </button>
-    </ng-template>
+    }
   }
 </div>
 <p [ngClass]="rating < 1 && hover < 1 ? 'hide' : 'none'">
   text
 </p>
-<p *ngIf="rating > 0 && hover < 1" [innerHTML]="rate | translate:{rating: rating, total: 5}"></p>
-<p *ngIf="hover > 0">
-  {{ 'REVIEW.RATING.' + hover | translate }}
-</p>
-<p *ngIf="detail">{{ detail }}</p>
+@if (rating > 0 && hover < 1) {
+  <p [innerHTML]="rate | translate:{rating: rating, total: 5}"></p>
+}
+@if (hover > 0) {
+  <p>{{ 'REVIEW.RATING.' + hover | translate }}</p>
+}
+@if (detail) {
+  <p>{{ detail }}</p>
+}

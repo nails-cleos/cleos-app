@@ -14,13 +14,11 @@ export class RatingComponent implements OnInit {
   @Input() starCount: number;
   @Input() detail?: string;
   @Input() color: ThemePalette;
-  @Input() notEmpty: boolean;
   @Input() canEdit: boolean;
   @Output() ratingUpdated = new EventEmitter<number>();
   @Output() ratingHover = new EventEmitter<number>();
 
   ratingArr: Array<number> = [];
-  background: string | undefined;
 
   constructor() {
     this.rating = -1;
@@ -28,16 +26,12 @@ export class RatingComponent implements OnInit {
     this.starCount = 5;
     this.color = 'accent';
     this.rate = 'REVIEW.YOUR_RATE';
-    this.notEmpty = false;
-    this.canEdit = false
+    this.canEdit = false;
   }
 
   ngOnInit(): void {
-    this.background = `var(--${ this.color }-color)`;
     for (let index = 1; index <= this.starCount; index++) {
-      if (!(this.notEmpty && Math.ceil(this.rating) < index)) {
-        this.ratingArr.push(index);
-      }
+      this.ratingArr.push(index);
     }
   }
 
@@ -49,5 +43,13 @@ export class RatingComponent implements OnInit {
   onHover(hover: number): void {
     this.hover = hover;
     this.ratingHover.emit(this.hover);
+  }
+
+  fontSet(i: number): 'material-icons' | 'material-symbols-outlined' {
+    return this.hover >= i + 1 || this.rating >= i + 1 ? 'material-icons' : 'material-symbols-outlined';
+  }
+
+  setColor(i: number): ThemePalette {
+    return this.hover >= i + 1 || this.rating >= i + 1 ? this.color : undefined;
   }
 }

@@ -6,59 +6,65 @@
 </div>
 <mat-divider class="divider-padding"></mat-divider>
 <div mat-dialog-content>
-  <div class="upcoming">
-    <table>
-      <tr *ngIf="reservation">
-        <td class="right">{{ 'ME.RESERVATION.UPCOMING.START' | translate }}</td>
-        <td class="left">{{reservation.start | date:'short':undefined:dateFormat}}</td>
-      </tr>
-      <tr *ngIf="end">
-        <td class="right">{{ 'ME.RESERVATION.UPCOMING.END' | translate }}</td>
-        <td class="left">{{end | date:'short':undefined:dateFormat}}</td>
-      </tr>
-      <tr *ngIf="reservation && reservation">
-        <td class="right">{{ 'COMMON.ROOM.FIELD' | translate }}</td>
-        <td class="left">{{reservation.room | roomName}}</td>
-      </tr>
-      <tr *ngIf="reservation">
-        <td class="right">{{ 'COMMON.ADDRESS.FIELD' | translate }}</td>
-        <td class="left dialog-title">
-          <a
-            [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + reservation.room.address.name"
-            rel="noreferrer" target="_blank">
-            {{reservation.room.address.name}}
-          </a>
-        </td>
-      </tr>
-      <tr *ngIf="reservation">
-        <td class="right">{{ 'COMMON.TREATMENT.FIELD' | translate }}</td>
-        <td class="left">{{reservation.treatment.name}}</td>
-      </tr>
-      <tr *ngIf="reservation">
-        <td class="right">{{ 'ME.RESERVATION.TREATMENT.PRICE.FIELD' | translate }}</td>
-        <td class="left">$ {{price.total | number:'1.2-2'}}</td>
-      </tr>
-    </table>
-  </div>
+  @if (reservation) {
+    <div class="upcoming">
+      <table>
+        <tr>
+          <td class="right">{{ 'ME.RESERVATION.UPCOMING.START' | translate }}</td>
+          <td class="left">{{ reservation.start | date:'short':reservation.room.timeZone:dateFormat }}</td>
+        </tr>
+        @if (end) {
+          <tr>
+            <td class="right">{{ 'ME.RESERVATION.UPCOMING.END' | translate }}</td>
+            <td class="left">{{ end | date:'short':reservation.room.timeZone:dateFormat }}</td>
+          </tr>
+        }
+        <tr>
+          <td class="right">{{ 'COMMON.ROOM.FIELD' | translate }}</td>
+          <td class="left">{{ reservation.room | roomName }}</td>
+        </tr>
+        <tr>
+          <td class="right">{{ 'COMMON.ADDRESS.FIELD' | translate }}</td>
+          <td class="left dialog-title">
+            <a
+              [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + reservation.room.address.name"
+              rel="noreferrer" target="_blank">
+              {{ reservation.room.address.name }}
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td class="right">{{ 'COMMON.TREATMENT.FIELD' | translate }}</td>
+          <td class="left">{{ reservation.treatment.name }}</td>
+        </tr>
+        <tr>
+          <td class="right">{{ 'ME.RESERVATION.TREATMENT.PRICE.FIELD' | translate }}</td>
+          <td class="left">$ {{ price.total | number:'1.2-2' }}</td>
+        </tr>
+      </table>
+    </div>
+  }
   <mat-divider class="divider-padding"></mat-divider>
-  <app-rating *ngIf="review; else noReview" [detail]="review.detail" [rating]="review.rating" [starCount]="starCount"
-              color="primary" [canEdit]="false"></app-rating>
-  <ng-template #noReview>
+  @if (review) {
+    <app-rating [detail]="review.detail" [rating]="review.rating" [starCount]="starCount" color="primary"
+                [canEdit]="false"></app-rating>
+  } @else {
     <app-rating (ratingHover)="onRatingHover($event)" (ratingUpdated)="onRatingChanged($event)" [hover]="hover"
-                [rating]="rating" [starCount]="starCount" color="accent" [canEdit]="true"></app-rating>
+                [rating]="rating" [starCount]="starCount" color="primary" [canEdit]="true"></app-rating>
     <mat-form-field appearance="outline">
       <mat-label>{{ 'ME.REVIEW.DETAIL' | translate }}</mat-label>
       <label>
         <textarea #message [formControl]="detail" matInput maxlength="256"></textarea>
       </label>
-      <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
+      <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
     </mat-form-field>
-  </ng-template>
+  }
 </div>
 <mat-divider class="divider-padding"></mat-divider>
 <div mat-dialog-actions class="card-actions">
   <div class="spacer"></div>
   <button (click)="onNoClick" color="accent" mat-fab extended>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
   <button (click)="doAction" *ngIf="!review" [disabled]="rating < 1" color="primary"
-          mat-fab extended>{{ 'COMMON.BUTTON.ADD' | translate }}</button>
+          mat-fab extended>{{ 'COMMON.BUTTON.ADD' | translate }}
+  </button>
 </div>

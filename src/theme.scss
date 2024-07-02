@@ -378,8 +378,7 @@ $light-theme: mat.define-light-theme((
   min-height: 2.5em;
 }
 
-.material-icons {
-  font-family: 'Material Symbols Outlined', 'Material Symbols', sans-serif;
+.material-symbols-outlined, .material-icons {
   font-weight: normal;
   font-style: normal;
   font-size: 24px;
@@ -400,6 +399,14 @@ $light-theme: mat.define-light-theme((
   .mat-slide-toggle-thumb {
     background-color: #a51a19 !important;
   }
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined', 'Material Symbols', sans-serif;
+}
+
+.material-icons {
+  font-family: 'Material Icons', 'Material Symbols', sans-serif;
 }
 
 @media (min-width: 320px) {

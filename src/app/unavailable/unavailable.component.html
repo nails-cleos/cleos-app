@@ -63,7 +63,7 @@
                     <mat-checkbox formControlName="allDay" color="primary">
                       {{ 'COMMON.ALL_DAY.CHECK' | translate }}
                     </mat-checkbox>
-                    @if (!getForm.allDay.valid) {
+                    @if (!getForm.allDay.value) {
                       <mat-form-field appearance="outline" class="full-margin">
                         <mat-label>{{ 'UNAVAILABLE.TIME.FIELD' | translate }}</mat-label>
                         <input (focusin)="focusin" formControlName="startTime" [format]="24" [max]="maxTime"
