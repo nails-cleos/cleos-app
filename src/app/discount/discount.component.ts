@@ -113,9 +113,6 @@ export class DiscountComponent implements OnInit, OnDestroy {
       map(value => typeof value === 'string' ? value : value.code),
       map(name => name ? this.filterCurrency(name) : this.currencies ? this.currencies.slice() : this.currencies)
     );
-    this.getForm.type.valueChanges.subscribe(v => {
-      console.log(v)
-    })
   }
 
   private filterCurrency(name: string): ICurrency[] | undefined {
@@ -156,9 +153,8 @@ export class DiscountComponent implements OnInit, OnDestroy {
           type: state.selected.type,
           currency: state.selected.currency
         } as IDiscountAll;
-        console.log(this.discount)
         this.form.patchValue(this.discount);
-        this.getForm.type.setValue(state.selected.type)
+        this.getForm.type.setValue(state.selected.type);
       }
       this.currencies = state.currencies;
       if (state.subErrors) {

@@ -60,12 +60,12 @@ import { Role } from '../../interfaces/token';
 export class ReservationDetailComponent implements OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator?: MatPaginator;
 
-  reservation: IReservationAll | undefined;
-  history: IReservationAll[] | undefined;
+  reservation?: IReservationAll;
+  history?: IReservationAll[];
   duration: IDuration = new Duration();
   start: Date = getNow();
   end: Date = getNow();
-  state: string | undefined;
+  state?: string;
   dateFormat: string;
   changeState: IFabMenu[] = [];
 
