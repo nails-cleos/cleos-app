@@ -158,7 +158,7 @@
             } @else {
               <div class="inner-container">
                 <mat-form-field appearance="outline">
-                  <mat-label>{{ 'RESERVATION.PAYMENT.TYPE' | translate }}</mat-label>
+                  <mat-label>{{ 'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate }}</mat-label>
                   <mat-select [formControl]="type">
                     @for (t of types; track t) {
                       <mat-option [value]="t">{{ 'COMMON.PAYMENT.TYPE.' + (t || 'NONE') | translate }}</mat-option>
@@ -168,9 +168,7 @@
                 @if (type.value === 'TRANSFER') {
                   <mat-form-field appearance="outline">
                     <mat-label>{{ 'RESERVATION.PAYMENT.TRANSFER.FIELD' | translate }}</mat-label>
-                    <label>
-                      <input [formControl]="transfer" matInput>
-                    </label>
+                    <input [formControl]="transfer" matInput>
                   </mat-form-field>
                 }
               </div>

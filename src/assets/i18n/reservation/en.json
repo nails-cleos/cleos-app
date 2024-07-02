@@ -140,7 +140,6 @@
     "PAYMENT": {
       "TITLE": "Payments",
       "PAID": "Paid",
-      "TYPE": "Payment type",
       "TRANSFER": {
         "FIELD": "Transfer reference"
       },
@@ -209,6 +208,10 @@
       "REQUIRED": "Note is <b>required</b>",
       "ADD": "Add note",
       "MESSAGE": "What is your note?"
+    },
+    "AMOUNT": {
+      "FIELD": "Amount paid",
+      "MIN": "Amount paid must be greater than 0"
     },
     "CANCEL": {
       "TITLE": "Cancel reservation",
