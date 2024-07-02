@@ -16,7 +16,7 @@ import {
   ICustomerLastReservation,
   IDay,
   IReservation,
-  IReservationAll,
+  IReservationAll, IReservationPayment,
   MAX_RESERVATION_MONTH,
   Reservation
 } from '../interfaces/reservation';
@@ -94,6 +94,7 @@ import {
   getStepOptional
 } from '../util/step';
 import PlaceResult = google.maps.places.PlaceResult;
+import { PaymentType } from '../interfaces/payment';
 
 @Component({
   selector: 'app-reservation',
@@ -167,6 +168,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   customerChange: UntypedFormControl = new UntypedFormControl();
   reference: UntypedFormControl = new UntypedFormControl();
   note: UntypedFormControl = new UntypedFormControl();
+  type: UntypedFormControl = new UntypedFormControl();
+  amount: UntypedFormControl = new UntypedFormControl('', [Validators.min(1)]);
+  transfer: UntypedFormControl = new UntypedFormControl();
 
   eventGroup!: UntypedFormGroup;
   event: UntypedFormControl = new UntypedFormControl('', [Validators.required]);
@@ -190,13 +194,12 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   minDate: any;
   maxDate: any;
   maxCalendarDate: Date;
+  types: string[] = [PaymentType.cash, PaymentType.transfer];
 
   private treatmentId?: string;
   private roomId?: string;
   private professionalId?: string;
   private isDarkMode = false;
-  private readonly isDashboard = false;
-  private readonly extras: any;
   private lessDays = 3;
   private reservations?: IReservationAll[];
   private reservation?: IReservationAll;
@@ -208,6 +211,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   private dismiss = false;
   private treatmentDiscount?: IDiscount;
   private totalDuration: IDuration = new Duration();
+  private readonly isDashboard = false;
+  private readonly extras: any;
   private readonly language: string;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
@@ -290,6 +295,13 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       reservation.canCustomerChange = this.customerChange.value;
       reservation.reference = this.reference.value;
       reservation.note = this.note.value;
+      if (this.amount.value && this.type.value) {
+        reservation.payment = {
+          type: this.type.value,
+          amount: this.amount.value,
+          transfer: this.transfer.value
+        } as IReservationPayment
+      }
 
       const role = this.isDashboard ? Role.roomAdmin : Role.professional;
       if (this.isEditing && this.reservation) {
@@ -679,7 +691,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.configurationForm = this.formBuilder.group({
       customerChange: this.customerChange,
       reference: this.reference,
-      note: this.note
+      note: this.note,
+      amount: this.amount,
+      type: this.type,
+      transfer: this.transfer
     });
     this.eventGroup = this.formBuilder.group({
       event: this.event
@@ -800,6 +815,15 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       } else {
         this.reference.setValidators([]);
         this.reference.updateValueAndValidity();
+      }
+    });
+    this.amount.valueChanges.subscribe(value => {
+      if (value) {
+        this.type.setValidators([Validators.required]);
+        this.type.updateValueAndValidity();
+      } else {
+        this.type.setValidators([]);
+        this.type.updateValueAndValidity();
       }
     });
   }
@@ -1110,6 +1134,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.customerAdditionalIds?.length && !this.additionalSelected.length && this.myStepper.selectedIndex === treatment) {
           this.additionalSelected = this.additionalList.filter(ad => this.customerAdditionalIds.includes(ad.id))
             .map(ad => Object.assign({}, ad, { id: ad.id }));
+          this.price = newAdditional(this.price, this.additionalSelected, this.reservation?.treatment?.discountCustomer);
         }
         if (this.additionalSelected?.length) {
           const selectIds = this.additionalSelected?.map(value => value.id);

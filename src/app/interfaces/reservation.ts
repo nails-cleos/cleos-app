@@ -60,6 +60,7 @@ export interface IReservationPayment {
   name?: string;
   countryCode?: string;
   amount?: number;
+  transfer?: string;
 }
 
 export interface IReservationAll {
