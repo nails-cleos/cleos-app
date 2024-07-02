@@ -3,82 +3,44 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://www.nailscleos.nl/en-GB</loc>
-    <xhtml:link
-      rel="alternate"
-      hreflang="es"
-      href="https://www.nailscleos.nl/es"/>
-    <!--    <xhtml:link-->
-    <!--      rel="alternate"-->
-    <!--      hreflang="nl"-->
-    <!--      href="https://www.example.com/nl"/>-->
-    <xhtml:link
-      rel="alternate"
-      hreflang="en-GB"
-      href="https://www.nailscleos.nl/en-GB"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.nailscleos.nl/es"/>
+    <!--    <xhtml:link rel="alternate" hreflang="nl" href="https://www.nailscleos.nl/nl"/>-->
+    <xhtml:link rel="alternate" hreflang="en-GB" href="https://www.nailscleos.nl/en-GB"/>
     <lastmod>2024-05-30</lastmod>
   </url>
   <url>
     <loc>https://www.nailscleos.nl/en-GB/catalogs</loc>
-    <xhtml:link
-      rel="alternate"
-      hreflang="es"
-      href="https://www.nailscleos.nl/es/catalogs"/>
-    <!--    <xhtml:link-->
-    <!--      rel="alternate"-->
-    <!--      hreflang="nl"-->
-    <!--      href="https://www.example.com/nl/catalogs"/>-->
-    <xhtml:link
-      rel="alternate"
-      hreflang="en-GB"
-      href="https://www.nailscleos.nl/en-GB/catalogs"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.nailscleos.nl/es/catalogs"/>
+    <!--    <xhtml:link rel="alternate" hreflang="nl" href="https://www.nailscleos.nl/nl/catalogs"/>-->
+    <xhtml:link rel="alternate" hreflang="en-GB" href="https://www.nailscleos.nl/en-GB/catalogs"/>
     <lastmod>2024-05-30</lastmod>
   </url>
   <url>
     <loc>https://www.nailscleos.nl/en-GB/privacy</loc>
-    <xhtml:link
-      rel="alternate"
-      hreflang="es"
-      href="https://www.nailscleos.nl/es/privacy"/>
-    <!--    <xhtml:link-->
-    <!--      rel="alternate"-->
-    <!--      hreflang="nl"-->
-    <!--      href="https://www.example.com/nl/privacy"/>-->
-    <xhtml:link
-      rel="alternate"
-      hreflang="en-GB"
-      href="https://www.nailscleos.nl/en-GB/privacy"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.nailscleos.nl/es/privacy"/>
+    <!--    <xhtml:link rel="alternate" hreflang="nl" href="https://www.nailscleos.nl/nl/privacy"/>-->
+    <xhtml:link rel="alternate" hreflang="en-GB" href="https://www.nailscleos.nl/en-GB/privacy"/>
     <lastmod>2024-05-30</lastmod>
   </url>
   <url>
     <loc>https://www.nailscleos.nl/en-GB/term-and-conditions</loc>
-    <xhtml:link
-      rel="alternate"
-      hreflang="es"
-      href="https://www.nailscleos.nl/es/term-and-conditions"/>
-    <!--    <xhtml:link-->
-    <!--      rel="alternate"-->
-    <!--      hreflang="nl"-->
-    <!--      href="https://www.example.com/nl/term-and-conditions"/>-->
-    <xhtml:link
-      rel="alternate"
-      hreflang="en-GB"
-      href="https://www.nailscleos.nl/en-GB/term-and-conditions"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.nailscleos.nl/es/term-and-conditions"/>
+    <!--    <xhtml:link rel="alternate" hreflang="nl" href="https://www.nailscleos.nl/nl/term-and-conditions"/>-->
+    <xhtml:link rel="alternate" hreflang="en-GB" href="https://www.nailscleos.nl/en-GB/term-and-conditions"/>
     <lastmod>2024-05-30</lastmod>
   </url>
   <url>
     <loc>https://www.nailscleos.nl/en-GB/auth</loc>
-    <xhtml:link
-      rel="alternate"
-      hreflang="es"
-      href="https://www.nailscleos.nl/es/auth"/>
-    <!--    <xhtml:link-->
-    <!--      rel="alternate"-->
-    <!--      hreflang="nl"-->
-    <!--      href="https://www.example.com/nl/auth"/>-->
-    <xhtml:link
-      rel="alternate"
-      hreflang="en-GB"
-      href="https://www.nailscleos.nl/en-GB/auth"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.nailscleos.nl/es/auth"/>
+    <!--    <xhtml:link rel="alternate" hreflang="nl" href="https://www.nailscleos.nl/nl/auth"/>-->
+    <xhtml:link rel="alternate" hreflang="en-GB" href="https://www.nailscleos.nl/en-GB/auth"/>
     <lastmod>2024-05-30</lastmod>
+  </url>
+  <url>
+    <loc>https://www.nailscleos.nl/en-GB/biab/treatment</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.nailscleos.nl/es/biab/treatment"/>
+    <!--    <xhtml:link rel="alternate" hreflang="nl" href="https://www.nailscleos.nl/nl/biab/treatment"/>-->
+    <xhtml:link rel="alternate" hreflang="en-GB" href="https://www.nailscleos.nl/en-GB/biab/treatment"/>
+    <lastmod>2024-07-01</lastmod>
   </url>
 </urlset>

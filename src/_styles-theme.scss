@@ -809,6 +809,13 @@
 
   .row-is-canceled {
     background-color: mat.get-color-from-palette($warn-palette, lighter);
+    color: black;
+
+    @if($isDark) {
+      &:hover {
+        color: white;
+      }
+    }
   }
 
   .deadLine {
@@ -829,11 +836,11 @@
   }
 
   .payment-button {
-    color: #87ceeb !important;
+    color: #04589a !important;
   }
 
   .mat-blue {
-    background-color: #87ceeb !important;
+    background-color: #04589a !important;
   }
 
   #close {

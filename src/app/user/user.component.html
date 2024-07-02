@@ -73,7 +73,7 @@
                   <ngx-mat-intl-tel-input [enablePlaceholder]="true" [enableSearch]="true" formControlName="phone"
                                           [preferredCountries]="['nl']" name="phone"></ngx-mat-intl-tel-input>
                   @if (getForm.phone.hasError('validatePhoneNumber')) {
-                    <mat-error [innerHTML]="'COMMON.USER.PHONE.REQUIRED' | translate"></mat-error>
+                    <mat-error [innerHTML]="'COMMON.USER.PHONE.INVALID' | translate"></mat-error>
                   } @else if (errors['phone']) {
                     <mat-error>{{ errors['phone'] }}</mat-error>
                   }

@@ -26,6 +26,7 @@
         ],
         "urls": [
           "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap",
+          "https://fonts.googleapis.com/css2?family=Material+Icons&display=swap",
           "https://fonts.googleapis.com/css2?family=EB+Garamond:wght@300;400;500&display=swap"
         ]
       }
