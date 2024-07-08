@@ -1,7 +1,7 @@
 <div class="flex-container">
   <div class="card-container">
     <div class="card-content">
-      @if (user && !user.completed) {
+      @if (user && !user.isCompleted) {
         <span class="incomplete">{{ 'COMMON.PROFILE.INCOMPLETE' | translate }}</span>
       }
       <mat-card appearance="outlined">
@@ -41,9 +41,7 @@
               <div class="inner-container">
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'COMMON.USER.DISPLAY_NAME.FIELD' | translate }}</mat-label>
-                  <label>
-                    <input [formControl]="displayName" autocomplete="given-name" matInput>
-                  </label>
+                  <input [formControl]="displayName" autocomplete="given-name" matInput>
                   @if (errors['displayName']) {
                     <mat-error>{{ errors['displayName'] }}</mat-error>
                   }
@@ -51,12 +49,12 @@
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'COMMON.USER.LANG.FIELD' | translate }}</mat-label>
                   @if (select.value) {
-                    <span [class]="'fi fi-' + select.value.icon" class="margin-right-eight" matPrefix></span>
+                    <span [ngClass]="['fi', 'fi-' + select.value.icon, 'icon-margin']" matPrefix></span>
                   }
                   <mat-select #select [formControl]="langValue" required>
                     @for (lang of flagList; track lang) {
                       <mat-option [value]="lang">
-                        <span [class]="'fi fi-' + lang.icon"></span>{{ 'COMMON.LANG.' + lang.text | translate }}
+                        <span [ngClass]="['fi', 'fi-' + lang.icon, 'icon-margin']"></span>{{ 'COMMON.LANG.' + lang.text | translate }}
                       </mat-option>
                     }
                   </mat-select>
