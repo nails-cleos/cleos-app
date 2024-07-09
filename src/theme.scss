@@ -1,8 +1,6 @@
 @use '@angular/material' as mat;
 @use './styles-theme' as style;
 
-$mat-theme-ignore-duplication-warnings: true;
-
 $fontConfig: (
   display-4: mat.define-typography-level(112px, 112px, 300, 'EB+Garamond', -0.0134em),
   display-3: mat.define-typography-level(56px, 56px, 400, 'EB+Garamond', -0.0089em),
@@ -315,6 +313,7 @@ $mat-warn-dark: (
     A700 : $dark-primary-text,
   )
 );
+
 $theme-warn-dark: mat.define-palette($mat-warn-dark);
 
 // Define a dark theme
@@ -335,24 +334,16 @@ $light-theme: mat.define-light-theme((
   )
 ));
 
-@mixin light($light-theme) {
+.light-theme {
   @include mat.all-component-themes($light-theme);
   @include style.theme($light-theme);
   @include mat.strong-focus-indicators-theme($light-theme);
 }
 
-@mixin dark($dark-theme) {
-  @include mat.all-component-themes($dark-theme);
-  @include style.theme($dark-theme);
-  @include mat.strong-focus-indicators-theme($dark-theme);
-}
-
-.light-theme {
-  @include light($light-theme);
-}
-
 .dark-theme {
-  @include dark($dark-theme);
+  @include mat.all-component-colors($dark-theme);
+  @include style.color($dark-theme);
+  @include mat.strong-focus-indicators-color($dark-theme);
 }
 
 .home-page-form {
