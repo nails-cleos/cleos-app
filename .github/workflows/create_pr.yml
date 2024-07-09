@@ -1,0 +1,54 @@
+name: Create Pull Request for New Branches
+
+on:
+  push:
+    branches:
+      - '*'
+      - '!main'
+      - '!develop'
+
+jobs:
+  pull-request:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get Issue Number
+        id: extract_issue
+        run: |
+          ISSUE_NUMBER=$(echo "${GITHUB_REF#refs/heads/}" | grep -oE '[0-9]+')
+          echo "::set-output name=issue_number::${ISSUE_NUMBER}"
+
+      - name: Get Issue Title
+        id: get_issue_title
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issue_number = parseInt('${{ steps.extract_issue.outputs.issue_number }}');
+            const { data: issue } = await github.rest.issues.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue_number
+            });
+            return '#' + issue_number + ' ' + issue.title;
+
+      - name: Create Pull Request
+        uses: diillson/auto-pull-request@v1.0.1
+        with:
+          source_branch: ${{ github.ref_name }}
+          destination_branch: "develop"
+          pr_title: ${{ steps.get_issue_title.outputs.result }}
+          pr_body: |
+            ## Check list
+
+            - [x] Pull request pointing to `develop`
+            - [x] Link Pull request to issue
+            - [ ] Pull request is green
+
+            Closes: #${{ steps.extract_issue.outputs.issue_number }}
+          pr_assignee: "lucasscarlatta"
+          pr_label: "FrontEnd"
+          pr_draft: false
+          pr_allow_empty: true
+          github_token: ${{ secrets.ADMIN_TOKEN }}

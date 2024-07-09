@@ -92,7 +92,7 @@
                 <mat-icon color="accent">today</mat-icon>
               </button>
               <button [routerLink]="['/', language, 'accounts', 'customers', user.id]" mat-icon-button>
-                <mat-icon color="primary">account_balance</mat-icon>
+                <mat-icon color="primary">account_circle</mat-icon>
               </button>
               <ng-template [ngIf]="!user.deleted && !user.verified && user.uid">
                 <button (click)="sendInvite(user)" mat-icon-button>
