@@ -45,26 +45,21 @@ const initialState: State = {
   isLoading: false
 };
 
-const merge = (a: IDashboard, b: IDashboard) => {
-  const res = {};
-  Object.keys({ ...a, ...b }).map(key => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    res[key] = b[key] || a[key];
-  });
-  return res;
-};
+const getMap = (a: Map<string, IDashboard>, b: IDashboard): Map<string, IDashboard> => {
+  const res = new Map(a);
 
-const getMap = (a: Map<string, IDashboard>, b: IDashboard) => {
-  const res = a;
-  Object.keys({ ...a, ...b }).map(key => {
+  Object.keys(b).forEach(key => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     const data = b[key];
     const dashKey = data.roomName || data.professionalName;
-    const values = a.get(dashKey);
-    res.set(dashKey, merge(data, values || {}));
+
+    if (dashKey) {
+      const values = res.get(dashKey) || {};
+      res.set(dashKey, { ...values, ...data });
+    }
   });
+
   return res;
 };
 

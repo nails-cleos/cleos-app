@@ -72,11 +72,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   }
 
   get goTo(): void {
-    if (this.hasAdminRole) {
-      this.router.navigate(['/', this.language, 'accounts', 'customers', this.customer?.id]);
-    } else {
-      this.router.navigate(['/', this.language, 'accounts', this.account?.id, 'transactions', 'add']);
-    }
+    this.router.navigate(['/', this.language, 'accounts', this.account?.id, 'transactions', 'view']);
     return;
   }
 
