@@ -88,7 +88,7 @@
             <button mat-icon-button
                     [routerLink]="['/', language, 'accounts', account?.id, 'transactions', transaction.id]"
                     matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
-              <mat-icon color="primary">visibility</mat-icon>
+              <mat-icon color="primary">receipt</mat-icon>
             </button>
           </ng-template>
         </div>
@@ -131,7 +131,7 @@
                 <button [routerLink]="['/', language, 'accounts', account?.id, 'transactions', transaction.id]"
                         color="primary"
                         mat-icon-button>
-                  <mat-icon matListItemIcon>visibility</mat-icon>
+                  <mat-icon matListItemIcon>receipt</mat-icon>
                 </button>
               </mat-list-item>
             </ng-template>

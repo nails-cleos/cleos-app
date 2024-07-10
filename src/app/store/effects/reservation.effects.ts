@@ -437,7 +437,6 @@ export class ReservationEffects {
           case Role.customer:
             if (data.payload.paymentLink) {
               window.open(data.payload.paymentLink, '_self');
-              return;
             }
             navigation = [...navigation, 'me', 'reservations'];
             break;

@@ -20,7 +20,7 @@ export interface IUser {
   image?: any;
   code?: string | null;
   referralMax?: number;
-  completed?: boolean;
+  isCompleted?: boolean;
   theme?: Theme;
   timeZone?: string;
   lightColor?: string;
