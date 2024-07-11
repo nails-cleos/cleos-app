@@ -29,7 +29,7 @@ export const createChart = (chart: IChart, currency?: ICurrency, isDark?: boolea
       options = barChartDefaultOptions(undefined, chart.sum, isDark, locale);
       break;
     case 'LINE_CHART_CURRENCY':
-      options = lineChartDefaultOptions(currency, chart.sum, isDark, locale);
+      options = lineChartDefaultOptions(currency, chart.sum, isDark, locale, chart.footer);
       break;
     case 'LINE_CHART':
       options = lineChartDefaultOptions(undefined, chart.sum, isDark, locale);
@@ -60,6 +60,7 @@ export const createChart = (chart: IChart, currency?: ICurrency, isDark?: boolea
         pointHoverRadius: (value.pointRadius || 3) + 1,
         backgroundColor: color.backgroundColor,
         hoverBackgroundColor: color.hoverBackgroundColor,
+        borderDash: value.borderDash,
         borderColor: color.borderColor,
         hoverBorderColor: color.hoverBorderColor,
         pointBackgroundColor: color.pointBackgroundColor,
@@ -209,7 +210,13 @@ const barChartDefaultOptions = (currency?: ICurrency, sum?: boolean, isDark?: bo
   return options;
 };
 
-const lineChartDefaultOptions = (currency?: ICurrency, sum?: boolean, isDark?: boolean, locale?: string): ChartOptions<'bar'> => {
+const lineChartDefaultOptions = (
+  currency?: ICurrency,
+  sum?: boolean,
+  isDark?: boolean,
+  locale?: string,
+  footerTitle?: string
+): ChartOptions<'bar'> => {
   let options: ChartOptions<'bar'>;
   if (isDark) {
     options = {
@@ -239,7 +246,7 @@ const lineChartDefaultOptions = (currency?: ICurrency, sum?: boolean, isDark?: b
         tooltip: {
           callbacks: {
             label: (tooltipItem: any) => label(tooltipItem, currency, sum, locale),
-            footer: (tooltipItems: any) => footer(tooltipItems, currency, sum, locale)
+            footer: (tooltipItems: any) => footer(tooltipItems, currency, sum, locale, footerTitle)
           }
         }
       }
@@ -266,7 +273,7 @@ const lineChartDefaultOptions = (currency?: ICurrency, sum?: boolean, isDark?: b
         tooltip: {
           callbacks: {
             label: (tooltipItem: any) => label(tooltipItem, currency, sum, locale),
-            footer: (tooltipItems) => footer(tooltipItems, currency, sum, locale)
+            footer: (tooltipItems) => footer(tooltipItems, currency, sum, locale, footerTitle)
           }
         }
       }
@@ -275,10 +282,10 @@ const lineChartDefaultOptions = (currency?: ICurrency, sum?: boolean, isDark?: b
   return options;
 };
 
-const footer = (tooltipItems: any, currency?: ICurrency, sum?: boolean, locale?: string) => {
-  const total = sum ? tooltipItems.reduce((a: number, b: any) => a + b.parsed.y, 0) :
+const footer = (tooltipItems: any, currency?: ICurrency, sum?: boolean, locale?: string, title?: string) => {
+  const total = sum ? tooltipItems.reduce((a: number, b: any) => a + (b.dataset.borderDash ? 0 : b.parsed.y), 0) :
     tooltipItems[tooltipItems.length - 1].formattedValue;
-  return tooltipItems.length > 1 ? createTooltip('Total', total, currency, locale) : '';
+  return tooltipItems.length > 1 ? createTooltip(title || 'Total', total, currency, locale) : '';
 };
 
 const label = (tooltipItem: any, currency?: ICurrency, sum?: boolean, locale?: string) => {
@@ -288,7 +295,9 @@ const label = (tooltipItem: any, currency?: ICurrency, sum?: boolean, locale?: s
     return createTooltip(tooltipItem.dataset.label, Number(tooltipItem.raw) - previous, currency, locale);
   }
 
-  return createTooltip(tooltipItem.dataset.label, tooltipItem.raw, currency, locale);
+  const addTooltip = !tooltipItem.dataset.borderDash || tooltipItem.dataset.borderDash && (tooltipItem.dataIndex === tooltipItem.dataset.data.length - 1);
+
+  return addTooltip ? createTooltip(tooltipItem.dataset.label, tooltipItem.raw, currency, locale) : '';
 };
 
 const createTooltip = (title: string, value: string | number, currency?: ICurrency, locale?: string) =>
@@ -535,7 +544,7 @@ const barChatTimeLabel = (tooltipItem: any): string => {
   if (tooltipItem.parsed.y !== null) {
     label += formatSecsAsHourMin(tooltipItem.parsed.y);
   }
-  return label;;
+  return label;
 };
 
 const chartArrayColors = (): any[] => ([{

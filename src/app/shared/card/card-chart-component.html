@@ -1,9 +1,11 @@
-<button [mat-dialog-close]="true" class="close-button" mat-icon-button>
-  <mat-icon>close</mat-icon>
-</button>
-<h1 mat-dialog-title>{{data.title}}</h1>
-<div mat-dialog-content>
-  <div>
+<div mat-dialog-header>
+  <button [mat-dialog-close]="true" class="close-button" mat-icon-button>
+    <mat-icon>close</mat-icon>
+  </button>
+  <h1 mat-dialog-title>{{data.title}}</h1>
+</div>
+<div mat-dialog-content class="center-content">
+  <div class="canvas-container">
     <canvas [type]="data.chart.type"
             [datasets]="data.chart.charData.datasets"
             [labels]="data.chart.labels"

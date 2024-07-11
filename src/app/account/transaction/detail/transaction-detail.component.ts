@@ -70,7 +70,6 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
 
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
-      console.log(state.selected)
       if (state.selected) {
         this.transaction = Object.assign({}, state.selected, { date: newDateTimestamp(state.selected.payment.timestamp) });
       }
