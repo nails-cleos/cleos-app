@@ -105,6 +105,7 @@ export interface IChart {
   colors?: string;
   sum?: boolean;
   currency?: ICurrency;
+  footer?: string
 }
 
 export interface IRoomEvents {
