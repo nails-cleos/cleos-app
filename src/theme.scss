@@ -335,8 +335,11 @@ $light-theme: mat.define-light-theme((
 ));
 
 @include mat.all-component-themes($light-theme);
-@include style.theme($light-theme);
-@include mat.strong-focus-indicators-theme($light-theme);
+
+.light-theme {
+  @include style.color($light-theme);
+  @include mat.strong-focus-indicators-color($light-theme);
+}
 
 .dark-theme {
   @include mat.all-component-colors($dark-theme);
