@@ -101,7 +101,7 @@
             <input (keydown)="keyDownGroup($event)" [formControl]="group" [matAutocomplete]="autoGroup" matInput
                    required type="text">
             <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
-              @for (group of filteredGroup | async | sortBy: 'asc':'name'; track group) {
+              @for (group of filteredGroup | async | sortBy: 'asc':'order'; track group) {
                 <mat-option [value]="group">{{ group.name }}</mat-option>
               }
             </mat-autocomplete>
@@ -124,7 +124,7 @@
               <input (keydown)="keyDownHandler($event, treatment)" [formControl]="treatment"
                      [matAutocomplete]="autoTreatment" matInput required type="text">
               <mat-autocomplete #autoTreatment="matAutocomplete" [displayWith]="displayFnTreatment">
-                @for (treatment of filteredTreatment | async | sortBy: 'asc':'name'; track treatment) {
+                @for (treatment of filteredTreatment | async | sortBy: 'asc':'order'; track treatment) {
                   <mat-option [value]="treatment">{{ treatment.name }}</mat-option>
                 }
               </mat-autocomplete>
