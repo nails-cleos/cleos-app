@@ -57,7 +57,7 @@ export class TreatmentComponent implements OnInit, OnDestroy {
       hasError = true;
       this.errors.treatments = 'REQUIRED';
     }
-    this.treatments = this.treatments.map((tab: ITreatment) => {
+    this.treatments = this.treatments.map((tab: ITreatment, i) => {
       const errors: any = {};
       if (!tab.name || tab.name.trim().length === 0) {
         errors.name = 'REQUIRED';
@@ -67,7 +67,7 @@ export class TreatmentComponent implements OnInit, OnDestroy {
         errors.time = 'REQUIRED';
         hasError = true;
       }
-      return Object.assign({}, tab, { errors });
+      return Object.assign({}, tab, { errors, order: i });
     });
 
     if (hasError || this.form.invalid) {

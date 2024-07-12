@@ -35,6 +35,7 @@ export class TreatmentSortingComponent implements OnInit, OnDestroy {
   }
 
   sorted(sorted: ISorted[]): void {
+    this.items = undefined;
     this.store.dispatch(
       new fromActionsTreatment.TreatmentUpdateSort(sorted)
     );
