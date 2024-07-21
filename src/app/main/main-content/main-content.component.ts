@@ -60,6 +60,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   contactTitle: AnimationSequenceMetadata;
   contactText: AnimationSequenceMetadata;
   contactMap: AnimationAnimateMetadata;
+  faqTitle: AnimationAnimateMetadata;
   isSmall: boolean;
   isDark: boolean;
   form!: UntypedFormGroup;
@@ -124,6 +125,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.contactText = rubberBand;
     this.contactTitle = fadeInUpDown('20px', '500ms');
     this.contactMap = bounceInDownAnimation('500ms');
+    this.faqTitle = bounceInDownAnimation('500ms');
 
     this.getState = this.store.select(selectMainState);
     this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {

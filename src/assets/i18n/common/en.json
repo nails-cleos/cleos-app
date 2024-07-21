@@ -411,7 +411,6 @@
       "id": "biab",
       "name": "Biab Treatment",
       "description": "The GelBottle Inc™ BIAB is a thicker consistency gel, chip-resistant which helps to harden your natural nails while you wear it and offer extreme long lasting shine. BIAB tends to last around three to four weeks – sometimes longer.",
-      "priceFrom": 60,
       "title": "Biab Nailstudio in Capelle aan den iJssel",
       "translations": {
         "value_1": "Why is BIAB TREATMENT the best?",
@@ -507,36 +506,32 @@
     {
       "id": "gel-polish",
       "name": "GelPolish",
-      "description": "The GelPolish Colour is applied with the Biab Rubber Base Coat underneath to give extra strength to flaky, brittle, thin or splitting nails. Treatments includes manicure always. GelPolish tends to last around two to three weeks – sometimes longer.",
-      "priceFrom": 40
+      "description": "The GelPolish Colour is applied with the Biab Rubber Base Coat underneath to give extra strength to flaky, brittle, thin or splitting nails. Treatments includes manicure always. GelPolish tends to last around two to three weeks – sometimes longer."
     },
     {
       "id": "vinylux",
       "name": "Nail Polish CND Vinylux",
-      "description": "CND VINYLUX™ Long Wear Polish Colour finished with top coat shine which makes it way more chip-resistant than your average nail polish. It tends to last at least a week. Then you can remove it with standard nail polish remover.",
-      "priceFrom": 35
+      "description": "CND VINYLUX™ Long Wear Polish Colour finished with top coat shine which makes it way more chip-resistant than your average nail polish. It tends to last at least a week. Then you can remove it with standard nail polish remover."
     },
     {
       "id": "e-file",
       "name": "Manicure E-File",
-      "description": "The E-file manicure means I perform on dry skin using different E-file bits to push back and exfoliate the dead skin which gives us a more clean and polished look. Then your nails are ready to receive the treatment you are wanting!",
-      "priceFrom": 25
+      "description": "The E-file manicure means I perform on dry skin using different E-file bits to push back and exfoliate the dead skin which gives us a more clean and polished look. Then your nails are ready to receive the treatment you are wanting!"
     },
     {
       "id": "toenails",
       "name": "Toenails Color",
-      "description": "Color on toenails (the treatment includes cuticles removal and shape toenails)",
-      "priceFrom": 40
+      "description": "Color on toenails (the treatment includes cuticles removal and shape toenails)"
     },
     {
       "id": "repair",
       "name": "Nail Repair",
-      "description": "Fixing nails just before your treatment or when you come to me to fix one. Time and price will depend on the condition of the nail. If it happend due to a defect in the treatment itself then it will be free of charge.",
-      "priceFrom": 5
+      "description": "Fixing nails just before your treatment or when you come to me to fix one. Time and price will depend on the condition of the nail. If it happend due to a defect in the treatment itself then it will be free of charge."
     },
     {
       "id": "spa",
-      "name": "CND Spa Manicure"
+      "name": "CND Spa Manicure",
+      "description": ""
     }
   ]
 }

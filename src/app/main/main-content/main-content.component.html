@@ -47,7 +47,7 @@
     <div class="section-title text-center" appAnimate [animateInAnimation]="storyTitle">
       <h2>{{ 'MAIN.SECTION.STORY' | translate }}</h2>
       <div class="home-divider">
-        <mat-icon>favorite</mat-icon>
+        <mat-icon color="warn" class="material-icons">favorite</mat-icon>
       </div>
     </div>
 
@@ -90,7 +90,7 @@
       <div class="section-title text-center">
         <h2>{{ 'MAIN.SECTION.WORK' | translate }}</h2>
         <div class="home-divider">
-          <mat-icon>favorite</mat-icon>
+          <mat-icon color="warn" class="material-icons">favorite</mat-icon>
         </div>
       </div>
 
@@ -145,7 +145,7 @@
       <div class="section-title text-center mb-50" appAnimate [animateInAnimation]="treatmentTitle">
         <h2 style="margin-top: 6%;">{{ 'MAIN.SECTION.TREATMENT' | translate }}</h2>
         <div class="home-divider">
-          <mat-icon>favorite</mat-icon>
+          <mat-icon color="warn" class="material-icons">favorite</mat-icon>
         </div>
       </div>
       <div #treatmentItem></div>
@@ -160,11 +160,6 @@
               </div>
               <div class="treatment-desc">
                 <h3>{{ group.name }}</h3>
-                @if (group.priceFrom) {
-                  <p
-                    [innerHTML]="'MAIN.TREATMENT.PRICE_FROM' | translate: {priceFrom: ('EUR'| currencySymbol) + ' ' + group.priceFrom}">
-                  </p>
-                }
                 <h5>{{ group.description }}</h5>
               </div>
             </div>
@@ -183,7 +178,7 @@
       <div class="section-title text-center mb-50" appAnimate [animateInAnimation]="experienceTitle">
         <h2 class="experience-title">{{ 'MAIN.SECTION.EXPERIENCE' | translate }}</h2>
         <div class="home-divider">
-          <mat-icon>favorite</mat-icon>
+          <mat-icon color="warn" class="material-icons">favorite</mat-icon>
         </div>
       </div>
 
@@ -212,7 +207,7 @@
     <div class="section-title text-center mb-50" appAnimate [animateInAnimation]="contactTitle">
       <h2>{{ 'MAIN.SECTION.CONTACTS' | translate }}</h2>
       <div class="home-divider">
-        <mat-icon>favorite</mat-icon>
+        <mat-icon color="warn" class="material-icons">favorite</mat-icon>
       </div>
     </div>
 
