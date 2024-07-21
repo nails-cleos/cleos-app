@@ -22,7 +22,7 @@
   .home-divider:before,
   .home-divider:after {
     content: "______________________";
-    color: mat.get-color-from-palette($foreground, text);
+    color: mat.get-color-from-palette($primary-palette);
     position: relative;
     bottom: 1.3vh;
   }
