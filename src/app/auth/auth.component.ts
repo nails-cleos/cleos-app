@@ -152,6 +152,7 @@ export class AuthComponent implements OnInit, OnDestroy {
         });
         if (state.message) {
           snackBarRef.afterDismissed().subscribe(() => {
+            this.logout();
             this.clean();
           });
         }
@@ -187,6 +188,12 @@ export class AuthComponent implements OnInit, OnDestroy {
         }
       }
     });
+  }
+
+  private logout(): void {
+    this.store.dispatch(
+      new fromActionsLogin.LogOut()
+    );
   }
 
   private clean(): void {
