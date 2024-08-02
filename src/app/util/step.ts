@@ -34,7 +34,7 @@ export const goNextStep = (step: IStep): void => {
 
 export const getIndex = (steps: IStep[], name: string): number | undefined => steps.find(s => s.name === name)?.order;
 
-export const getStepCall = (steps: IStep[], index: number): void => getStep(steps, index)?.call(false);
+export const getStepCall = (steps: IStep[], index: number, goNext: boolean = false): void => getStep(steps, index)?.call(goNext);
 export const getStepName = (steps: IStep[], index: number): string => {
   const step = getStep(steps, index);
   return step ? step.name : '';

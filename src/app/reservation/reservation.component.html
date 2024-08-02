@@ -117,23 +117,46 @@
       <div class="no-content bold">{{ 'RESERVATION.TREATMENT.NO_CONTENT' | translate }}</div>
     } @else {
       <div class="link-container">
-        <mat-form-field appearance="outline">
-          <mat-label>{{ 'RESERVATION.DATE.FIELD' | translate }}</mat-label>
-          <input (focus)="picker.open()" formControlName="date" [matDatepickerFilter]="myFilter"
-                 [matDatepicker]="picker" [max]="maxCalendarDate" matInput required>
-          <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
-          <mat-datepicker #picker touchUi></mat-datepicker>
-          @if (date.hasError('required')) {
-            <mat-error [innerHTML]="'RESERVATION.DATE.REQUIRED' | translate"></mat-error>
+        <div formArrayName="dateTimeList" class="date-time-form">
+          @for (dateGroup of dateTimeList.controls; track dateGroup; let i = $index) {
+            <div [formGroupName]="i" class="date-time-group">
+              <div class="date-time-fields">
+                <mat-form-field appearance="outline" class="date-field">
+                  <mat-label>{{ 'RESERVATION.DATE.FIELD' | translate }}</mat-label>
+                  <input (focus)="picker.open()" formControlName="date" [matDatepickerFilter]="myFilter"
+                         [matDatepicker]="picker" [max]="maxCalendarDate" matInput required>
+                  <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
+                  <mat-datepicker #picker touchUi></mat-datepicker>
+                  @if (dateGroup.get('date')?.hasError('invalid')) {
+                    <mat-error [innerHTML]="'RESERVATION.DATE.REQUIRED' | translate"></mat-error>
+                  }
+                  @if (dateGroup.get('date')?.hasError('duplicateDate')) {
+                    <mat-error>Duplicate dates are not allowed.</mat-error>
+                  }
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="time-field">
+                  <mat-label>{{ 'RESERVATION.START.FIELD' | translate }}</mat-label>
+                  <input formControlName="start" [format]="24" [max]="maxDate" [min]="minDate"
+                         [ngxTimepicker]="tStart"
+                         matInput name="start" readonly/>
+                  <span matPrefix><mat-icon (click)="tStart.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
+                  <ngx-material-timepicker #tStart (timeSet)="timeChange($event, i)"
+                                           [minutesGap]="15"></ngx-material-timepicker>
+                </mat-form-field>
+              </div>
+              <button class="remove-button" [disabled]="dateTimeList.controls.length === 1" (click)="removeDate(i)"
+                      mat-fab color="warn">
+                <mat-icon matIconPrefix>delete</mat-icon>
+              </button>
+            </div>
           }
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>{{ 'RESERVATION.START.FIELD' | translate }}</mat-label>
-          <input formControlName="start" [format]="24" [max]="maxDate" [min]="minDate" [ngxTimepicker]="tStart"
-                 matInput name="start" readonly/>
-          <span matPrefix><mat-icon (click)="tStart.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
-          <ngx-material-timepicker #tStart (timeSet)="timeChange($event)" [minutesGap]="15"></ngx-material-timepicker>
-        </mat-form-field>
+
+          <div class="add-button-container">
+            <button (click)="addDate()" [disabled]="isAddButtonDisabled" mat-fab color="primary" class="add-button">
+              <mat-icon matIconPrefix>calendar_add_on</mat-icon>
+            </button>
+          </div>
+        </div>
         @if (groups) {
           <mat-form-field appearance="outline">
             <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
@@ -326,29 +349,34 @@
 </ng-template>
 
 <ng-template #stepSix>
-  <mwl-calendar-week-view
-    (beforeViewRender)="beforeMonthViewRender($event)"
-    (eventTimesChanged)="eventTimesChanged($event)"
-    (hourSegmentClicked)="segmentClick($event.date, 'CREATED')"
-    [dayEndHour]="day.dayEndHour"
-    [dayEndMinute]="day.dayEndMinute"
-    [dayStartHour]="day.dayStartHour"
-    [dayStartMinute]="day.dayStartMinute"
-    [daysInWeek]="daysInWeek"
-    [events]="events"
-    [hourSegments]="4"
-    [locale]="dateFormat"
-    [refresh]="refresh"
-    [viewDate]="viewDate"
-    [weekendDays]="weekendDays"></mwl-calendar-week-view>
-  @if (errors['schedule']) {
-    <mat-error [innerHTML]="'RESERVATION.SCHEDULE.REQUIRED' | translate" class="divider"></mat-error>
-  }
-  @if (errors['overlapping']) {
-    <mat-error [innerHTML]="errors['overlapping']" class="divider"></mat-error>
-  }
-  @if (errors['professional']) {
-    <mat-error [innerHTML]="errors['professional']" class="divider"></mat-error>
+  @for (dataEvent of dataEvents | keyvalue; track dataEvent; let last = $last) {
+    <mwl-calendar-week-view
+      (beforeViewRender)="beforeMonthViewRender($event)"
+      (eventTimesChanged)="eventTimesChanged($event, dataEvent.value)"
+      (hourSegmentClicked)="segmentClick($event.date, 'CREATED', dataEvent.key)"
+      [dayEndHour]="day.dayEndHour"
+      [dayEndMinute]="day.dayEndMinute"
+      [dayStartHour]="day.dayStartHour"
+      [dayStartMinute]="day.dayStartMinute"
+      [daysInWeek]="daysInWeek"
+      [events]="dataEvent.value.calendarEvents"
+      [hourSegments]="4"
+      [locale]="dateFormat"
+      [refresh]="refresh"
+      [viewDate]="dataEvent.value.viewDate"
+      [weekendDays]="weekendDays"></mwl-calendar-week-view>
+    @if (errors['schedule']?.length && errors['schedule'][dataEvent.value.index]) {
+      <mat-error [innerHTML]="'RESERVATION.SCHEDULE.REQUIRED' | translate" class="divider"></mat-error>
+    }
+    @if (errors['overlapping']) {
+      <mat-error [innerHTML]="errors['overlapping']" class="divider"></mat-error>
+    }
+    @if (errors['professional']) {
+      <mat-error [innerHTML]="errors['professional']" class="divider"></mat-error>
+    }
+    @if (!last) {
+      <mat-divider style="margin-top: 5%"></mat-divider>
+    }
   }
 </ng-template>
 
@@ -392,7 +420,9 @@
               <a [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + room.value.address.name"
                  rel="noreferrer" target="_blank">{{ room.value.address.name }}</a>
             </div>
-            <div matListItemLine class="description">{{ room.value.address.description }}</div>
+            @if (room.value.address.description) {
+              <div matListItemLine class="description">{{ room.value.address.description }}</div>
+            }
           </mat-list-item>
           <mat-divider></mat-divider>
           <div mat-subheader>{{ 'COMMON.TREATMENT.FIELD' | translate }}</div>
@@ -443,25 +473,29 @@
           }
           <mat-divider></mat-divider>
           <div mat-subheader>{{ 'RESERVATION.APPOINTMENT' | translate }}</div>
-          <mat-list-item>
-            <mat-icon matListItemIcon>event</mat-icon>
-            <div matListItemTitle>
-              {{ event.value.start | date:'short':room.value.timeZone:dateFormat }}
-              @if (showTimeZone) {
-                <button (click)="openDialog(event.value?.start)" mat-icon-button type="button">
-                  <mat-icon>info_outline</mat-icon>
-                </button>
-              }
-            </div>
-            <div matListItemLine>
-              {{ event.value?.end | date:'short':room.value.timeZone:dateFormat }}
-              @if (showTimeZone) {
-                <button (click)="openDialog(event.value?.end)" mat-icon-button type="button">
-                  <mat-icon>info_outline</mat-icon>
-                </button>
-              }
-            </div>
-          </mat-list-item>
+          @for (eventGroup of events.value; track eventGroup) {
+            @if (eventGroup.event) {
+              <mat-list-item>
+                <mat-icon matListItemIcon>event</mat-icon>
+                <div matListItemTitle>
+                  {{ eventGroup.event.start | date:'short':room.value.timeZone:dateFormat }}
+                  @if (showTimeZone) {
+                    <button (click)="openDialog(eventGroup.event.start)" mat-icon-button type="button">
+                      <mat-icon>info_outline</mat-icon>
+                    </button>
+                  }
+                </div>
+                <div matListItemLine>
+                  {{ eventGroup.event.end | date:'short':room.value.timeZone:dateFormat }}
+                  @if (showTimeZone) {
+                    <button (click)="openDialog(eventGroup.event.end)" mat-icon-button type="button">
+                      <mat-icon>info_outline</mat-icon>
+                    </button>
+                  }
+                </div>
+              </mat-list-item>
+            }
+          }
           @if (additionalSelected.length) {
             <mat-list-item>
               <mat-icon matListItemIcon>timer</mat-icon>
@@ -527,10 +561,12 @@
                 <mat-label>{{ 'COMMON.ADDRESS.FIELD' | translate }}</mat-label>
                 <input [value]="room.value.address.name" disabled matInput type="text">
               </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'COMMON.ADDRESS.DESCRIPTION' | translate }}</mat-label>
-                <input [value]="room.value.address.description" disabled matInput type="text">
-              </mat-form-field>
+              @if (room.value.address.description) {
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'COMMON.ADDRESS.DESCRIPTION' | translate }}</mat-label>
+                  <input [value]="room.value.address.description" disabled matInput type="text">
+                </mat-form-field>
+              }
               <div class="vertical-divider"></div>
               <div style="width: 400px">
                 <app-google-map (addressEmitter)="getAddress($event)" [latitudeMarker]="room.value.address.location.y"
@@ -570,8 +606,8 @@
             <mat-icon>keyboard_return</mat-icon>
           </button>
         }
-        <button type="button" (click)="callStepFour(true)" [disabled]="treatmentForm.invalid" color="primary"
-                class="icon-button" mat-fab>
+        <button type="button" (click)="callStepFour(true)" [disabled]="treatmentForm.invalid || isAddButtonDisabled"
+                color="primary" class="icon-button" mat-fab>
           <mat-icon>arrow_downward</mat-icon>
         </button>
       </div>
@@ -686,10 +722,12 @@
                   <mat-label>{{ 'COMMON.ADDRESS.FIELD' | translate }}</mat-label>
                   <input [value]="room.value.address.name" disabled matInput type="text">
                 </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>{{ 'COMMON.ADDRESS.DESCRIPTION' | translate }}</mat-label>
-                  <input [value]="room.value.address.description" disabled matInput type="text">
-                </mat-form-field>
+                @if (room.value.address.description) {
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ 'COMMON.ADDRESS.DESCRIPTION' | translate }}</mat-label>
+                    <input [value]="room.value.address.description" disabled matInput type="text">
+                  </mat-form-field>
+                }
               }
             }
           </div>
@@ -738,8 +776,8 @@
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
         }
-        <button type="button" (click)="callStepFour(true)" [disabled]="treatmentForm.invalid" color="primary"
-                mat-fab extended class="icon-button">
+        <button type="button" (click)="callStepFour(true)" [disabled]="treatmentForm.invalid || isAddButtonDisabled"
+                color="primary" mat-fab extended class="icon-button">
           <mat-icon>arrow_forward</mat-icon>
           {{ 'COMMON.BUTTON.NEXT' | translate }}
         </button>

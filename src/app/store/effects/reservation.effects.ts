@@ -55,17 +55,15 @@ export class ReservationEffects {
   getAllGroupingByRoom$ = createEffect(() =>
     this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.getAllGroupingByRoom)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.reservationService.getAllGroupingByRoom(payload.days, payload.date, payload.roomId,
-        payload.professionalId).pipe(
-        switchMap((response) => of(new fromActionsReservation.ReservationSuccess(response ? response : []))),
+      switchMap((payload: any) => this.reservationService.getAllGroupingByRoom(payload.days, payload.date, payload.roomId, payload.professionalId).pipe(
+        switchMap((response) => of(new fromActionsReservation.ReservationSuccess(response ? response[0] : []))),
         catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({ error: err.error })))
       ))
     ));
 
   search$ = createEffect(() => this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.searchReservation)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.reservationService.search(payload.roomId, payload.days, payload.date,
-      payload.professionalId).pipe(
+    switchMap((payload: any) => this.reservationService.search(payload.roomId, payload.days, payload.dates, payload.professionalId).pipe(
       switchMap((response) => of(new fromActionsReservation.ReservationSuccess(response ? response : []))),
       catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({ error: err.error })))
     ))
@@ -158,10 +156,10 @@ export class ReservationEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.reservationService.add(payload.reservation).pipe(
       switchMap((response) => of(new fromActionsReservation.ReservationSaveSuccess({
-        message: this.translate.instant('COMMON.RESERVATION.CREATED', { date: newDateTimestamp(response.timestamp) }),
-        id: response.id,
+        message: this.translate.instant('COMMON.RESERVATION.CREATED', { date: newDateTimestamp(response[0].timestamp) }),
+        id: response[0].id,
         role: payload.role,
-        paymentLink: response.paymentLink,
+        paymentLink: response[0].paymentLink,
         navigate: true
       }))), catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({
         error: err.error
