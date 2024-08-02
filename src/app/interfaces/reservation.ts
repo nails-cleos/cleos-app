@@ -39,6 +39,7 @@ export interface IReservation {
   professionalId?: string;
   professional?: IUser;
   start?: string;
+  moreStart?: string[];
   timestamp?: number;
   timeZone?: string;
   state?: string;

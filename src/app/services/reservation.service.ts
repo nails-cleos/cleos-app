@@ -66,22 +66,24 @@ export class ReservationService {
   }
 
   public getAllGroupingByRoom(days: number, date: Date, roomId: string,
-                              professionalId?: string): Observable<IReservation> {
-    let params = new HttpParams().set('date', date.toISOString().slice(0, 10))
-      .append('days', days);
+                              professionalId?: string): Observable<IRoomReservation[]> {
+    let params = new HttpParams().set('dates', date.toISOString().slice(0, 10)).append('days', days);
     if (professionalId) {
       params = params.append('professionalId', professionalId);
     }
-    return this.http.get<any>(`${ this.urlV1 }/rooms/${ roomId }`, { params });
+    return this.http.get<IRoomReservation[]>(`${ this.urlV1 }/rooms/${ roomId }`, { params });
   }
 
-  public search(roomId: string, days: number, date: Date, professionalId?: string): Observable<IRoomReservation> {
-    let params = new HttpParams().set('date', date.toISOString().slice(0, 10));
-    params = params.append('days', days);
+  public search(roomId: string, days: number, dates: Date[], professionalId?: string): Observable<IRoomReservation[]> {
+    let params = new HttpParams().set('days', days);
+    dates.forEach(date => {
+      params = params.append('dates', date.toISOString().slice(0, 10));
+    });
+
     if (professionalId) {
       params = params.append('professionalId', professionalId);
     }
-    return this.http.get<IRoomReservation>(`${ this.urlV1 }/rooms/${ roomId }`, { params });
+    return this.http.get<IRoomReservation[]>(`${ this.urlV1 }/rooms/${ roomId }`, { params });
   }
 
   public customerSearch(roomId: string, treatmentId: string, date: Date, professionalId: string,
@@ -111,8 +113,8 @@ export class ReservationService {
     return this.http.get<IReservation>(`${ this.urlV1 }/${ id }/history`);
   }
 
-  public add(reservation: IReservation): Observable<IReservation> {
-    return this.http.post<IReservation>(this.urlV1, reservation);
+  public add(reservation: IReservation): Observable<IReservation[]> {
+    return this.http.post<IReservation[]>(this.urlV1, reservation);
   }
 
   public delete(id: string | null): Observable<IReservation> {

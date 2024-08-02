@@ -295,7 +295,7 @@ const label = (tooltipItem: any, currency?: ICurrency, sum?: boolean, locale?: s
     return createTooltip(tooltipItem.dataset.label, Number(tooltipItem.raw) - previous, currency, locale);
   }
 
-  const addTooltip = !tooltipItem.dataset.borderDash || tooltipItem.dataset.borderDash && (tooltipItem.dataIndex === tooltipItem.dataset.data.length - 1);
+  const addTooltip = !tooltipItem.dataset.borderDash || tooltipItem.dataset.borderDash && (new Date(tooltipItem.label) > new Date());
 
   return addTooltip ? createTooltip(tooltipItem.dataset.label, tooltipItem.raw, currency, locale) : '';
 };

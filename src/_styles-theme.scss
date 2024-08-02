@@ -169,6 +169,12 @@
     border: solid 1px mat.get-color-from-palette($background, tooltip);
   }
 
+  .date-time-form {
+    .date-time-group {
+      border: dashed 1px mat.get-color-from-palette($primary-palette);
+    }
+  }
+
   .sorting-item-box {
     background: mat.get-color-from-palette($background, card);
     border-bottom: solid 1px mat.get-color-from-palette($background, tooltip);

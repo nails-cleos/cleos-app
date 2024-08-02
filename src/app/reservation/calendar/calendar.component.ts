@@ -517,7 +517,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
       } else if (this.offices && this.offices.length === 1) {
         this.office.setValue(this.offices[0]);
       }
-      if (state.data && state.data && state.data.room && state.data.reservations) {
+      if (state.data && state.data.room && state.data.reservations) {
         this.data = state.data;
         this.fillData(this.isDarkMode);
       }

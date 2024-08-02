@@ -18,7 +18,9 @@ export enum ReservationIconName {
   change = 'switch_account',
   cancelledPaymentRequired = 'credit_card_off',
   editCancelled = 'edit_calendar',
-  color = 'palette'
+  color = 'palette',
+  previous = 'line_start_arrow_notch',
+  next = 'line_end_arrow_notch'
 }
 
 export enum RoomIconName {

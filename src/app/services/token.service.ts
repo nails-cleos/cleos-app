@@ -20,7 +20,7 @@ export class TokenService {
 
   constructor(private readonly translate: TranslateService, private router: Router, private auth: Auth) {
     this.cacheSize = 1;
-    this.refreshInterval = 5 * 60 * 1000; // 5 min
+    this.refreshInterval = 55 * 60 * 1000; // 5 min
   }
 
   get user(): IUserAll {

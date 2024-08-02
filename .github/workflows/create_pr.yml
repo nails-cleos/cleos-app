@@ -17,7 +17,8 @@ jobs:
         id: extract_issue
         run: |
           ISSUE_NUMBER=$(echo "${GITHUB_REF#refs/heads/}" | grep -oE '[0-9]+')
-          echo "issue_number=${ISSUE_NUMBER}" >> $GITHUB_ENV
+          echo "Extracted ISSUE_NUMBER: $ISSUE_NUMBER"
+          echo "ISSUE_NUMBER=$ISSUE_NUMBER" >> $GITHUB_ENV
 
       - name: Get Issue Title and Label
         id: get_issue_title_label
@@ -25,7 +26,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const issue_number = parseInt(process.env.issue_number);
+            const issue_number = parseInt(process.env.ISSUE_NUMBER);
             const { data: issue } = await github.rest.issues.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -50,7 +51,7 @@ jobs:
             - [x] Link Pull request to issue
             - [ ] Pull request is green
 
-            Closes: #${{ env.issue_number }}
+            Closes: #${{ env.ISSUE_NUMBER }}
           pr_assignee: "lucasscarlatta"
           pr_label: ${{ steps.get_issue_title_label.outputs.issueLabel }}
           pr_draft: false
