@@ -97,6 +97,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   step?: number;
   language: string;
 
+  private static stateMachineDefinition: any;
   private machine: any;
   private getState: Observable<any>;
   private getPaymentState: Observable<any>;
@@ -181,6 +182,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   }
 
   private static createMachine(stateMachineDefinition: any, initialState: any): any {
+    ReservationDetailComponent.stateMachineDefinition = stateMachineDefinition;
     const machine = {
       value: initialState,
       transition: (currentState: any, event: any): any => {
@@ -200,6 +202,31 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       }
     };
     return machine;
+  }
+
+  private static addTransitionToAllStates(eventName: string, transitionDetails: any, nextState: any, last: boolean = true): void {
+    for (const state in ReservationDetailComponent.stateMachineDefinition) {
+      if (state !== 'initialState') {
+        if (ReservationDetailComponent.stateMachineDefinition.hasOwnProperty(state)) {
+          const stateDefinition = ReservationDetailComponent.stateMachineDefinition[state];
+          if (!stateDefinition.transitions) {
+            stateDefinition.transitions = {};
+          }
+          stateDefinition.transitions[eventName] = transitionDetails;
+
+          if (!stateDefinition.next) {
+            stateDefinition.next = [];
+          }
+          if (!stateDefinition.next.includes(nextState)) {
+            if (last) {
+              stateDefinition.next.push(nextState);
+            } else {
+              stateDefinition.next.unshift(nextState)
+            }
+          }
+        }
+      }
+    }
   }
 
   private static createTransaction(target: string, action: any): any {
@@ -240,7 +267,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   }
 
   onChangeState(id: string): void {
-    const list = ['send', 'coffee', 'book', 'more', 'change', 'cancel', 'cancel_edit', 'notify', 'pay', 'color'];
+    const list = ['send', 'coffee', 'book', 'more', 'change', 'cancel', 'cancel_edit', 'notify', 'pay', 'color', 'previous', 'next'];
     if (list.indexOf(id) >= 0 && this.reservation) {
       this.machine.transition(snakeToCamel(this.reservation.state), snakeToCamel(id));
       return;
@@ -359,6 +386,30 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       this.dataSource = new MatTableDataSource(state.history);
       if (this.history && this.history[0]?.id) {
         this.dataSource.paginator = this.paginator;
+        if (this.reservation) {
+          const allReservations = [...this.history, this.reservation]
+            .sort((a, b) => a.timestamp - b.timestamp).map(reservation => reservation.id);
+
+          const currentIndex = allReservations.indexOf(this.reservation.id);
+          if (currentIndex > 0) {
+            const previous = 'previous';
+            const previousAction = this.createAction(this.translate.instant('RESERVATION.ACTION.PREVIOUS'),
+              ReservationIconName.previous, previous);
+            const previousTransition = ReservationDetailComponent.createTransaction(previous,
+              () => this.router.navigate([this.language, 'reservation', allReservations[currentIndex - 1]]
+              ));
+            ReservationDetailComponent.addTransitionToAllStates(previous, previousTransition, previousAction, false);
+          }
+          if (currentIndex >= 0 && currentIndex < allReservations.length - 1) {
+            const next = 'next';
+            const nextAction = this.createAction(this.translate.instant('RESERVATION.ACTION.NEXT'),
+              ReservationIconName.next, next);
+            const nextTransition = ReservationDetailComponent.createTransaction(next,
+              () => this.router.navigate([this.language, 'reservation', allReservations[currentIndex + 1]]
+              ));
+            ReservationDetailComponent.addTransitionToAllStates(next, nextTransition, nextAction);
+          }
+        }
       }
       if (state.errorMessage || state.message) {
         if (state.message) {

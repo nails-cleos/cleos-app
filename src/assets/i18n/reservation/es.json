@@ -163,7 +163,9 @@
       "MORE": "Más",
       "CHANGE": "Cambiar cliente",
       "COLOR": "Cambiar color",
-      "COFFEE": "Enviar café"
+      "COFFEE": "Enviar café",
+      "PREVIOUS": "Anterior",
+      "NEXT": "Siguiente"
     },
     "CHANGE_STATE": {
       "TITLE": "Cambio de estado",
