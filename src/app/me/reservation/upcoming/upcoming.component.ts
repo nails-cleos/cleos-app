@@ -15,7 +15,6 @@ import { Router } from '@angular/router';
 })
 export class UpcomingComponent implements OnChanges {
   @Input() upcoming: IUpcomingAll | undefined;
-  @Input() showHeader: boolean;
   @Input() small!: boolean;
 
   dateFormat: string;
@@ -24,7 +23,6 @@ export class UpcomingComponent implements OnChanges {
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private router: Router) {
     this.dateFormat = this.translate.currentLang;
     this.language = this.translate.currentLang;
-    this.showHeader = false;
   }
 
   get showTimeZone(): boolean {

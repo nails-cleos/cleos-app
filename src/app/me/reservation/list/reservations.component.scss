@@ -8,3 +8,15 @@
 .mat-mdc-card-header {
   justify-content: center;
 }
+
+.title-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 2%;
+}
+
+.title-container span {
+  flex-grow: 1;
+}

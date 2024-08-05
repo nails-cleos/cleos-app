@@ -1,6 +1,6 @@
 <mat-card appearance="outlined">
   @if (reservation) {
-    <mat-card-header>
+    <mat-card-header [class.row-is-canceled]="reservation.state === 'CANCELLED'">
       <mat-card-title>{{ 'RESERVATION.CUSTOMER.DETAIL' | translate }}</mat-card-title>
       <mat-card-subtitle>
         @if (isCustomer) {

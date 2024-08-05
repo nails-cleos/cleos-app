@@ -396,7 +396,7 @@
 
 @if (canCreate) {
   @if (smallScreen) {
-    <mat-vertical-stepper #stepper [linear]="true" (selectionChange)="triggerClick">
+    <mat-vertical-stepper #stepper [linear]="true" (selectionChange)="triggerClick($event)">
       <mat-step [completed]="getStepCompleted(0)" [editable]="getStepEnabled(0)" [state]="getStepName(0)"
                 [optional]="getStepOptional(0)" [stepControl]="roomForm">
         <ng-template matStepLabel>{{ 'COMMON.ROOM.FIELD' | translate }}</ng-template>
@@ -533,7 +533,7 @@
       </mat-step>
     </mat-vertical-stepper>
   } @else {
-    <mat-horizontal-stepper #stepper [linear]="true" (selectionChange)="triggerClick">
+    <mat-horizontal-stepper #stepper [linear]="true" (selectionChange)="triggerClick($event)">
       <mat-step [completed]="getStepCompleted(0)" [editable]="getStepEnabled(0)" [state]="getStepName(0)"
                 [optional]="getStepOptional(0)" [stepControl]="roomForm">
         <ng-template matStepLabel>{{ 'COMMON.ROOM.FIELD' | translate }}</ng-template>
