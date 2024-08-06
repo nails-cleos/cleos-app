@@ -1,6 +1,6 @@
 import { Pagination } from '../../interfaces/pagination';
 import { All, RoomActionTypes } from '../room.actions';
-import { IRoom, IRoomService } from '../../interfaces/room';
+import { IRoom, IRoomCustomer, IRoomService } from '../../interfaces/room';
 import { IUser } from '../../interfaces/user';
 import { ICurrency } from '../../interfaces/currency';
 
@@ -10,6 +10,7 @@ export interface State {
   professionals: IUser[] | null;
   currencies: ICurrency[] | null;
   offices: IUser[] | null;
+  customers: IRoomCustomer[] | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -24,6 +25,7 @@ export const initialState: State = {
   professionals: null,
   currencies: null,
   offices: null,
+  customers: null,
   errorMessage: null,
   error: null,
   subErrors: null,
@@ -37,8 +39,9 @@ export const reducer = (state = initialState, action: All): State => {
     case RoomActionTypes.getAll: {
       return {
         ...state,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        data: {content: [{}, {}, {}], totalElements: 3},
+        data: { content: [{}, {}, {}], totalElements: 3 },
         errorMessage: null,
         subErrors: null,
         selected: null,
@@ -152,6 +155,25 @@ export const reducer = (state = initialState, action: All): State => {
         subErrors: null,
         message: null,
         isLoading: true
+      };
+    }
+    case RoomActionTypes.getCustomerInfo: {
+      return {
+        ...state,
+        customers: [{}, {}, {}],
+        errorMessage: null,
+        subErrors: null,
+        selected: null,
+        message: null
+      };
+    }
+    case RoomActionTypes.customerInfoSuccess: {
+      return {
+        ...state,
+        customers: action.payload,
+        errorMessage: null,
+        subErrors: null,
+        message: null
       };
     }
     case RoomActionTypes.clean: {

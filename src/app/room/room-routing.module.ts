@@ -7,6 +7,7 @@ import { RoomComponent } from './room.component';
 import { AddServiceComponent } from './me/add-service/add-service.component';
 import { ExpensesComponent } from './me/expense/list/expenses.component';
 import { ExpenseComponent } from './me/expense/expense.component';
+import { CustomersComponent } from './me/customers/customers.component';
 
 const routes: Routes = [
   {
@@ -46,6 +47,11 @@ const routes: Routes = [
   },
   {
     path: ':id', component: RoomComponent, canActivate: [authGuard], data: {
+      roles: [Role.admin, Role.manager]
+    }
+  },
+  {
+    path: ':id/customers', component: CustomersComponent, canActivate: [authGuard], data: {
       roles: [Role.admin, Role.manager]
     }
   }
