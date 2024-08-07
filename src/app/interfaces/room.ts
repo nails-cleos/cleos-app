@@ -106,6 +106,14 @@ export interface ILocation {
   y: number;
 }
 
+export interface IRoomCustomer {
+  customerId?: string,
+  customerName?: string,
+  reservationId?: string,
+  days?: number,
+  lastTime?: number
+}
+
 export class Availability implements IAvailability {
   day = '';
 

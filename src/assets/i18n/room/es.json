@@ -148,7 +148,7 @@
         "NET": "Neto"
       },
       "ERROR": {
-        "NO_CONTENT": "No expenses"
+        "NO_CONTENT": "No hay expensas"
       }
     },
     "INVOICE": {
@@ -190,6 +190,17 @@
     },
     "UPDATED": {
       "MESSAGE": "Gasto {{invoice}} actualizado"
+    }
+  },
+  "CUSTOMER": {
+    "RESERVATION": "Última reserva",
+    "LAST_TIME": "Última vez",
+    "DAYS": {
+      "TITLE": "Días",
+      "VALUE": "{{days}} días atrás"
+    },
+    "ERROR": {
+      "NO_CONTENT": "No hay clientes"
     }
   }
 }

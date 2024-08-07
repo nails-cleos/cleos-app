@@ -86,6 +86,14 @@ export class RoomEffects {
     ))
   ));
 
+  getCustomerInfo$ = createEffect(() => this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.getCustomerInfo)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.roomService.getCustomerInfo(payload.id).pipe(
+      switchMap((response: any) => of(new fromActionsRoom.CustomerInfoSuccess(response))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({ error: err.error })))
+    ))
+  ));
+
   selectedData$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsRoom.RoomActionTypes.roomSelected),
     tap((data: any) => {
