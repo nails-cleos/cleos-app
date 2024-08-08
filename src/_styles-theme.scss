@@ -853,6 +853,14 @@
     background-color: #04589a !important;
   }
 
+  .mat-gray {
+    @if($isDark) {
+      background-color: gray !important;
+    } @else {
+      background-color: darkgray !important;
+    }
+  }
+
   #close {
     background: linear-gradient(180deg, mat.get-color-from-palette($background, background) 55%, mat.get-color-from-palette($warn-palette) 45%);
   }

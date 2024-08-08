@@ -159,8 +159,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   private get searchDate(): Date {
-    const date = this.totalDays ? this.viewDate : startOfWeek(this.viewDate);
-    return addDays(date, -2);
+    return this.totalDays ? addDays(this.viewDate, Math.floor(this.daysInWeek / 2)) : this.getRelevantWednesday(this.viewDate);
   }
 
   ngOnInit(): void {
@@ -344,7 +343,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   private changeDate(date: Date): void {
-    this.viewDate = createNewDate(date, this.viewDate.getHours(), this.viewDate.getMinutes());
+    const newDate = createNewDate(date, this.viewDate.getHours(), this.viewDate.getMinutes());
+    this.viewDate = this.totalDays ? addDays(newDate, -Math.floor(this.daysInWeek / 2)) : newDate;
   }
 
   private dateIsValid(date: Date): boolean {
@@ -507,6 +507,14 @@ export class CalendarComponent implements OnInit, OnDestroy {
     const calendar = new Calendar(room, events);
     calendar.day = day;
     this.calendar = calendar;
+  }
+
+  private getRelevantWednesday(date: Date): Date {
+    const dayOfWeek = date.getDay();
+
+    const wednesday: Date = new Date(date);
+    wednesday.setDate(date.getDate() - (dayOfWeek - 3));
+    return wednesday;
   }
 
   private subscribe(): void {

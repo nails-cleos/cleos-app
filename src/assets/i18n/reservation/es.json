@@ -1,5 +1,6 @@
 {
   "RESERVATION": {
+    "CLONE": "Fecha y hora para clonar",
     "PREVIEW": "Vista previa",
     "APPOINTMENT": "Cita",
     "LIST": {
@@ -165,7 +166,8 @@
       "COLOR": "Cambiar color",
       "COFFEE": "Enviar café",
       "PREVIOUS": "Anterior",
-      "NEXT": "Siguiente"
+      "NEXT": "Siguiente",
+      "CLONE": "Clonar"
     },
     "CHANGE_STATE": {
       "TITLE": "Cambio de estado",

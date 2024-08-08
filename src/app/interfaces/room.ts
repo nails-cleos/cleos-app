@@ -43,6 +43,7 @@ export interface IServicePrice {
 
 export interface IService {
   key: string;
+  groupId?: string;
   id: string;
   name: string;
   currency?: string;

@@ -16,14 +16,14 @@ export interface IFabMenu {
   tooltip: string;
   icon: string;
   id: string;
-  color?: 'primary' | 'accent' | 'warn';
+  color?: 'primary' | 'accent' | 'warn' | 'blue' | 'gray'; // To add a new color need to create a new theme class for .mat-{colorName}
 }
 
 export interface IExtras {
   price: number;
   description?: string;
-  paymentType?: PaymentType
-  name?: string // To make compatible with additional in price-extra
+  paymentType?: PaymentType;
+  name?: string; // To make compatible with additional in price-extra
 }
 
 export interface IReservation {
@@ -173,6 +173,63 @@ export interface ICustomerLastReservation {
   days: number;
   professionalName: string;
   additionalIds: string[];
+}
+
+export interface IDataEvent {
+  calendarEvents: CalendarEvent[],
+  unavailableEventLength: number,
+  index: number,
+  viewDate: Date,
+  process: boolean
+
+  addEvents(events: CalendarEvent[]): void;
+
+  addEvent(event?: CalendarEvent): void;
+
+  removeEvent(event: CalendarEvent, deleteCount?: number): void;
+
+  filterEvent(event: CalendarEvent): void;
+
+  updateLength(length: number): void;
+}
+
+export class DataEvent implements IDataEvent {
+  calendarEvents: CalendarEvent[];
+  unavailableEventLength: number;
+  index: number;
+  viewDate: Date;
+  process: boolean;
+
+  constructor(events: CalendarEvent[], index: number, viewDate: Date, unavailableEventLength: number, process: boolean = false) {
+    this.calendarEvents = events;
+    this.unavailableEventLength = unavailableEventLength;
+    this.index = index;
+    this.viewDate = viewDate;
+    this.process = process;
+  }
+
+  addEvents(events: CalendarEvent[]): void {
+    this.calendarEvents = this.calendarEvents.concat(events);
+  }
+
+  addEvent(event?: CalendarEvent): void {
+    if (event) {
+      this.calendarEvents = [...this.calendarEvents, event];
+    }
+  }
+
+  removeEvent(event: CalendarEvent, deleteCount: number = 1): void {
+    const i = this.calendarEvents.indexOf(event);
+    this.calendarEvents = this.calendarEvents.slice(i, deleteCount);
+  }
+
+  filterEvent(event: CalendarEvent): void {
+    this.calendarEvents = this.calendarEvents.filter(ev => ev !== event);
+  }
+
+  updateLength(length: number): void {
+    this.unavailableEventLength = length;
+  }
 }
 
 export class Reservation implements IReservation {
