@@ -877,7 +877,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       if (state.customerReservation?.upcoming && state.customerReservation.upcoming.length >= 3) {
         const dates = state.customerReservation.upcoming.map((upcoming: IReservationAll) => formatFullDateTime(
           newDateTimestamp(upcoming.timestamp, upcoming.room.timeZone), this.translate.currentLang));
-        setTimeout(()=> {
+        setTimeout(() => {
           const message = this.translate.instant('ME.RESERVATION.UPCOMING.ERROR.CUSTOMER',
             { date1: dates[0], date2: dates[1], date3: dates[2] });
           this.canNotContinue(message, 'create');
