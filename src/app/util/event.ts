@@ -49,23 +49,9 @@ export class Meta implements IMeta {
   }
 }
 
-export const createRecurringEvent = (start: Date, date: Date, it: any, daysInWeek: number, duration?: IDuration): any => {
-  const finalDate = greaterOrEqualsThan(date, start) ? date : start;
-  const startDate = createNewDate(finalDate, start.getHours(), start.getMinutes());
-  let calendarEnd = plusDays(date, daysInWeek);
-  if (it.end) {
-    const end = createEndDate(it.end);
-    if (greaterOrEqualsThan(calendarEnd, end)) {
-      calendarEnd = end;
-    }
-  }
-
-  return { duration, it, rrule: createRule(it.repeat, startDate, calendarEnd, start.getDate(), getWeekDay(start.getDay())) };
-};
-
 export const getFrequency = (repeat: string, start: Date, id: any, title: string, daysInWeek: number, state: string, path: string,
-                             endDate?: string, duration?: IDuration, allDay: boolean = false, professionalId?: string): any => {
-  let calendarEnd = plusDays(start, daysInWeek);
+                             endDate?: string, duration?: IDuration, allDay: boolean = false, professionalId?: string, calendarStart?: Date): any => {
+  let calendarEnd = plusDays(calendarStart ?? start, daysInWeek);
   if (endDate) {
     const end = createEndDate(endDate);
     if (greaterOrEqualsThan(calendarEnd, end)) {
