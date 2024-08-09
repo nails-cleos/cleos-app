@@ -191,5 +191,16 @@
     "UPDATED": {
       "MESSAGE": "Expense {{invoice}} updated"
     }
+  },
+  "CUSTOMER": {
+    "RESERVATION": "Last reservation",
+    "LAST_TIME": "Last time",
+    "DAYS": {
+      "TITLE": "Days",
+      "VALUE": "{{days}} days ago"
+    },
+    "ERROR": {
+      "NO_CONTENT": "No customers"
+    }
   }
 }

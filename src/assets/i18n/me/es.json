@@ -20,7 +20,7 @@
           "NO_CONTENT": "No hay disponibilidad el <span class='bold'>{{date}}</span>"
         },
         "ERROR": {
-          "CUSTOMER": "El cliente ya tiene una reserva el {{date}}",
+          "CUSTOMER": "El cliente ya tiene reservas el {{date1}}, {{date2}} y {{date3}}",
           "PAYMENT": "Debes pagar una reserva previa"
         }
       },

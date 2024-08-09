@@ -5,7 +5,14 @@ import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } 
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../interfaces/treatment';
 import { IRoom, IService } from '../../../interfaces/room';
-import { IAvailableDTO, IReservation, IUpcomingAll, MAX_RESERVATION_CUSTOMER_MONTH, Reservation } from '../../../interfaces/reservation';
+import {
+  IAvailableDTO,
+  IReservation,
+  IReservationAll,
+  IUpcomingAll,
+  MAX_RESERVATION_CUSTOMER_MONTH,
+  Reservation
+} from '../../../interfaces/reservation';
 import {
   API_LOCALE,
   createNewDate,
@@ -867,14 +874,14 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
           this.setData(state.selected);
         }
       }
-      if (state.customerReservation && state.customerReservation.upcoming && state.customerReservation.upcoming.length) {
-        const date = newDateTimestamp(state.customerReservation.upcoming[0].timestamp,
-          state.customerReservation.upcoming[0].room.timeZone);
-        const message = this.translate.instant('ME.RESERVATION.UPCOMING.ERROR.CUSTOMER',
-          {
-            date: formatFullDateTime(date, this.translate.currentLang)
-          });
-        this.canNotContinue(message, 'create');
+      if (state.customerReservation?.upcoming && state.customerReservation.upcoming.length >= 3) {
+        const dates = state.customerReservation.upcoming.map((upcoming: IReservationAll) => formatFullDateTime(
+          newDateTimestamp(upcoming.timestamp, upcoming.room.timeZone), this.translate.currentLang));
+        setTimeout(() => {
+          const message = this.translate.instant('ME.RESERVATION.UPCOMING.ERROR.CUSTOMER',
+            { date1: dates[0], date2: dates[1], date3: dates[2] });
+          this.canNotContinue(message, 'create');
+        }, 200);
       } else {
         this.canCreate = true;
         this.balance = state.customerReservation?.balance || 0;

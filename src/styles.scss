@@ -771,14 +771,14 @@ $box-shadow2: ();
   flex-grow: 1;
 }
 
+@media screen and (max-width: 599px) {
 .hide-xs {
-  @media screen and (max-width: 599px) {
     display: none !important;
   }
 }
 
+@media screen and (min-width: 600px) {
 .hide-gt-xs {
-  @media screen and (min-width: 600px) {
     display: none !important;
   }
 }
@@ -939,4 +939,12 @@ $box-shadow2: ();
     margin: 20px auto;
     width: 100%;
   }
+}
+
+.timepicker-overlay {
+  z-index: 1100 !important;
+}
+
+.timepicker-backdrop-overlay {
+  z-index: 1100 !important;
 }

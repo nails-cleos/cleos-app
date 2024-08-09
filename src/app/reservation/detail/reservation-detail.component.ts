@@ -12,6 +12,7 @@ import {
   getNow,
   getReservationGMT,
   getTime,
+  getTimeNumber,
   greaterOrEqualsThanToday,
   IDuration,
   isSameTimeZone,
@@ -50,6 +51,7 @@ import { AddNoteDialogComponent } from './add-note-dialog.component';
 import { AddDiscountDialogComponent } from './add-discount-dialog.component';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Role } from '../../interfaces/token';
+import { ReservationCloneDialogComponent } from './reservation-clone-dialog.component';
 
 @Component({
   selector: 'app-reservation-detail',
@@ -221,7 +223,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
             if (last) {
               stateDefinition.next.push(nextState);
             } else {
-              stateDefinition.next.unshift(nextState)
+              stateDefinition.next.unshift(nextState);
             }
           }
         }
@@ -267,7 +269,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   }
 
   onChangeState(id: string): void {
-    const list = ['send', 'coffee', 'book', 'more', 'change', 'cancel', 'cancel_edit', 'notify', 'pay', 'color', 'previous', 'next'];
+    const list = ['send', 'coffee', 'book', 'more', 'change', 'cancel', 'cancel_edit', 'notify', 'pay', 'color', 'clone',
+      'previous', 'next'];
     if (list.indexOf(id) >= 0 && this.reservation) {
       this.machine.transition(snakeToCamel(this.reservation.state), snakeToCamel(id));
       return;
@@ -394,7 +397,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
           if (currentIndex > 0) {
             const previous = 'previous';
             const previousAction = this.createAction(this.translate.instant('RESERVATION.ACTION.PREVIOUS'),
-              ReservationIconName.previous, previous);
+              ReservationIconName.previous, previous, 'gray');
             const previousTransition = ReservationDetailComponent.createTransaction(previous,
               () => this.router.navigate([this.language, 'reservation', allReservations[currentIndex - 1]]
               ));
@@ -403,7 +406,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
           if (currentIndex >= 0 && currentIndex < allReservations.length - 1) {
             const next = 'next';
             const nextAction = this.createAction(this.translate.instant('RESERVATION.ACTION.NEXT'),
-              ReservationIconName.next, next);
+              ReservationIconName.next, next, 'gray');
             const nextTransition = ReservationDetailComponent.createTransaction(next,
               () => this.router.navigate([this.language, 'reservation', allReservations[currentIndex + 1]]
               ));
@@ -492,6 +495,9 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     const color = this.createAction(translate.instant('RESERVATION.ACTION.COLOR'),
       ReservationIconName.color, 'color');
 
+    const clone = this.createAction(translate.instant('RESERVATION.ACTION.CLONE'),
+      ReservationIconName.clone, 'clone');
+
     const userPhone = reservation.customer.phone;
 
     let approveActions: IFabMenu[] = [];
@@ -508,7 +514,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         approveActions = [...approveActions, coffeeMessage];
       }
     }
-    approveActions = [...approveActions, more, cancel];
+    approveActions = [...approveActions, more, clone, cancel];
 
     const approveTransaction = ReservationDetailComponent.createTransaction('approved', (): void => {
       self.reservation = undefined;
@@ -569,6 +575,9 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     const changeColorTransaction = ReservationDetailComponent.createTransaction('color',
       (): void => self.changeColor(reservation));
 
+    const cloneTransaction = ReservationDetailComponent.createTransaction('clone',
+      (): void => self.clone(reservation));
+
     const options = Object.values(CancelOption).filter(co => co !== CancelOption.charge);
     const cancelTransaction = ReservationDetailComponent.createTransaction('cancelled', (): void =>
       self.cancel(reservation, options, self.price, result => {
@@ -603,7 +612,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         edit: editTransaction,
         send: sendMessageTransaction,
         coffee: coffeeMessageTransaction,
-        more: moreTransaction
+        more: moreTransaction,
+        clone: cloneTransaction
       },
       next: approveActions
     };
@@ -612,14 +622,15 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     if (reservation.configurationCanCustomerChange) {
       completeActions = [...completeActions, change];
     }
-    completeActions = [...completeActions, more, color];
+    completeActions = [...completeActions, more, color, clone];
 
     const completed = {
       transitions: {
         book: bookTransaction,
         more: moreTransaction,
         change: changeCustomerTransaction,
-        color: changeColorTransaction
+        color: changeColorTransaction,
+        clone: cloneTransaction
       },
       next: completeActions
     };
@@ -631,9 +642,10 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
           approve: approveTransaction,
           cancel: cancelTransaction,
           edit: editTransaction,
-          more: moreTransaction
+          more: moreTransaction,
+          clone: cloneTransaction
         },
-        next: [approve, edit, cancel, more]
+        next: [approve, edit, cancel, more, clone]
       },
       approved,
       paid: approved,
@@ -653,7 +665,10 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       },
       completed,
       cancelled: {
-        next: []
+        transitions: {
+          clone: cloneTransaction
+        },
+        next: [clone]
       },
       cancelledPaymentRequired: {
         next: []
@@ -897,6 +912,34 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         this.store.dispatch(
           new fromActionsReservation.ChangeColor({ colorId: result.colorId, reservationId: reservation.id })
         );
+      }
+    }, true);
+  }
+
+  private clone(reservation: IReservationAll): void {
+    const data = {
+      room: reservation.room,
+      small: this.small
+    };
+    executeDialog(this.dialog, ReservationCloneDialogComponent, data, result => {
+      if (result) {
+        if (result.time) {
+          const timeValue = getTimeNumber(result.time);
+          if (timeValue) {
+            result.date.setHours(timeValue.hour, timeValue.minute);
+          }
+        }
+        const state = {
+          date: result.date,
+          customer: reservation.customer,
+          professionalId: reservation.professional.id,
+          roomId: reservation.room.id,
+          treatmentId: reservation.treatment.key,
+          groupId: reservation.treatment.groupId,
+          additionalIds: reservation.additional?.map(it => it.key),
+          skip: true
+        };
+        this.router.navigate([this.language, 'reservation'], { state });
       }
     }, true);
   }

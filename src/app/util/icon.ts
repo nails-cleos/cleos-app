@@ -20,7 +20,8 @@ export enum ReservationIconName {
   editCancelled = 'edit_calendar',
   color = 'palette',
   previous = 'line_start_arrow_notch',
-  next = 'line_end_arrow_notch'
+  next = 'line_end_arrow_notch',
+  clone = 'file_copy'
 }
 
 export enum RoomIconName {

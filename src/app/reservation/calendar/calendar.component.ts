@@ -13,15 +13,18 @@ import {
   createNewDate,
   formatDateTime,
   getAvailability,
-  getDuration, getDurationOrUndefined,
-  getNow, getPreviousSunday,
+  getDuration,
+  getDurationOrUndefined,
+  getNow,
+  getPreviousSunday,
   getStartEndDay,
   greaterOrEqualsThan,
   isBetween,
   newDate,
   newDateTimestamp,
   plusDays,
-  reservationDuration, searchDates,
+  reservationDuration,
+  searchDates,
   subPeriod
 } from '../../util/dates';
 import { IRoom, IRoomAll } from '../../interfaces/room';
@@ -32,7 +35,7 @@ import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { IUnavailableAll } from '../../interfaces/unavailable';
 import { createRoomOffice, executeDialogNoWidth, FrequencyEnum } from '../../util/helper';
-import { addDays, addMonths, isEqual, isSameDay, startOfWeek } from 'date-fns';
+import { addDays, addMonths, isEqual, isSameDay } from 'date-fns';
 import { findStateColor } from '../../util/theme';
 import { map, startWith, takeUntil } from 'rxjs/operators';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
@@ -159,8 +162,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   private get searchDate(): Date {
-    const date = this.totalDays ? this.viewDate : startOfWeek(this.viewDate);
-    return addDays(date, -2);
+    return this.totalDays ? addDays(this.viewDate, Math.floor(this.daysInWeek / 2)) : this.getRelevantWednesday(this.viewDate);
   }
 
   ngOnInit(): void {
@@ -344,7 +346,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   private changeDate(date: Date): void {
-    this.viewDate = createNewDate(date, this.viewDate.getHours(), this.viewDate.getMinutes());
+    const newDate = createNewDate(date, this.viewDate.getHours(), this.viewDate.getMinutes());
+    this.viewDate = this.totalDays ? addDays(newDate, -Math.floor(this.daysInWeek / 2)) : newDate;
   }
 
   private dateIsValid(date: Date): boolean {
@@ -397,10 +400,10 @@ export class CalendarComponent implements OnInit, OnDestroy {
         const allDay = it.allDay;
         const professionalId = it.professional.id;
         const title = this.translate.instant('RESERVATION.EVENT.UNAVAILABLE', {
-          description: it.description ? it.description : '',
+          description: it.description ?? '',
           professionalName: it.professional.displayName
         });
-        let path = 'unavailable/';
+        let path = `${this.language}/unavailable/`;
         if (it.type === 'BLOCK_AGENDA') {
           path += 'block-agenda/';
         }
@@ -412,8 +415,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
         } else {
           const sundayViewDate = getPreviousSunday(this.viewDate);
           const calendarStart = greaterOrEqualsThan(sundayViewDate, start) ? sundayViewDate : start;
-          recurringEvents = [...recurringEvents, getFrequency(it.repeat, calendarStart, it.id, title, this.daysInWeek, 'UNAVAILABLE',
-            'unavailable', it.end, getDurationOrUndefined(it.duration), it.allDay, professionalId)];
+          recurringEvents = [...recurringEvents, getFrequency(it.repeat, start, it.id, title, this.daysInWeek, 'UNAVAILABLE',
+            'unavailable', it.end, getDurationOrUndefined(it.duration), it.allDay, professionalId, calendarStart)];
         }
       }
     });
@@ -507,6 +510,14 @@ export class CalendarComponent implements OnInit, OnDestroy {
     const calendar = new Calendar(room, events);
     calendar.day = day;
     this.calendar = calendar;
+  }
+
+  private getRelevantWednesday(date: Date): Date {
+    const dayOfWeek = date.getDay();
+
+    const wednesday: Date = new Date(date);
+    wednesday.setDate(date.getDate() - (dayOfWeek - 3));
+    return wednesday;
   }
 
   private subscribe(): void {

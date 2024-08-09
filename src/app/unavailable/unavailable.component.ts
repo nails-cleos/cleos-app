@@ -248,7 +248,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
     this.getForm.repeat.valueChanges.subscribe(value => {
-      if (value && (value === FrequencyEnum.onceAWeek || value === FrequencyEnum.everyDay)) {
+      if (value && [FrequencyEnum.onceAWeek, FrequencyEnum.everyDay, FrequencyEnum.onceAMonth].includes(value)) {
         this.getForm.endDate.setValidators(Validators.required);
         this.getForm.endDate.updateValueAndValidity();
         this.showEnd = true;

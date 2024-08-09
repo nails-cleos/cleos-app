@@ -817,6 +817,10 @@
     background-color: mat.get-color-from-palette($warn-palette, lighter);
     color: black;
 
+    a, button {
+      color: black;
+    }
+
     @if($isDark) {
       &:hover {
         color: white;
@@ -847,6 +851,14 @@
 
   .mat-blue {
     background-color: #04589a !important;
+  }
+
+  .mat-gray {
+    @if($isDark) {
+      background-color: gray !important;
+    } @else {
+      background-color: darkgray !important;
+    }
   }
 
   #close {

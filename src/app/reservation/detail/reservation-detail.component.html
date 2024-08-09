@@ -1,6 +1,6 @@
 <mat-card appearance="outlined">
   @if (reservation) {
-    <mat-card-header>
+    <mat-card-header [class.row-is-canceled]="reservation.state === 'CANCELLED'">
       <mat-card-title>{{ 'RESERVATION.CUSTOMER.DETAIL' | translate }}</mat-card-title>
       <mat-card-subtitle>
         @if (isCustomer) {
@@ -335,7 +335,7 @@
                     </mat-list>
                   }
                 </div>
-                <mat-divider [inset]="true"></mat-divider>
+                <mat-divider></mat-divider>
               </td>
             </ng-container>
 
@@ -449,7 +449,7 @@
                     </mat-list>
                   }
                 </div>
-                <mat-divider [inset]="true"></mat-divider>
+                <mat-divider></mat-divider>
               </td>
             </ng-container>
 

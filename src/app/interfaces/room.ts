@@ -43,6 +43,7 @@ export interface IServicePrice {
 
 export interface IService {
   key: string;
+  groupId?: string;
   id: string;
   name: string;
   currency?: string;
@@ -104,6 +105,14 @@ export interface IAddress {
 export interface ILocation {
   x: number;
   y: number;
+}
+
+export interface IRoomCustomer {
+  customerId?: string,
+  customerName?: string,
+  reservationId?: string,
+  days?: number,
+  lastTime?: number
 }
 
 export class Availability implements IAvailability {

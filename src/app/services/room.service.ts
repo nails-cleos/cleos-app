@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IRoom, IRoomInfo, IRoomService, IServicePrice } from '../interfaces/room';
+import { IRoom, IRoomCustomer, IRoomInfo, IRoomService, IServicePrice } from '../interfaces/room';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { createFilter } from '../util/service-helper';
 
@@ -54,5 +54,9 @@ export class RoomService {
 
   public updateService(id: string, prices: IServicePrice[]): Observable<IServicePrice[]> {
     return this.http.patch<IServicePrice[]>(`${this.urlV1}/${id}/services`, prices);
+  }
+
+  public getCustomerInfo(id: string): Observable<IRoomCustomer[]> {
+    return this.http.get<IRoomCustomer[]>(`${this.urlV1}/${id}/customers/info`);
   }
 }

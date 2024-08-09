@@ -13,7 +13,7 @@ import { CalendarEvent, CalendarMonthViewDay, CalendarView } from 'angular-calen
 import { findStateColor, getStateOrder } from '../util/theme';
 import { allDayEvent, getFrequency, IMeta, Meta, monthEvent } from '../util/event';
 import { Router } from '@angular/router';
-import { isSameDay, isSameMonth } from 'date-fns';
+import { addDays, isSameDay, isSameMonth, startOfMonth } from 'date-fns';
 import { ICalendarNote, ICalendarSummary, IChart, IDashboard } from '../interfaces/dashboard';
 import { UntypedFormControl } from '@angular/forms';
 import { IRoom } from '../interfaces/room';
@@ -357,6 +357,7 @@ export class DashComponent implements OnInit, OnDestroy {
         }
       });
       let recurring: any[] = [];
+      const calendarStart = addDays(startOfMonth(this.viewDate), -7);
       calendarSummary.unavailable?.forEach(it => {
         if (it.type === 'BLOCK_AGENDA') {
           return;
@@ -374,7 +375,7 @@ export class DashComponent implements OnInit, OnDestroy {
           }
         } else {
           recurring = [...recurring, getFrequency(it.repeat, start, it.unavailableId, title, 45, 'UNAVAILABLE',
-            `${ this.language }/unavailable`, it.end, getDurationOrUndefined(it.duration))];
+            `${ this.language }/unavailable`, it.end, getDurationOrUndefined(it.duration), it.allDay, undefined, calendarStart)];
         }
       });
 
@@ -411,7 +412,7 @@ export class DashComponent implements OnInit, OnDestroy {
             repeatDate = startDate;
           }
           recurring = [...recurring, getFrequency(it.repeat, repeatDate, it.noteId, it.title, 45, 'NOTE', `${ this.language }/notes`,
-            undefined, undefined, true)];
+            undefined, undefined, true, undefined, calendarStart)];
         }
       });
 
@@ -424,7 +425,6 @@ export class DashComponent implements OnInit, OnDestroy {
             this.events = [...this.events, event];
           }
         }));
-
 
       this.isCalendarLoading = false;
     }

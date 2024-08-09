@@ -1,5 +1,6 @@
 {
   "RESERVATION": {
+    "CLONE": "Date and time to clone",
     "PREVIEW": "Preview",
     "APPOINTMENT": "Appointment",
     "LIST": {
@@ -165,7 +166,8 @@
       "COLOR": "Change color",
       "COFFEE": "Send coffee",
       "PREVIOUS": "Previous",
-      "NEXT": "Next"
+      "NEXT": "Next",
+      "CLONE": "Clone"
     },
     "CHANGE_STATE": {
       "TITLE": "Change state",

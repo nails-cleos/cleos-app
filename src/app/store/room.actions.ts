@@ -15,6 +15,8 @@ export enum RoomActionTypes {
   roomServiceSelected = '[Room] Selected services',
   roomFind = '[Room] Find',
   roomDelete = '[Room] Delete',
+  getCustomerInfo = '[Room] Get customer info',
+  customerInfoSuccess = '[Room] Customer info Success',
   clean = '[Room] Clean'
 }
 
@@ -113,6 +115,20 @@ export class DeleteRoom implements Action {
   }
 }
 
+export class GetCustomerInfo implements Action {
+  readonly type = RoomActionTypes.getCustomerInfo;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class CustomerInfoSuccess implements Action {
+  readonly type = RoomActionTypes.customerInfoSuccess;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class Clean implements Action {
   readonly type = RoomActionTypes.clean;
 }
@@ -132,4 +148,6 @@ export type All =
   | RoomSelected
   | RoomServiceSelected
   | DeleteRoom
+  | GetCustomerInfo
+  | CustomerInfoSuccess
   | Clean;

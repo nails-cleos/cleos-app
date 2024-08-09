@@ -65,8 +65,7 @@ export class ReservationService {
     return this.http.get<IReservation[]>(`${ this.urlV1 }/filter`, { params });
   }
 
-  public getAllGroupingByRoom(days: number, date: Date, roomId: string,
-                              professionalId?: string): Observable<IRoomReservation[]> {
+  public getAllGroupingByRoom(days: number, date: Date, roomId: string, professionalId?: string): Observable<IRoomReservation[]> {
     let params = new HttpParams().set('dates', date.toISOString().slice(0, 10)).append('days', days);
     if (professionalId) {
       params = params.append('professionalId', professionalId);
