@@ -6,6 +6,10 @@ section {
   padding: 10px;
   display: table-cell;
   width: 390px;
+
+  button {
+    border: 1px solid;
+  }
 }
 
 .button-row .mat-mdc-button-base {
