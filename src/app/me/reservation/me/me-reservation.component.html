@@ -220,25 +220,30 @@
 </ng-template>
 
 <ng-template #stepFour>
-  <mat-tab-group *ngIf="availableList.size; else empty" [selectedIndex]="selectedIndex" backgroundColor="accent"
-                 color="primary" mat-align-tabs="center">
-    @for (available of availableList | keyvalue: sortDate; track available) {
-      <mat-tab [label]="formatKey(available.key)">
-        <section class="button-container">
-          <ng-container [ngTemplateOutletContext]="{available:available}"
-                        [ngTemplateOutlet]="available.value.length ? noEmpty : empty"></ng-container>
-        </section>
-      </mat-tab>
-    }
-  </mat-tab-group>
-  <ng-template #noEmpty let-available='available'>
-    <div class="button-row">
-      <button (click)="selectDate(datetime)" *ngFor="let datetime of sortTime(available.value)"
-              [color]="areEquals(datetime) ? 'primary' : undefined" class="large" mat-raised-button>
-        {{ datetime.time }}
-      </button>
-    </div>
-  </ng-template>
+  @if (availableList.size) {
+    <mat-tab-group [selectedIndex]="selectedIndex" fitInkBarToContent mat-align-tabs="center">
+      @for (available of availableList | keyvalue: sortDate; track available) {
+        <mat-tab [label]="formatKey(available.key)">
+          <section class="button-container">
+            @if (available.value.length) {
+              <div class="button-row">
+                @for (datetime of sortTime(available.value); track datetime) {
+                  <button (click)="selectDate(datetime)" [color]="areEquals(datetime) ? 'primary' : undefined"
+                          class="large" mat-raised-button>
+                    {{ datetime.time }}
+                  </button>
+                }
+              </div>
+            } @else {
+              <ng-container [ngTemplateOutlet]="empty"></ng-container>
+            }
+          </section>
+        </mat-tab>
+      }
+    </mat-tab-group>
+  } @else {
+    <ng-container [ngTemplateOutlet]="empty"></ng-container>
+  }
   <ng-template #empty let-available='available'>
     <div class="no-content divider">
       <p
