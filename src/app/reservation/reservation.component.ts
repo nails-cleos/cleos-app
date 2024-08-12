@@ -479,7 +479,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.dateTimeList.value.forEach((value: any, i: number) => {
         const timeValue = getTimeNumber(value.start || this.minDate);
         if (timeValue) {
-          value.date.setHours(timeValue.hour, timeValue.minute)
+          value.date.setHours(timeValue.hour, timeValue.minute);
         }
         const dateValue = value.date.toISOString().split('T')[0];
         let date = dateToUTC(newDate(dateValue), timeZone);
@@ -859,7 +859,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           this.dateTimeList.controls.forEach((control: any) => {
             const start = control.get('start');
             if (start && (!start.value || start.value === '' || start.value === '00:00')) {
-              control.get('start')?.setValue(this.minDate)
+              control.get('start')?.setValue(this.minDate);
             }
           });
         }
@@ -1141,7 +1141,19 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       const date = newDateTimestamp(reservation.timestamp, this.reservation.room.timeZone);
       this.room.setValue(reservation.room);
       this.professional.setValue(reservation.professional);
-      this.addDate(date, getTime(date, this.dateFormat));
+      const time = getTime(date, this.dateFormat);
+      if (this.dateTimeList.controls?.length === 1) {
+        const control = this.dateTimeList.at(0);
+        const controlDate = control.get('date');
+        if (!controlDate?.value) {
+          controlDate?.setValue(date);
+          control.get('start')?.setValue(time);
+        } else {
+          this.addDate(date, getTime(date, this.dateFormat));
+        }
+      } else {
+        this.addDate(date, getTime(date, this.dateFormat));
+      }
       this.customer.setValue(reservation.customer);
       this.price = getPrice(this.reservation);
       this.additionalSelected = this.reservation.additional ? this.reservation.additional
