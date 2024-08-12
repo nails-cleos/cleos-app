@@ -27,12 +27,12 @@
       <mat-icon>clear</mat-icon>
     </button>
     <button (click)="doAction" color="primary" [disabled]="form.invalid" mat-icon-button>
-      <mat-icon>published_with_changes</mat-icon>
+      <mat-icon>file_copy</mat-icon>
     </button>
   } @else {
     <button (click)="onNoClick" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
     <button (click)="doAction" color="primary" [disabled]="form.invalid" mat-fab extended class="icon-button">
-      {{ 'RESERVATION.CUSTOMER.UPDATE' | translate }}
+      {{ 'RESERVATION.ACTION.CLONE' | translate }}
     </button>
   }
 </div>
