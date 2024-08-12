@@ -239,6 +239,10 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     return newDateTimestamp(reservation.timestamp);
   }
 
+  private static createBullet(name: string): string {
+    return `%0A\uD83D\uDC85\uD83C\uDFFB ${ name }`;
+  }
+
   openHistoryDialog(history: IReservationAll): void {
     this.openDialog(ReservationDetailComponent.getDateTimeDetail(history));
   }
@@ -528,6 +532,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         const startDate = newDate(self.start);
         let key;
         let date = getTime(startDate, self.language);
+        let treatment = ReservationDetailComponent.createBullet(reservation.treatment.name);
+        treatment += reservation.additional?.map(additional => ReservationDetailComponent.createBullet(additional.name));
         switch (true) {
           case isToday(startDate):
             key = 'TODAY';
@@ -540,7 +546,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
             key = 'APPROVE';
             break;
         }
-        const message = translate.instant(`WHATSAPP.SEND.${ key }`, { date });
+        const message = translate.instant(`WHATSAPP.SEND.${ key }`, { date, treatment });
         window.open(`https://api.whatsapp.com/send?phone=+${ userPhone }&text=${ message }`, '_blank');
       }
     });
