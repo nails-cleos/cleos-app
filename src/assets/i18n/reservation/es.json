@@ -209,6 +209,7 @@
     },
     "NOTE": {
       "FIELD": "Nota",
+      "CUSTOMER": "Nota del cliente",
       "REQUIRED": "Nota es <b>requerida</b>",
       "ADD": "Agregar nota",
       "MESSAGE": "¿Cuál es tu nota?"

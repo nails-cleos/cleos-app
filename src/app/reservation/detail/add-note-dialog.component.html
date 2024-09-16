@@ -1,15 +1,23 @@
 <form (ngSubmit)="doAction" [formGroup]="noteForm" novalidate (keydown.enter)="$event.preventDefault()">
   <h1 mat-dialog-title>{{ 'RESERVATION.NOTE.ADD' | translate }}</h1>
   <div mat-dialog-content>
+    @if (!data.isCustomer) {
+      <p>{{ 'RESERVATION.NOTE.MESSAGE' | translate }}</p>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'RESERVATION.NOTE.FIELD' | translate }}</mat-label>
+        <label>
+          <textarea #message [formControl]="note" matInput [maxlength]="256"></textarea>
+        </label>
+        <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
+      </mat-form-field>
+    }
     <p>{{ 'RESERVATION.NOTE.MESSAGE' | translate }}</p>
     <mat-form-field appearance="outline" class="full">
-      <mat-label>{{ 'RESERVATION.NOTE.FIELD' | translate }}</mat-label>
+      <mat-label>{{ 'RESERVATION.NOTE.' + (data.isCustomer ? 'FIELD' : 'CUSTOMER') | translate }}</mat-label>
       <label>
-        <textarea #message [formControl]="note" matInput [maxlength]="256"></textarea>
+        <textarea #customerMessage [formControl]="customerNote" matInput [maxlength]="256"></textarea>
       </label>
-      <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
-      <mat-error *ngIf="note.hasError('required')" [innerHTML]="'RESERVATION.NOTE.REQUIRED' | translate">
-      </mat-error>
+      <mat-hint align="end">{{ customerMessage.value.length }} / 256</mat-hint>
     </mat-form-field>
   </div>
   <div mat-dialog-actions>
