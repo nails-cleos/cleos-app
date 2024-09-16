@@ -344,7 +344,7 @@ export class ReservationEffects {
 
   updateNote$ = createEffect(() => this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.updateNote)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.reservationService.addNote(payload.reservation.id, payload.note).pipe(
+    switchMap((payload: any) => this.reservationService.addNote(payload.reservation.id, payload.note, payload.customerNote).pipe(
       switchMap(() => of(new fromActionsReservation.ReservationSaveSuccess({
         message: this.translate.instant('COMMON.RESERVATION.UPDATED.MESSAGE', { date: newDateTimestamp(payload.reservation.timestamp) }),
         id: payload.reservation.id,

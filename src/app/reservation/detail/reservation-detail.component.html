@@ -31,14 +31,25 @@
           <div class="after"></div>
         </div>
       }
-      @if (reservation.note) {
+      @if (reservation.note || reservation.customerNote) {
         <mat-list class="note">
-          <mat-list-item>
-            <div matListItemTitle>{{ 'RESERVATION.NOTE.FIELD' | translate }}</div>
-            <div matListItemLine>{{ reservation.note }}</div>
-          </mat-list-item>
+          @if (reservation.note && !isCustomer) {
+            <mat-list-item>
+              <div matListItemTitle>{{ 'RESERVATION.NOTE.FIELD' | translate }}</div>
+              <div matListItemLine>{{ reservation.note }}</div>
+            </mat-list-item>
+            @if (reservation.customerNote) {
+              <mat-divider></mat-divider>
+            }
+          }
+          @if (reservation.customerNote) {
+            <mat-list-item>
+              <div matListItemTitle>{{ 'RESERVATION.NOTE.' + (isCustomer ? 'FIELD' : 'CUSTOMER') | translate }}</div>
+              <div matListItemLine>{{ reservation.customerNote }}</div>
+            </mat-list-item>
+          }
         </mat-list>
-        <mat-divider></mat-divider>
+        <mat-divider style="margin-top: 1%"></mat-divider>
       }
       <mat-list>
         <div mat-subheader>{{ 'COMMON.ROOM.FIELD' | translate }}</div>

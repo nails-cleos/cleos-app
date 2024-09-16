@@ -148,8 +148,8 @@ export class ReservationService {
     return this.http.post<IReview>(`${ this.urlV1 }/${ review.reservationId }/reviews`, review);
   }
 
-  public addNote(id: string, note: string): Observable<IReservation> {
-    return this.http.patch<IReservation>(`${ this.urlV1 }/${ id }/notes`, note);
+  public addNote(id: string, note?: string, customerNote?: string): Observable<IReservation> {
+    return this.http.patch<IReservation>(`${ this.urlV1 }/${ id }/notes`, { note, customerNote });
   }
 
   public addDiscount(id: string, discountId: string): Observable<IReservation> {
