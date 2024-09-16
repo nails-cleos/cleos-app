@@ -44,6 +44,7 @@
       "BLOCK_AGENDA": "Block agenda",
       "NOTE": "Add Note",
       "SORT": "Sort",
+      "PRINT": "Print",
       "EXPAND": {
         "TRUE": "Click to show less",
         "FALSE": "Click to show more"

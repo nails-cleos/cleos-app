@@ -79,7 +79,11 @@
 </div>
 
 @if (data && calendar) {
-  <div class="scroll-container">
+  @if (inProgress) {
+    <div class="spinner-parent-center">
+      <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+    </div>
+  } @else {
     <div class="divider card-actions">
       <button class="hide-gt-xs" (click)="decrement" color="accent" mat-fab>
         <mat-icon>navigate_before</mat-icon>
@@ -106,31 +110,40 @@
         <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
       </button>
       <div class="spacer"></div>
-      <button class="hide-gt-xs" color="accent" mat-fab [routerLink]="['/', language, 'reservation']">
+      @if (daysInWeek >= 5) {
+        <button (click)="downloadPDF" color="accent" mat-fab extended>
+          <mat-icon>print</mat-icon>
+          <span>{{ 'COMMON.BUTTON.PRINT' | translate }}</span>
+        </button>
+      }
+      <button class="hide-gt-xs" color="primary" mat-fab [routerLink]="['/', language, 'reservation']">
         <mat-icon>book_online</mat-icon>
       </button>
-      <button class="hide-xs" color="accent" mat-fab extended [routerLink]="['/', language, 'reservation']">
+      <button class="hide-xs" color="primary" mat-fab extended [routerLink]="['/', language, 'reservation']">
         <mat-icon>book_online</mat-icon>
         <span>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
       </button>
     </div>
-    <div class="divider">
-      <mwl-calendar-week-view
-        (beforeViewRender)="beforeMonthViewRender($event)"
-        (eventClicked)="view($event.event)"
-        (hourSegmentClicked)="segmentClick($event.date, calendar.room)"
-        (eventTimesChanged)="eventTimesChanged($event)"
-        [refresh]="refresh"
-        [dayEndHour]="calendar.day!.dayEndHour"
-        [dayEndMinute]="calendar.day!.dayEndMinute"
-        [dayStartHour]="calendar.day!.dayStartHour"
-        [dayStartMinute]="calendar.day!.dayStartMinute"
-        [daysInWeek]="totalDays"
-        [events]="calendar.events"
-        [hourSegments]="hourSegments"
-        [locale]="locale"
-        [viewDate]="viewDate"
-        [weekendDays]="[]"></mwl-calendar-week-view>
+
+    <div id="weekViewPDF">
+      <div class="divider">
+        <mwl-calendar-week-view
+          (beforeViewRender)="beforeMonthViewRender($event)"
+          (eventClicked)="view($event.event)"
+          (hourSegmentClicked)="segmentClick($event.date, calendar.room)"
+          (eventTimesChanged)="eventTimesChanged($event)"
+          [refresh]="refresh"
+          [dayEndHour]="calendar.day!.dayEndHour"
+          [dayEndMinute]="calendar.day!.dayEndMinute"
+          [dayStartHour]="calendar.day!.dayStartHour"
+          [dayStartMinute]="calendar.day!.dayStartMinute"
+          [daysInWeek]="totalDays"
+          [events]="calendar.events"
+          [hourSegments]="hourSegments"
+          [locale]="locale"
+          [viewDate]="viewDate"
+          [weekendDays]="[]"></mwl-calendar-week-view>
+      </div>
     </div>
-  </div>
+  }
 }

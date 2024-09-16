@@ -44,6 +44,7 @@
       "BLOCK_AGENDA": "Bloquear agenda",
       "NOTE": "Agregar nota",
       "SORT": "Ordenar",
+      "PRINT": "Imprimir",
       "EXPAND": {
         "TRUE": "Presiona para mostrar menos",
         "FALSE": "Presiona para mostrar más"
