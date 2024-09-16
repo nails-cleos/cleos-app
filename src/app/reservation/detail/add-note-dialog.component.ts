@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
@@ -8,13 +8,15 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 })
 export class AddNoteDialogComponent implements OnInit {
   noteForm!: UntypedFormGroup;
-  note: FormControl<string | null> = new FormControl('', [
-    Validators.required
-  ]);
+  note: FormControl<string | null> = new FormControl();
+  customerNote: FormControl<string | null> = new FormControl();
 
   constructor(public dialogRef: MatDialogRef<AddNoteDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
               private formBuilder: UntypedFormBuilder) {
-    this.note.setValue(data.note || '');
+    if (!data.isCustomer) {
+      this.note.setValue(data.note);
+    }
+    this.customerNote.setValue(data.customerNote);
   }
 
   get onNoClick(): void {
@@ -22,7 +24,7 @@ export class AddNoteDialogComponent implements OnInit {
   }
 
   get doAction(): void {
-    return this.dialogRef.close({ note: this.note.value });
+    return this.dialogRef.close({ note: this.getNoteValue(this.note.value), customerNote: this.getNoteValue(this.customerNote.value) });
   }
 
   ngOnInit(): void {
@@ -31,7 +33,15 @@ export class AddNoteDialogComponent implements OnInit {
 
   private createForm(): void {
     this.noteForm = this.formBuilder.group({
-      note: this.note
+      note: this.note,
+      customerNote: this.customerNote
     });
+  }
+
+  private getNoteValue(note: string | null): string | null {
+    if (note === null || note.length === 0) {
+      return null;
+    }
+    return note;
   }
 }

@@ -772,13 +772,13 @@ $box-shadow2: ();
 }
 
 @media screen and (max-width: 599px) {
-.hide-xs {
+  .hide-xs {
     display: none !important;
   }
 }
 
 @media screen and (min-width: 600px) {
-.hide-gt-xs {
+  .hide-gt-xs {
     display: none !important;
   }
 }
@@ -834,6 +834,7 @@ $box-shadow2: ();
   h4 {
     font-weight: normal;
   }
+
   flex: 1 1 calc(75% - 32px);
 
   @media (max-width: 960px) { // md breakpoint (adjust as needed)

@@ -1,6 +1,6 @@
 {
   "name": "cleos",
-  "version": "1.2.19",
+  "version": "1.2.20-rc",
   "engines": {
     "node": "v20.13.1",
     "npm": "10.5.2"
@@ -54,6 +54,7 @@
     "firebaseui": "^6.1.0",
     "firebaseui-angular": "^6.2.1",
     "flag-icons": "^7.2.3",
+    "html2pdf.js": "^0.10.2",
     "jspdf": "^2.5.1",
     "libphonenumber-js": "^1.11.2",
     "luxon": "^3.4.4",

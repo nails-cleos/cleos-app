@@ -80,6 +80,7 @@ export interface IReservationAll {
   configurationCanCustomerChange?: boolean;
   configurationReference?: string;
   note?: string;
+  customerNote?: string;
   startedTimestamp?: number;
   paymentLink?: string;
   canEdit?: boolean;

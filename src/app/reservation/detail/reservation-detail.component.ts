@@ -160,11 +160,16 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   }
 
   get addNote(): void {
-    return executeDialog(this.dialog, AddNoteDialogComponent, { note: this.reservation?.note }, result => {
+    return executeDialog(this.dialog, AddNoteDialogComponent, {
+      note: this.reservation?.note,
+      customerNote: this.reservation?.customerNote,
+      isCustomer: this.isCustomer
+    }, result => {
       if (result) {
         this.store.dispatch(
           new fromActionsReservation.UpdateNote({
             note: result.note,
+            customerNote: result.customerNote,
             reservation: this.reservation,
             role: this.professionalId ? Role.professional : Role.customer
           })
