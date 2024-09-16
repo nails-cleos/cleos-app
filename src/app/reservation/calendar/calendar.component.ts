@@ -12,6 +12,7 @@ import {
   CalendarPeriod,
   createNewDate,
   formatDateTime,
+  formatDateTwoDigit,
   getAvailability,
   getDuration,
   getDurationOrUndefined,
@@ -46,6 +47,9 @@ import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { INoteAll } from '../../interfaces/note';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Role } from '../../interfaces/token';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
+import * as html2pdf from 'html2pdf.js';
 
 @Component({
   selector: 'app-calendar',
@@ -83,6 +87,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
   refresh: Subject<any> = new Subject();
   maxDate: Date;
   minDate: Date;
+  daysInWeek: number;
+  inProgress: boolean;
 
   private isDarkMode?: boolean;
   private selectView: CalendarPeriod = 'day';
@@ -93,13 +99,14 @@ export class CalendarComponent implements OnInit, OnDestroy {
   private roomId?: string;
   private professionalSelectedId?: string;
   private today: Date = createNewDate(getNow());
-  private daysInWeek = 7;
   private isRoomAdmin = false;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private router: Router, private breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef,
               private formBuilder: UntypedFormBuilder, private authUserService: AuthUserService) {
     this.getState = this.store.select(selectReservationState);
+    this.daysInWeek = 7;
+    this.inProgress = false;
     const CALENDAR_RESPONSIVE = {
       xsmall: {
         breakpoint: '(max-width: 576px)',
@@ -159,6 +166,36 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   get decrement(): void {
     return this.picker.select(subPeriod(this.selectView, this.viewDate, this.daysInWeek));
+  }
+
+  get downloadPDF(): void {
+    this.inProgress = true;
+    const element = document.getElementById('weekViewPDF');
+    if (element) {
+      const clone = element.cloneNode(true) as HTMLElement;
+
+      clone.style.marginTop = '90px';
+      const events = clone.getElementsByClassName('cal-event');
+      for (let i = 0; i < events.length; i++) {
+        (events[i] as HTMLElement).style.backgroundColor = '#fff';
+      }
+
+      const endDate = addDays(this.searchDate, Math.floor(this.daysInWeek / 2));
+      const startDate = addDays(endDate, 1 - this.daysInWeek);
+
+      const options = {
+        margin: [0, 0.2, 0, 0.2],
+        filename: `From ${ formatDateTwoDigit(startDate, this.locale) } to ${ formatDateTwoDigit(endDate, this.locale) }.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+      };
+
+      html2pdf().from(clone).set(options).save().then(() => this.inProgress = false);
+    } else {
+      this.inProgress = false;
+    }
+    return;
   }
 
   private get searchDate(): Date {
@@ -403,7 +440,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
           description: it.description ?? '',
           professionalName: it.professional.displayName
         });
-        let path = `${this.language}/unavailable/`;
+        let path = `${ this.language }/unavailable/`;
         if (it.type === 'BLOCK_AGENDA') {
           path += 'block-agenda/';
         }
