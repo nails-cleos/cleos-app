@@ -32,7 +32,7 @@ import { INotification } from '../interfaces/notification';
 import { TranslateService } from '@ngx-translate/core';
 import { MessagingService } from '../services/messaging.service';
 import { environment } from '../../environments/environment';
-import { getDisplayNameInitials, getLocale, getUserImage } from '../util/helper';
+import { getDisplayNameInitials, getUserImage } from '../util/helper';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NavigationService } from '../services/navigation.service';
 import { TokenService } from '../services/token.service';

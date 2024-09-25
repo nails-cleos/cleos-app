@@ -14,7 +14,7 @@
           </mat-card-title>
           <mat-tab-group class="mat-elevation-z4">
             @for (up of upcoming; track up) {
-              <mat-tab label="{{up.timestamp | timeDetail | date:'short':up.room.timeZone:dateFormat}}">
+              <mat-tab label="{{up?.timestamp | timeDetail | date:'short':up?.room?.timeZone:dateFormat}}">
                 <app-upcoming [upcoming]="up" [small]="small"></app-upcoming>
               </mat-tab>
             }

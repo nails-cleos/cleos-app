@@ -383,6 +383,20 @@
                                  [penalty]="oldPrice?.penalty"></app-payment-preview>
           </mat-list>
           <mat-divider style="margin-bottom: 2%;"></mat-divider>
+          <p>{{ 'ME.RESERVATION.USER.PHONE.MESSAGE' | translate }}</p>
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'COMMON.USER.PHONE.FIELD' | translate }}</mat-label>
+            <ngx-mat-intl-tel-input [enablePlaceholder]="true" [enableSearch]="true" [formControl]="phone"
+                                    [required]="true" [preferredCountries]="['nl']" name="phone">
+            </ngx-mat-intl-tel-input>
+            @if (phone.hasError('validatePhoneNumber')) {
+              <mat-error>{{ 'COMMON.USER.PHONE.INVALID' | translate }}</mat-error>
+            }
+            @if (phone.hasError('required')) {
+              <mat-error [innerHTML]="'COMMON.USER.PHONE.REQUIRED' | translate"></mat-error>
+            }
+          </mat-form-field>
+          <mat-divider style="margin-bottom: 2%;"></mat-divider>
           <mat-label>{{ 'COMMON.PAYMENT.CANCELLATION_POLICY.TITLE' | translate }}</mat-label>
           @for (item of [1, 2, 3]; track item) {
             <div>
