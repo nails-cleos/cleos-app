@@ -51,7 +51,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   private subscription?: Subscription;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private router: Router, private breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef,
+              private router: Router, breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef,
               private analytic: Analytics) {
     this.getState = this.store.select(selectReservationState);
     this.dateFormat = this.translate.currentLang;
@@ -122,6 +122,18 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
     );
   }
 
+  private getReservations(page: number = 0): void {
+    const payload = {
+      active: this.sort.active,
+      direction: this.sort.direction,
+      size: this.pageSize,
+      page
+    };
+    this.store.dispatch(
+      new fromActionsReservation.GetCustomerReservations(payload)
+    );
+  }
+
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       this.error = state.error;
@@ -171,17 +183,5 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
         }
       }
     });
-  }
-
-  private getReservations(page: number = 0): void {
-    const payload = {
-      active: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-      page
-    };
-    this.store.dispatch(
-      new fromActionsReservation.GetCustomerReservations(payload)
-    );
   }
 }

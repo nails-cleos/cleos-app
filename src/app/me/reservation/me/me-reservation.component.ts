@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatStepper } from '@angular/material/stepper';
 import { Observable, Subscription } from 'rxjs';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../interfaces/treatment';
 import { IRoom, IService } from '../../../interfaces/room';
@@ -98,14 +98,10 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   treatmentForm!: UntypedFormGroup;
   groups?: IGroupService[];
   filteredGroup?: Observable<IGroupService[] | undefined>;
-  group: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required, requireMatch
-  ]);
+  group: UntypedFormControl = new UntypedFormControl('', [Validators.required, requireMatch]);
   treatmentList?: IService[];
   filteredTreatment?: Observable<IService[] | undefined>;
-  treatment: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required, requireMatch
-  ]);
+  treatment: UntypedFormControl = new UntypedFormControl('', [Validators.required, requireMatch]);
 
   eventGroup!: UntypedFormGroup;
   event: UntypedFormControl = new UntypedFormControl('', [Validators.required]);
@@ -119,33 +115,24 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   roomForm!: UntypedFormGroup;
   offices?: IOffice[];
   filteredOffice?: Observable<IOffice[] | undefined>;
-  office: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required, requireMatch
-  ]);
+  office: UntypedFormControl = new UntypedFormControl('', [Validators.required, requireMatch]);
   roomList?: IRoom[];
   filteredRoom?: Observable<IRoom[] | undefined>;
-  room: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required, requireMatch
-  ]);
+  room: UntypedFormControl = new UntypedFormControl('', [Validators.required, requireMatch]);
 
-  startDate: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required
-  ]);
+  startDate: UntypedFormControl = new UntypedFormControl('', [Validators.required]);
 
   professionalList?: IUser[];
   filteredProfessional?: Observable<IUser[] | undefined>;
-  professional: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required, requireMatch
-  ]);
+  professional: UntypedFormControl = new UntypedFormControl('', [Validators.required, requireMatch]);
 
   typeForm: UntypedFormGroup;
 
   options?: IPaymentOption[];
   accountCreditOptions: IPaymentOption[];
   acceptForm!: UntypedFormGroup;
-  accept: UntypedFormControl = new UntypedFormControl('', [
-    Validators.requiredTrue
-  ]);
+  accept: UntypedFormControl = new UntypedFormControl('', [Validators.requiredTrue]);
+  phone: FormControl<string | null> = new FormControl('', [Validators.required]);
 
   additionalList: IAdditionalAll[] = [];
   additionalSelected: IAdditionalAll[] = [];
@@ -263,6 +250,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       reservation.timeZone = getCurrentTimeZone();
     }
     reservation.additionalIds = this.additionalSelected?.map(value => value.id);
+    reservation.phone = this.phone.value;
 
     const role = Role.customer;
     const option: IPaymentOption = this.typeForm.get('type')?.value;
@@ -574,7 +562,8 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       event: this.event
     });
     this.acceptForm = this.formBuilder.group({
-      accept: this.accept
+      accept: this.accept,
+      phone: this.phone
     });
     this.valueChange();
   }
@@ -886,7 +875,8 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
         this.canCreate = true;
         this.balance = state.customerReservation?.balance || 0;
         this.price = this.price.withBalance(state.customerReservation?.balance);
-        if (state.customerReservation?.firstTime) {
+        this.phone.setValue(state.customerReservation?.phone);
+        if (state.customerReservation?.isFirstTime) {
           this.firstTime = true;
         }
         if (state.selected && !state.selected.canEdit) {

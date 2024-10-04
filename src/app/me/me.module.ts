@@ -35,6 +35,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
 import { ShareButtonsComponent } from './referrals/share-buttons/share-buttons.component';
+import { NgxMatIntlTelInputComponent } from 'ngx-mat-intl-tel-input';
 
 @NgModule({
   declarations: [
@@ -52,25 +53,26 @@ import { ShareButtonsComponent } from './referrals/share-buttons/share-buttons.c
     MePaymentComponent,
     ShareButtonsComponent
   ],
-  imports: [
-    MeRoutingModule,
-    SharedModule,
-    MatProgressBarModule,
-    MatStepperModule,
-    TranslateModule.forChild({
-      loader: {
-        provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('me')
-      },
-      missingTranslationHandler: {
-        provide: MissingTranslationHandler,
-        useClass: MissingTranslateHandler,
-      },
-      isolate: false,
-      extend: true
-    }),
-    EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects, CurrencyEffects])
-  ],
+    imports: [
+        MeRoutingModule,
+        SharedModule,
+        MatProgressBarModule,
+        MatStepperModule,
+        TranslateModule.forChild({
+            loader: {
+                provide: TranslateLoader,
+                useClass: TranslateLoaderFactory.forModule('me')
+            },
+            missingTranslationHandler: {
+                provide: MissingTranslationHandler,
+                useClass: MissingTranslateHandler,
+            },
+            isolate: false,
+            extend: true
+        }),
+        EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects, CurrencyEffects]),
+        NgxMatIntlTelInputComponent
+    ],
   providers: [
     ReservationService,
     PaymentService,

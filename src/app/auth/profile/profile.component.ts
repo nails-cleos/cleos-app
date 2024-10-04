@@ -37,7 +37,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   ]);
 
   displayName: UntypedFormControl = new UntypedFormControl();
-  phone: UntypedFormControl = new UntypedFormControl();
+  phone: UntypedFormControl = new UntypedFormControl('', [Validators.required]);
   dob: UntypedFormControl = new UntypedFormControl();
   darkColor: UntypedFormControl = new UntypedFormControl(undefined, [validColorValidator()]);
   darkColorPicker: UntypedFormControl = new UntypedFormControl();

@@ -74,6 +74,12 @@
             "M": "<span class='bold'>Distance:</span> {{distance}} Meters"
           }
         }
+      },
+      "USER": {
+        "PHONE": {
+          "ADD": "Add phone",
+          "MESSAGE": "The phone number is required to make a reservation, as it is used to send appointment updates."
+        }
       }
     },
     "PAYMENT": {

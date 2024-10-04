@@ -402,9 +402,9 @@ export const executeDialogNoWidth = (dialog: MatDialog, dialogComponent: any, da
   dialogRef.afterClosed().subscribe(afterClose);
 };
 export const executeDialog = (dialog: MatDialog, dialogComponent: any, data: any, afterClose: (result: any) => void,
-                              disableClose: boolean = false): void => {
+                              disableClose: boolean = false, width: string = '70vw'): void => {
   const dialogRef = dialog.open(dialogComponent, {
-    width: '70vw',
+    width,
     disableClose,
     data
   });
