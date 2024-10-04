@@ -80,8 +80,9 @@
         "ES": "Format $1.234,56"
       },
       "TABLE": {
-        "WEEK": "Week {{weekNumber}}",
         "DATE": "Date",
+        "WEEK": "Week {{weekNumber}}",
+        "MONTH": "Month",
         "CUSTOMER": "Customer",
         "DESCRIPTION": "Description",
         "DISCOUNT": "Discount",
