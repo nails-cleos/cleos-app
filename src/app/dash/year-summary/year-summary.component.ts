@@ -229,13 +229,14 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
   }
 
   private exportToExcel(): void {
-    this.sheetData.forEach(monthly => {
-      monthly.saleSummary = monthly.saleSummary.sort((a, b) => a.timestamp - b.timestamp);
-      monthly.expenseSummary = monthly.expenseSummary.sort((a, b) => a.timestamp - b.timestamp);
-      monthly.cashSaleSummary = monthly.cashSaleSummary.sort((a, b) => a.timestamp - b.timestamp);
-    });
+    this.sheetData = this.sheetData.map(monthly => ({
+      ...monthly,  // Create a shallow copy of the monthly object
+      saleSummary: [...monthly.saleSummary].sort((a, b) => a.timestamp - b.timestamp),
+      expenseSummary: [...monthly.expenseSummary].sort((a, b) => a.timestamp - b.timestamp),
+      cashSaleSummary: [...monthly.cashSaleSummary].sort((a, b) => a.timestamp - b.timestamp),
+    }));
     if (this.sheetData.length) {
-      const workbook = createYearlyWorkbook(this.sheetData, this.date.value || getNow(), currencySymbol(this.currency), this.timeZone);
+      const workbook = createYearlyWorkbook(this.sheetData, this.date.value || getNow(), currencySymbol(this.currency), this.timeZone, this.translate);
 
       workbook.creator = this.userName || '';
       workbook.created = getNow();
