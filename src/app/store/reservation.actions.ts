@@ -19,6 +19,7 @@ export enum ReservationActionTypes {
   reservationFindHistory = '[Reservation] Find history',
   findTracking = '[Reservation] Find tracking',
   executeTracking = '[Reservation] Execute tracking',
+  updateTracking = '[Reservation] Update tracking',
   reservationSave = '[Reservation] Save',
   reservationSelected = '[Reservation] Selected',
   reservationDelete = '[Reservation] Delete',
@@ -350,6 +351,13 @@ export class ExecuteTracking implements Action {
   }
 }
 
+export class UpdateTracking implements Action {
+  readonly type = ReservationActionTypes.updateTracking;
+
+  constructor(public payload: any) {
+  }
+}
+
 export class TrackingSuccess implements Action {
   readonly type = ReservationActionTypes.trackingSuccess;
 
@@ -471,6 +479,7 @@ export type All =
   | StateSuccess
   | FindTracking
   | ExecuteTracking
+  | UpdateTracking
   | TrackingSuccess
   | ReservationReview
   | ReservationCompleteSuccess

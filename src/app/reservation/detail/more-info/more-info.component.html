@@ -3,50 +3,39 @@
 </div>
 @if (tracking) {
   <div class="stepper-wrapper">
-    <div [ngClass]="{'active': tracking.reservation.state === 'CREATED', 'completed': tracking.approvedTimestamp}"
-         class="stepper-item">
+    <div class="stepper-item"
+         [ngClass]="{'active': tracking.reservation.state === 'CREATED', 'completed': tracking.approvedTimestamp}">
       <div class="step-counter">
         @if (tracking.createdTimestamp) {
-          <span>
-            {{ tracking.createdTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat }}
-          </span>
+          <span>{{ tracking.createdTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat }}</span>
         }
       </div>
       <div class="step-name">{{ 'COMMON.STATUS.RESERVATION.CREATED' | translate }}</div>
     </div>
-    <div class="stepper-item" [ngClass]="{
-     'active': ['APPROVED', 'PAID', 'PARTIALLY_PAID'].indexOf(tracking.reservation.state) >= 0,
-     'completed': tracking.startedTimestamp
-    }">
+    <div class="stepper-item"
+         [ngClass]="{ 'active': ['APPROVED', 'PAID', 'PARTIALLY_PAID'].indexOf(tracking.reservation.state) >= 0, 'completed': tracking.startedTimestamp }">
       <div class="step-counter">
         @if (tracking.approvedTimestamp) {
-          <span>
-            {{ tracking.approvedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat }}
-          </span>
+          <span>{{ tracking.approvedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat }}</span>
         }
       </div>
       <div class="step-name">{{ 'COMMON.STATUS.RESERVATION.APPROVED' | translate }}</div>
     </div>
-    <div [ngClass]="{'active': tracking.reservation.state === 'STARTED', 'completed': tracking.completedTimestamp}"
-         class="stepper-item">
+    <div class="stepper-item"
+         [ngClass]="{'active': tracking.reservation.state === 'STARTED', 'completed': tracking.completedTimestamp}">
       <div class="step-counter">
         @if (tracking.startedTimestamp) {
-          <span>
-            {{ tracking.startedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat }}
-          </span>
+          <span>{{ tracking.startedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat }}</span>
         }
       </div>
       <div class="step-name">{{ 'COMMON.STATUS.RESERVATION.STARTED' | translate }}</div>
     </div>
-    <div [ngClass]="{
-      'finish': ['COMPLETED', 'PARTIALLY_COMPLETED'].indexOf(tracking.reservation.state) >= 0,
-      'completed': tracking.completedTimestamp
-      }" class="stepper-item">
+    <div class="stepper-item" [ngClass]="{
+            'finish': ['COMPLETED', 'PARTIALLY_COMPLETED'].indexOf(tracking.reservation.state) >= 0,
+            'completed': tracking.completedTimestamp}">
       <div class="step-counter">
         @if (tracking.completedTimestamp) {
-          <span>
-            {{ tracking.completedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat }}
-          </span>
+          <span>{{ tracking.completedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat }}</span>
         }
       </div>
       <div class="step-name">{{ 'COMMON.STATUS.RESERVATION.COMPLETED' | translate }}</div>
@@ -55,34 +44,40 @@
   @if (totalTime) {
     <h4 class="bold" [innerHTML]="'RESERVATION.TRACKING.DURATION' | translate: {totalTime: totalTime}"></h4>
   }
-  @if (!tracking.process && tracking.completedTimestamp) {
-    <button type="button" (click)="execute" mat-fab extended class="icon-button">
-      <mat-icon>sync_problem</mat-icon>
-      {{ 'RESERVATION.TRACKING.SYNC' | translate }}
-    </button>
-  }
-
-  <mat-divider></mat-divider>
+  <div class="card-actions">
+    <div class="spacer"></div>
+    @if (!tracking.process && tracking.completedTimestamp) {
+      <button type="button" (click)="execute" mat-fab extended class="icon-button">
+        <mat-icon>sync_problem</mat-icon>
+        {{ 'RESERVATION.TRACKING.SYNC' | translate }}
+      </button>
+    }
+    @if (tracking.completedTimestamp) {
+      <button type="button" (click)="update" mat-fab extended class="icon-button" color="">
+        <mat-icon>update</mat-icon>
+        {{ 'RESERVATION.TRACKING.UPDATE' | translate }}
+      </button>
+    }
+  </div>
+  <mat-divider class="top-space"></mat-divider>
 } @else {
   <div class="ssc-square mb"></div>
 }
 
 @if (reservation) {
-  <div class="divider">
-    <h2>{{ 'RESERVATION.REVIEW.TITLE' | translate }}</h2>
-  </div>
   @if (reservation.review) {
-    <app-rating [detail]="reservation.review.detail" [rating]="reservation.review.rating" color="primary"></app-rating>
-  } @else {
-    <app-rating [rating]="0" color="primary"></app-rating>
+    <div class="divider">
+      <h2>{{ 'RESERVATION.REVIEW.TITLE' | translate }}</h2>
+    </div>
+    <app-rating [detail]="reservation.review.detail" [rating]="reservation.review.rating"
+                color="primary"></app-rating>
+    <mat-divider></mat-divider>
   }
 } @else {
   <div class="ssc-square mb"></div>
 }
 
 @if (payments && payments[0].id) {
-  <mat-divider></mat-divider>
-
   <div class="divider">
     <h2>{{ 'RESERVATION.PAYMENT.TITLE' | translate }}</h2>
   </div>
@@ -151,7 +146,8 @@
           @if (payment.id) {
             @if (payment.status !== 'APPROVED') {
               <div>
-                <button (click)="resend(payment)" mat-icon-button matTooltip="{{ 'COMMON.BUTTON.RESEND' | translate }}"
+                <button (click)="resend(payment)" mat-icon-button
+                        matTooltip="{{ 'COMMON.BUTTON.RESEND' | translate }}"
                         matTooltipPosition="above">
                   <mat-icon color="primary">autorenew</mat-icon>
                 </button>
@@ -182,5 +178,6 @@
 }
 <div class="top card-actions">
   <div class="spacer"></div>
-  <button appBackButton color="accent" mat-fab extended type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+  <button appBackButton color="accent" mat-fab extended type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
+  </button>
 </div>

@@ -185,7 +185,10 @@
     "TRACKING": {
       "TITLE": "Seguimiento",
       "DURATION": "Duración de la cita: {{totalTime}}",
-      "SYNC": "Reserva no procesada"
+      "SYNC": "Reserva no procesada",
+      "UPDATE": "Actualizar seguimiento",
+      "STARTED": "Iniciado",
+      "COMPLETED": "Terminado"
     },
     "REVIEW": {
       "TITLE": "Opinión"
