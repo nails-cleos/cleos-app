@@ -185,7 +185,10 @@
     "TRACKING": {
       "TITLE": "Tracking",
       "DURATION": "Appointment duration: {{totalTime}}",
-      "SYNC": "Reservation not processed"
+      "SYNC": "Reservation not processed",
+      "UPDATE": "Update tracking",
+      "STARTED": "Started",
+      "COMPLETED": "Completed"
     },
     "REVIEW": {
       "TITLE": "Review"

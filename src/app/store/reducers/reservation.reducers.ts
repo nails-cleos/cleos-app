@@ -69,7 +69,8 @@ export const reducer = (state = initialState, action: All): State => {
     case ReservationActionTypes.getCustomerReservations: {
       return {
         ...state,
-        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         customerReservation: { reservations: { content: [{}, {}, {}], totalElements: 3 }, upcoming: [{}] },
         errorMessage: null,
         error: null,
@@ -81,7 +82,8 @@ export const reducer = (state = initialState, action: All): State => {
     case ReservationActionTypes.getAllFilterPage: {
       return {
         ...state,
-        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         filter: { content: [{}, {}, {}], totalElements: 3 },
         errorMessage: null,
         error: null,
@@ -93,7 +95,8 @@ export const reducer = (state = initialState, action: All): State => {
     case ReservationActionTypes.getAllPage: {
       return {
         ...state,
-        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         page: { content: [{}, {}, {}], totalElements: 3 },
         errorMessage: null,
         error: null,
@@ -389,6 +392,7 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: true
       };
     }
+    case ReservationActionTypes.updateTracking:
     case ReservationActionTypes.executeTracking: {
       return {
         ...state,
