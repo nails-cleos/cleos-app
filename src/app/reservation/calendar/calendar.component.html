@@ -111,7 +111,7 @@
       </button>
       <div class="spacer"></div>
       @if (daysInWeek >= 5) {
-        <button (click)="downloadPDF" color="accent" mat-fab extended>
+        <button (click)="downloadPDF" color="accent" mat-fab extended [disabled]="isDarkMode">
           <mat-icon>print</mat-icon>
           <span>{{ 'COMMON.BUTTON.PRINT' | translate }}</span>
         </button>
