@@ -90,7 +90,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   daysInWeek: number;
   inProgress: boolean;
 
-  private isDarkMode?: boolean;
+  isDarkMode?: boolean;
   private selectView: CalendarPeriod = 'day';
   private getState: Observable<any>;
   private destroy$ = new Subject();
@@ -174,12 +174,18 @@ export class CalendarComponent implements OnInit, OnDestroy {
     if (element) {
       const clone = element.cloneNode(true) as HTMLElement;
 
-      clone.style.marginTop = '90px';
+      clone.style.marginTop = '40px';
+      clone.style.transform = 'scaleY(0.8)';
+      clone.style.transformOrigin = 'top';
       const events = clone.getElementsByClassName('cal-event');
       for (let i = 0; i < events.length; i++) {
         (events[i] as HTMLElement).style.backgroundColor = '#fff';
       }
-
+      const headerPast = clone.querySelectorAll('.cal-header.cal-disabled, .cal-header.cal-future');
+      for (let i = 0; i < headerPast.length; i++) {
+        headerPast[i].classList.remove('cal-future', 'cal-disabled');
+        headerPast[i].classList.add('cal-today');
+      }
       const endDate = addDays(this.searchDate, Math.floor(this.daysInWeek / 2));
       const startDate = addDays(endDate, 1 - this.daysInWeek);
 
@@ -584,8 +590,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
         const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
         const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
         const date = this.dateIsValid(this.searchDate) ? this.searchDate : this.viewDate;
-        this.calendar.events = this.calendar.events.concat(fillNotAvailable(unavailable, lunch, notWorking, date,
-          sunday, saturday, friday, thursday, wednesday, tuesday, monday, darkMode, plusDays(date, this.daysInWeek), timeZone));
+        const startDate = addDays(date, -Math.floor(this.daysInWeek / 2));
+        this.calendar.events = this.calendar.events.concat(fillNotAvailable(unavailable, lunch, notWorking, startDate,
+          sunday, saturday, friday, thursday, wednesday, tuesday, monday, darkMode, plusDays(startDate, this.daysInWeek), timeZone));
         this.addUnavailableList(this.data, darkMode);
         this.addBirthdays(this.data, darkMode);
         this.addNotes(this.data, darkMode);

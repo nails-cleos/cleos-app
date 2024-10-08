@@ -253,6 +253,7 @@
       },
       "PHONE": {
         "FIELD": "Teléfono",
+        "REQUIRED": "Teléfono es <b>requerido</b>",
         "INVALID": "Número de teléfono no valido"
       },
       "LANG": {

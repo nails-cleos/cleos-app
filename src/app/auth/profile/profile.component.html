@@ -54,7 +54,8 @@
                   <mat-select #select [formControl]="langValue" required>
                     @for (lang of flagList; track lang) {
                       <mat-option [value]="lang">
-                        <span [ngClass]="['fi', 'fi-' + lang.icon, 'icon-margin']"></span>{{ 'COMMON.LANG.' + lang.text | translate }}
+                        <span
+                          [ngClass]="['fi', 'fi-' + lang.icon, 'icon-margin']"></span>{{ 'COMMON.LANG.' + lang.text | translate }}
                       </mat-option>
                     }
                   </mat-select>
@@ -63,9 +64,13 @@
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'COMMON.USER.PHONE.FIELD' | translate }}</mat-label>
                   <ngx-mat-intl-tel-input [enablePlaceholder]="true" [enableSearch]="true" [formControl]="phone"
-                                          [preferredCountries]="['nl']" name="phone"></ngx-mat-intl-tel-input>
+                                          [required]="true" [preferredCountries]="['nl']" name="phone">
+                  </ngx-mat-intl-tel-input>
                   @if (phone.hasError('validatePhoneNumber')) {
                     <mat-error>{{ 'COMMON.USER.PHONE.INVALID' | translate }}</mat-error>
+                  }
+                  @if (phone.hasError('required')) {
+                    <mat-error [innerHTML]="'COMMON.USER.PHONE.REQUIRED' | translate"></mat-error>
                   }
                 </mat-form-field>
                 <mat-form-field appearance="outline">

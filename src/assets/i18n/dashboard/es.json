@@ -80,8 +80,9 @@
         "ES": "Formato $1.234,56"
       },
       "TABLE": {
-        "WEEK": "Semana {{weekNumber}}",
         "DATE": "Fecha",
+        "WEEK": "Semana {{weekNumber}}",
+        "MONTH": "Mes",
         "CUSTOMER": "Cliente",
         "DESCRIPTION": "Descripción",
         "DISCOUNT": "Descuento",

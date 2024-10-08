@@ -253,6 +253,7 @@
       },
       "PHONE": {
         "FIELD": "Phone",
+        "REQUIRED": "Phone is <b>required</b>",
         "INVALID": "Invalid phone number"
       },
       "LANG": {

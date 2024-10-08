@@ -23,4 +23,8 @@ export class TrackingService {
   public executeByReservationId(reservationId: string): Observable<ITracking> {
     return this.http.post<ITracking>(`${this.urlV1}/reservations/${reservationId}`, {});
   }
+
+  public updateByReservationId(reservationId: string, started?: string, completed?: string): Observable<ITracking> {
+    return this.http.patch<ITracking>(`${this.urlV1}/reservations/${reservationId}`, {started, completed});
+  }
 }

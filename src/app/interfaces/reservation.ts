@@ -47,6 +47,7 @@ export interface IReservation {
   canCustomerChange?: boolean;
   reference?: string;
   note?: string;
+  phone?: string | null;
 
   payment?: IReservationPayment;
   startedTimestamp?: number;
@@ -107,7 +108,8 @@ export interface IRoomReservation {
 export interface ICustomerReservation {
   reservations: Pagination<IReservationAll>;
   upcoming: IUpcomingAll[];
-  firstTime: boolean;
+  isFirstTime: boolean;
+  phone?: string;
 }
 
 export interface IAvailableDTO {

@@ -11,6 +11,10 @@ import { TranslateService } from '@ngx-translate/core';
 import { getDiffTime, newDateTimestamp } from '../../../util/dates';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { executeDialog } from '../../../util/helper';
+import { AddDiscountDialogComponent } from '../add-discount-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
+import { UpdateTrackingDialogComponent } from './update-tracking-dialog.component';
 
 @Component({
   selector: 'app-more-info',
@@ -34,7 +38,7 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
   private getState: Observable<any>;
   private subscription?: Subscription;
 
-  constructor(private store: Store<AppState>, private route: ActivatedRoute, private translate: TranslateService,
+  constructor(public dialog: MatDialog, private store: Store<AppState>, private route: ActivatedRoute, private translate: TranslateService,
               private clipboard: Clipboard, private snackBar: MatSnackBar) {
     this.getState = this.store.select(selectReservationState);
     this.paymentGetState = this.store.select(selectPaymentState);
@@ -46,6 +50,24 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
     return this.store.dispatch(
       new fromActionsReservation.ExecuteTracking({ reservationId: this.reservationId })
     );
+  }
+
+  get update(): void {
+    return executeDialog(this.dialog, UpdateTrackingDialogComponent, {
+      startedTimestamp: this.tracking?.startedTimestamp,
+      completedTimestamp: this.tracking?.completedTimestamp
+    }, result => {
+      if (result) {
+        this.tracking = undefined;
+        this.store.dispatch(
+          new fromActionsReservation.UpdateTracking({
+            reservationId: this.reservationId,
+            started: result.started,
+            completed: result.completed
+          })
+        );
+      }
+    }, true);
   }
 
   ngOnInit(): void {

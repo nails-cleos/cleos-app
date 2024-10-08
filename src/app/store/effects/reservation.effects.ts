@@ -312,6 +312,14 @@ export class ReservationEffects {
     ))
   ));
 
+  updateByReservationId$ = createEffect(() => this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.updateTracking)).pipe(
+    map((action: any) => action.payload),
+    switchMap((payload: any) => this.trackingService.updateByReservationId(payload.reservationId, payload.started, payload.completed).pipe(
+      switchMap((response) => of(new fromActionsReservation.TrackingSuccess(response))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsReservation.ReservationFailure({ error: err.error })))
+    ))
+  ));
+
   review$ = createEffect(() => this.actions.pipe(ofType(fromActionsReservation.ReservationActionTypes.reservationReview)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.reservationService.addReview(payload).pipe(

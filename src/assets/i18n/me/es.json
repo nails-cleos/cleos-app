@@ -75,6 +75,12 @@
             "M": "<span class='bold'>Distancia:</span> {{distance}} Metros"
           }
         }
+      },
+      "USER": {
+        "PHONE": {
+          "ADD": "Agregar teléfono",
+          "MESSAGE": "Se requiere un número de teléfono para hacer una reserva, ya que se utiliza para enviar actualizaciones de la cita."
+        }
       }
     },
     "PAYMENT": {
