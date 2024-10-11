@@ -146,25 +146,18 @@
     },
     "EXPENSE": {
       "TYPE": {
-        "OPERATING": "Operativo",
-        "COGS": "Costo de los bienes vendidos",
-        "O_MAP": "Marketing, publicidad y promoción",
-        "O_SBW": "Salarios, prestaciones y salarios",
-        "SGA": "Vendedor general y administrativo",
-        "RI": "Alquiler y seguro",
-        "DA": "Depreciación y amortización",
-        "OTHER": "Otros",
-        "NON_OPERATING": "No operativo",
-        "INTEREST": "Interés",
-        "TAXES": "Impuestos",
-        "IC": "Cargos por deterioro",
-        "FIXED": "Fijo",
-        "RENT": "Alquilar",
-        "F_SBW": "Salarios, prestaciones y salarios",
-        "VARIABLE": "Variable",
-        "TRANSACTION_FEES": "Tarifas de transacción",
-        "COMMISSIONS": "Comisiones",
-        "V_MAP": "Marketing, publicidad y promoción"
+        "DIRECT_COSTS": "Costos directo",
+        "PS": "Suministros de productos",
+        "LS": "Costos laborales",
+        "INDIRECT_COSTS": "Costos Indirectos",
+        "OC": "Costos generales",
+        "AC": "Costos administrativos",
+        "MA": "Marketing y publicidad",
+        "IO": "Otros costos indirectos",
+        "OTHER_EXPENSES": "Otros Gastos",
+        "TD": "Capacitación y desarrollo",
+        "MR": "Mantenimiento y reparaciones",
+        "ME": "Gastos misceláneos"
       }
     },
     "CASH": {

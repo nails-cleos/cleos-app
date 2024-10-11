@@ -90,6 +90,7 @@
         "NET": "Neto",
         "BTW": "IVA",
         "TYPE": "Tipo",
+        "SUB_TYPE": "Sub tipo",
         "COLOR": "Color",
         "INVOICE": "Factura",
         "SUPPLY_STORE": "Tienda de suministro",

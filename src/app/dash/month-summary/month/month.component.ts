@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, Input } from '@angular/core';
-import { IMonthSummary, ISummaryTotal, ITotal, Total } from '../../../interfaces/dashboard';
+import { IMonthSummary, ISummaryTotal, Total } from '../../../interfaces/dashboard';
 import { ICurrencyAll } from '../../../interfaces/currency';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -27,22 +27,27 @@ export class MonthComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     const { income, expense, cash } = this.month.total.reduce((types: any, next: ISummaryTotal) => {
-      const total = new Total(next.gross, next.btw, next.net);
       switch (next.type) {
         case 'CASH':
           if (this.showCash) {
-            types.cash = total;
+            types.cash.gross += next.gross;
+            types.cash.btw += next.btw;
+            types.cash.net += next.net;
           }
           break;
         case 'INCOME':
-          types.income = total;
+          types.income.gross += next.gross;
+          types.income.btw += next.btw;
+          types.income.net += next.net;
           break;
         case 'EXPENSE':
-          types.expense = total;
+          types.expense.gross += next.gross;
+          types.expense.btw += next.btw;
+          types.expense.net += next.net;
           break;
       }
       return types;
-    }, { income: {} as ITotal, expense: {} as ITotal, cash: {} as ITotal });
+    }, { income: new Total(), expense: new Total(), cash: new Total() });
     this.income = income;
     this.expense = expense;
     this.cash = cash;

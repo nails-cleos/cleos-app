@@ -72,10 +72,10 @@
 
 <div class="top-space card-actions">
   <div class="spacer"></div>
+  <button (click)="goBack" color="accent" mat-fab extended class="icon-button"
+          type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
   <button [disabled]="!this.monthSummaries" (click)="exportQuarterSummary()" color="primary" mat-fab extended class="icon-button">
     <mat-icon>file_download</mat-icon>
     <span>{{ 'COMMON.BUTTON.EXPORT' | translate }}</span>
   </button>
-  <button (click)="goBack" color="accent" mat-fab extended class="icon-button"
-          type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
 </div>

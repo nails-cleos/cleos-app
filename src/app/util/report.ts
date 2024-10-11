@@ -32,34 +32,34 @@ interface IMonthResult {
 const qCells = ['A', 'B', 'C', 'D'];
 const monthCells = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 const incomeCells = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
-const expenseCells = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
+const expenseCells = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
 
-export const createMonthlyExpenseWorkbook = (data: IMonthlySummaryExpense[], weeks: any[], title: string, name: string,
+export const createMonthlyExpenseWorkbook = (header: string, data: IMonthlySummaryExpense[], weeks: any[], title: string, name: string,
                                              translate: TranslateService, currency: string,
                                              timeZone: string = getCurrentTimeZone()): Workbook => {
   const workbook = new Workbook();
-  monthlyExpenseWorksheet(workbook, data, weeks, title, name, translate, currency, timeZone);
+  monthlyExpenseWorksheet(workbook, header, data, weeks, title, name, translate, currency, timeZone);
   return workbook;
 };
 
-export const createMonthlyIncomeWorkbook = (data: IMonthlySummarySale[], weeks: any[], title: string, type: string,
+export const createMonthlyIncomeWorkbook = (header: string, data: IMonthlySummarySale[], weeks: any[], title: string, type: string,
                                             name: string, translate: TranslateService, currency: string,
                                             timeZone: string = getCurrentTimeZone()): Workbook => {
   const workbook = new Workbook();
-  monthlyIncomeWorksheet(workbook, data, weeks, title, type, name, translate, currency, timeZone);
+  monthlyIncomeWorksheet(workbook, header, data, weeks, title, type, name, translate, currency, timeZone);
   return workbook;
 };
 
-export const createMonthlySummary = (weeks: any[], currency: string, translate: TranslateService,
+export const createMonthlySummary = (header: string, weeks: any[], currency: string, translate: TranslateService,
                                      timeZone: string = getCurrentTimeZone(), income?: IMonthlySummarySale[],
                                      expense?: IMonthlySummaryExpense[]): Workbook => {
   const workbook = new Workbook();
   if (income?.length) {
-    monthlyIncomeWorksheet(workbook, income, weeks, translate.instant('SUMMARY.INCOMES'),
+    monthlyIncomeWorksheet(workbook, header, income, weeks, translate.instant('SUMMARY.INCOMES'),
       SummaryType[SummaryType.payment], titleCase(SummaryType[SummaryType.payment]), translate, currency, timeZone);
   }
   if (expense?.length) {
-    monthlyExpenseWorksheet(workbook, expense, weeks, translate.instant('SUMMARY.EXPENSES'),
+    monthlyExpenseWorksheet(workbook, header, expense, weeks, translate.instant('SUMMARY.EXPENSES'),
       titleCase(SummaryType[SummaryType.expense]), translate, currency, timeZone);
   }
 
@@ -76,8 +76,8 @@ export const createQuarterSummary = (quarter: number, year: number, monthSummari
 
   monthSummaries.forEach((it, index) => {
     const month = monthViewTitle(new Date(year, it.month - 1));
-    const incomes = getTotalOrZero(it.total.find(total => total.type === 'INCOME'));
-    const expense = getTotalOrZero(it.total.find(total => total.type === 'EXPENSE'));
+    const incomes = getTotalOrZero(it.total, 'INCOME');
+    const expense = getTotalOrZero(it.total, 'EXPENSE');
     worksheet.getRow(3 + index).values = [month, incomes.gross, incomes.net, incomes.btw];
     worksheet.getRow(10 + index).values = [month, expense.gross, expense.net, expense.btw];
     worksheet.getRow(17 + index).values = [month, incomes.gross - expense.gross, incomes.net - expense.net, incomes.btw - expense.btw];
@@ -166,10 +166,10 @@ export const createYearlyWorkbook = (data: IMonthlyExport[], date: Date, currenc
   return workbook;
 };
 
-const monthlyIncomeWorksheet = (workbook: Workbook, data: IMonthlySummarySale[], weeks: any[], title: string,
+const monthlyIncomeWorksheet = (workbook: Workbook, header: string, data: IMonthlySummarySale[], weeks: any[], title: string,
                                 type: string, name: string, translate: TranslateService, currency: string,
                                 timeZone: string): Worksheet => {
-  const worksheet = workbook.addWorksheet(name);
+  const worksheet = workbook.addWorksheet(`${ name } - ${ header }`);
   let cellNumber = 1;
   setTitle(worksheet, cellNumber, 'K', title);
   cellNumber++;
@@ -257,15 +257,15 @@ const monthlyIncomeWorksheet = (workbook: Workbook, data: IMonthlySummarySale[],
   return worksheet;
 };
 
-const monthlyExpenseWorksheet = (workbook: Workbook, data: IMonthlySummaryExpense[], weeks: any[], title: string,
+const monthlyExpenseWorksheet = (workbook: Workbook, header: string, data: IMonthlySummaryExpense[], weeks: any[], title: string,
                                  name: string, translate: TranslateService, currency: string,
                                  timeZone: string): Worksheet => {
-  const worksheet = workbook.addWorksheet(name);
+  const worksheet = workbook.addWorksheet(`${ name } - ${ header }`);
   let cellNumber = 1;
-  setTitle(worksheet, cellNumber, 'I', title);
+  setTitle(worksheet, cellNumber, 'J', title);
   cellNumber++;
 
-  const headers = ['DATE', 'INVOICE', 'SUPPLY_STORE', 'TYPE', 'GROSS', 'NET', 'BTW'];
+  const headers = ['DATE', 'INVOICE', 'SUPPLY_STORE', 'TYPE', 'SUB_TYPE', 'GROSS', 'NET', 'BTW'];
   createHeader(worksheet, headers, translate);
   setSubtitle(worksheet, expenseCells, cellNumber);
 
@@ -274,7 +274,7 @@ const monthlyExpenseWorksheet = (workbook: Workbook, data: IMonthlySummaryExpens
   let totalNet = 0;
   let totalBtw = 0;
   weeks.forEach((week, index) => {
-    setWeek(worksheet, cellNumber, index, 'I', translate);
+    setWeek(worksheet, cellNumber, index, 'J', translate);
 
     let rowIndex = 0;
     const rowData = data.filter(item => week.dates.includes(item.day));
@@ -290,8 +290,9 @@ const monthlyExpenseWorksheet = (workbook: Workbook, data: IMonthlySummaryExpens
         totalNet += expense.total.net;
         totalBtw += expense.total.btw;
         const typeValue = translate.instant(getTranslateTypeKey(SummaryType[SummaryType.expense], expense.total.expenseType));
+        const subTypeValue = translate.instant(getTranslateTypeKey(SummaryType[SummaryType.expense], expense.total.expenseSubType));
         const row = worksheet.addRow([++rowIndex, link, exportFormatDate(newDateTimestamp(expense.timestamp, timeZone), API_LOCALE, timeZone),
-          expense.invoice, expense.supplyStore, typeValue, expense.total.gross, expense.total.net, expense.total.btw]);
+          expense.invoice, expense.supplyStore, typeValue, subTypeValue, expense.total.gross, expense.total.net, expense.total.btw]);
         setLinkFont(row);
       });
       const init = ++cellNumber;
@@ -302,15 +303,15 @@ const monthlyExpenseWorksheet = (workbook: Workbook, data: IMonthlySummaryExpens
     }
   });
 
-  worksheet.mergeCells(`A${ cellNumber }`, `F${ cellNumber }`);
+  worksheet.mergeCells(`A${ cellNumber }`, `G${ cellNumber }`);
   setResultTitle(worksheet, cellNumber);
 
-  setTotal(worksheet, cellNumber, 'G', `SUM(G${ 3 }:G${ cellNumber - 1 })`, totalGross, 'I');
-  setTotal(worksheet, cellNumber, 'H', `SUM(H${ 3 }:H${ cellNumber - 1 })`, totalNet, 'I');
-  setTotal(worksheet, cellNumber, 'I', `SUM(I${ 3 }:I${ cellNumber - 1 })`, totalBtw, 'I');
+  setTotal(worksheet, cellNumber, 'H', `SUM(H${ 3 }:H${ cellNumber - 1 })`, totalGross, 'J');
+  setTotal(worksheet, cellNumber, 'I', `SUM(I${ 3 }:I${ cellNumber - 1 })`, totalNet, 'J');
+  setTotal(worksheet, cellNumber, 'J', `SUM(J${ 3 }:J${ cellNumber - 1 })`, totalBtw, 'J');
 
   const priceFormat = currencyFormat(currency);
-  setColumnFormat(worksheet, ['G', 'H', 'I'], priceFormat);
+  setColumnFormat(worksheet, ['H', 'I', 'J'], priceFormat);
 
   const idColumn = worksheet.getColumn('B');
   idColumn.alignment = { vertical: 'middle', horizontal: 'center' };
@@ -349,7 +350,7 @@ const completeData = (workbook: Workbook, date: Date, data: IMonthlyExport[]): I
   return data.sort((a, b) => a.month - b.month);
 };
 
-const addData = (worksheet: Worksheet, key: string, cellNumber: number, column3Name: string, column4Name: string,
+const addData = (worksheet: Worksheet, key: string, cellNumber: number, column4Name: string, column5Name: string,
                  rowData: (CellHyperlinkValue | string | number)[][], gross: number, net: number, btw: number,
                  translate: TranslateService): number => {
   setTitle(worksheet, cellNumber, 'H', translate.instant(key));
@@ -359,7 +360,7 @@ const addData = (worksheet: Worksheet, key: string, cellNumber: number, column3N
   const grossTitle = translate.instant('SUMMARY.MONTHLY.TABLE.GROSS');
   const netTitle = translate.instant('SUMMARY.MONTHLY.TABLE.NET');
   const btwTitle = translate.instant('SUMMARY.MONTHLY.TABLE.BTW');
-  worksheet.addRow(['N°', 'ID', dateTitle, translate.instant(column3Name), translate.instant(column4Name), grossTitle, netTitle, btwTitle]);
+  worksheet.addRow(['N°', 'ID', dateTitle, translate.instant(column4Name), translate.instant(column5Name), grossTitle, netTitle, btwTitle]);
   cellNumber++;
   setSubtitle(worksheet, monthCells, cellNumber);
 
@@ -539,11 +540,15 @@ const setResultTitle = (worksheet: Worksheet, cellNumber: number, value: string 
   setFill(resultCellTitle, 'dcc8c2');
 };
 
-const getTotalOrZero = (total?: ISummaryTotal): { gross: number; btw: number; net: number } => ({
-  gross: total?.gross || 0,
-  net: total?.net || 0,
-  btw: total?.btw || 0
-});
+const getTotalOrZero = (totals: ISummaryTotal[], type: string): { gross: number; btw: number; net: number } => totals
+  .filter(total => total.type === type)
+  .reduce((acc, total) => ({
+      gross: acc.gross + total.gross,
+      btw: acc.btw + total.btw,
+      net: acc.net + total.net
+    }),
+    { gross: 0, btw: 0, net: 0 }
+  );
 
 const setQTitles = (worksheet: Worksheet, name: string, translate: TranslateService): void => {
   setTitle(worksheet, 1, 'D', translate.instant('SUMMARY.INCOMES'));
