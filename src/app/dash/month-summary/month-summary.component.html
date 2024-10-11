@@ -182,10 +182,14 @@
           <tr *ngIf="selectedRoom.value">
             <td mat-subheader [colSpan]="7">{{ 'SUMMARY.MONTHLY.TABLE.TOTALS' | translate }}</td>
             <td
-              mat-subheader>{{ reservationGrossMonth | currency:currency.code:'symbol':'1.2-2' }}
+              mat-subheader>{{ getTotal(reservationMonth, 'gross') | currency:currency.code:'symbol':'1.2-2' }}
             </td>
-            <td mat-subheader>{{ reservationNetMonth | currency:currency.code:'symbol':'1.2-2' }}</td>
-            <td mat-subheader>{{ reservationBtwMonth | currency:currency.code:'symbol':'1.2-2' }}</td>
+            <td
+              mat-subheader>{{ getTotal(reservationMonth, 'net') | currency:currency.code:'symbol':'1.2-2' }}
+            </td>
+            <td
+              mat-subheader>{{ getTotal(reservationMonth, 'btw') | currency:currency.code:'symbol':'1.2-2' }}
+            </td>
             <td mat-subheader></td>
           </tr>
           </tfoot>
@@ -193,22 +197,21 @@
         <mat-action-row>
           <div class="spacer"></div>
           <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryReservations?.length"
-                  (click)="updateMonthlySummary(type.payment, reservationGrossMonth, reservationBtwMonth, monthlySummaryPayment)">
+                  (click)="updateMonthlySummary(reservationMonth, monthlySummaryPayment)">
             <mat-icon>save</mat-icon>
           </button>
           <button color="primary" mat-fab extended class="icon-button hide-xs"
                   [disabled]="!summaryReservations?.length"
-                  (click)="updateMonthlySummary(type.payment, reservationGrossMonth, reservationBtwMonth, monthlySummaryPayment)">
+                  (click)="updateMonthlySummary(reservationMonth, monthlySummaryPayment)">
             <mat-icon>save</mat-icon>
             <span>{{ 'COMMON.BUTTON.SAVE' | translate }}</span>
           </button>
-          <button class="hide-gt-xs" color="accent" mat-fab
-                  (click)="exportToExcel(type.payment, 'INCOMES', summaryReservations)"
-                  [disabled]="!summaryReservations?.length">
+          <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryReservations?.length"
+                  (click)="exportToExcel('INCOMES', reservationMonth, monthlySummaryPayment, summaryReservations)">
             <mat-icon>file_download</mat-icon>
           </button>
-          <button (click)="exportToExcel(type.payment,'INCOMES', summaryReservations)"
-                  color="accent" mat-fab extended [disabled]="!summaryReservations?.length" class="icon-button hide-xs">
+          <button color="accent" mat-fab extended [disabled]="!summaryReservations?.length" class="icon-button hide-xs"
+                  (click)="exportToExcel('INCOMES', reservationMonth, monthlySummaryPayment, summaryReservations)">
             <mat-icon>file_download</mat-icon>
             <span>{{ 'COMMON.BUTTON.SAVE_EXPORT' | translate }}</span>
           </button>
@@ -291,9 +294,9 @@
           <tfoot>
           <tr *ngIf="selectedRoom.value">
             <td mat-subheader [colSpan]="7">{{ 'SUMMARY.MONTHLY.TABLE.TOTALS' | translate }}</td>
-            <td mat-subheader>{{ expenseGrossMonth | currency:currency.code:'symbol':'1.2-2' }}</td>
-            <td mat-subheader>{{ expenseNetMonth | currency:currency.code:'symbol':'1.2-2' }}</td>
-            <td mat-subheader>{{ expenseBtwMonth | currency:currency.code:'symbol':'1.2-2' }}</td>
+            <td mat-subheader>{{ getTotal(expenseMonth, 'gross') | currency:currency.code:'symbol':'1.2-2' }}</td>
+            <td mat-subheader>{{ getTotal(expenseMonth, 'net') | currency:currency.code:'symbol':'1.2-2' }}</td>
+            <td mat-subheader>{{ getTotal(expenseMonth, 'btw') | currency:currency.code:'symbol':'1.2-2' }}</td>
             <td mat-subheader></td>
           </tr>
           </tfoot>
@@ -301,21 +304,20 @@
         <mat-action-row>
           <div class="spacer"></div>
           <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryExpenses?.length"
-                  (click)="updateMonthlySummary(type.expense, expenseGrossMonth, expenseBtwMonth, monthlySummaryExpense)">
+                  (click)="updateMonthlySummary(expenseMonth, monthlySummaryExpense)">
             <mat-icon>save</mat-icon>
           </button>
-          <button (click)="updateMonthlySummary(type.expense, expenseGrossMonth, expenseBtwMonth, monthlySummaryExpense)"
-                  color="primary" mat-fab extended class="icon-button hide-xs" [disabled]="!summaryExpenses?.length">
+          <button color="primary" mat-fab extended class="icon-button hide-xs" [disabled]="!summaryExpenses?.length"
+                  (click)="updateMonthlySummary(expenseMonth, monthlySummaryExpense)">
             <mat-icon>save</mat-icon>
             <span>{{ 'COMMON.BUTTON.SAVE' | translate }}</span>
           </button>
-          <button class="hide-gt-xs" color="accent" mat-fab
-                  (click)="exportToExcel(type.expense, 'EXPENSES', summaryExpenses)"
-                  [disabled]="!summaryExpenses?.length">
+          <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryExpenses?.length"
+                  (click)="exportToExcel('EXPENSES', expenseMonth, monthlySummaryExpense, summaryExpenses)">
             <mat-icon>file_download</mat-icon>
           </button>
-          <button (click)="exportToExcel(type.expense, 'EXPENSES', summaryExpenses)" color="accent"
-                  mat-fab extended class="icon-button hide-xs" [disabled]="!summaryExpenses?.length">
+          <button color="accent" mat-fab extended class="icon-button hide-xs" [disabled]="!summaryExpenses?.length"
+                  (click)="exportToExcel('EXPENSES', expenseMonth, monthlySummaryExpense, summaryExpenses)">
             <mat-icon>file_download</mat-icon>
             <span>{{ 'COMMON.BUTTON.SAVE_EXPORT' | translate }}</span>
           </button>
@@ -414,9 +416,9 @@
             <tfoot>
             <tr *ngIf="selectedRoom.value">
               <td mat-subheader [colSpan]="7">{{ 'SUMMARY.MONTHLY.TABLE.TOTALS' | translate }}</td>
-              <td mat-subheader>{{ cashGrossMonth | currency:currency.code:'symbol':'1.2-2' }}</td>
-              <td mat-subheader>{{ cashNetMonth | currency:currency.code:'symbol':'1.2-2' }}</td>
-              <td mat-subheader>{{ cashBtwMonth | currency:currency.code:'symbol':'1.2-2' }}</td>
+              <td mat-subheader>{{ getTotal(cashMonth, 'gross') | currency:currency.code:'symbol':'1.2-2' }}</td>
+              <td mat-subheader>{{ getTotal(cashMonth, 'net') | currency:currency.code:'symbol':'1.2-2' }}</td>
+              <td mat-subheader>{{ getTotal(cashMonth, 'btw') | currency:currency.code:'symbol':'1.2-2' }}</td>
               <td mat-subheader></td>
             </tr>
             </tfoot>
@@ -424,22 +426,21 @@
           <mat-action-row class="card-actions">
             <div class="spacer"></div>
             <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryCash?.length"
-                    (click)="updateMonthlySummary(type.cash, cashGrossMonth, cashBtwMonth, monthlySummaryCash)">
+                    (click)="updateMonthlySummary(cashMonth, monthlySummaryCash)">
               <mat-icon>save</mat-icon>
             </button>
-            <button color="primary" mat-fab extended class="icon-button hide-xs"
-                    [disabled]="!summaryCash?.length"
-                    (click)="updateMonthlySummary(type.cash, cashGrossMonth, cashBtwMonth, monthlySummaryCash)">
+            <button color="primary" mat-fab extended class="icon-button hide-xs" [disabled]="!summaryCash?.length"
+                    (click)="updateMonthlySummary(cashMonth, monthlySummaryCash)">
               <mat-icon>save</mat-icon>
               <span>{{ 'COMMON.BUTTON.SAVE' | translate }}</span>
             </button>
-            <button class="hide-gt-xs" color="accent" mat-fab
-                    (click)="exportToExcel(type.cash, 'CASH_INCOMES', summaryCash)"
-                    [disabled]="!summaryCash?.length">
+            <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryCash?.length"
+                    (click)="exportToExcel('CASH_INCOMES', cashMonth, monthlySummaryCash, summaryCash)">
               <mat-icon>file_download</mat-icon>
             </button>
-            <button (click)="exportToExcel(type.cash, 'CASH_INCOMES', summaryCash)" color="accent"
-                    mat-fab extended [disabled]="!summaryCash?.length" class="icon-button hide-xs">
+            <button
+              (click)="exportToExcel('CASH_INCOMES', cashMonth, monthlySummaryCash, summaryCash)"
+              color="accent" mat-fab extended [disabled]="!summaryCash?.length" class="icon-button hide-xs">
               <mat-icon>file_download</mat-icon>
               <span>{{ 'COMMON.BUTTON.SAVE_EXPORT' | translate }}</span>
             </button>

@@ -90,6 +90,7 @@
         "NET": "Net",
         "BTW": "BTW",
         "TYPE": "Type",
+        "SUB_TYPE": "Sub type",
         "COLOR": "Color",
         "INVOICE": "Invoice",
         "SUPPLY_STORE": "Supply store",
