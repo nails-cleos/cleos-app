@@ -3,10 +3,10 @@
     "FIELD": "Tablero",
     "SIGN_IN": "Ingresar",
     "RESERVATION": {
-      "COMPLETED": "Completas: {{completed}}",
-      "UPCOMING": "Próximas: {{upcoming}}",
-      "TRANSACTION": "Crédito en cuenta: {{transaction}} - {{total}}",
-      "PAYMENT": "Pagos totales: {{total}}",
+      "COMPLETED": "<span class='bold'>Completas: </span>{{completed}}",
+      "UPCOMING": "<span class='bold'>Próximas: </span>{{upcoming}}",
+      "TRANSACTION": "<span class='bold'>Crédito en cuenta: </span>{{transaction}} - {{total}}",
+      "PAYMENT": "<span class='bold'>Pagos totales: </span>{{total}}",
       "DELETED": {
         "TITLE": "Eliminar reserva",
         "CONTENT": "¿Está seguro de eliminar la reserva {{date}}?",

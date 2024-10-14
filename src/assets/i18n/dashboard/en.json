@@ -3,10 +3,10 @@
     "FIELD": "Tablero",
     "SIGN_IN": "Sign In",
     "RESERVATION": {
-      "COMPLETED": "Completed: {{completed}} - {{total}}",
-      "UPCOMING": "Upcoming: {{upcoming}} - {{total}}",
-      "TRANSACTION": "Account credit: {{transaction}} - {{total}}",
-      "PAYMENT": "Total payments: {{total}}",
+      "COMPLETED": "<span class='bold'>Completed: </span>{{completed}} - {{total}}",
+      "UPCOMING": "<span class='bold'>Upcoming: </span>{{upcoming}} - {{total}}",
+      "TRANSACTION": "<span class='bold'>Account credit: </span>{{transaction}} - {{total}}",
+      "PAYMENT": "<span class='bold'>Total payments: </span>{{total}}",
       "DELETED": {
         "TITLE": "Delete reservation",
         "CONTENT": "Are you sure to delete reservation {{date}}?",

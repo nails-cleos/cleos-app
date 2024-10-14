@@ -420,6 +420,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
         meta.customer = it.customer.displayName;
         const draggable = [States.approved, States.created, States.partiallyPaid, States.paid].includes(it.state as States);
         const event = calendarEvent(detail, color, start, darkMode, end, `${ this.language }/reservation/${ it.id }`, meta, draggable);
+        if (it.showNotification) {
+          event.cssClass = `diagonal ${it.state.toLowerCase()}`
+        }
         let events;
         if (this.calendar) {
           events = [...this.calendar.events, event];
@@ -563,21 +566,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
     return wednesday;
   }
 
-  private subscribe(): void {
-    this.getState.pipe(takeUntil(this.subscription)).subscribe((state) => {
-      this.offices = Array.from(createRoomOffice(state.rooms)?.values() || []);
-      if (this.offices && this.roomId && !this.office.value) {
-        this.office.setValue(this.offices?.find(office => office.rooms?.find(o => o.id === this.roomId) ? office : undefined));
-      } else if (this.offices && this.offices.length === 1) {
-        this.office.setValue(this.offices[0]);
-      }
-      if (state.data && state.data.room && state.data.reservations) {
-        this.data = state.data;
-        this.fillData(this.isDarkMode);
-      }
-    });
-  }
-
   private fillData(darkMode: boolean = false): void {
     if (this.data) {
       this.addReservations(this.data, darkMode);
@@ -598,6 +586,24 @@ export class CalendarComponent implements OnInit, OnDestroy {
         this.addNotes(this.data, darkMode);
       }
     }
+  }
+
+  private filterOffice(name: string): IOffice[] | undefined {
+    const filterValue = name.toLowerCase();
+
+    return this.offices?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
+  }
+
+  private filterRoom(addressName: string): IRoom[] | undefined {
+    const filterValue = addressName.toLowerCase();
+
+    return this.roomList?.filter(option => option.address?.name?.toLowerCase().indexOf(filterValue) === 0);
+  }
+
+  private filterProfessional(name: string): IUser[] | undefined {
+    const filterValue = name.toLowerCase();
+
+    return this.professionalList?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
   }
 
   private clean(): void {
@@ -625,21 +631,18 @@ export class CalendarComponent implements OnInit, OnDestroy {
     );
   }
 
-  private filterOffice(name: string): IOffice[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.offices?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-  private filterRoom(addressName: string): IRoom[] | undefined {
-    const filterValue = addressName.toLowerCase();
-
-    return this.roomList?.filter(option => option.address?.name?.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-  private filterProfessional(name: string): IUser[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.professionalList?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
+  private subscribe(): void {
+    this.getState.pipe(takeUntil(this.subscription)).subscribe((state) => {
+      this.offices = Array.from(createRoomOffice(state.rooms)?.values() || []);
+      if (this.offices && this.roomId && !this.office.value) {
+        this.office.setValue(this.offices?.find(office => office.rooms?.find(o => o.id === this.roomId) ? office : undefined));
+      } else if (this.offices && this.offices.length === 1) {
+        this.office.setValue(this.offices[0]);
+      }
+      if (state.data && state.data.room && state.data.reservations) {
+        this.data = state.data;
+        this.fillData(this.isDarkMode);
+      }
+    });
   }
 }
