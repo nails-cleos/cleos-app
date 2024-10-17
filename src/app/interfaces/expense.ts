@@ -13,7 +13,15 @@ export interface IExpense {
   date?: string;
   timestamp?: number;
   room?: IRoomAll;
+  totals?: ITotalExpense[],
   deleted?: boolean;
+}
+
+export interface ITotalExpense {
+  type: string;
+  gross: number;
+  btw?: number;
+  description?: string;
 }
 
 export interface IExpenseAll {
@@ -26,6 +34,9 @@ export interface IExpenseAll {
   gross: number;
   btw?: number;
   room: IRoomAll;
+  totals: ITotalExpense[],
+  totalNet: number,
+  totalGross: number,
   deleted: boolean;
 }
 

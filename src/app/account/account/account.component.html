@@ -3,7 +3,7 @@
     <div class="card-content">
       <app-balance [account]="account" [showAdd]="showAdd" [showView]="true" [language]="language"></app-balance>
       <form (ngSubmit)="submit" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
-        <mat-card appearance="outlined" class="style-card">
+        <mat-card appearance="outlined">
           <mat-card-header>
             <mat-card-title>{{ 'ACCOUNT.TITLE' | translate }}</mat-card-title>
             @if (account?.customer) {

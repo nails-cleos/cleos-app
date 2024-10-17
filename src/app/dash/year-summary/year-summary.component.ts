@@ -230,7 +230,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
 
   private exportToExcel(): void {
     this.sheetData = this.sheetData.map(monthly => ({
-      ...monthly,  // Create a shallow copy of the monthly object
+      ...monthly,
       saleSummary: [...monthly.saleSummary].sort((a, b) => a.timestamp - b.timestamp),
       expenseSummary: [...monthly.expenseSummary].sort((a, b) => a.timestamp - b.timestamp),
       cashSaleSummary: [...monthly.cashSaleSummary].sort((a, b) => a.timestamp - b.timestamp),
@@ -257,6 +257,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     this.selectedRoom.setValue(null);
     this.primaryRoom = undefined;
     this.export = false;
+    this.yearSummaryMap = undefined;
   }
 
   private getSummary(year: number): void {

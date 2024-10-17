@@ -199,6 +199,7 @@ export interface ISummaryTotal extends ITotal {
   expenseType: string;
   expenseSubType: string;
   type: string;
+  description: string;
   discountDescription: string;
   discountValue: number;
   payments: ISummaryTotal[];

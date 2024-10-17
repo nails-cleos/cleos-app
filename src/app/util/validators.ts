@@ -16,7 +16,7 @@ export const requireMatch = (control: AbstractControl): any => {
 
 export const requireMatchAsync = (control: AbstractControl): Observable<ValidationErrors | null> => of(requireMatch(control));
 
-export function noDuplicateDatesValidator(): ValidatorFn {
+export function noDuplicateDatesValidator(key: string = 'date'): ValidatorFn {
   return (formArray: AbstractControl): { [key: string]: any } | null => {
     if (!(formArray instanceof FormArray)) {
       throw new Error('Validator must be applied to a FormArray');
@@ -27,27 +27,32 @@ export function noDuplicateDatesValidator(): ValidatorFn {
 
     for (let i = 0; i < formArray.controls.length; i++) {
       const control = formArray.controls[i];
-      const dateValue = control.get('date')?.value;
+      const keyValue = control.get(key)?.value;
 
-      if (dateValue) {
-        const dateStr = new Date(dateValue).toISOString().split('T')[0];
+      if (keyValue) {
+        const date = new Date(keyValue);
+        let keyString;
+        if (isNaN(date.getTime())) {
+          keyString = keyValue;
+        } else {
+          keyString = date.toISOString().split('T')[0];
+        }
 
-        if (dateSet.has(dateStr)) {
+        if (dateSet.has(keyString)) {
           duplicateIndex = i;
           break;
         }
-        dateSet.add(dateStr);
+        dateSet.add(keyString);
       }
     }
 
-    // Clear previous errors
-    formArray.controls.forEach(control => control.get('date')?.setErrors(null));
+    formArray.controls.forEach(control => control.get(key)?.setErrors(null));
 
     if (duplicateIndex !== null) {
-      // Set the 'duplicateDate' error on the specific control
+      const errorKey = `duplicate${ key.charAt(0).toUpperCase() + key.slice(1) }`;
       const duplicateControl = formArray.controls[duplicateIndex];
-      duplicateControl.get('date')?.setErrors({ 'duplicateDate': true });
-      return { 'duplicateDates': duplicateIndex }; // Optionally return this to show error at FormArray level
+      duplicateControl.get(key)?.setErrors({ [errorKey]: true });
+      return { [errorKey]: duplicateIndex };
     }
 
     return null; // No errors

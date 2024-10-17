@@ -174,10 +174,16 @@
     "BTW": {
       "FIELD": "IVA",
       "MIN": "IVA debe ser mayor a 0.00",
-      "MAX": "IVA debe ser menor a 100.00"
+      "MAX": "IVA debe ser menor a 100.00",
+      "DUPLICATED": "IVA ya agregado"
     },
     "NET": {
       "FIELD": "Neto"
+    },
+    "TOTAL": {
+      "GROSS": "Total Bruto",
+      "NET": "Total Neto",
+      "BTW": "Total IVA"
     },
     "TYPE": {
       "FIELD": "Tipo",

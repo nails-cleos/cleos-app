@@ -667,8 +667,7 @@ $box-shadow2: ();
 }
 
 .row-column-space-around-center,
-.row-space-around-container,
-.expense-space-around-container {
+.row-space-around-container {
   display: flex;
   flex-direction: row;
   justify-content: space-around;
@@ -711,12 +710,6 @@ $box-shadow2: ();
   .flex-wrap,
   .card-container {
     flex-direction: column;
-  }
-
-  .expense-space-around-container {
-    flex-direction: column;
-    justify-content: space-evenly;
-    align-items: stretch;
   }
 
   .card-content {
@@ -959,4 +952,57 @@ $box-shadow2: ();
   max-width: 100%;
   max-height: 100%;
   position: absolute;
+}
+
+@media (min-width: 768px) {
+  .side-by-side-fields {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1%;
+
+    .field {
+      margin-left: 2%;
+      margin-right: 2%;
+      flex: 1;
+      max-width: 100%;
+
+      &:nth-child(2n) {
+        max-width: calc(50% - 1%);
+      }
+
+      &:nth-child(3n) {
+        max-width: calc(33.33% - 1%);
+      }
+
+      &:nth-child(4n) {
+        max-width: calc(25% - 1%);
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .side-by-side-fields {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .field {
+    width: 90%;
+    margin-left: 5%;
+  }
+}
+
+.add-button-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 16px;
+}
+
+.add-button {
+  display: flex;
+  justify-content: center;
 }

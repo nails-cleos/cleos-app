@@ -29,7 +29,12 @@
 </div>
 
 <ng-template #paymentTemplate let-payment='payment' let-currency='currency' let-index='index' let-edit=edit
-             let-key='key' let-type='type'>
+             let-key='key' let-type='type' let-description='description'>
+  @if (description) {
+    <td>
+      {{ payment.description }}
+    </td>
+  }
   <td>
     <ng-template [ngIf]="edit" [ngIfElse]="noNetEdit">
       <mat-form-field class="amount" appearance="outline">
@@ -244,8 +249,8 @@
             <col class="date">
             <col id="invoice">
             <col>
-            <col id="store-supply">
-            <col>
+            <col class="store-supply">
+            <col id="description">
             <col class="gross">
             <col class="net">
             <col class="btw">
@@ -257,7 +262,8 @@
             <th mat-subheader>N°</th>
             <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.DATE' | translate }}</th>
             <th mat-subheader [colSpan]="2">{{ 'SUMMARY.MONTHLY.TABLE.INVOICE' | translate }}</th>
-            <th mat-subheader [colSpan]="2">{{ 'SUMMARY.MONTHLY.TABLE.SUPPLY_STORE' | translate }}</th>
+            <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.SUPPLY_STORE' | translate }}</th>
+            <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.DESCRIPTION' | translate }}</th>
             <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.GROSS' | translate }}</th>
             <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.NET' | translate }}</th>
             <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.BTW' | translate }}</th>
@@ -270,25 +276,41 @@
                 [innerHTML]="'SUMMARY.MONTHLY.TABLE.WEEK' | translate:{weekNumber: i + 1}"></td>
           </tr>
           <ng-template [ngIf]="summaryExpenses?.length">
-            <tr *ngFor="let summary of summaryExpenses | filterBy:week.dates:'day'">
-              <td>
-                <button mat-icon-button [routerLink]="summary.paths">
-                  <mat-icon>visibility</mat-icon>
-                </button>
-              </td>
-              <td>
-                {{ summary.position + 1 }}
-              </td>
-              <td>
-                {{ (summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat)?.replace(',', '') }}
-              </td>
-              <td [colSpan]="2">{{ summary.invoice }}</td>
-              <td [colSpan]="2">{{ summary.supplyStore }}</td>
-              <ng-container [ngTemplateOutlet]="paymentTemplate"
-                            [ngTemplateOutletContext]="{payment: summary.total, currency: currency.icon,
-                        index: summary.position, key: 'EXPENSE', type: summary.total.expenseType, edit: true}">
-              </ng-container>
-            </tr>
+            @for (summary of summaryExpenses | filterBy:week.dates:'day'; track summary) {
+              <tr>
+                <td [rowSpan]="summary.total.payments.length || 1">
+                  <button mat-icon-button [routerLink]="summary.paths">
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                </td>
+                <td [rowSpan]="summary.total.payments.length || 1">
+                  {{ summary.position + 1 }}
+                </td>
+                <td [rowSpan]="summary.total.payments.length || 1">
+                  {{ (summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat)?.replace(',', '') }}
+                </td>
+                <td [rowSpan]="summary.total.payments.length || 1" [colSpan]="2">{{ summary.invoice }}</td>
+                <td [rowSpan]="summary.total.payments.length || 1">{{ summary.supplyStore }}</td>
+                <ng-container [ngTemplateOutlet]="paymentTemplate"
+                              [ngTemplateOutletContext]="{payment: summary.total.payments[0], currency: currency.icon,
+                        index: summary.position, key: 'EXPENSE', type: summary.total.payments[0].expenseType,
+                        edit: true, description: true}">
+                </ng-container>
+              </tr>
+
+              <ng-template [ngIf]="summary.total.payments.length > 1">
+                @for (payment of summary.total.payments | slice:1; track payment; let i = $index) {
+                  <tr>
+                    <ng-container [ngTemplateOutlet]="paymentTemplate"
+                                  [ngTemplateOutletContext]="{payment: payment, currency: currency.icon,
+                        index: summary.position, key: 'EXPENSE', edit: true,
+                        type: summary.total.payments[i + 1].expenseType, description: true}">
+                    </ng-container>
+                  </tr>
+                }
+              </ng-template>
+            }
+
           </ng-template>
           </tbody>
           <tfoot>

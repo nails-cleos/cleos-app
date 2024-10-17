@@ -174,10 +174,16 @@
     "BTW": {
       "FIELD": "BTW",
       "MIN": "BTW must be greater than 0.00",
-      "MAX": "BTW must be less than 100.00"
+      "MAX": "BTW must be less than 100.00",
+      "DUPLICATED": "BTW already added"
     },
     "NET": {
       "FIELD": "Net"
+    },
+    "TOTAL": {
+      "GROSS": "Total Gross",
+      "NET": "Total Net",
+      "BTW": "Total BTW"
     },
     "TYPE": {
       "FIELD": "Type",
