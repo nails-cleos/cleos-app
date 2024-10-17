@@ -12,23 +12,10 @@
 
 <!--Calendar-->
 <mat-card appearance="outlined">
+  <mat-card-title class="calendar-title bold top">
+    <h3>{{ viewDate | calendarDate:(view + 'ViewTitle'):dateFormat }}</h3>
+  </mat-card-title>
   <mat-card-header>
-    <mat-card-title>{{ viewDate | calendarDate:(view + 'ViewTitle'):dateFormat }}
-      @if (!isCalendarLoading) {
-        <div [innerHTML]="'DASHBOARD.RESERVATION.PAYMENT' | translate:{total: thisMonthTotal}"></div>
-        <div [innerHTML]="'DASHBOARD.RESERVATION.COMPLETED' | translate:{completed: completed, total: completedTotal}">
-        </div>
-        <div [innerHTML]="'DASHBOARD.RESERVATION.UPCOMING' | translate:{upcoming: upcoming, total: upcomingTotal}">
-        </div>
-        <div
-          [innerHTML]="'DASHBOARD.RESERVATION.TRANSACTION' | translate:{transaction: transaction, total: transactionTotal}">
-        </div>
-      } @else {
-        <div style="margin-top: 10px" class="ssc-head-line"></div>
-        <div style="margin-top: 10px" class="ssc-head-line"></div>
-        <div style="margin-top: 10px" class="ssc-head-line"></div>
-      }
-    </mat-card-title>
     <mat-card-subtitle class="calendar-title">
       <button class="hide-gt-xs" (click)="changeDate" (viewDateChange)="closeOpenMonthViewDay" [(viewDate)]="viewDate"
               [class.spinner]="isLoading || isCalendarLoading" [disabled]="isLoading || isCalendarLoading" [view]="view"
@@ -88,8 +75,24 @@
                                [activeDayIsOpen]="activeDayIsOpen" [events]="events" [locale]="dateFormat"
                                [viewDate]="viewDate"></mwl-calendar-month-view>
     </mat-card-content>
+    <mat-card-actions>
+      <mat-card-title class="totals">
+        <div
+          [innerHTML]="'DASHBOARD.RESERVATION.COMPLETED' | translate:{completed: completed, total: completedTotal}">
+        </div>
+        <div [innerHTML]="'DASHBOARD.RESERVATION.UPCOMING' | translate:{upcoming: upcoming, total: upcomingTotal}">
+        </div>
+        <div
+          [innerHTML]="'DASHBOARD.RESERVATION.TRANSACTION' | translate:{transaction: transaction, total: transactionTotal}">
+        </div>
+        <div [innerHTML]="'DASHBOARD.RESERVATION.PAYMENT' | translate:{total: thisMonthTotal}"></div>
+      </mat-card-title>
+    </mat-card-actions>
   } @else {
     <div class="ssc-square mb"></div>
+    <div style="margin-top: 10px" class="ssc-head-line"></div>
+    <div style="margin-top: 10px" class="ssc-head-line"></div>
+    <div style="margin-top: 10px" class="ssc-head-line"></div>
   }
 </mat-card>
 <mat-grid-list [cols]="cardLayout.columns" [rowHeight]="cardLayout.rowHeight">

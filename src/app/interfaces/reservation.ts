@@ -88,6 +88,7 @@ export interface IReservationAll {
   paymentRequired?: boolean;
   relatedReservationId?: string;
   balance?: number;
+  showNotification?: boolean;
 }
 
 export interface IUpcomingAll extends IReservationAll {
