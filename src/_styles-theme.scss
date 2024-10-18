@@ -1,7 +1,6 @@
 @use 'sass:map';
 @use '@angular/material' as mat;
 @import "angular-calendar/scss/angular-calendar.scss";
-@import 'firebaseui/dist/firebaseui.css';
 
 @mixin color($theme) {
   // Get the color config from the theme.
@@ -106,18 +105,6 @@
   .mdl-card {
     background: mat.get-color-from-palette($background, card);
 
-    .firebaseui-title {
-      color: mat.get-color-from-palette($foreground, text);
-    }
-
-    .firebaseui-textfield.mdl-textfield .firebaseui-label {
-      color: mat.get-color-from-palette($foreground, text);
-    }
-
-    .firebaseui-textfield.mdl-textfield .firebaseui-input {
-      color: mat.get-color-from-palette($foreground, text);
-    }
-
     .progressbar {
       background-color: mat.get-color-from-palette($primary-palette) !important;
     }
@@ -128,18 +115,6 @@
     }
 
     .mdl-button.mdl-js-button.mdl-button--primary {
-      color: mat.get-color-from-palette($accent-palette) !important;
-    }
-
-    .firebaseui-textfield.mdl-textfield .firebaseui-label::after {
-      background-color: mat.get-color-from-palette($primary-palette) !important;
-    }
-
-    a.firebaseui-link {
-      color: mat.get-color-from-palette($primary-palette) !important;
-    }
-
-    a.firebaseui-input-floating-button {
       color: mat.get-color-from-palette($accent-palette) !important;
     }
 
