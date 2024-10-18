@@ -108,6 +108,13 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
   private static groupSummary(summaries?: IMonthlySummary[]): Map<string, IMonthlySummary[]> {
     return summaries?.reduce((grouped: Map<string, IMonthlySummary[]>, item: IMonthlySummary) => {
       const key = item.total.expenseType;
+
+      item.total.payments.forEach(total => {
+        const group = grouped.get(total.expenseType) || [];
+        group.push(item);
+        grouped.set(total.expenseType, group);
+      });
+
       const group = grouped.get(key) || [];
       group.push(item);
       grouped.set(key, group);
@@ -179,31 +186,43 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
     }
   }
 
+  private static parseValue(total: ISummaryTotal, key: 'btw' | 'gross' | 'net', id?: string): number {
+    if (id) {
+      const t = total.payments?.find(payment => payment.id === id);
+      if (t) {
+        return t[key] >= 0 ? t[key] : total[key];
+      }
+      return total[key]
+    }
+    return total[key]
+
+  }
+
   private static updateAmounts(summaries: IMonthlySummary[], summaryRequests: IMonthlySummaryRequest[], input: HTMLInputElement,
                                index: number, id: string): { monthlySummaries: IMonthlySummary[]; newSummaries: IMonthlySummaryRequest[] } {
     const objIndex = summaries.findIndex((obj => obj.position === index));
     const isInvalidInput = MonthSummaryComponent.isInvalidInput(input.value);
     const summary = summaries[objIndex];
     const total = summary.total;
-    let gross = isInvalidInput ? id ?
-        total.payments?.find(payment => payment.id === id)?.gross || total.gross
-        : total.gross
-      : parseFloat(input.value);
+    let gross = isInvalidInput ? this.parseValue(total, 'gross', id) : parseFloat(input.value);
+    const btwCurrent = this.parseValue(total, 'btw', id);
+    const netCurrent = this.parseValue(total, 'net', id)
+    const btwPercentage = Math.round((btwCurrent/netCurrent) * 100)
     let net = gross;
     let btw = 0;
     if (input.id === 'grossInput') {
-      net = gross * 100 / 121;
+      net = gross * 100 / (btwPercentage + 100);
       btw = gross - net;
     } else if (input.id === 'netInput') {
       if (!isInvalidInput) {
         net = parseFloat(input.value);
-        gross = net * 1.21;
+        gross = net * ((btwPercentage / 100) + 1);
         btw = gross - net;
       }
     } else if (input.id === 'btwInput') {
       if (!isInvalidInput) {
         btw = parseFloat(input.value);
-        net = btw * 100 / 21;
+        net = btw * 100 / btwPercentage;
         gross = btw + net;
       }
     }
@@ -513,29 +532,22 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
     });
   }
 
+  private getNewObject(s: IMonthlySummary): any {
+    if (s?.paths) {
+      const paths = Array.isArray(s.paths) ? `/${ this.language }/${ s.paths.join('/') }` : s.paths;
+      return Object.assign({}, s, { paths });
+    }
+    return s;
+  }
+
   private subscribe(): void {
     this.subscription = this.getState.subscribe(state => {
       this.monthlySummaryMap = state.monthlySummaryMap;
       this.monthlySummaryMap?.forEach((value, key) => {
         this.monthlySummaryMap?.set(key, {
-          summarySale: value.summarySale.map(s => {
-            if (s?.paths) {
-              return Object.assign({}, s, { paths: `/${ this.language }/${ s.paths.join('/') }` });
-            }
-            return s;
-          }),
-          summaryExpenses: value.summaryExpenses.map(s => {
-            if (s?.paths) {
-              return Object.assign({}, s, { paths: `/${ this.language }/${ s.paths.join('/') }` });
-            }
-            return s;
-          }),
-          summaryCashSale: value.summaryCashSale.map(s => {
-            if (s?.paths) {
-              return Object.assign({}, s, { paths: `/${ this.language }/${ s.paths.join('/') }` });
-            }
-            return s;
-          })
+          summarySale: value.summarySale.map(s => this.getNewObject(s)),
+          summaryExpenses: value.summaryExpenses.map(s => this.getNewObject(s)),
+          summaryCashSale: value.summaryCashSale.map(s => this.getNewObject(s))
         });
       });
       if (this.monthlySummaryMap) {

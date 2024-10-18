@@ -27,12 +27,12 @@
     width: 4%;
   }
 
-  .customer, .date, .description, .discount, .color, .type {
+  .customer, .date, .description, .discount, .color, .type, .store-supply {
     width: 10%;
   }
 
-  #invoice, #store-supply {
-    width: 18%;
+  #invoice, #description {
+    width: 14%;
   }
 
   .gross, .net, .btw {

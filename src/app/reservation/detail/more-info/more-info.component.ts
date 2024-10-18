@@ -104,7 +104,7 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
       this.tracking = state.tracking;
       this.reservation = state.selected;
       if (this.tracking && this.tracking.startedTimestamp && this.tracking.completedTimestamp) {
-        this.totalTime = getDiffTime(newDateTimestamp(this.tracking.startedTimestamp), newDateTimestamp(this.tracking.completedTimestamp));
+        this.totalTime = getDiffTime(newDateTimestamp(this.tracking.completedTimestamp), newDateTimestamp(this.tracking.startedTimestamp));
       }
     });
     this.paymentSubscription = this.paymentGetState.subscribe(state => {

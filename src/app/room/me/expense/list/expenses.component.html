@@ -1,6 +1,6 @@
 <div>
   <fieldset>
-    <legend>{{'COMMON.SEARCH.TITLE' | translate }}</legend>
+    <legend>{{ 'COMMON.SEARCH.TITLE' | translate }}</legend>
     <div class="row-column-space-evenly-center">
       <mat-form-field appearance="outline">
         <mat-label>{{ 'COMMON.LABEL.FILTER' | translate }}</mat-label>
@@ -9,7 +9,7 @@
         </label>
       </mat-form-field>
       <mat-form-field appearance="outline">
-        <mat-label>{{'SUMMARY.MONTHLY.SELECT.DATE' | translate}}</mat-label>
+        <mat-label>{{ 'SUMMARY.MONTHLY.SELECT.DATE' | translate }}</mat-label>
         <input matInput [matDatepicker]="dp" [formControl]="date" (keydown)="keyDownHandler($event)">
         <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
         <mat-datepicker #dp startView="year" (monthSelected)="setMonthAndYear($event, dp)">
@@ -24,7 +24,7 @@
       <ng-container matColumnDef="position">
         <th *matHeaderCellDef mat-header-cell>#</th>
         <td *matCellDef="let expense; let i = dataIndex;" mat-cell>
-          <div *ngIf="expense.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
+          <div *ngIf="expense.id; else skeleton">{{ (paginator.pageIndex * pageSize) + i + 1 }}</div>
           <ng-template #skeleton>
             <div class="ssc-line"></div>
           </ng-template>
@@ -35,7 +35,7 @@
         <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.DATE' | translate }}</th>
         <td *matCellDef="let expense" mat-cell>
           <div *ngIf="expense.id; else skeleton">
-            {{expense.timestamp | timeDetail | date:'mediumDate':expense.room.timeZone:dateFormat}}
+            {{ expense.timestamp | timeDetail | date:'mediumDate':expense.room.timeZone:dateFormat }}
             <ng-template [ngIf]="showTimeZone(expense)">
               <button (click)="openDialog(expense)" mat-icon-button type="button">
                 <mat-icon>info_outline</mat-icon>
@@ -53,7 +53,7 @@
             mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.INVOICE' | translate }}
         </th>
         <td *matCellDef="let expense" class="hide-xs" mat-cell>
-          <div *ngIf="expense.id; else skeleton">{{expense.invoice}}</div>
+          <div *ngIf="expense.id; else skeleton">{{ expense.invoice }}</div>
           <ng-template #skeleton>
             <div class="ssc-line"></div>
           </ng-template>
@@ -62,37 +62,25 @@
 
       <ng-container matColumnDef="supplyStore.name">
         <th *matHeaderCellDef mat-header-cell class="hide-xs"
-            mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.SUPPLY_STORE' | translate }}</th>
+            mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.SUPPLY_STORE' | translate }}
+        </th>
         <td *matCellDef="let expense" class="hide-xs" mat-cell>
-          <div *ngIf="expense.id; else skeleton">{{expense.supplyStore.name}}</div>
+          <div *ngIf="expense.id; else skeleton">{{ expense.supplyStore.name }}</div>
           <ng-template #skeleton>
             <div class="ssc-line"></div>
           </ng-template>
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="type">
-        <th *matHeaderCellDef class="hide-xs" mat-header-cell
-            mat-sort-header>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
-        <td *matCellDef="let expense" class="hide-xs" mat-cell>
-          <div *ngIf="expense.id; else skeleton">
-            {{'COMMON.EXPENSE.TYPE.' + expense.type | translate}}
-          </div>
-          <ng-template #skeleton>
-            <div class="ssc-line"></div>
-          </ng-template>
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="gross">
+      <ng-container matColumnDef="totalGross">
         <th *matHeaderCellDef class="hide-xs" mat-header-cell
             mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.GROSS' | translate }}
         </th>
         <td *matCellDef="let expense" class="hide-xs" mat-cell>
           <div *ngIf="expense.id; else skeleton">
             <mat-list-item>
-              <mat-icon matListItemIcon>{{expense.room.currency.icon}}</mat-icon>
-              <div matListItemTitle>{{expense.gross | number:'1.2-2'}}</div>
+              <mat-icon matListItemIcon>{{ expense.room.currency.icon }}</mat-icon>
+              <div matListItemTitle>{{ expense.totalGross | number:'1.2-2' }}</div>
             </mat-list-item>
           </div>
           <ng-template #skeleton>
@@ -101,15 +89,15 @@
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="btw">
+      <ng-container matColumnDef="totalBtw">
         <th *matHeaderCellDef class="hide-xs" mat-header-cell
             mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.BTW' | translate }}
         </th>
         <td *matCellDef="let expense" class="hide-xs" mat-cell>
           <div *ngIf="expense.id; else skeleton">
             <mat-list-item>
-              <mat-icon matListItemIcon>{{expense.room.currency.icon}}</mat-icon>
-              <div matListItemTitle>{{(expense.gross - expense.net) | number:'1.2-2'}}</div>
+              <mat-icon matListItemIcon>{{ expense.room.currency.icon }}</mat-icon>
+              <div matListItemTitle>{{ (expense.totalGross - expense.totalNet) | number:'1.2-2' }}</div>
             </mat-list-item>
           </div>
           <ng-template #skeleton>
@@ -118,13 +106,13 @@
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="net">
+      <ng-container matColumnDef="totalNet">
         <th *matHeaderCellDef mat-header-cell>{{ 'EXPENSE.LIST.COLUMN.NET' | translate }}</th>
         <td *matCellDef="let expense" mat-cell>
           <div *ngIf="expense.id; else skeleton">
             <mat-list-item>
-              <mat-icon matListItemIcon>{{expense.room.currency.icon}}</mat-icon>
-              <div matListItemTitle>{{expense.net | number:'1.2-2'}}</div>
+              <mat-icon matListItemIcon>{{ expense.room.currency.icon }}</mat-icon>
+              <div matListItemTitle>{{ expense.totalNet | number:'1.2-2' }}</div>
             </mat-list-item>
           </div>
           <ng-template #skeleton>
@@ -137,8 +125,8 @@
         <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
         <td *matCellDef="let expense" class="hide-xs" mat-cell>
           <div *ngIf="expense.id; else skeleton">
-            <button (click)="edit(expense)" *ngIf="!expense.deleted" mat-icon-button
-                    matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
+            <button [routerLink]="['/', language, 'rooms', roomId, 'expenses', expense.id]" *ngIf="!expense.deleted"
+                    mat-icon-button matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
               <mat-icon color="primary">edit</mat-icon>
             </button>
             <button (click)="delete(expense)" *ngIf="!expense.deleted" mat-icon-button
@@ -158,33 +146,34 @@
             <mat-list>
               <mat-list-item role="list">
                 <div matListItemTitle>{{ 'EXPENSE.LIST.COLUMN.INVOICE' | translate }}</div>
-                <div matListItemLine>{{expense.invoice}}</div>
+                <div matListItemLine>{{ expense.invoice }}</div>
               </mat-list-item>
               <mat-list-item role="list">
                 <div matListItemTitle>{{ 'EXPENSE.LIST.COLUMN.SUPPLY_STORE' | translate }}</div>
-                <div matListItemLine>{{expense.supplyStore?.name}}</div>
+                <div matListItemLine>{{ expense.supplyStore?.name }}</div>
               </mat-list-item>
               <mat-list-item role="list">
                 <div matListItemTitle>{{ 'COMMON.COLUMN.TYPE' | translate }}</div>
-                <div matListItemLine>{{'COMMON.EXPENSE.TYPE.' + expense.type | translate}}</div>
+                <div matListItemLine>{{ 'COMMON.EXPENSE.TYPE.' + expense.type | translate }}</div>
               </mat-list-item>
               <ng-template [ngIf]="expense.gross">
                 <div mat-subheader>{{ 'EXPENSE.LIST.COLUMN.GROSS' | translate }}</div>
                 <mat-list-item role="list">
-                  <mat-icon matListItemIcon>{{expense.room.currency.icon}}</mat-icon>
-                  <div matListItemTitle>{{expense.gross | number:'1.2-2'}}</div>
+                  <mat-icon matListItemIcon>{{ expense.room.currency.icon }}</mat-icon>
+                  <div matListItemTitle>{{ expense.gross | number:'1.2-2' }}</div>
                 </mat-list-item>
               </ng-template>
               <ng-template [ngIf]="expense.btw">
                 <div mat-subheader>{{ 'EXPENSE.LIST.COLUMN.BTW' | translate }}</div>
                 <mat-list-item role="list">
-                  <mat-icon matListItemIcon>{{expense.room.currency.icon}}</mat-icon>
-                  <div matListItemTitle>{{(expense.gross - expense.net) | number:'1.2-2'}}</div>
+                  <mat-icon matListItemIcon>{{ expense.room.currency.icon }}</mat-icon>
+                  <div matListItemTitle>{{ (expense.gross - expense.net) | number:'1.2-2' }}</div>
                 </mat-list-item>
               </ng-template>
               <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
               <mat-list-item role="list">
-                <button (click)="edit(expense)" *ngIf="!expense.deleted" color="primary" mat-icon-button>
+                <button [routerLink]="['/', language, 'rooms', roomId, 'expenses', expense.id]" *ngIf="!expense.deleted"
+                        color="primary" mat-icon-button>
                   <mat-icon matListItemIcon>edit</mat-icon>
                 </button>
                 <button (click)="delete(expense)" *ngIf="!expense.deleted" color="warn" mat-icon-button>
@@ -198,7 +187,8 @@
 
       <ng-container matColumnDef="noContent">
         <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-          {{ 'EXPENSE.LIST.ERROR.NO_CONTENT' | translate }}</td>
+          {{ 'EXPENSE.LIST.ERROR.NO_CONTENT' | translate }}
+        </td>
       </ng-container>
 
       <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>

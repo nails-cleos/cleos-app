@@ -10,7 +10,7 @@ import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } 
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IPaymentAll, PaymentType } from '../../../interfaces/payment';
 import { addPayment, createTreatmentGroupService, getPrice, newAdditional, newExtra, newPrice } from '../../../util/helper';
-import { API_LOCALE, getNowTimeZone, getTime, getTimeNumber, newDateTimestamp } from '../../../util/dates';
+import { API_LOCALE, getDiffTime, getNowTimeZone, getTime, getTimeNumber, newDateTimestamp } from '../../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
 import { map, startWith } from 'rxjs/operators';
 import { transitionAnimation } from '../../../util/animation';
@@ -71,6 +71,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   split: boolean = false;
   isValid: boolean = true;
   isValidSplit: boolean = true;
+  totalTime?: string;
 
   private reservationId: any;
   private roomId: any;
@@ -80,7 +81,6 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
   private readonly isDashboard = false;
   private currentExtraData?: IExtras[];
-  // TODO
   private currentSplitData?: IExtras[];
 
   constructor(public dialog: MatDialog, private store: Store<AppState>, private route: ActivatedRoute,
@@ -166,6 +166,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   timeChange($event: string, date: Date): void {
     const time = getTimeNumber($event);
     date.setHours(time?.hour || 0, time?.minute || 0, 0);
+    this.setAppointmentDuration();
   }
 
   onExtrasChanges(extras: IExtras[]): void {
@@ -195,6 +196,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
         this.additionalSelected = reservation.additional?.map(ad => Object.assign({}, ad, { id: ad.key })) || [];
         this.types = [...reservation.room.paymentTypes, PaymentType.transfer];
         this.reservation = reservation;
+        this.setAppointmentDuration();
       }
       this.price = addPayment(this.price, this.payments);
       this.additionalList = state.additional;
@@ -221,6 +223,12 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       }
       this.setPaymentType();
     });
+  }
+
+  private setAppointmentDuration(): void {
+    if (this.startDate && this.endDate) {
+      this.totalTime = getDiffTime(newDateTimestamp(this.endDate), newDateTimestamp(this.startDate));
+    }
   }
 
   private createForm(): void {

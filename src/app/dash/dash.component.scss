@@ -45,7 +45,7 @@
   animation: spinner .8s linear infinite;
 }
 
-@media screen and (min-width: 768px) { // Larger screens, two columns
+@media screen and (min-width: 768px) {
   .totals {
     display: flex;
     flex-wrap: wrap;
@@ -53,19 +53,19 @@
     margin: 1% 1% 0;
 
     div {
-      width: 48%; // Each column takes roughly half the width
+      width: 48%;
     }
   }
 }
 
-@media screen and (max-width: 767px) { // Smaller screens, one column
+@media screen and (max-width: 767px) {
   .totals {
     display: block;
     margin: 1% 1% 0;
 
     div {
-      width: 100%; // Each item takes full width
-      margin-bottom: 1%; // Optional: Add some spacing between the items
+      width: 100%;
+      margin-bottom: 1%;
     }
   }
 }

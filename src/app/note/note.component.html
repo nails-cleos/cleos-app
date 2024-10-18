@@ -2,7 +2,7 @@
   <div class="card-container">
     <div class="card-content">
       <form (ngSubmit)="submit" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
-        <mat-card appearance="outlined" class="style-card">
+        <mat-card appearance="outlined">
           @if (isAddMode) {
             <mat-card-header>
               <mat-card-title>{{ 'NOTE.TITLE' | translate }}</mat-card-title>

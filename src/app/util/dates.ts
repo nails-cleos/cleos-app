@@ -199,22 +199,28 @@ export const diffTime = (time: Date, maxHour = 24, diffMin = 0): IDuration => {
   const maxDate = new Date();
   maxDate.setHours(maxHour, diffMin);
 
-  const diff = getMinutesBetweenTimes(maxDate, date);
+  const diff = getMinutesBetweenTimesABS(maxDate, date);
   return timeConvert(diff);
 };
 
 export const getDiffTime = (maxDate: Date, minDate: Date): string => {
-  const diff = getMinutesBetweenTimes(maxDate, minDate);
+  const diffInMs = maxDate.getTime() - minDate.getTime();
 
-  const hours = (diff / 60);
-  const diffHour = Math.floor(hours);
-  const minutes = (hours - diffHour) * 60;
-  const diffMinute = Math.round(minutes);
+  // Determine if the difference is negative or positive
+  const sign = diffInMs < 0 ? '-' : '';
 
-  const hour = `0${ diffHour }`.slice(-2);
-  const minute = `0${ diffMinute }`.slice(-2);
+  // Convert absolute difference to total minutes
+  const totalMinutes = Math.floor(Math.abs(diffInMs) / (1000 * 60));
 
-  return `${ hour }:${ minute }`;
+  // Calculate hours and minutes
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  // Format as hh:mm (pad hours and minutes with leading zeros if necessary)
+  const formattedHours = String(hours).padStart(2, '0');
+  const formattedMinutes = String(minutes).padStart(2, '0');
+
+  return `${sign}${formattedHours}:${formattedMinutes}`;
 };
 
 export const getAvailability = (room: IRoom): any => {
@@ -608,8 +614,11 @@ const getMinAndMax = (availability: IAvailability, date: Date, timeZone: string)
   return { min, max };
 };
 
-export const getMinutesBetweenTimes = (date1: Date, date2: Date): number =>
+export const getMinutesBetweenTimesABS = (date1: Date, date2: Date): number =>
   Math.abs(Math.round((date1.getTime() - date2.getTime()) / (1000 * 60)));
+
+export const getMinutesBetweenTimes = (date1: Date, date2: Date): number =>
+  Math.round((date1.getTime() - date2.getTime()) / (1000 * 60));
 
 export const getReservationGMT = (reservation?: IReservationAll | IReservation): string => {
   let timeZone;

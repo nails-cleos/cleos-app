@@ -117,9 +117,9 @@
       <div class="no-content bold">{{ 'RESERVATION.TREATMENT.NO_CONTENT' | translate }}</div>
     } @else {
       <div class="link-container">
-        <div formArrayName="dateTimeList" class="date-time-form">
+        <div formArrayName="dateTimeList" class="array-form">
           @for (dateGroup of dateTimeList.controls; track dateGroup; let i = $index) {
-            <div [formGroupName]="i" class="date-time-group">
+            <div [formGroupName]="i" class="array-group">
               <div class="date-time-fields">
                 <mat-form-field appearance="outline" class="date-field">
                   <mat-label>{{ 'RESERVATION.DATE.FIELD' | translate }}</mat-label>

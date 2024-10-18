@@ -169,8 +169,8 @@
     border: solid 1px mat.get-color-from-palette($background, tooltip);
   }
 
-  .date-time-form {
-    .date-time-group {
+  .array-form {
+    .array-group {
       border: dashed 1px mat.get-color-from-palette($primary-palette);
     }
   }
@@ -209,8 +209,14 @@
       border: 1px solid mat.get-color-from-palette($primary-palette) !important;
     }
 
-    tr:hover {
-      background-color: mat.get-color-from-palette($background, hover);
+    tr {
+      &:hover {
+        background-color: mat.get-color-from-palette($background, hover);
+
+        td {
+          background-color: mat.get-color-from-palette($background, hover);
+        }
+      }
     }
   }
 

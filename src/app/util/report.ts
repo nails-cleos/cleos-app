@@ -31,8 +31,7 @@ interface IMonthResult {
 
 const qCells = ['A', 'B', 'C', 'D'];
 const monthCells = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-const incomeCells = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
-const expenseCells = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+const cells = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
 
 export const createMonthlyExpenseWorkbook = (header: string, data: IMonthlySummaryExpense[], weeks: any[], title: string, name: string,
                                              translate: TranslateService, currency: string,
@@ -176,7 +175,7 @@ const monthlyIncomeWorksheet = (workbook: Workbook, header: string, data: IMonth
 
   const headers = ['DATE', 'CUSTOMER', 'DESCRIPTION', 'DISCOUNT', 'COLOR', 'TYPE', 'GROSS', 'NET', 'BTW'];
   createHeader(worksheet, headers, translate);
-  setSubtitle(worksheet, incomeCells, cellNumber);
+  setSubtitle(worksheet, cells, cellNumber);
 
   cellNumber++;
   let totalGross = 0;
@@ -233,7 +232,7 @@ const monthlyIncomeWorksheet = (workbook: Workbook, header: string, data: IMonth
       });
       const init = ++cellNumber;
       cellNumber += rowIndex;
-      setBorder(worksheet, init, cellNumber - 1, incomeCells);
+      setBorder(worksheet, init, cellNumber - 1, cells);
     } else {
       cellNumber++;
     }
@@ -262,19 +261,20 @@ const monthlyExpenseWorksheet = (workbook: Workbook, header: string, data: IMont
                                  timeZone: string): Worksheet => {
   const worksheet = workbook.addWorksheet(`${ name } - ${ header }`);
   let cellNumber = 1;
-  setTitle(worksheet, cellNumber, 'J', title);
+  setTitle(worksheet, cellNumber, 'K', title);
   cellNumber++;
 
-  const headers = ['DATE', 'INVOICE', 'SUPPLY_STORE', 'TYPE', 'SUB_TYPE', 'GROSS', 'NET', 'BTW'];
+  const headers = ['DATE', 'INVOICE', 'SUPPLY_STORE', 'DESCRIPTION', 'TYPE', 'SUB_TYPE', 'GROSS', 'NET', 'BTW'];
   createHeader(worksheet, headers, translate);
-  setSubtitle(worksheet, expenseCells, cellNumber);
+  setSubtitle(worksheet, cells, cellNumber);
 
   cellNumber++;
   let totalGross = 0;
   let totalNet = 0;
   let totalBtw = 0;
+  let totalRow = 0;
   weeks.forEach((week, index) => {
-    setWeek(worksheet, cellNumber, index, 'J', translate);
+    setWeek(worksheet, cellNumber, index, 'K', translate);
 
     let rowIndex = 0;
     const rowData = data.filter(item => week.dates.includes(item.day));
@@ -286,32 +286,46 @@ const monthlyExpenseWorksheet = (workbook: Workbook, header: string, data: IMont
           hyperlink: `${ environment.appServer }/${ expense.paths }`
         } as CellHyperlinkValue;
 
-        totalGross += expense.total.gross;
-        totalNet += expense.total.net;
-        totalBtw += expense.total.btw;
-        const typeValue = translate.instant(getTranslateTypeKey(SummaryType[SummaryType.expense], expense.total.expenseType));
-        const subTypeValue = translate.instant(getTranslateTypeKey(SummaryType[SummaryType.expense], expense.total.expenseSubType));
-        const row = worksheet.addRow([++rowIndex, link, exportFormatDate(newDateTimestamp(expense.timestamp, timeZone), API_LOCALE, timeZone),
-          expense.invoice, expense.supplyStore, typeValue, subTypeValue, expense.total.gross, expense.total.net, expense.total.btw]);
-        setLinkFont(row);
+        const paymentInit = rowIndex;
+        const paymentSize = expense.total.payments.length;
+        expense.total.payments.forEach((payment: ISummaryTotal) => {
+          rowIndex++;
+          const typeValue = translate.instant(getTranslateTypeKey(SummaryType[SummaryType.expense], payment.expenseType));
+          const subTypeValue = translate.instant(getTranslateTypeKey(SummaryType[SummaryType.expense], payment.expenseSubType));
+          totalGross += payment.gross;
+          totalNet += payment.net;
+          totalBtw += payment.btw;
+          const row = worksheet.addRow([++totalRow, link, exportFormatDate(newDateTimestamp(expense.timestamp, timeZone), API_LOCALE, timeZone),
+            expense.invoice, expense.supplyStore, payment.description, typeValue, subTypeValue, payment.gross, payment.net, payment.btw]);
+          setLinkFont(row);
+        });
+        if (paymentSize > 1) {
+          const start = paymentInit + cellNumber;
+          worksheet.mergeCells(`A${ start + 1 }`, `A${ start + paymentSize }`);
+          worksheet.mergeCells(`B${ start + 1 }`, `B${ start + paymentSize }`);
+          worksheet.mergeCells(`C${ start + 1 }`, `C${ start + paymentSize }`);
+          worksheet.mergeCells(`D${ start + 1 }`, `D${ start + paymentSize }`);
+          worksheet.mergeCells(`E${ start + 1 }`, `E${ start + paymentSize }`);
+          worksheet.mergeCells(`F${ start + 1 }`, `F${ start + paymentSize }`);
+        }
       });
       const init = ++cellNumber;
       cellNumber += rowIndex;
-      setBorder(worksheet, init, cellNumber - 1, expenseCells);
+      setBorder(worksheet, init, cellNumber - 1, cells);
     } else {
       cellNumber++;
     }
   });
 
-  worksheet.mergeCells(`A${ cellNumber }`, `G${ cellNumber }`);
+  worksheet.mergeCells(`A${ cellNumber }`, `H${ cellNumber }`);
   setResultTitle(worksheet, cellNumber);
 
-  setTotal(worksheet, cellNumber, 'H', `SUM(H${ 3 }:H${ cellNumber - 1 })`, totalGross, 'J');
-  setTotal(worksheet, cellNumber, 'I', `SUM(I${ 3 }:I${ cellNumber - 1 })`, totalNet, 'J');
-  setTotal(worksheet, cellNumber, 'J', `SUM(J${ 3 }:J${ cellNumber - 1 })`, totalBtw, 'J');
+  setTotal(worksheet, cellNumber, 'I', `SUM(I${ 3 }:I${ cellNumber - 1 })`, totalNet, 'K');
+  setTotal(worksheet, cellNumber, 'J', `SUM(J${ 3 }:J${ cellNumber - 1 })`, totalBtw, 'K');
+  setTotal(worksheet, cellNumber, 'K', `SUM(K${ 3 }:K${ cellNumber - 1 })`, totalGross, 'K');
 
   const priceFormat = currencyFormat(currency);
-  setColumnFormat(worksheet, ['H', 'I', 'J'], priceFormat);
+  setColumnFormat(worksheet, ['I', 'J', 'K'], priceFormat);
 
   const idColumn = worksheet.getColumn('B');
   idColumn.alignment = { vertical: 'middle', horizontal: 'center' };
