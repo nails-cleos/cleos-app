@@ -11,7 +11,7 @@ import {
   getCurrentTimeZone,
   getDurationOrUndefined,
   getEnd,
-  getMinutesBetweenTimes,
+  getMinutesBetweenTimesABS,
   getNow,
   getRoomStartEndDay,
   isBetween,
@@ -204,7 +204,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       const nowTime = now.getTime();
       const endTime = calendarEvent.end.getTime();
 
-      const diffStart = getMinutesBetweenTimes(calendarEvent.start, dateTime);
+      const diffStart = getMinutesBetweenTimesABS(calendarEvent.start, dateTime);
       let startText;
       if (startTime > startedTime) {
         startText = `<span class="green-text"><b id="start">-${ diffStart } min.</b></span>`;
@@ -216,8 +216,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
       const start = this.startedText.replace('{startText}', startText);
 
-      const diffElapsed = getMinutesBetweenTimes(now, dateTime);
-      const duration = getMinutesBetweenTimes(calendarEvent.end, calendarEvent.start);
+      const diffElapsed = getMinutesBetweenTimesABS(now, dateTime);
+      const duration = getMinutesBetweenTimesABS(calendarEvent.end, calendarEvent.start);
 
       let elapsedText;
       if (duration > diffElapsed) {
@@ -230,7 +230,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
       const timeElapsed = this.elapsedText.replace('{elapsedText}', elapsedText);
 
-      const diffFinish = getMinutesBetweenTimes(calendarEvent.end, now);
+      const diffFinish = getMinutesBetweenTimesABS(calendarEvent.end, now);
       let finishText;
       if (endTime > nowTime) {
         finishText = `<span class="green-text"><b id="finish">-${ diffFinish } min.</b></span>`;

@@ -962,9 +962,7 @@ $box-shadow2: ();
     align-items: center;
     gap: 1%;
 
-    .field {
-      margin-left: 2%;
-      margin-right: 2%;
+    .field, .full-field {
       flex: 1;
       max-width: 100%;
 
@@ -980,6 +978,11 @@ $box-shadow2: ();
         max-width: calc(25% - 1%);
       }
     }
+
+    .field {
+      margin-left: 2%;
+      margin-right: 2%;
+    }
   }
 }
 
@@ -987,6 +990,10 @@ $box-shadow2: ();
   .side-by-side-fields {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .full-field {
+    width: 100%;
   }
 
   .field {
