@@ -29,7 +29,12 @@
 </div>
 
 <ng-template #paymentTemplate let-payment='payment' let-currency='currency' let-index='index' let-edit=edit
-             let-key='key' let-type='type'>
+             let-key='key' let-type='type' let-description='description'>
+  @if (description) {
+    <td>
+      {{ payment.description }}
+    </td>
+  }
   <td>
     <ng-template [ngIf]="edit" [ngIfElse]="noNetEdit">
       <mat-form-field class="amount" appearance="outline">
@@ -182,10 +187,14 @@
           <tr *ngIf="selectedRoom.value">
             <td mat-subheader [colSpan]="7">{{ 'SUMMARY.MONTHLY.TABLE.TOTALS' | translate }}</td>
             <td
-              mat-subheader>{{ reservationGrossMonth | currency:currency.code:'symbol':'1.2-2' }}
+              mat-subheader>{{ getTotal(reservationMonth, 'gross') | currency:currency.code:'symbol':'1.2-2' }}
             </td>
-            <td mat-subheader>{{ reservationNetMonth | currency:currency.code:'symbol':'1.2-2' }}</td>
-            <td mat-subheader>{{ reservationBtwMonth | currency:currency.code:'symbol':'1.2-2' }}</td>
+            <td
+              mat-subheader>{{ getTotal(reservationMonth, 'net') | currency:currency.code:'symbol':'1.2-2' }}
+            </td>
+            <td
+              mat-subheader>{{ getTotal(reservationMonth, 'btw') | currency:currency.code:'symbol':'1.2-2' }}
+            </td>
             <td mat-subheader></td>
           </tr>
           </tfoot>
@@ -193,22 +202,21 @@
         <mat-action-row>
           <div class="spacer"></div>
           <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryReservations?.length"
-                  (click)="updateMonthlySummary(type.payment, reservationGrossMonth, reservationBtwMonth, monthlySummaryPayment)">
+                  (click)="updateMonthlySummary(reservationMonth, monthlySummaryPayment)">
             <mat-icon>save</mat-icon>
           </button>
           <button color="primary" mat-fab extended class="icon-button hide-xs"
                   [disabled]="!summaryReservations?.length"
-                  (click)="updateMonthlySummary(type.payment, reservationGrossMonth, reservationBtwMonth, monthlySummaryPayment)">
+                  (click)="updateMonthlySummary(reservationMonth, monthlySummaryPayment)">
             <mat-icon>save</mat-icon>
             <span>{{ 'COMMON.BUTTON.SAVE' | translate }}</span>
           </button>
-          <button class="hide-gt-xs" color="accent" mat-fab
-                  (click)="exportToExcel(type.payment, 'INCOMES', summaryReservations)"
-                  [disabled]="!summaryReservations?.length">
+          <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryReservations?.length"
+                  (click)="exportToExcel('INCOMES', reservationMonth, monthlySummaryPayment, summaryReservations)">
             <mat-icon>file_download</mat-icon>
           </button>
-          <button (click)="exportToExcel(type.payment,'INCOMES', summaryReservations)"
-                  color="accent" mat-fab extended [disabled]="!summaryReservations?.length" class="icon-button hide-xs">
+          <button color="accent" mat-fab extended [disabled]="!summaryReservations?.length" class="icon-button hide-xs"
+                  (click)="exportToExcel('INCOMES', reservationMonth, monthlySummaryPayment, summaryReservations)">
             <mat-icon>file_download</mat-icon>
             <span>{{ 'COMMON.BUTTON.SAVE_EXPORT' | translate }}</span>
           </button>
@@ -241,8 +249,8 @@
             <col class="date">
             <col id="invoice">
             <col>
-            <col id="store-supply">
-            <col>
+            <col class="store-supply">
+            <col id="description">
             <col class="gross">
             <col class="net">
             <col class="btw">
@@ -254,7 +262,8 @@
             <th mat-subheader>N°</th>
             <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.DATE' | translate }}</th>
             <th mat-subheader [colSpan]="2">{{ 'SUMMARY.MONTHLY.TABLE.INVOICE' | translate }}</th>
-            <th mat-subheader [colSpan]="2">{{ 'SUMMARY.MONTHLY.TABLE.SUPPLY_STORE' | translate }}</th>
+            <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.SUPPLY_STORE' | translate }}</th>
+            <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.DESCRIPTION' | translate }}</th>
             <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.GROSS' | translate }}</th>
             <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.NET' | translate }}</th>
             <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.BTW' | translate }}</th>
@@ -267,33 +276,49 @@
                 [innerHTML]="'SUMMARY.MONTHLY.TABLE.WEEK' | translate:{weekNumber: i + 1}"></td>
           </tr>
           <ng-template [ngIf]="summaryExpenses?.length">
-            <tr *ngFor="let summary of summaryExpenses | filterBy:week.dates:'day'">
-              <td>
-                <button mat-icon-button [routerLink]="summary.paths">
-                  <mat-icon>visibility</mat-icon>
-                </button>
-              </td>
-              <td>
-                {{ summary.position + 1 }}
-              </td>
-              <td>
-                {{ (summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat)?.replace(',', '') }}
-              </td>
-              <td [colSpan]="2">{{ summary.invoice }}</td>
-              <td [colSpan]="2">{{ summary.supplyStore }}</td>
-              <ng-container [ngTemplateOutlet]="paymentTemplate"
-                            [ngTemplateOutletContext]="{payment: summary.total, currency: currency.icon,
-                        index: summary.position, key: 'EXPENSE', type: summary.total.expenseType, edit: true}">
-              </ng-container>
-            </tr>
+            @for (summary of summaryExpenses | filterBy:week.dates:'day'; track summary) {
+              <tr>
+                <td [rowSpan]="summary.total.payments.length || 1">
+                  <button mat-icon-button [routerLink]="summary.paths">
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                </td>
+                <td [rowSpan]="summary.total.payments.length || 1">
+                  {{ summary.position + 1 }}
+                </td>
+                <td [rowSpan]="summary.total.payments.length || 1">
+                  {{ (summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat)?.replace(',', '') }}
+                </td>
+                <td [rowSpan]="summary.total.payments.length || 1" [colSpan]="2">{{ summary.invoice }}</td>
+                <td [rowSpan]="summary.total.payments.length || 1">{{ summary.supplyStore }}</td>
+                <ng-container [ngTemplateOutlet]="paymentTemplate"
+                              [ngTemplateOutletContext]="{payment: summary.total.payments[0], currency: currency.icon,
+                        index: summary.position, key: 'EXPENSE', type: summary.total.payments[0].expenseType,
+                        edit: true, description: true}">
+                </ng-container>
+              </tr>
+
+              <ng-template [ngIf]="summary.total.payments.length > 1">
+                @for (payment of summary.total.payments | slice:1; track payment; let i = $index) {
+                  <tr>
+                    <ng-container [ngTemplateOutlet]="paymentTemplate"
+                                  [ngTemplateOutletContext]="{payment: payment, currency: currency.icon,
+                        index: summary.position, key: 'EXPENSE', edit: true,
+                        type: summary.total.payments[i + 1].expenseType, description: true}">
+                    </ng-container>
+                  </tr>
+                }
+              </ng-template>
+            }
+
           </ng-template>
           </tbody>
           <tfoot>
           <tr *ngIf="selectedRoom.value">
             <td mat-subheader [colSpan]="7">{{ 'SUMMARY.MONTHLY.TABLE.TOTALS' | translate }}</td>
-            <td mat-subheader>{{ expenseGrossMonth | currency:currency.code:'symbol':'1.2-2' }}</td>
-            <td mat-subheader>{{ expenseNetMonth | currency:currency.code:'symbol':'1.2-2' }}</td>
-            <td mat-subheader>{{ expenseBtwMonth | currency:currency.code:'symbol':'1.2-2' }}</td>
+            <td mat-subheader>{{ getTotal(expenseMonth, 'gross') | currency:currency.code:'symbol':'1.2-2' }}</td>
+            <td mat-subheader>{{ getTotal(expenseMonth, 'net') | currency:currency.code:'symbol':'1.2-2' }}</td>
+            <td mat-subheader>{{ getTotal(expenseMonth, 'btw') | currency:currency.code:'symbol':'1.2-2' }}</td>
             <td mat-subheader></td>
           </tr>
           </tfoot>
@@ -301,21 +326,20 @@
         <mat-action-row>
           <div class="spacer"></div>
           <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryExpenses?.length"
-                  (click)="updateMonthlySummary(type.expense, expenseGrossMonth, expenseBtwMonth, monthlySummaryExpense)">
+                  (click)="updateMonthlySummary(expenseMonth, monthlySummaryExpense)">
             <mat-icon>save</mat-icon>
           </button>
-          <button (click)="updateMonthlySummary(type.expense, expenseGrossMonth, expenseBtwMonth, monthlySummaryExpense)"
-                  color="primary" mat-fab extended class="icon-button hide-xs" [disabled]="!summaryExpenses?.length">
+          <button color="primary" mat-fab extended class="icon-button hide-xs" [disabled]="!summaryExpenses?.length"
+                  (click)="updateMonthlySummary(expenseMonth, monthlySummaryExpense)">
             <mat-icon>save</mat-icon>
             <span>{{ 'COMMON.BUTTON.SAVE' | translate }}</span>
           </button>
-          <button class="hide-gt-xs" color="accent" mat-fab
-                  (click)="exportToExcel(type.expense, 'EXPENSES', summaryExpenses)"
-                  [disabled]="!summaryExpenses?.length">
+          <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryExpenses?.length"
+                  (click)="exportToExcel('EXPENSES', expenseMonth, monthlySummaryExpense, summaryExpenses)">
             <mat-icon>file_download</mat-icon>
           </button>
-          <button (click)="exportToExcel(type.expense, 'EXPENSES', summaryExpenses)" color="accent"
-                  mat-fab extended class="icon-button hide-xs" [disabled]="!summaryExpenses?.length">
+          <button color="accent" mat-fab extended class="icon-button hide-xs" [disabled]="!summaryExpenses?.length"
+                  (click)="exportToExcel('EXPENSES', expenseMonth, monthlySummaryExpense, summaryExpenses)">
             <mat-icon>file_download</mat-icon>
             <span>{{ 'COMMON.BUTTON.SAVE_EXPORT' | translate }}</span>
           </button>
@@ -414,9 +438,9 @@
             <tfoot>
             <tr *ngIf="selectedRoom.value">
               <td mat-subheader [colSpan]="7">{{ 'SUMMARY.MONTHLY.TABLE.TOTALS' | translate }}</td>
-              <td mat-subheader>{{ cashGrossMonth | currency:currency.code:'symbol':'1.2-2' }}</td>
-              <td mat-subheader>{{ cashNetMonth | currency:currency.code:'symbol':'1.2-2' }}</td>
-              <td mat-subheader>{{ cashBtwMonth | currency:currency.code:'symbol':'1.2-2' }}</td>
+              <td mat-subheader>{{ getTotal(cashMonth, 'gross') | currency:currency.code:'symbol':'1.2-2' }}</td>
+              <td mat-subheader>{{ getTotal(cashMonth, 'net') | currency:currency.code:'symbol':'1.2-2' }}</td>
+              <td mat-subheader>{{ getTotal(cashMonth, 'btw') | currency:currency.code:'symbol':'1.2-2' }}</td>
               <td mat-subheader></td>
             </tr>
             </tfoot>
@@ -424,22 +448,21 @@
           <mat-action-row class="card-actions">
             <div class="spacer"></div>
             <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryCash?.length"
-                    (click)="updateMonthlySummary(type.cash, cashGrossMonth, cashBtwMonth, monthlySummaryCash)">
+                    (click)="updateMonthlySummary(cashMonth, monthlySummaryCash)">
               <mat-icon>save</mat-icon>
             </button>
-            <button color="primary" mat-fab extended class="icon-button hide-xs"
-                    [disabled]="!summaryCash?.length"
-                    (click)="updateMonthlySummary(type.cash, cashGrossMonth, cashBtwMonth, monthlySummaryCash)">
+            <button color="primary" mat-fab extended class="icon-button hide-xs" [disabled]="!summaryCash?.length"
+                    (click)="updateMonthlySummary(cashMonth, monthlySummaryCash)">
               <mat-icon>save</mat-icon>
               <span>{{ 'COMMON.BUTTON.SAVE' | translate }}</span>
             </button>
-            <button class="hide-gt-xs" color="accent" mat-fab
-                    (click)="exportToExcel(type.cash, 'CASH_INCOMES', summaryCash)"
-                    [disabled]="!summaryCash?.length">
+            <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryCash?.length"
+                    (click)="exportToExcel('CASH_INCOMES', cashMonth, monthlySummaryCash, summaryCash)">
               <mat-icon>file_download</mat-icon>
             </button>
-            <button (click)="exportToExcel(type.cash, 'CASH_INCOMES', summaryCash)" color="accent"
-                    mat-fab extended [disabled]="!summaryCash?.length" class="icon-button hide-xs">
+            <button
+              (click)="exportToExcel('CASH_INCOMES', cashMonth, monthlySummaryCash, summaryCash)"
+              color="accent" mat-fab extended [disabled]="!summaryCash?.length" class="icon-button hide-xs">
               <mat-icon>file_download</mat-icon>
               <span>{{ 'COMMON.BUTTON.SAVE_EXPORT' | translate }}</span>
             </button>

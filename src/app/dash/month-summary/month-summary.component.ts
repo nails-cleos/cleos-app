@@ -11,13 +11,16 @@ import { TranslateService } from '@ngx-translate/core';
 import * as fromActionsDashboard from '../../store/dashboard.actions';
 import {
   AmountFormat,
+  ExpenseType,
   IMonthlySummary,
   IMonthlySummaryExpense,
   IMonthlySummaryRequest,
   IMonthlySummarySale,
   ISummaryRoom,
   ISummaryTotal,
-  SummaryType
+  ITotalType,
+  SummaryType,
+  TotalType
 } from '../../interfaces/dashboard';
 import { YearMonthAdapter } from '../../util/adapter/year-month.adapter';
 import { allElementsHaveSameKeyFilterValue, currencySymbol, titleCase } from '../../util/helper';
@@ -50,15 +53,9 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
   summaryCash?: IMonthlySummary[];
   weeks: any[];
   dateFormat: string;
-  reservationGrossMonth = 0;
-  reservationNetMonth = 0;
-  reservationBtwMonth = 0;
-  expenseGrossMonth = 0;
-  expenseNetMonth = 0;
-  expenseBtwMonth = 0;
-  cashGrossMonth = 0;
-  cashNetMonth = 0;
-  cashBtwMonth = 0;
+  reservationMonth: ITotalType = new TotalType(SummaryType.payment);
+  expenseMonth: ITotalType = new TotalType(SummaryType.expense, Object.values(ExpenseType));
+  cashMonth: ITotalType = new TotalType(SummaryType.cash);
 
   monthlySummaryPayment: IMonthlySummaryRequest[] = [];
   monthlySummaryExpense: IMonthlySummaryRequest[] = [];
@@ -106,6 +103,23 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
       this.router.navigate([this.language, 'dashboard', 'quarter', 'summary']);
     }
     return;
+  }
+
+  private static groupSummary(summaries?: IMonthlySummary[]): Map<string, IMonthlySummary[]> {
+    return summaries?.reduce((grouped: Map<string, IMonthlySummary[]>, item: IMonthlySummary) => {
+      const key = item.total.expenseType;
+
+      item.total.payments.forEach(total => {
+        const group = grouped.get(total.expenseType) || [];
+        group.push(item);
+        grouped.set(total.expenseType, group);
+      });
+
+      const group = grouped.get(key) || [];
+      group.push(item);
+      grouped.set(key, group);
+      return grouped;
+    }, new Map()) || new Map();
   }
 
   private static calculateTotals(summaries?: IMonthlySummary[]): { gross: number; btw: number; net: number } {
@@ -172,31 +186,43 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
     }
   }
 
+  private static parseValue(total: ISummaryTotal, key: 'btw' | 'gross' | 'net', id?: string): number {
+    if (id) {
+      const t = total.payments?.find(payment => payment.id === id);
+      if (t) {
+        return t[key] >= 0 ? t[key] : total[key];
+      }
+      return total[key]
+    }
+    return total[key]
+
+  }
+
   private static updateAmounts(summaries: IMonthlySummary[], summaryRequests: IMonthlySummaryRequest[], input: HTMLInputElement,
                                index: number, id: string): { monthlySummaries: IMonthlySummary[]; newSummaries: IMonthlySummaryRequest[] } {
     const objIndex = summaries.findIndex((obj => obj.position === index));
     const isInvalidInput = MonthSummaryComponent.isInvalidInput(input.value);
     const summary = summaries[objIndex];
     const total = summary.total;
-    let gross = isInvalidInput ? id ?
-        total.payments?.find(payment => payment.id === id)?.gross || total.gross
-        : total.gross
-      : parseFloat(input.value);
+    let gross = isInvalidInput ? this.parseValue(total, 'gross', id) : parseFloat(input.value);
+    const btwCurrent = this.parseValue(total, 'btw', id);
+    const netCurrent = this.parseValue(total, 'net', id)
+    const btwPercentage = Math.round((btwCurrent/netCurrent) * 100)
     let net = gross;
     let btw = 0;
     if (input.id === 'grossInput') {
-      net = gross * 100 / 121;
+      net = gross * 100 / (btwPercentage + 100);
       btw = gross - net;
     } else if (input.id === 'netInput') {
       if (!isInvalidInput) {
         net = parseFloat(input.value);
-        gross = net * 1.21;
+        gross = net * ((btwPercentage / 100) + 1);
         btw = gross - net;
       }
     } else if (input.id === 'btwInput') {
       if (!isInvalidInput) {
         btw = parseFloat(input.value);
-        net = btw * 100 / 21;
+        net = btw * 100 / btwPercentage;
         gross = btw + net;
       }
     }
@@ -275,8 +301,16 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
     }
   }
 
+  getTotal(total: ITotalType, attribute: 'gross' | 'net' | 'btw'): number {
+    let sum = 0;
+    total.totals.forEach(value => sum += value[attribute]);
+
+    return sum;
+  }
+
   exportMonthlySummary(): void {
-    const workbook = createMonthlySummary(this.weeks, currencySymbol(this.currency), this.translate, this.timeZone,
+    const title = monthViewTitle(this.date.value || getNow());
+    const workbook = createMonthlySummary(title, this.weeks, currencySymbol(this.currency), this.translate, this.timeZone,
       this.summaryReservations as IMonthlySummarySale[], this.summaryExpenses as IMonthlySummaryExpense[]);
 
     workbook.creator = this.userName || '';
@@ -287,43 +321,30 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
       const blob = new Blob([content], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
-      fs.saveAs(blob, `Report_${ monthViewTitle(this.date.value || getNow()).replace(' ', '_') }.xlsx`);
+      fs.saveAs(blob, `Report_${ title.replace(' ', '_') }.xlsx`);
     });
   }
 
-  exportToExcel(type: SummaryType, title: string, data?: IMonthlySummary[]): void {
+  exportToExcel(title: string, totalTypes: ITotalType, values: IMonthlySummaryRequest[], data?: IMonthlySummary[]): void {
     if (data?.length) {
-      const name = `${ titleCase(SummaryType[type]) }-${ getDateFormat(this.date.value) }`;
+      const workbookName = `${ titleCase(SummaryType[totalTypes.type]) }-${ getDateFormat(this.date.value) }`;
+      const name = this.translate.instant(`SUMMARY.${ title }`);
 
       let workbook;
+      const header = monthViewTitle(this.date.value || getNow());
 
-      let gross;
-      let btw;
-      let values;
-      switch (type) {
+      switch (totalTypes.type) {
         case SummaryType.payment:
-          gross = this.reservationGrossMonth;
-          btw = this.reservationBtwMonth;
-          values = this.monthlySummaryPayment;
-          workbook = createMonthlyIncomeWorkbook(data as IMonthlySummarySale[], this.weeks,
-            this.translate.instant(`SUMMARY.${ title }`), SummaryType[type], name, this.translate,
-            currencySymbol(this.currency), this.timeZone);
+          workbook = createMonthlyIncomeWorkbook(header, data as IMonthlySummarySale[], this.weeks,
+            name, SummaryType[totalTypes.type], workbookName, this.translate, currencySymbol(this.currency), this.timeZone);
           break;
         case SummaryType.expense:
-          gross = this.expenseGrossMonth;
-          btw = this.expenseBtwMonth;
-          values = this.monthlySummaryExpense;
-          workbook = createMonthlyExpenseWorkbook(data as IMonthlySummaryExpense[], this.weeks,
-            this.translate.instant(`SUMMARY.${ title }`), name, this.translate,
-            currencySymbol(this.currency), this.timeZone);
+          workbook = createMonthlyExpenseWorkbook(header, data as IMonthlySummaryExpense[], this.weeks,
+            name, workbookName, this.translate, currencySymbol(this.currency), this.timeZone);
           break;
         case SummaryType.cash:
-          gross = this.cashGrossMonth;
-          btw = this.cashBtwMonth;
-          values = this.monthlySummaryCash;
-          workbook = createMonthlyIncomeWorkbook(data as IMonthlySummarySale[], this.weeks,
-            this.translate.instant(`SUMMARY.${ title }`), SummaryType[type], name, this.translate,
-            currencySymbol(this.currency), this.timeZone);
+          workbook = createMonthlyIncomeWorkbook(header, data as IMonthlySummarySale[], this.weeks,
+            name, SummaryType[totalTypes.type], workbookName, this.translate, currencySymbol(this.currency), this.timeZone);
           break;
       }
 
@@ -335,23 +356,35 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
         const blob = new Blob([content], {
           type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         });
-        fs.saveAs(blob, `${ name }.xlsx`);
+        fs.saveAs(blob, `${ workbookName }.xlsx`);
       });
 
-      this.updateMonthlySummary(type, gross, btw, values);
+      this.updateMonthlySummary(totalTypes, values);
     }
   }
 
-  updateMonthlySummary(type: SummaryType, gross: number, btw: number, summaries: IMonthlySummaryRequest[]): void {
+  updateMonthlySummary(totalTypes: ITotalType, summaries: IMonthlySummaryRequest[]): void {
     this.isLoading = true;
+    let totals;
+    switch (totalTypes.type) {
+      case SummaryType.cash:
+      case SummaryType.payment:
+        totals = Array.from(totalTypes.totals.values());
+        break;
+      case SummaryType.expense:
+        totals = Array.from(totalTypes.totals, ([key, value]) => ({
+          expenseType: key,
+          ...value
+        }));
+        break;
+    }
     return this.store.dispatch(
       new fromActionsDashboard.UpdateMonthlySummary(
         {
           date: getDateFormat(this.date.value),
           roomId: this.roomId,
-          type,
-          gross,
-          btw,
+          totals,
+          type: totalTypes.type,
           summaries,
           step: this.step
         }
@@ -416,6 +449,9 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
     this.summaryReservations = undefined;
     this.summaryExpenses = undefined;
     this.summaryCash = undefined;
+    this.reservationMonth = new TotalType(SummaryType.payment);
+    this.expenseMonth = new TotalType(SummaryType.expense, Object.values(ExpenseType));
+    this.cashMonth = new TotalType(SummaryType.cash);
     this.store.dispatch(
       new fromActionsDashboard.GetMonthlySummary(date)
     );
@@ -476,24 +512,32 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
   }
 
   private calculateReservationSummary(): void {
-    const { gross, net, btw } = MonthSummaryComponent.calculateTotals(this.summaryReservations);
-    this.reservationGrossMonth = gross;
-    this.reservationNetMonth = net;
-    this.reservationBtwMonth = btw;
+    MonthSummaryComponent.groupSummary(this.summaryReservations)?.forEach((it, key) => {
+      const { gross, net, btw } = MonthSummaryComponent.calculateTotals(it);
+      this.reservationMonth = this.reservationMonth.withTotal(gross, net, btw, key);
+    });
   }
 
   private calculateExpenseSummary(): void {
-    const { gross, net, btw } = MonthSummaryComponent.calculateTotals(this.summaryExpenses);
-    this.expenseGrossMonth = gross;
-    this.expenseNetMonth = net;
-    this.expenseBtwMonth = btw;
+    MonthSummaryComponent.groupSummary(this.summaryExpenses)?.forEach((it, key) => {
+      const { gross, net, btw } = MonthSummaryComponent.calculateTotals(it);
+      this.expenseMonth = this.expenseMonth.withTotal(gross, net, btw, key);
+    });
   }
 
   private calculateCashSummary(): void {
-    const { gross, net, btw } = MonthSummaryComponent.calculateTotals(this.summaryCash);
-    this.cashGrossMonth = gross;
-    this.cashNetMonth = net;
-    this.cashBtwMonth = btw;
+    MonthSummaryComponent.groupSummary(this.summaryCash)?.forEach((it, key) => {
+      const { gross, net, btw } = MonthSummaryComponent.calculateTotals(it);
+      this.cashMonth = this.cashMonth.withTotal(gross, net, btw, key);
+    });
+  }
+
+  private getNewObject(s: IMonthlySummary): any {
+    if (s?.paths) {
+      const paths = Array.isArray(s.paths) ? `/${ this.language }/${ s.paths.join('/') }` : s.paths;
+      return Object.assign({}, s, { paths });
+    }
+    return s;
   }
 
   private subscribe(): void {
@@ -501,24 +545,9 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
       this.monthlySummaryMap = state.monthlySummaryMap;
       this.monthlySummaryMap?.forEach((value, key) => {
         this.monthlySummaryMap?.set(key, {
-          summarySale: value.summarySale.map(s => {
-            if (s?.paths) {
-              return Object.assign({}, s, { paths: `/${ this.language }/${ s.paths.join('/') }` });
-            }
-            return s;
-          }),
-          summaryExpenses: value.summaryExpenses.map(s => {
-            if (s?.paths) {
-              return Object.assign({}, s, { paths: `/${ this.language }/${ s.paths.join('/') }` });
-            }
-            return s;
-          }),
-          summaryCashSale: value.summaryCashSale.map(s => {
-            if (s?.paths) {
-              return Object.assign({}, s, { paths: `/${ this.language }/${ s.paths.join('/') }` });
-            }
-            return s;
-          })
+          summarySale: value.summarySale.map(s => this.getNewObject(s)),
+          summaryExpenses: value.summaryExpenses.map(s => this.getNewObject(s)),
+          summaryCashSale: value.summaryCashSale.map(s => this.getNewObject(s))
         });
       });
       if (this.monthlySummaryMap) {

@@ -44,3 +44,28 @@
   border-top-color: #000;
   animation: spinner .8s linear infinite;
 }
+
+@media screen and (min-width: 768px) {
+  .totals {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin: 1% 1% 0;
+
+    div {
+      width: 48%;
+    }
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .totals {
+    display: block;
+    margin: 1% 1% 0;
+
+    div {
+      width: 100%;
+      margin-bottom: 1%;
+    }
+  }
+}

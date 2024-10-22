@@ -17,10 +17,10 @@
   height: auto;
 }
 
-.date-time-form {
+.array-form {
   flex: 1;
 
-  .date-time-group {
+  .array-group {
     display: grid;
     grid-template-columns: 1fr auto;
     gap: 16px;
@@ -44,16 +44,4 @@
       margin-right: 5px;
     }
   }
-}
-
-.add-button-container {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  margin-top: 16px;
-}
-
-.add-button {
-  display: flex;
-  justify-content: center;
 }

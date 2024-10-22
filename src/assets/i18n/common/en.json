@@ -45,6 +45,7 @@
       "NOTE": "Add Note",
       "SORT": "Sort",
       "PRINT": "Print",
+      "LOGIN": "Login",
       "EXPAND": {
         "TRUE": "Click to show less",
         "FALSE": "Click to show more"
@@ -146,25 +147,18 @@
     },
     "EXPENSE": {
       "TYPE": {
-        "OPERATING": "Operating",
-        "COGS": "Cost of Goods Sold",
-        "O_MAP": "Marketing, advertising and promotion",
-        "O_SBW": "Salaries, benefits and wages",
-        "SGA": "Selling, general and administrative",
-        "RI": "Rent and insurance",
-        "DA": "Depreciation and amortization",
-        "OTHER": "Other",
-        "NON_OPERATING": "Non operating",
-        "INTEREST": "Interest",
-        "TAXES": "Taxes",
-        "IC": "Impairment charges",
-        "FIXED": "Fixed",
-        "RENT": "Rent",
-        "F_SBW": "Salaries, benefits and wages",
-        "VARIABLE": "Variable",
-        "TRANSACTION_FEES": "Transaction fees",
-        "COMMISSIONS": "Commissions",
-        "V_MAP": "Marketing, advertising and promotion"
+        "DIRECT_COSTS": "Direct costs",
+        "PS": "Product supplies",
+        "LS": "Labor costs",
+        "INDIRECT_COSTS": "Indirect costs",
+        "OC": "Overhead costs",
+        "AC": "Administrative costs",
+        "MA": "Marketing and advertising",
+        "IO": "Others indirect costs",
+        "OTHER_EXPENSES": "Other Expenses",
+        "TD": "Training and development",
+        "MR": "Maintenance and repairs",
+        "ME": "Miscellaneous expenses"
       }
     },
     "CASH": {
@@ -242,6 +236,19 @@
       }
     },
     "USER": {
+      "WITH": {
+        "EMAIL": "Sign in with Email",
+        "GOOGLE": "Sign in with Google",
+        "IN": "Sign in",
+        "REGISTER": "Register"
+      },
+      "LOGIN": {
+        "ACCEPT": "By continuing, you are indicating that you accept our <a href='{{tos}}'>Terms<br>of Service</a> and <a href='{{privacyPolicy}}'>Privacy Policy</a>.",
+        "ACCOUNT": {
+          "TITLE":"You already have an account",
+          "MESSAGE": "You've already used <span class=bold>{{email}}</span>. Sign in with Google to continue."
+        }
+      },
       "DISPLAY_NAME": {
         "FIELD": "Display name",
         "REQUIRED": "Display name is <b>required</b>"
@@ -250,6 +257,12 @@
         "FIELD": "Email",
         "REQUIRED": "Email is <b>required</b>",
         "VALID": "Provide a valid email"
+      },
+      "PASSWORD": {
+        "FIELD": "Password",
+        "REQUIRED": "Password is <b>required</b>",
+        "WRONG": "Email or password is incorrect",
+        "WEEK": "Password is week"
       },
       "PHONE": {
         "FIELD": "Phone",
@@ -436,7 +449,6 @@
         "value_19": "Remember my words",
         "value_20": "Example of <span class='bigger bold'>26 days</span> nail growth protected by BIAB TREATMENT",
         "value_21": "After 4 weeks, you'll probably be wanting to cut your nails due to the discomfort caused by their excessive length.",
-
         "value_23": "Do nails need to rest during the Biab treatment?",
         "value_24": "It's a frequent question, but the answer is simple:",
         "value_25": "&#11088; Find the center that treats your nails<br>with the care they deserve...",
@@ -453,7 +465,6 @@
         "value_36": "BIAB encapsulates its essence in this equation:",
         "value_37": "One of the main advantages I highlight when promoting the BIAB TREATMENT, comparing it to other conventional gels and acrylics, is that it is a VEGAN and CRUELTY-FREE product, in addition to being 10-free, which means fewer unwanted chemicals. It offers a range of mostly natural and light colors to reflect the concern for minimizing damage and maintaining the product's naturalness.",
         "value_38": "BIAB offers an elegant color palette that, when applied, provides a uniform and natural finish without waste. As I always say, once you try it,",
-
         "value_40": "There's no turning back!",
         "value_41": "In contrast to other products, The GelBottle Inc. offers a range of HEMA-FREE Biab gels, with even fewer chemical components. This is ideal for clients with sensitivity, allergies, or simply for those who want to take additional precautions when caring for their nails.",
         "value_42": "And once again, I bring up Biab with another strength regarding the <span class='bold'>frequency with which you have to return for your new Biab Set Treatment</span>, as I mentioned earlier.",

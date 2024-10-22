@@ -55,8 +55,7 @@ export class DashboardEffects {
 
   saveMonthlySummary$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.saveMonthlySummary)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.dashboardService.saveMonthlySummary(payload.date, payload.gross, payload.btw,
-      payload.summaries, payload.type, payload.roomId).pipe(
+    switchMap((payload: any) => this.dashboardService.saveMonthlySummary(payload.date, payload.type, payload.totals, payload.summaries, payload.roomId).pipe(
       switchMap(() => of(new fromActionsDashboard.UpdateMonthlySummarySuccess({
         date: payload.date,
         step: payload.step,
@@ -101,7 +100,7 @@ export class DashboardEffects {
   saveMonthlySummarySuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsDashboard.DashboardActionTypes.saveMonthlySummarySuccess),
     tap((data: any) => this.navigationService.reload(this.router.url.split('/'),
-      { date: data.payload.date, step: data.payload.step }, null, `/${ getLocale(this.translate.currentLang).language }`))
+      { date: data.payload.date, step: data.payload.step }, null, '/dashboard/quarter/summary'))
   ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private router: Router,

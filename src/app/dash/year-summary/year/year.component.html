@@ -1,10 +1,12 @@
 <mat-toolbar class="summary-header">
-  {{year}}
+  {{ year }}
 </mat-toolbar>
 <mat-divider></mat-divider>
 <div class="flex-row-wrap">
-  <div *ngFor="let quarter of quarterSummaries; let index = index" class="year-cash-content">
-    <app-quarter [monthSummaries]="quarter.monthSummaries" [quarter]="quarter.quarter" [measure]="measure"
-                 [year]="year" [currency]="currency" [margin]="index >= start" [showCash]="showCash"></app-quarter>
-  </div>
+  @for (quarter of quarterSummaries; track quarter; let index = $index) {
+    <div class="year-cash-content">
+      <app-quarter [monthSummaries]="quarter.monthSummaries" [quarter]="quarter.quarter" [measure]="measure"
+                   [year]="year" [currency]="currency" [margin]="index >= start" [showCash]="showCash"></app-quarter>
+    </div>
+  }
 </div>

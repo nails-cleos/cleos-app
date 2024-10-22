@@ -1,6 +1,7 @@
 import { All, DashboardActionTypes } from '../dashboard.actions';
 import {
-  IDashboard, IMonthlyExport,
+  IDashboard,
+  IMonthlyExport,
   IMonthlyRoomSummary,
   IMonthlySummaryExpense,
   IMonthlySummarySale,
@@ -9,7 +10,8 @@ import {
   IQuarterSummary,
   IRoomEvents,
   ISummaryRoom,
-  ISummaryTotal, IYearRoomExport,
+  ISummaryTotal,
+  IYearRoomExport,
   IYearRoomSummary,
   MonthSummary,
   QuarterSummary
@@ -124,12 +126,9 @@ const emptySummariesTotal = (): ISummaryTotal[] => [emptySummaryTotal('INCOME'),
 
 const emptyQuarterMonth = (month: number) => new MonthSummary(month, emptySummariesTotal());
 
-const totalTypes = (quarterSummary: IMonthSummary) => ['INCOME', 'EXPENSE', 'CASH'].map(type => {
-  const totalType = quarterSummary.total.find(total => total.type === type);
-  if (totalType) {
-    return totalType;
-  }
-  return emptySummaryTotal(type);
+const totalTypes = (quarterSummary: IMonthSummary) => ['INCOME', 'CASH', 'EXPENSE'].flatMap(type => {
+  const matchingTotals = quarterSummary.total.filter(total => total.type === type);
+  return matchingTotals.length ? matchingTotals : [emptySummaryTotal(type)];
 });
 
 const fullYear = (quarterSummaries: IQuarterSummary[]): IQuarterSummary[] => [1, 2, 3, 4].map(quarter => {

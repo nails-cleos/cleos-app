@@ -1,7 +1,6 @@
 @use 'sass:map';
 @use '@angular/material' as mat;
 @import "angular-calendar/scss/angular-calendar.scss";
-@import 'firebaseui/dist/firebaseui.css';
 
 @mixin color($theme) {
   // Get the color config from the theme.
@@ -106,18 +105,6 @@
   .mdl-card {
     background: mat.get-color-from-palette($background, card);
 
-    .firebaseui-title {
-      color: mat.get-color-from-palette($foreground, text);
-    }
-
-    .firebaseui-textfield.mdl-textfield .firebaseui-label {
-      color: mat.get-color-from-palette($foreground, text);
-    }
-
-    .firebaseui-textfield.mdl-textfield .firebaseui-input {
-      color: mat.get-color-from-palette($foreground, text);
-    }
-
     .progressbar {
       background-color: mat.get-color-from-palette($primary-palette) !important;
     }
@@ -128,18 +115,6 @@
     }
 
     .mdl-button.mdl-js-button.mdl-button--primary {
-      color: mat.get-color-from-palette($accent-palette) !important;
-    }
-
-    .firebaseui-textfield.mdl-textfield .firebaseui-label::after {
-      background-color: mat.get-color-from-palette($primary-palette) !important;
-    }
-
-    a.firebaseui-link {
-      color: mat.get-color-from-palette($primary-palette) !important;
-    }
-
-    a.firebaseui-input-floating-button {
       color: mat.get-color-from-palette($accent-palette) !important;
     }
 
@@ -169,8 +144,8 @@
     border: solid 1px mat.get-color-from-palette($background, tooltip);
   }
 
-  .date-time-form {
-    .date-time-group {
+  .array-form {
+    .array-group {
       border: dashed 1px mat.get-color-from-palette($primary-palette);
     }
   }
@@ -209,8 +184,14 @@
       border: 1px solid mat.get-color-from-palette($primary-palette) !important;
     }
 
-    tr:hover {
-      background-color: mat.get-color-from-palette($background, hover);
+    tr {
+      &:hover {
+        background-color: mat.get-color-from-palette($background, hover);
+
+        td {
+          background-color: mat.get-color-from-palette($background, hover);
+        }
+      }
     }
   }
 
@@ -286,13 +267,31 @@
       background-color: #c0c0c0;
       color: black;
     }
+    .diagonal.created::before {
+      background: repeating-linear-gradient(
+          -45deg,
+          transparent,
+          transparent 12px,
+          #8494a4 17px
+      )
+    }
     .text-bg-approved {
       background-color: #b5ac9e;
       color: black;
     }
+    .text-bg-paid,
     .text-bg-partially_paid {
       background-color: #87ceeb;
       color: black;
+    }
+    .diagonal.paid::before,
+    .diagonal.partially_paid::before {
+      background: repeating-linear-gradient(
+          -45deg,
+          transparent,
+          transparent 12px,
+          #186cae 17px
+      )
     }
     .text-bg-paid {
       background-color: #87ceeb;
@@ -360,14 +359,29 @@
     .text-bg-created {
       background-color: #708090;
     }
+    .diagonal.created::before {
+      background: repeating-linear-gradient(
+          -45deg,
+          transparent,
+          transparent 12px,
+          #c0c0c0 17px
+      )
+    }
     .text-bg-approved {
       background-color: #8d8270;
     }
+    .text-bg-paid,
     .text-bg-partially_paid {
       background-color: #04589a;
     }
-    .text-bg-paid {
-      background-color: #04589a;
+    .diagonal.paid::before,
+    .diagonal.partially_paid::before {
+      background: repeating-linear-gradient(
+          -45deg,
+          transparent,
+          transparent 12px,
+          #87ceeb 17px
+      )
     }
     .text-bg-started {
       background-color: #673ab7;
@@ -821,7 +835,7 @@
       color: black;
     }
 
-    @if($isDark) {
+    @if ($isDark) {
       &:hover {
         color: white;
       }
@@ -854,7 +868,7 @@
   }
 
   .mat-gray {
-    @if($isDark) {
+    @if ($isDark) {
       background-color: gray !important;
     } @else {
       background-color: darkgray !important;

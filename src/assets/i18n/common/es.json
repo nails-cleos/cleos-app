@@ -45,6 +45,7 @@
       "NOTE": "Agregar nota",
       "SORT": "Ordenar",
       "PRINT": "Imprimir",
+      "LOGIN": "Ingresar",
       "EXPAND": {
         "TRUE": "Presiona para mostrar menos",
         "FALSE": "Presiona para mostrar más"
@@ -146,25 +147,18 @@
     },
     "EXPENSE": {
       "TYPE": {
-        "OPERATING": "Operativo",
-        "COGS": "Costo de los bienes vendidos",
-        "O_MAP": "Marketing, publicidad y promoción",
-        "O_SBW": "Salarios, prestaciones y salarios",
-        "SGA": "Vendedor general y administrativo",
-        "RI": "Alquiler y seguro",
-        "DA": "Depreciación y amortización",
-        "OTHER": "Otros",
-        "NON_OPERATING": "No operativo",
-        "INTEREST": "Interés",
-        "TAXES": "Impuestos",
-        "IC": "Cargos por deterioro",
-        "FIXED": "Fijo",
-        "RENT": "Alquilar",
-        "F_SBW": "Salarios, prestaciones y salarios",
-        "VARIABLE": "Variable",
-        "TRANSACTION_FEES": "Tarifas de transacción",
-        "COMMISSIONS": "Comisiones",
-        "V_MAP": "Marketing, publicidad y promoción"
+        "DIRECT_COSTS": "Costos directo",
+        "PS": "Suministros de productos",
+        "LS": "Costos laborales",
+        "INDIRECT_COSTS": "Costos Indirectos",
+        "OC": "Costos generales",
+        "AC": "Costos administrativos",
+        "MA": "Marketing y publicidad",
+        "IO": "Otros costos indirectos",
+        "OTHER_EXPENSES": "Otros Gastos",
+        "TD": "Capacitación y desarrollo",
+        "MR": "Mantenimiento y reparaciones",
+        "ME": "Gastos misceláneos"
       }
     },
     "CASH": {
@@ -242,6 +236,19 @@
       }
     },
     "USER": {
+      "WITH": {
+        "EMAIL": "Ingresar con Email",
+        "GOOGLE": "Ingresar con Google",
+        "IN": "Ingresar",
+        "REGISTER": "Registrarse"
+      },
+      "LOGIN": {
+        "ACCEPT": "Al continuar, indicas que aceptas nuestros <a href='{{tos}}'>Términos<br>de Servicio</a> y nuestra <a href='{{privacyPolicy}}'>Política de Privacidad</a>.",
+        "ACCOUNT": {
+          "TITLE":"Ya tienes una cuenta.",
+          "MESSAGE": "Ya has utilizado <span class=bold>{{email}}</span>. Inicia sesión con Google para continuar."
+        }
+      },
       "DISPLAY_NAME": {
         "FIELD": "Nombre",
         "REQUIRED": "Nombre es <b>requerido</b>"
@@ -250,6 +257,12 @@
         "FIELD": "Email",
         "REQUIRED": "Email es <b>requerido</b>",
         "VALID": "Ingrese un email valido"
+      },
+      "PASSWORD": {
+        "FIELD": "Contraseña",
+        "REQUIRED": "Contraseña es <b>requerido</b>",
+        "WRONG": "Email o contraseña incorrecto",
+        "WEEK": "Contraseña es devil"
       },
       "PHONE": {
         "FIELD": "Teléfono",

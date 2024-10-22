@@ -105,7 +105,7 @@ export interface IChart {
   colors?: string;
   sum?: boolean;
   currency?: ICurrency;
-  footer?: string
+  footer?: string;
 }
 
 export interface IRoomEvents {
@@ -143,22 +143,63 @@ export enum SummaryType {
   cash
 }
 
+export enum ExpenseType {
+  directCosts = 'DIRECT_COSTS',
+  indirectCosts = 'INDIRECT_COSTS',
+  otherExpenses = 'OTHER_EXPENSES'
+}
+
 export enum AmountFormat {
   en = 'EN',
   es = 'ES'
 }
 
 export interface ITotal {
+  gross: number;
   net: number;
   btw: number;
-  gross: number;
+}
+
+export interface ITotalType {
+  type: SummaryType;
+  totals: Map<string, ITotal>;
+
+  withTotal(gross: number, net: number, btw: number, subType?: string): ITotalType;
+}
+
+export class TotalType implements ITotalType {
+  type: SummaryType;
+  totals: Map<string, ITotal>;
+
+  constructor(type: SummaryType, subTypes: string[] = []) {
+    this.type = type;
+    this.totals = new Map();
+    if (!subTypes.length) {
+      subTypes = [type.toString()];
+    }
+    subTypes.forEach(it => {
+      this.totals.set(it, new Total());
+    });
+  }
+
+  withTotal(gross: number, net: number, btw: number, subType?: string): ITotalType {
+    const type = subType ?? this.type.toString();
+    let total = this.totals.get(type);
+    if (total) {
+      total = new Total(gross, btw, net);
+      this.totals.set(type, total);
+    }
+    return this;
+  }
 }
 
 export interface ISummaryTotal extends ITotal {
   id: string;
   paymentType: PaymentType;
   expenseType: string;
+  expenseSubType: string;
   type: string;
+  description: string;
   discountDescription: string;
   discountValue: number;
   payments: ISummaryTotal[];

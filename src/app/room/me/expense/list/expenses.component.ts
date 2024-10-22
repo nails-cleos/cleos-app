@@ -34,7 +34,7 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['position', 'invoice', 'supplyStore.name', 'timestamp', 'type', 'gross', 'btw', 'net', 'actions'];
+  displayedColumns: string[] = ['position', 'invoice', 'supplyStore.name', 'timestamp', 'totalGross', 'totalBtw', 'totalNet', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IExpense>>();
   expanded?: IExpense;
 
@@ -116,12 +116,6 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
     openDialog(expense.room, this.dateFormat, this.translate, this.dialog, time);
   }
 
-  edit(expense: IExpense): void {
-    this.store.dispatch(
-      new fromActionsExpense.ExpenseSelected({ expense, redirect: true })
-    );
-  }
-
   delete(expense: IExpense): void {
     const title = this.translate.instant('EXPENSE.DELETED.TITLE');
     const content = this.translate.instant('EXPENSE.DELETED.CONTENT', { invoice: expense.invoice });
@@ -152,13 +146,8 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.getExpenses();
       }
       this.dataSource = state.data?.content.map((expense: IExpenseAll) => {
-        let net;
-        if (expense.btw) {
-          net = expense.gross / (expense.btw + 100) * 100;
-        } else {
-          net = expense.gross;
-        }
-        return Object.assign({}, expense, { net });
+        const totalBtw = expense.totalGross - expense.totalNet;
+        return Object.assign({}, expense, { totalBtw });
       });
       this.resultsLength = state.data?.totalElements;
       if (!this.paginatorSubscription && this.resultsLength) {

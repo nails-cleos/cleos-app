@@ -4,7 +4,7 @@
       <app-balance [account]="account" [showView]="true" [showUser]="hasAdminRole" [language]="language"></app-balance>
       <form (ngSubmit)="submit" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
         @if (account) {
-          <mat-card appearance="outlined" class="style-card">
+          <mat-card appearance="outlined">
             <mat-card-header>
               <mat-card-title>{{ 'ACCOUNT.TRANSACTION.TITLE' | translate }}</mat-card-title>
             </mat-card-header>
