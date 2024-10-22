@@ -45,6 +45,7 @@
       "NOTE": "Agregar nota",
       "SORT": "Ordenar",
       "PRINT": "Imprimir",
+      "LOGIN": "Ingresar",
       "EXPAND": {
         "TRUE": "Presiona para mostrar menos",
         "FALSE": "Presiona para mostrar más"
@@ -235,6 +236,19 @@
       }
     },
     "USER": {
+      "WITH": {
+        "EMAIL": "Ingresar con Email",
+        "GOOGLE": "Ingresar con Google",
+        "IN": "Ingresar",
+        "REGISTER": "Registrarse"
+      },
+      "LOGIN": {
+        "ACCEPT": "Al continuar, indicas que aceptas nuestros <a href='{{tos}}'>Términos<br>de Servicio</a> y nuestra <a href='{{privacyPolicy}}'>Política de Privacidad</a>.",
+        "ACCOUNT": {
+          "TITLE":"Ya tienes una cuenta.",
+          "MESSAGE": "Ya has utilizado <span class=bold>{{email}}</span>. Inicia sesión con Google para continuar."
+        }
+      },
       "DISPLAY_NAME": {
         "FIELD": "Nombre",
         "REQUIRED": "Nombre es <b>requerido</b>"
@@ -243,6 +257,12 @@
         "FIELD": "Email",
         "REQUIRED": "Email es <b>requerido</b>",
         "VALID": "Ingrese un email valido"
+      },
+      "PASSWORD": {
+        "FIELD": "Contraseña",
+        "REQUIRED": "Contraseña es <b>requerido</b>",
+        "WRONG": "Email o contraseña incorrecto",
+        "WEEK": "Contraseña es devil"
       },
       "PHONE": {
         "FIELD": "Teléfono",
