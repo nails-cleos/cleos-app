@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 import { TranslationLoaderResolver } from './util/translation.resolver';
 
 const routes: Routes = [
@@ -8,7 +8,9 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, { anchorScrolling: 'enabled', preloadingStrategy: PreloadAllModules })],
+  imports: [
+    RouterModule.forRoot(routes, { anchorScrolling: 'enabled' })
+  ],
   exports: [RouterModule]
 })
 export class AppRoutingModule {

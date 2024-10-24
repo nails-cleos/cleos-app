@@ -30,15 +30,10 @@ export class TreatmentComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      this.loadTreatment(params.id)
-      this.translate.onLangChange.subscribe(() => this.loadTreatment(params.id));
+      const translations = this.translate.instant('TREATMENTS').find((it: IMainTreatment) => it.id === params.id).translations;
+      if (translations) {
+        this.sections = sections(translations);
+      }
     });
-  }
-
-  private loadTreatment(id: string) {
-    const translations = this.translate.instant('TREATMENTS').find((it: IMainTreatment) => it.id === id).translations;
-    if (translations) {
-      this.sections = sections(translations);
-    }
   }
 }

@@ -46,7 +46,6 @@
       "SORT": "Ordenar",
       "PRINT": "Imprimir",
       "LOGIN": "Ingresar",
-      "LOAD_MORE": "Ver mas",
       "EXPAND": {
         "TRUE": "Presiona para mostrar menos",
         "FALSE": "Presiona para mostrar más"
@@ -89,7 +88,8 @@
       "ONCE_A_YEAR": "Una vez al año"
     },
     "NOTIFICATION": {
-      "NO": "No hay notificaciones"
+      "NO": "No hay notificaciones",
+      "LOAD_MORE": "Ver mas"
     },
     "LANG": {
       "ES": "Español",
@@ -449,6 +449,7 @@
         "value_19": "Recuerda mis palabras",
         "value_20": "Ejemplo de crecimiento de la uña protegida por BIAB TREATMENT",
         "value_21": "Después de las 4 semanas, probablemente estarás deseando cortar tus uñas debido a la incomodidad causada por su excesiva longitud.",
+
         "value_23": "¿Las uñas necesitan descansar durante el tratamiento Biab?",
         "value_24": "Es una pregunta frecuente, pero su respuesta es sencilla:",
         "value_25": "&#11088; Encuentra el centro que trate tus uñas<br>con el cuidado que merecen...",
@@ -465,6 +466,7 @@
         "value_36": "BIAB encapsula su esencia en esta ecuación:",
         "value_37": "Una de las principales ventajas que resalto al promocionar el BIAB TREATMENT,  comparandolo con otros geles convencionales y el acrilico, es que se trata de un producto VEGANO y LIBRE DE CRUELDAD ANIMAL, además de 10-free, lo que significa menos químicos no deseados. Ofrece una gama de colores mayormente naturales y claros para reflejar la preocupación por minimizar el daño y mantener la naturalidad del producto.",
         "value_38": "BIAB ofrece una paleta de colores elegantes que, al aplicarse, brinda un acabado homogéneo y natural sin desperdicios. Como siempre digo, una vez que lo pruebas,",
+
         "value_40": "¡No hay vuelta atrás!",
         "value_41": "A diferencia de otros productos, The GelBottle Inc.  ofrece una gama de geles Biab HEMA FREE, con aún menos componentes químicos. Esto es ideal para clientes con sensibilidad, alergias o simplemente para aquellos que desean tomar precauciones adicionales al cuidar sus uñas.",
         "value_42": "Y una vez más traigo al Biab con otra fortaleza relativa a la <span class='bold'>frecuencia con la que tenes que volver por tu nuevo set de Biab</span>, que mencioné anteriormente.",
@@ -545,24 +547,6 @@
       "id": "spa",
       "name": "CND Spa Manicure",
       "description": ""
-    }
-  ],
-  "FAQS": [
-    {
-      "question": "¿Qué es Angular?",
-      "answer": "Angular es una plataforma para construir aplicaciones web móviles y de escritorio."
-    },
-    {
-      "question": "¿Cómo instalo Angular?",
-      "answer": "Puedes instalar Angular utilizando el Angular CLI con el comando `npm install -g @angular/cli`."
-    },
-    {
-      "question": "¿Qué es un componente?",
-      "answer": "Los componentes son los bloques básicos de construcción de las aplicaciones Angular. Cada componente consta de una plantilla HTML, una hoja de estilos CSS y una clase TypeScript."
-    },
-    {
-      "question": "¿Realizan envíos internacionales?",
-      "answer": "Sí, enviamos a más de 100 países..."
     }
   ]
 }
