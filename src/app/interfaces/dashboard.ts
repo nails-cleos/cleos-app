@@ -165,6 +165,8 @@ export interface ITotalType {
   totals: Map<string, ITotal>;
 
   withTotal(gross: number, net: number, btw: number, subType?: string): ITotalType;
+
+  reset(subTypes?: string[]): ITotalType;
 }
 
 export class TotalType implements ITotalType {
@@ -191,6 +193,17 @@ export class TotalType implements ITotalType {
     }
     return this;
   }
+
+  reset(subTypes: string[] = []): ITotalType {
+    if (!subTypes.length) {
+      subTypes = [this.type.toString()];
+    }
+    subTypes.forEach(it => {
+      this.totals.set(it, new Total());
+    });
+    return this;
+  }
+
 }
 
 export interface ISummaryTotal extends ITotal {
