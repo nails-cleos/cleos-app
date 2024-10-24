@@ -24,6 +24,7 @@ import { HashLocationStrategy, LocationStrategy, NgOptimizedImage } from '@angul
 import { Store } from '@ngrx/store';
 import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
+import { FaqComponent } from './faq/faq.component';
 
 @NgModule({
   declarations: [
@@ -52,6 +53,7 @@ import { Observable } from 'rxjs';
     }),
     EffectsModule.forFeature([MainEffects, CatalogueEffects, UserEffects, LoginEffects]),
     NgOptimizedImage,
+    FaqComponent
   ],
   providers: [
     MainService,
