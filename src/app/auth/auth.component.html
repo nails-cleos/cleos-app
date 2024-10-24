@@ -42,7 +42,7 @@
                           @if (['init', 'password', 'password|google.com', 'google.com|password', ''].includes(status)) {
                             <mat-form-field appearance="outline">
                               <mat-label>{{ 'COMMON.USER.EMAIL.FIELD' | translate }}</mat-label>
-                              <input matInput formControlName="email" required/>
+                              <input matInput formControlName="email" required type="email" name="email"/>
                               @if (loginForm.get('email')?.hasError('required')) {
                                 <mat-error [innerHTML]="'COMMON.USER.EMAIL.REQUIRED' | translate"></mat-error>
                               } @else if (loginForm.get('email')?.hasError('email')) {

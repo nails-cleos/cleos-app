@@ -107,17 +107,28 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
 
   private static groupSummary(summaries?: IMonthlySummary[]): Map<string, IMonthlySummary[]> {
     return summaries?.reduce((grouped: Map<string, IMonthlySummary[]>, item: IMonthlySummary) => {
-      const key = item.total.expenseType;
-
-      item.total.payments.forEach(total => {
-        const group = grouped.get(total.expenseType) || [];
+      const length = item.total.payments.length;
+      if (length) {
+        item.total.payments.forEach(total => {
+          const key = total.expenseType;
+          const group = grouped.get(key) || [];
+          const newItem = { ...item };
+          newItem.total = {
+            ...newItem.total,
+            gross: total.gross,
+            btw: total.btw,
+            net: total.net,
+            payments: []
+          };
+          group.push(newItem);
+          grouped.set(key, group);
+        });
+      } else {
+        const key = item.total.expenseType;
+        const group = grouped.get(key) || [];
         group.push(item);
-        grouped.set(total.expenseType, group);
-      });
-
-      const group = grouped.get(key) || [];
-      group.push(item);
-      grouped.set(key, group);
+        grouped.set(key, group);
+      }
       return grouped;
     }, new Map()) || new Map();
   }
@@ -192,9 +203,9 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
       if (t) {
         return t[key] >= 0 ? t[key] : total[key];
       }
-      return total[key]
+      return total[key];
     }
-    return total[key]
+    return total[key];
 
   }
 
@@ -206,8 +217,8 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
     const total = summary.total;
     let gross = isInvalidInput ? this.parseValue(total, 'gross', id) : parseFloat(input.value);
     const btwCurrent = this.parseValue(total, 'btw', id);
-    const netCurrent = this.parseValue(total, 'net', id)
-    const btwPercentage = Math.round((btwCurrent/netCurrent) * 100)
+    const netCurrent = this.parseValue(total, 'net', id);
+    const btwPercentage = Math.round((btwCurrent / netCurrent) * 100);
     let net = gross;
     let btw = 0;
     if (input.id === 'grossInput') {
@@ -512,6 +523,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
   }
 
   private calculateReservationSummary(): void {
+    this.reservationMonth = this.reservationMonth.reset();
     MonthSummaryComponent.groupSummary(this.summaryReservations)?.forEach((it, key) => {
       const { gross, net, btw } = MonthSummaryComponent.calculateTotals(it);
       this.reservationMonth = this.reservationMonth.withTotal(gross, net, btw, key);
@@ -519,6 +531,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
   }
 
   private calculateExpenseSummary(): void {
+    this.expenseMonth = this.expenseMonth.reset(Object.values(ExpenseType));
     MonthSummaryComponent.groupSummary(this.summaryExpenses)?.forEach((it, key) => {
       const { gross, net, btw } = MonthSummaryComponent.calculateTotals(it);
       this.expenseMonth = this.expenseMonth.withTotal(gross, net, btw, key);
@@ -526,6 +539,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
   }
 
   private calculateCashSummary(): void {
+    this.cashMonth = this.cashMonth.reset();
     MonthSummaryComponent.groupSummary(this.summaryCash)?.forEach((it, key) => {
       const { gross, net, btw } = MonthSummaryComponent.calculateTotals(it);
       this.cashMonth = this.cashMonth.withTotal(gross, net, btw, key);
