@@ -337,6 +337,19 @@
 </section>
 <!-- End Contact Us-->
 
+<section id="faq" class="faq">
+  <div class="section-container">
+
+    <div class="section-title text-center mb-50" appAnimate [animateInAnimation]="faqTitle">
+      <h2 style="margin-top: 6%;">{{ 'FAQs' | translate }}</h2>
+      <div class="home-divider">
+        <mat-icon color="warn" class="material-icons">favorite</mat-icon>
+      </div>
+    </div>
+    <app-faq [limit]="2"></app-faq>
+  </div>
+</section>
+
 <button color="primary" class="hide-xs book-button fab-book-button" (click)="openBottomSheet" mat-fab
         extended type="button" aria-label="Book your appointment">
   <mat-icon matPrefix>book_online</mat-icon>
