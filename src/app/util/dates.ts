@@ -519,6 +519,8 @@ export const greaterOrEqualsThan = (date1: Date, date2: Date): boolean => date1 
 
 export const greaterOrEqualsThanToday = (date: Date): boolean => date >= createDate();
 
+export const lessOrEqualsThanToday = (date: Date): boolean => date <= addDays(createDate(), 1);
+
 export const isBetween = (min: Date, max: Date, date: Date): boolean =>
   date >= createNewDate(min) && date <= createNewDate(max, 23, 59, 59, 99);
 

@@ -15,7 +15,7 @@ import {
   getTimeNumber,
   greaterOrEqualsThanToday,
   IDuration,
-  isSameTimeZone,
+  isSameTimeZone, lessOrEqualsThanToday,
   newDate,
   newDateTimestamp,
   reservationDuration
@@ -510,16 +510,16 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     const userPhone = reservation.customer.phone;
 
     let approveActions: IFabMenu[] = [];
-    if (isToday(newDate(self.start))) {
+    const startDate = newDate(self.start);
+    if (lessOrEqualsThanToday(startDate)) {
       approveActions = [start];
     }
     approveActions = [...approveActions, edit];
     if (userPhone) {
-      const date = newDate(self.start);
-      if (greaterOrEqualsThanToday(date)) {
+      if (greaterOrEqualsThanToday(startDate)) {
         approveActions = [...approveActions, sendMessage];
       }
-      if (isTomorrow(date)) {
+      if (isTomorrow(startDate)) {
         approveActions = [...approveActions, coffeeMessage];
       }
     }
@@ -533,8 +533,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     });
 
     const sendMessageTransaction = ReservationDetailComponent.createTransaction('send', (): void => {
-      if (self.start) {
-        const startDate = newDate(self.start);
+      if (startDate) {
         let key;
         let date = getTime(startDate, self.language);
         let treatment = ReservationDetailComponent.createBullet(reservation.treatment.name);
