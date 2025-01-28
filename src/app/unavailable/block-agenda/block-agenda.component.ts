@@ -1,5 +1,12 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
+import {
+  AbstractControl,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators,
+  ɵTypedOrUntyped
+} from '@angular/forms';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { IRoomAll } from '../../interfaces/room';
 import { Observable, Subscription } from 'rxjs';
@@ -18,7 +25,7 @@ import {
   formatTime,
   getCurrentTimeZone,
   getMinMaxDate,
-  getNow,
+  getNowTimeZone,
   getTime,
   getTimeNumber,
   newDate,
@@ -58,12 +65,14 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
   private getState: Observable<any>;
   private subscription?: Subscription;
   private readonly extras: any;
+  private readonly timeZone: string;
 
   constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router,
               private route: ActivatedRoute, private translate: TranslateService, public dialog: MatDialog) {
     this.isAddMode = true;
     this.getState = this.store.select(selectUnavailableState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
+    this.timeZone = getCurrentTimeZone();
   }
 
   get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
@@ -81,7 +90,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
     const unavailable: IUnavailable = new Unavailable();
     unavailable.professionalId = valueChange(this.getForm.professional.value, this.unavailable?.professional)?.id;
     unavailable.start = date.toLocaleString(API_LOCALE);
-    unavailable.timeZone = getCurrentTimeZone();
+    unavailable.timeZone = this.timeZone;
     unavailable.duration = fieldChange(this.getForm.duration as UntypedFormControl, this.unavailable?.duration);
 
     if (this.isAddMode) {
@@ -102,7 +111,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.rooms.length && startTime) {
       const startDate = this.getForm.startDate.value;
       const time = getTimeNumber(startTime);
-      const date = createNewDate(startDate ? newDate(startDate) : getNow(), time?.hour, time?.minute);
+      const date = createNewDate(startDate ? newDate(startDate) : getNowTimeZone(), time?.hour, time?.minute);
       const day = date.getDay();
       const { minDate, maxDate, roomAvailability } = getMinMaxDate(day, date, this.rooms);
 
@@ -223,7 +232,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
       if (value) {
         const startDate = this.getForm.startDate.value;
         const time = getTimeNumber(value);
-        const date = createNewDate(startDate ? newDate(startDate) : getNow(), time?.hour, time?.minute);
+        const date = createNewDate(startDate ? newDate(startDate) : getNowTimeZone(), time?.hour, time?.minute);
 
         this.calculateMaxDuration(date);
       }
@@ -253,9 +262,9 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
       const maxHour = max.hour;
       const diffMin = max.minute;
 
-      const d = diffTime(date, Number(maxHour), Number(diffMin));
+      const d = diffTime(date, this.timeZone, Number(maxHour), Number(diffMin));
       this.showDuration = true;
-      this.durationMax = formatTime(d);
+      this.durationMax = formatTime(d, this.timeZone);
       if (this.isAddMode) {
         this.getForm.duration.setValue(undefined);
       }

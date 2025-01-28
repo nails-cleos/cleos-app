@@ -16,7 +16,7 @@ import { Observable, Subscription } from 'rxjs';
 import { AppState, selectExpenseState } from '../../../store/app.states';
 import { Store } from '@ngrx/store';
 import * as fromActionsExpense from '../../../store/expense.actions';
-import { API_LOCALE, getNow, getNowTimeZone, newDateTimestamp } from '../../../util/dates';
+import { API_LOCALE, getNowTimeZone, newDateTimestamp } from '../../../util/dates';
 import { fieldChange, noDuplicateDatesValidator } from '../../../util/validators';
 import { map, startWith } from 'rxjs/operators';
 
@@ -47,7 +47,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   constructor(private readonly translate: TranslateService, private store: Store<AppState>, private formBuilder: FormBuilder,
               private route: ActivatedRoute, private router: Router) {
     this.isAddMode = true;
-    this.today = getNow();
+    this.today = getNowTimeZone();
     this.getState = this.store.select(selectExpenseState);
     this.language = this.translate.currentLang;
   }

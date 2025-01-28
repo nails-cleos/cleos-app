@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { IUserAll } from '../interfaces/user';
 import { Auth, user } from '@angular/fire/auth';
 import { User } from '@firebase/auth';
-import { getNow, newDate, plusMinutes } from '../util/dates';
+import { getNowTimeZone, newDate, plusMinutes } from '../util/dates';
 import { TranslateService } from '@ngx-translate/core';
 
 @Injectable()
@@ -48,7 +48,7 @@ export class TokenService {
       this.myTokenSubscription = this.myTokenCache.subscribe({
         next: (firebaseUser) => firebaseUser?.getIdTokenResult().then(tokenResult => {
           const expirationTime = plusMinutes(newDate(tokenResult.expirationTime), -10);
-          if (getNow() >= expirationTime) {
+          if (getNowTimeZone() >= expirationTime) {
             firebaseUser.getIdToken(true).then(newToken => this.myToken = newToken);
           }
         }),

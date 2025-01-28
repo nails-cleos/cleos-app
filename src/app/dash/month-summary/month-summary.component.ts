@@ -3,7 +3,15 @@ import { FormControl, UntypedFormControl } from '@angular/forms';
 import { DateAdapter } from '@angular/material/core';
 import { MatDatepicker } from '@angular/material/datepicker';
 
-import { dateMonthYear, getDateFormat, getDateQuarter, getNow, getWeeksInMonth, monthViewTitle, newDateTimestamp } from '../../util/dates';
+import {
+  dateMonthYear,
+  getDateFormat,
+  getDateQuarter,
+  getWeeksInMonth,
+  monthViewTitle,
+  newDateTimestamp,
+  getNowTimeZone
+} from '../../util/dates';
 import { Observable, Subscription } from 'rxjs';
 import { AppState, selectDashboardState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
@@ -82,7 +90,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
     this.getState = this.store.select(selectDashboardState);
     this.dateFormat = this.translate.currentLang;
     this.language = this.translate.currentLang;
-    this.weeks = getWeeksInMonth(getNow());
+    this.weeks = getWeeksInMonth(getNowTimeZone(this.timeZone));
     this.extras = this.router.getCurrentNavigation()?.extras.state;
     this.subscription = this.authUserService.authUser.subscribe(value => {
       this.userName = value.displayName;
@@ -266,7 +274,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
       }
       this.date.setValue(dateMonthYear(month, year));
     } else {
-      this.date.setValue(getNow());
+      this.date.setValue(getNowTimeZone(this.timeZone));
     }
   }
 
@@ -320,12 +328,12 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
   }
 
   exportMonthlySummary(): void {
-    const title = monthViewTitle(this.date.value || getNow());
+    const title = monthViewTitle(this.date.value || getNowTimeZone(this.timeZone));
     const workbook = createMonthlySummary(title, this.weeks, currencySymbol(this.currency), this.translate, this.timeZone,
       this.summaryReservations as IMonthlySummarySale[], this.summaryExpenses as IMonthlySummaryExpense[]);
 
     workbook.creator = this.userName || '';
-    workbook.created = getNow();
+    workbook.created = getNowTimeZone(this.timeZone);
 
     // Generate & Save Excel File
     workbook.xlsx.writeBuffer().then((content) => {
@@ -342,7 +350,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
       const name = this.translate.instant(`SUMMARY.${ title }`);
 
       let workbook;
-      const header = monthViewTitle(this.date.value || getNow());
+      const header = monthViewTitle(this.date.value || getNowTimeZone(this.timeZone));
 
       switch (totalTypes.type) {
         case SummaryType.payment:
@@ -360,7 +368,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
       }
 
       workbook.creator = this.userName || '';
-      workbook.created = getNow();
+      workbook.created = getNowTimeZone(this.timeZone);
 
       // Generate & Save Excel File
       workbook.xlsx.writeBuffer().then((content) => {
