@@ -9,7 +9,7 @@ import {
   createNewDate,
   Duration,
   formatDateTime,
-  getNow,
+  getNowTimeZone,
   getReservationGMT,
   getTime,
   getTimeNumber,
@@ -65,8 +65,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   reservation?: IReservationAll;
   history?: IReservationAll[];
   duration: IDuration = new Duration();
-  start: Date = getNow();
-  end: Date = getNow();
+  start: Date = getNowTimeZone();
+  end: Date = getNowTimeZone();
   state?: string;
   dateFormat: string;
   changeState: IFabMenu[] = [];
@@ -511,12 +511,12 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
     let approveActions: IFabMenu[] = [];
     const startDate = newDate(self.start);
-    if (lessOrEqualsThanToday(startDate)) {
+    if (lessOrEqualsThanToday(startDate, reservation.room.timeZone)) {
       approveActions = [start];
     }
     approveActions = [...approveActions, edit];
     if (userPhone) {
-      if (greaterOrEqualsThanToday(startDate)) {
+      if (greaterOrEqualsThanToday(startDate, reservation.room.timeZone)) {
         approveActions = [...approveActions, sendMessage];
       }
       if (isTomorrow(startDate)) {

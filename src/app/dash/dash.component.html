@@ -112,9 +112,9 @@
   <!--Charts-->
   @for (chart of charts; track chart) {
     <mat-grid-tile [colspan]="cardLayout.chart.cols" [rowspan]="cardLayout.chart.rows">
-      <app-card [chart]="chart" [title]="chart.title">
+      <app-card [chart]="chart" [title]="chart.title" [timeZone]="timeZone">
         <app-chart [chartSummary]="chart" [error]="error" [currency]="currency" [isLoading]="isLoading"
-                   [locale]="dateFormat"></app-chart>
+                   [locale]="dateFormat" [timeZone]="timeZone"></app-chart>
       </app-card>
     </mat-grid-tile>
   }
@@ -122,7 +122,7 @@
   @if (roomId || professionalId) {
     <mat-grid-tile [colspan]="cardLayout.table.cols" [rowspan]="cardLayout.table.rows">
       <app-card [expand]="false" [title]="'DASHBOARD.CARD.RESERVATION' | translate" [currency]="currency"
-                [locale]="dateFormat">
+                [locale]="dateFormat" [timeZone]="timeZone">
         <app-reservation-table [roomId]="roomId" [professionalId]="professionalId" [all]="all"></app-reservation-table>
       </app-card>
     </mat-grid-tile>

@@ -1,7 +1,15 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import * as fromActionsDashboard from '../../store/dashboard.actions';
 import { FormControl, UntypedFormControl } from '@angular/forms';
-import { IMonthSummary, ISummaryRoom, ISummaryTotal, ISummaryTotals, MonthSummary, SummaryTotals, Total } from '../../interfaces/dashboard';
+import {
+  IMonthSummary,
+  ISummaryRoom,
+  ISummaryTotal,
+  ISummaryTotals,
+  MonthSummary,
+  SummaryTotals,
+  Total
+} from '../../interfaces/dashboard';
 import { Observable, Subscription } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
@@ -11,7 +19,7 @@ import { Router } from '@angular/router';
 import { DateAdapter } from '@angular/material/core';
 import { YearAdapter } from '../../util/adapter/year.adapter';
 import { MatDatepicker } from '@angular/material/datepicker';
-import { dateMonthYear, getDateQuarter, getNow } from '../../util/dates';
+import { dateMonthYear, getDateQuarter, getNowTimeZone } from '../../util/dates';
 import { AuthUserService } from '../../services/auth-user.service';
 import { allElementsHaveSameKeyFilterValue, currencySymbol } from '../../util/helper';
 import { ICurrencyAll } from '../../interfaces/currency';
@@ -76,7 +84,7 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
     this.subscribe();
     this.clean();
     this.valueChange();
-    const now = getNow();
+    const now = getNowTimeZone();
     if (this.extras) {
       const year = this.extras.year || now.getFullYear();
       this.year = year;
@@ -105,14 +113,14 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
 
   exportQuarterSummary(): void {
     if (this.monthSummaries?.length) {
-      const now = getNow();
-      const quarter = this.selectedQuarter.value || getDateQuarter(getNow());
+      const now = getNowTimeZone();
+      const quarter = this.selectedQuarter.value || getDateQuarter(getNowTimeZone());
       const year = this.year || now.getFullYear();
       const workbook = createQuarterSummary(quarter, year, this.monthSummaries, this.quarterSummaryTotals,
         currencySymbol(this.currency), this.translate);
 
       workbook.creator = this.userName || '';
-      workbook.created = getNow();
+      workbook.created = getNowTimeZone();
 
       // Generate & Save Excel File
       workbook.xlsx.writeBuffer().then((content) => {
@@ -182,11 +190,13 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
         });
         totals = new Total(totals.gross + value.totalGross, totals.btw + value.totalBTW,
           totals.net + value.totalNet);
-        totalsWithoutCash = new Total(totalsWithoutCash.gross + value.totalWithoutGross, totalsWithoutCash.btw + value.totalWithoutBTW,
-          totalsWithoutCash.net + value.totalWithoutNet);
+        totalsWithoutCash =
+          new Total(totalsWithoutCash.gross + value.totalWithoutGross, totalsWithoutCash.btw + value.totalWithoutBTW,
+            totalsWithoutCash.net + value.totalWithoutNet);
 
-        this.quarterSummaryTotals = new SummaryTotals(this.quarterSummaryTotals.income, this.quarterSummaryTotals.expense,
-          this.quarterSummaryTotals.cash, totalsWithoutCash, totals);
+        this.quarterSummaryTotals =
+          new SummaryTotals(this.quarterSummaryTotals.income, this.quarterSummaryTotals.expense,
+            this.quarterSummaryTotals.cash, totalsWithoutCash, totals);
       });
     }
   }
@@ -238,7 +248,8 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
               this.selectedRoom.setValue(key);
             }
           });
-          if (this.quarterSummaryMap.size > 1 && allElementsHaveSameKeyFilterValue(this.quarterSummaryMap, ['currency', 'id'])) {
+          if (this.quarterSummaryMap.size > 1 &&
+            allElementsHaveSameKeyFilterValue(this.quarterSummaryMap, ['currency', 'id'])) {
             this.primaryRoom = this.selectedRoom.value;
           }
         }

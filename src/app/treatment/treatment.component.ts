@@ -5,7 +5,7 @@ import { AppState, selectTreatmentState } from '../store/app.states';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
 import { ITreatment, ITreatmentAll, ITreatmentGroup, Treatment, TreatmentGroup } from '../interfaces/treatment';
-import { createNewDate, formatDuration, getNow, getTime, getTimeNumber } from '../util/dates';
+import { createNewDate, formatDuration, getNowTimeZone, getTime, getTimeNumber } from '../util/dates';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IColorAll } from '../interfaces/color';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
@@ -134,7 +134,7 @@ export class TreatmentComponent implements OnInit, OnDestroy {
 
   setTime(treatment: ITreatment, $event: any): void {
     const time = getTimeNumber($event);
-    const date = createNewDate(getNow(), time?.hour, time?.minute);
+    const date = createNewDate(getNowTimeZone(), time?.hour, time?.minute);
     treatment.time = getTime(date);
   }
 

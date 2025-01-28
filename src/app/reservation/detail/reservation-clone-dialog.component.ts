@@ -3,7 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { SharedModule } from '../../shared/shared.module';
 import { ChangeCustomerDialogComponent } from './change-customer-dialog.component';
-import { filterDateRoom, getAvailability, getNow, getStartEndDay, getTimeNumber, getTime } from '../../util/dates';
+import { filterDateRoom, getAvailability, getNowTimeZone, getStartEndDay, getTime } from '../../util/dates';
 import { addMonths } from 'date-fns';
 import { MAX_RESERVATION_MONTH } from '../../interfaces/reservation';
 
@@ -28,7 +28,7 @@ export class ReservationCloneDialogComponent {
 
   constructor(public dialogRef: MatDialogRef<ChangeCustomerDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
               private formBuilder: UntypedFormBuilder) {
-    this.maxCalendarDate = addMonths(getNow(), MAX_RESERVATION_MONTH);
+    this.maxCalendarDate = addMonths(getNowTimeZone(), MAX_RESERVATION_MONTH);
     this.createForm();
     const { monday, tuesday, wednesday, thursday, friday, saturday, sunday } = getAvailability(this.data.room);
     const {

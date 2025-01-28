@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Availability, IAvailability, IAvailabilityDate } from '../../interfaces/room';
-import { createDate, getTime } from '../../util/dates';
+import { createDate, getCurrentTimeZone, getTime } from '../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
@@ -57,10 +57,11 @@ export class AvailabilityComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    const start = this.dates?.startDate || createDate(9, 0);
-    const end = this.dates?.endDate || createDate(18, 0);
-    const startLunch = this.dates?.startLunchDate || createDate(13, 0);
-    const endLunch = this.dates?.endLunchDate || createDate(14, 0);
+    const timeZone = getCurrentTimeZone();
+    const start = this.dates?.startDate || createDate(timeZone, 9, 0);
+    const end = this.dates?.endDate || createDate(timeZone, 18, 0);
+    const startLunch = this.dates?.startLunchDate || createDate(timeZone, 13, 0);
+    const endLunch = this.dates?.endLunchDate || createDate(timeZone, 14, 0);
 
     this.start.setValue(getTime(start, 'es'));
     this.end.setValue(getTime(end, 'es'));

@@ -4,7 +4,7 @@ import { CalendarEvent, EventColor, GetWeekViewArgs, WeekView, WeekViewAllDayEve
 import { DragEndEvent, DragMoveEvent } from 'angular-draggable-droppable';
 import { TranslateService } from '@ngx-translate/core';
 import { Day } from '../interfaces/reservation';
-import { getNow } from '../util/dates';
+import { getNowTimeZone } from '../util/dates';
 
 export interface IProfessional {
   id: string;
@@ -84,7 +84,7 @@ export class DayViewSchedulerCalendarUtils extends CalendarUtils {
 export class DayViewSchedulerComponent extends CalendarWeekViewComponent implements OnChanges {
   @Input() professionals: IProfessional[] = [];
   @Input() day!: Day;
-  @Input() viewDate: Date = getNow();
+  @Input() viewDate: Date = getNowTimeZone();
   @Input() events: CalendarEvent[] = [];
 
   @Output() professionalChanged = new EventEmitter();

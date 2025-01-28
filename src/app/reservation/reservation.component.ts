@@ -42,7 +42,7 @@ import {
   getCurrentTimeZone,
   getDuration,
   getDurationOrUndefined,
-  getNow,
+  getNowTimeZone,
   getStartEndDay,
   getTime,
   getTimeNumber,
@@ -244,7 +244,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.isAdmin = value.isAdmin;
       this.isDarkMode = value.isDarkMode;
     });
-    this.maxCalendarDate = addMonths(getNow(), MAX_RESERVATION_MONTH);
+    this.maxCalendarDate = addMonths(getNowTimeZone(), MAX_RESERVATION_MONTH);
     const preview = new Step(6, 'preview', () => this.create);
     const book = new Step(5, 'book_online', (goNext: boolean) => this.callStepSeven(goNext), preview);
     const settings = new Step(4, 'settings', (goNext: boolean) => this.callStepSix(goNext), book);
@@ -460,17 +460,17 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.isPreview = false;
       const duration = totalDuration(this.treatment.value, this.additionalSelected);
       this.totalDuration = duration.duration;
-      this.totalDurationFormatted = formatTime(duration.duration, this.dateFormat);
+      this.totalDurationFormatted = formatTime(duration.duration, this.room.value.timeZone, this.dateFormat);
       this.dataEvents = new Map();
 
       const timeZone = this.room.value.timeZone;
-      const now = dateToUTC(createDate(), timeZone);
+      const now = dateToUTC(createDate(timeZone), timeZone);
 
       const { monday, tuesday, wednesday, thursday, friday, saturday, sunday, exclude } = getAvailability(
         this.room.value);
       this.weekendDays = exclude;
       const { min, max } = getStartEndDay(monday, tuesday, wednesday, thursday, friday, saturday, sunday, timeZone);
-      this.day = new Day(min, max, getNow(), exclude, 1);
+      this.day = new Day(min, max, getNowTimeZone(), exclude, 1);
       const unavailable = this.translate.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
       const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
       const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
@@ -758,7 +758,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private dateIsValid(date: Date): boolean {
-    return isBetween(getNow(), this.maxCalendarDate, date);
+    return isBetween(getNowTimeZone(), this.maxCalendarDate, date);
   }
 
   private createForm(): void {
@@ -823,7 +823,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.room.valueChanges.subscribe((value) => {
       if (value) {
         if (!this.dismiss && !isSameTimeZone(value.timeZone)) {
-          const now = getNow();
+          const now = getNowTimeZone();
           const snack = this.snackBar.openFromComponent(TimeZoneSnackBarComponent, {
             data: { date: now, timeZone: value.timeZone }
           });

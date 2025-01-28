@@ -10,7 +10,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../store/app.states';
 import * as fromActionsReservation from '../../store/reservation.actions';
-import { getNow, isSameTimeZone, newDateTimestamp } from '../../util/dates';
+import { getNowTimeZone, isSameTimeZone, newDateTimestamp } from '../../util/dates';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { map, startWith } from 'rxjs/operators';
 import { IUser, IUserAll } from '../../interfaces/user';
@@ -182,7 +182,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     this.subscription = this.getState.subscribe(state => {
       this.customers = state.customers;
       if (state.filter) {
-        const now = getNow();
+        const now = getNowTimeZone();
         this.dataSource = state.filter.content?.map((reservation: IReservationAll) => {
           const reservationStart = newDateTimestamp(reservation.timestamp);
           if (reservationStart && [String(States.created), String(States.approved)].includes(reservation.state)) {

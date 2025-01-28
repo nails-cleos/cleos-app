@@ -16,6 +16,7 @@ export class ChartComponent implements OnChanges, OnDestroy {
   @Input() isLoading: any | boolean;
   @Input() currency?: ICurrency;
   @Input() locale?: string;
+  @Input() timeZone?: string;
 
   chart: IChartUtil | undefined;
 
@@ -41,6 +42,6 @@ export class ChartComponent implements OnChanges, OnDestroy {
       return;
     }
     this.error = undefined;
-    this.chart = createChart(this.chartSummary, this.currency, this.isDarkMode, this.locale);
+    this.chart = createChart(this.chartSummary, this.currency, this.isDarkMode, this.locale, this.timeZone);
   }
 }

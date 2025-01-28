@@ -9,7 +9,7 @@ import { IPayment, PaymentPercentage, PaymentType } from './payment';
 import { IReview } from './review';
 import { IAdditionalAll } from './additional';
 import { addHours, isSameDay } from 'date-fns';
-import { createNewDate, getNow } from '../util/dates';
+import { createNewDate, getNowTimeZone } from '../util/dates';
 import { INoteAll } from './note';
 
 export interface IFabMenu {
@@ -204,7 +204,8 @@ export class DataEvent implements IDataEvent {
   viewDate: Date;
   process: boolean;
 
-  constructor(events: CalendarEvent[], index: number, viewDate: Date, unavailableEventLength: number, process: boolean = false) {
+  constructor(events: CalendarEvent[], index: number, viewDate: Date, unavailableEventLength: number,
+              process: boolean = false) {
     this.calendarEvents = events;
     this.unavailableEventLength = unavailableEventLength;
     this.index = index;
@@ -248,8 +249,8 @@ export class Day implements IDay {
   dayEndMinute: number;
   excludeDays: number[];
 
-  constructor(startDate: Date = createNewDate(getNow(), 9), endDate: Date = createNewDate(getNow(), 18),
-              today: Date = getNow(), excludeDays: number[] = [], plusHour: number = 0) {
+  constructor(startDate: Date = createNewDate(getNowTimeZone(), 9), endDate: Date = createNewDate(getNowTimeZone(), 18),
+              today: Date = getNowTimeZone(), excludeDays: number[] = [], plusHour: number = 0) {
     const startView = addHours(startDate, -plusHour);
     const endView = addHours(endDate, plusHour);
     this.dayStartHour = startView.getHours();
