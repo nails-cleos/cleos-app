@@ -4,8 +4,8 @@ export interface IItem {
   key?: string;
   name: string;
   description?: string;
-  netoPrice: number;
-  brutoPrice: number;
+  netPrice: number;
+  grossPrice: number;
   order: number;
 }
 

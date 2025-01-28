@@ -5,7 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 
 @Injectable()
 export class MonthPeriodAdapter<D> implements MatDateRangeSelectionStrategy<D> {
-  constructor(private readonly translate: TranslateService, private dateAdapter: DateAdapter<D>) {
+  constructor(translate: TranslateService, private dateAdapter: DateAdapter<D>) {
     this.dateAdapter.setLocale(translate.currentLang);
   }
 

@@ -6,7 +6,7 @@ import { MatDatepicker } from '@angular/material/datepicker';
 import { FormControl, UntypedFormControl } from '@angular/forms';
 import { DateAdapter } from '@angular/material/core';
 import { YearAdapter } from '../../util/adapter/year.adapter';
-import { dateMonthYear, getNow } from '../../util/dates';
+import { dateMonthYear, getNowTimeZone } from '../../util/dates';
 import { AppState, selectDashboardState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
 import {
@@ -93,7 +93,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     this.subscribe();
     this.clean();
     this.valueChange();
-    const now = getNow();
+    const now = getNowTimeZone(this.timeZone);
     if (this.extras) {
       this.date.setValue(dateMonthYear(now.getMonth(), this.extras.year));
     } else {
@@ -169,9 +169,10 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
           });
           this.yearSummaryTotals.totals = new Total(this.yearSummaryTotals.totals.gross + value.totalGross,
             this.yearSummaryTotals.totals.btw + value.totalBTW, this.yearSummaryTotals.totals.net + value.totalNet);
-          this.yearSummaryTotals.totalsWithoutCash = new Total(this.yearSummaryTotals.totalsWithoutCash.gross + value.totalWithoutGross,
-            this.yearSummaryTotals.totalsWithoutCash.btw + value.totalWithoutBTW,
-            this.yearSummaryTotals.totalsWithoutCash.net + value.totalWithoutNet);
+          this.yearSummaryTotals.totalsWithoutCash =
+            new Total(this.yearSummaryTotals.totalsWithoutCash.gross + value.totalWithoutGross,
+              this.yearSummaryTotals.totalsWithoutCash.btw + value.totalWithoutBTW,
+              this.yearSummaryTotals.totalsWithoutCash.net + value.totalWithoutNet);
         });
       });
     }
@@ -236,10 +237,11 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
       cashSaleSummary: [...monthly.cashSaleSummary].sort((a, b) => a.timestamp - b.timestamp),
     }));
     if (this.sheetData.length) {
-      const workbook = createYearlyWorkbook(this.sheetData, this.date.value || getNow(), currencySymbol(this.currency), this.timeZone, this.translate);
+      const workbook = createYearlyWorkbook(this.sheetData, this.date.value || getNowTimeZone(this.timeZone),
+        currencySymbol(this.currency), this.timeZone, this.translate);
 
       workbook.creator = this.userName || '';
-      workbook.created = getNow();
+      workbook.created = getNowTimeZone(this.timeZone);
 
       // Generate & Save Excel File
       workbook.xlsx.writeBuffer().then((content) => {
@@ -294,7 +296,8 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
                 this.selectedRoom.setValue(key);
               }
             });
-            if (this.yearSummaryMap.size > 1 && allElementsHaveSameKeyFilterValue(this.yearSummaryMap, ['currency', 'id'])) {
+            if (this.yearSummaryMap.size > 1 &&
+              allElementsHaveSameKeyFilterValue(this.yearSummaryMap, ['currency', 'id'])) {
               this.primaryRoom = this.selectedRoom.value;
             }
           }

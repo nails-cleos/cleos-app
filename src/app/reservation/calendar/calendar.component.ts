@@ -16,7 +16,7 @@ import {
   getAvailability,
   getDuration,
   getDurationOrUndefined,
-  getNow,
+  getNowTimeZone,
   getPreviousSunday,
   getStartEndDay,
   greaterOrEqualsThan,
@@ -62,7 +62,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   data?: IRoomReservation;
   calendar?: ICalendar;
   hourSegments = 4;
-  viewDate: Date = getNow();
+  viewDate: Date = getNowTimeZone();
   locale: string;
   language: string;
   professionalId?: string;
@@ -98,7 +98,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   private authUserServiceSubscription: Subscription;
   private roomId?: string;
   private professionalSelectedId?: string;
-  private today: Date = createNewDate(getNow());
+  private today: Date = createNewDate(getNowTimeZone());
   private isRoomAdmin = false;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
@@ -147,7 +147,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
       this.isDarkMode = darkMode;
       this.isRoomAdmin = value.isRoomAdmin;
     });
-    this.maxDate = addMonths(getNow(), MAX_RESERVATION_MONTH);
+    this.maxDate = addMonths(getNowTimeZone(), MAX_RESERVATION_MONTH);
     this.minDate = new Date(2023, 0, 1);
   }
 
@@ -479,7 +479,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
           customerName: it.displayName
         });
         const startDate = newDateTimestamp(it.dob);
-        startDate.setFullYear(getNow().getFullYear());
+        startDate.setFullYear(getNowTimeZone().getFullYear());
         const color = findStateColor('BIRTHDAY', darkMode);
         const event = allDayEvent(detail, color, startDate, darkMode, `${ this.language }/users/${ it.id }`);
         if (this.calendar) {
@@ -573,7 +573,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
         const timeZone = this.calendar.room.timeZone;
         const { monday, tuesday, wednesday, thursday, friday, saturday, sunday, exclude } = getAvailability(this.calendar.room);
         const { min, max } = getStartEndDay(monday, tuesday, wednesday, thursday, friday, saturday, sunday, timeZone);
-        this.calendar.day = new Day(min, max, getNow(), exclude, 1);
+        this.calendar.day = new Day(min, max, getNowTimeZone(), exclude, 1);
         const unavailable = this.translate.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
         const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
         const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');

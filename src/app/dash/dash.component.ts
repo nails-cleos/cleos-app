@@ -8,7 +8,14 @@ import * as fromActionsDashboard from '../store/dashboard.actions';
 import * as fromActionsReservation from '../store/reservation.actions';
 import { IReservationSummary, States } from '../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
-import { getDurationOrUndefined, getEnd, getEndWithDuration, getNow, greaterOrEqualsThan, newDateTimestamp } from '../util/dates';
+import {
+  getDurationOrUndefined,
+  getEnd,
+  getEndWithDuration,
+  greaterOrEqualsThan,
+  newDateTimestamp,
+  getNowTimeZone
+} from '../util/dates';
 import { CalendarEvent, CalendarMonthViewDay, CalendarView } from 'angular-calendar';
 import { findStateColor, getStateOrder } from '../util/theme';
 import { allDayEvent, getFrequency, IMeta, Meta, monthEvent } from '../util/event';
@@ -23,6 +30,7 @@ import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
 import { numberFormat } from '../util/numbers';
 import { ICurrency } from '../interfaces/currency';
 import { AuthUserService } from '../services/auth-user.service';
+import { toZonedTime } from "date-fns-tz";
 
 @Component({
   selector: 'app-dash',
@@ -48,6 +56,7 @@ export class DashComponent implements OnInit, OnDestroy {
 
   currency?: ICurrency;
   all?: boolean;
+  timeZone?: string;
   thisMonthTotal: string;
 
   miniCardData: IReservationSummary[] = [{} as IReservationSummary, {} as IReservationSummary,
@@ -121,7 +130,7 @@ export class DashComponent implements OnInit, OnDestroy {
       this.viewDate = extras.date;
       this.activeDayIsOpen = true;
     } else {
-      this.viewDate = getNow();
+      this.viewDate = getNowTimeZone(this.timeZone);
       this.activeDayIsOpen = false;
     }
     this.dateFormat = this.translate.currentLang;
@@ -279,6 +288,7 @@ export class DashComponent implements OnInit, OnDestroy {
         this.currency = state.currency;
         this.state = state;
         this.all = state.all;
+        this.timeZone = state.timeZone;
         this.thisMonthTotal = numberFormat(state.thisMonthTotal || 0, this.currency, this.dateFormat);
         this.createEvents(this.isDarkMode);
         if (!state.chartSummaries && !state.miniCardSummaries) {
@@ -347,10 +357,10 @@ export class DashComponent implements OnInit, OnDestroy {
       calendarSummary.reservations?.forEach(it => {
         const start = newDateTimestamp(it.start);
         const end = it.end ? newDateTimestamp(it.end) : null;
-        this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNow());
+        this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNowTimeZone(this.timeZone));
 
         const event = monthEvent(it.title, start, end, it.reservationId, findStateColor(it.state, darkMode),
-          new Meta(true, this.state.timeZone, it.state, [this.language, 'reservation', it.reservationId], undefined, it.total),
+          new Meta(true, this.timeZone, it.state, [this.language, 'reservation', it.reservationId], undefined, it.total),
           darkMode);
         if (event) {
           this.events = [...this.events, event];
@@ -363,13 +373,13 @@ export class DashComponent implements OnInit, OnDestroy {
           return;
         }
         const start = newDateTimestamp(it.start);
-        this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNow());
+        this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNowTimeZone(this.timeZone));
         const title = it.duration ? it.title : `${ this.translate.instant('COMMON.ALL_DAY.CHECK') } - ${ it.title }`;
 
         if (it.repeat === FrequencyEnum.none) {
           const end = getEnd(start, it.duration);
           const event = monthEvent(title, start, end, it.unavailableId, findStateColor('DEFAULT', darkMode),
-            new Meta(!!it.duration, this.state.timeZone, 'UNAVAILABLE', [this.language, 'unavailable', it.unavailableId]), darkMode);
+            new Meta(!!it.duration, this.timeZone, 'UNAVAILABLE', [this.language, 'unavailable', it.unavailableId]), darkMode);
           if (event) {
             this.events = [...this.events, event];
           }
@@ -381,26 +391,26 @@ export class DashComponent implements OnInit, OnDestroy {
 
       calendarSummary.birthdays?.forEach(it => {
         const startDate = newDateTimestamp(it.date);
-        startDate.setFullYear(getNow().getFullYear());
+        startDate.setFullYear(getNowTimeZone(this.timeZone).getFullYear());
         const color = findStateColor('BIRTHDAY', darkMode);
         const event = allDayEvent(it.title, color, startDate, darkMode, `${ this.language }/users/${ it.userId }`,
-          new Meta(false, this.state.timeZone, 'BIRTHDAY', [this.language, 'users', it.userId]));
+          new Meta(false, this.timeZone, 'BIRTHDAY', [this.language, 'users', it.userId]));
         this.events = [...this.events, event];
       });
 
       calendarSummary.transactions?.forEach(it => {
         const startDate = newDateTimestamp(it.createdAt);
-        startDate.setFullYear(getNow().getFullYear());
+        startDate.setFullYear(getNowTimeZone(this.timeZone).getFullYear());
         const color = findStateColor('TRANSACTION', darkMode);
         const event = allDayEvent(it.title, color, startDate, darkMode,
           `${ this.language }/accounts/${ it.accountId }/transactions/ ${ it.transactionId }`,
-          new Meta(false, this.state.timeZone, 'TRANSACTION', [this.language, 'accounts', it.accountId, 'transactions', it.transactionId],
+          new Meta(false, this.timeZone, 'TRANSACTION', [this.language, 'accounts', it.accountId, 'transactions', it.transactionId],
             undefined, it.total));
         this.events = [...this.events, event];
       });
 
       calendarSummary.notes.forEach(it => {
-        const startDate = newDateTimestamp(it.date, this.state.timeZone);
+        const startDate = newDateTimestamp(it.date, this.timeZone);
         if (it.repeat === FrequencyEnum.none) {
           this.createNoteEvent(it, startDate, darkMode);
         } else {
@@ -420,7 +430,7 @@ export class DashComponent implements OnInit, OnDestroy {
         r.rule.all().forEach((date: Date) => {
           const end = getEndWithDuration(date, r.duration);
           const event = monthEvent(r.title, date, end, r.id, findStateColor(r.state, darkMode),
-            new Meta(!!r.duration, this.state.timeZone, r.state, [r.path, r.id]), darkMode);
+            new Meta(!!r.duration, this.timeZone, r.state, [r.path, r.id]), darkMode);
           if (event) {
             this.events = [...this.events, event];
           }
@@ -434,7 +444,7 @@ export class DashComponent implements OnInit, OnDestroy {
   private createNoteEvent(note: ICalendarNote, date: Date, darkMode: boolean): void {
     const color = findStateColor('NOTE', darkMode);
     const event = allDayEvent(note.title, color, date, darkMode, `${ this.language }/notes/${ note.noteId }`,
-      new Meta(false, this.state.timeZone, 'NOTE', [this.language, 'notes', note.noteId]));
+      new Meta(false, this.timeZone, 'NOTE', [this.language, 'notes', note.noteId]));
     this.events = [...this.events, event];
   }
 

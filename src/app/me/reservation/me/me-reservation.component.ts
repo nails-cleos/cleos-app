@@ -23,7 +23,7 @@ import {
   formatFullDateTime,
   formatTime,
   getCurrentTimeZone,
-  getNow,
+  getNowTimeZone,
   getTime,
   IDuration,
   isSameTimeZone,
@@ -189,7 +189,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.dateFormat = this.translate.currentLang;
     breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small])
       .subscribe(result => this.smallScreen = result.matches);
-    this.minDate = getNow();
+    this.minDate = getNowTimeZone();
     this.maxDate = plusMonthDate(this.minDate, this.reservationMonths, this.minDate.getDate() + 1);
     this.maxDateFormat = formatDateTwoDigit(this.maxDate, this.dateFormat);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
@@ -367,7 +367,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       this.time = undefined;
     }
     const duration = totalDuration(this.treatment.value, this.additionalSelected);
-    this.totalDurationFormatted = formatTime(duration.duration, this.dateFormat);
+    this.totalDurationFormatted = formatTime(duration.duration, this.room.value.timeZone, this.dateFormat);
 
     this.store.dispatch(
       new fromActionsReservation.CustomerSearchReservation({
@@ -592,7 +592,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.room.valueChanges.subscribe(value => {
       if (value) {
         if (!this.dismiss && !isSameTimeZone(value.timeZone)) {
-          const now = getNow();
+          const now = getNowTimeZone();
           const snack = this.snackBar.openFromComponent(TimeZoneSnackBarComponent, {
             data: { date: now, timeZone: value.timeZone }
           });

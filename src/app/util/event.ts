@@ -7,7 +7,7 @@ import {
   dateToUTC,
   daysOfWeek,
   getCurrentTimeZone,
-  getNow,
+  getNowTimeZone,
   getTimeNumber,
   getWeekDay,
   greaterOrEqualsThan,
@@ -90,7 +90,7 @@ export const fillNotAvailable = (unavailable: string, lunch: string, notWorking:
 export const newEvent = (title: string, color: string, start: Date, isDarkMode: boolean, end?: Date,
                          id?: string, meta: IMeta = new Meta(),
                          draggable: boolean = false): CalendarEvent | undefined => {
-  if (greaterOrEqualsThanToday(start)) {
+  if (greaterOrEqualsThanToday(start, meta.timeZone)) {
     return {
       id,
       start,
@@ -196,7 +196,7 @@ const createEvent = (date: Date, notWorking: string, unavailable: string,
       isDarkMode, createNewDate(date, 23, 59), 'NOT_WORKING_ALL_DAY');
     events = [...events, event];
   } else {
-    const now = getNow();
+    const now = getNowTimeZone();
     const nowTime = getTimeNumber(now)!;
     const hour = nowTime.hour;
     const minute = nowTime.minute;
@@ -234,7 +234,7 @@ const createEvent = (date: Date, notWorking: string, unavailable: string,
 
 const createLunchEvent = (it: IAvailability, date: Date, unavailable: string, lunch: string,
                           isDarkMode: boolean, timeZone: string): CalendarEvent | undefined => {
-  const now = getNow();
+  const now = getNowTimeZone();
   const nowTime = getTimeNumber(now)!;
   let hour = nowTime.hour;
   let minute = nowTime.minute;
@@ -255,8 +255,8 @@ const createLunchEvent = (it: IAvailability, date: Date, unavailable: string, lu
         return lunchEvent(hour, lunchStartHour, minute, lunchStartMinute, lunchEndHour, lunchEndMinute, date, lunch,
           isDarkMode, timeZone);
       }
-      const start = dateToUTC(createDate(), timeZone);
-      const end = dateToUTC(createDate(hour, minute), timeZone);
+      const start = dateToUTC(createDate(timeZone), timeZone);
+      const end = dateToUTC(createDate(timeZone, hour, minute), timeZone);
       return newEvent(unavailable, findStateColor('DEFAULT', isDarkMode), start, isDarkMode, end);
     } else {
       const start = dateToUTC(createNewDate(date, lunchStartHour, lunchStartMinute), timeZone);

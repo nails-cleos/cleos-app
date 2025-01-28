@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, NgZone, Output, Renderer2, ViewChild } from '@angular/core';
-import { getNow } from '../dates';
+import { getNowTimeZone } from '../dates';
 
 @Component({
   selector: 'app-counter',
@@ -15,7 +15,7 @@ export class CounterComponent {
   constructor(private zone: NgZone, private renderer: Renderer2) {
     this.zone.runOutsideAngular(() => {
       setInterval(() => {
-        const now = getNow();
+        const now = getNowTimeZone();
         this.refreshViewDate.emit(now);
         const hours = `0${now.getHours()}`.slice(-2);
         const minutes = `0${now.getMinutes()}`.slice(-2);

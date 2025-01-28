@@ -12,11 +12,11 @@ import {
   getDurationOrUndefined,
   getEnd,
   getMinutesBetweenTimesABS,
-  getNow,
   getRoomStartEndDay,
   isBetween,
   newDate,
   newDateTimestamp,
+  getNowTimeZone,
   startOfPeriod,
   subPeriod
 } from '../util/dates';
@@ -45,10 +45,10 @@ import { AuthUserService } from '../services/auth-user.service';
 export class DashboardComponent implements OnInit, OnDestroy {
   @ViewChild('picker') picker: any;
 
-  viewDate: Date = getNow();
-  endDate: Date = getNow();
-  startDate: Date = getNow();
-  today: Date = createNewDate(getNow());
+  viewDate: Date = getNowTimeZone();
+  endDate: Date = getNowTimeZone();
+  startDate: Date = getNowTimeZone();
+  today: Date = createNewDate(getNowTimeZone());
   maxDate: Date;
   day: Day;
   dashboard?: IRoomEvents;
@@ -89,7 +89,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.locale = translate.currentLang;
     this.language = this.translate.currentLang;
     this.day = new Day();
-    this.maxDate = addMonths(getNow(), MAX_RESERVATION_MONTH);
+    this.maxDate = addMonths(getNowTimeZone(), MAX_RESERVATION_MONTH);
     this.approveText = translate.instant('DASHBOARD.ROOM.APPROVE') ?? 'APPROVE';
     this.startText = translate.instant('DASHBOARD.ROOM.START');
     this.completeText = translate.instant('DASHBOARD.ROOM.COMPLETE');
@@ -192,7 +192,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  private createTitle(calendarEvent: CalendarEvent, now: Date = getNow()): CalendarEvent {
+  private createTitle(calendarEvent: CalendarEvent, now: Date = getNowTimeZone()): CalendarEvent {
     const matcher = calendarEvent.title.match(/(?<=<b>\s*).*?(?=\s*<\/b>)/gs);
     const title = matcher ? `<b>${ matcher[0] }</b>` : calendarEvent.title;
 
@@ -246,7 +246,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     const isNow = isToday(calendarEvent.start);
-    const showStart = isNow && [States.approved, States.partiallyPaid, States.paid].indexOf(calendarEvent.meta.state) >= 0;
+    const showStart = isNow && [States.approved, States.partiallyPaid, States.paid].indexOf(calendarEvent.meta.state) >=
+      0;
     const showComplete = isNow && [States.started].indexOf(calendarEvent.meta.state) >= 0;
     const showApprove = [States.created].indexOf(calendarEvent.meta.state) >= 0;
 
@@ -352,7 +353,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.startDate = createNewDate(this.startDate, this.day.dayStartHour, this.day.dayStartMinute);
       this.dashboard.professionals.forEach((professionalEvent: IProfessionalEvent) => {
         const professional = new Professional(professionalEvent.id, professionalEvent.name,
-          DashboardComponent.getProfessionalImage(professionalEvent), DashboardComponent.getColor(professionalEvent, darkMode));
+          DashboardComponent.getProfessionalImage(professionalEvent),
+          DashboardComponent.getColor(professionalEvent, darkMode));
 
         let reservations = 0;
         let seconds = 0;

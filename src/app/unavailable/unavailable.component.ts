@@ -18,7 +18,7 @@ import {
   formatTime,
   getCurrentTimeZone,
   getMinMaxDate,
-  getNow,
+  getNowTimeZone,
   getTime,
   getTimeNumber,
   newDate,
@@ -63,12 +63,14 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
   private getState: Observable<any>;
   private subscription?: Subscription;
   private readonly extras: any;
+  private readonly timeZone: string;
 
   constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router,
               private route: ActivatedRoute, private translate: TranslateService, public dialog: MatDialog) {
     this.isAddMode = true;
     this.getState = this.store.select(selectUnavailableState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
+    this.timeZone = getCurrentTimeZone();
   }
 
   get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
@@ -95,7 +97,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
     unavailable.repeat = fieldChange(this.getForm.repeat as UntypedFormControl, this.unavailable?.repeat);
 
     unavailable.start = date.toLocaleString(API_LOCALE);
-    unavailable.timeZone = getCurrentTimeZone();
+    unavailable.timeZone = this.timeZone;
     unavailable.allDay = this.getForm.allDay.value;
     if (this.getForm.endDate.value) {
       unavailable.end = createNewDate(this.getForm.endDate.value).toLocaleString(API_LOCALE);
@@ -132,7 +134,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
   get focusin(): void {
     if (this.rooms.length && this.getForm.startTime.value) {
       const time = getTimeNumber(this.getForm.startTime.value);
-      const date = createNewDate(this.getForm.startDate.value ? newDate(this.getForm.startDate.value) : getNow(), time?.hour,
+      const date = createNewDate(this.getForm.startDate.value ? newDate(this.getForm.startDate.value) : getNowTimeZone(), time?.hour,
         time?.minute);
       const day = date.getDay();
       const { minDate, maxDate, roomAvailability } = getMinMaxDate(day, date, this.rooms);
@@ -273,7 +275,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
       if (value) {
         const startDate = this.getForm.startDate.value;
         const time = getTimeNumber(value);
-        const date = createNewDate(startDate ? newDate(startDate) : getNow(), time?.hour, time?.minute);
+        const date = createNewDate(startDate ? newDate(startDate) : getNowTimeZone(), time?.hour, time?.minute);
 
         this.calculateMaxDuration(date);
       }
@@ -303,9 +305,9 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
       const maxHour = max.hour;
       const diffMin = max.minute;
 
-      const d = diffTime(date, Number(maxHour), Number(diffMin));
+      const d = diffTime(date, this.timeZone, Number(maxHour), Number(diffMin));
       this.showDuration = true;
-      this.durationMax = formatTime(d);
+      this.durationMax = formatTime(d, this.timeZone);
       if (this.isAddMode) {
         this.getForm.duration.setValue(undefined);
       }

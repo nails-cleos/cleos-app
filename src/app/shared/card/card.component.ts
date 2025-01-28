@@ -17,6 +17,7 @@ export class CardComponent implements OnDestroy {
   @Input() chart?: IChart;
   @Input() currency?: ICurrency;
   @Input() locale?: string;
+  @Input() timeZone?: string;
 
   private authUserServiceSubscription: Subscription;
   private isDarkMode: boolean;
@@ -28,7 +29,7 @@ export class CardComponent implements OnDestroy {
 
   get onClick(): void {
     if (this.chart) {
-      const chart = createChart(this.chart, this.currency, this.isDarkMode, this.locale);
+      const chart = createChart(this.chart, this.currency, this.isDarkMode, this.locale, this.timeZone);
       this.dialog.open(CardChartComponent, {
         height: '85vh',
         width: '70vw',

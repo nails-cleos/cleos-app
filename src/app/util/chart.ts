@@ -2,6 +2,7 @@ import { ChartConfiguration, ChartOptions, ChartType, TooltipItem } from 'chart.
 import { IChart } from '../interfaces/dashboard';
 import { ICurrency } from '../interfaces/currency';
 import { numberFormat } from './numbers';
+import { newDateTimestamp, getNowTimeZone } from "./dates";
 
 export interface IChartUtil {
   labels: any[];
@@ -10,7 +11,8 @@ export interface IChartUtil {
   options: ChartOptions;
 }
 
-export const createChart = (chart: IChart, currency?: ICurrency, isDark?: boolean, locale?: string): IChartUtil => {
+export const createChart = (chart: IChart, currency?: ICurrency, isDark?: boolean, locale?: string,
+                            timeZone?: string): IChartUtil => {
   let colors: any[];
   switch (chart.colors) {
     case 'COLORS_ARRAY':
@@ -26,13 +28,13 @@ export const createChart = (chart: IChart, currency?: ICurrency, isDark?: boolea
       options = barChartNoLabelOptions(isDark);
       break;
     case 'BAR_CHART':
-      options = barChartDefaultOptions(undefined, chart.sum, isDark, locale);
+      options = barChartDefaultOptions(chart.sum, isDark, locale, timeZone);
       break;
     case 'LINE_CHART_CURRENCY':
-      options = lineChartDefaultOptions(currency, chart.sum, isDark, locale, chart.footer);
+      options = lineChartDefaultOptions(chart.sum, isDark, locale, timeZone, currency, chart.footer);
       break;
     case 'LINE_CHART':
-      options = lineChartDefaultOptions(undefined, chart.sum, isDark, locale);
+      options = lineChartDefaultOptions(chart.sum, isDark, locale, timeZone);
       break;
     case 'RADAR_CHART':
       options = radarChartDefaultOptions(isDark);
@@ -41,7 +43,7 @@ export const createChart = (chart: IChart, currency?: ICurrency, isDark?: boolea
       options = pieChartPercentageOptions();
       break;
     case 'TIME_CHART':
-      options = barChartTimeOptions(isDark);
+      options = barChartTimeOptions(isDark, timeZone);
       break;
     case 'CHART':
     default:
@@ -138,7 +140,8 @@ const radarChartDefaultOptions = (isDark?: boolean): ChartOptions<'radar'> => {
   return options;
 };
 
-const barChartDefaultOptions = (currency?: ICurrency, sum?: boolean, isDark?: boolean, locale?: string): ChartOptions<'bar'> => {
+const barChartDefaultOptions = (sum?: boolean, isDark?: boolean, locale?: string, timeZone?: string,
+                                currency?: ICurrency): ChartOptions<'bar'> => {
   let options: ChartOptions<'bar'>;
   if (isDark) {
     options = {
@@ -169,7 +172,7 @@ const barChartDefaultOptions = (currency?: ICurrency, sum?: boolean, isDark?: bo
         },
         tooltip: {
           callbacks: {
-            label: (tooltipItem: any) => label(tooltipItem, currency, sum, locale),
+            label: (tooltipItem: any) => label(tooltipItem, currency, sum, locale, timeZone),
             footer: (tooltipItems: any) => footer(tooltipItems, currency, sum, locale),
           }
         }
@@ -200,7 +203,7 @@ const barChartDefaultOptions = (currency?: ICurrency, sum?: boolean, isDark?: bo
         },
         tooltip: {
           callbacks: {
-            label: (tooltipItem: any) => label(tooltipItem, currency, sum, locale),
+            label: (tooltipItem: any) => label(tooltipItem, currency, sum, locale, timeZone),
             footer: (tooltipItems: any) => footer(tooltipItems, currency, sum, locale),
           }
         }
@@ -211,10 +214,11 @@ const barChartDefaultOptions = (currency?: ICurrency, sum?: boolean, isDark?: bo
 };
 
 const lineChartDefaultOptions = (
-  currency?: ICurrency,
   sum?: boolean,
   isDark?: boolean,
   locale?: string,
+  timeZone?: string,
+  currency?: ICurrency,
   footerTitle?: string
 ): ChartOptions<'bar'> => {
   let options: ChartOptions<'bar'>;
@@ -245,7 +249,7 @@ const lineChartDefaultOptions = (
         },
         tooltip: {
           callbacks: {
-            label: (tooltipItem: any) => label(tooltipItem, currency, sum, locale),
+            label: (tooltipItem: any) => label(tooltipItem, currency, sum, locale, timeZone),
             footer: (tooltipItems: any) => footer(tooltipItems, currency, sum, locale, footerTitle)
           }
         }
@@ -272,7 +276,7 @@ const lineChartDefaultOptions = (
         },
         tooltip: {
           callbacks: {
-            label: (tooltipItem: any) => label(tooltipItem, currency, sum, locale),
+            label: (tooltipItem: any) => label(tooltipItem, currency, sum, locale, timeZone),
             footer: (tooltipItems) => footer(tooltipItems, currency, sum, locale, footerTitle)
           }
         }
@@ -288,14 +292,15 @@ const footer = (tooltipItems: any, currency?: ICurrency, sum?: boolean, locale?:
   return tooltipItems.length > 1 ? createTooltip(title || 'Total', total, currency, locale) : '';
 };
 
-const label = (tooltipItem: any, currency?: ICurrency, sum?: boolean, locale?: string) => {
+const label = (tooltipItem: any, currency?: ICurrency, sum?: boolean, locale?: string, timeZone?: string) => {
   if (!sum && tooltipItem.datasetIndex) {
     const previous = Number(tooltipItem.chart.data.datasets[tooltipItem.datasetIndex - 1].data[tooltipItem.dataIndex]);
 
     return createTooltip(tooltipItem.dataset.label, Number(tooltipItem.raw) - previous, currency, locale);
   }
 
-  const addTooltip = !tooltipItem.dataset.borderDash || tooltipItem.dataset.borderDash && (new Date(tooltipItem.label) > new Date());
+  const addTooltip = !tooltipItem.dataset.borderDash || tooltipItem.dataset.borderDash &&
+    (newDateTimestamp(tooltipItem.label, timeZone) > getNowTimeZone(timeZone));
 
   return addTooltip ? createTooltip(tooltipItem.dataset.label, tooltipItem.raw, currency, locale) : '';
 };
@@ -461,7 +466,7 @@ const externalTooltipHandler = (context: any) => {
   tooltipEl.style.padding = tooltip.options.padding + 'px ' + tooltip.options.padding + 'px';
 };
 
-const barChartTimeOptions = (isDark?: boolean): ChartOptions<'bar'> => {
+const barChartTimeOptions = (isDark?: boolean, timeZone?: string): ChartOptions<'bar'> => {
   let options: ChartOptions<'bar'>;
   if (isDark) {
     options = {
@@ -471,7 +476,7 @@ const barChartTimeOptions = (isDark?: boolean): ChartOptions<'bar'> => {
           grid: { color: 'rgba(255,255,255,0.1)' },
           beginAtZero: true,
           ticks: {
-            callback: (v: any) => formatSecsAsHourMin(v),
+            callback: (v: any) => formatSecsAsHourMin(v, timeZone),
             stepSize: 1800,
             color: 'white'
           }
@@ -486,7 +491,7 @@ const barChartTimeOptions = (isDark?: boolean): ChartOptions<'bar'> => {
           mode: 'index',
           intersect: false,
           callbacks: {
-            label: (tooltipItem: any) => barChatTimeLabel(tooltipItem)
+            label: (tooltipItem: any) => barChatTimeLabel(tooltipItem, timeZone)
           }
         }
       }
@@ -498,7 +503,7 @@ const barChartTimeOptions = (isDark?: boolean): ChartOptions<'bar'> => {
         y: {
           beginAtZero: true,
           ticks: {
-            callback: (v: any) => formatSecsAsHourMin(v),
+            callback: (v: any) => formatSecsAsHourMin(v, timeZone),
             stepSize: 1800
           }
         }
@@ -508,7 +513,7 @@ const barChartTimeOptions = (isDark?: boolean): ChartOptions<'bar'> => {
           mode: 'index',
           intersect: false,
           callbacks: {
-            label: (tooltipItem: any) => barChatTimeLabel(tooltipItem)
+            label: (tooltipItem: any) => barChatTimeLabel(tooltipItem, timeZone)
           }
         }
       }
@@ -534,15 +539,16 @@ const pieChatPercentageLabel = (tooltipItem: TooltipItem<'pie'>): string => {
   return `${ tooltipItem.label }: ${ (Number(tooltipItem.raw) * 100 / total).toFixed(2) }%`;
 };
 
-const formatSecsAsHourMin = (d: any): string => new Date(d * 1000).toISOString().substring(11, 16);
+const formatSecsAsHourMin = (d: any, timeZone?: string): string => newDateTimestamp(d, timeZone).toISOString()
+  .substring(11, 16);
 
-const barChatTimeLabel = (tooltipItem: any): string => {
+const barChatTimeLabel = (tooltipItem: any, timeZone?: string): string => {
   let label = tooltipItem.dataset.label || '';
   if (label) {
     label += ': ';
   }
   if (tooltipItem.parsed.y !== null) {
-    label += formatSecsAsHourMin(tooltipItem.parsed.y);
+    label += formatSecsAsHourMin(tooltipItem.parsed.y, timeZone);
   }
   return label;
 };

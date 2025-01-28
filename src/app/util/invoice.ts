@@ -129,7 +129,7 @@ const itemBody = (name: string, neto: number, bruto: number, symbol: string): an
 const createItems = (itemTitle: any, itemList: IItem[], currency: string): any => {
   let body = [itemTitle];
   itemList.forEach(item => {
-    const add = itemBody(item.name, item.netoPrice, item.brutoPrice, currency);
+    const add = itemBody(item.name, item.netPrice, item.grossPrice, currency);
     body = [...body, add];
   });
   return {

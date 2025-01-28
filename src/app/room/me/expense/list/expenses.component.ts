@@ -14,7 +14,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import * as fromActionsExpense from '../../../../store/expense.actions';
 import { DialogComponent } from '../../../../shared/dialog/generic/dialog.component';
 import { ActivatedRoute } from '@angular/router';
-import { getDateFormat, getNow, isSameTimeZone, newDateTimestamp } from '../../../../util/dates';
+import { getDateFormat, getNowTimeZone, isSameTimeZone, newDateTimestamp } from '../../../../util/dates';
 import { openDialog } from '../../../../util/helper';
 import { DateAdapter } from '@angular/material/core';
 import { YearMonthAdapter } from '../../../../util/adapter/year-month.adapter';
@@ -95,7 +95,7 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   setMonthAndYear(normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>): void {
-    const ctrlValue = this.date.value || getNow();
+    const ctrlValue = this.date.value || getNowTimeZone();
 
     ctrlValue.setMonth(normalizedMonthAndYear.getMonth());
     ctrlValue.setFullYear(normalizedMonthAndYear.getFullYear());
