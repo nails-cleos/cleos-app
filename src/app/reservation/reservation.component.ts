@@ -516,14 +516,16 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   callStepSeven(goNext: boolean): void {
     this.errors.schedule = [];
     this.errors.overlapping = false;
-    for (const dataEvent of this.dataEvents.values()) {
-      this.events.value.forEach((calendarEvent: any) => {
-        const event: CalendarEvent = calendarEvent.event;
-        if (!dataEvent.calendarEvents.includes(event)) {
+    if (!this.eventGroup.invalid) {
+      for (const dataEvent of this.dataEvents.values()) {
+        const missingEvent = this.events.value.some((calendarEvent: {
+          event: CalendarEvent
+        }) => !dataEvent.calendarEvents.includes(calendarEvent.event));
+
+        if (missingEvent) {
           this.errors.schedule[dataEvent.index] = true;
-          return;
         }
-      });
+      }
     }
     if (this.errors.schedule.length) {
       return;
@@ -597,7 +599,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }, true);
     } else {
-      this.createEvent(eventKey, date, state, id);
+      this.createEvent(eventKey, date, state, id || `${Math.random()}`);
     }
   }
 
