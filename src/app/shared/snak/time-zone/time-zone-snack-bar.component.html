@@ -1,5 +1,5 @@
 <mat-grid-list cols="6">
-  <mat-grid-tile class="warning" colspan="6">{{'COMMON.TIME_ZONE.WARNING' | translate}}</mat-grid-tile>
+  <mat-grid-tile class="warning-snack-bar" colspan="6">{{'COMMON.TIME_ZONE.WARNING' | translate}}</mat-grid-tile>
   <mat-grid-tile colspan="5">
     <div>
       <div [innerHTML]="'COMMON.TIME_ZONE.DATE.LOCAL' | translate: {date: localDate}"></div>
@@ -7,6 +7,6 @@
     </div>
   </mat-grid-tile>
   <mat-grid-tile>
-    <button (click)="snackBarRef.dismiss()" color="accent" mat-button>{{ action }}</button>
+    <button (click)="snackBarRef.dismiss()" class="accent-snack-bar" mat-button>{{ action }}</button>
   </mat-grid-tile>
 </mat-grid-list>
