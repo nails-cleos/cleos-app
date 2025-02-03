@@ -225,6 +225,7 @@ export interface IMonthlySummary {
   timestamp: number;
   total: ISummaryTotal;
   day: any;
+  reservationTimestamp?: number;
 }
 
 export interface IMonthlySummarySale extends IMonthlySummary {

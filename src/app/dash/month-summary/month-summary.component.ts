@@ -403,14 +403,19 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     let totals;
     let size;
+    const date = getDateFormat(this.date.value);
     switch (totalTypes.type) {
       case SummaryType.cash:
         totals = Array.from(totalTypes.totals.values());
-        size = this.summaryCash?.length;
+        size = this.summaryCash?.filter(
+          sr => sr.reservationTimestamp && date === getDateFormat(newDateTimestamp(sr.reservationTimestamp))
+        )?.length;
         break;
       case SummaryType.payment:
         totals = Array.from(totalTypes.totals.values());
-        size = this.summaryReservations?.length;
+        size = this.summaryReservations?.filter(
+          sr => sr.reservationTimestamp && date === getDateFormat(newDateTimestamp(sr.reservationTimestamp))
+        )?.length;
         break;
       case SummaryType.expense:
         totals = Array.from(totalTypes.totals, ([key, value]) => ({
@@ -528,7 +533,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
       this.summaryReservations = summary?.summarySale.map((s, i) => {
         if (s.id) {
           const reservationDate = newDateTimestamp(s.timestamp);
-          return Object.assign({}, s, { reservationDate, day: reservationDate.getDate(), position: i });
+          return Object.assign({}, s, { day: reservationDate.getDate(), position: i });
         }
         return s;
       });
@@ -537,7 +542,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
       this.summaryExpenses = summary?.summaryExpenses.map((s, i) => {
         if (s.id) {
           const expenseDate = newDateTimestamp(s.timestamp);
-          return Object.assign({}, s, { expenseDate, day: expenseDate.getDate(), position: i });
+          return Object.assign({}, s, { day: expenseDate.getDate(), position: i });
         }
         return s;
       });
@@ -546,7 +551,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
       this.summaryCash = summary?.summaryCashSale.map((s, i) => {
         if (s.id) {
           const reservationDate = newDateTimestamp(s.timestamp);
-          return Object.assign({}, s, { reservationDate, day: reservationDate.getDate(), position: i });
+          return Object.assign({}, s, { day: reservationDate.getDate(), position: i });
         }
         return s;
       });
