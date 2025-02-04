@@ -16,7 +16,7 @@ import { Observable, Subscription } from 'rxjs';
 import { AppState, selectExpenseState } from '../../../store/app.states';
 import { Store } from '@ngrx/store';
 import * as fromActionsExpense from '../../../store/expense.actions';
-import { API_LOCALE, getNowTimeZone, newDateTimestamp } from '../../../util/dates';
+import { API_LOCALE, createNewDateZonedTime, getNowTimeZone } from '../../../util/dates';
 import { fieldChange, noDuplicateDatesValidator } from '../../../util/validators';
 import { map, startWith } from 'rxjs/operators';
 
@@ -44,7 +44,8 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
   private readonly language: string;
 
-  constructor(private readonly translate: TranslateService, private store: Store<AppState>, private formBuilder: FormBuilder,
+  constructor(private readonly translate: TranslateService, private store: Store<AppState>,
+              private formBuilder: FormBuilder,
               private route: ActivatedRoute, private router: Router) {
     this.isAddMode = true;
     this.today = getNowTimeZone();
@@ -78,7 +79,8 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     expense.invoice = fieldChange(this.getForm.invoice as UntypedFormControl, this.expense?.invoice);
     expense.supplyStore = supplyStore?.id ? supplyStore.id : supplyStore;
     expense.totals = this.totals.value;
-    expense.date = this.getForm.date.value.toLocaleString(API_LOCALE);
+    expense.date =
+      createNewDateZonedTime(this.getForm.date.value, this.expense?.room?.timeZone).toLocaleString(API_LOCALE);
 
     if (this.isAddMode) {
       return this.store.dispatch(
@@ -197,7 +199,8 @@ export class ExpenseComponent implements OnInit, OnDestroy {
 
     this.filteredSupplyStore = this.getForm.supplyStore.valueChanges.pipe(startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterSupplyStore(name) : this.supplyStores ? this.supplyStores.slice() : this.supplyStores)
+      map(
+        name => name ? this.filterSupplyStore(name) : this.supplyStores ? this.supplyStores.slice() : this.supplyStores)
     );
   }
 
@@ -247,7 +250,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       this.expense = state.selected;
       if (this.expense?.id) {
         this.form.patchValue(this.expense);
-        this.getForm.date.setValue(newDateTimestamp(this.expense.timestamp, this.expense.room?.timeZone));
+        this.getForm.date.setValue(createNewDateZonedTime(this.expense.timestamp, this.expense.room?.timeZone));
         this.removeExpense(0);
         this.expense.totals.forEach((it, index) => {
           let btw = '';

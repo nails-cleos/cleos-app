@@ -60,7 +60,7 @@ export class DashboardEffects {
     () => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.saveMonthlySummary)).pipe(
       map((action: any) => action.payload),
       switchMap((payload: any) => this.dashboardService.saveMonthlySummary(payload.date, payload.type, payload.totals,
-        payload.summaries, payload.roomId, payload.size).pipe(
+        payload.summaries, payload.roomId).pipe(
         switchMap(() => of(new fromActionsDashboard.UpdateMonthlySummarySuccess({
           date: payload.date,
           step: payload.step,
