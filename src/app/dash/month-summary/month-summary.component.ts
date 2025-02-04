@@ -402,27 +402,18 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
   updateMonthlySummary(totalTypes: ITotalType, summaries: IMonthlySummaryRequest[]): void {
     this.isLoading = true;
     let totals;
-    let size;
-    const date = getDateFormat(this.date.value);
     switch (totalTypes.type) {
       case SummaryType.cash:
         totals = Array.from(totalTypes.totals.values());
-        size = this.summaryCash?.filter(
-          sr => sr.reservationTimestamp && date === getDateFormat(newDateTimestamp(sr.reservationTimestamp))
-        )?.length;
         break;
       case SummaryType.payment:
         totals = Array.from(totalTypes.totals.values());
-        size = this.summaryReservations?.filter(
-          sr => sr.reservationTimestamp && date === getDateFormat(newDateTimestamp(sr.reservationTimestamp))
-        )?.length;
         break;
       case SummaryType.expense:
         totals = Array.from(totalTypes.totals, ([key, value]) => ({
           expenseType: key,
           ...value
         }));
-        size = this.summaryExpenses?.length;
         break;
     }
     return this.store.dispatch(
@@ -433,8 +424,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
           totals,
           type: totalTypes.type,
           summaries,
-          step: this.step,
-          size
+          step: this.step
         }
       )
     );
@@ -532,7 +522,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
       }
       this.summaryReservations = summary?.summarySale.map((s, i) => {
         if (s.id) {
-          const reservationDate = newDateTimestamp(s.timestamp);
+          const reservationDate = newDateTimestamp(s.timestamp, this.timeZone);
           return Object.assign({}, s, { day: reservationDate.getDate(), position: i });
         }
         return s;
@@ -541,7 +531,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
 
       this.summaryExpenses = summary?.summaryExpenses.map((s, i) => {
         if (s.id) {
-          const expenseDate = newDateTimestamp(s.timestamp);
+          const expenseDate = newDateTimestamp(s.timestamp, this.timeZone);
           return Object.assign({}, s, { day: expenseDate.getDate(), position: i });
         }
         return s;
@@ -550,7 +540,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
 
       this.summaryCash = summary?.summaryCashSale.map((s, i) => {
         if (s.id) {
-          const reservationDate = newDateTimestamp(s.timestamp);
+          const reservationDate = newDateTimestamp(s.timestamp, this.timeZone);
           return Object.assign({}, s, { day: reservationDate.getDate(), position: i });
         }
         return s;
@@ -563,7 +553,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
     this.reservationMonth = this.reservationMonth.reset();
     MonthSummaryComponent.groupSummary(this.summaryReservations)?.forEach((it, key) => {
       const { gross, net, btw } = MonthSummaryComponent.calculateTotals(it);
-      this.reservationMonth = this.reservationMonth.withTotal(gross, net, btw, key);
+      this.reservationMonth = this.reservationMonth.withTotal(gross, net, btw, it.length, key);
     });
   }
 
@@ -571,7 +561,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
     this.expenseMonth = this.expenseMonth.reset(Object.values(ExpenseType));
     MonthSummaryComponent.groupSummary(this.summaryExpenses)?.forEach((it, key) => {
       const { gross, net, btw } = MonthSummaryComponent.calculateTotals(it);
-      this.expenseMonth = this.expenseMonth.withTotal(gross, net, btw, key);
+      this.expenseMonth = this.expenseMonth.withTotal(gross, net, btw, it.length, key);
     });
   }
 
@@ -579,7 +569,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
     this.cashMonth = this.cashMonth.reset();
     MonthSummaryComponent.groupSummary(this.summaryCash)?.forEach((it, key) => {
       const { gross, net, btw } = MonthSummaryComponent.calculateTotals(it);
-      this.cashMonth = this.cashMonth.withTotal(gross, net, btw, key);
+      this.cashMonth = this.cashMonth.withTotal(gross, net, btw, it.length, key);
     });
   }
 

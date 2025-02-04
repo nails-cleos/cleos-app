@@ -38,10 +38,9 @@ export class DashboardService {
   getSummary = (date: string): Observable<any> => this.http.get<any>(`${ this.urlV1 }/summaries/${ date }`)
 
   saveMonthlySummary = (
-    date: string, type: string, totals: any, summaries: IMonthlySummaryRequest[], roomId: string, size: number
+    date: string, type: string, totals: any, summaries: IMonthlySummaryRequest[], roomId: string
   ): Observable<void> => this.http.post<void>(
-    `${ this.urlV1 }/summaries/${ date }`,
-    { totals, summaries, type, roomId, size }
+    `${ this.urlV1 }/summaries/${ date }`, { totals, summaries, type, roomId }
   );
 
   getYearSummary = (year: number): Observable<any> => this.http.get<any>(`${ this.urlV1 }/years/${ year }`)

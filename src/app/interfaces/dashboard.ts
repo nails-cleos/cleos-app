@@ -158,13 +158,14 @@ export interface ITotal {
   gross: number;
   net: number;
   btw: number;
+  size: number;
 }
 
 export interface ITotalType {
   type: SummaryType;
   totals: Map<string, ITotal>;
 
-  withTotal(gross: number, net: number, btw: number, subType?: string): ITotalType;
+  withTotal(gross: number, net: number, btw: number, size: number, subType?: string): ITotalType;
 
   reset(subTypes?: string[]): ITotalType;
 }
@@ -184,11 +185,11 @@ export class TotalType implements ITotalType {
     });
   }
 
-  withTotal(gross: number, net: number, btw: number, subType?: string): ITotalType {
+  withTotal(gross: number, net: number, btw: number, size: number, subType?: string): ITotalType {
     const type = subType ?? this.type.toString();
     let total = this.totals.get(type);
     if (total) {
-      total = new Total(gross, btw, net);
+      total = new Total(gross, btw, net, size);
       this.totals.set(type, total);
     }
     return this;
@@ -353,11 +354,13 @@ export class Total implements ITotal {
   btw: number;
   gross: number;
   net: number;
+  size: number;
 
-  constructor(gross: number = 0, btw: number = 0, net: number = 0) {
+  constructor(gross: number = 0, btw: number = 0, net: number = 0, size: number = 0) {
     this.btw = btw;
     this.gross = gross;
     this.net = net;
+    this.size = size;
   }
 }
 
