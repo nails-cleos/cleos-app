@@ -8,34 +8,36 @@ import { TranslateService } from '@ngx-translate/core';
 import { DashboardService } from '../../services/dashboard.service';
 import { Router } from '@angular/router';
 import { NavigationService } from '../../services/navigation.service';
-import { getLocale } from '../../util/helper';
 
 @Injectable()
 export class DashboardEffects {
 
-  getDashEvents$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.dashEvents)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.dashboardService.getEvents(payload).pipe(
-      switchMap((response: any) => of(new fromActionsDashboard.DashSuccess(response ? response : []))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
-    ))
-  ));
+  getDashEvents$ = createEffect(
+    () => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.dashEvents)).pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.dashboardService.getEvents(payload).pipe(
+        switchMap((response: any) => of(new fromActionsDashboard.DashSuccess(response ? response : []))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
+      ))
+    ));
 
-  getEvents$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.dashboardEvents)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.dashboardService.meEvents(payload).pipe(
-      switchMap((response: any) => of(new fromActionsDashboard.EventSuccess(response ? response : []))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
-    ))
-  ));
+  getEvents$ = createEffect(
+    () => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.dashboardEvents)).pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.dashboardService.meEvents(payload).pipe(
+        switchMap((response: any) => of(new fromActionsDashboard.EventSuccess(response ? response : []))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
+      ))
+    ));
 
-  updateEvent$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.updateEvent)).pipe(
-    map((action: any) => action.payload),
-    mergeMap((payload: any) => this.dashboardService.updateEvent(payload).pipe(
-      switchMap(() => NEVER),
-      catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
-    ))
-  ));
+  updateEvent$ = createEffect(
+    () => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.updateEvent)).pipe(
+      map((action: any) => action.payload),
+      mergeMap((payload: any) => this.dashboardService.updateEvent(payload).pipe(
+        switchMap(() => NEVER),
+        catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
+      ))
+    ));
 
   getCards$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.dashCards)).pipe(
     map((action: any) => action.payload),
@@ -45,49 +47,55 @@ export class DashboardEffects {
     ))
   ));
 
-  getSummary$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.monthlySummary)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.dashboardService.getSummary(payload).pipe(
-      switchMap((response: any) => of(new fromActionsDashboard.MonthlySummarySuccess(response ? response : []))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
-    ))
-  ));
+  getSummary$ = createEffect(
+    () => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.monthlySummary)).pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.dashboardService.getSummary(payload).pipe(
+        switchMap((response: any) => of(new fromActionsDashboard.MonthlySummarySuccess(response ? response : []))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
+      ))
+    ));
 
-  saveMonthlySummary$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.saveMonthlySummary)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.dashboardService.saveMonthlySummary(payload.date, payload.type, payload.totals, payload.summaries, payload.roomId).pipe(
-      switchMap(() => of(new fromActionsDashboard.UpdateMonthlySummarySuccess({
-        date: payload.date,
-        step: payload.step,
-        message: this.translate.instant('SUMMARY.UPDATED')
-      }))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
-    ))
-  ));
+  saveMonthlySummary$ = createEffect(
+    () => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.saveMonthlySummary)).pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.dashboardService.saveMonthlySummary(payload.date, payload.type, payload.totals,
+        payload.summaries, payload.roomId).pipe(
+        switchMap(() => of(new fromActionsDashboard.UpdateMonthlySummarySuccess({
+          date: payload.date,
+          step: payload.step,
+          message: this.translate.instant('SUMMARY.UPDATED')
+        }))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
+      ))
+    ));
 
-  getYearSummary$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.yearSummary)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.dashboardService.getYearSummary(payload).pipe(
-      switchMap((response: any) => of(new fromActionsDashboard.YearSummarySuccess(response ? response : []))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
-    ))
-  ));
+  getYearSummary$ = createEffect(
+    () => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.yearSummary)).pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.dashboardService.getYearSummary(payload).pipe(
+        switchMap((response: any) => of(new fromActionsDashboard.YearSummarySuccess(response ? response : []))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
+      ))
+    ));
 
-  getYearExport$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.yearExport)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.dashboardService.getYearExport(payload).pipe(
-      switchMap((response: any) => of(new fromActionsDashboard.YearExportSuccess(response ? response : []))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
-    ))
-  ));
+  getYearExport$ = createEffect(
+    () => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.yearExport)).pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.dashboardService.getYearExport(payload).pipe(
+        switchMap((response: any) => of(new fromActionsDashboard.YearExportSuccess(response ? response : []))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
+      ))
+    ));
 
-  getQuarterSummary$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.quarterSummary)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.dashboardService.getQuarterSummary(payload.year, payload.quarter).pipe(
-      switchMap((response: any) => of(new fromActionsDashboard.QuarterSummarySuccess(response ? response : []))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
-    ))
-  ));
+  getQuarterSummary$ = createEffect(
+    () => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.quarterSummary)).pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.dashboardService.getQuarterSummary(payload.year, payload.quarter).pipe(
+        switchMap((response: any) => of(new fromActionsDashboard.QuarterSummarySuccess(response ? response : []))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
+      ))
+    ));
 
   dataSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsDashboard.DashboardActionTypes.dashSuccess)

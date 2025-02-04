@@ -909,6 +909,21 @@
     color: mat.get-color-from-palette($warn-palette, darker);
   }
 
+  @if ($isDark) {
+    .warning-snack-bar {
+      color: mat.get-color-from-palette($warn-palette, 500);
+    }
+    .accent-snack-bar {
+      color: black !important;
+    }
+  } @else {
+    .warning-snack-bar {
+      color: mat.get-color-from-palette($warn-palette, 200);
+    }
+    .accent-snack-bar {
+      color: white !important;
+    }
+  }
 }
 
 @mixin theme($theme) {
