@@ -361,7 +361,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
   exportToExcel(title: string, totalTypes: ITotalType, values: IMonthlySummaryRequest[],
                 data?: IMonthlySummary[]): void {
     if (data?.length) {
-      const workbookName = `${ titleCase(SummaryType[totalTypes.type]) }-${ getDateFormat(this.date.value) }`;
+      const workbookName = `${ titleCase(totalTypes.type) }-${ getDateFormat(this.date.value) }`;
       const name = this.translate.instant(`SUMMARY.${ title }`);
 
       let workbook;
@@ -370,7 +370,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
       switch (totalTypes.type) {
         case SummaryType.payment:
           workbook = createMonthlyIncomeWorkbook(header, data as IMonthlySummarySale[], this.weeks,
-            name, SummaryType[totalTypes.type], workbookName, this.translate, currencySymbol(this.currency),
+            name, totalTypes.type, workbookName, this.translate, currencySymbol(this.currency),
             this.timeZone);
           break;
         case SummaryType.expense:
@@ -379,7 +379,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
           break;
         case SummaryType.cash:
           workbook = createMonthlyIncomeWorkbook(header, data as IMonthlySummarySale[], this.weeks,
-            name, SummaryType[totalTypes.type], workbookName, this.translate, currencySymbol(this.currency),
+            name, totalTypes.type, workbookName, this.translate, currencySymbol(this.currency),
             this.timeZone);
           break;
       }

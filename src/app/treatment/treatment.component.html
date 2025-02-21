@@ -1,6 +1,6 @@
 <div class="flex-container">
   <div class="card-container">
-    <div class="card-content">
+    <div class="card-content" style="width: 80%">
       <form (ngSubmit)="submit" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
         <mat-card appearance="outlined">
           @if (isAddMode) {

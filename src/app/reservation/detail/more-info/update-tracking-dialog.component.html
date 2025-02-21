@@ -13,8 +13,7 @@
         <mat-label>{{ 'RESERVATION.START.FIELD' | translate }}</mat-label>
         <input [formControl]="startedTime" [format]="24" [ngxTimepicker]="sTime" matInput name="startedTime" readonly/>
         <span matPrefix><mat-icon (click)="sTime.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
-        <ngx-material-timepicker #sTime (timeSet)="timeChange($event, startedDate)"
-                                 [minutesGap]="15"></ngx-material-timepicker>
+        <ngx-material-timepicker #sTime (timeSet)="timeChange($event, startedDate)"></ngx-material-timepicker>
       </mat-form-field>
     </fieldset>
     <fieldset class="date-time-fields">

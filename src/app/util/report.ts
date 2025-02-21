@@ -55,11 +55,11 @@ export const createMonthlySummary = (header: string, weeks: any[], currency: str
   const workbook = new Workbook();
   if (income?.length) {
     monthlyIncomeWorksheet(workbook, header, income, weeks, translate.instant('SUMMARY.INCOMES'),
-      SummaryType[SummaryType.payment], titleCase(SummaryType[SummaryType.payment]), translate, currency, timeZone);
+      SummaryType.payment, titleCase(SummaryType.payment), translate, currency, timeZone);
   }
   if (expense?.length) {
     monthlyExpenseWorksheet(workbook, header, expense, weeks, translate.instant('SUMMARY.EXPENSES'),
-      titleCase(SummaryType[SummaryType.expense]), translate, currency, timeZone);
+      titleCase(SummaryType.expense), translate, currency, timeZone);
   }
 
   return workbook;
@@ -290,8 +290,8 @@ const monthlyExpenseWorksheet = (workbook: Workbook, header: string, data: IMont
         const paymentSize = expense.total.payments.length;
         expense.total.payments.forEach((payment: ISummaryTotal) => {
           rowIndex++;
-          const typeValue = translate.instant(getTranslateTypeKey(SummaryType[SummaryType.expense], payment.expenseType));
-          const subTypeValue = translate.instant(getTranslateTypeKey(SummaryType[SummaryType.expense], payment.expenseSubType));
+          const typeValue = translate.instant(getTranslateTypeKey(SummaryType.expense, payment.expenseType));
+          const subTypeValue = translate.instant(getTranslateTypeKey(SummaryType.expense, payment.expenseSubType));
           totalGross += payment.gross;
           totalNet += payment.net;
           totalBtw += payment.btw;
@@ -358,7 +358,7 @@ const completeData = (workbook: Workbook, date: Date, data: IMonthlyExport[]): I
     const name = monthViewTitle(new Date(date.getFullYear(), i - 1));
     workbook.addWorksheet(name);
     if (!data.find(it => it.month === i)) {
-      data = [...data, { month: i, expenseSummary: [], saleSummary: [], cashSaleSummary: [] }];
+      data = [...data, { month: i, expenseSummary: [], saleSummary: [], cashSummary: [] }];
     }
   }
   return data.sort((a, b) => a.month - b.month);
