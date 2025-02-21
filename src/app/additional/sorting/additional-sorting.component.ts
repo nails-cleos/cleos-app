@@ -40,8 +40,9 @@ export class AdditionalSortingComponent implements OnInit {
         this.clean();
         this.getAdditionalList();
       }
-      this.items = stateValue.data?.map((iAdditionalAll: IAdditionalAll) => new ItemSorting(iAdditionalAll.id, iAdditionalAll.name,
-        iAdditionalAll.order));
+      this.items = stateValue?.data?.map((iAdditionalAll: IAdditionalAll) => new ItemSorting(
+        iAdditionalAll.id, iAdditionalAll.name, iAdditionalAll.order)
+      );
     });
   }
 

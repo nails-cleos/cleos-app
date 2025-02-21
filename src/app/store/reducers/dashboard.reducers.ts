@@ -22,7 +22,11 @@ export interface State {
   data: Map<string, IDashboard>;
   dashboard: IRoomEvents | null;
   monthlySummaryMap: Map<ISummaryRoom,
-    { summarySale: IMonthlySummarySale[]; summaryCashSale: IMonthlySummarySale[]; summaryExpenses: IMonthlySummaryExpense[] }> | null;
+    {
+      summarySale: IMonthlySummarySale[];
+      summaryCashSale: IMonthlySummarySale[];
+      summaryExpenses: IMonthlySummaryExpense[]
+    }> | null;
   yearSummaryMap: Map<ISummaryRoom, { quarterSummaries: IQuarterSummary[] }> | null;
   quarterSummaryMap: Map<ISummaryRoom, { monthSummaries: IMonthSummary[] }> | null;
   yearExport: any | null;
@@ -112,7 +116,7 @@ const yearExportMap = (summaries: IYearRoomExport[]) => summaries.reduce((map, s
     timeZone: summary.timeZone,
     primary: summary.primary
   }, {
-    monthlyExport: summary.monthExportResponse
+    monthlyExport: summary.monthExport
   });
   return map;
 }, new Map<ISummaryRoom, {

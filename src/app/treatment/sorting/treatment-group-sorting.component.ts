@@ -53,7 +53,9 @@ export class TreatmentGroupSortingComponent implements OnInit {
         this.clean();
         this.getTreatments();
       }
-      this.items = stateValue.data?.map((group: ITreatmentGroupAll) => new ItemSorting(group.id, group.name, group.order));
+      this.items = stateValue?.data?.map((group: ITreatmentGroupAll) => new ItemSorting(
+        group.id, group.name, group.order)
+      );
     });
   }
 }

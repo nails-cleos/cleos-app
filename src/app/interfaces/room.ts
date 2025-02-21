@@ -19,6 +19,7 @@ export interface IRoom {
   paymentTypes?: string[];
   primary?: boolean;
   closeDate?: string | Date;
+  closeDateString?: string;
 }
 
 export interface IRoomService {

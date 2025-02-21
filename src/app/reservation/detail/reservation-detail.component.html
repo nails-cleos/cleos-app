@@ -263,7 +263,7 @@
                           <div [formGroupName]="i">
                             <mat-icon matPrefix>{{ reservation.room.currency.icon }}</mat-icon>&nbsp;
                             <mat-form-field appearance="outline" style="width: 100px;">
-                              <input matInput appTwoDigits formControlName="amount" (focusout)="twoDigit($event, i)">
+                              <input matInput appTwoDigits formControlName="amount" (focusout)="twoDigit(i)">
                             </mat-form-field>
                           </div>
                         </ng-container>

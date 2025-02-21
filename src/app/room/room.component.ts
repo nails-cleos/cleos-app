@@ -101,7 +101,7 @@ export class RoomComponent implements OnInit, OnDestroy {
               private formBuilder: UntypedFormBuilder, private router: Router) {
     this.isAddMode = true;
     this.primary = false;
-    this.today = createDate(this.getForm.timeZone.value.tzCode);
+    this.today = createDate();
     this.getState = this.store.select(selectRoomState);
     this.language = this.translate.currentLang;
   }
@@ -136,7 +136,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     room.address = createAddress(this.formattedAddress, this.geometry?.location, this.room?.address, this.getForm.addressDescription.value);
 
     if (this.getForm.closeDate.value) {
-      room.closeDate = createNewDate(this.getForm.closeDate.value).toLocaleString(API_LOCALE);
+      room.closeDateString = createNewDate(this.getForm.closeDate.value).toLocaleString(API_LOCALE);
     }
 
     if (this.isAddMode) {
@@ -286,6 +286,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     });
     const currentTimeZone = getCurrentTimeZone().toLowerCase();
     this.getForm.timeZone.setValue(this.timeZoneList.find(timeZone => timeZone.label.toLowerCase().indexOf(currentTimeZone) === 0));
+    this.today = createDate(this.getForm.timeZone.value.tzCode);
     this.filteredProfessionals = this.getForm.professional.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value ? value.name : ''),
@@ -353,10 +354,10 @@ export class RoomComponent implements OnInit, OnDestroy {
 
       const availability: IAvailabilityDate = new AvailabilityDate();
       const timeZone = this.getForm.timeZone.value.tzCode;
-      availability.startDate = RoomComponent.createAv(timeZone, av.start);
-      availability.endDate = RoomComponent.createAv(timeZone, av.end);
-      availability.startLunchDate = RoomComponent.createAv(timeZone, av.startLunch);
-      availability.endLunchDate = RoomComponent.createAv(timeZone, av.endLunch);
+      availability.startDate = RoomComponent.createAv(av.start, timeZone);
+      availability.endDate = RoomComponent.createAv(av.end, timeZone);
+      availability.startLunchDate = RoomComponent.createAv(av.startLunch, timeZone);
+      availability.endLunchDate = RoomComponent.createAv(av.endLunch, timeZone);
 
       switch (av.day) {
         case 'MONDAY':

@@ -93,12 +93,18 @@ export const getDurationOrUndefined = (duration?: string): IDuration | undefined
 
 export const convertDuration = (duration: string | number): IDuration => {
   if (typeof duration === 'string') {
-    const hIndex = duration.indexOf('H');
-    const mIndex = duration.indexOf('M');
-    const hour = hIndex > -1 ? Number(duration.slice(2, hIndex)) : 0;
-    const minute = mIndex > -1 ? Number(duration.slice(hIndex > -1 ? hIndex + 1 : 2, mIndex)) : 0;
+    if (duration.includes('PT')) {
+      const hIndex = duration.indexOf('H');
+      const mIndex = duration.indexOf('M');
+      const hour = hIndex > -1 ? Number(duration.slice(2, hIndex)) : 0;
+      const minute = mIndex > -1 ? Number(duration.slice(hIndex > -1 ? hIndex + 1 : 2, mIndex)) : 0;
 
-    return new Duration(hour, minute);
+      return new Duration(hour, minute);
+    } else {
+      const time = duration.split(':');
+
+      return new Duration(Number(time[0]), Number(time[1]));
+    }
   } else {
     const numberDuration = Number(duration);
 
@@ -478,11 +484,10 @@ export const getDateQuarter = (date: Date): number => getQuarter(date);
 export const getMonth = (quarter: number, key: number): number => ((quarter - 1) * 3) + key;
 
 export const getTimeNumber = (date: any) => {
-  if (date instanceof Date) {
-    const time = getTime(date).split(':');
-
-    return { hour: Number(time[0]), minute: Number(time[1]) };
-  } else if (date) {
+  if (date) {
+    if (date instanceof Date) {
+      return convertDuration(getTime(date));
+    }
     const time = date.split(':');
     let hour = Number(time[0]);
     if (isNaN(time[1])) {

@@ -8,7 +8,9 @@ export interface IUnavailable {
   repeat?: string;
   start?: string;
   end?: string;
+  endString?: string;
   duration?: string;
+  time?: string;
   startDate?: Date;
   endDate?: Date;
   startTime?: string | Date;

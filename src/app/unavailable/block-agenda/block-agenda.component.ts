@@ -91,7 +91,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
     unavailable.professionalId = valueChange(this.getForm.professional.value, this.unavailable?.professional)?.id;
     unavailable.start = date.toLocaleString(API_LOCALE);
     unavailable.timeZone = this.timeZone;
-    unavailable.duration = fieldChange(this.getForm.duration as UntypedFormControl, this.unavailable?.duration);
+    unavailable.time = fieldChange(this.getForm.duration as UntypedFormControl, this.unavailable?.duration);
 
     if (this.isAddMode) {
       return this.store.dispatch(

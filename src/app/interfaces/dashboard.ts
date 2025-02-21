@@ -138,9 +138,9 @@ export class ColorEvent implements EventColor {
 }
 
 export enum SummaryType {
-  payment,
-  expense,
-  cash
+  payment = "PAYMENT",
+  expense = "EXPENSE",
+  cash = "CASH"
 }
 
 export enum ExpenseType {
@@ -264,14 +264,14 @@ export interface IMonthlyRoomSummary extends ISummaryRoom {
 }
 
 export interface IYearRoomExport extends ISummaryRoom {
-  monthExportResponse: IMonthlyExport[];
+  monthExport: IMonthlyExport[];
 }
 
 export interface IMonthlyExport {
   month: number;
   saleSummary: IMonthlySummarySale[];
   expenseSummary: IMonthlySummaryExpense[];
-  cashSaleSummary: IMonthlySummarySale[];
+  cashSummary: IMonthlySummarySale[];
 }
 
 export interface IYearRoomSummary extends ISummaryRoom {
