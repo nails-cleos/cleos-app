@@ -77,8 +77,8 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     const expense: IExpense = new Expense();
     const supplyStore = fieldChange(this.getForm.supplyStore as UntypedFormControl, this.expense?.supplyStore);
     expense.invoice = fieldChange(this.getForm.invoice as UntypedFormControl, this.expense?.invoice);
-    expense.supplyStore = supplyStore?.id ? supplyStore.id : supplyStore;
-    expense.totals = this.totals.value;
+    expense.supplyStoreString = supplyStore?.id ? supplyStore.id : supplyStore;
+    expense.expenseTotals = this.totals.value;
     expense.date =
       createNewDateZonedTime(this.getForm.date.value, this.expense?.room?.timeZone).toLocaleString(API_LOCALE);
 
@@ -252,7 +252,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
         this.form.patchValue(this.expense);
         this.getForm.date.setValue(createNewDateZonedTime(this.expense.timestamp, this.expense.room?.timeZone));
         this.removeExpense(0);
-        this.expense.totals.forEach((it, index) => {
+        this.expense.expenseTotals.forEach((it, index) => {
           let btw = '';
           const total = { net: '', btwValue: '' };
           if (it.btw !== undefined) {

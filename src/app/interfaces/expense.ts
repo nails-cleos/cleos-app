@@ -3,7 +3,8 @@ import { IRoomAll } from './room';
 
 export interface IExpense {
   id?: string | null;
-  supplyStore?: string;
+  supplyStore?: ISupplyStore;
+  supplyStoreString?: string;
   invoice?: string;
   description?: string;
   type?: string;
@@ -13,7 +14,7 @@ export interface IExpense {
   date?: string;
   timestamp?: number;
   room?: IRoomAll;
-  totals?: ITotalExpense[],
+  expenseTotals?: ITotalExpense[],
   deleted?: boolean;
 }
 
@@ -34,7 +35,7 @@ export interface IExpenseAll {
   gross: number;
   btw?: number;
   room: IRoomAll;
-  totals: ITotalExpense[],
+  expenseTotals: ITotalExpense[],
   totalNet: number,
   totalGross: number,
   deleted: boolean;

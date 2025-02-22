@@ -459,3 +459,5 @@ export const createAddress = (formattedAddress?: string, location?: google.maps.
   }
   return undefined;
 };
+
+export const toUrl = (...url: string[]): string => url.join("/")

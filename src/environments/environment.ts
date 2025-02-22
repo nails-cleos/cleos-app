@@ -6,7 +6,7 @@ export const environment = {
     siteKey: '6Ldp5DgoAAAAAO9KDBFMNoyuTaJpIoGx8a8D04so'
   },
   appDomain: 'localhost',
-  appServer: 'http://localhost:4200',
+  appServer: 'http://localhost:4300',
   title: 'Cleos DEV',
   version: require('../../package.json').version + '-dev',
   baseUrl: 'http://localhost:9999/api',

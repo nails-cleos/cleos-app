@@ -15,7 +15,8 @@ import {
   getTimeNumber,
   greaterOrEqualsThanToday,
   IDuration,
-  isSameTimeZone, lessOrEqualsThanToday,
+  isSameTimeZone,
+  lessOrEqualsThanToday,
   newDate,
   newDateTimestamp,
   reservationDuration
@@ -38,7 +39,15 @@ import {
 } from '../../util/helper';
 import { IPrice, Price } from '../../interfaces/treatment';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { getPaymentOptions, getPayNlOptions, IPayment, IPaymentAll, IPaymentOption, PaymentType, PENALTY } from '../../interfaces/payment';
+import {
+  getPaymentOptions,
+  getPayNlOptions,
+  IPayment,
+  IPaymentAll,
+  IPaymentOption,
+  PaymentType,
+  PENALTY
+} from '../../interfaces/payment';
 import { detailExpandAnimation, transitionAnimation } from '../../util/animation';
 import { isToday, isTomorrow } from 'date-fns';
 import { ReservationIconName } from '../../util/icon';
@@ -179,13 +188,15 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   }
 
   get addDiscount(): void {
-    return executeDialog(this.dialog, AddDiscountDialogComponent, { customerId: this.reservation?.customer.id }, result => {
-      if (result) {
-        this.store.dispatch(
-          new fromActionsReservation.UpdateDiscount({ discountId: result.discountId, reservationId: this.reservation?.id })
-        );
-      }
-    }, true);
+    return executeDialog(this.dialog, AddDiscountDialogComponent, { customerId: this.reservation?.customer.id },
+      result => {
+        if (result) {
+          this.store.dispatch(
+            new fromActionsReservation.UpdateDiscount(
+              { discountId: result.discountId, reservationId: this.reservation?.id })
+          );
+        }
+      }, true);
   }
 
   private static createMachine(stateMachineDefinition: any, initialState: any): any {
@@ -211,7 +222,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     return machine;
   }
 
-  private static addTransitionToAllStates(eventName: string, transitionDetails: any, nextState: any, last: boolean = true): void {
+  private static addTransitionToAllStates(eventName: string, transitionDetails: any, nextState: any,
+                                          last: boolean = true): void {
     for (const state in ReservationDetailComponent.stateMachineDefinition) {
       if (state !== 'initialState') {
         if (ReservationDetailComponent.stateMachineDefinition.hasOwnProperty(state)) {
@@ -278,7 +290,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   }
 
   onChangeState(id: string): void {
-    const list = ['send', 'coffee', 'book', 'more', 'change', 'cancel', 'cancel_edit', 'notify', 'pay', 'color', 'clone',
+    const list = ['send', 'coffee', 'book', 'more', 'change', 'cancel', 'cancel_edit', 'notify', 'pay', 'color',
+      'clone',
       'previous', 'next'];
     if (list.indexOf(id) >= 0 && this.reservation) {
       this.machine.transition(snakeToCamel(this.reservation.state), snakeToCamel(id));
@@ -316,7 +329,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     );
   }
 
-  twoDigit($event: FocusEvent, i: number): void {
+  twoDigit(i: number): void {
     const payment = this.payments.at(i).value;
     if (!isNaN(payment.amount)) {
       payment.amount = parseFloat(payment.amount).toFixed(2);
@@ -334,7 +347,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       if (state.payments && state.payments[0].id) {
         if (this.isCustomer) {
           this.paymentPaid = state.payments.map((p: IPayment) => {
-            if (p.status && !['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND_PENDING', 'REFUND'].includes(p.status)) {
+            if (p.status &&
+              !['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND_PENDING', 'REFUND'].includes(p.status)) {
               this.addActions();
             }
             return p;
@@ -368,7 +382,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
           this.start.getMinutes() + this.duration.minute);
         this.state = state.selected.state;
         this.reservation = state.selected;
-        const isProfessionalAdmin = this.professionalId && isProfessional(this.professionalId, this.reservation?.room?.professionals);
+        const isProfessionalAdmin = this.professionalId &&
+          isProfessional(this.professionalId, this.reservation?.room?.professionals);
         this.isReservationAdmin = isProfessionalAdmin || this.hasRoomAdmin;
         if (this.reservation && this.reservation.treatment) {
           this.price = getPrice(this.reservation, this.paymentPaid);
@@ -377,8 +392,9 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
           this.professionalMachine(this);
           this.changeState = this.machine.next(snakeToCamel(this.reservation?.state));
         } else if (this.isCustomer) {
-          const types = state.selected.room.paymentTypes.filter((p: PaymentType) => ![PaymentType.cash, PaymentType.transfer]
-            .includes(p));
+          const types = state.selected.room.paymentTypes.filter(
+            (p: PaymentType) => ![PaymentType.cash, PaymentType.transfer]
+              .includes(p));
           if (types?.includes(PaymentType.paynl)) {
             this.getOptions();
           } else {
@@ -537,7 +553,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         let key;
         let date = getTime(startDate, self.language);
         let treatment = ReservationDetailComponent.createBullet(reservation.treatment.name);
-        treatment += reservation.additional?.map(additional => ReservationDetailComponent.createBullet(additional.name));
+        treatment +=
+          reservation.additional?.map(additional => ReservationDetailComponent.createBullet(additional.name));
         switch (true) {
           case isToday(startDate):
             key = 'TODAY';
@@ -572,7 +589,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     });
 
     const completeTransaction = ReservationDetailComponent.createTransaction('completed', (): void => {
-      self.router.navigate([this.language, 'reservation', reservationId, 'rooms', roomId, 'customer', customerId, 'complete']);
+      self.router.navigate(
+        [this.language, 'reservation', reservationId, 'rooms', roomId, 'customer', customerId, 'complete']);
     });
 
     const moreTransaction = ReservationDetailComponent.createTransaction('more', (): void => {
@@ -814,7 +832,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         ReservationIconName.edit, 'cancel_edit', 'accent');
 
       const editTransaction = ReservationDetailComponent.createTransaction('edited', (): void =>
-        customerEditDialog(self.dialog, self.router, reservationId, reservation.room.currency, self.small, self.language, price));
+        customerEditDialog(self.dialog, self.router, reservationId, reservation.room.currency, self.small,
+          self.language, price));
 
       created.transitions.cancelEdit = editTransaction;
       created.next.unshift(edit);
@@ -833,18 +852,20 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
           ReservationIconName.notify, 'notify');
         cancelledPaymentRequired.next = [notify];
 
-        cancelledPaymentRequired.transitions.notify = ReservationDetailComponent.createTransaction('cancelledPaymentRequired', (): void => {
-          this.notify(paymentPending);
-        });
+        cancelledPaymentRequired.transitions.notify =
+          ReservationDetailComponent.createTransaction('cancelledPaymentRequired', (): void => {
+            this.notify(paymentPending);
+          });
       } else {
         const pay = this.createAction(translate.instant('RESERVATION.ACTION.PAY'),
           ReservationIconName.payment, 'pay', 'blue');
         cancelledPaymentRequired.next = [pay];
 
-        cancelledPaymentRequired.transitions.pay = ReservationDetailComponent.createTransaction('cancelledPaymentRequired', (): void => {
-          this.router.navigate(['/', this.language, 'me', 'payment',
-            self.paymentPaid?.filter((p: IPayment) => p.status !== 'APPROVED')[0]?.id]);
-        });
+        cancelledPaymentRequired.transitions.pay =
+          ReservationDetailComponent.createTransaction('cancelledPaymentRequired', (): void => {
+            this.router.navigate(['/', this.language, 'me', 'payment',
+              self.paymentPaid?.filter((p: IPayment) => p.status !== 'APPROVED')[0]?.id]);
+          });
       }
       self.addActions();
     }

@@ -9,6 +9,7 @@ export interface ITreatmentGroup {
   description?: string;
   priceFrom?: string;
   colors?: string[];
+  colorIds?: string[];
   treatments?: ITreatment[];
   order?: number;
   image?: any;

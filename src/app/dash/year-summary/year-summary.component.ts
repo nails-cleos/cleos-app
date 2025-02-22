@@ -201,18 +201,18 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     if (room) {
       if (room === 'All' && this.yearExport) {
         this.yearExport.forEach(({ monthlyExport }) => {
-          monthlyExport.forEach(({ month, saleSummary, expenseSummary, cashSaleSummary }) => {
+          monthlyExport.forEach(({ month, saleSummary, expenseSummary, cashSummary }) => {
             const existingIndex = this.sheetData.findIndex(item => item.month === month);
             if (existingIndex !== -1) {
               this.sheetData[existingIndex].saleSummary.push(...saleSummary);
               this.sheetData[existingIndex].expenseSummary.push(...expenseSummary);
-              this.sheetData[existingIndex].cashSaleSummary.push(...cashSaleSummary);
+              this.sheetData[existingIndex].cashSummary.push(...cashSummary);
             } else {
               this.sheetData.push({
                 month,
                 saleSummary: [...saleSummary],
                 expenseSummary: [...expenseSummary],
-                cashSaleSummary: [...cashSaleSummary]
+                cashSummary: [...cashSummary]
               });
             }
           });
@@ -234,7 +234,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
       ...monthly,
       saleSummary: [...monthly.saleSummary].sort((a, b) => a.timestamp - b.timestamp),
       expenseSummary: [...monthly.expenseSummary].sort((a, b) => a.timestamp - b.timestamp),
-      cashSaleSummary: [...monthly.cashSaleSummary].sort((a, b) => a.timestamp - b.timestamp),
+      cashSaleSummary: [...monthly.cashSummary].sort((a, b) => a.timestamp - b.timestamp),
     }));
     if (this.sheetData.length) {
       const workbook = createYearlyWorkbook(this.sheetData, this.date.value || getNowTimeZone(this.timeZone),

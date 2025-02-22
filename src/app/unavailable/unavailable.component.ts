@@ -93,14 +93,14 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
     const unavailable: IUnavailable = new Unavailable();
     unavailable.professionalId = valueChange(this.getForm.professional.value, this.unavailable?.professional)?.id;
     unavailable.description = valueChange(this.getForm.description.value, this.unavailable?.description);
-    unavailable.duration = fieldChange(this.getForm.duration as UntypedFormControl, this.unavailable?.duration);
+    unavailable.time = fieldChange(this.getForm.duration as UntypedFormControl, this.unavailable?.duration);
     unavailable.repeat = fieldChange(this.getForm.repeat as UntypedFormControl, this.unavailable?.repeat);
 
     unavailable.start = date.toLocaleString(API_LOCALE);
     unavailable.timeZone = this.timeZone;
     unavailable.allDay = this.getForm.allDay.value;
     if (this.getForm.endDate.value) {
-      unavailable.end = createNewDate(this.getForm.endDate.value).toLocaleString(API_LOCALE);
+      unavailable.endString = createNewDate(this.getForm.endDate.value).toLocaleString(API_LOCALE);
     }
 
     if (this.isAddMode) {
@@ -349,6 +349,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
           description: state.selected.description,
           start: state.selected.start,
           end: state.selected.end,
+          endString: state.selected.endString,
           startDate: date,
           endDate: createEndDate(state.selected.end),
           startTime: getTime(date),

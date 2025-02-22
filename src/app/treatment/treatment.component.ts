@@ -82,7 +82,7 @@ export class TreatmentComponent implements OnInit, OnDestroy {
 
     const newColorIds = this.colors.map(({ id }) => id);
     if (!areEquals(newColorIds, this.currentColorIds)) {
-      group.colors = newColorIds;
+      group.colorIds = newColorIds;
     }
 
     if (this.isAddMode) {

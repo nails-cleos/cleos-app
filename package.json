@@ -1,6 +1,6 @@
 {
   "name": "cleos",
-  "version": "1.2.25",
+  "version": "1.2.26-rc",
   "engines": {
     "node": "v20.13.1",
     "npm": "10.5.2"
@@ -8,8 +8,8 @@
   "scripts": {
     "ng": "ng",
     "start": "node server.js",
-    "start:dev": "ng serve",
-    "start:pwa": "http-server -p 4200 -c-1 dist/cleos -P http://localhost:4200\\?",
+    "start:dev": "ng serve --port 4300 ",
+    "start:pwa": "http-server -p 4300 -c-1 dist/cleos -P http://localhost:4300\\?",
     "build": "ng build --configuration=production",
     "build-pwa": "ng build --configuration=pwa",
     "build-development": "ng build --configuration=development",
