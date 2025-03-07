@@ -26,7 +26,8 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['position', 'professional', 'description', 'timestamp', 'duration', 'repeat', 'actions'];
+  displayedColumns: string[] = ['position', 'professional', 'description', 'timestamp', 'duration', 'repeat',
+    'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IUnavailable>>();
 
   expandedUnavailable?: IUnavailable;
@@ -70,17 +71,16 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
     this.paginatorSubscription?.unsubscribe();
   }
 
-  edit(unavailable: IUnavailable): void {
-    this.store.dispatch(
-      new fromActionsUnavailable.UnavailableSelected(unavailable)
-    );
-  }
+  edit = (unavailable: IUnavailable): void => this.store.dispatch(
+    new fromActionsUnavailable.UnavailableSelected(unavailable)
+  );
 
-  delete(unavailable: IUnavailable): void {
+  delete = (unavailable: IUnavailable): void => {
     const title = this.translate.instant('UNAVAILABLE.DELETED.TITLE');
-    const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT', {date: newDateTimestamp(unavailable.timestamp)});
+    const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT',
+      { date: newDateTimestamp(unavailable.timestamp) });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: {title, content, value: unavailable}
+      data: { title, content, value: unavailable }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -92,18 +92,39 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
     });
   }
 
-  showTimeZone(unavailable: IUnavailableAll): boolean {
-    return !isSameTimeZone(unavailable.professional.timeZone);
-  }
+  showTimeZone = (unavailable: IUnavailableAll): boolean => !isSameTimeZone(unavailable.professional.timeZone)
 
-  openDialog(unavailable: IUnavailableAll): void {
+  openDialog = (unavailable: IUnavailableAll): void => {
     const time = newDateTimestamp(unavailable.timestamp);
     const name = unavailable.professional.displayName;
     const timeZone = unavailable.professional.timeZone;
     createDialog('PROFESSIONAL_INFO', name, this.dateFormat, this.translate, this.dialog, timeZone, time);
   }
 
-  private subscribe(): void {
+  private clean = (): void => this.store.dispatch(new fromActionsUnavailable.Clean());
+
+  private createPageSubscriptions = (): void => {
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.getUnavailableList();
+    });
+    this.paginatorSubscription =
+      this.paginator?.page.subscribe(() => this.getUnavailableList(this.paginator.pageIndex));
+
+    this.cdRef.detectChanges();
+  }
+
+  private getUnavailableList = (page: number = 0): void => this.store.dispatch(
+    new fromActionsUnavailable.GetAll({
+      active: this.sort.active,
+      direction: this.sort.direction,
+      size: this.pageSize,
+      page
+    })
+  );
+
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {
       if (state.message) {
         this.clean();
@@ -115,33 +136,5 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
         this.createPageSubscriptions();
       }
     });
-  }
-
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsUnavailable.Clean()
-    );
-  }
-
-  private createPageSubscriptions(): void {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getUnavailableList();
-    });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getUnavailableList(this.paginator.pageIndex));
-
-    this.cdRef.detectChanges();
-  }
-
-  private getUnavailableList(page: number = 0): void {
-    const payload = {
-      active: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-      page
-    };
-    this.store.dispatch(
-      new fromActionsUnavailable.GetAll(payload)
-    );
   }
 }

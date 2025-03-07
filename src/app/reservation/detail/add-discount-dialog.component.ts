@@ -49,25 +49,18 @@ export class AddDiscountDialogComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.discountForm = this.formBuilder.group({
       discount: this.discount
     });
-  }
+  };
 
-  private getDiscounts(): void {
-    this.store.dispatch(
-      new fromActionsDiscount.DiscountFindByCustomer(this.customerId)
-    );
-  }
+  private getDiscounts = (): void => this.store.dispatch(
+    new fromActionsDiscount.DiscountFindByCustomer(this.customerId));
 
-  private subscribe(): void {
+  private clean = (): void => this.store.dispatch(new fromActionsDiscount.Clean());
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => this.discounts = state.data);
-  }
-
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsDiscount.Clean()
-    );
   }
 }

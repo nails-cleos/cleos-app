@@ -63,12 +63,14 @@ export class OverviewComponent implements OnInit, OnDestroy {
   private getState: Observable<any>;
   private hasAdminRole: boolean;
 
-  constructor(private breakpointObserver: BreakpointObserver, private route: ActivatedRoute, private store: Store<AppState>,
+  constructor(private breakpointObserver: BreakpointObserver, private route: ActivatedRoute,
+              private store: Store<AppState>,
               private translate: TranslateService, private router: Router, private authUserService: AuthUserService) {
     this.getState = this.store.select(selectUserState);
     this.language = this.translate.currentLang;
     this.hasAdminRole = false;
-    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => this.hasAdminRole = value.hasAdminRole);
+    this.authUserServiceSubscription =
+      this.authUserService.authUser.subscribe(value => this.hasAdminRole = value.hasAdminRole);
   }
 
   get goTo(): void {
@@ -113,7 +115,16 @@ export class OverviewComponent implements OnInit, OnDestroy {
     this.authUserServiceSubscription.unsubscribe();
   }
 
-  private subscribe(): void {
+  private getUserOverview = (): void => {
+    if (!this.account) {
+      const id = this.route.snapshot.paramMap.get('id');
+      this.store.dispatch(
+        new fromActionsUser.UserOverview(id)
+      );
+    }
+  }
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {
       if (state?.data) {
         this.account = state.data.account;
@@ -140,14 +151,5 @@ export class OverviewComponent implements OnInit, OnDestroy {
         }
       }
     });
-  }
-
-  private getUserOverview(): void {
-    if (!this.account) {
-      const id = this.route.snapshot.paramMap.get('id');
-      this.store.dispatch(
-        new fromActionsUser.UserOverview(id)
-      );
-    }
   }
 }

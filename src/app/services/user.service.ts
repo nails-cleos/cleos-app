@@ -8,6 +8,7 @@ import { PAGE_SIZE } from '../interfaces/pagination';
 import { ICustomerLastReservation } from '../interfaces/reservation';
 import { createFilter } from '../util/service-helper';
 import { dataURLToBlob } from '../util/file';
+import { toUrl } from "../util/helper";
 
 @Injectable()
 export class UserService {
@@ -26,92 +27,66 @@ export class UserService {
   constructor(private http: HttpClient) {
   }
 
-  public getAll(sort: string, direction: string, page: number, size: number = PAGE_SIZE,
-                filter: string): Observable<IUser[]> {
-    const params = createFilter(page, size, sort, direction, filter);
+  getAll = (
+    sort: string,
+    direction: string,
+    page: number,
+    size: number = PAGE_SIZE,
+    filter: string
+  ): Observable<IUser[]> => this.http.get<IUser[]>(
+    toUrl(this.userUrlV1, 'pages'),
+    { params: createFilter(page, size, sort, direction, filter) }
+  );
 
-    return this.http.get<IUser[]>(`${ this.userUrlV1 }/pages`, { params });
-  }
+  getById = (
+    id: string
+  ): Observable<IUser | undefined> => this.http.get<IUser>(toUrl(this.userUrlV1, id));
 
-  public getById(id: string | null): Observable<IUser | undefined> {
-    const url = `${ this.userUrlV1 }/${ id }`;
-    return this.http.get<IUser>(url);
-  }
+  getMe = (): Observable<IUser | undefined> => this.http.get<IUser>(toUrl(this.userUrlV1, 'me'));
 
-  public getMe(): Observable<IUser | undefined> {
-    const url = `${ this.userUrlV1 }/me`;
-    return this.http.get<IUser>(url);
-  }
+  update = (
+    user: IUser
+  ): Observable<IUser> => this.http.patch<IUser>(toUrl(this.userUrlV1, user.id!!), user);
 
-  public update(user: IUser): Observable<IUser> {
-    const url = `${ this.userUrlV1 }/${ user.id }`;
-    return this.http.patch<IUser>(url, user);
-  }
+  updateMe = (user: IUser): Observable<IUser> => this.http.patch<IUser>(toUrl(this.userUrlV1, 'me'), user);
 
-  public updateMe(user: IUser): Observable<IUser> {
-    const url = `${ this.userUrlV1 }/me`;
-    return this.http.patch<IUser>(url, user);
-  }
-
-  public updateMePhoto(resizedImageDataUrl: string): Observable<IUser> {
+  updateMePhoto = (resizedImageDataUrl: string): Observable<IUser> => {
     const blob = dataURLToBlob(resizedImageDataUrl);
     const formData = new FormData();
     formData.append('file', blob, 'resized-image.jpg');
 
     const headers = new HttpHeaders().set('Upload', 'true');
 
-    return this.http.patch<IUser>(`${ this.userUrlV1 }/me/photo`, formData, { headers });
+    return this.http.patch<IUser>(toUrl(this.userUrlV1, 'me', 'photo'), formData, { headers });
   }
 
-  public addCustomer(user: IUser): Observable<IUser> {
-    return this.http.post(this.customerUrlV1, user);
-  }
+  addCustomer = (user: IUser): Observable<IUser> => this.http.post(this.customerUrlV1, user);
 
-  public getOverview(id: string | null): Observable<IUser | undefined> {
-    const url = `${ this.customerUrlV1 }/${ id ? id : 'me' }/reservations`;
-    return this.http.get<IUser>(url);
-  }
+  getOverview = (
+    id: string | null
+  ): Observable<IUser | undefined> => this.http.get<IUser>(toUrl(this.customerUrlV1, id ? id : 'me', 'reservations'));
 
-  public addProfessional(user: IUser): Observable<IUser> {
-    return this.http.post(this.professionalUrlV1, user);
-  }
+  addProfessional = (user: IUser): Observable<IUser> => this.http.post(this.professionalUrlV1, user);
 
-  public addManager(user: IUser): Observable<IUser> {
-    return this.http.post(this.officeUrlV1, user);
-  }
+  addManager = (user: IUser): Observable<IUser> => this.http.post(this.officeUrlV1, user);
 
-  public delete(id: string | null): Observable<IUser> {
-    const url = `${ this.userUrlV1 }/${ id }`;
-    return this.http.delete<IUser>(url);
-  }
+  delete = (id: string): Observable<IUser> => this.http.delete<IUser>(toUrl(this.userUrlV1, id));
 
-  public restore(user: IUser): Observable<IUser> {
-    const url = `${ this.userUrlV1 }/${ user.id }`;
-    return this.http.patch<IUser>(url, user);
-  }
+  restore = (user: IUser): Observable<IUser> => this.http.patch<IUser>(toUrl(this.userUrlV1, user.id!!), user);
 
-  public resend(id: string | null): Observable<any> {
-    const url = `${ this.userUrlV1 }/${ id }/token`;
-    return this.http.post(url, null);
-  }
+  resend = (id: string): Observable<any> => this.http.post(toUrl(this.userUrlV1, id, 'token'), null);
 
-  public getAllProfessionals(): Observable<IUser[]> {
-    return this.http.get<IUser[]>(this.professionalUrlV1);
-  }
+  getAllProfessionals = (): Observable<IUser[]> => this.http.get<IUser[]>(this.professionalUrlV1);
 
-  public getAllManagers(): Observable<IUser[]> {
-    return this.http.get<IUser[]>(this.officeUrlV1);
-  }
+  getAllManagers = (): Observable<IUser[]> => this.http.get<IUser[]>(this.officeUrlV1);
 
-  public getAllCustomers(): Observable<IUser[]> {
-    return this.http.get<IUser[]>(this.customerUrlV1);
-  }
+  getAllCustomers = (): Observable<IUser[]> => this.http.get<IUser[]>(this.customerUrlV1);
 
-  public getCustomerInformation(id: string): Observable<ICustomerLastReservation[]> {
-    return this.http.get<ICustomerLastReservation[]>(`${ this.customerUrlV1 }/${ id }/info`);
-  }
+  getCustomerInformation = (id: string): Observable<ICustomerLastReservation[]> => this.http.get<ICustomerLastReservation[]>(
+    toUrl(this.customerUrlV1, id, 'info')
+  );
 
-  public setRole(userId: string, role: Role): Observable<IUser> {
+  setRole = (userId: string, role: Role): Observable<IUser> => {
     let roleName;
     switch (role) {
       case Role.admin:
@@ -128,19 +103,16 @@ export class UserService {
         roleName = 'customer';
         break;
     }
-    const url = `${ this.userUrlV1 }/${ userId }/roles/${ roleName }`;
-    return this.http.post<IUser>(url, null);
-  }
+    return this.http.post<IUser>(toUrl(this.userUrlV1, userId, 'roles', roleName), null);
+  };
 
-  public getRoomByProfessionalId(id: string): Observable<IRoom> {
-    return this.http.get<IRoom>(`${ this.professionalUrlV1 }/${ id }/rooms`);
-  }
+  getRoomByProfessionalId = (
+    id: string
+  ): Observable<IRoom> => this.http.get<IRoom>(`${ this.professionalUrlV1 }/${ id }/rooms`);
 
-  public getAllDisableUsers(): Observable<IUser[]> {
-    return this.http.get<IUser[]>(this.userUrlV1);
-  }
+  getAllDisableUsers = (): Observable<IUser[]> => this.http.get<IUser[]>(this.userUrlV1);
 
-  public mergeUsers(mergeUserRequest: any): Observable<IUser> {
-    return this.http.post<IUser>(`${ this.userUrlV1 }/merge`, mergeUserRequest);
-  }
+  mergeUsers = (
+    mergeUserRequest: any
+  ): Observable<IUser> => this.http.post<IUser>(`${ this.userUrlV1 }/merge`, mergeUserRequest);
 }

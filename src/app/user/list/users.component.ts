@@ -76,19 +76,15 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription?.unsubscribe();
   }
 
-  applyFilter(event: Event): void {
+  applyFilter = (event: Event): void => {
     const filterValue = (event.target as HTMLInputElement).value;
     this.filter = filterValue.trim().toLowerCase();
     this.getUsers(0);
   }
 
-  edit(user: IUser): void {
-    this.store.dispatch(
-      new fromActionsUser.UserSelected({ user, profile: false })
-    );
-  }
+  edit = (user: IUser): void => this.store.dispatch(new fromActionsUser.UserSelected({ user, profile: false }));
 
-  delete(user: IUser): void {
+  delete = (user: IUser): void => {
     this.noExpanded(user);
     const title = this.translate.instant('USER.DELETED.TITLE');
     const content = this.translate.instant('USER.DELETED.CONTENT', { displayName: user.displayName });
@@ -105,7 +101,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  sendInvite(user: IUser): void {
+  sendInvite = (user: IUser): void => {
     this.noExpanded(user);
     const title = this.translate.instant('USER.ACTIVATION_RESEND.TITLE');
     const content = this.translate.instant('USER.ACTIVATION_RESEND.CONTENT', { displayName: user.displayName });
@@ -122,7 +118,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  restore(user: IUser): void {
+  restore = (user: IUser): void => {
     this.noExpanded(user);
     const title = this.translate.instant('USER.RESTORE.TITLE');
     const content = this.translate.instant('USER.RESTORE.CONTENT', { displayName: user.displayName });
@@ -142,7 +138,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  merge(user: IUser): void {
+  merge = (user: IUser): void => {
     this.noExpanded(user);
     const data = {
       small: this.smallScreen,
@@ -158,35 +154,27 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     }, true);
   }
 
-  getIcon(name: any): any {
+  getIcon = (name: any): any => {
     const iconName: RoleIconKey = snakeToCamel(name) as RoleIconKey;
     return RoleIconName[iconName];
   }
 
-  addRole(user: IUserAll, role: Role): void {
-    this.store.dispatch(
-      new fromActionsUser.SetRole({ user, role, action: 'ADD' })
-    );
-  }
+  addRole = (user: IUserAll, role: Role): void => this.store.dispatch(
+    new fromActionsUser.SetRole({ user, role, action: 'ADD' })
+  );
 
-  removeRole(user: IUserAll, role: string): void {
-    this.store.dispatch(
-      new fromActionsUser.SetRole({ user, role, action: 'REMOVE' })
-    );
-  }
+  removeRole = (user: IUserAll, role: string): void => this.store.dispatch(
+    new fromActionsUser.SetRole({ user, role, action: 'REMOVE' })
+  );
 
-  book(customer: IUser): void {
+  book = (customer: IUser): void => {
     const data = { customer };
     this.router.navigate([this.translate.currentLang, 'reservation'], { state: data });
   }
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsUser.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsUser.Clean());
 
-  private createPageSubscriptions(): void {
+  private createPageSubscriptions = (): void => {
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
       this.getUsers();
@@ -196,7 +184,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cdRef.detectChanges();
   }
 
-  private noExpanded(user: IUser): void {
+  private noExpanded = (user: IUser): void => {
     if (this.expandedUser) {
       this.expandedUser = undefined;
     } else {
@@ -204,20 +192,17 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private getUsers(page: number = 0): void {
-    const payload = {
+  private getUsers = (page: number = 0): void => this.store.dispatch(
+    new fromActionsUser.GetAll({
       active: this.sort.active,
       direction: this.sort.direction,
       size: this.pageSize,
       filter: this.filter,
       page
-    };
-    this.store.dispatch(
-      new fromActionsUser.GetAll(payload)
-    );
-  }
+    })
+  );
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe((stateValue) => {
       if (stateValue.message) {
         this.clean();
@@ -259,7 +244,8 @@ export class SelectUserDialogComponent implements OnInit, AfterViewInit, OnDestr
   private subscription?: Subscription;
 
   constructor(public dialogRef: MatDialogRef<SelectUserDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
-              private formBuilder: UntypedFormBuilder, private store: Store<AppState>, private cdRef: ChangeDetectorRef) {
+              private formBuilder: UntypedFormBuilder, private store: Store<AppState>,
+              private cdRef: ChangeDetectorRef) {
     this.newUser = data.newUser;
     this.getState = this.store.select(selectUserState);
   }
@@ -287,21 +273,19 @@ export class SelectUserDialogComponent implements OnInit, AfterViewInit, OnDestr
     this.subscription?.unsubscribe();
   }
 
-  displayFnUser(user: IUser): string {
-    return user?.displayName ? user.displayName : '';
-  }
+  displayFnUser = (user: IUser): string => user?.displayName ? user.displayName : '';
 
-  keyDownHandler(event: any): void {
+  keyDownHandler = (event: any): void => {
     if (event.code === 'Backspace') {
       this.user.setValue('');
     }
   }
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.userForm = this.formBuilder.group({ user: this.user });
   }
 
-  private createFilters(): void {
+  private createFilters = (): void => {
     this.filteredUser = this.user.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value ? value.name : ''),
@@ -309,19 +293,12 @@ export class SelectUserDialogComponent implements OnInit, AfterViewInit, OnDestr
     );
   }
 
-  private filterUser(name: string): IUser[] | undefined {
-    const filterValue = name.toLowerCase();
+  private filterUser = (name: string): IUser[] | undefined => this.users?.filter(
+    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-    return this.users?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
-  }
+  private getOldUsers = (): void => this.store.dispatch(new fromActionsUser.GetAllDisableUsers());
 
-  private getOldUsers(): void {
-    this.store.dispatch(
-      new fromActionsUser.GetAllDisableUsers()
-    );
-  }
-
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.users = state.users?.filter((it: IUser) => it.id !== this.newUser.id);
       this.user.setValue(null);

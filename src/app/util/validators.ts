@@ -4,7 +4,8 @@ import { Observable, of } from 'rxjs';
 export const fieldChange = (formControl: UntypedFormControl, value: any | undefined): any | undefined =>
   formControl && formControl.dirty && value !== formControl.value ? formControl.value : null;
 
-export const valueChange = (newValue: any, oldValue: any | undefined): any | undefined => oldValue !== newValue ? newValue : null;
+export const valueChange = (newValue: any, oldValue: any | undefined): any | undefined => oldValue !== newValue ?
+  newValue : null;
 
 export const requireMatch = (control: AbstractControl): any => {
   const selection: any = control.value;
@@ -14,7 +15,8 @@ export const requireMatch = (control: AbstractControl): any => {
   return null;
 };
 
-export const requireMatchAsync = (control: AbstractControl): Observable<ValidationErrors | null> => of(requireMatch(control));
+export const requireMatchAsync = (control: AbstractControl): Observable<ValidationErrors | null> => of(
+  requireMatch(control));
 
 export function noDuplicateDatesValidator(key: string = 'date'): ValidatorFn {
   return (formArray: AbstractControl): { [key: string]: any } | null => {

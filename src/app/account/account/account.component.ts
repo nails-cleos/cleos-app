@@ -82,29 +82,23 @@ export class AccountComponent implements OnInit, OnDestroy {
     this.authUserServiceSubscription.unsubscribe();
   }
 
-  displayCurrencyFn(currency: ICurrencyAll): string {
-    return currency ? currency.code : '';
-  }
+  displayCurrencyFn = (currency: ICurrencyAll): string => currency ? currency.code : ''
 
-  keyDownHandler(event: any): void {
+  keyDownHandler = (event: any): void => {
     if (event.code === 'Backspace') {
       this.getForm.currency.setValue('');
     }
   }
 
-  keyDownNumberHandler(event: any): void {
+  keyDownNumberHandler = (event: any): void => {
     if (event.code !== 'Backspace' && !event.key.match(/\d+/)) {
       event.preventDefault();
     }
   }
 
-  private getAccount(): void {
-    this.store.dispatch(
-      new fromActionsAccount.AccountFindByCustomer(this.customerId)
-    );
-  }
+  private getAccount = (): void => this.store.dispatch(new fromActionsAccount.AccountFindByCustomer(this.customerId));
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.form = this.formBuilder.group({
       currency: ['', [Validators.required, requireMatch]],
       gift: ['', Validators.required]
@@ -117,13 +111,11 @@ export class AccountComponent implements OnInit, OnDestroy {
     );
   }
 
-  private filterCurrency(name: string): ICurrency[] | undefined {
-    const filterValue = name.toLowerCase();
+  private filterCurrency = (name: string): ICurrency[] | undefined => this.account?.currencies?.filter(
+    option => option.code?.toLowerCase().indexOf(name.toLowerCase()) === 0
+  )
 
-    return this.account?.currencies?.filter(option => option.code?.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected && !this.account) {
         this.account = state.selected;

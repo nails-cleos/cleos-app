@@ -39,7 +39,7 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
   private getState: Observable<any>;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+              private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -67,11 +67,11 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription?.unsubscribe();
   }
 
-  delete(treatment: ITreatment): void {
+  delete = (treatment: ITreatment): void => {
     const title = this.translate.instant('TREATMENT.DELETED.TITLE');
-    const content = this.translate.instant('TREATMENT.DELETED.CONTENT', {name: treatment.name});
+    const content = this.translate.instant('TREATMENT.DELETED.CONTENT', { name: treatment.name });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: {title, content, value: treatment}
+      data: { title, content, value: treatment }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -83,7 +83,7 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  private createPageSubscriptions(): void {
+  private createPageSubscriptions = (): void => {
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
       this.getTreatments();
@@ -93,7 +93,18 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cdRef.detectChanges();
   }
 
-  private subscribe(): void {
+  private clean = (): void => this.store.dispatch(new fromActionsTreatment.Clean());
+
+  private getTreatments = (page: number = 0): void => this.store.dispatch(
+    new fromActionsTreatment.GetAll({
+      active: this.sort.active,
+      direction: this.sort.direction,
+      size: this.pageSize,
+      page
+    })
+  );
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe((stateValue) => {
       if (stateValue.message) {
         this.clean();
@@ -105,23 +116,5 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.createPageSubscriptions();
       }
     });
-  }
-
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsTreatment.Clean()
-    );
-  }
-
-  private getTreatments(page: number = 0): void {
-    const payload = {
-      active: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-      page
-    };
-    this.store.dispatch(
-      new fromActionsTreatment.GetAll(payload)
-    );
   }
 }

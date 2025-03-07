@@ -3,7 +3,15 @@ import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../store/app.states';
 import { Observable, Subject, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
-import { Calendar, Day, ICalendar, IReservationAll, IRoomReservation, MAX_RESERVATION_MONTH, States } from '../../interfaces/reservation';
+import {
+  Calendar,
+  Day,
+  ICalendar,
+  IReservationAll,
+  IRoomReservation,
+  MAX_RESERVATION_MONTH,
+  States
+} from '../../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import {
@@ -29,7 +37,15 @@ import {
   subPeriod
 } from '../../util/dates';
 import { IRoom, IRoomAll } from '../../interfaces/room';
-import { allDayEvent, calendarEvent, createBullet, fillNotAvailable, getFrequency, getOverlapEvent, Meta } from '../../util/event';
+import {
+  allDayEvent,
+  calendarEvent,
+  createBullet,
+  fillNotAvailable,
+  getFrequency,
+  getOverlapEvent,
+  Meta
+} from '../../util/event';
 import { Router } from '@angular/router';
 import { CalendarEvent, CalendarEventTimesChangedEvent } from 'angular-calendar';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
@@ -127,7 +143,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
     };
     this.breakpointObserver.observe(Object.values(CALENDAR_RESPONSIVE).map(({ breakpoint }) => breakpoint))
       .pipe(takeUntil(this.destroy$)).subscribe((state: BreakpointState) => {
-      const foundBreakpoint = Object.values(CALENDAR_RESPONSIVE).find(({ breakpoint }) => !!state.breakpoints[breakpoint]);
+      const foundBreakpoint = Object.values(CALENDAR_RESPONSIVE)
+        .find(({ breakpoint }) => !!state.breakpoints[breakpoint]);
       if (foundBreakpoint) {
         this.daysInWeek = foundBreakpoint.daysInWeek;
       } else {
@@ -191,7 +208,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
       const options = {
         margin: [0, 0.2, 0, 0.2],
-        filename: `From ${ formatDateTwoDigit(startDate, this.locale) } to ${ formatDateTwoDigit(endDate, this.locale) }.pdf`,
+        filename: `From ${ formatDateTwoDigit(startDate, this.locale) } to ${ formatDateTwoDigit(endDate,
+          this.locale) }.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2 },
         jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
@@ -205,7 +223,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   private get searchDate(): Date {
-    return this.totalDays ? addDays(this.viewDate, Math.floor(this.daysInWeek / 2)) : this.getRelevantWednesday(this.viewDate);
+    return this.totalDays ? addDays(this.viewDate, Math.floor(this.daysInWeek / 2)) :
+      this.getRelevantWednesday(this.viewDate);
   }
 
   ngOnInit(): void {
@@ -222,32 +241,26 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.authUserServiceSubscription.unsubscribe();
   }
 
-  displayFnOffice(office: IOffice): string {
-    return office ? `${ office.name }` : '';
-  }
+  displayFnOffice = (office: IOffice): string => office ? `${ office.name }` : '';
 
-  displayFnRoom(room: IRoom): string {
-    return room.address ? room.address.name : '';
-  }
+  displayFnRoom = (room: IRoom): string => room.address ? room.address.name : '';
 
-  displayFnProfessional(professional: IUser): string {
-    return professional?.displayName ? professional.displayName : '';
-  }
+  displayFnProfessional = (professional: IUser): string => professional?.displayName ? professional.displayName : '';
 
-  keyDownHandler(event: any, form: UntypedFormControl): void {
+  keyDownHandler = (event: any, form: UntypedFormControl): void => {
     if (event.code === 'Backspace') {
       form.setValue('');
     }
   }
 
-  keyDownOffice(event: any): void {
+  keyDownOffice = (event: any): void => {
     if (event.code === 'Backspace') {
       this.office.setValue('');
       this.keyDownRoom(event);
     }
   }
 
-  keyDownRoom(event: any): void {
+  keyDownRoom = (event: any): void => {
     if (event.code === 'Backspace') {
       this.professionalList = undefined;
       this.roomId = undefined;
@@ -257,13 +270,13 @@ export class CalendarComponent implements OnInit, OnDestroy {
     }
   }
 
-  view(event: CalendarEvent): void {
+  view = (event: CalendarEvent): void => {
     if (event.id) {
       this.router.navigate([event.id]);
     }
   }
 
-  segmentClick(date: Date, room?: IRoom): void {
+  segmentClick = (date: Date, room?: IRoom): void => {
     const data = { date, room, professional: this.professional.value };
     if (date && room && this.dateIsValid(date)) {
       executeDialogNoWidth(this.dialog, CalendarDialogComponent, null, result => {
@@ -274,12 +287,12 @@ export class CalendarComponent implements OnInit, OnDestroy {
     }
   }
 
-  selectDate(event: any): void {
+  selectDate = (event: any): void => {
     this.changeDate(newDate(event.value));
     this.getReservations();
   }
 
-  beforeMonthViewRender({ header }: any): void {
+  beforeMonthViewRender = ({ header }: any): void => {
     header.forEach((day: any) => {
       if (!this.dateIsValid(day.date)) {
         day.cssClass = 'cal-disabled';
@@ -287,7 +300,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     });
   }
 
-  eventTimesChanged({ event, newStart, newEnd }: CalendarEventTimesChangedEvent): void {
+  eventTimesChanged = ({ event, newStart, newEnd }: CalendarEventTimesChangedEvent): void => {
     if (isEqual(event.start, newStart)) {
       return;
     }
@@ -317,7 +330,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     });
   }
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.officeForm = this.formBuilder.group({
       office: this.office,
       room: this.room,
@@ -326,7 +339,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.valueChanges();
   }
 
-  private valueChanges(): void {
+  private valueChanges = (): void => {
     this.office.valueChanges.subscribe(value => {
       if (!value) {
         return;
@@ -370,7 +383,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.professional.valueChanges.subscribe(value => this.professionalSelectedId = value ? value.id : undefined);
   }
 
-  private createFilters(): void {
+  private createFilters = (): void => {
     this.filteredOffice = this.office.valueChanges.pipe(startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filterOffice(name) : this.offices ? this.offices.slice() : this.offices)
@@ -378,7 +391,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.filteredRoom = this.room.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
-      map(addressName => addressName ? this.filterRoom(addressName) : this.roomList ? this.roomList.slice() : this.roomList)
+      map(addressName => addressName ? this.filterRoom(addressName) :
+        this.roomList ? this.roomList.slice() : this.roomList)
     );
     this.filteredProfessional = this.professional.valueChanges.pipe(
       startWith(''),
@@ -388,16 +402,14 @@ export class CalendarComponent implements OnInit, OnDestroy {
     );
   }
 
-  private changeDate(date: Date): void {
+  private changeDate = (date: Date): void => {
     const newDate = createNewDate(date, this.viewDate.getHours(), this.viewDate.getMinutes());
     this.viewDate = this.totalDays ? addDays(newDate, -Math.floor(this.daysInWeek / 2)) : newDate;
   }
 
-  private dateIsValid(date: Date): boolean {
-    return isBetween(this.today, this.maxDate, date);
-  }
+  private dateIsValid = (date: Date): boolean => isBetween(this.today, this.maxDate, date)
 
-  private addReservations(rr: IRoomReservation, darkMode: boolean): void {
+  private addReservations = (rr: IRoomReservation, darkMode: boolean): void => {
     const reservations: IReservationAll[] = rr.reservations;
     this.calendar = new Calendar(rr.room, []);
     reservations.forEach(it => {
@@ -418,10 +430,12 @@ export class CalendarComponent implements OnInit, OnDestroy {
         const meta = new Meta(true, it.room.timeZone);
         meta.id = it.id;
         meta.customer = it.customer.displayName;
-        const draggable = [States.approved, States.created, States.partiallyPaid, States.paid].includes(it.state as States);
-        const event = calendarEvent(detail, color, start, darkMode, end, `${ this.language }/reservation/${ it.id }`, meta, draggable);
+        const draggable = [States.approved, States.created, States.partiallyPaid, States.paid].includes(
+          it.state as States);
+        const event = calendarEvent(detail, color, start, darkMode, end, `${ this.language }/reservation/${ it.id }`,
+          meta, draggable);
         if (it.showNotification) {
-          event.cssClass = `diagonal ${it.state.toLowerCase()}`
+          event.cssClass = `diagonal ${ it.state.toLowerCase() }`
         }
         let events;
         if (this.calendar) {
@@ -434,7 +448,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     });
   }
 
-  private addUnavailableList(rr: IRoomReservation, darkMode: boolean): void {
+  private addUnavailableList = (rr: IRoomReservation, darkMode: boolean): void => {
     const unavailableList: IUnavailableAll[] = rr.unavailableList;
     let recurringEvents: any[] = [];
     unavailableList.forEach(it => {
@@ -461,8 +475,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
         } else {
           const sundayViewDate = getPreviousSunday(this.viewDate);
           const calendarStart = greaterOrEqualsThan(sundayViewDate, start) ? sundayViewDate : start;
-          recurringEvents = [...recurringEvents, getFrequency(it.repeat, start, it.id, title, this.daysInWeek, 'UNAVAILABLE',
-            'unavailable', it.end, getDurationOrUndefined(it.duration), it.allDay, professionalId, calendarStart)];
+          recurringEvents =
+            [...recurringEvents, getFrequency(it.repeat, start, it.id, title, this.daysInWeek, 'UNAVAILABLE',
+              'unavailable', it.end, getDurationOrUndefined(it.duration), it.allDay, professionalId, calendarStart)];
         }
       }
     });
@@ -471,7 +486,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
       this.validateUnavailableEvent(rr.room, date, recurring, darkMode)));
   }
 
-  private addBirthdays(rr: IRoomReservation, darkMode: boolean): void {
+  private addBirthdays = (rr: IRoomReservation, darkMode: boolean): void => {
     const birthdays: IUserAll[] = rr.birthdays;
     birthdays.forEach(it => {
       if (it.dob) {
@@ -489,7 +504,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     });
   }
 
-  private addNotes(rr: IRoomReservation, darkMode: boolean): void {
+  private addNotes = (rr: IRoomReservation, darkMode: boolean): void => {
     const notes: INoteAll[] = rr.notes;
     let recurringEvents: any[] = [];
     notes.forEach(it => {
@@ -502,15 +517,17 @@ export class CalendarComponent implements OnInit, OnDestroy {
       if (it.repeat === FrequencyEnum.none) {
         this.createNoteEvent(title, state, path, startDate, darkMode);
       } else {
-        recurringEvents = [...recurringEvents, getFrequency(it.repeat, startDate, it.id, title, this.daysInWeek, state, path)];
+        recurringEvents =
+          [...recurringEvents, getFrequency(it.repeat, startDate, it.id, title, this.daysInWeek, state, path)];
       }
     });
 
-    recurringEvents.forEach(recurring => recurring.rule.all().forEach((date: Date) => this.createNoteEvent(recurring.title,
-      recurring.state, recurring.path, date, darkMode)));
+    recurringEvents.forEach(
+      recurring => recurring.rule.all().forEach((date: Date) => this.createNoteEvent(recurring.title,
+        recurring.state, recurring.path, date, darkMode)));
   }
 
-  private createNoteEvent(title: string, state: string, path: string, date: Date, darkMode: boolean): void {
+  private createNoteEvent = (title: string, state: string, path: string, date: Date, darkMode: boolean): void => {
     const color = findStateColor(state, darkMode);
     const event = allDayEvent(title, color, date, darkMode, path);
     if (this.calendar && event) {
@@ -518,7 +535,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     }
   }
 
-  private validateUnavailableEvent(room: IRoomAll, start: Date, recurring: any, darkMode: boolean): void {
+  private validateUnavailableEvent = (room: IRoomAll, start: Date, recurring: any, darkMode: boolean): void => {
     const [startSearch, endSearch] = searchDates(recurring.allDay, start, recurring.duration);
     if (this.calendar) {
       const calendar = this.calendar;
@@ -552,7 +569,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
                                  end: Date, darkMode: boolean): void {
     const color = findStateColor('DEFAULT', darkMode);
     const meta = new Meta(!recurring.allDay, room.timeZone);
-    events = [...events, calendarEvent(recurring.title, color, start, darkMode, end, recurring.path + recurring.id, meta)];
+    events =
+      [...events, calendarEvent(recurring.title, color, start, darkMode, end, recurring.path + recurring.id, meta)];
     const calendar = new Calendar(room, events);
     calendar.day = day;
     this.calendar = calendar;
@@ -571,7 +589,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
       this.addReservations(this.data, darkMode);
       if (this.calendar) {
         const timeZone = this.calendar.room.timeZone;
-        const { monday, tuesday, wednesday, thursday, friday, saturday, sunday, exclude } = getAvailability(this.calendar.room);
+        const { monday, tuesday, wednesday, thursday, friday, saturday, sunday, exclude } = getAvailability(
+          this.calendar.room);
         const { min, max } = getStartEndDay(monday, tuesday, wednesday, thursday, friday, saturday, sunday, timeZone);
         this.calendar.day = new Day(min, max, getNowTimeZone(), exclude, 1);
         const unavailable = this.translate.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
@@ -580,7 +599,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
         const date = this.dateIsValid(this.searchDate) ? this.searchDate : this.viewDate;
         const startDate = addDays(date, -Math.floor(this.daysInWeek / 2));
         this.calendar.events = this.calendar.events.concat(fillNotAvailable(unavailable, lunch, notWorking, startDate,
-          sunday, saturday, friday, thursday, wednesday, tuesday, monday, darkMode, plusDays(startDate, this.daysInWeek), timeZone));
+          sunday, saturday, friday, thursday, wednesday, tuesday, monday, darkMode,
+          plusDays(startDate, this.daysInWeek), timeZone));
         this.addUnavailableList(this.data, darkMode);
         this.addBirthdays(this.data, darkMode);
         this.addNotes(this.data, darkMode);
@@ -588,54 +608,39 @@ export class CalendarComponent implements OnInit, OnDestroy {
     }
   }
 
-  private filterOffice(name: string): IOffice[] | undefined {
-    const filterValue = name.toLowerCase();
+  private filterOffice = (name: string): IOffice[] | undefined => this.offices?.filter(
+    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-    return this.offices?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
-  }
+  private filterRoom = (addressName: string): IRoom[] | undefined => this.roomList?.filter(
+    option => option.address?.name?.toLowerCase().indexOf(addressName.toLowerCase()) === 0);
 
-  private filterRoom(addressName: string): IRoom[] | undefined {
-    const filterValue = addressName.toLowerCase();
+  private filterProfessional = (name: string): IUser[] | undefined => this.professionalList?.filter(
+    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-    return this.roomList?.filter(option => option.address?.name?.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-  private filterProfessional(name: string): IUser[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.professionalList?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-  private clean(): void {
+  private clean = (): void => {
     this.calendar = undefined;
     this.store.dispatch(
       new fromActionsReservation.Clean()
     );
   }
 
-  private getReservations(): void {
-    const payload = {
+  private getReservations = (): void => this.store.dispatch(
+    new fromActionsReservation.GetAllGroupingByRoom({
       days: this.daysInWeek,
       date: this.searchDate,
       roomId: this.roomId,
       professionalId: this.professionalSelectedId
-    };
-    this.store.dispatch(
-      new fromActionsReservation.GetAllGroupingByRoom(payload)
-    );
-  }
+    })
+  );
 
-  private getRoomList(): void {
-    this.store.dispatch(
-      new fromActionsReservation.FindRooms()
-    );
-  }
+  private getRoomList = (): void => this.store.dispatch(new fromActionsReservation.FindRooms());
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.getState.pipe(takeUntil(this.subscription)).subscribe((state) => {
       this.offices = Array.from(createRoomOffice(state.rooms)?.values() || []);
       if (this.offices && this.roomId && !this.office.value) {
-        this.office.setValue(this.offices?.find(office => office.rooms?.find(o => o.id === this.roomId) ? office : undefined));
+        this.office.setValue(
+          this.offices?.find(office => office.rooms?.find(o => o.id === this.roomId) ? office : undefined));
       } else if (this.offices && this.offices.length === 1) {
         this.office.setValue(this.offices[0]);
       }

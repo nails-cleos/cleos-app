@@ -54,7 +54,7 @@ export class ReservationCloneDialogComponent {
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d, this.data.room);
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.form = this.formBuilder.group({
       date: this.date,
       start: this.time

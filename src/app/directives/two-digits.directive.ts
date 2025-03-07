@@ -17,7 +17,7 @@ export class TwoDigitsDirective {
   }
 
   @HostListener('keydown', ['$event'])
-  onKeyDown(event: KeyboardEvent): void {
+  onKeyDown = (event: KeyboardEvent): void => {
     // Allow Backspace, tab, end, and home keys
     if (this.specialKeys.indexOf(event.key) !== -1) {
       return;
@@ -29,7 +29,8 @@ export class TwoDigitsDirective {
 
     const current: string = this.el.nativeElement.value;
     const position = this.el.nativeElement.selectionStart;
-    const next: string = [current.slice(0, position), event.key === 'Decimal' ? '.' : event.key, current.slice(position)].join('');
+    const next: string = [current.slice(0, position), event.key === 'Decimal' ? '.' : event.key,
+      current.slice(position)].join('');
     if (next && !String(next).match(this.regex) || String(next).match(new RegExp(/^0[0-9]$/g))) {
       event.preventDefault();
     }

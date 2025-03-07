@@ -7,14 +7,14 @@ import { Observable, Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CookieService } from 'ngx-cookie-service';
 import {
-  Auth, createUserWithEmailAndPassword,
-  sendEmailVerification, signInWithCredential,
+  Auth,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
   signInWithEmailAndPassword,
   signInWithPopup,
-  signInWithRedirect,
   updateProfile
 } from '@angular/fire/auth';
-import { isMobile, VERIFICATION_EMAIL } from '../util/helper';
+import { VERIFICATION_EMAIL } from '../util/helper';
 import { THEME } from '../util/theme';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
@@ -95,7 +95,8 @@ export class AuthComponent implements OnInit, OnDestroy {
     return;
   }
 
-  constructor(@Optional() private auth: Auth, private formBuilder: FormBuilder, private store: Store<AppState>, private route: ActivatedRoute, private snackBar: MatSnackBar,
+  constructor(@Optional() private auth: Auth, private formBuilder: FormBuilder, private store: Store<AppState>,
+              private route: ActivatedRoute, private snackBar: MatSnackBar,
               private cookieService: CookieService, private translate: TranslateService) {
     this.status = 'init';
     this.showForm = false;
@@ -123,7 +124,9 @@ export class AuthComponent implements OnInit, OnDestroy {
     this.authSubscription?.unsubscribe();
   }
 
-  private subscribe(): void {
+  private clean = (): void => this.store.dispatch(new fromActionsLogin.Clean());
+
+  private subscribe = (): void => {
     this.loginForm.get('code')?.valueChanges.subscribe(value => {
       if (value) {
         localStorage.setItem('CODE', value);
@@ -187,11 +190,5 @@ export class AuthComponent implements OnInit, OnDestroy {
         }
       }
     });
-  }
-
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsLogin.Clean()
-    );
   }
 }

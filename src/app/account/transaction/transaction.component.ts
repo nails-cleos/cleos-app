@@ -83,7 +83,9 @@ export class TransactionComponent implements OnInit, OnDestroy {
       paymentRequest: { type, paymentOptionId, transfer, bic }
     };
     return this.store.dispatch(
-      new fromActionsAccount.AccountSave({ transaction: payload, accountId: this.accountId, hasAdminRole: this.hasAdminRole })
+      new fromActionsAccount.AccountSave({
+        transaction: payload, accountId: this.accountId, hasAdminRole: this.hasAdminRole
+      })
     );
   }
 
@@ -102,7 +104,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
     this.authUserServiceSubscription.unsubscribe();
   }
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.form = this.formBuilder.group({
       amount: ['', [Validators.required, Validators.min(this.amountMin)]],
       type: ['', Validators.required],
@@ -111,7 +113,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
     });
   }
 
-  private getAccount(): void {
+  private getAccount = (): void => {
     if (!this.account) {
       this.store.dispatch(
         new fromActionsAccount.AccountFind(this.accountId)
@@ -119,13 +121,9 @@ export class TransactionComponent implements OnInit, OnDestroy {
     }
   }
 
-  private getOptions(): void {
-    this.store.dispatch(
-      new fromActionsAccount.PaymentOptions()
-    );
-  }
+  private getOptions = (): void => this.store.dispatch(new fromActionsAccount.PaymentOptions());
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
         this.account = state.selected;

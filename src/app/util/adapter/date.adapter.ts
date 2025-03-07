@@ -1,7 +1,7 @@
 import { NativeDateAdapter } from '@angular/material/core';
 
 export abstract class DateAdapter extends NativeDateAdapter {
-  parse(value: any): Date | null {
+  parse = (value: any): Date | null => {
     if ((typeof value === 'string') && (value.indexOf('/') > -1)) {
       const str = value.split('/');
 

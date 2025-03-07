@@ -53,7 +53,7 @@ export class MonthComponent implements AfterViewInit {
     this.cash = cash;
   }
 
-  goToMonth(month: number, type?: string): void {
+  goToMonth = (month: number, type?: string): void => {
     let step = 0;
     switch (type) {
       case 'INCOME':
@@ -66,6 +66,7 @@ export class MonthComponent implements AfterViewInit {
         step = 2;
         break;
     }
-    this.router.navigate([this.language, 'dashboard', 'monthly', 'summary'], { state: { date: `${ month }-${ this.year }`, step } });
+    this.router.navigate([this.language, 'dashboard', 'monthly', 'summary'],
+      { state: { date: `${ month }-${ this.year }`, step } });
   }
 }

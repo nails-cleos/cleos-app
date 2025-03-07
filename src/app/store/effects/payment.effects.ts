@@ -36,13 +36,15 @@ export class PaymentEffects {
     ))
   ));
 
-  findByReservation$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentByResource)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.paymentService.findByResourceId(payload.id, payload.path).pipe(
-      switchMap((payment: any) => of(new fromActionsPayment.PaymentSelected({ payment, redirect: payload.redirect }))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
-    ))
-  ));
+  findByReservation$ = createEffect(
+    () => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentByResource)).pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.paymentService.findByResourceId(payload.id, payload.path).pipe(
+        switchMap(
+          (payment: any) => of(new fromActionsPayment.PaymentSelected({ payment, redirect: payload.redirect }))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
+      ))
+    ));
 
   createOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentCreate)).pipe(
     map((action: any) => action.payload),
@@ -56,26 +58,27 @@ export class PaymentEffects {
 
   save$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentSave)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.paymentService.add(payload.id, payload.path, payload.status, payload.paymentStatus).pipe(
-      switchMap((response: any) => {
-        const paths = response.paths;
-        switch (response.status) {
-          case 'approved':
-            return of(new fromActionsPayment.PaymentSaveSuccess({
-              message: this.translate.instant('COMMON.PAYMENT.SUCCESS'), paths
-            }));
-          case 'pending':
-            return of(new fromActionsPayment.PaymentSaveSuccess({
-              message: this.translate.instant('COMMON.PAYMENT.PENDING'), paths
-            }));
-          default:
-            const message = this.translate.instant('ME.PAYMENT.ERROR', { reason: response.message });
-            return of(new fromActionsPayment.PaymentNotComplete({
-              message, paths
-            }));
-        }
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
-    ))
+    switchMap(
+      (payload: any) => this.paymentService.add(payload.id, payload.path, payload.status, payload.paymentStatus).pipe(
+        switchMap((response: any) => {
+          const paths = response.paths;
+          switch (response.status) {
+            case 'approved':
+              return of(new fromActionsPayment.PaymentSaveSuccess({
+                message: this.translate.instant('COMMON.PAYMENT.SUCCESS'), paths
+              }));
+            case 'pending':
+              return of(new fromActionsPayment.PaymentSaveSuccess({
+                message: this.translate.instant('COMMON.PAYMENT.PENDING'), paths
+              }));
+            default:
+              const message = this.translate.instant('ME.PAYMENT.ERROR', { reason: response.message });
+              return of(new fromActionsPayment.PaymentNotComplete({
+                message, paths
+              }));
+          }
+        }), catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
+      ))
   ));
 
   update$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentUpdate)).pipe(
@@ -89,40 +92,44 @@ export class PaymentEffects {
     ))
   ));
 
-  updateLink$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentUpdateLink)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.paymentService.updateLink(payload.id, payload.payment).pipe(
-      switchMap((payment: any) => of(new fromActionsPayment.PaymentSend(payment.link || payment.paymentURL))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
-    ))
-  ));
+  updateLink$ = createEffect(
+    () => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentUpdateLink)).pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.paymentService.updateLink(payload.id, payload.payment).pipe(
+        switchMap((payment: any) => of(new fromActionsPayment.PaymentSend(payment.link || payment.paymentURL))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
+      ))
+    ));
 
   recreate$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentRecreate)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.paymentService.recreate(payload.id, payload.paymentType).pipe(
-      switchMap(() => of(new fromActionsPayment.PaymentSaveSuccess({ message: this.translate.instant('PAYMENT.RECREATE') }))),
+      switchMap(
+        () => of(new fromActionsPayment.PaymentSaveSuccess({ message: this.translate.instant('PAYMENT.RECREATE') }))),
       catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
     ))
   ));
 
   notify$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentNotify)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.paymentService.notify(payload.id, payload.path, payload.resourceId, payload.preferenceId,
-      payload.type).pipe(switchMap((response: any) => {
-        switch (response.status) {
-          case 'approved':
-            return of(new fromActionsPayment.PaymentSaveSuccess({
-              message: this.translate.instant('COMMON.PAYMENT.SUCCESS'),
-              reload: true
-            }));
-          case 'pending':
-            return of(new fromActionsPayment.PaymentSaveSuccess({ message: this.translate.instant('COMMON.PAYMENT.PENDING') }));
-          default:
-            const message = this.translate.instant('COMMON.PAYMENT.ERROR', { reason: response.message });
-            return of(new fromActionsPayment.PaymentNotComplete({ message }));
-        }
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
-    ))
+    switchMap(
+      (payload: any) => this.paymentService.notify(payload.id, payload.path, payload.resourceId, payload.preferenceId,
+        payload.type).pipe(switchMap((response: any) => {
+          switch (response.status) {
+            case 'approved':
+              return of(new fromActionsPayment.PaymentSaveSuccess({
+                message: this.translate.instant('COMMON.PAYMENT.SUCCESS'),
+                reload: true
+              }));
+            case 'pending':
+              return of(
+                new fromActionsPayment.PaymentSaveSuccess({ message: this.translate.instant('COMMON.PAYMENT.PENDING') }));
+            default:
+              const message = this.translate.instant('COMMON.PAYMENT.ERROR', { reason: response.message });
+              return of(new fromActionsPayment.PaymentNotComplete({ message }));
+          }
+        }), catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
+      ))
   ));
 
   selectedData$ = createEffect(() => this.actions$.pipe(

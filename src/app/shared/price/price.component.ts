@@ -26,7 +26,5 @@ export class PriceComponent {
     this.showPenalty = false;
   }
 
-  emitter(percentage: number): void {
-    this.percentageEmitter.emit(percentage);
-  }
+  emitter = (percentage: number): void => this.percentageEmitter.emit(percentage);
 }

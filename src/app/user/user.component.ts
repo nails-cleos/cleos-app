@@ -1,5 +1,12 @@
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
+import {
+  AbstractControl,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators,
+  ɵTypedOrUntyped
+} from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -38,8 +45,9 @@ export class UserComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
   private readonly extras: any;
 
-  constructor(private readonly translate: TranslateService, private route: ActivatedRoute, private store: Store<AppState>,
-              private formBuilder: UntypedFormBuilder, private router: Router, private cdRef: ChangeDetectorRef) {
+  constructor(private readonly translate: TranslateService, private route: ActivatedRoute,
+              private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router,
+              private cdRef: ChangeDetectorRef) {
     this.isAddMode = true;
     this.isProfessionalOrManager = false;
     this.getState = this.store.select(selectUserState);
@@ -105,17 +113,15 @@ export class UserComponent implements OnInit, OnDestroy {
     this.cdRef.detectChanges();
   }
 
-  lightenDarkenColor(color: string, isDark: boolean): string {
-    return lightenDarkenColor(color, isDark ? 50 : -50);
-  }
+  lightenDarkenColor = (color: string, isDark: boolean): string => lightenDarkenColor(color, isDark ? 50 : -50);
 
-  getAddress(placeResult: PlaceResult): void {
+  getAddress = (placeResult: PlaceResult): void => {
     this.geometry = placeResult.geometry;
     this.formattedAddress = placeResult.formatted_address;
     this.addressUpdated = true;
   }
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.form = this.formBuilder.group({
       role: ['', Validators.required],
       displayName: ['', Validators.required],
@@ -161,13 +167,17 @@ export class UserComponent implements OnInit, OnDestroy {
     });
   }
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsUser.Clean()
-    );
+  private clean = (): void => this.store.dispatch(new fromActionsUser.Clean());
+
+  private getUser = (): void => {
+    if (!this.user) {
+      this.store.dispatch(
+        new fromActionsUser.FindUser(this.id)
+      );
+    }
   }
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
         this.user = state.selected;
@@ -203,13 +213,5 @@ export class UserComponent implements OnInit, OnDestroy {
         this.router.navigate([this.translate.currentLang, 'users']);
       }
     });
-  }
-
-  private getUser(): void {
-    if (!this.user) {
-      this.store.dispatch(
-        new fromActionsUser.FindUser(this.id)
-      );
-    }
   }
 }

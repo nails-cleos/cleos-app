@@ -14,12 +14,12 @@ export class PromptComponent {
               private bottomSheetRef: MatBottomSheetRef<PromptComponent>, private cookieService: CookieService) {
   }
 
-  public installPwa(): void {
+  installPwa = (): void => {
     this.data.promptEvent.prompt();
     this.close();
   }
 
-  public close(): void {
+  close = (): void => {
     this.cookieService.set(NOT_INSTALL_PWA, 'true');
     this.bottomSheetRef.dismiss();
   }

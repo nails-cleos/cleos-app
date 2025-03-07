@@ -12,9 +12,9 @@ import {
   getDurationOrUndefined,
   getEnd,
   getEndWithDuration,
+  getNowTimeZone,
   greaterOrEqualsThan,
-  newDateTimestamp,
-  getNowTimeZone
+  newDateTimestamp
 } from '../util/dates';
 import { CalendarEvent, CalendarMonthViewDay, CalendarView } from 'angular-calendar';
 import { findStateColor, getStateOrder } from '../util/theme';
@@ -30,7 +30,6 @@ import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
 import { numberFormat } from '../util/numbers';
 import { ICurrency } from '../interfaces/currency';
 import { AuthUserService } from '../services/auth-user.service';
-import { toZonedTime } from "date-fns-tz";
 
 @Component({
   selector: 'app-dash',
@@ -83,7 +82,8 @@ export class DashComponent implements OnInit, OnDestroy {
   private readonly language: string;
 
   constructor(public dialog: MatDialog, private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
-              private readonly translate: TranslateService, private router: Router, private authUserService: AuthUserService) {
+              private readonly translate: TranslateService, private router: Router,
+              private authUserService: AuthUserService) {
     this.getState = this.store.select(selectDashboardState);
     this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
       const darkMode: boolean = value.isDarkMode;
@@ -181,27 +181,28 @@ export class DashComponent implements OnInit, OnDestroy {
     return this.getSummaries();
   }
 
-  private static createErrorMiniCard(title: string, message: string): IReservationSummary {
-    return {
-      title: `DASHBOARD.MINI_CARD.${ title }`,
-      error: {
-        status: message
-      }
-    };
-  }
+  private static createErrorMiniCard = (title: string, message: string): IReservationSummary => ({
+    title: `DASHBOARD.MINI_CARD.${ title }`,
+    error: {
+      status: message
+    }
+  })
 
-  private static completedByMonth(event: CalendarEvent, viewDate: Date): boolean {
-    return event.meta.state === States.completed && isSameMonth(event.start, viewDate);
-  }
+  private static completedByMonth = (
+    event: CalendarEvent,
+    viewDate: Date
+  ): boolean => event.meta.state === States.completed && isSameMonth(event.start, viewDate)
 
-  private static upcomingByMonth(event: CalendarEvent, viewDate: Date): boolean {
-    return isSameMonth(event.start, viewDate) && event.meta.state
-      && [States.created, States.approved, States.partiallyPaid, States.paid].includes(event.meta.state);
-  }
+  private static upcomingByMonth = (
+    event: CalendarEvent,
+    viewDate: Date
+  ): boolean => isSameMonth(event.start, viewDate) && event.meta.state
+    && [States.created, States.approved, States.partiallyPaid, States.paid].includes(event.meta.state)
 
-  private static transactionByMonth(event: CalendarEvent, viewDate: Date): boolean {
-    return event.meta.state === 'TRANSACTION' && isSameMonth(event.start, viewDate);
-  }
+  private static transactionByMonth = (
+    event: CalendarEvent,
+    viewDate: Date
+  ): boolean => event.meta.state === 'TRANSACTION' && isSameMonth(event.start, viewDate)
 
   ngOnInit(): void {
     this.clean();
@@ -224,11 +225,11 @@ export class DashComponent implements OnInit, OnDestroy {
     this.authUserServiceSubscription.unsubscribe();
   }
 
-  handleEvent(event: CalendarEvent): void {
+  handleEvent = (event: CalendarEvent): void => {
     this.router.navigate(event.meta.route);
   }
 
-  dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {
+  dayClicked = ({ date, events }: { date: Date; events: CalendarEvent[] }): void => {
     if (isSameMonth(date, this.viewDate)) {
       this.activeDayIsOpen = !((isSameDay(this.viewDate, date) && this.activeDayIsOpen) || events.length === 0);
       this.viewDate = date;
@@ -239,12 +240,12 @@ export class DashComponent implements OnInit, OnDestroy {
     }
   }
 
-  cellClick(date: any): void {
+  cellClick = (date: any): void => {
     const room = { id: this.roomId };
     this.segmentClick(date, room);
   }
 
-  beforeMonthViewRender({ body, period }: { body: CalendarMonthViewDay<IMeta>[]; period: any }): void {
+  beforeMonthViewRender = ({ body, period }: { body: CalendarMonthViewDay<IMeta>[]; period: any }): void => {
     // month view has a different UX from the week and day view, so we only really need to group by the type
     this.periodStart = period.start;
     body.forEach((cell) => {
@@ -263,11 +264,10 @@ export class DashComponent implements OnInit, OnDestroy {
     });
   }
 
-  sortBy(eventGroups: CalendarEvent<IMeta>[]): any {
-    return eventGroups.sort((a: any, b: any) => getStateOrder(a[0]) - getStateOrder(b[0]));
-  }
+  sortBy = (eventGroups: CalendarEvent<IMeta>[]): any => eventGroups.sort(
+    (a: any, b: any) => getStateOrder(a[0]) - getStateOrder(b[0]))
 
-  private segmentClick(date: Date, room?: IRoom): void {
+  private segmentClick = (date: Date, room?: IRoom): void => {
     const data = { date };
     if (date && room) {
       executeDialogNoWidth(this.dialog, CalendarDialogComponent, null, result => {
@@ -278,7 +278,7 @@ export class DashComponent implements OnInit, OnDestroy {
     }
   }
 
-  private createDashboards(): void {
+  private createDashboards = (): void => {
     if (this.selectedDash) {
       const state: IDashboard | undefined = this.mapDashboard?.get(this.selectedDash.value);
       if (state) {
@@ -330,7 +330,7 @@ export class DashComponent implements OnInit, OnDestroy {
     }
   }
 
-  private clean(): void {
+  private clean = (): void => {
     this.store.dispatch(
       new fromActionsReservation.Clean()
     );
@@ -339,7 +339,7 @@ export class DashComponent implements OnInit, OnDestroy {
     );
   }
 
-  private miniCardError(error: string): void {
+  private miniCardError = (error: string): void => {
     const revenue = DashComponent.createErrorMiniCard('TOTAL_TREATMENT_SALES', error);
 
     const treatments = DashComponent.createErrorMiniCard('AVERAGE_TREATMENT_VALUE', error);
@@ -350,18 +350,19 @@ export class DashComponent implements OnInit, OnDestroy {
     this.miniCardData = [revenue, treatments, totalTreatments, customer];
   }
 
-  private createEvents(darkMode: boolean = false): void {
+  private createEvents = (darkMode: boolean = false): void => {
     this.events = [];
     if (this.state.calendarSummary) {
       const calendarSummary: ICalendarSummary = this.state.calendarSummary;
       calendarSummary.reservations?.forEach(it => {
         const start = newDateTimestamp(it.start);
         const end = it.end ? newDateTimestamp(it.end) : null;
-        this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNowTimeZone(this.timeZone));
+        this.activeDayIsOpen = this.activeDayIsOpen
+          ? this.activeDayIsOpen : isSameDay(start, getNowTimeZone(this.timeZone));
 
         const event = monthEvent(it.title, start, end, it.reservationId, findStateColor(it.state, darkMode),
-          new Meta(true, this.timeZone, it.state, [this.language, 'reservation', it.reservationId], undefined, it.total),
-          darkMode);
+          new Meta(true, this.timeZone, it.state, [this.language, 'reservation', it.reservationId], undefined,
+            it.total), darkMode);
         if (event) {
           this.events = [...this.events, event];
         }
@@ -373,19 +374,22 @@ export class DashComponent implements OnInit, OnDestroy {
           return;
         }
         const start = newDateTimestamp(it.start);
-        this.activeDayIsOpen = this.activeDayIsOpen ? this.activeDayIsOpen : isSameDay(start, getNowTimeZone(this.timeZone));
+        this.activeDayIsOpen = this.activeDayIsOpen
+          ? this.activeDayIsOpen : isSameDay(start, getNowTimeZone(this.timeZone));
         const title = it.duration ? it.title : `${ this.translate.instant('COMMON.ALL_DAY.CHECK') } - ${ it.title }`;
 
         if (it.repeat === FrequencyEnum.none) {
           const end = getEnd(start, it.duration);
           const event = monthEvent(title, start, end, it.unavailableId, findStateColor('DEFAULT', darkMode),
-            new Meta(!!it.duration, this.timeZone, 'UNAVAILABLE', [this.language, 'unavailable', it.unavailableId]), darkMode);
+            new Meta(!!it.duration, this.timeZone, 'UNAVAILABLE', [this.language, 'unavailable', it.unavailableId]),
+            darkMode);
           if (event) {
             this.events = [...this.events, event];
           }
         } else {
           recurring = [...recurring, getFrequency(it.repeat, start, it.unavailableId, title, 45, 'UNAVAILABLE',
-            `${ this.language }/unavailable`, it.end, getDurationOrUndefined(it.duration), it.allDay, undefined, calendarStart)];
+            `${ this.language }/unavailable`, it.end, getDurationOrUndefined(it.duration), it.allDay, undefined,
+            calendarStart)];
         }
       });
 
@@ -404,8 +408,8 @@ export class DashComponent implements OnInit, OnDestroy {
         const color = findStateColor('TRANSACTION', darkMode);
         const event = allDayEvent(it.title, color, startDate, darkMode,
           `${ this.language }/accounts/${ it.accountId }/transactions/ ${ it.transactionId }`,
-          new Meta(false, this.timeZone, 'TRANSACTION', [this.language, 'accounts', it.accountId, 'transactions', it.transactionId],
-            undefined, it.total));
+          new Meta(false, this.timeZone, 'TRANSACTION',
+            [this.language, 'accounts', it.accountId, 'transactions', it.transactionId], undefined, it.total));
         this.events = [...this.events, event];
       });
 
@@ -421,8 +425,8 @@ export class DashComponent implements OnInit, OnDestroy {
           } else {
             repeatDate = startDate;
           }
-          recurring = [...recurring, getFrequency(it.repeat, repeatDate, it.noteId, it.title, 45, 'NOTE', `${ this.language }/notes`,
-            undefined, undefined, true, undefined, calendarStart)];
+          recurring = [...recurring, getFrequency(it.repeat, repeatDate, it.noteId, it.title, 45, 'NOTE',
+            `${ this.language }/notes`, undefined, undefined, true, undefined, calendarStart)];
         }
       });
 
@@ -441,14 +445,14 @@ export class DashComponent implements OnInit, OnDestroy {
     this.events = this.events.slice().sort((a, b) => a.start.getTime() - b.start.getTime());
   }
 
-  private createNoteEvent(note: ICalendarNote, date: Date, darkMode: boolean): void {
+  private createNoteEvent = (note: ICalendarNote, date: Date, darkMode: boolean): void => {
     const color = findStateColor('NOTE', darkMode);
     const event = allDayEvent(note.title, color, date, darkMode, `${ this.language }/notes/${ note.noteId }`,
       new Meta(false, this.timeZone, 'NOTE', [this.language, 'notes', note.noteId]));
     this.events = [...this.events, event];
   }
 
-  private getSummaries(): void {
+  private getSummaries = (): void => {
     this.getEvents();
     this.isLoading = true;
     this.store.dispatch(
@@ -456,7 +460,7 @@ export class DashComponent implements OnInit, OnDestroy {
     );
   }
 
-  private getEvents(): void {
+  private getEvents = (): void => {
     this.events = [];
     this.isCalendarLoading = true;
     this.store.dispatch(
@@ -464,7 +468,7 @@ export class DashComponent implements OnInit, OnDestroy {
     );
   }
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.errorMessage) {
         this.state = state;

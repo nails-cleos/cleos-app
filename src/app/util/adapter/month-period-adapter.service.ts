@@ -9,15 +9,11 @@ export class MonthPeriodAdapter<D> implements MatDateRangeSelectionStrategy<D> {
     this.dateAdapter.setLocale(translate.currentLang);
   }
 
-  selectionFinished(date: D | null): DateRange<D> {
-    return this.createPeriodRange(date);
-  }
+  selectionFinished = (date: D | null): DateRange<D> => this.createPeriodRange(date);
 
-  createPreview(activeDate: D | null): DateRange<D> {
-    return this.createPeriodRange(activeDate);
-  }
+  createPreview = (activeDate: D | null): DateRange<D> => this.createPeriodRange(activeDate);
 
-  private createPeriodRange(date: D | null): DateRange<D> {
+  private createPeriodRange = (date: D | null): DateRange<D> => {
     if (date) {
       const year = this.dateAdapter.getYear(date);
       const month = this.dateAdapter.getMonth(date);

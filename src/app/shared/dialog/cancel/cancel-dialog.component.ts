@@ -52,7 +52,8 @@ export class CancelDialogComponent implements OnInit {
       return;
     }
     // if we want to only charge, it is the same use CHARGE_WITH_DISCOUNT or CHARGE_WITH_REFUND
-    const cancelOption = this.paymentCancellation.value === 'CHARGE' ? 'CHARGE_WITH_DISCOUNT' : this.paymentCancellation.value;
+    const cancelOption = this.paymentCancellation.value === 'CHARGE' ? 'CHARGE_WITH_DISCOUNT' :
+      this.paymentCancellation.value;
     const option: IPaymentOption = this.typeForm.get('type')?.value;
     const type = option?.type;
     const paymentOptionId = option?.bic;
@@ -67,7 +68,7 @@ export class CancelDialogComponent implements OnInit {
     this.createForm();
   }
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.cancelForm = this.formBuilder.group({
       paymentCancellation: this.paymentCancellation
     });

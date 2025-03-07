@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { IOffice } from '../interfaces/office';
 import { IReservation } from '../interfaces/reservation';
 import { IInvoice } from '../interfaces/invoice';
+import { toUrl } from "../util/helper";
 
 @Injectable({
   providedIn: 'root'
@@ -11,16 +12,19 @@ import { IInvoice } from '../interfaces/invoice';
 export class InvoiceService {
 
   private url = 'invoices';
-  private urlV1 = `v1/${this.url}`;
+  private urlV1 = `v1/${ this.url }`;
 
   constructor(private http: HttpClient) {
   }
 
-  public getAllMeOffice(): Observable<IOffice[]> {
-    return this.http.get<IOffice[]>(`${ this.urlV1 }/offices`);
-  }
+  getAllMeOffice = (): Observable<IOffice[]> => this.http.get<IOffice[]>(toUrl(this.urlV1, 'offices'));
 
-  public findInvoiceReservation(officeId: string, start: string, end: string, types?: string[]): Observable<IReservation[]> {
+  findInvoiceReservation = (
+    officeId: string,
+    start: string,
+    end: string,
+    types?: string[]
+  ): Observable<IReservation[]> => {
     let params = new HttpParams().set('start', start).set('end', end);
     if (types && types.length) {
       types.forEach(type => {
@@ -28,6 +32,6 @@ export class InvoiceService {
       });
     }
 
-    return this.http.get<IInvoice[]>(`${ this.urlV1 }/offices/${ officeId }`, { params });
-  }
+    return this.http.get<IInvoice[]>(toUrl(this.urlV1, 'offices', officeId), { params });
+  };
 }

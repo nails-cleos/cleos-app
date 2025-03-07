@@ -8,7 +8,6 @@ export class YearMonthAdapter extends DateAdapter {
   constructor(private readonly translate: TranslateService) {
     super(translate.currentLang);
   }
-  format(date: Date, displayFormat: any): string {
-    return super.formatDate(date, { year: 'numeric', month: 'long' });
-  }
+
+  format = (date: Date, displayFormat: any): string => super.formatDate(date, { year: 'numeric', month: 'long' });
 }

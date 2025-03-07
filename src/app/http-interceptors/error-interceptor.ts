@@ -18,21 +18,22 @@ export class ErrorInterceptor implements HttpInterceptor {
     this.authUserService.authUser.subscribe(value => this.isAuthenticated = value.isAuthenticated);
   }
 
-  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    return next.handle(request).pipe(retry({
-      count: 3,
-      delay: genericRetryStrategy({})
-    }), catchError(err => {
-      if ([0].indexOf(err.status) !== -1) {
-        const message = err?.error?.message || err.statusText;
-        return throwError(() => ({ error: { message } }));
-      }
-      if ([401].indexOf(err.status) >= 0 && this.isAuthenticated) {
-        this.store.dispatch(
-          new fromActionsLogin.ReLogin()
-        );
-      }
-      return throwError(err);
-    }));
-  }
+  intercept = (
+    request: HttpRequest<any>,
+    next: HttpHandler
+  ): Observable<HttpEvent<any>> => next.handle(request).pipe(retry({
+    count: 3,
+    delay: genericRetryStrategy({})
+  }), catchError(err => {
+    if ([0].indexOf(err.status) !== -1) {
+      const message = err?.error?.message || err.statusText;
+      return throwError(() => ({ error: { message } }));
+    }
+    if ([401].indexOf(err.status) >= 0 && this.isAuthenticated) {
+      this.store.dispatch(
+        new fromActionsLogin.ReLogin()
+      );
+    }
+    return throwError(err);
+  }))
 }

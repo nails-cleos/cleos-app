@@ -35,10 +35,12 @@ export const createEventColor = (hex: string, isDarkMode: boolean): ColorEvent =
 
 const getDarkColor = (hex?: string): ColorEvent => hex ? createColor(hex, true) : createColor(randomColor(true), true);
 
-const getLightColor = (hex?: string): ColorEvent => hex ? createColor(hex, false) : createColor(randomColor(false), false);
+const getLightColor = (hex?: string): ColorEvent => hex ? createColor(hex, false) :
+  createColor(randomColor(false), false);
 
 const convertRGBToHex = (red: number, green: number, blue: number): string =>
   '#' + getRGBColor(red) + getRGBColor(green) + getRGBColor(blue);
+
 const getRGBColor = (value: number): string => `0${ value.toString(16) }`.slice(-2);
 
 export const randomColor = (dark: boolean): string => {

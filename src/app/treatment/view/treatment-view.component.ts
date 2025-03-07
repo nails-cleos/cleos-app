@@ -43,14 +43,23 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
     this.getTreatment();
   }
 
-  getHistory(treatmentId?: string): void {
+  getHistory = (treatmentId?: string): void => {
     this.treatmentId = treatmentId;
     this.store.dispatch(
       new fromActionsTreatment.TreatmentHistory({ id: this.group?.id, treatmentId })
     );
   }
 
-  private subscribe(): void {
+  private getTreatment = (): void => {
+    if (!this.group) {
+      const id = this.route.snapshot.paramMap.get('id');
+      this.store.dispatch(
+        new fromActionsTreatment.TreatmentFind({ id, path: 'view' })
+      );
+    }
+  }
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
         const treatments = [...state.selected.treatments];
@@ -77,15 +86,6 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
         }
       }
     });
-  }
-
-  private getTreatment(): void {
-    if (!this.group) {
-      const id = this.route.snapshot.paramMap.get('id');
-      this.store.dispatch(
-        new fromActionsTreatment.TreatmentFind({ id, path: 'view' })
-      );
-    }
   }
 }
 

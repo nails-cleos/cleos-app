@@ -53,13 +53,14 @@ export class NoteEffects {
     ))
   ));
 
-  getAllProfessional$ = createEffect(() => this.actions.pipe(ofType(fromActionsNote.NoteActionTypes.getAllProfessional)).pipe(
-    map((action: any) => action.payload),
-    switchMap(() => this.userService.getAllProfessionals().pipe(
-      switchMap((response: any) => of(new fromActionsNote.NoteSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsNote.NoteFailure({ error: err.error })))
-    ))
-  ));
+  getAllProfessional$ = createEffect(
+    () => this.actions.pipe(ofType(fromActionsNote.NoteActionTypes.getAllProfessional)).pipe(
+      map((action: any) => action.payload),
+      switchMap(() => this.userService.getAllProfessionals().pipe(
+        switchMap((response: any) => of(new fromActionsNote.NoteSuccess(response))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsNote.NoteFailure({ error: err.error })))
+      ))
+    ));
 
   selectedData$ = createEffect(() => this.actions.pipe(
     ofType(fromActionsNote.NoteActionTypes.noteSelected),

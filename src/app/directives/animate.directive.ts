@@ -1,5 +1,11 @@
 import { AfterViewInit, Directive, ElementRef, Input, OnDestroy, OnInit } from '@angular/core';
-import { AnimationBuilder, AnimationFactory, AnimationMetadata, AnimationPlayer, AnimationSequenceMetadata, } from '@angular/animations';
+import {
+  AnimationBuilder,
+  AnimationFactory,
+  AnimationMetadata,
+  AnimationPlayer,
+  AnimationSequenceMetadata,
+} from '@angular/animations';
 
 @Directive({
   selector: '[appAnimate]'
@@ -42,7 +48,7 @@ export class AnimateDirective implements OnInit, AfterViewInit, OnDestroy {
     this.player?.destroy();
   }
 
-  private initialize(): AnimationPlayer | undefined {
+  private initialize = (): AnimationPlayer | undefined => {
     let animation: AnimationFactory | undefined;
     if (this.animateInAnimation) {
       animation = this.animationBuilder.build(this.animateInAnimation);
@@ -51,7 +57,7 @@ export class AnimateDirective implements OnInit, AfterViewInit, OnDestroy {
     return animation?.create(this.el.nativeElement);
   }
 
-  private animate(inView: boolean): void {
+  private animate = (inView: boolean): void => {
     if (!inView) {
       this.animating = false;
     }

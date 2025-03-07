@@ -28,19 +28,20 @@ export class MenuItemComponent implements OnInit {
 
   language: string;
 
-  constructor(private breakpointObserver: BreakpointObserver, public router: Router, private translate: TranslateService) {
+  constructor(private breakpointObserver: BreakpointObserver, public router: Router,
+              private translate: TranslateService) {
     this.language = this.translate.currentLang;
   }
 
   ngOnInit(): void {
   }
 
-  navigate(menu: IMenu, drawer?: any): void {
+  navigate = (menu: IMenu, drawer?: any): void => {
     drawer?.toggle();
     this.router.navigate([this.language].concat(menu.path.split('/')));
   }
 
-  toggleSubMenu(index: number) {
+  toggleSubMenu = (index: number) => {
     // Close all other submenus
     for (let key in this.openSubMenus) {
       if (Number(key) !== index) {
@@ -50,11 +51,9 @@ export class MenuItemComponent implements OnInit {
     this.openSubMenus[index] = !this.openSubMenus[index];
   }
 
-  isSubMenuOpen(index: number): boolean {
-    return this.openSubMenus[index] || false;
-  }
+  isSubMenuOpen = (index: number): boolean => this.openSubMenus[index] || false
 
-  toggleSubSubMenu(index: number, subIndex: number) {
+  toggleSubSubMenu = (index: number, subIndex: number) => {
     if (!this.openSubSubMenus[index]) {
       this.openSubSubMenus[index] = {};
     }
@@ -67,11 +66,8 @@ export class MenuItemComponent implements OnInit {
     this.openSubSubMenus[index][subIndex] = !this.openSubSubMenus[index][subIndex];
   }
 
-  isSubSubMenuOpen(index: number, subIndex: number): boolean {
-    return (this.openSubSubMenus[index] && this.openSubSubMenus[index][subIndex]) || false;
-  }
-
-  setStep(index: number): void {
-    this.step = index;
-  }
+  isSubSubMenuOpen = (
+    index: number,
+    subIndex: number
+  ): boolean => (this.openSubSubMenus[index] && this.openSubSubMenus[index][subIndex]) || false;
 }

@@ -1,6 +1,13 @@
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
+import {
+  AbstractControl,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators,
+  ɵTypedOrUntyped
+} from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AppState, selectDiscountState } from '../store/app.states';
 import { Discount, DiscountType, IDiscount, IDiscountAll } from '../interfaces/discount';
@@ -32,7 +39,8 @@ export class DiscountComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
   private readonly language: string;
 
-  constructor(private readonly translate: TranslateService, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
+  constructor(private readonly translate: TranslateService, private store: Store<AppState>,
+              private formBuilder: UntypedFormBuilder,
               private router: Router, private route: ActivatedRoute, private cdRef: ChangeDetectorRef) {
     this.isAddMode = true;
     this.getState = this.store.select(selectDiscountState);
@@ -90,17 +98,15 @@ export class DiscountComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  displayCurrencyFn(currency: ICurrencyAll): string {
-    return currency ? currency.code : '';
-  }
+  displayCurrencyFn = (currency: ICurrencyAll): string => currency ? currency.code : ''
 
-  keyDownHandler(event: any, form: AbstractControl): void {
+  keyDownHandler = (event: any, form: AbstractControl): void => {
     if (event.code === 'Backspace') {
       form.setValue('');
     }
   }
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.form = this.formBuilder.group({
       name: ['', [Validators.required]],
       currency: ['', [Validators.required]],
@@ -115,19 +121,12 @@ export class DiscountComponent implements OnInit, OnDestroy {
     );
   }
 
-  private filterCurrency(name: string): ICurrency[] | undefined {
-    const filterValue = name.toLowerCase();
+  private filterCurrency = (name: string): ICurrency[] | undefined => this.currencies?.filter(
+    option => option.code?.toLowerCase().indexOf(name.toLowerCase()) === 0)
 
-    return this.currencies?.filter(option => option.code?.toLowerCase().indexOf(filterValue) === 0);
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsDiscount.Clean());
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsDiscount.Clean()
-    );
-  }
-
-  private getDiscount(): void {
+  private getDiscount = (): void => {
     if (!this.discount) {
       const id = this.route.snapshot.paramMap.get('id');
       this.store.dispatch(
@@ -136,13 +135,9 @@ export class DiscountComponent implements OnInit, OnDestroy {
     }
   }
 
-  private getCurrencies(): void {
-    this.store.dispatch(
-      new fromActionsDiscount.GetCurrencies()
-    );
-  }
+  private getCurrencies = (): void => this.store.dispatch(new fromActionsDiscount.GetCurrencies());
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
         this.discount = {

@@ -106,7 +106,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  onSelectFile(target: any): void {
+  onSelectFile = (target: any): void => {
     if (target.files && target.files[0]) {
       const file = target.files[0];
       const reader = new FileReader();
@@ -130,22 +130,16 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
   }
 
-  lightenDarkenColor(color: string, isDark: boolean): string {
-    return lightenDarkenColor(color, isDark ? 50 : -50);
-  }
+  lightenDarkenColor = (color: string, isDark: boolean): string => lightenDarkenColor(color, isDark ? 50 : -50)
 
-  getAddress(placeResult: PlaceResult): void {
+  getAddress = (placeResult: PlaceResult): void => {
     this.geometry = placeResult.geometry;
     this.formattedAddress = placeResult.formatted_address;
   }
 
-  private findMe(): void {
-    this.store.dispatch(
-      new fromActionsUser.FindMe()
-    );
-  }
+  private findMe = (): void => this.store.dispatch(new fromActionsUser.FindMe());
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.form = this.formBuilder.group({
         langValue: this.langValue,
         displayName: this.displayName,
@@ -178,13 +172,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
     );
   }
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsUser.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsUser.Clean());
 
-  private resizeImageFromUrl(url?: string): void {
+  private resizeImageFromUrl = (url?: string): void => {
     if (url) {
       const img = new Image();
       img.crossOrigin = 'anonymous';
@@ -201,7 +191,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
   }
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
         const user = state.selected;

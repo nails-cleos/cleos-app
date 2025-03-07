@@ -38,8 +38,8 @@ export class RedirectComponent {
     });
   }
 
-  private static hasRoomOrAdmin(authorities?: IAuthority[]): boolean {
-    return !!authorities && authorities.length > 0 &&
-      authorities.some(u => (u.authority === Role.professional || u.authority === Role.manager || u.authority === Role.admin));
-  }
+  private static hasRoomOrAdmin = (authorities?: IAuthority[]): boolean =>
+    !!authorities && authorities.length > 0 && authorities.some(
+      u => (u.authority === Role.professional || u.authority === Role.manager || u.authority === Role.admin)
+    )
 }

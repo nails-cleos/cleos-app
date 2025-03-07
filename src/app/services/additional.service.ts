@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { IAdditional, IAdditionalAll } from '../interfaces/additional';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 import { createFilter } from '../util/service-helper';
+import { toUrl } from "../util/helper";
 
 @Injectable()
 export class AdditionalService {
@@ -15,41 +16,33 @@ export class AdditionalService {
   constructor(private http: HttpClient) {
   }
 
-  public getAll(sort: string, direction: string, page: number, size: number = PAGE_SIZE): Observable<IAdditional[]> {
-    const params = createFilter(page, size, sort, direction);
+  getAll = (
+    sort: string,
+    direction: string,
+    page: number,
+    size: number = PAGE_SIZE
+  ): Observable<IAdditional[]> => this.http.get<IAdditional[]>(
+    toUrl(this.urlV1, 'pages'), { params: createFilter(page, size, sort, direction) }
+  );
 
-    return this.http.get<IAdditional[]>(`${ this.urlV1 }/pages`, { params });
-  }
+  getAllAdditional = (roomId: string, groupId: string): Observable<IAdditional[]> =>
+    this.http.get<IAdditional[]>(toUrl(this.urlV1, 'groups'),
+      { params: new HttpParams().set('roomId', roomId).set('groupId', groupId) }
+    );
 
-  public getAllAdditional(roomId: string, groupId: string): Observable<IAdditional[]> {
-    const params = new HttpParams().set('roomId', roomId).set('groupId', groupId);
-    return this.http.get<IAdditional[]>(`${ this.urlV1 }/groups`, { params });
-  }
+  getAdditionalList = (): Observable<IAdditionalAll[]> => this.http.get<IAdditionalAll[]>(this.urlV1);
 
-  public getAdditionalList(): Observable<IAdditionalAll[]> {
-    return this.http.get<IAdditionalAll[]>(this.urlV1);
-  }
+  getById = (id: string): Observable<IAdditional | undefined> => this.http.get<IAdditional>(toUrl(this.urlV1, id));
 
-  public getById(id: string | null): Observable<IAdditional | undefined> {
-    const url = `${ this.urlV1 }/${ id }`;
-    return this.http.get<IAdditional>(url);
-  }
+  add = (additional: IAdditional): Observable<IAdditional> => this.http.post<IAdditional>(this.urlV1, additional);
 
-  public add(additional: IAdditional): Observable<IAdditional> {
-    return this.http.post<IAdditional>(this.urlV1, additional);
-  }
+  delete = (id: string): Observable<IAdditional> => this.http.delete<IAdditional>(toUrl(this.urlV1, id));
 
-  public delete(id: string | null): Observable<IAdditional> {
-    const url = `${ this.urlV1 }/${ id }`;
-    return this.http.delete<IAdditional>(url);
-  }
+  update = (additional: IAdditional): Observable<IAdditional> => this.http.patch<IAdditional>(
+    toUrl(this.urlV1, additional.id!!), additional
+  );
 
-  public update(additional: IAdditional): Observable<IAdditional> {
-    const url = `${ this.urlV1 }/${ additional.id }`;
-    return this.http.patch<IAdditional>(url, additional);
-  }
-
-  public updateSort(additionalList: ISorted[]): Observable<IAdditionalAll[]> {
-    return this.http.patch<IAdditionalAll[]>(this.urlV1, additionalList);
-  }
+  updateSort = (additionalList: ISorted[]): Observable<IAdditionalAll[]> => this.http.patch<IAdditionalAll[]>(
+    this.urlV1, additionalList
+  );
 }

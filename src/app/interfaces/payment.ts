@@ -52,7 +52,10 @@ export class PaymentOption implements IPaymentOption {
   }
 }
 
-export const getPaymentOptions = (translate: TranslateService, types?: PaymentType[]): IPaymentOption[] => types?.map((it: any) => {
+export const getPaymentOptions = (
+  translate: TranslateService,
+  types?: PaymentType[]
+): IPaymentOption[] => types?.map((it: any) => {
   let subTypes: IPaymentOption[] = [];
   if (it === PaymentType.ideal) {
     subTypes = iDealBanks();
@@ -71,7 +74,9 @@ export const getPaymentOptions = (translate: TranslateService, types?: PaymentTy
   return new PaymentOption(name, it, svgIcon, undefined, subTypes);
 }) || [];
 
-export const getPayNlOptions = (options?: IPaymentOption[]): PaymentOption[] => options?.map((it: any) => new PaymentOption(
+export const getPayNlOptions = (
+  options?: IPaymentOption[]
+): PaymentOption[] => options?.map((it: any) => new PaymentOption(
   it.name, PaymentType.paynl, it.image, it.id,
   it.paymentOptionSubList?.map((sub: any) => new PaymentOption(sub.name, PaymentType.paynl, sub.image, sub.id, [])))
 ) || [];
@@ -91,7 +96,14 @@ export const iDealBanks = (): IPaymentOption[] => [
 ];
 
 export const accountCredit = (name: string): IPaymentOption[] => [
-  { subTypes: [], type: PaymentType.account, name, icon: 'account_balance', hidePercentage: true, svgIcon: 'account_balance' }
+  {
+    subTypes: [],
+    type: PaymentType.account,
+    name,
+    icon: 'account_balance',
+    hidePercentage: true,
+    svgIcon: 'account_balance'
+  }
 ];
 
 export enum PaymentPercentage {

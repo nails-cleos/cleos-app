@@ -10,7 +10,7 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(private tokenService: TokenService) {
   }
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+  intercept = (req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> => {
     if (!isExternalUrl(req.url) && this.tokenService.token) {
       req = req.clone({
         setHeaders: {

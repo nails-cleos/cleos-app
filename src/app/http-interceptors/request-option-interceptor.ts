@@ -11,7 +11,7 @@ export class RequestOptionInterceptor implements HttpInterceptor {
   constructor(private tokenService: TokenService) {
   }
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+  intercept = (req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> => {
     if (!isExternalUrl(req.url)) {
       if (!req.headers.has('Content-Type') && !req.headers.has('Upload')) {
         req = req.clone({ headers: req.headers.set('Content-Type', 'application/json') });

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { IUnavailable } from '../interfaces/unavailable';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { createFilter } from '../util/service-helper';
+import { toUrl } from "../util/helper";
 
 @Injectable()
 export class UnavailableService {
@@ -17,11 +18,11 @@ export class UnavailableService {
   public getAll(sort: string, direction: string, page: number, size: number = PAGE_SIZE): Observable<IUnavailable[]> {
     const params = createFilter(page, size, sort, direction);
 
-    return this.http.get<IUnavailable[]>(`${ this.urlV1 }/pages`, { params });
+    return this.http.get<IUnavailable[]>(toUrl(this.urlV1, 'pages'), { params });
   }
 
-  public getById(id: string | null): Observable<IUnavailable | undefined> {
-    const url = `${ this.urlV1 }/${ id }`;
+  public getById(id: string): Observable<IUnavailable | undefined> {
+    const url = toUrl(this.urlV1, id);
     return this.http.get<IUnavailable>(url);
   }
 
@@ -33,8 +34,8 @@ export class UnavailableService {
     return this.http.post<IUnavailable>(`${ this.urlV1 }/block/agenda`, unavailable);
   }
 
-  public delete(id: string | null): Observable<IUnavailable> {
-    const url = `${ this.urlV1 }/${ id }`;
+  public delete(id: string): Observable<IUnavailable> {
+    const url = toUrl(this.urlV1, id);
     return this.http.delete<IUnavailable>(url);
   }
 

@@ -12,7 +12,8 @@ import { SeoService } from '../../services/seo.service';
 export class TermsAndConditionsComponent implements OnInit {
   url = environment.appServer;
 
-  constructor(private mainContent: MainContentService, private translate: TranslateService, private seoService: SeoService) {
+  constructor(private mainContent: MainContentService, private translate: TranslateService,
+              private seoService: SeoService) {
     this.mainContent.configure(false, 'open');
   }
 

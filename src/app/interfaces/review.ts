@@ -5,14 +5,9 @@ export interface IReview {
   reservationId?: string;
 }
 
-export interface IReviewAll {
-  id: string;
-  detail?: string;
-  rating: number;
-}
-
 export class Review implements IReview {
   rating: number;
+
   constructor(rating: number) {
     this.rating = rating;
   }

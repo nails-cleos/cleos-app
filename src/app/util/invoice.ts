@@ -155,8 +155,8 @@ const createItems = (itemTitle: any, itemList: IItem[], currency: string): any =
   };
 };
 
-const createTotals = (totals: ITotals, currency: string, titleSubTotal: string, titleExclBTW: string, titleBTW21: string,
-                      titleTotal: string, titleDiscount: string): any => {
+const createTotals = (totals: ITotals, currency: string, titleSubTotal: string, titleExclBTW: string,
+                      titleBTW21: string, titleTotal: string, titleDiscount: string): any => {
   const subTotal = [
     { text: titleSubTotal, style: ['item', 'amountKey'], border: [false, false, false, true] },
     {
@@ -242,8 +242,8 @@ export const pdf = (invoices: IInvoice[], office: IOfficeAll, start: number, sta
     const titleKVK = 'KvK nr';
     const titleAccount = 'Account nr';
     const titleBTWNr = 'BTW nr';
-    const header = createHeader(index, titleDate, date, titleSubject, office.subject, titleKVK, office.kvk, titleAccount, office.account,
-      titleBTWNr, office.btw);
+    const header = createHeader(index, titleDate, date, titleSubject, office.subject, titleKVK, office.kvk,
+      titleAccount, office.account, titleBTWNr, office.btw);
     const currency = currencySymbol(invoice.room.currencyCode);
 
     const titleDescription = 'ITEM DESCRIPTION';
@@ -263,7 +263,8 @@ export const pdf = (invoices: IInvoice[], office: IOfficeAll, start: number, sta
     const titleTotal = 'Total:';
     const titleDiscount = 'Discount:';
 
-    const totals = createTotals(invoice.totals, currency, titleSubTotal, titleExclBTW, titleBTW21, titleTotal, titleDiscount);
+    const totals = createTotals(invoice.totals, currency, titleSubTotal, titleExclBTW, titleBTW21, titleTotal,
+      titleDiscount);
 
     const titleAddress = 'Address';
     const titlePhone = 'Phone';

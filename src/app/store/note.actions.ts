@@ -14,7 +14,6 @@ export enum NoteActionTypes {
   clean = '[Note] Clean'
 }
 
-
 export class GetAllProfessional implements Action {
   readonly type = NoteActionTypes.getAllProfessional;
 }

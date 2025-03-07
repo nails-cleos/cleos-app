@@ -95,7 +95,7 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
     }, 500);
   }
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.paths) {
         this.router.navigate([this.language].concat(state.paths));

@@ -1,5 +1,12 @@
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
+import {
+  AbstractControl,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators,
+  ɵTypedOrUntyped
+} from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectCurrencyState } from '../store/app.states';
@@ -28,8 +35,9 @@ export class CurrencyComponent implements OnInit, OnDestroy {
   private subscription: Subscription | undefined;
   private readonly language: string;
 
-  constructor(private readonly translate: TranslateService, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
-              private router: Router, private route: ActivatedRoute, private cdRef: ChangeDetectorRef) {
+  constructor(private readonly translate: TranslateService, private store: Store<AppState>,
+              private formBuilder: UntypedFormBuilder, private router: Router, private route: ActivatedRoute,
+              private cdRef: ChangeDetectorRef) {
     this.isAddMode = true;
     this.getState = this.store.select(selectCurrencyState);
     this.language = this.translate.currentLang;
@@ -79,7 +87,7 @@ export class CurrencyComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.form = this.formBuilder.group({
       name: [''],
       code: ['', [Validators.required]],
@@ -87,13 +95,9 @@ export class CurrencyComponent implements OnInit, OnDestroy {
     });
   }
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsCurrency.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsCurrency.Clean());
 
-  private getCurrency(): void {
+  private getCurrency = (): void => {
     if (!this.currency) {
       this.store.dispatch(
         new fromActionsCurrency.CurrencyFind(this.id)
@@ -101,7 +105,7 @@ export class CurrencyComponent implements OnInit, OnDestroy {
     }
   }
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
         this.currency = {

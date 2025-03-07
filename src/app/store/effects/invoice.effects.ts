@@ -7,7 +7,6 @@ import { TranslateService } from '@ngx-translate/core';
 import * as fromActionsInvoice from '../invoice.actions';
 import { InvoiceService } from '../../services/invoice.service';
 import { OfficeService } from '../../services/office.service';
-import { UpdateOfficesSuccess } from '../invoice.actions';
 
 @Injectable()
 export class InvoiceEffects {
@@ -22,21 +21,23 @@ export class InvoiceEffects {
         ))
     ));
 
-  findMyOffices$ = createEffect(() => this.actions.pipe(ofType(fromActionsInvoice.InvoiceActionTypes.invoiceFindMyOffices)).pipe(
-    map((action: any) => action.payload),
-    switchMap(() => this.invoiceService.getAllMeOffice().pipe(
-      switchMap((response) => of(new fromActionsInvoice.OfficesSuccess(response ? response : []))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsInvoice.InvoiceFailure({ error: err.error })))
-    ))
-  ));
+  findMyOffices$ = createEffect(
+    () => this.actions.pipe(ofType(fromActionsInvoice.InvoiceActionTypes.invoiceFindMyOffices)).pipe(
+      map((action: any) => action.payload),
+      switchMap(() => this.invoiceService.getAllMeOffice().pipe(
+        switchMap((response) => of(new fromActionsInvoice.OfficesSuccess(response ? response : []))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsInvoice.InvoiceFailure({ error: err.error })))
+      ))
+    ));
 
-  updateOffices$ = createEffect(() => this.actions.pipe(ofType(fromActionsInvoice.InvoiceActionTypes.invoiceUpdateOffice)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.officeService.update(payload).pipe(
-      switchMap((response) => of(new fromActionsInvoice.UpdateOfficesSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsInvoice.InvoiceFailure({ error: err.error })))
-    ))
-  ));
+  updateOffices$ = createEffect(
+    () => this.actions.pipe(ofType(fromActionsInvoice.InvoiceActionTypes.invoiceUpdateOffice)).pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.officeService.update(payload).pipe(
+        switchMap((response) => of(new fromActionsInvoice.UpdateOfficesSuccess(response))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsInvoice.InvoiceFailure({ error: err.error })))
+      ))
+    ));
 
   officesSuccess$ = createEffect(() => this.actions.pipe(
     ofType(fromActionsInvoice.InvoiceActionTypes.invoiceOfficesSuccess)

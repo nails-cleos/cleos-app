@@ -35,21 +35,20 @@ export class RatingComponent implements OnInit {
     }
   }
 
-  onClick(rating: number): void {
+  onClick = (rating: number): void => {
     this.rating = this.rating === rating ? -1 : rating;
     this.ratingUpdated.emit(this.rating);
   }
 
-  onHover(hover: number): void {
+  onHover = (hover: number): void => {
     this.hover = hover;
     this.ratingHover.emit(this.hover);
   }
 
-  fontSet(i: number): 'material-icons' | 'material-symbols-outlined' {
-    return this.hover >= i + 1 || this.rating >= i + 1 ? 'material-icons' : 'material-symbols-outlined';
-  }
+  fontSet = (
+    i: number
+  ): 'material-icons' | 'material-symbols-outlined' => this.hover >= i + 1 || this.rating >= i + 1 ? 'material-icons' :
+    'material-symbols-outlined';
 
-  setColor(i: number): ThemePalette {
-    return this.hover >= i + 1 || this.rating >= i + 1 ? this.color : undefined;
-  }
+  setColor = (i: number): ThemePalette => this.hover >= i + 1 || this.rating >= i + 1 ? this.color : undefined;
 }

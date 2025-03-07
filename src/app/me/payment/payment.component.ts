@@ -27,7 +27,8 @@ export class PaymentComponent implements OnInit, OnDestroy {
   private id: any;
   private path: any;
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private router: Router, private translate: TranslateService) {
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private router: Router,
+              translate: TranslateService) {
     this.getState = this.store.select(selectPaymentState);
     this.language = translate.currentLang;
   }
@@ -50,7 +51,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  pay(payment: IPaymentAll): void {
+  pay = (payment: IPaymentAll): void => {
     if (payment.link || payment.paymentURL) {
       this.store.dispatch(
         new fromActionsPayment.PaymentSend(payment.link || payment.paymentURL)
@@ -58,7 +59,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
     }
   }
 
-  notify(payment: IPayment): void {
+  notify = (payment: IPayment): void => {
     this.store.dispatch(
       new fromActionsPayment.PaymentNotify({
         id: payment.id, resourceId: this.id,
@@ -69,7 +70,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
     );
   }
 
-  getCurrency(payment: IPaymentAll): string {
+  getCurrency = (payment: IPaymentAll): string => {
     let icon = 'euro';
     if (payment.reservation) {
       icon = payment.reservation.room.currency.icon;
@@ -79,7 +80,17 @@ export class PaymentComponent implements OnInit, OnDestroy {
     return icon;
   }
 
-  private subscribe(): void {
+  private getPayments = (): void => {
+    if (!this.dataSource) {
+      this.store.dispatch(
+        new fromActionsPayment.PaymentFindByResourceId({ id: this.id, path: this.path, redirect: true })
+      );
+    }
+  }
+
+  private clean = (): void => this.store.dispatch(new fromActionsPayment.Clean());
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.dataSource = state.selected;
       const paths = state.paths;
@@ -91,19 +102,5 @@ export class PaymentComponent implements OnInit, OnDestroy {
         this.errorMessage = state.subErrors;
       }
     });
-  }
-
-  private getPayments(): void {
-    if (!this.dataSource) {
-      this.store.dispatch(
-        new fromActionsPayment.PaymentFindByResourceId({ id: this.id, path: this.path, redirect: true })
-      );
-    }
-  }
-
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsPayment.Clean()
-    );
   }
 }

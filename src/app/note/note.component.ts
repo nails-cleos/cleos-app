@@ -1,5 +1,12 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, UntypedFormControl, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators,
+  ɵTypedOrUntyped
+} from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
@@ -37,8 +44,9 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly extras: any;
   private readonly language: string;
 
-  constructor(private readonly translate: TranslateService, private store: Store<AppState>, private formBuilder: FormBuilder,
-              private route: ActivatedRoute, private router: Router, public dialog: MatDialog) {
+  constructor(private readonly translate: TranslateService, private store: Store<AppState>,
+              private formBuilder: FormBuilder, private route: ActivatedRoute, private router: Router,
+              public dialog: MatDialog) {
     this.isAddMode = true;
     this.getState = this.store.select(selectNoteState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
@@ -112,17 +120,38 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
     this.getProfessionals();
   }
 
-  displayFn(user: IUser): string {
-    return user?.displayName ? user.displayName : '';
-  }
+  displayFn = (user: IUser): string => user?.displayName ? user.displayName : ''
 
-  keyDownHandler(event: any): void {
+  keyDownHandler = (event: any): void => {
     if (event.code === 'Backspace') {
       this.getForm.professional.setValue('');
     }
   }
 
-  private subscribe(): void {
+  private createForm = (): void => {
+    this.form = this.formBuilder.group({
+      description: ['', Validators.required],
+      professional: ['', Validators.required, requireMatchAsync],
+      date: ['', Validators.required],
+      repeat: ['', Validators.required]
+    });
+    this.filteredOptions = this.getForm.professional.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value.name),
+      map(name => name ? this.filter(name) : this.professionals ? this.professionals.slice() : this.professionals)
+    );
+  }
+
+  private filter = (name: string): IUser[] | undefined => this.professionals?.filter(
+    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0)
+
+  private clean = (): void => this.store.dispatch(new fromActionsNote.Clean());
+
+  private getProfessionals = (): void => this.store.dispatch(new fromActionsNote.GetAllProfessional());
+
+  private getNote = (): void => this.store.dispatch(new fromActionsNote.NoteFind(this.id));
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.professionals = state.professionals;
       this.note = state.selected;
@@ -139,43 +168,5 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
         this.router.navigate([this.language, 'reservation', 'calendar']);
       }
     });
-  }
-
-  private createForm(): void {
-    this.form = this.formBuilder.group({
-      description: ['', Validators.required],
-      professional: ['', Validators.required, requireMatchAsync],
-      date: ['', Validators.required],
-      repeat: ['', Validators.required]
-    });
-    this.filteredOptions = this.getForm.professional.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filter(name) : this.professionals ? this.professionals.slice() : this.professionals)
-    );
-  }
-
-  private filter(name: string): IUser[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.professionals?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsNote.Clean()
-    );
-  }
-
-  private getProfessionals(): void {
-    return this.store.dispatch(
-      new fromActionsNote.GetAllProfessional()
-    );
-  }
-
-  private getNote(): void {
-    this.store.dispatch(
-      new fromActionsNote.NoteFind(this.id)
-    );
   }
 }

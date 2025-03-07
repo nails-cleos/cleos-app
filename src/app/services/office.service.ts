@@ -4,6 +4,7 @@ import { PAGE_SIZE } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
 import { IOffice } from '../interfaces/office';
 import { createFilter } from '../util/service-helper';
+import { toUrl } from "../util/helper";
 
 @Injectable({
   providedIn: 'root'
@@ -16,28 +17,21 @@ export class OfficeService {
   constructor(private http: HttpClient) {
   }
 
-  public getAll(sort: string, direction: string, page: number, size: number = PAGE_SIZE): Observable<IOffice[]> {
-    const params = createFilter(page, size, sort, direction);
+  getAll = (
+    sort: string,
+    direction: string,
+    page: number,
+    size: number = PAGE_SIZE
+  ): Observable<IOffice[]> => this.http.get<IOffice[]>(
+    toUrl(this.urlV1, 'pages'),
+    { params: createFilter(page, size, sort, direction) }
+  );
 
-    return this.http.get<IOffice[]>(`${ this.urlV1 }/pages`, { params });
-  }
+  getById = (id: string): Observable<IOffice | undefined> => this.http.get<IOffice>(toUrl(this.urlV1, id));
 
-  public getById(id: string | null): Observable<IOffice | undefined> {
-    const url = `${ this.urlV1 }/${ id }`;
-    return this.http.get<IOffice>(url);
-  }
+  add = (office: IOffice): Observable<IOffice> => this.http.post<IOffice>(this.urlV1, office);
 
-  public add(office: IOffice): Observable<IOffice> {
-    return this.http.post<IOffice>(this.urlV1, office);
-  }
+  delete = (id: string): Observable<IOffice> => this.http.delete<IOffice>(toUrl(this.urlV1, id));
 
-  public delete(id: string | null): Observable<IOffice> {
-    const url = `${ this.urlV1 }/${ id }`;
-    return this.http.delete<IOffice>(url);
-  }
-
-  public update(office: IOffice): Observable<IOffice> {
-    const url = `${ this.urlV1 }/${ office.id }`;
-    return this.http.patch<IOffice>(url, office);
-  }
+  update = (office: IOffice): Observable<IOffice> => this.http.patch<IOffice>(toUrl(this.urlV1, office.id!!), office);
 }

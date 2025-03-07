@@ -26,7 +26,9 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
   @ViewChild(MatSort) sort!: MatSort;
   hasAdminRole: boolean;
 
-  displayedColumns: string[] = ['position', 'timestamp', 'amount', 'amountGifted', 'payment.status', 'payment.type', 'actions'];
+  displayedColumns: string[] = [
+    'position', 'timestamp', 'amount', 'amountGifted', 'payment.status', 'payment.type', 'actions'
+  ];
   dataSource: any = new MatTableDataSource<Pagination<ITransaction>>();
 
   expandedTransaction?: ITransaction;
@@ -44,7 +46,8 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
   private getState: Observable<any>;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private cdRef: ChangeDetectorRef,
-              breakpointObserver: BreakpointObserver, private translate: TranslateService, private authUserService: AuthUserService) {
+              breakpointObserver: BreakpointObserver, private translate: TranslateService,
+              private authUserService: AuthUserService) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -57,7 +60,9 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
     this.getState = this.store.select(selectAccountState);
     this.dateFormat = this.translate.currentLang;
     this.language = this.translate.currentLang;
-    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => this.hasAdminRole = value.hasAdminRole)
+    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(
+      value => this.hasAdminRole = value.hasAdminRole
+    )
   }
 
   ngOnInit(): void {
@@ -79,7 +84,7 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
     this.authUserServiceSubscription.unsubscribe();
   }
 
-  private createPageSubscriptions(): void {
+  private createPageSubscriptions = (): void => {
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
       this.getTransactions();
@@ -89,26 +94,19 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
     this.cdRef.detectChanges();
   }
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsAccount.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsAccount.Clean());
 
-  private getTransactions(page: number = 0): void {
-    const payload = {
+  private getTransactions = (page: number = 0): void => this.store.dispatch(
+    new fromActionsAccount.AccountFindTransactions({
       active: this.sort.active,
       direction: this.sort.direction,
       size: this.pageSize,
       accountId: this.accountId,
       page
-    };
-    this.store.dispatch(
-      new fromActionsAccount.AccountFindTransactions(payload)
-    );
-  }
+    })
+  );
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.data?.account) {
         this.account = state.data.account;

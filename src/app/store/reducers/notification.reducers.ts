@@ -27,7 +27,7 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         // @ts-ignore
-        data: {page: {content: [{}, {}, {}]}},
+        data: { page: { content: [{}, {}, {}] } },
         dataDeleted: null,
         errorMessage: null,
         subErrors: null,

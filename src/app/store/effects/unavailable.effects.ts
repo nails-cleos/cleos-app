@@ -39,53 +39,64 @@ export class UnavailableEffects {
     ))
   ));
 
-  findOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableFind)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.unavailableService.getById(payload).pipe(
-      switchMap((unavailable: any) => of(new fromActionsUnavailable.UnavailableSelected(unavailable))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error })))
-    ))
-  ));
+  findOne$ = createEffect(
+    () => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableFind)).pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.unavailableService.getById(payload).pipe(
+        switchMap((unavailable: any) => of(new fromActionsUnavailable.UnavailableSelected(unavailable))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error })))
+      ))
+    ));
 
-  save$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableSave)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.unavailableService.add(payload).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('UNAVAILABLE.CREATED', { date: newDateTimestamp(response.timestamp) });
-        return of(new fromActionsUnavailable.UnavailableSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error })))
-    ))
-  ));
+  save$ = createEffect(
+    () => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableSave)).pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.unavailableService.add(payload).pipe(
+        switchMap((response: any) => {
+          const message = this.translate.instant('UNAVAILABLE.CREATED', { date: newDateTimestamp(response.timestamp) });
+          return of(new fromActionsUnavailable.UnavailableSaveSuccess({ message }));
+        }),
+        catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error })))
+      ))
+    ));
 
-  blockAgenda$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableBlockAgenda)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.unavailableService.blockAgenda(payload).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('UNAVAILABLE.CREATED', { date: newDateTimestamp(response.timestamp) });
-        return of(new fromActionsUnavailable.UnavailableSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error })))
-    ))
-  ));
+  blockAgenda$ = createEffect(
+    () => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableBlockAgenda)).pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.unavailableService.blockAgenda(payload).pipe(
+        switchMap((response: any) => {
+          const message = this.translate.instant('UNAVAILABLE.CREATED', { date: newDateTimestamp(response.timestamp) });
+          return of(new fromActionsUnavailable.UnavailableSaveSuccess({ message }));
+        }),
+        catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error })))
+      ))
+    ));
 
-  update = createEffect(() => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableUpdate)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.unavailableService.update(payload).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('UNAVAILABLE.UPDATED.MESSAGE', { date: newDateTimestamp(response.timestamp) });
-        return of(new fromActionsUnavailable.UnavailableSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error })))
-    ))
-  ));
+  update = createEffect(
+    () => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableUpdate)).pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.unavailableService.update(payload).pipe(
+        switchMap((response: any) => {
+          const message = this.translate.instant('UNAVAILABLE.UPDATED.MESSAGE',
+            { date: newDateTimestamp(response.timestamp) });
+          return of(new fromActionsUnavailable.UnavailableSaveSuccess({ message }));
+        }),
+        catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error })))
+      ))
+    ));
 
-  delete$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableDelete)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.unavailableService.delete(payload.id).pipe(
-      switchMap(() => {
-        const message = this.translate.instant('UNAVAILABLE.DELETED.MESSAGE', { date: newDateTimestamp(payload.timestamp) });
-        return of(new fromActionsUnavailable.UnavailableSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error })))
-    ))
-  ));
+  delete$ = createEffect(
+    () => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableDelete)).pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.unavailableService.delete(payload.id).pipe(
+        switchMap(() => {
+          const message = this.translate.instant('UNAVAILABLE.DELETED.MESSAGE',
+            { date: newDateTimestamp(payload.timestamp) });
+          return of(new fromActionsUnavailable.UnavailableSaveSuccess({ message }));
+        }),
+        catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error })))
+      ))
+    ));
 
   selectedData$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableSelected),
@@ -110,7 +121,8 @@ export class UnavailableEffects {
     ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableSaveSuccess)
   ), { dispatch: false });
 
-  constructor(private readonly translate: TranslateService, private actions$: Actions, private unavailableService: UnavailableService,
+  constructor(private readonly translate: TranslateService, private actions$: Actions,
+              private unavailableService: UnavailableService,
               private userService: UserService, private router: Router) {
   }
 }

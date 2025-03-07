@@ -31,24 +31,25 @@ export class UpcomingComponent implements OnChanges {
 
   get edit(): void {
     if (this.upcoming && !this.upcoming.canEdit) {
-      return customerEditDialog(this.dialog, this.router, this.upcoming.id, this.upcoming.room.currency, this.small, this.language,
+      return customerEditDialog(this.dialog, this.router, this.upcoming.id, this.upcoming.room.currency, this.small,
+        this.language,
         this.upcoming.price);
     }
     this.router.navigate([this.language, 'me', 'reservation', this.upcoming?.id]);
     return;
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges(_: SimpleChanges): void {
     this.loadUpcoming();
   }
 
-  openDialog(reservationDate: Date): void {
+  openDialog = (reservationDate: Date): void => {
     if (this.upcoming) {
       openDialog(this.upcoming.room, this.dateFormat, this.translate, this.dialog, reservationDate);
     }
   }
 
-  private loadUpcoming(): void {
+  private loadUpcoming = (): void => {
     if (this.upcoming && this.upcoming.id) {
       let rowSpan = 0;
       if (this.upcoming.additional) {

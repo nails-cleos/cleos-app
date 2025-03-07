@@ -19,38 +19,43 @@ export class AccountEffects {
     ))
   ));
 
-  findTransaction$ = createEffect(() => this.actions.pipe(ofType(fromActionsAccount.AccountActionTypes.accountTransactionDetail)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.accountService.findTransaction(payload.id, payload.transactionId).pipe(
-      switchMap((account: any) => of(new fromActionsAccount.AccountSelected(account))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error })))
-    ))
-  ));
+  findTransaction$ = createEffect(
+    () => this.actions.pipe(ofType(fromActionsAccount.AccountActionTypes.accountTransactionDetail)).pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.accountService.findTransaction(payload.id, payload.transactionId).pipe(
+        switchMap((account: any) => of(new fromActionsAccount.AccountSelected(account))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error })))
+      ))
+    ));
 
-  paymentOptions$ = createEffect(() => this.actions.pipe(ofType(fromActionsAccount.AccountActionTypes.paymentOptions)).pipe(
-    map((action: any) => action.payload),
-    switchMap(() => this.paymentService.paymentOptions().pipe(
-      switchMap((response: any) => of(new fromActionsAccount.PaymentOptionsSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error })))
-    ))
-  ));
+  paymentOptions$ = createEffect(
+    () => this.actions.pipe(ofType(fromActionsAccount.AccountActionTypes.paymentOptions)).pipe(
+      map((action: any) => action.payload),
+      switchMap(() => this.paymentService.paymentOptions().pipe(
+        switchMap((response: any) => of(new fromActionsAccount.PaymentOptionsSuccess(response))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error })))
+      ))
+    ));
 
-  findAllTransaction$ = createEffect(() => this.actions.pipe(ofType(fromActionsAccount.AccountActionTypes.accountFindTransactions)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.accountService.getAllTransactions(payload.accountId, payload.page, payload.active,
-      payload.direction, payload.size).pipe(
-      switchMap((transactions: any) => of(new fromActionsAccount.AccountSuccess(transactions))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error })))
-    ))
-  ));
+  findAllTransaction$ = createEffect(
+    () => this.actions.pipe(ofType(fromActionsAccount.AccountActionTypes.accountFindTransactions)).pipe(
+      map((action: any) => action.payload),
+      switchMap(
+        (payload: any) => this.accountService.getAllTransactions(payload.accountId, payload.page, payload.active,
+          payload.direction, payload.size).pipe(
+          switchMap((transactions: any) => of(new fromActionsAccount.AccountSuccess(transactions))),
+          catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error })))
+        ))
+    ));
 
-  findByCustomer$ = createEffect(() => this.actions.pipe(ofType(fromActionsAccount.AccountActionTypes.accountFindByCustomer)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.accountService.findByCustomer(payload).pipe(
-      switchMap((account: any) => of(new fromActionsAccount.AccountSelected(account))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error })))
-    ))
-  ));
+  findByCustomer$ = createEffect(
+    () => this.actions.pipe(ofType(fromActionsAccount.AccountActionTypes.accountFindByCustomer)).pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.accountService.findByCustomer(payload).pipe(
+        switchMap((account: any) => of(new fromActionsAccount.AccountSelected(account))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error })))
+      ))
+    ));
 
   save$ = createEffect(() => this.actions.pipe(ofType(fromActionsAccount.AccountActionTypes.accountSave)).pipe(
     map((action: any) => action.payload),

@@ -36,6 +36,7 @@ export interface IAccountTransaction {
   account?: IAccountAll;
   transactions?: Pagination<ITransaction>;
 }
+
 export interface ITransaction {
   account?: IAccountAll;
   accountId?: string;

@@ -56,7 +56,8 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.zoom = 10;
     this.types = [];
     this.isDarkMode = false;
-    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => this.isDarkMode = value.isDarkMode);
+    this.authUserServiceSubscription =
+      this.authUserService.authUser.subscribe(value => this.isDarkMode = value.isDarkMode);
   }
 
   ngOnInit(): void {
@@ -167,7 +168,7 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.authUserServiceSubscription.unsubscribe();
   }
 
-  markerDragEnd($event: MapMouseEvent): void {
+  markerDragEnd = ($event: MapMouseEvent): void => {
     if ($event.latLng) {
       this.geocodeService.geocodeAddress($event.latLng.lat(), $event.latLng.lng(), this.showDistance)
         .subscribe(value => {
@@ -179,11 +180,9 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  openInfoWindow(marker: MapMarker): void {
-    this.infoWindow?.open(marker);
-  }
+  openInfoWindow = (marker: MapMarker): void => this.infoWindow?.open(marker);
 
-  private setAutocomplete(): void {
+  private setAutocomplete = (): void => {
     if (this.addressText?.nativeElement) {
       const options = {
         componentRestrictions: { country: 'nl' },
@@ -198,7 +197,7 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private setCurrentPosition(): void {
+  private setCurrentPosition = (): void => {
     if (this.latitudeMarker && this.longitudeMarker) {
       this.center = { lat: this.latitudeMarker, lng: this.longitudeMarker };
       this.markerPosition = { lat: this.latitudeMarker, lng: this.longitudeMarker };
@@ -207,14 +206,15 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.markerOptions = { gmpDraggable: this.isDraggable };
 
       if (this.showDistance) {
-        this.geocodeService.geocodeAddress(this.latitudeMarker, this.longitudeMarker, this.showDistance).subscribe(value => {
-          if (value.distance) {
-            this.distanceEmitter.emit(value.distance);
-          }
-          if (value.address) {
-            this.setAddress(value.address);
-          }
-        });
+        this.geocodeService.geocodeAddress(this.latitudeMarker, this.longitudeMarker, this.showDistance)
+          .subscribe(value => {
+            if (value.distance) {
+              this.distanceEmitter.emit(value.distance);
+            }
+            if (value.address) {
+              this.setAddress(value.address);
+            }
+          });
       } else if (!this.info) {
         this.info = this.markInfo;
       }
@@ -229,7 +229,7 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private setAddress(place: PlaceResult): void {
+  private setAddress = (place: PlaceResult): void => {
     if (place.geometry && place.geometry.location) {
       this.latitudeMarker = this.latitude = place.geometry.location.lat();
       this.longitudeMarker = this.longitude = place.geometry.location.lng();
@@ -251,7 +251,7 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private mockResponse(): void {
+  private mockResponse = (): void => {
     if (!this.addressFormGroup?.get('address')?.value) {
       const value = {
         // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -283,8 +283,10 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private getRandomInRange(from: number, to: number, fixed: number = 3): number {
-    return Number((Math.random() * (to - from) + from).toFixed(fixed)) * 1;
-    // .toFixed() returns string, so ' * 1' is a trick to convert to number
-  }
+  // .toFixed() returns string, so ' * 1' is a trick to convert to number
+  private getRandomInRange = (
+    from: number,
+    to: number,
+    fixed: number = 3
+  ): number => Number((Math.random() * (to - from) + from).toFixed(fixed)) * 1
 }

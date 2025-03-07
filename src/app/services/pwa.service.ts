@@ -13,7 +13,8 @@ export const NOT_INSTALL_PWA = 'not_install_pwa';
 export class PwaService {
   private promptEvent: any;
 
-  constructor(private bottomSheet: MatBottomSheet, private platform: Platform, swUpdate: SwUpdate, private cookieService: CookieService) {
+  constructor(private bottomSheet: MatBottomSheet, private platform: Platform, swUpdate: SwUpdate,
+              private cookieService: CookieService) {
     if (swUpdate.isEnabled) {
       swUpdate.versionUpdates
         .pipe(filter((evt): evt is VersionReadyEvent => evt.type === 'VERSION_READY'))
@@ -21,7 +22,7 @@ export class PwaService {
     }
   }
 
-  public initPwaPrompt(): void {
+  initPwaPrompt = (): void => {
     if (!this.cookieService.get(NOT_INSTALL_PWA)) {
       if (this.platform.ANDROID) {
         window.addEventListener('beforeinstallprompt', (event: any) => {
@@ -39,7 +40,7 @@ export class PwaService {
     }
   }
 
-  private openPromptComponent(mobileType: 'ios' | 'android'): void {
+  private openPromptComponent = (mobileType: 'ios' | 'android'): void => {
     timer(3000)
       .pipe(take(1))
       .subscribe(() => this.bottomSheet.open(PromptComponent, { data: { mobileType, promptEvent: this.promptEvent } }));

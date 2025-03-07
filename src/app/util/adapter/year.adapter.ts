@@ -9,7 +9,5 @@ export class YearAdapter extends DateAdapter {
     super(translate.currentLang);
   }
 
-  format(date: Date, displayFormat: any): string {
-    return super.formatDate(date, { year: 'numeric' });
-  }
+  format = (date: Date, displayFormat: any): string => super.formatDate(date, { year: 'numeric' });
 }

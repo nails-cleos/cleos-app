@@ -7,7 +7,11 @@ import { ReservationsComponent } from './reservation/list/reservations.component
 import { MeReservationComponent } from './reservation/me/me-reservation.component';
 import { PaymentComponent } from './payment/payment.component';
 import { PaymentCompleteComponent } from './payment/complete/payment-complete.component';
-import { BottomSheetReferralComponent, BottomSheetShareComponent, ReferralsComponent } from './referrals/referrals.component';
+import {
+  BottomSheetReferralComponent,
+  BottomSheetShareComponent,
+  ReferralsComponent
+} from './referrals/referrals.component';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
 import { ReviewDialogComponent } from './reservation/review/review-dialog.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -53,26 +57,26 @@ import { NgxMatIntlTelInputComponent } from 'ngx-mat-intl-tel-input';
     MePaymentComponent,
     ShareButtonsComponent
   ],
-    imports: [
-        MeRoutingModule,
-        SharedModule,
-        MatProgressBarModule,
-        MatStepperModule,
-        TranslateModule.forChild({
-            loader: {
-                provide: TranslateLoader,
-                useClass: TranslateLoaderFactory.forModule('me')
-            },
-            missingTranslationHandler: {
-                provide: MissingTranslationHandler,
-                useClass: MissingTranslateHandler,
-            },
-            isolate: false,
-            extend: true
-        }),
-        EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects, CurrencyEffects]),
-        NgxMatIntlTelInputComponent
-    ],
+  imports: [
+    MeRoutingModule,
+    SharedModule,
+    MatProgressBarModule,
+    MatStepperModule,
+    TranslateModule.forChild({
+      loader: {
+        provide: TranslateLoader,
+        useClass: TranslateLoaderFactory.forModule('me')
+      },
+      missingTranslationHandler: {
+        provide: MissingTranslationHandler,
+        useClass: MissingTranslateHandler,
+      },
+      isolate: false,
+      extend: true
+    }),
+    EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects, CurrencyEffects]),
+    NgxMatIntlTelInputComponent
+  ],
   providers: [
     ReservationService,
     PaymentService,

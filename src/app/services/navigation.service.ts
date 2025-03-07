@@ -18,7 +18,7 @@ export class NavigationService {
   constructor(private store: Store<AppState>, private router: Router, private translate: TranslateService) {
   }
 
-  subscribe(): void {
+  subscribe = (): void => {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         if (!event.urlAfterRedirects.includes('/payment/success?')
@@ -29,7 +29,7 @@ export class NavigationService {
     });
   }
 
-  back(date?: Date, step: number = 0): void {
+  back = (date?: Date, step: number = 0): void => {
     this.history.pop();
     if (this.history.length > 0) {
       const last = this.history[this.history.length - 1];
@@ -39,17 +39,17 @@ export class NavigationService {
     }
   }
 
-  reload(url: string[], data?: any, queryParams?: any, reloadURL = '/auth/redirect', lang?: string): void {
+  reload = (url: string[], data?: any, queryParams?: any, reloadURL = '/auth/redirect', lang?: string): void => {
     const navigateUrl = `/${ lang || getLocale(this.translate.currentLang).language }${ reloadURL }`;
     this.router.navigateByUrl(navigateUrl, { skipLocationChange: true }).then(() =>
       this.router.navigate(url.filter(path => path), { state: data, queryParams }));
   }
 
-  reloadPage(url: string = `/${ getLocale(this.translate.currentLang).language }`): void {
+  reloadPage = (url: string = `/${ getLocale(this.translate.currentLang).language }`): void => {
     this.router.navigateByUrl(url).then(() => window.location.reload());
   }
 
-  attachLang(lang: string | null, currentUser?: IUser): string {
+  attachLang = (lang: string | null, currentUser?: IUser): string => {
     const language = getLocale(lang).language;
     if (language !== getLocale(this.translate.currentLang).language) {
       const user: IUser = new User();

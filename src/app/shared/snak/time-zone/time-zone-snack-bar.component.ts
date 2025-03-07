@@ -26,7 +26,8 @@ export class TimeZoneSnackBarComponent {
     this.action = this.translate.instant('COMMON.TIME_ZONE.ACTION');
   }
 
-  private getDateTime(reservationDate: Date, timeZone?: string): string {
-    return localeTimeZoneDate(this.translate.currentLang, reservationDate, timeZone);
-  }
+  private getDateTime = (
+    reservationDate: Date,
+    timeZone?: string
+  ): string => localeTimeZoneDate(this.translate.currentLang, reservationDate, timeZone)
 }

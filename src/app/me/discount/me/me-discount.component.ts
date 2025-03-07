@@ -69,12 +69,33 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription?.unsubscribe();
   }
 
-  useDiscount(discount: IUserDiscount): void {
+  useDiscount = (discount: IUserDiscount): void => {
     const data = { discount };
     this.router.navigate([this.language, 'me', 'reservation'], { state: data });
   }
 
-  private subscribe(): void {
+  private clean = (): void => this.store.dispatch(new fromActionsDiscount.Clean());
+
+  private createPageSubscriptions = (): void => {
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.getDiscounts();
+    });
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getDiscounts(this.paginator.pageIndex));
+
+    this.cdRef.detectChanges();
+  }
+
+  private getDiscounts = (page: number = 0): void => this.store.dispatch(
+    new fromActionsDiscount.GetMyDiscounts({
+      active: this.sort.active,
+      direction: this.sort.direction,
+      size: this.pageSize,
+      page
+    })
+  );
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.message) {
         this.clean();
@@ -100,33 +121,5 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
         this.createPageSubscriptions();
       }
     });
-  }
-
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsDiscount.Clean()
-    );
-  }
-
-  private createPageSubscriptions(): void {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getDiscounts();
-    });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getDiscounts(this.paginator.pageIndex));
-
-    this.cdRef.detectChanges();
-  }
-
-  private getDiscounts(page: number = 0): void {
-    const payload = {
-      active: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-      page
-    };
-    this.store.dispatch(
-      new fromActionsDiscount.GetMyDiscounts(payload)
-    );
   }
 }

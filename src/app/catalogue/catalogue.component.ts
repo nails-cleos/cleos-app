@@ -1,6 +1,13 @@
 import { ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
+import {
+  AbstractControl,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators,
+  ɵTypedOrUntyped
+} from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AppState, selectCatalogueState } from '../store/app.states';
 import * as fromActionsCatalogue from '../store/catalogue.actions';
@@ -68,7 +75,8 @@ export class CatalogueComponent implements OnInit, OnDestroy {
     } else {
       catalogue.id = this.id;
       this.catalogue = undefined;
-      return this.store.dispatch(new fromActionsCatalogue.CatalogueUpdate({ catalogue, file: this.resizedImageDataUrl }));
+      return this.store.dispatch(
+        new fromActionsCatalogue.CatalogueUpdate({ catalogue, file: this.resizedImageDataUrl }));
     }
   }
 
@@ -115,33 +123,29 @@ export class CatalogueComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  displayFnGroup(group: ITreatmentGroup): string {
-    return group ? `${ group.name }` : '';
-  }
+  displayFnGroup = (group: ITreatmentGroup): string => group ? `${ group.name }` : '';
 
-  keyDownGroup(event: any): void {
+  keyDownGroup = (event: any): void => {
     if (event.code === 'Backspace') {
       this.getForm.group.setValue('');
     }
   }
 
-  onFileDropped(files: any): void {
+  onFileDropped = (files: any): void => {
     files[0].progress = 0;
     this.file = files[0];
     this.uploadFilesSimulator();
   }
 
-  fileBrowseHandler($event: any): void {
+  fileBrowseHandler = ($event: any): void => {
     $event.target.files[0].progress = 0;
     this.file = $event.target.files[0];
     this.uploadFilesSimulator();
   }
 
-  formatBytes(bytes: any, decimals: number): string {
-    return formatBytes(bytes, decimals);
-  }
+  formatBytes = (bytes: any, decimals: number): string => formatBytes(bytes, decimals);
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.form = this.formBuilder.group({
       name: ['', Validators.required],
       description: [''],
@@ -156,13 +160,11 @@ export class CatalogueComponent implements OnInit, OnDestroy {
     );
   }
 
-  private filterGroup(name: string): IGroupService[] | undefined {
-    const filterValue = name.toLowerCase();
+  private filterGroup = (name: string): IGroupService[] | undefined => this.groups?.filter(
+    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0
+  );
 
-    return this.groups?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-  private uploadFilesSimulator(): void {
+  private uploadFilesSimulator = (): void => {
     const fileSizeInMB = this.file.size / (1024 * 1024); // Convert file size to MB
     const baseInterval = 200; // Base interval in milliseconds
 
@@ -188,26 +190,18 @@ export class CatalogueComponent implements OnInit, OnDestroy {
     }, 1000);
   }
 
-  private processImage(img: HTMLImageElement): void {
+  private processImage = (img: HTMLImageElement): void => {
     this.resizedImageDataUrl = resizeImage(img, this.canvas?.nativeElement || this.canvasXs?.nativeElement);
     if (this.resizedImage) {
       this.resizedImage.nativeElement.src = this.resizedImageDataUrl;
     }
   }
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsCatalogue.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsCatalogue.Clean());
 
-  private findGroups(): void {
-    this.store.dispatch(
-      new fromActionsCatalogue.FindGroups()
-    );
-  }
+  private findGroups = (): void => this.store.dispatch(new fromActionsCatalogue.FindGroups());
 
-  private getCatalogue(): void {
+  private getCatalogue = (): void => {
     if (!this.catalogue) {
       const id = this.route.snapshot.paramMap.get('id');
       this.store.dispatch(
@@ -216,7 +210,7 @@ export class CatalogueComponent implements OnInit, OnDestroy {
     }
   }
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.groups = state.groups;
       if (state.selected) {

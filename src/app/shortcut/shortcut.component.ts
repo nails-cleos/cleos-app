@@ -19,8 +19,8 @@ export class ShortcutComponent implements OnDestroy {
 
   private authUserServiceSubscription: Subscription;
 
-  constructor(private readonly translate: TranslateService, private authUserService: AuthUserService, private route: ActivatedRoute,
-              private router: Router) {
+  constructor(private readonly translate: TranslateService, private authUserService: AuthUserService,
+              private route: ActivatedRoute, private router: Router) {
     const key = this.route.snapshot.paramMap.get('key') as keyof typeof ShortcutEnum;
     const shortcut = ShortcutEnum[key];
     this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {

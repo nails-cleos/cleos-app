@@ -7,8 +7,6 @@ import { snakeToCamel } from '../util/helper';
 })
 export class ReservationIconPipe implements PipeTransform {
 
-  transform(name?: string): any {
-    return name ? ReservationIconName[snakeToCamel(name) as ReservationIconKey] : '';
-  }
+  transform = (name?: string): any => name ? ReservationIconName[snakeToCamel(name) as ReservationIconKey] : ''
 
 }

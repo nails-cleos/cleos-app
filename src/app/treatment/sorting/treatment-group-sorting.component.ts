@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ISorted, ISorting, ItemSorting } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
 import { Observable, Subscription } from 'rxjs';
-import { TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { AppState, selectTreatmentState } from '../../store/app.states';
 import * as fromActionsTreatment from '../../store/treatment.actions';
@@ -12,14 +11,14 @@ import { ITreatmentGroupAll } from '../../interfaces/treatment';
   templateUrl: './treatment-group-sorting.component.html',
   styleUrls: ['./treatment-group-sorting.component.scss']
 })
-export class TreatmentGroupSortingComponent implements OnInit {
+export class TreatmentGroupSortingComponent implements OnInit, OnDestroy {
 
   items?: ISorting[];
 
   private subscription?: Subscription;
   private getState: Observable<any>;
 
-  constructor(private readonly translate: TranslateService, private store: Store<AppState>) {
+  constructor(private store: Store<AppState>) {
     this.getState = this.store.select(selectTreatmentState);
   }
 
@@ -29,25 +28,17 @@ export class TreatmentGroupSortingComponent implements OnInit {
     this.getTreatments();
   }
 
-  sorted(sorted: ISorted[]): void {
-    this.store.dispatch(
-      new fromActionsTreatment.TreatmentGroupUpdateSort(sorted)
-    );
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsTreatment.Clean()
-    );
-  }
+  sorted = (sorted: ISorted[]): void => this.store.dispatch(new fromActionsTreatment.TreatmentGroupUpdateSort(sorted));
 
-  private getTreatments(): void {
-    this.store.dispatch(
-      new fromActionsTreatment.GetAllGroup()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsTreatment.Clean());
 
-  private subscribe(): void {
+  private getTreatments = (): void => this.store.dispatch(new fromActionsTreatment.GetAllGroup());
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe((stateValue) => {
       if (stateValue.message) {
         this.clean();

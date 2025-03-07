@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
-import { IAvailability, IAvailabilityAll, IRoom } from '../../interfaces/room';
+import { IAvailability, IRoom } from '../../interfaces/room';
 import { Observable, Subscription } from 'rxjs';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -66,15 +66,47 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription?.unsubscribe();
   }
 
-  getTimeZone(timeZone?: string): ITimeZone {
-    return getTimeZone(timeZone);
+  getTimeZone = (timeZone?: string): ITimeZone => getTimeZone(timeZone);
+
+  getGMT = (timeZone?: string): string => this.getTimeZone(timeZone).gmt;
+
+  edit = (room: IRoom): void => this.store.dispatch(
+    new fromActionsRoom.RoomSelected({ roomInfo: { room }, redirect: true }));
+
+  delete = (room: IRoom): void => {
+    const title = this.translate.instant('ROOM.DELETED.TITLE');
+    const content = this.translate.instant('ROOM.DELETED.CONTENT', { name: room.address?.name });
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: room }, result => {
+      if (result) {
+        this.store.dispatch(
+          new fromActionsRoom.DeleteRoom(result)
+        );
+      }
+    });
   }
 
-  getGMT(timeZone?: string): string {
-    return this.getTimeZone(timeZone).gmt;
+  private clean = (): void => this.store.dispatch(new fromActionsRoom.Clean());
+
+  private createPageSubscriptions = (): void => {
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.getRooms();
+    });
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getRooms(this.paginator.pageIndex));
+
+    this.cdRef.detectChanges();
   }
 
-  subscribe(): void {
+  private getRooms = (page: number = 0): void => this.store.dispatch(
+    new fromActionsRoom.GetAll({
+      active: this.sort.active,
+      direction: this.sort.direction,
+      size: this.pageSize,
+      page
+    })
+  );
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe((stateValue) => {
       if (stateValue.message) {
         this.clean();
@@ -105,52 +137,4 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
   }
-
-  edit(room: IRoom): void {
-    this.store.dispatch(
-      new fromActionsRoom.RoomSelected({ roomInfo: { room }, redirect: true })
-    );
-  }
-
-  delete(room: IRoom): void {
-    const title = this.translate.instant('ROOM.DELETED.TITLE');
-    const content = this.translate.instant('ROOM.DELETED.CONTENT', { name: room.address?.name });
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: room }, result => {
-      if (result) {
-        this.store.dispatch(
-          new fromActionsRoom.DeleteRoom(result)
-        );
-      }
-    });
-  }
-
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsRoom.Clean()
-    );
-  }
-
-  private createPageSubscriptions(): void {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getRooms();
-    });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getRooms(this.paginator.pageIndex));
-
-    this.cdRef.detectChanges();
-  }
-
-  private getRooms(page: number = 0): void {
-    const payload = {
-      active: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-      page
-    };
-    this.store.dispatch(
-      new fromActionsRoom.GetAll(payload)
-    );
-  }
-
-  sortFn = (a: IAvailabilityAll, b: IAvailabilityAll): number => findDayOfWeek(a.day) - findDayOfWeek(b.day);
 }

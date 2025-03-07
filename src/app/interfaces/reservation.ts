@@ -213,26 +213,26 @@ export class DataEvent implements IDataEvent {
     this.process = process;
   }
 
-  addEvents(events: CalendarEvent[]): void {
+  addEvents = (events: CalendarEvent[]): void => {
     this.calendarEvents = this.calendarEvents.concat(events);
   }
 
-  addEvent(event?: CalendarEvent): void {
+  addEvent = (event?: CalendarEvent): void => {
     if (event) {
       this.calendarEvents = [...this.calendarEvents, event];
     }
   }
 
-  removeEvent(event: CalendarEvent, deleteCount: number = 1): void {
+  removeEvent = (event: CalendarEvent, deleteCount: number = 1): void => {
     const i = this.calendarEvents.indexOf(event);
     this.calendarEvents = this.calendarEvents.slice(i, deleteCount);
   }
 
-  filterEvent(event: CalendarEvent): void {
+  filterEvent = (event: CalendarEvent): void => {
     this.calendarEvents = this.calendarEvents.filter(ev => ev !== event);
   }
 
-  updateLength(length: number): void {
+  updateLength = (length: number): void => {
     this.unavailableEventLength = length;
   }
 }

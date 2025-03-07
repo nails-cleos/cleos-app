@@ -2,7 +2,8 @@ import { IStep } from '../interfaces/step';
 import { MatStepper } from '@angular/material/stepper';
 import { Analytics, logEvent } from '@angular/fire/analytics';
 
-export const completeAndNext = (steps: IStep[], myStepper: MatStepper, goNext: boolean, analytics?: Analytics): void => {
+export const completeAndNext = (steps: IStep[], myStepper: MatStepper, goNext: boolean,
+                                analytics?: Analytics): void => {
   setTimeout(() => {
     const step = getStep(steps, myStepper.selectedIndex - (goNext ? 0 : 1));
     if (step) {
@@ -34,7 +35,9 @@ export const goNextStep = (step: IStep): void => {
 
 export const getIndex = (steps: IStep[], name: string): number | undefined => steps.find(s => s.name === name)?.order;
 
-export const getStepCall = (steps: IStep[], index: number, goNext: boolean = false): void => getStep(steps, index)?.call(goNext);
+export const getStepCall = (steps: IStep[], index: number, goNext: boolean = false): void => getStep(steps, index)
+  ?.call(goNext);
+
 export const getStepName = (steps: IStep[], index: number): string => {
   const step = getStep(steps, index);
   return step ? step.name : '';

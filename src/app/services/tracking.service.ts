@@ -2,29 +2,33 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ITracking } from '../interfaces/reservation';
+import { toUrl } from "../util/helper";
 
 @Injectable()
 export class TrackingService {
 
   private url = 'tracking';
-  private urlV1 = `v1/${this.url}`;
+  private urlV1 = `v1/${ this.url }`;
 
   constructor(private http: HttpClient) {
   }
 
-  public getAll(): Observable<ITracking[]> {
-    return this.http.get<ITracking[]>(this.urlV1);
-  }
+  getAll = (): Observable<ITracking[]> => this.http.get<ITracking[]>(this.urlV1);
 
-  public findByReservationId(reservationId: string): Observable<ITracking> {
-    return this.http.get<ITracking>(`${this.urlV1}/reservations/${reservationId}`);
-  }
+  findByReservationId = (
+    reservationId: string
+  ): Observable<ITracking> => this.http.get<ITracking>(toUrl(this.urlV1, 'reservations', reservationId));
 
-  public executeByReservationId(reservationId: string): Observable<ITracking> {
-    return this.http.post<ITracking>(`${this.urlV1}/reservations/${reservationId}`, {});
-  }
+  executeByReservationId = (
+    reservationId: string
+  ): Observable<ITracking> => this.http.post<ITracking>(toUrl(this.urlV1, 'reservations', reservationId), {});
 
-  public updateByReservationId(reservationId: string, started?: string, completed?: string): Observable<ITracking> {
-    return this.http.patch<ITracking>(`${this.urlV1}/reservations/${reservationId}`, {started, completed});
-  }
+  updateByReservationId = (
+    reservationId: string,
+    started?: string,
+    completed?: string
+  ): Observable<ITracking> => this.http.patch<ITracking>(
+    toUrl(this.urlV1, 'reservations', reservationId),
+    { started, completed }
+  );
 }

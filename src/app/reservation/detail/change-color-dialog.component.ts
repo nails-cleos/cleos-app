@@ -50,23 +50,21 @@ export class ChangeColorDialogComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  displayFnColor(color: IColorAll): string {
-    return color ? color.name : '';
-  }
+  displayFnColor = (color: IColorAll): string => color ? color.name : '';
 
-  keyDownHandler(event: any): void {
+  keyDownHandler = (event: any): void => {
     if (event.code === 'Backspace') {
       this.color.setValue('');
     }
   }
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.colorForm = this.formBuilder.group({
       color: this.color
     });
   }
 
-  private createFilters(): void {
+  private createFilters = (): void => {
     this.filteredColor = this.color.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
@@ -74,19 +72,14 @@ export class ChangeColorDialogComponent implements OnInit, OnDestroy {
     );
   }
 
-  private filterColor(name: string): IColorAll[] | undefined {
-    const filterValue = name.toLowerCase();
+  private filterColor = (name: string): IColorAll[] | undefined => this.colors?.filter(
+    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0)
 
-    return this.colors?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
-  }
+  private getColors = (): void => this.store.dispatch(
+    new fromActionsReservation.GetAllColorsByTreatmentId(this.treatmentId)
+  );
 
-  private getColors(): void {
-    this.store.dispatch(
-      new fromActionsReservation.GetAllColorsByTreatmentId(this.treatmentId)
-    );
-  }
-
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.colors = state.colors;
       this.color.setValue(this.colors?.find(color => color.id === this.data.colorId));
