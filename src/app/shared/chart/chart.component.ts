@@ -25,10 +25,11 @@ export class ChartComponent implements OnChanges, OnDestroy {
 
   constructor(private authUserService: AuthUserService) {
     this.isDarkMode = false;
-    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => this.isDarkMode = value.isDarkMode);
+    this.authUserServiceSubscription =
+      this.authUserService.authUser.subscribe(value => this.isDarkMode = value.isDarkMode);
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges(_: SimpleChanges): void {
     this.createChart();
   }
 
@@ -36,7 +37,7 @@ export class ChartComponent implements OnChanges, OnDestroy {
     this.authUserServiceSubscription.unsubscribe();
   }
 
-  private createChart(): void {
+  private createChart = (): void => {
     if (!this.chartSummary || this.error || !this.chartSummary.type) {
       this.error = { status: 'NO_CONTENT' };
       return;

@@ -12,7 +12,6 @@ import { getDiffTime, newDateTimestamp } from '../../../util/dates';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { executeDialog } from '../../../util/helper';
-import { AddDiscountDialogComponent } from '../add-discount-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { UpdateTrackingDialogComponent } from './update-tracking-dialog.component';
 
@@ -38,8 +37,8 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
   private getState: Observable<any>;
   private subscription?: Subscription;
 
-  constructor(public dialog: MatDialog, private store: Store<AppState>, private route: ActivatedRoute, private translate: TranslateService,
-              private clipboard: Clipboard, private snackBar: MatSnackBar) {
+  constructor(public dialog: MatDialog, private store: Store<AppState>, private route: ActivatedRoute,
+              private translate: TranslateService, private clipboard: Clipboard, private snackBar: MatSnackBar) {
     this.getState = this.store.select(selectReservationState);
     this.paymentGetState = this.store.select(selectPaymentState);
     this.dateFormat = this.translate.currentLang;
@@ -83,13 +82,11 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
     this.paymentSubscription?.unsubscribe();
   }
 
-  resend(payment: IPaymentAll): void {
-    this.store.dispatch(
-      new fromActionsPayment.PaymentRecreate({ id: payment.id, paymentType: payment.type })
-    );
-  }
+  resend = (payment: IPaymentAll): void => this.store.dispatch(
+    new fromActionsPayment.PaymentRecreate({ id: payment.id, paymentType: payment.type })
+  );
 
-  copy(payment: IPaymentAll): void {
+  copy = (payment: IPaymentAll): void => {
     if (payment.link) {
       this.clipboard.copy(payment.link);
       this.snackBar.open(this.translate.instant('PAYMENT.COPY'), 'OK', {
@@ -98,24 +95,7 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
     }
   }
 
-  private subscribe(): void {
-    this.subscription = this.getState.subscribe(state => {
-      this.payments = state.payments;
-      this.tracking = state.tracking;
-      this.reservation = state.selected;
-      if (this.tracking && this.tracking.startedTimestamp && this.tracking.completedTimestamp) {
-        this.totalTime = getDiffTime(newDateTimestamp(this.tracking.completedTimestamp), newDateTimestamp(this.tracking.startedTimestamp));
-      }
-    });
-    this.paymentSubscription = this.paymentGetState.subscribe(state => {
-      if (state.message) {
-        this.payments = undefined;
-        this.getInformation();
-      }
-    });
-  }
-
-  private getInformation(): void {
+  private getInformation = (): void => {
     if (!this.tracking) {
       this.tracking = undefined;
       this.store.dispatch(
@@ -134,5 +114,23 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
         new fromActionsReservation.ReservationFind({ id: this.reservationId })
       );
     }
+  }
+
+  private subscribe = (): void => {
+    this.subscription = this.getState.subscribe(state => {
+      this.payments = state.payments;
+      this.tracking = state.tracking;
+      this.reservation = state.selected;
+      if (this.tracking && this.tracking.startedTimestamp && this.tracking.completedTimestamp) {
+        this.totalTime = getDiffTime(newDateTimestamp(this.tracking.completedTimestamp),
+          newDateTimestamp(this.tracking.startedTimestamp));
+      }
+    });
+    this.paymentSubscription = this.paymentGetState.subscribe(state => {
+      if (state.message) {
+        this.payments = undefined;
+        this.getInformation();
+      }
+    });
   }
 }

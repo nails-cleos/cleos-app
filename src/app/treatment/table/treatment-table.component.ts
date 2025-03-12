@@ -32,12 +32,12 @@ export class TreatmentTableComponent implements AfterViewInit, OnChanges {
     this.dataSource.paginator = this.paginator;
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges(_: SimpleChanges): void {
     this.dataSource = this.treatment?.map(p => {
       if (p.duration) {
         const duration = convertDuration(p.duration);
 
-        return Object.assign({}, p, {hour: duration.hour, minute: duration.minute});
+        return Object.assign({}, p, { hour: duration.hour, minute: duration.minute });
       }
       return p;
     });

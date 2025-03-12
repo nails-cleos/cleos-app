@@ -50,23 +50,21 @@ export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  displayFnUser(user: IUser): string {
-    return user?.displayName ? user.displayName : '';
-  }
+  displayFnUser = (user: IUser): string => user?.displayName ? user.displayName : '';
 
-  keyDownHandler(event: any): void {
+  keyDownHandler = (event: any): void => {
     if (event.code === 'Backspace') {
       this.customer.setValue('');
     }
   }
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.customerForm = this.formBuilder.group({
       customer: this.customer
     });
   }
 
-  private createFilters(): void {
+  private createFilters = (): void => {
     this.filteredCustomer = this.customer.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
@@ -74,28 +72,18 @@ export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
     );
   }
 
-  private filterCustomer(name: string): IUser[] | undefined {
-    const filterValue = name.toLowerCase();
+  private filterCustomer = (name: string): IUser[] | undefined => this.customers?.filter(
+    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0)
 
-    return this.customers?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
-  }
+  private getCustomers = (): void => this.store.dispatch(new fromActionsUser.GetAllCustomers());
 
-  private getCustomers(): void {
-    this.store.dispatch(
-      new fromActionsUser.GetAllCustomers()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsUser.Clean());
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.customers = state.data;
       this.customer.setValue(this.customers?.find(customer => customer.id === this.data.customerId));
     });
   }
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsUser.Clean()
-    );
-  }
 }

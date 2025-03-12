@@ -26,7 +26,8 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
   private id: string | null = null;
   private transactionId: string | null = null;
 
-  constructor(private store: Store<AppState>, private route: ActivatedRoute, private translate: TranslateService, private router: Router) {
+  constructor(private store: Store<AppState>, private route: ActivatedRoute, private translate: TranslateService,
+              private router: Router) {
     this.getState = this.store.select(selectAccountState);
     this.dateFormat = this.translate.currentLang;
     this.step = this.router.getCurrentNavigation()?.extras.state?.step;
@@ -62,16 +63,16 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  private getTransaction(): void {
-    this.store.dispatch(
-      new fromActionsAccount.TransactionDetail({ id: this.id, transactionId: this.transactionId })
-    );
-  }
+  private getTransaction = (): void => this.store.dispatch(
+    new fromActionsAccount.TransactionDetail({ id: this.id, transactionId: this.transactionId })
+  );
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
-        this.transaction = Object.assign({}, state.selected, { date: newDateTimestamp(state.selected.payment.timestamp) });
+        this.transaction = Object.assign(
+          {}, state.selected, { date: newDateTimestamp(state.selected.payment.timestamp) }
+        );
       }
       if (state.paths) {
         this.router.navigate([this.language].concat(state.paths));

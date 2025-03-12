@@ -1,7 +1,7 @@
 import { Pagination } from '../../interfaces/pagination';
 import { All, TreatmentActionTypes } from '../treatment.actions';
 import { ITreatmentAll, ITreatmentGroup } from '../../interfaces/treatment';
-import { IColor, IColorAll } from '../../interfaces/color';
+import { IColorAll } from '../../interfaces/color';
 
 export interface State {
   data: ITreatmentGroup | Pagination<ITreatmentGroup> | null;

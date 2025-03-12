@@ -32,17 +32,15 @@ export class BankComponent implements AfterViewInit {
     this.createFilter();
   }
 
-  displayFnBank(bank: IPaymentOption): string {
-    return bank ? `${ bank.name }` : '';
-  }
+  displayFnBank = (bank: IPaymentOption): string => bank ? `${ bank.name }` : '';
 
-  keyDownHandler(event: any): void {
+  keyDownHandler = (event: any): void => {
     if (event.code === 'Backspace') {
       this.formGroup.get('bank')?.setValue('');
     }
   }
 
-  private formChanges(): void {
+  private formChanges = (): void => {
     this.formGroup.get('percentage')?.setValue('TOTAL');
     if (this.firstTime) {
       this.formGroup.get('type')?.setValidators([Validators.required]);
@@ -91,7 +89,7 @@ export class BankComponent implements AfterViewInit {
     });
   }
 
-  private createFilter(): void {
+  private createFilter = (): void => {
     this.filteredBank = this.formGroup.get('bank')?.valueChanges.pipe(startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filterBank(name) : this.bankList ? this.bankList.slice() : this.bankList));
@@ -101,9 +99,6 @@ export class BankComponent implements AfterViewInit {
     }
   }
 
-  private filterBank(name: string): IPaymentOption[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.bankList?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
-  }
+  private filterBank = (name: string): IPaymentOption[] | undefined => this.bankList?.filter(
+    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 }

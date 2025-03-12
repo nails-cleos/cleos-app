@@ -1,4 +1,14 @@
-import { AfterViewInit, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { Store } from '@ngrx/store';
@@ -46,7 +56,8 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
   private authUserServiceSubscription: Subscription;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver, private authUserService: AuthUserService) {
+              private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver,
+              private authUserService: AuthUserService) {
     this.getState = this.store.select(selectReservationState);
     this.dateFormat = this.translate.currentLang;
     this.language = this.translate.currentLang;
@@ -69,7 +80,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
     this.getReservations();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges(_: SimpleChanges): void {
     if (this.sort) {
       this.paginator.pageIndex = 0;
       this.getReservations(0);
@@ -82,18 +93,17 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
     this.authUserServiceSubscription.unsubscribe();
   }
 
-  showTimeZone(reservation: IReservationAll): boolean {
-    return !isSameTimeZone(reservation.room.timeZone);
-  }
+  showTimeZone = (reservation: IReservationAll): boolean => !isSameTimeZone(reservation.room.timeZone);
 
-  openDialog(reservation: IReservationAll): void {
+  openDialog = (reservation: IReservationAll): void => {
     const time = newDateTimestamp(reservation.timestamp);
     openDialog(reservation.room, this.dateFormat, this.translate, this.dialog, time);
   }
 
-  delete(reservation: IReservation): void {
+  delete = (reservation: IReservation): void => {
     const title = this.translate.instant('RESERVATION.DELETED.TITLE');
-    const content = this.translate.instant('RESERVATION.DELETED.CONTENT', { date: newDateTimestamp(reservation.timestamp) });
+    const content = this.translate.instant('RESERVATION.DELETED.CONTENT',
+      { date: newDateTimestamp(reservation.timestamp) });
 
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: reservation }, result => {
       if (result) {
@@ -104,7 +114,29 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
     });
   }
 
-  private subscribe(): void {
+  private getReservations = (page: number = 0): void => this.store.dispatch(
+    new fromActionsReservation.GetAllPage({
+      all: this.all,
+      roomId: this.roomId,
+      professionalId: this.professionalId,
+      active: this.sort.active,
+      direction: this.sort.direction,
+      size: this.pageSize,
+      page
+    })
+  );
+
+  private createPageSubscriptions = (): void => {
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.getReservations();
+    });
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getReservations(this.paginator.pageIndex));
+
+    this.cdRef.detectChanges();
+  }
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.error = state.error;
       if (state.page) {
@@ -115,30 +147,5 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
         }
       }
     });
-  }
-
-  private getReservations(page: number = 0): void {
-    const payload = {
-      all: this.all,
-      roomId: this.roomId,
-      professionalId: this.professionalId,
-      active: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-      page
-    };
-    this.store.dispatch(
-      new fromActionsReservation.GetAllPage(payload)
-    );
-  }
-
-  private createPageSubscriptions(): void {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getReservations();
-    });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getReservations(this.paginator.pageIndex));
-
-    this.cdRef.detectChanges();
   }
 }

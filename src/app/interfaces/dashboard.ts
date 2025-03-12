@@ -185,7 +185,7 @@ export class TotalType implements ITotalType {
     });
   }
 
-  withTotal(gross: number, net: number, btw: number, size: number, subType?: string): ITotalType {
+  withTotal = (gross: number, net: number, btw: number, size: number, subType?: string): ITotalType => {
     const type = subType ?? this.type.toString();
     let total = this.totals.get(type);
     if (total) {
@@ -195,7 +195,7 @@ export class TotalType implements ITotalType {
     return this;
   }
 
-  reset(subTypes: string[] = []): ITotalType {
+  reset = (subTypes: string[] = []): ITotalType => {
     if (!subTypes.length) {
       subTypes = [this.type.toString()];
     }

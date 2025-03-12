@@ -19,7 +19,8 @@ export class PermissionsService {
 
   private readonly data: any;
 
-  constructor(private snackBar: MatSnackBar, private router: Router, private store: Store<AppState>, private translate: TranslateService) {
+  constructor(private snackBar: MatSnackBar, private router: Router, private store: Store<AppState>,
+              private translate: TranslateService) {
     this.getState = this.store.select(selectAuthState);
     this.getState.subscribe((state) => {
       this.currentUser = state.user;
@@ -27,15 +28,10 @@ export class PermissionsService {
     this.data = this.router.getCurrentNavigation()?.extras.state;
   }
 
-  private static hasRole(route: ActivatedRouteSnapshot, user: IUser): boolean {
-    if (route.data.roles && user.authorities) {
-      return user.authorities.some(au => route.data.roles.includes(au.authority));
-    }
+  private static hasRole = (route: ActivatedRouteSnapshot, user: IUser): boolean => route.data.roles &&
+  user.authorities ? user.authorities.some(au => route.data.roles.includes(au.authority)) : false
 
-    return false;
-  }
-
-  public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+  canActivate = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean => {
     if (this.currentUser) {
       if (PermissionsService.hasRole(route, this.currentUser)) {
         return true;

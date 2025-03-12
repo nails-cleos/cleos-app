@@ -18,8 +18,8 @@ export class SelectProfessionalDialogComponent implements OnInit {
     Validators.required, requireMatch
   ]);
 
-  constructor(public dialogRef: MatDialogRef<SelectProfessionalDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
-              private formBuilder: UntypedFormBuilder) {
+  constructor(public dialogRef: MatDialogRef<SelectProfessionalDialogComponent>,
+              @Inject(MAT_DIALOG_DATA) public data: any, private formBuilder: UntypedFormBuilder) {
     this.professionals = data.professionals;
   }
 
@@ -36,23 +36,21 @@ export class SelectProfessionalDialogComponent implements OnInit {
     this.createFilters();
   }
 
-  displayFnUser(user: IUser): string {
-    return user?.displayName ? user.displayName : '';
-  }
+  displayFnUser = (user: IUser): string => user?.displayName ? user.displayName : ''
 
-  keyDownHandler(event: any): void {
+  keyDownHandler = (event: any): void => {
     if (event.code === 'Backspace') {
       this.professional.setValue('');
     }
   }
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.professionalForm = this.formBuilder.group({
       professional: this.professional
     });
   }
 
-  private createFilters(): void {
+  private createFilters = (): void => {
     this.filteredProfessional = this.professional.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
@@ -61,9 +59,6 @@ export class SelectProfessionalDialogComponent implements OnInit {
     );
   }
 
-  private filterProfessional(name: string): IUser[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.professionals?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
-  }
+  private filterProfessional = (name: string): IUser[] | undefined => this.professionals?.filter(
+    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0)
 }

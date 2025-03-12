@@ -101,16 +101,14 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     this.paginatorSubscription?.unsubscribe();
   }
 
-  openDialog(reservation: IReservationAll): void {
+  openDialog = (reservation: IReservationAll): void => {
     const time = newDateTimestamp(reservation.timestamp);
     openDialog(reservation.room, this.dateFormat, this.translate, this.dialog, time);
   }
 
-  showTimeZone(reservation: IReservation): boolean {
-    return !isSameTimeZone(reservation?.room?.timeZone);
-  }
+  showTimeZone = (reservation: IReservation): boolean => !isSameTimeZone(reservation?.room?.timeZone)
 
-  cancel(reservation: IReservationAll): void {
+  cancel = (reservation: IReservationAll): void => {
     const title = this.translate.instant('RESERVATION.LIST.CANCEL.TITLE');
     const date = newDateTimestamp(reservation.timestamp);
     const content = this.translate.instant('RESERVATION.LIST.CANCEL.CONTENT', { date });
@@ -133,11 +131,9 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     });
   }
 
-  displayFnUser(user: IUser): string {
-    return user?.displayName ? user.displayName : '';
-  }
+  displayFnUser = (user: IUser): string => user?.displayName ? user.displayName : ''
 
-  keyDownHandler(event: any): void {
+  keyDownHandler = (event: any): void => {
     if (event.code === 'Backspace') {
       this.customer.setValue(null);
       this.userId = undefined;
@@ -145,7 +141,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     }
   }
 
-  remove(state: string): void {
+  remove = (state: string): void => {
     const index = this.states.indexOf(state);
 
     if (index >= 0) {
@@ -157,7 +153,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     }
   }
 
-  selected(event: MatAutocompleteSelectedEvent): void {
+  selected = (event: MatAutocompleteSelectedEvent): void => {
     const state = States[event.option.value as StatesKey];
     this.states = [...this.states, state];
     this.allStates = this.allStates.filter(s => States[s as StatesKey] !== state);
@@ -166,7 +162,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     this.getReservations();
   }
 
-  private createPageSubscriptions(): void {
+  private createPageSubscriptions = (): void => {
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
       this.getReservations();
@@ -178,7 +174,28 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     this.cdRef.detectChanges();
   }
 
-  private subscribe(): void {
+  private clean = (): void => this.store.dispatch(new fromActionsReservation.Clean());
+
+  private getCustomers = (): void => this.store.dispatch(new fromActionsReservation.GetAllCustomers());
+
+  private getReservations = (page: number = 0): void => this.store.dispatch(
+    new fromActionsReservation.GetAllFilterPage({
+      states: this.states,
+      userId: this.userId,
+      active: this.sort.active,
+      direction: this.sort.direction,
+      size: this.pageSize,
+      page
+    })
+  );
+
+  private filterCustomer = (name: string): IUser[] | undefined => this.customers?.filter(
+    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
+
+  private filterStates = (value: string): string[] => this.allStates.filter(
+    state => state.toLowerCase().indexOf(value.toLowerCase()) === 0);
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.customers = state.customers;
       if (state.filter) {
@@ -204,44 +221,6 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
         this.getReservations();
       }
     });
-  }
-
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsReservation.Clean()
-    );
-  }
-
-  private getCustomers(): void {
-    this.store.dispatch(
-      new fromActionsReservation.GetAllCustomers()
-    );
-  }
-
-  private getReservations(page: number = 0): void {
-    const payload = {
-      states: this.states,
-      userId: this.userId,
-      active: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-      page
-    };
-    this.store.dispatch(
-      new fromActionsReservation.GetAllFilterPage(payload)
-    );
-  }
-
-  private filterCustomer(name: string): IUser[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.customers?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-  private filterStates(value: string): string[] {
-    const filterValue = value.toLowerCase();
-
-    return this.allStates.filter(state => state.toLowerCase().indexOf(filterValue) === 0);
   }
 }
 

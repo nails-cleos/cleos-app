@@ -30,6 +30,8 @@ import { TotalSummaryComponent } from './total-summary/total-summary.component';
 import { AppState, selectI18nState } from '../store/app.states';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
+import { ResultSummaryComponent } from "./result-summary/result-summary.component";
+import { TotalSummaryItemComponent } from "./total-summary-item/total-summary-item.component";
 
 @NgModule({
   declarations: [
@@ -42,7 +44,7 @@ import { Observable } from 'rxjs';
     QuarterSummaryComponent,
     MonthComponent,
     QuarterComponent,
-    TotalSummaryComponent
+    TotalSummaryComponent,
   ],
   imports: [
     DashRoutingModule,
@@ -61,7 +63,9 @@ import { Observable } from 'rxjs';
       isolate: false,
       extend: true
     }),
-    EffectsModule.forFeature([DashboardEffects, ReservationEffects])
+    EffectsModule.forFeature([DashboardEffects, ReservationEffects]),
+    ResultSummaryComponent,
+    TotalSummaryItemComponent
   ],
   providers: [
     DashboardService,

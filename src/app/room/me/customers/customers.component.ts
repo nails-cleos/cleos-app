@@ -17,10 +17,7 @@ import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces
 @Component({
   selector: 'app-customers',
   standalone: true,
-  imports: [
-    SharedModule,
-    RouterLink
-  ],
+  imports: [SharedModule, RouterLink],
   animations: [detailExpandAnimation],
   templateUrl: './customers.component.html',
   styleUrl: './customers.component.scss'
@@ -63,7 +60,7 @@ export class CustomersComponent implements OnInit, AfterViewInit, OnDestroy {
     this.getCustomers();
   }
 
-  private getCustomers(): void {
+  private getCustomers = (): void => {
     this.route.params.subscribe((routeParams) => {
       this.roomId = routeParams.id;
       this.store.dispatch(
@@ -72,7 +69,7 @@ export class CustomersComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.customers = state.customers;
       if (this.customers) {

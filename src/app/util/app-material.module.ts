@@ -73,7 +73,7 @@ const materialModules = [
   exports: [...materialModules]
 })
 export class AppMaterialModule {
-  constructor(private matIconRegistry: MatIconRegistry, private domSanitizer: DomSanitizer) {
+  constructor(matIconRegistry: MatIconRegistry, private domSanitizer: DomSanitizer) {
     matIconRegistry.addSvgIcon('CLEOS', this.getUrl('assets/icons/safari-pinned-tab.svg'));
     matIconRegistry.addSvgIcon('CLEOS-COLOR', this.getUrl('assets/icons/icon.svg'));
     matIconRegistry.addSvgIcon('MANICURE', this.getUrl('assets/treatment.svg'));
@@ -106,7 +106,5 @@ export class AppMaterialModule {
     matIconRegistry.addSvgIcon('MOYONL21', this.getUrl('assets/issuers/MOYONL21.svg'));
   }
 
-  private getUrl(path: string): SafeResourceUrl {
-    return this.domSanitizer.bypassSecurityTrustResourceUrl(path);
-  }
+  private getUrl = (path: string): SafeResourceUrl => this.domSanitizer.bypassSecurityTrustResourceUrl(path);
 }

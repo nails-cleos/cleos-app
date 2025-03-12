@@ -7,9 +7,7 @@ import { ICurrencyAll } from '../../interfaces/currency';
 @Component({
   selector: 'app-price-extras',
   standalone: true,
-  imports: [
-    SharedModule
-  ],
+  imports: [SharedModule],
   templateUrl: './price-extras.component.html',
   styleUrl: './price-extras.component.scss'
 })

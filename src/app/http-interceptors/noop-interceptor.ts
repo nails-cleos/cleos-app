@@ -8,7 +8,7 @@ import { isExternalUrl } from "./index";
 @Injectable({ providedIn: 'root' })
 export class NoopInterceptor implements HttpInterceptor {
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+  intercept = (req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> => {
     if (!isExternalUrl(req.url)) {
       return next.handle(req.clone({ url: `${ environment.baseUrl }/${ req.url }` }));
     }

@@ -56,7 +56,7 @@ export class AvailabilityComponent implements OnChanges {
     return this.availability.emit(availability);
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges(_: SimpleChanges): void {
     const timeZone = getCurrentTimeZone();
     const start = this.dates?.startDate || createDate(timeZone, 9, 0);
     const end = this.dates?.endDate || createDate(timeZone, 18, 0);

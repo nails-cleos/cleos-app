@@ -102,7 +102,7 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  setYear(normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>): void {
+  setYear = (normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>): void => {
     const ctrlValue = this.date.value;
     ctrlValue?.setFullYear(normalizedMonthAndYear.getFullYear());
 
@@ -111,7 +111,7 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
     datepicker.close();
   }
 
-  exportQuarterSummary(): void {
+  exportQuarterSummary = (): void => {
     if (this.monthSummaries?.length) {
       const now = getNowTimeZone();
       const quarter = this.selectedQuarter.value || getDateQuarter(getNowTimeZone());
@@ -132,7 +132,7 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
     }
   }
 
-  private valueChange(): void {
+  private valueChange = (): void => {
     this.selectedRoom.valueChanges.subscribe(value => {
       if (value) {
         this.createData();
@@ -150,7 +150,7 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
     });
   }
 
-  private createData(): void {
+  private createData = (): void => {
     const room = this.selectedRoom.value;
     if (room) {
       if (room === 'All' && this.quarterSummaryMap) {
@@ -201,7 +201,7 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
     }
   }
 
-  private getAllMonthSummaries(quarterSummaries: IMonthSummary[], result: IMonthSummary[]): IMonthSummary[] {
+  private getAllMonthSummaries = (quarterSummaries: IMonthSummary[], result: IMonthSummary[]): IMonthSummary[] => {
     return result.map(m => {
       const month = quarterSummaries?.find(it => it.month === m.month);
       return new MonthSummary(m.month, m.total.map(t => {
@@ -215,7 +215,7 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
     });
   }
 
-  private getSummary(year: number, quarter: number): void {
+  private getSummary = (year: number, quarter: number): void => {
     this.reset();
     this.year = year;
     this.quarter = quarter;
@@ -225,18 +225,14 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
     );
   }
 
-  private reset(): void {
+  private reset = (): void => {
     this.monthSummaries = undefined;
     this.quarterSummaryTotals = new SummaryTotals();
   }
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsDashboard.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsDashboard.Clean());
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.quarterSummaryMap = state.quarterSummaryMap;
       if (this.quarterSummaryMap) {

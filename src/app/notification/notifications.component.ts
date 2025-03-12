@@ -44,7 +44,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  notification(notification: INotification): void {
+  notification = (notification: INotification): void => {
     if (notification.read) {
       this.router.navigate([notification.navigation]);
     } else {
@@ -55,19 +55,15 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     }
   }
 
-  getNotifications(): void {
-    ++this.page;
-    const payload = {
+  getNotifications = (): void => this.store.dispatch(
+    new fromActionsNotification.GetAllPaged({
       active: 'date',
       direction: 'desc',
-      page: this.page
-    };
-    this.store.dispatch(
-      new fromActionsNotification.GetAllPaged(payload)
-    );
-  }
+      page: ++this.page
+    })
+  );
 
-  remove(index: number): void {
+  remove = (index: number): void => {
     if (!this.notifications.length) {
       return;
     }
@@ -84,13 +80,9 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     }
   }
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsNotification.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsNotification.Clean());
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.data) {
         if (state.data.page?.content?.length) {

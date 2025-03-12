@@ -20,7 +20,7 @@ export class GeocodeService {
   constructor(private httpClient: HttpClient) {
   }
 
-  public createMap(): Observable<MapStatus> {
+  createMap = (): Observable<MapStatus> => {
     const showMap = environment.showMap;
     if (showMap) {
       return this.httpClient.jsonp(
@@ -36,24 +36,26 @@ export class GeocodeService {
     return new Observable((observer) => observer.next(MapStatus.notAvailable));
   }
 
-  geocodeAddress(lat: number, lng: number, showDistance: boolean | undefined): Observable<any> {
-    return new Observable((observer) => {
-      const latLng = new google.maps.LatLng(lat, lng);
-      if (showDistance) {
-        if ('geolocation' in navigator) {
-          navigator.geolocation.getCurrentPosition((position) => {
-            const currentLat = position.coords.latitude;
-            const currentLong = position.coords.longitude;
-            const currentLatLng = new google.maps.LatLng(currentLat, currentLong);
-            const distance = google.maps.geometry.spherical.computeDistanceBetween(latLng, currentLatLng);
-            observer.next({ distance });
-          });
-        }
+  geocodeAddress = (
+    lat: number,
+    lng: number,
+    showDistance: boolean | undefined
+  ): Observable<any> => new Observable((observer) => {
+    const latLng = new google.maps.LatLng(lat, lng);
+    if (showDistance) {
+      if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          const currentLat = position.coords.latitude;
+          const currentLong = position.coords.longitude;
+          const currentLatLng = new google.maps.LatLng(currentLat, currentLong);
+          const distance = google.maps.geometry.spherical.computeDistanceBetween(latLng, currentLatLng);
+          observer.next({ distance });
+        });
       }
-      new google.maps.Geocoder().geocode({ location: latLng }).then((response: any) => {
-        const results = response.results;
-        observer.next({ address: results[0] });
-      });
+    }
+    new google.maps.Geocoder().geocode({ location: latLng }).then((response: any) => {
+      const results = response.results;
+      observer.next({ address: results[0] });
     });
-  }
+  })
 }

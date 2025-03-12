@@ -66,13 +66,9 @@ export class ColorListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription?.unsubscribe();
   }
 
-  edit(color: IColor): void {
-    this.store.dispatch(
-      new fromActionsColor.ColorSelected(color)
-    );
-  }
+  edit = (color: IColor): void => this.store.dispatch(new fromActionsColor.ColorSelected(color));
 
-  delete(color: IColor): void {
+  delete = (color: IColor): void => {
     const title = this.translate.instant('COLOR.DELETED.TITLE');
     const content = this.translate.instant('COLOR.DELETED.CONTENT', { name: color.name });
 
@@ -85,7 +81,28 @@ export class ColorListComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  private subscribe(): void {
+  private clean = (): void => this.store.dispatch(new fromActionsColor.Clean());
+
+  private createPageSubscriptions = (): void => {
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.getColorList();
+    });
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getColorList(this.paginator.pageIndex));
+
+    this.cdRef.detectChanges();
+  }
+
+  private getColorList = (page: number = 0): void => this.store.dispatch(
+    new fromActionsColor.GetAll({
+      active: this.sort.active,
+      direction: this.sort.direction,
+      size: this.pageSize,
+      page
+    })
+  );
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {
       if (state.message) {
         this.clean();
@@ -97,33 +114,5 @@ export class ColorListComponent implements OnInit, AfterViewInit, OnDestroy {
         this.createPageSubscriptions();
       }
     });
-  }
-
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsColor.Clean()
-    );
-  }
-
-  private createPageSubscriptions(): void {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getColorList();
-    });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getColorList(this.paginator.pageIndex));
-
-    this.cdRef.detectChanges();
-  }
-
-  private getColorList(page: number = 0): void {
-    const payload = {
-      active: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-      page
-    };
-    this.store.dispatch(
-      new fromActionsColor.GetAll(payload)
-    );
   }
 }

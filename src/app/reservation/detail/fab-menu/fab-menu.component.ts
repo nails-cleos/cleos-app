@@ -24,13 +24,13 @@ export class FabMenuComponent {
   }
 
   @HostListener('document:click', ['$event'])
-  clickOutsideMenu(event: MouseEvent): void {
+  clickOutsideMenu = (event: MouseEvent): void => {
     if (!this.elementRef.nativeElement.contains(event.target)) {
       this.menuOpen = false;
     }
   }
 
-  handleMenuItemClick(item: any): void {
+  handleMenuItemClick = (item: any): void => {
     this.menuOpen = false;
     this.fabMenuItemSelected.emit(item.id);
   }

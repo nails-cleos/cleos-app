@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ISorted, ISorting, ItemSorting } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -11,7 +11,7 @@ import { IAdditionalAll } from '../../interfaces/additional';
   templateUrl: './additional-sorting.component.html',
   styleUrls: ['./additional-sorting.component.scss']
 })
-export class AdditionalSortingComponent implements OnInit {
+export class AdditionalSortingComponent implements OnInit, OnDestroy {
 
   items?: ISorting[];
 
@@ -28,13 +28,17 @@ export class AdditionalSortingComponent implements OnInit {
     this.getAdditionalList();
   }
 
-  sorted(sorted: ISorted[]): void {
-    this.store.dispatch(
-      new fromActionsAdditional.AdditionalUpdateSort(sorted)
-    );
+  ngOnDestroy() {
+    this.subscription?.unsubscribe();
   }
 
-  private subscribe(): void {
+  sorted = (sorted: ISorted[]): void => this.store.dispatch(new fromActionsAdditional.AdditionalUpdateSort(sorted));
+
+  private clean = (): void => this.store.dispatch(new fromActionsAdditional.Clean());
+
+  private getAdditionalList = (): void => this.store.dispatch(new fromActionsAdditional.GetAdditionalList());
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe((stateValue) => {
       if (stateValue.message) {
         this.clean();
@@ -44,17 +48,5 @@ export class AdditionalSortingComponent implements OnInit {
         iAdditionalAll.id, iAdditionalAll.name, iAdditionalAll.order)
       );
     });
-  }
-
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsAdditional.Clean()
-    );
-  }
-
-  private getAdditionalList(): void {
-    this.store.dispatch(
-      new fromActionsAdditional.GetAdditionalList()
-    );
   }
 }

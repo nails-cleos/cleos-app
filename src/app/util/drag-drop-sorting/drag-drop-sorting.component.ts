@@ -1,8 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { CdkDrag, CdkDragDrop, CdkDragPlaceholder, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
-import { NgFor } from '@angular/common';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { SharedModule } from '../../shared/shared.module';
-
 
 export interface ISorted {
   order: number;
@@ -42,7 +40,7 @@ export class ItemSorting implements ISorting {
   templateUrl: './drag-drop-sorting.component.html',
   styleUrls: ['./drag-drop-sorting.component.scss'],
   standalone: true,
-  imports: [CdkDropList, NgFor, CdkDrag, CdkDragPlaceholder, SharedModule],
+  imports: [SharedModule],
 })
 export class DragDropSortingComponent {
   @Input() title!: string;
@@ -54,7 +52,5 @@ export class DragDropSortingComponent {
     return this.sorted.emit(sorted);
   }
 
-  drop(event: CdkDragDrop<ISorting[]>): void {
-    moveItemInArray(this.items, event.previousIndex, event.currentIndex);
-  }
+  drop = (event: CdkDragDrop<ISorting[]>): void => moveItemInArray(this.items, event.previousIndex, event.currentIndex);
 }

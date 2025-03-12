@@ -26,7 +26,8 @@ export class CatalogComponent implements OnInit, OnDestroy {
 
   catalogues: ICatalogueAll[] = [];
 
-  constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>, private mainContent: MainContentService) {
+  constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
+              private mainContent: MainContentService) {
     this.getState = this.store.select(selectCatalogueState);
   }
 
@@ -40,19 +41,11 @@ export class CatalogComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsCatalogue.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsCatalogue.Clean());
 
-  private getCatalogs(): void {
-    this.store.dispatch(
-      new fromActionsCatalogue.GetAllCatalogs()
-    );
-  }
+  private getCatalogs = (): void => this.store.dispatch(new fromActionsCatalogue.GetAllCatalogs());
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {
       if (state.data) {
         state.data.forEach((it?: ICatalogueAll) => {

@@ -7,9 +7,7 @@ import { API_LOCALE, getTime, getTimeNumber, newDateTimestamp } from '../../../u
 @Component({
   selector: 'app-update-tracking-dialog',
   standalone: true,
-  imports: [
-    SharedModule
-  ],
+  imports: [SharedModule],
   templateUrl: './update-tracking-dialog.component.html',
   styleUrl: './update-tracking-dialog.component.scss',
 })
@@ -59,12 +57,12 @@ export class UpdateTrackingDialogComponent implements OnInit {
     this.createForm();
   }
 
-  timeChange($event: string, dateForm: FormControl): void {
+  timeChange = ($event: string, dateForm: FormControl): void => {
     const time = getTimeNumber($event);
     dateForm.value.setHours(time?.hour || 0, time?.minute || 0);
   }
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.trackingForm = this.formBuilder.group({
       startedDate: this.startedDate,
       startedTime: this.startedTime,

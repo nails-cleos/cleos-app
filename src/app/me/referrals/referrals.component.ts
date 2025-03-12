@@ -81,13 +81,11 @@ export class ReferralsComponent implements OnInit, OnDestroy {
     this.authUserServiceSubscription.unsubscribe();
   }
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsDiscount.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsDiscount.Clean());
 
-  private subscribe(): void {
+  private getReferrals = (): void => this.store.dispatch(new fromActionsDiscount.GetReferrals());
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.referrals) {
         const referrals: IUserDiscount[] = state.referrals;
@@ -97,12 +95,6 @@ export class ReferralsComponent implements OnInit, OnDestroy {
         this.showShare = this.referralMax ? this.referrals < this.referralMax : true;
       }
     });
-  }
-
-  private getReferrals(): void {
-    this.store.dispatch(
-      new fromActionsDiscount.GetReferrals()
-    );
   }
 }
 
@@ -152,7 +144,7 @@ export class BottomSheetReferralComponent {
     this.delay(data, 0, max);
   }
 
-  private delay(data: any, count: number, max: number): void {
+  private delay = (data: any, count: number, max: number): void => {
     setTimeout(() => {
       count++;
       this.referrals = count > data.referrals ? data.referrals : count;

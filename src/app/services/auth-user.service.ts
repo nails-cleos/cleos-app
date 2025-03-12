@@ -56,7 +56,7 @@ export class AuthUserService {
   constructor(private cookieConsentService: NgcCookieConsentService) {
   }
 
-  reloadUser(user?: IUserAll): IAuthUser {
+  reloadUser = (user?: IUserAll): IAuthUser => {
     let authUser = initialAuthUser;
     if (user) {
       const isProfessional = user.authorities.some(u => u.authority === Role.professional);
@@ -89,7 +89,7 @@ export class AuthUserService {
     return authUser;
   }
 
-  updateMode(isDark: boolean): IAuthUser {
+  updateMode = (isDark: boolean): IAuthUser => {
     const authUser = this.authUser.getValue();
     authUser.isDarkMode = isDark;
 
@@ -97,7 +97,7 @@ export class AuthUserService {
     return authUser;
   }
 
-  cookieConsent(translate: TranslateService): void {
+  cookieConsent = (translate: TranslateService): void => {
     const data = translate.instant('COOKIE');
     const content = this.cookieConsentService.getConfig().content || {} as NgcContentOptions;
     content.header = data.HEADER;

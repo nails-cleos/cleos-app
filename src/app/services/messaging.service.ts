@@ -25,7 +25,7 @@ export class MessagingService {
    * @param user user as a key
    * @param token the new token generated
    */
-  updateToken(user: any, token: string): void {
+  updateToken = (user: any, token: string): void => {
     if (this.auth.currentUser) {
       this.store.dispatch(
         new fromActionsNotification.NotificationSubscribe(token)
@@ -41,7 +41,7 @@ export class MessagingService {
   /**
    * hook method when new notification received in foreground
    */
-  receiveMessage(): void {
+  receiveMessage = (): void => {
     this.message$ = new Observable(sub => onMessage(this.messaging, it => sub.next(it)));
   }
 
@@ -50,7 +50,7 @@ export class MessagingService {
    *
    * @param user user
    */
-  requestPermission(user: any): void {
+  requestPermission = (user: any): void => {
     getTokenAppCheck(this.appCheck).then(appCheckToken => {
       if (appCheckToken) {
         Notification.requestPermission().then(value => {

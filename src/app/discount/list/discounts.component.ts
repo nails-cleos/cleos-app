@@ -1,4 +1,13 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Inject,
+  OnDestroy,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -71,13 +80,9 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription?.unsubscribe();
   }
 
-  edit(discount: IDiscount): void {
-    this.store.dispatch(
-      new fromActionsDiscount.DiscountSelected(discount)
-    );
-  }
+  edit = (discount: IDiscount): void => this.store.dispatch(new fromActionsDiscount.DiscountSelected(discount));
 
-  delete(discount: IDiscount): void {
+  delete = (discount: IDiscount): void => {
     const title = this.translate.instant('DISCOUNT.DELETED.TITLE');
     const content = this.translate.instant('DISCOUNT.DELETED.CONTENT', { name: discount.name });
     const dialogRef = this.dialog.open(DialogComponent, {
@@ -93,7 +98,7 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  sentToUsers(discount: IDiscount): void {
+  sentToUsers = (discount: IDiscount): void => {
     const data = {
       discount
     };
@@ -106,7 +111,7 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
     }, true);
   }
 
-  private createPageSubscriptions(): void {
+  private createPageSubscriptions = (): void => {
     this.sort.sortChange.subscribe((a) => {
       if (a !== this.lastSort) {
         this.paginator.pageIndex = 0;
@@ -119,25 +124,18 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cdRef.detectChanges();
   }
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsDiscount.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsDiscount.Clean());
 
-  private getDiscounts(page: number = 0): void {
-    const payload = {
+  private getDiscounts = (page: number = 0): void => this.store.dispatch(
+    new fromActionsDiscount.GetAll({
       active: this.sort.active,
       direction: this.sort.direction,
       size: this.pageSize,
       page
-    };
-    this.store.dispatch(
-      new fromActionsDiscount.GetAll(payload)
-    );
-  }
+    })
+  );
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe((stateValue) => {
       if (stateValue.message) {
         this.clean();
@@ -216,7 +214,7 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
     this.subscription?.unsubscribe();
   }
 
-  remove(customer: IUserAll): void {
+  remove = (customer: IUserAll): void => {
     const index = this.customers.indexOf(customer);
     if (index >= 0) {
       this.customers.splice(index, 1);
@@ -225,7 +223,7 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
     }
   }
 
-  selected(event: MatAutocompleteSelectedEvent): void {
+  selected = (event: MatAutocompleteSelectedEvent): void => {
     const customer = event.option.value;
     this.customers.push(customer);
     this.allCustomers = this.allCustomers?.filter(c => c.id !== customer.id);
@@ -233,15 +231,13 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
     this.customerCtrl.setValue(null);
   }
 
-  sortCustomers(data: any): IUser[] {
-    return data.sort((a: any, b: any) => {
-      const aName = a.displayName?.toUpperCase();
-      const bName = b.displayName?.toUpperCase();
-      return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
-    });
-  }
+  sortCustomers = (data: any): IUser[] => data.sort((a: any, b: any) => {
+    const aName = a.displayName?.toUpperCase();
+    const bName = b.displayName?.toUpperCase();
+    return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
+  })
 
-  private setSymbol(): void {
+  private setSymbol = (): void => {
     this.title = this.discount.name;
     switch (this.discount.type) {
       case DiscountType.money:
@@ -253,28 +249,17 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
     }
   }
 
-  private getCustomers(): void {
-    this.store.dispatch(
-      new fromActionsUser.GetAllCustomers()
-    );
-  }
+  private getCustomers = (): void => this.store.dispatch(new fromActionsUser.GetAllCustomers());
 
-  private subscribe(): void {
+  private clean = (): void => this.store.dispatch(new fromActionsUser.Clean());
+
+  private filter = (name: string): IUserAll[] | undefined => this.allCustomers?.filter(
+    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0)
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.allCustomers = state.data;
       this.customerCtrl.setValue(null);
     });
-  }
-
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsUser.Clean()
-    );
-  }
-
-  private filter(name: string): IUserAll[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.allCustomers?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
   }
 }

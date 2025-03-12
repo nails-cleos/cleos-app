@@ -19,7 +19,7 @@ export class OverviewChartComponent implements OnChanges {
   constructor() {
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges(_: SimpleChanges): void {
     if (this.chartSummary) {
       this.chart = createChart(this.chartSummary, this.currency, this.isDark);
     }

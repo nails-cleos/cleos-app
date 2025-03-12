@@ -9,8 +9,8 @@ export class TranslationLoaderResolver {
   constructor(private translate: TranslateService) {
   }
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
-    return this.translate.get('APP.TITTLE');
-  }
-
+  resolve = (
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<any> => this.translate.get('APP.TITTLE');
 }

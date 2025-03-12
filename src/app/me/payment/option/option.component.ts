@@ -100,11 +100,9 @@ export class OptionComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  triggerClick(event: StepperSelectionEvent): void {
-    return getStepCall(this.steps, event.selectedIndex - 1);
-  }
+  triggerClick = (event: StepperSelectionEvent): void => getStepCall(this.steps, event.selectedIndex - 1)
 
-  callStepTwo(goNext: boolean): void {
+  callStepTwo = (goNext: boolean): void => {
     if (this.typeForm.invalid) {
       return;
     }
@@ -112,19 +110,15 @@ export class OptionComponent implements OnInit, OnDestroy {
     completeAndNext(this.steps, this.myStepper, goNext);
   }
 
-  getStepName(index: number): string {
-    return getStepName(this.steps, index);
-  }
+  getStepName = (index: number): string => getStepName(this.steps, index);
 
-  getStepCompleted(index: number): boolean {
-    return getStepCompleted(this.steps, index);
-  }
+  getStepCompleted = (index: number): boolean => getStepCompleted(this.steps, index);
 
-  getPercentage(percentage: number): void {
+  getPercentage = (percentage: number): void => {
     this.price = newPercentage(this.price, percentage);
   }
 
-  private getPaymentFindByReservationId(): void {
+  private getPaymentFindByReservationId = (): void => {
     this.store.dispatch(
       new fromActionsPayment.PaymentFindByResourceId({ id: this.reservationId, path: 'reservation' })
     );
@@ -133,25 +127,18 @@ export class OptionComponent implements OnInit, OnDestroy {
     );
   }
 
-  private getOptions(): void {
-    this.store.dispatch(
-      new fromActionsPayment.PaymentOptions()
-    );
-  }
+  private getOptions = (): void => this.store.dispatch(new fromActionsPayment.PaymentOptions());
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsPayment.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsPayment.Clean());
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
         const reservation = state.selected[0].reservation;
         if (reservation) {
           if ((!this.options || this.options.length === 0)) {
-            const types = reservation.room.paymentTypes.filter((p: PaymentType) => ![PaymentType.cash, PaymentType.transfer].includes(p));
+            const types = reservation.room.paymentTypes.filter(
+              (p: PaymentType) => ![PaymentType.cash, PaymentType.transfer].includes(p));
             if (types?.includes(PaymentType.paynl)) {
               this.getOptions();
             } else {

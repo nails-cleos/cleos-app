@@ -24,7 +24,8 @@ export class CardComponent implements OnDestroy {
 
   constructor(public dialog: MatDialog, private authUserService: AuthUserService) {
     this.isDarkMode = false;
-    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => this.isDarkMode = value.isDarkMode);
+    this.authUserServiceSubscription =
+      this.authUserService.authUser.subscribe(value => this.isDarkMode = value.isDarkMode);
   }
 
   get onClick(): void {

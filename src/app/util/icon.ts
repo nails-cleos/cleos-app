@@ -38,4 +38,5 @@ export enum RoleIconName {
 }
 
 export type ReservationIconKey = keyof typeof ReservationIconName;
+
 export type RoleIconKey = keyof typeof RoleIconName;

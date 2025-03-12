@@ -58,7 +58,7 @@ export class TokenService {
     }
   }
 
-  public clear(): void {
+  clear = (): void => {
     if (this.myTokenSubscription) {
       this.myTokenSubscription.unsubscribe();
     }

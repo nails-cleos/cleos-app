@@ -24,24 +24,21 @@ export class AddNoteDialogComponent implements OnInit {
   }
 
   get doAction(): void {
-    return this.dialogRef.close({ note: this.getNoteValue(this.note.value), customerNote: this.getNoteValue(this.customerNote.value) });
+    return this.dialogRef.close({
+      note: this.getNoteValue(this.note.value), customerNote: this.getNoteValue(this.customerNote.value)
+    });
   }
 
   ngOnInit(): void {
     this.createForm();
   }
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.noteForm = this.formBuilder.group({
       note: this.note,
       customerNote: this.customerNote
     });
-  }
+  };
 
-  private getNoteValue(note: string | null): string | null {
-    if (note === null || note.length === 0) {
-      return null;
-    }
-    return note;
-  }
+  private getNoteValue = (note: string | null): string | null => note === null || note.length === 0 ? null : note;
 }

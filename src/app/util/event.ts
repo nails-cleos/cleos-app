@@ -38,7 +38,8 @@ export class Meta implements IMeta {
   id?: string;
   customer?: string;
 
-  constructor(time?: boolean, timeZone?: string, state?: string, route?: string[], professionalId?: string, total?: number, id?: string) {
+  constructor(time?: boolean, timeZone?: string, state?: string, route?: string[], professionalId?: string,
+              total?: number, id?: string) {
     this.time = time;
     this.timeZone = timeZone;
     this.state = state;
@@ -49,8 +50,9 @@ export class Meta implements IMeta {
   }
 }
 
-export const getFrequency = (repeat: string, start: Date, id: any, title: string, daysInWeek: number, state: string, path: string,
-                             endDate?: string, duration?: IDuration, allDay: boolean = false, professionalId?: string, calendarStart?: Date): any => {
+export const getFrequency = (repeat: string, start: Date, id: any, title: string, daysInWeek: number, state: string,
+                             path: string, endDate?: string, duration?: IDuration, allDay: boolean = false,
+                             professionalId?: string, calendarStart?: Date): any => {
   let calendarEnd = plusDays(calendarStart ?? start, daysInWeek);
   if (endDate) {
     const end = createEndDate(endDate);
@@ -87,9 +89,16 @@ export const fillNotAvailable = (unavailable: string, lunch: string, notWorking:
   return recurringEvent(recurring, notWorking, unavailable, lunch, isDark, timeZone);
 };
 
-export const newEvent = (title: string, color: string, start: Date, isDarkMode: boolean, end?: Date,
-                         id?: string, meta: IMeta = new Meta(),
-                         draggable: boolean = false): CalendarEvent | undefined => {
+export const newEvent = (
+  title: string,
+  color: string,
+  start: Date,
+  isDarkMode: boolean,
+  end?: Date,
+  id?: string,
+  meta: IMeta = new Meta(),
+  draggable: boolean = false
+): CalendarEvent | undefined => {
   if (greaterOrEqualsThanToday(start, meta.timeZone)) {
     return {
       id,
@@ -104,8 +113,16 @@ export const newEvent = (title: string, color: string, start: Date, isDarkMode: 
   return undefined;
 };
 
-export const calendarEvent = (title: string, color: string, start: Date, isDarkMode: boolean, end?: Date,
-                              id?: string, meta: IMeta = new Meta(), draggable: boolean = false): CalendarEvent => ({
+export const calendarEvent = (
+  title: string,
+  color: string,
+  start: Date,
+  isDarkMode: boolean,
+  end?: Date,
+  id?: string,
+  meta: IMeta = new Meta(),
+  draggable: boolean = false
+): CalendarEvent => ({
   id,
   start,
   end,
@@ -115,8 +132,14 @@ export const calendarEvent = (title: string, color: string, start: Date, isDarkM
   meta
 } as unknown as CalendarEvent);
 
-export const allDayEvent = (title: string, color: string, start: Date, isDarkMode: boolean, id?: string,
-                            meta: IMeta = new Meta()): CalendarEvent => ({
+export const allDayEvent = (
+  title: string,
+  color: string,
+  start: Date,
+  isDarkMode: boolean,
+  id?: string,
+  meta: IMeta = new Meta()
+): CalendarEvent => ({
   id,
   start,
   title,
@@ -125,8 +148,17 @@ export const allDayEvent = (title: string, color: string, start: Date, isDarkMod
   allDay: true
 } as unknown as CalendarEvent);
 
-export const monthEvent = (title: string, start: Date, end: Date | null, id: string, color: string, meta: Meta, isDarkMode: boolean,
-                           allDay: boolean = false, draggable: boolean = false): CalendarEvent | undefined => ({
+export const monthEvent = (
+  title: string,
+  start: Date,
+  end: Date | null,
+  id: string,
+  color: string,
+  meta: Meta,
+  isDarkMode: boolean,
+  allDay: boolean = false,
+  draggable: boolean = false
+): CalendarEvent | undefined => ({
   id,
   start,
   title,
@@ -137,8 +169,12 @@ export const monthEvent = (title: string, start: Date, end: Date | null, id: str
   allDay
 } as unknown as CalendarEvent);
 
-export const getOverlapEvent = (events: any[], eventStartDay: Date, eventEndDay: Date,
-                                professionalId?: string): CalendarEvent[] => {
+export const getOverlapEvent = (
+  events: any[],
+  eventStartDay: Date,
+  eventEndDay: Date,
+  professionalId?: string
+): CalendarEvent[] => {
   if (professionalId) {
     return events.filter((eventA: CalendarEvent) => ((eventA.meta?.professionalId === professionalId) && (
       (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
@@ -171,8 +207,14 @@ export const getOverlapEvent = (events: any[], eventStartDay: Date, eventEndDay:
 //   });
 // }
 
-const recurringEvent = (recurring: any[], notWorking: string, unavailable: string, lunch: string,
-                        isDark: boolean, timeZone: string): CalendarEvent[] => {
+const recurringEvent = (
+  recurring: any[],
+  notWorking: string,
+  unavailable: string,
+  lunch: string,
+  isDark: boolean,
+  timeZone: string
+): CalendarEvent[] => {
   let events: CalendarEvent[] = [];
 
   recurring.forEach(r =>
@@ -269,8 +311,7 @@ const createLunchEvent = (it: IAvailability, date: Date, unavailable: string, lu
 };
 
 const lunchEvent = (hour: number, lunchStartHour: number, minute: number, lunchStartMinute: number,
-                    lunchEndHour: number,
-                    lunchEndMinute: number, date: Date, lunch: string, isDarkMode: boolean,
+                    lunchEndHour: number, lunchEndMinute: number, date: Date, lunch: string, isDarkMode: boolean,
                     timeZone: string): CalendarEvent | undefined => {
   let lunchHour;
   let lunchMinute;

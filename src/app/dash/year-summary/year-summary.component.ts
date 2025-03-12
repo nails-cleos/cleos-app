@@ -105,7 +105,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  setYear(normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>): void {
+  setYear = (normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>): void => {
     const ctrlValue = this.date.value;
     ctrlValue?.setFullYear(normalizedMonthAndYear.getFullYear());
 
@@ -114,7 +114,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     datepicker.close();
   }
 
-  private valueChange(): void {
+  private valueChange = (): void => {
     this.selectedRoom.valueChanges.subscribe(value => {
       if (value) {
         this.createData();
@@ -128,7 +128,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     });
   }
 
-  private createData(): void {
+  private createData = (): void => {
     const room = this.selectedRoom.value;
     if (room) {
       if (room === 'All' && this.yearSummaryMap) {
@@ -178,24 +178,25 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     }
   }
 
-  private getAllQuarterSummaries(quarterSummaries: IQuarterSummary[], result: IQuarterSummary[]): IQuarterSummary[] {
-    return result.map(q => {
-      const quarter = quarterSummaries.find(it => it.quarter === q.quarter);
-      return new QuarterSummary(q.quarter, q.monthSummaries.map(m => {
-        const month = quarter?.monthSummaries?.find(it => it.month === m.month);
-        return new MonthSummary(m.month, m.total.map(t => {
-          const total = month?.total?.find(it => it.type === t.type);
-          const type = t.type;
-          const net = t.net + (total?.net || 0);
-          const btw = t.btw + (total?.btw || 0);
-          const gross = t.gross + (total?.gross || 0);
-          return { type, net, btw, gross } as ISummaryTotal;
-        }));
+  private getAllQuarterSummaries = (
+    quarterSummaries: IQuarterSummary[],
+    result: IQuarterSummary[]
+  ): IQuarterSummary[] => result.map(q => {
+    const quarter = quarterSummaries.find(it => it.quarter === q.quarter);
+    return new QuarterSummary(q.quarter, q.monthSummaries.map(m => {
+      const month = quarter?.monthSummaries?.find(it => it.month === m.month);
+      return new MonthSummary(m.month, m.total.map(t => {
+        const total = month?.total?.find(it => it.type === t.type);
+        const type = t.type;
+        const net = t.net + (total?.net || 0);
+        const btw = t.btw + (total?.btw || 0);
+        const gross = t.gross + (total?.gross || 0);
+        return { type, net, btw, gross } as ISummaryTotal;
       }));
-    });
-  }
+    }));
+  })
 
-  private createExportData(): void {
+  private createExportData = (): void => {
     this.sheetData = [];
     const room = this.selectedRoom.value;
     if (room) {
@@ -229,7 +230,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     }
   }
 
-  private exportToExcel(): void {
+  private exportToExcel = (): void => {
     this.sheetData = this.sheetData.map(monthly => ({
       ...monthly,
       saleSummary: [...monthly.saleSummary].sort((a, b) => a.timestamp - b.timestamp),
@@ -253,7 +254,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     }
   }
 
-  private reset(): void {
+  private reset = (): void => {
     this.quarterSummaries = undefined;
     this.yearSummaryTotals = new SummaryTotals();
     this.selectedRoom.setValue(null);
@@ -262,7 +263,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     this.yearSummaryMap = undefined;
   }
 
-  private getSummary(year: number): void {
+  private getSummary = (year: number): void => {
     this.reset();
     this.isLoading = true;
     this.store.dispatch(
@@ -270,20 +271,16 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     );
   }
 
-  private getExportData(year: number): void {
+  private getExportData = (year: number): void => {
     this.isExportLoading = true;
     this.store.dispatch(
       new fromActionsDashboard.GetYearExport(year)
     );
   }
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsDashboard.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsDashboard.Clean());
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (!this.yearSummaryMap) {
         this.yearSummaryMap = state.yearSummaryMap;

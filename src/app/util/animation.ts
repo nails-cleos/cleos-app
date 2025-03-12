@@ -1,4 +1,16 @@
-import { animate, animateChild, group, keyframes, query, sequence, stagger, state, style, transition, trigger } from '@angular/animations';
+import {
+  animate,
+  animateChild,
+  group,
+  keyframes,
+  query,
+  sequence,
+  stagger,
+  state,
+  style,
+  transition,
+  trigger
+} from '@angular/animations';
 import { BehaviorSubject } from 'rxjs';
 
 // const right = [
@@ -93,7 +105,8 @@ export const rubberBand = sequence([
   ]))
 ]);
 
-export const bounceInDownAnimation = (duration: string, delay: string = '0ms') => animate(`${ duration } ${ delay } ease-in-out`,
+export const bounceInDownAnimation = (duration: string, delay: string = '0ms') => animate(
+  `${ duration } ${ delay } ease-in-out`,
   keyframes([
     style({ opacity: 0, transform: 'translateY(-100vh)', offset: 0 }),
     style({ opacity: 1, transform: 'translateY(30px)', offset: 0.6 }),

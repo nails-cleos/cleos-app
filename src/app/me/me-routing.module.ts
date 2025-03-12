@@ -14,12 +14,42 @@ import { OptionComponent } from './payment/option/option.component';
 import { MePaymentComponent } from './payment/me/me-payment.component';
 
 const routes: Routes = [
-  { path: 'reservations', component: ReservationsComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
-  { path: 'reservation', component: MeReservationComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
-  { path: 'reservation/:id', component: MeReservationComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
-  { path: 'reservation/:id/payment/option', component: OptionComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
-  { path: 'reservation/:id/review', component: ReviewDialogComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
-  { path: ':path/:id/payment', component: PaymentComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
+  {
+    path: 'reservations',
+    component: ReservationsComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.customer] }
+  },
+  {
+    path: 'reservation',
+    component: MeReservationComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.customer] }
+  },
+  {
+    path: 'reservation/:id',
+    component: MeReservationComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.customer] }
+  },
+  {
+    path: 'reservation/:id/payment/option',
+    component: OptionComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.customer] }
+  },
+  {
+    path: 'reservation/:id/review',
+    component: ReviewDialogComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.customer] }
+  },
+  {
+    path: ':path/:id/payment',
+    component: PaymentComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.customer] }
+  },
   { path: ':path/:id/payment/:status', component: PaymentCompleteComponent },
   { path: 'payment/:id', component: MePaymentComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
   { path: 'referrals', component: ReferralsComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },

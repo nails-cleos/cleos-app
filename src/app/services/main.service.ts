@@ -6,12 +6,10 @@ import { Observable } from 'rxjs';
 export class MainService {
 
   private url = 'contacts';
-  private urlV1 = `v1/${this.url}`;
+  private urlV1 = `v1/${ this.url }`;
 
   constructor(private http: HttpClient) {
   }
 
-  public sendMessage(body: any): Observable<any> {
-    return this.http.post<any>(this.urlV1, body);
-  }
+  sendMessage = (body: any): Observable<any> => this.http.post<any>(this.urlV1, body);
 }

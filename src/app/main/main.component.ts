@@ -52,9 +52,10 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   private navigationObserve?: IntersectionObserver;
 
   constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>, private router: Router,
-              private translate: TranslateService, private overlayContainer: OverlayContainer, private cookieService: CookieService,
-              private themeService: ThemeService, @Optional() private auth: Auth, private authUserService: AuthUserService,
-              mainContent: MainContentService, private tokenService: TokenService, private navigationService: NavigationService,
+              private translate: TranslateService, private overlayContainer: OverlayContainer,
+              private cookieService: CookieService, private themeService: ThemeService, @Optional() private auth: Auth,
+              private authUserService: AuthUserService, mainContent: MainContentService,
+              private tokenService: TokenService, private navigationService: NavigationService,
               private route: ActivatedRoute) {
     this.navigationState = new BehaviorSubject<'open' | 'close'>('close');
     this.isAuthenticated = false;
@@ -83,7 +84,8 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
       const authenticatedUser: IUser = new User();
       authenticatedUser.theme = theme;
       const redirectUrl = this.router.url;
-      const message = this.translate.instant(`COMMON.PROFILE.UPDATED.DARK_MODE_${ this.isDarkMode.toString().toUpperCase() }`);
+      const message = this.translate.instant(
+        `COMMON.PROFILE.UPDATED.DARK_MODE_${ this.isDarkMode.toString().toUpperCase() }`);
       this.store.dispatch(
         new fromActionsMain.UpdateUser({ user: authenticatedUser, redirectUrl, message })
       );
@@ -117,20 +119,20 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     this.mainContentSubscription.unsubscribe();
   }
 
-  scrollToElement(element: HTMLElement | string): void {
+  scrollToElement = (element: HTMLElement | string): void => {
     this.router.navigate(['/', this.language]).then(() => setTimeout(() => {
       this.navigationAnimation();
       goTo(element);
     }, 100));
   }
 
-  private resetTheme(theme?: Theme): void {
+  private resetTheme = (theme?: Theme): void => {
     this.cssClass = resetTheme(theme, this.cssClass, this.overlayContainer, this.cookieService, this.themeService);
     this.authUserService.updateMode(isDarkMode(theme));
     this.backgroundColor = this.isDarkMode ? '126, 119, 105' : '169, 163, 151';
   }
 
-  private navigationAnimation(): void {
+  private navigationAnimation = (): void => {
     this.navigationObserve?.disconnect();
     this.firstSection = window.document.getElementById('slider');
     this.navigationObserve = observeElement(this.navigationState, this.firstSection, true, 0.1);

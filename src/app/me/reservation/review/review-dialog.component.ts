@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { newDateTimestamp, createNewDate, reservationDuration } from '../../../util/dates';
+import { createNewDate, newDateTimestamp, reservationDuration } from '../../../util/dates';
 import { getPrice } from '../../../util/helper';
 import { IReview } from '../../../interfaces/review';
 import { IReservationAll } from '../../../interfaces/reservation';
@@ -30,8 +30,9 @@ export class ReviewDialogComponent {
 
   detail = new UntypedFormControl();
 
-  constructor(public dialogRef: MatDialogRef<ReviewDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: IReservationAll,
-              private translate: TranslateService, private analytic: Analytics) {
+  constructor(public dialogRef: MatDialogRef<ReviewDialogComponent>,
+              @Inject(MAT_DIALOG_DATA) public data: IReservationAll, private translate: TranslateService,
+              private analytic: Analytics) {
     const start = newDateTimestamp(data.timestamp, data.room.timeZone);
     this.reservation = Object.assign({}, data, { start });
     this.price = getPrice(data);
@@ -55,11 +56,11 @@ export class ReviewDialogComponent {
     return this.dialogRef.close({ rating: this.rating, detail: this.detail.value });
   }
 
-  onRatingHover(hover: number): void {
+  onRatingHover = (hover: number): void => {
     this.hover = hover;
   }
 
-  onRatingChanged(rating: number): void {
+  onRatingChanged = (rating: number): void => {
     this.rating = rating;
   }
 }

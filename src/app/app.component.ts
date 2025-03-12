@@ -31,8 +31,11 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private getI18nState: Observable<any>;
   private i18nSubscription?: Subscription;
-  constructor(private translate: TranslateService, private overlayContainer: OverlayContainer, private cookieService: CookieService,
-              private themeService: ThemeService, private dateAdapter: DateAdapter<Date>, private authUserService: AuthUserService,
+
+  constructor(private translate: TranslateService, private overlayContainer: OverlayContainer,
+              private cookieService: CookieService,
+              private themeService: ThemeService, private dateAdapter: DateAdapter<Date>,
+              private authUserService: AuthUserService,
               @Inject(MAT_DATE_LOCALE) private locale: string, private seoService: SeoService,
               private readonly store: Store<AppState>) {
     this.authUserServiceSubscription = this.authUserService.authUser
@@ -50,7 +53,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.i18nSubscription?.unsubscribe();
   }
 
-  private resetConfig(locale: string, theme?: Theme): void {
+  private resetConfig = (locale: string, theme?: Theme): void => {
     const meta = this.translate.instant('META');
 
     this.seoService.setMetaDescription(meta.CONTENT);

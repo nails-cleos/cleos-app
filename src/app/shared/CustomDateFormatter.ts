@@ -5,30 +5,18 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class CustomDateFormatter extends CalendarNativeDateFormatter {
 
-  public monthViewTitle({date, locale}: DateFormatterParams): string {
-    return monthViewTitle(date, locale);
-  }
+  monthViewTitle = ({ date, locale }: DateFormatterParams): string => monthViewTitle(date, locale);
 
-  public monthViewColumnHeader({date, locale}: DateFormatterParams): string {
-    return columnHeader(date, locale);
-  }
+  monthViewColumnHeader = ({ date, locale }: DateFormatterParams): string => columnHeader(date, locale);
 
-  public weekViewColumnHeader({date, locale}: DateFormatterParams): string {
-    return columnHeader(date, locale);
-  }
+  weekViewColumnHeader = ({ date, locale }: DateFormatterParams): string => columnHeader(date, locale);
 
-  public weekViewHour({date, locale}: DateFormatterParams): string {
-    return formatDateHourMinute(date, locale);
-  }
+  weekViewHour = ({ date, locale }: DateFormatterParams): string => formatDateHourMinute(date, locale);
 
-  public dayViewTitle({date, locale}: DateFormatterParams): string {
-    return dayViewTitle(date, locale);
-  }
+  dayViewTitle = ({ date, locale }: DateFormatterParams): string => dayViewTitle(date, locale);
 
-  public dayViewHour({date, locale}: DateFormatterParams): string {
-    return new Intl.DateTimeFormat(locale, {
-      hour: 'numeric',
-      minute: 'numeric'
-    }).format(date);
-  }
+  dayViewHour = ({ date, locale }: DateFormatterParams): string => new Intl.DateTimeFormat(locale, {
+    hour: 'numeric',
+    minute: 'numeric'
+  }).format(date);
 }

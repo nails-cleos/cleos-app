@@ -2,7 +2,7 @@ import { ChartConfiguration, ChartOptions, ChartType, TooltipItem } from 'chart.
 import { IChart } from '../interfaces/dashboard';
 import { ICurrency } from '../interfaces/currency';
 import { numberFormat } from './numbers';
-import { newDateTimestamp, getNowTimeZone } from "./dates";
+import { getNowTimeZone, newDateTimestamp } from "./dates";
 
 export interface IChartUtil {
   labels: any[];
@@ -11,8 +11,13 @@ export interface IChartUtil {
   options: ChartOptions;
 }
 
-export const createChart = (chart: IChart, currency?: ICurrency, isDark?: boolean, locale?: string,
-                            timeZone?: string): IChartUtil => {
+export const createChart = (
+  chart: IChart,
+  currency?: ICurrency,
+  isDark?: boolean,
+  locale?: string,
+  timeZone?: string
+): IChartUtil => {
   let colors: any[];
   switch (chart.colors) {
     case 'COLORS_ARRAY':

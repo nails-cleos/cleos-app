@@ -5,6 +5,7 @@ import { ICustomerReservation, IReservation, IRoomReservation } from '../interfa
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { IReview } from '../interfaces/review';
 import { createFilter } from '../util/service-helper';
+import { toUrl } from "../util/helper";
 
 @Injectable()
 export class ReservationService {
@@ -15,8 +16,15 @@ export class ReservationService {
   constructor(private http: HttpClient) {
   }
 
-  public getAllPage(page: number, all?: boolean, roomId?: string, professionalId?: string, sort?: string, direction?: string,
-                    size: number = PAGE_SIZE): Observable<IReservation[]> {
+  getAllPage = (
+    page: number,
+    all?: boolean,
+    roomId?: string,
+    professionalId?: string,
+    sort?: string,
+    direction?: string,
+    size: number = PAGE_SIZE
+  ): Observable<IReservation[]> => {
     const params = createFilter(page, size, sort, direction);
 
     let baseUrl = this.urlV1;
@@ -31,8 +39,12 @@ export class ReservationService {
     return this.http.get<IReservation[]>(`${ baseUrl }/pages`, { params });
   }
 
-  public getCustomerReservations(sort: string, direction: string, page: number,
-                                 size: number = PAGE_SIZE): Observable<ICustomerReservation> {
+  getCustomerReservations = (
+    sort: string,
+    direction: string,
+    page: number,
+    size: number = PAGE_SIZE
+  ): Observable<ICustomerReservation> => {
     let params = new HttpParams().set('page', String(page)).set('size', String(size));
     if (sort) {
       params = params.append('sort', sort);
@@ -41,11 +53,17 @@ export class ReservationService {
       params = params.append('direction', direction);
     }
 
-    return this.http.get<ICustomerReservation>(`${ this.urlV1 }/customer`, { params });
+    return this.http.get<ICustomerReservation>(toUrl(this.urlV1, 'customer'), { params });
   }
 
-  public getAllFilterReservationsPage(sort: string, direction: string, page: number, size: number = PAGE_SIZE,
-                                      userId?: string, states?: string[]): Observable<IReservation[]> {
+  getAllFilterReservationsPage = (
+    sort: string,
+    direction: string,
+    page: number,
+    size: number = PAGE_SIZE,
+    userId?: string,
+    states?: string[]
+  ): Observable<IReservation[]> => {
     let params = new HttpParams().set('page', String(page)).set('size', String(size));
     if (sort) {
       params = params.append('sort', sort);
@@ -62,18 +80,28 @@ export class ReservationService {
       });
     }
 
-    return this.http.get<IReservation[]>(`${ this.urlV1 }/filter`, { params });
+    return this.http.get<IReservation[]>(toUrl(this.urlV1, 'filter'), { params });
   }
 
-  public getAllGroupingByRoom(days: number, date: Date, roomId: string, professionalId?: string): Observable<IRoomReservation[]> {
+  getAllGroupingByRoom = (
+    days: number,
+    date: Date,
+    roomId: string,
+    professionalId?: string
+  ): Observable<IRoomReservation[]> => {
     let params = new HttpParams().set('dates', date.toISOString().slice(0, 10)).append('days', days);
     if (professionalId) {
       params = params.append('professionalId', professionalId);
     }
-    return this.http.get<IRoomReservation[]>(`${ this.urlV1 }/rooms/${ roomId }`, { params });
+    return this.http.get<IRoomReservation[]>(toUrl(this.urlV1, 'rooms', roomId), { params });
   }
 
-  public search(roomId: string, days: number, dates: Date[], professionalId?: string): Observable<IRoomReservation[]> {
+  search = (
+    roomId: string,
+    days: number,
+    dates: Date[],
+    professionalId?: string
+  ): Observable<IRoomReservation[]> => {
     let params = new HttpParams().set('days', days);
     dates.forEach(date => {
       params = params.append('dates', date.toISOString().slice(0, 10));
@@ -82,11 +110,16 @@ export class ReservationService {
     if (professionalId) {
       params = params.append('professionalId', professionalId);
     }
-    return this.http.get<IRoomReservation[]>(`${ this.urlV1 }/rooms/${ roomId }`, { params });
+    return this.http.get<IRoomReservation[]>(toUrl(this.urlV1, 'rooms', roomId), { params });
   }
 
-  public customerSearch(roomId: string, treatmentId: string, date: Date, professionalId: string,
-                        additionalIds?: string[]): Observable<IRoomReservation> {
+  customerSearch = (
+    roomId: string,
+    treatmentId: string,
+    date: Date,
+    professionalId: string,
+    additionalIds?: string[]
+  ): Observable<IRoomReservation> => {
     let params = new HttpParams().set('date', date.toISOString().slice(0, 10));
     params = params.append('roomId', roomId);
     params = params.append('treatmentId', treatmentId);
@@ -97,66 +130,73 @@ export class ReservationService {
     }
     params = params.append('professionalId', professionalId);
 
-    return this.http.get<IRoomReservation>(`${ this.urlV1 }/search`, { params });
+    return this.http.get<IRoomReservation>(toUrl(this.urlV1, 'search'), { params });
   }
 
-  public getById(id: string | null, edit?: boolean): Observable<IReservation | undefined> {
-    let url = `${ this.urlV1 }/${ id }`;
+  getById = (id: string, edit?: boolean): Observable<IReservation | undefined> => {
+    let url = toUrl(this.urlV1, id);
     if (edit) {
       url += '/edit';
     }
     return this.http.get<IReservation>(url);
   }
 
-  public findHistory(id: string | null): Observable<IReservation | undefined> {
-    return this.http.get<IReservation>(`${ this.urlV1 }/${ id }/history`);
-  }
+  findHistory = (id: string): Observable<IReservation | undefined> => this.http.get<IReservation>(
+    toUrl(this.urlV1, id, 'history')
+  );
 
-  public add(reservation: IReservation): Observable<IReservation[]> {
-    return this.http.post<IReservation[]>(this.urlV1, reservation);
-  }
+  add = (
+    reservation: IReservation
+  ): Observable<IReservation[]> => this.http.post<IReservation[]>(this.urlV1, reservation);
 
-  public delete(id: string | null): Observable<IReservation> {
-    return this.http.delete<IReservation>(`${ this.urlV1 }/${ id }`);
-  }
+  delete = (id: string): Observable<IReservation> => this.http.delete<IReservation>(toUrl(this.urlV1, id));
 
-  public update(reservation: IReservation): Observable<IReservation> {
-    return this.http.patch<IReservation>(`${ this.urlV1 }/${ reservation.id }`, reservation);
-  }
+  update = (
+    reservation: IReservation
+  ): Observable<IReservation> => this.http.patch<IReservation>(toUrl(this.urlV1, reservation.id!!), reservation);
 
-  public changeState(reservationId: string, event: string, extras?: any): Observable<IReservation> {
-    return this.http.post<IReservation>(`${ this.urlV1 }/${ reservationId }/${ event }`, extras);
-  }
+  changeState = (
+    reservationId: string,
+    event: string,
+    extras?: any
+  ): Observable<IReservation> => this.http.post<IReservation>(toUrl(this.urlV1, reservationId, event), extras);
 
-  public changeCustomer(reservationId: string, customerId: string): Observable<void> {
-    return this.http.patch<void>(`${ this.urlV1 }/${ reservationId }/customers/${ customerId }`, null);
-  }
+  changeCustomer = (
+    reservationId: string,
+    customerId: string
+  ): Observable<void> => this.http.patch<void>(toUrl(this.urlV1, reservationId, 'customers', customerId), null);
 
-  public changeColor(reservationId: string, colorId: string): Observable<void> {
-    return this.http.patch<void>(`${ this.urlV1 }/${ reservationId }/colors/${ colorId }`, null);
-  }
+  changeColor = (
+    reservationId: string,
+    colorId: string
+  ): Observable<void> => this.http.patch<void>(toUrl(this.urlV1, reservationId, 'colors', colorId), null);
 
-  public getUpcomingReservation(): Observable<ICustomerReservation> {
-    return this.http.get<ICustomerReservation>(`${ this.urlV1 }/upcoming`);
-  }
+  getUpcomingReservation = (): Observable<ICustomerReservation> => this.http.get<ICustomerReservation>(
+    toUrl(this.urlV1, 'upcoming')
+  );
 
-  public paymentComplete(reservationId: string): Observable<IReservation> {
-    return this.http.post<IReservation>(`${ this.urlV1 }/${ reservationId }/payment/complete`, null);
-  }
+  paymentComplete = (reservationId: string): Observable<IReservation> => this.http.post<IReservation>(
+    toUrl(this.urlV1, reservationId, 'payment', 'complete'),
+    null
+  );
 
-  public addReview(review: IReview): Observable<IReview> {
-    return this.http.post<IReview>(`${ this.urlV1 }/${ review.reservationId }/reviews`, review);
-  }
+  addReview = (
+    review: IReview
+  ): Observable<IReview> => this.http.post<IReview>(toUrl(this.urlV1, review.reservationId!!, 'reviews'), review);
 
-  public addNote(id: string, note?: string, customerNote?: string): Observable<IReservation> {
-    return this.http.patch<IReservation>(`${ this.urlV1 }/${ id }/notes`, { note, customerNote });
-  }
+  addNote = (
+    id: string,
+    note?: string,
+    customerNote?: string
+  ): Observable<IReservation> => this.http.patch<IReservation>(toUrl(this.urlV1, id, 'notes'), { note, customerNote });
 
-  public addDiscount(id: string, discountId: string): Observable<IReservation> {
-    return this.http.patch<IReservation>(`${ this.urlV1 }/${ id }/discounts/${ discountId }`, null);
-  }
+  addDiscount = (
+    id: string,
+    discountId: string
+  ): Observable<IReservation> => this.http.patch<IReservation>(toUrl(this.urlV1, id, 'discounts', discountId), null);
 
-  public addTimestamp(id: string, start: string): Observable<IReservation> {
-    return this.http.patch<IReservation>(`${ this.urlV1 }/${ id }/timestamp`, start);
-  }
+  addTimestamp = (
+    id: string,
+    start: string
+  ): Observable<IReservation> => this.http.patch<IReservation>(toUrl(this.urlV1, id, 'timestamp'), start);
 }

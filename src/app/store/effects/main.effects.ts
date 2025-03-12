@@ -14,30 +14,32 @@ import { UserService } from '../../services/user.service';
 @Injectable()
 export class MainEffects {
 
-  getAllCatalogue$ = createEffect(() => this.actions$.pipe(ofType(fromActionsMain.MainActionTypes.getAllCatalogue)).pipe(
-    map((action: any) => action.payload),
-    switchMap(() => this.catalogueService.getAllHome().pipe(
-      switchMap((response: any) => of(new fromActionsMain.CatalogueSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsMain.RequestFailure({error: err.error})))
-    ))
-  ));
+  getAllCatalogue$ = createEffect(
+    () => this.actions$.pipe(ofType(fromActionsMain.MainActionTypes.getAllCatalogue)).pipe(
+      map((action: any) => action.payload),
+      switchMap(() => this.catalogueService.getAllHome().pipe(
+        switchMap((response: any) => of(new fromActionsMain.CatalogueSuccess(response))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsMain.RequestFailure({ error: err.error })))
+      ))
+    ));
 
-  getAllTreatments$ = createEffect(() => this.actions$.pipe(ofType(fromActionsMain.MainActionTypes.getAllTreatments)).pipe(
-    map((action: any) => action.payload),
-    switchMap(() => this.treatmentService.getTreatmentList().pipe(
-      switchMap((response: any) => of(new fromActionsMain.TreatmentsSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsMain.RequestFailure({error: err.error})))
-    ))
-  ));
+  getAllTreatments$ = createEffect(
+    () => this.actions$.pipe(ofType(fromActionsMain.MainActionTypes.getAllTreatments)).pipe(
+      map((action: any) => action.payload),
+      switchMap(() => this.treatmentService.getTreatmentList().pipe(
+        switchMap((response: any) => of(new fromActionsMain.TreatmentsSuccess(response))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsMain.RequestFailure({ error: err.error })))
+      ))
+    ));
 
   sendMessage$ = createEffect(() => this.actions$.pipe(ofType(fromActionsMain.MainActionTypes.sendMessage)).pipe(
     map((action: any) => action.payload),
     switchMap((payload) => this.mainService.sendMessage(payload).pipe(
       switchMap(() => {
         const message = this.translate.instant('MAIN.CONTACT.SEND.MESSAGE');
-        return of(new fromActionsMain.RequestSuccess({message}));
+        return of(new fromActionsMain.RequestSuccess({ message }));
       }),
-      catchError((err: HttpErrorResponse) => of(new fromActionsMain.RequestFailure({error: err.error})))
+      catchError((err: HttpErrorResponse) => of(new fromActionsMain.RequestFailure({ error: err.error })))
     ))
   ));
 
@@ -45,7 +47,8 @@ export class MainEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.userService.updateMe(payload.user).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('COMMON.PROFILE.UPDATED.MESSAGE', { displayName: response.user.displayName });
+        const message = this.translate.instant('COMMON.PROFILE.UPDATED.MESSAGE',
+          { displayName: response.user.displayName });
         return of(new LoginSuccess({
           response, queryParams: {
             state: btoa(JSON.stringify({ returnUrl: payload.redirectUrl }))
@@ -57,17 +60,18 @@ export class MainEffects {
 
   catalogueSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsMain.MainActionTypes.catalogueSuccess)
-  ), {dispatch: false});
+  ), { dispatch: false });
 
   treatmentDataSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsMain.MainActionTypes.treatmentSuccess)
-  ), {dispatch: false});
+  ), { dispatch: false });
 
   requestSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsMain.MainActionTypes.requestSuccess)
-  ), {dispatch: false});
+  ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private mainService: MainService,
-              private catalogueService: CatalogueService, private treatmentService: TreatmentService, private userService: UserService) {
+              private catalogueService: CatalogueService, private treatmentService: TreatmentService,
+              private userService: UserService) {
   }
 }
