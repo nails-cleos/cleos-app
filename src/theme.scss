@@ -2,19 +2,19 @@
 @use './styles-theme' as style;
 
 $fontConfig: (
-  display-4: mat.define-typography-level(112px, 112px, 300, 'EB+Garamond', -0.0134em),
-  display-3: mat.define-typography-level(56px, 56px, 400, 'EB+Garamond', -0.0089em),
-  display-2: mat.define-typography-level(45px, 48px, 400, 'EB+Garamond', 0.0000em),
-  display-1: mat.define-typography-level(34px, 40px, 400, 'EB+Garamond', 0.0074em),
-  headline: mat.define-typography-level(24px, 32px, 400, 'EB+Garamond', 0.0000em),
-  title: mat.define-typography-level(20px, 32px, 500, 'EB+Garamond', 0.0075em),
-  subheading-2: mat.define-typography-level(16px, 28px, 400, 'EB+Garamond', 0.0094em),
-  subheading-1: mat.define-typography-level(15px, 24px, 500, 'EB+Garamond', 0.0067em),
-  body-2: mat.define-typography-level(14px, 24px, 500, 'EB+Garamond', 0.0179em),
-  body-1: mat.define-typography-level(14px, 20px, 400, 'EB+Garamond', 0.0179em),
-  button: mat.define-typography-level(14px, 14px, 500, 'EB+Garamond', 0.0893em),
-  caption: mat.define-typography-level(12px, 20px, 400, 'EB+Garamond', 0.0333em),
-  input: mat.define-typography-level(inherit, 1.125, 400, 'EB+Garamond', 1.5px)
+  display-4: mat.m2-define-typography-level(112px, 112px, 300, 'EB+Garamond', -0.0134em),
+  display-3: mat.m2-define-typography-level(56px, 56px, 400, 'EB+Garamond', -0.0089em),
+  display-2: mat.m2-define-typography-level(45px, 48px, 400, 'EB+Garamond', 0.0000em),
+  display-1: mat.m2-define-typography-level(34px, 40px, 400, 'EB+Garamond', 0.0074em),
+  headline: mat.m2-define-typography-level(24px, 32px, 400, 'EB+Garamond', 0.0000em),
+  title: mat.m2-define-typography-level(20px, 32px, 500, 'EB+Garamond', 0.0075em),
+  subheading-2: mat.m2-define-typography-level(16px, 28px, 400, 'EB+Garamond', 0.0094em),
+  subheading-1: mat.m2-define-typography-level(15px, 24px, 500, 'EB+Garamond', 0.0067em),
+  body-2: mat.m2-define-typography-level(14px, 24px, 500, 'EB+Garamond', 0.0179em),
+  body-1: mat.m2-define-typography-level(14px, 20px, 400, 'EB+Garamond', 0.0179em),
+  button: mat.m2-define-typography-level(14px, 14px, 500, 'EB+Garamond', 0.0893em),
+  caption: mat.m2-define-typography-level(12px, 20px, 400, 'EB+Garamond', 0.0333em),
+  input: mat.m2-define-typography-level(inherit, 1.125, 400, 'EB+Garamond', 1.5px)
 );
 
 // Foreground Elements
@@ -314,23 +314,23 @@ $mat-warn-dark: (
   )
 );
 
-$theme-warn-dark: mat.define-palette($mat-warn-dark);
+$theme-warn-dark: mat.m2-define-palette($mat-warn-dark);
 
 // Define a dark theme
-$dark-theme: mat.define-dark-theme((
+$dark-theme: mat.m2-define-dark-theme((
   color: (
-    primary: mat.define-palette($mat-primary, 500),
-    accent: mat.define-palette($mat-accent),
-    warn: mat.define-palette($mat-warn-dark)
+    primary: mat.m2-define-palette($mat-primary, 500),
+    accent: mat.m2-define-palette($mat-accent),
+    warn: mat.m2-define-palette($mat-warn-dark)
   )
 ));
 
 // Define a light theme
-$light-theme: mat.define-light-theme((
+$light-theme: mat.m2-define-light-theme((
   color: (
-    primary: mat.define-palette($mat-primary, 500),
-    accent: mat.define-palette($mat-accent),
-    warn: mat.define-palette($mat-warn)
+    primary: mat.m2-define-palette($mat-primary, 500),
+    accent: mat.m2-define-palette($mat-accent),
+    warn: mat.m2-define-palette($mat-warn)
   )
 ));
 

@@ -10,7 +10,6 @@ import { BaseChartDirective } from 'ng2-charts';
 import { CustomDateFormatter } from './CustomDateFormatter';
 import { CustomEventTitleFormatter } from './CustomEventTitleFormatter';
 import { httpInterceptorProviders } from '../http-interceptors';
-import { HttpClientJsonpModule, HttpClientModule } from '@angular/common/http';
 import { GoogleMapsModule } from '@angular/google-maps';
 import { RouterLink } from "@angular/router";
 
@@ -20,8 +19,6 @@ const importExport = [
   TranslateModule,
   ReactiveFormsModule,
   BaseChartDirective,
-  HttpClientModule,
-  HttpClientJsonpModule,
   FormsModule,
   RouterLink,
 ];
