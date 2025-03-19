@@ -9,7 +9,6 @@ import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { BaseChartDirective } from 'ng2-charts';
 import { CustomDateFormatter } from './CustomDateFormatter';
 import { CustomEventTitleFormatter } from './CustomEventTitleFormatter';
-import { httpInterceptorProviders } from '../http-interceptors';
 import { GoogleMapsModule } from '@angular/google-maps';
 import { RouterLink } from "@angular/router";
 
@@ -47,7 +46,6 @@ const importExport = [
     ...importExport,
   ],
   providers: [
-    httpInterceptorProviders,
     GeocodeService
   ]
 })

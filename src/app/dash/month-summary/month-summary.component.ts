@@ -50,7 +50,7 @@ import { TwoDigitsDirective } from "../../directives/two-digits.directive";
     { provide: DateAdapter, useClass: YearMonthAdapter }
   ],
   standalone: true,
-  imports: [SharedModule, FilterByPipe, TimeDetailPipe, TwoDigitsDirective],
+  imports: [SharedModule, FilterByPipe, TimeDetailPipe, TwoDigitsDirective]
 })
 export class MonthSummaryComponent implements OnInit, OnDestroy {
   date = new FormControl<Date | null>(null);

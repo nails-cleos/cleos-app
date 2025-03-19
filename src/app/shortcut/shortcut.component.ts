@@ -16,7 +16,7 @@ enum ShortcutEnum {
   templateUrl: './shortcut.component.html',
   styleUrls: ['./shortcut.component.scss'],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class ShortcutComponent implements OnDestroy {
 

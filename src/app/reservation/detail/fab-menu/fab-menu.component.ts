@@ -9,7 +9,7 @@ import { SharedModule } from "../../../shared/shared.module";
   styleUrls: ['./fab-menu.component.scss'],
   animations: [listAnimation, iconChange],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class FabMenuComponent {
   @Input() fabMenus!: IFabMenu[];

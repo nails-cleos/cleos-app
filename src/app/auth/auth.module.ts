@@ -13,7 +13,6 @@ import { LoginEffects } from '../store/effects/auth.effects';
 import { AuthService } from '../services/auth.service';
 import { UserEffects } from '../store/effects/user.effects';
 import { UserService } from '../services/user.service';
-import { TokenService } from '../services/token.service';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { Store } from '@ngrx/store';
 import { AppState, selectI18nState } from '../store/app.states';
@@ -44,8 +43,7 @@ import { Observable } from 'rxjs';
   ],
   providers: [
     AuthService,
-    UserService,
-    TokenService
+    UserService
   ]
 })
 export class AuthModule {

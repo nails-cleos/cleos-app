@@ -16,7 +16,7 @@ import { BackButtonDirective } from "../../../directives/back-button.directive";
   templateUrl: './transaction-detail.component.html',
   styleUrls: ['./transaction-detail.component.scss'],
   standalone: true,
-  imports: [SharedModule, BackButtonDirective],
+  imports: [SharedModule, BackButtonDirective]
 })
 export class TransactionDetailComponent implements OnInit, OnDestroy {
 

@@ -47,7 +47,7 @@ pdfMake.fonts = {
     },
   ],
   standalone: true,
-  imports: [SharedModule, TimeDetailPipe],
+  imports: [SharedModule, TimeDetailPipe]
 })
 export class InvoiceComponent implements OnInit, OnDestroy {
   @ViewChild('pdfTable') pdfTable!: ElementRef;

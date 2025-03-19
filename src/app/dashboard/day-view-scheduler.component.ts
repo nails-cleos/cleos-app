@@ -106,7 +106,7 @@ export class DayViewSchedulerCalendarUtils extends CalendarUtils {
   styleUrls: ['./dashboard.component.scss'],
   providers: [DayViewSchedulerCalendarUtils],
   standalone: true,
-  imports: [SharedModule, CalendarModule, ConvertHMPipe],
+  imports: [SharedModule, CalendarModule, ConvertHMPipe]
 })
 export class DayViewSchedulerComponent extends CalendarWeekViewComponent implements OnChanges {
   @Input() professionals: IProfessional[] = [];

@@ -10,7 +10,7 @@ import { SharedModule } from "../../shared/shared.module";
   templateUrl: './terms-and-conditions.component.html',
   styleUrls: ['./terms-and-conditions.component.scss'],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class TermsAndConditionsComponent implements OnInit {
   url = environment.appServer;

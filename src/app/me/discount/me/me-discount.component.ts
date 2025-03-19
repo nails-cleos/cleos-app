@@ -20,7 +20,7 @@ import { SharedModule } from "../../../shared/shared.module";
   templateUrl: './me-discount.component.html',
   styleUrls: ['./me-discount.component.scss'],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;

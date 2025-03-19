@@ -32,7 +32,7 @@ import { ErrorComponent } from "../../../shared/error/error.component";
   templateUrl: './reservations.component.html',
   styleUrls: ['./reservations.component.scss'],
   standalone: true,
-  imports: [SharedModule, UpcomingComponent, TimeDetailPipe, ReservationIconPipe, ErrorComponent],
+  imports: [SharedModule, UpcomingComponent, TimeDetailPipe, ReservationIconPipe, ErrorComponent]
 })
 export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;

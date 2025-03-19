@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
@@ -17,8 +17,7 @@ export class PaymentService {
   private reservationUrlV1 = `v1/${ this.reservationUrl }`;
   private transactionUrlV1 = `v1/${ this.transactionUrl }`;
 
-  constructor(private http: HttpClient) {
-  }
+  private http: HttpClient = inject(HttpClient);
 
   getAll = (
     sort: string,

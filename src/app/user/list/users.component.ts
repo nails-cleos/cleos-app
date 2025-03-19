@@ -28,7 +28,7 @@ import { SharedModule } from "../../shared/shared.module";
   styleUrls: ['./users.component.scss'],
   animations: [detailExpandAnimation],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -233,7 +233,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   selector: 'app-select-user-dialog-component',
   templateUrl: './select-user-dialog.component.html',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class SelectUserDialogComponent implements OnInit, AfterViewInit, OnDestroy {
   userForm!: UntypedFormGroup;

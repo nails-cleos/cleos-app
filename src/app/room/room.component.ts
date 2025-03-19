@@ -51,7 +51,7 @@ export interface IIcon {
   templateUrl: './room.component.html',
   styleUrls: ['./room.component.scss'],
   standalone: true,
-  imports: [SharedModule, AvailabilityComponent, GoogleMapComponent, BackButtonDirective],
+  imports: [SharedModule, AvailabilityComponent, GoogleMapComponent, BackButtonDirective]
 })
 export class RoomComponent implements OnInit, OnDestroy {
   @ViewChild('professionalInput') professionalInput!: ElementRef<HTMLInputElement>;

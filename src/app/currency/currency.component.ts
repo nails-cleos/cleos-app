@@ -23,7 +23,7 @@ import { BackButtonDirective } from "../directives/back-button.directive";
   templateUrl: './currency.component.html',
   styleUrls: ['./currency.component.scss'],
   standalone: true,
-  imports: [SharedModule, BackButtonDirective],
+  imports: [SharedModule, BackButtonDirective]
 })
 export class CurrencyComponent implements OnInit, OnDestroy {
   @Input() currency?: ICurrency;

@@ -9,7 +9,7 @@ import { ErrorComponent } from "../../shared/error/error.component";
   templateUrl: './mini-card.component.html',
   styleUrls: ['./mini-card.component.scss'],
   standalone: true,
-  imports: [SharedModule, ErrorComponent],
+  imports: [SharedModule, ErrorComponent]
 })
 export class MiniCardComponent implements OnInit {
   @Input() icon?: string;

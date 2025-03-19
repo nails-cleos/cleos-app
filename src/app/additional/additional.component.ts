@@ -28,7 +28,7 @@ import { BackButtonDirective } from "../directives/back-button.directive";
   templateUrl: './additional.component.html',
   styleUrls: ['./additional.component.scss'],
   standalone: true,
-  imports: [SharedModule, BackButtonDirective],
+  imports: [SharedModule, BackButtonDirective]
 })
 export class AdditionalComponent implements OnInit, OnDestroy {
   @Input() additional?: IAdditional;

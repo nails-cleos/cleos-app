@@ -17,7 +17,7 @@ import { SharedModule } from "../../shared/shared.module";
   templateUrl: './treatment-sorting.component.html',
   styleUrls: ['./treatment-group-sorting.component.scss'],
   standalone: true,
-  imports: [SharedModule, DragDropSortingComponent],
+  imports: [SharedModule, DragDropSortingComponent]
 })
 export class TreatmentGroupSortingComponent implements OnInit, OnDestroy {
 

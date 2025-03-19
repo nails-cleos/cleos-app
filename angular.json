@@ -18,15 +18,16 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
             "allowedCommonJsDependencies": [
               "chart.js"
             ],
             "crossOrigin": "anonymous",
-            "outputPath": "dist/cleos",
+            "outputPath": {
+              "base": "dist/cleos"
+            },
             "index": "src/index.html",
-            "main": "src/main.ts",
             "polyfills": [
               "zone.js"
             ],
@@ -42,19 +43,23 @@
               "src/robots.txt"
             ],
             "styles": [
-              "node_modules/angular-calendar/css/angular-calendar.css",
               "node_modules/cookieconsent/build/cookieconsent.min.css",
               "src/styles.scss"
             ],
             "scripts": [
               "node_modules/cookieconsent/build/cookieconsent.min.js"
             ],
-            "vendorChunk": true,
             "extractLicenses": false,
-            "buildOptimizer": false,
             "sourceMap": true,
             "optimization": false,
-            "namedChunks": true
+            "namedChunks": true,
+            "browser": "src/main.ts",
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src",
+                "node_modules"
+              ]
+            }
           },
           "configurations": {
             "production": {
@@ -73,8 +78,6 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -87,8 +90,7 @@
                   "maximumError": "6kb"
                 }
               ],
-              "serviceWorker": true,
-              "ngswConfigPath": "ngsw-config.json"
+              "serviceWorker": "ngsw-config.json"
             },
             "staging": {
               "index": {
@@ -106,8 +108,6 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -120,8 +120,7 @@
                   "maximumError": "6kb"
                 }
               ],
-              "serviceWorker": true,
-              "ngswConfigPath": "ngsw-config.json"
+              "serviceWorker": "ngsw-config.json"
             },
             "pwa": {
               "index": {
@@ -139,8 +138,6 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -153,8 +150,7 @@
                   "maximumError": "6kb"
                 }
               ],
-              "serviceWorker": true,
-              "ngswConfigPath": "ngsw-config.json"
+              "serviceWorker": "ngsw-config.json"
             },
             "development": {
             }
@@ -209,7 +205,6 @@
               "src/robots.txt"
             ],
             "styles": [
-              "node_modules/angular-calendar/css/angular-calendar.css",
               "node_modules/cookieconsent/build/cookieconsent.min.css",
               "src/styles.scss"
             ],

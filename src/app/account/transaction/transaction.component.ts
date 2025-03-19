@@ -20,7 +20,7 @@ import { BankComponent } from "../../shared/bank/bank.component";
   templateUrl: './transaction.component.html',
   styleUrls: ['./transaction.component.scss'],
   standalone: true,
-  imports: [SharedModule, BalanceComponent, BackButtonDirective, BankComponent],
+  imports: [SharedModule, BalanceComponent, BackButtonDirective, BankComponent]
 })
 export class TransactionComponent implements OnInit, OnDestroy {
   form!: UntypedFormGroup;

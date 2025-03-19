@@ -12,7 +12,7 @@ import { SharedModule } from "../../shared/shared.module";
   templateUrl: './menu-item.component.html',
   styleUrls: ['./menu-item.component.scss'],
   standalone: true,
-  imports: [SharedModule, RouterLinkActive],
+  imports: [SharedModule, RouterLinkActive]
 })
 export class MenuItemComponent implements OnInit {
 

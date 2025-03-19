@@ -40,7 +40,7 @@ import { TotalSummaryComponent } from "../total-summary/total-summary.component"
     { provide: DateAdapter, useClass: YearAdapter }
   ],
   standalone: true,
-  imports: [SharedModule, YearComponent, TotalSummaryComponent],
+  imports: [SharedModule, YearComponent, TotalSummaryComponent]
 })
 export class YearSummaryComponent implements OnInit, OnDestroy {
   date = new FormControl<Date | null>(null);

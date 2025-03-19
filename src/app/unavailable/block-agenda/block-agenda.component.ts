@@ -46,7 +46,7 @@ import { BackButtonDirective } from "../../directives/back-button.directive";
   templateUrl: './block-agenda.component.html',
   styleUrls: ['./block-agenda.component.scss'],
   standalone: true,
-  imports: [SharedModule, BackButtonDirective],
+  imports: [SharedModule, BackButtonDirective]
 })
 export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() unavailable?: IUnavailable;

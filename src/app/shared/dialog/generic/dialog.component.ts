@@ -8,7 +8,7 @@ import { SharedModule } from "../../shared.module";
   templateUrl: './dialog.component.html',
   styleUrls: ['./dialog.component.scss'],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class DialogComponent {
 

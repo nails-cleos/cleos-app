@@ -25,7 +25,7 @@ import { DurationTimePipe } from "../../pipes/durationTime.pipe";
   styleUrls: ['./unavailable-list.component.scss'],
   animations: [detailExpandAnimation],
   standalone: true,
-  imports: [SharedModule, TimeDetailPipe, DurationTimePipe],
+  imports: [SharedModule, TimeDetailPipe, DurationTimePipe]
 })
 export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;

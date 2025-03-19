@@ -12,7 +12,7 @@ import { MonthComponent } from "../../month-summary/month/month.component";
   templateUrl: './quarter.component.html',
   styleUrls: ['./quarter.component.scss'],
   standalone: true,
-  imports: [SharedModule, MonthComponent],
+  imports: [SharedModule, MonthComponent]
 })
 export class QuarterComponent {
   @Input() monthSummaries?: IMonthSummary[];

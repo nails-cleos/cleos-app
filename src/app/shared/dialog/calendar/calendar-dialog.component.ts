@@ -10,7 +10,7 @@ import { MatButton } from "@angular/material/button";
   templateUrl: './calendar-dialog.component.html',
   styleUrls: ['./calendar-dialog.component.scss'],
   standalone: true,
-  imports: [MatRadioModule, MatDialogModule, ReactiveFormsModule, TranslateModule, MatButton],
+  imports: [MatRadioModule, MatDialogModule, ReactiveFormsModule, TranslateModule, MatButton]
 })
 export class CalendarDialogComponent {
 

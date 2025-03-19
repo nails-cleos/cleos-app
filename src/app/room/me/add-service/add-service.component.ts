@@ -19,7 +19,7 @@ import { BackButtonDirective } from "../../../directives/back-button.directive";
   templateUrl: './add-service.component.html',
   styleUrls: ['./add-service.component.scss'],
   standalone: true,
-  imports: [SharedModule, CurrencySymbolPipe, BackButtonDirective],
+  imports: [SharedModule, CurrencySymbolPipe, BackButtonDirective]
 })
 export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -147,7 +147,7 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
   selector: 'app-price-dialog',
   templateUrl: 'price-dialog.html',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class PriceDialogComponent implements OnInit {
 

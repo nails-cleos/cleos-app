@@ -8,7 +8,7 @@ import { TotalSummaryItemComponent } from "../total-summary-item/total-summary-i
   templateUrl: './result-summary.component.html',
   styleUrl: './result-summary.component.scss',
   standalone: true,
-  imports: [SharedModule, TotalSummaryItemComponent],
+  imports: [SharedModule, TotalSummaryItemComponent]
 })
 export class ResultSummaryComponent {
   @Input() summaryTotals!: any;

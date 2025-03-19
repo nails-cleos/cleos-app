@@ -26,7 +26,7 @@ import { BackButtonDirective } from "../../directives/back-button.directive";
   templateUrl: './overview.component.html',
   styleUrls: ['./overview.component.scss'],
   standalone: true,
-  imports: [SharedModule, ErrorComponent, CardComponent, ChartComponent, GoogleMapComponent, BackButtonDirective],
+  imports: [SharedModule, ErrorComponent, CardComponent, ChartComponent, GoogleMapComponent, BackButtonDirective]
 })
 export class OverviewComponent implements OnInit, OnDestroy {
   error: any;

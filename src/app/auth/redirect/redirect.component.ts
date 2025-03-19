@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { IAuthority, IUserAll } from '../../interfaces/user';
 import { Role } from '../../interfaces/token';
 import { Store } from '@ngrx/store';
@@ -14,14 +14,18 @@ import { SharedModule } from "../../shared/shared.module";
   templateUrl: './redirect.component.html',
   styleUrls: ['./redirect.component.scss'],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class RedirectComponent {
 
-  constructor(private store: Store<AppState>, private tokenService: TokenService,
-              private navigateService: NavigationService, translate: TranslateService) {
+  private store: Store<AppState> = inject(Store<AppState>);
+  private tokenService: TokenService = inject(TokenService);
+  private navigateService: NavigationService = inject(NavigationService);
+  private translate: TranslateService = inject(TranslateService);
+
+  constructor() {
     this.store.select(selectAuthState).subscribe((state: any) => {
-      const lang = getLocale(translate.currentLang).language;
+      const lang = getLocale(this.translate.currentLang).language;
       let redirectUrl = ['/', lang];
       if (state.redirect) {
         if (state.isAuthenticated) {

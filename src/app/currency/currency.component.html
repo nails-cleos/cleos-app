@@ -32,8 +32,9 @@
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'CURRENCY.NAME.FIELD' | translate }}</mat-label>
                   <input formControlName="name" matInput>
-                  @if (errors['name']) {
-                    <mat-error>{{ errors['name'] }}</mat-error>
+                  @let nameError = errors['name'];
+                  @if (nameError) {
+                    <mat-error>{{ nameError }}</mat-error>
                   }
                 </mat-form-field>
                 <mat-form-field appearance="outline">

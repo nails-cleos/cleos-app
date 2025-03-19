@@ -28,7 +28,7 @@ import { BackButtonDirective } from "../../../directives/back-button.directive";
   templateUrl: './expense.component.html',
   styleUrls: ['./expense.component.scss'],
   standalone: true,
-  imports: [SharedModule, TwoDigitsDirective, BackButtonDirective],
+  imports: [SharedModule, TwoDigitsDirective, BackButtonDirective]
 })
 export class ExpenseComponent implements OnInit, OnDestroy {
   @Input() expense?: IExpenseAll;

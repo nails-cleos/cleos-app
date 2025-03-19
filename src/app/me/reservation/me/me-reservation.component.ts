@@ -94,9 +94,9 @@ import { DurationTimePipe } from "../../../pipes/durationTime.pipe";
 import { PriceComponent } from "../../../shared/price/price.component";
 import { PricePreviewComponent } from "../../../shared/price-preview/price-preview.component";
 import { PaymentPreviewComponent } from "../../../shared/payment-preview/payment-preview.component";
-import { NgxMatIntlTelInputComponent } from "ngx-mat-intl-tel-input";
 import { GoogleMapComponent } from "../../../shared/google-map/google-map.component";
 import { BackButtonDirective } from "../../../directives/back-button.directive";
+import { NgxMaterialIntlTelInputComponent } from "ngx-material-intl-tel-input";
 
 @Component({
   selector: 'app-me-reservation',
@@ -108,8 +108,8 @@ import { BackButtonDirective } from "../../../directives/back-button.directive";
   }],
   standalone: true,
   imports: [SharedModule, RoomNamePipe, SortByPipe, CurrencySymbolPipe, DurationTimePipe, PriceComponent,
-    PricePreviewComponent, PaymentPreviewComponent, NgxMatIntlTelInputComponent, GoogleMapComponent,
-    BackButtonDirective],
+    PricePreviewComponent, PaymentPreviewComponent, NgxMaterialIntlTelInputComponent, GoogleMapComponent,
+    BackButtonDirective]
 })
 export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('stepper') myStepper!: MatStepper;

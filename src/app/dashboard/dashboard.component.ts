@@ -44,7 +44,7 @@ import { CounterComponent } from "../util/counter/counter.component";
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
-  imports: [SharedModule, CalendarModule, DayViewSchedulerComponent, CounterComponent],
+  imports: [SharedModule, CalendarModule, DayViewSchedulerComponent, CounterComponent]
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   @ViewChild('picker') picker: any;

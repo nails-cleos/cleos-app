@@ -7,7 +7,7 @@ import { SharedModule } from "../shared.module";
   templateUrl: './rating.component.html',
   styleUrls: ['./rating.component.scss'],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class RatingComponent implements OnInit {
 

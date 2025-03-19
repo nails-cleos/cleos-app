@@ -24,7 +24,7 @@ import { CurrencySymbolPipe } from "../../../pipes/currency-symbol.pipe";
   templateUrl: './me-payment.component.html',
   styleUrls: ['./me-payment.component.scss'],
   standalone: true,
-  imports: [SharedModule, BankComponent, BackButtonDirective, CurrencySymbolPipe],
+  imports: [SharedModule, BankComponent, BackButtonDirective, CurrencySymbolPipe]
 })
 export class MePaymentComponent implements OnInit, OnDestroy {
 

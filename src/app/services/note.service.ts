@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { INote } from '../interfaces/note';
@@ -12,8 +12,7 @@ export class NoteService {
   private url = 'notes';
   private urlV1 = `v1/${ this.url }`;
 
-  constructor(private http: HttpClient) {
-  }
+  private http: HttpClient = inject(HttpClient);
 
   getById = (id: string): Observable<INote | undefined> => this.http.get<INote>(toUrl(this.urlV1, id));
 

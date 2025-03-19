@@ -12,7 +12,7 @@ import { BankComponent } from "../bank/bank.component";
   templateUrl: './price.component.html',
   styleUrls: ['./price.component.scss'],
   standalone: true,
-  imports: [SharedModule, CurrencySymbolPipe, BankComponent],
+  imports: [SharedModule, CurrencySymbolPipe, BankComponent]
 })
 export class PriceComponent {
   @Input() typeForm!: UntypedFormGroup;

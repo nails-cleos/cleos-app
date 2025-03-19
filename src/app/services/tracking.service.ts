@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ITracking } from '../interfaces/reservation';
@@ -10,8 +10,7 @@ export class TrackingService {
   private url = 'tracking';
   private urlV1 = `v1/${ this.url }`;
 
-  constructor(private http: HttpClient) {
-  }
+  private http: HttpClient = inject(HttpClient);
 
   getAll = (): Observable<ITracking[]> => this.http.get<ITracking[]>(this.urlV1);
 

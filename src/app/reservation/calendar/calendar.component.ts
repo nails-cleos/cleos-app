@@ -63,9 +63,7 @@ import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { INoteAll } from '../../interfaces/note';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Role } from '../../interfaces/token';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
-import * as html2pdf from 'html2pdf.js';
+import html2pdf from 'html2pdf.js';
 import { SharedModule } from "../../shared/shared.module";
 import { RoomNamePipe } from "../../pipes/room-name.pipe";
 
@@ -74,7 +72,7 @@ import { RoomNamePipe } from "../../pipes/room-name.pipe";
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],
   standalone: true,
-  imports: [SharedModule, RoomNamePipe, CalendarModule],
+  imports: [SharedModule, RoomNamePipe, CalendarModule]
 })
 export class CalendarComponent implements OnInit, OnDestroy {
   @ViewChild('picker') picker: any;

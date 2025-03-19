@@ -22,7 +22,7 @@ import { CurrencySymbolPipe } from "../../pipes/currency-symbol.pipe";
   styleUrls: ['./treatments.component.scss'],
   animations: [detailExpandAnimation],
   standalone: true,
-  imports: [SharedModule, CurrencySymbolPipe],
+  imports: [SharedModule, CurrencySymbolPipe]
 })
 export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;

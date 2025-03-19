@@ -7,12 +7,14 @@
             @if (isAddMode) {
               <mat-card-title>{{ 'EXPENSE.TITLE' | translate }}</mat-card-title>
             } @else {
+            <ng-container>
               <mat-card-title>{{ 'EXPENSE.DETAIL' | translate }}</mat-card-title>
               @if (expense) {
                 <mat-card-subtitle>{{ expense.id }}</mat-card-subtitle>
               } @else {
-                <div class="ssc-line"></div>
-              }
+              <div class="ssc-line"></div>
+            }
+            </ng-container>
             }
             @if (roomName) {
               <mat-card-subtitle>{{ roomName }}</mat-card-subtitle>

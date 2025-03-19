@@ -6,7 +6,7 @@ import { SharedModule } from "../../../shared/shared.module";
   templateUrl: './share-buttons.component.html',
   styleUrls: ['./share-buttons.component.scss'],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class ShareButtonsComponent {
   @Input() message = '';

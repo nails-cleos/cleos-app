@@ -24,7 +24,7 @@ import { BackButtonDirective } from "../../../directives/back-button.directive";
   templateUrl: './more-info.component.html',
   styleUrls: ['./more-info.component.scss'],
   standalone: true,
-  imports: [SharedModule, TimeDetailPipe, RatingComponent, BackButtonDirective],
+  imports: [SharedModule, TimeDetailPipe, RatingComponent, BackButtonDirective]
 })
 export class MoreInfoComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = ['position', 'description', 'amount', 'type', 'status', 'actions'];

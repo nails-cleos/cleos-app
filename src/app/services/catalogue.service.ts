@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ICatalogue, ICatalogueAll } from '../interfaces/catalogue';
@@ -11,8 +11,7 @@ export class CatalogueService {
   private url = 'catalogues';
   private urlV1 = `v1/${ this.url }`;
 
-  constructor(private http: HttpClient) {
-  }
+  private http: HttpClient = inject(HttpClient);
 
   getAll = (): Observable<ICatalogue[]> => this.http.get<ICatalogue[]>(this.urlV1)
 

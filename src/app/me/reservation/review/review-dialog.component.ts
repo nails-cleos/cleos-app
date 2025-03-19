@@ -19,7 +19,7 @@ import { RatingComponent } from "../../../shared/rating/rating.component";
   animations: [transitionAnimation],
   styleUrls: ['./review-dialog.component.scss'],
   standalone: true,
-  imports: [SharedModule, RoomNamePipe, RatingComponent],
+  imports: [SharedModule, RoomNamePipe, RatingComponent]
 })
 export class ReviewDialogComponent {
   reservation?: IReservationAll;

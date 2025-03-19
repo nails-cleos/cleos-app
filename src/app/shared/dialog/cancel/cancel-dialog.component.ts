@@ -12,7 +12,7 @@ import { PriceComponent } from "../../price/price.component";
   templateUrl: './cancel-dialog.component.html',
   styleUrls: ['./cancel-dialog.component.scss'],
   standalone: true,
-  imports: [SharedModule, PriceComponent],
+  imports: [SharedModule, PriceComponent]
 })
 export class CancelDialogComponent implements OnInit {
   cancelForm!: UntypedFormGroup;

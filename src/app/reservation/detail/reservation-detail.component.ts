@@ -78,7 +78,7 @@ import { FabMenuComponent } from "./fab-menu/fab-menu.component";
   styleUrls: ['./reservation-detail.component.scss'],
   standalone: true,
   imports: [SharedModule, RoomNamePipe, ReservationIconPipe, PriceExtrasComponent, PricePreviewComponent,
-    TwoDigitsDirective, TimeDetailPipe, BackButtonDirective, FabMenuComponent],
+    TwoDigitsDirective, TimeDetailPipe, BackButtonDirective, FabMenuComponent]
 })
 export class ReservationDetailComponent implements OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator?: MatPaginator;

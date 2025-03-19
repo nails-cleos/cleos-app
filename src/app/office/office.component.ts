@@ -26,7 +26,7 @@ import { BackButtonDirective } from "../directives/back-button.directive";
   templateUrl: './office.component.html',
   styleUrls: ['./office.component.scss'],
   standalone: true,
-  imports: [SharedModule, BackButtonDirective],
+  imports: [SharedModule, BackButtonDirective]
 })
 export class OfficeComponent implements OnInit, OnDestroy {
   @Input() office?: IOffice;

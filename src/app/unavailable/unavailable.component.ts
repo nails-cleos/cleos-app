@@ -47,7 +47,7 @@ import { BackButtonDirective } from "../directives/back-button.directive";
   templateUrl: './unavailable.component.html',
   styleUrls: ['./unavailable.component.scss'],
   standalone: true,
-  imports: [SharedModule, BackButtonDirective],
+  imports: [SharedModule, BackButtonDirective]
 })
 export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() unavailable?: IUnavailable;

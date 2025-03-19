@@ -1,6 +1,7 @@
 @use 'sass:map';
+@use 'sass:color';
 @use '@angular/material' as mat;
-@import "angular-calendar/scss/angular-calendar.scss";
+@use 'angular-calendar/scss/angular-calendar.scss';
 
 @mixin color($theme) {
   // Get the color config from the theme.
@@ -48,7 +49,7 @@
     }
 
     .table-header {
-      background-color: lighten(#2c2c2c, 60%) !important;
+      background-color: color.scale(#2c2c2c, $lightness: +60%);
       color: black;
     }
 

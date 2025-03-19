@@ -10,7 +10,7 @@ import { ErrorComponent } from "../../../../shared/error/error.component";
   templateUrl: './overview-chart.component.html',
   styleUrls: ['./overview-chart.component.scss'],
   standalone: true,
-  imports: [SharedModule, ErrorComponent],
+  imports: [SharedModule, ErrorComponent]
 })
 export class OverviewChartComponent implements OnChanges {
   @Input() chartSummary: IChart | undefined;

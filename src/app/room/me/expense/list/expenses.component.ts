@@ -32,7 +32,7 @@ import { TimeDetailPipe } from "../../../../pipes/time-detail.pipe";
     { provide: DateAdapter, useClass: YearMonthAdapter }
   ],
   standalone: true,
-  imports: [SharedModule, TimeDetailPipe],
+  imports: [SharedModule, TimeDetailPipe]
 })
 export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;

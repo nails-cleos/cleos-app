@@ -16,7 +16,7 @@ import { BackButtonDirective } from "../../directives/back-button.directive";
   templateUrl: './treatment-view.component.html',
   styleUrls: ['./treatment-view.component.scss'],
   standalone: true,
-  imports: [SharedModule, DurationTimePipe, TreatmentTableComponent, BackButtonDirective],
+  imports: [SharedModule, DurationTimePipe, TreatmentTableComponent, BackButtonDirective]
 })
 export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy {
   group?: ITreatmentGroup;

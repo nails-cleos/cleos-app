@@ -20,7 +20,7 @@ import { ShareButtonsComponent } from "./share-buttons/share-buttons.component";
   templateUrl: './referrals.component.html',
   styleUrls: ['./referrals.component.scss'],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class ReferralsComponent implements OnInit, OnDestroy {
   userId?: string;
@@ -106,7 +106,7 @@ export class ReferralsComponent implements OnInit, OnDestroy {
   selector: 'app-bottom-sheet-share',
   templateUrl: 'bottom-sheet-share.component.html',
   standalone: true,
-  imports: [SharedModule, ShareButtonsComponent],
+  imports: [SharedModule, ShareButtonsComponent]
 })
 export class BottomSheetShareComponent {
   message: any;
@@ -139,7 +139,7 @@ export class BottomSheetShareComponent {
   templateUrl: 'bottom-sheet-referral.component.html',
   styleUrls: ['./bottom-sheet-referral.component.scss'],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class BottomSheetReferralComponent {
   referralMax = 5;

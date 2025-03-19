@@ -14,7 +14,7 @@ import { SharedModule } from "../../shared/shared.module";
   selector: 'app-change-color-dialog-component',
   templateUrl: './change-color-dialog.component.html',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class ChangeColorDialogComponent implements OnInit, OnDestroy {
   colorForm!: UntypedFormGroup;

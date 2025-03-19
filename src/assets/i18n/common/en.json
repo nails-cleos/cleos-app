@@ -266,8 +266,10 @@
       },
       "PHONE": {
         "FIELD": "Phone",
+        "SEARCH": "Search",
         "REQUIRED": "Phone is <b>required</b>",
-        "INVALID": "Invalid phone number"
+        "INVALID": "Invalid phone number",
+        "COUNTRY_NOT_FOUND": "No countries found"
       },
       "LANG": {
         "FIELD": "Language",

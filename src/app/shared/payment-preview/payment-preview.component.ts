@@ -7,7 +7,7 @@ import { SharedModule } from "../shared.module";
   templateUrl: './payment-preview.component.html',
   styleUrls: ['./payment-preview.component.scss'],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class PaymentPreviewComponent {
   @Input() type?: IPaymentOption;

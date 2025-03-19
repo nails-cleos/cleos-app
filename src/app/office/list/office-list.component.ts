@@ -21,7 +21,7 @@ import { SharedModule } from "../../shared/shared.module";
   styleUrls: ['./office-list.component.scss'],
   animations: [detailExpandAnimation],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;

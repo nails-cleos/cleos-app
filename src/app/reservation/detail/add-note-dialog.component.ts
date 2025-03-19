@@ -7,7 +7,7 @@ import { SharedModule } from "../../shared/shared.module";
   selector: 'app-add-note-dialog-component',
   templateUrl: './add-note-dialog.component.html',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class AddNoteDialogComponent implements OnInit {
   noteForm!: UntypedFormGroup;

@@ -37,7 +37,7 @@ import { ErrorComponent } from "../../../shared/error/error.component";
   styleUrls: ['./reservation-table.component.scss'],
   animations: [detailExpandAnimation],
   standalone: true,
-  imports: [SharedModule, TimeDetailPipe, ReservationIconPipe, ErrorComponent],
+  imports: [SharedModule, TimeDetailPipe, ReservationIconPipe, ErrorComponent]
 })
 export class ReservationTableComponent implements AfterViewInit, OnInit, OnChanges, OnDestroy {
   @Input() roomId: any;

@@ -29,7 +29,7 @@ import { SharedModule } from "../shared/shared.module";
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.scss'],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class AuthComponent implements OnInit, OnDestroy {
   loginForm: FormGroup;

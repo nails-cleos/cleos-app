@@ -11,7 +11,7 @@ import { SharedModule } from "../shared.module";
   templateUrl: './bank.component.html',
   styleUrls: ['./bank.component.scss'],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class BankComponent implements AfterViewInit {
   @Input() formGroup!: UntypedFormGroup;

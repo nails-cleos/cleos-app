@@ -10,7 +10,7 @@ import { SharedModule } from "../../shared/shared.module";
   templateUrl: './availability.component.html',
   styleUrls: ['./availability.component.scss'],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class AvailabilityComponent implements OnChanges {
   @Input() dates?: IAvailabilityDate;

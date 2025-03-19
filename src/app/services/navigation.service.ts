@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { getLocale } from '../util/helper';
 import { TranslateService } from '@ngx-translate/core';
@@ -13,10 +13,11 @@ import * as fromActionsI18n from '../store/i18n.actions';
 })
 export class NavigationService {
 
-  private history: string[] = [];
+  private store: Store<AppState> = inject(Store<AppState>);
+  private router: Router = inject(Router);
+  private translate: TranslateService = inject(TranslateService);
 
-  constructor(private store: Store<AppState>, private router: Router, private translate: TranslateService) {
-  }
+  private history: string[] = [];
 
   subscribe = (): void => {
     this.router.events.subscribe((event) => {

@@ -24,7 +24,7 @@ import { SortByPipe } from "../../pipes/sort-by.pipe";
   styleUrls: ['./rooms.component.scss'],
   animations: [detailExpandAnimation],
   standalone: true,
-  imports: [SharedModule, SortByPipe],
+  imports: [SharedModule, SortByPipe]
 })
 export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;

@@ -12,7 +12,7 @@ import { ErrorComponent } from "../error/error.component";
   templateUrl: './chart.component.html',
   styleUrls: ['./chart.component.scss'],
   standalone: true,
-  imports: [SharedModule, ErrorComponent],
+  imports: [SharedModule, ErrorComponent]
 })
 export class ChartComponent implements OnChanges, OnDestroy {
   @Input() error: any;

@@ -16,12 +16,11 @@ import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces
 import { TimeDetailPipe } from "../../../pipes/time-detail.pipe";
 
 @Component({
-  selector: 'app-customers',
-  animations: [detailExpandAnimation],
-  templateUrl: './customers.component.html',
-  styleUrl: './customers.component.scss',
-  standalone: true,
-  imports: [SharedModule, TimeDetailPipe],
+    selector: 'app-customers',
+    animations: [detailExpandAnimation],
+    templateUrl: './customers.component.html',
+    styleUrl: './customers.component.scss',
+    imports: [SharedModule, TimeDetailPipe]
 })
 export class CustomersComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;

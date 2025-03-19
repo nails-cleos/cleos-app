@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
@@ -10,8 +10,7 @@ export class ExpenseService {
 
   private urlV1 = `v1/rooms/{roomId}/expenses`;
 
-  constructor(private http: HttpClient) {
-  }
+  private http: HttpClient = inject(HttpClient);
 
   public getAll = (roomId: string, sort: string, direction: string, page: number, size: number = PAGE_SIZE,
                    filter?: string, dateFilter?: string): Observable<IExpense[]> => {

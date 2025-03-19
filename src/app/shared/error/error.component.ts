@@ -7,7 +7,7 @@ import { BackButtonDirective } from "../../directives/back-button.directive";
   templateUrl: './error.component.html',
   styleUrls: ['./error.component.scss'],
   standalone: true,
-  imports: [SharedModule, BackButtonDirective],
+  imports: [SharedModule, BackButtonDirective]
 })
 export class ErrorComponent implements OnInit {
 

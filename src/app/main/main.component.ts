@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, Optional, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { AppState } from '../store/app.states';
@@ -28,55 +28,55 @@ import { SharedModule } from "../shared/shared.module";
   styleUrls: ['./main.component.scss'],
   animations: [fade, bottomTop, colorChange, colorChangeChild],
   standalone: true,
-  imports: [SharedModule, RouterOutlet, RouterLinkActive],
+  imports: [SharedModule, RouterOutlet, RouterLinkActive]
 })
 export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
-
   @ViewChild('bodySection', { static: true }) bodySection?: ElementRef<HTMLElement>;
-  navigationState: BehaviorSubject<'open' | 'close'>;
+
+  private breakpointObserver: BreakpointObserver = inject(BreakpointObserver)
+  private store: Store<AppState> = inject(Store<AppState>)
+  private router: Router = inject(Router)
+  private translate: TranslateService = inject(TranslateService)
+  private overlayContainer: OverlayContainer = inject(OverlayContainer)
+  private cookieService: CookieService = inject(CookieService)
+  private themeService: ThemeService = inject(ThemeService)
+  private auth: Auth = inject(Auth)
+  private authUserService: AuthUserService = inject(AuthUserService)
+  private mainContent: MainContentService = inject(MainContentService)
+  private tokenService: TokenService = inject(TokenService)
+  private navigationService: NavigationService = inject(NavigationService)
+  private route: ActivatedRoute = inject(ActivatedRoute)
+
+  navigationState: BehaviorSubject<'open' | 'close'> = new BehaviorSubject<'open' | 'close'>('close');
 
   title = environment.title;
   firstSection?: Element | null;
-  showLoader: boolean;
-  isAuthenticated: boolean;
+  showLoader: boolean = true;
+  isAuthenticated: boolean = false;
   appVersion = environment.version;
 
   cssClass?: string;
-  isDarkMode: boolean;
-  backgroundColor: string;
-  language: string;
-  showArrow: boolean;
+  isDarkMode: boolean = isDarkMode(this.cookieService.get(THEME) as Theme);
+  backgroundColor: string = this.isDarkMode ? '126, 119, 105' : '169, 163, 151';
+  language: string = this.translate.currentLang;
+  showArrow: boolean = false;
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(map(result => result.matches), shareReplay());
 
-  private authUserServiceSubscription: Subscription;
-  private mainContentSubscription: Subscription;
+  private authUserServiceSubscription: Subscription = user(this.auth).subscribe(response => {
+    response?.getIdToken().then(idToken => this.tokenService.token = idToken);
+    this.isAuthenticated = response !== null;
+  });
+  private mainContentSubscription: Subscription = this.mainContent.data$.subscribe(it => {
+    this.showLoader = it.showPreload;
+    this.navigationState.next(it.navigationHeader);
+    this.showArrow = it.showArrow;
+  });
 
   private navigationObserve?: IntersectionObserver;
 
-  constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>, private router: Router,
-              private translate: TranslateService, private overlayContainer: OverlayContainer,
-              private cookieService: CookieService, private themeService: ThemeService, @Optional() private auth: Auth,
-              private authUserService: AuthUserService, mainContent: MainContentService,
-              private tokenService: TokenService, private navigationService: NavigationService,
-              private route: ActivatedRoute) {
-    this.navigationState = new BehaviorSubject<'open' | 'close'>('close');
-    this.isAuthenticated = false;
-    this.showLoader = true;
-    this.showArrow = false;
-    this.isDarkMode = isDarkMode(cookieService.get(THEME) as Theme);
+  constructor() {
     this.authUserService.updateMode(this.isDarkMode);
-    this.backgroundColor = this.isDarkMode ? '126, 119, 105' : '169, 163, 151';
-    this.authUserServiceSubscription = user(this.auth).subscribe(response => {
-      response?.getIdToken().then(idToken => this.tokenService.token = idToken);
-      this.isAuthenticated = response !== null;
-    });
-    this.mainContentSubscription = mainContent.data$.subscribe(it => {
-      this.showLoader = it.showPreload;
-      this.navigationState.next(it.navigationHeader);
-      this.showArrow = it.showArrow;
-    });
-    this.language = this.translate.currentLang;
   }
 
   get changeTheme(): void {

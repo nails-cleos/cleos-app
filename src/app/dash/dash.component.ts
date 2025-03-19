@@ -41,7 +41,7 @@ import { ChartComponent } from "../shared/chart/chart.component";
   templateUrl: './dash.component.html',
   styleUrls: ['./dash.component.scss'],
   standalone: true,
-  imports: [SharedModule, CalendarModule, MiniCardComponent, ReservationTableComponent, CardComponent, ChartComponent],
+  imports: [SharedModule, CalendarModule, MiniCardComponent, ReservationTableComponent, CardComponent, ChartComponent]
 })
 export class DashComponent implements OnInit, OnDestroy {
   state: any;

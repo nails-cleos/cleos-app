@@ -12,7 +12,7 @@ import { SharedModule } from "../../shared/shared.module";
   selector: 'app-add-discount-dialog-component',
   templateUrl: './add-discount-dialog.component.html',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class AddDiscountDialogComponent implements OnInit, OnDestroy {
   discountForm!: UntypedFormGroup;

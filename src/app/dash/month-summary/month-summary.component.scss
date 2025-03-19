@@ -11,6 +11,7 @@
 #reservationTableData, #expenseTableData, #cashTableData {
   border-collapse: collapse;
   border-spacing: 0;
+  width: 100%;
 
   @media not all and (min-width: 640px) {
     display: block;
@@ -21,7 +22,6 @@
   @media all and (min-width: 640px) {
     table-layout: fixed;
   }
-  width: 100%;
 
   .id, .nmb {
     width: 4%;

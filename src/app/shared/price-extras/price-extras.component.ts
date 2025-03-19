@@ -10,7 +10,7 @@ import { CurrencySymbolPipe } from "../../pipes/currency-symbol.pipe";
   templateUrl: './price-extras.component.html',
   styleUrl: './price-extras.component.scss',
   standalone: true,
-  imports: [SharedModule, CurrencySymbolPipe],
+  imports: [SharedModule, CurrencySymbolPipe]
 })
 export class PriceExtrasComponent {
   @Input('key') key!: string;

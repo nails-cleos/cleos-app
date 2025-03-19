@@ -10,7 +10,6 @@ import { UserEffects } from '../store/effects/user.effects';
 import { AuthService } from '../services/auth.service';
 import { NotificationService } from '../services/notification.service';
 import { UserService } from '../services/user.service';
-import { TokenService } from '../services/token.service';
 import { MenuItemComponent } from './menu-item/menu-item.component';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { Store } from '@ngrx/store';
@@ -39,8 +38,7 @@ import { Observable } from 'rxjs';
   providers: [
     AuthService,
     NotificationService,
-    UserService,
-    TokenService
+    UserService
   ]
 })
 export class NavModule {

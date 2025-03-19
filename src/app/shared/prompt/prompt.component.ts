@@ -9,7 +9,7 @@ import { SharedModule } from "../shared.module";
   templateUrl: './prompt.component.html',
   styleUrls: ['./prompt.component.scss'],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class PromptComponent {
 

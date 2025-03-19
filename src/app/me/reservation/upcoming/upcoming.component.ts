@@ -16,7 +16,7 @@ import { CurrencySymbolPipe } from "../../../pipes/currency-symbol.pipe";
   templateUrl: './upcoming.component.html',
   styleUrls: ['./upcoming.component.scss'],
   standalone: true,
-  imports: [SharedModule, RoomNamePipe, CurrencySymbolPipe],
+  imports: [SharedModule, RoomNamePipe, CurrencySymbolPipe]
 })
 export class UpcomingComponent implements OnChanges {
   @Input() upcoming: IUpcomingAll | undefined;

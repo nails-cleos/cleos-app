@@ -25,7 +25,7 @@ import { BackButtonDirective } from "../directives/back-button.directive";
   templateUrl: './discount.component.html',
   styleUrls: ['./discount.component.scss'],
   standalone: true,
-  imports: [SharedModule, BackButtonDirective],
+  imports: [SharedModule, BackButtonDirective]
 })
 export class DiscountComponent implements OnInit, OnDestroy {
   @Input() discount?: IDiscountAll;

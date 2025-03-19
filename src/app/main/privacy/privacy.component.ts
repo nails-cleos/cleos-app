@@ -8,7 +8,7 @@ import { SharedModule } from "../../shared/shared.module";
   templateUrl: './privacy.component.html',
   styleUrls: ['./privacy.component.scss'],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class PrivacyComponent {
   url = environment.appServer;

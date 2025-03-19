@@ -13,7 +13,7 @@ import { SharedModule } from "../../../shared/shared.module";
   templateUrl: './payment-complete.component.html',
   styleUrls: ['./payment-complete.component.scss'],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewInit {
   private subscription?: Subscription;

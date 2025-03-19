@@ -14,7 +14,7 @@ interface ITimeZone {
   templateUrl: './time-zone-snack-bar.component.html',
   styleUrls: ['./time-zone-snack-bar.component.scss'],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class TimeZoneSnackBarComponent {
 

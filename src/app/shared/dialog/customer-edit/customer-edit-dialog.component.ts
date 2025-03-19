@@ -11,7 +11,7 @@ import { PriceComponent } from "../../price/price.component";
   templateUrl: './customer-edit-dialog.component.html',
   styleUrls: ['./customer-edit-dialog.component.scss'],
   standalone: true,
-  imports: [SharedModule, PriceComponent],
+  imports: [SharedModule, PriceComponent]
 })
 export class CustomerEditDialogComponent {
   price: IPrice;

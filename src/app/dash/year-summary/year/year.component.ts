@@ -9,7 +9,7 @@ import { QuarterComponent } from "../../quarter-summary/quarter/quarter.componen
   templateUrl: './year.component.html',
   styleUrls: ['./year.component.scss'],
   standalone: true,
-  imports: [SharedModule, QuarterComponent],
+  imports: [SharedModule, QuarterComponent]
 })
 export class YearComponent {
   @Input() quarterSummaries?: IQuarterSummary[];

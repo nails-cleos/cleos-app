@@ -7,7 +7,7 @@ import { SharedModule } from "../../shared/shared.module";
   templateUrl: './balance.component.html',
   styleUrls: ['./balance.component.scss'],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class BalanceComponent {
   @Input() account?: IAccountAll;

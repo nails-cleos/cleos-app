@@ -41,7 +41,7 @@ export class ItemSorting implements ISorting {
   templateUrl: './drag-drop-sorting.component.html',
   styleUrls: ['./drag-drop-sorting.component.scss'],
   standalone: true,
-  imports: [SharedModule, BackButtonDirective],
+  imports: [SharedModule, BackButtonDirective]
 })
 export class DragDropSortingComponent {
   @Input() title!: string;

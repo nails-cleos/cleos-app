@@ -12,7 +12,6 @@
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
     "declaration": false,
-    "downlevelIteration": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "importHelpers": true,
@@ -27,7 +26,11 @@
         "node_modules/exceljs/dist/exceljs.min"
       ]
     },
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "typeRoots": [
+      "node_modules/@types",
+      "src/types"
+    ]
   },
   "angularCompilerOptions": {
     "strictInjectionParameters": true,

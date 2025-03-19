@@ -15,7 +15,7 @@ import { SharedModule } from "../../shared/shared.module";
   selector: 'app-change-customer-dialog-component',
   templateUrl: './change-customer-dialog.component.html',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
   customerForm!: UntypedFormGroup;

@@ -17,7 +17,7 @@ import { BackButtonDirective } from "../../directives/back-button.directive";
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss'],
   standalone: true,
-  imports: [SharedModule, BackButtonDirective],
+  imports: [SharedModule, BackButtonDirective]
 })
 export class ForgotPasswordComponent implements OnInit, OnDestroy {
 

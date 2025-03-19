@@ -39,7 +39,7 @@ import { AnimateDirective } from "../../directives/animate.directive";
   styleUrls: ['./main-content.component.scss'],
   animations: [bottomTop, leftRight, slideInX, slideInY, fadeInOut, slideAnimation],
   standalone: true,
-  imports: [SharedModule, AnimateDirective],
+  imports: [SharedModule, AnimateDirective]
 })
 export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -373,7 +373,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   selector: 'app-bottom-sheet-book-appointment',
   templateUrl: 'bottom-sheet-book-appointment.html',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class BottomSheetBookAppointmentComponent {
   constructor(private bottomSheetRef: MatBottomSheetRef<BottomSheetBookAppointmentComponent>,

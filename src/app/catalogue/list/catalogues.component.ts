@@ -19,7 +19,7 @@ import { SharedModule } from "../../shared/shared.module";
   templateUrl: './catalogues.component.html',
   styleUrls: ['./catalogues.component.scss'],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChildren(CdkDropList) dropsQuery!: QueryList<CdkDropList>;

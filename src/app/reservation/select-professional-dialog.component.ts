@@ -11,7 +11,7 @@ import { SharedModule } from "../shared/shared.module";
   selector: 'app-select-professional-dialog-component',
   templateUrl: './select-professional-dialog.component.html',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class SelectProfessionalDialogComponent implements OnInit {
   professionalForm!: UntypedFormGroup;

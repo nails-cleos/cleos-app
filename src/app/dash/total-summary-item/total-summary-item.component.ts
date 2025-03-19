@@ -6,7 +6,7 @@ import { SharedModule } from "../../shared/shared.module";
   templateUrl: './total-summary-item.component.html',
   styleUrl: './total-summary-item.component.scss',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class TotalSummaryItemComponent {
   @Input() label!: string;

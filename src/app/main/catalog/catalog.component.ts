@@ -15,7 +15,7 @@ import { SharedModule } from "../../shared/shared.module";
   templateUrl: './catalog.component.html',
   styleUrls: ['./catalog.component.scss'],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class CatalogComponent implements OnInit, OnDestroy {
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)

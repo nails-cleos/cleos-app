@@ -22,7 +22,7 @@ import { SharedModule } from "../../shared/shared.module";
   styleUrls: ['./currency-list.component.scss'],
   animations: [detailExpandAnimation],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class CurrencyListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;

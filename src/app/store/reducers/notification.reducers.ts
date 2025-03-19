@@ -54,9 +54,9 @@ export const reducer = (state = initialState, action: All): State => {
     case NotificationActionTypes.notificationFailure: {
       return {
         ...state,
-        errorMessage: action.payload.error.message,
+        errorMessage: action.payload.error?.message,
         error: action.payload.error,
-        subErrors: action.payload.error.subErrors,
+        subErrors: action.payload.error?.subErrors,
         message: null,
         isLoading: false
       };

@@ -1,4 +1,4 @@
-import { APP_INITIALIZER, enableProdMode, importProvidersFrom, LOCALE_ID } from '@angular/core';
+import { enableProdMode, importProvidersFrom, inject, LOCALE_ID, provideAppInitializer } from '@angular/core';
 
 import { environment } from './environments/environment';
 import { AppComponent } from './app/app.component';
@@ -38,7 +38,8 @@ import localeEnGB from '@angular/common/locales/en-GB';
 import localeEnNL from '@angular/common/locales/en-NL';
 import localeEs from '@angular/common/locales/es';
 import localeAr from '@angular/common/locales/es-AR';
-import { provideHttpClient } from "@angular/common/http";
+import { provideHttpClient, withInterceptors, withJsonpSupport } from "@angular/common/http";
+import { httpInterceptorProviders } from "./app/http-interceptors";
 
 const cookieConfig: NgcCookieConsentConfig = {
   cookie: {
@@ -116,8 +117,12 @@ const databaseProvider = provideDatabase(() => {
   return database;
 });
 
+export function initializePwaService(pwaService: PwaService) {
+  pwaService.initPwaPrompt()
+}
+
 const providers = [
-  provideHttpClient(),
+  provideHttpClient(withInterceptors(httpInterceptorProviders), withJsonpSupport()),
   providersFrom,
   {
     provide: MatPaginatorIntl, deps: [TranslateService],
@@ -140,12 +145,7 @@ const providers = [
     provide: MAT_ICON_DEFAULT_OPTIONS,
     useValue: { fontSet: 'material-symbols-outlined' }
   },
-  {
-    provide: APP_INITIALIZER,
-    useFactory: (pwaService: PwaService) => () => pwaService.initPwaPrompt(),
-    deps: [PwaService],
-    multi: true
-  },
+  provideAppInitializer(() => initializePwaService(inject(PwaService))),
   provideCharts(withDefaultRegisterables()),
   provideFirebaseApp(() => initializeApp(environment.firebase)),
   authProvider,

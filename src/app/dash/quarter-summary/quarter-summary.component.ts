@@ -38,7 +38,7 @@ import { TotalSummaryComponent } from "../total-summary/total-summary.component"
     { provide: DateAdapter, useClass: YearAdapter }
   ],
   standalone: true,
-  imports: [SharedModule, QuarterComponent, TotalSummaryComponent],
+  imports: [SharedModule, QuarterComponent, TotalSummaryComponent]
 })
 export class QuarterSummaryComponent implements OnInit, OnDestroy {
 

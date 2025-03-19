@@ -68,36 +68,41 @@
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'OFFICE.SUBJECT.FIELD' | translate }}</mat-label>
                   <input formControlName="subject" matInput>
-                  @if (errors['subject']) {
-                    <mat-error>{{ errors['subject'] }}</mat-error>
+                  @let subjectError = errors['subject'];
+                  @if (subjectError) {
+                    <mat-error>{{ subjectError }}</mat-error>
                   }
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'OFFICE.KVK.FIELD' | translate }}</mat-label>
                   <input formControlName="kvk" matInput>
-                  @if (errors['kvk']) {
-                    <mat-error>{{ errors['kvk'] }}</mat-error>
+                  @let kvkError = errors['kvk'];
+                  @if (kvkError) {
+                    <mat-error>{{ kvkError }}</mat-error>
                   }
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'OFFICE.ACCOUNT.FIELD' | translate }}</mat-label>
                   <input formControlName="account" matInput>
-                  @if (errors['account']) {
-                    <mat-error>{{ errors['account'] }}</mat-error>
+                  @let accountError = errors['account'];
+                  @if (accountError) {
+                    <mat-error>{{ accountError }}</mat-error>
                   }
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'OFFICE.BTW.FIELD' | translate }}</mat-label>
                   <input formControlName="btw" matInput>
-                  @if (errors['btw']) {
-                    <mat-error>{{ errors['btw'] }}</mat-error>
+                  @let btwError = errors['btw'];
+                  @if (btwError) {
+                    <mat-error>{{ btwError }}</mat-error>
                   }
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'OFFICE.ADDRESS.FIELD' | translate }}</mat-label>
                   <input formControlName="billingAddress" matInput>
-                  @if (errors['billingAddress']) {
-                    <mat-error>{{ errors['billingAddress'] }}</mat-error>
+                  @let billingAddressError = errors['billingAddress'];
+                  @if (billingAddressError) {
+                    <mat-error>{{ billingAddressError }}</mat-error>
                   }
                 </mat-form-field>
               </div>

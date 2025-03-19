@@ -1,5 +1,6 @@
 @use '@angular/material' as mat;
 @use './styles-theme' as style;
+@use 'sass:color';
 
 $fontConfig: (
   display-4: mat.m2-define-typography-level(112px, 112px, 300, 'EB+Garamond', -0.0134em),
@@ -80,13 +81,13 @@ $light-background: #fafafa;
 $dark-background: #2c2c2c;
 
 // Light bg
-$light-bg-darker-5: darken($light-background, 5%);
-$light-bg-darker-10: darken($light-background, 10%);
-$light-bg-darker-20: darken($light-background, 20%);
-$light-bg-darker-30: darken($light-background, 30%);
-$light-bg-lighter-5: lighten($light-background, 5%);
+$light-bg-darker-5: color.scale($light-background, $lightness: -5%);
+$light-bg-darker-10: color.scale($light-background, $lightness: -10%);
+$light-bg-darker-20: color.scale($light-background, $lightness: -20%);
+$light-bg-darker-30: color.scale($light-background, $lightness: -30%);
+$light-bg-lighter-5: color.scale($light-background, $lightness: 5%);
 $light-bg-alpha-80: rgba($light-background, 0.8);
-$dark-bg-tooltip: lighten($dark-background, 20%);
+$dark-bg-tooltip: color.scale($dark-background, $lightness: 20%);
 $dark-bg-alpha-4: rgba($dark-background, 0.04);
 $dark-bg-alpha-12: rgba($dark-background, 0.12);
 $dark-bg-alpha-20: rgba($dark-background, 0.20);
@@ -116,10 +117,10 @@ $mat-light-theme-background: (
 );
 
 // Dark bg
-$dark-bg-lighter-5: lighten($dark-background, 5%);
-$dark-bg-lighter-10: lighten($dark-background, 10%);
-$dark-bg-lighter-20: lighten($dark-background, 20%);
-$dark-bg-lighter-30: lighten($dark-background, 30%);
+$dark-bg-lighter-5: color.scale($dark-background, $lightness: 5%);
+$dark-bg-lighter-10: color.scale($dark-background, $lightness: 10%);
+$dark-bg-lighter-20: color.scale($dark-background, $lightness: 20%);
+$dark-bg-lighter-30: color.scale($dark-background, $lightness: 30%);
 $dark-bg-alpha-80: rgba($dark-background, 0.8);
 $light-bg-alpha-4: rgba($light-background, 0.04);
 $light-bg-alpha-12: rgba($light-background, 0.12);
@@ -152,7 +153,8 @@ $mat-dark-theme-background: (
 @include mat.slide-toggle-density(-1);
 
 @include mat.all-component-typographies($fontConfig);
-@include mat.core();
+@include mat.elevation-classes();
+@include mat.app-background();
 
 // Theme Config
 body {

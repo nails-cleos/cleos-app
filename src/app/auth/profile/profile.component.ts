@@ -1,9 +1,9 @@
-import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
 import { IUser, User } from '../../interfaces/user';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import * as fromActionsUser from '../../store/user.actions';
 import { fieldChange, valueChange } from '../../util/validators';
 import { findFlag, flags, IFlag } from '../../util/flags';
@@ -17,20 +17,25 @@ import { resizeImage } from '../../util/file';
 import { SharedModule } from "../../shared/shared.module";
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
-import { NgxMatIntlTelInputComponent } from "ngx-mat-intl-tel-input";
 import { GoogleMapComponent } from "../../shared/google-map/google-map.component";
 import { BackButtonDirective } from "../../directives/back-button.directive";
+import { NgxMaterialIntlTelInputComponent, TextLabels } from "ngx-material-intl-tel-input";
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
   standalone: true,
-  imports: [SharedModule, NgxMatIntlTelInputComponent, NgxColorsModule, GoogleMapComponent, BackButtonDirective],
+  imports: [SharedModule, NgxMaterialIntlTelInputComponent, NgxColorsModule, GoogleMapComponent, BackButtonDirective]
 })
 export class ProfileComponent implements OnInit, OnDestroy {
   @ViewChild('canvas', { static: false }) canvas?: ElementRef<HTMLCanvasElement>;
   @ViewChild('resizedImage', { static: false }) resizedImage?: ElementRef<HTMLImageElement>;
+
+  private store: Store<AppState> = inject(Store<AppState>);
+  private formBuilder: UntypedFormBuilder = inject(UntypedFormBuilder);
+  private cdRef: ChangeDetectorRef = inject(ChangeDetectorRef);
+  private translate: TranslateService = inject(TranslateService);
 
   form!: UntypedFormGroup;
   errors: any = [];
@@ -43,7 +48,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   ]);
 
   displayName: UntypedFormControl = new UntypedFormControl();
-  phone: UntypedFormControl = new UntypedFormControl('', [Validators.required]);
+  phone: FormControl = new FormControl('', [Validators.required]);
   dob: UntypedFormControl = new UntypedFormControl();
   darkColor: UntypedFormControl = new UntypedFormControl(undefined, [validColorValidator()]);
   darkColorPicker: UntypedFormControl = new UntypedFormControl();
@@ -55,21 +60,24 @@ export class ProfileComponent implements OnInit, OnDestroy {
   showColors = false;
 
   flagList: IFlag[] = flags();
-  isDarkMode = false;
-  isAdmin: boolean;
-  showCash: boolean;
+  isDarkMode: boolean = false;
+  isAdmin: boolean = false;
+  showCash: boolean = false;
+  labels: TextLabels = {
+    mainLabel: '',
+    codePlaceholder: '',
+    searchPlaceholderLabel: '',
+    noEntriesFoundLabel: '',
+    nationalNumberLabel: '',
+    hintLabel: '',
+    invalidNumberError: '',
+    requiredError: ''
+  };
 
-  private getState: Observable<any>;
+  private getState: Observable<any> = this.store.select(selectUserState);
   private subscription?: Subscription;
   private geometry?: PlaceGeometry;
   private formattedAddress?: string;
-
-  constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private cdRef: ChangeDetectorRef,
-              private translate: TranslateService) {
-    this.showCash = false;
-    this.isAdmin = false;
-    this.getState = this.store.select(selectUserState);
-  }
 
   get update(): void {
     if (this.form.invalid) {
@@ -105,6 +113,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.clean();
     this.findMe();
     this.subscribe();
+    this.loadLabels();
+    this.translate.onLangChange.subscribe(() => this.loadLabels());
     this.cdRef.detectChanges();
   }
 
@@ -141,6 +151,21 @@ export class ProfileComponent implements OnInit, OnDestroy {
   getAddress = (placeResult: PlaceResult): void => {
     this.geometry = placeResult.geometry;
     this.formattedAddress = placeResult.formatted_address;
+  }
+
+  private loadLabels = () => {
+    const phoneTranslations = this.translate.instant('COMMON.USER.PHONE');
+
+    this.labels = {
+      mainLabel: '',
+      codePlaceholder: '',
+      searchPlaceholderLabel: phoneTranslations.SEARCH || '',
+      noEntriesFoundLabel: phoneTranslations.COUNTRY_NOT_FOUND || '',
+      nationalNumberLabel: phoneTranslations.FIELD || '',
+      hintLabel: '',
+      invalidNumberError: phoneTranslations.INVALID || '',
+      requiredError: phoneTranslations.REQUIRED || ''
+    };
   }
 
   private findMe = (): void => this.store.dispatch(new fromActionsUser.FindMe());

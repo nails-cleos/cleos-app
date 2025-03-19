@@ -29,7 +29,7 @@ import { ReservationIconPipe } from "../../pipes/reservation-icon.pipe";
   styleUrls: ['./search.component.scss'],
   animations: [detailExpandAnimation],
   standalone: true,
-  imports: [SharedModule, TimeDetailPipe, ReservationIconPipe],
+  imports: [SharedModule, TimeDetailPipe, ReservationIconPipe]
 })
 export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;

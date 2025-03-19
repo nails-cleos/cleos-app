@@ -1,11 +1,10 @@
 @use 'sass:math';
 
-@import 'src/theme';
-@import 'node_modules/skeleton-screen-css';
-@import 'styles-theme';
+@use 'theme';
+@use 'styles-theme';
+@use 'skeleton-screen-css/dist/index';
 
 $flag-icon-css-path: '~flag-icon-css/flags' !default;
-@import 'node_modules/flag-icons/sass/flag-icons';
 
 html, body {
   height: 100%;
@@ -490,7 +489,7 @@ $box-shadow: ();
 $box-shadow2: ();
 @for $i from 0 through $particles {
   $box-shadow: $box-shadow,
-  random($width) - math.div($width, 2) + px random($height)- math.div($height, 1.2) + px hsl(random(360), 100%, 50%);
+  math.random($width) - math.div($width, 2) + px math.random($height)- math.div($height, 1.2) + px hsl(math.random(360), 100%, 50%);
   $box-shadow2: $box-shadow2, 0 0 #000
 }
 

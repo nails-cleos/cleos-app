@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { IUserAll } from '../interfaces/user';
 import { isDarkMode, Theme } from '../util/theme';
 import { hasRoomAdmin } from '../util/helper';
@@ -50,11 +50,8 @@ const initialAuthUser: IAuthUser = {
 
 @Injectable()
 export class AuthUserService {
-
+  private cookieConsentService: NgcCookieConsentService = inject(NgcCookieConsentService);
   public authUser: BehaviorSubject<IAuthUser> = new BehaviorSubject<IAuthUser>(initialAuthUser);
-
-  constructor(private cookieConsentService: NgcCookieConsentService) {
-  }
 
   reloadUser = (user?: IUserAll): IAuthUser => {
     let authUser = initialAuthUser;

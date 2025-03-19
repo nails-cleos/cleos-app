@@ -29,7 +29,7 @@ import { BackButtonDirective } from "../directives/back-button.directive";
   templateUrl: './catalogue.component.html',
   styleUrls: ['./catalogue.component.scss'],
   standalone: true,
-  imports: [SharedModule, DragDropDirective, SortByPipe, BackButtonDirective],
+  imports: [SharedModule, DragDropDirective, SortByPipe, BackButtonDirective]
 })
 export class CatalogueComponent implements OnInit, OnDestroy {
   @ViewChild('canvas', { static: false }) canvas?: ElementRef<HTMLCanvasElement>;

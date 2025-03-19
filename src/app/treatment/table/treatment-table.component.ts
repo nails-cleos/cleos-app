@@ -13,7 +13,7 @@ import { SharedModule } from "../../shared/shared.module";
   templateUrl: './treatment-table.component.html',
   styleUrls: ['./treatment-table.component.scss'],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class TreatmentTableComponent implements AfterViewInit, OnChanges {
   @ViewChild(MatPaginator) paginator!: MatPaginator;

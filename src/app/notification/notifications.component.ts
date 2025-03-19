@@ -18,7 +18,7 @@ import { MatRipple } from "@angular/material/core";
   styleUrls: ['./notifications.component.scss'],
   animations: [insertItemList, addRemoveItemList],
   standalone: true,
-  imports: [SharedModule, MatRipple],
+  imports: [SharedModule, MatRipple]
 })
 export class NotificationsComponent implements OnInit, OnDestroy {
   notifications: INotification[] = [];

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { IOffice } from '../interfaces/office';
@@ -14,8 +14,7 @@ export class InvoiceService {
   private url = 'invoices';
   private urlV1 = `v1/${ this.url }`;
 
-  constructor(private http: HttpClient) {
-  }
+  private http: HttpClient = inject(HttpClient);
 
   getAllMeOffice = (): Observable<IOffice[]> => this.http.get<IOffice[]>(toUrl(this.urlV1, 'offices'));
 

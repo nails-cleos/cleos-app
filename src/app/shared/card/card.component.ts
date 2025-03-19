@@ -12,7 +12,7 @@ import { SharedModule } from "../shared.module";
   templateUrl: './card.component.html',
   styleUrls: ['./card.component.scss'],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class CardComponent implements OnDestroy {
   @Input() title: string | undefined;
@@ -52,11 +52,10 @@ export class CardComponent implements OnDestroy {
 }
 
 @Component({
-  selector: 'app-card-chart-component',
-  templateUrl: './card-chart-component.html',
-  styleUrls: ['./card-chart-component.scss'],
-  standalone: true,
-  imports: [SharedModule],
+    selector: 'app-card-chart-component',
+    templateUrl: './card-chart-component.html',
+    styleUrls: ['./card-chart-component.scss'],
+    imports: [SharedModule]
 })
 export class CardChartComponent {
   constructor(

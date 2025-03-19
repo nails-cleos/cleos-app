@@ -29,7 +29,7 @@ import { BackButtonDirective } from "../directives/back-button.directive";
   templateUrl: './note.component.html',
   styleUrls: ['./note.component.scss'],
   standalone: true,
-  imports: [SharedModule, BackButtonDirective],
+  imports: [SharedModule, BackButtonDirective]
 })
 export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() note?: INoteAll;

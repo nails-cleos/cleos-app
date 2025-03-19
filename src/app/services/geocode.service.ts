@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
@@ -17,13 +17,12 @@ export enum MapStatus {
 })
 export class GeocodeService {
 
-  constructor(private httpClient: HttpClient) {
-  }
+  private http: HttpClient = inject(HttpClient);
 
   createMap = (): Observable<MapStatus> => {
     const showMap = environment.showMap;
     if (showMap) {
-      return this.httpClient.jsonp(
+      return this.http.jsonp(
         `https://maps.googleapis.com/maps/api/js?libraries=geometry,places&key=${ environment.googleMapKey }&sensor=false`,
         'callback')
         .pipe(map(() => MapStatus.ready),

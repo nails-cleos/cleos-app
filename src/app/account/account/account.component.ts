@@ -21,7 +21,7 @@ import { BackButtonDirective } from "../../directives/back-button.directive";
   templateUrl: './account.component.html',
   styleUrls: ['./account.component.scss'],
   standalone: true,
-  imports: [SharedModule, BalanceComponent, BackButtonDirective],
+  imports: [SharedModule, BalanceComponent, BackButtonDirective]
 })
 export class AccountComponent implements OnInit, OnDestroy {
   form!: UntypedFormGroup;

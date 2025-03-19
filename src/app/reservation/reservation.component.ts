@@ -124,7 +124,7 @@ import PlaceResult = google.maps.places.PlaceResult;
   }],
   standalone: true,
   imports: [SharedModule, RoomNamePipe, SortByPipe, CurrencySymbolPipe, DurationTimePipe, PricePreviewComponent,
-    CalendarModule, BackButtonDirective, GoogleMapComponent],
+    CalendarModule, BackButtonDirective, GoogleMapComponent]
 })
 export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() dataEvents: Map<string, IDataEvent> = new Map();

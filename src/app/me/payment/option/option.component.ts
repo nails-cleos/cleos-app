@@ -27,7 +27,7 @@ import { BackButtonDirective } from "../../../directives/back-button.directive";
   templateUrl: './option.component.html',
   styleUrls: ['./option.component.scss'],
   standalone: true,
-  imports: [SharedModule, BankComponent, DurationTimePipe, PaymentPreviewComponent, BackButtonDirective],
+  imports: [SharedModule, BankComponent, DurationTimePipe, PaymentPreviewComponent, BackButtonDirective]
 })
 export class OptionComponent implements OnInit, OnDestroy {
   @ViewChild('stepper') myStepper!: MatStepper;

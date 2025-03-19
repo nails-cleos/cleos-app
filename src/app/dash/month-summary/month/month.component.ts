@@ -10,7 +10,7 @@ import { SharedModule } from "../../../shared/shared.module";
   templateUrl: './month.component.html',
   styleUrls: ['./month.component.scss'],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class MonthComponent implements AfterViewInit {
   @Input() month!: IMonthSummary;

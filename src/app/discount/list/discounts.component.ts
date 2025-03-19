@@ -36,7 +36,7 @@ import { SharedModule } from "../../shared/shared.module";
   styleUrls: ['./discounts.component.scss'],
   animations: [detailExpandAnimation],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -168,7 +168,7 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
   templateUrl: './discount-dialog.component.html',
   styleUrls: ['./discount-dialog.component.scss'],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('customerInput') customerInput!: ElementRef<HTMLInputElement>;

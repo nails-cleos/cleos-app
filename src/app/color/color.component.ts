@@ -23,7 +23,7 @@ import { BackButtonDirective } from "../directives/back-button.directive";
   templateUrl: './color.component.html',
   styleUrls: ['./color.component.scss'],
   standalone: true,
-  imports: [SharedModule, BackButtonDirective],
+  imports: [SharedModule, BackButtonDirective]
 })
 export class ColorComponent implements OnInit, OnDestroy {
   @Input() color?: IColor;

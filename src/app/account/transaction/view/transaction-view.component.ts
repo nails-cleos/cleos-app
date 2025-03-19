@@ -23,7 +23,7 @@ import { BalanceComponent } from "../../balance/balance.component";
   styleUrls: ['./transaction-view.component.scss'],
   animations: [detailExpandAnimation],
   standalone: true,
-  imports: [SharedModule, BalanceComponent],
+  imports: [SharedModule, BalanceComponent]
 })
 export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;

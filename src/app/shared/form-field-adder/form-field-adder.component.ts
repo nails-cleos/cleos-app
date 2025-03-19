@@ -14,7 +14,7 @@ import { PaymentType } from '../../interfaces/payment';
   styleUrl: './form-field-adder.component.scss',
   animations: [detailExpandAnimation],
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule]
 })
 export class FormFieldAdderComponent implements OnInit {
   @Input() key!: string;

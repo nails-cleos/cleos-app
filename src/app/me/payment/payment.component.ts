@@ -16,7 +16,7 @@ import { BackButtonDirective } from "../../directives/back-button.directive";
   templateUrl: './payment.component.html',
   styleUrls: ['./payment.component.scss'],
   standalone: true,
-  imports: [SharedModule, BackButtonDirective],
+  imports: [SharedModule, BackButtonDirective]
 })
 export class PaymentComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = ['position', 'description', 'type', 'amount', 'status', 'actions'];

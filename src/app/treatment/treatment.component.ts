@@ -28,7 +28,7 @@ import { BackButtonDirective } from "../directives/back-button.directive";
   templateUrl: './treatment.component.html',
   styleUrls: ['./treatment.component.scss'],
   standalone: true,
-  imports: [SharedModule, BackButtonDirective],
+  imports: [SharedModule, BackButtonDirective]
 })
 export class TreatmentComponent implements OnInit, OnDestroy {
   @ViewChild('inputName') inputName: ElementRef<HTMLInputElement> | undefined;

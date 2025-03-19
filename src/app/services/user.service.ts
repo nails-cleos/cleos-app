@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { IUser } from '../interfaces/user';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -18,14 +18,12 @@ export class UserService {
   private customerUrl = 'customers';
   private officeUrl = `offices/managers`;
 
-
   private userUrlV1 = `v1/${ this.userUrl }`;
   private professionalUrlV1 = `v1/${ this.professionalUrl }`;
   private customerUrlV1 = `v1/${ this.customerUrl }`;
   private officeUrlV1 = `v1/${ this.officeUrl }`;
 
-  constructor(private http: HttpClient) {
-  }
+  private http: HttpClient = inject(HttpClient);
 
   getAll = (
     sort: string,

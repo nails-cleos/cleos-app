@@ -3,10 +3,9 @@ import { getNowTimeZone } from '../dates';
 import { SharedModule } from "../../shared/shared.module";
 
 @Component({
-  selector: 'app-counter',
-  template: '<div #counter></div>',
-  standalone: true,
-  imports: [SharedModule],
+    selector: 'app-counter',
+    template: '<div #counter></div>',
+    imports: [SharedModule]
 })
 export class CounterComponent {
 

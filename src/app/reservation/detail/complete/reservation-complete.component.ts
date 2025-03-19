@@ -42,7 +42,7 @@ import { BackButtonDirective } from "../../../directives/back-button.directive";
   animations: [transitionAnimation],
   standalone: true,
   imports: [SharedModule, TimeDetailPipe, CurrencySymbolPipe, DurationTimePipe, FormFieldAdderComponent,
-    PricePreviewComponent, BackButtonDirective],
+    PricePreviewComponent, BackButtonDirective]
 })
 export class ReservationCompleteComponent implements OnInit, OnDestroy {
   reservation?: IReservationAll;
