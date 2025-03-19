@@ -14,12 +14,15 @@ import * as fromActionsColor from '../../store/color.actions';
 import { executeDialogNoWidth } from '../../util/helper';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { detailExpandAnimation } from '../../util/animation';
+import { SharedModule } from "../../shared/shared.module";
 
 @Component({
   selector: 'app-color-list',
   templateUrl: './color-list.component.html',
   styleUrls: ['./color-list.component.scss'],
-  animations: [detailExpandAnimation]
+  animations: [detailExpandAnimation],
+  standalone: true,
+  imports: [SharedModule],
 })
 export class ColorListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;

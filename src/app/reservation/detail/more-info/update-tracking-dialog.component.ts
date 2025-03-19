@@ -6,10 +6,10 @@ import { API_LOCALE, getTime, getTimeNumber, newDateTimestamp } from '../../../u
 
 @Component({
   selector: 'app-update-tracking-dialog',
-  standalone: true,
-  imports: [SharedModule],
   templateUrl: './update-tracking-dialog.component.html',
   styleUrl: './update-tracking-dialog.component.scss',
+  standalone: true,
+  imports: [SharedModule],
 })
 export class UpdateTrackingDialogComponent implements OnInit {
   trackingForm!: UntypedFormGroup;

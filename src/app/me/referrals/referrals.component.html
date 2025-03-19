@@ -8,33 +8,35 @@
         <mat-divider></mat-divider>
         <mat-card-content>
           <div class="message divider card-container">
-            {{'ME.REFERRAL.MESSAGE' | translate}}
+            {{ 'ME.REFERRAL.MESSAGE' | translate }}
           </div>
           <div class="divider card-container">
-            {{'ME.REFERRAL.DETAIL' | translate}}
+            {{ 'ME.REFERRAL.DETAIL' | translate }}
           </div>
-          <ng-template [ngIf]="userId">
+          @if (userId) {
             <div class="divider card-container">
               <div class="box">
                 <div class="vertical-center">
                   <div class="box-text bold">
-                    {{userId}}
+                    {{ userId }}
                   </div>
                   <mat-chip-listbox class="box-button">
                     <mat-chip-option (click)="copy"
-                                     [disabled]="!showShare">{{'COMMON.BUTTON.COPY' | translate }}</mat-chip-option>
+                                     [disabled]="!showShare">{{ 'COMMON.BUTTON.COPY' | translate }}
+                    </mat-chip-option>
                   </mat-chip-listbox>
                 </div>
               </div>
             </div>
-          </ng-template>
+          }
         </mat-card-content>
         <mat-card-actions class="card-actions">
           <div class="spacer"></div>
           <button (click)="openBottomSheetShare" [disabled]="!showShare" color="primary"
-                  mat-fab extended class="icon-button">{{'COMMON.BUTTON.SHARE' | translate }}</button>
+                  mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.SHARE' | translate }}
+          </button>
           <button (click)="openBottomSheetReferral" [disabled]="!showInvites" mat-fab extended class="icon-button">
-            {{'ME.REFERRAL.INVITE.TITLE' | translate }}
+            {{ 'ME.REFERRAL.INVITE.TITLE' | translate }}
           </button>
         </mat-card-actions>
       </mat-card>

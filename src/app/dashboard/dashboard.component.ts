@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { CalendarEvent } from 'angular-calendar';
+import { CalendarEvent, CalendarModule } from 'angular-calendar';
 import { Observable, Subscription } from 'rxjs';
 import { AppState, selectDashboardState } from '../store/app.states';
 import {
@@ -25,7 +25,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { IProfessionalEvent, IRoomEvents } from '../interfaces/dashboard';
 import * as fromActionsDashboard from '../store/dashboard.actions';
 import * as fromActionsReservation from '../store/reservation.actions';
-import { IProfessional, Professional } from './day-view-scheduler.component';
+import { DayViewSchedulerComponent, IProfessional, Professional } from './day-view-scheduler.component';
 import { EventColor } from 'calendar-utils';
 import { getFrequency } from '../util/event';
 import { Day, IReservation, MAX_RESERVATION_MONTH, States } from '../interfaces/reservation';
@@ -36,11 +36,15 @@ import { getProfessionalColor } from '../util/color';
 import { CalendarDialogComponent } from '../shared/dialog/calendar/calendar-dialog.component';
 import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
 import { AuthUserService } from '../services/auth-user.service';
+import { SharedModule } from "../shared/shared.module";
+import { CounterComponent } from "../util/counter/counter.component";
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  styleUrls: ['./dashboard.component.scss'],
+  standalone: true,
+  imports: [SharedModule, CalendarModule, DayViewSchedulerComponent, CounterComponent],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   @ViewChild('picker') picker: any;

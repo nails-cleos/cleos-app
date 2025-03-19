@@ -28,12 +28,15 @@ import { map, startWith } from 'rxjs/operators';
 import { executeDialog } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
+import { SharedModule } from "../../shared/shared.module";
 
 @Component({
   selector: 'app-discounts',
   templateUrl: './discounts.component.html',
   styleUrls: ['./discounts.component.scss'],
-  animations: [detailExpandAnimation]
+  animations: [detailExpandAnimation],
+  standalone: true,
+  imports: [SharedModule],
 })
 export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -163,7 +166,9 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
 @Component({
   selector: 'app-discount-dialog-component',
   templateUrl: './discount-dialog.component.html',
-  styleUrls: ['./discount-dialog.component.scss']
+  styleUrls: ['./discount-dialog.component.scss'],
+  standalone: true,
+  imports: [SharedModule],
 })
 export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('customerInput') customerInput!: ElementRef<HTMLInputElement>;

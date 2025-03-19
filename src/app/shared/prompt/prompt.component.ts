@@ -2,11 +2,14 @@ import { Component, Inject } from '@angular/core';
 import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { NOT_INSTALL_PWA } from '../../services/pwa.service';
 import { CookieService } from 'ngx-cookie-service';
+import { SharedModule } from "../shared.module";
 
 @Component({
   selector: 'app-prompt-component',
   templateUrl: './prompt.component.html',
-  styleUrls: ['./prompt.component.scss']
+  styleUrls: ['./prompt.component.scss'],
+  standalone: true,
+  imports: [SharedModule],
 })
 export class PromptComponent {
 

@@ -20,6 +20,8 @@ import { DateAdapter } from '@angular/material/core';
 import { YearMonthAdapter } from '../../../../util/adapter/year-month.adapter';
 import { FormControl } from '@angular/forms';
 import { MatDatepicker } from '@angular/material/datepicker';
+import { SharedModule } from "../../../../shared/shared.module";
+import { TimeDetailPipe } from "../../../../pipes/time-detail.pipe";
 
 @Component({
   selector: 'app-expenses',
@@ -28,7 +30,9 @@ import { MatDatepicker } from '@angular/material/datepicker';
   animations: [detailExpandAnimation],
   providers: [
     { provide: DateAdapter, useClass: YearMonthAdapter }
-  ]
+  ],
+  standalone: true,
+  imports: [SharedModule, TimeDetailPipe],
 })
 export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;

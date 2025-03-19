@@ -1,39 +1,44 @@
-<div *ngIf="imageSrc; else noContent">
-  <div class="flex-container">
-    <div class="card-container">
-      <div *ngIf="isCard; else cardBox">
-        <img alt="error" class="error" src="{{imageSrc}}">
+@if (imageSrc) {
+  <div>
+    <div class="flex-container">
+      <div class="card-container">
+        @if (isCard) {
+          <div>
+            <img alt="error" class="error" src="{{imageSrc}}">
+          </div>
+        } @else {
+          <mat-card appearance="outlined">
+            <mat-card-header>
+            </mat-card-header>
+            <img alt="error" class="error" mat-card-image src="{{imageSrc}}">
+          </mat-card>
+        }
       </div>
-      <ng-template #cardBox>
-        <mat-card appearance="outlined">
-          <mat-card-header>
-          </mat-card-header>
-          <img alt="error" class="error" mat-card-image src="{{imageSrc}}">
-        </mat-card>
-      </ng-template>
+    </div>
+    <div class="card-actions">
+      <div class="spacer"></div>
+      <div class="only-button">
+        <button appBackButton color="accent" mat-fab extended class="icon-button" type="button">
+          {{ 'COMMON.BUTTON.BACK' | translate }}
+        </button>
+        @if (retry) {
+          <button (click)="reload" color="primary" mat-fab extended class="icon-button" type="button">
+            {{ 'COMMON.BUTTON.RELOAD' | translate }}
+          </button>
+        }
+      </div>
     </div>
   </div>
-  <div class="card-actions">
-    <div class="spacer"></div>
-    <div class="only-button">
-      <button appBackButton color="accent" mat-fab extended class="icon-button" type="button">
-        {{ 'COMMON.BUTTON.BACK' | translate }}
-      </button>
-      <button (click)="reload" *ngIf="retry" color="primary" mat-fab extended class="icon-button" type="button">
-        {{ 'COMMON.BUTTON.RELOAD' | translate }}
-      </button>
-    </div>
-  </div>
-</div>
-<ng-template #noContent>
+} @else {
   <div class="flex-container">
     <div class="card-container">
-      <div *ngIf="isCard; else noContentCard" class="card-content">
-        <div class="no-content bold">
-          {{ 'COMMON.ERROR.NO_CONTENT' | translate }}
+      @if (isCard) {
+        <div class="card-content">
+          <div class="no-content bold">
+            {{ 'COMMON.ERROR.NO_CONTENT' | translate }}
+          </div>
         </div>
-      </div>
-      <ng-template #noContentCard>
+      } @else {
         <mat-card appearance="outlined">
           <mat-card-content>
             <div class="no-content bold">
@@ -41,7 +46,7 @@
             </div>
           </mat-card-content>
         </mat-card>
-      </ng-template>
+      }
     </div>
   </div>
-</ng-template>
+}

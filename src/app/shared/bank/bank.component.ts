@@ -4,11 +4,14 @@ import { UntypedFormGroup, Validators } from '@angular/forms';
 import { requireMatch } from '../../util/validators';
 import { map, startWith } from 'rxjs/operators';
 import { IPaymentOption } from '../../interfaces/payment';
+import { SharedModule } from "../shared.module";
 
 @Component({
   selector: 'app-bank',
   templateUrl: './bank.component.html',
-  styleUrls: ['./bank.component.scss']
+  styleUrls: ['./bank.component.scss'],
+  standalone: true,
+  imports: [SharedModule],
 })
 export class BankComponent implements AfterViewInit {
   @Input() formGroup!: UntypedFormGroup;

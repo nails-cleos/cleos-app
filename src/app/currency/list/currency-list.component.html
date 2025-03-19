@@ -4,50 +4,57 @@
     <ng-container matColumnDef="position">
       <th *matHeaderCellDef mat-header-cell>#</th>
       <td *matCellDef="let currency; let i = dataIndex;" mat-cell>
-        <div *ngIf="currency.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
-        <ng-template #skeleton>
+        @if (currency.id) {
+          <div>{{ (paginator.pageIndex * pageSize) + i + 1 }}</div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="code">
       <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'CURRENCY.LIST.COLUMN.CODE' | translate }}</th>
       <td *matCellDef="let currency" mat-cell>
-        <div *ngIf="currency.id; else skeleton">{{currency.code}}</div>
-        <ng-template #skeleton>
+        @if (currency.id) {
+          <div>{{ currency.code }}</div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="name">
       <th *matHeaderCellDef class="hide-xs" mat-header-cell
-          mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
+          mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}
+      </th>
       <td *matCellDef="let currency" class="hide-xs" mat-cell>
-        <div *ngIf="currency.id; else skeleton">{{currency.name}}</div>
-        <ng-template #skeleton>
+        @if (currency.id) {
+          <div>{{ currency.name }}</div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="actions">
       <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
       <td *matCellDef="let currency" class="hide-xs" mat-cell>
-        <div *ngIf="currency.id; else skeleton">
-          <button (click)="edit(currency)" *ngIf="!currency.deleted" mat-icon-button
-                  matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
-            <mat-icon color="primary">edit</mat-icon>
-          </button>
-          <button (click)="delete(currency)" mat-icon-button
-                  matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
-            <mat-icon color="warn">delete</mat-icon>
-          </button>
-        </div>
-        <ng-template #skeleton>
+        @if (currency.id) {
+          <div>
+            @if (!currency.deleted) {
+              <button (click)="edit(currency)" mat-icon-button
+                      matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
+                <mat-icon color="primary">edit</mat-icon>
+              </button>
+              <button (click)="delete(currency)" mat-icon-button
+                      matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
+                <mat-icon color="warn">delete</mat-icon>
+              </button>
+            }
+          </div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
@@ -57,17 +64,19 @@
           <mat-list>
             <mat-list-item role="list">
               <div matListItemTitle>{{ 'COMMON.COLUMN.NAME' | translate }}</div>
-              <mat-icon matListItemIcon>{{currency.icon}}</mat-icon>
-              <div matListItemLine>{{currency.name}}</div>
+              <mat-icon matListItemIcon>{{ currency.icon }}</mat-icon>
+              <div matListItemLine>{{ currency.name }}</div>
             </mat-list-item>
             <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
             <mat-list-item role="list">
-              <button (click)="edit(currency)" *ngIf="!currency.deleted" color="primary" mat-icon-button>
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button (click)="delete(currency)" *ngIf="!currency.deleted" color="warn" mat-icon-button>
-                <mat-icon>delete</mat-icon>
-              </button>
+              @if (!currency.deleted) {
+                <button (click)="edit(currency)" color="primary" mat-icon-button>
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button (click)="delete(currency)" color="warn" mat-icon-button>
+                  <mat-icon>delete</mat-icon>
+                </button>
+              }
             </mat-list-item>
           </mat-list>
         </div>
@@ -76,7 +85,8 @@
 
     <ng-container matColumnDef="noContent">
       <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-        {{ 'CURRENCY.LIST.ERROR.NO_CONTENT' | translate }}</td>
+        {{ 'CURRENCY.LIST.ERROR.NO_CONTENT' | translate }}
+      </td>
     </ng-container>
 
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
@@ -86,7 +96,9 @@
 
     <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
   </table>
-  <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+  @if (resultsLength) {
+    <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+  }
 
   <button color="accent" id="add-button" mat-fab matTooltip="{{ 'CURRENCY.TITLE' | translate }}"
           [routerLink]="['/', language, 'currency', 'add']">

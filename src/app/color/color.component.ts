@@ -15,11 +15,15 @@ import { Color, IColor } from '../interfaces/color';
 import * as fromActionsColor from '../store/color.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { fieldChange, valueChange } from '../util/validators';
+import { SharedModule } from "../shared/shared.module";
+import { BackButtonDirective } from "../directives/back-button.directive";
 
 @Component({
   selector: 'app-colors',
   templateUrl: './color.component.html',
-  styleUrls: ['./color.component.scss']
+  styleUrls: ['./color.component.scss'],
+  standalone: true,
+  imports: [SharedModule, BackButtonDirective],
 })
 export class ColorComponent implements OnInit, OnDestroy {
   @Input() color?: IColor;

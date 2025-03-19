@@ -1,13 +1,15 @@
 <mat-toolbar (click)="goToQuarter(quarter)" class="pointer summary-header">
-  Q{{quarter}}
+  Q{{ quarter }}
 </mat-toolbar>
 <div class="flex-row-wrap">
-  <div *ngFor="let month of monthSummaries" class="quarter-content">
-    <mat-toolbar (click)="goToMonth(month.month)" class="pointer summary-header">
-      {{getMonth(month.month)}}
-    </mat-toolbar>
-    <div class="margin-top">
-      <app-month [month]="month" [year]="year" [currency]="currency" [showCash]="showCash"></app-month>
+  @for (month of monthSummaries; track month) {
+    <div class="quarter-content">
+      <mat-toolbar (click)="goToMonth(month.month)" class="pointer summary-header">
+        {{ getMonth(month.month) }}
+      </mat-toolbar>
+      <div class="margin-top">
+        <app-month [month]="month" [year]="year" [currency]="currency" [showCash]="showCash"></app-month>
+      </div>
     </div>
-  </div>
+  }
 </div>

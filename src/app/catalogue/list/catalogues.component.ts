@@ -12,11 +12,14 @@ import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { executeDialogNoWidth } from '../../util/helper';
+import { SharedModule } from "../../shared/shared.module";
 
 @Component({
   selector: 'app-catalogue-list',
   templateUrl: './catalogues.component.html',
-  styleUrls: ['./catalogues.component.scss']
+  styleUrls: ['./catalogues.component.scss'],
+  standalone: true,
+  imports: [SharedModule],
 })
 export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChildren(CdkDropList) dropsQuery!: QueryList<CdkDropList>;

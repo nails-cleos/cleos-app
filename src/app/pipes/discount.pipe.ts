@@ -4,7 +4,8 @@ import { currencySymbol } from '../util/helper';
 import { ICurrency } from '../interfaces/currency';
 
 @Pipe({
-  name: 'discount'
+  name: 'discount',
+  standalone: true
 })
 export class DiscountPipe implements PipeTransform {
 

@@ -30,12 +30,16 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MainContentService } from '../main-content.service';
 import { MatBottomSheet, MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { Router } from '@angular/router';
+import { SharedModule } from "../../shared/shared.module";
+import { AnimateDirective } from "../../directives/animate.directive";
 
 @Component({
   selector: 'app-main-content',
   templateUrl: './main-content.component.html',
   styleUrls: ['./main-content.component.scss'],
-  animations: [bottomTop, leftRight, slideInX, slideInY, fadeInOut, slideAnimation]
+  animations: [bottomTop, leftRight, slideInX, slideInY, fadeInOut, slideAnimation],
+  standalone: true,
+  imports: [SharedModule, AnimateDirective],
 })
 export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -368,6 +372,8 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
 @Component({
   selector: 'app-bottom-sheet-book-appointment',
   templateUrl: 'bottom-sheet-book-appointment.html',
+  standalone: true,
+  imports: [SharedModule],
 })
 export class BottomSheetBookAppointmentComponent {
   constructor(private bottomSheetRef: MatBottomSheetRef<BottomSheetBookAppointmentComponent>,

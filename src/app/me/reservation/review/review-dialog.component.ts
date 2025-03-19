@@ -9,12 +9,17 @@ import { UntypedFormControl } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { transitionAnimation } from '../../../util/animation';
 import { Analytics, logEvent } from '@angular/fire/analytics';
+import { SharedModule } from "../../../shared/shared.module";
+import { RoomNamePipe } from "../../../pipes/room-name.pipe";
+import { RatingComponent } from "../../../shared/rating/rating.component";
 
 @Component({
   selector: 'app-review-dialog',
   templateUrl: './review-dialog.component.html',
   animations: [transitionAnimation],
-  styleUrls: ['./review-dialog.component.scss']
+  styleUrls: ['./review-dialog.component.scss'],
+  standalone: true,
+  imports: [SharedModule, RoomNamePipe, RatingComponent],
 })
 export class ReviewDialogComponent {
   reservation?: IReservationAll;

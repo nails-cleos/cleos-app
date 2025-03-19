@@ -8,8 +8,8 @@ describe('OfficeComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ OfficeComponent ]
-    })
+    imports: [OfficeComponent]
+})
     .compileComponents();
   });
 

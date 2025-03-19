@@ -15,42 +15,42 @@
       </button>
     </div>
     <div class="space-around-container">
-      <ng-template [ngIf]="yearSummaryMap?.size">
+      @if (yearSummaryMap?.size) {
         <mat-form-field appearance="outline" class="full-select">
           <mat-label>{{ 'COMMON.ROOM.FIELD' | translate }}</mat-label>
           <mat-select [formControl]="selectedRoom">
-            <mat-option *ngIf="primaryRoom" [value]="'All'">All</mat-option>
-            <mat-option *ngFor="let yearSummary of yearSummaryMap | keyvalue" [value]="yearSummary.key">
-              {{ yearSummary.key.roomName }}
-            </mat-option>
+            @if (primaryRoom) {
+              <mat-option [value]="'All'">All</mat-option>
+            }
+            @for (yearSummary of yearSummaryMap | keyvalue; track yearSummary) {
+              <mat-option [value]="yearSummary.key">{{ yearSummary.key.roomName }}</mat-option>
+            }
           </mat-select>
         </mat-form-field>
-      </ng-template>
+      }
     </div>
   </fieldset>
 </div>
 
-<ng-template [ngIf]="!isLoading" [ngIfElse]="loading">
-  <ng-template [ngIf]="date.value">
+@if (!isLoading) {
+  @if (date.value) {
     <button [class.spinner]="isExportLoading" (click)="exportAction"
             [disabled]="isExportLoading || (export && (!yearExport || sheetData.length === 0))" color="accent"
             mat-fab extended style="width: 100%; margin: 10px">
-      <mat-icon *ngIf="!export">cloud_download</mat-icon>
-      <mat-icon *ngIf="export">file_download</mat-icon>
-      <span *ngIf="!export"
-            [innerHTML]="'COMMON.BUTTON.GET_DATA' | translate: {year: date.value.getFullYear() }"></span>
-      <span *ngIf="export">{{ 'COMMON.BUTTON.EXPORT' | translate }}</span>
+      <ng-container>
+        @if (export) {
+          <mat-icon>file_download</mat-icon>
+          <span>{{ 'COMMON.BUTTON.EXPORT' | translate }}</span>
+        } @else {
+          <mat-icon>cloud_download</mat-icon>
+          <span [innerHTML]="'COMMON.BUTTON.GET_DATA' | translate: {year: date.value.getFullYear() }"></span>
+        }
+      </ng-container>
     </button>
-    <ng-template [ngIf]="yearSummaryMap?.size" [ngIfElse]="noData">
-      <ng-template [ngIf]="isHandset$ | async" [ngIfElse]="bigScreen">
-        <app-year [quarterSummaries]="quarterSummaries" [year]="date.value.getFullYear()"
-                  [measure]="'short'" [currency]="currency" [start]="1" [showCash]="showCash"></app-year>
-      </ng-template>
-
-      <ng-template #bigScreen>
-        <app-year [quarterSummaries]="quarterSummaries" [year]="date.value.getFullYear()"
-                  [measure]="'long'" [currency]="currency" [start]="2" [showCash]="showCash"></app-year>
-      </ng-template>
+    @if (yearSummaryMap?.size) {
+      <app-year [quarterSummaries]="quarterSummaries" [year]="date.value.getFullYear()"
+                [measure]="(isHandset$ | async) ? 'short' : 'long'" [currency]="currency"
+                [start]="(isHandset$ | async) ?1 : 2" [showCash]="showCash"></app-year>
       <div class="top">
         <mat-toolbar color="primary">
           {{ 'SUMMARY.YEAR.RESULT' | translate }}
@@ -58,16 +58,13 @@
         <app-total-summary [summaryTotals]="yearSummaryTotals" [currency]="currency"
                            [showCash]="showCash"></app-total-summary>
       </div>
-    </ng-template>
-    <ng-template #noData>
+    } @else {
       <mat-toolbar color="warn" style="text-align: center"
                    [innerHTML]="'SUMMARY.YEAR.ERROR.NO_CONTENT' | translate:{year: date.value.getFullYear()}"></mat-toolbar>
-    </ng-template>
-  </ng-template>
-</ng-template>
-
-<ng-template #loading>
+    }
+  }
+} @else {
   <div class="spinner-parent-center">
     <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
   </div>
-</ng-template>
+}

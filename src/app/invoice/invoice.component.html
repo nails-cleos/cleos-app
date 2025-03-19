@@ -115,9 +115,11 @@
           <td *matCellDef="let invoice" mat-cell>
             @if (invoice.id) {
               {{ invoice.timestamp | timeDetail | date:'short':invoice.room.timeZone:dateFormat }}
-              <!--          <button (click)="openDialog(invoice)" *ngIf="showTimeZone(invoice)" mat-icon-button type="button">-->
-                <!--            <mat-icon>info_outline</mat-icon>-->
-                <!--          </button>-->
+              <!--              @if (showTimeZone(invoice)) {-->
+                <!--                <button (click)="openDialog(invoice)" mat-icon-button type="button">-->
+                <!--                  <mat-icon>info_outline</mat-icon>-->
+                <!--                </button>-->
+                <!--              }-->
             } @else {
               <div class="ssc-line"></div>
             }
@@ -130,7 +132,7 @@
           </th>
           <td *matCellDef="let invoice" class="hide-xs" mat-cell>
             @if (invoice.id) {
-              {{ invoice.items[0].name }}
+              {{ invoice.items?.[0].name }}
             } @else {
               <div class="ssc-line"></div>
             }

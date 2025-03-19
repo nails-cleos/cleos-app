@@ -3,11 +3,14 @@ import { environment } from '../../../environments/environment';
 import { MainContentService } from '../main-content.service';
 import { TranslateService } from '@ngx-translate/core';
 import { SeoService } from '../../services/seo.service';
+import { SharedModule } from "../../shared/shared.module";
 
 @Component({
   selector: 'app-terms-and-conditions',
   templateUrl: './terms-and-conditions.component.html',
-  styleUrls: ['./terms-and-conditions.component.scss']
+  styleUrls: ['./terms-and-conditions.component.scss'],
+  standalone: true,
+  imports: [SharedModule],
 })
 export class TermsAndConditionsComponent implements OnInit {
   url = environment.appServer;

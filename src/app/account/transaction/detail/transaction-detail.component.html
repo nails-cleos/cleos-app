@@ -35,12 +35,19 @@
                   <td class="left">{{ transaction.amountGifted | number:'1.2-2' }}</td>
                 </tr>
                 <tr>
-                  <td>
-                    <mat-divider *ngIf="transaction"></mat-divider>
-                  </td>
-                  <td>
-                    <mat-divider *ngIf="transaction"></mat-divider>
-                  </td>
+                  @if (transaction) {
+                    <td>
+                      <mat-divider></mat-divider>
+                    </td>
+                    <td>
+                      <mat-divider></mat-divider>
+                    </td>
+                  } @else {
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                  }
                 </tr>
                 <tr>
                   <td class="right">{{ 'ACCOUNT.TRANSACTION.PAYMENT_ID' | translate }}</td>

@@ -1,15 +1,23 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ISorted, ISorting, ItemSorting } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
+import {
+  DragDropSortingComponent,
+  ISorted,
+  ISorting,
+  ItemSorting
+} from '../../util/drag-drop-sorting/drag-drop-sorting.component';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectTreatmentState } from '../../store/app.states';
 import * as fromActionsTreatment from '../../store/treatment.actions';
 import { ITreatmentGroupAll } from '../../interfaces/treatment';
+import { SharedModule } from "../../shared/shared.module";
 
 @Component({
   selector: 'app-treatment-group-sorting',
-  templateUrl: './treatment-group-sorting.component.html',
-  styleUrls: ['./treatment-group-sorting.component.scss']
+  templateUrl: './treatment-sorting.component.html',
+  styleUrls: ['./treatment-group-sorting.component.scss'],
+  standalone: true,
+  imports: [SharedModule, DragDropSortingComponent],
 })
 export class TreatmentGroupSortingComponent implements OnInit, OnDestroy {
 

@@ -29,6 +29,10 @@ import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { goTo } from '../util/animation';
 import { areEquals, createAddress } from '../util/helper';
 import { TranslateService } from '@ngx-translate/core';
+import { SharedModule } from "../shared/shared.module";
+import { AvailabilityComponent } from "./availability/availability.component";
+import { GoogleMapComponent } from "../shared/google-map/google-map.component";
+import { BackButtonDirective } from "../directives/back-button.directive";
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
 
@@ -45,7 +49,9 @@ export interface IIcon {
 @Component({
   selector: 'app-room',
   templateUrl: './room.component.html',
-  styleUrls: ['./room.component.scss']
+  styleUrls: ['./room.component.scss'],
+  standalone: true,
+  imports: [SharedModule, AvailabilityComponent, GoogleMapComponent, BackButtonDirective],
 })
 export class RoomComponent implements OnInit, OnDestroy {
   @ViewChild('professionalInput') professionalInput!: ElementRef<HTMLInputElement>;

@@ -5,7 +5,7 @@ import { AppState } from '../store/app.states';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLinkActive, RouterOutlet } from '@angular/router';
 import * as fromActionsLogin from '../store/auth.actions';
 import { IUser, User } from '../interfaces/user';
 import { OverlayContainer } from '@angular/cdk/overlay';
@@ -20,12 +20,15 @@ import { MainContentService } from './main-content.service';
 import * as fromActionsMain from '../store/main.actions';
 import { TokenService } from '../services/token.service';
 import { NavigationService } from '../services/navigation.service';
+import { SharedModule } from "../shared/shared.module";
 
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
   styleUrls: ['./main.component.scss'],
-  animations: [fade, bottomTop, colorChange, colorChangeChild]
+  animations: [fade, bottomTop, colorChange, colorChangeChild],
+  standalone: true,
+  imports: [SharedModule, RouterOutlet, RouterLinkActive],
 })
 export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
 

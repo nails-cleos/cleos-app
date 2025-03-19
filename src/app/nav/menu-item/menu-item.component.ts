@@ -1,15 +1,18 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { IMenu } from '../../interfaces/user';
-import { Router } from '@angular/router';
+import { Router, RouterLinkActive } from '@angular/router';
 import { Observable } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
+import { SharedModule } from "../../shared/shared.module";
 
 @Component({
   selector: 'app-menu-item',
   templateUrl: './menu-item.component.html',
-  styleUrls: ['./menu-item.component.scss']
+  styleUrls: ['./menu-item.component.scss'],
+  standalone: true,
+  imports: [SharedModule, RouterLinkActive],
 })
 export class MenuItemComponent implements OnInit {
 

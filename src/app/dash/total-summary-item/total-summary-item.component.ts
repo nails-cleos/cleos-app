@@ -3,10 +3,10 @@ import { SharedModule } from "../../shared/shared.module";
 
 @Component({
   selector: 'app-total-summary-item',
+  templateUrl: './total-summary-item.component.html',
+  styleUrl: './total-summary-item.component.scss',
   standalone: true,
   imports: [SharedModule],
-  templateUrl: './total-summary-item.component.html',
-  styleUrl: './total-summary-item.component.scss'
 })
 export class TotalSummaryItemComponent {
   @Input() label!: string;

@@ -19,11 +19,16 @@ import * as fromActionsExpense from '../../../store/expense.actions';
 import { API_LOCALE, createNewDateZonedTime, getNowTimeZone } from '../../../util/dates';
 import { fieldChange, noDuplicateDatesValidator } from '../../../util/validators';
 import { map, startWith } from 'rxjs/operators';
+import { SharedModule } from "../../../shared/shared.module";
+import { TwoDigitsDirective } from "../../../directives/two-digits.directive";
+import { BackButtonDirective } from "../../../directives/back-button.directive";
 
 @Component({
   selector: 'app-expense',
   templateUrl: './expense.component.html',
-  styleUrls: ['./expense.component.scss']
+  styleUrls: ['./expense.component.scss'],
+  standalone: true,
+  imports: [SharedModule, TwoDigitsDirective, BackButtonDirective],
 })
 export class ExpenseComponent implements OnInit, OnDestroy {
   @Input() expense?: IExpenseAll;

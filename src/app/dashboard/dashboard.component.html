@@ -4,7 +4,7 @@
   </button>
   <button class="hide-xs" (click)="decrement" [disabled]="prevBtnDisabled" color="accent" mat-fab extended>
     <mat-icon>navigate_before</mat-icon>
-    <span>{{'COMMON.BUTTON.PREVIOUS' | translate}}</span>
+    <span>{{ 'COMMON.BUTTON.PREVIOUS' | translate }}</span>
   </button>
   <input (dateChange)="selectDate($event)" [matDatepicker]="picker" [max]="maxDate" [min]="today" [value]="viewDate"
          hidden matInput>
@@ -14,14 +14,14 @@
   </button>
   <button class="hide-xs" (click)="picker.open()" color="primary" mat-fab extended>
     <mat-icon>today</mat-icon>
-    <span>{{'COMMON.BUTTON.GOTO' | translate}}</span>
+    <span>{{ 'COMMON.BUTTON.GOTO' | translate }}</span>
   </button>
   <button class="hide-gt-xs" (click)="increment" [disabled]="nextBtnDisabled" color="accent" mat-fab>
     <mat-icon>navigate_next</mat-icon>
   </button>
   <button class="hide-xs" (click)="increment" [disabled]="nextBtnDisabled" color="accent" mat-fab extended>
     <mat-icon>navigate_next</mat-icon>
-    <span>{{'COMMON.BUTTON.NEXT' | translate}}</span>
+    <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
   </button>
   <div class="spacer"></div>
   <div>
@@ -29,25 +29,22 @@
     <app-counter style="text-align: center" (refreshViewDate)="refreshViewDate($event)"></app-counter>
   </div>
 </div>
-<div *ngIf="dashboard?.availability; else noContent">
-  <div *ngIf="professionals.length; else boxSkeleton" class="row">
-    <div class="divider">
-      <app-mwl-day-view-scheduler (segmentClicked)="segmentClick($event.date, $event.professionalId)"
-                                  (eventTimesChanged)="eventTimesChanged($event)"
-                                  (professionalChanged)="professionalChanged($event)" [day]="day" [events]="events"
-                                  [professionals]="professionals"
-                                  [locale]="locale"
-                                  [viewDate]="viewDate">
-      </app-mwl-day-view-scheduler>
+@if (dashboard?.availability) {
+  @if (professionals.length) {
+    <div class="row">
+      <div class="divider">
+        <app-mwl-day-view-scheduler
+          (segmentClicked)="segmentClick($event.date, $event.professionalId)"
+          (eventTimesChanged)="eventTimesChanged($event)" (professionalChanged)="professionalChanged($event)"
+          [day]="day" [events]="events" [professionals]="professionals" [locale]="locale" [viewDate]="viewDate">
+        </app-mwl-day-view-scheduler>
+      </div>
     </div>
-  </div>
-  <ng-template #boxSkeleton>
+  } @else {
     <div class="ssc-square mb"></div>
-  </ng-template>
-</div>
-<ng-template #noContent>
+  }
+} @else {
   <h2 style="text-align: center">
-    {{'DASHBOARD.ROOM.NO_OPEN' | translate:{date: viewDate | calendarDate:'dayViewTitle':locale} }}
+    {{ 'DASHBOARD.ROOM.NO_OPEN' | translate:{ date: viewDate | calendarDate:'dayViewTitle':locale } }}
   </h2>
-</ng-template>
-
+}

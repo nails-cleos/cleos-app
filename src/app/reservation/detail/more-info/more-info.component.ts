@@ -14,11 +14,17 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { executeDialog } from '../../../util/helper';
 import { MatDialog } from '@angular/material/dialog';
 import { UpdateTrackingDialogComponent } from './update-tracking-dialog.component';
+import { SharedModule } from "../../../shared/shared.module";
+import { TimeDetailPipe } from "../../../pipes/time-detail.pipe";
+import { RatingComponent } from "../../../shared/rating/rating.component";
+import { BackButtonDirective } from "../../../directives/back-button.directive";
 
 @Component({
   selector: 'app-more-info',
   templateUrl: './more-info.component.html',
-  styleUrls: ['./more-info.component.scss']
+  styleUrls: ['./more-info.component.scss'],
+  standalone: true,
+  imports: [SharedModule, TimeDetailPipe, RatingComponent, BackButtonDirective],
 })
 export class MoreInfoComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = ['position', 'description', 'amount', 'type', 'status', 'actions'];

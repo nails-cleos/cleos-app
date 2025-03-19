@@ -141,7 +141,9 @@
     <tr *matRowDef="let row; columns: displayedColumns;" [class.row-is-canceled]="row.state === 'CANCELLED'"
         mat-row></tr>
   </table>
-  <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+  @if (resultsLength) {
+    <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+  }
 } @else {
   <app-error [error]="error" [isCard]="true"></app-error>
 }

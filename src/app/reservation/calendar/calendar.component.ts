@@ -47,7 +47,7 @@ import {
   Meta
 } from '../../util/event';
 import { Router } from '@angular/router';
-import { CalendarEvent, CalendarEventTimesChangedEvent } from 'angular-calendar';
+import { CalendarEvent, CalendarEventTimesChangedEvent, CalendarModule } from 'angular-calendar';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { IUnavailableAll } from '../../interfaces/unavailable';
@@ -66,11 +66,15 @@ import { Role } from '../../interfaces/token';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 import * as html2pdf from 'html2pdf.js';
+import { SharedModule } from "../../shared/shared.module";
+import { RoomNamePipe } from "../../pipes/room-name.pipe";
 
 @Component({
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
-  styleUrls: ['./calendar.component.scss']
+  styleUrls: ['./calendar.component.scss'],
+  standalone: true,
+  imports: [SharedModule, RoomNamePipe, CalendarModule],
 })
 export class CalendarComponent implements OnInit, OnDestroy {
   @ViewChild('picker') picker: any;

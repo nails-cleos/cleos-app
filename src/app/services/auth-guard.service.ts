@@ -14,7 +14,7 @@ import * as fromActionsLogin from '../store/auth.actions';
 export class PermissionsService {
 
   getState: Observable<any>;
-  currentUser!: IUser;
+  currentUser?: IUser;
   token!: string;
 
   private readonly data: any;
@@ -22,10 +22,8 @@ export class PermissionsService {
   constructor(private snackBar: MatSnackBar, private router: Router, private store: Store<AppState>,
               private translate: TranslateService) {
     this.getState = this.store.select(selectAuthState);
-    this.getState.subscribe((state) => {
-      this.currentUser = state.user;
-    });
-    this.data = this.router.getCurrentNavigation()?.extras.state;
+    this.getState.subscribe((state) => this.currentUser = state.user);
+    this.data = this.router.getCurrentNavigation()?.extras?.state;
   }
 
   private static hasRole = (route: ActivatedRouteSnapshot, user: IUser): boolean => route.data.roles &&

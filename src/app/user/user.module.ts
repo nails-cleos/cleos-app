@@ -1,13 +1,11 @@
 import { NgModule } from '@angular/core';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../shared/shared.module';
 import { UserRoutingModule } from './user-routing.module';
 
 import { UserComponent } from './user.component';
 import { SelectUserDialogComponent, UsersComponent } from './list/users.component';
 import { OverviewComponent } from './overview/overview.component';
 import { OverviewChartComponent } from './overview/chart/overview-chart/overview-chart.component';
-import { NgxMatIntlTelInputComponent } from 'ngx-mat-intl-tel-input';
 import { EffectsModule } from '@ngrx/effects';
 import { UserEffects } from '../store/effects/user.effects';
 import { UserService } from '../services/user.service';
@@ -15,20 +13,15 @@ import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/trans
 import { Store } from '@ngrx/store';
 import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
-import { NgxColorsModule } from 'ngx-colors';
 
 @NgModule({
-  declarations: [
+  imports: [
     UserComponent,
     UsersComponent,
     OverviewComponent,
     OverviewChartComponent,
-    SelectUserDialogComponent
-  ],
-  imports: [
+    SelectUserDialogComponent,
     UserRoutingModule,
-    SharedModule,
-    NgxMatIntlTelInputComponent,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
@@ -42,7 +35,6 @@ import { NgxColorsModule } from 'ngx-colors';
       extend: true
     }),
     EffectsModule.forFeature([UserEffects]),
-    NgxColorsModule
   ],
   providers: [
     UserService

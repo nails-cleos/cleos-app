@@ -6,12 +6,17 @@ import { stampAnimation, transitionAnimation } from '../../../util/animation';
 import { createNewDate, isSameTimeZone, newDateTimestamp, reservationDuration } from '../../../util/dates';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { SharedModule } from "../../../shared/shared.module";
+import { RoomNamePipe } from "../../../pipes/room-name.pipe";
+import { CurrencySymbolPipe } from "../../../pipes/currency-symbol.pipe";
 
 @Component({
   selector: 'app-upcoming',
   animations: [transitionAnimation, stampAnimation],
   templateUrl: './upcoming.component.html',
-  styleUrls: ['./upcoming.component.scss']
+  styleUrls: ['./upcoming.component.scss'],
+  standalone: true,
+  imports: [SharedModule, RoomNamePipe, CurrencySymbolPipe],
 })
 export class UpcomingComponent implements OnChanges {
   @Input() upcoming: IUpcomingAll | undefined;

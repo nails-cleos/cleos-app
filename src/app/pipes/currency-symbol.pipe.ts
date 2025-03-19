@@ -3,7 +3,8 @@ import { currencySymbol } from '../util/helper';
 import { ICurrency, ICurrencyAll } from '../interfaces/currency';
 
 @Pipe({
-  name: 'currencySymbol'
+  name: 'currencySymbol',
+  standalone: true
 })
 export class CurrencySymbolPipe implements PipeTransform {
 

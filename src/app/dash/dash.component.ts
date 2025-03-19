@@ -16,7 +16,7 @@ import {
   greaterOrEqualsThan,
   newDateTimestamp
 } from '../util/dates';
-import { CalendarEvent, CalendarMonthViewDay, CalendarView } from 'angular-calendar';
+import { CalendarEvent, CalendarModule, CalendarMonthViewDay, CalendarView } from 'angular-calendar';
 import { findStateColor, getStateOrder } from '../util/theme';
 import { allDayEvent, getFrequency, IMeta, Meta, monthEvent } from '../util/event';
 import { Router } from '@angular/router';
@@ -30,11 +30,18 @@ import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
 import { numberFormat } from '../util/numbers';
 import { ICurrency } from '../interfaces/currency';
 import { AuthUserService } from '../services/auth-user.service';
+import { SharedModule } from "../shared/shared.module";
+import { MiniCardComponent } from "./mini-card/mini-card.component";
+import { ReservationTableComponent } from "./reservation/table/reservation-table.component";
+import { CardComponent } from "../shared/card/card.component";
+import { ChartComponent } from "../shared/chart/chart.component";
 
 @Component({
   selector: 'app-dash',
   templateUrl: './dash.component.html',
-  styleUrls: ['./dash.component.scss']
+  styleUrls: ['./dash.component.scss'],
+  standalone: true,
+  imports: [SharedModule, CalendarModule, MiniCardComponent, ReservationTableComponent, CardComponent, ChartComponent],
 })
 export class DashComponent implements OnInit, OnDestroy {
   state: any;

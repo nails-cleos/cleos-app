@@ -61,12 +61,24 @@ import { AddDiscountDialogComponent } from './add-discount-dialog.component';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Role } from '../../interfaces/token';
 import { ReservationCloneDialogComponent } from './reservation-clone-dialog.component';
+import { SharedModule } from "../../shared/shared.module";
+import { RoomNamePipe } from "../../pipes/room-name.pipe";
+import { ReservationIconPipe } from "../../pipes/reservation-icon.pipe";
+import { PriceExtrasComponent } from "../../shared/price-extras/price-extras.component";
+import { PricePreviewComponent } from "../../shared/price-preview/price-preview.component";
+import { TwoDigitsDirective } from "../../directives/two-digits.directive";
+import { TimeDetailPipe } from "../../pipes/time-detail.pipe";
+import { BackButtonDirective } from "../../directives/back-button.directive";
+import { FabMenuComponent } from "./fab-menu/fab-menu.component";
 
 @Component({
   selector: 'app-reservation-detail',
   animations: [transitionAnimation, detailExpandAnimation],
   templateUrl: './reservation-detail.component.html',
-  styleUrls: ['./reservation-detail.component.scss']
+  styleUrls: ['./reservation-detail.component.scss'],
+  standalone: true,
+  imports: [SharedModule, RoomNamePipe, ReservationIconPipe, PriceExtrasComponent, PricePreviewComponent,
+    TwoDigitsDirective, TimeDetailPipe, BackButtonDirective, FabMenuComponent],
 })
 export class ReservationDetailComponent implements OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator?: MatPaginator;

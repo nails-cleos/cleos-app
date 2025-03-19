@@ -3,7 +3,8 @@ import { ReservationIconKey, ReservationIconName } from '../util/icon';
 import { snakeToCamel } from '../util/helper';
 
 @Pipe({
-  name: 'reservationIcon'
+  name: 'reservationIcon',
+  standalone: true
 })
 export class ReservationIconPipe implements PipeTransform {
 

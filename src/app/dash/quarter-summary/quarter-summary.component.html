@@ -2,18 +2,18 @@
   <fieldset>
     <div class="row-space-around-container">
       <mat-form-field appearance="outline">
-        <mat-label>{{'SUMMARY.YEAR.SELECT.DATE' | translate}}</mat-label>
+        <mat-label>{{ 'SUMMARY.YEAR.SELECT.DATE' | translate }}</mat-label>
         <input matInput [matDatepicker]="dp" [formControl]="date">
         <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
         <mat-datepicker #dp startView="multi-year" (yearSelected)="setYear($event, dp)">
         </mat-datepicker>
       </mat-form-field>
       <mat-form-field appearance="outline">
-        <mat-label>{{'SUMMARY.QUARTER.SELECT' | translate}}</mat-label>
+        <mat-label>{{ 'SUMMARY.QUARTER.SELECT' | translate }}</mat-label>
         <mat-select [formControl]="selectedQuarter">
-          <mat-option *ngFor="let number of [1,2,3,4]" [value]="number">
-            Q{{number}}
-          </mat-option>
+          @for (number of [1, 2, 3, 4]; track number) {
+            <mat-option [value]="number">Q{{ number }}</mat-option>
+          }
         </mat-select>
       </mat-form-field>
       <button color="accent" mat-fab matTooltip="{{ 'SUMMARY.MONTHLY.RESULT' | translate }}"
@@ -22,59 +22,55 @@
       </button>
     </div>
     <div class="space-around-container">
-      <ng-template [ngIf]="quarterSummaryMap?.size">
+      @if (quarterSummaryMap?.size) {
         <mat-form-field appearance="outline" class="full-select">
-          <mat-label>{{'COMMON.ROOM.FIELD' | translate}}</mat-label>
+          <mat-label>{{ 'COMMON.ROOM.FIELD' | translate }}</mat-label>
           <mat-select [formControl]="selectedRoom">
-            <mat-option *ngIf="primaryRoom" [value]="'All'">All</mat-option>
-            <mat-option *ngFor="let quarterSummary of quarterSummaryMap | keyvalue" [value]="quarterSummary.key">
-              {{quarterSummary.key.roomName}}
-            </mat-option>
+            @if (primaryRoom) {
+              <mat-option [value]="'All'">All</mat-option>
+            }
+            @for (quarterSummary of quarterSummaryMap | keyvalue; track quarterSummary) {
+              <mat-option [value]="quarterSummary.key">{{ quarterSummary.key.roomName }}</mat-option>
+            }
           </mat-select>
         </mat-form-field>
-      </ng-template>
+      }
     </div>
   </fieldset>
 </div>
 
-<ng-template [ngIf]="!isLoading" [ngIfElse]="loading">
-  <ng-template [ngIf]="quarter && year">
-    <ng-template [ngIf]="quarterSummaryMap?.size" [ngIfElse]="noData">
-      <ng-template [ngIf]="isHandset$ | async" [ngIfElse]="bigScreen">
-        <app-quarter style="width: 100%" [measure]="'short'" [monthSummaries]="monthSummaries" [year]="year"
-                     [quarter]="quarter" [currency]="currency" [showCash]="showCash"></app-quarter>
-      </ng-template>
-      <ng-template #bigScreen>
-        <app-quarter style="width: 100%" [measure]="'long'" [monthSummaries]="monthSummaries" [year]="year"
-                     [quarter]="quarter" [currency]="currency" [showCash]="showCash"></app-quarter>
-      </ng-template>
+@if (!isLoading) {
+  @if (quarter && year) {
+    @if (quarterSummaryMap?.size) {
+      <app-quarter style="width: 100%" [showCash]="showCash" [year]="year" [quarter]="quarter" [currency]="currency"
+                   [measure]="(isHandset$ | async) ? 'short' : 'long'" [monthSummaries]="monthSummaries">
+      </app-quarter>
       <div class="top">
         <mat-toolbar color="primary">
-          {{'SUMMARY.QUARTER.RESULT' | translate}}
+          {{ 'SUMMARY.QUARTER.RESULT' | translate }}
         </mat-toolbar>
         <app-total-summary [summaryTotals]="quarterSummaryTotals" [showCash]="showCash"
                            [currency]="currency"></app-total-summary>
       </div>
-    </ng-template>
-    <ng-template #noData>
+    } @else {
       <mat-toolbar color="warn" style="text-align: center"
                    [innerHTML]="'SUMMARY.QUARTER.ERROR.NO_CONTENT' | translate:{quarter: quarter, year: year}">
       </mat-toolbar>
-    </ng-template>
-  </ng-template>
-</ng-template>
-
-<ng-template #loading>
+    }
+  }
+} @else {
   <div class="spinner-parent-center">
     <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
   </div>
-</ng-template>
+}
 
 <div class="top-space card-actions">
   <div class="spacer"></div>
   <button (click)="goBack" color="accent" mat-fab extended class="icon-button"
-          type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
-  <button [disabled]="!this.monthSummaries" (click)="exportQuarterSummary()" color="primary" mat-fab extended class="icon-button">
+          type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
+  </button>
+  <button [disabled]="!this.monthSummaries" (click)="exportQuarterSummary()" color="primary" mat-fab extended
+          class="icon-button">
     <mat-icon>file_download</mat-icon>
     <span>{{ 'COMMON.BUTTON.EXPORT' | translate }}</span>
   </button>

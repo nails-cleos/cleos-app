@@ -1,9 +1,0 @@
-<div *ngIf="items; else boxSkeleton">
-  <app-drag-drop-sorting [title]="'TREATMENT.DETAIL' | translate" [items]="items"
-                         (sorted)="sorted($event)"></app-drag-drop-sorting>
-</div>
-<ng-template #boxSkeleton>
-  <div class="ssc-hr"></div>
-  <div class="ssc-square mb"></div>
-  <div class="ssc-hr"></div>
-</ng-template>

@@ -9,89 +9,86 @@
   <mat-form-field appearance="outline">
     <mat-label>{{ 'SUMMARY.MONTHLY.SELECT.FORMAT' | translate }}</mat-label>
     <mat-select [formControl]="amountFormat">
-      <mat-option *ngFor="let keys of amountFormatKeys | keyvalue" [value]="keys.value">
-        {{ 'SUMMARY.MONTHLY.FORMAT.' + keys.value | translate }}
-      </mat-option>
+      @for (keys of amountFormatKeys | keyvalue; track keys) {
+        <mat-option [value]="keys.value">{{ 'SUMMARY.MONTHLY.FORMAT.' + keys.value | translate }}</mat-option>
+      }
     </mat-select>
   </mat-form-field>
 </div>
 <div class="space-around-container">
-  <ng-template [ngIf]="monthlySummaryMap?.size">
+  @if (monthlySummaryMap?.size) {
     <mat-form-field appearance="outline" class="full-select">
       <mat-select [formControl]="selectedRoom">
-        <mat-option *ngIf="primaryRoom" [value]="'All'">All</mat-option>
-        <mat-option *ngFor="let monthlySummary of monthlySummaryMap | keyvalue" [value]="monthlySummary.key">
-          {{ monthlySummary.key.roomName }}
-        </mat-option>
+        @if (primaryRoom) {
+          <mat-option [value]="'All'">All</mat-option>
+        }
+        @for (monthlySummary of monthlySummaryMap | keyvalue; track monthlySummary) {
+          <mat-option [value]="monthlySummary.key">{{ monthlySummary.key.roomName }}</mat-option>
+        }
       </mat-select>
     </mat-form-field>
-  </ng-template>
+  }
 </div>
 
 <ng-template #paymentTemplate let-payment='payment' let-currency='currency' let-index='index' let-edit=edit
              let-key='key' let-type='type' let-description='description'>
   @if (description) {
-    <td>
-      {{ payment.description }}
-    </td>
+    <td>{{ payment.description }}</td>
   }
-  <td>
-    <ng-template [ngIf]="edit" [ngIfElse]="noNetEdit">
+  @if (edit) {
+    <td>
       <mat-form-field class="amount" appearance="outline">
         <input matInput [value]="(payment.gross || 0) | number:'1.2-2'" appTwoDigits #gross
                id="grossInput" (focusin)="gross.select()" (focusout)="twoDigit(gross, index, key, payment.id)">
         <mat-icon matPrefix>{{ currency }}</mat-icon>
       </mat-form-field>
-    </ng-template>
-    <ng-template #noNetEdit>
+    </td>
+    <td>
+      <mat-form-field class="amount" appearance="outline">
+        <input matInput [value]="(payment.net || 0) | number:'1.2-2'" appTwoDigits #net id="netInput"
+               (focusin)="net.select()" (focusout)="twoDigit(net, index, key, payment.id)">
+        <mat-icon matPrefix>{{ currency }}</mat-icon>
+      </mat-form-field>
+    </td>
+    <td>
+      <mat-form-field class="amount" appearance="outline">
+        <input matInput [value]="(payment.btw || 0) | number:'1.2-2'" appTwoDigits #btw id="btwInput"
+               (focusin)="btw.select()" (focusout)="twoDigit(btw, index, key, payment.id)">
+        <mat-icon matPrefix>{{ currency }}</mat-icon>
+      </mat-form-field>
+    </td>
+  } @else {
+    <td>
       <mat-list>
         <mat-list-item>
           <div matListItemTitle>{{ (payment.gross || 0) | number:'1.2-2':locale }}</div>
           <mat-icon matListItemIcon>{{ currency }}</mat-icon>
         </mat-list-item>
       </mat-list>
-    </ng-template>
-  </td>
-  <td>
-    <ng-template [ngIf]="edit" [ngIfElse]="noNetEdit">
-      <mat-form-field class="amount" appearance="outline">
-        <input matInput [value]="(payment.net || 0) | number:'1.2-2'" appTwoDigits #net id="netInput"
-               (focusin)="net.select()" (focusout)="twoDigit(net, index, key, payment.id)">
-        <mat-icon matPrefix>{{ currency }}</mat-icon>
-      </mat-form-field>
-    </ng-template>
-    <ng-template #noNetEdit>
+    </td>
+    <td>
       <mat-list>
         <mat-list-item>
           <div matListItemTitle>{{ (payment.net || 0) | number:'1.2-2':locale }}</div>
           <mat-icon matListItemIcon>{{ currency }}</mat-icon>
         </mat-list-item>
       </mat-list>
-    </ng-template>
-  </td>
-  <td>
-    <ng-template [ngIf]="edit" [ngIfElse]="noNetEdit">
-      <mat-form-field class="amount" appearance="outline">
-        <input matInput [value]="(payment.btw || 0) | number:'1.2-2'" appTwoDigits #btw id="btwInput"
-               (focusin)="btw.select()" (focusout)="twoDigit(btw, index, key, payment.id)">
-        <mat-icon matPrefix>{{ currency }}</mat-icon>
-      </mat-form-field>
-    </ng-template>
-    <ng-template #noNetEdit>
+    </td>
+    <td>
       <mat-list>
         <mat-list-item>
           <div matListItemTitle>{{ (payment.btw || 0) | number:'1.2-2':locale }}</div>
           <mat-icon matListItemIcon>{{ currency }}</mat-icon>
         </mat-list-item>
       </mat-list>
-    </ng-template>
-  </td>
+    </td>
+  }
   <td [ngClass]="(type || 'PENDING').toLowerCase()">
     {{ 'COMMON.' + key + '.TYPE.' + (type || payment.paymentType || 'PENDING') | translate }}
   </td>
 </ng-template>
 
-<ng-template [ngIf]="!isLoading" [ngIfElse]="loading">
+@if (!isLoading) {
   <mat-accordion class="headers-align">
     <mat-expansion-panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle>
       <mat-expansion-panel-header>
@@ -104,269 +101,9 @@
         </mat-panel-description>
       </mat-expansion-panel-header>
 
-      <ng-template [ngIf]="summaryReservations?.length" [ngIfElse]="noIncomeData">
-        <table #reservationTableData id="reservationTableData">
-          <colgroup>
-            <col class="id">
-            <col class="nmb">
-            <col class="date">
-            <col class="customer">
-            <col class="description">
-            <col class="discount">
-            <col class="color">
-            <col class="gross">
-            <col class="net">
-            <col class="btw">
-            <col class="type">
-          </colgroup>
-          <thead>
-          <tr>
-            <th mat-subheader></th>
-            <th mat-subheader>N°</th>
-            <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.DATE' | translate }}</th>
-            <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.CUSTOMER' | translate }}</th>
-            <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.DESCRIPTION' | translate }}</th>
-            <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.DISCOUNT' | translate }}</th>
-            <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.COLOR' | translate }}</th>
-            <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.GROSS' | translate }}</th>
-            <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.NET' | translate }}</th>
-            <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.BTW' | translate }}</th>
-            <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.TYPE' | translate }}</th>
-          </tr>
-          </thead>
-          <tbody *ngFor="let week of weeks; let i = index">
-          <tr>
-            <td mat-subheader class="week text-center" [colSpan]="11"
-                [innerHTML]="'SUMMARY.MONTHLY.TABLE.WEEK' | translate:{weekNumber: i + 1}"></td>
-          </tr>
-          <ng-template [ngIf]="summaryReservations?.length">
-            <ng-container *ngFor="let summary of summaryReservations | filterBy:week.dates:'day';">
-              <tr>
-                <td [rowSpan]="summary.total.payments.length || 1">
-                  <button mat-icon-button [routerLink]="summary.paths" [state]="{step: 0}">
-                    <mat-icon>visibility</mat-icon>
-                  </button>
-                </td>
-                <td [rowSpan]="summary.total.payments.length || 1">
-                  {{ summary.position + 1 }}
-                </td>
-                <td [rowSpan]="summary.total.payments.length || 1">
-                  {{ summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat }}
-                </td>
-                <td [rowSpan]="summary.total.payments.length || 1">{{ summary.customerName }}</td>
-                <td [rowSpan]="summary.total.payments.length || 1">{{ summary.description }}</td>
-                <td [rowSpan]="summary.total.payments.length || 1">
-                  {{ summary.total.discountDescription }}
-                </td>
-                <td [rowSpan]="summary.total.payments.length || 1">{{ summary.color }}</td>
-                <ng-template [ngIf]="summary.total.payments.length" [ngIfElse]="noPaid">
-                  <ng-container [ngTemplateOutlet]="paymentTemplate"
-                                [ngTemplateOutletContext]="{payment: summary.total.payments[0], currency: currency.icon,
-                        index: summary.position, edit: true, key: 'PAYMENT'}">
-                  </ng-container>
-                </ng-template>
-                <ng-template #noPaid>
-                  <ng-container [ngTemplateOutlet]="paymentTemplate"
-                                [ngTemplateOutletContext]="{payment: summary.total, currency: currency.icon,
-                        index: summary.position, key: 'PAYMENT'}">
-                  </ng-container>
-                </ng-template>
-              </tr>
-              <ng-template [ngIf]="summary.total.payments.length > 1">
-                <tr *ngFor="let payment of summary.total.payments | slice:1">
-                  <ng-container [ngTemplateOutlet]="paymentTemplate"
-                                [ngTemplateOutletContext]="{payment: payment, currency: currency.icon,
-                        index: summary.position, edit: true, key: 'PAYMENT'}">
-                  </ng-container>
-                </tr>
-              </ng-template>
-            </ng-container>
-          </ng-template>
-          </tbody>
-          <tfoot>
-          <tr *ngIf="selectedRoom.value">
-            <td mat-subheader [colSpan]="7">{{ 'SUMMARY.MONTHLY.TABLE.TOTALS' | translate }}</td>
-            <td
-              mat-subheader>{{ getTotal(reservationMonth, 'gross') | currency:currency.code:'symbol':'1.2-2' }}
-            </td>
-            <td
-              mat-subheader>{{ getTotal(reservationMonth, 'net') | currency:currency.code:'symbol':'1.2-2' }}
-            </td>
-            <td
-              mat-subheader>{{ getTotal(reservationMonth, 'btw') | currency:currency.code:'symbol':'1.2-2' }}
-            </td>
-            <td mat-subheader></td>
-          </tr>
-          </tfoot>
-        </table>
-        <mat-action-row>
-          <div class="spacer"></div>
-          <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryReservations?.length"
-                  (click)="updateMonthlySummary(reservationMonth, monthlySummaryPayment)">
-            <mat-icon>save</mat-icon>
-          </button>
-          <button color="primary" mat-fab extended class="icon-button hide-xs"
-                  [disabled]="!summaryReservations?.length"
-                  (click)="updateMonthlySummary(reservationMonth, monthlySummaryPayment)">
-            <mat-icon>save</mat-icon>
-            <span>{{ 'COMMON.BUTTON.SAVE' | translate }}</span>
-          </button>
-          <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryReservations?.length"
-                  (click)="exportToExcel('INCOMES', reservationMonth, monthlySummaryPayment, summaryReservations)">
-            <mat-icon>file_download</mat-icon>
-          </button>
-          <button color="accent" mat-fab extended [disabled]="!summaryReservations?.length" class="icon-button hide-xs"
-                  (click)="exportToExcel('INCOMES', reservationMonth, monthlySummaryPayment, summaryReservations)">
-            <mat-icon>file_download</mat-icon>
-            <span>{{ 'COMMON.BUTTON.SAVE_EXPORT' | translate }}</span>
-          </button>
-        </mat-action-row>
-      </ng-template>
-
-      <ng-template #noIncomeData>
-        <mat-toolbar color="warn" style="text-align: center"
-                     [innerHTML]="'SUMMARY.MONTHLY.ERROR.INCOMES' | translate: {date: dateFormatted}">
-        </mat-toolbar>
-      </ng-template>
-    </mat-expansion-panel>
-
-    <mat-expansion-panel [expanded]="step === 1" (opened)="setStep(1)" hideToggle>
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          {{ 'SUMMARY.EXPENSES' | translate }}
-        </mat-panel-title>
-        <mat-panel-description>
-          &nbsp;
-          <mat-icon [color]="summaryExpenses?.length ? undefined : 'warn'">shopping_cart_checkout</mat-icon>
-        </mat-panel-description>
-      </mat-expansion-panel-header>
-
-      <ng-template [ngIf]="summaryExpenses?.length" [ngIfElse]="noExpenseData">
-        <table #expenseTableData id="expenseTableData">
-          <colgroup>
-            <col class="id">
-            <col class="nmb">
-            <col class="date">
-            <col id="invoice">
-            <col>
-            <col class="store-supply">
-            <col id="description">
-            <col class="gross">
-            <col class="net">
-            <col class="btw">
-            <col class="type">
-          </colgroup>
-          <thead>
-          <tr>
-            <th mat-subheader></th>
-            <th mat-subheader>N°</th>
-            <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.DATE' | translate }}</th>
-            <th mat-subheader [colSpan]="2">{{ 'SUMMARY.MONTHLY.TABLE.INVOICE' | translate }}</th>
-            <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.SUPPLY_STORE' | translate }}</th>
-            <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.DESCRIPTION' | translate }}</th>
-            <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.GROSS' | translate }}</th>
-            <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.NET' | translate }}</th>
-            <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.BTW' | translate }}</th>
-            <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.TYPE' | translate }}</th>
-          </tr>
-          </thead>
-          <tbody *ngFor="let week of weeks; let i = index">
-          <tr>
-            <td mat-subheader class="week text-center" [colSpan]="11"
-                [innerHTML]="'SUMMARY.MONTHLY.TABLE.WEEK' | translate:{weekNumber: i + 1}"></td>
-          </tr>
-          <ng-template [ngIf]="summaryExpenses?.length">
-            @for (summary of summaryExpenses | filterBy:week.dates:'day'; track summary) {
-              <tr>
-                <td [rowSpan]="summary.total.payments.length || 1">
-                  <button mat-icon-button [routerLink]="summary.paths">
-                    <mat-icon>visibility</mat-icon>
-                  </button>
-                </td>
-                <td [rowSpan]="summary.total.payments.length || 1">
-                  {{ summary.position + 1 }}
-                </td>
-                <td [rowSpan]="summary.total.payments.length || 1">
-                  {{ (summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat)?.replace(',', '') }}
-                </td>
-                <td [rowSpan]="summary.total.payments.length || 1" [colSpan]="2">{{ summary.invoice }}</td>
-                <td [rowSpan]="summary.total.payments.length || 1">{{ summary.supplyStore }}</td>
-                <ng-container [ngTemplateOutlet]="paymentTemplate"
-                              [ngTemplateOutletContext]="{payment: summary.total.payments[0], currency: currency.icon,
-                        index: summary.position, key: 'EXPENSE', type: summary.total.payments[0].expenseType,
-                        edit: true, description: true}">
-                </ng-container>
-              </tr>
-
-              <ng-template [ngIf]="summary.total.payments.length > 1">
-                @for (payment of summary.total.payments | slice:1; track payment; let i = $index) {
-                  <tr>
-                    <ng-container [ngTemplateOutlet]="paymentTemplate"
-                                  [ngTemplateOutletContext]="{payment: payment, currency: currency.icon,
-                        index: summary.position, key: 'EXPENSE', edit: true,
-                        type: summary.total.payments[i + 1].expenseType, description: true}">
-                    </ng-container>
-                  </tr>
-                }
-              </ng-template>
-            }
-
-          </ng-template>
-          </tbody>
-          <tfoot>
-          <tr *ngIf="selectedRoom.value">
-            <td mat-subheader [colSpan]="7">{{ 'SUMMARY.MONTHLY.TABLE.TOTALS' | translate }}</td>
-            <td mat-subheader>{{ getTotal(expenseMonth, 'gross') | currency:currency.code:'symbol':'1.2-2' }}</td>
-            <td mat-subheader>{{ getTotal(expenseMonth, 'net') | currency:currency.code:'symbol':'1.2-2' }}</td>
-            <td mat-subheader>{{ getTotal(expenseMonth, 'btw') | currency:currency.code:'symbol':'1.2-2' }}</td>
-            <td mat-subheader></td>
-          </tr>
-          </tfoot>
-        </table>
-        <mat-action-row>
-          <div class="spacer"></div>
-          <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryExpenses?.length"
-                  (click)="updateMonthlySummary(expenseMonth, monthlySummaryExpense)">
-            <mat-icon>save</mat-icon>
-          </button>
-          <button color="primary" mat-fab extended class="icon-button hide-xs" [disabled]="!summaryExpenses?.length"
-                  (click)="updateMonthlySummary(expenseMonth, monthlySummaryExpense)">
-            <mat-icon>save</mat-icon>
-            <span>{{ 'COMMON.BUTTON.SAVE' | translate }}</span>
-          </button>
-          <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryExpenses?.length"
-                  (click)="exportToExcel('EXPENSES', expenseMonth, monthlySummaryExpense, summaryExpenses)">
-            <mat-icon>file_download</mat-icon>
-          </button>
-          <button color="accent" mat-fab extended class="icon-button hide-xs" [disabled]="!summaryExpenses?.length"
-                  (click)="exportToExcel('EXPENSES', expenseMonth, monthlySummaryExpense, summaryExpenses)">
-            <mat-icon>file_download</mat-icon>
-            <span>{{ 'COMMON.BUTTON.SAVE_EXPORT' | translate }}</span>
-          </button>
-        </mat-action-row>
-      </ng-template>
-
-      <ng-template #noExpenseData>
-        <mat-toolbar color="warn" style="text-align: center"
-                     [innerHTML]="'SUMMARY.MONTHLY.ERROR.EXPENSES' | translate: {date: dateFormatted}">
-        </mat-toolbar>
-      </ng-template>
-    </mat-expansion-panel>
-
-    <ng-template [ngIf]="showCash">
-      <mat-expansion-panel [expanded]="step === 2" (opened)="setStep(2)" hideToggle>
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            {{ 'SUMMARY.CASH_INCOMES' | translate }}
-          </mat-panel-title>
-          <mat-panel-description>
-            &nbsp;
-            <mat-icon [color]="summaryCash?.length ? undefined : 'warn'">payments</mat-icon>
-          </mat-panel-description>
-        </mat-expansion-panel-header>
-
-        <ng-template [ngIf]="summaryCash?.length" [ngIfElse]="noCashData">
-          <table #cashTableData id="cashTableData">
+      @if (summaryReservations?.length) {
+        <ng-container>
+          <table #reservationTableData id="reservationTableData">
             <colgroup>
               <col class="id">
               <col class="nmb">
@@ -395,94 +132,368 @@
               <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.TYPE' | translate }}</th>
             </tr>
             </thead>
-            <tbody *ngFor="let week of weeks; let i = index">
-            <tr>
-              <td mat-subheader class="week text-center" [colSpan]="11"
-                  [innerHTML]="'SUMMARY.MONTHLY.TABLE.WEEK' | translate:{weekNumber: i + 1}"></td>
-            </tr>
-            <ng-template [ngIf]="summaryCash?.length">
-              <tr *ngFor="let summary of summaryCash | filterBy:week.dates:'day'">
-                <td [rowSpan]="summary.total.payments.length || 1">
-                  <button mat-icon-button [routerLink]="summary.paths" [state]="{step: 2}">
-                    <mat-icon>visibility</mat-icon>
-                  </button>
-                </td>
-                <td [rowSpan]="summary.total.payments.length || 1">
-                  {{ summary.position + 1 }}
-                </td>
-                <td [rowSpan]="summary.total.payments.length || 1">
-                  {{ summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat }}
-                </td>
-                <td [rowSpan]="summary.total.payments.length || 1">{{ summary.customerName }}</td>
-                <td [rowSpan]="summary.total.payments.length || 1">{{ summary.description }}</td>
-                <td [rowSpan]="summary.total.payments.length || 1">
-                  {{ summary.total.discountDescription }}
-                </td>
-                <td [rowSpan]="summary.total.payments.length || 1">{{ summary.color }}</td>
-                <ng-template [ngIf]="summary.total.payments.length" [ngIfElse]="noPaid">
-                  <ng-container *ngFor="let payment of summary.total.payments"
-                                [ngTemplateOutlet]="paymentTemplate"
-                                [ngTemplateOutletContext]="{payment: payment, currency: currency.icon,
-                        index: summary.position, edit: true, key: 'CASH', type: payment.paymentType}">
-                  </ng-container>
-                </ng-template>
-                <ng-template #noPaid>
-                  <ng-container [ngTemplateOutlet]="paymentTemplate"
-                                [ngTemplateOutletContext]="{payment: summary.total, currency: currency.icon,
-                        index: summary.position, key: 'CASH'}">
-                  </ng-container>
-                </ng-template>
+            @for (week of weeks; let i = $index; track week) {
+              <tbody>
+              <tr>
+                <td mat-subheader class="week text-center" [colSpan]="11"
+                    [innerHTML]="'SUMMARY.MONTHLY.TABLE.WEEK' | translate:{weekNumber: i + 1}"></td>
               </tr>
-            </ng-template>
-            </tbody>
+                @if (summaryReservations?.length) {
+                  @for (summary of summaryReservations | filterBy:week.dates:'day'; track summary) {
+                    <ng-container>
+                      <tr>
+                        <td [rowSpan]="summary.total.payments.length || 1">
+                          <button mat-icon-button [routerLink]="summary.paths" [state]="{step: 0}">
+                            <mat-icon>visibility</mat-icon>
+                          </button>
+                        </td>
+                        <td [rowSpan]="summary.total.payments.length || 1">
+                          {{ summary.position + 1 }}
+                        </td>
+                        <td [rowSpan]="summary.total.payments.length || 1">
+                          {{ summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat }}
+                        </td>
+                        <td [rowSpan]="summary.total.payments.length || 1">{{ summary.customerName }}</td>
+                        <td [rowSpan]="summary.total.payments.length || 1">{{ summary.description }}</td>
+                        <td [rowSpan]="summary.total.payments.length || 1">
+                          {{ summary.total.discountDescription }}
+                        </td>
+                        <td [rowSpan]="summary.total.payments.length || 1">{{ summary.color }}</td>
+                        @if (summary.total.payments.length) {
+                          <ng-container [ngTemplateOutlet]="paymentTemplate"
+                                        [ngTemplateOutletContext]="{payment: summary.total.payments[0], currency: currency.icon,
+                        index: summary.position, edit: true, key: 'PAYMENT'}">
+                          </ng-container>
+                        } @else {
+                          <ng-container [ngTemplateOutlet]="paymentTemplate"
+                                        [ngTemplateOutletContext]="{payment: summary.total, currency: currency.icon,
+                        index: summary.position, key: 'PAYMENT'}">
+                          </ng-container>
+                        }
+                      </tr>
+                      @if (summary.total.payments.length > 1) {
+                        @for (payment of summary.total.payments | slice:1; track payment) {
+                          <tr>
+                            <ng-container [ngTemplateOutlet]="paymentTemplate" [ngTemplateOutletContext]="{
+                        payment: payment, currency: currency.icon, index: summary.position, edit: true, key: 'PAYMENT'}">
+                            </ng-container>
+                          </tr>
+                        }
+                      }
+                    </ng-container>
+                  }
+                }
+              </tbody>
+            }
             <tfoot>
-            <tr *ngIf="selectedRoom.value">
-              <td mat-subheader [colSpan]="7">{{ 'SUMMARY.MONTHLY.TABLE.TOTALS' | translate }}</td>
-              <td mat-subheader>{{ getTotal(cashMonth, 'gross') | currency:currency.code:'symbol':'1.2-2' }}</td>
-              <td mat-subheader>{{ getTotal(cashMonth, 'net') | currency:currency.code:'symbol':'1.2-2' }}</td>
-              <td mat-subheader>{{ getTotal(cashMonth, 'btw') | currency:currency.code:'symbol':'1.2-2' }}</td>
-              <td mat-subheader></td>
-            </tr>
+              @if (selectedRoom.value) {
+                <tr>
+                  <td mat-subheader [colSpan]="7">{{ 'SUMMARY.MONTHLY.TABLE.TOTALS' | translate }}</td>
+                  <td mat-subheader>
+                    {{ getTotal(reservationMonth, 'gross') | currency:currency.code:'symbol':'1.2-2' }}
+                  </td>
+                  <td mat-subheader>
+                    {{ getTotal(reservationMonth, 'net') | currency:currency.code:'symbol':'1.2-2' }}
+                  </td>
+                  <td mat-subheader>
+                    {{ getTotal(reservationMonth, 'btw') | currency:currency.code:'symbol':'1.2-2' }}
+                  </td>
+                  <td mat-subheader></td>
+                </tr>
+              }
             </tfoot>
           </table>
-          <mat-action-row class="card-actions">
+          <mat-action-row>
             <div class="spacer"></div>
-            <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryCash?.length"
-                    (click)="updateMonthlySummary(cashMonth, monthlySummaryCash)">
+            <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryReservations?.length"
+                    (click)="updateMonthlySummary(reservationMonth, monthlySummaryPayment)">
               <mat-icon>save</mat-icon>
             </button>
-            <button color="primary" mat-fab extended class="icon-button hide-xs" [disabled]="!summaryCash?.length"
-                    (click)="updateMonthlySummary(cashMonth, monthlySummaryCash)">
+            <button color="primary" mat-fab extended class="icon-button hide-xs"
+                    [disabled]="!summaryReservations?.length"
+                    (click)="updateMonthlySummary(reservationMonth, monthlySummaryPayment)">
               <mat-icon>save</mat-icon>
               <span>{{ 'COMMON.BUTTON.SAVE' | translate }}</span>
             </button>
-            <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryCash?.length"
-                    (click)="exportToExcel('CASH_INCOMES', cashMonth, monthlySummaryCash, summaryCash)">
+            <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryReservations?.length"
+                    (click)="exportToExcel('INCOMES', reservationMonth, monthlySummaryPayment, summaryReservations)">
               <mat-icon>file_download</mat-icon>
             </button>
-            <button
-              (click)="exportToExcel('CASH_INCOMES', cashMonth, monthlySummaryCash, summaryCash)"
-              color="accent" mat-fab extended [disabled]="!summaryCash?.length" class="icon-button hide-xs">
+            <button color="accent" mat-fab extended [disabled]="!summaryReservations?.length"
+                    class="icon-button hide-xs"
+                    (click)="exportToExcel('INCOMES', reservationMonth, monthlySummaryPayment, summaryReservations)">
               <mat-icon>file_download</mat-icon>
               <span>{{ 'COMMON.BUTTON.SAVE_EXPORT' | translate }}</span>
             </button>
           </mat-action-row>
-        </ng-template>
-        <ng-template #noCashData>
+        </ng-container>
+      } @else {
+        <mat-toolbar color="warn" style="text-align: center"
+                     [innerHTML]="'SUMMARY.MONTHLY.ERROR.INCOMES' | translate: {date: dateFormatted}">
+        </mat-toolbar>
+      }
+    </mat-expansion-panel>
+
+    <mat-expansion-panel [expanded]="step === 1" (opened)="setStep(1)" hideToggle>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          {{ 'SUMMARY.EXPENSES' | translate }}
+        </mat-panel-title>
+        <mat-panel-description>
+          &nbsp;
+          <mat-icon [color]="summaryExpenses?.length ? undefined : 'warn'">shopping_cart_checkout</mat-icon>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+
+      @if (summaryExpenses?.length) {
+        <ng-container>
+          <table #expenseTableData id="expenseTableData">
+            <colgroup>
+              <col class="id">
+              <col class="nmb">
+              <col class="date">
+              <col id="invoice">
+              <col>
+              <col class="store-supply">
+              <col id="description">
+              <col class="gross">
+              <col class="net">
+              <col class="btw">
+              <col class="type">
+            </colgroup>
+            <thead>
+            <tr>
+              <th mat-subheader></th>
+              <th mat-subheader>N°</th>
+              <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.DATE' | translate }}</th>
+              <th mat-subheader [colSpan]="2">{{ 'SUMMARY.MONTHLY.TABLE.INVOICE' | translate }}</th>
+              <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.SUPPLY_STORE' | translate }}</th>
+              <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.DESCRIPTION' | translate }}</th>
+              <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.GROSS' | translate }}</th>
+              <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.NET' | translate }}</th>
+              <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.BTW' | translate }}</th>
+              <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.TYPE' | translate }}</th>
+            </tr>
+            </thead>
+            @for (week of weeks; let i = $index; track week) {
+              <tbody>
+              <tr>
+                <td mat-subheader class="week text-center" [colSpan]="11"
+                    [innerHTML]="'SUMMARY.MONTHLY.TABLE.WEEK' | translate:{weekNumber: i + 1}"></td>
+              </tr>
+                @if (summaryExpenses?.length) {
+                  @for (summary of summaryExpenses | filterBy:week.dates:'day'; track summary) {
+                    <tr>
+                      <td [rowSpan]="summary.total.payments.length || 1">
+                        <button mat-icon-button [routerLink]="summary.paths">
+                          <mat-icon>visibility</mat-icon>
+                        </button>
+                      </td>
+                      <td [rowSpan]="summary.total.payments.length || 1">
+                        {{ summary.position + 1 }}
+                      </td>
+                      <td [rowSpan]="summary.total.payments.length || 1">
+                        {{ (summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat)?.replace(',', '') }}
+                      </td>
+                      <td [rowSpan]="summary.total.payments.length || 1" [colSpan]="2">{{ summary.invoice }}</td>
+                      <td [rowSpan]="summary.total.payments.length || 1">{{ summary.supplyStore }}</td>
+                      <ng-container [ngTemplateOutlet]="paymentTemplate"
+                                    [ngTemplateOutletContext]="{payment: summary.total.payments[0], currency: currency.icon,
+                        index: summary.position, key: 'EXPENSE', type: summary.total.payments[0].expenseType,
+                        edit: true, description: true}">
+                      </ng-container>
+                    </tr>
+
+                    @if (summary.total.payments.length > 1) {
+                      @for (payment of summary.total.payments | slice:1; track payment; let i = $index) {
+                        <tr>
+                          <ng-container [ngTemplateOutlet]="paymentTemplate"
+                                        [ngTemplateOutletContext]="{payment: payment, currency: currency.icon,
+                        index: summary.position, key: 'EXPENSE', edit: true,
+                        type: summary.total.payments[i + 1].expenseType, description: true}">
+                          </ng-container>
+                        </tr>
+                      }
+                    }
+                  }
+                }
+              </tbody>
+            }
+            <tfoot>
+              @if (selectedRoom.value) {
+                <tr>
+                  <td mat-subheader [colSpan]="7">{{ 'SUMMARY.MONTHLY.TABLE.TOTALS' | translate }}</td>
+                  <td mat-subheader>{{ getTotal(expenseMonth, 'gross') | currency:currency.code:'symbol':'1.2-2' }}</td>
+                  <td mat-subheader>{{ getTotal(expenseMonth, 'net') | currency:currency.code:'symbol':'1.2-2' }}</td>
+                  <td mat-subheader>{{ getTotal(expenseMonth, 'btw') | currency:currency.code:'symbol':'1.2-2' }}</td>
+                  <td mat-subheader></td>
+                </tr>
+              }
+            </tfoot>
+          </table>
+          <mat-action-row>
+            <div class="spacer"></div>
+            <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryExpenses?.length"
+                    (click)="updateMonthlySummary(expenseMonth, monthlySummaryExpense)">
+              <mat-icon>save</mat-icon>
+            </button>
+            <button color="primary" mat-fab extended class="icon-button hide-xs" [disabled]="!summaryExpenses?.length"
+                    (click)="updateMonthlySummary(expenseMonth, monthlySummaryExpense)">
+              <mat-icon>save</mat-icon>
+              <span>{{ 'COMMON.BUTTON.SAVE' | translate }}</span>
+            </button>
+            <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryExpenses?.length"
+                    (click)="exportToExcel('EXPENSES', expenseMonth, monthlySummaryExpense, summaryExpenses)">
+              <mat-icon>file_download</mat-icon>
+            </button>
+            <button color="accent" mat-fab extended class="icon-button hide-xs" [disabled]="!summaryExpenses?.length"
+                    (click)="exportToExcel('EXPENSES', expenseMonth, monthlySummaryExpense, summaryExpenses)">
+              <mat-icon>file_download</mat-icon>
+              <span>{{ 'COMMON.BUTTON.SAVE_EXPORT' | translate }}</span>
+            </button>
+          </mat-action-row>
+        </ng-container>
+      } @else {
+        <mat-toolbar color="warn" style="text-align: center"
+                     [innerHTML]="'SUMMARY.MONTHLY.ERROR.EXPENSES' | translate: {date: dateFormatted}">
+        </mat-toolbar>
+      }
+    </mat-expansion-panel>
+
+    @if (showCash) {
+      <mat-expansion-panel [expanded]="step === 2" (opened)="setStep(2)" hideToggle>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{ 'SUMMARY.CASH_INCOMES' | translate }}
+          </mat-panel-title>
+          <mat-panel-description>
+            &nbsp;
+            <mat-icon [color]="summaryCash?.length ? undefined : 'warn'">payments</mat-icon>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        @if (summaryCash?.length) {
+          <ng-container>
+            <table #cashTableData id="cashTableData">
+              <colgroup>
+                <col class="id">
+                <col class="nmb">
+                <col class="date">
+                <col class="customer">
+                <col class="description">
+                <col class="discount">
+                <col class="color">
+                <col class="gross">
+                <col class="net">
+                <col class="btw">
+                <col class="type">
+              </colgroup>
+              <thead>
+              <tr>
+                <th mat-subheader></th>
+                <th mat-subheader>N°</th>
+                <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.DATE' | translate }}</th>
+                <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.CUSTOMER' | translate }}</th>
+                <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.DESCRIPTION' | translate }}</th>
+                <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.DISCOUNT' | translate }}</th>
+                <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.COLOR' | translate }}</th>
+                <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.GROSS' | translate }}</th>
+                <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.NET' | translate }}</th>
+                <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.BTW' | translate }}</th>
+                <th mat-subheader>{{ 'SUMMARY.MONTHLY.TABLE.TYPE' | translate }}</th>
+              </tr>
+              </thead>
+              @for (week of weeks; let i = $index; track week) {
+                <tbody>
+                <tr>
+                  <td mat-subheader class="week text-center" [colSpan]="11"
+                      [innerHTML]="'SUMMARY.MONTHLY.TABLE.WEEK' | translate:{weekNumber: i + 1}"></td>
+                </tr>
+                  @if (summaryCash?.length) {
+                    @for (summary of summaryCash | filterBy:week.dates:'day'; track summary) {
+                      <tr>
+                        <td [rowSpan]="summary.total.payments.length || 1">
+                          <button mat-icon-button [routerLink]="summary.paths" [state]="{step: 2}">
+                            <mat-icon>visibility</mat-icon>
+                          </button>
+                        </td>
+                        <td [rowSpan]="summary.total.payments.length || 1">
+                          {{ summary.position + 1 }}
+                        </td>
+                        <td [rowSpan]="summary.total.payments.length || 1">
+                          {{ summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat }}
+                        </td>
+                        <td [rowSpan]="summary.total.payments.length || 1">{{ summary.customerName }}</td>
+                        <td [rowSpan]="summary.total.payments.length || 1">{{ summary.description }}</td>
+                        <td [rowSpan]="summary.total.payments.length || 1">
+                          {{ summary.total.discountDescription }}
+                        </td>
+                        <td [rowSpan]="summary.total.payments.length || 1">{{ summary.color }}</td>
+                        @if (summary.total.payments.length) {
+                          @for (payment of summary.total.payments; track payment) {
+                            <ng-container [ngTemplateOutlet]="paymentTemplate" [ngTemplateOutletContext]="
+                          {payment: payment, currency: currency.icon, index: summary.position, edit: true, key: 'CASH', type: payment.paymentType}">
+                            </ng-container>
+                          }
+                        } @else {
+                          <ng-container [ngTemplateOutlet]="paymentTemplate" [ngTemplateOutletContext]="
+                          {payment: summary.total, currency: currency.icon, index: summary.position, key: 'CASH'}">
+                          </ng-container>
+                        }
+                      </tr>
+                    }
+                  }
+                </tbody>
+              }
+              <tfoot>
+                @if (selectedRoom.value) {
+                  <tr>
+                    <td mat-subheader [colSpan]="7">{{ 'SUMMARY.MONTHLY.TABLE.TOTALS' | translate }}</td>
+                    <td mat-subheader>{{ getTotal(cashMonth, 'gross') | currency:currency.code:'symbol':'1.2-2' }}</td>
+                    <td mat-subheader>{{ getTotal(cashMonth, 'net') | currency:currency.code:'symbol':'1.2-2' }}</td>
+                    <td mat-subheader>{{ getTotal(cashMonth, 'btw') | currency:currency.code:'symbol':'1.2-2' }}</td>
+                    <td mat-subheader></td>
+                  </tr>
+                }
+              </tfoot>
+            </table>
+            <mat-action-row class="card-actions">
+              <div class="spacer"></div>
+              <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryCash?.length"
+                      (click)="updateMonthlySummary(cashMonth, monthlySummaryCash)">
+                <mat-icon>save</mat-icon>
+              </button>
+              <button color="primary" mat-fab extended class="icon-button hide-xs" [disabled]="!summaryCash?.length"
+                      (click)="updateMonthlySummary(cashMonth, monthlySummaryCash)">
+                <mat-icon>save</mat-icon>
+                <span>{{ 'COMMON.BUTTON.SAVE' | translate }}</span>
+              </button>
+              <button class="hide-gt-xs" color="accent" mat-fab [disabled]="!summaryCash?.length"
+                      (click)="exportToExcel('CASH_INCOMES', cashMonth, monthlySummaryCash, summaryCash)">
+                <mat-icon>file_download</mat-icon>
+              </button>
+              <button
+                (click)="exportToExcel('CASH_INCOMES', cashMonth, monthlySummaryCash, summaryCash)"
+                color="accent" mat-fab extended [disabled]="!summaryCash?.length" class="icon-button hide-xs">
+                <mat-icon>file_download</mat-icon>
+                <span>{{ 'COMMON.BUTTON.SAVE_EXPORT' | translate }}</span>
+              </button>
+            </mat-action-row>
+          </ng-container>
+        } @else {
           <mat-toolbar color="warn" style="text-align: center"
                        [innerHTML]="'SUMMARY.MONTHLY.ERROR.CASH_INCOMES' | translate: {date: dateFormatted}">
           </mat-toolbar>
-        </ng-template>
+        }
       </mat-expansion-panel>
-    </ng-template>
+    }
   </mat-accordion>
-</ng-template>
-
-<ng-template #loading>
+} @else {
   <div class="spinner-parent-center">
     <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
   </div>
-</ng-template>
+}
+
 <div class="top-space card-actions">
   <div class="spacer"></div>
   <button (click)="goBack" color="accent" mat-fab extended class="icon-button" type="button">

@@ -1,9 +1,12 @@
 import { Component, Input } from '@angular/core';
+import { SharedModule } from "../../../shared/shared.module";
 
 @Component({
   selector: 'app-share-buttons',
   templateUrl: './share-buttons.component.html',
-  styleUrls: ['./share-buttons.component.scss']
+  styleUrls: ['./share-buttons.component.scss'],
+  standalone: true,
+  imports: [SharedModule],
 })
 export class ShareButtonsComponent {
   @Input() message = '';

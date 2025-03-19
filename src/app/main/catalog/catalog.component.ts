@@ -8,11 +8,14 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
 import { MainContentService } from '../main-content.service';
 import { getImage } from '../../util/file';
+import { SharedModule } from "../../shared/shared.module";
 
 @Component({
   selector: 'app-catalog',
   templateUrl: './catalog.component.html',
-  styleUrls: ['./catalog.component.scss']
+  styleUrls: ['./catalog.component.scss'],
+  standalone: true,
+  imports: [SharedModule],
 })
 export class CatalogComponent implements OnInit, OnDestroy {
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)

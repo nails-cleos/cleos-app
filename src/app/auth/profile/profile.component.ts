@@ -12,15 +12,21 @@ import { backendFormatDate, createDateFromString, newDate } from '../../util/dat
 import { lightenDarkenColor } from '../../util/color';
 import { Role } from '../../interfaces/token';
 import { TranslateService } from '@ngx-translate/core';
-import { validColorValidator } from 'ngx-colors';
+import { NgxColorsModule, validColorValidator } from 'ngx-colors';
 import { resizeImage } from '../../util/file';
+import { SharedModule } from "../../shared/shared.module";
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
+import { NgxMatIntlTelInputComponent } from "ngx-mat-intl-tel-input";
+import { GoogleMapComponent } from "../../shared/google-map/google-map.component";
+import { BackButtonDirective } from "../../directives/back-button.directive";
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.scss']
+  styleUrls: ['./profile.component.scss'],
+  standalone: true,
+  imports: [SharedModule, NgxMatIntlTelInputComponent, NgxColorsModule, GoogleMapComponent, BackButtonDirective],
 })
 export class ProfileComponent implements OnInit, OnDestroy {
   @ViewChild('canvas', { static: false }) canvas?: ElementRef<HTMLCanvasElement>;

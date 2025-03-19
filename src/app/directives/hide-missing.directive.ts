@@ -1,7 +1,8 @@
 import { Directive, ElementRef, HostListener } from '@angular/core';
 
 @Directive({
-  selector: '[appHideMissing]'
+  selector: '[appHideMissing]',
+  standalone: true,
 })
 export class HideMissingDirective {
 

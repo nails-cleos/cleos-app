@@ -9,9 +9,9 @@ import { MAX_RESERVATION_MONTH } from '../../interfaces/reservation';
 
 @Component({
   selector: 'app-reservation-clone-dialog',
+  templateUrl: './reservation-clone-dialog.component.html',
   standalone: true,
   imports: [SharedModule],
-  templateUrl: './reservation-clone-dialog.component.html'
 })
 export class ReservationCloneDialogComponent {
   form!: UntypedFormGroup;

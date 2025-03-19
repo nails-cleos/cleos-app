@@ -3,11 +3,14 @@ import { IMonthSummary, ISummaryTotal, Total } from '../../../interfaces/dashboa
 import { ICurrencyAll } from '../../../interfaces/currency';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { SharedModule } from "../../../shared/shared.module";
 
 @Component({
   selector: 'app-month',
   templateUrl: './month.component.html',
-  styleUrls: ['./month.component.scss']
+  styleUrls: ['./month.component.scss'],
+  standalone: true,
+  imports: [SharedModule],
 })
 export class MonthComponent implements AfterViewInit {
   @Input() month!: IMonthSummary;

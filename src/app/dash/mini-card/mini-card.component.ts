@@ -1,11 +1,15 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
 import { TranslateService } from '@ngx-translate/core';
+import { SharedModule } from "../../shared/shared.module";
+import { ErrorComponent } from "../../shared/error/error.component";
 
 @Component({
   selector: 'app-mini-card',
   templateUrl: './mini-card.component.html',
-  styleUrls: ['./mini-card.component.scss']
+  styleUrls: ['./mini-card.component.scss'],
+  standalone: true,
+  imports: [SharedModule, ErrorComponent],
 })
 export class MiniCardComponent implements OnInit {
   @Input() icon?: string;

@@ -274,8 +274,9 @@
               <mat-form-field>
                 <mat-label>{{ 'MAIN.CONTACT.SUBJECT.FIELD' | translate }}</mat-label>
                 <input [formControl]="subject" autocomplete="subject" matInput required>
-                <mat-error *ngIf="subject.hasError('required')"
-                           [innerHTML]="'MAIN.CONTACT.SUBJECT.REQUIRED' | translate"></mat-error>
+                @if (subject.hasError('required')) {
+                  <mat-error [innerHTML]="'MAIN.CONTACT.SUBJECT.REQUIRED' | translate"></mat-error>
+                }
               </mat-form-field>
               <mat-form-field>
                 <mat-label>{{ 'MAIN.CONTACT.BODY.FIELD' | translate }}</mat-label>

@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
 import {
   AppState,
@@ -43,11 +43,17 @@ import { ThemeService } from 'ng2-charts';
 import { AuthUserService } from '../services/auth-user.service';
 import { SeoService } from '../services/seo.service';
 import { newDateTimestamp } from '../util/dates';
+import { SharedModule } from "../shared/shared.module";
+import { MenuItemComponent } from "./menu-item/menu-item.component";
+import { ErrorComponent } from "../shared/error/error.component";
+import { MatRipple } from "@angular/material/core";
 
 @Component({
   selector: 'app-nav',
   templateUrl: './nav.component.html',
-  styleUrls: ['./nav.component.scss']
+  styleUrls: ['./nav.component.scss'],
+  standalone: true,
+  imports: [SharedModule, MenuItemComponent, RouterLinkActive, RouterOutlet, ErrorComponent, MatRipple],
 })
 export class NavComponent implements OnInit, OnDestroy {
   title = environment.title;

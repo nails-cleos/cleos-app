@@ -1,10 +1,13 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { SharedModule } from "../../shared/shared.module";
 
 @Component({
   selector: 'app-add-note-dialog-component',
-  templateUrl: './add-note-dialog.component.html'
+  templateUrl: './add-note-dialog.component.html',
+  standalone: true,
+  imports: [SharedModule],
 })
 export class AddNoteDialogComponent implements OnInit {
   noteForm!: UntypedFormGroup;

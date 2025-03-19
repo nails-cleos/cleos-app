@@ -13,12 +13,16 @@ import * as fromActionsTreatment from '../../store/treatment.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
+import { SharedModule } from "../../shared/shared.module";
+import { CurrencySymbolPipe } from "../../pipes/currency-symbol.pipe";
 
 @Component({
   selector: 'app-treatments',
   templateUrl: './treatments.component.html',
   styleUrls: ['./treatments.component.scss'],
-  animations: [detailExpandAnimation]
+  animations: [detailExpandAnimation],
+  standalone: true,
+  imports: [SharedModule, CurrencySymbolPipe],
 })
 export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;

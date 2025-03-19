@@ -4,134 +4,158 @@
     <mat-grid-tile [colspan]="(layout | async)?.miniCardInfo?.cols" [rowspan]="(layout | async)?.miniCardInfo?.rows">
       <mat-card appearance="outlined" class="dashboard-card">
         <mat-card-content>
-          <div *ngIf="customer; else circle" class="center-circle circle profile-background">
-            <img *ngIf="image; else showInitialsBlock" [src]="image" alt="Profile" mat-card-image>
-            <ng-template #showInitialsBlock>
-              <div class="initials">{{ initials | uppercase }}</div>
-            </ng-template>
-          </div>
-          <ng-template #circle>
+          @if (customer) {
+            <div class="center-circle circle profile-background">
+              @if (image) {
+                <img [src]="image" alt="Profile" mat-card-image>
+              } @else {
+                <div class="initials">{{ initials | uppercase }}</div>
+              }
+            </div>
+          } @else {
             <div class="center-circle ssc-circle w-100 initials"></div>
-          </ng-template>
+          }
           <div class="dashboard-card-content">
-            <div *ngIf="customer; else skeletonTitle" class="top-space">
-              <h2 class="bold">{{ customer.displayName }}</h2>
-            </div>
-            <div class="text-center" *ngIf="customer; else skeleton">
-              <mat-icon color="primary">cake</mat-icon>
-              <span class="super">{{ customer.dob ? customer.dob : 'N/A' }}</span>
-            </div>
-            <div class="text-center" *ngIf="customer; else skeleton">
-              <mat-icon color="primary">phone</mat-icon>
-              <span class="super">{{ customer.phone ? customer.phone : 'N/A' }}</span>
-            </div>
-            <div class="text-center" *ngIf="customer; else skeleton">
-              <mat-icon color="primary">mail_outline</mat-icon>
-              <span class="super">{{ customer.email ? customer.email : 'N/A' }}</span>
-            </div>
+            @if (customer) {
+              <div class="top-space">
+                <h2 class="bold">{{ customer.displayName }}</h2>
+              </div>
+              <div class="text-center">
+                <mat-icon color="primary">cake</mat-icon>
+                <span class="super">{{ customer.dob ? customer.dob : 'N/A' }}</span>
+              </div>
+              <div class="text-center">
+                <mat-icon color="primary">phone</mat-icon>
+                <span class="super">{{ customer.phone ? customer.phone : 'N/A' }}</span>
+              </div>
+              <div class="text-center">
+                <mat-icon color="primary">mail_outline</mat-icon>
+                <span class="super">{{ customer.email ? customer.email : 'N/A' }}</span>
+              </div>
+            } @else {
+              <div class="card-margin ssc-head-line"></div>
+              <div class="card-margin ssc-head-line"></div>
+              <div class="card-margin ssc-head-line"></div>
+              <div class="card-margin ssc-head-line"></div>
+            }
           </div>
           <ng-template #skeletonTitle>
             <div class="card-margin ssc-head-line"></div>
           </ng-template>
         </mat-card-content>
         <mat-card-actions class="top-space" style="margin: auto">
-          <button *ngIf="customer; else skeleton" class="hide-gt-xs only-button" color="accent" mat-fab
-                  (click)="goToProfile">
-            <mat-icon matPrefix>edit</mat-icon>
-          </button>
-          <button *ngIf="customer; else skeleton" class="hide-xs only-button" color="accent" mat-fab extended
-                  (click)="goToProfile">
-            <mat-icon matPrefix>edit</mat-icon>
-            <span>{{ 'COMMON.BUTTON.EDIT' | translate }}</span>
-          </button>
+          @if (customer) {
+            <button class="hide-gt-xs only-button" color="accent" mat-fab (click)="goToProfile">
+              <mat-icon matPrefix>edit</mat-icon>
+            </button>
+            <button class="hide-xs only-button" color="accent" mat-fab extended (click)="goToProfile">
+              <mat-icon matPrefix>edit</mat-icon>
+              <span>{{ 'COMMON.BUTTON.EDIT' | translate }}</span>
+            </button>
+          } @else {
+            <div class="card-margin divider ssc-line"></div>
+          }
         </mat-card-actions>
-        <ng-template #skeleton>
-          <div class="card-margin divider ssc-line"></div>
-        </ng-template>
       </mat-card>
     </mat-grid-tile>
     <mat-grid-tile [colspan]="(layout | async)?.miniCardAccount?.cols"
                    [rowspan]="(layout | async)?.miniCardAccount?.rows">
       <mat-card appearance="outlined" class="dashboard-card">
-        <mat-card-header *ngIf="account; else skeletonTitle" class="card-header">
-          <mat-card-title>{{ 'COMMON.ACCOUNT.BALANCE' | translate }}</mat-card-title>
-        </mat-card-header>
-        <ng-template #skeletonTitle>
+        @if (account) {
+          <mat-card-header class="card-header">
+            <mat-card-title>{{ 'COMMON.ACCOUNT.BALANCE' | translate }}</mat-card-title>
+          </mat-card-header>
+        } @else {
           <div class="card-margin ssc-head-line"></div>
-        </ng-template>
+        }
         <mat-card-content>
-          <div *ngIf="account && customer; else box">
-            <div class="card-icon top-space bottom-space" mat-card-avatar>
-              <mat-icon class="avatar-icon pointer-only" color="primary" [matBadgeOverlap]="true" [matBadge]="'+'"
-                        [matBadgeColor]="'primary'" (click)="goTo" aria-hidden="false">
-                account_balance
-              </mat-icon>
-            </div>
-            <div class="text-center">
-              <h2 class="no-bottom">{{ account.balance | currency: account.currency.code }}</h2>
-            </div>
-          </div>
-          <ng-template #box>
-            <div style="height: 80px" class="ssc-square mb"></div>
-          </ng-template>
-        </mat-card-content>
-      </mat-card>
-    </mat-grid-tile>
-    <mat-grid-tile *ngFor="let mc of miniCardData; let i = index" [colspan]="( layout | async )?.miniCard?.cols"
-                   [rowspan]="( layout | async )?.miniCard?.rows">
-      <mat-card appearance="outlined" class="dashboard-card">
-        <mat-card-header *ngIf="mc.title; else skeletonTitle" class="card-header">
-          <mat-card-title>{{ mc.title | translate }}</mat-card-title>
-        </mat-card-header>
-        <ng-template #skeletonTitle>
-          <div class="card-margin ssc-head-line"></div>
-        </ng-template>
-        <mat-card-content *ngIf="!mc.error; else error">
-          <div *ngIf="mc.title; else box">
-            <div class="card-icon top-space bottom-space" mat-card-avatar>
-              <mat-icon class="avatar-icon" color="primary">{{ mc.icon }}</mat-icon>
-            </div>
-            <div *ngIf="mc.split; else noSplit" class="text-center">
-              <div *ngIf="mc.link; else noLink">
-                <h3 (click)="mc.link(mc.primaryId)" [ngClass]="{'pointer': mc.primaryId}"
-                    class="no-bottom">{{ mc.primaryValue }}</h3>
-                <h3 (click)="mc.link(mc.secondaryId)" *ngIf="mc.secondaryValue"
-                    [ngClass]=" {'pointer': mc.secondaryId}">{{ mc.secondaryValue }}</h3>
+          @if (account && customer) {
+            <div>
+              <div class="card-icon top-space bottom-space" mat-card-avatar>
+                <mat-icon class="avatar-icon pointer-only" color="primary" [matBadgeOverlap]="true" [matBadge]="'+'"
+                          [matBadgeColor]="'primary'" (click)="goTo" aria-hidden="false">
+                  account_balance
+                </mat-icon>
               </div>
-              <ng-template #noLink>
-                <h3 class="no-bottom">{{ mc.primaryValue }}</h3>
-                <h3 *ngIf="mc.secondaryValue">{{ mc.secondaryValue }}</h3>
-              </ng-template>
+              <div class="text-center">
+                <h2 class="no-bottom">{{ account.balance | currency: account.currency.code }}</h2>
+              </div>
             </div>
-            <ng-template #noSplit>
-              <h1 class="text-center">{{ mc.primaryValue }}/{{ mc.secondaryValue }}</h1>
-            </ng-template>
-          </div>
-          <ng-template #box>
+          } @else {
             <div style="height: 80px" class="ssc-square mb"></div>
-          </ng-template>
+          }
         </mat-card-content>
-        <ng-template #error>
-          <app-error [error]="mc.error" [isCard]="true" class="text-center"></app-error>
-        </ng-template>
       </mat-card>
     </mat-grid-tile>
-    <mat-grid-tile *ngFor="let chart of charts" [colspan]="( layout | async )?.chart?.cols"
-                   [rowspan]="( layout | async )?.chart?.rows">
-      <app-card [chart]="chart" [title]="chart.title">
-        <app-chart [chartSummary]="chart" [error]="error" [locale]="language"></app-chart>
-      </app-card>
-    </mat-grid-tile>
+    @for (mc of miniCardData; let i = $index; track mc) {
+      <mat-grid-tile [colspan]="( layout | async )?.miniCard?.cols" [rowspan]="( layout | async )?.miniCard?.rows">
+        <mat-card appearance="outlined" class="dashboard-card">
+          @if (mc.title) {
+            <mat-card-header class="card-header">
+              <mat-card-title>{{ mc.title | translate }}</mat-card-title>
+            </mat-card-header>
+          } @else {
+            <div class="card-margin ssc-head-line"></div>
+          }
+          @if (!mc.error) {
+            <mat-card-content>
+              @if (mc.title) {
+                <div>
+                  <div class="card-icon top-space bottom-space" mat-card-avatar>
+                    <mat-icon class="avatar-icon" color="primary">{{ mc.icon }}</mat-icon>
+                  </div>
+                  @if (mc.split) {
+                    <div class="text-center">
+                      @if (mc.link) {
+                        <div>
+                          <h3 (click)="mc.link(mc.primaryId)" [ngClass]="{'pointer': mc.primaryId}" class="no-bottom">
+                            {{ mc.primaryValue }}
+                          </h3>
+                          @if (mc.secondaryValue) {
+                            <h3 (click)="mc.link(mc.secondaryId)" [ngClass]=" {'pointer': mc.secondaryId}">
+                              {{ mc.secondaryValue }}
+                            </h3>
+                          }
+                        </div>
+                      } @else {
+                        <h3 class="no-bottom">{{ mc.primaryValue }}</h3>
+                        @if (mc.secondaryValue) {
+                          <h3>{{ mc.secondaryValue }}</h3>
+                        }
+                      }
+                    </div>
+                  } @else {
+                    <h1 class="text-center">{{ mc.primaryValue }}/{{ mc.secondaryValue }}</h1>
+                  }
+                </div>
+              } @else {
+                <div style="height: 80px" class="ssc-square mb"></div>
+              }
+            </mat-card-content>
+          } @else {
+            <app-error [error]="mc.error" [isCard]="true" class="text-center"></app-error>
+          }
+        </mat-card>
+      </mat-grid-tile>
+    }
+    @for (chart of charts; track chart) {
+      <mat-grid-tile [colspan]="( layout | async )?.chart?.cols" [rowspan]="( layout | async )?.chart?.rows">
+        <app-card [chart]="chart" [title]="chart.title">
+          <app-chart [chartSummary]="chart" [error]="error" [locale]="language"></app-chart>
+        </app-card>
+      </mat-grid-tile>
+    }
   </mat-grid-list>
-  <div *ngIf="customer; else box">
-    <ng-template [ngIf]="customer.address">
-      <app-google-map [latitudeMarker]="customer.address.location.y" [longitudeMarker]="customer.address.location.x"
-                      [markInfo]="'<b>' + customer.address.name + '</b>'"></app-google-map>
-    </ng-template>
-  </div>
-  <ng-template #box>
+  @if (customer) {
+    <div>
+      @if (customer.address) {
+        <app-google-map [latitudeMarker]="customer.address.location.y" [longitudeMarker]="customer.address.location.x"
+                        [markInfo]="'<b>' + customer.address.name + '</b>'"></app-google-map>
+      }
+    </div>
+  } @else {
     <div class="ssc-square mb"></div>
-  </ng-template>
+  }
 </div>
 <div class="grid-container">
   <div class="card-actions">
@@ -139,8 +163,8 @@
     <button appBackButton color="accent" mat-fab extended type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
   </div>
 </div>
-<ng-template [ngIf]="upcoming.length && customer?.phone">
+@if (upcoming.length && customer?.phone) {
   <button color="accent" id="add-button" mat-fab (click)="notification">
     <mat-icon>campaign</mat-icon>
   </button>
-</ng-template>
+}

@@ -1,12 +1,9 @@
 import { NgModule } from '@angular/core';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../shared/shared.module';
 import { CatalogueRoutingModule } from './catalogue-routing.module';
-import { DragDropDirective } from '../directives/drag-drop.directive';
 
 import { CatalogueComponent } from './catalogue.component';
 import { CataloguesComponent } from './list/catalogues.component';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { EffectsModule } from '@ngrx/effects';
 import { CatalogueEffects } from '../store/effects/catalogue.effects';
 import { CatalogueService } from '../services/catalogue.service';
@@ -17,15 +14,10 @@ import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
 
 @NgModule({
-  declarations: [
+  imports: [
     CatalogueComponent,
     CataloguesComponent,
-    DragDropDirective
-  ],
-  imports: [
     CatalogueRoutingModule,
-    SharedModule,
-    MatProgressBarModule,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,

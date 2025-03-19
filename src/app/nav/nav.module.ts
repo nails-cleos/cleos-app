@@ -1,11 +1,8 @@
 import { NgModule } from '@angular/core';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../shared/shared.module';
 import { NavRoutingModule } from './nav-routing.module';
 
 import { NavComponent } from './nav.component';
-import { MatRippleModule } from '@angular/material/core';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { EffectsModule } from '@ngrx/effects';
 import { LoginEffects } from '../store/effects/auth.effects';
 import { NotificationEffects } from '../store/effects/notification.effects';
@@ -21,15 +18,10 @@ import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
 
 @NgModule({
-  declarations: [
-    NavComponent,
-    MenuItemComponent
-  ],
   imports: [
+    NavComponent,
+    MenuItemComponent,
     NavRoutingModule,
-    SharedModule,
-    MatRippleModule,
-    MatSlideToggleModule,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,

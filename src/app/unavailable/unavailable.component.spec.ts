@@ -8,8 +8,8 @@ describe('UnavailableComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ UnavailableComponent ]
-    })
+    imports: [UnavailableComponent]
+})
     .compileComponents();
   });
 

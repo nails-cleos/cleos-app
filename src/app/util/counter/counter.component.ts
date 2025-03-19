@@ -1,9 +1,12 @@
 import { Component, ElementRef, EventEmitter, NgZone, Output, Renderer2, ViewChild } from '@angular/core';
 import { getNowTimeZone } from '../dates';
+import { SharedModule } from "../../shared/shared.module";
 
 @Component({
   selector: 'app-counter',
-  template: '<div #counter></div>'
+  template: '<div #counter></div>',
+  standalone: true,
+  imports: [SharedModule],
 })
 export class CounterComponent {
 

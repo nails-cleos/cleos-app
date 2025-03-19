@@ -9,11 +9,11 @@ describe('ReservationTableComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ReservationTableComponent ],
-      imports: [
-        NoopAnimationsModule
-      ]
-    }).compileComponents();
+    imports: [
+        NoopAnimationsModule,
+        ReservationTableComponent
+    ]
+}).compileComponents();
   }));
 
   beforeEach(() => {

@@ -8,8 +8,6 @@ import { AuthComponent } from './auth.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ProfileComponent } from './profile/profile.component';
 import { RedirectComponent } from './redirect/redirect.component';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { NgxMatIntlTelInputComponent } from 'ngx-mat-intl-tel-input';
 import { EffectsModule } from '@ngrx/effects';
 import { LoginEffects } from '../store/effects/auth.effects';
 import { AuthService } from '../services/auth.service';
@@ -20,21 +18,16 @@ import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/trans
 import { Store } from '@ngrx/store';
 import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
-import { NgxColorsModule } from 'ngx-colors';
 
 
 @NgModule({
-  declarations: [
+  imports: [
     AuthComponent,
     ForgotPasswordComponent,
     ProfileComponent,
-    RedirectComponent
-  ],
-  imports: [
+    RedirectComponent,
     AuthRoutingModule,
     SharedModule,
-    MatSlideToggleModule,
-    NgxMatIntlTelInputComponent,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
@@ -47,8 +40,7 @@ import { NgxColorsModule } from 'ngx-colors';
       isolate: false,
       extend: true
     }),
-    EffectsModule.forFeature([LoginEffects, UserEffects]),
-    NgxColorsModule
+    EffectsModule.forFeature([LoginEffects, UserEffects])
   ],
   providers: [
     AuthService,

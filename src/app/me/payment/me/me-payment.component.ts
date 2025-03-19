@@ -14,11 +14,17 @@ import {
 } from '../../../interfaces/payment';
 import { Analytics, logEvent } from '@angular/fire/analytics';
 import { TranslateService } from '@ngx-translate/core';
+import { SharedModule } from "../../../shared/shared.module";
+import { BankComponent } from "../../../shared/bank/bank.component";
+import { BackButtonDirective } from "../../../directives/back-button.directive";
+import { CurrencySymbolPipe } from "../../../pipes/currency-symbol.pipe";
 
 @Component({
   selector: 'app-me-payment',
   templateUrl: './me-payment.component.html',
-  styleUrls: ['./me-payment.component.scss']
+  styleUrls: ['./me-payment.component.scss'],
+  standalone: true,
+  imports: [SharedModule, BankComponent, BackButtonDirective, CurrencySymbolPipe],
 })
 export class MePaymentComponent implements OnInit, OnDestroy {
 

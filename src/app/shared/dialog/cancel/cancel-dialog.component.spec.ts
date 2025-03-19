@@ -8,8 +8,8 @@ describe('CancelDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CancelDialogComponent ]
-    })
+    imports: [CancelDialogComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(CancelDialogComponent);

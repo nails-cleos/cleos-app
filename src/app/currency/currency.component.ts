@@ -15,11 +15,15 @@ import { Currency, ICurrency } from '../interfaces/currency';
 import * as fromActionsCurrency from '../store/currency.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { fieldChange } from '../util/validators';
+import { SharedModule } from "../shared/shared.module";
+import { BackButtonDirective } from "../directives/back-button.directive";
 
 @Component({
   selector: 'app-currency',
   templateUrl: './currency.component.html',
-  styleUrls: ['./currency.component.scss']
+  styleUrls: ['./currency.component.scss'],
+  standalone: true,
+  imports: [SharedModule, BackButtonDirective],
 })
 export class CurrencyComponent implements OnInit, OnDestroy {
   @Input() currency?: ICurrency;

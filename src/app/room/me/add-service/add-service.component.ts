@@ -10,11 +10,16 @@ import { IService, IServicePrice, ServicePrice, ServiceType } from '../../../int
 import { IGroupService } from '../../../interfaces/treatment';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { createTreatmentGroupService, executeDialogNoWidth } from '../../../util/helper';
+import { SharedModule } from "../../../shared/shared.module";
+import { CurrencySymbolPipe } from "../../../pipes/currency-symbol.pipe";
+import { BackButtonDirective } from "../../../directives/back-button.directive";
 
 @Component({
   selector: 'app-add-service',
   templateUrl: './add-service.component.html',
-  styleUrls: ['./add-service.component.scss']
+  styleUrls: ['./add-service.component.scss'],
+  standalone: true,
+  imports: [SharedModule, CurrencySymbolPipe, BackButtonDirective],
 })
 export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -140,7 +145,9 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
 
 @Component({
   selector: 'app-price-dialog',
-  templateUrl: 'price-dialog.html'
+  templateUrl: 'price-dialog.html',
+  standalone: true,
+  imports: [SharedModule],
 })
 export class PriceDialogComponent implements OnInit {
 

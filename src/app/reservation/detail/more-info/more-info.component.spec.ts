@@ -8,8 +8,8 @@ describe('MoreInfoComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ MoreInfoComponent ]
-    })
+    imports: [MoreInfoComponent]
+})
     .compileComponents();
   });
 

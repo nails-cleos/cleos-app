@@ -4,65 +4,72 @@
       <mat-card appearance="outlined">
         <mat-card-content>
           <h2>{{ 'ROOM.ME.SERVICES.ADDITIONAL.TITLE' | translate }}</h2>
-          <div *ngIf="(selectedAdditional.length && !additional.length) || (!selectedAdditional.length && additional.length)
-      || (selectedAdditional.length && additional.length); else boxSkeleton" class="inner-row-container">
-            <div class="drag-container">
-              <div class="section-heading">{{ 'ROOM.ME.SERVICES.ALL' | translate }}</div>
-              <div #additionalList="cdkDropList" (cdkDropListDropped)="drop($event, false)"
-                   [cdkDropListConnectedTo]="[selectedAdditionalList]" [cdkDropListData]="additional" cdkDropList
-                   class="item-list">
-                <div *ngFor="let item of additional" cdkDrag class="item-box">{{ item.name }}</div>
+          @if ((selectedAdditional.length && !additional.length) || (!selectedAdditional.length && additional.length) || (selectedAdditional.length && additional.length)) {
+            <div class="inner-row-container">
+              <div class="drag-container">
+                <div class="section-heading">{{ 'ROOM.ME.SERVICES.ALL' | translate }}</div>
+                <div #additionalList="cdkDropList" (cdkDropListDropped)="drop($event, false)"
+                     [cdkDropListConnectedTo]="[selectedAdditionalList]" [cdkDropListData]="additional" cdkDropList
+                     class="item-list">
+                  @for (item of additional; track item) {
+                    <div cdkDrag class="item-box">{{ item.name }}</div>
+                  }
+                </div>
               </div>
-            </div>
 
-            <div class="drag-container">
-              <div class="section-heading">{{ 'ROOM.ME.SERVICES.SELECTED' | translate }}</div>
-              <div #selectedAdditionalList="cdkDropList" (cdkDropListDropped)="drop($event,true)"
-                   [cdkDropListConnectedTo]="[additionalList]" [cdkDropListData]="selectedAdditional" cdkDropList
-                   class="item-list">
-                <div (click)="changePrice(item)" *ngFor="let item of selectedAdditional" cdkDrag class="item-box">
-                  <div>
-                    <div>{{ item.name }}</div>
-                    <div>{{ item.currency | currencySymbol }} {{ item.price }}</div>
-                  </div>
+              <div class="drag-container">
+                <div class="section-heading">{{ 'ROOM.ME.SERVICES.SELECTED' | translate }}</div>
+                <div #selectedAdditionalList="cdkDropList" (cdkDropListDropped)="drop($event,true)"
+                     [cdkDropListConnectedTo]="[additionalList]" [cdkDropListData]="selectedAdditional" cdkDropList
+                     class="item-list">
+                  @for (item of selectedAdditional; track item) {
+                    <div (click)="changePrice(item)" cdkDrag class="item-box">
+                      <div>
+                        <div>{{ item.name }}</div>
+                        <div>{{ item.currency | currencySymbol }} {{ item.price }}</div>
+                      </div>
+                    </div>
+                  }
                 </div>
               </div>
             </div>
-          </div>
+          } @else {
+            <div class="ssc-square mb"></div>
+          }
           <h2>{{ 'ROOM.ME.SERVICES.TREATMENT.TITLE' | translate }}</h2>
-          <div *ngIf="groups.size; else boxSkeleton">
-            <div *ngFor="let group of groups | keyvalue">
+          @if (groups.size) {
+            @for (group of groups | keyvalue; track group) {
               <div class="inner-row-container">
                 <div class="drag-container">
                   <div class="section-heading">{{ group.value.name }}</div>
                   <div #treatmentList="cdkDropList" (cdkDropListDropped)="drop($event, false)"
                        [cdkDropListConnectedTo]="[selectedTreatmentList]" [cdkDropListData]="group.value.treatments"
-                       cdkDropList
-                       class="item-list">
-                    <div *ngFor="let item of group.value.treatments" cdkDrag class="item-box">{{ item.name }}</div>
+                       cdkDropList class="item-list">
+                    @for (item of group.value.treatments; track item) {
+                      <div cdkDrag class="item-box">{{ item.name }}</div>
+                    }
                   </div>
                 </div>
                 <div class="drag-container">
                   <div class="section-heading">{{ group.value.name }}</div>
                   <div #selectedTreatmentList="cdkDropList" (cdkDropListDropped)="drop($event,true)"
                        [cdkDropListConnectedTo]="[treatmentList]" [cdkDropListData]="group.value.selectedTreatments"
-                       cdkDropList
-                       class="item-list">
-                    <div (click)="changePrice(item)" *ngFor="let item of group.value.selectedTreatments" cdkDrag
-                         class="item-box">
-                      <div>
-                        <div>{{ item.name }}</div>
-                        <div>{{ item.currency | currencySymbol }} {{ item.price }}</div>
+                       cdkDropList class="item-list">
+                    @for (item of group.value.selectedTreatments; track item) {
+                      <div (click)="changePrice(item)" cdkDrag class="item-box">
+                        <div>
+                          <div>{{ item.name }}</div>
+                          <div>{{ item.currency | currencySymbol }} {{ item.price }}</div>
+                        </div>
                       </div>
-                    </div>
+                    }
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-          <ng-template #boxSkeleton>
+            }
+          } @else {
             <div class="ssc-square mb"></div>
-          </ng-template>
+          }
         </mat-card-content>
         <mat-card-actions class="card-actions">
           <div class="spacer"></div>

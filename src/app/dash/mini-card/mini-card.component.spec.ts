@@ -8,8 +8,8 @@ describe('MiniCardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ MiniCardComponent ]
-    })
+    imports: [MiniCardComponent]
+})
     .compileComponents();
   });
 

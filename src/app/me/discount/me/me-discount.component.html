@@ -4,70 +4,71 @@
     <ng-container matColumnDef="position">
       <th *matHeaderCellDef mat-header-cell>#</th>
       <td *matCellDef="let userDiscount; let i = index;" mat-cell>
-        <div *ngIf="userDiscount.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
-        <ng-template #skeleton>
+        @if (userDiscount.id) {
+          <div>{{ (paginator.pageIndex * pageSize) + i + 1 }}</div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="discountCustomer.name">
       <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
       <td *matCellDef="let userDiscount" mat-cell>
-        <div *ngIf="userDiscount.id; else skeleton">{{userDiscount.discountCustomer.name}}</div>
-        <ng-template #skeleton>
+        @if (userDiscount.id) {
+          <div>{{ userDiscount.discountCustomer.name }}</div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="discountCustomer.amount">
       <th *matHeaderCellDef mat-header-cell
-          mat-sort-header>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
+          mat-sort-header>{{ 'COMMON.COLUMN.AMOUNT' | translate }}
+      </th>
       <td *matCellDef="let userDiscount" mat-cell>
-        <div *ngIf="userDiscount.id; else skeleton" class="bold">{{userDiscount.symbol}}</div>
-        <ng-template #skeleton>
+        @if (userDiscount.id) {
+          <div class="bold">{{ userDiscount.symbol | currency }}</div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="used">
       <th *matHeaderCellDef class="hide-xs" mat-header-cell
-          mat-sort-header>{{ 'ME.DISCOUNT.LIST.COLUMN.USED' | translate }}</th>
+          mat-sort-header>{{ 'ME.DISCOUNT.LIST.COLUMN.USED' | translate }}
+      </th>
       <td *matCellDef="let userDiscount" class="hide-xs" mat-cell>
-        <div *ngIf="userDiscount.id; else skeleton">
-          <div *ngIf="userDiscount.used; else notUsed">
-            <mat-icon>done</mat-icon>
-          </div>
-          <ng-template #notUsed>
-            <mat-icon>pending</mat-icon>
-          </ng-template>
-        </div>
-        <ng-template #skeleton>
+        @if (userDiscount.id) {
+          <mat-icon>userDiscount.user ? done : pending</mat-icon>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="actions">
       <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
       <td *matCellDef="let userDiscount" mat-cell>
-        <div *ngIf="userDiscount.id; else skeleton">
-          <button (click)="useDiscount(userDiscount)" *ngIf="!userDiscount.used" mat-icon-button
-                  matTooltip="{{ 'COMMON.BUTTON.BOOK' | translate }}" matTooltipPosition="left">
-            <mat-icon color="primary">book_online</mat-icon>
-          </button>
-        </div>
-        <ng-template #skeleton>
+        @if (userDiscount.id) {
+          @if (!userDiscount.used) {
+            <button (click)="useDiscount(userDiscount)" mat-icon-button
+                    matTooltip="{{ 'COMMON.BUTTON.BOOK' | translate }}" matTooltipPosition="left">
+              <mat-icon color="primary">book_online</mat-icon>
+            </button>
+          }
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="noContent">
       <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-        {{ 'ME.DISCOUNT.LIST.ERROR.NO_CONTENT' | translate }}</td>
+        {{ 'ME.DISCOUNT.LIST.ERROR.NO_CONTENT' | translate }}
+      </td>
     </ng-container>
 
     <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
@@ -75,5 +76,7 @@
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
     <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
   </table>
-  <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+  @if (resultsLength) {
+    <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+  }
 </div>

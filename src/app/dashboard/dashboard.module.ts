@@ -1,9 +1,7 @@
 import { NgModule } from '@angular/core';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EffectsModule } from '@ngrx/effects';
-import { CalendarModule, CalendarMonthModule } from 'angular-calendar';
 import { DashboardComponent } from './dashboard.component';
-import { SharedModule } from '../shared/shared.module';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { DashboardEffects } from '../store/effects/dashboard.effects';
 import { DashboardRoutingModule } from './dashboard-routing.module';
@@ -23,15 +21,10 @@ import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
 
 @NgModule({
-  declarations: [
-    DashboardComponent,
-    DayViewSchedulerComponent
-  ],
   imports: [
+    DashboardComponent,
+    DayViewSchedulerComponent,
     DashboardRoutingModule,
-    SharedModule,
-    CalendarMonthModule,
-    CalendarModule,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,

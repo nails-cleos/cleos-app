@@ -7,7 +7,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { executeDialogNoWidth } from '../util/helper';
 
 @Directive({
-  selector: '[appBackButton]'
+  selector: '[appBackButton]',
+  standalone: true,
 })
 export class BackButtonDirective {
   @Input() form?: UntypedFormGroup;

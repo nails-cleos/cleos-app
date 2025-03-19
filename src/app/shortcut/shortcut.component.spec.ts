@@ -8,8 +8,8 @@ describe('ShortcutComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ShortcutComponent ]
-    })
+    imports: [ShortcutComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(ShortcutComponent);

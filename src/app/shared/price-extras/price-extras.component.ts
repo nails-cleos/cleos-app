@@ -3,13 +3,14 @@ import { IAdditionalAll } from '../../interfaces/additional';
 import { IExtras } from '../../interfaces/reservation';
 import { SharedModule } from '../shared.module';
 import { ICurrencyAll } from '../../interfaces/currency';
+import { CurrencySymbolPipe } from "../../pipes/currency-symbol.pipe";
 
 @Component({
   selector: 'app-price-extras',
-  standalone: true,
-  imports: [SharedModule],
   templateUrl: './price-extras.component.html',
-  styleUrl: './price-extras.component.scss'
+  styleUrl: './price-extras.component.scss',
+  standalone: true,
+  imports: [SharedModule, CurrencySymbolPipe],
 })
 export class PriceExtrasComponent {
   @Input('key') key!: string;
