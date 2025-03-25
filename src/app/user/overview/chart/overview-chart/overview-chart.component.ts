@@ -23,7 +23,8 @@ export class OverviewChartComponent implements OnChanges {
   constructor() {
   }
 
-  ngOnChanges(_: SimpleChanges): void {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  ngOnChanges(_changes: SimpleChanges): void {
     if (this.chartSummary) {
       this.chart = createChart(this.chartSummary, this.currency, this.isDark);
     }

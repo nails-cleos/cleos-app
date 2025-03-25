@@ -44,5 +44,5 @@ export class AccountService {
   delete = (id: string): Observable<IAccount> => this.http.delete<IAccount>(toUrl(this.urlV1, id))
 
   update = (transaction: ITransaction): Observable<IAccount> => this.http.patch<IAccount>(
-    toUrl(this.urlV1, transaction.accountId!!), transaction)
+    toUrl(this.urlV1, transaction.accountId!), transaction)
 }

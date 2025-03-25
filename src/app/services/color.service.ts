@@ -35,5 +35,5 @@ export class ColorService {
 
   delete = (id: string): Observable<IColor> => this.http.delete<IColor>(toUrl(this.urlV1, id));
 
-  update = (color: IColor): Observable<IColor> => this.http.patch<IColor>(toUrl(this.urlV1, color.id!!), color);
+  update = (color: IColor): Observable<IColor> => this.http.patch<IColor>(toUrl(this.urlV1, color.id!), color);
 }

@@ -59,7 +59,8 @@ export class AvailabilityComponent implements OnChanges {
     return this.availability.emit(availability);
   }
 
-  ngOnChanges(_: SimpleChanges): void {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  ngOnChanges(_changes: SimpleChanges): void {
     const timeZone = getCurrentTimeZone();
     const start = this.dates?.startDate || createDate(timeZone, 9, 0);
     const end = this.dates?.endDate || createDate(timeZone, 18, 0);

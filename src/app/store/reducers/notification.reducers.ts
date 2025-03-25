@@ -1,5 +1,6 @@
 import { All, NotificationActionTypes } from '../notification.actions';
-import { INotificationDTO } from '../../interfaces/notification';
+import { INotification, INotificationDTO } from '../../interfaces/notification';
+import { Pagination } from "../../interfaces/pagination";
 
 export interface State {
   data: INotificationDTO | null;
@@ -26,8 +27,7 @@ export const reducer = (state = initialState, action: All): State => {
     case NotificationActionTypes.notificationPage: {
       return {
         ...state,
-        // @ts-ignore
-        data: { page: { content: [{}, {}, {}] } },
+        data: { page: { content: [{}, {}, {}] } as Pagination<INotification>, unread: -1 },
         dataDeleted: null,
         errorMessage: null,
         subErrors: null,

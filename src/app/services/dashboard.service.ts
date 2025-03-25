@@ -22,7 +22,7 @@ export class DashboardService {
   updateEvent = (
     reservation: IReservation
   ): Observable<IRoomEvents> => this.http.patch<IRoomEvents>(
-    toUrl(this.urlV1, 'me', 'events', reservation.id!!),
+    toUrl(this.urlV1, 'me', 'events', reservation.id!),
     reservation
   )
 

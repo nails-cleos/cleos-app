@@ -1,7 +1,6 @@
 import { Action } from '@ngrx/store';
 
 export enum PaymentActionTypes {
-  getAll = '[Payment] Get all',
   paymentSuccess = '[Payment] Success',
   paymentSave = '[Payment] Save',
   paymentUpdate = '[Payment] Update',
@@ -18,13 +17,6 @@ export enum PaymentActionTypes {
   paymentOptions = '[Payment] Options',
   paymentCreate = '[Payment] Create',
   clean = '[Payment] Clean'
-}
-
-export class GetAll implements Action {
-  readonly type = PaymentActionTypes.getAll;
-
-  constructor(public payload: any) {
-  }
 }
 
 export class PaymentSuccess implements Action {
@@ -134,7 +126,6 @@ export class Clean implements Action {
 }
 
 export type All =
-  | GetAll
   | PaymentSave
   | PaymentUpdate
   | PaymentUpdateLink

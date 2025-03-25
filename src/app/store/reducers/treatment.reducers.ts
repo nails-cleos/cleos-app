@@ -32,8 +32,7 @@ export const reducer = (state = initialState, action: All): State => {
     case TreatmentActionTypes.getAll: {
       return {
         ...state,
-        // @ts-ignore
-        data: { content: [{}, {}, {}], totalElements: 3 },
+        data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<ITreatmentGroup>,
         errorMessage: null,
         subErrors: null,
         selected: null,

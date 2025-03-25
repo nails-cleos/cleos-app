@@ -33,6 +33,6 @@ export class CurrencyService {
   delete = (id: string): Observable<ICurrency> => this.http.delete<ICurrency>(toUrl(this.urlV1, id));
 
   update = (currency: ICurrency): Observable<ICurrency> => this.http.patch<ICurrency>(
-    toUrl(this.urlV1, currency.id!!), currency
+    toUrl(this.urlV1, currency.id!), currency
   );
 }

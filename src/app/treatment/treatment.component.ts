@@ -139,7 +139,7 @@ export class TreatmentComponent implements OnInit, OnDestroy {
   }
 
   setValue = (treatment: ITreatment, attribute: string, $event: any): void => {
-    // @ts-ignore
+    // @ts-expect-error assign value in treatment[attribute]
     treatment[attribute] = $event.target.value;
   }
 

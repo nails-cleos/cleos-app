@@ -152,7 +152,7 @@ export class ReservationService {
 
   update = (
     reservation: IReservation
-  ): Observable<IReservation> => this.http.patch<IReservation>(toUrl(this.urlV1, reservation.id!!), reservation);
+  ): Observable<IReservation> => this.http.patch<IReservation>(toUrl(this.urlV1, reservation.id!), reservation);
 
   changeState = (
     reservationId: string,
@@ -181,7 +181,7 @@ export class ReservationService {
 
   addReview = (
     review: IReview
-  ): Observable<IReview> => this.http.post<IReview>(toUrl(this.urlV1, review.reservationId!!, 'reviews'), review);
+  ): Observable<IReview> => this.http.post<IReview>(toUrl(this.urlV1, review.reservationId!, 'reviews'), review);
 
   addNote = (
     id: string,

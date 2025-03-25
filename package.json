@@ -2,8 +2,8 @@
   "name": "cleos",
   "version": "1.2.27-rc",
   "engines": {
-    "node": "v20.13.1",
-    "npm": "10.5.2"
+    "node": "v22.14.0",
+    "npm": "10.9.2"
   },
   "scripts": {
     "ng": "ng",
@@ -17,7 +17,8 @@
     "postbuild-pwa": "cp -r ./src/manifest-dev.json ./dist/cleos/manifest.json && cp ./src/firebase-messaging-sw-dev.js ./dist/cleos/firebase-messaging-sw-dev.js",
     "build:source": "ng build --source-map",
     "test": "ng test",
-    "lint": "ng lint --fix",
+    "lint": "ng lint",
+    "lint-fix": "ng lint --fix",
     "eslint": "eslint src --fix",
     "e2e": "ng e2e",
     "heroku-postbuild": "ng build --configuration=staging",

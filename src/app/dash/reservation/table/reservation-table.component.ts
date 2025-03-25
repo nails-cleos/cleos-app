@@ -86,6 +86,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
     this.getReservations();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ngOnChanges(_: SimpleChanges): void {
     if (this.sort) {
       this.paginator.pageIndex = 0;

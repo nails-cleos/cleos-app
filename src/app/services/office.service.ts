@@ -32,5 +32,5 @@ export class OfficeService {
 
   delete = (id: string): Observable<IOffice> => this.http.delete<IOffice>(toUrl(this.urlV1, id));
 
-  update = (office: IOffice): Observable<IOffice> => this.http.patch<IOffice>(toUrl(this.urlV1, office.id!!), office);
+  update = (office: IOffice): Observable<IOffice> => this.http.patch<IOffice>(toUrl(this.urlV1, office.id!), office);
 }

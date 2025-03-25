@@ -1,3 +1,5 @@
+import packageJson from '../../package.json';
+
 export const environment = {
   production: false,
   useEmulators: false,
@@ -8,7 +10,7 @@ export const environment = {
   appDomain: 'localhost',
   appServer: 'http://localhost:4300',
   title: 'Cleos DEV',
-  version: require('../../package.json').version + '-dev',
+  version: packageJson.version + '-dev',
   baseUrl: 'http://localhost:9999/api',
   googleClientId: '364998384255-kk09n0fq6p79s7oim94ljevf8bb0etip.apps.googleusercontent.com',
   facebookClientId: '453309609006101',

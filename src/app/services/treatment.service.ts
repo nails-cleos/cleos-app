@@ -53,7 +53,7 @@ export class TreatmentService {
 
   update = (
     treatment: ITreatmentGroup
-  ): Observable<ITreatmentGroup> => this.http.patch<ITreatmentGroup>(toUrl(this.urlV1, treatment.id!!), treatment);
+  ): Observable<ITreatmentGroup> => this.http.patch<ITreatmentGroup>(toUrl(this.urlV1, treatment.id!), treatment);
 
   updateSort = (
     treatments: ISorted[]

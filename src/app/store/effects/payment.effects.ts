@@ -11,15 +11,6 @@ import { Router } from '@angular/router';
 @Injectable()
 export class PaymentEffects {
 
-  getAll$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.getAll)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.paymentService.getAll(payload.active, payload.direction, payload.page,
-      payload.size).pipe(
-      switchMap((response: any) => of(new fromActionsPayment.PaymentSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
-    ))
-  ));
-
   findOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentFind)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.paymentService.getById(payload).pipe(

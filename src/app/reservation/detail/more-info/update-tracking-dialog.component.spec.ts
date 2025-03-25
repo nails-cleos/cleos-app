@@ -32,6 +32,7 @@ describe('UpdateTrackingDialogComponent', () => {
   });
 
   it('should close the dialog with no data on onNoClick', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     component.onNoClick;
     expect(dialogRefSpy.close).toHaveBeenCalledWith();
   });
@@ -39,6 +40,7 @@ describe('UpdateTrackingDialogComponent', () => {
   it('should close the dialog with data on doAction', () => {
     component.startedDate.setValue(new Date());
     component.completedDate.setValue(new Date());
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     component.doAction;
     expect(dialogRefSpy.close).toHaveBeenCalledWith(jasmine.objectContaining({
       started: jasmine.any(String),

@@ -35,7 +35,8 @@ export class TreatmentTableComponent implements AfterViewInit, OnChanges {
     this.dataSource.paginator = this.paginator;
   }
 
-  ngOnChanges(_: SimpleChanges): void {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  ngOnChanges(_changes: SimpleChanges): void {
     this.dataSource = this.treatment?.map(p => {
       if (p.duration) {
         const duration = convertDuration(p.duration);

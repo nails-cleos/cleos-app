@@ -44,7 +44,7 @@ export class UserService {
 
   update = (
     user: IUser
-  ): Observable<IUser> => this.http.patch<IUser>(toUrl(this.userUrlV1, user.id!!), user);
+  ): Observable<IUser> => this.http.patch<IUser>(toUrl(this.userUrlV1, user.id!), user);
 
   updateMe = (user: IUser): Observable<IUser> => this.http.patch<IUser>(toUrl(this.userUrlV1, 'me'), user);
 
@@ -70,7 +70,7 @@ export class UserService {
 
   delete = (id: string): Observable<IUser> => this.http.delete<IUser>(toUrl(this.userUrlV1, id));
 
-  restore = (user: IUser): Observable<IUser> => this.http.patch<IUser>(toUrl(this.userUrlV1, user.id!!), user);
+  restore = (user: IUser): Observable<IUser> => this.http.patch<IUser>(toUrl(this.userUrlV1, user.id!), user);
 
   resend = (id: string): Observable<any> => this.http.post(toUrl(this.userUrlV1, id, 'token'), null);
 

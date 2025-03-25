@@ -20,7 +20,7 @@ export class NoteService {
 
   delete = (id: string): Observable<INote> => this.http.delete<INote>(toUrl(this.urlV1, id));
 
-  update = (note: INote): Observable<INote> => this.http.patch<INote>(toUrl(this.urlV1, note.id!!), note);
+  update = (note: INote): Observable<INote> => this.http.patch<INote>(toUrl(this.urlV1, note.id!), note);
 
   complete = (id: string): Observable<INote> => this.http.patch<INote>(toUrl(this.urlV1, id, 'complete'), null);
 }

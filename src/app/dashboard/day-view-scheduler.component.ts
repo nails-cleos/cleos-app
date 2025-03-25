@@ -117,8 +117,7 @@ export class DayViewSchedulerComponent extends CalendarWeekViewComponent impleme
   @Output() professionalChanged = new EventEmitter();
   @Output() segmentClicked: EventEmitter<{ date: Date; professionalId: string; }> = new EventEmitter();
 
-  // @ts-ignore
-  view: DayViewScheduler;
+  view!: DayViewScheduler;
 
   daysInWeek = 1;
 

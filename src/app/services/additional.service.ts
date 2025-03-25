@@ -38,7 +38,7 @@ export class AdditionalService {
   delete = (id: string): Observable<IAdditional> => this.http.delete<IAdditional>(toUrl(this.urlV1, id));
 
   update = (additional: IAdditional): Observable<IAdditional> => this.http.patch<IAdditional>(
-    toUrl(this.urlV1, additional.id!!), additional
+    toUrl(this.urlV1, additional.id!), additional
   );
 
   updateSort = (additionalList: ISorted[]): Observable<IAdditionalAll[]> => this.http.patch<IAdditionalAll[]>(

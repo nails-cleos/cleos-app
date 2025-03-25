@@ -44,7 +44,7 @@ export class RoomService {
 
   delete = (id: string): Observable<IRoom> => this.http.delete<IRoom>(toUrl(this.urlV1, id));
 
-  update = (room: IRoom): Observable<IRoom> => this.http.patch<IRoom>(toUrl(this.urlV1, room.id!!), room);
+  update = (room: IRoom): Observable<IRoom> => this.http.patch<IRoom>(toUrl(this.urlV1, room.id!), room);
 
   updateService = (
     id: string,

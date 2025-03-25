@@ -46,7 +46,7 @@ export class MenuItemComponent implements OnInit {
 
   toggleSubMenu = (index: number) => {
     // Close all other submenus
-    for (let key in this.openSubMenus) {
+    for (const key in this.openSubMenus) {
       if (Number(key) !== index) {
         this.openSubMenus[key] = false;
       }
@@ -61,7 +61,7 @@ export class MenuItemComponent implements OnInit {
       this.openSubSubMenus[index] = {};
     }
     // Close all other sub-submenus within the same sub-menu
-    for (let key in this.openSubSubMenus[index]) {
+    for (const key in this.openSubSubMenus[index]) {
       if (Number(key) !== subIndex) {
         this.openSubSubMenus[index][key] = false;
       }

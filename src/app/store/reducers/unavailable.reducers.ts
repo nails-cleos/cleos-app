@@ -33,8 +33,7 @@ export const reducer = (state = initialState, action: All): State => {
     case UnavailableActionTypes.getAll: {
       return {
         ...state,
-        // @ts-ignore
-        data: { content: [{}, {}, {}], totalElements: 3 },
+        data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IUnavailable>,
         errorMessage: null,
         subErrors: null,
         selected: null,

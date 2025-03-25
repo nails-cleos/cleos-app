@@ -7,7 +7,7 @@ export interface State {
   errorMessage: string | null;
   error: any;
   subErrors: any;
-  selected: IPayment | null;
+  selected: IPayment | IPayment[] | null;
   message: string | null;
   paths: string[] | null;
   reload: boolean | null;
@@ -28,23 +28,11 @@ export const initialState: State = {
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case PaymentActionTypes.getAll: {
-      return {
-        ...state,
-        // @ts-ignore
-        data: { content: [{}, {}, {}], totalElements: 3 },
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
     case PaymentActionTypes.paymentByResource: {
       return {
         ...state,
         errorMessage: null,
         subErrors: null,
-        // @ts-ignore
         selected: [{}, {}, {}],
         message: null
       };

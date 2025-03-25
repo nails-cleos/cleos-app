@@ -1,3 +1,5 @@
+import packageJson from '../../package.json';
+
 export const environment = {
   production: true,
   useEmulators: false,
@@ -8,7 +10,7 @@ export const environment = {
   appDomain: 'typically-optimum-tetra.ngrok-free.app',
   appServer: 'https://typically-optimum-tetra.ngrok-free.app',
   title: 'Cleos PWA',
-  version: require('../../package.json').version + '-pwa',
+  version: packageJson.version + '-pwa',
   baseUrl: 'http://localhost:9999/api',
   googleClientId: '364998384255-kk09n0fq6p79s7oim94ljevf8bb0etip.apps.googleusercontent.com',
   facebookClientId: '453309609006101',

@@ -1,3 +1,5 @@
+import packageJson from '../../package.json';
+
 export const environment = {
   production: true,
   useEmulators: true,
@@ -8,7 +10,7 @@ export const environment = {
   appDomain: 'cleos-staging.herokuapp.com',
   appServer: 'https://cleos-staging.herokuapp.com',
   title: 'CLEOS STAGING',
-  version: require('../../package.json').version + '-staging',
+  version: packageJson.version + '-staging',
   baseUrl: 'http://localhost:8080/api',
   googleClientId: '364998384255-kk09n0fq6p79s7oim94ljevf8bb0etip.apps.googleusercontent.com',
   facebookClientId: '453309609006101',
