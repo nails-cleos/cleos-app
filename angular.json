@@ -21,7 +21,16 @@
           "builder": "@angular-devkit/build-angular:application",
           "options": {
             "allowedCommonJsDependencies": [
-              "chart.js"
+              "chart.js",
+              "deepmerge",
+              "exceljs",
+              "google-libphonenumber",
+              "file-saver",
+              "timezones-list",
+              "rgbcolor",
+              "core-js",
+              "raf",
+              "pdfmake"
             ],
             "crossOrigin": "anonymous",
             "outputPath": {
