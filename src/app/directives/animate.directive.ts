@@ -8,7 +8,8 @@ import {
 } from '@angular/animations';
 
 @Directive({
-  selector: '[appAnimate]'
+  selector: '[appAnimate]',
+  standalone: true,
 })
 export class AnimateDirective implements OnInit, AfterViewInit, OnDestroy {
 

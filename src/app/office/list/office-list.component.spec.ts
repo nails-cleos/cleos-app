@@ -8,8 +8,8 @@ describe('OfficeListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ OfficeListComponent ]
-    })
+    imports: [OfficeListComponent]
+})
     .compileComponents();
   });
 

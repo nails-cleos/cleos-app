@@ -4,7 +4,7 @@ import { ICatalogue } from '../../interfaces/catalogue';
 import { ITreatmentGroup } from '../../interfaces/treatment';
 
 export interface State {
-  data: ICatalogue | Pagination<ICatalogue> | null;
+  data: ICatalogue | ICatalogue[] | Pagination<ICatalogue> | null;
   groups: ITreatmentGroup[] | null;
   errorMessage: string | null;
   error: any;
@@ -31,7 +31,6 @@ export const reducer = (state = initialState, action: All): State => {
     case CatalogueActionTypes.getAll: {
       return {
         ...state,
-        // @ts-ignore
         data: [{}, {}, {}],
         errorMessage: null,
         subErrors: null,
@@ -90,7 +89,6 @@ export const reducer = (state = initialState, action: All): State => {
     case CatalogueActionTypes.catalogueUpdateAll: {
       return {
         ...state,
-        // @ts-ignore
         data: [{}, {}, {}],
         errorMessage: null,
         subErrors: null,

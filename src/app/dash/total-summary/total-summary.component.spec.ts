@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { TotalSummaryComponent } from './total-summary.component';
 
 describe('TotalSummaryComponent', () => {
@@ -8,9 +7,9 @@ describe('TotalSummaryComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ TotalSummaryComponent ]
-    })
-    .compileComponents();
+    imports: [TotalSummaryComponent]
+})
+      .compileComponents();
 
     fixture = TestBed.createComponent(TotalSummaryComponent);
     component = fixture.componentInstance;
@@ -19,5 +18,9 @@ describe('TotalSummaryComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should initialize showCash to false', () => {
+    expect(component.showCash).toBeFalse();
   });
 });

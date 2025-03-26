@@ -7,11 +7,10 @@ import { SharedModule } from "../../shared/shared.module";
 import { NgOptimizedImage } from "@angular/common";
 
 @Component({
-  selector: 'app-treatment',
-  standalone: true,
-  imports: [SharedModule, NgOptimizedImage],
-  templateUrl: './treatment.component.html',
-  styleUrl: './treatment.component.scss'
+    selector: 'app-treatment',
+    templateUrl: './treatment.component.html',
+    styleUrl: './treatment.component.scss',
+    imports: [SharedModule, NgOptimizedImage]
 })
 export class TreatmentComponent implements OnInit {
   sections?: ISection[];

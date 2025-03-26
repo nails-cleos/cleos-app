@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { IUser } from '../interfaces/user';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -18,14 +18,12 @@ export class UserService {
   private customerUrl = 'customers';
   private officeUrl = `offices/managers`;
 
-
   private userUrlV1 = `v1/${ this.userUrl }`;
   private professionalUrlV1 = `v1/${ this.professionalUrl }`;
   private customerUrlV1 = `v1/${ this.customerUrl }`;
   private officeUrlV1 = `v1/${ this.officeUrl }`;
 
-  constructor(private http: HttpClient) {
-  }
+  private http: HttpClient = inject(HttpClient);
 
   getAll = (
     sort: string,
@@ -46,7 +44,7 @@ export class UserService {
 
   update = (
     user: IUser
-  ): Observable<IUser> => this.http.patch<IUser>(toUrl(this.userUrlV1, user.id!!), user);
+  ): Observable<IUser> => this.http.patch<IUser>(toUrl(this.userUrlV1, user.id!), user);
 
   updateMe = (user: IUser): Observable<IUser> => this.http.patch<IUser>(toUrl(this.userUrlV1, 'me'), user);
 
@@ -72,7 +70,7 @@ export class UserService {
 
   delete = (id: string): Observable<IUser> => this.http.delete<IUser>(toUrl(this.userUrlV1, id));
 
-  restore = (user: IUser): Observable<IUser> => this.http.patch<IUser>(toUrl(this.userUrlV1, user.id!!), user);
+  restore = (user: IUser): Observable<IUser> => this.http.patch<IUser>(toUrl(this.userUrlV1, user.id!), user);
 
   resend = (id: string): Observable<any> => this.http.post(toUrl(this.userUrlV1, id, 'token'), null);
 

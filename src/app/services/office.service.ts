@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
@@ -14,8 +14,7 @@ export class OfficeService {
   private url = 'offices';
   private urlV1 = `v1/${ this.url }`;
 
-  constructor(private http: HttpClient) {
-  }
+  private http: HttpClient = inject(HttpClient);
 
   getAll = (
     sort: string,
@@ -33,5 +32,5 @@ export class OfficeService {
 
   delete = (id: string): Observable<IOffice> => this.http.delete<IOffice>(toUrl(this.urlV1, id));
 
-  update = (office: IOffice): Observable<IOffice> => this.http.patch<IOffice>(toUrl(this.urlV1, office.id!!), office);
+  update = (office: IOffice): Observable<IOffice> => this.http.patch<IOffice>(toUrl(this.urlV1, office.id!), office);
 }

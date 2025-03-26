@@ -8,8 +8,8 @@ describe('QuarterComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ YearComponent ]
-    })
+    imports: [YearComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(YearComponent);

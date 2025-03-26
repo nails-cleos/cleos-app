@@ -8,11 +8,14 @@ import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
 import { map, startWith } from 'rxjs/operators';
 import * as fromActionsUser from '../../store/user.actions';
+import { SharedModule } from "../../shared/shared.module";
 
 
 @Component({
   selector: 'app-change-customer-dialog-component',
-  templateUrl: './change-customer-dialog.component.html'
+  templateUrl: './change-customer-dialog.component.html',
+  standalone: true,
+  imports: [SharedModule]
 })
 export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
   customerForm!: UntypedFormGroup;

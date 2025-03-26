@@ -3,6 +3,7 @@
     <div class="card-content">
       @if (user && !user.isCompleted) {
         <span class="incomplete">{{ 'COMMON.PROFILE.INCOMPLETE' | translate }}</span>
+        <span class="fi fi-gr"></span> <span class="fi fi-gr fis"></span>
       }
       <mat-card appearance="outlined">
         <mat-card-header class="center">
@@ -61,18 +62,11 @@
                   </mat-select>
                   <mat-error [innerHTML]="'COMMON.USER.LANG.REQUIRED' | translate"></mat-error>
                 </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>{{ 'COMMON.USER.PHONE.FIELD' | translate }}</mat-label>
-                  <ngx-mat-intl-tel-input [enablePlaceholder]="true" [enableSearch]="true" [formControl]="phone"
-                                          [required]="true" [preferredCountries]="['nl']" name="phone">
-                  </ngx-mat-intl-tel-input>
-                  @if (phone.hasError('validatePhoneNumber')) {
-                    <mat-error>{{ 'COMMON.USER.PHONE.INVALID' | translate }}</mat-error>
-                  }
-                  @if (phone.hasError('required')) {
-                    <mat-error [innerHTML]="'COMMON.USER.PHONE.REQUIRED' | translate"></mat-error>
-                  }
-                </mat-form-field>
+                <ngx-material-intl-tel-input style="margin-bottom: 22px !important;"
+                                             [enablePlaceholder]="true" [enableSearch]="true" [fieldControl]="phone"
+                                             [required]="true" [preferredCountries]="['nl']" fieldControlName="phone"
+                                             appearance="outline" [textLabels]="labels">
+                </ngx-material-intl-tel-input>
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'COMMON.USER.DOB.FIELD' | translate }}</mat-label>
                   <button (click)="picker.open()" mat-icon-button matPrefix type="button">
@@ -95,7 +89,6 @@
                   <mat-error class="divider">{{ errors['location'] }}</mat-error>
                 }
                 @if (showColors) {
-
                   <mat-form-field appearance="outline">
                     <mat-label>{{ 'COMMON.PROFESSIONAL.COLOR.DARK.FIELD' | translate }}</mat-label>
                     <input matInput [formControl]="darkColor"/>

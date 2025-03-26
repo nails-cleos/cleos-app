@@ -11,7 +11,7 @@ export const genericRetryStrategy = (
   }) => (error: any, attempts: number) => {
   const retryAttempt = attempts + 1;
   if (excludedStatusCodes.find(e => e === error.status)) {
-    return throwError(error);
+    return throwError(() => error);
   }
   return timer(retryAttempt * scalingDuration);
 };

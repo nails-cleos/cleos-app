@@ -3,7 +3,8 @@ import { IRoom, IRoomAll } from '../interfaces/room';
 import { roomCurrency, roomGMT } from '../util/helper';
 
 @Pipe({
-  name: 'roomName'
+  name: 'roomName',
+  standalone: true
 })
 export class RoomNamePipe implements PipeTransform {
 

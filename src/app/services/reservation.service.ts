@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ICustomerReservation, IReservation, IRoomReservation } from '../interfaces/reservation';
@@ -13,8 +13,7 @@ export class ReservationService {
   private url = 'reservations';
   private urlV1 = `v1/${ this.url }`;
 
-  constructor(private http: HttpClient) {
-  }
+  private http: HttpClient = inject(HttpClient);
 
   getAllPage = (
     page: number,
@@ -153,7 +152,7 @@ export class ReservationService {
 
   update = (
     reservation: IReservation
-  ): Observable<IReservation> => this.http.patch<IReservation>(toUrl(this.urlV1, reservation.id!!), reservation);
+  ): Observable<IReservation> => this.http.patch<IReservation>(toUrl(this.urlV1, reservation.id!), reservation);
 
   changeState = (
     reservationId: string,
@@ -182,7 +181,7 @@ export class ReservationService {
 
   addReview = (
     review: IReview
-  ): Observable<IReview> => this.http.post<IReview>(toUrl(this.urlV1, review.reservationId!!, 'reviews'), review);
+  ): Observable<IReview> => this.http.post<IReview>(toUrl(this.urlV1, review.reservationId!, 'reviews'), review);
 
   addNote = (
     id: string,

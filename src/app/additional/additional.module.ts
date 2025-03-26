@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 import { AdditionalRoutingModule } from './additional-routing.module';
 import { AdditionalComponent } from './additional.component';
 import { AdditionalListComponent } from './list/additional-list.component';
-import { SharedModule } from '../shared/shared.module';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EffectsModule } from '@ngrx/effects';
 import { AdditionalEffects } from '../store/effects/additional.effects';
@@ -17,14 +16,12 @@ import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
 
 @NgModule({
-  declarations: [
+  imports: [
     AdditionalComponent,
     AdditionalListComponent,
-    AdditionalSortingComponent
-  ],
-  imports: [
+    AdditionalSortingComponent,
+    DragDropSortingComponent,
     AdditionalRoutingModule,
-    SharedModule,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
@@ -37,8 +34,7 @@ import { Observable } from 'rxjs';
       isolate: false,
       extend: true
     }),
-    EffectsModule.forFeature([AdditionalEffects]),
-    DragDropSortingComponent
+    EffectsModule.forFeature([AdditionalEffects])
   ],
   providers: [
     AdditionalService,

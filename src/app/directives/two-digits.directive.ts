@@ -1,20 +1,18 @@
-import { Directive, ElementRef, HostListener, Input } from '@angular/core';
+import { Directive, ElementRef, HostListener, inject, Input } from '@angular/core';
 
 @Directive({
-  selector: '[appTwoDigits]'
+  selector: '[appTwoDigits]',
+  standalone: true,
 })
 export class TwoDigitsDirective {
-  @Input() allowNegatives: boolean;
+  @Input() allowNegatives: boolean = false;
 
-  private regex: RegExp;
+  private el: ElementRef = inject(ElementRef);
+
+  private regex: RegExp = new RegExp(/^\d*\.?\d{0,2}$/g);
   // Allow key codes for special events. Reflect :
   // Backspace, tab, end, home
   private specialKeys: Array<string> = ['Backspace', 'Tab', 'End', 'Home', 'ArrowLeft', 'ArrowRight', 'Del', 'Delete'];
-
-  constructor(private el: ElementRef) {
-    this.allowNegatives = false;
-    this.regex = new RegExp(/^\d*\.?\d{0,2}$/g);
-  }
 
   @HostListener('keydown', ['$event'])
   onKeyDown = (event: KeyboardEvent): void => {

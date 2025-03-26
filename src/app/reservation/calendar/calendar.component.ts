@@ -47,7 +47,7 @@ import {
   Meta
 } from '../../util/event';
 import { Router } from '@angular/router';
-import { CalendarEvent, CalendarEventTimesChangedEvent } from 'angular-calendar';
+import { CalendarEvent, CalendarEventTimesChangedEvent, CalendarModule } from 'angular-calendar';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { IUnavailableAll } from '../../interfaces/unavailable';
@@ -63,14 +63,15 @@ import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { INoteAll } from '../../interfaces/note';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Role } from '../../interfaces/token';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
-import * as html2pdf from 'html2pdf.js';
+import { SharedModule } from "../../shared/shared.module";
+import { RoomNamePipe } from "../../pipes/room-name.pipe";
 
 @Component({
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
-  styleUrls: ['./calendar.component.scss']
+  styleUrls: ['./calendar.component.scss'],
+  standalone: true,
+  imports: [SharedModule, RoomNamePipe, CalendarModule]
 })
 export class CalendarComponent implements OnInit, OnDestroy {
   @ViewChild('picker') picker: any;
@@ -104,7 +105,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
   maxDate: Date;
   minDate: Date;
   daysInWeek: number;
-  inProgress: boolean;
 
   isDarkMode?: boolean;
   private selectView: CalendarPeriod = 'day';
@@ -122,7 +122,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
               private formBuilder: UntypedFormBuilder, private authUserService: AuthUserService) {
     this.getState = this.store.select(selectReservationState);
     this.daysInWeek = 7;
-    this.inProgress = false;
     const CALENDAR_RESPONSIVE = {
       xsmall: {
         breakpoint: '(max-width: 576px)',
@@ -186,7 +185,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   get downloadPDF(): void {
-    this.inProgress = true;
     const element = document.getElementById('weekViewPDF');
     if (element) {
       const clone = element.cloneNode(true) as HTMLElement;
@@ -206,18 +204,12 @@ export class CalendarComponent implements OnInit, OnDestroy {
       const endDate = addDays(this.searchDate, Math.floor(this.daysInWeek / 2));
       const startDate = addDays(endDate, 1 - this.daysInWeek);
 
-      const options = {
-        margin: [0, 0.2, 0, 0.2],
-        filename: `From ${ formatDateTwoDigit(startDate, this.locale) } to ${ formatDateTwoDigit(endDate,
-          this.locale) }.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
-      };
+      document.title = `From ${ formatDateTwoDigit(startDate, this.locale) } to ${ formatDateTwoDigit(endDate,
+        this.locale) }`
 
-      html2pdf().from(clone).set(options).save().then(() => this.inProgress = false);
-    } else {
-      this.inProgress = false;
+      document.body.innerHTML = clone.innerHTML;
+      window.print();
+      location.reload()
     }
     return;
   }

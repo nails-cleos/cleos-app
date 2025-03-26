@@ -1,72 +1,80 @@
 <mat-nav-list style="width: 300px">
   @for (menu of items; track menu; let i = $index) {
-    <div *ngIf="menu.subMenus && menu.subMenus.length; else showItems">
-      <mat-list-item (click)="toggleSubMenu(i)">
-        <mat-icon matListItemIcon>{{ menu.icon }}</mat-icon>
-        <div matListItemTitle>{{ menu.subName ? menu.subName : menu.name }}</div>
-        <div matListItemMeta>
-          <mat-icon>{{ isSubMenuOpen(i) ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
-        </div>
-      </mat-list-item>
-      <mat-nav-list *ngIf="isSubMenuOpen(i)">
-        @for (subMenu of menu.subMenus; track subMenu; let j = $index) {
-          <div *ngIf="subMenu.subMenus && subMenu.subMenus.length; else showSubItems">
-            <mat-list-item (click)="toggleSubSubMenu(i, j)" class="sub-menu">
-              <mat-icon matListItemIcon>{{ subMenu.icon }}</mat-icon>
-              <div matListItemTitle>{{ subMenu.subName ? subMenu.subName : subMenu.name }}</div>
-              <div matListItemMeta>
-                <mat-icon>{{ isSubSubMenuOpen(i, j) ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
-              </div>
-            </mat-list-item>
-            <mat-nav-list *ngIf="isSubSubMenuOpen(i, j)">
-              @for (subSubMenu of subMenu.subMenus; track subSubMenu) {
-                <mat-list-item *ngIf="isHandset$ | async; else showSubSubMenu" class="sub-sub-menu"
-                               (click)="navigate(subSubMenu, drawer)" [routerLinkActive]="['active-link']"
-                               [routerLink]="'/'+language+'/'+subSubMenu.path">
-                  <mat-icon matListItemIcon>{{ subSubMenu.icon }}</mat-icon>
-                  <div matListItemTitle>{{ subSubMenu.name }}</div>
-                </mat-list-item>
-                <ng-template #showSubSubMenu>
-                  <mat-list-item (click)="navigate(subSubMenu)" [routerLinkActive]="['active-link']"
-                                 [routerLink]="'/'+language+'/'+subSubMenu.path" class="sub-sub-menu">
-                    <mat-icon matListItemIcon>{{ subSubMenu.icon }}</mat-icon>
-                    <div matListItemTitle>{{ subSubMenu.name }}</div>
-                  </mat-list-item>
-                </ng-template>
-              }
-            </mat-nav-list>
+    @if (menu.subMenus && menu.subMenus.length) {
+      <div>
+        <mat-list-item (click)="toggleSubMenu(i)">
+          <mat-icon matListItemIcon>{{ menu.icon }}</mat-icon>
+          <div matListItemTitle>{{ menu.subName ? menu.subName : menu.name }}</div>
+          <div matListItemMeta>
+            <mat-icon>{{ isSubMenuOpen(i) ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
           </div>
-          <ng-template #showSubItems>
-            <mat-list-item *ngIf="isHandset$ | async; else showSubMenu" class="sub-menu"
-                           (click)="navigate(subMenu, drawer)"
-                           [routerLinkActive]="['active-link']" [routerLink]="'/'+language+'/'+subMenu.path">
-              <mat-icon matListItemIcon>{{ subMenu.icon }}</mat-icon>
-              <div matListItemTitle>{{ subMenu.name }}</div>
-            </mat-list-item>
-            <ng-template #showSubMenu>
-              <mat-list-item class="sub-menu" (click)="navigate(subMenu)" [routerLinkActive]="['active-link']"
-                             [routerLink]="'/'+language+'/'+subMenu.path">
-                <mat-icon matListItemIcon>{{ subMenu.icon }}</mat-icon>
-                <div matListItemTitle>{{ subMenu.name }}</div>
-              </mat-list-item>
-            </ng-template>
-          </ng-template>
+        </mat-list-item>
+        @if (isSubMenuOpen(i)) {
+          <mat-nav-list>
+            @for (subMenu of menu.subMenus; track subMenu; let j = $index) {
+              @if (subMenu.subMenus && subMenu.subMenus.length) {
+                <div>
+                  <mat-list-item (click)="toggleSubSubMenu(i, j)" class="sub-menu">
+                    <mat-icon matListItemIcon>{{ subMenu.icon }}</mat-icon>
+                    <div matListItemTitle>{{ subMenu.subName ? subMenu.subName : subMenu.name }}</div>
+                    <div matListItemMeta>
+                      <mat-icon>{{ isSubSubMenuOpen(i, j) ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
+                    </div>
+                  </mat-list-item>
+                  @if (isSubSubMenuOpen(i, j)) {
+                    <mat-nav-list>
+                      @for (subSubMenu of subMenu.subMenus; track subSubMenu) {
+                        @if (isHandset$ | async) {
+                          <mat-list-item
+                            class="sub-sub-menu" (click)="navigate(subSubMenu, drawer)"
+                            [routerLinkActive]="['active-link']" [routerLink]="'/'+language+'/'+subSubMenu.path">
+                            <mat-icon matListItemIcon>{{ subSubMenu.icon }}</mat-icon>
+                            <div matListItemTitle>{{ subSubMenu.name }}</div>
+                          </mat-list-item>
+                        } @else {
+                          <mat-list-item (click)="navigate(subSubMenu)" [routerLinkActive]="['active-link']"
+                                         [routerLink]="'/'+language+'/'+subSubMenu.path" class="sub-sub-menu">
+                            <mat-icon matListItemIcon>{{ subSubMenu.icon }}</mat-icon>
+                            <div matListItemTitle>{{ subSubMenu.name }}</div>
+                          </mat-list-item>
+                        }
+                      }
+                    </mat-nav-list>
+                  }
+                </div>
+              } @else {
+                @if (isHandset$ | async) {
+                  <mat-list-item class="sub-menu" (click)="navigate(subMenu, drawer)"
+                                 [routerLinkActive]="['active-link']" [routerLink]="'/'+language+'/'+subMenu.path">
+                    <mat-icon matListItemIcon>{{ subMenu.icon }}</mat-icon>
+                    <div matListItemTitle>{{ subMenu.name }}</div>
+                  </mat-list-item>
+                } @else {
+                  <mat-list-item class="sub-menu" (click)="navigate(subMenu)" [routerLinkActive]="['active-link']"
+                                 [routerLink]="'/'+language+'/'+subMenu.path">
+                    <mat-icon matListItemIcon>{{ subMenu.icon }}</mat-icon>
+                    <div matListItemTitle>{{ subMenu.name }}</div>
+                  </mat-list-item>
+                }
+              }
+            }
+          </mat-nav-list>
         }
-      </mat-nav-list>
-    </div>
-    <ng-template #showItems>
-      <mat-list-item *ngIf="isHandset$ | async; else showMenu" (click)="navigate(menu, drawer)"
-                     [routerLinkActive]="['active-link']" [routerLink]="'/'+language+'/'+menu.path">
-        <mat-icon matListItemIcon>{{ menu.icon }}</mat-icon>
-        <div matListItemTitle>{{ menu.name }}</div>
-      </mat-list-item>
-      <ng-template #showMenu>
+      </div>
+    } @else {
+      @if (isHandset$ | async) {
+        <mat-list-item (click)="navigate(menu, drawer)" [routerLinkActive]="['active-link']"
+                       [routerLink]="'/'+language+'/'+menu.path">
+          <mat-icon matListItemIcon>{{ menu.icon }}</mat-icon>
+          <div matListItemTitle>{{ menu.name }}</div>
+        </mat-list-item>
+      } @else {
         <mat-list-item (click)="navigate(menu)" [routerLinkActive]="['active-link']"
                        [routerLink]="'/'+language+'/'+menu.path">
           <mat-icon matListItemIcon>{{ menu.icon }}</mat-icon>
           <div matListItemTitle>{{ menu.name }}</div>
         </mat-list-item>
-      </ng-template>
-    </ng-template>
+      }
+    }
   }
 </mat-nav-list>

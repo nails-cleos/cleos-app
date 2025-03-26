@@ -4,11 +4,15 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { IPrice } from '../../../interfaces/treatment';
 import { ICurrency } from '../../../interfaces/currency';
 import { IPaymentOption, PENALTY } from '../../../interfaces/payment';
+import { SharedModule } from "../../shared.module";
+import { PriceComponent } from "../../price/price.component";
 
 @Component({
   selector: 'app-cancel-dialog',
   templateUrl: './cancel-dialog.component.html',
-  styleUrls: ['./cancel-dialog.component.scss']
+  styleUrls: ['./cancel-dialog.component.scss'],
+  standalone: true,
+  imports: [SharedModule, PriceComponent]
 })
 export class CancelDialogComponent implements OnInit {
   cancelForm!: UntypedFormGroup;

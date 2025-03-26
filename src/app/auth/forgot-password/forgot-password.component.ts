@@ -9,11 +9,15 @@ import { Router } from '@angular/router';
 import { Auth } from '@angular/fire/auth';
 import { sendPasswordResetEmail } from '@firebase/auth';
 import { TranslateService } from '@ngx-translate/core';
+import { SharedModule } from "../../shared/shared.module";
+import { BackButtonDirective } from "../../directives/back-button.directive";
 
 @Component({
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.component.html',
-  styleUrls: ['./forgot-password.component.scss']
+  styleUrls: ['./forgot-password.component.scss'],
+  standalone: true,
+  imports: [SharedModule, BackButtonDirective]
 })
 export class ForgotPasswordComponent implements OnInit, OnDestroy {
 

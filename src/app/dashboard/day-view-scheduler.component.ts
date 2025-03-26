@@ -9,7 +9,13 @@ import {
   Output,
   SimpleChanges
 } from '@angular/core';
-import { CalendarUtils, CalendarWeekViewComponent, DateAdapter, getWeekViewPeriod } from 'angular-calendar';
+import {
+  CalendarModule,
+  CalendarUtils,
+  CalendarWeekViewComponent,
+  DateAdapter,
+  getWeekViewPeriod
+} from 'angular-calendar';
 import {
   CalendarEvent,
   EventColor,
@@ -22,6 +28,8 @@ import { DragEndEvent, DragMoveEvent } from 'angular-draggable-droppable';
 import { TranslateService } from '@ngx-translate/core';
 import { Day } from '../interfaces/reservation';
 import { getNowTimeZone } from '../util/dates';
+import { SharedModule } from "../shared/shared.module";
+import { ConvertHMPipe } from "../pipes/convert-hm.pipe";
 
 export interface IProfessional {
   id: string;
@@ -96,7 +104,9 @@ export class DayViewSchedulerCalendarUtils extends CalendarUtils {
   selector: 'app-mwl-day-view-scheduler',
   templateUrl: './day-view-scheduler.component.html',
   styleUrls: ['./dashboard.component.scss'],
-  providers: [DayViewSchedulerCalendarUtils]
+  providers: [DayViewSchedulerCalendarUtils],
+  standalone: true,
+  imports: [SharedModule, CalendarModule, ConvertHMPipe]
 })
 export class DayViewSchedulerComponent extends CalendarWeekViewComponent implements OnChanges {
   @Input() professionals: IProfessional[] = [];
@@ -107,8 +117,7 @@ export class DayViewSchedulerComponent extends CalendarWeekViewComponent impleme
   @Output() professionalChanged = new EventEmitter();
   @Output() segmentClicked: EventEmitter<{ date: Date; professionalId: string; }> = new EventEmitter();
 
-  // @ts-ignore
-  view: DayViewScheduler;
+  view!: DayViewScheduler;
 
   daysInWeek = 1;
 

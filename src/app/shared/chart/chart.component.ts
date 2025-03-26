@@ -4,11 +4,15 @@ import { IChart } from '../../interfaces/dashboard';
 import { ICurrency } from '../../interfaces/currency';
 import { Subscription } from 'rxjs';
 import { AuthUserService } from '../../services/auth-user.service';
+import { SharedModule } from "../shared.module";
+import { ErrorComponent } from "../error/error.component";
 
 @Component({
   selector: 'app-chart',
   templateUrl: './chart.component.html',
-  styleUrls: ['./chart.component.scss']
+  styleUrls: ['./chart.component.scss'],
+  standalone: true,
+  imports: [SharedModule, ErrorComponent]
 })
 export class ChartComponent implements OnChanges, OnDestroy {
   @Input() error: any;
@@ -29,7 +33,8 @@ export class ChartComponent implements OnChanges, OnDestroy {
       this.authUserService.authUser.subscribe(value => this.isDarkMode = value.isDarkMode);
   }
 
-  ngOnChanges(_: SimpleChanges): void {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  ngOnChanges(_changes: SimpleChanges): void {
     this.createChart();
   }
 

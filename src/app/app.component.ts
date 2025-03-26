@@ -13,6 +13,7 @@ import { SeoService } from './services/seo.service';
 import { Store } from '@ngrx/store';
 import { AppState, selectI18nState } from './store/app.states';
 import * as fromActionsI18n from './store/i18n.actions';
+import { RouterOutlet } from '@angular/router';
 
 
 @Component({
@@ -22,7 +23,9 @@ import * as fromActionsI18n from './store/i18n.actions';
   providers: [{
     provide: DateAdapter,
     useClass: YearMonthDateAdapter
-  }]
+  }],
+  standalone: true,
+  imports: [RouterOutlet]
 })
 export class AppComponent implements OnInit, OnDestroy {
 

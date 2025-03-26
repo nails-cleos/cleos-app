@@ -4,52 +4,57 @@
     <ng-container matColumnDef="position">
       <th *matHeaderCellDef mat-header-cell>#</th>
       <td *matCellDef="let color; let i = dataIndex;" mat-cell>
-        <div *ngIf="color.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
-        <ng-template #skeleton>
+        @if (color.id) {
+          <div>{{ (paginator.pageIndex * pageSize) + i + 1 }}</div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="name">
       <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
       <td *matCellDef="let color" mat-cell>
-        <div *ngIf="color.id; else skeleton">{{color.name}}</div>
-        <ng-template #skeleton>
+        @if (color.id) {
+          <div>{{ color.name }}</div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="description">
       <th *matHeaderCellDef class="hide-xs" mat-header-cell
-          mat-sort-header>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
+          mat-sort-header>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}
+      </th>
       <td *matCellDef="let color" class="hide-xs" mat-cell>
-        <div *ngIf="color.id; else skeleton">{{color.description}}</div>
-        <ng-template #skeleton>
+        @if (color.id) {
+          <div>{{ color.description }}</div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="actions">
       <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
       <td *matCellDef="let color" class="hide-xs" mat-cell>
-        <div *ngIf="color.id; else skeleton">
-          <ng-template [ngIf]="!color.deleted">
-            <button (click)="edit(color)" mat-icon-button
-                    matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
-              <mat-icon color="primary">edit</mat-icon>
-            </button>
-            <button (click)="delete(color)" mat-icon-button
-                    matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
-              <mat-icon color="warn">delete</mat-icon>
-            </button>
-          </ng-template>
-        </div>
-        <ng-template #skeleton>
+        @if (color.id) {
+          <div>
+            @if (!color.deleted) {
+              <button (click)="edit(color)" mat-icon-button
+                      matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
+                <mat-icon color="primary">edit</mat-icon>
+              </button>
+              <button (click)="delete(color)" mat-icon-button
+                      matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
+                <mat-icon color="warn">delete</mat-icon>
+              </button>
+            }
+          </div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
@@ -58,11 +63,13 @@
         <div [@detailExpand]="color === expandedColor ? 'expanded' : 'collapsed'"
              class="detail hide-gt-xs">
           <mat-list>
-            <mat-list-item *ngIf="color.description" role="list">
-              <div *ngIf="color.description" matListItemTitle>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</div>
-              <div *ngIf="color.description" matListItemLine>{{color.description}}</div>
-            </mat-list-item>
-            <ng-template [ngIf]="!color.deleted">
+            @if (color.description) {
+              <mat-list-item role="list">
+                <div matListItemTitle>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</div>
+                <div matListItemLine>{{ color.description }}</div>
+              </mat-list-item>
+            }
+            @if (!color.deleted) {
               <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
               <mat-list-item role="list">
                 <button (click)="edit(color)" color="primary" mat-icon-button>
@@ -72,7 +79,7 @@
                   <mat-icon matListItemIcon>delete</mat-icon>
                 </button>
               </mat-list-item>
-            </ng-template>
+            }
           </mat-list>
         </div>
       </td>
@@ -80,7 +87,8 @@
 
     <ng-container matColumnDef="noContent">
       <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-        {{ 'COLOR.LIST.ERROR.NO_CONTENT' | translate }}</td>
+        {{ 'COLOR.LIST.ERROR.NO_CONTENT' | translate }}
+      </td>
     </ng-container>
 
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
@@ -90,7 +98,9 @@
 
     <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
   </table>
-  <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+  @if (resultsLength) {
+    <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+  }
 
   <button color="accent" id="add-button" mat-fab matTooltip="{{ 'COLOR.TITLE' | translate }}"
           [routerLink]="['/', language, 'colors', 'add']">

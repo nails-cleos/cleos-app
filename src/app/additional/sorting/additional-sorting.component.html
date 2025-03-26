@@ -1,9 +1,8 @@
-<div *ngIf="items; else boxSkeleton">
+@if (items) {
   <app-drag-drop-sorting [title]="'ADDITIONAL.DETAIL' | translate" [items]="items"
                          (sorted)="sorted($event)"></app-drag-drop-sorting>
-</div>
-<ng-template #boxSkeleton>
+} @else {
   <div class="ssc-hr"></div>
   <div class="ssc-square mb"></div>
   <div class="ssc-hr"></div>
-</ng-template>
+}

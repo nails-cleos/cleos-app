@@ -1,10 +1,8 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { PAGE_SIZE } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
 import { IPayment, IPaymentStatus } from '../interfaces/payment';
 import { IReservationPayment } from '../interfaces/reservation';
-import { createFilter } from '../util/service-helper';
 import { toUrl } from "../util/helper";
 
 @Injectable()
@@ -17,18 +15,7 @@ export class PaymentService {
   private reservationUrlV1 = `v1/${ this.reservationUrl }`;
   private transactionUrlV1 = `v1/${ this.transactionUrl }`;
 
-  constructor(private http: HttpClient) {
-  }
-
-  getAll = (
-    sort: string,
-    direction: string,
-    page: number,
-    size: number = PAGE_SIZE
-  ): Observable<IPayment[]> => this.http.get<IPayment[]>(
-    toUrl(this.urlV1, 'pages'),
-    { params: createFilter(page, size, sort, direction) }
-  );
+  private http: HttpClient = inject(HttpClient);
 
   getById = (id: string): Observable<IPayment | undefined> => this.http.get<IPayment>(toUrl(this.urlV1, id));
 

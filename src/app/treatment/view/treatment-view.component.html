@@ -2,102 +2,110 @@
   <div class="card-container">
     <div class="card-content">
       <mat-card appearance="outlined">
-        <mat-card-header>
-          <mat-card-title *ngIf="group; else skeleton">{{ group.name }}</mat-card-title>
-          <mat-card-subtitle *ngIf="group; else skeleton">{{ group.id }}</mat-card-subtitle>
-          <ng-template #skeleton>
+        @if (group) {
+          <mat-card-header>
+            <mat-card-title>{{ group.name }}</mat-card-title>
+            <mat-card-subtitle>{{ group.id }}</mat-card-subtitle>
+          </mat-card-header>
+        } @else {
+          <mat-card-header>
             <div class="ssc-line"></div>
-          </ng-template>
-        </mat-card-header>
-        <mat-card-content *ngIf="group; else boxSkeleton">
-          <div class="inner-container">
-            <mat-form-field appearance="outline">
-              <mat-label>{{ 'TREATMENT.DESCRIPTION.FIELD' | translate }}</mat-label>
-              <label>
-                <textarea #message [value]="group.description" matInput readonly></textarea>
-              </label>
-              <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>{{ 'TREATMENT.PRICE_FROM.FIELD' | translate }}</mat-label>
-              <label>
-                <input [value]="group.priceFrom" matInput readonly>
-              </label>
-            </mat-form-field>
+          </mat-card-header>
+        }
+        @if (group) {
+          <mat-card-content>
+            <div class="inner-container">
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'TREATMENT.DESCRIPTION.FIELD' | translate }}</mat-label>
+                <label>
+                  <textarea #message [value]="group.description" matInput readonly></textarea>
+                </label>
+                <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'TREATMENT.PRICE_FROM.FIELD' | translate }}</mat-label>
+                <label>
+                  <input [value]="group.priceFrom" matInput readonly>
+                </label>
+              </mat-form-field>
 
-            <ng-template [ngIf]="colors">
-              <div>
-                <mat-list>
-                  <div mat-subheader>{{ 'TREATMENT.COLORS' | translate }}</div>
-                </mat-list>
-                <mat-chip-listbox>
-                  <mat-chip *ngFor="let color of colors" color="accent">
-                    {{ color.name }}
-                  </mat-chip>
-                </mat-chip-listbox>
+              @if (colors) {
+                <div>
+                  <mat-list>
+                    <div mat-subheader>{{ 'TREATMENT.COLORS' | translate }}</div>
+                  </mat-list>
+                  <mat-chip-listbox>
+                    @for (color of colors; track color) {
+                      <mat-chip color="accent">{{ color.name }}</mat-chip>
+                    }
+                  </mat-chip-listbox>
+                </div>
+              }
+              <div class="top">
+                <mat-accordion>
+                  @for (tab of group.treatments; let i = $index; track tab) {
+                    <mat-expansion-panel [expanded]="i === 0">
+                      <mat-expansion-panel-header>
+                        <mat-panel-title>
+                          {{ tab.name }}
+                        </mat-panel-title>
+                        <mat-panel-description class="hide-xs">
+                          {{ tab.id }}
+                        </mat-panel-description>
+                      </mat-expansion-panel-header>
+                      <mat-form-field appearance="outline" class="tab-field">
+                        <mat-label>{{ 'COMMON.TREATMENT.FIELD' | translate }}</mat-label>
+                        <label>
+                          <input [value]="tab.name" matInput readonly>
+                        </label>
+                      </mat-form-field>
+                      <mat-form-field appearance="outline" class="tab-field">
+                        <mat-label>{{ 'TREATMENT.DESCRIPTION.FIELD' | translate }}</mat-label>
+                        <label>
+                          <input [value]="tab.description" matInput readonly>
+                        </label>
+                      </mat-form-field>
+                      <mat-form-field appearance="outline" class="tab-field">
+                        <mat-label>{{ 'TREATMENT.DURATION.FIELD' | translate }}</mat-label>
+                        <label>
+                          <input [value]="tab.duration | durationTime" matInput readonly/>
+                        </label>
+                      </mat-form-field>
+                      <div class="card-actions">
+                        <div class="spacer"></div>
+                        <button (click)="getHistory(tab.id)" mat-icon-button>
+                          <mat-icon>timeline</mat-icon>
+                        </button>
+                      </div>
+                      @if (tab.history && tab.showHistory) {
+                        <div>
+                          <app-treatment-table [treatment]="tab.history"></app-treatment-table>
+                        </div>
+                      }
+                    </mat-expansion-panel>
+                  }
+                </mat-accordion>
               </div>
-            </ng-template>
-
-            <div class="top">
-              <mat-accordion>
-                <mat-expansion-panel *ngFor="let tab of group.treatments; let i = index" [expanded]="i === 0">
-                  <mat-expansion-panel-header>
-                    <mat-panel-title>
-                      {{ tab.name }}
-                    </mat-panel-title>
-                    <mat-panel-description class="hide-xs">
-                      {{ tab.id }}
-                    </mat-panel-description>
-                  </mat-expansion-panel-header>
-                  <mat-form-field appearance="outline" class="tab-field">
-                    <mat-label>{{ 'COMMON.TREATMENT.FIELD' | translate }}</mat-label>
-                    <label>
-                      <input [value]="tab.name" matInput readonly>
-                    </label>
-                  </mat-form-field>
-                  <mat-form-field appearance="outline" class="tab-field">
-                    <mat-label>{{ 'TREATMENT.DESCRIPTION.FIELD' | translate }}</mat-label>
-                    <label>
-                      <input [value]="tab.description" matInput readonly>
-                    </label>
-                  </mat-form-field>
-                  <mat-form-field appearance="outline" class="tab-field">
-                    <mat-label>{{ 'TREATMENT.DURATION.FIELD' | translate }}</mat-label>
-                    <label>
-                      <input [value]="tab.duration | durationTime" matInput readonly/>
-                    </label>
-                  </mat-form-field>
-                  <div class="card-actions">
-                    <div class="spacer"></div>
-                    <button (click)="getHistory(tab.id)" mat-icon-button>
-                      <mat-icon>timeline</mat-icon>
-                    </button>
-                  </div>
-                  <div *ngIf="tab.history && tab.showHistory">
-                    <app-treatment-table [treatment]="tab.history"></app-treatment-table>
-                  </div>
-                </mat-expansion-panel>
-              </mat-accordion>
             </div>
-          </div>
-        </mat-card-content>
-        <ng-template #boxSkeleton>
+          </mat-card-content>
+        } @else {
           <div class="ssc-hr"></div>
           <div class="ssc-square mb"></div>
           <div class="ssc-hr"></div>
-        </ng-template>
-        <mat-card-actions *ngIf="group; else buttonSkeleton" class="card-actions">
-          <div class="spacer"></div>
-          <button appBackButton color="accent" mat-fab extended class="icon-button" type="button">
-            {{ 'COMMON.BUTTON.BACK' | translate }}
-          </button>
-          <button (click)="edit" color="primary" mat-fab extended class="icon-button" type="button">
-            {{ 'COMMON.BUTTON.EDIT' | translate }}
-          </button>
-        </mat-card-actions>
-        <ng-template #buttonSkeleton>
+        }
+        @if (group) {
+          <mat-card-actions class="card-actions">
+            <div class="spacer"></div>
+            <button appBackButton color="accent" mat-fab extended class="icon-button" type="button">
+              {{ 'COMMON.BUTTON.BACK' | translate }}
+            </button>
+            <button (click)="edit" color="primary" mat-fab extended class="icon-button" type="button">
+              {{ 'COMMON.BUTTON.EDIT' | translate }}
+            </button>
+          </mat-card-actions>
+        } @else {
           <div class="ssc-head-line"></div>
-        </ng-template>
+        }
       </mat-card>
     </div>
   </div>

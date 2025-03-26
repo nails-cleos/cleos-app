@@ -16,11 +16,18 @@ import { IReservationAll } from '../../../interfaces/reservation';
 import * as fromActionsReservation from '../../../store/reservation.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
+import { SharedModule } from "../../../shared/shared.module";
+import { BankComponent } from "../../../shared/bank/bank.component";
+import { DurationTimePipe } from "../../../pipes/durationTime.pipe";
+import { PaymentPreviewComponent } from "../../../shared/payment-preview/payment-preview.component";
+import { BackButtonDirective } from "../../../directives/back-button.directive";
 
 @Component({
   selector: 'app-option',
   templateUrl: './option.component.html',
-  styleUrls: ['./option.component.scss']
+  styleUrls: ['./option.component.scss'],
+  standalone: true,
+  imports: [SharedModule, BankComponent, DurationTimePipe, PaymentPreviewComponent, BackButtonDirective]
 })
 export class OptionComponent implements OnInit, OnDestroy {
   @ViewChild('stepper') myStepper!: MatStepper;

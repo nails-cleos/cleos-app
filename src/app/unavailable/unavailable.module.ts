@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../shared/shared.module';
 import { UnavailableRoutingModule } from './unavailable-routing.module';
 
 import { UnavailableComponent } from './unavailable.component';
@@ -16,14 +15,11 @@ import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
 
 @NgModule({
-  declarations: [
+  imports: [
     UnavailableComponent,
     UnavailableListComponent,
-    BlockAgendaComponent
-  ],
-  imports: [
+    BlockAgendaComponent,
     UnavailableRoutingModule,
-    SharedModule,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,

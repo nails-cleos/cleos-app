@@ -30,7 +30,7 @@ import {
   MAX_RESERVATION_MONTH,
   Reservation
 } from '../interfaces/reservation';
-import { CalendarEvent, CalendarEventTimesChangedEvent } from 'angular-calendar';
+import { CalendarEvent, CalendarEventTimesChangedEvent, CalendarModule } from 'angular-calendar';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
@@ -104,6 +104,14 @@ import {
   getStepOptional
 } from '../util/step';
 import { PaymentType } from '../interfaces/payment';
+import { SharedModule } from "../shared/shared.module";
+import { RoomNamePipe } from "../pipes/room-name.pipe";
+import { SortByPipe } from "../pipes/sort-by.pipe";
+import { CurrencySymbolPipe } from "../pipes/currency-symbol.pipe";
+import { DurationTimePipe } from "../pipes/durationTime.pipe";
+import { PricePreviewComponent } from "../shared/price-preview/price-preview.component";
+import { BackButtonDirective } from "../directives/back-button.directive";
+import { GoogleMapComponent } from "../shared/google-map/google-map.component";
 import PlaceResult = google.maps.places.PlaceResult;
 
 @Component({
@@ -113,7 +121,10 @@ import PlaceResult = google.maps.places.PlaceResult;
   styleUrls: ['./reservation.component.scss'],
   providers: [{
     provide: STEPPER_GLOBAL_OPTIONS, useValue: { displayDefaultIndicatorType: false }
-  }]
+  }],
+  standalone: true,
+  imports: [SharedModule, RoomNamePipe, SortByPipe, CurrencySymbolPipe, DurationTimePipe, PricePreviewComponent,
+    CalendarModule, BackButtonDirective, GoogleMapComponent]
 })
 export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() dataEvents: Map<string, IDataEvent> = new Map();

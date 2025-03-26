@@ -64,7 +64,9 @@
 <div mat-dialog-actions class="card-actions">
   <div class="spacer"></div>
   <button (click)="onNoClick" color="accent" mat-fab extended>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
-  <button (click)="doAction" *ngIf="!review" [disabled]="rating < 1" color="primary"
-          mat-fab extended>{{ 'COMMON.BUTTON.ADD' | translate }}
-  </button>
+  @if (!review) {
+    <button (click)="doAction" [disabled]="rating < 1" color="primary" mat-fab extended>
+      {{ 'COMMON.BUTTON.ADD' | translate }}
+    </button>
+  }
 </div>

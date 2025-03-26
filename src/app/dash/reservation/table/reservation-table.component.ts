@@ -26,12 +26,18 @@ import { executeDialogNoWidth, openDialog } from '../../../util/helper';
 import { isSameTimeZone, newDateTimestamp } from '../../../util/dates';
 import { detailExpandAnimation } from '../../../util/animation';
 import { AuthUserService } from '../../../services/auth-user.service';
+import { SharedModule } from "../../../shared/shared.module";
+import { TimeDetailPipe } from "../../../pipes/time-detail.pipe";
+import { ReservationIconPipe } from "../../../pipes/reservation-icon.pipe";
+import { ErrorComponent } from "../../../shared/error/error.component";
 
 @Component({
   selector: 'app-reservation-table',
   templateUrl: './reservation-table.component.html',
   styleUrls: ['./reservation-table.component.scss'],
-  animations: [detailExpandAnimation]
+  animations: [detailExpandAnimation],
+  standalone: true,
+  imports: [SharedModule, TimeDetailPipe, ReservationIconPipe, ErrorComponent]
 })
 export class ReservationTableComponent implements AfterViewInit, OnInit, OnChanges, OnDestroy {
   @Input() roomId: any;
@@ -80,6 +86,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
     this.getReservations();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ngOnChanges(_: SimpleChanges): void {
     if (this.sort) {
       this.paginator.pageIndex = 0;

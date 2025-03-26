@@ -8,8 +8,8 @@ describe('ReferralsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ReferralsComponent ]
-    })
+    imports: [ReferralsComponent]
+})
     .compileComponents();
   });
 

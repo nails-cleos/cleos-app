@@ -6,10 +6,13 @@ import { Store } from '@ngrx/store';
 import { AppState, selectDiscountState } from '../../store/app.states';
 import * as fromActionsDiscount from '../../store/discount.actions';
 import { IUserDiscount } from '../../interfaces/discount';
+import { SharedModule } from "../../shared/shared.module";
 
 @Component({
   selector: 'app-add-discount-dialog-component',
-  templateUrl: './add-discount-dialog.component.html'
+  templateUrl: './add-discount-dialog.component.html',
+  standalone: true,
+  imports: [SharedModule]
 })
 export class AddDiscountDialogComponent implements OnInit, OnDestroy {
   discountForm!: UntypedFormGroup;

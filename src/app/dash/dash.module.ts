@@ -1,12 +1,10 @@
 import { NgModule } from '@angular/core';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../shared/shared.module';
 import { DashRoutingModule } from './dash-routing.module';
 
 import { DashComponent } from './dash.component';
 import { MiniCardComponent } from './mini-card/mini-card.component';
 import { ReservationTableComponent } from './reservation/table/reservation-table.component';
-import { CalendarModule, CalendarMonthModule } from 'angular-calendar';
 import { DashboardService } from '../services/dashboard.service';
 import { EffectsModule } from '@ngrx/effects';
 import { DashboardEffects } from '../store/effects/dashboard.effects';
@@ -34,7 +32,7 @@ import { ResultSummaryComponent } from "./result-summary/result-summary.componen
 import { TotalSummaryItemComponent } from "./total-summary-item/total-summary-item.component";
 
 @NgModule({
-  declarations: [
+  imports: [
     DashComponent,
     MiniCardComponent,
     ReservationTableComponent,
@@ -45,12 +43,9 @@ import { TotalSummaryItemComponent } from "./total-summary-item/total-summary-it
     MonthComponent,
     QuarterComponent,
     TotalSummaryComponent,
-  ],
-  imports: [
+    ResultSummaryComponent,
+    TotalSummaryItemComponent,
     DashRoutingModule,
-    SharedModule,
-    CalendarMonthModule,
-    CalendarModule,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
@@ -63,9 +58,7 @@ import { TotalSummaryItemComponent } from "./total-summary-item/total-summary-it
       isolate: false,
       extend: true
     }),
-    EffectsModule.forFeature([DashboardEffects, ReservationEffects]),
-    ResultSummaryComponent,
-    TotalSummaryItemComponent
+    EffectsModule.forFeature([DashboardEffects, ReservationEffects])
   ],
   providers: [
     DashboardService,

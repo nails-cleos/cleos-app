@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { INotification, PAGE_SIZE } from '../interfaces/notification';
 import { HttpClient } from '@angular/common/http';
@@ -11,8 +11,7 @@ export class NotificationService {
   private url = 'notifications';
   private urlV1 = `v1/${ this.url }`;
 
-  constructor(private http: HttpClient) {
-  }
+  private http: HttpClient = inject(HttpClient);
 
   getAll = (
     sort: string,

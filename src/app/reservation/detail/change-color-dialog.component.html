@@ -1,44 +1,46 @@
 <h1 mat-dialog-title>{{ 'RESERVATION.TREATMENT.COLOR.CHANGE' | translate }}</h1>
 <div mat-dialog-content>
   <form [formGroup]="colorForm" (keydown.enter)="$event.preventDefault()">
-    <mat-form-field *ngIf="colors; else skeleton" appearance="outline">
-      <mat-label>{{ 'RESERVATION.TREATMENT.COLOR.FIELD' | translate }}</mat-label>
-      <label>
-        <input (keydown)="keyDownHandler($event)" [formControl]="color" [matAutocomplete]="autoColor"
-               autocomplete="off" matInput required type="text">
-      </label>
-      <mat-autocomplete #autoColor="matAutocomplete" [displayWith]="displayFnColor">
-        <mat-option *ngFor="let color of filteredColor | async" [value]="color">
-          {{ color.name }}
-        </mat-option>
-      </mat-autocomplete>
-      <mat-error *ngIf="color.hasError('required')"
-                 [innerHTML]="'RESERVATION.TREATMENT.COLOR.REQUIRED' | translate">
-      </mat-error>
-      <mat-error *ngIf="color.hasError('requireMatch')"
-                 [innerHTML]="'RESERVATION.TREATMENT.COLOR.INVALID' | translate">
-      </mat-error>
-    </mat-form-field>
-    <ng-template #skeleton>
+    @if (colors) {
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'RESERVATION.TREATMENT.COLOR.FIELD' | translate }}</mat-label>
+        <label>
+          <input (keydown)="keyDownHandler($event)" [formControl]="color" [matAutocomplete]="autoColor"
+                 autocomplete="off" matInput required type="text">
+        </label>
+        <mat-autocomplete #autoColor="matAutocomplete" [displayWith]="displayFnColor">
+          @for (color of filteredColor | async; track color) {
+            <mat-option [value]="color">{{ color.name }}</mat-option>
+          }
+        </mat-autocomplete>
+        @if (color.hasError('required')) {
+          <mat-error [innerHTML]="'RESERVATION.TREATMENT.COLOR.REQUIRED' | translate"></mat-error>
+        }
+        @if (color.hasError('requireMatch')) {
+          <mat-error [innerHTML]="'RESERVATION.TREATMENT.COLOR.INVALID' | translate"></mat-error>
+        }
+      </mat-form-field>
+    } @else {
       <div class="ssc-line"></div>
-    </ng-template>
+    }
   </form>
 </div>
 <div mat-dialog-actions class="card-actions">
   <div class="spacer"></div>
-  <div *ngIf="data.small; else largeButton">
-    <button (click)="onNoClick" mat-icon-button>
-      <mat-icon>clear</mat-icon>
-    </button>
-    <button (click)="doAction" cdkFocusInitial color="primary" [disabled]="colorForm.invalid"
-            mat-icon-button>
-      <mat-icon>published_with_changes</mat-icon>
-    </button>
-  </div>
-  <ng-template #largeButton>
+  @if (data.small) {
+    <div>
+      <button (click)="onNoClick" mat-icon-button>
+        <mat-icon>clear</mat-icon>
+      </button>
+      <button (click)="doAction" cdkFocusInitial color="primary" [disabled]="colorForm.invalid"
+              mat-icon-button>
+        <mat-icon>published_with_changes</mat-icon>
+      </button>
+    </div>
+  } @else {
     <button (click)="onNoClick" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
     <button (click)="doAction" cdkFocusInitial color="primary" [disabled]="colorForm.invalid" mat-fab extended
             class="icon-button">{{ 'RESERVATION.TREATMENT.COLOR.UPDATE' | translate }}
     </button>
-  </ng-template>
+  }
 </div>

@@ -22,11 +22,14 @@ import { environment } from '../../environments/environment';
 import { GoogleAuthProvider } from 'firebase/auth';
 import { user } from 'rxfire/auth';
 import { fetchSignInMethodsForEmail } from '@firebase/auth';
+import { SharedModule } from "../shared/shared.module";
 
 @Component({
   selector: 'app-auth',
   templateUrl: './auth.component.html',
-  styleUrls: ['./auth.component.scss']
+  styleUrls: ['./auth.component.scss'],
+  standalone: true,
+  imports: [SharedModule]
 })
 export class AuthComponent implements OnInit, OnDestroy {
   loginForm: FormGroup;

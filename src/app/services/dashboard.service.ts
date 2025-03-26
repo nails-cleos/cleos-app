@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ICardSummary, IEventSummary, IMonthlySummaryRequest, IRoomEvents } from '../interfaces/dashboard';
@@ -11,8 +11,7 @@ export class DashboardService {
   private url = 'dashboard';
   private urlV1 = `v1/${ this.url }`;
 
-  constructor(private http: HttpClient) {
-  }
+  private http: HttpClient = inject(HttpClient);
 
   getCards = (date: Date): Observable<ICardSummary> => this.getSummaryData<ICardSummary>(date, 'cards');
 
@@ -23,7 +22,7 @@ export class DashboardService {
   updateEvent = (
     reservation: IReservation
   ): Observable<IRoomEvents> => this.http.patch<IRoomEvents>(
-    toUrl(this.urlV1, 'me', 'events', reservation.id!!),
+    toUrl(this.urlV1, 'me', 'events', reservation.id!),
     reservation
   )
 

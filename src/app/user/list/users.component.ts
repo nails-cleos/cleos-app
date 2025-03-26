@@ -20,12 +20,15 @@ import { Router } from '@angular/router';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { requireMatch } from '../../util/validators';
 import { map, startWith } from 'rxjs/operators';
+import { SharedModule } from "../../shared/shared.module";
 
 @Component({
   selector: 'app-users',
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.scss'],
-  animations: [detailExpandAnimation]
+  animations: [detailExpandAnimation],
+  standalone: true,
+  imports: [SharedModule]
 })
 export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -228,7 +231,9 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
 
 @Component({
   selector: 'app-select-user-dialog-component',
-  templateUrl: './select-user-dialog.component.html'
+  templateUrl: './select-user-dialog.component.html',
+  standalone: true,
+  imports: [SharedModule]
 })
 export class SelectUserDialogComponent implements OnInit, AfterViewInit, OnDestroy {
   userForm!: UntypedFormGroup;

@@ -1,14 +1,16 @@
-<mat-form-field appearance="outline" *ngIf="mapDashboard?.size" class="full-select">
-  <!--  <mat-card-header>-->
-  <mat-select [formControl]="selectedDash">
-    @for (dashboard of mapDashboard | keyvalue; track dashboard) {
-      <mat-option [value]="dashboard.key">
-        {{ dashboard.key }}
-      </mat-option>
-    }
-  </mat-select>
-  <!--  </mat-card-header>-->
-</mat-form-field>
+@if (mapDashboard?.size) {
+  <mat-form-field appearance="outline" class="full-select">
+    <!--  <mat-card-header>-->
+    <mat-select [formControl]="selectedDash">
+      @for (dashboard of mapDashboard | keyvalue; track dashboard) {
+        <mat-option [value]="dashboard.key">
+          {{ dashboard.key }}
+        </mat-option>
+      }
+    </mat-select>
+    <!--  </mat-card-header>-->
+  </mat-form-field>
+}
 
 <!--Calendar-->
 <mat-card appearance="outlined">

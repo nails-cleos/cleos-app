@@ -119,20 +119,21 @@
             <!--              <div mat-line>{{ 'MAIN.SECTION.CATALOG' | translate }}</div>-->
             <!--            </a>-->
             <mat-divider></mat-divider>
-            <mat-list-item (click)="redirect" *ngIf="isAuthenticated; else login" aria-label="My account">
-              <mat-icon matListItemIcon>person_pin</mat-icon>
-              <div matListItemTitle>{{ 'MAIN.SECTION.ACCOUNT' | translate }}</div>
-            </mat-list-item>
-            <ng-template #login>
+            @if (isAuthenticated) {
+              <mat-list-item (click)="redirect" aria-label="My account">
+                <mat-icon matListItemIcon>person_pin</mat-icon>
+                <div matListItemTitle>{{ 'MAIN.SECTION.ACCOUNT' | translate }}</div>
+              </mat-list-item>
+            } @else {
               <mat-list-item [routerLink]="['/', language, 'auth']" aria-label="Login">
                 <mat-icon matListItemIcon>login</mat-icon>
                 <div matListItemTitle>{{ 'MAIN.SECTION.AUTH' | translate }}</div>
               </mat-list-item>
               <!--              <a [routerLink]="['/', language, 'auth']" mat-list-item aria-label="Go to login">-->
-              <!--                <mat-icon matListItemIcon>login</mat-icon>-->
-              <!--                <div mat-line>{{ 'MAIN.SECTION.AUTH' | translate }}</div>-->
-              <!--              </a>-->
-            </ng-template>
+                <!--                <mat-icon matListItemIcon>login</mat-icon>-->
+                <!--                <div mat-line>{{ 'MAIN.SECTION.AUTH' | translate }}</div>-->
+                <!--              </a>-->
+            }
           </mat-nav-list>
         </mat-menu>
       }

@@ -25,7 +25,6 @@ export const reducer = (state = initialState, action: All): State => {
     case MainActionTypes.getAllCatalogue: {
       return {
         ...state,
-        // @ts-ignore
         catalogue: [{}, {}, {}],
         errorMessage: null,
         message: null,

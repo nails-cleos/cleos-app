@@ -14,20 +14,22 @@
       <ng-container matColumnDef="position">
         <th *matHeaderCellDef mat-header-cell>#</th>
         <td *matCellDef="let user; let i = dataIndex;" mat-cell>
-          <div *ngIf="user.id; else skeleton">{{ (paginator.pageIndex * pageSize) + i + 1 }}</div>
-          <ng-template #skeleton>
+          @if (user.id) {
+            <div>{{ (paginator.pageIndex * pageSize) + i + 1 }}</div>
+          } @else {
             <div class="ssc-line"></div>
-          </ng-template>
+          }
         </td>
       </ng-container>
 
       <ng-container matColumnDef="displayName">
         <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
         <td *matCellDef="let user" mat-cell>
-          <div *ngIf="user.id; else skeleton">{{ user.displayName }}</div>
-          <ng-template #skeleton>
+          @if (user.id) {
+            <div>{{ user.displayName }}</div>
+          } @else {
             <div class="ssc-line"></div>
-          </ng-template>
+          }
         </td>
       </ng-container>
 
@@ -35,88 +37,91 @@
         <th *matHeaderCellDef class="hide-xs" mat-header-cell
             mat-sort-header>{{ 'USER.LIST.COLUMN.EMAIL' | translate }}
         </th>
-        <td *matCellDef="let user" class="column-large-text" class="hide-xs" mat-cell>
-          <div *ngIf="user.id; else skeleton">{{ user.email }}</div>
-          <ng-template #skeleton>
+        <td *matCellDef="let user" class="column-large-text hide-xs" mat-cell>
+          @if (user.id) {
+            <div>{{ user.email }}</div>
+          } @else {
             <div class="ssc-line"></div>
-          </ng-template>
+          }
         </td>
       </ng-container>
 
       <ng-container matColumnDef="status">
         <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
         <td *matCellDef="let user" mat-cell>
-          <div *ngIf="user.id; else skeleton">
-            <div *ngIf="!user.deleted; else deleteBlock">
-              <ng-template [ngIf]="user.enabled && user.verified && user.uid">
-                <mat-icon matTooltip="{{ 'USER.LIST.STATUS.ENABLED' | translate }}" matTooltipPosition="left">
-                  verified_user
+          @if (user.id) {
+            <div>
+              @if (!user.deleted) {
+                <div>
+                  @if (user.enabled && user.verified && user.uid) {
+                    <mat-icon matTooltip="{{ 'USER.LIST.STATUS.ENABLED' | translate }}" matTooltipPosition="left">
+                      verified_user
+                    </mat-icon>
+                  }
+                  @if (!user.uid) {
+                    <mat-icon color="warn" matTooltip="{{ 'USER.LIST.STATUS.NOT_CREATED' | translate }}"
+                              matTooltipPosition="left">
+                      gpp_bad
+                    </mat-icon>
+                  }
+                  @if (user.uid && (!user.enabled || !user.verified)) {
+                    <mat-icon matTooltip="{{ 'USER.LIST.STATUS.DISABLED' | translate }}" matTooltipPosition="left">
+                      gpp_maybe
+                    </mat-icon>
+                  }
+                </div>
+              } @else {
+                <mat-icon color="primary" matTooltip="{{ 'USER.LIST.STATUS.DELETED' | translate }}"
+                          matTooltipPosition="left">delete_outline
                 </mat-icon>
-              </ng-template>
-              <ng-template [ngIf]="!user.uid">
-                <mat-icon color="warn" matTooltip="{{ 'USER.LIST.STATUS.NOT_CREATED' | translate }}"
-                          matTooltipPosition="left">
-                  gpp_bad
-                </mat-icon>
-              </ng-template>
-              <ng-template [ngIf]="user.uid && (!user.enabled || !user.verified)">
-                <mat-icon matTooltip="{{ 'USER.LIST.STATUS.DISABLED' | translate }}" matTooltipPosition="left">
-                  gpp_maybe
-                </mat-icon>
-              </ng-template>
+              }
             </div>
-            <ng-template #deleteBlock>
-              <mat-icon color="primary" matTooltip="{{ 'USER.LIST.STATUS.DELETED' | translate }}"
-                        matTooltipPosition="left">delete_outline
-              </mat-icon>
-            </ng-template>
-          </div>
-          <ng-template #skeleton>
+          } @else {
             <div class="ssc-line"></div>
-          </ng-template>
+          }
         </td>
       </ng-container>
 
       <ng-container matColumnDef="actions">
         <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
         <td *matCellDef="let user" class="hide-xs" mat-cell>
-          <div *ngIf="user.id; else skeleton">
-            <ng-template [ngIf]="!user.deleted" [ngIfElse]="deleted">
-              <button (click)="edit(user)" mat-icon-button>
-                <mat-icon color="primary">edit</mat-icon>
-              </button>
-              <button [routerLink]="['/', language, 'users', user.id, 'overview']" mat-icon-button>
-                <mat-icon color="primary">analytics</mat-icon>
-              </button>
-              <button (click)="book(user)" mat-icon-button>
-                <mat-icon color="accent">today</mat-icon>
-              </button>
-              <button [routerLink]="['/', language, 'accounts', 'customers', user.id]" mat-icon-button>
-                <mat-icon color="primary">account_circle</mat-icon>
-              </button>
-              <ng-template [ngIf]="!user.deleted && !user.verified && user.uid">
-                <button (click)="sendInvite(user)" mat-icon-button>
-                  <mat-icon color="accent">forward_to_inbox</mat-icon>
+          @if (user.id) {
+            <div>
+              @if (!user.deleted) {
+                <button (click)="edit(user)" mat-icon-button>
+                  <mat-icon color="primary">edit</mat-icon>
                 </button>
-              </ng-template>
-              <ng-template [ngIf]="user.enabled">
-                <button (click)="merge(user)" mat-icon-button>
-                  <mat-icon color="primary">merge</mat-icon>
+                <button [routerLink]="['/', language, 'users', user.id, 'overview']" mat-icon-button>
+                  <mat-icon color="primary">analytics</mat-icon>
                 </button>
-              </ng-template>
-              <button (click)="delete(user)" mat-icon-button>
-                <mat-icon color="warn">delete</mat-icon>
-              </button>
-            </ng-template>
-            <ng-template #deleted>
-              <button (click)="restore(user)" mat-icon-button>
-                <mat-icon color="primary">restore_from_trash</mat-icon>
-              </button>
-            </ng-template>
-          </div>
-          <ng-template #skeleton>
+                <button (click)="book(user)" mat-icon-button>
+                  <mat-icon color="accent">today</mat-icon>
+                </button>
+                <button [routerLink]="['/', language, 'accounts', 'customers', user.id]" mat-icon-button>
+                  <mat-icon color="primary">account_circle</mat-icon>
+                </button>
+                @if (!user.enabled && !user.verified && user.uid) {
+                  <button (click)="sendInvite(user)" mat-icon-button>
+                    <mat-icon color="accent">forward_to_inbox</mat-icon>
+                  </button>
+                }
+                @if (user.enabled) {
+                  <button (click)="merge(user)" mat-icon-button>
+                    <mat-icon color="primary">merge</mat-icon>
+                  </button>
+                }
+                <button (click)="delete(user)" mat-icon-button>
+                  <mat-icon color="warn">delete</mat-icon>
+                </button>
+              } @else {
+                <button (click)="restore(user)" mat-icon-button>
+                  <mat-icon color="primary">restore_from_trash</mat-icon>
+                </button>
+              }
+            </div>
+          } @else {
             <div class="ssc-line"></div>
-          </ng-template>
+          }
         </td>
       </ng-container>
 
@@ -134,7 +139,7 @@
                 <span matListItemLine>{{ user.email }}</span>
               </mat-list-item>
               <span class="hide-xs" mat-subheader>{{ 'USER.LIST.COLUMN.DETAIL.TITLE' | translate }}</span>
-              <ng-template [ngIf]="!user.deleted">
+              @if (!user.deleted) {
                 <div class="flex-container hide-xs">
                   <div class="flex-child">
                     @for (it of user.authorities; track it) {
@@ -160,9 +165,9 @@
                     }
                   </div>
                 </div>
-              </ng-template>
+              }
               <div class="hide-gt-xs" matListItemTitle>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
-              <ng-template [ngIf]="!user.deleted" [ngIfElse]="deleted">
+              @if (!user.deleted) {
                 <div class="hide-gt-xs">
                   <button (click)="edit(user)" mat-icon-button>
                     <mat-icon color="primary">edit</mat-icon>
@@ -173,28 +178,27 @@
                   <button (click)="book(user)" mat-icon-button>
                     <mat-icon color="accent">today</mat-icon>
                   </button>
-                  <ng-template [ngIf]="!user.enabled && !user.verified && user.uid">
+                  @if (!user.enabled && !user.verified && user.uid) {
                     <button (click)="sendInvite(user)" mat-icon-button>
                       <mat-icon color="accent">forward_to_inbox</mat-icon>
                     </button>
-                  </ng-template>
-                  <ng-template [ngIf]="user.enabled">
+                  }
+                  @if (user.enabled) {
                     <button (click)="merge(user)" mat-icon-button>
                       <mat-icon color="primary">merge</mat-icon>
                     </button>
-                  </ng-template>
+                  }
                   <button (click)="delete(user)" mat-icon-button>
                     <mat-icon color="warn">delete</mat-icon>
                   </button>
                 </div>
-              </ng-template>
-              <ng-template #deleted>
+              } @else {
                 <div class="hide-gt-xs">
-                  <button (click)="restore(user)" *ngIf="user.deleted" mat-icon-button>
+                  <button (click)="restore(user)" mat-icon-button>
                     <mat-icon color="primary">restore_from_trash</mat-icon>
                   </button>
                 </div>
-              </ng-template>
+              }
             </mat-list>
           </div>
         </td>
@@ -214,7 +218,9 @@
 
       <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
     </table>
-    <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+    @if (resultsLength) {
+      <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+    }
 
     <button color="accent" id="add-button" mat-fab matTooltip="{{ 'USER.TITLE' | translate }}"
             [routerLink]="['/', language, 'users', 'add']">

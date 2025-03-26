@@ -21,11 +21,15 @@ import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { map, startWith } from 'rxjs/operators';
+import { SharedModule } from "../shared/shared.module";
+import { BackButtonDirective } from "../directives/back-button.directive";
 
 @Component({
   selector: 'app-note',
   templateUrl: './note.component.html',
-  styleUrls: ['./note.component.scss']
+  styleUrls: ['./note.component.scss'],
+  standalone: true,
+  imports: [SharedModule, BackButtonDirective]
 })
 export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() note?: INoteAll;

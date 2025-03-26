@@ -1,10 +1,11 @@
 @use 'sass:map';
+@use 'sass:color';
 @use '@angular/material' as mat;
-@import "angular-calendar/scss/angular-calendar.scss";
+@use 'angular-calendar/scss/angular-calendar.scss';
 
 @mixin color($theme) {
   // Get the color config from the theme.
-  $color-config: mat.get-color-config($theme);
+  $color-config: mat.m2-get-color-config($theme);
 
   $primary-palette: map.get($color-config, 'primary');
   $accent-palette: map.get($color-config, 'accent');
@@ -15,121 +16,121 @@
 
   // Home page
   #back-top {
-    color: mat.get-color-from-palette($foreground, text) !important;
+    color: mat.m2-get-color-from-palette($foreground, text) !important;
   }
 
   .home-divider:before,
   .home-divider:after {
     content: "______________________";
-    color: mat.get-color-from-palette($primary-palette);
+    color: mat.m2-get-color-from-palette($primary-palette);
     position: relative;
     bottom: 1.3vh;
   }
 
   .section-sub-title p {
-    color: mat.get-color-from-palette($foreground, secondary-text);
+    color: mat.m2-get-color-from-palette($foreground, secondary-text);
   }
 
   .section-title h2 {
-    color: mat.get-color-from-palette($primary-palette);
+    color: mat.m2-get-color-from-palette($primary-palette);
   }
 
   .works {
-    background-color: mat.get-color-from-palette($background, hover);
+    background-color: mat.m2-get-color-from-palette($background, hover);
   }
 
   .treatment-table {
-    background-color: mat.get-color-from-palette($primary-palette, 400);
+    background-color: mat.m2-get-color-from-palette($primary-palette, 400);
   }
 
   table {
     .inner-border {
-      border: 1px solid mat.get-color-from-palette($foreground, contrast);
+      border: 1px solid mat.m2-get-color-from-palette($foreground, contrast);
     }
 
     .table-header {
-      background-color: lighten(#2c2c2c, 60%) !important;
+      background-color: color.scale(#2c2c2c, $lightness: +60%);
       color: black;
     }
 
     .table-column-header {
-      background-color: mat.get-color-from-palette($background, hover) !important;
+      background-color: mat.m2-get-color-from-palette($background, hover) !important;
     }
   }
 
   .work-filter ul li a {
-    color: mat.get-color-from-palette($foreground, text);
+    color: mat.m2-get-color-from-palette($foreground, text);
   }
 
   .work-filter ul li button:hover,
   .work-filter ul li button.active {
-    background-color: mat.get-color-from-palette($primary-palette);
+    background-color: mat.m2-get-color-from-palette($primary-palette);
     color: black;
   }
 
   .overlay {
-    background-color: rgba(mat.get-color-from-palette($primary-palette), .9);
-    color: mat.get-color-from-palette($foreground, text);
+    background-color: rgba(mat.m2-get-color-from-palette($primary-palette), .9);
+    color: mat.m2-get-color-from-palette($foreground, text);
   }
 
   .work-item .overlay a {
-    border: 1px solid mat.get-color-from-palette($foreground, text);
-    color: mat.get-color-from-palette($foreground, text);
+    border: 1px solid mat.m2-get-color-from-palette($foreground, text);
+    color: mat.m2-get-color-from-palette($foreground, text);
   }
 
   .work-item .overlay a:hover {
-    color: mat.get-color-from-palette($accent-palette) !important;
+    color: mat.m2-get-color-from-palette($accent-palette) !important;
   }
 
   .team-member h4 {
-    color: mat.get-color-from-palette($accent-palette);
+    color: mat.m2-get-color-from-palette($accent-palette);
   }
 
   .link {
-    color: mat.get-color-from-palette($foreground, text);
+    color: mat.m2-get-color-from-palette($foreground, text);
   }
 
   .footer {
-    color: mat.get-color-from-palette($foreground, text);
+    color: mat.m2-get-color-from-palette($foreground, text);
 
     #subs {
-      color: mat.get-color-from-palette($foreground, text);
+      color: mat.m2-get-color-from-palette($foreground, text);
     }
   }
 
   .copyright {
-    color: mat.get-color-from-palette($foreground, text);
+    color: mat.m2-get-color-from-palette($foreground, text);
   }
 
   // firebase-ui
   .mdl-card {
-    background: mat.get-color-from-palette($background, card);
+    background: mat.m2-get-color-from-palette($background, card);
 
     .progressbar {
-      background-color: mat.get-color-from-palette($primary-palette) !important;
+      background-color: mat.m2-get-color-from-palette($primary-palette) !important;
     }
 
     .mdl-button--raised.mdl-button--colored {
-      background-color: mat.get-color-from-palette($accent-palette) !important;
+      background-color: mat.m2-get-color-from-palette($accent-palette) !important;
       color: black
     }
 
     .mdl-button.mdl-js-button.mdl-button--primary {
-      color: mat.get-color-from-palette($accent-palette) !important;
+      color: mat.m2-get-color-from-palette($accent-palette) !important;
     }
 
     .progressbar {
-      background-color: mat.get-color-from-palette($primary-palette) !important;
+      background-color: mat.m2-get-color-from-palette($primary-palette) !important;
     }
 
     .bufferbar {
       background-image: none !important;
-      background-color: mat.get-color-from-palette($accent-palette)
+      background-color: mat.m2-get-color-from-palette($accent-palette)
     }
 
     .auxbar {
       background-image: none !important;
-      background-color: mat.get-color-from-palette($primary-palette) !important;
+      background-color: mat.m2-get-color-from-palette($primary-palette) !important;
     }
   }
   // firebase-ui
@@ -140,71 +141,71 @@
   }
 
   .sorting-item-list {
-    background: mat.get-color-from-palette($background, card);
-    border: solid 1px mat.get-color-from-palette($background, tooltip);
+    background: mat.m2-get-color-from-palette($background, card);
+    border: solid 1px mat.m2-get-color-from-palette($background, tooltip);
   }
 
   .array-form {
     .array-group {
-      border: dashed 1px mat.get-color-from-palette($primary-palette);
+      border: dashed 1px mat.m2-get-color-from-palette($primary-palette);
     }
   }
 
   .sorting-item-box {
-    background: mat.get-color-from-palette($background, card);
-    border-bottom: solid 1px mat.get-color-from-palette($background, tooltip);
+    background: mat.m2-get-color-from-palette($background, card);
+    border-bottom: solid 1px mat.m2-get-color-from-palette($background, tooltip);
   }
 
   .cdk-drag-preview {
-    box-shadow: 0 5px 5px -3px mat.get-color-from-palette($background, shadow),
-    0 8px 10px 1px mat.get-color-from-palette($background, shadow),
-    0 3px 14px 2px mat.get-color-from-palette($background, shadow);
+    box-shadow: 0 5px 5px -3px mat.m2-get-color-from-palette($background, shadow),
+    0 8px 10px 1px mat.m2-get-color-from-palette($background, shadow),
+    0 3px 14px 2px mat.m2-get-color-from-palette($background, shadow);
   }
 
   .sorting-item-placeholder {
-    background: mat.get-color-from-palette($background, hover);
-    border: dotted 3px mat.get-color-from-palette($background, hoverable);
+    background: mat.m2-get-color-from-palette($background, hover);
+    border: dotted 3px mat.m2-get-color-from-palette($background, hoverable);
   }
 
   .note {
-    border: solid 1px mat.get-color-from-palette($warn-palette) !important;
+    border: solid 1px mat.m2-get-color-from-palette($warn-palette) !important;
   }
 
   .bottom-divider {
-    border-bottom: 1px solid mat.get-color-from-palette($background, tooltip);
+    border-bottom: 1px solid mat.m2-get-color-from-palette($background, tooltip);
   }
 
   .week {
-    background-color: mat.get-color-from-palette($primary-palette, A700) !important;
+    background-color: mat.m2-get-color-from-palette($primary-palette, A700) !important;
     color: black;
   }
 
   #reservationTableData, #expenseTableData, #cashTableData {
     th, td {
-      border: 1px solid mat.get-color-from-palette($primary-palette) !important;
+      border: 1px solid mat.m2-get-color-from-palette($primary-palette) !important;
     }
 
     tr {
       &:hover {
-        background-color: mat.get-color-from-palette($background, hover);
+        background-color: mat.m2-get-color-from-palette($background, hover);
 
         td {
-          background-color: mat.get-color-from-palette($background, hover);
+          background-color: mat.m2-get-color-from-palette($background, hover);
         }
       }
     }
   }
 
   .result {
-    border-bottom: solid 3px mat.get-color-from-palette($accent-palette);
+    border-bottom: solid 3px mat.m2-get-color-from-palette($accent-palette);
   }
 
   .result:after {
-    border-bottom: solid 3px mat.get-color-from-palette($primary-palette);
+    border-bottom: solid 3px mat.m2-get-color-from-palette($primary-palette);
   }
 
   .summary-header {
-    border: 1px solid mat.get-color-from-palette($background, hover) !important;
+    border: 1px solid mat.m2-get-color-from-palette($background, hover) !important;
   }
 
   .map-info {
@@ -214,7 +215,7 @@
 
   @if $isDark {
     .newWeek {
-      border-bottom: 3px groove mat.get-color-from-palette($primary-palette, A700);
+      border-bottom: 3px groove mat.m2-get-color-from-palette($primary-palette, A700);
     }
 
     #experiences {
@@ -247,8 +248,8 @@
     }
 
     .footer {
-      border-top: 5px solid mat.get-color-from-palette($primary-palette, 900);
-      background-color: mat.get-color-from-palette($accent-palette, 900);
+      border-top: 5px solid mat.m2-get-color-from-palette($primary-palette, 900);
+      background-color: mat.m2-get-color-from-palette($accent-palette, 900);
     }
 
     .text-bg-birthday {
@@ -311,7 +312,7 @@
     }
   } @else {
     .newWeek {
-      border-bottom: 3px groove mat.get-color-from-palette($primary-palette, 700);
+      border-bottom: 3px groove mat.m2-get-color-from-palette($primary-palette, 700);
     }
     #experiences {
       background-color: #8d8270;
@@ -343,8 +344,8 @@
     }
 
     .footer {
-      border-top: 5px solid mat.get-color-from-palette($primary-palette, 500);
-      background-color: mat.get-color-from-palette($accent-palette, 500);
+      border-top: 5px solid mat.m2-get-color-from-palette($primary-palette, 500);
+      background-color: mat.m2-get-color-from-palette($accent-palette, 500);
     }
 
     .text-bg-birthday {
@@ -396,213 +397,213 @@
 
   .loading {
     &::before {
-      background: mat.get-color-from-palette($background, loading)
+      background: mat.m2-get-color-from-palette($background, loading)
     }
   }
 
   .active {
     .active-header-title {
-      color: mat.get-color-from-palette($primary-palette);
+      color: mat.m2-get-color-from-palette($primary-palette);
     }
   }
 
   .mat-mdc-list-item.active {
-    color: mat.get-color-from-palette($primary-palette);
+    color: mat.m2-get-color-from-palette($primary-palette);
   }
 
   .mat-mdc-row:hover {
-    background-color: mat.get-color-from-palette($background, hover);
+    background-color: mat.m2-get-color-from-palette($background, hover);
   }
 
   mat-header-cell, mat-cell {
-    border-bottom-color: mat.get-color-from-palette($background, hover);
+    border-bottom-color: mat.m2-get-color-from-palette($background, hover);
   }
 
   // Time picker
   .timepicker {
     .timepicker__header {
-      background-color: mat.get-color-from-palette($primary-palette) !important;
+      background-color: mat.m2-get-color-from-palette($primary-palette) !important;
     }
 
     .timepicker__body,
     .timepicker__actions {
       @if $isDark {
-        background-color: mat.get-color-from-palette($background, background) !important;
+        background-color: mat.m2-get-color-from-palette($background, background) !important;
       } @else {
-        background-color: mat.get-color-from-palette($background, card) !important;
+        background-color: mat.m2-get-color-from-palette($background, card) !important;
       }
     }
 
     .clock-face {
       @if $isDark {
-        background-color: mat.get-color-from-palette($background, card) !important;
+        background-color: mat.m2-get-color-from-palette($background, card) !important;
       } @else {
-        background-color: mat.get-color-from-palette($background, background) !important;
+        background-color: mat.m2-get-color-from-palette($background, background) !important;
       }
     }
 
     .clock-face__clock-hand {
-      background-color: mat.get-color-from-palette($primary-palette) !important;
+      background-color: mat.m2-get-color-from-palette($primary-palette) !important;
 
       &::after {
-        background-color: mat.get-color-from-palette($primary-palette) !important;
+        background-color: mat.m2-get-color-from-palette($primary-palette) !important;
       }
 
       &::before {
-        border-color: mat.get-color-from-palette($primary-palette) !important;
+        border-color: mat.m2-get-color-from-palette($primary-palette) !important;
       }
     }
 
     .clock-face__number {
       > span.active {
-        background-color: mat.get-color-from-palette($primary-palette) !important;
+        background-color: mat.m2-get-color-from-palette($primary-palette) !important;
       }
 
       > span.disabled {
-        color: mat.get-color-from-palette($background, disabled-button) !important;
+        color: mat.m2-get-color-from-palette($background, disabled-button) !important;
       }
 
       > span {
-        color: mat.get-color-from-palette($foreground, base) !important;
+        color: mat.m2-get-color-from-palette($foreground, base) !important;
       }
     }
 
     button:not(.timepicker-dial__item) {
-      color: mat.get-color-from-palette($primary-palette) !important;
+      color: mat.m2-get-color-from-palette($primary-palette) !important;
     }
   }
 
   .cal-month-view {
     .cal-header {
       .cal-cell:hover {
-        background-color: mat.get-color-from-palette($background, loading) !important;
+        background-color: mat.m2-get-color-from-palette($background, loading) !important;
       }
 
-      background-color: mat.get-color-from-palette($background, background);
+      background-color: mat.m2-get-color-from-palette($background, background);
     }
 
     .cal-cell-top:hover {
-      background-color: mat.get-color-from-palette($background, loading) !important;
+      background-color: mat.m2-get-color-from-palette($background, loading) !important;
     }
 
     .cal-day-cell:hover {
-      background-color: mat.get-color-from-palette($background, loading) !important;
+      background-color: mat.m2-get-color-from-palette($background, loading) !important;
     }
 
     .cal-day-cell:not(:last-child) {
-      border-right: 1px solid mat.get-color-from-palette($foreground, divider) !important;
+      border-right: 1px solid mat.m2-get-color-from-palette($foreground, divider) !important;
     }
 
     .cal-cell {
-      border: 1px solid mat.get-color-from-palette($foreground, divider);
-      background-color: mat.get-color-from-palette($background, background);
+      border: 1px solid mat.m2-get-color-from-palette($foreground, divider);
+      background-color: mat.m2-get-color-from-palette($background, background);
     }
 
     .cal-open-day-events {
       box-shadow: none;
-      background-color: mat.get-color-from-palette($background, background);
-      border-bottom: 1px solid mat.get-color-from-palette($foreground, divider);
-      border-left: 1px solid mat.get-color-from-palette($foreground, divider);
-      border-right: 1px solid mat.get-color-from-palette($foreground, divider);
-      color: mat.get-color-from-palette($foreground, base);
+      background-color: mat.m2-get-color-from-palette($background, background);
+      border-bottom: 1px solid mat.m2-get-color-from-palette($foreground, divider);
+      border-left: 1px solid mat.m2-get-color-from-palette($foreground, divider);
+      border-right: 1px solid mat.m2-get-color-from-palette($foreground, divider);
+      color: mat.m2-get-color-from-palette($foreground, base);
     }
 
     .cal-day-cell.cal-weekend .cal-day-number {
-      color: mat.get-color-from-palette($warn-palette) !important;
+      color: mat.m2-get-color-from-palette($warn-palette) !important;
     }
 
     .cal-day-number {
-      color: mat.get-color-from-palette($foreground, base);
+      color: mat.m2-get-color-from-palette($foreground, base);
     }
 
     .cal-open {
       .cal-day-number {
-        color: mat.get-color-from-palette($primary-palette, A700) !important;
+        color: mat.m2-get-color-from-palette($primary-palette, A700) !important;
         font-size: 2.6em !important;
         opacity: 1 !important;
       }
     }
 
     .cal-out-month .cal-day-number {
-      color: mat.get-color-from-palette($foreground, base);
+      color: mat.m2-get-color-from-palette($foreground, base);
       opacity: 1;
     }
 
     .cal-day-cell.cal-today .cal-day-number {
-      color: mat.get-color-from-palette($foreground, base);
+      color: mat.m2-get-color-from-palette($foreground, base);
       opacity: 1;
     }
 
     .cal-cell.cal-has-events.cal-open {
-      background-color: mat.get-color-from-palette($background, loading);
-      color: mat.get-color-from-palette($primary-palette, A100);
+      background-color: mat.m2-get-color-from-palette($background, loading);
+      color: mat.m2-get-color-from-palette($primary-palette, A100);
     }
 
     .cal-day-cell.cal-in-month.cal-has-events:hover {
-      background-color: mat.get-color-from-palette($background, loading) !important;
+      background-color: mat.m2-get-color-from-palette($background, loading) !important;
     }
 
     .cal-day-cell.cal-in-month.cal-has-events {
-      background-color: mat.get-color-from-palette($background, background) !important;
+      background-color: mat.m2-get-color-from-palette($background, background) !important;
     }
 
     // The cal-event-highlight class was added to angular-calendar in version 0.26.0-alpha.26
     // For earlier versions, you will need to specify the event secondary color in code (eg #8E24AA)
     .cal-cell.cal-event-highlight {
-      background-color: mat.get-color-from-palette($primary-palette, 600) !important;
+      background-color: mat.m2-get-color-from-palette($primary-palette, 600) !important;
     }
 
     .cal-day-cell.cal-today.cal-open,
     .cal-day-cell.cal-today {
-      background-color: mat.get-color-from-palette($primary-palette, 200);
-      color: mat.get-color-from-palette($primary-palette, A100);
+      background-color: mat.m2-get-color-from-palette($primary-palette, 200);
+      color: mat.m2-get-color-from-palette($primary-palette, A100);
     }
 
     .cal-event {
-      background-color: mat.get-color-from-palette($primary-palette, 600);
-      color: mat.get-color-from-palette($background, background);
+      background-color: mat.m2-get-color-from-palette($primary-palette, 600);
+      color: mat.m2-get-color-from-palette($background, background);
       border: 1px solid rgba(0, 0, 0, 0.2);
     }
 
     .cal-days {
-      border: 0 solid mat.get-color-from-palette($foreground, divider) !important;
+      border: 0 solid mat.m2-get-color-from-palette($foreground, divider) !important;
 
       .cal-cell-row {
-        border-bottom: 0 solid mat.get-color-from-palette($foreground, divider) !important;
+        border-bottom: 0 solid mat.m2-get-color-from-palette($foreground, divider) !important;
       }
     }
   }
 
   .cal-week-view {
     .cal-day-columns {
-      background-color: mat.get-color-from-palette($background, background);
+      background-color: mat.m2-get-color-from-palette($background, background);
     }
 
     .cal-day-headers {
       .cal-header:hover {
-        background-color: mat.get-color-from-palette($background, hover);
+        background-color: mat.m2-get-color-from-palette($background, hover);
       }
 
-      background-color: mat.get-color-from-palette($background, background);
+      background-color: mat.m2-get-color-from-palette($background, background);
     }
 
     .cal-header.cal-weekend b,
     .cal-header.cal-weekend span {
-      color: mat.get-color-from-palette($warn-palette);
+      color: mat.m2-get-color-from-palette($warn-palette);
     }
 
     .cal-header.cal-today {
-      background-color: mat.get-color-from-palette($primary-palette, 200);
+      background-color: mat.m2-get-color-from-palette($primary-palette, 200);
 
       span {
-        color: mat.get-color-from-palette($primary-palette, default-contrast);
+        color: mat.m2-get-color-from-palette($primary-palette, default-contrast);
         opacity: 1;
       }
     }
 
     .cal-event {
-      background-color: mat.get-color-from-palette($primary-palette, 600);
-      color: mat.get-color-from-palette($foreground, text);
+      background-color: mat.m2-get-color-from-palette($primary-palette, 600);
+      color: mat.m2-get-color-from-palette($foreground, text);
       border: 1px solid #000000;
     }
 
@@ -617,19 +618,19 @@
     }
 
     .cal-hour:nth-child(odd) {
-      background-color: mat.get-color-from-palette($background, background) !important;
+      background-color: mat.m2-get-color-from-palette($background, background) !important;
     }
 
     .cal-hour:nth-child(even) {
-      background-color: mat.get-color-from-palette($background, card) !important;
+      background-color: mat.m2-get-color-from-palette($background, card) !important;
     }
 
     .cal-drag-over .cal-hour-segment {
-      background-color: mat.get-color-from-palette($background, background);
+      background-color: mat.m2-get-color-from-palette($background, background);
     }
 
     .cal-hour-segment:hover {
-      background-color: mat.get-color-from-palette($background, hover) !important;
+      background-color: mat.m2-get-color-from-palette($background, hover) !important;
     }
 
     .cal-hour-segment.cal-after-hour-start .cal-time {
@@ -638,75 +639,75 @@
 
     .cal-hour:not(:last-child) .cal-hour-segment,
     .cal-hour:last-child :not(:last-child) .cal-hour-segment {
-      border-bottom: thin dashed mat.get-color-from-palette($primary-palette, lighter);
+      border-bottom: thin dashed mat.m2-get-color-from-palette($primary-palette, lighter);
     }
   }
 
   .cal-disabled {
-    background-color: mat.get-color-from-palette($background, disabled-button-toggle);
+    background-color: mat.m2-get-color-from-palette($background, disabled-button-toggle);
   }
 
   .cal-custom-event:hover {
-    box-shadow: -10px 15px 25px 1px mat.get-color-from-palette($background, hoverable) !important;
+    box-shadow: -10px 15px 25px 1px mat.m2-get-color-from-palette($background, hoverable) !important;
   }
 
   .cal-custom-event:after {
-    background: mat.get-color-from-palette($background, hoverable);
+    background: mat.m2-get-color-from-palette($background, hoverable);
   }
 
   pre, .rejected, .dot {
-    background-color: mat.get-color-from-palette($warn-palette) !important;
+    background-color: mat.m2-get-color-from-palette($warn-palette) !important;
   }
 
   .circle, .profile-background {
-    background-color: mat.get-color-from-palette($primary-palette);
+    background-color: mat.m2-get-color-from-palette($primary-palette);
   }
 
   .hoverable .profile-background {
-    background-color: mat.get-color-from-palette($background, loading);
+    background-color: mat.m2-get-color-from-palette($background, loading);
   }
 
   .hoverable:hover .hover-text {
-    color: mat.get-color-from-palette($foreground, base);
+    color: mat.m2-get-color-from-palette($foreground, base);
   }
 
   .hoverable {
-    border: 5px solid mat.get-color-from-palette($primary-palette);
+    border: 5px solid mat.m2-get-color-from-palette($primary-palette);
   }
 
   .strikethrough:before, .red-text, .incomplete, .minus {
-    color: mat.get-color-from-palette($warn-palette);
+    color: mat.m2-get-color-from-palette($warn-palette);
   }
 
   .red-text {
-    color: mat.get-color-from-palette($warn-palette);
+    color: mat.m2-get-color-from-palette($warn-palette);
   }
 
   .contrast-text {
-    color: mat.get-color-from-palette($foreground, contrast) !important;
+    color: mat.m2-get-color-from-palette($foreground, contrast) !important;
   }
 
   .mini-dashboard-card {
-    background-color: mat.get-color-from-palette($accent-palette);
+    background-color: mat.m2-get-color-from-palette($accent-palette);
   }
 
   #account-spinner {
     mat-progress-spinner {
-      box-shadow: 0 0 0 1.4em mat.get-color-from-palette($primary-palette, default, 0.2) inset;
+      box-shadow: 0 0 0 1.4em mat.m2-get-color-from-palette($primary-palette, default, 0.2) inset;
     }
   }
 
   .card-text-color {
-    color: mat.get-color-from-palette($accent-palette, darker-contrast);
+    color: mat.m2-get-color-from-palette($accent-palette, darker-contrast);
   }
 
   fieldset {
-    border-color: mat.get-color-from-palette($foreground, divider);
+    border-color: mat.m2-get-color-from-palette($foreground, divider);
   }
 
   .stamp-approved {
-    box-shadow: 0 0 0 3px mat.get-color-from-palette($primary-palette), 0 0 0 2px mat.get-color-from-palette($primary-palette) inset;
-    color: mat.get-color-from-palette($primary-palette);
+    box-shadow: 0 0 0 3px mat.m2-get-color-from-palette($primary-palette), 0 0 0 2px mat.m2-get-color-from-palette($primary-palette) inset;
+    color: mat.m2-get-color-from-palette($primary-palette);
   }
 
   @if ($isDark) {
@@ -728,7 +729,7 @@
       background-color: #008b00 !important;
 
       td {
-        color: mat.get-color-from-palette($foreground, contrast) !important;
+        color: mat.m2-get-color-from-palette($foreground, contrast) !important;
       }
     }
 
@@ -764,7 +765,7 @@
       background-color: #c3f69d !important;
 
       td {
-        color: mat.get-color-from-palette($foreground, contrast) !important;
+        color: mat.m2-get-color-from-palette($foreground, contrast) !important;
       }
     }
 
@@ -784,51 +785,51 @@
   }
 
   .stepper-item .step-counter {
-    border: 4px solid mat.get-color-from-palette($background, unselected-chip);
+    border: 4px solid mat.m2-get-color-from-palette($background, unselected-chip);
   }
 
   .stepper-item.completed::after {
-    border-bottom: 4px solid mat.get-color-from-palette($primary-palette);
+    border-bottom: 4px solid mat.m2-get-color-from-palette($primary-palette);
   }
 
   .stepper-item.completed .step-counter {
-    background-color: mat.get-color-from-palette($primary-palette) !important;
-    color: mat.get-color-from-palette($foreground, base)
+    background-color: mat.m2-get-color-from-palette($primary-palette) !important;
+    color: mat.m2-get-color-from-palette($foreground, base)
   }
 
   .stepper-item.completed,
   .stepper-item.active {
     .step-counter {
-      border: 4px solid mat.get-color-from-palette($primary-palette, 900);
+      border: 4px solid mat.m2-get-color-from-palette($primary-palette, 900);
     }
   }
 
   .active-link {
-    color: mat.get-color-from-palette($primary-palette, 900) !important;
+    color: mat.m2-get-color-from-palette($primary-palette, 900) !important;
     font-weight: bold;
   }
 
   mat-drawer-container {
     .footer {
-      border-top: 2px solid mat.get-color-from-palette($background, disabled-button);
+      border-top: 2px solid mat.m2-get-color-from-palette($background, disabled-button);
 
       a {
-        color: mat.get-color-from-palette($foreground, base);
+        color: mat.m2-get-color-from-palette($foreground, base);
       }
     }
   }
 
   .stepper-item .step-counter {
-    background: mat.get-color-from-palette($background, unselected-chip) !important;
+    background: mat.m2-get-color-from-palette($background, unselected-chip) !important;
   }
 
   .stepper-item::before,
   .stepper-item::after {
-    border-bottom: 4px solid mat.get-color-from-palette($background, unselected-chip) !important;
+    border-bottom: 4px solid mat.m2-get-color-from-palette($background, unselected-chip) !important;
   }
 
   .row-is-canceled {
-    background-color: mat.get-color-from-palette($warn-palette, lighter);
+    background-color: mat.m2-get-color-from-palette($warn-palette, lighter);
     color: black;
 
     a, button {
@@ -844,19 +845,19 @@
 
   .deadLine {
     td {
-      color: mat.get-color-from-palette($background, background) !important;
+      color: mat.m2-get-color-from-palette($background, background) !important;
     }
 
-    color: mat.get-color-from-palette($background, background) !important;
-    background-color: mat.get-color-from-palette($warn-palette, lighter);
+    color: mat.m2-get-color-from-palette($background, background) !important;
+    background-color: mat.m2-get-color-from-palette($warn-palette, lighter);
   }
 
   .cancelled {
-    text-decoration-color: mat.get-color-from-palette($accent-palette);
+    text-decoration-color: mat.m2-get-color-from-palette($accent-palette);
   }
 
   a {
-    color: mat.get-color-from-palette($primary-palette, 200);
+    color: mat.m2-get-color-from-palette($primary-palette, 200);
   }
 
   .payment-button {
@@ -876,49 +877,49 @@
   }
 
   #close {
-    background: linear-gradient(180deg, mat.get-color-from-palette($background, background) 55%, mat.get-color-from-palette($warn-palette) 45%);
+    background: linear-gradient(180deg, mat.m2-get-color-from-palette($background, background) 55%, mat.m2-get-color-from-palette($warn-palette) 45%);
   }
 
   #error-box {
-    border-color: mat.get-color-from-palette($warn-palette, darker);
-    background-color: mat.get-color-from-palette($warn-palette);
+    border-color: mat.m2-get-color-from-palette($warn-palette, darker);
+    background-color: mat.m2-get-color-from-palette($warn-palette);
   }
 
   .drag-container {
-    background-color: mat.get-color-from-palette($background, hover);
+    background-color: mat.m2-get-color-from-palette($background, hover);
   }
 
   .cdk-drag-preview {
-    box-shadow: 0 5px 5px -3px mat.get-color-from-palette($background, shadow),
-    0 8px 10px 1px mat.get-color-from-palette($background, hover),
-    0 3px 14px 2px mat.get-color-from-palette($background, hover);
+    box-shadow: 0 5px 5px -3px mat.m2-get-color-from-palette($background, shadow),
+    0 8px 10px 1px mat.m2-get-color-from-palette($background, hover),
+    0 3px 14px 2px mat.m2-get-color-from-palette($background, hover);
   }
 
   .item-box {
-    background: mat.get-color-from-palette($background, background);
-    border: solid 1px mat.get-color-from-palette($background, background);
-    color: mat.get-color-from-palette($foreground, text);
+    background: mat.m2-get-color-from-palette($background, background);
+    border: solid 1px mat.m2-get-color-from-palette($background, background);
+    color: mat.m2-get-color-from-palette($foreground, text);
   }
 
   .spinner:before {
-    border: 2px solid mat.get-color-from-palette($primary-palette);
-    border-top-color: mat.get-color-from-palette($background, hover);
+    border: 2px solid mat.m2-get-color-from-palette($primary-palette);
+    border-top-color: mat.m2-get-color-from-palette($background, hover);
   }
 
   .warning {
-    color: mat.get-color-from-palette($warn-palette, darker);
+    color: mat.m2-get-color-from-palette($warn-palette, darker);
   }
 
   @if ($isDark) {
     .warning-snack-bar {
-      color: mat.get-color-from-palette($warn-palette, 500);
+      color: mat.m2-get-color-from-palette($warn-palette, 500);
     }
     .accent-snack-bar {
       color: black !important;
     }
   } @else {
     .warning-snack-bar {
-      color: mat.get-color-from-palette($warn-palette, 200);
+      color: mat.m2-get-color-from-palette($warn-palette, 200);
     }
     .accent-snack-bar {
       color: white !important;
@@ -927,7 +928,7 @@
 }
 
 @mixin theme($theme) {
-  $color-config: mat.get-color-config($theme);
+  $color-config: mat.m2-get-color-config($theme);
   @if $color-config != null {
     @include color($theme);
   }

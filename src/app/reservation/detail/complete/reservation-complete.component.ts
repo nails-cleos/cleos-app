@@ -27,12 +27,22 @@ import { IService } from '../../../interfaces/room';
 import { IColorAll } from '../../../interfaces/color';
 import { DialogComponent } from '../../../shared/dialog/generic/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { SharedModule } from "../../../shared/shared.module";
+import { TimeDetailPipe } from "../../../pipes/time-detail.pipe";
+import { CurrencySymbolPipe } from "../../../pipes/currency-symbol.pipe";
+import { DurationTimePipe } from "../../../pipes/durationTime.pipe";
+import { FormFieldAdderComponent } from "../../../shared/form-field-adder/form-field-adder.component";
+import { PricePreviewComponent } from "../../../shared/price-preview/price-preview.component";
+import { BackButtonDirective } from "../../../directives/back-button.directive";
 
 @Component({
   selector: 'app-reservation-complete',
   templateUrl: './reservation-complete.component.html',
   styleUrls: ['./reservation-complete.component.scss'],
-  animations: [transitionAnimation]
+  animations: [transitionAnimation],
+  standalone: true,
+  imports: [SharedModule, TimeDetailPipe, CurrencySymbolPipe, DurationTimePipe, FormFieldAdderComponent,
+    PricePreviewComponent, BackButtonDirective]
 })
 export class ReservationCompleteComponent implements OnInit, OnDestroy {
   reservation?: IReservationAll;

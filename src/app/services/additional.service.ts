@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
@@ -13,8 +13,7 @@ export class AdditionalService {
   private url = 'additional';
   private urlV1 = `v1/${ this.url }`;
 
-  constructor(private http: HttpClient) {
-  }
+  private http: HttpClient = inject(HttpClient);
 
   getAll = (
     sort: string,
@@ -39,7 +38,7 @@ export class AdditionalService {
   delete = (id: string): Observable<IAdditional> => this.http.delete<IAdditional>(toUrl(this.urlV1, id));
 
   update = (additional: IAdditional): Observable<IAdditional> => this.http.patch<IAdditional>(
-    toUrl(this.urlV1, additional.id!!), additional
+    toUrl(this.urlV1, additional.id!), additional
   );
 
   updateSort = (additionalList: ISorted[]): Observable<IAdditionalAll[]> => this.http.patch<IAdditionalAll[]>(

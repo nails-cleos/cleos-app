@@ -14,16 +14,16 @@ describe('DashComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [DashComponent],
-      imports: [
+    imports: [
         NoopAnimationsModule,
         LayoutModule,
         MatButtonModule,
         MatCardModule,
         MatIconModule,
         MatMenuModule,
-      ]
-    }).compileComponents();
+        DashComponent,
+    ]
+}).compileComponents();
   }));
 
   beforeEach(() => {

@@ -10,11 +10,17 @@ import { IAccountAll } from '../../interfaces/account';
 import { getPayNlOptions, IPaymentOption, PaymentOption, PaymentType } from '../../interfaces/payment';
 import { currencySymbol } from '../../util/helper';
 import { TranslateService } from '@ngx-translate/core';
+import { SharedModule } from "../../shared/shared.module";
+import { BalanceComponent } from "../balance/balance.component";
+import { BackButtonDirective } from "../../directives/back-button.directive";
+import { BankComponent } from "../../shared/bank/bank.component";
 
 @Component({
   selector: 'app-transaction',
   templateUrl: './transaction.component.html',
-  styleUrls: ['./transaction.component.scss']
+  styleUrls: ['./transaction.component.scss'],
+  standalone: true,
+  imports: [SharedModule, BalanceComponent, BackButtonDirective, BankComponent]
 })
 export class TransactionComponent implements OnInit, OnDestroy {
   form!: UntypedFormGroup;

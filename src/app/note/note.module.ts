@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { NoteComponent } from './note.component';
-import { SharedModule } from '../shared/shared.module';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { EffectsModule } from '@ngrx/effects';
@@ -13,12 +12,9 @@ import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
 
 @NgModule({
-  declarations: [
-    NoteComponent
-  ],
   imports: [
+    NoteComponent,
     NoteRoutingModule,
-    SharedModule,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,

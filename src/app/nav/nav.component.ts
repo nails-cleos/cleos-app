@@ -1,8 +1,8 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
 import {
   AppState,
@@ -43,66 +43,69 @@ import { ThemeService } from 'ng2-charts';
 import { AuthUserService } from '../services/auth-user.service';
 import { SeoService } from '../services/seo.service';
 import { newDateTimestamp } from '../util/dates';
+import { SharedModule } from "../shared/shared.module";
+import { MenuItemComponent } from "./menu-item/menu-item.component";
+import { ErrorComponent } from "../shared/error/error.component";
+import { MatRipple } from "@angular/material/core";
 
 @Component({
   selector: 'app-nav',
   templateUrl: './nav.component.html',
-  styleUrls: ['./nav.component.scss']
+  styleUrls: ['./nav.component.scss'],
+  standalone: true,
+  imports: [SharedModule, MenuItemComponent, RouterLinkActive, RouterOutlet, ErrorComponent, MatRipple]
 })
 export class NavComponent implements OnInit, OnDestroy {
-  title = environment.title;
+  private tokenService: TokenService = inject(TokenService);
+  private translate: TranslateService = inject(TranslateService)
+  private breakpointObserver: BreakpointObserver = inject(BreakpointObserver)
+  private router: Router = inject(Router)
+  private store: Store<AppState> = inject(Store<AppState>)
+  private messagingService: MessagingService = inject(MessagingService)
+  private snackBar: MatSnackBar = inject(MatSnackBar)
+  private navigationService: NavigationService = inject(NavigationService)
+  private cookieService: CookieService = inject(CookieService)
+  private overlayContainer: OverlayContainer = inject(OverlayContainer)
+  private themeService: ThemeService = inject(ThemeService)
+  private authUserService: AuthUserService = inject(AuthUserService)
+  private seoService: SeoService = inject(SeoService)
+  private route: ActivatedRoute = inject(ActivatedRoute)
 
+  title = environment.title;
   isHandset$: Observable<boolean> = this.breakpointObserver.observe([
     Breakpoints.XSmall,
     Breakpoints.Small,
     Breakpoints.Medium
   ]).pipe(map(result => result.matches), shareReplay());
-
   menuItems: IMenu[] = [];
   notifications: INotification[] = [];
   workDay: INotification[] = [];
   currentUser!: IUser | null;
-
   showInformation = true;
-
-  dateFormat: string;
-
+  dateFormat: string = this.translate.currentLang;
   isProfessional = false;
   isManager = false;
   isAdmin = false;
-
   image?: string;
   initials?: string;
   countNotifications = 0;
   plusNotification?: string;
-
   isLoading = true;
   error: any;
   incomplete = false;
-
-  isDarkMode = false;
+  isDarkMode = isDarkMode(this.cookieService.get(THEME) as Theme);
   step = 0;
-  language: string;
+  language: string = this.translate.currentLang;
 
-  private getState: Observable<any>;
-  private getNotificationState: Observable<any>;
+  private getState: Observable<any> = this.store.select(selectAuthState);
+  private getNotificationState: Observable<any> = this.store.select(selectNotificationState);
   private authSubscription?: Subscription;
   private notificationSubscription?: Subscription;
   private isAuthorized = false;
   private cssClass?: string;
   private authSubject: Subject<boolean> = new Subject<boolean>();
 
-  constructor(public translate: TranslateService, private breakpointObserver: BreakpointObserver,
-              private router: Router, private store: Store<AppState>, private messagingService: MessagingService,
-              private snackBar: MatSnackBar, private navigationService: NavigationService,
-              private tokenService: TokenService, private cookieService: CookieService,
-              private overlayContainer: OverlayContainer, private themeService: ThemeService,
-              private authUserService: AuthUserService, private seoService: SeoService, private route: ActivatedRoute) {
-    this.isDarkMode = isDarkMode(cookieService.get(THEME) as Theme);
-    this.dateFormat = this.translate.currentLang;
-    this.language = this.translate.currentLang;
-    this.getState = this.store.select(selectAuthState);
-    this.getNotificationState = this.store.select(selectNotificationState);
+  constructor() {
     this.selectStore(
       [selectRoomState, selectTreatmentState, selectCatalogueState, selectDiscountState, selectUnavailableState,
         selectUserState, selectReservationState, selectPaymentState, selectAdditionalState, selectCurrencyState,

@@ -1,4 +1,4 @@
-import { Directive, HostListener, Input } from '@angular/core';
+import { Directive, HostListener, inject, Input } from '@angular/core';
 import { NavigationService } from '../services/navigation.service';
 import { UntypedFormGroup } from '@angular/forms';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
@@ -7,15 +7,17 @@ import { MatDialog } from '@angular/material/dialog';
 import { executeDialogNoWidth } from '../util/helper';
 
 @Directive({
-  selector: '[appBackButton]'
+  selector: '[appBackButton]',
+  standalone: true,
 })
 export class BackButtonDirective {
   @Input() form?: UntypedFormGroup;
   @Input() date?: Date;
   @Input() step?: number;
 
-  constructor(private navigation: NavigationService, private translate: TranslateService, public dialog: MatDialog) {
-  }
+  private navigation: NavigationService = inject(NavigationService);
+  private translate: TranslateService = inject(TranslateService);
+  public dialog: MatDialog = inject(MatDialog);
 
   @HostListener('click')
   @HostListener('window:popstate')

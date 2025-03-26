@@ -1,34 +1,46 @@
-<div *ngIf="addressFormGroup" [formGroup]="addressFormGroup" class="divider inner-container">
-  <mat-form-field appearance="outline" hidden>
-    <mat-label>{{ 'COMMON.ADDRESS.FIELD' | translate }}</mat-label>
-    <label>
-      <input formControlName="address" matInput #addressText type="address">
-    </label>
-    <mat-error *ngIf="addressFormGroup.get('address')?.hasError('requireMatch')"
-               [innerHTML]="'COMMON.CURRENCY.INVALID' | translate">
-    </mat-error>
-  </mat-form-field>
-  <ng-template [ngIf]="addressFormGroup.get('addressDescription')">
-    <mat-form-field appearance="outline">
-      <mat-label>{{ 'COMMON.ADDRESS.DESCRIPTION' | translate }}</mat-label>
+@if (addressFormGroup) {
+  <div [formGroup]="addressFormGroup" class="divider inner-container">
+    <mat-form-field appearance="outline" hidden>
+      <mat-label>{{ 'COMMON.ADDRESS.FIELD' | translate }}</mat-label>
       <label>
-        <textarea #message formControlName="addressDescription" matInput maxlength="256"></textarea>
+        <input formControlName="address" matInput #addressText type="address">
       </label>
-      <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
+      @if (addressFormGroup.get('address')?.hasError('requireMatch')) {
+        <mat-error [innerHTML]="'COMMON.CURRENCY.INVALID' | translate"></mat-error>
+      }
     </mat-form-field>
-  </ng-template>
-</div>
-<div [ngSwitch]="mapStatus">
-  <div *ngSwitchCase="0">
-    <google-map [zoom]="zoom" class="divider" [center]="center" [height]="height" [width]="width"
-                style="display: flex; justify-content: center;" [options]="options">
-      <map-marker *ngIf="markerPosition" #marker="mapMarker" [position]="markerPosition"
-                  [options]="markerOptions" (mapDragend)="markerDragEnd($event)"
-                  (mapClick)="openInfoWindow(marker)"></map-marker>
+    @if (addressFormGroup.get('addressDescription')) {
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'COMMON.ADDRESS.DESCRIPTION' | translate }}</mat-label>
+        <label>
+          <textarea #message formControlName="addressDescription" matInput maxlength="256"></textarea>
+        </label>
+        <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
+      </mat-form-field>
+    }
+  </div>
+}
+@switch (mapStatus) {
+  @case (0) {
+    <google-map [zoom]="zoom" class="divider" [center]="center" [height]="height" [width]="width" [options]="options"
+                style="display: flex; justify-content: center;">
+      @if (markerPosition) {
+        <map-advanced-marker
+          #marker="mapAdvancedMarker"
+          [position]="markerPosition"
+          [title]="'Your Location'"
+          [options]="markerOptions"
+          (mapDragend)="markerDragEnd($event)"
+          (mapClick)="openInfoWindow(marker)">
+        </map-advanced-marker>
+      }
       <map-info-window class="map-info" [innerHTML]="info"></map-info-window>
     </google-map>
-  </div>
-  <div *ngSwitchCase="1" class="ssc-square mb"></div>
-  <div *ngSwitchDefault></div>
-</div>
-
+  }
+  @case (1) {
+    <div class="ssc-square mb"></div>
+  }
+  @default {
+    <div></div>
+  }
+}

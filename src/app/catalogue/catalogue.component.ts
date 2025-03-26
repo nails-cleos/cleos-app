@@ -19,11 +19,17 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { IGroupService, ITreatmentGroup } from '../interfaces/treatment';
 import { map, startWith } from 'rxjs/operators';
+import { SharedModule } from "../shared/shared.module";
+import { DragDropDirective } from "../directives/drag-drop.directive";
+import { SortByPipe } from "../pipes/sort-by.pipe";
+import { BackButtonDirective } from "../directives/back-button.directive";
 
 @Component({
   selector: 'app-catalogue',
   templateUrl: './catalogue.component.html',
-  styleUrls: ['./catalogue.component.scss']
+  styleUrls: ['./catalogue.component.scss'],
+  standalone: true,
+  imports: [SharedModule, DragDropDirective, SortByPipe, BackButtonDirective]
 })
 export class CatalogueComponent implements OnInit, OnDestroy {
   @ViewChild('canvas', { static: false }) canvas?: ElementRef<HTMLCanvasElement>;

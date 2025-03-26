@@ -7,12 +7,14 @@
             @if (isAddMode) {
               <mat-card-title>{{ 'EXPENSE.TITLE' | translate }}</mat-card-title>
             } @else {
+            <ng-container>
               <mat-card-title>{{ 'EXPENSE.DETAIL' | translate }}</mat-card-title>
               @if (expense) {
                 <mat-card-subtitle>{{ expense.id }}</mat-card-subtitle>
               } @else {
-                <div class="ssc-line"></div>
-              }
+              <div class="ssc-line"></div>
+            }
+            </ng-container>
             }
             @if (roomName) {
               <mat-card-subtitle>{{ roomName }}</mat-card-subtitle>
@@ -40,10 +42,11 @@
                       <mat-label>{{ 'EXPENSE.SUPPLY_STORE.FIELD' | translate }}</mat-label>
                       <input formControlName="supplyStore" [matAutocomplete]="autoSupplyStore" matInput required
                              type="text">
-                      <button matSuffix mat-icon-button *ngIf="getForm.supplyStore.value" (click)="removeSupplyStore"
-                              type="button">
-                        <mat-icon>close</mat-icon>
-                      </button>
+                      @if (getForm.supplyStore.value) {
+                        <button matSuffix mat-icon-button (click)="removeSupplyStore" type="button">
+                          <mat-icon>close</mat-icon>
+                        </button>
+                      }
                       <mat-autocomplete #autoSupplyStore="matAutocomplete" [displayWith]="displayFnSupplyStore">
                         @for (supplyStore of filteredSupplyStore | async; track supplyStore) {
                           <mat-option [value]="supplyStore">{{ supplyStore.name }}</mat-option>

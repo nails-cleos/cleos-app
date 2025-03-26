@@ -3,7 +3,6 @@ import { ColorComponent } from './color.component';
 import { ColorListComponent } from './list/color-list.component';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ColorRoutingModule } from './color-routing.module';
-import { SharedModule } from '../shared/shared.module';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { EffectsModule } from '@ngrx/effects';
 import { ColorEffects } from '../store/effects/color.effects';
@@ -14,13 +13,10 @@ import { Observable } from 'rxjs';
 
 
 @NgModule({
-  declarations: [
-    ColorComponent,
-    ColorListComponent
-  ],
   imports: [
+    ColorComponent,
+    ColorListComponent,
     ColorRoutingModule,
-    SharedModule,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,

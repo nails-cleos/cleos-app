@@ -20,12 +20,19 @@ import { isToday } from 'date-fns';
 import { Router } from '@angular/router';
 import { IPayment } from '../../../interfaces/payment';
 import { Analytics, logEvent } from '@angular/fire/analytics';
+import { SharedModule } from "../../../shared/shared.module";
+import { UpcomingComponent } from "../upcoming/upcoming.component";
+import { TimeDetailPipe } from "../../../pipes/time-detail.pipe";
+import { ReservationIconPipe } from "../../../pipes/reservation-icon.pipe";
+import { ErrorComponent } from "../../../shared/error/error.component";
 
 @Component({
   selector: 'app-reservations',
   animations: [transitionAnimation, stampAnimation],
   templateUrl: './reservations.component.html',
-  styleUrls: ['./reservations.component.scss']
+  styleUrls: ['./reservations.component.scss'],
+  standalone: true,
+  imports: [SharedModule, UpcomingComponent, TimeDetailPipe, ReservationIconPipe, ErrorComponent]
 })
 export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;

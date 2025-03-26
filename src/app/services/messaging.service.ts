@@ -1,4 +1,4 @@
-import { Injectable, Optional } from '@angular/core';
+import { inject, Injectable, Optional } from '@angular/core';
 import { EMPTY, Observable } from 'rxjs';
 import { AppState } from '../store/app.states';
 import { Store } from '@ngrx/store';
@@ -13,11 +13,13 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class MessagingService {
-  message$: Observable<any> = EMPTY;
+  private store: Store<AppState> = inject(Store<AppState>);
+  @Optional() private messaging: Messaging = inject(Messaging);
+  @Optional() private auth: Auth = inject(Auth);
+  private database: Database = inject(Database);
+  private appCheck: AppCheck = inject(AppCheck);
 
-  constructor(private store: Store<AppState>, @Optional() private messaging: Messaging, @Optional() private auth: Auth,
-              private database: Database, private appCheck: AppCheck) {
-  }
+  message$: Observable<any> = EMPTY;
 
   /**
    * update token in firebase database
@@ -31,10 +33,10 @@ export class MessagingService {
         new fromActionsNotification.NotificationSubscribe(token)
       );
       const data = {};
-      // @ts-ignore
+      // @ts-expect-error assign value in data[user.id]
       data[user.id] = token;
       const collection = ref(this.database, 'fcmTokens/');
-      update(collection, data);
+      update(collection, data).then(() => console.info("DB updated"));
     }
   }
 

@@ -5,10 +5,10 @@ import { TotalSummaryItemComponent } from "../total-summary-item/total-summary-i
 
 @Component({
   selector: 'app-result-summary',
-  standalone: true,
-  imports: [SharedModule, TotalSummaryItemComponent],
   templateUrl: './result-summary.component.html',
-  styleUrl: './result-summary.component.scss'
+  styleUrl: './result-summary.component.scss',
+  standalone: true,
+  imports: [SharedModule, TotalSummaryItemComponent]
 })
 export class ResultSummaryComponent {
   @Input() summaryTotals!: any;

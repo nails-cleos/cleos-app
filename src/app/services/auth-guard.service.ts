@@ -12,20 +12,19 @@ import * as fromActionsLogin from '../store/auth.actions';
   providedIn: 'root'
 })
 export class PermissionsService {
+  private snackBar: MatSnackBar = inject(MatSnackBar);
+  private router: Router = inject(Router);
+  private store: Store<AppState> = inject(Store<AppState>);
+  private translate: TranslateService = inject(TranslateService);
 
-  getState: Observable<any>;
-  currentUser!: IUser;
+  getState: Observable<any> = this.store.select(selectAuthState);
+  currentUser?: IUser;
   token!: string;
 
-  private readonly data: any;
+  private readonly data: any = this.router.getCurrentNavigation()?.extras?.state;
 
-  constructor(private snackBar: MatSnackBar, private router: Router, private store: Store<AppState>,
-              private translate: TranslateService) {
-    this.getState = this.store.select(selectAuthState);
-    this.getState.subscribe((state) => {
-      this.currentUser = state.user;
-    });
-    this.data = this.router.getCurrentNavigation()?.extras.state;
+  constructor() {
+    this.getState.subscribe((state) => this.currentUser = state.user);
   }
 
   private static hasRole = (route: ActivatedRouteSnapshot, user: IUser): boolean => route.data.roles &&

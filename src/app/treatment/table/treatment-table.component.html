@@ -2,44 +2,43 @@
   <ng-container matColumnDef="date">
     <th *matHeaderCellDef mat-header-cell>{{ 'TREATMENT.LIST.COLUMN.DATE' | translate }}</th>
     <td *matCellDef="let treatment" mat-cell>
-      <div *ngIf="treatment.id; else skeleton">
-        {{treatment.createdAt | date:'shortDate':undefined:dateFormat}}
-      </div>
-      <ng-template #skeleton>
+      @if (treatment.id) {
+        <div>{{ treatment.createdAt | date:'shortDate':undefined:dateFormat }}</div>
+      } @else {
         <div class="ssc-line"></div>
-      </ng-template>
+      }
     </td>
   </ng-container>
 
   <ng-container matColumnDef="price">
     <th *matHeaderCellDef mat-header-cell>{{ 'TREATMENT.LIST.COLUMN.PRICE' | translate }}</th>
     <td *matCellDef="let treatment" mat-cell>
-      <div *ngIf="treatment.id; else skeleton">
-        <mat-icon matPrefix class="hide-xs">attach_money</mat-icon>&nbsp;{{treatment.price | number:'1.2-2'}}
-      </div>
-      <ng-template #skeleton>
+      @if (treatment.id) {
+        <mat-icon matPrefix class="hide-xs">attach_money</mat-icon>&nbsp;{{ treatment.price | number:'1.2-2' }}
+      } @else {
         <div class="ssc-line"></div>
-      </ng-template>
+      }
     </td>
   </ng-container>
 
   <ng-container matColumnDef="duration">
     <th *matHeaderCellDef class="hide-xs"
-        mat-header-cell>{{ 'TREATMENT.LIST.COLUMN.DURATION' | translate }}</th>
+        mat-header-cell>{{ 'TREATMENT.LIST.COLUMN.DURATION' | translate }}
+    </th>
     <td *matCellDef="let treatment" mat-cell>
-      <div *ngIf="treatment.id; else skeleton">
+      @if (treatment.id) {
         <mat-icon matPrefix class="hide-xs">timer</mat-icon>&nbsp;
-        {{treatment.hour | number:'2.0-0'}}:{{treatment.minute | number:'2.0-0'}}
-      </div>
-      <ng-template #skeleton>
+        {{ treatment.hour | number:'2.0-0' }}:{{ treatment.minute | number:'2.0-0' }}
+      } @else {
         <div class="ssc-line"></div>
-      </ng-template>
+      }
     </td>
   </ng-container>
 
   <ng-container matColumnDef="noContent">
     <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-      {{ 'TREATMENT.LIST.ERROR.NO_CONTENT' | translate }}</td>
+      {{ 'TREATMENT.LIST.ERROR.NO_CONTENT' | translate }}
+    </td>
   </ng-container>
 
   <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
@@ -47,4 +46,6 @@
   <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
   <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
 </table>
-<mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+@if (resultsLength) {
+  <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+}

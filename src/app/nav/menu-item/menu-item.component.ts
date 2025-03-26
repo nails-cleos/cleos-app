@@ -1,15 +1,18 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { IMenu } from '../../interfaces/user';
-import { Router } from '@angular/router';
+import { Router, RouterLinkActive } from '@angular/router';
 import { Observable } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
+import { SharedModule } from "../../shared/shared.module";
 
 @Component({
   selector: 'app-menu-item',
   templateUrl: './menu-item.component.html',
-  styleUrls: ['./menu-item.component.scss']
+  styleUrls: ['./menu-item.component.scss'],
+  standalone: true,
+  imports: [SharedModule, RouterLinkActive]
 })
 export class MenuItemComponent implements OnInit {
 
@@ -43,7 +46,7 @@ export class MenuItemComponent implements OnInit {
 
   toggleSubMenu = (index: number) => {
     // Close all other submenus
-    for (let key in this.openSubMenus) {
+    for (const key in this.openSubMenus) {
       if (Number(key) !== index) {
         this.openSubMenus[key] = false;
       }
@@ -58,7 +61,7 @@ export class MenuItemComponent implements OnInit {
       this.openSubSubMenus[index] = {};
     }
     // Close all other sub-submenus within the same sub-menu
-    for (let key in this.openSubSubMenus[index]) {
+    for (const key in this.openSubSubMenus[index]) {
       if (Number(key) !== subIndex) {
         this.openSubSubMenus[index][key] = false;
       }

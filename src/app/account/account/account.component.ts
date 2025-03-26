@@ -7,16 +7,21 @@ import * as fromActionsAccount from '../../store/account.actions';
 import { IAccountAll, ITransaction, Transaction } from '../../interfaces/account';
 import { ICurrency, ICurrencyAll } from '../../interfaces/currency';
 import { map, startWith } from 'rxjs/operators';
-import { FormBuilder, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
+import { AbstractControl, FormBuilder, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
 import { requireMatch, valueChange } from '../../util/validators';
 import { AuthUserService } from '../../services/auth-user.service';
 import { getLocale } from '../../util/helper';
 import { TranslateService } from '@ngx-translate/core';
+import { SharedModule } from "../../shared/shared.module";
+import { BalanceComponent } from "../balance/balance.component";
+import { BackButtonDirective } from "../../directives/back-button.directive";
 
 @Component({
   selector: 'app-account',
   templateUrl: './account.component.html',
-  styleUrls: ['./account.component.scss']
+  styleUrls: ['./account.component.scss'],
+  standalone: true,
+  imports: [SharedModule, BalanceComponent, BackButtonDirective]
 })
 export class AccountComponent implements OnInit, OnDestroy {
   form!: UntypedFormGroup;
@@ -47,7 +52,7 @@ export class AccountComponent implements OnInit, OnDestroy {
     this.language = getLocale(this.translate.currentLang).language;
   }
 
-  get getForm(): ɵTypedOrUntyped<any, any, any> {
+  get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
     return this.form.controls;
   }
 

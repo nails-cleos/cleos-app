@@ -10,11 +10,11 @@ import { PaymentType } from '../../interfaces/payment';
 
 @Component({
   selector: 'app-form-field-adder',
-  standalone: true,
-  imports: [SharedModule],
   templateUrl: './form-field-adder.component.html',
   styleUrl: './form-field-adder.component.scss',
-  animations: [detailExpandAnimation]
+  animations: [detailExpandAnimation],
+  standalone: true,
+  imports: [SharedModule]
 })
 export class FormFieldAdderComponent implements OnInit {
   @Input() key!: string;

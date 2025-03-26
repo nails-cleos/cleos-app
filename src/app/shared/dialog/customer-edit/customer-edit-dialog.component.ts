@@ -3,11 +3,15 @@ import { IPrice } from '../../../interfaces/treatment';
 import { ICurrencyAll } from '../../../interfaces/currency';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { PENALTY } from '../../../interfaces/payment';
+import { SharedModule } from "../../shared.module";
+import { PriceComponent } from "../../price/price.component";
 
 @Component({
   selector: 'app-customer-edit-reservation-dialog',
   templateUrl: './customer-edit-dialog.component.html',
-  styleUrls: ['./customer-edit-dialog.component.scss']
+  styleUrls: ['./customer-edit-dialog.component.scss'],
+  standalone: true,
+  imports: [SharedModule, PriceComponent]
 })
 export class CustomerEditDialogComponent {
   price: IPrice;

@@ -6,12 +6,19 @@ import { AppState, selectTreatmentState } from '../../store/app.states';
 import { TranslateService } from '@ngx-translate/core';
 import { ITreatmentAll } from '../../interfaces/treatment';
 import * as fromActionsTreatment from '../../store/treatment.actions';
-import { ISorted, ItemSorting } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
+import {
+  DragDropSortingComponent,
+  ISorted,
+  ItemSorting
+} from '../../util/drag-drop-sorting/drag-drop-sorting.component';
+import { SharedModule } from "../../shared/shared.module";
 
 @Component({
   selector: 'app-treatment-sorting',
   templateUrl: './treatment-sorting.component.html',
-  styleUrls: ['./treatment-sorting.component.scss']
+  styleUrls: ['./treatment-sorting.component.scss'],
+  standalone: true,
+  imports: [SharedModule, DragDropSortingComponent]
 })
 export class TreatmentSortingComponent implements OnInit, OnDestroy {
 

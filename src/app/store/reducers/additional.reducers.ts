@@ -30,8 +30,7 @@ export const reducer = (state = initialState, action: All): State => {
     case AdditionalActionTypes.getAll: {
       return {
         ...state,
-        // @ts-ignore
-        data: { content: [{}, {}, {}], totalElements: 3 },
+        data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IAdditional>,
         errorMessage: null,
         subErrors: null,
         selected: null,

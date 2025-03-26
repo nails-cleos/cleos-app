@@ -8,10 +8,13 @@ import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../store/app.states';
 import { map, startWith } from 'rxjs/operators';
 import * as fromActionsReservation from '../../store/reservation.actions';
+import { SharedModule } from "../../shared/shared.module";
 
 @Component({
   selector: 'app-change-color-dialog-component',
-  templateUrl: './change-color-dialog.component.html'
+  templateUrl: './change-color-dialog.component.html',
+  standalone: true,
+  imports: [SharedModule]
 })
 export class ChangeColorDialogComponent implements OnInit, OnDestroy {
   colorForm!: UntypedFormGroup;

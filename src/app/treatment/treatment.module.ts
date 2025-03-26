@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../shared/shared.module';
 import { TreatmentRoutingModule } from './treatment-routing.module';
 
 import { TreatmentComponent } from './treatment.component';
@@ -20,17 +19,16 @@ import { Observable } from 'rxjs';
 import { TreatmentSortingComponent } from './sorting/treatment-sorting.component';
 
 @NgModule({
-  declarations: [
+  declarations: [],
+  imports: [
     TreatmentComponent,
     TreatmentsComponent,
     TreatmentViewComponent,
     TreatmentTableComponent,
     TreatmentGroupSortingComponent,
-    TreatmentSortingComponent
-  ],
-  imports: [
+    TreatmentSortingComponent,
+    DragDropSortingComponent,
     TreatmentRoutingModule,
-    SharedModule,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
@@ -43,8 +41,7 @@ import { TreatmentSortingComponent } from './sorting/treatment-sorting.component
       isolate: false,
       extend: true
     }),
-    EffectsModule.forFeature([TreatmentEffects]),
-    DragDropSortingComponent
+    EffectsModule.forFeature([TreatmentEffects])
   ],
   providers: [
     TreatmentService,

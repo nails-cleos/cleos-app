@@ -5,11 +5,10 @@ import { SharedModule } from '../../../shared/shared.module';
 import { API_LOCALE, getTime, getTimeNumber, newDateTimestamp } from '../../../util/dates';
 
 @Component({
-  selector: 'app-update-tracking-dialog',
-  standalone: true,
-  imports: [SharedModule],
-  templateUrl: './update-tracking-dialog.component.html',
-  styleUrl: './update-tracking-dialog.component.scss',
+    selector: 'app-update-tracking-dialog',
+    templateUrl: './update-tracking-dialog.component.html',
+    styleUrl: './update-tracking-dialog.component.scss',
+    imports: [SharedModule]
 })
 export class UpdateTrackingDialogComponent implements OnInit {
   trackingForm!: UntypedFormGroup;

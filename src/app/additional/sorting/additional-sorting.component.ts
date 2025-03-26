@@ -1,15 +1,23 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ISorted, ISorting, ItemSorting } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
+import {
+  DragDropSortingComponent,
+  ISorted,
+  ISorting,
+  ItemSorting
+} from '../../util/drag-drop-sorting/drag-drop-sorting.component';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectAdditionalState } from '../../store/app.states';
 import * as fromActionsAdditional from '../../store/additional.actions';
 import { IAdditionalAll } from '../../interfaces/additional';
+import { SharedModule } from "../../shared/shared.module";
 
 @Component({
   selector: 'app-sorting',
   templateUrl: './additional-sorting.component.html',
-  styleUrls: ['./additional-sorting.component.scss']
+  styleUrls: ['./additional-sorting.component.scss'],
+  standalone: true,
+  imports: [SharedModule, DragDropSortingComponent]
 })
 export class AdditionalSortingComponent implements OnInit, OnDestroy {
 

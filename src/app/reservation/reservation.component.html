@@ -222,11 +222,11 @@
           <mat-list-item>
             <mat-icon matListItemIcon>spa</mat-icon>
             <div class="bold" matListItemTitle>{{ 'RESERVATION.TREATMENT.DETAIL' | translate }}</div>
-            <ng-template [ngIf]="treatment.value.description">
+            @if (treatment.value.description) {
               <div [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.DESCRIPTION' |
                   translate: {description: treatment.value.description}" matListItemLine>
               </div>
-            </ng-template>
+            }
           </mat-list-item>
           <mat-list-item>
             <div matListItemTitle>
@@ -466,9 +466,9 @@
             <mat-list-item>
               <mat-icon matListItemIcon>settings</mat-icon>
               <div matListItemTitle>{{ 'RESERVATION.CONFIGURATION.CUSTOMER_CHANGE.FIELD' | translate }}</div>
-              <ng-template [ngIf]="reference.value">
+              @if (reference.value) {
                 <div matListItemLine class="description">{{ reference.value }}</div>
-              </ng-template>
+              }
             </mat-list-item>
           }
           <mat-divider></mat-divider>
@@ -521,11 +521,11 @@
           <div class="column-space-between-start">
             <div class="row-space-between-start">
               <ng-container *ngTemplateOutlet="stepOne"></ng-container>
-              <ng-template [ngIf]="isAdmin">
+              @if (isAdmin) {
                 <button type="button" (click)="addCustomer" class="raised-button" color="accent" mat-mini-fab>
                   <mat-icon>person_add</mat-icon>
                 </button>
-              </ng-template>
+              }
               <div class="vertical-divider"></div>
             </div>
           </div>

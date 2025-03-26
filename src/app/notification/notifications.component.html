@@ -4,45 +4,57 @@
       <mat-card appearance="outlined">
         <mat-card-header>
           <mat-card-title [matBadgeHidden]="badge <= 0" [matBadge]="badge" matBadgeColor="warn"
-                           [matBadgeOverlap]="false">
+                          [matBadgeOverlap]="false">
             {{ 'NOTIFICATION.TITLE' | translate }}
           </mat-card-title>
-          <mat-card-subtitle
-            *ngIf="!notifications.length">{{ 'COMMON.NOTIFICATION.NO' | translate }}</mat-card-subtitle>
+          @if (!notifications.length) {
+            <mat-card-subtitle>{{ 'COMMON.NOTIFICATION.NO' | translate }}</mat-card-subtitle>
+          }
         </mat-card-header>
         <mat-card-content>
-          <div class="inner-container" @list *ngIf="notifications.length">
-            <mat-list *ngFor="let not of notifications; last as last; first as first; let i = index" @items
-                      matRipple style="padding: 0">
-              <mat-divider *ngIf="first"></mat-divider>
-              <mat-list-item class="notification-list">
-                <div (click)="notification(not)" [matTooltip]="not.message" [ngClass]="{ 'gray-text': not.read}"
-                     matListItemTitle class="pointer">
-                  <span *ngIf="!not.read" class="pointer dot"></span>
-                  {{not.message}}
-                </div>
-                <div matListItemLine>{{not.date | date:'short':undefined:dateFormat}}</div>
-                <button matListItemMeta mat-icon-button (click)="remove(i)">
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </mat-list-item>
-              <mat-divider *ngIf="!last || showMore"></mat-divider>
-            </mat-list>
-            <mat-list>
-              @for (n of loadingNotifications; track n) {
-                <mat-list-item>
-                  <div class="ssc-line" matListItemTitle></div>
-                  <div class="ssc-line top" matListItemLine></div>
-                </mat-list-item>
-                <mat-divider class="divider"></mat-divider>
+          @if (notifications.length) {
+            <div class="inner-container" @list>
+              @for (not of notifications; let last = $last; let first = $first; let i = $index; track not) {
+                <mat-list @items matRipple style="padding: 0">
+                  @if (first) {
+                    <mat-divider></mat-divider>
+                  }
+                  <mat-list-item class="notification-list">
+                    <div (click)="notification(not)" [matTooltip]="not.message" [ngClass]="{ 'gray-text': not.read}"
+                         matListItemTitle class="pointer">
+                      @if (!not.read) {
+                        <span class="pointer dot"></span>
+                      }
+                      {{ not.message }}
+                    </div>
+                    <div matListItemLine>{{ not.date | date:'short':undefined:dateFormat }}</div>
+                    <button matListItemMeta mat-icon-button (click)="remove(i)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </mat-list-item>
+                  @if (!last || showMore) {
+                    <mat-divider></mat-divider>
+                  }
+                </mat-list>
               }
-              <mat-list-item *ngIf="showMore">
-                <button (click)="getNotifications()" color="primary" mat-button>
-                  {{'COMMON.NOTIFICATION.LOAD_MORE' | translate}}
-                </button>
-              </mat-list-item>
-            </mat-list>
-          </div>
+              <mat-list>
+                @for (n of loadingNotifications; track n) {
+                  <mat-list-item>
+                    <div class="ssc-line" matListItemTitle></div>
+                    <div class="ssc-line top" matListItemLine></div>
+                  </mat-list-item>
+                  <mat-divider class="divider"></mat-divider>
+                }
+                @if (showMore) {
+                  <mat-list-item>
+                    <button (click)="getNotifications()" color="primary" mat-button>
+                      {{ 'COMMON.NOTIFICATION.LOAD_MORE' | translate }}
+                    </button>
+                  </mat-list-item>
+                }
+              </mat-list>
+            </div>
+          }
         </mat-card-content>
       </mat-card>
     </div>

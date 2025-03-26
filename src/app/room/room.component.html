@@ -103,11 +103,12 @@
                     <mat-form-field class="chip-list full-margin">
                       <mat-label>{{ 'ROOM.PROFESSIONAL.FIELD' | translate }}</mat-label>
                       <mat-chip-grid #chipList aria-label="Professional selection">
-                        <mat-chip-row (removed)="remove(professional)" *ngFor="let professional of professionals"
-                                      [removable]="true">
-                          {{ professional.displayName }}
-                          <mat-icon matChipRemove>cancel</mat-icon>
-                        </mat-chip-row>
+                        @for (professional of professionals; track professional) {
+                          <mat-chip-row (removed)="remove(professional)" [removable]="true">
+                            {{ professional.displayName }}
+                            <mat-icon matChipRemove>cancel</mat-icon>
+                          </mat-chip-row>
+                        }
                         <input #professionalInput formControlName="professional" [matAutocomplete]="auto"
                                [matChipInputFor]="chipList">
                       </mat-chip-grid>
