@@ -20,9 +20,11 @@
     "lint": "ng lint",
     "lint-fix": "ng lint --fix",
     "eslint": "eslint src --fix",
-    "e2e": "ng e2e",
+    "e2e": "concurrently --kill-others-on-fail \"npm run start:dev\" \"npx cypress run --headless --reporter junit\"",
     "heroku-postbuild": "ng build --configuration=staging",
-    "emulator": "firebase emulators:start"
+    "emulator": "firebase emulators:start",
+    "cypress:open": "concurrently --kill-others-on-fail \"npm run start:dev\" \"npx cypress open\"",
+    "cypress:run": "cypress run"
   },
   "private": true,
   "dependencies": {
@@ -84,6 +86,7 @@
     "@angular/cli": "^19.2.3",
     "@angular/compiler-cli": "^19.2.2",
     "@angular/localize": "^19.2.2",
+    "@cypress/schematic": "^3.0.0",
     "@ngrx/schematics": "^19.0.1",
     "@types/file-saver": "^2.0.7",
     "@types/google-libphonenumber": "^7.4.30",
@@ -94,6 +97,8 @@
     "@types/pdfmake": "^0.2.11",
     "@typescript-eslint/eslint-plugin": "^8.26.1",
     "@typescript-eslint/parser": "^8.26.1",
+    "concurrently": "^9.1.2",
+    "cypress": "latest",
     "eslint": "^9.22.0",
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-jsdoc": "50.6.8",

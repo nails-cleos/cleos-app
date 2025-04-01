@@ -50,3 +50,7 @@ Thumbs.db
 
 # Firebase
 *debug.log
+
+# Cypress
+screenshots/**
+test-results.xml
