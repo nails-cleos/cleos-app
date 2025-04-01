@@ -1,18 +1,18 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { FormControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormControl, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectDiscountState } from '../../store/app.states';
 import * as fromActionsDiscount from '../../store/discount.actions';
 import { IUserDiscount } from '../../interfaces/discount';
-import { SharedModule } from "../../shared/shared.module";
+import { AppMaterialModule } from '../../util/app-material.module';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-add-discount-dialog-component',
   templateUrl: './add-discount-dialog.component.html',
-  standalone: true,
-  imports: [SharedModule]
+  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe]
 })
 export class AddDiscountDialogComponent implements OnInit, OnDestroy {
   discountForm!: UntypedFormGroup;

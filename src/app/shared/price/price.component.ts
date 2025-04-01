@@ -3,16 +3,17 @@ import { IPrice } from '../../interfaces/treatment';
 import { ICurrency } from '../../interfaces/currency';
 import { UntypedFormGroup } from '@angular/forms';
 import { IPaymentOption } from '../../interfaces/payment';
-import { SharedModule } from "../shared.module";
-import { CurrencySymbolPipe } from "../../pipes/currency-symbol.pipe";
-import { BankComponent } from "../bank/bank.component";
+import { CurrencySymbolPipe } from '../../pipes/currency-symbol.pipe';
+import { BankComponent } from '../bank/bank.component';
+import { TranslatePipe } from '@ngx-translate/core';
+import { DecimalPipe } from '@angular/common';
+import { MatDivider } from '@angular/material/divider';
 
 @Component({
   selector: 'app-price',
   templateUrl: './price.component.html',
   styleUrls: ['./price.component.scss'],
-  standalone: true,
-  imports: [SharedModule, CurrencySymbolPipe, BankComponent]
+  imports: [CurrencySymbolPipe, BankComponent, TranslatePipe, DecimalPipe, MatDivider]
 })
 export class PriceComponent {
   @Input() typeForm!: UntypedFormGroup;

@@ -1,12 +1,11 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
-import { SharedModule } from "../shared.module";
+import { SharedModule } from '../shared.module';
 
 @Component({
   selector: 'app-rating',
   templateUrl: './rating.component.html',
   styleUrls: ['./rating.component.scss'],
-  standalone: true,
   imports: [SharedModule]
 })
 export class RatingComponent implements OnInit {

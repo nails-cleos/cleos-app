@@ -138,9 +138,9 @@ export class ColorEvent implements EventColor {
 }
 
 export enum SummaryType {
-  payment = "PAYMENT",
-  expense = "EXPENSE",
-  cash = "CASH"
+  payment = 'PAYMENT',
+  expense = 'EXPENSE',
+  cash = 'CASH'
 }
 
 export enum ExpenseType {

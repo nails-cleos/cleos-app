@@ -10,24 +10,31 @@ import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Role } from '../../interfaces/token';
 import { executeDialogNoWidth, snakeToCamel } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
 import { RoleIconKey, RoleIconName } from '../../util/icon';
 import { Router } from '@angular/router';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators
+} from '@angular/forms';
 import { requireMatch } from '../../util/validators';
 import { map, startWith } from 'rxjs/operators';
-import { SharedModule } from "../../shared/shared.module";
+import { SharedModule } from '../../shared/shared.module';
+import { AsyncPipe } from '@angular/common';
+import { AppMaterialModule } from '../../util/app-material.module';
 
 @Component({
   selector: 'app-users',
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.scss'],
   animations: [detailExpandAnimation],
-  standalone: true,
   imports: [SharedModule]
 })
 export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -232,8 +239,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
 @Component({
   selector: 'app-select-user-dialog-component',
   templateUrl: './select-user-dialog.component.html',
-  standalone: true,
-  imports: [SharedModule]
+  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe, AsyncPipe]
 })
 export class SelectUserDialogComponent implements OnInit, AfterViewInit, OnDestroy {
   userForm!: UntypedFormGroup;

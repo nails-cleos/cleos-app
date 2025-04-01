@@ -8,7 +8,6 @@ import { executeDialogNoWidth } from '../util/helper';
 
 @Directive({
   selector: '[appBackButton]',
-  standalone: true,
 })
 export class BackButtonDirective {
   @Input() form?: UntypedFormGroup;

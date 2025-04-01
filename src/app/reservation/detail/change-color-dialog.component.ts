@@ -1,5 +1,11 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators
+} from '@angular/forms';
 import { IColorAll } from '../../interfaces/color';
 import { Observable, Subscription } from 'rxjs';
 import { requireMatch } from '../../util/validators';
@@ -8,13 +14,14 @@ import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../store/app.states';
 import { map, startWith } from 'rxjs/operators';
 import * as fromActionsReservation from '../../store/reservation.actions';
-import { SharedModule } from "../../shared/shared.module";
+import { AppMaterialModule } from '../../util/app-material.module';
+import { TranslatePipe } from '@ngx-translate/core';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-change-color-dialog-component',
   templateUrl: './change-color-dialog.component.html',
-  standalone: true,
-  imports: [SharedModule]
+  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe, AsyncPipe]
 })
 export class ChangeColorDialogComponent implements OnInit, OnDestroy {
   colorForm!: UntypedFormGroup;

@@ -36,14 +36,13 @@ import { getProfessionalColor } from '../util/color';
 import { CalendarDialogComponent } from '../shared/dialog/calendar/calendar-dialog.component';
 import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
 import { AuthUserService } from '../services/auth-user.service';
-import { SharedModule } from "../shared/shared.module";
-import { CounterComponent } from "../util/counter/counter.component";
+import { SharedModule } from '../shared/shared.module';
+import { CounterComponent } from '../util/counter/counter.component';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
-  standalone: true,
   imports: [SharedModule, CalendarModule, DayViewSchedulerComponent, CounterComponent]
 })
 export class DashboardComponent implements OnInit, OnDestroy {

@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Token } from '../interfaces/token';
 import { Observable } from 'rxjs';
-import { toUrl } from "../util/helper";
+import { toUrl } from '../util/helper';
 
 @Injectable()
 export class AuthService {

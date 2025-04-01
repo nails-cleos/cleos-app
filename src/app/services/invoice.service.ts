@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { IOffice } from '../interfaces/office';
 import { IReservation } from '../interfaces/reservation';
 import { IInvoice } from '../interfaces/invoice';
-import { toUrl } from "../util/helper";
+import { toUrl } from '../util/helper';
 
 @Injectable({
   providedIn: 'root'

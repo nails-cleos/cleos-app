@@ -1,14 +1,13 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { iconChange, listAnimation } from '../../../util/animation';
 import { IFabMenu } from '../../../interfaces/reservation';
-import { SharedModule } from "../../../shared/shared.module";
+import { SharedModule } from '../../../shared/shared.module';
 
 @Component({
   selector: 'app-fab-menu',
   templateUrl: './fab-menu.component.html',
   styleUrls: ['./fab-menu.component.scss'],
   animations: [listAnimation, iconChange],
-  standalone: true,
   imports: [SharedModule]
 })
 export class FabMenuComponent {

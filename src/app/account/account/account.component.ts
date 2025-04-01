@@ -12,15 +12,14 @@ import { requireMatch, valueChange } from '../../util/validators';
 import { AuthUserService } from '../../services/auth-user.service';
 import { getLocale } from '../../util/helper';
 import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from "../../shared/shared.module";
-import { BalanceComponent } from "../balance/balance.component";
-import { BackButtonDirective } from "../../directives/back-button.directive";
+import { SharedModule } from '../../shared/shared.module';
+import { BalanceComponent } from '../balance/balance.component';
+import { BackButtonDirective } from '../../directives/back-button.directive';
 
 @Component({
   selector: 'app-account',
   templateUrl: './account.component.html',
   styleUrls: ['./account.component.scss'],
-  standalone: true,
   imports: [SharedModule, BalanceComponent, BackButtonDirective]
 })
 export class AccountComponent implements OnInit, OnDestroy {

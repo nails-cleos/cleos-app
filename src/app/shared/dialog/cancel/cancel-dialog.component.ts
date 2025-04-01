@@ -1,42 +1,47 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import {
+  FormBuilder,
+  FormControl,
+  ReactiveFormsModule,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators
+} from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { IPrice } from '../../../interfaces/treatment';
 import { ICurrency } from '../../../interfaces/currency';
 import { IPaymentOption, PENALTY } from '../../../interfaces/payment';
-import { SharedModule } from "../../shared.module";
-import { PriceComponent } from "../../price/price.component";
+import { PriceComponent } from '../../price/price.component';
+import { AppMaterialModule } from '../../../util/app-material.module';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-cancel-dialog',
   templateUrl: './cancel-dialog.component.html',
   styleUrls: ['./cancel-dialog.component.scss'],
-  standalone: true,
-  imports: [SharedModule, PriceComponent]
+  imports: [PriceComponent, AppMaterialModule, ReactiveFormsModule, TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CancelDialogComponent implements OnInit {
+  readonly dialogRef = inject(MatDialogRef<CancelDialogComponent>);
+  readonly data = inject<any>(MAT_DIALOG_DATA);
+  private formBuilder: FormBuilder = inject(FormBuilder);
+
   cancelForm!: UntypedFormGroup;
   typeForm!: UntypedFormGroup;
-  paymentOptions: IPaymentOption[];
+  paymentOptions: IPaymentOption[] = this.data.paymentOptions;
 
   paymentCancellation: FormControl = new UntypedFormControl('', [
     Validators.required
   ]);
 
-  options: string[];
-  price?: IPrice;
-  currency: ICurrency;
-  showPenalty: boolean;
+  options: string[] = this.data.options;
+  price?: IPrice = this.data.price;
+  currency: ICurrency = this.data.currency;
+  showPenalty: boolean = this.data.showPenalty || false;
   penalty = PENALTY;
 
-  constructor(public dialogRef: MatDialogRef<CancelDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
-              private formBuilder: FormBuilder) {
-    this.options = data.options;
-    this.price = data.price;
-    this.paymentOptions = data.paymentOptions;
-    this.currency = data.currency;
-    this.showPenalty = data.showPenalty || false;
-
+  constructor() {
     if (this.options.length === 1) {
       this.paymentCancellation.setValue(this.options[0]);
     }

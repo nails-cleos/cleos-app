@@ -24,7 +24,6 @@ import { RouterOutlet } from '@angular/router';
     provide: DateAdapter,
     useClass: YearMonthDateAdapter
   }],
-  standalone: true,
   imports: [RouterOutlet]
 })
 export class AppComponent implements OnInit, OnDestroy {

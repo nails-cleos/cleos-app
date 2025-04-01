@@ -43,16 +43,15 @@ import { ThemeService } from 'ng2-charts';
 import { AuthUserService } from '../services/auth-user.service';
 import { SeoService } from '../services/seo.service';
 import { newDateTimestamp } from '../util/dates';
-import { SharedModule } from "../shared/shared.module";
-import { MenuItemComponent } from "./menu-item/menu-item.component";
-import { ErrorComponent } from "../shared/error/error.component";
-import { MatRipple } from "@angular/material/core";
+import { SharedModule } from '../shared/shared.module';
+import { MenuItemComponent } from './menu-item/menu-item.component';
+import { ErrorComponent } from '../shared/error/error.component';
+import { MatRipple } from '@angular/material/core';
 
 @Component({
   selector: 'app-nav',
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.scss'],
-  standalone: true,
   imports: [SharedModule, MenuItemComponent, RouterLinkActive, RouterOutlet, ErrorComponent, MatRipple]
 })
 export class NavComponent implements OnInit, OnDestroy {

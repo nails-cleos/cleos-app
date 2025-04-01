@@ -9,15 +9,14 @@ import { TranslateService } from '@ngx-translate/core';
 import { NavigationService } from '../services/navigation.service';
 import { zoneDateToDate } from '../util/dates';
 import { addRemoveItemList, insertItemList } from '../util/animation';
-import { SharedModule } from "../shared/shared.module";
-import { MatRipple } from "@angular/material/core";
+import { SharedModule } from '../shared/shared.module';
+import { MatRipple } from '@angular/material/core';
 
 @Component({
   selector: 'app-notifications',
   templateUrl: './notifications.component.html',
   styleUrls: ['./notifications.component.scss'],
   animations: [insertItemList, addRemoveItemList],
-  standalone: true,
   imports: [SharedModule, MatRipple]
 })
 export class NotificationsComponent implements OnInit, OnDestroy {

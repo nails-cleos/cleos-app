@@ -14,18 +14,17 @@ import { formatDateTime, newDateTimestamp } from '../../util/dates';
 import { IAccountAll } from '../../interfaces/account';
 import { IUserAll } from '../../interfaces/user';
 import { AuthUserService } from '../../services/auth-user.service';
-import { SharedModule } from "../../shared/shared.module";
-import { ErrorComponent } from "../../shared/error/error.component";
-import { CardComponent } from "../../shared/card/card.component";
-import { ChartComponent } from "../../shared/chart/chart.component";
-import { GoogleMapComponent } from "../../shared/google-map/google-map.component";
-import { BackButtonDirective } from "../../directives/back-button.directive";
+import { SharedModule } from '../../shared/shared.module';
+import { ErrorComponent } from '../../shared/error/error.component';
+import { CardComponent } from '../../shared/card/card.component';
+import { ChartComponent } from '../../shared/chart/chart.component';
+import { GoogleMapComponent } from '../../shared/google-map/google-map.component';
+import { BackButtonDirective } from '../../directives/back-button.directive';
 
 @Component({
   selector: 'app-overview',
   templateUrl: './overview.component.html',
   styleUrls: ['./overview.component.scss'],
-  standalone: true,
   imports: [SharedModule, ErrorComponent, CardComponent, ChartComponent, GoogleMapComponent, BackButtonDirective]
 })
 export class OverviewComponent implements OnInit, OnDestroy {

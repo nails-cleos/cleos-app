@@ -4,7 +4,7 @@ import { GeocodeService, MapStatus } from '../../services/geocode.service';
 import { GoogleMap, MapAdvancedMarker, MapInfoWindow } from '@angular/google-maps';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Subscription } from 'rxjs';
-import { SharedModule } from "../shared.module";
+import { SharedModule } from '../shared.module';
 import PlaceResult = google.maps.places.PlaceResult;
 import MapMouseEvent = google.maps.MapMouseEvent;
 
@@ -13,7 +13,6 @@ import MapMouseEvent = google.maps.MapMouseEvent;
   templateUrl: './google-map.component.html',
   styleUrls: ['./google-map.component.scss'],
   viewProviders: [{ provide: ControlContainer, useExisting: NgForm }],
-  standalone: true,
   imports: [SharedModule, GoogleMap, MapInfoWindow, MapAdvancedMarker]
 })
 export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {

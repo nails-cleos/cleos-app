@@ -10,7 +10,7 @@ import { BaseChartDirective } from 'ng2-charts';
 import { CustomDateFormatter } from './CustomDateFormatter';
 import { CustomEventTitleFormatter } from './CustomEventTitleFormatter';
 import { GoogleMapsModule } from '@angular/google-maps';
-import { RouterLink } from "@angular/router";
+import { RouterLink } from '@angular/router';
 
 const importExport = [
   CommonModule,

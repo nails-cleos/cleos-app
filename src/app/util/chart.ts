@@ -2,7 +2,7 @@ import { ChartConfiguration, ChartOptions, ChartType, TooltipItem } from 'chart.
 import { IChart } from '../interfaces/dashboard';
 import { ICurrency } from '../interfaces/currency';
 import { numberFormat } from './numbers';
-import { getNowTimeZone, newDateTimestamp } from "./dates";
+import { getNowTimeZone, newDateTimestamp } from './dates';
 
 export interface IChartUtil {
   labels: any[];

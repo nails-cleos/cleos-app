@@ -3,13 +3,12 @@ import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } 
 import { Availability, IAvailability, IAvailabilityDate } from '../../interfaces/room';
 import { createDate, getCurrentTimeZone, getTime } from '../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from "../../shared/shared.module";
+import { SharedModule } from '../../shared/shared.module';
 
 @Component({
   selector: 'app-availability',
   templateUrl: './availability.component.html',
   styleUrls: ['./availability.component.scss'],
-  standalone: true,
   imports: [SharedModule]
 })
 export class AvailabilityComponent implements OnChanges {

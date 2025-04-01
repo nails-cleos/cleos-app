@@ -1,5 +1,11 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators
+} from '@angular/forms';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { Observable, Subscription } from 'rxjs';
 import { requireMatch } from '../../util/validators';
@@ -8,14 +14,15 @@ import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
 import { map, startWith } from 'rxjs/operators';
 import * as fromActionsUser from '../../store/user.actions';
-import { SharedModule } from "../../shared/shared.module";
+import { AppMaterialModule } from '../../util/app-material.module';
+import { TranslatePipe } from '@ngx-translate/core';
+import { AsyncPipe } from '@angular/common';
 
 
 @Component({
   selector: 'app-change-customer-dialog-component',
   templateUrl: './change-customer-dialog.component.html',
-  standalone: true,
-  imports: [SharedModule]
+  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe, AsyncPipe]
 })
 export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
   customerForm!: UntypedFormGroup;

@@ -1,21 +1,19 @@
-import { Component, Inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { IDialog } from '../../../interfaces/dialog';
-import { SharedModule } from "../../shared.module";
+import { TranslatePipe } from '@ngx-translate/core';
+import { AppMaterialModule } from '../../../util/app-material.module';
 
 @Component({
   selector: 'app-dialog',
   templateUrl: './dialog.component.html',
   styleUrls: ['./dialog.component.scss'],
-  standalone: true,
-  imports: [SharedModule]
+  imports: [AppMaterialModule, TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DialogComponent {
-
-  constructor(
-    public dialogRef: MatDialogRef<DialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: IDialog) {
-  }
+  readonly dialogRef = inject(MatDialogRef<DialogComponent>);
+  readonly data = inject<IDialog>(MAT_DIALOG_DATA);
 
   get onNoClick(): void {
     return this.dialogRef.close();

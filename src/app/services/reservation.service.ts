@@ -5,7 +5,7 @@ import { ICustomerReservation, IReservation, IRoomReservation } from '../interfa
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { IReview } from '../interfaces/review';
 import { createFilter } from '../util/service-helper';
-import { toUrl } from "../util/helper";
+import { toUrl } from '../util/helper';
 
 @Injectable()
 export class ReservationService {

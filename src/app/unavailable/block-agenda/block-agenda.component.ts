@@ -38,14 +38,13 @@ import { closest } from '../../util/numbers';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { SharedModule } from "../../shared/shared.module";
-import { BackButtonDirective } from "../../directives/back-button.directive";
+import { SharedModule } from '../../shared/shared.module';
+import { BackButtonDirective } from '../../directives/back-button.directive';
 
 @Component({
   selector: 'app-block-agenda',
   templateUrl: './block-agenda.component.html',
   styleUrls: ['./block-agenda.component.scss'],
-  standalone: true,
   imports: [SharedModule, BackButtonDirective]
 })
 export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {

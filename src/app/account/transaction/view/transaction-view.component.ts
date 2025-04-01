@@ -14,15 +14,14 @@ import * as fromActionsAccount from '../../../store/account.actions';
 import { detailExpandAnimation } from '../../../util/animation';
 import { newDateTimestamp } from '../../../util/dates';
 import { AuthUserService } from '../../../services/auth-user.service';
-import { SharedModule } from "../../../shared/shared.module";
-import { BalanceComponent } from "../../balance/balance.component";
+import { SharedModule } from '../../../shared/shared.module';
+import { BalanceComponent } from '../../balance/balance.component';
 
 @Component({
   selector: 'app-transaction-view',
   templateUrl: './transaction-view.component.html',
   styleUrls: ['./transaction-view.component.scss'],
   animations: [detailExpandAnimation],
-  standalone: true,
   imports: [SharedModule, BalanceComponent]
 })
 export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestroy {

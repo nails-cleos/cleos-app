@@ -3,7 +3,7 @@ import { inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { TokenService } from '../services/token.service';
 import { IUserAll } from '../interfaces/user';
-import { isExternalUrl } from "./index";
+import { isExternalUrl } from './index';
 
 export const requestOptionInterceptor = (req: HttpRequest<unknown>,
                                          next: HttpHandlerFn): Observable<HttpEvent<unknown>> => {

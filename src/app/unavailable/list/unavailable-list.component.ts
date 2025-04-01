@@ -15,16 +15,15 @@ import { IUnavailable, IUnavailableAll } from '../../interfaces/unavailable';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
 import { createDialog } from '../../util/helper';
-import { SharedModule } from "../../shared/shared.module";
-import { TimeDetailPipe } from "../../pipes/time-detail.pipe";
-import { DurationTimePipe } from "../../pipes/durationTime.pipe";
+import { SharedModule } from '../../shared/shared.module';
+import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
+import { DurationTimePipe } from '../../pipes/durationTime.pipe';
 
 @Component({
   selector: 'app-unavailable-list',
   templateUrl: './unavailable-list.component.html',
   styleUrls: ['./unavailable-list.component.scss'],
   animations: [detailExpandAnimation],
-  standalone: true,
   imports: [SharedModule, TimeDetailPipe, DurationTimePipe]
 })
 export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestroy {

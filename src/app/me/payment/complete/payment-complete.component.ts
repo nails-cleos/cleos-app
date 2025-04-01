@@ -6,13 +6,12 @@ import { Store } from '@ngrx/store';
 import * as fromActionsPayment from '../../../store/payment.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { PaymentStatus, PaymentType } from '../../../interfaces/payment';
-import { SharedModule } from "../../../shared/shared.module";
+import { SharedModule } from '../../../shared/shared.module';
 
 @Component({
   selector: 'app-payment-complete',
   templateUrl: './payment-complete.component.html',
   styleUrls: ['./payment-complete.component.scss'],
-  standalone: true,
   imports: [SharedModule]
 })
 export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewInit {

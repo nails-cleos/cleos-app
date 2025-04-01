@@ -17,14 +17,13 @@ import { ICurrency, ICurrencyAll } from '../interfaces/currency';
 import { fieldChange, valueChange } from '../util/validators';
 import { map, startWith } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from "../shared/shared.module";
-import { BackButtonDirective } from "../directives/back-button.directive";
+import { SharedModule } from '../shared/shared.module';
+import { BackButtonDirective } from '../directives/back-button.directive';
 
 @Component({
   selector: 'app-discount',
   templateUrl: './discount.component.html',
   styleUrls: ['./discount.component.scss'],
-  standalone: true,
   imports: [SharedModule, BackButtonDirective]
 })
 export class DiscountComponent implements OnInit, OnDestroy {

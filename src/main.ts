@@ -32,14 +32,14 @@ import { PermissionsService } from './app/services/auth-guard.service';
 import { PaginatorI18n } from './app/util/paginator';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatPaginatorIntl } from '@angular/material/paginator';
-import { localStorageSync } from "ngrx-store-localstorage";
+import { localStorageSync } from 'ngrx-store-localstorage';
 import localeEn from '@angular/common/locales/en';
 import localeEnGB from '@angular/common/locales/en-GB';
 import localeEnNL from '@angular/common/locales/en-NL';
 import localeEs from '@angular/common/locales/es';
 import localeAr from '@angular/common/locales/es-AR';
-import { provideHttpClient, withInterceptors, withJsonpSupport } from "@angular/common/http";
-import { httpInterceptorProviders } from "./app/http-interceptors";
+import { provideHttpClient, withInterceptors, withJsonpSupport } from '@angular/common/http';
+import { httpInterceptorProviders } from './app/http-interceptors';
 
 const cookieConfig: NgcCookieConsentConfig = {
   cookie: {

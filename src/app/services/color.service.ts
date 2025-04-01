@@ -4,7 +4,7 @@ import { PAGE_SIZE } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
 import { IColor } from '../interfaces/color';
 import { createFilter } from '../util/service-helper';
-import { toUrl } from "../util/helper";
+import { toUrl } from '../util/helper';
 
 @Injectable()
 export class ColorService {

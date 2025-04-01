@@ -12,14 +12,13 @@ import { IUserDiscount } from '../../interfaces/discount';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Analytics, logEvent } from '@angular/fire/analytics';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { SharedModule } from "../../shared/shared.module";
-import { ShareButtonsComponent } from "./share-buttons/share-buttons.component";
+import { SharedModule } from '../../shared/shared.module';
+import { ShareButtonsComponent } from './share-buttons/share-buttons.component';
 
 @Component({
   selector: 'app-referrals',
   templateUrl: './referrals.component.html',
   styleUrls: ['./referrals.component.scss'],
-  standalone: true,
   imports: [SharedModule]
 })
 export class ReferralsComponent implements OnInit, OnDestroy {
@@ -105,7 +104,6 @@ export class ReferralsComponent implements OnInit, OnDestroy {
 @Component({
   selector: 'app-bottom-sheet-share',
   templateUrl: 'bottom-sheet-share.component.html',
-  standalone: true,
   imports: [SharedModule, ShareButtonsComponent]
 })
 export class BottomSheetShareComponent {
@@ -138,7 +136,6 @@ export class BottomSheetShareComponent {
   selector: 'app-bottom-sheet-referral',
   templateUrl: 'bottom-sheet-referral.component.html',
   styleUrls: ['./bottom-sheet-referral.component.scss'],
-  standalone: true,
   imports: [SharedModule]
 })
 export class BottomSheetReferralComponent {

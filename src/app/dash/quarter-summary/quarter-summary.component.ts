@@ -26,9 +26,9 @@ import { ICurrencyAll } from '../../interfaces/currency';
 import { createQuarterSummary } from '../../util/report';
 import fs from 'file-saver';
 import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from "../../shared/shared.module";
-import { QuarterComponent } from "./quarter/quarter.component";
-import { TotalSummaryComponent } from "../total-summary/total-summary.component";
+import { SharedModule } from '../../shared/shared.module';
+import { QuarterComponent } from './quarter/quarter.component';
+import { TotalSummaryComponent } from '../total-summary/total-summary.component';
 
 @Component({
   selector: 'app-quarter-summary',
@@ -37,7 +37,6 @@ import { TotalSummaryComponent } from "../total-summary/total-summary.component"
   providers: [
     { provide: DateAdapter, useClass: YearAdapter }
   ],
-  standalone: true,
   imports: [SharedModule, QuarterComponent, TotalSummaryComponent]
 })
 export class QuarterSummaryComponent implements OnInit, OnDestroy {

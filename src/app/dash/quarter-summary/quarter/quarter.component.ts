@@ -4,14 +4,13 @@ import { ICurrencyAll } from '../../../interfaces/currency';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { dateMonthYear, monthTitle } from '../../../util/dates';
-import { SharedModule } from "../../../shared/shared.module";
-import { MonthComponent } from "../../month-summary/month/month.component";
+import { SharedModule } from '../../../shared/shared.module';
+import { MonthComponent } from '../../month-summary/month/month.component';
 
 @Component({
   selector: 'app-quarter',
   templateUrl: './quarter.component.html',
   styleUrls: ['./quarter.component.scss'],
-  standalone: true,
   imports: [SharedModule, MonthComponent]
 })
 export class QuarterComponent {

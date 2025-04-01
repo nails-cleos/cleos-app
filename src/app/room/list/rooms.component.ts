@@ -15,15 +15,14 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
 import { findDayOfWeek, getTimeZone, ITimeZone } from '../../util/dates';
 import { executeDialogNoWidth } from '../../util/helper';
-import { SharedModule } from "../../shared/shared.module";
-import { SortByPipe } from "../../pipes/sort-by.pipe";
+import { SharedModule } from '../../shared/shared.module';
+import { SortByPipe } from '../../pipes/sort-by.pipe';
 
 @Component({
   selector: 'app-rooms',
   templateUrl: './rooms.component.html',
   styleUrls: ['./rooms.component.scss'],
   animations: [detailExpandAnimation],
-  standalone: true,
   imports: [SharedModule, SortByPipe]
 })
 export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {

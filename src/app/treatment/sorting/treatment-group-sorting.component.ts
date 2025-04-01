@@ -10,13 +10,12 @@ import { Store } from '@ngrx/store';
 import { AppState, selectTreatmentState } from '../../store/app.states';
 import * as fromActionsTreatment from '../../store/treatment.actions';
 import { ITreatmentGroupAll } from '../../interfaces/treatment';
-import { SharedModule } from "../../shared/shared.module";
+import { SharedModule } from '../../shared/shared.module';
 
 @Component({
   selector: 'app-treatment-group-sorting',
   templateUrl: './treatment-sorting.component.html',
   styleUrls: ['./treatment-group-sorting.component.scss'],
-  standalone: true,
   imports: [SharedModule, DragDropSortingComponent]
 })
 export class TreatmentGroupSortingComponent implements OnInit, OnDestroy {

@@ -21,10 +21,10 @@ import { createAddress } from '../util/helper';
 import { TranslateService } from '@ngx-translate/core';
 import { NgxColorsModule, validColorValidator } from 'ngx-colors';
 import { Role } from '../interfaces/token';
-import { SharedModule } from "../shared/shared.module";
-import { GoogleMapComponent } from "../shared/google-map/google-map.component";
-import { BackButtonDirective } from "../directives/back-button.directive";
-import { NgxMaterialIntlTelInputComponent } from "ngx-material-intl-tel-input";
+import { SharedModule } from '../shared/shared.module';
+import { GoogleMapComponent } from '../shared/google-map/google-map.component';
+import { BackButtonDirective } from '../directives/back-button.directive';
+import { NgxMaterialIntlTelInputComponent } from 'ngx-material-intl-tel-input';
 import PlaceGeometry = google.maps.places.PlaceGeometry;
 import PlaceResult = google.maps.places.PlaceResult;
 
@@ -32,7 +32,6 @@ import PlaceResult = google.maps.places.PlaceResult;
   selector: 'app-user',
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.scss'],
-  standalone: true,
   imports: [SharedModule, NgxMaterialIntlTelInputComponent, GoogleMapComponent, NgxColorsModule, BackButtonDirective]
 })
 export class UserComponent implements OnInit, OnDestroy {

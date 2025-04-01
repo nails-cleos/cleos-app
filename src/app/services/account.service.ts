@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { IAccount, ITransaction } from '../interfaces/account';
 import { createFilter } from '../util/service-helper';
 import { PAGE_SIZE } from '../interfaces/pagination';
-import { toUrl } from "../util/helper";
+import { toUrl } from '../util/helper';
 
 @Injectable({
   providedIn: 'root'

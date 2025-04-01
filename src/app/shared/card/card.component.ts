@@ -5,13 +5,14 @@ import { IChart } from '../../interfaces/dashboard';
 import { ICurrency } from '../../interfaces/currency';
 import { Subscription } from 'rxjs';
 import { AuthUserService } from '../../services/auth-user.service';
-import { SharedModule } from "../shared.module";
+import { SharedModule } from '../shared.module';
+import { AppMaterialModule } from '../../util/app-material.module';
+import { BaseChartDirective } from 'ng2-charts';
 
 @Component({
   selector: 'app-card',
   templateUrl: './card.component.html',
   styleUrls: ['./card.component.scss'],
-  standalone: true,
   imports: [SharedModule]
 })
 export class CardComponent implements OnDestroy {
@@ -55,7 +56,7 @@ export class CardComponent implements OnDestroy {
     selector: 'app-card-chart-component',
     templateUrl: './card-chart-component.html',
     styleUrls: ['./card-chart-component.scss'],
-    imports: [SharedModule]
+  imports: [AppMaterialModule, BaseChartDirective]
 })
 export class CardChartComponent {
   constructor(

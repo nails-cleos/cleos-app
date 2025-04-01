@@ -36,7 +36,7 @@ export class MessagingService {
       // @ts-expect-error assign value in data[user.id]
       data[user.id] = token;
       const collection = ref(this.database, 'fcmTokens/');
-      update(collection, data).then(() => console.info("DB updated"));
+      update(collection, data).then(() => console.info('DB updated'));
     }
   }
 

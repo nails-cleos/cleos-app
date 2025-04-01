@@ -28,8 +28,8 @@ import { TotalSummaryComponent } from './total-summary/total-summary.component';
 import { AppState, selectI18nState } from '../store/app.states';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { ResultSummaryComponent } from "./result-summary/result-summary.component";
-import { TotalSummaryItemComponent } from "./total-summary-item/total-summary-item.component";
+import { ResultSummaryComponent } from './result-summary/result-summary.component';
+import { TotalSummaryItemComponent } from './total-summary-item/total-summary-item.component';
 
 @NgModule({
   imports: [

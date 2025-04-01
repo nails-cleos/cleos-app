@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { IPayment, IPaymentStatus } from '../interfaces/payment';
 import { IReservationPayment } from '../interfaces/reservation';
-import { toUrl } from "../util/helper";
+import { toUrl } from '../util/helper';
 
 @Injectable()
 export class PaymentService {

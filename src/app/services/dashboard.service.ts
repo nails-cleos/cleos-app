@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ICardSummary, IEventSummary, IMonthlySummaryRequest, IRoomEvents } from '../interfaces/dashboard';
 import { IReservation } from '../interfaces/reservation';
-import { toUrl } from "../util/helper";
+import { toUrl } from '../util/helper';
 
 @Injectable()
 export class DashboardService {

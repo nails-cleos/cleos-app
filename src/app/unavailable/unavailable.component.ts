@@ -39,14 +39,13 @@ import { fieldChange, requireMatchAsync, valueChange } from '../util/validators'
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { SharedModule } from "../shared/shared.module";
-import { BackButtonDirective } from "../directives/back-button.directive";
+import { SharedModule } from '../shared/shared.module';
+import { BackButtonDirective } from '../directives/back-button.directive';
 
 @Component({
   selector: 'app-unavailable',
   templateUrl: './unavailable.component.html',
   styleUrls: ['./unavailable.component.scss'],
-  standalone: true,
   imports: [SharedModule, BackButtonDirective]
 })
 export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {

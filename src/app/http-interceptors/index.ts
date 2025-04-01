@@ -1,7 +1,7 @@
-import { noopInterceptor } from "./noop-interceptor";
-import { authInterceptor } from "./auth-interceptor";
-import { errorInterceptor } from "./error-interceptor";
-import { requestOptionInterceptor } from "./request-option-interceptor";
+import { noopInterceptor } from './noop-interceptor';
+import { authInterceptor } from './auth-interceptor';
+import { errorInterceptor } from './error-interceptor';
+import { requestOptionInterceptor } from './request-option-interceptor';
 
 export const httpInterceptorProviders = [
   noopInterceptor,

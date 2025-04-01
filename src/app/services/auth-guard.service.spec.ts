@@ -1,11 +1,11 @@
 import { getTestBed, TestBed } from '@angular/core/testing';
 
 import { authGuard, PermissionsService } from './auth-guard.service';
-import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from "@angular/router";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import { Store } from "@ngrx/store";
-import { TranslateService } from "@ngx-translate/core";
-import { of } from "rxjs";
+import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Store } from '@ngrx/store';
+import { TranslateService } from '@ngx-translate/core';
+import { of } from 'rxjs';
 
 let injector: TestBed;
 let service: PermissionsService;

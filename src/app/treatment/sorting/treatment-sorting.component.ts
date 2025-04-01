@@ -11,13 +11,12 @@ import {
   ISorted,
   ItemSorting
 } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
-import { SharedModule } from "../../shared/shared.module";
+import { SharedModule } from '../../shared/shared.module';
 
 @Component({
   selector: 'app-treatment-sorting',
   templateUrl: './treatment-sorting.component.html',
   styleUrls: ['./treatment-sorting.component.scss'],
-  standalone: true,
   imports: [SharedModule, DragDropSortingComponent]
 })
 export class TreatmentSortingComponent implements OnInit, OnDestroy {

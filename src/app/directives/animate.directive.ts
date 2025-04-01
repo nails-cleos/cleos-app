@@ -9,7 +9,6 @@ import {
 
 @Directive({
   selector: '[appAnimate]',
-  standalone: true,
 })
 export class AnimateDirective implements OnInit, AfterViewInit, OnDestroy {
 
