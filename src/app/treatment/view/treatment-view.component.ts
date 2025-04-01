@@ -52,7 +52,7 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
     this.store.dispatch(
       new fromActionsTreatment.TreatmentHistory({ id: this.group?.id, treatmentId })
     );
-  }
+  };
 
   private getTreatment = (): void => {
     if (!this.group) {
@@ -61,7 +61,7 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
         new fromActionsTreatment.TreatmentFind({ id, path: 'view' })
       );
     }
-  }
+  };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
@@ -90,6 +90,6 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
         }
       }
     });
-  }
+  };
 }
 

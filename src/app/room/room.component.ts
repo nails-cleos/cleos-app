@@ -184,7 +184,7 @@ export class RoomComponent implements OnInit, OnDestroy {
       return createDate(timeZone, startTime?.hour, startTime?.minute);
     }
     return undefined;
-  }
+  };
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(param => {
@@ -209,7 +209,7 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   setStep = (index: number): void => {
     this.step = index;
-  }
+  };
 
   displayCurrencyFn = (currency: ICurrencyAll): string => currency ? currency.code : '';
 
@@ -221,7 +221,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     if (event.code === 'Backspace') {
       form.setValue('');
     }
-  }
+  };
 
   addAvailability = (availability: IAvailability, step: number): void => {
     this.setIcon(availability.day, RoomIconName.eventAvailable);
@@ -233,7 +233,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.availabilities = [...this.availabilities, availability];
 
     this.step = step;
-  }
+  };
 
   ignore = (day: string, step: number): void => {
     this.setIcon(day, RoomIconName.eventBusy);
@@ -242,13 +242,13 @@ export class RoomComponent implements OnInit, OnDestroy {
       this.availabilities.splice(index, 1);
     }
     this.step = step;
-  }
+  };
 
   onChange = (options: MatListOption[]): void => {
     this.paymentTypes = options.map(o => o.value);
-  }
+  };
 
-  isSelected = (it: IPaymentType): boolean => it.checked || this.paymentTypes.includes(it.name)
+  isSelected = (it: IPaymentType): boolean => it.checked || this.paymentTypes.includes(it.name);
 
   remove = (professional: IUserAll): void => {
     const index = this.professionals.indexOf(professional);
@@ -257,7 +257,7 @@ export class RoomComponent implements OnInit, OnDestroy {
       this.allProfessional?.push(professional);
       this.getForm.professional.setValue(null);
     }
-  }
+  };
 
   selected = (event: MatAutocompleteSelectedEvent): void => {
     const professional = event.option.value;
@@ -265,7 +265,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.allProfessional = this.allProfessional?.filter(c => c.id !== professional.id);
     this.professionalInput.nativeElement.value = '';
     this.getForm.professional.setValue(null);
-  }
+  };
 
   sortProfessionals = (data: any): IUser[] => data.sort((a: any, b: any) => {
     const aName = a.displayName.toUpperCase();
@@ -276,7 +276,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   getAddress = (placeResult: PlaceResult): void => {
     this.geometry = placeResult.geometry;
     this.formattedAddress = placeResult.formatted_address;
-  }
+  };
 
   private createForm = (): void => {
     this.form = this.formBuilder.group({
@@ -313,7 +313,7 @@ export class RoomComponent implements OnInit, OnDestroy {
       map(value => typeof value === 'string' ? value : value.label),
       map(name => name ? this.filterTimeZone(name) : this.timeZoneList ? this.timeZoneList.slice() : this.timeZoneList)
     );
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsRoom.Clean());
 
@@ -343,7 +343,7 @@ export class RoomComponent implements OnInit, OnDestroy {
         this.icons.sunday = icon;
         break;
     }
-  }
+  };
 
   private getAvailabilities = (availabilities: IAvailability[]): void => availabilities.forEach((av: IAvailability) => {
     this.currentAvailabilities = [...this.currentAvailabilities, av];
@@ -432,7 +432,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     }
 
     return true;
-  }
+  };
 
   private filter = (name: string): IUserAll[] | undefined => this.allProfessional?.filter(
     option => option.displayName?.toLowerCase().indexOf(name.toString()) === 0);
@@ -451,7 +451,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsRoom.RoomFind({ id, redirect: true })
     );
-  }
+  };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
@@ -494,5 +494,5 @@ export class RoomComponent implements OnInit, OnDestroy {
         this.router.navigate([this.language, 'rooms']);
       }
     });
-  }
+  };
 }

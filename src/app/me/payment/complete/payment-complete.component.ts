@@ -105,5 +105,5 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
         this.router.navigate([this.language, 'me', this.path, this.id, 'payment']);
       }
     });
-  }
+  };
 }

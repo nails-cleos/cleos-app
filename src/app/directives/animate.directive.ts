@@ -55,7 +55,7 @@ export class AnimateDirective implements OnInit, AfterViewInit, OnDestroy {
     }
 
     return animation?.create(this.el.nativeElement);
-  }
+  };
 
   private animate = (inView: boolean): void => {
     if (!inView) {
@@ -68,5 +68,5 @@ export class AnimateDirective implements OnInit, AfterViewInit, OnDestroy {
 
     this.player?.play();
     this.animating = true;
-  }
+  };
 }

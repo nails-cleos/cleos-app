@@ -152,7 +152,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  displayFnGroup = (group: ITreatmentGroup): string => group ? `${ group.name }` : ''
+  displayFnGroup = (group: ITreatmentGroup): string => group ? `${ group.name }` : '';
 
   displayFnTreatment = (treatment: ITreatment): string => treatment ? `${ treatment.name }` : '';
 
@@ -162,21 +162,21 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     if (event.code === 'Backspace') {
       form.setValue('');
     }
-  }
+  };
 
   onChange = (options: MatListOption[]): void => {
     this.additionalSelected = options.map(o => o.value);
     this.price = newAdditional(this.price, this.additionalSelected, this.reservation?.treatment?.discountCustomer);
     this.setPaymentType();
-  }
+  };
 
-  isSelected = (it: IAdditionalAll): boolean => this.additionalSelected.filter(el => el.id === it.id).length > 0
+  isSelected = (it: IAdditionalAll): boolean => this.additionalSelected.filter(el => el.id === it.id).length > 0;
 
   timeChange = ($event: string, date: Date): void => {
     const time = getTimeNumber($event);
     date.setHours(time?.hour || 0, time?.minute || 0, 0);
     this.setAppointmentDuration();
-  }
+  };
 
   onExtrasChanges = (extras: IExtras[]): void => {
     this.currentExtraData = extras;
@@ -185,11 +185,11 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       extrasTotal = extras.map(a => a.price).reduce((p, c) => p + c);
     }
     this.price = newExtra(this.price, extrasTotal, this.reservation?.treatment?.discountCustomer);
-  }
+  };
 
   onSplitChanges = (split: IExtras[]): void => {
     this.currentSplitData = split;
-  }
+  };
 
   splitChange = () => {
     this.split = !this.split;
@@ -199,13 +199,13 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
         this.isValidSplit = false;
       }
     }
-  }
+  };
 
   private setAppointmentDuration = (): void => {
     if (this.startDate && this.endDate) {
       this.totalTime = getDiffTime(newDateTimestamp(this.endDate), newDateTimestamp(this.startDate));
     }
-  }
+  };
 
   private createForm = (): void => {
     this.form = this.formBuilder.group({
@@ -218,7 +218,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       formFields: this.formBuilder.array([])
     });
     this.valueChange();
-  }
+  };
 
   private valueChange = (): void => {
     this.group.valueChanges.subscribe(value => {
@@ -247,7 +247,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
         this.setPaymentType();
       }
     });
-  }
+  };
 
   private createFilters = (): void => {
     this.filteredGroup = this.group.valueChanges.pipe(
@@ -266,7 +266,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       map(
         name => name ? this.filterColor(name) : (this.colors ? this.colors.slice() : this.colors))
     );
-  }
+  };
 
   private getTreatments = (): void => {
     if (this.roomId) {
@@ -274,7 +274,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
         new fromActionsReservation.GetAllTreatments({ roomId: this.roomId, customerId: this.customerId })
       );
     }
-  }
+  };
 
   private getAdditionalList = (groupId: string): void => {
     if (this.groupId !== groupId && this.roomId) {
@@ -283,7 +283,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
         new fromActionsReservation.GetAllAdditional({ roomId: this.roomId, groupId })
       );
     }
-  }
+  };
 
   private filterGroup = (name: string): IGroupService[] | undefined => this.groups?.filter(
     option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
@@ -314,7 +314,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
         })
       );
     }
-  }
+  };
 
   private getReservation = (): void => {
     if (!this.payments) {
@@ -329,7 +329,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
         new fromActionsReservation.ReservationFind({ id: this.reservationId })
       );
     }
-  }
+  };
 
   private setPaymentType = (): void => {
     if (this.price.isPaid) {
@@ -337,7 +337,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     } else {
       this.type.setValue(PaymentType.transfer);
     }
-  }
+  };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
@@ -385,5 +385,5 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       }
       this.setPaymentType();
     });
-  }
+  };
 }

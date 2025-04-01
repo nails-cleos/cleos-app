@@ -84,7 +84,7 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
         );
       }
     });
-  }
+  };
 
   private createPageSubscriptions = (): void => {
     this.sort.sortChange.subscribe(() => {
@@ -94,7 +94,7 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getTreatments(this.paginator.pageIndex));
 
     this.cdRef.detectChanges();
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsTreatment.Clean());
 
@@ -119,5 +119,5 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.createPageSubscriptions();
       }
     });
-  }
+  };
 }

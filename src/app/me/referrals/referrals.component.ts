@@ -98,7 +98,7 @@ export class ReferralsComponent implements OnInit, OnDestroy {
         this.showShare = this.referralMax ? this.referrals < this.referralMax : true;
       }
     });
-  }
+  };
 }
 
 @Component({
@@ -158,5 +158,5 @@ export class BottomSheetReferralComponent {
         this.delay(data, count, max);
       }
     }, 500);
-  }
+  };
 }

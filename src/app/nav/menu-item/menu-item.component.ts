@@ -41,7 +41,7 @@ export class MenuItemComponent implements OnInit {
   navigate = (menu: IMenu, drawer?: any): void => {
     drawer?.toggle();
     this.router.navigate([this.language].concat(menu.path.split('/')));
-  }
+  };
 
   toggleSubMenu = (index: number) => {
     // Close all other submenus
@@ -51,9 +51,9 @@ export class MenuItemComponent implements OnInit {
       }
     }
     this.openSubMenus[index] = !this.openSubMenus[index];
-  }
+  };
 
-  isSubMenuOpen = (index: number): boolean => this.openSubMenus[index] || false
+  isSubMenuOpen = (index: number): boolean => this.openSubMenus[index] || false;
 
   toggleSubSubMenu = (index: number, subIndex: number) => {
     if (!this.openSubSubMenus[index]) {
@@ -66,7 +66,7 @@ export class MenuItemComponent implements OnInit {
       }
     }
     this.openSubSubMenus[index][subIndex] = !this.openSubSubMenus[index][subIndex];
-  }
+  };
 
   isSubSubMenuOpen = (
     index: number,

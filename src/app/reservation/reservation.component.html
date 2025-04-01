@@ -364,7 +364,11 @@
       [locale]="dateFormat"
       [refresh]="refresh"
       [viewDate]="dataEvent.value.viewDate"
-      [weekendDays]="weekendDays"></mwl-calendar-week-view>
+      [weekendDays]="weekendDays"
+      [eventTitleTemplate]="eventTitleTemplate"></mwl-calendar-week-view>
+    <ng-template #eventTitleTemplate let-event="event">
+      <div [ngClass]="event.cssClass" [innerHTML]="event.title"></div>
+    </ng-template>
     @if (errors['schedule']?.length && errors['schedule'][dataEvent.value.index]) {
       <mat-error [innerHTML]="'RESERVATION.SCHEDULE.REQUIRED' | translate" class="divider"></mat-error>
     }

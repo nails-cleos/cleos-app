@@ -92,9 +92,9 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
     const filterValue = (event.target as HTMLInputElement).value;
     this.filter = filterValue.trim().toLowerCase();
     this.getExpenses(0);
-  }
+  };
 
-  showTimeZone = (expense: IExpenseAll): boolean => !isSameTimeZone(expense.room.timeZone)
+  showTimeZone = (expense: IExpenseAll): boolean => !isSameTimeZone(expense.room.timeZone);
 
   setMonthAndYear = (normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>): void => {
     const ctrlValue = this.date.value || getNowTimeZone();
@@ -105,13 +105,13 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.date.setValue(ctrlValue);
 
     datepicker.close();
-  }
+  };
 
   keyDownHandler = (event: any): void => {
     if (event.code === 'Backspace') {
       this.date.setValue(null);
     }
-  }
+  };
 
   openDialog = (expense: IExpenseAll): void => openDialog(
     expense.room, this.dateFormat, this.translate, this.dialog, newDateTimestamp(expense.timestamp)
@@ -131,14 +131,14 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
         );
       }
     });
-  }
+  };
 
   private valueChange = (): void => {
     this.date.valueChanges.subscribe(value => {
       this.dateFilter = value ? getDateFormat(value) : value;
       this.getExpenses(0);
     });
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsExpense.Clean());
 
@@ -150,7 +150,7 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getExpenses(this.paginator.pageIndex));
 
     this.cdRef.detectChanges();
-  }
+  };
 
   private getExpenses = (page: number = 0): void => {
     this.paginatorSubscription?.unsubscribe();
@@ -166,7 +166,7 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
         page
       })
     );
-  }
+  };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {
@@ -183,5 +183,5 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.createPageSubscriptions();
       }
     });
-  }
+  };
 }

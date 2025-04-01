@@ -108,9 +108,9 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   openDialog = (reservation: IReservationAll): void => {
     const time = newDateTimestamp(reservation.timestamp);
     openDialog(reservation.room, this.dateFormat, this.translate, this.dialog, time);
-  }
+  };
 
-  showTimeZone = (reservation: IReservation): boolean => !isSameTimeZone(reservation?.room?.timeZone)
+  showTimeZone = (reservation: IReservation): boolean => !isSameTimeZone(reservation?.room?.timeZone);
 
   cancel = (reservation: IReservationAll): void => {
     const title = this.translate.instant('RESERVATION.LIST.CANCEL.TITLE');
@@ -133,9 +133,9 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
         });
       }
     });
-  }
+  };
 
-  displayFnUser = (user: IUser): string => user?.displayName ? user.displayName : ''
+  displayFnUser = (user: IUser): string => user?.displayName ? user.displayName : '';
 
   keyDownHandler = (event: any): void => {
     if (event.code === 'Backspace') {
@@ -143,7 +143,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
       this.userId = undefined;
       this.getReservations();
     }
-  }
+  };
 
   remove = (state: string): void => {
     const index = this.states.indexOf(state);
@@ -155,7 +155,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
       this.state.setValue(null);
       this.getReservations();
     }
-  }
+  };
 
   selected = (event: MatAutocompleteSelectedEvent): void => {
     const state = States[event.option.value as StatesKey];
@@ -164,7 +164,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     this.stateInput.nativeElement.value = '';
     this.state.setValue(null);
     this.getReservations();
-  }
+  };
 
   private createPageSubscriptions = (): void => {
     this.sort.sortChange.subscribe(() => {
@@ -176,7 +176,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     });
 
     this.cdRef.detectChanges();
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsReservation.Clean());
 
@@ -225,6 +225,6 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
         this.getReservations();
       }
     });
-  }
+  };
 }
 

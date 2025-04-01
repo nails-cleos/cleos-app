@@ -122,10 +122,10 @@ export class OfficeComponent implements OnInit, OnDestroy {
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filter(name) : this.managers ? this.managers.slice() : this.managers)
     );
-  }
+  };
 
   private filter = (name: string): IUser[] | undefined => this.managers?.filter(
-    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0)
+    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
   private clean = (): void => this.store.dispatch(new fromActionsOffice.Clean());
 
@@ -137,7 +137,7 @@ export class OfficeComponent implements OnInit, OnDestroy {
         new fromActionsOffice.OfficeFind(this.id)
       );
     }
-  }
+  };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
@@ -168,6 +168,6 @@ export class OfficeComponent implements OnInit, OnDestroy {
         this.router.navigate([this.language, 'offices']);
       }
     });
-  }
+  };
 }
 

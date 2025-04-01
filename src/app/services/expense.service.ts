@@ -20,7 +20,7 @@ export class ExpenseService {
     }
 
     return this.http.get<IExpense[]>(this.updatePathVariable(roomId, ['pages']), { params });
-  }
+  };
 
   getExpenseInfo = (roomId: string): Observable<IExpenseInfo> => this.http.get<IExpenseInfo>(
     this.updatePathVariable(roomId, ['info'])

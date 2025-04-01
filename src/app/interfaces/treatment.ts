@@ -131,19 +131,19 @@ export class Price implements IPrice {
     this.totalPaid = totalPaid;
     this.isPaid = this.calculateIsPaid();
     return this;
-  }
+  };
 
   withBalance = (balance: number = 0): IPrice => {
     this.balance = balance;
     this.isPaid = this.calculateIsPaid();
     return this;
-  }
+  };
 
   setPenalty = (penalty: number): void => {
     this.penalty = penalty;
-  }
+  };
 
-  private calculateIsPaid = (): boolean => this.amount > 0 && this.totalPaid + this.balance >= this.total
+  private calculateIsPaid = (): boolean => this.amount > 0 && this.totalPaid + this.balance >= this.total;
 
   private calculateToPaid = (): number => (this.total * this.percentageToPaid / 100) - this.totalPaid - this.balance;
 

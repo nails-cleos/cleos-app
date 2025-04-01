@@ -52,6 +52,7 @@ import {
   dateToTimestamp,
   dateToUTC,
   Duration,
+  eventFormatDate,
   filterDateRoom,
   formatTime,
   getAvailability,
@@ -70,10 +71,9 @@ import {
   newDateTimestamp,
   plusDays,
   reservationDuration,
-  searchDates,
   totalDuration
 } from '../util/dates';
-import { createBullet, fillNotAvailable, getFrequency, getOverlapEvent, Meta, newEvent } from '../util/event';
+import { createBullet, fillNotAvailable, getFrequency, Meta, newEvent } from '../util/event';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Role } from '../interfaces/token';
 import { IUnavailableAll } from '../interfaces/unavailable';
@@ -88,16 +88,17 @@ import {
   newPrice,
   openDialog,
   removeDiscount,
-  roomDetail
+  roomDetail,
+  validateUnavailableEvent
 } from '../util/helper';
 import { transitionAnimation } from '../util/animation';
-import { addDays, addMonths, isEqual, isSameDay } from 'date-fns';
+import { addDays, addMonths, isEqual } from 'date-fns';
 import { findStateColor } from '../util/theme';
 import { IAdditionalAll } from '../interfaces/additional';
 import { MatListOption } from '@angular/material/list';
 import { IOffice } from '../interfaces/office';
 import { IStep, Step } from '../interfaces/step';
-import { TimeZoneSnackBarComponent } from '../shared/snak/time-zone/time-zone-snack-bar.component';
+import { TimeZoneSnackBarComponent } from '../shared/snack/time-zone/time-zone-snack-bar.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SelectProfessionalDialogComponent } from './select-professional-dialog.component';
 import { AuthUserService } from '../services/auth-user.service';
@@ -121,6 +122,8 @@ import { DurationTimePipe } from '../pipes/durationTime.pipe';
 import { PricePreviewComponent } from '../shared/price-preview/price-preview.component';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { GoogleMapComponent } from '../shared/google-map/google-map.component';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { SnackbarComponent } from '../shared/snack/snackbar/snackbar.component';
 import PlaceResult = google.maps.places.PlaceResult;
 
 @Component({
@@ -136,6 +139,8 @@ import PlaceResult = google.maps.places.PlaceResult;
 })
 export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly dialog = inject(MatDialog);
+  private snackBar: MatSnackBar = inject(MatSnackBar);
+  private sanitizer: DomSanitizer = inject(DomSanitizer);
 
   @Input() dataEvents: Map<string, IDataEvent> = new Map();
   @ViewChild('stepper') myStepper!: MatStepper;
@@ -237,10 +242,11 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly isDashboard = false;
   private readonly extras: any;
   private readonly language: string;
+  private alreadyCreated = false;
 
   constructor(private readonly translate: TranslateService, private store: Store<AppState>,
               private formBuilder: UntypedFormBuilder, breakpointObserver: BreakpointObserver, private router: Router,
-              private route: ActivatedRoute, private cdRef: ChangeDetectorRef, private snackBar: MatSnackBar,
+              private route: ActivatedRoute, private cdRef: ChangeDetectorRef,
               private authUserService: AuthUserService) {
     this.price = new Price();
     this.day = new Day();
@@ -306,6 +312,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   get back(): void {
     if (this.isPreview) {
       this.isPreview = false;
+      this.alreadyCreated = true;
     } else {
       this.cleanEvent();
     }
@@ -445,7 +452,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.cleanEvent();
     }
     completeAndNext(this.steps, this.myStepper, goNext);
-  }
+  };
 
   callStepThree = (goNext: boolean): void => {
     if (this.officeForm.invalid) {
@@ -457,7 +464,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.cleanEvent();
     }
     completeAndNext(this.steps, this.myStepper, goNext);
-  }
+  };
 
   callStepFour = (goNext: boolean): void => {
     if (this.treatmentForm.invalid) {
@@ -469,7 +476,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.cleanEvent();
     }
     completeAndNext(this.steps, this.myStepper, goNext);
-  }
+  };
 
   callStepFive = (goNext: boolean): void => {
     if (!goNext) {
@@ -477,7 +484,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.cleanEvent();
     }
     completeAndNext(this.steps, this.myStepper, goNext);
-  }
+  };
 
   callStepSix = (goNext: boolean): void => {
     if (this.configurationForm.invalid) {
@@ -523,7 +530,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           eventData.addEvents(events);
           eventData.updateLength(eventData.calendarEvents.length);
         } else {
-          this.dataEvents.set(dateValue, new DataEvent(events, i, date, events.length));
+          this.dataEvents.set(dateValue, new DataEvent(events, i, date, events.length, this.room.value));
         }
         dates.push(value.date);
       });
@@ -538,18 +545,25 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       );
     }
     completeAndNext(this.steps, this.myStepper, goNext);
-  }
+  };
 
   callStepSeven = (goNext: boolean): void => {
     this.errors.schedule = [];
     this.errors.overlapping = false;
     if (!this.eventGroup.invalid) {
-      for (const dataEvent of this.dataEvents.values()) {
-        const missingEvent = this.events.value.some((calendarEvent: {
-          event: CalendarEvent
-        }) => !dataEvent.calendarEvents.includes(calendarEvent.event));
+      for (const [_key, dataEvent] of this.dataEvents) {
+        let eventFound = false;
 
-        if (missingEvent) {
+        for (const eventData of this.events.value) {
+          const eventToCheck = eventData.event;
+
+          if (dataEvent.calendarEvents.some(calendarEvent => calendarEvent.id === eventToCheck.id)) {
+            eventFound = true;
+            break;
+          }
+        }
+
+        if (!eventFound) {
           this.errors.schedule[dataEvent.index] = true;
         }
       }
@@ -561,7 +575,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.isPreview = true;
     }
     completeAndNext(this.steps, this.myStepper, goNext);
-  }
+  };
 
   getStepName = (index: number): string => getStepName(this.steps, index);
 
@@ -589,42 +603,65 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.room.value, this.dateFormat, this.translate, this.dialog, reservationDate
   );
 
-  segmentClick = (date: Date, state: string, eventKey: string, id?: string): void => {
-    if (!this.dateIsValid(date)) {
-      return;
-    }
-    if (!this.professionalId) {
-      const data = {
-        professionals: this.professionalList,
-        small: this.smallScreen
-      };
+  segmentClick = (date: Date, state: string, eventKey: string, id: string = `${ Math.random() }`): void => {
+    const eventData = this.dataEvents.get(eventKey);
+    if (eventData) {
+      if (!this.dateIsValid(date)) {
+        return;
+      }
+      const currentEvent = this.events.at(eventData?.index)?.get('event')?.value;
+      if (currentEvent && !this.alreadyCreated) {
+        eventData.addClass(currentEvent, 'highlighted-event');
+        const date = eventFormatDate(currentEvent.start, this.dateFormat);
+        const startTime = getTime(currentEvent.start, this.dateFormat);
+        const endTime = getTime(currentEvent.end, this.dateFormat);
+        const dateTime = `<span><span class="bold">${ date } </span>${ startTime } - ${ endTime }</span>`;
 
-      executeDialogNoWidth(this.dialog, SelectProfessionalDialogComponent, data, result => {
-        if (result) {
-          this.professional.setValue(result.professional);
-          this.createEvent(eventKey, date, state, id);
-        }
-      }, true);
-    } else {
-      this.createEvent(eventKey, date, state, id || `${ Math.random() }`);
+        const safeHtml: SafeHtml = this.sanitizer.bypassSecurityTrustHtml(
+          this.translate.instant('RESERVATION.EVENT.ALREADY_SELECTED', { data: dateTime }));
+
+        const snackBarRef = this.snackBar.openFromComponent(SnackbarComponent, { data: safeHtml, duration: 5000 });
+        snackBarRef.afterDismissed().subscribe(() => eventData.addClass(currentEvent, ''));
+        return;
+      }
+      this.dataEvents.delete(eventKey);
+      this.dataEvents.set(date.toISOString().split('T')[0], eventData);
+      if (this.errors.schedule) {
+        this.errors.schedule[eventData.index] = false;
+      }
+      if (!this.professionalId) {
+        const data = {
+          professionals: this.professionalList,
+          small: this.smallScreen
+        };
+
+        executeDialogNoWidth(this.dialog, SelectProfessionalDialogComponent, data, result => {
+          if (result) {
+            this.professional.setValue(result.professional);
+            this.createEvent(eventData, date, state, id);
+          }
+        }, true);
+      } else {
+        this.createEvent(eventData, date, state, id);
+      }
     }
-  }
+  };
 
   getAddress = ($event: PlaceResult): void => {
     this.address = $event.formatted_address;
-  }
+  };
 
   timeChange = ($event: string, index: number): void => {
     const dateGroup = this.dateTimeList.at(index) as FormGroup;
     const time = getTimeNumber($event);
     dateGroup.get('date')?.value.setHours(time?.hour || 0, time?.minute || 0);
-  }
+  };
 
   keyDownHandler = (event: any, form: UntypedFormControl): void => {
     if (event.code === 'Backspace') {
       form.setValue('');
     }
-  }
+  };
 
   keyDownGroup = (event: any): void => {
     this.treatmentList = undefined;
@@ -633,13 +670,13 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.errors = this.errors.filter((it: any) => it !== 'treatment');
     this.errors = this.errors.filter((it: any) => it !== 'group');
     this.errors = this.errors.filter((it: any) => it !== 'start');
-  }
+  };
 
   keyDownOffice = (event: any): void => {
     this.keyDownRoom(event);
     this.keyDownHandler(event, this.office);
     this.errors = this.errors.filter((it: any) => it !== 'office');
-  }
+  };
 
   keyDownRoom = (event: any): void => {
     if (event.code === 'Backspace') {
@@ -651,7 +688,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.errors = this.errors.filter((it: any) => it !== 'room');
       this.errors = this.errors.filter((it: any) => it !== 'professional');
     }
-  }
+  };
 
   beforeMonthViewRender = ({ header }: any): void => {
     header.forEach((day: any) => {
@@ -659,7 +696,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         day.cssClass = 'cal-disabled';
       }
     });
-  }
+  };
 
   eventTimesChanged = ({ event, newStart, newEnd }: CalendarEventTimesChangedEvent, eventData: IDataEvent): void => {
     event.start = newStart;
@@ -668,78 +705,70 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const dateTimeForm = this.dateTimeList.at(eventData.index);
     dateTimeForm.get('date')?.setValue(newStart);
     dateTimeForm.get('start')?.setValue(getTime(newStart));
-  }
+  };
 
   onChange = (options: MatListOption[]): void => {
     this.additionalSelected = options.map(o => o.value);
     this.price = newAdditional(this.price, this.additionalSelected, this.treatmentDiscount);
     this.cleanEvent();
-  }
+  };
 
   isSelected = (it: IAdditionalAll): boolean => this.additionalSelected.filter(el => el.id === it.id).length > 0;
 
   addDate = (dateValue?: Date, startTime?: string): void => {
     this.dateTimeList.push(this.createDate(dateValue, startTime));
     this.events.push(this.createEventForm());
-  }
+  };
 
   removeDate = (index: number): void => {
     this.dateTimeList.removeAt(index);
     this.events.removeAt(index);
-  }
+  };
 
-  private createEvent = (eventKey: string, date: Date, state: string, id?: string): void => {
+  private createEvent = (eventData: IDataEvent, date: Date, state: string, id?: string): void => {
     this.errors.overlapping = false;
 
-    const eventData = this.dataEvents.get(eventKey);
-    if (eventData) {
-      this.dataEvents.delete(eventKey);
-      this.dataEvents.set(date.toISOString().split('T')[0], eventData);
-      if (this.errors.schedule) {
-        this.errors.schedule[eventData.index] = false;
-      }
-      const dateGroup = this.dateTimeList.at(eventData.index) as FormGroup;
-      dateGroup.get('date')?.setValue(date);
-      dateGroup.get('start')?.setValue(getTime(date, this.dateFormat));
+    const dateGroup = this.dateTimeList.at(eventData.index) as FormGroup;
+    dateGroup.get('date')?.setValue(date);
+    dateGroup.get('start')?.setValue(getTime(date, this.dateFormat));
 
-      const nowTime = getTimeNumber(date);
+    const nowTime = getTimeNumber(date);
 
-      const start = createNewDate(date, nowTime?.hour, nowTime?.minute);
-      const end = createNewDate(start, start.getHours() + this.totalDuration.hour,
-        start.getMinutes() + this.totalDuration.minute);
-      const event = this.createNewEvent(start, end, state, this.room.value.timeZone, id);
+    const start = createNewDate(date, nowTime?.hour, nowTime?.minute);
+    const end = createNewDate(start, start.getHours() + this.totalDuration.hour,
+      start.getMinutes() + this.totalDuration.minute);
+    const event = this.createNewEvent(start, end, state, this.room.value.timeZone, id);
 
-      if (event) {
-        let title;
-        let content;
-        const selectedEvent = this.events.at(eventData.index)?.get('event')?.value;
-        const eventsOverlapping = getOverlapEvent(eventData.calendarEvents, start, end, this.professionalId);
-        if (eventsOverlapping.length && eventsOverlapping[0] !== selectedEvent) {
-          let message = '';
-          eventsOverlapping.forEach(e => {
-            message += `<div>${ e.title }</div>`;
-          });
-          title = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.TITLE');
-          content = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.CONTENT', { data: message });
+    if (event) {
+      let title;
+      let content;
+      const selectedEvent = this.events.at(eventData.index)?.get('event')?.value;
+      const eventsOverlapping = eventData.getOverlapEvent(start, end, this.professionalId);
+      if (eventsOverlapping.length && eventsOverlapping[0] !== selectedEvent) {
+        let message = '';
+        eventsOverlapping.forEach(e => {
+          message += `<div>${ e.title }</div>`;
+        });
+        title = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.TITLE');
+        content = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.CONTENT', { data: message });
+      } else {
+        if (!selectedEvent && !id) {
+          title = this.translate.instant('RESERVATION.EVENT.TITLE');
+          content = this.translate.instant('RESERVATION.EVENT.CONTENT', { date: start.toLocaleString(API_LOCALE) });
         } else {
-          if (!selectedEvent && !id) {
-            title = this.translate.instant('RESERVATION.EVENT.TITLE');
-            content = this.translate.instant('RESERVATION.EVENT.CONTENT', { date: start.toLocaleString(API_LOCALE) });
-          } else {
-            title = this.translate.instant('RESERVATION.EVENT.CHANGE.TITLE');
-            content = this.translate.instant('RESERVATION.EVENT.CHANGE.CONTENT',
-              { date: start.toLocaleString(API_LOCALE) });
-          }
+          title = this.translate.instant('RESERVATION.EVENT.CHANGE.TITLE');
+          content = this.translate.instant('RESERVATION.EVENT.CHANGE.CONTENT',
+            { date: start.toLocaleString(API_LOCALE) });
         }
-        this.createSelectEvent(title, content, event, eventData);
       }
+      this.createSelectEvent(title, content, event, eventData);
     }
-  }
+  };
 
   private createDate = (dateValue?: Date, startTime?: string): FormGroup => this.formBuilder.group({
     date: [dateValue, [Validators.required]],
     start: [startTime || this.minDate]
-  })
+  });
 
   private createEventForm = (): FormGroup => this.formBuilder.group({ event: ['', Validators.required], });
 
@@ -756,9 +785,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const meta = new Meta(true, timeZone, undefined, undefined, this.professional.value.id);
     return newEvent(detail, findStateColor(state, this.isDarkMode), start, this.isDarkMode, end, id, meta, true);
-  }
+  };
 
-  private dateIsValid = (date: Date): boolean => isBetween(getNowTimeZone(), this.maxCalendarDate, date)
+  private dateIsValid = (date: Date): boolean => isBetween(getNowTimeZone(), this.maxCalendarDate, date);
 
   private createForm = (): void => {
     this.customerForm = this.formBuilder.group({
@@ -787,7 +816,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       events: this.formBuilder.array([this.createEventForm()])
     });
     this.valueChanges();
-  }
+  };
 
   private valueChanges = (): void => {
     this.customer.valueChanges.subscribe((value) => {
@@ -933,7 +962,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dateTimeList.valueChanges.subscribe(() => {
       this.dateTimeList.updateValueAndValidity({ onlySelf: true, emitEvent: false });
     });
-  }
+  };
 
   private cleanTreatment = (): void => {
     if (!this.skip) {
@@ -947,7 +976,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.additionalSelected = [];
       this.cleanEvent();
     }
-  }
+  };
 
   private createFilters = (): void => {
     this.filteredCustomer = this.customer.valueChanges.pipe(
@@ -981,7 +1010,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       map(addressName => addressName ? this.filterProfessional(addressName) : this.professionalList
         ? this.professionalList.slice() : this.professionalList)
     );
-  }
+  };
 
   private addReservations = (reservations: IReservationAll[]): CalendarEvent[] => reservations.map(it => {
     if (it.id !== this.reservationId) {
@@ -1002,12 +1031,13 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
           const color = findStateColor(it.state, this.isDarkMode);
           const meta = new Meta(true, timeZone, undefined, undefined, it.professional.id);
+          meta.isReservation = true;
           return newEvent(detail, color, start, this.isDarkMode, end, it.id, meta);
         }
       }
     }
     return undefined;
-  }).filter((item): item is CalendarEvent => item !== undefined) ?? []
+  }).filter((item): item is CalendarEvent => item !== undefined) ?? [];
 
   private addUnavailableList = (dataEvent: IDataEvent, unavailableList: IUnavailableAll[]) => {
     let recurringEvents: any[] = [];
@@ -1030,7 +1060,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         if (it.repeat === 'NONE') {
           if (!greaterOrEqualsThan(start, this.maxCalendarDate)) {
             const data = { id, allDay, title, path, duration, professionalId };
-            this.validateUnavailableEvent(start, data, dataEvent);
+            this.validateUnavailable(start, data, dataEvent);
           }
         } else {
           const calendarStart = greaterOrEqualsThan(dataEvent.viewDate, start) ? dataEvent.viewDate : start;
@@ -1042,58 +1072,46 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     recurringEvents.forEach(recurring =>
-      recurring.rule.all()?.forEach((date: Date) => this.validateUnavailableEvent(date, recurring, dataEvent))
+      recurring.rule.all()?.forEach((date: Date) => this.validateUnavailable(date, recurring, dataEvent))
     );
-  }
+  };
 
-  private validateUnavailableEvent = (start: Date, recurring: any, dataEvent: IDataEvent): void => {
-    const [startSearch, endSearch] = searchDates(recurring.allDay, start, recurring.duration);
-    const overlapEvent = getOverlapEvent(dataEvent.calendarEvents, startSearch, endSearch);
-    if (overlapEvent.length > 0) {
-      overlapEvent.forEach(value => {
-        if (value.id !== 'NOT_WORKING_ALL_DAY') {
-          dataEvent.filterEvent(value);
-          if (value.end) {
-            if (startSearch < value.start && endSearch < value.end) {
-              value.start = endSearch;
-              dataEvent.addEvent(value);
-            } else if (startSearch > value.start && endSearch > value.end) {
-              value.end = startSearch;
-              dataEvent.addEvent(value);
-            }
-          }
-          if (!dataEvent.calendarEvents.find(ce => ce.id === recurring.path && isSameDay(value.start, ce.start))) {
-            this.createUnavailableEvent(recurring, startSearch, endSearch, dataEvent);
-          }
-        }
-      });
-    } else {
-      this.createUnavailableEvent(recurring, startSearch, endSearch, dataEvent);
-    }
-  }
+  private validateUnavailable = (start: Date, recurring: any, dataEvent: IDataEvent): void => {
+    validateUnavailableEvent(start, recurring, dataEvent,
+      (startSearch, endSearch, dataEvent) => this.createUnavailableEvent(recurring, startSearch, endSearch, dataEvent));
+  };
 
   private createUnavailableEvent = (recurring: any, start: Date, end: Date, dataEvent: IDataEvent): void => {
     const color = findStateColor('DEFAULT', this.isDarkMode);
     const meta = new Meta(!recurring.allDay, this.room.value.timeZone, undefined, undefined, recurring.professionalId);
     const event = newEvent(recurring.title, color, start, this.isDarkMode, end, recurring.path, meta);
     dataEvent.addEvent(event);
-  }
+  };
 
   private createSelectEvent = (title: string, content: string, event: CalendarEvent, eventData: IDataEvent): void => {
-    const dialogRef = this.dialog.open(DialogComponent, {
-      data: { title, content, value: event }
-    });
+    if (this.alreadyCreated) {
+      this.createSelectedEvent(eventData, event);
+      this.alreadyCreated = false;
+    } else {
+      const dialogRef = this.dialog.open(DialogComponent, {
+        data: { title, content, value: event }
+      });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        const selectedEvent = this.events.at(eventData.index)?.get('event');
-        if (selectedEvent?.value) {
-          eventData.removeEvent(selectedEvent.value);
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.createSelectedEvent(eventData, event);
         }
-        selectedEvent?.setValue(event);
-        eventData.addEvent(event);
-      }
-    });
+      });
+    }
+  };
+
+  private createSelectedEvent = (eventData: IDataEvent, event: CalendarEvent): void => {
+    const selectedEvent = this.events.at(eventData.index)?.get('event');
+    if (selectedEvent?.value) {
+      eventData.removeEvent(selectedEvent.value);
+    }
+    selectedEvent?.setValue(event);
+    eventData.addEvent(event);
   }
 
   private filterCustomer = (name: string): IUser[] | undefined => this.customers?.filter(
@@ -1149,9 +1167,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       completeAndNext(this.steps, this.myStepper, true);
     }
-  }
+  };
 
   private cleanEvent = (): void => {
+    this.alreadyCreated = false;
     for (const dataEvent of this.dataEvents.values()) {
       const event = this.events.at(dataEvent.index)?.get('event');
       if (event) {
@@ -1159,7 +1178,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         event.setValue(null);
       }
     }
-  }
+  };
 
   private getReservation = (id: string | null): void => this.store.dispatch(
     new fromActionsReservation.ReservationFind({ id }));
@@ -1174,7 +1193,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         new fromActionsReservation.GetAllTreatments({ roomId, customerId: this.customer.value?.id })
       );
     }
-  }
+  };
 
   private getAdditionalList = (): void => {
     const roomId = this.room?.value?.id || this.roomId;
@@ -1184,7 +1203,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         new fromActionsReservation.GetAllAdditional({ roomId, groupId })
       );
     }
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsReservation.Clean());
 
@@ -1210,14 +1229,14 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         setTimeout(() => getStepCall(this.steps, 1, true), 300);
       }
     }
-  }
+  };
 
   private setCustomerInfo = (treatmentIndex?: number): void => {
     if (this.customerInfo && this.myStepper.selectedIndex === treatmentIndex) {
       this.treatmentId = this.treatmentId || this.customerInfo.treatment.key;
       this.customerAdditionalIds = this.customerAdditionalIds || this.customerInfo.additionalIds;
     }
-  }
+  };
 
   private setAdditional = (treatmentIndex?: number): void => {
     if (this.additionalList && this.additionalList.length) {
@@ -1249,7 +1268,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     }
-  }
+  };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
@@ -1327,8 +1346,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
                 } else {
                   this.segmentClick(date, 'EDITING', data.date, this.reservation.id);
                 }
-              } else if ((this.extras?.date || start && this.myStepper.selectedIndex === bookOrder) &&
-                !this.events.at(eventData.index)?.get('event')?.value) {
+              } else if ((this.extras?.date || start && this.myStepper.selectedIndex === bookOrder)) {
+                console.log("create again")
                 this.segmentClick(dateValue, 'CREATED', data.date);
               }
             }, 50);
@@ -1362,5 +1381,5 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       }
     });
-  }
+  };
 }

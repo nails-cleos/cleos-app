@@ -56,19 +56,19 @@ import { MatRipple } from '@angular/material/core';
 })
 export class NavComponent implements OnInit, OnDestroy {
   private tokenService: TokenService = inject(TokenService);
-  private translate: TranslateService = inject(TranslateService)
-  private breakpointObserver: BreakpointObserver = inject(BreakpointObserver)
-  private router: Router = inject(Router)
-  private store: Store<AppState> = inject(Store<AppState>)
-  private messagingService: MessagingService = inject(MessagingService)
-  private snackBar: MatSnackBar = inject(MatSnackBar)
-  private navigationService: NavigationService = inject(NavigationService)
-  private cookieService: CookieService = inject(CookieService)
-  private overlayContainer: OverlayContainer = inject(OverlayContainer)
-  private themeService: ThemeService = inject(ThemeService)
-  private authUserService: AuthUserService = inject(AuthUserService)
-  private seoService: SeoService = inject(SeoService)
-  private route: ActivatedRoute = inject(ActivatedRoute)
+  private translate: TranslateService = inject(TranslateService);
+  private breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private router: Router = inject(Router);
+  private store: Store<AppState> = inject(Store<AppState>);
+  private messagingService: MessagingService = inject(MessagingService);
+  private snackBar: MatSnackBar = inject(MatSnackBar);
+  private navigationService: NavigationService = inject(NavigationService);
+  private cookieService: CookieService = inject(CookieService);
+  private overlayContainer: OverlayContainer = inject(OverlayContainer);
+  private themeService: ThemeService = inject(ThemeService);
+  private authUserService: AuthUserService = inject(AuthUserService);
+  private seoService: SeoService = inject(SeoService);
+  private route: ActivatedRoute = inject(ActivatedRoute);
 
   title = environment.title;
   isHandset$: Observable<boolean> = this.breakpointObserver.observe([
@@ -172,13 +172,13 @@ export class NavComponent implements OnInit, OnDestroy {
         new fromActionsNotification.NotificationRead(notification)
       );
     }
-  }
+  };
 
   navigate = (menu: IMenu, drawer?: any): void => {
     drawer?.toggle();
     this.error = undefined;
     this.router.navigate([this.language].concat(menu.path.split('/')));
-  }
+  };
 
   private selectStore = (states: any[]): void => states.forEach(
     selectedState => this.store.select(selectedState).subscribe((state: any) => {
@@ -204,7 +204,7 @@ export class NavComponent implements OnInit, OnDestroy {
       this.plusNotification = undefined;
     }
     this.setBadge();
-  }
+  };
 
   private setBadge = (): void => {
     if ('setAppBadge' in navigator && 'clearAppBadge' in navigator) {
@@ -214,7 +214,7 @@ export class NavComponent implements OnInit, OnDestroy {
         (navigator as any).clearAppBadge();
       }
     }
-  }
+  };
 
   private getNotifications = (): void => {
     if (!this.countNotifications) {
@@ -227,18 +227,18 @@ export class NavComponent implements OnInit, OnDestroy {
         new fromActionsNotification.GetAllPaged(payload)
       );
     }
-  }
+  };
 
   private resetTheme = (theme?: Theme): void => {
     this.cssClass = resetTheme(theme, this.cssClass, this.overlayContainer, this.cookieService, this.themeService);
-  }
+  };
 
   private subscribe = (): void => {
     this.authSubject.subscribe(isAuthorized => {
       if (isAuthorized && this.tokenService.token) {
-        this.getNotifications()
+        this.getNotifications();
       }
-    })
+    });
     this.authSubscription = this.getState.subscribe(state => {
       this.isAuthorized = state.isAuthenticated;
       this.isLoading = state.isLoading;
@@ -312,5 +312,5 @@ export class NavComponent implements OnInit, OnDestroy {
       }
       this.isLoading = state.isLoading;
     });
-  }
+  };
 }

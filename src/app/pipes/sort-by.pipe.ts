@@ -32,5 +32,5 @@ export class SortByPipe implements PipeTransform {
     });
 
     return value;
-  }
+  };
 }

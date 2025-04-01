@@ -111,5 +111,5 @@ export class MePaymentComponent implements OnInit, OnDestroy {
         this.options = getPayNlOptions(state.data);
       }
     });
-  }
+  };
 }

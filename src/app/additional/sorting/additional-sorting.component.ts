@@ -55,5 +55,5 @@ export class AdditionalSortingComponent implements OnInit, OnDestroy {
         iAdditionalAll.id, iAdditionalAll.name, iAdditionalAll.order)
       );
     });
-  }
+  };
 }

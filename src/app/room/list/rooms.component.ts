@@ -86,7 +86,7 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
         );
       }
     });
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsRoom.Clean());
 
@@ -98,7 +98,7 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getRooms(this.paginator.pageIndex));
 
     this.cdRef.detectChanges();
-  }
+  };
 
   private getRooms = (page: number = 0): void => this.store.dispatch(
     new fromActionsRoom.GetAll({
@@ -139,5 +139,5 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.createPageSubscriptions();
       }
     });
-  }
+  };
 }

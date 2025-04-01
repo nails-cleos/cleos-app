@@ -101,13 +101,13 @@ export class DiscountComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  displayCurrencyFn = (currency: ICurrencyAll): string => currency ? currency.code : ''
+  displayCurrencyFn = (currency: ICurrencyAll): string => currency ? currency.code : '';
 
   keyDownHandler = (event: any, form: AbstractControl): void => {
     if (event.code === 'Backspace') {
       form.setValue('');
     }
-  }
+  };
 
   private createForm = (): void => {
     this.form = this.formBuilder.group({
@@ -122,10 +122,10 @@ export class DiscountComponent implements OnInit, OnDestroy {
       map(value => typeof value === 'string' ? value : value.code),
       map(name => name ? this.filterCurrency(name) : this.currencies ? this.currencies.slice() : this.currencies)
     );
-  }
+  };
 
   private filterCurrency = (name: string): ICurrency[] | undefined => this.currencies?.filter(
-    option => option.code?.toLowerCase().indexOf(name.toLowerCase()) === 0)
+    option => option.code?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
   private clean = (): void => this.store.dispatch(new fromActionsDiscount.Clean());
 
@@ -136,7 +136,7 @@ export class DiscountComponent implements OnInit, OnDestroy {
         new fromActionsDiscount.DiscountFind(id)
       );
     }
-  }
+  };
 
   private getCurrencies = (): void => this.store.dispatch(new fromActionsDiscount.GetCurrencies());
 
@@ -164,5 +164,5 @@ export class DiscountComponent implements OnInit, OnDestroy {
         this.router.navigate([this.language, 'discounts']);
       }
     });
-  }
+  };
 }

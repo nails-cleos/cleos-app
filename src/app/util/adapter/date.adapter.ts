@@ -13,7 +13,7 @@ export abstract class DateAdapter extends NativeDateAdapter {
     }
     const timestamp = typeof value === 'number' ? value : Date.parse(value);
     return isNaN(timestamp) ? null : new Date(timestamp);
-  }
+  };
 
   formatDate(date: Date, displayFormat: any): string {
     date = new Date(Date.UTC(

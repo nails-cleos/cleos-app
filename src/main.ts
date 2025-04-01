@@ -118,7 +118,7 @@ const databaseProvider = provideDatabase(() => {
 });
 
 export function initializePwaService(pwaService: PwaService) {
-  pwaService.initPwaPrompt()
+  pwaService.initPwaPrompt();
 }
 
 const providers = [
@@ -156,7 +156,7 @@ const providers = [
   ScreenTrackingService,
   UserTrackingService,
   provideAnimations()
-]
+];
 
 if (environment.production) {
   enableProdMode();

@@ -65,7 +65,7 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
     this.language = this.translate.currentLang;
     this.authUserServiceSubscription = this.authUserService.authUser.subscribe(
       value => this.hasAdminRole = value.hasAdminRole
-    )
+    );
   }
 
   ngOnInit(): void {
@@ -95,7 +95,7 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
     this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getTransactions(this.paginator.pageIndex));
 
     this.cdRef.detectChanges();
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsAccount.Clean());
 
@@ -122,5 +122,5 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
         this.createPageSubscriptions();
       }
     });
-  }
+  };
 }

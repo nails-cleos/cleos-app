@@ -100,7 +100,7 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
         );
       }
     });
-  }
+  };
 
   sentToUsers = (discount: IDiscount): void => {
     const data = {
@@ -113,7 +113,7 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
         );
       }
     }, true);
-  }
+  };
 
   private createPageSubscriptions = (): void => {
     this.sort.sortChange.subscribe((a) => {
@@ -126,7 +126,7 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getDiscounts(this.paginator.pageIndex));
 
     this.cdRef.detectChanges();
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsDiscount.Clean());
 
@@ -161,7 +161,7 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.createPageSubscriptions();
       }
     });
-  }
+  };
 }
 
 @Component({
@@ -226,7 +226,7 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
       this.allCustomers?.push(customer);
       this.customerCtrl.setValue(null);
     }
-  }
+  };
 
   selected = (event: MatAutocompleteSelectedEvent): void => {
     const customer = event.option.value;
@@ -234,13 +234,13 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
     this.allCustomers = this.allCustomers?.filter(c => c.id !== customer.id);
     this.customerInput.nativeElement.value = '';
     this.customerCtrl.setValue(null);
-  }
+  };
 
   sortCustomers = (data: any): IUser[] => data.sort((a: any, b: any) => {
     const aName = a.displayName?.toUpperCase();
     const bName = b.displayName?.toUpperCase();
     return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
-  })
+  });
 
   private setSymbol = (): void => {
     this.title = this.discount.name;
@@ -252,19 +252,19 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
         this.title = `${ this.discount.amount } % ${ this.title }`;
         break;
     }
-  }
+  };
 
   private getCustomers = (): void => this.store.dispatch(new fromActionsUser.GetAllCustomers());
 
   private clean = (): void => this.store.dispatch(new fromActionsUser.Clean());
 
   private filter = (name: string): IUserAll[] | undefined => this.allCustomers?.filter(
-    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0)
+    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.allCustomers = state.data;
       this.customerCtrl.setValue(null);
     });
-  }
+  };
 }

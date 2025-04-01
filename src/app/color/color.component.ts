@@ -92,7 +92,7 @@ export class ColorComponent implements OnInit, OnDestroy {
       name: ['', [Validators.required]],
       description: ['']
     });
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsColor.Clean());
 
@@ -102,7 +102,7 @@ export class ColorComponent implements OnInit, OnDestroy {
         new fromActionsColor.ColorFind(this.id)
       );
     }
-  }
+  };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
@@ -123,5 +123,5 @@ export class ColorComponent implements OnInit, OnDestroy {
         this.router.navigate([this.language, 'colors']);
       }
     });
-  }
+  };
 }

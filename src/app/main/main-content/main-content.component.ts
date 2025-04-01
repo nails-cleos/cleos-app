@@ -208,17 +208,17 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
       goTo('home');
       this.router.navigate([this.translate.currentLang, name, 'treatment']);
     }
-  }
+  };
 
   onHover = (social: ISocialLink, enter: boolean): void => {
     const suffix = enter ? '' : '-NO-COLOR';
     social.svgIcon = `${ social.name }${ suffix }`;
-  }
+  };
 
   filterBy = (group?: ITreatmentGroup): void => {
     this.works = [];
     this.filter?.next(group);
-  }
+  };
 
   private createForm = (): void => {
     this.form = this.formBuilder.group({
@@ -227,12 +227,12 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
       subject: this.subject,
       body: this.body
     });
-  }
+  };
 
   private automateSlider = (): void => {
     // let forward = true;
     this.sliderSubscription = interval(3000).subscribe(() => this.moveForwardSlide());
-  }
+  };
 
   private moveForwardSlide = (): void => {
     if (this.slides?.length) {
@@ -266,7 +266,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
       //   this.currentIndex++;
       // }
     }
-  }
+  };
 
   private allSocialLinks = (): ISocialLink[] => [
     {
@@ -365,7 +365,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       }
     });
-  }
+  };
 }
 
 @Component({
@@ -407,5 +407,5 @@ export class BottomSheetBookAppointmentComponent {
       }
       window.open(url, '_blank');
     }, 500);
-  }
+  };
 }

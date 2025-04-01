@@ -185,7 +185,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
       this.getForm.professional.setValue('');
       this.setValues();
     }
-  }
+  };
 
   private setValues = (startDate?: any, startTime?: any, minTime?: string, maxTime?: string,
                        showDuration: boolean = false, durationMax?: any, roomAvailability?: IRoomAll): void => {
@@ -197,7 +197,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
     this.durationMax = durationMax;
     this.roomAvailability = roomAvailability;
     this.getForm.duration.setValue(undefined);
-  }
+  };
 
   private createForm = (): void => {
     this.form = this.formBuilder.group({
@@ -213,7 +213,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
       map(name => name ? this.filter(name) : this.professionals ? this.professionals.slice() : this.professionals)
     );
     this.valueChange();
-  }
+  };
 
   private valueChange = (): void => {
     this.getForm.startDate.valueChanges.subscribe(value => {
@@ -241,7 +241,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
         this.getRoom(value);
       }
     });
-  }
+  };
 
   private setMaxMin = (startDate: Date, rooms: IRoomAll[]): void => {
     const day = startDate.getDay();
@@ -252,7 +252,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
     this.maxTime = getTime(maxDate);
     this.calculateMaxDuration(startDate);
     this.roomAvailability = availability;
-  }
+  };
 
   private calculateMaxDuration = (date: Date): void => {
     const max = getTimeNumber(this.maxTime);
@@ -267,7 +267,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
         this.getForm.duration.setValue(undefined);
       }
     }
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsUnavailable.Clean());
 
@@ -308,7 +308,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
         this.router.navigate([this.translate.currentLang, 'unavailable']);
       }
     });
-  }
+  };
 
   private filter = (name: string): IUser[] | undefined => this.professionals?.filter(
     option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
@@ -319,5 +319,5 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
         new fromActionsUnavailable.UnavailableFind(this.id)
       );
     }
-  }
+  };
 }

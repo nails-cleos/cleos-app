@@ -113,7 +113,7 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
     this.date.setValue(ctrlValue);
 
     datepicker.close();
-  }
+  };
 
   exportQuarterSummary = (): void => {
     if (this.monthSummaries?.length) {
@@ -134,7 +134,7 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
         fs.saveAs(blob, `Report_Q${ this.selectedQuarter.value }_${ year }.xlsx`);
       });
     }
-  }
+  };
 
   private valueChange = (): void => {
     this.selectedRoom.valueChanges.subscribe(value => {
@@ -152,7 +152,7 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
         this.getSummary(value.getFullYear(), this.selectedQuarter.value);
       }
     });
-  }
+  };
 
   private createData = (): void => {
     const room = this.selectedRoom.value;
@@ -203,7 +203,7 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
             this.quarterSummaryTotals.cash, totalsWithoutCash, totals);
       });
     }
-  }
+  };
 
   private getAllMonthSummaries = (quarterSummaries: IMonthSummary[], result: IMonthSummary[]): IMonthSummary[] => {
     return result.map(m => {
@@ -217,7 +217,7 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
         return { type, net, btw, gross } as ISummaryTotal;
       }));
     });
-  }
+  };
 
   private getSummary = (year: number, quarter: number): void => {
     this.reset();
@@ -227,12 +227,12 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsDashboard.GetQuarterSummary({ year, quarter })
     );
-  }
+  };
 
   private reset = (): void => {
     this.monthSummaries = undefined;
     this.quarterSummaryTotals = new SummaryTotals();
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsDashboard.Clean());
 
@@ -256,5 +256,5 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
         this.isLoading = false;
       }
     });
-  }
+  };
 }

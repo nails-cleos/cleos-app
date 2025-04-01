@@ -79,7 +79,7 @@ export class CurrencyListComponent implements OnInit, AfterViewInit, OnDestroy {
         );
       }
     });
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsCurrency.Clean());
 
@@ -91,7 +91,7 @@ export class CurrencyListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getCurrency(this.paginator.pageIndex));
 
     this.cdRef.detectChanges();
-  }
+  };
 
   private getCurrency = (page: number = 0): void => this.store.dispatch(
     new fromActionsCurrency.GetAll({
@@ -114,5 +114,5 @@ export class CurrencyListComponent implements OnInit, AfterViewInit, OnDestroy {
         this.createPageSubscriptions();
       }
     });
-  }
+  };
 }

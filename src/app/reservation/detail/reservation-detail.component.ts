@@ -231,7 +231,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       }
     };
     return machine;
-  }
+  };
 
   private static addTransitionToAllStates = (
     eventName: string,
@@ -261,13 +261,13 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         }
       }
     }
-  }
+  };
 
-  private static createTransaction = (target: string, action: any): any => ({ target, action })
+  private static createTransaction = (target: string, action: any): any => ({ target, action });
 
-  private static getDateTimeDetail = (reservation: IReservationAll): Date => newDateTimestamp(reservation.timestamp)
+  private static getDateTimeDetail = (reservation: IReservationAll): Date => newDateTimestamp(reservation.timestamp);
 
-  private static createBullet = (name: string): string => `%0A\uD83D\uDC85\uD83C\uDFFB ${ name }`
+  private static createBullet = (name: string): string => `%0A\uD83D\uDC85\uD83C\uDFFB ${ name }`;
 
   openHistoryDialog = (history: IReservationAll): void => this.openDialog(
     ReservationDetailComponent.getDateTimeDetail(history));
@@ -276,10 +276,10 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     if (this.reservation) {
       openDialog(this.reservation.room, this.language, this.translate, this.dialog, reservationDate);
     }
-  }
+  };
 
   showTimeZone = (reservation: IReservationAll | undefined = this.reservation): boolean => !isSameTimeZone(
-    reservation?.room.timeZone)
+    reservation?.room.timeZone);
 
   ngOnInit(): void {
     this.subscribe();
@@ -315,7 +315,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         this.machine.transition(snakeToCamel(this.reservation.state), event);
       }
     });
-  }
+  };
 
   notify = (payment: IPaymentAll): void => this.store.dispatch(
     new fromActionsPayment.PaymentNotify({
@@ -337,14 +337,14 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       payment.amount = parseFloat(payment.amount).toFixed(2);
       this.payments.at(i).setValue(payment);
     }
-  }
+  };
 
   private createAction = (
     tooltip: string,
     icon: string,
     id: string,
     color?: string
-  ): IFabMenu => ({ tooltip, icon, id, color } as IFabMenu)
+  ): IFabMenu => ({ tooltip, icon, id, color } as IFabMenu);
 
   private valueChanges = (arr: any[]): void => {
     this.payments.valueChanges.pipe(startWith(arr), pairwise()).subscribe(([prev, next]: [any[], any[]]) => {
@@ -352,14 +352,14 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         this.disableUpdateButton = false;
       }
     });
-  }
+  };
 
   private clean = (): void => {
     this.payments.clear();
     this.store.dispatch(
       new fromActionsReservation.Clean()
     );
-  }
+  };
 
   private getOptions = (): void => this.store.dispatch(new fromActionsPayment.PaymentOptions());
 
@@ -374,7 +374,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsReservation.ReservationFindHistory({ id })
     );
-  }
+  };
 
   private professionalMachine = (self: this): any => {
     if (!self.reservation) {
@@ -598,7 +598,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         next: []
       }
     }, initialState);
-  }
+  };
 
   private customerMachine = (self: this): any => {
     if (!self.reservation) {
@@ -801,13 +801,13 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       },
       cancelledPaymentRequired
     }, initialState);
-  }
+  };
 
   private addActions = (): void => {
     if (!this.paymentDisplayedColumns.includes('actions')) {
       this.paymentDisplayedColumns.splice(this.paymentDisplayedColumns.length - 1, 0, 'actions');
     }
-  }
+  };
 
   private changeUser = (reservation: IReservationAll): void => executeDialog(
     this.dialog,
@@ -992,5 +992,5 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       }
     });
     this.paymentSubscription = this.getPaymentState.subscribe(state => this.options = getPayNlOptions(state.data));
-  }
+  };
 }

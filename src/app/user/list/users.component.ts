@@ -90,7 +90,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     const filterValue = (event.target as HTMLInputElement).value;
     this.filter = filterValue.trim().toLowerCase();
     this.getUsers(0);
-  }
+  };
 
   edit = (user: IUser): void => this.store.dispatch(new fromActionsUser.UserSelected({ user, profile: false }));
 
@@ -109,7 +109,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
         );
       }
     });
-  }
+  };
 
   sendInvite = (user: IUser): void => {
     this.noExpanded(user);
@@ -126,7 +126,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
         );
       }
     });
-  }
+  };
 
   restore = (user: IUser): void => {
     this.noExpanded(user);
@@ -146,7 +146,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
         );
       }
     });
-  }
+  };
 
   merge = (user: IUser): void => {
     this.noExpanded(user);
@@ -162,12 +162,12 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
         );
       }
     }, true);
-  }
+  };
 
   getIcon = (name: any): any => {
     const iconName: RoleIconKey = snakeToCamel(name) as RoleIconKey;
     return RoleIconName[iconName];
-  }
+  };
 
   addRole = (user: IUserAll, role: Role): void => this.store.dispatch(
     new fromActionsUser.SetRole({ user, role, action: 'ADD' })
@@ -180,7 +180,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   book = (customer: IUser): void => {
     const data = { customer };
     this.router.navigate([this.translate.currentLang, 'reservation'], { state: data });
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsUser.Clean());
 
@@ -192,7 +192,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getUsers(this.paginator.pageIndex));
 
     this.cdRef.detectChanges();
-  }
+  };
 
   private noExpanded = (user: IUser): void => {
     if (this.expandedUser) {
@@ -200,7 +200,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this.expandedUser = user;
     }
-  }
+  };
 
   private getUsers = (page: number = 0): void => this.store.dispatch(
     new fromActionsUser.GetAll({
@@ -233,7 +233,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
         this.paginatorSubscription = undefined;
       }
     });
-  }
+  };
 }
 
 @Component({
@@ -290,11 +290,11 @@ export class SelectUserDialogComponent implements OnInit, AfterViewInit, OnDestr
     if (event.code === 'Backspace') {
       this.user.setValue('');
     }
-  }
+  };
 
   private createForm = (): void => {
     this.userForm = this.formBuilder.group({ user: this.user });
-  }
+  };
 
   private createFilters = (): void => {
     this.filteredUser = this.user.valueChanges.pipe(
@@ -302,7 +302,7 @@ export class SelectUserDialogComponent implements OnInit, AfterViewInit, OnDestr
       map(value => typeof value === 'string' ? value : value ? value.name : ''),
       map(name => name ? this.filterUser(name) : this.users ? this.users.slice() : this.users)
     );
-  }
+  };
 
   private filterUser = (name: string): IUser[] | undefined => this.users?.filter(
     option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
@@ -314,6 +314,6 @@ export class SelectUserDialogComponent implements OnInit, AfterViewInit, OnDestr
       this.users = state.users?.filter((it: IUser) => it.id !== this.newUser.id);
       this.user.setValue(null);
     });
-  }
+  };
 }
 

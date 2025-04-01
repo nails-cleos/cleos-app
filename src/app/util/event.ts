@@ -37,6 +37,7 @@ export class Meta implements IMeta {
   total?: number;
   id?: string;
   customer?: string;
+  isReservation?: boolean;
 
   constructor(time?: boolean, timeZone?: string, state?: string, route?: string[], professionalId?: string,
               total?: number, id?: string) {
@@ -168,26 +169,6 @@ export const monthEvent = (
   draggable,
   allDay
 } as unknown as CalendarEvent);
-
-export const getOverlapEvent = (
-  events: any[],
-  eventStartDay: Date,
-  eventEndDay: Date,
-  professionalId?: string
-): CalendarEvent[] => {
-  if (professionalId) {
-    return events.filter((eventA: CalendarEvent) => ((eventA.meta?.professionalId === professionalId) && (
-      (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
-      || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
-      || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end)
-    )));
-  }
-  return events.filter(
-    (eventA: CalendarEvent) => (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
-      || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
-      || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end)
-  );
-};
 
 // private isAnOverlapEvent(eventStartDay: Date, eventEndDay: Date): CalendarEvent | undefined {
 //   return this.events.find((eventA: CalendarEvent) => {

@@ -84,7 +84,7 @@ export class AuthUserService {
     }
     this.authUser.next(authUser);
     return authUser;
-  }
+  };
 
   updateMode = (isDark: boolean): IAuthUser => {
     const authUser = this.authUser.getValue();
@@ -92,7 +92,7 @@ export class AuthUserService {
 
     this.authUser.next(authUser);
     return authUser;
-  }
+  };
 
   cookieConsent = (translate: TranslateService): void => {
     const data = translate.instant('COOKIE');
@@ -108,5 +108,5 @@ export class AuthUserService {
     this.cookieConsentService.getConfig().content = content;
     this.cookieConsentService.destroy();
     this.cookieConsentService.init(this.cookieConsentService.getConfig());
-  }
+  };
 }

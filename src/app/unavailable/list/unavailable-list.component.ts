@@ -94,16 +94,16 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
         );
       }
     });
-  }
+  };
 
-  showTimeZone = (unavailable: IUnavailableAll): boolean => !isSameTimeZone(unavailable.professional.timeZone)
+  showTimeZone = (unavailable: IUnavailableAll): boolean => !isSameTimeZone(unavailable.professional.timeZone);
 
   openDialog = (unavailable: IUnavailableAll): void => {
     const time = newDateTimestamp(unavailable.timestamp);
     const name = unavailable.professional.displayName;
     const timeZone = unavailable.professional.timeZone;
     createDialog('PROFESSIONAL_INFO', name, this.dateFormat, this.translate, this.dialog, timeZone, time);
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsUnavailable.Clean());
 
@@ -116,7 +116,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
       this.paginator?.page.subscribe(() => this.getUnavailableList(this.paginator.pageIndex));
 
     this.cdRef.detectChanges();
-  }
+  };
 
   private getUnavailableList = (page: number = 0): void => this.store.dispatch(
     new fromActionsUnavailable.GetAll({
@@ -140,5 +140,5 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
         this.createPageSubscriptions();
       }
     });
-  }
+  };
 }

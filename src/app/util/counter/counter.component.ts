@@ -4,7 +4,7 @@ import { SharedModule } from '../../shared/shared.module';
 
 @Component({
     selector: 'app-counter',
-    template: '<div #counter></div>',
+    templateUrl: 'counter.component.html',
     imports: [SharedModule]
 })
 export class CounterComponent {

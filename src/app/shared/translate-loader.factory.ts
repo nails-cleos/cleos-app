@@ -14,7 +14,7 @@ export class TranslateLoaderFactory {
 
         return from(import(`../../assets/i18n/${ module }/${ fileLang }.json`));
       }
-    }
+    };
 }
 
 export class MissingTranslateHandler implements MissingTranslationHandler {
@@ -25,7 +25,7 @@ export class MissingTranslateHandler implements MissingTranslationHandler {
       const file = JSON.parse(JSON.stringify(t));
       this.byString(file, key);
     });
-  }
+  };
 
   byString = (o: any, s: string): any => {
     s = s.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
@@ -40,5 +40,5 @@ export class MissingTranslateHandler implements MissingTranslationHandler {
       }
     }
     return o;
-  }
+  };
 }

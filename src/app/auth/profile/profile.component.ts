@@ -143,14 +143,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
       reader.readAsDataURL(file);
     }
-  }
+  };
 
-  lightenDarkenColor = (color: string, isDark: boolean): string => lightenDarkenColor(color, isDark ? 50 : -50)
+  lightenDarkenColor = (color: string, isDark: boolean): string => lightenDarkenColor(color, isDark ? 50 : -50);
 
   getAddress = (placeResult: PlaceResult): void => {
     this.geometry = placeResult.geometry;
     this.formattedAddress = placeResult.formatted_address;
-  }
+  };
 
   private loadLabels = () => {
     const phoneTranslations = this.translate.instant('COMMON.USER.PHONE');
@@ -165,7 +165,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       invalidNumberError: phoneTranslations.INVALID || '',
       requiredError: phoneTranslations.REQUIRED || ''
     };
-  }
+  };
 
   private findMe = (): void => this.store.dispatch(new fromActionsUser.FindMe());
 
@@ -200,7 +200,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.lightColorPicker.valueChanges.subscribe((color) =>
       this.lightColor.setValue(color, { emitEvent: false })
     );
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsUser.Clean());
 
@@ -213,13 +213,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
           const dataUrl = resizeImage(img, this.canvas.nativeElement);
           if (this.resizedImage) {
             this.resizedImage.nativeElement.src = dataUrl;
-            this.cdRef.detectChanges()
+            this.cdRef.detectChanges();
           }
         }
       };
       img.src = url;
     }
-  }
+  };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
@@ -261,5 +261,5 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.findMe();
       }
     });
-  }
+  };
 }

@@ -31,5 +31,5 @@ export class TwoDigitsDirective {
     if (next && !String(next).match(this.regex) || String(next).match(new RegExp(/^0[0-9]$/g))) {
       event.preventDefault();
     }
-  }
+  };
 }

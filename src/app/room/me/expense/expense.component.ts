@@ -140,7 +140,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  displayFnSupplyStore = (supplyStore: ISupplyStore): string => supplyStore ? `${ supplyStore.name }` : ''
+  displayFnSupplyStore = (supplyStore: ISupplyStore): string => supplyStore ? `${ supplyStore.name }` : '';
 
   validateInputValue = (input: HTMLInputElement, index: number, min?: number, max?: number): void => {
     const id = input.id.replace(`${ index }`, '');
@@ -181,7 +181,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     } else {
       expense?.setValue(null);
     }
-  }
+  };
 
   addDate = (): void => this.totals.push(this.createTotals());
 
@@ -200,7 +200,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       map(
         name => name ? this.filterSupplyStore(name) : this.supplyStores ? this.supplyStores.slice() : this.supplyStores)
     );
-  }
+  };
 
   private createTotals = (type: string = '', gross: string = '', btw: string = '',
                           description: string = ''): FormGroup => {
@@ -210,10 +210,10 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       description: [description],
       btw: [btw]
     });
-  }
+  };
 
   private filterSupplyStore = (name: string): ISupplyStore[] | undefined => this.supplyStores?.filter(
-    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0)
+    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
   private getExpenseInfo = (): void => this.store.dispatch(new fromActionsExpense.GetExpenseInfo(this.roomId));
 
@@ -228,7 +228,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsExpense.Clean()
     );
-  }
+  };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
@@ -265,5 +265,5 @@ export class ExpenseComponent implements OnInit, OnDestroy {
         this.router.navigate([this.language, 'rooms', this.roomId, 'expenses']);
       }
     });
-  }
+  };
 }

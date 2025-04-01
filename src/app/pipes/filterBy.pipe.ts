@@ -16,5 +16,5 @@ export class FilterByPipe implements PipeTransform {
     }
 
     return items.filter(item => filter === (key ? item[key] : item));
-  }
+  };
 }

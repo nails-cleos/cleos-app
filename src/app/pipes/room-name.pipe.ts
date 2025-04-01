@@ -15,6 +15,6 @@ export class RoomNamePipe implements PipeTransform {
     const gmt = showGMT ? roomGMT(room) : '';
     const currency = showCurrency && room.currency ? ` - ${ roomCurrency(room) }` : '';
     return room.office ? `${ room.office.name }${ currency }${ gmt }` : '';
-  }
+  };
 
 }

@@ -116,7 +116,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
       transfer: [''],
       bank: ['']
     });
-  }
+  };
 
   private getAccount = (): void => {
     if (!this.account) {
@@ -124,7 +124,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
         new fromActionsAccount.AccountFind(this.accountId)
       );
     }
-  }
+  };
 
   private getOptions = (): void => this.store.dispatch(new fromActionsAccount.PaymentOptions());
 
@@ -149,5 +149,5 @@ export class TransactionComponent implements OnInit, OnDestroy {
         }
       }
     });
-  }
+  };
 }

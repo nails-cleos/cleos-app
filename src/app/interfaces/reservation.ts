@@ -125,12 +125,6 @@ export interface IDay {
   excludeDays: number[];
 }
 
-export interface ICalendar {
-  room: IRoomAll;
-  day?: IDay;
-  events: CalendarEvent[];
-}
-
 export interface IReservationSummary {
   title: string;
   value?: number | string;
@@ -180,11 +174,13 @@ export interface ICustomerLastReservation {
 }
 
 export interface IDataEvent {
-  calendarEvents: CalendarEvent[],
-  unavailableEventLength: number,
-  index: number,
-  viewDate: Date,
-  process: boolean
+  calendarEvents: CalendarEvent[];
+  unavailableEventLength: number;
+  index: number;
+  viewDate: Date;
+  process: boolean;
+  room: IRoomAll;
+  day?: IDay;
 
   addEvents(events: CalendarEvent[]): void;
 
@@ -195,6 +191,12 @@ export interface IDataEvent {
   filterEvent(event: CalendarEvent): void;
 
   updateLength(length: number): void;
+
+  getOverlapEvent(eventStartDay: Date, eventEndDay: Date, professionalId?: string): CalendarEvent[]
+
+  sameDayEvent(recurring: any, event: CalendarEvent): boolean;
+
+  addClass(currentEvent: CalendarEvent, cssClass: string): void;
 }
 
 export class DataEvent implements IDataEvent {
@@ -203,37 +205,75 @@ export class DataEvent implements IDataEvent {
   index: number;
   viewDate: Date;
   process: boolean;
+  room: IRoomAll;
+  day?: IDay;
 
   constructor(events: CalendarEvent[], index: number, viewDate: Date, unavailableEventLength: number,
-              process: boolean = false) {
+              room: IRoomAll, process: boolean = false, day?: IDay) {
     this.calendarEvents = events;
     this.unavailableEventLength = unavailableEventLength;
     this.index = index;
     this.viewDate = viewDate;
+    this.room = room;
     this.process = process;
+    this.day = day;
   }
 
   addEvents = (events: CalendarEvent[]): void => {
-    this.calendarEvents = this.calendarEvents.concat(events);
-  }
+    events.forEach(event => this.addEvent(event));
+  };
 
   addEvent = (event?: CalendarEvent): void => {
     if (event) {
-      this.calendarEvents = [...this.calendarEvents, event];
+      if (event.id === undefined || !this.calendarEvents.some(e => e.id === event.id))
+        this.calendarEvents = [...this.calendarEvents, event];
     }
-  }
+  };
 
   removeEvent = (event: CalendarEvent, deleteCount: number = 1): void => {
     const i = this.calendarEvents.indexOf(event);
+    if (i === -1) {
+      return;
+    }
     this.calendarEvents = this.calendarEvents.slice(i, deleteCount);
-  }
+  };
 
   filterEvent = (event: CalendarEvent): void => {
     this.calendarEvents = this.calendarEvents.filter(ev => ev !== event);
-  }
+  };
 
   updateLength = (length: number): void => {
     this.unavailableEventLength = length;
+  };
+
+  getOverlapEvent = (
+    eventStartDay: Date,
+    eventEndDay: Date,
+    professionalId?: string
+  ): CalendarEvent[] => {
+    const events = [...this.calendarEvents];
+    if (professionalId) {
+      return events.filter((eventA: CalendarEvent) => ((eventA.meta?.professionalId === professionalId) && (
+        (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
+        || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
+        || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end)
+      )));
+    }
+    return events.filter(
+      (eventA: CalendarEvent) => (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
+        || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
+        || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end)
+    );
+  };
+
+  sameDayEvent = (recurring: any, event: CalendarEvent): boolean => !this.calendarEvents
+    .find(ce => ce.id === recurring.path && isSameDay(event.start, ce.start))
+
+  addClass(currentEvent: CalendarEvent, cssClass: string): void {
+    this.calendarEvents = this.calendarEvents.map(event => ({
+      ...event,
+      cssClass: event.id === currentEvent.id ? cssClass : ''
+    }));
   }
 }
 
@@ -268,18 +308,6 @@ export class Day implements IDay {
     }
 
     this.excludeDays = excludeDays;
-  }
-}
-
-export class Calendar implements ICalendar {
-
-  events: CalendarEvent[];
-  room: IRoomAll;
-  day: any;
-
-  constructor(room: IRoomAll, events: CalendarEvent[]) {
-    this.events = events;
-    this.room = room;
   }
 }
 

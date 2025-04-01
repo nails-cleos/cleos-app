@@ -18,7 +18,7 @@ export class PwaService {
   private promptEvent: any;
 
   constructor() {
-    const swUpdate: SwUpdate = inject(SwUpdate)
+    const swUpdate: SwUpdate = inject(SwUpdate);
     if (swUpdate.isEnabled) {
       swUpdate.versionUpdates
         .pipe(filter((evt): evt is VersionReadyEvent => evt.type === 'VERSION_READY'))
@@ -42,11 +42,11 @@ export class PwaService {
         }
       }
     }
-  }
+  };
 
   private openPromptComponent = (mobileType: 'ios' | 'android'): void => {
     timer(3000)
       .pipe(take(1))
       .subscribe(() => this.bottomSheet.open(PromptComponent, { data: { mobileType, promptEvent: this.promptEvent } }));
-  }
+  };
 }

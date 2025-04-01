@@ -136,7 +136,7 @@ export class InvoiceComponent implements OnInit, OnDestroy {
     if (event.code === 'Backspace') {
       this.office.setValue(null);
     }
-  }
+  };
 
   displayFnOffice = (office: IOfficeAll): string => office ? office.name : '';
 
@@ -147,7 +147,7 @@ export class InvoiceComponent implements OnInit, OnDestroy {
     this.typeInput.nativeElement.value = '';
     this.type.setValue(null);
     this.findInvoices();
-  }
+  };
 
   remove = (type: string): void => {
     const index = this.types.indexOf(type);
@@ -159,10 +159,10 @@ export class InvoiceComponent implements OnInit, OnDestroy {
       this.type.setValue(null);
       this.findInvoices();
     }
-  }
+  };
 
   // numSelected === numRows
-  isAllSelected = (): boolean => this.selection.selected.length === this.dataSource.data.length
+  isAllSelected = (): boolean => this.selection.selected.length === this.dataSource.data.length;
 
   toggleAllRows = (): void => {
     if (this.isAllSelected()) {
@@ -171,15 +171,15 @@ export class InvoiceComponent implements OnInit, OnDestroy {
     }
 
     this.selection.select(...this.dataSource.data);
-  }
+  };
 
   checkboxLabel = (row?: any): string =>
     !row ? `${ this.isAllSelected() ? 'deselect' : 'select' } all` :
-      `${ this.selection.isSelected(row) ? 'deselect' : 'select' } row ${ row.position + 1 }`
+      `${ this.selection.isSelected(row) ? 'deselect' : 'select' } row ${ row.position + 1 }`;
 
   goToPath = (invoice: IInvoice): void => {
-    this.router.navigate(invoice.paths)
-  }
+    this.router.navigate(invoice.paths);
+  };
 
   private createForm = (): void => {
     this.dateRange = this.formBuilder.group({
@@ -199,7 +199,7 @@ export class InvoiceComponent implements OnInit, OnDestroy {
     );
 
     this.valueChanges();
-  }
+  };
 
   private valueChanges = (): void => {
     this.dateRange.valueChanges.subscribe(value => {
@@ -215,14 +215,14 @@ export class InvoiceComponent implements OnInit, OnDestroy {
         }
       }
     });
-  }
+  };
 
   private filterTypes = (
     value: string
-  ): string[] => this.allPaymentTypes.filter(state => state.toLowerCase().indexOf(value.toLowerCase()) === 0)
+  ): string[] => this.allPaymentTypes.filter(state => state.toLowerCase().indexOf(value.toLowerCase()) === 0);
 
   private filterOffice = (name: string): IOfficeAll[] | undefined => this.offices?.filter(
-    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0)
+    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
   private findInvoices = (): void => {
     if (this.startDate.value && this.endDate.value) {
@@ -237,7 +237,7 @@ export class InvoiceComponent implements OnInit, OnDestroy {
         new fromActionsInvoice.InvoiceFind(payload)
       );
     }
-  }
+  };
 
   private findOffices = (): void => this.store.dispatch(new fromActionsInvoice.FindMyOffices());
 
@@ -268,5 +268,5 @@ export class InvoiceComponent implements OnInit, OnDestroy {
         this.dataSource = new MatTableDataSource(this.invoices);
       }
     });
-  }
+  };
 }

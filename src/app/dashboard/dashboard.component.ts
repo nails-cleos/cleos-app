@@ -123,12 +123,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     return image || 'assets/icons/icon-512x512.png';
-  }
+  };
 
   private static getColor = (
     professional: IProfessionalEvent,
     isDark: boolean
-  ): EventColor => getProfessionalColor(isDark, professional.darkColor, professional.lightColor)
+  ): EventColor => getProfessionalColor(isDark, professional.darkColor, professional.lightColor);
 
   ngOnInit(): void {
     this.clean();
@@ -144,14 +144,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   selectDate = (event: any): void => {
     this.changeDate(newDate(event.value));
     this.getEvents();
-  }
+  };
 
   eventTimesChanged = ({ event, newStart, newEnd }: any): void => {
     event.start = newStart;
     event.end = newEnd;
     this.events = [...this.events];
     this.updateEvent(event.id, event.start);
-  }
+  };
 
   professionalChanged = ({ event, newProfessional }: any): void => {
     const endTime = event.end ? event.end.getTime() / 1000 : 0;
@@ -174,7 +174,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     event.meta.professional = newProfessional;
     this.events = [...this.events];
     setTimeout(() => this.updateEvent(event.id, undefined, newProfessional.id), 500);
-  }
+  };
 
   refreshViewDate = (now: Date): void => {
     if (isSameDay(now, this.viewDate)) {
@@ -183,7 +183,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
       this.viewDate = now;
     }
-  }
+  };
 
   segmentClick = (date: Date, professionalId: string): void => {
     const data = { date, professionalId, isDashboard: true };
@@ -194,7 +194,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
       });
     }
-  }
+  };
 
   private createTitle = (calendarEvent: CalendarEvent, now: Date = getNowTimeZone()): CalendarEvent => {
     const matcher = calendarEvent.title.match(/(?<=<b>\s*).*?(?=\s*<\/b>)/gs);
@@ -297,7 +297,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     return calendarEvent;
-  }
+  };
 
   private updateEvent = (id: string, dateStart?: Date, professionalId?: string): void => {
     const reservation: IReservation = { id };
@@ -313,14 +313,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsDashboard.UpdateEvent(reservation)
     );
-  }
+  };
 
   private changeDate = (date: Date): void => {
     this.viewDate = createNewDate(date, this.viewDate.getHours(), this.viewDate.getMinutes());
     this.endDate = createNewDate(date, this.endDate.getHours(), this.endDate.getMinutes());
     this.startDate = createNewDate(date, this.startDate.getHours(), this.startDate.getMinutes());
     this.dateOrViewChanged();
-  }
+  };
 
   private dateOrViewChanged = (): void => {
     this.prevBtnDisabled = !this.dateIsValid(
@@ -334,7 +334,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     } else if (this.viewDate > this.maxDate) {
       this.changeDate(this.maxDate);
     }
-  }
+  };
 
   private dateIsValid = (date: Date): boolean => isBetween(this.today, this.maxDate, date);
 
@@ -419,7 +419,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         );
       });
     }
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsDashboard.Clean());
 
@@ -428,7 +428,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsDashboard.GetDashboardEvents(this.viewDate)
     );
-  }
+  };
 
   private eventClick = (event: CalendarEvent, type: string): void => {
     const reservationId = event.id;
@@ -462,12 +462,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
       case 'MORE_INFO':
         this.router.navigate([this.language, 'reservation', reservationId, 'more-info']);
     }
-  }
+  };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.dashboard = state.dashboard;
       this.createEvents(this.isDarkMode);
     });
-  }
+  };
 }

@@ -63,9 +63,9 @@ export class ReviewDialogComponent {
 
   onRatingHover = (hover: number): void => {
     this.hover = hover;
-  }
+  };
 
   onRatingChanged = (rating: number): void => {
     this.rating = rating;
-  }
+  };
 }

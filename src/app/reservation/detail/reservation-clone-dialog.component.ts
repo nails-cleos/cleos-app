@@ -47,7 +47,7 @@ export class ReservationCloneDialogComponent {
     if (max) {
       this.maxDate = getTime(max);
     }
-    this.time.setValue(this.minDate)
+    this.time.setValue(this.minDate);
   }
 
   get onNoClick(): void {
@@ -65,5 +65,5 @@ export class ReservationCloneDialogComponent {
       date: this.date,
       start: this.time
     });
-  }
+  };
 }

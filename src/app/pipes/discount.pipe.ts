@@ -17,5 +17,5 @@ export class DiscountPipe implements PipeTransform {
         return `${ currencySymbol(currency) } ${ value }`;
     }
     return value ? `${ value }` : '';
-  }
+  };
 }

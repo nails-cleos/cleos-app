@@ -204,7 +204,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
       this.getForm.professional.setValue('');
       this.setValues();
     }
-  }
+  };
 
   private setValues = (startDate?: any, startTime?: any, minTime?: string, maxTime?: string,
                        showDuration: boolean = false, durationMax?: any, roomAvailability?: IRoomAll): void => {
@@ -220,7 +220,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
     this.getForm.repeat.setValue(undefined);
     this.getForm.allDay.setValue(startDate ? this.getForm.allDay.value : false);
     this.showEnd = false;
-  }
+  };
 
   private createForm = (): void => {
     this.form = this.formBuilder.group({
@@ -239,7 +239,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
       map(name => name ? this.filter(name) : this.professionals ? this.professionals.slice() : this.professionals)
     );
     this.formValueChange();
-  }
+  };
 
   private formValueChange = (): void => {
     this.getForm.allDay.valueChanges.subscribe(value => {
@@ -292,7 +292,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
         this.getRoom(value);
       }
     });
-  }
+  };
 
   private setMaxMin = (startDate: Date, rooms: IRoomAll[]): void => {
     const day = startDate.getDay();
@@ -303,7 +303,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
     this.maxTime = getTime(maxDate);
     this.calculateMaxDuration(startDate);
     this.roomAvailability = availability;
-  }
+  };
 
   private calculateMaxDuration = (date: Date): void => {
     const max = getTimeNumber(this.maxTime);
@@ -318,7 +318,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
         this.getForm.duration.setValue(undefined);
       }
     }
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsUnavailable.Clean());
 
@@ -334,7 +334,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
         new fromActionsUnavailable.UnavailableFind(this.id)
       );
     }
-  }
+  };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
@@ -378,5 +378,5 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
         this.router.navigate([this.translate.currentLang, 'unavailable']);
       }
     });
-  }
+  };
 }

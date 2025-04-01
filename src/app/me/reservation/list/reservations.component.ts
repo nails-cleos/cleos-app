@@ -100,7 +100,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  showTimeZone = (reservation: IReservationAll): boolean => !isSameTimeZone(reservation.room.timeZone)
+  showTimeZone = (reservation: IReservationAll): boolean => !isSameTimeZone(reservation.room.timeZone);
 
   onRatingChanged = (reservation: IReservationAll): void => executeDialogNoWidth(
     this.dialog, ReviewDialogComponent, reservation, result => {
@@ -118,7 +118,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   openDialog = (reservation: IReservationAll): void => {
     const time = newDateTimestamp(reservation.timestamp);
     openDialog(reservation.room, this.dateFormat, this.translate, this.dialog, time);
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsReservation.Clean());
 
@@ -180,5 +180,5 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
         }
       }
     });
-  }
+  };
 }

@@ -28,7 +28,7 @@ export class NavigationService {
         }
       }
     });
-  }
+  };
 
   back = (date?: Date, step: number = 0): void => {
     this.history.pop();
@@ -38,17 +38,17 @@ export class NavigationService {
     } else {
       this.reloadPage();
     }
-  }
+  };
 
   reload = (url: string[], data?: any, queryParams?: any, reloadURL = '/auth/redirect', lang?: string): void => {
     const navigateUrl = `/${ lang || getLocale(this.translate.currentLang).language }${ reloadURL }`;
     this.router.navigateByUrl(navigateUrl, { skipLocationChange: true }).then(() =>
       this.router.navigate(url.filter(path => path), { state: data, queryParams }));
-  }
+  };
 
   reloadPage = (url: string = `/${ getLocale(this.translate.currentLang).language }`): void => {
     this.router.navigateByUrl(url).then(() => window.location.reload());
-  }
+  };
 
   attachLang = (lang: string | null, currentUser?: IUser): string => {
     const language = getLocale(lang).language;
@@ -68,5 +68,5 @@ export class NavigationService {
       }
     }
     return language;
-  }
+  };
 }

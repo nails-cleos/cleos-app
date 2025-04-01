@@ -65,5 +65,5 @@ export class AddDiscountDialogComponent implements OnInit, OnDestroy {
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => this.discounts = state.data);
-  }
+  };
 }

@@ -60,7 +60,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
         new fromActionsPayment.PaymentSend(payment.link || payment.paymentURL)
       );
     }
-  }
+  };
 
   notify = (payment: IPayment): void => {
     this.store.dispatch(
@@ -71,7 +71,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
         type: payment.type
       })
     );
-  }
+  };
 
   getCurrency = (payment: IPaymentAll): string => {
     let icon = 'euro';
@@ -81,7 +81,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
       icon = payment.transaction.account.currency.icon;
     }
     return icon;
-  }
+  };
 
   private getPayments = (): void => {
     if (!this.dataSource) {
@@ -89,7 +89,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
         new fromActionsPayment.PaymentFindByResourceId({ id: this.id, path: this.path, redirect: true })
       );
     }
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsPayment.Clean());
 
@@ -105,5 +105,5 @@ export class PaymentComponent implements OnInit, OnDestroy {
         this.errorMessage = state.subErrors;
       }
     });
-  }
+  };
 }

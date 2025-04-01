@@ -116,7 +116,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     this.date.setValue(ctrlValue);
 
     datepicker.close();
-  }
+  };
 
   private valueChange = (): void => {
     this.selectedRoom.valueChanges.subscribe(value => {
@@ -130,7 +130,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
         this.getSummary(value.getFullYear());
       }
     });
-  }
+  };
 
   private createData = (): void => {
     const room = this.selectedRoom.value;
@@ -180,7 +180,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
         });
       });
     }
-  }
+  };
 
   private getAllQuarterSummaries = (
     quarterSummaries: IQuarterSummary[],
@@ -198,7 +198,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
         return { type, net, btw, gross } as ISummaryTotal;
       }));
     }));
-  })
+  });
 
   private createExportData = (): void => {
     this.sheetData = [];
@@ -232,7 +232,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
         });
       }
     }
-  }
+  };
 
   private exportToExcel = (): void => {
     this.sheetData = this.sheetData.map(monthly => ({
@@ -256,7 +256,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
         fs.saveAs(blob, `Report_${ this.date.value?.getFullYear() }.xlsx`);
       });
     }
-  }
+  };
 
   private reset = (): void => {
     this.quarterSummaries = undefined;
@@ -265,7 +265,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     this.primaryRoom = undefined;
     this.export = false;
     this.yearSummaryMap = undefined;
-  }
+  };
 
   private getSummary = (year: number): void => {
     this.reset();
@@ -273,14 +273,14 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsDashboard.GetYearSummary(year)
     );
-  }
+  };
 
   private getExportData = (year: number): void => {
     this.isExportLoading = true;
     this.store.dispatch(
       new fromActionsDashboard.GetYearExport(year)
     );
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsDashboard.Clean());
 
@@ -313,5 +313,5 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
         this.export = true;
       }
     });
-  }
+  };
 }

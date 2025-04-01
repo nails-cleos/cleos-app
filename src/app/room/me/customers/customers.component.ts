@@ -67,16 +67,16 @@ export class CustomersComponent implements OnInit, AfterViewInit, OnDestroy {
         new fromActionsRoom.GetCustomerInfo({ id: this.roomId })
       );
     });
-  }
+  };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.customers = state.customers;
       if (this.customers) {
-        this.dataSource.data = this.customers
+        this.dataSource.data = this.customers;
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
       }
     });
-  }
+  };
 }

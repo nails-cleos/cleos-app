@@ -710,7 +710,7 @@
     color: mat.m2-get-color-from-palette($primary-palette);
   }
 
-  @if ($isDark) {
+  @if $isDark {
     .success,
     .green-text {
       color: #008b00;
@@ -836,7 +836,7 @@
       color: black;
     }
 
-    @if ($isDark) {
+    @if $isDark {
       &:hover {
         color: white;
       }
@@ -869,7 +869,7 @@
   }
 
   .mat-gray {
-    @if ($isDark) {
+    @if $isDark {
       background-color: gray !important;
     } @else {
       background-color: darkgray !important;
@@ -910,7 +910,7 @@
     color: mat.m2-get-color-from-palette($warn-palette, darker);
   }
 
-  @if ($isDark) {
+  @if $isDark {
     .warning-snack-bar {
       color: mat.m2-get-color-from-palette($warn-palette, 500);
     }
@@ -923,6 +923,24 @@
     }
     .accent-snack-bar {
       color: white !important;
+    }
+  }
+
+  @keyframes flash {
+    @if $isDark {
+      0%, 100% {
+        background-color: rgba(0, 0, 0, 0.7);
+      }
+      50% {
+        background-color: rgba(0, 0, 0, 0);
+      }
+    } @else {
+      0%, 100% {
+        background-color: rgba(255, 255, 255, 0.7);
+      }
+      50% {
+        background-color: rgba(255, 255, 255, 0);
+      }
     }
   }
 }

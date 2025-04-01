@@ -81,5 +81,5 @@ export class CancelDialogComponent implements OnInit {
     this.cancelForm = this.formBuilder.group({
       paymentCancellation: this.paymentCancellation
     });
-  }
+  };
 }

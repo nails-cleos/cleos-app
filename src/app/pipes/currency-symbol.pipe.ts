@@ -7,5 +7,5 @@ import { ICurrency, ICurrencyAll } from '../interfaces/currency';
 })
 export class CurrencySymbolPipe implements PipeTransform {
 
-  transform = (currency?: ICurrency | ICurrencyAll | string): unknown => currency ? currencySymbol(currency) : ''
+  transform = (currency?: ICurrency | ICurrencyAll | string): unknown => currency ? currencySymbol(currency) : '';
 }

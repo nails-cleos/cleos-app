@@ -135,18 +135,18 @@ export class TreatmentComponent implements OnInit, OnDestroy {
 
   removeTab = (index: number): void => {
     this.treatments.splice(index, 1);
-  }
+  };
 
   setValue = (treatment: ITreatment, attribute: string, $event: any): void => {
     // @ts-expect-error assign value in treatment[attribute]
     treatment[attribute] = $event.target.value;
-  }
+  };
 
   setTime = (treatment: ITreatment, $event: any): void => {
     const time = getTimeNumber($event);
     const date = createNewDate(getNowTimeZone(), time?.hour, time?.minute);
     treatment.time = getTime(date);
-  }
+  };
 
   remove = (color: IColorAll): void => {
     const index = this.colors.indexOf(color);
@@ -155,7 +155,7 @@ export class TreatmentComponent implements OnInit, OnDestroy {
       this.allColors?.push(color);
       this.getForm.color.setValue(null);
     }
-  }
+  };
 
   selectedColor = (event: MatAutocompleteSelectedEvent): void => {
     const color = event.option.value;
@@ -163,7 +163,7 @@ export class TreatmentComponent implements OnInit, OnDestroy {
     this.allColors = this.allColors?.filter(c => c.id !== color.id);
     this.colorInput.nativeElement.value = '';
     this.getForm.color.setValue(null);
-  }
+  };
 
   sortColors = (data: any): IColorAll[] => data.sort((a: any, b: any) => {
     const aName = a.name.toUpperCase();
@@ -185,7 +185,7 @@ export class TreatmentComponent implements OnInit, OnDestroy {
       map(
         name => name ? this.filter(name) : (this.allColors ? this.allColors.slice() : this.allColors))
     );
-  }
+  };
 
   private filter = (name: string): IColorAll[] | undefined => this.allColors?.filter(
     option => option?.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
@@ -200,7 +200,7 @@ export class TreatmentComponent implements OnInit, OnDestroy {
         new fromActionsTreatment.TreatmentFind({ id: this.id, path: 'edit' })
       );
     }
-  }
+  };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
@@ -234,5 +234,5 @@ export class TreatmentComponent implements OnInit, OnDestroy {
         this.router.navigate([this.translate.currentLang, 'treatments']);
       }
     });
-  }
+  };
 }

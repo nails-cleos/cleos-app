@@ -74,7 +74,7 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
   useDiscount = (discount: IUserDiscount): void => {
     const data = { discount };
     this.router.navigate([this.language, 'me', 'reservation'], { state: data });
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsDiscount.Clean());
 
@@ -86,7 +86,7 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getDiscounts(this.paginator.pageIndex));
 
     this.cdRef.detectChanges();
-  }
+  };
 
   private getDiscounts = (page: number = 0): void => this.store.dispatch(
     new fromActionsDiscount.GetMyDiscounts({
@@ -123,5 +123,5 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
         this.createPageSubscriptions();
       }
     });
-  }
+  };
 }

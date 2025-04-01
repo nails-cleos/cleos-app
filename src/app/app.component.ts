@@ -65,5 +65,5 @@ export class AppComponent implements OnInit, OnDestroy {
     const currentLocale = getLocale(this.locale);
     this.dateAdapter.setLocale(currentLocale.language);
     this.store.dispatch(new fromActionsI18n.SetLanguage(currentLocale.language));
-  }
+  };
 }

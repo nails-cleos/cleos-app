@@ -38,14 +38,14 @@ export class MessagingService {
       const collection = ref(this.database, 'fcmTokens/');
       update(collection, data).then(() => console.info('DB updated'));
     }
-  }
+  };
 
   /**
    * hook method when new notification received in foreground
    */
   receiveMessage = (): void => {
     this.message$ = new Observable(sub => onMessage(this.messaging, it => sub.next(it)));
-  }
+  };
 
   /**
    * request permission for notification from firebase cloud messaging
@@ -70,5 +70,5 @@ export class MessagingService {
         });
       }
     });
-  }
+  };
 }

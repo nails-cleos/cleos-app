@@ -56,7 +56,7 @@ export class UserService {
     const headers = new HttpHeaders().set('Upload', 'true');
 
     return this.http.patch<IUser>(toUrl(this.userUrlV1, 'me', 'photo'), formData, { headers });
-  }
+  };
 
   addCustomer = (user: IUser): Observable<IUser> => this.http.post(this.customerUrlV1, user);
 

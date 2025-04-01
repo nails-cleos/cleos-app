@@ -97,7 +97,7 @@ export class DayViewSchedulerCalendarUtils extends CalendarUtils {
     });
 
     return view;
-  }
+  };
 }
 
 @Component({
@@ -139,7 +139,7 @@ export class DayViewSchedulerComponent extends CalendarWeekViewComponent impleme
 
   getDayColumnWidth = (
     eventRowContainer: HTMLElement
-  ): number => Math.floor(eventRowContainer.offsetWidth / this.professionals.length)
+  ): number => Math.floor(eventRowContainer.offsetWidth / this.professionals.length);
 
   dragMove = (dayEvent: WeekViewTimeEvent, dragEvent: DragMoveEvent): void => {
     if (this.snapDraggedEvents) {
@@ -155,7 +155,7 @@ export class DayViewSchedulerComponent extends CalendarWeekViewComponent impleme
       this.restoreOriginalEvents(tempEvents, new Map([[adjustedEvent, originalEvent]]));
     }
     this.dragAlreadyMoved = true;
-  }
+  };
 
   dragEnded = (
     weekEvent: WeekViewAllDayEvent | WeekViewTimeEvent,
@@ -172,12 +172,12 @@ export class DayViewSchedulerComponent extends CalendarWeekViewComponent impleme
     if (newProfessional && newProfessional !== weekEvent.event.meta.professional) {
       this.professionalChanged.emit({ event: weekEvent.event, newProfessional });
     }
-  }
+  };
 
   segmentClick = (date: Date, index: number): void => {
     const professionalId = this.view.professionals[index].id;
     this.segmentClicked.emit({ date, professionalId });
-  }
+  };
 
   protected getWeekView = (events: CalendarEvent[]): DayViewScheduler => {
     this.dayStartHour = this.day.dayStartHour;
@@ -212,7 +212,7 @@ export class DayViewSchedulerComponent extends CalendarWeekViewComponent impleme
         this.daysInWeek
       )
     });
-  }
+  };
 
   private getDraggedProfessionalColumn = (
     dayEvent: WeekViewTimeEvent | WeekViewAllDayEvent,
@@ -223,5 +223,5 @@ export class DayViewSchedulerComponent extends CalendarWeekViewComponent impleme
       .findIndex((professional) => professional === dayEvent.event.meta.professional);
     const newIndex = currentColumnIndex + columnsMoved;
     return this.view.professionals[newIndex];
-  }
+  };
 }

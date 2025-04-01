@@ -52,7 +52,7 @@ export class UpcomingComponent implements OnChanges {
     if (this.upcoming) {
       openDialog(this.upcoming.room, this.dateFormat, this.translate, this.dialog, reservationDate);
     }
-  }
+  };
 
   private loadUpcoming = (): void => {
     if (this.upcoming && this.upcoming.id) {
@@ -74,5 +74,5 @@ export class UpcomingComponent implements OnChanges {
 
       this.upcoming = Object.assign({}, this.upcoming, { rowSpan, price, end, start });
     }
-  }
+  };
 }

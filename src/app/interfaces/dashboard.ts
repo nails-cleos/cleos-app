@@ -193,7 +193,7 @@ export class TotalType implements ITotalType {
       this.totals.set(type, total);
     }
     return this;
-  }
+  };
 
   reset = (subTypes: string[] = []): ITotalType => {
     if (!subTypes.length) {
@@ -203,7 +203,7 @@ export class TotalType implements ITotalType {
       this.totals.set(it, new Total());
     });
     return this;
-  }
+  };
 
 }
 

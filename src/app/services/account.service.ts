@@ -26,23 +26,23 @@ export class AccountService {
     { params: createFilter(page, size, sort, direction) }
   );
 
-  getById = (id: string): Observable<IAccount | undefined> => this.http.get<IAccount>(toUrl(this.urlV1, id))
+  getById = (id: string): Observable<IAccount | undefined> => this.http.get<IAccount>(toUrl(this.urlV1, id));
 
   findTransaction = (
     id: string,
     transactionId: string
   ): Observable<ITransaction | undefined> => this.http.get<ITransaction>(
-    toUrl(this.urlV1, id, 'transactions', transactionId))
+    toUrl(this.urlV1, id, 'transactions', transactionId));
 
   findByCustomer = (
     customerId: string
-  ): Observable<IAccount | undefined> => this.http.get<IAccount>(toUrl(this.urlV1, 'customers', customerId))
+  ): Observable<IAccount | undefined> => this.http.get<IAccount>(toUrl(this.urlV1, 'customers', customerId));
 
   add = (transaction: ITransaction, accountId: string): Observable<IAccount> => this.http.post<IAccount>(
-    toUrl(this.urlV1, accountId, 'transactions'), transaction)
+    toUrl(this.urlV1, accountId, 'transactions'), transaction);
 
-  delete = (id: string): Observable<IAccount> => this.http.delete<IAccount>(toUrl(this.urlV1, id))
+  delete = (id: string): Observable<IAccount> => this.http.delete<IAccount>(toUrl(this.urlV1, id));
 
   update = (transaction: ITransaction): Observable<IAccount> => this.http.patch<IAccount>(
-    toUrl(this.urlV1, transaction.accountId!), transaction)
+    toUrl(this.urlV1, transaction.accountId!), transaction);
 }
