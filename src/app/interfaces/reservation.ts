@@ -267,7 +267,7 @@ export class DataEvent implements IDataEvent {
   };
 
   sameDayEvent = (recurring: any, event: CalendarEvent): boolean => !this.calendarEvents
-    .find(ce => ce.id === recurring.path && isSameDay(event.start, ce.start))
+    .find(ce => ce.id === recurring.path && isSameDay(event.start, ce.start));
 
   addClass(currentEvent: CalendarEvent, cssClass: string): void {
     this.calendarEvents = this.calendarEvents.map(event => ({

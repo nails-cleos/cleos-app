@@ -551,7 +551,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.errors.schedule = [];
     this.errors.overlapping = false;
     if (!this.eventGroup.invalid) {
-      for (const [_key, dataEvent] of this.dataEvents) {
+      for (const dataEvent of this.dataEvents.values()) {
         let eventFound = false;
 
         for (const eventData of this.events.value) {
@@ -1112,7 +1112,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     selectedEvent?.setValue(event);
     eventData.addEvent(event);
-  }
+  };
 
   private filterCustomer = (name: string): IUser[] | undefined => this.customers?.filter(
     option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
@@ -1347,7 +1347,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
                   this.segmentClick(date, 'EDITING', data.date, this.reservation.id);
                 }
               } else if ((this.extras?.date || start && this.myStepper.selectedIndex === bookOrder)) {
-                console.log("create again")
                 this.segmentClick(dateValue, 'CREATED', data.date);
               }
             }, 50);

@@ -35,15 +35,7 @@ import {
   subPeriod
 } from '../../util/dates';
 import { IRoom, IRoomAll } from '../../interfaces/room';
-import {
-  allDayEvent,
-  calendarEvent,
-  createBullet,
-  fillNotAvailable,
-  getFrequency,
-  Meta,
-  newEvent
-} from '../../util/event';
+import { allDayEvent, calendarEvent, createBullet, fillNotAvailable, getFrequency, Meta } from '../../util/event';
 import { Router } from '@angular/router';
 import { CalendarEvent, CalendarEventTimesChangedEvent, CalendarModule } from 'angular-calendar';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
