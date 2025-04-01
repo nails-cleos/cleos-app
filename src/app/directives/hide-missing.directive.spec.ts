@@ -1,5 +1,5 @@
 import { HideMissingDirective } from './hide-missing.directive';
-import { ElementRef } from "@angular/core";
+import { ElementRef } from '@angular/core';
 
 describe('HideMissingDirective', () => {
   it('should create an instance', () => {

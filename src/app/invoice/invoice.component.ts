@@ -23,8 +23,8 @@ import { requireMatch } from '../util/validators';
 import { MonthPeriodAdapter } from '../util/adapter/month-period-adapter.service';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
-import { SharedModule } from "../shared/shared.module";
-import { TimeDetailPipe } from "../pipes/time-detail.pipe";
+import { SharedModule } from '../shared/shared.module';
+import { TimeDetailPipe } from '../pipes/time-detail.pipe';
 
 pdfMake.fonts = {
   EBGaramond: {
@@ -46,7 +46,6 @@ pdfMake.fonts = {
       useClass: MonthPeriodAdapter,
     },
   ],
-  standalone: true,
   imports: [SharedModule, TimeDetailPipe]
 })
 export class InvoiceComponent implements OnInit, OnDestroy {

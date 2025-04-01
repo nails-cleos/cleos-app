@@ -63,14 +63,13 @@ import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { INoteAll } from '../../interfaces/note';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Role } from '../../interfaces/token';
-import { SharedModule } from "../../shared/shared.module";
-import { RoomNamePipe } from "../../pipes/room-name.pipe";
+import { SharedModule } from '../../shared/shared.module';
+import { RoomNamePipe } from '../../pipes/room-name.pipe';
 
 @Component({
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],
-  standalone: true,
   imports: [SharedModule, RoomNamePipe, CalendarModule]
 })
 export class CalendarComponent implements OnInit, OnDestroy {

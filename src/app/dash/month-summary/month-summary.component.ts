@@ -37,10 +37,10 @@ import { AuthUserService } from '../../services/auth-user.service';
 import { ICurrencyAll } from '../../interfaces/currency';
 import fs from 'file-saver';
 import { createMonthlyExpenseWorkbook, createMonthlyIncomeWorkbook, createMonthlySummary } from '../../util/report';
-import { SharedModule } from "../../shared/shared.module";
-import { FilterByPipe } from "../../pipes/filterBy.pipe";
-import { TimeDetailPipe } from "../../pipes/time-detail.pipe";
-import { TwoDigitsDirective } from "../../directives/two-digits.directive";
+import { SharedModule } from '../../shared/shared.module';
+import { FilterByPipe } from '../../pipes/filterBy.pipe';
+import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
+import { TwoDigitsDirective } from '../../directives/two-digits.directive';
 
 @Component({
   selector: 'app-month-summary',
@@ -49,7 +49,6 @@ import { TwoDigitsDirective } from "../../directives/two-digits.directive";
   providers: [
     { provide: DateAdapter, useClass: YearMonthAdapter }
   ],
-  standalone: true,
   imports: [SharedModule, FilterByPipe, TimeDetailPipe, TwoDigitsDirective]
 })
 export class MonthSummaryComponent implements OnInit, OnDestroy {

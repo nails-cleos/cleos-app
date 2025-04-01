@@ -28,8 +28,8 @@ import { DragEndEvent, DragMoveEvent } from 'angular-draggable-droppable';
 import { TranslateService } from '@ngx-translate/core';
 import { Day } from '../interfaces/reservation';
 import { getNowTimeZone } from '../util/dates';
-import { SharedModule } from "../shared/shared.module";
-import { ConvertHMPipe } from "../pipes/convert-hm.pipe";
+import { SharedModule } from '../shared/shared.module';
+import { ConvertHMPipe } from '../pipes/convert-hm.pipe';
 
 export interface IProfessional {
   id: string;
@@ -105,7 +105,6 @@ export class DayViewSchedulerCalendarUtils extends CalendarUtils {
   templateUrl: './day-view-scheduler.component.html',
   styleUrls: ['./dashboard.component.scss'],
   providers: [DayViewSchedulerCalendarUtils],
-  standalone: true,
   imports: [SharedModule, CalendarModule, ConvertHMPipe]
 })
 export class DayViewSchedulerComponent extends CalendarWeekViewComponent implements OnChanges {

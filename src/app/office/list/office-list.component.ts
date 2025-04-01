@@ -13,14 +13,13 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import * as fromActionsOffice from '../../store/office.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { detailExpandAnimation } from '../../util/animation';
-import { SharedModule } from "../../shared/shared.module";
+import { SharedModule } from '../../shared/shared.module';
 
 @Component({
   selector: 'app-office-list',
   templateUrl: './office-list.component.html',
   styleUrls: ['./office-list.component.scss'],
   animations: [detailExpandAnimation],
-  standalone: true,
   imports: [SharedModule]
 })
 export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {

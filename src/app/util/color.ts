@@ -20,7 +20,7 @@ export const lightenDarkenColor = (color: string, amount: number): string => {
   b = Math.min(Math.max(b, 0), 255);
 
   // Convert the adjusted RGB components back to a hexadecimal string
-  return "#" + (g | (b << 8) | (r << 16)).toString(16).padStart(6, '0');
+  return '#' + (g | (b << 8) | (r << 16)).toString(16).padStart(6, '0');
 };
 
 const createColor = (color: string, isDarkMode: boolean): ColorEvent => {

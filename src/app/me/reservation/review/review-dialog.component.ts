@@ -5,21 +5,21 @@ import { IReview } from '../../../interfaces/review';
 import { IReservationAll } from '../../../interfaces/reservation';
 import { IPrice } from '../../../interfaces/treatment';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { UntypedFormControl } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
+import { ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { transitionAnimation } from '../../../util/animation';
 import { Analytics, logEvent } from '@angular/fire/analytics';
-import { SharedModule } from "../../../shared/shared.module";
-import { RoomNamePipe } from "../../../pipes/room-name.pipe";
-import { RatingComponent } from "../../../shared/rating/rating.component";
+import { RoomNamePipe } from '../../../pipes/room-name.pipe';
+import { RatingComponent } from '../../../shared/rating/rating.component';
+import { DatePipe, DecimalPipe } from '@angular/common';
+import { AppMaterialModule } from '../../../util/app-material.module';
 
 @Component({
   selector: 'app-review-dialog',
   templateUrl: './review-dialog.component.html',
   animations: [transitionAnimation],
   styleUrls: ['./review-dialog.component.scss'],
-  standalone: true,
-  imports: [SharedModule, RoomNamePipe, RatingComponent]
+  imports: [RoomNamePipe, RatingComponent, AppMaterialModule, TranslatePipe, DatePipe, DecimalPipe, ReactiveFormsModule]
 })
 export class ReviewDialogComponent {
   reservation?: IReservationAll;

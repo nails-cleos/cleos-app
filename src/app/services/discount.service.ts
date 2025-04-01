@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { IDiscount, IUserDiscount } from '../interfaces/discount';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { createFilter } from '../util/service-helper';
-import { toUrl } from "../util/helper";
+import { toUrl } from '../util/helper';
 
 @Injectable()
 export class DiscountService {

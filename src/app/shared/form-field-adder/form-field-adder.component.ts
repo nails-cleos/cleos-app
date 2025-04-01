@@ -13,7 +13,6 @@ import { PaymentType } from '../../interfaces/payment';
   templateUrl: './form-field-adder.component.html',
   styleUrl: './form-field-adder.component.scss',
   animations: [detailExpandAnimation],
-  standalone: true,
   imports: [SharedModule]
 })
 export class FormFieldAdderComponent implements OnInit {

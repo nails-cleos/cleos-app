@@ -1,4 +1,13 @@
-import { AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  inject,
+  Input,
+  OnDestroy,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import { STEPPER_GLOBAL_OPTIONS, StepperSelectionEvent } from '@angular/cdk/stepper';
 import {
   FormArray,
@@ -104,14 +113,14 @@ import {
   getStepOptional
 } from '../util/step';
 import { PaymentType } from '../interfaces/payment';
-import { SharedModule } from "../shared/shared.module";
-import { RoomNamePipe } from "../pipes/room-name.pipe";
-import { SortByPipe } from "../pipes/sort-by.pipe";
-import { CurrencySymbolPipe } from "../pipes/currency-symbol.pipe";
-import { DurationTimePipe } from "../pipes/durationTime.pipe";
-import { PricePreviewComponent } from "../shared/price-preview/price-preview.component";
-import { BackButtonDirective } from "../directives/back-button.directive";
-import { GoogleMapComponent } from "../shared/google-map/google-map.component";
+import { SharedModule } from '../shared/shared.module';
+import { RoomNamePipe } from '../pipes/room-name.pipe';
+import { SortByPipe } from '../pipes/sort-by.pipe';
+import { CurrencySymbolPipe } from '../pipes/currency-symbol.pipe';
+import { DurationTimePipe } from '../pipes/durationTime.pipe';
+import { PricePreviewComponent } from '../shared/price-preview/price-preview.component';
+import { BackButtonDirective } from '../directives/back-button.directive';
+import { GoogleMapComponent } from '../shared/google-map/google-map.component';
 import PlaceResult = google.maps.places.PlaceResult;
 
 @Component({
@@ -122,11 +131,12 @@ import PlaceResult = google.maps.places.PlaceResult;
   providers: [{
     provide: STEPPER_GLOBAL_OPTIONS, useValue: { displayDefaultIndicatorType: false }
   }],
-  standalone: true,
   imports: [SharedModule, RoomNamePipe, SortByPipe, CurrencySymbolPipe, DurationTimePipe, PricePreviewComponent,
     CalendarModule, BackButtonDirective, GoogleMapComponent]
 })
 export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
+  readonly dialog = inject(MatDialog);
+
   @Input() dataEvents: Map<string, IDataEvent> = new Map();
   @ViewChild('stepper') myStepper!: MatStepper;
 
@@ -228,7 +238,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly extras: any;
   private readonly language: string;
 
-  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
+  constructor(private readonly translate: TranslateService, private store: Store<AppState>,
               private formBuilder: UntypedFormBuilder, breakpointObserver: BreakpointObserver, private router: Router,
               private route: ActivatedRoute, private cdRef: ChangeDetectorRef, private snackBar: MatSnackBar,
               private authUserService: AuthUserService) {

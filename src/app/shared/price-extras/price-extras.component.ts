@@ -3,13 +3,12 @@ import { IAdditionalAll } from '../../interfaces/additional';
 import { IExtras } from '../../interfaces/reservation';
 import { SharedModule } from '../shared.module';
 import { ICurrencyAll } from '../../interfaces/currency';
-import { CurrencySymbolPipe } from "../../pipes/currency-symbol.pipe";
+import { CurrencySymbolPipe } from '../../pipes/currency-symbol.pipe';
 
 @Component({
   selector: 'app-price-extras',
   templateUrl: './price-extras.component.html',
   styleUrl: './price-extras.component.scss',
-  standalone: true,
   imports: [SharedModule, CurrencySymbolPipe]
 })
 export class PriceExtrasComponent {

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, Optional } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, Optional } from '@angular/core';
 import { Store } from '@ngrx/store';
 import * as fromActionsLogin from '../store/auth.actions';
 import { AppState, selectAuthState } from '../store/app.states';
@@ -22,27 +22,40 @@ import { environment } from '../../environments/environment';
 import { GoogleAuthProvider } from 'firebase/auth';
 import { user } from 'rxfire/auth';
 import { fetchSignInMethodsForEmail } from '@firebase/auth';
-import { SharedModule } from "../shared/shared.module";
+import { SharedModule } from '../shared/shared.module';
 
 @Component({
   selector: 'app-auth',
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.scss'],
-  standalone: true,
   imports: [SharedModule]
 })
 export class AuthComponent implements OnInit, OnDestroy {
-  loginForm: FormGroup;
+
+  @Optional() private auth: Auth = inject(Auth);
+  private formBuilder: FormBuilder = inject(FormBuilder);
+  private store: Store<AppState> = inject(Store<AppState>);
+  private route: ActivatedRoute = inject(ActivatedRoute);
+  private snackBar: MatSnackBar = inject(MatSnackBar);
+  private cookieService: CookieService = inject(CookieService);
+  private translate: TranslateService = inject(TranslateService);
+
+  loginForm: FormGroup = this.formBuilder.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', Validators.required],
+    code: [''],
+    displayName: ['']
+  });
 
   code: string | null = null;
-  language: string;
-  showForm: boolean;
-  status: string;
-  tos: string;
-  privacyPolicy: string;
+  language: string = this.translate.currentLang;
+  showForm: boolean = false;
+  status: string = 'init';
+  tos: string = `${ environment.appServer }/${ this.language }/term-and-conditions`;
+  privacyPolicy: string = `${ environment.appServer }/${ this.language }/privacy`;
 
   private subscription?: Subscription;
-  private getState: Observable<any>;
+  private getState: Observable<any> = this.store.select(selectAuthState);
   private authSubscription?: Subscription;
 
   get onSubmit(): void {
@@ -96,23 +109,6 @@ export class AuthComponent implements OnInit, OnDestroy {
       this.status = response.join('|');
     }).catch(err => console.error('An error happen trying to fetchSignInMethodsForEmail', err));
     return;
-  }
-
-  constructor(@Optional() private auth: Auth, private formBuilder: FormBuilder, private store: Store<AppState>,
-              private route: ActivatedRoute, private snackBar: MatSnackBar,
-              private cookieService: CookieService, private translate: TranslateService) {
-    this.status = 'init';
-    this.showForm = false;
-    this.getState = this.store.select(selectAuthState);
-    this.language = this.translate.currentLang;
-    this.loginForm = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
-      code: [''],
-      displayName: ['']
-    });
-    this.tos = `${ environment.appServer }/${ this.language }/term-and-conditions`;
-    this.privacyPolicy = `${ environment.appServer }/${ this.language }/privacy`;
   }
 
   ngOnInit(): void {

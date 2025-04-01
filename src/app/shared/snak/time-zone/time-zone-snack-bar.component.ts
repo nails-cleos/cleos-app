@@ -2,7 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material/snack-bar';
 import { localeTimeZoneDate } from '../../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from "../../shared.module";
+import { SharedModule } from '../../shared.module';
 
 interface ITimeZone {
   date: Date;
@@ -13,7 +13,6 @@ interface ITimeZone {
   selector: 'app-time-zone-snack-bar',
   templateUrl: './time-zone-snack-bar.component.html',
   styleUrls: ['./time-zone-snack-bar.component.scss'],
-  standalone: true,
   imports: [SharedModule]
 })
 export class TimeZoneSnackBarComponent {

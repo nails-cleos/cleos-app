@@ -1,14 +1,15 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { FormControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { SharedModule } from '../../../shared/shared.module';
+import { FormControl, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { API_LOCALE, getTime, getTimeNumber, newDateTimestamp } from '../../../util/dates';
+import { AppMaterialModule } from '../../../util/app-material.module';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-update-tracking-dialog',
     templateUrl: './update-tracking-dialog.component.html',
     styleUrl: './update-tracking-dialog.component.scss',
-    imports: [SharedModule]
+  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe]
 })
 export class UpdateTrackingDialogComponent implements OnInit {
   trackingForm!: UntypedFormGroup;

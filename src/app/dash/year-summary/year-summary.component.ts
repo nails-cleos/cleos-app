@@ -28,9 +28,9 @@ import { ICurrencyAll } from '../../interfaces/currency';
 import { createYearlyWorkbook } from '../../util/report';
 import fs from 'file-saver';
 import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from "../../shared/shared.module";
-import { YearComponent } from "./year/year.component";
-import { TotalSummaryComponent } from "../total-summary/total-summary.component";
+import { SharedModule } from '../../shared/shared.module';
+import { YearComponent } from './year/year.component';
+import { TotalSummaryComponent } from '../total-summary/total-summary.component';
 
 @Component({
   selector: 'app-year-summary',
@@ -39,7 +39,6 @@ import { TotalSummaryComponent } from "../total-summary/total-summary.component"
   providers: [
     { provide: DateAdapter, useClass: YearAdapter }
   ],
-  standalone: true,
   imports: [SharedModule, YearComponent, TotalSummaryComponent]
 })
 export class YearSummaryComponent implements OnInit, OnDestroy {

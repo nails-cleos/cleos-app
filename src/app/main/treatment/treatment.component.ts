@@ -3,8 +3,8 @@ import { ActivatedRoute } from '@angular/router';
 import { MainContentService } from '../main-content.service';
 import { TranslateService } from '@ngx-translate/core';
 import { IMainTreatment, ISection, sections } from '../../util/MainTreatment';
-import { SharedModule } from "../../shared/shared.module";
-import { NgOptimizedImage } from "@angular/common";
+import { SharedModule } from '../../shared/shared.module';
+import { NgOptimizedImage } from '@angular/common';
 
 @Component({
     selector: 'app-treatment',

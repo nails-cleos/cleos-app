@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { SharedModule } from '../../shared/shared.module';
-import { BackButtonDirective } from "../../directives/back-button.directive";
+import { BackButtonDirective } from '../../directives/back-button.directive';
 
 export interface ISorted {
   order: number;
@@ -40,7 +40,6 @@ export class ItemSorting implements ISorting {
   selector: 'app-drag-drop-sorting',
   templateUrl: './drag-drop-sorting.component.html',
   styleUrls: ['./drag-drop-sorting.component.scss'],
-  standalone: true,
   imports: [SharedModule, BackButtonDirective]
 })
 export class DragDropSortingComponent {

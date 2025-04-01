@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { IAdditional, IAdditionalAll } from '../interfaces/additional';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 import { createFilter } from '../util/service-helper';
-import { toUrl } from "../util/helper";
+import { toUrl } from '../util/helper';
 
 @Injectable()
 export class AdditionalService {

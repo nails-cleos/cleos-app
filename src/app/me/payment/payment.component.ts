@@ -8,14 +8,13 @@ import * as fromActionsPayment from '../../store/payment.actions';
 import { MatTableDataSource } from '@angular/material/table';
 import { Pagination } from '../../interfaces/pagination';
 import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from "../../shared/shared.module";
-import { BackButtonDirective } from "../../directives/back-button.directive";
+import { SharedModule } from '../../shared/shared.module';
+import { BackButtonDirective } from '../../directives/back-button.directive';
 
 @Component({
   selector: 'app-payment',
   templateUrl: './payment.component.html',
   styleUrls: ['./payment.component.scss'],
-  standalone: true,
   imports: [SharedModule, BackButtonDirective]
 })
 export class PaymentComponent implements OnInit, OnDestroy {

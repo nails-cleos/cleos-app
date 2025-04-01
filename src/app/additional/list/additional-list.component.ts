@@ -15,14 +15,13 @@ import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { convertDuration } from '../../util/dates';
 import { detailExpandAnimation } from '../../util/animation';
 import { executeDialogNoWidth } from '../../util/helper';
-import { SharedModule } from "../../shared/shared.module";
+import { SharedModule } from '../../shared/shared.module';
 
 @Component({
   selector: 'app-additional-list',
   templateUrl: './additional-list.component.html',
   styleUrls: ['./additional-list.component.scss'],
   animations: [detailExpandAnimation],
-  standalone: true,
   imports: [SharedModule]
 })
 export class AdditionalListComponent implements OnInit, AfterViewInit, OnDestroy {

@@ -8,14 +8,13 @@ import * as fromActionsAccount from '../../../store/account.actions';
 import { TranslateService } from '@ngx-translate/core';
 import * as fromActionsPayment from '../../../store/payment.actions';
 import { newDateTimestamp } from '../../../util/dates';
-import { SharedModule } from "../../../shared/shared.module";
-import { BackButtonDirective } from "../../../directives/back-button.directive";
+import { SharedModule } from '../../../shared/shared.module';
+import { BackButtonDirective } from '../../../directives/back-button.directive';
 
 @Component({
   selector: 'app-transaction-detail',
   templateUrl: './transaction-detail.component.html',
   styleUrls: ['./transaction-detail.component.scss'],
-  standalone: true,
   imports: [SharedModule, BackButtonDirective]
 })
 export class TransactionDetailComponent implements OnInit, OnDestroy {

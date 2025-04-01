@@ -6,16 +6,15 @@ import { Store } from '@ngrx/store';
 import { AppState, selectTreatmentState } from '../../store/app.states';
 import * as fromActionsTreatment from '../../store/treatment.actions';
 import { IColorAll } from '../../interfaces/color';
-import { SharedModule } from "../../shared/shared.module";
-import { DurationTimePipe } from "../../pipes/durationTime.pipe";
-import { TreatmentTableComponent } from "../table/treatment-table.component";
-import { BackButtonDirective } from "../../directives/back-button.directive";
+import { SharedModule } from '../../shared/shared.module';
+import { DurationTimePipe } from '../../pipes/durationTime.pipe';
+import { TreatmentTableComponent } from '../table/treatment-table.component';
+import { BackButtonDirective } from '../../directives/back-button.directive';
 
 @Component({
   selector: 'app-treatment-view',
   templateUrl: './treatment-view.component.html',
   styleUrls: ['./treatment-view.component.scss'],
-  standalone: true,
   imports: [SharedModule, DurationTimePipe, TreatmentTableComponent, BackButtonDirective]
 })
 export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy {

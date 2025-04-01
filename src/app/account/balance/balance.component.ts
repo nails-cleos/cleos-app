@@ -1,12 +1,11 @@
 import { Component, Input } from '@angular/core';
 import { IAccountAll } from '../../interfaces/account';
-import { SharedModule } from "../../shared/shared.module";
+import { SharedModule } from '../../shared/shared.module';
 
 @Component({
   selector: 'app-balance',
   templateUrl: './balance.component.html',
   styleUrls: ['./balance.component.scss'],
-  standalone: true,
   imports: [SharedModule]
 })
 export class BalanceComponent {

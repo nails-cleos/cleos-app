@@ -20,14 +20,13 @@ import { map, startWith } from 'rxjs/operators';
 import { fieldChange } from '../util/validators';
 import { areEquals } from '../util/helper';
 import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from "../shared/shared.module";
-import { BackButtonDirective } from "../directives/back-button.directive";
+import { SharedModule } from '../shared/shared.module';
+import { BackButtonDirective } from '../directives/back-button.directive';
 
 @Component({
   selector: 'app-treatment',
   templateUrl: './treatment.component.html',
   styleUrls: ['./treatment.component.scss'],
-  standalone: true,
   imports: [SharedModule, BackButtonDirective]
 })
 export class TreatmentComponent implements OnInit, OnDestroy {

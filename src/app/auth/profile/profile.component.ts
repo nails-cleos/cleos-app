@@ -14,18 +14,17 @@ import { Role } from '../../interfaces/token';
 import { TranslateService } from '@ngx-translate/core';
 import { NgxColorsModule, validColorValidator } from 'ngx-colors';
 import { resizeImage } from '../../util/file';
-import { SharedModule } from "../../shared/shared.module";
+import { SharedModule } from '../../shared/shared.module';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
-import { GoogleMapComponent } from "../../shared/google-map/google-map.component";
-import { BackButtonDirective } from "../../directives/back-button.directive";
-import { NgxMaterialIntlTelInputComponent, TextLabels } from "ngx-material-intl-tel-input";
+import { GoogleMapComponent } from '../../shared/google-map/google-map.component';
+import { BackButtonDirective } from '../../directives/back-button.directive';
+import { NgxMaterialIntlTelInputComponent, TextLabels } from 'ngx-material-intl-tel-input';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
-  standalone: true,
   imports: [SharedModule, NgxMaterialIntlTelInputComponent, NgxColorsModule, GoogleMapComponent, BackButtonDirective]
 })
 export class ProfileComponent implements OnInit, OnDestroy {

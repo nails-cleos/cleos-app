@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ICatalogue, ICatalogueAll } from '../interfaces/catalogue';
 import { dataURLToBlob } from '../util/file';
-import { toUrl } from "../util/helper";
+import { toUrl } from '../util/helper';
 
 @Injectable()
 export class CatalogueService {

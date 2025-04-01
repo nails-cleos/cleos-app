@@ -3,7 +3,7 @@ import { AuthUserService } from '../services/auth-user.service';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from "../shared/shared.module";
+import { SharedModule } from '../shared/shared.module';
 
 enum ShortcutEnum {
   dashboard,
@@ -15,7 +15,6 @@ enum ShortcutEnum {
   selector: 'app-shortcut',
   templateUrl: './shortcut.component.html',
   styleUrls: ['./shortcut.component.scss'],
-  standalone: true,
   imports: [SharedModule]
 })
 export class ShortcutComponent implements OnDestroy {

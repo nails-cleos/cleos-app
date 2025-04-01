@@ -3,15 +3,15 @@ import { IPrice } from '../../../interfaces/treatment';
 import { ICurrencyAll } from '../../../interfaces/currency';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { PENALTY } from '../../../interfaces/payment';
-import { SharedModule } from "../../shared.module";
-import { PriceComponent } from "../../price/price.component";
+import { PriceComponent } from '../../price/price.component';
+import { TranslatePipe } from '@ngx-translate/core';
+import { AppMaterialModule } from '../../../util/app-material.module';
 
 @Component({
   selector: 'app-customer-edit-reservation-dialog',
   templateUrl: './customer-edit-dialog.component.html',
   styleUrls: ['./customer-edit-dialog.component.scss'],
-  standalone: true,
-  imports: [SharedModule, PriceComponent]
+  imports: [PriceComponent, AppMaterialModule, TranslatePipe]
 })
 export class CustomerEditDialogComponent {
   price: IPrice;

@@ -32,8 +32,8 @@ import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatBadgeModule } from '@angular/material/badge';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { MatProgressBar } from "@angular/material/progress-bar";
-import { MatStep, MatStepLabel, MatStepper } from "@angular/material/stepper";
+import { MatProgressBar } from '@angular/material/progress-bar';
+import { MatStep, MatStepLabel, MatStepper } from '@angular/material/stepper';
 
 const materialModules = [
   NgxMaterialTimepickerModule,

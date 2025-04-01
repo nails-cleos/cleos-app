@@ -2,7 +2,7 @@ import { AnimateDirective } from './animate.directive';
 import { ElementRef } from '@angular/core';
 import { AnimationBuilder } from '@angular/animations';
 import { Router } from '@angular/router';
-import { TestBed } from "@angular/core/testing";
+import { TestBed } from '@angular/core/testing';
 
 const mockRouter = {
   getCurrentNavigation: () => ({ extras: { state: { key: 'value' } } })

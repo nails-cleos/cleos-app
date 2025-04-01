@@ -1,17 +1,24 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators
+} from '@angular/forms';
 import { IUser } from '../interfaces/user';
 import { Observable } from 'rxjs';
 import { requireMatch } from '../util/validators';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { map, startWith } from 'rxjs/operators';
-import { SharedModule } from "../shared/shared.module";
+import { AsyncPipe } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
+import { AppMaterialModule } from '../util/app-material.module';
 
 @Component({
   selector: 'app-select-professional-dialog-component',
   templateUrl: './select-professional-dialog.component.html',
-  standalone: true,
-  imports: [SharedModule]
+  imports: [AppMaterialModule, AsyncPipe, TranslatePipe, ReactiveFormsModule]
 })
 export class SelectProfessionalDialogComponent implements OnInit {
   professionalForm!: UntypedFormGroup;

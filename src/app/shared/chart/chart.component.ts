@@ -4,14 +4,13 @@ import { IChart } from '../../interfaces/dashboard';
 import { ICurrency } from '../../interfaces/currency';
 import { Subscription } from 'rxjs';
 import { AuthUserService } from '../../services/auth-user.service';
-import { SharedModule } from "../shared.module";
-import { ErrorComponent } from "../error/error.component";
+import { SharedModule } from '../shared.module';
+import { ErrorComponent } from '../error/error.component';
 
 @Component({
   selector: 'app-chart',
   templateUrl: './chart.component.html',
   styleUrls: ['./chart.component.scss'],
-  standalone: true,
   imports: [SharedModule, ErrorComponent]
 })
 export class ChartComponent implements OnChanges, OnDestroy {

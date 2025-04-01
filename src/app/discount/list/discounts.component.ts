@@ -14,13 +14,13 @@ import { MatTableDataSource } from '@angular/material/table';
 import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
 import { DiscountType, IDiscount, IDiscountAll } from '../../interfaces/discount';
 import { Observable, Subscription } from 'rxjs';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectDiscountState, selectUserState } from '../../store/app.states';
 import * as fromActionsDiscount from '../../store/discount.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
-import { UntypedFormControl } from '@angular/forms';
+import { ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import * as fromActionsUser from '../../store/user.actions';
 import { IUser, IUserAll } from '../../interfaces/user';
@@ -28,14 +28,15 @@ import { map, startWith } from 'rxjs/operators';
 import { executeDialog } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
-import { SharedModule } from "../../shared/shared.module";
+import { SharedModule } from '../../shared/shared.module';
+import { AppMaterialModule } from '../../util/app-material.module';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-discounts',
   templateUrl: './discounts.component.html',
   styleUrls: ['./discounts.component.scss'],
   animations: [detailExpandAnimation],
-  standalone: true,
   imports: [SharedModule]
 })
 export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -167,8 +168,7 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
   selector: 'app-discount-dialog-component',
   templateUrl: './discount-dialog.component.html',
   styleUrls: ['./discount-dialog.component.scss'],
-  standalone: true,
-  imports: [SharedModule]
+  imports: [AppMaterialModule, TranslatePipe, ReactiveFormsModule, AsyncPipe]
 })
 export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('customerInput') customerInput!: ElementRef<HTMLInputElement>;

@@ -1,6 +1,6 @@
 import { All, NotificationActionTypes } from '../notification.actions';
 import { INotification, INotificationDTO } from '../../interfaces/notification';
-import { Pagination } from "../../interfaces/pagination";
+import { Pagination } from '../../interfaces/pagination';
 
 export interface State {
   data: INotificationDTO | null;

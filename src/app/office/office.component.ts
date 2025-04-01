@@ -18,14 +18,13 @@ import * as fromActionsOffice from '../store/office.actions';
 import { Role } from '../interfaces/token';
 import { map, startWith } from 'rxjs/operators';
 import { IOffice, Office } from '../interfaces/office';
-import { SharedModule } from "../shared/shared.module";
-import { BackButtonDirective } from "../directives/back-button.directive";
+import { SharedModule } from '../shared/shared.module';
+import { BackButtonDirective } from '../directives/back-button.directive';
 
 @Component({
   selector: 'app-office',
   templateUrl: './office.component.html',
   styleUrls: ['./office.component.scss'],
-  standalone: true,
   imports: [SharedModule, BackButtonDirective]
 })
 export class OfficeComponent implements OnInit, OnDestroy {

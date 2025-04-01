@@ -8,7 +8,7 @@ import { createFilter } from '../util/service-helper';
 @Injectable()
 export class ExpenseService {
 
-  private urlV1 = `v1/rooms/{roomId}/expenses`;
+  private urlV1 = 'v1/rooms/{roomId}/expenses';
 
   private http: HttpClient = inject(HttpClient);
 

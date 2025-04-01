@@ -20,14 +20,13 @@ import { formatDuration } from '../util/dates';
 import { areEquals } from '../util/helper';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from "../shared/shared.module";
-import { BackButtonDirective } from "../directives/back-button.directive";
+import { SharedModule } from '../shared/shared.module';
+import { BackButtonDirective } from '../directives/back-button.directive';
 
 @Component({
   selector: 'app-additional',
   templateUrl: './additional.component.html',
   styleUrls: ['./additional.component.scss'],
-  standalone: true,
   imports: [SharedModule, BackButtonDirective]
 })
 export class AdditionalComponent implements OnInit, OnDestroy {

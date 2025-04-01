@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { INote } from '../interfaces/note';
-import { toUrl } from "../util/helper";
+import { toUrl } from '../util/helper';
 
 @Injectable({
   providedIn: 'root'

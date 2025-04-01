@@ -54,7 +54,7 @@
                           @if (status === '') {
                             <mat-form-field appearance="outline">
                               <mat-label>{{ 'COMMON.USER.DISPLAY_NAME.FIELD' | translate }}</mat-label>
-                              <input matInput formControlName="displayName" required autocomplete="given-name"/>
+                              <input matInput formControlName="displayName" required autocomplete="given-name" name="displayName"/>
                               @if (loginForm.get('displayName')?.hasError('required')) {
                                 <mat-error [innerHTML]="'COMMON.USER.DISPLAY_NAME.REQUIRED' | translate"></mat-error>
                               }
@@ -64,7 +64,7 @@
                           @if (['password', 'password|google.com', 'google.com|password', ''].includes(status)) {
                             <mat-form-field appearance="outline">
                               <mat-label>{{ 'COMMON.USER.PASSWORD.FIELD' | translate }}</mat-label>
-                              <input matInput type="password" formControlName="password" required/>
+                              <input matInput type="password" formControlName="password" required name="password"/>
                               @if (loginForm.get('password')?.hasError('required')) {
                                 <mat-error [innerHTML]="'COMMON.USER.PASSWORD.REQUIRED' | translate"></mat-error>
                               } @else if (loginForm.get('password')?.hasError('week')) {

@@ -19,16 +19,15 @@ import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material
 import { openCancel, openDialog } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
-import { SharedModule } from "../../shared/shared.module";
-import { TimeDetailPipe } from "../../pipes/time-detail.pipe";
-import { ReservationIconPipe } from "../../pipes/reservation-icon.pipe";
+import { SharedModule } from '../../shared/shared.module';
+import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
+import { ReservationIconPipe } from '../../pipes/reservation-icon.pipe';
 
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
   animations: [detailExpandAnimation],
-  standalone: true,
   imports: [SharedModule, TimeDetailPipe, ReservationIconPipe]
 })
 export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {

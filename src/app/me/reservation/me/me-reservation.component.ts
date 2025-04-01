@@ -86,17 +86,17 @@ import {
   getStepName,
   getStepOptional
 } from '../../../util/step';
-import { SharedModule } from "../../../shared/shared.module";
-import { RoomNamePipe } from "../../../pipes/room-name.pipe";
-import { SortByPipe } from "../../../pipes/sort-by.pipe";
-import { CurrencySymbolPipe } from "../../../pipes/currency-symbol.pipe";
-import { DurationTimePipe } from "../../../pipes/durationTime.pipe";
-import { PriceComponent } from "../../../shared/price/price.component";
-import { PricePreviewComponent } from "../../../shared/price-preview/price-preview.component";
-import { PaymentPreviewComponent } from "../../../shared/payment-preview/payment-preview.component";
-import { GoogleMapComponent } from "../../../shared/google-map/google-map.component";
-import { BackButtonDirective } from "../../../directives/back-button.directive";
-import { NgxMaterialIntlTelInputComponent } from "ngx-material-intl-tel-input";
+import { SharedModule } from '../../../shared/shared.module';
+import { RoomNamePipe } from '../../../pipes/room-name.pipe';
+import { SortByPipe } from '../../../pipes/sort-by.pipe';
+import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
+import { DurationTimePipe } from '../../../pipes/durationTime.pipe';
+import { PriceComponent } from '../../../shared/price/price.component';
+import { PricePreviewComponent } from '../../../shared/price-preview/price-preview.component';
+import { PaymentPreviewComponent } from '../../../shared/payment-preview/payment-preview.component';
+import { GoogleMapComponent } from '../../../shared/google-map/google-map.component';
+import { BackButtonDirective } from '../../../directives/back-button.directive';
+import { NgxMaterialIntlTelInputComponent } from 'ngx-material-intl-tel-input';
 
 @Component({
   selector: 'app-me-reservation',
@@ -106,7 +106,6 @@ import { NgxMaterialIntlTelInputComponent } from "ngx-material-intl-tel-input";
   providers: [{
     provide: STEPPER_GLOBAL_OPTIONS, useValue: { displayDefaultIndicatorType: false }
   }],
-  standalone: true,
   imports: [SharedModule, RoomNamePipe, SortByPipe, CurrencySymbolPipe, DurationTimePipe, PriceComponent,
     PricePreviewComponent, PaymentPreviewComponent, NgxMaterialIntlTelInputComponent, GoogleMapComponent,
     BackButtonDirective]

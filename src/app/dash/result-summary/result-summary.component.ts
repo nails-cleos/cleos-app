@@ -1,13 +1,12 @@
 import { Component, Input } from '@angular/core';
-import { SharedModule } from "../../shared/shared.module";
-import { ICurrencyAll } from "../../interfaces/currency";
-import { TotalSummaryItemComponent } from "../total-summary-item/total-summary-item.component";
+import { SharedModule } from '../../shared/shared.module';
+import { ICurrencyAll } from '../../interfaces/currency';
+import { TotalSummaryItemComponent } from '../total-summary-item/total-summary-item.component';
 
 @Component({
   selector: 'app-result-summary',
   templateUrl: './result-summary.component.html',
   styleUrl: './result-summary.component.scss',
-  standalone: true,
   imports: [SharedModule, TotalSummaryItemComponent]
 })
 export class ResultSummaryComponent {

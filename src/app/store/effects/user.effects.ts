@@ -180,7 +180,7 @@ export class UserEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.userService.mergeUsers(payload).pipe(
       switchMap(() => {
-        const message = this.translate.instant(`USER.MERGE.SUCCESS`);
+        const message = this.translate.instant('USER.MERGE.SUCCESS');
         return of(new fromActionsUser.UserSaveSuccess({ message }));
       }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
     ))

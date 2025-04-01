@@ -1,12 +1,11 @@
 import { Component, Input } from '@angular/core';
 import { IPaymentOption } from '../../interfaces/payment';
-import { SharedModule } from "../shared.module";
+import { SharedModule } from '../shared.module';
 
 @Component({
   selector: 'app-payment-preview',
   templateUrl: './payment-preview.component.html',
   styleUrls: ['./payment-preview.component.scss'],
-  standalone: true,
   imports: [SharedModule]
 })
 export class PaymentPreviewComponent {

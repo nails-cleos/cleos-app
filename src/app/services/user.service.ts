@@ -8,7 +8,7 @@ import { PAGE_SIZE } from '../interfaces/pagination';
 import { ICustomerLastReservation } from '../interfaces/reservation';
 import { createFilter } from '../util/service-helper';
 import { dataURLToBlob } from '../util/file';
-import { toUrl } from "../util/helper";
+import { toUrl } from '../util/helper';
 
 @Injectable()
 export class UserService {
@@ -16,7 +16,7 @@ export class UserService {
   private userUrl = 'users';
   private professionalUrl = 'professionals';
   private customerUrl = 'customers';
-  private officeUrl = `offices/managers`;
+  private officeUrl = 'offices/managers';
 
   private userUrlV1 = `v1/${ this.userUrl }`;
   private professionalUrlV1 = `v1/${ this.professionalUrl }`;

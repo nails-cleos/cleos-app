@@ -13,13 +13,12 @@ import * as fromActionsDiscount from '../../../store/discount.actions';
 import { Router } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Analytics, logEvent } from '@angular/fire/analytics';
-import { SharedModule } from "../../../shared/shared.module";
+import { SharedModule } from '../../../shared/shared.module';
 
 @Component({
   selector: 'app-me-discount',
   templateUrl: './me-discount.component.html',
   styleUrls: ['./me-discount.component.scss'],
-  standalone: true,
   imports: [SharedModule]
 })
 export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {

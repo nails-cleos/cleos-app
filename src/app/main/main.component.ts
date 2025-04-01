@@ -20,14 +20,13 @@ import { MainContentService } from './main-content.service';
 import * as fromActionsMain from '../store/main.actions';
 import { TokenService } from '../services/token.service';
 import { NavigationService } from '../services/navigation.service';
-import { SharedModule } from "../shared/shared.module";
+import { SharedModule } from '../shared/shared.module';
 
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
   styleUrls: ['./main.component.scss'],
   animations: [fade, bottomTop, colorChange, colorChangeChild],
-  standalone: true,
   imports: [SharedModule, RouterOutlet, RouterLinkActive]
 })
 export class MainComponent implements OnInit, AfterViewInit, OnDestroy {

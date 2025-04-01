@@ -2,7 +2,6 @@ import { Directive, ElementRef, HostListener, inject, Input } from '@angular/cor
 
 @Directive({
   selector: '[appTwoDigits]',
-  standalone: true,
 })
 export class TwoDigitsDirective {
   @Input() allowNegatives: boolean = false;

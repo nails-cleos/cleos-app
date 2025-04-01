@@ -7,13 +7,12 @@ import { TokenService } from '../../services/token.service';
 import { getLocale, hasRoomAdmin } from '../../util/helper';
 import { NavigationService } from '../../services/navigation.service';
 import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from "../../shared/shared.module";
+import { SharedModule } from '../../shared/shared.module';
 
 @Component({
   selector: 'app-redirect',
   templateUrl: './redirect.component.html',
   styleUrls: ['./redirect.component.scss'],
-  standalone: true,
   imports: [SharedModule]
 })
 export class RedirectComponent {

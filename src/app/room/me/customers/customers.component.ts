@@ -13,7 +13,7 @@ import { detailExpandAnimation } from '../../../util/animation';
 import { TranslateService } from '@ngx-translate/core';
 import { MatSort } from '@angular/material/sort';
 import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
-import { TimeDetailPipe } from "../../../pipes/time-detail.pipe";
+import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
 
 @Component({
     selector: 'app-customers',
